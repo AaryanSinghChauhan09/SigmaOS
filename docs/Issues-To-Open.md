@@ -1,177 +1,104 @@
-# GitHub Issues to Open
+# SigmaOS Issues To Open
 
-Here are the ready-to-paste templates for the top 10 deliverables in our Month 0–3 Foundation Sprint. 
-You can copy and paste these directly into GitHub to track the work on your project board.
-
----
-
-### Issue 1: Publish ABI specification and LTS policy
-**Title:** Publish ABI specification and LTS policy
-**Description:**
-```markdown
-As part of our Month 0-3 Foundation Sprint, we need to document the formal non-POSIX syscall ABI for SigmaOS and define our LTS (Long Term Support) policy to ensure a stable `main` branch.
-
-**Acceptance Criteria:**
-- [ ] Create `docs/ABI.md` detailing the versioned syscall interface.
-- [ ] Create `docs/LTS-Policy.md` (or add to `Contributing.md`) defining the `main` branch stability guarantees.
-- [ ] Review and merge via PR.
-
-**Labels:** `documentation`, `good first issue`, `phase:0.2`
-**Assignee:** @ReleaseManager
-```
+Pre-written issue descriptions ready to file on GitHub. File these as they become active work.
 
 ---
 
-### Issue 2: Create reproducible build CI job for `main`
-**Title:** Create reproducible build CI job for `main`
-**Description:**
-```markdown
-To ensure supply chain security and stability, the `main` branch must have a CI pipeline that verifies the kernel and userland can be built reproducibly across multiple architectures (x86_64, aarch64, riscv64).
+## Phase G — Kernel Boot (File Immediately)
 
-**Acceptance Criteria:**
-- [ ] Create `.github/workflows/reproducible-build.yml`.
-- [ ] Add matrix build targets: `x86_64-unknown-none`, `aarch64`, `riscv64`.
-- [ ] Verify that building the same commit twice produces matching binary hashes.
+### [KERNEL] Implement round-robin scheduler — Phase G-01
+**Label:** `kernel`, `phase-g`, `good first issue (advanced)`
+**File:** `kernel/core/sigma_sched.cpp`
+**Body:**
+Implement a simple 64-task round-robin scheduler. The scheduler must:
+- Maintain a circular task queue
+- Context switch on timer tick (APIC, 10ms quantum)
+- Pass QEMU test: 2 tasks printing alternately without deadlock
+- Exit criteria: `make qemu` shows interleaved output from 2 tasks
 
-**Labels:** `ci`, `phase:0.2`
-**Assignee:** @ReleaseManager
-```
+### [KERNEL] Implement buddy physical allocator — Phase G-02
+**Label:** `kernel`, `phase-g`
+**File:** `kernel/core/sigma_mm.cpp`
+**Body:**
+Implement a buddy allocator for physical page frames:
+- Support orders 0–10 (4 KB – 4 MB blocks)
+- `alloc_pages(order)` and `free_pages(ptr, order)`
+- No leaks: alloc 100 pages, free all, realloc should succeed
+- Slab on top: `kmalloc(size)` / `kfree(ptr)` with 10k object test
 
----
+### [KERNEL] APIC + HPET timer initialisation — Phase G-04
+**Label:** `kernel`, `phase-g`
+**File:** `kernel/core/sigma_irq.cpp`
+**Body:**
+Initialise APIC and HPET for timer interrupts:
+- Parse ACPI MADT to locate APIC base
+- Initialise local APIC timer at 100 Hz
+- Test: timer IRQ fires in QEMU; `jiffies` counter increments
 
-### Issue 3: Add role-based Wiki pages and contribution templates
-**Title:** Add role-based Wiki pages and contribution templates
-**Description:**
-```markdown
-To lower the barrier to entry for new contributors and clarify responsibilities, we need to flesh out role-based guides and standardize our issue/PR templates.
-
-**Acceptance Criteria:**
-- [ ] Create `.github/ISSUE_TEMPLATE/` files (Bug Report, Feature Request, Security Report).
-- [ ] Create `.github/PULL_REQUEST_TEMPLATE.md`.
-- [ ] Add role-based guides in `docs/wiki/`: Developer, Maintainer, Security Researcher, Hardware Vendor.
-
-**Labels:** `documentation`, `good first issue`, `phase:0.2`
-**Assignee:** @ReleaseManager
-```
-
----
-
-### Issue 4: Implement `sigma-sh` minimal shell and 3 core utilities
-**Title:** Implement `sigma-sh` minimal shell and 3 core utilities
-**Description:**
-```markdown
-We are absorbing the functionality of Bash/Zsh and GNU Coreutils to make SigmaOS self-sufficient. This issue tracks the initial MVP in Rust/Zig.
-
-**Acceptance Criteria:**
-- [ ] Finalize `sigma-sh` v0.2 REPL and scripting engine.
-- [ ] Implement `ls` equivalent in Rust (in `sigma-core-utils`).
-- [ ] Implement `cat` equivalent in Rust.
-- [ ] Implement `cp` equivalent in Rust.
-- [ ] Ensure all compile under `cargo build` without external dependencies.
-
-**Labels:** `component:sigma-sh`, `component:coreutils`, `absorption`, `phase:0.2`
-**Assignee:** @PackagingLead
-```
+### [BOOT] Implement sigma-boot.efi UEFI loader — Phase G-07
+**Label:** `boot`, `phase-g`, `critical`
+**File:** `sigma-boot/sigma_boot.c`
+**Body:**
+Implement a minimal UEFI bootloader:
+- Load kernel ELF from ESP
+- Build memory map for physical MM init
+- Set up identity-mapped page tables (first 4 GB)
+- Jump to `sigma_kernel_main()`
+- Test: `qemu-system-x86_64 -cdrom SigmaOS.iso` boots to kernel
 
 ---
 
-### Issue 5: Define Security Model and CVE reporting workflow
-**Title:** Define Security Model and CVE reporting workflow
-**Description:**
-```markdown
-SigmaOS needs a formalized security posture. While the Security Model Wiki page outlines the architecture, we need a formal CVE reporting process and a finalized `SECURITY.md` file in the repository root.
+## Phase G — Drivers
 
-**Acceptance Criteria:**
-- [ ] Create `.github/SECURITY.md` outlining the responsible disclosure policy.
-- [ ] Finalize the CVE reporting workflow (e.g., using GitHub Security Advisories).
-- [ ] Link `SECURITY.md` from the README and Wiki.
+### [DRIVER] VESA/GOP framebuffer SDF driver — Phase G-06
+**Label:** `driver`, `display`, `phase-g`
+**File:** `drivers/display/sigma_vesa.cpp`
+**Body:**
+Implement framebuffer driver using UEFI GOP (Graphics Output Protocol):
+- Detect framebuffer base, width, height, pitch from GOP
+- Provide `sigma_fb_write_pixel(x, y, rgb)` API
+- Test: coloured rectangle visible in QEMU `-display gtk`
 
-**Labels:** `security`, `documentation`, `phase:0.2`
-**Assignee:** @SecurityLead
-```
-
----
-
-### Issue 6: Publish Driver API spec and sample USB driver
-**Title:** Publish Driver API spec and sample USB driver
-**Description:**
-```markdown
-To enable community driver development in the `drivers-dev` branch, we need a documented Driver API and a sample implementation (USB or simple fallback).
-
-**Acceptance Criteria:**
-- [ ] Create `docs/driver-api.md` outlining device enumeration, interrupts, and DMA.
-- [ ] Create a sample USB host controller driver skeleton in `kernel/drivers/usb/`.
-- [ ] Create QEMU tests for the driver.
-
-**Labels:** `component:drivers`, `phase:0.2`
-**Assignee:** @DriversLead
-```
+### [DRIVER] Intel iwlwifi Wi-Fi 6 driver — Phase G-09
+**Label:** `driver`, `net`, `phase-g`
+**File:** `drivers/net/sigma_iwlwifi.cpp`
+**Body:**
+Implement 802.11ax driver for Intel wireless NICs:
+- Probe via PCI (vendor 0x8086, device IDs for AX200/AX201/AX210)
+- Init firmware loading via sigma-firmwared
+- Implement `scan`, `connect`, `disconnect` ops
+- Test: QEMU passthrough or physical Intel NIC associates with AP
 
 ---
 
-### Issue 7: Create `sigpkg` repo skeleton and package signing spec
-**Title:** Create `sigpkg` repo skeleton and package signing spec
-**Description:**
-```markdown
-We are building a sovereign package manager (`sigpkg`) inspired by Wolfi OS reproducible packaging. This issue tracks the completion of the package signing specification.
+## Security
 
-**Acceptance Criteria:**
-- [ ] Document the package metadata schema (JSON/TOML).
-- [ ] Document the Ed25519 + SHA-256 signing process for packages.
-- [ ] Integrate signing logic into `sigpkg` v0.2.
-
-**Labels:** `component:sigpkg`, `security`, `phase:0.2`
-**Assignee:** @PackagingLead
+### [SECURITY] Fix CryptFS key derivation — Issue #1009
+**Label:** `security`, `critical`, `phase-g`
+**File:** `kernel/security/sigma_cryptfs.cpp`
+**Body:**
+`derive_key()` currently returns 32 zero bytes. All CryptFS-encrypted volumes are trivially decryptable.
+Fix: implement Argon2id key derivation from passphrase + salt:
+```cpp
+sigma_status derive_key(const char* passphrase, const uint8_t* salt, 
+                         size_t salt_len, uint8_t* key_out, size_t key_len);
 ```
+Use `security/SovereignEntropy.cpp` for salt generation.
+Test: encrypted file not readable after password change.
 
 ---
 
-### Issue 8: Publish FS design doc for journaling and encryption
-**Title:** Publish FS design doc for journaling and encryption
-**Description:**
-```markdown
-`SovereignFS` will be the default filesystem, replacing ext4/btrfs. We need a formal design document outlining the on-disk format, journaling mechanism, and native encryption before implementation begins.
+## Networking
 
-**Acceptance Criteria:**
-- [ ] Create `docs/fs-design.md`.
-- [ ] Outline on-disk structures (superblocks, inodes, extents).
-- [ ] Define the journaling strategy (data vs. metadata journaling).
-- [ ] Define the encryption strategy (file-based or block-based).
-
-**Labels:** `component:fs`, `documentation`, `phase:0.2`
-**Assignee:** @FSLead
-```
+### [NET] Complete TCP RFC 793 state machine — Issue #1012
+**Label:** `net`, `phase-g`
+**File:** `kernel/net/sigma_socket.cpp`
+**Body:**
+Current TCP implementation is missing the full state machine.
+Implement: SYN_SENT → ESTABLISHED → FIN_WAIT → CLOSED
+Required for all application networking.
+Test: `curl --unix-socket` to `sigmad-netd` returns HTTP 200.
 
 ---
 
-### Issue 9: Implement NVMe driver and add QEMU tests
-**Title:** Implement NVMe driver and add QEMU tests
-**Description:**
-```markdown
-Modern hardware relies heavily on NVMe. We need a robust, non-blocking NVMe driver implemented in Rust for the `drivers-dev` branch.
-
-**Acceptance Criteria:**
-- [ ] Implement NVMe PCIe enumeration and queue pairs.
-- [ ] Implement block read/write operations.
-- [ ] Add QEMU automation to test NVMe read/write workflows in CI.
-
-**Labels:** `component:drivers`, `hardware`, `phase:0.3`
-**Assignee:** @DriversLead
-```
-
----
-
-### Issue 10: Define `sigma-core` meta-manifest and alpha desktop image
-**Title:** Define `sigma-core` meta-manifest and alpha desktop image
-**Description:**
-```markdown
-To move towards our first release profiles, we need to define the exact package compositions of our target environments.
-
-**Acceptance Criteria:**
-- [ ] Create `config/profiles/sigma-core.toml` listing all base CLI packages.
-- [ ] Create `config/profiles/sigma-desktop.toml` extending core with Zenith compositor.
-- [ ] Set up a build pipeline to output a bootable ISO for `sigma-desktop-alpha`.
-
-**Labels:** `release`, `component:desktop`, `phase:0.3`
-**Assignee:** @ReleaseManager
-```
+*File these at: https://github.com/AaryanSinghChauhan09/SigmaOS/issues/new*

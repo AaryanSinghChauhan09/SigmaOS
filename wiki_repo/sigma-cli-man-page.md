@@ -2,43 +2,133 @@
 
 ## NAME
 
-`sigma-cli` - The sovereign command-line interface for SigmaOS workspace management, package handling, and lattice shard diagnostics.
+`sigma` — SigmaOS unified OS development CLI
 
 ## SYNOPSIS
 
-`sigma-cli [COMMAND] [OPTIONS]`
+```
+sigma [--json] [--verbose] <command> [command-options]
+sigma --version
+sigma --help
+sigma help <command>
+```
 
 ## DESCRIPTION
 
-`sigma-cli` provides direct access to the SigmaOS microkernel features, bypassing legacy shell utilities. It allows users to manage packages natively via `sigma-pkg`, query hardware shards, and monitor security contexts in real time.
+`sigma` is the single-binary orchestrator for the full SigmaOS development lifecycle. It replaces `cmake`, `cargo`, `qemu`, `gdb`, and package manager invocations with a single consistent interface. Compiled from `tools/sigma-cli.rs` (Rust, zero third-party crates).
+
+## GLOBAL OPTIONS
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Emit machine-readable JSON on stdout |
+| `--verbose` / `-v` | Extra diagnostic output |
+| `--version` / `-V` | Print version and exit |
+| `--help` / `-h` | Show help and exit |
+
+Any subcommand accepts `--help` for per-command detail:
+```
+sigma build --help
+sigma pkg --help
+```
 
 ## COMMANDS
 
-### `pkg` (Package Management)
+### Development
 
-*`sigma-cli pkg update` : Synchronizes the local delta indices with the package nexus.* `sigma-cli pkg install [SHARD_NAME]` : Installs a cryptographically attested shard.
+| Command | Description |
+|---------|-------------|
+| `init <name>` | Scaffold a new kernel module / driver / app |
+| `build [--target] [--release] [--profile]` | Unified CMake/Cargo/Ninja build |
+| `run [--headless] [--serial] [--debug]` | Boot image in QEMU |
+| `debug` | Attach gdb-server on `:1234` |
+| `test [--bench]` | Unit + QEMU integration tests |
+| `bench [suite] [--save]` | Performance benchmarks (8 suites) |
+| `lint` | Clippy + clang-tidy + kernel safety rules |
+| `fmt [--check]` | Multi-language formatter |
+| `trace [--pid] [--filter]` | Live syscall event streaming |
+| `image [--format] [--minimal]` | Reproducible bootable image |
 
-- `sigma-cli pkg rollback` : Reverts the system to the last verified clean state.
+### Packaging & SDK
 
-### `shard` (Kernel Module Management)
+| Command | Description |
+|---------|-------------|
+| `pkg add\|remove\|list\|search\|audit` | Sigma Store package manager |
+| `sdk <version>` | Cross-compiler toolchain manager |
+| `key [--algo] [--export]` | Identity & signing key management |
+| `update [--channel] [--dry-run]` | A/B OTA partition swap |
+| `profile list\|show\|set` | Build profiles (desktop/cloud/embedded/gaming) |
 
-*`sigma-cli shard list` : Lists all currently active microkernel shards.* `sigma-cli shard load [PATH]` : Loads a compiled `.shard` dynamically into the kernel lattice.
+### Infrastructure
 
-### `diag` (Diagnostics & Telemetry)
+| Command | Description |
+|---------|-------------|
+| `node enroll\|status\|upgrade\|logs` | Fleet/cluster node control |
+| `config validate\|show\|set` | sigma.toml management |
+| `doctor [--fix]` | Toolchain health check (detects real versions) |
 
-*`sigma-cli diag health` : Outputs real-time telemetry from the `SovereignHealthMonitor`.* `sigma-cli diag pci` : Probes the silicon bus for hardware devices via `SovereignHAL`.
+### Meta
+
+| Command | Description |
+|---------|-------------|
+| `version` | Print version, build ID, Rust toolchain |
+| `completions bash\|zsh\|fish\|pwsh` | Generate shell completions |
+| `help [command]` | Detailed per-command help |
+
+## PLUGIN SYSTEM
+
+Any binary named `sigma-<name>` on `PATH` is auto-discovered:
+
+```bash
+cp sigma-profiler /usr/local/bin/
+sigma profiler start   # delegates to sigma-profiler start
+```
 
 ## EXAMPLES
 
 ```bash
+# Scaffold and build a driver
+sigma init my-nvme-driver
+sigma build --target aarch64 --release
 
-# Update the package lattice and install the VR compositor
+# Run in QEMU headless
+sigma run --headless --serial
 
-sigma-cli pkg update
-sigma-cli pkg install vr-studio
+# Install a package
+sigma pkg add sigma-vr-studio
 
-# View active system shards
+# Check toolchain health
+sigma doctor --fix
 
-sigma-cli shard list
+# Run benchmarks and save results
+sigma bench all --save
 
+# Set a build profile
+sigma profile set cloud
+sigma build --profile cloud
+
+# Generate completions
+sigma completions bash >> ~/.bashrc
+
+# JSON output for CI
+sigma doctor --json | jq '.[] | select(.status=="missing")'
 ```
+
+## ENVIRONMENT VARIABLES
+
+| Variable | Description |
+|----------|-------------|
+| `SIGMA_BUILD_ID` | Injected at build time, shown by `version` |
+| `SIGMA_RUST_VERSION` | Rust toolchain version shown by `version` |
+
+## SEE ALSO
+
+`sigma-sh(1)`, `sigma-pkg(1)`, `sigma-debug(1)`, `sigma-monitor(1)`, `sigma-log(1)`
+
+## VERSION
+
+sigma 15.0 (Zenith)
+
+## LICENSE
+
+GPL-2.0-or-later

@@ -1,214 +1,143 @@
-# SigmaOS — Silicon Sovereignty
+# SigmaOS Wiki
 
-> A zero-dependency, browser-first operating system that boots straight to Chromium in under 3 seconds, runs the browser as the OS shell, and gives web apps direct access to raw Unix primitives.
+> **v15.0.0 Zenith — Stable** · One branch (`main`) · PQC-signed · Multi-format
 
 ---
 
 ## What is SigmaOS?
 
-Most operating systems bolt a browser on top of a traditional desktop. SigmaOS flips this: **the browser IS the desktop**. The entire window manager, workspace system, and application launcher live inside Chromium. Native system calls — `spawn`, `pipe`, `mmap`, `/dev` files — are exposed to web apps through a capability-gated native messaging bridge.
+SigmaOS is a sovereign, multi-format operating system built from a single unified codebase.
+It ships in **50+ distribution formats** — from a bare-metal RTOS to a browser-tab WASM app —
+all signed with post-quantum cryptography (Kyber-1024 + Dilithium-5).
 
-Under the hood, a custom freestanding microkernel handles scheduling, memory management, and process isolation with no glibc dependency. The same kernel binary runs on x86_64, ARM64, and RISC-V.
-
-```
-Traditional OS:                    SigmaOS:
-  Kernel                             Kernel (freestanding)
-    └── Desktop environment            └── Go daemons (sigmad-*)
-          └── Browser (one app)              └── Chromium (the shell)
-                └── Web apps                        └── PWAs (the apps)
-```
+> *The only OS that boots on bare metal, runs in a browser, deploys as a cloud container,
+> and installs as a mobile APK — all from one codebase.*
 
 ---
 
-## Why SigmaOS Exists — The Problem It Solves
+## 🚀 Start Here
 
-| Problem with Today's OSes | SigmaOS Answer |
+| I want to… | Go to |
 |---|---|
-| Web apps are second-class citizens — no access to real system primitives | `navigator.sigmaos.*` exposes `spawn`, `pipe`, `mmap`, `/dev` to any PWA |
-| Browsers are slow, memory-heavy, add 10+ sec to boot | SigmaOS boots *to* Chromium in under 3 sec — no desktop stack loading first |
-| Every app can see everything — no per-app filesystem restriction | `sigma_pledge` + `sigma_unveil` lock each process to exactly what it declared |
-| Crypto is bolt-on, hard to use correctly | Post-quantum (Kyber-1024 + Dilithium3) baked into TLS, package signing, and attestation |
-| Same OS image for laptops, servers, IoT — bloated everywhere | 8 purpose-built profiles from one shared kernel codebase |
+| **Download SigmaOS** | [DOWNLOAD.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md) |
+| **Run it in QEMU right now** | [Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/QUICKSTART.md) |
+| **Understand the architecture** | [Architecture Overview](Architecture-Overview) |
+| **Use the AI CLI agent** | [sigma-agent](sigma-agent) |
+| **Automate workflows** | [sigma-agent-workflow](sigma-agent-workflow) |
+| **Migrate from Linux** | [Migration Guide](Migration-Guide) |
+| **Build an app** | [SDK Guide](SDK-Guide) · [Your First App](Your-First-App) |
+| **Add a driver** | [Driver Development](Driver-Development) |
+| **Contribute code** | [Community Governance](Community-Governance) · [Developer Guide](Developer_Guide) |
+| **Compare to other distros** | [SigmaOS vs Linux](SigmaOS-vs-Linux) |
+| **Understand the roadmap** | [ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md) |
 
 ---
 
-## Quick Architecture Sketch
+## 🤖 AI Agent (sigma-agent)
 
-```
-┌────────────────────────────────────────────────────────────────┐
-│  USER: PWAs, Zenith Desktop, Extensions, AI Kits               │
-├────────────────────────────────────────────────────────────────┤
-│  BROWSER: Custom Chromium + navigator.sigmaos.* APIs           │
-├────────────────────────────────────────────────────────────────┤
-│  DAEMONS: Go services (process, clipboard, window, AI, health)  │
-├────────────────────────────────────────────────────────────────┤
-│  KERNEL: Freestanding microkernel — no glibc, no hosted stdlib  │
-│    ├── Scheduler (MLFQ + SCHED_SOVEREIGN real-time class)       │
-│    ├── Memory (4-level paging, ASLR 42-bit, W^X enforcement)    │
-│    ├── Security (pledge/unveil, AVC, namespace isolation)        │
-│    ├── Network (TLS 1.3 + Kyber, DNS/DoH, DHCP, WPA3/SAE)      │
-│    └── Filesystem (VFS layer, OSTree atomic updates)            │
-└────────────────────────────────────────────────────────────────┘
-```
-
-Full diagram → [Architecture Overview](Architecture-Overview)
-
----
-
-## Deployment Profiles
-
-SigmaOS ships as **8 purpose-built profiles** compiled from a single shared codebase. Each activates different kernel features and daemon sets via CMake feature flags.
-
-| Profile | Branch | Best For | What's Different |
-|---|---|---|---|
-| **Standalone** | `release/standalone` | Developer laptops | Full Zenith DE, sigma IDE, one-command installer |
-| **Browser** | `release/browser` | Consumer / thin clients | `navigator.sigmaos.*` API, zero-install packages |
-| **Microkernel** | `release/microkernel` | Servers, research, hypervisors | No GUI overhead, minimal ring-0 binary |
-| **Mobile** | `release/mobile` | ARM64 / RISC-V tablets | Adaptive P/C-state scheduling, touch UI |
-| **RTOS** | `release/rtos` | Industrial control, robotics | `SCHED_SOVEREIGN` hard real-time EDF class |
-| **Dual-Boot** | `release/dual-boot` | Users keeping Windows/Linux | Multiboot2, GRUB chain-load, NTFS read driver |
-| **Cloud** | `release/cloud` | AWS / Azure / GCP VMs | Immutable root, A/B partition rollback, no GUI |
-| **Distributed** | `release/distributed` | Multi-node clusters | ZeroNet mesh, CRDT sync, container orchestration |
-
-→ [Branch Guide](Branch-Guide) for detailed per-profile feature lists
-
----
-
-## Key Design Decisions (and why)
-
-### Why a custom kernel?
-Linux is 30 million lines. SigmaOS needs a kernel small enough to audit completely, boot in < 3 seconds, and ship on resource-constrained embedded targets. The freestanding binary (`-nostdlib -ffreestanding`) has zero glibc symbols.
-
-### Why Go daemons?
-Go gives safe memory management, built-in goroutine concurrency, and easy Unix socket servers. Every daemon exposes an HTTP API on a Unix socket — `curl --unix-socket /run/sigma/healthd.sock /health` works from any shell.
-
-### Why the browser as shell?
-Web technologies compose better than native widgets. The entire desktop is hot-reloadable. Any developer who knows HTML/CSS/JS can build a SigmaOS app without learning a native toolkit.
-
-### Why post-quantum crypto now?
-NIST standardised Kyber-1024 (FIPS 203) and Dilithium3 (FIPS 204) in 2024. Harvest-now-decrypt-later attacks are real — data encrypted today with classical crypto can be broken retroactively once quantum computers scale. We bake PQC in from day one.
-
----
-
-## Feature Matrix (by profile)
-
-| Feature | main | standalone | browser | rtos | cloud | distributed |
-|---|---|---|---|---|---|---|
-| MLFQ Scheduler | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| SCHED_SOVEREIGN (RT EDF) | ~ | ~ | — | ✓ | — | — |
-| 4-level paging + ASLR | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| W^X enforcement | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| pledge / unveil | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Namespace isolation (bwrap) | ✓ | ✓ | ✓ | — | ✓ | ✓ |
-| Zenith Desktop | ~ | ✓ | ✓ | — | ~ | — |
-| navigator.sigmaos API | ✓ | ✓ | ✓ | — | ~ | ~ |
-| TLS 1.3 + Kyber-1024 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| DNS-over-HTTPS + DNSSEC | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| WPA3/SAE WiFi | ✓ | ✓ | ✓ | ✓ | — | — |
-| Immutable root (A/B) | — | — | — | — | ✓ | ✓ |
-| OSTree atomic updates | — | ✓ | ✓ | — | ✓ | ✓ |
-| Container orchestration | ~ | ✓ | ✓ | — | ✓ | ✓ |
-| Distributed VFS / CRDT | — | — | — | — | ~ | ✓ |
-| AI scheduler (TinyLlama) | ✓ | ✓ | ✓ | — | ✓ | ✓ |
-
-`✓` = present · `~` = partial/optional · `—` = not applicable for this profile
-
----
-
-## 60-Second Quick Start
+sigma-agent is SigmaOS's built-in AI CLI assistant — 36 modules, 22 subcommands.
 
 ```bash
-# 1. Clone
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-
-# 2. Install build dependencies (Ubuntu 22.04)
-sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go
-
-# 3. Build + boot in QEMU
-make clean && make all -j$(nproc)
-qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
-
-# 4. Check for implementation stubs
-make check-stubs
+sigma-agent                          # interactive REPL
+sigma-agent "install sigma-edit"     # one-shot NL command
+sigma-agent "set dark mode"          # any GUI action via NL
+sigma-agent doctor                   # health check
+sigma-agent daemon start             # background AI service
+sigma-agent workflow install --all   # install automation templates
+sigma-agent security scan            # security audit
 ```
 
-Full guide → [Building from Source](Building-from-Source)
+Every GUI action has a CLI equivalent. Full docs: [sigma-agent](sigma-agent) · [Workflow Automation](sigma-agent-workflow)
 
 ---
 
-## Engineering Roadmap
+## 📦 Download Formats
 
-```
-Phase 1 — Boot & HAL ............ ✓ COMPLETE
-  ✓ Freestanding x86_64 kernel (no glibc)
-  ✓ PID 1 signalfd event loop (infinite — fixed 5-iteration bug)
-  ✓ IDT with 32 ISR stubs + hardware IRQ vectors
-  ✓ Multi-arch HAL stubs (ARM64, RISC-V)
-
-Phase 2 — Security (complete)
-  ✓ sigma_pledge (per-process syscall restriction)
-  ✓ sigma_unveil (per-process filesystem restriction)
-  ✓ Namespace isolation — real unshare/pivot_root/seccomp
-  ✓ ASLR 42-bit per-region + W^X enforcement
-  ✓ AVC (O(1) MAC policy cache, SELinux-inspired)
-  ✓ Zero-trust SPIFFE workload identities
-  ✓ CryptFS — AES-256-GCM + TPM2 key unsealing (Issue #44 fixed)
-
-Phase 3 — Network (complete)
-  ✓ TLS 1.3 + X25519/Kyber-1024 hybrid key exchange
-  ✓ DNS resolver — UDP/TCP/DoH + DNSSEC + LRU cache
-  ✓ DHCP client — full RFC 2131/2132 state machine
-  ✓ WPA3/SAE — dragonfly key exchange (P-256)
-  ✓ Stateful firewall + NAT + conntrack
-
-Phase 4 — System Services (in progress)
-  ✓ sigma-healthd (CoreOS-inspired structured health)
-  ✓ sigma-watchdog (hardware WDT + daemon liveness)
-  ✓ sigma-metrics (Prometheus-compatible /metrics)
-  ✓ sigma-telemetry (opt-in, PII-scrubbed)
-  ✓ sigma-cloudsync (E2E encrypted, Argon2id)
-  □ Ext4 JBD2 ordered journaling (planned)
-  □ NVMe / e1000 production drivers (planned)
-
-Phase 5 — Desktop & Tooling (planned)
-  □ Zenith native C++ compositor (replacing JS prototype)
-  □ Sigma Shell full POSIX scripting
-  □ Graphical installer (Calamares equivalent)
-  □ Signed .spkg registry with BLAKE2b + Dilithium3
-```
-
----
-
-## Rounds of Improvements
-
-SigmaOS is developed in iterative improvement rounds, each inspired by a real production OS:
-
-| Round | Theme | Key Addition |
-|---|---|---|
-| 1 | Bug fixes | PID 1 loop, buffer overflows, CI tests |
-| 2 | OpenBSD / Gentoo | pledge, unveil, USE flags, staged rollout |
-| 3 | OSTree / Talos | atomic updates, namespace isolation, gRPC API |
-| 4–5 | HardenedBSD / SELinux | ASLR+W^X, AVC, DTrace, cgroup v2 |
-| 6–7 | seL4 / Genode | MCS scheduler, capability space, Dilithium fix |
-| 8 | dm-verity / snapd | verified boot, package assertions, SemanticFS |
-| 9 | Comprehensive | sigma-bus IPC, audio, session, driver framework |
-| 10–12 | SMP / eBPF / drivers | LAPIC, ACPI, eBPF VM, AHCI, LVM, India apps |
-| 13–14 | Compositor / roadmap | Wayland compositor, CryptFS fix, roadmap SPA |
-| 15–17 | Protocols | Full TLS 1.3, DNS, DHCP, firewall, shell, OOM |
-
-Full history → [Improvements Overview](Improvements-Overview)
-
----
-
-## Wiki Navigation
-
-| Section | Pages |
+| Category | Formats |
 |---|---|
-| **Getting Started** | [Building from Source](Building-from-Source) · [Branch Guide](Branch-Guide) · [FAQ](FAQ) |
-| **Architecture** | [Architecture Overview](Architecture-Overview) · [Kernel](Kernel) · [HAL](HAL) · [Networking](Networking) |
-| **Security** | [Security Model](Security-Model) · [Post-Quantum Crypto](Post-Quantum-Security) |
-| **Development** | [Developer Guide](Developer-Guide) · [Utilities Roadmap](Utilities-Roadmap) · [Contributor Roadmap](Contributor-Roadmap) |
-| **API** | [navigator.sigmaos API](API-Reference) · [Syscall Dispatcher](Syscall-Dispatcher) · [App Manifest](App-Manifest) |
-| **Profiles** | [Release Profiles](Release-Profiles) · [Zenith Desktop](Zenith-Desktop) · [Branch Guide](Branch-Guide) |
-| **Operations** | [System Daemons](System-Daemons) · [Improvements Overview](Improvements-Overview) · [Feature Roadmap](Feature-Roadmap) |
+| App | Native, Electron, Java, .NET, Python, AppImage/Snap/Flatpak, WASM, Mobile, ELF, sigpkg |
+| Standalone | Native ISO, AppImage, Portable EXE, WASM Bundle |
+| RTOS | Monolithic, Microkernel, Layered, Exokernel, POSIX Layer, Bare-Metal |
+| Mobile | APK, IPA, Hybrid, Cross-Platform, PWA |
+| Microkernel | Pure, Hybrid, Modular, Exokernel, POSIX Layer |
+| Dual Boot | Partition, Separate Disk, Chainload, Virtualized, Live USB |
+| Distributed | Client-Server, P2P, Cluster, Grid, SOA, Ledger, Actor |
+| Cloud | Public, Private, Hybrid, Multi, Community, IaaS, PaaS, SaaS, FaaS |
+| Browser | Desktop, Mobile, WebViews, Headless, Lite, Specialised |
+| Kernel | Monolithic, Microkernel, Hybrid, Exokernel, Nanokernel, Modular, Mono+Modular |
+
+---
+
+## 🗺️ Roadmap at a Glance
+
+| Phase | Version | Goal | Status |
+|---|---|---|---|
+| 1 | **v0.1** | Bootable ISO + sigma-sh + sigma-pkg | 🔴 Building |
+| 2 | v1.0 | Desktop + AppImage + 50 packages + SDK | ⬜ Planned Q2 2027 |
+| 3 | v2.0 | Mobile + WASM + Cloud images | ⬜ Planned Q4 2027 |
+| 4 | v3.0 | RTOS + Distributed + Formal verification | ⬜ Planned Q2 2028 |
+
+---
+
+## 🏗️ System Architecture
+
+```
+User Space     → PWAs · Zenith Desktop · sigma-ai · profession apps
+Browser Shell  → Custom Chromium + navigator.sigmaos.* API
+System Daemons → sigmad-health · sigmad-pkg · sigmad-netd · sigmad-vault
+Syscall Layer  → sigma_pledge + sigma_unveil + seccomp-BPF + AVC
+Kernel (Ring 0)→ MLFQ+EDF+CFS Scheduler · Buddy+Slab MM · PQC Security
+                 TCP/IP+TLS1.3+Kyber · VFS+SigmaFS+Ext4 · IPC · eBPF
+HAL            → x86_64 · ARM64 · RISC-V RV64GC
+Hardware       → CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI
+```
+
+---
+
+## 🧩 Ecosystem
+
+- **600+ shards** — atomic, independently testable capability modules
+- **sigma-pkg** — PQC-signed package manager with reproducible builds
+- **sigma-sdk** — multi-language SDK (Rust, JS/TS, Python, Java, .NET)
+- **Zenith Desktop** — glassmorphic DE with `navigator.sigmaos.*` web API
+- **sigma-vault** — TPM2-backed secrets store
+- **sigma-pod** — OCI-compatible container runtime
+- **sigma-ai** — on-device TinyLlama inference daemon
+
+---
+
+## 🔒 Security Pillars
+
+1. **Post-Quantum Cryptography** — Kyber-1024 KEM + Dilithium-5 signatures
+2. **sigma_pledge / sigma_unveil** — kernel-enforced capability restriction
+3. **Zero-Trust** — SPIFFE workload identities, per-syscall attestation
+4. **TPM2** — sealed key derivation, remote attestation
+5. **W^X** — no page simultaneously writable and executable
+6. **Reproducible Builds** — cryptographically verifiable binaries
+
+---
+
+## 📚 Key Documents
+
+| Document | Description |
+|---|---|
+| [Architecture Overview](Architecture-Overview) | System layers, subsystems, deployment profiles |
+| [sigma-agent](sigma-agent) | AI CLI agent — 36 modules, 22 subcommands |
+| [sigma-agent-workflow](sigma-agent-workflow) | n8n-style workflow automation |
+| [Migration Guide](Migration-Guide) | Moving from Ubuntu/Fedora/Arch to SigmaOS |
+| [SigmaOS vs Linux](SigmaOS-vs-Linux) | Feature-by-feature comparison |
+| [Linux Absorption Architecture](Linux-Absorption-Architecture) | Running Linux apps on SigmaOS |
+| [SDK Guide](SDK-Guide) | Build native SigmaOS apps |
+| [Community Governance](Community-Governance) | Contributor roles, RFC process, voting |
+| [Security Model](Security-Model) | PQC, pledge/unveil, zero-trust |
+| [Professional Tools & Apps](Professional-Tools-And-Apps) | Full app and tool ecosystem |
+| [sigpkg Specification](sigpkg-Spec) | Package format and registry |
+| [OSS Reference Map](OSS-Reference-Map) | Inspirational open-source projects |
+| [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas backlog |
+| [999 Structured Ideas (6 Pillars)](Ideas-999-Structured) | Kernel, Packages, AI, Security, UX, Community — 999 actionable tasks |
+| [Profession Profiles](PROFILES) | 1000+ role-specific shard bundles |
+
+---
+
+*SigmaOS — Sovereign by Design. One codebase. Every format.*
+*GitHub: [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)*

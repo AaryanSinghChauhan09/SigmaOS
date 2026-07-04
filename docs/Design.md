@@ -1,77 +1,52 @@
-# SigmaOS Subsystem API Specifications
+# SigmaOS Design Philosophy
 
-This document outlines the API definitions and structures for System Calls, Filesystems, and the Networking Stack in SigmaOS Zenith.
+## Core Principles
 
----
+### 1. Sovereignty First
+Every subsystem is designed to function without external dependencies. The kernel is freestanding (`-nostdlib -ffreestanding`). Package signatures use sovereign PQC algorithms. Identity uses self-sovereign DIDs. No cloud dependency for basic OS operation.
 
-## 1. System Call Interface (Syscalls)
+### 2. Security by Architecture, Not Policy
+Security is not a configuration option — it is structurally enforced:
+- W^X: hardware enforcement, not compiler convention
+- sigma_pledge / sigma_unveil: kernel-enforced capability restriction
+- PQC: baked into TLS, package signing, boot chain — not optional
 
-All userland interactions with the kernel are handled via the syscall table:
+### 3. Honest Implementation
+The codebase distinguishes clearly between what is implemented and what is stubbed. `make check-stubs` reports all unimplemented bodies. Documentation does not claim completion before implementation exists.
 
-### `sigma_write`
-```c
-sigma_u64 sigma_write(sigma_i32 fd, const void* buf, sigma_size_t count);
-```
-- **Description**: Outputs character string buffer directly to the debug terminal device or serial logger.
-- **Return**: Number of bytes written on success, negative value on failure.
+### 4. Profile Diversity, Code Unity
+8 radically different deployment targets (microkernel to distributed cloud) compiled from **one shared codebase** via CMake feature flags. No divergent forks.
 
-### `sigma_read`
-```c
-sigma_u64 sigma_read(sigma_i32 fd, void* buf, sigma_size_t count);
-```
-- **Description**: Suspends thread execution and reads characters from the PS/2 keyboard buffer.
-- **Return**: Bytes read on success, negative error code on failure.
+### 5. Shard Autonomy
+600+ atomic capability shards — each independently testable, deployable, and replaceable. A broken shard does not break the OS; it is isolated and can be reloaded.
 
 ---
 
-## 2. Virtual File System (VFS) APIs
+## Architecture Decisions
 
-All filesystem drivers must mount their interfaces onto the VFS node structures:
+### Why No glibc?
+glibc is 35 years of accumulated POSIX legacy with thousands of functions few programs use. The freestanding kernel has zero glibc symbols — smaller binary, no hidden dependencies, full control over memory layout.
 
-```c
-typedef struct vfs_node {
-    char name[128];
-    sigma_u32 inode_id;
-    sigma_size_t size;
-    sigma_u32 flags; // File, Directory, Block Device, Character Device
+### Why C++ for the Kernel?
+C++ with strict restrictions (no RTTI, no exceptions in kernel paths, no `new`/`delete` — use `kmalloc`/`kfree`). Benefits: namespaces for organisation, RAII for resource safety, templates for generic data structures without runtime overhead.
 
-    // Callback functions mapping directly to drivers
-    sigma_i32 (*read)(struct vfs_node* node, void* buf, sigma_size_t size, sigma_u64 offset);
-    sigma_i32 (*write)(struct vfs_node* node, const void* buf, sigma_size_t size, sigma_u64 offset);
-} vfs_node_t;
-```
+### Why Rust in `lib/`?
+Safe memory management for utility code paths where kernel guarantees are too strict. `lib/libsigma_safe.rs` provides string/buffer utilities. Rust kernel modules are a stretch goal for Phase H.
 
-### Ext4 Driver Operations
-- **`init_ext4`**: Reads block sector 2 to look up superblock properties and verify the `0xEF53` signature.
-- **`ext4_read`**: Resolves inode numbers and copies raw blocks from memory segments.
+### Why the Browser as Desktop Shell?
+Web technologies compose better than native widgets for rapid iteration. The entire desktop is hot-reloadable without recompiling C++. Any web developer can build a SigmaOS app without learning a native toolkit. The `navigator.sigmaos.*` bridge gives web apps real system primitives.
 
-### FAT32 Driver Operations
-- **`init_fat32`**: Analyzes the active Extended Boot Record (EBR) mapping data sectors.
-- **`fat32_read_file`**: Resolves cluster chain offsets and reads sequential cluster data.
+### Why Post-Quantum Now?
+NIST finalised FIPS 203/204 in 2024. Harvest-now-decrypt-later attacks mean data protected with classical crypto today is at future risk. Retrofitting PQC after deployment is orders of magnitude harder than designing it in from the start.
 
 ---
 
-## 3. Networking APIs
+## What SigmaOS is NOT
 
-POSIX-inspired socket communication wrappers:
+- **Not another Linux distribution** — entirely custom kernel, not a Linux fork
+- **Not a research toy** — production deployment targets (cloud, RTOS, mobile) with real hardware support roadmap
+- **Not vapourware** — each claimed feature maps to a source file; unimplemented features are explicitly marked
 
-### Socket Allocation
-```c
-sigma_i32 net_socket(sigma_i32 domain, sigma_i32 type, sigma_i32 protocol);
-```
-- **Description**: Allocates a new socket connection slot in the socket list table.
-- **Return**: Assigned file descriptor (FD) number, or `-1` if the table is full.
+---
 
-### Establish Connection
-```c
-sigma_i32 net_connect(sigma_i32 fd, sigma_u32 remote_ip, sigma_u16 remote_port);
-```
-- **Description**: Initiates the TCP 3-way handshake state machine (SYN -> SYN-ACK -> ACK) to connect the socket to a destination address.
-- **Return**: `0` on success, or `-1` if the host is unreachable.
-
-### Data Transmission
-```c
-sigma_i32 net_send(sigma_i32 fd, const void* data, sigma_size_t size);
-```
-- **Description**: Packets are routed through the virtual loopback device (`127.0.0.1`) and sent to the destination receive buffers.
-- **Return**: Number of bytes sent, or `-1` if the transmission failed.
+*See also: [Architecture-Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview) · [ARCHITECTURE.md](../ARCHITECTURE.md) · [STRATEGIC_VISION.md](../STRATEGIC_VISION.md)*

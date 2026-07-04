@@ -1,156 +1,116 @@
-# Branch Guide
+# SigmaOS Branch Guide
 
-SigmaOS uses a structured multi-branch model. Each branch targets a specific deployment profile or development area. This page maps every active branch to its purpose, audience, and key differences from `main`.
-
----
-
-## Development Branches
-
-| Branch | Purpose | Key Additions |
-|---|---|---|
-| `main` | Stable trunk — everything merged here | Full feature set |
-| `kernel-exp` | Kernel subsystem experiments | Scheduler, VMM, IPC research code |
-| `drivers-dev` | Hardware driver development | Unified Driver API, USB, NVMe, Wi-Fi shims |
-| `performance-optimized` | Latency / throughput tuning | NUMA pinning, lockless allocators, AVX-512 paths |
-| `fs-dev` | Filesystem research | Ext4 journaling, CoW layer, SovereignFS prototype |
-| `tools-dev` | Userland toolchain | `sigma-cc`, `sigma-pkg`, CLI utilities |
-| `docs-update` | Documentation sync | Architecture diagrams, API reference updates |
-| `prepare-sigmaos-launch` | Launch readiness | Contributor roadmap, gap analysis, launch checklist |
-| `gh-pages` | GitHub Pages website | Landing page, app store HTML |
+Full details of every active branch — purpose, current state, and how to work with it.
 
 ---
 
-## Release Branches
+## Branch Map
 
-Each `release/*` branch is a purpose-built variant of SigmaOS. They all share the same Ring-0 microkernel core but differ in enabled features, target hardware, and build flags.
-
-### `release/standalone`
-
-The reference desktop build. Bundles the Vite frontend, Electron shell, and full Zenith GUI into a self-contained package requiring no host setup.
-
-- **Target**: Developer workstations, laptops
-- **Boot time**: ~3 seconds to Chromium shell
-- **Key features**: Full Zenith DE, SigmaCode IDE, SigmaTerm, SigmaNotes
-- **Build**: `cmake -DCMAKE_TOOLCHAIN_FILE=profiles/workstation.cmake -B build`
-
----
-
-### `release/microkernel`
-
-The minimal kernel-only build. No GUI, no daemons — just the freestanding Ring-0 binary. Used as the base for all other profiles and for academic/research use.
-
-- **Target**: Bare-metal servers, hypervisor guests, research
-- **Key features**: MLFQ scheduler, VMM, VFS, TCP/IP stack, PID 1 event loop
-- **Build**: `make SIGMA_USE_ZENITH_DE=0 SIGMA_USE_AI_ENGINE=0`
-
----
-
-### `release/browser`
-
-SigmaOS with Chromium as the OS shell — the closest analog to ChromeOS but with Unix primitives exposed to web apps via `navigator.sigmaos.*`.
-
-- **Target**: Consumer laptops, thin clients
-- **Key features**: Full `navigator.sigmaos` API, native messaging host, bwrap sandboxing, zero-install packages
-- **Build**: `cmake -DSIGMA_PROFILE=standalone -DSIGMA_USE_ZENITH_DE=ON -B build`
+| Branch | Purpose | Target Version | Priority |
+|--------|---------|----------------|----------|
+| `main` | Stable integration target | v15.x current | 🔴 Critical |
+| `master` | Legacy mirror (deprecated) | — | — |
+| `kernel-exp` | Real kernel implementation lab | v16.0 Apex | 🔴 Critical |
+| `drivers-dev` | SDF hardware driver development | v16.0 Apex | 🔴 Critical |
+| `fs-dev` | VFS, SigmaFS, Ext4 | v16.0 Apex | 🟠 High |
+| `tools-dev` | CLI tools, docs, automation | v15.x ongoing | 🟠 High |
+| `performance-optimized` | Scheduler tuning, SIMD, PGO | v16.0 Apex | 🟠 High |
+| `docs-update` | Wiki, API docs, man pages | v15.x ongoing | 🟡 Medium |
+| `prepare-sigmaos-launch` | v15.1 launch checklist | v15.1 | 🟡 Medium |
+| `gh-pages` | GitHub Pages public website | live | 🟡 Medium |
+| `release/standalone` | Full desktop profile | v15.1 | 🟠 High |
+| `release/microkernel` | Minimal microkernel | v16.0 Apex | 🔴 Critical |
+| `release/cloud` | Cloud/container headless | v17.0 Sovereign | 🟠 High |
+| `release/distributed` | Multi-node cluster | v17.0 Sovereign | 🟡 Medium |
+| `release/dual-boot` | Dual-boot coexistence | v16.0 Apex | 🟡 Medium |
+| `release/rtos` | Hard real-time | v17.0 Sovereign | 🟡 Medium |
+| `release/mobile` | ARM64/RISC-V mobile | v17.0 Sovereign | 🟡 Medium |
+| `release/browser` | WASM browser demo | v15.1 | 🟢 Low |
+| `release/app` | App store demo | v15.1 | 🟢 Low |
 
 ---
 
-### `release/mobile`
-
-Tailored for ARM64 and RISC-V architectures. Optimized for low-power operation with adaptive P/C-state scheduling and touch-friendly UI scaling.
-
-- **Target**: ARM laptops, tablets, Raspberry Pi
-- **Toolchain**: `aarch64-linux-gnu-gcc` / `riscv64-linux-gnu-gcc`
-- **Key features**: Hardware-adaptive scheduler, low-power idle states, responsive Zenith UI
-- **Build**: `cmake -DCMAKE_TOOLCHAIN_FILE=profiles/iot-minimal.cmake -B build`
-
----
-
-### `release/rtos`
-
-Hard real-time extensions. Tasks with priority > 80 are promoted to `SCHED_SOVEREIGN` — a deterministic scheduling class with strict execution deadlines.
-
-- **Target**: Industrial control systems, robotics, avionics simulators
-- **Key features**:
-  - `SCHED_SOVEREIGN` hard real-time class
-  - Priority inheritance via `SovereignMutex` (prevents priority inversion)
-  - Lock-free SPSC ring buffers for sub-microsecond IPC
-  - Zero-copy memory segments for inter-task messaging
-- **Build**: `make SIGMA_USE_ZENITH_DE=0 SIGMA_SCHED_REALTIME=1`
-
----
-
-### `release/dual-boot`
-
-Coexistence with Windows and Linux. Implements the Multiboot2 specification so standard GRUB installations can chain-load SigmaOS without repartitioning.
-
-- **Target**: Users who want SigmaOS alongside an existing OS
-- **Key features**:
-  - Multiboot2 header in `arch/boot/multiboot_header.asm`
-  - ELF64 output at load address `0x100000` (see `linker.ld`)
-  - GRUB configuration generator in `Makefile` (`grub-mkrescue`)
-  - Shared `/home` partition support via VFS mount abstraction
-- **Setup**: See [Building from Source](Building-from-Source) for GRUB chain-load instructions
-
----
-
-### `release/cloud`
-
-CoreOS-style immutable cloud image. Root filesystem is read-only. Updates happen via A/B partition swap with attestation validation before commit.
-
-- **Target**: AWS, Azure, GCP bare-metal and VM instances
-- **Key features**:
-  - Immutable root (handled by `SovereignImmutableHostEngine`)
-  - A/B partition slots — instant rollback if boot attestation fails
-  - Declarative system configuration (NixOS-inspired)
-  - Hardened `sigmad-fleet` telemetry daemon for enterprise monitoring
-- **Build**: `cmake -DSIGMA_PROFILE=cloud-x86 -B build`
-
----
-
-### `release/distributed`
-
-Extends the cloud profile with decentralized coordination. Virtual filesystems sync across nodes via secure sockets. Supports ZeroNet mesh networking and P2P shard replication.
-
-- **Target**: Multi-node clusters, sovereign cloud data centers
-- **Key features**:
-  - Decoupled VFS synced via encrypted sockets (BLAKE2b integrity)
-  - `sigma-cluster` daemon for distributed state coordination
-  - Sovereign Container Orchestrator (Kubernetes-equivalent)
-  - CRDT-based offline-first sync for eventually consistent deployments
-- **Build**: `cmake -DSIGMA_PROFILE=cloud-x86 -DSIGMA_USE_CLUSTER=ON -B build`
-
----
-
-## Choosing a Branch
+## Critical Path
 
 ```
-Are you building for a laptop/desktop?
-  └─ Yes → release/standalone  (or main)
+kernel-exp (bootable kernel — EVERYTHING blocks on this)
+    ├── drivers-dev (SDF driver launch mechanism)
+    │       ├── release/standalone (GPU + Wi-Fi)
+    │       └── release/mobile (ARM64 BSP)
+    ├── fs-dev (VFS layer)
+    │       ├── release/standalone (profile VFS load)
+    │       └── release/cloud (dm-verity)
+    └── release/microkernel (minimal kernel subset)
 
-Are you targeting ARM / low-power hardware?
-  └─ Yes → release/mobile  (or profiles/iot-minimal.cmake)
-
-Do you need hard real-time guarantees?
-  └─ Yes → release/rtos
-
-Do you need to coexist with Windows/Linux?
-  └─ Yes → release/dual-boot
-
-Are you deploying to cloud VMs?
-  └─ Immutable single-node  → release/cloud
-  └─ Multi-node cluster     → release/distributed
-
-Are you doing kernel research?
-  └─ release/microkernel  +  kernel-exp
-
-Are you developing drivers?
-  └─ drivers-dev
-
-Are you working on performance?
-  └─ performance-optimized
+performance-optimized → kernel-exp scheduler merged first
+release/cloud → kernel-exp cgroup + namespace
+release/distributed → release/cloud
+release/rtos → performance-optimized EDF + kernel-exp IRQ
+release/dual-boot → kernel-exp sigma-boot.efi + fs-dev
 ```
 
 ---
 
-*See also: [Building from Source](Building-from-Source) · [Architecture Overview](Architecture-Overview) · [Contributor Roadmap](Contributor-Roadmap)*
+## Merge Order
+
+```
+1.  kernel-exp → main          (Phase 0: QEMU CI passing)
+2.  drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
+3.  fs-dev → main              (VFS + tmpfs + SigmaFS)
+4.  tools-dev → main           (ongoing — every green CI run)
+5.  performance-optimized → main (after kernel-exp)
+6.  docs-update → main         (ongoing)
+7.  release/microkernel ← main (branch from stable main)
+8.  release/standalone ← main  (after GPU drivers)
+9.  release/cloud ← main       (after cgroup enforcement)
+10. release/mobile ← main      (after ARM64 BSP)
+11. release/rtos ← main        (after EDF scheduler)
+12. release/dual-boot ← main   (after sigma-boot.efi)
+13. release/distributed ← release/cloud
+14. release/browser / release/app ← main (after bootable ISO)
+```
+
+---
+
+## Branch Uniformity (S-BUSE Pipeline)
+
+All release branches are kept in sync with `main` via:
+
+```bash
+node tools/sync_all_branches.js
+```
+
+This checks out each `release/*` branch, merges from `main`, and pushes — guaranteeing structural parity across all profiles.
+
+---
+
+## Working with Branches
+
+```bash
+# Checkout a branch
+git checkout tools-dev
+
+# Sync with upstream main
+git checkout tools-dev
+git merge main
+
+# Create a new feature branch
+git checkout -b feat/my-feature main
+
+# Sync all release branches with main
+node tools/sync_all_branches.js
+```
+
+---
+
+## PR Requirements (before merging to main)
+
+1. CI green (`sigma_ci.yml`)
+2. `CURRENT_PROBLEMS_MANIFEST.md` updated if fixing a bug
+3. Kernel changes: QEMU smoke test log in PR description
+4. New subsystems: wiki page in `wiki_repo/`
+5. Reviewed by at least one maintainer
+
+---
+
+*See also: [Branch-Development-Roadmap](Branch-Development-Roadmap) · [Development-Roadmap](Development-Roadmap) · [Contributing](Contributing)*

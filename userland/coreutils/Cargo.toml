@@ -1,0 +1,10 @@
+[package]
+name        = "sigma-coreutils"
+version     = "15.0.0"
+edition     = "2021"
+description = "SigmaOS core utilities — BusyBox-style multi-call binary"
+license     = "MIT"
+
+[[bin]]
+name = "sigma-coreutils"
+path = "src/main.rs"

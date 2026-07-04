@@ -53,3 +53,68 @@ Our immediate priorities are:
 3.  **Build Power Management & Peripheral Drivers:** Ensure flawlessly smooth operation on laptops and consumer hardware.
 4.  **Launch Developer Ecosystem Tools & App Store:** Attract the initial wave of high-tier contributors and users.
 5.  **Accelerate Sovereignty Differentiators:** Double down on formal verification, zero-trust frameworks, sovereign containers, and AI scheduling.
+
+---
+
+## 🎯 Ground Truth: What to Build First
+
+The ambitious agenda above is the destination. The honest starting point is this:
+
+**SigmaOS does not yet produce a bootable ISO.**
+
+Before we out-sovereign anyone, we must first *boot*. That means:
+
+```
+make iso  →  qemu boot  →  sigma-sh prompt  →  sigma-pkg works
+```
+
+This is Phase 1. Everything in the ambitious agenda above is Phase 2 and beyond.
+Trying to skip Phase 1 produces impressive documentation but no users.
+
+### The Simplicity Principle
+
+The distros SigmaOS should first match — Alpine, Tiny Core, Puppy Linux — are
+successful not because of architecture, but because of **simplicity and reliability**:
+
+- Small ISO (target: under 150 MB).
+- Shell works on first boot.
+- Package installation is one command: `sigma-pkg install <name>`.
+- Hardware "just works" for keyboard, display, and network.
+
+Match this baseline first. Then the sovereign differentiators become *reasons to switch*,
+not vaporware.
+
+### User Trust Hierarchy
+
+```
+Layer 1 → It boots                    ← We are here (building Phase 1)
+Layer 2 → The shell works             ← Basic usability
+Layer 3 → Packages install            ← Ecosystem entry point
+Layer 4 → Drivers cover common HW     ← Daily-driver viability
+Layer 5 → GUI desktop                 ← Mass-market appeal
+Layer 6 → PQC + pledge/unveil         ← The sovereign differentiator (already built)
+Layer 7 → Multi-format from 1 repo    ← Unique distribution advantage (already built)
+Layer 8 → Formal verification         ← Enterprise/defense positioning
+```
+
+Each layer only earns user trust because the layers below it are solid.
+Layers 6–7 are already implemented — they need layers 1–4 underneath them to matter.
+
+### The Positioning That Actually Works
+
+> *"SigmaOS is the only OS that runs on bare metal, in a browser tab, as a cloud
+> container, and as a mobile APK — all from one unified codebase, all signed with
+> post-quantum cryptography."*
+
+No Linux distro can say this. Lead with it — once the ISO exists.
+
+### Phase Map
+
+| Phase | Version | Milestone | Beats |
+|-------|---------|-----------|-------|
+| 1 | v0.1 | Bootable ISO + sigma-sh + sigma-pkg | Tiny Core, early Alpine |
+| 2 | v1.0 | Desktop + AppImage + 50 packages + SDK | Alpine, Void Linux |
+| 3 | v2.0 | Mobile + WASM + Cloud images | Any distro on portability |
+| 4 | v3.0 | RTOS + Distributed + Formal verification | VxWorks, Fedora CoreOS |
+
+**See also:** [ROADMAP.md](ROADMAP.md) · [docs/Competitive_Analysis.md](docs/Competitive_Analysis.md) · [docs/Minimal_SigmaOS_v0.1.md](docs/Minimal_SigmaOS_v0.1.md) · [DOWNLOAD.md](DOWNLOAD.md)

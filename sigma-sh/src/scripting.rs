@@ -27,14 +27,67 @@ impl ShellEnv {
         }
     }
 
-    /// Expand $VAR, ${VAR}, ${VAR:-default} in a string
+    /// Expand $VAR, ${VAR}, ${VAR:-default}, $((expr)), $(...), $RANDOM, $LINENO in a string
     pub fn expand_vars(&self, input: &str) -> String {
+        self.expand_vars_with_lineno(input, 0)
+    }
+
+    pub fn expand_vars_with_lineno(&self, input: &str, lineno: usize) -> String {
         let mut out = String::with_capacity(input.len());
         let mut chars = input.chars().peekable();
 
         while let Some(c) = chars.next() {
             if c == '$' {
                 match chars.peek() {
+                    // $(( arithmetic ))
+                    Some('(') => {
+                        // peek ahead to see if it's $(( or $(
+                        let mut lookahead: Vec<char> = Vec::new();
+                        // consume first '('
+                        chars.next();
+                        lookahead.push('(');
+                        if chars.peek() == Some(&'(') {
+                            chars.next(); // consume second '('
+                            // collect until '))'
+                            let mut expr = String::new();
+                            let mut depth = 2usize;
+                            loop {
+                                match chars.next() {
+                                    Some(')') => {
+                                        depth -= 1;
+                                        if depth == 0 { break; }
+                                        expr.push(')');
+                                    }
+                                    Some(other) => expr.push(other),
+                                    None => break,
+                                }
+                            }
+                            // Consume trailing ')'
+                            if chars.peek() == Some(&')') { chars.next(); }
+                            let result = eval_arithmetic(&expr, self);
+                            out.push_str(&result.to_string());
+                        } else {
+                            // $(...) command substitution
+                            let mut cmd = String::new();
+                            let mut depth = 1usize;
+                            loop {
+                                match chars.next() {
+                                    Some('(') => { depth += 1; cmd.push('('); }
+                                    Some(')') => {
+                                        depth -= 1;
+                                        if depth == 0 { break; }
+                                        cmd.push(')');
+                                    }
+                                    Some(other) => cmd.push(other),
+                                    None => break,
+                                }
+                            }
+                            // Expand variables inside the command string first
+                            let expanded_cmd = self.expand_vars(&cmd);
+                            let result = command_substitution(&expanded_cmd);
+                            out.push_str(&result);
+                        }
+                    }
                     Some('{') => {
                         chars.next(); // consume '{'
                         let mut name = String::new();
@@ -64,6 +117,30 @@ impl ShellEnv {
                         chars.next();
                         out.push_str(&self.last_exit.to_string());
                     }
+                    Some('$') => {
+                        // $$ — current PID
+                        chars.next();
+                        out.push_str(&std::process::id().to_string());
+                    }
+                    Some('!') => {
+                        // $! — last background PID (simplified: 0)
+                        chars.next();
+                        out.push('0');
+                    }
+                    Some('#') => {
+                        // $# — argument count
+                        chars.next();
+                        let argc = self.vars.get("__argc__")
+                            .and_then(|s| s.parse::<usize>().ok())
+                            .unwrap_or(0);
+                        out.push_str(&argc.to_string());
+                    }
+                    Some('@') | Some('*') => {
+                        // $@ / $* — all positional args
+                        chars.next();
+                        let args = self.vars.get("__args__").cloned().unwrap_or_default();
+                        out.push_str(&args);
+                    }
                     Some(c) if c.is_alphanumeric() || *c == '_' => {
                         let mut name = String::new();
                         while let Some(&ch) = chars.peek() {
@@ -74,9 +151,34 @@ impl ShellEnv {
                                 break;
                             }
                         }
-                        let val = self.vars.get(&name).cloned()
-                            .or(std::env::var(&name).ok())
-                            .unwrap_or_default();
+                        let val = match name.as_str() {
+                            // Special read-only variables
+                            "RANDOM"  => {
+                                use std::time::{SystemTime, UNIX_EPOCH};
+                                let seed = SystemTime::now()
+                                    .duration_since(UNIX_EPOCH)
+                                    .map(|d| d.subsec_nanos())
+                                    .unwrap_or(0);
+                                ((seed ^ (seed >> 13) ^ (seed << 7)) % 32768).to_string()
+                            }
+                            "LINENO"  => lineno.to_string(),
+                            "SECONDS" => {
+                                use std::time::{SystemTime, UNIX_EPOCH};
+                                SystemTime::now()
+                                    .duration_since(UNIX_EPOCH)
+                                    .map(|d| d.as_secs().to_string())
+                                    .unwrap_or_else(|_| "0".to_string())
+                            }
+                            "PWD"     => std::env::current_dir()
+                                .map(|p| p.display().to_string())
+                                .unwrap_or_default(),
+                            "UID"     => "0".to_string(),
+                            "EUID"    => "0".to_string(),
+                            "BASHPID" | "PPID" => std::process::id().to_string(),
+                            _ => self.vars.get(&name).cloned()
+                                .or(std::env::var(&name).ok())
+                                .unwrap_or_default(),
+                        };
                         out.push_str(&val);
                     }
                     _ => out.push('$'),
@@ -86,6 +188,133 @@ impl ShellEnv {
             }
         }
         out
+    }
+}
+
+/// Evaluate a simple arithmetic expression: +, -, *, /, %, parens, variables
+fn eval_arithmetic(expr: &str, env: &ShellEnv) -> i64 {
+    // First expand variables in the expression
+    let expanded = expr.trim().to_string();
+    // Replace $VAR and VAR with their numeric values
+    let tokens = tokenise_arith(&expanded, env);
+    parse_arith_expr(&tokens, &mut 0)
+}
+
+fn tokenise_arith(s: &str, env: &ShellEnv) -> Vec<String> {
+    let mut tokens = Vec::new();
+    let mut chars = s.chars().peekable();
+    while let Some(&c) = chars.peek() {
+        match c {
+            ' ' | '\t' => { chars.next(); }
+            '+' | '-' | '*' | '/' | '%' | '(' | ')' => {
+                tokens.push(c.to_string()); chars.next();
+            }
+            '$' => {
+                chars.next();
+                let mut name = String::new();
+                while let Some(&ch) = chars.peek() {
+                    if ch.is_alphanumeric() || ch == '_' { name.push(ch); chars.next(); }
+                    else { break; }
+                }
+                let val = env.vars.get(&name).cloned()
+                    .or_else(|| std::env::var(&name).ok())
+                    .unwrap_or_else(|| "0".to_string());
+                tokens.push(val);
+            }
+            '0'..='9' => {
+                let mut num = String::new();
+                while let Some(&ch) = chars.peek() {
+                    if ch.is_ascii_digit() { num.push(ch); chars.next(); }
+                    else { break; }
+                }
+                tokens.push(num);
+            }
+            'a'..='z' | 'A'..='Z' | '_' => {
+                // bare variable name (no $)
+                let mut name = String::new();
+                while let Some(&ch) = chars.peek() {
+                    if ch.is_alphanumeric() || ch == '_' { name.push(ch); chars.next(); }
+                    else { break; }
+                }
+                let val = env.vars.get(&name).cloned()
+                    .or_else(|| std::env::var(&name).ok())
+                    .unwrap_or_else(|| "0".to_string());
+                tokens.push(val);
+            }
+            _ => { chars.next(); }
+        }
+    }
+    tokens
+}
+
+fn parse_arith_expr(tokens: &[String], pos: &mut usize) -> i64 {
+    let mut left = parse_arith_term(tokens, pos);
+    while *pos < tokens.len() {
+        match tokens[*pos].as_str() {
+            "+" => { *pos += 1; left += parse_arith_term(tokens, pos); }
+            "-" => { *pos += 1; left -= parse_arith_term(tokens, pos); }
+            _ => break,
+        }
+    }
+    left
+}
+
+fn parse_arith_term(tokens: &[String], pos: &mut usize) -> i64 {
+    let mut left = parse_arith_factor(tokens, pos);
+    while *pos < tokens.len() {
+        match tokens[*pos].as_str() {
+            "*" => { *pos += 1; left *= parse_arith_factor(tokens, pos); }
+            "/" => {
+                *pos += 1;
+                let r = parse_arith_factor(tokens, pos);
+                left = if r != 0 { left / r } else { 0 };
+            }
+            "%" => {
+                *pos += 1;
+                let r = parse_arith_factor(tokens, pos);
+                left = if r != 0 { left % r } else { 0 };
+            }
+            _ => break,
+        }
+    }
+    left
+}
+
+fn parse_arith_factor(tokens: &[String], pos: &mut usize) -> i64 {
+    if *pos >= tokens.len() { return 0; }
+    match tokens[*pos].as_str() {
+        "(" => {
+            *pos += 1;
+            let val = parse_arith_expr(tokens, pos);
+            if *pos < tokens.len() && tokens[*pos] == ")" { *pos += 1; }
+            val
+        }
+        "-" => {
+            *pos += 1;
+            -parse_arith_factor(tokens, pos)
+        }
+        _ => {
+            let val = tokens[*pos].parse::<i64>().unwrap_or(0);
+            *pos += 1;
+            val
+        }
+    }
+}
+
+/// Run a command string and return its trimmed stdout (for $(...) substitution)
+fn command_substitution(cmd: &str) -> String {
+    use std::process::Command;
+    // Try the shell first; fall back gracefully
+    let output = Command::new("sh")
+        .arg("-c")
+        .arg(cmd)
+        .output();
+    match output {
+        Ok(o) => {
+            let s = String::from_utf8_lossy(&o.stdout).to_string();
+            s.trim_end_matches('\n').to_string()
+        }
+        Err(_) => String::new(),
     }
 }
 
@@ -183,7 +412,7 @@ fn run_lines(lines: &[String], env: &mut ShellEnv) -> Result<i32, String> {
         }
 
         // Regular command
-        last_exit = execute_script_line(line, env);
+        last_exit = execute_script_line_with_lineno(line, env, i + 1);
         i += 1;
     }
 
@@ -191,7 +420,11 @@ fn run_lines(lines: &[String], env: &mut ShellEnv) -> Result<i32, String> {
 }
 
 fn execute_script_line(line: &str, env: &mut ShellEnv) -> i32 {
-    let expanded = env.expand_vars(line);
+    execute_script_line_with_lineno(line, env, 0)
+}
+
+fn execute_script_line_with_lineno(line: &str, env: &mut ShellEnv, lineno: usize) -> i32 {
+    let expanded = env.expand_vars_with_lineno(line, lineno);
     let ast = match crate::parser::parse(&expanded) {
         Ok(a) => a,
         Err(e) => { eprintln!("sigma-sh: {}", e); return 1; }

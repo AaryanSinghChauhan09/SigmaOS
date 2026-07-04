@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2024-2026 SigmaOS Project
+#
+# userland/agent/Cargo.toml — sigma-agent-core Rust binary
+# Inspiration: Claude Code, Aider, azure-cli, openclaw
+
+[package]
+name        = "sigma-agent-core"
+version     = "15.0.0"
+edition     = "2021"
+authors     = ["SigmaOS Project"]
+description = "sigma-agent-core: Rust agent engine for sigma-agent AI CLI"
+license     = "MIT"
+repository  = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[[bin]]
+name = "sigma-agent-core"
+path = "main.rs"
+
+# No external crates — pure Rust std only (SigmaOS zero-dependency policy)
+[dependencies]
+
+[profile.release]
+opt-level     = "z"
+lto           = true
+codegen-units = 1
+strip         = "symbols"
+panic         = "abort"

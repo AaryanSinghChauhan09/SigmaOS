@@ -4,16 +4,23 @@ on:
   push:
     branches: [main]
     paths:
+      - 'wiki_repo/**'
       - 'docs/wiki/**'
       - 'docs/Absorption-Matrix.md'
       - 'docs/Security-Model.md'
+      - 'docs/Open_Source_Drivers.md'
+      - 'docs/Competitive_Analysis.md'
+      - 'docs/Minimal_SigmaOS_v0.1.md'
+      - 'ROADMAP.md'
+      - 'DOWNLOAD.md'
+      - 'QUICKSTART.md'
       - 'roadmap.md'
 
   workflow_dispatch:
 
 jobs:
   sync-wiki:
-    name: Sync docs/wiki → GitHub Wiki
+    name: Sync wiki_repo/ + docs/ → GitHub Wiki
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -26,34 +33,47 @@ jobs:
 
       - name: Clone the GitHub Wiki repo
         run: |
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-repo
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-live
 
-      - name: Copy wiki pages
+      - name: Copy wiki_repo pages (primary source)
         run: |
-          # Copy all pages from docs/wiki/ to the wiki repo root
-          cp docs/wiki/*.md wiki-repo/
+          # Copy every .md file from wiki_repo/ to the live wiki root
+          find wiki_repo -maxdepth 1 -name '*.md' | while read f; do
+            cp "$f" "wiki-live/$(basename $f)"
+          done
+          # Copy sidebar and footer
+          cp wiki_repo/_Sidebar.md wiki-live/_Sidebar.md 2>/dev/null || true
+          cp wiki_repo/_Footer.md  wiki-live/_Footer.md  2>/dev/null || true
 
-          # Also copy key top-level docs into the wiki
-          cp docs/Absorption-Matrix.md wiki-repo/Absorption-Matrix.md
-          cp docs/Security-Model.md wiki-repo/Security-Model.md
-          cp roadmap.md wiki-repo/Roadmap.md
+      - name: Copy docs/ key pages
+        run: |
+          # Mirror important docs/ files as wiki pages
+          cp docs/Absorption-Matrix.md        wiki-live/Absorption-Matrix.md        2>/dev/null || true
+          cp docs/Security-Model.md           wiki-live/Security-Model.md           2>/dev/null || true
+          cp docs/Open_Source_Drivers.md      wiki-live/Open-Source-Drivers.md      2>/dev/null || true
+          cp docs/Competitive_Analysis.md     wiki-live/Competitive-Analysis-Doc.md 2>/dev/null || true
+          cp docs/Minimal_SigmaOS_v0.1.md     wiki-live/Minimal-v01-Spec.md         2>/dev/null || true
+          [ -d docs/wiki ] && cp docs/wiki/*.md wiki-live/ 2>/dev/null || true
+
+      - name: Copy root docs as wiki pages
+        run: |
+          cp ROADMAP.md   wiki-live/Growth-Roadmap.md   2>/dev/null || true
+          cp DOWNLOAD.md  wiki-live/Download-Guide.md   2>/dev/null || true
+          cp QUICKSTART.md wiki-live/Quick-Start.md     2>/dev/null || true
+          cp roadmap.md   wiki-live/Roadmap-Legacy.md   2>/dev/null || true
 
       - name: Commit and push wiki
         run: |
-          cd wiki-repo
+          cd wiki-live
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add -A
-
-          # Only commit if there are changes
           if git diff --cached --quiet; then
             echo "No wiki changes to push."
           else
-            git commit -m "docs: sync wiki from main [skip ci]
+            git commit -m "wiki: sync from main — wiki_repo/, docs/, ROADMAP, DOWNLOAD, QUICKSTART
 
-            Auto-synced from docs/wiki/ and docs/ by GitHub Actions.
-            Triggered by: ${{ github.sha }}"
+Auto-synced by GitHub Actions from commit ${{ github.sha }}"
             git push
           fi
 
@@ -61,7 +81,6 @@ jobs:
         run: |
           echo "## Wiki Sync Complete ✅" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Pages synced:" >> $GITHUB_STEP_SUMMARY
-          ls docs/wiki/*.md | xargs -I{} basename {} .md | while read page; do
-            echo "- [$page](https://github.com/${{ github.repository }}/wiki/$page)" >> $GITHUB_STEP_SUMMARY
-          done
+          echo "Synced $(find wiki_repo -maxdepth 1 -name '*.md' | wc -l) pages from wiki_repo/ + key docs." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Wiki](https://github.com/${{ github.repository }}/wiki)" >> $GITHUB_STEP_SUMMARY

@@ -1,262 +1,125 @@
-# SigmaOS Sovereign Roadmap 🗺️
+# SigmaOS — Growth Roadmap
 
-SigmaOS draws inspiration from the best aspects of various Linux distributions:
-
-- **Debian‑style stability** → predictable releases
-- **Fedora‑style innovation** → cutting‑edge drivers/security
-- **Arch‑style flexibility** → modular FS and userland
-- **Ubuntu‑style ecosystem** → strong community and package management
-
-## Phase 1: Core System & Stability
-
-- [ ] Unify branches into a stable main
-- [ ] Kernel scheduler: finalize Round Robin/EDF into a robust, tested default
-- [ ] Memory allocator: stress‑test and formally verify
-- [ ] Syscall layer: expand non‑POSIX ABI for consistency
-- [ ] Release cadence: adopt predictable stable releases
-
-## Phase 2: Hardware Support
-
-- [ ] Networking: expand NIC support beyond e1000
-- [ ] Storage: add NVMe, SSD optimizations
-- [ ] USB/HID: implement keyboard, mouse, and USB stack
-- [ ] Graphics: move from VGA framebuffer to modern GPU drivers
-- [ ] Audio: add basic sound subsystem
-
-## Phase 3: File Systems & Storage
-
-- [ ] Enhance FS support: journaling, encryption, sovereign FS
-- [ ] Add modern FS equivalents: ext4‑like, btrfs‑like features
-- [ ] Virtualization drivers: VirtIO for cloud/server use cases
-
-## Phase 4: Package Management & Build System
-
-- [ ] Develop sigpkg: sovereign package manager
-- [ ] Deterministic builds: reproducible recipes, cryptographic verification
-- [ ] Profiles: sigma-core, sigma-desktop, sigma-cloud
-
-## Phase 5: Security & Sovereignty
-
-- [ ] Sandboxing: sovereign equivalents
-- [ ] Audit framework: syscall monitoring
-- [ ] Secure boot: expand cryptographic verification, rollback protection
-- [ ] Exploit mitigations: hardened allocators, memory safety
-
-## Phase 6: Userland & Ecosystem
-
-- [ ] Expand utilities: sovereign replacements for GNU tools
-- [ ] Shell (sigma-sh): scripting, automation, developer ergonomics
-- [ ] SDK/toolchain: sovereign SDK for driver/app development
-
-## Phase 7: Community & Adoption
-
-- [ ] Contribution workflow: PRs only into main, modular tasks
-- [ ] Wiki expansion: roadmap, coding standards, migration guides
-- [ ] Target domains: secure systems, research, silicon sovereignty
+> Current: **v15.0.0 Zenith** (Stable baseline, unified `main`)
+> Next milestone: **v0.1 Minimal** — the first truly bootable, installable SigmaOS
 
 ---
 
-## Future Development Roadmap (2026-2028)
+## The Honest Starting Point
 
-### Q3 2026 - Q4 2026: Foundation Consolidation
-- **Kernel Core**: Complete Round Robin/EDF scheduler implementation with formal verification
-- **Memory System**: Finalize memory allocator with stress testing and formal proofs
-- **Syscall Layer**: Implement comprehensive non-POSIX ABI for enhanced functionality
-- **Branch Unification**: Complete merge of all development branches into stable main
-- **Release Management**: Establish predictable stable release cadence (quarterly)
+SigmaOS has excellent architecture, documentation, and ambition.
+What it does **not yet have** is a bootable ISO, a working package manager, or
+out-of-the-box hardware support — the table-stakes that even the simplest distros
+(Alpine, Puppy, Tiny Core) cleared years ago.
 
-### Q1 2027 - Q2 2027: Hardware Expansion
-- **Network Drivers**: Add support for Intel I219-V, Realtek 8111, and Broadcom NICs
-- **Storage Optimization**: Implement NVMe driver stack with TRIM support and SSD wear leveling
-- **USB Stack**: Complete USB 3.0/3.1 support with xHCI controller
-- **HID Implementation**: Full keyboard, mouse, and generic HID device support
-- **Graphics Transition**: Begin transition from VGA to DRM/KMS with basic GPU acceleration
-- **Audio Subsystem**: Implement ALSA-compatible sound layer with basic codec support
-
-### Q3 2027 - Q4 2027: File System Revolution
-- **Journaling FS**: Implement ext4-like journaling with crash recovery
-- **Encryption Layer**: Add LUKS-equivalent full-disk encryption
-- **Sovereign FS**: Develop custom file system with built-in integrity verification
-- **Btrfs Features**: Add snapshot, compression, and deduplication capabilities
-- **VirtIO Drivers**: Complete VirtIO block, net, and balloon drivers for cloud deployment
-- **FS Benchmarks**: Comprehensive performance testing against ext4, btrfs, ZFS
-
-### Q1 2028 - Q2 2028: Package Management Ecosystem
-- **sigpkg Core**: Complete sovereign package manager with dependency resolution
-- **Build System**: Implement deterministic build system with reproducible recipes
-- **Cryptographic Verification**: Package signing and verification infrastructure
-- **Profile System**: sigma-core (minimal), sigma-desktop (full), sigma-cloud (server)
-- **Repository Network**: Distributed package repository with mirror support
-- **Migration Tools**: Tools for importing packages from Debian/Ubuntu/Fedora
-
-### Q3 2028 - Q4 2028: Security Hardening
-- **Sandboxing**: Implement capability-based security model
-- **Audit Framework**: Complete syscall monitoring and logging system
-- **Secure Boot**: Expand UEFI Secure Boot with custom key management
-- **Rollback Protection**: Implement A/B partition system with automatic rollback
-- **Memory Safety**: Hardened allocator with guard pages and canaries
-- **Exploit Mitigations**: ASLR, stack canaries, CET, and other hardening features
-
-### 2029+: Userland & Ecosystem
-- **GNU Utilities**: Complete sovereign replacements for coreutils, binutils
-- **Sigma Shell**: Full-featured shell with scripting and automation
-- **Developer SDK**: Complete SDK for driver and application development
-- **IDE Integration**: VS Code/Neovim plugins for SigmaOS development
-- **Claude Code Integration**: Native agentic coding tool integrated into SigmaIDE and sigma-sh
-- **Documentation**: Comprehensive developer and user documentation
-- **Testing Suite**: Automated testing infrastructure for all components
-
-### Long-term Vision (2030+)
-- **AI Integration**: Native AI/ML acceleration in kernel and userland
-- **Quantum Readiness**: Post-quantum cryptography throughout the stack
-- **Formal Verification**: SPARK/Ada proofs for critical security components
-- **Silicon Sovereignty**: Custom hardware support and optimization
-- **Research Platform**: Target OS for academic and industry research
+This roadmap closes that gap methodically, one phase at a time,
+then layers on the sovereign differentiators that make SigmaOS worth choosing.
 
 ---
 
-## Detailed Implementation Milestones
+## Phase 1 — Stable Core (`v0.1 Minimal`, target: Q4 2026)
 
-### 2026 Q3-Q4: Foundation Phase Details
-**Month 1-2 (July-August 2026)**
-- Complete Round Robin scheduler with CPU affinity support
-- Implement EDF (Earliest Deadline First) for real-time tasks
-- Memory allocator stress testing suite with 1000+ test cases
-- Formal verification of memory management using Coq/Isabelle
-- Non-POSIX syscall ABI specification document
+> Goal: a bootable ISO that installs, has a shell, and connects to the network.
+> Beat Alpine Linux on simplicity. Match Tiny Core on size.
 
-**Month 3-4 (September-October 2026)**
-- Branch unification: merge all feature branches to main
-- Establish CI/CD pipeline with automated testing
-- Define quarterly release schedule (March, June, September, December)
-- Create release engineering team and processes
-- Documentation overhaul for all core components
+### Kernel (`kernel-exp` work, now on `main`)
 
-### 2027 Q1-Q2: Hardware Expansion Details
-**Month 5-6 (January-February 2027)**
-- Intel I219-V driver implementation with interrupt handling
-- Realtek 8111 driver with DMA support
-- Broadcom NIC driver with advanced features
-- Network driver testing suite with packet capture analysis
+| Task | File | Done? |
+|------|------|-------|
+| Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.cpp` | ⬜ |
+| Buddy physical allocator | `kernel/core/sigma_mm.cpp` | ⬜ |
+| Slab allocator (kmalloc) | `kernel/core/sigma_mm.cpp` | ⬜ |
+| x86-64 4-level page table walker | `kernel/mm/sigma_vmm.cpp` | ⬜ |
+| APIC + PIC init | `kernel/core/sigma_irq.cpp` | ⬜ |
+| HPET/APIC timer → jiffies | `kernel/core/sigma_timer.cpp` | ⬜ |
+| 30-syscall dispatch table | `kernel/core/sigma_syscall_dispatch.cpp` | ⬜ |
+| VESA/GOP framebuffer | `drivers/display/sigma_vesa.cpp` | ⬜ |
+| sigma-boot.efi UEFI loader | `sigma-boot/sigma_boot.c` | ⬜ |
+| **`make iso` → bootable ISO** | `Makefile` | ⬜ |
 
-**Month 7-8 (March-April 2027)**
-- NVMe driver implementation with queue management
-- SSD wear leveling algorithms and TRIM support
-- USB 3.0 xHCI controller driver
-- USB 3.1 support with enhanced speeds
-- HID stack: keyboard, mouse, gamepad support
+### Drivers (minimum viable set)
 
-**Month 9-10 (May-June 2027)**
-- DRM/KMS subsystem implementation
-- Basic GPU acceleration framework
-- AMDGPU and Intel GPU driver skeletons
-- ALSA sound subsystem with codec support
-- Audio driver testing with real hardware
+| Driver | Hardware | Done? |
+|--------|----------|-------|
+| e1000 NIC | Intel Gigabit / QEMU virtio-net | 🔄 |
+| NVMe | PCIe SSDs | ✅ |
+| xHCI USB | USB 3.x | ✅ |
+| VirtIO-blk | QEMU block device | ✅ |
+| VESA framebuffer | All UEFI | ⬜ |
+| USB HID | Keyboard + mouse | ⬜ |
 
-### 2027 Q3-Q4: File System Revolution Details
-**Month 11-12 (July-August 2027)**
-- Journaling file system with ext4 compatibility
-- Crash recovery and consistency checking
-- LUKS-equivalent full-disk encryption
-- Key management and recovery mechanisms
+### Filesystem
 
-**Month 13-14 (September-October 2027)**
-- Sovereign FS with built-in integrity verification
-- Merkle tree-based file integrity checking
-- Snapshot functionality with COW semantics
-- Compression algorithms (zstd, lz4)
-- Deduplication engine for block-level optimization
+| Task | Done? |
+|------|-------|
+| VFS open/read/write/close | ⬜ |
+| Tmpfs (RAM-backed) | ⬜ |
+| Ext4 read-only mount | ⬜ |
+| FAT32 (EFI partition) | ✅ |
 
-**Month 15-16 (November-December 2027)**
-- VirtIO block driver with multiqueue support
-- VirtIO network driver with offload features
-- VirtIO balloon driver for memory management
-- Comprehensive FS benchmarking suite
-- Performance optimization against ext4, btrfs, ZFS
+### Shell & Userland
 
-### 2028 Q1-Q2: Package Management Details
-**Month 17-18 (January-February 2028)**
-- sigpkg core engine with SAT solver
-- Dependency resolution algorithms
-- Package format specification
-- Repository protocol design
+| Task | Done? |
+|------|-------|
+| sigma-sh: basic REPL (exec, cd, ls, cat, echo) | ⬜ |
+| sigma-sh: env vars + PATH | ⬜ |
+| sigma-init: PID 1, mount /proc /sys /dev | ⬜ |
+| sigma-pkg: install/remove from local repo | ⬜ |
+| Minimal coreutils (ls, cp, mv, rm, mkdir) | ⬜ |
 
-**Month 19-20 (March-April 2028)**
-- Deterministic build system implementation
-- Reproducible build recipes
-- Cryptographic signing infrastructure
-- Package verification and trust chain
+### Installer
 
-**Month 21-22 (May-June 2028)**
-- Profile system: sigma-core, sigma-desktop, sigma-cloud
-- Distributed repository network
-- Mirror synchronization protocols
-- Migration tools from Debian/Ubuntu/Fedora
-- Package dependency graph visualization
+| Task | Done? |
+|------|-------|
+| CLI partition wizard (fdisk wrapper) | ⬜ |
+| Install to disk (dd + grub-install equivalent) | ⬜ |
+| Dual-boot EFI entry registration | ⬜ |
+| Live USB boot (tmpfs overlay) | ⬜ |
 
-### 2028 Q3-Q4: Security Hardening Details
-**Month 23-24 (July-August 2028)**
-- Capability-based security model implementation
-- Fine-grained permission system
-- Sandbox API and library
-- Application containment policies
+### CI Gate
 
-**Month 25-26 (September-October 2028)**
-- Comprehensive syscall monitoring framework
-- Audit logging with tamper detection
-- Real-time security event correlation
-- SIEM integration capabilities
+```yaml
+# Must pass before v0.1 tag
+- make iso                          # builds without error
+- qemu-system-x86_64 -cdrom ...     # boots to sigma-sh prompt
+- echo "hello" | sigma-sh           # shell executes command
+- sigma-pkg install hello           # installs a test package
+```
 
-**Month 27-28 (November-December 2028)**
-- UEFI Secure Boot with custom key management
-- Key rotation and revocation policies
-- A/B partition system implementation
-- Automatic rollback on boot failure
-- Update verification and testing
+### Exit Criteria
+> A user can: download ISO → boot in QEMU → type commands in sigma-sh →
+> install a package with sigma-pkg → shut down cleanly.
 
-**Month 29-30 (January-February 2029)**
-- Hardened allocator with guard pages
-- Stack canaries and heap protection
-- Control Flow Enforcement Technology (CET)
-- Address Space Layout Randomization (ASLR)
-- Exploit mitigation testing suite
+---
 
-### 2029+: Userland & Ecosystem Details
-**Month 31-36 (March-August 2029)**
-- GNU coreutils replacements in Rust
-- binutils sovereign implementation
-- Performance optimization and testing
-- Compatibility layer for existing scripts
+## Phase 2 — Community (`v1.0`, target: Q2 2027)
 
-**Month 37-42 (September-February 2030)**
-- Sigma shell with full POSIX compatibility
-- Advanced scripting capabilities
-- Pipeline and job control
-- Built-in AI assistance features
+> Goal: AppImage + Flatpak + Snap. Developer SDK. Enough apps to be useful daily.
 
-**Month 43-48 (March-August 2030)**
-- Complete SDK for driver development
-- Application development frameworks
-- Debugging and profiling tools
-- Documentation and tutorials
+### Package Ecosystem
+- `sigma-pkg` online registry at `pkg.sigmaos.app`
+- 50 essential packages: browser, text editor, git, curl, Python 3, Node.js
+- sigpkg build spec format (`PKGBUILD`-style) + reproducible builds
+- Cryptographic package signing (Dilithium-5) verified on install
 
-**Month 49-54 (September-February 2031)**
-- VS Code extension for SigmaOS development
-- Neovim plugin ecosystem
-- LSP server for SigmaOS languages
-- Remote development support
+### Desktop
+- Zenith Desktop on real framebuffer (DRM/KMS via i915 / VirtIO-GPU)
+- Auto-tiling window manager (keyboard-driven)
+- Theme engine + accessibility (high contrast, screen reader stub)
+- sigma-ai: TinyLlama on-device inference daemon
 
-**Month 55-60 (March-August 2031)**
-- Claude Code integration completion
-- SigmaIDE native agentic coding
-- sigma-sh AI command completion
-- AI-powered code generation
+### Driver Coverage
+- Intel i915 modesetting
+- AMD amdgpu basic
+- Intel iwlwifi Wi-Fi 6
+- USB HID complete (keyboard, mouse, touchpad)
+- HDA audio
 
-**Month 61-66 (September-February 2032)**
-- Comprehensive documentation portal
-- User guides and administrator manuals
-- API reference documentation
-- Video tutorials and training materials
+### Distribution Formats Added
+- AppImage (Linux portable)
+- Flatpak via Flathub submission
+- Snap submission
+- Electron installer (Windows + macOS)
 
 **Month 67-72 (March-August 2032)**
 - Automated testing infrastructure
@@ -1097,3 +960,125 @@ The roadmap is ambitious but achievable:
 *Last Updated: 2026-07-04*  
 *Maintained by: SigmaOS Core Team*  
 *Next Review: Monthly (Phase-aligned)*
+=======
+### Developer SDK
+- sigma-sdk: compiler toolchain, headers, sigma-pkg build tool
+- Electron app template + TypeScript types for `navigator.sigmaos.*`
+- Python bindings (`pip install sigmaos`)
+- Java bindings (JAR + Maven)
+- Documentation site: `docs.sigmaos.app`
+
+---
+
+## Phase 3 — Expansion (`v2.0`, target: Q4 2027)
+
+> Goal: mobile + WASM sandbox + cloud images. Expand beyond desktop.
+
+### Mobile
+- ARM64 APK (Android 12+) via sigma-mobile build target
+- iOS IPA via TestFlight
+- Cross-platform via React Native + sigma-rn plugin
+- PWA installable from browser
+
+### WASM Sandbox
+- Full sigma kernel compiled to WASM/WASI
+- Runs in Chrome/Firefox/Safari — no install
+- sigma-wasm npm package
+
+### Cloud
+- AWS AMI + GCE image + Azure VHD published
+- OCI container image: `docker pull sigmaos/paas:2.0`
+- FaaS runtime for AWS Lambda custom runtime
+- Kubernetes operator for sigma-pod workloads
+
+### Security Maturity
+- sigma_pledge + sigma_unveil enforced in all userland processes
+- TPM2 attestation on cloud images
+- Reproducible builds verified by CI
+- CVE response SLA: 72 hours for critical, 14 days for high
+
+---
+
+## Phase 4 — Enterprise (`v3.0`, target: Q2 2028)
+
+> Goal: RTOS variants, distributed services, formal verification.
+> Beat Fedora CoreOS on cloud. Rival VxWorks on RTOS.
+
+### RTOS
+- EDF scheduler with <10 µs IRQ latency
+- ROS 2 DDS middleware port
+- SovereignWCET: worst-case execution time analyser
+- Bare-metal firmware images (STM32, ESP32, RP2040)
+
+### Distributed
+- SovereignConsensus (RAFT-inspired) <15 ms over GbE
+- CRDT offline-first sync (sigma-cloudsync)
+- Grid computing work-stealing scheduler
+- Actor model runtime (sigma-bus mailbox)
+
+### Formal Verification
+- Coq proofs for microkernel memory safety
+- seL4-style capability model verification
+- sigma-audit: kernel-level syscall monitoring for compliance
+
+### Governance
+- RFC process for kernel changes
+- LTS branch: 5-year security support
+- sigma-security-advisories mailing list
+- Public CVE database at `cve.sigmaos.app`
+
+---
+
+## What Makes SigmaOS Different (The Killer Features)
+
+Every distro has a shell and a package manager. Here is what SigmaOS has that others
+structurally cannot offer:
+
+| Differentiator | Why Others Can't Match It |
+|---|---|
+| **10 distribution formats from 1 codebase** | Linux distros repackage; SigmaOS compiles to any target via CMake flags |
+| **Post-quantum crypto baked in** | Kyber-1024 + Dilithium-5 in TLS, packages, boot — not bolted on |
+| **WASM-native kernel** | Run SigmaOS in a browser tab — no VM, no install |
+| **sigma_pledge/unveil** | OpenBSD-inspired but kernel-enforced, not just advisory |
+| **AI-predictive scheduler** | TinyLlama pre-warming for hot code paths (Phase H) |
+| **Profession profiles** | 1000+ role-specific shard bundles — AI Researcher to Aerospace Engineer |
+| **Sovereign identity (SPIFFE DIDs)** | Per-process cryptographic identity, not just UIDs |
+| **sigpkg reproducible builds** | Deterministic, hash-verified — not "probably the same as last time" |
+
+---
+
+## The Honest Gap vs Simple Distros
+
+| What Alpine/Puppy Has | SigmaOS Status | Fix |
+|---|---|---|
+| Bootable ISO | ⬜ Phase 1 | `make iso` — blocked on scheduler+MM |
+| Working shell | ⬜ Phase 1 | sigma-sh REPL |
+| Package manager | 🔄 Phase 1 | sigma-pkg (local repo first) |
+| Kernel-integrated NIC/USB drivers | 🔄 Partial | e1000 ✅, HID ⬜ |
+| Out-of-box Wi-Fi | ⬜ Phase 2 | iwlwifi |
+| GUI installer | ⬜ Phase 2 | installer.html already designed |
+| 10,000+ packages | ⬜ Phase 2+ | community-driven sigpkg registry |
+| 5+ year LTS | ⬜ Phase 4 | governance model needed |
+
+Closing Phase 1 alone puts SigmaOS ahead of Tiny Core on ambition
+and on par with Alpine on usability. Everything after that is gravy.
+
+---
+
+## Contribution Priority Order
+
+If you want to contribute, work in this order:
+
+1. **Kernel boot** — `kernel/core/sigma_sched.cpp`, `sigma_mm.cpp`, `sigma_irq.cpp`
+2. **sigma-sh** — `userland/shell/sigma_shell.cpp`
+3. **sigma-pkg** — `userland/pkg/sigma_registry.cpp`
+4. **Drivers** — `drivers/display/sigma_vesa.cpp`, `drivers/input/sigma_hid.rs`
+5. **Installer** — `userland/installer/`
+6. **Docs** — wiki pages, man pages, troubleshooting guide
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the technical mandates and PR process.
+
+---
+
+*See also: [DOWNLOAD.md](DOWNLOAD.md) · [docs/Competitive_Analysis.md](docs/Competitive_Analysis.md) · [docs/Minimal_SigmaOS_v0.1.md](docs/Minimal_SigmaOS_v0.1.md) · [STRATEGIC_VISION.md](STRATEGIC_VISION.md)*
+>>>>>>> origin/main

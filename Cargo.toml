@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = [
+    "kernel/core",
+    "kernel/security",
+    "kernel/fs",
+    "kernel/net",
+    "kernel/ipc",
+    "kernel/scheduling",
+    "kernel/crypto",
+    "kernel/memory",
+    "drivers/net",
+    "drivers/storage",
+    "drivers/input",
+    "security",
+    "userland/init",
+    "userland/update",
+    "userland/agent",
+    "tools/tracing",
+    "virtualization/ocirunner",
+]
+
+[workspace.package]
+version     = "15.0.0"
+authors     = ["SigmaOS Project"]
+edition     = "2021"
+license     = "MIT"
+repository  = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[workspace.dependencies]
+# No third-party crates in kernel — all dependencies are sigma-* internal
+
+[profile.dev]
+opt-level    = 1
+debug        = true
+overflow-checks = true
+
+[profile.release]
+opt-level  = "z"     # size-optimised
+lto        = true
+codegen-units = 1
+strip      = "symbols"
+panic      = "abort"
+
+[profile.kernel]
+inherits   = "release"
+opt-level  = "s"
+debug      = false

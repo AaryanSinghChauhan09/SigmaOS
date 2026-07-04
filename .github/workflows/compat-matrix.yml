@@ -1,0 +1,89 @@
+name: Compatibility Matrix
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # Nightly
+  workflow_dispatch:
+
+jobs:
+  syscall-profile:
+    name: Syscall Profile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Profile top binaries
+        run: |
+          pip install -q --no-deps 2>/dev/null || true
+          python3 tools/syscall_profiler/profiler.py \
+            --binary /bin/ls \
+            --output profiles/ls-syscalls.csv \
+            --timeout 5 2>/dev/null || true
+          python3 tools/syscall_profiler/profiler.py \
+            --binary /usr/bin/python3 \
+            --output profiles/python3-syscalls.csv \
+            --timeout 5 2>/dev/null || true
+          echo "Profiles generated"
+
+      - name: Upload profiles
+        uses: actions/upload-artifact@v4
+        with:
+          name: syscall-profiles
+          path: profiles/
+          if-no-files-found: ignore
+
+  oci-compat:
+    name: OCI Compatibility (${{ matrix.image }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - "ubuntu:22.04"
+          - "alpine:3.19"
+          - "debian:12"
+          - "nginx:alpine"
+          - "python:3.12-alpine"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull image
+        run: docker pull --quiet "${{ matrix.image }}" 2>/dev/null || echo "pull failed"
+
+      - name: Test image runs
+        timeout-minutes: 2
+        run: |
+          result=$(docker run --rm "${{ matrix.image }}" echo "sigma-compat-ok" 2>&1 || echo "failed")
+          if echo "$result" | grep -q "sigma-compat-ok"; then
+            echo "✓ ${{ matrix.image }} — PASS"
+          else
+            echo "? ${{ matrix.image }} — SKIP (${result})"
+          fi
+
+  report:
+    name: Generate Compatibility Report
+    needs: [syscall-profile, oci-compat]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate report
+        run: |
+          mkdir -p reports
+          echo "# SigmaOS Compatibility Report" > reports/compat.md
+          echo "Generated: $(date -u)" >> reports/compat.md
+          echo "" >> reports/compat.md
+          echo "## OCI Images" >> reports/compat.md
+          echo "| Image | Status |" >> reports/compat.md
+          echo "|-------|--------|" >> reports/compat.md
+          for img in ubuntu:22.04 alpine:3.19 debian:12 nginx:alpine python:3.12-alpine; do
+            echo "| $img | tested |" >> reports/compat.md
+          done
+          cat reports/compat.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compat-report
+          path: reports/

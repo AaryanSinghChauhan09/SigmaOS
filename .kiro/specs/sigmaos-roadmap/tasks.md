@@ -16,7 +16,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Call `sigma_idt_load()` to flush descriptor to CPU; emit serial diagnostic and halt on failure
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [ ]* 1.2 Write property test for ISR handler invocation (Property 1)
+  - [ ] 1.2 Write property test for ISR handler invocation (Property 1)
     - **Property 1: ISR Handler Invocation for All Exception Vectors**
     - **Validates: Requirement 1.3**
     - Use `theft` to generate exception vectors 0–31 and verify corresponding handler is registered
@@ -30,7 +30,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Register GP fault ISR to handle `iret` errors; log diagnostic
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [ ]* 1.4 Write property test for per-process TSS stack isolation (Property 2)
+  - [ ] 1.4 Write property test for per-process TSS stack isolation (Property 2)
     - **Property 2: Per-Process TSS Kernel Stack Isolation**
     - **Validates: Requirement 2.3**
     - Use `theft` to generate 10–100 mock process structures and assert all `rsp0` values are unique
@@ -43,7 +43,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Emit serial error and halt if decryption key is invalid (no unauthenticated mount)
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 37.1, 37.2, 37.3, 37.4_
 
-  - [ ]* 1.6 Write property test for CryptFS key derivation determinism (Property 17)
+  - [ ] 1.6 Write property test for CryptFS key derivation determinism (Property 17)
     - **Property 17: CryptFS Key Derivation Determinism**
     - **Validates: Requirement 37.4**
     - Use `theft` to generate passphrases (1–256 chars) and salts (16–64 bytes); call `sigma_cryptfs_derive_key()` twice per pair and assert identical 256-bit outputs
@@ -56,7 +56,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Replace `fake_dev` stub call with `pci_scan_devices(devices, max)`
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ]* 1.8 Write property tests for PCI scanner (Properties 3 & 4)
+  - [ ] 1.8 Write property tests for PCI scanner (Properties 3 & 4)
     - **Property 3: PCI Device Field Capture Completeness** — Validates: Requirement 4.3
     - **Property 4: Empty PCI Slot Exclusion** — Validates: Requirement 4.4
     - Use `theft` to generate mock PCI config tables; assert field capture and empty-slot filtering
@@ -79,7 +79,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Add `enableResize(windowId)` binding resize handle; constrain to min 200×150 px
     - _Requirements: 5.2, 5.3_
 
-  - [ ]* 3.3 Write property tests for window drag and resize (Properties 5 & 6)
+  - [ ] 3.3 Write property tests for window drag and resize (Properties 5 & 6)
     - **Property 5: Window Drag Position Translation** — Validates: Requirement 5.2
     - **Property 6: Window Resize Minimum Constraints** — Validates: Requirement 5.3
     - Use `fast-check` to generate drag deltas in [-1000, 1000] and resize dimensions including (0×0, 199×149, 200×150)
@@ -91,7 +91,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Click handler calls `focusWindow(id)` and updates active highlight
     - _Requirements: 5.4, 5.5_
 
-  - [ ]* 3.5 Write unit tests for WindowManager
+  - [ ] 3.5 Write unit tests for WindowManager
     - Test window create, focus, close, taskbar sync, and z-index ordering
     - _Test file: `tests/unit/webshell/windowManager.test.js`_
 
@@ -103,7 +103,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Implement formatting toolbar: bold (`**`), italic (`_`), heading (`#`), link (`[]()`); insert at cursor position
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-  - [ ]* 4.2 Write unit tests for SigmaNotes
+  - [ ] 4.2 Write unit tests for SigmaNotes
     - Test debounce timing (≤500ms), toolbar insertions, cursor position, Markdown render correctness
     - _Test file: `tests/unit/apps/sigmaNotes.test.js`_
 
@@ -114,7 +114,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Implement `runFile()` calling `navigator.sigmaos.process.spawn()` and piping stdout/stderr to integrated terminal panel
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-  - [ ]* 4.4 Write unit tests for SigmaCode
+  - [ ] 4.4 Write unit tests for SigmaCode
     - Test open/save round-trip, process spawn stdout display, and error handling for missing files
     - _Test file: `tests/unit/apps/sigmaCode.test.js`_
 
@@ -124,7 +124,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Build slide-out panel listing notifications chronologically; clear badge on open
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-  - [ ]* 4.6 Write unit tests for Notification Center
+  - [ ] 4.6 Write unit tests for Notification Center
     - Test FIFO ordering, badge increment/reset, and panel toggle behavior
     - _Test file: `tests/unit/webshell/notificationCenter.test.js`_
 
@@ -135,7 +135,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Track `failedAttempts`; impose 30-second lockout after 3 consecutive failures
     - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-  - [ ]* 4.8 Write unit tests for Lock Screen
+  - [ ] 4.8 Write unit tests for Lock Screen
     - Test Ctrl+L binding, clock updates, correct PIN unlock, three-strike lockout timing
     - _Test file: `tests/unit/webshell/lockScreen.test.js`_
 
@@ -156,7 +156,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Send `{type:'resize', cols, rows}` JSON message on terminal resize event
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-  - [ ]* 6.3 Write unit tests for SigmaTerm
+  - [ ] 6.3 Write unit tests for SigmaTerm
     - Test input forwarding, output rendering, resize signal, and WebSocket reconnection logic
     - _Test file: `tests/unit/apps/sigmaTerm.test.js`_
 
@@ -167,7 +167,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Ensure AI fetch is non-blocking: editor input events never await the fetch directly
     - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
-  - [ ]* 7.2 Write unit tests for SigmaNotes AI
+  - [ ] 7.2 Write unit tests for SigmaNotes AI
     - Test success path, 5-second timeout rejection, retry mechanism, and non-blocking behavior
     - _Test file: `tests/unit/apps/sigmaNotesAI.test.js`_
 
@@ -179,7 +179,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Implement `recomposite()` clearing canvas and blending all visible layers in order
     - _Requirements: 12.1, 12.2, 12.3, 12.4_
 
-  - [ ]* 7.4 Write unit tests for SigmaPaint
+  - [ ] 7.4 Write unit tests for SigmaPaint
     - Test layer create/reorder/toggle, recomposite ordering, and 100ms visibility latency
     - _Test file: `tests/unit/apps/sigmaPaint.test.js`_
 
@@ -190,7 +190,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - On network error: set `available = false`, show single non-blocking status indicator
     - _Requirements: 13.1, 13.2, 13.3, 13.4_
 
-  - [ ]* 7.6 Write unit tests for Neural UI Engine
+  - [ ] 7.6 Write unit tests for Neural UI Engine
     - Test 200 path, non-200 fallback, unreachable endpoint disablement, and status indicator
     - _Test file: `tests/unit/webshell/neuralUIEngine.test.js`_
 
@@ -200,7 +200,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Reset `reconnectDelay` to 1s on successful reconnection
     - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-  - [ ]* 7.8 Write unit tests for Enterprise Dashboard
+  - [ ] 7.8 Write unit tests for Enterprise Dashboard
     - Test SSE metric update, disconnection indicator, and exponential backoff timing
     - _Test file: `tests/unit/apps/enterpriseDashboard.test.js`_
 
@@ -222,13 +222,13 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - On sandbox exit: release all resources within 500ms (`context.WithTimeout`)
     - _Requirements: 15.2, 15.3, 15.4_
 
-  - [ ]* 9.3 Write property tests for sandbox enforcement (Properties 7 & 8)
+  - [ ] 9.3 Write property tests for sandbox enforcement (Properties 7 & 8)
     - **Property 7: Sandbox Syscall Enforcement** — Validates: Requirement 15.2
     - **Property 8: Capability Violation Audit Logging** — Validates: Requirement 15.3
     - Use `gopter` to generate syscall lists and manifests; assert denial and log entry creation
     - _Test file: `tests/unit/kernel/sandbox_enforcement_property_test.go`_
 
-  - [ ]* 9.4 Write integration tests for zero-install sandbox
+  - [ ] 9.4 Write integration tests for zero-install sandbox
     - Test with manifests requesting no capabilities, network-only, and filesystem.read
     - Verify untrusted syscalls are blocked and violations are logged
     - _Test file: `tests/integration/sandbox_enforcement_test.go`_
@@ -245,7 +245,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Implement `setStatus(status, error)` updating class and `title` attribute for hover error text
     - _Requirements: 16.3, 16.4_
 
-  - [ ]* 10.3 Write unit tests for Cloud Sync
+  - [ ] 10.3 Write unit tests for Cloud Sync
     - Test OAuth callback handling, token storage, and status indicator state transitions
     - _Test file: `tests/unit/webshell/cloudSync.test.js`_
 
@@ -255,7 +255,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - On AI failure (`catch`): set `aiAvailable = false`, fallback to `textMatchSearch()` across indexed sources; show "AI ranking unavailable" badge
     - _Requirements: 17.1, 17.2, 17.3, 17.4_
 
-  - [ ]* 10.5 Write unit tests for SigmaAI Assistant
+  - [ ] 10.5 Write unit tests for SigmaAI Assistant
     - Test overlay show/hide, ranked result display, 2s latency, text-match fallback, and unavailability indicator
     - _Test file: `tests/unit/webshell/sigmaAIAssistant.test.js`_
 
@@ -266,13 +266,13 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Support MIME types: `text/plain`, `text/html`, `image/*`
     - _Requirements: 18.1, 18.2, 18.3, 18.4_
 
-  - [ ]* 10.7 Write property test for clipboard round-trip fidelity (Property 9)
+  - [ ] 10.7 Write property test for clipboard round-trip fidelity (Property 9)
     - **Property 9: Clipboard Round-Trip Fidelity**
     - **Validates: Requirements 18.3, 18.4**
     - Use `gopter` to generate text strings (ASCII, Unicode), HTML snippets, base64 images; Write then Read and assert identical content and MIME type
     - _Test file: `tests/unit/kernel/clipboard_roundtrip_property_test.go`_
 
-  - [ ]* 10.8 Write integration tests for clipboard daemon IPC
+  - [ ] 10.8 Write integration tests for clipboard daemon IPC
     - Test multi-client broadcast, concurrent reads, and 100ms read latency guarantee
     - _Test file: `tests/integration/clipboard_daemon_test.go`_
 
@@ -301,7 +301,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Include `npm` or `make` build step and README with quickstart instructions
     - _Requirements: 19.3_
 
-  - [ ]* 12.5 Write unit tests for SDK validator
+  - [ ] 12.5 Write unit tests for SDK validator
     - Test valid manifests, each required-field missing, invalid capability value, and invalid semver
     - _Test file: `tests/unit/sdk/manifestValidator.test.js`_
 
@@ -312,7 +312,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - On signature failure: abort installation and display untrusted-package error message
     - _Requirements: 20.1, 20.2, 20.3, 20.4_
 
-  - [ ]* 13.2 Write unit tests for App Store
+  - [ ] 13.2 Write unit tests for App Store
     - Test registry fetch, valid-signature install, invalid-signature abort, and offline fallback to cached list
     - _Test file: `tests/unit/webshell/appStore.test.js`_
 
@@ -345,7 +345,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Add service exit handler: log `service_name` + exit code on non-zero exit, then restart service
     - _Requirements: 23.1, 23.2, 23.3_
 
-  - [ ]* 15.2 Write unit tests for PID 1 watchdog
+  - [ ] 15.2 Write unit tests for PID 1 watchdog
     - Test that init never returns from main loop, service restart on non-zero exit, and exit code logging
     - _Test file: `tests/unit/kernel/sigma_init_watchdog_test.c`_
 
@@ -355,7 +355,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Add security audit log entry when any copy would exceed buffer capacity (before truncation)
     - _Requirements: 24.1, 24.2, 24.3, 24.4_
 
-  - [ ]* 15.4 Write property tests for ZeroTrust bounded string operations (Properties 10 & 11)
+  - [ ] 15.4 Write property tests for ZeroTrust bounded string operations (Properties 10 & 11)
     - **Property 10: ZeroTrust Bounded String Copy** — Validates: Requirements 24.1, 24.2
     - **Property 11: Buffer Overflow Security Event Logging** — Validates: Requirement 24.4
     - Use `theft` to generate strings (0–1000 bytes) and buffers (16–512 bytes); verify canary integrity, null termination, and audit log entry on overflow
@@ -367,7 +367,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Ensure runtime revocation is enforced: no restart required; check runs on every subsequent request
     - _Requirements: 25.1, 25.2, 25.3, 25.4_
 
-  - [ ]* 15.6 Write property tests for revocation list enforcement (Properties 12 & 13)
+  - [ ] 15.6 Write property tests for revocation list enforcement (Properties 12 & 13)
     - **Property 12: Revocation List Consultation on Every Check** — Validates: Requirements 25.1, 25.3
     - **Property 13: Runtime Revocation Enforcement** — Validates: Requirement 25.4
     - Use `theft` to generate workload IDs and revocation list states; assert every-check consultation and immediate denial
@@ -379,7 +379,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - On extension restart: iterate all pending Promises in `pendingCalls` map and reject each one
     - _Requirements: 26.1, 26.2, 26.3, 26.4_
 
-  - [ ]* 15.8 Write unit tests for extension Promise resolution
+  - [ ] 15.8 Write unit tests for extension Promise resolution
     - Test 10s timeout rejection, response-before-timeout resolve, restart-time pending rejection
     - _Test file: `tests/unit/webshell/extensionPromises.test.js`_
 
@@ -392,3 +392,43 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
 
 - [ ] 16. Checkpoint — Critical bug fixes verified
   - Ensure all critical bug fix tests pass and `nm` verification confirms no glibc symbols. Ask the user if questions arise.
+
+## Task Dependency Graph
+
+```
+1 -> 2
+2 -> 3, 6, 9, 12, 15
+3 -> 4
+4 -> 5
+5 -> 6
+6 -> 7
+7 -> 8
+8 -> 9
+9 -> 10
+10 -> 11
+11 -> 12
+12 -> 13
+13 -> 14
+14 -> 15
+15 -> 16
+```
+
+```json
+{
+  "waves": [
+    {"wave": 1, "tasks": ["1"]},
+    {"wave": 2, "tasks": ["2"]},
+    {"wave": 3, "tasks": ["3", "6", "9", "12", "15"]},
+    {"wave": 4, "tasks": ["4", "7", "10", "13"]},
+    {"wave": 5, "tasks": ["5", "8", "11", "14", "16"]}
+  ]
+}
+```
+
+## Notes
+
+- Phase 0 kernel tasks (task 1) must complete before any subsequent phases.
+- Checkpoints (tasks 2, 5, 8, 11, 14, 16) are validation gates; all children of the preceding phase must pass before advancing.
+- Property-based tests (PBT) are co-located with their implementation sub-tasks and must pass before the parent task is marked complete.
+- Languages: C/C++ for kernel modules, Go for daemons, JavaScript/TypeScript for web shell and applications.
+- Property test libraries: `theft`/`rapidcheck` (C), `fast-check` (JS), `gopter` (Go).
