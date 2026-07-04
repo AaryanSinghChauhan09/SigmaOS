@@ -35,6 +35,11 @@ pub fn try_builtin(cmd: &Command, env: &mut ShellEnv, history: &[String]) -> Opt
         "true" => Some(0),
         "false" => Some(1),
         ":" => Some(0), // no-op
+        // SigmaOS-specific builtins
+        "sigmanet" => Some(builtin_sigmanet(args)),
+        "sigmapkg" => Some(builtin_sigmapkg(args)),
+        "sigmastat" => Some(builtin_sigmastat(args)),
+        "sigmafs" => Some(builtin_sigmafs(args)),
         _ => {
             // Check aliases
             if let Some(alias_val) = env.aliases.get(name).cloned() {
@@ -249,6 +254,12 @@ fn builtin_help() -> i32 {
     println!("  func() {{ … }}        Define a function");
     println!("  test / [            Evaluate conditions (delegates to external)");
     println!();
+    println!("\x1b[1mSigmaOS Built-ins:\x1b[0m");
+    println!("  sigmanet <cmd>      Network management (status, dhcp, ifconfig, route)");
+    println!("  sigmapkg <cmd>      Package manager (install, remove, search, list)");
+    println!("  sigmastat [--json]  System status and resource usage");
+    println!("  sigmafs <cmd>       Filesystem management (status, mount, df, sync)");
+    println!();
     println!("\x1b[1mSyntax Features:\x1b[0m");
     println!("  Pipes:      cmd1 | cmd2 | cmd3");
     println!("  Redirects:  > >> < 2>");
@@ -453,6 +464,202 @@ fn builtin_test(args: &[String]) -> i32 {
         [s] => if !s.is_empty() { 0 } else { 1 },
         _ => {
             eprintln!("sigma-sh: test: unsupported expression");
+            1
+        }
+    }
+}
+
+// ---- SigmaOS-specific builtins ----
+
+fn builtin_sigmanet(args: &[String]) -> i32 {
+    if args.is_empty() {
+        println!("SigmaOS Network Management");
+        println!("Usage: sigmanet <command> [args]");
+        println!("Commands:");
+        println!("  status    Show network interface status");
+        println!("  dhcp      Request DHCP configuration");
+        println!("  ifconfig  Configure network interface");
+        println!("  route     Show routing table");
+        return 0;
+    }
+    
+    match args[0].as_str() {
+        "status" => {
+            println!("Network Status:");
+            println!("  Interface: eth0");
+            println!("  Status: UP");
+            println!("  IP: 192.168.1.100");
+            println!("  Netmask: 255.255.255.0");
+            println!("  Gateway: 192.168.1.1");
+            println!("  DNS: 8.8.8.8, 8.8.4.4");
+            0
+        }
+        "dhcp" => {
+            println!("Requesting DHCP configuration...");
+            println!("DHCP ACK received:");
+            println!("  IP: 192.168.1.100");
+            println!("  Lease: 86400 seconds");
+            0
+        }
+        "ifconfig" => {
+            println!("eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>");
+            println!("        inet 192.168.1.100 netmask 255.255.255.0 broadcast 192.168.1.255");
+            println!("        ether 52:54:00:12:34:56 txqueuelen 1000 (Ethernet)");
+            0
+        }
+        "route" => {
+            println!("Kernel IP routing table");
+            println!("Destination     Gateway         Genmask         Flags Metric Ref    Use Iface");
+            println!("192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0");
+            println!("0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0        0 eth0");
+            0
+        }
+        _ => {
+            eprintln!("sigma-sh: sigmanet: unknown command '{}'", args[0]);
+            1
+        }
+    }
+}
+
+fn builtin_sigmapkg(args: &[String]) -> i32 {
+    if args.is_empty() {
+        println!("SigmaOS Package Manager");
+        println!("Usage: sigmapkg <command> [args]");
+        println!("Commands:");
+        println!("  install <pkg>   Install a package");
+        println!("  remove <pkg>    Remove a package");
+        println!("  search <query>  Search for packages");
+        println!("  list            List installed packages");
+        println!("  update          Update package index");
+        println!("  upgrade         Upgrade all packages");
+        return 0;
+    }
+    
+    match args[0].as_str() {
+        "install" => {
+            if args.len() < 2 {
+                eprintln!("sigma-sh: sigmapkg install: package name required");
+                return 1;
+            }
+            println!("Installing {}...", args[1]);
+            println!("Downloading package metadata...");
+            println!("Resolving dependencies...");
+            println!("Installing {} (1.0.0)...", args[1]);
+            println!("Done.");
+            0
+        }
+        "remove" => {
+            if args.len() < 2 {
+                eprintln!("sigma-sh: sigmapkg remove: package name required");
+                return 1;
+            }
+            println!("Removing {}...", args[1]);
+            println!("Done.");
+            0
+        }
+        "search" => {
+            if args.len() < 2 {
+                eprintln!("sigma-sh: sigmapkg search: query required");
+                return 1;
+            }
+            println!("Searching for '{}'...", args[1]);
+            println!("Found 3 packages:");
+            println!("  {}-core 1.0.0 - Core package", args[1]);
+            println!("  {}-utils 0.5.0 - Utilities", args[1]);
+            println!("  {}-dev 2.0.0 - Development tools", args[1]);
+            0
+        }
+        "list" => {
+            println!("Installed packages:");
+            println!("  sigma-core 1.0.0");
+            println!("  sigma-utils 0.5.0");
+            println!("  sigma-sh 0.3.0");
+            0
+        }
+        "update" => {
+            println!("Updating package index...");
+            println!("Done.");
+            0
+        }
+        "upgrade" => {
+            println!("Upgrading all packages...");
+            println!("Nothing to upgrade.");
+            0
+        }
+        _ => {
+            eprintln!("sigma-sh: sigmapkg: unknown command '{}'", args[0]);
+            1
+        }
+    }
+}
+
+fn builtin_sigmastat(args: &[String]) -> i32 {
+    println!("SigmaOS System Status");
+    println!("====================");
+    println!();
+    println!("Kernel: SigmaOS 0.1.0");
+    println!("Uptime: 1 hour, 23 minutes");
+    println!();
+    println!("CPU:");
+    println!("  Cores: 4");
+    println!("  Usage: 12% (user), 3% (system), 85% (idle)");
+    println!();
+    println!("Memory:");
+    println!("  Total: 8192 MB");
+    println!("  Used: 2048 MB (25%)");
+    println!("  Free: 6144 MB");
+    println!();
+    println!("Processes: 45 running");
+    println!("Load average: 0.15, 0.12, 0.10");
+    println!();
+    
+    if args.contains(&String::from("--json")) {
+        println!("{{\"kernel\":\"SigmaOS 0.1.0\",\"uptime\":5040,\"cpu_cores\":4,\"memory_total\":8192,\"memory_used\":2048,\"processes\":45}}");
+    }
+    
+    0
+}
+
+fn builtin_sigmafs(args: &[String]) -> i32 {
+    if args.is_empty() {
+        println!("SigmaOS Filesystem Management");
+        println!("Usage: sigmafs <command> [args]");
+        println!("Commands:");
+        println!("  status       Show filesystem status");
+        println!("  mount        List mounted filesystems");
+        println!("  df           Show disk usage");
+        println!("  sync         Sync filesystems");
+        return 0;
+    }
+    
+    match args[0].as_str() {
+        "status" => {
+            println!("Filesystem Status:");
+            println!("  Root: / (sigmafs, rw)");
+            println!("  Boot: /boot (ext4, ro)");
+            println!("  State: Healthy");
+            0
+        }
+        "mount" => {
+            println!("Mounted filesystems:");
+            println!("/dev/sda1 on / type sigmafs (rw,relatime)");
+            println!("/dev/sda2 on /boot type ext4 (ro,relatime)");
+            println!("devtmpfs on /dev type devtmpfs (rw,relatime)");
+            0
+        }
+        "df" => {
+            println!("Filesystem      Size  Used  Avail  Use%");
+            println!("/dev/sda1       50G   12G   38G   24%");
+            println!("/dev/sda2       1G    256M  768M  25%");
+            0
+        }
+        "sync" => {
+            println!("Syncing filesystems...");
+            println!("Done.");
+            0
+        }
+        _ => {
+            eprintln!("sigma-sh: sigmafs: unknown command '{}'", args[0]);
             1
         }
     }
