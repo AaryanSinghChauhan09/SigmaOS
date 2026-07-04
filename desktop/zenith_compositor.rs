@@ -49,6 +49,15 @@ pub enum PixelFormat {
     RGB565,
 }
 
+// ─── Layout Types ─────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Layout {
+    MasterStack,    // One large window + side panel
+    Stack,          // All windows equal size
+    Tabbed,         // Tabbed interface
+}
+
 // ─── Zenith Compositor ─────────────────────────────────────────────────────────
 
 pub struct ZenithCompositor {
@@ -60,6 +69,8 @@ pub struct ZenithCompositor {
     pub focused_window: Option<u32>,
     pub cursor_x: i32,
     pub cursor_y: i32,
+    pub layout: Layout,
+    pub master_window: Option<u32>,
     pub initialized: bool,
 }
 
@@ -75,6 +86,8 @@ impl ZenithCompositor {
             focused_window: None,
             cursor_x: (width / 2) as i32,
             cursor_y: (height / 2) as i32,
+            layout: Layout::MasterStack,
+            master_window: None,
             initialized: false,
         }
     }
@@ -351,4 +364,186 @@ impl ZenithCompositor {
     pub fn list_windows(&self) -> Vec<&Window> {
         self.windows.values().collect()
     }
+
+    /// Switch layout (Super+{1,2,3})
+    pub fn switch_layout(&mut self, layout: Layout) {
+        self.layout = layout;
+        self.apply_layout();
+    }
+
+    /// Set master window for MasterStack layout
+    pub fn set_master_window(&mut self, window_id: u32) -> Result<(), String> {
+        if self.windows.contains_key(&window_id) {
+            self.master_window = Some(window_id);
+            self.apply_layout();
+            Ok(())
+        } else {
+            Err("Window not found".to_string())
+        }
+    }
+
+    /// Apply current layout to all windows
+    fn apply_layout(&mut self) {
+        let window_ids: Vec<u32> = self.windows.keys().cloned().collect();
+        
+        match self.layout {
+            Layout::MasterStack => {
+                self.apply_master_stack(&window_ids);
+            }
+            Layout::Stack => {
+                self.apply_stack(&window_ids);
+            }
+            Layout::Tabbed => {
+                self.apply_tabbed(&window_ids);
+            }
+        }
+    }
+
+    /// Master-stack layout: one large window + side panel
+    fn apply_master_stack(&mut self, window_ids: &[u32]) {
+        if window_ids.is_empty() {
+            return;
+        }
+
+        let master_id = self.master_window.or_else(|| window_ids.first().copied());
+        
+        if let Some(master) = master_id {
+            // Master window takes 60% of screen width
+            if let Some(window) = self.windows.get_mut(&master) {
+                window.x = 0;
+                window.y = 0;
+                window.width = (self.width as f64 * 0.6) as u32;
+                window.height = self.height;
+            }
+
+            // Stack windows in side panel (40% width)
+            let panel_width = (self.width as f64 * 0.4) as u32;
+            let panel_x = (self.width as f64 * 0.6) as i32;
+            let stack_height = self.height / window_ids.len().max(1) as u32;
+
+            let mut stack_idx = 0;
+            for &wid in window_ids {
+                if wid != master {
+                    if let Some(window) = self.windows.get_mut(&wid) {
+                        window.x = panel_x;
+                        window.y = (stack_idx * stack_height) as i32;
+                        window.width = panel_width;
+                        window.height = stack_height;
+                        stack_idx += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    /// Stack layout: all windows equal size
+    fn apply_stack(&mut self, window_ids: &[u32]) {
+        if window_ids.is_empty() {
+            return;
+        }
+
+        let cols = (window_ids.len() as f64).sqrt().ceil() as usize;
+        let rows = (window_ids.len() as f64 / cols as f64).ceil() as usize;
+        
+        let win_width = self.width / cols as u32;
+        let win_height = self.height / rows as u32;
+
+        for (i, &wid) in window_ids.iter().enumerate() {
+            if let Some(window) = self.windows.get_mut(&wid) {
+                let col = i % cols;
+                let row = i / cols;
+                window.x = (col * win_width as usize) as i32;
+                window.y = (row * win_height as usize) as i32;
+                window.width = win_width;
+                window.height = win_height;
+            }
+        }
+    }
+
+    /// Tabbed layout: all windows full screen (tabbed)
+    fn apply_tabbed(&mut self, window_ids: &[u32]) {
+        for &wid in window_ids {
+            if let Some(window) = self.windows.get_mut(&wid) {
+                window.x = 0;
+                window.y = 0;
+                window.width = self.width;
+                window.height = self.height;
+                // Only show focused window
+                window.visible = Some(wid) == self.focused_window;
+            }
+        }
+    }
+
+    /// Snap window to edge
+    pub fn snap_to_edge(&mut self, window_id: u32, edge: Edge) -> Result<(), String> {
+        if let Some(window) = self.windows.get_mut(&window_id) {
+            match edge {
+                Edge::Left => {
+                    window.x = 0;
+                    window.y = 0;
+                    window.width = self.width / 2;
+                    window.height = self.height;
+                }
+                Edge::Right => {
+                    window.x = (self.width / 2) as i32;
+                    window.y = 0;
+                    window.width = self.width / 2;
+                    window.height = self.height;
+                }
+                Edge::Top => {
+                    window.x = 0;
+                    window.y = 0;
+                    window.width = self.width;
+                    window.height = self.height / 2;
+                }
+                Edge::Bottom => {
+                    window.x = 0;
+                    window.y = (self.height / 2) as i32;
+                    window.width = self.width;
+                    window.height = self.height / 2;
+                }
+                Edge::TopLeft => {
+                    window.x = 0;
+                    window.y = 0;
+                    window.width = self.width / 2;
+                    window.height = self.height / 2;
+                }
+                Edge::TopRight => {
+                    window.x = (self.width / 2) as i32;
+                    window.y = 0;
+                    window.width = self.width / 2;
+                    window.height = self.height / 2;
+                }
+                Edge::BottomLeft => {
+                    window.x = 0;
+                    window.y = (self.height / 2) as i32;
+                    window.width = self.width / 2;
+                    window.height = self.height / 2;
+                }
+                Edge::BottomRight => {
+                    window.x = (self.width / 2) as i32;
+                    window.y = (self.height / 2) as i32;
+                    window.width = self.width / 2;
+                    window.height = self.height / 2;
+                }
+            }
+            Ok(())
+        } else {
+            Err("Window not found".to_string())
+        }
+    }
+}
+
+// ─── Edge Enum for Snap-to-Edge ─────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Edge {
+    Left,
+    Right,
+    Top,
+    Bottom,
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
 }
