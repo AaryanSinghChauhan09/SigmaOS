@@ -25,6 +25,10 @@ Phase H  ████████████████░░░░  50% 🔄 
   - sigma-accounts (GST IRN): ✅
   - sigma-pay (UPI/NPCI): ✅
   - sigma-aadhaar (QR Auth): ✅
+Phase I  ██████████████░░░░░░  40% 🔄  (Desktop & Drivers — ACTIVE)
+  - Zenith Desktop Compositor: ✅
+  - i915 GPU Driver: ✅
+  - iwlwifi Wi-Fi Driver: ✅
 ```
 
 ## The Critical Path
