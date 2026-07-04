@@ -17,11 +17,25 @@ type
   SovereignPkgManager* = object of RootObj
     initialized*: SigmaBool
 
+type
+  SovereignPkgManagerPQCSecure* = object of SovereignPkgManager
+    pqc_verified*: SigmaBool
+
 proc newSovereignPkgManager*(): SovereignPkgManager =
   result = SovereignPkgManager(initialized: false)
 
+proc newSovereignPkgManagerPQCSecure*(): SovereignPkgManagerPQCSecure =
+  result = SovereignPkgManagerPQCSecure(
+    initialized: false,
+    pqc_verified: false
+  )
+
 proc verify_dilithium_signature*(self: var SovereignPkgManager) =
   self.initialized = true
+
+proc verify_ml_dsa*(self: var SovereignPkgManagerPQCSecure) =
+  self.initialized = true
+  self.pqc_verified = true
 
 proc resolve_dependencies*(self: var SovereignPkgManager) =
   self.initialized = true

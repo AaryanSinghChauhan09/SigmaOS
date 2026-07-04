@@ -9,3 +9,4 @@ pub mod sigma_usercopy;
 pub mod ai_scheduler;
 pub mod pqc;
 pub mod memory_pool;
+pub mod interrupt_coalesce;
