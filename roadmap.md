@@ -26,55 +26,55 @@ then layers on the sovereign differentiators that make SigmaOS worth choosing.
 
 | Task | File | Done? |
 |------|------|-------|
-| Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.cpp` | ⬜ |
-| Buddy physical allocator | `kernel/core/sigma_mm.cpp` | ⬜ |
-| Slab allocator (kmalloc) | `kernel/core/sigma_mm.cpp` | ⬜ |
-| x86-64 4-level page table walker | `kernel/mm/sigma_vmm.cpp` | ⬜ |
-| APIC + PIC init | `kernel/core/sigma_irq.cpp` | ⬜ |
-| HPET/APIC timer → jiffies | `kernel/core/sigma_timer.cpp` | ⬜ |
-| 30-syscall dispatch table | `kernel/core/sigma_syscall_dispatch.cpp` | ⬜ |
-| VESA/GOP framebuffer | `drivers/display/sigma_vesa.cpp` | ⬜ |
-| sigma-boot.efi UEFI loader | `sigma-boot/sigma_boot.c` | ⬜ |
-| **`make iso` → bootable ISO** | `Makefile` | ⬜ |
+| Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.cpp` | ✅ |
+| Buddy physical allocator | `kernel/core/sigma_mm.cpp` | ✅ |
+| Slab allocator (kmalloc) | `kernel/core/sigma_mm.cpp` | ✅ |
+| x86-64 4-level page table walker | `kernel/mm/sigma_vmm.cpp` | ✅ |
+| APIC + PIC init | `kernel/core/sigma_irq.cpp` | ✅ |
+| HPET/APIC timer → jiffies | `kernel/core/sigma_timer.cpp` | ✅ |
+| 30-syscall dispatch table | `kernel/core/sigma_syscall_dispatch.cpp` | ✅ |
+| VESA/GOP framebuffer | `drivers/display/sigma_vesa.cpp` | ✅ |
+| sigma-boot.efi UEFI loader | `sigma-boot/sigma_boot.c` | ✅ |
+| **`make iso` → bootable ISO** | `Makefile` | ✅ |
 
 ### Drivers (minimum viable set)
 
 | Driver | Hardware | Done? |
 |--------|----------|-------|
-| e1000 NIC | Intel Gigabit / QEMU virtio-net | 🔄 |
+| e1000 NIC | Intel Gigabit / QEMU virtio-net | ✅ |
 | NVMe | PCIe SSDs | ✅ |
 | xHCI USB | USB 3.x | ✅ |
 | VirtIO-blk | QEMU block device | ✅ |
-| VESA framebuffer | All UEFI | ⬜ |
-| USB HID | Keyboard + mouse | ⬜ |
+| VESA framebuffer | All UEFI | ✅ |
+| USB HID | Keyboard + mouse | ✅ |
 
 ### Filesystem
 
 | Task | Done? |
 |------|-------|
-| VFS open/read/write/close | ⬜ |
-| Tmpfs (RAM-backed) | ⬜ |
-| Ext4 read-only mount | ⬜ |
+| VFS open/read/write/close | ✅ |
+| Tmpfs (RAM-backed) | ✅ |
+| Ext4 read-only mount | ✅ |
 | FAT32 (EFI partition) | ✅ |
 
 ### Shell & Userland
 
 | Task | Done? |
 |------|-------|
-| sigma-sh: basic REPL (exec, cd, ls, cat, echo) | ⬜ |
-| sigma-sh: env vars + PATH | ⬜ |
-| sigma-init: PID 1, mount /proc /sys /dev | ⬜ |
-| sigma-pkg: install/remove from local repo | ⬜ |
-| Minimal coreutils (ls, cp, mv, rm, mkdir) | ⬜ |
+| sigma-sh: basic REPL (exec, cd, ls, cat, echo) | ✅ |
+| sigma-sh: env vars + PATH | ✅ |
+| sigma-init: PID 1, mount /proc /sys /dev | ✅ |
+| sigma-pkg: install/remove from local repo | ✅ |
+| Minimal coreutils (ls, cp, mv, rm, mkdir) | ✅ |
 
 ### Installer
 
 | Task | Done? |
 |------|-------|
-| CLI partition wizard (fdisk wrapper) | ⬜ |
-| Install to disk (dd + grub-install equivalent) | ⬜ |
-| Dual-boot EFI entry registration | ⬜ |
-| Live USB boot (tmpfs overlay) | ⬜ |
+| CLI partition wizard (fdisk wrapper) | ✅ |
+| Install to disk (dd + grub-install equivalent) | ✅ |
+| Dual-boot EFI entry registration | ✅ |
+| Live USB boot (tmpfs overlay) | ✅ |
 
 ### CI Gate
 
