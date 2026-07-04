@@ -1,9 +1,12 @@
 # SHARD ORCHESTRATION
 
+1
 
+1
 
 SigmaOS is composed of 600+ independent functional units known as **Shards**. These shards are orchestrated by the `SovereignShardManager` to ensure maximum availability and performance.
 
+1
 
 1. **Isolation**: Every shard runs in its own hardware-protected address space.
 
@@ -11,6 +14,7 @@ SigmaOS is composed of 600+ independent functional units known as **Shards**. Th
 
 3. **Redundancy**: Critical shards (PMM, VMM, Security) maintain hot-standby mirrors.
 
+1
 
 When a shard failure is detected by the `SovereignMonitor`, the following sequence is initiated:
 
@@ -22,7 +26,9 @@ When a shard failure is detected by the `SovereignMonitor`, the following sequen
 
 4. **Audit**: The failure root cause is analyzed by the `SovereignAI` for future prevention.
 
+1
 
+1
 
 class SovereignShardManager {
 public:
@@ -31,5 +37,8 @@ public:
     void restartShard(sigma_shard_id_t id);
 };
 
+1
 
+1
 
+1

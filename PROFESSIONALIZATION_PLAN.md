@@ -8,7 +8,7 @@
 
 - [x] Automated directory and manifest generation for all specialized roles.
 
-- [x] Synchronized the [PROFESSION-MAP.md](PROFESSION-MAP) as the source of truth for role-based tools.
+- [x] Synchronized the [PROFESSION-MAP.md](PROFESSION-MAP.md) as the source of truth for role-based tools.
 
 ## 2. Industrial Hardening
 

@@ -1,9 +1,14 @@
 # ROADMAP SEQUENCE
 
+1
 
+1
 
+1
 
+1
 
+1
 
 1. **ARM64 optimization for RPi5** ? crush hardware sovereignty requirements.
 

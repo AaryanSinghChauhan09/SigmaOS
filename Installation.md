@@ -47,7 +47,7 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
 
 1. **Build the Kernel**
 
-   Follow the instructions in [Build.md](Build) to compile `sigma_os.elf`.
+   Follow the instructions in [Build.md](Build.md) to compile `sigma_os.elf`.
 
 1. **Run QEMU**
 

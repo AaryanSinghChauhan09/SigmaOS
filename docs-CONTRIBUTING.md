@@ -51,7 +51,7 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 
 ## 🛡️ Security First
 
-If you find a security vulnerability, please follow our **[Security Policy](SECURITY)**. Do NOT open a public issue for security bugs.
+If you find a security vulnerability, please follow our **[Security Policy](SECURITY.md)**. Do NOT open a public issue for security bugs.
 
 ---
 

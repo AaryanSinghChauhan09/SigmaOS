@@ -32,7 +32,7 @@ This document tracks the incomplete work and future tasks required to achieve 10
 
 ## 🛠️ 3. Baseline Toolset (The Manifest)
 
-*[x]**Definition**: [CORE_TOOLSET.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/architecture/CORE_TOOLSET) created.
+*[x]**Definition**: [CORE_TOOLSET.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/architecture/CORE_TOOLSET.md) created.
 
 *[ ]**🔜 Task**: Finalize the "Default Toolset Manifest" bundles for:
   *[ ]**System Utilities**: BleachBit (Cleanup), Timeshift (Backup), htop/sysbench (Monitoring).
@@ -62,7 +62,7 @@ This document tracks the incomplete work and future tasks required to achieve 10
 - [ ] Boot Times (<2ms enforcement)
 - [ ] GUI Responsiveness (Latency monitoring)
 
-*[ ]**🔜 Task**: Publish real-time benchmark results to the [Performance Benchmarks](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Performance-Benchmarks) page.
+*[ ]**🔜 Task**: Publish real-time benchmark results to the [Performance Benchmarks](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Performance-Benchmarks.md) page.
 
 ---
 

@@ -1,20 +1,28 @@
 # WIKI-Contributing
 
+1
 
 > Join the evolution of digital sovereignty.
 
 ---
 
+1
 
 SigmaOS is an industrial-grade project. All contributions must adhere to:
 
+1
 
+1
 
+1
 
 We follow a staged release cadence:
 
+1
 
+1
 
+1
 
 Every Pull Request triggers the following automated suite:
 
@@ -26,6 +34,7 @@ Every Pull Request triggers the following automated suite:
 
 4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
 
+1
 
 1. **Fork** the repository and create an `alpha` branch.
 

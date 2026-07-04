@@ -2,7 +2,7 @@
 
 Extends: `undici.Client`
 
-A mock client class that implements the same api as [MockPool](/docs/docs/api/MockPool).
+A mock client class that implements the same api as [MockPool](/docs/docs/api/MockPool.md).
 
 ## `new MockClient(origin, [options])`
 

@@ -22,7 +22,9 @@ A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
 ## 📄 Manifest Specification
 
+1
 
+1
 
 {
   "shard_id": "com.sigma.browser.firefox",

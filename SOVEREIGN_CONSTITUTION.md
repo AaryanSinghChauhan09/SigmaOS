@@ -1,11 +1,14 @@
 # SOVEREIGN CONSTITUTION
 
+1
 
+1
 
 This document serves as the supreme law of the SigmaOS codebase. Every shard, suite, and algorithm must adhere to these directives.
 
 ---
 
+1
 
 1. **LATTICE PURITY**: Kernel, drivers, bootloader, HAL must be hand-coded Assembly and C only.
 
@@ -15,6 +18,7 @@ This document serves as the supreme law of the SigmaOS codebase. Every shard, su
 
 4. **AI PURITY**: AI inference must be hand-coded C with SIMD intrinsics; zero Python in the inference path.
 
+1
 
 1. **DAG ORCHESTRATION**: No circular dependencies. The system is a strict Directed Acyclic Graph.
 
@@ -26,6 +30,7 @@ This document serves as the supreme law of the SigmaOS codebase. Every shard, su
 
 5. **LATENCY GUARANTEES**: Every module declares its maximum memory footprint and worst-case latency.
 
+1
 
 1. **DATA TRANSPARENCY**: Every command must support `--json` and `--binary` output.
 
@@ -35,6 +40,7 @@ This document serves as the supreme law of the SigmaOS codebase. Every shard, su
 
 4. **IDEMPOTENCY**: Commands must be safe to run multiple times with predictable outcomes.
 
+1
 
 1. **IMMUTABLE AUDIT**: Every automation event is written to the immutable Sovereign Forensic Lattice.
 
@@ -46,3 +52,4 @@ This document serves as the supreme law of the SigmaOS codebase. Every shard, su
 
 ---
 
+1

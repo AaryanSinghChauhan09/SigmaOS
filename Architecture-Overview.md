@@ -1,56 +1,102 @@
-# 🏗️ SigmaOS Architecture Overview
+# SigmaOS Architecture Overview
 
-> **Σ SigmaOS Zenith** is a sovereign, zero-dependency microkernel operating system built on a 600-shard C++ singleton lattice — targeting x86_64, ARM64, and RISC-V with absolute hardware independence.
+> Quick navigation: [Kernel](Kernel) · [HAL](HAL) · [Networking](Networking) · [Security-Model](Security-Model) · [System-Daemons](System-Daemons)
 
 ---
 
-## Memory Layout
+## System Layers
 
 ```
-0x0000_0000 — 0x0007_FFFF  ▪ BIOS & Legacy regions (reserved)
-0x0008_0000 — 0x0009_FFFF  ▪ VGA BIOS ROM
-0x000B_8000 — 0x000B_FFFF  ▪ VGA Text Mode Framebuffer (0xB8000)
-0x0010_0000 — 0x001F_FFFF  ▪ Kernel Image (.text, .data, .bss)
-0x0020_0000 — 0x002F_FFFF  ▪ Page Table Pool (sigma_paging)
-0x0030_0000 — 0x003F_FFFF  ▪ Kernel Stack
-0x0040_0000 — 0x013F_FFFF  ▪ Slab Allocator Arena (sigma_slab)
-0x8000_0000 — 0xFFFF_FFFF  ▪ MMIO / Device Registers (e.g., e1000 NIC)
-FFFF_8000 — 0xFFFF_FFFF_FFFF  ▪ Higher-Half Kernel Virtual (future)
+┌─────────────────────────────────────────────────────────────────┐
+│  USER SPACE (Ring 3 / EL0)                                      │
+│  PWAs · Zenith Desktop · profession apps · sigma-ai LLM         │
+├─────────────────────────────────────────────────────────────────┤
+│  BROWSER SHELL (browser profile)                                │
+│  Custom Chromium + navigator.sigmaos.* API                      │
+├─────────────────────────────────────────────────────────────────┤
+│  SYSTEM DAEMONS (Ring 3, pledge-restricted)                     │
+│  sigmad-health · sigmad-pkg · sigmad-netd · sigmad-vault        │
+├─────────────────────────────────────────────────────────────────┤
+│  SYSCALL INTERFACE                                              │
+│  sigma_pledge · sigma_unveil · seccomp-BPF · AVC MAC            │
+├─────────────────────────────────────────────────────────────────┤
+│  KERNEL (Ring 0 — freestanding, no glibc)                       │
+│  Scheduler · Memory · Security · Network · Filesystem           │
+│  IPC · IRQ/APIC · cgroups · namespaces · eBPF                   │
+├─────────────────────────────────────────────────────────────────┤
+│  SOVEREIGN HAL — x86_64 · ARM64 · RISC-V                        │
+├─────────────────────────────────────────────────────────────────┤
+│  HARDWARE — CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Bootloader → Kernel Handoff
+## Core Subsystems
 
-1. **Stage 1**: BIOS loads the 512-byte MBR boot sector from LBA 0.
-2. **Stage 2**: Enters 32-bit Protected Mode, loads the kernel ELF.
-3. **Kernel Init** (`S01_Genesis/init.cpp`):
-   - Calls `sigma_vga_init()` — screen is live.
-   - Calls `sigma_slab_init()` — memory allocator ready.
-   - Calls `sigma_paging_init()` — 4-level page tables activated.
-   - Calls `sigma_fat32_mount()` — filesystem mounted.
-   - Calls `sigma_e1000_init()` — network link up.
-   - Calls `sigma_sh_run()` — drops into the Sovereign Shell.
+### Scheduler
+- MLFQ (4 queues + aging), CFS clone (vruntime/red-black tree)
+- EDF for RTOS profile, NUMA-aware placement
+- sigma-ai predictive pre-warming (Phase H)
+
+### Memory
+- Buddy allocator (2^n frames), Slab allocator (kmalloc)
+- 4-level paging (x86_64 PML4), ASLR 42-bit per VMA, W^X
+
+### Security
+- sigma_pledge / sigma_unveil (OpenBSD-inspired)
+- AVC O(1) MAC, Zero-trust SPIFFE, TPM2 attestation
+- PQC: Kyber-1024 KEM + Dilithium-5 signatures
+
+### Networking
+- TCP/IP · TLS 1.3+Kyber · DNS/DoH · DHCP · WPA3 · Firewall
+
+### Filesystem
+- VFS → SigmaFS (native CoW) / Ext4 / FAT32 / Tmpfs / dm-verity
+
+### HAL
+- PCI/PCIe MSI-X, ACPI (MADT/SRAT/DSDT), UEFI runtime
 
 ---
 
-## Subsystem Map
+## Shard System
 
-| Subsystem | File | Technique |
-|:--|:--|:--|
-| Memory Allocator | `kernel/memory/sigma_slab_allocator.cpp` | SLUB power-of-2 buckets, intrusive free lists |
-| Virtual Memory | `kernel/memory/sigma_paging.cpp` | x86_64 4-level paging, TLB flush via `invlpg` |
-| File System | `kernel/fs/sigma_fat32.cpp` | FAT32 BPB parsing, cluster chain traversal |
-| ATA Disk | `kernel/drivers/sigma_ata_driver.cpp` | Port I/O via inline assembly (`inb`, `outb`) |
-| NIC Driver | `kernel/drivers/sigma_e1000.cpp` | Intel e1000 MMIO, TX/RX ring buffers |
-| VGA Display | `kernel/drivers/sigma_vga.cpp` | Direct 0xB8000 mapping, hardware cursor |
-| Touch Input | `kernel/drivers/sigma_touch_driver.cpp` | I2C HID parsing, SPSC ring buffer |
-| Real-Time Sched | `kernel/scheduler/sigma_rt_scheduler.cpp` | EDF algorithm, priority inheritance |
-| Adaptive Sched | `kernel/core/SovereignAdaptiveScheduler.cpp` | EWMA slice predictor, class-aware priorities |
-| Self-Healing | `kernel/core/SovereignSelfHealingKernel.cpp` | Subsystem watches, runtime live patching |
-| Config Rollback | `tools/cli/SovereignConfigRollbackCLI.cpp` | NixOS-style generation management |
-| Registry | `kernel/core/sigma_registry_manager.cpp` | Key-value persistence store |
-| Shell | `usr/sigma_sh.cpp` | BusyBox-inspired, PS/2 keyboard polling |
-| App Signer | `tools/sigma_app_signer.cpp` | Dilithium-5 PQC attestation |
-| Forensics | `tools/sigma_forensics.cpp` | CR0-CR4 register dumps |
-| GST Calc | `tools/gst_court_calculator.cpp` | Fixed-point integer math |
+600+ atomic capability modules (`suites/S001–S500+`) — each independently testable and deployable. Shards are merged into profiles at build time via CMake feature flags.
+
+---
+
+## 8 Deployment Profiles
+
+| Profile | Branch | Use Case |
+|---------|--------|---------|
+| Standalone | `release/standalone` | Developer laptops, workstations |
+| Browser | `release/browser` | Chromebook-style thin clients |
+| Microkernel | `release/microkernel` | Servers, hypervisors, research |
+| Mobile | `release/mobile` | Raspberry Pi, ARM64 tablets |
+| RTOS | `release/rtos` | Industrial control, robotics |
+| Dual-Boot | `release/dual-boot` | Alongside Windows/Linux |
+| Cloud | `release/cloud` | AWS/Azure VMs, BharatCloud |
+| Distributed | `release/distributed` | Multi-node clusters |
+
+---
+
+## Key Directories
+
+| Path | Purpose |
+|------|---------|
+| `kernel/` | Microkernel core |
+| `arch/` | x86_64, arm64, riscv64 code |
+| `drivers/` | SDF hardware drivers |
+| `hal/` | Hardware abstraction |
+| `fs/` | Filesystems |
+| `net/` | Network stack |
+| `security/` | Security subsystems |
+| `crypto/` | PQC primitives (Kyber, Dilithium) |
+| `suites/` | 600+ capability shards |
+| `include/` | All header files |
+| `docs/` | Extended documentation |
+| `wiki_repo/` | This wiki |
+
+---
+
+*Full spec: [ARCHITECTURE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ARCHITECTURE.md) · [Kernel internals](Kernel) · [Development Roadmap](Development-Roadmap)*

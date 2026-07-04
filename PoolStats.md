@@ -1,6 +1,6 @@
 # Class: PoolStats
 
-Aggregate stats for a [Pool](/docs/docs/api/Pool) or [BalancedPool](/docs/docs/api/BalancedPool).
+Aggregate stats for a [Pool](/docs/docs/api/Pool.md) or [BalancedPool](/docs/docs/api/BalancedPool.md).
 
 ## `new PoolStats(pool)`
 

@@ -82,4 +82,4 @@ To guarantee 100% codebase uniformity and prevent branch drift across the 12 git
 | **Right to Information Act, 2005** | `SovereignRTIComplianceCalc` | Timelines & penalty trackers | Capped ₹25,000 maximum penalty audit | 
 | **Industrial Disputes Act, 1947** | `SovereignIndustrialDisputeArbitrator` | Public Utility strike notice checkers | Statutory 6-week notices verification | 
 | **National Food Security Act, 2013** | `SovereignRationAllocationCalc` | Grain entitlement multipliers | Subsidized rate calculations auditing | 
-| **Trade Unions Act, 1926** | `SovereignTradeUnionRegistrationValidator` | Minimum worker membership checkers | Enforces 10% or 100 workers minimum limits | 
+| **Trade Unions Act, 1926** | `SovereignTradeUnionRegistrationValidator` | Minimum worker membership checkers | Enforces 10% or 100 workers minimum limits |

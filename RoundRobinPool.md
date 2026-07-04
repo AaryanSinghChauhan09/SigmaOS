@@ -2,9 +2,9 @@
 
 Extends: `undici.Dispatcher`
 
-A pool of [Client](/docs/docs/api/Client) instances connected to the same upstream target with round-robin client selection.
+A pool of [Client](/docs/docs/api/Client.md) instances connected to the same upstream target with round-robin client selection.
 
-Unlike [`Pool`](/docs/docs/api/Pool), which always selects the first available client, `RoundRobinPool` cycles through clients in a round-robin fashion. This ensures even distribution of requests across all connections, which is particularly useful when the upstream target is behind a load balancer that round-robins TCP connections across multiple backend servers (e.g., Kubernetes Services).
+Unlike [`Pool`](/docs/docs/api/Pool.md), which always selects the first available client, `RoundRobinPool` cycles through clients in a round-robin fashion. This ensures even distribution of requests across all connections, which is particularly useful when the upstream target is behind a load balancer that round-robins TCP connections across multiple backend servers (e.g., Kubernetes Services).
 
 Requests are not guaranteed to be dispatched in order of invocation.
 
@@ -66,7 +66,7 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 4. Result: Requests distributed proportionally to how the LB distributed the connections
 
-If the load balancer assigns all connections to the same backend (e.g., due to session affinity), `RoundRobinPool` cannot overcome this. In such cases, consider using [`BalancedPool`](/docs/docs/api/BalancedPool) with direct backend addresses (e.g., individual pod IPs) instead of a load-balanced endpoint.
+If the load balancer assigns all connections to the same backend (e.g., due to session affinity), `RoundRobinPool` cannot overcome this. In such cases, consider using [`BalancedPool`](/docs/docs/api/BalancedPool.md) with direct backend addresses (e.g., individual pod IPs) instead of a load-balanced endpoint.
 
 ## Instance Properties
 
@@ -80,7 +80,7 @@ Implements [Client.destroyed](/docs/docs/api/Client.md#clientdestroyed)
 
 ### `RoundRobinPool.stats`
 
-Returns [`PoolStats`](PoolStats) instance for this pool.
+Returns [`PoolStats`](PoolStats.md) instance for this pool.
 
 ## Instance Methods
 
@@ -154,8 +154,8 @@ await pool.close()
 
 ## See Also
 
-- [Pool](/docs/docs/api/Pool) - Connection pool without round-robin
+- [Pool](/docs/docs/api/Pool.md) - Connection pool without round-robin
 
-- [BalancedPool](/docs/docs/api/BalancedPool) - Load balancing across multiple origins
+- [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
 
 - [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution

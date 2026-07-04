@@ -46,4 +46,4 @@ Mainstream distros focus on **General Purpose**. SigmaOS focuses on **Sovereign 
 | **AI Integration** | Third-party / Desktop | S-PAI (Core-Integrated Life-OS) | 
 
 ---
-*Next: [Professionalization Roadmap](PROFESSIONALIZATION_PLAN)*
+*Next: [Professionalization Roadmap](PROFESSIONALIZATION_PLAN.md)*

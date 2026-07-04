@@ -1,214 +1,93 @@
-# Feature-Roadmap
-
-
-This document outlines the 100 functional aspirations for the SigmaOS Sovereign Lattice, serving as a master backlog for industrial development.
-
-
-1. Multi-core scheduling
-
-2. NUMA-aware memory management
-
-3. Dynamic kernel modules
-
-4. Hot-pluggable device support
-
-5. Advanced interrupt handling
-
-6. Real-time task prioritization
-
-7. Multiple file system support (ext4, ZFS, Btrfs)
-
-8. Journaling file system integration
-
-9. Virtual memory paging
-
-10. Swap space management
-
-11. Kernel crash dump analysis
-
-12. Secure bootloader
-
-13. Modular driver framework
-
-14. System call tracing
-
-15. Kernel-level logging
-
-
-1. Role-based access control (RBAC)
-
-2. Mandatory access control (MAC)
-
-3. Encrypted home directories
-
-4. Secure enclave integration
-
-5. Sandboxed apps
-
-6. Intrusion detection hooks
-
-7. Firewall subsystem
-
-8. Secure keyring management
-
-9. Anti-rootkit detection
-
-10. Quantum-safe crypto algorithms (PQC)
-
-11. Secure update mechanism
-
-12. Kernel integrity checks
-
-13. Encrypted swap space
-
-14. Two-factor authentication (2FA)
-
-15. Secure password vault
-
-
-1. Adaptive resource allocation
-
-2. Energy-aware scheduling
-
-3. Smart caching layers
-
-4. Parallelized I/O operations
-
-5. GPU acceleration for system tasks
-
-6. Kernel prefetching
-
-7. Low-latency networking stack
-
-8. Optimized memory allocator
-
-9. Transparent huge pages
-
-10. Dynamic load balancing
-
-11. Fast boot optimization
-
-12. Kernel profiling tools
-
-13. Predictive resource scaling
-
-14. Real-time performance monitoring
-
-15. Lightweight virtualization
-
-
-1. IPv6 full stack
-
-2. Built-in VPN support
-
-3. Mesh networking (P2P)
-
-4. Secure DNS resolver
-
-5. Network traffic shaping
-
-6. Packet inspection tools
-
-7. Wireless driver suite
-
-8. Bluetooth stack
-
-9. NFC support
-
-10. Peer-to-peer networking APIs
-
-11. Quantum-safe TLS
-
-12. Multi-path TCP
-
-13. Network namespace isolation
-
-14. Container networking support
-
-15. Zero-trust networking
-
-
-1. Integrated package manager
-
-2. Debugging suite with live tracing
-
-3. Configurable CLI shell
-
-4. GUI system monitor
-
-5. API hooks for extensions
-
-6. Build automation tools
-
-7. Kernel module SDK
-
-8. Documentation generator
-
-9. Unit testing framework
-
-10. Continuous integration hooks
-
-11. Developer sandbox environments
-
-12. Profiling tools
-
-13. Dynamic linker/loader improvements
-
-14. Plugin architecture
-
-15. Version control integration
-
-
-1. Zenith desktop enhancements
-
-2. Window manager with tiling
-
-3. Customizable themes
-
-4. Accessibility (screen reader, high contrast)
-
-5. Multi-language support (i18n)
-
-6. Touchscreen optimization
-
-7. Gesture-based navigation
-
-8. Notification center
-
-9. Clipboard manager
-
-10. Virtual desktops
-
-11. Dock/taskbar customization
-
-12. Hotkey manager
-
-13. System-wide search
-
-14. App store integration
-
-15. User session management
-
-
-1. AI-assisted workload balancing
-
-2. Predictive failure detection
-
-3. Self-healing kernel modules
-
-4. Blockchain-based identity management
-
-5. Secure federated computing
-
-6. Edge computing optimization
-
-7. IoT device integration
-
-8. AR/VR system hooks
-
-9. Quantum computing APIs
-
-10. Autonomous resource orchestration
+# SigmaOS Feature Roadmap
+
+## Implemented Features (v15.0.0 Zenith)
+
+### Kernel & Security
+- Post-quantum crypto: Kyber-1024 KEM + Dilithium-5 signatures
+- sigma_pledge (per-process syscall restriction)
+- sigma_unveil (per-process filesystem restriction)
+- Namespace isolation (unshare/pivot_root/seccomp)
+- ASLR 42-bit per-region + W^X enforcement
+- AVC — O(1) MAC policy cache
+- Zero-trust SPIFFE workload identities
+- Immutable audit trail
+- TPM2 key unsealing (CryptFS)
+
+### Networking
+- TLS 1.3 + X25519/Kyber-1024 hybrid key exchange
+- DNS resolver with DoH + DNSSEC + LRU cache
+- DHCP client (full RFC 2131/2132 state machine)
+- WPA3/SAE dragonfly key exchange
+- Stateful firewall + NAT + conntrack
+- Offline-First CRDT sync
+
+### System Daemons
+- sigma-healthd (structured health, CoreOS-inspired)
+- sigma-watchdog (hardware WDT + daemon liveness)
+- sigma-metrics (Prometheus-compatible)
+- sigma-telemetry (opt-in, PII-scrubbed)
+- sigma-cloudsync (E2E encrypted, Argon2id)
+
+### Runtime
+- WASM/WASI runtime
+- Linux ELF compatibility layer
+- Container orchestration framework
+
+### Desktop
+- Zenith JS prototype (browser-based desktop)
+- Theme engine + dark mode
+- AI-driven UI (AVX-512 neural acceleration)
+- Accessibility (Sovereign Screen Reader)
 
 ---
 
+## Planned Features — Phase G (v16.0 Apex)
+
+### Kernel (Critical Path)
+- [ ] Round-robin scheduler → MLFQ → CFS → NUMA → EDF
+- [ ] Buddy physical allocator + slab (kmalloc)
+- [ ] x86-64 4-level page table walker
+- [ ] APIC + PIC init + HPET timer
+- [ ] 30-syscall dispatch table
+- [ ] sigma-boot.efi UEFI loader
+- [ ] Bootable ISO pipeline (`make iso`)
+
+### Drivers
+- [ ] VESA/GOP framebuffer SDF driver
+- [ ] VirtIO-GPU (QEMU accelerated)
+- [ ] Intel i915 basic modesetting
+- [ ] AMD amdgpu basic modesetting
+- [ ] Intel iwlwifi 802.11ax (Wi-Fi 6)
+- [ ] HDA audio controller
+- [ ] Bluetooth HCI over USB
+
+### Filesystem
+- [ ] VFS open/read/write/close bodies
+- [ ] Tmpfs (RAM-backed)
+- [ ] SigmaFS mkfs + mount
+- [ ] Ext4 read-only mount
+- [ ] Unified Buffer Cache (UBC)
+- [ ] dm-verity block verifier
+
+### Desktop
+- [ ] Zenith native C++ compositor (replacing JS prototype)
+- [ ] Sigma Shell full POSIX scripting + tab completion
+- [ ] Graphical installer (Calamares equivalent)
+- [ ] Signed `.spkg` registry with BLAKE2b + Dilithium3
+
+---
+
+## Planned Features — Phase H (v17-18, India Stack)
+
+- [ ] ABDM FHIR API client
+- [ ] GST IRN + e-Way Bill API live
+- [ ] UPI Autopay / mandate
+- [ ] Local LLM backend (llama.cpp / TinyLlama)
+- [ ] Indian IME — Inscript + phonetic (all 22 scheduled languages)
+- [ ] sigma-bhashini offline speech models
+- [ ] Federated learning coordinator
+- [ ] CBDC e-rupee wallet
+
+---
+
+*See also: [FEATURE_MATRIX.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FEATURE_MATRIX.md) · [Development-Roadmap](Development-Roadmap)*

@@ -1,31 +1,111 @@
-# Process Management & Scheduling
+# Process Management
 
-SigmaOS implements a modern, highly concurrent process management architecture designed for both general-purpose throughput and real-time responsiveness.
+SigmaOS process management is implemented in `kernel/core/process_manager.rs`.
 
-## Architecture
+---
 
-The Process Manager (`sigma-procmgr`) is responsible for:
-- **PID Allocation**: 4096 maximum processes with O(1) recycling.
-- **Process Control Blocks (PCB)**: Tracking state, CPU time, and priority.
-- **Process Lifecycle**: `CREATED` → `READY` → `RUNNING` → `BLOCKED` → `TERMINATED`.
+## Process Control Block (PCB)
 
-## Memory Virtualization
+Every process has a `Task` struct containing:
 
-Integrated deeply with the Process Manager is the Virtual Memory Manager (VMM), which provides:
-- **Per-Process Address Spaces**: 4-level page table walking (PML4 architecture).
-- **Demand Paging**: Lazy allocation of physical memory.
-- **Copy-on-Write (CoW)**: Zero-copy fork implementation.
+```rust
+pub struct Task {
+    pub pid:       u32,         // Process ID
+    pub ppid:      u32,         // Parent PID
+    pub state:     TaskState,   // Unused/Embryo/Sleeping/Runnable/Running/Zombie
+    pub exit_code: i32,         // Exit status
+    pub ctx:       TaskContext, // CPU register state for context switch
+    pub name:      [u8; 32],    // Process name
+    pub open_fds:  [i32; 256],  // Open file descriptor table
+    pub cwd_ino:   u64,         // Current working directory inode
+    pub uid:       u32,         // User ID
+    pub kstack:    [u8; 65536], // 64 KB kernel stack
+    pub sched_policy: u8,       // 0=MLFQ, 1=CFS, 2=EDF
+    pub vruntime:     u64,      // CFS virtual runtime
+    pub deadline:     u64,      // EDF absolute deadline (ns)
+}
+```
 
-## Task Scheduling
+---
 
-The scheduler utilizes a hybrid architecture:
-- **MLFQ (Multi-Level Feedback Queue)**: 8 priority levels for general tasks.
-- **EDF (Earliest Deadline First)**: Real-time guarantees for latency-sensitive tasks.
-- **Per-CPU Run Queues**: Lockless scheduling on multi-core systems.
-- **Starvation Prevention**: Periodic priority boosts.
+## Task States
 
-## IPC (Inter-Process Communication)
+```
+          fork()
+ UNUSED ──────────► EMBRYO ──── ready ──► RUNNABLE
+                                               │
+                                         context switch
+                                               │
+                              I/O wait ◄── RUNNING ──► exit() ──► ZOMBIE
+                                │                                      │
+                            wakeup                              wait() ──► UNUSED
+                                │
+                            SLEEPING
+```
 
-- **Message Queues**: Ring-buffer backed, maximum 128 queues, 64 messages per queue.
-- **Shared Memory**: Ref-counted, permission-checked shared memory segments.
-- **Signals**: Basic signal delivery mechanism mirroring UNIX standard signals.
+---
+
+## System Calls
+
+```c
+// Create a child process (copy of current)
+int child_pid = sigma_fork();
+// parent: returns child PID
+// child:  returns 0
+
+// Terminate current process
+sigma_exit(exit_code);
+
+// Wait for a child to exit
+int child_pid = sigma_wait4();
+
+// Get current PID
+uint32_t pid = sigma_getpid();
+
+// Sleep for ms milliseconds
+sigma_sleep_ms(100);
+```
+
+---
+
+## Context Switch
+
+Context switching is handled by `arch/x86_64/context_switch.asm`:
+
+```
+sigma_context_switch(from*, to*)
+  1. Save RSP, R12-R15, RBP, RBX, RIP, CR3, RFLAGS to *from
+  2. Load above from *to
+  3. If CR3 differs → flush TLB (load new page table)
+  4. Restore RFLAGS
+  5. Jump to saved RIP (ret with pushed return address)
+```
+
+Per-task kernel stack (64 KB) ensures each task has its own call stack during
+interrupt handling and kernel operations.
+
+---
+
+## Initial Tasks
+
+At boot, two tasks are created:
+
+| PID | Name | Policy | Description |
+|-----|------|--------|-------------|
+| 0 | `idle` | MLFQ Q3 | Runs `hlt` when nothing else is runnable |
+| 1 | `init` | MLFQ Q0 | First userspace process, parent of all others |
+
+---
+
+## Maximum Limits
+
+| Limit | Value |
+|-------|-------|
+| Max concurrent tasks | 256 |
+| Open FDs per process | 256 |
+| Kernel stack size | 64 KB |
+| Max name length | 32 bytes |
+
+---
+
+*Source: `kernel/core/process_manager.rs` · `arch/x86_64/context_switch.asm`*
