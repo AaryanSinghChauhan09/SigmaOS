@@ -1,23 +1,17 @@
 [workspace]
 resolver = "2"
 members = [
-    "kernel/core",
-    "kernel/security",
-    "kernel/fs",
-    "kernel/net",
-    "kernel/ipc",
-    "kernel/scheduling",
-    "kernel/crypto",
-    "kernel/memory",
-    "drivers/net",
-    "drivers/storage",
-    "drivers/input",
-    "security",
-    "userland/init",
-    "userland/update",
+    "kabi",
+    "kernel",
+    "meta/config",
+    "sdk/driver",
+    "sigma-sh",
+    "suites/S03_Orchestrator",
+    "tools",
+    "tools/sigma-cli-bin",
     "userland/agent",
-    "tools/tracing",
-    "virtualization/ocirunner",
+    "userland/coreutils",
+    "userland/sigpkg",
     "sigma_pkg_registry",
 ]
 
