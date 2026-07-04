@@ -3,9 +3,9 @@
 //! A simple buddy memory allocator for kernel use.
 
 #![no_std]
-#![allow(unused)]
 
 use core::ptr::null_mut;
+use super::Allocator;
 
 /// Order represents the power-of-two size of a block.
 pub type Order = usize;
@@ -58,8 +58,25 @@ impl BuddyAllocator {
         self.free_lists[order] = initial_block;
     }
 
+    /// Helper: converts a size in bytes to the smallest order that fits
+    #[inline(always)]
+    fn size_to_order(size: usize) -> Order {
+        if size == 0 {
+            return 0;
+        }
+        // Use leading zeros to find the highest set bit (fast operation!)
+        // For example, size=4 → 0b100 → highest bit at position 3, subtract 1 gives order 2 (4 bytes)
+        let bit_pos = 64 - size.leading_zeros() as usize;
+        if (1 << (bit_pos - 1)) == size {
+            bit_pos - 1
+        } else {
+            bit_pos
+        }
+    }
+
     /// Allocates a block of the given order.
-    pub fn alloc(&mut self, order: Order) -> *mut u8 {
+    #[inline(always)]
+    pub fn alloc_order(&mut self, order: Order) -> *mut u8 {
         if order > MAX_ORDER || !self.initialized {
             return null_mut();
         }
@@ -95,7 +112,8 @@ impl BuddyAllocator {
     }
 
     /// Deallocates a block of the given order.
-    pub fn dealloc(&mut self, addr: *mut u8, order: Order) {
+    #[inline(always)]
+    pub fn dealloc_order(&mut self, addr: *mut u8, order: Order) {
         if order > MAX_ORDER || !self.initialized || addr.is_null() {
             return;
         }
@@ -142,6 +160,25 @@ impl BuddyAllocator {
                 break;
             }
         }
+    }
+}
+
+// Implement the Allocator trait (OOP: Polymorphism)
+impl Allocator for BuddyAllocator {
+    fn alloc(&mut self, size: usize) -> *mut u8 {
+        if size == 0 {
+            return null_mut();
+        }
+        let order = Self::size_to_order(size);
+        self.alloc_order(order)
+    }
+
+    fn dealloc(&mut self, ptr: *mut u8, size: usize) {
+        if size == 0 || ptr.is_null() {
+            return;
+        }
+        let order = Self::size_to_order(size);
+        self.dealloc_order(ptr, order)
     }
 }
 
