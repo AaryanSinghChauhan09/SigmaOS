@@ -21,7 +21,7 @@ class PerformanceMonitor {
             this.metrics.fps = Math.round(this.metrics.frameCount * 1000 / (now - this.metrics.lastFrameTime));
             this.metrics.lastFrameTime = now;
             this.metrics.frameCount = 0;
-            console.log(`Σ://PERF> Current FPS: ' + this.metrics.fps);
+            console.log(`Σ://PERF> Current FPS: ${this.metrics.fps}`);
         }, 1000);
     }
 
@@ -32,7 +32,7 @@ class PerformanceMonitor {
     getMemoryUsage() {
         if (performance.memory) {
             this.metrics.memoryUsage = performance.memory.usedJSHeapSize / 1024 / 1024;
-            console.log(`Σ://PERF> Memory usage: ' + this.metrics.memoryUsage.toFixed(2) + ' MB');
+            console.log(`Σ://PERF> Memory usage: ${this.metrics.memoryUsage.toFixed(2)} MB`);
             return this.metrics.memoryUsage;
         }
         return null;
@@ -49,7 +49,7 @@ class ObjectPool {
         for (let i = 0; i < initialSize; i++) {
             this.pool.push(this.createFn());
         }
-        console.log(`Σ://PERF> ObjectPool initialized with ' + initialSize + ' objects.');
+        console.log(`Σ://PERF> ObjectPool initialized with ${initialSize} objects.`);
     }
 
     acquire() {
@@ -119,13 +119,13 @@ class SigmaPerformanceFramework {
     constructor() {
         this.shardId = 'S58_PerformanceOptimization';
         this.monitor = new PerformanceMonitor();
-        console.log(`Σ://INIT> ${this.shardId} Initializing performance optimization framework...');
+        console.log(`Σ://INIT> ${this.shardId} Initializing performance optimization framework...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
-            console.log(`Σ://PERF> ${this.shardId} Online. Performance framework active.');
+            console.log(`Σ://PERF> ${this.shardId} Online. Performance framework active.`);
         });
     }
 

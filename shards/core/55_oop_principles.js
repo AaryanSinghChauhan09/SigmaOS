@@ -141,13 +141,13 @@ class SigmaOOPFramework {
     constructor() {
         this.shardId = 'S55_OOPPrinciples';
         this.objects = [];
-        console.log(`Σ://INIT> ${this.shardId} Initializing OOP framework...');
+        console.log(`Σ://INIT> ${this.shardId} Initializing OOP framework...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
-            console.log(`Σ://OOP> ${this.shardId} Online. OOP principles framework active.');
+            console.log(`Σ://OOP> ${this.shardId} Online. OOP principles framework active.`);
         });
     }
 
@@ -176,10 +176,10 @@ class SigmaOOPFramework {
                 obj = new Rectangle(...args);
                 break;
             default:
-                throw new Error(`Unknown object type: ' + type);
+                throw new Error(`Unknown object type: ${type}`);
         }
         this.objects.push(obj);
-        console.log(`Σ://OOP> Object ' + type + ' created.');
+        console.log(`Σ://OOP> Object ${type} created.`);
         return obj;
     }
 
@@ -188,7 +188,7 @@ class SigmaOOPFramework {
             if (obj.performAction) {
                 obj.performAction();
             } else if (obj.getArea) {
-                console.log(`Σ://OOP> ' + obj.id + ' area: ' + obj.getArea());
+                console.log(`Σ://OOP> ${obj.id} area: ${obj.getArea()}`);
             }
         });
     }
