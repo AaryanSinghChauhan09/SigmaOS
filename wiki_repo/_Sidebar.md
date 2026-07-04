@@ -135,6 +135,19 @@
 - [Reproducible Builds](../docs/REPRODUCIBLE_BUILD.md)
 - [Distribution Formats](../docs/DISTRIBUTION_FORMATS.md)
 
+## 🧠 AI & Agent Platform
+- [Sovereign Competitive Absorption](Sovereign-Competitive-Absorption)
+- [**Wave 4 Absorption (S64–S69)**](Wave4-Absorption)
+- [**Wave 5 Absorption (S70–S75)**](Wave5-Absorption)
+- [**Wave 6 Absorption (S76–S83)**](Wave6-Absorption)
+- [**Wave 7 Absorption (S84–S90)**](Wave7-Absorption)
+- [**Alibaba / Composio / .NET Absorption**](Alibaba-Composio-DotNet-Absorption)
+- [**ByteDance / MiMo Absorption**](ByteDance-MiMo-Absorption)
+- [**Sigma Agent Platform (S55)**](Sigma-Agent-Platform)
+- [**Sigma Copilot CLI (sigma-agent)**](Sigma-Copilot-CLI)
+- [**Production Readiness Roadmap**](Production-Readiness-Roadmap)
+- [Intelligence & Autonomy](Intelligence)
+
 ## Development
 - [12-Week Milestone Plan](12-Week-Milestone-Plan)
 - [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
