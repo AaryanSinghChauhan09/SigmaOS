@@ -8,7 +8,23 @@
 //
 // Language: Rust #![no_std]
 #![no_std]
-#![allow(dead_code)]
+
+// ─── Socket Trait (OOP: Polymorphism & Abstraction) ──────────────────────────
+/// A common trait for all socket types!
+pub trait Socket {
+    /// Binds a socket to an address
+    fn bind(&mut self, addr: &SockAddrIn) -> i32;
+    /// Starts listening for incoming connections
+    fn listen(&mut self, backlog: i32) -> i32;
+    /// Connects to a remote address
+    fn connect(&mut self, addr: &SockAddrIn) -> i32;
+    /// Sends data to the remote end
+    fn send(&mut self, buf: &[u8]) -> i64;
+    /// Receives data from the remote end
+    fn recv(&mut self, buf: &mut [u8]) -> i64;
+    /// Closes the socket
+    fn close(&mut self) -> i32;
+}
 
 // ── Socket address structures ─────────────────────────────────────────────
 #[repr(C)]
@@ -71,6 +87,7 @@ impl SocketTable {
         Self { sockets: [const { SocketEntry::empty() }; MAX_SOCKETS] }
     }
 
+    #[inline(always)]
     fn alloc(&mut self) -> Option<usize> {
         for i in 3..MAX_SOCKETS {   // 0,1,2 = stdin/stdout/stderr
             if self.sockets[i].kind == SockKind::Unused { return Some(i); }
@@ -78,6 +95,7 @@ impl SocketTable {
         None
     }
 
+    #[inline(always)]
     fn get(&self, fd: i32) -> Option<&SocketEntry> {
         let i = fd as usize;
         if i >= MAX_SOCKETS || self.sockets[i].kind == SockKind::Unused {
@@ -87,6 +105,7 @@ impl SocketTable {
         }
     }
 
+    #[inline(always)]
     fn get_mut(&mut self, fd: i32) -> Option<&mut SocketEntry> {
         let i = fd as usize;
         if i >= MAX_SOCKETS || self.sockets[i].kind == SockKind::Unused {
