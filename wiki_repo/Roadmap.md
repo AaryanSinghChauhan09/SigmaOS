@@ -20,7 +20,11 @@
 ```
 Phase F  ████████████████████  100% ✅  (KMS, cgroup, pkg registry)
 Phase G  ████████████████████  100% ✅  (kernel boot — COMPLETE)
-Phase H  ░░░░░░░░░░░░░░░░░░░░    0% ⬜  (India Stack — ACTIVE)
+Phase H  ████████████████░░░░  50% 🔄  (India Stack — ACTIVE)
+  - sigma-health (ABDM FHIR): ✅
+  - sigma-accounts (GST IRN): ✅
+  - sigma-pay (UPI/NPCI): ✅
+  - sigma-aadhaar (QR Auth): ✅
 ```
 
 ## The Critical Path
