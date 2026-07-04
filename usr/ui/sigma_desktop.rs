@@ -4,7 +4,7 @@
 // usr/ui/sigma_desktop.rs — Sigma Desktop Environment (KDE/GNOME)
 //
 // Implements KDE/GNOME-style desktop environment with panel management,
-    pub application launcher, window management, and system settings.
+// application launcher, window management, and system settings.
 //
 // Language: Rust (std for userland applications)
 

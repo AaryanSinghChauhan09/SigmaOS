@@ -4,7 +4,7 @@
 // usr/privacy/sigma_gnupg.rs — Sigma GnuPG Integration
 //
 // Implements GnuPG-style encryption with key generation, key management,
-    pub encryption/decryption, and digital signatures.
+// encryption/decryption, and digital signatures.
 //
 // Language: Rust (std for userland applications)
 

@@ -4,7 +4,7 @@
 // usr/privacy/sigma_tor.rs — Sigma Tor Integration
 //
 // Implements Tor-style anonymous networking with circuit management,
-    pub onion services, and privacy features.
+// onion services, and privacy features.
 //
 // Language: Rust (std for userland applications)
 

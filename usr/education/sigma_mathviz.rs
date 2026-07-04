@@ -4,7 +4,7 @@
 // usr/education/sigma_mathviz.rs — Sigma Math Visualization (GeoGebra style)
 //
 // Implements GeoGebra-style math visualization with geometric constructions,
-    pub algebraic functions, calculus tools, and interactive plotting.
+// algebraic functions, calculus tools, and interactive plotting.
 //
 // Language: Rust (std for userland applications)
 
