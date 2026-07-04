@@ -10,7 +10,7 @@ build:
 
 run: build
 	@echo "Running SigmaOS in QEMU..."
-	cd $(KERNEL_DIR) && cargo run
+	./qemu-boot.sh standalone
 
 clean:
 	@echo "Cleaning build artifacts..."

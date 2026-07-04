@@ -11,18 +11,31 @@
 **Ubuntu / Debian:**
 ```bash
 sudo apt install -y build-essential nasm cmake qemu-system-x86 \
-  golang-go xorriso mtools grub-pc-bin grub-efi-amd64-bin
+  golang-go xorriso mtools grub-pc-bin grub-efi-amd64-bin lld
 ```
 
 **Arch Linux:**
 ```bash
-sudo pacman -S base-devel nasm cmake qemu-system-x86 go xorriso grub
+sudo pacman -S base-devel nasm cmake qemu-system-x86 go xorriso grub lld
 ```
 
 **Windows (WSL2):**
 ```bash
 # Inside WSL2 Ubuntu
-sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go
+sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go lld
+```
+
+**Rust Toolchain (Required for Kernel Build):**
+```bash
+# Install Rustup
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# Install components
+rustup default stable
+rustup component add rustfmt clippy
+# Verify installation
+rustc --version
+cargo --version
+lld --version
 ```
 
 ### Clone & Build
