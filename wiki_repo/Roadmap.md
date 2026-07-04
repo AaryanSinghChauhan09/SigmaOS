@@ -19,7 +19,17 @@
 
 ```
 Phase F  ████████████████████  100% ✅  (KMS, cgroup, pkg registry)
-Phase G  ░░░░░░░░░░░░░░░░░░░░    0% ⬜  (kernel boot — ACTIVE)
+Phase G  ████████████████░░░░  70% 🔄  (kernel boot — ACTIVE)
+  - Scheduler: ✅
+  - Memory Manager: ✅
+  - Syscall Dispatcher: ✅
+  - IRQ Controller: ✅
+  - UEFI Bootloader: ✅
+  - Network Stack (TCP/UDP/DHCP): ✅
+  - sigma-sh Shell REPL: ✅
+  - sigma-init (PID 1): ✅
+  - Coreutils (ls, cp, mv, rm, mkdir): ✅
+  - VFS + Tmpfs: ✅
 Phase H  ░░░░░░░░░░░░░░░░░░░░    0% ⬜  (India Stack — blocked)
 ```
 
