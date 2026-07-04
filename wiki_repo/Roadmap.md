@@ -142,6 +142,35 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - [CONTRIBUTOR_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTOR_ROADMAP.md)
 - [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 
+## Recent Module Enhancements (July 2026)
+
+### Office Suite (sigma_office.rs)
+- Enhanced formula evaluation with support for +, -, *, /, ^ operators
+- Added SUM function for spreadsheet calculations
+- Implemented column sum/average calculations
+- Added document import/export functionality for file persistence
+
+### Core Utilities (sigma_coreutils.rs) v1.1
+- Added recursive directory removal with `rm -r` flag
+- Added parent directory creation with `mkdir -p` flag
+- Added line numbering with `cat -n` flag
+- Added `pwd` command for printing working directory
+- Added `echo` command for text output
+
+### Text Editor (sigma_edit.rs)
+- Implemented undo/redo functionality with 50-state history
+- Added search/replace with result highlighting
+- Added goto line command for navigation
+- Added word count and character count statistics
+- Enhanced CLI with new commands: undo, redo, search, clear, replace, goto, stats, saveas
+
+### Service Manager (sigma_service.rs)
+- Added restart count tracking for monitoring service stability
+- Added memory limit configuration per service (in MB)
+- Added CPU limit configuration per service (percentage)
+- Added environment variable support for service configuration
+- Added methods: set_memory_limit(), set_cpu_limit(), set_env_var()
+
 ## Phase 4 (36+ months)
 - Certifications
 - Vendor partnerships
