@@ -19,7 +19,7 @@
 
 ```
 Phase F  ████████████████████  100% ✅  (KMS, cgroup, pkg registry)
-Phase G  ████████████████░░░░  70% 🔄  (kernel boot — ACTIVE)
+Phase G  ██████████████████░░  80% 🔄  (kernel boot — ACTIVE)
   - Scheduler: ✅
   - Memory Manager: ✅
   - Syscall Dispatcher: ✅
@@ -30,6 +30,10 @@ Phase G  ████████████████░░░░  70% 🔄 
   - sigma-init (PID 1): ✅
   - Coreutils (ls, cp, mv, rm, mkdir): ✅
   - VFS + Tmpfs: ✅
+  - sigma-pkg (install, remove, search, list, update): ✅
+  - VESA Framebuffer: ✅
+  - USB HID Driver: ✅
+  - Ext4 Read-Only: ✅
 Phase H  ░░░░░░░░░░░░░░░░░░░░    0% ⬜  (India Stack — blocked)
 ```
 
