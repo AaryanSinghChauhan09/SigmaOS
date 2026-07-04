@@ -8,3 +8,4 @@ pub mod sigma_trace;
 pub mod sigma_usercopy;
 pub mod ai_scheduler;
 pub mod pqc;
+pub mod memory_pool;
