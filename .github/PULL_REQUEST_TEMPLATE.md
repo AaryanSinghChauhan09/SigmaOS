@@ -9,15 +9,15 @@
 ## Subsystem(s) affected
 
 <!-- Check all that apply -->
-- [ ] kernel/core (scheduler, MM, syscalls, IRQ)
+- [ ] kernel/core (scheduler, MM, syscalls, IRQ, boot)
 - [ ] kernel/fs (VFS, tmpfs, sigmafs, ext4)
-- [ ] kernel/net (TCP, UDP, sockets, Wi-Fi)
-- [ ] kernel/security (pledge, unveil, seccomp, PQC)
-- [ ] drivers (NVMe, USB, GPU, Wi-Fi, audio, input)
-- [ ] boot (UEFI, multiboot, bootloader)
-- [ ] sigma-sh (shell)
-- [ ] sigma-pkg (package manager)
-- [ ] zenith_desktop (compositor, WM)
+- [ ] kernel/net (TCP, UDP, sockets, Wi-Fi, DHCP, DNS)
+- [ ] kernel/security (pledge, unveil, seccomp, PQC, audit)
+- [ ] drivers (NVMe, USB, GPU, Wi-Fi, audio, input, storage)
+- [ ] arch (x86_64, ARM64, RISC-V)
+- [ ] sigma-sh (shell REPL)
+- [ ] sigma-pkg (package manager, registry)
+- [ ] zenith_desktop (compositor, WM, GUI)
 - [ ] userland/ai (sigma-ai, GGUF, NL-CLI)
 - [ ] sdk (driver DDK, app SDK)
 - [ ] ci / build system
@@ -28,7 +28,7 @@
 
 - [ ] `feat` — new feature
 - [ ] `fix` — bug fix
-- [ ] `impl` — implements a roadmap item from Ideas-999-Structured
+- [ ] `impl` — implements a roadmap item
 - [ ] `perf` — performance improvement
 - [ ] `security` — security fix/hardening
 - [ ] `refactor` — code refactoring (no behaviour change)
@@ -39,8 +39,9 @@
 
 ## Roadmap item (if applicable)
 
-<!-- Reference the Ideas-999-Structured.md idea number, e.g. "Idea #86 Wi-Fi DDK" -->
-Ideas: #___
+<!-- Reference the roadmap phase and item -->
+Phase: ___
+Item: ___
 
 ## Testing done
 
@@ -76,9 +77,10 @@ $ sigma-pkg install ...
 - [ ] All `unsafe` blocks have `// SAFETY:` explanation comments
 - [ ] No new `unsafe` blocks without justification
 - [ ] `sigma_pledge` / `sigma_unveil` calls are correct for new syscalls
-- [ ] New syscalls added to `syscall_dispatch.rs` and `sigma_pledge.rs` mapping
+- [ ] New syscalls added to syscall dispatcher and pledge mapping
 - [ ] PQC signatures verified on any new binary artifacts
 - [ ] No secret material (keys, tokens) in the diff
+- [ ] Security review completed for security-critical changes
 
 ## ABI / compatibility impact
 
@@ -88,6 +90,15 @@ $ sigma-pkg install ...
 - [ ] ABI-compatible extension (new fields at end of struct)
 - [ ] ABI break — requires kabi version bump and MAINTAINERS notification
 
+## Commit Message Format
+
+<!-- Verify your commits follow the kernel-style format -->
+
+- [ ] Title follows format: `subsystem: short description (≤50 chars)`
+- [ ] Commits include detailed explanation (motivation, technical details, testing)
+- [ ] Commits include `Signed-off-by: Name <email>` (DCO requirement)
+- [ ] References included (Issue #123, PR #456)
+
 ## Checklist
 
 - [ ] Title follows Conventional Commits: `type(scope): description`
@@ -95,7 +106,9 @@ $ sigma-pkg install ...
 - [ ] SPDX-License-Identifier on all new source files
 - [ ] MAINTAINERS updated if adding a new subsystem or driver
 - [ ] Wiki / docs updated if behaviour changes are user-visible
-- [ ] `CURRENT_PROBLEMS_MANIFEST.md` updated if this resolves an open issue
+- [ ] CODEOWNERS updated if adding new directories
+- [ ] Tests added for new functionality
+- [ ] No external dependencies added without review
 
 ## Linked issues
 

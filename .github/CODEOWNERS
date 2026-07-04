@@ -9,37 +9,112 @@
 # Subsystem Ownership
 # -------------------------
 
-# Kernel & Drivers (Drivers Lead)
-/kernel/drivers/      @AaryanSinghChauhan09
+# Kernel Core (Kernel Lead)
+/kernel/core/         @AaryanSinghChauhan09
+/kernel/core/sovereign_scheduler.rs @AaryanSinghChauhan09
+/kernel/core/memory/  @AaryanSinghChauhan09
+/kernel/core/memory/vmm.rs @AaryanSinghChauhan09
+/kernel/core/memory/pmm.rs @AaryanSinghChauhan09
+/kernel/core/syscalls/ @AaryanSinghChauhan09
+/kernel/core/syscalls/SyscallDispatcher.rs @AaryanSinghChauhan09
+/kernel/core/irq_controller.rs @AaryanSinghChauhan09
+/kernel/core/sovereign_idt.rs @AaryanSinghChauhan09
+/kernel/core/boot/    @AaryanSinghChauhan09
+/kernel/core/boot/sigma_boot.rs @AaryanSinghChauhan09
+
+# Architecture (Arch Lead)
+/arch/                @AaryanSinghChauhan09
+/arch/x86_64/         @AaryanSinghChauhan09
+/arch/arm64/          @AaryanSinghChauhan09
+/arch/riscv/          @AaryanSinghChauhan09
 /kernel/arch/         @AaryanSinghChauhan09
-/kernel/src/pci/      @AaryanSinghChauhan09
-/kernel/src/usb/      @AaryanSinghChauhan09
-/kernel/src/nvme/     @AaryanSinghChauhan09
+
+# Drivers (Drivers Lead)
+/drivers/             @AaryanSinghChauhan09
+/drivers/net/        @AaryanSinghChauhan09
+/drivers/storage/    @AaryanSinghChauhan09
+/drivers/usb/        @AaryanSinghChauhan09
+/drivers/gpu/         @AaryanSinghChauhan09
+/drivers/audio/      @AaryanSinghChauhan09
+drivers/e1000*.rs     @AaryanSinghChauhan09
+drivers/virtio*.rs    @AaryanSinghChauhan09
 
 # Filesystem (FS Lead)
 /fs/                  @AaryanSinghChauhan09
 /kernel/fs/           @AaryanSinghChauhan09
+fs/sigmafs/           @AaryanSinghChauhan09
+fs/ext4/              @AaryanSinghChauhan09
 
 # Security & Verification (Security Lead)
 /security/            @AaryanSinghChauhan09
 /kernel/security/     @AaryanSinghChauhan09
 /crypto/              @AaryanSinghChauhan09
+kernel/core/sigma_pledge.rs @AaryanSinghChauhan09
+kernel/core/sigma_unveil.rs @AaryanSinghChauhan09
 *.ads                 @AaryanSinghChauhan09
 *.adb                 @AaryanSinghChauhan09
 
+# Network Stack (Network Lead)
+/net/                 @AaryanSinghChauhan09
+/kernel/net/          @AaryanSinghChauhan09
+net/tcp/              @AaryanSinghChauhan09
+net/udp/              @AaryanSinghChauhan09
+net/dhcp/             @AaryanSinghChauhan09
+
 # Package Manager & Build (Packaging Lead)
+/sigma-pkg/           @AaryanSinghChauhan09
+/sigma_pkg_registry/  @AaryanSinghChauhan09
 /userland/sigpkg/     @AaryanSinghChauhan09
+/pkg/                 @AaryanSinghChauhan09
 /config/profiles/     @AaryanSinghChauhan09
+/scripts/             @AaryanSinghChauhan09
+CMakeLists.txt        @AaryanSinghChauhan09
+Cargo.toml            @AaryanSinghChauhan09
+Makefile              @AaryanSinghChauhan09
+
+# Bootloader (Boot Lead)
+/sigma-boot/          @AaryanSinghChauhan09
+/initramfs/           @AaryanSinghChauhan09
 
 # Desktop & GUI (UX Lead)
 /desktop/             @AaryanSinghChauhan09
 /graphics/            @AaryanSinghChauhan09
-/zenith_desktop.js    @AaryanSinghChauhan09
+/web_ui/              @AaryanSinghChauhan09
+/ui/                  @AaryanSinghChauhan09
+zenith_desktop.js     @AaryanSinghChauhan09
 
 # Shell & Utilities (UX/Packaging Lead)
 /sigma-sh/            @AaryanSinghChauhan09
 /userland/coreutils/  @AaryanSinghChauhan09
+/userland/            @AaryanSinghChauhan09
 
 # Cloud & Virtualization (Cloud Lead)
-/net/                 @AaryanSinghChauhan09
+/virtualization/      @AaryanSinghChauhan09
 /sigma-container/     @AaryanSinghChauhan09
+
+# AI Subsystem (AI Lead)
+/userland/ai/         @AaryanSinghChauhan09
+/tools/sigma_nl_cli.py @AaryanSinghChauhan09
+
+# Documentation (Docs Lead)
+/docs/                @AaryanSinghChauhan09
+/wiki_repo/           @AaryanSinghChauhan09
+README.md             @AaryanSinghChauhan09
+ROADMAP.md            @AaryanSinghChauhan09
+CONTRIBUTING.md       @AaryanSinghChauhan09
+MAINTAINERS           @AaryanSinghChauhan09
+
+# CI/CD (CI Lead)
+.github/             @AaryanSinghChauhan09
+.github/workflows/    @AaryanSinghChauhan09
+
+# KABI (ABI Lead)
+/kabi/                @AaryanSinghChauhan09
+sigma_libc.rs         @AaryanSinghChauhan09
+
+# SDK (SDK Lead)
+/sdk/                 @AaryanSinghChauhan09
+
+# India Stack (India Lead)
+/userland/india/      @AaryanSinghChauhan09
+/tools/gst_calc*      @AaryanSinghChauhan09

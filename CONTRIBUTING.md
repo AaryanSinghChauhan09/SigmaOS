@@ -6,6 +6,68 @@ See [Community Governance](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/
 
 ---
 
+## Kernel-Style Contribution Workflow
+
+SigmaOS follows Linux kernel development practices adapted for our polyglot codebase.
+
+### Signed-off-by Requirement
+
+All commits must include a `Signed-off-by` line to certify the Developer Certificate of Origin (DCO):
+
+```
+kernel/scheduler: implement adaptive EWMA scheduling
+
+Implement exponential weighted moving average for runtime estimation
+to improve task scheduling fairness and responsiveness.
+
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+To automatically add this, configure git:
+
+```bash
+git config --local commit.template .git/commit-template
+```
+
+### Commit Message Format
+
+Follow the conventional commit format with subsystem prefix:
+
+```
+subsystem: short description (≤50 chars)
+
+Detailed explanation of the change, including:
+- Motivation for the change
+- Technical details of implementation
+- Testing performed
+- Performance impact (if any)
+
+References: Issue #123, PR #456
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+**Valid subsystems:** `kernel`, `drivers`, `userland`, `security`, `fs`, `net`, `docs`, `ci`, `build`
+
+**Commit types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `security`, `perf`
+
+### Branch Naming Convention
+
+```
+feature/subsystem-description
+fix/subsystem-bug-description
+docs/subject
+refactor/subject
+security/subject
+```
+
+Examples:
+- `feature/kernel-adaptive-scheduler`
+- `fix/drivers-e1000-rx-overflow`
+- `docs/api-syscall-reference`
+- `security/kernel-seccomp-filter`
+
+---
+
 ## Language Policy
 
 SigmaOS uses a polyglot codebase. Each language has a specific domain:
@@ -73,23 +135,25 @@ make PROFILE=standalone qemu
 
 ---
 
-## Branch + Commit Conventions
+## Code Review Process
 
-```bash
-# Branch naming
-feature/sigma-agent-new-tool
-fix/kernel-scheduler-edge-case
-docs/wiki-migration-guide
-refactor/pkg-absorb-rpm-support
+### Review Requirements
 
-# Commit format
-type(scope): short description (≤50 chars)
+- **Kernel changes**: Must be reviewed by at least one kernel maintainer
+- **Driver changes**: Must be reviewed by subsystem maintainer
+- **Security changes**: Must be reviewed by security team
+- **ABI changes**: Require sign-off from kabi maintainer
 
-Optional longer explanation.
-Closes #123
-```
+### Review Checklist
 
-Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `security`, `perf`
+Reviewers should verify:
+- [ ] Code follows language policy and style guidelines
+- [ ] Commit messages are properly formatted with Signed-off-by
+- [ ] Tests are included for new functionality
+- [ ] Documentation is updated where necessary
+- [ ] No unsafe code without justification (Rust)
+- [ ] No external dependencies added without review
+- [ ] CI pipeline passes all checks
 
 ---
 
@@ -155,9 +219,28 @@ Add the appropriate SPDX header:
 
 ---
 
+## Security Vulnerability Reporting
+
+For security vulnerabilities, please follow the process in [SECURITY.md](SECURITY.md).
+
+---
+
 ## Getting Help
 
 - GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
-- Issues: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+- Issues: https://github.com/AaryanSinghChauhan19/SigmaOS/issues
 - Wiki: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 - Ask sigma-agent: `sigma-agent "how do I contribute to SigmaOS"`
+
+---
+
+## Maintainer Responsibilities
+
+See [MAINTAINERS](MAINTAINERS) for the full list of subsystem maintainers and their responsibilities.
+
+Maintainers are expected to:
+- Review PRs in their subsystem within 7 days
+- Ensure code quality and adherence to standards
+- Participate in architecture reviews
+- Mentor new contributors
+- Update documentation for their subsystem

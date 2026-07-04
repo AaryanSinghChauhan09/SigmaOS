@@ -31,6 +31,7 @@ S: Supported
 F: arch/x86_64/
 F: arch/boot/
 F: kernel/arch/
+F: kernel/core/boot/
 K: x86_64 idt gdt apic
 
 ARCH — ARM64 / AARCH64
@@ -51,22 +52,22 @@ K: riscv rv64
 KERNEL CORE — SCHEDULER
 M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
 S: Supported
-F: kernel/core/sigma_sched.rs
+F: kernel/core/sovereign_ovheruler.rs
+F: kernelecore/sigma_sched.rsign_scheduler.rs
+F: kernel/core/core/sigma_sched.rs
+F: kernel/sched/
 F: kernel/core/sched/
 F: kernel/sched/
 K: scheduler mlfq cfs edf runqueue
 
-KERNEL CORE — MEMORY MANAGEMENT
-M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
-S: Supported
-F: kernel/core/sigma_mm.rs
+KERNEL CORE yansinghchauhan09@github>
+S: Supportedigma_mm.rs
 F: kernel/memory/
 F: kernel/mm/
 K: buddy slab paging tlb vma aslr
 
 KERNEL CORE — SYSCALL DISPATCH
-M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
-S: Supported
+M: Aaryan Si
 F: kernel/core/sigma_syscalls_io.rs
 F: kernel/core/sigma_syscalls_proc.rs
 F: kernel/core/syscall_dispatch.rs
@@ -76,6 +77,8 @@ K: syscall dispatch open read write fork execve
 KERNEL CORE — IRQ / INTERRUPT HANDLING
 M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
 S: Supported
+F: kernel/core/irq_controller.rs
+F: kernel/core/sovereign_idt.rs
 F: kernel/core/sigma_irq.rs
 F: kernel/core/sigma_irq.zig
 K: irq pic apic pit interrupt
