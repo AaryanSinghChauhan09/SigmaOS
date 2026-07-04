@@ -3,7 +3,8 @@
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
-#![allow(dead_code)]
+
+use core::ptr;
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -19,6 +20,11 @@ type SigmaUsize = usize;
 // ─── Module: Sigma::custom_function_executor ─────────────────────
 
 #[no_mangle]
-pub unsafe extern "C" fn free_sandboxed_memory() {
+pub unsafe extern "C" fn free_sandboxed_memory(ptr: *mut SigmaU8, len: SigmaUsize) {
+    if ptr.is_null() || len == 0 {
+        return;
+    }
+    // Zero the memory as a safety precaution
+    ptr::write_bytes(ptr, 0, len);
 }
 

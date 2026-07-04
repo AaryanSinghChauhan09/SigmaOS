@@ -26,6 +26,7 @@ pub enum TaskClass {
 pub struct AdaptiveTask {
     pub task_id: u32,
     pub tclass: TaskClass,
+    pub priority: u8,
     pub deadline_ns: u64,
     pub ewma_runtime_ns: u64,
     pub last_runtime_ns: u64,
@@ -40,6 +41,7 @@ impl AdaptiveTask {
         Self {
             task_id: 0,
             tclass: TaskClass::Idle,
+            priority: 255,
             deadline_ns: 0,
             ewma_runtime_ns: 0,
             last_runtime_ns: 0,
@@ -51,8 +53,14 @@ impl AdaptiveTask {
     }
 }
 
+pub const MIN_PRIORITY: u8 = 0;
+pub const MAX_PRIORITY: u8 = 255;
+pub const KERNEL_PRIORITY_MAX: u8 = 127;
+pub const USER_PRIORITY_MIN: u8 = 128;
+pub const USER_PRIORITY_MAX: u8 = 255;
+
 pub trait Scheduler {
-    fn register(&mut self, tclass: TaskClass, deadline_ns: u64) -> u32;
+    fn register(&mut self, tclass: TaskClass, priority: u8, deadline_ns: u64) -> u32;
     fn complete(&mut self, task_id: u32, runtime_ns: u64, preempted: bool);
     fn elect(&mut self) -> u32;
 }
@@ -107,7 +115,7 @@ pub unsafe extern "C" fn asched_init() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn asched_register(task_class: u8, deadline_ns: u64) -> u32 {
+pub unsafe extern "C" fn asched_register(task_class: u8, priority: u8, deadline_ns: u64) -> u32 {
     let s = &mut *ADAPTIVE_SCHEDULER.inner.get();
     if s.task_count >= MAX_TASKS as u32 {
         return 0;
@@ -124,6 +132,7 @@ pub unsafe extern "C" fn asched_register(task_class: u8, deadline_ns: u64) -> u3
     let t = &mut s.tasks[idx];
     t.task_id = s.task_count + 1;
     t.tclass = tc;
+    t.priority = priority;
     t.deadline_ns = deadline_ns;
     t.ewma_runtime_ns = match tc {
         TaskClass::Interactive => 1_000_000,
@@ -178,6 +187,7 @@ pub unsafe extern "C" fn asched_complete(task_id: u32, runtime_ns: u64, preempte
 pub unsafe extern "C" fn asched_elect() -> u32 {
     let s = &mut *ADAPTIVE_SCHEDULER.inner.get();
     let mut best = 0;
+    let mut best_priority = 255; // Lowest priority initially
     let mut urgency = 0;
     s.tick = s.tick.wrapping_add(1);
 
@@ -187,18 +197,26 @@ pub unsafe extern "C" fn asched_elect() -> u32 {
             continue;
         }
 
-        let mut score = match t.tclass {
-            TaskClass::Realtime => 1_000_000_000,
-            TaskClass::Interactive => 100_000_000,
-            TaskClass::Batch => 10_000_000,
-            TaskClass::Idle => 1_000,
-        };
-
-        score += (s.tick.wrapping_sub(t.run_count) as u64) * 1_000;
-
-        if score > urgency {
-            urgency = score;
+        // First compare by priority (lower number = higher priority)
+        if t.priority < best_priority {
+            best_priority = t.priority;
+            urgency = 0; // Reset urgency for higher priority
             best = t.task_id;
+        } else if t.priority == best_priority {
+            // If same priority, use original urgency score
+            let mut score = match t.tclass {
+                TaskClass::Realtime => 1_000_000_000,
+                TaskClass::Interactive => 100_000_000,
+                TaskClass::Batch => 10_000_000,
+                TaskClass::Idle => 1_000,
+            };
+
+            score += (s.tick.wrapping_sub(t.run_count) as u64) * 1_000;
+
+            if score > urgency {
+                urgency = score;
+                best = t.task_id;
+            }
         }
     }
 

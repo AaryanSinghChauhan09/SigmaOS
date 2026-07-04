@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "persona": "sovereign-copilot",
+  "model": "xllm-default",
+  "max_turns": 32,
+  "tools": [
+    {
+      "name": "Read",
+      "description": "Read a file from SemanticFS. Input: {\"path\": \"...\"}",
+      "category": "file"
+    },
+    {
+      "name": "Write",
+      "description": "Write content to a file. Input: {\"path\": \"...\", \"content\": \"...\"}",
+      "category": "file"
+    },
+    {
+      "name": "Edit",
+      "description": "Replace text in a file. Input: {\"path\": \"...\", \"old\": \"...\", \"new\": \"...\"}",
+      "category": "file"
+    },
+    {
+      "name": "Bash",
+      "description": "Run sigma-sh command. Input: {\"command\": \"...\"}",
+      "category": "shell"
+    },
+    {
+      "name": "Grep",
+      "description": "Search file contents. Input: {\"pattern\": \"...\", \"path\": \"...\"}",
+      "category": "search"
+    },
+    {
+      "name": "Glob",
+      "description": "Find files by pattern. Input: {\"pattern\": \"**/*.cpp\"}",
+      "category": "search"
+    },
+    {
+      "name": "ZenithGUI",
+      "description": "Control Zenith Desktop. Input: {\"command\": \"layout tile\"} — see zenith-gui skill",
+      "category": "gui",
+      "maps_to_gui": true,
+      "commands": [
+        "start", "stop", "status",
+        "layout mosaic|tile|stack|float",
+        "theme obsidian|cyber|paper|high-contrast",
+        "workspace <n>",
+        "launch settings|files|browser|terminal|dashboard",
+        "apps", "close <app>",
+        "settings list|get|set",
+        "files search|tree|open",
+        "browser open <url>",
+        "dashboard", "dashboard query"
+      ]
+    },
+    {
+      "name": "Skill",
+      "description": "Dispatch agent skill. Input: {\"skill\": \"zenith-gui\", \"args\": {}}",
+      "category": "agent"
+    },
+    {
+      "name": "Memory",
+      "description": "Store/recall L0-L3 memory. Input: {\"action\": \"store|recall\", \"layer\": \"L3\", \"content\": \"...\"}",
+      "category": "agent"
+    },
+    {
+      "name": "ComputerUse",
+      "description": "Accessibility automation fallback. Input: {\"action\": \"snapshot|click|type\", ...}",
+      "category": "gui"
+    },
+    {
+      "name": "Pkg",
+      "description": "Package manager. Input: {\"action\": \"install|remove|list\", \"shard\": \"...\"}",
+      "category": "system"
+    },
+    {
+      "name": "Net",
+      "description": "Network diagnostics. Input: {\"action\": \"diagnose|mesh\", ...}",
+      "category": "system"
+    },
+    {
+      "name": "Sec",
+      "description": "Security audit. Input: {\"action\": \"audit|enforce\", ...}",
+      "category": "system"
+    },
+    {
+      "name": "LLM",
+      "description": "Direct inference. Input: {\"prompt\": \"...\"}",
+      "category": "ai"
+    },
+    {
+      "name": "FastContext",
+      "description": "Repo exploration with citations. Input: {\"query\": \"...\"}",
+      "category": "ai"
+    }
+  ],
+  "gui_task_coverage": {
+    "compositor": ["start", "stop", "status", "layout", "theme", "workspace"],
+    "apps": ["launch", "close", "apps", "focus"],
+    "zenith_settings": ["settings list", "settings get", "settings set"],
+    "zenith_files": ["files search", "files tree", "files open"],
+    "zenith_browser": ["browser open"],
+    "zenith_panel": ["status", "workspace"],
+    "sigma_dashboard": ["dashboard", "dashboard query"],
+    "window_manager": ["layout tile", "workspace", "arrange"]
+  }
+}

@@ -1,56 +1,63 @@
-# SigmaOS Privilege & Isolation Boundaries
+# SigmaOS Architecture
 
-This document defines the strict execution boundaries between the Kernel Space and User Space in the SigmaOS Zenith microkernel.
+## Vision
+A sovereign, bare-metal OS that is dramatically safer (memory & capability security), equal-or-better performance (latency, throughput, boot time), developer-friendly (tooling, reproducibility), interoperable (run or host Linux workloads, container/VM compatibility), extensible (sandboxed drivers & services), and certifiable (secure boot, attestation).
 
----
+## Primary KPIs
+- Syscall latency / context switch cost (microbenchmarks)
+- Single-thread & multi-threaded throughput (fileserver, network)
+- Boot time (cold boot to login/service)
+- Mean Time Between Failures (driver+kernel crashes per 1000 hours)
+- Vulnerabilities found (CVE-equivalent count)
+- Memory overhead for comparable workloads
+- Power efficiency (mobile/edge targets)
+- Time-to-driver (days to get a new NIC/GPU working via vendor-supplied spec)
+- Adoption metrics: number of production deployments, packaged apps, contributors
 
-## 🔒 Privilege Ring Separation
+## High-Level Architecture Recommendation
+### Capability-Based Hybrid Microkernel
+- **Kernel Responsibilities**: Scheduling, low-level IPC, address-space management, interrupts, minimal drivers for boot & storage if necessary
+- **Userspace**: Most drivers, filesystems, network stack, window compositor, etc., run in isolated processes with capability tokens
+- **Hybrid Compromise**: Keep very hot paths (timer tick, fast-path IO queue handling) in the kernel; implement everything else in userland
+- **Language**: Rust for kernel + drivers, Nim/Rust for tooling & UI, JS/TypeScript for web-based higher-level UX as needed
 
-SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3):
+## Memory Safety & Correctness
+- Use Rust with no_std where appropriate (kernel), strictly audited unsafe blocks
+- Adopt formal verification for core primitives (bootloader, capability manager, scheduler critical sections)
+- Leverage hardware features: PAE/SME/MTE (ARMv8-MTE), Intel CET, SMEP/SMAP, page table features
 
-```text
-       +---------------------------------------------+
-       |                 RING 3: USERLAND            |
-       |  - sh shell       - coreutils (ls, cat)    |
-       |  - UI Renderer    - apps / web applications |
-       +----------------------+----------------------+
-                              |
-                     SYSCALL INTERFACE
-                              |
-       +----------------------v----------------------+
-       |                RING 0: KERNEL SPACE         |
-       |  - MLFQ Scheduler    - Page Allocators      |
-       |  - VFS Vitals        - TCP/IP Stack         |
-       |  - Device Drivers    - Shard Manager        |
-       +---------------------------------------------+
-```
+## Driver Strategy
+- **Primary Driver Runtime**: WASM with a rich host ABI or a vetted Rust driver ABI
+- **Driver Lifecycles**: Load/unload, hot-restart, isolated crash recovery
+- **Standardized Driver Host API**: DMA, interrupts, memory mapping, io_uring-like submission queues with capability tokens
+- **Vendor Strategy**: SDK, certification harnesses, Linux-hosted adapter
 
-### 1. Kernel Space (Ring 0 - Privilege)
-- **Subsystems**: Memory Manager, Scheduler, Device Drivers, VFS Core, Net Core.
-- **Privilege**: Direct access to hardware ports (`outb`/`inb`), page tables, CPU interrupt control registers, and physical disk sectors.
-- **Isolation**: Executed in a flat identity-mapped segment, isolated from user task interference.
+## Userspace & Compatibility
+- **Native API**: Modern, async-first syscall interface with io_uring-style completion queues
+- **POSIX Compatibility**: Small POSIX shim layer
+- **Linux Compatibility**: Linux-ABI shim or KVM for drivers/apps
+- **Container Support**: Native secure container runtime for OCI images
 
-### 2. User Space (Ring 3 - Non-Privilege)
-- **Subsystems**: Omni-Shell, user application shards, system packages, standard libraries.
-- **Privilege**: No direct access to memory outside allocated task boundaries. No direct hardware I/O commands.
-- **Isolation**: Each process runs in its own virtual address space managed by the Virtual Memory Manager.
+## Scheduler & Performance
+- NUMA-aware hierarchical scheduler with core isolation
+- Lock-free/RCU for read-heavy paths
+- Async-first design with io_uring-like batching
+- PGO, LTO, SIMD for performance
 
----
+## Security
+- Fine-grained capabilities, no global root
+- Secure boot, measured boot, TPM attestation
+- Mandatory code signing, sandboxing, CFI, DEP, ASLR, PAC
 
-## 📞 System Call (Syscall) Dispatcher
+## Observability & Tooling
+- Low-overhead tracing, flamegraphs
+- eBPF-like introspection
+- Reproducible cross-compilers, VS Code debugger integration
+- Fuzzing, HIL tests, formal verification
 
-Communication across the kernel-userland boundary is strictly routed via the Sovereign Syscall Dispatcher (`SovereignSyscall.cpp`), mapped through the `int 0x80` or `syscall` CPU instructions:
-
-| Syscall ID | Name | Source Parameter | Target Action |
-|---|---|---|---|
-| `0x01` | `sys_write` | String buffer, length | Writes data to the COM1 debug serial or VGA screen. |
-| `0x02` | `sys_read` | Input buffer, maximum length | Reads input data from the keyboard queue. |
-| `0x05` | `sys_socket` | Domain, type, protocol | Allocates a network socket handler. |
-| `0x06` | `sys_pkg_install` | Package name, source | Downloads and registers a software package. |
-
----
-
-## 🛡️ Boundary Enforcement Policies
-1. **Memory Separation**: User space cannot read or write to memory belonging to the kernel. Violation triggers a Page Fault Exception, terminating the user thread.
-2. **I/O Isolation**: Any hardware I/O port manipulation from Ring 3 results in a General Protection Fault.
-3. **No Monolithic Bloat**: File systems (Ext4/FAT32) and protocol parsers are run inside isolated kernel services and exposed through clean, lightweight wrappers.
+## Roadmap Milestones
+- **Phase 0 (0-3 months)**: Architecture RFCs, dev env, bootloader, minimal kernel
+- **Phase 1 (3-9 months)**: Kernel v0 with memory management, IPC, async syscalls, basic userspace, Linux-compat prototype
+- **Phase 2 (9-18 months)**: Stable driver model, NIC/block drivers, scheduler tuning, secure boot
+- **Phase 3 (18-36 months)**: Full userspace, production filesystems, GPU stack, formal verification
+- **Phase 4 (36+ months)**: Certifications, vendor partnerships, migration tools

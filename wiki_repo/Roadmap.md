@@ -1,21 +1,37 @@
 # SigmaOS Roadmap
 
-> Quick navigation hub for all roadmap documents.
+## Phase 0 (0-3 months)
+- Finalize architecture RFC (microkernel vs hybrid, async syscalls)
+- Set kernel coding standards (Rust, unsafe usage rules)
+- Implement minimal reproducible build pipeline & cross-toolchain
+- Build boot-to-userspace demo:
+  - Boot kernel
+  - Spawn userspace process
+  - Demonstrate simple async syscall & IPC
+- Create driver SDK prototypes (WASM + Rust host ABI)
+- Configure CI with cross-compilation, unit tests, nightly benchmarks
+- Begin outreach to 3 hardware vendors for driver partnerships
 
-## Roadmap Documents
+## Phase 1 (3-9 months)
+- Kernel v0: memory management, basic process model, IPC, async syscall interface
+- Basic userspace: shell, minimal filesystem, package manager skeleton
+- Linux-compat prototype (container runtime or syscall shim)
 
-| Document | Purpose |
-|----------|---------|
-| [Development-Roadmap](Development-Roadmap) | Master roadmap with phases, versions, and branch priorities |
-| [Branch-Development-Roadmap](Branch-Development-Roadmap) | Per-branch file-level task lists |
-| [Feature-Roadmap](Feature-Roadmap) | Implemented vs planned features |
-| [Version-Timeline](Version-Timeline) | Release history and upcoming versions |
-| [Release-Profiles](Release-Profiles) | All 8 deployment profiles explained |
-| [PHASE_G_ROADMAP](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/PHASE_G_ROADMAP.md) | Phase G kernel completion tasks |
-| [Competitive-Analysis](Competitive-Analysis) | How SigmaOS compares to Linux distros |
-| [Gap-Analysis](Gap-Analysis) | Remaining gaps vs competitors |
+## Phase 2 (9-18 months)
+- Stable driver model (WASM host)
+- NIC and block drivers (bare minimum)
+- Scheduler tuning
+- Basic security features (secure boot)
+- Mature developer tooling
 
-## Current Status at a Glance
+## Phase 3 (18-36 months)
+- Full userspace stack
+- Production-grade filesystems
+- GPU/graphics stack
+- NVMe performance optimizations
+- Enterprise-grade CI
+- Fuzzing everywhere
+- Formal verification for critical modules
 
 ```
 Phase F  ████████████████████  100% ✅  (KMS, cgroup, pkg registry)
@@ -46,3 +62,10 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - [FEATURE_MATRIX.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FEATURE_MATRIX.md)
 - [CONTRIBUTOR_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTOR_ROADMAP.md)
 - [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+
+## Phase 4 (36+ months)
+- Certifications
+- Vendor partnerships
+- Mainstream device driver coverage
+- Migration tools
+- Scale community and support offerings

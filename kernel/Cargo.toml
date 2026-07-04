@@ -5,6 +5,10 @@ edition = "2021"
 authors = ["SigmaOS Contributors"]
 description = "Core kernel for SigmaOS"
 
+[[bin]]
+name = "sigma-kernel"
+path = "src/main.rs"
+
 [profile.dev]
 panic = "abort" # Disable unwinding on panic
 

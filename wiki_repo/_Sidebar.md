@@ -7,6 +7,16 @@
 - [FAQ](FAQ)
 - [Building from Source](Building-from-Source)
 - [Installation](Installation)
+- [Manifesto](Manifesto)
+
+## Critical Gaps & Roadmap
+- [Top 10 Critical Gaps](Top-10-Critical-Gaps)
+- [Ultimate 24-Month Dominance Strategy](Ultimate-Dominance-Strategy)
+- [Comprehensive 18-Month Plan](Comprehensive-Development-Plan)
+- [Architecture](Architecture)
+- [Roadmap](Roadmap)
+- [Memory Management](Memory-Management)
+- [New Ideas 2001–2100](New-Ideas-2001-2100)
 
 ## CLI Tools
 - [CLI Reference (all tools)](CLI-Reference)
@@ -47,6 +57,7 @@
 - [Post-Quantum Security](Post-Quantum-Security)
 - [Verified Boot](Verified-Boot)
 - [Sandbox Hardening](Sandbox-Hardening)
+- [Zero-Dependency Architecture](Zero-Dependency-Architecture)
 
 ## Linux Adoption
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
@@ -67,7 +78,6 @@
 - [Developer Guide](Developer_Guide)
 - [SDK Guide](SDK-Guide)
 - [Your First App](Your-First-App)
-- [Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md)
 
 ## Source Code
 - [Source Files Index](Source-Files-Index)
@@ -75,15 +85,6 @@
 - [Architecture Deep Dive](Architecture-Deep-Dive)
 - [Kernel Boot Sequence](Kernel-Boot-Sequence)
 - [Shard Development Guide](Shard-Development-Guide)
-
-## Roadmap
-- [Growth Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md)
-- [v0.1 Minimal Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md)
-- [Roadmap Hub](Roadmap)
-- [Version Timeline](Version-Timeline)
-- [Release Profiles](Release-Profiles)
-- [Phase 1 — Foundation](Phase-1-Foundation-And-Branch-Unification)
-- [Phase 5 — Ecosystem](Phase-5-Ecosystem-And-Developer-Tools)
 
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
@@ -135,6 +136,19 @@
 - [Reproducible Builds](../docs/REPRODUCIBLE_BUILD.md)
 - [Distribution Formats](../docs/DISTRIBUTION_FORMATS.md)
 
+## 🧠 AI & Agent Platform
+- [Sovereign Competitive Absorption](Sovereign-Competitive-Absorption)
+- [**Wave 4 Absorption (S64–S69)**](Wave4-Absorption)
+- [**Wave 5 Absorption (S70–S75)**](Wave5-Absorption)
+- [**Wave 6 Absorption (S76–S83)**](Wave6-Absorption)
+- [**Wave 7 Absorption (S84–S90)**](Wave7-Absorption)
+- [**Alibaba / Composio / .NET Absorption**](Alibaba-Composio-DotNet-Absorption)
+- [**ByteDance / MiMo Absorption**](ByteDance-MiMo-Absorption)
+- [**Sigma Agent Platform (S55)**](Sigma-Agent-Platform)
+- [**Sigma Copilot CLI (sigma-agent)**](Sigma-Copilot-CLI)
+- [**Production Readiness Roadmap**](Production-Readiness-Roadmap)
+- [Intelligence & Autonomy](Intelligence)
+
 ## Development
 - [12-Week Milestone Plan](12-Week-Milestone-Plan)
 - [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
@@ -178,14 +192,6 @@
 - [Testing Infrastructure](Testing-Infrastructure)
 - [Debugging Guide](DEBUGGING_GUIDE)
 - [Performance Guidelines](Performance_Guidelines)
-
-## Security
-- [Security Model](Security-Model)
-- [PQC Hardening](PQC_HARDENING)
-- [Sandbox Hardening](Sandbox-Hardening)
-- [Verified Boot](Verified-Boot)
-- [Post-Quantum Security](Post-Quantum-Security)
-- [Zero-Dependency Architecture](Zero-Dependency-Architecture)
 
 ## API Reference
 - [navigator.sigmaos API](API-Reference)
