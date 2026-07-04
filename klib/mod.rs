@@ -11,3 +11,4 @@ pub mod pqc;
 pub mod memory_pool;
 pub mod interrupt_coalesce;
 pub mod capability;
+pub mod syscall_queue;
