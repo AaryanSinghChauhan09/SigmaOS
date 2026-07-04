@@ -68,6 +68,15 @@ impl SigPkgCli {
         } else if bytes_eq(cmd, b"count") {
             let _n = unsafe { crate::manager::sigpkg_count() };
             SIGMA_OK
+        } else if bytes_eq(cmd, b"list") {
+            let mut names = [[0u8; 64]; 512];
+            let _count = unsafe { crate::manager::sigpkg_list(names.as_mut_ptr()) };
+            SIGMA_OK
+        } else if bytes_eq(cmd, b"search") {
+            let _count = unsafe { crate::manager::sigpkg_search(arg.as_ptr(), arg.len() as U32) };
+            SIGMA_OK
+        } else if bytes_eq(cmd, b"update") {
+            unsafe { crate::manager::sigpkg_update(arg.as_ptr(), arg.len() as U32, 0x0002_0000) }
         } else {
             SIGMA_ERROR
         }

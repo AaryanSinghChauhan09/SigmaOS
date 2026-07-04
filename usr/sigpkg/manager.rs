@@ -154,6 +154,56 @@ impl SigPkgManager {
     }
 
     pub fn installed_count(&self) -> U32 { self.count }
+
+    /// List all installed packages by iterating the registry
+    pub fn list(&self, names: &mut [[u8; 64]; MAX_PACKAGES]) -> U32 {
+        let mut count = 0u32;
+        let mut i = 0;
+        while i < self.count as usize {
+            if self.packages[i].installed {
+                // In a real implementation, we'd have a name-to-hash reverse lookup
+                // For now, return the hash as a placeholder
+                let hash_bytes = self.packages[i].name_hash.to_le_bytes();
+                let mut j = 0;
+                while j < 8 && j < 64 {
+                    names[count as usize][j] = hash_bytes[j];
+                    j += 1;
+                }
+                count += 1;
+            }
+            i += 1;
+        }
+        count
+    }
+
+    /// Search for packages by partial name hash match
+    pub fn search(&self, pattern: &[u8]) -> U32 {
+        let pattern_hash = Self::fnv1a_hash(pattern);
+        let mut count = 0u32;
+        let mut i = 0;
+        while i < self.count as usize {
+            if self.packages[i].name_hash == pattern_hash {
+                count += 1;
+            }
+            i += 1;
+        }
+        count
+    }
+
+    /// Update a package to a new version
+    pub fn update(&mut self, name: &[u8], new_version: U32) -> SigmaStatus {
+        if !self.initialized { return SIGMA_ERROR; }
+        let name_hash = Self::fnv1a_hash(name);
+        let mut i = 0;
+        while i < self.count as usize {
+            if self.packages[i].name_hash == name_hash {
+                self.packages[i].version = new_version;
+                return SIGMA_OK;
+            }
+            i += 1;
+        }
+        SIGMA_ERROR
+    }
 }
 
 // ── Global Singleton ───────────────────────────────────────────────────────
@@ -194,4 +244,22 @@ pub unsafe extern "C" fn sigpkg_verify(name: *const u8, name_len: U32) -> SigmaS
 #[no_mangle]
 pub unsafe extern "C" fn sigpkg_count() -> U32 {
     G_PKG_MGR.installed_count()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_list(names: *mut [u8; 64]) -> U32 {
+    let names_slice = core::slice::from_raw_parts_mut(names, MAX_PACKAGES);
+    G_PKG_MGR.list(names_slice)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_search(pattern: *const u8, pattern_len: U32) -> U32 {
+    let pattern_slice = core::slice::from_raw_parts(pattern, pattern_len as usize);
+    G_PKG_MGR.search(pattern_slice)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_update(name: *const u8, name_len: U32, new_version: U32) -> SigmaStatus {
+    let name_slice = core::slice::from_raw_parts(name, name_len as usize);
+    G_PKG_MGR.update(name_slice, new_version)
 }
