@@ -11,6 +11,7 @@
 
 ## Critical Gaps & Roadmap
 - [Top 10 Critical Gaps](Top-10-Critical-Gaps)
+- [Comprehensive 18-Month Plan](Comprehensive-Development-Plan)
 - [Architecture](Architecture)
 - [Roadmap](Roadmap)
 - [Memory Management](Memory-Management)
