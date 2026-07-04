@@ -26,16 +26,16 @@ then layers on the sovereign differentiators that make SigmaOS worth choosing.
 
 | Task | File | Done? |
 |------|------|-------|
-| Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.cpp` | ✅ |
-| Buddy physical allocator | `kernel/core/sigma_mm.cpp` | ✅ |
-| Slab allocator (kmalloc) | `kernel/core/sigma_mm.cpp` | ✅ |
-| x86-64 4-level page table walker | `kernel/mm/sigma_vmm.cpp` | ✅ |
-| APIC + PIC init | `kernel/core/sigma_irq.cpp` | ✅ |
-| HPET/APIC timer → jiffies | `kernel/core/sigma_timer.cpp` | ✅ |
-| 30-syscall dispatch table | `kernel/core/sigma_syscall_dispatch.cpp` | ✅ |
-| VESA/GOP framebuffer | `drivers/display/sigma_vesa.cpp` | ✅ |
-| sigma-boot.efi UEFI loader | `sigma-boot/sigma_boot.c` | ✅ |
-| **`make iso` → bootable ISO** | `Makefile` | ✅ |
+| Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.rs` | ✅ |
+| Buddy physical allocator | `kernel/core/sigma_mm.rs` | ✅ |
+| Slab allocator (kmalloc) | `kernel/core/sigma_mm.rs` | ✅ |
+| x86-64 4-level page table walker | `kernel/core/hal/SovereignVMM.rs` | ✅ |
+| APIC + PIC init | `kernel/core/sigma_irq.rs` | ✅ |
+| HPET/APIC timer → jiffies | `kernel/core/sigma_irq.rs` | ✅ |
+| 30-syscall dispatch table | `kernel/core/sigma_syscall_dispatch.rs` | ✅ |
+| VESA/GOP framebuffer | `drivers/display/sigma_vesa.zig` | ✅ |
+| sigma-boot.efi UEFI loader | `sigma-boot/sigma_boot.zig` | ✅ |
+| **`make iso` → bootable ISO** | `scripts/build-iso.sh` | ✅ |
 
 ### Drivers (minimum viable set)
 
