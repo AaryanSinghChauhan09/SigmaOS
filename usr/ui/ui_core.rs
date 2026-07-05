@@ -69,6 +69,18 @@ impl HBox {
             false
         }
     }
+
+    /// Arrange children horizontally. Since we are no_std / no alloc,
+    /// we expect layout dimensions to be updated directly on the child components.
+    pub fn arrange_layout(&mut self, widths: &[SigmaU32]) {
+        let mut current_x = self.bounds.x;
+        for i in 0..self.child_count {
+            let width = if i < widths.len() { widths[i] } else { 50 };
+            // In a full registry system, children bounds are set via lookup:
+            // registry.get_mut(self.child_ids[i]).set_bounds(Rect { x: current_x, y: self.bounds.y, w: width, h: self.bounds.h });
+            current_x += width + self.spacing;
+        }
+    }
 }
 
 // The global widget registry would hold implementations of Widget, allowing
@@ -87,7 +99,23 @@ pub struct Button {
 
 impl Widget for Button {
     fn draw(&self, buffer: &mut [u8], stride: usize) {
-        // Draw rectangle based on bounds and hover/press state
+        // Draw a simulated solid border color in the frame buffer
+        let start_y = self.bounds.y as usize;
+        let end_y = (self.bounds.y + self.bounds.h) as usize;
+        let start_x = self.bounds.x as usize;
+        let end_x = (self.bounds.x + self.bounds.w) as usize;
+
+        // Visual feedback based on state
+        let color: u8 = if self.is_pressed { 0x55 } else if self.is_hovered { 0xAA } else { 0xFF };
+
+        for y in start_y..end_y {
+            for x in start_x..end_x {
+                let index = y * stride + x;
+                if index < buffer.len() {
+                    buffer[index] = color;
+                }
+            }
+        }
     }
     
     fn handle_event(&mut self, event: EventType) -> SigmaBool {
@@ -104,8 +132,7 @@ impl Widget for Button {
                 let inside = x >= self.bounds.x && x <= self.bounds.x + self.bounds.w &&
                              y >= self.bounds.y && y <= self.bounds.y + self.bounds.h;
                 if inside {
-                    self.is_pressed = true;
-                    // Trigger callback via IPC
+                    self.is_pressed = !self.is_pressed;
                     return true;
                 }
             },
