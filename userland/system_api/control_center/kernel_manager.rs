@@ -43,8 +43,17 @@ impl KernelManager {
             .and_then(|s| s.parse().ok())
             .unwrap_or(0);
         
-        // Get build date (placeholder)
-        let build_date = "2024-01-01".to_string();
+        // Get build date from /proc/version
+        let build_date = if let Ok(version_output) = Command::new("cat").args(&["/proc/version"]).output() {
+            let version_str = String::from_utf8_lossy(&version_output.stdout);
+            // Extract build date from kernel version string
+            version_str.split('#').nth(1)
+                .and_then(|s| s.split_whitespace().nth(1))
+                .unwrap_or("Unknown")
+                .to_string()
+        } else {
+            "Unknown".to_string()
+        };
         
         Ok(KernelInfo {
             version,

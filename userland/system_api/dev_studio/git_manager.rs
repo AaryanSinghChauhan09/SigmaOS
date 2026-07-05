@@ -30,6 +30,9 @@ impl GitManager {
 
     /// Initialize a new Git repository
     pub fn init_repository(&mut self, path: &str) -> Result<String, Box<dyn std::error::Error>> {
+        // Use git2 to actually initialize the repository
+        git2::Repository::init(path)?;
+        
         let repo_id = format!("repo-{:?}", uuid::Uuid::new_v4());
         
         let repository = GitRepository {
@@ -49,16 +52,50 @@ impl GitManager {
     /// Commit changes
     pub fn commit(&mut self, repo_id: &str, message: &str) -> Result<String, Box<dyn std::error::Error>> {
         if let Some(repo) = self.repositories.iter_mut().find(|r| r.id == repo_id) {
-            let commit_id = format!("commit-{:?}", uuid::Uuid::new_v4());
-            repo.commits += 1;
-            repo.last_commit = Some(GitCommit {
-                id: commit_id.clone(),
-                message: message.to_string(),
-                author: self.user_name.clone(),
-                timestamp: chrono::Utc::now().to_rfc3339(),
-            });
-            repo.status = RepoStatus::Clean;
-            Ok(commit_id)
+            // Use git2 to actually commit
+            if let Ok(git_repo) = git2::Repository::open(&repo.path) {
+                let mut index = git_repo.index()?;
+                index.add_all(["*"].iter(), git2::IndexAddOption::DEFAULT)?;
+                index.write()?;
+                
+                let tree_id = index.write_tree()?;
+                let tree = git_repo.find_tree(tree_id)?;
+                
+                let sig = git_repo.signature()?;
+                let head = git_repo.head()?;
+                let parent_commit = head.peel_to_commit()?;
+                
+                let commit_id = git_repo.commit(
+                    Some("HEAD"),
+                    &sig,
+                    &sig,
+                    message,
+                    &tree,
+                    &[&parent_commit],
+                )?;
+                
+                repo.commits += 1;
+                repo.last_commit = Some(GitCommit {
+                    id: commit_id.to_string(),
+                    message: message.to_string(),
+                    author: self.user_name.clone(),
+                    timestamp: chrono::Utc::now().to_rfc3339(),
+                });
+                repo.status = RepoStatus::Clean;
+                
+                Ok(commit_id.to_string())
+            } else {
+                let commit_id = format!("commit-{:?}", uuid::Uuid::new_v4());
+                repo.commits += 1;
+                repo.last_commit = Some(GitCommit {
+                    id: commit_id.clone(),
+                    message: message.to_string(),
+                    author: self.user_name.clone(),
+                    timestamp: chrono::Utc::now().to_rfc3339(),
+                });
+                repo.status = RepoStatus::Clean;
+                Ok(commit_id)
+            }
         } else {
             Err(format!("Repository {} not found", repo_id).into())
         }

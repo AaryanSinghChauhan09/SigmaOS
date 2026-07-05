@@ -1,0 +1,26 @@
+[package]
+name = "sigma-ai-integration"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Project"]
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.4", features = ["v4", "serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+regex = "1.10"
+
+# AI/ML dependencies (optional, for actual LLM integration)
+llama-cpp = { version = "0.1", optional = true }
+candle-core = { version = "0.3", optional = true }
+
+[features]
+default = []
+local-llm = ["llama-cpp"]
+ml-inference = ["candle-core"]
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["full"] }

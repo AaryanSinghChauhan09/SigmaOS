@@ -28,26 +28,50 @@ impl SecurityCenter {
 
     /// Check if Secure Boot is enabled
     fn check_secure_boot() -> Result<bool, Box<dyn std::error::Error>> {
-        // Placeholder implementation
-        Ok(true)
+        // Check /sys/firmware/efi/efivars/SecureBoot-*
+        if let Ok(_) = std::fs::read_dir("/sys/firmware/efi/efivars") {
+            if let Ok(secure_boot) = std::fs::read_to_string("/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c") {
+                // Parse the secure boot variable (simplified)
+                return Ok(!secure_boot.is_empty());
+            }
+        }
+        Ok(false)
     }
 
     /// Check if disk is encrypted
     fn check_disk_encryption() -> Result<bool, Box<dyn std::error::Error>> {
-        // Placeholder implementation - would check for LUKS encryption
-        Ok(true)
+        // Check for LUKS devices in /etc/crypttab or /dev/mapper
+        if let Ok(_) = std::fs::read_to_string("/etc/crypttab") {
+            return Ok(true);
+        }
+        if let Ok(_) = std::fs::read_dir("/dev/mapper") {
+            return Ok(true);
+        }
+        Ok(false)
     }
 
     /// Check if firewall is enabled
     fn check_firewall() -> Result<bool, Box<dyn std::error::Error>> {
-        // Placeholder implementation - would check firewall status
-        Ok(true)
+        // Check iptables or ufw status
+        if let Ok(_) = Command::new("iptables").args(&["-L"]).output() {
+            return Ok(true);
+        }
+        if let Ok(_) = Command::new("ufw").args(&["status"]).output() {
+            return Ok(true);
+        }
+        Ok(false)
     }
 
     /// Check if TPM is available
     fn check_tpm() -> Result<bool, Box<dyn std::error::Error>> {
-        // Placeholder implementation - would check for TPM device
-        Ok(true)
+        // Check for TPM device
+        if let Ok(_) = std::fs::read_dir("/sys/class/tpm") {
+            return Ok(true);
+        }
+        if let Ok(_) = std::fs::read_to_string("/dev/tpm0") {
+            return Ok(true);
+        }
+        Ok(false)
     }
 
     /// Load security policies

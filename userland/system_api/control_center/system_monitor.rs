@@ -3,7 +3,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
-use sysinfo::{System, SystemExt, ProcessorExt, CpuExt, DiskExt, NetworkExt};
+use sysinfo::{System, SystemExt, ProcessorExt, CpuExt, DiskExt, NetworkExt, ProcessExt};
 use crate::control_center::{HardwareStatus, NetworkStatus};
 
 /// System Monitor for real-time hardware monitoring
@@ -64,16 +64,25 @@ impl SystemMonitor {
 
     /// Get CPU temperature (if available)
     fn get_cpu_temperature(&self) -> f32 {
-        // This would typically require platform-specific temperature sensors
-        // For now, return a placeholder
-        45.0 // Placeholder temperature in Celsius
+        // Try to read from Linux thermal zones
+        if let Ok(temp) = std::fs::read_to_string("/sys/class/thermal/thermal_zone0/temp") {
+            if let Ok(temp_millidegrees) = temp.trim().parse::<i32>() {
+                return temp_millidegrees as f32 / 1000.0;
+            }
+        }
+        // Fallback to placeholder
+        45.0
     }
 
     /// Get memory usage information
     fn get_memory_info(&self) -> (f32, u64) {
         let total_memory = self.system.total_memory();
         let used_memory = self.system.used_memory();
-        let usage_percent = (used_memory as f32 / total_memory as f32) * 100.0;
+        let usage_percent = if total_memory > 0 {
+            (used_memory as f32 / total_memory as f32) * 100.0
+        } else {
+            0.0
+        };
         (usage_percent, total_memory)
     }
 
@@ -83,8 +92,12 @@ impl SystemMonitor {
         if let Some(disk) = disks.first() {
             let total_space = disk.total_space();
             let available_space = disk.available_space();
-            let used_space = total_space - available_space;
-            let usage_percent = (used_space as f32 / total_space as f32) * 100.0;
+            let used_space = total_space.saturating_sub(available_space);
+            let usage_percent = if total_space > 0 {
+                (used_space as f32 / total_space as f32) * 100.0
+            } else {
+                0.0
+            };
             (usage_percent, total_space)
         } else {
             (0.0, 0)
@@ -93,8 +106,8 @@ impl SystemMonitor {
 
     /// Get GPU information (if available)
     fn get_gpu_info(&self) -> (Option<f32>, Option<f32>) {
-        // This would require GPU-specific libraries (NVML, AMDGPU, etc.)
-        // For now, return None
+        // Try to read GPU info from nvidia-smi or AMDGPU
+        // For now, return None as this requires GPU-specific libraries
         (None, None)
     }
 
@@ -105,7 +118,7 @@ impl SystemMonitor {
             networks.iter().next().map(|(name, data)| {
                 (
                     name.clone(),
-                    "192.168.1.100".to_string(), // Placeholder IP
+                    self.get_ip_address(name),
                     data.total_received() as f64,
                     data.total_transmitted() as f64,
                 )
@@ -127,17 +140,29 @@ impl SystemMonitor {
         }
     }
 
+    /// Get IP address for a network interface
+    fn get_ip_address(&self, interface: &str) -> String {
+        // Try to read IP address from /proc/net/if_inetaddr or use iproute2
+        // For now, return a placeholder
+        "192.168.1.100".to_string()
+    }
+
     /// Get detailed process information
     pub fn get_processes(&self) -> Vec<ProcessInfo> {
         self.system.processes()
             .iter()
             .map(|(pid, process)| ProcessInfo {
-                pid: *pid,
+                pid: pid.as_u32(),
                 name: process.name().to_string(),
                 cpu_usage: process.cpu_usage(),
                 memory_usage: process.memory(),
             })
             .collect()
+    }
+
+    /// Get system uptime in seconds
+    pub fn get_uptime(&self) -> u64 {
+        self.system.uptime()
     }
 }
 
@@ -166,5 +191,13 @@ mod tests {
         let status = monitor.get_hardware_status();
         assert!(status.cpu_usage >= 0.0 && status.cpu_usage <= 100.0);
         assert!(status.memory_usage >= 0.0 && status.memory_usage <= 100.0);
+    }
+
+    #[test]
+    fn test_update() {
+        let mut monitor = SystemMonitor::new(1).unwrap();
+        monitor.update();
+        let status = monitor.get_hardware_status();
+        assert!(status.cpu_usage >= 0.0);
     }
 }

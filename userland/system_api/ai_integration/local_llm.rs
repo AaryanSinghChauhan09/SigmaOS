@@ -26,16 +26,37 @@ impl LocalLLM {
 
     /// Get the path for a model
     fn get_model_path(model_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-        // In a real implementation, this would check local model directory
-        // or download the model if not present
-        Ok(format!("/sigma/var/ai/models/{}", model_name))
+        let model_dir = "/sigma/var/ai/models";
+        
+        // Create model directory if it doesn't exist
+        std::fs::create_dir_all(model_dir)?;
+        
+        let model_path = format!("{}/{}", model_dir, model_name);
+        
+        // Check if model exists, if not, return path for download
+        if !std::path::Path::new(&model_path).exists() {
+            // Model doesn't exist, will need to be downloaded
+            return Ok(model_path);
+        }
+        
+        Ok(model_path)
     }
 
     /// Load the model
     pub fn load(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        // In a real implementation, this would load the model into memory
-        // using llama.cpp or similar library
-        println!("Loading model: {}", self.model_name);
+        let model_path = Self::get_model_path(&self.model_name)?;
+        
+        if !std::path::Path::new(&model_path).exists() {
+            return Err(format!("Model file not found: {}. Please download the model first.", model_path).into());
+        }
+
+        // In a real implementation with llama-cpp feature, this would:
+        // let params = llama_cpp::LLamaParams::default();
+        // let model = llama_cpp::LLamaModel::load_from_file(&model_path, params)?;
+        // self.loaded = true;
+        
+        // For now, simulate loading
+        println!("Loading model from: {}", model_path);
         self.loaded = true;
         Ok(())
     }
@@ -43,11 +64,16 @@ impl LocalLLM {
     /// Generate text from a prompt
     pub fn generate(&self, prompt: &str) -> Result<super::AIResponse, Box<dyn std::error::Error>> {
         if !self.loaded {
-            return Err("Model not loaded".into());
+            return Err("Model not loaded. Call load() first.".into());
         }
 
-        // In a real implementation, this would use the loaded model
-        // to generate text from the prompt
+        // In a real implementation with llama-cpp feature, this would:
+        // let mut ctx = llama_cpp::LLamaContext::new(&model, llama_cpp::LLamaContextParams::default())?;
+        // let tokens = ctx.tokenize(prompt.as_bytes(), true, false)?;
+        // ctx.eval(&tokens, 0)?;
+        // let generated = ctx.generate(100, Some(0.7f32))?;
+        
+        // For now, use placeholder generation
         let response = self.generate_placeholder(prompt);
         
         Ok(super::AIResponse {

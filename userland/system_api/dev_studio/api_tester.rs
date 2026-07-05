@@ -54,13 +54,45 @@ impl APITester {
     /// Execute an API request
     pub fn execute_request(&self, request_id: &str) -> Result<APIResponse, Box<dyn std::error::Error>> {
         if let Some(request) = self.requests.iter().find(|r| r.id == request_id) {
-            // Placeholder implementation - would execute actual HTTP request
+            // Use reqwest to actually execute the HTTP request
+            let client = reqwest::blocking::Client::new();
+            
+            let response = match request.method {
+                HTTPMethod::GET => client.get(&request.url).send()?,
+                HTTPMethod::POST => {
+                    let body = request.body.as_ref().unwrap_or(&String::new());
+                    client.post(&request.url).body(body.clone()).send()?
+                },
+                HTTPMethod::PUT => {
+                    let body = request.body.as_ref().unwrap_or(&String::new());
+                    client.put(&request.url).body(body.clone()).send()?
+                },
+                HTTPMethod::DELETE => client.delete(&request.url).send()?,
+                HTTPMethod::PATCH => {
+                    let body = request.body.as_ref().unwrap_or(&String::new());
+                    client.patch(&request.url).body(body.clone()).send()?
+                },
+                HTTPMethod::HEAD => client.head(&request.url).send()?,
+                HTTPMethod::OPTIONS => client.request(reqwest::Method::OPTIONS, &request.url).send()?,
+            };
+            
+            let status = response.status();
+            let status_code = status.as_u16();
+            let status_message = status.canonical_reason().unwrap_or("Unknown").to_string();
+            
+            let headers: Vec<(String, String)> = response.headers()
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("").to_string()))
+                .collect();
+            
+            let body = response.text()?;
+            
             Ok(APIResponse {
-                status_code: 200,
-                status_message: "OK".to_string(),
-                headers: vec![],
-                body: "{}".to_string(),
-                execution_time_ms: 100,
+                status_code,
+                status_message,
+                headers,
+                body,
+                execution_time_ms: 100, // Placeholder timing
             })
         } else {
             Err(format!("Request {} not found", request_id).into())
