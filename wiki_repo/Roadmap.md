@@ -209,6 +209,14 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - Printer enable/disable and default printer selection
 - Server management with port configuration
 
+#### Avahi Service Discovery (sigma_avahi.rs)
+- mDNS/DNS-SD service registration
+- Service browsing by type (HTTP, SSH, FTP, IPP, etc.)
+- Hostname resolution with address lookup
+- TXT record support for service metadata
+- Local hostname and domain configuration
+- Daemon management for service discovery
+
 ### Developer Tools
 #### Git Integration (sigma_git.rs)
 - Version control with repository management
