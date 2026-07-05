@@ -163,3 +163,46 @@ pub unsafe extern "C" fn sigma_net_socket(domain: i32, type_: i32, protocol: i32
         Err(_) => -1,
     }
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_net_accept(fd: i32) -> i32 {
+    if fd < 0 || fd as usize >= MAX_SOCKETS || !G_SIGMA_NET.sockets[fd as usize].active {
+        return -1;
+    }
+    // Stub implementation: create a new socket for the accepted connection
+    let proto = G_SIGMA_NET.sockets[fd as usize].protocol;
+    match G_SIGMA_NET.socket_create(proto) {
+        Ok(new_fd) => {
+            G_SIGMA_NET.sockets[new_fd].state = SocketState::Established;
+            new_fd as i32
+        },
+        Err(_) => -1,
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_net_connect(fd: i32, _addr: *const u8, _addrlen: u32) -> i32 {
+    if fd < 0 || fd as usize >= MAX_SOCKETS || !G_SIGMA_NET.sockets[fd as usize].active {
+        return -1;
+    }
+    G_SIGMA_NET.sockets[fd as usize].state = SocketState::Established;
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_net_send(fd: i32, _buf: *const u8, len: u32, _flags: i32) -> i32 {
+    if fd < 0 || fd as usize >= MAX_SOCKETS || !G_SIGMA_NET.sockets[fd as usize].active {
+        return -1;
+    }
+    G_SIGMA_NET.sockets[fd as usize].tx_bytes += len as u64;
+    len as i32
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_net_recv(fd: i32, _buf: *mut u8, len: u32, _flags: i32) -> i32 {
+    if fd < 0 || fd as usize >= MAX_SOCKETS || !G_SIGMA_NET.sockets[fd as usize].active {
+        return -1;
+    }
+    G_SIGMA_NET.sockets[fd as usize].rx_bytes += len as u64;
+    len as i32
+}

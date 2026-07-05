@@ -140,6 +140,9 @@ pub struct IoUringRing {
     pending:     AtomicU32,
     completed:   AtomicU32,
     dropped:     AtomicU32,
+    
+    // Fixed file table
+    fixed_files: [SigmaI32; 64],
 }
 
 impl IoUringRing {
@@ -155,6 +158,7 @@ impl IoUringRing {
             pending:   AtomicU32::new(0),
             completed: AtomicU32::new(0),
             dropped:   AtomicU32::new(0),
+            fixed_files: [-1; 64],
         }
     }
 
@@ -201,27 +205,53 @@ impl IoUringRing {
 
     /// Execute a single SQE and return the result (bytes done / errno).
     unsafe fn execute_op(&self, sqe: &SqEntry) -> SigmaI32 {
+        let fd = if (sqe.flags & IOSQE_FIXED_FILE) != 0 {
+            if sqe.fd >= 0 && (sqe.fd as usize) < self.fixed_files.len() {
+                self.fixed_files[sqe.fd as usize]
+            } else {
+                return -9; // EBADF
+            }
+        } else {
+            sqe.fd
+        };
+
         match sqe.opcode {
             0 => 0, // Nop: always success
             1 => {  // Read
                 extern "C" {
                     fn sigma_fd_read(fd: SigmaI32, buf: *mut SigmaU8, len: SigmaU32, off: SigmaU64) -> SigmaI32;
                 }
-                sigma_fd_read(sqe.fd, sqe.addr as *mut SigmaU8, sqe.len, sqe.off)
+                sigma_fd_read(fd, sqe.addr as *mut SigmaU8, sqe.len, sqe.off)
             }
             2 => {  // Write
                 extern "C" {
                     fn sigma_fd_write(fd: SigmaI32, buf: *const SigmaU8, len: SigmaU32, off: SigmaU64) -> SigmaI32;
                 }
-                sigma_fd_write(sqe.fd, sqe.addr as *const SigmaU8, sqe.len, sqe.off)
+                sigma_fd_write(fd, sqe.addr as *const SigmaU8, sqe.len, sqe.off)
             }
             3 => {  // Fsync
                 extern "C" { fn sigma_fd_fsync(fd: SigmaI32) -> SigmaI32; }
-                sigma_fd_fsync(sqe.fd)
+                sigma_fd_fsync(fd)
             }
             5 => {  // Close
                 extern "C" { fn sigma_fd_close(fd: SigmaI32) -> SigmaI32; }
-                sigma_fd_close(sqe.fd)
+                sigma_fd_close(fd)
+            }
+            7 => {  // Accept
+                extern "C" { fn sigma_net_accept(fd: SigmaI32) -> SigmaI32; }
+                sigma_net_accept(fd)
+            }
+            8 => {  // Connect
+                extern "C" { fn sigma_net_connect(fd: SigmaI32, addr: *const SigmaU8, addrlen: SigmaU32) -> SigmaI32; }
+                sigma_net_connect(fd, sqe.addr as *const SigmaU8, sqe.len)
+            }
+            9 => {  // Recv
+                extern "C" { fn sigma_net_recv(fd: SigmaI32, buf: *mut SigmaU8, len: SigmaU32, flags: SigmaI32) -> SigmaI32; }
+                sigma_net_recv(fd, sqe.addr as *mut SigmaU8, sqe.len, sqe.op_flags as SigmaI32)
+            }
+            10 => { // Send
+                extern "C" { fn sigma_net_send(fd: SigmaI32, buf: *const SigmaU8, len: SigmaU32, flags: SigmaI32) -> SigmaI32; }
+                sigma_net_send(fd, sqe.addr as *const SigmaU8, sqe.len, sqe.op_flags as SigmaI32)
             }
             _ => -38, // ENOSYS
         }
@@ -326,4 +356,23 @@ pub unsafe extern "C" fn sigma_io_uring_sq_ptr() -> *const SqEntry {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_io_uring_cq_ptr() -> *const CqEntry {
     G_IO_RING.cq.as_ptr()
+}
+
+/// Register an array of fixed file descriptors
+#[no_mangle]
+pub unsafe extern "C" fn sigma_io_uring_register_files(fds: *const SigmaI32, count: SigmaU32) -> SigmaI32 {
+    if fds.is_null() || count > 64 { return -22; } // EINVAL
+    let slice = core::slice::from_raw_parts(fds, count as usize);
+    for i in 0..count as usize {
+        G_IO_RING.fixed_files[i] = slice[i];
+    }
+    0
+}
+
+/// Trigger SQPOLL (Submit without enter)
+#[no_mangle]
+pub unsafe extern "C" fn sigma_io_uring_sqpoll_wakeup() {
+    // In a real kernel this would wake up the SQPOLL kthread.
+    // Here we just synchronously dispatch pending.
+    G_IO_RING.dispatch();
 }
