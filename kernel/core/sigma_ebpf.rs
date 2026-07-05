@@ -204,30 +204,92 @@ impl BpfProgram {
 
 // ── Global eBPF State ─────────────────────────────────────────────────────
 
-static mut G_EBPF_PROG: BpfProgram = BpfProgram::new();
+const MAX_PROGRAMS: usize = 16;
+
+pub struct BpfRegistry {
+    programs: [BpfProgram; MAX_PROGRAMS],
+    active_mask: u32, // Bitmask of active programs (up to 32)
+}
+
+impl BpfRegistry {
+    pub const fn new() -> Self {
+        Self {
+            programs: [
+                BpfProgram::new(), BpfProgram::new(), BpfProgram::new(), BpfProgram::new(),
+                BpfProgram::new(), BpfProgram::new(), BpfProgram::new(), BpfProgram::new(),
+                BpfProgram::new(), BpfProgram::new(), BpfProgram::new(), BpfProgram::new(),
+                BpfProgram::new(), BpfProgram::new(), BpfProgram::new(), BpfProgram::new(),
+            ],
+            active_mask: 0,
+        }
+    }
+}
+
+static mut G_EBPF_REGISTRY: BpfRegistry = BpfRegistry::new();
 static BPF_ID_GEN: AtomicU32 = AtomicU32::new(1);
 
 // ── C-ABI Exports ─────────────────────────────────────────────────────────
 
+/// Dynamically load a BPF program into the registry
 #[no_mangle]
 pub unsafe extern "C" fn sigma_bpf_load(insns: *const BpfInsn, count: usize) -> i32 {
     if insns.is_null() || count == 0 {
         return -1;
     }
     
+    // Find an empty slot
+    let mut slot = -1;
+    for i in 0..MAX_PROGRAMS {
+        if (G_EBPF_REGISTRY.active_mask & (1 << i)) == 0 {
+            slot = i as i32;
+            break;
+        }
+    }
+    
+    if slot == -1 {
+        return -2; // ENOMEM / Registry Full
+    }
+    
     let slice = core::slice::from_raw_parts(insns, count);
     let id = BPF_ID_GEN.fetch_add(1, Ordering::Relaxed);
     
-    match G_EBPF_PROG.load(slice, id) {
-        Ok(_) => id as i32,
+    match G_EBPF_REGISTRY.programs[slot as usize].load(slice, id) {
+        Ok(_) => {
+            G_EBPF_REGISTRY.active_mask |= 1 << slot;
+            id as i32
+        },
         Err(_) => -1,
     }
 }
 
+/// Unload a BPF program by ID
 #[no_mangle]
-pub unsafe extern "C" fn sigma_bpf_run(ctx: *mut u8) -> u64 {
-    if G_EBPF_PROG.len == 0 {
-        return 0;
+pub unsafe extern "C" fn sigma_bpf_unload(id: u32) -> i32 {
+    for i in 0..MAX_PROGRAMS {
+        if (G_EBPF_REGISTRY.active_mask & (1 << i)) != 0 {
+            if G_EBPF_REGISTRY.programs[i].id == id {
+                G_EBPF_REGISTRY.active_mask &= !(1 << i);
+                return 0; // Success
+            }
+        }
     }
-    G_EBPF_PROG.run(ctx)
+    -1 // Not found
+}
+
+/// Run a specific BPF program by ID, or if id == 0, run all of them.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_bpf_run(id: u32, ctx: *mut u8) -> u64 {
+    let mut last_ret = 0;
+    for i in 0..MAX_PROGRAMS {
+        if (G_EBPF_REGISTRY.active_mask & (1 << i)) != 0 {
+            let prog = &G_EBPF_REGISTRY.programs[i];
+            if id == 0 || prog.id == id {
+                last_ret = prog.run(ctx);
+                if id != 0 {
+                    return last_ret;
+                }
+            }
+        }
+    }
+    last_ret
 }
