@@ -145,3 +145,16 @@ These are blocked until Phase G kernel work completes:
 ---
 
 *Found a bug? Open an issue with subsystem label (`net`, `boot`, `zenith`, `orchestrator`) and link to checklist item.*
+
+## Open — Advanced Technical Ideas
+
+- **[#21] sigma-zkvm:** ✅ **Resolved** — `kernel/zkvm/sigma_zkvm.rs` implements Zero-Knowledge Virtual Machine with zk-SNARK primitives and DID attestation.
+- **[#22] sigma-mesh-compute:** ✅ **Resolved** — `kernel/mesh/sigma_mesh_compute.rs` implements National Distributed Compute Grid with DID-based opt-in and e-RUPI rewards.
+- **[#23] sigma-blockchain-lite:** ✅ **Resolved** — `kernel/blockchain/sigma_blockchain_lite.rs` implements Sovereign DLT for government records with NIC validators.
+- **[#24] sigma-quantum-ready:** ✅ **Resolved** — `kernel/crypto/sigma_pqc.rs` implements NIST PQC Stack (ML-KEM, ML-DSA, SLH-DSA) with CNSA 2.0 compliance.
+- **[#25] sigma-telco:** 5G/6G Network OS with O-RAN Alliance integration and TRAI QoS monitoring.
+- **[#26] sigma-robotics:** ROS 2 on SigmaOS with URDF robot model loader and sigma-twin integration.
+- **[#27] sigma-neuro:** BCI (Brain-Computer Interface) integration with OpenBCI and Neurosity device drivers.
+- **[#28] sigma-space:** IN-SPACe Developer Tools with satellite design validation and TLE orbit propagation.
+- **[#29] Formal Verification:** Formal verification of core IPC using Frama-C WP or Kani.
+- **[#30] sigma-print:** 3D Printing & Additive Manufacturing with G-code slicer API integration.
