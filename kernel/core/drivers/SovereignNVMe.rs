@@ -63,9 +63,12 @@ pub struct NvmeCompletion {
 // ── Fixed Queue Sizes ─────────────────────────────────────────────────────
 const ASQ_SIZE: usize = 32;
 const ACQ_SIZE: usize = 32;
+const MAX_ASYNC_QUEUE_DEPTH: usize = 32;
 
 pub struct SovereignNVMe {
     bar0: usize,
+    mmio_base: u64,
+    async_enabled: bool,
     asq: [NvmeCmd; ASQ_SIZE],
     acq: [NvmeCompletion; ACQ_SIZE],
     iosq: [NvmeCmd; ASQ_SIZE],
@@ -81,6 +84,8 @@ impl SovereignNVMe {
     pub const fn new() -> Self {
         Self {
             bar0: 0,
+            mmio_base: 0,
+            async_enabled: false,
             asq: [NvmeCmd {
                 opcode: 0, flags: 0, cid: 0, nsid: 0, rsvd2: 0, mptr: 0,
                 prp1: 0, prp2: 0, cdw10: 0, cdw11: 0, cdw12: 0, cdw13: 0, cdw14: 0, cdw15: 0
@@ -148,6 +153,11 @@ impl SovereignNVMe {
 
         self.initialized = true;
         true
+    }
+
+    pub fn init_async(&mut self, enable: bool, mmio_base: u64) {
+        self.async_enabled = enable;
+        self.mmio_base = mmio_base;
     }
 
     /// Submit an Admin command.
