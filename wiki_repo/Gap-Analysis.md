@@ -47,6 +47,8 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 | `.deb` / `.rpm` / `.apk` compat | ☐ | Format resolver in sigma-pkg not implemented |
 | Binary delta updates | 🔧 | `sigma_delta.h` exists — no implementation |
 | India CDN mirror infrastructure | ☐ | NIC/DigitalIndia-hosted mirrors for zero foreign dependency |
+| Universal package format (sigma-snapd) | ✅ | Implemented in `userland/snapd/sigma_snapd.rs` (Ubuntu Snap-inspired) |
+| Multiple version support (sigma-modularity) | ✅ | Implemented in `userland/modularity/sigma_modularity.rs` (Fedora Modularity-inspired) |
 
 ### Display & Login
 
@@ -88,6 +90,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 | RISC-V native build | 🔧 | Stubs present — not buildable |
 | Formal verification | ☐ | `sigma_contracts.h` exists — no Frama-C proofs |
 | SDF userspace driver ABI | 🔧 | Framework header complete — no actual driver binary produced |
+| Immutable base system (sigma-ostree) | ✅ | Implemented in `userland/ostree/sigma_ostree.rs` (Fedora Silverblue/RHEL Image Mode-inspired) |
 
 ### Security
 
@@ -135,6 +138,8 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 | sigma-observatory dashboard | ☐ | Native Prometheus+Grafana equivalent in Zenith |
 | D-Bus compatibility bridge | ☐ | Needed for running existing Linux apps |
 | sigma-bus TLA+/Alloy model | ☐ | Formal IPC protocol specification |
+| Web console (sigma-cockpit) | ✅ | Implemented in `userland/cockpit/sigma_cockpit.rs` (Fedora Cockpit-inspired) |
+| Unified configuration tool (sigma-yast) | ✅ | Implemented in `userland/yast/sigma_yast.rs` (openSUSE YaST-inspired) |
 
 ### Multilingual & Accessibility
 
@@ -162,6 +167,10 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 | Real-time scheduler | Optional | Optional | Optional | ✅ |
 | Immutable root | ❌ | ❌ | ❌ | ✅ |
 | Reproducible builds | Partial | Partial | ✅ | ✅ |
+| Universal package format | Snap (Ubuntu) | ❌ | ❌ | ✅ (sigma-snapd) |
+| Multiple version support | ❌ | Modularity (Fedora) | ❌ | ✅ (sigma-modularity) |
+| Web console | ❌ | Cockpit (Fedora) | ❌ | ✅ (sigma-cockpit) |
+| Unified config tool | ❌ | ❌ | ❌ | ✅ (sigma-yast) |
 
 ---
 
@@ -195,9 +204,9 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 
 ---
 
-## New Gaps Identified — Rounds 29–32
+## New Gaps Identified — Rounds 29–33
 
-The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, and the XR/DataSov platform:
+The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, and Linux distro-inspired components:
 
 | Gap | Discovered While | Priority |
 |---|---|---|
@@ -209,10 +218,32 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 | No Indian IME for sigma-gamelearn text input | sigma_gamelearn.h | 🟠 |
 | No biometric hardware driver (fingerprint/iris) | sigma_continuous_auth.h | 🟠 |
 | sigma-commnet needs iptables/nftables NAT — no implementation | sigma_commnet.h | 🟠 |
+| Snapshot & rollback system (sigma-snapper) — not implemented | Linux distro research | 🟡 |
+| Build service infrastructure (sigma-obs) — not implemented | Linux distro research | 🟡 |
+| Application catalog (sigma-appstreams) — not implemented | Linux distro research | 🟡 |
+| GUI package manager (sigma-pamac) — not implemented | Linux distro research | 🟡 |
+| Rust-based desktop (sigma-cosmic) — not implemented | Linux distro research | 🟡 |
+| User-friendly desktop (sigma-pantheon) — not implemented | Linux distro research | 🟡 |
+| System utilities (sigma-mint-tools) — not implemented | Linux distro research | 🟡 |
+| Guided installer (sigma-archinstall) — not implemented | Linux distro research | 🟡 |
+| Fast package manager (sigma-pacman) — not implemented | Linux distro research | 🟡 |
+| ISO build system (sigma-live-build) — not implemented | Linux distro research | 🟡 |
+| Advanced storage (sigma-stratis) — not implemented | Linux distro research | 🟡 |
+| Mandatory access control (sigma-selinux) — not implemented | Linux distro research | 🟡 |
+| Telemetry and analytics (sigma-insights) — not implemented | Linux distro research | 🟡 |
+| Configuration database (sigma-debconf) — not implemented | Linux distro research | 🟡 |
+| Rolling release model (sigma-rolling) — not implemented | Linux distro research | 🟡 |
 
 ---
 
 ## Priority Queue — Recommended Next Rounds
+
+### Round 34 — Linux Distro Components (NEW)
+1. sigma-snapper — Snapshot & rollback system (openSUSE Snapper-inspired)
+2. sigma-obs — Build service infrastructure (openSUSE OBS-inspired)
+3. sigma-appstreams — Application catalog (RHEL AppStreams-inspired)
+4. sigma-pamac — GUI package manager (Manjaro PAMAC-inspired)
+5. sigma-cosmic — Rust-based desktop (Pop!_OS COSMIC-inspired)
 
 ### Round 33 — Make It Boot
 1. VESA/GOP framebuffer driver (get pixels on screen)
@@ -220,26 +251,26 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 3. QEMU boot test in CI (assert boots to shell)
 4. `make iso` pipeline producing a bootable ISO
 
-### Round 34 — Make It Connect  
+### Round 35 — Make It Connect  
 1. TCP/UDP socket layer implementation
 2. Basic WiFi SDF driver (iwlwifi or cfg80211 userspace)
 3. sigma-pkg talking to a real repo server
 4. sigma-bus IPC running end-to-end
 
-### Round 35 — Make It Secure
+### Round 36 — Make It Secure
 1. Real Argon2id CryptFS key derivation (fix Issue #44)
 2. TPM2 seal/unseal for disk key
 3. DID login screen replacing username/password
 4. sigma-trustd Dilithium3 certificate chain end-to-end
 
-### Round 36 — Make It Indian
+### Round 37 — Make It Indian
 1. ABDM FHIR client (sigma-health goes live)
 2. GST IRN API client (sigma-accounts e-invoice goes live)
 3. IndiaStack UPI autopay working
 4. Bhashini offline model bundle (22-language ASR/TTS)
 5. Indian IME (Inscript + phonetic for Devanagari)
 
-### Round 37 — Make It Smart
+### Round 38 — Make It Smart
 1. Local LLM integration (sigma-ai with llama.cpp backend)
 2. sigma-heal AI analysis using local model
 3. sigma-lex Gazette parser using local NLP
