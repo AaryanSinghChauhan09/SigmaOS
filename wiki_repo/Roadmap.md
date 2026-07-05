@@ -235,6 +235,14 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - Environment variable configuration
 - Container statistics and logs
 
+#### Kubernetes k3s Orchestration (sigma_k3s.rs)
+- Pod management with container specifications
+- Service management (ClusterIP, NodePort, LoadBalancer, ExternalName)
+- Deployment management with replica scaling
+- Namespace isolation and management
+- Node management with resource tracking
+- Resource requirements (CPU, memory limits and requests)
+
 ### Package Management
 #### Flatpak/Sandbox (sigma_flatpak.rs)
 - Sandboxed application distribution
