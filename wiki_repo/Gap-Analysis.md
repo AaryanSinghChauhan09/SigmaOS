@@ -204,6 +204,59 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 
 ---
 
+## 🚨 CRITICAL BLOCKING GAPS
+
+The following gaps currently prevent SigmaOS from functioning like established Linux distros (Ubuntu, Fedora, Arch, Debian). These must be addressed before SigmaOS can be considered a functional operating system.
+
+### 🧩 Core System Gaps (BLOCKING - Phase 1)
+| Gap | Priority | Impact |
+|---|---|---|
+| No stable kernel or hardware driver layer | 🔴 CRITICAL | Cannot boot on real hardware |
+| No tested installer and bootloader integration | 🔴 CRITICAL | Cannot install system |
+| No service manager (systemd, OpenRC, etc.) defined | 🔴 CRITICAL | Cannot manage system services |
+| No modular kernel builds (desktop, server, mobile) | 🔴 CRITICAL | Cannot optimize for different use cases |
+| No update mechanism (rolling + LTS) | 🔴 CRITICAL | Cannot keep system updated |
+
+### ⚙️ Package Ecosystem Gaps (BLOCKING - Phase 2)
+| Gap | Priority | Impact |
+|---|---|---|
+| sigpkg is proposed but not fully implemented | 🔴 CRITICAL | Cannot install software |
+| No central repo of software packages | 🔴 CRITICAL | No software distribution |
+| Missing package signing, updates, rollback | 🔴 CRITICAL | Cannot trust or manage packages |
+| No GUI shell (GNOME/KDE/XFCE equivalent) | 🔴 CRITICAL | No desktop environment |
+| Display server integration missing (Wayland/X.Org) | 🔴 CRITICAL | No graphical interface |
+
+### 🎨 Desktop & User Experience Gaps (BLOCKING - Phase 2)
+| Gap | Priority | Impact |
+|---|---|---|
+| Accessibility tools absent (screen readers, multilingual UI) | 🟠 HIGH | Not accessible to all users |
+| No theme store or customization hub | 🟡 MEDIUM | Poor user experience |
+| No input method integration for Indic scripts | 🟠 HIGH | Cannot type in Indian languages |
+
+### 🔒 Security & Privacy Gaps (HIGH PRIORITY - Phase 4)
+| Gap | Priority | Impact |
+|---|---|---|
+| No QubesOS-style sandboxing/isolation | 🟠 HIGH | Security vulnerability |
+| No Suricata/Snort integration | 🟠 HIGH | No network threat detection |
+| AI transparency logging not implemented | 🟠 HIGH | Cannot audit AI decisions |
+| No KeePassXC integration | 🟡 MEDIUM | No password management |
+
+### 🧠 AI & Automation Gaps (HIGH PRIORITY - Phase 4)
+| Gap | Priority | Impact |
+|---|---|---|
+| SigmaAI Agent still conceptual, not embedded | 🟠 HIGH | No natural language control |
+| No n8n/Airflow-style workflow engine | 🟡 MEDIUM | No automation capabilities |
+| Natural language → CLI translator not functional | 🟠 HIGH | No voice/text control |
+
+### 📘 Education & Professional Tools Gaps (MEDIUM PRIORITY - Phase 3)
+| Gap | Priority | Impact |
+|---|---|---|
+| CBSE Tools (GeoGebra, Scilab, OpenBoard) not bundled | 🟡 MEDIUM | Not suitable for education |
+| Professional Modules (ERPNext, Koha, QGIS, GNUCash) missing | 🟡 MEDIUM | Not suitable for professional use |
+| Indic language packs not integrated | 🟠 HIGH | Not accessible in Indian languages |
+
+---
+
 ## New Gaps Identified — Rounds 29–35
 
 The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, Linux distro-inspired components, open source project-inspired components, and the new categorized component structure:
