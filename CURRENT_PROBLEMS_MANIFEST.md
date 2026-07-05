@@ -76,7 +76,7 @@
 | G-03 | Virtual Memory Manager (Page Table Walker) | **Resolved** | `kernel/mm/page_table_walker.rs` |
 | G-04 | IRQ Controller (APIC+PIC+Timer) | **Resolved** | `kernel/core/sigma_irq.rs` |
 | G-05 | Syscall Dispatch (30+ syscalls) | **Resolved** | `kernel/core/sigma_syscall_dispatch.rs` |
-| G-06 | VESA/GOP Framebuffer Driver | **Resolved** | `drivers/display/sigma_vesa.zig` |
+| G-06 | VESA/GOP Framebuffer Driver | **Resolved** | `kernel/gfx/sigma_framebuffer.rs` |
 | G-07 | UEFI Bootloader (sigma-boot.efi) | **Resolved** | `sigma-boot/sigma_boot.zig` |
 | G-08 | Bootable ISO Pipeline | **Resolved** | `Makefile` (iso target) |
 
