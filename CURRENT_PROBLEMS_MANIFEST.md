@@ -101,6 +101,12 @@
 - **[#2002] sigma-msme:** ✅ **Resolved** — `userland/msme/sigma_msme.rs` implements MSME Platform with Udyam, GeM, TReDS, OCEN.
 - **[#2003] sigma-elections:** ✅ **Resolved** — `userland/elections/sigma_elections.rs` implements Voter Services with EPIC, booth finder, candidate affidavits.
 - **[#2004] sigma-ayush:** ✅ **Resolved** — `userland/ayush/sigma_ayush.rs` implements AYUSH Healthcare with practitioner registry, AFI, Panchakarma, NABH.
+- **[#2005] sigma-climate:** ✅ **Resolved** — `userland/climate/sigma_climate.rs` implements Environmental Compliance with CPCB, EC, Carbon Market, ESG, REC, AQI.
+- **[#2006] sigma-media:** ✅ **Resolved** — `userland/media/sigma_media.rs` implements Broadcast & Press Compliance with MIB, OTT IT Rules, Press Registrar, PIB, TRAI DAS.
+- **[#2007] sigma-water:** ✅ **Resolved** — `userland/water/sigma_water.rs` implements Water Resource Management with CWC, JJM, WRIS, Irrigation, CGWB, Flood Warning.
+- **[#2008] sigma-prison:** ✅ **Resolved** — `userland/prison/sigma_prison.rs` implements Correctional Facility Management with ePrisons, BNSS, Bail, Rehabilitation, Arnesh Kumar.
+- **[#2009] sigma-port:** ✅ **Resolved** — `userland/port/sigma_port.rs` implements Customs & Logistics with ICEGATE, PCS1x, Bill of Lading, FASTag, EXIM Bank, RODTEP.
+- **[#2010] sigma-land:** ✅ **Resolved** — `userland/land/sigma_land.rs` implements Land Records & Survey with DILRMP, Mutation, Bhu-Naksha, LARR Act, SVAMITVA, Encumbrance.
 
 ## Documentation / Community
 
