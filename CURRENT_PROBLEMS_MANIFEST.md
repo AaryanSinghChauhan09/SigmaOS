@@ -95,6 +95,13 @@
 - **[#1015] Indian language IME:** ✅ **Resolved** — `userland/input/sigma_ime.rs` implements Inscript and Phonetic IME for 10 Indian languages.
 - **[#1016] Local LLM backend (sigma-ai):** ✅ **Resolved** — `userland/ai/sigma_llm_backend.rs` implements llama.cpp backend integration.
 
+## Open — Phase I India Profession Apps
+
+- **[#2001] sigma-judicial:** ✅ **Resolved** — `userland/judicial/sigma_judicial.rs` implements eCourts Deep Integration.
+- **[#2002] sigma-msme:** ✅ **Resolved** — `userland/msme/sigma_msme.rs` implements MSME Platform with Udyam, GeM, TReDS, OCEN.
+- **[#2003] sigma-elections:** ✅ **Resolved** — `userland/elections/sigma_elections.rs` implements Voter Services with EPIC, booth finder, candidate affidavits.
+- **[#2004] sigma-ayush:** ✅ **Resolved** — `userland/ayush/sigma_ayush.rs` implements AYUSH Healthcare with practitioner registry, AFI, Panchakarma, NABH.
+
 ## Documentation / Community
 
 - **[#600] Wiki depth:** Phase F/G docs to be added to `wiki_repo/` — offline sync, perf governor.
