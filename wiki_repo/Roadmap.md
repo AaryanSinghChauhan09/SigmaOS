@@ -253,6 +253,14 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - Portal integration for file access, printing, screenshots
 - Application search and installation
 
+#### RPM/dpkg Package Management (sigma_package.rs)
+- Package installation and removal with dependency checking
+- Repository management (add, remove, enable, disable)
+- Package cache updates and upgrades
+- Dependency resolution and conflict detection
+- Package integrity verification
+- Support for both RPM and DEB formats
+
 ### Observability
 #### Cockpit Web Admin (sigma_cockpit.rs)
 - System monitoring with CPU, memory, disk, network statistics
