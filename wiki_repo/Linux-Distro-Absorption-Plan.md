@@ -2,6 +2,20 @@
 
 This document outlines a systematic approach for absorbing tools, functions, features, principles, ideas, CLI innovations, performance optimizations, and unique selling propositions (USPs) from various Linux distributions.
 
+## ⚠️ IP Compliance Notice
+
+**All feature absorption must comply with the [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.md).**
+
+Key principles:
+- ✅ Study principles and patterns, not code
+- ✅ Create original implementations from learned concepts
+- ✅ Provide proper attribution to inspiration sources
+- ✅ Respect all license requirements
+- ❌ Never copy-paste code from other projects
+- ❌ Never violate license terms
+
+See [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.md) for detailed guidelines.
+
 ## 🎯 Absorption Framework
 
 ### Phase 1: Research & Identification

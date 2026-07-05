@@ -345,6 +345,25 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 | Unified settings hub (sigma-budgie) — not implemented | Distro absorption research | 🟡 |
 | Fast package manager (sigma-xbps) — not implemented | Distro absorption research | 🟡 |
 | Source-based package manager (sigma-portage) — not implemented | Distro absorption research | 🟡 |
+| Video editor (sigma-video) — not implemented | Open source research | 🟡 |
+| Vector graphics editor (sigma-vector) — not implemented | Open source research | 🟡 |
+| Distributed data processing (sigma-spark) — not implemented | Open source research | 🟡 |
+| Lazy DataFrame engine (sigma-polars) — not implemented | Open source research | 🟡 |
+| Security compartmentalization (sigma-qubes) — not implemented | Open source research | 🟡 |
+| Modern VPN (sigma-wireguard) — not implemented | Open source research | 🟡 |
+| Software-defined networking (sigma-zerotier) — not implemented | Open source research | 🟡 |
+| File synchronization (sigma-sync) — not implemented | Open source research | 🟡 |
+| Self-hosted collaboration (sigma-cloud) — not implemented | Open source research | 🟡 |
+| Video conferencing (sigma-meet) — not implemented | Open source research | 🟡 |
+| Automated ML (sigma-automl) — not implemented | Open source research | 🟡 |
+| Distributed computing (sigma-ray) — not implemented | Open source research | 🟡 |
+| Model inference (sigma-onnx) — not implemented | Open source research | 🟡 |
+| Learning management system (sigma-lms) — not implemented | Open source research | 🟡 |
+| Spaced repetition (sigma-anki) — not implemented | Open source research | 🟡 |
+| Hospital information system (sigma-health) — not implemented | Open source research | 🟡 |
+| Mobile data collection (sigma-odk) — not implemented | Open source research | 🟡 |
+| Crisis mapping (sigma-ushahidi) — not implemented | Open source research | 🟡 |
+| Business suite (sigma-odoo) — not implemented | Open source research | 🟡 |
 
 ---
 
