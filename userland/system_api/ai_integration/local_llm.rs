@@ -2,6 +2,7 @@
 // SigmaOS Local LLM - Local Large Language Model integration
 
 use serde::{Deserialize, Serialize};
+use log::{info, warn, error};
 
 /// Local LLM integration for on-device AI processing
 pub struct LocalLLM {
@@ -39,6 +40,32 @@ impl LocalLLM {
             return Ok(model_path);
         }
         
+        Ok(model_path)
+    }
+
+    /// Download a model from Hugging Face
+    pub async fn download_model(&self, model_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let model_path = Self::get_model_path(model_name)?;
+        
+        if std::path::Path::new(&model_path).exists() {
+            return Ok("Model already exists".to_string());
+        }
+
+        log::info!("Downloading model: {}", model_name);
+        
+        // Use reqwest to download the model from Hugging Face
+        let model_url = format!("https://huggingface.co/{}/resolve/main/model.bin", model_name);
+        
+        let response = reqwest::get(&model_url).await?;
+        
+        if !response.status().is_success() {
+            return Err(format!("Failed to download model: {}", response.status()).into());
+        }
+        
+        let bytes = response.bytes().await?;
+        std::fs::write(&model_path, bytes)?;
+        
+        log::info!("Model downloaded successfully to: {}", model_path);
         Ok(model_path)
     }
 

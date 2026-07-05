@@ -13,5 +13,19 @@ uuid = { version = "1.4", features = ["v4", "serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
+# GPU monitoring (optional)
+nvml-wrapper = { version = "0.9", optional = true }
+amdgpu = { version = "0.1", optional = true }
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+[features]
+default = []
+nvidia-gpu = ["nvml-wrapper"]
+amd-gpu = ["amdgpu"]
+all-gpu = ["nvidia-gpu", "amd-gpu"]
+
 [dev-dependencies]
 tokio = { version = "1.0", features = ["full"] }

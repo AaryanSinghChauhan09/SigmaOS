@@ -2,39 +2,109 @@
 // SigmaOS Docker Manager - Docker GUI and management
 
 use serde::{Deserialize, Serialize};
+use log::{info, warn, error};
 
 /// Docker Manager for Docker operations
 pub struct DockerManager {
+    #[cfg(feature = "docker-daemon")]
+    docker: Option<bollard::Docker>,
     containers: Vec<DockerContainer>,
     images: Vec<DockerImage>,
 }
 
 impl DockerManager {
     /// Create a new Docker Manager
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let containers = Self::list_containers()?;
-        let images = Self::list_images()?;
+    pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            // Try to connect to Docker daemon
+            let docker = match bollard::Docker::connect_with_local_defaults() {
+                Ok(d) => {
+                    info!("Connected to Docker daemon");
+                    Some(d)
+                },
+                Err(e) => {
+                    warn!("Could not connect to Docker daemon: {}", e);
+                    None
+                }
+            };
+        }
+
+        let containers = Self::list_containers().await?;
+        let images = Self::list_images().await?;
         
         Ok(Self {
+            #[cfg(feature = "docker-daemon")]
+            docker,
             containers,
             images,
         })
     }
 
     /// List Docker containers
-    fn list_containers() -> Result<Vec<DockerContainer>, Box<dyn std::error::Error>> {
-        // Placeholder implementation - would query Docker daemon
+    async fn list_containers() -> Result<Vec<DockerContainer>, Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Ok(docker) = bollard::Docker::connect_with_local_defaults() {
+                let containers = docker.containers::<bollard::container::ListContainersOptions<&str>>(None).await?;
+                // Convert to internal format
+                return Ok(vec![]);
+            }
+        }
+        // Placeholder implementation
         Ok(vec![])
     }
 
     /// List Docker images
-    fn list_images() -> Result<Vec<DockerImage>, Box<dyn std::error::Error>> {
-        // Placeholder implementation - would query Docker daemon
+    async fn list_images() -> Result<Vec<DockerImage>, Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Ok(docker) = bollard::Docker::connect_with_local_defaults() {
+                let images = docker.images::<bollard::image::ListImagesOptions<&str>>(None).await?;
+                // Convert to internal format
+                return Ok(vec![]);
+            }
+        }
+        // Placeholder implementation
         Ok(vec![])
     }
 
     /// Create a new container
-    pub fn create_container(&mut self, config: ContainerConfig) -> Result<String, Box<dyn std::error::Error>> {
+    pub async fn create_container(&mut self, config: ContainerConfig) -> Result<String, Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Some(ref docker) = self.docker {
+                let container_id = docker.create_container::<bollard::container::CreateContainerOptions<&str>, &bollard::container::Config<&str>>(
+                    None,
+                    &bollard::container::Config {
+                        image: Some(config.image.clone()),
+                        env: Some(config.environment.iter().map(|s| s.as_str()).collect()),
+                        exposed_ports: Some(config.ports.iter().map(|p| {
+                            let parts: Vec<&str> = p.split(':').collect();
+                            bollard::container::PortMap::Tcp(vec![bollard::container::PortBinding {
+                                host_ip: Some("0.0.0.0".to_string()),
+                                host_port: Some(parts.get(1).unwrap_or(&"80").to_string()),
+                            })])
+                        }).collect()),
+                        ..Default::default()
+                    },
+                ).await?.id;
+                
+                let container = DockerContainer {
+                    id: container_id.clone(),
+                    name: config.name,
+                    image: config.image,
+                    status: ContainerStatus::Stopped,
+                    ports: config.ports,
+                    environment: config.environment,
+                };
+                
+                self.containers.push(container);
+                return Ok(container_id);
+            }
+        }
+
+        // Fallback to placeholder
         let container_id = format!("container-{:?}", uuid::Uuid::new_v4());
         
         let container = DockerContainer {
@@ -51,7 +121,14 @@ impl DockerManager {
     }
 
     /// Start a container
-    pub fn start_container(&mut self, container_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn start_container(&mut self, container_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Some(ref docker) = self.docker {
+                docker.start_container::<&str>(container_id, None).await?;
+            }
+        }
+        
         if let Some(container) = self.containers.iter_mut().find(|c| c.id == container_id) {
             container.status = ContainerStatus::Running;
             Ok(())
@@ -61,7 +138,14 @@ impl DockerManager {
     }
 
     /// Stop a container
-    pub fn stop_container(&mut self, container_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn stop_container(&mut self, container_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Some(ref docker) = self.docker {
+                docker.stop_container::<&str>(container_id, None).await?;
+            }
+        }
+        
         if let Some(container) = self.containers.iter_mut().find(|c| c.id == container_id) {
             container.status = ContainerStatus::Stopped;
             Ok(())
@@ -71,7 +155,14 @@ impl DockerManager {
     }
 
     /// Delete a container
-    pub fn delete_container(&mut self, container_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn delete_container(&mut self, container_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Some(ref docker) = self.docker {
+                docker.remove_container::<&str>(container_id, None).await?;
+            }
+        }
+        
         if let Some(pos) = self.containers.iter().position(|c| c.id == container_id) {
             self.containers.remove(pos);
             Ok(())
@@ -81,7 +172,19 @@ impl DockerManager {
     }
 
     /// Pull an image
-    pub fn pull_image(&mut self, image_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn pull_image(&mut self, image_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Some(ref docker) = self.docker {
+                info!("Pulling image: {}", image_name);
+                docker.create_image::<bollard::image::CreateImageOptions<&str>, &str>(
+                    None,
+                    image_name,
+                    None
+                ).await?;
+            }
+        }
+        
         let image = DockerImage {
             id: format!("image-{:?}", uuid::Uuid::new_v4()),
             name: image_name.to_string(),
@@ -94,7 +197,25 @@ impl DockerManager {
     }
 
     /// Get container logs
-    pub fn get_container_logs(&self, container_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+    pub async fn get_container_logs(&self, container_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        #[cfg(feature = "docker-daemon")]
+        {
+            if let Some(ref docker) = self.docker {
+                let logs = docker.logs::<&str>(
+                    container_id,
+                    None,
+                    Some(bollard::container::LogsOptions {
+                        follow: false,
+                        stdout: true,
+                        stderr: true,
+                        tail: "100",
+                        ..Default::default()
+                    })
+                ).await?;
+                return Ok(String::from_utf8_lossy(&logs).to_string());
+            }
+        }
+        
         if let Some(_) = self.containers.iter().find(|c| c.id == container_id) {
             Ok("Container logs placeholder".to_string())
         } else {

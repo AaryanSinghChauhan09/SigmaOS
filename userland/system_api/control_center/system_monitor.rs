@@ -106,8 +106,39 @@ impl SystemMonitor {
 
     /// Get GPU information (if available)
     fn get_gpu_info(&self) -> (Option<f32>, Option<f32>) {
-        // Try to read GPU info from nvidia-smi or AMDGPU
-        // For now, return None as this requires GPU-specific libraries
+        // Try NVIDIA GPU first
+        #[cfg(feature = "nvidia-gpu")]
+        {
+            if let Ok(nvml) = nvml_wrapper::Nvml::init() {
+                if let Ok(device_count) = nvml.device_count() {
+                    if device_count > 0 {
+                        if let Ok(device) = nvml.device_by_index(0) {
+                            if let Ok(usage) = device.utilization_rates() {
+                                if let Ok(temp) = device.temperature(nvml_wrapper::TemperatureSensor::Gpu) {
+                                    return (Some(usage.gpu as f32), Some(temp as f32));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Try AMD GPU
+        #[cfg(feature = "amd-gpu")]
+        {
+            if let Ok(gpu_info) = amdgpu::get_gpu_info() {
+                return (Some(gpu_info.usage), Some(gpu_info.temperature));
+            }
+        }
+
+        // Fallback to reading from sysfs
+        if let Ok(temp) = std::fs::read_to_string("/sys/class/hwmon/hwmon0/temp1_input") {
+            if let Ok(temp_millidegrees) = temp.trim().parse::<i32>() {
+                return (None, Some(temp_millidegrees as f32 / 1000.0));
+            }
+        }
+
         (None, None)
     }
 

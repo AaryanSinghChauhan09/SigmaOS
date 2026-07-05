@@ -63,11 +63,11 @@ pub struct DevStudio {
 
 impl DevStudio {
     /// Create a new Dev Studio instance
-    pub fn new(config: DevStudioConfig) -> Result<Self, Box<dyn std::error::Error>> {
+    pub async fn new(config: DevStudioConfig) -> Result<Self, Box<dyn std::error::Error>> {
         let git_manager = GitManager::new(&config.git_user_name, &config.git_user_email)?;
-        let docker_manager = DockerManager::new()?;
-        let kubernetes_manager = KubernetesManager::new()?;
-        let database_client = DatabaseClient::new()?;
+        let docker_manager = DockerManager::new().await?;
+        let kubernetes_manager = KubernetesManager::new().await?;
+        let database_client = DatabaseClient::new().await?;
         let api_tester = APITester::new()?;
         let environment_manager = EnvironmentManager::new()?;
         let build_manager = BuildManager::new()?;

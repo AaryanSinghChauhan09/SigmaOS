@@ -2,39 +2,76 @@
 // SigmaOS Kubernetes Manager - Kubernetes GUI and management
 
 use serde::{Deserialize, Serialize};
+use log::{info, warn, error};
 
 /// Kubernetes Manager for Kubernetes operations
 pub struct KubernetesManager {
+    #[cfg(feature = "kubernetes")]
+    client: Option<kube::Client>,
     clusters: Vec<KubernetesCluster>,
     pods: Vec<KubernetesPod>,
 }
 
 impl KubernetesManager {
     /// Create a new Kubernetes Manager
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let clusters = Self::list_clusters()?;
-        let pods = Self::list_pods()?;
+    pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        #[cfg(feature = "kubernetes")]
+        {
+            // Try to connect to Kubernetes cluster
+            let client = match kube::Client::try_default().await {
+                Ok(c) => {
+                    info!("Connected to Kubernetes cluster");
+                    Some(c)
+                },
+                Err(e) => {
+                    warn!("Could not connect to Kubernetes cluster: {}", e);
+                    None
+                }
+            };
+        }
+
+        let clusters = Self::list_clusters().await?;
+        let pods = Self::list_pods().await?;
         
         Ok(Self {
+            #[cfg(feature = "kubernetes")]
+            client,
             clusters,
             pods,
         })
     }
 
     /// List Kubernetes clusters
-    fn list_clusters() -> Result<Vec<KubernetesCluster>, Box<dyn std::error::Error>> {
+    async fn list_clusters() -> Result<Vec<KubernetesCluster>, Box<dyn std::error::Error>> {
+        #[cfg(feature = "kubernetes")]
+        {
+            if let Ok(client) = kube::Client::try_default().await {
+                // Use kubectl config to list contexts
+                // This is a simplified implementation
+                return Ok(vec![]);
+            }
+        }
         // Placeholder implementation - would query kubectl
         Ok(vec![])
     }
 
     /// List Kubernetes pods
-    fn list_pods() -> Result<Vec<KubernetesPod>, Box<dyn std::error::Error>> {
+    async fn list_pods() -> Result<Vec<KubernetesPod>, Box<dyn std::error::Error>> {
+        #[cfg(feature = "kubernetes")]
+        {
+            if let Ok(client) = kube::Client::try_default().await {
+                // List pods from default namespace
+                let pods: kube::corev1::Pod = client.list(None).await?;
+                // Convert to internal format
+                return Ok(vec![]);
+            }
+        }
         // Placeholder implementation - would query kubectl
         Ok(vec![])
     }
 
     /// Create a new cluster
-    pub fn create_cluster(&mut self, config: ClusterConfig) -> Result<String, Box<dyn std::error::Error>> {
+    pub async fn create_cluster(&mut self, config: ClusterConfig) -> Result<String, Box<dyn std::error::Error>> {
         let cluster_id = format!("cluster-{:?}", uuid::Uuid::new_v4());
         
         let cluster = KubernetesCluster {
@@ -51,7 +88,7 @@ impl KubernetesManager {
     }
 
     /// Delete a cluster
-    pub fn delete_cluster(&mut self, cluster_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn delete_cluster(&mut self, cluster_id: &str) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(pos) = self.clusters.iter().position(|c| c.id == cluster_id) {
             self.clusters.remove(pos);
             Ok(())
@@ -61,7 +98,7 @@ impl KubernetesManager {
     }
 
     /// Create a pod
-    pub fn create_pod(&mut self, cluster_id: &str, config: PodConfig) -> Result<String, Box<dyn std::error::Error>> {
+    pub async fn create_pod(&mut self, cluster_id: &str, config: PodConfig) -> Result<String, Box<dyn std::error::Error>> {
         if let Some(_) = self.clusters.iter().find(|c| c.id == cluster_id) {
             let pod_id = format!("pod-{:?}", uuid::Uuid::new_v4());
             
@@ -82,7 +119,7 @@ impl KubernetesManager {
     }
 
     /// Delete a pod
-    pub fn delete_pod(&mut self, pod_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn delete_pod(&mut self, pod_id: &str) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(pos) = self.pods.iter().position(|p| p.id == pod_id) {
             self.pods.remove(pos);
             Ok(())
@@ -92,7 +129,19 @@ impl KubernetesManager {
     }
 
     /// Get pod logs
-    pub fn get_pod_logs(&self, pod_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+    pub async fn get_pod_logs(&self, pod_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        #[cfg(feature = "kubernetes")]
+        {
+            if let Some(ref client) = self.client {
+                if let Some(pod) = self.pods.iter().find(|p| p.id == pod_id) {
+                    let logs = kube::Api::namespaced(client.clone(), &pod.namespace)
+                        .logs(&pod.name, &kube::api::LogParams::default())
+                        .await?;
+                    return Ok(logs);
+                }
+            }
+        }
+        
         if let Some(_) = self.pods.iter().find(|p| p.id == pod_id) {
             Ok("Pod logs placeholder".to_string())
         } else {

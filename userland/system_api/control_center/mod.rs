@@ -24,6 +24,7 @@ pub use ai_assistant::AIAssistant;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use log::{info, warn, error};
 
 /// Control Center configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -40,6 +41,10 @@ pub struct ControlCenterConfig {
     pub backup_interval: u64,
     /// Theme preference
     pub theme: String,
+    /// Enable logging
+    pub enable_logging: bool,
+    /// Log level
+    pub log_level: String,
 }
 
 impl Default for ControlCenterConfig {
@@ -51,6 +56,8 @@ impl Default for ControlCenterConfig {
             auto_backups: true,
             backup_interval: 24,
             theme: "dark".to_string(),
+            enable_logging: true,
+            log_level: "info".to_string(),
         }
     }
 }
@@ -71,6 +78,23 @@ pub struct ControlCenter {
 impl ControlCenter {
     /// Create a new Control Center instance
     pub fn new(config: ControlCenterConfig) -> Result<Self, Box<dyn std::error::Error>> {
+        // Initialize logging if enabled
+        if config.enable_logging {
+            let log_level = match config.log_level.to_lowercase().as_str() {
+                "error" => log::LevelFilter::Error,
+                "warn" => log::LevelFilter::Warn,
+                "info" => log::LevelFilter::Info,
+                "debug" => log::LevelFilter::Debug,
+                "trace" => log::LevelFilter::Trace,
+                _ => log::LevelFilter::Info,
+            };
+            env_logger::Builder::from_default_env()
+                .filter_level(log_level)
+                .init();
+            
+            info!("Initializing Sigma Control Center");
+        }
+
         let system_monitor = SystemMonitor::new(config.monitor_interval)?;
         let driver_manager = DriverManager::new()?;
         let kernel_manager = KernelManager::new()?;
@@ -80,11 +104,14 @@ impl ControlCenter {
         let virtualization_manager = VirtualizationManager::new()?;
         
         let ai_assistant = if config.enable_ai {
+            info!("AI Assistant enabled");
             Some(AIAssistant::new()?)
         } else {
+            info!("AI Assistant disabled");
             None
         };
 
+        info!("Control Center initialized successfully");
         Ok(Self {
             config,
             system_monitor,
@@ -100,6 +127,7 @@ impl ControlCenter {
 
     /// Get system status overview
     pub fn get_system_status(&self) -> SystemStatus {
+        info!("Fetching system status");
         SystemStatus {
             hardware: self.system_monitor.get_hardware_status(),
             drivers: self.driver_manager.get_driver_status(),
@@ -117,6 +145,7 @@ impl ControlCenter {
 
     /// Update configuration
     pub fn update_config(&mut self, config: ControlCenterConfig) {
+        info!("Updating Control Center configuration");
         self.config = config;
         // Reinitialize components if needed
     }
