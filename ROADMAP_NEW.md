@@ -119,6 +119,7 @@ Reach parity on app ecosystem adoption and provide migration/installation custom
 - **Resume from suspend**: <500ms to unlock screen
 - **Service startup**: <100ms for critical services (init, network, display)
 - **Boot optimization**: parallel init, lazy loading, predictive pre-fetch
+- **AI-assisted boot**: Machine learning model predicts and pre-loads frequently used services
 
 ### Memory Efficiency
 - **Idle memory (desktop)**: <150 MB with Zenith running
@@ -126,6 +127,7 @@ Reach parity on app ecosystem adoption and provide migration/installation custom
 - **Memory overhead per process**: <2 MB base overhead
 - **Zero-copy IPC**: Shared memory buffers for inter-process communication
 - **Memory compression**: zswap-style compression for swap
+- **AI memory management**: Predictive page caching based on usage patterns
 
 ### CPU Performance
 - **Context switch latency**: <500ns (vs Linux ~1-2µs)
@@ -133,6 +135,7 @@ Reach parity on app ecosystem adoption and provide migration/installation custom
 - **Interrupt latency**: <5µs for real-time class interrupts
 - **Lock-free data structures**: Minimal kernel lock contention
 - **NUMA-aware scheduling**: Optimize for multi-socket systems
+- **AI scheduler**: Neural network predicts optimal CPU placement for workloads
 
 ### I/O Performance
 - **NVMe sequential**: >3 GB/s read, >2 GB/s write
@@ -140,18 +143,35 @@ Reach parity on app ecosystem adoption and provide migration/installation custom
 - **Network throughput**: Line-rate 10GbE with <10µs latency
 - **Filesystem operations**: <10µs for metadata operations
 - **Async I/O**: Native async/await for all I/O operations
+- **AI I/O scheduling**: Predictive read-ahead and write aggregation
 
 ### Security Performance
 - **Cryptographic operations**: AES-NI acceleration, post-quantum crypto optimization
 - **Secure boot**: <500ms verification time
 - **Capability checks**: <100ns per permission check
 - **Sandbox overhead**: <5% performance penalty for WASM apps
+- **Hardware acceleration**: TPM/TEE for cryptographic operations
 
 ### Scalability
 - **Multi-core scaling**: Near-linear scaling up to 64 cores
 - **Concurrent connections**: 100K+ network connections per server
 - **Process limit**: 1M+ processes (vs Linux ~32K default)
 - **File descriptor limit**: 10M+ open files
+- **Distributed scaling**: Cluster-aware scheduling for multi-node deployments
+
+### Advanced Kernel Optimizations
+- **Bypass I/O**: Direct memory access for high-performance networking (DPDK-style)
+- **Kernel bypass**: Userspace drivers for latency-sensitive applications
+- **Huge pages**: Transparent huge page management for reduced TLB misses
+- **CPU isolation**: Isolated CPU cores for real-time workloads
+- **Tickless kernel**: Adaptive tickless operation for power efficiency
+
+### AI/ML Integration
+- **On-device inference**: Local LLM for system optimization and automation
+- **Predictive caching**: ML models predict and cache frequently accessed data
+- **Anomaly detection**: Real-time performance anomaly detection and mitigation
+- **Auto-tuning**: Automatic system parameter tuning based on workload characteristics
+- **Resource prediction**: Predict workload requirements and allocate resources proactively
 
 ## Metrics to Beat Linux (Suggested KPIs)
 
