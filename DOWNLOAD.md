@@ -199,14 +199,137 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 
 ---
 
+## Installation Instructions
+
+### Windows Dual-Boot Installation
+
+**Prerequisites**:
+- Windows 10/11 with at least 20GB free space
+- 8GB USB drive
+- Stable internet connection
+
+**Steps**:
+1. Download SigmaOS ISO: `wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/v15.0.0/sigmaos-15.0.0.iso`
+2. Verify checksum: `sha256sum -c SigmaOS-SHA256SUMS`
+3. Create bootable USB using Rufus or balenaEtcher
+4. Boot from USB (press F12/F2 during startup)
+5. Select "Dual Boot Installation" from menu
+6. Follow on-screen instructions to partition disk
+7. Install SigmaOS alongside Windows
+8. Reboot and select SigmaOS from boot menu
+
+**Risk Level**: Low (separate partitions)
+
+### Linux Replacement Installation
+
+**Prerequisites**:
+- Existing Linux installation with backup
+- 8GB USB drive
+- Stable internet connection
+
+**Steps**:
+1. Backup important data
+2. Download SigmaOS ISO: `wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/v15.0.0/sigmaos-15.0.0.iso`
+3. Verify checksum: `sha256sum -c SigmaOS-SHA256SUMS`
+4. Create bootable USB: `sudo dd if=sigmaos-15.0.0.iso of=/dev/sdX bs=4M status=progress`
+5. Boot from USB
+6. Select "Full Disk Installation" from menu
+7. Follow on-screen instructions to replace existing Linux
+8. Reboot into SigmaOS
+
+**Risk Level**: Medium (replaces existing Linux)
+
+### Virtual Machine Installation
+
+**Prerequisites**:
+- VirtualBox, VMware, or QEMU
+- At least 4GB RAM allocated
+- 20GB disk space
+
+**Steps**:
+1. Download SigmaOS ISO or QCOW2 image
+2. Verify checksum: `sha256sum -c SigmaOS-SHA256SUMS`
+3. Create new VM with 4GB+ RAM, 20GB+ disk
+4. Attach SigmaOS ISO to VM
+5. Boot VM and select "Installation"
+6. Follow on-screen instructions
+7. Install guest tools for better performance
+
+**QEMU Quick Start**:
+```bash
+qemu-system-x86_64 -cdrom sigmaos-15.0.0.iso -m 4G -smp 2 -enable-kvm
+```
+
+**Risk Level**: Zero (isolated environment)
+
 ## Verification
 
 Every release artefact ships with a `.sig` file signed with Dilithium-5:
 
 ```bash
-sigma-pkg verify sigmaos-15.0.0.sigpkg   # verify a sigpkg
-sha256sum -c SigmaOS-SHA256SUMS          # verify raw images
+# Verify sigpkg
+sigma-pkg verify sigmaos-15.0.0.sigpkg
+
+# Verify raw images
+sha256sum -c SigmaOS-SHA256SUMS
+
+# Verify signature
+sigma-pkg verify-sig sigmaos-15.0.0.sig sigmaos-15.0.0.iso
 ```
+
+**Checksum Verification**:
+- Download SHA256SUMS file from releases
+- Compare with downloaded file
+- Use provided verification script: `./verify-checksum.sh sigmaos-15.0.0.iso`
+
+## Troubleshooting
+
+### Installation Issues
+
+**Boot fails after installation**:
+- Check BIOS boot order (ensure SigmaOS is first)
+- Try UEFI mode if using Legacy BIOS
+- Disable Secure Boot temporarily
+- Check disk partitioning with GParted
+
+**USB not booting**:
+- Re-create bootable USB with different tool
+- Try USB 2.0 port instead of USB 3.0
+- Verify ISO integrity with checksum
+- Try different USB drive
+
+**Graphics issues**:
+- Boot with `nomodeset` parameter
+- Try VESA driver: `sigmaos video=vesa`
+- Update graphics drivers post-installation
+- Check hardware compatibility matrix
+
+### Post-Installation Issues
+
+**Network not working**:
+- Check driver compatibility matrix
+- Install additional drivers: `sigma-pkg install network-drivers`
+- Try USB tethering for initial setup
+- Check network configuration: `sigma-net config`
+
+**Audio not working**:
+- Install audio drivers: `sigma-pkg install audio-drivers`
+- Check audio settings: `sigma-audio config`
+- Try different audio backend
+- Check hardware compatibility matrix
+
+**Performance issues**:
+- Check system resources: `sigma-top`
+- Disable unnecessary services: `sigma-service disable <service>`
+- Update system: `sigma-pkg update`
+- Check for driver updates
+
+### Getting Help
+
+- **Documentation**: [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
+- **Issues**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+- **Community**: [Discord/Forum](#)
+- **Email**: support@sigmaos.org
 
 ---
 
