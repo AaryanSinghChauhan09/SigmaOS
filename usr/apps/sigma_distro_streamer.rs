@@ -37,11 +37,15 @@ pub struct LinuxSyscallMapping {
 }
 
 // Map key common Linux syscall numbers to SigmaOS capability calls
-pub static LINUX_SYSCALL_TABLE: [LinuxSyscallMapping; 8] = [
+pub static LINUX_SYSCALL_TABLE: [LinuxSyscallMapping; 12] = [
     LinuxSyscallMapping { linux_nr: 0, sigma_nr: 10, name: "sys_read" },
     LinuxSyscallMapping { linux_nr: 1, sigma_nr: 11, name: "sys_write" },
     LinuxSyscallMapping { linux_nr: 2, sigma_nr: 12, name: "sys_open" },
     LinuxSyscallMapping { linux_nr: 3, sigma_nr: 13, name: "sys_close" },
+    LinuxSyscallMapping { linux_nr: 41, sigma_nr: 35, name: "sys_socket" },
+    LinuxSyscallMapping { linux_nr: 42, sigma_nr: 36, name: "sys_connect" },
+    LinuxSyscallMapping { linux_nr: 43, sigma_nr: 37, name: "sys_accept" },
+    LinuxSyscallMapping { linux_nr: 44, sigma_nr: 38, name: "sys_sendto" },
     LinuxSyscallMapping { linux_nr: 56, sigma_nr: 25, name: "sys_clone" },
     LinuxSyscallMapping { linux_nr: 57, sigma_nr: 26, name: "sys_fork" },
     LinuxSyscallMapping { linux_nr: 59, sigma_nr: 28, name: "sys_execve" },
