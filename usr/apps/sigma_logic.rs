@@ -20,6 +20,7 @@ pub enum NodeType {
     ActionRunAiPrompt,
     ActionSendNotification,
     ActionMoveFile,
+    ActionRunCliCommand,
 }
 
 #[derive(Copy, Clone)]
@@ -27,7 +28,7 @@ pub struct LogicNode {
     pub id: SigmaU32,
     pub node_type: NodeType,
     pub next_node_id: Option<SigmaU32>, // Singly-linked list of actions
-    pub data_param: [u8; 32],           // E.g., File path or AI prompt
+    pub data_param: [u8; 64],           // E.g., File path or AI prompt / command
 }
 
 impl LogicNode {
@@ -36,7 +37,7 @@ impl LogicNode {
             id: 0,
             node_type: NodeType::TriggerTimerExpired,
             next_node_id: None,
-            data_param: [0; 32],
+            data_param: [0; 64],
         }
     }
 }
@@ -53,6 +54,7 @@ static mut AUTOMATION_GRAPH: LogicGraph = LogicGraph {
 
 extern "C" {
     fn ai_submit_task(caller: SigmaU32, prio: u8, prompt: *const u8, len: SigmaUsize) -> i32;
+    fn shell_execute_cmd(cmd: *const u8, len: SigmaUsize) -> i32;
 }
 
 #[no_mangle]
@@ -64,6 +66,7 @@ pub unsafe extern "C" fn logic_add_node(id: SigmaU32, ntype: u8, next: SigmaU32)
         1 => NodeType::TriggerTimerExpired,
         2 => NodeType::ActionRunAiPrompt,
         3 => NodeType::ActionSendNotification,
+        4 => NodeType::ActionRunCliCommand,
         _ => NodeType::ActionMoveFile,
     };
     
@@ -108,7 +111,11 @@ unsafe fn execute_node(node: &LogicNode) {
     match node.node_type {
         NodeType::ActionRunAiPrompt => {
             // Submit automation prompt to AI backend
-            ai_submit_task(0, 0, node.data_param.as_ptr(), 32);
+            ai_submit_task(0, 0, node.data_param.as_ptr(), 64);
+        },
+        NodeType::ActionRunCliCommand => {
+            // Submit shell command execution to kernel handler
+            shell_execute_cmd(node.data_param.as_ptr(), 64);
         },
         NodeType::ActionSendNotification => {
             // Call into UI dash to show notification
