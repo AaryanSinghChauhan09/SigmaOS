@@ -8,7 +8,7 @@ SigmaOS draws inspiration from the best aspects of various Linux distributions:
 - **Arch‑style flexibility** → modular FS and userland
 - **Ubuntu‑style ecosystem** → strong community and package management
 
----
+## Roadmap Documents
 
 ## 🏗️ Strategic Phase Plan & Distro-Inspired Model
 
@@ -44,7 +44,7 @@ SigmaOS draws inspiration from the best aspects of various Linux distributions:
 - **Hardware Partnerships**: Collaborate with chipmakers to optimize SigmaOS drivers.
 - **Global Adoption**: Establish predictable sovereign release cycles.
 
----
+## Quick Links
 
 ## 📦 Detailed Task Tracking (v0.1 → v1.0)
 Status key: 🟢 Done · 🟡 In Progress · 🔴 Blocked · ⚪ Planned
