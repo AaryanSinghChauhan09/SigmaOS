@@ -1,388 +1,194 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2024-2026 SigmaOS Project
-//
-// userland/ai/sigma_llm_backend.rs — Local LLM Integration (llama.cpp backend)
-// Implements local LLM inference using llama.cpp for SigmaOS AI features
-//
-// Features:
-//   - Model loading (GGUF format)
-//   - Text generation
-//   - Tokenization
-//   - Streaming output
-//   - Memory management
-//   - Multi-threading support
-//
-// Language: Rust
+/// SigmaOS: userland/ai/sigma_llm_backend.rs
+/// AI Task Queue and Inference Routing Engine.
+/// no_std | no alloc | no external crates.
 
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use std::thread;
+#![no_std]
+#![allow(dead_code)]
+#![allow(unused_variables)]
 
-// ── LLM Model Configuration ──────────────────────────────────────────────
+type SigmaU32   = u32;
+type SigmaI32   = i32;
+type SigmaU64   = u64;
+type SigmaBool  = bool;
+type SigmaUsize = usize;
 
-#[derive(Debug, Clone)]
-pub struct ModelConfig {
-    pub model_path: String,
-    pub context_size: usize,
-    pub n_threads: usize,
-    pub n_gpu_layers: usize,
-    pub temperature: f32,
-    pub top_p: f32,
-    pub top_k: i32,
-    pub repeat_penalty: f32,
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+pub const MAX_AI_TASKS: SigmaUsize = 64;
+pub const MAX_PROMPT_LEN: SigmaUsize = 512;
+pub const MAX_RESPONSE_LEN: SigmaUsize = 1024;
+
+// ─── Task Priorities ──────────────────────────────────────────────────────────
+
+#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum TaskPriority {
+    Background = 0, // Log analysis, indexing
+    Normal     = 1, // User requests
+    Interactive= 2, // UI autocomplete, shell prediction
+    Critical   = 3, // System security heuristics
 }
 
-impl Default for ModelConfig {
-    fn default() -> Self {
-        Self {
-            model_path: String::new(),
-            context_size: 2048,
-            n_threads: 4,
-            n_gpu_layers: 0,
-            temperature: 0.7,
-            top_p: 0.9,
-            top_k: 40,
-            repeat_penalty: 1.1,
-        }
-    }
+// ─── AI Task ──────────────────────────────────────────────────────────────────
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct AiTask {
+    pub task_id:    SigmaU32,
+    pub priority:   TaskPriority,
+    pub caller_id:  SigmaU32, // Shard ID requesting inference
+    pub prompt:     [u8; MAX_PROMPT_LEN],
+    pub prompt_len: SigmaU32,
+    pub response:   [u8; MAX_RESPONSE_LEN],
+    pub resp_len:   SigmaU32,
+    pub completed:  SigmaBool,
+    pub active:     SigmaBool,
 }
 
-// ── Generation Parameters ─────────────────────────────────────────────────
-
-#[derive(Debug, Clone)]
-pub struct GenerationParams {
-    pub prompt: String,
-    pub max_tokens: usize,
-    pub stop_sequences: Vec<String>,
-    pub stream: bool,
-}
-
-impl Default for GenerationParams {
-    fn default() -> Self {
-        Self {
-            prompt: String::new(),
-            max_tokens: 512,
-            stop_sequences: Vec::new(),
-            stream: false,
+impl AiTask {
+    pub const fn empty() -> Self {
+        AiTask {
+            task_id:    0,
+            priority:   TaskPriority::Background,
+            caller_id:  0,
+            prompt:     [0; MAX_PROMPT_LEN],
+            prompt_len: 0,
+            response:   [0; MAX_RESPONSE_LEN],
+            resp_len:   0,
+            completed:  false,
+            active:     false,
         }
     }
 }
 
-// ── Generation Result ─────────────────────────────────────────────────────
+// ─── Task Queue State ─────────────────────────────────────────────────────────
 
-#[derive(Debug, Clone)]
-pub struct GenerationResult {
-    pub text: String,
-    pub tokens_generated: usize,
-    pub prompt_tokens: usize,
-    pub total_time_ms: u64,
-    pub tokens_per_second: f32,
+static mut TASK_QUEUE: [AiTask; MAX_AI_TASKS] = [AiTask::empty(); MAX_AI_TASKS];
+static mut NEXT_TASK_ID: SigmaU32 = 1;
+static mut ENGINE_READY: SigmaBool = false;
+
+// ─── External Inference Hooks (Bound to actual local_llm execution) ───────────
+
+extern "C" {
+    fn llm_execute_inference(prompt: *const u8, p_len: SigmaU32, out_buf: *mut u8, max_out: SigmaU32) -> SigmaI32;
+    fn kernel_uptime() -> SigmaU64;
 }
 
-// ── LLM Backend ─────────────────────────────────────────────────────────
-
-pub struct LlmBackend {
-    config: ModelConfig,
-    model_loaded: bool,
-    // In production: These would be FFI bindings to llama.cpp
-    // For now: Mock implementation
-}
-
-impl LlmBackend {
-    pub fn new(config: ModelConfig) -> Self {
-        Self {
-            config,
-            model_loaded: false,
-        }
-    }
-
-    /// Load a GGUF model from disk
-    pub fn load_model(&mut self) -> Result<(), String> {
-        if self.config.model_path.is_empty() {
-            return Err("Model path not specified".to_string());
-        }
-
-        // In production: Call llama.cpp FFI to load model
-        // llama_load_model_from_file(config.model_path, config.context_size, ...)
-        
-        println!("Loading model from: {}", self.config.model_path);
-        println!("Context size: {}", self.config.context_size);
-        println!("Threads: {}", self.config.n_threads);
-        println!("GPU layers: {}", self.config.n_gpu_layers);
-
-        self.model_loaded = true;
-        Ok(())
-    }
-
-    /// Check if model is loaded
-    pub fn is_loaded(&self) -> bool {
-        self.model_loaded
-    }
-
-    /// Generate text from a prompt
-    pub fn generate(&self, params: &GenerationParams) -> Result<GenerationResult, String> {
-        if !self.model_loaded {
-            return Err("Model not loaded".to_string());
-        }
-
-        let start_time = std::time::Instant::now();
-
-        // In production: Call llama.cpp FFI for generation
-        // llama_eval(ctx, tokens, n_tokens, n_past, ...)
-        // llama_sample_token(ctx, ...)
-        
-        // Mock generation for demonstration
-        let generated_text = self.mock_generate(&params.prompt, params.max_tokens);
-        
-        let elapsed = start_time.elapsed();
-        let total_time_ms = elapsed.as_millis() as u64;
-        let tokens_generated = generated_text.split_whitespace().count();
-        let tokens_per_second = if total_time_ms > 0 {
-            (tokens_generated as f32) / (total_time_ms as f32 / 1000.0)
-        } else {
-            0.0
-        };
-
-        Ok(GenerationResult {
-            text: generated_text,
-            tokens_generated,
-            prompt_tokens: params.prompt.split_whitespace().count(),
-            total_time_ms,
-            tokens_per_second,
-        })
-    }
-
-    /// Generate text with streaming callback
-    pub fn generate_stream<F>(&self, params: &GenerationParams, mut callback: F) -> Result<GenerationResult, String>
-    where
-        F: FnMut(&str),
-    {
-        if !self.model_loaded {
-            return Err("Model not loaded".to_string());
-        }
-
-        let start_time = std::time::Instant::now();
-        let mut full_text = String::new();
-
-        // In production: Stream tokens from llama.cpp
-        // For now: Simulate streaming
-        let words: Vec<&str> = self.mock_generate(&params.prompt, params.max_tokens)
-            .split_whitespace().collect();
-        
-        for word in words {
-            callback(word);
-            callback(" ");
-            full_text.push_str(word);
-            full_text.push(' ');
-            std::thread::sleep(std::time::Duration::from_millis(50));
-        }
-
-        let elapsed = start_time.elapsed();
-        let total_time_ms = elapsed.as_millis() as u64;
-        let tokens_generated = full_text.split_whitespace().count();
-        let tokens_per_second = if total_time_ms > 0 {
-            (tokens_generated as f32) / (total_time_ms as f32 / 1000.0)
-        } else {
-            0.0
-        };
-
-        Ok(GenerationResult {
-            text: full_text,
-            tokens_generated,
-            prompt_tokens: params.prompt.split_whitespace().count(),
-            total_time_ms,
-            tokens_per_second,
-        })
-    }
-
-    /// Tokenize text
-    pub fn tokenize(&self, text: &str) -> Result<Vec<u32>, String> {
-        if !self.model_loaded {
-            return Err("Model not loaded".to_string());
-        }
-
-        // In production: Call llama_tokenize
-        // For now: Return mock tokens
-        Ok(text.chars().map(|c| c as u32).collect())
-    }
-
-    /// Detokenize tokens
-    pub fn detokenize(&self, tokens: &[u32]) -> Result<String, String> {
-        if !self.model_loaded {
-            return Err("Model not loaded".to_string());
-        }
-
-        // In production: Call llama_token_to_str
-        // For now: Return mock detokenization
-        Ok(tokens.iter().map(|&t| (t as u8 as char)).collect())
-    }
-
-    /// Get model info
-    pub fn get_model_info(&self) -> ModelInfo {
-        // In production: Query llama.cpp for actual model info
-        ModelInfo {
-            n_vocab: 32000,
-            n_ctx_train: self.config.context_size,
-            n_embd: 4096,
-            n_layer: 32,
-            n_head: 32,
-            n_ff: 11008,
-            n_rot: 64,
-            f16_kv: true,
-            f16: true,
-        }
-    }
-
-    /// Mock generation for demonstration
-    fn mock_generate(&self, prompt: &str, max_tokens: usize) -> String {
-        format!(
-            "{}\n\nThis is a mock response from the local LLM backend. \
-            In production, this would use llama.cpp for actual inference. \
-            The model would generate text based on the prompt using the \
-            configured parameters (temperature={}, top_p={}, top_k={}).",
-            prompt,
-            self.config.temperature,
-            self.config.top_p,
-            self.config.top_k
-        )
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ModelInfo {
-    pub n_vocab: usize,
-    pub n_ctx_train: usize,
-    pub n_embd: usize,
-    pub n_layer: usize,
-    pub n_head: usize,
-    pub n_ff: usize,
-    pub n_rot: usize,
-    pub f16_kv: bool,
-    pub f16: bool,
-}
-
-// ── LLM Session Manager ───────────────────────────────────────────────────
-
-pub struct LlmSession {
-    backend: Arc<Mutex<LlmBackend>>,
-    conversation_history: Vec<(String, String)>,
-}
-
-impl LlmSession {
-    pub fn new(backend: Arc<Mutex<LlmBackend>>) -> Self {
-        Self {
-            backend,
-            conversation_history: Vec::new(),
-        }
-    }
-
-    pub fn chat(&mut self, user_message: &str) -> Result<String, String> {
-        let mut backend = self.backend.lock().map_err(|e| format!("Lock error: {}", e))?;
-        
-        // Build prompt with conversation history
-        let mut prompt = String::new();
-        for (user, assistant) in &self.conversation_history {
-            prompt.push_str("User: ");
-            prompt.push_str(user);
-            prompt.push_str("\nAssistant: ");
-            prompt.push_str(assistant);
-            prompt.push_str("\n");
-        }
-        prompt.push_str("User: ");
-        prompt.push_str(user_message);
-        prompt.push_str("\nAssistant: ");
-
-        let params = GenerationParams {
-            prompt: prompt.clone(),
-            max_tokens: 512,
-            stop_sequences: vec!["User:".to_string()],
-            stream: false,
-        };
-
-        let result = backend.generate(&params)?;
-        let response = result.text.clone();
-
-        self.conversation_history.push((user_message.to_string(), response.clone()));
-        Ok(response)
-    }
-
-    pub fn clear_history(&mut self) {
-        self.conversation_history.clear();
-    }
-
-    pub fn get_history(&self) -> &[(String, String)] {
-        &self.conversation_history
-    }
-}
-
-// ── C-ABI exports ─────────────────────────────────────────────────────────
+// ─── Implementation ───────────────────────────────────────────────────────────
 
 #[no_mangle]
-pub extern "C" fn llm_backend_create(model_path: *const u8, model_path_len: usize,
-                                      context_size: usize, n_threads: usize) -> *mut LlmBackend {
-    unsafe {
-        let model_path = String::from_utf8_unchecked(
-            std::slice::from_raw_parts(model_path, model_path_len));
-        let config = ModelConfig {
-            model_path,
-            context_size,
-            n_threads,
-            ..Default::default()
-        };
-        Box::into_raw(Box::new(LlmBackend::new(config)))
+pub unsafe extern "C" fn ai_engine_init() -> SigmaI32 {
+    for task in TASK_QUEUE.iter_mut() {
+        task.active = false;
     }
+    ENGINE_READY = true;
+    0
 }
 
+/// Submit a prompt to the AI backend. Returns the task ID.
 #[no_mangle]
-pub extern "C" fn llm_backend_destroy(backend: *mut LlmBackend) {
-    unsafe {
-        if !backend.is_null() {
-            let _ = Box::from_raw(backend);
+pub unsafe extern "C" fn ai_submit_task(
+    caller_id: SigmaU32,
+    priority_level: SigmaU8,
+    prompt_str: *const u8,
+    p_len: SigmaUsize,
+) -> SigmaI32 {
+    if !ENGINE_READY || prompt_str.is_null() { return -1; }
+    
+    let prio = match priority_level {
+        0 => TaskPriority::Background,
+        1 => TaskPriority::Normal,
+        2 => TaskPriority::Interactive,
+        _ => TaskPriority::Critical,
+    };
+    
+    let len = core::cmp::min(p_len, MAX_PROMPT_LEN);
+    
+    for i in 0..MAX_AI_TASKS {
+        if !TASK_QUEUE[i].active {
+            let id = NEXT_TASK_ID;
+            NEXT_TASK_ID = NEXT_TASK_ID.wrapping_add(1);
+            
+            TASK_QUEUE[i].task_id    = id;
+            TASK_QUEUE[i].priority   = prio;
+            TASK_QUEUE[i].caller_id  = caller_id;
+            TASK_QUEUE[i].prompt_len = len as SigmaU32;
+            TASK_QUEUE[i].completed  = false;
+            
+            core::ptr::copy_nonoverlapping(prompt_str, TASK_QUEUE[i].prompt.as_mut_ptr(), len);
+            
+            TASK_QUEUE[i].active = true;
+            return id as SigmaI32;
         }
     }
+    
+    -12 // ENOMEM (Queue full)
 }
 
+/// Retrieve the result of a completed AI task.
 #[no_mangle]
-pub extern "C" fn llm_load_model(backend: *mut LlmBackend) -> i32 {
-    unsafe {
-        if backend.is_null() { return -1; }
-        match (*backend).load_model() {
-            Ok(_) => 0,
-            Err(_) => -1,
-        }
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn llm_generate(backend: *const LlmBackend,
-                               prompt: *const u8, prompt_len: usize,
-                               max_tokens: usize,
-                               out: *mut u8, out_len: usize) -> i32 {
-    unsafe {
-        if backend.is_null() || prompt.is_null() { return -1; }
-        let prompt = String::from_utf8_unchecked(
-            std::slice::from_raw_parts(prompt, prompt_len));
-        let params = GenerationParams {
-            prompt,
-            max_tokens,
-            ..Default::default()
-        };
-        match (*backend).generate(&params) {
-            Ok(result) => {
-                let bytes = result.text.as_bytes();
-                let copy_len = std::cmp::min(bytes.len(), out_len);
-                std::ptr::copy_nonoverlapping(bytes.as_ptr(), out, copy_len);
-                copy_len as i32
+pub unsafe extern "C" fn ai_get_result(
+    task_id: SigmaU32,
+    out_buf: *mut u8,
+    max_len: SigmaUsize,
+    out_len: *mut SigmaU32,
+) -> SigmaI32 {
+    if out_buf.is_null() || out_len.is_null() { return -1; }
+    
+    for i in 0..MAX_AI_TASKS {
+        if TASK_QUEUE[i].active && TASK_QUEUE[i].task_id == task_id {
+            if !TASK_QUEUE[i].completed {
+                return -16; // EBUSY (still processing)
             }
-            Err(_) => -1,
+            
+            let len = core::cmp::min(max_len as u32, TASK_QUEUE[i].resp_len);
+            core::ptr::copy_nonoverlapping(TASK_QUEUE[i].response.as_ptr(), out_buf, len as usize);
+            *out_len = len;
+            
+            // Free the slot
+            TASK_QUEUE[i].active = false;
+            return 0;
         }
     }
+    -4 // ENOENT
 }
 
+/// Engine worker loop — meant to run in a background shard.
 #[no_mangle]
-pub extern "C" fn llm_is_loaded(backend: *const LlmBackend) -> i32 {
-    unsafe {
-        if backend.is_null() { return 0; }
-        if (*backend).is_loaded() { 1 } else { 0 }
+pub unsafe extern "C" fn ai_engine_tick() {
+    if !ENGINE_READY { return; }
+    
+    // Find the highest priority uncompleted task
+    let mut best_idx: Option<usize> = None;
+    let mut highest_prio = 0; // 0 is lowest (Background)
+    
+    for i in 0..MAX_AI_TASKS {
+        if TASK_QUEUE[i].active && !TASK_QUEUE[i].completed {
+            let prio_val = TASK_QUEUE[i].priority as u8;
+            if best_idx.is_none() || prio_val > highest_prio {
+                highest_prio = prio_val;
+                best_idx = Some(i);
+            }
+        }
+    }
+    
+    if let Some(idx) = best_idx {
+        let task = &mut TASK_QUEUE[idx];
+        // In a real system, this dispatches to the hardware NPU / GPU via the HAL.
+        // For now, we mock the execution logic via `llm_execute_inference`.
+        let rc = llm_execute_inference(
+            task.prompt.as_ptr(),
+            task.prompt_len,
+            task.response.as_mut_ptr(),
+            MAX_RESPONSE_LEN as u32
+        );
+        
+        if rc > 0 {
+            task.resp_len = rc as u32;
+        } else {
+            // Error during inference
+            task.resp_len = 0;
+        }
+        task.completed = true;
     }
 }
