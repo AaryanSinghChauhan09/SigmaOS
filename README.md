@@ -1,58 +1,61 @@
-# SigmaOS Zenith (v15.2 - Release Microkernel)
+# SigmaOS
 
-The Sovereign Industrial Microkernel.
+**SigmaOS** is a sovereign, zero-allocation, `no_std` operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
-This branch represents the core modular microkernel layout of SigmaOS, structured to align with established Linux distribution layouts for robustness, isolation, and silicon-direct execution.
+## Core Capabilities
 
----
+SigmaOS has undergone a massive architectural upgrade to include modern Computer Science and Data Science paradigms natively.
 
-## 🏛️ Design Specification & Architecture Layers
+### 1. Sovereign Kernel (`no_std`)
+- **Capability Tokens**: A 64-bit hardware-enforced permission model (bypassing legacy ACLs).
+- **Zero-Copy IPC**: SPSC ring-buffers for inter-shard communication.
+- **SigmaFS & VFS**: Copy-on-Write (CoW) filesystem with deterministic extent mapping.
+- **Self-Healing Watchdogs**: Autonomous fault detection and exponential backoff restart policies.
 
-SigmaOS is organized into isolated functional layers to guarantee complete safety and hardware-isolation boundary conditions:
+### 2. Artificial Intelligence & Data Science
+- **Local LLM Backend**: An embedded AI Task Orchestrator that natively routes prioritized prompts (Background, Interactive, Critical) without requiring external userland wrappers.
+- **Embedded ML**: Zero-allocation K-Means Clustering and FFT algorithms baked into the OS telemetry layer for autonomous system optimization.
 
-### 1. Kernel Layer (`/kernel/`)
-- **Process Scheduler**: Multi-level Feedback Queue (MLFQ) and Round-Robin scheduler handling task priorities and time-slice yields.
-- **Memory Management**: Physical Page Frame Allocator (PMM) and Virtual Memory Paging (VMM) supporting 4-level paging tables.
-- **Hardware Drivers**: Low-level abstractions for COM1 serial logs, PS/2 keyboards, standard VGA text mode, and ATA disk sector operations.
+### 3. Cyber Security & Isolation
+- **Security Center Daemon**: Actively monitors the immutable, BLAKE3-linked kernel audit logs. Applies temporal decay heuristics to identify threats (e.g., sandbox escape attempts) and kills malicious shards autonomously.
+- **Sovereign Sandboxes**: Strict CPU, Memory, and Network limits applied via CLI to untrusted code.
 
-### 2. Standard Libraries (`/lib/`)
-- **Sovereign Libc**: Independent, zero-dependency C11 standard library implementation providing `sigma_printf`, memory manipulators (`memcpy`, `memset`), string utilities, and attestation helpers (`crc32`).
+### 4. Zenith Desktop (UI/UX)
+- **Object-Oriented UI**: A Trait-based Widget framework operating entirely without heap allocations.
+- **BSP Window Manager**: Binary Space Partitioning tiling engine.
+- **Glassmorphism Profiles**: Declarative UI parsing via `~/.sigma_profile` supporting dynamic theming.
 
-### 3. Init System (`/init/`)
-- **PID 1 Bootstrap**: Orchestrates clean startup sequences using Runlevels (1 to 5) to boot vital telemetry, load the virtual file system, initialize the TCP/IP stack, and spawn the user shell in order.
+## System Architecture
 
-### 4. Virtual File System (`/fs/`)
-- **VFS Interface**: Standardizes operations like `open`, `close`, `read`, and `write` via file descriptor tables and inode indexing.
-- **Ext4/FAT32 Drivers**: Handles block storage, reads superblock states, and walks clusters.
-
-### 5. Networking Stack (`/net/`)
-- **Loopback NIC**: Direct virtual hardware interface loopback (`lo` at `127.0.0.1`).
-- **TCP/IP Suite**: Custom TCP 3-way handshake state machine and UDP port binding.
-- **DNS Lookup**: Local resolver mapping domain endpoints to IPv4 destinations.
-
-### 6. Userland utilities (`/usr/`)
-- **sh Shell**: Interactive CLI command execution environment mapping user inputs to system calls.
-
----
-
-## 🛠️ Build, Test, & Execution Instructions
-
-### Dependencies
-- Make, NASM assembler, GCC, QEMU
-
-### 1. Compile all Modular Subsystems
-```bash
-make clean
-make all
+```mermaid
+graph TD
+    subgraph Userland (Zenith Desktop)
+        UI[Zenith Compositor & Shell]
+        Logic[Sigma Logic Automation]
+        AI[Local LLM Context Mgr]
+    end
+    
+    subgraph Daemons
+        SEC[Security Center]
+        MONITOR[Observability Telemetry]
+        STORE[Sigma DB Key-Value]
+    end
+    
+    subgraph Kernel (no_std)
+        IPC[SPSC Ring Buffer IPC]
+        CAP[Capability Token Auth]
+        VFS[Virtual File System]
+        MEM[Bitmap Page Allocator]
+    end
+    
+    UI <--> IPC
+    Logic <--> IPC
+    AI <--> IPC
+    SEC <--> CAP
+    MONITOR <--> MEM
+    IPC <--> CAP
 ```
 
-### 2. Running the Emulator
-```bash
-qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio -m 2G
-```
+## Getting Started
 
-### 3. Running Unit Tests
-```bash
-npm run test
-```
-All unit tests in `/tests` must return green states before submitting patches.
+See [INSTALL.md](INSTALL.md) for build instructions using the new `Justfile` toolchain.
