@@ -133,11 +133,22 @@ impl CgroupManager {
     }
 
     pub fn check_memory(&self, id: u32, alloc_bytes: u64) -> bool {
-        for g in &self.groups {
-            if g.active && g.id == id {
-                let max = g.limits.memory_max_bytes;
-                return max == 0 || g.stats.memory_current + alloc_bytes <= max;
+        let mut current_id = id;
+        loop {
+            if current_id == 0 { break; }
+            let mut found = false;
+            for g in &self.groups {
+                if g.active && g.id == current_id {
+                    let max = g.limits.memory_max_bytes;
+                    if max != 0 && g.stats.memory_current + alloc_bytes > max {
+                        return false;
+                    }
+                    current_id = g.parent;
+                    found = true;
+                    break;
+                }
             }
+            if !found { break; }
         }
         true
     }
