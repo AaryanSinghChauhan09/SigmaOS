@@ -201,6 +201,14 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - Domain blocking for ad/tracker filtering
 - Domain forwarding to specific servers
 
+#### CUPS Printing System (sigma_cups.rs)
+- Printer management with device URI configuration
+- Print job queue management
+- Job submission with pages, copies, media type, quality settings
+- Job control (cancel, hold, release)
+- Printer enable/disable and default printer selection
+- Server management with port configuration
+
 ### Developer Tools
 #### Git Integration (sigma_git.rs)
 - Version control with repository management
