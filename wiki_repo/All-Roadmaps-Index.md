@@ -1,8 +1,8 @@
-# Master Index of All SigmaOS Roadmaps
+# Complete Index of All SigmaOS Roadmaps
 
-This document serves as the absolute index linking all 233 roadmaps developed for SigmaOS.
+This document serves as the master catalog of all 247 roadmaps developed for SigmaOS.
 
-## 🧠 AI & Cognitive (AI-01 to AI-50)
+## 🧠 AI & Cognitive (AI-01 to AI-55)
 | # | Document | Topic |
 |---|---|---|
 | 1 | [Roadmap-AI-01-Local-LLM-Inference](Roadmap-AI-01-Local-LLM-Inference.md) | Embedded GGUF model loader |
@@ -55,64 +55,64 @@ This document serves as the absolute index linking all 233 roadmaps developed fo
 | 48 | [Roadmap-AI-48-Personal-Knowledge-Graph](Roadmap-AI-48-Personal-Knowledge-Graph.md) | Unified Personal Knowledge Graph (PKG) |
 | 49 | [Roadmap-AI-49-AI-Search-Ranking](Roadmap-AI-49-AI-Search-Ranking.md) | AI Search Relevance Re-ranker |
 | 50 | [Roadmap-AI-50-Neural-Data-Compression](Roadmap-AI-50-Neural-Data-Compression.md) | Neural Network-Based Data Compression |
+| 51 | [Roadmap-AI-51-Continuous-Calibration](Roadmap-AI-51-Continuous-Calibration.md) | Continuous Calibration of Local LLMs |
+| 52 | [Roadmap-AI-52-Resource-Aware-Inference](Roadmap-AI-52-Resource-Aware-Inference.md) | Resource-Aware Dynamic LLM Inference |
+| 53 | [Roadmap-AI-53-Federated-Pruning](Roadmap-AI-53-Federated-Pruning.md) | Privacy-Preserving Federated Model Pruning |
+| 54 | [Roadmap-AI-54-Explainable-Clustering](Roadmap-AI-54-Explainable-Clustering.md) | Explainable Telemetry Clustering |
+| 55 | [Roadmap-AI-55-Differential-Privacy-Telemetry](Roadmap-AI-55-Differential-Privacy-Telemetry.md) | Local Differential Privacy for Analytics |
 
-## 🤖 ML Algorithms (ML-01 to ML-30)
+## 🤖 ML Algorithms (ML-01 to ML-35)
 | # | Document | Topic |
 |---|---|---|
-| 51 | [Roadmap-ML-01-Kernel-SVM](Roadmap-ML-01-Kernel-SVM.md) | Support Vector Machine (SMO solver) |
-| 52 | [Roadmap-ML-02-Random-Forest](Roadmap-ML-02-Random-Forest.md) | Ensemble tree classifier |
-| 53 | [Roadmap-ML-03-Neural-Network-Inference](Roadmap-ML-03-Neural-Network-Inference.md) | MLP inference (INT8 quantised) |
-| 54 | [Roadmap-ML-04-Time-Series-Forecast](Roadmap-ML-04-Time-Series-Forecast.md) | ARIMA + LSTM forecasting |
-| 55 | [Roadmap-ML-05-Clustering-Engine](Roadmap-ML-05-Clustering-Engine.md) | DBSCAN + Hierarchical clustering |
-| 56 | [Roadmap-ML-06-Recommendation-Engine](Roadmap-ML-06-Recommendation-Engine.md) | Collaborative filtering / SVD |
-| 57 | [Roadmap-ML-07-NLP-Indic-Models](Roadmap-ML-07-NLP-Indic-Models.md) | IndicBERT/MuRIL NLP models |
-| 58 | [Roadmap-ML-08-Reinforcement-Learning](Roadmap-ML-08-Reinforcement-Learning.md) | Q-Learning OS auto-tuner |
-| 59 | [Roadmap-ML-09-Transfer-Learning](Roadmap-ML-09-Transfer-Learning.md) | LoRA fine-tuning on-device |
-| 60 | [Roadmap-ML-10-Model-Registry](Roadmap-ML-10-Model-Registry.md) | MLflow-inspired on-device model registry |
-| 61 | [Roadmap-ML-11-Gradient-Boosting](Roadmap-ML-11-Gradient-Boosting.md) | Gradient Boosting Engine |
-| 62 | [Roadmap-ML-12-Gaussian-Process](Roadmap-ML-12-Gaussian-Process.md) | Gaussian Process Regression |
-| 63 | [Roadmap-ML-13-Dimensionality-Reduction](Roadmap-ML-13-Dimensionality-Reduction.md) | Advanced Dimensionality Reduction |
-| 64 | [Roadmap-ML-14-Anomaly-Autoencoder](Roadmap-ML-14-Anomaly-Autoencoder.md) | Autoencoder Anomaly Detection |
-| 65 | [Roadmap-ML-15-Multi-Label-Classifier](Roadmap-ML-15-Multi-Label-Classifier.md) | Multi-Label Log Classifier |
-| 66 | [Roadmap-ML-16-Semi-Supervised-Learning](Roadmap-ML-16-Semi-Supervised-Learning.md) | Semi-Supervised Learning on Logs |
-| 67 | [Roadmap-ML-17-Causal-Inference](Roadmap-ML-17-Causal-Inference.md) | Causal Inference for Root-Cause Analysis |
-| 68 | [Roadmap-ML-18-Meta-Learning](Roadmap-ML-18-Meta-Learning.md) | Meta-Learning (Few-Shot Adaptation) |
-| 69 | [Roadmap-ML-19-Imbalanced-Learning](Roadmap-ML-19-Imbalanced-Learning.md) | Imbalanced Class Learning |
-| 70 | [Roadmap-ML-20-Online-Learning](Roadmap-ML-20-Online-Learning.md) | Online Learning Streaming Classifier |
-| 71 | [Roadmap-ML-21-Lightweight-GBDT](Roadmap-ML-21-Lightweight-GBDT.md) | Lightweight Gradient Boosted Decision Trees |
-| 72 | [Roadmap-ML-22-GP-Workloads](Roadmap-ML-22-GP-Workloads.md) | Gaussian Process Workload Modelling |
-| 73 | [Roadmap-ML-23-Online-UMAP](Roadmap-ML-23-Online-UMAP.md) | Real-Time Online UMAP |
-| 74 | [Roadmap-ML-24-Autoencoder-IPC](Roadmap-ML-24-Autoencoder-IPC.md) | Autoencoder-Based IPC Profiling |
-| 75 | [Roadmap-ML-25-Multi-Label-Logs](Roadmap-ML-25-Multi-Label-Logs.md) | Multi-Label Logging Classifier |
-| 76 | [Roadmap-ML-26-Semi-Supervised-Parser](Roadmap-ML-26-Semi-Supervised-Parser.md) | Semi-Supervised Log Format Parser |
-| 77 | [Roadmap-ML-27-Causal-Diag](Roadmap-ML-27-Causal-Diag.md) | Causal Fault Diagnosis |
-| 78 | [Roadmap-ML-28-Meta-Init](Roadmap-ML-28-Meta-Init.md) | Meta-Learned Core Initialization |
-| 79 | [Roadmap-ML-29-Imbalanced-Telemetry](Roadmap-ML-29-Imbalanced-Telemetry.md) | Imbalanced Telemetry Data Balancing |
-| 80 | [Roadmap-ML-30-Streaming-Regression](Roadmap-ML-30-Streaming-Regression.md) | Streaming Linear Regression |
+| 56 | [Roadmap-ML-01-Kernel-SVM](Roadmap-ML-01-Kernel-SVM.md) | Support Vector Machine (SMO solver) |
+| 57 | [Roadmap-ML-02-Random-Forest](Roadmap-ML-02-Random-Forest.md) | Ensemble tree classifier |
+| 58 | [Roadmap-ML-03-Neural-Network-Inference](Roadmap-ML-03-Neural-Network-Inference.md) | MLP inference (INT8 quantised) |
+| 59 | [Roadmap-ML-04-Time-Series-Forecast](Roadmap-ML-04-Time-Series-Forecast.md) | ARIMA + LSTM forecasting |
+| 60 | [Roadmap-ML-05-Clustering-Engine](Roadmap-ML-05-Clustering-Engine.md) | DBSCAN + Hierarchical clustering |
+| 61 | [Roadmap-ML-06-Recommendation-Engine](Roadmap-ML-06-Recommendation-Engine.md) | Collaborative filtering / SVD |
+| 62 | [Roadmap-ML-07-NLP-Indic-Models](Roadmap-ML-07-NLP-Indic-Models.md) | IndicBERT/MuRIL NLP models |
+| 63 | [Roadmap-ML-08-Reinforcement-Learning](Roadmap-ML-08-Reinforcement-Learning.md) | Q-Learning OS auto-tuner |
+| 64 | [Roadmap-ML-09-Transfer-Learning](Roadmap-ML-09-Transfer-Learning.md) | LoRA fine-tuning on-device |
+| 65 | [Roadmap-ML-10-Model-Registry](Roadmap-ML-10-Model-Registry.md) | MLflow-inspired on-device model registry |
+| 66 | [Roadmap-ML-11-Gradient-Boosting](Roadmap-ML-11-Gradient-Boosting.md) | Gradient Boosting Engine |
+| 67 | [Roadmap-ML-12-Gaussian-Process](Roadmap-ML-12-Gaussian-Process.md) | Gaussian Process Regression |
+| 68 | [Roadmap-ML-13-Dimensionality-Reduction](Roadmap-ML-13-Dimensionality-Reduction.md) | Advanced Dimensionality Reduction |
+| 69 | [Roadmap-ML-14-Anomaly-Autoencoder](Roadmap-ML-14-Anomaly-Autoencoder.md) | Autoencoder Anomaly Detection |
+| 70 | [Roadmap-ML-15-Multi-Label-Classifier](Roadmap-ML-15-Multi-Label-Classifier.md) | Multi-Label Log Classifier |
+| 71 | [Roadmap-ML-16-Semi-Supervised-Learning](Roadmap-ML-16-Semi-Supervised-Learning.md) | Semi-Supervised Learning on Logs |
+| 72 | [Roadmap-ML-17-Causal-Inference](Roadmap-ML-17-Causal-Inference.md) | Causal Inference for Root-Cause Analysis |
+| 73 | [Roadmap-ML-18-Meta-Learning](Roadmap-ML-18-Meta-Learning.md) | Meta-Learning (Few-Shot Adaptation) |
+| 74 | [Roadmap-ML-19-Imbalanced-Learning](Roadmap-ML-19-Imbalanced-Learning.md) | Imbalanced Class Learning |
+| 75 | [Roadmap-ML-20-Online-Learning](Roadmap-ML-20-Online-Learning.md) | Online Learning Streaming Classifier |
+| 76 | [Roadmap-ML-21-Lightweight-GBDT](Roadmap-ML-21-Lightweight-GBDT.md) | Lightweight Gradient Boosted Decision Trees |
+| 77 | [Roadmap-ML-22-GP-Workloads](Roadmap-ML-22-GP-Workloads.md) | Gaussian Process Workload Modelling |
+| 78 | [Roadmap-ML-23-Online-UMAP](Roadmap-ML-23-Online-UMAP.md) | Real-Time Online UMAP |
+| 79 | [Roadmap-ML-24-Autoencoder-IPC](Roadmap-ML-24-Autoencoder-IPC.md) | Autoencoder-Based IPC Profiling |
+| 80 | [Roadmap-ML-25-Multi-Label-Logs](Roadmap-ML-25-Multi-Label-Logs.md) | Multi-Label Logging Classifier |
+| 81 | [Roadmap-ML-26-Semi-Supervised-Parser](Roadmap-ML-26-Semi-Supervised-Parser.md) | Semi-Supervised Log Format Parser |
+| 82 | [Roadmap-ML-27-Causal-Diag](Roadmap-ML-27-Causal-Diag.md) | Causal Fault Diagnosis |
+| 83 | [Roadmap-ML-28-Meta-Init](Roadmap-ML-28-Meta-Init.md) | Meta-Learned Core Initialization |
+| 84 | [Roadmap-ML-29-Imbalanced-Telemetry](Roadmap-ML-29-Imbalanced-Telemetry.md) | Imbalanced Telemetry Data Balancing |
+| 85 | [Roadmap-ML-30-Streaming-Regression](Roadmap-ML-30-Streaming-Regression.md) | Streaming Linear Regression |
+| 86 | [Roadmap-ML-31-Online-Sparse-GP](Roadmap-ML-31-Online-Sparse-GP.md) | Sparse Gaussian Processes for Real-Time Telemetry |
+| 87 | [Roadmap-ML-32-Streaming-Random-Forests](Roadmap-ML-32-Streaming-Random-Forests.md) | Streaming Random Forests |
+| 88 | [Roadmap-ML-33-Low-Rank-SVD](Roadmap-ML-33-Low-Rank-SVD.md) | Incremental Low-Rank SVD |
+| 89 | [Roadmap-ML-34-Multi-Task-Learning](Roadmap-ML-34-Multi-Task-Learning.md) | Multi-Task Telemetry Classifiers |
+| 90 | [Roadmap-ML-35-Active-Kernel-Tuning](Roadmap-ML-35-Active-Kernel-Tuning.md) | Active Learning for Kernel Parameter Tuning |
 
-## 🧩 Foundation Model Integrations (Model-01 to Model-30)
+## 🧩 Foundation Model Integrations (Model-01 to Model-35)
 | # | Document | Topic |
 |---|---|---|
-| 81 | [Roadmap-Model-01-Phi-3](Roadmap-Model-01-Phi-3-Integration.md) | Microsoft Phi-3-mini (3.8B) |
-| 82 | [Roadmap-Model-02-Gemma](Roadmap-Model-02-Gemma-Integration.md) | Google Gemma-2B |
-| 83 | [Roadmap-Model-03-Llama3](Roadmap-Model-03-Llama3-Integration.md) | Meta LLaMA 3 8B |
-| 84 | [Roadmap-Model-04-Mistral](Roadmap-Model-04-Mistral-Integration.md) | Mistral 7B Instruct |
-| 85 | [Roadmap-Model-05-CodeLlama](Roadmap-Model-05-CodeLlama-Integration.md) | CodeLlama 7B FIM |
-| 86 | [Roadmap-Model-06-Stable-Diffusion](Roadmap-Model-06-Stable-Diffusion.md) | SD-Turbo UI asset generation |
-| 87 | [Roadmap-Model-07-Whisper-Large](Roadmap-Model-07-Whisper-Large.md) | Whisper Large-v3 transcription |
-| 88 | [Roadmap-Model-08-BERT-Embeddings](Roadmap-Model-08-BERT-Embeddings.md) | MiniLM embeddings for RAG |
-| 89 | [Roadmap-Model-09-Qwen](Roadmap-Model-09-Qwen-Integration.md) | Qwen2.5 1.5B multilingual |
-| 90 | [Roadmap-Model-10-DeepSeek-Coder](Roadmap-Model-10-DeepSeek-Coder.md) | DeepSeek-Coder 1.3B |
-| 91 | [Roadmap-Model-11-Falcon](Roadmap-Model-11-Falcon-Integration.md) | Falcon-1B Integration |
-| 92 | [Roadmap-Model-12-Yi](Roadmap-Model-12-Yi-Integration.md) | Yi-1.5-6B Integration |
-| 93 | [Roadmap-Model-13-Mamba](Roadmap-Model-13-Mamba-Integration.md) | Mamba SSM Architecture |
-| 94 | [Roadmap-Model-14-MoE-Router](Roadmap-Model-14-MoE-Router.md) | Mixture-of-Experts (MoE) Router |
-| 95 | [Roadmap-Model-15-Diffusion-Text](Roadmap-Model-15-Diffusion-Text.md) | Diffusion-Based Text Generation |
-| 96 | [Roadmap-Model-16-Graph-Neural-Net](Roadmap-Model-16-Graph-Neural-Net.md) | Graph Neural Net for Dependency Analysis |
-| 97 | [Roadmap-Model-17-Audio-LM](Roadmap-Model-17-Audio-LM.md) | Audio Language Model |
-| 98 | [Roadmap-Model-18-Video-LM](Roadmap-Model-18-Video-LM.md) | Video Understanding Model |
-| 99 | [Roadmap-Model-19-Math-LM](Roadmap-Model-19-Math-LM.md) | Mathematics Language Model (MathLM) |
-| 100| [Roadmap-Model-20-Bioinformatics-LM](Roadmap-Model-20-Bioinformatics-LM.md) | Bioinformatics Language Model |
+| 91 | [Roadmap-Model-01-Phi-3](Roadmap-Model-01-Phi-3-Integration.md) | Microsoft Phi-3-mini (3.8B) |
+| 92 | [Roadmap-Model-02-Gemma](Roadmap-Model-02-Gemma-Integration.md) | Google Gemma-2B |
+| 93 | [Roadmap-Model-03-Llama3](Roadmap-Model-03-Llama3-Integration.md) | Meta LLaMA 3 8B |
+| 94 | [Roadmap-Model-04-Mistral](Roadmap-Model-04-Mistral-Integration.md) | Mistral 7B Instruct |
+| 95 | [Roadmap-Model-05-CodeLlama](Roadmap-Model-05-CodeLlama-Integration.md) | CodeLlama 7B FIM |
+| 96 | [Roadmap-Model-06-Stable-Diffusion](Roadmap-Model-06-Stable-Diffusion.md) | SD-Turbo UI asset generation |
+| 97 | [Roadmap-Model-07-Whisper-Large](Roadmap-Model-07-Whisper-Large.md) | Whisper Large-v3 transcription |
+| 98 | [Roadmap-Model-08-BERT-Embeddings](Roadmap-Model-08-BERT-Embeddings.md) | MiniLM embeddings for RAG |
+| 99 | [Roadmap-Model-09-Qwen](Roadmap-Model-09-Qwen-Integration.md) | Qwen2.5 1.5B multilingual |
+| 100| [Roadmap-Model-10-DeepSeek-Coder](Roadmap-Model-10-DeepSeek-Coder.md) | DeepSeek-Coder 1.3B |
 | 101| [Roadmap-Model-21-Falcon-Lite](Roadmap-Model-21-Falcon-Lite.md) | Falcon Lite 1B Optimizer |
 | 102| [Roadmap-Model-22-Yi-LongContext](Roadmap-Model-22-Yi-LongContext.md) | Yi 6B Long-Context Engine |
 | 103| [Roadmap-Model-23-Mamba-SSM](Roadmap-Model-23-Mamba-SSM.md) | Mamba SSM Execution Runtime |
@@ -123,5 +123,10 @@ This document serves as the absolute index linking all 233 roadmaps developed fo
 | 108| [Roadmap-Model-28-Video-Summarizer](Roadmap-Model-28-Video-Summarizer.md) | Local Video Summarization Engine |
 | 109| [Roadmap-Model-29-Symbolic-Math](Roadmap-Model-29-Symbolic-Math.md) | Symbolic Math LLM Solver |
 | 110| [Roadmap-Model-30-Genomic-Embeddings](Roadmap-Model-30-Genomic-Embeddings.md) | Genomic Embedding Engine |
+| 111| [Roadmap-Model-31-Mistral-SWA](Roadmap-Model-31-Mistral-SWA.md) | Mistral Sliding Window Attention Optimization |
+| 112| [Roadmap-Model-32-Quantized-Embedding-Models](Roadmap-Model-32-Quantized-Embedding-Models.md) | Binary and Ternary Embedding Models |
+| 113| [Roadmap-Model-33-Graph-Neural-Networks](Roadmap-Model-33-Graph-Neural-Networks.md) | Deep GNNs for Process Analysis |
+| 114| [Roadmap-Model-34-Mamba-SSM-Inference](Roadmap-Model-34-Mamba-SSM-Inference.md) | State-Space Model Hardware Accelerators |
+| 115| [Roadmap-Model-35-MoE-Sparse-Execution](Roadmap-Model-35-MoE-Sparse-Execution.md) | Mixture-of-Experts Sparse Weight Loader |
 
-*(Refer to [All-Roadmaps-Index](All-Roadmaps-Index.md) for full categories 111-233 including OS, Security, Storage, Networking, UI, Compilers, SciComp, India, and Robotics)*
+*(Refer to [All-Roadmaps-Index](All-Roadmaps-Index.md) for full categories 116-247 including OS, Security, Storage, Networking, UI, Compilers, SciComp, India, and Robotics)*
