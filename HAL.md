@@ -1,140 +1,126 @@
 # Hardware Abstraction Layer (HAL)
 
-The SigmaOS HAL provides a thin, zero-overhead interface between the architecture-specific assembly stubs and the portable microkernel core. It allows the same kernel code to run on x86_64, ARM64, and RISC-V by swapping the HAL implementation, without changing any core logic.
+The SigmaOS HAL provides architecture-independent access to hardware.
 
 ---
 
-## Design Principle
+## Components
 
-The HAL is intentionally minimal. It only abstracts operations that are genuinely different across architectures:
-
-- CPU halt / wait-for-interrupt
-- Hardware timer initialization and calibration
-- Interrupt controller setup (APIC on x86, GIC on ARM)
-- MMU page table manipulation
-- I/O port read/write (x86 only — other architectures use MMIO)
-
-Everything else — scheduling logic, VFS, TCP/IP, syscall dispatch — is pure portable C++ with no HAL involvement.
+| Component | Language | File | Status |
+|-----------|----------|------|--------|
+| Port I/O | Zig | `drivers/hal/port_io.zig` | ✅ |
+| MMIO | Rust | `drivers/hal/mmio.rs` | ✅ |
+| PCI enumeration | Rust | `kernel/core/sigma_pci.rs` | ✅ |
+| ACPI parsing | Rust | `kernel/core/sigma_acpi.rs` | ✅ |
+| 4-level paging | Zig | `arch/x86_64/paging.zig` | ✅ |
+| GDT/TSS | NASM | `arch/x86_64/gdt.asm` | ✅ |
+| IDT (256 entries) | NASM | `arch/x86_64/idt.asm` | ✅ |
+| Context switch | NASM | `arch/x86_64/context_switch.asm` | ✅ |
+| PIC (8259) | Rust | `kernel/core/sigma_irq.rs` | ✅ |
+| PIT timer | Rust | `kernel/core/sigma_irq.rs` | ✅ |
+| VGA text | Rust | `drivers/display/vga_console.rs` | ✅ |
+| VESA framebuffer | Rust | `drivers/display/vga_console.rs` | ✅ |
+| PS/2 keyboard | Rust | `drivers/input/keyboard.rs` | ✅ |
+| Serial (COM1) | Rust | `drivers/char/console.rs` | ✅ |
 
 ---
 
-## API (`hal.h` / `sigma_hal.h`)
+## Port I/O
+
+```zig
+// drivers/hal/port_io.zig
+pub fn inb(port: u16) u8 { ... }   // read byte from I/O port
+pub fn outb(port: u16, val: u8) { ... }  // write byte to I/O port
+```
+
+---
+
+## MMIO
+
+```rust
+// drivers/hal/mmio.rs
+pub fn mmio_read32(base: *const u32, offset: usize) -> u32 {
+    unsafe { core::ptr::read_volatile(base.byte_add(offset)) }
+}
+pub fn mmio_write32(base: *mut u32, offset: usize, val: u32) {
+    unsafe { core::ptr::write_volatile(base.byte_add(offset), val); }
+}
+```
+
+---
+
+## PCI Enumeration
 
 ```c
-// Halt the CPU until the next interrupt
-void cpu_halt(void);
+// Enumerate all PCI devices at boot
+sigma_pci_enumerate();
 
-// Initialize the hardware timer at the given frequency (Hz)
-void timer_init(sigma_u32 hz);
+// Read PCI config space
+uint32_t ids = sigma_pci_read_config32(bus, dev, func, 0x00);
+uint16_t vendor = ids & 0xFFFF;
+uint16_t device = (ids >> 16) & 0xFFFF;
 
-// Initialize the interrupt controller (APIC/PIC/GIC)
-void interrupt_init(void);
-
-// Map a virtual address to a physical address with given flags
-void mmu_map(sigma_u64 virt, sigma_u64 phys, sigma_u32 flags);
-
-// Unmap a virtual address
-void mmu_unmap(sigma_u64 virt);
-
-// Read a byte from an I/O port (x86 only)
-sigma_u8 read_io(sigma_u16 port);
-
-// Write a byte to an I/O port (x86 only)
-void write_io(sigma_u16 port, sigma_u8 value);
-
-// Read the current CPU timestamp counter (for timing)
-sigma_u64 cpu_rdtsc(void);
-
-// Enable/disable interrupts
-void interrupts_enable(void);
-void interrupts_disable(void);
+// Enable bus mastering + memory space access
+sigma_pci_enable(bus, dev, func);
 ```
 
 ---
 
-## Architecture Implementations
+## ACPI
 
-### x86_64 (`arch/x86_64/`)
+```c
+// Parse ACPI tables from RSDP (passed by bootloader)
+sigma_acpi_parse(boot_info->rsdp_addr);
 
-| File | Contents |
-|---|---|
-| `paging.asm` | PML4/PDPT/PD/PT setup, `cr3` load |
-| `paging.c` | VMM helper functions using the asm primitives |
-| `switch.asm` | Context switch — saves/restores registers, updates `cr3` |
-| `vmm_fast.asm` | Fast path for TLB invalidation and page table walks |
-
-The x86_64 HAL uses:
-- **PIT (Programmable Interval Timer)** or **LAPIC timer** for `timer_init`.
-- **APIC** for `interrupt_init` (replaces the legacy 8259 PIC).
-- `inb`/`outb` instructions for `read_io`/`write_io`.
-- `hlt` instruction for `cpu_halt`.
-
-### ARM64 (planned)
-
-The ARM64 HAL stub will use:
-- **GIC (Generic Interrupt Controller)** for `interrupt_init`.
-- **Generic Timer** (`CNTPCT_EL0`) for `timer_init` and `cpu_rdtsc`.
-- MMIO for all I/O (no `inb`/`outb`).
-- `wfi` (Wait For Interrupt) for `cpu_halt`.
-
-### RISC-V (planned)
-
-- **PLIC** for interrupt control.
-- `rdtime` CSR for timestamps.
-- `wfi` for halt.
-- Sv48 paging for MMU.
-
----
-
-## Boot Sequence and HAL Initialization
-
-The HAL is initialized very early in the boot sequence, before any other kernel subsystem:
-
-```
-boot/sovereign_boot.asm
-    │
-    ├─ Set up initial GDT (flat segments)
-    ├─ Enter 64-bit long mode
-    ├─ Set up initial page tables (identity map first 4 GB)
-    └─ Call kmain()
-            │
-            ├─ sigma_hal_init()          ← HAL first
-            │    ├─ interrupt_init()     (APIC)
-            │    └─ timer_init(1000)     (1 kHz tick)
-            ├─ sigma_idt_init()          ← IDT second
-            ├─ sigma_mm_init()           ← Memory manager
-            ├─ sigma_vfs_init()          ← VFS
-            ├─ sigma_net_init()          ← Network stack
-            └─ sigma_init_start()        ← PID 1
+// Query results
+size_t ncpus = sigma_acpi_cpu_count();
+uint64_t lapic = sigma_acpi_lapic_base();
+uint64_t ioapic = sigma_acpi_ioapic_base();
 ```
 
 ---
 
-## Multiboot Header
+## Paging (4-level, x86_64)
 
-SigmaOS uses the **Multiboot2** specification for GRUB compatibility:
+```zig
+// arch/x86_64/paging.zig
+pub const PageTable = struct {
+    entries: [512]PageEntry,
+    pub fn map(self: *PageTable, index: usize, phys: u64, flags: u64) void;
+    pub fn unmap(self: *PageTable, index: usize) void;
+};
 
-```asm
-; arch/boot/multiboot_header.asm
-MULTIBOOT2_MAGIC    equ 0xE85250D6
-MULTIBOOT2_ARCH     equ 0           ; i386 / x86_64
-MULTIBOOT2_LENGTH   equ header_end - header_start
-MULTIBOOT2_CHECKSUM equ -(MULTIBOOT2_MAGIC + MULTIBOOT2_ARCH + MULTIBOOT2_LENGTH)
-
-section .multiboot
-header_start:
-    dd MULTIBOOT2_MAGIC
-    dd MULTIBOOT2_ARCH
-    dd MULTIBOOT2_LENGTH
-    dd MULTIBOOT2_CHECKSUM
-    ; end tag
-    dw 0, 0
-    dd 8
-header_end:
+pub const FrameAllocator = struct {
+    pub fn allocate(self: *FrameAllocator) ?u64;
+};
 ```
 
-GRUB reads this header and passes a Multiboot2 info struct to `kmain` in `rbx`, containing the physical memory map, framebuffer info, and command line.
+Head64.asm sets up identity-mapped 4GB (2MB huge pages) at boot.
 
 ---
 
-*See also: [Kernel](Kernel) · [Building from Source](Building-from-Source) · [Architecture Overview](Architecture-Overview)*
+## Timer
+
+```c
+// PIT 1000 Hz initialized at boot
+// sigma_clock_ns() = jiffies × 1,000,000 nanoseconds
+
+uint64_t now_ns = sigma_clock_ns();   // nanoseconds since boot
+uint64_t jiffies = sigma_jiffies();   // milliseconds since boot
+```
+
+---
+
+## Serial Debug
+
+```c
+// All kernel log output goes to COM1 (115200 8N1)
+// Viewable with: -serial stdio in QEMU
+
+serial_puts("[BOOT] SigmaOS starting\n");
+sigma_log(msg_ptr, msg_len);   // also goes to VGA
+```
+
+---
+
+*See also: [Bootloader](Bootloader) · [Driver Framework](Driver-Framework) · [Architecture](Architecture-Overview)*
