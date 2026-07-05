@@ -500,3 +500,4 @@ cp sigma-agent /usr/bin/ && cp target/release/sigma-agent-core /usr/bin/
 *Sovereign AI — local inference, no telemetry, privacy-first.*
 
 *See also: [Architecture Overview](Architecture-Overview) · [Zenith Desktop](Zenith-Desktop) · [Security Model](Security-Model)*
+```

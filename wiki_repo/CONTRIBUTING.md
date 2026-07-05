@@ -1,131 +1,163 @@
 # Contributing to SigmaOS
 
-Welcome. SigmaOS is built in the open — every kernel subsystem, driver, and doc is community-authored. Here's how to get involved.
+Thank you for contributing to SigmaOS — a sovereign, self-sufficient operating system. Every line of code helps reduce dependency on external tools and brings us closer to a fully independent computing environment.
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
-# 1. Fork the repo on GitHub, then clone your fork
+# 1. Fork and clone
 git clone https://github.com/YOUR_USERNAME/SigmaOS.git
 cd SigmaOS
 
-# 2. Set up upstream remote
-git remote add upstream https://github.com/AaryanSinghChauhan09/SigmaOS.git
+# 2. Install toolchain
+rustup toolchain install nightly
+rustup target add x86_64-unknown-none
+cargo install just
 
-# 3. Create a feature branch
-git checkout -b feat/my-contribution
+# 3. Build everything
+just build
 
-# 4. Make changes, build, test
-make all -j$(nproc)
-make test
+# 4. Run tests
+just test
 
-# 5. Commit (conventional commits format)
-git commit -m "feat(kernel): add buddy allocator initial implementation"
-
-# 6. Push and open a PR
-git push origin feat/my-contribution
+# 5. Run in QEMU
+just qemu
 ```
 
 ---
 
-## What to Work On
+## 📋 PR Workflow (main-only)
 
-### Highest Impact (Phase G — blocks everything)
-- `kernel/core/sigma_sched.cpp` — round-robin scheduler
-- `kernel/core/sigma_mm.cpp` — buddy + slab allocator
-- `kernel/mm/sigma_vmm.cpp` — x86_64 page table walker
-- `kernel/core/sigma_irq.cpp` — APIC + PIC init
-- `kernel/core/sigma_syscall_dispatch.cpp` — 30 syscalls
-- `sigma-boot/sigma_boot.c` — UEFI loader (sigma-boot.efi)
+SigmaOS follows a **trunk-based development** model. All code merges directly to `main` via PR.
 
-### Good First Issues
-- Look for `good first issue` label on GitHub Issues
-- Fix markdown lint issues in `wiki_repo/`
-- Add tests in `tests/unit/`
-- Improve error messages in CLI tools
+```
+fork → feature branch → PR → review → CI green → squash merge to main
+```
 
-### Driver Contributions
-See [Driver-Development](Driver-Development) for the SDF template.
-Priority: VESA framebuffer → VirtIO-GPU → Intel i915 → iwlwifi
+### Rules
+- ✅ **PRs only** — no direct pushes to `main`
+- ✅ **Squash merge** — one commit per PR on main
+- ✅ **CI must be green** — no exceptions
+- ✅ **At least 1 reviewer** for non-trivial changes
+- ✅ **CODEOWNERS review** for subsystem changes (see `.github/CODEOWNERS`)
+- ❌ No WIP PRs — use Draft PR instead
+
+### Branch Naming
+
+| Type | Pattern | Example |
+|---|---|---|
+| Feature | `feat/description` | `feat/sigma-sh-scripting` |
+| Bug fix | `fix/description` | `fix/sigpkg-semver-compare` |
+| Docs | `docs/description` | `docs/absorption-matrix` |
+| Security | `security/description` | `security/hardened-allocator` |
+| Refactor | `refactor/description` | `refactor/kernel-memory-api` |
 
 ---
 
-## Commit Convention
+## 🛠️ Development Setup
 
-```
-<type>(<scope>): <short description>
+### Required Tools
 
-[optional body]
-[optional footer: Fixes #123]
-```
+| Tool | Version | Purpose |
+|---|---|---|
+| Rust | nightly (see `rust-toolchain.toml`) | Kernel + userland |
+| Zig | 0.13+ | Userland build + some tools |
+| GNAT/SPARK | Community 2024 | Ada/SPARK security modules |
+| just | latest | Task runner |
+| QEMU | 8.x+ | Testing |
+| git | 2.40+ | Version control |
 
-**Types:** `feat` · `fix` · `docs` · `test` · `refactor` · `perf` · `build` · `ci`
+### Dev Container
 
-**Scopes:** `kernel` · `driver` · `net` · `fs` · `security` · `crypto` · `ui` · `pkg` · `docs`
-
-**Examples:**
-```
-feat(kernel): add round-robin scheduler for 64 tasks
-fix(net): resolve TCP SYN retransmit race condition
-docs(wiki): add kernel internals page
-test(security): add fuzz test for Kyber-1024 KEM
+The easiest setup — all tools pre-installed:
+```bash
+# Open in VSCode with Dev Containers extension
+code .
+# → Click "Reopen in Container"
 ```
 
 ---
 
-## PR Guidelines
+## 🧪 Testing Requirements
 
-1. **One concern per PR** — don't mix driver work with kernel changes
-2. **CI must be green** — `sigma_ci.yml` runs on every push
-3. **Update manifests**: if fixing a bug, mark it resolved in `CURRENT_PROBLEMS_MANIFEST.md`
-4. **New subsystem** = new wiki page in `wiki_repo/`
-5. **Kernel changes** = include QEMU boot log or smoke test output in PR description
-6. **No force-push** to `main` — new commits only
-
----
-
-## Code Standards
-
-- **Language**: C++ (kernel, drivers, UI), C (low-level kernel paths), Rust (safe modules in `lib/`), Python/Shell (scripts)
-- **Style**: clang-format enforced (see `.clang-format`); run `make format` before committing
-- **Warnings**: `-Werror` enabled — zero warnings in CI
-- **Headers**: place in `include/sigma_<subsystem>.h`; use `#pragma once`
-- **Memory**: no `new`/`delete` in kernel code — use `kmalloc`/`kfree`
-- **No global state**: use `SovereignEngine` singleton pattern (see existing subsystems)
-
----
-
-## Testing
+Before submitting a PR:
 
 ```bash
-# Unit tests
-make test
+# Run all tests
+just test
 
-# Run a specific subsystem's tests
-make test SUITE=kernel
-make test SUITE=security
-make test SUITE=net
-
-# Fuzz testing
-make fuzz          # all fuzz targets
-make fuzz TARGET=pqc   # PQC crypto only
+# Lint (must pass cleanly)
+cargo clippy --all -- -D warnings
+cargo fmt --all --check
 
 # QEMU smoke test
-make qemu-test
+just qemu-test
 
-# Static analysis
-make lint
-make clang-tidy
+# SPARK proofs (if modifying security/)
+gnatprove -P security/security.gpr
 ```
 
----
-
-## Governance
-
-See [GOVERNANCE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/GOVERNANCE.md) for roles, RFC process, and decision-making policy.
+All checks run automatically in CI (`ci.yml`). PRs cannot merge with failing checks.
 
 ---
 
-*See also: [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) · [Building-from-Source](Building-from-Source) · [Branch-Guide](Branch-Guide)*
+## 🗂️ What to Work On
+
+Check the issue tracker for tagged issues:
+
+| Label | Meaning |
+|---|---|
+| `good first issue` | Great for newcomers |
+| `help wanted` | Any contributor welcome |
+| `phase:0.2` | Current milestone priority |
+| `component:kernel` | Kernel subsystem work |
+| `component:sigma-sh` | Shell work |
+| `component:sigpkg` | Package manager work |
+| `component:security` | Security-critical (SPARK required) |
+| `absorption` | Implementing a sovereign tool replacement |
+
+### High-Priority Now (v0.2)
+- 🟡 QEMU CI smoke test (green CI on main)
+- 🟡 sigma-sh: scripting improvements
+- 🟡 sigpkg: real registry fetch implementation
+- 🟡 sigma-core-utils: `ls`, `cat`, `cp`, `mv` in Rust
+
+---
+
+## 📝 Commit Message Format
+
+```
+type(scope): short description (50 chars max)
+
+Optional longer body explaining the why, not the what.
+Reference issues: Fixes #123, Closes #456
+```
+
+Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `security`, `perf`
+
+---
+
+## 🔒 Security Contributions
+
+For security-critical components (`security/`, `kernel/security/`, `sigma-crypto`):
+- Ada/SPARK is **required** — no plain C/Rust without approval
+- `gnatprove` must pass with 0 violations
+- Two-maintainer review required
+- Report vulnerabilities privately via [SECURITY.md](../SECURITY.md)
+
+---
+
+## 📚 Resources
+
+- [Architecture Overview](Architecture.md)
+- [Coding Standards](Coding-Standards.md)
+- [Security Model](Security-Model.md)
+- [Absorption Matrix](Absorption-Matrix.md) — pick a tool to absorb!
+- [Roadmap](Roadmap.md)
+- [Developer Guide](../DEVELOPER_GUIDE.md)
+
+---
+
+*SigmaOS is a community project. Be kind, be sovereign. 🛡️*
