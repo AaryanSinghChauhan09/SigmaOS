@@ -243,6 +243,22 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - Node management with resource tracking
 - Resource requirements (CPU, memory limits and requests)
 
+#### CMake/Meson Build Systems (sigma_build.rs)
+- Project configuration with build type selection (debug, release)
+- Target management (executable, library, shared_library)
+- Build task generation and parallel execution
+- Dependency management and include directories
+- Compile and link options configuration
+- Clean and incremental build support
+
+#### JupyterLab Notebooks (sigma_jupyter.rs)
+- Notebook creation and management
+- Cell types (code, markdown, raw) with execution
+- Kernel management (Python, R, Julia)
+- Kernel session management
+- Cell output handling (stream, display data, errors)
+- Notebook save and export
+
 ### Package Management
 #### Flatpak/Sandbox (sigma_flatpak.rs)
 - Sandboxed application distribution
