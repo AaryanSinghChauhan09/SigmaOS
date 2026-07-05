@@ -56,13 +56,20 @@
 
 SigmaOS systematically absorbs open-source tools and replaces them with sovereign equivalents. See the **[Absorption Matrix](Absorption-Matrix.md)** for the full list (70+ tools mapped).
 
-**Key replacements:**
+### Key replacements:
+
 - `sigma-sh` → Bash/Zsh/Fish
+
 - `sigpkg` → apt/pacman/npm
+
 - `SigmaVCS` → Git
+
 - `sigma-sandbox` → SELinux/AppArmor
+
 - `sigma-crypto` → OpenSSL/libsodium
+
 - `sigma-vault` → KeePass/Bitwarden
+
 - `zenith-compositor` → Wayland/X11
 
 ---
@@ -70,10 +77,15 @@ SigmaOS systematically absorbs open-source tools and replaces them with sovereig
 ## 🔒 Security Layers
 
 - **Zero-Trust VFS**: Explicit RBAC at filesystem level
+
 - **Capability Sandbox**: Every process gets minimal cap token (Capsicum-inspired)
+
 - **Syscall Audit**: BPF-based audit with policy-as-code
+
 - **Secure Boot**: TPM 2.0 + Ed25519 + A/B rollback
+
 - **Hardened Allocator**: Magic cookies, guard pages, poison-on-free
+
 - **PQC Crypto**: Kyber-1024 + Ed25519 + ChaCha20-Poly1305
 
 → Full spec: [Security-Model](Security-Model.md)
@@ -83,21 +95,27 @@ SigmaOS systematically absorbs open-source tools and replaces them with sovereig
 ## 🛠️ Getting Started
 
 ```bash
+
 # Clone the repo
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
 # Build the kernel (requires Rust nightly + x86_64-unknown-none target)
+
 rustup target add x86_64-unknown-none
 cargo build --target x86_64-unknown-none -p sigmaos-kernel
 
 # Build sigma-sh shell
+
 cargo build -p sigma-sh
 
-# Build sigpkg package manager  
+# Build sigpkg package manager
+
 cargo build -p sigpkg
 
 # Run in QEMU
+
 just qemu
 ```
 

@@ -30,6 +30,7 @@ Filesystem ops vtable (FsOps)
 ## Key Data Structures
 
 ### Inode
+
 Represents a file, directory, symlink, or device:
 ```rust
 pub struct Inode {
@@ -44,6 +45,7 @@ pub struct Inode {
 ```
 
 ### Dentry (Directory Entry)
+
 Links a filename to an inode:
 ```rust
 pub struct Dentry {
@@ -54,6 +56,7 @@ pub struct Dentry {
 ```
 
 ### File Descriptor
+
 Per-process open file handle:
 ```rust
 pub struct FileDesc {
@@ -103,10 +106,15 @@ sigma_vfs_mount("/proc", 5, proc_root, &PROC_OPS);
 ## Path Resolution
 
 `path_lookup("/usr/bin/ls")`:
+
 1. Start at root inode (`/`)
+
 2. Look up dentry `usr` → inode for `/usr`
+
 3. Look up dentry `bin` → inode for `/usr/bin`
+
 4. Look up dentry `ls` → inode for `/usr/bin/ls`
+
 5. Return inode number
 
 ---

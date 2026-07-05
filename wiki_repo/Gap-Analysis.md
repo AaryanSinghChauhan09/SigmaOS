@@ -23,6 +23,7 @@ Updated after Rounds 1–32. Compares SigmaOS against Tier 1 (Linux distros), Ti
 These five gaps mean SigmaOS **cannot run on real hardware today**. All other work is irrelevant until these are resolved.
 
 | # | Gap | Status | Notes |
+
 |---|---|---|---|
 | 1 | Kernel scheduler implementation | ☐ | `kernel/core/sigma_sched.cpp` — MLFQ+MCS bodies missing |
 | 2 | Memory manager implementation | ☐ | `kernel/core/sigma_mm.cpp` — physical/virtual MM missing |
@@ -209,6 +210,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 The following gaps currently prevent SigmaOS from functioning like established Linux distros (Ubuntu, Fedora, Arch, Debian). These must be addressed before SigmaOS can be considered a functional operating system.
 
 ### 🧩 Core System Gaps (BLOCKING - Phase 1)
+
 | Gap | Priority | Impact |
 |---|---|---|
 | No stable kernel or hardware driver layer | 🔴 CRITICAL | Cannot boot on real hardware |
@@ -218,6 +220,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 | No update mechanism (rolling + LTS) | 🔴 CRITICAL | Cannot keep system updated |
 
 ### ⚙️ Package Ecosystem Gaps (BLOCKING - Phase 2)
+
 | Gap | Priority | Impact |
 |---|---|---|
 | sigpkg is proposed but not fully implemented | 🔴 CRITICAL | Cannot install software |
@@ -227,6 +230,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 | Display server integration missing (Wayland/X.Org) | 🔴 CRITICAL | No graphical interface |
 
 ### 🎨 Desktop & User Experience Gaps (BLOCKING - Phase 2)
+
 | Gap | Priority | Impact |
 |---|---|---|
 | Accessibility tools absent (screen readers, multilingual UI) | 🟠 HIGH | Not accessible to all users |
@@ -234,6 +238,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 | No input method integration for Indic scripts | 🟠 HIGH | Cannot type in Indian languages |
 
 ### 🔒 Security & Privacy Gaps (HIGH PRIORITY - Phase 4)
+
 | Gap | Priority | Impact |
 |---|---|---|
 | No QubesOS-style sandboxing/isolation | 🟠 HIGH | Security vulnerability |
@@ -242,6 +247,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 | No KeePassXC integration | 🟡 MEDIUM | No password management |
 
 ### 🧠 AI & Automation Gaps (HIGH PRIORITY - Phase 4)
+
 | Gap | Priority | Impact |
 |---|---|---|
 | SigmaAI Agent still conceptual, not embedded | 🟠 HIGH | No natural language control |
@@ -249,6 +255,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 | Natural language → CLI translator not functional | 🟠 HIGH | No voice/text control |
 
 ### 📘 Education & Professional Tools Gaps (MEDIUM PRIORITY - Phase 3)
+
 | Gap | Priority | Impact |
 |---|---|---|
 | CBSE Tools (GeoGebra, Scilab, OpenBoard) not bundled | 🟡 MEDIUM | Not suitable for education |
@@ -370,62 +377,103 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 ## Priority Queue — Recommended Next Rounds
 
 ### Round 37 — Distro Absorption Round 1 (NEW)
+
 1. sigma-snapshot — System snapshot manager (openSUSE Snapper-inspired)
+
 2. sigma-aur — Community package repository (Arch AUR-inspired)
+
 3. sigma-mint-tools — System management suite (Linux Mint-inspired)
+
 4. sigma-musl — Lightweight C library (Alpine-inspired)
+
 5. sigma-runit — Lightweight init system (Void Linux-inspired)
 
 ### Round 36 — Categorized Components (NEW)
+
 1. sigpkg — Universal package manager (Core System)
+
 2. sigma-code — Code editor suite (Development & IT)
+
 3. sigma-containers — Containerization (Development & IT)
+
 4. sigma-i18n — Multilingual UI (Desktop & UX)
+
 5. sigma-a11y — Accessibility tools (Desktop & UX)
 
 ### Round 35 — Open Source Project Components (NEW)
+
 1. sigma-paint — Digital painting suite (Krita/GIMP-inspired)
+
 2. sigma-office — Office suite (LibreOffice-inspired)
+
 3. sigma-mail — Email client (Thunderbird-inspired)
+
 4. sigma-cloud — Self-hosted cloud (Nextcloud-inspired)
+
 5. sigma-web — Modern web browser (Firefox/Chromium-inspired)
 
 ### Round 34 — Linux Distro Components (NEW)
+
 1. sigma-snapper — Snapshot & rollback system (openSUSE Snapper-inspired)
+
 2. sigma-obs — Build service infrastructure (openSUSE OBS-inspired)
+
 3. sigma-appstreams — Application catalog (RHEL AppStreams-inspired)
+
 4. sigma-pamac — GUI package manager (Manjaro PAMAC-inspired)
+
 5. sigma-cosmic — Rust-based desktop (Pop!_OS COSMIC-inspired)
 
 ### Round 33 — Make It Boot
+
 1. VESA/GOP framebuffer driver (get pixels on screen)
+
 2. Minimal scheduler implementation (`sigma_sched.cpp` — round-robin first)
+
 3. QEMU boot test in CI (assert boots to shell)
+
 4. `make iso` pipeline producing a bootable ISO
 
-### Round 35 — Make It Connect  
+### Round 35 — Make It Connect
+
 1. TCP/UDP socket layer implementation
+
 2. Basic WiFi SDF driver (iwlwifi or cfg80211 userspace)
+
 3. sigma-pkg talking to a real repo server
+
 4. sigma-bus IPC running end-to-end
 
 ### Round 36 — Make It Secure
+
 1. Real Argon2id CryptFS key derivation (fix Issue #44)
+
 2. TPM2 seal/unseal for disk key
+
 3. DID login screen replacing username/password
+
 4. sigma-trustd Dilithium3 certificate chain end-to-end
 
 ### Round 37 — Make It Indian
+
 1. ABDM FHIR client (sigma-health goes live)
+
 2. GST IRN API client (sigma-accounts e-invoice goes live)
+
 3. IndiaStack UPI autopay working
+
 4. Bhashini offline model bundle (22-language ASR/TTS)
+
 5. Indian IME (Inscript + phonetic for Devanagari)
 
 ### Round 38 — Make It Smart
+
 1. Local LLM integration (sigma-ai with llama.cpp backend)
+
 2. sigma-heal AI analysis using local model
+
 3. sigma-lex Gazette parser using local NLP
+
 4. Federated learning coordinator server
 
 ---

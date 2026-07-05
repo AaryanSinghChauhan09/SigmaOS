@@ -26,16 +26,16 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
    git checkout -b shard/your-feature-name
    ```
 
-3. **Implement & Document**:
+1. **Implement & Document**:
    - Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
    - Update the corresponding `.md` file in the wiki if the architecture changes.
 
-4. **Validation**:
+2. **Validation**:
    - Run the build system: `make all`.
    - Test in QEMU: `./qemu-boot.sh`.
    - Ensure `sigma-heal` reports no technical debt.
 
-5. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
+3. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
 
 ---
 

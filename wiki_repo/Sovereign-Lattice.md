@@ -10,16 +10,16 @@ The **Sovereign Lattice**is the core structural paradigm of SigmaOS. Unlike mono
 
 Shards are organized into functional tiers for optimal orchestration:
 
-| Tier | Range | Responsibility | Examples | 
-| :--- | :--- | :--- | :--- | 
+| Tier | Range | Responsibility | Examples |
+| :--- | :--- | :--- | :--- |
 
-| **Genesis** | S01 - S09 | Core Kernel Primitives | Scheduler, Memory, PQC | 
+| **Genesis** | S01 - S09 | Core Kernel Primitives | Scheduler, Memory, PQC |
 
-| **Foundation** | S10 - S99 | System Services | FS, Net, HAL, Drivers | 
+| **Foundation** | S10 - S99 | System Services | FS, Net, HAL, Drivers |
 
-| **Nexus** | S100 - S199 | Industrial Integration | K8s, Global Distros, ERP | 
+| **Nexus** | S100 - S199 | Industrial Integration | K8s, Global Distros, ERP |
 
-| **Zenith** | S200 - S299 | Interface & UI | Compositor, Themes, AI Shell | 
+| **Zenith** | S200 - S299 | Interface & UI | Compositor, Themes, AI Shell |
 
 1
 

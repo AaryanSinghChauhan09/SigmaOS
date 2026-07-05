@@ -1,5 +1,7 @@
 # SigmaOS — Modularisation & Architecture Roadmap
+
 ## Shard System · Module Boundaries · Dependency Management
+
 ## Build Modularity · Runtime Modularity · Feature Flags · Plugin System
 
 ---
@@ -135,13 +137,21 @@ Capability token system:
 **Current:** `CMakeLists.txt` has SIGMA_PROFILE variable. Some guards missing.
 
 ```cmake
+
 # CMakeLists.txt — target profiles:
+
 # microkernel  : Level 0 + 1 only, < 512 KB kernel
+
 # standalone   : All levels, Zenith desktop
+
 # cloud        : Level 0-2, container-optimised, no GUI
+
 # rtos         : Level 0-1 + sigma-sched-edf, no network
+
 # mobile       : Level 0-1 (ARM64), sigma-ultra
+
 # forensic     : Level 0-2 + sigma-forensics, read-only root
+
 # gaming       : Level 0-3 + sigma-dxvk, GameMode
 
 option(SIGMA_PROFILE "Build profile" "standalone")
@@ -210,13 +220,19 @@ if (sigma_feature_available("INDIA_STACK")) {
 ### RM1 — Dynamic Shard Loading
 
 ```bash
+
 # Runtime shard management:
+
 sigma-drv load sigma-drv-iwlwifi   # load Wi-Fi driver at runtime
+
 sigma-drv unload sigma-drv-i915    # unload GPU driver (sigma-heal takes over)
+
 sigma-drv reload sigma-drv-e1000   # hot-reload NIC driver
 
 sigma-shard list                   # all loaded shards + version + health
+
 sigma-shard status sigma-net-tcp   # health + stats for one shard
+
 sigma-shard load /sigma/shards/sigma-gamemode.shard
 sigma-shard unload sigma-gamemode
 ```
@@ -234,10 +250,15 @@ sigma-shard unload sigma-gamemode
 
 ```bash
 sigma-perf kpatch status           # list active patches
+
 sigma-perf kpatch apply CVE-2026-1234.kpatch  # apply live patch
+
 sigma-perf kpatch verify <patch>   # verify ML-DSA sig before apply
+
 sigma-perf kpatch rollback <id>    # revert a patch
+
 # No reboot required for kernel security patches
+
 ```
 
 | Task | File | Branch | Detail |
@@ -294,7 +315,6 @@ SIGMA_DEPRECATED sigma_err_t sigma_sys_old_socket(int domain, int type);
 | `make check-abi` — symbol diff | `Makefile` | `tools-dev` | `nm` diff: fail if SIGMA_STABLE symbol changed signature |
 | ABI stability CI gate | `.github/workflows/sigma_ci.yml` | all | Block merge if ABI broken |
 | Deprecation warning in CI | `.github/workflows/sigma_ci.yml` | all | `grep SIGMA_DEPRECATED` → warn in PR comment |
-
 
 ---
 
@@ -430,21 +450,33 @@ Every module must have its own test directory:
 tests/
   kernel/
     test_sched.cpp       # sigma-sched tests
+
     test_mm.cpp          # sigma-mm tests
+
     test_irq.cpp         # sigma-irq tests
+
     test_bus.cpp         # sigma-bus tests
+
   net/
     test_tcp.cpp         # sigma-net-tcp tests
+
     test_udp.cpp         # sigma-net-udp tests
+
   crypto/
     test_kyber.cpp       # sigma-crypto Kyber tests
+
     test_dilithium.cpp   # sigma-crypto Dilithium tests
+
   apps/
     test_sigma_ca.cpp    # sigma-ca profession app tests
+
     test_sigma_agri.cpp  # sigma-agri tests
+
   compat/
     test_linux_elf.cpp   # sigma-linux-compat tests
+
     test_pe_loader.cpp   # sigma-wine PE loader tests
+
 ```
 
 | Gate | CI check | Branch | Target |
@@ -470,8 +502,11 @@ tests/
 | Full standalone ISO | 500 MB | Unknown | < 500 MB |
 
 ```bash
+
 # Size budget CI gate:
+
 sigma_automation.sh size-check      # new command — check all module sizes
+
 ```
 
 ---
@@ -480,14 +515,17 @@ sigma_automation.sh size-check      # new command — check all module sizes
 
 ### EU1 — Error Recovery UX
 
-**Every error must be a teaching moment:**
+### Every error must be a teaching moment:
 
 ```bash
+
 # Bad (current behavior):
+
 $ sigma-pkg install sigma-foo
 Error: -5
 
 # Good (target behavior):
+
 $ sigma-pkg install sigma-foo
 ✗ Package not found: sigma-foo
 
@@ -512,22 +550,32 @@ $ sigma-pkg install sigma-foo
 ### EU2 — Progressive Disclosure
 
 ```bash
+
 # Level 1 — simple user (hide complexity):
+
 sigma-agri msp                     # shows 5 most common crops
+
 sigma-ca gst                       # shows current month only
 
 # Level 2 — power user (more options visible):
+
 sigma-agri msp --list              # shows all 26 crops
+
 sigma-ca gst --period 2025-04      # specify period
 
 # Level 3 — developer (everything):
+
 sigma-agri msp --list --json --year 2026
 sigma-ca gst --debug --trace --all-returns
 
 # Discovery via --help levels:
+
 sigma-ca --help           # basic usage
+
 sigma-ca --help --verbose # all options
+
 sigma-ca --help --expert  # internal flags too
+
 ```
 
 | Task | File | Branch | Detail |
@@ -540,11 +588,17 @@ sigma-ca --help --expert  # internal flags too
 ### EU3 — Onboarding Flow Quality
 
 ```bash
+
 # 5-minute onboarding (verified by CI timer):
+
 1. Boot SigmaOS → language selection (30 s)
+
 2. Scan DID QR → ABHA linked (60 s)
+
 3. Profile auto-suggested by profession (30 s)
+
 4. sigma-pkg install sigma-ca (60 s)
+
 5. sigma-ca dashboard opens (30 s)
 Total: < 4 minutes to first profession app running
 ```
@@ -599,7 +653,9 @@ struct SigmaCronJob {
 **New daemon:** `userland/daemons/sigma_hook.cpp`
 
 ```toml
+
 # /sigma/etc/sigma-hooks.conf
+
 [[hook]]
 event   = "network.connected"
 command = "sigma_automation.sh india-sync"
@@ -641,14 +697,17 @@ timeout = 10
 
 ### OP1 — Hot Path Identification & Optimisation
 
-**Tools to measure:**
+### Tools to measure:
+
 ```bash
 sigma-perf record --pid $(pgrep sigma-net-tcp) --duration 30
 sigma-perf report --top 20        # top 20 hot functions
+
 sigma-perf flame ./sigma-ca       # flamegraph
+
 ```
 
-**Known hot paths that need optimisation:**
+### Known hot paths that need optimisation:
 
 | Hot path | Current cost | Target | Optimisation |
 |----------|-------------|--------|-------------|
@@ -705,7 +764,7 @@ All roadmap documents with their primary dimensions:
 | Engineering-Principles-Roadmap | SOLID/OOP, Design patterns, CLI design, Optimisation, Refactoring | ~700 |
 | Modularisation-Architecture-Roadmap | Shard system, Build modularity, Runtime loading, Plugin API, Automation depth | ~700 |
 
-**Total: 7 documents, ~5,400 lines of actionable engineering roadmap.**
+### Total: 7 documents, ~5,400 lines of actionable engineering roadmap.
 
 ---
 

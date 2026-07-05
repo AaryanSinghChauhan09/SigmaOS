@@ -7,6 +7,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 ## Round 1 — Critical Bug Fixes
 
 | # | Fix | File | Severity |
+
 |---|---|---|---|
 | 1 | PID 1 exits after 5 loops → kernel panic | `init/sigma_init_loop.c` | 🔴 Critical |
 | 2 | `sprintf`/`strcpy` buffer overflows in ZeroTrust | `kernel/security/sigma_zerotrust.cpp` | 🔴 Critical |
@@ -27,6 +28,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 ## Round 2 — OpenBSD · FreeBSD · Gentoo · Debian · Fedora
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | `sigma_pledge()` — per-process syscall restriction | OpenBSD | `kernel/security/jail/sigma_pledge.cpp` |
 | 2 | `sigma_unveil()` — per-process filesystem restriction | OpenBSD | `kernel/security/mac/sigma_unveil.cpp` |
@@ -44,6 +46,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 ## Round 3 — OSTree · Bottlerocket · Talos · Buildroot · Bubblewrap
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Atomic OS updates via content-addressed object store | OSTree | `userland/pkg/sigma_ostree.cpp` |
 | 2 | Real Linux namespace isolation (unshare + pivot_root + seccomp) | Bubblewrap | `kernel/security/jail/sigma_namespace.cpp` |
@@ -58,6 +61,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 ## Round 4 — HardenedBSD · illumos · SELinux · OCI runc · CoreOS
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | ASLR 42-bit per-region entropy + W^X enforcement | HardenedBSD | `kernel/mm/sigma_aslr.cpp` |
 | 2 | DTrace-style zero-cost SDT probe framework | illumos DTrace | `klib/sigma_trace.cpp` |
@@ -73,6 +77,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 ## Round 5 — HardenedBSD · MINIX 3 · Zephyr RTOS · Redox OS · illumos
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Trust label matrix — real MAC policy (replaces always-GRANTED stub) | Qubes OS | `kernel/security/sigma_trust_labels.h` |
 | 2 | seL4-inspired capability space per workload | seL4 | `kernel/security/sigma_cap.cpp` |
@@ -88,6 +93,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 ## Round 6 — seL4 · Plan 9 · Unikraft · Genode OS · Yocto
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | `sigma_scheme` — unified resource URL dispatcher | Redox OS | `klib/sigma_scheme.cpp` |
 | 2 | Hardened `sigma_fstab` with `MS_NOEXEC\|MS_NOSUID\|MS_NODEV` | OCI runc | `kernel/fs/sigma_fstab.cpp` |
@@ -105,8 +111,10 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 
 **Kyber-1024 is NOT a signature scheme.** It is a KEM (Key Encapsulation Mechanism). The hypervisor was calling `sigma_crypto_verify_kyber1024()` which cannot exist — Kyber has no signing operation.
 
-**Correct usage:**
+### Correct usage:
+
 - `Dilithium3` (ML-DSA-65) — for **signatures** (VM image verification, package signing)
+
 - `Kyber-1024` — for **key exchange only** (hypervisor↔guest encrypted channel)
 
 The `sigma-trustd` daemon (in `sigmad/trustd/`) enforces this separation: it issues Dilithium3-signed certificates and uses Kyber-1024 for the key exchange establishing the mTLS session.
@@ -115,7 +123,7 @@ The `sigma-trustd` daemon (in `sigmad/trustd/`) enforces this separation: it iss
 
 ## Current Stub Status
 
-Run `make check-stubs` to see the current list at build time.  
+Run `make check-stubs` to see the current list at build time.
 Run `sigmactl health` to see the list at runtime (requires sigma-healthd).
 
 | Subsystem | Status | Tracking |
@@ -153,6 +161,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 8 — dm-verity · SemanticFS · snapd · Haiku · rpm-ostree · Whonix
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | dm-verity per-package hash verification | Android Verified Boot / snapd | `userland/sigma-pkg/sigma_pkg_verity.h` |
 | 2 | Package assertions with anti-replay chain | snapd SnapDeclaration | `sigmad/pkg/assert/sigma_assert.go` |
@@ -171,6 +180,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 9 — IPC · Audio · Fonts · Session · Drivers · Syscalls · SDK · Updates · l10n · SecBoot
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | sigma-bus IPC subsystem — typed Unix-socket message bus | D-Bus / Mach ports | `userland/ipc/sigma_bus.h` + `sigmad/busd/main.go` |
 | 2 | Audio server protocol | PipeWire / PulseAudio | `userland/audio/sigma_audio_server.h` |
@@ -201,6 +211,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 10 — SMP · ACPI · THP · zram · CET+KASLR · RT Scheduler · Journal
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | SMP support — LAPIC/IPI/per-CPU data structures | Linux SMP | `kernel/arch/sigma_smp.h` |
 | 2 | ACPI parser — full DSDT/SSDT table walking | ACPICA | `kernel/arch/sigma_acpi.h` |
@@ -221,6 +232,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 11 — Driver Shards · VFS · SigmaFS · RAID · DRM · Audio · Namespaces
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Shard-based driver architecture | Genode components | `kernel/drivers/sigma_shard_arch.h` |
 | 2 | Virtual File System (VFS) layer | Linux VFS | `kernel/fs/sigma_vfs.h` |
@@ -242,6 +254,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 12 — eBPF VM · IPC Tracer · ACPI Power · AHCI · LVM · Professional Apps
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | eBPF VM + verifier (safe kernel programmability) | Linux eBPF | `kernel/ebpf/sigma_ebpf_vm.h` |
 | 2 | IPC tracer — strace-equivalent for sigma-bus | strace / bpftrace | `tools/sigma-trace/sigma_ipc_tracer.h` |
@@ -259,6 +272,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 13 — Compositor · CryptFS Fix · IPC SHM · A11y · Cloud Sync · Bench
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Zenith Wayland compositor (VRR, HDR, multi-monitor, animations) | Sway / KWin / Mutter | `userland/compositor/sigma_compositor.h` |
 | 2 | **CryptFS real AES-256-GCM (fixes Issue #44 zero-key stub)** | dm-crypt / fscrypt / LUKS2 | `kernel/crypto/sigma_cryptfs_real.cpp` |
@@ -272,6 +286,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 14 — Interactive Roadmap SPA · WPA3 Impl · Net Stack Tests · CMakeLists
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | **Interactive Utilities Roadmap SPA** — 42 utilities, 5 phases, live filter/search, dependency tracking | GitHub Projects / Linear | `userland/roadmap/index.html` |
 | 2 | WPA3/SAE full implementation (hunting-and-pecking, dragonfly key exchange) | IEEE 802.11-2020 | `net/wifi/sigma_wpa3.cpp` |
@@ -283,6 +298,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 15 — Firewall · Watchdog · Metrics · Shell · Rollback · OOM · MM Tests
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Stateful packet filter + NAT engine | OpenBSD pf / nftables | `kernel/net/sigma_firewall.h` |
 | 2 | Hardware + software watchdog daemon (WDT pet + daemon health) | Linux watchdog / systemd-watchdog | `sigmad/watchdog/main.go` |
@@ -297,6 +313,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 16 — Full TLS 1.3 · DNS Resolver · DHCP Client Implementations
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | TLS 1.3 with HKDF extract/expand/expand-label, Kyber hybrid handshake | RFC 8446 + draft-ietf-tls-hybrid | `net/tls/sigma_tls.cpp` |
 | 2 | DNS resolver: UDP/TCP/DoH, DNSSEC, LRU cache, name encode/decode | RFC 1035 / 8484 (DoH) | `net/dns/sigma_dns.cpp` |
@@ -305,6 +322,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 17 — Full Protocol Implementations
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | DHCP RFC 2131/2132 — full state machine (INIT→BOUND→RENEW→REBIND→EXPIRE), option decode, lease management, event tick, socket stubs | RFC 2131 / ISC dhclient | `net/dhcp/sigma_dhcp_full.cpp` |
 | 2 | DNS full RR decoder — A/AAAA/CNAME/NS/MX/SRV/TXT/DNSKEY/DS/RRSIG, response decode, DNSSEC chain validation stub, cache store+prune | RFC 1035 / 4033-4035 | `net/dns/sigma_dns_full.cpp` |
@@ -315,6 +333,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 18 — Live Kpatch · NetGW · mimalloc · Reproducible Builds · Pkg Templates · Testing
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Live kernel patching without reboot (kpatch stop_machine approach) | Red Hat kpatch | `kernel/kpatch/sigma_kpatch.h`, `tools/sigma-kpatch-build/sigma_kpatch_build.sh` |
 | 2 | Two-VM network gateway (Whonix-level isolation, virtio NIC) | Whonix / Qubes OS | `kernel/net/sigma_netgw.h` |
@@ -336,6 +355,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 19 — Screen Reader · India Strategy · Testing Docs
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Package fuzzer (path traversal, JSON, signature, header parse) | libFuzzer best practices | `tests/fuzz/fuzz_sigma_pkg.cpp` |
 | 2 | AT-SPI2 screen reader (TTS, focus tracking, live regions, keyboard nav) | GNOME Orca / AT-SPI2 | `userland/accessibility/sigma_screen_reader.cpp` |
@@ -347,6 +367,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 20 — CI Pipeline · GST Tests · IPC Tests · Voice Control · Man Pages · Themes
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Full GitHub Actions CI workflow (8 jobs: build, unit, fuzz, memory, POSIX, integration, repro, security) | openSUSE OBS / Fedora Koji | `.github/workflows/sigma_ci.yml` |
 | 2 | GST calculation unit tests (9 tests: slabs, ITC, rounding, inter-state, UT) | Indian tax law | `tests/unit/test_sigma_gst.cpp` |
@@ -365,6 +386,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 21 — IndiaStack Native Integration
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | IndiaStack unified header — UPI, GSTN, ABDM, DigiLocker, ONDC, OCEN, AA framework | India MeitY / RBI | `userland/indiastack/sigma_indiastack.h` |
 | 2 | e-RUPI government voucher redemption | NPCI / ABDM | `userland/indiastack/sigma_indiastack.h` |
@@ -379,6 +401,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 22 — Bhashini AI Language Platform
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | Bhashini unified header — 22-language ASR, TTS, NMT, transliteration | MeitY Bhashini | `userland/bhashini/sigma_bhashini.h` |
 | 2 | Offline ASR inference (22 Indian languages + sign language recognition) | Bhashini / Vakyansh | `userland/bhashini/sigma_bhashini.h` |
@@ -392,6 +415,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 23 — ISRO Space Stack Integration
 
 | # | Improvement | Inspired By | File |
+
 |---|---|---|---|
 | 1 | ISRO integration header — NavIC, Bhuvan GIS, MOSDAC, IRNSS timing | ISRO | `userland/isro/sigma_isro.h` |
 | 2 | NavIC L1/L5 GNSS receiver API (India's sovereign GPS) | IRNSS / ISRO NAVIC | `userland/isro/sigma_isro.h` |
@@ -405,6 +429,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 24 — India Profession Apps (Batch 1: 14 apps)
 
 | # | App | Profession / Regulator | Key Feature |
+
 |---|---|---|---|
 | 1 | `sigma-accounts` | Business owner (GSTN) | e-Invoice IRN, eWay Bill, double-entry, DID audit trail |
 | 2 | `sigma-ca` | Chartered Accountant (ICAI) | GSTR filing, Form 16, multi-client dashboard |
@@ -426,6 +451,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 25 — India Profession Apps (Batch 2: 22 more apps)
 
 | # | App | Profession / Regulator | Key Feature |
+
 |---|---|---|---|
 | 1 | `sigma-cma` | Cost Accountant (ICMAI) | Cost audit §148, CMA data for loans, DSCR |
 | 2 | `sigma-cs` | Company Secretary (ICSI) | ROC filings MGT-7/AOC-4, board SS-1/SS-2 |
@@ -455,6 +481,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 26 — India Profession Apps (Batch 3: 14 specialty apps)
 
 | # | App | Profession / Regulator | Key Feature |
+
 |---|---|---|---|
 | 1 | `sigma-film` | Director/producer (CBFC/IPRS) | CBFC application, OTT IT Rules 2021, copyright |
 | 2 | `sigma-creator` | Influencer/YouTuber (ASCI) | Disclosure check, 44ADA tax, brand deal invoice |
@@ -476,6 +503,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 27 — Self-Heal + Community Internet (Sigma-Heal & Sigma-CommNet)
 
 | # | Improvement | Description | File |
+
 |---|---|---|---|
 | 1 | **sigma-heal: Autonomous OS repair daemon** | Self-healing for filesystem corruption (btrfs scrub), kernel panic recovery (memory dump + rollback), broken package dependency resolution, network self-heal (DNS fallback, DHCP renew, WiFi module reload) | `sigmad/heal/main.go` |
 | 2 | **Filesystem self-heal** | Detects bad sectors, corrupted inodes, orphaned files; runs btrfs scrub + repair; auto-restores from sigma-mirror if unfixable | `sigmad/heal/main.go` |
@@ -491,6 +519,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 28 — Remaining Profession App Headers + Competitive Analysis Wiki
 
 | # | Improvement | Description | File |
+
 |---|---|---|---|
 | 1 | `sigma-urbanplanning` header | Building plan approval, FSI calc, AMRUT status, RERA compliance | `userland/apps/sigma-urbanplanning/sigma_urbanplanning.h` |
 | 2 | `sigma-bloodbank` header | eRaktkosh sync, mandatory HIV/HBV/HCV testing, NABL audit trail | `userland/apps/sigma-bloodbank/sigma_bloodbank.h` |
@@ -509,6 +538,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 29 — sigma-heal + sigma-commnet Full Implementation
 
 | # | Improvement | Description | File |
+
 |---|---|---|---|
 | 1 | `sigma_heal.h` — Autonomous OS repair header | Full API for filesystem heal (btrfs scrub/restore), kernel panic recovery (kdump+AI analysis), package conflict fix, network self-heal (DNS fallback/DHCP renew/module reload), security heal (process isolation/integrity restore/DID rekey), hardware heal (GPU fallback/sound mute/USB safe state), simulation mode, DID-signed audit events | `sigmad/heal/sigma_heal.h` |
 | 2 | `sigma_commnet.h` — Community internet header | Gateway config (2-NIC, TRAI-compliant), DID-based member enrollment, fair-share QoS (HTB), local content cache (govt/NCERT/eNAM domains), offline mode, bandwidth reporting, UPI cost-split billing, access logging (DoT 6-month retention) | `sigmad/commnet/sigma_commnet.h` |
@@ -518,6 +548,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 30 — Continuous Auth + Federated Learning + Digital Twin
 
 | # | Improvement | Description | File |
+
 |---|---|---|---|
 | 1 | `sigma_continuous_auth.h` — Continuous authentication | Passive biometric signals (typing rhythm, mouse patterns, face liveness, BT proximity, Wi-Fi device presence), confidence-gated access tiers, RBI step-up for transactions >₹5000, full access audit log | `userland/auth/sigma_continuous_auth.h` |
 | 2 | `sigma_fedlearn.h` — Federated learning platform | Round-based FedAvg/FedProx, Kyber-encrypted weight uploads, differential privacy (ε=0.5), 6 built-in networks (agri-disease, tax-anomaly, OCR, medical, ASR, fraud), DPDP Act 2023 compliant, opt-in/opt-out | `userland/ai/sigma_fedlearn.h` |
@@ -528,6 +559,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 31 — AR/VR + Data Sovereignty + Boot Hardening + GameLearn
 
 | # | Improvement | Description | File |
+
 |---|---|---|---|
 | 1 | `sigma_xr.h` — Extended reality platform | OpenXR 1.1 runtime, AR passthrough overlays (RERA data, building plans, patient vitals, machine manuals, NavIC navigation), VR 3D workspace (3 screens at 4K), VR training simulations (surgery, fire drill, courtroom), HMD + phone AR support | `userland/xr/sigma_xr.h` |
 | 2 | `sigma_datasov.h` — Data sovereignty platform | Encrypted local vault per sigma-* app category, consent-based marketplace (DPDP Act), ZK proofs (income/age/credential/credit without revealing data), Groth16 zk-SNARK, UPI earnings from data sharing | `userland/datasov/sigma_datasov.h` |
@@ -539,6 +571,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 32 — Wiki: Self-Heal, CommNet, Crushing Strategy, Advanced Features
 
 | # | Wiki Page | Content |
+
 |---|---|---|
 | 1 | `Sigma-Self-Heal.md` | Complete guide to sigma-heal: 6 heal categories, CLI commands, simulation output, architecture diagram, comparison table vs Ubuntu/Windows/macOS/Android |
 | 2 | `Sigma-CommNet.md` | Complete guide to sigma-commnet: architecture diagram, TRAI compliance table, QoS algorithm, local cache domain table, setup walkthrough, full CLI reference, hardware requirements |
@@ -554,6 +587,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 35 — Extended Profession App Headers (9 more apps)
 
 | # | App | Profession | Regulator | File |
+
 |---|---|---|---|---|
 | 1 | `sigma-cs` | Company Secretary | ICSI/MCA/SEBI LODR | `userland/apps/sigma-cs/sigma_cs.h` |
 | 2 | `sigma-sebi` | Stock broker/RIA/MFD | SEBI/AMFI/CDSL | `userland/apps/sigma-sebi/sigma_sebi.h` |
@@ -570,6 +604,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 36 — OS Security Improvements
 
 | # | Improvement | Description | File |
+
 |---|---|---|---|
 | 1 | `sigma_landlock.h` — Auto-generated Landlock + seccomp-bpf profiles | Per-app filesystem restriction + syscall filter auto-generated from manifest capabilities; audit log every denial via sigma-bus | `kernel/security/sigma_landlock.h` |
 | 2 | `sigma_sbom.h` — Software Bill of Materials | CycloneDX 1.6 + SPDX 2.3 SBOM per package, Dilithium3-signed, OSV vulnerability scan, public transparency log at verify.sigmaos.dev | `userland/pkg/sigma_sbom.h` |
@@ -579,6 +614,7 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ## Round 37 — Wiki: Extended Profession Tools + OS Technical Superiority
 
 | # | Wiki Page | Content |
+
 |---|---|---|
 | 1 | `Extended-Profession-Tools.md` | 9 new profession apps documented: CS/SEBI/aviation/FSSAI/mining/textile/marine/forest/trust — with feature tables, CLI examples, key differentiators |
 | 2 | `OS-Technical-Superiority.md` | 11 things no Linux distro has: kernel AI inference, DID identity, PQC default, SemanticFS, time-travel FS, fleet compute, profession customisation, India compliance, continuous auth, sigma-lex, auto-generated Landlock+seccomp. Security depth comparison (15 layers vs Ubuntu's 6). Performance targets table |

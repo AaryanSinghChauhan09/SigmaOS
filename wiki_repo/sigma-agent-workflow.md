@@ -35,22 +35,29 @@
 ## Quick Start
 
 ```bash
+
 # Install all 8 built-in templates
+
 sigma-agent workflow install --all
 
 # List installed workflows
+
 sigma-agent workflow list
 
 # Run a workflow
+
 sigma-agent workflow run weekly-backup
 
 # Preview without executing
+
 sigma-agent workflow run weekly-backup --dry-run
 
 # Generate from natural language
+
 sigma-agent workflow create "back up my code every Friday night"
 
 # Start background scheduler (runs all schedule/event workflows)
+
 sigma-agent workflow scheduler
 ```
 
@@ -74,7 +81,9 @@ steps:
   - name: step-one
     action: "sigma-agent natural language command"
     on_fail: stop        # stop | continue | notify
+
     timeout: 60          # seconds, default 60
+
     retries: 0           # retry count on failure
 
   - name: step-two
@@ -109,13 +118,17 @@ steps:
 Conditions let steps run only when previous steps succeeded or produced specific output:
 
 ```yaml
+
 # Only run if 'build' step exited with code 0
+
 condition: "exit_code_of(build) == 0"
 
 # Only run if 'build' step succeeded
+
 condition: "success_of(build)"
 
 # Only run if 'scan' output contains "critical"
+
 condition: "output_contains(scan, 'critical')"
 ```
 
@@ -134,6 +147,7 @@ condition: "output_contains(scan, 'critical')"
 Install with `sigma-agent workflow install <name>` or `sigma-agent workflow install --all`.
 
 ### `weekly-backup`
+
 Backs up `~/Code` and `~/Documents` every Friday at 22:00.
 ```bash
 sigma-agent workflow install weekly-backup
@@ -141,24 +155,31 @@ sigma-agent workflow run weekly-backup --dry-run
 ```
 
 ### `daily-update`
+
 Updates all packages and runs a security scan daily at 06:00.
 
 ### `cpu-alert`
+
 Fires when CPU load exceeds 90% — diagnoses the cause and sends a critical alert.
 
 ### `low-disk-alert`
+
 Fires when free disk space drops below 10% — alerts and suggests cleanup.
 
 ### `dev-workflow`
+
 Manual workflow: `cargo build` → `cargo test` → security review → notify.
 
 ### `security-hardening`
+
 Manual workflow: full security scan → enable firewall → disable telemetry → policy recommendations.
 
 ### `on-boot-setup`
+
 Runs `sigma-agent doctor` and syncs knowledge from GitHub on every boot.
 
 ### `pkg-update-notify`
+
 Notifies you when package updates are available.
 
 ---
@@ -168,17 +189,22 @@ Notifies you when package updates are available.
 Generate a complete YAML workflow from a plain English description:
 
 ```bash
+
 # Print to stdout
+
 sigma-agent workflow create "back up home folder every Friday"
 
 # Save to file
+
 sigma-agent workflow create "run security audit nightly at 23:00" -o nightly-audit.yaml
 
 # Generate and install immediately
+
 sigma-agent workflow create "monitor CPU and alert when high" -o cpu-watch.yaml
 cp cpu-watch.yaml ~/.config/sigma/agent/workflows/
 
 # Generate and run immediately
+
 sigma-agent workflow create "build and test my project" -o /tmp/build.yaml
 sigma-agent workflow run /tmp/build.yaml
 ```
@@ -192,21 +218,30 @@ Works offline with rule-based planner. When sigma-agent daemon is running, uses 
 The scheduler checks all workflow triggers every 60 seconds:
 
 ```bash
+
 # Start in foreground (Ctrl+C to stop)
+
 sigma-agent workflow scheduler
 
 # Start via daemon (recommended)
+
 sigma-agent daemon start  # daemon includes scheduler automatically
 
 # Check what would fire right now
+
 sigma-agent workflow check
 ```
 
 The scheduler:
+
 - Runs schedule-based workflows at their configured time
+
 - Fires event-based workflows when conditions are met (CPU/disk/pkg)
+
 - Debounces event triggers (minimum 5 minutes between firings)
+
 - Logs every run to `~/.cache/sigma/agent/workflow_runs/`
+
 - Appends to audit log at `~/.cache/sigma/agent/workflow_audit.log`
 
 ---
@@ -214,13 +249,17 @@ The scheduler:
 ## Run History & Audit
 
 ```bash
+
 # Show last 20 runs
+
 sigma-agent workflow history
 
 # Show runs for a specific workflow
+
 sigma-agent workflow history weekly-backup
 
 # Show audit log (every action logged)
+
 sigma-agent workflow audit
 ```
 
@@ -233,11 +272,17 @@ Every action (create, run, enable, disable) is appended to the audit log.
 
 ```bash
 sigma-agent workflow list                  # list all workflows
+
 sigma-agent workflow enable weekly-backup  # enable
+
 sigma-agent workflow disable cpu-alert     # disable (won't auto-trigger)
+
 sigma-agent workflow delete my-workflow    # delete permanently
+
 sigma-agent workflow edit weekly-backup    # open YAML in $EDITOR
+
 sigma-agent workflow templates             # list built-in templates
+
 ```
 
 ---
@@ -249,26 +294,32 @@ Workflow steps can use **any sigma-agent command**:
 ```yaml
 steps:
   # Security advisor
+
   - name: audit
     action: "security scan"
 
   # Multi-agent diagnosis
+
   - name: diagnose
     action: "multi --agent sysadmin 'why is system slow'"
 
   # Memory
+
   - name: remember
     action: "memory add 'last backup ran successfully' --pattern"
 
   # Notification
+
   - name: alert
     action: "notify 'Workflow' 'Step complete' --critical"
 
   # Raw shell
+
   - name: compress
     action: "run tar -czf /backup/code.tar.gz /home/user/Code"
 
   # Explain what happened
+
   - name: explain-error
     action: "explain --error 'cargo build' 'linker error'"
     condition: "exit_code_of(build) != 0"

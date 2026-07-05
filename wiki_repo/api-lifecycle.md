@@ -1,4 +1,4 @@
-# Client Lifecycle
+﻿# Client Lifecycle
 
 An Undici [Client](/docs/docs/api/Client.md) can be best described as a state machine. The following list is a summary of the various state transitions the `Client` will go through in its lifecycle. This document also contains detailed breakdowns of each state.
 
@@ -6,7 +6,23 @@ An Undici [Client](/docs/docs/api/Client.md) can be best described as a state ma
 
 ## State Transition Overview
 
-*A `Client` begins in the**idle**state with no socket connection and no requests in queue.*The*connect*event transitions the `Client` to the**pending**state where requests can be queued prior to processing.*The*close*and*destroy*events transition the `Client` to the**destroyed**state. Since there are no requests in the queue, the *close*event immediately transitions to the**destroyed** state.*The**pending**state indicates the underlying socket connection has been successfully established and requests are queueing.*The*process*event transitions the `Client` to the**processing**state where requests are processed.*If requests are queued, the*close*event transitions to the**processing**state; otherwise, it transitions to the**destroyed**state.*The*destroy*event transitions to the**destroyed**state.*The**processing**state initializes to the**processing.running**state.*If the current request requires draining, the*needDrain*event transitions the `Client` into the**processing.busy**state which will return to the**processing.running**state with the*drainComplete*event.*After all queued requests are completed, the*keepalive*event transitions the `Client` back to the**pending**state. If no requests are queued during the timeout, the**close**event transitions the `Client` to the**destroyed**state.*If the*close*event is fired while the `Client` still has queued requests, the `Client` transitions to the**process.closing**state where it will complete all existing requests before firing the*done*event.*The*done*event gracefully transitions the `Client` to the**destroyed**state.*At any point in time, the*destroy*event will transition the `Client` from the**processing**state to the**destroyed**state, destroying any queued requests.*The**destroyed** state is a final state and the `Client` is no longer functional.
+- A `Client` begins in the **idle** state with no socket connection and no requests in queue.
+- The *connect* event transitions the `Client` to the **pending** state where requests can be queued prior to processing.
+- The *close* and *destroy* events transition the `Client` to the **destroyed** state. Since there are no requests in the queue, the *close* event immediately transitions to the **destroyed** state.
+
+- The **pending** state indicates the underlying socket connection has been successfully established and requests are queueing.
+- The *process* event transitions the `Client` to the **processing** state where requests are processed.
+- If requests are queued, the *close* event transitions to the **processing** state; otherwise, it transitions to the **destroyed** state.
+- The *destroy* event transitions to the **destroyed** state.
+
+- The **processing** state initializes to the **processing.running** state.
+- If the current request requires draining, the *needDrain* event transitions the `Client` into the **processing.busy** state which will return to the **processing.running** state with the *drainComplete* event.
+- After all queued requests are completed, the *keepalive* event transitions the `Client` back to the **pending** state. If no requests are queued during the timeout, the **close** event transitions the `Client` to the **destroyed** state.
+- If the *close* event is fired while the `Client` still has queued requests, the `Client` transitions to the **process.closing** state where it will complete all existing requests before firing the *done* event.
+- The *done* event gracefully transitions the `Client` to the **destroyed** state.
+- At any point in time, the *destroy* event will transition the `Client` from the **processing** state to the **destroyed** state, destroying any queued requests.
+
+- The **destroyed** state is a final state and the `Client` is no longer functional.
 
 A state diagram representing an Undici Client instance:
 
@@ -40,14 +56,13 @@ stateDiagram-v2
       running --> [*] : keepalive
       closing --> [*] : done
   }
-
 ```
 
 ## State details
 
 ### idle
 
-The **idle**state is the initial state of a `Client` instance. While an `origin` is required for instantiating a `Client` instance, the underlying socket connection will not be established until a request is queued using [`Client.dispatch()`](/docs/docs/api/Client.md#clientdispatchoptions-handlers). By calling `Client.dispatch()` directly or using one of the multiple implementations ([`Client.connect()`](Client.md#clientconnectoptions-callback), [`Client.pipeline()`](Client.md#clientpipelineoptions-handler), [`Client.request()`](Client.md#clientrequestoptions-callback), [`Client.stream()`](Client.md#clientstreamoptions-factory-callback), and [`Client.upgrade()`](/docs/docs/api/Client.md#clientupgradeoptions-callback)), the `Client` instance will transition from**idle** to [**pending**](/docs/docs/api/Client.md#pending) and then most likely directly to [**processing**](/docs/docs/api/Client.md#processing).
+The **idle** state is the initial state of a `Client` instance. While an `origin` is required for instantiating a `Client` instance, the underlying socket connection will not be established until a request is queued using [`Client.dispatch()`](/docs/docs/api/Client.md#clientdispatchoptions-handlers). By calling `Client.dispatch()` directly or using one of the multiple implementations ([`Client.connect()`](Client.md#clientconnectoptions-callback), [`Client.pipeline()`](Client.md#clientpipelineoptions-handler), [`Client.request()`](Client.md#clientrequestoptions-callback), [`Client.stream()`](Client.md#clientstreamoptions-factory-callback), and [`Client.upgrade()`](/docs/docs/api/Client.md#clientupgradeoptions-callback)), the `Client` instance will transition from **idle** to [**pending**](/docs/docs/api/Client.md#pending) and then most likely directly to [**processing**](/docs/docs/api/Client.md#processing).
 
 Calling [`Client.close()`](/docs/docs/api/Client.md#clientclosecallback) or [`Client.destroy()`](Client.md#clientdestroyerror-callback) transitions directly to the [**destroyed**](/docs/docs/api/Client.md#destroyed) state since the `Client` instance will have no queued requests in this state.
 
@@ -65,7 +80,7 @@ The **processing** state is a state machine within itself. It initializes to the
 
 #### running
 
-In the **processing.running**sub-state, queued requests are being processed in a FIFO order. If a request body requires draining, the*needDrain*event transitions to the [**processing.busy**](/docs/docs/api/Client.md#busy) sub-state. The*close*event transitions the Client to the [**process.closing**](/docs/docs/api/Client.md#closing) sub-state. If all queued requests are processed and neither [`Client.close()`](/docs/docs/api/Client.md#clientclosecallback) nor [`Client.destroy()`](Client.md#clientdestroyerror-callback) are called, then the [**processing**](/docs/docs/api/Client.md#processing) machine will trigger a*keepalive*event transitioning the `Client` back to the [**pending**](/docs/docs/api/Client.md#pending) state. During this time, the `Client` is waiting for the socket connection to timeout, and once it does, it triggers the*timeout* event and transitions to the [**idle**](/docs/docs/api/Client.md#idle) state.
+In the **processing.running** sub-state, queued requests are being processed in a FIFO order. If a request body requires draining, the *needDrain* event transitions to the [**processing.busy**](/docs/docs/api/Client.md#busy) sub-state. The *close* event transitions the Client to the [**process.closing**](/docs/docs/api/Client.md#closing) sub-state. If all queued requests are processed and neither [`Client.close()`](/docs/docs/api/Client.md#clientclosecallback) nor [`Client.destroy()`](Client.md#clientdestroyerror-callback) are called, then the [**processing**](/docs/docs/api/Client.md#processing) machine will trigger a *keepalive* event transitioning the `Client` back to the [**pending**](/docs/docs/api/Client.md#pending) state. During this time, the `Client` is waiting for the socket connection to timeout, and once it does, it triggers the *timeout* event and transitions to the [**idle**](/docs/docs/api/Client.md#idle) state.
 
 #### busy
 

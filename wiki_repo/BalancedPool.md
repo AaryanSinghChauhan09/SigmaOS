@@ -1,4 +1,4 @@
-# Class: BalancedPool
+﻿# Class: BalancedPool
 
 Extends: `undici.Dispatcher`
 
@@ -10,7 +10,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **upstreams**`URL | string | string[]` - It should only include the**protocol, hostname, and port**.
+- **upstreams** `URL | string | string[]` - It should only include the **protocol, hostname, and port**.
 
 - **options** `BalancedPoolOptions` (optional)
 
@@ -48,7 +48,7 @@ Add an upstream.
 
 Arguments:
 
-- **upstream**`string` - It should only include the**protocol, hostname, and port**.
+- **upstream** `string` - It should only include the **protocol, hostname, and port**.
 
 ### `BalancedPool.removeUpstream(upstream)`
 

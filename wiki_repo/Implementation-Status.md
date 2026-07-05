@@ -59,6 +59,7 @@
 ### Top 10 High-Impact
 
 | # | Idea | Status | File |
+
 |---|---|---|---|
 | 1 | Cryptographic Execution Proof | ✅ | `security/sigma_zkp_execution_proof.rs` |
 | 2 | Capability-based App Store | ✅ | `userland/agent/sigma_agent_capability_store.nim` |

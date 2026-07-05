@@ -1,4 +1,4 @@
-# Class: RoundRobinPool
+﻿# Class: RoundRobinPool
 
 Extends: `undici.Dispatcher`
 
@@ -12,7 +12,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **url**`URL | string` - It should only include the**protocol, hostname, and port**.
+- **url** `URL | string` - It should only include the **protocol, hostname, and port**.
 
 - **options** `RoundRobinPoolOptions` (optional)
 
@@ -40,9 +40,9 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 ### Important: Backend Distribution Considerations
 
-`RoundRobinPool` distributes **HTTP requests**evenly across**TCP connections**. Whether this translates to even backend server distribution depends on the load balancer's behavior:
+`RoundRobinPool` distributes **HTTP requests** evenly across **TCP connections**. Whether this translates to even backend server distribution depends on the load balancer's behavior:
 
-**✓ Works when the load balancer**:
+**âœ“ Works when the load balancer**:
 
 - Assigns different backends to different TCP connections from the same client
 
@@ -50,14 +50,12 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 - Example: Default Kubernetes Services without `sessionAffinity`
 
-**✗ Does NOT work when**:
+**âœ— Does NOT work when**:
 
-- Load balancer has client/source IP affinity (all connections from one IP → same backend)
+- Load balancer has client/source IP affinity (all connections from one IP â†’ same backend)
 
 - Load balancer uses source-IP-hash or sticky sessions
-
-### How it works
-
+### How it works:
 1. `RoundRobinPool` creates N TCP connections to the load balancer endpoint
 
 2. Load balancer assigns each TCP connection to a backend (per its algorithm)
@@ -149,7 +147,6 @@ for (let i = 0; i < 100; i++) {
 }
 
 await pool.close()
-
 ```
 
 ## See Also
@@ -159,3 +156,4 @@ await pool.close()
 - [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
 
 - [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution
+

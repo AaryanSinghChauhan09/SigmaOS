@@ -55,14 +55,21 @@ void sigma_wasm_destroy(wasm_instance_t *inst);
 ## Roadmap
 
 - [ ] WASM binary validator (MVP spec)
+
 - [ ] Stack-machine interpreter (for early boot)
+
 - [ ] Cranelift JIT backend integration
+
 - [ ] WASI → SigmaOS syscall mapping table
+
 - [ ] Lua 5.4 interpreter port (no C stdlib)
+
 - [ ] Python 3 minimal port (for scripting tools)
+
 - [ ] Runtime hot-swap (update runtime without reboot)
 
 ## Related Modules
 
 - [`modules/ext/plugins`](../plugins/README.md) — WASM capsule packaging
+
 - [`modules/tools/sandbox`](../../tools/sandbox/README.md) — Runtime sandboxing

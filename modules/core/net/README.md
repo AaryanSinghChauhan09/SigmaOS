@@ -65,17 +65,27 @@ All `sovereign_net.rs` channels use a **hybrid** scheme:
 ## Roadmap
 
 - [x] TCP state machine (`tcp.rs`)
+
 - [x] Socket API (`socket.rs`)
+
 - [x] ICMP (`icmp.rs`)
+
 - [x] Post-quantum encryption stub (`pqfs.rs`)
+
 - [x] Mesh gossip protocol (`mesh_net.rs`)
+
 - [ ] Full IPv6 SLAAC / NDP
+
 - [ ] DHCPv4 / DHCPv6 client
+
 - [ ] DNSSEC resolver integration
+
 - [ ] WireGuard-inspired VPN tunnel
+
 - [ ] Formal Kani proofs for TCP state machine
 
 ## Related Modules
 
 - [`modules/core/kernel`](../kernel/README.md) — IPC used by net stack
+
 - [`modules/security/isolation`](../../security/isolation/README.md) — Network namespace isolation

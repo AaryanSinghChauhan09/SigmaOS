@@ -7,8 +7,11 @@ It ships as a **single static binary** compiled from `tools/sigma-cli.rs` (Rust,
 
 ```bash
 cargo build --release --manifest-path tools/Cargo.toml
+
 # Binary output: tools/target/release/sigma
+
 # Copy to PATH:
+
 sudo cp tools/target/release/sigma /usr/local/bin/sigma
 ```
 
@@ -33,8 +36,10 @@ Generates:
 ```text
 my_driver/
 ├── Config.sigma        # project metadata (name, arch, license)
+
 └── src/
     └── main.rs         # no_std entry stub
+
 ```
 
 ---
@@ -58,7 +63,9 @@ Boot the built kernel image inside QEMU.
 sigma run
 sigma run --headless --serial
 sigma run --debug     # attaches gdb on :1234
+
 sigma run --snapshot  # saves VM state on exit
+
 ```
 
 ---
@@ -160,6 +167,8 @@ sigma completions pwsh  >> $PROFILE
 Any binary named `sigma-<name>` on `PATH` is auto-discovered as a subcommand (cargo-style):
 
 ```bash
+
 # e.g., place sigma-profiler in /usr/local/bin:
+
 sigma profiler start
 ```

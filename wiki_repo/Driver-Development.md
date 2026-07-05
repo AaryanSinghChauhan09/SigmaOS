@@ -86,11 +86,17 @@ SIGMA_SDF_REGISTER_DRIVER(SigmaMyDriver, "my_driver", MY_VENDOR, MY_DEVICE);
 ## Writing a New Driver — Step by Step
 
 1. **Create the file** in the appropriate `drivers/subsystem/` directory
+
 2. **Inherit** from `SovereignDriverBase`
+
 3. **Implement** `probe()`, `init()`, `shutdown()`
+
 4. **Register** with `SIGMA_SDF_REGISTER_DRIVER`
+
 5. **Add a test** in `tests/unit/drivers/`
+
 6. **Run in QEMU**: `make DRIVER=my_driver qemu-driver-test`
+
 7. **Update** `CURRENT_PROBLEMS_MANIFEST.md` — mark the driver as resolved
 
 ## PCI Driver Helpers
@@ -111,9 +117,13 @@ void* dma_buf = sigma_dma_alloc(size, &phys_addr);
 ## Submitting a Driver PR
 
 1. PR title: `driver: add <name> <subsystem> driver`
+
 2. Must pass `make fuzz DRIVER=<name>`
+
 3. Must pass QEMU smoke test (include screenshot/log in PR)
+
 4. Update `CURRENT_PROBLEMS_MANIFEST.md`
+
 5. Add wiki entry to [Driver-Shards](Driver-Shards) page
 
 ---

@@ -1,3 +1,5 @@
+#  Footer
+
 ---
 
 **[SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)** — Sovereign, AI-native, automation-first OS · v15.1 · MIT + GPL-2.0

@@ -18,14 +18,21 @@ Filesystem corruption:
 ```
 
 sigma-heal polls filesystem health every 60 seconds using `btrfs device stats` and checks for:
+
 - Bad sectors and read errors
+
 - Corrupted inodes and orphaned files
+
 - Filesystem tree inconsistencies
 
-**Repair flow:**
+### Repair flow:
+
 1. `btrfs scrub start /` → waits for result
+
 2. If errors found → `btrfs scrub -r` (repair mode)
+
 3. If still unfixable → pulls clean snapshot from `sigma-mirror` (encrypted remote backup)
+
 4. Logs event to immutable DID-signed audit trail
 
 ### Kernel Panic Recovery
@@ -39,10 +46,15 @@ Kernel panic recovery:
 ```
 
 SigmaOS always keeps two kernel slots (A/B). When a panic occurs:
+
 1. kdump captures full memory dump to `/var/sigma-crash/`
+
 2. System boots to slot-B (recovery kernel)
+
 3. `sigma-ai` analyzes the dump — identifies faulting module, stack trace pattern
+
 4. If a known hotfix exists → apply via `sigma-livepatch` (no reboot needed)
+
 5. If no hotfix → roll back to last known-good generation
 
 Every crash and its resolution is logged with a DID-signed event for audit.
@@ -57,8 +69,11 @@ Package conflicts:
 ```
 
 After any `sigma-pkg upgrade`, sigma-heal verifies the dependency graph. If a broken state is found:
+
 1. Dependency resolver identifies the offending package
+
 2. Either re-fetches the correct version or rolls back to the previous generation
+
 3. System is never left in a partial upgrade state
 
 ### Network Self-Heal
@@ -71,8 +86,11 @@ Network self-heal:
 ```
 
 sigma-heal subscribes to `sigma-bus` network events from `sigma-netd`. On failure:
+
 - DNS probe fails → switch to fallback DNS automatically, restore original when it recovers
+
 - Route table empty → trigger DHCP renew on all interfaces
+
 - Wi-Fi kernel module crash → unload + reload (`iwlwifi`, `mt7921`, etc.)
 
 ### Security Self-Heal
@@ -85,8 +103,11 @@ Security self-heal:
 ```
 
 sigma-heal integrates with `sigma-ids` (intrusion detection) and `sigma-trustd` (key management):
+
 - **Process isolation**: compromised process gets sandboxed with `sigma-jail --isolate <pid>`
+
 - **Rootkit**: file integrity baseline (Dilithium3-signed) compared — deviations restored from baseline
+
 - **Key compromise**: DID keypair automatically revoked and regenerated; all services notified via `sigma-bus`
 
 ### Hardware Self-Heal
@@ -99,8 +120,11 @@ Hardware self-heal:
 ```
 
 Because SigmaOS drivers run in userspace (SDF), a driver crash is isolated and handled:
+
 - GPU driver dies → display server switches to `llvmpipe`/`softpipe` software renderer — user sees degraded performance, not a black screen
+
 - Audio driver dies → sigma-audio mutes gracefully, no kernel involvement
+
 - USB device pulled during a write → write barrier was already issued; file system state is consistent
 
 ---
@@ -108,23 +132,29 @@ Because SigmaOS drivers run in userspace (SDF), a driver crash is isolated and h
 ## CLI Commands
 
 ```bash
+
 # What was healed in the last 30 days
+
 sigma-heal status
 
 # Full repair history (paginated)
+
 sigma-heal log
 
 # Full history filtered by category
+
 sigma-heal log --category filesystem
 sigma-heal log --category security
 
 # Run simulation: what would happen if this component fails?
+
 sigma-heal simulate --component "nvidia.ko"
 sigma-heal simulate --component "wlan0"
 sigma-heal simulate --component "dns"
 sigma-heal simulate --component "/dev/sda1"
 
 # Export stats as JSON
+
 sigma-heal stats --output /tmp/heal-stats.json
 ```
 
@@ -166,9 +196,13 @@ Permanent fix needed: sigma-pkg update nvidia-sdf-driver
 ## Architecture
 
 sigma-heald is a Go daemon (`sigmad/heal/main.go`) that:
+
 1. Subscribes to `sigma-bus` for hardware, security, and package events
+
 2. Runs a 60-second poll loop for filesystem and service health
+
 3. Calls into `sigma_heal.h` C library for actual repair operations
+
 4. Writes all events to the DID-signed immutable audit journal
 
 ```
@@ -189,8 +223,11 @@ Poll loop (60s)
 ## What sigma-heal Does NOT Do
 
 - Does not modify data files (only system files and configurations)
+
 - Does not make network connections on your behalf (no phoning home)
+
 - Does not hide events — everything is logged to the DID-signed audit trail
+
 - Does not replace a human decision for FAILED repairs — admin is notified
 
 ---

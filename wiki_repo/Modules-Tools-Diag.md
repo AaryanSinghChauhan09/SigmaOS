@@ -81,14 +81,21 @@ void tracer_dump(const char *path);
 ## Roadmap
 
 - [x] Ring-buffer structured logger (`logger.rs`)
+
 - [x] PMU-based profiler stub (`profiler.rs`)
+
 - [x] Syscall tracer stub (`syscall_tracer.rs`)
+
 - [ ] Flamegraph generation (Brendan Gregg format)
+
 - [ ] Log shipping to Sovereign Audit Chain
+
 - [ ] Distributed tracing (OpenTelemetry-compatible spans)
+
 - [ ] Interactive TUI dashboard (`sigma-top`)
 
 ## Related Modules
 
 - [`modules/core/kernel`](../../core/kernel/README.md) — Kernel log sources
+
 - [`modules/security/access_control`](../../security/access_control/README.md) — Audit chain

@@ -6,14 +6,14 @@ This document details the advanced operating system design concepts absorbed fro
 
 ## 🚀 Competitor Features Absorbed Matrix
 
-| Incumbent USP | Source Competitor | SigmaOS Native Shard | Parity Level | Implementation Source | 
-| :--- | :--- | :--- | :--- | :--- | 
-| **Declarative System State**| NixOS (configuration.nix) |**S-Nix Config**|**Full** | `tools/sigma_nix_config.cpp` | 
-| **Sandboxed App Runtimes**| Linux Flatpak / Bubblewrap |**S-Flatpak Sandbox**|**Full** | `tools/sigma_flatpak.cpp` | 
-| **Silicon Cgroup Throttles**| Linux cgroups v2 / Kubernetes |**Sovereign Cgroups**|**Full** | `kernel/core/SovereignCgroup.cpp` | 
-| **CoW Storage Pooling**| OpenZFS / Apple APFS |**Sovereign ZFS Pool**|**Full** | `kernel/core/SovereignZFSPool.cpp` | 
-| **Dynamic Tracing / Observability**| Solaris DTrace / eBPF |**Sigma DTrace**|**Full** | `tools/sigma_dtrace.c` | 
-| **Zero-Reboot Hot-Patching**| RedHat kpatch / SUSE kGraft |**Sovereign Hot-Patch**|**Full** | `kernel/core/SovereignHotPatch.cpp` | 
+| Incumbent USP | Source Competitor | SigmaOS Native Shard | Parity Level | Implementation Source |
+| :--- | :--- | :--- | :--- | :--- |
+| **Declarative System State**| NixOS (configuration.nix) |**S-Nix Config**|**Full** | `tools/sigma_nix_config.cpp` |
+| **Sandboxed App Runtimes**| Linux Flatpak / Bubblewrap |**S-Flatpak Sandbox**|**Full** | `tools/sigma_flatpak.cpp` |
+| **Silicon Cgroup Throttles**| Linux cgroups v2 / Kubernetes |**Sovereign Cgroups**|**Full** | `kernel/core/SovereignCgroup.cpp` |
+| **CoW Storage Pooling**| OpenZFS / Apple APFS |**Sovereign ZFS Pool**|**Full** | `kernel/core/SovereignZFSPool.cpp` |
+| **Dynamic Tracing / Observability**| Solaris DTrace / eBPF |**Sigma DTrace**|**Full** | `tools/sigma_dtrace.c` |
+| **Zero-Reboot Hot-Patching**| RedHat kpatch / SUSE kGraft |**Sovereign Hot-Patch**|**Full** | `kernel/core/SovereignHotPatch.cpp` |
 
 ---
 

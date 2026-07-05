@@ -1,6 +1,6 @@
-# Detects trojan source attacks that employ unicode bidi attacks to inject malicious code (`security/detect-bidi-characters`)
+﻿# Detects trojan source attacks that employ unicode bidi attacks to inject malicious code (`security/detect-bidi-characters`)
 
-⚠️ This rule _warns_ in the ✅ `recommended` config.
+âš ï¸ This rule _warns_ in the âœ… `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -22,7 +22,6 @@ var accessLevel = 'user';
 if (accessLevel != 'userRLO LRI// Check if adminPDI IRI') {
   console.log('You are an admin.');
 }
-
 ```
 
 The code above, will be rendered by a text editor as follows:
@@ -36,7 +35,6 @@ if (accessLevel != 'user') {
   // Check if admin
   console.log('You are an admin.');
 }
-
 ```
 
 By looking at the rendered code above, a user reviewing this code might not notice the injected malicious unicode characters which are actually changing the semantic and the behaviour of the actual code.

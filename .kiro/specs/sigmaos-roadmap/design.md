@@ -4,29 +4,37 @@
 
 This design document specifies the technical implementation for the complete SigmaOS full-platform roadmap, encompassing 40 requirements organized into five development phases (Phase 0–4) and three bug fix severity levels (Critical, High, Medium). The roadmap transforms SigmaOS from a prototype into a production-grade, bootable, secure operating system with kernel stability, a polished web-shell desktop, complete applications, platform features, and a developer ecosystem.
 
-**Core Architecture Context:**
+### Core Architecture Context:
 
 SigmaOS is a minimal Chromium-based operating system built on Buildroot that boots to browser in under 3 seconds. The browser serves as the OS shell, with workspaces and window management implemented entirely as web applications. The architecture consists of four layers:
 
 1. **User Layer**: SigmaOS Shell (React/Svelte UI), PWAs, extensions, workspaces, AI kits, resource manager
+
 2. **Browser Layer**: Custom Chromium fork with SigmaOS APIs, multi-profile manager, tab suspension, native messaging host
+
 3. **System Layer**: SigmaOS daemons (Go) handling processes, clipboard, BlueZ, workspaces, native windows
+
 4. **OS Base Layer**: Minimal Linux (Buildroot) with systemd, bubblewrap, and seccomp for isolation
 
-**Security Model:**
+### Security Model:
 
 - Native messaging bridge: Daemons listen locally, gated by the SigmaOS extension
+
 - Bubblewrap containers: All processes run in isolated namespaces with restricted network, filesystem, and PID access
+
 - Capabilities system: Websites must explicitly request capabilities for binary access or filesystem paths
 
-**Key Design Principles:**
+### Key Design Principles:
 
 1. **Boot to Web**: Direct boot to Chromium without traditional desktop environment
-2. **Browser as OS Shell**: Window management, workspaces, and hardware interfaces via web apps
-3. **Unix Philosophy for Web**: PWAs gain access to raw system primitives (pipe, spawn, mmap, /dev)
-4. **Zero-Bloat Packaging**: Alpine packages installed directly into user-space
-5. **Strict Isolation**: Every execution context sandboxed by default
 
+2. **Browser as OS Shell**: Window management, workspaces, and hardware interfaces via web apps
+
+3. **Unix Philosophy for Web**: PWAs gain access to raw system primitives (pipe, spawn, mmap, /dev)
+
+4. **Zero-Bloat Packaging**: Alpine packages installed directly into user-space
+
+5. **Strict Isolation**: Every execution context sandboxed by default
 
 ## Architecture
 
@@ -103,7 +111,7 @@ SigmaOS is a minimal Chromium-based operating system built on Buildroot that boo
 
 ### Component Responsibilities
 
-**Phase 0: Kernel Stability (Hardware Foundation)**
+### Phase 0: Kernel Stability (Hardware Foundation)
 
 1. **Interrupt Descriptor Table (IDT) Module**
    - Initialization: `sigma_idt_init()`
@@ -129,253 +137,247 @@ SigmaOS is a minimal Chromium-based operating system built on Buildroot that boo
    - Replacement of `fake_dev` stub
    - Empty slot detection (0xFFFF vendor ID)
 
-**Phase 1: Shell Polish (User Experience)**
+### Phase 1: Shell Polish (User Experience)
 
-5. **Window Manager** (Web Shell component)
+1. **Window Manager** (Web Shell component)
    - In-page window rendering (no `window.open()`)
    - Drag handlers for title bars
    - Resize handlers with 200×150px minimum
    - Persistent taskbar with focus management
    - Z-index stacking management
 
-
-6. **SigmaNotes Application**
+2. **SigmaNotes Application**
    - Split-pane layout (source + preview)
    - Markdown rendering engine integration
    - 500ms update latency target
    - Formatting toolbar (bold, italic, heading, link)
    - Cursor position tracking for insertions
 
-7. **SigmaCode IDE Application**
+3. **SigmaCode IDE Application**
    - Code editor engine (Monaco or CodeMirror)
    - Syntax highlighting, line numbers, multi-cursor
    - Filesystem access via `navigator.sigmaos.fs.*`
    - Process spawn via `navigator.sigmaos.process.spawn()`
    - Integrated terminal panel for stdout/stderr
 
-8. **Notification Center**
+4. **Notification Center**
    - Bell icon in system tray
    - Notification queue (FIFO)
    - Slide-out panel with chronological listing
    - Badge counter for unread notifications
    - `navigator.sigmaos.notification.show()` API
 
-9. **Lock Screen**
+5. **Lock Screen**
    - Ctrl+L hotkey binding
    - Full-screen overlay (z-index management)
    - Date/time display (1-second update interval)
    - PIN/credential verification
    - Three-strike lockout (30-second penalty)
 
-**Phase 2: App Completions (Feature Parity)**
+### Phase 2: App Completions (Feature Parity)
 
-10. **SigmaTerm PTY Module**
+1. **SigmaTerm PTY Module**
     - Server-side PTY allocation
     - WebSocket or SSE multiplexing
     - 50ms input latency target
     - 100ms output rendering latency
     - SIGWINCH on resize (column/row dimensions)
 
-11. **SigmaNotes AI Integration**
+2. **SigmaNotes AI Integration**
     - HTTP client for `localhost:17392`
     - 5-second timeout handling
     - Inline suggestion display
     - Non-blocking editor during inference
     - Retry mechanism on timeout
 
-12. **SigmaPaint Layers Panel**
+3. **SigmaPaint Layers Panel**
     - Layer list UI component
     - Layer creation (above current layer)
     - Visibility toggle with 100ms recomposite
     - Drag-to-reorder with immediate canvas update
     - Canvas composite engine
 
-
-13. **Neural UI Engine**
+4. **Neural UI Engine**
     - HTTP POST to `localhost:17392/v1/predict`
     - Prediction application to UI context
     - Non-200 response fallback to last prediction
     - Unreachable endpoint detection
     - Single non-blocking status indicator
 
-14. **Enterprise Dashboard**
+5. **Enterprise Dashboard**
     - SSE connection to telemetry stream
     - 200ms metric widget update latency
     - Exponential backoff reconnection (1s → 30s cap)
     - Visible disconnection status indicator
     - Real-time metric rendering
 
-**Phase 3: Platform Features (Advanced Capabilities)**
+### Phase 3: Platform Features (Advanced Capabilities)
 
-15. **Zero-Install Package Execution**
+1. **Zero-Install Package Execution**
     - `bwrap` invocation with minimal capabilities
     - Manifest-derived capability set
     - Syscall filtering via seccomp
     - Capability violation logging to audit log
     - 500ms resource cleanup on exit
 
-16. **Cloud Sync Module**
+2. **Cloud Sync Module**
     - OAuth wizard UI flow
     - Credential vault storage (access/refresh tokens)
     - Topbar sync-status indicator (Idle, Syncing, Error, Disconnected)
     - Human-readable error messages on hover
     - Multi-provider support structure
 
-17. **SigmaAI Assistant**
+3. **SigmaAI Assistant**
     - Spotlight-style overlay UI
     - Natural language query input
     - 2-second result latency target
     - Result ranking (apps, filesystem, settings)
     - Fallback to text-match search when AI unavailable
 
-18. **Cross-App Clipboard** (`sigmad_clipboard`)
+4. **Cross-App Clipboard** (`sigmad_clipboard`)
     - Session-resident daemon
     - Clipboard-updated event broadcast
     - 100ms read latency guarantee
     - MIME type support (text/plain, text/html, image/*)
     - IPC via D-Bus or Unix sockets
 
+### Phase 4: Ecosystem (Developer & Community)
 
-**Phase 4: Ecosystem (Developer & Community)**
-
-19. **App Developer SDK**
+1. **App Developer SDK**
     - JSDoc-annotated API reference
     - Machine-readable manifest schema (JSON Schema)
     - Template repository (minimal working app)
     - Schema validation with error reporting (field path + message)
 
-20. **App Store Backend**
+2. **App Store Backend**
     - Live registry endpoint client
     - 3-second metadata update latency
     - Package download + signature verification
     - Installation pipeline
     - Untrusted package rejection UI
 
-21. **GitHub & CI Hygiene**
+3. **GitHub & CI Hygiene**
     - Issue template compliance
     - Test suite execution (10-minute target)
     - No permanently commented-out tests
     - Signed release artifact for v0.1.0
     - File path validation in workflows
 
-22. **Documentation Wiki**
+4. **Documentation Wiki**
     - Architecture document (kernel, HAL, scheduler, FS, net, security)
     - API reference (syscalls, IPC, SDK)
     - Build guide (bootable image from source)
     - App tutorial (create, sign, publish)
     - Security model (trust boundaries, capabilities, attestation)
 
-**Bug Fix Components**
+### Bug Fix Components
 
-23. **PID 1 Init Watchdog** (`sigma_init.cpp`)
+1. **PID 1 Init Watchdog** (`sigma_init.cpp`)
     - Infinite wait loop after service launch
     - `hlt` instruction in tight loop
     - Service exit logging (name + exit code)
     - Auto-restart on non-zero exit
 
-24. **ZeroTrust String Operations** (`sigma_zerotrust.cpp`)
+2. **ZeroTrust String Operations** (`sigma_zerotrust.cpp`)
     - Bounded string copies (`strncpy`, `snprintf`)
     - Explicit size limits with null termination
     - Buffer overflow prevention
     - Security event logging on capacity exceeded
 
-
-25. **Revoked Workload Policy** (`sigma_zerotrust.cpp`)
+3. **Revoked Workload Policy** (`sigma_zerotrust.cpp`)
     - Revocation list consultation on every check
     - Capability denial for revoked identities
     - Revocation error code return
     - Runtime revocation enforcement (no restart required)
 
-26. **Extension Promise Resolution** (`background.js`)
+4. **Extension Promise Resolution** (`background.js`)
     - 10-second timeout on all API calls
     - Timeout error rejection
     - No permanently unresolved Promises
     - Pending Promise rejection on restart
 
-27. **Freestanding Kernel Build** (`CMakeLists.txt`)
+5. **Freestanding Kernel Build** (`CMakeLists.txt`)
     - `-nostdlib`, `-nostdinc`, `-ffreestanding` flags
     - No hosted stdlib headers in kernel code
     - Link against sovereign libc
     - CI verification via `nm` (no glibc symbols)
 
-28. **Init Service Array Bounds** (`sigma_init.cpp`)
+6. **Init Service Array Bounds** (`sigma_init.cpp`)
     - `MAX_SERVICES` compile-time constant
     - Overflow check in `sigma_init_register()`
     - Error return on capacity exceeded
     - Warning log with rejected service name
 
-29. **Complete Kernel Sources**
+7. **Complete Kernel Sources**
     - All `CMakeLists.txt` files compile without errors
     - Object code from every translation unit (verified via `nm`)
     - CI build failure on missing files
 
-30. **CI Test Activation**
+8. **CI Test Activation**
     - All test cases execute (no commented-out blocks)
     - Failed test pipeline marking
     - Test execution under 10 minutes
 
-31. **Firewall Packet Inspection** (`sigma_shield.cpp`)
+9. **Firewall Packet Inspection** (`sigma_shield.cpp`)
     - Real packet header evaluation
     - No mocked packet data in production paths
     - Drop counter updates with actual packet fields
     - 1ms per-packet processing target
 
-32. **Audit Log Timestamps**
+10. **Audit Log Timestamps**
     - Real wall-clock timestamps (system clock)
     - ISO 8601 format with millisecond precision
     - No hardcoded timestamp values
 
-
-33. **Go Daemon Error Handling** (storage ejection)
+11. **Go Daemon Error Handling** (storage ejection)
     - `handleEject` failure propagation
     - Non-success response on unmount error
     - Success response only on verified unmount
 
-34. **Separate WiFi/Bluetooth Builds**
+12. **Separate WiFi/Bluetooth Builds**
     - Separate CMake targets for WiFi and Bluetooth
     - WiFi-only build excludes Bluetooth objects
     - Bluetooth-only build excludes WiFi objects
 
-35. **Web Shell XSS Prevention**
+13. **Web Shell XSS Prevention**
     - No direct `innerHTML` assignment with untrusted data
     - `textContent` or DOM sanitization for user content
     - Allowlist-based sanitizer for HTML rendering
     - CI static analysis for `innerHTML` usage
 
-36. **TCP Fuzzer Reproducibility**
+14. **TCP Fuzzer Reproducibility**
     - Seed value command-line/env argument
     - Reproducible packet sequence from seed
     - High-entropy default seed from system entropy
     - Seed logging at session start
 
-37. **CryptFS Key Derivation Implementation**
+15. **CryptFS Key Derivation Implementation**
     - Key computation in `sigma_cryptfs_derive_key()`
     - Full key buffer write before return
     - Key buffer zeroing on failure
     - Deterministic 256-bit key from passphrase + salt
 
-38. **SIGMA_PROFILE Flag Usage**
+16. **SIGMA_PROFILE Flag Usage**
     - Per-function timing instrumentation when enabled
     - Profiling output to buffer/file
     - Build guide documentation for flag
 
-39. **CI Path Validation**
+17. **CI Path Validation**
     - All workflow paths exist in repository
     - Pipeline lint step for path validation
     - Descriptive error for invalid paths
 
-40. **Connection Tracking Counter**
+18. **Connection Tracking Counter**
     - Counter decrement on CLOSED state
     - Counter decrement before entry removal
     - Counter equals active entries at all times
     - Configurable maximum with rejection and logging
 
-
 ## Components and Interfaces
 
 ### Phase 0: Kernel Interfaces
 
-**IDT Module Interface**
+### IDT Module Interface
 
 ```c
 // sigma_idt.h
@@ -391,7 +393,7 @@ void sigma_idt_register(uint8_t vector, isr_handler_t handler);
 void sigma_idt_load(void);
 ```
 
-**Usermode Transition Interface**
+### Usermode Transition Interface
 
 ```c
 // sigma_usermode.h
@@ -408,7 +410,7 @@ void sigma_tss_init(uint64_t kernel_stack);
 void jump_to_usermode(uint64_t entry_point, uint64_t user_stack);
 ```
 
-**CryptFS Interface**
+### CryptFS Interface
 
 ```c
 // sigma_cryptfs.h
@@ -433,7 +435,7 @@ int sigma_cryptfs_derive_key(const char* passphrase,
 int sigma_cryptfs_unmount(void);
 ```
 
-**PCI Scanner Interface**
+### PCI Scanner Interface
 
 ```c
 // pci_scanner.h
@@ -452,10 +454,9 @@ int pci_scan_devices(pci_device_t* devices, size_t max_devices);
 uint32_t pci_read_config(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
 ```
 
-
 ### Phase 1: Web Shell Interfaces
 
-**Window Manager API (JavaScript)**
+### Window Manager API (JavaScript)
 
 ```javascript
 // windowManager.js
@@ -489,7 +490,7 @@ class WindowManager {
 }
 ```
 
-**SigmaNotes API**
+### SigmaNotes API
 
 ```javascript
 // sigmaNotes.js
@@ -517,7 +518,7 @@ class SigmaNotes {
 }
 ```
 
-**SigmaCode API**
+### SigmaCode API
 
 ```javascript
 // sigmaCode.js
@@ -553,8 +554,7 @@ class SigmaCode {
 }
 ```
 
-
-**Notification Center API**
+### Notification Center API
 
 ```javascript
 // notificationCenter.js
@@ -592,7 +592,7 @@ navigator.sigmaos.notification = {
 };
 ```
 
-**Lock Screen API**
+### Lock Screen API
 
 ```javascript
 // lockScreen.js
@@ -630,10 +630,9 @@ class LockScreen {
 }
 ```
 
-
 ### Phase 2: Application Interfaces
 
-**SigmaTerm PTY Interface**
+### SigmaTerm PTY Interface
 
 ```javascript
 // sigmaTerm.js (client)
@@ -693,7 +692,7 @@ func (s *PTYSession) HandleResize(cols, rows int) {
 }
 ```
 
-**SigmaNotes AI Client**
+### SigmaNotes AI Client
 
 ```javascript
 // sigmaNotesAI.js
@@ -726,8 +725,7 @@ class NotesAIClient {
 }
 ```
 
-
-**SigmaPaint Layers Interface**
+### SigmaPaint Layers Interface
 
 ```javascript
 // sigmaPaint.js
@@ -777,7 +775,7 @@ class SigmaPaint {
 }
 ```
 
-**Neural UI Engine Interface**
+### Neural UI Engine Interface
 
 ```javascript
 // neuralUIEngine.js
@@ -812,8 +810,7 @@ class NeuralUIEngine {
 }
 ```
 
-
-**Enterprise Dashboard SSE Interface**
+### Enterprise Dashboard SSE Interface
 
 ```javascript
 // enterpriseDashboard.js
@@ -864,7 +861,7 @@ class EnterpriseDashboard {
 
 ### Phase 3: Platform Interfaces
 
-**Zero-Install Execution Interface**
+### Zero-Install Execution Interface
 
 ```go
 // sigmad-sandbox/main.go
@@ -903,8 +900,7 @@ func ExecuteZeroInstall(manifest PackageManifest) error {
 }
 ```
 
-
-**Cloud Sync Interface**
+### Cloud Sync Interface
 
 ```javascript
 // cloudSync.js
@@ -950,7 +946,7 @@ class CloudSync {
 }
 ```
 
-**SigmaAI Assistant Interface**
+### SigmaAI Assistant Interface
 
 ```javascript
 // sigmaAIAssistant.js
@@ -1006,8 +1002,7 @@ class SigmaAIAssistant {
 }
 ```
 
-
-**Cross-App Clipboard Daemon Interface**
+### Cross-App Clipboard Daemon Interface
 
 ```go
 // sigmad-clipboard/main.go
@@ -1068,7 +1063,7 @@ func (d *ClipboardDaemon) Register(clientId string) chan ClipboardData {
 
 ### Phase 4: Ecosystem Interfaces
 
-**SDK Manifest Schema**
+### SDK Manifest Schema
 
 ```json
 {
@@ -1113,8 +1108,7 @@ func (d *ClipboardDaemon) Register(clientId string) chan ClipboardData {
 }
 ```
 
-
-**App Store Backend Interface**
+### App Store Backend Interface
 
 ```javascript
 // appStore.js
@@ -1176,7 +1170,7 @@ class AppStore {
 
 ### Kernel Data Structures
 
-**IDT Entry**
+### IDT Entry
 
 ```c
 typedef struct {
@@ -1190,7 +1184,7 @@ typedef struct {
 } __attribute__((packed)) idt_entry_t;
 ```
 
-**Task State Segment**
+### Task State Segment
 
 ```c
 typedef struct {
@@ -1206,8 +1200,7 @@ typedef struct {
 } __attribute__((packed)) tss_t;
 ```
 
-
-**PCI Device Structure**
+### PCI Device Structure
 
 ```c
 typedef struct {
@@ -1239,7 +1232,7 @@ typedef struct {
 
 ### Application Data Models
 
-**Window Configuration**
+### Window Configuration
 
 ```typescript
 interface WindowConfig {
@@ -1256,7 +1249,7 @@ interface WindowConfig {
 }
 ```
 
-**Notification Data**
+### Notification Data
 
 ```typescript
 interface Notification {
@@ -1275,7 +1268,7 @@ interface NotificationAction {
 }
 ```
 
-**Layer Data (SigmaPaint)**
+### Layer Data (SigmaPaint)
 
 ```typescript
 interface Layer {
@@ -1297,8 +1290,7 @@ interface Layer {
 type BlendMode = 'normal' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten';
 ```
 
-
-**PTY Session Data**
+### PTY Session Data
 
 ```typescript
 interface PTYSession {
@@ -1313,7 +1305,7 @@ interface PTYSession {
 }
 ```
 
-**Cloud Sync Configuration**
+### Cloud Sync Configuration
 
 ```typescript
 interface CloudSyncConfig {
@@ -1330,7 +1322,7 @@ interface CloudSyncConfig {
 }
 ```
 
-**Package Manifest**
+### Package Manifest
 
 ```typescript
 interface PackageManifest {
@@ -1360,7 +1352,7 @@ type Capability =
   | 'microphone';
 ```
 
-**Audit Log Entry**
+### Audit Log Entry
 
 ```c
 typedef struct {
@@ -1374,83 +1366,121 @@ typedef struct {
 } audit_log_entry_t;
 ```
 
-
 ## Error Handling
 
 ### Kernel Error Handling
 
-**IDT Initialization Errors**
+### IDT Initialization Errors
+
 - IDT descriptor load failure → Serial diagnostic message + system halt
+
 - Invalid ISR handler registration → Log warning, continue with default handler
+
 - Triple-fault detection → Emergency serial dump of registers + halt
 
-**Usermode Transition Errors**
+### Usermode Transition Errors
+
 - Invalid TSS configuration → Kernel panic with diagnostic
+
 - General protection fault on `iret` → Handle via IDT, log diagnostic, kill process
+
 - Invalid user stack pointer → Return error to caller, do not transition
 
-**CryptFS Errors**
+### CryptFS Errors
+
 - Invalid decryption key → Serial error message + halt (no unauthenticated mount)
+
 - dm-crypt layer failure → Propagate error code, log to serial
+
 - Mount timeout → Retry with exponential backoff (3 attempts), then halt
 
-**PCI Enumeration Errors**
-- Empty slot (0xFFFF vendor ID) → Skip silently, continue enumeration
-- Invalid BAR values → Log warning, mark device as unavailable
-- MMIO access fault → Log error, continue with next device
+### PCI Enumeration Errors
 
+- Empty slot (0xFFFF vendor ID) → Skip silently, continue enumeration
+
+- Invalid BAR values → Log warning, mark device as unavailable
+
+- MMIO access fault → Log error, continue with next device
 
 ### Application Error Handling
 
-**Window Manager Errors**
+### Window Manager Errors
+
 - Window creation failure → Return null, log to console
+
 - Invalid drag/resize bounds → Constrain to viewport
+
 - Z-index overflow → Reset all windows to base range
 
-**SigmaNotes/SigmaCode Errors**
+### SigmaNotes/SigmaCode Errors
+
 - File read failure → Show error dialog, keep empty editor
+
 - File write failure → Show error dialog, preserve content in memory
+
 - Markdown parsing error → Show error in preview pane, allow editing
+
 - Process spawn failure → Display error in terminal panel
 
-**AI Integration Errors**
+### AI Integration Errors
+
 - 5-second timeout → Display timeout message, allow retry
+
 - HTTP error (non-200) → Display error code, suggest checking daemon
+
 - Connection refused → Disable AI features, show status message
+
 - Invalid JSON response → Log error, display generic error message
 
-**PTY Errors**
+### PTY Errors
+
 - PTY allocation failure → Display error, disable terminal
+
 - WebSocket connection drop → Attempt reconnection (3 retries)
+
 - Resize signal failure → Log warning, continue operation
 
-**Clipboard Errors**
+### Clipboard Errors
+
 - Daemon unavailable → Fallback to browser clipboard API
+
 - IPC timeout → Retry once, then show error
+
 - MIME type unsupported → Convert to plain text if possible
 
-**App Store Errors**
+### App Store Errors
+
 - Registry unreachable → Show cached apps, display offline indicator
+
 - Signature verification failure → Abort installation, show untrusted package error
+
 - Download failure → Retry with exponential backoff (3 attempts)
+
 - Installation conflict → Show conflict resolution dialog
 
 ### Security Error Handling
 
-**ZeroTrust Module**
+### ZeroTrust Module
+
 - Revoked workload check → Deny capability, return revocation error
+
 - Buffer overflow attempt → Log security event, terminate process
+
 - Invalid capability request → Deny, log to audit log
 
-**Firewall Module**
+### Firewall Module
+
 - Invalid packet header → Drop packet, increment drop counter
+
 - Rule evaluation failure → Apply default deny policy, log error
 
-**Sandbox Violations**
-- Syscall not in allowlist → Block with EPERM, log violation
-- Namespace escape attempt → Kill process, log security event
-- Capability not in manifest → Deny operation, record violation
+### Sandbox Violations
 
+- Syscall not in allowlist → Block with EPERM, log violation
+
+- Namespace escape attempt → Kill process, log security event
+
+- Capability not in manifest → Deny operation, record violation
 
 ## Testing Strategy
 
@@ -1458,21 +1488,30 @@ typedef struct {
 
 This roadmap encompasses infrastructure, UI components, kernel-level code, configuration, and side-effect operations. Most requirements fall into categories where property-based testing (PBT) is **NOT appropriate**:
 
-**Why PBT is NOT Applicable:**
+### Why PBT is NOT Applicable:
 
 1. **Infrastructure as Code** (Requirements 1-4, 27, 29, 34, 38, 39): Kernel initialization, build configuration, CI workflows
+
 2. **UI Rendering and Layout** (Requirements 5-9, 12): Window manager, lock screen, notification center
+
 3. **Configuration and Setup** (Requirements 21, 22, 38): GitHub hygiene, documentation, build flags
+
 4. **Side-Effect Operations** (Requirements 10, 14, 16, 18, 20, 33): PTY allocation, SSE streams, daemon operations
+
 5. **External Service Integration** (Requirements 11, 13, 17): AI daemon calls, cloud sync OAuth
 
-**Small Subset Where PBT May Apply:**
+### Small Subset Where PBT May Apply:
 
 - **Requirement 24**: String operations in ZeroTrust module (bounded copies, null termination)
+
 - **Requirement 25**: Revocation list checking (input: workload ID, output: allow/deny)
+
 - **Requirement 31**: Firewall packet header parsing (input: packet bytes, output: drop/allow)
+
 - **Requirement 36**: TCP fuzzer seed reproducibility (same seed → same packet sequence)
+
 - **Requirement 37**: CryptFS key derivation (same passphrase + salt → same key)
+
 - **Requirement 40**: Connection tracking counter invariant (counter == active entries)
 
 Given that only ~6 out of 40 requirements have potential PBT applicability, and those are testing low-level utility functions rather than core feature behavior, **we will skip the Correctness Properties section entirely** for this roadmap specification.
@@ -1480,48 +1519,79 @@ Given that only ~6 out of 40 requirements have potential PBT applicability, and 
 ### Recommended Testing Approach
 
 **Unit Tests** (Example-Based)
+
 - Test specific scenarios with concrete inputs
+
 - Focus on edge cases and error conditions
+
 - Mock external dependencies (daemons, filesystems, network)
+
 - Fast execution for CI pipeline
 
-**Integration Tests**
+### Integration Tests
+
 - Test component interactions (browser ↔ daemon, kernel ↔ userspace)
+
 - Verify IPC mechanisms (D-Bus, Unix sockets, native messaging)
+
 - Test with real PTY, real clipboard daemon, real AI endpoint
+
 - Run in isolated test environment
 
+### End-to-End Tests
 
-**End-to-End Tests**
 - Boot SigmaOS in QEMU
+
 - Verify IDT initialization on boot
+
 - Test usermode transition with sample process
+
 - Validate encrypted root mount
+
 - Test full application workflows (create note, edit code, run terminal)
 
-**Snapshot Tests**
+### Snapshot Tests
+
 - Kernel build output (`nm` symbol verification)
+
 - CI workflow syntax validation
+
 - App manifest schema validation
+
 - Documentation completeness checks
 
-**Security Tests**
+### Security Tests
+
 - Fuzz test ZeroTrust module string operations
+
 - Verify sandbox escape prevention (bubblewrap)
+
 - Test revocation list enforcement
+
 - Firewall rule evaluation with crafted packets
+
 - XSS prevention in web shell (CSP headers, sanitization)
 
-**Performance Tests**
+### Performance Tests
+
 - Window drag latency < 16ms (60fps)
+
 - Markdown preview update < 500ms
+
 - PTY input latency < 50ms
+
 - PTY output rendering < 100ms
+
 - Notification display < 200ms
+
 - Layer visibility toggle < 100ms
+
 - AI inference response < 5s
+
 - Dashboard metric update < 200ms
+
 - Clipboard read < 100ms
+
 - Search results < 2s
 
 ### Test Organization
@@ -1564,20 +1634,26 @@ tests/
     └── ai_inference_benchmark.js
 ```
 
-
 ### Test Coverage Targets
 
 - **Kernel modules**: 80% line coverage, 90% branch coverage
+
 - **Critical security modules** (ZeroTrust, Firewall, Sandbox): 95% branch coverage
+
 - **Web shell components**: 70% line coverage
+
 - **Applications**: 60% line coverage (focus on core functionality)
+
 - **Integration tests**: All IPC paths, all daemon interactions
+
 - **E2E tests**: Boot sequence, primary user workflows
 
 ### CI Pipeline Structure
 
 ```yaml
+
 # .github/workflows/sigma_ci.yml
+
 name: SigmaOS CI
 
 on: [pull_request, push]
@@ -1611,7 +1687,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Start daemons
-        run: | 
+        run: |
           ./sigmad-process &
           ./sigmad-clipboard &
           ./sigmad-ai &
@@ -1639,570 +1715,909 @@ jobs:
         run: make test-firewall
 ```
 
-
 ## Implementation Approach
 
 ### Phase 0: Kernel Stability (Week 1-2)
 
-**Priority: Critical - Foundation for all other work**
+### Priority: Critical - Foundation for all other work
 
 **IDT Initialization** (2 days)
+
 1. Define `idt_entry_t` structure with proper packing
+
 2. Implement `sigma_idt_init()` to populate 32 exception handlers
+
 3. Write ISR stub assembly code for vectors 0-31
+
 4. Add serial diagnostic output on IDT load failure
+
 5. Test on real hardware (verify no triple-faults)
 
 **Usermode Transition** (3 days)
+
 1. Define `tss_t` structure with Ring 0 stack pointer
+
 2. Implement `sigma_tss_init()` to configure TSS
+
 3. Write `jump_to_usermode()` assembly routine with `iret`
+
 4. Add per-process kernel stack allocation
+
 5. Implement GP fault handler for transition errors
+
 6. Test with simple Ring 3 program
 
 **CryptFS Integration** (3 days)
+
 1. Implement `sigma_cryptfs_derive_key()` with PBKDF2
+
 2. Wire `sigma_cryptfs_mount_root()` to dm-crypt
+
 3. Add key buffer writing before dm-crypt handoff
+
 4. Implement authentication failure halt logic
+
 5. Test with encrypted test volume
 
 **PCI Enumeration** (2 days)
-1. Replace `fake_dev` stub with MMIO config space reads
-2. Implement bus/device/function iteration (0-255, 0-31, 0-7)
-3. Parse vendor ID, device ID, class code, BARs
-4. Skip empty slots (0xFFFF vendor ID)
-5. Test on real x86_64 hardware with multiple PCI devices
 
+1. Replace `fake_dev` stub with MMIO config space reads
+
+2. Implement bus/device/function iteration (0-255, 0-31, 0-7)
+
+3. Parse vendor ID, device ID, class code, BARs
+
+4. Skip empty slots (0xFFFF vendor ID)
+
+5. Test on real x86_64 hardware with multiple PCI devices
 
 ### Phase 1: Shell Polish (Week 3-4)
 
-**Priority: High - User-facing experience**
+### Priority: High - User-facing experience
 
 **Window Manager** (4 days)
+
 1. Create `WindowManager` class with window registry
+
 2. Implement in-page window rendering (no `window.open()`)
+
 3. Add drag handlers with mouse event tracking
+
 4. Add resize handlers with 200×150px minimum constraint
+
 5. Implement z-index stacking and focus management
+
 6. Build persistent taskbar with window list
+
 7. Test drag/resize performance (< 16ms frame time)
 
 **SigmaNotes** (2 days)
+
 1. Create split-pane layout with HTML/CSS
+
 2. Integrate markdown rendering library (e.g., marked.js)
+
 3. Add debounced preview update (500ms)
+
 4. Implement toolbar with formatting buttons
+
 5. Add cursor position tracking for insertions
+
 6. Test with large documents
 
 **SigmaCode** (3 days)
+
 1. Integrate Monaco or CodeMirror editor
+
 2. Connect filesystem API for open/save
+
 3. Implement process spawn for run action
+
 4. Add integrated terminal panel for output
+
 5. Configure syntax highlighting for common languages
+
 6. Test with multi-file projects
 
 **Notification Center** (2 days)
+
 1. Create bell icon in system tray
+
 2. Implement FIFO notification queue
+
 3. Build slide-out panel UI
+
 4. Add badge counter logic
+
 5. Integrate with `navigator.sigmaos.notification` API
+
 6. Test with multiple concurrent notifications
 
 **Lock Screen** (2 days)
-1. Create full-screen overlay component
-2. Bind Ctrl+L hotkey
-3. Add date/time display with 1s updates
-4. Implement PIN verification logic
-5. Add three-strike lockout (30s penalty)
-6. Test lockout timer accuracy
 
+1. Create full-screen overlay component
+
+2. Bind Ctrl+L hotkey
+
+3. Add date/time display with 1s updates
+
+4. Implement PIN verification logic
+
+5. Add three-strike lockout (30s penalty)
+
+6. Test lockout timer accuracy
 
 ### Phase 2: App Completions (Week 5-6)
 
-**Priority: Medium - Feature parity**
+### Priority: Medium - Feature parity
 
 **SigmaTerm PTY** (3 days)
+
 1. Implement Go server-side PTY allocator using `creack/pty`
+
 2. Add WebSocket server for PTY I/O multiplexing
+
 3. Integrate xterm.js client library
+
 4. Implement 50ms input forwarding
+
 5. Add SIGWINCH resize signal handling
+
 6. Test with interactive programs (vim, htop)
 
 **SigmaNotes AI** (2 days)
+
 1. Add HTTP client for `localhost:17392`
+
 2. Implement 5-second timeout with AbortController
+
 3. Create inline suggestion display UI
+
 4. Add non-blocking request handling
+
 5. Implement retry mechanism
+
 6. Test with various text contexts
 
 **SigmaPaint Layers** (2 days)
+
 1. Create layers panel UI component
+
 2. Implement layer creation (above current)
+
 3. Add visibility toggle with recomposite
+
 4. Implement drag-to-reorder with event handlers
+
 5. Build canvas composite engine
+
 6. Test recomposite performance (< 100ms)
 
 **Neural UI Engine** (2 days)
+
 1. Implement HTTP POST to `/v1/predict`
+
 2. Add response status handling (200 vs non-200)
+
 3. Implement fallback to last prediction
+
 4. Add unreachable endpoint detection
+
 5. Create status indicator UI
+
 6. Test with mock prediction server
 
 **Enterprise Dashboard** (2 days)
-1. Create SSE connection manager
-2. Implement metric widget update logic (< 200ms)
-3. Add exponential backoff reconnection
-4. Create disconnection status indicator
-5. Build real-time metric rendering
-6. Test with high-frequency telemetry stream
 
+1. Create SSE connection manager
+
+2. Implement metric widget update logic (< 200ms)
+
+3. Add exponential backoff reconnection
+
+4. Create disconnection status indicator
+
+5. Build real-time metric rendering
+
+6. Test with high-frequency telemetry stream
 
 ### Phase 3: Platform Features (Week 7-8)
 
-**Priority: Medium - Advanced capabilities**
+### Priority: Medium - Advanced capabilities
 
 **Zero-Install Execution** (3 days)
+
 1. Implement Go sandbox manager with bubblewrap
+
 2. Parse package manifest for capabilities
+
 3. Build bwrap command with minimal capability set
+
 4. Add seccomp filtering for syscall enforcement
+
 5. Implement capability violation logging
+
 6. Add 500ms resource cleanup
+
 7. Test with various package types
 
 **Cloud Sync** (3 days)
+
 1. Build OAuth wizard UI flow
+
 2. Implement provider-specific OAuth handlers
+
 3. Add credential vault integration
+
 4. Create topbar sync-status indicator
+
 5. Implement sync state machine (Idle/Syncing/Error/Disconnected)
+
 6. Add error message display on hover
+
 7. Test with Google Drive and Dropbox
 
 **SigmaAI Assistant** (3 days)
+
 1. Create Spotlight-style overlay UI
+
 2. Implement natural language query input
+
 3. Add HTTP client for AI search endpoint
+
 4. Build result ranking algorithm
+
 5. Implement text-match fallback search
+
 6. Index installed apps, filesystem, settings
+
 7. Test response latency (< 2s target)
 
 **Cross-App Clipboard** (2 days)
-1. Implement Go clipboard daemon with D-Bus
-2. Add clipboard-updated event broadcast
-3. Implement MIME type support (text, HTML, image)
-4. Add 100ms read latency optimization
-5. Create client library for apps
-6. Test cross-app copy/paste
 
+1. Implement Go clipboard daemon with D-Bus
+
+2. Add clipboard-updated event broadcast
+
+3. Implement MIME type support (text, HTML, image)
+
+4. Add 100ms read latency optimization
+
+5. Create client library for apps
+
+6. Test cross-app copy/paste
 
 ### Phase 4: Ecosystem (Week 9-10)
 
-**Priority: Medium - Developer enablement**
+### Priority: Medium - Developer enablement
 
 **App Developer SDK** (3 days)
+
 1. Write JSDoc annotations for all public APIs
+
 2. Create JSON Schema for manifest validation
+
 3. Build template repository with minimal app
+
 4. Implement schema validator with error reporting
+
 5. Write API reference documentation
+
 6. Create quickstart tutorial
 
 **App Store Backend** (3 days)
+
 1. Implement live registry client
+
 2. Add package download with progress tracking
+
 3. Implement RSA signature verification
+
 4. Build installation pipeline
+
 5. Create untrusted package error UI
+
 6. Test with test registry server
 
 **GitHub & CI Hygiene** (2 days)
+
 1. Create issue templates (bug, feature, docs)
+
 2. Audit CI workflows for valid file paths
+
 3. Uncomment and fix all test blocks
+
 4. Configure signed release workflow for v0.1.0
+
 5. Add CI path validation step
+
 6. Test full CI pipeline execution
 
 **Documentation Wiki** (3 days)
-1. Write architecture document (kernel, HAL, scheduler, FS, net, security)
-2. Write API reference (syscalls, IPC, SDK entry points)
-3. Write build guide (source → bootable image)
-4. Write app tutorial (create, sign, publish)
-5. Write security model document (trust boundaries, capabilities, attestation)
-6. Review for completeness and accuracy
 
+1. Write architecture document (kernel, HAL, scheduler, FS, net, security)
+
+2. Write API reference (syscalls, IPC, SDK entry points)
+
+3. Write build guide (source → bootable image)
+
+4. Write app tutorial (create, sign, publish)
+
+5. Write security model document (trust boundaries, capabilities, attestation)
+
+6. Review for completeness and accuracy
 
 ### Bug Fixes: Critical (Week 11)
 
-**Priority: Critical - System stability**
+### Priority: Critical - System stability
 
 **PID 1 Watchdog Loop** (1 day)
+
 1. Replace bounded loop with infinite `while(1)` loop
+
 2. Add `hlt` instruction in tight loop
+
 3. Implement service exit logging (name + code)
+
 4. Add auto-restart logic for failed services
+
 5. Test PID 1 remains alive indefinitely
 
 **ZeroTrust String Operations** (1 day)
+
 1. Replace all `strcpy` with `strncpy`
+
 2. Replace all `sprintf` with `snprintf`
+
 3. Add explicit size limits and null termination
+
 4. Implement security event logging on overflow
+
 5. Fuzz test with long inputs
 
 **Revoked Workload Policy** (1 day)
+
 1. Add revocation list consultation to every check
+
 2. Implement revocation error code return
+
 3. Remove authentication-only revocation check
+
 4. Add runtime revocation enforcement
+
 5. Test with revoked workload ID
 
 **Extension Promise Resolution** (1 day)
+
 1. Add 10-second timeout to all API calls
+
 2. Implement timeout error rejection
+
 3. Audit for unresolved Promises
+
 4. Add pending Promise rejection on restart
+
 5. Test with slow/unresponsive handlers
 
 **Freestanding Kernel Build** (1 day)
-1. Add `-nostdlib -nostdinc -ffreestanding` to CMakeLists.txt
-2. Remove hosted stdlib includes from kernel code
-3. Link against sovereign libc
-4. Add CI `nm` verification step
-5. Test full kernel build without glibc symbols
 
+1. Add `-nostdlib -nostdinc -ffreestanding` to CMakeLists.txt
+
+2. Remove hosted stdlib includes from kernel code
+
+3. Link against sovereign libc
+
+4. Add CI `nm` verification step
+
+5. Test full kernel build without glibc symbols
 
 ### Bug Fixes: High (Week 12)
 
-**Priority: High - Correctness and safety**
+### Priority: High - Correctness and safety
 
 **Init Service Array Bounds** (0.5 day)
+
 1. Define `MAX_SERVICES` constant
+
 2. Add overflow check in `sigma_init_register()`
+
 3. Implement error return on capacity exceeded
+
 4. Add warning log with service name
+
 5. Test with > MAX_SERVICES registrations
 
 **Complete Kernel Sources** (0.5 day)
+
 1. Audit CMakeLists.txt for all declared sources
+
 2. Create missing source files or remove declarations
+
 3. Verify object code from all translation units
+
 4. Add CI build verification
+
 5. Test full kernel build
 
 **CI Test Activation** (0.5 day)
+
 1. Uncomment all test blocks in CI workflows
+
 2. Fix any failing tests
+
 3. Verify < 10-minute execution time
+
 4. Add failed test pipeline marking
+
 5. Test full CI run
 
 **Firewall Packet Inspection** (1 day)
+
 1. Remove mocked packet data from production paths
+
 2. Implement real packet header evaluation
+
 3. Update drop counters with actual fields
+
 4. Optimize for 1ms per-packet processing
+
 5. Test with captured network traffic
 
 **Audit Log Timestamps** (0.5 day)
+
 1. Replace hardcoded timestamps with system clock
+
 2. Format as ISO 8601 with millisecond precision
+
 3. Remove any static timestamp values
+
 4. Test timestamp accuracy
 
 **Go Daemon Error Handling** (0.5 day)
+
 1. Check unmount system call return value
+
 2. Propagate error to caller on failure
+
 3. Return success only on verified unmount
+
 4. Test with busy filesystem
 
 **Separate WiFi/Bluetooth** (1 day)
-1. Create separate CMake targets
-2. Split source files into wifi/ and bluetooth/
-3. Verify WiFi-only build excludes Bluetooth
-4. Verify Bluetooth-only build excludes WiFi
-5. Test both build configurations
 
+1. Create separate CMake targets
+
+2. Split source files into wifi/ and bluetooth/
+
+3. Verify WiFi-only build excludes Bluetooth
+
+4. Verify Bluetooth-only build excludes WiFi
+
+5. Test both build configurations
 
 ### Bug Fixes: Medium (Week 13)
 
-**Priority: Medium - Quality improvements**
+### Priority: Medium - Quality improvements
 
 **XSS Prevention** (1 day)
+
 1. Audit web shell for direct `innerHTML` usage
+
 2. Replace with `textContent` or sanitizer
+
 3. Implement allowlist-based HTML sanitizer
+
 4. Add CI static analysis rule
+
 5. Test with XSS payloads
 
 **TCP Fuzzer Reproducibility** (0.5 day)
+
 1. Add seed command-line/env argument
+
 2. Implement reproducible PRNG seeding
+
 3. Add high-entropy default seed
+
 4. Log seed at session start
+
 5. Test reproducibility with same seed
 
 **CryptFS Key Derivation** (1 day)
+
 1. Implement key computation in `sigma_cryptfs_derive_key()`
+
 2. Write full key buffer before return
+
 3. Add key zeroing on failure
+
 4. Test deterministic output with same passphrase + salt
+
 5. Verify 256-bit key length
 
 **SIGMA_PROFILE Flag** (0.5 day)
+
 1. Add per-function timing instrumentation
+
 2. Write profiling output to buffer/file
+
 3. Document flag in build guide
+
 4. Test profiling data generation
 
 **CI Path Validation** (0.5 day)
+
 1. Add workflow path existence checks
+
 2. Implement pipeline lint step
+
 3. Add descriptive error messages
+
 4. Test with invalid paths
 
 **Connection Tracking Counter** (1 day)
-1. Add counter decrement on CLOSED state
-2. Add counter decrement before entry removal
-3. Verify counter == active entries invariant
-4. Add configurable maximum with logging
-5. Test with high connection churn
 
+1. Add counter decrement on CLOSED state
+
+2. Add counter decrement before entry removal
+
+3. Verify counter == active entries invariant
+
+4. Add configurable maximum with logging
+
+5. Test with high connection churn
 
 ## Security Considerations
 
 ### Kernel Security
 
-**Ring Separation Enforcement**
+### Ring Separation Enforcement
+
 - IDT configured to prevent Ring 3 from disabling interrupts
+
 - TSS provides separate kernel stacks per process
+
 - Page table permissions enforce memory isolation
+
 - I/O port access restricted to Ring 0
 
-**Encrypted Storage**
+### Encrypted Storage
+
 - All persistent data protected by dm-crypt
+
 - Keys derived using PBKDF2 with high iteration count
+
 - No plaintext key storage in memory beyond use
+
 - Unauthenticated filesystem mounting prevented
 
-**ZeroTrust Module**
+### ZeroTrust Module
+
 - All string operations bounded to prevent overflows
+
 - Revocation list checked on every capability request
+
 - Security events logged with full context
+
 - Buffer overflow attempts terminate process
 
-**Firewall Module**
+### Firewall Module
+
 - Packet inspection on real network traffic
+
 - Default deny policy on evaluation failure
+
 - Drop counters for forensic analysis
+
 - 1ms processing to prevent DoS via inspection overhead
 
 ### Application Security
 
-**Sandbox Isolation**
+### Sandbox Isolation
+
 - Bubblewrap provides namespace isolation (PID, net, mount, IPC)
+
 - Seccomp filters restrict syscalls to manifest capabilities
+
 - Filesystem access limited to declared paths
+
 - Network access disabled unless explicitly requested
 
-**Browser Security**
+### Browser Security
+
 - Content Security Policy headers on all web shell pages
+
 - No inline JavaScript evaluation
+
 - Sanitization of all user-generated content
+
 - XSS prevention via textContent and allowlist sanitizers
 
-**IPC Security**
+### IPC Security
+
 - Native messaging gated by SigmaOS extension
+
 - D-Bus policy restricts daemon access
+
 - Unix socket permissions limit client connections
+
 - Message authentication prevents spoofing
 
 ### Cryptographic Security
 
-**Encryption**
+### Encryption
+
 - AES-256 for filesystem encryption (dm-crypt)
+
 - PBKDF2 with ≥100,000 iterations for key derivation
+
 - Secure random number generation for salts
 
-**Signatures**
-- RSA-2048 minimum for package signatures
-- SHA-256 hash algorithm
-- Public key pinning for registry
-- Signature verification before any package execution
+### Signatures
 
+- RSA-2048 minimum for package signatures
+
+- SHA-256 hash algorithm
+
+- Public key pinning for registry
+
+- Signature verification before any package execution
 
 ### Audit and Compliance
 
-**Audit Logging**
+### Audit Logging
+
 - All security-relevant events logged with ISO 8601 timestamps
+
 - Subject, object, action, result recorded for each event
+
 - Tamper-evident log structure
+
 - Capability violations logged with call site information
 
-**Trust Boundaries**
+### Trust Boundaries
+
 - Kernel (Ring 0) ↔ Userspace (Ring 3): Syscall interface
+
 - Browser ↔ System daemons: Native messaging bridge
+
 - Applications ↔ Sandbox: Bubblewrap namespace isolation
+
 - User ↔ Applications: Capability manifest enforcement
 
-**Threat Model**
+### Threat Model
 
-*Assumed Adversaries:*
+### Assumed Adversaries:
+
 - Malicious web application attempting sandbox escape
+
 - Compromised browser extension attempting privilege escalation
+
 - Network attacker attempting packet injection/DoS
+
 - Physical attacker with brief device access (mitigated by lock screen + encryption)
 
-*Out of Scope:*
+### Out of Scope:
+
 - Physical attacker with sustained access (cold boot attacks, hardware implants)
+
 - Compromised kernel (requires code signing, verified boot in future)
+
 - Supply chain attacks on build toolchain
+
 - Side-channel attacks (Spectre, Meltdown)
 
 ### Capability Model
 
-**Capability Types:**
+### Capability Types:
+
 - `filesystem.read`: Read access to declared paths
+
 - `filesystem.write`: Write access to declared paths
+
 - `network`: Network socket creation
+
 - `process.spawn`: Process execution via sigmad-process
+
 - `clipboard`: Access to cross-app clipboard
+
 - `notification`: Display notifications
+
 - `camera`: Camera device access
+
 - `microphone`: Microphone device access
 
-**Enforcement Points:**
+### Enforcement Points:
+
 - Manifest parsing at package installation
+
 - Runtime checks in bubblewrap wrapper
+
 - Seccomp filter generation from capability list
+
 - Audit log recording on violation attempts
 
-**Revocation:**
-- Workload identity tokens can be revoked remotely
-- Revocation list consulted on every capability check
-- Revoked workloads denied all capabilities immediately
-- No process restart required for revocation enforcement
+### Revocation:
 
+- Workload identity tokens can be revoked remotely
+
+- Revocation list consulted on every capability check
+
+- Revoked workloads denied all capabilities immediately
+
+- No process restart required for revocation enforcement
 
 ## Design Decisions and Rationale
 
 ### Kernel Design Decisions
 
-**Why IDT for all 32 exception vectors?**
+### Why IDT for all 32 exception vectors?
+
 - x86_64 CPU can raise any exception 0-31
+
 - Unhandled exceptions cause triple-fault → system reset
+
 - Registering all handlers provides graceful degradation
+
 - Serial diagnostics enable debugging on real hardware
 
-**Why separate TSS per process?**
+### Why separate TSS per process?
+
 - Each process needs isolated kernel stack for syscalls
+
 - TSS provides hardware-enforced stack switching
+
 - Prevents kernel stack corruption across processes
+
 - Required for secure Ring 0/3 transitions
 
-**Why dm-crypt for root filesystem?**
+### Why dm-crypt for root filesystem?
+
 - Industry-standard encryption (used by LUKS)
+
 - Transparent to filesystem layer (works with any FS)
+
 - Hardware-accelerated AES on modern CPUs
+
 - Key derivation separates passphrase from encryption key
 
-**Why real PCI enumeration vs fake stub?**
+### Why real PCI enumeration vs fake stub?
+
 - Real hardware has diverse device configurations
+
 - Driver initialization depends on actual BARs
+
 - QEMU emulation differs from physical machines
+
 - Production OS must handle real PCI topology
 
 ### Application Design Decisions
 
-**Why in-page windows vs native OS windows?**
+### Why in-page windows vs native OS windows?
+
 - Browser is the OS shell (no separate window manager)
+
 - Consistent look/feel across all apps
+
 - Portable across host operating systems (for development)
+
 - Full control over window behavior and styling
 
-**Why Monaco/CodeMirror over custom editor?**
+### Why Monaco/CodeMirror over custom editor?
+
 - Production-grade syntax highlighting and LSP integration
+
 - Multi-cursor, find/replace, snippet support
+
 - Well-tested on millions of users (VS Code, CodeMirror)
+
 - Custom implementation would take months
 
-**Why WebSocket for PTY vs HTTP polling?**
+### Why WebSocket for PTY vs HTTP polling?
+
 - Interactive terminal needs low latency (< 50ms)
+
 - Bidirectional communication (input + output)
+
 - Efficient binary frame encoding
+
 - Standard protocol with browser support
 
-**Why 500ms debounce for markdown preview?**
-- Balance between responsiveness and CPU usage
-- Prevents stuttering during fast typing
-- Allows batch processing of edits
-- Matches user expectation (preview "catches up" quickly)
+### Why 500ms debounce for markdown preview?
 
+- Balance between responsiveness and CPU usage
+
+- Prevents stuttering during fast typing
+
+- Allows batch processing of edits
+
+- Matches user expectation (preview "catches up" quickly)
 
 ### Platform Design Decisions
 
-**Why bubblewrap for sandboxing?**
+### Why bubblewrap for sandboxing?
+
 - Userspace implementation (no kernel patches required)
+
 - Uses Linux namespaces (PID, net, mount, IPC)
+
 - Integrates with seccomp for syscall filtering
+
 - Battle-tested by Flatpak and Fedora Silverblue
+
 - Lighter than Docker/containers (no separate FS image)
 
-**Why OAuth for cloud sync vs API keys?**
+### Why OAuth for cloud sync vs API keys?
+
 - Industry standard for delegated authorization
+
 - Automatic token refresh without user re-auth
+
 - Scoped permissions (read-only vs read-write)
+
 - Revokable without changing user password
+
 - User-friendly authorization flow in browser
 
-**Why D-Bus for clipboard daemon?**
+### Why D-Bus for clipboard daemon?
+
 - Standard IPC on Linux systems
+
 - Policy-based access control
+
 - Signal broadcast for clipboard updates
+
 - Low latency (Unix domain sockets)
+
 - Language bindings for Go, JavaScript, Python
 
-**Why separate daemon per service?**
+### Why separate daemon per service?
+
 - Fault isolation (clipboard crash doesn't kill AI)
+
 - Independent restart and upgrade
+
 - Language choice per service (Go for systems, Python for AI)
+
 - Granular resource limits and monitoring
+
 - Follows Unix philosophy (do one thing well)
 
 ### Ecosystem Design Decisions
 
-**Why JSON Schema for manifests?**
+### Why JSON Schema for manifests?
+
 - Machine-readable validation
+
 - IDE autocompletion support (VS Code, IntelliJ)
+
 - Extensive tooling ecosystem
+
 - Human-readable error messages with field paths
+
 - Standard format for API documentation
 
-**Why RSA signatures for packages?**
+### Why RSA signatures for packages?
+
 - Asymmetric cryptography (public key distribution safe)
+
 - Widely supported (OpenSSL, Web Crypto API)
+
 - 2048-bit provides adequate security for next decade
+
 - Standard format for CI/CD integration
 
-**Why live registry vs static package list?**
-- Dynamic updates without OS upgrade
-- Centralized security advisory distribution
-- Usage analytics for app popularity
-- A/B testing for new features
-- Package author can update without user action
+### Why live registry vs static package list?
 
+- Dynamic updates without OS upgrade
+
+- Centralized security advisory distribution
+
+- Usage analytics for app popularity
+
+- A/B testing for new features
+
+- Package author can update without user action
 
 ## Phase Dependency Graph
 
@@ -2258,41 +2673,66 @@ graph TD
 ## Release Plan
 
 ### v0.1.0-alpha (End of Phase 0 + Critical Bugs)
+
 - Bootable kernel on x86_64 hardware
+
 - IDT + ISR handling
+
 - Ring 3 usermode transition
+
 - Encrypted root filesystem
+
 - Real PCI enumeration
+
 - Critical bug fixes (PID 1, ZeroTrust, extension Promises, freestanding build)
 
 ### v0.2.0-beta (End of Phase 1 + High Bugs)
+
 - In-page window manager
+
 - SigmaNotes, SigmaCode, SigmaTerm stubs
+
 - Notification center
+
 - Lock screen
+
 - High severity bug fixes
 
 ### v0.3.0 (End of Phase 2)
+
 - SigmaTerm with real PTY
+
 - SigmaNotes AI integration
+
 - SigmaPaint layers
+
 - Neural UI Engine with real inference
+
 - Enterprise Dashboard live telemetry
+
 - Medium severity bug fixes
 
 ### v0.4.0 (End of Phase 3)
+
 - Zero-install package execution
+
 - Cloud sync OAuth
+
 - SigmaAI Assistant
+
 - Cross-app clipboard daemon
 
 ### v1.0.0 (End of Phase 4)
-- App Developer SDK
-- App Store with live registry
-- Clean CI/CD pipeline
-- Complete documentation wiki
-- Signed v0.1.0 release artifact
 
+- App Developer SDK
+
+- App Store with live registry
+
+- Clean CI/CD pipeline
+
+- Complete documentation wiki
+
+- Signed v0.1.0 release artifact
 
 ## Correctness Properties
 
@@ -2303,122 +2743,122 @@ graph TD
 After analyzing all 40 requirements across the five phases and bug fix categories, **property-based testing is applicable to a limited subset** of requirements. The majority of requirements fall into categories where PBT is not appropriate:
 
 - **Infrastructure as Code**: Kernel initialization, build configuration, CI workflows (Requirements 1-4, 21, 27, 29, 34, 38, 39)
+
 - **UI Rendering and Interaction**: Window manager, notification center, lock screen (Requirements 5-9, 12)
+
 - **Side-Effect Operations**: PTY allocation, SSE streams, OAuth flows, daemon management (Requirements 10, 11, 13, 14, 16, 17, 18, 20, 33)
+
 - **Configuration and Documentation**: SDK, documentation wiki, CI templates (Requirements 19, 22)
 
 The following requirements contain testable properties where behavior varies meaningfully across inputs and property-based testing adds value:
-
 
 ### Property 1: ISR Handler Invocation for All Exception Vectors
 
 *For any* CPU exception vector in the range 0-31, when that exception is triggered, the kernel SHALL invoke the corresponding ISR handler without causing a triple-fault.
 
-**Validates: Requirements 1.3**
+### Validates: Requirements 1.3
 
 ### Property 2: Per-Process TSS Kernel Stack Isolation
 
 *For any* collection of user processes, each process SHALL have a unique kernel stack pointer in its TSS entry, ensuring no two processes share the same kernel stack.
 
-**Validates: Requirements 2.3**
+### Validates: Requirements 2.3
 
 ### Property 3: PCI Device Field Capture Completeness
 
 *For any* PCI device discovered during enumeration (vendor ID ≠ 0xFFFF), the PCI scanner SHALL record all required fields (vendor_id, device_id, class_code, BARs).
 
-**Validates: Requirements 4.3**
+### Validates: Requirements 4.3
 
 ### Property 4: Empty PCI Slot Exclusion
 
 *For any* PCI configuration space scan where some slots return vendor ID 0xFFFF, those slots SHALL NOT appear in the final device list.
 
-**Validates: Requirements 4.4**
+### Validates: Requirements 4.4
 
 ### Property 5: Window Drag Position Translation
 
 *For any* window and any drag delta (Δx, Δy) applied to its title bar, the window's final position SHALL be (initial_x + Δx, initial_y + Δy).
 
-**Validates: Requirements 5.2**
+### Validates: Requirements 5.2
 
 ### Property 6: Window Resize Minimum Constraints
 
 *For any* window resize operation, the resulting window dimensions SHALL satisfy width ≥ 200 pixels AND height ≥ 150 pixels.
 
-**Validates: Requirements 5.3**
+### Validates: Requirements 5.3
 
 ### Property 7: Sandbox Syscall Enforcement
 
 *For any* syscall attempted by a sandboxed process, IF that syscall is not covered by the process's declared capability list, THEN the syscall SHALL be denied with EPERM.
 
-**Validates: Requirements 15.2**
+### Validates: Requirements 15.2
 
 ### Property 8: Capability Violation Audit Logging
 
 *For any* capability request not declared in the package manifest, the system SHALL deny the operation AND record a violation entry in the audit log.
 
-**Validates: Requirements 15.3**
-
+### Validates: Requirements 15.3
 
 ### Property 9: Clipboard Round-Trip Fidelity
 
 *For any* clipboard payload with a supported MIME type (text/plain, text/html, image/*), writing the payload and immediately reading it back SHALL return identical content and MIME type.
 
-**Validates: Requirements 18.3, 18.4**
+### Validates: Requirements 18.3, 18.4
 
 ### Property 10: ZeroTrust Bounded String Copy
 
 *For any* input string and target buffer, the ZeroTrust module's string copy operation SHALL never write beyond the buffer boundary, even when the input exceeds buffer capacity.
 
-**Validates: Requirements 24.1, 24.2**
+### Validates: Requirements 24.1, 24.2
 
 ### Property 11: Buffer Overflow Security Event Logging
 
 *For any* string input that exceeds the target buffer capacity in the ZeroTrust module, a security event SHALL be recorded in the audit log.
 
-**Validates: Requirements 24.4**
+### Validates: Requirements 24.4
 
 ### Property 12: Revocation List Consultation on Every Check
 
 *For any* workload identity and capability request, the ZeroTrust module SHALL consult the revocation list before returning an allow/deny decision.
 
-**Validates: Requirements 25.1, 25.3**
+### Validates: Requirements 25.1, 25.3
 
 ### Property 13: Runtime Revocation Enforcement
 
 *For any* running workload that is added to the revocation list, all subsequent capability requests from that workload SHALL be denied with a revocation error, without requiring process restart.
 
-**Validates: Requirements 25.4**
+### Validates: Requirements 25.4
 
 ### Property 14: Firewall Real Packet Header Evaluation
 
 *For any* network packet arriving at the firewall, rule evaluation SHALL reference the actual packet header fields (source IP, dest IP, ports, protocol) rather than mocked or cached values.
 
-**Validates: Requirements 31.1, 31.2**
+### Validates: Requirements 31.1, 31.2
 
 ### Property 15: Firewall Drop Counter Accuracy
 
 *For any* sequence of N packets dropped by the firewall, the drop counter for the matching rule SHALL increment exactly N times, using actual packet header fields for counter identification.
 
-**Validates: Requirements 31.3**
-
+### Validates: Requirements 31.3
 
 ### Property 16: TCP Fuzzer Seed Reproducibility
 
 *For any* seed value S, running the TCP fuzzer twice with seed S SHALL produce identical packet sequences in both runs (same packet count, same header values, same payload bytes).
 
-**Validates: Requirements 36.2**
+### Validates: Requirements 36.2
 
 ### Property 17: CryptFS Key Derivation Determinism
 
 *For any* non-empty passphrase P and salt value S, invoking `sigma_cryptfs_derive_key(P, S)` multiple times SHALL always produce the same 256-bit key output.
 
-**Validates: Requirements 37.4**
+### Validates: Requirements 37.4
 
 ### Property 18: Connection Tracking Counter Invariant
 
 *For any* sequence of connection lifecycle operations (open, track, close), the conntrack module's active connection counter SHALL equal the number of entries currently in the connection table at all times.
 
-**Validates: Requirements 40.1, 40.2, 40.3**
+### Validates: Requirements 40.1, 40.2, 40.3
 
 ---
 
@@ -2426,14 +2866,20 @@ The following requirements contain testable properties where behavior varies mea
 
 For the 18 properties above, implement property-based tests using the following configuration:
 
-**Test Library:**
+### Test Library:
+
 - C/C++ kernel code: Use [theft](https://github.com/silentbicycle/theft) or [rapidcheck](https://github.com/emil-e/rapidcheck)
+
 - JavaScript web shell: Use [fast-check](https://github.com/dubzzz/fast-check)
+
 - Go daemons: Use [gopter](https://github.com/leanovate/gopter)
 
-**Test Configuration:**
+### Test Configuration:
+
 - **Minimum iterations**: 100 per property test
+
 - **Test tag format**: `Feature: sigmaos-roadmap, Property N: [property title]`
+
 - **Generator guidance**:
   - Property 1: Generate exception vectors 0-31
   - Property 2: Generate 10-100 mock process structures with unique IDs
@@ -2445,8 +2891,7 @@ For the 18 properties above, implement property-based tests using the following 
   - Property 17: Generate passphrases (1-256 chars), salts (16-64 bytes)
   - Property 18: Generate connection event sequences (100-1000 events with random open/close timing)
 
-
-**Example Property Test (Property 10: ZeroTrust Bounded String Copy):**
+### Example Property Test (Property 10: ZeroTrust Bounded String Copy):
 
 ```c
 // tests/unit/kernel/zerotrust_bounded_copy_test.c

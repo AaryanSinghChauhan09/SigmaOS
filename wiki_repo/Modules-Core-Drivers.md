@@ -64,18 +64,29 @@ Each driver shard must declare its required capabilities in `module.json`:
 ## Roadmap
 
 - [x] PCI bus enumeration (`pci.rs`)
+
 - [x] USB XHCI stub (`usb.rs`)
+
 - [x] GPU framebuffer stub (`gpu.rs`)
+
 - [x] Audio HD-Audio stub (`audio.rs`)
+
 - [x] WiFi 802.11 stub (`wifi.rs`)
+
 - [ ] Full DMA ring-buffer implementation (NIC)
+
 - [ ] GPU DRM/KMS mode-setting
+
 - [ ] NVMe storage driver
+
 - [ ] Bluetooth HCI driver
+
 - [ ] Formal DDK API header (`ddk_api.h`)
+
 - [ ] CBMC/Kani safety proofs for DMA paths
 
 ## Related Modules
 
 - [`modules/ext/hal`](../../ext/hal/README.md) — Hardware Abstraction Layer
+
 - [`modules/tools/diag`](../../tools/diag/README.md) — Driver diagnostics & tracing

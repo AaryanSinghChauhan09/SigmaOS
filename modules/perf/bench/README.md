@@ -19,16 +19,21 @@ used to catch performance regressions before they reach `main`.
 ## Running Benchmarks
 
 ```bash
+
 # Run all benchmarks
+
 just bench
 
 # Run only IPC benchmarks
+
 just bench -- kernel/ipc
 
 # Generate flamegraph
+
 just bench-flamegraph
 
 # Compare against baseline
+
 just bench-compare baseline.json
 ```
 
@@ -50,24 +55,35 @@ All benchmarks run nightly on bare-metal CI (not in QEMU — timing is not
 meaningful in a VM). A regression of > 5% triggers a blocking CI alert.
 
 ```yaml
+
 # .github/workflows/bench.yml
+
 on:
   schedule:
     - cron: '0 2 * * *'   # 02:00 UTC nightly
+
 ```
 
 ## Roadmap
 
 - [ ] Syscall round-trip benchmark
+
 - [ ] IPC throughput benchmark
+
 - [ ] Memory allocator latency suite
+
 - [ ] Filesystem IOPS benchmark
+
 - [ ] Network TCP throughput benchmark
+
 - [ ] Automated regression detection (± 5% threshold)
+
 - [ ] Flamegraph generation pipeline
+
 - [ ] Historical results dashboard (GitHub Pages)
 
 ## Related Modules
 
 - [`modules/perf/scheduler`](../scheduler/README.md) — Scheduler performance
+
 - [`modules/perf/mm`](../mm/README.md) — Memory manager benchmarks

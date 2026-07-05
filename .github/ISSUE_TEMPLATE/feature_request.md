@@ -1,3 +1,5 @@
+# feature request
+
 ---
 name: Feature Request
 about: Suggest a new feature or enhancement for SigmaOS
@@ -26,16 +28,27 @@ Describe any alternative solutions or features you've considered.
 ## Affected Subsystem
 
 - [ ] Kernel Core (scheduler, memory, syscalls)
+
 - [ ] Drivers (network, storage, GPU, USB)
+
 - [ ] Filesystem
+
 - [ ] Network Stack
+
 - [ ] Security
+
 - [ ] Package Manager
+
 - [ ] Boot/ISO
+
 - [ ] Desktop/GUI
+
 - [ ] Shell/Userland
+
 - [ ] Documentation
+
 - [ ] CI/CD
+
 - [ ] Other (specify)
 
 ## Implementation Plan

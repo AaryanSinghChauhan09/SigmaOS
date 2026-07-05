@@ -4,6 +4,7 @@ This document tracks the status of the SigmaOS Sovereign Kernel implementation.
 The kernel is written entirely in `no_std` Rust, with no external crates and no allocator dependency.
 
 ## Core Kernel
+
 | File | Subsystem | Status | Description |
 |------|-----------|--------|-------------|
 | `kernel.rs` | Bootstrap | 🟩 Implemented | Boot sequence, state machine, subsystem wiring. |
@@ -17,26 +18,30 @@ The kernel is written entirely in `no_std` Rust, with no external crates and no 
 | `self_heal.rs` | Fault Recovery | 🟩 Implemented | Shard fault tracking, restart policies, backoff. |
 
 ## Filesystem (VFS)
+
 | File | Subsystem | Status | Description |
 |------|-----------|--------|-------------|
 | `vfs.rs` | Virtual Filesystem | 🟩 Implemented | File descriptor table, open/read/write/close dispatch. |
 | `sigmafs.rs` | SovereignFS | 🟩 Implemented | CoW extent-based layout, snapshot metadata. |
 
 ## Networking
+
 | File | Subsystem | Status | Description |
 |------|-----------|--------|-------------|
 | `tcp.rs` | TCP Stack | 🟩 Implemented | TCP state machine (RFC 793) and socket table. |
 | `socket.rs` | Sockets API | 🟩 Implemented | Unified socket dispatch (AF_INET, SOCK_STREAM). |
 
 ## Security & Isolation
+
 | File | Subsystem | Status | Description |
 |------|-----------|--------|-------------|
 | `audit_chain.rs` | Audit Log | 🟩 Implemented | Immutable BLAKE3-linked event chain. |
 | `sandbox.rs` | Sandbox | 🟩 Implemented | Lifecycle and configuration. |
 
 ## Hardware Abstraction (HAL)
+
 | File | Subsystem | Status | Description |
 |------|-----------|--------|-------------|
 | `hal.rs` | x86_64 HAL | 🟩 Implemented | LAPIC setup, CPU halt, TSC reading, TLB flushes. |
 
-*Last Updated: July 2026*
+### Last Updated: July 2026

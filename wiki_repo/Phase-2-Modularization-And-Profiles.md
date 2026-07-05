@@ -21,14 +21,18 @@ Three first-class profiles ship with v15.0:
 ### Selecting a Profile at Build Time
 
 ```bash
+
 # CMake
+
 cmake -B build \
   -DSIGMA_TARGET_OS=sigma \
   -DSIGMA_USE_ZENITH_DE=OFF \          # sigma-core
+
   -DSIGMA_USE_AI_ENGINE=ON \
   -DSIGMA_IMMUTABLE_ROOT=ON
 
 # Makefile
+
 make TARGET_OS=sigma SIGMA_PROFILE=sigma-core -j$(nproc)
 ```
 
@@ -40,13 +44,21 @@ make TARGET_OS=sigma SIGMA_PROFILE=sigma-core -j$(nproc)
 kernel/
 ├── core/
 │   ├── memory/         # Sovereign VMM, slab allocator, PMM (Rewritten in Rust no_std)
+
 │   ├── sched/          # MLFQ-MCS scheduler (Rewritten in Rust no_std)
+
 │   ├── syscall/        # Sovereign syscall gate (Rewritten in Rust no_std)
+
 │   └── hal/            # Hardware Abstraction Layer (Rewritten in Rust no_std & Zig freestanding)
+
 ├── net/                # Sovereign TCP/IP stack (Rewritten in Rust no_std)
+
 ├── storage/            # SigmaFS + ZFS journal shim (Rewritten in Rust no_std)
+
 ├── telemetry/          # Zero-trust audit & telemetry (Rewritten in Rust no_std)
+
 └── virt/               # Hypervisor (optional — SIGMA_USE_HYPERVISOR) (Rewritten in Rust no_std)
+
 ```
 
 ### USE-Flag Feature Toggles (CMake)
@@ -71,6 +83,7 @@ Each profile YAML (under `config/`) documents:
 
 ```yaml
 target_os: sigma           # Build target: sigma | ubuntu | bsd
+
 meta:
   description: "..."
   edition: "Zenith"
@@ -93,6 +106,9 @@ features:
 ## 🔗 Related Pages
 
 - [Phase 1: Foundation & Branch Unification](Phase-1-Foundation-And-Branch-Unification)
+
 - [Phase 3: Package & Update System](Phase-3-Package-And-Update-System)
+
 - [OS Formats](OS_FORMATS)
+
 - [Build Guide](BuildGuide)

@@ -58,14 +58,21 @@ Allocations prefer the local node; spill to remote only when local is exhausted.
 ## Roadmap
 
 - [ ] Buddy allocator implementation
+
 - [ ] Slab cache (fixed-size object pools)
+
 - [ ] NUMA-aware page allocator
+
 - [ ] Guard page + canary overflow detection
+
 - [ ] Memory pressure callbacks (OOM handler)
+
 - [ ] Transparent huge pages (THP) support
+
 - [ ] Kani formal proofs: no double-free, no use-after-free
 
 ## Related Modules
 
 - [`modules/core/kernel/memory`](../../core/kernel/memory/) — Page-table management
+
 - [`modules/perf/bench`](../bench/README.md) — Memory allocator benchmarks

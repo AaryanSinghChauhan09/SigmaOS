@@ -20,13 +20,13 @@ impl EdgeRuntime {
     async fn start(&mut self) -> Result<()> {
         // Initialize minimal kernel
         self.kernel.initialize_minimal().await?;
-        
+
         // Start essential services
         self.services.start_essential().await?;
-        
+
         // Optimize resource usage
         self.resource_manager.optimize_for_edge().await?;
-        
+
         Ok(())
     }
 }
@@ -47,15 +47,15 @@ impl EdgeKernel {
             enable_swap: false,
             enable_hibernation: false,
             enable_debug_symbols: false,
-            
+
             // Optimize for low memory
             memory_overcommit: false,
             transparent_hugepages: false,
-            
+
             // Optimize for low power
             cpu_governor: CpuGovernor::Powersave,
             tickless: true,
-            
+
             // Minimal drivers
             driver_set: DriverSet::Minimal,
         }
@@ -81,26 +81,26 @@ impl OfflineStorage {
         if let Some(value) = self.local_db.get(key) {
             return Ok(value);
         }
-        
+
         // Check sync queue for pending updates
         if let Some(pending) = self.sync_queue.get_pending(key) {
             return Ok(pending);
         }
-        
+
         Err(Error::NotFound)
     }
-    
+
     async fn write(&mut self, key: &str, value: Value) -> Result<()> {
         // Write to local storage
         self.local_db.set(key, value.clone());
-        
+
         // Queue for sync when online
         self.sync_queue.enqueue(SyncOperation {
             key: key.to_string(),
             value,
             operation: SyncOp::Write,
         });
-        
+
         Ok(())
     }
 }
@@ -151,7 +151,7 @@ impl EdgeSync {
     async fn sync_up(&mut self) -> Result<()> {
         // Get local changes
         let changes = self.local_store.get_changes_since_last_sync()?;
-        
+
         // Upload to cloud
         for change in changes {
             match self.sync_policy.upload_strategy {
@@ -163,7 +163,7 @@ impl EdgeSync {
                 }
             }
         }
-        
+
         Ok(())
     }
 }
@@ -183,13 +183,13 @@ impl DeltaSync {
         // Chunk both versions
         let old_chunks = self.chunking.chunk(old);
         let new_chunks = self.chunking.chunk(new);
-        
+
         // Compute delta
         let delta = self.compute_chunk_delta(old_chunks, new_chunks)?;
-        
+
         // Compress delta
         let compressed = self.compression.compress(&delta)?;
-        
+
         Ok(Delta { data: compressed })
     }
 }
@@ -210,12 +210,12 @@ impl EdgeAnalytics {
     async fn process_event(&mut self, event: Event) -> Result<()> {
         // Process event locally
         let metrics = self.processor.process(event).await?;
-        
+
         // Store in time-series database
         for metric in metrics {
             self.storage.insert(metric).await?;
         }
-        
+
         Ok(())
     }
 }
@@ -234,13 +234,13 @@ impl EdgeML {
     async fn predict(&self, input: &[u8]) -> Result<Prediction> {
         // Preprocess input
         let preprocessed = self.preprocess(input)?;
-        
+
         // Run inference
         let output = self.inference_engine.infer(&self.model, preprocessed).await?;
-        
+
         // Postprocess output
         let prediction = self.postprocess(output)?;
-        
+
         Ok(prediction)
     }
 }
@@ -274,7 +274,7 @@ impl EdgePowerManager {
                 self.disable_non_essential_cores().await?;
             }
         }
-        
+
         Ok(())
     }
 }
@@ -293,13 +293,13 @@ impl EdgeMemoryManager {
     async fn optimize(&mut self) -> Result<()> {
         // Compress cold pages
         self.compress_cold_pages().await?;
-        
+
         // Release unused memory pools
         self.memory_pools.release_unused().await?;
-        
+
         // Enable memory overcommit with caution
         self.enable_controlled_overcommit().await?;
-        
+
         Ok(())
     }
 }
@@ -321,13 +321,13 @@ impl EdgeSecurity {
     async fn initialize(&mut self) -> Result<()> {
         // Initialize TPM
         self.tpm.initialize().await?;
-        
+
         // Enable secure boot
         self.secure_boot.enable().await?;
-        
+
         // Generate hardware keys
         self.hardware_keys.generate().await?;
-        
+
         Ok(())
     }
 }
@@ -346,10 +346,10 @@ impl DeviceIdentity {
     fn generate() -> Result<Self> {
         // Generate key pair
         let (private_key, public_key) = generate_key_pair()?;
-        
+
         // Create certificate
         let certificate = DeviceCertificate::new(public_key)?;
-        
+
         Ok(DeviceIdentity {
             certificate,
             private_key,
@@ -373,7 +373,7 @@ impl AdaptiveNetwork {
     async fn select_best_interface(&self) -> Result<NetworkInterface> {
         let mut best_interface = None;
         let mut best_score = 0.0;
-        
+
         for interface in &self.interfaces {
             let score = self.score_interface(interface).await?;
             if score > best_score {
@@ -381,7 +381,7 @@ impl AdaptiveNetwork {
                 best_interface = Some(interface.clone());
             }
         }
-        
+
         best_interface.ok_or(Error::NoAvailableInterface)
     }
 }
@@ -403,13 +403,13 @@ impl BandwidthOptimizer {
         if let Some(cached) = self.caching.check_cache(data) {
             return Ok(cached);
         }
-        
+
         // Compress data
         let compressed = self.compression.compress(data)?;
-        
+
         // Cache compressed data
         self.caching.store_in_cache(data, compressed.clone());
-        
+
         Ok(compressed)
     }
 }
@@ -430,16 +430,16 @@ impl EdgeOrchestrator {
     async fn deploy_service(&mut self, spec: ServiceSpec) -> Result<()> {
         // Validate spec
         self.validate_spec(&spec)?;
-        
+
         // Schedule service
         let placement = self.scheduler.schedule(&spec).await?;
-        
+
         // Deploy service
         let service = EdgeService::deploy(spec, placement).await?;
-        
+
         // Register service
         self.services.insert(service.id, service);
-        
+
         Ok(())
     }
 }
@@ -462,7 +462,7 @@ impl EdgeMonitor {
         let memory = self.metrics.collect_memory().await;
         let storage = self.metrics.collect_storage().await;
         let network = self.metrics.collect_network().await;
-        
+
         EdgeMetrics {
             cpu,
             memory,
@@ -489,16 +489,16 @@ impl UpdateManager {
     async fn apply_update(&mut self, update: Update) -> Result<()> {
         // Verify update
         self.verifier.verify(&update).await?;
-        
+
         // Write to update partition
         self.write_to_partition(&update, &self.update_partition).await?;
-        
+
         // Mark update partition as bootable
         self.mark_bootable(&self.update_partition).await?;
-        
+
         // Schedule reboot
         self.schedule_reboot().await?;
-        
+
         Ok(())
     }
 }
@@ -521,16 +521,16 @@ impl ABUpdateSystem {
             PartitionId::A => &self.partition_b,
             PartitionId::B => &self.partition_a,
         };
-        
+
         // Write update to inactive partition
         self.write_update(update, inactive_partition).await?;
-        
+
         // Mark as bootable
         self.mark_bootable(inactive_partition).await?;
-        
+
         // Switch active partition on next boot
         self.switch_active_partition().await?;
-        
+
         Ok(())
     }
 }
@@ -551,14 +551,14 @@ impl FederatedLearning {
     async fn train_local(&mut self, data: &[TrainingSample]) -> Result<ModelUpdate> {
         // Train on local data
         let update = self.local_model.train(data).await?;
-        
+
         Ok(update)
     }
-    
+
     async fn submit_update(&self, update: ModelUpdate) -> Result<()> {
         // Submit update to aggregator
         self.aggregator.submit_update(update).await?;
-        
+
         Ok(())
     }
 }
@@ -566,5 +566,5 @@ impl FederatedLearning {
 
 ---
 
-**Last Updated**: 2026-07-05  
+**Last Updated**: 2026-07-05
 **Maintained by**: SigmaOS Edge Computing Team

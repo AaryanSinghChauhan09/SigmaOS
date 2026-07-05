@@ -103,4 +103,4 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 ---
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+### Last updated: 2026-05-18 | SigmaOS Zenith v15.1

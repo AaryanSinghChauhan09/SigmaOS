@@ -56,28 +56,40 @@ void init_tools_sandbox(void);
 ## Fuzz Integration
 
 ```bash
+
 # Build a fuzz harness
+
 sigma build --fuzz target/fuzz_net_parser
 
 # Run under AFL++
+
 sigma fuzz --target fuzz_net_parser --timeout 3600
 
 # Triage a crash
+
 sigma sandbox run --repro crash-001.bin --target fuzz_net_parser
 ```
 
 ## Roadmap
 
 - [ ] Basic shard isolation (`sandbox_create` / `sandbox_destroy`)
+
 - [ ] SovereignFS snapshot-based reset (`sandbox_reset`)
+
 - [ ] Syscall trace interceptor (`sandbox_trace_syscalls`)
+
 - [ ] AFL++ / libFuzzer integration harness
+
 - [ ] QEMU-backed hardware simulation (virtio-blk, virtio-net)
+
 - [ ] Coverage-guided fuzzing via KCOV equivalent
+
 - [ ] Distributed sandbox pool for CI parallelism
 
 ## Related Modules
 
 - [`modules/security/isolation`](../../security/isolation/README.md) — Production isolation
+
 - [`modules/tools/diag`](../diag/README.md) — Syscall tracing
+
 - [`modules/perf/bench`](../../perf/bench/README.md) — Performance regression testing

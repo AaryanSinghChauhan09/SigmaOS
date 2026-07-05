@@ -1,3 +1,5 @@
+# SKILL
+
 ---
 name: sigma-copilot
 description: Sovereign Copilot agent — Claude Code / openclaw / hermes-ide inspired OS automation.
@@ -10,10 +12,15 @@ The primary SigmaOS agent persona. Runs tool-use loops to accomplish OS tasks vi
 ## Architecture (inspired by Claude Code)
 
 1. **Read persona** — `profiles/ai_agent/system_prompt.md`
+
 2. **Plan** — decompose user intent into tool calls
+
 3. **Execute** — dispatch tools (Read, Bash, ZenithGUI, Skill, Memory, …)
+
 4. **Observe** — collect tool results
+
 5. **Respond** — summarize outcome for the user
+
 6. **Persist** — JSONL session log under `.sigma/logs/agent/`
 
 ## Entry points
@@ -52,12 +59,17 @@ sigma_copilot_tool_dispatch(SIGMA_TOOL_GUI, "theme obsidian", result, sizeof(res
 ## Training config
 
 - Persona: `profiles/ai_agent/system_prompt.md`
+
 - Tools schema: `profiles/ai_agent/tools.json`
+
 - Active skills: `profiles/ai_agent/config.json`
 
 ## Related skills
 
 - `zenith-gui` — GUI-specific commands
+
 - `computer-use` — accessibility automation fallback
+
 - `claude-skills` / `copilot-patterns` — IDE workflow patterns
+
 - `session-viewer` — review agent JSONL trajectories

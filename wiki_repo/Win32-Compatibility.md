@@ -33,11 +33,17 @@ println!("Imports:  {} DLLs", image.import_count);
 ```
 
 ### Features
+
 - **PE32+ (x86-64)** — supports both EXE and DLL
+
 - **Section mapping** — `.text` (r-x), `.data` (rw-), `.rdata` (r--) mapped with correct permissions
+
 - **W^X enforcement** — sections cannot be both writable and executable (SigmaOS security policy)
+
 - **Base relocations** — `.reloc` section processed when ASLR loads at non-preferred base
+
 - **Import table parsing** — lists all DLL dependencies (resolved by the ntdll shim)
+
 - **TLS callbacks** — Thread Local Storage initializers called on load
 
 ### Section Permissions (W^X)
@@ -122,24 +128,35 @@ pub const CURRENT_THREAD:  usize = !1usize;  // (HANDLE)-2
 ## Running a Win32 Binary
 
 ```bash
+
 # Run a Windows .exe under SigmaOS
+
 sigma-compat run notepad.exe
 sigma-compat run setup.exe /S
 
 # List loaded modules for a running Win32 process
+
 sigma-compat modules <pid>
 
 # Check if a binary is compatible
+
 sigma-compat check myapp.exe
 ```
 
 The launcher (`sigma_wine_loader.rs`):
+
 1. Reads PE32+ header, validates it's 64-bit
+
 2. Allocates memory at preferred base (or ASLR random base)
+
 3. Maps all sections with `NtAllocateVirtualMemory`
+
 4. Processes base relocations if base differs from preferred
+
 5. Resolves imports — maps `ntdll.dll` calls to `sigma_ntdll.rs` shim
+
 6. Calls TLS callbacks
+
 7. Calls entry point with `argc/argv/envp`
 
 ---
@@ -162,13 +179,21 @@ The PE loader enforces W^X — no RWX memory regions.
 ## Limitations (Phase A)
 
 - ❌ 32-bit PE32 (x86) not supported — only PE32+ (x86-64)
+
 - ❌ GUI (USER32/GDI32) not yet wired — console apps only
+
 - ❌ COM/OLE not implemented
+
 - ❌ Registry (`RegOpenKey` etc.) is a stub
+
 - ❌ DirectX — Phase E
+
 - ✅ Console I/O via `sigma_ntdll` → sigma-sh
+
 - ✅ File I/O (`CreateFile`, `ReadFile`, `WriteFile`)
+
 - ✅ Threading (`CreateThread`, `WaitForSingleObject` via event shim)
+
 - ✅ Memory management (`VirtualAlloc`, `VirtualFree`)
 
 ---

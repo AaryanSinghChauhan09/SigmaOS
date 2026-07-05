@@ -72,20 +72,29 @@ Every loadable module ships with `module.json`:
 The loader supports **hot-module replacement** for non-critical modules:
 
 1. Load new version into a shadow domain.
+
 2. Quiesce the old version (drain in-flight requests).
+
 3. Atomically swap the dispatch table pointer.
+
 4. Unload the old version.
 
 ## Roadmap
 
 - [x] ELF loader + relocation (`module_loader.rs`)
+
 - [ ] WASM capsule loader (Cranelift JIT)
+
 - [ ] Signature verification integration
+
 - [ ] Hot-reload (shadow domain swap)
+
 - [ ] Dependency graph resolver (topological sort)
+
 - [ ] Module version compatibility checks (semver)
 
 ## Related Modules
 
 - [`modules/ext/plugins`](../../ext/plugins/README.md) — Plugin capsule format
+
 - [`modules/security/isolation`](../../security/isolation/README.md) — Module sandboxing

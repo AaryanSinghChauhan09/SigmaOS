@@ -7,17 +7,27 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 ## Strategic Objectives
 
 ### Primary Goals
+
 1. **Universal CLI Access**: Every GUI operation accessible via CLI
+
 2. **Natural Language Interface**: Natural language → CLI translation
+
 3. **GUI Automation**: AI agent can control GUI elements
+
 4. **Task Orchestration**: Complex multi-step task automation
+
 5. **Learning & Adaptation**: Agent learns from user behavior
 
 ### Success Metrics
+
 - **GUI Coverage**: 100% of GUI operations accessible via CLI
+
 - **NL Accuracy**: >90% natural language translation accuracy
+
 - **Task Success**: >85% automated task completion rate
+
 - **Response Time**: <2 seconds for command translation
+
 - **Learning Rate**: Agent improves with usage
 
 ## SigmaAI Agent Architecture
@@ -48,49 +58,76 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 ### Component Overview
 
-**1. Natural Language Parser**
+### 1. Natural Language Parser
+
 - Parse natural language input into structured commands
+
 - Intent recognition and entity extraction
+
 - Context understanding
 
-**2. Command Generator**
+### 2. Command Generator
+
 - Generate CLI commands from parsed natural language
+
 - Command template matching and parameter substitution
+
 - Alternative command suggestions
 
-**3. Command Validator**
+### 3. Command Validator
+
 - Validate generated commands for safety and correctness
+
 - Syntax validation and permission checking
+
 - Risk assessment
 
-**4. Context Manager**
+### 4. Context Manager
+
 - Maintain system context and state awareness
+
 - System state tracking and user session management
+
 - Application context and file system awareness
 
-**5. Knowledge Base**
+### 5. Knowledge Base
+
 - Store learned commands, patterns, and best practices
+
 - Command history and success/failure patterns
+
 - User preferences and application-specific knowledge
 
-**6. GUI Bridge**
+### 6. GUI Bridge
+
 - Bridge between CLI commands and GUI operations
+
 - GUI element identification and event simulation
+
 - Window management and application control
 
-**7. LLM Core**
+### 7. LLM Core
+
 - Core language model for natural language understanding
+
 - Text generation and intent classification
+
 - Entity recognition and context understanding
 
-**8. Executor**
+### 8. Executor
+
 - Execute validated commands safely
+
 - Output capture and error handling
+
 - Timeout management
 
-**9. Sandbox**
+### 9. Sandbox
+
 - Safe execution environment for commands
+
 - Resource limits and network isolation
+
 - File system isolation and process isolation
 
 ## CLI-to-GUI Bridge Specification
@@ -131,15 +168,23 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 **Objective**: Establish core AI agent infrastructure
 
 **Tasks**:
+
 - Implement NL Parser
+
 - Implement Command Generator
+
 - Implement Command Validator
+
 - Implement Context Manager
+
 - Create basic LLM integration
 
 **Success Criteria**:
+
 - NL Parser accuracy >80%
+
 - Command generation success >75%
+
 - Validation coverage >90%
 
 ### Phase 2: GUI Bridge (Weeks 5-8)
@@ -147,15 +192,23 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 **Objective**: Implement CLI-to-GUI bridge
 
 **Tasks**:
+
 - Implement GUI Bridge
+
 - Implement Element Identifier
+
 - Implement Event Simulator
+
 - Create command mapping tables
+
 - Implement application-specific bridges
 
 **Success Criteria**:
+
 - Element identification >85% accuracy
+
 - Event simulation >90% success
+
 - Command mapping >80% coverage
 
 ### Phase 3: Knowledge & Learning (Weeks 9-12)
@@ -163,14 +216,21 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 **Objective**: Implement knowledge base and learning
 
 **Tasks**:
+
 - Implement Knowledge Base
+
 - Implement pattern recognition
+
 - Implement learning algorithms
+
 - Create user preference system
 
 **Success Criteria**:
+
 - Pattern recognition >75% accuracy
+
 - Learning improvement >20% over time
+
 - User preference adaptation >80%
 
 ### Phase 4: Integration & Optimization (Weeks 13-16)
@@ -178,15 +238,23 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 **Objective**: Integrate all components and optimize
 
 **Tasks**:
+
 - Integrate all components
+
 - Implement Executor
+
 - Implement Sandbox
+
 - Optimize performance
+
 - Add safety mechanisms
 
 **Success Criteria**:
+
 - End-to-end success >85%
+
 - Response time <2 seconds
+
 - Safety incidents <1%
 
 ## Resource Allocation
@@ -194,11 +262,17 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 ### Team Structure
 
 **AI Agent Team** (6 engineers)
+
 - NL Engineer: 1 engineer
+
 - Bridge Engineer: 1 engineer
+
 - LLM Engineer: 1 engineer
+
 - Learning Engineer: 1 engineer
+
 - Safety Engineer: 1 engineer
+
 - Testing Engineer: 1 engineer
 
 ### Effort Distribution
@@ -220,21 +294,33 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 ## Success Metrics
 
 ### Performance Metrics
+
 - **NL Accuracy**: >90% translation accuracy
+
 - **Command Success**: >85% command execution success
+
 - **Response Time**: <2 seconds average response
+
 - **GUI Coverage**: >90% GUI operations accessible
 
 ### Learning Metrics
+
 - **Pattern Recognition**: >75% pattern accuracy
+
 - **Learning Rate**: >20% improvement over time
+
 - **User Adaptation**: >80% preference adaptation
+
 - **Feedback Effectiveness**: >90% feedback utilization
 
 ### Safety Metrics
+
 - **Validation Success**: >95% validation accuracy
+
 - **Sandbox Effectiveness**: >99% isolation success
+
 - **Safety Incidents**: <1% dangerous command execution
+
 - **Rollback Success**: >95% rollback success
 
 ---

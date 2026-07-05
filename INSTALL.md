@@ -5,7 +5,9 @@ SigmaOS utilizes a strict `no_std` Rust environment and automates the build proc
 ## Prerequisites
 
 - `rustup` (Nightly toolchain required)
+
 - `just` command runner (`cargo install just`)
+
 - `qemu-system-x86_64` (for virtualization)
 
 ## Setup
@@ -15,7 +17,7 @@ SigmaOS utilizes a strict `no_std` Rust environment and automates the build proc
    rustup target add x86_64-unknown-none
    ```
 
-2. **Verify Toolchain:**
+1. **Verify Toolchain:**
    Ensure you are using a nightly compiler as SigmaOS relies on unstable features like `naked_functions` and `asm_const`.
 
 ## Build Commands
@@ -39,7 +41,9 @@ Run these commands from the root of the repository:
   ```
 
 - **Run in QEMU:**
-  *Note: Bootloader integration is currently in progress.*
+
+###   Note: Bootloader integration is currently in progress.
+
   ```bash
   just run
   ```

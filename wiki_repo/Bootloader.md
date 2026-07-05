@@ -75,11 +75,14 @@ pub const BootInfo = extern struct {
 ## Building
 
 ```bash
+
 # Build the UEFI EFI stub
+
 cd sigma-boot
 zig build -Dtarget=x86_64-uefi
 
 # Output: zig-out/bin/sigma-boot.efi
+
 ```
 
 ---
@@ -87,16 +90,21 @@ zig build -Dtarget=x86_64-uefi
 ## Testing with QEMU OVMF
 
 ```bash
+
 # Install OVMF (UEFI firmware for QEMU)
+
 # Ubuntu: apt install ovmf
+
 # Arch:   pacman -S edk2-ovmf
 
 # Create ESP (EFI System Partition)
+
 mkdir -p esp/EFI/BOOT esp/boot
 cp sigma-boot/zig-out/bin/sigma-boot.efi esp/EFI/BOOT/BOOTX64.EFI
 cp build/sigma-kernel.elf esp/boot/sigma-kernel.elf
 
 # Run with QEMU OVMF
+
 qemu-system-x86_64 \
   -bios /usr/share/OVMF/OVMF.fd \
   -drive format=raw,file=fat:rw:esp \
@@ -105,10 +113,15 @@ qemu-system-x86_64 \
   -nographic
 
 # Expected output:
+
 # SigmaOS Boot v15.0
+
 # [BOOT] Kernel loaded at 0x200000 (sz: ...)
+
 # [BOOT] ExitBootServices — jumping to kernel
+
 # Σ SigmaOS Zenith Kernel Initializing (Rust)
+
 ```
 
 ---
@@ -118,7 +131,9 @@ qemu-system-x86_64 \
 For legacy BIOS systems, SigmaOS supports Multiboot2 via GRUB:
 
 ```
+
 # /boot/grub/grub.cfg
+
 menuentry "SigmaOS v15.0" {
     multiboot2 /boot/sigma-kernel.elf
     module2 /boot/sigma-initramfs.cpio.gz
@@ -133,9 +148,13 @@ The `arch/boot/multiboot_header.asm` provides the Multiboot2 magic header.
 ## Secure Boot (Phase G)
 
 Planned: sigma-boot.efi will:
+
 1. Verify kernel ELF signature (Dilithium-5)
+
 2. Extend TPM PCR[0..4] with hashes of each boot stage
+
 3. Seal disk encryption key against PCR values
+
 4. Refuse to boot unsigned kernels
 
 ---

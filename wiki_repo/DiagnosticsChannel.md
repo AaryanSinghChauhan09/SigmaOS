@@ -1,4 +1,4 @@
-# Diagnostics Channel Support
+﻿# Diagnostics Channel Support
 
 Stability: Experimental.
 
@@ -23,7 +23,6 @@ diagnosticsChannel.channel('undici:request:create').subscribe(({ request }) => {
   request.addHeader('hello', 'world')
   console.log('headers', request.headers) // e.g. ['foo', 'bar', 'hello', 'world']
 })
-
 ```
 
 Note: a request is only loosely completed to a given socket.
@@ -38,7 +37,6 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:bodyChunkSent').subscribe(({ request, chunk }) => {
   // request is the same object undici:request:create
 })
-
 ```
 
 ## `undici:request:bodySent`
@@ -51,7 +49,6 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:bodySent').subscribe(({ request }) => {
   // request is the same object undici:request:create
 })
-
 ```
 
 ## `undici:request:headers`
@@ -68,7 +65,6 @@ diagnosticsChannel.channel('undici:request:headers').subscribe(({ request, respo
   // response.headers are buffers.
   console.log(response.headers.map((x) => x.toString()))
 })
-
 ```
 
 ## `undici:request:bodyChunkReceived`
@@ -81,7 +77,6 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:bodyChunkReceived').subscribe(({ request, chunk }) => {
   // request is the same object undici:request:create
 })
-
 ```
 
 ## `undici:request:trailers`
@@ -97,7 +92,6 @@ diagnosticsChannel.channel('undici:request:trailers').subscribe(({ request, trai
   // trailers are buffers.
   console.log(trailers.map((x) => x.toString()))
 })
-
 ```
 
 ## `undici:request:error`
@@ -110,7 +104,6 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:error').subscribe(({ request, error }) => {
   // request is the same object undici:request:create
 })
-
 ```
 
 ## `undici:client:sendHeaders`
@@ -126,13 +119,11 @@ diagnosticsChannel.channel('undici:client:sendHeaders').subscribe(({ request, he
   // request is the same object undici:request:create
   console.log(`Full headers list ${headers.split('\r\n')}`);
 })
-
 ```
 
 ## `undici:client:beforeConnect`
 
 This message is published before creating a new connection for **any** request.
-
 You can not assume that this event is related to any specific request.
 
 ```js
@@ -142,7 +133,6 @@ diagnosticsChannel.channel('undici:client:beforeConnect').subscribe(({ connectPa
   // const { host, hostname, protocol, port, servername, version } = connectParams
   // connector is a function that creates the socket
 })
-
 ```
 
 ## `undici:client:connected`
@@ -156,7 +146,6 @@ diagnosticsChannel.channel('undici:client:connected').subscribe(({ socket, conne
   // const { host, hostname, protocol, port, servername, version } = connectParams
  // connector is a function that creates the socket
 })
-
 ```
 
 ## `undici:client:connectError`
@@ -171,7 +160,6 @@ diagnosticsChannel.channel('undici:client:connectError').subscribe(({ error, soc
   // connector is a function that creates the socket
   console.log(`Connect failed with ${error.message}`)
 })
-
 ```
 
 ## `undici:websocket:open`
@@ -187,7 +175,6 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
   extensions,        // string - negotiated extensions
   websocket,         // WebSocket - the WebSocket instance
   handshakeResponse  // object - HTTP response that upgraded the connection
-
 }) => {
   console.log(address) // address, family, and port
   console.log(protocol) // negotiated subprotocols
@@ -199,7 +186,6 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
   console.log(handshakeResponse.statusText) // 'Switching Protocols' for HTTP/1.1, commonly 'OK' for HTTP/2 in Node.js
   console.log(handshakeResponse.headers) // Object containing response headers
 })
-
 ```
 
 ### Handshake Response Object
@@ -231,7 +217,6 @@ diagnosticsChannel.channel('undici:websocket:close').subscribe(({ websocket, cod
   console.log(code) // the closing status code
   console.log(reason) // the closing reason
 })
-
 ```
 
 ## `undici:websocket:socket_error`
@@ -244,7 +229,6 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:websocket:socket_error').subscribe((error) => {
   console.log(error)
 })
-
 ```
 
 ## `undici:websocket:ping`
@@ -259,7 +243,6 @@ diagnosticsChannel.channel('undici:websocket:ping').subscribe(({ payload, websoc
   console.log(payload)
   console.log(websocket) // the WebSocket instance
 })
-
 ```
 
 ## `undici:websocket:pong`
@@ -274,7 +257,6 @@ diagnosticsChannel.channel('undici:websocket:pong').subscribe(({ payload, websoc
   console.log(payload)
   console.log(websocket) // the WebSocket instance
 })
-
 ```
 
 ## `undici:proxy:connected`
@@ -289,7 +271,6 @@ diagnosticsChannel.channel('undici:proxy:connected').subscribe(({ socket, connec
   console.log(connectParams)
   // const { origin, port, path, signal, headers, servername } = connectParams
 })
-
 ```
 
 ## `undici:request:pending-requests`
@@ -306,7 +287,6 @@ diagnosticsChannel.channel('undici:request:pending-requests').subscribe(({ type,
   console.log(size)  // current number of pending requests
   console.log(key)   // the deduplication key for this request
 })
-
 ```
 
 ### Event Properties
@@ -331,7 +311,6 @@ channel.subscribe(({ type, size, key }) => {
     console.log(`Request completed: ${key} (${size} remaining)`)
   }
 })
-
 ```
 
 This can be useful for:

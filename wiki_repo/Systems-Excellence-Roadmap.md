@@ -1,5 +1,7 @@
 # SigmaOS — Systems Excellence Roadmap
+
 ## Gaming · Media · IoT · Developer Tools · Package Ecosystem
+
 ## Multi-Platform · Update & Recovery · Master Sprint Plan
 
 Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
@@ -26,7 +28,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 | Proton compatibility layer | `userland/compat/sigma_proton_bridge.cpp` | `release/standalone` | `sigma-wine --proton game.exe` wrapper |
 | Gaming profile (`sigma-cli profile use gaming`) | `userland/tools/sigma_cli.cpp` | `performance-optimized` | Activate: GameMode sched + Vulkan perf + disable audit |
 
-**Gaming performance targets:**
+### Gaming performance targets:
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
@@ -103,16 +105,27 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 
 ```bash
 sigma-gdb ./myapp                    # attach and run
+
 sigma-gdb --pid 1234                 # attach to running process
+
 sigma-gdb --core /sigma/cores/dump   # analyse core dump
+
 (sigma-gdb) break main               # set breakpoint
+
 (sigma-gdb) next                     # step over
+
 (sigma-gdb) step                     # step into
+
 (sigma-gdb) info regs                # register state
+
 (sigma-gdb) x/16x $rsp               # memory examine
+
 (sigma-gdb) bt                       # backtrace via DWARF
+
 (sigma-gdb) watch *ptr               # data watchpoint
+
 (sigma-gdb) disassemble              # disassembly
+
 ```
 
 | Task | File | Branch | Detail |
@@ -130,19 +143,33 @@ sigma-gdb --core /sigma/cores/dump   # analyse core dump
 
 ```bash
 sigma-perf record ./myapp            # sample CPU cycles
+
 sigma-perf record --pid 1234         # sample running process
+
 sigma-perf stat ./myapp              # hardware PMU counters
+
 sigma-perf top                       # live CPU usage by symbol
+
 sigma-perf report                    # annotated profile
+
 sigma-perf flame ./myapp             # flamegraph SVG
+
 sigma-perf bench sched               # context switch latency
+
 sigma-perf bench mem                 # allocator throughput
+
 sigma-perf bench pqc                 # Kyber/Dilithium ops/sec
+
 sigma-perf bench io                  # disk IOPS + latency
+
 sigma-perf bench net                 # network throughput
+
 sigma-perf kpatch status             # live kernel patches
+
 sigma-perf governor show             # P-state + frequency
+
 sigma-perf numa show                 # NUMA topology + stats
+
 ```
 
 | Task | File | Branch | Detail |
@@ -157,10 +184,15 @@ sigma-perf numa show                 # NUMA topology + stats
 
 ```bash
 sigma-strace ./myapp                 # trace all syscalls
+
 sigma-strace -e read,write ./myapp   # filter by syscall
+
 sigma-strace -p 1234                 # trace running process
+
 sigma-strace --pqc ./myapp           # include PQC operation trace
+
 sigma-strace --count ./myapp         # count + time per syscall
+
 sigma-strace --json ./myapp > trace.json
 ```
 
@@ -175,10 +207,15 @@ sigma-strace --json ./myapp > trace.json
 
 ```bash
 sigma-memcheck ./myapp               # run with shadow memory
+
 sigma-memcheck --leak-check ./myapp  # detect memory leaks
+
 sigma-memcheck --uaf ./myapp         # detect use-after-free
+
 sigma-memcheck --oob ./myapp         # detect out-of-bounds
+
 sigma-memcheck report <pid>          # report for running process
+
 ```
 
 | Task | File | Branch | Detail |
@@ -191,12 +228,19 @@ sigma-memcheck report <pid>          # report for running process
 ### DT5 — sigma-sdk (Application SDK)
 
 ```bash
+
 # Developer workflow:
+
 sigma-contrib new-app sigma-myapp    # scaffold new profession app
+
 sigma-contrib new-driver sigma-mydrv # scaffold SDF driver
+
 sigma-contrib check                  # lint + test + ABI check
+
 sigma-contrib submit                 # format commit + open PR
+
 sigma-contrib publish                # build .spkg + sign + push to registry
+
 ```
 
 | Task | File | Branch | Detail |
@@ -217,12 +261,18 @@ sigma-contrib publish                # build .spkg + sign + push to registry
 **Current:** No server exists. `sigma_pkg_registry/` has recipe stubs.
 
 ```bash
+
 # sigma-repo-server (Go HTTPS):
+
 sigma-repo-server start --port 8443 --db /sigma/data/packages.db
 sigma-repo-server index build        # scan .spkg files, generate index
+
 sigma-repo-server sign               # sign index with ML-DSA-87
+
 sigma-repo-server mirror sync        # sync to NIC CDN mirror
+
 sigma-repo-server stats              # download counts, popular packages
+
 ```
 
 | Task | File | Branch | Detail |
@@ -236,7 +286,9 @@ sigma-repo-server stats              # download counts, popular packages
 ### PE2 — .spkg Recipe Quality
 
 ```toml
+
 # sigma_pkg_registry/recipes/sigma-agri.recipe
+
 [package]
 name        = "sigma-agri"
 version     = "1.0.0"
@@ -247,6 +299,7 @@ license     = "GPL-2.0-or-later"
 [source]
 url     = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 commit  = "abc123def"           # exact commit — no floating refs
+
 sha256  = "deadbeef..."
 
 [build]
@@ -298,12 +351,19 @@ public_key = "sigma-team.mldsa87.pub"
 
 ```bash
 sigma-update status                  # current slot, pending update
+
 sigma-update check                   # fetch update manifest
+
 sigma-update download                # download to inactive slot
+
 sigma-update apply                   # mark inactive slot for next boot
+
 sigma-update verify                  # verify Dilithium3 sig before apply
+
 sigma-update rollback                # revert to previous slot
+
 sigma-update history                 # list past updates with timestamps
+
 ```
 
 | Task | File | Branch | Detail |
@@ -322,15 +382,25 @@ sigma-update history                 # list past updates with timestamps
 **Current:** Rollback counter + resilient fallback shell exist. Fix-it menu partial.
 
 ```bash
+
 # Recovery scenarios and commands:
+
 sigma-recovery start                 # launch text-mode recovery menu
+
 sigma-recovery rollback              # revert to last known-good boot
+
 sigma-recovery fsck                  # check + repair all filesystems
+
 sigma-recovery reinstall             # reinstall current version from ISO
+
 sigma-recovery import-backup <file>  # restore from sigma-automation backup
+
 sigma-recovery diagnose              # AI-powered crash analysis
+
 sigma-recovery network               # minimal networking (fetch updates)
+
 sigma-recovery shell                 # drop to recovery sigma-sh
+
 ```
 
 | Task | File | Branch | Detail |
@@ -389,7 +459,9 @@ sigma-recovery shell                 # drop to recovery sigma-sh
 ### MP4 — Cross-Platform CI Matrix
 
 ```yaml
+
 # .github/workflows/sigma_qemu.yml — target matrix
+
 strategy:
   matrix:
     arch: [x86_64, aarch64, riscv64]
@@ -397,6 +469,7 @@ strategy:
     exclude:
       - arch: riscv64
         profile: standalone   # too slow for RISC-V CI
+
 ```
 
 | Task | File | Branch | Detail |
@@ -416,6 +489,7 @@ strategy:
 **Goal:** `qemu-system-x86_64 -cdrom SigmaOS.iso` reaches a shell.
 
 | # | Task | Owner branch | Done when |
+
 |---|------|-------------|-----------|
 | 0.1 | Round-robin scheduler body | `kernel-exp` | 2 tasks interleave in QEMU serial |
 | 0.2 | Buddy allocator connected to VMM | `kernel-exp` | `sigma_malloc(4096)` returns valid pointer |
@@ -431,6 +505,7 @@ strategy:
 ### Sprint 1 (Month 1–3): Make It Connect
 
 | # | Task | Owner branch | Done when |
+
 |---|------|-------------|-----------|
 | 1.1 | e1000 DMA TX/RX rings | `drivers-dev` | `ping 10.0.2.2` succeeds in QEMU |
 | 1.2 | TCP state machine | `drivers-dev` | `nc` can make TCP connection |
@@ -446,6 +521,7 @@ strategy:
 ### Sprint 2 (Month 3–6): Make It Visible
 
 | # | Task | Owner branch | Done when |
+
 |---|------|-------------|-----------|
 | 2.1 | VirtIO-GPU real DMA | `drivers-dev` | Zenith renders desktop frame |
 | 2.2 | DRM/KMS layer | `drivers-dev` | Native resolution on real display |
@@ -461,6 +537,7 @@ strategy:
 ### Sprint 3 (Month 6–12): Make It Indian
 
 | # | Task | Owner branch | Done when |
+
 |---|------|-------------|-----------|
 | 3.1 | ABDM FHIR client | `release/standalone` | Create ABHA, push FHIR record |
 | 3.2 | GST IRN + e-Way Bill live | `release/standalone` | CA generates IRN on GSTN |
@@ -476,6 +553,7 @@ strategy:
 ### Sprint 4 (Month 12–18): Make It Trusted
 
 | # | Task | Owner branch | Done when |
+
 |---|------|-------------|-----------|
 | 4.1 | sigma-boot.efi + TPM2 PCR | `kernel-exp` | TPM2 seals CryptFS key to PCR |
 | 4.2 | ML-DSA FIPS 204 final | `performance-optimized` | All packages signed with FIPS 204 |
@@ -500,7 +578,7 @@ strategy:
 | [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | SH1-SH5, NS1-NS3, EF1-EF4, AI1-AI3, I18N1-I18N3, EDU1, RU1-RU2, CE1-CE3 | ~700 |
 | [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | GM1-GM3, EI1-EI3, DT1-DT5, PE1-PE3, UR1-UR3, MP1-MP4, Sprint 0-4 | ~700 |
 
-**Total roadmap content: ~4,000 lines across 5 documents.**
+### Total roadmap content: ~4,000 lines across 5 documents.
 
 ---
 

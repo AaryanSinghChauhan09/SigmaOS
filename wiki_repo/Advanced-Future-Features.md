@@ -48,4 +48,4 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 ---
 
-*SigmaOS — The Singularity is just the beginning.*
+### SigmaOS — The Singularity is just the beginning.

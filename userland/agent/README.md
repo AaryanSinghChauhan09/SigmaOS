@@ -32,20 +32,26 @@ self-diagnosis, smart completions, benchmarking, and plugin extensions.
 ## Quick Start
 
 ```bash
+
 # Install
+
 nim c -d:release --opt:speed -o:sigma-agent sigma_agent_main.nim
 cp sigma-agent /usr/bin/
 
 # Verify
+
 sigma-agent doctor
 
 # Set up shell integration
+
 sigma-agent install --shell-integration
 
 # Install workflow templates
+
 sigma-agent workflow install --all
 
 # Start background daemon (knowledge sync + completions)
+
 sigma-agent daemon start
 ```
 
@@ -87,22 +93,28 @@ sigma-agent daemon start
 ## Workflow Automation (n8n-style)
 
 ```bash
+
 # Install all 8 built-in templates
+
 sigma-agent workflow install --all
 
 # Templates: weekly-backup, daily-update, cpu-alert, low-disk-alert,
+
 #            dev-workflow, security-hardening, on-boot-setup, pkg-update-notify
 
 # Run a workflow
+
 sigma-agent workflow run weekly-backup
 sigma-agent workflow run weekly-backup --dry-run
 sigma-agent workflow run dev-workflow --verbose
 
 # Generate from natural language
+
 sigma-agent workflow create "backup home folder every Friday"
 sigma-agent workflow create "run security scan every night at 23:00" -o nightly.yaml
 
 # Manage
+
 sigma-agent workflow list
 sigma-agent workflow enable weekly-backup
 sigma-agent workflow disable cpu-alert
@@ -110,6 +122,7 @@ sigma-agent workflow history
 sigma-agent workflow audit
 
 # Background scheduler (checks triggers every 60s)
+
 sigma-agent workflow scheduler
 ```
 
@@ -119,6 +132,7 @@ name: my-workflow
 description: "What this does"
 enabled: true
 trigger: schedule=daily 06:00    # or: manual, cpu>90, disk<10, pkg_update, boot
+
 steps:
   - name: update
     action: "run sigma-pkg update"
@@ -194,13 +208,18 @@ Or: `sigma-pkg install sigma-agent`
 
 ```bash
 sigma-agent train seed          # 65+ built-in samples (v1 + v2)
+
 sigma-agent train sync          # pull GitHub wiki → samples
+
 sigma-agent learn rate good     # rate interactions as you use it
+
 sigma-agent learn build v1      # build fine-tuning dataset
+
 sigma-agent learn finetune tinyllama-1.1b sigma-v1
 ```
 
 ---
 
-*Sovereign AI — local inference, no telemetry, no external APIs.*
-*Docs: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/sigma-agent*
+### Sovereign AI — local inference, no telemetry, no external APIs.
+
+### Docs: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/sigma-agent

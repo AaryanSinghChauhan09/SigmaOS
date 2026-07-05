@@ -1,33 +1,29 @@
-# SECURITY ROADMAP
+# SigmaOS: Security & Cybersecurity Roadmap
 
-1
+Security is the foundational pillar of SigmaOS. We will absorb and natively reimplement concepts from the world's most secure operating systems.
 
-To achieve parity with enterprise Linux distributions, SigmaOS is implementing a rigorous security and compliance infrastructure. While our Post-Quantum Cryptography (PQC) integration provides next-generation security, we must establish standard enterprise compliance pipelines.
+## Target Repositories for Absorption
 
-1
+1. **`QubesOS/qubes-core-admin`**
+   - **Goal:** Security by compartmentalization.
+   - **SigmaOS Implementation:** Our `sigma_sandbox.rs` uses hardware-enforced Capability Tokens to isolate untrusted applications entirely, mimicking Qubes' Xen-based isolation without the heavy hypervisor overhead.
 
-To prevent supply chain attacks and ensure the integrity of the Sovereign Lattice:
+2. **`openvpn/openvpn` & `WireGuard/wireguard-tools`**
+   - **Goal:** Secure, encrypted networking.
+   - **SigmaOS Implementation:** A native `no_std` WireGuard implementation integrated directly into the `sigma_networkmanager.rs` stack.
 
-1
+3. **`suricata/suricata` & `clamav/clamav`**
+   - **Goal:** Intrusion Detection and Anti-Virus.
+   - **SigmaOS Implementation:** The Security Center Daemon (`security_center.rs`) will absorb Suricata's rule-matching logic to parse kernel network packets and IPC traffic dynamically, blocking malicious behavior autonomously.
 
-1
+4. **`hashicorp/vault`**
+   - **Goal:** Secrets management.
+   - **SigmaOS Implementation:** `sigma_keepass.rs` will act as a kernel-gated secure enclave for managing user credentials and API keys.
 
-1
+## Implementation Phases
 
-1
+- **Phase 1:** Sandboxing API completion.
 
-1
+- **Phase 2:** Native WireGuard integration.
 
-1
-
-1
-
-1
-
-1
-
-Long-term, SigmaOS will target the following compliance standards to allow adoption in government and highly regulated industries:
-
-1
-
-1
+- **Phase 3:** Real-time IDS/IPS via Security Center Daemon.

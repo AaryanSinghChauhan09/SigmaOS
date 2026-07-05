@@ -9,8 +9,11 @@
 SigmaR embeds a highly optimized R execution environment directly into the Ring-3 userland lattice, providing an unparalleled statistical computing layer for:
 
 - `SigmaViz` interactive data visualization pipelines
+
 - `SigmaDB` analytical OLAP query processing
+
 - `SigmaLegalAI` text mining and case law citation network analysis
+
 - Kernel telemetry modeling and regression diagnostics
 
 **Unique Selling Point (USP):** Turning raw data into actionable insights with state-of-the-art statistical modeling, publication-quality graphics (ggplot2), and rich data manipulation ecosystems (dplyr, tidyr).
@@ -28,18 +31,26 @@ SigmaR embeds a highly optimized R execution environment directly into the Ring-
 # Variables and Data Types
 
 x <- 42              # integer/double
+
 name <- "SigmaOS"    # character
+
 flag <- TRUE         # logical
+
 z <- 2 + 3i          # complex
+
 n <- NULL            # null
+
 na_val <- NA         # missing value
 
 # Operators
 
 10 + 3; 10 - 3; 10 * 3; 10 / 3
 10 %% 3       # modulo: 1
+
 10 %/% 3      # integer division: 3
+
 10 ^ 3        # power: 1000
+
 x == 10; x != 5; x > 5; x >= 10
 x & TRUE; x | FALSE; !FALSE   # logical
 
@@ -47,11 +58,16 @@ x & TRUE; x | FALSE; !FALSE   # logical
 
 v <- c(1, 2, 3, 4, 5)
 seq_v <- seq(1, 10, by=2)          # 1 3 5 7 9
+
 rep_v <- rep(c(1,2), times=3)      # 1 2 1 2 1 2
+
 len <- length(v)                   # 5
+
 names(v) <- c("a","b","c","d","e")
 v["a"]                             # 1 (named indexing)
+
 v[c(1,3,5)]                        # 1 3 5 (vector indexing)
+
 v[v > 3]                           # 4 5 (logical indexing)
 
 # Vector recycling
@@ -62,10 +78,15 @@ c(1,2,3,4) + c(10,20)  # = c(11, 22, 13, 24) — 10,20 recycled
 
 m <- matrix(1:9, nrow=3, ncol=3)
 dim(m)                       # 3 3
+
 nrow(m); ncol(m)             # 3; 3
+
 t(m)                         # transpose
+
 m %*% m                      # matrix multiplication
+
 m[1, ]                       # row 1
+
 m[ , 2]                      # column 2
 
 arr <- array(1:24, dim=c(2,3,4))  # 3D array
@@ -74,8 +95,11 @@ arr <- array(1:24, dim=c(2,3,4))  # 3D array
 
 lst <- list(pid=42, name="sigma-ui", running=TRUE, cores=c(1,2))
 lst$name              # "sigma-ui"
+
 lst[["pid"]]          # 42
+
 lst[[4]]              # c(1,2)
+
 length(lst)           # 4
 
 # NULL and Pair lists
@@ -91,8 +115,11 @@ df <- data.frame(
   running = c(TRUE, TRUE, FALSE)
 )
 df$process            # column access
+
 df[1, ]               # row 1
+
 df[df$running == TRUE, ]  # filter
+
 nrow(df); ncol(df)
 
 # Data Input
@@ -119,8 +146,11 @@ get_uptime <- function(unit = "hours") {
 # Higher-order functions
 
 apply(m, 1, sum)               # apply sum over rows
+
 sapply(1:5, function(x) x^2)   # [1 4 9 16 25]
+
 lapply(lst, class)             # list of types
+
 Map("+", c(1,2,3), c(10,20,30)) # element-wise add
 
 # Variable scope
@@ -128,18 +158,24 @@ Map("+", c(1,2,3), c(10,20,30)) # element-wise add
 counter <- 0
 increment <- function() {
   counter <<- counter + 1    # <<- assigns to parent scope
+
 }
 
 # String operations
 
 s <- "SigmaOS Zenith 15.2"
 nchar(s)                      # 20
+
 toupper(s); tolower(s)
 substr(s, 1, 7)               # "SigmaOS"
+
 strsplit(s, " ")[[1]]         # c("SigmaOS","Zenith","15.2")
+
 gsub("15.2", "16.0", s)       # replace
+
 paste("SigmaOS", "Zenith", sep=" ")
 paste0("v", 15.2)              # "v15.2"
+
 sprintf("PID %d: %.1f%% CPU", 42, 15.4)
 file.path("/sigma", "data", "log.csv")  # path construction
 
@@ -147,7 +183,9 @@ file.path("/sigma", "data", "log.csv")  # path construction
 
 os_types <- factor(c("Linux","Windows","SigmaOS","Linux","SigmaOS"))
 levels(os_types)        # "Linux" "SigmaOS" "Windows"
+
 nlevels(os_types)       # 3
+
 table(os_types)         # frequency count
 
 ord_perf <- factor(c("low","high","medium","high"),
@@ -323,14 +361,17 @@ accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Memory Exhaustion in Copy-on-Modify Semantics:** R duplicates entire data frames in memory upon minor column modifications, triggering frequent garbage collection pauses.
-  * *Fix Strategy:* Migrate from base R data frames to `data.table` or `dplyr`, utilizing in-place assignment operators (`:=`) to mutate columns without memory allocation overhead.
-* **Issue - Algorithmic Complexity in Explicit Loops:** Writing explicit `for` loops in R to iterate over millions of rows yields massive interpreter overhead ($O(N)$ execution drag).
-  * *Fix Strategy:* Replace explicit loops with vectorized C-level operations E.g., `colSums`, `rowMeans`, or the `apply` family of functions.
-* **Issue - Database Deadlocks in RMySQL:** Synchronous database queries holding open transaction locks stall under concurrent batch extraction.
-  * *Fix Strategy:* Use `dbSendQuery` combined with chunked `dbFetch(res, n=1000)` to stream results asynchronously, ensuring database locks are released promptly.
-* **Issue - Factor Level Mismatches in Train/Test Splits:** Predicting on test sets containing unseen categorical factor levels triggers fatal runtime exceptions.
-  * *Fix Strategy:* Convert strings to factors globally before partitioning, or utilize `forcats::fct_expand` to harmonize factor levels across train and test data frames.
+- **Issue - Memory Exhaustion in Copy-on-Modify Semantics:** R duplicates entire data frames in memory upon minor column modifications, triggering frequent garbage collection pauses.
+- *Fix Strategy:* Migrate from base R data frames to `data.table` or `dplyr`, utilizing in-place assignment operators (`:=`) to mutate columns without memory allocation overhead.
+
+- **Issue - Algorithmic Complexity in Explicit Loops:** Writing explicit `for` loops in R to iterate over millions of rows yields massive interpreter overhead ($O(N)$ execution drag).
+- *Fix Strategy:* Replace explicit loops with vectorized C-level operations E.g., `colSums`, `rowMeans`, or the `apply` family of functions.
+
+- **Issue - Database Deadlocks in RMySQL:** Synchronous database queries holding open transaction locks stall under concurrent batch extraction.
+- *Fix Strategy:* Use `dbSendQuery` combined with chunked `dbFetch(res, n=1000)` to stream results asynchronously, ensuring database locks are released promptly.
+
+- **Issue - Factor Level Mismatches in Train/Test Splits:** Predicting on test sets containing unseen categorical factor levels triggers fatal runtime exceptions.
+- *Fix Strategy:* Convert strings to factors globally before partitioning, or utilize `forcats::fct_expand` to harmonize factor levels across train and test data frames.
 
 ---
 
@@ -344,4 +385,4 @@ accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
 | `parallel` | Uses SigmaOS multi-core kernel scheduler |
 | `shiny` | Native SigmaWeb runtime integration |
 
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

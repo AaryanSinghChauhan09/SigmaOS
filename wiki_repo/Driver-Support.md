@@ -20,18 +20,27 @@ This document outlines the current state of hardware support in SigmaOS, mapping
 ## 🚀 The Path to Hardware Parity
 
 ### Phase 1: Virtualization & Cloud (Months 1-3)
+
 Before tackling bare metal, SigmaOS must run perfectly in QEMU and cloud hypervisors.
+
 - **VirtIO Suite:** Implement `virtio-blk`, `virtio-net`, and `virtio-gpu`.
+
 - **NVMe Base:** NVMe is the standard for modern cloud storage instances.
 
 ### Phase 2: Modern Desktop Basics (Months 3-6)
+
 To be usable as a daily driver, basic peripherals must work.
+
 - **USB Core & xHCI:** USB 3.0 controller support.
+
 - **USB HID:** Without this, modern USB keyboards and mice will not function.
+
 - **Intel HDA:** Basic audio output for modern motherboards.
 
 ### Phase 3: Graphics & Wireless (Months 6-12)
+
 - **KMS / DRM:** Transition away from the legacy VBE framebuffer.
+
 - **Wi-Fi:** Port or reimplement a basic 802.11 stack and the `iwlwifi` driver.
 
 ## 🛠️ Testing Drivers

@@ -54,19 +54,33 @@ release/dual-boot → kernel-exp sigma-boot.efi + fs-dev
 ## Merge Order
 
 ```
-1.  kernel-exp → main          (Phase 0: QEMU CI passing)
-2.  drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
-3.  fs-dev → main              (VFS + tmpfs + SigmaFS)
-4.  tools-dev → main           (ongoing — every green CI run)
-5.  performance-optimized → main (after kernel-exp)
-6.  docs-update → main         (ongoing)
-7.  release/microkernel ← main (branch from stable main)
-8.  release/standalone ← main  (after GPU drivers)
-9.  release/cloud ← main       (after cgroup enforcement)
+
+1. kernel-exp → main          (Phase 0: QEMU CI passing)
+
+2. drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
+
+3. fs-dev → main              (VFS + tmpfs + SigmaFS)
+
+4. tools-dev → main           (ongoing — every green CI run)
+
+5. performance-optimized → main (after kernel-exp)
+
+6. docs-update → main         (ongoing)
+
+7. release/microkernel ← main (branch from stable main)
+
+8. release/standalone ← main  (after GPU drivers)
+
+9. release/cloud ← main       (after cgroup enforcement)
+
 10. release/mobile ← main      (after ARM64 BSP)
+
 11. release/rtos ← main        (after EDF scheduler)
+
 12. release/dual-boot ← main   (after sigma-boot.efi)
+
 13. release/distributed ← release/cloud
+
 14. release/browser / release/app ← main (after bootable ISO)
 ```
 
@@ -87,17 +101,22 @@ This checks out each `release/*` branch, merges from `main`, and pushes — guar
 ## Working with Branches
 
 ```bash
+
 # Checkout a branch
+
 git checkout tools-dev
 
 # Sync with upstream main
+
 git checkout tools-dev
 git merge main
 
 # Create a new feature branch
+
 git checkout -b feat/my-feature main
 
 # Sync all release branches with main
+
 node tools/sync_all_branches.js
 ```
 
@@ -106,9 +125,13 @@ node tools/sync_all_branches.js
 ## PR Requirements (before merging to main)
 
 1. CI green (`sigma_ci.yml`)
+
 2. `CURRENT_PROBLEMS_MANIFEST.md` updated if fixing a bug
+
 3. Kernel changes: QEMU smoke test log in PR description
+
 4. New subsystems: wiki page in `wiki_repo/`
+
 5. Reviewed by at least one maintainer
 
 ---

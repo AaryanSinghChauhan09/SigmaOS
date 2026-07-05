@@ -1,11 +1,11 @@
-$sourceDir = "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"
-$wikiDir = "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\wiki_repo"
+$sourceDir = "c:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS"
+$wikiDir = "c:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS\wiki_repo"
 
 # Ensure wiki dir exists
 if (-not (Test-Path $wikiDir)) { New-Item -ItemType Directory -Path $wikiDir }
 
 # Copy all .md files recursively from source, but flatten them for the wiki
-Get-ChildItem -Path $sourceDir -Recurse -Filter *.md | ForEach-Object {
+Get-ChildItem -Path $sourceDir -Recurse -Filter *.md | Where-Object { $_.FullName -notmatch '\\wiki_repo\\' } | ForEach-Object {
     $destName = $_.Name.Replace(" ", "-")
     $destPath = Join-Path $wikiDir $destName
     
