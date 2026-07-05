@@ -204,9 +204,9 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 
 ---
 
-## New Gaps Identified — Rounds 29–34
+## New Gaps Identified — Rounds 29–35
 
-The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, Linux distro-inspired components, and open source project-inspired components:
+The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, Linux distro-inspired components, open source project-inspired components, and the new categorized component structure:
 
 | Gap | Discovered While | Priority |
 |---|---|---|
@@ -255,10 +255,41 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 | Business management (sigma-erp) — not implemented | Open source research | 🟡 |
 | Geographic information system (sigma-gis) — not implemented | Open source research | 🟡 |
 | Personal finance (sigma-finance) — not implemented | Open source research | 🟡 |
+| Rolling release model (sigma-rolling) — not implemented | Core system research | 🟡 |
+| Long-term support release (sigma-lts) — not implemented | Core system research | 🟡 |
+| System init choices (sigma-init) — not implemented | Core system research | 🟡 |
+| Kernel customization (sigma-kernel-custom) — not implemented | Core system research | 🟡 |
+| Multiple desktop environments (sigma-desktops) — not implemented | Desktop UX research | 🟡 |
+| Display server options (sigma-display) — not implemented | Desktop UX research | 🟡 |
+| Accessibility tools (sigma-a11y) — not implemented | Desktop UX research | 🟡 |
+| Multilingual UI (sigma-i18n) — not implemented | Desktop UX research | 🟡 |
+| Theme & extension store (sigma-theme-store) — not implemented | Desktop UX research | 🟡 |
+| Home theater media center (sigma-kodi) — not implemented | Creative tools research | 🟡 |
+| Digital audio workstation (sigma-ardour) — not implemented | Creative tools research | 🟡 |
+| RAW photo editor (sigma-rawtherapee) — not implemented | Creative tools research | 🟡 |
+| Version control integration (sigma-git) — not implemented | Development tools research | 🟡 |
+| Kubernetes orchestration (sigma-k8s) — not implemented | Development tools research | 🟡 |
+| IT automation framework (sigma-automation) — not implemented | Development tools research | 🟡 |
+| Interactive notebooks (sigma-jupyter) — not implemented | Development tools research | 🟡 |
+| Statistical computing (sigma-rstudio) — not implemented | Development tools research | 🟡 |
+| Password manager (sigma-password) — not implemented | Security tools research | 🟡 |
+| Antivirus protection (sigma-av) — not implemented | Security tools research | 🟡 |
+| Intrusion detection (sigma-ids) — not implemented | Security tools research | 🟡 |
+| Audit trail tools (sigma-audit) — not implemented | Security tools research | 🟡 |
+| Healthcare records (sigma-health) — not implemented | Indian professional research | 🟡 |
+| Engineering CAD (sigma-cad) — not implemented | Indian professional research | 🟡 |
+| Regional language integration (sigma-boss) — not implemented | Indian professional research | 🟡 |
 
 ---
 
 ## Priority Queue — Recommended Next Rounds
+
+### Round 36 — Categorized Components (NEW)
+1. sigpkg — Universal package manager (Core System)
+2. sigma-code — Code editor suite (Development & IT)
+3. sigma-containers — Containerization (Development & IT)
+4. sigma-i18n — Multilingual UI (Desktop & UX)
+5. sigma-a11y — Accessibility tools (Desktop & UX)
 
 ### Round 35 — Open Source Project Components (NEW)
 1. sigma-paint — Digital painting suite (Krita/GIMP-inspired)

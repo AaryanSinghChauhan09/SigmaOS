@@ -1,10 +1,19 @@
 # SigmaOS Future Development Ideas
 
-95+ ideas across kernel, India-native apps, advanced technology, infrastructure, and national vision. Organised by priority and complexity. Updated with Linux distro and open source project research insights.
+120+ ideas across kernel, India-native apps, advanced technology, infrastructure, and national vision. Organised by category and priority. Updated with Linux distro and open source project research insights.
 
-**NEW SECTIONS**: 
-- Linux Distro-Inspired Components (ideas 51-70) added based on research of Ubuntu, Fedora, Debian, Arch, openSUSE, RHEL, Linux Mint, Manjaro, Pop!_OS, and elementary OS.
-- Open Source Project-Inspired Components (ideas 71-95) added based on research of 35+ major open source projects including VLC, GIMP, Kodi, Audacity, OBS Studio, Krita, Inkscape, Blender, Darktable, LibreOffice, OnlyOffice, Joplin, Zotero, Thunderbird, Nextcloud, Tor Browser, Firefox, Chromium, OpenVPN, TensorFlow, PyTorch, scikit-learn, pandas, NumPy, RStudio, Hugging Face Transformers, GeoGebra, Scilab, Octave, OpenBoard, Koha, ERPNext, Indic NLP Library, QGIS, and GnuCash.
+**NEW CATEGORIZATION**:
+- 🧩 Core System (from Ubuntu, Fedora, Arch, Debian)
+- ⚙️ Desktop & User Experience
+- 🎨 Creative & Media Tools
+- 📘 Productivity & Education
+- 💻 Development & IT
+- 🔒 Security & Privacy
+- 🌍 Indian Professional Tools
+
+**PREVIOUS SECTIONS**: 
+- Linux Distro-Inspired Components (ideas 51-70) based on research of Ubuntu, Fedora, Debian, Arch, openSUSE, RHEL, Linux Mint, Manjaro, Pop!_OS, and elementary OS.
+- Open Source Project-Inspired Components (ideas 71-95) based on research of 35+ major open source projects including VLC, GIMP, Kodi, Audacity, OBS Studio, Krita, Inkscape, Blender, Darktable, LibreOffice, OnlyOffice, Joplin, Zotero, Thunderbird, Nextcloud, Tor Browser, Firefox, Chromium, OpenVPN, TensorFlow, PyTorch, scikit-learn, pandas, NumPy, RStudio, Hugging Face Transformers, GeoGebra, Scilab, Octave, OpenBoard, Koha, ERPNext, Indic NLP Library, QGIS, and GnuCash.
 
 ---
 
@@ -999,12 +1008,286 @@ Double-entry accounting and personal finance:
 
 ---
 
+## 🟢 CORE SYSTEM COMPONENTS (NEW)
+
+### 96. sigpkg — Universal Package Manager
+Unify .deb, .rpm, Flatpak, Snap into single package format:
+- Universal package format compatible with multiple package managers
+- Automatic dependency resolution across package types
+- Transactional updates with rollback capability
+- Repository management for multiple sources
+- India context: Optimized for Indian mirror networks
+**Status**: ✅ Implemented - `userland/pkg/sigpkg.rs`
+
+### 97. sigma-rolling — Rolling Release Option
+Arch-like rolling release for bleeding-edge users:
+- Continuous updates instead of point releases
+- Latest software versions always available
+- Testing branch for stability testing
+- News feed for important changes
+- India context: For users who want latest features and IndiaStack API versions
+**Status**: Concept stage - needs design and implementation
+
+### 98. sigma-lts — Long-Term Support Release
+Ubuntu/Debian-like LTS for stability:
+- 5-year support cycle for stable releases
+- Security updates only after initial period
+- Backported critical fixes
+- Enterprise-grade stability
+- India context: For government and enterprise deployments
+**Status**: Concept stage - needs design and implementation
+
+### 99. sigma-init — System Init Choices
+Support both systemd and alternatives (OpenRC):
+- Pluggable init system architecture
+- Support for systemd, OpenRC, runit, s6
+- Service management abstraction layer
+- Init system selection during installation
+- India context: Lightweight init for resource-constrained systems
+**Status**: Concept stage - needs design and implementation
+
+### 100. sigma-kernel-custom — Kernel Customization
+Modular kernels for desktop, server, mobile:
+- Pre-configured kernel profiles for different use cases
+- Desktop kernel with gaming/media optimizations
+- Server kernel with performance tuning
+- Mobile kernel with power management
+- India context: Custom profiles for Indian hardware ecosystem
+**Status**: Concept stage - needs design and implementation
+
+---
+
+## ⚙️ DESKTOP & USER EXPERIENCE (NEW)
+
+### 101. sigma-desktops — Multiple Desktop Environments
+GNOME, KDE, XFCE, Cinnamon support:
+- Official support for major desktop environments
+- DE selection during installation
+- Session manager for switching between DEs
+- Consistent theming across DEs
+- India context: Optimized for low-end hardware common in India
+**Status**: Concept stage - needs design and implementation
+
+### 102. sigma-display — Display Server Options
+Wayland + X.Org fallback:
+- Native Wayland support with modern protocols
+- X.Org compatibility layer for legacy applications
+- Automatic display server selection
+- Mixed Wayland/X11 session support
+- India context: Optimized for diverse hardware configurations
+**Status**: Concept stage - needs design and implementation
+
+### 103. sigma-a11y — Accessibility Tools
+Screen readers, magnifiers, voice input:
+- Screen reader with Indian language TTS
+- Screen magnifier with tracking
+- On-screen keyboard with Indic script support
+- Voice input for all major Indian languages
+- India context: Support for all 22 official Indian languages
+**Status**: Concept stage - needs design and implementation
+
+### 104. sigma-i18n — Multilingual UI
+Indic language packs (Hindi, Tamil, Bengali, Gujarati, etc.):
+- Complete UI translations for all major Indian languages
+- Language switcher in system settings
+- Input method integration for all Indic scripts
+- Right-to-left language support (Urdu)
+- India context: First-class support for all 22 official Indian languages
+**Status**: Concept stage - needs design and implementation
+
+### 105. sigma-theme-store — Theme & Extension Store
+User-friendly customization hub:
+- Centralized theme repository
+- Extension marketplace with ratings
+- One-click theme installation
+- Custom theme creation tools
+- India context: Themes inspired by Indian art and culture
+**Status**: Concept stage - needs design and implementation
+
+---
+
+## 🎨 ADDITIONAL CREATIVE & MEDIA TOOLS (NEW)
+
+### 106. sigma-kodi — Home Theater Media Center
+Kodi-inspired media center:
+- 10-foot UI for TV usage
+- Media library management
+- Live TV and PVR support
+- Add-on ecosystem
+- India context: Integration with Indian streaming services
+**Status**: Concept stage - needs design and implementation
+
+### 107. sigma-ardour — Digital Audio Workstation
+Professional audio recording and editing:
+- Multi-track recording with unlimited tracks
+- MIDI sequencing and editing
+- Plugin support (LADSPA, LV2, VST)
+- Automation and mixing console
+- India context: Support for Indian classical music microtones
+**Status**: Concept stage - needs design and implementation
+
+### 108. sigma-rawtherapee — RAW Photo Editor
+Non-destructive RAW photo editing:
+- Advanced color grading tools
+- Noise reduction and sharpening
+- Lens correction profiles
+- Batch processing
+- India context: Color profiles for Indian lighting conditions
+**Status**: Concept stage - needs design and implementation
+
+---
+
+## 💻 DEVELOPMENT & IT TOOLS (NEW)
+
+### 109. sigma-code — Code Editor Suite
+VS Code OSS/Neovim-inspired development environment:
+- Modern code editor with LSP support
+- Integrated terminal
+- Git integration
+- Extension marketplace
+- India context: Support for Indian programming languages and scripts
+**Status**: ✅ Implemented - `userland/code/sigma_code.rs`
+
+### 110. sigma-git — Version Control Integration
+Native Git integration and tools:
+- Git command-line tools
+- GUI Git client
+- GitHub/GitLab integration
+- Commit signing support
+- India context: Integration with Indian code hosting platforms
+**Status**: Concept stage - needs design and implementation
+
+### 111. sigma-containers — Containerization
+Docker/Podman container support:
+- Container runtime (Docker-compatible)
+- Container image management
+- Docker Compose alternative
+- Container orchestration basics
+- India context: Optimized for Indian cloud providers
+**Status**: ✅ Implemented - `userland/containers/sigma_containers.rs`
+
+### 112. sigma-k8s — Kubernetes Orchestration
+k3s/microk8s lightweight Kubernetes:
+- Lightweight Kubernetes distribution
+- Single-node and multi-node clusters
+- Local development environment
+- Helm chart support
+- India context: Optimized for Indian edge computing scenarios
+**Status**: Concept stage - needs design and implementation
+
+### 113. sigma-automation — IT Automation Framework
+Ansible/Puppet/Chef-inspired configuration management:
+- Agentless configuration management
+- YAML-based playbooks
+- Inventory management
+- Idempotent operations
+- India context: Templates for Indian government IT infrastructure
+**Status**: Concept stage - needs design and implementation
+
+### 114. sigma-jupyter — Interactive Notebooks
+JupyterLab-inspired data science environment:
+- Jupyter notebook support
+- Multiple kernel support (Python, R, Julia)
+- Interactive visualization
+- Extension system
+- India context: Pre-configured for Indian datasets and examples
+**Status**: Concept stage - needs design and implementation
+
+### 115. sigma-rstudio — Statistical Computing
+RStudio-inspired statistical IDE:
+- R development environment
+- Data visualization tools
+- Package management
+- Markdown document generation
+- India context: Examples from Indian statistical surveys and research
+**Status**: Concept stage - needs design and implementation
+
+---
+
+## 🔒 SECURITY & PRIVACY TOOLS (NEW)
+
+### 116. sigma-password — Password Manager
+KeePassXC-inspired password vault:
+- Encrypted password storage
+- Cross-platform sync
+- Auto-fill integration
+- Password generator
+- India context: Support for Indian government authentication systems
+**Status**: Concept stage - needs design and implementation
+
+### 117. sigma-av — Antivirus Protection
+ClamAV-inspired malware scanning:
+- Real-time scanning
+- On-demand scanning
+- Signature updates
+- Heuristic analysis
+- India context: Signatures for Indian-specific malware
+**Status**: Concept stage - needs design and implementation
+
+### 118. sigma-ids — Intrusion Detection
+Suricata/Snort-inspired network security:
+- Network intrusion detection
+- Rule-based alerting
+- Traffic analysis
+- Log management
+- India context: Rules for Indian compliance requirements
+**Status**: Concept stage - needs design and implementation
+
+### 119. sigma-audit — Audit Trail Tools
+Transparency for AI-generated actions:
+- Comprehensive system logging
+- AI decision audit trail
+- Tamper-evident logs
+- Compliance reporting
+- India context: Compliance with Indian data protection laws
+**Status**: Concept stage - needs design and implementation
+
+---
+
+## 🌍 ADDITIONAL INDIAN PROFESSIONAL TOOLS (NEW)
+
+### 120. sigma-health — Healthcare Records
+OpenMRS-inspired medical records:
+- Electronic health records
+- Patient management
+- Prescription management
+- Integration with ABDM (Ayushman Bharat Digital Mission)
+- India context: Full ABDM compliance and integration
+**Status**: Concept stage - needs design and implementation
+
+### 121. sigma-cad — Engineering CAD
+FreeCAD-inspired 3D CAD:
+- Parametric 3D modeling
+- 2D drafting
+- CAM integration
+- Finite element analysis
+- India context: Templates for Indian engineering standards
+**Status**: Concept stage - needs design and implementation
+
+### 122. sigma-boss — Regional Language Integration
+BOSS Linux-inspired localization:
+- Deep integration of Indian languages
+- Localized applications
+- Regional language input methods
+- Language-specific fonts
+- India context: Complete localization for all Indian languages
+**Status**: Concept stage - needs design and implementation
+
+---
+
 ## Summary by Effort
 
 | Idea | Effort | Team Size | Timeline |
 |---|---|---|---|
 | Kernel implementations (1–4) | Massive | 5–10 engineers | 12–18 months |
 | ISO + boot pipeline | High | 2–3 engineers | 3–6 months |
+| Core system components (96–100) | High each | 2-3 engineers each | 3-6 months each |
+| Desktop & UX components (101–105) | Medium-High each | 1-2 engineers each | 2-4 months each |
+| Creative & media tools (71–80, 106–108) | High each | 2-3 engineers each | 3-6 months each |
+| Productivity & education (81–95) | Medium-High each | 1-2 engineers each | 2-4 months each |
+| Development & IT tools (109–115) | Medium-High each | 1-2 engineers each | 2-4 months each |
+| Security & privacy tools (84–86, 116–119) | High each | 2-3 engineers each | 3-6 months each |
+| Indian professional tools (21–50, 120–122) | Medium each | 1-2 engineers each | 2-4 months each |
 | ABDM + GST API clients | Medium | 1–2 engineers | 2–3 months |
 | Indian IME | Medium | 1 engineer | 2–3 months |
 | Local LLM integration | Medium | 1–2 engineers | 1–2 months |
