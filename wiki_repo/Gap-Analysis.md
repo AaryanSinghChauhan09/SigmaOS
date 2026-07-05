@@ -204,9 +204,9 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 
 ---
 
-## New Gaps Identified — Rounds 29–33
+## New Gaps Identified — Rounds 29–34
 
-The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, and Linux distro-inspired components:
+The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, Linux distro-inspired components, and open source project-inspired components:
 
 | Gap | Discovered While | Priority |
 |---|---|---|
@@ -233,10 +233,39 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 | Telemetry and analytics (sigma-insights) — not implemented | Linux distro research | 🟡 |
 | Configuration database (sigma-debconf) — not implemented | Linux distro research | 🟡 |
 | Rolling release model (sigma-rolling) — not implemented | Linux distro research | 🟡 |
+| Digital painting suite (sigma-paint) — not implemented | Open source research | 🟡 |
+| Vector graphics editor (sigma-vector) — not implemented | Open source research | 🟡 |
+| 3D creation suite (sigma-3d) — not implemented | Open source research | 🟡 |
+| Photography workflow (sigma-photo) — not implemented | Open source research | 🟡 |
+| Live streaming studio (sigma-stream) — not implemented | Open source research | 🟡 |
+| Audio production suite (sigma-audio) — not implemented | Open source research | 🟡 |
+| Office suite (sigma-office) — not implemented | Open source research | 🟡 |
+| Collaborative office (sigma-collab) — not implemented | Open source research | 🟡 |
+| Privacy-focused notes (sigma-notes) — not implemented | Open source research | 🟡 |
+| Reference manager (sigma-ref) — not implemented | Open source research | 🟡 |
+| Email client (sigma-mail) — not implemented | Open source research | 🟡 |
+| Self-hosted cloud (sigma-cloud) — not implemented | Open source research | 🟡 |
+| Privacy browser (sigma-privacy) — not implemented | Open source research | 🟡 |
+| Modern web browser (sigma-web) — not implemented | Open source research | 🟡 |
+| Secure VPN (sigma-vpn) — not implemented | Open source research | 🟡 |
+| Machine learning framework (sigma-ml) — not implemented | Open source research | 🟡 |
+| Mathematics software (sigma-math) — not implemented | Open source research | 🟡 |
+| Interactive whiteboard (sigma-edu) — not implemented | Open source research | 🟡 |
+| Library management (sigma-library) — not implemented | Open source research | 🟡 |
+| Business management (sigma-erp) — not implemented | Open source research | 🟡 |
+| Geographic information system (sigma-gis) — not implemented | Open source research | 🟡 |
+| Personal finance (sigma-finance) — not implemented | Open source research | 🟡 |
 
 ---
 
 ## Priority Queue — Recommended Next Rounds
+
+### Round 35 — Open Source Project Components (NEW)
+1. sigma-paint — Digital painting suite (Krita/GIMP-inspired)
+2. sigma-office — Office suite (LibreOffice-inspired)
+3. sigma-mail — Email client (Thunderbird-inspired)
+4. sigma-cloud — Self-hosted cloud (Nextcloud-inspired)
+5. sigma-web — Modern web browser (Firefox/Chromium-inspired)
 
 ### Round 34 — Linux Distro Components (NEW)
 1. sigma-snapper — Snapshot & rollback system (openSUSE Snapper-inspired)
