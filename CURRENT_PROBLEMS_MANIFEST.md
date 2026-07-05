@@ -87,7 +87,7 @@
 - **[#1000] Developer SDK:** sigma-sdk CLI, debugger (sigma-gdb), profiler (sigma-perf trace).
 - **[#1001] App Sandbox:** Fine-grained capability system (sandboxctl) for third-party apps.
 - **[#1002] Multi-monitor KMS:** Extended desktop and clone mode across multiple KMS adapters.
-- **[#1009] CryptFS real key derivation (Issue #44):** ✅ **Resolved** — `fs/sigma_cryptfs_derive.rs` implements PBKDF2-HMAC-SHA256 with 100,000 iterations.
+- **[#1003] Real Argon2id CryptFS:** ✅ **Resolved** — `fs/sigma_cryptfs_derive.rs` implements Argon2id (RFC 9106) with BLAKE2b, replacing PBKDF2.
 - **[#1011] Package repository server:** ✅ **Resolved** — `userland/pkg/sigma_repo_server.rs` implements HTTP-based package repository server.
 - **[#1012] TCP/UDP socket layer:** ✅ **Resolved** — `kernel/net/sigma_tcp_state.rs` implements full RFC 793 TCP state machine.
 - **[#1013] ABDM FHIR API client:** ✅ **Resolved** — `userland/health/sigma_abdm_client.rs` implements ABDM FHIR R4 client.
