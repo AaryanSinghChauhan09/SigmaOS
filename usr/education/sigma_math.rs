@@ -41,6 +41,29 @@ impl Matrix {
     }
 }
 
+/// Simple Linear Regression using Gradient Descent in no_std / zero allocation.
+/// Fits y = m * x + c on matching slices. Returns (m, c).
+pub fn ml_linear_regression_fit(x: &[f32], y: &[f32], epochs: usize, lr: f32) -> (f32, f32) {
+    let mut m = 0.0f32;
+    let mut c = 0.0f32;
+    let n = x.len();
+    if n == 0 { return (m, c); }
+
+    for _ in 0..epochs {
+        let mut dm = 0.0f32;
+        let mut dc = 0.0f32;
+        for i in 0..n {
+            let prediction = m * x[i] + c;
+            let error = prediction - y[i];
+            dm += error * x[i];
+            dc += error;
+        }
+        m -= (lr * dm) / (n as f32);
+        c -= (lr * dc) / (n as f32);
+    }
+    (m, c)
+}
+
 /// Computes the dot product of two matrices. O(N^3) zero-allocation.
 #[no_mangle]
 pub unsafe extern "C" fn math_matrix_multiply(
