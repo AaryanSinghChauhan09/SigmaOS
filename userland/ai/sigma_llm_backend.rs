@@ -89,11 +89,11 @@ pub unsafe extern "C" fn ai_engine_init() -> SigmaI32 {
 #[no_mangle]
 pub unsafe extern "C" fn ai_submit_task(
     caller_id: SigmaU32,
-    priority_level: SigmaU8,
+    priority_level: u8,
     prompt_str: *const u8,
     p_len: SigmaUsize,
 ) -> SigmaI32 {
-    if !ENGINE_READY || prompt_str.is_null() { return -1; }
+    if !ENGINE_READY || prompt_str.is_null() || p_len == 0 { return -1; }
     
     let prio = match priority_level {
         0 => TaskPriority::Background,
