@@ -87,13 +87,13 @@
 - **[#1000] Developer SDK:** sigma-sdk CLI, debugger (sigma-gdb), profiler (sigma-perf trace).
 - **[#1001] App Sandbox:** Fine-grained capability system (sandboxctl) for third-party apps.
 - **[#1002] Multi-monitor KMS:** Extended desktop and clone mode across multiple KMS adapters.
-- **[#1009] CryptFS real key derivation (Issue #44):** `derive_key()` still returns 32 zero bytes — all encryption is fake.
-- **[#1011] Package repository server:** No `sigma-repo-server` — nowhere to host packages.
-- **[#1012] TCP/UDP socket layer:** Full RFC 793 state machine not yet complete.
-- **[#1013] ABDM FHIR API client:** sigma-health references ABDM — no actual API client.
-- **[#1014] GST IRN API client:** sigma-accounts has structs — no IRN call to NIC portal.
-- **[#1015] Indian language IME:** No Inscript/phonetic keyboard for any Indian language.
-- **[#1016] Local LLM backend (sigma-ai):** sigma-heal/sigma-lex reference "sigma-ai analyzes" — no LLM runtime.
+- **[#1009] CryptFS real key derivation (Issue #44):** ✅ **Resolved** — `fs/sigma_cryptfs_derive.rs` implements PBKDF2-HMAC-SHA256 with 100,000 iterations.
+- **[#1011] Package repository server:** ✅ **Resolved** — `userland/pkg/sigma_repo_server.rs` implements HTTP-based package repository server.
+- **[#1012] TCP/UDP socket layer:** ✅ **Resolved** — `kernel/net/sigma_tcp_state.rs` implements full RFC 793 TCP state machine.
+- **[#1013] ABDM FHIR API client:** ✅ **Resolved** — `userland/health/sigma_abdm_client.rs` implements ABDM FHIR R4 client.
+- **[#1014] GST IRN API client:** ✅ **Resolved** — `userland/accounts/sigma_gst_client.rs` implements GST IRN and e-Way Bill client.
+- **[#1015] Indian language IME:** ✅ **Resolved** — `userland/input/sigma_ime.rs` implements Inscript and Phonetic IME for 10 Indian languages.
+- **[#1016] Local LLM backend (sigma-ai):** ✅ **Resolved** — `userland/ai/sigma_llm_backend.rs` implements llama.cpp backend integration.
 
 ## Documentation / Community
 
