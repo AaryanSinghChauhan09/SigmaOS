@@ -1,0 +1,346 @@
+name: SigmaOS CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight UTC
+
+jobs:
+  build:
+    name: Build SigmaOS (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            os: ubuntu-latest
+            qemu_arch: x86_64
+            toolchain: x86_64-unknown-none-elf
+          - arch: aarch64
+            os: ubuntu-latest
+            qemu_arch: aarch64
+            toolchain: aarch64-unknown-none-elf
+          - arch: riscv64
+            os: ubuntu-latest
+            qemu_arch: riscv64
+            toolchain: riscv64gc-unknown-none-elf
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          qemu-system-x86 \
+          qemu-system-arm \
+          qemu-system-riscv64 \
+          mtools \
+          xorriso \
+          grub-common \
+          grub-pc-bin \
+          grub-efi-amd64-bin \
+          grub-efi-ia32-bin
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        target: ${{ matrix.toolchain }}
+        override: true
+
+    - name: Cache build artifacts
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+          build
+        key: ${{ runner.os }}-cargo-${{ matrix.arch }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ matrix.arch }}-
+
+    - name: Configure build
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=../toolchain-${{ matrix.arch }}.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -GNinja
+
+    - name: Build kernel
+      run: |
+        cd build
+        ninja kernel
+
+    - name: Build userland
+      run: |
+        cd build
+        ninja userland
+
+    - name: Generate ISO
+      run: |
+        cd build
+        ninja iso
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: sigmaos-${{ matrix.arch }}-iso
+        path: build/sigmaos-${{ matrix.arch }}.iso
+        retention-days: 7
+
+  boot-test:
+    name: Boot Test (${{ matrix.arch }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            qemu_arch: x86_64
+            qemu_cmd: qemu-system-x86_64
+          - arch: aarch64
+            qemu_arch: aarch64
+            qemu_cmd: qemu-system-aarch64
+          - arch: riscv64
+            qemu_arch: riscv64
+            qemu_cmd: qemu-system-riscv64
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: sigmaos-${{ matrix.arch }}-iso
+        path: build
+
+    - name: Install QEMU
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-system-x86 qemu-system-arm qemu-system-riscv64
+
+    - name: Boot test
+      run: |
+        chmod +x qemu-boot.sh
+        timeout 300 ./qemu-boot.sh -arch ${{ matrix.arch }} -iso build/sigmaos-${{ matrix.arch }}.iso || exit 1
+
+    - name: Collect boot logs
+      if: always()
+      run: |
+        if [ -f boot.log ]; then
+          cat boot.log
+        fi
+
+  reproducible-build:
+    name: Reproducible Build Check
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          qemu-system-x86 \
+          mtools \
+          xorriso
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        target: x86_64-unknown-none-elf
+        override: true
+
+    - name: Build first image
+      run: |
+        mkdir -p build1
+        cd build1
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=../toolchain-x86_64.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -GNinja
+        ninja iso
+        sha256sum sigmaos-x86_64.iso > hash1.txt
+
+    - name: Build second image
+      run: |
+        mkdir -p build2
+        cd build2
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=../toolchain-x86_64.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -GNinja
+        ninja iso
+        sha256sum sigmaos-x86_64.iso > hash2.txt
+
+    - name: Compare hashes
+      run: |
+        diff build1/hash1.txt build2/hash2.txt
+        if [ $? -eq 0 ]; then
+          echo "✓ Reproducible build verified"
+        else
+          echo "✗ Build not reproducible"
+          exit 1
+        fi
+
+    - name: Generate build provenance
+      run: |
+        cat > provenance.json <<EOF
+        {
+          "build_id": "${{ github.run_id }}",
+          "commit": "${{ github.sha }}",
+          "branch": "${{ github.ref_name }}",
+          "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+          "builder": "GitHub Actions",
+          "toolchain": "x86_64-unknown-none-elf",
+          "reproducible": true
+        }
+        EOF
+        cat provenance.json
+
+    - name: Upload provenance
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-provenance
+        path: provenance.json
+
+  benchmark:
+    name: Performance Benchmarks
+    needs: boot-test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: sigmaos-x86_64-iso
+        path: build
+
+    - name: Install QEMU
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-system-x86
+
+    - name: Run boot time benchmark
+      run: |
+        chmod +x scripts/benchmark-boot.sh
+        ./scripts/benchmark-boot.sh -iso build/sigmaos-x86_64.iso -output boot-times.json
+
+    - name: Run memory benchmark
+      run: |
+        chmod +x scripts/benchmark-memory.sh
+        ./scripts/benchmark-memory.sh -iso build/sigmaos-x86_64.iso -output memory-usage.json
+
+    - name: Generate benchmark report
+      run: |
+        python3 scripts/generate-benchmark-report.py \
+          --boot boot-times.json \
+          --memory memory-usage.json \
+          --output benchmark-report.md
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results
+        path: |
+          boot-times.json
+          memory-usage.json
+          benchmark-report.md
+
+    - name: Comment PR with benchmarks
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('benchmark-report.md', 'utf8');
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report
+          });
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Rust security audit
+      uses: actions-rs/audit-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run static analysis
+      run: |
+        cargo install clippy
+        cargo clippy --all-targets --all-features -- -D warnings
+
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+
+    - name: Run tests
+      run: |
+        cargo test --all --all-features
+
+    - name: Generate coverage
+      run: |
+        cargo install tarpaulin
+        cargo tarpaulin --out Xml --output-dir coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/cobertura.xml
