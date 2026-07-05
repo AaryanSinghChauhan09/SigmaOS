@@ -229,6 +229,24 @@ Everything depends on `kernel-exp` shipping Phase 0:
 - Portal integration for file access, printing, screenshots
 - Application search and installation
 
+### Observability
+#### Cockpit Web Admin (sigma_cockpit.rs)
+- System monitoring with CPU, memory, disk, network statistics
+- Service management (start, stop, restart, enable, disable)
+- User management with add/remove operations
+- Log viewing and filtering by service
+- Dashboard summary with system health status
+- Web server configuration with SSL and authentication options
+
+### Productivity
+#### Thunderbird Email Client (sigma_thunderbird.rs)
+- Email account management with IMAP/SMTP configuration
+- Message composition, sending, receiving
+- Folder management (Inbox, Sent, Drafts, Trash, Spam, Archive, custom)
+- Contact management with search functionality
+- Message operations (reply, forward, move, delete, flag)
+- Attachment support and message search
+
 ### Previous Enhancements
 #### Office Suite (sigma_office.rs)
 - Enhanced formula evaluation with support for +, -, *, /, ^ operators
