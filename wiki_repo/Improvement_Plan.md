@@ -59,12 +59,12 @@ graph LR
 
 ## 6. Unified API Expansion Roadmap
 
-| Phase | Target Subsystem | Improvement Feature | Expected Benefit |
-| :--- | :--- | :--- | :--- |
-| **Phase I** | `SovereignBoot` | Async concurrent shard ignition | Reduces boot times to under 400 milliseconds |
-| **Phase II** | `SovereignVideo` | SIMD-accelerated non-linear edits | 4x faster HEVC transcode operations |
-| **Phase III** | `SovereignCloudFS` | Encrypted multi-node block syncing | Zero-overhead distributed replication |
-| **Phase IV** | `S-ERA / S-CCF` | High-performance batch auditing | Real-time analysis for corporate registers |
+| Phase | Target Subsystem | Improvement Feature | Expected Benefit | 
+| :--- | :--- | :--- | :--- | 
+| **Phase I** | `SovereignBoot` | Async concurrent shard ignition | Reduces boot times to under 400 milliseconds | 
+| **Phase II** | `SovereignVideo` | SIMD-accelerated non-linear edits | 4x faster HEVC transcode operations | 
+| **Phase III** | `SovereignCloudFS` | Encrypted multi-node block syncing | Zero-overhead distributed replication | 
+| **Phase IV** | `S-ERA / S-CCF` | High-performance batch auditing | Real-time analysis for corporate registers | 
 
 ---
 

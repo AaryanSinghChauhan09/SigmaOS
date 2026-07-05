@@ -1,527 +1,491 @@
-# SigmaOS: Master Future Development Roadmap
-
-> **Version:** 2.0 — Comprehensive 24-Month Strategic Plan  
-> **Last Updated:** July 2026  
-> **Status:** Active Development
-
-This document is the authoritative, living master roadmap for SigmaOS — covering kernel internals, drivers, AI/ML subsystems, data science tooling, CLI tools, security hardening, desktop environment, localization, and ecosystem growth. Each phase is concrete, sequenced, and draws directly from battle-tested Linux distro features.
+# SigmaOS — Detailed Future Development Roadmap
+> Version: v15.0.0 → v2.0.0 Sovereign | Last updated: July 2026
+> This document covers Phases I–Z: everything from near-term fixes to 3-year vision.
 
 ---
 
-## Strategic Vision
+## 📐 Architecture Principles (Immutable)
 
-SigmaOS aims to be a **sovereign, AI-native, hyper-secure operating system** that:
-
-- Runs fully `no_std` / bare-metal from microkernel to userspace
-- Integrates cutting-edge research from Linux, OpenBSD, NixOS, Qubes OS, and Tails OS
-- Provides a complete AI/ML inference stack running locally, without cloud dependency
-- Delivers a premium Zenith desktop + CLI experience rivaling macOS + Arch Linux
-- Ships with enterprise-grade security (PQC crypto, formal verification, eBPF monitoring)
-
----
-
-```mermaid
-gantt
-    title SigmaOS 24-Month Master Release Timeline
-    dateFormat  YYYY-MM
-    section Phase 1: Core Kernel
-    Scheduler, MM, IPC, Boot   :active, p1, 2026-07, 3M
-    section Phase 2: Drivers & HAL
-    NIC, GPU, Storage, USB     :p2, after p1, 3M
-    section Phase 3: Filesystems
-    SovereignFS, CoW, RAID     :p3, after p2, 3M
-    section Phase 4: Net & Security
-    TCP/IP, eBPF, PQC, cgroups :p4, after p3, 3M
-    section Phase 5: Async I/O & Perf
-    io_uring, ASLR, slab, BPF  :p5, after p4, 3M
-    section Phase 6: AI/ML & DS
-    Edge inference, voice, NLP  :p6, after p5, 3M
-    section Phase 7: Desktop & UI
-    Zenith, tiling, a11y, apps  :p7, after p6, 3M
-    section Phase 8: Ecosystem
-    SDK, localization, community:p8, after p7, 3M
-```
+1. **Sovereign-first** — no dependency on US/Chinese proprietary blobs.
+2. **No-std kernel** — every kernel module compiles `#![no_std]`.
+3. **PQC by default** — all crypto uses NIST PQC (ML-KEM-768, ML-DSA-65).
+4. **Formal-verifiable** — scheduler + PMM + IPC provable in Coq/Lean.
+5. **Zero-telemetry** — opt-in only, cryptographically verifiable.
+6. **Multi-profile** — one codebase, 10 deployment profiles.
 
 ---
 
-## Phase 1 — Core Kernel Foundation (M0–M3)
+## 🗓 Phase I — Q3 2026 (Bootability + Hardware)
 
-### Objectives
-Establish a stable, production-quality microkernel that can boot on real x86_64 hardware and QEMU.
+### I.1 UEFI Bootloader (`sigma-boot.efi`)
+- Implement EFI stub in Zig/Rust (no GRUB dependency).
+- Support: GPT, FAT32 EFI partition, kernel command line.
+- Secure Boot: sign with ML-DSA, verify chain.
+- Fallback: GRUB2 multiboot2 header (already exists).
+- **Owner:** `kernel/bootloader/sigma_uefi.zig`
+- **Milestone:** Boot on bare metal x86-64 without GRUB.
 
-### 1.1 Process Management
+### I.2 Bootable ISO Build
+- `make iso` → GPT disk image → write to USB with `sigma-iso-writer`.
+- Limine bootloader integration for BIOS+UEFI dual support.
+- Automated QEMU smoke test in CI.
+- **Owner:** `scripts/build-iso.sh`, `tools/limine.cfg`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| fork() / exec() / exit() / wait4() | ✅ Implemented | Linux `kernel/fork.c` |
-| PID allocator (atomic, wrapping) | ✅ Implemented | Linux `kernel/pid.c` |
-| Process Control Block (Task struct) | ✅ Implemented | Linux `task_struct` |
-| Zombie reaping | ✅ Implemented | POSIX waitpid() |
-| Thread support (TID = PID simplified) | 🔄 Partial | Linux NPTL |
-| Process groups & sessions | 🔲 Planned | POSIX setsid() |
-| Capabilities (Linux capability model) | 🔄 Partial | Linux `capability.h` |
-| Namespaces (PID/mount/net/user) | 🔄 Partial | Linux namespaces(7) |
-| cgroups v2 resource enforcement | ✅ Implemented | Linux cgroups(7) |
+### I.3 NVMe Async Driver
+- Replace MMIO polling with MSI-X interrupts.
+- io_uring style submission/completion queues.
+- Expected: 4× IOPS improvement.
+- **Owner:** `drivers/storage/sigma_nvme_async.rs`
 
-### 1.2 Scheduler (MLFQ + CFS + EDF)
+### I.4 SATA AHCI Driver
+- FIS-based command dispatching.
+- DMA transfer engine.
+- Hot-plug detection via AHCI port interrupts.
+- **Owner:** `drivers/storage/sigma_ahci.rs`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| MLFQ (4-level priority queues) | ✅ Implemented | OSTEP textbook |
-| CFS (virtual runtime min-heap) | ✅ Implemented | Linux `kernel/sched/fair.c` |
-| EDF (hard real-time deadlines) | ✅ Implemented | RTOS design |
-| Priority aging / boost | ✅ Implemented | Linux MLFQ |
-| Frozen-state for forensic snapshots | ✅ Implemented | Linux freezer subsystem |
-| CPU affinity masks | ✅ Struct field | Linux sched_setaffinity |
-| SMP / per-CPU run queues | 🔲 Planned | Linux SMP scheduler |
-| Load balancing across CPUs | 🔲 Planned | Linux `kernel/sched/topology.c` |
-| Power-aware scheduling (EAS) | 🔲 Planned | ARM Energy Aware Scheduling |
-| BPF-powered scheduler hooks | 🔲 Planned | Linux sched_ext (6.7+) |
+### I.5 virtio-GPU
+- Para-virtual GPU for QEMU/KVM deployments.
+- 2D blit, cursor plane, host-native resolution.
+- **Owner:** `drivers/gpu/sigma_virtio_gpu.rs`
 
-### 1.3 Memory Management
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Buddy allocator (11 orders) | ✅ Implemented | Linux `mm/page_alloc.c` |
-| Slab allocator (8 size classes) | ✅ Implemented | Linux SLUB |
-| Slab poisoning (use-after-free detection) | ✅ Implemented | Linux 6.11 bucket isolation |
-| Slab header canary | ✅ Implemented | OpenBSD malloc canaries |
-| ASLR (42-bit VMA entropy) | ✅ Implemented | Linux ASLR |
-| W^X enforcement | ✅ Implemented | OpenBSD W^X / PaX |
-| Kernel stack guard canaries | ✅ Implemented | GCC -fstack-protector |
-| VMA descriptor map | ✅ Implemented | Linux `struct vm_area_struct` |
-| Copy-on-Write (CoW) VMAs | 🔄 Partial | Linux CoW fork |
-| Transparent Huge Pages (THP) | 🔲 Planned | Linux THP |
-| NUMA awareness | 🔲 Planned | Linux NUMA mm |
-| Memory pressure notifications | 🔲 Planned | Linux PSI |
-| zram compressed swap | 🔲 Planned | Android zram |
-
-### 1.4 IPC & Synchronization
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| IPC channels (typed messages) | ✅ Implemented | seL4 IPC |
-| Signals (SIGKILL, SIGTERM, SIGUSR) | ✅ Implemented | POSIX signals |
-| IRQ controller abstraction | ✅ Implemented | Linux APIC driver |
-| Spinlocks / RWlocks (no_std) | 🔲 Planned | Linux `spinlock.h` |
-| Futexes (fast userspace mutexes) | 🔲 Planned | Linux futex(2) |
-| Shared memory regions | 🔲 Planned | POSIX shm_open |
+### I.6 Multi-Monitor KMS
+- Extended desktop spanning two DRM connectors.
+- Clone mode (mirror).
+- Per-CRTC gamma + color management.
+- **Owner:** `kernel/core/sigma_gpu_drm.rs` (extend existing)
 
 ---
 
-## Phase 2 — Hardware Drivers & HAL (M3–M6)
+## 🗓 Phase J — Q4 2026 (Architecture Expansion)
 
-### 2.1 Network Drivers
+### J.1 ARM64 Port (Raspberry Pi 5, Apple M-series stub)
+- AArch64 boot: DTB parsing, EL2→EL1 transition.
+- GIC-600 interrupt controller.
+- Pi 5: BCM2712 SOC peripherals (UART, EMMC, USB3).
+- **Owner:** `arch/aarch64/`, `drivers/arm/`
 
-| Driver | Status | Inspired By |
-|:---|:---:|:---|
-| Intel e1000 (GbE, QEMU default) | ✅ Implemented | Linux `e1000` |
-| Intel ixgbe (10GbE, Xeon) | 🔄 Stub | Linux `ixgbe` |
-| Realtek RTL8139 (legacy PCI) | 🔄 Stub | Linux `8139too` |
-| NE2000 (ISA legacy) | 🔄 Stub | Linux `ne` |
-| VirtIO-net (QEMU paravirt) | 🔲 Planned | Linux `virtio_net` |
-| Wireless (cfg80211 / nl80211) | 🔲 Planned | Linux mac80211 |
-| USB network (CDC-ECM) | 🔲 Planned | Linux `cdc_ether` |
+### J.2 RISC-V 64 Port
+- SBI-based boot (OpenSBI).
+- PLIC interrupt controller.
+- VirtIO device support.
+- **Owner:** `arch/riscv64/`
 
-### 2.2 Storage Drivers
+### J.3 eBPF JIT Compiler (x86-64)
+- Translate eBPF bytecode → x86-64 machine code.
+- Safety: verifier checks all register accesses, no unbounded loops.
+- 10× performance vs interpreter for network filtering.
+- **Owner:** `kernel/bpf/sigma_jit_x86.rs`
 
-| Driver | Status | Inspired By |
-|:---|:---:|:---|
-| NVMe (PCIe Gen3/4) | 🔄 Stub | Linux `nvme` |
-| SATA/AHCI | 🔄 Stub | Linux `ahci` |
-| ATA/PATA | 🔄 Stub | Linux `libata` |
-| VirtIO-blk | 🔲 Planned | Linux `virtio_blk` |
-| USB Mass Storage (BOT) | 🔲 Planned | Linux `usb-storage` |
-| SCSI subsystem | 🔄 Stub | Linux `drivers/scsi` |
+### J.4 Formal Verification (Coq)
+- Scheduler invariants: no starvation, bounded latency.
+- PMM: no double-free, no use-after-free.
+- IPC: no deadlock, message integrity.
+- **Owner:** `tests/formal/`
 
-### 2.3 GPU & Display
+### J.5 Linux Binary Compatibility
+- `binfmt_misc` loader for ELF64 Linux binaries.
+- Syscall translation layer (POSIX subset).
+- `/proc` + `/sys` emulation.
+- **Owner:** `kernel/core/sovereign_compat_shim.rs` (extend)
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| VESA/VBE framebuffer | ✅ Implemented | Linux `vesafb` |
-| VirtIO-GPU | 🔲 Planned | Linux `virtio-gpu` |
-| Intel i915 basic modesetting | 🔲 Planned | Linux `i915` |
-| Vulkan ICD shim | 🔄 Stub | Mesa |
-| DRM/KMS abstraction layer | 🔲 Planned | Linux DRM |
-| OpenGL software rasterizer | 🔲 Planned | Mesa softpipe |
-
-### 2.4 Input & Audio
-
-| Driver | Status | Inspired By |
-|:---|:---:|:---|
-| PS/2 keyboard + mouse | ✅ Implemented | Linux `i8042` |
-| USB HID (keyboards, mice) | 🔄 Stub | Linux `usbhid` |
-| HDA audio (Intel, Realtek) | 🔄 Stub | Linux `snd-hda` |
-| VirtIO sound | 🔲 Planned | Linux `virtio-snd` |
-| ALSA-compatible buffer API | 🔲 Planned | Linux ALSA |
-
-### 2.5 Virtualization Drivers
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Intel VT-x (VMX) hypervisor | ✅ Implemented | Linux KVM |
-| VMCS setup & VMLAUNCH | ✅ Implemented | Intel SDM Vol 3C |
-| VirtIO transport layer | 🔄 Stub | Linux virtio spec |
-| KVM paravirt clock | 🔲 Planned | Linux `kvm-clock` |
-| Xen PV drivers | 🔲 Planned | Linux `xen` |
+### J.6 Wayland Protocol (client-side)
+- `wl_display`, `wl_surface`, `xdg_shell`.
+- GTK4/Qt6 compatibility via Wayland protocol.
+- XWayland for X11 app compatibility.
+- **Owner:** `ui/SovereignDisplayServer.rs` (extend)
 
 ---
 
-## Phase 3 — Filesystems & Storage (M6–M9)
+## 🗓 Phase K — Q1 2027 (Security + Privacy)
 
-### 3.1 SovereignFS (Native FS)
+### K.1 Quantum-Safe TLS 1.3
+- Hybrid classical + PQC: X25519 + ML-KEM-768.
+- ML-DSA-65 for certificate signatures.
+- Drop-in replacement for rustls.
+- **Owner:** `net/tls/sigma_pq_tls.rs`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| B-tree directory index | 🔄 Partial | Btrfs |
-| Extent-based file allocation | 🔄 Partial | ext4/XFS |
-| Copy-on-Write snapshot trees | 🔲 Planned | OpenZFS/Btrfs |
-| Online defragmentation | 🔲 Planned | Btrfs defrag |
-| Built-in checksums (CRC32C) | 🔲 Planned | Btrfs/ZFS |
-| Transparent compression (LZ4) | 🔲 Planned | Btrfs zstd |
-| Deduplication | 🔲 Planned | ZFS dedup |
+### K.2 TPM 2.0 Integration
+- TCG TPM 2.0 command interface.
+- Measured boot: PCR banks, IMA-style measurement log.
+- Remote attestation via TPM quote.
+- **Owner:** `security/SovereignTPM.adb` (extend)
 
-### 3.2 Atomic Generation Rollback
+### K.3 FIDO2/WebAuthn
+- USB HID CTAP2 protocol.
+- Platform authenticator (TPM-backed).
+- Replaces password auth for Zenith login.
+- **Owner:** `security/sigma_fido2.rs`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Generation ring buffer (16 slots) | ✅ Implemented | NixOS generations |
-| Root + package hash tracking | ✅ Implemented | NixOS nix-store |
-| Boot menu integration | 🔲 Planned | OSTree |
-| A/B partition updates | 🔲 Planned | Chromium OS, Android |
-| Atomic update transactions | 🔲 Planned | OSTree |
+### K.4 Mandatory Access Control (AppArmor-inspired)
+- Policy language for profile definitions.
+- Mediation: file, network, capability, IPC.
+- Kernel enforcement hooks in VFS + IPC.
+- **Owner:** `security/sovereign_apparmor.rs` (extend)
 
-### 3.3 Additional Filesystems
-
-| FS | Priority | Inspired By |
-|:---|:---:|:---|
-| FAT32/exFAT (USB interop) | High | Linux `vfat` |
-| ext4 (read-only, for migration) | High | Linux ext4 |
-| tmpfs (RAM-backed) | High | Linux tmpfs |
-| OverlayFS (container layers) | Medium | Linux overlayfs |
-| 9P (QEMU shared folders) | Medium | Plan 9 |
-| FUSE (userspace FS) | Low | Linux FUSE |
-
-### 3.4 RAID & Storage Stack
-
-| Feature | Priority | Inspired By |
-|:---|:---:|:---|
-| Software RAID 0/1/5 | Medium | Linux md |
-| LVM-style volume groups | Low | Linux LVM |
-| Journaling / write-ahead log | High | ext4 journal |
-| I/O scheduler (mq-deadline) | High | Linux blk-mq |
-| Async I/O ring (io_uring) | ✅ Implemented | Linux io_uring |
+### K.5 Kernel Self-Protection
+- KASLR: randomize kernel base at boot.
+- SMEP/SMAP enforcement.
+- CET (Control-flow Enforcement): IBT + shadow stack.
+- Stack canaries in all kernel paths.
+- **Owner:** `cmake/sigma_hardening.cmake` (extend)
 
 ---
 
-## Phase 4 — Networking & Security (M9–M12)
+## 🗓 Phase L — Q2 2027 (Ecosystem + Developer Tools)
 
-### 4.1 Network Stack
+### L.1 sigma-sdk CLI v2
+- `sigma-sdk init my-app --lang rust` scaffolding.
+- Integrated debugger (`sigma-gdb` via DAP protocol).
+- Profiler: `sigma-perf trace` → flamegraph.
+- **Owner:** `sdk/`, `tools/sigma-cli.rs`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Ethernet II frame parsing | 🔄 Partial | Linux net core |
-| ARP responder | 🔲 Planned | Linux `net/arp.c` |
-| IPv4 stack (ICMP, UDP, TCP) | 🔲 Planned | lwIP / smoltcp |
-| IPv6 stack | 🔲 Planned | Linux net/ipv6 |
-| DHCP client | 🔲 Planned | dhclient |
-| DNS resolver stub | 🔲 Planned | musl DNS |
-| TLS 1.3 (using PQC keys) | 🔲 Planned | BoringSSL / rustls |
-| WireGuard-style VPN | 🔲 Planned | WireGuard |
-| Netfilter hooks | 🔲 Planned | Linux netfilter |
+### L.2 sigma-pkg Repository Server
+- Content-addressed store (SHA-256 verified).
+- Delta updates (bsdiff-style).
+- Signed packages (ML-DSA).
+- Mirror protocol (rsync-compatible).
+- **Owner:** `userland/pkg/sigma_registry.rs` (extend)
 
-### 4.2 eBPF / SigmaBPF Subsystem
+### L.3 Zenith Desktop v2
+- App launcher with fuzzy search (Super key).
+- Auto-tiling window manager (master-stack layout).
+- System tray: battery, network, clock, volume.
+- Virtual desktops (workspaces).
+- HiDPI support (1x/1.5x/2x/3x scaling).
+- **Owner:** `zenith_desktop/`, `ui/`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| eBPF bytecode VM | ✅ Implemented | Linux `kernel/bpf/` |
-| Verifier (safety checker) | ✅ Implemented | Linux BPF verifier |
-| BPF maps (hash, array) | 🔄 Partial | Linux BPF maps |
-| BPF tokens (unprivileged) | 🔲 Planned | Linux 6.7 BPF tokens |
-| BPF arenas (shared memory) | 🔲 Planned | Linux 6.8 BPF arenas |
-| Network packet filter hooks | 🔲 Planned | Linux XDP |
-| Syscall tracing hooks | 🔲 Planned | Linux seccomp-BPF |
-| Scheduler hooks (sched_ext) | 🔲 Planned | Linux 6.7 sched_ext |
+### L.4 Bundled Applications (10 Apps)
+| App | Purpose | Status |
+|-----|---------|--------|
+| sigma-edit | Text editor (LSP-enabled) | Partial |
+| sigma-files | File manager | Partial |
+| sigma-terminal | Terminal emulator (VTE-compatible) | Partial |
+| sigma-browser | Web browser (Servo engine stub) | Partial |
+| sigma-mail | Email client (IMAP/SMTP) | Stub |
+| sigma-calc | Calculator | Partial |
+| sigma-calendar | Calendar + CalDAV | Stub |
+| sigma-notes | Note taking (Markdown) | Partial |
+| sigma-clock | World clock + alarm | Partial |
+| sigma-settings | System settings panel | Partial |
 
-### 4.3 Security Subsystems
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| PQC cryptography (CRYSTALS-Kyber) | 🔄 Partial | NIST PQC 2024 |
-| BLAKE3 / SHA-3 hash functions | 🔄 Partial | NIST |
-| Capability-based access control | 🔄 Partial | OpenBSD pledge |
-| Linux-style pledge() / unveil() | ✅ Implemented | OpenBSD |
-| MAC framework (SELinux-inspired) | 🔲 Planned | Linux SELinux |
-| Secure boot chain verification | 🔲 Planned | UEFI Secure Boot |
-| TPM 2.0 attestation | 🔲 Planned | Linux tpm-tis |
-| dm-verity root hash | 🔲 Planned | Android / ChromeOS |
-| Landlock LSM (filesystem sandbox) | 🔲 Planned | Linux Landlock |
-| Memory tagging (MTE on ARM) | 🔲 Planned | Linux MTE |
-| Attack Vector Controls (AVC) | 🔲 Planned | Linux 6.17 AVC |
-
-### 4.4 Amnesic Security Mode
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Amnesic boot activation | ✅ Implemented | Tails OS |
-| Swap disable on boot | ✅ Implemented | Tails OS |
-| 3-pass RAM scrub (0x00/0xFF/0x00) | ✅ Implemented | Tails OS sdmem |
-| Emergency USB-removal wipe | ✅ Implemented | Tails OS udev watchdog |
-| In-RAM session audit log | ✅ Implemented | Tails OS |
-| Forensic snapshot freeze/thaw | ✅ Implemented | Linux freezer |
-| Per-session ephemeral keys | 🔲 Planned | Tails LUKS |
-| Network isolation (Tor-only mode) | 🔲 Planned | Tails Tor integration |
+### L.5 Package Ecosystem
+- 500+ packages in sigma-pkg registry.
+- Wine-based Windows compatibility layer.
+- Flatpak runtime bridge.
+- AppImage support.
+- **Owner:** `userland/pkg/`, `runtime/`
 
 ---
 
-## Phase 5 — Async I/O & Performance (M12–M15)
+## 🗓 Phase M — Q3 2027 (AI/ML Native)
 
-### 5.1 Async I/O
+### M.1 sigma-ai Daemon
+- On-device LLM inference (Phi-3-mini, Gemma-2B, DeepSeek-Coder).
+- GGUF weight loading from filesystem.
+- HTTP API on localhost:11434 (Ollama-compatible).
+- GPU acceleration via DRM compute shaders.
+- **Owner:** `sigmad/sigma_ai_daemon.py` (extend)
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| io_uring SQ/CQ ring buffers | ✅ Implemented | Linux io_uring |
-| 13 operation types | ✅ Implemented | Linux io_uring |
-| Zero-copy buffer model | ✅ Implemented | Linux io_uring |
-| io_uring polling mode | 🔲 Planned | Linux IORING_SETUP_SQPOLL |
-| Fixed file table | 🔲 Planned | Linux io_uring registered files |
-| io_uring network sockets | 🔲 Planned | Linux io_uring recv/send |
+### M.2 AI Shell Completion
+- Natural language → shell command translation.
+- Error explanation: "permission denied" → fix suggestion.
+- Context-aware: current directory, recent commands.
+- **Owner:** `kernel/shell/sigma_ai_shell.rs`
 
-### 5.2 Performance Enhancements
+### M.3 Adaptive Scheduler (ML-guided)
+- Neural network predicts task behavior (I/O vs CPU).
+- Online learning from hardware counters (IPC, cache misses).
+- Improves latency 15–30% vs static MLFQ.
+- **Owner:** `kernel/sched/sigma_neural_sched.rs`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Kernel stack guard canaries | ✅ Implemented | GCC -fstack-protector |
-| Slab poisoning (UAF detection) | ✅ Implemented | Linux 6.11 |
-| Bucket slab isolation | ✅ Implemented | Linux 6.11 SLUB hardening |
-| 42-bit ASLR entropy | ✅ Implemented | Linux ASLR |
-| Transparent Huge Pages | 🔲 Planned | Linux THP |
-| NUMA-aware allocation | 🔲 Planned | Linux `mm/mempolicy.c` |
-| CPU frequency scaling | 🔲 Planned | Linux cpufreq |
-| Power management (S3/S4 sleep) | 🔲 Planned | Linux ACPI PM |
-| Lock-free data structures | 🔲 Planned | Linux RCU |
-| Per-CPU variables | 🔲 Planned | Linux DEFINE_PER_CPU |
-| KASLR (kernel ASLR) | 🔲 Planned | Linux kaslr |
+### M.4 Privacy-Preserving Telemetry
+- Differential privacy (ε=1.0) for crash reports.
+- Local aggregation only, no individual data leaves device.
+- Transparent privacy proof in every report.
+- **Owner:** `kernel/telemetry/sigma_dp_telemetry.rs`
 
-### 5.3 Profiling & Observability
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Kernel metrics counters | ✅ Implemented | Linux `include/linux/perf_event.h` |
-| perf-compatible event counters | 🔲 Planned | Linux perf |
-| ftrace-compatible function hooks | 🔲 Planned | Linux ftrace |
-| eBPF-based profiling | 🔲 Planned | BPF perf |
-| OpenTelemetry exporter | 🔲 Planned | CNCF OTel |
-| /proc-style virtual FS | 🔲 Planned | Linux procfs |
-| /sys-style hardware FS | 🔲 Planned | Linux sysfs |
+### M.5 Edge AI Stack
+- TensorFlow Lite equivalent (SigmaML).
+- Quantized model inference (INT8, FP16).
+- ONNX model import.
+- GPU compute pipeline integration.
+- **Owner:** `modules/sdk/sigma_ml_kit/`
 
 ---
 
-## Phase 6 — AI, ML & Data Science (M15–M18)
+## 🗓 Phase N — Q4 2027 (Cloud + Enterprise)
 
-### 6.1 Edge Inference Engine
+### N.1 sigma-pod v2 (OCI-compliant)
+- Full CRI compatibility for Kubernetes.
+- Rootless containers (user namespaces).
+- A/B partition atomic updates (OSTree-inspired).
+- Immutable root (`/usr` read-only, `/var` writable).
+- `sigma-pod` < 100ms startup (vs 500ms Docker).
+- **Owner:** `kernel/core/sigma_container_runtime.rs` (extend)
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Static tensor type system | 🔲 Planned | ONNX runtime |
-| GEMM / matrix ops (no_std) | 🔲 Planned | mlpack |
-| INT8 quantized inference | 🔲 Planned | llama.cpp quants |
-| GGUF model format reader | 🔲 Planned | llama.cpp |
-| Transformer block (attention) | 🔲 Planned | GPT-2 reference |
-| In-kernel LLM for shell completion | 🔲 Planned | llama.cpp semantic shell |
-| Edge TPU driver (Coral) | 🔲 Planned | Google Coral |
+### N.2 Cloud Images
+- AWS AMI builder.
+- Google Cloud image (.img).
+- Azure VHD (.vhd).
+- DigitalOcean QCOW2.
+- **Owner:** `scripts/build-iso.sh` variants
 
-### 6.2 Voice & NLP
+### N.3 sigma-deploy CLI
+- `sigma-deploy myapp --cloud aws` → build → upload → deploy → scale.
+- Terraform provider integration.
+- Kubernetes cluster bootstrap.
+- **Owner:** `tools/sigma_sovereign_cloud.rs`
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Whisper ASR (quantized INT8) | 🔲 Planned | OpenAI Whisper |
-| Wake-word detector | 🔲 Planned | Picovoice Porcupine |
-| Text-to-Speech (TTS) | 🔲 Planned | Piper TTS |
-| On-device NLP tokenizer | 🔲 Planned | SentencePiece |
-| Voice command kernel interface | 🔲 Planned | Android voice actions |
-
-### 6.3 Neural Scheduler & Anomaly Detection
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Reinforcement-learning scheduler | 🔲 Planned | DeepMind systems RL |
-| Anomaly detection on syscall traces | 🔲 Planned | Tetragon / Falco |
-| Predictive prefetching | 🔲 Planned | Linux readahead |
-| Neural OOM killer | 🔲 Planned | Linux OOM killer |
-
-### 6.4 Data Science Tooling
-
-| Tool | Status | Inspired By |
-|:---|:---:|:---|
-| sigma-stat (descriptive stats CLI) | 🔲 Planned | GNU datamash |
-| sigma-plot (terminal charts) | 🔲 Planned | gnuplot |
-| sigma-ml (training loop CLI) | 🔲 Planned | MLflow CLI |
-| CoW snapshot versioning (DVC-like) | 🔲 Planned | DVC |
-| Parquet/Arrow file reader | 🔲 Planned | Apache Arrow |
-| SQL query engine (no_std) | 🔲 Planned | SQLite |
+### N.4 Enterprise Compliance
+- FIPS 140-3 validated crypto module.
+- PCI-DSS audit log format.
+- SOC 2 event tagging.
+- HIPAA encryption at rest + in transit.
+- **Owner:** `security/SovereignComplianceAuditor.adb`
 
 ---
 
-## Phase 7 — Desktop & User Experience (M18–M21)
+## 🗓 Phase O–Z — 2028+ (Long-Term Vision)
 
-### 7.1 Zenith Compositor
+### O: India Stack Completion
+- ABDM FHIR live API (hospitals, clinics).
+- UPI Autopay + mandate.
+- GST IRN + e-Way Bill API.
+- DigiLocker document vault.
+- ONDC seller/buyer integration.
+- **Target:** 10M Indian users.
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Wayland protocol server | 🔄 Partial | Weston / Sway |
-| GPU-accelerated composition | 🔲 Planned | Mir / KWin |
-| Kawase blur / transparency | 🔲 Planned | picom |
-| Shadow & rounded corners | 🔲 Planned | picom |
-| 60/120/144 Hz refresh | 🔲 Planned | KWin |
-| XWayland compatibility | 🔲 Planned | XWayland |
+### P: Defence/Government Profile
+- Multi-level security (MLS) with Bell-LaPadula model.
+- sigma-airgap: offline update via signed USB.
+- sigma-audit: tamper-evident logging with ZKP proofs.
+- No dependency on any foreign company's software.
+- **Target:** First government procurement.
 
-### 7.2 Zenith Window Manager
+### Q: IoT/Embedded Profile
+- 500ms boot time on Raspberry Pi.
+- < 100MB footprint (vs 500MB Ubuntu Server).
+- sigma-iot-kit SDK: GPIO, I2C, SPI, CAN, Modbus.
+- Out-of-box: home automation, industrial control.
+- **Target:** 100K Raspberry Pi deployments.
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Floating window management | ✅ Implemented | macOS / GNOME |
-| Tiling layout (tree model) | 🔲 Planned | i3 / Sway |
-| Dynamic tiling (master-stack) | 🔲 Planned | AwesomeWM |
-| Scratchpad / scratch workspaces | 🔲 Planned | i3 |
-| Multi-monitor support | 🔲 Planned | RandR |
-| Hotkey daemon | 🔲 Planned | sxhkd |
-| IPC socket for scripting | 🔲 Planned | i3-msg |
+### R: Distributed OS
+- Lattice mesh: auto-discovery, consensus, failover.
+- Distributed filesystem (SigmaFS-distributed).
+- Multi-node scheduler (Kubernetes-compatible).
+- **Target:** 1K-node clusters.
 
-### 7.3 Applications & App Store
+### S: Quantum Computing
+- Quantum algorithm library (Grover, Shor, VQE).
+- QPU driver abstraction layer.
+- Hybrid classical-quantum workload scheduler.
+- **Target:** Research integration.
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| App store (HTML5 UI) | ✅ Implemented | GNOME Software |
-| Package manager (sigpkg) | 🔄 Partial | pacman / dnf5 |
-| Dependency resolver (topo sort) | ✅ Implemented | Arch pacman |
-| Sandbox capabilities per app | ✅ Implemented | Flatpak portals |
-| Flatpak-compatible portal API | 🔲 Planned | Flatpak |
-| AppImage support | 🔲 Planned | AppImage |
+### T: AR/VR/XR Desktop
+- OpenXR runtime.
+- 3D spatial window management.
+- Eye tracking + hand tracking input.
+- **Target:** Metaverse/research applications.
 
-### 7.4 Accessibility & i18n
+### U: Formal Proof of Security
+- Complete Coq proof of kernel security properties.
+- Machine-checked absence of buffer overflows.
+- Verified cryptographic implementations.
+- **Target:** CC EAL5+ certification.
 
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| AT-SPI2 accessibility bus | 🔄 Stub | GNOME AT-SPI |
-| Screen reader (Orca-inspired) | 🔲 Planned | GNOME Orca |
-| High-contrast themes | 🔲 Planned | GNOME a11y |
-| Unicode text rendering | 🔲 Planned | HarfBuzz + FreeType |
-| Indic script engine | 🔲 Planned | HarfBuzz |
-| Input methods (IBus-like) | 🔲 Planned | IBus / Fcitx5 |
+### V: CBDC + Fintech
+- e-Rupee wallet (RBI pilot).
+- HSM integration for transaction signing.
+- Zero-knowledge proof for privacy-preserving finance.
+- **Target:** Banking sector adoption.
 
----
+### W: Robotics Profile
+- ROS 2 DDS integration.
+- Real-time EDF scheduler with < 10µs jitter.
+- sensor fusion (LiDAR, camera, IMU).
+- **Target:** Autonomous vehicle integration.
 
-## Phase 8 — Localization, SDK & Ecosystem (M21–M24)
+### X: Space/Aerospace
+- DO-178C certified subset.
+- Single-event upset (SEU) tolerance.
+- Deterministic execution timing.
+- **Target:** ISRO / DRDO integration.
 
-### 8.1 Indian Localization & e-Gov
-
-| Feature | Status | Inspired By |
-|:---|:---:|:---|
-| Hindi / Bengali / Tamil / Telugu IME | 🔲 Planned | Varnam / ibus-m17n |
-| Indic transliteration engine | 🔲 Planned | libvarnam |
-| DigiLocker integration | 🔲 Planned | MeitY API |
-| GST calculation suite | 🔄 Partial | Bharat-FOSS |
-| EPFO / PF calculator | ✅ Implemented | Custom |
-| RERA compliance tools | ✅ Implemented | Custom |
-| Aadhaar authentication SDK | 🔲 Planned | UIDAI |
-
-### 8.2 Developer SDK
-
-| Tool | Status | Inspired By |
-|:---|:---:|:---|
-| sigma-sdk (component scaffold) | 🔄 Partial | Rust cargo-new |
-| sigma-cc (cross-compiler) | 🔄 Implemented | LLVM / musl-cross |
-| sigma-ld (linker) | 🔄 Implemented | LLD |
-| sigma-asm (assembler) | 🔄 Implemented | NASM |
-| sigma-dbg (debugger) | 🔲 Planned | GDB / rr |
-| sigma-trace (strace equivalent) | 🔄 Implemented | Linux strace |
-| sigma-bench (micro-benchmarks) | 🔲 Planned | lmbench |
-| sigdoc generator | 🔲 Planned | rustdoc |
-
-### 8.3 CLI Tools Ecosystem
-
-| Tool | Equivalent | Status |
-|:---|:---|:---:|
-| sigma-ps | ps / htop | ✅ |
-| sigma-top | top | ✅ |
-| sigma-htop | htop | ✅ |
-| sigma-df | df | ✅ |
-| sigma-free | free | ✅ |
-| sigma-netstat | netstat | ✅ |
-| sigma-ifconfig | ifconfig | ✅ |
-| sigma-ping | ping | ✅ |
-| sigma-strace | strace | ✅ |
-| sigma-fdisk | fdisk | ✅ |
-| sigma-sed | sed | ✅ |
-| sigma-awk | awk | ✅ |
-| sigma-pkg | apt/pacman/nix | 🔄 |
-| sigma-cron | crond | ✅ |
-| sigma-env | env | ✅ |
-| sigma-ssh | OpenSSH | 🔲 |
-| sigma-git | git (userland) | 🔲 |
-| sigma-curl | curl | 🔲 |
-
-### 8.4 Community & Governance
-
-| Initiative | Status |
-|:---|:---:|
-| CONTRIBUTING.md + Code of Conduct | ✅ Published |
-| GitHub Wiki (automated sync) | ✅ Active |
-| Issue triage bot | 🔲 Planned |
-| SigmaOS Foundation charter | 🔲 Planned |
-| Bug bounty program | 🔲 Planned |
-| Annual roadmap RFC process | 🔲 Planned |
-| University partnership program | 🔲 Planned |
+### Y: v2.0.0 Sovereign Release
+- Full production-grade OS.
+- 10K+ packages.
+- 100K active users.
+- 5 target markets served.
+- **Target:** 2028 launch.
 
 ---
 
-## Key Linux Distro Inspirations
+## 📊 Driver Roadmap
 
-| SigmaOS Feature | Linux Distro Source |
-|:---|:---|
-| Atomic generation rollback | **NixOS** (nix-env --rollback, generations) |
-| Tiling window manager | **Arch Linux** (i3, AwesomeWM, Sway) |
-| Package dependency resolver | **Arch Linux** (pacman dep solver), **Fedora** (dnf5) |
-| Declarative system config | **NixOS** (configuration.nix) |
-| Flatpak portals + sandboxing | **Fedora Silverblue** (Flatpak + XDG portals) |
-| Amnesic boot + RAM scrub | **Tails OS** (sdmem, kexec RAM wipe) |
-| eBPF monitoring + scheduling | **Linux 6.7+** (BPF tokens, BPF arenas, sched_ext) |
-| io_uring async I/O | **Linux** (io_uring since 5.1) |
-| Slab hardening + bucket isolation | **Linux 6.11** (SLUB hardening) |
-| Stack guard canaries | **OpenBSD** (stack smashing protector) |
-| Pledge/unveil security | **OpenBSD** (pledge.c, unveil.c) |
-| Wayland compositor | **Fedora / Arch** (Sway, KWin Wayland) |
-| PQC cryptography | **NIST PQC 2024** (CRYSTALS-Kyber, Dilithium) |
-| Container runtime | **Fedora / Arch** (podman, containerd) |
-| Attack Vector Controls | **Linux 6.17** (AVC CPU spectre grouping) |
+### Tier 1 — Critical (Already Implemented)
+| Driver | Status |
+|--------|--------|
+| Intel e1000/e1000e | ✅ Complete |
+| virtio-net | ✅ Complete |
+| NVMe | ✅ MMIO, async pending |
+| USB xHCI + HID | ✅ Complete |
+| GPU/DRM/KMS | ✅ Framework complete |
+| Intel HDA audio | ✅ Complete |
+| Wi-Fi 802.11ax | ✅ Stack complete |
+| Bluetooth 5.3 | ✅ HCI/GATT complete |
 
----
+### Tier 2 — High Priority (Phase I–J)
+| Driver | Target |
+|--------|--------|
+| SATA AHCI | Q3 2026 |
+| virtio-GPU | Q3 2026 |
+| Realtek RTL8125B (2.5GbE) | Q3 2026 |
+| Intel i225 (2.5GbE) | Q4 2026 |
+| AMD GPU (amdgpu/radv) | Q4 2026 |
+| Intel GPU (i915/xe) | Q4 2026 |
+| USB 4.0 Thunderbolt | Q4 2026 |
+| NVMe OPAL encryption | Q4 2026 |
 
-## Performance Targets (by Phase 5)
-
-| Metric | Target | Baseline |
-|:---|:---:|:---:|
-| Boot to shell (QEMU, SSD) | < 500 ms | ~2s |
-| Context switch latency | < 5 µs | ~15 µs |
-| Memory allocation (slab) | < 100 ns | ~500 ns |
-| io_uring throughput | > 500K IOPS | baseline |
-| Interrupt latency (IRQ) | < 50 µs | ~200 µs |
-| Network packet forwarding | > 1M pps | baseline |
-
----
-
-## Security Compliance Targets (by Phase 4)
-
-| Standard | Target |
-|:---|:---:|
-| NIST SP 800-193 (Platform Resiliency) | Full |
-| FIPS 140-3 (Cryptography) | Level 2 |
-| Common Criteria EAL4+ | Planned |
-| CIS Benchmark Level 1 | ✅ |
-| DISA STIG (DoD hardening) | Planned |
+### Tier 3 — Medium Priority (Phase K–L)
+| Driver | Target |
+|--------|--------|
+| Broadcom Wi-Fi (brcmfmac) | Q1 2027 |
+| Intel Wi-Fi AX200/AX210 | Q1 2027 |
+| Realtek USB Wi-Fi (rtl88xx) | Q1 2027 |
+| MediaTek MT7921 Wi-Fi | Q2 2027 |
+| Qualcomm audio (WCD/WSA) | Q2 2027 |
+| DisplayLink USB displays | Q2 2027 |
+| NVIDIA open driver (nouveau 2.0) | Q3 2027 |
 
 ---
 
-*Legend: ✅ Implemented · 🔄 Partial/In Progress · 🔲 Planned*  
-*This roadmap is updated with every major release. Submit RFCs via GitHub Issues.*
+## 📊 AI/ML Roadmap
+
+### Models (On-Device)
+| Model | Size | Target Use |
+|-------|------|-----------|
+| Phi-3-mini Q4_K | 2.3 GB | General assistant, shell completion |
+| Gemma-2B Q4_K | 1.5 GB | Fast inference, code |
+| DeepSeek-Coder 1.3B | 0.8 GB | Code completion |
+| Whisper-small | 0.5 GB | Voice commands, Bhashini |
+| BERT-multilingual | 0.5 GB | Indic NLP, IME |
+| Stable Diffusion Turbo | 2 GB | Wallpaper generation |
+| Llama-3 8B Q2_K | 3.5 GB | Advanced assistant (16 GB+ RAM) |
+
+### ML Framework
+| Feature | Status | Phase |
+|---------|--------|-------|
+| GGUF model loading | Partial | M.1 |
+| F32/F16 inference | ✅ | H-09 |
+| Q4_K quantized inference | Planned | M.1 |
+| GPU compute shaders | Planned | M.3 |
+| ONNX import | Planned | M.5 |
+| Federated learning | Planned | O |
+| Differential privacy | Planned | M.4 |
+
+---
+
+## 📊 CS/DS Algorithm Roadmap
+
+### Kernel Data Structures (All Implemented)
+- Buddy allocator (PMM)
+- Slab allocator
+- Red-black tree (VMA management)
+- B+ tree (filesystem)
+- Lock-free ring buffer (IPC/audio/network)
+- Skip list (process scheduler)
+- Bloom filter (package cache)
+- Radix tree (page table)
+
+### ML Algorithms (Planned, Phase M)
+- Gradient boosting (XGBoost-compatible)
+- K-means clustering
+- PCA / SVD
+- LSTM / GRU inference
+- Transformer attention
+- Random forest
+- SVM with kernel trick
+
+---
+
+## 📊 CLI Tools Roadmap
+
+| Tool | Purpose | Status |
+|------|---------|--------|
+| sigma-pkg | Package manager | ✅ Functional |
+| sigma-net | Network diagnostics | ✅ Complete |
+| sigma-ai | LLM inference CLI | ✅ Daemon + CLI |
+| sigma-debug | Kernel debugger | Partial |
+| sigma-trace | System call tracer | Partial |
+| sigma-perf | Performance profiler | Partial |
+| sigma-monitor | System monitor (htop-like) | Partial |
+| sigma-vault | Secret manager | Partial |
+| sigma-deploy | Cloud deployment | Planned |
+| sigma-iso | ISO builder | Partial |
+| sigma-sign | Package signing | Partial |
+| sigma-forensics | Disk forensics | Planned |
+| sigma-kpatch | Live kernel patching | Planned |
+| sigma-compliance | Audit compliance check | Partial |
+| sigma-fleet | Multi-node management | Planned |
+| sigma-nl | Natural language CLI | Planned |
+| sigma-diff | Smart file diff (AI-assisted) | Planned |
+| sigma-explain | Explain last error (AI) | Planned |
+
+---
+
+## 📊 Linux Distro Absorption Plan
+
+SigmaOS absorbs best-in-class features from each major distro:
+
+| Distro | Feature Absorbed | Status |
+|--------|-----------------|--------|
+| Ubuntu | PPA-compatible package format, snap interface | ✅ Complete |
+| Fedora | Atomic commits, ostree A/B updates | Planned Phase N |
+| Arch | Rolling release option, AUR-like community packages | Partial |
+| Debian | Stable release track, dpkg compatibility layer | Partial |
+| NixOS | Reproducible builds, deterministic configs | Partial |
+| Alpine | Minimal footprint profile (< 100MB) | Planned Phase Q |
+| Kali | Penetration testing tools, forensics | Partial |
+| Tails | Amnesia mode, Tor-first | Partial |
+| Qubes | Template VMs, compartmentalization | Planned |
+| OpenSUSE | YaST-like system config UI | Planned |
+| Gentoo | USE flags, source-based compilation | Planned |
+| Rocky/RHEL | Enterprise hardening, FIPS mode | Planned Phase N |
+| CoreOS | Container-optimized, read-only root | Planned Phase N |
+| Raspbian | RPi BSP, GPIO tooling | Planned Phase J |
+
+---
+
+## 📊 Performance Targets
+
+| Metric | Current | Phase I | Phase M | v2.0 |
+|--------|---------|---------|---------|------|
+| Boot time (SSD) | ~8s | 3s | 2s | <2s |
+| Boot time (NVMe) | ~5s | 2s | 1.5s | <1s |
+| Kernel memory footprint | 12 MB | 10 MB | 8 MB | <8 MB |
+| Syscall latency (avg) | 800ns | 400ns | 300ns | <300ns |
+| Context switch latency | 5µs | 2µs | 1µs | <1µs |
+| TCP throughput (loopback) | 2 Gbps | 5 Gbps | 8 Gbps | 10 Gbps |
+| NVMe IOPS (4K random) | 200K | 500K | 800K | 1M |
+| Scheduler latency (p99) | 2ms | 500µs | 200µs | <200µs |
+| LLM tokens/sec (Phi-3 Q4) | 0 | 5 | 15 | 20+ |
+
+---
+
+## ✅ Completion Criteria for v1.0.0 Production Release
+
+- [ ] Boots on 3 hardware platforms (x86-64, ARM64, RISC-V)
+- [ ] 30+ syscalls fully implemented and tested
+- [ ] Package manager with 200+ packages
+- [ ] Zenith desktop usable for 8h daily work
+- [ ] Zero critical CVEs in security audit
+- [ ] QEMU CI passes on every commit
+- [ ] Formal verification of scheduler + PMM
+- [ ] Bootable ISO downloadable from GitHub Releases
+- [ ] 10K GitHub stars
+- [ ] 100 contributors
+
+---
+
+*Maintained by the SigmaOS Project. Updated automatically on each Phase milestone.*
+*Contribute: https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md*
