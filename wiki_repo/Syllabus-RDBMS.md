@@ -148,12 +148,15 @@ END;
 ### Common Issues & Fix Strategies
 
 - **Issue - Incorrect Indexing & Table Scans:** Missing B+ Tree indices cause full table scans ($O(N)$), stalling heavy analytical `JOIN` queries.
+
 - *Fix Strategy:* Run `EXPLAIN PLAN FOR` to inspect the query execution tree, identify unindexed nested loops, and create composite covering B+ Tree indices (`CREATE INDEX idx_emp_dept ON employees(dept_id, salary)`).
 
 - **Issue - Database Deadlocks:** Concurrent transactions update identical table rows in reverse order, triggering circular lock wait states.
+
 - *Fix Strategy:* Enforce strict Two-Phase Locking (2PL), acquire row locks in a globally deterministic order, and utilize `SELECT ... FOR UPDATE NOWAIT` to prevent indefinite blocking.
 
 - **Issue - Dirty Reads & Phantom Records:** Unsynchronized transaction isolation levels permit reading uncommitted data or phantom insertions.
+
 - *Fix Strategy:* Elevate transaction isolation levels from `READ COMMITTED` to `REPEATABLE READ` or `SERIALIZABLE`, leveraging SigmaDB's MVCC snapshot isolation engine.
 
 ---

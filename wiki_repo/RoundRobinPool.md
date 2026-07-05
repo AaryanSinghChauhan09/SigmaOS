@@ -55,7 +55,9 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 - Load balancer has client/source IP affinity (all connections from one IP â†’ same backend)
 
 - Load balancer uses source-IP-hash or sticky sessions
+
 ### How it works:
+
 1. `RoundRobinPool` creates N TCP connections to the load balancer endpoint
 
 2. Load balancer assigns each TCP connection to a backend (per its algorithm)

@@ -362,15 +362,19 @@ accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
 ### Common Issues & Fix Strategies
 
 - **Issue - Memory Exhaustion in Copy-on-Modify Semantics:** R duplicates entire data frames in memory upon minor column modifications, triggering frequent garbage collection pauses.
+
 - *Fix Strategy:* Migrate from base R data frames to `data.table` or `dplyr`, utilizing in-place assignment operators (`:=`) to mutate columns without memory allocation overhead.
 
 - **Issue - Algorithmic Complexity in Explicit Loops:** Writing explicit `for` loops in R to iterate over millions of rows yields massive interpreter overhead ($O(N)$ execution drag).
+
 - *Fix Strategy:* Replace explicit loops with vectorized C-level operations E.g., `colSums`, `rowMeans`, or the `apply` family of functions.
 
 - **Issue - Database Deadlocks in RMySQL:** Synchronous database queries holding open transaction locks stall under concurrent batch extraction.
+
 - *Fix Strategy:* Use `dbSendQuery` combined with chunked `dbFetch(res, n=1000)` to stream results asynchronously, ensuring database locks are released promptly.
 
 - **Issue - Factor Level Mismatches in Train/Test Splits:** Predicting on test sets containing unseen categorical factor levels triggers fatal runtime exceptions.
+
 - *Fix Strategy:* Convert strings to factors globally before partitioning, or utilize `forcats::fct_expand` to harmonize factor levels across train and test data frames.
 
 ---

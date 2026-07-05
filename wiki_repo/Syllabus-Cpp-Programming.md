@@ -283,15 +283,19 @@ void risky_operation(int fd) {
 ### Common Issues & Fix Strategies
 
 - **Issue - Memory Leaks & Dangling Pointers:** Manual `new`/`delete` mismanagement leaves orphaned heap allocations or dangling pointer references.
+
 - *Fix Strategy:* Enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`, `SigmaSharedPtr`) to guarantee deterministic heap deallocation upon scope exit.
 
 - **Issue - Concurrency Deadlocks in Object Methods:** Multiple threads invoking synchronized class methods acquire member mutexes in conflicting orders.
+
 - *Fix Strategy:* Utilize `std::scoped_lock` (or sovereign equivalent) for deadlock-free multi-lock acquisition, and adhere to strict hierarchical locking protocols across object boundaries.
 
 - **Issue - Virtual Table (vtable) Slicing & Corruption:** Passing derived objects by value rather than reference/pointer slices off derived attributes and corrupts polymorphic vtable dispatch.
+
 - *Fix Strategy:* Always pass polymorphic objects by reference (`const HALDriver&`) or smart pointer (`SigmaUniquePtr<HALDriver>`), and enforce mandatory `virtual` destructors on all base classes.
 
 - **Issue - Algorithmic Complexity in Container Traversal:** Linear array scanning ($O(n)$) or naive sorting ($O(n^2)$) degrades object container performance.
+
 - *Fix Strategy:* Migrate from linear vectors to balanced B+ Trees or hash maps (`SovereignHashMap`), reducing search and indexing complexity to $O(\log n)$ or $O(1)$.
 
 ---

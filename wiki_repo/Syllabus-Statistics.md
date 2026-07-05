@@ -273,15 +273,19 @@ SigmaStats provides seamless bridging to industry-standard data science and stat
 ### Common Issues & Fix Strategies
 
 - **Issue - Overfitting in Statistical/ML Models:** Models capture noise rather than underlying distributions, leading to high training accuracy but poor generalization.
+
 - *Fix Strategy:* Apply $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, increase k-fold cross-validation partitions, or prune decision tree depths.
 
 - **Issue - Data Problems (Missing Values & Scaling):** Unclean datasets skew mean/variance calculations and cause gradient explosion.
+
 - *Fix Strategy:* Implement robust imputation (k-NN or median replacement) for missing values, and normalize/standardize features using Z-score transformations ($z = \frac{x - \mu}{\sigma}$).
 
 - **Issue - Algorithmic Complexity Bottlenecks:** Naive sorting or pairwise distance calculations yield $O(n^2)$ complexity, stalling large dataset ingestion.
+
 - *Fix Strategy:* Optimize algorithmic complexity by replacing naive bubble/insertion sorts with QuickSort or MergeSort ($O(n \log n)$), and utilize spatial B+ Trees or k-d trees for searching.
 
 - **Issue - Runtime Errors:** Unhandled exceptions during matrix inversion or floating-point division by zero.
+
 - *Fix Strategy:* Use kernel-level logging (`sigma_log`), exhaustive unit testing suites, and hardware profiling tools (DTrace/perf) to trace execution bottlenecks.
 
 ---

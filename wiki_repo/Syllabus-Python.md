@@ -336,15 +336,19 @@ gen       = (x**2 for x in range(1000000))               # Generator (memory-eff
 ### Common Issues & Fix Strategies
 
 - **Issue - Memory Leaks in Long-Running Data Pipelines:** Unreferenced Pandas DataFrames or large NumPy arrays remain trapped in memory due to cyclic garbage collection delays.
+
 - *Fix Strategy:* Use explicit `del df` statements, invoke `gc.collect()` manually after heavy batch transformations, and utilize memory-mapped files (`np.memmap`) for out-of-core processing.
 
 - **Issue - Algorithmic Complexity in Nested Loops:** Using naive `for` loops to search or cross-reference large lists yields $O(N^2)$ complexity.
+
 - *Fix Strategy:* Convert lists to Python sets or dictionaries (`O(1)` hash lookup) or vectorize operations entirely using NumPy broadcasting ($O(N)$ C-speed execution).
 
 - **Issue - Thread Deadlocks & GIL Contention:** Multi-threaded CPython scripts stall due to Global Interpreter Lock (GIL) contention or circular lock acquisition.
+
 - *Fix Strategy:* Migrate from `threading` to `multiprocessing` or `concurrent.futures.ProcessPoolExecutor` to bypass the GIL entirely and distribute workloads across physical CPU cores.
 
 - **Issue - Silent Data Truncation & Missing Values:** Unsanitized CSV ingestion injects `NaN` values into mathematical tensors.
+
 - *Fix Strategy:* Integrate robust unit testing (`pytest`) and data validation pipelines (`pydantic` / `great_expectations`) to enforce strict schema contracts before execution.
 
 ---

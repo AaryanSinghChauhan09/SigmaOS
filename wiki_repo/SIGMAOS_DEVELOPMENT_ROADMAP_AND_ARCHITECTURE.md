@@ -26,8 +26,11 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: Minimal Ring-0 footprint focusing entirely on thread scheduling, virtual memory paging, and hardware abstraction. All high-level services (file systems, network stacks, user UIs) are run in Ring 3 as isolated user-space processes (Attested Core Shards) communicating via syscalls.
 
 - **Code Base Linkages**:
+
 - Syscall Routing: Mapped dynamically via the O(1) registry in [SovereignSyscall.cpp](file:///C:/Users/Aaryan/Documents/antigravity/joyful-einstein/kernel/core/syscall/SovereignSyscall.cpp) (`int 0x80` entrypoints).
+
 - Shard Isolation: Enforced using privilege Ring 3 boundaries and separate page directories in the Virtual Memory Manager.
+
 - Extensibility: Supports on-the-fly loading of signed modular binaries via `sys_pkg_install` (Syscall `0x06`).
 
 ### 2. Real-Time OS Extensions (`release/rtos`)
@@ -35,8 +38,11 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: Hard real-time execution guarantees through deterministic task prioritization, priority inheritance (to prevent priority inversion), and lock-free Single Producer Single Consumer (SPSC) IPC queues.
 
 - **Code Base Linkages**:
+
 - Scheduling Class: Tasks marked with priorities > 80 are automatically promoted to `SchedClass::SCHED_SOVEREIGN` (Hard Real-Time Class) inside [SovereignScheduler.cpp](file:///C:/Users/Aaryan/Documents/antigravity/joyful-einstein/kernel/scheduler/SovereignScheduler.cpp).
+
 - Priority Inheritance: Supports dynamic priority boosts through `task.priority_boost` to resolve resource locking.
+
 - IPC Channels: Lock-free zero-copy ring buffers running in active memory segments to achieve sub-microsecond inter-task message dispatch.
 
 ### 3. Performance-Optimized Branch (`performance-optimized`)
@@ -44,8 +50,11 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: Direct-silicon latency reduction. Lockless, fragmentation-free memory allocation, NUMA cache locality pinning, and register-preserving inline assembly context switches.
 
 - **Code Base Linkages**:
+
 - Context Switch: Preserves and swaps x86_64 registers directly on CPU stacks via register inline asm inside `SovereignScheduler::swapContextRegisters`.
+
 - Memory Allocation: Fast O(1) page allocation handled by the Physical Memory Manager bitmap and lock-free Slab allocation buckets.
+
 - NUMA Locality: Pinned scheduler threads automatically balance workloads using `SovereignScheduler::balanceNUMANodes()` to eliminate high-latency cross-socket memory accesses.
 
 ### 4. Mobile Adaptations (`release/mobile`)
@@ -53,8 +62,11 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: Tailored for ARM64 and RISC-V architectures. Focuses on low-power C-state/P-state transitions, battery-efficiency scheduling (pinning background tasks to efficient cores), and touch-friendly interface scaling.
 
 - **Code Base Linkages**:
+
 - Hardware Abstraction: The HAL layer in `/kernel/hal/` handles multi-architecture registers for x86_64, ARM, and RISC-V.
+
 - Visual Compositor: Touch-responsive UI layouts and responsive glassmorphism in `zenith_desktop.js` and `style.css`.
+
 - Power Management: Thread scheduling intervals dynamically expand during idle periods to preserve silicon power draw.
 
 ### 5. Cloud/Distributed Native (`release/cloud` and `release/distributed`)
@@ -62,8 +74,11 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: CoreOS-style immutability. Supports bare-metal A/B partition redundancy for safe rolling updates, declarative system configurations, and decentralized virtual file system clusters.
 
 - **Code Base Linkages**:
+
 - Immutable Root: Handled by `SovereignImmutableHostEngine` inside [sigma_absorption_principle_container_coreos.cpp](file:///C:/Users/Aaryan/Documents/antigravity/joyful-einstein/tools/sigma_absorption_principle_container_coreos.cpp), blocking write operations targeting root directories.
+
 - A/B Partitions: Active system state is tracked via two redundant `PartitionSlot` structures, enabling instant rollbacks if a boot attestation fails.
+
 - Distributed VFS: Decoupled virtual filesystems synced via secure sockets.
 
 ### 6. Dual-Boot Coexistence (`release/dual-boot`)
@@ -71,7 +86,9 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: Coexistence with Windows/Linux. Out-of-the-box Multiboot specification compatibility, allowing standard bootloaders like GRUB to parse and chain-load the system.
 
 - **Code Base Linkages**:
+
 - Bootloader Entry: Mapped via [linker.ld](file:///C:/Users/Aaryan/Documents/antigravity/joyful-einstein/linker.ld) targeting ELF64 output at load address `0x100000`.
+
 - Packaging Pipeline: Containerized ISO compilation and GRUB configuration generator inside [Makefile](file:///C:/Users/Aaryan/Documents/antigravity/joyful-einstein/Makefile) (`grub-mkrescue`).
 
 ### 7. Standalone Stable Packaging (`release/standalone`)
@@ -79,6 +96,7 @@ Our core vision positions SigmaOS as a **universal cross-profile operating syste
 - **Philosophy**: Complete self-contained sovereign execution. Fuses Vite frontend assets, Electron desktop runtimes, and core system shunts into a lightweight, standalone app package requiring zero host environment setups.
 
 - **Code Base Linkages**:
+
 - Desktop Shell: Orchestrated through [main.js](file:///C:/Users/Aaryan/Documents/antigravity/joyful-einstein/main.js) and standard production distribution scripts.
 
 ---

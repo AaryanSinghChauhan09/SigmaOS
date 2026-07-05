@@ -7,19 +7,29 @@ An Undici [Client](/docs/docs/api/Client.md) can be best described as a state ma
 ## State Transition Overview
 
 - A `Client` begins in the **idle** state with no socket connection and no requests in queue.
+
 - The *connect* event transitions the `Client` to the **pending** state where requests can be queued prior to processing.
+
 - The *close* and *destroy* events transition the `Client` to the **destroyed** state. Since there are no requests in the queue, the *close* event immediately transitions to the **destroyed** state.
 
 - The **pending** state indicates the underlying socket connection has been successfully established and requests are queueing.
+
 - The *process* event transitions the `Client` to the **processing** state where requests are processed.
+
 - If requests are queued, the *close* event transitions to the **processing** state; otherwise, it transitions to the **destroyed** state.
+
 - The *destroy* event transitions to the **destroyed** state.
 
 - The **processing** state initializes to the **processing.running** state.
+
 - If the current request requires draining, the *needDrain* event transitions the `Client` into the **processing.busy** state which will return to the **processing.running** state with the *drainComplete* event.
+
 - After all queued requests are completed, the *keepalive* event transitions the `Client` back to the **pending** state. If no requests are queued during the timeout, the **close** event transitions the `Client` to the **destroyed** state.
+
 - If the *close* event is fired while the `Client` still has queued requests, the `Client` transitions to the **process.closing** state where it will complete all existing requests before firing the *done* event.
+
 - The *done* event gracefully transitions the `Client` to the **destroyed** state.
+
 - At any point in time, the *destroy* event will transition the `Client` from the **processing** state to the **destroyed** state, destroying any queued requests.
 
 - The **destroyed** state is a final state and the `Client` is no longer functional.

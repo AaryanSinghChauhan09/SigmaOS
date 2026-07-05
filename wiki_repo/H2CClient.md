@@ -3,7 +3,9 @@
 Extends: `undici.Dispatcher`
 
 A basic H2C client.
+
 ### Example
+
 ```js
 const { createServer } = require('node:http2')
 const { once } = require('node:events')
