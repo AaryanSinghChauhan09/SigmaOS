@@ -10,7 +10,7 @@ pub type SigmaStatus = i32;
 pub const SIGMA_OK: SigmaStatus = 0;
 pub const SIGMA_ERROR: SigmaStatus = -1;
 
-pub const MAX_PACKAGES: usize = 16;
+pub const MAX_PACKAGES: usize = 32;
 pub const NAME_MAX: usize = 32;
 
 #[derive(Copy, Clone)]
