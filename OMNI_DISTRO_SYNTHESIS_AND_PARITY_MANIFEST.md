@@ -74,9 +74,11 @@ int SovereignOmniCompatLayer::dispatch_linux_syscall(int syscall_nr, Register64 
 ## 4. Universal Debugging & Dependency Resolution
 
 - **Issue - Shared Library Collisions (`glibc` vs `musl`):** Running Arch Linux binaries alongside Alpine Linux binaries triggers fatal symbol lookup errors.
+
 - *Fix Strategy:* SigmaOS utilizes isolated NixOS symlink trees (`/sigma/store/...`), ensuring every assimilated binary links exclusively against its exact required library manifest without global namespace pollution.
 
 - **Issue - Package Manager Database Lock Deadlocks:** Concurrent execution of `apt-get` and `pacman` locks the global package registry.
+
 - *Fix Strategy:* SigmaOS decouples package management into transactional, Copy-on-Write SQLite shards (`sigma_gui_package_manager.cpp`), allowing parallel non-conflicting staging installations with instant rollback capability.
 
 ---

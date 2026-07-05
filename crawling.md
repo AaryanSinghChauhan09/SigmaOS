@@ -19,7 +19,9 @@ When adding contact details, avoid using personal identifiers such as your own n
 If a crawler behaves unexpectedlyâ€”for example, due to misconfiguration or implementation errorsâ€”server administrators can use the information in the user agent to contact the operator and coordinate an appropriate resolution.
 
 The `User-Agent` header can be set on individual requests or applied globally by configuring a custom dispatcher.
+
 ### Example: setting a `User-Agent` per request
+
 ```js
 import { fetch } from 'undici'
 

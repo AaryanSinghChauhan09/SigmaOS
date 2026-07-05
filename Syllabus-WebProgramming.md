@@ -353,16 +353,21 @@ echo get_memory_info('MB');
 ### Common Issues & Fix Strategies
 
 - **Issue - Client-Side Memory Leaks:** Uncleaned event listeners, uncleared `setInterval` timers, or detached DOM nodes accumulate in browser memory, lagging UI execution.
+
 - *Fix Strategy:* Execute explicit cleanup within React `useEffect` return callbacks (`clearInterval`), utilize `WeakMap`/`WeakSet` for caching DOM nodes, and profile heap allocations via Chrome DevTools Memory tab.
 
 - **Issue - Incorrect Indexing & Database Bottlenecks:** Unoptimized REST API backend ORM queries execute $N+1$ database selects or scan unindexed tables.
+
 - *Fix #1:* Implement `select_related` or `prefetch_related` in Django ORM to compress $N+1$ queries into a single `JOIN`.
+
 - *Fix #2:* Add composite B+ Tree indices to SigmaDB tables supporting frequent foreign key lookups.
 
 - **Issue - API Deadlocks & Starvation:** Synchronous, blocking I/O calls in Node.js or Django exhaust worker thread pools under high concurrent traffic.
+
 - *Fix Strategy:* Migrate to fully asynchronous, non-blocking I/O event loops (`async`/`await`), offload heavy CPU calculations to Web Workers or Celery background queues, and utilize Redis caching layers.
 
 - **Issue - State Inconsistency & Prop Drilling:** Deeply nested React component trees suffer from sluggish re-renders and unsynchronized local state.
+
 - *Fix Strategy:* Implement centralized state management (Redux Toolkit or React Context API) and utilize `useMemo`/`useCallback` hooks to prevent unneeded child component re-renders.
 
 ---

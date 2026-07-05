@@ -126,9 +126,11 @@ public:
 ## 5. Matrix Debugging & Audit Remediation
 
 - **Issue - False Positive Regulatory Lockouts:** Ambiguous column naming in SigmaDB (`user_id` vs `social_security_number`) triggers aggressive automated GDPR compliance lockouts.
+
 - *Fix Strategy:* The compliance engine supports declarative YAML override manifests (`compliance_exceptions.yml`) combined with interactive administrator authorization prompts via `SigmaCLI`.
 
 - **Issue - SLA Priority Inversion Starvation:** Dynamically elevating SLA-breaching userland microservices to real-time priority starves foundational kernel VFS daemons.
+
 - *Fix Strategy:* The CFS scheduler enforces strict **Bandwidth Capping (Cgroups v2)**, guaranteeing that Ring-0 kernel workers always preserve a minimum 15% guaranteed CPU allocation quantum regardless of userland SLA escalations.
 
 ---

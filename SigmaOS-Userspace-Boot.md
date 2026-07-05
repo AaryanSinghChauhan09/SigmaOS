@@ -11,13 +11,19 @@ Moving beyond ring-0 isolation, the SigmaOS ecosystem has expanded to feature ha
 To validate the SigmaOS IPC, Compositor, and VFS implementations, two flagship user-space environments have been engineered:
 
 1. **SigmaTerm (`sigma_term.c`)**
+
 - A high-performance terminal emulator modeled after `st` (suckless).
+
 - Interfaces directly with the Wayland-style kernel compositor to request a shared-memory back-buffer window.
+
 - Parses incoming TTY escape sequences to render hardware-accelerated fonts and colors.
 
 1. **OmniWeb Browser Stub (`sigma_browser.c`)**
+
 - The conceptual foundation for a sovereign rendering engine.
+
 - Implements a lightweight, isolated DOM tree allocator and parser.
+
 - Maps elements (like `html`, `body`, `h1`) into absolute bounding boxes that are passed to the kernel compositor for frame swapping.
 
 ## Bootloader & ISO Generation

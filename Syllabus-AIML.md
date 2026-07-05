@@ -325,12 +325,15 @@ prediction = legal_ai.predict_outcome(case_facts)
 ### Common Issues & Fix Strategies
 
 - **Issue - Overfitting in Deep Neural Networks:** Model memorizes training data noise, causing high validation loss and poor real-world accuracy.
+
 - *Fix Strategy:* Inject `Dropout` layers (rate 0.2 to 0.5), apply $L_2$ weight decay regularization, utilize Early Stopping callbacks, or execute data augmentation.
 
 - **Issue - Vanishing & Exploding Gradients:** Gradients shrink to zero or grow exponentially during backpropagation in deep networks.
+
 - *Fix Strategy:* Replace Sigmoid/Tanh activations with ReLU or LeakyReLU, initialize weights using He/Glorot normal initializers, and implement Gradient Clipping (`clipnorm=1.0`).
 
 - **Issue - Algorithmic Complexity in Attention / Distance Matrices:** Pairwise distance calculations in k-NN or self-attention scale quadratically ($O(n^2)$).
+
 - *Fix Strategy:* Utilize approximate nearest neighbor (ANN) search trees (HNSW / k-d trees) to reduce search complexity to $O(n \log n)$.
 
 ---

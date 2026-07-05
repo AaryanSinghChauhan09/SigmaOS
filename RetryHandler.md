@@ -40,11 +40,15 @@ Extends: [`Dispatch.DispatchOptions`](/docs/docs/api/Dispatcher.md#parameter-dis
 - **statusCodes** `number[]` (optional) - Array of HTTP status codes to retry. Default: `[429, 500, 502, 503, 504]`
 
 - **errorCodes** `string[]` (optional) - Array of Error codes to retry. Default: `['ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'ENETDOWN','ENETUNREACH', 'EHOSTDOWN', 'UND_ERR_SOCKET']`
+
 ### `RetryContext`
+
 - `state`: `RetryState` - Current retry state. It can be mutated.
 
 - `opts`: `Dispatch.DispatchOptions & RetryOptions` - Options passed to the retry handler.
+
 ### `RetryState`
+
 It represents the retry state for a given request.
 
 - `counter`: `number` - Current retry attempt.

@@ -10,7 +10,9 @@ a response's `Vary` header (if present). It is expected to be compliant with
 ### `MemoryCacheStore`
 
 The `MemoryCacheStore` stores the responses in-memory.
+
 ### Options
+
 - `maxSize` - The maximum total size in bytes of all stored responses. Default `104857600` (100MB).
 
 - `maxCount` - The maximum amount of responses to store. Default `1024`.
@@ -40,7 +42,9 @@ Emitted when the cache exceeds its maximum size or count limits. The event paylo
 The `SqliteCacheStore` stores the responses in a SQLite database.
 Under the hood, it uses Node.js' [`node:sqlite`](https://nodejs.org/api/sqlite.html) api.
 The `SqliteCacheStore` is only exposed if the `node:sqlite` api is present.
+
 ### Options
+
 - `location` - The location of the SQLite database to use. Default `:memory:`.
 
 - `maxCount` - The maximum number of entries to store in the database. Default `Infinity`.

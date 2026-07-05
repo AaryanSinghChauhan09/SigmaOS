@@ -347,12 +347,15 @@ loaded = joblib.load('/sigma/ai/models/anomaly_detector.pkl')
 ### Common Issues & Fix Strategies
 
 - **Issue - Out-of-Memory (OOM) Crashes during Batch ETL:** Trying to load multi-gigabyte Parquet or CSV files entirely into Pandas RAM triggers fatal kernel OOM terminations.
+
 - *Fix Strategy:* Use `pd.read_csv(chunksize=10000)` to stream and aggregate chunks iteratively, or migrate to Dask / PySpark for distributed out-of-core lazy execution.
 
 - **Issue - Data Leakage during Preprocessing Pipelines:** Fitting `StandardScaler` or `SimpleImputer` on the entire dataset before `train_test_split` leaks future test distribution metrics into the training phase.
+
 - *Fix Strategy:* Always encapsulate scaling and imputation steps within a Scikit-Learn `Pipeline`, ensuring `fit_transform` executes solely on the active training fold during cross-validation.
 
 - **Issue - SettingWithCopyWarning in Pandas:** Modifying DataFrame slices (`df[df['cpu'] > 50]['mem'] = 0`) triggers ambiguous CoW assignment warnings and fails to update the original frame.
+
 - *Fix Strategy:* Utilize explicit `.loc` indexing (`df.loc[df['cpu'] > 50, 'mem'] = 0`) or create an explicit deep copy (`df_sub = df[df['cpu'] > 50].copy()`).
 
 ---

@@ -1015,7 +1015,9 @@ await client.request({ path: '/', method: 'GET' })
 The `redirect` interceptor allows you to customize the way your dispatcher handles redirects.
 
 It accepts the same arguments as the [`RedirectHandler` constructor](/docs/docs/api/RedirectHandler.md).
+
 ### Example - Basic Redirect Interceptor
+
 ```js
 const { Client, interceptors } = require("undici");
 const { redirect } = interceptors;
@@ -1031,7 +1033,9 @@ client.request({ path: "/" })
 The `retry` interceptor allows you to customize the way your dispatcher handles retries.
 
 It accepts the same arguments as the [`RetryHandler` constructor](/docs/docs/api/RetryHandler.md).
+
 ### Example - Basic Redirect Interceptor
+
 ```js
 const { Client, interceptors } = require("undici");
 const { retry } = interceptors;
@@ -1050,11 +1054,15 @@ const client = new Client("http://service.example").compose(
 ##### `dump`
 
 The `dump` interceptor enables you to dump the response body from a request upon a given limit.
+
 ### Options
+
 - `maxSize` - The maximum size (in bytes) of the response body to dump. If the size of the request's body exceeds this value then the connection will be closed. Default: `1048576`.
 
 > The `Dispatcher#options` also gets extended with the options `dumpMaxSize`, `abortOnDumped`, and `waitForTrailers` which can be used to configure the interceptor at a request-per-request basis.
+
 ### Example - Basic Dump Interceptor
+
 ```js
 const { Client, interceptors } = require("undici");
 const { dump } = interceptors;
@@ -1081,7 +1089,9 @@ client.dispatch(
 The `dns` interceptor enables you to cache DNS lookups for a given duration, per origin.
 
 >It is well suited for scenarios where you want to cache DNS lookups to avoid the overhead of resolving the same domain multiple times
+
 ### Options
+
 - `maxTTL` - The maximum time-to-live (in milliseconds) of the DNS cache. It should be a positive integer. Default: `10000`.
   - Set `0` to disable TTL.
 
@@ -1105,19 +1115,25 @@ The `dns` interceptor enables you to cache DNS lookups for a given duration, per
 - `storage: DNSStorage` - Custom storage for resolved DNS records
 
 > The `Dispatcher#options` also gets extended with the options `dns.affinity`, `dns.dualStack`, `dns.lookup` and `dns.pick` which can be used to configure the interceptor at a request-per-request basis.
+
 ### DNSInterceptorRecord
+
 It represents a DNS record.
 
 - `family` - (`number`) The IP family of the address. It can be either `4` or `6`.
 
 - `address` - (`string`) The IP address.
+
 ### DNSInterceptorOriginRecords
+
 It represents a map of DNS IP addresses records for a single origin.
 
 - `4.ips` - (`DNSInterceptorRecord[] | null`) The IPv4 addresses.
 
 - `6.ips` - (`DNSInterceptorRecord[] | null`) The IPv6 addresses.
+
 ### DNSStorage
+
 It represents a storage object for resolved DNS records.
 
 - `size` - (`number`) current size of the storage.
@@ -1129,7 +1145,9 @@ It represents a storage object for resolved DNS records.
 - `delete` - (`(origin: string) => void`) method to delete records for a given origin.
 
 - `full` - (`() => boolean`) method to check if the storage is full, if returns `true`, DNS lookup will be skipped in this interceptor and new records will not be stored.
+
 ### Example - Basic DNS Interceptor
+
 ```js
 const { Client, interceptors } = require("undici");
 const { dns } = interceptors;
@@ -1143,7 +1161,9 @@ const response = await client.request({
   ...requestOpts
 })
 ```
+
 ### Example - DNS Interceptor and LRU cache as a storage
+
 ```js
 const { Client, interceptors } = require("undici");
 const QuickLRU = require("quick-lru");
@@ -1184,7 +1204,9 @@ const response = await client.request({
 ##### `responseError`
 
 The `responseError` interceptor throws an error for responses with status code errors (>= 400).
+
 ### Example
+
 ```js
 const { Client, interceptors } = require("undici");
 const { responseError } = interceptors;
@@ -1205,11 +1227,15 @@ await client.request({
 âš ï¸ The decompress interceptor is experimental and subject to change.
 
 The `decompress` interceptor automatically decompresses response bodies that are compressed with gzip, deflate, brotli, or zstd compression. It removes the `content-encoding` and `content-length` headers from decompressed responses and supports RFC-9110 compliant multiple encodings.
+
 ### Options
+
 - `skipErrorResponses` - Whether to skip decompression for error responses (status codes >= 400). Default: `true`.
 
 - `skipStatusCodes` - Array of status codes to skip decompression for. Default: `[204, 304]`.
+
 ### Example - Basic Decompress Interceptor
+
 ```js
 const { Client, interceptors } = require("undici");
 const { decompress } = interceptors;
@@ -1224,7 +1250,9 @@ const response = await client.request({
   path: "/"
 });
 ```
+
 ### Example - Custom Options
+
 ```js
 const { Client, interceptors } = require("undici");
 const { decompress } = interceptors;
@@ -1236,7 +1264,9 @@ const client = new Client("http://service.example").compose(
   })
 );
 ```
+
 ### Supported Encodings
+
 - `gzip` / `x-gzip` - GZIP compression
 
 - `deflate` / `x-compress` - DEFLATE compression
@@ -1246,7 +1276,9 @@ const client = new Client("http://service.example").compose(
 - `zstd` - Zstandard compression
 
 - Multiple encodings (e.g., `gzip, deflate`) are supported per RFC-9110
+
 ### Behavior
+
 - Skips decompression for status codes < 200 or >= 400 (configurable)
 
 - Skips decompression for 204 No Content and 304 Not Modified by default
@@ -1263,7 +1295,9 @@ const client = new Client("http://service.example").compose(
 
 The `cache` interceptor implements client-side response caching as described in
 [RFC9111](https://www.rfc-editor.org/rfc/rfc9111.html).
+
 ### Options
+
 - `store` - The [`CacheStore`](/docs/docs/api/CacheStore.md) to store and retrieve responses from. Default is [`MemoryCacheStore`](/docs/docs/api/CacheStore.md#memorycachestore).
 
 - `methods` - The [**safe** HTTP methods](https://www.rfc-editor.org/rfc/rfc9110#section-9.2.1) to cache the response of.
@@ -1271,7 +1305,9 @@ The `cache` interceptor implements client-side response caching as described in
 - `cacheByDefault` - The default expiration time to cache responses by if they don't have an explicit expiration and cannot have an heuristic expiry computed. If this isn't present, responses neither with an explicit expiration nor heuristically cacheable will not be cached. Default `undefined`.
 
 - `type` - The [type of cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching#types_of_caches) for Undici to act as. Can be `shared` or `private`. Default `shared`. `private` implies privately cacheable responses will be cached and potentially shared with other users of your application.
+
 ### Usage with `fetch`
+
 ```js
 const { Agent, cacheStores, interceptors, setGlobalDispatcher } = require('undici')
 
@@ -1295,7 +1331,9 @@ const second = await fetch('https://example.com/data')
 ##### `Deduplicate Interceptor`
 
 The `deduplicate` interceptor deduplicates concurrent identical requests. When multiple identical requests are made while one is already in-flight, only one request is sent to the origin server, and all waiting handlers receive the same response. This reduces server load and improves performance.
+
 ### Options
+
 - `methods` - The [**safe** HTTP methods](https://www.rfc-editor.org/rfc/rfc9110#section-9.2.1) to deduplicate. Default `['GET']`.
 
 - `skipHeaderNames` - Header names that, if present in a request, will cause the request to skip deduplication entirely. Useful for headers like `idempotency-key` where presence indicates unique processing. Header name matching is case-insensitive. Default `[]`.
@@ -1303,7 +1341,9 @@ The `deduplicate` interceptor deduplicates concurrent identical requests. When m
 - `excludeHeaderNames` - Header names to exclude from the deduplication key. Requests with different values for these headers will still be deduplicated together. Useful for headers like `x-request-id` that vary per request but shouldn't affect deduplication. Header name matching is case-insensitive. Default `[]`.
 
 - `maxBufferSize` - Maximum bytes buffered per paused waiting deduplicated handler. If a waiting handler remains paused and exceeds this threshold, it is failed with an abort error to prevent unbounded memory growth. Default `5 * 1024 * 1024`.
+
 ### Usage
+
 ```js
 const { Client, interceptors } = require("undici");
 const { deduplicate, cache } = interceptors;

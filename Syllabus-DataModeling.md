@@ -287,12 +287,15 @@ ml_dash.render('/sigma/ai/reports/model_report.html')
 ### Common Issues & Fix Strategies
 
 - **Issue - Incorrect Indexing & B+ Tree Fragmentation:** Unindexed foreign keys or highly fragmented B+ Tree indices cause heavy sequential table scans ($O(N)$), degrading OLAP query performance.
+
 - *Fix Strategy:* Run `EXPLAIN QUERY PLAN` to identify unindexed joins, create composite covering B+ Tree indices (`CREATE INDEX idx_fk ON child_table(parent_id)`), and execute periodic index defragmentation (`REINDEX`).
 
 - **Issue - Normalization Anomalies & Redundancy:** Storing unnormalized data (1NF/2NF) causes severe update, insertion, and deletion anomalies, leading to inconsistent database states.
+
 - *Fix Strategy:* Run `SigmaModeler` automated normalizer (`normalizer.cpp`) to decompose monolithic tables into strict 3NF/BCNF schemas, eliminating transitive functional dependencies.
 
 - **Issue - Database Deadlocks in Transactional ER Models:** Mutually dependent transactions acquire row locks across parent-child ER tables in conflicting orders, triggering circular wait states.
+
 - *Fix Strategy:* Enforce strict two-phase locking (2PL) protocols, acquire table/row locks in a globally uniform hierarchical order, and implement automated deadlock detection with exponential backoff retries.
 
 ---

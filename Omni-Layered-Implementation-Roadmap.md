@@ -62,9 +62,11 @@ public:
 ### Debugging & Fix Strategies
 
 - **Issue - Kernel Race Conditions:** Concurrent threads corrupt shared kernel data structures across asynchronous CPU cores.
+
 - *Fix Strategy:* Enforce strict mutual exclusion utilizing `SovereignMutex` spinlocks (`sigma_spin_lock_irqsave`) and atomic memory barriers (`std::atomic_thread_fence`).
 
 - **Issue - Kernel Memory Leaks:** Unreleased slab allocations exhaust physical RAM over extended system uptimes.
+
 - *Fix Strategy:* Implement automated kernel garbage collection tracking (`SovereignAllocator::scrub()`) and enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`).
 
 ---
@@ -78,7 +80,9 @@ public:
 - **OLAP Cubes:** Multi-dimensional hypercubes enabling rapid analytical aggregations across disparate business dimensions (Time, Geography, Process Lineage).
 
 - **Star vs. Snowflake Schema:**
+
 - **Star Schema:** Centralized fact table connected directly to denormalized dimension tables; highly optimized for rapid read aggregations and simplicity.
+
 - **Snowflake Schema:** Centralized fact table connected to fully normalized, branching dimension tables; minimizes storage footprint and enforces strict normalization.
 
 **Unique Selling Point (USP):** Efficient structured storage, horizontal sharding, and lightning-fast analytical retrieval designed specifically for enterprise data warehousing.
@@ -110,6 +114,7 @@ CREATE INDEX idx_fact_time ON fact_system_metrics(time_id);
 ### Debugging & Fix Strategies
 
 - **Issue - Slow Analytical Queries & Index Misconfiguration:** Unindexed foreign keys trigger sequential table scans ($O(N)$), stalling OLAP reports.
+
 - *Fix Strategy:* Execute `EXPLAIN QUERY PLAN` to inspect the query execution tree, identify unindexed nested loops, create composite covering B+ Tree indices, implement Redis caching layers, or denormalize highly queried dimension tables for direct read speed.
 
 ---
@@ -167,12 +172,15 @@ sv.scatter(data=df, x='cpu_pct', y='mem_mb', hue='anomaly', title='Anomaly Scatt
 ### Debugging & Fix Strategies
 
 - **Issue - Model Overfitting:** High training accuracy accompanied by severe validation loss due to capturing background noise.
+
 - *Fix Strategy:* Enforce $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, inject Dropout layers (`nn.Dropout`), and prune decision tree max depths.
 
 - **Issue - Imbalanced Classification Data:** Extreme class imbalance E.g., 99% normal logs vs 1% anomalies distorts model decision boundaries.
+
 - *Fix Strategy:* Apply **SMOTE (Synthetic Minority Over-sampling Technique)** to synthetically generate minority class instances along k-NN line segments.
 
 - **Issue - Misinterpretation of p-values:** Relying exclusively on arbitrary p-value thresholds ($p < 0.05$) leads to false positive conclusions in large industrial sample sizes.
+
 - *Fix Strategy:* Emphasize **Effect Sizes** (Cohen's $d$, Hedge's $g$) alongside p-values to quantify the actual magnitude of observed statistical phenomena.
 
 ---
@@ -223,9 +231,11 @@ class SovereignNeuralNet(nn.Module):
 ### Debugging & Fix Strategies
 
 - **Issue - Vanishing Gradients:** Gradients shrink exponentially during backpropagation in deep architectures, stalling early layer learning.
+
 - *Fix Strategy:* Replace Sigmoid/Tanh activations with non-saturating **ReLU (Rectified Linear Unit)** activations ($f(x) = \max(0, x)$).
 
 - **Issue - Exploding Gradients:** Gradients accumulate into massive unstable numbers during backpropagation, causing numerical overflow (`NaN`).
+
 - *Fix Strategy:* Implement explicit **Gradient Clipping** (`torch.nn.utils.clip_grad_norm_`) to cap gradient vectors at a maximum threshold.
 
 ---
@@ -235,13 +245,19 @@ class SovereignNeuralNet(nn.Module):
 ### Core Concepts, Tooling & Algorithms
 
 - **Discrete Mathematics:** Tooling compatibility bridging **MATLAB, Wolfram Mathematica, and SageMath**.
+
 - **Graph Theory:** Modeling pairwise relations using vertices and edges E.g., shortest path routing, graph coloring for register allocation.
+
 - **Combinatorics:** Permutations and combinations analyzing execution path permutations and cryptographic key spaces.
+
 - **Mathematical Logic & Set Theory:** Propositional/predicate logic powering automated theorem proving and RBAC security policy evaluation.
 
 - **Foundational Algorithms:**
+
 - **Sorting:** In-place **QuickSort** utilizing median-of-three pivot selection ($O(N \log N)$ average).
+
 - **Searching:** **Binary Search** across sorted continuous arrays ($O(\log N)$).
+
 - **Graph Traversal:** **Breadth-First Search (BFS)** and **Depth-First Search (DFS)** for AST parsing and VFS directory indexing.
 
     $$\text{BFS Complexity} = O(V + E)$$
@@ -251,6 +267,7 @@ class SovereignNeuralNet(nn.Module):
 ### Debugging & Fix Strategies
 
 - **Issue - Algorithmic Inefficiency & Quadratic Scaling:** Using naive nested loops or bubble sort on large datasets yields crippling $O(N^2)$ execution complexity.
+
 - *Fix Strategy:* Execute rigorous Big-O complexity analysis and refactor underlying data structures E.g., migrating from linear array scans to balanced B+ Trees or Hash Maps, reducing complexity from $O(N^2)$ to $O(N \log N)$ or $O(1)$.
 
 ---
@@ -286,6 +303,7 @@ public:
 ### Debugging & Fix Strategies
 
 - **Issue - Flawed Inheritance Hierarchies & Tight Coupling:** Rigid, deeply nested inheritance trees suffer from fragile base class problems and vtable slicing.
+
 - *Fix Strategy:* Rigorously apply **SOLID Principles** and refactor fragile base class inheritance hierarchies using pure abstract interface classes (`class IReadable { virtual int read() = 0; }`).
 
 ---
@@ -323,6 +341,7 @@ app.post('/sigma/api/telemetry', (req, res) => {
 ### Debugging & Fix Strategies
 
 - **Issue - Web Security Vulnerabilities (SQLi, XSS, CSRF):** Unsanitized user input compromises backend databases or executes malicious scripts within client browsers.
+
 - *Fix Strategy:* Enforce strict server-side **Input Validation** (regex white-listing), utilize parameterized SQL queries (prepared statements) to eliminate SQL injection, implement Anti-CSRF cryptographic tokens, and sanitize all HTML rendering to prevent Cross-Site Scripting (XSS).
 
 ---
@@ -342,12 +361,15 @@ app.post('/sigma/api/telemetry', (req, res) => {
 ### Universal Remediation Protocols
 
 - **Issue - Silent Regressions & Logic Bugs:** Unnoticed code changes break existing operational contracts.
+
 - *Fix Strategy:* Deploy exhaustive automated unit test suites (`pytest` / `SIGMA_ASSERT`) blocking PR merges on failure.
 
 - **Issue - System Bottlenecks & Lock Starvation:** Unidentified execution delays degrade overall throughput.
+
 - *Fix Strategy:* Attach profiling tools (eDTrace / KASAN / Valgrind) to isolate lock contention and memory stalls.
 
 - **Issue - Ambiguous Runtime Crashes:** Unhandled exceptions terminate daemons without clear diagnostic trails.
+
 - *Fix Strategy:* Implement structured logging (`sigma_klog` JSON format) capturing precise stack traces and registers upon panic.
 
 ---

@@ -201,15 +201,19 @@ sigma.viz.dendrogram(hc)
 ### Common Issues & Fix Strategies
 
 - **Issue - Incorrect Indexing in Databases:** Missing or fragmented B+ Tree indices cause full table scans, degrading analytical query performance.
+
 - *Fix Strategy:* Run `EXPLAIN QUERY PLAN` to identify unindexed scans, create composite covering indices for frequent `WHERE` and `JOIN` clauses, and periodically rebuild fragmented index trees.
 
 - **Issue - Database Deadlocks:** Concurrent ETL write transactions lock identical tables in reverse order, causing circular wait states.
+
 - *Fix Strategy:* Enforce strict two-phase locking (2PL) protocols, acquire table locks in a globally uniform hierarchical order, and implement automatic deadlock detection with exponential backoff retries.
 
 - **Issue - Data Corruption & Missing Values:** Sensor dropouts or network failures inject `NULL` values into OLAP fact tables.
+
 - *Fix Strategy:* Use automated ETL data preprocessors to execute k-NN or mean imputation, ensuring analytical hypercubes remain fully populated.
 
 - **Issue - Algorithmic Complexity in Mining Scans:** Apriori candidate generation ($C_k$) scales exponentially ($O(2^d)$) with unique item counts.
+
 - *Fix Strategy:* Migrate from Apriori to FP-Growth tree traversal, compressing transactional databases into in-memory prefix trees to eliminate candidate generation entirely.
 
 ---

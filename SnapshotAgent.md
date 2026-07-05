@@ -590,7 +590,9 @@ test('validate snapshot contents', async (t) => {
 ## Comparison with Other Tools
 
 ### vs Manual MockAgent Setup
+
 ### Manual MockAgent:
+
 ```javascript
 const mockAgent = new MockAgent()
 const mockPool = mockAgent.get('https://api.example.com')
@@ -603,7 +605,9 @@ mockPool.intercept({
   { id: 2, name: 'User 2' }
 ])
 ```
+
 ### SnapshotAgent:
+
 ```javascript
 // Record once
 const agent = new SnapshotAgent({ mode: 'record', snapshotPath: './snapshots.json' })
