@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignEqualRemunerationAuditor ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignEqualRemunerationAuditor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// EqualityReport — hardware-compatible struct.
+/// EqualityReport â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct EqualityReport {
     pub is_compliant: SigmaBool,
     pub pay_disparity_paise: SigmaU64,
     pub disparity_percentage_bps: SigmaU32,
     pub has_discriminatory_hiring_policies: SigmaBool,
 }
 
-/// SovereignEqualRemunerationAuditor — OOP singleton pattern.
+/// SovereignEqualRemunerationAuditor â€” OOP singleton pattern.
 pub struct SovereignEqualRemunerationAuditor {
     pub initialized: SigmaBool,
 }
@@ -51,4 +51,6 @@ static mut INSTANCE: SovereignEqualRemunerationAuditor = SovereignEqualRemunerat
 pub unsafe extern "C" fn run_equal_remuneration_audit() {
     INSTANCE.initialized = true;
 }
+
+
 

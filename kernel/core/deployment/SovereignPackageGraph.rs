@@ -1,11 +1,11 @@
-/// SigmaOS: e.g. "GitHub:AaryanSinghChauhan09/SigmaOS" */
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: e.g. "GitHub:AaryanSinghChauhan09/SigmaOS" */
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPackageGraph ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPackageGraph â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PackageMetadata — hardware-compatible struct.
+/// PackageMetadata â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PackageMetadata {
     pub name: [u8; 64],
     pub provenance_root: [u8; 128],
     pub pqc_attested: SigmaU8,
     pub build_deterministic: SigmaU8,
 }
 
-/// SovereignPackageGraph — OOP singleton pattern.
+/// SovereignPackageGraph â€” OOP singleton pattern.
 pub struct SovereignPackageGraph {
     pub initialized: SigmaBool,
 }
@@ -101,4 +101,6 @@ pub unsafe extern "C" fn pkg_resolve() {
 pub unsafe extern "C" fn pkg_verify() {
     INSTANCE.initialized = true;
 }
+
+
 

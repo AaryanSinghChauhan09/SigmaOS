@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,26 +16,26 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::with ─────────────────────
+// â”€â”€â”€ Module: Sigma::with â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SearchResult — hardware-compatible struct.
+/// SearchResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SearchResult {
     pub source: [u8; 64],
     pub rank: SigmaU64,
 }
 
-/// SovereignSearch — hardware-compatible struct.
+/// SovereignSearch â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignSearch {
     pub result_count: SigmaU32,
     pub queries_served: SigmaU64,
     pub onion_active: SigmaBool,
 }
 
-/// with — OOP singleton pattern.
+/// with â€” OOP singleton pattern.
 pub struct with {
     pub initialized: SigmaBool,
 }
@@ -113,4 +113,6 @@ pub unsafe extern "C" fn search_onion() {
 pub unsafe extern "C" fn search_print_results() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignDistributedOrchestrator.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignDistributedOrchestrator.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::NodeState ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::NodeState â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ClusterNode — hardware-compatible struct.
+/// ClusterNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ClusterNode {
     pub id: SigmaU32,
     pub hostname: [u8; 48],
     pub ip_addr: SigmaU32,
@@ -33,10 +33,10 @@ pub struct {s_name} {{
     pub leader: SigmaBool,
 }
 
-/// Workload — hardware-compatible struct.
+/// Workload â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Workload {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub type: SigmaU64,
@@ -46,7 +46,7 @@ pub struct {s_name} {{
     pub healthy: SigmaBool,
 }
 
-/// NodeState — OOP singleton pattern.
+/// NodeState â€” OOP singleton pattern.
 pub struct NodeState {
     pub initialized: SigmaBool,
 }
@@ -144,4 +144,6 @@ pub unsafe extern "C" fn orch_elect_leader() {
 pub unsafe extern "C" fn orch_status() {
     INSTANCE.initialized = true;
 }
+
+
 

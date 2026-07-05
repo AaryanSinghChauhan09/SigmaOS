@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Dietitian / Nutritionist Shard (S-DIET)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Dietitian / Nutritionist Shard (S-DIET)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,16 +16,16 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignDiet ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignDiet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// RDAEntry — hardware-compatible struct.
+/// RDAEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RDAEntry {
     pub rda_value: SigmaU32,
 }
 
-/// SovereignDiet — OOP singleton pattern.
+/// SovereignDiet â€” OOP singleton pattern.
 pub struct SovereignDiet {
     pub initialized: SigmaBool,
 }
@@ -128,4 +128,6 @@ pub unsafe extern "C" fn diet_fssai() {
 pub unsafe extern "C" fn diet_rda() {
     INSTANCE.initialized = true;
 }
+
+
 

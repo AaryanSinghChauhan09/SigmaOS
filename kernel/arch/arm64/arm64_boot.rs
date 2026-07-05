@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: ARM64::arm64_boot ─────────────────────
+// â”€â”€â”€ Module: ARM64::arm64_boot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// GICv3State — hardware-compatible struct.
+/// GICv3State â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct GICv3State {
     pub max_irqs: SigmaU64,
     pub num_cpus: SigmaU64,
     pub initialized: SigmaBool,
 }
 
-/// ExceptionVectorTable — hardware-compatible struct.
+/// ExceptionVectorTable â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ExceptionVectorTable {
     pub sync_sp0: [SigmaU64; 128],
     pub irq_sp0: [SigmaU64; 128],
     pub fiq_sp0: [SigmaU64; 128],
@@ -49,10 +49,10 @@ pub struct {s_name} {{
     pub serror_lower32: [SigmaU64; 128],
 }
 
-/// ARM64CoreState — hardware-compatible struct.
+/// ARM64CoreState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ARM64CoreState {
     pub mpidr: SigmaU64,
     pub online: SigmaBool,
     pub stack_base: SigmaU64,
@@ -209,4 +209,6 @@ pub unsafe extern "C" fn arm64_system_reset() {
 #[no_mangle]
 pub unsafe extern "C" fn arm64_system_off() {
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ResourceType ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ResourceType â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SessionContext — hardware-compatible struct.
+/// SessionContext â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SessionContext {
     pub uid: SigmaU32,
     pub session_id: SigmaU32,
     pub created_tsc: SigmaU64,
@@ -34,10 +34,10 @@ pub struct {s_name} {{
     pub terminated: SigmaBool,
 }
 
-/// PolicyEntry — hardware-compatible struct.
+/// PolicyEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PolicyEntry {
     pub role: SigmaU64,
     pub resource: SigmaU64,
     pub allowed_ops: SigmaU32,
@@ -45,7 +45,7 @@ pub struct {s_name} {{
     pub allowed: SigmaU64,
 }
 
-/// ResourceType — OOP singleton pattern.
+/// ResourceType â€” OOP singleton pattern.
 pub struct ResourceType {
     pub initialized: SigmaBool,
 }
@@ -173,4 +173,6 @@ pub unsafe extern "C" fn sigma_zerotrust_init() {
 pub unsafe extern "C" fn sigma_zerotrust_close_session() {
     INSTANCE.initialized = true;
 }
+
+
 

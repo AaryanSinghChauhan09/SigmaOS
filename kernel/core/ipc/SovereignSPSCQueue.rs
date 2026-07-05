@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignSPSCQueue ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignSPSCQueue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SovereignIPCMessage — hardware-compatible struct.
+/// SovereignIPCMessage â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignIPCMessage {
     pub sender_shard_id: SigmaU32,
     pub receiver_shard_id: SigmaU32,
     pub opcode: SigmaU32,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub payload: [SigmaU64; 4],
 }
 
-/// SovereignSPSCQueue — OOP singleton pattern.
+/// SovereignSPSCQueue â€” OOP singleton pattern.
 pub struct SovereignSPSCQueue {
     pub initialized: SigmaBool,
 }
@@ -52,4 +52,6 @@ impl SovereignSPSCQueue {
 }
 
 static mut INSTANCE: SovereignSPSCQueue = SovereignSPSCQueue::new();
+
+
 

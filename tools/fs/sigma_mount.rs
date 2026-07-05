@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_mount: Sovereign Filesystem Mount/Unmount Utility
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_mount: Sovereign Filesystem Mount/Unmount Utility
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_mount ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_mount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// MountEntry — hardware-compatible struct.
+/// MountEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct MountEntry {
     pub device: [u8; 32],
     pub mountpoint: [u8; 64],
     pub fs_type: SigmaI32,
@@ -31,4 +31,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {
 }
+
+
 

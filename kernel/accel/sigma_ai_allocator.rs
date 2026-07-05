@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_ai_allocator: AI-Driven Resource Allocation
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_ai_allocator: AI-Driven Resource Allocation
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_ai_allocator ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_ai_allocator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ProcessPredictor — hardware-compatible struct.
+/// ProcessPredictor â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ProcessPredictor {
     pub pid: SigmaU64,
     pub head: SigmaU64,
     pub active: SigmaBool,
@@ -34,4 +34,6 @@ pub unsafe extern "C" fn sigma_ai_record_page_fault() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_ai_allocator_tick() {
 }
+
+
 

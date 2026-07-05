@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Insurance Actuary Shard (S-ACTUARY)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Insurance Actuary Shard (S-ACTUARY)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,17 +16,17 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignActuary ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignActuary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// MortalityEntry — hardware-compatible struct.
+/// MortalityEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct MortalityEntry {
     pub age: SigmaU32,
     pub qx_per_1000: SigmaU32,
 }
 
-/// SovereignActuary — OOP singleton pattern.
+/// SovereignActuary â€” OOP singleton pattern.
 pub struct SovereignActuary {
     pub initialized: SigmaBool,
 }
@@ -104,4 +104,6 @@ pub unsafe extern "C" fn actuary_premium() {
 pub unsafe extern "C" fn actuary_solvency() {
     INSTANCE.initialized = true;
 }
+
+
 

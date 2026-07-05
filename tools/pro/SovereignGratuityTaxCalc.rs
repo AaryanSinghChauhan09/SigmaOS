@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignGratuityTaxCalc ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignGratuityTaxCalc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// TaxExemptionResult — hardware-compatible struct.
+/// TaxExemptionResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct TaxExemptionResult {
     pub exempt_amount_paise: SigmaU64,
     pub taxable_amount_paise: SigmaU64,
     pub is_fully_exempt: SigmaBool,
 }
 
-/// SovereignGratuityTaxCalc — OOP singleton pattern.
+/// SovereignGratuityTaxCalc â€” OOP singleton pattern.
 pub struct SovereignGratuityTaxCalc {
     pub initialized: SigmaBool,
 }
@@ -50,4 +50,6 @@ static mut INSTANCE: SovereignGratuityTaxCalc = SovereignGratuityTaxCalc::new();
 pub unsafe extern "C" fn run_gratuity_tax_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

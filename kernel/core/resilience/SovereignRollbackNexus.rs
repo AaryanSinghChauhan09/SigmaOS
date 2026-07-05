@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Rollback Nexus (S-ROLLBACK)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Rollback Nexus (S-ROLLBACK)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignRollbackNexus ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignRollbackNexus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SnapshotHorizon — hardware-compatible struct.
+/// SnapshotHorizon â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SnapshotHorizon {
     pub id: SigmaU64,
     pub timestamp: SigmaU64,
     pub memory_checksum: SigmaU64,
     pub committed: SigmaBool,
 }
 
-/// SovereignRollbackNexus — OOP singleton pattern.
+/// SovereignRollbackNexus â€” OOP singleton pattern.
 pub struct SovereignRollbackNexus {
     pub initialized: SigmaBool,
 }
@@ -91,4 +91,6 @@ pub unsafe extern "C" fn rollback_init() {
 pub unsafe extern "C" fn rollback_execute() {
     INSTANCE.initialized = true;
 }
+
+
 

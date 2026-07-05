@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignShardOrchestrator ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignShardOrchestrator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ShardMetadata — hardware-compatible struct.
+/// ShardMetadata â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ShardMetadata {
     pub version: SigmaU32,
     pub active: SigmaBool,
     pub load_addr: SigmaU64,
 }
 
-/// SovereignShardOrchestrator — OOP singleton pattern.
+/// SovereignShardOrchestrator â€” OOP singleton pattern.
 pub struct SovereignShardOrchestrator {
     pub initialized: SigmaBool,
 }
@@ -40,4 +40,6 @@ impl SovereignShardOrchestrator {
 }
 
 static mut INSTANCE: SovereignShardOrchestrator = SovereignShardOrchestrator::new();
+
+
 

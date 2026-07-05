@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_aes: Sovereign AES-256 implementation
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_aes: Sovereign AES-256 implementation
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_aes ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_aes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// sigma_aes256_ctx — hardware-compatible struct.
+/// sigma_aes256_ctx â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct sigma_aes256_ctx {
     pub round_key: [SigmaU64; 60],
     pub round_keys: [SigmaU64; 240],
 }
@@ -57,4 +57,6 @@ pub unsafe extern "C" fn sigma_aes256_decrypt_block() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_aes256_gcm_encrypt() {
 }
+
+
 

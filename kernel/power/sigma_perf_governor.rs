@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::GovernorProfile ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::GovernorProfile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CPUFeatures — hardware-compatible struct.
+/// CPUFeatures â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CPUFeatures {
     pub avx512f: SigmaBool,
     pub avx512bw: SigmaBool,
     pub avx512vl: SigmaBool,
@@ -36,10 +36,10 @@ pub struct {s_name} {{
     pub llc_size_kb: SigmaU32,
 }
 
-/// NumaNode — hardware-compatible struct.
+/// NumaNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NumaNode {
     pub id: SigmaU32,
     pub cpu_first: SigmaU32,
     pub cpu_count: SigmaU32,
@@ -48,7 +48,7 @@ pub struct {s_name} {{
     pub llc_size_kb: SigmaU32,
 }
 
-/// GovernorProfile — OOP singleton pattern.
+/// GovernorProfile â€” OOP singleton pattern.
 pub struct GovernorProfile {
     pub initialized: SigmaBool,
 }
@@ -201,4 +201,6 @@ pub unsafe extern "C" fn sigma_perf_thermal_event() {
 pub unsafe extern "C" fn sigma_perf_thermal_event() {
     INSTANCE.initialized = true;
 }
+
+
 

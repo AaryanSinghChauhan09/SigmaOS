@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignModuleLoader ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignModuleLoader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SigmaModuleABI — hardware-compatible struct.
+/// SigmaModuleABI â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaModuleABI {
     pub name: [u8; 64],
     pub version: [u8; 16],
     pub version_major: SigmaU32,
@@ -33,18 +33,18 @@ pub struct {s_name} {{
     pub destroy: SigmaU64,
 }
 
-/// Capability — hardware-compatible struct.
+/// Capability â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Capability {
     pub name: [u8; 48],
     pub granted: SigmaBool,
 }
 
-/// LoadedModule — hardware-compatible struct.
+/// LoadedModule â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LoadedModule {
     pub id: SigmaU32,
     pub abi: SigmaU64,
     pub state: SigmaU64,
@@ -55,7 +55,7 @@ pub struct {s_name} {{
     pub restart_count: SigmaU32,
 }
 
-/// SovereignModuleLoader — OOP singleton pattern.
+/// SovereignModuleLoader â€” OOP singleton pattern.
 pub struct SovereignModuleLoader {
     pub initialized: SigmaBool,
 }
@@ -158,4 +158,6 @@ pub unsafe extern "C" fn module_loader_start_all() {
 pub unsafe extern "C" fn module_loader_status() {
     INSTANCE.initialized = true;
 }
+
+
 

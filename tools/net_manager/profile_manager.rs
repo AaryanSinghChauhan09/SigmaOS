@@ -1,11 +1,11 @@
-/// SigmaOS: profile_manager module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: profile_manager module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ProfileType ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ProfileType â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NetProfile — hardware-compatible struct.
+/// NetProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NetProfile {
     pub type: SigmaU64,
     pub name: SigmaU64,
     pub use_dhcp: SigmaBool,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub enforce_strict_firewall: SigmaBool,
 }
 
-/// ProfileType — OOP singleton pattern.
+/// ProfileType â€” OOP singleton pattern.
 pub struct ProfileType {
     pub initialized: SigmaBool,
 }
@@ -57,4 +57,6 @@ impl ProfileType {
 }
 
 static mut INSTANCE: ProfileType = ProfileType::new();
+
+
 

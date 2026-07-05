@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign SEBI / Stock Market Shard (S-SEBI)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign SEBI / Stock Market Shard (S-SEBI)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,17 +16,17 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignSEBI ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignSEBI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// FnOMargin — hardware-compatible struct.
+/// FnOMargin â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FnOMargin {
     pub span_permille: SigmaU32,
     pub exposure_permille: SigmaU32,
 }
 
-/// SovereignSEBI — OOP singleton pattern.
+/// SovereignSEBI â€” OOP singleton pattern.
 pub struct SovereignSEBI {
     pub initialized: SigmaBool,
 }
@@ -139,4 +139,6 @@ pub unsafe extern "C" fn sebi_fno_margin() {
 pub unsafe extern "C" fn sebi_pit() {
     INSTANCE.initialized = true;
 }
+
+
 

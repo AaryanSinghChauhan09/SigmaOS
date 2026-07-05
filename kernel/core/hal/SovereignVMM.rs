@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Virtual Memory Manager (S-VMM)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Virtual Memory Manager (S-VMM)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,15 +16,15 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignVMM ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignVMM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PageTableEntry — hardware-compatible struct.
+/// PageTableEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PageTableEntry {
 }
 
-/// SovereignVMM — OOP singleton pattern.
+/// SovereignVMM â€” OOP singleton pattern.
 pub struct SovereignVMM {
     pub initialized: SigmaBool,
 }
@@ -107,4 +107,6 @@ pub unsafe extern "C" fn vmm_flush_tlb() {
 pub unsafe extern "C" fn vmm_page_fault() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: persona_manager module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: persona_manager module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPersonaManager ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPersonaManager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PersonaConfig — hardware-compatible struct.
+/// PersonaConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PersonaConfig {
     pub name: [u8; 32],
     pub accent_color: SigmaU32,
     pub entropy_protection: SigmaBool,
     pub clearance_level: SigmaU8,
 }
 
-/// SovereignPersonaManager — OOP singleton pattern.
+/// SovereignPersonaManager â€” OOP singleton pattern.
 pub struct SovereignPersonaManager {
     pub initialized: SigmaBool,
 }
@@ -71,4 +71,6 @@ pub unsafe extern "C" fn EnableMorphicSync() {
 pub unsafe extern "C" fn AuditPersona() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::dist_shard ─────────────────────
+// â”€â”€â”€ Module: Sigma::dist_shard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// TaskShard — hardware-compatible struct.
+/// TaskShard â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct TaskShard {
     pub task_id: SigmaU64,
     pub target_node_id: SigmaU32,
     pub status: SigmaU64,
 }
 
-/// NodeRegistry — hardware-compatible struct.
+/// NodeRegistry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NodeRegistry {
     pub node_id: SigmaU32,
     pub cpu_count: SigmaU32,
     pub memory_free: SigmaU64,
@@ -44,4 +44,6 @@ pub unsafe extern "C" fn dist_shard_init() {
 #[no_mangle]
 pub unsafe extern "C" fn dist_audit() {
 }
+
+
 

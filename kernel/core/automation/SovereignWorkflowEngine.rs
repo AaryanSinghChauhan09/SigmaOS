@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignWorkflowEngine � AI-Native Automation Rule Engine
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignWorkflowEngine ï¿½ AI-Native Automation Rule Engine
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,26 +16,26 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignWorkflowEngineShard ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignWorkflowEngineShard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// WorkflowRule — hardware-compatible struct.
+/// WorkflowRule â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WorkflowRule {
     pub action: SigmaU64,
     pub valid: SigmaU32,
 }
 
-/// ScheduledTask — hardware-compatible struct.
+/// ScheduledTask â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ScheduledTask {
     pub interval_ms: SigmaU64,
     pub next_run_ms: SigmaU64,
     pub action: SigmaU64,
 }
 
-/// SovereignWorkflowEngineShard — OOP singleton pattern.
+/// SovereignWorkflowEngineShard â€” OOP singleton pattern.
 pub struct SovereignWorkflowEngineShard {
     pub initialized: SigmaBool,
 }
@@ -148,4 +148,6 @@ pub unsafe extern "C" fn sigma_workflow_dispatch() {
 pub unsafe extern "C" fn sigma_workflow_update() {
     INSTANCE.initialized = true;
 }
+
+
 

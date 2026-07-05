@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignDevPortal.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignDevPortal.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::PipelineStatus ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::PipelineStatus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CIPipeline — hardware-compatible struct.
+/// CIPipeline â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CIPipeline {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub branch: [u8; 32],
@@ -31,10 +31,10 @@ pub struct {s_name} {{
     pub test_failed: SigmaU32,
 }
 
-/// PackageSubmission — hardware-compatible struct.
+/// PackageSubmission â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PackageSubmission {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub author: [u8; 32],
@@ -43,10 +43,10 @@ pub struct {s_name} {{
     pub approved: SigmaBool,
 }
 
-/// RepoMetrics — hardware-compatible struct.
+/// RepoMetrics â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RepoMetrics {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub open_prs: SigmaU32,
@@ -56,7 +56,7 @@ pub struct {s_name} {{
     pub coverage_pct: SigmaU32,
 }
 
-/// PipelineStatus — OOP singleton pattern.
+/// PipelineStatus â€” OOP singleton pattern.
 pub struct PipelineStatus {
     pub initialized: SigmaBool,
 }
@@ -129,4 +129,6 @@ pub unsafe extern "C" fn devportal_init() {
 pub unsafe extern "C" fn devportal_dashboard() {
     INSTANCE.initialized = true;
 }
+
+
 

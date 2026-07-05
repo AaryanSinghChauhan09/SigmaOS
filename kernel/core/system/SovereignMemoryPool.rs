@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SIGMAOS: Sovereign Memory Pool Manager
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SIGMAOS: Sovereign Memory Pool Manager
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignMemoryPool ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignMemoryPool â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Pool — hardware-compatible struct.
+/// Pool â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Pool {
     pub start: SigmaU64,
     pub size: SigmaU64,
     pub used: SigmaU64,
     pub locked: SigmaBool,
 }
 
-/// SovereignMemoryPool — OOP singleton pattern.
+/// SovereignMemoryPool â€” OOP singleton pattern.
 pub struct SovereignMemoryPool {
     pub initialized: SigmaBool,
 }
@@ -96,4 +96,6 @@ pub unsafe extern "C" fn profile_leaks() {
 pub unsafe extern "C" fn smm_pool_reset() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignProfileEngine ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignProfileEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SystemProfile — hardware-compatible struct.
+/// SystemProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SystemProfile {
     pub id: SigmaU32,
     pub type: SigmaU64,
     pub name: [u8; 64],
@@ -35,20 +35,20 @@ pub struct {s_name} {{
     pub active: SigmaBool,
 }
 
-/// Keybind — hardware-compatible struct.
+/// Keybind â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Keybind {
     pub id: SigmaU32,
     pub combo: [u8; 32],
     pub action: [u8; 64],
     pub enabled: SigmaBool,
 }
 
-/// SigmaTheme — hardware-compatible struct.
+/// SigmaTheme â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaTheme {
     pub id: SigmaU32,
     pub name: [u8; 32],
     pub accent_color: SigmaU32,
@@ -59,7 +59,7 @@ pub struct {s_name} {{
     pub dark_mode: SigmaBool,
 }
 
-/// SovereignProfileEngine — OOP singleton pattern.
+/// SovereignProfileEngine â€” OOP singleton pattern.
 pub struct SovereignProfileEngine {
     pub initialized: SigmaBool,
 }
@@ -162,4 +162,6 @@ pub unsafe extern "C" fn profile_switch() {
 pub unsafe extern "C" fn profile_status() {
     INSTANCE.initialized = true;
 }
+
+
 

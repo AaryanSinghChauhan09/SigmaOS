@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS Zenith — Capacitive Touch Input Driver Shard
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS Zenith â€” Capacitive Touch Input Driver Shard
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_touch_driver ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_touch_driver â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SigmaTouchEvent — hardware-compatible struct.
+/// SigmaTouchEvent â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaTouchEvent {
     pub x: SigmaU64,
     pub y: SigmaU64,
     pub finger_id: SigmaU64,
@@ -29,10 +29,10 @@ pub struct {s_name} {{
     pub pressure: SigmaU64,
 }
 
-/// SovereignTouchRingBuffer — hardware-compatible struct.
+/// SovereignTouchRingBuffer â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignTouchRingBuffer {
     pub events: [SigmaU64; 256],
     pub head: SigmaU64,
     pub tail: SigmaU64,
@@ -49,4 +49,6 @@ pub unsafe extern "C" fn sigma_touch_init() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_touch_irq_handler() {
 }
+
+
 

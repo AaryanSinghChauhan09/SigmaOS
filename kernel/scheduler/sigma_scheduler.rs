@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_scheduler: Sovereign Round-Robin + EDF Hybrid Scheduler
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_scheduler: Sovereign Round-Robin + EDF Hybrid Scheduler
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_scheduler ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_scheduler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SigmaPCB — hardware-compatible struct.
+/// SigmaPCB â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaPCB {
     pub pid: SigmaU64,
     pub ppid: SigmaU64,
     pub sched_class: SigmaU64,
@@ -37,10 +37,10 @@ pub struct {s_name} {{
     pub current_cpu: SigmaU64,
 }
 
-/// RunQueue — hardware-compatible struct.
+/// RunQueue â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RunQueue {
     pub current_pid: SigmaU64,
     pub load_weight: SigmaU64,
     pub last_idle_time: SigmaU64,
@@ -57,4 +57,6 @@ pub unsafe extern "C" fn sigma_sched_yield() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_sched_scale_cpu_freq() {
 }
+
+
 

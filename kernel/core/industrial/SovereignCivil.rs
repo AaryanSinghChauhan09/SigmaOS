@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Civil Engineering Shard (S-CIVIL)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Civil Engineering Shard (S-CIVIL)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignCivil ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignCivil â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BeamParams — hardware-compatible struct.
+/// BeamParams â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BeamParams {
     pub length_mm: SigmaU32,
     pub load_n: SigmaU32,
     pub e_mpa: SigmaU32,
     pub i_mm4: SigmaU32,
 }
 
-/// SovereignCivil — OOP singleton pattern.
+/// SovereignCivil â€” OOP singleton pattern.
 pub struct SovereignCivil {
     pub initialized: SigmaBool,
 }
@@ -81,4 +81,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn civil_init() {
     INSTANCE.initialized = true;
 }
+
+
 

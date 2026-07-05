@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignRTIComplianceCalc ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignRTIComplianceCalc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// RTIComplianceResult — hardware-compatible struct.
+/// RTIComplianceResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RTIComplianceResult {
     pub filing_fee_paise: SigmaU32,
     pub statutory_limit_days: SigmaU32,
     pub delayed_days: SigmaU32,
@@ -30,7 +30,7 @@ pub struct {s_name} {{
     pub is_life_or_liberty_case: SigmaBool,
 }
 
-/// SovereignRTIComplianceCalc — OOP singleton pattern.
+/// SovereignRTIComplianceCalc â€” OOP singleton pattern.
 pub struct SovereignRTIComplianceCalc {
     pub initialized: SigmaBool,
 }
@@ -53,4 +53,6 @@ static mut INSTANCE: SovereignRTIComplianceCalc = SovereignRTIComplianceCalc::ne
 pub unsafe extern "C" fn run_rti_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

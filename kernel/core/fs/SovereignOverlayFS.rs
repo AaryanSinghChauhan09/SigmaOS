@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Overlay File System Shard (S-OverlayFS)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Overlay File System Shard (S-OverlayFS)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,22 +16,22 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignOverlayEngine ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignOverlayEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// FileNode — hardware-compatible struct.
+/// FileNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FileNode {
     pub name: [u8; 64],
     pub content: [u8; 256],
     pub is_upper: SigmaBool,
     pub active: SigmaBool,
 }
 
-/// OverlayMount — hardware-compatible struct.
+/// OverlayMount â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct OverlayMount {
     pub lower_dir: [u8; 64],
     pub upper_dir: [u8; 64],
     pub merged_dir: [u8; 64],
@@ -40,7 +40,7 @@ pub struct {s_name} {{
     pub active: SigmaBool,
 }
 
-/// SovereignOverlayEngine — OOP singleton pattern.
+/// SovereignOverlayEngine â€” OOP singleton pattern.
 pub struct SovereignOverlayEngine {
     pub initialized: SigmaBool,
 }
@@ -123,4 +123,6 @@ pub unsafe extern "C" fn overlay_init() {
 pub unsafe extern "C" fn overlay_list() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -46,6 +46,8 @@ pub enum TaskState {
     Runnable = 1,
     Blocked  = 2,
     Zombie   = 3,
+    /// Frozen by forensic snapshot — scheduler skips this task.
+    Frozen   = 4,
 }
 
 impl TaskCb {
@@ -236,6 +238,8 @@ pub struct SigmaScheduler {
     tick_count:    AtomicU64,
     current_pid:   AtomicU32,
     initialized:   bool,
+    /// True when all tasks are frozen for forensic snapshot.
+    all_frozen:    bool,
 }
 
 impl SigmaScheduler {
@@ -249,6 +253,7 @@ impl SigmaScheduler {
             tick_count:  AtomicU64::new(0),
             current_pid: AtomicU32::new(0),
             initialized: false,
+            all_frozen:  false,
         }
     }
 
@@ -280,18 +285,25 @@ impl SigmaScheduler {
 
         // EDF first (hard real-time)
         if let Some(t) = self.edf.pick_next() {
+            // Skip frozen tasks.
+            if t.state == TaskState::Frozen {
+                return self.current_pid.load(Ordering::Relaxed);
+            }
             self.current_pid.store(t.pid, Ordering::Relaxed);
             return t.pid;
         }
 
         // MLFQ second (interactive)
         if let Some((pid, _lvl)) = self.mlfq.dequeue() {
+            // Skip if all_frozen.
+            if self.all_frozen { return 0; }
             self.current_pid.store(pid, Ordering::Relaxed);
             return pid;
         }
 
         // CFS third (fair sharing)
         if let Some(t) = self.cfs.pick_next() {
+            if self.all_frozen { return 0; }
             self.current_pid.store(t.pid, Ordering::Relaxed);
             return t.pid;
         }
@@ -301,6 +313,29 @@ impl SigmaScheduler {
 
     pub fn current_pid(&self) -> u32 { self.current_pid.load(Ordering::Relaxed) }
     pub fn tick_count(&self)  -> u64 { self.tick_count.load(Ordering::Relaxed)  }
+
+    /// Freeze all tasks — scheduler returns idle (PID 0) on every tick.
+    /// Called by forensic snapshot subsystem before taking a dump.
+    pub fn freeze_all(&mut self) {
+        self.all_frozen = true;
+        for i in 0..self.task_count {
+            if self.tasks[i].pid > 1 {
+                self.tasks[i].state = TaskState::Frozen;
+            }
+        }
+    }
+
+    /// Thaw all frozen tasks — restores them to Runnable.
+    pub fn thaw_all(&mut self) {
+        self.all_frozen = false;
+        for i in 0..self.task_count {
+            if self.tasks[i].state == TaskState::Frozen {
+                self.tasks[i].state = TaskState::Runnable;
+            }
+        }
+    }
+
+    pub fn is_frozen(&self) -> bool { self.all_frozen }
 }
 
 static mut G_SCHEDULER: SigmaScheduler = SigmaScheduler::new();
@@ -331,4 +366,23 @@ pub unsafe extern "C" fn sched_tick(now_ns: u64) -> u32 {
 #[no_mangle]
 pub unsafe extern "C" fn sched_current_pid() -> u32 {
     G_SCHEDULER.current_pid()
+}
+
+/// Freeze all tasks — called by forensic snapshot before capturing memory.
+/// Scheduler will return PID 0 (idle) on every subsequent tick.
+#[no_mangle]
+pub unsafe extern "C" fn sched_freeze_all() {
+    G_SCHEDULER.freeze_all();
+}
+
+/// Thaw all frozen tasks — called by forensic snapshot after capture completes.
+#[no_mangle]
+pub unsafe extern "C" fn sched_thaw_all() {
+    G_SCHEDULER.thaw_all();
+}
+
+/// Returns 1 if the scheduler is in frozen state, 0 otherwise.
+#[no_mangle]
+pub unsafe extern "C" fn sched_is_frozen() -> u32 {
+    if G_SCHEDULER.is_frozen() { 1 } else { 0 }
 }

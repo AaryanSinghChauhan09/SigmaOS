@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,22 +16,22 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::0x0C ─────────────────────
+// â”€â”€â”€ Module: Sigma::0x0C â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// UsbPort — hardware-compatible struct.
+/// UsbPort â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UsbPort {
     pub index: SigmaU8,
     pub connected: SigmaBool,
     pub speed: SigmaU64,
     pub slot_id: SigmaU32,
 }
 
-/// SigmaUSB — hardware-compatible struct.
+/// SigmaUSB â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaUSB {
     pub cap_length: SigmaU8,
     pub max_slots: SigmaU8,
     pub max_ports: SigmaU8,
@@ -39,7 +39,7 @@ pub struct {s_name} {{
     pub active_slots: SigmaU32,
 }
 
-/// 0x0C — OOP singleton pattern.
+/// 0x0C â€” OOP singleton pattern.
 pub struct 0x0C {
     pub initialized: SigmaBool,
 }
@@ -102,4 +102,6 @@ pub unsafe extern "C" fn usb_init() {
 pub unsafe extern "C" fn usb_audit() {
     INSTANCE.initialized = true;
 }
+
+
 

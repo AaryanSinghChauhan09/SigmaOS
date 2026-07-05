@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Package Manager (SigmaPkg)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Package Manager (SigmaPkg)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SigmaPkg ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SigmaPkg â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ShardPackage — hardware-compatible struct.
+/// ShardPackage â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ShardPackage {
     pub name: [u8; 64],
     pub version: [u8; 16],
     pub shard_id: SigmaU32,
     pub depends_on: [SigmaU32; 8],
 }
 
-/// SigmaPkg — OOP singleton pattern.
+/// SigmaPkg â€” OOP singleton pattern.
 pub struct SigmaPkg {
     pub initialized: SigmaBool,
 }
@@ -91,4 +91,6 @@ pub unsafe extern "C" fn pkg_init() {
 pub unsafe extern "C" fn pkg_install() {
     INSTANCE.initialized = true;
 }
+
+
 

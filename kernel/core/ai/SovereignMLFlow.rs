@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign MLFlow (S-MLFlow)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign MLFlow (S-MLFlow)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignMLFlow ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignMLFlow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ExperimentRun — hardware-compatible struct.
+/// ExperimentRun â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ExperimentRun {
     pub run_id: SigmaU32,
     pub name: [u8; 64],
     pub accuracy: f32,
     pub loss: f32,
 }
 
-/// SovereignMLFlow — OOP singleton pattern.
+/// SovereignMLFlow â€” OOP singleton pattern.
 pub struct SovereignMLFlow {
     pub initialized: SigmaBool,
 }
@@ -121,4 +121,6 @@ pub unsafe extern "C" fn ml_flow_save() {
 pub unsafe extern "C" fn ml_flow_grid_search() {
     INSTANCE.initialized = true;
 }
+
+
 

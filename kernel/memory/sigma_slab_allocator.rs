@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS Zenith — Slab Allocator (Inspired by Linux SLUB)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS Zenith â€” Slab Allocator (Inspired by Linux SLUB)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_slab_allocator ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_slab_allocator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SlabObject — hardware-compatible struct.
+/// SlabObject â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SlabObject {
 }
 
-/// SlabCache — hardware-compatible struct.
+/// SlabCache â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SlabCache {
     pub object_size: SigmaU64,
     pub slab_capacity: SigmaU64,
     pub slab_base_addr: SigmaU64,
@@ -50,4 +50,6 @@ pub unsafe extern "C" fn sigma_slab_init() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_slab_free() {
 }
+
+
 

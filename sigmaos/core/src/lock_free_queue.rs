@@ -1,11 +1,11 @@
-/// SigmaOS: lock_free_queue module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: lock_free_queue module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,15 +16,15 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::LockFreeQueue ─────────────────────
+// â”€â”€â”€ Module: sigma::LockFreeQueue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Node — hardware-compatible struct.
+/// Node â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Node {
 }
 
-/// LockFreeQueue — OOP singleton pattern.
+/// LockFreeQueue â€” OOP singleton pattern.
 pub struct LockFreeQueue {
     pub initialized: SigmaBool,
 }
@@ -47,4 +47,6 @@ static mut INSTANCE: LockFreeQueue = LockFreeQueue::new();
 pub unsafe extern "C" fn enqueue() {
     INSTANCE.initialized = true;
 }
+
+
 

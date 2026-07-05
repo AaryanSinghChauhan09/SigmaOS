@@ -1,11 +1,11 @@
-/// SigmaOS: @file sigma_theme.h
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: @file sigma_theme.h
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::sigma_theme ─────────────────────
+// â”€â”€â”€ Module: sigma::sigma_theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ColorPalette — hardware-compatible struct.
+/// ColorPalette â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ColorPalette {
     pub accent: SigmaU32,
     pub background: SigmaU32,
     pub surface: SigmaU32,
@@ -32,10 +32,10 @@ pub struct {s_name} {{
     pub warning: SigmaU32,
 }
 
-/// FontConfig — hardware-compatible struct.
+/// FontConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FontConfig {
     pub family: [u8; 64],
     pub size_body: SigmaU32,
     pub size_heading: SigmaU32,
@@ -44,30 +44,30 @@ pub struct {s_name} {{
     pub hinting: SigmaBool,
 }
 
-/// WindowStyle — hardware-compatible struct.
+/// WindowStyle â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WindowStyle {
     pub corner_radius: SigmaU32,
     pub shadow_blur: SigmaU32,
     pub border_width: SigmaU32,
     pub blur_behind: SigmaBool,
 }
 
-/// AnimationConfig — hardware-compatible struct.
+/// AnimationConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AnimationConfig {
     pub duration_fast: SigmaU32,
     pub duration_normal: SigmaU32,
     pub duration_slow: SigmaU32,
     pub reduced_motion: SigmaBool,
 }
 
-/// SigmaTheme — hardware-compatible struct.
+/// SigmaTheme â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaTheme {
     pub name: [u8; 64],
     pub dark_mode: SigmaBool,
     pub colors: SigmaU64,
@@ -75,4 +75,6 @@ pub struct {s_name} {{
     pub windows: SigmaU64,
     pub animations: SigmaU64,
 }
+
+
 

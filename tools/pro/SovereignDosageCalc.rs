@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignDosageCalc ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignDosageCalc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// DrugProfile — hardware-compatible struct.
+/// DrugProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct DrugProfile {
     pub name: [u8; 32],
     pub dose_mg_per_kg: SigmaU32,
     pub doses_per_day: SigmaU32,
     pub suspension_mg_per_5ml: SigmaU32,
 }
 
-/// SovereignDosageCalc — OOP singleton pattern.
+/// SovereignDosageCalc â€” OOP singleton pattern.
 pub struct SovereignDosageCalc {
     pub initialized: SigmaBool,
 }
@@ -71,4 +71,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn dosage_init() {
     INSTANCE.initialized = true;
 }
+
+
 

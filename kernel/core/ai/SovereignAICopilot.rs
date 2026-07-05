@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignAICopilot ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignAICopilot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SystemAgent — hardware-compatible struct.
+/// SystemAgent â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SystemAgent {
     pub id: SigmaU32,
     pub type: SigmaU64,
     pub name: [u8; 64],
@@ -31,10 +31,10 @@ pub struct {s_name} {{
     pub auto_fixes: SigmaU32,
 }
 
-/// KnowledgeNode — hardware-compatible struct.
+/// KnowledgeNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct KnowledgeNode {
     pub id: SigmaU32,
     pub type: SigmaU64,
     pub name: [u8; 64],
@@ -42,17 +42,17 @@ pub struct {s_name} {{
     pub health_score: SigmaU32,
 }
 
-/// NLCommand — hardware-compatible struct.
+/// NLCommand â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NLCommand {
     pub raw_input: [u8; 256],
     pub action: [u8; 64],
     pub target: [u8; 64],
     pub confidence: SigmaU32,
 }
 
-/// SovereignAICopilot — OOP singleton pattern.
+/// SovereignAICopilot â€” OOP singleton pattern.
 pub struct SovereignAICopilot {
     pub initialized: SigmaBool,
 }
@@ -170,4 +170,6 @@ pub unsafe extern "C" fn ai_copilot_tick() {
 pub unsafe extern "C" fn ai_copilot_status() {
     INSTANCE.initialized = true;
 }
+
+
 

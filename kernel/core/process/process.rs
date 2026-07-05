@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,20 +16,20 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::process ─────────────────────
+// â”€â”€â”€ Module: Sigma::process â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ProcFD — hardware-compatible struct.
+/// ProcFD â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ProcFD {
     pub vfs_fd: SigmaI32,
     pub flags: SigmaU32,
 }
 
-/// SigmaProc — hardware-compatible struct.
+/// SigmaProc â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaProc {
     pub pid: SigmaU32,
     pub ppid: SigmaU32,
     pub state: SigmaU64,
@@ -40,10 +40,10 @@ pub struct {s_name} {{
     pub exit_code: SigmaI32,
 }
 
-/// SigmaProcTable — hardware-compatible struct.
+/// SigmaProcTable â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaProcTable {
     pub next_pid: SigmaU32,
     pub active: SigmaU32,
 }
@@ -63,4 +63,6 @@ pub unsafe extern "C" fn proc_exit() {
 #[no_mangle]
 pub unsafe extern "C" fn proc_audit() {
 }
+
+
 

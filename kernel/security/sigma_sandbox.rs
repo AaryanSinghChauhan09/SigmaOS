@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_sandbox: Sovereign Process Sandboxing
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_sandbox: Sovereign Process Sandboxing
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,32 +16,32 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_sandbox ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_sandbox â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ResourceLimits — hardware-compatible struct.
+/// ResourceLimits â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ResourceLimits {
     pub max_memory_bytes: SigmaU64,
     pub max_cpu_time_ms: SigmaU64,
     pub used_memory_bytes: SigmaU64,
     pub used_cpu_time_ms: SigmaU64,
 }
 
-/// Namespaces — hardware-compatible struct.
+/// Namespaces â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Namespaces {
     pub pid_ns: SigmaU64,
     pub net_ns: SigmaU64,
     pub mnt_ns: SigmaU64,
     pub ipc_ns: SigmaU64,
 }
 
-/// SandboxProfile — hardware-compatible struct.
+/// SandboxProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SandboxProfile {
     pub capabilities: SigmaU64,
     pub allowed_syscalls: SigmaU64,
     pub limits: SigmaU64,
@@ -53,4 +53,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {
 }
+
+
 

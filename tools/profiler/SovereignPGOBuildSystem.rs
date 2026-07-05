@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignPGOBuildSystem.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignPGOBuildSystem.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::OptLevel ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::OptLevel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BuildProfile — hardware-compatible struct.
+/// BuildProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BuildProfile {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub opt: SigmaU64,
@@ -34,10 +34,10 @@ pub struct {s_name} {{
     pub last_build_time_ms: SigmaU64,
 }
 
-/// BuildTarget — hardware-compatible struct.
+/// BuildTarget â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BuildTarget {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub profile_id: SigmaU32,
@@ -46,7 +46,7 @@ pub struct {s_name} {{
     pub built: SigmaBool,
 }
 
-/// OptLevel — OOP singleton pattern.
+/// OptLevel â€” OOP singleton pattern.
 pub struct OptLevel {
     pub initialized: SigmaBool,
 }
@@ -124,4 +124,6 @@ pub unsafe extern "C" fn pgobuild_init() {
 pub unsafe extern "C" fn pgobuild_status() {
     INSTANCE.initialized = true;
 }
+
+
 

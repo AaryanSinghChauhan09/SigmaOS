@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Teacher / Educator Shard (S-TEACH)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Teacher / Educator Shard (S-TEACH)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,25 +16,25 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignTeacher ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignTeacher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CBSEGrade — hardware-compatible struct.
+/// CBSEGrade â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CBSEGrade {
     pub min_marks: SigmaU32,
     pub grade_point: SigmaU32,
 }
 
-/// UGCPayLevel — hardware-compatible struct.
+/// UGCPayLevel â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UGCPayLevel {
     pub level: SigmaU32,
     pub basic_paise: SigmaU64,
 }
 
-/// SovereignTeacher — OOP singleton pattern.
+/// SovereignTeacher â€” OOP singleton pattern.
 pub struct SovereignTeacher {
     pub initialized: SigmaBool,
 }
@@ -147,4 +147,6 @@ pub unsafe extern "C" fn teach_ugc_pay() {
 pub unsafe extern "C" fn teach_rte_ptr() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -17,7 +17,7 @@ param(
     [switch]$Json,
     [switch]$DryRun,
     [switch]$Headless,
-    [switch]$Verbose
+    [switch]$SigmaVerbose
 )
 
 Set-StrictMode -Version 3.0
@@ -106,7 +106,7 @@ function Cmd-Build {
     # Try cargo first
     if (Test-Path (Join-Path $Path "Cargo.toml")) {
         Sigma-Log "info" "Running cargo build --release..."
-        if ($Verbose) { Sigma-Log "info" "cargo build --release --target $Target-unknown-none-elf" }
+        if ($SigmaVerbose) { Sigma-Log "info" "cargo build --release --target $Target-unknown-none-elf" }
         $result = & cargo build --release 2>&1
         if ($LASTEXITCODE -eq 0) {
             Sigma-Log "success" "Cargo build succeeded."

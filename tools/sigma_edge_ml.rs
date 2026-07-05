@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,65 +16,65 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ModelArchitecture ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ModelArchitecture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// AgentProfile — hardware-compatible struct.
+/// AgentProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AgentProfile {
     pub name: [u8; 32],
     pub role: [u8; 64],
     pub cognitive_depth: SigmaU32,
     pub persistent: SigmaBool,
 }
 
-/// QLoRAConfig — hardware-compatible struct.
+/// QLoRAConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct QLoRAConfig {
     pub rank: SigmaU32,
     pub alpha: SigmaU32,
     pub dropout: f32,
     pub target_modules: [u8; 64],
 }
 
-/// RAGConfig — hardware-compatible struct.
+/// RAGConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RAGConfig {
     pub chunk_size: SigmaU32,
     pub chunk_overlap: SigmaU32,
     pub similarity_threshold: f32,
 }
 
-/// AgentFileConfig — hardware-compatible struct.
+/// AgentFileConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AgentFileConfig {
     pub core_memory: [u8; 128],
     pub episodic_memory: [u8; 128],
     pub consolidated: SigmaBool,
 }
 
-/// VoiceStarConfig — hardware-compatible struct.
+/// VoiceStarConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct VoiceStarConfig {
     pub sample_rate: SigmaU32,
     pub channels: SigmaU32,
     pub latency_ms: f32,
 }
 
-/// DeepLiveCamConfig — hardware-compatible struct.
+/// DeepLiveCamConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct DeepLiveCamConfig {
     pub face_model: [u8; 32],
     pub target_fps: SigmaU32,
     pub inference_time_ms: f32,
 }
 
-/// ModelArchitecture — OOP singleton pattern.
+/// ModelArchitecture â€” OOP singleton pattern.
 pub struct ModelArchitecture {
     pub initialized: SigmaBool,
 }
@@ -312,4 +312,6 @@ pub unsafe extern "C" fn edgeml_owl_run() {
 pub unsafe extern "C" fn edgeml_embed() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::CloudProvider ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::CloudProvider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SyncTask — hardware-compatible struct.
+/// SyncTask â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SyncTask {
     pub local_path: [u8; 128],
     pub remote_path: [u8; 128],
     pub provider: SigmaU64,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub last_sync_time: SigmaU32,
 }
 
-/// CloudProvider — OOP singleton pattern.
+/// CloudProvider â€” OOP singleton pattern.
 pub struct CloudProvider {
     pub initialized: SigmaBool,
 }
@@ -102,4 +102,6 @@ pub unsafe extern "C" fn cloudsync_add() {
 pub unsafe extern "C" fn cloudsync_execute() {
     INSTANCE.initialized = true;
 }
+
+
 

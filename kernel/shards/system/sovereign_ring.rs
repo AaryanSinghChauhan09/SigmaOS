@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sovereign_ring ─────────────────────
+// â”€â”€â”€ Module: Sigma::sovereign_ring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SRingEntry — hardware-compatible struct.
+/// SRingEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SRingEntry {
     pub opcode: SigmaU32,
     pub flags: SigmaU32,
     pub fd: SigmaI32,
@@ -30,19 +30,19 @@ pub struct {s_name} {{
     pub user_data: SigmaU64,
 }
 
-/// SRingCompletion — hardware-compatible struct.
+/// SRingCompletion â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SRingCompletion {
     pub user_data: SigmaU64,
     pub result: SigmaI32,
     pub flags: SigmaU32,
 }
 
-/// SovereignRing — hardware-compatible struct.
+/// SovereignRing â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignRing {
     pub sq_head: SigmaU32,
     pub sq_tail: SigmaU32,
     pub cq_head: SigmaU32,
@@ -57,4 +57,6 @@ pub unsafe extern "C" fn sring_init() {
 #[no_mangle]
 pub unsafe extern "C" fn sring_process_submissions() {
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,28 +16,28 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::CrashReporter ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::CrashReporter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CpuRegisterDump — hardware-compatible struct.
+/// CpuRegisterDump â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CpuRegisterDump {
     pub rip: SigmaU64,
     pub rflags: SigmaU64,
 }
 
-/// StackFrame — hardware-compatible struct.
+/// StackFrame â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct StackFrame {
     pub rip: SigmaU64,
     pub rbp: SigmaU64,
 }
 
-/// CrashReport — hardware-compatible struct.
+/// CrashReport â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CrashReport {
     pub magic: SigmaU32,
     pub version: SigmaU32,
     pub type: SigmaU64,
@@ -55,7 +55,7 @@ pub struct {s_name} {{
     pub checksum: SigmaU32,
 }
 
-/// CrashReporter — OOP singleton pattern.
+/// CrashReporter â€” OOP singleton pattern.
 pub struct CrashReporter {
     pub initialized: SigmaBool,
 }
@@ -158,4 +158,6 @@ pub unsafe extern "C" fn sigma_crash_reporter_init() {
 pub unsafe extern "C" fn sigma_crash_report() {
     INSTANCE.initialized = true;
 }
+
+
 

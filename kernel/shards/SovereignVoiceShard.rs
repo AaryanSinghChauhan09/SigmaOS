@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,36 +16,36 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignVoiceShard ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignVoiceShard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SovereignAudioCapture — hardware-compatible struct.
+/// SovereignAudioCapture â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignAudioCapture {
     pub head: SigmaU32,
     pub tail: SigmaU32,
     pub capturing: SigmaBool,
 }
 
-/// SovereignTranscriptionEngine — hardware-compatible struct.
+/// SovereignTranscriptionEngine â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignTranscriptionEngine {
     pub frames_processed: SigmaU64,
 }
 
-/// SovereignHIDBridge — hardware-compatible struct.
+/// SovereignHIDBridge â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignHIDBridge {
     pub chars_injected: SigmaU64,
     pub linux_evdev_mode: SigmaBool,
 }
 
-/// SovereignVoiceShard — hardware-compatible struct.
+/// SovereignVoiceShard â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignVoiceShard {
     pub audio: SigmaU64,
     pub engine: SigmaU64,
     pub hid: SigmaU64,
@@ -100,4 +100,6 @@ pub unsafe extern "C" fn voice_process_event() {
 #[no_mangle]
 pub unsafe extern "C" fn voice_audit() {
 }
+
+
 

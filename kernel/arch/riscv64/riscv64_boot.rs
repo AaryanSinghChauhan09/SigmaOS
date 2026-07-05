@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,28 +16,28 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: RISCV64::riscv64_boot ─────────────────────
+// â”€â”€â”€ Module: RISCV64::riscv64_boot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SBIReturn — hardware-compatible struct.
+/// SBIReturn â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SBIReturn {
     pub error: SigmaU64,
     pub value: SigmaU64,
 }
 
-/// PLICState — hardware-compatible struct.
+/// PLICState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PLICState {
     pub max_irqs: SigmaU64,
     pub initialized: SigmaBool,
 }
 
-/// HartState — hardware-compatible struct.
+/// HartState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct HartState {
     pub hart_id: SigmaU64,
     pub online: SigmaBool,
     pub stack_base: SigmaU64,
@@ -146,4 +146,6 @@ pub unsafe extern "C" fn riscv64_boot_init() {
 #[no_mangle]
 pub unsafe extern "C" fn riscv64_system_reset() {
 }
+
+
 
