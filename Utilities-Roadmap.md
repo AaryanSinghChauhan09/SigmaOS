@@ -20,7 +20,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 
 ## Phase 1 — Core System Foundations (Q1 2026) `In Progress`
 
-*Build the bedrock utilities that bridge the microkernel to usable user-space.*
+### Build the bedrock utilities that bridge the microkernel to usable user-space.
 
 | Utility | Priority | Category | Key Dependencies |
 |---|---|---|---|
@@ -37,7 +37,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 
 ## Phase 2 — Developer & Power Tools (Q2 2026) `Planned`
 
-*Equip developers with the tools needed to build and debug on SigmaOS.*
+### Equip developers with the tools needed to build and debug on SigmaOS.
 
 | Utility | Priority | Category | Key Dependencies |
 |---|---|---|---|
@@ -55,7 +55,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 
 ## Phase 3 — Userland Applications (Q3 2026) `Planned`
 
-*Build interactive end-user applications that make SigmaOS a daily driver.*
+### Build interactive end-user applications that make SigmaOS a daily driver.
 
 | Utility | Priority | Category | Key Dependencies |
 |---|---|---|---|
@@ -72,7 +72,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 
 ## Phase 4 — Advanced System & Security (Q4 2026) `Planned`
 
-*Harden the OS and make it production-ready for multi-user networked environments.*
+### Harden the OS and make it production-ready for multi-user networked environments.
 
 | Utility | Priority | Category | Key Dependencies |
 |---|---|---|---|
@@ -90,7 +90,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 
 ## Phase 5 — Ecosystem & Developer Experience (Q1 2027) `Planned`
 
-*Create a thriving ecosystem and lower the barrier to porting existing software.*
+### Create a thriving ecosystem and lower the barrier to porting existing software.
 
 | Utility | Priority | Category | Key Dependencies |
 |---|---|---|---|
@@ -135,10 +135,15 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 The file `userland/roadmap/index.html` is a zero-dependency single-page app:
 
 - **Expandable phases** — click to drill into individual utilities
+
 - **Live filtering** — search by keyword, filter by category and priority
+
 - **Dependency tracking** — each item shows its upstream dependencies
+
 - **Priority badges** — Critical / High / Medium / Low with colour coding
+
 - **Status indicators** — In Progress / Planned / Completed
+
 - **Overview dashboard** — stats cards for totals, criticals, phases, categories
 
 No build step needed — open directly in any browser.

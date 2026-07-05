@@ -68,14 +68,21 @@ is blocked at the dispatcher and logged to the audit chain:
 ## Roadmap
 
 - [x] Sandbox create / execute / destroy lifecycle (`sandbox.rs`)
+
 - [x] Syscall allowlist enforcement
+
 - [ ] IOMMU-enforced DMA isolation
+
 - [ ] seccomp-BPF equivalent for Sovereign ABI
+
 - [ ] Sandbox live introspection API
+
 - [ ] Escape detection via invariant checking
+
 - [ ] Formal proof: sandbox capability confinement (Isabelle/HOL)
 
 ## Related Modules
 
 - [`modules/security/access_control`](../access_control/README.md) — MAC policies
+
 - [`modules/ext/plugins`](../../ext/plugins/README.md) — Plugin capsule sandboxing

@@ -1,7 +1,7 @@
 # Master Enterprise SLA & Compliance Matrix
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Enterprise Governance & Regulatory Compliance Manifest  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Enterprise Governance & Regulatory Compliance Manifest
 > **Execution Scope:** Ring-3 Userland Daemons (`tools/sigma_legal_compliance_engine.cpp`, `tools/sigma_enterprise_sla_manager.cpp`, `tools/sigma_telemetry_shield.cpp`)
 
 ---
@@ -48,7 +48,7 @@ class SovereignLegalComplianceEngine {
     std::vector<ComplianceRegime> m_active_regimes;
 
 public:
-    explicit SovereignLegalComplianceEngine(const std::vector<ComplianceRegime>& regimes) 
+    explicit SovereignLegalComplianceEngine(const std::vector<ComplianceRegime>& regimes)
         : m_active_regimes(regimes) {}
 
     bool audit_storage_encryption(const std::string& mount_point) {
@@ -125,11 +125,12 @@ public:
 
 ## 5. Matrix Debugging & Audit Remediation
 
-* **Issue - False Positive Regulatory Lockouts:** Ambiguous column naming in SigmaDB (`user_id` vs `social_security_number`) triggers aggressive automated GDPR compliance lockouts.
-  * *Fix Strategy:* The compliance engine supports declarative YAML override manifests (`compliance_exceptions.yml`) combined with interactive administrator authorization prompts via `SigmaCLI`.
-* **Issue - SLA Priority Inversion Starvation:** Dynamically elevating SLA-breaching userland microservices to real-time priority starves foundational kernel VFS daemons.
-  * *Fix Strategy:* The CFS scheduler enforces strict **Bandwidth Capping (Cgroups v2)**, guaranteeing that Ring-0 kernel workers always preserve a minimum 15% guaranteed CPU allocation quantum regardless of userland SLA escalations.
+- **Issue - False Positive Regulatory Lockouts:** Ambiguous column naming in SigmaDB (`user_id` vs `social_security_number`) triggers aggressive automated GDPR compliance lockouts.
+- *Fix Strategy:* The compliance engine supports declarative YAML override manifests (`compliance_exceptions.yml`) combined with interactive administrator authorization prompts via `SigmaCLI`.
+
+- **Issue - SLA Priority Inversion Starvation:** Dynamically elevating SLA-breaching userland microservices to real-time priority starves foundational kernel VFS daemons.
+- *Fix Strategy:* The CFS scheduler enforces strict **Bandwidth Capping (Cgroups v2)**, guaranteeing that Ring-0 kernel workers always preserve a minimum 15% guaranteed CPU allocation quantum regardless of userland SLA escalations.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

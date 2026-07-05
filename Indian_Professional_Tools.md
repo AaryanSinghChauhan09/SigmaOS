@@ -21,6 +21,9 @@ SigmaOS aims to uniquely support the Indian professional sector through localize
    - **SigmaOS Implementation:** Provide out-of-the-box GST and TDS calculators (`sigma_finance.rs`) and ensure seamless deployment of ERP environments for Indian MSMEs.
 
 ## Implementation Phases
+
 - **Phase 1:** Native Indic language UI integration.
+
 - **Phase 2:** Specialized GST/TDS calculation tools.
+
 - **Phase 3:** Packaging QGIS and ERPNext as one-click apps.

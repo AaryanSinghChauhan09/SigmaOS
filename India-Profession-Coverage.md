@@ -2,7 +2,7 @@
 
 SigmaOS ships a purpose-built app for every licensed and registered profession in India. Each app integrates with the OS at the kernel level via sigma-bus — invoices auto-post to accounts, lab results auto-update EMR, payroll auto-feeds EPF.
 
-**Total: 50+ profession apps covering every sector regulated by Indian law.**
+### Total: 50+ profession apps covering every sector regulated by Indian law.
 
 ---
 
@@ -127,7 +127,9 @@ sigma-sec did professional-credential add \
   --verification-url https://icai.org/check?id=123456
 
 # Client scans QR → sees verified credential
+
 # Government portals accept sigma-DID login (no username/password)
+
 ```
 
 | Body | Example credential |

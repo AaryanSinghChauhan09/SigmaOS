@@ -14,14 +14,18 @@ algorithms in one unified implementation, selecting the right policy per task.
 ```
 Queue 0: Q0 — highest priority, 2-tick quantum (interactive, new tasks)
 Queue 1: Q1 — medium-high,      4-tick quantum
-Queue 2: Q2 — medium,           8-tick quantum  
+Queue 2: Q2 — medium,           8-tick quantum
 Queue 3: Q3 — lowest,          16-tick quantum  (CPU-bound background)
 ```
 
 Rules:
+
 - New tasks start at Q0
+
 - If a task uses its full quantum → demoted to next lower queue
+
 - If a task blocks before quantum expires → stays at current level (I/O-bound = stays high)
+
 - Every 200 ticks: **priority boost** — all tasks moved to Q0 (prevents starvation)
 
 ### CFS — Fair Sharing
@@ -29,7 +33,9 @@ Rules:
 Linux-style Completely Fair Scheduler for batch and daemon workloads.
 
 - Tracks `vruntime` per task (total CPU time weighted by priority)
+
 - Always picks the task with the smallest `vruntime` (leftmost in concept-tree)
+
 - New tasks start at `min_vruntime` to prevent starvation
 
 ### EDF — Hard Real-Time
@@ -37,8 +43,11 @@ Linux-style Completely Fair Scheduler for batch and daemon workloads.
 Earliest Deadline First for `PROFILE=rtos` and industrial tasks.
 
 - Each task has an absolute deadline in nanoseconds
+
 - Always schedules the task whose deadline is soonest
+
 - Deadline miss detection: `check_deadline_misses(now_ns)` returns count
+
 - IRQ latency target: < 10 µs with EDF
 
 ---

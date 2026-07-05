@@ -12,11 +12,15 @@ SigmaOS ships a complete browser-based OS simulator built in React/TypeScript. I
 cd sigma-web
 npm install
 npm run dev
+
 # → http://localhost:5173
+
 ```
 
 1. Boot animation → 2 seconds
+
 2. Login screen → click "Enter Desktop"
+
 3. Desktop with dock → double-click **Device Manager** to see all 24 drivers
 
 ---
@@ -26,17 +30,25 @@ npm run dev
 ```
 sigma-web/src/
 ├── App.tsx                       # Root — OsProvider + DriversProvider
+
 ├── os/
 │   ├── OsContext.tsx             # Window manager state
+
 │   │                             # (open/close/minimize/maximize/drag/resize)
+
 │   ├── DriverContext.tsx         # Aggregates all 24 driver hooks
+
 │   └── drivers/                  # 24 individual Web API hooks
+
 ├── apps/
 │   ├── registry.tsx              # App definitions (id, name, icon, component)
+
 │   └── devicemanager/
 │       └── DeviceManagerApp.tsx  # 24-panel hardware explorer
+
 └── screens/
     └── OsRoot.tsx                # Boot → Login → Desktop with windowed apps
+
 ```
 
 ---
@@ -125,7 +137,9 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 This browser demo serves three purposes:
 
 1. **Proof of concept** — shows SigmaOS architecture working before native hardware boot exists
+
 2. **Driver showcase** — demonstrates the 24-driver hardware abstraction layer that will map to native kernel drivers
+
 3. **Demo for users** — anyone can try SigmaOS immediately without downloading anything
 
 The mapping from browser drivers to native kernel drivers:

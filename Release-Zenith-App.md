@@ -15,7 +15,7 @@ Welcome to the **Sovereign Professional Shard**. The App edition is the definiti
    s-pkg install dev-suite-zenith
    ```
 
-4. **Personalize**: Use the `SigmaPersona` engine to customize your glassmorphic dashboard.
+1. **Personalize**: Use the `SigmaPersona` engine to customize your glassmorphic dashboard.
 
 ## 🛠️ Core Functions
 

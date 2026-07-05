@@ -21,6 +21,9 @@ Security is the foundational pillar of SigmaOS. We will absorb and natively reim
    - **SigmaOS Implementation:** `sigma_keepass.rs` will act as a kernel-gated secure enclave for managing user credentials and API keys.
 
 ## Implementation Phases
+
 - **Phase 1:** Sandboxing API completion.
+
 - **Phase 2:** Native WireGuard integration.
+
 - **Phase 3:** Real-time IDS/IPS via Security Center Daemon.

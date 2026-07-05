@@ -41,8 +41,11 @@ exit criteria, and merge target.
 Every PR to `main` must pass `sigma_ci.yml` smoke tests.
 
 ### Current state
+
 - Last merged: `tools-dev` with docs + compat headers
+
 - CI: GitHub Actions running on push
+
 - Wiki sync: automatic on push
 
 ### Next tasks for maintainers
@@ -56,7 +59,9 @@ Every PR to `main` must pass `sigma_ci.yml` smoke tests.
 | Merge `kernel-exp` once Phase 0 complete | — | 🔴 |
 
 ### Exit criteria
+
 - `make iso` produces bootable image (blocked on `kernel-exp`)
+
 - All CI checks green on every commit
 
 ---
@@ -65,15 +70,19 @@ Every PR to `main` must pass `sigma_ci.yml` smoke tests.
 
 **Purpose:** The most critical branch. Implements the real kernel bodies
 that turn SigmaOS from a design document into a bootable OS.
-**Everything else is blocked until this branch ships Phase 0.**
+
+### Everything else is blocked until this branch ships Phase 0.
 
 ### Current state
+
 - Headers complete for scheduler, MM, syscall, IRQ
+
 - Bodies missing — all `.cpp` implementations are stubs
 
 ### Next tasks (ordered — do not skip ahead)
 
 | # | Task | File | Exit test |
+
 |---|------|------|-----------|
 | 1 | Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.cpp` | QEMU: 2 tasks interleave |
 | 2 | Buddy physical allocator | `kernel/core/sigma_mm.cpp` | alloc/free 100 pages, no leak |
@@ -87,6 +96,7 @@ that turn SigmaOS from a design document into a bootable OS.
 | 10 | `make iso` → bootable ISO | `Makefile` | `qemu -cdrom SigmaOS.iso` → shell |
 
 ### Upgrade path: scheduler
+
 ```
 Round 1: round-robin (simplest, unblock boot)
 Round 2: MLFQ (4 queues, aging)
@@ -97,6 +107,7 @@ Round 6: sigma-ai predictive pre-warming
 ```
 
 ### Merge target
+
 `main` after `make iso` + QEMU boot CI passing.
 
 ---
@@ -107,10 +118,15 @@ Round 6: sigma-ai predictive pre-warming
 Depends on `kernel-exp` Phase 0 for the SDF Ring-3 launch mechanism.
 
 ### Current state
+
 - NVMe driver: `drivers/storage/sigma_nvme.cpp` ✅
+
 - USB xHCI: `drivers/usb/sigma_xhci.cpp` ✅
+
 - e1000 NIC: `kernel/core/drivers/SovereignE1000.cpp` ✅
+
 - KMS/GPU: `drivers/graphics/sigma_kms.cpp` — framework only
+
 - Wi-Fi: not started
 
 ### Next tasks
@@ -131,6 +147,7 @@ Depends on `kernel-exp` Phase 0 for the SDF Ring-3 launch mechanism.
 | 🟡 | ARM64 BCM2712 (RPi 5) BSP | `arch/arm64/sigma_bcm2712.cpp` | Raspberry Pi 5 |
 
 ### SDF driver template
+
 Every new driver follows this pattern:
 ```cpp
 // drivers/subsystem/sigma_mydriver.cpp
@@ -145,6 +162,7 @@ SIGMA_SDF_REGISTER_DRIVER(SigmaMyDriver, "my_driver", VendorID, DeviceID);
 ```
 
 ### Merge target
+
 `main` per-driver, after passing QEMU + physical hardware CI.
 
 ---
@@ -155,9 +173,13 @@ SIGMA_SDF_REGISTER_DRIVER(SigmaMyDriver, "my_driver", VendorID, DeviceID);
 and the unified buffer cache.
 
 ### Current state
+
 - VFS header: `kernel/include/kernel/sigma_vfs.h` ✅
+
 - Ext4 journal rewrite: `fs/ext4_journal.c` ✅
+
 - SigmaFS: early design
+
 - UBC (Unified Buffer Cache): `kernel/fs/sigma_ubc.h` — header only
 
 ### Next tasks
@@ -176,7 +198,9 @@ and the unified buffer cache.
 | 🟡 | FAT32 write support | `fs/fat/sigma_fat32_write.cpp` |
 
 ### Exit criteria
+
 - `sigma-sh` can `open`, `read`, `write`, `ls` on tmpfs
+
 - `sigma-pkg install` writes packages to SigmaFS partition
 
 ---
@@ -185,14 +209,21 @@ and the unified buffer cache.
 
 **Purpose:** sigma-cli, sigma-sh, sigma_automation.sh, documentation,
 wiki sync, compat layer headers and stubs.
-*This is the current working branch.*
+
+### This is the current working branch.
 
 ### Current state ✅
+
 - sigma-cli profiles/aliases: `userland/tools/sigma_cli.cpp`
+
 - sigma_automation.sh: `scripts/sigma_automation.sh`
+
 - sigma_git_sync.sh: `scripts/sigma_git_sync.sh`
+
 - ci_branch_check.sh: `scripts/ci_branch_check.sh`
+
 - Windows compat headers: `include/compat/*.h` (5 headers complete)
+
 - Windows compat skeletons: `runtime/compat/win32/*.cpp` (5 files complete)
 
 ### Next tasks
@@ -210,6 +241,7 @@ wiki sync, compat layer headers and stubs.
 | 🟡 | sigma-observatory stub | `userland/tools/sigma_observatory.cpp` |
 
 ### Merge target
+
 `main` on every green CI run. Ongoing.
 
 ---
@@ -319,6 +351,7 @@ profession apps + sigma-ai local LLM.
 | 🟡 | Accessibility: Braille + switch access | Phase B |
 
 ### Exit criteria
+
 - First-time user boots → Zenith desktop → types Hindi → runs sigma-ai
 
 ---
@@ -340,8 +373,11 @@ Target: under 512 KB kernel image, under 8 MB RAM footprint.
 | 🟡 | Formal verification proofs | Frama-C / Coq |
 
 ### Exit criteria
+
 - Boots in QEMU with 8 MB RAM
+
 - sigma-bus ping-pong IPC working
+
 - No userland except sigma-sh
 
 ---
@@ -365,7 +401,9 @@ BharatOS government machines, and sigma-fleet managed nodes.
 | 🟡 | SovereignCloudFS | `net/sigma_cloudfs.cpp` |
 
 ### Exit criteria
+
 - `sigma-pod run-native demo.spkg --cpu=250 --mem=128` enforces limits in kernel
+
 - sigma-fleet agent registers with management console
 
 ---
@@ -386,6 +424,7 @@ and SovereignCloudFS for national distributed grid vision.
 | 🟡 | sigma-zkvm (ZK virtual machine) | `runtime/zkvm/sigma_zkvm.cpp` |
 
 ### Blocked by
+
 `release/cloud` cgroup + namespace enforcement must be complete first.
 
 ---
@@ -406,6 +445,7 @@ existing data. EFI dual-boot configuration, partition detection.
 | 🟡 | Installer UI | `userland/installer/sigma_installer_ui.cpp` |
 
 ### Blocked by
+
 `kernel-exp` bootloader (`sigma-boot.efi`) and `fs-dev` VFS.
 
 ---
@@ -427,6 +467,7 @@ embedded control applications (sigma-robotics, sigma-digital-twin).
 | 🟡 | PREEMPT_RT-style full preemption | `kernel/core/sigma_sched.cpp` |
 
 ### Blocked by
+
 `performance-optimized` scheduler work and `kernel-exp` IRQ subsystem.
 
 ---
@@ -450,6 +491,7 @@ sigma-ultra USSD mode on Pi Zero.
 | 🟡 | JioPhone KaiOS-compat build | `profiles/sigma_jio.config` |
 
 ### Blocked by
+
 `kernel-exp` core kernel — the ARM64 port layers on top of the same MM/sched.
 
 ---
@@ -469,6 +511,7 @@ demos at conferences and on the website.
 | 🟢 | Service worker for offline demo | `browser/sw.js` |
 
 ### Blocked by
+
 `kernel-exp` producing a bootable ISO.
 
 ---
@@ -523,17 +566,29 @@ release/dual-boot
 ## Merge Order (Recommended)
 
 ```
+
 1. kernel-exp → main          (Phase 0: boot + QEMU CI passing)
+
 2. drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
+
 3. fs-dev → main              (VFS + tmpfs + basic SigmaFS)
+
 4. tools-dev → main           (ongoing — after each green CI)
+
 5. performance-optimized → main (after kernel-exp merged)
+
 6. release/microkernel ← main (branch from stable main)
+
 7. release/standalone ← main  (after drivers-dev GPU merged)
+
 8. release/cloud ← main       (after cgroup enforcement)
+
 9. release/mobile ← main      (after ARM64 BSP done)
+
 10. release/rtos ← main       (after EDF scheduler)
+
 11. release/dual-boot ← main  (after sigma-boot.efi)
+
 12. release/distributed ← release/cloud
 ```
 

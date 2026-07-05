@@ -7,17 +7,22 @@ Everything you need to build SigmaOS from source and test it in QEMU.
 ## Quick Start (5 minutes)
 
 ```bash
+
 # Clone
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
 # Install Rust nightly (if not already)
+
 rustup show   # confirms rust-toolchain.toml toolchain is active
 
 # Build the kernel
+
 cd kernel && cargo build --release
 
 # Run in QEMU
+
 cd .. && ./qemu-boot.sh standalone
 ```
 
@@ -57,22 +62,29 @@ winget install NASM.NASM QEMU.QEMU
 ## Build Targets
 
 ```bash
+
 # Kernel (no_std Rust)
+
 cd kernel && cargo build --release
 
 # All workspace crates
+
 cargo build --release --workspace
 
 # UEFI bootloader
+
 cd sigma-boot && zig build -Dtarget=x86_64-uefi
 
 # Shell
+
 cd sigma-sh && cargo build --release
 
 # Core utilities
+
 cd userland/coreutils && cargo build --release
 
 # Driver SDK
+
 cd sdk/driver && cargo build --release
 ```
 
@@ -81,12 +93,15 @@ cd sdk/driver && cargo build --release
 ## UEFI Boot (Full Boot Path)
 
 ```bash
+
 # Set up EFI System Partition
+
 mkdir -p esp/EFI/BOOT esp/boot
 cp sigma-boot/zig-out/bin/sigma-boot.efi esp/EFI/BOOT/BOOTX64.EFI
 cp kernel/target/x86_64-sigmaos/release/sigma-kernel esp/boot/sigma-kernel.elf
 
 # Boot with OVMF
+
 qemu-system-x86_64 \
   -bios /usr/share/OVMF/OVMF.fd \
   -drive format=raw,file=fat:rw:esp \
@@ -121,8 +136,11 @@ SigmaOS/
 ## First Contribution
 
 1. Check [12-Week-Milestone-Plan](12-Week-Milestone-Plan) for current priorities
+
 2. Look at [GITHUB_ISSUES.md](../docs/GITHUB_ISSUES.md) for open tasks
+
 3. Read [Linux-Parity-Roadmap](Linux-Parity-Roadmap) for what needs implementing
+
 4. Follow [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
 
 ---

@@ -22,14 +22,19 @@ Show a latency histogram table for all tracked syscalls, sorted by p99 latency d
 
 ```bash
 sigma-telemetry stats           # all syscalls
+
 sigma-telemetry stats --top 10  # top 10 by p99
+
 ```
 
 Output columns: `Syscall | Calls | p50 | p95 | p99 | mean (µs)`
 
 Colour coding:
+
 - Green: p99 < 100 µs (fast)
+
 - Yellow: p99 100–1000 µs (moderate)
+
 - Red: p99 > 1000 µs (slow — investigate)
 
 ### `export [endpoint]`
@@ -38,6 +43,7 @@ Push metrics to an OpenTelemetry collector (OTLP/HTTP):
 
 ```bash
 sigma-telemetry export                          # default: localhost:4318
+
 sigma-telemetry export http://otel-collector:4318
 ```
 
@@ -51,7 +57,9 @@ Measure per-process power consumption using Intel RAPL counters (requires `/sys/
 
 ```bash
 sigma-telemetry power          # total package power (2s window)
+
 sigma-telemetry power 1234     # attribute to PID 1234
+
 ```
 
 Returns power in Watts. Falls back gracefully on non-Intel hardware.
@@ -84,6 +92,7 @@ When pushing to a collector, the resource attributes include:
 Each metric is named `sigma.syscall.latency.<syscall_name>` as a histogram metric with `unit: us`.
 
 ### Example Grafana query
+
 ```
 histogram_quantile(0.99, rate(sigma_syscall_latency_read_bucket[5m]))
 ```
@@ -91,16 +100,21 @@ histogram_quantile(0.99, rate(sigma_syscall_latency_read_bucket[5m]))
 ## EXAMPLES
 
 ```bash
+
 # Show syscall stats with top-10 hotspots
+
 sigma-telemetry stats --top 10
 
 # Export to local Prometheus/OTel stack
+
 sigma-telemetry export http://localhost:4318
 
 # Check power use during a build
+
 sigma-telemetry power $(pgrep cargo)
 
 # Verify input latency before releasing a desktop update
+
 sigma-telemetry input-latency
 ```
 

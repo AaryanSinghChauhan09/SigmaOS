@@ -21,6 +21,9 @@ The Zenith Desktop must rival established desktop environments in both aesthetic
    - **SigmaOS Implementation:** Because Zenith relies on a custom Trait-based Widget system with no heap allocations, it fundamentally outperforms these C/C++ DEs while maintaining the visual flair of GNOME.
 
 ## Implementation Phases
+
 - **Phase 1:** Polishing the Glassmorphism compositor.
+
 - **Phase 2:** Implementing full Accessibility Tools (Screen readers, magnifiers).
+
 - **Phase 3:** Multi-monitor support and dynamic workspace tiling.

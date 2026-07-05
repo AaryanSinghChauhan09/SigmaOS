@@ -1,4 +1,4 @@
-# Class: MockPool
+﻿# Class: MockPool
 
 Extends: `undici.Pool`
 
@@ -8,7 +8,7 @@ A mock Pool class that implements the Pool API and is used by MockAgent to inter
 
 Arguments:
 
-- **origin**`string` - It should only include the**protocol, hostname, and port**.
+- **origin** `string` - It should only include the **protocol, hostname, and port**.
 
 - **options** `MockPoolOptions` - It extends the `Pool` options.
 
@@ -30,7 +30,6 @@ import { MockAgent } from 'undici'
 const mockAgent = new MockAgent()
 
 const mockPool = mockAgent.get('http://localhost:3000')
-
 ```
 
 ## Instance Methods
@@ -41,12 +40,11 @@ This method defines the interception rules for matching against requests for a M
 
 When defining interception rules, all the rules must pass for a request to be intercepted. If a request is not intercepted, a real request will be attempted.
 
-| Matcher type | Condition to pass          | 
-| :------------: | -------------------------- | 
-
-| `string`     | Exact match against string | 
-| `RegExp`     | Regex must pass            | 
-| `Function`   | Function must return true  | 
+| Matcher type | Condition to pass          |
+|:------------:| -------------------------- |
+| `string`     | Exact match against string |
+| `RegExp`     | Regex must pass            |
+| `Function`   | Function must return true  |
 
 Arguments:
 
@@ -102,7 +100,7 @@ A `MockScope` is associated with a single `MockInterceptor`. With this, we can c
 
 - **persist** `() => MockScope` - any matching request will always reply with the defined response indefinitely.
 
-- **times**`(repeatTimes: number) => MockScope` - any matching request will reply with the defined response a fixed amount of times. This is overridden by**persist**.
+- **times** `(repeatTimes: number) => MockScope` - any matching request will reply with the defined response a fixed amount of times. This is overridden by **persist**.
 
 #### Example - Basic Mocked Request
 
@@ -126,7 +124,6 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
 ```
 
 #### Example - Mocked request using reply data callbacks
@@ -160,7 +157,6 @@ console.log('headers', headers) // { 'content-type': 'application/json' }
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // { "message":"hello world!" }
 }
-
 ```
 
 #### Example - Mocked request using reply options callback
@@ -194,7 +190,6 @@ console.log('headers', headers) // { 'content-type': 'application/json' }
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // { "message":"hello world!" }
 }
-
 ```
 
 #### Example - Basic Mocked requests with multiple intercepts
@@ -232,7 +227,6 @@ console.log('response received', result2.statusCode) // response received 200
 for await (const data of result2.body) {
   console.log('data', data.toString('utf8')) // data hello
 }
-
 ```
 
 #### Example - Mocked request with query body, request headers and response headers and trailers
@@ -281,7 +275,6 @@ for await (const data of body) {
 }
 
 console.log('trailers', trailers) // { 'content-md5': 'test' }
-
 ```
 
 #### Example - Mocked request using different matchers
@@ -322,7 +315,6 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
 ```
 
 #### Example - Mocked request with reply with a defined error
@@ -348,7 +340,6 @@ try {
   console.error(error) // TypeError: fetch failed
   console.error(error.cause) // Error: kaboom
 }
-
 ```
 
 #### Example - Mocked request with defaultReplyHeaders
@@ -370,7 +361,6 @@ mockPool.intercept({
 const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { foo: 'bar' }
-
 ```
 
 #### Example - Mocked request with defaultReplyTrailers
@@ -392,7 +382,6 @@ mockPool.intercept({
 const { trailers } = await request('http://localhost:3000/foo')
 
 console.log('trailers', trailers) // trailers { foo: 'bar' }
-
 ```
 
 #### Example - Mocked request with automatic content-length calculation
@@ -413,7 +402,6 @@ mockPool.intercept({
 const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { 'content-length': '3' }
-
 ```
 
 #### Example - Mocked request with automatic content-length calculation on an object
@@ -434,7 +422,6 @@ mockPool.intercept({
 const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { 'content-length': '13' }
-
 ```
 
 #### Example - Mocked request with persist enabled
@@ -459,7 +446,6 @@ const result2 = await request('http://localhost:3000/foo')
 // Will match and return mocked data
 
 // Etc
-
 ```
 
 #### Example - Mocked request with times enabled
@@ -485,7 +471,6 @@ const result2 = await request('http://localhost:3000/foo')
 
 const result3 = await request('http://localhost:3000/foo')
 // Will not match and make attempt a real request
-
 ```
 
 #### Example - Mocked request with path callback
@@ -507,7 +492,7 @@ const matchPath = requestPath => {
     return false
   }
 
-  if (!Object.keys(requestQuery).includes('foo') | | requestQuery.foo !== 'bar') {
+  if (!Object.keys(requestQuery).includes('foo') || requestQuery.foo !== 'bar') {
     return false
   }
 
@@ -521,7 +506,6 @@ mockPool.intercept({
 
 const result = await request('http://localhost:3000/foo?foo=bar')
 // Will match and return mocked data
-
 ```
 
 ### `MockPool.close()`
@@ -539,7 +523,6 @@ const mockAgent = new MockAgent()
 const mockPool = mockAgent.get('http://localhost:3000')
 
 await mockPool.close()
-
 ```
 
 ### `MockPool.dispatch(options, handlers)`
@@ -577,7 +560,6 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
 ```
 
 ### `MockPool.cleanMocks()`

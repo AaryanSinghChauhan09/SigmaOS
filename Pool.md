@@ -1,4 +1,4 @@
-# Class: Pool
+﻿# Class: Pool
 
 Extends: `undici.Dispatcher`
 
@@ -10,7 +10,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **url**`URL | string` - It should only include the**protocol, hostname, and port**.
+- **url** `URL | string` - It should only include the **protocol, hostname, and port**.
 
 - **options** `PoolOptions` (optional)
 

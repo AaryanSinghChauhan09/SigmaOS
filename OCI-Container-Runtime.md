@@ -18,16 +18,21 @@ Mode 2: Native            — OCI rootfs + SigmaOS linux-compat syscall layer
 ## Quick Start
 
 ```bash
+
 # Run Ubuntu in microVM
+
 sigma-compat run ubuntu:22.04
 
 # Run with command
+
 sigma-compat run alpine:3.19 sh -c "echo hello from sigma-compat"
 
 # Run nginx
+
 sigma-compat container nginx:latest
 
 # List running containers
+
 sigma-compat list
 ```
 
@@ -38,13 +43,19 @@ sigma-compat list
 `virtualization/ocirunner/run_in_microvm.sh`
 
 Uses QEMU's `-M microvm` profile:
+
 - Minimal attack surface (no BIOS, no legacy devices)
+
 - VirtIO-blk for rootfs, VirtIO-net for networking
+
 - 256 MB RAM, 2 vCPUs by default
+
 - Boots in < 2 seconds
 
 ```bash
+
 # Under the hood
+
 qemu-system-x86_64 \
   -M microvm,x-option-roms=off,pic=off,pit=off \
   -enable-kvm -m 256M -smp 2 -nographic \
@@ -59,13 +70,17 @@ qemu-system-x86_64 \
 ## Resource Limits
 
 ```bash
+
 # Memory limit
+
 sigma-compat run --memory 512m nginx:latest
 
 # CPU shares
+
 sigma-compat run --cpus 1.5 heavy-workload:latest
 
 # Read-only rootfs
+
 sigma-compat run --read-only alpine:3.19 sh
 ```
 
@@ -81,10 +96,15 @@ Internally uses cgroup v2:
 ## Security
 
 All containers run with:
+
 - sigma-compat namespace isolation
+
 - `sigma_pledge("stdio rpath wpath exec proc inet")`
+
 - W^X: no RWX memory regions
+
 - Optional read-only rootfs
+
 - Automatic cleanup on exit
 
 ---
@@ -92,7 +112,9 @@ All containers run with:
 ## CI Integration
 
 ```yaml
+
 # .github/workflows/compat-matrix.yml
+
 - name: Test OCI images
   run: |
     for image in ubuntu:22.04 alpine:3.19 nginx:alpine; do

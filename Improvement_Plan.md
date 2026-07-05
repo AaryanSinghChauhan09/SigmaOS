@@ -20,7 +20,9 @@ graph LR
 ## 2. Kernel Performance Enhancements (O(1) Slab Compaction)
 
 - **Lock-Free Free-List Compaction**: Employs atomic compare-and-swap (CAS) loops to defragment active slabs in constant $O(1)$ time, eliminating pause sweeps.
+
 - **Core-Local Cache Affinity**: Dynamically maps core-local memory partitions to specific hardware threads, preventing NUMA cross-talk and bus saturation.
+
 - **Microsecond Context Switching**: Streamlines Ring-0 to Ring-3 transition vectors, reducing system call dispatcher latency to under 12 clock cycles.
 
 ---
@@ -28,7 +30,9 @@ graph LR
 ## 3. Storage Acceleration Layer (Zero-Copy Buffer Cache)
 
 - **Unified Buffer Cache (UBC)**: Integrates filesystem and virtual memory caches, enabling direct DMA transfers from block controllers to user space without intermediate buffer copies.
+
 - **Relativistic Journaling**: Incorporates circular log-structured ring buffers, transforming multiple directory writes into sequential disk sweeps.
+
 - **Pre-emptive Read-Ahead**: Analyzes sequential block access histories to fetch subsequent sectors into caches before user processes dispatch IO syscalls.
 
 ---
@@ -36,7 +40,9 @@ graph LR
 ## 4. GPU Rendering Optimizations (Vulkan Ring Buffering)
 
 - **Triple-Buffered Compositor**: Pre-allocates Vulkan command queues to submit display updates concurrently without CPU render-lock waits.
+
 - **Vectorized Matrix Scaling**: Replaces standard loops with SIMD-vectorized floating-point math to render desktop scaling updates instantly.
+
 - **Zero-Alloc UI Styling**: Bypasses dynamic heap requests inside the Sovereign Window Manager, utilizing static memory buffers to cache window textures and styles.
 
 ---
@@ -44,7 +50,9 @@ graph LR
 ## 5. Post-Quantum Cryptographic Speedups (PQC Engine)
 
 - **Vectorized Kyber Operations**: Accelerates Kyber-1024 polynomial multiplications using hardware AVX-512 and ARM Neon instructions.
+
 - **Dilithium-5 Attestation Pipeline**: Standardizes asynchronous public key audits in the background, allowing the system to boot while cryptography checks execute concurrently.
+
 - **Secure Shard Ring Buffers**: Uses pre-allocated circular rings for PQC key exchanges, removing heap allocation overheads in networking tools.
 
 ---
@@ -65,5 +73,7 @@ graph LR
 To secure absolute system integrity, SigmaOS implements:
 
 1. **Lattice Fuzzing Pools**: Executes continuous input fuzzing across all 256 syscall vectors to detect edge-case boundaries.
+
 2. **Deterministic Regression Sweeps**: Conducts strict structural validations after every branch merge, preventing regression drift.
+
 3. **PQC Cryptographic Verification**: Verifies Dilithium signatures across all active userland binaries.

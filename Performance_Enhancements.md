@@ -21,6 +21,9 @@ To achieve parity and eventual superiority over legacy operating systems, SigmaO
    - **SigmaOS Implementation:** Build the Zenith Developer SDK targeting LLVM IR natively, allowing SigmaOS to run heavily optimized machine code while enforcing safety at the compilation layer.
 
 ## Implementation Phases
+
 - **Phase 1:** Core Utils (Busybox equivalent in Rust).
+
 - **Phase 2:** Service Manager (Parallelized init sequence).
+
 - **Phase 3:** Advanced Scheduler (Linux-inspired heuristics).

@@ -1,4 +1,4 @@
-# Avoiding Command Injection in Node.js
+﻿# Avoiding Command Injection in Node.js
 
 In this post we are going to learn about the proper way to call a system command using node.js to avoid a common security flaw, command injection.
 
@@ -10,7 +10,6 @@ Here is a very typical way you would call a system command with `child_process.e
 child_process.exec('ls', function (err, data) {
   console.log(data);
 });
-
 ```
 
 What happens though when you need to start getting user input for arguments into your command? The obvious solution is to take the user input and build your command out using string concatenation. But here's something I've learned over the years: When you use string concatenation to send data from one system to another you're probably going to have a bad day.
@@ -20,7 +19,6 @@ var path = 'user input';
 child_process.exec('ls -l ' + path, function (err, data) {
   console.log(data);
 });
-
 ```
 
 ## Why is string concatenation a problem?
@@ -28,8 +26,7 @@ child_process.exec('ls -l ' + path, function (err, data) {
 Well, because under the hood, `child_process.exec` makes a call to execute <kbd>/bin/sh</kbd> rather than the target program. The command that was sent just gets passed along as a shell command in the newly spawned <kbd>/bin/sh</kbd> process. `child_process.exec` has a misleading name - it's a bash interpreter, not a program launcher. And that means that all shell metacharacters can have devastating effects if the command is including user input.
 
 ```sh
-[pid 25170] execve("/bin/sh", ["/bin/sh", "-c", "ls -l user input"], [/*16 vars*/]
-
+[pid 25170] execve("/bin/sh", ["/bin/sh", "-c", "ls -l user input"], [/* 16 vars */]
 ```
 
 For example, an attacker could use a ; to end the statement and start another one, they could use backticks or $() to run a subcommand. Lots of potential for abuse.
@@ -49,14 +46,12 @@ var path = '.';
 child_process.execFile('/bin/ls', ['-l', path], function (err, result) {
   console.log(result);
 });
-
 ```
 
 System call that is run
 
 ```sh
-[pid 25565] execve("/bin/ls", ["/bin/ls", "-l", "."], [/*16 vars*/]
-
+[pid 25565] execve("/bin/ls", ["/bin/ls", "-l", "."], [/* 16 vars */]
 ```
 
 ### `child_process.spawn`
@@ -71,14 +66,12 @@ var ls = child_process.spawn('/bin/ls', ['-l', path]);
 ls.stdout.on('data', function (data) {
   console.log(data.toString());
 });
-
 ```
 
 System call that is run
 
 ```sh
-[pid 26883] execve("/bin/ls", ["/bin/ls", "-l", "."], [/*16 vars*/
-
+[pid 26883] execve("/bin/ls", ["/bin/ls", "-l", "."], [/* 16 vars */
 ```
 
 When using `spawn` or `execFile`, our target program is the first argument to execve. This means that a user cannot run subcommands in the shell, because <kbd>/bin/ls</kbd> has no idea what to do with backticks or pipes or ;. It's <kbd>/bin/bash</kbd> that is going to be interpreting those commands. It's similar to using parameterized vs string-based SQL queries, if you are familiar with that.

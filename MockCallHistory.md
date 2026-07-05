@@ -1,4 +1,4 @@
-# Class: MockCallHistory
+﻿# Class: MockCallHistory
 
 Access to an instance with :
 
@@ -22,7 +22,6 @@ for (const log of mockAgent.getCallHistory()) {
 
 const array: Array<MockCallHistoryLog> = [...mockAgent.getCallHistory()]
 const set: Set<MockCallHistoryLog> = new Set(mockAgent.getCallHistory())
-
 ```
 
 ## class methods
@@ -35,7 +34,6 @@ Clear all MockCallHistoryLog registered. This is automatically done when calling
 mockAgent.clearCallHistory()
 // same as
 mockAgent.getCallHistory()?.clear()
-
 ```
 
 ### calls
@@ -44,7 +42,6 @@ Get all MockCallHistoryLog registered as an array
 
 ```js
 mockAgent.getCallHistory()?.calls()
-
 ```
 
 ### firstCall
@@ -53,7 +50,6 @@ Get the first MockCallHistoryLog registered or undefined
 
 ```js
 mockAgent.getCallHistory()?.firstCall()
-
 ```
 
 ### lastCall
@@ -62,7 +58,6 @@ Get the last MockCallHistoryLog registered or undefined
 
 ```js
 mockAgent.getCallHistory()?.lastCall()
-
 ```
 
 ### nthCall
@@ -71,7 +66,6 @@ Get the nth MockCallHistoryLog registered or undefined
 
 ```js
 mockAgent.getCallHistory()?.nthCall(3) // the third MockCallHistoryLog registered
-
 ```
 
 ### filterCallsByProtocol
@@ -83,7 +77,6 @@ Filter MockCallHistoryLog by protocol.
 ```js
 mockAgent.getCallHistory()?.filterCallsByProtocol(/https/)
 mockAgent.getCallHistory()?.filterCallsByProtocol('https:')
-
 ```
 
 ### filterCallsByHost
@@ -95,7 +88,6 @@ Filter MockCallHistoryLog by host.
 ```js
 mockAgent.getCallHistory()?.filterCallsByHost(/localhost/)
 mockAgent.getCallHistory()?.filterCallsByHost('localhost:3000')
-
 ```
 
 ### filterCallsByPort
@@ -108,7 +100,6 @@ Filter MockCallHistoryLog by port.
 mockAgent.getCallHistory()?.filterCallsByPort(/3000/)
 mockAgent.getCallHistory()?.filterCallsByPort('3000')
 mockAgent.getCallHistory()?.filterCallsByPort('')
-
 ```
 
 ### filterCallsByOrigin
@@ -120,7 +111,6 @@ Filter MockCallHistoryLog by origin.
 ```js
 mockAgent.getCallHistory()?.filterCallsByOrigin(/http:\/\/localhost:3000/)
 mockAgent.getCallHistory()?.filterCallsByOrigin('http://localhost:3000')
-
 ```
 
 ### filterCallsByPath
@@ -132,7 +122,6 @@ Filter MockCallHistoryLog by path.
 ```js
 mockAgent.getCallHistory()?.filterCallsByPath(/api\/v1\/graphql/)
 mockAgent.getCallHistory()?.filterCallsByPath('/api/v1/graphql')
-
 ```
 
 ### filterCallsByHash
@@ -144,7 +133,6 @@ Filter MockCallHistoryLog by hash.
 ```js
 mockAgent.getCallHistory()?.filterCallsByPath(/hash/)
 mockAgent.getCallHistory()?.filterCallsByPath('#hash')
-
 ```
 
 ### filterCallsByFullUrl
@@ -156,7 +144,6 @@ Filter MockCallHistoryLog by fullUrl. fullUrl contains protocol, host, port, pat
 ```js
 mockAgent.getCallHistory()?.filterCallsByFullUrl(/https:\/\/localhost:3000\/\?query=value#hash/)
 mockAgent.getCallHistory()?.filterCallsByFullUrl('https://localhost:3000/?query=value#hash')
-
 ```
 
 ### filterCallsByMethod
@@ -168,7 +155,6 @@ Filter MockCallHistoryLog by method.
 ```js
 mockAgent.getCallHistory()?.filterCallsByMethod(/POST/)
 mockAgent.getCallHistory()?.filterCallsByMethod('POST')
-
 ```
 
 ### filterCalls
@@ -191,22 +177,15 @@ mockAgent.getCallHistory()?.filterCalls(/"data": "{ "errors": "wrong body" }"/)
 
 // returns an Array of MockCallHistoryLog which all have
 // - a hash containing my-hash
-
 // - OR
-
 // - a path equal to /endpoint
-
 mockAgent.getCallHistory()?.filterCalls({ hash: /my-hash/, path: '/endpoint' })
 
 // returns an Array of MockCallHistoryLog which all have
 // - a hash containing my-hash
-
 // - AND
-
 // - a path equal to /endpoint
-
 mockAgent.getCallHistory()?.filterCalls({ hash: /my-hash/, path: '/endpoint' }, { operator: 'AND' })
-
 ```
 
 ## filter parameter

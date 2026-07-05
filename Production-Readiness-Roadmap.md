@@ -1,5 +1,7 @@
 # SigmaOS — Production Readiness & Go-Live Roadmap
+
 ## Phase Gates · India Stack Go-Live · Hardware Reference Design
+
 ## Community Growth · Research Agenda · Full Gantt Schedule
 
 Eleventh roadmap document. Covers production readiness criteria,
@@ -15,15 +17,25 @@ month-by-month development schedule through v18.0 Singularity.
 SigmaOS is production ready when a CA in Maharashtra can:
 
 ```
+
 1. Boot SigmaOS on a JioBook laptop (< 10 seconds)
+
 2. Log in via ABHA DID (no username/password)
+
 3. Open sigma-ca dashboard (< 2 seconds)
+
 4. Enter client GSTIN and generate GSTR-1 JSON (< 5 seconds)
+
 5. File GSTR-1 on GSTN portal (< 30 seconds, TLS 1.3 PQC-hybrid)
+
 6. Generate e-Invoice IRN + QR code (< 5 seconds)
+
 7. Share IRN-signed invoice to client via DID
+
 8. Close laptop lid → suspend-to-RAM (S3)
+
 9. Reopen → resume in < 3 seconds
+
 10. Entire workflow: no internet required except step 5 and 7
 ```
 
@@ -218,11 +230,17 @@ Tier 4 — SigmaBox (target: ₹2,000)
 ### HD2 — Hardware Certification Programme
 
 ```bash
+
 # Every device gets a sigma-compatibility score:
+
 sigma-hardware-cert run --device JioBook-2026
+
 # Tests: boot, network, display, storage, audio, power
+
 # Output: SigmaOS Certified Level 2 (8/9 tests pass)
+
 # Badge: sigmaos.dev/certified/jiobook-2026
+
 ```
 
 | Task | File | Branch | Detail |
@@ -575,6 +593,7 @@ Built in India. For India. By India.
 ## 9. All Roadmap Documents — Master Index
 
 | # | Document | Lines | Key focus |
+
 |---|----------|-------|-----------|
 | 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | ~1,000 | S/P/Q/UX/Security/A11y/DX |
 | 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | ~900 | Energy/Reliability/Observability/Network |
@@ -588,6 +607,6 @@ Built in India. For India. By India.
 | 10 | [Final-Excellence-Roadmap](Final-Excellence-Roadmap) | ~800 | Feedback/Boot/IPC/Data/Error/Tools |
 | 11 | [Production-Readiness-Roadmap](Production-Readiness-Roadmap) | ~900 | Go-live gates/India Stack/Gantt/KPIs |
 
-**Grand total: 11 documents, ~8,600 lines of engineering roadmap.**
+### Grand total: 11 documents, ~8,600 lines of engineering roadmap.
 
 *See also: [Development Roadmap](Development-Roadmap) · [Branch Development Roadmap](Branch-Development-Roadmap) · [Gap Analysis](Gap-Analysis) · [India Profession Coverage](India-Profession-Coverage)*

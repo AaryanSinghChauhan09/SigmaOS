@@ -21,23 +21,30 @@
 ## Quick Start
 
 ```bash
+
 # Install DDK tools
+
 sigma-pkg install sigma-ddk
 
 # Scaffold a new driver
+
 sigma-shard-new my-nic-driver --template networking
 
 # Or port a Linux driver
+
 sigma-driver-porter port linux_driver.c
 sigma-driver-porter port linux_driver.c --ai  # AI-assisted translation
 
 # Build
+
 cd sigma-my-nic-driver && cargo build --release
 
 # Validate
+
 sigma-ddk validate target/release/libsigma_my_nic_driver.so
 
 # List registered drivers
+
 sigma-ddk list
 ```
 
@@ -190,22 +197,33 @@ Recommended: use ring-3 for all third-party and community drivers. Ring-0 only f
 If you have a Linux driver to port (cleanroom — don't copy GPL code, study patterns):
 
 ```bash
+
 # Analyse the Linux driver structure
+
 sigma-driver-porter analyse linux_rtl8169.c
 
 # Generate SigmaOS skeleton from patterns
+
 sigma-driver-porter port linux_rtl8169.c
 
 # Full AI translation (needs sigma-agent daemon)
+
 sigma-driver-porter port linux_rtl8169.c --ai
 
 # The tool maps Linux APIs → SigmaOS equivalents:
+
 # ioremap          → ddk::iomap
+
 # readl/writel     → ddk::mmio_read32/write32
+
 # request_irq      → ddk::request_irq
+
 # kmalloc          → kfree/kmalloc
+
 # netdev_alloc     → sigma_bus_send
+
 # pci_register_driver → sigma_register_driver
+
 ```
 
 ---
@@ -215,8 +233,11 @@ sigma-driver-porter port linux_rtl8169.c --ai
 The `SigmaDriverDescriptor` struct layout is **frozen at DDK v1.0**. Drivers compiled today will work on SigmaOS v20.0 without recompilation.
 
 Rules:
+
 - New fields only added at the end of the struct
+
 - ABI version bumped only for breaking changes (never planned)
+
 - Old drivers gracefully ignored if ABI version < required
 
 ```rust
@@ -233,16 +254,23 @@ if desc.abi_version != DDK_ABI_VERSION {
 SigmaOS supports both:
 
 ```toml
+
 # Open source driver (preferred)
+
 flags = SIGMA_DRV_FLAG_OPEN_SOURCE
 
 # Vendor-supplied closed blob (e.g., NVIDIA proprietary)
+
 flags = SIGMA_DRV_FLAG_CERTIFIED   # vendor-signed binary
+
 ```
 
 Closed drivers are accepted with:
+
 1. Dilithium-5 vendor signature
+
 2. Published security contact
+
 3. Ring-3 isolation enforced (no ring-0 for closed drivers)
 
 ---
@@ -250,16 +278,22 @@ Closed drivers are accepted with:
 ## Submitting to sigma_pkg_registry
 
 ```bash
+
 # 1. Write sigma-shard.toml with driver metadata
+
 # 2. Build and validate
+
 cargo build --release
 sigma-ddk validate target/release/libmy_driver.so
 
 # 3. Create package recipe
+
 sigma-pkg recipe create my-nic-driver
 
 # 4. Submit PR to sigma_pkg_registry/recipes/
+
 # File: sigma_pkg_registry/recipes/sigma-driver-my-nic.toml
+
 ```
 
 ---
@@ -269,8 +303,11 @@ sigma-pkg recipe create my-nic-driver
 Want the **SIGMA_DRV_FLAG_CERTIFIED** badge?
 
 1. Submit driver to https://github.com/AaryanSinghChauhan09/SigmaOS/issues (Driver Certification)
+
 2. Provide: source code (or binary + security contact), test results, hardware to lend for CI
+
 3. SigmaOS team reviews, signs with project Dilithium-5 key
+
 4. Listed in sigma-ddk certified registry
 
 Benefits: driver shows "✓ Certified" in sigma-capstore, higher trust score, auto-included in SigmaOS ISO for supported hardware.

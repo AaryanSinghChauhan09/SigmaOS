@@ -1,4 +1,4 @@
-# Dispatcher
+﻿# Dispatcher
 
 Extends: `events.EventEmitter`
 
@@ -21,7 +21,6 @@ Returns: `void | Promise<null>` - Only returns a `Promise` if no `callback` argu
 ```js
 dispatcher.close() // -> Promise
 dispatcher.close(() => {}) // -> void
-
 ```
 
 #### Example - Request resolves before Client closes
@@ -52,7 +51,6 @@ await client.close()
 
 console.log('Client closed')
 server.close()
-
 ```
 
 ### `Dispatcher.connect(options[, callback])`
@@ -130,7 +128,6 @@ try {
   socket.write(wanted)
   socket.end()
 } catch (error) { }
-
 ```
 
 ### `Dispatcher.destroy([error, callback]): Promise`
@@ -152,7 +149,6 @@ dispatcher.destroy() // -> Promise
 dispatcher.destroy(new Error()) // -> Promise
 dispatcher.destroy(() => {}) // -> void
 dispatcher.destroy(new Error(), () => {}) // -> void
-
 ```
 
 #### Example - Request is aborted when Client is destroyed
@@ -184,7 +180,6 @@ try {
 } catch (error) {
   console.error(error)
 }
-
 ```
 
 ### `Dispatcher.dispatch(options, handler)`
@@ -288,7 +283,6 @@ client.dispatch({
     server.close()
   }
 })
-
 ```
 
 #### Example 2 - Dispatch Upgrade Request
@@ -339,7 +333,6 @@ client.dispatch({
     socket.end()
   }
 })
-
 ```
 
 #### Example 3 - Dispatch POST request
@@ -393,7 +386,6 @@ client.dispatch({
     server.close()
   }
 })
-
 ```
 
 ### `Dispatcher.pipeline(options, handler)`
@@ -480,7 +472,6 @@ pipeline(
     server.close()
   }
 )
-
 ```
 
 ### `Dispatcher.request(options[, callback])`
@@ -528,7 +519,6 @@ The `RequestOptions.method` property should not be value `'CONNECT'`.
 - **body** `stream.Readable` which also implements [the body mixin from the Fetch Standard](https://fetch.spec.whatwg.org/#body-mixin).
 
 - **trailers** `Record<string, string>` - This object starts out
-
   as empty and will be mutated to contain trailers after `body` has emitted `'end'`.
 
 - **opaque** `unknown`
@@ -593,7 +583,6 @@ try {
 } catch (error) {
   console.error(error)
 }
-
 ```
 
 #### Example 2 - Aborting a request
@@ -627,7 +616,6 @@ try {
 }
 
 abortController.abort()
-
 ```
 
 Alternatively, any `EventEmitter` that emits an `'abort'` event may be used as an abort controller:
@@ -659,7 +647,6 @@ try {
 }
 
 ee.emit('abort')
-
 ```
 
 Destroying the request or response body will have the same effect.
@@ -688,7 +675,6 @@ try {
   client.close()
   server.close()
 }
-
 ```
 
 #### Example 3 - Conditionally reading the body
@@ -708,7 +694,6 @@ if (statusCode === 200) {
 await body.dump()
 
 return null
-
 ```
 
 ### `Dispatcher.stream(options, factory[, callback])`
@@ -786,7 +771,6 @@ try {
 } catch (error) {
   console.error(error)
 }
-
 ```
 
 #### Example 2 - Stream to Fastify Response
@@ -844,7 +828,6 @@ try {
   fastifyServer.close()
   nodeServer.close()
 } catch (error) { }
-
 ```
 
 ### `Dispatcher.upgrade(options[, callback])`
@@ -912,7 +895,6 @@ try {
   client.close()
   server.close()
 }
-
 ```
 
 ### `Dispatcher.compose(interceptors[, interceptor])`
@@ -920,30 +902,25 @@ try {
 Compose a new dispatcher from the current dispatcher and the given interceptors.
 
 > _Notes_:
->
 > - The order of the interceptors matters. The last interceptor will be the first to be called.
-
 > - It is important to note that the `interceptor` function should return a function that follows the `Dispatcher.dispatch` signature.
-
 > - Any fork of the chain of `interceptors` can lead to unexpected results.
-
 >
 > **Interceptor Stack Visualization:**
->
 > ```
 > compose([interceptor1, interceptor2, interceptor3])
 >
 > Request Flow:
-> ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-> │   Request   │───▶│interceptor3 │───▶│interceptor2 │───▶│interceptor1 │───▶│  dispatcher │
-> └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    │   .dispatch │
->                           ▲                   ▲                   ▲         └─────────────┘
->                           │                   │                   │                ▲
->                    (called first)      (called second)     (called last)           │
->                                                                                    │
-> ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐          │
-> │  Response   │◀───│interceptor3 │◀───│interceptor2 │◀───│interceptor1 │◀─────────┘
-> └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+> â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+> â”‚   Request   â”‚â”€â”€â”€â–¶â”‚interceptor3 â”‚â”€â”€â”€â–¶â”‚interceptor2 â”‚â”€â”€â”€â–¶â”‚interceptor1 â”‚â”€â”€â”€â–¶â”‚  dispatcher â”‚
+> â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚   .dispatch â”‚
+>                           â–²                   â–²                   â–²         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+>                           â”‚                   â”‚                   â”‚                â–²
+>                    (called first)      (called second)     (called last)           â”‚
+>                                                                                    â”‚
+> â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”‚
+> â”‚  Response   â”‚â—€â”€â”€â”€â”‚interceptor3 â”‚â—€â”€â”€â”€â”‚interceptor2 â”‚â—€â”€â”€â”€â”‚interceptor1 â”‚â—€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+> â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 >
 > The interceptors are composed in reverse order due to function composition.
 > ```
@@ -986,7 +963,6 @@ const client = new Client('http://localhost:3000')
   .compose(redirectInterceptor)
 
 await client.request({ path: '/', method: 'GET' })
-
 ```
 
 #### Example 2 - Chained Compose
@@ -1030,7 +1006,6 @@ const client = new Client('http://localhost:3000')
   .compose(retryInterceptor)
 
 await client.request({ path: '/', method: 'GET' })
-
 ```
 
 #### Pre-built interceptors
@@ -1040,9 +1015,7 @@ await client.request({ path: '/', method: 'GET' })
 The `redirect` interceptor allows you to customize the way your dispatcher handles redirects.
 
 It accepts the same arguments as the [`RedirectHandler` constructor](/docs/docs/api/RedirectHandler.md).
-
 ### Example - Basic Redirect Interceptor
-
 ```js
 const { Client, interceptors } = require("undici");
 const { redirect } = interceptors;
@@ -1051,7 +1024,6 @@ const client = new Client("http://service.example").compose(
   redirect({ maxRedirections: 3, throwOnMaxRedirect: true })
 );
 client.request({ path: "/" })
-
 ```
 
 ##### `retry`
@@ -1059,9 +1031,7 @@ client.request({ path: "/" })
 The `retry` interceptor allows you to customize the way your dispatcher handles retries.
 
 It accepts the same arguments as the [`RetryHandler` constructor](/docs/docs/api/RetryHandler.md).
-
 ### Example - Basic Redirect Interceptor
-
 ```js
 const { Client, interceptors } = require("undici");
 const { retry } = interceptors;
@@ -1075,21 +1045,16 @@ const client = new Client("http://service.example").compose(
     retryAfter: true,
   })
 );
-
 ```
 
 ##### `dump`
 
 The `dump` interceptor enables you to dump the response body from a request upon a given limit.
-
 ### Options
-
 - `maxSize` - The maximum size (in bytes) of the response body to dump. If the size of the request's body exceeds this value then the connection will be closed. Default: `1048576`.
 
 > The `Dispatcher#options` also gets extended with the options `dumpMaxSize`, `abortOnDumped`, and `waitForTrailers` which can be used to configure the interceptor at a request-per-request basis.
-
 ### Example - Basic Dump Interceptor
-
 ```js
 const { Client, interceptors } = require("undici");
 const { dump } = interceptors;
@@ -1109,7 +1074,6 @@ client.dispatch(
   },
   handler
 );
-
 ```
 
 ##### `dns`
@@ -1117,9 +1081,7 @@ client.dispatch(
 The `dns` interceptor enables you to cache DNS lookups for a given duration, per origin.
 
 >It is well suited for scenarios where you want to cache DNS lookups to avoid the overhead of resolving the same domain multiple times
-
 ### Options
-
 - `maxTTL` - The maximum time-to-live (in milliseconds) of the DNS cache. It should be a positive integer. Default: `10000`.
   - Set `0` to disable TTL.
 
@@ -1143,25 +1105,19 @@ The `dns` interceptor enables you to cache DNS lookups for a given duration, per
 - `storage: DNSStorage` - Custom storage for resolved DNS records
 
 > The `Dispatcher#options` also gets extended with the options `dns.affinity`, `dns.dualStack`, `dns.lookup` and `dns.pick` which can be used to configure the interceptor at a request-per-request basis.
-
 ### DNSInterceptorRecord
-
 It represents a DNS record.
 
 - `family` - (`number`) The IP family of the address. It can be either `4` or `6`.
 
 - `address` - (`string`) The IP address.
-
 ### DNSInterceptorOriginRecords
-
 It represents a map of DNS IP addresses records for a single origin.
 
 - `4.ips` - (`DNSInterceptorRecord[] | null`) The IPv4 addresses.
 
 - `6.ips` - (`DNSInterceptorRecord[] | null`) The IPv6 addresses.
-
 ### DNSStorage
-
 It represents a storage object for resolved DNS records.
 
 - `size` - (`number`) current size of the storage.
@@ -1173,9 +1129,7 @@ It represents a storage object for resolved DNS records.
 - `delete` - (`(origin: string) => void`) method to delete records for a given origin.
 
 - `full` - (`() => boolean`) method to check if the storage is full, if returns `true`, DNS lookup will be skipped in this interceptor and new records will not be stored.
-
 ### Example - Basic DNS Interceptor
-
 ```js
 const { Client, interceptors } = require("undici");
 const { dns } = interceptors;
@@ -1188,11 +1142,8 @@ const response = await client.request({
   origin: `http://localhost:3030`,
   ...requestOpts
 })
-
 ```
-
 ### Example - DNS Interceptor and LRU cache as a storage
-
 ```js
 const { Client, interceptors } = require("undici");
 const QuickLRU = require("quick-lru");
@@ -1228,15 +1179,12 @@ const response = await client.request({
   origin: `http://localhost:3030`,
   ...requestOpts
 })
-
 ```
 
 ##### `responseError`
 
 The `responseError` interceptor throws an error for responses with status code errors (>= 400).
-
 ### Example
-
 ```js
 const { Client, interceptors } = require("undici");
 const { responseError } = interceptors;
@@ -1250,23 +1198,18 @@ await client.request({
   method: "GET",
   path: "/"
 });
-
 ```
 
 ##### `decompress`
 
-⚠️ The decompress interceptor is experimental and subject to change.
+âš ï¸ The decompress interceptor is experimental and subject to change.
 
 The `decompress` interceptor automatically decompresses response bodies that are compressed with gzip, deflate, brotli, or zstd compression. It removes the `content-encoding` and `content-length` headers from decompressed responses and supports RFC-9110 compliant multiple encodings.
-
 ### Options
-
 - `skipErrorResponses` - Whether to skip decompression for error responses (status codes >= 400). Default: `true`.
 
 - `skipStatusCodes` - Array of status codes to skip decompression for. Default: `[204, 304]`.
-
 ### Example - Basic Decompress Interceptor
-
 ```js
 const { Client, interceptors } = require("undici");
 const { decompress } = interceptors;
@@ -1280,11 +1223,8 @@ const response = await client.request({
   method: "GET",
   path: "/"
 });
-
 ```
-
 ### Example - Custom Options
-
 ```js
 const { Client, interceptors } = require("undici");
 const { decompress } = interceptors;
@@ -1295,11 +1235,8 @@ const client = new Client("http://service.example").compose(
     skipStatusCodes: [204, 304, 201] // Skip these status codes
   })
 );
-
 ```
-
 ### Supported Encodings
-
 - `gzip` / `x-gzip` - GZIP compression
 
 - `deflate` / `x-compress` - DEFLATE compression
@@ -1309,9 +1246,7 @@ const client = new Client("http://service.example").compose(
 - `zstd` - Zstandard compression
 
 - Multiple encodings (e.g., `gzip, deflate`) are supported per RFC-9110
-
 ### Behavior
-
 - Skips decompression for status codes < 200 or >= 400 (configurable)
 
 - Skips decompression for 204 No Content and 304 Not Modified by default
@@ -1328,9 +1263,7 @@ const client = new Client("http://service.example").compose(
 
 The `cache` interceptor implements client-side response caching as described in
 [RFC9111](https://www.rfc-editor.org/rfc/rfc9111.html).
-
 ### Options
-
 - `store` - The [`CacheStore`](/docs/docs/api/CacheStore.md) to store and retrieve responses from. Default is [`MemoryCacheStore`](/docs/docs/api/CacheStore.md#memorycachestore).
 
 - `methods` - The [**safe** HTTP methods](https://www.rfc-editor.org/rfc/rfc9110#section-9.2.1) to cache the response of.
@@ -1338,17 +1271,15 @@ The `cache` interceptor implements client-side response caching as described in
 - `cacheByDefault` - The default expiration time to cache responses by if they don't have an explicit expiration and cannot have an heuristic expiry computed. If this isn't present, responses neither with an explicit expiration nor heuristically cacheable will not be cached. Default `undefined`.
 
 - `type` - The [type of cache](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching#types_of_caches) for Undici to act as. Can be `shared` or `private`. Default `shared`. `private` implies privately cacheable responses will be cached and potentially shared with other users of your application.
-
 ### Usage with `fetch`
-
 ```js
 const { Agent, cacheStores, interceptors, setGlobalDispatcher } = require('undici')
 
 const client = new Agent().compose(interceptors.cache({
   store: new cacheStores.MemoryCacheStore({
-    maxSize: 100 *1024* 1024, // 100MB
+    maxSize: 100 * 1024 * 1024, // 100MB
     maxCount: 1000,
-    maxEntrySize: 5 *1024* 1024 // 5MB
+    maxEntrySize: 5 * 1024 * 1024 // 5MB
   })
 }))
 
@@ -1359,25 +1290,20 @@ const first = await fetch('https://example.com/data')
 
 // Second request can be served from cache according to RFC9111 rules.
 const second = await fetch('https://example.com/data')
-
 ```
 
 ##### `Deduplicate Interceptor`
 
 The `deduplicate` interceptor deduplicates concurrent identical requests. When multiple identical requests are made while one is already in-flight, only one request is sent to the origin server, and all waiting handlers receive the same response. This reduces server load and improves performance.
-
 ### Options
-
 - `methods` - The [**safe** HTTP methods](https://www.rfc-editor.org/rfc/rfc9110#section-9.2.1) to deduplicate. Default `['GET']`.
 
 - `skipHeaderNames` - Header names that, if present in a request, will cause the request to skip deduplication entirely. Useful for headers like `idempotency-key` where presence indicates unique processing. Header name matching is case-insensitive. Default `[]`.
 
 - `excludeHeaderNames` - Header names to exclude from the deduplication key. Requests with different values for these headers will still be deduplicated together. Useful for headers like `x-request-id` that vary per request but shouldn't affect deduplication. Header name matching is case-insensitive. Default `[]`.
 
-*`maxBufferSize` - Maximum bytes buffered per paused waiting deduplicated handler. If a waiting handler remains paused and exceeds this threshold, it is failed with an abort error to prevent unbounded memory growth. Default `5*1024* 1024`.
-
+- `maxBufferSize` - Maximum bytes buffered per paused waiting deduplicated handler. If a waiting handler remains paused and exceeds this threshold, it is failed with an abort error to prevent unbounded memory growth. Default `5 * 1024 * 1024`.
 ### Usage
-
 ```js
 const { Client, interceptors } = require("undici");
 const { deduplicate, cache } = interceptors;
@@ -1392,7 +1318,6 @@ const clientWithCache = new Client("http://service.example").compose(
   deduplicate(),
   cache()
 );
-
 ```
 
 Requests are considered identical if they have the same:
@@ -1467,7 +1392,6 @@ Header arguments such as `options.headers` in [`Client.dispatch`](/docs/docs/api
 - As an array of strings. An array representation of a header list must have an even length, or an `InvalidArgumentError` will be thrown.
 
 - As an iterable that can encompass `Headers`, `Map`, or a custom iterator returning key-value pairs.
-
 Keys are lowercase and values are not modified.
 
 Undici validates header syntax at the protocol level (for example, invalid header names and invalid control characters in string values), but it does not sanitize untrusted application input. Validate and sanitize any user-provided header names and values before passing them to Undici to prevent header/body injection vulnerabilities.
@@ -1486,7 +1410,6 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   host: 'mysite.com',
   accept: '*/*'
 }
-
 ```
 
 ### Example 2 - Array
@@ -1499,7 +1422,6 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   'host', 'mysite.com',
   'accept', '*/*'
 ]
-
 ```
 
 ### Example 3 - Iterable
@@ -1512,11 +1434,8 @@ new Headers({
   host: 'mysite.com',
   accept: '*/*'
 })
-
 ```
-
 or
-
 ```js
 new Map([
   ['content-length', '123'],
@@ -1525,11 +1444,8 @@ new Map([
   ['host', 'mysite.com'],
   ['accept', '*/*']
 ])
-
 ```
-
 or
-
 ```js
 {
   *[Symbol.iterator] () {
@@ -1540,5 +1456,4 @@ or
     yield ['accept', '*/*']
   }
 }
-
 ```

@@ -26,18 +26,29 @@ This page tracks the integration status of Phase G kernel components into the ma
 **File**: `kernel/src/main.rs`
 
 **Entry Points**:
+
 - `kernel_main(boot_info: *const BootInfo)` - Main entry point from UEFI bootloader
+
 - `_start()` - Legacy entry point for compatibility
 
 **Initialization Sequence**:
+
 1. Initialize logging system
+
 2. Initialize driver registry
+
 3. Initialize interrupt controller (APIC/PIC)
+
 4. Initialize buddy physical allocator
+
 5. Initialize slab allocator (kmalloc)
+
 6. Initialize page table walker
+
 7. Initialize round-robin scheduler
+
 8. Initialize system call dispatcher
+
 9. Initialize framebuffer driver
 
 **Boot Info Structure**:
@@ -63,28 +74,43 @@ pub struct BootInfo {
 ## Module Structure
 
 ### Scheduler Module
+
 **File**: `kernel/scheduler.rs`
+
 - Exports: `round_robin_scheduler`
+
 - Components: Round-robin scheduler implementation
 
 ### Memory Management Module
+
 **File**: `kernel/mm.rs`
+
 - Exports: `buddy_allocator`, `slab_allocator`, `page_table_walker`
+
 - Components: Physical memory allocation, dynamic allocation, virtual memory
 
 ### HAL Module
+
 **File**: `kernel/hal.rs`
+
 - Exports: `interrupt_controller`
+
 - Components: APIC and PIC interrupt controller
 
 ### Syscalls Module
+
 **File**: `kernel/syscalls.rs`
+
 - Exports: `syscall_dispatcher`
+
 - Components: System call dispatcher with 30+ syscalls
 
 ### Drivers Module
+
 **File**: `kernel/drivers/mod.rs`
+
 - Exports: `framebuffer`
+
 - Components: VESA/GOP framebuffer driver
 
 ## Kernel Services
@@ -94,9 +120,13 @@ pub struct BootInfo {
 **File**: `kernel/src/log.rs`
 
 **Features**:
+
 - Structured logging with different levels (Trace, Debug, Info, Warn, Error)
+
 - Module-based logging
+
 - Log count tracking
+
 - Configurable minimum log level
 
 **API**:
@@ -121,9 +151,13 @@ kerror!("message {}", arg)
 **File**: `kernel/src/panic.rs`
 
 **Features**:
+
 - Enhanced panic information display
+
 - Location reporting (file, line)
+
 - Message formatting
+
 - System halt on panic
 
 **API**:
@@ -164,63 +198,91 @@ SigmaOS is running.
 ## Error Handling
 
 Each component initialization includes:
+
 - VGA output for user feedback
+
 - Logging for debugging
+
 - Fallback mechanisms (e.g., PIC fallback if APIC fails)
+
 - Error status reporting
 
 ## Known Limitations
 
 - Some syscall implementations are stubs
+
 - Page table allocation needs integration with buddy allocator
+
 - Slab allocator needs integration with buddy allocator
+
 - Logging output needs actual VGA/serial implementation
+
 - Panic output needs actual VGA/serial implementation
 
 ## Next Steps
 
 ### Testing
+
 - Test kernel boot in QEMU
+
 - Test component initialization order
+
 - Test error handling paths
+
 - Test logging output
 
 ### Enhancements
+
 - Implement actual logging output to VGA/serial
+
 - Implement actual panic output to VGA/serial
+
 - Integrate memory allocators (buddy → slab)
+
 - Implement proper error recovery
+
 - Add kernel command line parsing
 
 ### Documentation
+
 - Add inline code documentation
+
 - Create architecture diagrams
+
 - Write integration guide
+
 - Create troubleshooting guide
 
 ## Build Instructions
 
 ```bash
+
 # Build kernel
+
 cd kernel
 cargo build --target x86_64-sigmaos.json
 
 # Build UEFI bootloader
+
 cd ../sigma-boot
 zig build-exe -target x86_64-uefi -femit-bin=BOOTX64.EFI
 
 # Create bootable ISO
+
 cd ..
 make iso
 
 # Run in QEMU
+
 make run-iso
 ```
 
 ## System Requirements
 
 - **Build**: Zig compiler, Rust toolchain, xorriso
+
 - **Run**: QEMU with KVM support
+
 - **Hardware**: x86_64 with UEFI support
 
 ## Contributors
@@ -230,11 +292,13 @@ make run-iso
 ## References
 
 - [Phase G Implementation Status](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Phase-G-Implementation-Status)
+
 - [Development Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap)
+
 - [Architecture Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 
 ---
 
-**Last Updated**: 2026-07-05  
-**Status**: Kernel Integration Complete  
+**Last Updated**: 2026-07-05
+**Status**: Kernel Integration Complete
 **Next Phase**: Testing and Enhancement

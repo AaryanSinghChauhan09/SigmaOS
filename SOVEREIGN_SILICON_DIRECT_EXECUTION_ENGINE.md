@@ -1,7 +1,7 @@
 # Sovereign Silicon-Direct Execution Engine (S2DE2)
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Definitive Bare-Metal Computational Engine Specification  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Definitive Bare-Metal Computational Engine Specification
 > **Target Hardware:** x86_64 (AVX-512/FMA), ARM64 (NEON), RISC-V (V-Extension)
 
 ---
@@ -121,11 +121,12 @@ bool SovereignBankersDeadlockGuard::is_safe_state(int num_procs, int num_resourc
 
 S2DE2 includes a fully integrated Hardware-in-the-Loop diagnostic pipeline (`sigma_ai_silicon_tuner.cpp`) designed to capture real-time execution anomalies:
 
-* **Issue - Unaligned SIMD Memory Access Traps:** Casting arbitrary userland buffers to AVX-512 registers triggers fatal `#GP` general protection faults.
-  * *Fix Strategy:* S2DE2 automatically intercepts unaligned memory allocations, routes them through `sigma_kmalloc_aligned(size, 64)`, and executes zero-copy DMA memory pinning.
-* **Issue - NPU Thermal Throttling & Clock Drifts:** Intensive matrix multiplications overheat silicon dies, leading to silent calculation errors or kernel stalls.
-  * *Fix Strategy:* S2DE2 monitors physical core temperature sensors via `sigma_power_tuner.cpp`, dynamically scaling SIMD clock frequencies and interleaving sleep cycles to maintain thermal equilibrium.
+- **Issue - Unaligned SIMD Memory Access Traps:** Casting arbitrary userland buffers to AVX-512 registers triggers fatal `#GP` general protection faults.
+- *Fix Strategy:* S2DE2 automatically intercepts unaligned memory allocations, routes them through `sigma_kmalloc_aligned(size, 64)`, and executes zero-copy DMA memory pinning.
+
+- **Issue - NPU Thermal Throttling & Clock Drifts:** Intensive matrix multiplications overheat silicon dies, leading to silent calculation errors or kernel stalls.
+- *Fix Strategy:* S2DE2 monitors physical core temperature sensors via `sigma_power_tuner.cpp`, dynamically scaling SIMD clock frequencies and interleaving sleep cycles to maintain thermal equilibrium.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

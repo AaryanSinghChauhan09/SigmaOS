@@ -23,6 +23,7 @@ Phase G converts SigmaOS from a design scaffold to a bootable operating system.
 ### G Blockers (ordered)
 
 | # | Task | File | Status |
+
 |---|------|------|--------|
 | 1 | Round-robin scheduler | `kernel/core/sigma_sched.cpp` | ⬜ |
 | 2 | Buddy physical allocator | `kernel/core/sigma_mm.cpp` | ⬜ |
@@ -61,27 +62,45 @@ Phase G converts SigmaOS from a design scaffold to a bootable operating system.
 ## Completed Phases
 
 ### Phase F — Competitor Crusher ✅
+
 - Native KMS/GPU framework
+
 - PCIe MSI-X HAL
+
 - Cgroup enforcement
+
 - Sovereign Package Registry
+
 - Offline-First CRDT Sync
+
 - Native Performance Governor
 
 ### Phase E — Gap Closing ✅
+
 - NVMe Driver
+
 - USB xHCI Driver
+
 - Power Management (ACPI)
+
 - Crash Reporter
+
 - Ext4 Journal (JBD2 rewrite)
 
 ### Phase C/D — Security + Runtime ✅
+
 - Kyber-1024 KEM
+
 - Dilithium-5 signatures
+
 - Immutable audit trail
+
 - Adaptive zero-trust engine
+
 - Neural UI (AVX-512)
+
 - WASM/WASI runtime
+
 - Linux ELF compat layer
 
 ---

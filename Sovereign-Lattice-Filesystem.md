@@ -37,13 +37,13 @@ void save_critical_data() {
 
 ## 🚀 Industrial Parity
 
-| Feature | ext4 (Linux) | SLFS (SigmaOS) | 
-| :--- | :--- | :--- | 
+| Feature | ext4 (Linux) | SLFS (SigmaOS) |
+| :--- | :--- | :--- |
 
-| **Journaling** | Yes (Generic) | Yes (Atomic Journal) | 
+| **Journaling** | Yes (Generic) | Yes (Atomic Journal) |
 
-| **PQC-Attestation** | No | Yes (Dilithium-5) | 
+| **PQC-Attestation** | No | Yes (Dilithium-5) |
 
-| **Snapshot Speed** | Seconds/Minutes | < 2ms (Silicon-Direct) | 
+| **Snapshot Speed** | Seconds/Minutes | < 2ms (Silicon-Direct) |
 
 | **Shard Distribution** | External (DRBD/Gluster) | Native (SovereignVFS) |

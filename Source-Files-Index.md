@@ -59,4 +59,4 @@ Nim     ≈ 10%  (CLI tools, shell, package manager)
 SPARK   ≈  5%  (formal crypto verification)
 ```
 
-*No C or C++ in any of the above. All C++ stubs have been replaced.*
+### No C or C++ in any of the above. All C++ stubs have been replaced.

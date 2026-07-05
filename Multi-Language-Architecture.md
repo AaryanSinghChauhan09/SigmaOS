@@ -56,7 +56,6 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/unified/driver_api.zig` | `drivers/unified/driver_api.h` |
 | **`fs/sovereign_vfs.zig`** | `fs/sigmafs/sigmafs.h`, `fs/sovereign_fs/sovereign_fs.h`, `fs/SovereignDiskZenith.h`, all `include/fs/*.h` |
 
-
 ### Nim (compiles to native, no stdlib/libc)
 
 | File | Replaces |
@@ -87,6 +86,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ## OOP Principles Per Language
 
 ### Rust
+
 ```rust
 // Struct as class, Trait as interface
 pub trait SigmaObject { fn initialize(&mut self) -> i32; }
@@ -95,6 +95,7 @@ impl AgentOrchestrator { pub fn register(&mut self, id: usize, priority: u8) -> 
 ```
 
 ### Zig
+
 ```zig
 // Struct with methods as OOP class
 pub const Framebuffer = struct {
@@ -104,14 +105,18 @@ pub const Framebuffer = struct {
 ```
 
 ### Nim
+
 ```nim
+
 # Object type with procedures = OOP class
+
 type GenerationManager* = object
   generations*: seq[GenerationInfo]
 proc createGeneration*(mgr: var GenerationManager; label: string): int = ...
 ```
 
 ### Ada/SPARK
+
 ```ada
 -- Tagged Record = OOP class, SPARK aspects = contracts
 type AHCI_Port is tagged record
@@ -127,9 +132,13 @@ procedure Read_Sector (Port: in out AHCI_Port; ...) with Pre => Port.State = Idl
 The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 
 ```yaml
+
 - Rust:     cargo build --target x86_64-unknown-none
+
 - Zig:      zig build-lib --target x86_64-freestanding-none
+
 - Nim:      nim c --noMain --noLinking --cpu:amd64
+
 - Ada/SPARK: gprbuild -P sigmaos.gpr
 ```
 
@@ -138,6 +147,9 @@ The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 ## 🔗 Related Pages
 
 - [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
+
 - [Phase 6: Long-Term Vision](Phase-6-Long-Term-Vision)
+
 - [Zero-Dependency Architecture](Zero-Dependency-Architecture)
+
 - [Roadmap](Roadmap)

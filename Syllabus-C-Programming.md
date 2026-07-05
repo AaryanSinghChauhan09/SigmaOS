@@ -29,10 +29,10 @@ Problem → Algorithm → Flowchart → C Code → Kernel Module
 ```c
 /* kernel/tools/sigma_example.c
 
- * SigmaOS C coding standard:
- * - No stdlib malloc (use sigma_kmalloc)
- * - No printf (use sigma_klog)
- * - No exit() (use sigma_panic)
+- SigmaOS C coding standard:
+- - No stdlib malloc (use sigma_kmalloc)
+- - No printf (use sigma_klog)
+- - No exit() (use sigma_panic)
 
  */
 #include "sigma_kernel_types.h"
@@ -73,7 +73,7 @@ int truncated = (int)3.99;  /* → 3 */
    () []  →  Postfix
    ++ -- ! ~ (type) * & sizeof  →  Unary
 
-   * / %  →  Multiplicative
+- / %  →  Multiplicative
    + -    →  Additive
 
    << >>  →  Shift
@@ -253,14 +253,17 @@ sigma_fclose(bin);
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Memory Leaks & Dangling Pointers:** Failing to invoke `sigma_kfree` on dynamically allocated heap buffers causes kernel memory exhaustion.
-  * *Fix Strategy:* Enforce strict pairing of `sigma_kmalloc` and `sigma_kfree` within identical execution scopes, zero out freed pointers immediately (`ptr = NULL`), and run AddressSanitizer (KASAN) during kernel debugging passes.
-* **Issue - Buffer Overflows in String Manipulation:** Using unsafe legacy C functions (`strcpy`, `strcat`) without bounds checking overwrites adjacent kernel stack frames.
-  * *Fix Strategy:* Strictly utilize bounded sovereign string manipulation primitives (`sigma_strcpy`, `sigma_strcat`, `sigma_snprintf`) passing explicit destination buffer sizes.
-* **Issue - Concurrency Deadlocks in Interrupt Handlers:** Acquiring spinlocks within an IRQ handler that are already held by an interrupted thread causes instant CPU deadlocks.
-  * *Fix Strategy:* Utilize `sigma_spin_lock_irqsave` to disable local interrupts before acquiring spinlocks, ensuring absolute deadlock prevention across asynchronous execution boundaries.
-* **Issue - Alignment Faults on RISC Architectures:** Casting unaligned byte arrays to 64-bit struct pointers triggers fatal unaligned memory access traps.
-  * *Fix Strategy:* Utilize explicit `__attribute__((aligned(8)))` declarations or execute byte-by-byte `sigma_memcpy` into properly aligned stack structs.
+- **Issue - Memory Leaks & Dangling Pointers:** Failing to invoke `sigma_kfree` on dynamically allocated heap buffers causes kernel memory exhaustion.
+- *Fix Strategy:* Enforce strict pairing of `sigma_kmalloc` and `sigma_kfree` within identical execution scopes, zero out freed pointers immediately (`ptr = NULL`), and run AddressSanitizer (KASAN) during kernel debugging passes.
+
+- **Issue - Buffer Overflows in String Manipulation:** Using unsafe legacy C functions (`strcpy`, `strcat`) without bounds checking overwrites adjacent kernel stack frames.
+- *Fix Strategy:* Strictly utilize bounded sovereign string manipulation primitives (`sigma_strcpy`, `sigma_strcat`, `sigma_snprintf`) passing explicit destination buffer sizes.
+
+- **Issue - Concurrency Deadlocks in Interrupt Handlers:** Acquiring spinlocks within an IRQ handler that are already held by an interrupted thread causes instant CPU deadlocks.
+- *Fix Strategy:* Utilize `sigma_spin_lock_irqsave` to disable local interrupts before acquiring spinlocks, ensuring absolute deadlock prevention across asynchronous execution boundaries.
+
+- **Issue - Alignment Faults on RISC Architectures:** Casting unaligned byte arrays to 64-bit struct pointers triggers fatal unaligned memory access traps.
+- *Fix Strategy:* Utilize explicit `__attribute__((aligned(8)))` declarations or execute byte-by-byte `sigma_memcpy` into properly aligned stack structs.
 
 ---
 
@@ -274,4 +277,4 @@ sigma_fclose(bin);
 | **fopen/fclose** | `sigma_fopen` / `sigma_fclose` | `kernel/fs/sigma_vfs.h` |
 | **assert** | `SIGMA_ASSERT(cond, msg)` | `kernel/core/sigma_debug.h` |
 
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

@@ -3,9 +3,13 @@
 ## Legend
 
 - ✅ **Supported**: Works out-of-the-box with SigmaOS
+
 - 🔄 **Partial Support**: Works with limitations or requires configuration
+
 - ⚠️ **Requires Driver**: Needs additional driver installation
+
 - ❌ **Not Supported**: Not currently supported
+
 - 📅 **Planned**: Support planned for future release
 
 ## Network Adapters
@@ -70,10 +74,15 @@
 ## Compatibility Statistics
 
 - **Wi-Fi**: 80%+ compatibility
+
 - **Ethernet**: 100% compatibility
+
 - **Graphics**: 70%+ compatibility (basic)
+
 - **Audio**: 90%+ compatibility
+
 - **Storage**: 100% compatibility
+
 - **Printers**: 70%+ compatibility
 
 ---

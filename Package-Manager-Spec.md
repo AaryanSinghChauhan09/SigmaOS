@@ -42,45 +42,62 @@ myapp-1.0.0.spkg
 ## CLI Reference
 
 ```bash
+
 # Install
+
 sigma-pkg install firefox
 sigma-pkg install ./myapp-1.0.0.spkg    # local file
+
 sigma-pkg install firefox@120.0.0       # specific version
 
 # Remove
+
 sigma-pkg remove firefox
 sigma-pkg remove firefox --purge        # also removes config
 
 # Update
+
 sigma-pkg update                        # all packages
+
 sigma-pkg update firefox               # single package
+
 sigma-pkg update --delta               # incremental delta only
 
 # Search
+
 sigma-pkg search "text editor"
 sigma-pkg search --tag dev-tools
 
 # Info
+
 sigma-pkg info firefox
 sigma-pkg info --files firefox          # list installed files
 
 # List
+
 sigma-pkg list                          # installed packages
+
 sigma-pkg list --upgradeable           # packages with updates
 
 # Verify
+
 sigma-pkg verify firefox               # check signature + hashes
+
 sigma-pkg verify --all                 # verify all installed packages
 
 # Build
+
 sigma-pkg build ./myapp/               # build from source
+
 sigma-pkg sign myapp-1.0.0.spkg        # sign a package
 
 # Repo management
+
 sigma-pkg repo add https://repo.sigmaos.dev/main
 sigma-pkg repo list
 sigma-pkg repo remove old-repo
 sigma-pkg repo sync                    # refresh package lists
+
 ```
 
 ---
@@ -88,9 +105,13 @@ sigma-pkg repo sync                    # refresh package lists
 ## Reproducible Builds
 
 Every `.spkg` in the official registry is reproducibly built:
+
 1. Build environment is a hermetic sigma-pod container
+
 2. All inputs (source, deps, build tools) are content-addressed
+
 3. Build hash recorded in `build.proof`
+
 4. Any developer can verify: `sigma-pkg verify --repro firefox`
 
 ---

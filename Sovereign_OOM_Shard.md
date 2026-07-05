@@ -32,11 +32,11 @@ Thresholds:
 
 1
 
-| Sub-command | Action | 
-| --- | --- | 
-| `sigma-oom reg <name> <pid> <mem_kb> <score> <prot>` | Register a mission in the OOM score table | 
-| `sigma-oom sweep <free_kb>` | Trigger an auto-cull sweep at a simulated free memory level | 
-| `sigma-oom audit` | Display full OOM table with scores, memory usage, and protection state | 
+| Sub-command | Action |
+| --- | --- |
+| `sigma-oom reg <name> <pid> <mem_kb> <score> <prot>` | Register a mission in the OOM score table |
+| `sigma-oom sweep <free_kb>` | Trigger an auto-cull sweep at a simulated free memory level |
+| `sigma-oom audit` | Display full OOM table with scores, memory usage, and protection state |
 
 ---
 

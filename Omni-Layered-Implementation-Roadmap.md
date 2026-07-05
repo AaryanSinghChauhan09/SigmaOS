@@ -1,7 +1,7 @@
 # Omni-Layered Implementation Roadmap & Multi-Domain Framework
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Definitive Sovereign Ecosystem Implementation Manifest  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Definitive Sovereign Ecosystem Implementation Manifest
 > **Execution Scope:** Bare-Metal Microkernel (Ring-0) to Sandboxed Userland (Ring-3)
 
 ---
@@ -29,16 +29,19 @@ The **SigmaOS Zenith Sovereign Omni-Matrix** operates on a highly decoupled, mul
 
 ### Core Principles & Architecture
 
-* **Modular Microkernel Design:** Decoupled kernel architecture confining core OS services (VFS, IPC, scheduling) to failure-isolated userland servers while preserving bare-metal Ring-0 execution for hardware interrupt dispatching. Inspired by Linux kernel robustness and Windows OS internals.
-* **Process Scheduling & Concurrency:** Preemptive, multi-core scheduling engine supporting priority inheritance, dynamic quantum allocation, and real-time thread pinning.
-* **Memory Management:** 4-level x86_64 hierarchical paging combined with a buddy-system physical frame allocator and slab caches for kernel object pooling.
+- **Modular Microkernel Design:** Decoupled kernel architecture confining core OS services (VFS, IPC, scheduling) to failure-isolated userland servers while preserving bare-metal Ring-0 execution for hardware interrupt dispatching. Inspired by Linux kernel robustness and Windows OS internals.
+
+- **Process Scheduling & Concurrency:** Preemptive, multi-core scheduling engine supporting priority inheritance, dynamic quantum allocation, and real-time thread pinning.
+
+- **Memory Management:** 4-level x86_64 hierarchical paging combined with a buddy-system physical frame allocator and slab caches for kernel object pooling.
 
 **Unique Selling Point (USP):** Bare-metal hardware sovereignty providing direct, zero-overhead hardware control optimized specifically for high-throughput AI workloads and tensor operations.
 
 ### Algorithms & Mathematical Primitives
 
-* **Round-Robin Scheduling:** Preemptive circular queue dispatching with a fixed time quantum ($Q = 10ms$), guaranteeing bounded CPU starvation.
-* **Banker's Algorithm (Deadlock Detection):** Evaluates resource allocation requests against available kernel matrices to verify safe execution states before granting peripheral locks:
+- **Round-Robin Scheduling:** Preemptive circular queue dispatching with a fixed time quantum ($Q = 10ms$), guaranteeing bounded CPU starvation.
+
+- **Banker's Algorithm (Deadlock Detection):** Evaluates resource allocation requests against available kernel matrices to verify safe execution states before granting peripheral locks:
 
   $$\text{Need}[i, j] = \text{Max}[i, j] - \text{Allocation}[i, j]$$
 
@@ -58,10 +61,11 @@ public:
 
 ### Debugging & Fix Strategies
 
-* **Issue - Kernel Race Conditions:** Concurrent threads corrupt shared kernel data structures across asynchronous CPU cores.
-  * *Fix Strategy:* Enforce strict mutual exclusion utilizing `SovereignMutex` spinlocks (`sigma_spin_lock_irqsave`) and atomic memory barriers (`std::atomic_thread_fence`).
-* **Issue - Kernel Memory Leaks:** Unreleased slab allocations exhaust physical RAM over extended system uptimes.
-  * *Fix Strategy:* Implement automated kernel garbage collection tracking (`SovereignAllocator::scrub()`) and enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`).
+- **Issue - Kernel Race Conditions:** Concurrent threads corrupt shared kernel data structures across asynchronous CPU cores.
+- *Fix Strategy:* Enforce strict mutual exclusion utilizing `SovereignMutex` spinlocks (`sigma_spin_lock_irqsave`) and atomic memory barriers (`std::atomic_thread_fence`).
+
+- **Issue - Kernel Memory Leaks:** Unreleased slab allocations exhaust physical RAM over extended system uptimes.
+- *Fix Strategy:* Implement automated kernel garbage collection tracking (`SovereignAllocator::scrub()`) and enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`).
 
 ---
 
@@ -69,20 +73,25 @@ public:
 
 ### Core Concepts & Schema Design
 
-* **Normalization:** Systematic decomposition of relational tables into strict normal forms (1NF through BCNF) to eliminate data redundancy and insertion/deletion anomalies.
-* **OLAP Cubes:** Multi-dimensional hypercubes enabling rapid analytical aggregations across disparate business dimensions (Time, Geography, Process Lineage).
-* **Star vs. Snowflake Schema:**
-  * **Star Schema:** Centralized fact table connected directly to denormalized dimension tables; highly optimized for rapid read aggregations and simplicity.
-  * **Snowflake Schema:** Centralized fact table connected to fully normalized, branching dimension tables; minimizes storage footprint and enforces strict normalization.
+- **Normalization:** Systematic decomposition of relational tables into strict normal forms (1NF through BCNF) to eliminate data redundancy and insertion/deletion anomalies.
+
+- **OLAP Cubes:** Multi-dimensional hypercubes enabling rapid analytical aggregations across disparate business dimensions (Time, Geography, Process Lineage).
+
+- **Star vs. Snowflake Schema:**
+- **Star Schema:** Centralized fact table connected directly to denormalized dimension tables; highly optimized for rapid read aggregations and simplicity.
+- **Snowflake Schema:** Centralized fact table connected to fully normalized, branching dimension tables; minimizes storage footprint and enforces strict normalization.
 
 **Unique Selling Point (USP):** Efficient structured storage, horizontal sharding, and lightning-fast analytical retrieval designed specifically for enterprise data warehousing.
 
 ### Algorithms & Tooling Parity
 
-* **Query Optimization:** Cost-based query optimizer generating optimal execution plans based on B+ Tree index selectivity.
-* **Join Algorithms:** Supports both Nested Loop Joins ($O(M \cdot N)$) for small transactions and Hash Joins ($O(M + N)$) for massive analytical aggregations.
-* **B+ Tree Indexing:** Balanced multi-way search trees providing $O(\log N)$ search, insertion, and deletion complexity.
-* **Enterprise Tooling Compatibility:** Provides drop-in query bridging parity with **PostgreSQL, MySQL, SQL Server, Oracle, Snowflake, and Amazon Redshift**.
+- **Query Optimization:** Cost-based query optimizer generating optimal execution plans based on B+ Tree index selectivity.
+
+- **Join Algorithms:** Supports both Nested Loop Joins ($O(M \cdot N)$) for small transactions and Hash Joins ($O(M + N)$) for massive analytical aggregations.
+
+- **B+ Tree Indexing:** Balanced multi-way search trees providing $O(\log N)$ search, insertion, and deletion complexity.
+
+- **Enterprise Tooling Compatibility:** Provides drop-in query bridging parity with **PostgreSQL, MySQL, SQL Server, Oracle, Snowflake, and Amazon Redshift**.
 
 ```sql
 -- Star Schema Fact and Dimension Table Creation
@@ -100,8 +109,8 @@ CREATE INDEX idx_fact_time ON fact_system_metrics(time_id);
 
 ### Debugging & Fix Strategies
 
-* **Issue - Slow Analytical Queries & Index Misconfiguration:** Unindexed foreign keys trigger sequential table scans ($O(N)$), stalling OLAP reports.
-  * *Fix Strategy:* Execute `EXPLAIN QUERY PLAN` to inspect the query execution tree, identify unindexed nested loops, create composite covering B+ Tree indices, implement Redis caching layers, or denormalize highly queried dimension tables for direct read speed.
+- **Issue - Slow Analytical Queries & Index Misconfiguration:** Unindexed foreign keys trigger sequential table scans ($O(N)$), stalling OLAP reports.
+- *Fix Strategy:* Execute `EXPLAIN QUERY PLAN` to inspect the query execution tree, identify unindexed nested loops, create composite covering B+ Tree indices, implement Redis caching layers, or denormalize highly queried dimension tables for direct read speed.
 
 ---
 
@@ -109,10 +118,13 @@ CREATE INDEX idx_fact_time ON fact_system_metrics(time_id);
 
 ### End-to-End Pipeline Stages & Tooling
 
-* **Data Mining & Statistics:** Extracting frequent itemsets, hidden behavioral patterns, and statistical significance from raw transactional logs using the **Apriori Algorithm** (association rules), **K-Means Clustering** (unsupervised grouping), and rigorous Hypothesis Testing (ANOVA, Chi-Square). Tooling bridging includes **R, Python (NumPy, Pandas), RapidMiner, and Weka**.
-* **Data Preprocessing:** Sanitizing noisy data shards by imputing missing values (mean/median/k-NN imputation), normalizing/standardizing features (Z-score scaling), and executing **Principal Component Analysis (PCA)** for dimensionality reduction.
-* **Statistical Modelling:** Fitting robust predictive models across continuous regression targets, discrete classification boundaries, and deep neural representations.
-* **Data Visualization:** Rendering interactive visual analytics and executive dashboards via **Tableau, Power BI, Matplotlib, and Seaborn** bridging layers.
+- **Data Mining & Statistics:** Extracting frequent itemsets, hidden behavioral patterns, and statistical significance from raw transactional logs using the **Apriori Algorithm** (association rules), **K-Means Clustering** (unsupervised grouping), and rigorous Hypothesis Testing (ANOVA, Chi-Square). Tooling bridging includes **R, Python (NumPy, Pandas), RapidMiner, and Weka**.
+
+- **Data Preprocessing:** Sanitizing noisy data shards by imputing missing values (mean/median/k-NN imputation), normalizing/standardizing features (Z-score scaling), and executing **Principal Component Analysis (PCA)** for dimensionality reduction.
+
+- **Statistical Modelling:** Fitting robust predictive models across continuous regression targets, discrete classification boundaries, and deep neural representations.
+
+- **Data Visualization:** Rendering interactive visual analytics and executive dashboards via **Tableau, Power BI, Matplotlib, and Seaborn** bridging layers.
 
 **Unique Selling Point (USP):** End-to-end data lifecycle management turning raw industrial telemetry into actionable, publication-quality executive insights.
 
@@ -148,18 +160,20 @@ sv.scatter(data=df, x='cpu_pct', y='mem_mb', hue='anomaly', title='Anomaly Scatt
 
 ### Statistical Formulas & Diagnostics
 
-* **Confidence Interval Formula:** Calculating the bounded statistical range containing the true population mean with a specified confidence level E.g., 95%:
+- **Confidence Interval Formula:** Calculating the bounded statistical range containing the true population mean with a specified confidence level E.g., 95%:
 
   $$CI = \bar{x} \pm Z \cdot \frac{\sigma}{\sqrt{n}}$$
 
 ### Debugging & Fix Strategies
 
-* **Issue - Model Overfitting:** High training accuracy accompanied by severe validation loss due to capturing background noise.
-  * *Fix Strategy:* Enforce $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, inject Dropout layers (`nn.Dropout`), and prune decision tree max depths.
-* **Issue - Imbalanced Classification Data:** Extreme class imbalance E.g., 99% normal logs vs 1% anomalies distorts model decision boundaries.
-  * *Fix Strategy:* Apply **SMOTE (Synthetic Minority Over-sampling Technique)** to synthetically generate minority class instances along k-NN line segments.
-* **Issue - Misinterpretation of p-values:** Relying exclusively on arbitrary p-value thresholds ($p < 0.05$) leads to false positive conclusions in large industrial sample sizes.
-  * *Fix Strategy:* Emphasize **Effect Sizes** (Cohen's $d$, Hedge's $g$) alongside p-values to quantify the actual magnitude of observed statistical phenomena.
+- **Issue - Model Overfitting:** High training accuracy accompanied by severe validation loss due to capturing background noise.
+- *Fix Strategy:* Enforce $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, inject Dropout layers (`nn.Dropout`), and prune decision tree max depths.
+
+- **Issue - Imbalanced Classification Data:** Extreme class imbalance E.g., 99% normal logs vs 1% anomalies distorts model decision boundaries.
+- *Fix Strategy:* Apply **SMOTE (Synthetic Minority Over-sampling Technique)** to synthetically generate minority class instances along k-NN line segments.
+
+- **Issue - Misinterpretation of p-values:** Relying exclusively on arbitrary p-value thresholds ($p < 0.05$) leads to false positive conclusions in large industrial sample sizes.
+- *Fix Strategy:* Emphasize **Effect Sizes** (Cohen's $d$, Hedge's $g$) alongside p-values to quantify the actual magnitude of observed statistical phenomena.
 
 ---
 
@@ -167,13 +181,15 @@ sv.scatter(data=df, x='cpu_pct', y='mem_mb', hue='anomaly', title='Anomaly Scatt
 
 ### Core Algorithms & Mathematical Primitives
 
-* **Gradient Descent:** First-order iterative optimization algorithm minimizing objective loss functions via parameter updates:
+- **Gradient Descent:** First-order iterative optimization algorithm minimizing objective loss functions via parameter updates:
 
   $$\theta_{new} = \theta_{old} - \alpha \cdot \nabla J(\theta)$$
 
-* **Backpropagation:** Computing neural network weight gradients via the chain rule of calculus from the output layer backwards.
-* **Reinforcement & Transfer Learning:** Model-free temporal difference Q-learning combined with deep Transfer Learning architectures adapting pre-trained foundational weights to specialized sovereign tasks.
-* **Logistic Regression Formula:** Binary classifier predicting probabilities using the Sigmoid activation function:
+- **Backpropagation:** Computing neural network weight gradients via the chain rule of calculus from the output layer backwards.
+
+- **Reinforcement & Transfer Learning:** Model-free temporal difference Q-learning combined with deep Transfer Learning architectures adapting pre-trained foundational weights to specialized sovereign tasks.
+
+- **Logistic Regression Formula:** Binary classifier predicting probabilities using the Sigmoid activation function:
 
   $$P(y=1 \mid x) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 x)}}$$
 
@@ -181,7 +197,7 @@ sv.scatter(data=df, x='cpu_pct', y='mem_mb', hue='anomaly', title='Anomaly Scatt
 
 ### Tooling Parity & Diagnostics
 
-* **Framework Compatibility:** Maintains drop-in execution parity with **TensorFlow, PyTorch, Scikit-Learn, and Keras**.
+- **Framework Compatibility:** Maintains drop-in execution parity with **TensorFlow, PyTorch, Scikit-Learn, and Keras**.
 
 ```python
 import torch
@@ -193,9 +209,12 @@ class SovereignNeuralNet(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(input_dim, 128),
             nn.ReLU(),                  # Fixes vanishing gradients
+
             nn.Dropout(0.2),            # Fixes overfitting
+
             nn.Linear(128, 1),
             nn.Sigmoid()                # Logistic regression output
+
         )
     def forward(self, x):
         return self.net(x)
@@ -203,10 +222,11 @@ class SovereignNeuralNet(nn.Module):
 
 ### Debugging & Fix Strategies
 
-* **Issue - Vanishing Gradients:** Gradients shrink exponentially during backpropagation in deep architectures, stalling early layer learning.
-  * *Fix Strategy:* Replace Sigmoid/Tanh activations with non-saturating **ReLU (Rectified Linear Unit)** activations ($f(x) = \max(0, x)$).
-* **Issue - Exploding Gradients:** Gradients accumulate into massive unstable numbers during backpropagation, causing numerical overflow (`NaN`).
-  * *Fix Strategy:* Implement explicit **Gradient Clipping** (`torch.nn.utils.clip_grad_norm_`) to cap gradient vectors at a maximum threshold.
+- **Issue - Vanishing Gradients:** Gradients shrink exponentially during backpropagation in deep architectures, stalling early layer learning.
+- *Fix Strategy:* Replace Sigmoid/Tanh activations with non-saturating **ReLU (Rectified Linear Unit)** activations ($f(x) = \max(0, x)$).
+
+- **Issue - Exploding Gradients:** Gradients accumulate into massive unstable numbers during backpropagation, causing numerical overflow (`NaN`).
+- *Fix Strategy:* Implement explicit **Gradient Clipping** (`torch.nn.utils.clip_grad_norm_`) to cap gradient vectors at a maximum threshold.
 
 ---
 
@@ -214,14 +234,15 @@ class SovereignNeuralNet(nn.Module):
 
 ### Core Concepts, Tooling & Algorithms
 
-* **Discrete Mathematics:** Tooling compatibility bridging **MATLAB, Wolfram Mathematica, and SageMath**.
-  * **Graph Theory:** Modeling pairwise relations using vertices and edges E.g., shortest path routing, graph coloring for register allocation.
-  * **Combinatorics:** Permutations and combinations analyzing execution path permutations and cryptographic key spaces.
-  * **Mathematical Logic & Set Theory:** Propositional/predicate logic powering automated theorem proving and RBAC security policy evaluation.
-* **Foundational Algorithms:**
-  * **Sorting:** In-place **QuickSort** utilizing median-of-three pivot selection ($O(N \log N)$ average).
-  * **Searching:** **Binary Search** across sorted continuous arrays ($O(\log N)$).
-  * **Graph Traversal:** **Breadth-First Search (BFS)** and **Depth-First Search (DFS)** for AST parsing and VFS directory indexing.
+- **Discrete Mathematics:** Tooling compatibility bridging **MATLAB, Wolfram Mathematica, and SageMath**.
+- **Graph Theory:** Modeling pairwise relations using vertices and edges E.g., shortest path routing, graph coloring for register allocation.
+- **Combinatorics:** Permutations and combinations analyzing execution path permutations and cryptographic key spaces.
+- **Mathematical Logic & Set Theory:** Propositional/predicate logic powering automated theorem proving and RBAC security policy evaluation.
+
+- **Foundational Algorithms:**
+- **Sorting:** In-place **QuickSort** utilizing median-of-three pivot selection ($O(N \log N)$ average).
+- **Searching:** **Binary Search** across sorted continuous arrays ($O(\log N)$).
+- **Graph Traversal:** **Breadth-First Search (BFS)** and **Depth-First Search (DFS)** for AST parsing and VFS directory indexing.
 
     $$\text{BFS Complexity} = O(V + E)$$
 
@@ -229,8 +250,8 @@ class SovereignNeuralNet(nn.Module):
 
 ### Debugging & Fix Strategies
 
-* **Issue - Algorithmic Inefficiency & Quadratic Scaling:** Using naive nested loops or bubble sort on large datasets yields crippling $O(N^2)$ execution complexity.
-  * *Fix Strategy:* Execute rigorous Big-O complexity analysis and refactor underlying data structures E.g., migrating from linear array scans to balanced B+ Trees or Hash Maps, reducing complexity from $O(N^2)$ to $O(N \log N)$ or $O(1)$.
+- **Issue - Algorithmic Inefficiency & Quadratic Scaling:** Using naive nested loops or bubble sort on large datasets yields crippling $O(N^2)$ execution complexity.
+- *Fix Strategy:* Execute rigorous Big-O complexity analysis and refactor underlying data structures E.g., migrating from linear array scans to balanced B+ Trees or Hash Maps, reducing complexity from $O(N^2)$ to $O(N \log N)$ or $O(1)$.
 
 ---
 
@@ -238,11 +259,15 @@ class SovereignNeuralNet(nn.Module):
 
 ### Core Principles & Tooling
 
-* **Encapsulation:** Bundling data attributes and member functions into unified class abstractions, shielding internal state via explicit access specifiers.
-* **Inheritance:** Establishing hierarchical relationships between base and derived classes for structural code reuse.
-* **Polymorphism:** Permitting distinct derived objects to be treated uniformly via base pointers, utilizing dynamic vtable dispatch for late binding.
-* **Abstraction:** Exposing simplified, high-level operational interfaces while hiding complex internal implementation mechanics.
-* **Tooling Parity:** Clean architectural bridging supporting **Java, C++, Python OOP, and C#** paradigms.
+- **Encapsulation:** Bundling data attributes and member functions into unified class abstractions, shielding internal state via explicit access specifiers.
+
+- **Inheritance:** Establishing hierarchical relationships between base and derived classes for structural code reuse.
+
+- **Polymorphism:** Permitting distinct derived objects to be treated uniformly via base pointers, utilizing dynamic vtable dispatch for late binding.
+
+- **Abstraction:** Exposing simplified, high-level operational interfaces while hiding complex internal implementation mechanics.
+
+- **Tooling Parity:** Clean architectural bridging supporting **Java, C++, Python OOP, and C#** paradigms.
 
 **Unique Selling Point (USP):** Highly modular, reusable, and maintainable codebase enforcing clean architectural boundaries across all kernel utility shards.
 
@@ -260,8 +285,8 @@ public:
 
 ### Debugging & Fix Strategies
 
-* **Issue - Flawed Inheritance Hierarchies & Tight Coupling:** Rigid, deeply nested inheritance trees suffer from fragile base class problems and vtable slicing.
-  * *Fix Strategy:* Rigorously apply **SOLID Principles** and refactor fragile base class inheritance hierarchies using pure abstract interface classes (`class IReadable { virtual int read() = 0; }`).
+- **Issue - Flawed Inheritance Hierarchies & Tight Coupling:** Rigid, deeply nested inheritance trees suffer from fragile base class problems and vtable slicing.
+- *Fix Strategy:* Rigorously apply **SOLID Principles** and refactor fragile base class inheritance hierarchies using pure abstract interface classes (`class IReadable { virtual int read() = 0; }`).
 
 ---
 
@@ -269,10 +294,13 @@ public:
 
 ### Core Concepts & Tooling
 
-* **Client-Server Architecture:** Distributed application structure partitioning workloads between requesting client browsers and centralized server nodes over HTTP/TCP.
-* **REST APIs & Microservices:** Representational State Transfer architectural style utilizing stateless HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) to manipulate microservice JSON/XML resource representations.
-* **MVC Architecture:** Design pattern decoupling web applications into `Model` (data state), `View` (UI presentation), and `Controller` (request routing).
-* **Enterprise Tooling Parity:** Native embedded bridging supporting **HTML5, CSS3, JavaScript, React, Node.js, Django, Flask, and Progressive Web Apps (PWAs)**.
+- **Client-Server Architecture:** Distributed application structure partitioning workloads between requesting client browsers and centralized server nodes over HTTP/TCP.
+
+- **REST APIs & Microservices:** Representational State Transfer architectural style utilizing stateless HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) to manipulate microservice JSON/XML resource representations.
+
+- **MVC Architecture:** Design pattern decoupling web applications into `Model` (data state), `View` (UI presentation), and `Controller` (request routing).
+
+- **Enterprise Tooling Parity:** Native embedded bridging supporting **HTML5, CSS3, JavaScript, React, Node.js, Django, Flask, and Progressive Web Apps (PWAs)**.
 
 **Unique Selling Point (USP):** Global accessibility, interactive user engagement, and horizontal scalability securely sandboxed within Ring-3 userland memory.
 
@@ -294,8 +322,8 @@ app.post('/sigma/api/telemetry', (req, res) => {
 
 ### Debugging & Fix Strategies
 
-* **Issue - Web Security Vulnerabilities (SQLi, XSS, CSRF):** Unsanitized user input compromises backend databases or executes malicious scripts within client browsers.
-  * *Fix Strategy:* Enforce strict server-side **Input Validation** (regex white-listing), utilize parameterized SQL queries (prepared statements) to eliminate SQL injection, implement Anti-CSRF cryptographic tokens, and sanitize all HTML rendering to prevent Cross-Site Scripting (XSS).
+- **Issue - Web Security Vulnerabilities (SQLi, XSS, CSRF):** Unsanitized user input compromises backend databases or executes malicious scripts within client browsers.
+- *Fix Strategy:* Enforce strict server-side **Input Validation** (regex white-listing), utilize parameterized SQL queries (prepared statements) to eliminate SQL injection, implement Anti-CSRF cryptographic tokens, and sanitize all HTML rendering to prevent Cross-Site Scripting (XSS).
 
 ---
 
@@ -303,20 +331,24 @@ app.post('/sigma/api/telemetry', (req, res) => {
 
 ### Core Tooling & Automation
 
-* **Version Control & Containerization:** Immutable version tracking via **GitHub** combined with reproducible cleanroom builds using **Docker** containers.
-* **Experimentation & CI/CD:** Rapid prototyping and exploratory modeling via **Jupyter Notebooks**, backed by automated Continuous Integration (CI) test runners.
-* **Structured Diagnostics:** Deep kernel profiling and structured JSON logging frameworks tracking system execution traces.
+- **Version Control & Containerization:** Immutable version tracking via **GitHub** combined with reproducible cleanroom builds using **Docker** containers.
+
+- **Experimentation & CI/CD:** Rapid prototyping and exploratory modeling via **Jupyter Notebooks**, backed by automated Continuous Integration (CI) test runners.
+
+- **Structured Diagnostics:** Deep kernel profiling and structured JSON logging frameworks tracking system execution traces.
 
 **Unique Selling Point (USP):** Faster iteration cycles, guaranteed reproducibility, and zero-regression deployment pipelines.
 
 ### Universal Remediation Protocols
 
-* **Issue - Silent Regressions & Logic Bugs:** Unnoticed code changes break existing operational contracts.
-  * *Fix Strategy:* Deploy exhaustive automated unit test suites (`pytest` / `SIGMA_ASSERT`) blocking PR merges on failure.
-* **Issue - System Bottlenecks & Lock Starvation:** Unidentified execution delays degrade overall throughput.
-  * *Fix Strategy:* Attach profiling tools (eDTrace / KASAN / Valgrind) to isolate lock contention and memory stalls.
-* **Issue - Ambiguous Runtime Crashes:** Unhandled exceptions terminate daemons without clear diagnostic trails.
-  * *Fix Strategy:* Implement structured logging (`sigma_klog` JSON format) capturing precise stack traces and registers upon panic.
+- **Issue - Silent Regressions & Logic Bugs:** Unnoticed code changes break existing operational contracts.
+- *Fix Strategy:* Deploy exhaustive automated unit test suites (`pytest` / `SIGMA_ASSERT`) blocking PR merges on failure.
+
+- **Issue - System Bottlenecks & Lock Starvation:** Unidentified execution delays degrade overall throughput.
+- *Fix Strategy:* Attach profiling tools (eDTrace / KASAN / Valgrind) to isolate lock contention and memory stalls.
+
+- **Issue - Ambiguous Runtime Crashes:** Unhandled exceptions terminate daemons without clear diagnostic trails.
+- *Fix Strategy:* Implement structured logging (`sigma_klog` JSON format) capturing precise stack traces and registers upon panic.
 
 ---
 
@@ -348,9 +380,11 @@ app.post('/sigma/api/telemetry', (req, res) => {
 In short, treat the entire SigmaOS ecosystem as a unified, multi-layered computational stack:
 
 1. **Foundation Layer (`SigmaOS Core + CS + OOP`):** The bare-metal microkernel providing silicon sovereignty, modular C++17 OOP architectures, and foundational algorithmic correctness.
+
 2. **Middle Layer (`DBMS + Warehousing + Pipelines`):** The data management backbone providing ACID transactions, B+ Tree indexing, Star/Snowflake analytical schemas, and automated CIRT preprocessing pipelines.
+
 3. **Top Layer (`AI / ML + Statistics + Web Apps`):** The user-facing intelligence layer delivering bare-metal neural predictions, rigorous statistical confidence intervals, and globally accessible React/Node.js visual dashboards.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

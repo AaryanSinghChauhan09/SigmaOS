@@ -9,13 +9,17 @@ The boot sequence is structured in 5 key phases:
 
 1. **Core Kernel Bootstrap**: Sets up process tables, memory pagers, and the
    Round-Robin / EDF Scheduler.
-2. **HAL & Vitals**: Detects bare-metal hardware (PCIe, USB, ACPI) and spins up
+
+1. **HAL & Vitals**: Detects bare-metal hardware (PCIe, USB, ACPI) and spins up
    telemetry metrics.
-3. **VFS & Storage Mounting**: Mounts the Virtual File System (VFS) and loads the
+
+1. **VFS & Storage Mounting**: Mounts the Virtual File System (VFS) and loads the
    `ext4` / `SovereignFS` filesystem drivers.
-4. **Network Stack**: Spins up the network interface loopback and prepares
+
+1. **Network Stack**: Spins up the network interface loopback and prepares
    standard socket connections.
-5. **Userland Handoff**: Spawns the CLI shell (`/usr/bin/sh`) to transition
+
+1. **Userland Handoff**: Spawns the CLI shell (`/usr/bin/sh`) to transition
    execution to user space.
 
 ## Services Lifecycle
@@ -59,9 +63,15 @@ SIGMA_SERVICE_REGISTER(my_service, .start = my_start, .stop = my_stop);
 ## Roadmap
 
 - [x] Basic 5-phase boot sequence
+
 - [x] Service registry table (compile-time)
+
 - [ ] Dynamic service dependencies (DAG-based ordering)
+
 - [ ] Parallel service startup (topological sort)
+
 - [ ] Service restart policies (always / on-failure / never)
+
 - [ ] Watchdog integration (`modules/core/kernel/watchdog.rs`)
+
 - [ ] Journal-based service logs (`modules/tools/diag/logger.rs`)

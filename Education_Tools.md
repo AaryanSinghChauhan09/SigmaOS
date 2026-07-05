@@ -21,6 +21,9 @@ Education is a primary target market for SigmaOS. We will integrate and absorb f
    - **SigmaOS Implementation:** Provide optimized SigmaOS server modules (`sigma_koha.rs`, `sigma_moodle.rs`) capable of deploying these systems with a single command for educational institutions.
 
 ## Implementation Phases
+
 - **Phase 1:** Core SciComp algorithms (Simpson's Rule, Matrix Math).
+
 - **Phase 2:** Native Math visualization GUI.
+
 - **Phase 3:** Automated LMS Server deployments.

@@ -70,26 +70,41 @@ Every shard is granted a minimal capability set at spawn time:
 ## Roadmap
 
 - [x] IRQ handler table (`interrupts.rs`)
+
 - [x] Zero-copy IPC (`ipc.rs`)
+
 - [x] Syscall dispatcher (`syscalls.rs`)
+
 - [x] Watchdog timer (`watchdog.rs`)
+
 - [x] Self-healing shard restart (`self_heal.rs`)
+
 - [x] AI resource allocation hints (`res_alloc_ai.rs`)
+
 - [ ] Full NUMA-aware memory allocator
+
 - [ ] Formal Kani proofs for IPC non-interference
+
 - [ ] Live kernel patching (hot-patch without reboot)
+
 - [ ] Microkernel split: move drivers fully out of Ring 0
 
 ## Sub-Directories
 
 - [`memory/`](memory/) — Paging, slab allocator, NUMA topology
+
 - [`scheduling/`](scheduling/) — Round-Robin, EDF, real-time lanes
+
 - [`security/`](security/) — Capability enforcement hooks
+
 - [`syscalls/`](syscalls/) — Per-syscall implementation shards
+
 - [`hypervisor/`](hypervisor/) — Type-1 hypervisor (VT-x / AMD-V)
 
 ## Related Modules
 
 - [`modules/core/drivers`](../drivers/README.md) — Hardware drivers
+
 - [`modules/core/net`](../net/README.md) — Network stack
+
 - [`modules/tools/diag`](../../tools/diag/README.md) — Kernel diagnostics

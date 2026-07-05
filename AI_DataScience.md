@@ -21,6 +21,9 @@ SigmaOS is an AI-native operating system. We are embedding machine learning fram
    - **SigmaOS Implementation:** `sigma_jupyter.rs` will provide an embedded, lightweight notebook interface for educational and professional data analysis.
 
 ## Implementation Phases
+
 - **Phase 1:** Zero-allocation Scikit-learn algorithms (Completed).
+
 - **Phase 2:** Local LLM Shell Integration (Natural Language CLI).
+
 - **Phase 3:** Hardware NPU/GPU tensor acceleration bindings.

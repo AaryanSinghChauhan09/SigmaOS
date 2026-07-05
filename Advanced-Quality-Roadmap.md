@@ -1,5 +1,7 @@
 # SigmaOS — Advanced Quality Roadmap
+
 ## Security Hardening · Networking Sovereignty · Enterprise · AI/ML Quality
+
 ## Internationalisation · Education Stack · Community & Ecosystem
 
 Continues from [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap),
@@ -139,11 +141,17 @@ Completeness progress:
 ### NS3 — Network Quality & Testing
 
 ```bash
+
 # Network quality benchmarks (CI):
+
 sigma-net bench throughput --iface eth0      # iperf3 equivalent
+
 sigma-net bench latency --host 8.8.8.8       # RTT histogram
+
 sigma-net bench dns --resolver 1.1.1.1       # DNS query latency
+
 sigma-net bench tls --url https://abdm.gov.in # TLS handshake time
+
 ```
 
 | Task | File | Branch | Target |
@@ -155,7 +163,6 @@ sigma-net bench tls --url https://abdm.gov.in # TLS handshake time
 | IPv6 SLAAC CI | `tests/net/test_ipv6.sh` | `drivers-dev` | RA received, address configured < 5 s |
 | Wi-Fi reconnect CI | `tests/net/test_wifi_roam.sh` | `drivers-dev` | Re-associate + DHCP < 10 s |
 | BharatNet latency | `tests/net/bench_bharatnet.sh` | `release/mobile` | < 100 ms RTT on rural 4G fallback |
-
 
 ---
 
@@ -179,18 +186,31 @@ sigma-net bench tls --url https://abdm.gov.in # TLS handshake time
 **Target:** Manage 10,000+ SigmaOS devices from a single console.
 
 ```bash
+
 # Fleet management commands:
+
 sigma-fleet register <server> <token>    # enroll device
+
 sigma-fleet status                       # heartbeat + health
+
 sigma-fleet policy get                   # fetch + apply .sigma-policy
+
 sigma-fleet update pull                  # download OS update
+
 sigma-fleet update apply                 # apply A/B update
+
 sigma-fleet inventory                    # hardware fingerprint
+
 sigma-fleet audit push                   # send audit log to server
+
 sigma-fleet lock [--wipe]                # remote lock / wipe
+
 sigma-fleet app deploy sigma-ca --all    # deploy profession app to fleet
+
 sigma-fleet config set <key> <val>       # push Config.sigma key
+
 sigma-fleet report compliance            # STQC / MeitY compliance report
+
 ```
 
 | Task | File | Branch | Detail |
@@ -206,11 +226,17 @@ sigma-fleet report compliance            # STQC / MeitY compliance report
 
 ```bash
 sigma-siem status                 # SIEM pipeline health
+
 sigma-siem rules list             # detection rules
+
 sigma-siem rules add <sigma_rule> # add Sigma detection rule
+
 sigma-siem alerts list            # recent alerts
+
 sigma-siem export <file>          # export in Splunk/ELK/CEF format
+
 sigma-siem report cert-in         # CERT-In 6-hour disclosure format
+
 ```
 
 | Task | File | Branch | Detail |
@@ -310,13 +336,21 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 ### I18N3 — Date, Time & Legal Calendar
 
 ```bash
+
 # India-specific temporal features:
+
 sigma-cal show                     # Indian national calendar (Saka)
+
 sigma-cal holidays 2026            # all central + state public holidays
+
 sigma-cal gst-due 2026-07          # GST filing deadlines for July 2026
+
 sigma-cal court-vacation --state MH  # Maharashtra court vacation calendar
+
 sigma-cal itr-due 2025-26          # ITR filing deadline for AY2025-26
+
 sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
+
 ```
 
 | Task | File | Branch | Detail |
@@ -388,14 +422,21 @@ sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
 ### CE2 — Developer Ecosystem
 
 ```bash
+
 # Developer quick-start (target: productive in 30 minutes):
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 ./scripts/setup.sh                  # install all deps
+
 make PROFILE=microkernel            # first build (~5 minutes)
+
 make test                           # unit tests pass
+
 sigma-drv list                      # see loaded drivers
+
 sigma-agri msp --crop wheat --year 2026  # test profession app
+
 ```
 
 | Task | File | Branch | Detail |

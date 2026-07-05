@@ -82,35 +82,45 @@ Any binary named `sigma-<name>` on `PATH` is auto-discovered:
 ```bash
 cp sigma-profiler /usr/local/bin/
 sigma profiler start   # delegates to sigma-profiler start
+
 ```
 
 ## EXAMPLES
 
 ```bash
+
 # Scaffold and build a driver
+
 sigma init my-nvme-driver
 sigma build --target aarch64 --release
 
 # Run in QEMU headless
+
 sigma run --headless --serial
 
 # Install a package
+
 sigma pkg add sigma-vr-studio
 
 # Check toolchain health
+
 sigma doctor --fix
 
 # Run benchmarks and save results
+
 sigma bench all --save
 
 # Set a build profile
+
 sigma profile set cloud
 sigma build --profile cloud
 
 # Generate completions
+
 sigma completions bash >> ~/.bashrc
 
 # JSON output for CI
+
 sigma doctor --json | jq '.[] | select(.status=="missing")'
 ```
 

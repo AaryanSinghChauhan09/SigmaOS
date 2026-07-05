@@ -75,13 +75,21 @@ Every profession app must meet these standards before shipping:
 ### IQ3 — India Stack Integration Tests
 
 ```bash
+
 # All run against government sandboxes (not production):
+
 ./tests/india/test_gstn_sandbox.sh       # GSTR compute + file
+
 ./tests/india/test_abdm_sandbox.sh       # ABHA create + FHIR push
+
 ./tests/india/test_upi_sandbox.sh        # UPI collect + confirm
+
 ./tests/india/test_digilocker_mock.sh    # Fetch/verify document
+
 ./tests/india/test_aadhaar_offline.sh    # Offline eKYC XML parse
+
 ./tests/india/test_navic_parse.sh        # NavIC NMEA sentence parse
+
 ```
 
 | Task | File | Branch | Detail |
@@ -126,13 +134,21 @@ Every profession app must meet these standards before shipping:
 ### TI3 — Continuous Benchmarking
 
 ```bash
+
 # Run on every merge to main — results stored in git notes:
+
 ./tests/perf/bench_boot.sh          # boot time
+
 ./tests/perf/bench_sched.cpp        # context switch latency
+
 ./tests/perf/bench_pqc.cpp          # Kyber/Dilithium ops/sec
+
 ./tests/perf/bench_net.sh           # network throughput
+
 ./tests/perf/bench_io.sh            # disk IOPS
+
 ./tests/perf/bench_sigma_ca.sh      # GST compute throughput
+
 ```
 
 | Task | File | Branch | Detail |
@@ -209,7 +225,8 @@ For each verified device, CI must pass:
 | sigma-pkg package manager | `userland/rust/sigma_pkg.rs` | `tools-dev` | Medium — supply chain |
 | sigma-cli | `userland/rust/sigma_cli.rs` | `tools-dev` | Low — minimal attack surface |
 
-**Milestones:**
+### Milestones:
+
 ```
 Month 36: sigma-net in Rust — no unsafe blocks except FFI boundary
 Month 42: sigma-fs in Rust
@@ -289,6 +306,7 @@ Month 60: 0 memory-safety CVEs for 12 months in Rust components
 The following quality issues must be added to the manifest and tracked:
 
 ```markdown
+
 ## Phase Q (Quality & Stability) — Open
 
 | ID | Area | Priority | File | Status |
@@ -315,7 +333,9 @@ The following quality issues must be added to the manifest and tracked:
 
 ```bash
 #!/usr/bin/env bash
+
 # SigmaOS quality gate script — run before any PR merge to main
+
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -324,6 +344,7 @@ echo "[sigma-quality] Running all quality gates..."
 FAIL=0
 
 # 1. Stub count
+
 STUBS=$(grep -r "return 0; // stub\|TODO\|FIXME\|return -1; // NYI" \
   "$ROOT/kernel" "$ROOT/net" "$ROOT/drivers" --include="*.cpp" --include="*.c" \
   2>/dev/null | wc -l)
@@ -331,6 +352,7 @@ echo "[sigma-quality] Open stubs: $STUBS"
 [ "$STUBS" -lt 200 ] || { echo "FAIL: too many stubs ($STUBS)"; FAIL=1; }
 
 # 2. SPDX headers
+
 MISSING=$(find "$ROOT/kernel" "$ROOT/userland" "$ROOT/crypto" \
   -name "*.cpp" -o -name "*.h" -o -name "*.c" 2>/dev/null | \
   xargs grep -rL "SPDX-License-Identifier" 2>/dev/null | wc -l)
@@ -338,6 +360,7 @@ echo "[sigma-quality] Files missing SPDX: $MISSING"
 [ "$MISSING" -eq 0 ] || { echo "WARN: $MISSING files missing SPDX"; }
 
 # 3. Hardcoded credentials
+
 if grep -rn 'password\s*=\s*"[^"]\{4,\}"\|secret\s*=\s*"[^"]\{4,\}"' \
   "$ROOT/kernel" "$ROOT/userland" --include="*.cpp" --include="*.h" \
   2>/dev/null | grep -v "test\|example\|stub"; then
@@ -345,11 +368,13 @@ if grep -rn 'password\s*=\s*"[^"]\{4,\}"\|secret\s*=\s*"[^"]\{4,\}"' \
 fi
 
 # 4. CURRENT_PROBLEMS open critical items
+
 CRITICAL=$(grep -c "🔴" "$ROOT/CURRENT_PROBLEMS_MANIFEST.md" 2>/dev/null || echo 0)
 echo "[sigma-quality] Open critical problems: $CRITICAL"
 [ "$CRITICAL" -le 5 ] || { echo "WARN: $CRITICAL critical problems open"; }
 
 # 5. Wiki sync check
+
 WIKI_BEHIND=$(git -C "$ROOT/wiki_repo" log --oneline HEAD..origin/main 2>/dev/null | wc -l)
 [ "$WIKI_BEHIND" -eq 0 ] || echo "WARN: wiki is $WIKI_BEHIND commits behind origin"
 

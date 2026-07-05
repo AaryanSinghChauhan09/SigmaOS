@@ -17,6 +17,9 @@ Creative professionals require stable, high-performance multimedia tools. SigmaO
    - **SigmaOS Implementation:** Ensure the Sovereign IPC system and audio drivers have sub-millisecond latency to prevent desyncing issues common in monolithic architectures.
 
 ## Implementation Phases
+
 - **Phase 1:** Graphics and Audio HAL optimization.
+
 - **Phase 2:** `sigpkg` containerization for multimedia apps.
+
 - **Phase 3:** Real-time priority scheduling for rendering tasks.

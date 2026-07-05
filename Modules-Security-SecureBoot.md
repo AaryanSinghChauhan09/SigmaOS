@@ -17,11 +17,15 @@ UEFI Firmware (OEM key)
 ## Verification Algorithm
 
 1. Load component into memory.
+
 2. Compute BLAKE3 hash of the raw bytes.
+
 3. Verify Ed25519 signature (from the Sovereign Root CA public key embedded
    in the bootloader).
-4. If verification fails → halt with error code and log to TPM event log.
-5. If verification passes → transfer execution.
+
+1. If verification fails → halt with error code and log to TPM event log.
+
+2. If verification passes → transfer execution.
 
 ## Rollback Protection
 
@@ -63,13 +67,19 @@ void init_security_secure_boot(void);
 ## Roadmap
 
 - [ ] Ed25519 signature verification (UEFI phase)
+
 - [ ] BLAKE3 hash chain (initramfs → kernel → rootfs)
+
 - [ ] TPM 2.0 PCR extension and measurement log
+
 - [ ] Rollback counter in TPM NV
+
 - [ ] Measured Boot report (for remote attestation)
+
 - [ ] Post-quantum upgrade path (Dilithium3 signatures)
 
 ## Related Modules
 
 - [`modules/security/access_control`](../access_control/README.md) — Runtime MAC
+
 - [`modules/security/isolation`](../isolation/README.md) — Process sandbox
