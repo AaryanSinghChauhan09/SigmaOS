@@ -68,8 +68,12 @@ pub struct SovereignNVMe {
     bar0: usize,
     asq: [NvmeCmd; ASQ_SIZE],
     acq: [NvmeCompletion; ACQ_SIZE],
+    iosq: [NvmeCmd; ASQ_SIZE],
+    iocq: [NvmeCompletion; ACQ_SIZE],
     asq_tail: u16,
     acq_head: u16,
+    iosq_tail: u16,
+    iocq_head: u16,
     initialized: bool,
 }
 
@@ -82,8 +86,15 @@ impl SovereignNVMe {
                 prp1: 0, prp2: 0, cdw10: 0, cdw11: 0, cdw12: 0, cdw13: 0, cdw14: 0, cdw15: 0
             }; ASQ_SIZE],
             acq: [NvmeCompletion { cdw0: 0, rsvd1: 0, sqhead: 0, sqid: 0, cid: 0, status: 0 }; ACQ_SIZE],
+            iosq: [NvmeCmd {
+                opcode: 0, flags: 0, cid: 0, nsid: 0, rsvd2: 0, mptr: 0,
+                prp1: 0, prp2: 0, cdw10: 0, cdw11: 0, cdw12: 0, cdw13: 0, cdw14: 0, cdw15: 0
+            }; ASQ_SIZE],
+            iocq: [NvmeCompletion { cdw0: 0, rsvd1: 0, sqhead: 0, sqid: 0, cid: 0, status: 0 }; ACQ_SIZE],
             asq_tail: 0,
             acq_head: 0,
+            iosq_tail: 0,
+            iocq_head: 0,
             initialized: false,
         }
     }
@@ -152,6 +163,41 @@ impl SovereignNVMe {
             self.write_reg32(doorbell_offset, self.asq_tail as u32);
         }
     }
+
+    /// Submit an I/O command (Read/Write)
+    pub fn submit_io_cmd(&mut self, cmd: NvmeCmd) {
+        if !self.initialized { return; }
+        let tail = self.iosq_tail as usize;
+        self.iosq[tail] = cmd;
+        self.iosq_tail = (self.iosq_tail + 1) % (ASQ_SIZE as u16);
+        
+        // Ring doorbell for I/O SQ (SQID 1)
+        // Offset: 0x1000 + (1 * 2 * DoorbellStride). Assuming stride=0, so 0x1000 + 8 = 0x1008
+        let doorbell_offset = 0x1008; 
+        unsafe {
+            self.write_reg32(doorbell_offset, self.iosq_tail as u32);
+        }
+    }
+
+    /// Poll for I/O completion. In a real implementation this would check the phase bit.
+    pub fn poll_io_completion(&mut self) -> bool {
+        if !self.initialized { return false; }
+        let head = self.iocq_head as usize;
+        let comp = &self.iocq[head];
+        
+        // Simulated phase bit check (status != 0 means completed for this stub)
+        if comp.status != 0 {
+            self.iocq_head = (self.iocq_head + 1) % (ACQ_SIZE as u16);
+            // Ring doorbell for I/O CQ (CQID 1)
+            // Offset: 0x1000 + (1 * 2 * DoorbellStride + DoorbellStride) = 0x1000 + 8 + 4 = 0x100C
+            let doorbell_offset = 0x100C;
+            unsafe {
+                self.write_reg32(doorbell_offset, self.iocq_head as u32);
+            }
+            return true; // Completed
+        }
+        false // Not completed yet
+    }
 }
 
 static mut G_NVME: SovereignNVMe = SovereignNVMe::new();
@@ -171,4 +217,25 @@ pub unsafe extern "C" fn sigma_nvme_identify() -> i32 {
     cmd.prp1 = 0x200000; // Static dummy physical address for identify buffer
     G_NVME.submit_admin_cmd(cmd);
     0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_nvme_read(lba: u64, block_count: u16, prp1: u64) -> i32 {
+    let mut cmd = NvmeCmd::default();
+    cmd.opcode = 0x02; // Read
+    cmd.nsid = 1;      // Namespace 1
+    cmd.prp1 = prp1;
+    cmd.cdw10 = (lba & 0xFFFFFFFF) as u32; // SLBA lower 32
+    cmd.cdw11 = (lba >> 32) as u32;        // SLBA upper 32
+    cmd.cdw12 = (block_count as u32) | (1 << 30); // block count + Force Unit Access
+    
+    G_NVME.submit_io_cmd(cmd);
+    
+    // Simulate polling for completion
+    let mut spins = 0;
+    while !G_NVME.poll_io_completion() && spins < 1000 {
+        spins += 1;
+    }
+    
+    if spins >= 1000 { -1 } else { 0 }
 }
