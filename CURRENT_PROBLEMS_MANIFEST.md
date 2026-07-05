@@ -108,6 +108,17 @@
 - **[#2009] sigma-port:** ✅ **Resolved** — `userland/port/sigma_port.rs` implements Customs & Logistics with ICEGATE, PCS1x, Bill of Lading, FASTag, EXIM Bank, RODTEP.
 - **[#2010] sigma-land:** ✅ **Resolved** — `userland/land/sigma_land.rs` implements Land Records & Survey with DILRMP, Mutation, Bhu-Naksha, LARR Act, SVAMITVA, Encumbrance.
 
+## Open — Phase J India-Specific Gaps
+
+- **[#3001] PM WANI:** ✅ **Resolved** — `userland/wani/sigma_wani.rs` implements PM WANI Public Wi-Fi with TRAI registry, UPI payments, PDO management.
+- **[#3002] DigiYatra:** ✅ **Resolved** — `userland/digiyatra/sigma_digiyatra.rs` implements Biometric Air/Rail Travel with face enrollment, booking, verification.
+- **[#3003] e-Shram:** ✅ **Resolved** — `userland/eshram/sigma_eshram.rs` implements Unorganised Worker Platform with profile, schemes, BoCW, gig compliance.
+- **[#3004] India Post Banking (IPPB):** ✅ **Resolved** — `userland/ippb/sigma_ippb.rs` implements IPPB with savings schemes, AePS, doorstep banking, bill payment.
+- **[#3005] IRCTC:** ✅ **Resolved** — `userland/irctc/sigma_irctc.rs` implements IRCTC Deep Integration with PNR, seat map, running status, Tatkal, UTS, accessibility.
+- **[#3006] COWIN / U-WIN:** ✅ **Resolved** — `userland/cowin/sigma_cowin.rs` implements Immunisation with records, school health, AEFI, pregnancy, child tracking.
+- **[#3007] sigma-census:** ✅ **Resolved** — `userland/census/sigma_census.rs` implements Population Survey Tool with household records, NPR, coverage dashboard.
+- **[#3008] Multilingual Error Messages:** ✅ **Resolved** — `kernel/core/sigma_error.rs` implements locale-aware errors in 22 Indian languages.
+
 ## Documentation / Community
 
 - **[#600] Wiki depth:** Phase F/G docs to be added to `wiki_repo/` — offline sync, perf governor.
