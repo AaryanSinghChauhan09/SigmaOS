@@ -144,27 +144,113 @@ Everything depends on `kernel-exp` shipping Phase 0:
 
 ## Recent Module Enhancements (July 2026)
 
-### Office Suite (sigma_office.rs)
+### Core Sovereignty Tools
+#### ZFS Filesystem (sigma_zfs.rs)
+- Advanced filesystem with snapshots, compression, deduplication
+- Pool management with VDev support and health monitoring
+- Dataset management with property configuration
+- Snapshot creation, cloning, and rollback functionality
+- Scrub operations for data integrity verification
+
+#### AppArmor/SELinux MAC (sigma_mac.rs)
+- Mandatory access control with profile-based security
+- File rules with permissions (read, write, execute, create, delete)
+- Network rules with protocol and port filtering
+- Capability management for Linux capabilities
+- Enforcement modes: enforce, complain, kill, unconfined
+- Security context management for processes
+
+#### ClamAV Antivirus (sigma_clamav.rs)
+- Virus signature scanning with multiple threat levels
+- Heuristic analysis for suspicious patterns
+- Quarantine management with restore/delete operations
+- Real-time protection and auto-quarantine options
+- Signature updates and exclusion rules
+- Scan reports with threat details
+
+#### Fail2Ban Intrusion Prevention (sigma_fail2ban.rs)
+- Log monitoring with regex pattern matching
+- IP banning with configurable ban duration
+- Jail management for different services (SSH, HTTP, FTP)
+- Whitelist and blacklist support
+- Automatic ban expiration clearing
+- Statistics and audit logging
+
+#### KeePassXC Password Manager (sigma_keepass.rs)
+- Secure credential storage with database encryption
+- Password generation with customizable options
+- Group organization for entries
+- Search functionality across entries
+- Import/export in JSON and CSV formats
+- Recycle bin for deleted entries
+
+### Networking
+#### NetworkManager (sigma_networkmanager.rs)
+- Unified network configuration for all devices
+- WiFi management with scanning and connection
+- Ethernet and device management
+- IP configuration (auto, manual, link-local)
+- Connection profiles with auto-connect
+- DNS server configuration
+
+#### dnsmasq/Unbound DNS (sigma_dnsmasq.rs)
+- DNS resolver with caching for performance
+- DHCP server with lease management
+- Local DNS record management (A, AAAA, MX, TXT, etc.)
+- Upstream DNS server configuration
+- Domain blocking for ad/tracker filtering
+- Domain forwarding to specific servers
+
+### Developer Tools
+#### Git Integration (sigma_git.rs)
+- Version control with repository management
+- Branch creation, checkout, and merging
+- Staging and committing changes
+- Remote repository management
+- Commit log viewing
+- Global configuration management
+
+#### Podman/Docker Containerization (sigma_podman.rs)
+- Container lifecycle management (create, start, stop, remove)
+- Image management with pull operations
+- Pod orchestration for grouped containers
+- Network management (bridge, host, none)
+- Volume mounting and port mapping
+- Environment variable configuration
+- Container statistics and logs
+
+### Package Management
+#### Flatpak/Sandbox (sigma_flatpak.rs)
+- Sandboxed application distribution
+- Runtime management for application dependencies
+- Remote repository management (Flathub)
+- Permission management (network, X11, Wayland, etc.)
+- Sandbox level configuration (full, host, shared)
+- Portal integration for file access, printing, screenshots
+- Application search and installation
+
+### Previous Enhancements
+#### Office Suite (sigma_office.rs)
 - Enhanced formula evaluation with support for +, -, *, /, ^ operators
 - Added SUM function for spreadsheet calculations
 - Implemented column sum/average calculations
 - Added document import/export functionality for file persistence
 
-### Core Utilities (sigma_coreutils.rs) v1.1
+#### Core Utilities (sigma_coreutils.rs) v1.1
 - Added recursive directory removal with `rm -r` flag
 - Added parent directory creation with `mkdir -p` flag
 - Added line numbering with `cat -n` flag
 - Added `pwd` command for printing working directory
 - Added `echo` command for text output
 
-### Text Editor (sigma_edit.rs)
+#### Text Editor (sigma_edit.rs)
 - Implemented undo/redo functionality with 50-state history
 - Added search/replace with result highlighting
 - Added goto line command for navigation
 - Added word count and character count statistics
 - Enhanced CLI with new commands: undo, redo, search, clear, replace, goto, stats, saveas
 
-### Service Manager (sigma_service.rs)
+#### Service Manager (sigma_service.rs)
 - Added restart count tracking for monitoring service stability
 - Added memory limit configuration per service (in MB)
 - Added CPU limit configuration per service (percentage)
