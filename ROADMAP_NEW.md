@@ -112,6 +112,47 @@ Reach parity on app ecosystem adoption and provide migration/installation custom
 5. Build sigpkg MVP + registry + web UI and sign the first 200 curated packages (sigma-pkg, sigma_pkg_registry, app_store.html)
 6. Create benchmark suite (boot time, boot-to-desktop, memory footprint, context-switch) and publish CI badges
 
+## Advanced Performance Targets & Capabilities
+
+### Boot Performance
+- **Cold boot to desktop**: <2s on NVMe, <3s on SATA SSD, <5s on HDD
+- **Resume from suspend**: <500ms to unlock screen
+- **Service startup**: <100ms for critical services (init, network, display)
+- **Boot optimization**: parallel init, lazy loading, predictive pre-fetch
+
+### Memory Efficiency
+- **Idle memory (desktop)**: <150 MB with Zenith running
+- **Idle memory (server)**: <64 MB headless
+- **Memory overhead per process**: <2 MB base overhead
+- **Zero-copy IPC**: Shared memory buffers for inter-process communication
+- **Memory compression**: zswap-style compression for swap
+
+### CPU Performance
+- **Context switch latency**: <500ns (vs Linux ~1-2µs)
+- **Scheduler latency**: <10µs for high-priority tasks
+- **Interrupt latency**: <5µs for real-time class interrupts
+- **Lock-free data structures**: Minimal kernel lock contention
+- **NUMA-aware scheduling**: Optimize for multi-socket systems
+
+### I/O Performance
+- **NVMe sequential**: >3 GB/s read, >2 GB/s write
+- **NVMe random 4K**: >500K IOPS read, >300K IOPS write
+- **Network throughput**: Line-rate 10GbE with <10µs latency
+- **Filesystem operations**: <10µs for metadata operations
+- **Async I/O**: Native async/await for all I/O operations
+
+### Security Performance
+- **Cryptographic operations**: AES-NI acceleration, post-quantum crypto optimization
+- **Secure boot**: <500ms verification time
+- **Capability checks**: <100ns per permission check
+- **Sandbox overhead**: <5% performance penalty for WASM apps
+
+### Scalability
+- **Multi-core scaling**: Near-linear scaling up to 64 cores
+- **Concurrent connections**: 100K+ network connections per server
+- **Process limit**: 1M+ processes (vs Linux ~32K default)
+- **File descriptor limit**: 10M+ open files
+
 ## Metrics to Beat Linux (Suggested KPIs)
 
 - **Boot time (cold) to desktop**: <2s for a "desktop profile" in QEMU on NVMe
@@ -120,6 +161,10 @@ Reach parity on app ecosystem adoption and provide migration/installation custom
 - **Package coverage**: 1,000 curated packages in sigpkg in year 1; migration scripts for common packages
 - **Security SLA**: triage <24h, fix/mitigation <72h for critical CVEs
 - **Driver parity**: support for top 20 NICs / top 10 GPUs for modesetting & basic acceleration
+- **Context switch latency**: <500ns (vs Linux ~1-2µs)
+- **Boot-to-shell**: <1s on NVMe, <2s on SSD
+- **Service startup time**: <100ms average for critical services
+- **Memory overhead**: <2 MB per process base overhead
 
 ## Repository Mapping
 
