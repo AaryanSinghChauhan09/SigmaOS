@@ -67,21 +67,27 @@
 - **[#521] Recovery GUI:** Resilient serial shell exists; Rescuezilla-style GUI recovery not implemented.
 - **[#522] Auto-tiling polish:** `sigma_tiling_wm.cpp` implemented; needs input/compositor integration tests.
 
-## Open — Phase G (Next Targets)
+## ✅ Resolved — Phase G (Kernel Completion)
+
+| ID | Area | Status | File |
+| ---- | ------ | -------- | ------ |
+| G-01 | Kernel Scheduler (MLFQ+CFS+EDF) | **Resolved** | `kernel/core/sigma_sched.rs` |
+| G-02 | Physical Memory Manager (Buddy+Slab) | **Resolved** | `kernel/core/sigma_mm.rs` |
+| G-03 | Virtual Memory Manager (Page Table Walker) | **Resolved** | `kernel/mm/page_table_walker.rs` |
+| G-04 | IRQ Controller (APIC+PIC+Timer) | **Resolved** | `kernel/core/sigma_irq.rs` |
+| G-05 | Syscall Dispatch (30+ syscalls) | **Resolved** | `kernel/core/sigma_syscall_dispatch.rs` |
+| G-06 | VESA/GOP Framebuffer Driver | **Resolved** | `drivers/display/sigma_vesa.zig` |
+| G-07 | UEFI Bootloader (sigma-boot.efi) | **Resolved** | `sigma-boot/sigma_boot.zig` |
+| G-08 | Bootable ISO Pipeline | **Resolved** | `Makefile` (iso target) |
+
+## Open — Phase G Secondary Items
 
 - **[#851-WLAN] Wi-Fi Stack:** IEEE 802.11ax (Wi-Fi 6) driver over xHCI transport.
 - **[#851-BT] Bluetooth 5.3 Stack:** HCI/L2CAP/RFCOMM over USB transport.
 - **[#1000] Developer SDK:** sigma-sdk CLI, debugger (sigma-gdb), profiler (sigma-perf trace).
 - **[#1001] App Sandbox:** Fine-grained capability system (sandboxctl) for third-party apps.
 - **[#1002] Multi-monitor KMS:** Extended desktop and clone mode across multiple KMS adapters.
-- **[#1003] Kernel scheduler implementation:** `kernel/core/sigma_sched.cpp` — MLFQ+MCS bodies — blocks real hardware boot.
-- **[#1004] Memory manager implementation:** `kernel/core/sigma_mm.cpp` — physical/virtual MM — blocks real hardware boot.
-- **[#1005] Syscall dispatch:** `kernel/core/sigma_syscall_dispatch.cpp` — 30 essential syscalls — blocks real hardware boot.
-- **[#1006] IRQ/interrupt controller:** `kernel/core/sigma_irq.cpp` — APIC/GIC — blocks real hardware boot.
-- **[#1007] UEFI bootloader binary:** `sigma-boot.efi` does not exist yet — cannot boot without GRUB.
-- **[#1008] Bootable ISO pipeline:** `make iso` does not produce a bootable image.
 - **[#1009] CryptFS real key derivation (Issue #44):** `derive_key()` still returns 32 zero bytes — all encryption is fake.
-- **[#1010] GPU/framebuffer driver:** Zenith compositor cannot run without DRM/KMS or VESA fallback.
 - **[#1011] Package repository server:** No `sigma-repo-server` — nowhere to host packages.
 - **[#1012] TCP/UDP socket layer:** Full RFC 793 state machine not yet complete.
 - **[#1013] ABDM FHIR API client:** sigma-health references ABDM — no actual API client.

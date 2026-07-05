@@ -19,7 +19,7 @@ bootloader:
 # Create bootable ISO
 iso: build bootloader
 	@echo "Creating bootable ISO..."
-	mkdir -p $(BOOT_DIR)
+	mkdir -p $(BOOT_DIR)/grub
 	mkdir -p $(EFI_DIR)
 	
 	# Copy kernel to boot directory
@@ -28,10 +28,24 @@ iso: build bootloader
 	# Copy UEFI bootloader
 	cp sigma-boot/BOOTX64.EFI $(EFI_DIR)/BOOTX64.EFI
 	
-	# Create ISO with xorriso
+	# Create GRUB config
+	@echo "Creating GRUB configuration..."
+	@echo "set timeout=5" > $(BOOT_DIR)/grub/grub.cfg
+	@echo "set default=0" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "menuentry \"SigmaOS v16.0 Apex (UEFI)\" {" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "    multiboot2 /boot/sigma-kernel.elf" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "    boot" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "}" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "menuentry \"SigmaOS v16.0 Apex (UEFI - Safe Mode)\" {" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "    multiboot2 /boot/sigma-kernel.elf safe_mode=1" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "    boot" >> $(BOOT_DIR)/grub/grub.cfg
+	@echo "}" >> $(BOOT_DIR)/grub/grub.cfg
+	
+	# Create ISO with xorriso (UEFI-only)
 	xorriso -as mkisofs \
-		-r -J -b boot/grub/grub.cfg \
-		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		-r -J \
 		-eltorito-alt-boot -e EFI/BOOT/BOOTX64.EFI -no-emul-boot \
 		-o sigmaos.iso $(ISO_DIR)
 
