@@ -332,10 +332,30 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 | Healthcare records (sigma-health) — not implemented | Indian professional research | 🟡 |
 | Engineering CAD (sigma-cad) — not implemented | Indian professional research | 🟡 |
 | Regional language integration (sigma-boss) — not implemented | Indian professional research | 🟡 |
+| System snapshot manager (sigma-snapshot) — not implemented | Distro absorption research | 🟡 |
+| Community package repository (sigma-aur) — not implemented | Distro absorption research | 🟡 |
+| System management suite (sigma-mint-tools) — not implemented | Distro absorption research | 🟡 |
+| Lightweight C library (sigma-musl) — not implemented | Distro absorption research | 🟡 |
+| Lightweight init system (sigma-runit) — not implemented | Distro absorption research | 🟡 |
+| Declarative configuration (sigma-declarative) — not implemented | Distro absorption research | 🟡 |
+| System configuration tool (sigma-yast2) — not implemented | Distro absorption research | 🟡 |
+| Mandatory access control (sigma-selinux) — not implemented | Distro absorption research | 🟡 |
+| Modern desktop environment (sigma-cosmic) — not implemented | Distro absorption research | 🟡 |
+| User-friendly desktop (sigma-pantheon) — not implemented | Distro absorption research | 🟡 |
+| Unified settings hub (sigma-budgie) — not implemented | Distro absorption research | 🟡 |
+| Fast package manager (sigma-xbps) — not implemented | Distro absorption research | 🟡 |
+| Source-based package manager (sigma-portage) — not implemented | Distro absorption research | 🟡 |
 
 ---
 
 ## Priority Queue — Recommended Next Rounds
+
+### Round 37 — Distro Absorption Round 1 (NEW)
+1. sigma-snapshot — System snapshot manager (openSUSE Snapper-inspired)
+2. sigma-aur — Community package repository (Arch AUR-inspired)
+3. sigma-mint-tools — System management suite (Linux Mint-inspired)
+4. sigma-musl — Lightweight C library (Alpine-inspired)
+5. sigma-runit — Lightweight init system (Void Linux-inspired)
 
 ### Round 36 — Categorized Components (NEW)
 1. sigpkg — Universal package manager (Core System)
