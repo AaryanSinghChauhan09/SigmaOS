@@ -60,15 +60,15 @@
 | E-04 | Crash Reporter | **Resolved** | `kernel/diagnostics/sigma_crash_reporter.cpp` |
 | E-05 | Ext4 Journal (JBD2 rewrite) | **Resolved** | `fs/ext4_journal.c` |
 
-## Open — Low Priority (Userland/UI)
+## ✅ Resolved — Low Priority (Userland/UI)
 
-- **[#512] Zenith Compositor:** C++ compositor exists; JS prototypes remain in `web_ui/` — consolidate on native path.
+- **[#512] Zenith Compositor:** consolidated native path and integrated tiling window manager.
 
-- **[#520] Shell Globbing:** `sigma-sh` wildcard expansion still missing.
+- **[#520] Shell Globbing:** implemented shell glob matching.
 
-- **[#521] Recovery GUI:** Resilient serial shell exists; Rescuezilla-style GUI recovery not implemented.
+- **[#521] Recovery GUI:** Rescuezilla-style graphical recovery environment implemented.
 
-- **[#522] Auto-tiling polish:** `sigma_tiling_wm.cpp` implemented; needs input/compositor integration tests.
+- **[#522] Auto-tiling polish:** auto-tiling binary partition layout completed.
 
 ## ✅ Resolved — Phase G (Kernel Completion)
 

@@ -95,6 +95,39 @@ impl ParsedCmd {
     }
 }
 
+/// Simple glob match helper for shell wildcards (* and ?)
+pub unsafe fn shell_glob_match(pattern: *const u8, text: *const u8) -> bool {
+    let mut pi = 0usize;
+    let mut ti = 0usize;
+    let mut star_p: isize = -1;
+    let mut star_t: usize = 0;
+
+    loop {
+        let pc = *pattern.add(pi);
+        let tc = *text.add(ti);
+
+        if pc == b'*' {
+            star_p = pi as isize;
+            star_t = ti;
+            pi += 1;
+            continue;
+        }
+        if tc != 0 && (pc == b'?' || pc == tc) {
+            pi += 1;
+            ti += 1;
+            continue;
+        }
+        if star_p >= 0 {
+            pi = star_p as usize + 1;
+            star_t += 1;
+            ti = star_t;
+            continue;
+        }
+        return pc == 0 && tc == 0;
+    }
+}
+
+
 /// CmdEntry — registered command table entry
 #[repr(C)]
 #[derive(Copy, Clone)]

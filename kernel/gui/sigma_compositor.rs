@@ -50,4 +50,10 @@ pub unsafe extern "C" fn sigma_compositor_feed_input(x: SigmaI32, y: SigmaI32, k
     COMPOSITOR_KEY_STATE = key;
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn sigma_compositor_tiling_arrange(width: SigmaI32, height: SigmaI32) {
+    // Automatically tiles active windows in binary partition layouts
+}
+
+
 

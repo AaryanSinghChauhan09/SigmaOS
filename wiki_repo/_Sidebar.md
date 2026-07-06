@@ -2,6 +2,12 @@
 
 - [Home](Home)
 
+- [Linux-Inspired Subsystems](Linux-Inspired-Subsystems)
+
+- [Coreutils Reference](Coreutils-Reference)
+
+- [Device Management](Device-Management)
+
 - [Getting Started](Getting-Started)
 
 - [Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/QUICKSTART.md)
