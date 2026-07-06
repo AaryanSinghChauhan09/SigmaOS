@@ -55,7 +55,7 @@
 | I-05 | Multi-monitor KMS (clone + extended) | H-05 base | ✅ Started - multi-monitor support done |
 | I-06 | SATA AHCI driver | PMM stable | ✅ Completed - full AHCI implementation |
 | I-07 | Virtio-GPU (GPU acceleration for VMs) | H-05 base | ✅ Started - basic driver done |
-| I-08 | Package repository server (`sigma-repo-server`) | net stack stable | sigma-pkg install needs a real server |
+| I-08 | Package repository server (`sigma-repo-server`) | net stack stable | ✅ Completed - full server implementation |
 | I-09 | Display server crash recovery | H-05 + IPC | ✅ Started - crash recovery done |
 | I-10 | Indian Language IME (Inscript + phonetic 22 langs) | H-05 + sound | ✅ Completed - full IME implementation |
 | I-11 | Dependency reduction (Electron → native Zenith) | Zenith compositor | Reduce binary size by ~200MB |
