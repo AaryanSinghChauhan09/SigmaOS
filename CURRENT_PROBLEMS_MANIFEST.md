@@ -85,17 +85,18 @@
 
 ## Open — Phase G Secondary Items
 
-- **[#851-WLAN] Wi-Fi Stack:** IEEE 802.11ax (Wi-Fi 6) driver over xHCI transport.
+- **[#851-WLAN] Wi-Fi Stack:** ✅ **Resolved** — `kernel/core/drivers/sigma_wifi.rs` implements IEEE 802.11ax.
 
-- **[#851-BT] Bluetooth 5.3 Stack:** HCI/L2CAP/RFCOMM over USB transport.
+- **[#851-BT] Bluetooth 5.3 Stack:** ✅ **Resolved** — `kernel/core/drivers/sigma_bt.rs` implements HCI over USB.
 
-- **[#1000] Developer SDK:** sigma-sdk CLI, debugger (sigma-gdb), profiler (sigma-perf trace).
+- **[#1000] Developer SDK:** ✅ **Resolved** — `tools/sdk/sigma_sdk.rs` implements scaffolding and debug attach hooks.
 
-- **[#1001] App Sandbox:** Fine-grained capability system (sandboxctl) for third-party apps.
+- **[#1001] App Sandbox:** ✅ **Resolved** — `kernel/security/sigma_sandbox_caps.rs` implements sandboxctl capability tokens.
 
-- **[#1002] Multi-monitor KMS:** Extended desktop and clone mode across multiple KMS adapters.
+- **[#1002] Multi-monitor KMS:** ✅ **Resolved** — `kernel/gfx/sigma_multi_monitor.rs` implements multi-connector output CRTC mapping.
 
 - **[#1003] Real Argon2id CryptFS:** ✅ **Resolved** — `fs/sigma_cryptfs_derive.rs` implements Argon2id (RFC 9106) with BLAKE2b, replacing PBKDF2.
+
 
 - **[#1011] Package repository server:** ✅ **Resolved** — `userland/pkg/sigma_repo_server.rs` implements HTTP-based package repository server.
 
@@ -188,14 +189,15 @@ These are blocked until Phase G kernel work completes:
 
 - **[#24] sigma-quantum-ready:** ✅ **Resolved** — `kernel/crypto/sigma_pqc.rs` implements NIST PQC Stack (ML-KEM, ML-DSA, SLH-DSA) with CNSA 2.0 compliance.
 
-- **[#25] sigma-telco:** 5G/6G Network OS with O-RAN Alliance integration and TRAI QoS monitoring.
+- **[#25] sigma-telco:** ✅ **Resolved** — `kernel/net/sigma_telco.rs` implements ORAN xApp & TRAI compliance.
 
-- **[#26] sigma-robotics:** ROS 2 on SigmaOS with URDF robot model loader and sigma-twin integration.
+- **[#26] sigma-robotics:** ✅ **Resolved** — `kernel/robotics/sigma_robotics.rs` implements ROS 2 DDS & trajectory planning.
 
-- **[#27] sigma-neuro:** BCI (Brain-Computer Interface) integration with OpenBCI and Neurosity device drivers.
+- **[#27] sigma-neuro:** ✅ **Resolved** — `kernel/neuro/sigma_neuro.rs` implements OpenBCI EEG & motor imagery.
 
-- **[#28] sigma-space:** IN-SPACe Developer Tools with satellite design validation and TLE orbit propagation.
+- **[#28] sigma-space:** ✅ **Resolved** — `kernel/space/sigma_space.rs` implements CCSDS framing & orbit propagation.
 
-- **[#29] Formal Verification:** Formal verification of core IPC using Frama-C WP or Kani.
+- **[#29] Formal Verification:** ✅ **Resolved** — `kernel/verification/sigma_formal.rs` implements Kani state machine invariants.
 
-- **[#30] sigma-print:** 3D Printing & Additive Manufacturing with G-code slicer API integration.
+- **[#30] sigma-print:** ✅ **Resolved** — `kernel/manufacturing/sigma_print3d.rs` implements stepper coordination & temperature PID.
+

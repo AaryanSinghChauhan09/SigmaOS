@@ -238,6 +238,17 @@
 
 - [Hardware Support](Hardware-Support)
 
+- [Advanced Technical Projects](Advanced-Technical-Projects)
+
+- [Developer SDK Guide](Developer-SDK-Guide)
+
+- [App Sandbox Architecture](App-Sandbox-Architecture)
+
+- [Multi-Monitor KMS](Multi-Monitor-KMS)
+
+- [India Apps Overview](India-Apps-Overview)
+
+
 ## Updates & Packaging
 
 - [Transactional Updates](Transactional-Updates)

@@ -18,7 +18,18 @@ type SigmaUsize = usize;
 
 // ─── Module: Sigma::sigma_boot_recovery_menu ─────────────────────
 
+static mut RECOVERY_MENU_SELECTION: SigmaI32 = 0;
+
 #[no_mangle]
 pub unsafe extern "C" fn sigma_boot_show_fix_it_menu() {
+    // Basic text output simulation for recovery/safe-mode selector
+    // In a real UEFI environment, this would render to the console or GOP framebuffer.
+    RECOVERY_MENU_SELECTION = 1; // Default to Safe Mode
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_boot_get_recovery_choice() -> SigmaI32 {
+    RECOVERY_MENU_SELECTION
+}
+
 
