@@ -1,176 +1,99 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2024-2026 SigmaOS Project
-// kernel/security/sigma_mac.rs — Mandatory Access Control (SELinux-inspired)
-// Language: Rust #![no_std] — OOP via MacPolicy struct + label system
+// SPDX-License-Identifier: GPL-2.0-or-later
+//! SigmaOS Mandatory Access Control (MAC)
+//! SELinux-style context labeling and policy enforcement.
+//! no_std, no alloc.
 
 #![no_std]
+#![allow(dead_code)]
 
-pub const MAX_LABELS:   usize = 64;
-pub const MAX_RULES:    usize = 256;
-pub const LABEL_LEN:    usize = 32;
+type SigmaU32 = u32;
+type SigmaI32 = i32;
 
-// ── Security Labels ───────────────────────────────────────────────────────────
-#[derive(Clone, Copy, PartialEq, Eq, Default)]
-pub struct Label(pub u32);
+pub const MAX_MAC_POLICIES: usize = 128;
+pub const MAC_CONTEXT_LEN: usize = 32;
 
-impl Label {
-    pub const UNLABELED: Label = Label(0);
-    pub const KERNEL:    Label = Label(1);
-    pub const SYSTEM:    Label = Label(2);
-    pub const USER:      Label = Label(3);
-}
-
-// ── Object Classes ────────────────────────────────────────────────────────────
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum ObjClass {
-    File      = 0,
-    Dir       = 1,
-    Process   = 2,
-    Socket    = 3,
-    Ipc       = 4,
-    Shard     = 5,
-    Capability = 6,
-}
-
-// ── Permission vector (64-bit bitmask) ───────────────────────────────────────
-#[derive(Clone, Copy, Default)]
-pub struct Perms(pub u64);
-
-impl Perms {
-    pub const READ:    u64 = 1 << 0;
-    pub const WRITE:   u64 = 1 << 1;
-    pub const EXEC:    u64 = 1 << 2;
-    pub const CREATE:  u64 = 1 << 3;
-    pub const UNLINK:  u64 = 1 << 4;
-    pub const CONNECT: u64 = 1 << 5;
-    pub const SEND:    u64 = 1 << 6;
-    pub const RECV:    u64 = 1 << 7;
-    pub const SIGNAL:  u64 = 1 << 8;
-    pub const FORK:    u64 = 1 << 9;
-    pub const MOUNT:   u64 = 1 << 10;
-    pub const LOAD:    u64 = 1 << 11;
-    pub const ALL:     u64 = u64::MAX;
-
-    pub fn allows(&self, p: u64) -> bool { self.0 & p == p }
-    pub fn add(&mut self, p: u64) { self.0 |= p; }
-}
-
-// ── Policy Rule ───────────────────────────────────────────────────────────────
-#[derive(Clone, Copy)]
-pub struct MacRule {
-    pub src:     Label,
-    pub dst:     Label,
-    pub class:   ObjClass,
-    pub allow:   Perms,
-    pub audit:   bool,
-    pub enabled: bool,
-}
-
-// ── Label Registry ────────────────────────────────────────────────────────────
-#[derive(Clone, Copy)]
-struct LabelEntry {
-    label: Label,
-    name:  [u8; LABEL_LEN],
-    len:   usize,
-}
-
-// ── MAC Policy Engine ─────────────────────────────────────────────────────────
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct MacPolicy {
-    labels:    [Option<LabelEntry>; MAX_LABELS],
-    n_labels:  usize,
-    rules:     [Option<MacRule>; MAX_RULES],
-    n_rules:   usize,
-    enforcing: bool,
-    default_deny: bool,
+    pub subject_context: [u8; MAC_CONTEXT_LEN],
+    pub object_context: [u8; MAC_CONTEXT_LEN],
+    pub permissions: SigmaU32, // Bitmask: Read/Write/Execute/Transition
+    pub active: bool,
 }
 
-impl MacPolicy {
-    pub const fn new() -> Self {
-        Self {
-            labels:    [const { None }; MAX_LABELS],
-            n_labels:  0,
-            rules:     [const { None }; MAX_RULES],
-            n_rules:   0,
-            enforcing: true,
-            default_deny: true,
+pub const MAC_PERM_READ:   SigmaU32 = 0x1;
+pub const MAC_PERM_WRITE:  SigmaU32 = 0x2;
+pub const MAC_PERM_EXEC:   SigmaU32 = 0x4;
+pub const MAC_PERM_TRANS:  SigmaU32 = 0x8;
+
+static mut POLICIES: [MacPolicy; MAX_MAC_POLICIES] = [MacPolicy {
+    subject_context: [0; MAC_CONTEXT_LEN],
+    object_context: [0; MAC_CONTEXT_LEN],
+    permissions: 0,
+    active: false,
+}; MAX_MAC_POLICIES];
+
+unsafe fn c_str_match(s1: *const u8, s2: *const u8) -> bool {
+    let mut i = 0;
+    loop {
+        let c1 = *s1.add(i);
+        let c2 = *s2.add(i);
+        if c1 != c2 { return false; }
+        if c1 == 0 { return true; }
+        i += 1;
+        if i >= MAC_CONTEXT_LEN { return true; }
+    }
+}
+
+unsafe fn copy_context(dst: &mut [u8; MAC_CONTEXT_LEN], src: *const u8) {
+    let mut i = 0;
+    while i < MAC_CONTEXT_LEN - 1 {
+        let c = *src.add(i);
+        dst[i] = c;
+        if c == 0 { break; }
+        i += 1;
+    }
+    dst[MAC_CONTEXT_LEN - 1] = 0;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_mac_init() {
+    for i in 0..MAX_MAC_POLICIES {
+        POLICIES[i].active = false;
+    }
+}
+
+/// Add a new MAC policy rule.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_mac_add_rule(sub: *const u8, obj: *const u8, perms: SigmaU32) -> SigmaI32 {
+    if sub.is_null() || obj.is_null() { return -1; }
+    for i in 0..MAX_MAC_POLICIES {
+        if !POLICIES[i].active {
+            copy_context(&mut POLICIES[i].subject_context, sub);
+            copy_context(&mut POLICIES[i].object_context, obj);
+            POLICIES[i].permissions = perms;
+            POLICIES[i].active = true;
+            return 0;
         }
     }
+    -1 // Policy table full
+}
 
-    pub fn set_enforcing(&mut self, v: bool) { self.enforcing = v; }
-
-    /// Load a permissive default policy (all-allow) for initial boot
-    pub fn load_permissive(&mut self) {
-        self.enforcing    = false;
-        self.default_deny = false;
-    }
-
-    /// Register a security label by name
-    pub fn register_label(&mut self, name: &[u8]) -> Label {
-        let id = self.n_labels as u32 + 4; // start at 4 (0-3 reserved)
-        let label = Label(id);
-        let mut entry = LabelEntry { label, name: [0u8; LABEL_LEN], len: name.len().min(LABEL_LEN) };
-        entry.name[..entry.len].copy_from_slice(&name[..entry.len]);
-        for slot in &mut self.labels {
-            if slot.is_none() { *slot = Some(entry); self.n_labels += 1; return label; }
-        }
-        Label::UNLABELED
-    }
-
-    /// Add a policy rule: allow src→dst class permissions
-    pub fn allow(&mut self, src: Label, dst: Label, class: ObjClass, perms: u64) -> bool {
-        if self.n_rules >= MAX_RULES { return false; }
-        for slot in &mut self.rules {
-            if slot.is_none() {
-                *slot = Some(MacRule {
-                    src, dst, class,
-                    allow: Perms(perms), audit: false, enabled: true,
-                });
-                self.n_rules += 1;
-                return true;
-            }
-        }
-        false
-    }
-
-    /// Check if (src_label, dst_label, class, perms) is allowed
-    pub fn check(&self, src: Label, dst: Label, class: ObjClass, perms: u64) -> MacDecision {
-        if !self.enforcing { return MacDecision::Allow; }
-
-        for rule in self.rules[..self.n_rules].iter().flatten() {
-            if !rule.enabled { continue; }
-            if rule.src == src && rule.dst == dst && rule.class == class {
-                if rule.allow.allows(perms) {
-                    if rule.audit { return MacDecision::AllowAudit; }
-                    return MacDecision::Allow;
-                } else {
-                    return MacDecision::Deny;
+/// Check if subject is allowed to perform action on object.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_mac_check_access(sub: *const u8, obj: *const u8, requested_perms: SigmaU32) -> SigmaI32 {
+    if sub.is_null() || obj.is_null() { return -1; }
+    
+    for i in 0..MAX_MAC_POLICIES {
+        if POLICIES[i].active {
+            if c_str_match(POLICIES[i].subject_context.as_ptr(), sub) && 
+               c_str_match(POLICIES[i].object_context.as_ptr(), obj) {
+                // If policy grants ALL requested permissions
+                if (POLICIES[i].permissions & requested_perms) == requested_perms {
+                    return 0; // Access granted
                 }
             }
         }
-        // No matching rule → default
-        if self.default_deny { MacDecision::Deny } else { MacDecision::Allow }
     }
-
-    /// Bootstrap default policy for SigmaOS
-    pub fn load_default(&mut self) {
-        // Kernel can do everything
-        self.allow(Label::KERNEL, Label::KERNEL, ObjClass::File,    Perms::ALL);
-        self.allow(Label::KERNEL, Label::KERNEL, ObjClass::Process, Perms::ALL);
-        // System services: r/w files, connect sockets
-        self.allow(Label::SYSTEM, Label::SYSTEM, ObjClass::File,
-                   Perms::READ | Perms::WRITE | Perms::CREATE);
-        self.allow(Label::SYSTEM, Label::SYSTEM, ObjClass::Socket,
-                   Perms::CONNECT | Perms::SEND | Perms::RECV);
-        // User processes: read/exec files, no kernel objects
-        self.allow(Label::USER, Label::USER, ObjClass::File,
-                   Perms::READ | Perms::EXEC | Perms::CREATE);
-        self.allow(Label::USER, Label::USER, ObjClass::Socket,
-                   Perms::CONNECT | Perms::SEND | Perms::RECV);
-        // User → system: read only
-        self.allow(Label::USER, Label::SYSTEM, ObjClass::File, Perms::READ);
-    }
+    -1 // Default deny
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MacDecision { Allow, AllowAudit, Deny }

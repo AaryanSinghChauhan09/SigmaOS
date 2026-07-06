@@ -167,9 +167,8 @@
 ## Architecture
 
 - [Architecture Overview](Architecture-Overview)
-
 - [Bootloader](Bootloader)
-
+- [Init System (PID 1)](Init-System-Sovereign)
 - [Kernel Internals](Kernel)
 
 - [Scheduler](Scheduler)
@@ -179,8 +178,8 @@
 - [Process Management](Process-Management)
 
 - [IPC — sigma-bus](IPC)
-
 - [VFS & Filesystems](VFS)
+- [Filesystem Internals](Filesystem-Internals)
 
 - [TCP Stack](TCP-Stack)
 
@@ -191,17 +190,16 @@
 - [Networking Stack](Networking)
 
 - [System Daemons](System-Daemons)
-
+- [Security Subsystems](Security-Subsystems)
 - [Zenith Desktop](Zenith-Desktop)
 
 ## Utilities
 
 - [Coreutils](Coreutils)
-
+- [Shell Tools](Shell-Tools)
 - [sigma-sh Shell](CLI-Reference#sigma-sh--sovereign-interactive-shell)
-
 - [sigma-pkg](CLI-Reference#sigma-pkg--package-manager)
-
+- [Package Manager (sigpkg)](Package-Manager-sigpkg)
 - [Full CLI Reference](CLI-Reference)
 
 - [sigma-top](CLI-Reference#sigma-top--process-monitor)
@@ -416,7 +414,7 @@
 ## AI Agent (sigma-agent)
 
 - [sigma-agent CLI](sigma-agent)
-
+- [AI Agent Features](AI-Agent-Features)
 - [Workflow Automation](sigma-agent-workflow)
 
 - [Doctor & Self-update](sigma-agent#doctor--self-diagnosis)
