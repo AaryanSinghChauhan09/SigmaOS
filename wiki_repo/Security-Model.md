@@ -1,5 +1,4 @@
 # SigmaOS Security Model
-
 **Version:** 1.0 | **Status:** Formal Specification | **Classification:** Public
 
 ---
@@ -25,15 +24,10 @@ SigmaOS employs a **layered, capability-based security architecture** rooted in 
 | Insider / rogue process | Side-channel, memory attacks | Hardened allocator, ASLR, stack canaries |
 
 ### 2.2 Assets to Protect
-
 - Kernel integrity (immutable after boot)
-
 - User credentials and secrets (`sigma-crypto-vault`)
-
 - Network communications (E2E encrypted)
-
 - Package supply chain (cryptographic chain of trust)
-
 - Filesystem data (VFS RBAC + optional encryption)
 
 ---
@@ -71,9 +65,7 @@ SigmaOS implements a **Capsicum-inspired capability model**. Every process recei
 ### 3.3 Sandbox Profiles
 
 ```toml
-
 # /etc/sigmaos/sandbox/sigma-browser.toml
-
 [sandbox]
 profile = "network-isolated"
 cap_fs = ["/home/user/Downloads:rw", "/tmp/sigma-browser:rw"]
@@ -81,7 +73,6 @@ cap_net = ["tcp:80", "tcp:443"]
 cap_ipc = ["zenith-compositor", "sigma-audio"]
 cap_dev = []
 cap_syscall = ["minimal"]  # ~30 syscalls vs 400+ on Linux
-
 seccomp_bpf = true
 landlock = true
 ```
@@ -121,9 +112,7 @@ Process → [syscall] → Kernel Interceptor → BPF Filter
 Audit policies are written in a declarative TOML DSL:
 
 ```toml
-
 # /etc/sigma-audit/policy.toml
-
 [[rule]]
 name = "block-ptrace"
 match.syscall = "ptrace"
@@ -166,21 +155,15 @@ Userland (profile packages, sandboxed)
 ### 5.2 A/B Partition Rollback
 
 - Two kernel slots: **Slot A** (active) and **Slot B** (backup)
-
 - On update: write to inactive slot → verify hash → flip active pointer atomically
-
 - If boot of new slot fails 3× → automatic rollback to previous slot
-
 - TPM extends PCR[9] with slot change events (audit trail)
 
 ### 5.3 Sovereign Root Key
 
 The **sovereign root key** is an Ed25519 keypair:
-
 - Private key: HSM-protected, never leaves signing infrastructure
-
 - Public key: burned into firmware and distributed with the ISO
-
 - Key rotation: requires 3-of-5 multisig from SigmaOS core maintainers
 
 ---
@@ -190,15 +173,10 @@ The **sovereign root key** is an Ed25519 keypair:
 ### 6.1 Design Principles (inspired by OpenBSD malloc, hardened_malloc)
 
 - **Magic cookie validation:** Every allocation tagged with `0xSIGMA5A5A`
-
 - **Guard pages:** Unmapped pages before/after each allocation region
-
 - **Randomized base:** ASLR + randomized heap layout per boot
-
 - **Use-after-free detection:** Poison freed memory with `0xDEADBEEF`
-
 - **Double-free detection:** Allocation bitmap tracks state
-
 - **Size segregation:** Separate arenas per size class (8, 16, 32, 64, 128, 256 bytes)
 
 ### 6.2 sigma_malloc ABI
@@ -250,9 +228,7 @@ Internet ──────► sigma-shield (BPF firewall)
 ```
 
 - GUI apps: **no** direct network access — all requests proxied via `sigma-netd`
-
 - DNS: DoH only (no cleartext UDP/53 from userland)
-
 - Outbound firewall: default-deny, whitelist per-app
 
 ---
@@ -262,13 +238,9 @@ Internet ──────► sigma-shield (BPF firewall)
 Sovereign replacement for KeePass/Bitwarden:
 
 - Master key: Argon2id-derived from passphrase + hardware token (FIDO2/TPM)
-
 - Vault file: ChaCha20-Poly1305 encrypted, Ed25519-signed
-
 - No cloud sync by default — sovereign storage only
-
 - CLI: `sigma-vault get/set/delete/generate`
-
 - TOTP support built-in
 
 ---

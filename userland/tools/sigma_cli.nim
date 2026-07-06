@@ -151,6 +151,18 @@ var g_aliases: seq[SigmaAlias] = @[
   SigmaAlias(name:"ll",  command:"ls -la", active:true),
   SigmaAlias(name:"gst", command:"git status", active:true),
   SigmaAlias(name:"gc",  command:"git commit -m", active:true),
+  SigmaAlias(name:"gp",  command:"git push", active:true),
+  SigmaAlias(name:"gl",  command:"git pull", active:true),
+  SigmaAlias(name:"gd",  command:"git diff", active:true),
+  SigmaAlias(name:"ga",  command:"git add", active:true),
+  SigmaAlias(name:"gco", command:"git checkout", active:true),
+  SigmaAlias(name:"gr",  command:"git reset", active:true),
+  SigmaAlias(name:"cls", command:"clear", active:true),
+  SigmaAlias(name:"h",   command:"history", active:true),
+  SigmaAlias(name:"mkd", command:"mkdir -p", active:true),
+  SigmaAlias(name:"rmf", command:"rm -rf", active:true),
+  SigmaAlias(name:"cat", command:"bat", active:true),
+  SigmaAlias(name:"find", command:"fd", active:true),
 ]
 
 proc cmd_alias(args: seq[string], json: bool) =
@@ -278,6 +290,18 @@ proc cmd_sysctl(args: seq[string]) =
     let (out, code) = execCmdEx(fmt"sysctl {arg} 2>/dev/null")
     if code == 0: echo out else: echo fmt"  {arg} = (requires root)"
 
+# ─── Command suggestions ───────────────────────────────────────────────────────
+proc suggest_command(input: string) =
+  let commands = ["profile", "alias", "auto", "pkg", "pod", "_net", "sysctl", "version"]
+  var suggestions: seq[string]
+  for cmd in commands:
+    if cmd.startsWith(input) or input.len == 0:
+      suggestions.add(cmd)
+  if suggestions.len > 0:
+    echo dim("Did you mean: ") & cyan(suggestions.join(", "))
+  else:
+    echo dim("Available commands: ") & cyan(commands.join(", "))
+
 # ─── Help & dispatch ─────────────────────────────────────────────────────────
 proc print_usage() =
   echo cyan("Σ sigma-cli") & "  v" & VERSION
@@ -293,6 +317,10 @@ proc print_usage() =
   echo "  net       status|ping|dns"
   echo "  sysctl    <key>[=value]"
   echo "  version   print version info"
+  echo ""
+  echo bold("QUICK ALIASES:")
+  echo "  ll, gst, gc, gp, gl, gd, ga, gco, gr (Git)"
+  echo "  cls, h, mkd, rmf, cat, find (Common)"
   echo ""
   echo bold("GLOBAL OPTIONS:")
   echo "  --json     Machine-readable JSON output"
@@ -328,7 +356,9 @@ proc main() =
   of "net":     cmd_net(rest)
   of "sysctl":  cmd_sysctl(rest)
   else:
-    err(fmt"Unknown subsystem '{sub}'. Run --help.")
+    err(fmt"Unknown subsystem '{sub}'.")
+    suggest_command(sub)
+    echo dim("Run --help for usage information.")
     quit(1)
 
 main()
