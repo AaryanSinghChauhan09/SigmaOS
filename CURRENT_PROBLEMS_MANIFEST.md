@@ -69,6 +69,8 @@
 | I-19 | SELinux-inspired MAC system | Security framework | ✅ Started - basic policy engine done |
 | I-20 | Graphical installer (Calamares-inspired) | Installer framework | ✅ Started - basic installer done |
 | I-21 | UEFI bootloader (sigma-boot) | Bootloader framework | ✅ Started - basic bootloader done |
+| I-22 | Display server (Wayland-inspired) | Desktop framework | ✅ Started - basic compositor done |
+| I-23 | NLP engine (AI assistant) | AI framework | ✅ Started - basic NLP done |
 
 ---
 
