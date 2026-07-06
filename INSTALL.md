@@ -13,6 +13,7 @@ SigmaOS utilizes a strict `no_std` Rust environment and automates the build proc
 ## Setup
 
 1. **Install the `x86_64-unknown-none` target:**
+
    ```bash
    rustup target add x86_64-unknown-none
    ```
@@ -25,24 +26,27 @@ SigmaOS utilizes a strict `no_std` Rust environment and automates the build proc
 Run these commands from the root of the repository:
 
 - **Format Code:**
+
   ```bash
   just fmt
   ```
 
 - **Compile and Check:**
   Validates that all Kernel and Userland code adheres to `no_std` zero-allocation constraints.
+
   ```bash
   just check
   ```
 
 - **Build Kernel:**
+
   ```bash
   just build
   ```
 
 - **Run in QEMU:**
 
-###   Note: Bootloader integration is currently in progress.
+### Note: Bootloader integration is currently in progress
 
   ```bash
   just run
