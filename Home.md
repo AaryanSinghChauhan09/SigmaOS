@@ -63,3 +63,10 @@ graph TD
 
 See [INSTALL.md](INSTALL.md) for build instructions using the new `Justfile` toolchain.
 
+## Linux Distro Parity
+
+SigmaOS matches standard Linux system interfaces:
+- [Linux-Inspired Subsystems](Linux-Inspired-Subsystems) (udev, sysfs, procfs, tmpfs, inotify, dmesg, mount, sysctl, logrotate)
+- [Coreutils Reference](Coreutils-Reference) (chmod, chown, cp, mv, touch, wc, grep, head, tail, df, du)
+- [Device Management](Device-Management) (probe detection, naming rules, node hierarchy)
+
