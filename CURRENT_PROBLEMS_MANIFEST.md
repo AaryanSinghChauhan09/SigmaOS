@@ -73,6 +73,7 @@
 | I-23 | NLP engine (AI assistant) | AI framework | ✅ Started - basic NLP done |
 | I-24 | Education suite (GeoGebra, Scilab, Octave) | Education tools | ✅ Started - basic suite done |
 | I-25 | Indic NLP support (22 languages) | India-specific | ✅ Started - basic NLP done |
+| I-26 | Community governance model | Community | ✅ Started - governance doc done |
 
 ---
 
