@@ -47,7 +47,40 @@ This roadmap synthesizes insights from leading Linux distributions (Ubuntu, Arch
 
 ## SigmaOS Strategic Absorption Plan
 
-### Phase 1: Foundation & Quick Wins (Weeks 1-8)
+### Phase 0: Dependency Reduction (Weeks 1-4)
+
+#### 0.1 Dependency Elimination Priority
+**Inspiration**: Linux from Scratch, Gentoo (minimal dependencies)
+
+**Deliverables**:
+- **sigma-format**: Native Rust formatter (replaces Prettier)
+  - Basic code formatting with indentation
+  - Line ending normalization
+  - Zero external dependencies
+- **sigma-lint**: Native Rust linter (replaces ESLint)
+  - Basic linting rules (no-console, no-unused-vars, eqeqeq, semi)
+  - Fast Rust-based parsing
+  - Zero external dependencies
+- **sigma-build**: Native Rust build tool (replaces Vite)
+  - ES module bundling
+  - Hot module replacement
+  - Zero Node.js dependency
+- **Timeline**: 4 weeks
+- **Priority**: 🔴 CRITICAL
+
+#### 0.2 Electron Elimination
+**Inspiration**: Native desktop environments (GNOME, KDE)
+
+**Deliverables**:
+- **sigma-zenith-native**: Native Zenith Desktop compositor
+  - Replace Electron with native SigmaOS compositor
+  - Reduce binary size by ~200MB
+  - Better kernel integration
+  - Improved performance
+- **Timeline**: 8 weeks
+- **Priority**: 🔴 CRITICAL
+
+## Phase 1: Foundation & Quick Wins (Weeks 5-12)
 
 #### 1.1 Package Manager Enhancement
 **Inspiration**: Pacman (speed), APT (repository size), DNF (rollback)

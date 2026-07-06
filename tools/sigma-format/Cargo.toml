@@ -1,0 +1,17 @@
+[package]
+name = "sigma-format"
+version = "1.0.0"
+edition = "2021"
+authors = ["SigmaOS Project"]
+description = "Native Rust code formatter for SigmaOS - replaces Prettier"
+license = "MIT"
+
+[[bin]]
+name = "sigma-format"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true

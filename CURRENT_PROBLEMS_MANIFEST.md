@@ -58,6 +58,10 @@
 | I-08 | Package repository server (`sigma-repo-server`) | net stack stable | sigma-pkg install needs a real server |
 | I-09 | Display server crash recovery | H-05 + IPC | Zenith restarts on segfault |
 | I-10 | Indian Language IME (Inscript + phonetic 22 langs) | H-05 + sound | BHASHINI integration |
+| I-11 | Dependency reduction (Electron → native Zenith) | Zenith compositor | Reduce binary size by ~200MB |
+| I-12 | Build tool replacement (Vite → sigma-build) | sigma-build design | Eliminate Node.js dependency |
+| I-13 | Linter replacement (ESLint → sigma-lint) | sigma-lint implementation | ✅ Started - basic implementation done |
+| I-14 | Formatter replacement (Prettier → sigma-format) | sigma-format implementation | ✅ Started - basic implementation done |
 
 ---
 

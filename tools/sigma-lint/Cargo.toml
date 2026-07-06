@@ -1,0 +1,17 @@
+[package]
+name = "sigma-lint"
+version = "1.0.0"
+edition = "2021"
+authors = ["SigmaOS Project"]
+description = "Native Rust linter for SigmaOS - replaces ESLint"
+license = "MIT"
+
+[[bin]]
+name = "sigma-lint"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
