@@ -78,6 +78,9 @@
 | I-28 | Package repository server | Package ecosystem | ✅ Started - basic server done |
 | I-29 | Workflow automation engine | AI framework | ✅ Started - basic engine done |
 | I-30 | Adaptive learning system | AI framework | ✅ Started - basic system done |
+| I-31 | Enhanced systemctl (systemd compatibility) | Linux compatibility | ✅ Started - enhanced implementation |
+| I-32 | Enhanced APT compatibility layer | Linux compatibility | ✅ Started - enhanced implementation |
+| I-33 | Performance tuner (perf, tuned) | Performance | ✅ Started - basic tuner done |
 
 ---
 
