@@ -1,4 +1,4 @@
-# Fetch
+﻿# Fetch
 
 Undici exposes a fetch() method starts the process of fetching a resource from the network.
 
@@ -62,5 +62,4 @@ const busboy = new Busboy({
 })
 
 Readable.fromWeb(response.body).pipe(busboy)
-
 ```

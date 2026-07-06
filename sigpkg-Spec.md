@@ -1,200 +1,78 @@
-# sigpkg — Sovereign Package Manager Specification
+# `sigpkg` Package Format Specification
 
-> The native SigmaOS package format and manager. PQC-signed, reproducible, atomic.
+**Version:** 0.1 (Draft) | **Status:** Active Development
 
----
+`sigpkg` is SigmaOS’s deterministic, sovereign package manager. It is designed to ensure reproducible builds, cryptographic trust, and atomic upgrades.
 
-## Overview
+## 1. Package Metadata (`Sigma.toml`)
 
-`sigma-pkg` is the SigmaOS package manager. It handles `.sigpkg` archives — a sovereign
-format that combines a binary payload, metadata, dependency graph, and Dilithium-5 signature.
-
-```
-sigma-pkg install sigma-edit        # install
-sigma-pkg remove  sigma-edit        # remove
-sigma-pkg update                    # update all
-sigma-pkg search  editor            # search registry
-sigma-pkg info    sigma-edit        # show metadata
-sigma-pkg verify  sigma-edit.sigpkg # verify signature
-sigma-pkg build   PKGBUILD          # build from source
-```
-
----
-
-## .sigpkg Format
-
-A `.sigpkg` file is a gzip-compressed tar archive with the following layout:
-
-```
-sigma-edit-1.2.0-x86_64.sigpkg
-├── META
-│   ├── MANIFEST.toml      ← package metadata
-│   ├── DEPS.toml          ← dependency declarations
-│   ├── FILES.sha256       ← SHA-256 checksums for all payload files
-│   └── SIGNATURE.d5sig    ← Dilithium-5 signature over FILES.sha256
-└── PAYLOAD/
-    ├── usr/bin/sigma-edit
-    ├── usr/share/sigma-edit/
-    └── usr/share/man/man1/sigma-edit.1.gz
-```
-
-### MANIFEST.toml Schema
+Every package in the SigmaOS ecosystem is defined by a TOML manifest. We selected TOML for its strict typing and readability, matching the Rust `Cargo.toml` ecosystem.
 
 ```toml
 [package]
-name        = "sigma-edit"
-version     = "1.2.0"
-description = "Sovereign text and code editor"
-author      = "SigmaOS Project"
-license     = "GPL-2.0-or-later"
-arch        = "x86_64"           # x86_64 | arm64 | riscv64 | any | wasm
-profile     = ["standalone", "minimal", "cloud"]
-size_bytes  = 892340
-installed_size_bytes = 2100000
+name = "sigma-coreutils"
+version = "0.2.1"
+description = "Sovereign core utilities in Rust"
+architecture = ["x86_64-unknown-none", "aarch64"]
+license = "MIT"
+maintainer = "packaging-lead@sigmaos.local"
 
-[build]
-reproducible = true
-source_url   = "https://github.com/AaryanSinghChauhan09/SigmaOS"
-build_date   = "2026-07-01T00:00:00Z"
-build_hash   = "sha256:abc123..."
-
-[signing]
-algorithm   = "Dilithium-5"
-public_key  = "sigmaos-official-2026.d5pub"
-signature   = "SIGNATURE.d5sig"
-```
-
-### DEPS.toml Schema
-
-```toml
 [dependencies]
-sigma-coreutils = ">=1.0.0"
-sigma-libc      = ">=0.5.0"
-
-[optional]
-sigma-spellcheck = ">=1.0.0"    # pulled in if available
-
-[conflicts]
-nano = "*"                       # conflicts with plain nano
-
-[provides]
-editor = "1.2.0"                 # virtual package
-```
-
----
-
-## Registry Protocol
-
-`sigma-pkg` fetches packages from a registry server over HTTPS + PQC TLS.
-
-### Local Mode (v0.1 — available now)
-```
-/var/sigma/pkg/
-├── repo/
-│   ├── INDEX.toml          ← package index
-│   └── *.sigpkg            ← local packages
-├── installed/
-│   └── sigma-edit/MANIFEST.toml
-└── cache/
-    └── *.sigpkg
-```
-
-### Online Mode (v1.0 target)
-```
-Registry URL: https://pkg.sigmaos.app/v1/
-GET /v1/index                        → package index (signed)
-GET /v1/pkg/{name}/{version}/{arch}  → download .sigpkg
-GET /v1/search?q={query}             → search results
-POST /v1/publish                     → upload package (auth required)
-```
-
-Registry responses are signed with the SigmaOS root Dilithium-5 key.
-`sigma-pkg` verifies the registry signature before trusting any index data.
-
----
-
-## PKGBUILD — Build Recipe Format
-
-```toml
-# PKGBUILD for sigma-edit
-[package]
-name    = "sigma-edit"
-version = "1.2.0"
-source  = "https://github.com/AaryanSinghChauhan09/SigmaOS/archive/v1.2.0.tar.gz"
-sha256  = "abc123..."
+sigma-libc = ">= 0.1.0"
+sigma-crypto = "0.2.x"
 
 [build]
-steps = [
-  "make PROFILE=standalone sigma-edit -j$(nproc)",
-  "make DESTDIR=$PKG install-sigma-edit",
-]
 
-[check]
-steps = [
-  "make test-sigma-edit",
-]
+# Deterministic build command
+
+recipe = "cargo build --release --target {architecture}"
+hash = "sha256-abcdef1234567890..." # Expected hash of the output tarball
+
 ```
 
-Build a package:
-```bash
-sigma-pkg build PKGBUILD
-# Output: sigma-edit-1.2.0-x86_64.sigpkg
+## 2. Package Format Structure
+
+A compiled `.sigpkg` file is an uncompressed tarball (for reproducible hashing) containing:
+
+1. `Sigma.toml`: The metadata file.
+
+2. `signature.sig`: Ed25519 signature of the `data/` directory.
+
+3. `data/`: The actual compiled binaries, libraries, and assets mirroring the target filesystem hierarchy (e.g., `data/bin/ls`).
+
+## 3. Cryptographic Signing & Verification
+
+All packages must be signed before installation. The target system maintains a trusted keyring (seeded during OS installation).
+
+- **Algorithm:** Ed25519 for signatures, SHA-256 for integrity hashing.
+
+- **Verification Flow:**
+  1. `sigpkg` extracts the tarball into memory.
+  2. Computes the SHA-256 hash of the `data/` directory contents.
+  3. Verifies `signature.sig` against the hash using the trusted keyring.
+  4. Aborts installation if verification fails.
+
+## 4. Repository Layout (Registry)
+
+In the MVP phase, packages are hosted on a standard Git repository or static HTTP server with a central `index.toml`.
+```
+registry/
+├── index.toml
+├── core/
+│   ├── sigma-coreutils/
+│   │   ├── 0.2.1.sigpkg
+│   │   └── metadata.toml
+├── desktop/
+│   ├── zenith-compositor/
+│   │   ├── 0.4.0.sigpkg
 ```
 
----
+## 5. System Profiles (Meta-Packages)
 
-## Reproducible Builds
+`sigpkg` defines full environments using meta-packages called Profiles:
 
-Every official SigmaOS package must be reproducible:
+- **`sigma-core`**: Boots a shell with basic networking.
 
-1. Fixed build timestamp (from `SOURCE_DATE_EPOCH`).
-2. Deterministic linker flags (`-Wl,--build-id=none`).
-3. Sorted file lists in archives.
-4. Documented build environment (compiler version, flags).
+- **`sigma-desktop`**: Pulls `sigma-core` + `zenith-compositor` + GPU drivers.
 
-Verify reproducibility:
-```bash
-sigma-pkg rebuild sigma-edit-1.2.0-x86_64.sigpkg
-sigma-pkg diff   sigma-edit-1.2.0-x86_64.sigpkg sigma-edit-1.2.0-x86_64.rebuild.sigpkg
-# Output: "Identical" or diff of differing bytes
-```
-
----
-
-## Multi-Format Output
-
-`sigma-pkg build` can emit multiple formats from one PKGBUILD:
-
-```bash
-sigma-pkg build --format sigpkg   PKGBUILD   # native
-sigma-pkg build --format appimage PKGBUILD   # Linux AppImage
-sigma-pkg build --format flatpak  PKGBUILD   # Flatpak bundle
-sigma-pkg build --format apk      PKGBUILD   # Android APK
-sigma-pkg build --format wasm     PKGBUILD   # WASM bundle
-sigma-pkg build --format jar      PKGBUILD   # Java JAR
-sigma-pkg build --format nupkg    PKGBUILD   # NuGet package
-```
-
-This is the foundation of SigmaOS's multi-format distribution promise.
-
----
-
-## Privacy Policy
-
-`sigma-pkg` sends **zero telemetry by default**. The only network requests are:
-
-- Package index fetch (anonymous GET, no cookies, no session tracking).
-- Package download (anonymous GET).
-- Signature verification against the public key (local, no network).
-
-Opt-in analytics (disabled by default):
-```toml
-# /etc/sigma/pkg.toml
-[analytics]
-enabled = false          # default
-report_installs = false  # default
-```
-
----
-
-*See also: [Professional-Tools-And-Apps](Professional-Tools-And-Apps.md) · [Reproducibility-Guide](Reproducibility-Guide.md) · [Sovereign-Packaging-Specification](Sovereign-Packaging-Specification.md)*
+- **`sigma-cloud`**: Minimal cloud image with `sigma-container` orchestrator.

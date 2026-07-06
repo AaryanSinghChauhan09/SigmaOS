@@ -33,7 +33,7 @@ Every push to `main` or `lattice-dev` triggers:
 cargo test --target x86_64-unknown-linux-gnu
 ```
 
-**Current status: Full Rust migration**
+### Current status: Full Rust migration
 
 | Suite | Tests |
 |-------|-------|
@@ -43,8 +43,11 @@ cargo test --target x86_64-unknown-linux-gnu
 ### Format Validation Tests (Rust)
 
 The test file enforces:
+
 1. **Compile-time guard**: Fails immediately if no `TARGET_OS_*` define is set via `#[cfg(feature = "...")]`
+
 2. **Mutual-exclusivity**: Fails if more than one `TARGET_OS_*` define is active.
+
 3. **Profile assertions**: Validates driver availability, POSIX state, and key feature flags per profile.
 
 ### Static Analysis (Clippy)
@@ -82,6 +85,9 @@ cargo clippy --target x86_64-unknown-none -- -D warnings
 ## 🔗 Related Pages
 
 - [Phase 3: Package & Update System](Phase-3-Package-And-Update-System)
+
 - [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
+
 - [Testing Guide](Testing-Guide)
+
 - [CI Pipeline](CI-Pipeline)

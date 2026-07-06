@@ -1,4 +1,4 @@
-# Class: Client
+﻿# Class: Client
 
 Extends: `undici.Dispatcher`
 
@@ -10,7 +10,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **url**`URL | string` - Should only include the**protocol, hostname, and port**.
+- **url** `URL | string` - Should only include the **protocol, hostname, and port**.
 
 - **options** `ClientOptions` (optional)
 
@@ -22,21 +22,27 @@ Returns: `Client`
 
 - **headersTimeout** `number | null` (optional) - Default: `300e3` - The amount of time, in milliseconds, the parser will wait to receive the complete HTTP headers while not sending the request. Defaults to 300 seconds.
 
-- **keepAliveMaxTimeout**`number | null` (optional) - Default: `600e3` - The maximum allowed `keepAliveTimeout`, in milliseconds, when overridden by*keep-alive* hints from the server. Defaults to 10 minutes.
+- **keepAliveMaxTimeout** `number | null` (optional) - Default: `600e3` - The maximum allowed `keepAliveTimeout`, in milliseconds, when overridden by *keep-alive* hints from the server. Defaults to 10 minutes.
 
-- **keepAliveTimeout**`number | null` (optional) - Default: `4e3` - The timeout, in milliseconds, after which a socket without active requests will time out. Monitors time between activity on a connected socket. This value may be overridden by*keep-alive* hints from the server. See [MDN: HTTP - Headers - Keep-Alive directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive#directives) for more details. Defaults to 4 seconds.
+- **keepAliveTimeout** `number | null` (optional) - Default: `4e3` - The timeout, in milliseconds, after which a socket without active requests will time out. Monitors time between activity on a connected socket. This value may be overridden by *keep-alive* hints from the server. See [MDN: HTTP - Headers - Keep-Alive directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive#directives) for more details. Defaults to 4 seconds.
 
-- **keepAliveTimeoutThreshold**`number | null` (optional) - Default: `2e3` - A number of milliseconds subtracted from server*keep-alive* hints when overriding `keepAliveTimeout` to account for timing inaccuracies caused by e.g. transport latency. Defaults to 2 seconds.
+- **keepAliveTimeoutThreshold** `number | null` (optional) - Default: `2e3` - A number of milliseconds subtracted from server *keep-alive* hints when overriding `keepAliveTimeout` to account for timing inaccuracies caused by e.g. transport latency. Defaults to 2 seconds.
 
 - **maxHeaderSize** `number | null` (optional) - Default: `--max-http-header-size` or `16384` - The maximum length of request headers in bytes. Defaults to Node.js' --max-http-header-size or 16KiB.
 
 - **maxResponseSize** `number | null` (optional) - Default: `-1` - The maximum length of response body in bytes. Set to `-1` to disable.
 
+- **webSocket** `WebSocketOptions` (optional) - WebSocket-specific configuration options.
+
+- **maxFragments** `number` (optional) - Default: `131072` - Maximum number of fragments in a message. Set to 0 to disable the limit.
+
+- **maxPayloadSize** `number` (optional) - Default: `134217728` (128 MB) - Maximum allowed payload size in bytes for WebSocket messages. Applied to uncompressed messages, compressed frame payloads, and decompressed (permessage-deflate) messages. Set to 0 to disable the limit.
+
 - **pipelining** `number | null` (optional) - Default: `1` - The amount of concurrent requests to be sent over the single TCP/TLS connection according to [RFC7230](https://tools.ietf.org/html/rfc7230#section-6.3.2). Carefully consider your workload and environment before enabling concurrent requests as pipelining may reduce performance if used incorrectly. Pipelining is sensitive to network stack settings as well as head of line blocking caused by e.g. long running requests. Set to `0` to disable keep-alive connections.
 
 - **connect** `ConnectOptions | Function | null` (optional) - Default: `null`.
 
-- **strictContentLength**`Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body.**Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
+- **strictContentLength** `Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body. **Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
 
 - **autoSelectFamily**: `boolean` (optional) - Default: depends on local Node version, on Node 18.13.0 and above is `false`. Enables a family autodetection algorithm that loosely implements section 5 of [RFC 8305](https://tools.ietf.org/html/rfc8305#section-5). See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details. This option is ignored if not supported by the current Node version.
 
@@ -55,23 +61,14 @@ Returns: `Client`
 - **pingInterval**: `number` - Default: `60e3`. The time interval in milliseconds between PING frames sent to the server. Set to `0` to disable PING frames. This is only applicable for HTTP/2 connections. This will emit a `ping` event on the client with the duration of the ping in milliseconds.
 
 > **Notes about HTTP/2**
->
 > - It only works under TLS connections. h2c is not supported.
-
 > - The server must support HTTP/2 and choose it as the protocol during the ALPN negotiation.
-
-> - The server must not have a bigger priority for HTTP/1.1 than HTTP/2.
-
+>   - The server must not have a bigger priority for HTTP/1.1 than HTTP/2.
 > - Pseudo headers are automatically attached to the request. If you try to set them, they will be overwritten.
-
-> - The `:path` header is automatically set to the request path.
-
-> - The `:method` header is automatically set to the request method.
-
-> - The `:scheme` header is automatically set to the request scheme.
-
-> - The `:authority` header is automatically set to the request `host[:port]`.
-
+>   - The `:path` header is automatically set to the request path.
+>   - The `:method` header is automatically set to the request method.
+>   - The `:scheme` header is automatically set to the request scheme.
+>   - The `:authority` header is automatically set to the request `host[:port]`.
 > - `PUSH` frames are yet not supported.
 
 #### Parameter: `ConnectOptions`
@@ -100,7 +97,6 @@ This will instantiate the undici Client, but it will not connect to the origin u
 import { Client } from 'undici'
 
 const client = new Client('http://localhost:3000')
-
 ```
 
 ### Example - Custom connector
@@ -117,7 +113,7 @@ const client = new Client('https://localhost:3000', {
     connector(opts, (err, socket) => {
       if (err) {
         cb(err)
-      } else if (/*assertion*/) {
+      } else if (/* assertion */) {
         socket.destroy()
         cb(new Error('kaboom'))
       } else {
@@ -126,7 +122,6 @@ const client = new Client('https://localhost:3000', {
     })
   }
 })
-
 ```
 
 ## Instance Methods
@@ -232,7 +227,6 @@ try {
   client.close()
   server.close()
 }
-
 ```
 
 ### Event: `'disconnect'`
@@ -278,7 +272,6 @@ try {
   client.close()
   server.close()
 }
-
 ```
 
 ### Event: `'drain'`
@@ -317,7 +310,6 @@ const requests = [
 await Promise.all(requests)
 
 console.log('requests completed')
-
 ```
 
 ### Event: `'error'`

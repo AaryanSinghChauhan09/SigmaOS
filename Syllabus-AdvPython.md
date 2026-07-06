@@ -24,8 +24,11 @@ Problem Definition → Data Collection (SigmaDB / SovereignFS)
 # SigmaOS ships with an Anaconda-compatible Python environment
 
 sigma pkg install sigma-datascience  # installs numpy, pandas, matplotlib, seaborn, sklearn
+
 sigma-jupyter start                  # Launch Jupyter-compatible notebook server
+
 sigma-py --repl                      # Interactive Python REPL
+
 ```
 
 ### NumPy
@@ -39,8 +42,11 @@ arr = np.array([1, 2, 3, 4, 5])
 zeros = np.zeros((3, 4))
 ones  = np.ones((2, 3, 4))
 eye   = np.eye(4)                  # Identity matrix
+
 rand  = np.random.randn(100, 10)   # Normal distribution
+
 arange = np.arange(0, 100, 5)      # Like range(), returns array
+
 linspace = np.linspace(0, 1, 100)  # 100 evenly spaced points
 
 # Data types
@@ -54,21 +60,28 @@ arr_bool = np.array([True, False, True])
 a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
 print(a + b)        # [5, 7, 9]
+
 print(a * b)        # [4, 10, 18]
+
 print(a ** 2)       # [1, 4, 9]
+
 print(np.sqrt(a))   # [1.0, 1.414, 1.732]
 
 # Indexing and slicing
 
 arr2d = np.arange(24).reshape(4, 6)
 arr2d[1, 3]          # Row 1, Col 3
+
 arr2d[0:2, 1:4]      # Sub-matrix
+
 arr2d[:, -1]         # Last column
+
 arr2d[arr2d > 10]    # Boolean mask
 
 # Transposing
 
 arr2d.T              # Transpose
+
 arr3d = np.ones((2, 3, 4))
 np.swapaxes(arr3d, 0, 1)
 
@@ -86,17 +99,24 @@ np.min(arr); np.max(arr); np.argmin(arr); np.argmax(arr)
 # Sorting
 
 np.sort(arr)           # Sorted copy
+
 np.argsort(arr)        # Indices that would sort
+
 np.unique(arr)         # Unique values
 
 # Reshaping and concatenation
 
 arr.reshape(2, -1)             # -1 auto-infers dimension
+
 np.concatenate([a, b], axis=0)
 np.vstack([a, b])              # Vertical stack
+
 np.hstack([a, b])              # Horizontal stack
+
 np.split(arr, [2])             # Split at index 2
+
 np.tile(a, (2, 3))             # Repeat 2 rows, 3 cols
+
 np.repeat(a, 3)                # Repeat each element 3x
 
 # File I/O
@@ -118,6 +138,7 @@ import pandas as pd
 
 s = pd.Series([10, 20, 30], index=['a', 'b', 'c'])
 s['a']     # 10
+
 s[s > 15]  # b=20, c=30
 
 # DataFrame
@@ -133,16 +154,23 @@ df = pd.DataFrame({
 
 df.index = df['pid']
 df = df.reindex([1, 42, 43, 99, 100])  # 100 becomes NaN
+
 df.reindex(method='ffill')             # forward fill
+
 df.reindex(method='bfill')             # backward fill
 
 # Selection and filtering
 
 df['process']                          # column
+
 df[['pid', 'cpu_pct']]                 # multiple columns
+
 df.loc[42]                             # by label
+
 df.iloc[0]                             # by integer position
+
 df.loc[df['cpu_pct'] > 10]            # boolean filter
+
 df.query('cpu_pct > 10 and mem_mb > 100')
 
 # Arithmetic alignment
@@ -168,8 +196,11 @@ df.groupby('process').apply(lambda g: g.nlargest(1, 'cpu_pct'))
 
 ts = pd.Series(range(100), index=pd.date_range('2026-01-01', periods=100, freq='h'))
 ts.resample('D').mean()           # Daily average
+
 ts.rolling(window=7).mean()       # 7-period moving average
+
 ts.shift(1)                       # Lag by 1
+
 ts.diff()                         # First difference
 
 # Reading/writing
@@ -199,6 +230,7 @@ pd.merge(df_procs, df_metrics, on='pid', how='left')
 df1 = pd.DataFrame({'A': [1, 2]})
 df2 = pd.DataFrame({'A': [3, 4]})
 pd.concat([df1, df2], axis=0)     # vertical stack
+
 pd.concat([df1, df2], axis=1)     # horizontal join
 
 # Reshaping
@@ -213,6 +245,7 @@ df.drop_duplicates(subset=['pid'])
 df['cpu_pct'] = df['cpu_pct'].replace({-1: 0, None: 0})
 df = df.rename(columns={'cpu_pct': 'cpu_percent'})
 df['cpu_percent'] = df['cpu_percent'].clip(lower=0, upper=100)   # Remove outliers
+
 df = pd.get_dummies(df, columns=['process'])  # One-hot encoding
 
 # Matplotlib
@@ -313,12 +346,17 @@ loaded = joblib.load('/sigma/ai/models/anomaly_detector.pkl')
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Out-of-Memory (OOM) Crashes during Batch ETL:** Trying to load multi-gigabyte Parquet or CSV files entirely into Pandas RAM triggers fatal kernel OOM terminations.
-  * *Fix Strategy:* Use `pd.read_csv(chunksize=10000)` to stream and aggregate chunks iteratively, or migrate to Dask / PySpark for distributed out-of-core lazy execution.
-* **Issue - Data Leakage during Preprocessing Pipelines:** Fitting `StandardScaler` or `SimpleImputer` on the entire dataset before `train_test_split` leaks future test distribution metrics into the training phase.
-  * *Fix Strategy:* Always encapsulate scaling and imputation steps within a Scikit-Learn `Pipeline`, ensuring `fit_transform` executes solely on the active training fold during cross-validation.
-* **Issue - SettingWithCopyWarning in Pandas:** Modifying DataFrame slices (`df[df['cpu'] > 50]['mem'] = 0`) triggers ambiguous CoW assignment warnings and fails to update the original frame.
-  * *Fix Strategy:* Utilize explicit `.loc` indexing (`df.loc[df['cpu'] > 50, 'mem'] = 0`) or create an explicit deep copy (`df_sub = df[df['cpu'] > 50].copy()`).
+- **Issue - Out-of-Memory (OOM) Crashes during Batch ETL:** Trying to load multi-gigabyte Parquet or CSV files entirely into Pandas RAM triggers fatal kernel OOM terminations.
+
+- *Fix Strategy:* Use `pd.read_csv(chunksize=10000)` to stream and aggregate chunks iteratively, or migrate to Dask / PySpark for distributed out-of-core lazy execution.
+
+- **Issue - Data Leakage during Preprocessing Pipelines:** Fitting `StandardScaler` or `SimpleImputer` on the entire dataset before `train_test_split` leaks future test distribution metrics into the training phase.
+
+- *Fix Strategy:* Always encapsulate scaling and imputation steps within a Scikit-Learn `Pipeline`, ensuring `fit_transform` executes solely on the active training fold during cross-validation.
+
+- **Issue - SettingWithCopyWarning in Pandas:** Modifying DataFrame slices (`df[df['cpu'] > 50]['mem'] = 0`) triggers ambiguous CoW assignment warnings and fails to update the original frame.
+
+- *Fix Strategy:* Utilize explicit `.loc` indexing (`df.loc[df['cpu'] > 50, 'mem'] = 0`) or create an explicit deep copy (`df_sub = df[df['cpu'] > 50].copy()`).
 
 ---
 
@@ -333,4 +371,4 @@ loaded = joblib.load('/sigma/ai/models/anomaly_detector.pkl')
 | **Joblib** | Model serialization to `SovereignFS` |
 | **Jupyter-like** | `sigma-jupyter` notebook server |
 
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

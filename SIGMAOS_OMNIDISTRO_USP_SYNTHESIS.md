@@ -14,53 +14,63 @@ Traditional Linux distributions suffer from extreme userland fragmentation: a to
 
 ### 1. General-Purpose Supremacy (`sigma_usp_tool_general_purpose`)
 
-* **Absorbed Lineage**: Ubuntu, Debian, Fedora, Arch Linux, CentOS Stream, OpenSUSE, Gentoo, Manjaro.
-* **Sovereign Capability**: Integrates Snapper automated ZFS/Btrfs snapshot rollback, YaST all-in-one system management control centers, Portage USE-flag source compilation matrices, and Pamac/Octopi GUI package management.
+- **Absorbed Lineage**: Ubuntu, Debian, Fedora, Arch Linux, CentOS Stream, OpenSUSE, Gentoo, Manjaro.
+
+- **Sovereign Capability**: Integrates Snapper automated ZFS/Btrfs snapshot rollback, YaST all-in-one system management control centers, Portage USE-flag source compilation matrices, and Pamac/Octopi GUI package management.
 
 ### 2. Lightweight Edge IoT (`sigma_usp_tool_lightweight_edge`)
 
-* **Absorbed Lineage**: Alpine Linux, Tiny Core Linux, Puppy Linux, Void Linux, Lubuntu.
-* **Sovereign Capability**: Bootstraps `apk-tools` lightning fast dependency solvers, `runit`/`OpenRC` minimal init supervision, and RAM-only live boot with persistent Sovereign OverlayFS storage shards.
+- **Absorbed Lineage**: Alpine Linux, Tiny Core Linux, Puppy Linux, Void Linux, Lubuntu.
+
+- **Sovereign Capability**: Bootstraps `apk-tools` lightning fast dependency solvers, `runit`/`OpenRC` minimal init supervision, and RAM-only live boot with persistent Sovereign OverlayFS storage shards.
 
 ### 3. Security & Penetration Testing (`sigma_usp_tool_sec_pentest`)
 
-* **Absorbed Lineage**: Kali Linux, Parrot Security OS, BlackArch Linux, Tails.
-* **Sovereign Capability**: Activates Undercover Windows 11 desktop camouflage mode, Tor transparent proxy routing, Metasploit/Nmap/Wireshark pre-configured security toolsets, and LUKS nuke emergency destruction passwords.
+- **Absorbed Lineage**: Kali Linux, Parrot Security OS, BlackArch Linux, Tails.
+
+- **Sovereign Capability**: Activates Undercover Windows 11 desktop camouflage mode, Tor transparent proxy routing, Metasploit/Nmap/Wireshark pre-configured security toolsets, and LUKS nuke emergency destruction passwords.
 
 ### 4. Server & Enterprise Administration (`sigma_usp_tool_server_enterprise`)
 
-* **Absorbed Lineage**: Rocky Linux, AlmaLinux, RHEL.
-* **Sovereign Capability**: Deploys Cockpit web-based server administration dashboards, SELinux/AppArmor mandatory access control profiles, `kdump` automated crash dumping, and Leapp major-version in-place upgrade engines.
+- **Absorbed Lineage**: Rocky Linux, AlmaLinux, RHEL.
+
+- **Sovereign Capability**: Deploys Cockpit web-based server administration dashboards, SELinux/AppArmor mandatory access control profiles, `kdump` automated crash dumping, and Leapp major-version in-place upgrade engines.
 
 ### 5. Privacy & Compartmentalization (`sigma_usp_tool_privacy_qubes`)
 
-* **Absorbed Lineage**: Qubes OS, Whonix, PureOS.
-* **Sovereign Capability**: Spawns Disposable single-use VM application instances, split-GPG secure cryptographic key isolation, and Kloak keystroke anonymizers defeating advanced timing analysis attacks.
+- **Absorbed Lineage**: Qubes OS, Whonix, PureOS.
+
+- **Sovereign Capability**: Spawns Disposable single-use VM application instances, split-GPG secure cryptographic key isolation, and Kloak keystroke anonymizers defeating advanced timing analysis attacks.
 
 ### 6. Education & Polished Desktop (`sigma_usp_tool_edu_desktop`)
 
-* **Absorbed Lineage**: DebianEdu / Skolelinux, Elementary OS, Zorin OS.
-* **Sovereign Capability**: Integrates Zorin Connect seamless Android/iOS smartphone integration, Pantheon curated app stores, and Skolelinux centralized LDAP student/teacher workstation provisioning.
+- **Absorbed Lineage**: DebianEdu / Skolelinux, Elementary OS, Zorin OS.
+
+- **Sovereign Capability**: Integrates Zorin Connect seamless Android/iOS smartphone integration, Pantheon curated app stores, and Skolelinux centralized LDAP student/teacher workstation provisioning.
 
 ### 7. Specialized & Declarative Staging (`sigma_usp_tool_specialized_nix`)
 
-* **Absorbed Lineage**: Raspberry Pi OS, SteamOS, Clear Linux, NixOS, Slackware.
-* **Sovereign Capability**: Orchestrates Gamescope micro-compositors for HDR gaming, Nix Flakes reproducible development environments, and ClearLinux `AutoFDO` AI-driven profile-guided kernel optimizations.
+- **Absorbed Lineage**: Raspberry Pi OS, SteamOS, Clear Linux, NixOS, Slackware.
+
+- **Sovereign Capability**: Orchestrates Gamescope micro-compositors for HDR gaming, Nix Flakes reproducible development environments, and ClearLinux `AutoFDO` AI-driven profile-guided kernel optimizations.
 
 ### 8. Forensics & Incident Recovery (`sigma_usp_tool_forensics_recovery`)
 
-* **Absorbed Lineage**: CAINE, Rescuezilla, SystemRescue.
-* **Sovereign Capability**: Activates Guymager graphical forensic image acquisition, TestDisk/PhotoRec lost partition carving engines, and `ddrescue` automated bad-sector disk cloning.
+- **Absorbed Lineage**: CAINE, Rescuezilla, SystemRescue.
+
+- **Sovereign Capability**: Activates Guymager graphical forensic image acquisition, TestDisk/PhotoRec lost partition carving engines, and `ddrescue` automated bad-sector disk cloning.
 
 ### 9. Container-Native Infrastructure (`sigma_usp_tool_container_coreos`)
 
-* **Absorbed Lineage**: CoreOS, RancherOS, Flatcar Linux.
-* **Sovereign Capability**: Bootstraps Zincati automated reboot coordinators for atomic OS updates, `k3s` ultra-lightweight Kubernetes edge clusters, and Butane declarative YAML compilers.
+- **Absorbed Lineage**: CoreOS, RancherOS, Flatcar Linux.
+
+- **Sovereign Capability**: Bootstraps Zincati automated reboot coordinators for atomic OS updates, `k3s` ultra-lightweight Kubernetes edge clusters, and Butane declarative YAML compilers.
 
 ### 10. Rolling Release Staging (`sigma_usp_tool_rolling_solus`)
 
-* **Absorbed Lineage**: Solus, EndeavourOS.
-* **Sovereign Capability**: Integrates Budgie desktop raven sidebar control centers, `yay` automated AUR helpers, and Linux Steam Integration (`LSI`) runtime optimizations.
+- **Absorbed Lineage**: Solus, EndeavourOS.
+
+- **Sovereign Capability**: Integrates Budgie desktop raven sidebar control centers, `yay` automated AUR helpers, and Linux Steam Integration (`LSI`) runtime optimizations.
 
 ---
 

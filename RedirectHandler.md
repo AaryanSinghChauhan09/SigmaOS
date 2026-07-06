@@ -1,4 +1,4 @@
-# Class: RedirectHandler
+﻿# Class: RedirectHandler
 
 A class that handles redirection logic for HTTP requests.
 

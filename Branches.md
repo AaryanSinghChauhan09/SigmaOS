@@ -28,7 +28,9 @@ SigmaOS implements a strict, 12-branch unified system architecture. The **Branch
 To prevent repository fragmentation and keep all 12 branches perfectly uniform:
 
 1. All changes, bugfixes, and C++ modules are developed and committed onto `main`.
+
 2. The Branch Uniformity & Synchronization Engine (`tools/sync_all_branches.js`) programmatically checks out each target branch, merges from `main`, and pushes back to remote origin.
+
 3. This guarantees bit-perfect uniformity and instant updates across all branches with zero merge conflicts.
 
 ---

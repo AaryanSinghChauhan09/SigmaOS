@@ -23,7 +23,6 @@ export async function bankTransfer(recipient, amount) {
   )
   return await body.json()
 }
-
 ```
 
 And this is what the test file looks like:
@@ -72,7 +71,6 @@ mockPool.intercept({
 const badRequest = await bankTransfer('1234567890', '100')
 
 assert.deepEqual(badRequest, { message: 'bank account not found' })
-
 ```
 
 Explore other MockAgent functionality [here](/docs/docs/api/MockAgent.md)
@@ -121,7 +119,6 @@ assert.deepStrictEqual(mockAgent.getCallHistory()?.firstCall()?.headers, { 'cont
 mockAgent.clearCallHistory()
 
 assert.ok(mockAgent.getCallHistory()?.calls().length === 0)
-
 ```
 
 Calling `mockAgent.close()` will automatically clear and delete every call history for you.
@@ -156,7 +153,6 @@ const badRequest = await bankTransfer('1234567890', '100')
 // Will throw an error
 // MockNotMatchedError: Mock dispatch not matched for path '/bank-transfer':
 // subsequent request to origin http://localhost:3000 was not allowed (net.connect disabled)
-
 ```
 
 ## Reply with data based on request
@@ -179,7 +175,6 @@ mockPool.intercept({
 
   return { message: 'transaction processed' }
 })
-
 ```
 
 in this case opts will be
@@ -192,5 +187,4 @@ in this case opts will be
   origin: 'http://localhost:3000',
   path: '/bank-transfer'
 }
-
 ```

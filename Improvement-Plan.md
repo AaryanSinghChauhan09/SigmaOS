@@ -19,25 +19,29 @@
 ## Design Improvements
 
 1. **Design tokens** → `sigma_design_tokens.rs` (colours/spacing/radius/motion as constants)
+
 2. **Icon system** → 100+ 24×24 icons, SVG-to-bitmap rasterizer
+
 3. **Typography engine** → PSF bitmap → TrueType rasterizer
+
 4. **Dark/Light adaptive** → all components implement `Themed` trait
+
 5. **Consistency audit** → WCAG AA contrast, 8px grid, hover/active/focus on all elements
 
 ## Application Plan
 
-**Tier 1 (v0.1)**: terminal, files, editor, settings, launcher  
-**Tier 2 (v1.0)**: browser, PDF, notes, calendar, contacts, calculator  
-**Tier 3 (v1.5)**: media player, image viewer, email, chat, video calls  
+**Tier 1 (v0.1)**: terminal, files, editor, settings, launcher
+**Tier 2 (v1.0)**: browser, PDF, notes, calendar, contacts, calculator
+**Tier 3 (v1.5)**: media player, image viewer, email, chat, video calls
 **Tier 4 (v2.0)**: office suite, vector/raster editor, IDE, DAW
 
 Each app uses the **SigmaApp trait** (Model-View-Intent pattern).
 
 ## UI/UX Improvements
 
-**Missing widgets**: Toggle, Slider, ListView, DropDown, ProgressBar, Modal, Tooltip, TabBar, TreeView  
-**UX flows**: Onboarding wizard, Quick Settings panel, App Switcher, Global Search, Screen Lock  
-**Accessibility**: TTS audio, screen magnifier, voice control, braille display  
+**Missing widgets**: Toggle, Slider, ListView, DropDown, ProgressBar, Modal, Tooltip, TabBar, TreeView
+**UX flows**: Onboarding wizard, Quick Settings panel, App Switcher, Global Search, Screen Lock
+**Accessibility**: TTS audio, screen magnifier, voice control, braille display
 **Mobile**: Breakpoints 480/1024px, bottom nav, split-view, adaptive layout
 
 ## Performance Targets
@@ -52,9 +56,13 @@ Each app uses the **SigmaApp trait** (Model-View-Intent pattern).
 ## OOP Improvements
 
 1. **Error hierarchy** — typed errors with context (not just `IoError`)
+
 2. **Capability-typed API** — phantom types prevent privilege escalation at compile time
+
 3. **Plugin system** — `Plugin` trait + `PluginManager` for extensibility
+
 4. **Reactive state** — MVI (Model-View-Intent) pattern for all app state
+
 5. **Async/await** — `sigma-async` no_std runtime for I/O-bound code
 
 ## Implementation Schedule

@@ -1,5 +1,7 @@
 # SigmaOS — Engineering Principles Roadmap
+
 ## OOP Architecture · CLI Design · Optimisation · Code Quality
+
 ## Codebase Standards · Design Patterns · Refactoring Plan
 
 ---
@@ -14,7 +16,7 @@ what exists and defines the standard every new piece of code must meet.
 
 #### Single Responsibility Principle (SRP)
 
-**Current violations:**
+### Current violations:
 
 | File | Violation | Fix |
 |------|-----------|-----|
@@ -77,7 +79,7 @@ High-level modules must not depend on low-level modules. Both depend on abstract
 
 **Current:** `SovereignGPU`, `SovereignNICEngine`, `SovereignNVMeEngine`, `SovereignKyber`, `SovereignDilithium` all use Meyer's singleton. This is correct for hardware drivers and crypto engines — there is physically one GPU, one NIC.
 
-**Wrong singletons to fix:**
+### Wrong singletons to fix:
 
 | Class | Problem | Fix |
 |-------|---------|-----|
@@ -202,26 +204,26 @@ class SigmaExample {
 public:
     // 1. Factory method instead of complex constructor
     static SigmaExample* create(const SigmaExampleConfig& cfg);
-    
+
     // 2. RAII — resources acquired in constructor, released in destructor
     ~SigmaExample();
-    
+
     // 3. No raw pointers in public API — use sigma_unique_ptr or reference
     sigma_err_t process(sigma_span<const sigma_u8> data);
-    
+
     // 4. const-correct: const on every method that doesn't mutate state
     sigma_u32 version() const;
-    
+
     // 5. Explicit error handling — no exceptions (kernel code), no silent failure
     sigma_err_t init();   // returns error code, never throws
-    
+
     // 6. Move semantics for expensive objects
     SigmaExample(SigmaExample&&) noexcept = default;
     SigmaExample& operator=(SigmaExample&&) noexcept = default;
-    
+
     // 7. No implicit conversions
     explicit SigmaExample(sigma_u32 id);
-    
+
     // 8. No mutable global state outside of singleton hardware drivers
 private:
     sigma_u32 m_id;           // m_ prefix for member variables
@@ -262,7 +264,7 @@ Examples:
   sigma-fleet device list --filter "status=healthy" --json
 ```
 
-**Rules every tool must follow:**
+### Rules every tool must follow:
 
 | Rule | Implementation | CI gate |
 |------|---------------|---------|
@@ -278,14 +280,21 @@ Examples:
 ### CLI2 — sigma-cli Completions & Discovery
 
 ```bash
+
 # Tab completion (fish-style, already partially real in sigma-sh):
+
 sigma-cli <TAB>                    # shows: profile alias pkg pod wine ...
+
 sigma-cli profile <TAB>            # shows: list show use create edit export
+
 sigma-cli profile use <TAB>        # shows: desktop minimal cloud forensic gaming
 
 # Fuzzy search (fzf-style):
+
 sigma-cli search pkg               # fuzzy: sigma-pkg, sigma-cli pkg, ...
+
 sigma-cli --interactive            # TUI picker for all commands
+
 ```
 
 | Task | File | Branch | Detail |
@@ -302,29 +311,37 @@ sigma-cli --interactive            # TUI picker for all commands
 **Current:** Parser complete, history/aliases/env real, no TTY.
 
 ```bash
+
 # Features to implement:
 
 # Scripting
+
 if sigma-net status --json | jq -r '.connected' | grep -q true; then
-    sigma-ai ask "Today's GST filing status" 
+    sigma-ai ask "Today's GST filing status"
 fi
 
 # Pipelines (already tokenised — just missing exec):
+
 sigma-agri msp --list | sort -k3 -n | head -5
 
 # Process substitution
+
 sigma-ca gst compute <(sigma-digilocker fetch --gstin 27ABCDE1234F1Z5)
 
 # Here documents
+
 sigma-accounts voucher <<EOF
 {"type":"sales","amount":10000,"gstin":"27ABCDE1234F1Z5"}
 EOF
 
 # Background jobs
+
 sigma-ai ask "analyse this report" &
 sigma-agri enam prices --mandi Azadpur &
 jobs         # list running background jobs
+
 wait %1      # wait for job 1
+
 ```
 
 | Task | File | Branch | Detail |
@@ -347,24 +364,35 @@ wait %1      # wait for job 1
 ### CLI4 — India-Specific CLI Features
 
 ```bash
+
 # Rupee currency output (₹, not $)
+
 sigma-agri msp --crop wheat        # Output: "₹2,425 per quintal"
+
 sigma-ca gst compute --gstin ...   # Output: "CGST: ₹9,000 | SGST: ₹9,000"
 
 # Indian date format
+
 sigma-cal gst-due 2026-07          # Output: "31 July 2026"
+
 sigma-agri pmkisan status          # Output: "Last credit: 01 April 2026"
 
 # Number formatting (Indian system: lakhs/crores)
+
 sigma-accounts balance --account Sales  # Output: "₹12,45,67,890" (not 124,567,890)
 
 # Regional language output
+
 SIGMA_LANG=hi sigma-agri msp --crop wheat
+
 # Output: "गेहूं का MSP: ₹2,425 प्रति क्विंटल"
 
 # Aadhaar / PAN masking in output
+
 sigma-digilocker list              # Output: "PAN: ABCDE****F" (masked)
+
 sigma-abdm patient search --name Ramesh  # Output: "ABHA: ****-****-1234"
+
 ```
 
 | Task | File | Branch | Detail |
@@ -498,7 +526,7 @@ typedef int32_t sigma_err_t;
 | [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | Gaming, IoT, Dev tools, Packages, Updates, Multi-platform, Sprint plan | ✅ Done |
 | [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | SOLID/OOP principles, Design patterns, CLI architecture, Optimisation, Refactoring | ✅ This doc |
 
-**Total: 6 documents, ~4,700 lines of actionable engineering roadmap.**
+### Total: 6 documents, ~4,700 lines of actionable engineering roadmap.
 
 ---
 

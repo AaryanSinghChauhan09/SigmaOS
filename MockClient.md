@@ -1,4 +1,4 @@
-# Class: MockClient
+﻿# Class: MockClient
 
 Extends: `undici.Client`
 
@@ -8,7 +8,7 @@ A mock client class that implements the same api as [MockPool](/docs/docs/api/Mo
 
 Arguments:
 
-- **origin**`string` - It should only include the**protocol, hostname, and port**.
+- **origin** `string` - It should only include the **protocol, hostname, and port**.
 
 - **options** `MockClientOptions` - It extends the `Client` options.
 
@@ -31,7 +31,6 @@ import { MockAgent } from 'undici'
 const mockAgent = new MockAgent({ connections: 1 })
 
 const mockClient = mockAgent.get('http://localhost:3000')
-
 ```
 
 ## Instance Methods
@@ -80,5 +79,4 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
 ```

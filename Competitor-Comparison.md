@@ -19,11 +19,17 @@
 ## Key weaknesses
 
 1. Hardware support breadth (GPU/Wi-Fi/Bluetooth/ARM matrix)
+
 2. Package ecosystem reproducibility
+
 3. Recovery UX beyond resilient shell
+
 4. Scheduler/compiler performance tuning
+
 5. Zenith desktop polish
+
 6. Immutable update verification on all release branches
+
 7. Wiki/docs synchronization discipline
 
 See [SigmaOS-Differentiation-Blueprint](SigmaOS-Differentiation-Blueprint) and [Stability-Playbook](Stability-Playbook).

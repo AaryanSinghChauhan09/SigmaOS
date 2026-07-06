@@ -1,4 +1,4 @@
-# Class: RetryAgent
+﻿# Class: RetryAgent
 
 Extends: `undici.Dispatcher`
 
@@ -30,7 +30,6 @@ Returns: `ProxyAgent`
 - **timeoutFactor** `number` (optional) - Factor to multiply the timeout by for each retry attempt. Default: `2`
 
 - **retryAfter** `boolean` (optional) - It enables automatic retry after the `Retry-After` header is received. Default: `true`
-
 -
 
 - **methods** `string[]` (optional) - Array of HTTP methods to retry. Default: `['GET', 'PUT', 'HEAD', 'OPTIONS', 'DELETE']`
@@ -59,5 +58,4 @@ const res = await agent.request({
 })
 console.log(res.statusCode)
 console.log(await res.body.text())
-
 ```

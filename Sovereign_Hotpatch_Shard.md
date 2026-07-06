@@ -33,11 +33,11 @@ Trampoline Engine
 
 1
 
-| Sub-command | Action | 
-| --- | --- | 
-| `sigma-hotpatch load <id> <target_addr> <patch_addr>` | Load and apply a live silicon trampoline patch | 
-| `sigma-hotpatch revert <id>` | Atomically revert a named patch and restore original code | 
-| `sigma-hotpatch audit` | Display all patches with addresses, state, and ref-counts | 
+| Sub-command | Action |
+| --- | --- |
+| `sigma-hotpatch load <id> <target_addr> <patch_addr>` | Load and apply a live silicon trampoline patch |
+| `sigma-hotpatch revert <id>` | Atomically revert a named patch and restore original code |
+| `sigma-hotpatch audit` | Display all patches with addresses, state, and ref-counts |
 
 ---
 

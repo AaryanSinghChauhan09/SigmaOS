@@ -10,7 +10,7 @@ These are blocking every other feature. In strict execution order:
 
 1. **Round-robin scheduler** — `kernel/core/sigma_sched.cpp`
    - 64-task round-robin, QEMU test: 2 tasks interleave
-   
+
 2. **Buddy physical allocator** — `kernel/core/sigma_mm.cpp`
    - Alloc/free 100 pages, no leak; slab for kmalloc
 
@@ -68,10 +68,15 @@ These are blocking every other feature. In strict execution order:
 ## 🟢 Documentation & Community (Ongoing)
 
 - [ ] Doxygen wired to CI
+
 - [ ] Man pages for 50 CLI tools (`docs/man/*.1`)
+
 - [ ] QEMU smoke test in CI
+
 - [ ] `make check-abi` gate
+
 - [ ] Interactive branch status dashboard on gh-pages
+
 - [ ] First public contributor meetup / hackathon planning
 
 ---
@@ -79,15 +84,25 @@ These are blocking every other feature. In strict execution order:
 ## ✅ Recently Completed
 
 - Kyber-1024 KEM + Dilithium-5 PQC signatures
+
 - WASM/WASI runtime
+
 - Linux ELF compat layer
+
 - Native KMS/GPU framework
+
 - PCIe MSI-X HAL
+
 - Cgroup enforcement
+
 - Sovereign Package Registry
+
 - Offline-First CRDT sync
+
 - Native Performance Governor
+
 - ARCHITECTURE.md, GOVERNANCE.md, INSTALL.md, SUPPORT.md
+
 - Complete wiki core reference pages
 
 ---

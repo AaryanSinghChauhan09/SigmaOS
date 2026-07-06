@@ -1,129 +1,53 @@
 # SigmaOS Memory Management
 
-The memory manager (`kernel/core/sigma_mm.rs`) provides physical and virtual
-memory management with ASLR and W^X enforcement built in.
+## Overview
 
----
+SigmaOS provides a modular, secure memory management system with:
 
-## Physical Memory: Buddy Allocator
+- Buddy system allocator for physical memory
 
-Manages physical page frames in 2^n block sizes (4 KB to 8 MB).
+- Memory pools for fast, fragmentation-free allocation
 
-```
-Order 0:  1 page  =    4 KB
-Order 1:  2 pages =    8 KB
-Order 2:  4 pages =   16 KB
-...
-Order 10: 1024 pages = 4 MB
-Order 11: 2048 pages = 8 MB (max block)
-```
+- 4-level paging (x86_64) for virtual memory
 
-Operations:
-- `alloc(order)` → returns physical frame number, O(log n) worst case
-- `free(frame, order)` → coalesces with buddy if both free, O(log n)
-- Automatic coalescing: when two buddies are both free → merged into larger block
+- Capability-based memory access control
 
-```c
-// Kernel C ABI
-sigma_slab_init();              // initialize both buddy + slab
-uint64_t free_pages = sigma_mm_free_pages();
-uint64_t used_pages = sigma_mm_used_pages();
-```
+## Components
 
----
+### Buddy Allocator (`klib/buddy_allocator.rs`)
 
-## Object Memory: Slab Allocator
+- Power-of-two block allocation
 
-Fast O(1) allocation for fixed-size kernel objects (8 bytes to 1024 bytes).
+- Free lists for each size class
 
-| Size Class | Objects/Slab | Use Case |
-|-----------|-------------|---------|
-| 8 bytes | 512 | Small flags, counters |
-| 16 bytes | 512 | Short descriptors |
-| 32 bytes | 512 | IPC messages |
-| 64 bytes | 512 | File descriptors |
-| 128 bytes | 512 | Task descriptors |
-| 256 bytes | 512 | Network packets |
-| 512 bytes | 512 | DMA headers |
-| 1024 bytes | 512 | Large kernel objects |
+- Merging of adjacent buddies on free
 
-```c
-void* obj = sigma_slab_alloc(64);   // allocate 64-byte object
-sigma_slab_free(obj);               // return to slab
-```
+- No external dependencies, no_std Rust
 
----
+### Memory Pool (`klib/memory_pool.rs`)
 
-## Virtual Memory: ASLR + W^X
+- Pre-allocated fixed-size blocks
 
-Every `mmap()` call randomizes the base address with 42-bit entropy:
+- Per-shard pools for isolation
 
-```
-rand = xorshift64() & 0x3FF_FFFF_F000  (42-bit, page-aligned)
-base = hint_base | rand
-```
+- O(1) allocation/deallocation
 
-### W^X Enforcement
+- No fragmentation
 
-SigmaOS never allows a page to be both writable and executable:
+### Paging (`klib/paging.rs`)
 
-```rust
-// Attempted: exec+write → REJECTED
-mmap(hint, size, PROT_WRITE | PROT_EXEC)  // → Err(MmError::WxViolation)
+- x86_64 4-level page tables
 
-// Allowed: exec+read (no write)
-mmap(hint, size, PROT_READ | PROT_EXEC)   // → Ok(randomized_addr)
-```
+- User/kernel access control
 
-This prevents a whole class of memory corruption exploits.
+- Present/writable flags
 
-### Virtual Memory Areas
+- Manual page mapping
 
-Each process has a `VmSpace` tracking up to 256 VMAs:
+### Capability-based Access (`klib/capability.rs`)
 
-```rust
-// Map a region (with ASLR + W^X check)
-let addr = vm_space.mmap(hint, size, VmaPerm::Rx)?;  // read+exec
+- Memory capabilities with per-object permissions
 
-// Unmap
-vm_space.munmap(addr, size);
+- No global root authority
 
-// Page fault handler
-vm_space.handle_page_fault(fault_addr, write_access)?;
-```
-
----
-
-## Memory Layout (x86-64)
-
-```
-0x0000_0000_0000_0000 ─ 0x0000_7FFF_FFFF_FFFF   User space (128 TB)
-   ├── ASLR-randomized text, data, stack
-   └── [stack top] → randomized per process
-
-0xFFFF_8000_0000_0000 ─ 0xFFFF_FFFF_FFFF_FFFF   Kernel space (128 TB)
-   ├── 0xFFFF_8000_0000_0000  Physical direct map
-   ├── 0xC000_0000            Slab allocator pool
-   ├── 0xFFFF_A000_0000_0000  Kernel text + data
-   ├── 0xFFFF_C000_0000_0000  Kernel heap
-   └── 0xFFFF_FF00_0000_0000  MMIO / device memory
-```
-
----
-
-## Performance Targets
-
-| Operation | Target | Algorithm |
-|-----------|--------|-----------|
-| `slab_alloc(64)` | < 50 ns | O(1) free-list |
-| `buddy_alloc(order=0)` | < 200 ns | O(log n) |
-| `mmap(hint, size)` | < 500 ns | ASLR + VMA insert |
-| Page fault (valid) | < 1 µs | VMA lookup |
-
----
-
-## Source
-
-`kernel/core/sigma_mm.rs` — 370 lines, `#![no_std]`, no external crates.
-
-*See also: [Scheduler](Scheduler) · [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)*
+- Fine-grained least privilege

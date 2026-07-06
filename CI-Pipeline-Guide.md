@@ -51,9 +51,13 @@ PR opened / push to main
 **Fix:** Your commit message doesn't follow Conventional Commits.
 
 ```bash
+
 # Amend your last commit message
+
 git commit --amend
+
 # Enter: feat(kernel): your description here
+
 ```
 
 ---
@@ -64,15 +68,20 @@ git commit --amend
 Diff in kernel/core/sigma_pledge.rs at line 42
 ```
 
-**Fix:**
+### Fix:
+
 ```bash
+
 # Format all Rust files
+
 cargo +nightly fmt
 
 # Or just the specific file
+
 rustfmt +nightly kernel/core/sigma_pledge.rs
 
 # Re-stage and amend
+
 git add -u && git commit --amend --no-edit
 ```
 
@@ -117,8 +126,11 @@ error[RUSTSEC-2024-XXXX]: vulnerability in crate-name
 **Fix:** Update the affected dependency:
 ```bash
 cargo update -p crate-name
+
 # Or pin to a safe version in Cargo.toml:
+
 # crate-name = "=1.2.3"
+
 ```
 
 ---
@@ -130,8 +142,11 @@ cargo update -p crate-name
 ```
 
 **Fix:** The kernel didn't print any expected output. Check:
+
 1. `arch/boot/sovereign_boot.asm` — does it print to serial?
+
 2. `kernel/core/sigma_irq.rs` — is serial console initialized (`serial_puts`)?
+
 3. `kernel/src/main.rs` — does it call `print_str("Welcome...")`?
 
 The QEMU boot test is currently **non-blocking** (warning only) until the kernel produces a stable boot.
@@ -144,8 +159,10 @@ The QEMU boot test is currently **non-blocking** (warning only) until the kernel
 ❌ REMOVED (1 symbols — ABI BREAK): fn sigma_request_irq
 ```
 
-**Fix:**
+### Fix:
+
 - If removal is intentional: bump `kabi/src/version.rs`, run `python kabi/check.py snapshot`
+
 - If accidental: restore the symbol or add a compatibility shim
 
 ---
@@ -167,26 +184,33 @@ pub unsafe fn sigma_pic_init(...) { ... }
 ## Running the Full CI Suite Locally
 
 ```bash
+
 # 1. Rust checks
+
 cargo fmt --check
 cargo clippy -- -D warnings
 cargo test
 
 # 2. SPDX headers
+
 find kernel security -name '*.rs' | while read f; do
   head -3 "$f" | grep -q SPDX || echo "MISSING: $f"
 done
 
 # 3. cargo-audit
+
 cargo install cargo-audit && cargo audit
 
 # 4. ABI check
+
 python kabi/check.py check
 
 # 5. QEMU boot (if QEMU installed)
+
 ./qemu-boot.sh smoke
 
 # 6. Nim check
+
 nim check userland/tools/sigma_top.nim
 ```
 
@@ -209,8 +233,11 @@ Fuzz runs are uploaded as CI artifacts. Download from:
 `Actions → nightly run → Artifacts → sigmaos-fuzz-results`
 
 If a fuzz crash is found:
+
 1. Download the crash input from the artifact
+
 2. Open an issue with label `bug` `security` `fuzz-found`
+
 3. Reference `SECURITY_POLICY.md` if it's a security-sensitive crash
 
 ---

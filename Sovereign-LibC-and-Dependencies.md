@@ -9,16 +9,20 @@ One of SigmaOS's core sovereignty principles is **eliminating hidden dependencie
 > *"Don't trust what you didn't build."*
 
 | Concern | Standard OS | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | Memory allocator | glibc `malloc` (dlmalloc-based, opaque) | `sigma_malloc` — bump + free-list, fully auditable |
 | String ops | glibc `strcpy`, `memcpy` (SIMD, hidden codegen) | Inline sovereign implementations, predictable |
 | Console output | `printf` → FILE* → glibc → kernel | `sys_print` → raw `write(2)` syscall, no FILE* |
 | Arch support | Conditional glibc ABI | Explicit `#ifdef __x86_64__` / `#ifdef __aarch64__` |
 
-**Inspired by:**
+### Inspired by:
+
 - **musl libc** (Alpine Linux): Lean, spec-compliant, no hidden surprises.
+
 - **diet libc**: Radically minimal for embedded targets.
+
 - **Linux kernel `lib/`**: In-tree string helpers used where libc is unavailable.
+
 - **BusyBox**: Replacing heavy glibc calls with inline helpers throughout.
 
 ---
@@ -92,8 +96,11 @@ The following rules are enforced across the entire SigmaOS codebase:
 ## 🛡️ Security Benefits
 
 - **No hidden glibc allocator state**: No `ptmalloc` bins that can be heap-groomed.
+
 - **Audit trail**: Every byte of `sigma_malloc`/`sigma_free` is traceable.
+
 - **No format string exploits**: `sys_print` handles only known format specifiers — unknown `%` tokens emit `?`.
+
 - **Heap corruption detection**: Each block carries a `0xSIGMA5A5` magic cookie; `sigma_free` validates it before marking the block free.
 
 ---
@@ -101,7 +108,7 @@ The following rules are enforced across the entire SigmaOS codebase:
 ## 🚀 Roadmap
 
 | Milestone | Status |
-|---|---|
+| --- | --- |
 | Bump allocator + free-list | ✅ Done |
 | Full string library | ✅ Done |
 | `sys_print` (x86_64 + ARM64 inline asm) | ✅ Done |

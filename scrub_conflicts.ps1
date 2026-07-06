@@ -1,4 +1,4 @@
-$files = Get-ChildItem -Path "C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\wiki_repo" -Filter "*.md" -Recurse
+$files = Get-ChildItem -Path "C:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS\wiki_repo" -Filter "*.md" -Recurse
 foreach ($file in $files) {
     $content = Get-Content $file.FullName
     if ($content -match "<<<<<<<" -or $content -match ">>>>>>>") {

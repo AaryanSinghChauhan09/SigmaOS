@@ -15,7 +15,7 @@ Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, ba
    core-init --shards 1024 --mem-lock secure
    ```
 
-4. **Deploy**: Use `lattice-deploy` to add custom industrial or userland shards as needed.
+1. **Deploy**: Use `lattice-deploy` to add custom industrial or userland shards as needed.
 
 ## 🛠️ Core Functions
 

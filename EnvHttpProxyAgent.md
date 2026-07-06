@@ -1,4 +1,4 @@
-# Class: EnvHttpProxyAgent
+﻿# Class: EnvHttpProxyAgent
 
 Extends: `undici.Dispatcher`
 
@@ -34,7 +34,6 @@ import { EnvHttpProxyAgent } from 'undici'
 const envHttpProxyAgent = new EnvHttpProxyAgent()
 // or
 const envHttpProxyAgent = new EnvHttpProxyAgent({ httpProxy: 'my.proxy.server:8080', httpsProxy: 'my.proxy.server:8443', noProxy: 'localhost' })
-
 ```
 
 #### Example - EnvHttpProxyAgent instantiation
@@ -45,7 +44,6 @@ This will instantiate the EnvHttpProxyAgent. It will not do anything until regis
 import { EnvHttpProxyAgent } from 'undici'
 
 const envHttpProxyAgent = new EnvHttpProxyAgent()
-
 ```
 
 #### Example - Basic Proxy Fetch with global agent dispatcher
@@ -61,7 +59,6 @@ const { status, json } = await fetch('http://localhost:3000/foo')
 console.log('response received', status) // response received 200
 
 const data = await json() // data { foo: "bar" }
-
 ```
 
 #### Example - Basic Proxy Request with global agent dispatcher
@@ -79,7 +76,6 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
 ```
 
 #### Example - Basic Proxy Request with local agent dispatcher
@@ -99,7 +95,6 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
 ```
 
 #### Example - Basic Proxy Fetch with local agent dispatcher
@@ -117,7 +112,6 @@ const {
 console.log('response received', status) // response received 200
 
 const data = await json() // data { foo: "bar" }
-
 ```
 
 ## Instance Methods

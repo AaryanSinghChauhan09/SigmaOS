@@ -22,4 +22,4 @@ The `release/standalone` branch is the pure, bare-metal expression of SigmaOS, o
 
 - **Simulation Framework**: Using the `simulation/` directory to stress-test algorithmic behavior at scale.
 
-*"Standalone is the ultimate industrial fact."*
+### "Standalone is the ultimate industrial fact."

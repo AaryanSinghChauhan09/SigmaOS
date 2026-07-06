@@ -13,9 +13,9 @@ Welcome to the **Sovereign Standalone Shard**. This edition is the ultimate expr
    dd if=sigma-standalone.iso of=/dev/sdX bs=4M status=progress
    ```
 
-3. **Ignite**: Boot from the device. The **Secure Shard Bootstrapping (SSB)** algorithm will automatically verify the lattice integrity in < 1s.
+1. **Ignite**: Boot from the device. The **Secure Shard Bootstrapping (SSB)** algorithm will automatically verify the lattice integrity in < 1s.
 
-4. **Provision**: Run `sigma-setup` to configure the local entropy pool and PQC sentinels.
+2. **Provision**: Run `sigma-setup` to configure the local entropy pool and PQC sentinels.
 
 ## 🛠️ Core Functions
 

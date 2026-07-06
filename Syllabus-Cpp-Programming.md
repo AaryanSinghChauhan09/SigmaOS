@@ -8,10 +8,13 @@
 
 ### Core OOP Principles
 
-* **Encapsulation:** Bundling data attributes and member functions into unified class abstractions, shielding internal state via explicit access specifiers (`private`, `protected`, `public`).
-* **Inheritance:** Establishing hierarchical relationships between base and derived classes, enabling structural code reuse and interface subtyping E.g., `NVMeDriver` inheriting from `HALDriver`.
-* **Polymorphism:** Permitting distinct derived objects to be treated uniformly via base pointers, utilizing dynamic vtable dispatch for late binding or templates for static compile-time resolution.
-* **Abstraction:** Exposing simplified, high-level operational interfaces while hiding complex internal implementation mechanics E.g., presenting a clean `read()` method while concealing low-level DMA register manipulation.
+- **Encapsulation:** Bundling data attributes and member functions into unified class abstractions, shielding internal state via explicit access specifiers (`private`, `protected`, `public`).
+
+- **Inheritance:** Establishing hierarchical relationships between base and derived classes, enabling structural code reuse and interface subtyping E.g., `NVMeDriver` inheriting from `HALDriver`.
+
+- **Polymorphism:** Permitting distinct derived objects to be treated uniformly via base pointers, utilizing dynamic vtable dispatch for late binding or templates for static compile-time resolution.
+
+- **Abstraction:** Exposing simplified, high-level operational interfaces while hiding complex internal implementation mechanics E.g., presenting a clean `read()` method while concealing low-level DMA register manipulation.
 
 **Unique Selling Point (USP):** Unmatched reusability, modularity, and clean architectural boundaries, enabling failure-isolated kernel shards and rapid ecosystem scaling.
 
@@ -279,14 +282,21 @@ void risky_operation(int fd) {
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Memory Leaks & Dangling Pointers:** Manual `new`/`delete` mismanagement leaves orphaned heap allocations or dangling pointer references.
-  * *Fix Strategy:* Enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`, `SigmaSharedPtr`) to guarantee deterministic heap deallocation upon scope exit.
-* **Issue - Concurrency Deadlocks in Object Methods:** Multiple threads invoking synchronized class methods acquire member mutexes in conflicting orders.
-  * *Fix Strategy:* Utilize `std::scoped_lock` (or sovereign equivalent) for deadlock-free multi-lock acquisition, and adhere to strict hierarchical locking protocols across object boundaries.
-* **Issue - Virtual Table (vtable) Slicing & Corruption:** Passing derived objects by value rather than reference/pointer slices off derived attributes and corrupts polymorphic vtable dispatch.
-  * *Fix Strategy:* Always pass polymorphic objects by reference (`const HALDriver&`) or smart pointer (`SigmaUniquePtr<HALDriver>`), and enforce mandatory `virtual` destructors on all base classes.
-* **Issue - Algorithmic Complexity in Container Traversal:** Linear array scanning ($O(n)$) or naive sorting ($O(n^2)$) degrades object container performance.
-  * *Fix Strategy:* Migrate from linear vectors to balanced B+ Trees or hash maps (`SovereignHashMap`), reducing search and indexing complexity to $O(\log n)$ or $O(1)$.
+- **Issue - Memory Leaks & Dangling Pointers:** Manual `new`/`delete` mismanagement leaves orphaned heap allocations or dangling pointer references.
+
+- *Fix Strategy:* Enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`, `SigmaSharedPtr`) to guarantee deterministic heap deallocation upon scope exit.
+
+- **Issue - Concurrency Deadlocks in Object Methods:** Multiple threads invoking synchronized class methods acquire member mutexes in conflicting orders.
+
+- *Fix Strategy:* Utilize `std::scoped_lock` (or sovereign equivalent) for deadlock-free multi-lock acquisition, and adhere to strict hierarchical locking protocols across object boundaries.
+
+- **Issue - Virtual Table (vtable) Slicing & Corruption:** Passing derived objects by value rather than reference/pointer slices off derived attributes and corrupts polymorphic vtable dispatch.
+
+- *Fix Strategy:* Always pass polymorphic objects by reference (`const HALDriver&`) or smart pointer (`SigmaUniquePtr<HALDriver>`), and enforce mandatory `virtual` destructors on all base classes.
+
+- **Issue - Algorithmic Complexity in Container Traversal:** Linear array scanning ($O(n)$) or naive sorting ($O(n^2)$) degrades object container performance.
+
+- *Fix Strategy:* Migrate from linear vectors to balanced B+ Trees or hash maps (`SovereignHashMap`), reducing search and indexing complexity to $O(\log n)$ or $O(1)$.
 
 ---
 
@@ -301,4 +311,4 @@ void risky_operation(int fd) {
 | **Namespaces**| All kernel code encapsulated within `Sigma::` hierarchy |
 | **Virtual dtors**| Mandatory on all base classes containing virtual methods |
 
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

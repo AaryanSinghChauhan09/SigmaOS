@@ -40,9 +40,13 @@
 ## Rules (enforced by CI)
 
 1. No C or C++ in `kernel/`, `drivers/`, `security/`, `crypto/`
+
 2. `#![no_std]` in all kernel crates
+
 3. No third-party crates in kernel
+
 4. Every `unsafe` block has a justification comment
+
 5. OOP via Traits (Rust) / struct methods (Zig) / contracts (SPARK)
 
 *See full guide: [docs/Language_Implementation_Policy.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Language_Implementation_Policy.md)*

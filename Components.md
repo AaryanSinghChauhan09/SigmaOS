@@ -62,4 +62,4 @@ SigmaOS v15.0 (Zenith) has reached industrial maturity through the implementatio
 
 - **Legal**: BNS 2023 (Bharatiya Nyaya Sanhita) legal mapping and cross-referencing.
 
-*"SigmaOS is not a project. It is the industrial single source of truth."*
+### "SigmaOS is not a project. It is the industrial single source of truth."

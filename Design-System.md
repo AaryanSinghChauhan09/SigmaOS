@@ -8,7 +8,9 @@
 ## Core Principles
 
 1. **Sovereign** — No dark patterns, no ads, no manipulation
+
 2. **Fluid** — Physics-based motion, every animation has purpose
+
 3. **Legible** — Contrast ≥ 4.5:1 (WCAG AA), always readable
 
 ---
@@ -65,10 +67,10 @@ Corner radius: `6 / 10 / 14 / 18 / 24px / full`
 
 ## Component Quick Ref
 
-**Button** — 36px h, 10px radius, cyan border + bg tint, 2px focus ring  
-**Input** — 36px h, 1px border, 3px glow on focus  
-**Card** — glassmorphism (60% opacity + 16px blur + 14px radius)  
-**Toggle** — 40×24px, spring-animated thumb  
+**Button** — 36px h, 10px radius, cyan border + bg tint, 2px focus ring
+**Input** — 36px h, 1px border, 3px glow on focus
+**Card** — glassmorphism (60% opacity + 16px blur + 14px radius)
+**Toggle** — 40×24px, spring-animated thumb
 
 ---
 

@@ -16,7 +16,6 @@ const cache_2 = await caches.open('v1')
 assert(cache_1 !== cache_2)
 // The same Response is matched in both.
 assert.deepStrictEqual(await cache_1.match('/req'), await cache_2.match('/req'))
-
 ```
 
 ## Deleting a Cache
@@ -28,5 +27,4 @@ const response = await cache_1.match('/req')
 await caches.delete('v1')
 
 await response.text() // the Response's body
-
 ```

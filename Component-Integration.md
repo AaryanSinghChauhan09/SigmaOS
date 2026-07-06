@@ -41,24 +41,40 @@ Keep everything in `AaryanSinghChauhan09/SigmaOS`. Use subdirectory namespacing:
 ```
 SigmaOS/
 ├── kernel/           # OS core
+
 ├── drivers/          # SDF drivers
+
 ├── fs/               # Filesystems
+
 ├── apps/
 │   ├── sigma-edit/   # Text editor
+
 │   ├── sigma-browser/# Browser
+
 │   ├── sigma-play/   # Media player
+
 │   └── sigma-mail/   # Email client
+
 ├── tools/
 │   ├── sigma-pkg/    # Package manager
+
 │   ├── sigma-sdk/    # Developer SDK
+
 │   ├── sigma-monitor/# Process monitor
+
 │   └── sigma-disks/  # Disk manager
+
 ├── installer/        # GUI + CLI installer
+
 ├── build/            # Multi-format build pipeline
+
 └── labs/
     ├── rtos/         # RTOS experiments
+
     ├── distributed/  # Distributed OS
+
     └── mobile/       # Mobile builds
+
 ```
 
 **Pros**: one CI pipeline, one issue tracker, atomic commits across kernel+app.
@@ -85,9 +101,13 @@ Create `github.com/SigmaOS-Project` organization. Each repo is a component:
 | `SigmaOS-Project/ci` | Shared GitHub Actions workflows |
 
 Every repo follows the same:
+
 - Branch policy: `main` only, PRs required.
+
 - CI template: from `SigmaOS-Project/ci`.
+
 - Package output: each repo produces `.sigpkg` artifacts.
+
 - Branding: "SigmaOS Browser", "SigmaOS Editor", etc.
 
 ---
@@ -95,8 +115,11 @@ Every repo follows the same:
 ## Option C: Hybrid (Current Best Fit)
 
 - `AaryanSinghChauhan09/SigmaOS` = monorepo for core + early apps.
+
 - Create `SigmaOS-Project` GitHub org when the first external contributor joins.
+
 - Move experimental labs to separate repos under the org immediately (they're low-risk to separate).
+
 - Keep apps in the monorepo until they have their own maintainer.
 
 ---
@@ -108,9 +131,13 @@ Every SigmaOS component (whether in monorepo or separate repo) must:
 ### 1. Produce a .sigpkg
 
 ```bash
+
 # Every component's CI must output a signed package
+
 sigma-pkg build PKGBUILD
+
 # Uploads sigma-<name>-<version>-<arch>.sigpkg to the registry
+
 ```
 
 ### 2. Use the SDF Interface (for kernel-touching components)
@@ -128,25 +155,35 @@ sigma_sdf::register_driver!(MyComponent, "sigma-mycomponent");
 ### 3. Declare Platform Compatibility
 
 ```toml
+
 # MANIFEST.toml
+
 [package]
 profile = ["standalone", "cloud", "mobile"]  # which OS profiles it supports
+
 arch    = ["x86_64", "arm64"]
 ```
 
 ### 4. Follow the Privacy Contract
 
 - No telemetry by default.
+
 - No network calls not documented in MANIFEST.toml.
+
 - Secrets only via `sigma-vault` API, never plain files.
 
 ### 5. Pass CI Gates
 
 ```yaml
+
 # Required checks before merge
+
 - sigma-pkg build && sigma-pkg verify   # package builds and verifies
+
 - make test-<component>                 # component tests pass
+
 - sigma-pkg lint PKGBUILD               # PKGBUILD is valid
+
 ```
 
 ---
@@ -156,9 +193,13 @@ arch    = ["x86_64", "arm64"]
 Users and developers find components via:
 
 1. `sigma-pkg search <keyword>` — command-line search.
+
 2. `app_store.html` — the sovereign app store UI.
+
 3. `download.html` — format-specific downloads.
+
 4. GitHub org page (when created).
+
 5. `docs.sigmaos.app` — developer documentation hub.
 
 ---
@@ -166,9 +207,13 @@ Users and developers find components via:
 ## Branding Rules
 
 Every component must:
+
 - Use the prefix `sigma-` for CLI tools and daemons.
+
 - Use `SigmaOS <Name>` for GUI apps (e.g., "SigmaOS Browser", "SigmaOS Editor").
+
 - Include the Σ logo in any GUI launcher icon.
+
 - Reference `https://github.com/AaryanSinghChauhan09/SigmaOS` in package metadata.
 
 ---

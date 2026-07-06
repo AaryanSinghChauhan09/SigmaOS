@@ -1,4 +1,4 @@
-# MIME Type Parsing
+﻿# MIME Type Parsing
 
 ## `MIMEType` interface
 
@@ -26,14 +26,13 @@ parseMIMEType('text/html; charset=gbk')
 //   parameters: Map(1) { 'charset' => 'gbk' },
 //   essence: 'text/html'
 // }
-
 ```
 
 Arguments:
 
 - **input** `string`
 
-Returns: `MIMEType | 'failure'`
+Returns: `MIMEType|'failure'`
 
 ## `serializeAMimeType(input)`
 
