@@ -62,6 +62,11 @@
 | I-12 | Build tool replacement (Vite → sigma-build) | sigma-build design | Eliminate Node.js dependency |
 | I-13 | Linter replacement (ESLint → sigma-lint) | sigma-lint implementation | ✅ Started - basic implementation done |
 | I-14 | Formatter replacement (Prettier → sigma-format) | sigma-format implementation | ✅ Started - basic implementation done |
+| I-15 | Intel GPU driver (i915-inspired) | GPU framework | ✅ Started - basic modesetting done |
+| I-16 | Realtek network driver (r8169-inspired) | Network stack | ✅ Started - basic driver done |
+| I-17 | Init system (systemd/OpenRC-inspired) | Service framework | ✅ Started - basic service manager done |
+| I-18 | Package manager core (sigpkg) | Package ecosystem | ✅ Started - basic package handling done |
+| I-19 | SELinux-inspired MAC system | Security framework | ✅ Started - basic policy engine done |
 
 ---
 
