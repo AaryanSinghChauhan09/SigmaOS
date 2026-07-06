@@ -48,8 +48,8 @@
 
 | ID | Area | Blocked By | Notes |
 |----|------|-----------|-------|
-| I-01 | UEFI bootloader binary (`sigma-boot.efi`) | Phase G kernel stable | Cannot dual-boot without EFI stub |
-| I-02 | Bootable ISO pipeline (`make iso` → GPT image) | I-01 | GRUB2 fallback usable meanwhile |
+| I-01 | UEFI bootloader binary (`sigma-boot.efi`) | Phase G kernel stable | ✅ Started - bootloader implementation done, EFI build needed |
+| I-02 | Bootable ISO pipeline (`make iso` → GPT image) | I-01 | ✅ Started - ISO builder implementation |
 | I-03 | NVMe interrupt-driven async driver (vs MMIO poll) | IRQ controller | ✅ Started - async driver exists |
 | I-04 | Wi-Fi 6E (6 GHz band) + WPA3-Enterprise | G-02 base | ✅ Started - basic driver done |
 | I-05 | Multi-monitor KMS (clone + extended) | H-05 base | ✅ Started - multi-monitor support done |
