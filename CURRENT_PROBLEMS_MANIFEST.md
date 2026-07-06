@@ -67,6 +67,8 @@
 | I-17 | Init system (systemd/OpenRC-inspired) | Service framework | ✅ Started - basic service manager done |
 | I-18 | Package manager core (sigpkg) | Package ecosystem | ✅ Started - basic package handling done |
 | I-19 | SELinux-inspired MAC system | Security framework | ✅ Started - basic policy engine done |
+| I-20 | Graphical installer (Calamares-inspired) | Installer framework | ✅ Started - basic installer done |
+| I-21 | UEFI bootloader (sigma-boot) | Bootloader framework | ✅ Started - basic bootloader done |
 
 ---
 
