@@ -53,7 +53,7 @@
 | I-03 | NVMe interrupt-driven async driver (vs MMIO poll) | IRQ controller | Performance: 4× throughput gain |
 | I-04 | Wi-Fi 6E (6 GHz band) + WPA3-Enterprise | G-02 base | Enterprise / government deployments |
 | I-05 | Multi-monitor KMS (clone + extended) | H-05 base | Zenith desktop requires this |
-| I-06 | SATA AHCI driver | PMM stable | Many embedded devices use SATA |
+| I-06 | SATA AHCI driver | PMM stable | ✅ Completed - full AHCI implementation |
 | I-07 | Virtio-GPU (GPU acceleration for VMs) | H-05 base | QEMU CI requires this |
 | I-08 | Package repository server (`sigma-repo-server`) | net stack stable | sigma-pkg install needs a real server |
 | I-09 | Display server crash recovery | H-05 + IPC | Zenith restarts on segfault |
@@ -74,6 +74,10 @@
 | I-24 | Education suite (GeoGebra, Scilab, Octave) | Education tools | ✅ Started - basic suite done |
 | I-25 | Indic NLP support (22 languages) | India-specific | ✅ Started - basic NLP done |
 | I-26 | Community governance model | Community | ✅ Started - governance doc done |
+| I-27 | USB HID driver | USB stack | ✅ Started - basic driver done |
+| I-28 | Package repository server | Package ecosystem | ✅ Started - basic server done |
+| I-29 | Workflow automation engine | AI framework | ✅ Started - basic engine done |
+| I-30 | Adaptive learning system | AI framework | ✅ Started - basic system done |
 
 ---
 
