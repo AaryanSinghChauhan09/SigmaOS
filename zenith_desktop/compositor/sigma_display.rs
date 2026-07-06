@@ -29,6 +29,8 @@ pub struct Output {
     pub x: SigmaI32,
     pub y: SigmaI32,
     pub scale: SigmaU32,
+    pub primary: SigmaBool,
+    pub clone_of: SigmaU32, // If cloning another output
 }
 
 /// Surface (window/buffer)
@@ -76,7 +78,7 @@ pub unsafe extern "C" fn sigma_display_init() -> SigmaI32 {
     OUTPUT_COUNT = 0;
     SURFACE_COUNT = 0;
     
-    // Initialize default output
+    // Initialize primary output
     OUTPUTS[0] = Output {
         id: 0,
         name: *b"eDP-1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
@@ -90,6 +92,8 @@ pub unsafe extern "C" fn sigma_display_init() -> SigmaI32 {
         x: 0,
         y: 0,
         scale: 1,
+        primary: true,
+        clone_of: 0xFFFFFFFF, // Not cloning
     };
     OUTPUT_COUNT = 1;
     
@@ -121,6 +125,8 @@ pub unsafe extern "C" fn sigma_display_add_output(
         x: 0,
         y: 0,
         scale: 1,
+        primary: false,
+        clone_of: 0xFFFFFFFF,
     };
     
     if !name.is_null() {
@@ -134,6 +140,50 @@ pub unsafe extern "C" fn sigma_display_add_output(
     OUTPUTS[OUTPUT_COUNT as usize] = output;
     OUTPUT_COUNT += 1;
     
+    0 // Success
+}
+
+/// Set output position (for extended mode)
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_set_output_position(
+    output_id: SigmaU32,
+    x: SigmaI32,
+    y: SigmaI32,
+) -> SigmaI32 {
+    if output_id >= OUTPUT_COUNT {
+        return -1;
+    }
+    
+    OUTPUTS[output_id as usize].x = x;
+    OUTPUTS[output_id as usize].y = y;
+    0 // Success
+}
+
+/// Clone output to another (mirror mode)
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_clone_output(
+    source_id: SigmaU32,
+    target_id: SigmaU32,
+) -> SigmaI32 {
+    if source_id >= OUTPUT_COUNT || target_id >= OUTPUT_COUNT {
+        return -1;
+    }
+    
+    OUTPUTS[target_id as usize].clone_of = source_id;
+    OUTPUTS[target_id as usize].current_mode = OUTPUTS[source_id as usize].current_mode;
+    0 // Success
+}
+
+/// Set primary output
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_set_primary(output_id: SigmaU32) -> SigmaI32 {
+    if output_id >= OUTPUT_COUNT {
+        return -1;
+    }
+    
+    for i in 0..OUTPUT_COUNT as usize {
+        OUTPUTS[i].primary = (i == output_id as usize);
+    }
     0 // Success
 }
 

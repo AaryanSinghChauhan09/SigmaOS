@@ -51,10 +51,10 @@
 | I-01 | UEFI bootloader binary (`sigma-boot.efi`) | Phase G kernel stable | Cannot dual-boot without EFI stub |
 | I-02 | Bootable ISO pipeline (`make iso` → GPT image) | I-01 | GRUB2 fallback usable meanwhile |
 | I-03 | NVMe interrupt-driven async driver (vs MMIO poll) | IRQ controller | Performance: 4× throughput gain |
-| I-04 | Wi-Fi 6E (6 GHz band) + WPA3-Enterprise | G-02 base | Enterprise / government deployments |
-| I-05 | Multi-monitor KMS (clone + extended) | H-05 base | Zenith desktop requires this |
+| I-04 | Wi-Fi 6E (6 GHz band) + WPA3-Enterprise | G-02 base | ✅ Started - basic driver done |
+| I-05 | Multi-monitor KMS (clone + extended) | H-05 base | ✅ Started - multi-monitor support done |
 | I-06 | SATA AHCI driver | PMM stable | ✅ Completed - full AHCI implementation |
-| I-07 | Virtio-GPU (GPU acceleration for VMs) | H-05 base | QEMU CI requires this |
+| I-07 | Virtio-GPU (GPU acceleration for VMs) | H-05 base | ✅ Started - basic driver done |
 | I-08 | Package repository server (`sigma-repo-server`) | net stack stable | sigma-pkg install needs a real server |
 | I-09 | Display server crash recovery | H-05 + IPC | Zenith restarts on segfault |
 | I-10 | Indian Language IME (Inscript + phonetic 22 langs) | H-05 + sound | BHASHINI integration |
