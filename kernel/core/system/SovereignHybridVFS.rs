@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Hybrid VFS (S-VFS-ADV)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Hybrid VFS (S-VFS-ADV)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,17 +16,17 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignHybridVFS ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignHybridVFS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// VFSNode — hardware-compatible struct.
+/// VFSNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct VFSNode {
     pub shard_id: SigmaU64,
     pub is_remote: SigmaBool,
 }
 
-/// SovereignHybridVFS — OOP singleton pattern.
+/// SovereignHybridVFS â€” OOP singleton pattern.
 pub struct SovereignHybridVFS {
     pub initialized: SigmaBool,
 }
@@ -79,4 +79,6 @@ pub unsafe extern "C" fn vfs_adv_init() {
 pub unsafe extern "C" fn vfs_mount() {
     INSTANCE.initialized = true;
 }
+
+
 

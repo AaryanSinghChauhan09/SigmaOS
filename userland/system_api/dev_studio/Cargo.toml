@@ -1,0 +1,47 @@
+[package]
+name = "sigma-dev-studio"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Project"]
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.4", features = ["v4", "serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Git integration
+git2 = "0.18"
+
+# HTTP client for API testing
+reqwest = { version = "0.11", features = ["json"] }
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Docker daemon integration
+bollard = "0.15"
+
+# Kubernetes client
+kube = { version = "0.88", features = ["runtime", "client", "rustls-tls"], optional = true }
+k8s-openapi = { version = "0.20", optional = true }
+
+# Database drivers
+sqlx = { version = "0.7", features = ["runtime-tokio", "mysql", "postgres", "sqlite"], optional = true }
+mongodb = { version = "2.8", optional = true }
+redis = { version = "0.24", features = ["tokio-comp"], optional = true }
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+[features]
+default = []
+kubernetes = ["kube", "k8s-openapi"]
+databases = ["sqlx", "mongodb", "redis"]
+all-integrations = ["kubernetes", "databases"]
+
+[dev-dependencies]
+mockito = "1.2"

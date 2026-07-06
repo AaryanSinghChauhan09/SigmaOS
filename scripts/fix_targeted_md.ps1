@@ -1,4 +1,4 @@
-$BASE = 'c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS'
+$BASE = 'c:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS'
 
 function Fix-File {
     param([string]$path, [scriptblock]$transform)

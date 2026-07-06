@@ -6,12 +6,12 @@ This document identifies the critical areas where the SigmaOS Sovereign Lattice 
 
 ## 📊 Gap Audit Matrix
 
-| Domain | Incumbent standard | Current SigmaOS Status | Engineering Resolution Plan | 
-| :--- | :--- | :--- | :--- | 
-| **Driver Coverage** | Decades of monolithic driver trees (USB, NVMe, Wi-Fi, Intel/AMD GPU) | Broad stub drivers with unified HAL wrappers | Implement the**Unified Driver API** and stabilize physical USB, storage, and graphics controller interfaces. | 
-| **Power Management** | Deep ACPI tables integration, CPU P-States/C-States, dynamic TLP | Base power state controls | Expand the ACPI subsystem tables parser and integrate dynamic CPU throttle/governor sweeps. | 
-| **Storage Resiliency** | Industry-standard transactional FS (`ext4`, `APFS`, `ZFS`, `NTFS`) | Base block writing and paging | Deployed the**Sovereign ZFS Storage Pool (S-ZFS)** offering RAID-Z striping and Copy-on-Write snapshots. | 
-| **App Ecosystem** | Flatpak, Snap, MSI installers, native app stores | Static package manifests | Deployed the**S-Flatpak Sandbox Runtime** and WASM shard registries to support secure local app isolation. | 
+| Domain | Incumbent standard | Current SigmaOS Status | Engineering Resolution Plan |
+| :--- | :--- | :--- | :--- |
+| **Driver Coverage** | Decades of monolithic driver trees (USB, NVMe, Wi-Fi, Intel/AMD GPU) | Broad stub drivers with unified HAL wrappers | Implement the**Unified Driver API** and stabilize physical USB, storage, and graphics controller interfaces. |
+| **Power Management** | Deep ACPI tables integration, CPU P-States/C-States, dynamic TLP | Base power state controls | Expand the ACPI subsystem tables parser and integrate dynamic CPU throttle/governor sweeps. |
+| **Storage Resiliency** | Industry-standard transactional FS (`ext4`, `APFS`, `ZFS`, `NTFS`) | Base block writing and paging | Deployed the**Sovereign ZFS Storage Pool (S-ZFS)** offering RAID-Z striping and Copy-on-Write snapshots. |
+| **App Ecosystem** | Flatpak, Snap, MSI installers, native app stores | Static package manifests | Deployed the**S-Flatpak Sandbox Runtime** and WASM shard registries to support secure local app isolation. |
 
 ---
 

@@ -32,10 +32,15 @@ sigma-commnet is the OS-level infrastructure to do this legally and fairly.
 ```
 
 The gateway node runs `sigma-commetd` and manages:
+
 - Upstream bandwidth (via `tc HTB` fair-share QoS)
+
 - DID-based access control (only enrolled members connect)
+
 - Local content cache (government sites, NCERT, eNAM served from local storage)
+
 - Billing (calculates exact cost per household, collects via UPI)
+
 - Access logs (mandatory DoT compliance)
 
 ---
@@ -61,11 +66,14 @@ If a household is idle, its share is automatically redistributed. Nobody gets lo
 ### Local Content Caching
 
 Government websites, educational content, and farm data are cached locally on the gateway node. This means:
+
 - NCERT textbooks load instantly even on 2G-equivalent local Wi-Fi
+
 - eNAM mandi prices work even when upstream ISP is slow
+
 - Aadhaar-linked services serve cached responses for common queries
 
-**Pre-seeded domains:**
+### Pre-seeded domains:
 
 | Domain | Content | Category |
 |---|---|---|
@@ -81,15 +89,21 @@ Add any domain to the cache:
 ```bash
 sigma-commnet cache add --url "ncert.nic.in" --category education
 sigma-commnet cache sync --all  # Sync all cached domains now
+
 ```
 
 ### Community Dashboard
 
 A web-based dashboard (accessible on the local mesh, no internet needed) shows:
+
 - Who is using how much bandwidth right now
+
 - Monthly usage per household
+
 - Cache hit ratio (bandwidth saved)
+
 - Upstream status (up/down)
+
 - Cost per household this month
 
 ### Billing — Flat Cost Share, No Profit
@@ -104,9 +118,13 @@ sigma-commnet bill generate --month 2026-07
 ```
 
 The billing system:
+
 - Calculates exact ISP cost ÷ enrolled members
+
 - Optionally weights by usage (members who use more pay proportionally more)
+
 - Generates UPI payment link for each member
+
 - Records payment via community UPI VPA
 
 **This is not reselling.** Cost-sharing among a defined community is permitted under TRAI guidelines.
@@ -114,17 +132,25 @@ The billing system:
 ### Offline Mode
 
 When the upstream ISP fails, sigma-commnet switches to offline mode automatically:
+
 - All cached content (NCERT, government portals, health info) continues to work
+
 - sigma-gram panchayat records remain accessible
+
 - sigma-health local patient records remain accessible
+
 - Community dashboard shows "Offline since [time]"
 
 ### DID-Based Access Control
 
 Only enrolled community members can connect. Enrollment is simple:
+
 1. Head of household submits their SigmaOS DID to the gateway admin
+
 2. Gateway admin approves
+
 3. All devices with registered MAC addresses get access
+
 4. Non-enrolled devices see a DID enrollment page
 
 Access logs are maintained for 6 months as required by DoT rules.
@@ -150,39 +176,50 @@ sigma-commnet is designed to comply with TRAI's community Wi-Fi regulations:
 ### Quick Setup
 
 ```bash
+
 # Setup gateway: upstream on eth0, community mesh on wlan0, up to 20 members
+
 sigma-commnet setup --gateway eth0 --mesh wlan0 --members 20
 
 # Add a member
+
 sigma-commnet member add \
   --name "Ramesh Kumar" \
   --did "did:sigma:abc123..." \
   --mac "AA:BB:CC:DD:EE:FF"
 
 # Check status
+
 sigma-commnet status
 ```
 
 ### Full Setup Walkthrough
 
 ```bash
+
 # 1. Configure upstream ISP connection
+
 sigma-commnet upstream set --iface eth0 --bandwidth 100 --isp "Jio Fiber" --cost 1200
 
 # 2. Configure mesh network
+
 sigma-commnet mesh set --iface wlan0 --ssid "GramNet-Rampur" --password <wpa3-password>
 
 # 3. Set billing UPI
+
 sigma-commnet billing set --upi "gramnet.rampur@upi" --split equal
 
 # 4. Enable caching
+
 sigma-commnet cache add --url "ncert.nic.in" --category education
 sigma-commnet cache add --url "enam.gov.in" --category agriculture
 
 # 5. Start service
+
 sigma-commnet start
 
 # 6. Generate monthly bill
+
 sigma-commnet bill generate --month 2026-07
 ```
 
@@ -211,17 +248,24 @@ sigma-commnet access-log --from 2026-06-01 --to 2026-06-30
 
 ## Hardware Requirements
 
-**Gateway node (minimum):**
+### Gateway node (minimum):
+
 - Any SigmaOS machine with 2 network interfaces (NICs)
+
 - 1 GB RAM, 10 GB storage (for cache)
+
 - Example: ₹3,000 Raspberry Pi 4 + USB ethernet adapter
 
-**Community mesh:**
+### Community mesh:
+
 - Any 802.11n/ac Wi-Fi router or access point (acts as dumb AP)
+
 - Or: cat5e ethernet run to each house (PoE switches)
 
-**Upstream:**
+### Upstream:
+
 - Any single ISP connection: Jio Fiber, BSNL, ACT, Starlink
+
 - 4G LTE router as backup upstream
 
 ---

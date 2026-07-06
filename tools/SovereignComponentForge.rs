@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignComponentForge ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignComponentForge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ComponentDescriptor — hardware-compatible struct.
+/// ComponentDescriptor â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ComponentDescriptor {
     pub component_id: SigmaU32,
     pub capability_mask: SigmaU32,
     pub active: SigmaBool,
     pub execution_count: SigmaU32,
 }
 
-/// SovereignComponentForge — OOP singleton pattern.
+/// SovereignComponentForge â€” OOP singleton pattern.
 pub struct SovereignComponentForge {
     pub initialized: SigmaBool,
 }
@@ -91,4 +91,6 @@ pub unsafe extern "C" fn component_forge_init() {
 pub unsafe extern "C" fn component_forge_dispatch() {
     INSTANCE.initialized = true;
 }
+
+
 

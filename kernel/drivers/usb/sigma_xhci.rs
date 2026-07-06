@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,39 +16,39 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::XhciController ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::XhciController â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// XhciTRB — hardware-compatible struct.
+/// XhciTRB â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciTRB {
     pub param_lo: SigmaU32,
     pub param_hi: SigmaU32,
     pub status: SigmaU32,
     pub control: SigmaU32,
 }
 
-/// XhciERSTEntry — hardware-compatible struct.
+/// XhciERSTEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciERSTEntry {
     pub ring_segment_base: SigmaU64,
     pub ring_segment_size: SigmaU16,
     pub reserved1: SigmaU16,
     pub reserved2: SigmaU32,
 }
 
-/// XhciDCBAA — hardware-compatible struct.
+/// XhciDCBAA â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciDCBAA {
     pub pointers: [SigmaU64; 256],
 }
 
-/// XhciCapRegs — hardware-compatible struct.
+/// XhciCapRegs â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciCapRegs {
     pub caplength: SigmaU8,
     pub reserved: SigmaU8,
     pub hciversion: SigmaU16,
@@ -61,10 +61,10 @@ pub struct {s_name} {{
     pub hccparams2: SigmaU32,
 }
 
-/// XhciOpRegs — hardware-compatible struct.
+/// XhciOpRegs â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciOpRegs {
     pub usbcmd: SigmaU32,
     pub usbsts: SigmaU32,
     pub pagesize: SigmaU32,
@@ -76,20 +76,20 @@ pub struct {s_name} {{
     pub config: SigmaU32,
 }
 
-/// XhciPortRegs — hardware-compatible struct.
+/// XhciPortRegs â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciPortRegs {
     pub portsc: SigmaU32,
     pub portpmsc: SigmaU32,
     pub portli: SigmaU32,
     pub porthlpmc: SigmaU32,
 }
 
-/// XhciInterrupterRegs — hardware-compatible struct.
+/// XhciInterrupterRegs â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct XhciInterrupterRegs {
     pub iman: SigmaU32,
     pub imod: SigmaU32,
     pub erstsz: SigmaU32,
@@ -98,7 +98,7 @@ pub struct {s_name} {{
     pub erdp: SigmaU64,
 }
 
-/// XhciController — OOP singleton pattern.
+/// XhciController â€” OOP singleton pattern.
 pub struct XhciController {
     pub initialized: SigmaBool,
 }
@@ -136,4 +136,6 @@ static mut INSTANCE: XhciController = XhciController::new();
 pub unsafe extern "C" fn pollPorts() {
     INSTANCE.initialized = true;
 }
+
+
 

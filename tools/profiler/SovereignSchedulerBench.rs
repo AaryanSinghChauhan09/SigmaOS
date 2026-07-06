@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignSchedulerBench.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignSchedulerBench.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignSchedulerBench ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignSchedulerBench â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BenchTask — hardware-compatible struct.
+/// BenchTask â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BenchTask {
     pub task_id: SigmaU32,
     pub vruntime: SigmaU64,
     pub deadline: SigmaU64,
@@ -30,17 +30,17 @@ pub struct {s_name} {{
     pub preemptions: SigmaU32,
 }
 
-/// LatencySample — hardware-compatible struct.
+/// LatencySample â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LatencySample {
     pub task_id: SigmaU32,
     pub expected_wakeup: SigmaU64,
     pub actual_wakeup: SigmaU64,
     pub drift_ns: SigmaU64,
 }
 
-/// SovereignSchedulerBench — OOP singleton pattern.
+/// SovereignSchedulerBench â€” OOP singleton pattern.
 pub struct SovereignSchedulerBench {
     pub initialized: SigmaBool,
 }
@@ -158,4 +158,6 @@ pub unsafe extern "C" fn sched_bench_run_edf() {
 pub unsafe extern "C" fn sched_bench_audit() {
     INSTANCE.initialized = true;
 }
+
+
 

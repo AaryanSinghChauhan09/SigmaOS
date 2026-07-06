@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Rollback Shard
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Rollback Shard
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignRollbackShard ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignRollbackShard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// RollbackSnapshot — hardware-compatible struct.
+/// RollbackSnapshot â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RollbackSnapshot {
     pub id: SigmaU32,
     pub timestamp: SigmaU32,
     pub checksum_valid: SigmaBool,
 }
 
-/// SovereignRollbackShard — OOP singleton pattern.
+/// SovereignRollbackShard â€” OOP singleton pattern.
 pub struct SovereignRollbackShard {
     pub initialized: SigmaBool,
 }
@@ -125,4 +125,6 @@ pub unsafe extern "C" fn rollback_execute() {
 pub unsafe extern "C" fn rollback_stress_test() {
     INSTANCE.initialized = true;
 }
+
+
 

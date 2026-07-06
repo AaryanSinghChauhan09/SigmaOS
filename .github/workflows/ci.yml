@@ -25,6 +25,21 @@ jobs:
       - name: Run cargo check
         run: cargo check --workspace
 
+      - name: Run cargo test
+        run: cargo test --workspace
+
+      - name: Test Control Center
+        run: cargo test -p sigma-control-center
+
+      - name: Test AI Integration
+        run: cargo test -p sigma-ai-integration
+
+      - name: Test Dev Studio
+        run: cargo test -p sigma-dev-studio
+
+      - name: Test Design System
+        run: cargo test -p sigma-design-system
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:

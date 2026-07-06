@@ -35,9 +35,9 @@
 
 ## Core OOP Rules
 
-**Rust**: traits > inheritance, composition > extension, generics for hot paths, dyn only for runtime polymorphism  
-**Zig**: every struct has `init()`, no global mutable state outside AtomicXxx  
-**Nim**: `method` for virtual, `proc` for non-virtual, no implicit globals  
+**Rust**: traits > inheritance, composition > extension, generics for hot paths, dyn only for runtime polymorphism
+**Zig**: every struct has `init()`, no global mutable state outside AtomicXxx
+**Nim**: `method` for virtual, `proc` for non-virtual, no implicit globals
 **SPARK**: Pre+Post on all public operations, gnatprove level-2, no side effects on Pure
 
 ---
@@ -45,9 +45,13 @@
 ## Upcoming Improvements
 
 1. **Typed error hierarchy** — `SigmaError { Kernel | Fs | Net | Security | Crypto }`
+
 2. **Capability-typed API** — phantom types prevent privilege escalation at compile time
+
 3. **Plugin system** — `Plugin` trait + dynamic loading via sigpkg
+
 4. **Reactive state (MVI)** — `Store<S,A>` with reducer + subscribers for all app state
+
 5. **Async/await** — `sigma-async` cooperative runtime, no_std compatible
 
 ---

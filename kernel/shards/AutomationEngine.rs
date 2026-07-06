@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::MorphicAutomationEngine ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::MorphicAutomationEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// AutomationRecipe — hardware-compatible struct.
+/// AutomationRecipe â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AutomationRecipe {
     pub name: SigmaU64,
     pub trigger: SigmaU64,
     pub action: SigmaU64,
     pub is_active: SigmaBool,
 }
 
-/// MorphicAutomationEngine — OOP singleton pattern.
+/// MorphicAutomationEngine â€” OOP singleton pattern.
 pub struct MorphicAutomationEngine {
     pub initialized: SigmaBool,
 }
@@ -81,4 +81,6 @@ pub unsafe extern "C" fn audit_performance() {
 pub unsafe extern "C" fn start_automation_engine() {
     INSTANCE.initialized = true;
 }
+
+
 

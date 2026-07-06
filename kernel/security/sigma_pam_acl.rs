@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,37 +16,37 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SystemRole ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SystemRole â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ACE — hardware-compatible struct.
+/// ACE â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ACE {
     pub role: SigmaU64,
     pub allowed_mask: SigmaU32,
     pub denied_mask: SigmaU32,
 }
 
-/// ACL — hardware-compatible struct.
+/// ACL â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ACL {
     pub resource_id: SigmaU32,
     pub num_entries: SigmaU32,
     pub entries: [SigmaU64; 8],
 }
 
-/// UserRecord — hardware-compatible struct.
+/// UserRecord â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UserRecord {
     pub uid: SigmaU32,
     pub username: [u8; 32],
     pub pwd_hash: [u8; 64],
     pub role: SigmaU64,
 }
 
-/// SystemRole — OOP singleton pattern.
+/// SystemRole â€” OOP singleton pattern.
 pub struct SystemRole {
     pub initialized: SigmaBool,
 }
@@ -99,4 +99,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn sigma_security_init() {
     INSTANCE.initialized = true;
 }
+
+
 

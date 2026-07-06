@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPatentsFeeCalc ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPatentsFeeCalc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PatentFeeResult — hardware-compatible struct.
+/// PatentFeeResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PatentFeeResult {
     pub official_filing_fee_paise: SigmaU64,
     pub official_examination_fee_paise: SigmaU64,
     pub early_publication_fee_paise: SigmaU64,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub is_e_filing: SigmaBool,
 }
 
-/// SovereignPatentsFeeCalc — OOP singleton pattern.
+/// SovereignPatentsFeeCalc â€” OOP singleton pattern.
 pub struct SovereignPatentsFeeCalc {
     pub initialized: SigmaBool,
 }
@@ -52,4 +52,6 @@ static mut INSTANCE: SovereignPatentsFeeCalc = SovereignPatentsFeeCalc::new();
 pub unsafe extern "C" fn run_patent_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

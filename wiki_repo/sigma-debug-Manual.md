@@ -24,9 +24,13 @@ Manage kernel lattice shards:
 
 ```bash
 sigma-debug shard list               # list all loaded shards
+
 sigma-debug shard info sigma-core    # show base address, size, sections
+
 sigma-debug shard load mymod.shard   # load and verify a shard
+
 sigma-debug shard unload sigma-net   # unload a shard
+
 ```
 
 ### `mem <read|dump|map> [--addr <hex>] [--len <n>]`
@@ -36,6 +40,7 @@ Inspect kernel memory:
 ```bash
 sigma-debug mem dump --addr 0xffff000000001000 --len 64
 sigma-debug mem map          # show full kernel memory map (r-x/rw-/r--)
+
 sigma-debug mem read --addr 0xffff800000010000 --len 16 --json
 ```
 
@@ -45,7 +50,9 @@ Dump CPU registers for a process:
 
 ```bash
 sigma-debug reg              # kernel thread (pid 1)
+
 sigma-debug reg --pid 512    # specific process
+
 sigma-debug reg --json
 ```
 
@@ -55,7 +62,9 @@ Symbol resolution:
 
 ```bash
 sigma-debug sym resolve 0xffff000000001234   # addr → function+offset
+
 sigma-debug sym search sigma_syscall         # search by name fragment
+
 ```
 
 ### `bp <set|list|del|clear> [--addr <hex>]`
@@ -104,20 +113,26 @@ Interactive debug REPL — simulates a session connected to `sigma-debugd`.
 ## EXAMPLES
 
 ```bash
+
 # Show all loaded shards
+
 sigma-debug shard list
 
 # Hex dump 128 bytes at a kernel address
+
 sigma-debug mem dump --addr 0xffff000000001000 --len 128
 
 # Look up a symbol by address
+
 sigma-debug sym resolve 0xffff000000001234
 
 # Set a breakpoint and backtrace
+
 sigma-debug bp set --addr 0xffff000000001234
 sigma-debug bt --pid 1
 
 # Start interactive session
+
 sigma-debug repl
 ```
 

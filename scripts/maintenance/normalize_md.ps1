@@ -1,7 +1,7 @@
 # SigmaOS Markdown Normalizer (Industrial v100.4)
 # Fixes MD012, MD022, MD029, MD030, MD032, MD036, MD041
 
-$docs = Get-ChildItem -Path "C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS", "C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\WIKI" -Filter "*.md" -Recurse
+$docs = Get-ChildItem -Path "C:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS", "C:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS\WIKI" -Filter "*.md" -Recurse
 
 foreach ($file in $docs) {
     if ($file.FullName -like "*node_modules*") { continue }

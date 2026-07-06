@@ -76,9 +76,13 @@ sigma_pledge_check(current->pledge_mask, syscall_nr)
 ## Adding a Syscall
 
 1. Add entry to `kernel/syscalls/sigma_syscall_table.cpp`
+
 2. Add handler in `kernel/syscalls/sigma_sys_<subsystem>.cpp`
+
 3. Declare in `include/sigma_syscall.h`
+
 4. Add pledge capability check in `kernel/security/sigma_pledge.cpp`
+
 5. Write a test in `tests/unit/syscalls/`
 
 ---

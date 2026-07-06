@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignBonusComplianceCalc ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignBonusComplianceCalc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BonusResult — hardware-compatible struct.
+/// BonusResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BonusResult {
     pub minimum_bonus_payable_paise: SigmaU64,
     pub maximum_bonus_payable_paise: SigmaU64,
     pub statutory_bonus_paise: SigmaU64,
     pub is_eligible: SigmaBool,
 }
 
-/// SovereignBonusComplianceCalc — OOP singleton pattern.
+/// SovereignBonusComplianceCalc â€” OOP singleton pattern.
 pub struct SovereignBonusComplianceCalc {
     pub initialized: SigmaBool,
 }
@@ -51,4 +51,6 @@ static mut INSTANCE: SovereignBonusComplianceCalc = SovereignBonusComplianceCalc
 pub unsafe extern "C" fn run_bonus_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

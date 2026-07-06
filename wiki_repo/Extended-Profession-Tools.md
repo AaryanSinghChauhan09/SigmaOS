@@ -259,9 +259,13 @@ sigma-trust 12a renewal check --expiry
 | `sigma-trust` | NGO/temple manager | FCRA/IT Dept | `userland/apps/sigma-trust/sigma_trust.h` |
 
 Plus from previous round (already committed):
+
 - `sigma-cs` Company Secretary header
+
 - `sigma-sebi` SEBI professionals header
+
 - `sigma-textile` Textile industry header
+
 - `sigma-trust` Religious institutions header
 
 ---

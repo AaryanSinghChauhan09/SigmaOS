@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_fdisk: Sovereign Disk Partitioner
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_fdisk: Sovereign Disk Partitioner
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_fdisk ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_fdisk â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PartTypeName — hardware-compatible struct.
+/// PartTypeName â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PartTypeName {
     pub id: SigmaU64,
 }
 
@@ -56,4 +56,6 @@ pub unsafe extern "C" fn print_utf16_name() {
 #[no_mangle]
 pub unsafe extern "C" fn fdisk_list_gpt() {
 }
+
+
 

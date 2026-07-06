@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign NUMA Orchestrator (S-NUMA)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign NUMA Orchestrator (S-NUMA)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignNUMA ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignNUMA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NUMANode — hardware-compatible struct.
+/// NUMANode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NUMANode {
     pub id: SigmaU32,
     pub memory_base: SigmaU64,
     pub memory_size: SigmaU64,
     pub cpu_count: SigmaU32,
 }
 
-/// SovereignNUMA — OOP singleton pattern.
+/// SovereignNUMA â€” OOP singleton pattern.
 pub struct SovereignNUMA {
     pub initialized: SigmaBool,
 }
@@ -66,4 +66,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn numa_init() {
     INSTANCE.initialized = true;
 }
+
+
 

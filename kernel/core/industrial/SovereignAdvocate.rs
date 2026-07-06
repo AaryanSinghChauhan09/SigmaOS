@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Advocate Shard (S-ADVOCATE)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Advocate Shard (S-ADVOCATE)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,25 +16,25 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignAdvocate ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignAdvocate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// LimitationEntry — hardware-compatible struct.
+/// LimitationEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LimitationEntry {
     pub article: SigmaU32,
     pub period_years: SigmaU32,
 }
 
-/// IPCBNSMap — hardware-compatible struct.
+/// IPCBNSMap â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct IPCBNSMap {
     pub ipc: SigmaU32,
     pub bns: SigmaU32,
 }
 
-/// SovereignAdvocate — OOP singleton pattern.
+/// SovereignAdvocate â€” OOP singleton pattern.
 pub struct SovereignAdvocate {
     pub initialized: SigmaBool,
 }
@@ -167,4 +167,6 @@ pub unsafe extern "C" fn advocate_bail() {
 pub unsafe extern "C" fn advocate_consumer() {
     INSTANCE.initialized = true;
 }
+
+
 

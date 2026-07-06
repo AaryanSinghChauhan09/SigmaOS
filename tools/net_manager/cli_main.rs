@@ -1,11 +1,11 @@
-/// SigmaOS: cli_main module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: cli_main module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ProfileType ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ProfileType â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NetworkInterface — hardware-compatible struct.
+/// NetworkInterface â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NetworkInterface {
     pub name: [u8; 16],
     pub is_up: SigmaBool,
     pub ipv4_address: [u8; 16],
@@ -29,10 +29,10 @@ pub struct {s_name} {{
     pub mac_address: [u8; 18],
 }
 
-/// NetProfile — hardware-compatible struct.
+/// NetProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NetProfile {
     pub type: SigmaU64,
     pub name: SigmaU64,
     pub use_dhcp: SigmaBool,
@@ -40,7 +40,7 @@ pub struct {s_name} {{
     pub enforce_strict_firewall: SigmaBool,
 }
 
-/// ProfileType — OOP singleton pattern.
+/// ProfileType â€” OOP singleton pattern.
 pub struct ProfileType {
     pub initialized: SigmaBool,
 }
@@ -108,4 +108,6 @@ pub unsafe extern "C" fn cmd_rollback() {
 pub unsafe extern "C" fn cmd_dns() {
     INSTANCE.initialized = true;
 }
+
+
 

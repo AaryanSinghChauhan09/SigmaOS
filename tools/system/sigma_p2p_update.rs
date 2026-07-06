@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_p2p_update: Decentralized Update System
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_p2p_update: Decentralized Update System
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_p2p_update ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_p2p_update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PeerNode — hardware-compatible struct.
+/// PeerNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PeerNode {
     pub node_id: [SigmaU64; 32],
     pub ip_addr: [SigmaU64; 16],
     pub last_seen_ms: SigmaU64,
@@ -29,10 +29,10 @@ pub struct {s_name} {{
     pub active: SigmaBool,
 }
 
-/// UpdateManifest — hardware-compatible struct.
+/// UpdateManifest â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UpdateManifest {
     pub version: [u8; 16],
     pub package_hash: [SigmaU64; 32],
     pub package_size: SigmaU64,
@@ -41,4 +41,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn sigma_p2p_check_for_updates() {
 }
+
+
 

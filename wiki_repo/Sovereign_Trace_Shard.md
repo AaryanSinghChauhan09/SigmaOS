@@ -30,11 +30,11 @@ Workflow:
 
 1
 
-| Sub-command | Action | 
-| --- | --- | 
-| `sigma-trace attach <pid>` | Attach the silicon tracer (0 = capture all missions) | 
-| `sigma-trace detach` | Detach and print the syscall summary histogram | 
-| `sigma-trace audit` | Show current tracer state and event count | 
+| Sub-command | Action |
+| --- | --- |
+| `sigma-trace attach <pid>` | Attach the silicon tracer (0 = capture all missions) |
+| `sigma-trace detach` | Detach and print the syscall summary histogram |
+| `sigma-trace audit` | Show current tracer state and event count |
 
 ---
 

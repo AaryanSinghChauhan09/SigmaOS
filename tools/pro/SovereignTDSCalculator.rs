@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignTDSCalculator ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignTDSCalculator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// TDSResult — hardware-compatible struct.
+/// TDSResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct TDSResult {
     pub tds_deducted_paise: SigmaU64,
     pub net_payable_paise: SigmaU64,
     pub rate_basis_points: SigmaU32,
     pub is_pan_penalty_applied: SigmaBool,
 }
 
-/// SovereignTDSCalculator — OOP singleton pattern.
+/// SovereignTDSCalculator â€” OOP singleton pattern.
 pub struct SovereignTDSCalculator {
     pub initialized: SigmaBool,
 }
@@ -51,4 +51,6 @@ static mut INSTANCE: SovereignTDSCalculator = SovereignTDSCalculator::new();
 pub unsafe extern "C" fn run_tds_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

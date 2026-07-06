@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ComplianceFramework ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ComplianceFramework â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ComplianceCheck — hardware-compatible struct.
+/// ComplianceCheck â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ComplianceCheck {
     pub label: [u8; 64],
     pub framework: SigmaU64,
     pub passed: SigmaU8,
     pub evidence: [u8; 128],
 }
 
-/// ComplianceFramework — OOP singleton pattern.
+/// ComplianceFramework â€” OOP singleton pattern.
 pub struct ComplianceFramework {
     pub initialized: SigmaBool,
 }
@@ -91,4 +91,6 @@ pub unsafe extern "C" fn compliance_init() {
 pub unsafe extern "C" fn compliance_report() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Architect Shard (S-ARCHITECT)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Architect Shard (S-ARCHITECT)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignArchitect ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignArchitect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// FAREntry — hardware-compatible struct.
+/// FAREntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FAREntry {
     pub residential_x10: SigmaU32,
     pub commercial_x10: SigmaU32,
     pub max_height_m: SigmaU32,
 }
 
-/// SovereignArchitect — OOP singleton pattern.
+/// SovereignArchitect â€” OOP singleton pattern.
 pub struct SovereignArchitect {
     pub initialized: SigmaBool,
 }
@@ -120,4 +120,6 @@ pub unsafe extern "C" fn architect_setback() {
 pub unsafe extern "C" fn architect_fire() {
     INSTANCE.initialized = true;
 }
+
+
 

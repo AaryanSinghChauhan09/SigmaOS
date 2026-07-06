@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::camera_shard ─────────────────────
+// â”€â”€â”€ Module: Sigma::camera_shard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Pixel — hardware-compatible struct.
+/// Pixel â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Pixel {
 }
 
-/// Frame — hardware-compatible struct.
+/// Frame â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Frame {
     pub width: SigmaU32,
     pub height: SigmaU32,
     pub timestamp_ns: SigmaU64,
@@ -36,45 +36,45 @@ pub struct {s_name} {{
     pub valid: SigmaBool,
 }
 
-/// FilterKernel3x3 — hardware-compatible struct.
+/// FilterKernel3x3 â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FilterKernel3x3 {
     pub bias: SigmaU64,
     pub name: [u8; 32],
 }
 
-/// ScratchEvent — hardware-compatible struct.
+/// ScratchEvent â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ScratchEvent {
     pub type: SigmaU64,
     pub id: SigmaU32,
     pub timestamp_ns: SigmaU64,
     pub payload: [SigmaU32; 4],
 }
 
-/// EventBus — hardware-compatible struct.
+/// EventBus â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct EventBus {
     pub head: SigmaU32,
     pub tail: SigmaU32,
     pub count: SigmaU32,
 }
 
-/// FilterEngine — hardware-compatible struct.
+/// FilterEngine â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FilterEngine {
     pub count: SigmaU32,
     pub active_filter: SigmaU32,
 }
 
-/// CaptureSession — hardware-compatible struct.
+/// CaptureSession â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CaptureSession {
     pub session_id: SigmaU32,
     pub start_ns: SigmaU64,
     pub end_ns: SigmaU64,
@@ -84,10 +84,10 @@ pub struct {s_name} {{
     pub active: SigmaBool,
 }
 
-/// CameraDevice — hardware-compatible struct.
+/// CameraDevice â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CameraDevice {
     pub current_frame: SigmaU64,
     pub filter_engine: SigmaU64,
     pub event_bus: SigmaU64,
@@ -127,4 +127,6 @@ pub unsafe extern "C" fn camera_list_filters() {
 #[no_mangle]
 pub unsafe extern "C" fn camera_process_events() {
 }
+
+
 

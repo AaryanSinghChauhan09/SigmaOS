@@ -119,12 +119,19 @@ namespace Sigma::Charset {
 # sigma-cli commands (SigmaOS equivalent of CMD/bash)
 
 sigma ls /sigma/home           # list directory
+
 sigma cd /sigma/apps           # change directory
+
 sigma run SigmaDocs            # launch app
+
 sigma convert 255 --to binary  # number conversion
+
 sigma pkg install sigma-python # package manager
+
 sigma sysinfo                  # system information
+
 sigma netstat                  # network status
+
 sigma kill <pid>               # process management
 
 ```text
@@ -388,11 +395,15 @@ public:
 ## 🔗 Related Wiki Pages
 
 - [Syllabus Implementation Map](Syllabus-Implementation-Map)
+
 - [HAL Driver Framework](HAL)
+
 - [Sovereign Memory Management](Sovereign-Memory-Management)
+
 - [S-ZFS Storage Pool](Sovereign_ZFS_Pool)
+
 - [SigmaAI Intelligence Layer](Syllabus-AIML)
 
 ---
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+### Last updated: 2026-05-18 | SigmaOS Zenith v15.1

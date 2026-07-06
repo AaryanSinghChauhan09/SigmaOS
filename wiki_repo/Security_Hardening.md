@@ -14,14 +14,14 @@ SigmaOS uses a multi-layered approach to cryptographic sovereignty:
 
 ## 🛡 System Hardening Standard
 
-| Feature | Mechanism | Standard Compliance | 
-| :--- | :--- | :--- | 
+| Feature | Mechanism | Standard Compliance |
+| :--- | :--- | :--- |
 
-| **Memory Protection** | ASLR + NX + SMAP | ISO/IEC 27001 | 
+| **Memory Protection** | ASLR + NX + SMAP | ISO/IEC 27001 |
 
-| **Sandboxing** | Shard Isolation (Lattice-native) | POSIX.1e (Draft) | 
+| **Sandboxing** | Shard Isolation (Lattice-native) | POSIX.1e (Draft) |
 
-| **Integrity** | IMA (Integrity Measurement Architecture) | IEEE 802.1AR | 
+| **Integrity** | IMA (Integrity Measurement Architecture) | IEEE 802.1AR |
 
 ## 🛠 Security Audit Workflow
 
@@ -33,4 +33,4 @@ To verify system integrity:
 
 3. Verify shard signatures via `pqc_verify <shard_id>`
 
-*"Security is not a feature; it is the fundamental state of the Shard."*
+### "Security is not a feature; it is the fundamental state of the Shard."

@@ -1,4 +1,4 @@
-# Global Installation
+﻿# Global Installation
 
 Undici provides an `install()` function to add all WHATWG fetch classes to `globalThis`, making them available globally without requiring imports.
 
@@ -6,7 +6,7 @@ Undici provides an `install()` function to add all WHATWG fetch classes to `glob
 
 Install all WHATWG fetch classes globally on `globalThis`.
 
-### Example
+### Example:
 
 ```js
 import { install } from 'undici'
@@ -24,25 +24,24 @@ const request = new Request('https://example.com')
 const formData = new FormData()
 const ws = new WebSocket('wss://example.com')
 const eventSource = new EventSource('https://example.com/events')
-
 ```
 
 ## Installed Classes
 
 The `install()` function adds the following classes to `globalThis`:
 
-| Class | Description | 
-| ------- | ------------- | 
-| `fetch` | The fetch function for making HTTP requests | 
-| `Headers` | HTTP headers management | 
-| `Response` | HTTP response representation | 
-| `Request` | HTTP request representation | 
-| `FormData` | Form data handling | 
-| `WebSocket` | WebSocket client | 
-| `CloseEvent` | WebSocket close event | 
-| `ErrorEvent` | WebSocket error event | 
-| `MessageEvent` | WebSocket message event | 
-| `EventSource` | Server-sent events client | 
+| Class | Description |
+|-------|-------------|
+| `fetch` | The fetch function for making HTTP requests |
+| `Headers` | HTTP headers management |
+| `Response` | HTTP response representation |
+| `Request` | HTTP request representation |
+| `FormData` | Form data handling |
+| `WebSocket` | WebSocket client |
+| `CloseEvent` | WebSocket close event |
+| `ErrorEvent` | WebSocket error event |
+| `MessageEvent` | WebSocket message event |
+| `EventSource` | Server-sent events client |
 
 ## Using `FormData` with `fetch`
 
@@ -58,7 +57,6 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
-
 ```
 
 ```js
@@ -72,7 +70,6 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
-
 ```
 
 After `install()`, `fetch`, `Headers`, `Response`, `Request`, and `FormData`
@@ -88,7 +85,6 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
-
 ```
 
 Avoid mixing a global `FormData` with `undici.fetch()`, or `undici.FormData`
@@ -122,7 +118,6 @@ if (typeof globalThis.fetch === 'undefined') {
 
 // Now fetch is guaranteed to be available
 const response = await fetch('https://api.example.com')
-
 ```
 
 ## Example: Testing Environment
@@ -138,7 +133,6 @@ test('fetch API test', async () => {
   const response = await fetch('https://example.com')
   expect(response).toBeInstanceOf(Response)
 })
-
 ```
 
 ## Notes

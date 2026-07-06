@@ -10,7 +10,7 @@ Connect, methodOverride middleware
 
 ### Description
 
-### Connect's "methodOverride" middleware allows an HTTP request to override the method of the request with the value of the "\_method" post key or with the header "x-http-method-override"
+**Connect's "methodOverride" middleware allows an HTTP request to override the method of the request with the value of the "\_method" post key or with the header "x-http-method-override".**
 
 As the declaration order of middlewares determines the execution stack in Connect, it is possible to abuse this functionality in order to bypass the standard Connect's anti-CSRF protection.
 
@@ -21,7 +21,6 @@ Considering the following code:
 app.use(express.csrf())
 ...
 app.use(express.methodOverride())
-
 ```
 
 Connect's CSRF middleware does not check csrf tokens in case of idempotent verbs (GET/HEAD/OPTIONS, see lib/middleware/csrf.js). As a result, it is possible to bypass this security control by sending a GET request with a POST MethodOverride header or key.
@@ -32,7 +31,6 @@ Connect's CSRF middleware does not check csrf tokens in case of idempotent verbs
 GET / HTTP/1.1
 [..]
 _method=POST
-
 ```
 
 ### Mitigation Factors

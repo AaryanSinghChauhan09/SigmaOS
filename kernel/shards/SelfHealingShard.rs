@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignSelfHealer ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignSelfHealer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ShardStatus — hardware-compatible struct.
+/// ShardStatus â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ShardStatus {
     pub name: [u8; 32],
     pub health: SigmaU64,
     pub uptime: SigmaU32,
     pub restarts: SigmaU32,
 }
 
-/// SovereignSelfHealer — OOP singleton pattern.
+/// SovereignSelfHealer â€” OOP singleton pattern.
 pub struct SovereignSelfHealer {
     pub initialized: SigmaBool,
 }
@@ -71,4 +71,6 @@ pub unsafe extern "C" fn AuditLattice() {
 pub unsafe extern "C" fn RestoreShard() {
     INSTANCE.initialized = true;
 }
+
+
 

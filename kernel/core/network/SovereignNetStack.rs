@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignNetStackEngine ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignNetStackEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// EthernetHeader — hardware-compatible struct.
+/// EthernetHeader â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct EthernetHeader {
     pub dest_mac: [SigmaU8; 6],
     pub src_mac: [SigmaU8; 6],
     pub ethertype: SigmaU16,
 }
 
-/// IPv4Header — hardware-compatible struct.
+/// IPv4Header â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct IPv4Header {
     pub version_ihl: SigmaU8,
     pub dscp_ecn: SigmaU8,
     pub length: SigmaU16,
@@ -43,10 +43,10 @@ pub struct {s_name} {{
     pub dest_ip: SigmaU32,
 }
 
-/// IPv6Header — hardware-compatible struct.
+/// IPv6Header â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct IPv6Header {
     pub version_tc_flow: SigmaU32,
     pub payload_len: SigmaU16,
     pub next_header: SigmaU8,
@@ -55,10 +55,10 @@ pub struct {s_name} {{
     pub dest_ip: [SigmaU8; 16],
 }
 
-/// TCPHeader — hardware-compatible struct.
+/// TCPHeader â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct TCPHeader {
     pub src_port: SigmaU16,
     pub dest_port: SigmaU16,
     pub seq_num: SigmaU32,
@@ -70,17 +70,17 @@ pub struct {s_name} {{
     pub urgent_ptr: SigmaU16,
 }
 
-/// UDPHeader — hardware-compatible struct.
+/// UDPHeader â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UDPHeader {
     pub src_port: SigmaU16,
     pub dest_port: SigmaU16,
     pub length: SigmaU16,
     pub checksum: SigmaU16,
 }
 
-/// SovereignNetStackEngine — OOP singleton pattern.
+/// SovereignNetStackEngine â€” OOP singleton pattern.
 pub struct SovereignNetStackEngine {
     pub initialized: SigmaBool,
 }
@@ -183,4 +183,6 @@ pub unsafe extern "C" fn netstack_register_iface() {
 pub unsafe extern "C" fn netstack_stats() {
     INSTANCE.initialized = true;
 }
+
+
 

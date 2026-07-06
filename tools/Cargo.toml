@@ -2,7 +2,7 @@
 # This allows 'cargo build/test/fmt/clippy' to work from the tools/ directory
 
 [workspace]
-members = ["sigma-cli-bin"]
+members = ["sigma-cli-bin", "sigma-format", "sigma-lint"]
 
 [workspace.package]
 version    = "15.0.0"

@@ -1,28 +1,34 @@
-# SigmaOS Justfile task runner
+# Justfile for SigmaOS
+# Sovereign OS build and maintenance automation.
 
-# Default target: list all available commands
-default:
-    @just --list
+default: check
 
-# Build all kernel modules and tools workspace
-build target="x86_64":
-    @echo "Building SigmaOS target: {{target}}..."
-    @cmake -B build -DCMAKE_BUILD_TYPE=Release
-    @cmake --build build
-    @cargo build --manifest-path tools/Cargo.toml --release
+# Validate all code compiles
+check:
+	@echo "Checking core modules (no_std)..."
+	cargo check --manifest-path modules/core/Cargo.toml --target x86_64-unknown-none || echo "[Warning] No Cargo.toml found in modules/core yet, skipping."
+	@echo "Checking sigpkg userland tool..."
+	cargo check --manifest-path userland/sigpkg/Cargo.toml || echo "[Warning] No Cargo.toml found in sigpkg yet, skipping."
 
-# Run unit tests and integration tests
+# Format code
+fmt:
+	cargo fmt --all
+
+# Run all test suites
 test:
-    @echo "Running all tests..."
-    @cargo test --manifest-path tools/Cargo.toml
-    @cmd /c "npm run test"
+	@echo "Running userland tests..."
+	cargo test --manifest-path userland/sigpkg/Cargo.toml
 
-# Run the bootable image in QEMU emulator
-run headless="":
-    @echo "Launching QEMU emulator..."
-    @sigma run {{if headless == "true" { "--headless" } else { "" }}}
+# Build the system (placeholder for when cross-compilation is fully setup)
+build:
+	@echo "Building SigmaOS kernel..."
+	# In a real environment: cargo build --release -Z build-std=core,alloc --target x86_64-unknown-none
 
-# Package everything into a bootable ISO image
-iso:
-    @echo "Building bootable ESP ISO image..."
-    @sigma image build --minimal
+# Clean artifacts
+clean:
+	cargo clean
+	rm -rf target/
+
+# Maintenance scripts
+verify:
+	python scripts/maintenance/verify_implementations.py

@@ -33,7 +33,9 @@ brew install nasm cmake ninja qemu x86_64-elf-gcc xorriso
 ### Windows (WSL2 recommended)
 
 ```bash
+
 # Inside WSL2 Ubuntu — same as Ubuntu above
+
 ```
 
 ---
@@ -50,18 +52,23 @@ cd SigmaOS
 ## Build
 
 ```bash
+
 # Default (standalone profile, x86_64)
+
 make clean && make all -j$(nproc)
 
 # Specific profile
+
 make PROFILE=standalone all -j$(nproc)
 make PROFILE=microkernel all -j$(nproc)
 make PROFILE=cloud all -j$(nproc)
 
 # ARM64 cross-compile
+
 make PROFILE=mobile ARCH=arm64 CC=aarch64-linux-gnu-gcc all -j$(nproc)
 
 # Verbose build
+
 make VERBOSE=1 all
 ```
 
@@ -70,13 +77,17 @@ make VERBOSE=1 all
 ## Run in QEMU
 
 ```bash
+
 # Basic run (serial output to terminal)
+
 qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 
 # With KVM acceleration (Linux host only)
+
 qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -enable-kvm -serial stdio
 
 # Debug with GDB
+
 qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -S -gdb tcp::1234 &
 gdb -ex "target remote :1234" build/sigma.elf
 ```
@@ -109,10 +120,13 @@ The repo includes `.devcontainer/devcontainer.json`. Open in VS Code → "Reopen
 ## Verify Build
 
 ```bash
+
 # Check for stub functions (returns list of unimplemented bodies)
+
 make check-stubs
 
 # Run QEMU smoke test
+
 make qemu-test
 ```
 

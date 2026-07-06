@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SigmaAudioMixer ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SigmaAudioMixer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// AudioStream — hardware-compatible struct.
+/// AudioStream â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AudioStream {
     pub name: [u8; 64],
     pub sample_rate: SigmaU32,
     pub channels: SigmaU8,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub active: SigmaU8,
 }
 
-/// SigmaAudioMixer — OOP singleton pattern.
+/// SigmaAudioMixer â€” OOP singleton pattern.
 pub struct SigmaAudioMixer {
     pub initialized: SigmaBool,
 }
@@ -132,4 +132,6 @@ pub unsafe extern "C" fn audio_master_vol() {
 pub unsafe extern "C" fn audio_list() {
     INSTANCE.initialized = true;
 }
+
+
 

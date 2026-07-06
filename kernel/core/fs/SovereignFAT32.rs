@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignFAT32 module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignFAT32 module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignFAT32Driver ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignFAT32Driver â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// FAT32_BootSector — hardware-compatible struct.
+/// FAT32_BootSector â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FAT32_BootSector {
     pub jmp: [SigmaU8; 3],
     pub oem: [u8; 8],
     pub bytes_per_sector: SigmaU16,
@@ -51,7 +51,7 @@ pub struct {s_name} {{
     pub fs_type: [u8; 8],
 }
 
-/// SovereignFAT32Driver — OOP singleton pattern.
+/// SovereignFAT32Driver â€” OOP singleton pattern.
 pub struct SovereignFAT32Driver {
     pub initialized: SigmaBool,
 }
@@ -104,4 +104,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn fat32_init() {
     INSTANCE.initialized = true;
 }
+
+
 

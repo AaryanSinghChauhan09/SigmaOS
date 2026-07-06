@@ -85,14 +85,21 @@ SigmaOS HAL equivalent:
 ### Loading a Linux Driver Module
 
 ```bash
+
 # Load a .ko built for Ubuntu into sigma-compat
+
 sigma-compat load-driver /lib/modules/rtl8169.ko
 
 # The shim:
+
 # 1. Verifies ELF format
+
 # 2. Resolves Linux kernel symbols → SigmaOS equivalents
+
 # 3. Calls module_init()
+
 # 4. Registers driver with SDF at ring-3 isolation
+
 ```
 
 ### Security Isolation
@@ -108,40 +115,61 @@ applied automatically. A Linux driver bug cannot crash the SigmaOS kernel.
 and generates a SigmaOS SDF skeleton with the same hardware logic.
 
 ```bash
+
 # Analyse a driver to understand its patterns
+
 sigma-driver-porter analyse linux_e1000_main.c
 
 # Output:
+
 #   Patterns:   DpPciProbe, DpMmioRead, DpMmioWrite, DpIrqHandler, DpDmaAlloc
+
 #   IRQ:        true  DMA: true
+
 #   Complexity: 3/5
+
 #   pledge:     stdio inet
+
 #   Linux APIs: ioremap readl writel request_irq dma_alloc_coherent
 
 # Generate SigmaOS skeleton (cleanroom — no GPL code copied)
+
 sigma-driver-porter port linux_e1000_main.c
 
 # Generated files:
+
 #   sigma_drivers/e1000/Cargo.toml
+
 #   sigma_drivers/e1000/src/lib.rs
+
 #   sigma_drivers/e1000/sigma-shard.toml
+
 ```
 
 The generated `lib.rs` contains:
+
 - Correct SDF lifecycle (`probe/init/shutdown/irq`)
+
 - `sigma_pledge` call with inferred capabilities
+
 - `sigma_register_driver!` macro registration
+
 - TODO comments for register definitions (filled from vendor datasheet)
+
 - API mapping comments: `// Replace: ioremap → ddk::iomap`
 
 ### AI Translation Mode
 
 ```bash
+
 # Full LLM-powered translation (requires sigma-agent daemon)
+
 sigma-driver-porter port linux_e1000_main.c --ai
 
 # sigma-agent analyses the full driver source, generates complete Rust code
+
 # Falls back to rule-based skeleton if daemon not running
+
 ```
 
 ---

@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_ifconfig: Sovereign Network Interface Configuration
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_ifconfig: Sovereign Network Interface Configuration
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_ifconfig ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_ifconfig â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NetInterface — hardware-compatible struct.
+/// NetInterface â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NetInterface {
     pub name: [u8; 16],
     pub mac: [SigmaU64; 6],
     pub ip_addr: SigmaU64,
@@ -46,4 +46,6 @@ pub unsafe extern "C" fn print_ip() {
 #[no_mangle]
 pub unsafe extern "C" fn init_demo_interfaces() {
 }
+
+
 

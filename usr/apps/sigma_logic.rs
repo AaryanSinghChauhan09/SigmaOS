@@ -1,18 +1,125 @@
-﻿// SPDX-License-Identifier: GPL-2.0-or-later
-//! SIGMAOS: SigmaLogic (Rust, no_std)
-#[allow(dead_code)]
-pub type SigmaStatus = i32;
-pub const SIGMA_OK: SigmaStatus = 0;
-pub const SIGMA_ERROR: SigmaStatus = -1;
+/// SigmaOS: usr/apps/sigma_logic.rs
+/// Visual automation node engine (OS-level Zapier logic).
+/// Evaluates node graphs triggered by OS events.
+/// no_std | no alloc | no external crates.
 
-pub struct SigmaLogic { active: bool }
-impl SigmaLogic {
-    pub const fn new() -> Self { SigmaLogic { active: false } }
-    pub fn init(&mut self) -> SigmaStatus { self.active = true; SIGMA_OK }
-    pub fn is_active(&self) -> bool { self.active }
+#![no_std]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+
+type SigmaU32   = u32;
+type SigmaI32   = i32;
+type SigmaUsize = usize;
+
+pub const MAX_NODES: SigmaUsize = 64;
+
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum NodeType {
+    TriggerFileCreated,
+    TriggerTimerExpired,
+    ActionRunAiPrompt,
+    ActionSendNotification,
+    ActionMoveFile,
+    ActionRunCliCommand,
 }
-static mut G_INSTANCE: SigmaLogic = SigmaLogic::new();
+
+#[derive(Copy, Clone)]
+pub struct LogicNode {
+    pub id: SigmaU32,
+    pub node_type: NodeType,
+    pub next_node_id: Option<SigmaU32>, // Singly-linked list of actions
+    pub data_param: [u8; 64],           // E.g., File path or AI prompt / command
+}
+
+impl LogicNode {
+    pub const fn empty() -> Self {
+        LogicNode {
+            id: 0,
+            node_type: NodeType::TriggerTimerExpired,
+            next_node_id: None,
+            data_param: [0; 64],
+        }
+    }
+}
+
+pub struct LogicGraph {
+    pub nodes: [LogicNode; MAX_NODES],
+    pub count: SigmaUsize,
+}
+
+static mut AUTOMATION_GRAPH: LogicGraph = LogicGraph {
+    nodes: [LogicNode::empty(); MAX_NODES],
+    count: 0,
+};
+
+extern "C" {
+    fn ai_submit_task(caller: SigmaU32, prio: u8, prompt: *const u8, len: SigmaUsize) -> i32;
+    fn shell_execute_cmd(cmd: *const u8, len: SigmaUsize) -> i32;
+}
+
 #[no_mangle]
-pub unsafe extern "C" fn sigma_logic_init() -> SigmaStatus { G_INSTANCE.init() }
+pub unsafe extern "C" fn logic_add_node(id: SigmaU32, ntype: u8, next: SigmaU32) -> SigmaI32 {
+    if AUTOMATION_GRAPH.count >= MAX_NODES { return -12; } // ENOMEM
+    
+    let t = match ntype {
+        0 => NodeType::TriggerFileCreated,
+        1 => NodeType::TriggerTimerExpired,
+        2 => NodeType::ActionRunAiPrompt,
+        3 => NodeType::ActionSendNotification,
+        4 => NodeType::ActionRunCliCommand,
+        _ => NodeType::ActionMoveFile,
+    };
+    
+    let next_opt = if next == 0 { None } else { Some(next) };
+    
+    let idx = AUTOMATION_GRAPH.count;
+    AUTOMATION_GRAPH.nodes[idx].id = id;
+    AUTOMATION_GRAPH.nodes[idx].node_type = t;
+    AUTOMATION_GRAPH.nodes[idx].next_node_id = next_opt;
+    
+    AUTOMATION_GRAPH.count += 1;
+    0
+}
+
 #[no_mangle]
-pub unsafe extern "C" fn sigma_logic_active() -> u8 { G_INSTANCE.is_active() as u8 }
+pub unsafe extern "C" fn logic_trigger_event(event_type: u8) {
+    let t = match event_type {
+        0 => NodeType::TriggerFileCreated,
+        _ => NodeType::TriggerTimerExpired,
+    };
+    
+    // Find all triggers matching this event
+    for i in 0..AUTOMATION_GRAPH.count {
+        if AUTOMATION_GRAPH.nodes[i].node_type == t {
+            // Execute the chain
+            let mut curr = AUTOMATION_GRAPH.nodes[i].next_node_id;
+            while let Some(next_id) = curr {
+                // Find node
+                for j in 0..AUTOMATION_GRAPH.count {
+                    if AUTOMATION_GRAPH.nodes[j].id == next_id {
+                        execute_node(&AUTOMATION_GRAPH.nodes[j]);
+                        curr = AUTOMATION_GRAPH.nodes[j].next_node_id;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+unsafe fn execute_node(node: &LogicNode) {
+    match node.node_type {
+        NodeType::ActionRunAiPrompt => {
+            // Submit automation prompt to AI backend
+            ai_submit_task(0, 0, node.data_param.as_ptr(), 64);
+        },
+        NodeType::ActionRunCliCommand => {
+            // Submit shell command execution to kernel handler
+            shell_execute_cmd(node.data_param.as_ptr(), 64);
+        },
+        NodeType::ActionSendNotification => {
+            // Call into UI dash to show notification
+        },
+        _ => {}
+    }
+}

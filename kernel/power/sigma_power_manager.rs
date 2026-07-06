@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::PowerManager ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::PowerManager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// AcpiRsdp — hardware-compatible struct.
+/// AcpiRsdp â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AcpiRsdp {
     pub signature: [u8; 8],
     pub checksum: SigmaU8,
     pub oem_id: [u8; 6],
@@ -33,10 +33,10 @@ pub struct {s_name} {{
     pub reserved: [SigmaU8; 3],
 }
 
-/// AcpiSdtHeader — hardware-compatible struct.
+/// AcpiSdtHeader â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AcpiSdtHeader {
     pub signature: [u8; 4],
     pub length: SigmaU32,
     pub revision: SigmaU8,
@@ -48,10 +48,10 @@ pub struct {s_name} {{
     pub creator_revision: SigmaU32,
 }
 
-/// BatteryStatus — hardware-compatible struct.
+/// BatteryStatus â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BatteryStatus {
     pub state: SigmaU32,
     pub present_rate: SigmaU32,
     pub remaining_cap: SigmaU32,
@@ -60,10 +60,10 @@ pub struct {s_name} {{
     pub percent: SigmaU8,
 }
 
-/// ThermalZone — hardware-compatible struct.
+/// ThermalZone â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ThermalZone {
     pub name: [u8; 16],
     pub current_temp: SigmaU32,
     pub critical_temp: SigmaU32,
@@ -72,10 +72,10 @@ pub struct {s_name} {{
     pub throttling: SigmaBool,
 }
 
-/// CpuFreqInfo — hardware-compatible struct.
+/// CpuFreqInfo â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CpuFreqInfo {
     pub base_mhz: SigmaU32,
     pub max_mhz: SigmaU32,
     pub current_mhz: SigmaU32,
@@ -83,7 +83,7 @@ pub struct {s_name} {{
     pub policy: SigmaU64,
 }
 
-/// PowerManager — OOP singleton pattern.
+/// PowerManager â€” OOP singleton pattern.
 pub struct PowerManager {
     pub initialized: SigmaBool,
 }
@@ -251,4 +251,6 @@ pub unsafe extern "C" fn sigma_power_set_policy() {
 pub unsafe extern "C" fn sigma_power_check_thermal() {
     INSTANCE.initialized = true;
 }
+
+
 

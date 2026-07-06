@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_rtsched module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_rtsched module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_rtsched ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_rtsched â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// rt_thread — hardware-compatible struct.
+/// rt_thread â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct rt_thread {
     pub tid: SigmaU64,
     pub priority: SigmaU64,
     pub sched_class: SigmaU64,
@@ -30,10 +30,10 @@ pub struct {s_name} {{
     pub period_us: SigmaU64,
 }
 
-/// rt_runqueue — hardware-compatible struct.
+/// rt_runqueue â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct rt_runqueue {
     pub bitmap: SigmaU64,
 }
 
@@ -52,4 +52,6 @@ pub unsafe extern "C" fn rt_enqueue() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_rtsched_tick() {
 }
+
+
 

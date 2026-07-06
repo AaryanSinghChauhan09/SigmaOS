@@ -14,19 +14,28 @@ To maintain undisputed superiority over monolithic operating systems, SigmaOS mu
 
 ### O(1) Slab Compaction
 
-**Lock-Free Free-List Compaction**
+### Lock-Free Free-List Compaction
+
 - Atomic compare-and-swap (CAS) loops defragment active slabs in constant O(1) time
+
 - Eliminates pause sweeps entirely
+
 - Implementation: `klib/sigma_slab_lockfree.cpp`
 
-**Core-Local Cache Affinity**
+### Core-Local Cache Affinity
+
 - Dynamically maps core-local memory partitions to specific hardware threads
+
 - Prevents NUMA cross-talk and bus saturation
+
 - Implementation: `kernel/mm/sigma_numa_affinity.h`
 
-**Microsecond Context Switching**
+### Microsecond Context Switching
+
 - Streamlines Ring-0 to Ring-3 transition vectors
+
 - Target: < 12 clock cycles for syscall dispatcher latency
+
 - Implementation: `arch/x86_64/syscall_entry.asm` — hand-optimized to avoid pipeline stalls
 
 ```
@@ -41,22 +50,34 @@ SigmaOS target:                < 50 ns   (custom asm SYSCALL entry)
 
 ### Zero-Copy Buffer Cache
 
-**Unified Buffer Cache (UBC)**
+### Unified Buffer Cache (UBC)
+
 - Integrates filesystem and virtual memory caches
+
 - Enables direct DMA transfers from block controllers to user space
+
 - No intermediate buffer copies
+
 - Implementation: `kernel/fs/sigma_ubc.h`
 
-**Relativistic Journaling**
+### Relativistic Journaling
+
 - Circular log-structured ring buffers
+
 - Transforms multiple directory writes into sequential disk sweeps
+
 - Reduces write amplification on flash storage
+
 - Implementation: `kernel/fs/sigmafs/sigma_journal.h`
 
-**Pre-emptive Read-Ahead**
+### Pre-emptive Read-Ahead
+
 - Analyzes sequential block access histories
+
 - Fetches subsequent sectors into cache before user processes dispatch IO syscalls
+
 - Adaptive: learns per-file access patterns via sigma-ai inference
+
 - Implementation: `kernel/fs/sigma_readahead.cpp`
 
 ---
@@ -65,23 +86,32 @@ SigmaOS target:                < 50 ns   (custom asm SYSCALL entry)
 
 ### Vulkan Ring Buffering
 
-**Triple-Buffered Compositor**
+### Triple-Buffered Compositor
+
 - Pre-allocates Vulkan command queues for concurrent display updates
+
 - No CPU render-lock waits
+
 - Frame pipeline:
 ```
 App render → sigma-display protocol → Vulkan command buffer (triple) → DRM/KMS → display
 Target latency: 1 frame (8.3ms @ 120Hz)
 ```
 
-**Vectorized Matrix Scaling**
+### Vectorized Matrix Scaling
+
 - SIMD-vectorized floating-point math replaces standard loops
+
 - Desktop scaling updates rendered instantly
+
 - AVX-512 on x86, NEON on ARM
 
-**Zero-Alloc UI Styling**
+### Zero-Alloc UI Styling
+
 - Bypasses dynamic heap requests inside Sovereign Window Manager
+
 - Static memory buffers cache window textures and styles
+
 - Zero allocations on the hot render path
 
 ---
@@ -90,7 +120,7 @@ Target latency: 1 frame (8.3ms @ 120Hz)
 
 ### PQC Engine
 
-**Vectorized Kyber Operations**
+### Vectorized Kyber Operations
 
 ```
 CRYSTALS-Kyber-1024 NTT performance:
@@ -104,14 +134,20 @@ Target throughput (KEM operations/sec):
   SigmaOS NEON:    ~2,100,000 ops/sec
 ```
 
-**Dilithium-5 Attestation Pipeline**
+### Dilithium-5 Attestation Pipeline
+
 - Asynchronous public key audits in background
+
 - System boots while cryptography checks execute concurrently
+
 - No blocking on signature verification during boot
 
-**Secure Shard Ring Buffers**
+### Secure Shard Ring Buffers
+
 - Pre-allocated circular rings for PQC key exchanges
+
 - Removes heap allocation overhead in networking tools
+
 - Zero-copy key material via DMA-BUF sharing
 
 ---
@@ -129,19 +165,28 @@ Target throughput (KEM operations/sec):
 
 ## 7. Quality Assurance & Fuzzing Strategies
 
-**Lattice Fuzzing Pools**
+### Lattice Fuzzing Pools
+
 - Continuous input fuzzing across all 256 syscall vectors
+
 - Detects edge-case boundaries before production
+
 - Integration: AFL++ + libFuzzer hybrid
 
-**Deterministic Regression Sweeps**
+### Deterministic Regression Sweeps
+
 - Strict structural validations after every branch merge
+
 - Prevents regression drift
+
 - CI gate: `make check-regressions` must pass on every PR
 
-**PQC Cryptographic Verification**
+### PQC Cryptographic Verification
+
 - Verifies Dilithium signatures across all active userland binaries
+
 - Integrated into sigma-pkg install pipeline
+
 - Every package verified before exec permission granted
 
 ---
@@ -185,7 +230,8 @@ SigmaOS SDF driver:         crash → sigma-heal restarts it → zero data loss
 
 Security is the default execution environment — not a mode you enable.
 
-**Sandboxing by default:**
+### Sandboxing by default:
+
 ```
 sigma-init spawns process
   → sigma-mac assigns MAC label from .sigma-policy
@@ -195,7 +241,8 @@ sigma-init spawns process
           → process runs in isolated namespace
 ```
 
-**Secure boot chain:**
+### Secure boot chain:
+
 ```
 sigma-boot.efi (ML-DSA signed)
   └── Kernel (dm-verity + ML-DSA)
@@ -204,13 +251,17 @@ sigma-boot.efi (ML-DSA signed)
               └── TPM2 unseals CryptFS key (Argon2id)
 ```
 
-**Memory protection stack:**
+### Memory protection stack:
+
 - KASLR at every boot
+
 - W^X enforcement (no page writable + executable simultaneously)
+
 - Intel CET shadow stack for ROP mitigation (`arch/x86_64/sigma_cet.asm`)
+
 - Full ASLR for all userland processes
 
-**Post-quantum default:**
+### Post-quantum default:
 
 | Algorithm | Standard | Use |
 |-----------|----------|-----|
@@ -224,7 +275,8 @@ sigma-boot.efi (ML-DSA signed)
 
 Loose coupling ensures any subsystem can be updated without destabilizing the system.
 
-**Shard properties:**
+### Shard properties:
+
 ```
 Each of the 600 shards has:
   ├── Versioned ABI contract (semver)
@@ -234,20 +286,30 @@ Each of the 600 shards has:
   └── Topological dependency graph
 ```
 
-**sigma-kpatch — live patching:**
+### sigma-kpatch — live patching:
+
 ```bash
 sigma-pkg install sigma-kpatch-CVE-2026-XXXX
+
 # → patch Dilithium3-verified
+
 # → function-level binary patch applied to live kernel
+
 # No reboot. No downtime.
+
 ```
 
-**Profile hot-swap:**
+### Profile hot-swap:
+
 ```bash
 sigma-svc profile switch --to forensic     # WORM audit + write-block mounts
+
 sigma-svc profile switch --to gaming       # Vulkan perf mode + no audit overhead
+
 sigma-svc profile switch --to developer    # debug symbols + relaxed MAC
+
 sigma-svc profile switch --to container-host  # max cgroup + no GUI
+
 ```
 
 ---
@@ -267,7 +329,9 @@ ABI stability is CI-enforced: `make check-abi` fails if any `SIGMA_STABLE` symbo
 ### Virtualization & Containerization
 
 - `sigma-pod run-native` creates kernel namespaces + cgroup slices with no Docker/containerd dependency
+
 - `SovereignContainer` provides KVM-backed VM hosting with VirtIO device model
+
 - `.spkg` images are dm-verity verified before execution
 
 ### Energy Efficiency

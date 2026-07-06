@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Packet Filter (S-FILTER)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Packet Filter (S-FILTER)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::FilterAction ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::FilterAction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// FilterRule — hardware-compatible struct.
+/// FilterRule â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FilterRule {
     pub src_ip: SigmaU32,
     pub dest_ip: SigmaU32,
     pub port: SigmaU16,
     pub action: SigmaU64,
 }
 
-/// FilterAction — OOP singleton pattern.
+/// FilterAction â€” OOP singleton pattern.
 pub struct FilterAction {
     pub initialized: SigmaBool,
 }
@@ -61,4 +61,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn filter_init() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -44,4 +44,4 @@ The `performance/optimization` branch is dedicated to experimental algorithmic i
 
 - SIMD-accelerated cryptographic kernels.
 
-*"A sovereign system must be as fast as it is free."*
+### "A sovereign system must be as fast as it is free."

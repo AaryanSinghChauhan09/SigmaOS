@@ -75,28 +75,37 @@ console.log(ver.sysname, ver.release); // "SigmaOS" "16.0.0-Apex"
 ## sigma-pkg CLI
 
 ```bash
+
 # Install a package
+
 sigma-pkg install firefox@latest
 
 # Remove a package
+
 sigma-pkg remove firefox
 
 # Update all packages
+
 sigma-pkg update
 
 # Delta update (incremental)
+
 sigma-pkg update --delta
 
 # Search packages
+
 sigma-pkg search "text editor"
 
 # Show package info
+
 sigma-pkg info neovim
 
 # List installed
+
 sigma-pkg list
 
 # Reproduce-verify a build
+
 sigma-pkg verify firefox
 ```
 
@@ -105,25 +114,32 @@ sigma-pkg verify firefox
 ## sigma-cli System Tools
 
 ```bash
+
 # System status
+
 sigma status
 
 # Top-like process viewer
+
 sigma-top
 
 # Network monitor
+
 sigma-net status
 sigma-net dns set 1.1.1.1
 
 # Package manager shorthand
+
 sigma install firefox
 sigma remove firefox
 
 # Profile switcher
+
 sigma profile set developer
 sigma profile list
 
 # Snapshot management
+
 sigma snapshot create my-backup
 sigma snapshot restore my-backup
 sigma snapshot diff my-backup HEAD

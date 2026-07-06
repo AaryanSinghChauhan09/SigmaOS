@@ -1,11 +1,11 @@
-/// SigmaOS: @file sigma_automate.h
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: @file sigma_automate.h
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,28 +16,28 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::sigma_automate ─────────────────────
+// â”€â”€â”€ Module: sigma::sigma_automate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// TriggerDescriptor — hardware-compatible struct.
+/// TriggerDescriptor â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct TriggerDescriptor {
     pub type: SigmaU64,
     pub interval_sec: SigmaU32,
 }
 
-/// ActionDescriptor — hardware-compatible struct.
+/// ActionDescriptor â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ActionDescriptor {
     pub type: SigmaU64,
     pub run_in_sandbox: SigmaBool,
 }
 
-/// Playbook — hardware-compatible struct.
+/// Playbook â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Playbook {
     pub id: SigmaU32,
     pub name: [u8; 64],
     pub trigger: SigmaU64,
@@ -45,10 +45,12 @@ pub struct {s_name} {{
     pub enabled: SigmaBool,
 }
 
-/// AutomateRegistry — hardware-compatible struct.
+/// AutomateRegistry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AutomateRegistry {
     pub count: SigmaU32,
 }
+
+
 

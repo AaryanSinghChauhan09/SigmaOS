@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignCommunityPortal ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignCommunityPortal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Contributor — hardware-compatible struct.
+/// Contributor â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Contributor {
     pub id: SigmaU32,
     pub username: [u8; 64],
     pub email: [u8; 128],
@@ -33,10 +33,10 @@ pub struct {s_name} {{
     pub verified: SigmaBool,
 }
 
-/// DocEntry — hardware-compatible struct.
+/// DocEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct DocEntry {
     pub id: SigmaU32,
     pub title: [u8; 128],
     pub category: [u8; 64],
@@ -46,10 +46,10 @@ pub struct {s_name} {{
     pub published: SigmaBool,
 }
 
-/// BuildScript — hardware-compatible struct.
+/// BuildScript â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BuildScript {
     pub id: SigmaU32,
     pub package_name: [u8; 64],
     pub version: [u8; 32],
@@ -59,7 +59,7 @@ pub struct {s_name} {{
     pub sovereign_approved: SigmaBool,
 }
 
-/// SovereignCommunityPortal — OOP singleton pattern.
+/// SovereignCommunityPortal â€” OOP singleton pattern.
 pub struct SovereignCommunityPortal {
     pub initialized: SigmaBool,
 }
@@ -147,4 +147,6 @@ pub unsafe extern "C" fn community_init() {
 pub unsafe extern "C" fn community_report_health() {
     INSTANCE.initialized = true;
 }
+
+
 

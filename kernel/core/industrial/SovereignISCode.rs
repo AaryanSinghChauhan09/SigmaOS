@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Civil Engineering Shard (S-IS)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Civil Engineering Shard (S-IS)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,24 +16,24 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignISCode ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignISCode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SeismicZone — hardware-compatible struct.
+/// SeismicZone â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SeismicZone {
     pub zone: SigmaU32,
     pub Z_x1000: SigmaU32,
 }
 
-/// WindCity — hardware-compatible struct.
+/// WindCity â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WindCity {
     pub vb_kmh: SigmaU32,
 }
 
-/// SovereignISCode — OOP singleton pattern.
+/// SovereignISCode â€” OOP singleton pattern.
 pub struct SovereignISCode {
     pub initialized: SigmaBool,
 }
@@ -126,4 +126,6 @@ pub unsafe extern "C" fn is_seismic() {
 pub unsafe extern "C" fn is_rc_beam() {
     INSTANCE.initialized = true;
 }
+
+
 

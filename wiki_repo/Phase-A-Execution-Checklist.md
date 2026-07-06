@@ -34,11 +34,14 @@ Repo: [SigmaOS on GitHub](https://github.com/AaryanSinghChauhan09/SigmaOS)
 | Single socket ABI authority (remove duplicates) | `[~]` | `kernel/net/sigma_net_socket.cpp`, `net/sockets/SovereignSocketAPI.cpp` |
 | `SIGMA_SYS_SOCKET` syscall allocation | `[x]` | `kernel/core/syscall/SovereignSyscall.cpp` |
 
-**Test:**
+### Test:
+
 ```bash
 make PROFILE=standalone iso
 ./qemu-boot.sh standalone
+
 # In-guest: ping gateway, verify ICMP reply path logs
+
 ```
 
 ---
@@ -53,7 +56,8 @@ make PROFILE=standalone iso
 | Kernel cgroup CPU/mem/io enforcement | `[~]` | `kernel/core/process/sigma_cgroup.c` |
 | Pod lifecycle logging (`sigma_pod.log`) | `[~]` | `userland/tools/sigma_pod_cli.cpp` |
 
-**Test:**
+### Test:
+
 ```bash
 sigma-pod run-native demo.spkg --all-ns --cpu=250 --mem=128
 sigma-pod list
@@ -72,9 +76,12 @@ sigma-pod stop 0
 | Boot stage API + safe-mode selector | `[~]` | `kernel/core/system/SovereignBoot.cpp`, `sigma_boot.c` |
 | Bootloader UI "Fix it" menu | `[~]` | `kernel/core/boot/sigma_boot_recovery_menu.c` |
 
-**Test:**
+### Test:
+
 ```bash
+
 # Simulate repeated failed boots
+
 qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio
 ```
 
@@ -90,10 +97,13 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio
 | Profile engine (`~/.sigma_profile`) | `[~]` | `zenith_desktop/personalization/sigma_profile_engine.cpp` |
 | Input → compositor event loop hardening | `[ ]` | `zenith_desktop/compositor/` |
 
-**Test:**
+### Test:
+
 ```bash
 make iso-secure
+
 # Validate tiling layout transitions and theme apply
+
 ```
 
 ---
@@ -108,7 +118,8 @@ make iso-secure
 | GitHub sync helper | `[x]` | `scripts/sigma_git_sync.sh` |
 | Boot profile selector (Minimal/Desktop/Cloud) | `[x]` | `init/sigma_profile_selector.cpp` |
 
-**Test:**
+### Test:
+
 ```bash
 ./scripts/sigma_automation.sh backup
 ./scripts/sigma_automation.sh recovery-check
@@ -174,9 +185,13 @@ Goal: leapfrog SteamOS, Clear Linux, NixOS, Fedora CoreOS, Flatcar, Solus, Rescu
 
 ```bash
 ./tools/zenith/build_tiling_test.sh
+
 # In-guest:
+
 # zenith_compositor_init();
+
 # zenith_compositor_run_loop();
+
 ```
 
 ### Branch Consistency
@@ -215,8 +230,11 @@ doxygen Doxyfile
 Before merging to `main` or promoting a `release/*` branch:
 
 1. Kernel/network/boot smoke path passes in CI (`sigma_ci.yml`)
+
 2. Docs updated for every subsystem touched
+
 3. `CURRENT_PROBLEMS_MANIFEST.md` reflects new status
+
 4. Wiki page updated in `wiki_repo/` (auto-sync on push)
 
 ---

@@ -53,16 +53,21 @@ CPU usage bar changes colour based on load:
 ## EXAMPLES
 
 ```bash
+
 # Single snapshot, all metrics
+
 sigma-monitor
 
 # Watch CPU only, refresh every second
+
 sigma-monitor cpu --interval 1
 
 # Collect 10 samples of memory stats in JSON
+
 sigma-monitor mem --count 10 --json
 
 # Run continuously and pipe to a log
+
 sigma-monitor all --json >> /var/log/sigma-metrics.jsonl
 ```
 

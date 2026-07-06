@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_ipi module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_ipi module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_ipi ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_ipi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// shootdown_range — hardware-compatible struct.
+/// shootdown_range â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct shootdown_range {
     pub start: SigmaU64,
     pub end: SigmaU64,
     pub acked: SigmaU64,
 }
 
-/// ipi_call — hardware-compatible struct.
+/// ipi_call â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ipi_call {
     pub func: SigmaU64,
     pub done: SigmaU64,
 }
@@ -66,4 +66,6 @@ pub unsafe extern "C" fn sigma_ipi_call_function() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_ipi_handler_call_function() {
 }
+
+
 

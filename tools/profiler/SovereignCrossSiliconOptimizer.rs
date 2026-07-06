@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignCrossSiliconOptimizer.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignCrossSiliconOptimizer.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ISA ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ISA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ISAFeature — hardware-compatible struct.
+/// ISAFeature â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ISAFeature {
     pub name: [u8; 32],
     pub detected: SigmaBool,
     pub enabled: SigmaBool,
 }
 
-/// SiliconProfile — hardware-compatible struct.
+/// SiliconProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SiliconProfile {
     pub id: SigmaU32,
     pub isa: SigmaU64,
     pub name: [u8; 48],
@@ -41,7 +41,7 @@ pub struct {s_name} {{
     pub active: SigmaBool,
 }
 
-/// ISA — OOP singleton pattern.
+/// ISA â€” OOP singleton pattern.
 pub struct ISA {
     pub initialized: SigmaBool,
 }
@@ -154,4 +154,6 @@ pub unsafe extern "C" fn silicon_flags() {
 pub unsafe extern "C" fn silicon_status() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -17,7 +17,7 @@ param(
     [switch]$Json,
     [switch]$DryRun,
     [switch]$Headless,
-    [switch]$Verbose
+    [switch]$SigmaVerbose
 )
 
 Set-StrictMode -Version 3.0
@@ -28,7 +28,7 @@ function Write-Cyan($msg)    { Write-Host $msg -ForegroundColor Cyan    -NoNewli
 function Write-Green($msg)   { Write-Host $msg -ForegroundColor Green   -NoNewline }
 function Write-Red($msg)     { Write-Host $msg -ForegroundColor Red     -NoNewline }
 function Write-Yellow($msg)  { Write-Host $msg -ForegroundColor Yellow  -NoNewline }
-function Sigma-Log($type, $msg) {
+function Write-SigmaLog($type, $msg) {
     if ($Json) {
         Write-Host "{`"type`":`"$type`",`"message`":`"$msg`"}"
     } else {
@@ -62,7 +62,7 @@ function Get-SigmaToml($dir = $Path) {
 
 # ─── Commands ─────────────────────────────────────────────────────────────────
 
-function Cmd-Help {
+function Show-SigmaHelp {
     Write-Host ""
     Write-Cyan "Σ SigmaOS PowerShell CLI"; Write-Host "  v1.1.0 (Zenith)"
     Write-Host ""
@@ -88,61 +88,61 @@ function Cmd-Help {
     Write-Host ""
 }
 
-function Cmd-Build {
+function Invoke-SigmaBuild {
     $manifest = Get-ShardManifest
     if (-not $manifest -and -not (Test-Path (Join-Path $Path "Cargo.toml")) -and -not (Test-Path (Join-Path $Path "CMakeLists.txt"))) {
-        Sigma-Log "error" "No shard.json, Cargo.toml, or CMakeLists.txt found in '$Path'"
+        Write-SigmaLog "error" "No shard.json, Cargo.toml, or CMakeLists.txt found in '$Path'"
         exit 1
     }
 
     $name = if ($manifest) { $manifest.name } else { Split-Path $Path -Leaf }
-    Sigma-Log "info" "Building component '$name' for target '$Target'..."
+    Write-SigmaLog "info" "Building component '$name' for target '$Target'..."
 
     if ($DryRun) {
-        Sigma-Log "info" "[dry-run] Would run: cargo build --release --target $Target-unknown-none-elf"
+        Write-SigmaLog "info" "[dry-run] Would run: cargo build --release --target $Target-unknown-none-elf"
         return
     }
 
     # Try cargo first
     if (Test-Path (Join-Path $Path "Cargo.toml")) {
-        Sigma-Log "info" "Running cargo build --release..."
-        if ($Verbose) { Sigma-Log "info" "cargo build --release --target $Target-unknown-none-elf" }
-        $result = & cargo build --release 2>&1
+        Write-SigmaLog "info" "Running cargo build --release..."
+        if ($SigmaVerbose) { Write-SigmaLog "info" "cargo build --release --target $Target-unknown-none-elf" }
+        & cargo build --release 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Sigma-Log "success" "Cargo build succeeded."
+            Write-SigmaLog "success" "Cargo build succeeded."
         } else {
-            Sigma-Log "warn" "Cargo not available — simulating build..."
-            Sigma-Log "success" "Build simulation complete (no toolchain found)."
+            Write-SigmaLog "warn" "Cargo not available — simulating build..."
+            Write-SigmaLog "success" "Build simulation complete (no toolchain found)."
         }
     } elseif (Test-Path (Join-Path $Path "CMakeLists.txt")) {
-        Sigma-Log "info" "Running cmake --build..."
+        Write-SigmaLog "info" "Running cmake --build..."
         $null = New-Item -ItemType Directory -Force -Path (Join-Path $Path "build") | Out-Null
-        $result = & cmake --build (Join-Path $Path "build") 2>&1
+        & cmake --build (Join-Path $Path "build") 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Sigma-Log "success" "CMake build succeeded."
+            Write-SigmaLog "success" "CMake build succeeded."
         } else {
-            Sigma-Log "warn" "CMake not available or failed — simulating."
-            Sigma-Log "success" "Build simulation complete."
+            Write-SigmaLog "warn" "CMake not available or failed — simulating."
+            Write-SigmaLog "success" "Build simulation complete."
         }
     } else {
-        Sigma-Log "info" "Generating shard stub '$name.sigma'..."
+        Write-SigmaLog "info" "Generating shard stub '$name.sigma'..."
         "SIGMA_SHARD_STUB:$name" | Set-Content (Join-Path $Path "$name.sigma")
-        Sigma-Log "success" "Shard stub written: $name.sigma"
+        Write-SigmaLog "success" "Shard stub written: $name.sigma"
     }
 }
 
-function Cmd-Run {
-    Sigma-Log "info" "Checking for QEMU..."
+function Start-SigmaRun {
+    Write-SigmaLog "info" "Checking for QEMU..."
     $qemu = Get-Command "qemu-system-x86_64" -ErrorAction SilentlyContinue
     if (-not $qemu) {
-        Sigma-Log "warn" "qemu-system-x86_64 not found. Install QEMU from https://www.qemu.org/"
-        Sigma-Log "info" "Simulation: sigma run --target $Target$(if ($Headless) {' --headless'} else {''})"
+        Write-SigmaLog "warn" "qemu-system-x86_64 not found. Install QEMU from https://www.qemu.org/"
+        Write-SigmaLog "info" "Simulation: sigma run --target $Target$(if ($Headless) {' --headless'} else {''})"
         return
     }
 
     $isoPath = Join-Path $Path "build/sigmaos.iso"
     if (-not (Test-Path $isoPath)) {
-        Sigma-Log "warn" "ISO not found at '$isoPath'. Run sigma.ps1 build first."
+        Write-SigmaLog "warn" "ISO not found at '$isoPath'. Run sigma.ps1 build first."
         return
     }
 
@@ -150,19 +150,19 @@ function Cmd-Run {
     if ($Headless) { $qemuArgs += @("-nographic","-serial","stdio") }
 
     if ($DryRun) {
-        Sigma-Log "info" "[dry-run] Would run: qemu-system-x86_64 $($qemuArgs -join ' ')"
+        Write-SigmaLog "info" "[dry-run] Would run: qemu-system-x86_64 $($qemuArgs -join ' ')"
         return
     }
-    Sigma-Log "info" "Launching SigmaOS in QEMU..."
+    Write-SigmaLog "info" "Launching SigmaOS in QEMU..."
     & qemu-system-x86_64 @qemuArgs
 }
 
-function Cmd-Verify {
+function Test-SigmaVerify {
     $manifest = Get-ShardManifest
-    Sigma-Log "info" "Verifying shard integrity..."
+    Write-SigmaLog "info" "Verifying shard integrity..."
 
     $checks = @(
-        @{ name = "Manifest present";      ok = ($manifest -ne $null);                     detail = "shard.json found" },
+        @{ name = "Manifest present";      ok = ($null -ne $manifest);                     detail = "shard.json found" },
         @{ name = "PQC signature (mock)";  ok = $true;                                     detail = "Dilithium-5 sig VALID (simulation)" },
         @{ name = "Capability grant";      ok = $true;                                     detail = "capabilities: sigma.fs.read, sigma.net" },
         @{ name = "Hash integrity";        ok = $true;                                     detail = "SHA-256: 3a7c9f... (mock)" }
@@ -179,28 +179,28 @@ function Cmd-Verify {
         $colour = if ($check.ok) { "Green" } else { "Red" }
         Write-Host "  $icon $($check.name.PadRight(28)) $($check.detail)" -ForegroundColor $colour
     }
-    Sigma-Log "success" "All checks passed."
+    Write-SigmaLog "success" "All checks passed."
 }
 
-function Cmd-Inject {
+function Start-SigmaInject {
     $manifest = Get-ShardManifest
-    if (-not $manifest) { Sigma-Log "error" "No shard.json found"; exit 1 }
+    if (-not $manifest) { Write-SigmaLog "error" "No shard.json found"; exit 1 }
 
-    Sigma-Log "info" "Hot-injecting shard '$($manifest.name)' into lattice..."
+    Write-SigmaLog "info" "Hot-injecting shard '$($manifest.name)' into lattice..."
     if ($DryRun) {
-        Sigma-Log "info" "[dry-run] Would POST to ws://127.0.0.1:17382/shard/inject"
+        Write-SigmaLog "info" "[dry-run] Would POST to ws://127.0.0.1:17382/shard/inject"
         return
     }
     # In production: WebSocket or Unix socket IPC to sigma-latticed
-    Sigma-Log "info" "Sending shard to sigma-latticed at 127.0.0.1:17382..."
-    Sigma-Log "success" "Shard '$($manifest.name)' hot-swapped successfully."
+    Write-SigmaLog "info" "Sending shard to sigma-latticed at 127.0.0.1:17382..."
+    Write-SigmaLog "success" "Shard '$($manifest.name)' hot-swapped successfully."
 }
 
-function Cmd-Init {
-    if (-not $Name) { Sigma-Log "error" "-Name is required. Usage: sigma.ps1 init -Name my-driver"; exit 1 }
-    if (Test-Path $Name) { Sigma-Log "error" "Path '$Name' already exists."; exit 1 }
+function Initialize-SigmaComponent {
+    if (-not $Name) { Write-SigmaLog "error" "-Name is required. Usage: sigma.ps1 init -Name my-driver"; exit 1 }
+    if (Test-Path $Name) { Write-SigmaLog "error" "Path '$Name' already exists."; exit 1 }
 
-    Sigma-Log "info" "Scaffolding SigmaOS component '$Name'..."
+    Write-SigmaLog "info" "Scaffolding SigmaOS component '$Name'..."
     New-Item -ItemType Directory -Path "$Name/src" -Force | Out-Null
 
     # Write no_std Rust stub
@@ -227,7 +227,7 @@ project: {
     @{name=$Name; version="0.1.0"; arch="x86_64"; entry="_start"} |
         ConvertTo-Json | Set-Content "$Name/shard.json"
 
-    Sigma-Log "success" "Component '$Name' scaffolded."
+    Write-SigmaLog "success" "Component '$Name' scaffolded."
     Write-Host "  $Name/src/main.rs    (no_std entry stub)"
     Write-Host "  $Name/Config.sigma  (project config)"
     Write-Host "  $Name/shard.json    (manifest)"
@@ -235,25 +235,25 @@ project: {
     Write-Host "  Next: cd $Name && .\sigma.ps1 build" -ForegroundColor Cyan
 }
 
-function Cmd-Sign {
+function Set-SigmaSignature {
     $manifest = Get-ShardManifest
-    if (-not $manifest) { Sigma-Log "error" "No shard.json found in '$Path'"; exit 1 }
+    if (-not $manifest) { Write-SigmaLog "error" "No shard.json found in '$Path'"; exit 1 }
 
-    Sigma-Log "info" "Signing shard '$($manifest.name)' with Dilithium-5..."
+    Write-SigmaLog "info" "Signing shard '$($manifest.name)' with Dilithium-5..."
     if ($DryRun) {
-        Sigma-Log "info" "[dry-run] Would sign: $Path/$($manifest.name).sigma"
+        Write-SigmaLog "info" "[dry-run] Would sign: $Path/$($manifest.name).sigma"
         return
     }
     # In production: call sigma-pqc sign tool
     $sigPath = Join-Path $Path "$($manifest.name).sig"
     "SIGMA_PQC_SIG:$(Get-Date -Format o)" | Set-Content $sigPath
-    Sigma-Log "success" "Signature written: $sigPath"
+    Write-SigmaLog "success" "Signature written: $sigPath"
     Write-Host "  Algorithm : Dilithium-5 (NIST FIPS 204, simulation)"
     Write-Host "  Key       : $env:USERPROFILE\.sigmaos\signing.key (auto-generated if absent)"
 }
 
-function Cmd-Doctor {
-    Sigma-Log "info" "Checking SigmaOS build environment..."
+function Test-SigmaDoctor {
+    Write-SigmaLog "info" "Checking SigmaOS build environment..."
     $tools = @(
         @{ cmd = "rustc";               args = "--version"; label = "Rust toolchain" },
         @{ cmd = "cargo";               args = "--version"; label = "Cargo" },
@@ -267,7 +267,7 @@ function Cmd-Doctor {
     if ($Json) { Write-Host "{`"checks`":[" }
     foreach ($tool in $tools) {
         $found = Get-Command $tool.cmd -ErrorAction SilentlyContinue
-        $ok    = $found -ne $null
+        $ok    = ($null -ne $found)
         $ver   = if ($ok) { (& $tool.cmd $tool.args 2>&1 | Select-Object -First 1).ToString().Trim() } else { "NOT FOUND" }
         if (-not $ok) { $allOk = $false }
 
@@ -280,14 +280,14 @@ function Cmd-Doctor {
         }
     }
     if ($Json) { Write-Host "]}" }
-    if ($allOk) { Sigma-Log "success" "All tools found. Environment is healthy." }
-    else         { Sigma-Log "warn"    "Some tools missing. Install them to build SigmaOS." }
+    if ($allOk) { Write-SigmaLog "success" "All tools found. Environment is healthy." }
+    else         { Write-SigmaLog "warn"    "Some tools missing. Install them to build SigmaOS." }
 }
 
-function Cmd-Shard($action = "list") {
+function Invoke-SigmaShard($action = "list") {
     switch ($action) {
         "list" {
-            Sigma-Log "info" "Loaded kernel shards (via /sys/sigma/shards — simulated):"
+            Write-SigmaLog "info" "Loaded kernel shards (via /sys/sigma/shards — simulated):"
             $shards = @(
                 @{ name="sigma-core";    base="0xffff000000001000"; status="loaded";    size="128 KiB" },
                 @{ name="sigma-net";     base="0xffff000000020000"; status="loaded";    size=" 64 KiB" },
@@ -306,16 +306,16 @@ function Cmd-Shard($action = "list") {
             }
         }
         "verify" {
-            Sigma-Log "info" "Verifying shard signatures..."
-            Sigma-Log "success" "All shard Dilithium-5 signatures valid (simulation)."
+            Write-SigmaLog "info" "Verifying shard signatures..."
+            Write-SigmaLog "success" "All shard Dilithium-5 signatures valid (simulation)."
         }
         default {
-            Sigma-Log "error" "Unknown shard action '$action'. Valid: list, info, verify"
+            Write-SigmaLog "error" "Unknown shard action '$action'. Valid: list, info, verify"
         }
     }
 }
 
-function Cmd-Version {
+function Get-SigmaVersion {
     if ($Json) {
         Write-Host '{"tool":"sigma.ps1","version":"1.1.0","codename":"Zenith","platform":"win32"}'
     } else {
@@ -329,16 +329,16 @@ function Cmd-Version {
 
 # ─── Dispatch ─────────────────────────────────────────────────────────────────
 switch ($Command.ToLower()) {
-    "build"   { Cmd-Build }
-    "run"     { Cmd-Run }
-    "verify"  { Cmd-Verify }
-    "inject"  { Cmd-Inject }
-    "init"    { Cmd-Init }
-    "sign"    { Cmd-Sign }
-    "doctor"  { Cmd-Doctor }
-    "shard"   { $action = if ($args.Count -gt 0) { $args[0] } else { "list" }; Cmd-Shard $action }
-    "version" { Cmd-Version }
-    "help"    { Cmd-Help }
+    "build"   { Invoke-SigmaBuild }
+    "run"     { Start-SigmaRun }
+    "verify"  { Test-SigmaVerify }
+    "inject"  { Start-SigmaInject }
+    "init"    { Initialize-SigmaComponent }
+    "sign"    { Set-SigmaSignature }
+    "doctor"  { Test-SigmaDoctor }
+    "shard"   { $action = if ($args.Count -gt 0) { $args[0] } else { "list" }; Invoke-SigmaShard $action }
+    "version" { Get-SigmaVersion }
+    "help"    { Show-SigmaHelp }
     default   {
         Write-Red "Σ [ERROR]  "; Write-Host " Unknown command '$Command'. Run: sigma.ps1 help"
         exit 1

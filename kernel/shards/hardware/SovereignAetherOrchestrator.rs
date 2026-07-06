@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,24 +16,24 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: to::method ─────────────────────
+// â”€â”€â”€ Module: to::method â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ZenithInterruptVector — hardware-compatible struct.
+/// ZenithInterruptVector â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ZenithInterruptVector {
     pub active: SigmaBool,
 }
 
-/// SovereignAetherOrchestrator — hardware-compatible struct.
+/// SovereignAetherOrchestrator â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignAetherOrchestrator {
     pub registered_count: SigmaU32,
     pub events_pulsed: SigmaU32,
 }
 
-/// method — OOP singleton pattern.
+/// method â€” OOP singleton pattern.
 pub struct method {
     pub initialized: SigmaBool,
 }
@@ -106,4 +106,6 @@ pub unsafe extern "C" fn aether_audit() {
 pub unsafe extern "C" fn start_aether_zenith() {
     INSTANCE.initialized = true;
 }
+
+
 

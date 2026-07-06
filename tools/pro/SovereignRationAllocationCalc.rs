@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignRationAllocationCalc ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignRationAllocationCalc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// RationReport — hardware-compatible struct.
+/// RationReport â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct RationReport {
     pub wheat_kg: SigmaU32,
     pub rice_kg: SigmaU32,
     pub coarse_grain_kg: SigmaU32,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub total_cost_paise: SigmaU64,
 }
 
-/// SovereignRationAllocationCalc — OOP singleton pattern.
+/// SovereignRationAllocationCalc â€” OOP singleton pattern.
 pub struct SovereignRationAllocationCalc {
     pub initialized: SigmaBool,
 }
@@ -52,4 +52,6 @@ static mut INSTANCE: SovereignRationAllocationCalc = SovereignRationAllocationCa
 pub unsafe extern "C" fn run_pds_ration_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

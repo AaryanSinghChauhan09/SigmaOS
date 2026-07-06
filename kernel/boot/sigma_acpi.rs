@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_acpi module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_acpi module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_acpi ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_acpi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// acpi_rsdp — hardware-compatible struct.
+/// acpi_rsdp â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct acpi_rsdp {
     pub signature: [u8; 8],
     pub checksum: SigmaU64,
     pub oem_id: [u8; 6],
@@ -33,10 +33,10 @@ pub struct {s_name} {{
     pub reserved: [SigmaU64; 3],
 }
 
-/// acpi_sdt_header — hardware-compatible struct.
+/// acpi_sdt_header â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct acpi_sdt_header {
     pub signature: [u8; 4],
     pub length: SigmaU64,
     pub revision: SigmaU64,
@@ -48,26 +48,26 @@ pub struct {s_name} {{
     pub creator_revision: SigmaU64,
 }
 
-/// acpi_xsdt — hardware-compatible struct.
+/// acpi_xsdt â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct acpi_xsdt {
     pub hdr: SigmaU64,
 }
 
-/// acpi_madt — hardware-compatible struct.
+/// acpi_madt â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct acpi_madt {
     pub hdr: SigmaU64,
     pub lapic_addr: SigmaU64,
     pub flags: SigmaU64,
 }
 
-/// madt_lapic — hardware-compatible struct.
+/// madt_lapic â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct madt_lapic {
     pub type: SigmaU64,
     pub length: SigmaU64,
     pub acpi_id: SigmaU64,
@@ -75,10 +75,10 @@ pub struct {s_name} {{
     pub flags: SigmaU64,
 }
 
-/// madt_ioapic — hardware-compatible struct.
+/// madt_ioapic â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct madt_ioapic {
     pub type: SigmaU64,
     pub length: SigmaU64,
     pub ioapic_id: SigmaU64,
@@ -87,10 +87,10 @@ pub struct {s_name} {{
     pub global_irq_base: SigmaU64,
 }
 
-/// acpi_mcfg_entry — hardware-compatible struct.
+/// acpi_mcfg_entry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct acpi_mcfg_entry {
     pub base_addr: SigmaU64,
     pub segment: SigmaU64,
     pub start_bus: SigmaU64,
@@ -98,10 +98,10 @@ pub struct {s_name} {{
     pub reserved: SigmaU64,
 }
 
-/// acpi_mcfg — hardware-compatible struct.
+/// acpi_mcfg â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct acpi_mcfg {
     pub hdr: SigmaU64,
     pub reserved: SigmaU64,
 }
@@ -117,4 +117,6 @@ pub unsafe extern "C" fn parse_mcfg() {
 #[no_mangle]
 pub unsafe extern "C" fn parse_xsdt() {
 }
+
+
 

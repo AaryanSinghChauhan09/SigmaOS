@@ -28,13 +28,21 @@ impl SovereignLinuxSubsystem {
         Self { initialized: false }
     }
 
-    pub unsafe fn translate_syscall(&mut self) {
-        // Migrated: translate_syscall
+    pub unsafe fn translate_syscall(&mut self, linux_nr: SigmaU32) -> SigmaI32 {
         self.initialized = true;
+        // Map common standard Linux calls directly to SigmaOS capability offsets
+        match linux_nr {
+            0 => 10,  // sys_read -> read capability
+            1 => 11,  // sys_write -> write capability
+            2 => 12,  // sys_open -> open capability
+            3 => 13,  // sys_close -> close capability
+            57 => 26, // sys_fork -> fork capability
+            60 => 30, // sys_exit -> exit capability
+            _ => -1,  // ENOSYS equivalent
+        }
     }
 
     pub unsafe fn instantiate_distro(&mut self) {
-        // Migrated: instantiate_distro
         self.initialized = true;
     }
 

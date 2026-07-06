@@ -1,41 +1,50 @@
 # security report
 
-1
+---
+name: Security Vulnerability
+about: Report a security vulnerability (private)
+title: '[SECURITY] <brief description>'
+labels: security
+assignees: ''
 
 ---
 
-name: ??? Security Vulnerability
-about: Report a security vulnerability (use only for non-critical issues; for critical issues use SECURITY.md)
-title: "[SECURITY] "
-labels: ["security", "needs-triage"]
-assignees: AaryanSinghChauhan09
----
+**IMPORTANT**: For security vulnerabilities, please do NOT file a public issue. Instead, follow the security reporting process in [SECURITY.md](../../SECURITY.md).
 
-> **?? CRITICAL VULNERABILITIES**: For critical security issues, do NOT use this public template.
-> Instead, email directly or use [GitHub Private Security Reporting](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new).
+This template is for reference only. Security issues should be reported privately to maintain responsible disclosure.
 
-1
+## Security Reporting Process
 
-<!-- Brief description (do not include full exploit details here) -->
+1. **Email**: Send details to the security team at the address listed in SECURITY.md
 
-1
+2. **Include**: Description, impact, reproduction steps, and affected versions
 
-1
+3. **Response**: The security team will acknowledge within 48 hours
 
-1
+4. **Disclosure**: We will coordinate a fix and public disclosure timeline
 
-1
+## What to Include
 
-1
+- **Description**: Clear description of the vulnerability
 
-1
+- **Impact**: Severity and potential consequences
 
-1
+- **Reproduction**: Steps to reproduce the issue
 
-1
+- **Affected Versions**: Which versions are affected
 
-<!-- Only include steps that do not expose a working exploit -->
+- **Proof of Concept**: If available (optional)
 
-1
+- **Suggested Fix**: If you have a proposed solution (optional)
 
-<!-- Optional: if you have a fix in mind -->
+## Security Policy
+
+See [SECURITY.md](../../SECURITY.md) for our full security policy, including:
+
+- Supported versions
+
+- Severity classification
+
+- Disclosure timeline
+
+- Bounty program (if applicable)

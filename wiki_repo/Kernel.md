@@ -1,160 +1,145 @@
 # SigmaOS Kernel Internals
 
-The SigmaOS kernel is a freestanding microkernel — compiled with `-nostdlib -ffreestanding`, zero glibc symbols, runs the same binary on x86_64, ARM64, and RISC-V.
-
----
-
-## Kernel Source Layout
-
-```
-kernel/
-├── core/           # Scheduler, MM, syscall dispatch, IRQ
-├── arch/           # CPU-specific: x86_64, arm64, riscv64
-├── boot/           # Early boot, multiboot2, UEFI stub
-├── bpf/            # eBPF VM + verifier
-├── crypto/         # In-kernel PQC accelerator hooks
-├── diagnostics/    # Crash reporter, panic handler
-├── drivers/        # Core built-in drivers (e1000, VirtIO)
-├── fs/             # VFS core, UBC (Unified Buffer Cache)
-├── hal/            # SovereignHAL bridge
-├── hypervisor/     # KVM-like hypervisor stub
-├── ipc/            # sigma-bus IPC, shared memory
-├── kpatch/         # Live kernel patching
-├── memory/         # Buddy + Slab allocators, VMM
-├── mm/             # Page table walker, ASLR engine
-├── net/            # Network stack core
-├── orchestration/  # Cgroup + namespace enforcement
-├── power/          # ACPI, P-state governor
-├── recovery/       # Self-healing, rollback
-├── resilience/     # Watchdog, fault tolerance
-├── rust/           # Rust kernel modules (safe code paths)
-├── sched/          # Scheduler implementations
-├── security/       # AVC, pledge/unveil, zero-trust
-├── self_healing/   # Autonomous fault recovery
-├── shards/         # Kernel-resident shard loader
-├── shell/          # sigma-ksh emergency kernel shell
-├── storage/        # Block layer, I/O scheduler
-├── syscalls/       # Syscall table + dispatch
-├── telemetry/      # Kernel telemetry hooks
-└── virt/           # Virtualisation support
-```
-
----
+> Updated: July 2026 · Phase 10 · All `#![no_std]` Rust
 
 ## Boot Sequence
 
 ```
-UEFI firmware
-  └── sigma-boot.efi (Phase G)  ← loads kernel ELF
-        └── multiboot2 header   ← sets up identity-mapped page tables
-              └── sigma_kernel_main()
-                    ├── HAL init (PCI, ACPI, APIC)
-                    ├── Physical MM init (buddy allocator)
-                    ├── Virtual MM init (4-level paging, ASLR)
-                    ├── IDT + APIC/HPET timer
-                    ├── Scheduler init (MLFQ)
-                    ├── Syscall gate (LSTAR MSR)
-                    ├── VFS mount (tmpfs root)
-                    ├── Init process (PID 1 — sigma_init)
-                    └── Idle loop
+BIOS/UEFI → sigma-boot.efi (or GRUB2) → Multiboot2 header
+  → sovereign_kernel_main.rs
+    → serial_init() + VGA init
+    → IDT + APIC init (sigma_irq_controller.rs)
+    → PMM init (sigma_pmm.rs) — buddy allocator
+    → slab_init (sigma_mm.rs)
+    → VFS init (sigma_vfs_ext4.rs)
+    → Process manager + scheduler (sigma_sched.rs)
+    → Network stack (sigma_network_stack.rs)
+    → Display server (sigma_display_server.rs)
+    → Init process (PID 1) — sigma-init
 ```
-
----
-
-## Scheduler
-
-| Mode | Algorithm | Use Case |
-|------|-----------|---------|
-| Normal | MLFQ (4 queues, aging) | Interactive + background |
-| Fair | CFS clone (vruntime, RB tree) | CPU-bound batch work |
-| RT | EDF (earliest-deadline-first) | `release/rtos` tasks |
-| AI | TinyLlama pre-warming | Phase H — predictive |
-
-### Phase G Implementation Order
-1. Round-robin (64 tasks) — unblocks boot
-2. MLFQ with 4 queues
-3. CFS vruntime + red-black tree
-4. NUMA-aware placement (ACPI SRAT)
-5. EDF + priority inheritance
-6. sigma-ai predictive scheduler
-
----
 
 ## Memory Management
 
-### Physical (`kernel/memory/`, `kernel/core/sigma_mm.cpp`)
-- **Buddy allocator**: 2^n contiguous page frames, O(log n) alloc/free
-- **Slab allocator**: per-type object caches, `kmalloc()`/`kfree()`
-- Physical page bitmap for 4 GB addressable RAM (Phase G baseline)
+**Physical Memory Manager** (`sigma_pmm.rs`)
+- Buddy allocator: orders 0–11 (4KB–8MB blocks)
+- `sigma_pmm_alloc(order)` → physical address
+- `sigma_pmm_free(phys)` → coalesces buddies
+- Stats: `sigma_pmm_stats()` → (free_mb, total_mb)
 
-### Virtual (`kernel/mm/sigma_vmm.cpp`)
-- **4-level paging** (PML4 → PDPT → PD → PT on x86_64)
-- Per-process page tables, kernel mapped in upper half
-- **ASLR**: 42-bit entropy per VMA region (`/proc/sys/kernel/randomize_va_space` equivalent)
-- **W^X**: no page is `PROT_WRITE | PROT_EXEC` simultaneously
+**Virtual Memory** (`sigma_mm.rs`)
+- 4-level x86-64 page tables (PML4 → PDPT → PD → PT)
+- Slab allocator for kernel objects
+- ASLR: randomize kernel/stack/heap bases
+- W^X enforcement: no page both writable and executable
+- Stack guard canaries (`DEAD_C0DE_BEEF_CAFE`)
 
----
+## Scheduler (`sigma_sched.rs`)
 
-## Syscall Dispatch (`kernel/syscalls/`, `kernel/core/sigma_syscall_dispatch.cpp`)
+Three unified policies in one scheduler:
 
-Phase G target: 30 essential syscalls via `syscall` instruction (LSTAR MSR).
+| Policy | Algorithm | Use Case |
+|--------|-----------|----------|
+| `Mlfq` | 8-level MLFQ + priority boost every 1s | Interactive/general |
+| `Cfs` | CFS with vruntime red-black tree | Fair CPU sharing |
+| `Edf` | Earliest Deadline First | Hard real-time (RTOS) |
 
-| ID | Name | Description |
-|----|------|-------------|
-| 1 | `sys_write` | Write to fd |
-| 2 | `sys_read` | Read from fd |
-| 3 | `sys_open` | Open file |
-| 4 | `sys_close` | Close fd |
-| 5 | `sys_exit` | Terminate process |
-| 6 | `sys_fork` | Fork process |
-| 7 | `sys_execve` | Execute program |
-| 8 | `sys_mmap` | Map memory |
-| 9 | `sys_munmap` | Unmap memory |
-| 10 | `sys_socket` | Create socket |
-| 11 | `sys_pledge` | Restrict capabilities |
-| 12 | `sys_unveil` | Restrict filesystem |
-| 13 | `sys_sigaction` | Signal handler |
-| 14 | `sys_kill` | Send signal |
-| 15 | `sys_waitpid` | Wait for child |
-| ... | (30 total) | ... |
+**MCS Spinlock** — queue-based, O(1) lock/unlock, cache-coherent.
 
----
+**API:**
+```rust
+sigma_sched_spawn(entry: u64, sp: u64) → Option<u32>
+sigma_sched_tick()       // call every 1ms from timer IRQ
+sigma_sched_next()       // pick next process
+sigma_sched_block(idx)   // I/O wait → priority boost on wake
+sigma_sched_unblock(idx)
+sigma_sched_exit(idx)
+```
 
-## IPC (`kernel/ipc/`)
+## IRQ Subsystem (`sigma_irq_controller.rs`)
 
-- **sigma-bus**: capability-gated message-passing, zero-copy where possible
-- **Shared memory**: `sys_mmap` with `MAP_SHARED` + VMA sharing
-- **Signals**: POSIX-compatible signal delivery
+- x86-64: IDT (256 entries), Local APIC, I/O APIC
+- ARM64: GIC-400 (distributor + CPU interface)
+- `register_irq_handler(vector, handler_fn)` — per-vector dispatch
+- `apic_eoi()` — end-of-interrupt signaling
+- `apic_send_ipi(dest, vector)` — inter-processor interrupts
 
----
+## IPC (`sigma_ipc_pipe.rs`)
 
-## Security Enforcement (`kernel/security/`)
+| Mechanism | API | Notes |
+|-----------|-----|-------|
+| Pipe | `pipe.write()` / `pipe.read()` | 64KB lock-free ring buffer |
+| Message Queue | `msgq.send()` / `msgq.recv(type)` | 256 msgs, type-based recv |
+| Shared Memory | `shm_create()` / `shm_attach()` | Physical backing pages |
 
-- `sigma_pledge`: process declares capability set at exec time
-- `sigma_unveil`: process declares allowed filesystem paths
-- **AVC**: O(1) access vector cache for MAC policy decisions
-- **Namespace isolation**: PID, mount, network, UTS, IPC, user namespaces
-- **Cgroup v2**: CPU, memory, I/O resource limits per container
+## Filesystem (`sigma_vfs_ext4.rs`)
 
----
+- VFS layer: inodes, dentries, open file table
+- Path resolution: `vfs.path_resolve(path)` → inode
+- Operations: `create`, `mkdir`, `open`, `close`, `unlink`, `rename`, `readdir`
+- Ext4-compatible layout: direct blocks (12) + single/double/triple indirect
+- In-memory for now; persistent ext4 driver planned Phase I
 
-## Current Status (v15.0 baseline)
+## Network Stack (`sigma_network_stack.rs`, `sigma_tcp_stack.rs`)
 
-| Subsystem | Status |
-|-----------|--------|
-| Scheduler (stub) | 🔄 Headers complete, bodies stubbed |
-| Buddy allocator | 🔄 Partial |
-| Slab allocator | 🔄 Partial |
-| Page table walker | 🔄 Partial |
-| APIC + timer | ⬜ Phase G |
-| Syscall dispatch | ⬜ Phase G |
-| sigma-boot.efi | ⬜ Phase G |
-| IPC (sigma-bus) | 🔄 Framework done |
-| AVC / pledge | ✅ Implemented |
-| Cgroup enforcement | ✅ Implemented |
-| PQC crypto | ✅ Implemented |
-| eBPF VM | 🔄 Stub |
+```
+Application
+  └── sigma_socket_{open,connect,send,recv,close}
+        └── TCP state machine (sigma_tcp_stack.rs)
+              └── IPv4 (Ipv4Header + checksum)
+                    └── Ethernet (EthHeader)
+                          └── NIC driver (e1000 / virtio-net)
+```
 
----
+Also: ARP cache, DHCP client, DNS cache with TTL aging.
 
-*See also: [Architecture-Overview](Architecture-Overview) · [HAL](HAL) · [Phase G Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/PHASE_G_ROADMAP.md)*
+## Crypto (`crypto/sigma_key_derive.rs`)
+
+- SHA-256: sovereign, no external deps
+- HMAC-SHA256
+- PBKDF2-SHA256 (100K iterations for passwords)
+- HKDF-SHA256 (subkey derivation)
+- `derive_key(passphrase, salt)` — fixes CryptFS issue #1009
+- `verify_key` — constant-time comparison
+
+## Security
+
+- **Kyber (ML-KEM-768)**: post-quantum key encapsulation
+- **Dilithium (ML-DSA-65)**: post-quantum signatures
+- **AppArmor-style MAC**: profile-based mediation
+- **Pledge/Unveil**: capability reduction (OpenBSD-inspired)
+- **eBPF**: kernel extension with verifier
+
+## Container Runtime (`sigma_container_runtime.rs`)
+
+- OCI spec compliant
+- Namespaces: PID, NET, MNT, UTS, IPC, USER, CGROUP
+- Cgroups: CPU quota, memory limit, PID limit
+- Image layers + overlay filesystem
+- CRI interface for Kubernetes
+- `sigma-pod start <spec>` → < 200ms startup
+
+## GPU/Display (`sigma_gpu_drm.rs`)
+
+- DRM device, CRTC, connectors, framebuffers
+- GEM buffer objects (physical-backed)
+- Mode-setting: `drm.set_crtc(crtc_id, fb_id, mode)`
+- Page-flipping: `drm.page_flip(crtc_id, fb_id)`
+- VESA framebuffer fallback: `VesaFb::put_pixel()`
+- Supported: 1080p, 1440p, 4K modes out-of-box
+
+## Audio (`sigma_sound.rs`)
+
+- Mixer: up to 32 concurrent streams, per-stream volume
+- Ring buffer: lock-free, 4 × 1024-frame periods
+- HDA (Intel High Definition Audio): CORB/RIRB command interface
+- API: `mixer.open_stream(device)` → stream_id
+- `stream.write_samples(samples)`, `mixer.mix_to_output(out)`
+- Master volume + mute, soft clipping
+
+## USB (`sigma_usb_stack.rs`)
+
+- xHCI: MMIO register map, port probing, speed detection
+- HID: keyboard (HID boot protocol), mouse
+- Mass storage: BBB bulk-only transfer, SCSI READ10/WRITE10
+- Keycode → ASCII decoder (US layout)
+- `xhci.enumerate_all()` → discovers all connected devices

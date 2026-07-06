@@ -48,17 +48,22 @@
 SigmaOS doesn't ask you to give up Linux apps. It runs them natively:
 
 ```bash
+
 # Run any Linux package
+
 sigma-pkg absorb firefox.deb  && sigma-pkg install firefox
 sigma-pkg absorb code.rpm     && sigma-pkg install code
 
 # Run Docker containers
+
 sigma-compat container ubuntu:22.04 bash
 
 # Run AppImages directly
+
 sigma-pkg absorb Blender.AppImage && sigma-pkg install blender
 
 # Use Flatpaks
+
 sigma-pkg install --flatpak org.mozilla.firefox
 ```
 
@@ -91,8 +96,11 @@ The compatibility architecture: [Linux Absorption Architecture](Linux-Absorption
 Moving from Linux to SigmaOS is designed to be zero-friction:
 
 1. **Dual boot** — install alongside your Linux distro ([Migration Guide](Migration-Guide))
+
 2. **Absorb packages** — `sigma-pkg absorb *.deb` converts your apps
+
 3. **Import dotfiles** — sigma-sh is POSIX-compatible, most scripts run as-is
+
 4. **Enhance** — use sigma-agent for automation, AI, security that Linux can't match
 
 ---

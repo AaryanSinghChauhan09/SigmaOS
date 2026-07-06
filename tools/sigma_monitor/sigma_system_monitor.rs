@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_system_monitor: Real-Time Performance Dashboard
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_system_monitor: Real-Time Performance Dashboard
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_system_monitor ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_system_monitor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SystemMetrics — hardware-compatible struct.
+/// SystemMetrics â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SystemMetrics {
     pub cpu_usage_pct: SigmaU64,
     pub interrupts_sec: SigmaU64,
     pub disk_io_mbps: SigmaU64,
@@ -30,4 +30,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn sigma_monitor_update() {
 }
+
+
 

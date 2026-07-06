@@ -276,17 +276,23 @@
 ## Immediate Priorities (1-2 Contributors)
 
 ```bash
+
 # Fix syscall dispatch (unblocks real hardware)
+
 cd kernel/syscalls && cargo test
 
 # Implement AHCI driver (SATA disk support)
+
 # File: drivers/storage/sigma_ahci.rs
 
 # Wi-Fi firmware loading (iwlwifi priority)
+
 # File: drivers/net/sigma_wifi_driver.rs (firmware_name() already returns paths)
 
 # sigma-boot.efi UEFI bootloader
+
 # File: sigma-boot/sigma_boot.zig (extend existing stub)
+
 ```
 
 ---

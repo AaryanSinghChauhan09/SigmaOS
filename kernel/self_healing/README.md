@@ -5,6 +5,7 @@ kernel shard crashes, the system diagnoses the fault and restarts only the
 affected component without rebooting.
 
 ## Recovery Flow
+
 ```
 Fault detected (watchdog / page-fault / assertion)
    ↓
@@ -18,6 +19,9 @@ Telemetry report filed to Sovereign Audit Log
 ```
 
 ## Roadmap
+
 - [ ] Watchdog timer integration
+
 - [ ] Snapshot restore from SovereignFS
+
 - [ ] Fault classifier training data collection

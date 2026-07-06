@@ -41,7 +41,8 @@ crashing driver **cannot crash the kernel**.
 | Crash recovery | Minidump → reboot | sigma-heal auto-diagnosis + hotfix suggestion |
 | Live patching | Requires reboot for kernel patches | sigma-kpatch function-level live patching — no reboot |
 
-**Implementation targets (Phase 0 — critical path):**
+### Implementation targets (Phase 0 — critical path):
+
 ```
 kernel/core/sigma_sched.cpp        — MLFQ+MCS, blocks everything
 kernel/core/sigma_mm.cpp           — buddy+slab+page table
@@ -56,7 +57,7 @@ make iso                           → first bootable SigmaOS.iso
 Windows runs on everything because of its WDM (Windows Driver Model) and a massive third-party
 driver ecosystem built over decades. SigmaOS's answer: SDF + sigma-dna auto-profiling.
 
-**Current driver coverage:**
+### Current driver coverage:
 
 | Category | Windows | SigmaOS | Gap | Fix phase |
 |---|---|---|---|---|
@@ -76,8 +77,11 @@ driver ecosystem built over decades. SigmaOS's answer: SDF + sigma-dna auto-prof
 | Neural accelerators | ❌ | ❌ planned | Future | Phase 6 |
 
 **sigma-dna hardware profiler** reads CPUID, DMI, ACPI SRAT, and PCI topology at boot. It:
+
 - Auto-selects the right driver set for detected hardware
+
 - Tunes scheduler policy per silicon (Atom vs. Core, Zen 3 vs. Zen 4)
+
 - Selects PGO build targets at package install time
 
 ### Security Architecture
@@ -104,7 +108,7 @@ Windows has Secure Boot, BitLocker, Defender, and Windows Hello. SigmaOS goes fu
 Windows has millions of apps because developers had a single stable API target for 30 years.
 SigmaOS's answer: a clean, stable, well-documented API with India Stack built in.
 
-**Three API tiers:**
+### Three API tiers:
 
 ```
 Tier 1 — sigma-syscall ABI
@@ -122,7 +126,7 @@ Tier 3 — sigma-web API (browser)
   JavaScript accessible from sigma-browser
 ```
 
-**Developer tooling roadmap:**
+### Developer tooling roadmap:
 
 | Tool | Windows equivalent | Status | Phase |
 |---|---|---|---|
@@ -139,17 +143,25 @@ Tier 3 — sigma-web API (browser)
 Windows' biggest moat: Win32 apps from 2001 still run. SigmaOS takes a different approach.
 
 **sigma-linux-compat** (optional bridge layer):
+
 - Runs existing Linux ELF binaries inside SDF containers without modification
+
 - Translates Linux syscalls → sigma-syscall at the boundary
+
 - Opt-in: never compiled into default profiles (sovereignty is preserved)
+
 - Implementation: `runtime/containers/sigma_linux_compat.cpp` ✅ (done)
 
 **POSIX bridge** (future):
+
 - Optional POSIX compatibility shim for migration from Linux/macOS
+
 - Does not ship in default profiles — available as `sigma-pkg install sigma-posix-compat`
+
 - Keeps sovereignty-first design intact for users who don't need it
 
-**Why this is better than Windows' approach:**
+### Why this is better than Windows' approach:
+
 Windows carries the Win32 ABI forever, accumulating security debt. SigmaOS can offer compat
 as an *optional package* while keeping the default OS clean.
 
@@ -162,10 +174,14 @@ as an *optional package* while keeping the default OS clean.
 | WSL equivalent | WSL2 (Linux in VM) | sigma-linux-compat (ELF in SDF sandbox) |
 | Orchestration | AKS / Azure Arc | SovereignCluster (no cloud dependency) |
 
-**sigma-pod advantages over Docker:**
+### sigma-pod advantages over Docker:
+
 - No daemon: `sigma-pod run-native` directly creates kernel namespaces
+
 - dm-verity verified images: tamper detection before exec
+
 - Cgroup v2 enforcement in kernel path — limits are real, not advisory
+
 - PQC-signed image registry by default
 
 ---
@@ -177,7 +193,7 @@ as an *optional package* while keeping the default OS clean.
 Windows balances a GUI for everyday users with PowerShell for developers. SigmaOS provides both
 through the Zenith desktop + sigma-cli surface.
 
-**Zenith compositor vs. Windows DWM:**
+### Zenith compositor vs. Windows DWM:
 
 | Dimension | Windows DWM | SigmaOS Zenith |
 |---|---|---|
@@ -189,15 +205,23 @@ through the Zenith desktop + sigma-cli surface.
 | HDR support | ✅ | Planned Phase 2 |
 | Auto-tiling WM | ❌ (manual only) | ✅ BSP/columns/grid (sigma_tiling_wm.cpp) |
 
-**sigma-cli coherent command surface:**
+### sigma-cli coherent command surface:
+
 ```bash
 sigma-cli profile show              # active profile
+
 sigma-cli pkg install vim           # install package
+
 sigma-cli pod run demo.spkg         # run containerized app
+
 sigma-cli health check              # sigma-heal status
+
 sigma-cli net status                # network topology
+
 sigma-cli boot rollback             # revert to last known-good
+
 sigma-cli sec verify                # boot chain integrity
+
 ```
 
 ### Accessibility Features
@@ -249,9 +273,13 @@ SigmaOS needs sovereign equivalents — ones that don't phone home to Redmond.
 | Remote Desktop | sigma-remote (PQC-encrypted session) | `[ ]` Phase 3 |
 
 **sigma-trustd DID-based identity** is architecturally superior to Active Directory:
+
 - No central domain controller that becomes a single point of failure
+
 - Identity is a DID document — works offline, verified cryptographically
+
 - Rotating keys doesn't require a domain admin — user self-manages
+
 - Foreign to LDAP/Kerberos attack surface by design
 
 ### Cloud Integration
@@ -347,6 +375,7 @@ SigmaOS → open cloud standards with sovereign deployment option.
 ## Problems & Fixes Matrix
 
 | # | Problem | Root Cause | Fix | Phase |
+
 |---|---------|------------|-----|-------|
 | 1 | Limited driver support (no GPU, Wi-Fi, BT, audio) | No DRM/KMS, no cfg80211 | Add SDF drivers: i915, amdgpu, iwlwifi, mt7921, HDA audio | Ph 1–2 |
 | 2 | Only FAT32 / Ext2 — no journaling | fs/sigmafs early stage | Implement Ext4 journal (JBD2 rewrite done: `fs/ext4_journal.c`) + SigmaFS native | Ph 1 |

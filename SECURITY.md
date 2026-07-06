@@ -12,16 +12,20 @@
 
 ## Reporting a Vulnerability
 
-**Do NOT open a public GitHub issue for security vulnerabilities.**
+### Do NOT open a public GitHub issue for security vulnerabilities.
 
 Instead, use one of the following private channels:
 
 ### Option A — GitHub Private Security Advisory (preferred)
+
 1. Go to the [Security tab](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories) of this repo.
+
 2. Click **"Report a vulnerability"**.
+
 3. Fill in the advisory form. We aim to acknowledge within **48 hours**.
 
 ### Option B — Email
+
 Send a PGP-encrypted email to: **security@sigmaos.dev** *(placeholder — replace with real address before release)*
 
 ```
@@ -50,15 +54,21 @@ We follow coordinated disclosure — we will not publish details until a fix is 
 Security bugs that are **in scope**:
 
 - Kernel privilege escalation (Ring 3 → Ring 0)
+
 - Memory safety violations in `kernel/`, `crypto/`, `security/`
+
 - Capability / Zero-Trust enforcement bypass in `security/`
+
 - Cryptographic implementation errors (especially in `crypto/cryptfs/`)
+
 - Supply-chain attacks against signed release artifacts
 
-**Out of scope (for this project stage):**
+### Out of scope (for this project stage):
 
 - Bugs in third-party dependencies (report upstream)
+
 - Theoretical / non-exploitable issues without a PoC
+
 - Social engineering
 
 ---
@@ -72,6 +82,9 @@ We use [CVSS v3.1](https://www.first.org/cvss/) for scoring. Critical (≥9.0) a
 ## Bug Bounty
 
 There is no monetary bounty program at this stage. Reporters of significant findings will be credited in:
+
 - The GitHub Security Advisory
+
 - The `CHANGELOG.md` release notes
+
 - The `CONTRIBUTORS.md` file (if desired)

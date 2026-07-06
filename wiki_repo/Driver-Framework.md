@@ -126,9 +126,13 @@ Kernel ring-0          sigma-bus              Driver ring-3
 ```
 
 Benefits:
+
 - Driver crash → kernel keeps running, driver process restarted
+
 - Driver bug → contained in sandbox, no kernel memory corruption
+
 - `sigma_pledge` per driver limits syscall access
+
 - Easier debugging (driver is a normal process)
 
 Cost: ~1–5µs per operation for IPC crossing.
@@ -187,21 +191,27 @@ access — one exploit = full system compromise.
 ## Building a Driver
 
 ```bash
+
 # Generate skeleton from Linux driver (cleanroom study)
+
 sigma-driver-porter analyse /path/to/linux_rtl8169.c
 sigma-driver-porter port    /path/to/linux_rtl8169.c
 
 # Or with AI translation
+
 sigma-driver-porter port /path/to/linux_rtl8169.c --ai
 
 # Build
+
 cd sigma_drivers/rtl8169
 cargo build --release --target x86_64-sigmaos.json
 
 # Validate
+
 sigma-ddk validate target/x86_64-sigmaos/release/librtl8169.a
 
 # View vendor registry
+
 sigma-ddk-vendors list
 sigma-ddk-vendors score
 ```

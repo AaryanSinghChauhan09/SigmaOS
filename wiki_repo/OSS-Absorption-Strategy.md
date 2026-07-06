@@ -15,10 +15,14 @@
 | [serenityos/serenity](https://github.com/SerenityOS/serenity) | GUI ecosystem integration, browser engine, consistent UX patterns | Zenith Desktop (`zenith_desktop/`), sigma-browser |
 | [QubesOS/qubes-core-admin](https://github.com/QubesOS/qubes-core-admin) | Compartmentalization, VM-based isolation, security domains | sigma_pledge + sigma_unveil + sigma-pod isolation |
 
-**What to study:**
+### What to study:
+
 - Linux: `Documentation/ABI/` for stable ABI patterns; `drivers/` for SDF driver model
+
 - Redox: `kernel/src/` for memory-safe system calls; `drivers/` for Rust driver traits
+
 - Serenity: `Userland/` for GUI app patterns; `Kernel/` for clean kernel architecture
+
 - QubesOS: `qubes/` for domain isolation; `core-admin/` for policy enforcement
 
 ### 2. AI & CLI Integration
@@ -32,10 +36,14 @@
 | [anthropics/claude-code](https://github.com/anthropics/claude-code) | ReAct loop, CLAUDE.md memory, `claude doctor`, streaming, supervised mode | sigma_agent_planner.rs, sigma_agent_memory.nim, sigma_agent_doctor.nim |
 | [Aider-AI/aider](https://github.com/Aider-AI/aider) | `/remember`, `/architect`, workflow-from-description | sigma_agent_memory.nim, sigma_agent_script_gen.nim |
 
-**What to study:**
+### What to study:
+
 - llama.cpp: `src/llama.cpp` for GGUF parsing; `examples/server/` for HTTP inference API
+
 - ai-shell: `src/commands/` for NL→command translation pipeline
+
 - Aider: `aider/coders/` for diff-based code editing; `aider/history.py` for session memory
+
 - Claude Code: `src/tools/` for tool schema design; system prompt patterns
 
 ### 3. Automation & Orchestration
@@ -46,9 +54,12 @@
 | [Azure/azure-cli](https://github.com/Azure/azure-cli) | Subcommand namespacing, extension system, `az upgrade`, automation runbooks | sigma_agent_main.nim 22-subcommand router, sigma_agent_plugin.nim |
 | [github/copilot-cli](https://github.com/github/copilot-cli) | `??` explain, `?!` execute, shell integration, `git?` context | sigma_agent_explain.nim `??`, sigma_agent_shell_integration.nim |
 
-**What to study:**
+### What to study:
+
 - n8n: `packages/nodes-base/nodes/` for trigger/action node design
+
 - azure-cli: `azure-cli/src/azure-cli/azure/cli/command_modules/` for namespace pattern
+
 - copilot-cli: `src/commands/` for context-aware suggestion UX
 
 ### 4. Security & Sovereignty
@@ -59,8 +70,10 @@
 | QubesOS | Hardware-enforced compartmentalization, Xen-based isolation | sigma_pledge/sigma_unveil, sigma-pod OCI isolation |
 | OpenBSD pledge/unveil | Capability restriction, minimal attack surface | sigma_pledge + sigma_unveil syscalls (kernel/security/) |
 
-**What to study:**
+### What to study:
+
 - OpenBSD: `sys/kern/kern_pledge.c` for pledge() implementation
+
 - QubesOS: `dom0/` for policy engine design
 
 ### 5. Package Ecosystem
@@ -71,8 +84,10 @@
 | [flatpak/flatpak](https://github.com/flatpak/flatpak) | Universal app packaging, sandboxed runtimes, OCI bundles | sigma_pkg_absorb.nim Flatpak support, sigma-pod |
 | ArchLinux packages | AUR-style community packages, PKGBUILD format | sigma_pkg_registry/ recipes, sigpkg format |
 
-**What to study:**
+### What to study:
+
 - nixpkgs: `pkgs/` for derivation patterns; `lib/` for version resolution
+
 - flatpak: `common/flatpak-oci-utils.c` for OCI bundle packaging
 
 ---
@@ -101,10 +116,15 @@
 ## How to Contribute an Absorption
 
 1. Pick a project from the list above
+
 2. Study it cleanroom (read the code, don't copy)
+
 3. Build a SigmaOS-sovereign equivalent
+
 4. Add training samples to `sigma_agent_seed_v2.jsonl`
+
 5. Add to OSS Reference Map (`docs/OSS_Reference_Map.md`)
+
 6. Submit a PR
 
 **Important:** All absorbed ideas must be implemented from scratch in SigmaOS's languages (Rust/Nim/Zig/Ada). We never copy GPL code. We study patterns and build sovereign replacements.

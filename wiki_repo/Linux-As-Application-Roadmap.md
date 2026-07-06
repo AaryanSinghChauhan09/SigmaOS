@@ -1,4 +1,5 @@
 # SigmaOS — Linux-as-Application Roadmap
+
 ## Making Every Linux Distro Run as a sigma-pod App on SigmaOS
 
 **Vision:** Ubuntu, Fedora, Debian, Arch, Kali, NixOS, and every other
@@ -103,34 +104,49 @@ SigmaOS kernel (Ring-0)
 
 **Exit gate:** `sigma-linux exec ubuntu bash` opens Ubuntu 24.04 bash prompt.
 
-
 ### Phase L2 — Full Distro Support (Months 6-12)
 
 **Goal:** Every major Linux distro installable and usable via sigma-linux.
 
 ```bash
+
 # Install any distro as an app:
+
 sigma-linux install ubuntu       # Ubuntu 24.04 LTS
+
 sigma-linux install fedora       # Fedora 41
+
 sigma-linux install debian       # Debian 12 Bookworm
+
 sigma-linux install arch         # Arch Linux (rolling)
+
 sigma-linux install kali         # Kali Linux (forensic profile)
+
 sigma-linux install nixos        # NixOS (declarative)
+
 sigma-linux install alpine       # Alpine (musl, minimal)
+
 sigma-linux install pop-os       # Pop!_OS (NVIDIA-friendly)
+
 sigma-linux install manjaro      # Manjaro (user-friendly Arch)
+
 sigma-linux install opensuse     # openSUSE Tumbleweed
 
 # Run:
+
 sigma-linux exec ubuntu          # bash inside Ubuntu
+
 sigma-linux exec fedora -- dnf install vim
 sigma-linux exec arch -- pacman -S firefox
 sigma-linux exec kali -- nmap -sV 192.168.1.1  # requires forensic cap
 
 # GUI apps from Linux distros in Zenith:
+
 sigma-linux exec ubuntu -- firefox              # X11/Wayland app in Zenith
+
 sigma-linux exec fedora -- gnome-text-editor
 sigma-linux exec ubuntu -- code .              # VSCode from Ubuntu
+
 ```
 
 | Task | File | Branch | Detail |
@@ -153,16 +169,25 @@ sigma-linux exec ubuntu -- code .              # VSCode from Ubuntu
 **Goal:** Linux GUI apps appear as first-class Zenith windows.
 
 ```bash
+
 # Linux GUI app in Zenith window:
+
 sigma-linux app ubuntu firefox         # Firefox from Ubuntu in Zenith
+
 sigma-linux app fedora libreoffice     # LibreOffice from Fedora
+
 sigma-linux app ubuntu --display sigma -- gimp  # GIMP in Zenith
 
 # Linux app appears in:
+
 #  - Zenith app launcher (Super key search)
+
 #  - Taskbar with correct icon
+
 #  - Alt+Tab window switcher
+
 #  - Proper window title and close button
+
 ```
 
 | Task | File | Branch | Detail |
@@ -208,48 +233,81 @@ Security advantages over native Linux:
 ## 3. sigma-linux CLI — Complete Command Set
 
 ```bash
+
 # Installation
+
 sigma-linux install <distro> [--version x.y]   # download + verify + install
+
 sigma-linux install --url <spkg-url>            # install from custom URL
+
 sigma-linux import <rootfs.tar.gz>              # import custom rootfs
 
 # Execution
+
 sigma-linux exec <distro>                       # interactive shell
+
 sigma-linux exec <distro> -- <command>          # run single command
+
 sigma-linux exec <distro> --root -- <cmd>       # run as root inside
+
 sigma-linux exec <distro> --cpu 500 --mem 1024  # with resource limits
+
 sigma-linux exec <distro> --cap forensic        # with forensic profile
+
 sigma-linux exec <distro> --no-network          # network-isolated
+
 sigma-linux exec <distro> --bind /sigma/data/ca:/mnt/ca  # mount path
 
 # GUI apps
+
 sigma-linux app <distro> <app-name>             # launch GUI app in Zenith
+
 sigma-linux app <distro> --list                 # list installed GUI apps
+
 sigma-linux app <distro> install <pkg>          # install GUI app from distro pkg
 
 # Management
+
 sigma-linux list                                # installed distros + disk usage
+
 sigma-linux status <distro>                     # running instances + resources
+
 sigma-linux stop <distro>                       # stop all instances
+
 sigma-linux update <distro>                     # run distro's package updater
+
 sigma-linux remove <distro> [--purge]           # uninstall
+
 sigma-linux backup <distro> <file.spkg>         # export snapshot
+
 sigma-linux restore <file.spkg>                 # restore from snapshot
+
 sigma-linux rename <old> <new>                  # rename distro instance
 
 # Configuration
+
 sigma-linux config <distro> shell /usr/bin/zsh  # set default shell
+
 sigma-linux config <distro> memory 4096         # set RAM limit (MB)
+
 sigma-linux config <distro> cpu 1000            # set CPU limit (milliCPU)
+
 sigma-linux config <distro> dns sigma           # use sigma-dns-cache
+
 sigma-linux config <distro> gpu enable          # GPU passthrough
+
 sigma-linux config <distro> audio enable        # audio bridge
 
 # Security
+
 sigma-linux policy <distro> show                # current sigma-mac policy
+
 sigma-linux policy <distro> set forensic        # apply forensic profile
+
 sigma-linux audit <distro> log --last 50        # audit trail inside distro
+
 sigma-linux audit <distro> verify               # verify audit chain
+
 ```
 
 | Task | File | Branch | Priority |

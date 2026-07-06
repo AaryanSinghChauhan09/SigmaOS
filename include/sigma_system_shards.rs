@@ -1,11 +1,11 @@
-/// SigmaOS: Sovereign Net Mesh Shard */
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Sovereign Net Mesh Shard */
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_system_shards ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_system_shards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SovereignNetZenith — hardware-compatible struct.
+/// SovereignNetZenith â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignNetZenith {
     pub handshakes: SigmaU64,
     pub dns_queries: SigmaU64,
     pub active_connections: SigmaU32,
@@ -29,10 +29,10 @@ pub struct {s_name} {{
     pub firewall_shard_active: SigmaBool,
 }
 
-/// SovereignScheduler — hardware-compatible struct.
+/// SovereignScheduler â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignScheduler {
     pub task_count: SigmaU32,
     pub context_switches: SigmaU32,
     pub cpu_affinity: SigmaU8,
@@ -40,11 +40,13 @@ pub struct {s_name} {{
     pub deadline_misses: SigmaU64,
 }
 
-/// SovereignCloudOrchestrator — hardware-compatible struct.
+/// SovereignCloudOrchestrator â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignCloudOrchestrator {
     pub active_nodes: SigmaU32,
     pub isolated_vpcs: SigmaU32,
 }
+
+
 

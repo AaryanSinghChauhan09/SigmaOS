@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignInstaller ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignInstaller â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// DiskConfig — hardware-compatible struct.
+/// DiskConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct DiskConfig {
     pub target_disk: [u8; 32],
     pub use_encryption: SigmaBool,
     pub use_lvm: SigmaBool,
@@ -30,7 +30,7 @@ pub struct {s_name} {{
     pub secure_boot: SigmaBool,
 }
 
-/// SovereignInstaller — OOP singleton pattern.
+/// SovereignInstaller â€” OOP singleton pattern.
 pub struct SovereignInstaller {
     pub initialized: SigmaBool,
 }
@@ -93,4 +93,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn installer_init() {
     INSTANCE.initialized = true;
 }
+
+
 

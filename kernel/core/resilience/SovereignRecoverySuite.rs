@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignRecoverySuite ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignRecoverySuite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SnapshotEntry — hardware-compatible struct.
+/// SnapshotEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SnapshotEntry {
     pub id: SigmaU32,
     pub timestamp: SigmaU32,
     pub description: [u8; 128],
@@ -32,10 +32,10 @@ pub struct {s_name} {{
     pub bootable: SigmaBool,
 }
 
-/// ForensicDevice — hardware-compatible struct.
+/// ForensicDevice â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ForensicDevice {
     pub device_id: [u8; 64],
     pub write_blocked: SigmaBool,
     pub total_blocks: SigmaU64,
@@ -54,4 +54,6 @@ pub unsafe extern "C" fn recovery_run_forensic_audit() {
 #[no_mangle]
 pub unsafe extern "C" fn recovery_secure_wipe_shard() {
 }
+
+
 

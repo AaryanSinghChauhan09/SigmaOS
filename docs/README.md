@@ -60,4 +60,4 @@
 
 ---
 
-*If in doubt, open a GitHub Discussion before creating a new file.*
+### If in doubt, open a GitHub Discussion before creating a new file.

@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_kernel_types.h — Sovereign canonical shim */
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_kernel_types.h â€” Sovereign canonical shim */
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,20 +16,20 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_kernel_types ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_kernel_types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// sigma_jail — hardware-compatible struct.
+/// sigma_jail â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct sigma_jail {
     pub id: SigmaU32,
     pub flags: SigmaU32,
 }
 
-/// sigma_unit — hardware-compatible struct.
+/// sigma_unit â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct sigma_unit {
     pub state: SigmaU32,
 }
 
@@ -40,4 +40,6 @@ pub unsafe extern "C" fn cpu_halt() {
 #[no_mangle]
 pub unsafe extern "C" fn cpu_pause() {
 }
+
+
 

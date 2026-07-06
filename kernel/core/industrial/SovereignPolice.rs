@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Police / IPS Shard (S-POLICE)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Police / IPS Shard (S-POLICE)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,17 +16,17 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPolice ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPolice â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NDPSEntry — hardware-compatible struct.
+/// NDPSEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NDPSEntry {
     pub small_qty_g: SigmaU32,
     pub commercial_g: SigmaU32,
 }
 
-/// SovereignPolice — OOP singleton pattern.
+/// SovereignPolice â€” OOP singleton pattern.
 pub struct SovereignPolice {
     pub initialized: SigmaBool,
 }
@@ -139,4 +139,6 @@ pub unsafe extern "C" fn police_ndps() {
 pub unsafe extern "C" fn police_pc_act() {
     INSTANCE.initialized = true;
 }
+
+
 
