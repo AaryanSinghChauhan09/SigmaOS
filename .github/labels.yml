@@ -1,0 +1,130 @@
+# SigmaOS GitHub Issue Labels
+# Defines labels for organizing GitHub issues
+
+- name: "bug"
+  color: "#d73a4a"
+  description: "Something isn't working"
+
+- name: "enhancement"
+  color: "#a2eeef"
+  description: "New feature or improvement"
+
+- name: "documentation"
+  color: "#0075ca"
+  description: "Documentation improvements"
+
+- name: "question"
+  color: "#d876e3"
+  description: "Question or discussion"
+
+- name: "wontfix"
+  color: "#ffffff"
+  description: "Won't fix"
+
+- name: "duplicate"
+  color: "#cfd3d7"
+  description: "Duplicate of another issue"
+
+- name: "help wanted"
+  color: "#008672"
+  description: "Help needed"
+
+- name: "good first issue"
+  color: "#7057ff"
+  description: "Good for newcomers"
+
+- name: "priority: critical"
+  color: "#b60205"
+  description: "Critical priority - must fix immediately"
+
+- name: "priority: high"
+  color: "#e11d21"
+  description: "High priority"
+
+- name: "priority: medium"
+  color: "#fbca04"
+  description: "Medium priority"
+
+- name: "priority: low"
+  color: "#0e8a16"
+  description: "Low priority"
+
+- name: "component: kernel"
+  color: "#5319e7"
+  description: "Kernel-related issue"
+
+- name: "component: drivers"
+  color: "#5319e7"
+  description: "Driver-related issue"
+
+- name: "component: filesystem"
+  color: "#5319e7"
+  description: "Filesystem-related issue"
+
+- name: "component: package-manager"
+  color: "#5319e7"
+  description: "Package manager (sigpkg) issue"
+
+- name: "component: desktop"
+  color: "#5319e7"
+  description: "Desktop environment issue"
+
+- name: "component: security"
+  color: "#5319e7"
+  description: "Security-related issue"
+
+- name: "component: ai"
+  color: "#5319e7"
+  description: "AI/ML-related issue"
+
+- name: "component: installer"
+  color: "#5319e7"
+  description: "Installer-related issue"
+
+- name: "component: networking"
+  color: "#5319e7"
+  description: "Networking-related issue"
+
+- name: "component: ui"
+  color: "#5319e7"
+  description: "UI/UX-related issue"
+
+- name: "status: in-progress"
+  color: "#ff9900"
+  description: "Currently being worked on"
+
+- name: "status: blocked"
+  color: "#ff0000"
+  description: "Blocked by another issue"
+
+- name: "status: review"
+  color: "#00ff00"
+  description: "Ready for review"
+
+- name: "type: breaking-change"
+  color: "#ff4500"
+  description: "Breaking change"
+
+- name: "type: regression"
+  color: "#ff4500"
+  description: "Regression from previous version"
+
+- name: "area: performance"
+  color: "#1d76db"
+  description: "Performance-related issue"
+
+- name: "area: accessibility"
+  color: "#1d76db"
+  description: "Accessibility-related issue"
+
+- name: "area: i18n"
+  color: "#1d76db"
+  description: "Internationalization issue"
+
+- name: "area: testing"
+  color: "#1d76db"
+  description: "Testing-related issue"
+
+- name: "area: ci/cd"
+  color: "#1d76db"
+  description: "CI/CD-related issue"
