@@ -23,13 +23,22 @@ static mut RECOVERY_MENU_SELECTION: SigmaI32 = 0;
 #[no_mangle]
 pub unsafe extern "C" fn sigma_boot_show_fix_it_menu() {
     // Basic text output simulation for recovery/safe-mode selector
-    // In a real UEFI environment, this would render to the console or GOP framebuffer.
-    RECOVERY_MENU_SELECTION = 1; // Default to Safe Mode
+    // Option 1: Safe Mode Core
+    // Option 2: Fallback Rollback System
+    // Option 3: Full Reset Diagnostics
+    RECOVERY_MENU_SELECTION = 2; // Default to Fallback Rollback
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn sigma_boot_get_recovery_choice() -> SigmaI32 {
     RECOVERY_MENU_SELECTION
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_boot_select_recovery_option(choice: SigmaI32) {
+    if choice >= 1 && choice <= 3 {
+        RECOVERY_MENU_SELECTION = choice;
+    }
 }
 
 
