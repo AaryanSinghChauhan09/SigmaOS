@@ -81,6 +81,8 @@
 | I-31 | Enhanced systemctl (systemd compatibility) | Linux compatibility | ✅ Started - enhanced implementation |
 | I-32 | Enhanced APT compatibility layer | Linux compatibility | ✅ Started - enhanced implementation |
 | I-33 | Performance tuner (perf, tuned) | Performance | ✅ Started - basic tuner done |
+| I-34 | DNF compatibility layer (Fedora/RHEL) | Linux compatibility | ✅ Started - DNF compat done |
+| I-35 | Pacman compatibility layer (Arch Linux) | Linux compatibility | ✅ Started - Pacman compat done |
 
 ---
 
