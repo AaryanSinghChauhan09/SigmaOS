@@ -77,6 +77,9 @@ static mut SURFACE_COUNT: SigmaU32 = 0;
 pub unsafe extern "C" fn sigma_display_init() -> SigmaI32 {
     OUTPUT_COUNT = 0;
     SURFACE_COUNT = 0;
+    CRASH_COUNT = 0;
+    LAST_CRASH_TIME = 0;
+    RECOVERY_MODE = false;
     
     // Initialize primary output
     OUTPUTS[0] = Output {
@@ -185,6 +188,81 @@ pub unsafe extern "C" fn sigma_display_set_primary(output_id: SigmaU32) -> Sigma
         OUTPUTS[i].primary = (i == output_id as usize);
     }
     0 // Success
+}
+
+/// Handle display server crash
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_handle_crash() -> SigmaI32 {
+    CRASH_COUNT += 1;
+    let current_time = get_timestamp();
+    
+    // Check if too many crashes in short time
+    if CRASH_COUNT > 5 && (current_time - LAST_CRASH_TIME) < 60000 {
+        // More than 5 crashes in 60 seconds - enter recovery mode
+        RECOVERY_MODE = true;
+        return -2; // Recovery mode
+    }
+    
+    LAST_CRASH_TIME = current_time;
+    
+    // Attempt recovery
+    // 1. Save current surface states
+    let mut saved_surfaces: [(SigmaU32, SigmaU64, SigmaU32, SigmaU32); MAX_SURFACES] = 
+        [(0, 0, 0, 0); MAX_SURFACES];
+    let mut saved_count = 0;
+    
+    for i in 0..SURFACE_COUNT as usize {
+        if SURFACES[i].visible {
+            saved_surfaces[saved_count] = (
+                SURFACES[i].id,
+                SURFACES[i].buffer_addr,
+                SURFACES[i].width,
+                SURFACES[i].height,
+            );
+            saved_count += 1;
+        }
+    }
+    
+    // 2. Reinitialize display server
+    sigma_display_init();
+    
+    // 3. Restore surfaces
+    for i in 0..saved_count {
+        sigma_display_create_surface(
+            saved_surfaces[i].2,
+            saved_surfaces[i].3,
+            saved_surfaces[i].1,
+        );
+        sigma_display_set_visibility(saved_surfaces[i].0, true);
+    }
+    
+    0 // Recovery successful
+}
+
+/// Get crash count
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_get_crash_count() -> SigmaU32 {
+    CRASH_COUNT
+}
+
+/// Check if in recovery mode
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_is_recovery_mode() -> SigmaBool {
+    RECOVERY_MODE
+}
+
+/// Exit recovery mode
+#[no_mangle]
+pub unsafe extern "C" fn sigma_display_exit_recovery_mode() -> SigmaI32 {
+    CRASH_COUNT = 0;
+    RECOVERY_MODE = false;
+    0 // Success
+}
+
+/// Get timestamp (placeholder)
+fn get_timestamp() -> SigmaU64 {
+    // In a real implementation, this would get the actual system time
+    0
 }
 
 /// Create surface

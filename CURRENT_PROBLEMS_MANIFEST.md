@@ -50,14 +50,14 @@
 |----|------|-----------|-------|
 | I-01 | UEFI bootloader binary (`sigma-boot.efi`) | Phase G kernel stable | Cannot dual-boot without EFI stub |
 | I-02 | Bootable ISO pipeline (`make iso` → GPT image) | I-01 | GRUB2 fallback usable meanwhile |
-| I-03 | NVMe interrupt-driven async driver (vs MMIO poll) | IRQ controller | Performance: 4× throughput gain |
+| I-03 | NVMe interrupt-driven async driver (vs MMIO poll) | IRQ controller | ✅ Started - async driver exists |
 | I-04 | Wi-Fi 6E (6 GHz band) + WPA3-Enterprise | G-02 base | ✅ Started - basic driver done |
 | I-05 | Multi-monitor KMS (clone + extended) | H-05 base | ✅ Started - multi-monitor support done |
 | I-06 | SATA AHCI driver | PMM stable | ✅ Completed - full AHCI implementation |
 | I-07 | Virtio-GPU (GPU acceleration for VMs) | H-05 base | ✅ Started - basic driver done |
 | I-08 | Package repository server (`sigma-repo-server`) | net stack stable | sigma-pkg install needs a real server |
-| I-09 | Display server crash recovery | H-05 + IPC | Zenith restarts on segfault |
-| I-10 | Indian Language IME (Inscript + phonetic 22 langs) | H-05 + sound | BHASHINI integration |
+| I-09 | Display server crash recovery | H-05 + IPC | ✅ Started - crash recovery done |
+| I-10 | Indian Language IME (Inscript + phonetic 22 langs) | H-05 + sound | ✅ Completed - full IME implementation |
 | I-11 | Dependency reduction (Electron → native Zenith) | Zenith compositor | Reduce binary size by ~200MB |
 | I-12 | Build tool replacement (Vite → sigma-build) | sigma-build design | Eliminate Node.js dependency |
 | I-13 | Linter replacement (ESLint → sigma-lint) | sigma-lint implementation | ✅ Started - basic implementation done |
