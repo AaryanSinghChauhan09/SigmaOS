@@ -53,4 +53,4 @@
 
 ---
 
-*See also: [Architecture-Overview](Architecture-Overview) · [FAQ](FAQ)*
+### See also: [Architecture-Overview](Architecture-Overview) · [FAQ](FAQ)

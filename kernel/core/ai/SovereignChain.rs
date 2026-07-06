@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignChain � AI Component Orchestration and Flow Engine.
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignChain ï¿½ AI Component Orchestration and Flow Engine.
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,15 +16,15 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignChain ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignChain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ChainStep — hardware-compatible struct.
+/// ChainStep â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ChainStep {
 }
 
-/// SovereignChain — OOP singleton pattern.
+/// SovereignChain â€” OOP singleton pattern.
 pub struct SovereignChain {
     pub initialized: SigmaBool,
 }
@@ -57,4 +57,6 @@ pub unsafe extern "C" fn executeFlow() {
 pub unsafe extern "C" fn sigma_chain_execute() {
     INSTANCE.initialized = true;
 }
+
+
 

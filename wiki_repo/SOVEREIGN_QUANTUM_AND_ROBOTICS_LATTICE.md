@@ -1,7 +1,7 @@
 # Sovereign Quantum & Robotics Lattice
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Advanced Specialized Computational Subsystem Manifest  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Advanced Specialized Computational Subsystem Manifest
 > **Execution Scope:** Bare-Metal Microkernel Shards (`tools/sigma_quantum_simulator.cpp`, `tools/sigma_robotics_planner.cpp`, `tools/sigma_sensor_fusion.cpp`)
 
 ---
@@ -51,7 +51,7 @@ public:
     void apply_hadamard(sigma_usize target_qubit) {
         sigma_usize states = 1ULL << m_num_qubits;
         double inv_sqrt2 = 1.0 / std::sqrt(2.0);
-        
+
         for (sigma_usize i = 0; i < states; i++) {
             if ((i & (1ULL << target_qubit)) == 0) {
                 sigma_usize j = i | (1ULL << target_qubit);
@@ -129,11 +129,14 @@ public:
 
 ## 5. Subsystem Debugging & Failure Mode Analysis
 
-* **Issue - Kinematic Singularity Lockups:** Robotic arm trajectories passing through mathematical singular configurations cause infinite joint velocity calculations (`NaN`).
-  * *Fix Strategy:* The robotics planner implements **Damped Least Squares (Levenberg-Marquardt)** inverse kinematics, capping maximum joint velocities and automatically bypassing singular matrices.
-* **Issue - Sensor Desynchronization Jitter:** Asynchronous LIDAR packets arriving over network interfaces cause Kalman filter state divergence.
-  * *Fix Strategy:* S-ZFS VFS wrappers timestamp incoming peripheral packets at the exact hardware interrupt level (`sigma_timestamp()`), allowing the EKF engine to interpolate exact temporal offsets.
+- **Issue - Kinematic Singularity Lockups:** Robotic arm trajectories passing through mathematical singular configurations cause infinite joint velocity calculations (`NaN`).
+
+- *Fix Strategy:* The robotics planner implements **Damped Least Squares (Levenberg-Marquardt)** inverse kinematics, capping maximum joint velocities and automatically bypassing singular matrices.
+
+- **Issue - Sensor Desynchronization Jitter:** Asynchronous LIDAR packets arriving over network interfaces cause Kalman filter state divergence.
+
+- *Fix Strategy:* S-ZFS VFS wrappers timestamp incoming peripheral packets at the exact hardware interrupt level (`sigma_timestamp()`), allowing the EKF engine to interpolate exact temporal offsets.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

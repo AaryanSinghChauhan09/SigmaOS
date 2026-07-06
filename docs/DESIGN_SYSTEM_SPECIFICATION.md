@@ -6,11 +6,16 @@ This document defines the unified design system for SigmaOS, ensuring consistenc
 
 ## Design Philosophy
 
-**Core Principles:**
+### Core Principles:
+
 - **Consistency**: Uniform appearance and behavior across all applications
+
 - **Clarity**: Clear visual hierarchy and intuitive interactions
+
 - **Efficiency**: Fast, responsive, and performant
+
 - **Accessibility**: Inclusive design for all users
+
 - **Polish**: macOS-like attention to detail
 
 ## Color System
@@ -302,9 +307,13 @@ pub struct DurationScale {
 ### WCAG 2.1 AA Compliance
 
 - **Color Contrast**: Minimum 4.5:1 for normal text, 3:1 for large text
+
 - **Focus Indicators**: Visible focus states for all interactive elements
+
 - **Keyboard Navigation**: Full keyboard accessibility
+
 - **Screen Reader Support**: Proper ARIA labels and roles
+
 - **Text Scaling**: Support for 200% text zoom
 
 ### Accessibility Features
@@ -400,7 +409,7 @@ fn main() {
         .variant(ButtonVariant::Primary)
         .size(ButtonSize::Medium)
         .build(&tokens);
-    
+
     // Render button
 }
 ```
@@ -408,21 +417,28 @@ fn main() {
 ## Success Criteria
 
 - **100% design consistency** across all applications
+
 - **WCAG 2.1 AA compliance** for accessibility
+
 - **50+ components** in component library
+
 - **Light/Dark theme support** with auto-switching
+
 - **Design token system** for easy customization
+
 - **Component generator** for developer productivity
 
 ## References
 
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+
 - [Material Design Guidelines](https://material.io/design)
+
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: 2026-07-05  
-**Status**: Draft for Implementation  
+**Document Version**: 1.0
+**Last Updated**: 2026-07-05
+**Status**: Draft for Implementation
 **Next Review**: 2026-07-12

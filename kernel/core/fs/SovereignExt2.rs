@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Ext2 Filesystem (S-EXT2)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Ext2 Filesystem (S-EXT2)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignExt2 ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignExt2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Ext2Superblock — hardware-compatible struct.
+/// Ext2Superblock â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Ext2Superblock {
     pub inodes_count: SigmaU32,
     pub blocks_count: SigmaU32,
     pub free_blocks_count: SigmaU32,
@@ -30,16 +30,16 @@ pub struct {s_name} {{
     pub magic: SigmaU32,
 }
 
-/// SovereignJournal — hardware-compatible struct.
+/// SovereignJournal â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignJournal {
     pub head: SigmaU32,
     pub tail: SigmaU32,
     pub state: SigmaU32,
 }
 
-/// SovereignExt2 — OOP singleton pattern.
+/// SovereignExt2 â€” OOP singleton pattern.
 pub struct SovereignExt2 {
     pub initialized: SigmaBool,
 }
@@ -152,4 +152,6 @@ pub unsafe extern "C" fn ext2_snapshot() {
 pub unsafe extern "C" fn ext2_fsck() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,4 +1,4 @@
-# Cookie Handling
+﻿# Cookie Handling
 
 ## `Cookie` interface
 
@@ -6,7 +6,7 @@
 
 - **value** `string`
 
-- **expires** `Date | number` (optional)
+- **expires** `Date|number` (optional)
 
 - **maxAge** `number` (optional)
 
@@ -18,7 +18,7 @@
 
 - **httpOnly** `boolean` (optional)
 
-- **sameSite** `'String' | 'Lax' | 'None'` (optional)
+- **sameSite** `'String'|'Lax'|'None'` (optional)
 
 - **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
 
@@ -33,7 +33,6 @@ const headers = new Headers()
 deleteCookie(headers, 'name')
 
 console.log(headers.get('set-cookie')) // name=; Expires=Thu, 01 Jan 1970 00:00:00 GMT
-
 ```
 
 Arguments:
@@ -58,7 +57,6 @@ const headers = new Headers({
 })
 
 console.log(getCookies(headers)) // { get: 'cookies', and: 'attributes' }
-
 ```
 
 Arguments:
@@ -93,6 +91,34 @@ Arguments:
 
 Returns: `Cookie[]`
 
+## `parseCookie(cookie)`
+
+Parses a single `Set-Cookie` header value into a `Cookie` object.
+
+```js
+import { parseCookie } from 'undici'
+
+console.log(parseCookie('undici=getSetCookies; Secure; SameSite=Lax'))
+// {
+//   name: 'undici',
+//   value: 'getSetCookies',
+//   secure: true,
+//   sameSite: 'Lax'
+// }
+```
+
+Notes:
+
+- The cookie value is returned as it appears in the header. Percent-encoded sequences such as `%20` or `%0D%0A` are **not** decoded.
+
+- `sameSite` is only set for exact case-insensitive matches of `Strict`, `Lax`, or `None`.
+
+Arguments:
+
+- **cookie** `string`
+
+Returns: `Cookie | null`
+
 ## `setCookie(headers, cookie)`
 
 Appends a cookie to the `Set-Cookie` header.
@@ -104,7 +130,6 @@ const headers = new Headers()
 setCookie(headers, { name: 'undici', value: 'setCookie' })
 
 console.log(headers.get('Set-Cookie')) // undici=setCookie
-
 ```
 
 Arguments:

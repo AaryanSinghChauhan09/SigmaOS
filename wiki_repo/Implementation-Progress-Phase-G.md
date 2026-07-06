@@ -15,6 +15,7 @@ This page documents every source file added or completed across the 6 pillars of
 ### Syscall Implementations (Ideas #131–150)
 
 #### `kernel/core/sigma_syscalls_io.rs` — File I/O syscalls (NEW ✅)
+
 Full implementations of 15 previously-stubbed syscalls:
 
 | Syscall | Status | Notes |
@@ -35,10 +36,11 @@ Full implementations of 15 previously-stubbed syscalls:
 | `pread64`| ✅ Real | Positional read |
 | `pwrite64`| ✅ Real | Positional write |
 
-FD table: 256 slots, kinds: Free / File / Pipe / Device / Socket.  
+FD table: 256 slots, kinds: Free / File / Pipe / Device / Socket.
 Devices: /dev/null, /dev/zero, /dev/urandom, stdin, stdout, stderr.
 
 #### `kernel/core/sigma_syscalls_proc.rs` — Process syscalls (NEW ✅)
+
 | Syscall | Status | Notes |
 |---------|--------|-------|
 | `fork`  | ✅ Real | Allocates child process entry + stack, adds to scheduler |
@@ -51,16 +53,19 @@ Devices: /dev/null, /dev/zero, /dev/urandom, stdin, stdout, stderr.
 | `kill`  | ✅ Real | SIGKILL/SIGTERM process termination |
 | `pipe`/`pipe2` | ✅ Real | 4 KB ring buffer per pipe, FD allocation |
 
-Process table: 256 slots with PID, PPID, state, exit code.  
+Process table: 256 slots with PID, PPID, state, exit code.
 Pipe system: 64 pipes × 4 KB ring buffers.
 
 ### Interrupt & IRQ (Ideas #61–70)
+
 `kernel/core/sigma_irq.rs` — Already implemented (8259 PIC, PIT 1000Hz, serial debug).
 
 ### Wi-Fi Drivers (Ideas #86–93)
 
 #### `drivers/wifi/sigma_wifi.rs` — Wi-Fi Driver DDK (NEW ✅)
+
 - **WifiDriver trait** — stable DDK interface for all Wi-Fi vendors
+
 - **IwlWifi** — Intel AX200/AX210 driver port with:
   - Firmware load mechanism
   - Scan (returns BSS list with SSID, RSSI, channel, security mode)
@@ -68,19 +73,29 @@ Pipe system: 64 pipes × 4 KB ring buffers.
   - Connect / disconnect lifecycle
   - Power save (PS-Poll mode)
   - TX frame / RX poll
+
 - **Mt7921** — MediaTek skeleton (DDK conformance)
+
 - C-ABI exports: `sigma_wifi_init`, `sigma_wifi_scan`, `sigma_wifi_connect`, `sigma_wifi_state`, `sigma_wifi_rssi`
 
 ### Boot (Idea #1)
 
 #### `boot/sigma_uefi_boot.c` — UEFI Bootloader (NEW ✅)
+
 Complete `sigma-boot.efi` implementation:
+
 1. EFI ConOut banner print
+
 2. 4-level page table setup (identity + high-half map)
+
 3. Kernel ELF load via `sigma_elf_load()`
+
 4. SHA-256 kernel measurement
+
 5. UEFI memory map retrieval
+
 6. `ExitBootServices` → CR3 load → jump to kernel entry
+
 7. `SigmaBootInfo` handoff struct with SHA-256 digest + memory map
 
 Build command in file header. Depends on `kernel/linux_compat/elf_loader.rs`.
@@ -92,6 +107,7 @@ Build command in file header. Depends on `kernel/linux_compat/elf_loader.rs`.
 ### sigma-pkg Install CLI (Ideas #186–200)
 
 #### `sigma-pkg/sigma_pkg_install.py` — Full Package Manager (NEW ✅)
+
 Implements the complete sigma-pkg CLI:
 
 | Command | Implemented | Notes |
@@ -111,10 +127,15 @@ Implements the complete sigma-pkg CLI:
 | `pin`/`unpin` | ✅ | Hold packages at version |
 
 Features:
+
 - Dependency resolver (recursive install)
+
 - Content-addressed store at `/sigma/store/<hash>-<name>-<ver>/`
+
 - Registry client (HTTPS JSON API + offline mock)
+
 - Transaction log at `/sigma/var/pkg/history.jsonl`
+
 - `--dry-run`, `--force`, `--json` flags
 
 ---
@@ -124,13 +145,21 @@ Features:
 ### GGUF Model Loader (Idea #335)
 
 #### `userland/ai/sigma_gguf_loader.rs` — GGUF Parser (NEW ✅)
+
 Full GGUF v3 format parser:
+
 - Magic validation (`GGUF` = `0x46554747`)
+
 - Metadata KV: all 13 value types (uint8…float64, string, array)
+
 - Tensor descriptors: name, dims, dtype, offset
+
 - Quantization types: F32, F16, Q4_0, Q4_1, Q5_0, Q8_0, Q8_1, Q2/3/4/5/6_K
+
 - **Tensor data loading**: F32 direct, F16→F32 conversion, Q4_0 dequant, Q8_0 dequant
+
 - Architecture metadata helpers: `n_layers()`, `n_heads()`, `embedding_length()`, `context_length()`, `vocab_size()`
+
 - Model discovery: scans `~/.sigmaos/models/*.gguf`
 
 This enables `sigma-ai model list` and actual weight loading into `LanguageModel`.
@@ -138,6 +167,7 @@ This enables `sigma-ai model list` and actual weight loading into `LanguageModel
 ### NL → CLI Translator (Ideas #356–375)
 
 #### `tools/sigma_nl_cli.py` — Natural Language CLI (NEW ✅)
+
 ```bash
 sigma-ai translate "install nginx and start it"
 sigma-ai explain "sigma-secure audit --fix"
@@ -148,12 +178,19 @@ sigma-ai predict cpu
 ```
 
 Features:
+
 - Intent classifier (10 categories via regex patterns)
+
 - Package name extractor from NL
+
 - Cron expression generator from time descriptions
+
 - Shell script generator with error handling
+
 - Command explanation database (5 commands detailed)
+
 - Local LLM HTTP API integration (localhost:17388)
+
 - Rule-based offline fallback for all categories
 
 ---
@@ -163,33 +200,51 @@ Features:
 ### sigma_pledge + sigma_unveil (Ideas #521–523)
 
 #### `kernel/core/sigma_pledge.rs` — Capability Restriction (NEW ✅)
+
 Full OpenBSD-inspired pledge/unveil implementation:
 
 **sigma_pledge**: 28 promise bits including stdio, rpath, wpath, cpath, inet, unix, proc, exec, tty, audio, video, bpf, etc.
+
 - Parse space-separated promise strings
+
 - Enforce monotonic narrowing (can't widen after first pledge)
+
 - Per-process state table (256 processes)
+
 - `sigma_pledge_check(promise_bit)` — fast O(1) enforcement
+
 - `sigma_pledge_check_syscall(nr)` — syscall → promise bit mapping
 
 **sigma_unveil**: Per-process filesystem path allowlist
+
 - Up to 32 unveiled paths per process
+
 - Permissions: r, w, x, c (create)
+
 - `sigma_unveil_check(path, operation)` — path prefix matching
+
 - Locking: `sigma_unveil(NULL, NULL)` finalizes the table
 
 ### seccomp-BPF (Idea #543)
 
 #### `kernel/security/sigma_seccomp.rs` — BPF Filter Engine (NEW ✅)
+
 Complete seccomp implementation:
+
 - **BPF virtual machine**: LD, LDX, ALU (10 ops), JMP (JEQ/JGT/JGE/JSET/JA), RET
+
 - **Modes**: SECCOMP_MODE_STRICT (allow only read/write/exit/sigreturn), SECCOMP_MODE_FILTER
+
 - **Return actions**: ALLOW, KILL_PROCESS, KILL_THREAD, TRAP, ERRNO, LOG
+
 - `build_allowlist_filter()` — generate a filter from an array of allowed syscall numbers
+
 - `sigma_seccomp_check(pid, nr, args)` — called by syscall gate
+
 - `sigma_pledge_to_seccomp()` — bridge: pledge bitmask → seccomp filter
 
 ### Socket Security (Ideas #534–536)
+
 Networking isolation provided by `kernel/net/sigma_socket_syscalls.rs`.
 
 ---
@@ -199,32 +254,49 @@ Networking isolation provided by `kernel/net/sigma_socket_syscalls.rs`.
 ### Zenith Compositor (Ideas #669–695)
 
 #### `zenith_desktop/compositor/sigma_compositor.rs` — Wayland Compositor (NEW ✅)
+
 Full compositor implementation:
 
 **Window management**:
+
 - Surface registry (per-client with app_id, title, rect, state, z-order)
+
 - `WindowState`: Normal, Minimized, Maximized, Fullscreen
+
 - `LayoutMode`: Tiling (BSP), Floating, Stacking
 
 **Layout engine**:
+
 - Binary-space partitioning auto-tiler
+
 - Edge snapping (threshold-based)
+
 - Quarter-tile shortcuts (quadrant snapping)
+
 - Maximize/restore toggle
 
 **Input handling**:
+
 - Mouse: move, click (focus-follows-click), scroll
+
 - Keyboard: Super+Q (close), Super+T (terminal), Super+F (maximize), Super+←/→ (snap half), Super+1-4 (workspaces)
+
 - Multi-workspace support (4 workspaces)
 
 **Rendering**:
+
 - `RenderFrame` with sorted surfaces (back-to-front by z-order)
+
 - Glassmorphism properties: opacity (0.92 default), blur_radius (20px), shadow_px
+
 - 60fps render loop (16ms sleep)
+
 - FPS monitoring (logged every 300 frames)
 
 **IPC server** (Unix socket at `/run/user/1000/zenith.socket`):
+
 - Commands: `list`, `focused`, `focus <id>`, `open <app>`, `close <id>`, `tile`, `float`, `status`
+
 - JSON responses
 
 ---
@@ -232,16 +304,27 @@ Full compositor implementation:
 ## ✅ Pillar 4 (cont.): Network Socket Syscalls
 
 #### `kernel/net/sigma_socket_syscalls.rs` — Socket API (NEW ✅)
+
 All POSIX socket syscalls wired to the network stack:
+
 - `socket(AF_INET, SOCK_STREAM/DGRAM, proto)` → `sigma_sock_create`
+
 - `bind` → port + IP assignment
+
 - `connect` → remote endpoint association
+
 - `listen` → mark as listening
+
 - `accept` → EAGAIN (non-blocking; full backlog queue in Phase H)
+
 - `sendto`/`send` → `sigma_sock_send` → NIC TX
+
 - `recvfrom`/`recv` → `sigma_sock_recv` → socket RX ring
+
 - `setsockopt`/`getsockopt` → SO_ERROR support
+
 - `getsockname`/`getpeername`
+
 - `shutdown` → socket cleanup
 
 ---
@@ -322,4 +405,4 @@ SYS_RECVFROM→ sigma_sys_recvfrom()
 
 ---
 
-*SigmaOS — Sovereign by Design. One codebase. Every format.*
+### SigmaOS — Sovereign by Design. One codebase. Every format.

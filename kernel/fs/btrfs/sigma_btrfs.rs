@@ -1,11 +1,11 @@
-/// SigmaOS: @file sigma_btrfs.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: @file sigma_btrfs.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::sigma_btrfs ─────────────────────
+// â”€â”€â”€ Module: sigma::sigma_btrfs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BtrfsSuperBlock — hardware-compatible struct.
+/// BtrfsSuperBlock â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BtrfsSuperBlock {
     pub csum: [SigmaU8; 32],
     pub fsid: [SigmaU8; 16],
     pub bytenr: SigmaU64,
@@ -29,4 +29,6 @@ pub struct {s_name} {{
     pub magic: [u8; 8],
     pub generation: SigmaU64,
 }
+
+
 

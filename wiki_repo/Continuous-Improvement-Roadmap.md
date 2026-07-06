@@ -1,10 +1,11 @@
 # SigmaOS — Continuous Improvement Roadmap
+
 ## Versioning · Code Review · Testing Philosophy · Documentation System
+
 ## Automation Pipelines Deep-Dive · CLI UX Patterns · Feedback Loops
 
 Continues from all previous roadmap documents. Covers the remaining
 engineering dimensions not yet addressed in earlier docs.
-
 
 ---
 
@@ -46,20 +47,33 @@ channel: stable | rc | beta | nightly
 ### VS3 — Changelog Automation
 
 ```bash
+
 # Auto-generate from conventional commits:
+
 sigma_automation.sh gen-changelog
 
 # Format (CHANGELOG.md):
+
 # ## v16.0.0-apex — 2026-Q4
+
 # ### Features
+
 #   - feat(kernel): MLFQ scheduler with MCS budget accounting
+
 #   - feat(drivers): VirtIO-GPU DRM/KMS compositor pipeline
+
 # ### Bug fixes
+
 #   - fix(crypto): CryptFS Argon2id replaces zero-byte derive_key (#44)
+
 # ### Security
+
 #   - security(pqc): Replace PRNG placeholders with real NTT
+
 # ### Breaking changes
+
 #   - BREAKING(shard): SigmaShardManifest v2 requires recover() callback
+
 ```
 
 | Task | File | Branch | Detail |
@@ -78,34 +92,55 @@ sigma_automation.sh gen-changelog
 Every PR to `main` or `release/*` must answer:
 
 ```markdown
+
 ## Code Review Checklist
+
 ### Correctness
+
 - [ ] Logic is correct for happy path
+
 - [ ] Error paths return correct sigma_err_t codes
+
 - [ ] No silent failures (all errors propagated or logged)
+
 - [ ] No undefined behaviour (UB sanitizer clean)
 
 ### Security
+
 - [ ] No hardcoded credentials or secrets
+
 - [ ] SPDX-License-Identifier present on new files
+
 - [ ] No raw pointer arithmetic in public APIs
+
 - [ ] PII (Aadhaar/PAN) masked in any log output
 
 ### OOP / Design
+
 - [ ] Single responsibility: class does one thing
+
 - [ ] Depends on abstractions, not implementations (DIP)
+
 - [ ] [[nodiscard]] on all error-returning functions
+
 - [ ] RAII: resources released in destructor
 
 ### Testing
+
 - [ ] Unit test added or updated
+
 - [ ] Edge cases covered (empty input, OOM, timeout)
+
 - [ ] No test-only code compiled into production binary
 
 ### Documentation
+
 - [ ] CURRENT_PROBLEMS_MANIFEST.md updated if fixing a known issue
+
 - [ ] Public API has Doxygen comment (brief + @param + @return)
+
 - [ ] Man page updated if CLI changed
+
 - [ ] wiki_repo/ updated if new feature or behaviour change
 ```
 
@@ -122,18 +157,28 @@ Every PR to `main` or `release/*` must answer:
 Big decisions get an Architecture Decision Record before implementation:
 
 ```markdown
+
 # ADR-001: Scheduler Algorithm Choice
+
 ## Status: Accepted
+
 ## Context: Need scheduler for 600-shard lattice
+
 ## Decision: MLFQ + MCS budget accounting (seL4-inspired)
+
 ## Rationale:
+
   - MLFQ: fairness for interactive workloads
   - MCS: real-time budget for safety-critical shards
   - Formal verification path via Frama-C
+
 ## Consequences:
+
   - Positive: provably bounded latency for RT shards
   - Negative: more complex than round-robin; implement in phases
+
 ## Alternatives rejected:
+
   - Pure CFS: no hard RT guarantees
   - Preemptive EDF only: starvation for non-RT tasks
 ```
@@ -230,12 +275,19 @@ CURRENT_PROBLEMS_MANIFEST.md ← Active issues tracker
 ### DS2 — Doc-per-PR Policy
 
 ```yaml
+
 # .github/PULL_REQUEST_TEMPLATE.md mandatory section:
+
 ## Documentation
+
 - [ ] New public API has Doxygen comment (/// @brief, @param, @return)
+
 - [ ] CURRENT_PROBLEMS_MANIFEST.md updated if fixing known issue
+
 - [ ] Man page updated if any CLI command changed
+
 - [ ] wiki_repo/ page updated if user-visible behaviour changed
+
 - [ ] Example added to docs/examples/ if new capability introduced
 ```
 
@@ -250,16 +302,22 @@ CURRENT_PROBLEMS_MANIFEST.md ← Active issues tracker
 ### DS3 — India-Language Documentation
 
 ```bash
+
 # Every profession app guide available in 6 Indian languages:
+
 sigma-docs serve --lang hi    # Hindi docs server
+
 sigma-docs serve --lang ta    # Tamil
 
 # File structure:
+
 wiki_repo/
   hi/                      # Hindi translations
+
     Sigma-CA-Guide.md
     Sigma-Agri-Guide.md
   ta/                      # Tamil translations
+
     ...
 ```
 
@@ -311,7 +369,9 @@ On release tag vX.Y.Z:
 ### AP2 — sigma-automation.sh Complete Command Set
 
 ```bash
+
 # Current (all real):
+
 sigma_automation.sh backup
 sigma_automation.sh update
 sigma_automation.sh update-check
@@ -321,18 +381,31 @@ sigma_automation.sh wiki-sync
 sigma_automation.sh quality-check [--strict]
 
 # To add:
+
 sigma_automation.sh release          # tag + sign + publish ISO
+
 sigma_automation.sh sign-release     # ML-DSA-87 sign ISO
+
 sigma_automation.sh qemu-test        # real QEMU boot test
+
 sigma_automation.sh perf-bench       # run 6 benchmarks
+
 sigma_automation.sh sbom             # CycloneDX SBOM generate
+
 sigma_automation.sh india-sync       # refresh offline India data
+
 sigma_automation.sh fleet-sync       # push policy to all devices
+
 sigma_automation.sh lint             # clang-tidy + markdownlint
+
 sigma_automation.sh gen-changelog    # CHANGELOG.md from git log
+
 sigma_automation.sh clean            # remove build artefacts
+
 sigma_automation.sh size-check       # verify module size budgets
+
 sigma_automation.sh dep-scan         # foreign dependency audit
+
 ```
 
 | Task | File | Branch | Detail |
@@ -477,33 +550,48 @@ ZDL Core Principles:
 #### ZDL Colour System
 
 ```toml
+
 # Zenith Design Language — canonical colour tokens
 
 [color.base]
 background        = "#1E1E2E"   # Catppuccin Mocha Base (dark)
+
 surface           = "#313244"   # Surface0
+
 overlay           = "#45475A"   # Surface1
+
 border            = "#585B70"   # Surface2
 
 [color.accent]
 primary           = "#CBA6F7"   # Mauve (primary action)
+
 secondary         = "#89B4FA"   # Blue (info)
+
 success           = "#A6E3A1"   # Green
+
 warning           = "#FAB387"   # Peach
+
 error             = "#F38BA8"   # Red
+
 india_saffron     = "#FF9933"   # India flag saffron (special)
+
 india_green       = "#138808"   # India flag green (special)
 
 [color.text]
 primary           = "#CDD6F4"   # Text
+
 secondary         = "#A6ADC8"   # Subtext1
+
 disabled          = "#6C7086"   # Surface2
+
 inverse           = "#1E1E2E"   # On accent
 
 [color.light]
 background        = "#EFF1F5"   # Catppuccin Latte Base
+
 surface           = "#FFFFFF"
 primary           = "#8839EF"   # Mauve light
+
 india_saffron     = "#E67300"
 india_green       = "#0E6B06"
 ```
@@ -521,12 +609,16 @@ india_green       = "#0E6B06"
 ```toml
 [typography]
 font_ui         = "Noto Sans"             # Latin, all scripts
+
 font_devanagari = "Noto Sans Devanagari"  # Hindi, Marathi, Sanskrit
+
 font_tamil      = "Noto Sans Tamil"
 font_telugu     = "Noto Sans Telugu"
 font_bengali    = "Noto Sans Bengali"
 font_mono       = "JetBrains Mono"        # code, terminal
+
 font_size_base  = 13                      # px equivalent
+
 font_size_sm    = 11
 font_size_lg    = 16
 font_size_xl    = 20
@@ -538,17 +630,26 @@ line_height     = 1.5
 ```toml
 [spacing]
 xs  = 4    # within component
+
 sm  = 8    # between related elements
+
 md  = 16   # between sections
+
 lg  = 24   # between groups
+
 xl  = 32   # page margins
 
 [motion]
 duration_fast   = 100   # ms — hover, toggle
+
 duration_normal = 200   # ms — open, close, switch
+
 duration_slow   = 400   # ms — page transition
+
 easing          = "cubic-bezier(0.4, 0, 0.2, 1)"  # Material easing
+
 reduce_motion   = false  # respect prefers-reduced-motion
+
 ```
 
 ### UX2 — UI Component Library (sigma-ui)
@@ -634,11 +735,14 @@ Every profession app follows the same layout:
 ### UX4 — CLI UX Patterns (deeper)
 
 ```bash
+
 # Progress with percentage and ETA:
+
 sigma-pkg install sigma-ca
 [████████░░░░░░░░░░░░]  42%  sigma-ca 2.1 MB/5.0 MB  ETA: 3s
 
 # Success confirmation with summary:
+
 sigma-ca gst file --period 2026-06
 ✓ GSTR-3B filed successfully
   GSTIN:   27ABCDE1234F1Z5
@@ -648,6 +752,7 @@ sigma-ca gst file --period 2026-06
   Next due: 20 July 2026
 
 # Warning with actionable next steps:
+
 sigma-agri enam register --fpo --district Amritsar
 ⚠ FPO registration requires SFAC certificate
   You have: Aadhaar ✓  Bank account ✓  Land records ✓
@@ -656,6 +761,7 @@ sigma-agri enam register --fpo --district Amritsar
   Or:        sigma-agri enam register --as-individual
 
 # Structured JSON output (--json flag):
+
 sigma-agri msp --crop wheat --year 2026 --json
 {
   "crop": "wheat",
@@ -771,19 +877,31 @@ Hardware event (keyboard/pointer/touch)
 ### SEC1 — Security Audit Trail Quality
 
 ```bash
+
 # Every security event produces a tamper-evident log entry:
+
 sigma-audit log --filter security
+
 # Output:
+
 # 2026-06-28T14:32:01+05:30 [INFO] [sigma-mac] open("/sigma/data/ca.db") ALLOW
+
 #   subject: sigma-ca[PID:1234] DID:arjun123
+
 #   object:  /sigma/data/ca.db
+
 #   rule:    policy.ca.data.read
+
 #   sig:     ML-DSA-87:abc123...  ← every entry signed
 
 # Verify chain of custody:
+
 sigma-audit verify
+
 # ✓ 1,247 entries verified. Chain intact.
+
 # ✓ No gaps detected. No tampering detected.
+
 ```
 
 | Task | File | Branch | Detail |
@@ -843,6 +961,7 @@ sigma-observatory                    # full TUI dashboard
 
 ```bash
 sigma-doctor
+
 # Scanning SigmaOS health...
 
 ✓ Kernel: booted successfully (slot A)
@@ -886,7 +1005,7 @@ Run 'sigma-doctor --fix' to auto-resolve warnings
 | [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | Foreign dep reduction, User extensions, India-first, DID identity | ~700 |
 | [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | Versioning, Code review, Testing, Docs, Automation pipelines, sigma-nanolib, ZDL, UI arch | ~800 |
 
-**Total: 9 documents, ~7,000 lines of actionable engineering roadmap.**
+### Total: 9 documents, ~7,000 lines of actionable engineering roadmap.
 
 ---
 

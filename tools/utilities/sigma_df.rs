@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS Zenith — df (Disk Free) Utility
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS Zenith â€” df (Disk Free) Utility
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,15 +16,17 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_df ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_df â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// sigma_fs_stat — hardware-compatible struct.
+/// sigma_fs_stat â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct sigma_fs_stat {
     pub total_blocks: SigmaU64,
     pub free_blocks: SigmaU64,
     pub block_size: SigmaU64,
     pub mount_point: [u8; 32],
 }
+
+
 

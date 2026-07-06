@@ -1,11 +1,11 @@
-/// SigmaOS: @file sigma_notification_daemon.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: @file sigma_notification_daemon.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,20 +16,20 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::sigma_notification_daemon ─────────────────────
+// â”€â”€â”€ Module: sigma::sigma_notification_daemon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NotifyAction — hardware-compatible struct.
+/// NotifyAction â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NotifyAction {
     pub label: [u8; 64],
     pub command: [u8; 256],
 }
 
-/// Notification — hardware-compatible struct.
+/// Notification â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Notification {
     pub id: SigmaU32,
     pub app_name: [u8; 64],
     pub summary: [u8; 128],
@@ -44,10 +44,10 @@ pub struct {s_name} {{
     pub num_actions: SigmaU32,
 }
 
-/// NotifyDaemon — hardware-compatible struct.
+/// NotifyDaemon â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NotifyDaemon {
     pub queue_count: SigmaU32,
     pub history_count: SigmaU32,
     pub next_id: SigmaU32,
@@ -58,4 +58,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {
 }
+
+
 

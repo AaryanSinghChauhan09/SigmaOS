@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_percpu module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_percpu module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_percpu ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_percpu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// gdt_entry — hardware-compatible struct.
+/// gdt_entry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct gdt_entry {
     pub limit_low: SigmaU64,
     pub base_low: SigmaU64,
     pub base_mid: SigmaU64,
@@ -30,18 +30,18 @@ pub struct {s_name} {{
     pub base_high: SigmaU64,
 }
 
-/// gdtr — hardware-compatible struct.
+/// gdtr â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct gdtr {
     pub limit: SigmaU64,
     pub base: SigmaU64,
 }
 
-/// tss64 — hardware-compatible struct.
+/// tss64 â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct tss64 {
     pub reserved0: SigmaU64,
     pub rsp0: SigmaU64,
     pub rsp1: SigmaU64,
@@ -53,10 +53,10 @@ pub struct {s_name} {{
     pub iopb_offset: SigmaU64,
 }
 
-/// per_cpu_data — hardware-compatible struct.
+/// per_cpu_data â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct per_cpu_data {
     pub tss: SigmaU64,
     pub gdtr: SigmaU64,
 }
@@ -80,4 +80,6 @@ pub unsafe extern "C" fn sigma_percpu_alloc() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_percpu_load() {
 }
+
+
 

@@ -1,8 +1,8 @@
 # Sovereign Multi-Layer Computing Parity Matrix
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Full-Stack Integrated Sovereign Infrastructure Blueprint  
-> **Target OS Parity:** Apple Vision Pro, Linux Enterprise, ChromeOS, macOS, cloud-native bare metal  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Full-Stack Integrated Sovereign Infrastructure Blueprint
+> **Target OS Parity:** Apple Vision Pro, Linux Enterprise, ChromeOS, macOS, cloud-native bare metal
 
 ---
 
@@ -28,21 +28,30 @@ To establish absolute technological sovereignty, the **SigmaOS Zenith Sovereign 
 ## 2. Exhaustive Layer Integration Specifications
 
 ### A. Foundation Layer: Operating System & Discrete Algorithms
-* **Banker's Deadlock Avoidance Algorithm:** Determines state safeness programmatically by tracking resource allocation matrices, availability vectors, and process requirements to eliminate deadlock paths.
-* **Watchdog Heartbeat Monitor:** Simulates microkernel watchdogs. Triggers system panics or safe recovery loops when ticks are absent.
-* **$O(V + E)$ Breadth-First State Tree Search:** Performs vertex explorations across state graph space to trace and optimize execution vectors.
+
+- **Banker's Deadlock Avoidance Algorithm:** Determines state safeness programmatically by tracking resource allocation matrices, availability vectors, and process requirements to eliminate deadlock paths.
+
+- **Watchdog Heartbeat Monitor:** Simulates microkernel watchdogs. Triggers system panics or safe recovery loops when ticks are absent.
+
+- **$O(V + E)$ Breadth-First State Tree Search:** Performs vertex explorations across state graph space to trace and optimize execution vectors.
 
 ### B. Middle Layer: Data Warehousing, OLAP & Pipelines
-* **Logarithmic B-Tree Index Querying:** Implements efficient $O(\log n)$ search indexing over sorted transaction keys to bypass standard $O(N)$ linear scanning overhead.
-* **PCA Eigen Decomposition:** Solves the dimensional equation $X^T X v = \lambda v$ using iterative power iteration loops to extract dominant eigenvectors without high-level statistical library imports.
-* **Star & Snowflake Database Layouts:** Employs denormalized facts and dimension arrays to structure analytical query pipelines.
+
+- **Logarithmic B-Tree Index Querying:** Implements efficient $O(\log n)$ search indexing over sorted transaction keys to bypass standard $O(N)$ linear scanning overhead.
+
+- **PCA Eigen Decomposition:** Solves the dimensional equation $X^T X v = \lambda v$ using iterative power iteration loops to extract dominant eigenvectors without high-level statistical library imports.
+
+- **Star & Snowflake Database Layouts:** Employs denormalized facts and dimension arrays to structure analytical query pipelines.
 
 ### C. Top Layer: Artificial Intelligence & Web Interface
-* **Sigmoidal Logistic Probability Inference:** Computes likelihood outputs matching:
+
+- **Sigmoidal Logistic Probability Inference:** Computes likelihood outputs matching:
   $$P(y = 1 \mid x) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 x)}}$$
   using custom Taylor series exponent expansions to avoid standard floating math library inclusions.
-* **Exploding Gradient Clipping:** Evaluates NPU weights during backpropagation and clips excessive gradients to absolute safety boundaries.
-* **XSS Input Sanitization:** Sanitizes incoming REST API string tags (e.g. converting `<` and `>` to safe HTML entities) to protect the presentation layer from web injection sequences.
+
+- **Exploding Gradient Clipping:** Evaluates NPU weights during backpropagation and clips excessive gradients to absolute safety boundaries.
+
+- **XSS Input Sanitization:** Sanitizes incoming REST API string tags (e.g. converting `<` and `>` to safe HTML entities) to protect the presentation layer from web injection sequences.
 
 ---
 
@@ -73,12 +82,12 @@ public:
     const char* type_name() const noexcept override { return "SovereignOSKernel"; }
 
     // Enforces absolute deadlock avoidance in microkernel memory managers
-    sigma_bool IsSafeState(const sigma_u32 available[3], 
-                           const sigma_u32 max[4][3], 
+    sigma_bool IsSafeState(const sigma_u32 available[3],
+                           const sigma_u32 max[4][3],
                            const sigma_u32 allocation[4][3]) const {
         sigma_u32 work[3];
         for (int i = 0; i < 3; i++) work[i] = available[i];
-        
+
         sigma_bool finish[4] = {SIGMA_FALSE, SIGMA_FALSE, SIGMA_FALSE, SIGMA_FALSE};
         sigma_u32 need[4][3];
         // ... evaluates process requirement matrices securely ...
@@ -92,5 +101,5 @@ public:
 ```
 
 ---
-> **Verification Status:** ALL CLEAR | WIKI PARITY ACHIEVED  
+> **Verification Status:** ALL CLEAR | WIKI PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::voice_zenith ─────────────────────
+// â”€â”€â”€ Module: Sigma::voice_zenith â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// VoiceConfig — hardware-compatible struct.
+/// VoiceConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct VoiceConfig {
     pub sample_rate: SigmaU32,
     pub pitch: SigmaU16,
     pub vol: SigmaU8,
@@ -34,4 +34,6 @@ pub unsafe extern "C" fn voice_init() {
 #[no_mangle]
 pub unsafe extern "C" fn voice_speak_alert() {
 }
+
+
 

@@ -35,8 +35,11 @@ graph TD
 ### Diskless Local State Commit Pipeline
 
 1. **Dynamic Track**: Add files to persistence via `sigma-lbu track <file_path>`.
+
 2. **Atomic Packaging**: On command `sigma-lbu commit`, the engine aggregates and compresses tracked directories.
+
 3. **PQC Attestation**: Generates and pins post-quantum cryptographic signatures inside the state header.
+
 4. **Boot Restoration**: On subsequent system initialization, `lbu_restore` extracts the secure archive back into the system RAM disk, ensuring complete state alignment.
 
 ---

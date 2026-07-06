@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPFRDAMemberRegistry ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPFRDAMemberRegistry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NPSResult — hardware-compatible struct.
+/// NPSResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NPSResult {
     pub total_contribution_paise: SigmaU64,
     pub sec_80ccd_1_deduction_paise: SigmaU64,
     pub sec_80ccd_1b_deduction_paise: SigmaU64,
     pub total_tax_deduction_eligible_paise: SigmaU64,
 }
 
-/// SovereignPFRDAMemberRegistry — OOP singleton pattern.
+/// SovereignPFRDAMemberRegistry â€” OOP singleton pattern.
 pub struct SovereignPFRDAMemberRegistry {
     pub initialized: SigmaBool,
 }
@@ -51,4 +51,6 @@ static mut INSTANCE: SovereignPFRDAMemberRegistry = SovereignPFRDAMemberRegistry
 pub unsafe extern "C" fn run_nps_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::ElfLoader ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::ElfLoader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Elf64_Ehdr — hardware-compatible struct.
+/// Elf64_Ehdr â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Elf64_Ehdr {
     pub e_ident: [SigmaU8; 16],
     pub e_type: SigmaU64,
     pub e_machine: SigmaU64,
@@ -38,10 +38,10 @@ pub struct {s_name} {{
     pub e_shstrndx: SigmaU64,
 }
 
-/// Elf64_Phdr — hardware-compatible struct.
+/// Elf64_Phdr â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Elf64_Phdr {
     pub p_type: SigmaU64,
     pub p_flags: SigmaU64,
     pub p_offset: SigmaU64,
@@ -52,20 +52,20 @@ pub struct {s_name} {{
     pub p_align: SigmaU64,
 }
 
-/// LoadedSegment — hardware-compatible struct.
+/// LoadedSegment â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LoadedSegment {
     pub vaddr: SigmaU64,
     pub size: SigmaU64,
     pub file_offset: SigmaU64,
     pub perms: SigmaU32,
 }
 
-/// LinuxProcessImage — hardware-compatible struct.
+/// LinuxProcessImage â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LinuxProcessImage {
     pub entry_point: SigmaU64,
     pub segments: [SigmaU64; 32],
     pub segment_count: SigmaU32,
@@ -77,15 +77,15 @@ pub struct {s_name} {{
     pub needs_interp: SigmaBool,
 }
 
-/// LinuxSyscallEntry — hardware-compatible struct.
+/// LinuxSyscallEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LinuxSyscallEntry {
     pub linux_nr: SigmaU64,
     pub sigma_nr: SigmaU64,
 }
 
-/// ElfLoader — OOP singleton pattern.
+/// ElfLoader â€” OOP singleton pattern.
 pub struct ElfLoader {
     pub initialized: SigmaBool,
 }
@@ -188,4 +188,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn sigma_compat_linux_init() {
     INSTANCE.initialized = true;
 }
+
+
 

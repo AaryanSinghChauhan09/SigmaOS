@@ -1,194 +1,120 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-// SigmaOS Local LLM - Local Large Language Model integration
+/// SigmaOS: userland/system_api/ai_integration/local_llm.rs
+/// Local LLM Inference Wrapper and Context Manager.
+/// no_std | no alloc | no external crates.
 
-use serde::{Deserialize, Serialize};
-use log::{info, warn, error};
+#![no_std]
+#![allow(dead_code)]
+#![allow(unused_variables)]
 
-/// Local LLM integration for on-device AI processing
-pub struct LocalLLM {
-    model_name: String,
-    model_path: String,
-    context_length: usize,
-    loaded: bool,
+type SigmaU32   = u32;
+type SigmaI32   = i32;
+type SigmaU64   = u64;
+type SigmaBool  = bool;
+type SigmaUsize = usize;
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+pub const MAX_CONTEXT_SESSIONS: SigmaUsize = 16;
+pub const MAX_CONTEXT_SIZE: SigmaUsize = 2048;
+
+// ─── Session State ────────────────────────────────────────────────────────────
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct LlmSession {
+    pub session_id: SigmaU32,
+    pub caller_id:  SigmaU32,
+    pub context:    [u8; MAX_CONTEXT_SIZE],
+    pub context_len: SigmaU32,
+    pub active:     SigmaBool,
 }
 
-impl LocalLLM {
-    /// Create a new Local LLM instance
-    pub fn new(model_name: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let model_path = Self::get_model_path(model_name)?;
-        
-        Ok(Self {
-            model_name: model_name.to_string(),
-            model_path,
-            context_length: 4096,
-            loaded: false,
-        })
-    }
-
-    /// Get the path for a model
-    fn get_model_path(model_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-        let model_dir = "/sigma/var/ai/models";
-        
-        // Create model directory if it doesn't exist
-        std::fs::create_dir_all(model_dir)?;
-        
-        let model_path = format!("{}/{}", model_dir, model_name);
-        
-        // Check if model exists, if not, return path for download
-        if !std::path::Path::new(&model_path).exists() {
-            // Model doesn't exist, will need to be downloaded
-            return Ok(model_path);
+impl LlmSession {
+    pub const fn empty() -> Self {
+        LlmSession {
+            session_id:  0,
+            caller_id:   0,
+            context:     [0; MAX_CONTEXT_SIZE],
+            context_len: 0,
+            active:      false,
         }
-        
-        Ok(model_path)
-    }
-
-    /// Download a model from Hugging Face
-    pub async fn download_model(&self, model_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-        let model_path = Self::get_model_path(model_name)?;
-        
-        if std::path::Path::new(&model_path).exists() {
-            return Ok("Model already exists".to_string());
-        }
-
-        log::info!("Downloading model: {}", model_name);
-        
-        // Use reqwest to download the model from Hugging Face
-        let model_url = format!("https://huggingface.co/{}/resolve/main/model.bin", model_name);
-        
-        let response = reqwest::get(&model_url).await?;
-        
-        if !response.status().is_success() {
-            return Err(format!("Failed to download model: {}", response.status()).into());
-        }
-        
-        let bytes = response.bytes().await?;
-        std::fs::write(&model_path, bytes)?;
-        
-        log::info!("Model downloaded successfully to: {}", model_path);
-        Ok(model_path)
-    }
-
-    /// Load the model
-    pub fn load(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        let model_path = Self::get_model_path(&self.model_name)?;
-        
-        if !std::path::Path::new(&model_path).exists() {
-            return Err(format!("Model file not found: {}. Please download the model first.", model_path).into());
-        }
-
-        // In a real implementation with llama-cpp feature, this would:
-        // let params = llama_cpp::LLamaParams::default();
-        // let model = llama_cpp::LLamaModel::load_from_file(&model_path, params)?;
-        // self.loaded = true;
-        
-        // For now, simulate loading
-        println!("Loading model from: {}", model_path);
-        self.loaded = true;
-        Ok(())
-    }
-
-    /// Generate text from a prompt
-    pub fn generate(&self, prompt: &str) -> Result<super::AIResponse, Box<dyn std::error::Error>> {
-        if !self.loaded {
-            return Err("Model not loaded. Call load() first.".into());
-        }
-
-        // In a real implementation with llama-cpp feature, this would:
-        // let mut ctx = llama_cpp::LLamaContext::new(&model, llama_cpp::LLamaContextParams::default())?;
-        // let tokens = ctx.tokenize(prompt.as_bytes(), true, false)?;
-        // ctx.eval(&tokens, 0)?;
-        // let generated = ctx.generate(100, Some(0.7f32))?;
-        
-        // For now, use placeholder generation
-        let response = self.generate_placeholder(prompt);
-        
-        Ok(super::AIResponse {
-            message: response,
-            confidence: 0.85,
-            action: None,
-        })
-    }
-
-    /// Placeholder generation (would be replaced by actual LLM inference)
-    fn generate_placeholder(&self, prompt: &str) -> String {
-        // Simple pattern matching for demonstration
-        let prompt_lower = prompt.to_lowercase();
-        
-        if prompt_lower.contains("temperature") {
-            "Your system temperature is currently within normal ranges. I can help you optimize cooling if needed.".to_string()
-        } else if prompt_lower.contains("optimize") {
-            "I've analyzed your system and suggest the following optimizations: disable unnecessary startup programs, adjust power settings, and clear temporary files.".to_string()
-        } else if prompt_lower.contains("install") {
-            "I can help you install software. Please specify what you'd like to install, and I'll handle the dependencies and configuration.".to_string()
-        } else {
-            "I understand your request. Let me help you with that.".to_string()
-        }
-    }
-
-    /// Generate with streaming
-    pub fn generate_stream(&self, prompt: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-        if !self.loaded {
-            return Err("Model not loaded".into());
-        }
-
-        // In a real implementation, this would stream tokens as they're generated
-        let response = self.generate_placeholder(prompt);
-        let tokens: Vec<String> = response.split_whitespace().map(|s| s.to_string()).collect();
-        
-        Ok(tokens)
-    }
-
-    /// Unload the model to free memory
-    pub fn unload(&mut self) {
-        self.loaded = false;
-    }
-
-    /// Check if model is loaded
-    pub fn is_loaded(&self) -> bool {
-        self.loaded
-    }
-
-    /// Get model information
-    pub fn get_model_info(&self) -> ModelInfo {
-        ModelInfo {
-            name: self.model_name.clone(),
-            path: self.model_path.clone(),
-            context_length: self.context_length,
-            loaded: self.loaded,
-        }
-    }
-
-    /// Set context length
-    pub fn set_context_length(&mut self, length: usize) {
-        self.context_length = length;
     }
 }
 
-/// Model information
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ModelInfo {
-    pub name: String,
-    pub path: String,
-    pub context_length: usize,
-    pub loaded: bool,
+static mut SESSIONS: [LlmSession; MAX_CONTEXT_SESSIONS] = [LlmSession::empty(); MAX_CONTEXT_SESSIONS];
+static mut NEXT_SESSION_ID: SigmaU32 = 1;
+
+// ─── Implementation ───────────────────────────────────────────────────────────
+
+#[no_mangle]
+pub unsafe extern "C" fn llm_context_init() -> SigmaI32 {
+    for s in SESSIONS.iter_mut() {
+        s.active = false;
+    }
+    0
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_local_llm_creation() {
-        let llm = LocalLLM::new("llama-2-7b");
-        assert!(llm.is_ok());
+#[no_mangle]
+pub unsafe extern "C" fn llm_session_create(caller_id: SigmaU32) -> SigmaI32 {
+    for i in 0..MAX_CONTEXT_SESSIONS {
+        if !SESSIONS[i].active {
+            let id = NEXT_SESSION_ID;
+            NEXT_SESSION_ID = NEXT_SESSION_ID.wrapping_add(1);
+            
+            SESSIONS[i].session_id  = id;
+            SESSIONS[i].caller_id   = caller_id;
+            SESSIONS[i].context_len = 0;
+            SESSIONS[i].active      = true;
+            
+            return id as SigmaI32;
+        }
     }
+    -12 // ENOMEM
+}
 
-    #[test]
-    fn test_model_loading() {
-        let mut llm = LocalLLM::new("llama-2-7b").unwrap();
-        assert!(!llm.is_loaded());
-        llm.load().unwrap();
-        assert!(llm.is_loaded());
+#[no_mangle]
+pub unsafe extern "C" fn llm_session_append(
+    session_id: SigmaU32,
+    text: *const u8,
+    len: SigmaUsize,
+) -> SigmaI32 {
+    if text.is_null() { return -1; }
+    
+    for i in 0..MAX_CONTEXT_SESSIONS {
+        if SESSIONS[i].active && SESSIONS[i].session_id == session_id {
+            let available = MAX_CONTEXT_SIZE - SESSIONS[i].context_len as usize;
+            if len > available {
+                // In production, we'd evict older context (sliding window).
+                // For this implementation, we just cap it.
+                return -12; 
+            }
+            
+            let dest = SESSIONS[i].context.as_mut_ptr().add(SESSIONS[i].context_len as usize);
+            core::ptr::copy_nonoverlapping(text, dest, len);
+            SESSIONS[i].context_len += len as SigmaU32;
+            
+            return 0;
+        }
     }
+    -4 // ENOENT
+}
+
+/// Raw LLM Execution hook (mocking llama.cpp / hardware execution)
+#[no_mangle]
+pub unsafe extern "C" fn llm_execute_inference(
+    prompt: *const u8,
+    p_len: SigmaU32,
+    out_buf: *mut u8,
+    max_out: SigmaU32,
+) -> SigmaI32 {
+    if prompt.is_null() || out_buf.is_null() { return -1; }
+    
+    // Simulate inference.
+    // In reality, this interfaces with NPU memory or triggers an IPC to a GPU shard.
+    let canned_response = b"I am the SigmaOS AI. Command received.\0";
+    let len = core::cmp::min(canned_response.len(), max_out as usize);
+    
+    core::ptr::copy_nonoverlapping(canned_response.as_ptr(), out_buf, len);
+    
+    len as SigmaI32
 }

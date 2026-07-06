@@ -9,8 +9,11 @@
 India has 1.4 billion people, 63 million MSMEs, 400,000 CAs, 300,000 doctors, 150,000 lawyers, 500,000 engineers — and software that serves none of them well.
 
 - **Tally** — closed source, aging UI, no mobile, no direct GST filing
+
 - **Zoho** — ₹2,800/user/month, data in their servers, requires internet
+
 - **SAP** — for the top 500 companies only, ignores 63 million MSMEs
+
 - **Windows** — built for the US, bolted onto India as an afterthought
 
 SigmaOS is built *from the ground up* for India's professionals, laws, languages, and infrastructure constraints.
@@ -20,6 +23,7 @@ SigmaOS is built *from the ground up* for India's professionals, laws, languages
 ## The 16 Unique Features No Other OS Has
 
 | # | Feature | What it does |
+
 |---|---|---|
 | 1 | **IndiaStack Native** | e-RUPI, ONDC, OCEN, Account Aggregator baked into the OS |
 | 2 | **Bhashini AI** | 22 languages + sign language, fully offline (Whisper.cpp) |
@@ -104,10 +108,15 @@ When something breaks, sigma-heal fixes it:
 ```
 
 Features:
+
 - QoS fair-share: each household gets equal bandwidth
+
 - Offline cache: NCERT, DigiLocker, e-NAM, PM-KISAN always available
+
 - DID access control: only enrolled community members can connect
+
 - Community billing: shares actual ISP cost equally — no profit, no markup
+
 - TRAI compliant: cost-sharing (not reselling) is permitted
 
 ---
@@ -153,7 +162,7 @@ Five things that take competitors 5+ years to replicate:
 
 Linux is 30 million lines of general-purpose OS. SigmaOS is a purpose-built platform for 1.4 billion specific people with specific needs, specific laws, and specific infrastructure constraints.
 
-**SigmaOS is the first OS where Indian law is a first-class citizen — not a plugin.**
+### SigmaOS is the first OS where Indian law is a first-class citizen — not a plugin.
 
 ---
 

@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Pharmacology Shard (S-PHARMA)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Pharmacology Shard (S-PHARMA)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPharma ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPharma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// DrugProfile — hardware-compatible struct.
+/// DrugProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct DrugProfile {
     pub half_life_min: SigmaU32,
     pub volume_dist_ml: SigmaU32,
     pub bioavailability: SigmaU32,
 }
 
-/// SovereignPharma — OOP singleton pattern.
+/// SovereignPharma â€” OOP singleton pattern.
 pub struct SovereignPharma {
     pub initialized: SigmaBool,
 }
@@ -85,4 +85,6 @@ pub unsafe extern "C" fn pharma_init() {
 pub unsafe extern "C" fn pharma_pk() {
     INSTANCE.initialized = true;
 }
+
+
 

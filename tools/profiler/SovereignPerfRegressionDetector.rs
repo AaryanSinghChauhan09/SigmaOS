@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignPerfRegressionDetector.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignPerfRegressionDetector.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,22 +16,22 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPerfRegressionDetector ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPerfRegressionDetector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BenchmarkResult — hardware-compatible struct.
+/// BenchmarkResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BenchmarkResult {
     pub cycles_per_op: SigmaU64,
     pub memory_bytes: SigmaU64,
     pub latency_ns: SigmaU64,
     pub build_number: SigmaU32,
 }
 
-/// Benchmark — hardware-compatible struct.
+/// Benchmark â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Benchmark {
     pub id: SigmaU32,
     pub name: [u8; 48],
     pub history_count: SigmaU32,
@@ -39,7 +39,7 @@ pub struct {s_name} {{
     pub regression_pct: SigmaI32,
 }
 
-/// SovereignPerfRegressionDetector — OOP singleton pattern.
+/// SovereignPerfRegressionDetector â€” OOP singleton pattern.
 pub struct SovereignPerfRegressionDetector {
     pub initialized: SigmaBool,
 }
@@ -142,4 +142,6 @@ pub unsafe extern "C" fn perfci_new_build() {
 pub unsafe extern "C" fn perfci_report() {
     INSTANCE.initialized = true;
 }
+
+
 

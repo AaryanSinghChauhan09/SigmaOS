@@ -36,15 +36,19 @@
 ## Usage
 
 ```bash
+
 # As multi-call binary
+
 sigma-coreutils ls /tmp
 sigma-coreutils grep "error" /var/log/sigma.log
 sigma-coreutils wc -l /etc/passwd
 
 # Via symlinks (BusyBox style)
+
 ln -s sigma-coreutils /usr/bin/ls
 ln -s sigma-coreutils /usr/bin/grep
 ls /tmp           # works directly
+
 ```
 
 ---
@@ -54,9 +58,11 @@ ls /tmp           # works directly
 ```bash
 cd userland/coreutils
 cargo build --release
+
 # Output: target/release/sigma-coreutils
 
 # Create symlinks
+
 for cmd in ls cat echo pwd mkdir rm cp mv touch stat grep head tail wc uname sleep env id; do
     ln -sf sigma-coreutils /usr/bin/$cmd
 done
@@ -67,15 +73,23 @@ done
 ## Missing (Phase D)
 
 - `sed` — stream editor (regex replacement)
+
 - `awk` — text processing
+
 - `find` — file search
+
 - `tar` — archive utility
+
 - `gzip` / `xz` — compression
+
 - `dd` — disk imager
+
 - `mount` / `umount` — filesystem mounting
+
 - `ps` — process list
+
 - `kill` — send signals
 
 ---
 
-*Source: `userland/coreutils/src/main.rs` — Rust std, ~400 lines*
+### Source: `userland/coreutils/src/main.rs` — Rust std, ~400 lines

@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::NeuralInferenceEngine ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::NeuralInferenceEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// UIPreferences — hardware-compatible struct.
+/// UIPreferences â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UIPreferences {
     pub font_scale: f32,
     pub contrast_boost: f32,
     pub ui_density: f32,
@@ -32,10 +32,10 @@ pub struct {s_name} {{
     pub dark_mode: f32,
 }
 
-/// UsageFeatures — hardware-compatible struct.
+/// UsageFeatures â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UsageFeatures {
     pub avg_session_length: f32,
     pub typing_speed: f32,
     pub mouse_speed: f32,
@@ -54,7 +54,7 @@ pub struct {s_name} {{
     pub dark_env_sensor: f32,
 }
 
-/// NeuralInferenceEngine — OOP singleton pattern.
+/// NeuralInferenceEngine â€” OOP singleton pattern.
 pub struct NeuralInferenceEngine {
     pub initialized: SigmaBool,
 }
@@ -137,4 +137,6 @@ pub unsafe extern "C" fn sigma_neural_ui_init() {
 pub unsafe extern "C" fn sigma_neural_ui_update() {
     INSTANCE.initialized = true;
 }
+
+
 

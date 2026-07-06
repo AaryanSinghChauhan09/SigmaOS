@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SectionId ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SectionId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// WasmVal — hardware-compatible struct.
+/// WasmVal â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmVal {
     pub type: SigmaU64,
     pub i32: SigmaU32,
     pub i64: SigmaU64,
@@ -29,58 +29,58 @@ pub struct {s_name} {{
     pub f64: f64,
 }
 
-/// WasmType — hardware-compatible struct.
+/// WasmType â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmType {
     pub param_count: SigmaU8,
     pub result_count: SigmaU8,
     pub params: [SigmaU64; 16],
     pub results: [SigmaU64; 4],
 }
 
-/// WasmFunc — hardware-compatible struct.
+/// WasmFunc â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmFunc {
     pub type_idx: SigmaU32,
     pub code_offset: SigmaU32,
     pub code_size: SigmaU32,
     pub local_count: SigmaU32,
 }
 
-/// WasmExport — hardware-compatible struct.
+/// WasmExport â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmExport {
     pub name: [u8; 64],
     pub kind: SigmaU8,
     pub index: SigmaU32,
 }
 
-/// WasmImport — hardware-compatible struct.
+/// WasmImport â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmImport {
     pub module_name: [u8; 32],
     pub field_name: [u8; 64],
     pub kind: SigmaU8,
     pub type_idx: SigmaU32,
 }
 
-/// WasmMemory — hardware-compatible struct.
+/// WasmMemory â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmMemory {
     pub min_pages: SigmaU32,
     pub max_pages: SigmaU32,
     pub current_pages: SigmaU32,
 }
 
-/// WasmModule — hardware-compatible struct.
+/// WasmModule â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WasmModule {
     pub types: [SigmaU64; 128],
     pub type_count: SigmaU32,
     pub imports: [SigmaU64; 64],
@@ -95,7 +95,7 @@ pub struct {s_name} {{
     pub valid: SigmaBool,
 }
 
-/// SectionId — OOP singleton pattern.
+/// SectionId â€” OOP singleton pattern.
 pub struct SectionId {
     pub initialized: SigmaBool,
 }
@@ -273,4 +273,6 @@ pub unsafe extern "C" fn sigma_wasm_init() {
 pub unsafe extern "C" fn execute_wasm() {
     INSTANCE.initialized = true;
 }
+
+
 

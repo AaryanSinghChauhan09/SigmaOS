@@ -77,16 +77,16 @@ make test            # Run industrial CI/CD battery
 
 ## ?? Strategic Superiority
 
-| Feature | SigmaOS | Linux | Windows | 
-| :--- | :--- | :--- | :--- | 
+| Feature | SigmaOS | Linux | Windows |
+| :--- | :--- | :--- | :--- |
 
-| **Kernel** | Shard Lattice | Monolithic | Hybrid | 
+| **Kernel** | Shard Lattice | Monolithic | Hybrid |
 
-| **Crypto** | PQC-Native | Add-on | Add-on | 
+| **Crypto** | PQC-Native | Add-on | Add-on |
 
-| **Trust** | Zero-Trust | Implicit | Implicit | 
+| **Trust** | Zero-Trust | Implicit | Implicit |
 
-| **Legal** | Native India | External | External | 
+| **Legal** | Native India | External | External |
 
 ---
 

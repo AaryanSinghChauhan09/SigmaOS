@@ -1,11 +1,11 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,41 +16,43 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::hal_contract ─────────────────────
+// â”€â”€â”€ Module: Sigma::hal_contract â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SigmaDisplayOps — hardware-compatible struct.
+/// SigmaDisplayOps â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaDisplayOps {
 }
 
-/// SigmaInputOps — hardware-compatible struct.
+/// SigmaInputOps â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaInputOps {
 }
 
-/// SigmaStorageOps — hardware-compatible struct.
+/// SigmaStorageOps â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaStorageOps {
 }
 
-/// SigmaNetOps — hardware-compatible struct.
+/// SigmaNetOps â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaNetOps {
 }
 
-/// SigmaTimerOps — hardware-compatible struct.
+/// SigmaTimerOps â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaTimerOps {
 }
 
-/// SigmaSerialOps — hardware-compatible struct.
+/// SigmaSerialOps â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaSerialOps {
 }
+
+
 

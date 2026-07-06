@@ -47,55 +47,93 @@
 ## Core Subsystems
 
 ### Scheduler (`kernel/sched/`)
+
 - **MLFQ**: 4 queues with aging — interactive tasks stay responsive
+
 - **CFS clone**: vruntime + red-black tree for fair CPU sharing
+
 - **EDF**: Earliest-Deadline-First for `release/rtos` hard real-time tasks
+
 - **SCHED_SOVEREIGN RT**: bounded IRQ latency < 10 µs target
+
 - **sigma-ai predictive**: TinyLlama pre-warming for hot code paths (Phase H)
+
 - **NUMA-aware**: reads ACPI SRAT table for memory locality placement
 
 ### Memory Manager (`kernel/memory/`, `kernel/mm/`)
+
 - **Buddy allocator**: 2^n page-frame management, O(log n) alloc/free
+
 - **Slab allocator**: kmalloc via object caches, minimises fragmentation
+
 - **4-level paging** (x86_64 PML4): per-process virtual address spaces
+
 - **ASLR**: 42-bit entropy per VMA region
+
 - **W^X enforcement**: no page is simultaneously writable and executable
 
 ### Security (`security/`, `kernel/security/`)
+
 - **sigma_pledge**: process declares capabilities at exec; kernel enforces allowlist
+
 - **sigma_unveil**: process declares filesystem paths; all others denied
+
 - **AVC**: O(1) SELinux-inspired access vector cache for MAC decisions
+
 - **Zero-trust**: SPIFFE workload identities, per-syscall cryptographic attestation
+
 - **PQC**: Kyber-1024 KEM + Dilithium-5 signatures baked into TLS, packages, boot
+
 - **TPM2**: seals CryptFS key derivation; remote attestation via sigma-trustd
 
 ### Networking (`net/`, `kernel/net/`)
+
 - **Stack**: IPv4/IPv6 · TCP · UDP · ICMP · ARP
+
 - **TLS 1.3**: X25519/Kyber-1024 hybrid key exchange
+
 - **DNS**: UDP/TCP/DoH + DNSSEC + LRU cache
+
 - **DHCP**: full RFC 2131/2132 state machine
+
 - **WPA3/SAE**: dragonfly key exchange (P-256)
+
 - **Firewall**: stateful + NAT + conntrack
+
 - **Mesh**: CRDT offline-first sync, ZeroNet (release/distributed)
 
 ### Filesystem (`fs/`, `kernel/fs/`)
+
 - **VFS**: generic inode/dentry/file layer
+
 - **SigmaFS**: native CoW journaling filesystem (Phase G)
+
 - **Ext4**: read/write with JBD2 ordered journaling
+
 - **FAT32**: for EFI system partitions
+
 - **Tmpfs**: RAM-backed ephemeral storage
+
 - **dm-verity**: block-level integrity verification (release/cloud)
+
 - **OSTree A/B**: atomic updates (release/cloud, release/standalone)
 
 ### HAL (`hal/`, `arch/`)
+
 - Multi-arch: x86_64, ARM64, RISC-V RV64GC
+
 - PCI/PCIe enumeration + MSI-X interrupt routing
+
 - ACPI tables (MADT/SRAT/DSDT) parsing
+
 - UEFI runtime services via sigma-boot.efi (Phase G)
 
 ### Sovereign Driver Framework (SDF) (`drivers/`)
+
 - Each driver: `probe()` → `init()` → `shutdown()` lifecycle
+
 - Ring-3 driver launch for fault isolation (Phase G)
+
 - Auto-registered via `SIGMA_SDF_REGISTER_DRIVER` macro
 
 ---
@@ -105,7 +143,9 @@
 SigmaOS code is organised into **600+ shards** — atomic, independently-testable modules. Shards are identified by `S<N>_<Name>` and live in `suites/`.
 
 Key shard groups:
+
 - **S01–S14**: Genesis, Silicon, ZenithUI, HAL, Memory, Storage, Network, Security, Intelligence, Registry, Virtualisation, Ecosystem, LuaBridge, Transcendence
+
 - **S034–S500+**: Extended capability shards (IPC, crypto, observability, AI, etc.)
 
 ---

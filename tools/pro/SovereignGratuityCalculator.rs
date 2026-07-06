@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignGratuityCalculator ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignGratuityCalculator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// GratuityResult — hardware-compatible struct.
+/// GratuityResult â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct GratuityResult {
     pub statutory_entitlement_paise: SigmaU64,
     pub raw_calculated_paise: SigmaU64,
     pub is_entitled: SigmaBool,
     pub is_statutory_cap_exceeded: SigmaBool,
 }
 
-/// SovereignGratuityCalculator — OOP singleton pattern.
+/// SovereignGratuityCalculator â€” OOP singleton pattern.
 pub struct SovereignGratuityCalculator {
     pub initialized: SigmaBool,
 }
@@ -51,4 +51,6 @@ static mut INSTANCE: SovereignGratuityCalculator = SovereignGratuityCalculator::
 pub unsafe extern "C" fn run_gratuity_calc() {
     INSTANCE.initialized = true;
 }
+
+
 

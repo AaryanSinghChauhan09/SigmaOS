@@ -15,8 +15,11 @@ Statistics is the mathematical science of collecting, organizing, analyzing, int
 **SigmaOS Integration:** `SigmaStats` provides freestanding, kernel-level statistical primitives used by:
 
 - `SigmaViz` — direct framebuffer chart rendering
+
 - `SigmaAI` — ML feature engineering and normalization
+
 - `SigmaSheets` — spreadsheet calculation engine
+
 - `SigmaDB` — columnar aggregate query functions
 
 ### Primary vs Secondary Data
@@ -137,9 +140,11 @@ namespace Sigma::Stats {
 
 Hypothesis testing provides a rigorous mathematical framework for validating assumptions regarding population parameters using sample data.
 
-* **Null Hypothesis ($H_0$):** Assumes no effect or no difference between groups.
-* **Alternative Hypothesis ($H_1$):** Assumes a statistically significant effect or difference exists.
-* **Probability Distributions:** Evaluates test statistics against established theoretical distributions including Normal ($Z$), Student's $t$, Chi-Square ($\chi^2$), and $F$-distributions.
+- **Null Hypothesis ($H_0$):** Assumes no effect or no difference between groups.
+
+- **Alternative Hypothesis ($H_1$):** Assumes a statistically significant effect or difference exists.
+
+- **Probability Distributions:** Evaluates test statistics against established theoretical distributions including Normal ($Z$), Student's $t$, Chi-Square ($\chi^2$), and $F$-distributions.
 
 ```cpp
 namespace Sigma::Stats {
@@ -255,9 +260,11 @@ namespace Sigma::Stats {
 
 SigmaStats provides seamless bridging to industry-standard data science and statistical toolkits:
 
-* **R Environment:** Full compatibility with R dataframe structures and CRAN analytical packages.
-* **Python Ecosystem:** Direct interoperability with `NumPy` array buffers, `Pandas` series, and `Matplotlib` plotting backends.
-* **Jupyter Notebooks:** Interactive kernel execution for real-time exploratory data analysis (EDA).
+- **R Environment:** Full compatibility with R dataframe structures and CRAN analytical packages.
+
+- **Python Ecosystem:** Direct interoperability with `NumPy` array buffers, `Pandas` series, and `Matplotlib` plotting backends.
+
+- **Jupyter Notebooks:** Interactive kernel execution for real-time exploratory data analysis (EDA).
 
 ---
 
@@ -265,14 +272,21 @@ SigmaStats provides seamless bridging to industry-standard data science and stat
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Overfitting in Statistical/ML Models:** Models capture noise rather than underlying distributions, leading to high training accuracy but poor generalization.
-  * *Fix Strategy:* Apply $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, increase k-fold cross-validation partitions, or prune decision tree depths.
-* **Issue - Data Problems (Missing Values & Scaling):** Unclean datasets skew mean/variance calculations and cause gradient explosion.
-  * *Fix Strategy:* Implement robust imputation (k-NN or median replacement) for missing values, and normalize/standardize features using Z-score transformations ($z = \frac{x - \mu}{\sigma}$).
-* **Issue - Algorithmic Complexity Bottlenecks:** Naive sorting or pairwise distance calculations yield $O(n^2)$ complexity, stalling large dataset ingestion.
-  * *Fix Strategy:* Optimize algorithmic complexity by replacing naive bubble/insertion sorts with QuickSort or MergeSort ($O(n \log n)$), and utilize spatial B+ Trees or k-d trees for searching.
-* **Issue - Runtime Errors:** Unhandled exceptions during matrix inversion or floating-point division by zero.
-  * *Fix Strategy:* Use kernel-level logging (`sigma_log`), exhaustive unit testing suites, and hardware profiling tools (DTrace/perf) to trace execution bottlenecks.
+- **Issue - Overfitting in Statistical/ML Models:** Models capture noise rather than underlying distributions, leading to high training accuracy but poor generalization.
+
+- *Fix Strategy:* Apply $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, increase k-fold cross-validation partitions, or prune decision tree depths.
+
+- **Issue - Data Problems (Missing Values & Scaling):** Unclean datasets skew mean/variance calculations and cause gradient explosion.
+
+- *Fix Strategy:* Implement robust imputation (k-NN or median replacement) for missing values, and normalize/standardize features using Z-score transformations ($z = \frac{x - \mu}{\sigma}$).
+
+- **Issue - Algorithmic Complexity Bottlenecks:** Naive sorting or pairwise distance calculations yield $O(n^2)$ complexity, stalling large dataset ingestion.
+
+- *Fix Strategy:* Optimize algorithmic complexity by replacing naive bubble/insertion sorts with QuickSort or MergeSort ($O(n \log n)$), and utilize spatial B+ Trees or k-d trees for searching.
+
+- **Issue - Runtime Errors:** Unhandled exceptions during matrix inversion or floating-point division by zero.
+
+- *Fix Strategy:* Use kernel-level logging (`sigma_log`), exhaustive unit testing suites, and hardware profiling tools (DTrace/perf) to trace execution bottlenecks.
 
 ---
 
@@ -297,5 +311,6 @@ Consumers:
 └── SigmaDB (aggregate SQL functions)
 ```
 
-**Files:** `userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`  
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+**Files:** `userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`
+
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

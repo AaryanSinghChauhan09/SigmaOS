@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_users: Sovereign User & Group Management
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_users: Sovereign User & Group Management
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_users ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_users â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SigmaUser — hardware-compatible struct.
+/// SigmaUser â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaUser {
     pub uid: SigmaI32,
     pub gid: SigmaI32,
     pub username: [u8; 32],
@@ -31,10 +31,10 @@ pub struct {s_name} {{
     pub is_active: SigmaBool,
 }
 
-/// SigmaGroup — hardware-compatible struct.
+/// SigmaGroup â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SigmaGroup {
     pub gid: SigmaI32,
     pub groupname: [u8; 32],
     pub member_uids: [SigmaI32; 16],
@@ -44,4 +44,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {
 }
+
+
 

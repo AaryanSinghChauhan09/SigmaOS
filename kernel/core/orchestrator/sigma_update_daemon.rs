@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::UpdateDaemon ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::UpdateDaemon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// UpdateDescriptor — hardware-compatible struct.
+/// UpdateDescriptor â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct UpdateDescriptor {
     pub target_version: SigmaU32,
     pub kernel_image_signature: [SigmaU8; 64],
     pub sector_offset: SigmaU32,
@@ -29,7 +29,7 @@ pub struct {s_name} {{
     pub kernel_version_str: [u8; 64],
 }
 
-/// UpdateDaemon — OOP singleton pattern.
+/// UpdateDaemon â€” OOP singleton pattern.
 pub struct UpdateDaemon {
     pub initialized: SigmaBool,
 }
@@ -102,4 +102,6 @@ pub unsafe extern "C" fn rollback() {
 pub unsafe extern "C" fn sigma_update_daemon_init() {
     INSTANCE.initialized = true;
 }
+
+
 

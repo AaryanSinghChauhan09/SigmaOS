@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Pod (S-POD)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Pod (S-POD)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignPod ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignPod â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PodConfig — hardware-compatible struct.
+/// PodConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PodConfig {
     pub pod_id: SigmaU32,
     pub image_name: [u8; 64],
     pub memory_limit: SigmaU64,
     pub cpu_shares: SigmaU8,
 }
 
-/// SovereignPod — OOP singleton pattern.
+/// SovereignPod â€” OOP singleton pattern.
 pub struct SovereignPod {
     pub initialized: SigmaBool,
 }
@@ -101,4 +101,6 @@ pub unsafe extern "C" fn pod_create() {
 pub unsafe extern "C" fn pod_kill() {
     INSTANCE.initialized = true;
 }
+
+
 

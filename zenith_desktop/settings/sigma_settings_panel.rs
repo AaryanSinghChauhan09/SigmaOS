@@ -1,11 +1,11 @@
-/// SigmaOS: @file sigma_settings_panel.cpp
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: @file sigma_settings_panel.cpp
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::sigma_settings_panel ─────────────────────
+// â”€â”€â”€ Module: sigma::sigma_settings_panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SettingsPlug — hardware-compatible struct.
+/// SettingsPlug â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SettingsPlug {
     pub category: SigmaU64,
     pub name: [u8; 64],
     pub icon: [u8; 128],
@@ -29,10 +29,10 @@ pub struct {s_name} {{
     pub visible: SigmaBool,
 }
 
-/// SettingEntry — hardware-compatible struct.
+/// SettingEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SettingEntry {
     pub key: [u8; 128],
     pub label: [u8; 128],
     pub description: [u8; 256],
@@ -44,11 +44,13 @@ pub struct {s_name} {{
     pub category: SigmaU64,
 }
 
-/// SettingsRegistry — hardware-compatible struct.
+/// SettingsRegistry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SettingsRegistry {
     pub count: SigmaU32,
     pub plug_count: SigmaU32,
 }
+
+
 

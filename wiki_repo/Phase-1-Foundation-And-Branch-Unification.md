@@ -27,13 +27,16 @@ The Sovereign Driver Interface enforces a clean ABI boundary: OS-specific driver
 ```
 drivers/
 ├── linux/          # Ubuntu/Debian ABI wrappers (TARGET_OS=ubuntu)
+
 │   ├── ubuntu_compat.cpp
 │   └── ubuntu_e1000.cpp
 ├── sigma/          # Native Sovereign drivers (TARGET_OS=sigma)
+
 │   ├── sigma_nvme.cpp
 │   ├── sigma_wifi.cpp
 │   └── sigma_usb.cpp
 └── bsd/            # FreeBSD newbus wrappers (TARGET_OS=bsd)
+
     ├── bsd_compat.cpp
     └── bsd_em.cpp
 ```
@@ -45,13 +48,17 @@ Each driver exposes a minimal C bridge (`extern "C"`) so the shared HAL boot cod
 ## 📐 Build Commands
 
 ```bash
+
 # Native SigmaOS (default)
+
 cmake -B build -DSIGMA_TARGET_OS=sigma && ninja -C build
 
 # Ubuntu compat
+
 make TARGET_OS=ubuntu -j$(nproc)
 
 # BSD compat
+
 cmake -B build -DSIGMA_TARGET_OS=bsd && ninja -C build
 ```
 
@@ -60,6 +67,9 @@ cmake -B build -DSIGMA_TARGET_OS=bsd && ninja -C build
 ## 🔗 Related Pages
 
 - [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
+
 - [Build Guide](BuildGuide)
+
 - [Driver Development](Driver-Development)
+
 - [CI Pipeline](CI-Pipeline)

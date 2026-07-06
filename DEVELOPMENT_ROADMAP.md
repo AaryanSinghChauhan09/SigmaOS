@@ -69,8 +69,11 @@ release/dual-boot      → depends on kernel-exp sigma-boot.efi + fs-dev
 **Policy:** No direct development on `main`. Every PR must pass `sigma_ci.yml`.
 
 ### Current State
+
 - v15.0.0 Zenith released
+
 - CI: GitHub Actions on push
+
 - Wiki auto-sync on push
 
 ### Immediate Tasks
@@ -84,7 +87,9 @@ release/dual-boot      → depends on kernel-exp sigma-boot.efi + fs-dev
 | Merge `drivers-dev` VESA/VirtIO-GPU | — | 🔴 |
 
 ### Exit Criteria
+
 - `make iso` produces a bootable image
+
 - All CI checks pass on every push
 
 ---
@@ -94,12 +99,15 @@ release/dual-boot      → depends on kernel-exp sigma-boot.efi + fs-dev
 **Status:** 🔴 CRITICAL — blocks all other branches
 
 ### Current State
+
 - Headers complete for scheduler, MM, syscall, IRQ
+
 - All `.cpp` bodies are stubs — no real hardware boot
 
 ### Phase 0 Tasks (ordered — do not skip)
 
 | # | Task | File | Exit Test |
+
 |---|------|------|-----------|
 | 1 | Round-robin scheduler (64 tasks) | `kernel/core/sigma_sched.cpp` | QEMU: 2 tasks interleave |
 | 2 | Buddy physical allocator | `kernel/core/sigma_mm.cpp` | alloc/free 100 pages, no leak |
@@ -113,6 +121,7 @@ release/dual-boot      → depends on kernel-exp sigma-boot.efi + fs-dev
 | 10 | `make iso` → bootable ISO | `Makefile` | `qemu -cdrom SigmaOS.iso` → shell |
 
 ### Scheduler Upgrade Path
+
 ```
 Round 1: round-robin (unblocks boot)
 Round 2: MLFQ (4 queues, aging)
@@ -123,6 +132,7 @@ Round 6: sigma-ai predictive pre-warming
 ```
 
 ### Merge Target
+
 `main` after `make iso` + QEMU boot CI passing.
 
 ---
@@ -132,9 +142,13 @@ Round 6: sigma-ai predictive pre-warming
 **Depends on:** `kernel-exp` Phase 0
 
 ### Current State
+
 - NVMe: `drivers/storage/sigma_nvme.cpp` ✅
+
 - USB xHCI: `drivers/usb/sigma_xhci.cpp` ✅
+
 - e1000 NIC: `kernel/core/drivers/SovereignE1000.cpp` ✅
+
 - KMS/GPU: framework only; Wi-Fi: not started
 
 ### Next Tasks
@@ -154,6 +168,7 @@ Round 6: sigma-ai predictive pre-warming
 | 🟡 | ARM64 BCM2712 BSP | `arch/arm64/sigma_bcm2712.cpp` | Raspberry Pi 5 |
 
 ### Merge Target
+
 `main` per-driver after QEMU + physical hardware CI passes.
 
 ---
@@ -163,8 +178,11 @@ Round 6: sigma-ai predictive pre-warming
 **Depends on:** `kernel-exp` Phase 0
 
 ### Current State
+
 - VFS header: `kernel/include/kernel/sigma_vfs.h` ✅
+
 - Ext4 journal rewrite: `fs/ext4_journal.c` ✅
+
 - SigmaFS: early design; UBC: header only
 
 ### Next Tasks
@@ -182,7 +200,9 @@ Round 6: sigma-ai predictive pre-warming
 | 🟡 | FAT32 write support | `fs/fat/sigma_fat32_write.cpp` |
 
 ### Exit Criteria
+
 - `sigma-sh` can open/read/write/ls on tmpfs
+
 - `sigma-pkg install` writes packages to SigmaFS partition
 
 ---
@@ -190,9 +210,13 @@ Round 6: sigma-ai predictive pre-warming
 ## `tools-dev` — CLI, Docs, Automation (Current Working Branch)
 
 ### Current State ✅
+
 - sigma-cli profiles/aliases: `userland/tools/sigma_cli.cpp`
+
 - sigma_automation.sh: `scripts/sigma_automation.sh`
+
 - Windows compat headers: `include/compat/*.h`
+
 - ci_branch_check.sh: `scripts/ci_branch_check.sh`
 
 ### Next Tasks
@@ -208,6 +232,7 @@ Round 6: sigma-ai predictive pre-warming
 | 🟡 | sigma-observatory stub | `userland/tools/sigma_observatory.cpp` |
 
 ### Merge Target
+
 `main` on every green CI run. Ongoing.
 
 ---
@@ -298,6 +323,7 @@ Round 6: sigma-ai predictive pre-warming
 | 🟠 | Indian IME (Inscript + phonetic) |
 
 ### Exit Criteria
+
 User boots → Zenith desktop → types Hindi → runs sigma-ai.
 
 ---
@@ -405,19 +431,33 @@ User boots → Zenith desktop → types Hindi → runs sigma-ai.
 ## Recommended Merge Order
 
 ```
-1.  kernel-exp → main          (Phase 0: boot + QEMU CI)
-2.  drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
-3.  fs-dev → main              (VFS + tmpfs + SigmaFS)
-4.  tools-dev → main           (ongoing, every green CI)
-5.  performance-optimized → main (after kernel-exp)
-6.  docs-update → main         (ongoing)
-7.  release/microkernel ← main (branch from stable main)
-8.  release/standalone ← main  (after drivers-dev GPU)
-9.  release/cloud ← main       (after cgroup enforcement)
+
+1. kernel-exp → main          (Phase 0: boot + QEMU CI)
+
+2. drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
+
+3. fs-dev → main              (VFS + tmpfs + SigmaFS)
+
+4. tools-dev → main           (ongoing, every green CI)
+
+5. performance-optimized → main (after kernel-exp)
+
+6. docs-update → main         (ongoing)
+
+7. release/microkernel ← main (branch from stable main)
+
+8. release/standalone ← main  (after drivers-dev GPU)
+
+9. release/cloud ← main       (after cgroup enforcement)
+
 10. release/mobile ← main      (after ARM64 BSP)
+
 11. release/rtos ← main        (after EDF scheduler)
+
 12. release/dual-boot ← main   (after sigma-boot.efi)
+
 13. release/distributed ← release/cloud
+
 14. release/browser / release/app ← main (after bootable ISO)
 ```
 

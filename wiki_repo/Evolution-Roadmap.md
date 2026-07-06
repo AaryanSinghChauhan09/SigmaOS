@@ -34,11 +34,11 @@ SigmaOS is on a 3-year trajectory to become the world's most innovative and prof
 
 ---
 
-| Phase | Focus | Key Shard | 
-| :--- | :--- | :--- | 
+| Phase | Focus | Key Shard |
+| :--- | :--- | :--- |
 
-| **Short Term** | Usability | S-INSTALL | 
+| **Short Term** | Usability | S-INSTALL |
 
-| **Medium Term** | Security | S-MAC | 
+| **Medium Term** | Security | S-MAC |
 
 | **Long Term** | AI / Gaming | S-PROTON |

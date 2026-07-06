@@ -41,18 +41,27 @@ Adoption = Technical Excellence × Ecosystem × Community × Trust
 ## Community Building
 
 ### Immediate
+
 - GitHub Discussions + Good-first-issue labels
+
 - CONTRIBUTING.md 5-minute guide
+
 - Weekly dev update posts
 
 ### Short-term
+
 - Discord (#kernel #drivers #userland #apps #help)
+
 - sigma-bounty: $50–500 for critical bugs
+
 - Monthly contributor digest
 
 ### Long-term
+
 - sigma-conf annual developer conference
+
 - University partnerships (CS curriculum)
+
 - sigma-foundation non-profit governance
 
 ---

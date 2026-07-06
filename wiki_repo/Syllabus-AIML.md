@@ -21,10 +21,13 @@ Artificial Intelligence within SigmaOS provides freestanding, zero-dependency an
 
 ### Core Machine Learning Concepts
 
-* **Supervised Learning:** Algorithms learn from labeled training data ($X, y$), mapping feature vectors to known ground-truth targets E.g., regression or classification.
-* **Unsupervised Learning:** Algorithms identify hidden patterns, groupings, or underlying structures within unlabeled data ($X$) E.g., clustering or dimensionality reduction.
-* **Reinforcement Learning:** Agents learn optimal policy actions within an environment to maximize cumulative rewards through trial-and-error exploration.
-* **Neural Networks & Deep Learning:** Multi-layered interconnected perceptron networks capable of hierarchical feature representation and non-linear function approximation.
+- **Supervised Learning:** Algorithms learn from labeled training data ($X, y$), mapping feature vectors to known ground-truth targets E.g., regression or classification.
+
+- **Unsupervised Learning:** Algorithms identify hidden patterns, groupings, or underlying structures within unlabeled data ($X$) E.g., clustering or dimensionality reduction.
+
+- **Reinforcement Learning:** Agents learn optimal policy actions within an environment to maximize cumulative rewards through trial-and-error exploration.
+
+- **Neural Networks & Deep Learning:** Multi-layered interconnected perceptron networks capable of hierarchical feature representation and non-linear function approximation.
 
 ### Knowledge Representation
 
@@ -130,9 +133,13 @@ from sigma.ai.metrics import (
 #        Neg  FP     TN
 
 acc = accuracy_score(y_test, y_pred)    # (TP+TN)/(TP+TN+FP+FN)
+
 prec = precision_score(y_test, y_pred)  # TP/(TP+FP)
+
 rec = recall_score(y_test, y_pred)      # TP/(TP+FN)
+
 f1 = f1_score(y_test, y_pred)          # 2*(prec*rec)/(prec+rec)
+
 cm = confusion_matrix(y_test, y_pred)
 
 # Overfitting: high train acc, low test acc
@@ -162,6 +169,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dropout(0.3),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')  # Binary classification
+
 ])
 
 model.compile(
@@ -214,6 +222,7 @@ class SigmaAIModel(nn.Module):
         super().__init__()
         self.layers = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),  # Dense Layer
+
             nn.ReLU(),
             nn.Dropout(0.3),
             nn.Linear(hidden_dim, output_dim),
@@ -234,16 +243,20 @@ for epoch in range(100):
     output = model(X_tensor)
     loss = loss_fn(output, y_tensor)
     loss.backward()   # Backpropagation
+
     optimizer.step()  # Update weights
+
 ```
 
 ### Tools & Ecosystem Parity
 
 `SigmaAI` maintains full API and binary compatibility with premier industry AI/ML frameworks:
 
-* **TensorFlow & Keras:** Direct execution of SavedModel graphs and Keras sequential/functional models.
-* **PyTorch:** Native TorchScript JIT compilation and tensor sharding across AVX-512 registers.
-* **Scikit-learn:** Tabular data modeling and pipeline automation matching exact `fit`/`predict` paradigms.
+- **TensorFlow & Keras:** Direct execution of SavedModel graphs and Keras sequential/functional models.
+
+- **PyTorch:** Native TorchScript JIT compilation and tensor sharding across AVX-512 registers.
+
+- **Scikit-learn:** Tabular data modeling and pipeline automation matching exact `fit`/`predict` paradigms.
 
 ---
 
@@ -311,12 +324,17 @@ prediction = legal_ai.predict_outcome(case_facts)
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Overfitting in Deep Neural Networks:** Model memorizes training data noise, causing high validation loss and poor real-world accuracy.
-  * *Fix Strategy:* Inject `Dropout` layers (rate 0.2 to 0.5), apply $L_2$ weight decay regularization, utilize Early Stopping callbacks, or execute data augmentation.
-* **Issue - Vanishing & Exploding Gradients:** Gradients shrink to zero or grow exponentially during backpropagation in deep networks.
-  * *Fix Strategy:* Replace Sigmoid/Tanh activations with ReLU or LeakyReLU, initialize weights using He/Glorot normal initializers, and implement Gradient Clipping (`clipnorm=1.0`).
-* **Issue - Algorithmic Complexity in Attention / Distance Matrices:** Pairwise distance calculations in k-NN or self-attention scale quadratically ($O(n^2)$).
-  * *Fix Strategy:* Utilize approximate nearest neighbor (ANN) search trees (HNSW / k-d trees) to reduce search complexity to $O(n \log n)$.
+- **Issue - Overfitting in Deep Neural Networks:** Model memorizes training data noise, causing high validation loss and poor real-world accuracy.
+
+- *Fix Strategy:* Inject `Dropout` layers (rate 0.2 to 0.5), apply $L_2$ weight decay regularization, utilize Early Stopping callbacks, or execute data augmentation.
+
+- **Issue - Vanishing & Exploding Gradients:** Gradients shrink to zero or grow exponentially during backpropagation in deep networks.
+
+- *Fix Strategy:* Replace Sigmoid/Tanh activations with ReLU or LeakyReLU, initialize weights using He/Glorot normal initializers, and implement Gradient Clipping (`clipnorm=1.0`).
+
+- **Issue - Algorithmic Complexity in Attention / Distance Matrices:** Pairwise distance calculations in k-NN or self-attention scale quadratically ($O(n^2)$).
+
+- *Fix Strategy:* Utilize approximate nearest neighbor (ANN) search trees (HNSW / k-d trees) to reduce search complexity to $O(n \log n)$.
 
 ---
 
@@ -351,8 +369,11 @@ SigmaAI Intelligence Layer
 ### Files
 
 - `userland/apps/SigmaAI/sigma_ai_engine.cpp`
+
 - `userland/apps/SigmaAI/nn_runtime.cpp`
+
 - `userland/apps/SigmaNLP/sigma_nlp.cpp`
+
 - `userland/apps/SigmaLegalAI/legal_predictor.cpp`
 
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_strace: Sovereign Syscall Tracer
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_strace: Sovereign Syscall Tracer
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_strace ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_strace â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SyscallName — hardware-compatible struct.
+/// SyscallName â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SyscallName {
     pub num: SigmaU64,
 }
 
-/// TraceEntry — hardware-compatible struct.
+/// TraceEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct TraceEntry {
     pub pid: SigmaU64,
     pub syscall_num: SigmaU64,
     pub args: [SigmaU64; 6],
@@ -56,4 +56,6 @@ pub unsafe extern "C" fn print_s64() {
 #[no_mangle]
 pub unsafe extern "C" fn dump_entry() {
 }
+
+
 

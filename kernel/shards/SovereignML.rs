@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,20 +16,20 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: to::SovereignML ─────────────────────
+// â”€â”€â”€ Module: to::SovereignML â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SovereignGraphPlotter — hardware-compatible struct.
+/// SovereignGraphPlotter â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignGraphPlotter {
     pub plots: SigmaU64,
     pub dashboards: SigmaU64,
 }
 
-/// SovereignNeuralForge — hardware-compatible struct.
+/// SovereignNeuralForge â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SovereignNeuralForge {
     pub fwd_passes: SigmaU64,
     pub automl_steps: SigmaU64,
 }
@@ -53,4 +53,6 @@ pub unsafe extern "C" fn neural_init() {
 #[no_mangle]
 pub unsafe extern "C" fn neural_automl() {
 }
+
+
 

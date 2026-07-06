@@ -1,11 +1,11 @@
-/// SigmaOS: SovereignKeybind � Dynamic keybinding and shortcut orchestration.
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SovereignKeybind ï¿½ Dynamic keybinding and shortcut orchestration.
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignKeybindShard ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignKeybindShard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Keybind — hardware-compatible struct.
+/// Keybind â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Keybind {
     pub key_code: SigmaU32,
     pub modifiers: SigmaU32,
     pub active: SigmaBool,
 }
 
-/// SovereignKeybindShard — OOP singleton pattern.
+/// SovereignKeybindShard â€” OOP singleton pattern.
 pub struct SovereignKeybindShard {
     pub initialized: SigmaBool,
 }
@@ -80,4 +80,6 @@ pub unsafe extern "C" fn sigma_keybind_add() {
 pub unsafe extern "C" fn sigma_keybind_trigger() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign ZFS-COW Storage Pool (S-ZFS)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign ZFS-COW Storage Pool (S-ZFS)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignZFSEngine ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignZFSEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// StorageDevice — hardware-compatible struct.
+/// StorageDevice â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct StorageDevice {
     pub path: [u8; 64],
     pub capacity_gb: SigmaU32,
     pub used_gb: SigmaU32,
     pub active: SigmaBool,
 }
 
-/// SovereignZFSEngine — OOP singleton pattern.
+/// SovereignZFSEngine â€” OOP singleton pattern.
 pub struct SovereignZFSEngine {
     pub initialized: SigmaBool,
 }
@@ -121,4 +121,6 @@ pub unsafe extern "C" fn zfs_snapshot() {
 pub unsafe extern "C" fn zfs_audit() {
     INSTANCE.initialized = true;
 }
+
+
 

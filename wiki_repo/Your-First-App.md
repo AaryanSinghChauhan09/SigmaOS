@@ -7,8 +7,11 @@ This tutorial walks through building, testing, and "installing" a minimal SigmaO
 ## What you'll build
 
 A simple **file word-counter** app that:
+
 1. Lets the user pick a text file from their home directory
+
 2. Spawns the native `wc` binary to count words
+
 3. Displays the result in the browser
 
 ---
@@ -16,7 +19,9 @@ A simple **file word-counter** app that:
 ## Prerequisites
 
 - SigmaOS running in QEMU or on hardware (or the web shell at `http://localhost:8080` in dev mode)
+
 - A text editor (SigmaCode is built in, or use the host machine)
+
 - Basic knowledge of HTML/JavaScript
 
 ---
@@ -41,9 +46,12 @@ Every SigmaOS app needs a `manifest.json` that declares its identity and capabil
 }
 ```
 
-**Key fields:**
+### Key fields:
+
 - `id` — reverse-domain identifier, must be globally unique
+
 - `start_url` — the entry point URL for the app
+
 - `capabilities` — the minimum set of permissions the app needs to function
 
 ---
@@ -94,7 +102,7 @@ const errDiv  = document.getElementById('error');
 async function loadFiles() {
   try {
     const entries = await navigator.sigmaos.fs.readdir('/home/user');
-    
+
     entries
       .filter(e => e.type === 'file' && e.name.endsWith('.txt'))
       .forEach(e => {
@@ -175,13 +183,16 @@ loadFiles();
 In the SigmaOS shell, open the App Store (or use the developer install flow):
 
 1. Open the **Settings** app → **Developer Mode** → enable it.
+
 2. Click **Install from URL** and paste the URL where your app is hosted (or `localhost:3000` if running a dev server).
+
 3. SigmaOS reads the `manifest.json`, prompts you to grant the declared capabilities, and adds the app to the launcher.
 
 For local development, you can also serve the app with:
 
 ```bash
 npx serve .   # runs on localhost:3000
+
 ```
 
 Then install it from `http://localhost:3000/manifest.json`.
@@ -197,8 +208,11 @@ Now try removing `"process:spawn"` from your manifest and reinstalling. When you
 ## What's next
 
 - **Add stdin**: Pass file contents as stdin to `wc -w` instead of a path argument, using `navigator.sigmaos.fs.read()`.
+
 - **Stream output**: For long-running processes, render each chunk as it arrives using the `for await` loop.
+
 - **Add AI**: Call `navigator.sigmaos.ai.complete()` to summarize the document after counting words.
+
 - **Publish**: Submit a PR to the [sigmaos/app-registry](https://github.com/sigmaos/app-registry) repo with your `manifest.json` and it will appear in the public App Store.
 
 ---

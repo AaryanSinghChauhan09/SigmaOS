@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_initramfs_loader: Sovereign Initial RAM Disk Loader
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_initramfs_loader: Sovereign Initial RAM Disk Loader
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_initramfs_loader ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_initramfs_loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CpioHeader — hardware-compatible struct.
+/// CpioHeader â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CpioHeader {
     pub magic: [u8; 6],
     pub ino: [u8; 8],
     pub mode: [u8; 8],
@@ -41,4 +41,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn sigma_extract_initramfs() {
 }
+
+
 

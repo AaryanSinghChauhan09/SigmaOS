@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_htop: Sovereign Interactive Process Monitor
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_htop: Sovereign Interactive Process Monitor
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,16 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_htop ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_htop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ProcessInfo — hardware-compatible struct.
+/// ProcessInfo â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ProcessInfo {
     pub pid: SigmaI32,
     pub name: [u8; 32],
     pub state: SigmaI32,
     pub mem_kb: SigmaI32,
     pub cpu_percent: SigmaI32,
 }
+
+
 

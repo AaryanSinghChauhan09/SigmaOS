@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_web_runtime module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_web_runtime module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,16 +16,16 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignWebAssemblyVM ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignWebAssemblyVM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// VDOMNode — hardware-compatible struct.
+/// VDOMNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct VDOMNode {
     pub child_count: SigmaI32,
 }
 
-/// SovereignWebAssemblyVM — OOP singleton pattern.
+/// SovereignWebAssemblyVM â€” OOP singleton pattern.
 pub struct SovereignWebAssemblyVM {
     pub initialized: SigmaBool,
 }
@@ -108,4 +108,6 @@ pub unsafe extern "C" fn DispatchGraphQLQuery() {
 pub unsafe extern "C" fn initialize_web_runtime() {
     INSTANCE.initialized = true;
 }
+
+
 

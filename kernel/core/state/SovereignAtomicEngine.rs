@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignAtomicEngine ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignAtomicEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Generation — hardware-compatible struct.
+/// Generation â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Generation {
     pub id: SigmaU32,
     pub timestamp: SigmaU32,
     pub description: [u8; 128],
@@ -31,10 +31,10 @@ pub struct {s_name} {{
     pub layer_count: SigmaU32,
 }
 
-/// OverlayLayer — hardware-compatible struct.
+/// OverlayLayer â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct OverlayLayer {
     pub id: SigmaU32,
     pub type: SigmaU64,
     pub mount_point: [u8; 64],
@@ -42,10 +42,10 @@ pub struct {s_name} {{
     pub size_bytes: SigmaU64,
 }
 
-/// PartitionState — hardware-compatible struct.
+/// PartitionState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PartitionState {
     pub active_slot: SigmaU8,
     pub pending_slot: SigmaU8,
     pub update_in_progress: SigmaBool,
@@ -54,26 +54,26 @@ pub struct {s_name} {{
     pub verified: SigmaBool,
 }
 
-/// ServiceDeclaration — hardware-compatible struct.
+/// ServiceDeclaration â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ServiceDeclaration {
     pub name: [u8; 64],
     pub enabled: SigmaBool,
     pub auto_restart: SigmaBool,
 }
 
-/// DeclarativeConfig — hardware-compatible struct.
+/// DeclarativeConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct DeclarativeConfig {
     pub desktop: [u8; 32],
     pub kernel_profile: [u8; 32],
     pub service_count: SigmaU32,
     pub generation_id: SigmaU32,
 }
 
-/// SovereignAtomicEngine — OOP singleton pattern.
+/// SovereignAtomicEngine â€” OOP singleton pattern.
 pub struct SovereignAtomicEngine {
     pub initialized: SigmaBool,
 }
@@ -186,4 +186,6 @@ pub unsafe extern "C" fn createGeneration() {
 pub unsafe extern "C" fn atomic_init() {
     INSTANCE.initialized = true;
 }
+
+
 

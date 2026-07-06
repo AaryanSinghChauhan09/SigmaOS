@@ -79,14 +79,21 @@ then layers on the sovereign differentiators that make SigmaOS worth choosing.
 ### CI Gate
 
 ```yaml
+
 # Must pass before v0.1 tag
+
 - make iso                          # builds without error
+
 - qemu-system-x86_64 -cdrom ...     # boots to sigma-sh prompt
+
 - echo "hello" | sigma-sh           # shell executes command
+
 - sigma-pkg install hello           # installs a test package
+
 ```
 
 ### Exit Criteria
+
 > A user can: download ISO → boot in QEMU → type commands in sigma-sh →
 > install a package with sigma-pkg → shut down cleanly.
 
@@ -97,34 +104,55 @@ then layers on the sovereign differentiators that make SigmaOS worth choosing.
 > Goal: AppImage + Flatpak + Snap. Developer SDK. Enough apps to be useful daily.
 
 ### Package Ecosystem
+
 - `sigma-pkg` online registry at `pkg.sigmaos.app`
+
 - 50 essential packages: browser, text editor, git, curl, Python 3, Node.js
+
 - sigpkg build spec format (`PKGBUILD`-style) + reproducible builds
+
 - Cryptographic package signing (Dilithium-5) verified on install
 
 ### Desktop
+
 - Zenith Desktop on real framebuffer (DRM/KMS via i915 / VirtIO-GPU)
+
 - Auto-tiling window manager (keyboard-driven)
+
 - Theme engine + accessibility (high contrast, screen reader stub)
+
 - sigma-ai: TinyLlama on-device inference daemon
 
 ### Driver Coverage
+
 - Intel i915 modesetting
+
 - AMD amdgpu basic
+
 - Intel iwlwifi Wi-Fi 6
+
 - USB HID complete (keyboard, mouse, touchpad)
+
 - HDA audio
 
 ### Distribution Formats Added
+
 - AppImage (Linux portable)
+
 - Flatpak via Flathub submission
+
 - Snap submission
+
 - Electron installer (Windows + macOS)
 
-**Month 67-72 (March-August 2032)**
+### Month 67-72 (March-August 2032)
+
 - Automated testing infrastructure
+
 - Continuous integration for all components
+
 - Performance regression testing
+
 - Security vulnerability scanning
 
 ---
@@ -132,153 +160,263 @@ then layers on the sovereign differentiators that make SigmaOS worth choosing.
 ## Advanced Future Development Ideas (2033+)
 
 ### AI-Native Operating System Architecture
-**Neural Kernel Integration**
+
+### Neural Kernel Integration
+
 - Neural network acceleration in kernel space for real-time AI inference
+
 - Hardware-accelerated AI scheduling using NPU/TPU integration
+
 - Adaptive resource allocation based on AI workload patterns
+
 - Federated learning framework for distributed model training
+
 - AI-driven system optimization and self-tuning
 
-**Agentic Computing Framework**
+### Agentic Computing Framework
+
 - Native support for autonomous AI agents with system-level permissions
+
 - Agent marketplace and sandboxed execution environment
+
 - Inter-agent communication protocols and orchestration
+
 - AI-powered system administration and maintenance
+
 - Predictive failure detection and automated remediation
 
 ### Quantum Computing Preparation
-**Post-Quantum Cryptography Suite**
+
+### Post-Quantum Cryptography Suite
+
 - Complete migration to quantum-resistant algorithms (Kyber, Dilithium, Falcon)
+
 - Quantum key distribution (QKD) integration for secure communications
+
 - Hybrid classical-quantum cryptographic protocols
+
 - Quantum random number generation integration
+
 - Quantum-safe digital identity and authentication
 
-**Quantum Simulation Capabilities**
+### Quantum Simulation Capabilities
+
 - Quantum circuit simulation framework for algorithm development
+
 - Integration with quantum cloud services (IBM Q, Google Cirq, Amazon Braket)
+
 - Quantum error correction simulation and testing
+
 - Hybrid classical-quantum application development tools
+
 - Quantum algorithm optimization and compilation
 
 ### Advanced Cloud & Distributed Computing
-**SigmaOS Cloud Platform**
+
+### SigmaOS Cloud Platform
+
 - Native cloud-native application deployment framework
+
 - Serverless computing with automatic scaling
+
 - Edge computing integration with distributed execution
+
 - Multi-cloud orchestration and management
+
 - Cloud-native storage with global consistency
 
-**Distributed Systems Framework**
+### Distributed Systems Framework
+
 - Consensus algorithms for distributed state management
+
 - Distributed transaction processing with ACID guarantees
+
 - Peer-to-peer networking with NAT traversal
+
 - Distributed filesystem with global namespace
+
 - Byzantine fault tolerance for critical systems
 
 ### Advanced Security & Privacy
-**Zero-Trust Security Architecture**
+
+### Zero-Trust Security Architecture
+
 - Continuous authentication and authorization
+
 - Micro-segmentation with dynamic policy enforcement
+
 - Behavioral analytics for anomaly detection
+
 - Deception technology for threat detection
+
 - Automated incident response and containment
 
-**Privacy-Preserving Technologies**
+### Privacy-Preserving Technologies
+
 - Homomorphic encryption for private computation
+
 - Secure multi-party computation (SMPC) framework
+
 - Differential privacy for data analytics
+
 - Privacy-preserving machine learning
+
 - Anonymous communication networks (Tor-like integration)
 
 ### Next-Generation Hardware Support
-**Neuromorphic Computing**
+
+### Neuromorphic Computing
+
 - Support for neuromorphic chips (Intel Loihi, IBM TrueNorth)
+
 - Spiking neural network simulation and execution
+
 - Event-driven processing frameworks
+
 - Brain-inspired computing paradigms
+
 - Low-power AI inference at the edge
 
-**Advanced Memory Technologies**
+### Advanced Memory Technologies
+
 - Persistent memory (PMEM) integration and optimization
+
 - Heterogeneous memory management (HBM, CXL, Optane)
+
 - Memory-centric computing architectures
+
 - Non-volatile RAM filesystems
+
 - Advanced caching and prefetching strategies
 
 ### Developer Experience Revolution
-**AI-Augmented Development Environment**
+
+### AI-Augmented Development Environment
+
 - Intelligent code completion with context awareness
+
 - Automated refactoring and optimization suggestions
+
 - Real-time performance profiling and optimization
+
 - Automated testing generation and execution
+
 - AI-powered debugging and error resolution
 
-**Next-Generation Build Systems**
+### Next-Generation Build Systems
+
 - Incremental compilation at the function level
+
 - Distributed compilation with automatic load balancing
+
 - Build artifact caching with intelligent invalidation
+
 - Reproducible builds with cryptographic verification
+
 - Continuous performance monitoring of builds
 
 ### Sustainability & Energy Efficiency
-**Green Computing Initiatives**
+
+### Green Computing Initiatives
+
 - Dynamic power management based on workload
+
 - Carbon footprint tracking and optimization
+
 - Energy-efficient scheduling algorithms
+
 - Renewable energy-aware resource allocation
+
 - Thermal management and cooling optimization
 
-**Circular Computing**
+### Circular Computing
+
 - Hardware lifecycle management and recycling
+
 - Component-level upgradeability
+
 - Resource-efficient virtualization
+
 - Sustainable software development practices
+
 - Environmental impact reporting
 
 ### Space & Specialized Domains
-**Space-Ready Operating System**
+
+### Space-Ready Operating System
+
 - Radiation-hardened kernel components
+
 - Real-time guaranteed execution for critical systems
+
 - Satellite communication protocols
+
 - Autonomous spacecraft operation support
+
 - Deep space networking protocols
 
-**Scientific Computing Platform**
+### Scientific Computing Platform
+
 - High-performance computing (HPC) integration
+
 - Numerical computing libraries and frameworks
+
 - Scientific visualization tools
+
 - Large-scale data processing pipelines
+
 - Computational fluid dynamics support
 
 ### Human-Computer Interaction
-**Next-Generation User Interfaces**
+
+### Next-Generation User Interfaces
+
 - Brain-computer interface (BCI) integration
+
 - Augmented reality (AR) and virtual reality (VR) support
+
 - Natural language processing for system control
+
 - Gesture recognition and eye tracking
+
 - Haptic feedback integration
 
-**Accessibility & Inclusion**
+### Accessibility & Inclusion
+
 - Universal design principles throughout the OS
+
 - Advanced screen reading and magnification
+
 - Voice control and dictation integration
+
 - Cognitive load reduction features
+
 - Customizable accessibility profiles
 
 ### Blockchain & Web3 Integration
-**Decentralized Infrastructure**
+
+### Decentralized Infrastructure
+
 - Native blockchain node support
+
 - Smart contract execution environment
+
 - Decentralized storage integration (IPFS, Filecoin)
+
 - Web3 protocol support (Ethereum, Polkadot, Solana)
+
 - Token-based resource management
 
-**Digital Identity & Sovereignty**
+### Digital Identity & Sovereignty
+
 - Self-sovereign identity (SSI) framework
+
 - Decentralized identifiers (DIDs)
+
 - Verifiable credentials system
+
 - Privacy-preserving authentication
+
 - Reputation and trust systems
 
 ---
@@ -290,9 +428,13 @@ then layers on the sovereign differentiators that make SigmaOS worth choosing.
 SigmaOS is a sovereign, next-generation operating system designed to compete with and eventually surpass major Linux distributions (Arch, Fedora, Ubuntu, Alpine) by combining:
 
 - Zero-trust security with post-quantum cryptography
+
 - Multi-format deployment (bare metal, cloud, browser, mobile, WASM)
+
 - Developer-first architecture with formal verification
+
 - India Stack integration for emerging markets
+
 - Modular, sharded design for fault tolerance and scaling
 
 This roadmap charts the path from Phase 1 (Bootable OS) to Phase 9 (Formal Verification + 1,000 Villages) across 9 phases over 60 months.
@@ -359,13 +501,19 @@ This roadmap charts the path from Phase 1 (Bootable OS) to Phase 9 (Formal Verif
 
 ```bash
 make PROFILE=standalone all  # → SigmaOS.iso (150–200 MB)
+
 qemu-system-x86_64 -cdrom SigmaOS.iso  # → shell prompt ✅
+
 ```
 
 **Success Metrics**:
+
 - ✅ ISO boots in QEMU without external bootloader
+
 - ✅ Kernel runs scheduler for ≥5 seconds without panic
+
 - ✅ User gets shell prompt (sigma:~#)
+
 - ✅ Basic commands work: echo, ls, cd, pwd
 
 ### Phase 2: Hardware Support & Basic Usability (Months 3–6) — CONNECTIVITY
@@ -408,25 +556,37 @@ qemu-system-x86_64 -cdrom SigmaOS.iso  # → shell prompt ✅
 #### 2.4 Deliverables
 
 ```bash
+
 # Bootable ISO + working shell
+
 qemu-system-x86_64 -cdrom SigmaOS.iso -device e1000 -net user
 
 # On boot:
+
 sigma:~# echo "Hello, SigmaOS"
+
 Hello, SigmaOS
 sigma:~# sigma-pkg install git
+
 [installed git 2.45.0]
 sigma:~# ifconfig
+
 eth0: 192.168.1.100/24
 sigma:~# git clone https://github.com/example/repo.git
+
 [cloned 256 files]
 ```
 
 **Success Metrics**:
+
 - ✅ Network card (e1000) works
+
 - ✅ sigma-sh REPL with tab completion
+
 - ✅ sigma-pkg install works for 50+ packages
+
 - ✅ USB keyboard + mouse work
+
 - ✅ DHCP gives IP address automatically
 
 ### Phase 3: Desktop & Multi-Platform (Months 6–14) — USABILITY + EXPANSION
@@ -477,7 +637,9 @@ sigma:~# git clone https://github.com/example/repo.git
 #### 3.5 Deliverables
 
 ```bash
+
 # Zenith desktop on QEMU
+
 qemu-system-x86_64 \
   -kernel sigma-kernel \
   -device i915 \
@@ -485,18 +647,25 @@ qemu-system-x86_64 \
   -device ramfb  # → Zenith DE boots ✅
 
 # ARM64
+
 make PROFILE=standalone ARCH=arm64 all  # → Raspberry Pi image
 
 # API client
+
 sigma-health login --qr-code
 sigma-accounts file-gstr "sales_return_jan_2024.pdf"
 ```
 
 **Success Metrics**:
+
 - ✅ Zenith desktop boots with wallpaper + taskbar
+
 - ✅ GPU acceleration works (i915 or virtio-gpu)
+
 - ✅ Raspberry Pi 4 boots and shows desktop
+
 - ✅ ABDM login via QR code works
+
 - ✅ GST filing tool launches and communicates with NIC
 
 ### Phase 4: Security Hardening (Months 12–18) — DEFENSE
@@ -534,24 +703,34 @@ sigma-accounts file-gstr "sales_return_jan_2024.pdf"
 #### 4.4 Deliverables
 
 ```bash
+
 # Verified kernel module
+
 sigma-verify kernel.elf  # → ✅ all invariants proven
 
 # TPM2 sealing
+
 sigma-tpm2 seal-key --pcr 0-7 > encrypted_key.bin
 
 # Package signing
+
 sigma-pkg sign libcurl-8.0.tar  # → libcurl-8.0.tar.sig (Dilithium-5)
 
 # Audit log
+
 sigma-audit list --immutable-only | head -50
 ```
 
 **Success Metrics**:
+
 - ✅ Kernel MM + scheduler formally verified in Coq
+
 - ✅ TPM2 seals bootloader measurements
+
 - ✅ All packages signed with Dilithium-5
+
 - ✅ Audit log uses hardware TPM for authenticity
+
 - ✅ Zero CVEs in verified modules
 
 ### Phase 5: Multi-Platform & Cloud (Months 15–21) — REACH
@@ -591,28 +770,43 @@ sigma-audit list --immutable-only | head -50
 #### 5.4 Deliverables
 
 ```bash
+
 # Raspberry Pi 4 image
+
 make PROFILE=standalone ARCH=arm64 BOARD=rpi4 all
+
 # → SigmaOS-rpi4.img.xz (450 MB)
 
 # AWS AMI
+
 make PROFILE=cloud ARCH=arm64 TARGET=aws all
+
 # → ami-0abc123def456... (registered in us-east-1)
 
 # Docker image
+
 make PROFILE=cloud ARCH=arm64 TARGET=docker all
+
 # → sigmaos:latest (120 MB, OCI format)
 
 # Boot on Pi 4
+
 dd if=SigmaOS-rpi4.img of=/dev/sdX bs=4M
+
 # → desktop on HDMI ✅
+
 ```
 
 **Success Metrics**:
+
 - ✅ Raspberry Pi 4 boots and shows desktop
+
 - ✅ AWS Graviton AMI launches and network works
+
 - ✅ Docker sigmaos:latest runs and starts shell
+
 - ✅ All 6 cloud providers have working images
+
 - ✅ RISC-V simulator boots (experimental)
 
 ### Phase 6: AI & Advanced Features (Months 18–24) — INTELLIGENCE
@@ -647,28 +841,42 @@ dd if=SigmaOS-rpi4.img of=/dev/sdX bs=4M
 #### 6.4 Deliverables
 
 ```bash
+
 # Local LLM inference (4GB RAM, no internet)
+
 sigma-ai ask "What is the fastest car?"
+
 # → Sarvam-2 model inference: ~200ms response
 
 # Crash analysis
+
 sigma-heal analyze /var/log/crashes/2026-07-03.log
+
 # → "Segfault at 0xdeadbeef due to null pointer in shm_alloc()"
 
 # Federated learning
+
 sigma-fedlearn train --data ~/patient_records/ --epochs 5
+
 # → Model improves without uploading data
 
 # Self-healing demo
+
 killall sigma-shard-graphics  # Force crash
+
 sleep 2
 pgrep sigma-shard-graphics  # ✅ Restarted automatically
+
 ```
 
 **Success Metrics**:
+
 - ✅ LLM generates reasonable text (5-10 word perplexity)
+
 - ✅ Federated learning improves model accuracy
+
 - ✅ Crashed shards auto-restart within 100ms
+
 - ✅ Anomaly detection catches 95%+ of known attack patterns
 
 ### Phase 7: Enterprise & Government (Months 24–36) — SCALE
@@ -704,24 +912,36 @@ pgrep sigma-shard-graphics  # ✅ Restarted automatically
 #### 7.4 Deliverables
 
 ```bash
+
 # Fleet management
+
 sigma-fleet register --nic-id NIC-2026-001
 sigma-fleet deploy --version 3.0 --target all-nics
+
 # → 1,000 machines update atomically
 
 # Device compliance
+
 sigma-audit export --format=pdf > compliance-report.pdf
+
 # → Generate SOC2/ISO27001 report automatically
 
 # Hardware certification
+
 sigma-certify intel-i7-13700K  # → ✅ Certified for production
+
 ```
 
 **Success Metrics**:
+
 - ✅ 1,000 NIC machines running SigmaOS
+
 - ✅ STQC quality certification obtained
+
 - ✅ DRDO pilot pass all security tests
+
 - ✅ OEM partnerships signed (Lava + Micromax)
+
 - ✅ Enterprise support SLA: 4-hour response
 
 ### Phase 8: Rural Infrastructure (Months 30–42) — UNIVERSAL
@@ -756,28 +976,41 @@ sigma-certify intel-i7-13700K  # → ✅ Certified for production
 #### 8.4 Deliverables
 
 ```bash
+
 # Village stack (no internet)
+
 sigma-gram register --village-code UP-2026-00042
 sigma-gram mgnrega --worker-id MGNREGA-123 --hours 8
+
 # → Payment latency < 24 hours (via mesh + BharatNet)
 
 # Health records (offline-first)
+
 sigma-health-rural add-patient \
   --name "Ramesh Kumar" \
   --village "Sitpur" \
   --sync-on-net
+
 # → Syncs to central when connection available
 
 # Offline LLM
+
 sigma-ai --offline ask "How to treat fever at home?"
+
 # → Responds with Ayurvedic remedies using local model
+
 ```
 
 **Success Metrics**:
+
 - ✅ 1,000 villages have SigmaOS devices
+
 - ✅ Panchayat management works offline + syncs
+
 - ✅ MGNREGA payment latency < 24 hours
+
 - ✅ Health records replicate via CRDT
+
 - ✅ Mesh network connects 5+ villages
 
 ### Phase 9: Research & Formal Verification (Months 36–60) — FOREVER
@@ -813,32 +1046,50 @@ sigma-ai --offline ask "How to treat fever at home?"
 #### 9.4 Deliverables
 
 ```bash
+
 # Formally verified kernel
+
 sigma-verify kernel.v  # Coq proof checker
+
 # → ✅ Kernel proved safe for all inputs
 
 # Rust migration complete
+
 sigma-cve --historical | grep "memory-safety"
+
 # → Zero results (2026+)
 
 # 1M deployment milestone
+
 sigma-registry stats
+
 # → 1,000,000 active devices
+
 # → 42,000 villages
+
 # → 1.2B users (India)
 
 # 5G telco network
+
 sigma-telco init --mode=5g --ran=open
 sigma-telco cell-add --frequency=28GHz --power=43dBm
+
 # → Open RAN network running on SigmaOS
+
 ```
 
 **Success Metrics**:
+
 - ✅ Kernel + scheduler + MM fully formally verified
+
 - ✅ 100% of code migrated to Rust (where applicable)
+
 - ✅ Zero memory-safety CVEs ever reported
+
 - ✅ 1M+ devices running SigmaOS
+
 - ✅ 5G telco networks operational
+
 - ✅ Academic papers published (3+ top-tier venues)
 
 ## PART 3: WHAT'S MISSING COMPARED TO LINUX DISTROS
@@ -886,46 +1137,77 @@ sigma-telco cell-add --frequency=28GHz --power=43dBm
 ## PART 4: SUCCESS METRICS & MILESTONES
 
 ### Phase 1 (Months 1–3)
+
 - ✅ Bootable ISO ships
+
 - ✅ Shell works (echo, ls, cd, pwd)
+
 - ✅ Kernel uptime > 1 hour without panic
+
 - ✅ QEMU CI passes
+
 - 🎯 1,000 GitHub stars
 
 ### Phase 2 (Months 3–6)
+
 - ✅ Network works (ping, curl, git)
+
 - ✅ sigma-pkg installs 50 packages
+
 - ✅ Real hardware boots (laptop/desktop)
+
 - ✅ WiFi working on common chipsets
+
 - 🎯 10,000 GitHub stars
+
 - 🎯 500+ packages in registry
 
 ### Phase 3 (Months 6–14)
+
 - ✅ Zenith desktop boots
+
 - ✅ Raspberry Pi 4 boots and shows desktop
+
 - ✅ ABDM login via QR works
+
 - ✅ AWS AMI available
+
 - 🎯 50,000 GitHub stars
+
 - 🎯 10,000 active devices
 
 ### Phase 4 (Months 12–18)
+
 - ✅ Kernel formally verified (IPC + scheduler)
+
 - ✅ Zero critical CVEs
+
 - ✅ TPM2 sealing works
+
 - 🎯 100,000 GitHub stars
 
 ### Phase 7 (Months 24–36)
+
 - ✅ 1,000 NIC machines running
+
 - ✅ STQC certification obtained
+
 - 🎯 1,000,000 GitHub stars
+
 - 🎯 100,000 active devices
 
 ### Phase 9 (Months 36–60)
+
 - ✅ Formal verification complete
+
 - ✅ Rust migration 100%
+
 - ✅ Zero memory-safety CVEs ever
+
 - ✅ 5G telco networks operational
+
 - 🎯 1,000,000+ devices running
+
 - 🎯 42,000+ villages using SigmaOS
 
 ## CONCLUSION: The Path Forward
@@ -933,39 +1215,63 @@ sigma-telco cell-add --frequency=28GHz --power=43dBm
 SigmaOS is not competing with Linux distros today — it's building the foundation to compete in 2027.
 
 The roadmap is ambitious but achievable:
+
 - **Phase 1–2 (6 months)**: Match Alpine Linux basics
+
 - **Phase 2–3 (12 months)**: Achieve desktop usability
+
 - **Phase 4–6 (24 months)**: Surpass Ubuntu on security + multi-format
+
 - **Phase 7–9 (60 months)**: Redefine what an OS can be
 
 **Key differentiators that Linux cannot easily copy**:
+
 - ✅ Multi-format from one codebase — architectural advantage
+
 - ✅ PQC by default — security advantage
+
 - ✅ Formal verification — trust advantage
+
 - ✅ India Stack native — market advantage
+
 - ✅ Modular sharded design — fault tolerance advantage
 
 **Immediate next steps (Next 30 days)**:
+
 1. Hire kernel team (3 engineers) — scheduler + MM experts
+
 2. Define Phase 1 sprint schedule — 8-week plan
+
 3. Set up QEMU CI — daily boot tests
+
 4. Launch Phase 1 tracking issue — public roadmap
+
 5. Community call #1 — share vision with contributors
 
 **The vision**: In 2027, SigmaOS will be the OS that developers choose because it's more secure, more flexible, and more sovereign than Linux.
 
 ---
 
-*Document Version: 2.0*  
-*Last Updated: 2026-07-04*  
-*Maintained by: SigmaOS Core Team*  
-*Next Review: Monthly (Phase-aligned)*
+### Document Version: 2.0
+
+### Last Updated: 2026-07-04
+
+### Maintained by: SigmaOS Core Team
+
+### Next Review: Monthly (Phase-aligned)
+
 =======
+
 ### Developer SDK
+
 - sigma-sdk: compiler toolchain, headers, sigma-pkg build tool
+
 - Electron app template + TypeScript types for `navigator.sigmaos.*`
+
 - Python bindings (`pip install sigmaos`)
+
 - Java bindings (JAR + Maven)
+
 - Documentation site: `docs.sigmaos.app`
 
 ---
@@ -975,26 +1281,41 @@ The roadmap is ambitious but achievable:
 > Goal: mobile + WASM sandbox + cloud images. Expand beyond desktop.
 
 ### Mobile
+
 - ARM64 APK (Android 12+) via sigma-mobile build target
+
 - iOS IPA via TestFlight
+
 - Cross-platform via React Native + sigma-rn plugin
+
 - PWA installable from browser
 
 ### WASM Sandbox
+
 - Full sigma kernel compiled to WASM/WASI
+
 - Runs in Chrome/Firefox/Safari — no install
+
 - sigma-wasm npm package
 
 ### Cloud
+
 - AWS AMI + GCE image + Azure VHD published
+
 - OCI container image: `docker pull sigmaos/paas:2.0`
+
 - FaaS runtime for AWS Lambda custom runtime
+
 - Kubernetes operator for sigma-pod workloads
 
 ### Security Maturity
+
 - sigma_pledge + sigma_unveil enforced in all userland processes
+
 - TPM2 attestation on cloud images
+
 - Reproducible builds verified by CI
+
 - CVE response SLA: 72 hours for critical, 14 days for high
 
 ---
@@ -1005,26 +1326,41 @@ The roadmap is ambitious but achievable:
 > Beat Fedora CoreOS on cloud. Rival VxWorks on RTOS.
 
 ### RTOS
+
 - EDF scheduler with <10 µs IRQ latency
+
 - ROS 2 DDS middleware port
+
 - SovereignWCET: worst-case execution time analyser
+
 - Bare-metal firmware images (STM32, ESP32, RP2040)
 
 ### Distributed
+
 - SovereignConsensus (RAFT-inspired) <15 ms over GbE
+
 - CRDT offline-first sync (sigma-cloudsync)
+
 - Grid computing work-stealing scheduler
+
 - Actor model runtime (sigma-bus mailbox)
 
 ### Formal Verification
+
 - Coq proofs for microkernel memory safety
+
 - seL4-style capability model verification
+
 - sigma-audit: kernel-level syscall monitoring for compliance
 
 ### Governance
+
 - RFC process for kernel changes
+
 - LTS branch: 5-year security support
+
 - sigma-security-advisories mailing list
+
 - Public CVE database at `cve.sigmaos.app`
 
 ---
@@ -1070,10 +1406,15 @@ and on par with Alpine on usability. Everything after that is gravy.
 If you want to contribute, work in this order:
 
 1. **Kernel boot** — `kernel/core/sigma_sched.cpp`, `sigma_mm.cpp`, `sigma_irq.cpp`
+
 2. **sigma-sh** — `userland/shell/sigma_shell.cpp`
+
 3. **sigma-pkg** — `userland/pkg/sigma_registry.cpp`
+
 4. **Drivers** — `drivers/display/sigma_vesa.cpp`, `drivers/input/sigma_hid.rs`
+
 5. **Installer** — `userland/installer/`
+
 6. **Docs** — wiki pages, man pages, troubleshooting guide
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the technical mandates and PR process.

@@ -1,59 +1,63 @@
-# Sovereign Support Nexus
+# SigmaOS Support
 
-Welcome to the SigmaOS Support Nexus. As an industrial-grade operating system, SigmaOS provides several tiers of support for the Sovereign Lattice.
+## Getting Help
 
-## 🛠 Self-Service Support
+### GitHub Discussions
+Best place for questions, ideas, and general help:
+https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
 
-### 1. The Sovereign Wiki
+### GitHub Issues
+For confirmed bugs and feature requests:
+https://github.com/AaryanSinghChauhan09/SigmaOS/issues
 
-The [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) is the primary source of truth for all 600 shards, API references, and industrial strategy.
+**Before opening an issue:**
+- Search existing issues first
+- Check [CURRENT_PROBLEMS_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST.md) — your issue may already be tracked
+- Use the appropriate issue template (bug, feature, driver request, docs)
 
-### 2. S-LOG Telemetry
+### Wiki
+Comprehensive documentation:
+https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 
-If you encounter a shard failure, check the internal journal logs:
+---
 
-```bash
+## Issue Labels
 
-# View real-time kernel telemetry
+| Label | Meaning |
+|-------|---------|
+| `bug` | Something broken |
+| `feature` | New capability request |
+| `driver` | Hardware driver request |
+| `security` | Security-related (use private advisory for vulnerabilities) |
+| `docs` | Documentation improvement |
+| `kernel` | Core kernel subsystem |
+| `networking` | Network stack |
+| `fs` | Filesystem layer |
+| `good first issue` | Suitable for new contributors |
+| `help wanted` | Maintainers need community assistance |
 
-sigma-cli log --follow
+---
 
-```
+## Security Issues
 
-### 3. S-AUTO Self-Healing
+**Do not open public issues for security vulnerabilities.**
+See [SECURITY_POLICY.md](SECURITY_POLICY.md) for private reporting.
 
-SigmaOS is designed to automatically recover from shard-level corruption. If a component fails, the `SovereignRollbackShard` will attempt to restore the last stable PQC-attested snapshot.
+---
 
-## 🤝 Community & Industrial Support
+## FAQ
 
-### 1. S-FORUM (Lattice-Net)
+**Q: Is SigmaOS bootable on real hardware?**
+A: Not yet. `make iso` producing a bootable image is Phase G (v16.0 Apex, Q1 2027). Currently QEMU-testable.
 
-SigmaOS v15.0 introduces the **S-FORUM**, a decentralized support mesh. Unlike legacy forums, all SigmaOS support threads are:
+**Q: Can I run Linux apps on SigmaOS?**
+A: A Linux ELF compatibility layer (`runtime/containers/sigma_linux_compat.cpp`) is implemented. Full parity is Phase G+.
 
-- **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
+**Q: What architectures are supported?**
+A: x86_64 (primary), ARM64 (Phase G), RISC-V RV64GC (Phase H). HAL stubs exist for all three.
 
-***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY** playground.
+**Q: How do I contribute a driver?**
+A: See [CONTRIBUTING.md](CONTRIBUTING.md) and the SDF driver template in [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md).
 
-- **Self-Healing**: The S-WIKI automatically incorporates community-verified solutions.
-
-### 2. GitHub Issues
-
-For bug reports and architectural suggestions, please use the [Issue Tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues). Ensure you attach the relevant `S-LOG` artifacts.
-
-### 3. Professional Tiers
-
-For mission-critical industrial deployments (Bio-Fab, Aerospace, Defense), professional support is available via SAC-certified partners. Refer to the `Sovereign-Industrial-Contract.md` for SLA-backed support.
-
-## 🔍 Frequently Asked Questions (FAQ)
-
-### Q: How do I resolve include path errors?
-
-A: SigmaOS enforces root-relative addressing. Ensure your compiler search path includes the project root.
-
-### Q: My PQC keys are not synchronizing
-
-A: Verify that the `SovereignPQCEngine` is initialized and the hardware RNG (RDRAND) is accessible.
-
-### Q: Can I run Linux applications?
-
-A: Yes, via the `S-PROTON` bridge, which provides OCI-compliant sharding for mainstream binaries.
+**Q: Where is the package registry?**
+A: `sigma_pkg_registry/` in the repo. The online registry server is Phase G (#1011).

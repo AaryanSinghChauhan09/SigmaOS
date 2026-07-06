@@ -1,23 +1,20 @@
-# Security Hardening Policies
+# Security Policy
 
-SigmaOS utilizes a zero-trust, post-quantum architecture.
+## Supported Versions
 
-## 1. Access Control (S-ARMOR)
+Currently, only the `main` branch (EXTINCTION-1 APEX) receives active security patches.
 
-***Mandatory Access Control (MAC)**: Similar to SELinux/AppArmor, but enforced at the shard boundary.* **Privilege Separation**: Shards operate in isolated hardware rings with explicit IPC whitelisting.
+## Zero-Trust Architecture Guidelines
 
-## 2. Auditing & Logging
+SigmaOS employs a "Zero-Trust shard namespacing" model. When contributing or modifying suites:
 
-***Kernel-Level Audit**: All syscalls and inter-shard communications are logged.* **Immutable Logs**: Security-critical events are written to an append-only, cryptographically verifiable log.
+1. **No Implicit Trust:** No S-suite (S01-S33) inherently trusts another. All inter-suite communication MUST use the Sovereign Event Bus.
 
-## 3. Sandboxing & Isolation
+2. **WASM Isolation:** Untrusted or foreign logic MUST be executed inside the Native WASM JIT Engine within `S11_Virtualization`, adhering to WASI capability-based permissions.
 
-- User processes are isolated using sovereign namespaces and resource limitation cgroups.
+3. **Memory Safety:** Avoid raw pointers outside of the `S05_Memory` suite. Use the native `sigma_sdk_malloc` and bounds-checked wrappers.
 
-## 4. Cryptography
+## Reporting a Vulnerability
 
-***Post-Quantum Cryptography (PQC)**: Used for sealing shards and verifying inter-module signatures.* **Secure Boot**: Bootloader verifies signed binaries before execution.
-
-## 5. Testing & CI
-
-*Automated fuzzing (via `SovereignFuzzer`) is required for all new device drivers.* Regression tests continuously validate MAC policies.
+Do not report security vulnerabilities via public GitHub issues.
+Please email `security@sigmaos.dev` with a detailed description, PoC (if available), and potential mitigation. We aim to acknowledge reports within 48 hours.

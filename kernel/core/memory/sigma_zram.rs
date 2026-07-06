@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_zram module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_zram module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_zram ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_zram â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// zram_slot — hardware-compatible struct.
+/// zram_slot â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct zram_slot {
     pub offset: SigmaU64,
     pub comp_size: SigmaU64,
     pub flags: SigmaU64,
 }
 
-/// zram_stats — hardware-compatible struct.
+/// zram_stats â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct zram_stats {
     pub pages_stored: SigmaU64,
     pub pages_freed: SigmaU64,
     pub bytes_used: SigmaU64,
@@ -44,4 +44,6 @@ pub unsafe extern "C" fn sigma_zram_free_slot() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_zram_get_stats() {
 }
+
+
 

@@ -8,20 +8,20 @@ SigmaOS is available in multiple professional formats to ensure total industrial
 
 ## 🏛️ Deployment Formats Status
 
-| Format | Status | Primary Branch | Key Shards | 
-| :--- | :--- | :--- | :--- | 
+| Format | Status | Primary Branch | Key Shards |
+| :--- | :--- | :--- | :--- |
 
-| **Standalone (Bare Metal)** | 🟢 [STABLE] | `release/standalone` | `SovereignBoot`, `S-GPU`, `S-NVMe` | 
+| **Standalone (Bare Metal)** | 🟢 [STABLE] | `release/standalone` | `SovereignBoot`, `S-GPU`, `S-NVMe` |
 
-| **Dual Boot (Interop)** | 🟢 [STABLE] | `release/dual-boot` | `S-Compatibility`, `S-Partition`, `sigma-grub` | 
+| **Dual Boot (Interop)** | 🟢 [STABLE] | `release/dual-boot` | `S-Compatibility`, `S-Partition`, `sigma-grub` |
 
-| **App-Based (Runtime)** | 🟡 [BETA] | `release/app` | `S-Wine`, `S-ARC`, `S-WASM` | 
+| **App-Based (Runtime)** | 🟡 [BETA] | `release/app` | `S-Wine`, `S-ARC`, `S-WASM` |
 
-| **Browser-Based (Web)** | 🟡 [BETA] | `release/browser` | `ZenithWebUI`, `S-Sandboxing` | 
+| **Browser-Based (Web)** | 🟡 [BETA] | `release/browser` | `ZenithWebUI`, `S-Sandboxing` |
 
-| **Core (Headless/Server)** | 🟢 [STABLE] | `release/microkernel` | `S-SSH`, `S-Orchestrator`, `S-MM` | 
+| **Core (Headless/Server)** | 🟢 [STABLE] | `release/microkernel` | `S-SSH`, `S-Orchestrator`, `S-MM` |
 
-| **Distributed (Mesh)** | 🟠 [DEV] | `release/distributed` | `LatticeNet`, `S-Consensus` | 
+| **Distributed (Mesh)** | 🟠 [DEV] | `release/distributed` | `LatticeNet`, `S-Consensus` |
 
 ---
 
@@ -65,4 +65,4 @@ SigmaOS follows a **Strict Parity Protocol**. While the deployment format varies
 
 ---
 
-*SigmaOS — One Kernel. Every Hardware. Absolute Sovereignty.*
+### SigmaOS — One Kernel. Every Hardware. Absolute Sovereignty.

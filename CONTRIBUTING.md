@@ -37,9 +37,13 @@ Follow the conventional commit format with subsystem prefix:
 subsystem: short description (≤50 chars)
 
 Detailed explanation of the change, including:
+
 - Motivation for the change
+
 - Technical details of implementation
+
 - Testing performed
+
 - Performance impact (if any)
 
 References: Issue #123, PR #456
@@ -61,9 +65,13 @@ security/subject
 ```
 
 Examples:
+
 - `feature/kernel-adaptive-scheduler`
+
 - `fix/drivers-e1000-rx-overflow`
+
 - `docs/api-syscall-reference`
+
 - `security/kernel-seccomp-filter`
 
 ---
@@ -88,22 +96,30 @@ Cross-language calls go through `kabi/` using `#[repr(C)]` structs.
 ## Quick Start
 
 ```bash
+
 # 1. Fork and clone
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 
 # 2. Set up dev environment
+
 ./scripts/setup.sh          # installs Rust, Nim, Zig, QEMU toolchain
 
 # 3. Build
+
 cargo build --release       # Rust kernel + tools
+
 nim c -d:release userland/agent/sigma_agent_main.nim  # Nim CLI tools
 
 # 4. Run tests
+
 cargo test                  # Rust unit tests
+
 ./sigma-agent benchmark quick  # Agent quality tests
 
 # 5. Run in QEMU
+
 make PROFILE=standalone qemu
 ```
 
@@ -112,25 +128,41 @@ make PROFILE=standalone qemu
 ## What to Work On
 
 ### Easy (good first issues)
+
 - New sigma-agent workflow templates (`userland/agent/sigma_agent_workflow.nim`)
+
 - New sigma-agent plugin (`sigma-agent plugin create my-skill`)
+
 - Wiki page improvements (`wiki_repo/`)
+
 - New package recipes (`sigma_pkg_registry/recipes/`)
+
 - sigma-agent training samples (`userland/agent/sigma_agent_seed_v2.jsonl`)
+
 - Translation/localisation (`locales/`)
 
 ### Medium
+
 - New sigma-agent tools (implement `Tool` trait in `userland/agent/sigma_agent.rs`)
+
 - New sigma-agent explain topics (`userland/agent/sigma_agent_explain.nim`)
+
 - Package absorption improvements (`pkg/sigma_pkg_absorb.nim`)
+
 - Linux compatibility shim (`userland/compat/sigma_linux_compat.nim`)
+
 - New SDF drivers (`drivers/`)
+
 - Benchmark test cases (`userland/agent/sigma_agent_benchmark.nim`)
 
 ### Hard (core team review required)
+
 - Kernel subsystem changes (`kernel/`)
+
 - Syscall interface changes (`kernel/syscalls/`)
+
 - Security policy changes (`security/`)
+
 - ABI changes (`kabi/`)
 
 ---
@@ -140,19 +172,29 @@ make PROFILE=standalone qemu
 ### Review Requirements
 
 - **Kernel changes**: Must be reviewed by at least one kernel maintainer
+
 - **Driver changes**: Must be reviewed by subsystem maintainer
+
 - **Security changes**: Must be reviewed by security team
+
 - **ABI changes**: Require sign-off from kabi maintainer
 
 ### Review Checklist
 
 Reviewers should verify:
+
 - [ ] Code follows language policy and style guidelines
+
 - [ ] Commit messages are properly formatted with Signed-off-by
+
 - [ ] Tests are included for new functionality
+
 - [ ] Documentation is updated where necessary
+
 - [ ] No unsafe code without justification (Rust)
+
 - [ ] No external dependencies added without review
+
 - [ ] CI pipeline passes all checks
 
 ---
@@ -160,13 +202,21 @@ Reviewers should verify:
 ## CI Requirements
 
 All PRs must pass the 12-job CI pipeline:
+
 - Rust build + clippy (kernel + tools)
+
 - Nim build + type check (7 agent modules)
+
 - 21-tool smoke tests
+
 - GUI mirror validation (60+ mappings)
+
 - Workflow automation tests
+
 - Benchmark quick suite
+
 - Shell integration test
+
 - Training data seed generation
 
 ---
@@ -176,11 +226,17 @@ All PRs must pass the 12-job CI pipeline:
 The fastest way to contribute automation value:
 
 ```bash
+
 # 1. Write the YAML
+
 # 2. Add to WORKFLOW_TEMPLATES in userland/agent/sigma_agent_workflow.nim
+
 # 3. Test
+
 sigma-agent workflow install my-template --dry-run
+
 # 4. Submit PR
+
 ```
 
 ---
@@ -191,9 +247,13 @@ No core PR needed for plugins:
 
 ```bash
 sigma-agent plugin create my-skill
+
 # Edit ~/.config/sigma/agent/plugins/my-skill/plugin.toml
+
 # Add commands, training.jsonl samples
+
 # Publish to sigma_pkg_registry as sigma-agent-plugin-my-skill
+
 ```
 
 ---
@@ -201,8 +261,11 @@ sigma-agent plugin create my-skill
 ## Documentation
 
 - New wiki page → `wiki_repo/<Name>.md`
+
 - New code doc → comment in the source file
+
 - API reference → `docs/API_Reference.md`
+
 - Do not duplicate existing canonical files (check `docs/README.md`)
 
 ---
@@ -228,8 +291,11 @@ For security vulnerabilities, please follow the process in [SECURITY.md](SECURIT
 ## Getting Help
 
 - GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
+
 - Issues: https://github.com/AaryanSinghChauhan19/SigmaOS/issues
+
 - Wiki: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+
 - Ask sigma-agent: `sigma-agent "how do I contribute to SigmaOS"`
 
 ---
@@ -239,8 +305,13 @@ For security vulnerabilities, please follow the process in [SECURITY.md](SECURIT
 See [MAINTAINERS](MAINTAINERS) for the full list of subsystem maintainers and their responsibilities.
 
 Maintainers are expected to:
+
 - Review PRs in their subsystem within 7 days
+
 - Ensure code quality and adherence to standards
+
 - Participate in architecture reviews
+
 - Mentor new contributors
+
 - Update documentation for their subsystem

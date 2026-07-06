@@ -28,16 +28,16 @@ SigmaOS Zenith v15.0 is the first version of the Sovereign Lattice to support mu
 
 ## ??? Evolution Roadmap
 
-| Phase | Milestone | Focus | 
-| :--- | :--- | :--- | 
+| Phase | Milestone | Focus |
+| :--- | :--- | :--- |
 
-| **Phase 1** | Stabilization | Paging, Watchdog, S-EXT2 Journaling, Networking. | 
+| **Phase 1** | Stabilization | Paging, Watchdog, S-EXT2 Journaling, Networking. |
 
-| **Phase 2** | Performance | CFS-style Scheduler, Demand Paging, PQC Package Registry. | 
+| **Phase 2** | Performance | CFS-style Scheduler, Demand Paging, PQC Package Registry. |
 
-| **Phase 3** | Differentiation | Sovereign Hypervisor, Shard Snapshots, PQC-Sealed Hardware. | 
+| **Phase 3** | Differentiation | Sovereign Hypervisor, Shard Snapshots, PQC-Sealed Hardware. |
 
-| **Phase 4** | Leadership | Sovereign Cloud/Edge, AI Shard Optimization, Global Ecosystem. | 
+| **Phase 4** | Leadership | Sovereign Cloud/Edge, AI Shard Optimization, Global Ecosystem. |
 
 ## ?? Launch Parity
 

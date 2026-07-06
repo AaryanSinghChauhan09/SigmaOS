@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SigmaBackupCLI ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SigmaBackupCLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BackupSnapshot — hardware-compatible struct.
+/// BackupSnapshot â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BackupSnapshot {
     pub label: [u8; 64],
     pub timestamp: SigmaU64,
     pub size_bytes: SigmaU64,
@@ -30,7 +30,7 @@ pub struct {s_name} {{
     pub verified: SigmaU8,
 }
 
-/// SigmaBackupCLI — OOP singleton pattern.
+/// SigmaBackupCLI â€” OOP singleton pattern.
 pub struct SigmaBackupCLI {
     pub initialized: SigmaBool,
 }
@@ -113,4 +113,6 @@ pub unsafe extern "C" fn backup_restore() {
 pub unsafe extern "C" fn backup_list() {
     INSTANCE.initialized = true;
 }
+
+
 

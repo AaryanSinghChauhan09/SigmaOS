@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Environmental Engineer Shard (S-ENVIRO)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Environmental Engineer Shard (S-ENVIRO)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,27 +16,27 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignEnviro ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignEnviro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// NAAQS — hardware-compatible struct.
+/// NAAQS â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct NAAQS {
     pub annual_ug_m3: SigmaU32,
     pub daily_ug_m3: SigmaU32,
 }
 
-/// AQIBreak — hardware-compatible struct.
+/// AQIBreak â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AQIBreak {
     pub pm25_lo: SigmaU32,
     pub pm25_hi: SigmaU32,
     pub aqi_lo: SigmaU32,
     pub aqi_hi: SigmaU32,
 }
 
-/// SovereignEnviro — OOP singleton pattern.
+/// SovereignEnviro â€” OOP singleton pattern.
 pub struct SovereignEnviro {
     pub initialized: SigmaBool,
 }
@@ -119,4 +119,6 @@ pub unsafe extern "C" fn enviro_naaqs() {
 pub unsafe extern "C" fn enviro_eia() {
     INSTANCE.initialized = true;
 }
+
+
 

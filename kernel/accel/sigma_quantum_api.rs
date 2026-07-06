@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_quantum_api: Quantum-Ready APIs
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_quantum_api: Quantum-Ready APIs
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,16 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_quantum_api ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_quantum_api â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// QuantumJob — hardware-compatible struct.
+/// QuantumJob â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct QuantumJob {
     pub job_id: SigmaU64,
     pub num_qubits: SigmaU64,
     pub bytecode_len: SigmaU64,
     pub result_len: SigmaU64,
     pub status: SigmaU64,
 }
+
+
 

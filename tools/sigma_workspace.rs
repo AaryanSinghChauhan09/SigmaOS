@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SigmaWorkspaceProfiles ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SigmaWorkspaceProfiles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// WorkspaceProfile — hardware-compatible struct.
+/// WorkspaceProfile â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct WorkspaceProfile {
     pub name: [u8; 64],
     pub theme: [u8; 32],
     pub window_count: SigmaU32,
@@ -30,7 +30,7 @@ pub struct {s_name} {{
     pub notifications: SigmaU8,
 }
 
-/// SigmaWorkspaceProfiles — OOP singleton pattern.
+/// SigmaWorkspaceProfiles â€” OOP singleton pattern.
 pub struct SigmaWorkspaceProfiles {
     pub initialized: SigmaBool,
 }
@@ -103,4 +103,6 @@ pub unsafe extern "C" fn workspace_load() {
 pub unsafe extern "C" fn workspace_list() {
     INSTANCE.initialized = true;
 }
+
+
 

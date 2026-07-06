@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_linker: Custom Sovereign Linker
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_linker: Custom Sovereign Linker
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,29 +16,29 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_linker ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_linker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SymbolTableEntry — hardware-compatible struct.
+/// SymbolTableEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SymbolTableEntry {
     pub name: [u8; 64],
     pub address: SigmaU64,
     pub type: SigmaU64,
 }
 
-/// LinkerState — hardware-compatible struct.
+/// LinkerState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct LinkerState {
     pub sym_count: SigmaU64,
     pub current_address: SigmaU64,
 }
 
-/// Elf64_Ehdr — hardware-compatible struct.
+/// Elf64_Ehdr â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Elf64_Ehdr {
     pub e_ident: [SigmaU64; 16],
     pub e_type: SigmaU64,
     pub e_machine: SigmaU64,
@@ -55,10 +55,10 @@ pub struct {s_name} {{
     pub e_shstrndx: SigmaU64,
 }
 
-/// Elf64_Phdr — hardware-compatible struct.
+/// Elf64_Phdr â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Elf64_Phdr {
     pub p_type: SigmaU64,
     pub p_flags: SigmaU64,
     pub p_offset: SigmaU64,
@@ -80,4 +80,6 @@ pub unsafe extern "C" fn emit_elf_header() {
 #[no_mangle]
 pub unsafe extern "C" fn emit_program_header() {
 }
+
+
 

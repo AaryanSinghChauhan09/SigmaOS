@@ -18,6 +18,7 @@ dp = DataPreprocessor()
 # Data Cleaning & Imputation
 
 df = dp.fill_missing(df, strategy='mean')     # Replace NaN with column mean
+
 df = dp.remove_outliers(df, method='zscore', threshold=3.0)
 df = dp.drop_duplicates(df)
 
@@ -28,12 +29,15 @@ df_merged = dp.merge([df_telemetry, df_events], on='timestamp', how='inner')
 # Data Reduction
 
 df_reduced = dp.pca(df, n_components=10)      # PCA: keep top 10 components
+
 df_sampled = dp.sample(df, n=10000, strategy='stratified')
 
 # Data Transformation (Normalization & Standardization)
 
 df_norm = dp.normalize(df, method='min-max')  # Scale to [0, 1]
+
 df_std  = dp.standardize(df, method='zscore') # Mean=0, Std=1
+
 df_enc  = dp.encode_categorical(df, columns=['os_type'], method='onehot')
 ```
 
@@ -80,9 +84,13 @@ cube.load('/sigma/data/metrics.parquet')
 # OLAP Operations
 
 cube.roll_up('timestamp', 'month')       # Aggregate by month
+
 cube.drill_down('timestamp', 'hour')     # Granular view
+
 cube.slice(app_name='sigma-ui')          # Fix one dimension
+
 cube.dice(hostname='node1', month='May') # Filter 2+ dimensions
+
 cube.pivot(rows='app_name', cols='month', values='cpu_pct')
 ```
 
@@ -101,15 +109,18 @@ pipeline = ETLPipeline(
     load=SigmaWarehouse.table('metrics_warehouse')
 )
 pipeline.run(schedule='daily')  # Runs via SigmaOS task scheduler
+
 ```
 
 ### Tools & Enterprise Ecosystem Parity
 
 SigmaWarehouse provides drop-in compatibility and bridging with major enterprise data warehousing platforms:
 
-* **SQL Server & Oracle:** Direct ODBC/JDBC query translation and stored procedure execution.
-* **Amazon Redshift:** Columnar Parquet/ORC file ingestion and distributed query sharding.
-* **Snowflake:** Cloud-native virtual warehouse scaling and zero-copy data cloning emulation.
+- **SQL Server & Oracle:** Direct ODBC/JDBC query translation and stored procedure execution.
+
+- **Amazon Redshift:** Columnar Parquet/ORC file ingestion and distributed query sharding.
+
+- **Snowflake:** Cloud-native virtual warehouse scaling and zero-copy data cloning emulation.
 
 ---
 
@@ -189,14 +200,21 @@ sigma.viz.dendrogram(hc)
 
 ### Common Issues & Fix Strategies
 
-* **Issue - Incorrect Indexing in Databases:** Missing or fragmented B+ Tree indices cause full table scans, degrading analytical query performance.
-  * *Fix Strategy:* Run `EXPLAIN QUERY PLAN` to identify unindexed scans, create composite covering indices for frequent `WHERE` and `JOIN` clauses, and periodically rebuild fragmented index trees.
-* **Issue - Database Deadlocks:** Concurrent ETL write transactions lock identical tables in reverse order, causing circular wait states.
-  * *Fix Strategy:* Enforce strict two-phase locking (2PL) protocols, acquire table locks in a globally uniform hierarchical order, and implement automatic deadlock detection with exponential backoff retries.
-* **Issue - Data Corruption & Missing Values:** Sensor dropouts or network failures inject `NULL` values into OLAP fact tables.
-  * *Fix Strategy:* Use automated ETL data preprocessors to execute k-NN or mean imputation, ensuring analytical hypercubes remain fully populated.
-* **Issue - Algorithmic Complexity in Mining Scans:** Apriori candidate generation ($C_k$) scales exponentially ($O(2^d)$) with unique item counts.
-  * *Fix Strategy:* Migrate from Apriori to FP-Growth tree traversal, compressing transactional databases into in-memory prefix trees to eliminate candidate generation entirely.
+- **Issue - Incorrect Indexing in Databases:** Missing or fragmented B+ Tree indices cause full table scans, degrading analytical query performance.
+
+- *Fix Strategy:* Run `EXPLAIN QUERY PLAN` to identify unindexed scans, create composite covering indices for frequent `WHERE` and `JOIN` clauses, and periodically rebuild fragmented index trees.
+
+- **Issue - Database Deadlocks:** Concurrent ETL write transactions lock identical tables in reverse order, causing circular wait states.
+
+- *Fix Strategy:* Enforce strict two-phase locking (2PL) protocols, acquire table locks in a globally uniform hierarchical order, and implement automatic deadlock detection with exponential backoff retries.
+
+- **Issue - Data Corruption & Missing Values:** Sensor dropouts or network failures inject `NULL` values into OLAP fact tables.
+
+- *Fix Strategy:* Use automated ETL data preprocessors to execute k-NN or mean imputation, ensuring analytical hypercubes remain fully populated.
+
+- **Issue - Algorithmic Complexity in Mining Scans:** Apriori candidate generation ($C_k$) scales exponentially ($O(2^d)$) with unique item counts.
+
+- *Fix Strategy:* Migrate from Apriori to FP-Growth tree traversal, compressing transactional databases into in-memory prefix trees to eliminate candidate generation entirely.
 
 ---
 
@@ -216,7 +234,9 @@ SigmaWarehouse Stack
 ### Files
 
 - `userland/apps/SigmaWarehouse/sigma_warehouse.cpp`
+
 - `userland/apps/SigmaAnalytics/data_mining.cpp`
+
 - `userland/apps/SigmaViz/olap_dashboard.cpp`
 
-*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

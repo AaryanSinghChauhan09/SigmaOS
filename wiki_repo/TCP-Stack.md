@@ -68,6 +68,7 @@ Hand-rolled RFC 793 checksum with pseudo-header:
 
 ```
 Pseudo header:  src_ip(32) | dst_ip(32) | 0(8) | proto=6(8) | tcp_len(16)
+
 + TCP header + payload
 One's complement sum of all 16-bit words
 ```
@@ -77,9 +78,13 @@ One's complement sum of all 16-bit words
 ## Congestion Control (Phase C)
 
 Planned BBR/CUBIC implementation:
+
 - Slow start
+
 - Congestion avoidance
+
 - Fast retransmit (3 duplicate ACKs)
+
 - Fast recovery
 
 ---
@@ -87,8 +92,11 @@ Planned BBR/CUBIC implementation:
 ## RX/TX Buffers
 
 Each socket has:
+
 - 64 KB RX ring buffer
+
 - 64 KB TX ring buffer
+
 - MSS = 1460 bytes (standard Ethernet - IP - TCP headers)
 
 ---

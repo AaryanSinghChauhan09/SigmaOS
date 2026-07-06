@@ -1,11 +1,11 @@
-/// SigmaOS: SIGMAOS: SOVEREIGN FAIR SCHEDULER (S-FSCHED)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SIGMAOS: SOVEREIGN FAIR SCHEDULER (S-FSCHED)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignFairScheduler ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignFairScheduler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SchedEntity — hardware-compatible struct.
+/// SchedEntity â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SchedEntity {
     pub pid: SigmaU32,
     pub vruntime: SigmaU64,
     pub weight: SigmaU32,
 }
 
-/// SovereignFairScheduler — OOP singleton pattern.
+/// SovereignFairScheduler â€” OOP singleton pattern.
 pub struct SovereignFairScheduler {
     pub initialized: SigmaBool,
 }
@@ -70,4 +70,6 @@ pub unsafe extern "C" fn pick_next() {
 pub unsafe extern "C" fn fsched_init() {
     INSTANCE.initialized = true;
 }
+
+
 

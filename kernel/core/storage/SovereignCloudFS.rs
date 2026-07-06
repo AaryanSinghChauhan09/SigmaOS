@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS: SovereignCloudFS (Low-Level Skeleton)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS: SovereignCloudFS (Low-Level Skeleton)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignCloudFS ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignCloudFS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CloudInodeNode — hardware-compatible struct.
+/// CloudInodeNode â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CloudInodeNode {
     pub inode_id: SigmaU64,
     pub physical_address: SigmaU64,
     pub replica_shards: [SigmaU32; 3],
 }
 
-/// SovereignCloudFS — OOP singleton pattern.
+/// SovereignCloudFS â€” OOP singleton pattern.
 pub struct SovereignCloudFS {
     pub initialized: SigmaBool,
 }
@@ -80,4 +80,6 @@ pub unsafe extern "C" fn insert_inode() {
 pub unsafe extern "C" fn replicate_to_shard() {
     INSTANCE.initialized = true;
 }
+
+
 

@@ -17,9 +17,13 @@ All notable changes to the SigmaOS Sovereign Lattice will be documented in this 
 - **Architecture Documentation**: New `docs/architecture.md` explaining the lattice sharding model.
 
 - **Verification Assertions**: Added `sigma_assert` for kernel-level sanity checks.
+
 - **Phase 2 Utilities Parity**: Integrated `SovereignRecovery`, `SovereignIoT`, `SovereignGPUSched`, and `SovereignOptimizer` shards.
+
 - **Unified Sovereign CLI**: Deployed `sigma-cli` and `telemetry-cli` for professional lattice orchestration.
+
 - **Adaptive Scheduling (NPWO)**: Implemented Neural Predictive Workload Orchestration in `SovereignAISched`.
+
 - **UI Toolkit & Accessibility**: Added `SovereignUIToolkit` with theme engine and SSR (Sovereign Screen Reader) support.
 
 ### Changed

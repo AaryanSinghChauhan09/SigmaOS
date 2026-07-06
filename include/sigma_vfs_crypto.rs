@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_vfs_crypto module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_vfs_crypto module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,17 +16,17 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::SovereignEncryptedVolume ─────────────────────
+// â”€â”€â”€ Module: sigma::SovereignEncryptedVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CipherKey — hardware-compatible struct.
+/// CipherKey â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CipherKey {
     pub key: [SigmaU64; 32],
     pub salt: [SigmaU64; 16],
 }
 
-/// SovereignEncryptedVolume — OOP singleton pattern.
+/// SovereignEncryptedVolume â€” OOP singleton pattern.
 pub struct SovereignEncryptedVolume {
     pub initialized: SigmaBool,
 }
@@ -39,4 +39,6 @@ impl SovereignEncryptedVolume {
 }
 
 static mut INSTANCE: SovereignEncryptedVolume = SovereignEncryptedVolume::new();
+
+
 

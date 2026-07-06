@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS: SovereignVulkanLayer (Low-Level Skeleton)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS: SovereignVulkanLayer (Low-Level Skeleton)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignVulkanLayer ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignVulkanLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// GPUDMABuffer — hardware-compatible struct.
+/// GPUDMABuffer â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct GPUDMABuffer {
     pub pci_base_address: SigmaU64,
     pub command_length: SigmaU32,
     pub flags: SigmaU32,
 }
 
-/// SovereignVulkanLayer — OOP singleton pattern.
+/// SovereignVulkanLayer â€” OOP singleton pattern.
 pub struct SovereignVulkanLayer {
     pub initialized: SigmaBool,
 }
@@ -70,4 +70,6 @@ pub unsafe extern "C" fn route_shader_binary() {
 pub unsafe extern "C" fn optimize_context_switch() {
     INSTANCE.initialized = true;
 }
+
+
 

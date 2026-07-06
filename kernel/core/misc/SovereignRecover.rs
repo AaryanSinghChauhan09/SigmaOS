@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Recover Implementation
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Recover Implementation
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,18 +16,18 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignRecover ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignRecover â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// sigma_recovery_record_t — hardware-compatible struct.
+/// sigma_recovery_record_t â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct sigma_recovery_record_t {
     pub shard_id: SigmaU64,
     pub heal_count: SigmaU64,
     pub permanent_failure: SigmaBool,
 }
 
-/// SovereignRecover — OOP singleton pattern.
+/// SovereignRecover â€” OOP singleton pattern.
 pub struct SovereignRecover {
     pub initialized: SigmaBool,
 }
@@ -65,4 +65,6 @@ pub unsafe extern "C" fn recover_init() {
 pub unsafe extern "C" fn recover_trigger_healing() {
     INSTANCE.initialized = true;
 }
+
+
 

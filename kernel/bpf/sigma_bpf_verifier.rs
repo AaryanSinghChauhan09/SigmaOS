@@ -1,11 +1,11 @@
-/// SigmaOS: ALU64 IMM */
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ALU64 IMM */
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::uint8_t ─────────────────────
+// â”€â”€â”€ Module: Sigma::uint8_t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// reg_state — hardware-compatible struct.
+/// reg_state â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct reg_state {
     pub type: SigmaU64,
     pub smin: SigmaU64,
     pub smax: SigmaU64,
@@ -31,16 +31,16 @@ pub struct {s_name} {{
     pub nullable: SigmaBool,
 }
 
-/// verifier_state — hardware-compatible struct.
+/// verifier_state â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct verifier_state {
     pub insn_idx: SigmaU64,
     pub depth: SigmaU64,
     pub iter_count: SigmaU64,
 }
 
-/// uint8_t — OOP singleton pattern.
+/// uint8_t â€” OOP singleton pattern.
 pub struct uint8_t {
     pub initialized: SigmaBool,
 }
@@ -73,4 +73,6 @@ impl uint8_t {
 }
 
 static mut INSTANCE: uint8_t = uint8_t::new();
+
+
 

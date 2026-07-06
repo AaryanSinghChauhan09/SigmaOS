@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Indian Doctor Shard (S-MBBS)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Indian Doctor Shard (S-MBBS)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,16 +16,16 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignMBBS ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignMBBS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// BMICategory — hardware-compatible struct.
+/// BMICategory â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BMICategory {
     pub bmi_x10: SigmaU32,
 }
 
-/// SovereignMBBS — OOP singleton pattern.
+/// SovereignMBBS â€” OOP singleton pattern.
 pub struct SovereignMBBS {
     pub initialized: SigmaBool,
 }
@@ -128,4 +128,6 @@ pub unsafe extern "C" fn mbbs_gfr() {
 pub unsafe extern "C" fn mbbs_paed_dose() {
     INSTANCE.initialized = true;
 }
+
+
 

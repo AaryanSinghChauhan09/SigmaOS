@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Real Estate Shard (S-REALTY)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Real Estate Shard (S-REALTY)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignRealty ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignRealty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// StampDutyRate — hardware-compatible struct.
+/// StampDutyRate â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct StampDutyRate {
     pub male_permille: SigmaU32,
     pub female_permille: SigmaU32,
     pub joint_permille: SigmaU32,
     pub reg_fee_permille: SigmaU32,
 }
 
-/// SovereignRealty — OOP singleton pattern.
+/// SovereignRealty â€” OOP singleton pattern.
 pub struct SovereignRealty {
     pub initialized: SigmaBool,
 }
@@ -101,4 +101,6 @@ pub unsafe extern "C" fn realty_init() {
 pub unsafe extern "C" fn realty_stamp() {
     INSTANCE.initialized = true;
 }
+
+
 

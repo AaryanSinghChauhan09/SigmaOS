@@ -1,11 +1,11 @@
-/// SigmaOS: SigmaOS Sovereign Cgroup Shard (S-Cgroup)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: SigmaOS Sovereign Cgroup Shard (S-Cgroup)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::SovereignCgroupEngine ─────────────────────
+// â”€â”€â”€ Module: Sigma::SovereignCgroupEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// CgroupEntry — hardware-compatible struct.
+/// CgroupEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct CgroupEntry {
     pub name: [u8; 64],
     pub cpu_pct: SigmaU32,
     pub mem_mb: SigmaU32,
@@ -32,7 +32,7 @@ pub struct {s_name} {{
     pub throttled: SigmaBool,
 }
 
-/// SovereignCgroupEngine — OOP singleton pattern.
+/// SovereignCgroupEngine â€” OOP singleton pattern.
 pub struct SovereignCgroupEngine {
     pub initialized: SigmaBool,
 }
@@ -115,4 +115,6 @@ pub unsafe extern "C" fn cgroup_enforce() {
 pub unsafe extern "C" fn cgroup_audit() {
     INSTANCE.initialized = true;
 }
+
+
 

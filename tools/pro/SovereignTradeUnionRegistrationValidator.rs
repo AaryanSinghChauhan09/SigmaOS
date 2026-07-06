@@ -1,11 +1,11 @@
-/// SigmaOS: =========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,19 +16,19 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignTradeUnionRegistrationValidator ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignTradeUnionRegistrationValidator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ComplianceReport — hardware-compatible struct.
+/// ComplianceReport â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ComplianceReport {
     pub is_eligible_for_registration: SigmaBool,
     pub required_minimum_workers: SigmaU32,
     pub actual_workers: SigmaU32,
     pub violates_absolute_minimum: SigmaBool,
 }
 
-/// SovereignTradeUnionRegistrationValidator — OOP singleton pattern.
+/// SovereignTradeUnionRegistrationValidator â€” OOP singleton pattern.
 pub struct SovereignTradeUnionRegistrationValidator {
     pub initialized: SigmaBool,
 }
@@ -51,4 +51,6 @@ static mut INSTANCE: SovereignTradeUnionRegistrationValidator = SovereignTradeUn
 pub unsafe extern "C" fn run_trade_union_validation() {
     INSTANCE.initialized = true;
 }
+
+
 

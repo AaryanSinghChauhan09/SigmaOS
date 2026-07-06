@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — sigma_netstat: Sovereign Network Connection Monitor
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” sigma_netstat: Sovereign Network Connection Monitor
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_netstat ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_netstat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SocketEntry — hardware-compatible struct.
+/// SocketEntry â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SocketEntry {
     pub local_addr: SigmaU64,
     pub local_port: SigmaU64,
     pub remote_addr: SigmaU64,
@@ -33,4 +33,6 @@ pub struct {s_name} {{
 #[no_mangle]
 pub unsafe extern "C" fn print_ip() {
 }
+
+
 

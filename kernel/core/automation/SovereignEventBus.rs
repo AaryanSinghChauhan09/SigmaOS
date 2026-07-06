@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignEventBus ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignEventBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Event — hardware-compatible struct.
+/// Event â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct Event {
     pub id: SigmaU32,
     pub type: SigmaU64,
     pub timestamp: SigmaU32,
@@ -30,18 +30,18 @@ pub struct {s_name} {{
     pub handled: SigmaBool,
 }
 
-/// AutomationAction — hardware-compatible struct.
+/// AutomationAction â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AutomationAction {
     pub type: SigmaU64,
     pub description: [u8; 64],
 }
 
-/// AutomationRule — hardware-compatible struct.
+/// AutomationRule â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct AutomationRule {
     pub id: SigmaU32,
     pub name: [u8; 64],
     pub trigger: SigmaU64,
@@ -51,7 +51,7 @@ pub struct {s_name} {{
     pub times_fired: SigmaU32,
 }
 
-/// SovereignEventBus — OOP singleton pattern.
+/// SovereignEventBus â€” OOP singleton pattern.
 pub struct SovereignEventBus {
     pub initialized: SigmaBool,
 }
@@ -164,4 +164,6 @@ pub unsafe extern "C" fn eventbus_process() {
 pub unsafe extern "C" fn eventbus_status() {
     INSTANCE.initialized = true;
 }
+
+
 

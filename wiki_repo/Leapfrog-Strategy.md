@@ -40,18 +40,18 @@ We don't aim to replace Linux everywhere at once. We dominate **Sovereign Silico
 
 ## 🛠️ Implementation Roadmap
 
-| Feature | Phase | Priority | 
-| :--- | :--- | :--- | 
+| Feature | Phase | Priority |
+| :--- | :--- | :--- |
 
-| **Self-Healing Watchdog** | Industrialization | Critical | 
+| **Self-Healing Watchdog** | Industrialization | Critical |
 
-| **Unified Config Hub** | Evolution | High | 
+| **Unified Config Hub** | Evolution | High |
 
-| **PQC Networking Shard** | Security Hardening | Critical | 
+| **PQC Networking Shard** | Security Hardening | Critical |
 
-| **Zenith CSS Theme Engine** | UX Polish | High | 
+| **Zenith CSS Theme Engine** | UX Polish | High |
 
-| **Linux Binary Support** | Ecosystem Bridge | Critical | 
+| **Linux Binary Support** | Ecosystem Bridge | Critical |
 
 ---
 *These features represent the definitive path for SigmaOS to redefine the modern operating system landscape.*

@@ -32,18 +32,18 @@ SigmaOS is designed to transcend the limitations of legacy monolithic kernels (U
 
 Mainstream distros focus on **General Purpose**. SigmaOS focuses on **Sovereign Professional Purpose**.
 
-| Feature | Ubuntu/Fedora | SigmaOS (Zenith) | 
-| :--- | :--- | :--- | 
+| Feature | Ubuntu/Fedora | SigmaOS (Zenith) |
+| :--- | :--- | :--- |
 
-| **Architecture** | Monolithic / Hybrid | Sovereign Lattice (600+ Shards) | 
+| **Architecture** | Monolithic / Hybrid | Sovereign Lattice (600+ Shards) |
 
-| **Security** | SELinux/AppArmor | PQC-Lattice / Zero-Trust Sharding | 
+| **Security** | SELinux/AppArmor | PQC-Lattice / Zero-Trust Sharding |
 
-| **Recovery** | TimeShift / Snapper | S-AUTO (10ms Atomic Rollback) | 
+| **Recovery** | TimeShift / Snapper | S-AUTO (10ms Atomic Rollback) |
 
-| **Professionalism** | General Purpose Apps | Native Professional Shards (S-MED, S-VAKIL) | 
+| **Professionalism** | General Purpose Apps | Native Professional Shards (S-MED, S-VAKIL) |
 
-| **AI Integration** | Third-party / Desktop | S-PAI (Core-Integrated Life-OS) | 
+| **AI Integration** | Third-party / Desktop | S-PAI (Core-Integrated Life-OS) |
 
 ---
 *Next: [Professionalization Roadmap](PROFESSIONALIZATION_PLAN.md)*

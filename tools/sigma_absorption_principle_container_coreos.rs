@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SIGMAOS: SOVEREIGN CONTAINER & COREOS COMPAT RUNTIME (v15.2)
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SIGMAOS: SOVEREIGN CONTAINER & COREOS COMPAT RUNTIME (v15.2)
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,28 +16,28 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignImmutableHostEngine ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignImmutableHostEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// PartitionSlot — hardware-compatible struct.
+/// PartitionSlot â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct PartitionSlot {
     pub slot_name: u8,
     pub is_active: SigmaBool,
     pub is_bootable: SigmaBool,
     pub version_code: SigmaU32,
 }
 
-/// IgnitionConfig — hardware-compatible struct.
+/// IgnitionConfig â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct IgnitionConfig {
     pub username: [u8; 32],
     pub ssh_key_hash: [u8; 64],
     pub sudo_permitted: SigmaBool,
 }
 
-/// SovereignImmutableHostEngine — OOP singleton pattern.
+/// SovereignImmutableHostEngine â€” OOP singleton pattern.
 pub struct SovereignImmutableHostEngine {
     pub initialized: SigmaBool,
 }
@@ -75,4 +75,6 @@ pub unsafe extern "C" fn init() {
 pub unsafe extern "C" fn initialize_container_principles() {
     INSTANCE.initialized = true;
 }
+
+
 

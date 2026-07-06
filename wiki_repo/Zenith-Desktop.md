@@ -72,20 +72,28 @@ Key bindings (default):
 ## Theme System (`zenith_desktop/theme/`)
 
 ```bash
+
 # List available themes
+
 sigma-theme list
 
 # Apply a theme
+
 sigma-theme apply midnight-sovereign
 
 # Create a custom theme
+
 sigma-theme new my-theme --base midnight-sovereign
 ```
 
-**Built-in themes:**
+### Built-in themes:
+
 - `midnight-sovereign` — dark blue/purple
+
 - `solar-zenith` — warm amber + white
+
 - `forest-minimal` — muted green
+
 - `arctic-pure` — clean white/grey
 
 Theme structure: CSS-like variables → compositor applies to all windows.
@@ -97,8 +105,11 @@ Theme structure: CSS-like variables → compositor applies to all windows.
 AI-driven adaptive UI using AVX-512 SIMD acceleration:
 
 - **Predictive pre-loading**: predicts next app the user will open based on context
+
 - **Adaptive layouts**: rearranges widgets based on usage patterns
+
 - **Smart notifications**: batches low-priority notifications, surfaces critical ones immediately
+
 - **Energy-aware rendering**: reduces refresh rate when battery low
 
 ---
@@ -106,10 +117,15 @@ AI-driven adaptive UI using AVX-512 SIMD acceleration:
 ## Accessibility (`zenith_desktop/a11y/`)
 
 - **Sovereign Screen Reader (SSR)**: reads UI elements aloud via sigma-voice
+
 - **High-contrast themes**: automatic inversion for visual impairments
+
 - **Keyboard-only navigation**: full WCAG 2.1 AA compliance target
+
 - **Switch access**: single-switch scanning for motor impairments
+
 - **Font scaling**: 75%–300% without layout break
+
 - **Braille display**: planned via sigma-braille daemon (Phase H)
 
 ---
@@ -131,13 +147,17 @@ Pre-installed widgets on the desktop panel:
 ## Desktop Build & Run
 
 ```bash
+
 # Build Zenith desktop
+
 make PROFILE=standalone all -j$(nproc)
 
 # Run JS prototype in browser (current demo)
+
 open sigma-web/index.html
 
 # Run native compositor in QEMU (Phase G)
+
 make PROFILE=standalone qemu
 ```
 

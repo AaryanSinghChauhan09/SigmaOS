@@ -1,11 +1,11 @@
-/// SigmaOS: Σ SigmaOS — SovereignContainerOrchestrator: Lightweight Container Engine
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: Î£ SigmaOS â€” SovereignContainerOrchestrator: Lightweight Container Engine
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: simulation::ContainerState ─────────────────────
+// â”€â”€â”€ Module: simulation::ContainerState â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ServiceContainer — hardware-compatible struct.
+/// ServiceContainer â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ServiceContainer {
     pub id: SigmaU64,
     pub name: [u8; 64],
     pub image: [u8; 128],
@@ -31,7 +31,7 @@ pub struct {s_name} {{
     pub auto_restart: SigmaBool,
 }
 
-/// ContainerState — OOP singleton pattern.
+/// ContainerState â€” OOP singleton pattern.
 pub struct ContainerState {
     pub initialized: SigmaBool,
 }
@@ -124,4 +124,6 @@ pub unsafe extern "C" fn container_destroy_service() {
 pub unsafe extern "C" fn container_list_services() {
     INSTANCE.initialized = true;
 }
+
+
 

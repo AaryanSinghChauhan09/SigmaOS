@@ -13,9 +13,9 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
    ./scripts/industrial_build.ps1
    ```
 
-3. **Flash**: Deploy to a high-speed NVMe drive.
+1. **Flash**: Deploy to a high-speed NVMe drive.
 
-4. **Experiment**: Toggle experimental shards via the `SovereignHorizon` control panel.
+2. **Experiment**: Toggle experimental shards via the `SovereignHorizon` control panel.
 
 ## 🛠️ Core Functions
 

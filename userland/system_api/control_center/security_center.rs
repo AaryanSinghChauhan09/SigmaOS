@@ -1,252 +1,117 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-// SigmaOS Security Center - Security management and monitoring
+/// SigmaOS: userland/system_api/control_center/security_center.rs
+/// Security Center Daemon - Monitors kernel audit logs and enforces heuristics.
+/// no_std | no alloc | no external crates.
 
-use serde::{Deserialize, Serialize};
-use crate::control_center::SecurityStatus;
+#![no_std]
+#![allow(dead_code)]
+#![allow(unused_variables)]
 
-/// Security Center for security management
-pub struct SecurityCenter {
-    secure_boot_enabled: bool,
-    disk_encrypted: bool,
-    firewall_enabled: bool,
-    tpm_available: bool,
-    security_policies: Vec<SecurityPolicy>,
+type SigmaU32   = u32;
+type SigmaI32   = i32;
+type SigmaU64   = u64;
+type SigmaBool  = bool;
+type SigmaUsize = usize;
+
+pub const THREAT_LEVEL_NONE:     SigmaU32 = 0;
+pub const THREAT_LEVEL_LOW:      SigmaU32 = 1;
+pub const THREAT_LEVEL_MEDIUM:   SigmaU32 = 2;
+pub const THREAT_LEVEL_HIGH:     SigmaU32 = 3;
+pub const THREAT_LEVEL_CRITICAL: SigmaU32 = 4;
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ThreatHeuristic {
+    pub shard_id: SigmaU32,
+    pub failed_ipc_count: SigmaU32,
+    pub auth_failures: SigmaU32,
+    pub last_violation_time: SigmaU64,
+    pub active_threat_level: SigmaU32,
 }
 
-impl SecurityCenter {
-    /// Create a new Security Center
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        // In a real implementation, this would check actual system security status
-        Ok(Self {
-            secure_boot_enabled: Self::check_secure_boot()?,
-            disk_encrypted: Self::check_disk_encryption()?,
-            firewall_enabled: Self::check_firewall()?,
-            tpm_available: Self::check_tpm()?,
-            security_policies: Self::load_security_policies()?,
-        })
+impl ThreatHeuristic {
+    pub const fn empty() -> Self {
+        ThreatHeuristic {
+            shard_id: 0,
+            failed_ipc_count: 0,
+            auth_failures: 0,
+            last_violation_time: 0,
+            active_threat_level: THREAT_LEVEL_NONE,
+        }
     }
+}
 
-    /// Check if Secure Boot is enabled
-    fn check_secure_boot() -> Result<bool, Box<dyn std::error::Error>> {
-        // Check /sys/firmware/efi/efivars/SecureBoot-*
-        if let Ok(_) = std::fs::read_dir("/sys/firmware/efi/efivars") {
-            if let Ok(secure_boot) = std::fs::read_to_string("/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c") {
-                // Parse the secure boot variable (simplified)
-                return Ok(!secure_boot.is_empty());
+static mut THREAT_STATE: [ThreatHeuristic; 64] = [ThreatHeuristic::empty(); 64];
+
+extern "C" {
+    fn kernel_uptime() -> SigmaU64;
+    fn shard_kill(id: SigmaU32) -> SigmaI32;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sec_center_init() -> SigmaI32 {
+    for t in THREAT_STATE.iter_mut() {
+        t.active_threat_level = THREAT_LEVEL_NONE;
+    }
+    0
+}
+
+/// Daemon tick called by the control center scheduler.
+#[no_mangle]
+pub unsafe extern "C" fn sec_center_analyze_logs() {
+    let now = kernel_uptime();
+    
+    // In production, this would read from `audit_chain.rs` via IPC / Syscall.
+    // For this implementation, we apply decay heuristics.
+    
+    for t in THREAT_STATE.iter_mut() {
+        if t.active_threat_level > THREAT_LEVEL_NONE {
+            // Decay threat level over time (e.g. 5 mins = 300,000 ticks)
+            if now > t.last_violation_time + 300_000 {
+                t.active_threat_level -= 1;
+                t.failed_ipc_count = 0;
+                t.auth_failures = 0;
+            }
+            
+            // Automatic remediation
+            if t.active_threat_level >= THREAT_LEVEL_CRITICAL {
+                shard_kill(t.shard_id);
             }
         }
-        Ok(false)
     }
+}
 
-    /// Check if disk is encrypted
-    fn check_disk_encryption() -> Result<bool, Box<dyn std::error::Error>> {
-        // Check for LUKS devices in /etc/crypttab or /dev/mapper
-        if let Ok(_) = std::fs::read_to_string("/etc/crypttab") {
-            return Ok(true);
+/// API for other modules to report suspicious activity.
+#[no_mangle]
+pub unsafe extern "C" fn sec_center_report_violation(
+    shard_id: SigmaU32,
+    violation_type: SigmaU32
+) {
+    let mut target = None;
+    for i in 0..64 {
+        if THREAT_STATE[i].shard_id == shard_id {
+            target = Some(i);
+            break;
+        } else if THREAT_STATE[i].shard_id == 0 && target.is_none() {
+            target = Some(i);
         }
-        if let Ok(_) = std::fs::read_dir("/dev/mapper") {
-            return Ok(true);
-        }
-        Ok(false)
     }
-
-    /// Check if firewall is enabled
-    fn check_firewall() -> Result<bool, Box<dyn std::error::Error>> {
-        // Check iptables or ufw status
-        if let Ok(_) = Command::new("iptables").args(&["-L"]).output() {
-            return Ok(true);
-        }
-        if let Ok(_) = Command::new("ufw").args(&["status"]).output() {
-            return Ok(true);
-        }
-        Ok(false)
-    }
-
-    /// Check if TPM is available
-    fn check_tpm() -> Result<bool, Box<dyn std::error::Error>> {
-        // Check for TPM device
-        if let Ok(_) = std::fs::read_dir("/sys/class/tpm") {
-            return Ok(true);
-        }
-        if let Ok(_) = std::fs::read_to_string("/dev/tpm0") {
-            return Ok(true);
-        }
-        Ok(false)
-    }
-
-    /// Load security policies
-    fn load_security_policies() -> Result<Vec<SecurityPolicy>, Box<dyn std::error::Error>> {
-        // Placeholder implementation
-        Ok(vec![
-            SecurityPolicy {
-                name: "Password Policy".to_string(),
-                enabled: true,
-                description: "Enforce strong password requirements".to_string(),
-                compliance_level: ComplianceLevel::High,
+    
+    if let Some(idx) = target {
+        let t = &mut THREAT_STATE[idx];
+        t.shard_id = shard_id;
+        t.last_violation_time = kernel_uptime();
+        
+        match violation_type {
+            1 => { // IPC Auth Failure
+                t.failed_ipc_count += 1;
+                if t.failed_ipc_count > 10 {
+                    t.active_threat_level = THREAT_LEVEL_HIGH;
+                }
             },
-            SecurityPolicy {
-                name: "Automatic Updates".to_string(),
-                enabled: true,
-                description: "Install security updates automatically".to_string(),
-                compliance_level: ComplianceLevel::Medium,
+            2 => { // Sandbox escape attempt
+                t.active_threat_level = THREAT_LEVEL_CRITICAL;
             },
-        ])
-    }
-
-    /// Get current security status
-    pub fn get_security_status(&self) -> SecurityStatus {
-        let security_score = self.calculate_security_score();
-        
-        SecurityStatus {
-            secure_boot_enabled: self.secure_boot_enabled,
-            disk_encrypted: self.disk_encrypted,
-            firewall_enabled: self.firewall_enabled,
-            security_score,
+            _ => {}
         }
-    }
-
-    /// Calculate security score (0-100)
-    fn calculate_security_score(&self) -> u8 {
-        let mut score = 0;
-        
-        if self.secure_boot_enabled {
-            score += 25;
-        }
-        if self.disk_encrypted {
-            score += 25;
-        }
-        if self.firewall_enabled {
-            score += 25;
-        }
-        if self.tpm_available {
-            score += 25;
-        }
-        
-        score
-    }
-
-    /// Enable Secure Boot
-    pub fn enable_secure_boot(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        // In a real implementation, this would configure Secure Boot
-        self.secure_boot_enabled = true;
-        Ok(())
-    }
-
-    /// Enable disk encryption
-    pub fn enable_disk_encryption(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        // In a real implementation, this would enable LUKS encryption
-        self.disk_encrypted = true;
-        Ok(())
-    }
-
-    /// Enable firewall
-    pub fn enable_firewall(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        // In a real implementation, this would enable the firewall
-        self.firewall_enabled = true;
-        Ok(())
-    }
-
-    /// Get security recommendations
-    pub fn get_recommendations(&self) -> Vec<SecurityRecommendation> {
-        let mut recommendations = Vec::new();
-        
-        if !self.secure_boot_enabled {
-            recommendations.push(SecurityRecommendation {
-                priority: RecommendationPriority::High,
-                title: "Enable Secure Boot".to_string(),
-                description: "Secure Boot ensures that only trusted software runs during boot".to_string(),
-            });
-        }
-        
-        if !self.disk_encrypted {
-            recommendations.push(SecurityRecommendation {
-                priority: RecommendationPriority::High,
-                title: "Enable Disk Encryption".to_string(),
-                description: "Disk encryption protects your data if your device is lost or stolen".to_string(),
-            });
-        }
-        
-        if !self.firewall_enabled {
-            recommendations.push(SecurityRecommendation {
-                priority: RecommendationPriority::Medium,
-                title: "Enable Firewall".to_string(),
-                description: "Firewall protects against unauthorized network access".to_string(),
-            });
-        }
-        
-        recommendations
-    }
-
-    /// Run security scan
-    pub fn run_security_scan(&self) -> SecurityScanResult {
-        // Placeholder implementation - would run actual security checks
-        SecurityScanResult {
-            vulnerabilities_found: 0,
-            critical_issues: 0,
-            scan_duration_seconds: 5,
-            recommendations: self.get_recommendations(),
-        }
-    }
-}
-
-/// Security policy
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SecurityPolicy {
-    pub name: String,
-    pub enabled: bool,
-    pub description: String,
-    pub compliance_level: ComplianceLevel,
-}
-
-/// Compliance level
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ComplianceLevel {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
-
-/// Security recommendation
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SecurityRecommendation {
-    pub priority: RecommendationPriority,
-    pub title: String,
-    pub description: String,
-}
-
-/// Recommendation priority
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum RecommendationPriority {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
-
-/// Security scan result
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SecurityScanResult {
-    pub vulnerabilities_found: usize,
-    pub critical_issues: usize,
-    pub scan_duration_seconds: u64,
-    pub recommendations: Vec<SecurityRecommendation>,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_security_center_creation() {
-        let center = SecurityCenter::new();
-        assert!(center.is_ok());
-    }
-
-    #[test]
-    fn test_security_status() {
-        let center = SecurityCenter::new().unwrap();
-        let status = center.get_security_status();
-        assert!(status.security_score <= 100);
     }
 }

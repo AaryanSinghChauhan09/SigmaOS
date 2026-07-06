@@ -1,4 +1,4 @@
-# Cache Store
+﻿# Cache Store
 
 A Cache Store is responsible for storing and retrieving cached responses.
 It is also responsible for deciding which specific response to use based off of
@@ -67,7 +67,6 @@ Parameters:
 - **req** `Dispatcher.RequestOptions` - Incoming request
 
 Returns: `GetResult | Promise<GetResult | undefined> | undefined` - If the request is cached, the cached response is returned. If the request's method is anything other than HEAD, the response is also returned.
-
 If the request isn't cached, `undefined` is returned.
 
 The `get` method may return a `Promise` for async cache stores (e.g. Redis-backed or remote stores). The cache interceptor handles both synchronous and asynchronous return values, including in revalidation paths (304 Not Modified handling and stale-while-revalidate background revalidation).
@@ -107,39 +106,32 @@ This is an interface containing the majority of a response's data (minus the bod
 ### Property `vary`
 
 `Record<string, string | string[] | null> | undefined` - The headers defined by the response's `Vary` header
-
 and their respective values for later comparison. Values are `null` when the
 header specified in `Vary` was not present in the original request. These `null`
 values are automatically filtered out during revalidation so they are not sent
 as request headers.
 
 For example, for a response like
-
 ```
 Vary: content-encoding, accepts
 content-encoding: utf8
 accepts: application/json
-
 ```
 
 This would be
-
 ```js
 {
   'content-encoding': 'utf8',
   accepts: 'application/json'
 }
-
 ```
 
 If the original request did not include the `accepts` header:
-
 ```js
 {
   'content-encoding': 'utf8',
   accepts: null
 }
-
 ```
 
 ### Property `cachedAt`
@@ -153,7 +145,6 @@ If the original request did not include the `accepts` header:
 ### Property `deleteAt`
 
 `number` - Time in millis that this value is to be deleted from the cache. This
-
 is either the same sa staleAt or the `max-stale` caching directive.
 
 The store must not return a response after the time defined in this property.

@@ -1,11 +1,11 @@
-/// SigmaOS: @file sigma_spins.h
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: @file sigma_spins.h
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: sigma::SpinId ─────────────────────
+// â”€â”€â”€ Module: sigma::SpinId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// SpinManifest — hardware-compatible struct.
+/// SpinManifest â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct SpinManifest {
     pub id: SigmaU64,
     pub net_policy: SigmaU64,
     pub sandbox_ring_level: SigmaU64,
@@ -30,7 +30,7 @@ pub struct {s_name} {{
     pub audio_low_latency: SigmaBool,
 }
 
-/// SpinId — OOP singleton pattern.
+/// SpinId â€” OOP singleton pattern.
 pub struct SpinId {
     pub initialized: SigmaBool,
 }
@@ -43,4 +43,6 @@ impl SpinId {
 }
 
 static mut INSTANCE: SpinId = SpinId::new();
+
+
 

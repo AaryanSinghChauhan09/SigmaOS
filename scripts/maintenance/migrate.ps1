@@ -1,6 +1,6 @@
-$main_repo = "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"
-$wiki_repo = "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\wiki_repo"
-$log_file = "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\migration_log.txt"
+$main_repo = "c:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS"
+$wiki_repo = "c:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS\wiki_repo"
+$log_file = "c:\Users\Aaryan\.gemini\antigravity-ide\scratch\SigmaOS\migration_log.txt"
 
 if (Test-Path $log_file) { Remove-Item $log_file }
 

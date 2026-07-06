@@ -8,16 +8,16 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 ## 💻 Supported Hardware
 
-| Platform | Support Tier | Notes | 
-| :--- | :--- | :--- | 
+| Platform | Support Tier | Notes |
+| :--- | :--- | :--- |
 
-| **Raspberry Pi 5 (BCM2712)** | Tier 1 (Optimized) | Full silicon-level hardware acceleration. | 
+| **Raspberry Pi 5 (BCM2712)** | Tier 1 (Optimized) | Full silicon-level hardware acceleration. |
 
-| **Raspberry Pi 4 (BCM2711)** | Tier 1 (Supported) | Primary development target. | 
+| **Raspberry Pi 4 (BCM2711)** | Tier 1 (Supported) | Primary development target. |
 
-| **x86_64 Systems (Intel/AMD)** | Tier 2 (Stable) | Generic drivers for UEFI systems. | 
+| **x86_64 Systems (Intel/AMD)** | Tier 2 (Stable) | Generic drivers for UEFI systems. |
 
-| **RISC-V Generic** | Experimental | Basic kernel boot only. | 
+| **RISC-V Generic** | Experimental | Basic kernel boot only. |
 
 ---
 

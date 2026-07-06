@@ -1,11 +1,11 @@
-/// SigmaOS: ===========================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: ===========================================================================
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,12 +16,12 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: SigmaOS::SovereignGamingEngine ─────────────────────
+// â”€â”€â”€ Module: SigmaOS::SovereignGamingEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// ControllerDevice — hardware-compatible struct.
+/// ControllerDevice â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ControllerDevice {
     pub device_id: SigmaU32,
     pub vendor_id: SigmaU16,
     pub product_id: SigmaU16,
@@ -29,10 +29,10 @@ pub struct {s_name} {{
     pub connected: SigmaBool,
 }
 
-/// BoostShard — hardware-compatible struct.
+/// BoostShard â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct BoostShard {
     pub shard_id: SigmaU32,
     pub level: SigmaU64,
     pub active: SigmaBool,
@@ -40,10 +40,10 @@ pub struct {s_name} {{
     pub mem_clock_offset_mhz: SigmaU32,
 }
 
-/// FramePacerState — hardware-compatible struct.
+/// FramePacerState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct FramePacerState {
     pub total_frames: SigmaU64,
     pub dropped_frames: SigmaU64,
     pub avg_frame_time_us: SigmaU32,
@@ -51,10 +51,10 @@ pub struct {s_name} {{
     pub vsync_enabled: SigmaBool,
 }
 
-/// ProtonLayerState — hardware-compatible struct.
+/// ProtonLayerState â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct ProtonLayerState {
     pub proton_available: SigmaBool,
     pub wine_available: SigmaBool,
     pub proton_version_major: SigmaU32,
@@ -94,4 +94,6 @@ pub unsafe extern "C" fn gaming_detect_controllers() {
 #[no_mangle]
 pub unsafe extern "C" fn gaming_report_gpu_load() {
 }
+
+
 

@@ -4,14 +4,14 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ## 📊 Summary Table (Beyond Singularity Phase)
 
-| Roadmap Item | Implemented Shards | Implementation Details | 
-| :--- | :--- | :--- | 
+| Roadmap Item | Implemented Shards | Implementation Details |
+| :--- | :--- | :--- |
 
-| **Quantum-Hardened Persistence** | `S-PQC`, `S-SNAP` | Kyber-1024 encrypted CoW snapshots for atomic shard recovery. | 
+| **Quantum-Hardened Persistence** | `S-PQC`, `S-SNAP` | Kyber-1024 encrypted CoW snapshots for atomic shard recovery. |
 
-| **Neural Lattice** | `S-NEURAL`, `S-HOTSWAP` | AI-driven predictive telemetry and zero-downtime shard migration. | 
+| **Neural Lattice** | `S-NEURAL`, `S-HOTSWAP` | AI-driven predictive telemetry and zero-downtime shard migration. |
 
-| **Heterogeneous Deployment** | `S-ARCH-ARM64`, `S-ARCH-RISCV` | ISA-agnostic abstraction for multi-silicon sovereignty. | 
+| **Heterogeneous Deployment** | `S-ARCH-ARM64`, `S-ARCH-RISCV` | ISA-agnostic abstraction for multi-silicon sovereignty. |
 
 ---
 
@@ -63,4 +63,4 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ---
 
-*"The Singularity was just the beginning. Beyond it lies the infinite lattice."*
+### "The Singularity was just the beginning. Beyond it lies the infinite lattice."

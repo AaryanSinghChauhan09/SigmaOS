@@ -13,6 +13,14 @@ const PAGE_SIZE:  usize = 4096;
 const MAX_ORDER:  usize = 11;       // 2^11 pages = 8 MB max block
 const MAX_FRAMES: usize = 1 << 20; // support up to 4 GB (1M × 4 KB pages)
 
+/// Physical base address of usable RAM (updated by init).
+static PHYS_BASE:  AtomicU64 = AtomicU64::new(0x0010_0000);
+/// Total physical memory in bytes.
+static PHYS_TOTAL: AtomicU64 = AtomicU64::new(0x0400_0000);
+
+/// Canary value written at the bottom of kernel stacks to detect overflow.
+const STACK_GUARD_CANARY: u64 = 0xDEAD_C0DE_BEEF_CAFE;
+
 // ── Buddy allocator ───────────────────────────────────────────────────────
 // Each order has a free-list of block indices.
 const BUDDY_LIST_SIZE: usize = MAX_FRAMES / 2;
@@ -111,8 +119,14 @@ impl BuddyAllocator {
 }
 
 // ── Slab allocator ─────────────────────────────────────────────────────────
+// Linux 6.11-inspired: separate slab cache per size class prevents
+// cross-cache heap-spray attacks (bucket slab isolation).
 const SLAB_SIZES: [usize; 8] = [8, 16, 32, 64, 128, 256, 512, 1024];
 const SLAB_SLOTS: usize = 512;
+/// Poisoning pattern written into freed slab objects (detects use-after-free).
+const SLAB_POISON_BYTE: u8 = 0x5A; // "ZAP"
+/// Header written at start of each allocated slab object for overflow detection.
+const SLAB_HEADER_MAGIC: u32 = 0xCAFE_BABE;
 
 struct SlabCache {
     slots:    [u64; SLAB_SLOTS], // store addresses as u64
@@ -145,7 +159,16 @@ impl SlabCache {
             if self.free_map[i] {
                 self.free_map[i] = false;
                 self.count += 1;
-                return Some(self.slots[i]);
+                let addr = self.slots[i];
+                // Clear poison bytes from previous free, write header magic.
+                unsafe {
+                    let ptr = addr as *mut u8;
+                    for j in 0..self.obj_size { core::ptr::write_volatile(ptr.add(j), 0); }
+                    if self.obj_size >= 4 {
+                        core::ptr::write_volatile(ptr as *mut u32, SLAB_HEADER_MAGIC);
+                    }
+                }
+                return Some(addr);
             }
         }
         None
@@ -156,6 +179,13 @@ impl SlabCache {
             if self.slots[i] == addr {
                 self.free_map[i] = true;
                 self.count = self.count.saturating_sub(1);
+                // Poison freed object to catch use-after-free.
+                unsafe {
+                    let ptr = addr as *mut u8;
+                    for j in 0..self.obj_size {
+                        core::ptr::write_volatile(ptr.add(j), SLAB_POISON_BYTE);
+                    }
+                }
                 return true;
             }
         }
@@ -320,6 +350,21 @@ pub enum MmError {
     OutOfMemory, OutOfVmas, WxViolation, PermDenied, NoMapping,
 }
 
+// ── Guard page helpers ────────────────────────────────────────────────────
+/// Write a guard canary at the bottom of a kernel stack.
+/// On x86_64 the stack grows downward, so `stack_base` is the lowest address.
+pub unsafe fn kstack_guard_write(stack_base: *mut u8) {
+    let canary_ptr = stack_base as *mut u64;
+    core::ptr::write_volatile(canary_ptr, STACK_GUARD_CANARY);
+}
+
+/// Check the guard canary at the bottom of a kernel stack.
+/// Returns `true` if the canary is intact, `false` if overwritten (overflow!).
+pub unsafe fn kstack_guard_check(stack_base: *const u8) -> bool {
+    let canary_ptr = stack_base as *const u64;
+    core::ptr::read_volatile(canary_ptr) == STACK_GUARD_CANARY
+}
+
 // ── Global instances ──────────────────────────────────────────────────────
 static mut G_BUDDY: BuddyAllocator = BuddyAllocator::new();
 static mut G_SLAB:  SlabAllocator  = SlabAllocator::new();
@@ -327,7 +372,11 @@ static mut G_SLAB:  SlabAllocator  = SlabAllocator::new();
 // ── C-ABI exports ─────────────────────────────────────────────────────────
 #[no_mangle]
 pub unsafe extern "C" fn sigma_slab_init() {
-    G_BUDDY.init(0x0010_0000, 0x0400_0000); // 1 MB base, 64 MB
+    let phys_base  = 0x0010_0000u64;
+    let phys_total = 0x0400_0000u64; // default 64 MB — overridden by bootloader
+    PHYS_BASE.store(phys_base,  Ordering::Relaxed);
+    PHYS_TOTAL.store(phys_total, Ordering::Relaxed);
+    G_BUDDY.init(phys_base, phys_total);
     G_SLAB.init();
 }
 
@@ -345,3 +394,35 @@ pub unsafe extern "C" fn sigma_slab_free(ptr: *mut u8) -> i32 {
 pub unsafe extern "C" fn sigma_mm_free_pages() -> u64 { G_BUDDY.free_pages() }
 #[no_mangle]
 pub unsafe extern "C" fn sigma_mm_used_pages() -> u64 { G_BUDDY.used_pages() }
+
+/// Returns total physical memory size in bytes (used by amnesic scrubber).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_mm_total_bytes() -> u64 {
+    PHYS_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Returns physical base address of RAM (used by amnesic scrubber).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_mm_phys_base() -> u64 {
+    PHYS_BASE.load(Ordering::Relaxed)
+}
+
+/// Write guard canary at base of a kernel stack.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_kstack_guard_init(stack_base: *mut u8) {
+    kstack_guard_write(stack_base);
+}
+
+/// Check guard canary — returns 1 if intact, 0 if overwritten (stack overflow!).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_kstack_guard_check(stack_base: *const u8) -> u32 {
+    if kstack_guard_check(stack_base) { 1 } else { 0 }
+}
+
+/// Override physical memory parameters (called from bootloader with real E820 map).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_mm_set_params(phys_base: u64, phys_total: u64) {
+    PHYS_BASE.store(phys_base,   Ordering::Relaxed);
+    PHYS_TOTAL.store(phys_total, Ordering::Relaxed);
+    G_BUDDY.init(phys_base, phys_total);
+}

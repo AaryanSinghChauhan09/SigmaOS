@@ -1,11 +1,11 @@
-/// SigmaOS: sigma_cpufreq module
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+﻿/// SigmaOS: sigma_cpufreq module
+/// Migrated from C/C++ to Rust â€” no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
 #![no_std]
 #![allow(dead_code)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Kernel Primitive Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type SigmaU8  = u8;
 type SigmaU16 = u16;
@@ -16,21 +16,21 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_cpufreq ─────────────────────
+// â”€â”€â”€ Module: Sigma::sigma_cpufreq â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// pstate — hardware-compatible struct.
+/// pstate â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct pstate {
     pub freq_mhz: SigmaU64,
     pub voltage_mv: SigmaU64,
     pub msr_value: SigmaU64,
 }
 
-/// cpufreq_cpu — hardware-compatible struct.
+/// cpufreq_cpu â€” hardware-compatible struct.
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct {s_name} {{
+pub struct cpufreq_cpu {
     pub governor: SigmaU64,
     pub current_pstate: SigmaU64,
     pub util_percent: SigmaU64,
@@ -70,4 +70,6 @@ pub unsafe extern "C" fn sigma_cpufreq_init() {
 #[no_mangle]
 pub unsafe extern "C" fn sigma_cpufreq_set_governor() {
 }
+
+
 

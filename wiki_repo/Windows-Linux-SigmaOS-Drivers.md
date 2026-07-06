@@ -25,8 +25,11 @@ This comes at a cost: Windows carries **decades of legacy baggage**:
 
 - The Win32 subsystem (ntdll.dll, kernel32.dll, user32.dll) ships with code paths
   from Windows NT 3.1 (1993) still active
+
 - Drivers run in **ring-0** with full kernel access — one driver bug = full BSOD
+
 - Closed drivers cannot be audited, patched by the community, or adapted
+
 - Backward compatibility means the kernel grows heavier with every release
 
 ---
@@ -47,9 +50,13 @@ This comes at a cost: Windows carries **decades of legacy baggage**:
 Despite driver struggles, Linux wins in other areas:
 
 - **Open source** — anyone can audit, fork, fix drivers
+
 - **Security** — open drivers have fewer hidden backdoors
+
 - **Modularity** — strip to minimal install, no legacy bloat
+
 - **Community** — Intel, AMD, ARM all contribute upstream drivers
+
 - **Containers** — Docker/Flatpak/Snap solve legacy app compat without kernel baggage
 
 ---
@@ -126,32 +133,50 @@ SigmaOS ring-3 driver: one exploit = limited to declared capabilities.
 ### 5. AI-Assisted Driver Porting
 
 ```bash
+
 # Study a Linux driver, generate SigmaOS SDF skeleton (cleanroom)
+
 sigma-driver-porter analyse rtl8169.c     # understand structure
+
 sigma-driver-porter port rtl8169.c        # generate skeleton
+
 sigma-driver-porter port rtl8169.c --ai   # LLM-powered full translation
 
 # 20 Linux APIs → SigmaOS equivalents mapped automatically:
+
 # ioremap → ddk::iomap
+
 # request_irq → ddk::request_irq
+
 # dma_alloc_coherent → ddk::dma_alloc
+
 # pci_register_driver → sigma_register_driver!
+
 ```
 
 ### 6. Vendor Transparency Incentives
 
 ```bash
 sigma-ddk-vendors score    # see transparency scores
+
 # Intel:    ████████████████░░░░ 82/100  (open drivers rewarded)
+
 # AMD:      ████████████████░░░░ 79/100
+
 # NVIDIA:   ████░░░░░░░░░░░░░░░░ 22/100  (closed blob penalty)
+
 # Realtek:  ████████░░░░░░░░░░░░ 41/100
+
 ```
 
 Vendors who open-source drivers get:
+
 - Higher transparency score (shown on the app store)
+
 - Inclusion in the SigmaOS ISO for supported hardware
+
 - `SIGMA_DRV_FLAG_CERTIFIED` badge
+
 - Community bug fixes and maintenance
 
 ---
@@ -167,13 +192,17 @@ Vendors who open-source drivers get:
 | **Strict versioning** | ABI version in every component, explicit deprecation cycle (see `kabi/`) |
 
 ```bash
+
 # Run a legacy Linux binary without touching the kernel
+
 sigma-compat run /usr/bin/old-linux-app
 
 # Run a full Ubuntu container for legacy workloads
+
 sigma-compat container ubuntu:22.04 ./legacy-script.sh
 
 # AI-migrate a bash script to sigma-sh
+
 sigma-agent "convert to sigma-sh: $(cat deploy.sh)"
 ```
 
@@ -206,32 +235,45 @@ Legend: ✅ Working · 🔄 Partial (init done, full TX/RX WIP) · ⬜ Planned
 Windows drivers are closed because of **vendor business incentives**, not technical necessity:
 
 1. **IP protection** — register offsets, firmware formats, and optimization tricks are competitive advantages
+
 2. **Liability** — closed code means Microsoft/vendor can't be blamed for community modifications
+
 3. **WHQL process** — certification is easier to enforce with closed, signed binaries
+
 4. **Historical inertia** — the WDM model predates the open source movement; vendors never changed
 
 ### What Would Change If Windows Drivers Were Open
 
 - Security researchers could audit for backdoors and vulnerabilities
+
 - Community could port drivers to other platforms (like SigmaOS)
+
 - Hardware vendors could compete on hardware quality, not software lock-in
+
 - Driver bugs could be fixed by anyone, not just the vendor
 
 ### Linux's Open Driver Advantage
 
 Intel and AMD now contribute open source drivers directly to the Linux kernel.
 This means:
+
 - Drivers evolve with the hardware (day-0 support for new CPUs/GPUs)
+
 - Security issues fixed by the community, not just the vendor
+
 - SigmaOS can port these drivers cleanly via `sigma-driver-porter`
 
 ### SigmaOS's Stance
 
 SigmaOS **does not require** open source drivers — closed vendor blobs are allowed.
 But the framework creates strong **incentives** for open drivers:
+
 - Ring-3 isolation means a closed driver still can't crash the kernel
+
 - Transparency scores visible to users in the app store
+
 - Open drivers get certified faster and included in the ISO
+
 - AI porting makes open-sourcing less work for vendors
 
 ---
@@ -239,24 +281,33 @@ But the framework creates strong **incentives** for open drivers:
 ## Contribution Guide
 
 ```bash
+
 # 1. Find a missing driver (see gaps)
+
 sigma-ddk-vendors missing
 
 # 2. Study the Linux driver (don't copy GPL code)
+
 sigma-driver-porter analyse /path/to/linux_driver.c
 
 # 3. Generate SigmaOS skeleton
+
 sigma-driver-porter port /path/to/linux_driver.c -o my_drivers/
 
 # 4. Fill in register definitions from vendor datasheet
+
 # 5. Build and test
+
 cd my_drivers/my_driver && cargo build --release
 
 # 6. Validate ABI
+
 sigma-ddk validate target/release/libmy_driver.a
 
 # 7. Submit PR
+
 # Title: "Driver: <vendor> <device> — SDF port"
+
 ```
 
 ---

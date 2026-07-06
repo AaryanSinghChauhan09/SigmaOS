@@ -43,4 +43,5 @@ The engine is encapsulated in the `SigmaOS::Kernel::Memory::SovereignMemoryManag
 - **Shard Isolation**: Guaranteed boundary protection between Ring-0 modules.
 
 ---
-*Stay Sovereign.*
+
+### Stay Sovereign.

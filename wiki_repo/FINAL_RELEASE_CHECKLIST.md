@@ -58,4 +58,4 @@ The Wiki is already updated with:
 
 - [Independent Deployment](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Independent-Deployment)
 
-*"The Zenith is the final industrial fact."*
+### "The Zenith is the final industrial fact."

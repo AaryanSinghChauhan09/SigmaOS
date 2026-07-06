@@ -140,19 +140,41 @@ impl Tool for ListDirTool {
 pub struct ShellTool;
 impl Tool for ShellTool {
     fn name(&self)        -> &'static str { "shell" }
-    fn description(&self) -> &'static str { "Execute a shell command and return stdout+stderr" }
+    fn description(&self) -> &'static str { "Execute a shell command and return stdout+stderr (with optional interactive input simulation)" }
     fn aliases(&self)     -> &'static [&'static str] { &["run", "exec", "bash", "cmd"] }
     fn schema(&self) -> Vec<ToolArg> { vec![
         ToolArg { name:"command", description:"Shell command to execute", required:true, example:"sigma-pkg list" },
         ToolArg { name:"cwd",     description:"Working directory",        required:false, example:"/home/user" },
+        ToolArg { name:"input",   description:"Interactive input string to feed into stdin", required:false, example:"y\n" },
     ]}
     fn execute(&self, args: &BTreeMap<String, String>) -> ToolResult {
-        let cmd = match args.get("command") { Some(c) => c, None => return ToolResult::err("command required") };
-        let cwd = args.get("cwd").map(|s| s.as_str()).unwrap_or(".");
-        let output = Command::new("sh")
-            .arg("-c").arg(cmd)
+        let cmd   = match args.get("command") { Some(c) => c, None => return ToolResult::err("command required") };
+        let cwd   = args.get("cwd").map(|s| s.as_str()).unwrap_or(".");
+        let input = args.get("input");
+        
+        let mut child = Command::new("sh")
+            .arg("-c")
+            .arg(cmd)
             .current_dir(cwd)
-            .output();
+            .stdin(if input.is_some() { std::process::Stdio::piped() } else { std::process::Stdio::null() })
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .spawn();
+
+        let mut child = match child {
+            Ok(c) => c,
+            Err(e) => return ToolResult::err(format!("Spawn failed: {}", e)),
+        };
+
+        if let Some(in_str) = input {
+            if let Some(mut stdin) = child.stdin.take() {
+                let _ = write!(stdin, "{}", in_str);
+                let _ = stdin.flush();
+            }
+        }
+
+        let output = child.wait_with_output();
+
         match output {
             Ok(out) => {
                 let stdout = String::from_utf8_lossy(&out.stdout).to_string();
