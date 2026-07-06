@@ -80,9 +80,59 @@ pub struct {s_name} {{
 
 #[no_mangle]
 pub unsafe extern "C" fn apply_bsp() {
+    // Binary Space Partitioning layout - inspired by i3wm
+    // Divides screen recursively into binary tree of windows
+    // Each node represents either a window or a split point
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn apply_master_stack() {
+    // Master-Stack layout - inspired by dwm/i3
+    // Master area on left (or top) for main window
+    // Stack area on right (or bottom) for secondary windows
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn apply_monocle() {
+    // Monocle layout - inspired by i3wm/dwm
+    // Single window takes entire screen
+    // Other windows hidden but accessible via workspace switching
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn apply_floating() {
+    // Floating layout - inspired by traditional window managers
+    // Windows can be positioned and resized freely
+    // Tiling disabled for this workspace
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn toggle_floating() {
+    // Toggle current window between tiling and floating
+    // Inspired by i3wm floating toggle
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn focus_next() {
+    // Focus next window in tiling order
+    // Inspired by i3wm focus navigation
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn focus_prev() {
+    // Focus previous window in tiling order
+    // Inspired by i3wm focus navigation
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn swap_next() {
+    // Swap current window with next window
+    // Inspired by i3wm window swapping
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn swap_prev() {
+    // Swap current window with previous window
+    // Inspired by i3wm window swapping
 }
 
