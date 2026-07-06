@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Marathi (mr_IN)
+[meta]
+language = "Marathi"
+code = "mr_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ठीक आहे"
+cancel = "रद्द करा"
+yes = "होय"
+no = "नाही"
+error = "त्रुटी"
+warning = "चेतावणी"
+info = "माहिती"
+loading = "लोड होत आहे..."
+settings = "सेटिंग्ज"
+shutdown = "बंद करा"
+restart = "पुन्हा सुरू करा"
+logout = "लॉगआउट"
+[pkg]
+installing = "इन्स्टॉल होत आहे..."
+removing = "काढले जात आहे..."
+updated = "अपडेट झाले"

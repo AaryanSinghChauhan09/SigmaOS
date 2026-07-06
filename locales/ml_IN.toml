@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Malayalam (ml_IN)
+[meta]
+language = "Malayalam"
+code = "ml_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ശരി"
+cancel = "റദ്ദാക്കുക"
+yes = "അതെ"
+no = "ഇല്ല"
+error = "പിശക്"
+warning = "മുന്നറിയിപ്പ്"
+info = "വിവരങ്ങൾ"
+loading = "ലോഡ് ചെയ്യുന്നു..."
+settings = "ക്രമീകരണങ്ങൾ"
+shutdown = "അണച്ചിരിക്കുക"
+restart = "പുനരാരംഭിക്കുക"
+logout = "ലോഗ്ഔട്ട്"
+[pkg]
+installing = "ഇൻസ്റ്റോൾ ചെയ്യുന്നു..."
+removing = "നീക്കം ചെയ്യുന്നു..."
+updated = "അപ്‌ഡേറ്റ് ആയി"

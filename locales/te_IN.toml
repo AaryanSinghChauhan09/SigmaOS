@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Telugu (te_IN)
+[meta]
+language = "Telugu"
+code = "te_IN"
+charset = "UTF-8"
+
+[system]
+ok = "సరే"
+cancel = "రద్దు చేయి"
+yes = "అవును"
+no = "లేదు"
+error = "లోపం"
+warning = "హెచ్చరిక"
+info = "సమాచారం"
+loading = "లోడ్ అవుతోంది..."
+settings = "సెట్టింగులు"
+shutdown = "మూసివేయి"
+restart = "పునఃప్రారంభించు"
+logout = "లాగ్ అవుట్"
+[pkg]
+installing = "ఇన్‌స్టాల్ అవుతోంది..."
+removing = "తొలగిస్తోంది..."
+updated = "నవీకరించబడింది"

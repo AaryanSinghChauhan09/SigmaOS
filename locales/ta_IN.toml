@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Tamil (ta_IN)
+[meta]
+language = "Tamil"
+code = "ta_IN"
+charset = "UTF-8"
+
+[system]
+ok = "சரி"
+cancel = "ரத்து செய்"
+yes = "ஆம்"
+no = "இல்லை"
+error = "பிழை"
+warning = "எச்சரிக்கை"
+info = "தகவல்"
+loading = "ஏற்றுகிறது..."
+settings = "அமைப்புகள்"
+shutdown = "அணை"
+restart = "மறுதொடக்கம்"
+logout = "வெளியேறு"
+[pkg]
+installing = "நிறுவுகிறது..."
+removing = "நீக்குகிறது..."
+updated = "புதுப்பிக்கப்பட்டது"

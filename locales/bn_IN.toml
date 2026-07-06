@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Bengali (bn_IN)
+[meta]
+language = "Bengali"
+code = "bn_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ঠিক আছে"
+cancel = "বাতিল"
+yes = "হ্যাঁ"
+no = "না"
+error = "ত্রুটি"
+warning = "সতর্কতা"
+info = "তথ্য"
+loading = "লোড হচ্ছে..."
+settings = "সেটিংস"
+shutdown = "বন্ধ করুন"
+restart = "পুনরায় চালু করুন"
+logout = "লগআউট"
+[pkg]
+installing = "ইনস্টল হচ্ছে..."
+removing = "সরানো হচ্ছে..."
+updated = "আপডেট হয়েছে"

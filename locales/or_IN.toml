@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Odia (or_IN)
+[meta]
+language = "Odia"
+code = "or_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ଠିକ ଅଛି"
+cancel = "ବାତିଲ"
+yes = "ହଁ"
+no = "ନା"
+error = "ତ୍ରୁଟି"
+warning = "ସତର୍କତା"
+info = "ସୂଚନା"
+loading = "ଲୋଡ ହେଉଛି..."
+settings = "ସେଟିଂ"
+shutdown = "ବନ୍ଦ"
+restart = "ପୁନରାରମ୍ଭ"
+logout = "ଲଗ ଆଉଟ"
+[pkg]
+installing = "ଇନ୍‌ସ୍ଟଲ ହେଉଛି..."
+removing = "ହଟାଯାଉଛି..."
+updated = "ଅଦ୍ୟତନ ହୋଇଛି"

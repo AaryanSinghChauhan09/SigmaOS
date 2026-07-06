@@ -1,0 +1,14 @@
+name: SigmaOS Driver CI
+
+on:
+  push:
+    paths:
+      - 'kernel/drivers/**'
+
+jobs:
+  build-drivers:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build Drivers
+      run: cargo build --features "all-drivers"

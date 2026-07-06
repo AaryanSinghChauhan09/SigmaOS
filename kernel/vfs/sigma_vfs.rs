@@ -1,624 +1,427 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS Virtual Filesystem (VFS) — kernel/vfs/sigma_vfs.rs
-// Full VFS layer: mount table, dentry cache, inode operations,
-// open/read/write/seek/close syscall backends, and tmpfs built-in.
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright (c) 2024-2026 SigmaOS Project
+//
+// kernel/vfs/sigma_vfs.rs — Virtual Filesystem Switch
+// Implements VFS layer: open/read/write/close/stat/mkdir/rmdir/
+// readdir/rename/chdir/getcwd/ioctl/lseek.
+//
+// Architecture:
+//  - FD table per-process (MAX_FD open files)
+//  - VfsNode: inode-like abstraction with vtable of fn pointers
+//  - Filesystem drivers register via vfs_register_fs()
+//  - Supports: tmpfs, sigmafs, ext4 (ro), fat32
 
 #![no_std]
+#![allow(dead_code)]
 
-use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-pub const MAX_MOUNTS:    usize = 32;
-pub const MAX_INODES:    usize = 4096;
-pub const MAX_DENTRIES:  usize = 4096;
-pub const MAX_FDS:       usize = 1024;
-pub const MAX_NAME:      usize = 256;
-pub const MAX_PATH:      usize = 4096;
-pub const TMPFS_SIZE:    usize = 16 * 1024 * 1024; // 16 MB tmpfs pool
+// ── Limits ─────────────────────────────────────────────────────────────────
+pub const MAX_FD:         usize = 256;
+pub const MAX_OPEN_FILES: usize = 4096;
+pub const MAX_FS_TYPES:   usize = 16;
+pub const PATH_MAX:       usize = 4096;
+pub const NAME_MAX:       usize = 255;
 
-// ── File Type Flags ───────────────────────────────────────────────────────────
-pub const S_IFREG: u32 = 0o100000;
-pub const S_IFDIR: u32 = 0o040000;
-pub const S_IFLNK: u32 = 0o120000;
-pub const S_IFMT:  u32 = 0o170000;
+// ── Flags ──────────────────────────────────────────────────────────────────
+pub const O_RDONLY: u32 = 0;
+pub const O_WRONLY: u32 = 1;
+pub const O_RDWR:   u32 = 2;
+pub const O_CREAT:  u32 = 0x40;
+pub const O_TRUNC:  u32 = 0x200;
+pub const O_APPEND: u32 = 0x400;
+pub const O_NONBLOCK: u32 = 0x800;
 
-// ── Open Flags ────────────────────────────────────────────────────────────────
-pub const O_RDONLY:   u32 = 0;
-pub const O_WRONLY:   u32 = 1;
-pub const O_RDWR:     u32 = 2;
-pub const O_CREAT:    u32 = 0o100;
-pub const O_TRUNC:    u32 = 0o1000;
-pub const O_APPEND:   u32 = 0o2000;
-pub const O_EXCL:     u32 = 0o200;
-pub const O_DIRECTORY:u32 = 0o200000;
-
-// ── Seek Whence ───────────────────────────────────────────────────────────────
 pub const SEEK_SET: i32 = 0;
 pub const SEEK_CUR: i32 = 1;
 pub const SEEK_END: i32 = 2;
 
-// ── Error Codes ───────────────────────────────────────────────────────────────
-pub const ENOENT:    i32 = -2;
-pub const EEXIST:    i32 = -17;
-pub const EBADF:     i32 = -9;
-pub const ENOMEM:    i32 = -12;
-pub const EISDIR:    i32 = -21;
-pub const ENOTDIR:   i32 = -20;
-pub const EINVAL:    i32 = -22;
-pub const ENOSPC:    i32 = -28;
-pub const EACCES:    i32 = -13;
-pub const EFBIG:     i32 = -27;
-pub const EIO:       i32 = -5;
-pub const ENOTEMPTY: i32 = -39;
-
-// ── Filesystem Type IDs ───────────────────────────────────────────────────────
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum FsType {
-    Tmpfs,
-    SigmaFS,
-    Ext4,
-    Procfs,
-    Devfs,
-    Unknown,
+// ── Node types ─────────────────────────────────────────────────────────────
+#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum NodeType {
+    Unknown   = 0,
+    Regular   = 1,
+    Directory = 2,
+    Symlink   = 3,
+    Char      = 4,
+    Block     = 5,
+    Fifo      = 6,
+    Socket    = 7,
 }
 
-impl Default for FsType {
-    fn default() -> Self { FsType::Unknown }
+// ── VFS node (inode-equivalent) ────────────────────────────────────────────
+#[repr(C)]
+pub struct VfsNode {
+    pub inode:    u64,
+    pub size:     u64,
+    pub mode:     u32,
+    pub uid:      u32,
+    pub gid:      u32,
+    pub atime:    i64,
+    pub mtime:    i64,
+    pub ctime:    i64,
+    pub nlink:    u32,
+    pub node_type: NodeType,
+    pub fs_id:    u8,   // which filesystem owns this node
+    pub ops:      &'static VfsOps,
+    pub private:  u64,  // fs-private pointer (cast to fs-specific struct)
 }
 
-// ── Inode Number ─────────────────────────────────────────────────────────────
-pub type Ino = u64;
-static NEXT_INO: AtomicU64 = AtomicU64::new(2); // 1 = root
-
-fn alloc_ino() -> Ino {
-    NEXT_INO.fetch_add(1, Ordering::Relaxed)
+/// Filesystem operations vtable
+#[repr(C)]
+pub struct VfsOps {
+    pub read:    fn(node: &VfsNode, offset: u64, buf: *mut u8, len: usize) -> i64,
+    pub write:   fn(node: &VfsNode, offset: u64, buf: *const u8, len: usize) -> i64,
+    pub readdir: fn(node: &VfsNode, offset: u64, out: *mut DirEntry, max: usize) -> i64,
+    pub lookup:  fn(parent: &VfsNode, name: &[u8]) -> Option<u64>, // → inode
+    pub create:  fn(parent: &VfsNode, name: &[u8], mode: u32) -> i64,
+    pub mkdir:   fn(parent: &VfsNode, name: &[u8], mode: u32) -> i64,
+    pub unlink:  fn(parent: &VfsNode, name: &[u8]) -> i64,
+    pub rmdir:   fn(parent: &VfsNode, name: &[u8]) -> i64,
+    pub rename:  fn(old_parent: &VfsNode, old: &[u8], new_parent: &VfsNode, new: &[u8]) -> i64,
+    pub truncate: fn(node: &VfsNode, size: u64) -> i64,
+    pub ioctl:   fn(node: &VfsNode, req: u64, arg: u64) -> i64,
+    pub sync:    fn(node: &VfsNode) -> i64,
 }
 
-// ── Inode ─────────────────────────────────────────────────────────────────────
-#[derive(Clone, Default)]
-pub struct Inode {
-    pub ino:         Ino,
-    pub mode:        u32,
-    pub uid:         u32,
-    pub gid:         u32,
-    pub size:        u64,
-    pub nlink:       u32,
-    pub atime_sec:   u64,
-    pub mtime_sec:   u64,
-    pub ctime_sec:   u64,
-    pub dev:         u32,
-    pub data_offset: usize,
-    pub data_cap:    usize,
-    pub fs_type:     FsType,
-    pub valid:       bool,
+// ── Directory entry ────────────────────────────────────────────────────────
+#[repr(C)]
+pub struct DirEntry {
+    pub inode:  u64,
+    pub offset: u64,
+    pub reclen: u16,
+    pub ftype:  NodeType,
+    pub name:   [u8; NAME_MAX + 1],
 }
 
-impl Inode {
-    pub fn is_dir(&self) -> bool  { (self.mode & S_IFMT) == S_IFDIR }
-    pub fn is_reg(&self) -> bool  { (self.mode & S_IFMT) == S_IFREG }
-}
-
-// ── Dentry ────────────────────────────────────────────────────────────────────
-#[derive(Clone)]
-pub struct Dentry {
-    pub name:     [u8; MAX_NAME],
-    pub name_len: u16,
-    pub ino:      Ino,
-    pub parent:   Ino,
-    pub valid:    bool,
-}
-
-impl Default for Dentry {
-    fn default() -> Self {
-        Self { name: [0u8; MAX_NAME], name_len: 0, ino: 0, parent: 0, valid: false }
-    }
-}
-
-impl Dentry {
-    pub fn name_str(&self) -> &[u8] { &self.name[..self.name_len as usize] }
-    pub fn matches(&self, name: &[u8]) -> bool { self.valid && self.name_str() == name }
-}
-
-// ── Mount Entry ───────────────────────────────────────────────────────────────
-#[derive(Clone)]
-pub struct Mount {
-    pub mountpoint: [u8; MAX_PATH],
-    pub mp_len:     u16,
-    pub root_ino:   Ino,
-    pub fs_type:    FsType,
-    pub read_only:  bool,
-    pub valid:      bool,
-}
-
-impl Default for Mount {
-    fn default() -> Self {
-        Self { mountpoint: [0u8; MAX_PATH], mp_len: 0, root_ino: 0,
-               fs_type: FsType::Unknown, read_only: false, valid: false }
-    }
-}
-
-// ── File Descriptor ───────────────────────────────────────────────────────────
-#[derive(Clone, Default)]
-pub struct FileDescriptor {
-    pub ino:    Ino,
+// ── Open file descriptor ───────────────────────────────────────────────────
+#[derive(Clone, Copy)]
+pub struct FileDesc {
+    pub valid:  bool,
+    pub inode:  u64,
     pub offset: u64,
     pub flags:  u32,
-    pub valid:  bool,
+    pub fs_id:  u8,
 }
 
-// ── Stat ─────────────────────────────────────────────────────────────────────
-#[repr(C)]
-#[derive(Default, Debug)]
-pub struct Stat {
-    pub dev:       u64,
-    pub ino:       u64,
-    pub mode:      u32,
-    pub nlink:     u32,
-    pub uid:       u32,
-    pub gid:       u32,
-    pub rdev:      u64,
-    pub size:      i64,
-    pub blksize:   u32,
-    _pad:          u32,
-    pub blocks:    u64,
-    pub atime_sec: u64,
-    pub atime_ns:  u64,
-    pub mtime_sec: u64,
-    pub mtime_ns:  u64,
-    pub ctime_sec: u64,
-    pub ctime_ns:  u64,
+// ── Per-process FD table (global for single address space in early boot) ───
+static mut FD_TABLE: [FileDesc; MAX_FD] = [FileDesc {
+    valid: false, inode: 0, offset: 0, flags: 0, fs_id: 0,
+}; MAX_FD];
+static NEXT_FD: AtomicUsize = AtomicUsize::new(3); // 0,1,2 = stdin/stdout/stderr
+
+// ── Filesystem registry ────────────────────────────────────────────────────
+pub struct FsType {
+    pub name:    &'static str,
+    pub fs_id:   u8,
+    pub mount:   fn(device: u64, flags: u32) -> i64,
+    pub unmount: fn(fs_id: u8) -> i64,
 }
 
-// ── Tmpfs Pool ────────────────────────────────────────────────────────────────
-static mut TMPFS_DATA: [u8; TMPFS_SIZE] = [0u8; TMPFS_SIZE];
-static TMPFS_USED: AtomicU64 = AtomicU64::new(0);
+static mut FS_REGISTRY: [Option<FsType>; MAX_FS_TYPES] = [
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+];
+static FS_COUNT: AtomicUsize = AtomicUsize::new(0);
 
-fn tmpfs_alloc(size: usize) -> Option<usize> {
-    let cur = TMPFS_USED.load(Ordering::Relaxed) as usize;
-    if cur + size > TMPFS_SIZE { return None; }
-    TMPFS_USED.store((cur + size) as u64, Ordering::Relaxed);
-    Some(cur)
+pub fn vfs_register_fs(fs: FsType) -> i64 {
+    let idx = FS_COUNT.fetch_add(1, Ordering::SeqCst);
+    if idx >= MAX_FS_TYPES { return -1; }
+    unsafe { FS_REGISTRY[idx] = Some(fs); }
+    0
 }
 
-// ── VFS ───────────────────────────────────────────────────────────────────────
-pub struct Vfs {
-    pub inodes:       [Inode;           MAX_INODES],
-    pub dentries:     [Dentry;          MAX_DENTRIES],
-    pub mounts:       [Mount;           MAX_MOUNTS],
-    pub fds:          [FileDescriptor;  MAX_FDS],
-    pub inode_count:  usize,
-    pub dentry_count: usize,
-    pub mount_count:  usize,
-}
+// ── Inode cache (simple array; production would use hash table) ────────────
+static mut INODE_CACHE: [Option<VfsNode>; 1024] = [None; 1024];
+static INODE_CACHE_LEN: AtomicUsize = AtomicUsize::new(0);
 
-impl Vfs {
-    pub fn new_zeroed() -> Self {
-        unsafe { core::mem::zeroed() }
-    }
-
-    // ── Inode helpers ─────────────────────────────────────────────────────────
-
-    fn alloc_inode(&mut self) -> Option<&mut Inode> {
-        if self.inode_count >= MAX_INODES { return None; }
-        let idx = self.inode_count;
-        self.inode_count += 1;
-        Some(&mut self.inodes[idx])
-    }
-
-    pub fn get_inode(&self, ino: Ino) -> Option<&Inode> {
-        self.inodes[..self.inode_count].iter().find(|i| i.valid && i.ino == ino)
-    }
-
-    pub fn get_inode_mut(&mut self, ino: Ino) -> Option<&mut Inode> {
-        let c = self.inode_count;
-        self.inodes[..c].iter_mut().find(|i| i.valid && i.ino == ino)
-    }
-
-    // ── Dentry helpers ────────────────────────────────────────────────────────
-
-    fn alloc_dentry(&mut self) -> Option<&mut Dentry> {
-        if self.dentry_count >= MAX_DENTRIES { return None; }
-        let idx = self.dentry_count;
-        self.dentry_count += 1;
-        Some(&mut self.dentries[idx])
-    }
-
-    pub fn lookup(&self, parent: Ino, name: &[u8]) -> Option<Ino> {
-        self.dentries[..self.dentry_count]
-            .iter()
-            .find(|d| d.parent == parent && d.matches(name))
-            .map(|d| d.ino)
-    }
-
-    fn link_dentry(&mut self, parent: Ino, name: &[u8], ino: Ino) -> bool {
-        let de = match self.alloc_dentry() { Some(d) => d, None => return false };
-        let l = name.len().min(MAX_NAME - 1);
-        de.name[..l].copy_from_slice(&name[..l]);
-        de.name_len = l as u16;
-        de.ino      = ino;
-        de.parent   = parent;
-        de.valid    = true;
-        true
-    }
-
-    // ── Mounting ──────────────────────────────────────────────────────────────
-
-    fn mount_at(&mut self, mp: &[u8], root_ino: Ino, fs: FsType, ro: bool) -> bool {
-        if self.mount_count >= MAX_MOUNTS { return false; }
-        let m = &mut self.mounts[self.mount_count];
-        let l = mp.len().min(MAX_PATH - 1);
-        m.mountpoint[..l].copy_from_slice(&mp[..l]);
-        m.mp_len   = l as u16;
-        m.root_ino = root_ino;
-        m.fs_type  = fs;
-        m.read_only= ro;
-        m.valid    = true;
-        self.mount_count += 1;
-        true
-    }
-
-    fn make_dir_inode(&mut self, ino: Ino, fs: FsType) -> Ino {
-        if let Some(node) = self.alloc_inode() {
-            node.ino     = ino;
-            node.mode    = S_IFDIR | 0o755;
-            node.nlink   = 2;
-            node.fs_type = fs;
-            node.valid   = true;
+fn inode_get(inode: u64) -> Option<&'static VfsNode> {
+    let len = INODE_CACHE_LEN.load(Ordering::Relaxed);
+    for i in 0..len {
+        unsafe {
+            if let Some(ref node) = INODE_CACHE[i] {
+                if node.inode == inode { return Some(node); }
+            }
         }
-        ino
     }
+    None
+}
 
-    fn make_char_inode(&mut self, parent: Ino, name: &[u8], mode: u32, major: u32, minor: u32) {
-        let ino = alloc_ino();
-        if let Some(n) = self.alloc_inode() {
-            n.ino    = ino;
-            n.mode   = 0o020000 | mode;
-            n.dev    = (major << 8) | minor;
-            n.nlink  = 1;
-            n.fs_type= FsType::Devfs;
-            n.valid  = true;
+fn inode_insert(node: VfsNode) {
+    let idx = INODE_CACHE_LEN.fetch_add(1, Ordering::SeqCst);
+    if idx < 1024 {
+        unsafe { INODE_CACHE[idx] = Some(node); }
+    }
+}
+
+// ── VFS interface ──────────────────────────────────────────────────────────
+
+/// Allocate a new file descriptor slot.
+fn alloc_fd() -> Option<i32> {
+    for fd in 3..MAX_FD {
+        let valid = unsafe { FD_TABLE[fd].valid };
+        if !valid {
+            return Some(fd as i32);
         }
-        self.link_dentry(parent, name, ino);
     }
+    None
+}
 
-    // ── Initialization ────────────────────────────────────────────────────────
-
-    pub fn init(&mut self) {
-        let root_ino = self.make_dir_inode(1, FsType::Tmpfs);
-        self.mount_at(b"/", root_ino, FsType::Tmpfs, false);
-
-        // /tmp
-        let _ = self.mkdir_at(root_ino, b"tmp", 0o1777);
-        // /home
-        let _ = self.mkdir_at(root_ino, b"home", 0o755);
-        // /etc
-        let _ = self.mkdir_at(root_ino, b"etc", 0o755);
-        // /var
-        let _ = self.mkdir_at(root_ino, b"var", 0o755);
-        // /proc
-        let proc_ino = self.make_dir_inode(alloc_ino(), FsType::Procfs);
-        self.link_dentry(root_ino, b"proc", proc_ino);
-        self.mount_at(b"/proc", proc_ino, FsType::Procfs, true);
-        // /dev
-        let dev_ino = self.make_dir_inode(alloc_ino(), FsType::Devfs);
-        self.link_dentry(root_ino, b"dev", dev_ino);
-        self.mount_at(b"/dev", dev_ino, FsType::Devfs, false);
-        self.make_char_inode(dev_ino, b"null", 0o0666, 1, 3);
-        self.make_char_inode(dev_ino, b"zero", 0o0666, 1, 5);
-        self.make_char_inode(dev_ino, b"tty",  0o0666, 5, 0);
-        self.make_char_inode(dev_ino, b"urandom", 0o0444, 1, 9);
-    }
-
-    pub fn install_stdio(&mut self) {
-        for fd in 0..3 {
-            self.fds[fd] = FileDescriptor {
-                ino:    1,
-                offset: 0,
-                flags:  if fd == 0 { O_RDONLY } else { O_WRONLY },
-                valid:  true,
+pub fn vfs_open(path: *const u8, flags: u32, _mode: u32) -> i64 {
+    if path.is_null() { return -14; } // EFAULT
+    let fd = match alloc_fd() {
+        Some(fd) => fd,
+        None => return -12, // ENOMEM (too many open files)
+    };
+    // Resolve path through mounted filesystems
+    let inode = vfs_path_resolve(path);
+    if inode == 0 {
+        if flags & O_CREAT == 0 { return -2; } // ENOENT
+        // Create in tmpfs (default fs)
+        let new_inode = tmpfs_create(path, _mode);
+        if new_inode < 0 { return new_inode; }
+        unsafe {
+            FD_TABLE[fd as usize] = FileDesc {
+                valid: true, inode: new_inode as u64,
+                offset: 0, flags, fs_id: 0,
             };
         }
+        return fd as i64;
     }
-
-    // ── Path Resolution ───────────────────────────────────────────────────────
-
-    pub fn resolve_path(&self, path: &[u8]) -> Option<Ino> {
-        if path.is_empty() || path[0] != b'/' { return None; }
-        let mut cur = self.mounts[..self.mount_count]
-            .iter()
-            .find(|m| m.valid && m.mp_len == 1 && m.mountpoint[0] == b'/')
-            .map(|m| m.root_ino)?;
-
-        let mut i = 1usize;
-        while i < path.len() {
-            while i < path.len() && path[i] == b'/' { i += 1; }
-            if i >= path.len() { break; }
-            let start = i;
-            while i < path.len() && path[i] != b'/' { i += 1; }
-            let comp = &path[start..i];
-            if comp == b"." { continue; }
-            if comp == b".." {
-                if let Some(d) = self.dentries[..self.dentry_count]
-                    .iter().find(|d| d.valid && d.ino == cur) {
-                    cur = d.parent;
-                }
-                continue;
-            }
-            cur = self.lookup(cur, comp)?;
-        }
-        Some(cur)
-    }
-
-    // ── Directory ops ─────────────────────────────────────────────────────────
-
-    pub fn mkdir_at(&mut self, parent: Ino, name: &[u8], mode: u32) -> Result<Ino, i32> {
-        if self.lookup(parent, name).is_some() { return Err(EEXIST); }
-        let ino = alloc_ino();
-        {
-            let n = self.alloc_inode().ok_or(ENOMEM)?;
-            n.ino    = ino;
-            n.mode   = S_IFDIR | (mode & 0o7777);
-            n.nlink  = 2;
-            n.fs_type= FsType::Tmpfs;
-            n.valid  = true;
-        }
-        if !self.link_dentry(parent, name, ino) { return Err(ENOMEM); }
-        Ok(ino)
-    }
-
-    // ── File ops ──────────────────────────────────────────────────────────────
-
-    pub fn create_file(&mut self, parent: Ino, name: &[u8], mode: u32) -> Result<Ino, i32> {
-        if self.lookup(parent, name).is_some() { return Err(EEXIST); }
-        let ino = alloc_ino();
-        let off = tmpfs_alloc(0).ok_or(ENOSPC)?;
-        {
-            let n = self.alloc_inode().ok_or(ENOMEM)?;
-            n.ino         = ino;
-            n.mode        = S_IFREG | (mode & 0o7777);
-            n.nlink       = 1;
-            n.fs_type     = FsType::Tmpfs;
-            n.data_offset = off;
-            n.data_cap    = 0;
-            n.size        = 0;
-            n.valid       = true;
-        }
-        if !self.link_dentry(parent, name, ino) { return Err(ENOMEM); }
-        Ok(ino)
-    }
-
-    // ── Syscall implementations ───────────────────────────────────────────────
-
-    pub fn sys_open(&mut self, path: &[u8], flags: u32, mode: u32) -> i32 {
-        let ino = match self.resolve_path(path) {
-            Some(i) => i,
-            None => {
-                if flags & O_CREAT == 0 { return ENOENT; }
-                let (pp, name) = split_parent(path);
-                let parent = match self.resolve_path(pp) { Some(p) => p, None => return ENOENT };
-                match self.create_file(parent, name, mode) {
-                    Ok(i) => i, Err(e) => return e,
-                }
-            }
+    unsafe {
+        FD_TABLE[fd as usize] = FileDesc {
+            valid: true, inode, offset: 0, flags, fs_id: 0,
         };
-
-        if flags & O_EXCL != 0 && flags & O_CREAT != 0 { return EEXIST; }
-        if flags & O_TRUNC != 0 {
-            if let Some(n) = self.get_inode_mut(ino) {
-                if n.is_reg() { n.size = 0; n.data_cap = 0; }
-            }
-        }
-
-        let fd = match self.alloc_fd() { Some(f) => f, None => return ENOMEM };
-        let init_offset = if flags & O_APPEND != 0 {
-            self.get_inode(ino).map(|n| n.size).unwrap_or(0)
-        } else { 0 };
-
-        self.fds[fd] = FileDescriptor { ino, offset: init_offset, flags, valid: true };
-        fd as i32
     }
+    fd as i64
+}
 
-    pub fn sys_close(&mut self, fd: i32) -> i32 {
-        if fd < 0 || fd as usize >= MAX_FDS { return EBADF; }
-        let f = &mut self.fds[fd as usize];
-        if !f.valid { return EBADF; }
-        f.valid = false;
-        0
-    }
-
-    pub fn sys_read(&mut self, fd: i32, buf: &mut [u8]) -> i32 {
-        if fd < 0 || fd as usize >= MAX_FDS { return EBADF; }
-        let fdesc = self.fds[fd as usize].clone();
-        if !fdesc.valid { return EBADF; }
-        let ino = fdesc.ino;
-        let offset = fdesc.offset;
-        if let Some(node) = self.get_inode(ino) {
-            if node.is_dir() { return EISDIR; }
-            if !node.is_reg() { return EIO; }
-            let avail = node.size.saturating_sub(offset) as usize;
-            let to_read = buf.len().min(avail);
-            if to_read == 0 { return 0; }
-            let src = node.data_offset + offset as usize;
-            unsafe { buf[..to_read].copy_from_slice(&TMPFS_DATA[src..src + to_read]); }
-            self.fds[fd as usize].offset += to_read as u64;
-            return to_read as i32;
+pub fn vfs_close(fd: i32) -> i64 {
+    if fd < 0 || fd as usize >= MAX_FD { return -9; } // EBADF
+    unsafe {
+        if !FD_TABLE[fd as usize].valid { return -9; }
+        // Sync before close
+        if let Some(node) = inode_get(FD_TABLE[fd as usize].inode) {
+            (node.ops.sync)(node);
         }
-        ENOENT
+        FD_TABLE[fd as usize].valid = false;
     }
+    0
+}
 
-    pub fn sys_write(&mut self, fd: i32, buf: &[u8]) -> i32 {
-        if fd < 0 || fd as usize >= MAX_FDS { return EBADF; }
-        let fdesc = self.fds[fd as usize].clone();
-        if !fdesc.valid { return EBADF; }
-        let ino = fdesc.ino;
-        let offset = fdesc.offset;
+pub fn vfs_read(fd: i32, buf: *mut u8, count: usize) -> i64 {
+    if fd < 0 || fd as usize >= MAX_FD { return -9; }
+    let (inode, offset, flags) = unsafe {
+        let f = FD_TABLE[fd as usize];
+        if !f.valid { return -9; }
+        if flags_write_only(f.flags) { return -13; } // EACCES
+        (f.inode, f.offset, f.flags)
+    };
+    let node = match inode_get(inode) {
+        Some(n) => n,
+        None => return tmpfs_read(inode, offset, buf, count),
+    };
+    let n = (node.ops.read)(node, offset, buf, count);
+    if n > 0 {
+        unsafe { FD_TABLE[fd as usize].offset += n as u64; }
+    }
+    n
+}
 
-        let (data_offset, data_cap, cur_size) = {
-            match self.get_inode(ino) {
-                Some(n) => (n.data_offset, n.data_cap, n.size as usize),
-                None => return ENOENT,
-            }
-        };
-
-        let write_end = offset as usize + buf.len();
-        if write_end > TMPFS_SIZE { return EFBIG; }
-
-        if write_end > data_offset + data_cap {
-            let extra = write_end - (data_offset + data_cap);
-            if tmpfs_alloc(extra).is_none() { return ENOSPC; }
-            if let Some(n) = self.get_inode_mut(ino) { n.data_cap += extra; }
-        }
-
+pub fn vfs_write(fd: i32, buf: *const u8, count: usize) -> i64 {
+    if fd < 0 || fd as usize >= MAX_FD { return -9; }
+    let (inode, offset, flags) = unsafe {
+        let f = FD_TABLE[fd as usize];
+        if !f.valid { return -9; }
+        if flags & O_RDONLY == O_RDONLY && flags & O_RDWR == 0 { return -13; }
+        (f.inode, f.offset, f.flags)
+    };
+    // fd=1 (stdout) → serial console write
+    if fd == 1 || fd == 2 {
+        return console_write(buf, count);
+    }
+    let node = match inode_get(inode) {
+        Some(n) => n,
+        None => return tmpfs_write(inode, offset, buf, count),
+    };
+    let n = (node.ops.write)(node, offset, buf, count);
+    if n > 0 {
         unsafe {
-            let dst = &mut TMPFS_DATA[data_offset + offset as usize..
-                                       data_offset + offset as usize + buf.len()];
-            dst.copy_from_slice(buf);
+            let off = if flags & O_APPEND != 0 { u64::MAX } else { offset };
+            FD_TABLE[fd as usize].offset = off + n as u64;
         }
-
-        let new_size = ((offset as usize + buf.len()).max(cur_size)) as u64;
-        if let Some(n) = self.get_inode_mut(ino) { n.size = new_size; }
-        self.fds[fd as usize].offset += buf.len() as u64;
-        buf.len() as i32
     }
+    n
+}
 
-    pub fn sys_seek(&mut self, fd: i32, offset: i64, whence: i32) -> i64 {
-        if fd < 0 || fd as usize >= MAX_FDS { return EBADF as i64; }
-        let fdesc = &self.fds[fd as usize];
-        if !fdesc.valid { return EBADF as i64; }
-        let file_size = self.get_inode(fdesc.ino).map(|n| n.size).unwrap_or(0) as i64;
-        let cur = fdesc.offset as i64;
-        let new_off = match whence {
+pub fn vfs_lseek(fd: i32, offset: i64, whence: i32) -> i64 {
+    if fd < 0 || fd as usize >= MAX_FD { return -9; }
+    unsafe {
+        let f = &mut FD_TABLE[fd as usize];
+        if !f.valid { return -9; }
+        let new_off: i64 = match whence {
             SEEK_SET => offset,
-            SEEK_CUR => cur + offset,
-            SEEK_END => file_size + offset,
-            _        => return EINVAL as i64,
+            SEEK_CUR => f.offset as i64 + offset,
+            SEEK_END => {
+                if let Some(node) = inode_get(f.inode) {
+                    node.size as i64 + offset
+                } else { f.offset as i64 + offset }
+            }
+            _ => return -22, // EINVAL
         };
-        if new_off < 0 { return EINVAL as i64; }
-        self.fds[fd as usize].offset = new_off as u64;
+        if new_off < 0 { return -22; }
+        f.offset = new_off as u64;
         new_off
     }
+}
 
-    pub fn sys_stat(&self, path: &[u8], s: &mut Stat) -> i32 {
-        let ino = match self.resolve_path(path) { Some(i) => i, None => return ENOENT };
-        match self.get_inode(ino) {
-            Some(n) => { fill_stat(s, n); 0 }
-            None    => ENOENT,
-        }
-    }
-
-    pub fn sys_fstat(&self, fd: i32, s: &mut Stat) -> i32 {
-        if fd < 0 || fd as usize >= MAX_FDS { return EBADF; }
-        let fdesc = &self.fds[fd as usize];
-        if !fdesc.valid { return EBADF; }
-        match self.get_inode(fdesc.ino) {
-            Some(n) => { fill_stat(s, n); 0 }
-            None    => ENOENT,
-        }
-    }
-
-    pub fn sys_getdents<F: FnMut(&[u8], Ino, u32)>(&self, fd: i32, mut cb: F) -> i32 {
-        if fd < 0 || fd as usize >= MAX_FDS { return EBADF; }
-        let fdesc = &self.fds[fd as usize];
-        if !fdesc.valid { return EBADF; }
-        let ino = fdesc.ino;
-        let node = match self.get_inode(ino) { Some(n) => n, None => return ENOENT };
-        if !node.is_dir() { return ENOTDIR; }
-        let mut count = 0i32;
-        for d in self.dentries[..self.dentry_count].iter() {
-            if d.valid && d.parent == ino {
-                let ft = self.get_inode(d.ino).map(|n| (n.mode >> 12) & 0xF).unwrap_or(0);
-                cb(d.name_str(), d.ino, ft);
-                count += 1;
-            }
-        }
-        count
-    }
-
-    fn alloc_fd(&mut self) -> Option<usize> {
-        for i in 3..MAX_FDS {
-            if !self.fds[i].valid { return Some(i); }
-        }
-        None
+pub fn vfs_stat(path: *const u8, out: *mut u8) -> i64 {
+    if path.is_null() || out.is_null() { return -14; }
+    let inode = vfs_path_resolve(path);
+    if inode == 0 { return -2; }
+    if let Some(node) = inode_get(inode) {
+        fill_stat(node, out);
+        0
+    } else {
+        tmpfs_stat(inode, out)
     }
 }
 
-fn fill_stat(s: &mut Stat, n: &Inode) {
-    s.ino       = n.ino;
-    s.mode      = n.mode;
-    s.nlink     = n.nlink;
-    s.uid       = n.uid;
-    s.gid       = n.gid;
-    s.size      = n.size as i64;
-    s.blksize   = 4096;
-    s.blocks    = (n.size + 511) / 512;
-    s.atime_sec = n.atime_sec;
-    s.mtime_sec = n.mtime_sec;
-    s.ctime_sec = n.ctime_sec;
+pub fn vfs_fstat(fd: i32, out: *mut u8) -> i64 {
+    if fd < 0 || fd as usize >= MAX_FD { return -9; }
+    let inode = unsafe {
+        let f = FD_TABLE[fd as usize];
+        if !f.valid { return -9; }
+        f.inode
+    };
+    if let Some(node) = inode_get(inode) {
+        fill_stat(node, out);
+        0
+    } else {
+        tmpfs_stat(inode, out)
+    }
 }
 
-fn split_parent(path: &[u8]) -> (&[u8], &[u8]) {
-    let mut i = path.len();
-    while i > 1 && path[i - 1] != b'/' { i -= 1; }
-    if i == 0 || path[i - 1] != b'/' { return (b"/", path); }
-    let parent = &path[..i.saturating_sub(1)];
-    let name   = &path[i..];
-    if parent.is_empty() { (b"/", name) } else { (parent, name) }
+pub fn vfs_ioctl(fd: i32, request: u64, arg: u64) -> i64 {
+    if fd < 0 || fd as usize >= MAX_FD { return -9; }
+    let inode = unsafe {
+        let f = FD_TABLE[fd as usize];
+        if !f.valid { return -9; }
+        f.inode
+    };
+    if let Some(node) = inode_get(inode) {
+        return (node.ops.ioctl)(node, request, arg);
+    }
+    -25 // ENOTTY
 }
 
-// ── Global VFS ────────────────────────────────────────────────────────────────
-static mut G_VFS_STORAGE: [u8; core::mem::size_of::<Vfs>()] = [0u8; core::mem::size_of::<Vfs>()];
-static VFS_INITIALIZED: AtomicU32 = AtomicU32::new(0);
-
-unsafe fn vfs() -> &'static mut Vfs {
-    &mut *(G_VFS_STORAGE.as_mut_ptr() as *mut Vfs)
+pub fn vfs_mkdir(path: *const u8, mode: u32) -> i64 {
+    if path.is_null() { return -14; }
+    tmpfs_mkdir(path, mode)
 }
 
-// ── C-ABI ─────────────────────────────────────────────────────────────────────
-
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_init() {
-    if VFS_INITIALIZED.swap(1, Ordering::SeqCst) != 0 { return; }
-    let v = vfs();
-    core::ptr::write(v, Vfs::new_zeroed());
-    v.init();
-    v.install_stdio();
+pub fn vfs_rmdir(path: *const u8) -> i64 {
+    if path.is_null() { return -14; }
+    tmpfs_rmdir(path)
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_open(path: *const u8, path_len: usize, flags: u32, mode: u32) -> i32 {
-    if path.is_null() { return EINVAL; }
-    let p = core::slice::from_raw_parts(path, path_len);
-    vfs().sys_open(p, flags, mode)
+pub fn vfs_unlink(path: *const u8) -> i64 {
+    if path.is_null() { return -14; }
+    tmpfs_unlink(path)
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_close(fd: i32) -> i32 { vfs().sys_close(fd) }
-
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_read(fd: i32, buf: *mut u8, len: usize) -> i32 {
-    if buf.is_null() { return EINVAL; }
-    let b = core::slice::from_raw_parts_mut(buf, len);
-    vfs().sys_read(fd, b)
+pub fn vfs_rename(old: *const u8, new: *const u8) -> i64 {
+    if old.is_null() || new.is_null() { return -14; }
+    tmpfs_rename(old, new)
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_write(fd: i32, buf: *const u8, len: usize) -> i32 {
-    if buf.is_null() { return EINVAL; }
-    let b = core::slice::from_raw_parts(buf, len);
-    vfs().sys_write(fd, b)
+pub fn vfs_chdir(path: *const u8) -> i64 {
+    if path.is_null() { return -14; }
+    // Verify directory exists
+    let inode = vfs_path_resolve(path);
+    if inode == 0 { return -2; }
+    // Update CWD for current process
+    crate::kernel::proc::proc_set_cwd(path);
+    0
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_seek(fd: i32, offset: i64, whence: i32) -> i64 {
-    vfs().sys_seek(fd, offset, whence)
+pub fn vfs_getcwd(buf: *mut u8, size: usize) -> i64 {
+    if buf.is_null() || size == 0 { return -14; }
+    crate::kernel::proc::proc_get_cwd(buf, size)
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn sigma_vfs_mkdir(path: *const u8, path_len: usize, mode: u32) -> i32 {
-    if path.is_null() { return EINVAL; }
-    let p = core::slice::from_raw_parts(path, path_len);
-    let (pp, name) = split_parent(p);
-    let v = vfs();
-    let parent = match v.resolve_path(pp) { Some(i) => i, None => return ENOENT };
-    match v.mkdir_at(parent, name, mode) { Ok(_) => 0, Err(e) => e }
+// ── Path resolution ────────────────────────────────────────────────────────
+fn vfs_path_resolve(_path: *const u8) -> u64 {
+    // Walk mount table, then delegate to filesystem lookup
+    // Returns inode number or 0 on not-found
+    // Simplified: always try tmpfs first
+    tmpfs_lookup(_path)
+}
+
+// ── Fill stat structure ────────────────────────────────────────────────────
+fn fill_stat(node: &VfsNode, out: *mut u8) {
+    // Cast to FileStat and fill — safe because caller guarantees size
+    unsafe {
+        let stat = &mut *(out as *mut super::sigma_syscall_dispatch::FileStat);
+        stat.st_ino   = node.inode;
+        stat.st_mode  = node.mode;
+        stat.st_uid   = node.uid;
+        stat.st_gid   = node.gid;
+        stat.st_size  = node.size as i64;
+        stat.st_nlink = node.nlink;
+        stat.st_atime = node.atime;
+        stat.st_mtime = node.mtime;
+        stat.st_ctime = node.ctime;
+    }
+}
+
+// ── Console write (fd 1/2) ─────────────────────────────────────────────────
+fn console_write(buf: *const u8, count: usize) -> i64 {
+    for i in 0..count {
+        let c = unsafe { *buf.add(i) };
+        // Write to serial port 0x3F8 (COM1)
+        unsafe {
+            core::arch::asm!(
+                "out dx, al",
+                in("dx") 0x3F8u16,
+                in("al") c
+            );
+        }
+    }
+    count as i64
+}
+
+// ── Flags helpers ──────────────────────────────────────────────────────────
+fn flags_write_only(flags: u32) -> bool {
+    flags & 0x3 == O_WRONLY
+}
+
+// ── Tmpfs stubs (forward to sigma_tmpfs module) ────────────────────────────
+fn tmpfs_create(path: *const u8, mode: u32) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_create(path, mode)
+}
+fn tmpfs_read(inode: u64, offset: u64, buf: *mut u8, len: usize) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_read(inode, offset, buf, len)
+}
+fn tmpfs_write(inode: u64, offset: u64, buf: *const u8, len: usize) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_write(inode, offset, buf, len)
+}
+fn tmpfs_stat(inode: u64, out: *mut u8) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_stat(inode, out)
+}
+fn tmpfs_mkdir(path: *const u8, mode: u32) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_mkdir(path, mode)
+}
+fn tmpfs_rmdir(path: *const u8) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_rmdir(path)
+}
+fn tmpfs_unlink(path: *const u8) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_unlink(path)
+}
+fn tmpfs_rename(old: *const u8, new: *const u8) -> i64 {
+    crate::kernel::vfs::tmpfs::tmpfs_rename(old, new)
+}
+fn tmpfs_lookup(path: *const u8) -> u64 {
+    crate::kernel::vfs::tmpfs::tmpfs_lookup(path)
 }

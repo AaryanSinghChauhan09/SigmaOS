@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Gujarati (gu_IN)
+[meta]
+language = "Gujarati"
+code = "gu_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ઠીક છે"
+cancel = "રદ કરો"
+yes = "હા"
+no = "ના"
+error = "ભૂલ"
+warning = "ચેતવણી"
+info = "માહિતી"
+loading = "લોડ થઈ રહ્યું છે..."
+settings = "સેટિંગ્સ"
+shutdown = "બંધ કરો"
+restart = "ફરીથી શરૂ કરો"
+logout = "લૉગ આઉટ"
+[pkg]
+installing = "ઇન્સ્ટોલ થઈ રહ્યું છે..."
+removing = "દૂર કરી રહ્યા છીએ..."
+updated = "અપડેટ થઈ ગયું"

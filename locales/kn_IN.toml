@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Kannada (kn_IN)
+[meta]
+language = "Kannada"
+code = "kn_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ಸರಿ"
+cancel = "ರದ್ದು"
+yes = "ಹೌದು"
+no = "ಇಲ್ಲ"
+error = "ದೋಷ"
+warning = "ಎಚ್ಚರಿಕೆ"
+info = "ಮಾಹಿತಿ"
+loading = "ಲೋಡ್ ಆಗುತ್ತಿದೆ..."
+settings = "ಸೆಟ್ಟಿಂಗ್‌ಗಳು"
+shutdown = "ಮುಚ್ಚಿರಿ"
+restart = "ಮರುಪ್ರಾರಂಭಿಸಿ"
+logout = "ಲಾಗ್‌ಔಟ್"
+[pkg]
+installing = "ಸ್ಥಾಪಿಸಲಾಗುತ್ತಿದೆ..."
+removing = "ತೆಗೆಯಲಾಗುತ್ತಿದೆ..."
+updated = "ನವೀಕರಿಸಲಾಗಿದೆ"

@@ -1,0 +1,23 @@
+# SigmaOS Locale Pack — Punjabi (pa_IN)
+[meta]
+language = "Punjabi"
+code = "pa_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ਠੀਕ ਹੈ"
+cancel = "ਰੱਦ ਕਰੋ"
+yes = "ਹਾਂ"
+no = "ਨਹੀਂ"
+error = "ਗਲਤੀ"
+warning = "ਚੇਤਾਵਨੀ"
+info = "ਜਾਣਕਾਰੀ"
+loading = "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ..."
+settings = "ਸੈਟਿੰਗਾਂ"
+shutdown = "ਬੰਦ ਕਰੋ"
+restart = "ਮੁੜ ਚਾਲੂ ਕਰੋ"
+logout = "ਲਾਗ ਆਊਟ"
+[pkg]
+installing = "ਇੰਸਟਾਲ ਹੋ ਰਿਹਾ ਹੈ..."
+removing = "ਹਟਾਇਆ ਜਾ ਰਿਹਾ ਹੈ..."
+updated = "ਅੱਪਡੇਟ ਹੋ ਗਿਆ"

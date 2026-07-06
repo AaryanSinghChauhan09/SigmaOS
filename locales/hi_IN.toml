@@ -1,0 +1,26 @@
+# SigmaOS Locale Pack — Hindi (hi_IN)
+# Generated for SigmaOS v15.0 Zenith
+
+[meta]
+language = "Hindi"
+code = "hi_IN"
+charset = "UTF-8"
+
+[system]
+ok = "ठीक है"
+cancel = "रद्द करें"
+yes = "हाँ"
+no = "नहीं"
+error = "त्रुटि"
+warning = "चेतावनी"
+info = "जानकारी"
+loading = "लोड हो रहा है..."
+settings = "सेटिंग्स"
+shutdown = "बंद करें"
+restart = "पुनः प्रारंभ करें"
+logout = "लॉगआउट"
+
+[pkg]
+installing = "इंस्टॉल हो रहा है..."
+removing = "हटाया जा रहा है..."
+updated = "अपडेट हो गया"
