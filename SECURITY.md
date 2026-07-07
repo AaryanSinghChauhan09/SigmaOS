@@ -1,90 +1,27 @@
-# Security Policy — SigmaOS
+# Security Roadmap & Spec
 
-## Supported Versions
+## 1. MicroVM Sandboxing (Firecracker & KVM Primitives)
+Rather than relying on kernel namespaces and cgroups (which share a single kernel surface), SigmaOS enforces process isolation via hardware virtualization.
+- **VMM core**: Interacts directly with KVM/VMM primitives (`sigma_sandbox.rs`).
+- **Memory isolation**: Userspace applications execute inside MicroVM structures with isolated page directories (`root_cr3`).
+- **System Call Filters**: Allowlist filtering traps unknown or raw syscalls instantly at the hypervisor level.
 
-| Version | Supported |
-|---------|-----------|
-| `main` (rolling) | ✅ Active |
-| Tagged releases | ✅ Latest tag only |
-| Older tags | ❌ Not backported |
+## 2. TPM Attestation & MAC Policies
+- **Measured Boot**: TPM2 registers record cryptographic signatures throughout the boot cycle, locking root encryption keys against configuration tampering.
+- **Mandatory Access Control (MAC)**: Custom security rules configure fine-grained permissions for all storage mounts and network namespaces.
+- **Privilege management**: The traditional `root` user is disabled. Elevation (`sudo`) requires secure attestation.
 
----
+## 3. Network Policies & IDS
+- Network namespaces are air-gapped by default.
+- Apps declare network profiles in `sigpkg` manifests.
+- Built-in packet analyzers (Suricata, Snort) run inside network interfaces to block unauthorized connections.
 
-## Reporting a Vulnerability
+## 4. Roadmap Phases
+- **Phase 1 (0–3m)**: Basic KVM integration and memory layout isolation.
+- **Phase 2 (3–6m)**: Syscall allowlist checking and security auditing APIs.
+- **Phase 3 (6–9m)**: Declarative MAC engine integration and virtual network policy enforcement.
+- **Phase 4 (9–12m)**: Full TPM attestation verification and host intrusion detection module.
 
-### Do NOT open a public GitHub issue for security vulnerabilities.
-
-Instead, use one of the following private channels:
-
-### Option A — GitHub Private Security Advisory (preferred)
-
-1. Go to the [Security tab](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories) of this repo.
-
-2. Click **"Report a vulnerability"**.
-
-3. Fill in the advisory form. We aim to acknowledge within **48 hours**.
-
-### Option B — Email
-
-Send a PGP-encrypted email to: **security@sigmaos.dev** *(placeholder — replace with real address before release)*
-
-```
-PGP Key Fingerprint: XXXX XXXX XXXX XXXX XXXX  (add real key before first release)
-```
-
-Full public key: `docs/security/pgp-key.asc`
-
----
-
-## Disclosure Timeline
-
-| Stage | Target |
-|-------|--------|
-| Initial acknowledgement | 48 hours |
-| Triage & severity assessment | 7 days |
-| Fix development | 30 days (critical) / 90 days (high) |
-| Public disclosure (CVE + advisory) | Upon fix release |
-
-We follow coordinated disclosure — we will not publish details until a fix is available, and we will credit reporters unless they prefer anonymity.
-
----
-
-## Scope
-
-Security bugs that are **in scope**:
-
-- Kernel privilege escalation (Ring 3 → Ring 0)
-
-- Memory safety violations in `kernel/`, `crypto/`, `security/`
-
-- Capability / Zero-Trust enforcement bypass in `security/`
-
-- Cryptographic implementation errors (especially in `crypto/cryptfs/`)
-
-- Supply-chain attacks against signed release artifacts
-
-### Out of scope (for this project stage):
-
-- Bugs in third-party dependencies (report upstream)
-
-- Theoretical / non-exploitable issues without a PoC
-
-- Social engineering
-
----
-
-## Severity Rating
-
-We use [CVSS v3.1](https://www.first.org/cvss/) for scoring. Critical (≥9.0) and High (≥7.0) findings are given priority treatment.
-
----
-
-## Bug Bounty
-
-There is no monetary bounty program at this stage. Reporters of significant findings will be credited in:
-
-- The GitHub Security Advisory
-
-- The `CHANGELOG.md` release notes
-
-- The `CONTRIBUTORS.md` file (if desired)
+## 5. Contributor Guidelines
+- Any kernel subsystem modification must be vetted against the central Security Policy.
+- Never write unprotected `unsafe` pointers without documenting validation checks.

@@ -1,37 +1,197 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in advancing Sovereign Silicon! Contributing to SigmaOS requires adhering to strict architectural constraints.
+Thank you for contributing to SigmaOS — a sovereign, self-sufficient operating system. Every line of code helps reduce dependency on external tools and brings us closer to a fully independent computing environment.
 
-## The Prime Directive: Zero Dependencies
+---
 
-SigmaOS guarantees computational sovereignty. Under no circumstances may a contributor:
+## 🚀 Quick Start
 
-1. `#include <stdio.h>`, `<stdlib.h>`, `<string.h>`, or any standard library header.
+```bash
 
-2. Link against `glibc`, `musl`, or any pre-compiled system library.
+# 1. Fork and clone
 
-3. Import external logic that relies on POSIX standards.
+git clone https://github.com/YOUR_USERNAME/SigmaOS.git
+cd SigmaOS
 
-## Writing a Sovereign Driver
+# 2. Install toolchain
 
-When writing a driver, integrate it with the Universal Driver Framework (`sigma_driver_fw.cpp`).
+rustup toolchain install nightly
+rustup target add x86_64-unknown-none
+cargo install just
 
-1. **Hardware Direct**: Use MMIO or port I/O directly.
+# 3. Build everything
 
-2. **Metadata**: Define a `SigmaDriverMetadata` block matching vendor/device IDs.
+just build
 
-3. **Registration**: Expose an initialization function that calls `sigma_register_driver()`.
+# 4. Run tests
 
-## Writing a Sovereign Tool
+just test
 
-When building a new utility (e.g., a clone of a GNU tool):
+# 5. Run in QEMU
 
-1. **Standalone**: Create `tools/utilities/sigma_<name>.cpp`.
+just qemu
+```
 
-2. **Interface**: Expose `extern "C" int sigma_<name>_main(int argc, char** argv)`.
+---
 
-3. **I/O**: Only use `sigma_vga_puts()`, `sigma_vga_printf()`, or the VFS read/write functions.
+## 📋 PR Workflow (main-only)
 
-4. **Integration**: Register your tool in the `sigma_sh.cpp` shell dispatcher.
+SigmaOS follows a **trunk-based development** model. All code merges directly to `main` via PR.
 
-Please open an RFC issue before initiating massive architectural shifts or adding entirely new file systems!
+```
+fork → feature branch → PR → review → CI green → squash merge to main
+```
+
+### Rules
+
+- ✅ **PRs only** — no direct pushes to `main`
+
+- ✅ **Squash merge** — one commit per PR on main
+
+- ✅ **CI must be green** — no exceptions
+
+- ✅ **At least 1 reviewer** for non-trivial changes
+
+- ✅ **CODEOWNERS review** for subsystem changes (see `.github/CODEOWNERS`)
+
+- ❌ No WIP PRs — use Draft PR instead
+
+### Branch Naming
+
+| Type | Pattern | Example |
+|---|---|---|
+| Feature | `feat/description` | `feat/sigma-sh-scripting` |
+| Bug fix | `fix/description` | `fix/sigpkg-semver-compare` |
+| Docs | `docs/description` | `docs/absorption-matrix` |
+| Security | `security/description` | `security/hardened-allocator` |
+| Refactor | `refactor/description` | `refactor/kernel-memory-api` |
+
+---
+
+## 🛠️ Development Setup
+
+### Required Tools
+
+| Tool | Version | Purpose |
+|---|---|---|
+| Rust | nightly (see `rust-toolchain.toml`) | Kernel + userland |
+| Zig | 0.13+ | Userland build + some tools |
+| GNAT/SPARK | Community 2024 | Ada/SPARK security modules |
+| just | latest | Task runner |
+| QEMU | 8.x+ | Testing |
+| git | 2.40+ | Version control |
+
+### Dev Container
+
+The easiest setup — all tools pre-installed:
+```bash
+
+# Open in VSCode with Dev Containers extension
+
+code .
+
+# → Click "Reopen in Container"
+
+```
+
+---
+
+## 🧪 Testing Requirements
+
+Before submitting a PR:
+
+```bash
+
+# Run all tests
+
+just test
+
+# Lint (must pass cleanly)
+
+cargo clippy --all -- -D warnings
+cargo fmt --all --check
+
+# QEMU smoke test
+
+just qemu-test
+
+# SPARK proofs (if modifying security/)
+
+gnatprove -P security/security.gpr
+```
+
+All checks run automatically in CI (`ci.yml`). PRs cannot merge with failing checks.
+
+---
+
+## 🗂️ What to Work On
+
+Check the issue tracker for tagged issues:
+
+| Label | Meaning |
+|---|---|
+| `good first issue` | Great for newcomers |
+| `help wanted` | Any contributor welcome |
+| `phase:0.2` | Current milestone priority |
+| `component:kernel` | Kernel subsystem work |
+| `component:sigma-sh` | Shell work |
+| `component:sigpkg` | Package manager work |
+| `component:security` | Security-critical (SPARK required) |
+| `absorption` | Implementing a sovereign tool replacement |
+
+### High-Priority Now (v0.2)
+
+- 🟡 QEMU CI smoke test (green CI on main)
+
+- 🟡 sigma-sh: scripting improvements
+
+- 🟡 sigpkg: real registry fetch implementation
+
+- 🟡 sigma-core-utils: `ls`, `cat`, `cp`, `mv` in Rust
+
+---
+
+## 📝 Commit Message Format
+
+```
+type(scope): short description (50 chars max)
+
+Optional longer body explaining the why, not the what.
+Reference issues: Fixes #123, Closes #456
+```
+
+Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `security`, `perf`
+
+---
+
+## 🔒 Security Contributions
+
+For security-critical components (`security/`, `kernel/security/`, `sigma-crypto`):
+
+- Ada/SPARK is **required** — no plain C/Rust without approval
+
+- `gnatprove` must pass with 0 violations
+
+- Two-maintainer review required
+
+- Report vulnerabilities privately via [SECURITY.md](../SECURITY.md)
+
+---
+
+## 📚 Resources
+
+- [Architecture Overview](Architecture.md)
+
+- [Coding Standards](Coding-Standards.md)
+
+- [Security Model](Security-Model.md)
+
+- [Absorption Matrix](Absorption-Matrix.md) — pick a tool to absorb!
+
+- [Roadmap](Roadmap.md)
+
+- [Developer Guide](../DEVELOPER_GUIDE.md)
+
+---
+
+### SigmaOS is a community project. Be kind, be sovereign. 🛡️
