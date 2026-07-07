@@ -1,25 +1,45 @@
-# Community & Governance Roadmap
+# SigmaOS Community Governance Model
 
-## 1. Contributor Onboarding Checklist
-To accelerate contribution:
-- **Quickstart Guide**: Setup developer sandboxes under QEMU in one command.
-- **First Issue List**: Curate issues tagged `good-first-issue` on kernel, tools, and UI layers.
-- **Interactive Guides**: Inline documentation outlining system call dispatching and kernel scheduler structures.
+## Overview
+SigmaOS operates under a decentralized, open-source governance charter. Project decisions, package inclusions, and kernel specification changes are managed by the SigmaOS Steering Committee. Decisions are reached through cryptographically signed contributor voting, preventing central-point centralization or hostile takeovers.
 
-## 2. Milestone Voting & Project Proposals
-- **Milestone Planning**: Feature matrix priorities are discussed on public forums, allowing contributors to vote on implementation phases.
-- **Incubator Program**: Experimental applications or drivers (e.g. experimental filesystems, alternative terminal managers) enter incubator stages before integration proposals.
+## Contributor Voting & Onboarding
+```
+ [New Contributor] ──► [Submit Valid PR] ──► PR Merged
+                                               │
+                                               ▼
+ [Signed DID Issued] ◄── [Earn Contributor Status] ◄─┘
+         │
+         ▼
+ [Cast Vote on RFCs]
+```
 
-## 3. Governance Charters
-- **Core Maintainers**: Governance is overseen by maintainers responsible for specific modules (Core, Security, Desktop, AI).
-- **PR gates**: Main branch requires two peer reviews and automated compilation checks before code mergers.
+## Governance Properties
+Ecosystem voting procedures are configured in `/etc/sigma/governance.conf`:
+```toml
+[steering_committee]
+seats = 7
+election_term_months = 12
 
-## 4. Roadmap Phases
-- **Phase 1 (0–3m)**: Publish developer guides and setup public contribution forums.
-- **Phase 2 (3–6m)**: Setup the RFC review process for major architectural modifications.
-- **Phase 3 (6–9m)**: Standardize incubator gates and community voting schedules.
-- **Phase 4 (9–12m)**: Establish the sovereign development foundation charter.
+[voting]
+quorum_percent = 60
+vote_duration_days = 7
+require_pgp_signature = true
+```
 
-## 5. Contributor Guidelines
-- Adhere strictly to the Code of Conduct.
-- Follow the signature process for all commits to maintain provenance tracking.
+## Technical Implementation
+Votes are verified using cryptographic signatures submitted through Git-compatible voting logs.
+
+```rust
+// userland/apps/sigma-startup/sigma_startup.nim (simulated voting verify)
+proc verify_vote_signature(voter_did: string, vote_hash: string, signature: string): bool =
+    # Verify the signature of a governance vote against the voter's public key
+    let public_key = lookup_contributor_key(voter_did)
+    return verify_signature(public_key, vote_hash, signature)
+```
+
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: Establish open-source code of conduct and contributor license agreements (CLA).
+- **Phase 2 (Months 3-6)**: GitHub bot parsing RFC votes using PGP/MOK signatures.
+- **Phase 3 (Months 6-9)**: Steering committee election framework and dashboard interface.
+- **Phase 4 (Months 9-12)**: Foundation establishment and intellectual property protection trust structure.

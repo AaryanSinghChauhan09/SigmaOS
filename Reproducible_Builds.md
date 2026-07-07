@@ -1,26 +1,55 @@
-# Reproducible Builds Roadmap
+# SigmaOS Reproducible Builds Specification
 
-## 1. Containerized Build Farm
-SigmaOS guarantees that building the same source twice results in bit-for-bit identical binary output.
-- **Build runner**: Isolated builder containers containing standardized toolchains and libraries.
-- **Sealed environments**: Builders run offline without internet connectivity to prevent unauthorized package downloads during compilation.
-- **Nix/Guix Adaptations**: System compilers map outputs to address-based content trees.
+## Overview
+SigmaOS enforces 100% deterministic builds across its entire package ecosystem. By neutralizing variables like timestamps, compile paths, and filesystem order during compilation, we guarantee that compiling a specific Git commit results in bit-for-bit identical binaries. Each package contains cryptographically signed Software Bills of Materials (SBOMs) to verify package provenance.
 
-## 2. Determinism Policies
-- **Frozen Timestamps**: Timestamps are overwritten using a fixed epoch (`SOURCE_DATE_EPOCH`).
-- **Path Stripping**: All binary paths are stripped of compiler host directories.
-- **Deterministic ordering**: Compilers sort source trees before parsing blocks.
+## Deterministic Pipeline Flow
+```
+ [Source Code (Git Commit)] ──► [Neutralize Timestamps & Paths]
+                                         │
+                                         ▼
+ [Isolated Container Sandbox] ──► [Deterministic Compilation]
+                                         │
+                                         ▼
+ [Cryptographic Signature] ◄──► [Bit-for-Bit Parity Check]
+         │
+         ▼
+ [Staged Repository Package + SBOM]
+```
 
-## 3. SBOM Generation & Attestation
-- **SPDX/CycloneDX Integration**: The CI build farm generates software bills of materials (SBOM) documenting exact version hashes of dependencies.
-- **Cryptographic Attestations**: Build systems sign output hashes, attaching provenance attestations to verify that compilation occurred on certified runners.
+## System Properties
+Build environment policies are declared in `build.toml`:
+```toml
+[build]
+reproducible = true
+env_clear = ["PATH", "LANG", "TZ"]
+timezone = "UTC"
+timestamp = 1770000000 # Fixed epoch timestamp for build determinism
 
-## 4. Roadmap Phases
-- **Phase 1 (0–3m)**: Standardize build tooling versioning and enforce compiler environment settings.
-- **Phase 2 (3–6m)**: Script build pipelines to verify matching binary checksums on separate machines.
-- **Phase 3 (6–9m)**: Automate SPDX SBOM generator integrations for every `.sigpkg` compilation.
-- **Phase 4 (9–12m)**: Setup the distributed build farm using signed builder verification.
+[sbom]
+format = "SPDX"
+hash_algorithm = "sha256"
+```
 
-## 5. Contributor Guidelines
-- Do not utilize compilation-time variables (like current system clock checks or environment overrides).
-- Ensure all library dependencies are explicitly pinned inside `Cargo.toml` or dependency profiles.
+## Technical Implementation
+Our build verification script compares hash outputs of separately compiled binary files to assert bit-for-bit identity.
+
+```rust
+// tools/sigma_iso_builder.rs
+pub fn verify_binary_determinism(path_a: &Path, path_b: &Path) -> Result<bool, io::Error> {
+    let bytes_a = fs::read(path_a)?;
+    let bytes_b = fs::read(path_b)?;
+    
+    if bytes_a.len() != bytes_b.len() {
+        return Ok(false);
+    }
+    
+    Ok(bytes_a == bytes_b)
+}
+```
+
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: Build environment isolation removing local paths, hostnames, and time stamps.
+- **Phase 2 (Months 3-6)**: SPDX-compliant SBOM generator integration inside `sigpkg-build`.
+- **Phase 3 (Months 6-9)**: Re-builder farms running independent builds to cross-verify binary signatures.
+- **Phase 4 (Months 9-12)**: System-wide verification policies preventing installation of any package lacking signed SBOM attestation.

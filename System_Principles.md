@@ -1,16 +1,34 @@
-# System Principles & Directives
+# SigmaOS Core System Principles
 
-## 1. Single Package Ecosystem
-Everything on the system, from the kernel to the web browser to the pentesting suite, is installable exclusively via `sigpkg`. We reject the fragmentation of flatpaks, snaps, and appimages.
+## Overview
+SigmaOS is built on a set of core principles that separate it from standard GNU/Linux distributions. By placing speed, security, and predictability first, the OS minimizes runtime footprint, avoids unverified dependencies, and guarantees offline execution and reproducible states.
 
-## 2. Reproducible Builds
-Every bundled application is deterministically compiled. If a user downloads the source, they will generate the exact same binary hash as the one provided in the repository.
+## Core Pillars
+1. **Low-level first**: Implement critical features directly in C, Assembly, Rust, and Nim. Minimize dependency on heavy, dynamically-typed runtime languages (e.g., Python, Javascript) in boot sequences, package handling, or IPC.
+2. **Reproducibility**: Enforce deterministic compilation pipelines. A given source configuration must result in bit-for-bit identical binary artifacts, complete with Software Bills of Materials (SBOMs) and signed build provenance.
+3. **Least privilege**: Restrict system calls and filesystem access using custom Linux Security Module (LSM) policies, Landlock sandbox profiles, and capability tokens. Home directories and user workspaces are encrypted by default.
+4. **Offline-first**: Ensure all help systems, reference manuals, local AI runtimes, and law/education databases are fully accessible without a network connection.
+5. **Unified UX**: Establish a consistent desktop experience via the custom Zenith Wayland compositor, built-in accessibility services, and comprehensive multilingual translations (with primary focus on Indic languages).
 
-## 3. Secure Posture
-All bundled applications run under the principle of least privilege. Network access requires explicit declarative grants. Home directories are encrypted by default, anchored to TPM attestation.
+```
+   [System App / Utility]
+             │
+             ▼
+   [Capability Check]  ──► Fails? ──► Terminate
+             │
+             ▼ Passes
+   [Landlock Filesystem Sandbox]
+             │
+             ▼
+      [System Kernel]
+```
 
-## 4. Offline-First
-SigmaOS ships with offline documentation, local AI runtimes, and local legal databases to ensure it remains a fully functional ecosystem even in air-gapped environments.
+## Technical Rules
+- **No Python/JS in PID 1**: The init system (`sigmad`) and the package manager (`sigpkg`) must compiled to standalone machine code without interpreter dependencies.
+- **Strict Capabilities**: Applications must not run as root. Root permissions are broken down into discrete capability tokens (`cap_network`, `cap_mount`, `cap_debug`).
 
-## 5. Low-Level Independence (Zero-Bloat Ecosystem)
-SigmaOS heavily reduces dependencies on high-level programming languages, predefined external libraries, and bloated frameworks. The core system relies on bare-metal C, assembly, and `no_std` Rust. We prioritize writing custom, highly-optimized low-level functions tailored for silicon efficiency over adopting black-box legacy dependencies.
+## Implementation Checklist
+- [x] Standardize on Rust/Nim for userland utilities (replaces shell scripts).
+- [ ] Implement signature validation for all boot stages.
+- [ ] Enforce automated SBOM generation for `sigpkg` outputs.
+- [ ] Integrate Indic multilingual support into Zenith compositor.

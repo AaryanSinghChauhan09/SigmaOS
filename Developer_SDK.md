@@ -1,29 +1,49 @@
-# Developer SDK Roadmap
+# SigmaOS Developer SDK Specification
 
-## 1. Developer Sandboxes
-To keep the host system pristine, SigmaOS provides isolated developer sandboxes.
-- **MicroVM Shell**: Spawns isolated builder containers (`sigma_sandbox.rs`) pre-loaded with developer packages.
-- **Resource Limits**: Configures CPU/Memory quotas for builds to prevent compiler resource starvation.
-- **LSP Bridging**: Redirects Neovim, VSCode, and Helix LSP requests through a secure socket into the container environment.
+## Overview
+The SigmaOS Developer SDK provides a complete set of systems debugging and performance profiling utilities integrated natively with the OS runtime. GDB, `perf`, and LTTng are pre-packaged, along with a reproducible cross-compilation toolchain resembling Buildroot/Yocto, allowing developers to target SigmaOS from any build host.
 
-## 2. Packaging Templates
-Official templates simplify compilation and testing setup for multiple frameworks:
-- **Rust Template**: Automates cross-compilation with standard `no_std` compiler profiles.
-- **C/C++ Template**: Enforces reproducible header checks and static compilation directives.
-- **Node.js/Python Templates**: Freezes dependency states using lockfiles.
+## Development Workflow
+```
+ [Build Host (Linux/macOS)] ──► [sig-sdk Cross Toolchain]
+                                         │
+                                         ▼
+   [Staged ISO Image] ◄──────────────────┘
+         │
+         ▼ (Boot in QEMU)
+ [Debugger (GDB) Session] ◄──► [LTTng Telemetry Port]
+```
 
-## 3. CI/CD Skeleton
-Provides GitHub Actions workflows for:
-- Deterministic checks and SBOM validations.
-- Automated code formatting and linting.
-- Ed25519 signature signing for build releases.
+## SDK Properties & Configuration
+SDK profiles are declared in `/etc/sigma/sdk.conf`:
+```toml
+[toolchain]
+sysroot = "/usr/share/sigma-sdk/sysroot"
+target = "x86_64-sigmaos-elf"
+optimization = "O2"
 
-## 4. Roadmap Phases
-- **Phase 1 (0–3m)**: Standardize cross-compilation targets and publish basic template recipes.
-- **Phase 2 (3–6m)**: Implement container isolation controls and LSP socket redirections.
-- **Phase 3 (6–9m)**: Launch the verification CLI tools and SBOM validator integrations.
-- **Phase 4 (9–12m)**: Expand IDE extension suites and debugging tool wrappers.
+[profiling]
+lttng_daemon_port = 5342
+enable_perf_events = true
+```
 
-## 5. Contributor Guidelines
-- Add tests for every new SDK template in standard QEMU images.
-- Keep templates clean, documenting variable overrides.
+## Technical Implementation
+Debugging hooks link GDB server directly to the kernel capability interfaces for trace control.
+
+```rust
+// userland/sigpkg/sigpkg_core.rs (simulated SDK helper)
+pub fn configure_debugging_session(target_pid: u32) -> Result<(), io::Error> {
+    // Assert cap_debug capabilities before attaching ptrace
+    validate_capability(get_current_task_caps(), CAP_DEBUG)?;
+    unsafe {
+        ptrace(PTRACE_ATTACH, target_pid, ptr::null_mut(), ptr::null_mut());
+    }
+    Ok(())
+}
+```
+
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: GCC/Clang and LLVM cross-compilers target configuration.
+- **Phase 2 (Months 3-6)**: Porting GDB server onto the SigmaOS userland runtime.
+- **Phase 3 (Months 6-9)**: LTTng integration for tracepoint execution monitoring.
+- **Phase 4 (Months 9-12)**: Fully automated Yocto-style build farm configuration to produce signed release artifacts.

@@ -1,9 +1,23 @@
-# SigmaOS Sovereign Vulkan Layer
+# Sovereign Bare-Metal Hypervisor
 
-The SovereignVulkanLayer provides a direct, zero-wrapper C/C++ interface forwarding SPIR-V shader bytecode directly to GPU MMIO command queues.
+A Type-1 hypervisor built directly into SigmaOS to run isolated guest VMs
+without depending on Linux KVM.
 
-## Mechanism
+## Design
 
-- Bypasses heavy Vulkan SDK runtime libraries entirely.
+- **VT-x / AMD-V** on x86_64; **EL2** on AArch64
 
-- Streams pre-compiled SPIR-V binaries directly to memory-mapped GPU command queues (`VK_CMD_QUEUE`), achieving zero-copy shader execution.
+- Each guest VM is a capability-gated shard — the hypervisor is just another
+  kernel module, not a privileged monolith
+
+- Live migration via SovereignFS snapshot deltas
+
+## Roadmap
+
+- [ ] VMCS/VMCB setup (x86_64)
+
+- [ ] Guest memory isolation (EPT / NPT)
+
+- [ ] Virtio-net / Virtio-blk para-virtual devices
+
+- [ ] Live migration prototype

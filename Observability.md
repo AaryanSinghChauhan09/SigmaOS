@@ -1,27 +1,53 @@
-# Observability Roadmap & Spec
+# SigmaOS System Observability & Self-Healing
 
-## 1. Zero-Overhead Kernel Telemetry
-Observability is integrated directly into the kernel scheduler (`sigma_rr_sched.rs`), memory allocation subsystems, and virtual filesystems (`sigma_vmm.rs`, `sigma_vfs_core.rs`).
-- **Tracepoints**: Lockless, static tracepoints write event logs directly to per-CPU ring buffers in physical memory.
-- **Exporters**: A native daemon (`sigma-prom-agent`) translates ring buffer data into standard Prometheus metrics.
+## Overview
+SigmaOS incorporates a local observability stack designed for low-overhead telemetry gathering and autonomous self-healing. System metrics are exposed via native endpoints compatible with Prometheus and Grafana, while the anomaly detection daemon monitors kernel telemetry to trigger automated snapshot rollbacks on critical failures.
 
-## 2. Metrics & Dashboards
-The monitoring daemon exposes an HTTP `/metrics` endpoint parsing system statistics:
-- CPU core utilization and task queue length.
-- Slab cache fragmentation levels.
-- Page faults and memory allocations.
-- Sandbox MicroVM performance quotas.
+## Observability & Self-Healing Flow
+```
+ [System/Kernel Metrics] ──► [sigmad-monitor (Prometheus exporter)]
+                                       │
+                                       ▼
+ [Autonomous Self-Healer] ◄────────────┤
+         │                             ▼
+         ▼                      [Grafana Dashboard]
+ [Anomaly Detected?]
+         │
+         └──► Yes ──► Terminate Process / Rollback Snapshot
+```
 
-## 3. Anomaly Detection & Auto-Rollback
-- **Threshold Monitors**: Detect post-upgrade issues like high context switch loops, out-of-memory errors, and device read failures.
-- **Self-Healing Loop**: If metrics exceed critical thresholds during the post-install verification period, the system triggers the `sigpkg` rollback state machine, reverting the active partition to the previous stable snapshot.
+## System Properties
+Telemetry configurations are defined in `/etc/sigma/observability.conf`:
+```toml
+[observability]
+enabled = true
+export_interval = "15s"
+prometheus_port = 9100
 
-## 4. Roadmap Phases
-- **Phase 1 (0–3m)**: Define kernel tracepoint macros and initialize lockless memory buffers.
-- **Phase 2 (3–6m)**: Launch the Prometheus metrics exporter daemon.
-- **Phase 3 (6–9m)**: Design Grafana dashboard setups and alert metric rules.
-- **Phase 4 (9–12m)**: Link the telemetry monitoring system to the active package manager rollback triggers.
+[self_healing]
+enabled = true
+memory_critical_threshold_percent = 95
+auto_rollback_on_panic = true
+```
 
-## 5. Contributor Guidelines
-- Add tracepoints to all new drivers and core system modules.
-- Ensure tracing calls do not allocate memory on the heap.
+## Technical Implementation
+The monitoring daemon records kernel performance parameters directly from memory ring-buffers.
+
+```rust
+// kernel/mm/sigma_vmm.rs
+pub fn get_memory_utilization() -> MemoryStats {
+    let total_pages = get_total_physical_pages();
+    let free_pages = get_free_physical_pages();
+    MemoryStats {
+        total: total_pages * PAGE_SIZE,
+        free: free_pages * PAGE_SIZE,
+        used: (total_pages - free_pages) * PAGE_SIZE,
+    }
+}
+```
+
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: Prometheus metrics exporter daemon for cpu/memory utilization.
+- **Phase 2 (Months 3-6)**: Integrated Grafana dashboard service pre-packaged.
+- **Phase 3 (Months 6-9)**: Self-healing watchdog daemon that restarts critical services.
+- **Phase 4 (Months 9-12)**: Automated ZFS/Btrfs snapshot rollback on core file corruption detection.

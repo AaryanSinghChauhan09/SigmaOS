@@ -1,27 +1,55 @@
-# Core System Roadmap & Architecture Spec
+# SigmaOS Core System Design
 
-## 1. Kernel Strategy & LTS Baseline
-SigmaOS implements a sovereign `no_std` Rust microkernel architecture designed to achieve zero-dependency safety, low latency, and a minimal Trusted Computing Base (TCB). Rather than inheriting the legacy bloat of standard monolithic kernels, SigmaOS maintains a strict boundaries policy.
+## Overview
+The Core System is the foundation of SigmaOS, providing kernel-level functionality, hardware abstraction, and system initialization. Taking inspiration from Arch Linux and Fedora, SigmaOS combines a Rolling/Stable hybrid release model with Fedora's strong hardware driver integration and Arch's minimal base philosophy.
 
-### Core Primitives
-- **Scheduler**: Preemptive Round-Robin scheduler (`sigma_rr_sched.rs`) with O(1) task enqueue/dequeue.
-- **Physical Memory**: Buddy physical allocator (`sigma_buddy_alloc.rs`) for coarse page grouping.
-- **Virtual Memory**: 4-level page table manager (`sigma_vmm.rs`) protecting user/kernel boundaries.
-- **Slab Memory**: Cache allocator (`sigma_slab_alloc.rs`) for fast, fragmented heap reclamation.
+```
+          [SigmaOS Release Strategy]
+                      │
+            ┌─────────┴─────────┐
+            ▼                   ▼
+    [Arch Rolling Stream]  [Fedora Stable Stream]
+    (Developers/Cutting)    (Enterprise/Stable)
+            │                   │
+            └─────────┬─────────┘
+                      ▼
+            [Unified Base System]
+```
 
-## 2. Hardware Compatibility List (HCL) Strategy
-We reject blind driver insertion. Drivers must be written in bare-metal Rust with zero C dependencies.
-- **Tier 1 (Fully Supported)**: Lenovo ThinkPad T14 (Gen 3/4), Framework Laptop 13, Dell XPS 13.
-- **Virtualization Target**: QEMU/KVM with virtio-gpu, virtio-net, and virtio-blk.
-- **Network Interface**: Intel Gigabit Ethernet (`sigma_e1000.rs`) and Basic Intel Wi-Fi.
+## System Properties & Models
+1. **Rolling & Stable Hybrid Model**: Developer profiles run on a rolling-release tree (`sigma-rolling`), receiving package upgrades immediately. Production and enterprise instances run on a stable-cadence tree (`sigma-stable`), receiving frozen, hardened packages validated on 6-month cycles.
+2. **Minimal Base System**: Follows Arch's minimal core footprint philosophy. The default base system includes only the microkernel, the `sigmad` init system, `sigpkg`, and basic terminal utils. Everything else is structured as standalone packages.
+3. **Hardware Compatibility Matrix**: Upstreams drivers directly. The project publishes an Hardware Compatibility List (HCL) generated automatically from user telemetry.
 
-## 3. Driver Roadmap
-- **Phase 1 (0–3m)**: Stabilize memory-mapped I/O, VirtIO networking, and basic graphics framing.
-- **Phase 2 (3–6m)**: Adapt Open-Source Nouveau and basic Intel/AMD KMS display controllers.
-- **Phase 3 (6–9m)**: Launch the Driver Bounty Program to write community USB/PCI controllers in Rust.
-- **Phase 4 (9–12m)**: Implement peripheral USB printer and Wi-Fi 6/7 adapters.
+## System Configuration Specification
+System release streams are configured in `/etc/sigma/core.conf`:
+```toml
+[system]
+stream = "stable" # stable or rolling
+version = "2026.07"
+minimal_base = true
 
-## 4. Contributor Guidelines
-- No imports of standard library (`no_std` only).
-- Keep code clean of unsafe blocks unless interfacing directly with memory-mapped register regions.
-- Document all hardware register definitions in a `registers.toml` specification.
+[hcl]
+telemetry_enabled = true
+publish_hcl_status = true
+```
+
+## Technical Implementation
+The system bootstrap loads the environment and dynamically maps the release repositories based on stream configuration.
+
+```rust
+// kernel/init/sigma_init.rs
+pub fn determine_system_profile() -> SystemProfile {
+    let config = load_system_config("/etc/sigma/core.conf");
+    match config.get("system", "stream") {
+        Some("rolling") => SystemProfile::Rolling,
+        _ => SystemProfile::Stable,
+    }
+}
+```
+
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: Base bootloader optimization and rolling release repository hosting.
+- **Phase 2 (Months 3-6)**: Hardware detection suite and publication of the automated HCL website.
+- **Phase 3 (Months 6-9)**: Containerized testing farm to validate stable release package trees.
+- **Phase 4 (Months 9-12)**: Upstream driver submission tool and automated compatibility warning systems.
