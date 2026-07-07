@@ -21,6 +21,7 @@ type SigmaUsize = usize;
 pub const MAX_ORDER: usize = 10; // Maximum order (2^10 = 1024 pages)
 pub const PAGE_SIZE: usize = 4096; // 4KB pages
 pub const MIN_ORDER: usize = 0; // Minimum order (1 page)
+pub const MAX_FRAMES: usize = 262144; // Maximum frames (1GB memory)
 
 // ─── Physical Frame ───────────────────────────────────────────────────────
 
@@ -41,6 +42,8 @@ pub struct BuddyBlock {
     pub order: SigmaU8,
     pub free: SigmaBool,
     pub split: SigmaBool,
+    pub next: SigmaU64,  // Next free block in linked list
+    pub prev: SigmaU64,  // Previous free block in linked list
 }
 
 // ─── Buddy Allocator ─────────────────────────────────────────────────────
@@ -52,8 +55,8 @@ pub struct BuddyAllocator {
     allocated_frames: SigmaU64,
     max_order: SigmaU8,
     free_lists: [Option<SigmaU64>; MAX_ORDER + 1],
-    frame_table: Option<&'static mut [PhysicalFrame]>,
-    block_table: Option<&'static mut [BuddyBlock]>,
+    frame_table: [PhysicalFrame; MAX_FRAMES], // BUG-001 Fix: Static frame table
+    block_table: [BuddyBlock; MAX_FRAMES], // BUG-001 Fix: Static block table
     base_address: SigmaU64,
 }
 
@@ -66,8 +69,19 @@ impl BuddyAllocator {
             allocated_frames: 0,
             max_order: MAX_ORDER as SigmaU8,
             free_lists: [None; MAX_ORDER + 1],
-            frame_table: None,
-            block_table: None,
+            frame_table: [PhysicalFrame {
+                pfn: 0,
+                order: 0,
+                allocated: false,
+                reserved: false,
+            }; MAX_FRAMES],
+            block_table: [BuddyBlock {
+                order: 0,
+                free: false,
+                split: false,
+                next: 0,
+                prev: 0,
+            }; MAX_FRAMES],
             base_address: 0,
         }
     }
@@ -83,13 +97,28 @@ impl BuddyAllocator {
         self.free_frames = self.total_frames;
         self.max_order = self.calculate_max_order(self.total_frames);
 
-        // Initialize frame table (placeholder - needs actual memory)
-        // TODO: Allocate frame table from boot memory
-        self.frame_table = None;
+        // BUG-001 Fix: Initialize frame table with actual frame data
+        let actual_frames = if self.total_frames as usize > MAX_FRAMES {
+            MAX_FRAMES as SigmaU64
+        } else {
+            self.total_frames
+        };
 
-        // Initialize block table (placeholder - needs actual memory)
-        // TODO: Allocate block table from boot memory
-        self.block_table = None;
+        for i in 0..actual_frames as usize {
+            self.frame_table[i] = PhysicalFrame {
+                pfn: i as SigmaU64,
+                order: 0,
+                allocated: false,
+                reserved: false,
+            };
+            self.block_table[i] = BuddyBlock {
+                order: 0,
+                free: true,
+                split: false,
+                next: 0,
+                prev: 0,
+            };
+        }
 
         // Clear free lists
         for i in 0..=MAX_ORDER {
@@ -97,7 +126,7 @@ impl BuddyAllocator {
         }
 
         // Add all memory to free list at max order
-        self.add_to_free_list(0, self.max_order);
+        self.add_to_free_list(base_addr, self.max_order);
 
         self.initialized = true;
 
@@ -204,51 +233,140 @@ impl BuddyAllocator {
         addr ^ block_size
     }
 
-    /// Add block to free list
+    /// Add block to free list (linked list implementation)
     unsafe fn add_to_free_list(&mut self, addr: SigmaU64, order: SigmaU8) {
         let order_usize = order as usize;
-        if order_usize <= MAX_ORDER {
-            self.free_lists[order_usize] = Some(addr);
+        if order_usize > MAX_ORDER {
+            return;
         }
+
+        let pfn = self.addr_to_pfn(addr);
+        if pfn >= MAX_FRAMES as SigmaU64 {
+            return;
+        }
+
+        let pfn_usize = pfn as usize;
+
+        // Insert at head of free list for this order
+        if let Some(head_addr) = self.free_lists[order_usize] {
+            let head_pfn = self.addr_to_pfn(head_addr);
+            if head_pfn < MAX_FRAMES as SigmaU64 {
+                self.block_table[head_pfn as usize].prev = addr;
+            }
+        }
+
+        self.block_table[pfn_usize].next = self.free_lists[order_usize].unwrap_or(0);
+        self.block_table[pfn_usize].prev = 0;
+        self.free_lists[order_usize] = Some(addr);
     }
 
-    /// Remove block from free list
+    /// Remove block from free list (linked list implementation)
     unsafe fn remove_from_free_list(&mut self, addr: SigmaU64, order: SigmaU8) {
         let order_usize = order as usize;
-        if order_usize <= MAX_ORDER {
-            if self.free_lists[order_usize] == Some(addr) {
-                self.free_lists[order_usize] = None;
+        if order_usize > MAX_ORDER {
+            return;
+        }
+
+        let pfn = self.addr_to_pfn(addr);
+        if pfn >= MAX_FRAMES as SigmaU64 {
+            return;
+        }
+
+        let pfn_usize = pfn as usize;
+        let block = self.block_table[pfn_usize];
+
+        // Update previous block's next pointer
+        if block.prev != 0 {
+            let prev_pfn = self.addr_to_pfn(block.prev);
+            if prev_pfn < MAX_FRAMES as SigmaU64 {
+                self.block_table[prev_pfn as usize].next = block.next;
+            }
+        } else {
+            // Block was head of list
+            self.free_lists[order_usize] = if block.next != 0 { Some(block.next) } else { None };
+        }
+
+        // Update next block's prev pointer
+        if block.next != 0 {
+            let next_pfn = self.addr_to_pfn(block.next);
+            if next_pfn < MAX_FRAMES as SigmaU64 {
+                self.block_table[next_pfn as usize].prev = block.prev;
+            }
+        }
+
+        // Clear block's links
+        self.block_table[pfn_usize].next = 0;
+        self.block_table[pfn_usize].prev = 0;
+    }
+
+    /// Mark block as allocated (BUG-001 Fix)
+    unsafe fn mark_allocated(&mut self, addr: SigmaU64, order: SigmaU8) {
+        let pfn = self.addr_to_pfn(addr);
+        if pfn < MAX_FRAMES as SigmaU64 {
+            self.frame_table[pfn as usize].allocated = true;
+            self.frame_table[pfn as usize].order = order;
+            self.block_table[pfn as usize].free = false;
+            
+            // Mark all frames in the block
+            let num_frames = 1 << order;
+            for i in 0..num_frames {
+                let frame_pfn = pfn + i as SigmaU64;
+                if frame_pfn < MAX_FRAMES as SigmaU64 {
+                    self.frame_table[frame_pfn as usize].allocated = true;
+                    self.frame_table[frame_pfn as usize].order = order;
+                }
             }
         }
     }
 
-    /// Mark block as allocated
-    unsafe fn mark_allocated(&mut self, addr: SigmaU64, order: SigmaU8) {
-        // TODO: Implement frame table marking
-        let _ = (addr, order);
-    }
-
-    /// Mark block as free
+    /// Mark block as free (BUG-001 Fix)
     unsafe fn mark_free(&mut self, addr: SigmaU64, order: SigmaU8) {
-        // TODO: Implement frame table marking
-        let _ = (addr, order);
+        let pfn = self.addr_to_pfn(addr);
+        if pfn < MAX_FRAMES as SigmaU64 {
+            self.frame_table[pfn as usize].allocated = false;
+            self.frame_table[pfn as usize].order = 0;
+            self.block_table[pfn as usize].free = true;
+            
+            // Mark all frames in the block
+            let num_frames = 1 << order;
+            for i in 0..num_frames {
+                let frame_pfn = pfn + i as SigmaU64;
+                if frame_pfn < MAX_FRAMES as SigmaU64 {
+                    self.frame_table[frame_pfn as usize].allocated = false;
+                    self.frame_table[frame_pfn as usize].order = 0;
+                }
+            }
+        }
     }
 
-    /// Check if block is allocated
+    /// Check if block is allocated (BUG-001 Fix)
     unsafe fn is_allocated(&self, addr: SigmaU64, order: SigmaU8) -> SigmaBool {
-        // TODO: Implement frame table check
-        let _ = (addr, order);
-        false
-    }
-
-    /// Check if block is free
-    unsafe fn is_free(&self, addr: SigmaU64, order: SigmaU8) -> SigmaBool {
-        let order_usize = order as usize;
-        if order_usize <= MAX_ORDER {
-            self.free_lists[order_usize] == Some(addr)
+        let pfn = self.addr_to_pfn(addr);
+        if pfn < MAX_FRAMES as SigmaU64 {
+            self.frame_table[pfn as usize].allocated
         } else {
             false
         }
+    }
+
+    /// Check if block is free (BUG-001 Fix)
+    unsafe fn is_free(&self, addr: SigmaU64, order: SigmaU8) -> SigmaBool {
+        let pfn = self.addr_to_pfn(addr);
+        if pfn < MAX_FRAMES as SigmaU64 {
+            !self.frame_table[pfn as usize].allocated
+        } else {
+            false
+        }
+    }
+    
+    /// Convert physical address to frame number (BUG-001 Fix)
+    fn addr_to_pfn(&self, addr: SigmaU64) -> SigmaU64 {
+        (addr - self.base_address) / PAGE_SIZE as SigmaU64
+    }
+    
+    /// Convert frame number to physical address (BUG-001 Fix)
+    fn pfn_to_addr(&self, pfn: SigmaU64) -> SigmaU64 {
+        self.base_address + (pfn * PAGE_SIZE as SigmaU64)
     }
 
     /// Calculate maximum order for given memory
