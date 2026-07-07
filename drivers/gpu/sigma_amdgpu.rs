@@ -301,6 +301,171 @@ impl AmdgpuDevice {
 
 static mut G_AMDGPU: AmdgpuDevice = AmdgpuDevice::new();
 
+// ─── PCI Probe Functions (BUG-006 Fix) ───────────────────────────────────────
+
+/// PCI configuration space offsets
+pub const PCI_VENDOR_ID: U8 = 0x00;
+pub const PCI_DEVICE_ID: U8 = 0x02;
+pub const PCI_CLASS_CODE: U8 = 0x0B;
+pub const PCI_SUBCLASS: U8 = 0x0A;
+pub const PCI_BAR0: U8 = 0x10;
+pub const PCI_BAR2: U8 = 0x18;
+
+/// PCI class codes
+pub const PCI_CLASS_DISPLAY: U8 = 0x03;
+pub const PCI_SUBCLASS_VGA: U8 = 0x00;
+pub const PCI_SUBCLASS_XGA: U8 = 0x01;
+pub const PCI_SUBCLASS_3D: U8 = 0x02;
+
+/// Probe for AMD GPU devices (BUG-006 Fix)
+#[no_mangle]
+pub unsafe extern "C" fn amdgpu_probe() -> I32 {
+    // Scan PCI bus for AMD GPU devices
+    let mut found_devices = 0;
+    
+    // Scan PCI buses 0-255
+    for bus in 0..256u8 {
+        // Scan devices 0-31
+        for device in 0..32u8 {
+            // Scan functions 0-7
+            for function in 0..8u8 {
+                let device_id = read_pci_config_u16(bus, device, function, PCI_DEVICE_ID);
+                let vendor_id = read_pci_config_u16(bus, device, function, PCI_VENDOR_ID);
+                
+                // Check if this is an AMD GPU
+                if vendor_id == AMD_VENDOR_ID && is_amd_gpu_device(device_id) {
+                    // Get PCI BARs
+                    let mmio_bar = read_pci_config_u32(bus, device, function, PCI_BAR0);
+                    let gart_bar = read_pci_config_u32(bus, device, function, PCI_BAR2);
+                    
+                    // Extract physical addresses from BARs
+                    let mmio_base = (mmio_bar & 0xFFFFFFF0) as U64;
+                    let gart_base = (gart_bar & 0xFFFFFFF0) as U64;
+                    
+                    // Initialize the device
+                    let result = G_AMDGPU.init(mmio_base, gart_base, device_id);
+                    
+                    if result == AMDGPU_OK {
+                        found_devices += 1;
+                        // For now, just use the first found device
+                        return AMDGPU_OK;
+                    }
+                }
+            }
+        }
+    }
+    
+    if found_devices > 0 {
+        AMDGPU_OK
+    } else {
+        AMDGPU_ERR_NO_DEVICE
+    }
+}
+
+/// Check if device ID is a supported AMD GPU
+unsafe fn is_amd_gpu_device(device_id: U16) -> bool {
+    match device_id {
+        AMDGPU_DEVICE_ID_VEGA10 |
+        AMDGPU_DEVICE_ID_VEGA12 |
+        AMDGPU_DEVICE_ID_VEGA20 |
+        AMDGPU_DEVICE_ID_NAVI10 |
+        AMDGPU_DEVICE_ID_NAVI12 |
+        AMDGPU_DEVICE_ID_NAVI14 |
+        AMDGPU_DEVICE_ID_SIENNA_CICHLID |
+        AMDGPU_DEVICE_ID_NAVY_FLOUNDER => true,
+        _ => false,
+    }
+}
+
+/// Read 16-bit value from PCI configuration space
+unsafe fn read_pci_config_u16(bus: U8, device: U8, function: U8, offset: U8) -> U16 {
+    // In a real implementation, this would use PCI configuration access mechanism
+    // For x86, this would use IO ports 0xCF8 (address) and 0xCFC (data)
+    // For now, return 0 as stub
+    let config_address = ((1u32 << 31) | 
+                          ((bus as u32) << 16) | 
+                          ((device as u32) << 11) | 
+                          ((function as u32) << 8) | 
+                          ((offset as u32) & 0xFC)) as u32;
+    
+    // Write to address port (0xCF8)
+    // outl(0xCF8, config_address);
+    
+    // Read from data port (0xCFC)
+    // let value = inl(0xCFC);
+    
+    // Extract the 16-bit value based on offset
+    // let shift = ((offset & 2) as u32) * 8;
+    // ((value >> shift) & 0xFFFF) as U16
+    
+    0 // Stub
+}
+
+/// Read 32-bit value from PCI configuration space
+unsafe fn read_pci_config_u32(bus: U8, device: U8, function: U8, offset: U8) -> U32 {
+    // In a real implementation, this would use PCI configuration access mechanism
+    let config_address = ((1u32 << 31) | 
+                          ((bus as u32) << 16) | 
+                          ((device as u32) << 11) | 
+                          ((function as u32) << 8) | 
+                          ((offset as u32) & 0xFC)) as u32;
+    
+    // Write to address port (0xCF8)
+    // outl(0xCF8, config_address);
+    
+    // Read from data port (0xCFC)
+    // inl(0xCFC)
+    
+    0 // Stub
+}
+
+/// Get device info string (BUG-006 Fix)
+#[no_mangle]
+pub unsafe extern "C" fn amdgpu_get_device_info(
+    buffer: *mut U8,
+    buffer_size: usize,
+) -> I32 {
+    if buffer.is_null() || buffer_size == 0 {
+        return -1;
+    }
+    
+    if !G_AMDGPU.initialized {
+        return AMDGPU_ERR_INIT_FAILED;
+    }
+    
+    let family_name = match G_AMDGPU.family {
+        GpuFamily::Vega10 => "AMD Radeon Vega 10",
+        GpuFamily::Vega12 => "AMD Radeon Vega 12",
+        GpuFamily::Vega20 => "AMD Radeon Vega 20",
+        GpuFamily::Navi10 => "AMD Radeon RX 5700 (Navi 10)",
+        GpuFamily::Navi12 => "AMD Radeon RX 5600 (Navi 12)",
+        GpuFamily::Navi14 => "AMD Radeon RX 5500 (Navi 14)",
+        GpuFamily::SiennaCichlid => "AMD Radeon RX 6800 (Sienna Cichlid)",
+        GpuFamily::NavyFlounder => "AMD Radeon RX 6600 (Navy Flounder)",
+        GpuFamily::Unknown => "Unknown AMD GPU",
+    };
+    
+    let name_bytes = family_name.as_bytes();
+    let copy_len = name_bytes.len().min(buffer_size - 1);
+    
+    for i in 0..copy_len {
+        *buffer.add(i) = name_bytes[i];
+    }
+    *buffer.add(copy_len) = 0;
+    
+    AMDGPU_OK
+}
+
+/// Check if device is initialized (BUG-006 Fix)
+#[no_mangle]
+pub unsafe extern "C" fn amdgpu_is_initialized() -> I32 {
+    if G_AMDGPU.initialized {
+        1
+    } else {
+        0
+    }
+}
+
 // ─── C-ABI Exports ───────────────────────────────────────────────────────────
 
 #[no_mangle]

@@ -5,6 +5,9 @@
 #![no_std]
 #![allow(dead_code)]
 
+extern crate alloc;
+use alloc::vec::Vec;
+
 type SigmaU32 = u32;
 type SigmaI32 = i32;
 type SigmaBool = bool;
@@ -213,31 +216,89 @@ pub unsafe extern "C" fn sigma_init_get_service_count() -> SigmaU32 {
     SERVICE_COUNT
 }
 
-/// Start all services in dependency order
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_start_all() -> SigmaI32 {
-    let mut started = 0;
-    let mut attempts = 0;
-    const MAX_ATTEMPTS: SigmaU32 = 100;
+/// Build dependency graph and perform topological sort (BUG-009 Fix)
+unsafe fn build_dependency_order() -> Result<Vec<SigmaU32>, SigmaI32> {
+    let mut in_degree = [0u32; MAX_SERVICES];
+    let mut order = Vec::new();
+    let mut queue = Vec::new();
     
-    while started < SERVICE_COUNT && attempts < MAX_ATTEMPTS {
-        attempts += 1;
+    // Calculate in-degrees
+    for i in 0..SERVICE_COUNT as usize {
+        if let Some(service) = &SERVICES[i] {
+            for j in 0..service.dependency_count as usize {
+                let dep_id = service.dependencies[j] as usize;
+                if dep_id < MAX_SERVICES {
+                    in_degree[dep_id] += 1;
+                }
+            }
+        }
+    }
+    
+    // Find all services with no dependencies (in-degree 0)
+    for i in 0..SERVICE_COUNT as usize {
+        if in_degree[i] == 0 {
+            queue.push(i as SigmaU32);
+        }
+    }
+    
+    // Process queue (Kahn's algorithm for topological sort)
+    while !queue.is_empty() {
+        let current = queue.remove(0);
+        order.push(current);
         
-        for i in 0..SERVICE_COUNT {
-            if let Some(service) = &SERVICES[i as usize] {
-                if service.state == ServiceState::Stopped {
-                    // Try to start
-                    if sigma_init_start_service(i) == 0 {
-                        started += 1;
+        if let Some(service) = &SERVICES[current as usize] {
+            for j in 0..service.dependency_count as usize {
+                let dep_id = service.dependencies[j] as usize;
+                if dep_id < MAX_SERVICES {
+                    in_degree[dep_id] -= 1;
+                    if in_degree[dep_id] == 0 {
+                        queue.push(dep_id as SigmaU32);
                     }
                 }
             }
         }
     }
     
-    if started == SERVICE_COUNT {
-        0 // All services started
+    // Check for cycles
+    if order.len() != SERVICE_COUNT as usize {
+        Err(-3) // Circular dependency detected
     } else {
-        -1 // Some services failed to start
+        Ok(order)
+    }
+}
+
+/// Start all services in dependency order (BUG-009 Fix - proper topological sort)
+#[no_mangle]
+pub unsafe extern "C" fn sigma_init_start_all() -> SigmaI32 {
+    // Build dependency graph and get startup order
+    let order = match build_dependency_order() {
+        Ok(o) => o,
+        Err(e) => return e,
+    };
+    
+    // Start services in dependency order
+    for service_id in order {
+        if sigma_init_start_service(service_id) != 0 {
+            // Failed to start service - mark as failed and continue
+            if let Some(service) = &mut SERVICES[service_id as usize] {
+                service.state = ServiceState::Failed;
+            }
+        }
+    }
+    
+    // Verify all services are running or failed
+    let mut running_count = 0;
+    for i in 0..SERVICE_COUNT as usize {
+        if let Some(service) = &SERVICES[i] {
+            if service.state == ServiceState::Running {
+                running_count += 1;
+            }
+        }
+    }
+    
+    if running_count == SERVICE_COUNT as usize {
+        0 // All services started successfully
+    } else {
+        1 // Some services failed to start (but not critical error)
     }
 }
