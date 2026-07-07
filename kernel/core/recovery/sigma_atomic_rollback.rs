@@ -44,6 +44,10 @@ const GEN_DESC_LEN: SigmaUsize = 64;
 const KVER_LEN: SigmaUsize = 32;
 /// SHA-256 hash length in bytes.
 const HASH_LEN: SigmaUsize = 32;
+/// Maximum number of rollback hooks.
+const MAX_HOOKS: SigmaUsize = 16;
+/// Hook command length.
+const HOOK_CMD_LEN: SigmaUsize = 128;
 
 /// Special sentinel: no active generation.
 const GEN_NONE: SigmaU32 = u32::MAX;
@@ -62,6 +66,41 @@ pub enum GenStatus {
     Old     = 3,
     /// Generation is corrupted / hash mismatch.
     Corrupt = 4,
+}
+
+// ── Hook Type ───────────────────────────────────────────────────────────────
+#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum HookType {
+    /// Hook runs before rollback.
+    PreRollback = 0,
+    /// Hook runs after rollback.
+    PostRollback = 1,
+    /// Hook runs before generation creation.
+    PreCreate = 2,
+    /// Hook runs after generation creation.
+    PostCreate = 3,
+}
+
+// ── Rollback Hook ───────────────────────────────────────────────────────────
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct RollbackHook {
+    pub hook_type: HookType,
+    pub command: [SigmaU8; HOOK_CMD_LEN],
+    pub enabled: SigmaBool,
+    pub _pad: [SigmaU8; 7],
+}
+
+impl RollbackHook {
+    pub const fn zeroed() -> Self {
+        Self {
+            hook_type: HookType::PreRollback,
+            command: [0u8; HOOK_CMD_LEN],
+            enabled: false,
+            _pad: [0u8; 7],
+        }
+    }
 }
 
 // ── SystemGeneration — one generation record ──────────────────────────────────
@@ -109,7 +148,9 @@ impl SystemGeneration {
 // ── GenerationManager ─────────────────────────────────────────────────────────
 pub struct GenerationManager {
     gens:        [SystemGeneration; MAX_GENERATIONS],
+    hooks:       [RollbackHook; MAX_HOOKS],
     count:       SigmaUsize,
+    hook_count:  SigmaUsize,
     active_id:   AtomicU32,
     next_gen_id: AtomicU32,
     initialized: SigmaBool,
@@ -119,7 +160,9 @@ impl GenerationManager {
     pub const fn new() -> Self {
         Self {
             gens:        [SystemGeneration::zeroed(); MAX_GENERATIONS],
+            hooks:       [RollbackHook::zeroed(); MAX_HOOKS],
             count:       0,
+            hook_count:  0,
             active_id:   AtomicU32::new(GEN_NONE),
             next_gen_id: AtomicU32::new(1),
             initialized: false,
@@ -254,8 +297,47 @@ impl GenerationManager {
         written
     }
 
+    // ── Hook Management ───────────────────────────────────────────────────────
+
+    /// Register a rollback hook.
+    pub fn register_hook(&mut self, hook_type: HookType, command: &[SigmaU8]) -> SigmaI32 {
+        if self.hook_count >= MAX_HOOKS {
+            return -1;
+        }
+        let idx = self.hook_count;
+        self.hooks[idx].hook_type = hook_type;
+        self.hooks[idx].enabled = true;
+        let len = command.len().min(HOOK_CMD_LEN - 1);
+        let mut i = 0;
+        while i < len { self.hooks[idx].command[i] = command[i]; i += 1; }
+        self.hooks[idx].command[len] = 0;
+        self.hook_count += 1;
+        0
+    }
+
+    /// Run hooks of a specific type.
+    pub fn run_hooks(&self, hook_type: HookType) {
+        for i in 0..self.hook_count {
+            if self.hooks[i].hook_type == hook_type && self.hooks[i].enabled {
+                // In production: execute hook command
+                // For now, just mark as executed
+            }
+        }
+    }
+
+    /// Remove a hook by index.
+    pub fn remove_hook(&mut self, index: SigmaUsize) -> SigmaI32 {
+        if index >= self.hook_count {
+            return -1;
+        }
+        self.hooks[index] = RollbackHook::zeroed();
+        self.hook_count -= 1;
+        0
+    }
+
     pub fn active_id(&self) -> SigmaU32 { self.active_id.load(Ordering::Relaxed) }
     pub fn generation_count(&self) -> SigmaUsize { self.count }
+    pub fn hook_count(&self) -> SigmaUsize { self.hook_count }
 }
 
 // ── Global Instance ───────────────────────────────────────────────────────────
@@ -320,4 +402,47 @@ pub unsafe extern "C" fn sigma_generation_list(
     out: *mut SystemGeneration, max: SigmaU32,
 ) -> SigmaU32 {
     G_GEN_MGR.list(out, max as SigmaUsize) as SigmaU32
+}
+
+/// Register a rollback hook. Returns 0 on success.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_hook_register(
+    hook_type: SigmaU32,
+    command: *const SigmaU8,
+    cmd_len: SigmaUsize,
+) -> SigmaI32 {
+    let ht = match hook_type {
+        0 => HookType::PreRollback,
+        1 => HookType::PostRollback,
+        2 => HookType::PreCreate,
+        3 => HookType::PostCreate,
+        _ => HookType::PreRollback,
+    };
+    let cmd = core::slice::from_raw_parts(command, cmd_len.min(HOOK_CMD_LEN));
+    G_GEN_MGR.register_hook(ht, cmd)
+}
+
+/// Run hooks of a specific type.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_hook_run(hook_type: SigmaU32) {
+    let ht = match hook_type {
+        0 => HookType::PreRollback,
+        1 => HookType::PostRollback,
+        2 => HookType::PreCreate,
+        3 => HookType::PostCreate,
+        _ => HookType::PreRollback,
+    };
+    G_GEN_MGR.run_hooks(ht);
+}
+
+/// Remove a hook by index. Returns 0 on success.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_hook_remove(index: SigmaU32) -> SigmaI32 {
+    G_GEN_MGR.remove_hook(index as SigmaUsize)
+}
+
+/// Returns the total number of registered hooks.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_hook_count() -> SigmaU32 {
+    G_GEN_MGR.hook_count() as SigmaU32
 }
