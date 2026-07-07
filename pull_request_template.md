@@ -1,4 +1,6 @@
-ï»¿<!-- SigmaOS Pull Request Template
+# PULL REQUEST TEMPLATE
+
+<!-- SigmaOS Pull Request Template
      Fill in each section. Delete irrelevant items.
      Inspired by Linux kernel patch submission guidelines. -->
 
@@ -9,64 +11,101 @@
 ## Subsystem(s) affected
 
 <!-- Check all that apply -->
-- [ ] kernel/core (scheduler, MM, syscalls, IRQ)
+
+- [ ] kernel/core (scheduler, MM, syscalls, IRQ, boot)
+
 - [ ] kernel/fs (VFS, tmpfs, sigmafs, ext4)
-- [ ] kernel/net (TCP, UDP, sockets, Wi-Fi)
-- [ ] kernel/security (pledge, unveil, seccomp, PQC)
-- [ ] drivers (NVMe, USB, GPU, Wi-Fi, audio, input)
-- [ ] boot (UEFI, multiboot, bootloader)
-- [ ] sigma-sh (shell)
-- [ ] sigma-pkg (package manager)
-- [ ] zenith_desktop (compositor, WM)
+
+- [ ] kernel/net (TCP, UDP, sockets, Wi-Fi, DHCP, DNS)
+
+- [ ] kernel/security (pledge, unveil, seccomp, PQC, audit)
+
+- [ ] drivers (NVMe, USB, GPU, Wi-Fi, audio, input, storage)
+
+- [ ] arch (x86_64, ARM64, RISC-V)
+
+- [ ] sigma-sh (shell REPL)
+
+- [ ] sigma-pkg (package manager, registry)
+
+- [ ] zenith_desktop (compositor, WM, GUI)
+
 - [ ] userland/ai (sigma-ai, GGUF, NL-CLI)
+
 - [ ] sdk (driver DDK, app SDK)
+
 - [ ] ci / build system
+
 - [ ] docs / wiki
+
 - [ ] other: ___
 
 ## Type of change
 
-- [ ] `feat` â€” new feature
-- [ ] `fix` â€” bug fix
-- [ ] `impl` â€” implements a roadmap item from Ideas-999-Structured
-- [ ] `perf` â€” performance improvement
-- [ ] `security` â€” security fix/hardening
-- [ ] `refactor` â€” code refactoring (no behaviour change)
-- [ ] `driver` â€” new or updated hardware driver
-- [ ] `docs` â€” documentation only
-- [ ] `ci` â€” CI/workflow changes
-- [ ] `test` â€” tests only
+- [ ] `feat` — new feature
+
+- [ ] `fix` — bug fix
+
+- [ ] `impl` — implements a roadmap item
+
+- [ ] `perf` — performance improvement
+
+- [ ] `security` — security fix/hardening
+
+- [ ] `refactor` — code refactoring (no behaviour change)
+
+- [ ] `driver` — new or updated hardware driver
+
+- [ ] `docs` — documentation only
+
+- [ ] `ci` — CI/workflow changes
+
+- [ ] `test` — tests only
 
 ## Roadmap item (if applicable)
 
-<!-- Reference the Ideas-999-Structured.md idea number, e.g. "Idea #86 Wi-Fi DDK" -->
-Ideas: #___
+<!-- Reference the roadmap phase and item -->
+Phase: ___
+Item: ___
 
 ## Testing done
 
-<!-- Required â€” describe what you tested and how -->
+<!-- Required — describe what you tested and how -->
 
-**Build targets tested:**
+### Build targets tested:
+
 - [ ] x86_64-unknown-none (kernel no_std)
+
 - [ ] aarch64-unknown-none
+
 - [ ] riscv64gc-unknown-none-elf
+
 - [ ] x86_64-unknown-linux-gnu (host tools / sigma-sh)
 
-**Tests run:**
+### Tests run:
+
 - [ ] `cargo test` passes
+
 - [ ] `cargo clippy -- -D warnings` clean
+
 - [ ] `cargo fmt --check` clean
+
 - [ ] QEMU boot smoke test (`make qemu` or `./qemu-boot.sh smoke`)
+
 - [ ] Manual testing: describe below
 
 ```
+
 # Paste your test session here
+
 $ sigma-sh
 $ sigma-pkg install ...
 ```
 
-**Hardware tested on (if driver change):**
+### Hardware tested on (if driver change):
+
 - [ ] QEMU virtio
+
 - [ ] Physical hardware: ___
 
 ## Safety / Security considerations
@@ -74,28 +113,58 @@ $ sigma-pkg install ...
 <!-- Required if touching kernel/, security/, drivers/, or kabi/ -->
 
 - [ ] All `unsafe` blocks have `// SAFETY:` explanation comments
+
 - [ ] No new `unsafe` blocks without justification
+
 - [ ] `sigma_pledge` / `sigma_unveil` calls are correct for new syscalls
-- [ ] New syscalls added to `syscall_dispatch.rs` and `sigma_pledge.rs` mapping
+
+- [ ] New syscalls added to syscall dispatcher and pledge mapping
+
 - [ ] PQC signatures verified on any new binary artifacts
+
 - [ ] No secret material (keys, tokens) in the diff
+
+- [ ] Security review completed for security-critical changes
 
 ## ABI / compatibility impact
 
 <!-- Does this change any public ABI that drivers or apps depend on? -->
 
 - [ ] No ABI change
+
 - [ ] ABI-compatible extension (new fields at end of struct)
-- [ ] ABI break â€” requires kabi version bump and MAINTAINERS notification
+
+- [ ] ABI break — requires kabi version bump and MAINTAINERS notification
+
+## Commit Message Format
+
+<!-- Verify your commits follow the kernel-style format -->
+
+- [ ] Title follows format: `subsystem: short description (=50 chars)`
+
+- [ ] Commits include detailed explanation (motivation, technical details, testing)
+
+- [ ] Commits include `Signed-off-by: Name <email>` (DCO requirement)
+
+- [ ] References included (Issue #123, PR #456)
 
 ## Checklist
 
 - [ ] Title follows Conventional Commits: `type(scope): description`
+
 - [ ] Commits touching `kernel/` or `drivers/` have `Signed-off-by: Name <email>`
+
 - [ ] SPDX-License-Identifier on all new source files
+
 - [ ] MAINTAINERS updated if adding a new subsystem or driver
+
 - [ ] Wiki / docs updated if behaviour changes are user-visible
-- [ ] `CURRENT_PROBLEMS_MANIFEST.md` updated if this resolves an open issue
+
+- [ ] CODEOWNERS updated if adding new directories
+
+- [ ] Tests added for new functionality
+
+- [ ] No external dependencies added without review
 
 ## Linked issues
 
