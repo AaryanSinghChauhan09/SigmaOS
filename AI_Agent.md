@@ -1,25 +1,38 @@
-# AI Agent Roadmap (SigmaAI)
+# AI Agent & Self-Driving Operating System Architecture
 
-## 1. Local-First Runtime & Quantization
-SigmaOS embeds an offline-first machine learning runtime (`sigma_ai`), eliminating cloud dependancies and privacy leaks.
-- **Inference Engine**: Highly optimized, quantized ONNX/HuggingFace runtime targeting local CPUs/NPUs.
-- **Quantization strategy**: Focus on INT4 and INT8 quantized formats, running large language models smoothly within a minimal memory footprint (e.g. Phi-3, Gemma-2B).
+This document describes the architectural plan for upgrading the SigmaOS AI Agent (`sigma-agent`) to enable autonomous execution of multi-step system workflows, reinforcing its ability to replicate human operations without manual intervention.
 
-## 2. NL -> CLI Safety & Guardrails
-- **Dry-run enforcement**: Translates natural language system requests ("Show network interfaces and active sockets") into staged commands.
-- **Safety checks**: Staged CLI commands are validated against security rules. Destructive commands are blocked or require explicit TPM verification.
+---
 
-## 3. Signed Model Marketplace
-- Users cannot download untrusted weights.
-- Models must be signed by the SigmaOS authority and verified before loading.
-- Provenance logs record all AI-generated suggestions to ensure administrative accountability.
+## 🧠 Architectural Framework
 
-## 4. Roadmap Phases
-- **Phase 1 (0–3m)**: Basic ONNX parser and model runtime loading stubs.
-- **Phase 2 (3–6m)**: CLI suggestion interface with Dry-Run safety buffers.
-- **Phase 3 (6–9m)**: Model verification and cryptographic signature validation routines.
-- **Phase 4 (9–12m)**: Advanced NPU hardware acceleration optimization.
+```mermaid
+graph TD
+    UserQuery[User Natural Language / Prompt] --> Parser[Intent Parser & Local LLM]
+    Parser --> Router{Intent Matches?}
+    Router -- Yes --> ToolExecution[Dynamic Tool Dispatcher]
+    Router -- No --> LLMBackend[Local SLM Command Translation]
+    LLMBackend --> Verification{Safety Sandbox Check}
+    Verification -- Safe --> ToolExecution
+    Verification -- Unsafe --> PromptConfirm[Prompt for Confirmation]
+    ToolExecution --> Exec[Shell / IPC Call]
+    Exec --> Feedback[Relevance Feedback & Memory Update]
+    Feedback --> Learning[Reinforcement Learning State Optimizer]
+    Learning -.-> Parser
+```
 
-## 5. Contributor Guidelines
-- Implement local fallback paths for all AI features.
-- Ensure all models pass the strict integrity signature checks before integration.
+---
+
+## 🛠️ Key Subsystems
+
+### 1. Natural Language ↔ CLI Translation
+- **Translation Layer**: Map semantic queries (e.g. `"install graphic editor"`) dynamically to underlying OS commands (`sigpkg install gimp`).
+- **Context Preservation**: Save previous conversation variables in a structured SQLite/NoSQL DB wrapper.
+
+### 2. Reinforcement Learning Scheduler
+- **State-Action Rewards**: Reward the agent based on execution duration, CPU consumption, and success/failure outputs.
+- **Model Adaptation**: Run online updates using lightweight Q-learning weights for common tasks.
+
+### 3. Verification Sandbox
+- **Capability Gating**: Force critical actions to execute within a transient capability-gated sandbox before committing modifications to the system directory.
+- **Audit Logs**: Generate cryptographic BLAKE3 chain logs of all action states.
