@@ -284,11 +284,13 @@ impl RoundRobinScheduler {
     /// Dequeue task from queue
     unsafe fn dequeue_task(&mut self, tid: SigmaU64) {
         let tid_usize = tid as usize;
-        if let Some(ref tcb) = self.task_table[tid_usize].clone() {
+        if let Some(tcb) = self.task_table[tid_usize] {
             if let Some(prev) = tcb.prev {
                 let prev_usize = prev as usize;
-                if let Some(ref mut prev_tcb) = self.task_table[prev_usize] {
-                    prev_tcb.next = tcb.next;
+                if prev_usize < MAX_TASKS {
+                    if let Some(ref mut prev_tcb) = self.task_table[prev_usize] {
+                        prev_tcb.next = tcb.next;
+                    }
                 }
             } else {
                 // Task was head
@@ -297,8 +299,10 @@ impl RoundRobinScheduler {
 
             if let Some(next) = tcb.next {
                 let next_usize = next as usize;
-                if let Some(ref mut next_tcb) = self.task_table[next_usize] {
-                    next_tcb.prev = tcb.prev;
+                if next_usize < MAX_TASKS {
+                    if let Some(ref mut next_tcb) = self.task_table[next_usize] {
+                        next_tcb.prev = tcb.prev;
+                    }
                 }
             } else {
                 // Task was tail
@@ -324,10 +328,21 @@ impl RoundRobinScheduler {
         None
     }
 
-    /// Get current timestamp (placeholder)
+    /// Get current timestamp using RDTSC
     fn get_timestamp(&self) -> SigmaU64 {
-        // TODO: Implement proper timestamp
-        0
+        unsafe {
+            let mut low: u32;
+            let mut high: u32;
+            core::arch::asm!(
+                "rdtsc",
+                "mov edx, eax",
+                "mov eax, 0",
+                out("eax") low,
+                out("edx") high,
+                options(nomem, nostack)
+            );
+            ((high as SigmaU64) << 32) | (low as SigmaU64)
+        }
     }
 
     /// Get task count
@@ -352,10 +367,73 @@ impl RoundRobinScheduler {
         self.time_slice
     }
 
-    /// Print scheduler statistics
-    pub unsafe fn print_stats(&mut self) {
-        // TODO: Implement proper printing
-        let _ = (self.task_count, self.total_switches, self.time_slice);
+    /// Print scheduler statistics (returns formatted string buffer)
+    pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
+        // Simple number-to-string conversion
+        let mut written = 0;
+        
+        // Write "Tasks: "
+        let prefix = b"Tasks: ";
+        if written + prefix.len() < buf.len() {
+            buf[written..written+prefix.len()].copy_from_slice(prefix);
+            written += prefix.len();
+        }
+        
+        // Write task count
+        written += self.write_number(self.task_count, &mut buf[written..]);
+        
+        // Write " Switches: "
+        let prefix2 = b" Switches: ";
+        if written + prefix2.len() < buf.len() {
+            buf[written..written+prefix2.len()].copy_from_slice(prefix2);
+            written += prefix2.len();
+        }
+        
+        // Write total switches
+        written += self.write_number(self.total_switches, &mut buf[written..]);
+        
+        // Write " Quantum: "
+        let prefix3 = b" Quantum: ";
+        if written + prefix3.len() < buf.len() {
+            buf[written..written+prefix3.len()].copy_from_slice(prefix3);
+            written += prefix3.len();
+        }
+        
+        // Write time slice
+        written += self.write_number(self.time_slice, &mut buf[written..]);
+        
+        written
+    }
+    
+    /// Helper: Write number to buffer
+    fn write_number(&self, mut num: SigmaU64, buf: &mut [u8]) -> usize {
+        if num == 0 {
+            if buf.len() > 0 {
+                buf[0] = b'0';
+                return 1;
+            }
+            return 0;
+        }
+        
+        let mut digits = [0u8; 20];
+        let mut len = 0;
+        
+        while num > 0 && len < 20 {
+            digits[len] = (num % 10) as u8 + b'0';
+            num /= 10;
+            len += 1;
+        }
+        
+        // Reverse and copy
+        let mut written = 0;
+        for i in (0..len).rev() {
+            if written < buf.len() {
+                buf[written] = digits[i];
+                written += 1;
+            }
+        }
+        
+        written
     }
 }
 
