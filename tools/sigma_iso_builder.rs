@@ -148,23 +148,102 @@ pub unsafe extern "C" fn sigma_iso_set_config(
     0 // Success
 }
 
-/// Create GPT partition table
+/// GPT Header structure
+#[repr(C)]
+pub struct GptHeader {
+    pub signature: [u8; 8],           // "EFI PART"
+    pub revision: u32,
+    pub header_size: u32,
+    pub header_crc32: u32,
+    pub reserved: u32,
+    pub my_lba: SigmaU64,
+    pub alternate_lba: SigmaU64,
+    pub first_usable_lba: SigmaU64,
+    pub last_usable_lba: SigmaU64,
+    pub disk_guid: [u8; 16],
+    pub partition_entry_lba: SigmaU64,
+    pub number_of_partition_entries: u32,
+    pub size_of_partition_entry: u32,
+    pub partition_entry_array_crc32: u32,
+}
+
+/// Protective MBR structure
+#[repr(C)]
+pub struct ProtectiveMbr {
+    pub boot_indicator: u8,
+    pub starting_chs: [u8; 3],
+    pub partition_type: u8,
+    pub ending_chs: [u8; 3],
+    pub starting_lba: u32,
+    pub size_in_lba: u32,
+    pub signature: u16,
+}
+
+/// Calculate CRC32 (BUG-001 Fix: Implement actual CRC32 calculation)
+fn crc32(data: &[u8]) -> u32 {
+    let mut crc: u32 = 0xFFFFFFFF;
+    for &byte in data {
+        crc ^= byte as u32;
+        for _ in 0..8 {
+            if crc & 1 != 0 {
+                crc = (crc >> 1) ^ 0xEDB88320;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+    !crc
+}
+
+/// Create protective MBR
+unsafe fn create_protective_mbr(disk_size_lba: SigmaU64) -> ProtectiveMbr {
+    ProtectiveMbr {
+        boot_indicator: 0x00,
+        starting_chs: [0x00, 0x02, 0x00],
+        partition_type: 0xEE, // GPT protective
+        ending_chs: [0xFF, 0xFF, 0xFF],
+        starting_lba: 1,
+        size_in_lba: if disk_size_lba > 0xFFFFFFFF { 0xFFFFFFFF } else { disk_size_lba as u32 },
+        signature: 0xAA55,
+    }
+}
+
+/// Create GPT partition table (BUG-001 Fix: Implement full GPT creation)
 #[no_mangle]
 pub unsafe extern "C" fn sigma_iso_create_gpt(
     partitions: *mut GptPartition,
     partition_count: SigmaU32,
+    gpt_header: *mut GptHeader,
+    mbr: *mut ProtectiveMbr,
 ) -> SigmaI32 {
-    if !ISO_INITIALIZED || partitions.is_null() {
+    if !ISO_INITIALIZED || partitions.is_null() || gpt_header.is_null() || mbr.is_null() {
         return -1;
     }
     
-    // In a real implementation, this would:
-    // 1. Create protective MBR
-    // 2. Create GPT header
-    // 3. Create partition entries
-    // 4. Calculate CRC32 checksums
+    let disk_size_lba = (ISO_CONFIG.size_mb as SigmaU64 * 1024 * 1024) / 512;
     
-    // Placeholder - create EFI System Partition
+    // Create protective MBR
+    *mbr = create_protective_mbr(disk_size_lba);
+    
+    // Create GPT header
+    let mut header = GptHeader {
+        signature: [b'E', b'F', b'I', b' ', b'P', b'A', b'R', b'T'],
+        revision: 0x00010000,
+        header_size: 92,
+        header_crc32: 0,
+        reserved: 0,
+        my_lba: 1,
+        alternate_lba: disk_size_lba - 1,
+        first_usable_lba: 34,
+        last_usable_lba: disk_size_lba - 34,
+        disk_guid: [0; 16],
+        partition_entry_lba: 2,
+        number_of_partition_entries: partition_count,
+        size_of_partition_entry: 128,
+        partition_entry_array_crc32: 0,
+    };
+    
+    // Create EFI System Partition
     if partition_count >= 1 {
         let mut efi_part = GptPartition {
             partition_type_guid: [0; 16],
@@ -191,6 +270,26 @@ pub unsafe extern "C" fn sigma_iso_create_gpt(
         
         *partitions = efi_part;
     }
+    
+    // Calculate partition entry array CRC32
+    let partition_data = core::slice::from_raw_parts(
+        partitions as *const u8,
+        (partition_count as usize) * core::mem::size_of::<GptPartition>(),
+    );
+    header.partition_entry_array_crc32 = crc32(partition_data);
+    
+    // Calculate header CRC32 (excluding the CRC32 field itself)
+    let header_bytes = core::slice::from_raw_parts(
+        gpt_header as *const u8,
+        core::mem::size_of::<GptHeader>(),
+    );
+    let mut header_copy = *header_bytes;
+    // Zero out the CRC32 field for calculation
+    let crc_ptr = &mut header_copy[16..20];
+    crc_ptr[0] = 0; crc_ptr[1] = 0; crc_ptr[2] = 0; crc_ptr[3] = 0;
+    header.header_crc32 = crc32(&header_copy);
+    
+    *gpt_header = header;
     
     0 // Success
 }
