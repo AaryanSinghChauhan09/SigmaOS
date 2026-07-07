@@ -1,23 +1,26 @@
-# Security Hardening Policies
+# SigmaOS Security Model
 
-SigmaOS utilizes a zero-trust, post-quantum architecture.
+SigmaOS adopts a zero-trust, natively isolated approach to security, fundamentally differing from monolithic designs like Linux or Windows.
 
-## 1. Access Control (S-ARMOR)
+## Capability-Based Access Control
 
-***Mandatory Access Control (MAC)**: Similar to SELinux/AppArmor, but enforced at the shard boundary.* **Privilege Separation**: Shards operate in isolated hardware rings with explicit IPC whitelisting.
+Every resource (IPC channels, file descriptors, PCI config space, memory maps) is gated by 64-bit unforgeable **capability tokens**.
+- **No Global root:** There is no concept of a "root" user possessing omnipotent access.
+- **VFS Enforcement:** `kernel/fs/vfs.rs` enforces capability checks at the descriptor open/truncate layer.
+- **IPC Enforcement:** `kernel/ipc/ring_channel.rs` strictly drops messages that do not provide the correct capability token for the target channel.
 
-## 2. Auditing & Logging
+## Cryptography
 
-***Kernel-Level Audit**: All syscalls and inter-shard communications are logged.* **Immutable Logs**: Security-critical events are written to an append-only, cryptographically verifiable log.
+The kernel ships with native, zero-dependency implementations of essential cryptography for disk encryption and network protocols.
+- **ChaCha20 (`kernel/crypto/chacha20.rs`)**: A highly optimized, constant-time stream cipher used natively by the kernel. No dynamic memory allocations are used.
 
-## 3. Sandboxing & Isolation
+## Package Security (`sigpkg`)
 
-- User processes are isolated using sovereign namespaces and resource limitation cgroups.
+Supply chain security is a first-class citizen:
+- **SBOM Verification (`sigma-pkg/sbom.rs`)**: Software Bill of Materials (SBOM) manifests are verified against incoming packages to ensure zero drift from signed source.
+- **ED25519 Signatures (`sigma-pkg/ed25519_verify.rs`)**: Package manifests must be signed using ED25519 public key infrastructure. Untrusted binaries cannot execute on the host.
 
-## 4. Cryptography
+## Memory Safety
 
-***Post-Quantum Cryptography (PQC)**: Used for sealing shards and verifying inter-module signatures.* **Secure Boot**: Bootloader verifies signed binaries before execution.
-
-## 5. Testing & CI
-
-*Automated fuzzing (via `SovereignFuzzer`) is required for all new device drivers.* Regression tests continuously validate MAC policies.
+- **100% Rust No-Std**: Memory safety vulnerabilities (buffer overflows, use-after-free) are structurally prevented by Rust's ownership model in the kernel core.
+- **Custom Memory Manager (`kernel/mm/buddy_slab_vmm.rs`)**: Avoids fragmentation and isolates kernel objects using dedicated SLAB caches.
