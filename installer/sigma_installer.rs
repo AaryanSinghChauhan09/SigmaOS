@@ -1,6 +1,16 @@
 //! SigmaOS Calamares-Style Installer
 //! Polished installer with dual-boot and VM support
 //! Inspired by Calamares, Ubuntu Ubiquity, and Fedora Anaconda
+//!
+//! Modular installer with pluggable modules for:
+//! - Welcome screen
+//! - Language selection
+//! - Location/timezone
+//! - Partitioning
+//! - User creation
+//! - Summary
+//! - Installation progress
+//! - Finished screen
 
 #![no_std]
 #![allow(dead_code)]

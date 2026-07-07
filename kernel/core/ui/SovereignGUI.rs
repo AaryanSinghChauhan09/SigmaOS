@@ -6,6 +6,12 @@
 // Implements the core GUI engine for SigmaOS desktop environment.
 // Provides framebuffer management, drawing primitives, and window compositing.
 // Inspired by: Wayland, X11, Windows DWM
+//
+// Wayland Compositor Patches:
+// - Low latency rendering with VSync
+// - GPU buffer reuse for reduced overhead
+// - Hardware acceleration hints
+// - Direct scanout support
 // Language: Rust #![no_std] — no alloc, no external crates.
 
 #![no_std]
