@@ -55,6 +55,14 @@ This document tracks the implementation progress of SigmaOS Year 1 foundation co
 | **Reproducible Build Farm Orchestration** | ✅ Complete | 100% |
 | **Persona Bundle Installer** | ✅ Complete | 100% |
 | **TPM Attestation Workflows** | ✅ Complete | 100% |
+| **Intel GPU Driver Improvements** | ✅ Complete | 100% |
+| **AMDGPU Updates** | ✅ Complete | 100% |
+| **NVIDIA Nouveau Improvements** | ✅ Complete | 100% |
+| **Broadcom Wi-Fi Driver Fixes** | ✅ Complete | 100% |
+| **Realtek Wi-Fi Driver Fixes** | ✅ Complete | 100% |
+| **Nix-Style Declarative Package Modules** | ✅ Complete | 100% |
+| **OSTree/Immutable OS Model** | ✅ Complete | 100% |
+| **Signed Model Marketplace** | ✅ Complete | 100% |
 
 ## Detailed Implementation Status
 
@@ -1274,6 +1282,218 @@ This document tracks the implementation progress of SigmaOS Year 1 foundation co
 - SHA-256 PCR digests
 - Inspired by Intel TXT and AMD SEV
 
+### 44. Intel GPU Driver Improvements
+
+**Status**: ✅ Complete
+**Location**: `kernel/drivers/gpu/sigma_intel_gpu.rs`
+
+**Implemented Functions**:
+- GPU initialization and detection
+- Generation detection (Sandy Bridge to Arc Alchemist)
+- Architecture detection (integrated/discrete)
+- VRAM size detection
+- GT level detection
+- GPU context creation and management
+- Buffer allocation and management
+- Buffer mapping/unmapping
+- Power management
+- GuC firmware enablement
+- HuC firmware enablement
+- GPU reset
+
+**Key Features**:
+- Intel GPU driver with mainline improvements
+- Support for Intel HD Graphics, Iris Xe, and Arc Graphics
+- GuC and HuC firmware support
+- Power management enabled by default
+- Multiple GPU generations supported
+- Context and buffer management
+- Inspired by Linux i915 driver
+
+### 45. AMDGPU Updates
+
+**Status**: ✅ Complete
+**Location**: `kernel/drivers/gpu/sigma_amdgpu.rs`
+
+**Implemented Functions**:
+- GPU initialization and detection
+- Architecture detection (GCN 1.0 to RDNA 3, CDNA)
+- VRAM size detection
+- Compute units detection
+- GPU context creation and management (compute-only support)
+- Buffer allocation and management
+- Buffer mapping/unmapping
+- Power management
+- RAS (Reliability, Availability, Serviceability) enablement
+- GPU reset
+
+**Key Features**:
+- AMD GPU driver with mainline improvements
+- Support for Radeon RX 6000/7000 series and APUs
+- RDNA 1/2/3 architecture support
+- GCN architecture support
+- CDNA compute support
+- RAS enabled by default
+- Compute-only context support
+- Inspired by Linux amdgpu driver
+
+### 46. NVIDIA Nouveau Improvements
+
+**Status**: ✅ Complete
+**Location**: `kernel/drivers/gpu/sigma_nouveau.rs`
+
+**Implemented Functions**:
+- GPU initialization and detection
+- Architecture detection (Tesla to Ada Lovelace)
+- VRAM size detection
+- CUDA cores detection
+- GPU context creation and management (compute-only support)
+- Buffer allocation and management
+- Buffer mapping/unmapping
+- Power management
+- Reclocking enablement (Nouveau feature)
+- GPU reset
+
+**Key Features**:
+- NVIDIA GPU driver with Nouveau improvements
+- Support for GeForce GTX, RTX series (experimental)
+- Tesla to Ada Lovelace architecture support
+- Reclocking enabled by default
+- CUDA cores detection
+- Compute-only context support
+- Inspired by Linux nouveau driver
+
+### 47. Broadcom Wi-Fi Driver Fixes
+
+**Status**: ✅ Complete
+**Location**: `kernel/drivers/net/sigma_brcm_wifi.rs`
+
+**Implemented Functions**:
+- Wi-Fi interface creation and management
+- Chipset detection (BCM43xx, BCM4360, BCM4356, BCM4375, BCM4389)
+- Network connection/disconnection
+- Network scanning
+- TX power control
+- Band selection (2.4/5/6 GHz)
+- Security support (Open, WEP, WPA-PSK, WPA2-PSK, WPA3-SAE)
+- Power management
+- Country code configuration
+
+**Key Features**:
+- Broadcom Wi-Fi driver with fixes
+- Support for modern Broadcom chipsets
+- Multiple security protocols
+- Multi-band support
+- Power management enabled
+- Firmware loading
+- Inspired by Linux brcmfmac driver
+
+### 48. Realtek Wi-Fi Driver Fixes
+
+**Status**: ✅ Complete
+**Location**: `kernel/drivers/net/sigma_realtek_wifi.rs`
+
+**Implemented Functions**:
+- Wi-Fi interface creation and management
+- Chipset detection (RTL8812AU, RTL8822CU, RTL8822BU, RTL8852AE, RTL8723DU)
+- Network connection/disconnection
+- Network scanning
+- TX power control
+- Band selection (2.4/5/6 GHz)
+- Security support (Open, WEP, WPA-PSK, WPA2-PSK, WPA3-SAE)
+- Beamforming enablement
+- Power management
+- LED control
+- Country code configuration
+
+**Key Features**:
+- Realtek Wi-Fi driver with backported fixes
+- Support for modern Realtek chipsets
+- Beamforming support
+- LED control
+- Multi-band support
+- Power management enabled
+- Inspired by Linux rtl88xxau driver
+
+### 49. Nix-Style Declarative Package Modules
+
+**Status**: ✅ Complete
+**Location**: `kernel/core/package/sigma_nix_modules.rs`
+
+**Implemented Functions**:
+- Package module management
+- Module configuration (enable/disable)
+- Dependency resolution
+- Circular dependency detection
+- Global configuration
+- Module-specific configuration
+- Package sources (Git, Local, URL, Channel)
+- Configuration persistence
+- CLI interface for module management
+
+**Key Features**:
+- NixOS-inspired declarative package management
+- Reproducible package configurations
+- Atomic module changes
+- Dependency resolution with cycle detection
+- Multiple package sources
+- Global and per-module configuration
+- Default modules (core, desktop, development)
+- Inspired by NixOS modules and flakes
+
+### 50. OSTree/Immutable OS Model
+
+**Status**: ✅ Complete
+**Location**: `kernel/core/ostree/sigma_ostree.rs`
+
+**Implemented Functions**:
+- Deployment creation and management
+- Deployment staging for next boot
+- Booted deployment tracking
+- Rollback to previous deployment
+- Deployment pinning (prevent garbage collection)
+- Deployment deletion
+- Immutable root filesystem
+- Deployment listing
+- Total size calculation
+
+**Key Features**:
+- OSTree-inspired immutable OS model
+- Atomic system updates
+- Rollback support
+- Deployment pinning
+- Immutable root filesystem by default
+- Multiple deployment management
+- Commit hash tracking
+- Inspired by Fedora Silverblue and Endless OS
+
+### 51. Signed Model Marketplace
+
+**Status**: ✅ Complete
+**Location**: `kernel/core/ml/sigma_model_marketplace.rs`
+
+**Implemented Functions**:
+- Model discovery and listing
+- Model search by tag
+- Model download
+- Model installation
+- Model uninstallation
+- Model signature verification
+- Trusted key management
+- Model metadata (architecture, format, parameters)
+- Multiple model formats (ONNX, Torch, TensorFlow, GGUF, GGML)
+- CLI interface for marketplace management
+
+**Key Features**:
+- Signed marketplace for AI/ML models
+- Model signature verification
+- Trusted key management
+- Multiple model formats supported
+- Model caching and installation
+- Default models (LLaMA 2, Mistral, SDXL)
+- Tag-based search
+- Inspired by Hugging Face Hub and Ollama
+
 ## Success Metrics
 
 ### Year 1 Targets
@@ -1292,7 +1512,7 @@ This document tracks the implementation progress of SigmaOS Year 1 foundation co
 
 - **Implementation Progress**: 100% complete
 
-- **Components Implemented**: 44/44 components (18 foundation + 12 roadmap phases + 14 third-party imports & integrations)
+- **Components Implemented**: 52/52 components (18 foundation + 12 roadmap phases + 22 third-party imports & integrations)
 
 - **Code Coverage**: Comprehensive structure complete, integration tests added
 
