@@ -275,9 +275,12 @@ This document outlines the transparent development roadmap for SigmaOS, a full-f
 
 ### v16.0.0 Foundation (Current) ✅
 - Core OS foundation complete
-- Package management system operational
-- Multiple desktop environments available
-- Security framework in place
+- Bare-Metal Microkernel Subsystems implemented (CFS Scheduler, Buddy/Slab Allocator, VFS, atomic IPC rings)
+- Zero-Dependency TCP/IPv4 Network Stack & ChaCha20 Cryptography
+- Package management system operational with secure ED25519 & SBOM Verification
+- Sovereignty-first Application Suite Stubs (SigmaWriter, SigmaSheet, SigmaVector)
+- Multiple desktop environments available (Zenith, GNOME, KDE, XFCE)
+- Security framework in place (Capability-gated access control)
 - AI features integrated
 - Filesystem layer complete
 - Atomic updates implemented
@@ -285,7 +288,7 @@ This document outlines the transparent development roadmap for SigmaOS, a full-f
 - Security hardening complete
 - Cloud integration complete
 - Desktop experience complete
-- Developer tools complete
+- Developer tools complete & GitHub Actions CI/CD with auto-SBOM verification pipeline
 
 ### v17.0.0 Stability (Planned)
 - Enhanced filesystem support
