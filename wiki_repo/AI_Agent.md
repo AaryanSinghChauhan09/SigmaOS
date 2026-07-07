@@ -1,25 +1,59 @@
-# AI Agent Roadmap (SigmaAI)
+# SigmaOS Natural Language CLI Agent (SigmaAI Shell)
 
-## 1. Local-First Runtime & Quantization
-SigmaOS embeds an offline-first machine learning runtime (`sigma_ai`), eliminating cloud dependancies and privacy leaks.
-- **Inference Engine**: Highly optimized, quantized ONNX/HuggingFace runtime targeting local CPUs/NPUs.
-- **Quantization strategy**: Focus on INT4 and INT8 quantized formats, running large language models smoothly within a minimal memory footprint (e.g. Phi-3, Gemma-2B).
+## Overview
+SigmaOS incorporates a Natural Language-to-CLI shell agent (`SigmaAI Shell`) built directly into the terminal emulator. The agent parses user intent, translates it into safe command-line executions, and validates them against system capability tokens before execution, protecting the user from destructive commands.
 
-## 2. NL -> CLI Safety & Guardrails
-- **Dry-run enforcement**: Translates natural language system requests ("Show network interfaces and active sockets") into staged commands.
-- **Safety checks**: Staged CLI commands are validated against security rules. Destructive commands are blocked or require explicit TPM verification.
+## Architecture & Safety Verification
+```
+ [User Prompt (e.g., "compress downloads")]
+                     │
+                     ▼
+       [Local ONNX Model parser]
+                     │
+                     ▼
+          [Proposed CLI Command]
+         ("tar -czf downloads.tar.gz")
+                     │
+                     ▼
+         [Capability-Token Check] ──► Violates Policy? ──► Terminate
+                     │
+                     ▼ Passes
+        [Execution inside Sandboxed Shell]
+```
 
-## 3. Signed Model Marketplace
-- Users cannot download untrusted weights.
-- Models must be signed by the SigmaOS authority and verified before loading.
-- Provenance logs record all AI-generated suggestions to ensure administrative accountability.
+## System Properties
+The shell agent parameters are defined in `/etc/sigma/agent.conf`:
+```toml
+[agent]
+enabled = true
+model_path = "/usr/share/sigma-ai/models/phi-3-mini-q4.onnx"
+safety_threshold = 0.85
+interactive_confirmation = true
 
-## 4. Roadmap Phases
-- **Phase 1 (0–3m)**: Basic ONNX parser and model runtime loading stubs.
-- **Phase 2 (3–6m)**: CLI suggestion interface with Dry-Run safety buffers.
-- **Phase 3 (6–9m)**: Model verification and cryptographic signature validation routines.
-- **Phase 4 (9–12m)**: Advanced NPU hardware acceleration optimization.
+[permissions]
+blocked_commands = ["rm -rf /", "mkfs", "dd"]
+```
 
-## 5. Contributor Guidelines
-- Implement local fallback paths for all AI features.
-- Ensure all models pass the strict integrity signature checks before integration.
+## Technical Implementation
+The translation parser maps raw strings to executable shell tokens using localized model weights.
+
+```rust
+// agents/sigma_ai_agent.rs
+pub fn parse_intent_to_cmd(prompt: &str, runtime: &SigmaAIRuntime) -> Result<String, AgentError> {
+    let system_instructions = "Translate the prompt to a safe POSIX command.";
+    let formatted_prompt = format!("{} Prompt: {}", system_instructions, prompt);
+    let raw_output = runtime.infer(&formatted_prompt)?;
+    
+    // Validate command safety before returning
+    if is_command_malicious(&raw_output) {
+        return Err(AgentError::MaliciousCommandBlocked);
+    }
+    Ok(raw_output)
+}
+```
+
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: Intent mapping engine and local command translation CLI.
+- **Phase 2 (Months 3-6)**: Sandbox execution sandbox for testing proposed commands.
+- **Phase 3 (Months 6-9)**: Multi-step script generator with interactive step-by-step debugger.
+- **Phase 4 (Months 9-12)**: Self-healing shell integration that auto-corrects command syntax errors.

@@ -1,39 +1,61 @@
-# SigmaOS Security Architecture
+# SigmaOS Security Architecture & Enforcement
 
-SigmaOS enforces security through a combination of traditional sandboxing and modern Zero-Trust principles, operating entirely in a zero-dependency environment.
+## Overview
+SigmaOS implements a Zero-Trust, capability-first security architecture that completely eliminates legacy sudo access or raw root accounts. To guarantee application isolation, the system couples a fine-grained capability-based token system with modern Mandatory Access Control (MAC) policies, running Landlock and seccomp filters at the kernel boundary.
 
-## 1. Secure Boot & Attestation
+## Security Architecture
+The security layer operates at the system call dispatcher. Every requested system call passes through a capability validation check before execution.
 
-- **Post-Quantum Cryptography (PQC)**: Uses CRYSTALS-Dilithium for verifying kernel and driver signatures during boot.
+```
+ [Application Syscall Request]
+               │
+               ▼
+   [Capabilities Validator]  ──► Invalid? ──► Terminate
+               │
+               ▼ Valid
+      [MAC / Landlock Audit] ──► Blocked File? ──► Access Denied
+               │
+               ▼ Approved
+      [Kernel Execution]
+```
 
-- **Root of Trust**: Hardcoded or TPM-sealed keys establish the initial trust anchor.
+## Security Configuration
+MAC profiles are defined declaratively in `/etc/sigma/security/profiles.d/`.
 
-- **Rollback Protection**: Prevents downgrading to vulnerable older versions using monotonic counters.
+Example profile (`user-app.sigma`):
+```toml
+[profile]
+name = "user-app"
+inherit = "base-sandbox"
 
-- **TPM Measurements**: PCR[0] is extended with the SHA-256 hash of every loaded component.
+[capabilities]
+allow_net_connect = false
+allow_fs_write = ["/home/user/downloads", "/tmp"]
+allow_fs_read = ["/home/user/documents", "/usr/share"]
 
-## 2. Zero-Trust Enforcer (sigma_zero_trust)
+[syscalls]
+allow = ["read", "write", "exit", "futex", "epoll_wait"]
+deny = ["ptrace", "sys_chroot", "reboot"]
+```
 
-- Every inter-process communication (IPC) channel requires explicit mutual authentication.
+## Technical Implementation
+The token-based sandbox checks process capabilities stored in the task control block (TCB).
 
-- Uses CRYSTALS-Kyber Key Encapsulation Mechanism (KEM) to establish shared session keys between processes.
+```rust
+// kernel/security/capability.rs
+pub const CAP_NET_CONNECT: u64 = 1 << 0;
+pub const CAP_FS_WRITE: u64 = 1 << 1;
 
-- **Runtime Attestation**: Processes are verified periodically against their expected code hashes.
+pub fn validate_capability(current_mask: u64, requested_cap: u64) -> Result<(), SecurityError> {
+    if (current_mask & requested_cap) == 0 {
+        return Err(SecurityError::PermissionDenied);
+    }
+    Ok(())
+}
+```
 
-## 3. Capability-Based Sandboxing (sigma_sandbox)
-
-Instead of coarse ACLs, SigmaOS uses a fine-grained capability bitmask (`CAP_NET`, `CAP_FS`, `CAP_IPC`, `CAP_HW`, `CAP_ADMIN`).
-
-- **Namespaces**: Process ID (PID), Network, Mount, and IPC namespaces are fully isolated per sandbox profile.
-
-- **cgroups-lite**: Enforces strict CPU time and memory allocation limits.
-
-- **Syscall Filtering**: A bitmask allows explicitly granting only necessary system calls to a process (similar to seccomp).
-
-## 4. Cryptographic Primitives
-
-- **Symmetric**: AES-256 (GCM mode for authenticated encryption).
-
-- **Hashing**: SHA-256.
-
-- **Asymmetric/PQC**: CRYSTALS-Kyber (KEM), CRYSTALS-Dilithium (Signatures).
+## Roadmap & Milestones
+- **Phase 1 (Months 0-3)**: Implementation of capability-token bitmasks in the task manager.
+- **Phase 2 (Months 3-6)**: Integration of Landlock filesystem sandboxing hooks.
+- **Phase 3 (Months 6-9)**: Automated profiling tool (`sigtrace`) that generates sandboxing manifests by tracing system calls.
+- **Phase 4 (Months 9-12)**: System-wide Zero-Trust verification requiring cryptographically signed capability tokens for all IPC interactions.
