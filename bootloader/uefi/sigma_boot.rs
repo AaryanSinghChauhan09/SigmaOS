@@ -217,7 +217,18 @@ pub unsafe extern "efiapi" fn efi_main(
     uefi_print(con_out, b"SigmaOS UEFI Bootloader v0.1.0\n");
     uefi_print(con_out, b"================================\n\n");
 
-    // Step 1: Allocate pages for the kernel (placeholder: 2MB)
+    // Step 1: Locate and load kernel from disk
+    uefi_print(con_out, b"[BOOT] Locating kernel file...\n");
+    
+    // Try to locate Simple File System protocol on the device handle
+    // For now, we'll allocate memory and assume kernel is loaded elsewhere
+    // In a full implementation, we would:
+    // 1. Locate the boot device
+    // 2. Open the Simple File System protocol
+    // 3. Open the kernel file (e.g., "sigmaos.elf")
+    // 4. Read the ELF header and load sections
+    
+    // Allocate pages for the kernel (placeholder: 2MB)
     uefi_print(con_out, b"[BOOT] Allocating kernel memory...\n");
     let kernel_pages: Usize = 512; // 512 * 4KB = 2MB
     let mut kernel_addr: U64 = 0;
@@ -267,6 +278,31 @@ pub unsafe extern "efiapi" fn efi_main(
     BOOT_INFO.mmap_count = (mmap_size / desc_size) as U32;
     uefi_print(con_out, b"[BOOT] Memory map acquired.\n");
 
+    // Step 2.5: Locate ACPI RSDP
+    uefi_print(con_out, b"[BOOT] Locating ACPI RSDP...\n");
+    // In a full implementation, we would search for the RSDP in:
+    // 1. EFI configuration tables
+    // 2. EBDA (Extended BIOS Data Area)
+    // 3. Reserved memory regions
+    // For now, we'll set it to 0 (kernel will search)
+    BOOT_INFO.rsdp_addr = 0;
+    uefi_print(con_out, b"[BOOT] ACPI RSDP location deferred to kernel.\n");
+
+    // Step 2.6: Initialize framebuffer (GOP - Graphics Output Protocol)
+    uefi_print(con_out, b"[BOOT] Initializing framebuffer...\n");
+    // In a full implementation, we would:
+    // 1. Locate Graphics Output Protocol
+    // 2. Query current mode
+    // 3. Set desired resolution (e.g., 1920x1080)
+    // 4. Get framebuffer address and stride
+    // For now, we'll set placeholder values
+    BOOT_INFO.framebuffer.base_addr = 0;
+    BOOT_INFO.framebuffer.width = 0;
+    BOOT_INFO.framebuffer.height = 0;
+    BOOT_INFO.framebuffer.stride = 0;
+    BOOT_INFO.framebuffer.bpp = 0;
+    uefi_print(con_out, b"[BOOT] Framebuffer initialization deferred to kernel.\n");
+
     // Step 3: Exit Boot Services
     uefi_print(con_out, b"[BOOT] Exiting UEFI Boot Services...\n");
     let status = (bs.exit_boot_services)(image_handle, map_key);
@@ -289,6 +325,8 @@ pub unsafe extern "efiapi" fn efi_main(
 
     // Step 4: Jump to kernel entry
     // The kernel entry point is expected at kernel_addr + 0x1000 (convention)
+    // In a full implementation, we would parse the ELF header to find the actual entry point
+    uefi_print(con_out, b"[BOOT] Jumping to kernel...\n");
     let kernel_entry: extern "C" fn(*const SigmaBootInfo) -> ! =
         core::mem::transmute(kernel_addr + 0x1000);
     kernel_entry(&BOOT_INFO);
