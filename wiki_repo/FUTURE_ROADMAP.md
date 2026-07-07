@@ -1,75 +1,35 @@
-# SigmaOS — Future Development Roadmap
-> Phases I–Z | Updated July 2026 | [Full detail: FUTURE_ROADMAP.md in repo](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FUTURE_ROADMAP.md)
+# SigmaOS Future Development Roadmap
 
-## Phase I — Q3 2026 (Bootability)
-- UEFI bootloader (`sigma-boot.efi`) — no GRUB dependency
-- Bootable ISO pipeline (`make iso`)
-- NVMe interrupt-driven async driver
-- SATA AHCI driver
-- virtio-GPU for QEMU/KVM
-- Multi-monitor KMS
+With the foundational kernel subsystems, `no_std` coreutils, bespoke package manager (`sigpkg`), and security hooks implemented, SigmaOS is transitioning from foundational OS architecture to high-level integration and user-facing features. 
 
-## Phase J — Q4 2026 (Architecture)
-- ARM64 port (Raspberry Pi 5, Apple M-series stub)
-- RISC-V 64 port (SBI/PLIC)
-- eBPF JIT compiler (x86-64)
-- Formal verification (Coq proofs)
-- Linux binary compatibility (`binfmt_misc`)
-- Wayland protocol (client-side)
+The following phases outline the next 12-18 months of development for SigmaOS.
 
-## Phase K — Q1 2027 (Security)
-- Quantum-safe TLS 1.3 (ML-KEM-768 + ML-DSA-65)
-- TPM 2.0 measured boot + remote attestation
-- FIDO2/WebAuthn
-- Full MAC (AppArmor-inspired)
-- KASLR, SMEP/SMAP, CET
+## Phase 8: Networking & Connectivity
+**Goal:** Establish a robust networking stack without relying on the standard library.
+- **TCP/IP Stack Integration:** Wrap and integrate `smoltcp` into the kernel to provide `no_std`, `no_alloc` networking.
+- **Network Interface Drivers:** Implement e1000e (Intel Gigabit) and virtio-net drivers in the Sigma Driver Framework (SDF).
+- **Socket IPC:** Bridge the kernel network stack with userland via a POSIX-like, zero-copy socket API.
 
-## Phase L — Q2 2027 (Ecosystem)
-- sigma-sdk CLI v2 (scaffold, debug, profile)
-- sigma-pkg repository server (content-addressed)
-- Zenith desktop v2 (tiling WM, virtual desktops, HiDPI)
-- 10 bundled apps complete
-- 500+ packages in registry
+## Phase 9: Post-Quantum Cryptography (PQC)
+**Goal:** Solidify SigmaOS as a quantum-resistant platform.
+- **Sigpkg PQC:** Replace the Ed25519 stubs in `sigma_pkg_repo.rs` with true Kyber/Dilithium implementations for package signing.
+- **Kernel Keystore:** Create a secure, memory-isolated keystore for PQC keys.
+- **Verified Boot:** Implement a post-quantum verifiable bootloader chain linking into `sigma_dmverity.rs`.
 
-## Phase M — Q3 2027 (AI-Native)
-- sigma-ai v2: Phi-3, Gemma-2B, DeepSeek-Coder on-device
-- AI shell completion (NL → command)
-- ML-guided adaptive scheduler
-- Differential privacy telemetry
-- ONNX model import
+## Phase 10: AI LLM Integration
+**Goal:** Bring the `sigma-agent` CLI to life with a local, offline LLM.
+- **llama.cpp Port:** Port `llama.cpp` to run on top of SigmaOS's `no_std` APIs.
+- **Agent IPC:** Connect the `sigma_ai_agent.rs` stub to the local LLM daemon via `sigma-bus`.
+- **System Telemetry RAG:** Pipe kernel telemetry and `sigma_audit.rs` logs into a localized vector database for real-time, context-aware AI debugging.
 
-## Phase N — Q4 2027 (Cloud + Enterprise)
-- sigma-pod v2: rootless, < 100ms startup, CRI for K8s
-- Cloud images: AWS/GCP/Azure/DO
-- sigma-deploy CLI
-- FIPS 140-3 + PCI-DSS + SOC2 compliance
+## Phase 11: The Zenith Compositor & GUI
+**Goal:** Deliver a modern, hardware-accelerated desktop experience.
+- **KMS / DRM Subsystem:** Implement the Kernel Mode Setting and Direct Rendering Manager APIs.
+- **GPU Drivers:** Provide basic frame-buffer and virtio-gpu drivers.
+- **Wayland-Compatible Compositor:** Develop the Zenith Compositor using `no_alloc` paradigms, targeting 60FPS fluid UI with micro-animations.
 
-## Phase O–Z (2028+)
-- India Stack: ABDM, UPI, GST, DigiLocker, ONDC
-- Defence profile: MLS, air-gap, tamper-evident logs
-- IoT: < 100MB, GPIO/I2C/SPI/CAN, 500ms boot
-- Quantum: QPU driver, hybrid classical-quantum scheduler
-- v2.0.0 Sovereign Release: production OS, 10K packages
-
-## Driver Roadmap
-| Driver | Phase | Priority |
-|--------|-------|----------|
-| SATA AHCI | I | 🔴 Critical |
-| virtio-GPU | I | 🔴 Critical |
-| RTL8125B 2.5GbE | I | 🟠 High |
-| AMD GPU | J | 🟠 High |
-| Intel GPU (xe) | J | 🟠 High |
-| Broadcom Wi-Fi | K | 🟡 Medium |
-| DisplayLink USB | L | 🟡 Medium |
-| NVIDIA nouveau 2.0 | L | 🟡 Medium |
-
-## Performance Targets
-| Metric | Current | v1.0 | v2.0 |
-|--------|---------|------|------|
-| Boot time | ~8s | 2s | <1s |
-| Syscall latency | 800ns | 300ns | <200ns |
-| TCP throughput | 2 Gbps | 8 Gbps | 10 Gbps |
-| NVMe IOPS | 200K | 800K | 1M |
-| LLM tokens/sec | 0 | 15 | 20+ |
-
-See full details in the [repo FUTURE_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FUTURE_ROADMAP.md).
+## Phase 12: Hardware & Driver Ecosystem
+**Goal:** Expand compatibility with bare-metal hardware.
+- **USB Subsystem:** Implement xHCI controllers for USB 3.0 support.
+- **Storage Controllers:** NVMe and AHCI (SATA) driver development.
+- **Driver Sandboxing:** Enforce strict MAC policies (`sigma_mac.rs`) on third-party hardware drivers.

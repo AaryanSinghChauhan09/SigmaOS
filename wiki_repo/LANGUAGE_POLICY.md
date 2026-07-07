@@ -1,24 +1,44 @@
-# SigmaOS Language Policy & ABI Guidelines
+# Language Policy for SigmaOS
 
-To stabilize our polyglot codebase and avoid ABI conflicts, SigmaOS enforces strict guidelines on programming language usage.
+## Approved Languages (production code only)
 
----
+| Language               | Scope                                             | Rationale                                                          |
+| :--------------------- | :------------------------------------------------ | :----------------------------------------------------------------- |
+| **C (C11)**            | Kernel, drivers, boot, POSIX tools                | No runtime, bare-metal, deterministic ABI                          |
+| **Rust (no_std)**      | Kernel subsystems, userland daemons, sigpkg       | Memory-safe, zero-cost, no GC, no runtime                         |
+| **Nim (--gc:none)**    | CLI frontends, build tools, wiki sync utilities   | Compiles to C then native binary; fast, ergonomic, zero-GC mode   |
+| **Zig**                | Low-level hardware drivers, cross-compilation     | Comptime, zero hidden allocations, C-interop                       |
+| **NASM / AT&T ASM**    | CPU boot stubs, ISR entry points                  | Required for x86_64/AArch64 bare-metal startup                    |
+| **POSIX sh**           | Build/CI scripts                                  | Universal, no runtime dependency                                   |
+| **Batch (.bat)**       | Windows host-side helpers only                    | Native CMD, no interpreter required                                |
 
-## 🗺️ Language Domains
+## Banned Languages (production code)
 
-| Language | Primary Target Domain | Execution Rules |
-| :--- | :--- | :--- |
-| **Rust** | Microkernel core, critical modules, modern driver trees. | `#![no_std]`, no standard allocation unless in dedicated crates. |
-| **Zig** | Leaf performance-sensitive drivers, low-level HAL utilities. | Minimal dependency, static leaf compilation only. |
-| **Ada/SPARK** | Formal proof-critical security checkers, memory verifiers. | Must pass `gnatprove` analysis before merge. |
-| **Nim** | Userspace tools, CLI helpers, store package managers. | Compiled with JS backend or C backend without GC when inside userspace. |
+| Language       | Status    | Migration Path                             |
+| :------------- | :-------- | :----------------------------------------- |
+| **JavaScript** | REMOVED   | No desktop UI role; Wayland compositor = C/Rust |
+| **HTML**       | REMOVED   | Desktop = native Wayland                   |
+| **Python**     | REMOVED   | Replaced with Nim CLI or C tools           |
+| **Go**         | REMOVED   | Replaced with Rust daemons                 |
+| **PowerShell** | REMOVED   | Replaced with Nim or POSIX sh or Batch     |
+| **PHP**        | FORBIDDEN | Not applicable to an OS                    |
+| **Ruby**       | FORBIDDEN | Not applicable to an OS                    |
+| **Java**       | FORBIDDEN | JVM runtime is antithetical to zero-bloat  |
+| **C#**         | FORBIDDEN | CLR runtime dependency                     |
+| **TypeScript** | FORBIDDEN | Transpiles to JS; same issues as JS        |
 
----
+## Enforcement
 
-## 📞 FFI Boundaries (The kabi/ C-ABI Rules)
+> [!IMPORTANT]
+> Any PR introducing a new file with a banned extension (`.js`, `.py`, `.go`, `.ps1`,
+> `.html`, `.ts`, `.rb`, `.php`, `.java`, `.cs`) is rejected automatically by the
+> GitHub Actions CI pipeline.
 
-1. **repr(C)**: All cross-language structures MUST be defined in `kabi/` as `#[repr(C)]` Rust structures or equivalent C headers.
+## Rationale for Nim and Zig
 
-2. **Raw Pointers**: Avoid returning raw allocations. Pass structures by reference/pointer with explicit size boundaries.
-
-3. **No Panic FFI**: Rust code must not panic across an FFI boundary. Use `catch_unwind` or check boundaries before execution.
+- **Nim** compiles via a C backend, producing auditable, minimal C that then goes through
+  our standard LLVM/GCC toolchain. With `--gc:none` and `--mm:none` it produces
+  completely allocation-free binaries comparable to handwritten C.
+- **Zig** provides comptime evaluation, no hidden allocations, and direct C interop
+  without a header layer, making it ideal for writing drivers and HAL components with
+  compile-time verified memory layouts.

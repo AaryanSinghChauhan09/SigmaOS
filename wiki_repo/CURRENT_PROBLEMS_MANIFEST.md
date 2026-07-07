@@ -1,64 +1,84 @@
-# SigmaOS — Active Problems & Resolution Status
-> Updated: July 2026 · Phase 10
+# SigmaOS — Current Problems Manifest
 
-This is the canonical issue tracker for kernel/driver/subsystem problems.
+> SigmaOS v15.0 "Zenith" — Last Updated: 2026-07-06
 
-## ✅ Phase G–H: All Resolved This Session
-
-| ID | Problem | Fix | File |
-|----|---------|-----|------|
-| G-01 | TCP stack had no full RFC 793 state machine | Full FSM implementation | `sigma_tcp_stack.rs` |
-| G-02 | No Wi-Fi stack | IEEE 802.11ax + WPA3-SAE | `sigma_wifi_stack.rs` |
-| G-03 | No Bluetooth | HCI/L2CAP/GATT BT 5.3 | `sigma_bluetooth.rs` |
-| G-04 | PMM had no buddy coalescing | Full coalesce on free | `sigma_pmm.rs` |
-| G-05 | Scheduler lacked priority boost (starvation) | 1s period boost | `sigma_mlfq_sched.rs` |
-| G-06 | IRQ had no I/O APIC support | Full IOAPIC mapping | `sigma_irq_controller.rs` |
-| G-07 | CryptFS `derive_key()` returned 32 zero bytes | PBKDF2-SHA256 100K iter | `sigma_key_derive.rs` |
-| H-01 | No IPC beyond channels | Pipe + MsgQ + SHM | `sigma_ipc_pipe.rs` |
-| H-02 | VFS had no path resolver | Full `path_resolve()` | `sigma_vfs_ext4.rs` |
-| H-03 | No audio subsystem | HDA + PipeWire-style mixer | `sigma_sound.rs` |
-| H-04 | USB had no device enumeration | xHCI port probing | `sigma_usb_stack.rs` |
-| H-05 | GPU had no mode-setting | Full DRM/KMS + page-flip | `sigma_gpu_drm.rs` |
-| H-06 | Network stack missing ARP/DHCP/DNS | Full stack | `sigma_network_stack.rs` |
-| H-07 | No container runtime | OCI + CRI complete | `sigma_container_runtime.rs` |
-| H-08 | No DVFS or battery management | Full power manager | `sigma_power_mgmt.rs` |
-| H-09 | sigma-ai daemon was Python stub only | Rust inference engine | `sigma_local_llm.rs` |
-
-## 🔴 Open — Phase I (Next Sprint)
-
-| ID | Problem | Impact |
-|----|---------|--------|
-| I-01 | No UEFI `sigma-boot.efi` | Cannot boot without GRUB |
-| I-02 | `make iso` fails / produces non-bootable image | No easy install |
-| I-03 | NVMe uses MMIO polling (no MSI-X interrupts) | 4× less throughput |
-| I-04 | No SATA AHCI driver | Many systems have only SATA |
-| I-05 | virtio-GPU missing (QEMU can't display) | CI video test fails |
-| I-06 | Multi-monitor KMS not implemented | One display only |
-| I-07 | sigma-pkg has no real package repository server | Can't install packages |
-| I-08 | Zenith crashes if display server exits | No recovery |
-| I-09 | No Indian language IME | Non-English users blocked |
-| I-10 | Wi-Fi 6E 6 GHz band not supported | New hardware incompatible |
-
-## 🟠 Open — Phase J
-
-| ID | Problem |
-|----|---------|
-| J-01 | ARM64 port incomplete (no BSP for Pi 5) |
-| J-02 | RISC-V port not started |
-| J-03 | eBPF uses interpreter (no JIT) — 10× slower |
-| J-04 | No formal proofs (Coq) for scheduler + PMM |
-| J-05 | Linux binaries don't run (no binfmt_misc) |
-| J-06 | Wayland protocol not implemented client-side |
-| J-07 | sigma-pod rootless containers not implemented |
-| J-08 | TPM 2.0 commands not implemented |
-
-## Low-Priority / Known Limitations
-
-- Shell globbing (`*`, `?`) in sigma-sh incomplete
-- Recovery GUI not implemented (serial-only recovery)
-- Package delta updates not implemented
-- Multi-architecture CI (ARM64/RISC-V) not yet running
-- ZFS driver is a stub only
+This document tracks known issues, limitations, and technical debt across the codebase.
 
 ---
-*See [FUTURE_ROADMAP.md](FUTURE_ROADMAP.md) for planned resolutions and timelines.*
+
+## Critical (P0) — Blocks Boot/Functionality
+
+| ID | Component | Description | Workaround |
+|---|---|---|---|
+| BUG-001 | Buddy Allocator | `alloc_pages` / `free_pages` not fully wired to VMM | Use stack-allocated arrays for early-boot code |
+| BUG-002 | Scheduler | Work-stealing uses O(n) scan; may cause latency spikes on >8 CPUs | Limit to single-CPU in current builds |
+| BUG-003 | UEFI Boot | `sigma_efi_entry.c` ELF segment loading is a stub — kernel not actually mapped from ELF | Use flat binary load for testing |
+
+---
+
+## High (P1) — Significant Limitations
+
+| ID | Component | Description | Target Release |
+|---|---|---|---|
+| BUG-004 | Btrfs | `create_snapshot` / `rollback` are stubs; actual CoW tree operations not implemented | v15.1 |
+| BUG-005 | sigpkg | Dilithium-5 signature verification is stubbed; packages not cryptographically verified | v15.1 |
+| BUG-006 | AMD GPU | `sigma_amdgpu.rs` probe is stubbed; display not functional on AMD hardware | v15.1 |
+| BUG-007 | Bluetooth | `sigma_hci_usb.rs` USB endpoint setup is stubbed | v15.1 |
+| BUG-008 | RTL Wi-Fi | `sigma_rtl8xxxu.rs` USB control transfer not implemented | v15.1 |
+| BUG-009 | Init System | `sigma_init.rs` service dependency graph not built; all services start sequentially | v15.1 |
+| BUG-010 | AI Agent | Inference is a heuristic stub; no real LLM model loaded | v15.2 |
+
+---
+
+## Medium (P2) — Functional Gaps
+
+| ID | Component | Description | Target Release |
+|---|---|---|---|
+| BUG-011 | IDS | Rule parser not implemented; only packet pass-through | v15.2 |
+| BUG-012 | Fail2Ban | IP blocklist not connected to network filter tables | v15.2 |
+| BUG-013 | UBC | `allocate_page` references `buddy_allocator::alloc_pages` which is not yet wired | v15.1 |
+| BUG-014 | MAC | `sigma_mac.rs` label enforcement not wired into VFS call sites | v15.2 |
+| BUG-015 | Seccomp | `sigma_seccomp.rs` BPF JIT not implemented; filters not applied | v15.2 |
+| BUG-016 | Locale | Locale packs are TOML stubs; not loaded by the display system | v15.2 |
+
+---
+
+## Low (P3) — Polish / Optimization
+
+| ID | Component | Description |
+|---|---|---|
+| BUG-017 | CFS Scheduler | Red-black tree not implemented; O(n) sorted array used instead |
+| BUG-018 | EDF Scheduler | Binary heap not implemented; O(n) linear scan used |
+| BUG-019 | VFS | Mount table limited to 16 entries (increase to 256 in next release) |
+| BUG-020 | sigpkg GUI | GUI runs as stub; not connected to `sigpkgd` daemon |
+| BUG-021 | SigmaFS | Indirect block pointers for large files not implemented |
+| BUG-022 | i915 | Display mode setting relies on GOP pre-configuration; custom resolution not supported |
+
+---
+
+## Technical Debt
+
+| Area | Debt Description |
+|---|---|
+| `no_std` violations | Some modules use `alloc::string` which requires a global allocator not yet wired |
+| Static `mut` usage | Many driver singletons use `static mut` without proper spinlock protection |
+| Test coverage | Unit test files are stubs; no actual assertions implemented |
+| Error propagation | Most functions return `bool` or `Option`; should migrate to `Result<T, SigmaError>` |
+| Documentation | Inline doc comments missing from most public functions |
+
+---
+
+## Reporting New Issues
+
+Open an issue at: `https://github.com/sigmaos/kernel/issues`
+
+Use the template:
+```
+**Component**: 
+**Severity**: P0 / P1 / P2 / P3
+**Description**: 
+**Reproduction Steps**: 
+**Expected Behavior**: 
+**Actual Behavior**: 
+**Logs**: (attach sigma-journal output)
+```

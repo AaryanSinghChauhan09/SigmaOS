@@ -8,23 +8,17 @@
 
 | Subsystem | Status | Files |
 |---|---|---|
-| Sovereign Kernel (`no_std`) | ✅ Implemented | `modules/core/kernel/` |
-| Zero-Alloc IPC Ring Buffer | ✅ Implemented | `modules/core/kernel/ipc.rs` |
-| Capability Token Auth | ✅ Implemented | `modules/core/kernel/cap.rs` |
-| VFS / SigmaFS | ✅ Implemented | `modules/core/kernel/vfs.rs` |
-| Self-Healing Watchdog | ✅ Implemented | `modules/core/kernel/watchdog.rs` |
-| Zenith Desktop UI | ✅ Implemented | `usr/ui/zenith_desktop.rs` |
-| OOP Widget Framework | ✅ Implemented | `usr/ui/ui_core.rs` |
-| AI Task Orchestrator | ✅ Implemented | `userland/ai/sigma_llm_backend.rs` |
-| Local LLM Context Manager | ✅ Implemented | `userland/ai/local_llm.rs` |
-| Security Center Daemon | ✅ Implemented | `usr/security/security_center.rs` |
-| System Telemetry Monitor | ✅ Implemented | `usr/observability/sigma_monitoring.rs` |
-| Matrix Math / SciComp | ✅ Implemented | `usr/education/sigma_math.rs` |
-| Distro Streamer (Linux compat) | ✅ Implemented | `usr/apps/sigma_distro_streamer.rs` |
-| Declarative Personalizer | ✅ Implemented | `usr/apps/sigma_personalizer.rs` |
-| Sigma NoSQL DB | ✅ Implemented | `usr/apps/sigma_db.rs` |
-| Logic Automation Engine | ✅ Implemented | `usr/apps/sigma_logic.rs` |
-| sigpkg Package Manager | 🔄 In Progress | `sigma-pkg/` |
+| Sovereign Kernel (`no_std` CFS Scheduler) | ✅ Implemented | `kernel/core/sched_cfs.rs` |
+| Multi-tier VMM (Buddy & Slab Allocator) | ✅ Implemented | `kernel/mm/buddy_slab_vmm.rs` |
+| Zero-Alloc IPC Ring Buffer | ✅ Implemented | `kernel/ipc/ring_channel.rs` |
+| VFS / Capability-gated Filesystem | ✅ Implemented | `kernel/fs/vfs.rs` |
+| TCP/IP stack (zero-dependency) | ✅ Implemented | `kernel/net/tcp_stack.rs` |
+| Native Cryptography (ChaCha20) | ✅ Implemented | `kernel/crypto/chacha20.rs` |
+| sigpkg Security (ED25519 + SBOM Verification) | ✅ Core Implemented | `sigma-pkg/` |
+| ACPI Hardware Discovery | ✅ Implemented | `kernel/drivers/acpi.rs` |
+| NVMe Disk Driver | ✅ Implemented | `kernel/drivers/nvme.rs` |
+| Sovereign App Suites (Writer, Sheet, Vector) | 🔄 Stubs Implemented | `office/`, `design/` |
+| CI/CD Pipeline & Automatic SBOMs | ✅ Implemented | `.github/workflows/` |
 | Bootloader / UEFI | ⏳ Planned | `sigma-boot/` |
 | WASM Runtime | ⏳ Planned | `runtime/wasm/` |
 
@@ -39,6 +33,7 @@
 #### Kernel
 - [ ] UEFI boot and verified boot integration (`sigma-boot`)
 - [ ] Multi-arch CI images: `x86_64`, `aarch64`, `riscv64`
+- [x] ACPI hardware discovery implemented (RSDP/RSDT/XSDT/MADT) (`kernel/drivers/acpi.rs`)
 - [ ] ACPI power management and suspend/resume
 - [ ] SMP scheduling with per-CPU runqueues
 
@@ -49,7 +44,8 @@
 
 #### Drivers
 - [ ] VirtIO-net, VirtIO-blk, VirtIO-gpu
-- [ ] NVMe, e1000 network, USB xHCI
+- [x] NVMe driver implemented (`kernel/drivers/nvme.rs`)
+- [ ] e1000 network, USB xHCI
 - [ ] Basic Intel / AMD GPU KMS support
 
 #### Security

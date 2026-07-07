@@ -173,6 +173,74 @@ pub struct EfiSimpleTextInputProtocol {
     pub wait_for_key: *const EfiEvent,
 }
 
+/// UEFI Simple File System Protocol (BUG-003 Fix: Add for file loading)
+#[repr(C)]
+pub struct EfiSimpleFileSystemProtocol {
+    pub open_volume: extern "efiapi" fn(
+        this: *const Self,
+        root: *mut *const EfiFileProtocol,
+    ) -> EfiStatus,
+}
+
+/// UEFI File Protocol (BUG-003 Fix: Add for file loading)
+#[repr(C)]
+pub struct EfiFileProtocol {
+    pub revision: u64,
+    pub open: extern "efiapi" fn(
+        this: *const Self,
+        new_handle: *mut *const EfiFileProtocol,
+        file_name: *const u16,
+        open_mode: u64,
+        attributes: u64,
+    ) -> EfiStatus,
+    pub close: extern "efiapi" fn(this: *const Self) -> EfiStatus,
+    pub delete: extern "efiapi" fn(this: *const Self) -> EfiStatus,
+    pub read: extern "efiapi" fn(
+        this: *const Self,
+        buffer_size: *mut usize,
+        buffer: *mut u8,
+    ) -> EfiStatus,
+    pub write: extern "efiapi" fn(
+        this: *const Self,
+        buffer_size: *mut usize,
+        buffer: *const u8,
+    ) -> EfiStatus,
+    pub get_position: extern "efiapi" fn(
+        this: *const Self,
+        position: *mut u64,
+    ) -> EfiStatus,
+    pub set_position: extern "efiapi" fn(
+        this: *const Self,
+        position: u64,
+    ) -> EfiStatus,
+    pub get_info: extern "efiapi" fn(
+        this: *const Self,
+        information_type: *const EfiGuid,
+        buffer_size: *mut usize,
+        buffer: *mut u8,
+    ) -> EfiStatus,
+    pub set_info: extern "efiapi" fn(
+        this: *const Self,
+        information_type: *const EfiGuid,
+        buffer_size: usize,
+        buffer: *const u8,
+    ) -> EfiStatus,
+    pub flush: extern "efiapi" fn(this: *const Self) -> EfiStatus,
+}
+
+/// EFI File Info structure
+#[repr(C)]
+pub struct EfiFileInfo {
+    pub size: u64,
+    pub file_size: u64,
+    pub physical_size: u64,
+    pub create_time: EfiTime,
+    pub last_access_time: EfiTime,
+    pub modification_time: EfiTime,
+    pub attribute: u64,
+    pub file_name: [u16; 256],
+}
+
 /// UEFI Input Key
 #[repr(C)]
 pub struct EfiInputKey {
@@ -830,9 +898,121 @@ unsafe fn load_file(path: &str) -> Result<(EfiPhysicalAddress, u64), EfiStatus> 
     print_string(path);
     print_string("\n");
     
-    // TODO: Implement actual file loading using EFI File Protocol
-    // For now, return placeholder - this needs EFI Simple File System Protocol
-    Ok((0, 0))
+    // GUID for Simple File System Protocol
+    let sfs_guid = EfiGuid {
+        data1: 0x0964e5b22,
+        data2: 0x6459,
+        data3: 0x11d2,
+        data4: [0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b],
+    };
+    
+    // Locate Simple File System Protocol
+    let mut sfs_protocol: *mut () = core::ptr::null_mut();
+    let status = (*BOOT_SERVICES).locate_protocol(
+        &sfs_guid,
+        core::ptr::null_mut(),
+        &mut sfs_protocol,
+    );
+    
+    if status != EfiStatus::Success {
+        print_string("Failed to locate Simple File System Protocol\n");
+        return Err(status);
+    }
+    
+    let sfs = sfs_protocol as *const EfiSimpleFileSystemProtocol;
+    
+    // Open volume
+    let mut root: *const EfiFileProtocol = core::ptr::null();
+    let status = (*sfs).open_volume(sfs, &mut root as *mut _ as *mut _);
+    
+    if status != EfiStatus::Success {
+        print_string("Failed to open volume\n");
+        return Err(status);
+    }
+    
+    // Convert path to u16
+    let path_u16 = str_to_u16(path);
+    
+    // Open file
+    let mut file: *const EfiFileProtocol = core::ptr::null();
+    let status = (*root).open(
+        root,
+        &mut file as *mut _ as *mut _,
+        path_u16.as_ptr(),
+        0x8000000000000000, // EFI_FILE_MODE_READ
+        0,                  // No attributes
+    );
+    
+    if status != EfiStatus::Success {
+        print_string("Failed to open file\n");
+        let _ = (*root).close(root);
+        return Err(status);
+    }
+    
+    // Get file size
+    let mut info_size = core::mem::size_of::<EfiFileInfo>();
+    let mut info_buf: [u8; 512] = [0; 512];
+    
+    let file_info_guid = EfiGuid {
+        data1: 0x9576e92,
+        data2: 0x6d3f,
+        data3: 0x11d2,
+        data4: [0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b],
+    };
+    
+    let status = (*file).get_info(
+        file,
+        &file_info_guid,
+        &mut info_size,
+        info_buf.as_mut_ptr(),
+    );
+    
+    if status != EfiStatus::Success {
+        print_string("Failed to get file info\n");
+        let _ = (*file).close(file);
+        let _ = (*root).close(root);
+        return Err(status);
+    }
+    
+    let file_info = &*(info_buf.as_ptr() as *const EfiFileInfo);
+    let file_size = file_info.file_size as usize;
+    
+    print_string("File size: ");
+    // Simple print of file size would go here
+    print_string("\n");
+    
+    // Allocate buffer for file
+    let mut buffer: *mut u8 = core::ptr::null_mut();
+    let status = (*BOOT_SERVICES).allocate_pool(
+        EfiMemoryType::LoaderData,
+        file_size,
+        &mut buffer as *mut _ as *mut *mut u8,
+    );
+    
+    if status != EfiStatus::Success {
+        print_string("Failed to allocate buffer for file\n");
+        let _ = (*file).close(file);
+        let _ = (*root).close(root);
+        return Err(status);
+    }
+    
+    // Read file
+    let mut read_size = file_size;
+    let status = (*file).read(file, &mut read_size, buffer);
+    
+    if status != EfiStatus::Success || read_size != file_size {
+        print_string("Failed to read file\n");
+        let _ = (*BOOT_SERVICES).free_pool(buffer);
+        let _ = (*file).close(file);
+        let _ = (*root).close(root);
+        return Err(status);
+    }
+    
+    let _ = (*file).close(file);
+    let _ = (*root).close(root);
+    
+    print_string("File loaded successfully\n");
+    Ok((buffer as u64, file_size as u64))
 }
 
 /// Load ELF kernel from memory (BUG-003 Fix: Implement proper ELF loading)
