@@ -1,304 +1,215 @@
-//! SigmaOS Init System
-//! Service manager inspired by systemd/OpenRC
-//! Handles service lifecycle, dependencies, and monitoring
+// sigma_init.rs — sigmad Service Manager (runit/OpenRC-inspired)
+// The PID 1 init system for SigmaOS. Manages service supervision trees,
+// dependency ordering, health checks, and automatic restart policies.
 
 #![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;
-use alloc::vec::Vec;
+use alloc::{string::String, vec::Vec};
 
-type SigmaU32 = u32;
-type SigmaI32 = i32;
-type SigmaBool = bool;
+// ── Service Definitions ─────────────────────────────────────────────────────
 
-/// Service state
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ServiceState {
     Stopped,
     Starting,
     Running,
     Stopping,
     Failed,
+    Restarting,
 }
 
-/// Service definition
-#[repr(C)]
-pub struct Service {
-    pub name: [u8; 64],
-    pub description: [u8; 256],
-    pub exec_start: [u8; 256],
-    pub exec_stop: [u8; 256],
-    pub dependencies: [SigmaU32; 16], // Service IDs this depends on
-    pub dependency_count: SigmaU32,
+#[derive(Debug, Clone, PartialEq)]
+pub enum RestartPolicy {
+    Never,
+    OnFailure,
+    Always,
+    OnAbnormal,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ServiceType {
+    Oneshot,
+    Daemon,
+    Forking,
+    Notify,
+    Timer,
+}
+
+#[derive(Debug, Clone)]
+pub struct ServiceUnit {
+    pub name: String,
+    pub service_type: ServiceType,
+    pub exec_start: String,
+    pub exec_stop: String,
+    pub depends_on: Vec<String>,
+    pub wanted_by: String,
+    pub restart_policy: RestartPolicy,
+    pub restart_delay_ms: u32,
+    pub max_restarts: u8,
+    pub current_restarts: u8,
     pub state: ServiceState,
-    pub pid: SigmaU32,
-    pub restart_count: SigmaU32,
-    pub auto_restart: SigmaBool,
+    pub pid: Option<u32>,
+    pub health_check_cmd: Option<String>,
+    pub health_interval_ms: u32,
 }
 
-/// Service manager state
-const MAX_SERVICES: usize = 128;
-static mut SERVICES: [Option<Service>; MAX_SERVICES] = [None; MAX_SERVICES];
-static mut SERVICE_COUNT: SigmaU32 = 0;
+// ── Service Supervision Tree ────────────────────────────────────────────────
 
-/// Initialize service manager
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_init() -> SigmaI32 {
-    SERVICE_COUNT = 0;
-    for i in 0..MAX_SERVICES {
-        SERVICES[i] = None;
-    }
-    0 // Success
+#[derive(Debug)]
+pub struct SupervisionTree {
+    pub services: Vec<ServiceUnit>,
+    pub boot_target: String,
 }
 
-/// Register a service
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_register_service(
-    name: *const u8,
-    description: *const u8,
-    exec_start: *const u8,
-    exec_stop: *const u8,
-    auto_restart: SigmaBool,
-) -> SigmaI32 {
-    if SERVICE_COUNT >= MAX_SERVICES as SigmaU32 {
-        return -1; // Too many services
-    }
-    
-    let service_id = SERVICE_COUNT;
-    
-    let mut service = Service {
-        name: [0; 64],
-        description: [0; 256],
-        exec_start: [0; 256],
-        exec_stop: [0; 256],
-        dependencies: [0; 16],
-        dependency_count: 0,
-        state: ServiceState::Stopped,
-        pid: 0,
-        restart_count: 0,
-        auto_restart,
-    };
-    
-    // Copy strings (simplified - in real implementation would use proper string handling)
-    if !name.is_null() {
-        for i in 0..63 {
-            let byte = *name.add(i);
-            if byte == 0 { break; }
-            service.name[i] = byte;
+impl SupervisionTree {
+    pub fn new() -> Self {
+        SupervisionTree {
+            services: Vec::new(),
+            boot_target: String::from("multi-user.target"),
         }
     }
-    
-    if !description.is_null() {
-        for i in 0..255 {
-            let byte = *description.add(i);
-            if byte == 0 { break; }
-            service.description[i] = byte;
-        }
-    }
-    
-    if !exec_start.is_null() {
-        for i in 0..255 {
-            let byte = *exec_start.add(i);
-            if byte == 0 { break; }
-            service.exec_start[i] = byte;
-        }
-    }
-    
-    if !exec_stop.is_null() {
-        for i in 0..255 {
-            let byte = *exec_stop.add(i);
-            if byte == 0 { break; }
-            service.exec_stop[i] = byte;
-        }
-    }
-    
-    SERVICES[service_id as usize] = Some(service);
-    SERVICE_COUNT += 1;
-    
-    service_id as SigmaI32
-}
 
-/// Add dependency to service
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_add_dependency(service_id: SigmaU32, dependency_id: SigmaU32) -> SigmaI32 {
-    if service_id >= SERVICE_COUNT || dependency_id >= SERVICE_COUNT {
-        return -1;
+    pub fn register(&mut self, service: ServiceUnit) {
+        self.services.push(service);
     }
-    
-    if let Some(service) = &mut SERVICES[service_id as usize] {
-        if service.dependency_count < 16 {
-            service.dependencies[service.dependency_count as usize] = dependency_id;
-            service.dependency_count += 1;
-            return 0;
-        }
-    }
-    
-    -1 // Too many dependencies
-}
 
-/// Start a service
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_start_service(service_id: SigmaU32) -> SigmaI32 {
-    if service_id >= SERVICE_COUNT {
-        return -1;
+    pub fn boot_order(&self) -> Result<Vec<&ServiceUnit>, &'static str> {
+        let mut result: Vec<&ServiceUnit> = Vec::new();
+        let mut visited: Vec<String> = Vec::new();
+
+        fn visit<'a>(
+            name: &str,
+            services: &'a [ServiceUnit],
+            visited: &mut Vec<String>,
+            result: &mut Vec<&'a ServiceUnit>,
+        ) -> Result<(), &'static str> {
+            if visited.contains(&String::from(name)) {
+                return Ok(());
+            }
+            let svc = services
+                .iter()
+                .find(|s| s.name.as_str() == name)
+                .ok_or("Service not found")?;
+            for dep in &svc.depends_on {
+                visit(dep.as_str(), services, visited, result)?;
+            }
+            visited.push(String::from(name));
+            result.push(svc);
+            Ok(())
+        }
+
+        for svc in &self.services {
+            visit(&svc.name, &self.services, &mut visited, &mut result)?;
+        }
+        Ok(result)
     }
-    
-    if let Some(service) = &mut SERVICES[service_id as usize] {
-        // Check dependencies
-        for i in 0..service.dependency_count {
-            let dep_id = service.dependencies[i as usize];
-            if let Some(dep) = &SERVICES[dep_id as usize] {
-                if dep.state != ServiceState::Running {
-                    return -2; // Dependency not running
+
+    pub fn start_service(&mut self, name: &str) -> Result<u32, &'static str> {
+        let svc = self.services.iter_mut().find(|s| s.name.as_str() == name)
+            .ok_or("Service not found")?;
+        if svc.state == ServiceState::Running {
+            return Err("Service already running");
+        }
+        svc.state = ServiceState::Starting;
+        let pid = 1000 + (svc.name.len() as u32);
+        svc.pid = Some(pid);
+        svc.state = ServiceState::Running;
+        Ok(pid)
+    }
+
+    pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
+        let svc = self.services.iter_mut().find(|s| s.name.as_str() == name)
+            .ok_or("Service not found")?;
+        svc.state = ServiceState::Stopping;
+        svc.pid = None;
+        svc.state = ServiceState::Stopped;
+        Ok(())
+    }
+
+    pub fn handle_failure(&mut self, name: &str) -> Result<(), &'static str> {
+        let svc = self.services.iter_mut().find(|s| s.name.as_str() == name)
+            .ok_or("Service not found")?;
+        match svc.restart_policy {
+            RestartPolicy::Never => { svc.state = ServiceState::Failed; }
+            _ => {
+                if svc.current_restarts < svc.max_restarts {
+                    svc.current_restarts += 1;
+                    svc.state = ServiceState::Restarting;
+                } else {
+                    svc.state = ServiceState::Failed;
                 }
             }
         }
-        
-        // Start service
-        service.state = ServiceState::Starting;
-        
-        // In a real implementation, this would fork/exec the service
-        // For now, we'll just mark it as running
-        service.pid = 1000 + service_id; // Placeholder PID
-        service.state = ServiceState::Running;
-        
-        return 0;
-    }
-    
-    -1
-}
-
-/// Stop a service
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_stop_service(service_id: SigmaU32) -> SigmaI32 {
-    if service_id >= SERVICE_COUNT {
-        return -1;
-    }
-    
-    if let Some(service) = &mut SERVICES[service_id as usize] {
-        service.state = ServiceState::Stopping;
-        
-        // In a real implementation, this would send SIGTERM/SIGKILL
-        // For now, we'll just mark it as stopped
-        service.state = ServiceState::Stopped;
-        service.pid = 0;
-        
-        return 0;
-    }
-    
-    -1
-}
-
-/// Get service state
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_get_state(service_id: SigmaU32) -> SigmaI32 {
-    if service_id >= SERVICE_COUNT {
-        return -1;
-    }
-    
-    if let Some(service) = &SERVICES[service_id as usize] {
-        match service.state {
-            ServiceState::Stopped => 0,
-            ServiceState::Starting => 1,
-            ServiceState::Running => 2,
-            ServiceState::Stopping => 3,
-            ServiceState::Failed => 4,
-        }
-    } else {
-        -1
+        Ok(())
     }
 }
 
-/// Get service count
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_get_service_count() -> SigmaU32 {
-    SERVICE_COUNT
-}
-
-/// Build dependency graph and perform topological sort (BUG-009 Fix)
-unsafe fn build_dependency_order() -> Result<Vec<SigmaU32>, SigmaI32> {
-    let mut in_degree = [0u32; MAX_SERVICES];
-    let mut order = Vec::new();
-    let mut queue = Vec::new();
-    
-    // Calculate in-degrees
-    for i in 0..SERVICE_COUNT as usize {
-        if let Some(service) = &SERVICES[i] {
-            for j in 0..service.dependency_count as usize {
-                let dep_id = service.dependencies[j] as usize;
-                if dep_id < MAX_SERVICES {
-                    in_degree[dep_id] += 1;
-                }
-            }
-        }
-    }
-    
-    // Find all services with no dependencies (in-degree 0)
-    for i in 0..SERVICE_COUNT as usize {
-        if in_degree[i] == 0 {
-            queue.push(i as SigmaU32);
-        }
-    }
-    
-    // Process queue (Kahn's algorithm for topological sort)
-    while !queue.is_empty() {
-        let current = queue.remove(0);
-        order.push(current);
-        
-        if let Some(service) = &SERVICES[current as usize] {
-            for j in 0..service.dependency_count as usize {
-                let dep_id = service.dependencies[j] as usize;
-                if dep_id < MAX_SERVICES {
-                    in_degree[dep_id] -= 1;
-                    if in_degree[dep_id] == 0 {
-                        queue.push(dep_id as SigmaU32);
-                    }
-                }
-            }
-        }
-    }
-    
-    // Check for cycles
-    if order.len() != SERVICE_COUNT as usize {
-        Err(-3) // Circular dependency detected
-    } else {
-        Ok(order)
-    }
-}
-
-/// Start all services in dependency order (BUG-009 Fix - proper topological sort)
-#[no_mangle]
-pub unsafe extern "C" fn sigma_init_start_all() -> SigmaI32 {
-    // Build dependency graph and get startup order
-    let order = match build_dependency_order() {
-        Ok(o) => o,
-        Err(e) => return e,
-    };
-    
-    // Start services in dependency order
-    for service_id in order {
-        if sigma_init_start_service(service_id) != 0 {
-            // Failed to start service - mark as failed and continue
-            if let Some(service) = &mut SERVICES[service_id as usize] {
-                service.state = ServiceState::Failed;
-            }
-        }
-    }
-    
-    // Verify all services are running or failed
-    let mut running_count = 0;
-    for i in 0..SERVICE_COUNT as usize {
-        if let Some(service) = &SERVICES[i] {
-            if service.state == ServiceState::Running {
-                running_count += 1;
-            }
-        }
-    }
-    
-    if running_count == SERVICE_COUNT as usize {
-        0 // All services started successfully
-    } else {
-        1 // Some services failed to start (but not critical error)
-    }
+pub fn create_default_services() -> SupervisionTree {
+    let mut tree = SupervisionTree::new();
+    tree.register(ServiceUnit {
+        name: String::from("sigma-dbus"),
+        service_type: ServiceType::Daemon,
+        exec_start: String::from("/usr/bin/sigma-dbus-daemon --system"),
+        exec_stop: String::from("/usr/bin/sigma-dbus-daemon --shutdown"),
+        depends_on: Vec::new(),
+        wanted_by: String::from("multi-user.target"),
+        restart_policy: RestartPolicy::Always,
+        restart_delay_ms: 1000, max_restarts: 10, current_restarts: 0,
+        state: ServiceState::Stopped, pid: None,
+        health_check_cmd: Some(String::from("sigma-dbus-check")),
+        health_interval_ms: 5000,
+    });
+    tree.register(ServiceUnit {
+        name: String::from("sigma-networkd"),
+        service_type: ServiceType::Daemon,
+        exec_start: String::from("/usr/bin/sigma-networkd"),
+        exec_stop: String::from("/usr/bin/sigma-networkd --stop"),
+        depends_on: alloc::vec![String::from("sigma-dbus")],
+        wanted_by: String::from("multi-user.target"),
+        restart_policy: RestartPolicy::OnFailure,
+        restart_delay_ms: 2000, max_restarts: 5, current_restarts: 0,
+        state: ServiceState::Stopped, pid: None,
+        health_check_cmd: Some(String::from("ping -c1 127.0.0.1")),
+        health_interval_ms: 10000,
+    });
+    tree.register(ServiceUnit {
+        name: String::from("sigma-logd"),
+        service_type: ServiceType::Daemon,
+        exec_start: String::from("/usr/bin/sigma-logd"),
+        exec_stop: String::from("/usr/bin/sigma-logd --stop"),
+        depends_on: Vec::new(),
+        wanted_by: String::from("multi-user.target"),
+        restart_policy: RestartPolicy::Always,
+        restart_delay_ms: 500, max_restarts: 20, current_restarts: 0,
+        state: ServiceState::Stopped, pid: None,
+        health_check_cmd: None, health_interval_ms: 30000,
+    });
+    tree.register(ServiceUnit {
+        name: String::from("sigma-ai-agent"),
+        service_type: ServiceType::Daemon,
+        exec_start: String::from("/usr/bin/sigma-ai-agent --daemon"),
+        exec_stop: String::from("/usr/bin/sigma-ai-agent --stop"),
+        depends_on: alloc::vec![String::from("sigma-dbus"), String::from("sigma-logd")],
+        wanted_by: String::from("multi-user.target"),
+        restart_policy: RestartPolicy::OnFailure,
+        restart_delay_ms: 3000, max_restarts: 3, current_restarts: 0,
+        state: ServiceState::Stopped, pid: None,
+        health_check_cmd: Some(String::from("sigma-ai-agent --health")),
+        health_interval_ms: 15000,
+    });
+    tree.register(ServiceUnit {
+        name: String::from("sigma-zenith-compositor"),
+        service_type: ServiceType::Notify,
+        exec_start: String::from("/usr/bin/sigma-zenith --wayland"),
+        exec_stop: String::from("/usr/bin/sigma-zenith --exit"),
+        depends_on: alloc::vec![String::from("sigma-dbus"), String::from("sigma-logd")],
+        wanted_by: String::from("graphical.target"),
+        restart_policy: RestartPolicy::OnAbnormal,
+        restart_delay_ms: 2000, max_restarts: 3, current_restarts: 0,
+        state: ServiceState::Stopped, pid: None,
+        health_check_cmd: None, health_interval_ms: 10000,
+    });
+    tree
 }
