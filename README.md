@@ -1,23 +1,9 @@
-# Sovereign Bare-Metal Hypervisor
+# SigmaOS Syscall Dispatcher Architecture
 
-A Type-1 hypervisor built directly into SigmaOS to run isolated guest VMs
-without depending on Linux KVM.
+The SigmaOS Syscall Dispatcher is a modular, zero-dependency C/C++ implementation designed to replace high-level abstractions with silicon-direct dispatch tables.
 
-## Design
+## Mechanism
 
-- **VT-x / AMD-V** on x86_64; **EL2** on AArch64
+- `syscalls.h`: Defines sequential syscall identifiers (`SYSCALL_GETPID`, `SYSCALL_WRITE`, etc.) and function prototypes.
 
-- Each guest VM is a capability-gated shard — the hypervisor is just another
-  kernel module, not a privileged monolith
-
-- Live migration via SovereignFS snapshot deltas
-
-## Roadmap
-
-- [ ] VMCS/VMCB setup (x86_64)
-
-- [ ] Guest memory isolation (EPT / NPT)
-
-- [ ] Virtio-net / Virtio-blk para-virtual devices
-
-- [ ] Live migration prototype
+- `dispatcher.c` / `dispatcher.cpp`: Implements direct table lookup O(1) dispatching, validating syscall numbers and forwar
