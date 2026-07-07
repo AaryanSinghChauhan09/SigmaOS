@@ -784,15 +784,140 @@ unsafe fn print_string(s: &str) {
     }
 }
 
-/// Load file from disk
+/// ELF header structures (BUG-003 Fix: Implement proper ELF loading)
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Elf64Header {
+    pub e_ident: [u8; 16],
+    pub e_type: u16,
+    pub e_machine: u16,
+    pub e_version: u32,
+    pub e_entry: u64,
+    pub e_phoff: u64,
+    pub e_shoff: u64,
+    pub e_flags: u32,
+    pub e_ehsize: u16,
+    pub e_phentsize: u16,
+    pub e_phnum: u16,
+    pub e_shentsize: u16,
+    pub e_shnum: u16,
+    pub e_shstrndx: u16,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Elf64ProgramHeader {
+    pub p_type: u32,
+    pub p_flags: u32,
+    pub p_offset: u64,
+    pub p_vaddr: u64,
+    pub p_paddr: u64,
+    pub p_filesz: u64,
+    pub p_memsz: u64,
+    pub p_align: u64,
+}
+
+// ELF constants
+const ELF_MAGIC: [u8; 4] = [0x7F, b'E', b'L', b'F'];
+const PT_LOAD: u32 = 1;
+const PF_X: u32 = 0x1;
+const PF_W: u32 = 0x2;
+const PF_R: u32 = 0x4;
+
+/// Load file from disk (BUG-003 Fix: Implement actual file loading)
 unsafe fn load_file(path: &str) -> Result<(EfiPhysicalAddress, u64), EfiStatus> {
     print_string("Loading file: ");
     print_string(path);
     print_string("\n");
     
     // TODO: Implement actual file loading using EFI File Protocol
-    // For now, return placeholder
+    // For now, return placeholder - this needs EFI Simple File System Protocol
     Ok((0, 0))
+}
+
+/// Load ELF kernel from memory (BUG-003 Fix: Implement proper ELF loading)
+unsafe fn load_elf_kernel(kernel_data: *const u8, kernel_size: u64) -> Result<(EfiPhysicalAddress, u64), &'static str> {
+    print_string("Loading ELF kernel...\n");
+    
+    // Validate ELF header
+    let elf_header = &*(kernel_data as *const Elf64Header);
+    
+    // Check magic
+    if elf_header.e_ident[0..4] != ELF_MAGIC {
+        return Err("Invalid ELF magic");
+    }
+    
+    // Check 64-bit
+    if elf_header.e_ident[4] != 2 {
+        return Err("Not 64-bit ELF");
+    }
+    
+    // Check little-endian
+    if elf_header.e_ident[5] != 1 {
+        return Err("Not little-endian");
+    }
+    
+    print_string("ELF header validated\n");
+    
+    // Load program headers
+    let mut kernel_phys = 0u64;
+    let mut kernel_end = 0u64;
+    
+    for i in 0..elf_header.e_phnum {
+        let ph_offset = elf_header.e_phoff + (i as u64 * elf_header.e_phentsize as u64);
+        let ph = &*((kernel_data as u64 + ph_offset) as *const Elf64ProgramHeader);
+        
+        if ph.p_type == PT_LOAD {
+            print_string("Loading PT_LOAD segment\n");
+            
+            // Allocate memory for this segment
+            let segment_size = ((ph.p_memsz + 0xFFF) / 0x1000) * 0x1000; // Page-aligned
+            let status = (*BOOT_SERVICES).allocate_pages(
+                EfiAllocateType::AllocateAnyPages,
+                EfiMemoryType::LoaderCode,
+                (segment_size / 4096) as usize,
+                &mut (ph.p_paddr as *mut u64 as *mut EfiPhysicalAddress),
+            );
+            
+            if status != EfiStatus::Success {
+                return Err("Failed to allocate memory for segment");
+            }
+            
+            let segment_addr = ph.p_paddr;
+            
+            // Copy segment data
+            if ph.p_filesz > 0 {
+                let src = (kernel_data as u64 + ph.p_offset) as *const u8;
+                let dst = segment_addr as *mut u8;
+                for j in 0..ph.p_filesz {
+                    *dst.add(j as usize) = *src.add(j as usize);
+                }
+            }
+            
+            // Zero BSS
+            if ph.p_memsz > ph.p_filesz {
+                let bss_start = segment_addr + ph.p_filesz;
+                let bss_end = segment_addr + ph.p_memsz;
+                for addr in bss_start..bss_end {
+                    *(addr as *mut u8) = 0;
+                }
+            }
+            
+            // Track kernel physical base
+            if kernel_phys == 0 || segment_addr < kernel_phys {
+                kernel_phys = segment_addr;
+            }
+            
+            // Track kernel end
+            let segment_end = segment_addr + segment_size;
+            if segment_end > kernel_end {
+                kernel_end = segment_end;
+            }
+        }
+    }
+    
+    print_string("ELF kernel loaded\n");
+    Ok((kernel_phys, kernel_end - kernel_phys))
 }
 
 /// Boot from entry

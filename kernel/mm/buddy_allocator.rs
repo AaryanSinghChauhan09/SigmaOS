@@ -331,3 +331,19 @@ pub unsafe extern "C" fn sigma_buddy_get_total() -> SigmaU64 {
 pub unsafe extern "C" fn sigma_buddy_get_allocated() -> SigmaU64 {
     ALLOCATOR.get_allocated_frames()
 }
+
+// ─── VMM Compatibility Functions (BUG-001 Fix) ────────────────────────────────
+// These functions are called by sigma_vmm.rs for page frame allocation
+
+#[no_mangle]
+pub unsafe extern "C" fn alloc_pages(order: usize) -> usize {
+    match ALLOCATOR.alloc(order as SigmaU8) {
+        Ok(addr) => addr as usize,
+        Err(_) => 0,
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free_pages(phys: usize, order: usize) {
+    let _ = ALLOCATOR.free(phys as SigmaU64, order as SigmaU8);
+}

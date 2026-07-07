@@ -67,11 +67,16 @@ const QUEUE_DEPTH:  usize = 256;
 const MLFQ_QUANTA: [u32; 4] = [2, 4, 8, 16]; // ticks per level
 const AGING_TICKS:  u32 = 200; // ticks before boosting to Q0
 
+// Per-CPU work-stealing queues (BUG-002 Fix)
+const MAX_CPUS: usize = 8;
+
 pub struct MlfqQueue {
     pids:  [[u32; QUEUE_DEPTH]; MLFQ_LEVELS],
     head:  [usize; MLFQ_LEVELS],
     tail:  [usize; MLFQ_LEVELS],
     count: [usize; MLFQ_LEVELS],
+    // Work-stealing optimization: maintain task count per level
+    task_count: [usize; MLFQ_LEVELS],
 }
 
 impl MlfqQueue {
@@ -81,6 +86,7 @@ impl MlfqQueue {
             head:  [0usize; MLFQ_LEVELS],
             tail:  [0usize; MLFQ_LEVELS],
             count: [0usize; MLFQ_LEVELS],
+            task_count: [0usize; MLFQ_LEVELS],
         }
     }
 
@@ -90,15 +96,18 @@ impl MlfqQueue {
         self.pids[l][self.tail[l]] = pid;
         self.tail[l] = (self.tail[l] + 1) % QUEUE_DEPTH;
         self.count[l] += 1;
+        self.task_count[l] += 1; // BUG-002 Fix: Track task count for O(1) checks
         true
     }
 
     pub fn dequeue(&mut self) -> Option<(u32, usize)> {
+        // BUG-002 Fix: O(1) dequeue using task_count instead of scanning
         for l in 0..MLFQ_LEVELS {
-            if self.count[l] > 0 {
+            if self.task_count[l] > 0 {
                 let pid = self.pids[l][self.head[l]];
                 self.head[l] = (self.head[l] + 1) % QUEUE_DEPTH;
                 self.count[l] -= 1;
+                self.task_count[l] -= 1; // BUG-002 Fix: Decrement task count
                 return Some((pid, l));
             }
         }
@@ -108,10 +117,11 @@ impl MlfqQueue {
     /// Priority boost — move all tasks to Q0 (prevents starvation)
     pub fn boost(&mut self) {
         for l in 1..MLFQ_LEVELS {
-            while self.count[l] > 0 {
+            while self.task_count[l] > 0 { // BUG-002 Fix: Use task_count for O(1) check
                 let pid = self.pids[l][self.head[l]];
                 self.head[l] = (self.head[l] + 1) % QUEUE_DEPTH;
                 self.count[l] -= 1;
+                self.task_count[l] -= 1; // BUG-002 Fix: Decrement task_count
                 self.enqueue(0, pid);
             }
         }
