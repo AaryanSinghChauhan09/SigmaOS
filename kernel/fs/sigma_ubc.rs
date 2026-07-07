@@ -1,118 +1,157 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-//! SigmaOS Unified Buffer Cache (UBC)
-//! Page-granularity cache mapping (device, block) → cached page frames.
-//! Eviction policy: Clock (second-chance). no_std, no alloc.
+//! SigmaOS — Unified Buffer Cache (UBC)
+//! Caches file blocks in physical memory to speed up I/O.
+//! Uses a simple LRU replacement policy.
 
 #![no_std]
 #![allow(dead_code)]
 
-type SigmaU32  = u32;
-type SigmaU64  = u64;
-type SigmaUsize= usize;
+type U8  = u8;
+type U32 = u32;
+type U64 = u64;
 
-pub const UBC_PAGE_SIZE: usize = 4096;
-pub const UBC_MAX_PAGES: usize = 128;
+const PAGE_SIZE: usize = 4096;
+const MAX_CACHE_PAGES: usize = 1024; // 4MB cache
 
-#[repr(C)]
 #[derive(Copy, Clone)]
-pub struct UbcPage {
-    pub dev_id:    SigmaU32,
-    pub block_no:  SigmaU64,
-    pub data:      [u8; UBC_PAGE_SIZE],
-    pub valid:     bool,
-    pub dirty:     bool,
-    pub referenced: bool,  // clock hand bit
+pub struct CachePage {
+    pub dev_id:  U32,
+    pub block:   U64,
+    pub pfn:     U32,  // Physical Frame Number backing this block
+    pub dirty:   bool,
+    pub valid:   bool,
+    pub prev:    i32,
+    pub next:    i32,
 }
 
-static mut UBC_CACHE: [UbcPage; UBC_MAX_PAGES] = [UbcPage {
-    dev_id: 0, block_no: 0, data: [0u8; UBC_PAGE_SIZE],
-    valid: false, dirty: false, referenced: false,
-}; UBC_MAX_PAGES];
-
-static mut UBC_CLOCK_HAND: usize = 0;
-static mut UBC_HIT_COUNT:  SigmaU64 = 0;
-static mut UBC_MISS_COUNT: SigmaU64 = 0;
-
-/// Find a cached page; returns its index or usize::MAX.
-unsafe fn ubc_find(dev_id: SigmaU32, block_no: SigmaU64) -> usize {
-    for i in 0..UBC_MAX_PAGES {
-        if UBC_CACHE[i].valid && UBC_CACHE[i].dev_id == dev_id && UBC_CACHE[i].block_no == block_no {
-            return i;
-        }
-    }
-    usize::MAX
-}
-
-/// Clock eviction: advance hand, skip referenced pages (give second chance).
-unsafe fn ubc_evict() -> usize {
-    loop {
-        let hand = UBC_CLOCK_HAND % UBC_MAX_PAGES;
-        if !UBC_CACHE[hand].valid {
-            UBC_CLOCK_HAND = (hand + 1) % UBC_MAX_PAGES;
-            return hand;
-        }
-        if UBC_CACHE[hand].referenced {
-            UBC_CACHE[hand].referenced = false;
-            UBC_CLOCK_HAND = (hand + 1) % UBC_MAX_PAGES;
-        } else {
-            // Evict this page (caller handles writeback if dirty)
-            UBC_CACHE[hand].valid = false;
-            UBC_CLOCK_HAND = (hand + 1) % UBC_MAX_PAGES;
-            return hand;
+impl CachePage {
+    pub const fn empty() -> Self {
+        CachePage {
+            dev_id: 0, block: 0, pfn: 0, dirty: false, valid: false,
+            prev: -1, next: -1,
         }
     }
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn sigma_ubc_init() {
-    for i in 0..UBC_MAX_PAGES { UBC_CACHE[i].valid = false; }
-    UBC_CLOCK_HAND = 0;
-    UBC_HIT_COUNT  = 0;
-    UBC_MISS_COUNT = 0;
+pub struct UbcState {
+    pub pages: [CachePage; MAX_CACHE_PAGES],
+    pub lru_head: i32,
+    pub lru_tail: i32,
+    pub cache_hits: U64,
+    pub cache_misses: U64,
 }
 
-/// Look up a block. Returns a pointer to cached data, or null on miss.
-#[no_mangle]
-pub unsafe extern "C" fn sigma_ubc_lookup(dev_id: SigmaU32, block_no: SigmaU64) -> *mut u8 {
-    let idx = ubc_find(dev_id, block_no);
-    if idx != usize::MAX {
-        UBC_HIT_COUNT += 1;
-        UBC_CACHE[idx].referenced = true;
-        UBC_CACHE[idx].data.as_mut_ptr()
+static mut UBC: UbcState = UbcState {
+    pages: [CachePage::empty(); MAX_CACHE_PAGES],
+    lru_head: -1,
+    lru_tail: -1,
+    cache_hits: 0,
+    cache_misses: 0,
+};
+
+// ── External Dependencies ───────────────────────────────────────────────────
+extern "C" {
+    fn sigma_buddy_alloc(order: U32) -> U32;
+    fn sigma_buddy_free(pfn: U32, order: U32);
+}
+
+// ── Internal Helpers ────────────────────────────────────────────────────────
+
+unsafe fn lru_remove(idx: i32) {
+    if idx < 0 || idx as usize >= MAX_CACHE_PAGES { return; }
+    let prev = UBC.pages[idx as usize].prev;
+    let next = UBC.pages[idx as usize].next;
+
+    if prev >= 0 {
+        UBC.pages[prev as usize].next = next;
     } else {
-        UBC_MISS_COUNT += 1;
-        core::ptr::null_mut()
+        UBC.lru_head = next;
     }
-}
 
-/// Insert a block into the cache, returning a pointer to where data should be written.
-#[no_mangle]
-pub unsafe extern "C" fn sigma_ubc_insert(dev_id: SigmaU32, block_no: SigmaU64) -> *mut u8 {
-    // Check if already present
-    let existing = ubc_find(dev_id, block_no);
-    if existing != usize::MAX {
-        return UBC_CACHE[existing].data.as_mut_ptr();
+    if next >= 0 {
+        UBC.pages[next as usize].prev = prev;
+    } else {
+        UBC.lru_tail = prev;
     }
-    let slot = ubc_evict();
-    UBC_CACHE[slot] = UbcPage {
-        dev_id, block_no,
-        data: [0u8; UBC_PAGE_SIZE],
-        valid: true, dirty: false, referenced: true,
-    };
-    UBC_CACHE[slot].data.as_mut_ptr()
+
+    UBC.pages[idx as usize].prev = -1;
+    UBC.pages[idx as usize].next = -1;
 }
 
-/// Mark a cached page as dirty (needs writeback).
-#[no_mangle]
-pub unsafe extern "C" fn sigma_ubc_mark_dirty(dev_id: SigmaU32, block_no: SigmaU64) {
-    let idx = ubc_find(dev_id, block_no);
-    if idx != usize::MAX { UBC_CACHE[idx].dirty = true; }
+unsafe fn lru_append(idx: i32) {
+    if idx < 0 || idx as usize >= MAX_CACHE_PAGES { return; }
+    
+    UBC.pages[idx as usize].prev = UBC.lru_tail;
+    UBC.pages[idx as usize].next = -1;
+
+    if UBC.lru_tail >= 0 {
+        UBC.pages[UBC.lru_tail as usize].next = idx;
+    } else {
+        UBC.lru_head = idx;
+    }
+    UBC.lru_tail = idx;
 }
 
-/// Returns hit rate as hits*100/(hits+misses), or 0.
+// ── Public API ──────────────────────────────────────────────────────────────
+
 #[no_mangle]
-pub unsafe extern "C" fn sigma_ubc_hit_rate_pct() -> SigmaU32 {
-    let total = UBC_HIT_COUNT + UBC_MISS_COUNT;
-    if total == 0 { return 0; }
-    (UBC_HIT_COUNT * 100 / total) as SigmaU32
+pub unsafe extern "C" fn sigma_ubc_init() -> i32 {
+    for i in 0..MAX_CACHE_PAGES {
+        UBC.pages[i].valid = false;
+        // Initially, link all pages in LRU list
+        lru_append(i as i32);
+    }
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_ubc_lookup(dev_id: U32, block: U64) -> U32 {
+    // Linear scan (could be optimized with a hash table)
+    for i in 0..MAX_CACHE_PAGES {
+        if UBC.pages[i].valid && UBC.pages[i].dev_id == dev_id && UBC.pages[i].block == block {
+            // Hit! Move to tail (most recently used)
+            lru_remove(i as i32);
+            lru_append(i as i32);
+            UBC.cache_hits += 1;
+            return UBC.pages[i].pfn;
+        }
+    }
+    UBC.cache_misses += 1;
+    U32::MAX
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_ubc_insert(dev_id: U32, block: U64, pfn: U32) -> i32 {
+    // Evict the least recently used page (head)
+    let victim_idx = UBC.lru_head;
+    if victim_idx < 0 { return -1; }
+
+    let victim = &mut UBC.pages[victim_idx as usize];
+
+    // If victim was valid and dirty, we would normally flush it to disk here
+    // For now, we just overwrite it
+    if victim.valid && victim.pfn != 0 && victim.pfn != pfn {
+        sigma_buddy_free(victim.pfn, 0);
+    }
+
+    victim.dev_id = dev_id;
+    victim.block = block;
+    victim.pfn = pfn;
+    victim.dirty = false;
+    victim.valid = true;
+
+    // Move to MRU position
+    lru_remove(victim_idx);
+    lru_append(victim_idx);
+
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_ubc_mark_dirty(dev_id: U32, block: U64) {
+    for i in 0..MAX_CACHE_PAGES {
+        if UBC.pages[i].valid && UBC.pages[i].dev_id == dev_id && UBC.pages[i].block == block {
+            UBC.pages[i].dirty = true;
+            break;
+        }
+    }
 }

@@ -7,26 +7,34 @@
 SigmaOS has undergone a massive architectural upgrade to include modern Computer Science and Data Science paradigms natively.
 
 ### 1. Sovereign Kernel (`no_std`)
+
 - **Capability Tokens**: A 64-bit hardware-enforced permission model (bypassing legacy ACLs).
+
 - **Zero-Copy IPC**: SPSC ring-buffers for inter-shard communication.
+
 - **SigmaFS & VFS**: Copy-on-Write (CoW) filesystem with deterministic extent mapping.
+
 - **Self-Healing Watchdogs**: Autonomous fault detection and exponential backoff restart policies.
 
-### 2. Advanced Technology Suites
-- **5G/6G Network OS**: Implements E2/A1/O1 O-RAN Interfaces, 3GPP network slicing (eMBB, URLLC, mMTC), and automatic TRAI QoS verification.
-- **ROS 2 Robotics**: Built-in DDS Participant registration, complementary filter sensor fusion, and trapezoidal trajectory planning.
-- **Brain-Computer Interface**: Integration for OpenBCI Cyton/Daisy and Neurosity Crown EEG headsets with band power Goertzel extraction and motor imagery classifiers.
-- **IN-SPACe Developer Tools**: CCSDS framing, orbit element propagation, and link budget estimators.
-- **Formal Verification**: Bounded model checking specs for key ring-buffer IPC paths.
+### 2. Artificial Intelligence & Data Science
+
+- **Local LLM Backend**: An embedded AI Task Orchestrator that natively routes prioritized prompts (Background, Interactive, Critical) without requiring external userland wrappers.
+
+- **Embedded ML**: Zero-allocation K-Means Clustering and FFT algorithms baked into the OS telemetry layer for autonomous system optimization.
 
 ### 3. Cyber Security & Isolation
+
 - **Security Center Daemon**: Actively monitors the immutable, BLAKE3-linked kernel audit logs. Applies temporal decay heuristics to identify threats (e.g., sandbox escape attempts) and kills malicious shards autonomously.
-- **Sovereign Sandboxes**: Fine-grained capability systems (sandboxctl) restricting filesystem and network accesses.
+
+- **Sovereign Sandboxes**: Strict CPU, Memory, and Network limits applied via CLI to untrusted code.
 
 ### 4. Zenith Desktop (UI/UX)
+
 - **Object-Oriented UI**: A Trait-based Widget framework operating entirely without heap allocations.
+
 - **BSP Window Manager**: Binary Space Partitioning tiling engine.
-- **Multi-Monitor KMS**: Direct hardware Modesetting supporting cloned and extended CRTC outputs.
+
+- **Glassmorphism Profiles**: Declarative UI parsing via `~/.sigma_profile` supporting dynamic theming.
 
 ## System Architecture
 
@@ -62,11 +70,3 @@ graph TD
 ## Getting Started
 
 See [INSTALL.md](INSTALL.md) for build instructions using the new `Justfile` toolchain.
-
-## Linux Distro Parity
-
-SigmaOS matches standard Linux system interfaces:
-- [Linux-Inspired Subsystems](Linux-Inspired-Subsystems) (udev, sysfs, procfs, tmpfs, inotify, dmesg, mount, sysctl, logrotate)
-- [Coreutils Reference](Coreutils-Reference) (chmod, chown, cp, mv, touch, wc, grep, head, tail, df, du)
-- [Device Management](Device-Management) (probe detection, naming rules, node hierarchy)
-

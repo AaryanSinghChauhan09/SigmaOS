@@ -1,321 +1,275 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (c) 2024-2026 SigmaOS Project
-//
-// kernel/mm/sigma_vmm.rs — x86-64 Virtual Memory Manager
-// Implements: 4-level page table walker, ASLR for exec, W^X enforcement,
-// mmap/munmap/brk/mprotect syscall backends, TLB shootdown.
-//
-// Paging: PML4 → PDPT → PD → PT → Physical Frame (4KB pages)
-// Uses kernel buddy allocator for page table frame allocation.
+//! SigmaOS — x86-64 Page Table Walker / Virtual Memory Manager
+//! 4-level paging: PML4 → PDPT → PD → PT
+//! No std, no allocator — static page table structures.
 
 #![no_std]
 #![allow(dead_code)]
 
-use core::sync::atomic::{AtomicU64, Ordering};
+type U64 = u64;
+type Usize = usize;
 
-// ── Constants ──────────────────────────────────────────────────────────────
-pub const PAGE_SIZE:   usize = 4096;
-pub const PAGE_SHIFT:  usize = 12;
-pub const PT_ENTRIES:  usize = 512;
+// ── Page Table Constants ────────────────────────────────────────────────────
+const PAGE_SIZE:      Usize = 4096;
+const ENTRIES_PER_TABLE: usize = 512;
 
-/// Protection flags (mprotect/mmap prot arg)
-pub const PROT_NONE:  u32 = 0;
-pub const PROT_READ:  u32 = 1;
-pub const PROT_WRITE: u32 = 2;
-pub const PROT_EXEC:  u32 = 4;
+// Page table entry flags (x86-64)
+const PTE_PRESENT:    U64 = 1 << 0;
+const PTE_WRITABLE:   U64 = 1 << 1;
+const PTE_USER:       U64 = 1 << 2;
+const PTE_PWT:        U64 = 1 << 3;  // Page Write-Through
+const PTE_PCD:        U64 = 1 << 4;  // Page Cache Disable
+const PTE_ACCESSED:   U64 = 1 << 5;
+const PTE_DIRTY:      U64 = 1 << 6;
+const PTE_HUGE:       U64 = 1 << 7;  // 2MB or 1GB page
+const PTE_GLOBAL:     U64 = 1 << 8;
+const PTE_NX:         U64 = 1 << 63; // No Execute
 
-/// mmap flags
-pub const MAP_PRIVATE:   u32 = 0x02;
-pub const MAP_ANONYMOUS: u32 = 0x20;
-pub const MAP_FIXED:     u32 = 0x10;
-pub const MAP_FAILED:    u64 = u64::MAX;
+const ADDR_MASK: U64 = 0x000F_FFFF_FFFF_F000; // Physical address bits 12-51
 
-// ── Page table entry flags ─────────────────────────────────────────────────
-pub const PTE_PRESENT:  u64 = 1 << 0;
-pub const PTE_WRITABLE: u64 = 1 << 1;
-pub const PTE_USER:     u64 = 1 << 2;
-pub const PTE_ACCESSED: u64 = 1 << 5;
-pub const PTE_DIRTY:    u64 = 1 << 6;
-pub const PTE_HUGE:     u64 = 1 << 7;
-pub const PTE_GLOBAL:   u64 = 1 << 8;
-pub const PTE_NX:       u64 = 1 << 63; // No-Execute (W^X enforcement)
-pub const PTE_ADDR_MASK: u64 = 0x000F_FFFF_FFFF_F000;
+// Virtual address decomposition
+const PML4_SHIFT: u32 = 39;
+const PDPT_SHIFT: u32 = 30;
+const PD_SHIFT:   u32 = 21;
+const PT_SHIFT:   u32 = 12;
+const INDEX_MASK: U64 = 0x1FF; // 9 bits = 512 entries
 
-// ── CR3 / TLB ─────────────────────────────────────────────────────────────
-#[inline]
-pub unsafe fn read_cr3() -> u64 {
-    let v: u64;
-    core::arch::asm!("mov {}, cr3", out(reg) v);
-    v
+// ── Page Table Entry ────────────────────────────────────────────────────────
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PageTableEntry(U64);
+
+impl PageTableEntry {
+    pub const fn empty() -> Self { PageTableEntry(0) }
+
+    pub fn is_present(&self) -> bool { self.0 & PTE_PRESENT != 0 }
+    pub fn is_writable(&self) -> bool { self.0 & PTE_WRITABLE != 0 }
+    pub fn is_user(&self) -> bool { self.0 & PTE_USER != 0 }
+    pub fn is_huge(&self) -> bool { self.0 & PTE_HUGE != 0 }
+    pub fn is_nx(&self) -> bool { self.0 & PTE_NX != 0 }
+    pub fn is_accessed(&self) -> bool { self.0 & PTE_ACCESSED != 0 }
+    pub fn is_dirty(&self) -> bool { self.0 & PTE_DIRTY != 0 }
+
+    pub fn address(&self) -> U64 { self.0 & ADDR_MASK }
+
+    pub fn set(&mut self, phys_addr: U64, flags: U64) {
+        self.0 = (phys_addr & ADDR_MASK) | flags;
+    }
+
+    pub fn clear(&mut self) { self.0 = 0; }
+
+    pub fn add_flags(&mut self, flags: U64) { self.0 |= flags; }
+    pub fn remove_flags(&mut self, flags: U64) { self.0 &= !flags; }
 }
 
-#[inline]
-pub unsafe fn write_cr3(val: u64) {
-    core::arch::asm!("mov cr3, {}", in(reg) val);
+// ── Page Table (one level) ──────────────────────────────────────────────────
+#[repr(C, align(4096))]
+#[derive(Copy, Clone)]
+pub struct PageTable {
+    pub entries: [PageTableEntry; ENTRIES_PER_TABLE],
 }
 
-#[inline]
-pub fn tlb_flush_all() {
-    unsafe {
-        let cr3 = read_cr3();
-        write_cr3(cr3);
+impl PageTable {
+    pub const fn new() -> Self {
+        PageTable {
+            entries: [PageTableEntry::empty(); ENTRIES_PER_TABLE],
+        }
     }
 }
 
-#[inline]
-pub fn tlb_flush_page(virt: u64) {
-    unsafe { core::arch::asm!("invlpg [{0}]", in(reg) virt) }
+// ── Static Page Tables (for early boot) ─────────────────────────────────────
+const MAX_PML4: usize = 1;
+const MAX_PDPT: usize = 4;
+const MAX_PD:   usize = 16;
+const MAX_PT:   usize = 512;
+
+static mut PML4:  [PageTable; MAX_PML4] = [PageTable::new(); MAX_PML4];
+static mut PDPTS: [PageTable; MAX_PDPT] = [PageTable::new(); MAX_PDPT];
+static mut PDS:   [PageTable; MAX_PD]   = [PageTable::new(); MAX_PD];
+static mut PTS:   [PageTable; MAX_PT]   = [PageTable::new(); MAX_PT];
+static mut PT_NEXT: usize = 0;
+static mut PD_NEXT: usize = 0;
+static mut PDPT_NEXT: usize = 0;
+
+// ── VMM State ───────────────────────────────────────────────────────────────
+pub struct VmmState {
+    pub pml4_phys: U64,
+    pub mapped_pages: U64,
+    pub page_faults: U64,
 }
 
-// ── Page table walker ──────────────────────────────────────────────────────
+static mut VMM: VmmState = VmmState {
+    pml4_phys: 0,
+    mapped_pages: 0,
+    page_faults: 0,
+};
 
-/// Indices into each level for a virtual address.
-#[inline]
-fn pml4_idx(va: u64) -> usize { ((va >> 39) & 0x1FF) as usize }
-#[inline]
-fn pdpt_idx(va: u64) -> usize { ((va >> 30) & 0x1FF) as usize }
-#[inline]
-fn pd_idx(va: u64) -> usize   { ((va >> 21) & 0x1FF) as usize }
-#[inline]
-fn pt_idx(va: u64) -> usize   { ((va >> 12) & 0x1FF) as usize }
+// ── Internal Helpers ────────────────────────────────────────────────────────
+fn virt_pml4_idx(vaddr: U64) -> usize { ((vaddr >> PML4_SHIFT) & INDEX_MASK) as usize }
+fn virt_pdpt_idx(vaddr: U64) -> usize { ((vaddr >> PDPT_SHIFT) & INDEX_MASK) as usize }
+fn virt_pd_idx(vaddr: U64)   -> usize { ((vaddr >> PD_SHIFT) & INDEX_MASK) as usize }
+fn virt_pt_idx(vaddr: U64)   -> usize { ((vaddr >> PT_SHIFT) & INDEX_MASK) as usize }
+fn page_offset(vaddr: U64)   -> usize { (vaddr & 0xFFF) as usize }
 
-/// Walk to the PTE for `va`; create intermediate tables if `alloc` is true.
-pub unsafe fn walk_to_pte(cr3: u64, va: u64, alloc: bool) -> Option<*mut u64> {
-    let pml4 = (cr3 & PTE_ADDR_MASK) as *mut u64;
-    let pml4e = &mut *pml4.add(pml4_idx(va));
-    if *pml4e & PTE_PRESENT == 0 {
-        if !alloc { return None; }
-        let frame = alloc_page_frame()? as u64;
-        *pml4e = frame | PTE_PRESENT | PTE_WRITABLE | PTE_USER;
+// ── Public API ──────────────────────────────────────────────────────────────
+
+/// Initialize the VMM with identity mapping for the first `num_pages` pages.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_init(num_pages: u32) -> i32 {
+    PT_NEXT = 0;
+    PD_NEXT = 0;
+    PDPT_NEXT = 0;
+    VMM.mapped_pages = 0;
+
+    // Store PML4 physical address (for cr3)
+    VMM.pml4_phys = PML4.as_ptr() as U64;
+
+    // Identity map: virtual address == physical address
+    let mut page: u32 = 0;
+    while page < num_pages {
+        let vaddr = (page as U64) * PAGE_SIZE as U64;
+        let phys  = vaddr;
+        sigma_vmm_map(vaddr, phys, PTE_PRESENT | PTE_WRITABLE);
+        page += 1;
     }
 
-    let pdpt = ((*pml4e) & PTE_ADDR_MASK) as *mut u64;
-    let pdpte = &mut *pdpt.add(pdpt_idx(va));
-    if *pdpte & PTE_PRESENT == 0 {
-        if !alloc { return None; }
-        let frame = alloc_page_frame()? as u64;
-        *pdpte = frame | PTE_PRESENT | PTE_WRITABLE | PTE_USER;
-    }
-
-    let pd = ((*pdpte) & PTE_ADDR_MASK) as *mut u64;
-    let pde = &mut *pd.add(pd_idx(va));
-    if *pde & PTE_PRESENT == 0 {
-        if !alloc { return None; }
-        let frame = alloc_page_frame()? as u64;
-        *pde = frame | PTE_PRESENT | PTE_WRITABLE | PTE_USER;
-    }
-
-    let pt = ((*pde) & PTE_ADDR_MASK) as *mut u64;
-    Some(pt.add(pt_idx(va)))
-}
-
-/// Translate virtual → physical address for current page table.
-pub fn virt_to_phys(va: u64) -> Option<u64> {
-    unsafe {
-        let cr3 = read_cr3();
-        let pte_ptr = walk_to_pte(cr3, va, false)?;
-        let pte = *pte_ptr;
-        if pte & PTE_PRESENT == 0 { return None; }
-        Some((pte & PTE_ADDR_MASK) | (va & 0xFFF))
-    }
-}
-
-/// Map `virt` → `phys` with given protection flags.
-pub fn map_page(cr3: u64, virt: u64, phys: u64, prot: u32) -> i64 {
-    let flags = prot_to_pte_flags(prot);
-    unsafe {
-        let pte_ptr = match walk_to_pte(cr3, virt, true) {
-            Some(p) => p,
-            None => return -12, // ENOMEM
-        };
-        *pte_ptr = (phys & PTE_ADDR_MASK) | flags | PTE_PRESENT;
-        tlb_flush_page(virt);
-    }
     0
 }
 
-/// Unmap a single page.
-pub fn unmap_page(cr3: u64, virt: u64) -> i64 {
-    unsafe {
-        if let Some(pte_ptr) = walk_to_pte(cr3, virt, false) {
-            let pte = *pte_ptr;
-            if pte & PTE_PRESENT != 0 {
-                let phys = pte & PTE_ADDR_MASK;
-                free_page_frame(phys as usize);
-                *pte_ptr = 0;
-                tlb_flush_page(virt);
-            }
-        }
+/// Map a single 4KB page: vaddr → phys_addr with given flags.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_map(vaddr: U64, phys_addr: U64, flags: U64) -> i32 {
+    let pml4_idx = virt_pml4_idx(vaddr);
+    let pdpt_idx = virt_pdpt_idx(vaddr);
+    let pd_idx   = virt_pd_idx(vaddr);
+    let pt_idx   = virt_pt_idx(vaddr);
+
+    // Ensure PML4 entry points to a PDPT
+    if !PML4[0].entries[pml4_idx].is_present() {
+        if PDPT_NEXT >= MAX_PDPT { return -1; }
+        let pdpt_phys = PDPTS[PDPT_NEXT..].as_ptr() as U64;
+        PML4[0].entries[pml4_idx].set(pdpt_phys, PTE_PRESENT | PTE_WRITABLE | PTE_USER);
+        PDPT_NEXT += 1;
     }
+
+    // Get the PDPT
+    let pdpt_base = PML4[0].entries[pml4_idx].address();
+    let pdpt = &mut *(pdpt_base as *mut PageTable);
+
+    // Ensure PDPT entry points to a PD
+    if !pdpt.entries[pdpt_idx].is_present() {
+        if PD_NEXT >= MAX_PD { return -2; }
+        let pd_phys = PDS[PD_NEXT..].as_ptr() as U64;
+        pdpt.entries[pdpt_idx].set(pd_phys, PTE_PRESENT | PTE_WRITABLE | PTE_USER);
+        PD_NEXT += 1;
+    }
+
+    // Get the PD
+    let pd_base = pdpt.entries[pdpt_idx].address();
+    let pd = &mut *(pd_base as *mut PageTable);
+
+    // Ensure PD entry points to a PT
+    if !pd.entries[pd_idx].is_present() {
+        if PT_NEXT >= MAX_PT { return -3; }
+        let pt_phys = PTS[PT_NEXT..].as_ptr() as U64;
+        pd.entries[pd_idx].set(pt_phys, PTE_PRESENT | PTE_WRITABLE | PTE_USER);
+        PT_NEXT += 1;
+    }
+
+    // Get the PT
+    let pt_base = pd.entries[pd_idx].address();
+    let pt = &mut *(pt_base as *mut PageTable);
+
+    // Set the page table entry
+    pt.entries[pt_idx].set(phys_addr, flags | PTE_PRESENT);
+    VMM.mapped_pages += 1;
+
+    // Invalidate TLB for this page
+    #[cfg(target_arch = "x86_64")]
+    core::arch::asm!("invlpg [{}]", in(reg) vaddr, options(nostack, preserves_flags));
+
     0
 }
 
-fn prot_to_pte_flags(prot: u32) -> u64 {
-    let mut flags = PTE_USER;
-    if prot & PROT_WRITE != 0 { flags |= PTE_WRITABLE; }
-    // W^X: if executable, do NOT set NX; otherwise always set NX
-    if prot & PROT_EXEC == 0  { flags |= PTE_NX; }
-    flags
-}
+/// Unmap a single 4KB page.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_unmap(vaddr: U64) -> i32 {
+    let pml4_idx = virt_pml4_idx(vaddr);
+    let pdpt_idx = virt_pdpt_idx(vaddr);
+    let pd_idx   = virt_pd_idx(vaddr);
+    let pt_idx   = virt_pt_idx(vaddr);
 
-// ── ASLR ───────────────────────────────────────────────────────────────────
+    if !PML4[0].entries[pml4_idx].is_present() { return -1; }
+    let pdpt = &mut *(PML4[0].entries[pml4_idx].address() as *mut PageTable);
 
-static ASLR_SEED: AtomicU64 = AtomicU64::new(0xDEAD_BEEF_CAFE_1234);
+    if !pdpt.entries[pdpt_idx].is_present() { return -1; }
+    let pd = &mut *(pdpt.entries[pdpt_idx].address() as *mut PageTable);
 
-fn aslr_rand() -> u64 {
-    // xorshift64 PRNG — seeded from hardware RNG on first call
-    let mut s = ASLR_SEED.load(Ordering::Relaxed);
-    s ^= s << 13;
-    s ^= s >> 7;
-    s ^= s << 17;
-    ASLR_SEED.store(s, Ordering::Relaxed);
-    s
-}
+    if !pd.entries[pd_idx].is_present() { return -1; }
+    let pt = &mut *(pd.entries[pd_idx].address() as *mut PageTable);
 
-/// Return a random user-space mmap base (ASLR).
-pub fn aslr_mmap_base() -> u64 {
-    // Randomize in range 0x0000_7F00_0000_0000..0x0000_7FFF_FFFF_F000
-    let rand = aslr_rand() & 0xFFFF_FFFF_F000;
-    0x0000_7F00_0000_0000 | rand
-}
+    if !pt.entries[pt_idx].is_present() { return -1; }
 
-/// Return ASLR stack base.
-pub fn aslr_stack_base() -> u64 {
-    let rand = aslr_rand() & 0x00FF_FFFF_F000;
-    0x0000_7FFF_0000_0000 | rand
-}
+    pt.entries[pt_idx].clear();
+    VMM.mapped_pages -= 1;
 
-// ── mmap / munmap / brk / mprotect ────────────────────────────────────────
+    #[cfg(target_arch = "x86_64")]
+    core::arch::asm!("invlpg [{}]", in(reg) vaddr, options(nostack, preserves_flags));
 
-static BRK_END: AtomicU64 = AtomicU64::new(0x0000_0001_0000_0000); // 4 GB base
-
-pub fn mm_mmap(addr: u64, len: usize, prot: u32, flags: u32, _fd: i32, _off: i64) -> i64 {
-    if len == 0 { return -22; }
-    let pages = (len + PAGE_SIZE - 1) / PAGE_SIZE;
-    let base = if flags & MAP_FIXED != 0 {
-        if addr == 0 { return MAP_FAILED as i64; }
-        addr
-    } else {
-        aslr_mmap_base() & !(PAGE_SIZE as u64 - 1)
-    };
-    unsafe {
-        let cr3 = read_cr3();
-        for i in 0..pages {
-            let virt = base + (i * PAGE_SIZE) as u64;
-            let phys = match alloc_page_frame() {
-                Some(p) => p as u64,
-                None => {
-                    // Roll back already-mapped pages
-                    for j in 0..i {
-                        unmap_page(cr3, base + (j * PAGE_SIZE) as u64);
-                    }
-                    return MAP_FAILED as i64;
-                }
-            };
-            if map_page(cr3, virt, phys, prot) != 0 {
-                return MAP_FAILED as i64;
-            }
-            // Zero the page (anonymous mapping)
-            if flags & MAP_ANONYMOUS != 0 {
-                core::ptr::write_bytes(virt as *mut u8, 0, PAGE_SIZE);
-            }
-        }
-    }
-    base as i64
-}
-
-pub fn mm_munmap(addr: u64, len: usize) -> i64 {
-    if addr == 0 || len == 0 { return -22; }
-    let pages = (len + PAGE_SIZE - 1) / PAGE_SIZE;
-    unsafe {
-        let cr3 = read_cr3();
-        for i in 0..pages {
-            unmap_page(cr3, addr + (i * PAGE_SIZE) as u64);
-        }
-    }
     0
 }
 
-pub fn mm_brk(new_brk: u64) -> i64 {
-    let cur = BRK_END.load(Ordering::SeqCst);
-    if new_brk == 0 { return cur as i64; } // query
-    if new_brk < cur {
-        // Shrink: unmap pages
-        let mut va = new_brk & !(PAGE_SIZE as u64 - 1);
-        unsafe {
-            let cr3 = read_cr3();
-            while va < cur {
-                unmap_page(cr3, va);
-                va += PAGE_SIZE as u64;
-            }
-        }
-    } else {
-        // Grow: map new pages
-        let mut va = cur;
-        unsafe {
-            let cr3 = read_cr3();
-            while va < new_brk {
-                let phys = match alloc_page_frame() {
-                    Some(p) => p as u64,
-                    None => return -12, // ENOMEM
-                };
-                map_page(cr3, va, phys, PROT_READ | PROT_WRITE);
-                va += PAGE_SIZE as u64;
-            }
-        }
+/// Translate a virtual address to a physical address.
+/// Returns the physical address or U64::MAX on failure.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_translate(vaddr: U64) -> U64 {
+    let pml4_idx = virt_pml4_idx(vaddr);
+    if !PML4[0].entries[pml4_idx].is_present() { return U64::MAX; }
+    let pdpt = &*(PML4[0].entries[pml4_idx].address() as *const PageTable);
+
+    let pdpt_idx = virt_pdpt_idx(vaddr);
+    if !pdpt.entries[pdpt_idx].is_present() { return U64::MAX; }
+    // Check for 1GB huge page
+    if pdpt.entries[pdpt_idx].is_huge() {
+        return pdpt.entries[pdpt_idx].address() | (vaddr & 0x3FFF_FFFF);
     }
-    BRK_END.store(new_brk, Ordering::SeqCst);
-    new_brk as i64
-}
+    let pd = &*(pdpt.entries[pdpt_idx].address() as *const PageTable);
 
-pub fn mm_mprotect(addr: u64, len: usize, prot: u32) -> i64 {
-    let pages = (len + PAGE_SIZE - 1) / PAGE_SIZE;
-    let flags = prot_to_pte_flags(prot);
-    unsafe {
-        let cr3 = read_cr3();
-        for i in 0..pages {
-            let va = addr + (i * PAGE_SIZE) as u64;
-            if let Some(pte_ptr) = walk_to_pte(cr3, va, false) {
-                let phys = *pte_ptr & PTE_ADDR_MASK;
-                if phys == 0 { return -14; } // EFAULT
-                *pte_ptr = phys | flags | PTE_PRESENT;
-                tlb_flush_page(va);
-            } else {
-                return -14;
-            }
-        }
+    let pd_idx = virt_pd_idx(vaddr);
+    if !pd.entries[pd_idx].is_present() { return U64::MAX; }
+    // Check for 2MB huge page
+    if pd.entries[pd_idx].is_huge() {
+        return pd.entries[pd_idx].address() | (vaddr & 0x1F_FFFF);
     }
-    0
+    let pt = &*(pd.entries[pd_idx].address() as *const PageTable);
+
+    let pt_idx = virt_pt_idx(vaddr);
+    if !pt.entries[pt_idx].is_present() { return U64::MAX; }
+
+    pt.entries[pt_idx].address() | (vaddr & 0xFFF)
 }
 
-// ── Allocator bridge (calls kernel buddy allocator) ────────────────────────
-fn alloc_page_frame() -> Option<usize> {
-    crate::kernel::mm::buddy_allocator::alloc_pages(0) // order-0 = 1 page
+/// Get the PML4 physical address (for loading into CR3).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_get_cr3() -> U64 {
+    VMM.pml4_phys
 }
 
-fn free_page_frame(phys: usize) {
-    crate::kernel::mm::buddy_allocator::free_pages(phys, 0);
+/// Get the total number of mapped pages.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_mapped_pages() -> U64 {
+    VMM.mapped_pages
 }
 
-// ── Kernel page table init ─────────────────────────────────────────────────
-
-/// Map the kernel's own text/data/bss sections.
-/// Called once during early boot before paging is enabled.
-pub fn vmm_init(kernel_phys_base: u64, kernel_size: usize) {
-    // Identity-map first 4 MB for UEFI compatibility
-    let pages = (kernel_size + PAGE_SIZE - 1) / PAGE_SIZE;
-    unsafe {
-        let cr3 = read_cr3();
-        for i in 0..pages {
-            let phys = kernel_phys_base + (i * PAGE_SIZE) as u64;
-            // Kernel text: R+X; kernel data: R+W (W^X enforced)
-            let prot = if i * PAGE_SIZE < (kernel_size / 2) {
-                PROT_READ | PROT_EXEC  // text segment
-            } else {
-                PROT_READ | PROT_WRITE // data/bss segment
-            };
-            map_page(cr3, phys, phys, prot); // identity map
-        }
+/// Flush the entire TLB by reloading CR3.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_vmm_flush_tlb() {
+    #[cfg(target_arch = "x86_64")]
+    {
+        let cr3 = VMM.pml4_phys;
+        core::arch::asm!(
+            "mov cr3, {}",
+            in(reg) cr3,
+            options(nostack, preserves_flags)
+        );
     }
-    tlb_flush_all();
 }

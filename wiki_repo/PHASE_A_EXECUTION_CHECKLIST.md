@@ -29,7 +29,8 @@ Repo: [SigmaOS on GitHub](https://github.com/AaryanSinghChauhan09/SigmaOS)
 | ARP resolution (replace stub) | [~] | Networking | `kernel/net/sigma_net_arp.cpp` |
 | RX/TX buffer pools + `nic_init()` | [x] | Networking | `kernel/net/sigma_net.c` |
 | `sigma_socket_open/send/recv` ABI | [x] | Networking | `kernel/include/sigma_socket_abi.h`, `kernel/net/sigma_net_socket.cpp` |
-| Single socket ABI authority (remove duplicate APIs) | [~] | Networking | `kernel/net/sigma_net_socket.cpp`, `net/sockets/SovereignSocketAPI.cpp` |
+| Single socket ABI authority (remove duplicate APIs) | [x] | Networking | `kernel/net/sigma_net_socket.cpp`, `net/sockets/SovereignSocketAPI.cpp` |
+
 | `SIGMA_SYS_SOCKET` syscall allocation | [x] | Kernel | `kernel/core/syscall/SovereignSyscall.cpp` |
 
 ### Tests
@@ -74,8 +75,8 @@ sigma-pod stop 0
 | Rollback gate at early boot | [x] | Kernel/Boot | `kernel/core/sigma_kernel_main.c` |
 | Resilient fallback shell entry | [x] | Kernel/Boot | `kernel/resilience/sigma_micro_fallback.cpp` |
 | `SIGMA_MINIMAL_MODE` reduced boot path | [x] | Kernel/Boot | `kernel/core/sigma_kernel_main.c` |
-| Boot stage API + safe-mode selector | [~] | Kernel/Boot | `kernel/core/system/SovereignBoot.cpp`, `kernel/core/boot/sigma_boot.c` |
-| Bootloader UI “Fix it” menu | [~] | Kernel/Boot | `kernel/core/boot/sigma_boot_recovery_menu.c` |
+| Boot stage API + safe-mode selector | [x] | Kernel/Boot | `kernel/core/system/SovereignBoot.cpp`, `kernel/core/boot/sigma_boot.c` |
+| Bootloader UI “Fix it” menu | [x] | Kernel/Boot | `kernel/core/boot/sigma_boot_recovery_menu.c` |
 
 ### Tests
 
@@ -96,7 +97,7 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio
 | Auto-tiling WM (`auto_tile()` / BSP/columns/grid) | [~] | GUI/UX | `zenith_desktop/wm/sigma_tiling_wm.cpp` |
 | Theme/widget engine | [~] | GUI/UX | `zenith_desktop/theme/sigma_theme_engine.cpp` |
 | Profile engine (`~/.sigma_profile`) | [~] | GUI/UX | `zenith_desktop/personalization/sigma_profile_engine.cpp` |
-| Input → compositor event loop hardening | [ ] | GUI/UX | `zenith_desktop/compositor/` |
+| Input → compositor event loop hardening | [x] | GUI/UX | `zenith_desktop/compositor/` |
 
 ### Tests
 

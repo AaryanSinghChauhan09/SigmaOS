@@ -37,7 +37,8 @@ Repo: [SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS) · Wiki: [Phase
 
 | Task | Status | Files |
 | ------ | -------- | ------- |
-| Compositor loop (framebuffer + input poll) | [~] | `zenith_desktop/compositor/sigma_compositor.cpp` |
+| Compositor loop (framebuffer + input poll) | [x] | `zenith_desktop/compositor/sigma_compositor.cpp` |
+
 | Auto-tiling WM (`auto_tile`, BSP/master-stack) | [~] | `zenith_desktop/wm/sigma_tiling_wm.cpp` |
 | Theme engine (light/dark, accent) | [~] | `zenith_desktop/theme/sigma_theme_engine.cpp` |
 | Unified Zenith boot (`zenith_subsystem_init`) | [x] | `zenith_desktop/zenith_unified_init.cpp` |

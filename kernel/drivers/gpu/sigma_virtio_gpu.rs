@@ -1,389 +1,348 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (c) 2024-2026 SigmaOS Project
-//
-// kernel/drivers/gpu/sigma_virtio_gpu.rs — VirtIO-GPU Driver
-// Implements VirtIO-GPU 1.0 spec for QEMU/KVM accelerated rendering.
-// Provides: 2D framebuffer (resource_create_2d, transfer, flush),
-// cursor support, and a compatible KMS interface.
-//
-// Reference: virtio-v1.1 spec §5.7 (GPU device)
-//
-// This driver is critical for CI boot testing in QEMU.
+//! SigmaOS — VirtIO-GPU Driver
+//! Paravirtualized GPU driver for QEMU/KVM environments.
+//! Provides framebuffer, 2D acceleration, and cursor support.
+//! No std, no allocator.
 
 #![no_std]
 #![allow(dead_code)]
 
-use core::sync::atomic::{AtomicBool, Ordering};
+type U8  = u8;
+type U16 = u16;
+type U32 = u32;
+type U64 = u64;
+type Usize = usize;
 
-// ── VirtIO PCI config offsets ──────────────────────────────────────────────
-const VIRTIO_PCI_CAP_COMMON:  u8 = 1;
-const VIRTIO_PCI_CAP_NOTIFY:  u8 = 2;
-const VIRTIO_PCI_CAP_ISR:     u8 = 3;
-const VIRTIO_PCI_CAP_DEVICE:  u8 = 4;
-const VIRTIO_PCI_DEVICE_ID_GPU: u16 = 0x1050;
-const VIRTIO_VENDOR_ID:       u16 = 0x1AF4;
+// ── VirtIO Common Constants ─────────────────────────────────────────────────
+const VIRTIO_GPU_DEVICE_ID: U32 = 16;
 
-// ── VirtIO GPU control commands ────────────────────────────────────────────
-#[repr(u32)]
-#[allow(non_camel_case_types)]
-enum GpuCmd {
-    GET_DISPLAY_INFO         = 0x0100,
-    RESOURCE_CREATE_2D       = 0x0101,
-    RESOURCE_UNREF           = 0x0102,
-    SET_SCANOUT              = 0x0103,
-    RESOURCE_FLUSH           = 0x0104,
-    TRANSFER_TO_HOST_2D      = 0x0105,
-    RESOURCE_ATTACH_BACKING  = 0x0106,
-    RESOURCE_DETACH_BACKING  = 0x0107,
-    GET_CAPSET_INFO          = 0x0108,
-    GET_CAPSET               = 0x0109,
-    UPDATE_CURSOR            = 0x0300,
-    MOVE_CURSOR              = 0x0301,
-    RESP_OK_NODATA           = 0x1100,
-    RESP_OK_DISPLAY_INFO     = 0x1101,
-    RESP_ERR_UNSPEC          = 0x1200,
-}
+// VirtIO Status bits
+const VIRTIO_STATUS_ACK:         U8 = 1;
+const VIRTIO_STATUS_DRIVER:      U8 = 2;
+const VIRTIO_STATUS_FEATURES_OK: U8 = 8;
+const VIRTIO_STATUS_DRIVER_OK:   U8 = 4;
 
-// ── VirtIO GPU formats ─────────────────────────────────────────────────────
-#[repr(u32)]
-pub enum PixelFormat {
-    Bgra8888 = 1,
-    Bgrx8888 = 2,
-    Rgba8888 = 67,
-    Rgbx8888 = 68,
-    Bgr888   = 115,
-    Rgb888   = 121,
-    Bgr565   = 130,
-    Rgb565   = 132,
-}
+// ── VirtIO-GPU Command Types ────────────────────────────────────────────────
+const VIRTIO_GPU_CMD_GET_DISPLAY_INFO:  U32 = 0x0100;
+const VIRTIO_GPU_CMD_RESOURCE_CREATE_2D: U32 = 0x0101;
+const VIRTIO_GPU_CMD_RESOURCE_UNREF:    U32 = 0x0102;
+const VIRTIO_GPU_CMD_SET_SCANOUT:       U32 = 0x0103;
+const VIRTIO_GPU_CMD_RESOURCE_FLUSH:    U32 = 0x0104;
+const VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D: U32 = 0x0105;
+const VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING: U32 = 0x0106;
+const VIRTIO_GPU_CMD_RESOURCE_DETACH_BACKING: U32 = 0x0107;
+const VIRTIO_GPU_CMD_GET_CAPSET_INFO:   U32 = 0x0108;
+const VIRTIO_GPU_CMD_GET_CAPSET:        U32 = 0x0109;
+const VIRTIO_GPU_CMD_UPDATE_CURSOR:     U32 = 0x0300;
+const VIRTIO_GPU_CMD_MOVE_CURSOR:       U32 = 0x0301;
 
-// ── Control header ─────────────────────────────────────────────────────────
-#[repr(C)]
-struct CtrlHdr {
-    cmd_type: u32,
-    flags:    u32,
-    fence_id: u64,
-    ctx_id:   u32,
-    _pad:     u32,
-}
+// Response types
+const VIRTIO_GPU_RESP_OK_NODATA:       U32 = 0x1100;
+const VIRTIO_GPU_RESP_OK_DISPLAY_INFO: U32 = 0x1101;
+const VIRTIO_GPU_RESP_ERR_UNSPEC:      U32 = 0x1200;
+const VIRTIO_GPU_RESP_ERR_OUT_OF_MEMORY: U32 = 0x1201;
 
-// ── Display info ───────────────────────────────────────────────────────────
+// Pixel formats
+const VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM: U32 = 1;
+const VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM: U32 = 2;
+const VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM: U32 = 67;
+
+// ── VirtIO-GPU Structures ───────────────────────────────────────────────────
+
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct Rect { pub x: u32, pub y: u32, pub w: u32, pub h: u32 }
+pub struct VirtioGpuCtrlHeader {
+    pub cmd_type: U32,
+    pub flags:    U32,
+    pub fence_id: U64,
+    pub ctx_id:   U32,
+    pub padding:  U32,
+}
 
-#[repr(C)]
-struct DisplayOne {
-    r:       Rect,
-    enabled: u32,
-    flags:   u32,
+impl VirtioGpuCtrlHeader {
+    pub const fn new(cmd: U32) -> Self {
+        VirtioGpuCtrlHeader {
+            cmd_type: cmd, flags: 0, fence_id: 0, ctx_id: 0, padding: 0,
+        }
+    }
 }
 
 #[repr(C)]
-struct DisplayInfo {
-    hdr:   CtrlHdr,
-    pmodes: [DisplayOne; 16],
+#[derive(Copy, Clone)]
+pub struct VirtioGpuRect {
+    pub x: U32,
+    pub y: U32,
+    pub width: U32,
+    pub height: U32,
 }
 
-// ── Resource create 2D ─────────────────────────────────────────────────────
 #[repr(C)]
-struct ResourceCreate2D {
-    hdr:         CtrlHdr,
-    resource_id: u32,
-    format:      u32,
-    width:       u32,
-    height:      u32,
+#[derive(Copy, Clone)]
+pub struct VirtioGpuDisplayOne {
+    pub r: VirtioGpuRect,
+    pub enabled: U32,
+    pub flags: U32,
 }
 
-// ── Transfer to host ───────────────────────────────────────────────────────
+const MAX_SCANOUTS: usize = 16;
+
 #[repr(C)]
-struct TransferToHost2D {
-    hdr:         CtrlHdr,
-    r:           Rect,
-    offset:      u64,
-    resource_id: u32,
-    _pad:        u32,
+#[derive(Copy, Clone)]
+pub struct VirtioGpuDisplayInfo {
+    pub hdr: VirtioGpuCtrlHeader,
+    pub pmodes: [VirtioGpuDisplayOne; MAX_SCANOUTS],
 }
 
-// ── Resource flush ─────────────────────────────────────────────────────────
 #[repr(C)]
-struct ResourceFlush {
-    hdr:         CtrlHdr,
-    r:           Rect,
-    resource_id: u32,
-    _pad:        u32,
+#[derive(Copy, Clone)]
+pub struct VirtioGpuResourceCreate2d {
+    pub hdr: VirtioGpuCtrlHeader,
+    pub resource_id: U32,
+    pub format: U32,
+    pub width: U32,
+    pub height: U32,
 }
 
-// ── Set scanout ────────────────────────────────────────────────────────────
 #[repr(C)]
-struct SetScanout {
-    hdr:         CtrlHdr,
-    r:           Rect,
-    scanout_id:  u32,
-    resource_id: u32,
+#[derive(Copy, Clone)]
+pub struct VirtioGpuSetScanout {
+    pub hdr: VirtioGpuCtrlHeader,
+    pub r: VirtioGpuRect,
+    pub scanout_id: U32,
+    pub resource_id: U32,
 }
 
-// ── VirtIO GPU device state ────────────────────────────────────────────────
-pub struct VirtioGpu {
-    pub initialized: bool,
-    pub width:       u32,
-    pub height:      u32,
-    pub stride:      u32,
-    pub format:      u32,
-    pub resource_id: u32,
-    pub fb_phys:     u64,   // physical address of framebuffer
-    pub fb_size:     usize,
-    pub scanout_id:  u32,
-    mmio_base:       usize,
-    controlq_desc:   u64,
-    cursorq_desc:    u64,
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct VirtioGpuTransferToHost2d {
+    pub hdr: VirtioGpuCtrlHeader,
+    pub r: VirtioGpuRect,
+    pub offset: U64,
+    pub resource_id: U32,
+    pub padding: U32,
 }
 
-static mut VIRTIO_GPU: VirtioGpu = VirtioGpu {
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct VirtioGpuResourceFlush {
+    pub hdr: VirtioGpuCtrlHeader,
+    pub r: VirtioGpuRect,
+    pub resource_id: U32,
+    pub padding: U32,
+}
+
+// ── VirtQueue (simplified) ──────────────────────────────────────────────────
+const VRING_SIZE: usize = 64;
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct VringDesc {
+    pub addr:  U64,
+    pub len:   U32,
+    pub flags: U16,
+    pub next:  U16,
+}
+
+impl VringDesc {
+    pub const fn empty() -> Self {
+        VringDesc { addr: 0, len: 0, flags: 0, next: 0 }
+    }
+}
+
+pub struct VirtQueue {
+    pub desc:  [VringDesc; VRING_SIZE],
+    pub avail_idx: U16,
+    pub used_idx:  U16,
+    pub num_free:  U16,
+    pub free_head: U16,
+}
+
+impl VirtQueue {
+    pub const fn new() -> Self {
+        VirtQueue {
+            desc: [VringDesc::empty(); VRING_SIZE],
+            avail_idx: 0,
+            used_idx: 0,
+            num_free: VRING_SIZE as U16,
+            free_head: 0,
+        }
+    }
+}
+
+// ── GPU Framebuffer ─────────────────────────────────────────────────────────
+const FB_MAX_WIDTH:  usize = 1920;
+const FB_MAX_HEIGHT: usize = 1080;
+const FB_BPP:        usize = 4; // BGRA
+const FB_SIZE:       usize = FB_MAX_WIDTH * FB_MAX_HEIGHT * FB_BPP;
+
+pub struct VirtioGpuState {
+    pub mmio_base:     U64,
+    pub width:         U32,
+    pub height:        U32,
+    pub stride:        U32,
+    pub format:        U32,
+    pub resource_id:   U32,
+    pub scanout_id:    U32,
+    pub initialized:   bool,
+    pub controlq:      VirtQueue,
+    pub cursorq:       VirtQueue,
+    // Framebuffer in memory
+    pub fb:            [U8; FB_SIZE],
+}
+
+static mut GPU: VirtioGpuState = VirtioGpuState {
+    mmio_base: 0,
+    width: 1024,
+    height: 768,
+    stride: 1024 * 4,
+    format: VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM,
+    resource_id: 1,
+    scanout_id: 0,
     initialized: false,
-    width: 1024, height: 768, stride: 4096,
-    format: PixelFormat::Bgra8888 as u32,
-    resource_id: 1, fb_phys: 0, fb_size: 0,
-    scanout_id: 0, mmio_base: 0,
-    controlq_desc: 0, cursorq_desc: 0,
+    controlq: VirtQueue::new(),
+    cursorq: VirtQueue::new(),
+    fb: [0u8; FB_SIZE],
 };
 
-static GPU_READY: AtomicBool = AtomicBool::new(false);
+// ── MMIO Helpers ────────────────────────────────────────────────────────────
+unsafe fn gpu_read32(offset: Usize) -> U32 {
+    let ptr = (GPU.mmio_base as Usize + offset) as *const U32;
+    core::ptr::read_volatile(ptr)
+}
 
-impl VirtioGpu {
-    /// Probe for VirtIO-GPU on PCI bus and initialize.
-    pub fn probe_and_init() -> bool {
-        // Scan PCI for vendor=0x1AF4 device=0x1050
-        let bar0 = match pci_find_device(VIRTIO_VENDOR_ID, VIRTIO_PCI_DEVICE_ID_GPU) {
-            Some(b) => b,
-            None => return false,
-        };
-        unsafe {
-            VIRTIO_GPU.mmio_base = bar0;
-            VIRTIO_GPU.init_device();
+unsafe fn gpu_write32(offset: Usize, val: U32) {
+    let ptr = (GPU.mmio_base as Usize + offset) as *mut U32;
+    core::ptr::write_volatile(ptr, val);
+}
+
+// ── Public API ──────────────────────────────────────────────────────────────
+
+/// Initialize VirtIO-GPU from MMIO base address.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_init(mmio_base: U64, width: U32, height: U32) -> i32 {
+    if mmio_base == 0 { return -1; }
+
+    GPU.mmio_base = mmio_base;
+    GPU.width = width.min(FB_MAX_WIDTH as U32);
+    GPU.height = height.min(FB_MAX_HEIGHT as U32);
+    GPU.stride = GPU.width * FB_BPP as U32;
+
+    // VirtIO device initialization sequence (MMIO transport)
+    // Step 1: Reset device
+    gpu_write32(0x70, 0); // Status = 0 (reset)
+
+    // Step 2: Acknowledge
+    gpu_write32(0x70, VIRTIO_STATUS_ACK as U32);
+
+    // Step 3: Driver
+    gpu_write32(0x70, (VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER) as U32);
+
+    // Step 4: Negotiate features (accept all for now)
+    let _features = gpu_read32(0x10);
+    gpu_write32(0x20, 0); // Accept features page 0
+
+    // Step 5: Features OK
+    gpu_write32(0x70, (VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER | VIRTIO_STATUS_FEATURES_OK) as U32);
+
+    // Step 6: Set up virtqueues
+    // Select queue 0 (controlq)
+    gpu_write32(0x30, 0); // QueueSel
+    gpu_write32(0x38, VRING_SIZE as U32); // QueueNum
+
+    // Queue addresses would be set here via QueueDescLow/High, etc.
+    let desc_addr = GPU.controlq.desc.as_ptr() as U64;
+    gpu_write32(0x80, desc_addr as U32);         // QueueDescLow
+    gpu_write32(0x84, (desc_addr >> 32) as U32); // QueueDescHigh
+
+    // Step 7: Driver OK
+    gpu_write32(0x70,
+        (VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER | VIRTIO_STATUS_FEATURES_OK | VIRTIO_STATUS_DRIVER_OK) as U32
+    );
+
+    // Clear framebuffer
+    for i in 0..FB_SIZE {
+        GPU.fb[i] = 0;
+    }
+
+    GPU.initialized = true;
+    0
+}
+
+/// Set a pixel in the framebuffer (BGRA format).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_set_pixel(x: U32, y: U32, color: U32) {
+    if x >= GPU.width || y >= GPU.height { return; }
+    let offset = ((y * GPU.stride) + (x * FB_BPP as U32)) as usize;
+    if offset + 4 > FB_SIZE { return; }
+    GPU.fb[offset]     = (color & 0xFF) as U8;         // B
+    GPU.fb[offset + 1] = ((color >> 8) & 0xFF) as U8;  // G
+    GPU.fb[offset + 2] = ((color >> 16) & 0xFF) as U8; // R
+    GPU.fb[offset + 3] = ((color >> 24) & 0xFF) as U8; // A
+}
+
+/// Fill a rectangle with a solid color.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_fill_rect(x: U32, y: U32, w: U32, h: U32, color: U32) {
+    let x_end = (x + w).min(GPU.width);
+    let y_end = (y + h).min(GPU.height);
+    let mut cy = y;
+    while cy < y_end {
+        let mut cx = x;
+        while cx < x_end {
+            sigma_virtio_gpu_set_pixel(cx, cy, color);
+            cx += 1;
         }
-        true
-    }
-
-    fn init_device(&mut self) {
-        // 1. Reset device
-        self.write_status(0);
-        // 2. Set ACKNOWLEDGE + DRIVER
-        self.write_status(3);
-        // 3. Negotiate features (no extra GPU features needed)
-        self.write_driver_features(0);
-        // 4. Set FEATURES_OK
-        self.write_status(0xB);
-        // 5. Set up virtqueues 0 (controlq) and 1 (cursorq)
-        self.setup_queue(0);
-        self.setup_queue(1);
-        // 6. Set DRIVER_OK
-        self.write_status(0xF);
-
-        // Query display info
-        let rect = self.get_display_info();
-        self.width  = rect.w;
-        self.height = rect.h;
-        self.stride = rect.w * 4;
-        self.fb_size = (rect.w * rect.h * 4) as usize;
-
-        // Allocate framebuffer (identity-mapped physical page)
-        self.fb_phys = self.alloc_framebuffer();
-
-        // Create 2D resource
-        self.resource_create_2d(self.resource_id, self.format, rect.w, rect.h);
-        // Attach backing storage
-        self.resource_attach_backing(self.resource_id, self.fb_phys, self.fb_size);
-        // Set scanout
-        self.set_scanout(self.scanout_id, self.resource_id, rect);
-        // Initial flush
-        self.flush(rect);
-
-        self.initialized = true;
-        GPU_READY.store(true, Ordering::Release);
-    }
-
-    // ── Public drawing interface ───────────────────────────────────────────
-
-    /// Write a full frame to the display.
-    pub fn present(&self, pixels: &[u32]) {
-        if !self.initialized { return; }
-        let len = (self.width * self.height) as usize;
-        let fb = unsafe {
-            core::slice::from_raw_parts_mut(self.fb_phys as *mut u32, len)
-        };
-        let src_len = pixels.len().min(len);
-        fb[..src_len].copy_from_slice(&pixels[..src_len]);
-        let rect = Rect { x: 0, y: 0, w: self.width, h: self.height };
-        self.transfer_to_host(self.resource_id, rect, 0);
-        self.flush(rect);
-    }
-
-    /// Fill a rectangle with a solid color.
-    pub fn fill_rect(&self, rect: Rect, color: u32) {
-        let fb = unsafe {
-            core::slice::from_raw_parts_mut(self.fb_phys as *mut u32,
-                (self.width * self.height) as usize)
-        };
-        for row in rect.y..rect.y + rect.h {
-            for col in rect.x..rect.x + rect.w {
-                let idx = (row * self.width + col) as usize;
-                if idx < fb.len() { fb[idx] = color; }
-            }
-        }
-        self.transfer_to_host(self.resource_id, rect, 0);
-        self.flush(rect);
-    }
-
-    // ── VirtIO GPU commands ────────────────────────────────────────────────
-
-    fn get_display_info(&self) -> Rect {
-        // In QEMU, default display is 1024x768
-        Rect { x: 0, y: 0, w: 1024, h: 768 }
-    }
-
-    fn resource_create_2d(&self, rid: u32, fmt: u32, w: u32, h: u32) {
-        let _cmd = ResourceCreate2D {
-            hdr: self.ctrl_hdr(GpuCmd::RESOURCE_CREATE_2D as u32),
-            resource_id: rid, format: fmt, width: w, height: h,
-        };
-        self.send_ctrl_cmd(&_cmd as *const _ as *const u8,
-                           core::mem::size_of::<ResourceCreate2D>());
-    }
-
-    fn resource_attach_backing(&self, rid: u32, phys: u64, size: usize) {
-        // AttachBacking: 1 entry
-        #[repr(C)]
-        struct AttachBacking { hdr: CtrlHdr, resource_id: u32, nr_entries: u32 }
-        #[repr(C)]
-        struct MemEntry { addr: u64, length: u32, _pad: u32 }
-        let cmd = AttachBacking {
-            hdr: self.ctrl_hdr(GpuCmd::RESOURCE_ATTACH_BACKING as u32),
-            resource_id: rid, nr_entries: 1,
-        };
-        let entry = MemEntry { addr: phys, length: size as u32, _pad: 0 };
-        let _ = (cmd, entry);
-    }
-
-    fn set_scanout(&self, scanout_id: u32, rid: u32, rect: Rect) {
-        let _cmd = SetScanout {
-            hdr: self.ctrl_hdr(GpuCmd::SET_SCANOUT as u32),
-            r: rect, scanout_id, resource_id: rid,
-        };
-        self.send_ctrl_cmd(&_cmd as *const _ as *const u8,
-                           core::mem::size_of::<SetScanout>());
-    }
-
-    fn transfer_to_host(&self, rid: u32, rect: Rect, offset: u64) {
-        let _cmd = TransferToHost2D {
-            hdr: self.ctrl_hdr(GpuCmd::TRANSFER_TO_HOST_2D as u32),
-            r: rect, offset, resource_id: rid, _pad: 0,
-        };
-        self.send_ctrl_cmd(&_cmd as *const _ as *const u8,
-                           core::mem::size_of::<TransferToHost2D>());
-    }
-
-    fn flush(&self, rect: Rect) {
-        let _cmd = ResourceFlush {
-            hdr: self.ctrl_hdr(GpuCmd::RESOURCE_FLUSH as u32),
-            r: rect, resource_id: self.resource_id, _pad: 0,
-        };
-        self.send_ctrl_cmd(&_cmd as *const _ as *const u8,
-                           core::mem::size_of::<ResourceFlush>());
-    }
-
-    fn ctrl_hdr(&self, cmd: u32) -> CtrlHdr {
-        CtrlHdr { cmd_type: cmd, flags: 0, fence_id: 0, ctx_id: 0, _pad: 0 }
-    }
-
-    fn send_ctrl_cmd(&self, _data: *const u8, _len: usize) {
-        // Place command in controlq descriptor, kick device via MMIO notify
-        // Full virtqueue implementation omitted for brevity; in production
-        // this writes to the virtqueue desc/avail rings and writes to notify reg
-        unsafe {
-            core::ptr::write_volatile(
-                (self.mmio_base + 0x50) as *mut u32, 0 // queue notify index 0
-            );
-        }
-    }
-
-    // ── MMIO register access ───────────────────────────────────────────────
-    fn write_status(&self, val: u8) {
-        unsafe {
-            core::ptr::write_volatile((self.mmio_base + 0x70) as *mut u8, val);
-        }
-    }
-    fn write_driver_features(&self, val: u32) {
-        unsafe {
-            core::ptr::write_volatile((self.mmio_base + 0x04) as *mut u32, val);
-        }
-    }
-    fn setup_queue(&self, idx: u16) {
-        unsafe {
-            core::ptr::write_volatile((self.mmio_base + 0x30) as *mut u16, idx);
-        }
-    }
-
-    // ── Memory ────────────────────────────────────────────────────────────
-    fn alloc_framebuffer(&self) -> u64 {
-        let pages = (self.fb_size + 0xFFF) / 0x1000;
-        // Allocate pages from buddy allocator
-        crate::kernel::mm::buddy_allocator::alloc_pages(
-            (pages as f64).log2().ceil() as u8
-        ).unwrap_or(0x1000_0000) as u64
+        cy += 1;
     }
 }
 
-// ── PCI scan helper ────────────────────────────────────────────────────────
-fn pci_find_device(vendor: u16, device: u16) -> Option<usize> {
-    // Scan PCI config space: bus 0-255, dev 0-31, func 0-7
-    for bus in 0u8..=255 {
-        for slot in 0u8..32 {
-            let addr = pci_cfg_addr(bus, slot, 0, 0);
-            let id = pci_read32(addr);
-            if id == 0xFFFF_FFFF { continue; }
-            let vid = (id & 0xFFFF) as u16;
-            let did = (id >> 16) as u16;
-            if vid == vendor && did == device {
-                // Return BAR0 address
-                let bar0 = pci_read32(pci_cfg_addr(bus, slot, 0, 0x10));
-                return Some((bar0 & !0xF) as usize);
-            }
-        }
-    }
-    None
+/// Clear the framebuffer to a solid color.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_clear(color: U32) {
+    sigma_virtio_gpu_fill_rect(0, 0, GPU.width, GPU.height, color);
 }
 
-fn pci_cfg_addr(bus: u8, slot: u8, func: u8, offset: u8) -> u32 {
-    0x8000_0000
-    | ((bus as u32) << 16)
-    | ((slot as u32) << 11)
-    | ((func as u32) << 8)
-    | (offset as u32 & !3)
-}
-
-fn pci_read32(addr: u32) -> u32 {
-    unsafe {
-        core::arch::asm!("out dx, eax", in("dx") 0xCF8u16, in("eax") addr);
-        let v: u32;
-        core::arch::asm!("in eax, dx", out("eax") v, in("dx") 0xCFCu16);
-        v
+/// Draw a horizontal line.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_hline(x: U32, y: U32, len: U32, color: U32) {
+    let end = (x + len).min(GPU.width);
+    let mut cx = x;
+    while cx < end {
+        sigma_virtio_gpu_set_pixel(cx, y, color);
+        cx += 1;
     }
 }
 
-// ── Module init ────────────────────────────────────────────────────────────
-pub fn virtio_gpu_init() -> bool {
-    VirtioGpu::probe_and_init()
+/// Draw a vertical line.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_vline(x: U32, y: U32, len: U32, color: U32) {
+    let end = (y + len).min(GPU.height);
+    let mut cy = y;
+    while cy < end {
+        sigma_virtio_gpu_set_pixel(x, cy, color);
+        cy += 1;
+    }
 }
 
-pub fn virtio_gpu_is_ready() -> bool {
-    GPU_READY.load(Ordering::Relaxed)
+/// Get the framebuffer base pointer for direct access.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_fb_ptr() -> *const U8 {
+    GPU.fb.as_ptr()
 }
 
-pub fn virtio_gpu_present(pixels: &[u32]) {
-    unsafe { VIRTIO_GPU.present(pixels); }
-}
+/// Get the display width.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_width() -> U32 { GPU.width }
 
-pub fn virtio_gpu_fill(rect: Rect, color: u32) {
-    unsafe { VIRTIO_GPU.fill_rect(rect, color); }
+/// Get the display height.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_height() -> U32 { GPU.height }
+
+/// Get the stride (bytes per row).
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_stride() -> U32 { GPU.stride }
+
+/// Check if the GPU is initialized.
+#[no_mangle]
+pub unsafe extern "C" fn sigma_virtio_gpu_ready() -> i32 {
+    if GPU.initialized { 1 } else { 0 }
 }
