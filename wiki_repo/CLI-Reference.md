@@ -1,174 +1,112 @@
-# SigmaOS CLI Reference
+# CLI Reference
 
-The `sigma` command-line tool is a unified orchestrator for every aspect of the SigmaOS development lifecycle.
-It ships as a **single static binary** compiled from `tools/sigma-cli.rs` (Rust, no external dependencies).
+1
 
-## Installation
-
-```bash
-cargo build --release --manifest-path tools/Cargo.toml
-
-# Binary output: tools/target/release/sigma
-
-# Copy to PATH:
-
-sudo cp tools/target/release/sigma /usr/local/bin/sigma
-```
-
-## Global Options
-
-| Flag | Description |
-|------|-------------|
-| `--json` | Machine-readable JSON output on stdout |
-
-## Commands
-
-### `sigma init <name>`
-
-Bootstrap a new SigmaOS kernel module, driver, or userland app.
-
-```bash
-sigma init my_driver
-```
-
-Generates:
-
-```text
-my_driver/
-├── Config.sigma        # project metadata (name, arch, license)
-
-└── src/
-    └── main.rs         # no_std entry stub
-
-```
+> The sovereign command-line interface for the 7-layer lattice.
 
 ---
 
-### `sigma build [--target <arch>]`
+1
 
-Unified build orchestrator. Wraps CMake/Cargo/Go under one command.
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| **`sigma-office`**|**Produce**|**Sovereign Productivity Suite (Docs, Sheets, Slides).** |
 
-```bash
-sigma build --target riscv64gc
-sigma build --target x86_64 --release
-```
+| **`sigma-nexus`**|**Manage**|**Sovereign Enterprise ERP/CRM/Cloud management.** |
 
----
+| **`sigma-linux`**|**Compatibility**|**Run legacy Linux/POSIX binaries via S99 translation.** |
 
-### `sigma run [--headless] [--serial]`
+| **`sigma-reg`**|**Configure**|**Query/Edit the Sovereign Registry (Git-backed).** |
 
-Boot the built kernel image inside QEMU.
+| `sigma-driver` | Manage | Load, list, and auto-detect modular kernel drivers. |
 
-```bash
-sigma run
-sigma run --headless --serial
-sigma run --debug     # attaches gdb on :1234
+1
 
-sigma run --snapshot  # saves VM state on exit
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| **`sigma-claw`**|**Automate**|**Sovereign Claw AI Automation (Multi-step intents).** |
 
-```
+| **`sigma-shell`**|**Interact**|**Enter the Sovereign Intent Shell (NL-to-CLI).** |
 
----
+| `sigma-ai status` | Monitor | Check the health of the local AI assistant. |
+| `sigma-ai query` | Interact | Send a natural language command to the OS. |
 
-### `sigma debug`
+1
 
-Launches QEMU with `-s -S`, waits for gdb on port `:1234`, and auto-loads kernel symbols.
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `sigma-init` | Initialize | Manage and list system services (AI-enhanced). |
+| **`sigma-reg`**|**Configure**|**Query/Edit the Sovereign Registry (Git-backed).** |
 
----
+| `sigma-boot-fast` | Boot | Execute Apex Fast Startup (Hybrid Hibernation). |
+| `sigma-irq` | Inspect | View the hardware IDT and active interrupt handlers. |
+| `sigma-sched` | Tune | Configure SHS v2 Hybrid Scheduling policies. |
+| `sigma-bench` | Test | Run performance and security benchmarks across the lattice. |
+| `sigma-dev`   | Toolkit | Debugging, profiling, and tracing utilities for shards. |
+| `sigma-recover` | Rollback | Boot into the last known good Apex checkpoint. |
 
-### `sigma pkg <action> [name]`
+1
 
-Package manager for the Sigma Store registry.
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `sigma-top` | Monitor | Real-time system monitor (CPU, Mem, GPU, AI metrics). |
+| `sigma-log` | View | Unified logging tool for all sovereign lattice events. |
+| `sigma-net` | Diagnose | Network diagnostics with PQC and sovereignty checks. |
+| `sigma-update` | Update | Unified updater with automatic snapshot rollback protection. |
+| `sigma-health` | Audit | Comprehensive system health check (Kernel, UI, Sec, AI). |
 
-| Action | Description |
-|--------|-------------|
-| `add <name>` | Download and install a package |
-| `remove <name>` | Uninstall a package |
-| `list` | Show installed packages |
-| `search <query>` | Search the registry |
-| `audit` | Check for vulnerabilities in installed packages |
+1
 
----
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `sigma-pkg install` | Install | Install a shard (automatically creates a pre-install snapshot). |
+| `sigma-pkg remove` | Remove | Purge a shard from the lattice (creates a safety snapshot). |
+| `sigma-pkg list` | List | View all installed sovereign shards and their versions. |
+| `sigma-pkg graph` | Visualize | Generate a dependency DAG of the current system. |
 
-### `sigma sdk <version>`
+1
 
-Toolchain manager — like `rustup` but for SigmaOS cross-compilers.
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `zenith-start` | Launch | Start the Wayland-native Zenith compositor. |
+| `zenith-layout` | Switch | Change the UI layout (Mosaic, Tile, Stack). |
+| `zenith-theme` | Style | Apply a new visual theme (Dark, Cyber, Paper). |
+| `zenith-status` | Health | Monitor surface health and GPU fallback status. |
 
-```bash
-sigma sdk nightly
-sigma sdk 0.3.0
-```
+1
 
----
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `sigma-sec attest` | Handshake | Perform TPM 2.0 hardware attestation. |
+| `sigma-sec audit` | Verify | Run PQC compliance audit on all active shards. |
+| `sigma-sec enforce` | Policy | Apply strict security policies to the kernel lattice. |
 
-### `sigma test [--bench]`
+1
 
-Run unit tests on the host and integration tests inside a booted QEMU instance.
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `sigma-ai status` | Monitor | Check the health of the local AI assistant. |
+| `sigma-ai query` | Interact | Send a natural language command to the OS orchestrator. |
+| `sigma-ai adapt` | Optimize | Enable AI-driven UI and resource optimization. |
 
----
+1
 
-### `sigma lint`
-
-Static analysis: Clippy (Rust), clang-tidy (C/C++), and SigmaOS-specific kernel safety rules.
-
----
-
-### `sigma fmt`
-
-Multi-language formatter across the entire repository.
-
----
-
-### `sigma trace [--pid <pid>]`
-
-Live-attach to a running SigmaOS instance over serial/vsock and stream syscall + scheduler events.
-
----
-
-### `sigma image [--minimal] [--with pkg1,pkg2]`
-
-Build a reproducible bootable image (`.img`, `.iso`, UEFI ESP, Raspberry Pi SD).
-
----
-
-### `sigma node <action>`
-
-Fleet control: `enroll`, `status`, `update`, `ssh`, `logs`, `metrics`.
-
----
-
-### `sigma key`
-
-Generate device identity keys, sign packages/images, and verify the chain of trust (TPM/HSM integration).
+| Command | Action | Description |
+| --------- | -------- | ------------- |
+| `sigma-snap create` | Capture | Manually create a silicon-direct system snapshot. |
+| `sigma-snap list` | View | List all available restore points in the `S41` registry. |
+| `sigma-snap rollback` | Restore | Revert the system to a specific snapshot ID. |
+| `sigma-snap monitor` | Watchdog | Start the daemon that triggers auto-rollback on failure. |
 
 ---
 
-### `sigma update [--channel stable|beta|nightly]`
+1
 
-Perform an A/B partition OTA swap with automatic rollback on boot failure.
+1
 
----
+1
 
-### `sigma doctor`
+s-cli sigma-pkg install sigma-pqc-kyber
+s-cli sigma-sec audit
 
-Checks that all toolchain dependencies (Rust, Zig, QEMU, etc.) are healthy and correctly versioned.
-
-## Shell Completions
-
-```bash
-sigma completions bash  >> ~/.bashrc
-sigma completions zsh   >> ~/.zshrc
-sigma completions fish  > ~/.config/fish/completions/sigma.fish
-sigma completions pwsh  >> $PROFILE
-```
-
-## Plugin System
-
-Any binary named `sigma-<name>` on `PATH` is auto-discovered as a subcommand (cargo-style):
-
-```bash
-
-# e.g., place sigma-profiler in /usr/local/bin:
-
-sigma profiler start
-```
+1
