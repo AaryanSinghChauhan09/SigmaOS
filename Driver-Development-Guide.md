@@ -1,317 +1,144 @@
-# SigmaOS Driver Development Guide
+# Driver Development Guide
 
-> Build stable, sovereign, AI-portable drivers for SigmaOS.
-> One framework. Stable ABI. Works on every SigmaOS version forever.
+> SigmaOS v15.0 "Zenith" — Writing Kernel Drivers
 
----
+## Overview
 
-## Why SigmaOS Drivers Are Different
-
-| | Windows | Linux | SigmaOS |
-|---|---|---|---|
-| ABI stability | Stable (decades) | Breaks on kernel update | **Stable across all versions** |
-| Source model | Mostly closed | Mostly open | **Open + closed coexist** |
-| Isolation | Ring-0 (kernel crash) | Ring-0 | **Ring-3 option (crash-safe)** |
-| Security model | Vendor trust | None | **sigma_pledge per driver** |
-| AI porting | None | None | **sigma-driver-porter** |
-| Vendor friction | High (WHQL cert) | Medium | **Low (open DDK + AI help)** |
+SigmaOS drivers are Rust modules compiled into the kernel image. All driver code must be `#![no_std]` compatible. Drivers interact with hardware via MMIO (Memory-Mapped I/O) and PCI configuration space.
 
 ---
 
-## Quick Start
+## Quick Start: Adding a New Driver
 
-```bash
-
-# Install DDK tools
-
-sigma-pkg install sigma-ddk
-
-# Scaffold a new driver
-
-sigma-shard-new my-nic-driver --template networking
-
-# Or port a Linux driver
-
-sigma-driver-porter port linux_driver.c
-sigma-driver-porter port linux_driver.c --ai  # AI-assisted translation
-
-# Build
-
-cd sigma-my-nic-driver && cargo build --release
-
-# Validate
-
-sigma-ddk validate target/release/libsigma_my_nic_driver.so
-
-# List registered drivers
-
-sigma-ddk list
-```
-
----
-
-## The SDF Lifecycle
-
-Every SigmaOS driver follows the Sovereign Driver Framework (SDF):
+### 1. Create the driver file
 
 ```
-sigma_ddk loads driver
-       │
-       ▼
-  probe(pci_bar, irq)   → return 0 if hardware found, -1 if not
-       │
-       ▼
-  init()                → map MMIO, alloc DMA, request IRQ, call sigma_pledge()
-       │
-       ▼
-  run() / IRQ loop      → handle events, communicate via sigma-bus
-       │
-       ▼
-  shutdown()            → release all resources
+kernel/drivers/<category>/sigma_<device>.rs
 ```
 
----
+Categories: `gpu/`, `net/`, `audio/`, `bt/`, `storage/`, `input/`, `usb/`
 
-## Minimal Driver Example
+### 2. PCI Device Detection
+
+Use the `pci_find()` helper pattern to locate your device:
 
 ```rust
-// SPDX-License-Identifier: MIT
-// my-nic/src/lib.rs
-
-#![no_std]
-use sigma_ddk::*;
-
-const REG_CTRL:   u32 = 0x00;
-const REG_STATUS: u32 = 0x04;
-
-#[no_mangle]
-pub extern "C" fn my_nic_probe(pci_bar: u64, irq: u8) -> i32 {
-    // Check PCI vendor/device ID at config space offset 0
-    let id = pci_config_read32(0, 0, 0, 0);
-    if id & 0xFFFF != 0x8086 { return -1; }  // not our device
-    let _ = (pci_bar, irq);
-    0
-}
-
-#[no_mangle]
-pub extern "C" fn my_nic_init() -> i32 {
-    // 1. Restrict capabilities (sigma_pledge)
-    unsafe {
-        extern "C" { fn sigma_pledge(p: *const u8, l: usize) -> i32; }
-        let pledge = b"stdio rpath inet\0";
-        sigma_pledge(pledge.as_ptr(), pledge.len());
+fn pci_find_device(vendor_id: u16, device_id: u16) -> Option<(usize, usize)> {
+    for bus in 0u8..=255 {
+        for slot in 0u8..32 {
+            let addr = 0x8000_0000u32 | ((bus as u32) << 16) | ((slot as u32) << 11);
+            let id = pci_read32(addr);
+            if id == 0xFFFF_FFFF { continue; }
+            if (id & 0xFFFF) as u16 == vendor_id && (id >> 16) as u16 == device_id {
+                let bar0 = (pci_read32(addr | 0x10) & !0xF) as usize; // MMIO base
+                let bar1 = (pci_read32(addr | 0x14) & !0xF) as usize;
+                return Some((bar0, bar1));
+            }
+        }
     }
-    // 2. Map MMIO (production: use pci_bar from probe)
-    let _bar = iomap(0xFEB00000, 0x10000);
-    // 3. Configure hardware registers
-    // mmio_write32(bar as *mut u32, REG_CTRL, 0x01);  // enable
-    0
+    None
 }
-
-#[no_mangle]
-pub extern "C" fn my_nic_shutdown() {
-    // Disable hardware, free DMA, release IRQ
-}
-
-#[no_mangle]
-pub extern "C" fn my_nic_irq() -> bool {
-    // Read interrupt status, handle RX/TX
-    // sigma_bus_send(BUS_NETWORK, &event, size_of::<NetEvent>());
-    true  // interrupt was ours
-}
-
-// Register with SDF
-sigma_register_driver!(SigmaDriverDescriptor {
-    magic:       SIGMA_DDK_MAGIC,
-    abi_version: DDK_ABI_VERSION,
-    vendor_id:   0x8086,
-    device_id:   0x100E,   // Intel e1000
-    class:       DriverClass::Network as u16,
-    flags:       SIGMA_DRV_FLAG_OPEN_SOURCE,
-    ring:        3,        // ring-3 isolated (recommended)
-    fn_probe:    Some(my_nic_probe),
-    fn_init:     Some(my_nic_init),
-    fn_shutdown: Some(my_nic_shutdown),
-    fn_irq:      Some(my_nic_irq),
-    ..Default::default()
-});
 ```
 
----
+### 3. MMIO Access Pattern
 
-## sigma_pledge for Drivers
-
-Every driver must call `sigma_pledge()` at the start of `init()` to declare its capabilities. This limits the damage if the driver is exploited.
-
-| Driver type | Recommended pledge |
-|---|---|
-| Network NIC | `"stdio rpath inet"` |
-| Storage block | `"stdio rpath wpath"` |
-| GPU display | `"stdio video"` |
-| Audio | `"stdio audio"` |
-| USB HID | `"stdio device"` |
-| Serial/I2C | `"stdio device"` |
-| Crypto accelerator | `"stdio"` |
-
----
-
-## sigma-bus Communication
-
-Drivers communicate with userspace via sigma-bus typed channels:
+Always use `read_volatile` / `write_volatile` for MMIO registers:
 
 ```rust
-// Notify userspace of received network packet
-let event = NetRxEvent { len: pkt.len, flags: 0 };
-sigma_bus_send(BUS_NETWORK, &event as *const _ as *const u8,
-               core::mem::size_of::<NetRxEvent>());
+fn read32(base: usize, offset: usize) -> u32 {
+    unsafe { core::ptr::read_volatile((base + offset) as *const u32) }
+}
 
-// Channels
-const BUS_NETWORK:  u32 = 0x0100;
-const BUS_STORAGE:  u32 = 0x0200;
-const BUS_DISPLAY:  u32 = 0x0300;
-const BUS_AUDIO:    u32 = 0x0400;
-const BUS_INPUT:    u32 = 0x0500;
+fn write32(base: usize, offset: usize, val: u32) {
+    unsafe { core::ptr::write_volatile((base + offset) as *mut u32, val) }
+}
 ```
 
----
+### 4. Register the Driver
 
-## Ring-3 Driver Isolation
-
-Setting `ring: 3` in the descriptor runs the driver in an isolated ring-3 process. If it crashes, the kernel keeps running.
+Add to `kernel/drivers/mod.rs`:
 
 ```rust
-// Ring-3 isolated driver — crashes don't take down kernel
-sigma_register_driver!(SigmaDriverDescriptor {
-    ring:  3,    // 0 = ring-0 (kernel), 3 = userspace process
-    flags: SIGMA_DRV_FLAG_RING3 | SIGMA_DRV_FLAG_OPEN_SOURCE,
-    // ... rest of descriptor
-});
+pub mod sigma_mydevice;
 ```
 
-Recommended: use ring-3 for all third-party and community drivers. Ring-0 only for performance-critical core drivers (storage, NIC) after security review.
-
----
-
-## AI-Assisted Porting from Linux
-
-If you have a Linux driver to port (cleanroom — don't copy GPL code, study patterns):
-
-```bash
-
-# Analyse the Linux driver structure
-
-sigma-driver-porter analyse linux_rtl8169.c
-
-# Generate SigmaOS skeleton from patterns
-
-sigma-driver-porter port linux_rtl8169.c
-
-# Full AI translation (needs sigma-agent daemon)
-
-sigma-driver-porter port linux_rtl8169.c --ai
-
-# The tool maps Linux APIs → SigmaOS equivalents:
-
-# ioremap          → ddk::iomap
-
-# readl/writel     → ddk::mmio_read32/write32
-
-# request_irq      → ddk::request_irq
-
-# kmalloc          → kfree/kmalloc
-
-# netdev_alloc     → sigma_bus_send
-
-# pci_register_driver → sigma_register_driver
-
-```
-
----
-
-## Stable ABI Guarantee
-
-The `SigmaDriverDescriptor` struct layout is **frozen at DDK v1.0**. Drivers compiled today will work on SigmaOS v20.0 without recompilation.
-
-Rules:
-
-- New fields only added at the end of the struct
-
-- ABI version bumped only for breaking changes (never planned)
-
-- Old drivers gracefully ignored if ABI version < required
-
+Add init call in `kernel_main()`:
 ```rust
-// Check ABI version at driver load time
-if desc.abi_version != DDK_ABI_VERSION {
-    // Kernel handles version mismatch gracefully
+if sigma_mydevice::init() {
+    log!("MyDevice driver loaded");
 }
 ```
 
 ---
 
-## Dual Mode: Open + Closed Drivers
+## Interrupt Handling
 
-SigmaOS supports both:
+Register your IRQ handler:
 
-```toml
+```rust
+// In your driver init:
+sigma_irq::register_handler(irq_number, my_irq_handler);
 
-# Open source driver (preferred)
-
-flags = SIGMA_DRV_FLAG_OPEN_SOURCE
-
-# Vendor-supplied closed blob (e.g., NVIDIA proprietary)
-
-flags = SIGMA_DRV_FLAG_CERTIFIED   # vendor-signed binary
-
-```
-
-Closed drivers are accepted with:
-
-1. Dilithium-5 vendor signature
-
-2. Published security contact
-
-3. Ring-3 isolation enforced (no ring-0 for closed drivers)
-
----
-
-## Submitting to sigma_pkg_registry
-
-```bash
-
-# 1. Write sigma-shard.toml with driver metadata
-
-# 2. Build and validate
-
-cargo build --release
-sigma-ddk validate target/release/libmy_driver.so
-
-# 3. Create package recipe
-
-sigma-pkg recipe create my-nic-driver
-
-# 4. Submit PR to sigma_pkg_registry/recipes/
-
-# File: sigma_pkg_registry/recipes/sigma-driver-my-nic.toml
-
+// Your handler:
+fn my_irq_handler() {
+    // Read interrupt status register
+    let status = read32(BASE, STATUS_REG);
+    // Handle the interrupt
+    // ...
+    // Acknowledge
+    sigma_irq::eoi(irq_number);
+}
 ```
 
 ---
 
-## Getting Vendor Certification
+## DMA
 
-Want the **SIGMA_DRV_FLAG_CERTIFIED** badge?
+For DMA operations, allocate physically contiguous pages:
 
-1. Submit driver to https://github.com/AaryanSinghChauhan09/SigmaOS/issues (Driver Certification)
+```rust
+let phys_addr = buddy_allocator::alloc_pages(order)?;
+let virt_addr = sigma_vmm::phys_to_virt(phys_addr);
+```
 
-2. Provide: source code (or binary + security contact), test results, hardware to lend for CI
-
-3. SigmaOS team reviews, signs with project Dilithium-5 key
-
-4. Listed in sigma-ddk certified registry
-
-Benefits: driver shows "✓ Certified" in sigma-capstore, higher trust score, auto-included in SigmaOS ISO for supported hardware.
+Always flush CPU cache before device DMA reads, and invalidate after device DMA writes.
 
 ---
 
-*See also: [sigma-ddk CLI](Driver-Development-Guide) · [Shard Development Guide](Shard-Development-Guide) · [Architecture Overview](Architecture-Overview) · [Security Model](Security-Model)*
+## ARM64 Drivers
+
+For ARM64 targets, use the GIC instead of APIC:
+
+```rust
+sigma_gic::enable_irq(irq_number);
+// ... your handler ...
+sigma_gic::eoi(irq_number);
+```
+
+The BCM2711 (Raspberry Pi 4) HAL is in `arch/arm64/sigma_bcm2711.rs`.
+
+---
+
+## Existing Drivers Reference
+
+| Driver | File | Hardware |
+|---|---|---|
+| VirtIO GPU | `sigma_virtio_gpu.rs` | QEMU/KVM virtual GPU |
+| Intel i915 | `sigma_i915.rs` | Intel Gen9+ integrated graphics |
+| AMD GPU | `sigma_amdgpu.rs` | AMD discrete/integrated GPU |
+| Intel Wi-Fi 6 | `sigma_iwlwifi.rs` | AX200/AX210 802.11ax |
+| Realtek USB Wi-Fi | `sigma_rtl8xxxu.rs` | RTL8XXXU USB devices |
+| Intel HDA | `sigma_hda.rs` | Intel HD Audio (CORB/RIRB) |
+| USB Bluetooth | `sigma_hci_usb.rs` | Generic USB HCI |
+| ARM GIC | `sigma_gic.rs` | ARM Generic Interrupt Controller |
+| BCM2711 | `sigma_bcm2711.rs` | Raspberry Pi 4 HAL |
+
+---
+
+## Coding Standards
+
+- Use `#![no_std]` and `#![allow(dead_code)]` at the top of every driver file
+- Static driver state must use `static mut` guarded by an `AtomicBool` ready flag
+- Never `panic!` in interrupt context
+- All public functions must have doc comments
+- Run `cargo clippy` before submitting a PR
