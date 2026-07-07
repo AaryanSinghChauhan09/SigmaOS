@@ -1,24 +1,32 @@
-# SigmaOS Language Policy & ABI Guidelines
+# Language Policy for SigmaOS
 
-To stabilize our polyglot codebase and avoid ABI conflicts, SigmaOS enforces strict guidelines on programming language usage.
+## Permitted Languages (production code only)
 
----
+| Language     | Scope                                          | Rationale                                      |
+| :----------- | :--------------------------------------------- | :--------------------------------------------- |
+| **C**        | Kernel, drivers, boot, POSIX tools             | No runtime, bare-metal, deterministic ABI      |
+| **Rust**     | Userland daemons, sigpkg, SigmaAI engine       | Memory-safe, `no_std` capable, zero-cost       |
+| **NASM/AT&T ASM** | CPU-specific boot stubs, ISR entry points | Required for x86_64/AArch64 bare-metal startup |
+| **POSIX sh** | Build scripts, CI hooks                        | Universal, no runtime dependency               |
+| **Batch**    | Windows host-side build helpers only           | Native CMD, no PowerShell/Python required      |
 
-## 🗺️ Language Domains
+## Banned Languages (production code)
 
-| Language | Primary Target Domain | Execution Rules |
-| :--- | :--- | :--- |
-| **Rust** | Microkernel core, critical modules, modern driver trees. | `#![no_std]`, no standard allocation unless in dedicated crates. |
-| **Zig** | Leaf performance-sensitive drivers, low-level HAL utilities. | Minimal dependency, static leaf compilation only. |
-| **Ada/SPARK** | Formal proof-critical security checkers, memory verifiers. | Must pass `gnatprove` analysis before merge. |
-| **Nim** | Userspace tools, CLI helpers, store package managers. | Compiled with JS backend or C backend without GC when inside userspace. |
+| Language       | Status    | Migration path                          |
+| :------------- | :-------- | :-------------------------------------- |
+| **JavaScript** | REMOVED   | No replacement in core OS              |
+| **HTML**       | REMOVED   | Desktop UI = Wayland native C/Rust     |
+| **Python**     | REMOVED   | Replaced with C tools or Rust          |
+| **Go**         | REMOVED   | Replaced with Rust daemons             |
+| **PowerShell** | REMOVED   | Replaced with POSIX sh or Batch        |
+| **PHP**        | FORBIDDEN | Not applicable                         |
+| **Ruby**       | FORBIDDEN | Not applicable                         |
 
----
+## Exceptions
 
-## 📞 FFI Boundaries (The kabi/ C-ABI Rules)
+- **Test harnesses**: POSIX sh test scripts only.
+- **CI pipeline**: GitHub Actions YAML (declarative, not executable code).
+- **Documentation**: Markdown only (`.md`).
 
-1. **repr(C)**: All cross-language structures MUST be defined in `kabi/` as `#[repr(C)]` Rust structures or equivalent C headers.
-
-2. **Raw Pointers**: Avoid returning raw allocations. Pass structures by reference/pointer with explicit size boundaries.
-
-3. **No Panic FFI**: Rust code must not panic across an FFI boundary. Use `catch_unwind` or check boundaries before execution.
+> [!IMPORTANT]
+> Any PR introducing a new file with a banned extension will be rejected automatically by CI.
