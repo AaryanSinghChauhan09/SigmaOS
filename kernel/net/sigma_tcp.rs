@@ -111,3 +111,95 @@ pub unsafe extern "C" fn sigma_tcp_handle_syn(
     
     -1 // Queue full, drop
 }
+
+/// Handle TCP ACK packet (for 3-way handshake completion)
+#[no_mangle]
+pub unsafe extern "C" fn sigma_tcp_handle_ack(
+    conn_idx: i32, ack: SigmaU32
+) -> i32 {
+    if conn_idx < 0 || conn_idx >= MAX_TCP_CONNS as i32 {
+        return -1;
+    }
+    
+    let conn = &mut TCP_CONNS[conn_idx as usize];
+    if !conn.active {
+        return -1;
+    }
+    
+    match conn.state {
+        TcpState::SynReceived => {
+            if ack == conn.snd_nxt {
+                conn.state = TcpState::Established;
+                return 0; // Connection established
+            }
+        }
+        TcpState::Established => {
+            if ack >= conn.snd_una && ack <= conn.snd_nxt {
+                conn.snd_una = ack;
+                return 0;
+            }
+        }
+        _ => {}
+    }
+    
+    -1
+}
+
+/// Send data on established TCP connection
+#[no_mangle]
+pub unsafe extern "C" fn sigma_tcp_send(
+    conn_idx: i32, data: *const u8, len: usize
+) -> i32 {
+    if conn_idx < 0 || conn_idx >= MAX_TCP_CONNS as i32 {
+        return -1;
+    }
+    
+    let conn = &mut TCP_CONNS[conn_idx as usize];
+    if !conn.active || conn.state != TcpState::Established {
+        return -1;
+    }
+    
+    // Update sequence numbers
+    conn.snd_nxt += len as SigmaU32;
+    
+    // In real implementation, this would queue data for transmission
+    // For now, return success
+    len as i32
+}
+
+/// Receive data from TCP connection
+#[no_mangle]
+pub unsafe extern "C" fn sigma_tcp_recv(
+    conn_idx: i32, buffer: *mut u8, max_len: usize
+) -> i32 {
+    if conn_idx < 0 || conn_idx >= MAX_TCP_CONNS as i32 {
+        return -1;
+    }
+    
+    let conn = &mut TCP_CONNS[conn_idx as usize];
+    if !conn.active || conn.state != TcpState::Established {
+        return -1;
+    }
+    
+    // In real implementation, this would read from receive buffer
+    // For now, return 0 (no data available)
+    0
+}
+
+/// Close TCP connection
+#[no_mangle]
+pub unsafe extern "C" fn sigma_tcp_close(conn_idx: i32) -> i32 {
+    if conn_idx < 0 || conn_idx >= MAX_TCP_CONNS as i32 {
+        return -1;
+    }
+    
+    let conn = &mut TCP_CONNS[conn_idx as usize];
+    if !conn.active {
+        return -1;
+    }
+    
+    conn.state = TcpState::Closed;
+    conn.active = false;
+    
+    0
+}

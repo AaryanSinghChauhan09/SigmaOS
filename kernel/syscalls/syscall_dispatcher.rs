@@ -185,26 +185,56 @@ impl SyscallDispatcher {
     // ─── File Operations ─────────────────────────────────────────────────────
 
     unsafe fn sys_read(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement read syscall
-        let _ = args;
-        0
+        let fd = args.arg0 as i32;
+        let buf = args.arg1 as *mut u8;
+        let count = args.arg2 as usize;
+        
+        if buf.is_null() || count == 0 {
+            return -1;
+        }
+        
+        // For now, return count as if read succeeded
+        // TODO: Integrate with VFS layer
+        count as SigmaI64
     }
 
     unsafe fn sys_write(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement write syscall
-        let _ = args;
-        0
+        let fd = args.arg0 as i32;
+        let buf = args.arg1 as *const u8;
+        let count = args.arg2 as usize;
+        
+        if buf.is_null() || count == 0 {
+            return -1;
+        }
+        
+        // For now, return count as if write succeeded
+        // TODO: Integrate with VFS layer
+        count as SigmaI64
     }
 
     unsafe fn sys_open(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement open syscall
-        let _ = args;
-        0
+        let pathname = args.arg0 as *const u8;
+        let flags = args.arg1 as i32;
+        let mode = args.arg2 as u32;
+        
+        if pathname.is_null() {
+            return -1;
+        }
+        
+        // For now, return fd 3 (first non-std fd)
+        // TODO: Integrate with VFS layer
+        3
     }
 
     unsafe fn sys_close(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement close syscall
-        let _ = args;
+        let fd = args.arg0 as i32;
+        
+        if fd < 0 {
+            return -1;
+        }
+        
+        // For now, return success
+        // TODO: Integrate with VFS layer
         0
     }
 
@@ -235,9 +265,20 @@ impl SyscallDispatcher {
     // ─── Memory Operations ───────────────────────────────────────────────────
 
     unsafe fn sys_mmap(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement mmap syscall
-        let _ = args;
-        0
+        let addr = args.arg0;
+        let length = args.arg1;
+        let prot = args.arg2;
+        let flags = args.arg3;
+        let fd = args.arg4 as i32;
+        let offset = args.arg5;
+        
+        if length == 0 {
+            return -1;
+        }
+        
+        // For now, return a dummy address
+        // TODO: Integrate with VMM
+        0x1000000
     }
 
     unsafe fn sys_mprotect(&self, args: SyscallArgs) -> SigmaI64 {
@@ -247,15 +288,24 @@ impl SyscallDispatcher {
     }
 
     unsafe fn sys_munmap(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement munmap syscall
-        let _ = args;
+        let addr = args.arg0;
+        let length = args.arg1;
+        
+        if addr == 0 || length == 0 {
+            return -1;
+        }
+        
+        // For now, return success
+        // TODO: Integrate with VMM
         0
     }
 
     unsafe fn sys_brk(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement brk syscall
-        let _ = args;
-        0
+        let brk = args.arg0;
+        
+        // For now, return the brk address
+        // TODO: Integrate with heap manager
+        brk as SigmaI64
     }
 
     unsafe fn sys_madvise(&self, args: SyscallArgs) -> SigmaI64 {
@@ -291,9 +341,11 @@ impl SyscallDispatcher {
     }
 
     unsafe fn sys_exit(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement exit syscall
-        let _ = args;
-        0
+        let exit_code = args.arg0 as i32;
+        
+        // For now, just return
+        // TODO: Integrate with process manager
+        exit_code as SigmaI64
     }
 
     unsafe fn sys_wait4(&self, args: SyscallArgs) -> SigmaI64 {
@@ -303,9 +355,9 @@ impl SyscallDispatcher {
     }
 
     unsafe fn sys_getpid(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement getpid syscall
         let _ = args;
-        0
+        // Return init process PID (1)
+        1
     }
 
     unsafe fn sys_kill(&self, args: SyscallArgs) -> SigmaI64 {
@@ -473,8 +525,9 @@ impl SyscallDispatcher {
     }
 
     unsafe fn sys_sched_yield(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement sched_yield syscall
         let _ = args;
+        // Yield CPU to next task
+        // TODO: Call scheduler yield
         0
     }
 
