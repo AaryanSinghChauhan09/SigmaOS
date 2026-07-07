@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (c) 2024-2026 SigmaOS Project
 //
-// kernel/drivers/gpu/sigma_amdgpu.rs — AMD GPU Driver
+// kernel/drivers/gpu/sigma_nouveau.rs — NVIDIA Nouveau Driver
 //
-// Implements AMD GPU driver with mainline improvements.
-// Supports Radeon RX 6000 series, RX 7000 series, and APUs.
-// Inspired by: Linux amdgpu driver, AMDGPU-PRO
+// Implements NVIDIA GPU driver with Nouveau improvements.
+// Supports GeForce GTX series, RTX series (experimental), and Tesla.
+// Inspired by: Linux nouveau driver, NVIDIA proprietary driver
 // Language: Rust #![no_std] — no alloc, no external crates.
 
 #![no_std]
@@ -20,7 +20,7 @@ type SigmaBool  = bool;
 type SigmaUsize = usize;
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const AMD_VID: SigmaU16 = 0x1002;
+const NVIDIA_VID: SigmaU16 = 0x10DE;
 /// Maximum number of GPU contexts.
 const MAX_CONTEXTS: SigmaUsize = 32;
 /// Maximum number of buffers.
@@ -28,28 +28,28 @@ const MAX_BUFFERS: SigmaUsize = 256;
 /// GPU name length.
 const GPU_NAME_LEN: SigmaUsize = 64;
 
-// ── AMD GPU Architecture ───────────────────────────────────────────────────
+// ── NVIDIA GPU Architecture ───────────────────────────────────────────────────
 #[repr(u8)]
 #[derive(Copy, Clone, PartialEq, Eq)]
-pub enum AmdGpuArch {
-    /// GCN 1.0 (Southern Islands).
-    Gcn1 = 1,
-    /// GCN 1.1 (Sea Islands).
-    Gcn1_1 = 2,
-    /// GCN 1.2 (Volcanic Islands).
-    Gcn1_2 = 3,
-    /// GCN 1.3 (Arctic Islands).
-    Gcn1_3 = 4,
-    /// GCN 1.4 (Vega).
-    Gcn1_4 = 5,
-    /// RDNA 1.0 (Navi 10/12/14).
-    Rdna1 = 6,
-    /// RDNA 2.0 (Navi 21/22/23).
-    Rdna2 = 7,
-    /// RDNA 3.0 (Navi 31/32/33).
-    Rdna3 = 8,
-    /// CDNA (compute).
-    Cdna = 9,
+pub enum NvidiaGpuArch {
+    /// Tesla (G80+).
+    Tesla = 1,
+    /// Fermi (GF100+).
+    Fermi = 2,
+    /// Kepler (GK100+).
+    Kepler = 3,
+    /// Maxwell (GM100+).
+    Maxwell = 4,
+    /// Pascal (GP100+).
+    Pascal = 5,
+    /// Volta (GV100+).
+    Volta = 6,
+    /// Turing (TU100+).
+    Turing = 7,
+    /// Ampere (GA100+).
+    Ampere = 8,
+    /// Ada Lovelace (AD100+).
+    Ada = 9,
 }
 
 // ── Buffer Type ───────────────────────────────────────────────────────────
@@ -116,37 +116,39 @@ impl GpuContext {
     }
 }
 
-// ── AMD GPU Device ───────────────────────────────────────────────────────
+// ── NVIDIA GPU Device ─────────────────────────────────────────────────────
 #[repr(C)]
-pub struct AmdGpuDevice {
+pub struct NvidiaGpuDevice {
     pub device_id: SigmaU32,
     pub name: [SigmaU8; GPU_NAME_LEN],
-    pub architecture: AmdGpuArch,
+    pub architecture: NvidiaGpuArch,
     pub pci_id: SigmaU32,
     pub vram_size: SigmaU64,
-    pub compute_units: SigmaU32,
+    pub cuda_cores: SigmaU32,
     pub initialized: SigmaBool,
-    pub _pad: [SigmaU8; 7],
+    pub reclocking_enabled: SigmaBool,
+    pub _pad: [SigmaU8; 6],
 }
 
-impl AmdGpuDevice {
+impl NvidiaGpuDevice {
     pub const fn new() -> Self {
         Self {
             device_id: 0,
             name: [0u8; GPU_NAME_LEN],
-            architecture: AmdGpuArch::Rdna2,
+            architecture: NvidiaGpuArch::Pascal,
             pci_id: 0,
             vram_size: 0,
-            compute_units: 0,
+            cuda_cores: 0,
             initialized: false,
-            _pad: [0u8; 7],
+            reclocking_enabled: true,
+            _pad: [0u8; 6],
         }
     }
 }
 
-// ── AMD GPU Driver ─────────────────────────────────────────────────────
-pub struct AmdGpuDriver {
-    pub device: AmdGpuDevice,
+// ── NVIDIA GPU Driver ─────────────────────────────────────────────────────
+pub struct NvidiaGpuDriver {
+    pub device: NvidiaGpuDevice,
     pub contexts: [GpuContext; MAX_CONTEXTS],
     pub buffers: [GpuBuffer; MAX_BUFFERS],
     pub context_count: SigmaUsize,
@@ -154,13 +156,13 @@ pub struct AmdGpuDriver {
     pub next_context_id: SigmaU32,
     pub next_buffer_id: SigmaU32,
     pub power_management: SigmaBool,
-    pub ras_enabled: SigmaBool,
+    pub firmware_loaded: SigmaBool,
 }
 
-impl AmdGpuDriver {
+impl NvidiaGpuDriver {
     pub const fn new() -> Self {
         Self {
-            device: AmdGpuDevice::new(),
+            device: NvidiaGpuDevice::new(),
             contexts: [GpuContext::new(); MAX_CONTEXTS],
             buffers: [GpuBuffer::new(); MAX_BUFFERS],
             context_count: 0,
@@ -168,7 +170,7 @@ impl AmdGpuDriver {
             next_context_id: 1,
             next_buffer_id: 1,
             power_management: true,
-            ras_enabled: true,
+            firmware_loaded: false,
         }
     }
 
@@ -176,43 +178,48 @@ impl AmdGpuDriver {
         self.device.pci_id = pci_id;
         self.device.architecture = self.detect_architecture(pci_id);
         self.device.vram_size = self.detect_vram_size(pci_id);
-        self.device.compute_units = self.detect_compute_units(pci_id);
+        self.device.cuda_cores = self.detect_cuda_cores(pci_id);
         self.device.initialized = true;
         
-        // Enable mainline improvements
+        // Enable Nouveau improvements
+        self.device.reclocking_enabled = true;
         self.power_management = true;
-        self.ras_enabled = true;
+        self.firmware_loaded = true;
         
         0
     }
 
-    fn detect_architecture(&self, pci_id: SigmaU32) -> AmdGpuArch {
+    fn detect_architecture(&self, pci_id: SigmaU32) -> NvidiaGpuArch {
         match pci_id {
-            0x73DF..=0x73FF => AmdGpuArch::Rdna3,      // Navi 31/32/33
-            0x73BF..=0x73CF => AmdGpuArch::Rdna2,      // Navi 21/22/23
-            0x731F..=0x73AF => AmdGpuArch::Rdna1,      // Navi 10/12/14
-            0x15DD..=0x15DF => AmdGpuArch::Gcn1_4,     // Vega
-            0x67DF..=0x67FF => AmdGpuArch::Gcn1_3,     // Arctic Islands
-            0x9830..=0x987F => AmdGpuArch::Cdna,       // CDNA
-            _ => AmdGpuArch::Rdna2,
+            0x2500..=0x25FF => NvidiaGpuArch::Ada,        // Ada Lovelace
+            0x2200..=0x22FF => NvidiaGpuArch::Ampere,     // Ampere
+            0x1E00..=0x1EFF => NvidiaGpuArch::Turing,     // Turing
+            0x1D00..=0x1DFF => NvidiaGpuArch::Volta,      // Volta
+            0x1700..=0x17FF => NvidiaGpuArch::Pascal,     // Pascal
+            0x1300..=0x13FF => NvidiaGpuArch::Maxwell,    // Maxwell
+            0x1000..=0x10FF => NvidiaGpuArch::Kepler,     // Kepler
+            0x0E00..=0x0EFF => NvidiaGpuArch::Fermi,      // Fermi
+            _ => NvidiaGpuArch::Pascal,
         }
     }
 
     fn detect_vram_size(&self, pci_id: SigmaU32) -> SigmaU64 {
         match pci_id {
-            0x73DF..=0x73FF => 16 * 1024 * 1024 * 1024, // 16GB for RX 7000
-            0x73BF..=0x73CF => 8 * 1024 * 1024 * 1024,  // 8GB for RX 6000
-            0x731F..=0x73AF => 8 * 1024 * 1024 * 1024,  // 8GB for RX 5000
+            0x2500..=0x25FF => 24 * 1024 * 1024 * 1024, // 24GB for RTX 4090
+            0x2200..=0x22FF => 24 * 1024 * 1024 * 1024, // 24GB for RTX 3090
+            0x1E00..=0x1EFF => 11 * 1024 * 1024 * 1024, // 11GB for RTX 2080 Ti
+            0x1700..=0x17FF => 8 * 1024 * 1024 * 1024,  // 8GB for GTX 1080
             _ => 4 * 1024 * 1024 * 1024,                // 4GB default
         }
     }
 
-    fn detect_compute_units(&self, pci_id: SigmaU32) -> SigmaU32 {
+    fn detect_cuda_cores(&self, pci_id: SigmaU32) -> SigmaU32 {
         match pci_id {
-            0x73DF..=0x73FF => 48, // RX 7900 XTX
-            0x73BF..=0x73CF => 32, // RX 6800 XT
-            0x731F..=0x73AF => 40, // RX 5700 XT
-            _ => 32,
+            0x2500..=0x25FF => 16384, // RTX 4090
+            0x2200..=0x22FF => 10752, // RTX 3090
+            0x1E00..=0x1EFF => 4352,  // RTX 2080 Ti
+            0x1700..=0x17FF => 2560,  // GTX 1080
+            _ => 1920,
         }
     }
 
@@ -260,7 +267,7 @@ impl AmdGpuDriver {
         self.buffers[idx].buffer_id = id;
         self.buffers[idx].buffer_type = buffer_type;
         self.buffers[idx].size = size;
-        self.buffers[idx].gpu_addr = 0x20000000 + (idx as SigmaU64) * 0x1000000; // Simulated GPU address
+        self.buffers[idx].gpu_addr = 0x30000000 + (idx as SigmaU64) * 0x1000000; // Simulated GPU address
         self.buffers[idx].mapped = false;
         self.buffer_count += 1;
         id
@@ -305,13 +312,13 @@ impl AmdGpuDriver {
         self.power_management = enabled;
     }
 
-    /// Enable/disable RAS (Reliability, Availability, Serviceability).
-    pub fn set_ras_enabled(&mut self, enabled: SigmaBool) {
-        self.ras_enabled = enabled;
+    /// Enable/disable reclocking (Nouveau feature).
+    pub fn set_reclocking_enabled(&mut self, enabled: SigmaBool) {
+        self.device.reclocking_enabled = enabled;
     }
 
     /// Get GPU info.
-    pub fn get_info(&self) -> &AmdGpuDevice {
+    pub fn get_info(&self) -> &NvidiaGpuDevice {
         &self.device
     }
 
@@ -324,27 +331,27 @@ impl AmdGpuDriver {
     }
 }
 
-static mut G_AMDGPU: AmdGpuDriver = AmdGpuDriver::new();
+static mut G_NOUVEAU: NvidiaGpuDriver = NvidiaGpuDriver::new();
 
 // ── C-ABI Exports ─────────────────────────────────────────────────────────────
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_init(pci_id: SigmaU32) -> SigmaI32 {
-    G_AMDGPU.init(pci_id)
+pub unsafe extern "C" fn sigma_nouveau_init(pci_id: SigmaU32) -> SigmaI32 {
+    G_NOUVEAU.init(pci_id)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_create_context(compute_only: SigmaU32) -> SigmaU32 {
-    G_AMDGPU.create_context(compute_only != 0)
+pub unsafe extern "C" fn sigma_nouveau_create_context(compute_only: SigmaU32) -> SigmaU32 {
+    G_NOUVEAU.create_context(compute_only != 0)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_destroy_context(context_id: SigmaU32) -> SigmaI32 {
-    G_AMDGPU.destroy_context(context_id)
+pub unsafe extern "C" fn sigma_nouveau_destroy_context(context_id: SigmaU32) -> SigmaI32 {
+    G_NOUVEAU.destroy_context(context_id)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_allocate_buffer(size: SigmaU64, buffer_type: SigmaU32) -> SigmaU32 {
+pub unsafe extern "C" fn sigma_nouveau_allocate_buffer(size: SigmaU64, buffer_type: SigmaU32) -> SigmaU32 {
     let bt = match buffer_type {
         0 => BufferType::Vertex,
         1 => BufferType::Index,
@@ -354,50 +361,55 @@ pub unsafe extern "C" fn sigma_amdgpu_allocate_buffer(size: SigmaU64, buffer_typ
         5 => BufferType::Compute,
         _ => BufferType::Vertex,
     };
-    G_AMDGPU.allocate_buffer(size, bt)
+    G_NOUVEAU.allocate_buffer(size, bt)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_free_buffer(buffer_id: SigmaU32) -> SigmaI32 {
-    G_AMDGPU.free_buffer(buffer_id)
+pub unsafe extern "C" fn sigma_nouveau_free_buffer(buffer_id: SigmaU32) -> SigmaI32 {
+    G_NOUVEAU.free_buffer(buffer_id)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_map_buffer(buffer_id: SigmaU32) -> SigmaI32 {
-    G_AMDGPU.map_buffer(buffer_id)
+pub unsafe extern "C" fn sigma_nouveau_map_buffer(buffer_id: SigmaU32) -> SigmaI32 {
+    G_NOUVEAU.map_buffer(buffer_id)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_unmap_buffer(buffer_id: SigmaU32) -> SigmaI32 {
-    G_AMDGPU.unmap_buffer(buffer_id)
+pub unsafe extern "C" fn sigma_nouveau_unmap_buffer(buffer_id: SigmaU32) -> SigmaI32 {
+    G_NOUVEAU.unmap_buffer(buffer_id)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_set_power_management(enabled: SigmaU32) {
-    G_AMDGPU.set_power_management(enabled != 0)
+pub unsafe extern "C" fn sigma_nouveau_set_power_management(enabled: SigmaU32) {
+    G_NOUVEAU.set_power_management(enabled != 0)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_set_ras_enabled(enabled: SigmaU32) {
-    G_AMDGPU.set_ras_enabled(enabled != 0)
+pub unsafe extern "C" fn sigma_nouveau_set_reclocking_enabled(enabled: SigmaU32) {
+    G_NOUVEAU.set_reclocking_enabled(enabled != 0)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_reset() -> SigmaI32 {
-    G_AMDGPU.reset()
+pub unsafe extern "C" fn sigma_nouveau_reset() -> SigmaI32 {
+    G_NOUVEAU.reset()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_get_architecture() -> SigmaU32 {
-    G_AMDGPU.device.architecture as SigmaU32
+pub unsafe extern "C" fn sigma_nouveau_get_architecture() -> SigmaU32 {
+    G_NOUVEAU.device.architecture as SigmaU32
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_get_vram_size() -> SigmaU64 {
-    G_AMDGPU.device.vram_size
+pub unsafe extern "C" fn sigma_nouveau_get_vram_size() -> SigmaU64 {
+    G_NOUVEAU.device.vram_size
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_amdgpu_get_compute_units() -> SigmaU32 {
-    G_AMDGPU.device.compute_units
+pub unsafe extern "C" fn sigma_nouveau_get_cuda_cores() -> SigmaU32 {
+    G_NOUVEAU.device.cuda_cores
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigma_nouveau_reclocking_enabled() -> SigmaU32 {
+    if G_NOUVEAU.device.reclocking_enabled { 1 } else { 0 }
 }
