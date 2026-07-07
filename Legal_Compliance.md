@@ -1,9 +1,28 @@
 # Legal Compliance & Forensics Roadmap
 
-## Indian Law Tools Integration
-SigmaOS provides dedicated integration for Indian Kanoon and SCC Online APIs, ensuring legal professionals can access offline-first case law databases in full compliance with the Digital Personal Data Protection (DPDP) Act.
+## 1. Indian Law Research Tools
+Provides legal professionals with offline-first search tools:
+- **Indian Kanoon API Integration**: High-performance caching layers indexing case laws and constitutional articles.
+- **SCC Online Adaptors**: Secure API clients for legal citation lookups.
 
-## Privacy & Forensics
-- **Opt-in Telemetry:** Absolutely zero data leaves the system without explicit consent.
-- **AI Provenance:** All AI-generated commands are logged to maintain human accountability.
-- **Dedicated Forensics Mode:** A rescue boot target that mounts filesystems read-only and provides immediate access to Wireshark, Volatility, and Sleuth Kit for rapid incident response.
+## 2. Privacy & DPDP Compliance Framework
+SigmaOS is architected to align with the Digital Personal Data Protection (DPDP) Act:
+- **Data Locality**: No user telemetry or system data is sent to external clouds by default.
+- **Consent Logs**: User consent is explicitly logged using cryptographic timestamps.
+- **AI Provenance**: Command execution logs tag all SigmaAI generated actions, ensuring accountability.
+
+## 3. Incident Investigation & Forensics Mode
+A dedicated boot target (`BootTarget::Forensics`) launches the system into a read-only forensics target:
+- Enforces write-protection on all block storage devices.
+- Includes pre-installed forensic tools (Autopsy, Sleuth Kit, Volatility).
+- Built-in memory capture tools dump physical RAM states to encrypted external media.
+
+## 4. Roadmap Phases
+- **Phase 1 (0–3m)**: Standardize data audit trail formats.
+- **Phase 2 (3–6m)**: Integrate offline legal citation cache systems.
+- **Phase 3 (6–9m)**: Launch the Forensic boot loader configuration.
+- **Phase 4 (9–12m)**: Implement DPDP compliant consent audit tools.
+
+## 5. Contributor Guidelines
+- Any change processing user data must be reviewed by the Privacy Board.
+- Forensics tools must maintain strict read-only guarantees on block devices.
