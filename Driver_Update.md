@@ -1,7 +1,7 @@
 # SigmaOS Driver Auto-Updater
 
 ## Overview
-SigmaOS implements a signed driver package auto-updater framework (`sigdriver`) to maintain hardware compatibility matrices without manual compilation or untrusted binaries. The system scans the PCI, USB, and ACPI buses, matches hardware IDs against a cryptographically signed database, and stages updates securely.
+SigmaOS implements a signed driver package auto-updater framework (`sigdriver`) to maintain hardware compatibility matrices without manual compilation or untrusted binaries. The system scans the PCI, USB, and ACPI buses, matches hardware IDs against a cryptographically signed database, and stages updates securely. This framework absorbs driver testing, staging, and automated delivery infrastructure models from `https://github.com/fedora-infra` (such as the Bodhi updates feedback cycle and Koji packaging hooks) to ensure stable driver release gating.
 
 ## Driver Lifecycle and Signature Verification
 Drivers are packaged as signed kernel modules (`.sko`). Each driver undergoes hardware compatibility checks before load.

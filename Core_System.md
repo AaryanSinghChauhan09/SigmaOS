@@ -19,7 +19,8 @@ The Core System is the foundation of SigmaOS, providing kernel-level functionali
 ## System Properties & Models
 1. **Rolling & Stable Hybrid Model**: Developer profiles run on a rolling-release tree (`sigma-rolling`), receiving package upgrades immediately. Production and enterprise instances run on a stable-cadence tree (`sigma-stable`), receiving frozen, hardened packages validated on 6-month cycles.
 2. **Minimal Base System**: Follows Arch's minimal core footprint philosophy. The default base system includes only the microkernel, the `sigmad` init system, `sigpkg`, and basic terminal utils. Everything else is structured as standalone packages.
-3. **Hardware Compatibility Matrix**: Upstreams drivers directly. The project publishes an Hardware Compatibility List (HCL) generated automatically from user telemetry.
+3. **Hardware Compatibility Matrix**: Upstreams drivers directly and publishes an Hardware Compatibility List (HCL) generated automatically from user telemetry.
+4. **Fedora Infrastructure Driver Integration**: Absorbs driver support structures and build pipeline orchestration patterns inspired by `https://github.com/fedora-infra`. This includes implementing custom analogues of the Koji build system for automated package compilation, Bodhi for gating updates based on hardware testing feedback loops, and MirrorManager for high-speed local driver package delivery.
 
 ## System Configuration Specification
 System release streams are configured in `/etc/sigma/core.conf`:
