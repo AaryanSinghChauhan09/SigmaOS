@@ -22,6 +22,7 @@ pub const SLAB_MIN_SIZE: usize = 8;
 pub const SLAB_MAX_SIZE: usize = 4096;
 pub const SLAB_OBJ_PER_SLAB: usize = 64;
 pub const SLAB_CACHE_COUNT: usize = 16;
+pub const MAX_SLABS: usize = 256; // Maximum slabs per cache
 
 // ─── Slab Object ───────────────────────────────────────────────────────────
 
@@ -61,6 +62,7 @@ pub struct SlabCache {
 pub struct SlabAllocator {
     initialized: SigmaBool,
     caches: [SlabCache; SLAB_CACHE_COUNT],
+    slabs: [[Option<Slab>; MAX_SLABS]; SLAB_CACHE_COUNT], // BUG-001 Fix: Static slab storage
     total_memory: SigmaU64,
     used_memory: SigmaU64,
 }
@@ -78,6 +80,7 @@ impl SlabAllocator {
                 total_objects: 0,
                 free_objects: 0,
             }; SLAB_CACHE_COUNT],
+            slabs: [[None; MAX_SLABS]; SLAB_CACHE_COUNT], // BUG-001 Fix
             total_memory: 0,
             used_memory: 0,
         }
@@ -204,38 +207,166 @@ impl SlabAllocator {
         cache_idx
     }
 
-    /// Allocate from existing slab
+    /// Allocate from existing slab (BUG-001 Fix)
     unsafe fn alloc_from_slab(&mut self, slab_addr: SigmaU64, obj_size: SigmaUsize) -> Option<SigmaU64> {
-        // TODO: Implement slab object allocation
-        // This would walk the slab's free list
+        let cache_idx = self.find_cache(obj_size);
+        if cache_idx >= SLAB_CACHE_COUNT {
+            return None;
+        }
+
+        // Find slab in storage
+        let slab_idx = self.find_slab_index(slab_addr, cache_idx);
+        if slab_idx >= MAX_SLABS {
+            return None;
+        }
+
+        if let Some(ref mut slab) = self.slabs[cache_idx][slab_idx] {
+            // Find first free object
+            for i in 0..SLAB_OBJ_PER_SLAB {
+                if !slab.objects[i].in_use {
+                    slab.objects[i].in_use = true;
+                    slab.free_count -= 1;
+                    
+                    // Calculate object address
+                    let obj_offset = i as SigmaU64 * obj_size as SigmaU64;
+                    let obj_addr = slab.base_addr + obj_offset;
+                    
+                    return Some(obj_addr);
+                }
+            }
+        }
+
         None
     }
 
-    /// Free object in slab
+    /// Free object in slab (BUG-001 Fix)
     unsafe fn free_in_slab(&mut self, slab_addr: SigmaU64, ptr: SigmaU64, obj_size: SigmaUsize) {
-        // TODO: Implement slab object freeing
-        // This would add the object back to the slab's free list
-        let _ = (slab_addr, ptr, obj_size);
+        let cache_idx = self.find_cache(obj_size);
+        if cache_idx >= SLAB_CACHE_COUNT {
+            return;
+        }
+
+        let slab_idx = self.find_slab_index(slab_addr, cache_idx);
+        if slab_idx >= MAX_SLABS {
+            return;
+        }
+
+        if let Some(ref mut slab) = self.slabs[cache_idx][slab_idx] {
+            // Calculate object index
+            let offset = ptr - slab.base_addr;
+            let obj_idx = (offset / obj_size as SigmaU64) as usize;
+
+            if obj_idx < SLAB_OBJ_PER_SLAB {
+                slab.objects[obj_idx].in_use = false;
+                slab.free_count += 1;
+            }
+        }
     }
 
-    /// Allocate new slab
+    /// Allocate new slab (BUG-001 Fix)
     unsafe fn alloc_new_slab(&mut self, obj_size: SigmaUsize) -> Option<SigmaU64> {
+        let cache_idx = self.find_cache(obj_size);
+        if cache_idx >= SLAB_CACHE_COUNT {
+            return None;
+        }
+
         // Calculate slab size
         let slab_size = obj_size * SLAB_OBJ_PER_SLAB;
         
-        // TODO: Allocate from buddy allocator
-        // This would call sigma_buddy_alloc with appropriate order
-        let _ = slab_size;
+        // Calculate required order for buddy allocator
+        let order = self.calculate_order(slab_size);
         
-        None
+        // Allocate from buddy allocator (external function)
+        let slab_addr = sigma_buddy_alloc(order as SigmaU8);
+        if slab_addr == 0 {
+            return None;
+        }
+
+        // Find free slab slot
+        let slab_idx = self.find_free_slab_slot(cache_idx);
+        if slab_idx >= MAX_SLABS {
+            return None;
+        }
+
+        // Initialize slab
+        let mut new_slab = Slab {
+            objects: [SlabObject {
+                in_use: false,
+                next: None,
+            }; SLAB_OBJ_PER_SLAB],
+            free_count: SLAB_OBJ_PER_SLAB,
+            total_count: SLAB_OBJ_PER_SLAB,
+            base_addr: slab_addr,
+            next: None,
+        };
+
+        // Initialize free list
+        for i in 0..SLAB_OBJ_PER_SLAB {
+            new_slab.objects[i].next = if i < SLAB_OBJ_PER_SLAB - 1 {
+                Some(slab_addr + ((i + 1) * obj_size) as SigmaU64)
+            } else {
+                None
+            };
+        }
+
+        self.slabs[cache_idx][slab_idx] = Some(new_slab);
+        self.total_memory += slab_size as SigmaU64;
+        self.used_memory += slab_size as SigmaU64;
+
+        Some(slab_addr)
     }
 
-    /// Find slab containing pointer
+    /// Find slab containing pointer (BUG-001 Fix)
     unsafe fn find_slab_for_ptr(&self, ptr: SigmaU64, obj_size: SigmaUsize) -> SigmaU64 {
-        // TODO: Implement slab lookup
-        // This would search through slabs to find which one contains the pointer
-        let _ = (ptr, obj_size);
+        let cache_idx = self.find_cache(obj_size);
+        if cache_idx >= SLAB_CACHE_COUNT {
+            return 0;
+        }
+
+        // Search through all slabs in this cache
+        for slab_idx in 0..MAX_SLABS {
+            if let Some(ref slab) = self.slabs[cache_idx][slab_idx] {
+                let slab_size = obj_size * SLAB_OBJ_PER_SLAB;
+                if ptr >= slab.base_addr && ptr < slab.base_addr + slab_size as SigmaU64 {
+                    return slab.base_addr;
+                }
+            }
+        }
+
         0
+    }
+    
+    /// Find slab index by address (BUG-001 Fix)
+    unsafe fn find_slab_index(&self, slab_addr: SigmaU64, cache_idx: usize) -> usize {
+        for i in 0..MAX_SLABS {
+            if let Some(ref slab) = self.slabs[cache_idx][i] {
+                if slab.base_addr == slab_addr {
+                    return i;
+                }
+            }
+        }
+        MAX_SLABS
+    }
+    
+    /// Find free slab slot (BUG-001 Fix)
+    unsafe fn find_free_slab_slot(&self, cache_idx: usize) -> usize {
+        for i in 0..MAX_SLABS {
+            if self.slabs[cache_idx][i].is_none() {
+                return i;
+            }
+        }
+        MAX_SLABS
+    }
+    
+    /// Calculate buddy order for size (BUG-001 Fix)
+    fn calculate_order(&self, size: usize) -> usize {
+        let mut order = 0;
+        let mut block_size = 4096; // PAGE_SIZE
+        while block_size < size {
+            block_size *= 2;
+            order += 1;
+        }
+        order
     }
 
     /// Get total memory used

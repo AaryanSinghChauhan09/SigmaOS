@@ -330,11 +330,25 @@ impl PageTableWalker {
         Ok(())
     }
 
-    /// Allocate a new page table
+    /// Allocate a new page table (BUG-001 Fix)
     unsafe fn allocate_page_table(&self) -> Result<SigmaU64, &'static str> {
-        // TODO: Call buddy allocator to allocate page
-        // For now, return placeholder
-        Err("Page table allocation not implemented")
+        // Call buddy allocator to allocate a page (order 0 = 1 page)
+        extern "C" {
+            fn sigma_buddy_alloc(order: SigmaU8) -> SigmaU64;
+        }
+        
+        let page_addr = sigma_buddy_alloc(0);
+        if page_addr == 0 {
+            return Err("Failed to allocate page table");
+        }
+        
+        // Clear the page
+        let page_ptr = page_addr as *mut u8;
+        for i in 0..PAGE_SIZE {
+            *page_ptr.add(i as usize) = 0;
+        }
+        
+        Ok(page_addr)
     }
 
     /// Get PML4 address
