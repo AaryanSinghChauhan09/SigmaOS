@@ -6,7 +6,7 @@ This document tracks the implementation progress of SigmaOS Year 1 foundation co
 
 ## Overall Progress
 
-**Completion Status**: 100% of Year 1 Foundation Phase
+**Completion Status**: 100% of Year 1 Foundation Phase + Critical Kernel Components
 
 | Component | Status | Progress |
 |-----------|--------|----------|
@@ -29,6 +29,12 @@ This document tracks the implementation progress of SigmaOS Year 1 foundation co
 | Logging System | ✅ Complete | 100% |
 | GitHub Wiki Update | ✅ Complete | 100% |
 | Repository Sync | ✅ Complete | 100% |
+| **TCP State Machine** | ✅ Complete | 100% |
+| **Container Orchestrator** | ✅ Complete | 100% |
+| **Cgroup Enforcement** | ✅ Complete | 100% |
+| **ARP Resolution** | ✅ Complete | 100% |
+| **Syscall Dispatcher** | ✅ Complete | 100% |
+| **Zenith Auto-Tiling WM** | ✅ Complete | 100% |
 
 ## Detailed Implementation Status
 
@@ -675,6 +681,124 @@ This document tracks the implementation progress of SigmaOS Year 1 foundation co
 13. ✅ Comprehensive error handling system
 
 14. ✅ Logging system with configurable levels
+
+### 18. TCP State Machine Enhancements
+
+**Status**: ✅ Complete
+**Location**: `kernel/net/sigma_tcp.rs`
+
+**Implemented Functions**:
+- `sigma_tcp_handle_ack()` - ACK handling for 3-way handshake completion
+- `sigma_tcp_send()` - Data transmission on established connections
+- `sigma_tcp_recv()` - Data reception from established connections
+- `sigma_tcp_close()` - Connection teardown
+
+**Key Features**:
+- Complete TCP 3-way handshake support
+- Sequence number tracking
+- Connection state management
+- Data send/receive operations
+- Graceful connection closure
+
+### 19. Container Orchestrator
+
+**Status**: ✅ Complete
+**Location**: `kernel/core/orchestrator/sigma_orchestrator.rs`
+
+**Implemented Functions**:
+- `spawnContainer()` - Container creation with resource limits
+- `spawnNativeContainer()` - Native container spawning
+- `stopContainer()` - Container lifecycle management
+- `translatePathForContainer()` - Path translation
+- `allocate_stage2_pgdir()` - Page directory allocation
+- `sigma_get_container_state()` - State queries
+
+**Key Features**:
+- 64-container capacity
+- Memory limits (default 512MB)
+- CPU quota management
+- Namespace isolation
+- Resource tracking
+
+### 20. Cgroup CPU/Memory/IO Enforcement
+
+**Status**: ✅ Complete
+**Location**: `kernel/core/orchestrator/sigma_cgroup_impl.rs`
+
+**Implemented Functions**:
+- `sigma_cgroup_create()` - Cgroup creation with limits
+- `sigma_cgroup_enforce_cpu()` - CPU quota enforcement
+- `sigma_cgroup_enforce_memory()` - Memory limit enforcement with OOM detection
+- `sigma_cgroup_enforce_io()` - IO weight-based throttling
+- `sigma_cgroup_release_memory()` - Memory release tracking
+
+**Key Features**:
+- 128 cgroup capacity
+- CPU throttling with quota tracking
+- Memory OOM kill detection
+- IO weight-based throttling
+- Runtime statistics tracking
+
+### 21. ARP Resolution
+
+**Status**: ✅ Complete
+**Location**: `kernel/net/sigma_arp.rs`
+
+**Implemented Functions**:
+- `sigma_arp_init()` - ARP table initialization
+- `sigma_arp_lookup()` - IP-to-MAC address resolution
+- `sigma_arp_add()` - ARP entry addition
+- `sigma_arp_remove()` - ARP entry removal
+- `sigma_arp_send_request()` - ARP request transmission
+- `sigma_arp_process_packet()` - ARP packet processing
+
+**Key Features**:
+- 128-entry ARP table
+- IP-to-MAC address mapping
+- ARP request/reply handling
+- Interface-specific entries
+- Timestamp tracking
+
+### 22. Syscall Dispatcher
+
+**Status**: ✅ Complete
+**Location**: `kernel/syscalls/syscall_dispatcher.rs`
+
+**Implemented Critical Syscalls**:
+- `sys_read()` - File read operations
+- `sys_write()` - File write operations
+- `sys_open()` - File opening
+- `sys_close()` - File closing
+- `sys_exit()` - Process termination
+- `sys_getpid()` - Process ID retrieval
+- `sys_sched_yield()` - CPU yielding
+- `sys_mmap()` - Memory mapping
+- `sys_munmap()` - Memory unmapping
+- `sys_brk()` - Heap management
+
+**Key Features**:
+- 30+ syscall dispatch framework
+- Argument validation
+- Error handling
+- Integration points for VFS, VMM, process manager
+
+### 23. Zenith Auto-Tiling Window Manager
+
+**Status**: ✅ Complete
+**Location**: `desktop/wm/sigma_wm.rs`
+
+**Implemented Functions**:
+- `wm_retile_workspace()` - Automatic workspace tiling
+- `wm_auto_tile()` - Auto-tile on window addition
+- `wm_set_tiling_direction()` - Horizontal/vertical tiling
+- `wm_set_gaps()` - Inner/outer gap configuration
+
+**Key Features**:
+- Horizontal and vertical tiling modes
+- Configurable inner/outer gaps
+- Automatic window layout on addition
+- Multi-monitor support
+- Workspace-specific tiling
 
 ## Success Metrics
 
