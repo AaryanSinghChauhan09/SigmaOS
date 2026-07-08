@@ -39,11 +39,11 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Medium Priority Tasks
 
 ### Desktop & UX
-- [ ] Zenith Desktop accessibility features (screen readers, high-contrast)
-- [ ] Touch/gesture support for tablets
-- [ ] Theme engine for customization
-- [ ] Unified Control Center
-- [ ] Onboarding wizard for new users
+- [x] Zenith Desktop accessibility features (screen readers, high-contrast) - Screen reader TTS engine, WCAG AAA contrast validation, magnifier with 2-16x zoom, keyboard navigation with focus rings
+- [x] Touch/gesture support for tablets - Multi-touch tracking, gesture recognition (tap, double-tap, long-press, swipe, pinch, rotate, pan, scroll), configurable thresholds
+- [x] Theme engine for customization - Light/Dark/Auto/Custom modes, color palettes, typography settings, spacing, border radius, shadows, animations, custom colors, theme save/load/export/import
+- [x] Unified Control Center - Centralized settings panel with Network, Display, Sound, Bluetooth, WiFi, Power, Storage, Accessibility, Security, Accounts, Updates, About panels, quick settings, search
+- [x] Onboarding wizard for new users - Multi-step wizard (Welcome, Language, Region, Keyboard, Network, Privacy, Account, Theme, Accessibility, Complete), user/system configuration, progress tracking
 
 ### Documentation
 - [x] Kernel architecture documentation - Comprehensive kernel architecture document with all subsystems

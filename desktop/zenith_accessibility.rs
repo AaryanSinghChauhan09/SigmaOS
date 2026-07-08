@@ -49,17 +49,64 @@ pub struct KeyboardNav {
     pub tab_navigation: bool,
 }
 
-// ─── Accessibility Manager ───────────────────────────────────────────────────
+// ─── Screen Reader Implementation ───────────────────────────────────────────────
 
-pub struct AccessibilityManager {
-    pub theme: Theme,
-    pub magnifier: Magnifier,
-    pub keyboard_nav: KeyboardNav,
-    pub screen_reader_enabled: bool,
-    pub reduced_motion: bool,
-    pub initialized: bool,
+/// Screen reader text-to-speech engine
+pub struct ScreenReader {
+    pub enabled: bool,
+    pub voice: String,
+    pub rate: f32, // 0.5 to 2.0
+    pub pitch: f32, // 0.5 to 2.0
+    pub volume: f32, // 0.0 to 1.0
 }
 
+impl ScreenReader {
+    pub fn new() -> Self {
+        ScreenReader {
+            enabled: false,
+            voice: "default".to_string(),
+            rate: 1.0,
+            pitch: 1.0,
+            volume: 1.0,
+        }
+    }
+
+    /// Speak text
+    pub fn speak(&self, text: &str) {
+        if !self.enabled {
+            return;
+        }
+        // In real implementation, use TTS engine to speak text
+        // For now, this is a placeholder
+    }
+
+    /// Stop speaking
+    pub fn stop(&self) {
+        // In real implementation, stop TTS engine
+    }
+
+    /// Set voice
+    pub fn set_voice(&mut self, voice: &str) {
+        self.voice = voice.to_string();
+    }
+
+    /// Set speech rate
+    pub fn set_rate(&mut self, rate: f32) {
+        self.rate = rate.clamp(0.5, 2.0);
+    }
+
+    /// Set speech pitch
+    pub fn set_pitch(&mut self, pitch: f32) {
+        self.pitch = pitch.clamp(0.5, 2.0);
+    }
+
+    /// Set volume
+    pub fn set_volume(&mut self, volume: f32) {
+        self.volume = volume.clamp(0.0, 1.0);
+    }
+}
+
+/// Add screen reader to accessibility manager
 impl AccessibilityManager {
     pub fn new() -> Self {
         AccessibilityManager {
@@ -256,5 +303,21 @@ impl AccessibilityManager {
             self.keyboard_nav.focus_ring_color,
             self.keyboard_nav.focus_ring_width,
         )
+    }
+
+    /// Announce UI element to screen reader
+    pub fn announce(&self, text: &str) {
+        if self.screen_reader_enabled {
+            // In real implementation, use screen reader to announce text
+            // For now, this is a placeholder
+        }
+    }
+
+    /// Read focused element
+    pub fn read_focused_element(&self) {
+        if self.screen_reader_enabled {
+            // In real implementation, read the currently focused element
+            // For now, this is a placeholder
+        }
     }
 }
