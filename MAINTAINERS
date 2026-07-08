@@ -52,22 +52,23 @@ K: riscv rv64
 KERNEL CORE — SCHEDULER
 M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
 S: Supported
-F: kernel/core/sovereign_ovheruler.rs
-F: kernelecore/sigma_sched.rsign_scheduler.rs
+F: kernel/core/sovereign_overlord.rs
+F: kernel/core/sigma_sched.rs
 F: kernel/core/core/sigma_sched.rs
 F: kernel/sched/
 F: kernel/core/sched/
-F: kernel/sched/
 K: scheduler mlfq cfs edf runqueue
 
-KERNEL CORE yansinghchauhan09@github>
-S: Supportedigma_mm.rs
+KERNEL CORE — MEMORY MANAGEMENT
+M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
+S: Supported
 F: kernel/memory/
 F: kernel/mm/
 K: buddy slab paging tlb vma aslr
 
 KERNEL CORE — SYSCALL DISPATCH
-M: Aaryan Si
+M: Aaryan Singh Chauhan <aaryansinghchauhan09@github>
+S: Supported
 F: kernel/core/sigma_syscalls_io.rs
 F: kernel/core/sigma_syscalls_proc.rs
 F: kernel/core/syscall_dispatch.rs

@@ -24,15 +24,17 @@ Instead, use one of the following private channels:
 
 3. Fill in the advisory form. We aim to acknowledge within **48 hours**.
 
-### Option B — Email
+### Option B — Email (Temporary)
 
-Send a PGP-encrypted email to: **security@sigmaos.dev** *(placeholder — replace with real address before release)*
+Send a PGP-encrypted email to: **aaryansinghchauhan09@github** *(temporary until security@sigmaos.dev is set up)*
 
 ```
-PGP Key Fingerprint: XXXX XXXX XXXX XXXX XXXX  (add real key before first release)
+PGP Key Fingerprint: Placeholder - see docs/security/pgp-key.asc
 ```
 
 Full public key: `docs/security/pgp-key.asc`
+
+*Note: Email contact is temporary. Use GitHub Security Advisory (Option A) for fastest response.*
 
 ---
 
