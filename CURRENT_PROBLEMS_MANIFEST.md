@@ -1,6 +1,6 @@
 # SigmaOS — Current Problems Manifest
 
-> SigmaOS v15.0 "Zenith" — Last Updated: 2026-07-06
+> SigmaOS v15.1 "Zenith" — Last Updated: 2026-07-08
 
 This document tracks known issues, limitations, and technical debt across the codebase.
 
@@ -47,8 +47,8 @@ This document tracks known issues, limitations, and technical debt across the co
 
 | ID | Component | Description |
 |---|---|---|
-| BUG-017 | CFS Scheduler | Red-black tree not implemented; O(n) sorted array used instead |
-| BUG-018 | EDF Scheduler | Binary heap not implemented; O(n) linear scan used |
+| ~~BUG-017~~ | ~~CFS Scheduler~~ | ~~Red-black tree not implemented; O(n) sorted array used instead~~ | **RESOLVED v15.1** — Array-backed RB-tree implemented in `sigma_sched.rs` |
+| ~~BUG-018~~ | ~~EDF Scheduler~~ | ~~Binary heap not implemented; O(n) linear scan used instead~~ | **RESOLVED v15.1** — Array-backed Binary Min-Heap (`bubble_up`/`trickle_down`) implemented in `sigma_sched.rs` |
 | BUG-019 | VFS | Mount table limited to 16 entries (increase to 256 in next release) |
 | BUG-020 | sigpkg GUI | GUI runs as stub; not connected to `sigpkgd` daemon |
 | BUG-021 | SigmaFS | Indirect block pointers for large files not implemented |

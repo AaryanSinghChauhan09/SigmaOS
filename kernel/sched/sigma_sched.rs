@@ -5,8 +5,8 @@
 //
 // SigmaOS uses a three-tier scheduler:
 //   • MLFQ  — interactive tasks (Tier 0, highest priority)
-//   • CFS   — normal fair-share tasks (Tier 1)
-//   • EDF   — real-time tasks with deadlines (Tier 2)
+//   • CFS   — normal fair-share tasks (Tier 1) (Red-Black Tree)
+//   • EDF   — real-time tasks with deadlines (Tier 2) (Binary Min-Heap)
 //
 // Each CPU core has its own per-CPU runqueue. Work-stealing is used for load
 // balancing. Thread state is captured in `SigmaThread` and the selected next
@@ -27,6 +27,7 @@ pub const MLFQ_LEVELS:     usize = 8;
 pub const MLFQ_TIMESLICE:  u64   = 5;   // ticks per MLFQ level-0 slot
 pub const CFS_MIN_GRAN:    u64   = 1;   // minimum CFS granularity (ticks)
 pub const EDF_MAX_TASKS:   usize = 64;
+pub const NIL:             u32   = u32::MAX;
 
 pub const SCHED_NORMAL: u8 = 0;
 pub const SCHED_FIFO:   u8 = 1;
@@ -46,7 +47,6 @@ pub enum ThreadState {
     Zombie,
 }
 
-/// Saved register context for x86-64 context switch
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct CpuContext {
@@ -57,11 +57,11 @@ pub struct CpuContext {
     pub r13: u64,
     pub r14: u64,
     pub r15: u64,
-    pub rip: u64,   // saved return address / entry point
+    pub rip: u64,
     pub rflags: u64,
     pub cs: u64,
     pub ss: u64,
-    pub cr3: u64,   // page table root
+    pub cr3: u64,
 }
 
 impl CpuContext {
@@ -73,20 +73,19 @@ impl CpuContext {
     }
 }
 
-/// Per-thread descriptor
 #[derive(Copy, Clone)]
 pub struct SigmaThread {
     pub tid:         u32,
     pub pid:         u32,
     pub state:       ThreadState,
-    pub policy:      u8,          // SCHED_NORMAL / SCHED_EDF / …
-    pub priority:    i32,         // nice value (–20 … 19)
-    pub vruntime:    u64,         // CFS virtual runtime (ns)
-    pub deadline_ns: u64,         // EDF absolute deadline (ns since boot)
-    pub timeslice:   u64,         // MLFQ remaining ticks
-    pub mlfq_level:  usize,       // 0 = most interactive
-    pub cpu_affinity:u64,         // bitmask of allowed CPUs
-    pub cpu_id:      usize,       // currently assigned CPU
+    pub policy:      u8,
+    pub priority:    i32,
+    pub vruntime:    u64,
+    pub deadline_ns: u64,
+    pub timeslice:   u64,
+    pub mlfq_level:  usize,
+    pub cpu_affinity:u64,
+    pub cpu_id:      usize,
     pub ctx:         CpuContext,
     pub stack_top:   u64,
     pub stack_size:  u64,
@@ -118,8 +117,6 @@ impl SigmaThread {
 // MLFQ Sub-scheduler
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Circular bitmap queue per MLFQ level.
-/// Each level stores up to MAX_THREADS / MLFQ_LEVELS indices.
 pub struct MlfqQueue {
     pub queues:  [[u32; MAX_THREADS / MLFQ_LEVELS]; MLFQ_LEVELS],
     pub heads:   [usize; MLFQ_LEVELS],
@@ -130,7 +127,7 @@ pub struct MlfqQueue {
 impl MlfqQueue {
     pub const fn new() -> Self {
         Self {
-            queues:  [[u32::MAX; MAX_THREADS / MLFQ_LEVELS]; MLFQ_LEVELS],
+            queues:  [[NIL; MAX_THREADS / MLFQ_LEVELS]; MLFQ_LEVELS],
             heads:   [0; MLFQ_LEVELS],
             tails:   [0; MLFQ_LEVELS],
             counts:  [0; MLFQ_LEVELS],
@@ -154,7 +151,6 @@ impl MlfqQueue {
         Some(tid)
     }
 
-    /// Pick the highest-priority non-empty MLFQ level and dequeue from it.
     pub fn pick_next(&mut self) -> Option<u32> {
         for lv in 0..MLFQ_LEVELS {
             if let Some(tid) = self.dequeue(lv) {
@@ -166,87 +162,261 @@ impl MlfqQueue {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CFS Sub-scheduler (simplified red-black tree via sorted array)
+// CFS Sub-scheduler: Array-Backed Red-Black Tree (O(log n))
 // ─────────────────────────────────────────────────────────────────────────────
 
+#[derive(Copy, Clone, PartialEq)]
+enum Color { Red, Black }
+
+#[derive(Copy, Clone)]
+struct RbNode {
+    tid: u32,
+    vruntime: u64,
+    parent: u32,
+    left: u32,
+    right: u32,
+    color: Color,
+}
+
+impl RbNode {
+    const fn empty() -> Self {
+        Self { tid: NIL, vruntime: 0, parent: NIL, left: NIL, right: NIL, color: Color::Black }
+    }
+}
+
 pub struct CfsRunqueue {
-    pub tids:   [u32; MAX_THREADS],
-    pub count:  usize,
-    /// Minimum vruntime in the runqueue (used for new thread placement)
+    nodes: [RbNode; MAX_THREADS],
+    root: u32,
+    pub count: usize,
     pub min_vruntime: u64,
 }
 
 impl CfsRunqueue {
     pub const fn new() -> Self {
-        Self { tids: [u32::MAX; MAX_THREADS], count: 0, min_vruntime: 0 }
+        Self { nodes: [RbNode::empty(); MAX_THREADS], root: NIL, count: 0, min_vruntime: 0 }
     }
 
-    pub fn insert(&mut self, tid: u32) {
-        if self.count >= MAX_THREADS { return; }
-        self.tids[self.count] = tid;
+    pub fn insert(&mut self, tid: u32, vruntime: u64) {
+        let node_idx = tid; 
+        if (node_idx as usize) >= MAX_THREADS { return; }
+
+        self.nodes[node_idx as usize] = RbNode {
+            tid,
+            vruntime,
+            parent: NIL,
+            left: NIL,
+            right: NIL,
+            color: Color::Red,
+        };
         self.count += 1;
-    }
 
-    /// Pick thread with smallest vruntime (O(n) scan; production uses rb-tree)
-    pub fn pick_next(&mut self, threads: &[SigmaThread]) -> Option<u32> {
-        let mut best: Option<(usize, u64)> = None;
-        for i in 0..self.count {
-            let tid = self.tids[i] as usize;
-            if tid >= MAX_THREADS { continue; }
-            let vrt = threads[tid].vruntime;
-            if best.map_or(true, |(_, bv)| vrt < bv) {
-                best = Some((i, vrt));
+        if self.root == NIL {
+            self.root = node_idx;
+            self.nodes[node_idx as usize].color = Color::Black;
+            return;
+        }
+
+        let mut y = NIL;
+        let mut x = self.root;
+        while x != NIL {
+            y = x;
+            if vruntime < self.nodes[x as usize].vruntime {
+                x = self.nodes[x as usize].left;
+            } else {
+                x = self.nodes[x as usize].right;
             }
         }
-        best.map(|(idx, _)| {
-            let tid = self.tids[idx];
-            // Remove from runqueue
-            self.tids[idx] = self.tids[self.count - 1];
-            self.tids[self.count - 1] = u32::MAX;
-            self.count -= 1;
-            tid
-        })
+
+        self.nodes[node_idx as usize].parent = y;
+        if vruntime < self.nodes[y as usize].vruntime {
+            self.nodes[y as usize].left = node_idx;
+        } else {
+            self.nodes[y as usize].right = node_idx;
+        }
+
+        let mut curr = node_idx;
+        while curr != self.root && self.nodes[self.nodes[curr as usize].parent as usize].color == Color::Red {
+            let parent = self.nodes[curr as usize].parent;
+            let grandparent = self.nodes[parent as usize].parent;
+            if grandparent == NIL { break; }
+
+            if parent == self.nodes[grandparent as usize].left {
+                let uncle = self.nodes[grandparent as usize].right;
+                if uncle != NIL && self.nodes[uncle as usize].color == Color::Red {
+                    self.nodes[parent as usize].color = Color::Black;
+                    self.nodes[uncle as usize].color = Color::Black;
+                    self.nodes[grandparent as usize].color = Color::Red;
+                    curr = grandparent;
+                } else {
+                    if curr == self.nodes[parent as usize].right {
+                        curr = parent;
+                        self.left_rotate(curr);
+                    }
+                    let p = self.nodes[curr as usize].parent;
+                    let g = self.nodes[p as usize].parent;
+                    self.nodes[p as usize].color = Color::Black;
+                    self.nodes[g as usize].color = Color::Red;
+                    self.right_rotate(g);
+                }
+            } else {
+                let uncle = self.nodes[grandparent as usize].left;
+                if uncle != NIL && self.nodes[uncle as usize].color == Color::Red {
+                    self.nodes[parent as usize].color = Color::Black;
+                    self.nodes[uncle as usize].color = Color::Black;
+                    self.nodes[grandparent as usize].color = Color::Red;
+                    curr = grandparent;
+                } else {
+                    if curr == self.nodes[parent as usize].left {
+                        curr = parent;
+                        self.right_rotate(curr);
+                    }
+                    let p = self.nodes[curr as usize].parent;
+                    let g = self.nodes[p as usize].parent;
+                    self.nodes[p as usize].color = Color::Black;
+                    self.nodes[g as usize].color = Color::Red;
+                    self.left_rotate(g);
+                }
+            }
+        }
+        self.nodes[self.root as usize].color = Color::Black;
+    }
+
+    fn left_rotate(&mut self, x: u32) {
+        let y = self.nodes[x as usize].right;
+        if y == NIL { return; }
+        self.nodes[x as usize].right = self.nodes[y as usize].left;
+        if self.nodes[y as usize].left != NIL {
+            self.nodes[self.nodes[y as usize].left as usize].parent = x;
+        }
+        self.nodes[y as usize].parent = self.nodes[x as usize].parent;
+        if self.nodes[x as usize].parent == NIL {
+            self.root = y;
+        } else if x == self.nodes[self.nodes[x as usize].parent as usize].left {
+            self.nodes[self.nodes[x as usize].parent as usize].left = y;
+        } else {
+            self.nodes[self.nodes[x as usize].parent as usize].right = y;
+        }
+        self.nodes[y as usize].left = x;
+        self.nodes[x as usize].parent = y;
+    }
+
+    fn right_rotate(&mut self, y: u32) {
+        let x = self.nodes[y as usize].left;
+        if x == NIL { return; }
+        self.nodes[y as usize].left = self.nodes[x as usize].right;
+        if self.nodes[x as usize].right != NIL {
+            self.nodes[self.nodes[x as usize].right as usize].parent = y;
+        }
+        self.nodes[x as usize].parent = self.nodes[y as usize].parent;
+        if self.nodes[y as usize].parent == NIL {
+            self.root = x;
+        } else if y == self.nodes[self.nodes[y as usize].parent as usize].right {
+            self.nodes[self.nodes[y as usize].parent as usize].right = x;
+        } else {
+            self.nodes[self.nodes[y as usize].parent as usize].left = x;
+        }
+        self.nodes[x as usize].right = y;
+        self.nodes[y as usize].parent = x;
+    }
+
+    pub fn pick_next(&mut self) -> Option<u32> {
+        if self.root == NIL { return None; }
+        
+        let mut curr = self.root;
+        while self.nodes[curr as usize].left != NIL {
+            curr = self.nodes[curr as usize].left;
+        }
+
+        let tid = self.nodes[curr as usize].tid;
+        self.min_vruntime = self.nodes[curr as usize].vruntime;
+        
+        let parent = self.nodes[curr as usize].parent;
+        let right = self.nodes[curr as usize].right;
+        if parent == NIL {
+            self.root = right;
+        } else if curr == self.nodes[parent as usize].left {
+            self.nodes[parent as usize].left = right;
+        } else {
+            self.nodes[parent as usize].right = right;
+        }
+        if right != NIL {
+            self.nodes[right as usize].parent = parent;
+        }
+        
+        self.nodes[curr as usize] = RbNode::empty();
+        self.count -= 1;
+        Some(tid)
+    }
+
+    pub fn extract_any(&mut self) -> Option<u32> {
+        self.pick_next()
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EDF Sub-scheduler
+// EDF Sub-scheduler: Array-Backed Binary Min-Heap (O(log n))
 // ─────────────────────────────────────────────────────────────────────────────
 
+#[derive(Copy, Clone)]
+struct EdfNode {
+    tid: u32,
+    deadline_ns: u64,
+}
+
 pub struct EdfRunqueue {
-    pub tids:  [u32; EDF_MAX_TASKS],
+    nodes: [EdfNode; EDF_MAX_TASKS],
     pub count: usize,
 }
 
 impl EdfRunqueue {
     pub const fn new() -> Self {
-        Self { tids: [u32::MAX; EDF_MAX_TASKS], count: 0 }
+        Self { nodes: [EdfNode { tid: NIL, deadline_ns: 0 }; EDF_MAX_TASKS], count: 0 }
     }
 
-    pub fn insert(&mut self, tid: u32) {
+    pub fn insert(&mut self, tid: u32, deadline_ns: u64) {
         if self.count >= EDF_MAX_TASKS { return; }
-        self.tids[self.count] = tid;
+        self.nodes[self.count] = EdfNode { tid, deadline_ns };
+        self.bubble_up(self.count);
         self.count += 1;
     }
 
-    /// Pick thread with earliest deadline (O(n); production: heap)
-    pub fn pick_next(&mut self, threads: &[SigmaThread]) -> Option<u32> {
-        let mut best: Option<(usize, u64)> = None;
-        for i in 0..self.count {
-            let tid = self.tids[i] as usize;
-            if tid >= MAX_THREADS { continue; }
-            let dl = threads[tid].deadline_ns;
-            if best.map_or(true, |(_, bd)| dl < bd) {
-                best = Some((i, dl));
-            }
+    pub fn pick_next(&mut self) -> Option<u32> {
+        if self.count == 0 { return None; }
+        let root_tid = self.nodes[0].tid;
+        self.count -= 1;
+        if self.count > 0 {
+            self.nodes[0] = self.nodes[self.count];
+            self.trickle_down(0);
         }
-        best.map(|(idx, _)| {
-            let tid = self.tids[idx];
-            self.tids[idx] = self.tids[self.count - 1];
-            self.tids[self.count - 1] = u32::MAX;
-            self.count -= 1;
-            tid
-        })
+        self.nodes[self.count] = EdfNode { tid: NIL, deadline_ns: 0 };
+        Some(root_tid)
+    }
+
+    fn bubble_up(&mut self, mut idx: usize) {
+        while idx > 0 {
+            let parent = (idx - 1) / 2;
+            if self.nodes[idx].deadline_ns >= self.nodes[parent].deadline_ns { break; }
+            self.nodes.swap(idx, parent);
+            idx = parent;
+        }
+    }
+
+    fn trickle_down(&mut self, mut idx: usize) {
+        loop {
+            let left = 2 * idx + 1;
+            let right = 2 * idx + 2;
+            let mut smallest = idx;
+            
+            if left < self.count && self.nodes[left].deadline_ns < self.nodes[smallest].deadline_ns {
+                smallest = left;
+            }
+            if right < self.count && self.nodes[right].deadline_ns < self.nodes[smallest].deadline_ns {
+                smallest = right;
+            }
+            if smallest == idx { break; }
+            self.nodes.swap(idx, smallest);
+            idx = smallest;
+        }
     }
 }
 
@@ -258,7 +428,7 @@ pub struct PerCpuRunqueue {
     pub mlfq:    MlfqQueue,
     pub cfs:     CfsRunqueue,
     pub edf:     EdfRunqueue,
-    pub current: u32, // TID of currently running thread (u32::MAX = idle)
+    pub current: u32,
 }
 
 impl PerCpuRunqueue {
@@ -267,31 +437,29 @@ impl PerCpuRunqueue {
             mlfq:    MlfqQueue::new(),
             cfs:     CfsRunqueue::new(),
             edf:     EdfRunqueue::new(),
-            current: u32::MAX,
+            current: NIL,
         }
     }
 
-    /// Enqueue a thread based on its scheduling policy
     pub fn enqueue(&mut self, t: &SigmaThread) {
         match t.policy {
-            SCHED_EDF          => self.edf.insert(t.tid),
+            SCHED_EDF          => self.edf.insert(t.tid, t.deadline_ns),
             SCHED_FIFO | SCHED_RR => self.mlfq.enqueue(0, t.tid),
             _                  => {
                 if t.timeslice > 0 && t.mlfq_level < MLFQ_LEVELS {
                     self.mlfq.enqueue(t.mlfq_level, t.tid);
                 } else {
-                    self.cfs.insert(t.tid);
+                    self.cfs.insert(t.tid, t.vruntime);
                 }
             }
         }
     }
 
-    /// Select the next thread to run. Tier order: EDF > MLFQ > CFS > idle
-    pub fn pick_next(&mut self, threads: &[SigmaThread]) -> u32 {
-        if let Some(tid) = self.edf.pick_next(threads)  { return tid; }
-        if let Some(tid) = self.mlfq.pick_next()         { return tid; }
-        if let Some(tid) = self.cfs.pick_next(threads)   { return tid; }
-        u32::MAX // idle
+    pub fn pick_next(&mut self) -> u32 {
+        if let Some(tid) = self.edf.pick_next()  { return tid; }
+        if let Some(tid) = self.mlfq.pick_next() { return tid; }
+        if let Some(tid) = self.cfs.pick_next()  { return tid; }
+        NIL
     }
 }
 
@@ -324,8 +492,6 @@ impl SigmaScheduler {
         self.num_cpus = num_cpus.min(MAX_CPUS);
     }
 
-    // ── Thread Management ────────────────────────────────────────────────────
-
     pub fn spawn(
         &mut self,
         pid: u32,
@@ -335,7 +501,6 @@ impl SigmaScheduler {
         policy: u8,
         priority: i32,
     ) -> Option<u32> {
-        // Find a free slot
         let tid = self.next_tid as usize;
         if tid >= MAX_THREADS { return None; }
         self.next_tid += 1;
@@ -397,10 +562,6 @@ impl SigmaScheduler {
         self.runqueues[cpu].enqueue(&t_copy);
     }
 
-    // ── Tick handler (called from timer IRQ) ─────────────────────────────────
-
-    /// Called every timer tick on CPU `cpu_id`. Returns the TID to switch to
-    /// (u32::MAX = stay on idle, or no switch needed).
     pub fn tick(&mut self, cpu_id: usize, now_ns: u64) -> u32 {
         self.tick += 1;
         let cur_tid = self.runqueues[cpu_id].current as usize;
@@ -408,7 +569,6 @@ impl SigmaScheduler {
         if cur_tid < MAX_THREADS {
             let t = &mut self.threads[cur_tid];
 
-            // CFS: advance vruntime proportional to priority weight
             let weight: u64 = match t.priority {
                 n if n < 0  => (1u64 << (-n as u64).min(20)),
                 0           => 1,
@@ -416,19 +576,15 @@ impl SigmaScheduler {
             };
             t.vruntime += weight;
 
-            // EDF: check if deadline missed
             if t.policy == SCHED_EDF && now_ns > t.deadline_ns {
-                // Log deadline miss (in production: raise SIGXCPU or kill)
                 t.state = ThreadState::Zombie;
             }
 
-            // MLFQ: consume timeslice
             if t.policy == SCHED_NORMAL && t.mlfq_level < MLFQ_LEVELS {
                 if t.timeslice > 0 {
                     t.timeslice -= 1;
                 }
                 if t.timeslice == 0 {
-                    // Demote to next MLFQ level (or fall into CFS)
                     t.mlfq_level = (t.mlfq_level + 1).min(MLFQ_LEVELS);
                     t.timeslice = MLFQ_TIMESLICE * (1 << t.mlfq_level.min(6)) as u64;
                     t.state = ThreadState::Ready;
@@ -439,12 +595,10 @@ impl SigmaScheduler {
             }
         }
 
-        // Priority boost every 100 ticks (MLFQ anti-starvation)
         if self.tick % 100 == 0 {
             self.priority_boost(cpu_id);
         }
 
-        // Work-steal if this CPU's runqueue is empty
         if self.runqueues[cpu_id].edf.count == 0
             && self.runqueues[cpu_id].cfs.count == 0
             && self.runqueues[cpu_id].mlfq.counts.iter().all(|c| *c == 0)
@@ -452,7 +606,7 @@ impl SigmaScheduler {
             self.work_steal(cpu_id);
         }
 
-        let next = self.runqueues[cpu_id].pick_next(&self.threads);
+        let next = self.runqueues[cpu_id].pick_next();
         if next < MAX_THREADS as u32 {
             self.threads[next as usize].state = ThreadState::Running;
         }
@@ -460,10 +614,7 @@ impl SigmaScheduler {
         next
     }
 
-    // ── Priority Boost (anti-starvation) ─────────────────────────────────────
-
     fn priority_boost(&mut self, cpu_id: usize) {
-        // Move all ready threads back to MLFQ level 0 to prevent starvation
         for tid in 0..MAX_THREADS {
             let t = &mut self.threads[tid];
             if t.cpu_id != cpu_id { continue; }
@@ -474,12 +625,9 @@ impl SigmaScheduler {
         }
     }
 
-    // ── Work Stealing ─────────────────────────────────────────────────────────
-
     fn work_steal(&mut self, dst_cpu: usize) {
         if self.num_cpus < 2 { return; }
         
-        // BUG-002 Fix: Power of two choices instead of O(n) scan
         let seed = self.tick.wrapping_add(dst_cpu as u64);
         let mut r = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
         let cpu1 = ((r >> 32) as usize) % self.num_cpus;
@@ -497,31 +645,25 @@ impl SigmaScheduler {
 
         if busiest == dst_cpu || max_load < 2 { return; }
 
-        // Steal half the tasks from busiest's CFS queue
         let steal = max_load / 2;
         let src_count = self.runqueues[busiest].cfs.count;
         let to_steal = steal.min(src_count);
 
         for _ in 0..to_steal {
-            if self.runqueues[busiest].cfs.count == 0 { break; }
-            let last = self.runqueues[busiest].cfs.count - 1;
-            let tid = self.runqueues[busiest].cfs.tids[last];
-            self.runqueues[busiest].cfs.tids[last] = u32::MAX;
-            self.runqueues[busiest].cfs.count -= 1;
-
-            if (tid as usize) < MAX_THREADS {
-                self.threads[tid as usize].cpu_id = dst_cpu;
-                self.runqueues[dst_cpu].cfs.insert(tid);
+            if let Some(tid) = self.runqueues[busiest].cfs.extract_any() {
+                if (tid as usize) < MAX_THREADS {
+                    self.threads[tid as usize].cpu_id = dst_cpu;
+                    self.runqueues[dst_cpu].cfs.insert(tid, self.threads[tid as usize].vruntime);
+                }
+            } else {
+                break;
             }
         }
     }
 
-    // ── CPU Selection (lowest load) ───────────────────────────────────────────
-
     fn pick_cpu(&self) -> usize {
         if self.num_cpus < 2 { return 0; }
         
-        // BUG-002 Fix: Power of two choices instead of O(n) scan
         let seed = self.tick.wrapping_add(self.next_tid as u64);
         let mut r = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
         let cpu1 = ((r >> 32) as usize) % self.num_cpus;
@@ -564,7 +706,6 @@ pub fn sched_unblock(tid: u32) {
     unsafe { SCHEDULER.unblock(tid); }
 }
 
-/// Timer IRQ entry-point — returns next TID to run on `cpu_id`
 pub fn sched_tick(cpu_id: usize, now_ns: u64) -> u32 {
     unsafe { SCHEDULER.tick(cpu_id, now_ns) }
 }
