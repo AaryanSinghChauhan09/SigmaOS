@@ -1,0 +1,1 @@
+# GPG‑signed package repo tooling\n\n**Area**: packaging-build-reproducibility\n**Source**: Fedora\n**Note**: signing, verification, and key rotation scripts.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,0 +1,1 @@
+# Secrets manager integration (Vault)\n\n**Area**: security-sandboxing-forensics\n**Source**: HashiCorp patterns\n**Note**: secrets lifecycle and rotation.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

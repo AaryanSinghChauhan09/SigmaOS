@@ -1,0 +1,1 @@
+# Automated incident response playbooks\n\n**Area**: security-sandboxing-forensics\n**Source**: Kali/Qubes\n**Note**: runnable playbooks in Wiki.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

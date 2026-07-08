@@ -1,0 +1,1 @@
+# Secure logging with tamper evidence\n\n**Area**: security-sandboxing-forensics\n**Source**: systemd/journal + signing\n**Note**: forensic integrity.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

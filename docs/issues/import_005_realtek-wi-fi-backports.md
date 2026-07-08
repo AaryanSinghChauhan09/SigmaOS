@@ -1,0 +1,1 @@
+# Realtek Wi‑Fi backports\n\n**Area**: kernel-drivers\n**Source**: Arch/Fedora\n**Note**: backport stable fixes for consumer chipsets.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

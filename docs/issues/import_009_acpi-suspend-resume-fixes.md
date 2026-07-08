@@ -1,0 +1,1 @@
+# ACPI suspend/resume fixes\n\n**Area**: kernel-drivers\n**Source**: linux\n**Note**: reduce resume failures on popular laptops.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

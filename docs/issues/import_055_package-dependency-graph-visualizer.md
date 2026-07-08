@@ -1,0 +1,1 @@
+# Package dependency graph visualizer\n\n**Area**: packaging-build-reproducibility\n**Source**: Arch/Nix\n**Note**: maintainers debug dependency bloat.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

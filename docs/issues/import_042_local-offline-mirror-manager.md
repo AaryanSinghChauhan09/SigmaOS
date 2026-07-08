@@ -1,0 +1,1 @@
+# Local offline mirror manager\n\n**Area**: packaging-build-reproducibility\n**Source**: Debian/Arch\n**Note**: create air‑gapped mirrors for installs.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

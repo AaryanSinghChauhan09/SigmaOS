@@ -1,0 +1,1 @@
+# TPM attestation workflows\n\n**Area**: security-sandboxing-forensics\n**Source**: Fedora\n**Note**: device attestation and sealed secrets.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

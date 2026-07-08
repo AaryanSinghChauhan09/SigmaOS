@@ -1,0 +1,1 @@
+# Signed ZFS module packaging\n\n**Area**: kernel-drivers\n**Source**: Debian/Arch\n**Note**: reproducible, signed ZFS kernel modules.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

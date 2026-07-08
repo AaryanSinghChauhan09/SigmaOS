@@ -1,0 +1,1 @@
+# Per‑app network policy engine\n\n**Area**: security-sandboxing-forensics\n**Source**: Fedora/nftables\n**Note**: per‑app firewall and WireGuard profiles.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

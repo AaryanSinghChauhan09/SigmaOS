@@ -1,0 +1,1 @@
+# Automated SBOM publishing\n\n**Area**: packaging-build-reproducibility\n**Source**: Nix\n**Note**: publish SBOMs to artifact registry.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

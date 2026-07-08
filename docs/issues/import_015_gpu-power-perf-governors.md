@@ -1,0 +1,1 @@
+# GPU power/perf governors\n\n**Area**: kernel-drivers\n**Source**: Fedora\n**Note**: persona profiles for battery vs performance.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

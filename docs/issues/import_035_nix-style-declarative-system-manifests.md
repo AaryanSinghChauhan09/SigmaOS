@@ -1,0 +1,1 @@
+# Nix‑style declarative system manifests\n\n**Area**: packaging-build-reproducibility\n**Source**: NixOS\n**Note**: reproducible system configuration model.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

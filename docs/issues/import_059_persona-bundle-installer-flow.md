@@ -1,0 +1,1 @@
+# Persona bundle installer flow\n\n**Area**: installer-imaging-first-run\n**Source**: Ubuntu/Fedora\n**Note**: preconfigured persona selection.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

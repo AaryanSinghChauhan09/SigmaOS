@@ -1,0 +1,1 @@
+# Accessibility suite (screen reader, magnifier)\n\n**Area**: desktop-compositor-ux\n**Source**: Ubuntu\n**Note**: ship and configure by default.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

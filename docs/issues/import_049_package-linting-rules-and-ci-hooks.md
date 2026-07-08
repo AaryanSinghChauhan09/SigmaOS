@@ -1,0 +1,1 @@
+# Package linting rules and CI hooks\n\n**Area**: packaging-build-reproducibility\n**Source**: Arch/Debian\n**Note**: enforce packaging quality.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,0 +1,1 @@
+# Fingerprint sensor support (fprintd)\n\n**Area**: kernel-drivers\n**Source**: Fedora/Arch\n**Note**: secure enrollment and UX.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

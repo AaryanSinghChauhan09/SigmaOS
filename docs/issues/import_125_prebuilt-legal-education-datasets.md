@@ -1,0 +1,1 @@
+# Prebuilt legal/education datasets\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: community\n**Note**: offline corpora for bundles.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

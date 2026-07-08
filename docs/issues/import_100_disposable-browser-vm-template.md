@@ -1,0 +1,1 @@
+# Disposable browser VM template\n\n**Area**: security-sandboxing-forensics\n**Source**: Qubes\n**Note**: ephemeral browsing environments.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

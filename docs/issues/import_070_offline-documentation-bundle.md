@@ -1,0 +1,1 @@
+# Offline documentation bundle\n\n**Area**: installer-imaging-first-run\n**Source**: Debian\n**Note**: ship full docs for air‑gapped users.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

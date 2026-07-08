@@ -1,0 +1,1 @@
+# ALSA + PipeWire kernel hooks\n\n**Area**: kernel-drivers\n**Source**: Fedora/Arch\n**Note**: low‑latency audio path tuning.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

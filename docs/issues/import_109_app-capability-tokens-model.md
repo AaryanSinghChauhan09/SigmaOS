@@ -1,0 +1,1 @@
+# App capability tokens model\n\n**Area**: security-sandboxing-forensics\n**Source**: Qubes-like\n**Note**: fine‑grained capability model for apps.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

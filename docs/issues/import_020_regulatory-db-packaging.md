@@ -1,0 +1,1 @@
+# Regulatory DB packaging\n\n**Area**: kernel-drivers\n**Source**: Debian\n**Note**: correct Wi‑Fi regulatory defaults per region.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

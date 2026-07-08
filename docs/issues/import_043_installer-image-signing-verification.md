@@ -1,0 +1,1 @@
+# Installer image signing & verification\n\n**Area**: packaging-build-reproducibility\n**Source**: Fedora\n**Note**: ensure ISO integrity at boot.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

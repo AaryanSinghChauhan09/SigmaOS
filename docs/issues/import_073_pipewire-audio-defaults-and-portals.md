@@ -1,0 +1,1 @@
+# PipeWire audio defaults and portals\n\n**Area**: desktop-compositor-ux\n**Source**: Fedora\n**Note**: low‑latency audio and sandboxing.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

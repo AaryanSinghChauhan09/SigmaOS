@@ -1,0 +1,1 @@
+# Unified settings with persona profiles\n\n**Area**: desktop-compositor-ux\n**Source**: GNOME\n**Note**: switch persona presets centrally.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

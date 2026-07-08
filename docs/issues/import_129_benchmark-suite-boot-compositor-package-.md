@@ -1,0 +1,1 @@
+# Benchmark suite (boot, compositor, package install)\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Arch/Fedora\n**Note**: automated performance regression tests.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

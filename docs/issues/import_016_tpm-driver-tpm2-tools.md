@@ -1,0 +1,1 @@
+# TPM driver + tpm2 tools\n\n**Area**: kernel-drivers\n**Source**: Fedora/Debian\n**Note**: attestation and sealed storage flows.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

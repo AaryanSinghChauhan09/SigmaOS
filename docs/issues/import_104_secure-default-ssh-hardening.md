@@ -1,0 +1,1 @@
+# Secure default SSH hardening\n\n**Area**: security-sandboxing-forensics\n**Source**: Debian/Fedora\n**Note**: modern algorithms and rate limits.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

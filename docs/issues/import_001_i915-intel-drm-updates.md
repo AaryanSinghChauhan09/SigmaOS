@@ -1,0 +1,1 @@
+# i915 Intel DRM updates\n\n**Area**: kernel-drivers\n**Source**: torvalds/linux\n**Note**: integrate latest stability and power patches.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

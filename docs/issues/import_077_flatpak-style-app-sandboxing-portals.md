@@ -1,0 +1,1 @@
+# Flatpak‑style app sandboxing + portals\n\n**Area**: desktop-compositor-ux\n**Source**: Flatpak/Fedora\n**Note**: secure app resource access.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

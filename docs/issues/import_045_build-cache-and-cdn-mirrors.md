@@ -1,0 +1,1 @@
+# Build cache and CDN mirrors\n\n**Area**: packaging-build-reproducibility\n**Source**: Arch/Fedora\n**Note**: accelerate installs and updates.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

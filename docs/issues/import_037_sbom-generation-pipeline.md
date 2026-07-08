@@ -1,0 +1,1 @@
+# SBOM generation pipeline\n\n**Area**: packaging-build-reproducibility\n**Source**: Nix/Guix\n**Note**: SBOMs for every artifact in CI.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,0 +1,1 @@
+# Automated HCL detection during install\n\n**Area**: installer-imaging-first-run\n**Source**: Arch/Fedora\n**Note**: preselect drivers and firmware.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,0 +1,1 @@
+# Structured kernel crash telemetry\n\n**Area**: kernel-drivers\n**Source**: linux\n**Note**: automated OOPS/panic reporting to CI.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

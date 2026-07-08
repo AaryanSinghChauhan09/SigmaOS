@@ -1,0 +1,1 @@
+# Accessibility first‑run flow\n\n**Area**: installer-imaging-first-run\n**Source**: Ubuntu\n**Note**: screen reader and high‑contrast setup.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

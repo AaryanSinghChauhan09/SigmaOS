@@ -1,0 +1,1 @@
+# Window tiling and keyboard workflows\n\n**Area**: desktop-compositor-ux\n**Source**: i3/tiling extensions\n**Note**: power user features.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

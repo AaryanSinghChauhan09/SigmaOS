@@ -1,0 +1,1 @@
+# Encrypted swap and zram policies\n\n**Area**: security-sandboxing-forensics\n**Source**: Debian/Fedora\n**Note**: secure memory defaults.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

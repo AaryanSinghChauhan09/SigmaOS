@@ -1,0 +1,1 @@
+# Intel wireless power management\n\n**Area**: kernel-drivers\n**Source**: linux/firmware\n**Note**: reduce suspend/resume issues and power draw.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

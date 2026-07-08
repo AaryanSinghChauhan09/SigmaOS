@@ -1,0 +1,20 @@
+name: Sync Wiki
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'wiki/**'
+      - 'wiki_repo/**'
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Sync Wiki Directory
+        uses: _SigmaOS_Internal_Action_Placeholder_
+        with:
+          source: wiki_repo
+          destination: wiki
+          token: ${{ secrets.GITHUB_TOKEN }}

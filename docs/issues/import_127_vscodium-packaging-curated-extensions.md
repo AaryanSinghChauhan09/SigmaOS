@@ -1,0 +1,1 @@
+# VSCodium packaging + curated extensions\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Arch/Fedora\n**Note**: audited IDE experience.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,0 +1,1 @@
+# Early serial console improvements\n\n**Area**: kernel-drivers\n**Source**: linux\n**Note**: robust early boot logging and crash capture.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

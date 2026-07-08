@@ -1,0 +1,1 @@
+# Suricata IDS packaged with default rules\n\n**Area**: security-sandboxing-forensics\n**Source**: Kali/Fedora\n**Note**: network intrusion detection.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

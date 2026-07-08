@@ -1,0 +1,1 @@
+# Broadcom Wi‑Fi firmware packaging\n\n**Area**: kernel-drivers\n**Source**: Debian/Fedora patches\n**Note**: signed firmware loader and secure packaging.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

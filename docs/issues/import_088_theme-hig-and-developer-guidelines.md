@@ -1,0 +1,1 @@
+# Theme/HIG and developer guidelines\n\n**Area**: desktop-compositor-ux\n**Source**: GNOME\n**Note**: consistent app design language.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

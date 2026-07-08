@@ -1,0 +1,1 @@
+# JupyterLab secure sandbox\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Debian/Fedora\n**Note**: notebook isolation and resource limits.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

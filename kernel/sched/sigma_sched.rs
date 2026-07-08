@@ -477,18 +477,22 @@ impl SigmaScheduler {
     // ── Work Stealing ─────────────────────────────────────────────────────────
 
     fn work_steal(&mut self, dst_cpu: usize) {
-        // Find the busiest CPU
-        let mut busiest = dst_cpu;
-        let mut max_load = 0usize;
-        for cpu in 0..self.num_cpus {
-            if cpu == dst_cpu { continue; }
-            let load = self.runqueues[cpu].cfs.count
-                + self.runqueues[cpu].edf.count
-                + self.runqueues[cpu].mlfq.counts.iter().sum::<usize>();
-            if load > max_load {
-                max_load = load;
-                busiest = cpu;
-            }
+        if self.num_cpus < 2 { return; }
+        
+        // BUG-002 Fix: Power of two choices instead of O(n) scan
+        let seed = self.tick.wrapping_add(dst_cpu as u64);
+        let mut r = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        let cpu1 = ((r >> 32) as usize) % self.num_cpus;
+        r = r.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        let cpu2 = ((r >> 32) as usize) % self.num_cpus;
+
+        let load1 = self.runqueues[cpu1].cfs.count + self.runqueues[cpu1].edf.count + self.runqueues[cpu1].mlfq.counts.iter().sum::<usize>();
+        let load2 = self.runqueues[cpu2].cfs.count + self.runqueues[cpu2].edf.count + self.runqueues[cpu2].mlfq.counts.iter().sum::<usize>();
+
+        let (mut busiest, mut max_load) = if load1 > load2 { (cpu1, load1) } else { (cpu2, load2) };
+        if busiest == dst_cpu {
+            busiest = if busiest == cpu1 { cpu2 } else { cpu1 };
+            max_load = if busiest == cpu1 { load1 } else { load2 };
         }
 
         if busiest == dst_cpu || max_load < 2 { return; }
@@ -515,18 +519,19 @@ impl SigmaScheduler {
     // ── CPU Selection (lowest load) ───────────────────────────────────────────
 
     fn pick_cpu(&self) -> usize {
-        let mut min_load = usize::MAX;
-        let mut best = 0;
-        for cpu in 0..self.num_cpus {
-            let load = self.runqueues[cpu].cfs.count
-                + self.runqueues[cpu].edf.count
-                + self.runqueues[cpu].mlfq.counts.iter().sum::<usize>();
-            if load < min_load {
-                min_load = load;
-                best = cpu;
-            }
-        }
-        best
+        if self.num_cpus < 2 { return 0; }
+        
+        // BUG-002 Fix: Power of two choices instead of O(n) scan
+        let seed = self.tick.wrapping_add(self.next_tid as u64);
+        let mut r = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        let cpu1 = ((r >> 32) as usize) % self.num_cpus;
+        r = r.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        let cpu2 = ((r >> 32) as usize) % self.num_cpus;
+
+        let load1 = self.runqueues[cpu1].cfs.count + self.runqueues[cpu1].edf.count + self.runqueues[cpu1].mlfq.counts.iter().sum::<usize>();
+        let load2 = self.runqueues[cpu2].cfs.count + self.runqueues[cpu2].edf.count + self.runqueues[cpu2].mlfq.counts.iter().sum::<usize>();
+
+        if load1 < load2 { cpu1 } else { cpu2 }
     }
 }
 

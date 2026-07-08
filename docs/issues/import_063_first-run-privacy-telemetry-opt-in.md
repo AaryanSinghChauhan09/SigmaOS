@@ -1,0 +1,1 @@
+# First‑run privacy & telemetry opt‑in\n\n**Area**: installer-imaging-first-run\n**Source**: Ubuntu\n**Note**: transparent telemetry choices.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

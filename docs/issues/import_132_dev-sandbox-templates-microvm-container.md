@@ -1,0 +1,1 @@
+# Dev sandbox templates (microVM + container)\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Qubes/Nix\n**Note**: reproducible dev environments.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

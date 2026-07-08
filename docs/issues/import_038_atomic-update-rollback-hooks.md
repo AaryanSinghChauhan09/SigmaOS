@@ -1,0 +1,1 @@
+# Atomic update + rollback hooks\n\n**Area**: packaging-build-reproducibility\n**Source**: Nix/OSTree\n**Note**: safe upgrades with rollback.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

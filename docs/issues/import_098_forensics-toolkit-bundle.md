@@ -1,0 +1,1 @@
+# Forensics toolkit bundle\n\n**Area**: security-sandboxing-forensics\n**Source**: Kali\n**Note**: Volatility, Autopsy, Sleuth Kit preconfigured.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

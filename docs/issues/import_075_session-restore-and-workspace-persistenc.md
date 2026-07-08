@@ -1,0 +1,1 @@
+# Session restore and workspace persistence\n\n**Area**: desktop-compositor-ux\n**Source**: GNOME/KDE\n**Note**: robust session management.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

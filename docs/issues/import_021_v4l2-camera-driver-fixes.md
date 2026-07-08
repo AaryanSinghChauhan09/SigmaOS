@@ -1,0 +1,1 @@
+# V4L2 camera driver fixes\n\n**Area**: kernel-drivers\n**Source**: Arch/Debian\n**Note**: firmware packaging and privacy toggles.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n
