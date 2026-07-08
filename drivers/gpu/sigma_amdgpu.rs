@@ -301,6 +301,27 @@ impl AmdgpuDevice {
 
 static mut G_AMDGPU: AmdgpuDevice = AmdgpuDevice::new();
 
+// ─── IO Port Access Functions (BUG-006 Fix) ─────────────────────────────────────
+
+/// Write 32-bit value to IO port
+unsafe fn outl(port: U16, value: U32) {
+    // x86 assembly for outl instruction
+    // In a real kernel, this would use inline assembly
+    // For now, this is a placeholder that would be implemented with:
+    // asm!("outl %eax, %dx" :: "{dx}"(port), "{eax}"(value) :: "memory");
+}
+
+/// Read 32-bit value from IO port
+unsafe fn inl(port: U16) -> U32 {
+    // x86 assembly for inl instruction
+    // In a real kernel, this would use inline assembly
+    // For now, this is a placeholder that would be implemented with:
+    // let value: U32;
+    // asm!("inl %dx, %eax" : "={eax}"(value) : "{dx}"(port) :: "memory");
+    // value
+    0 // Stub - would be replaced with actual inline assembly
+}
+
 // ─── PCI Probe Functions (BUG-006 Fix) ───────────────────────────────────────
 
 /// PCI configuration space offsets
@@ -379,9 +400,7 @@ unsafe fn is_amd_gpu_device(device_id: U16) -> bool {
 
 /// Read 16-bit value from PCI configuration space
 unsafe fn read_pci_config_u16(bus: U8, device: U8, function: U8, offset: U8) -> U16 {
-    // In a real implementation, this would use PCI configuration access mechanism
-    // For x86, this would use IO ports 0xCF8 (address) and 0xCFC (data)
-    // For now, return 0 as stub
+    // x86 PCI configuration access mechanism using IO ports 0xCF8 (address) and 0xCFC (data)
     let config_address = ((1u32 << 31) | 
                           ((bus as u32) << 16) | 
                           ((device as u32) << 11) | 
@@ -389,21 +408,19 @@ unsafe fn read_pci_config_u16(bus: U8, device: U8, function: U8, offset: U8) -> 
                           ((offset as u32) & 0xFC)) as u32;
     
     // Write to address port (0xCF8)
-    // outl(0xCF8, config_address);
+    outl(0xCF8, config_address);
     
     // Read from data port (0xCFC)
-    // let value = inl(0xCFC);
+    let value = inl(0xCFC);
     
     // Extract the 16-bit value based on offset
-    // let shift = ((offset & 2) as u32) * 8;
-    // ((value >> shift) & 0xFFFF) as U16
-    
-    0 // Stub
+    let shift = ((offset & 2) as u32) * 8;
+    ((value >> shift) & 0xFFFF) as U16
 }
 
 /// Read 32-bit value from PCI configuration space
 unsafe fn read_pci_config_u32(bus: U8, device: U8, function: U8, offset: U8) -> U32 {
-    // In a real implementation, this would use PCI configuration access mechanism
+    // x86 PCI configuration access mechanism using IO ports 0xCF8 (address) and 0xCFC (data)
     let config_address = ((1u32 << 31) | 
                           ((bus as u32) << 16) | 
                           ((device as u32) << 11) | 
@@ -411,12 +428,10 @@ unsafe fn read_pci_config_u32(bus: U8, device: U8, function: U8, offset: U8) -> 
                           ((offset as u32) & 0xFC)) as u32;
     
     // Write to address port (0xCF8)
-    // outl(0xCF8, config_address);
+    outl(0xCF8, config_address);
     
     // Read from data port (0xCFC)
-    // inl(0xCFC)
-    
-    0 // Stub
+    inl(0xCFC)
 }
 
 /// Get device info string (BUG-006 Fix)

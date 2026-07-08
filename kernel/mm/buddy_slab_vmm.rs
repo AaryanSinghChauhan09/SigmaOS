@@ -62,6 +62,32 @@ pub unsafe extern "C" fn mm_buddy_init(base: U64, total: Usize) {
     }
 }
 
+// BUG-001 Fix: Add VMM integration helper functions
+
+/// Allocate pages for VMM with automatic buddy allocator integration
+#[no_mangle]
+pub unsafe extern "C" fn vmm_alloc_pages_for_vmm(order: Usize) -> U64 {
+    mm_alloc_pages(order)
+}
+
+/// Free pages from VMM with automatic buddy allocator integration
+#[no_mangle]
+pub unsafe extern "C" fn vmm_free_pages_for_vmm(addr: U64, order: Usize) {
+    mm_free_pages(addr, order)
+}
+
+/// Get total free pages for VMM statistics
+#[no_mangle]
+pub unsafe extern "C" fn vmm_get_free_pages() -> Usize {
+    mm_free_page_count()
+}
+
+/// Check if buddy allocator is initialized (BUG-001 Fix)
+#[no_mangle]
+pub unsafe extern "C" fn mm_buddy_is_initialized() -> Bool {
+    TOTAL_PAGES > 0
+}
+
 /// Free `2^order` pages starting at physical address `addr`.
 #[no_mangle]
 pub unsafe extern "C" fn mm_free_pages(addr: U64, order: Usize) {

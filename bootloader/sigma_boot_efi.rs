@@ -1118,11 +1118,22 @@ pub unsafe extern "C" fn sigma_boot_entry(entry_index: SigmaI32) -> SigmaI32 {
         &entry.kernel_path[..entry.kernel_path.iter().position(|&x| x == 0).unwrap_or(256)]
     );
     
-    let (kernel_phys, kernel_sz) = match load_file(kernel_path) {
+    let (kernel_data_phys, kernel_file_sz) = match load_file(kernel_path) {
         Ok(addr) => addr,
         Err(status) => {
             print_string("Failed to load kernel\n");
             return -(status as i32);
+        }
+    };
+    
+    // BUG-003 Fix: Load ELF kernel from loaded file data
+    let (kernel_phys, kernel_sz) = match load_elf_kernel(kernel_data_phys as *const u8, kernel_file_sz) {
+        Ok(addr) => addr,
+        Err(msg) => {
+            print_string("Failed to load ELF kernel: ");
+            print_string(msg);
+            print_string("\n");
+            return -1;
         }
     };
     
