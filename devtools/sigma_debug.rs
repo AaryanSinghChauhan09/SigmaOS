@@ -225,8 +225,15 @@ pub unsafe extern "C" fn debugger_enable_breakpoint(breakpoint_id: SigmaU32) -> 
         return -1;
     }
 
-    // In real implementation, enable breakpoint
-    0
+    if let Some(debugger) = &mut DEBUGGER {
+        // Enable breakpoint (inspired by GDB)
+        // In production: set breakpoint state to enabled, insert INT3 instruction
+        if breakpoint_id > 0 && breakpoint_id <= debugger.breakpoint_count {
+            return 0;
+        }
+    }
+
+    -1
 }
 
 /// Disable breakpoint
@@ -236,8 +243,15 @@ pub unsafe extern "C" fn debugger_disable_breakpoint(breakpoint_id: SigmaU32) ->
         return -1;
     }
 
-    // In real implementation, disable breakpoint
-    0
+    if let Some(debugger) = &mut DEBUGGER {
+        // Disable breakpoint (inspired by GDB)
+        // In production: set breakpoint state to disabled, remove INT3 instruction
+        if breakpoint_id > 0 && breakpoint_id <= debugger.breakpoint_count {
+            return 0;
+        }
+    }
+
+    -1
 }
 
 /// List breakpoints
@@ -281,8 +295,14 @@ pub unsafe extern "C" fn debugger_step() -> SigmaI32 {
         return -1;
     }
 
-    // In real implementation, single step
-    0
+    if let Some(debugger) = &mut DEBUGGER {
+        // Single step (inspired by GDB)
+        // In production: execute single instruction, update registers
+        debugger.running = false;
+        return 0;
+    }
+
+    -1
 }
 
 /// Step over
@@ -292,8 +312,14 @@ pub unsafe extern "C" fn debugger_step_over() -> SigmaI32 {
         return -1;
     }
 
-    // In real implementation, step over function
-    0
+    if let Some(debugger) = &mut DEBUGGER {
+        // Step over function (inspired by GDB)
+        // In production: execute until return from current function
+        debugger.running = false;
+        return 0;
+    }
+
+    -1
 }
 
 /// Step out

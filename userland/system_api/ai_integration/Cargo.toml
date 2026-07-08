@@ -7,16 +7,19 @@ license = "MIT"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
 [dependencies]
-chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "1.4", features = ["v4", "serde"] }
+# Native replacements for external crates:
+# - sigma_time: replaces chrono
+# - sigma_uuid: replaces uuid
+# - sigma_regex: replaces regex (simple pattern matching)
+# serde and serde_json kept for serialization (can be replaced later if needed)
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-regex = "1.10"
 
-# HTTP client for model downloads
+# HTTP client for model downloads (native implementation planned)
+# For now, keep reqwest but mark for replacement
 reqwest = { version = "0.11", features = ["json"] }
 
-# Async runtime
+# Async runtime (keep for now, consider native async)
 tokio = { version = "1.0", features = ["full"] }
 
 # AI/ML dependencies (optional, for actual LLM integration)

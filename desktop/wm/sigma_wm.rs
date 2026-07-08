@@ -455,8 +455,18 @@ pub unsafe extern "C" fn wm_set_tiling_direction(
         return -1;
     }
 
-    // In real implementation, set tiling direction
-    0
+    if let Some(wm) -> &mut WINDOW_MANAGER {
+        if let Some(workspaces) = wm.workspaces.as_mut() {
+            let idx = workspace_id as usize;
+            if idx < wm.workspace_count as usize {
+                workspaces[idx].tiling_direction = direction;
+                wm_retile_workspace(workspace_id);
+                return 0;
+            }
+        }
+    }
+
+    -1
 }
 
 /// Set gaps
@@ -601,4 +611,112 @@ unsafe fn str_len(s: *const SigmaU8) -> usize {
         len += 1;
     }
     len
+}
+
+/// Auto-tile workspace windows
+#[no_mangle]
+pub unsafe extern "C" fn wm_retile_workspace(workspace_id: SigmaU32) -> SigmaI32 {
+    if WINDOW_MANAGER.is_none() {
+        return -1;
+    }
+
+    if let Some(wm) -> &mut WINDOW_MANAGER {
+        if let Some(workspaces) = wm.workspaces.as_mut() {
+            if let Some(windows) = wm.windows.as_mut() {
+                let ws_idx = workspace_id as usize;
+                if ws_idx >= wm.workspace_count as usize {
+                    return -1;
+                }
+
+                let workspace = &workspaces[ws_idx];
+                let direction = workspace.tiling_direction;
+                let gap_inner = workspace.gaps_inner;
+                let gap_outer = workspace.gaps_outer;
+
+                // Count windows in this workspace
+                let mut ws_windows: [SigmaU32; 64] = [0; 64];
+                let mut ws_window_count = 0;
+
+                for i in 0..wm.window_count as usize {
+                    if windows[i].workspace == workspace_id && !windows[i].floating {
+                        if ws_window_count < 64 {
+                            ws_windows[ws_window_count] = i as SigmaU32;
+                            ws_window_count += 1;
+                        }
+                    }
+                }
+
+                if ws_window_count == 0 {
+                    return 0;
+                }
+
+                // Get output dimensions (simplified - use first output)
+                let mut output_width = 1920;
+                let mut output_height = 1080;
+                if let Some(outputs) = wm.outputs.as_ref() {
+                    if wm.output_count > 0 {
+                        output_width = outputs[0].width;
+                        output_height = outputs[0].height;
+                    }
+                }
+
+                // Apply outer gaps
+                let available_width = output_width - 2 * gap_outer;
+                let available_height = output_height - 2 * gap_outer;
+                let start_x = gap_outer as i32;
+                let start_y = gap_outer as i32;
+
+                match direction {
+                    TilingDirection::Horizontal => {
+                        // Split horizontally (stack vertically)
+                        let window_height = (available_height - (ws_window_count - 1) * gap_inner) / ws_window_count as u32;
+                        
+                        for i in 0..ws_window_count {
+                            let win_idx = ws_windows[i] as usize;
+                            windows[win_idx].geometry.x = start_x;
+                            windows[win_idx].geometry.y = start_y + (i as i32 * (window_height + gap_inner) as i32);
+                            windows[win_idx].geometry.width = available_width;
+                            windows[win_idx].geometry.height = window_height;
+                        }
+                    }
+                    TilingDirection::Vertical => {
+                        // Split vertically (stack horizontally)
+                        let window_width = (available_width - (ws_window_count - 1) * gap_inner) / ws_window_count as u32;
+                        
+                        for i in 0..ws_window_count {
+                            let win_idx = ws_windows[i] as usize;
+                            windows[win_idx].geometry.x = start_x + (i as i32 * (window_width + gap_inner) as i32);
+                            windows[win_idx].geometry.y = start_y;
+                            windows[win_idx].geometry.width = window_width;
+                            windows[win_idx].geometry.height = available_height;
+                        }
+                    }
+                }
+
+                return 0;
+            }
+        }
+    }
+
+    -1
+}
+
+/// Auto-tile on window addition
+#[no_mangle]
+pub unsafe extern "C" fn wm_auto_tile(window_id: SigmaU32) -> SigmaI32 {
+    if WINDOW_MANAGER.is_none() {
+        return -1;
+    }
+
+    if let Some(wm) -> &WINDOW_MANAGER {
+        if let Some(windows) = wm.windows.as_ref() {
+            let win_idx = window_id as usize;
+            if win_idx < wm.window_count as usize {
+                let workspace_id = windows[win_idx].workspace;
+                return wm_retile_workspace(workspace_id);
+            }
+        }
+    }
+
+    -1
 }
