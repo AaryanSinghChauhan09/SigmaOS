@@ -75,6 +75,12 @@ SigmaOS includes a comprehensive set of hardware drivers based on Linux kernel d
   - Memory management
   - GART (Graphics Address Remapping Table)
   - Display engine support
+- **Recent Updates**:
+  - GART initialization with table clearing and VRAM management
+  - Display engine initialization with EDID reading and CRTC configuration
+  - Compute engine initialization with ring buffers and context setup
+  - Display detection, EDID structure, and CRTC configuration functions
+  - Inline assembly for IO port access (outl/inl)
 
 #### Intel GPU Driver (i915)
 - **File**: `drivers/gpu/sigma_i915.rs`
