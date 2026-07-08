@@ -23,11 +23,11 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Package signing verification - ED25519 signature verification implemented
 
 ### Networking
-- [ ] VPN client/server support (WireGuard, OpenVPN)
+- [x] VPN client/server support (WireGuard, OpenVPN) - WireGuard tunnel with key generation, OpenVPN with cert management, kill switch with firewall integration
 - [x] Firewall with user-defined rules (iptables/nftables compatibility) - Firewall trait with rule evaluation
-- [ ] Advanced routing (BGP, OSPF)
-- [ ] QoS controls
-- [ ] Network monitoring dashboard
+- [x] Advanced routing (BGP, OSPF) - BGP peer management, route selection, OSPF areas, SPF algorithm
+- [x] QoS controls - Token bucket rate limiting, traffic classification, queue management (FIFO, Priority, WFQ, CBQ, HTB)
+- [x] Network monitoring dashboard - Interface stats, connection monitoring, traffic analysis, alert thresholds
 - [x] Ethernet NIC drivers (e1000e) - Intel e1000e driver with EthernetDevice trait
 
 ### Security
