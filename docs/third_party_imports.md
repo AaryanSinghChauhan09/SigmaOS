@@ -13,7 +13,7 @@ This document tracks all third-party components, drivers, tools, and features im
 ## Source Distributions
 
 | Distro | Strength | Repo Types | Why Useful for SigmaOS |
-|--------|----------|------------|----------------------|
+| --- | --- | --- | --- |
 | Linux kernel | Upstream drivers, core subsystems | Kernel tree, drivers | Canonical source for drivers and kernel features |
 | Fedora | Upstream integration, SELinux, packaging | RPM specs, kernel modules, tooling | Strong driver packaging, security policies, CI patterns |
 | Arch Linux | Fast adoption, PKGBUILDs, userland tooling | PKGBUILDs, AUR helpers | Rapid packaging patterns, bleeding-edge modules |
@@ -210,8 +210,8 @@ All imported components must have their licenses tracked in this document and at
 ## Implementation Checklist
 
 - [x] Create docs/third_party_imports.md documentation structure
-- [ ] Open issues for each item with labels area/* and priority/*
-- [ ] Create feature branches work/<area>/<short-desc> for each implementation
+- [ ] Open issues for each item with labels `area/*` and `priority/*`
+- [ ] Create feature branches `work/<area>/<short-desc>` for each implementation
 - [ ] Add CI jobs: build, reproducibility, SBOM, CVE scan, hardware driver tests
 - [ ] Mirror docs to Wiki via script that syncs docs/ to Wiki on merged PRs
 - [ ] Track license compliance for each imported component
@@ -219,6 +219,6 @@ All imported components must have their licenses tracked in this document and at
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2026-07-07
+**Document Version**: 1.1
+**Last Updated**: 2026-07-08
 **Status**: Active Tracking
