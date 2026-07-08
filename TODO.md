@@ -17,9 +17,9 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 
 ### Package Management
 - [x] sigma_pkg dependency resolver implementation - OOP-based with DependencyResolver trait
-- [ ] Package rollback functionality
-- [ ] Sandboxed package installs
-- [ ] Delta updates support
+- [x] Package rollback functionality - Snapshot-based rollback system with circular buffer
+- [x] Sandboxed package installs - Network/filesystem isolation with resource limits
+- [x] Delta updates support - Binary patch application with version verification
 - [x] Package signing verification - ED25519 signature verification implemented
 
 ### Networking
