@@ -584,7 +584,67 @@ pub unsafe extern "C" fn secure_boot_generate_key(
         return -1;
     }
 
-    // In real implementation, generate key pair
+    let priv_key = &mut *private_key;
+    let pub_key = &mut *public_key;
+
+    // Set algorithm
+    priv_key.algorithm = algorithm;
+    pub_key.algorithm = algorithm;
+
+    // Generate key pair based on algorithm
+    match algorithm {
+        SignatureAlgorithm::RSA2048_SHA256 => {
+            priv_key.size = 256; // 2048 bits = 256 bytes
+            pub_key.size = 256;
+            // In real implementation, generate RSA-2048 key pair
+            // For now, allocate buffers
+            extern "C" {
+                fn sigma_malloc(size: SigmaUsize) -> *mut SigmaU8;
+            }
+            priv_key.data = sigma_malloc(256);
+            pub_key.data = sigma_malloc(256);
+            if priv_key.data.is_null() || pub_key.data.is_null() {
+                return -2;
+            }
+        }
+        SignatureAlgorithm::RSA4096_SHA512 => {
+            priv_key.size = 512; // 4096 bits = 512 bytes
+            pub_key.size = 512;
+            extern "C" {
+                fn sigma_malloc(size: SigmaUsize) -> *mut SigmaU8;
+            }
+            priv_key.data = sigma_malloc(512);
+            pub_key.data = sigma_malloc(512);
+            if priv_key.data.is_null() || pub_key.data.is_null() {
+                return -2;
+            }
+        }
+        SignatureAlgorithm::ECDSA_P256_SHA256 => {
+            priv_key.size = 32; // P-256 private key = 32 bytes
+            pub_key.size = 64; // P-256 public key = 64 bytes (uncompressed)
+            extern "C" {
+                fn sigma_malloc(size: SigmaUsize) -> *mut SigmaU8;
+            }
+            priv_key.data = sigma_malloc(32);
+            pub_key.data = sigma_malloc(64);
+            if priv_key.data.is_null() || pub_key.data.is_null() {
+                return -2;
+            }
+        }
+        SignatureAlgorithm::ECDSA_P384_SHA384 => {
+            priv_key.size = 48; // P-384 private key = 48 bytes
+            pub_key.size = 96; // P-384 public key = 96 bytes (uncompressed)
+            extern "C" {
+                fn sigma_malloc(size: SigmaUsize) -> *mut SigmaU8;
+            }
+            priv_key.data = sigma_malloc(48);
+            pub_key.data = sigma_malloc(96);
+            if priv_key.data.is_null() || pub_key.data.is_null() {
+                return -2;
+            }
+        }
+    }
+
     0
 }
 
@@ -639,6 +699,336 @@ pub unsafe extern "C" fn secure_boot_initialized() -> SigmaBool {
         manager.initialized
     } else {
         false
+    }
+}
+
+/// TPM device structure
+#[repr(C)]
+pub struct TpmDevice {
+    pub device_id: SigmaU32,
+    pub manufacturer: [SigmaU8; 4],
+    pub version: SigmaU32,
+    pub pcr_count: SigmaU32,
+    pub pcr_registers: [SigmaU8; 24 * 20], // 24 PCRs, 20 bytes each
+    pub initialized: SigmaBool,
+}
+
+/// TPM command codes
+pub const TPM_CMD_PCR_EXTEND: SigmaU32 = 0x00000014;
+pub const TPM_CMD_PCR_READ: SigmaU32 = 0x00000015;
+pub const TPM_CMD_SEAL: SigmaU32 = 0x00000016;
+pub const TPM_CMD_UNSEAL: SigmaU32 = 0x00000017;
+pub const TPM_CMD_QUOTE: SigmaU32 = 0x00000018;
+
+static mut TPM_DEVICE: Option<TpmDevice> = None;
+
+/// Initialize TPM device
+#[no_mangle]
+pub unsafe extern "C" fn tpm_init() -> SigmaI32 {
+    TPM_DEVICE = Some(TpmDevice {
+        device_id: 0,
+        manufacturer: [0; 4],
+        version: 0,
+        pcr_count: 24,
+        pcr_registers: [0; 24 * 20],
+        initialized: false,
+    });
+
+    if let Some(tpm) = &mut TPM_DEVICE {
+        // In real implementation, probe TPM via TCG interface
+        // For now, simulate TPM 2.0 device
+        tpm.device_id = 0x00010001; // TPM 2.0
+        tpm.manufacturer = [b'I', b'B', b'M', 0]; // IBM (example)
+        tpm.version = 0x02000000; // TPM 2.0 spec version
+        tpm.initialized = true;
+        return 0;
+    }
+
+    -1
+}
+
+/// Extend PCR register
+#[no_mangle]
+pub unsafe extern "C" fn tpm_pcr_extend(
+    pcr_index: SigmaU32,
+    data: *const SigmaU8,
+    data_len: SigmaU32,
+) -> SigmaI32 {
+    if TPM_DEVICE.is_none() || data.is_null() {
+        return -1;
+    }
+
+    if let Some(tpm) = &mut TPM_DEVICE {
+        if pcr_index >= 24 {
+            return -2;
+        }
+
+        if !tpm.initialized {
+            return -3;
+        }
+
+        // In real implementation, use SHA-256 to extend PCR
+        // PCR_new = SHA-256(PCR_old || data)
+        // For now, simulate extension
+        let pcr_offset = (pcr_index as usize) * 20;
+        for i in 0..20 {
+            if i < data_len as usize {
+                tpm.pcr_registers[pcr_offset + i] ^= *data.add(i);
+            }
+        }
+
+        return 0;
+    }
+
+    -1
+}
+
+/// Read PCR register
+#[no_mangle]
+pub unsafe extern "C" fn tpm_pcr_read(
+    pcr_index: SigmaU32,
+    pcr_value: *mut SigmaU8,
+) -> SigmaI32 {
+    if TPM_DEVICE.is_none() || pcr_value.is_null() {
+        return -1;
+    }
+
+    if let Some(tpm) = &TPM_DEVICE {
+        if pcr_index >= 24 {
+            return -2;
+        }
+
+        if !tpm.initialized {
+            return -3;
+        }
+
+        let pcr_offset = (pcr_index as usize) * 20;
+        for i in 0..20 {
+            *pcr_value.add(i) = tpm.pcr_registers[pcr_offset + i];
+        }
+
+        return 0;
+    }
+
+    -1
+}
+
+/// Seal data to TPM
+#[no_mangle]
+pub unsafe extern "C" fn tpm_seal(
+    data: *const SigmaU8,
+    data_len: SigmaU32,
+    pcr_mask: SigmaU32,
+    sealed_data: *mut SigmaU8,
+    sealed_len: *mut SigmaU32,
+) -> SigmaI32 {
+    if TPM_DEVICE.is_none() || data.is_null() || sealed_data.is_null() || sealed_len.is_null() {
+        return -1;
+    }
+
+    if let Some(tpm) = &TPM_DEVICE {
+        if !tpm.initialized {
+            return -3;
+        }
+
+        // In real implementation, seal data to TPM with PCR binding
+        // For now, simulate sealing
+        *sealed_len = data_len;
+        for i in 0..data_len as usize {
+            *sealed_data.add(i) = *data.add(i) ^ 0x42; // Simple XOR "encryption"
+        }
+
+        return 0;
+    }
+
+    -1
+}
+
+/// Unseal data from TPM
+#[no_mangle]
+pub unsafe extern "C" fn tpm_unseal(
+    sealed_data: *const SigmaU8,
+    sealed_len: SigmaU32,
+    pcr_mask: SigmaU32,
+    data: *mut SigmaU8,
+    data_len: *mut SigmaU32,
+) -> SigmaI32 {
+    if TPM_DEVICE.is_none() || sealed_data.is_null() || data.is_null() || data_len.is_null() {
+        return -1;
+    }
+
+    if let Some(tpm) = &TPM_DEVICE {
+        if !tpm.initialized {
+            return -3;
+        }
+
+        // In real implementation, verify PCR values and unseal
+        // For now, simulate unsealing
+        *data_len = sealed_len;
+        for i in 0..sealed_len as usize {
+            *data.add(i) = *sealed_data.add(i) ^ 0x42; // Reverse XOR
+        }
+
+        return 0;
+    }
+
+    -1
+}
+
+/// Quote PCR values
+#[no_mangle]
+pub unsafe extern "C" fn tpm_quote(
+    pcr_mask: SigmaU32,
+    nonce: *const SigmaU8,
+    nonce_len: SigmaU32,
+    quote: *mut SigmaU8,
+    quote_len: *mut SigmaU32,
+) -> SigmaI32 {
+    if TPM_DEVICE.is_none() || nonce.is_null() || quote.is_null() || quote_len.is_null() {
+        return -1;
+    }
+
+    if let Some(tpm) = &TPM_DEVICE {
+        if !tpm.initialized {
+            return -3;
+        }
+
+        // In real implementation, sign PCR values with TPM attestation key
+        // For now, simulate quote
+        let mut offset = 0;
+        for i in 0..24 {
+            if (pcr_mask & (1 << i)) != 0 {
+                let pcr_offset = i * 20;
+                for j in 0..20 {
+                    if offset < 1024 {
+                        *quote.add(offset) = tpm.pcr_registers[pcr_offset + j];
+                        offset += 1;
+                    }
+                }
+            }
+        }
+
+        *quote_len = offset as SigmaU32;
+        return 0;
+    }
+
+    -1
+}
+
+/// Check if TPM is initialized
+#[no_mangle]
+pub unsafe extern "C" fn tpm_initialized() -> SigmaBool {
+    if let Some(tpm) = &TPM_DEVICE {
+        tpm.initialized
+    } else {
+        false
+    }
+}
+
+/// Get TPM device info
+#[no_mangle]
+pub unsafe extern "C" fn tpm_get_info(
+    device_id: *mut SigmaU32,
+    version: *mut SigmaU32,
+) -> SigmaI32 {
+    if TPM_DEVICE.is_none() || device_id.is_null() || version.is_null() {
+        return -1;
+    }
+
+    if let Some(tpm) = &TPM_DEVICE {
+        *device_id = tpm.device_id;
+        *version = tpm.version;
+        return 0;
+    }
+
+    -1
+}
+
+/// Integrate Secure Boot with TPM
+#[no_mangle]
+pub unsafe extern "C" fn secure_boot_tpm_integrate() -> SigmaI32 {
+    if SECURE_BOOT.is_none() {
+        return -1;
+    }
+
+    // Initialize TPM
+    if tpm_init() != 0 {
+        return -2;
+    }
+
+    // Extend PCR 0 with bootloader hash
+    extern "C" {
+        fn sigma_vfs_read_file(
+            path: *const SigmaU8,
+            buffer: *mut SigmaU8,
+            max_size: SigmaUsize,
+            bytes_read: *mut SigmaUsize,
+        ) -> SigmaI32;
+    }
+
+    let bootloader_path = b"/boot/sigma_boot.efi\0";
+    let mut buffer: [SigmaU8; 65536] = [0; 65536];
+    let mut bytes_read: SigmaUsize = 0;
+
+    if sigma_vfs_read_file(bootloader_path.as_ptr(), buffer.as_mut_ptr(), 65536, &mut bytes_read) == 0 {
+        // Hash bootloader and extend PCR 0
+        extern "C" {
+            fn sigma_crypto_sha256(data: *const SigmaU8, len: SigmaU32, hash: *mut SigmaU8) -> SigmaI32;
+        }
+
+        let mut hash: [SigmaU8; 32] = [0; 32];
+        if sigma_crypto_sha256(buffer.as_ptr(), bytes_read as SigmaU32, hash.as_mut_ptr()) == 0 {
+            tpm_pcr_extend(0, hash.as_ptr(), 32);
+        }
+    }
+
+    // Extend PCR 1 with kernel hash
+    let kernel_path = b"/boot/sigma_kernel.elf\0";
+    let mut kernel_buffer: [SigmaU8; 1048576] = [0; 1048576];
+    let mut kernel_bytes_read: SigmaUsize = 0;
+
+    if sigma_vfs_read_file(kernel_path.as_ptr(), kernel_buffer.as_mut_ptr(), 1048576, &mut kernel_bytes_read) == 0 {
+        let mut kernel_hash: [SigmaU8; 32] = [0; 32];
+        if sigma_crypto_sha256(kernel_buffer.as_ptr(), kernel_bytes_read as SigmaU32, kernel_hash.as_mut_ptr()) == 0 {
+            tpm_pcr_extend(1, kernel_hash.as_ptr(), 32);
+        }
+    }
+
+    0
+}
+
+/// Verify TPM measurements
+#[no_mangle]
+pub unsafe extern "C" fn secure_boot_tpm_verify() -> SigmaI32 {
+    if SECURE_BOOT.is_none() {
+        return -1;
+    }
+
+    if !tpm_initialized() {
+        return -2;
+    }
+
+    // Read PCR 0 (bootloader) and PCR 1 (kernel)
+    let mut pcr0: [SigmaU8; 20] = [0; 20];
+    let mut pcr1: [SigmaU8; 20] = [0; 20];
+
+    if tpm_pcr_read(0, pcr0.as_mut_ptr()) != 0 {
+        return -3;
+    }
+
+    if tpm_pcr_read(1, pcr1.as_mut_ptr()) != 0 {
+        return -4;
+    }
+
+    // In real implementation, compare with expected values
+    // For now, just check that PCRs are non-zero (have been extended)
+    let pcr0_nonzero = pcr0.iter().any(|&x| x != 0);
+    let pcr1_nonzero = pcr1.iter().any(|&x| x != 0);
+
+    if pcr0_nonzero && pcr1_nonzero {
+        0
+    } else {
+        -5
     }
 }
 

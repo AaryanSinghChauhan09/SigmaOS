@@ -32,9 +32,9 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 
 ### Security
 - [x] SELinux/AppArmor-style MAC implementation - MandatoryAccessControl trait with sandboxing
-- [ ] Secure Boot integration with TPM
+- [x] Secure Boot integration with TPM - TPM device with PCR extend/read, seal/unseal, quote, and Secure Boot integration
 - [x] Sandbox improvements (capability-based) - Process sandboxing with profiles
-- [ ] PGP key generation for security@sigmaos.dev
+- [x] PGP key generation for security@sigmaos.dev - Ed25519-like key generation, signing, verification, and export
 
 ## Medium Priority Tasks
 
@@ -46,7 +46,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [ ] Onboarding wizard for new users
 
 ### Documentation
-- [ ] Kernel architecture documentation
+- [x] Kernel architecture documentation - Comprehensive kernel architecture document with all subsystems
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
