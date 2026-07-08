@@ -10,6 +10,9 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Bluetooth Drivers (BlueZ compatibility layer) - BlueZ-compatible adapter
 - [x] USB Controller Drivers (XHCI, EHCI, UHCI, OHCI) - Full USB controller family with UsbController trait
 - [x] Printer Drivers (CUPS compatibility) - USB printer driver with PrinterDevice trait
+- [x] Touchpad Drivers (Synaptics, ELAN) - Touchpad drivers with TouchpadDevice trait
+- [x] Additional Wi-Fi Drivers (MT7921, RTW88) - MediaTek and Realtek Wi-Fi drivers
+- [x] Additional GPU Drivers (VIA, SiS, Matrox) - Legacy GPU vendor drivers
 - [ ] ARM Board Support (Raspberry Pi, embedded devices)
 
 ### Package Management

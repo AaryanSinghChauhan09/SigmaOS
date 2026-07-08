@@ -38,26 +38,23 @@ This document outlines the transparent development roadmap for SigmaOS, a full-f
 ## Phase 2: Essential Drivers 🚧 IN PROGRESS
 
 **Timeline:** Weeks 13-24  
-**Status:** 75% Complete
+**Status:** 90% Complete
 
 ### Completed Components
-- GPU Drivers (NVIDIA, AMD, Intel) - OOP-based with Device/GpuDevice traits
+- GPU Drivers (NVIDIA, AMD, Intel, VIA, SiS, Matrox) - OOP-based with Device/GpuDevice traits
 - USB Controller Drivers (XHCI, EHCI, UHCI, OHCI) - Full USB controller family with UsbController trait
 - Audio Drivers (HDA/ALSA compatibility) - Intel HDA driver with AudioDevice trait
 - Storage Drivers (NVMe, AHCI) - NVMe and SATA AHCI drivers with StorageDevice trait
 - Network Drivers (e1000e) - Intel e1000e Ethernet driver with EthernetDevice trait
-- Input Drivers (PS/2 keyboard/mouse) - PS/2 keyboard and mouse drivers with InputDevice trait
+- Input Drivers (PS/2 keyboard/mouse, Synaptics, ELAN touchpads) - PS/2 keyboard/mouse and touchpad drivers with InputDevice trait
 - Camera Drivers (UVC/V4L2 compatibility) - USB Video Class driver with CameraDevice trait
 - Printer Drivers (USB/CUPS compatibility) - USB printer driver with PrinterDevice trait
-- Wi-Fi Driver (iwlwifi) - Intel Wi-Fi driver with WifiDevice trait
+- Wi-Fi Drivers (iwlwifi, MT7921, RTW88) - Intel, MediaTek, Realtek Wi-Fi drivers with WifiDevice trait
 - Bluetooth Driver (BlueZ compatibility) - BlueZ-compatible adapter with BluetoothDevice trait
 
 ### Remaining Work
 - Full DRM/KMS Layer implementation
-- Additional Wi-Fi chipset drivers (mt7921, rtw88)
-- Additional GPU vendor drivers (VIA, SiS, Matrox)
 - ARM Board Support (Raspberry Pi, embedded devices)
-- Touchpad drivers (Synaptics, ELAN)
 
 ---
 
