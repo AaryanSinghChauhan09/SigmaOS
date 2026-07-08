@@ -38,7 +38,7 @@ This document outlines the transparent development roadmap for SigmaOS, a full-f
 ## Phase 2: Essential Drivers 🚧 IN PROGRESS
 
 **Timeline:** Weeks 13-24  
-**Status:** 90% Complete
+**Status:** 95% Complete
 
 ### Completed Components
 - GPU Drivers (NVIDIA, AMD, Intel, VIA, SiS, Matrox) - OOP-based with Device/GpuDevice traits
@@ -51,10 +51,10 @@ This document outlines the transparent development roadmap for SigmaOS, a full-f
 - Printer Drivers (USB/CUPS compatibility) - USB printer driver with PrinterDevice trait
 - Wi-Fi Drivers (iwlwifi, MT7921, RTW88) - Intel, MediaTek, Realtek Wi-Fi drivers with WifiDevice trait
 - Bluetooth Driver (BlueZ compatibility) - BlueZ-compatible adapter with BluetoothDevice trait
+- ARM Board Support (Raspberry Pi BCM2835, BCM2711) - SoC drivers with GPIO, UART, SPI, I2C support
 
 ### Remaining Work
 - Full DRM/KMS Layer implementation
-- ARM Board Support (Raspberry Pi, embedded devices)
 
 ---
 

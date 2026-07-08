@@ -13,7 +13,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Touchpad Drivers (Synaptics, ELAN) - Touchpad drivers with TouchpadDevice trait
 - [x] Additional Wi-Fi Drivers (MT7921, RTW88) - MediaTek and Realtek Wi-Fi drivers
 - [x] Additional GPU Drivers (VIA, SiS, Matrox) - Legacy GPU vendor drivers
-- [ ] ARM Board Support (Raspberry Pi, embedded devices)
+- [x] ARM Board Support (Raspberry Pi, embedded devices) - BCM2835, BCM2711 SoC drivers
 
 ### Package Management
 - [x] sigma_pkg dependency resolver implementation - OOP-based with DependencyResolver trait
