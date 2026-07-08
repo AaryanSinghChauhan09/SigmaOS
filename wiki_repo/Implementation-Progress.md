@@ -127,9 +127,11 @@ This document tracks the implementation progress of all planned features in Sigm
 
 - [x] Tmpfs (Task 3.1.2)
   - Location: `kernel/vfs/sigma_tmpfs.rs`
-  - Status: Fully implemented with in-memory filesystem
+  - Status: Fully implemented with VFS interface functions
   - Testing: File operations, directory operations, stat operations
   - Features: 512 inodes, 32MB data pool, directory entries, rename/unlink
+  - Recent Update: Added complete VFS interface functions (tmpfs_create, tmpfs_read, tmpfs_write, tmpfs_stat, tmpfs_mkdir, tmpfs_rmdir, tmpfs_unlink, tmpfs_rename, tmpfs_lookup)
+  - Integration: Integrated with VFS core for Phase G filesystem requirements
 
 - [x] SigmaFS Implementation (Task 3.1.3)
   - Location: `kernel/fs/sigmafs.rs`
