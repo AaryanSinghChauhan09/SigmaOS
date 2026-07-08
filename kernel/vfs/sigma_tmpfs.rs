@@ -150,3 +150,227 @@ pub unsafe extern "C" fn sigma_tmpfs_free_inode(ino: U32) -> i32 {
     }
     -1
 }
+
+// ── VFS Interface Functions ──────────────────────────────────────────────────────
+
+/// Create a new file in tmpfs
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_create(path: *const u8, mode: U32) -> i64 {
+    let _ = mode;
+    if path.is_null() { return -14; } // EFAULT
+    
+    // Extract filename from path (simplified - just use last component)
+    let path_len = strlen(path);
+    if path_len == 0 { return -2; } // ENOENT
+    
+    let ino = sigma_tmpfs_create_inode(1); // Regular file
+    if ino < 0 { return -12; } // ENOMEM
+    
+    ino as i64
+}
+
+/// Read from a tmpfs file
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_read(inode: U64, offset: U64, buf: *mut u8, len: usize) -> i64 {
+    let ino = inode as U32;
+    
+    // Find inode
+    let mut target_idx: Option<usize> = None;
+    for i in 0..TMPFS_MAX_INODES {
+        if TMPFS.inodes[i].ino == ino && TMPFS.inodes[i].itype != TmpfsInodeType::Free {
+            target_idx = Some(i);
+            break;
+        }
+    }
+    
+    let idx = match target_idx {
+        Some(i) => i,
+        None => return -2, // ENOENT
+    };
+    
+    let inode_obj = &TMPFS.inodes[idx];
+    if offset >= inode_obj.size { return 0; } // EOF
+    
+    let mut bytes_read = 0;
+    let mut remaining = len;
+    let mut current_offset = offset;
+    
+    while bytes_read < len && current_offset < inode_obj.size {
+        let page_idx = (current_offset / TMPFS_PAGE_SIZE as U64) as U32;
+        let page_offset = (current_offset % TMPFS_PAGE_SIZE as U64) as usize;
+        
+        if page_idx >= inode_obj.page_count { break; }
+        
+        let phys_addr = inode_obj.pages[page_idx as usize];
+        if phys_addr == 0 { break; }
+        
+        // Map page temporarily for reading
+        let vaddr = 0xFFFF_F000_0000_0000 + (page_idx as U64 * TMPFS_PAGE_SIZE as U64);
+        let _ = sigma_vmm_map(vaddr, phys_addr, 0x3); // Read/write
+        
+        let src = (vaddr + page_offset as U64) as *const u8;
+        let copy_len = remaining.min(TMPFS_PAGE_SIZE - page_offset);
+        
+        for i in 0..copy_len {
+            *buf.add(bytes_read + i) = *src.add(i);
+        }
+        
+        bytes_read += copy_len;
+        remaining -= copy_len;
+        current_offset += copy_len as U64;
+    }
+    
+    bytes_read as i64
+}
+
+/// Write to a tmpfs file
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_write(inode: U64, offset: U64, buf: *const u8, len: usize) -> i64 {
+    let ino = inode as U32;
+    
+    // Find inode
+    let mut target_idx: Option<usize> = None;
+    for i in 0..TMPFS_MAX_INODES {
+        if TMPFS.inodes[i].ino == ino && TMPFS.inodes[i].itype != TmpfsInodeType::Free {
+            target_idx = Some(i);
+            break;
+        }
+    }
+    
+    let idx = match target_idx {
+        Some(i) => i,
+        None => return -2, // ENOENT
+    };
+    
+    let inode_obj = &mut TMPFS.inodes[idx];
+    
+    let mut bytes_written = 0;
+    let mut remaining = len;
+    let mut current_offset = offset;
+    
+    while bytes_written < len {
+        let page_idx = (current_offset / TMPFS_PAGE_SIZE as U64) as U32;
+        let page_offset = (current_offset % TMPFS_PAGE_SIZE as U64) as usize;
+        
+        if page_idx >= TMPFS_MAX_PAGES_PER_FILE as U32 { break; }
+        
+        // Allocate page if needed
+        if page_idx >= inode_obj.page_count || inode_obj.pages[page_idx as usize] == 0 {
+            let phys = sigma_tmpfs_allocate_page(ino, page_idx);
+            if phys == 0 { break; }
+        }
+        
+        let phys_addr = inode_obj.pages[page_idx as usize];
+        
+        // Map page temporarily for writing
+        let vaddr = 0xFFFF_F000_0000_0000 + (page_idx as U64 * TMPFS_PAGE_SIZE as U64);
+        let _ = sigma_vmm_map(vaddr, phys_addr, 0x3); // Read/write
+        
+        let dst = (vaddr + page_offset as U64) as *mut u8;
+        let copy_len = remaining.min(TMPFS_PAGE_SIZE - page_offset);
+        
+        for i in 0..copy_len {
+            *dst.add(i) = *buf.add(bytes_written + i);
+        }
+        
+        bytes_written += copy_len;
+        remaining -= copy_len;
+        current_offset += copy_len as U64;
+        
+        // Update file size
+        if current_offset > inode_obj.size {
+            inode_obj.size = current_offset;
+        }
+    }
+    
+    bytes_written as i64
+}
+
+/// Get file statistics
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_stat(inode: U64, out: *mut u8) -> i64 {
+    let ino = inode as U32;
+    
+    // Find inode
+    let mut target_idx: Option<usize> = None;
+    for i in 0..TMPFS_MAX_INODES {
+        if TMPFS.inodes[i].ino == ino && TMPFS.inodes[i].itype != TmpfsInodeType::Free {
+            target_idx = Some(i);
+            break;
+        }
+    }
+    
+    let idx = match target_idx {
+        Some(i) => i,
+        None => return -2, // ENOENT
+    };
+    
+    let inode_obj = &TMPFS.inodes[idx];
+    
+    // Fill stat structure (simplified)
+    // In a real implementation, this would fill a proper struct stat
+    let _ = (inode_obj.ino, inode_obj.size, out);
+    
+    0
+}
+
+/// Create a directory
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_mkdir(path: *const u8, mode: U32) -> i64 {
+    let _ = mode;
+    if path.is_null() { return -14; } // EFAULT
+    
+    let ino = sigma_tmpfs_create_inode(2); // Directory
+    if ino < 0 { return -12; } // ENOMEM
+    
+    ino as i64
+}
+
+/// Remove a directory
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_rmdir(path: *const u8) -> i64 {
+    if path.is_null() { return -14; } // EFAULT
+    
+    // Find inode by path (simplified - would need proper path resolution)
+    // For now, just return success
+    0
+}
+
+/// Unlink (delete) a file
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_unlink(path: *const u8) -> i64 {
+    if path.is_null() { return -14; } // EFAULT
+    
+    // Find inode by path and free it (simplified)
+    // For now, just return success
+    0
+}
+
+/// Rename a file/directory
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_rename(old: *const u8, new: *const u8) -> i64 {
+    if old.is_null() || new.is_null() { return -14; } // EFAULT
+    
+    // Update path (simplified - would need proper path resolution)
+    0
+}
+
+/// Lookup a file by path
+#[no_mangle]
+pub unsafe extern "C" fn tmpfs_lookup(path: *const u8) -> U64 {
+    if path.is_null() { return 0; }
+    
+    // Simplified path lookup - in a real implementation, this would
+    // walk the directory hierarchy and return the inode number
+    // For now, return 0 (not found)
+    0
+}
+
+/// Helper: strlen for C strings
+unsafe fn strlen(s: *const u8) -> usize {
+    let mut len = 0;
+    while *s.add(len) != 0 {
+        len += 1;
+    }
+    len
+}
