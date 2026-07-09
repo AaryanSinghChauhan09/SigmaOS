@@ -30,8 +30,13 @@ Linux ELF Binary
 
 ## Roadmap
 
-- [ ] ELF loader with syscall interception
-
-- [ ] `mmap()` translation
-
-- [ ] Dynamic linker shim
+- [x] ELF loader with syscall interception
+- [x] `mmap()` translation
+- [x] Dynamic linker shim
+- [ ] Signal handling translation
+- [ ] Socket API translation
+- [ ] Thread library (pthread) translation
+- [ ] File descriptor management
+- [ ] Environment variable handling
+- [ ] Process group/session management
+- [ ] Terminal I/O control (termios)

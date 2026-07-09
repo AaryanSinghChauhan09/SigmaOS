@@ -14,8 +14,13 @@ instead of Linux namespaces and cgroups.
 
 ## Roadmap
 
-- [ ] `sigma-run` container runtime
-
-- [ ] Shard bundle format (OCI-compatible import)
-
-- [ ] Networking namespace analogue via mesh shards
+- [x] `sigma-run` container runtime
+- [x] Shard bundle format (OCI-compatible import)
+- [x] Networking namespace analogue via mesh shards
+- [ ] Container image registry
+- [ ] Container orchestration API
+- [ ] Resource quota enforcement
+- [ ] Container health monitoring
+- [ ] Container lifecycle management
+- [ ] Container storage volumes
+- [ ] Container security policies

@@ -50,13 +50,15 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [ ] Arch Wiki-style knowledge base
+- [x] Arch Wiki-style knowledge base - Comprehensive wiki documentation established
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented
 - [x] Input driver documentation - PS/2 keyboard/mouse driver documented
 - [x] Camera driver documentation - UVC/V4L2 driver documented
 - [x] Printer driver documentation - USB/CUPS driver documented
+- [x] Debugging tools documentation - Comprehensive debugging suite documented
+- [x] SDK documentation - All SDKs documented with examples and guides
 
 ### Developer Tools
 - [x] IDE integration (VS Code, JetBrains, Eclipse plugins) - VS Code extension with syntax highlighting, IntelliSense, build integration, debugging; JetBrains plugin with CMake/Rust support; Eclipse CDT integration

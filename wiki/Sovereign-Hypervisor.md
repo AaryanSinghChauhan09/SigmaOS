@@ -14,10 +14,13 @@ without depending on Linux KVM.
 
 ## Roadmap
 
-- [ ] VMCS/VMCB setup (x86_64)
-
-- [ ] Guest memory isolation (EPT / NPT)
-
-- [ ] Virtio-net / Virtio-blk para-virtual devices
-
-- [ ] Live migration prototype
+- [x] VMCS/VMCB setup (x86_64)
+- [x] Guest memory isolation (EPT / NPT)
+- [x] Virtio-net / Virtio-blk para-virtual devices
+- [x] Live migration prototype
+- [ ] ARM64 EL2 virtualization support
+- [ ] Nested virtualization
+- [ ] GPU passthrough
+- [ ] SR-IOV support
+- [ ] Hypervisor management API
+- [ ] VM snapshot and restore

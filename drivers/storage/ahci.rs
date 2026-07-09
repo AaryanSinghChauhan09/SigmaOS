@@ -580,7 +580,7 @@ impl StorageDevice for AhciController {
             }
         }
 
-        STORAGE_NO_DEVICE
+        STORAGE_ERR_NO_DEVICE
     }
 
     fn get_capacity(&self) -> U64 {
