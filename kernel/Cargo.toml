@@ -11,6 +11,13 @@ path = "src/main.rs"
 
 [profile.dev]
 panic = "abort" # Disable unwinding on panic
+opt-level = 1   # Some optimization even in dev
+overflow-checks = true
 
 [profile.release]
 panic = "abort" # Disable unwinding on panic
+opt-level = "z"  # Size optimization
+lto = true      # Link-time optimization
+codegen-units = 1 # Single codegen unit
+strip = true    # Strip symbols
+overflow-checks = false # Disable for performance

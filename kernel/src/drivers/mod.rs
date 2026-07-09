@@ -1,7 +1,12 @@
 pub mod vga;
 pub mod bus;
 pub mod nic;
+pub mod traits;
 
+// Re-export the improved OOP traits
+pub use traits::*;
+
+// Legacy compatibility types
 #[derive(Debug, PartialEq, Eq)]
 pub enum DeviceClass {
     Network,
@@ -19,8 +24,8 @@ pub enum BusType {
     None,
 }
 
-/// Core trait representing a hardware driver in SigmaOS.
-/// This OOP-based approach ensures a consistent interface across all devices.
+/// Legacy driver trait for backward compatibility
+/// New code should use the traits from traits.rs
 pub trait Driver {
     /// Initialize the hardware device.
     fn init(&mut self) -> Result<(), &'static str>;
@@ -50,6 +55,7 @@ pub enum DriverStatus {
 }
 
 /// A centralized registry to keep track of loaded drivers.
+/// Zero-allocation design with fixed-capacity storage
 pub struct DriverRegistry {
     pub vga: vga::VgaDriver,
     // In a dynamic system, we would have arrays/vectors of generic drivers here.

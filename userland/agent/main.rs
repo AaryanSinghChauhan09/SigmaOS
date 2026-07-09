@@ -28,8 +28,9 @@ mod sigma_agent_tools_ext;
 mod sigma_llm;
 mod sigma_agent_planner;
 mod sigma_agent_code;
+mod collections;
 
-use std::collections::BTreeMap;
+use collections::{SigmaMap, SigmaVec, SigmaStringBuilder};
 use sigma_agent_core::{Agent, AgentModel};
 use sigma_agent_tools_ext::{
     ExplainTool, CodeEditTool, SummariseTool, WmControlTool,
