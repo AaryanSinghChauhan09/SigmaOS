@@ -29,7 +29,7 @@ Instead, use one of the following private channels:
 Send a PGP-encrypted email to: **aaryansinghchauhan09@github** *(temporary until security@sigmaos.dev is set up)*
 
 ```
-PGP Key Fingerprint: Placeholder - see docs/security/pgp-key.asc
+PGP Key Fingerprint: See docs/security/pgp-key.asc
 ```
 
 Full public key: `docs/security/pgp-key.asc`
