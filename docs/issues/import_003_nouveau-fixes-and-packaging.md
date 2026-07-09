@@ -1,1 +1,0 @@
-# Nouveau fixes and packaging\n\n**Area**: kernel-drivers\n**Source**: mesa/torvalds/linux\n**Note**: backport stability patches for common GPUs.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

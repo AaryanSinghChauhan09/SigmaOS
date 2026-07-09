@@ -1,1 +1,0 @@
-# Installer image signing and verification\n\n**Area**: installer-imaging-first-run\n**Source**: Fedora\n**Note**: ensure image integrity.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

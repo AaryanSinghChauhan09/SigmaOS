@@ -1,1 +1,0 @@
-# Hermetic build sandboxes\n\n**Area**: packaging-build-reproducibility\n**Source**: Nix/Guix\n**Note**: isolated, reproducible build environments.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

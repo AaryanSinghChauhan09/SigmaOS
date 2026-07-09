@@ -1,1 +1,0 @@
-# Enterprise NIC drivers packaging\n\n**Area**: kernel-drivers\n**Source**: Fedora\n**Note**: Intel/Realtek server NICs with tests.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# Session sandbox for untrusted web apps\n\n**Area**: desktop-compositor-ux\n**Source**: Qubes/containers\n**Note**: disposable browser sessions.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# Tamper‑resistant boot chain enforcement\n\n**Area**: security-sandboxing-forensics\n**Source**: Fedora\n**Note**: signed bootloader, kernel, initramfs.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# AMDGPU kernel improvements\n\n**Area**: kernel-drivers\n**Source**: torvalds/linux\n**Note**: absorb perf/power fixes and firmware packaging.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

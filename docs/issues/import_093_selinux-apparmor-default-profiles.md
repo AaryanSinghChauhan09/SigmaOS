@@ -1,1 +1,0 @@
-# SELinux/AppArmor default profiles\n\n**Area**: security-sandboxing-forensics\n**Source**: Fedora/Debian\n**Note**: enforce least privilege for services.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

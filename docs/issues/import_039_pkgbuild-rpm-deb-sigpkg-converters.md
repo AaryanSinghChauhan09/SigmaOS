@@ -1,1 +1,0 @@
-# PKGBUILD/RPM/DEB → sigpkg converters\n\n**Area**: packaging-build-reproducibility\n**Source**: Arch/Fedora/Debian\n**Note**: automated conversion scripts.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

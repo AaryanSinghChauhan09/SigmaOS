@@ -1,287 +1,456 @@
 # SigmaOS Drivers
 
-SigmaOS includes a comprehensive set of hardware drivers based on Linux kernel driver patterns. All drivers use an Object-Oriented Programming (OOP) approach with Rust traits to ensure type safety, polymorphism, and extensibility.
+## Overview
 
-## Driver Categories
-
-### Network Drivers
-
-#### Intel e1000e Ethernet Driver
-- **File**: `drivers/net/e1000e.rs`
-- **Supported Devices**: Intel I219-V, I219-LM, I219-V, I217-V, I218-V, and related chipsets
-- **Features**: 
-  - Gigabit Ethernet support
-  - PHY management
-  - Interrupt-driven I/O
-  - DMA transfers
-  - Promiscuous mode
-  - Multicast filtering
-
-#### Realtek r8169 Ethernet Driver
-- **File**: `drivers/net/r8169.rs`
-- **Supported Devices**: Realtek 8169, 8168, 8411, and related chipsets
-- **Features**:
-  - Gigabit Ethernet support
-  - PHY management
-  - DMA transfers
-  - Auto-negotiation
-  - Multicast filtering
-
-#### VirtIO Network Driver
-- **File**: `drivers/net/sigma_virtio_net.rs`
-- **Supported Devices**: VirtIO network devices in virtualized environments
-- **Features**:
-  - Paravirtualized network driver
-  - Optimized for VM performance
-  - Multi-queue support
-
-### Storage Drivers
-
-#### AHCI SATA Driver
-- **File**: `drivers/storage/ahci.rs`
-- **Supported Devices**: Intel, AMD, VIA, NVIDIA, Marvell AHCI controllers
-- **Features**:
-  - SATA I/II/III support
-  - NCQ (Native Command Queuing)
-  - Hot-plug support
-  - Multiple ports
-  - DMA transfers
-
-#### NVMe Driver
-- **File**: `drivers/storage/nvme.rs`
-- **Supported Devices**: NVMe SSDs
-- **Features**:
-  - High-performance SSD access
-  - Multiple namespaces
-  - Multiple I/O queues
-  - Power management
-
-#### VirtIO Block Driver
-- **File**: `drivers/storage/sigma_virtio_blk.rs`
-- **Supported Devices**: VirtIO block devices in virtualized environments
-- **Features**:
-  - Paravirtualized block driver
-  - Optimized for VM performance
-  - Multiple queues
-
-### GPU Drivers
-
-#### AMD GPU Driver (amdgpu)
-- **File**: `drivers/gpu/sigma_amdgpu.rs`
-- **Supported Devices**: AMD Radeon Vega, Navi, RDNA2 series
-- **Features**:
-  - DRM/KMS modesetting
-  - GPU command submission
-  - Memory management
-  - GART (Graphics Address Remapping Table)
-  - Display engine support
-- **Recent Updates**:
-  - GART initialization with table clearing and VRAM management
-  - Display engine initialization with EDID reading and CRTC configuration
-  - Compute engine initialization with ring buffers and context setup
-  - Display detection, EDID structure, and CRTC configuration functions
-  - Inline assembly for IO port access (outl/inl)
-
-#### Intel GPU Driver (i915)
-- **File**: `drivers/gpu/sigma_i915.rs`
-- **Supported Devices**: Intel Gen 6-12, Arc series
-- **Features**:
-  - DRM/KMS modesetting
-  - GPU command submission
-  - Memory management
-  - Display engine support
-
-#### NVIDIA GPU Driver (nouveau)
-- **File**: `drivers/gpu/sigma_nvidia.rs`
-- **Supported Devices**: NVIDIA Kepler, Maxwell, Pascal series
-- **Features**:
-  - DRM/KMS modesetting
-  - GPU command submission
-  - Memory management
-  - Display engine support
-
-#### VirtIO GPU Driver
-- **File**: `drivers/gpu/sigma_virtio_gpu.rs`
-- **Supported Devices**: VirtIO GPU devices in virtualized environments
-- **Features**:
-  - Paravirtualized GPU driver
-  - 2D acceleration
-  - Display support
-
-### USB Drivers
-
-#### xHCI USB 3.0 Driver
-- **File**: `drivers/usb/xhci.rs`
-- **Supported Devices**: USB 3.0/3.1 xHCI controllers
-- **Features**:
-  - USB 3.0/3.1 support
-  - USB 2.0 backward compatibility
-  - Multiple USB speeds
-  - Multiple ports
-
-#### EHCI USB 2.0 Driver
-- **File**: `drivers/usb/ehci.rs`
-- **Supported Devices**: USB 2.0 EHCI controllers
-- **Features**:
-  - USB 2.0 support
-  - High-speed transfers
-  - Multiple ports
-
-#### UHCI USB 1.1 Driver
-- **File**: `drivers/usb/uhci.rs`
-- **Supported Devices**: USB 1.1 UHCI controllers
-- **Features**:
-  - USB 1.1 support
-  - Low-speed and full-speed transfers
-  - Multiple ports
-
-#### OHCI USB 1.1 Driver
-- **File**: `drivers/usb/ohci.rs`
-- **Supported Devices**: USB 1.1 OHCI controllers
-- **Features**:
-  - USB 1.1 support
-  - Low-speed and full-speed transfers
-  - Multiple ports
-
-### Input Drivers
-
-#### HID Driver
-- **File**: `drivers/input/hid.rs`
-- **Supported Devices**: USB HID devices (keyboards, mice, gamepads, etc.)
-- **Features**:
-  - USB HID protocol 1.11
-  - Report descriptor parsing
-  - Input/output reports
-  - Feature reports
-
-#### PS/2 Keyboard Driver
-- **File**: `drivers/input/ps2_keyboard.rs`
-- **Supported Devices**: PS/2 keyboards
-- **Features**:
-  - PS/2 protocol support
-  - Scancode translation
-  - LED control
-
-#### PS/2 Mouse Driver
-- **File**: `drivers/input/ps2_mouse.rs`
-- **Supported Devices**: PS/2 mice
-- **Features**:
-  - PS/2 protocol support
-  - Movement tracking
-  - Button support
-
-#### Synaptics Touchpad Driver
-- **File**: `drivers/input/synaptics.rs`
-- **Supported Devices**: Synaptics touchpads
-- **Features**:
-  - Touchpad protocol support
-  - Multi-touch support
-  - Gesture recognition
-
-#### ELAN Touchpad Driver
-- **File**: `drivers/input/elan.rs`
-- **Supported Devices**: ELAN touchpads
-- **Features**:
-  - Touchpad protocol support
-  - Multi-touch support
-  - Gesture recognition
+SigmaOS includes drivers for various hardware components. This document describes the driver architecture and available drivers.
 
 ## Driver Architecture
 
-SigmaOS drivers use a trait-based OOP architecture:
+### Driver Model
 
-### Base Traits
+SigmaOS uses a modular driver model:
 
-- **Device**: Base trait for all hardware devices
-- **EthernetDevice**: Network device operations
-- **EthernetPhy**: PHY management for network devices
-- **StorageDevice**: Storage device operations
-- **GpuDevice**: GPU device operations
-- **UsbController**: USB controller operations
-- **HidDriver**: HID device operations
-
-### PCI Configuration Access
-
-All drivers use standard PCI configuration space access functions:
-
-```rust
-read_pci_config_u8(bus, device, function, offset)
-read_pci_config_u16(bus, device, function, offset)
-read_pci_config_u32(bus, device, function, offset)
+```
+┌─────────────────────────────────────┐
+│         Userland Applications       │
+└─────────────────────────────────────┘
+              │
+┌─────────────────────────────────────┐
+│         Device Abstraction Layer    │
+└─────────────────────────────────────┘
+              │
+┌─────────────────────────────────────┐
+│         Hardware Drivers            │
+│  ┌──────┐ ┌──────┐ ┌──────┐       │
+│  │Network│ │ GPU  │ │Storage│       │
+│  └──────┘ └──────┘ └──────┘       │
+└─────────────────────────────────────┘
+              │
+┌─────────────────────────────────────┐
+│         Hardware Abstraction Layer   │
+└─────────────────────────────────────┘
 ```
 
-### Device Probing
-
-Drivers implement probe functions to scan the PCI bus for supported devices:
+### Driver Interface
 
 ```rust
-#[no_mangle]
-pub unsafe extern "C" fn driver_probe() -> I32
+pub trait Driver {
+    fn name(&self) -> &str;
+    fn init(&mut self) -> Result<(), DriverError>;
+    fn probe(&self) -> bool;
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
+    fn write(&mut self, buf: &[u8]) -> Result<usize, DriverError>;
+    fn ioctl(&mut self, cmd: u64, arg: u64) -> Result<u64, DriverError>;
+}
 ```
 
-### MMIO Access
+## Network Drivers
 
-Drivers access device registers through Memory-Mapped I/O:
+### Ethernet Drivers
 
+#### Intel e1000
+
+**Location**: `kernel/drivers/net/e1000.rs`
+
+**Features**:
+- Gigabit Ethernet support
+- Interrupt-driven I/O
+- DMA transfers
+- Jumbo frames
+
+**Initialization**:
 ```rust
-read_mmio(offset)
-write_mmio(offset, value)
+pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
+    // Reset device
+    // Configure DMA
+    // Setup RX/TX rings
+    // Enable interrupts
+}
 ```
+
+#### Realtek r8169
+
+**Location**: `kernel/drivers/net/r8169.rs`
+
+**Features**:
+- Fast Ethernet support
+- PCI interface
+- Hardware checksumming
+
+#### Virtio-net
+
+**Location**: `kernel/drivers/net/virtio_net.rs`
+
+**Features**:
+- Paravirtualized network
+- High performance in VMs
+- Multi-queue support
+
+### Wireless Drivers
+
+#### Intel iwlwifi
+
+**Location**: `kernel/drivers/net/iwlwifi.rs`
+
+**Features**:
+- 802.11a/b/g/n/ac support
+- MIMO
+- WPA2/WPA3 encryption
+
+#### MediaTek mt7921
+
+**Location**: `kernel/drivers/net/mt7921.rs`
+
+**Features**:
+- 802.11ax (Wi-Fi 6)
+- Bluetooth coexistence
+- Low power consumption
+
+## Storage Drivers
+
+### AHCI/SATA
+
+**Location**: `kernel/drivers/storage/ahci.rs`
+
+**Features**:
+- SATA 3.0 support
+- NCQ (Native Command Queuing)
+- Hot-plug support
+
+**Initialization**:
+```rust
+pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
+    // Enable AHCI
+    // Scan for devices
+    // Initialize ports
+    // Setup command lists
+}
+```
+
+### NVMe
+
+**Location**: `kernel/drivers/storage/nvme.rs`
+
+**Features**:
+- PCIe SSD support
+- High performance
+- Multiple namespaces
+
+### Virtio-blk
+
+**Location**: `kernel/drivers/storage/virtio_blk.rs`
+
+**Features**:
+- Paravirtualized block device
+- High performance in VMs
+- Support for multiple queues
+
+## Graphics Drivers
+
+### Intel i915
+
+**Location**: `kernel/drivers/gpu/i915.rs`
+
+**Features**:
+- Intel integrated graphics
+- DRM/KMS support
+- Hardware acceleration
+
+### AMD amdgpu
+
+**Location**: `kernel/drivers/gpu/amdgpu.rs`
+
+**Features**:
+- AMD Radeon GPUs
+- Vulkan support
+- Hardware video decoding
+
+### Virtio-gpu
+
+**Location**: `kernel/drivers/gpu/virtio_gpu.rs`
+
+**Features**:
+- Paravirtualized GPU
+- 2D acceleration
+- 3D support (virgl)
+
+## Input Drivers
+
+### Keyboard
+
+**Location**: `kernel/drivers/input/keyboard.rs`
+
+**Features**:
+- PS/2 keyboard support
+- USB keyboard support
+- Layout configuration
+
+### Mouse
+
+**Location**: `kernel/drivers/input/mouse.rs`
+
+**Features**:
+- PS/2 mouse support
+- USB mouse support
+- Scroll wheel support
+
+## Audio Drivers
+
+### Intel HDA
+
+**Location**: `kernel/drivers/audio/hda.rs`
+
+**Features**:
+- High Definition Audio
+- Multi-channel support
+- Hardware mixing
+
+### USB Audio
+
+**Location**: `kernel/drivers/audio/usb_audio.rs`
+
+**Features**:
+- USB audio class
+- Plug-and-play
+- Low latency
+
+## Interrupt Controller Drivers
+
+### APIC
+
+**Location**: `kernel/core/hal/apic.rs`
+
+**Features**:
+- Local APIC
+- I/O APIC
+- Interrupt routing
+- MSI support
+
+**Initialization**:
+```rust
+pub unsafe fn apic_init() -> Result<(), DriverError> {
+    // Enable APIC
+    // Configure interrupt vectors
+    // Setup I/O APIC
+    // Enable MSI
+}
+```
+
+### PIC (8259)
+
+**Location**: `kernel/core/hal/pic.rs`
+
+**Features**:
+- Legacy 8259 PIC
+- Cascade mode
+- IRQ masking
+
+## Timer Drivers
+
+### HPET
+
+**Location**: `kernel/core/hal/hpet.rs`
+
+**Features**:
+- High Precision Event Timer
+- Nanosecond precision
+- Multiple timers
+
+### APIC Timer
+
+**Location**: `kernel/core/hal/apic_timer.rs`
+
+**Features**:
+- Per-CPU timers
+- One-shot mode
+- Periodic mode
+
+## UART/Serial Driver
+
+**Location**: `kernel/drivers/uart.rs`
+
+**Features**:
+- 16550 UART compatibility
+- Configurable baud rate
+- Interrupt-driven I/O
+
+**Initialization**:
+```rust
+pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
+    // Configure baud rate
+    // Set data format
+    // Enable interrupts
+}
+```
+
+## USB Drivers
+
+### USB Core
+
+**Location**: `kernel/drivers/usb/core.rs`
+
+**Features**:
+- USB 2.0/3.0 support
+- Hub support
+- Device enumeration
+
+### USB Host Controllers
+
+#### EHCI (USB 2.0)
+
+**Location**: `kernel/drivers/usb/ehci.rs`
+
+**Features**:
+- Enhanced Host Controller Interface
+- High-speed USB
+- Isochronous transfers
+
+#### XHCI (USB 3.0)
+
+**Location**: `kernel/drivers/usb/xhci.rs`
+
+**Features**:
+- Extensible Host Controller Interface
+- SuperSpeed USB
+- USB 3.1 support
 
 ## Driver Development
 
-For detailed information on developing drivers for SigmaOS, see the [Driver Development Guide](../drivers/DRIVER_DEVELOPMENT_GUIDE.md).
+### Writing a New Driver
 
-## Linux Kernel References
+1. **Create driver file**:
+   ```rust
+   // kernel/drivers/my_driver.rs
+   use kernel::drivers::Driver;
+   
+   pub struct MyDriver {
+       // Driver state
+   }
+   
+   impl Driver for MyDriver {
+       fn name(&self) -> &str {
+           "my_driver"
+       }
+       
+       fn init(&mut self) -> Result<(), DriverError> {
+           // Initialize hardware
+           Ok(())
+       }
+       
+       // Implement other methods
+   }
+   ```
 
-SigmaOS drivers are based on Linux kernel driver patterns. Reference implementations can be found in:
+2. **Register driver**:
+   ```rust
+   // kernel/drivers/mod.rs
+   pub mod my_driver;
+   
+   pub fn init_drivers() {
+       let mut driver = my_driver::MyDriver::new();
+       driver.init().expect("Failed to init driver");
+   }
+   ```
 
-- **Network**: `drivers/net/ethernet/intel/e1000e/`, `drivers/net/ethernet/realtek/r8169/`
-- **Storage**: `drivers/ata/ahci.c`, `drivers/nvme/host/`
-- **GPU**: `drivers/gpu/drm/amd/amdgpu/`, `drivers/gpu/drm/i915/`
-- **USB**: `drivers/usb/host/`
-- **Input**: `drivers/hid/`, `drivers/input/keyboard/`, `drivers/input/mouse/`
+3. **Add to build system**:
+   ```toml
+   # kernel/Cargo.toml
+   [dependencies]
+   # ...
+   ```
 
-## Supported Hardware
+### Driver Best Practices
 
-### Network
-- Intel: e1000e (I219 series)
-- Realtek: r8169/r8168 series
-- VirtIO: paravirtualized network
+1. **Error handling**: Always check return values
+2. **Resource cleanup**: Implement cleanup on failure
+3. **Interrupt safety**: Use proper synchronization
+4. **DMA**: Use proper DMA mappings
+5. **Power management**: Implement suspend/resume
 
-### Storage
-- SATA: AHCI controllers (Intel, AMD, VIA, NVIDIA, Marvell)
-- NVMe: NVMe SSDs
-- VirtIO: paravirtualized block
+## Driver Debugging
 
-### GPU
-- AMD: Vega, Navi, RDNA2 series
-- Intel: Gen 6-12, Arc series
-- NVIDIA: Kepler, Maxwell, Pascal series
-- VirtIO: paravirtualized GPU
+### Debug Output
 
-### USB
-- USB 3.0/3.1: xHCI controllers
-- USB 2.0: EHCI controllers
-- USB 1.1: UHCI/OHCI controllers
+Add debug prints to driver:
+```rust
+#[cfg(debug_assertions)]
+println!("Driver: {}", message);
+```
 
-### Input
-- USB HID: keyboards, mice, gamepads
-- PS/2: keyboards, mice
-- Touchpads: Synaptics, ELAN
+### Hardware Inspection
 
-## Contributing
+Use tools to inspect hardware:
+```bash
+# List PCI devices
+lspci
 
-When contributing new drivers:
+# List USB devices
+lsusb
 
-1. Implement the appropriate base trait
-2. Follow SigmaOS coding standards
-3. Add comprehensive documentation
-4. Include probe and initialization functions
-5. Add error handling for all failure cases
-6. Test on real hardware when possible
-7. Update this wiki page
+# Inspect memory
+cat /proc/iomem
+```
 
-## License
+### Tracing
 
-All SigmaOS drivers are licensed under GPL-2.0-or-later, consistent with the Linux kernel.
+Enable driver tracing:
+```rust
+pub fn trace_read(&self, offset: usize, value: u32) {
+    println!("Read offset={:x} value={:x}", offset, value);
+}
+```
+
+## Future Drivers
+
+### Planned Drivers
+
+1. **Bluetooth**: Bluetooth controller support
+2. **Camera**: USB camera support
+3. **Touchscreen**: Touchscreen input
+4. **Fingerprint**: Biometric authentication
+5. **TPM**: Trusted Platform Module
+
+### Research Areas
+
+1. **GPU compute**: OpenCL/CUDA support
+2. **AI accelerators**: NPU support
+3. **FPGA**: Programmable hardware
+4. **Quantum**: Quantum computing interfaces
+
+## Troubleshooting
+
+### Driver Not Loading
+
+**Symptoms**: Driver fails to initialize
+
+**Solutions**:
+1. Check hardware is present
+2. Verify driver is registered
+3. Check for resource conflicts
+4. Review debug output
+
+### Device Not Working
+
+**Symptoms**: Device initialized but not functional
+
+**Solutions**:
+1. Check configuration
+2. Verify firmware is loaded
+3. Test with different hardware
+4. Review driver logs
+
+### Performance Issues
+
+**Symptoms**: Poor device performance
+
+**Solutions**:
+1. Enable DMA
+2. Use interrupts instead of polling
+3. Optimize buffer sizes
+4. Profile driver code
+
+## References
+
+- [Linux Device Drivers](https://lwn.net/Kernel/LDD3/)
+- [OSDev Drivers](https://wiki.osdev.org/Category:Device_Drivers)
+- [PCI Specification](https://pcisig.com/specifications)

@@ -1,1 +1,0 @@
-# Hardware isolation test harness\n\n**Area**: security-sandboxing-forensics\n**Source**: Qubes\n**Note**: validate microVM isolation on HCL devices.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

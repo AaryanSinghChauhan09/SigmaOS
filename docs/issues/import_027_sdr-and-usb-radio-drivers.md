@@ -1,1 +1,0 @@
-# SDR and USB radio drivers\n\n**Area**: kernel-drivers\n**Source**: Kali/Arch\n**Note**: optional SigmaSec modules for researchers.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

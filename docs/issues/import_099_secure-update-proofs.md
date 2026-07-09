@@ -1,1 +1,0 @@
-# Secure update proofs\n\n**Area**: security-sandboxing-forensics\n**Source**: Nix/Fedora\n**Note**: reproducible signed update proofs for clients.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

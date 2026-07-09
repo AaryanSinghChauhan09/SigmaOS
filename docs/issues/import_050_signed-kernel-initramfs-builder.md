@@ -1,1 +1,0 @@
-# Signed kernel + initramfs builder\n\n**Area**: packaging-build-reproducibility\n**Source**: Fedora\n**Note**: reproducible boot artifacts.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

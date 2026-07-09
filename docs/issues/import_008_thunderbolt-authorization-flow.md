@@ -1,1 +1,0 @@
-# Thunderbolt authorization flow\n\n**Area**: kernel-drivers\n**Source**: Fedora/Arch\n**Note**: implement secure device whitelisting UI.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

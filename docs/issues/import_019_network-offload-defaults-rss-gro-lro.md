@@ -1,1 +1,0 @@
-# Network offload defaults (RSS/GRO/LRO)\n\n**Area**: kernel-drivers\n**Source**: linux\n**Note**: NIC tuning for throughput/latency.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

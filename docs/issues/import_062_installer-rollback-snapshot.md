@@ -1,1 +1,0 @@
-# Installer rollback snapshot\n\n**Area**: installer-imaging-first-run\n**Source**: OSTree\n**Note**: snapshot before major changes.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

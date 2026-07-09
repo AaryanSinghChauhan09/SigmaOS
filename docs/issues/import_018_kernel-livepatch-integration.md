@@ -1,1 +1,0 @@
-# Kernel livepatch integration\n\n**Area**: kernel-drivers\n**Source**: Canonical/Fedora\n**Note**: hotpatch CVE fixes in production.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

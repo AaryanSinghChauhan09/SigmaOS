@@ -1,1 +1,0 @@
-# Native PDF editor and annotation\n\n**Area**: desktop-compositor-ux\n**Source**: Evince/Okular\n**Note**: integrated document workflows.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

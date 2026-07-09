@@ -1,1 +1,0 @@
-# Native file manager with previews and remote mounts\n\n**Area**: desktop-compositor-ux\n**Source**: GNOME/KDE\n**Note**: productivity features.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

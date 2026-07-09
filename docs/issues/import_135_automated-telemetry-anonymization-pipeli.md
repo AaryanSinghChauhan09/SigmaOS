@@ -1,1 +1,0 @@
-# Automated telemetry anonymization pipeline\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: privacy projects\n**Note**: safe telemetry for product improvement.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

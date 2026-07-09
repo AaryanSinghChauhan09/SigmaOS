@@ -1,1 +1,0 @@
-# ROCm/CUDA compute packaging\n\n**Area**: kernel-drivers\n**Source**: Fedora/Arch\n**Note**: signed compute stacks for AI workloads.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

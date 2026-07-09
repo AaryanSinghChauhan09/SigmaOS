@@ -1,1 +1,0 @@
-# PXE and enterprise imaging support\n\n**Area**: installer-imaging-first-run\n**Source**: Debian\n**Note**: network boot and mass deploy.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

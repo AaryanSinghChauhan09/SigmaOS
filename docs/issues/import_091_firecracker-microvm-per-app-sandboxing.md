@@ -1,1 +1,0 @@
-# Firecracker microVM per‑app sandboxing\n\n**Area**: security-sandboxing-forensics\n**Source**: Qubes/Firecracker\n**Note**: strong isolation for untrusted apps.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

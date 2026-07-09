@@ -1,1 +1,0 @@
-# CLI NL→CLI agent dry‑run sandbox\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: community\n**Note**: safe command preview and approval flow.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

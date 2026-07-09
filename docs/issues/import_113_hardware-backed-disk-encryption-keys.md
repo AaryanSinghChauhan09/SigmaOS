@@ -1,1 +1,0 @@
-# Hardware-backed disk encryption keys\n\n**Area**: security-sandboxing-forensics\n**Source**: Debian/Fedora\n**Note**: LUKS + TPM sealing integration.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

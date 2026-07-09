@@ -1,1 +1,0 @@
-# BlueZ Bluetooth improvements\n\n**Area**: kernel-drivers\n**Source**: bluez\n**Note**: integrate pairing and audio stability patches.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# Network installer with offline bundles\n\n**Area**: installer-imaging-first-run\n**Source**: Debian\n**Note**: offline persona provisioning.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# Rust dev toolchain templates\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Fedora/Arch\n**Note**: reproducible Rust project templates and CI.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# ARM SoC board support packages\n\n**Area**: kernel-drivers\n**Source**: linux/nixos\n**Note**: reproducible images for SBCs.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

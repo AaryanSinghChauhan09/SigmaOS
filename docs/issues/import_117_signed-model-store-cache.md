@@ -1,1 +1,0 @@
-# Signed model store + cache\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Hugging Face/community\n**Note**: offline model marketplace with provenance.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

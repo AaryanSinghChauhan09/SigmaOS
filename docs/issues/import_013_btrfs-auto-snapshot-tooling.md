@@ -1,1 +1,0 @@
-# Btrfs auto‑snapshot tooling\n\n**Area**: kernel-drivers\n**Source**: Fedora/Arch\n**Note**: scheduled scrub and snapshot automation.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

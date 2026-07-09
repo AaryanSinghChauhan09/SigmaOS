@@ -1,1 +1,0 @@
-# Remote desktop with Wayland streaming\n\n**Area**: desktop-compositor-ux\n**Source**: Fedora\n**Note**: secure low‑latency remote access.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# Migration assistant (Windows/macOS)\n\n**Area**: installer-imaging-first-run\n**Source**: Ubuntu\n**Note**: import settings and data.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

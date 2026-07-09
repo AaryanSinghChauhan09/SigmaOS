@@ -1,1 +1,0 @@
-# Optional immutable root (OSTree)\n\n**Area**: packaging-build-reproducibility\n**Source**: Silverblue\n**Note**: layered packages on immutable base.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

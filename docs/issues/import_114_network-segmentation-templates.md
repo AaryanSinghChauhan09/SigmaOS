@@ -1,1 +1,0 @@
-# Network segmentation templates\n\n**Area**: security-sandboxing-forensics\n**Source**: Fedora\n**Note**: persona network isolation blueprints.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

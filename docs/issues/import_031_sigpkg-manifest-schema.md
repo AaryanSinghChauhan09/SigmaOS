@@ -1,1 +1,0 @@
-# sigpkg manifest schema\n\n**Area**: packaging-build-reproducibility\n**Source**: NixOS/Nixpkgs inspiration\n**Note**: declarative metadata with SBOM fields.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

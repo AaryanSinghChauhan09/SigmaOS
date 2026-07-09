@@ -1,1 +1,0 @@
-# gVisor container isolation option\n\n**Area**: security-sandboxing-forensics\n**Source**: gVisor\n**Note**: alternative sandboxing for workloads.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

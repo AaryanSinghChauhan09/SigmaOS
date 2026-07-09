@@ -1,1 +1,0 @@
-# Modular Calamares installer modules\n\n**Area**: installer-imaging-first-run\n**Source**: Calamares/Arch\n**Note**: persona selection, encryption, drivers.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

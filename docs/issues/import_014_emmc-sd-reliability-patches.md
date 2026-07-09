@@ -1,1 +1,0 @@
-# eMMC/SD reliability patches\n\n**Area**: kernel-drivers\n**Source**: linux\n**Note**: improve embedded device storage reliability.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

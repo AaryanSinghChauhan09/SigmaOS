@@ -1,1 +1,0 @@
-# Compositor GPU buffer reuse\n\n**Area**: desktop-compositor-ux\n**Source**: Wayland patches\n**Note**: reduce CPU/GPU overhead.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

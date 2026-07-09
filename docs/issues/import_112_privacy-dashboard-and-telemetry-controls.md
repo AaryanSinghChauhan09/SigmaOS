@@ -1,1 +1,0 @@
-# Privacy dashboard and telemetry controls\n\n**Area**: security-sandboxing-forensics\n**Source**: Ubuntu/Fedora\n**Note**: transparent telemetry management.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

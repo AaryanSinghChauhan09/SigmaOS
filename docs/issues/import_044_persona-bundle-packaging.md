@@ -1,1 +1,0 @@
-# Persona bundle packaging\n\n**Area**: packaging-build-reproducibility\n**Source**: Fedora/Ubuntu\n**Note**: curated Dev/Data/Security bundles.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# Secure default browser sandboxing\n\n**Area**: security-sandboxing-forensics\n**Source**: Fedora/Kali\n**Note**: site isolation and plugin restrictions.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

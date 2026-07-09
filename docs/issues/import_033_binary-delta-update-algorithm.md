@@ -1,1 +1,0 @@
-# Binary delta update algorithm\n\n**Area**: packaging-build-reproducibility\n**Source**: OSTree/Fedora Silverblue\n**Note**: reduce update sizes.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

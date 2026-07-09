@@ -1,1 +1,0 @@
-# Local package signing verification at install\n\n**Area**: packaging-build-reproducibility\n**Source**: Fedora\n**Note**: enforce provenance on client.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

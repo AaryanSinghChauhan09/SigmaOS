@@ -1,1 +1,0 @@
-# Image build CI templates\n\n**Area**: packaging-build-reproducibility\n**Source**: Fedora/Nix\n**Note**: reproducible ISO/OCI pipelines.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

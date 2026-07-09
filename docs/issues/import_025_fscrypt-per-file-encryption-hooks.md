@@ -1,1 +1,0 @@
-# fscrypt per‑file encryption hooks\n\n**Area**: kernel-drivers\n**Source**: Debian\n**Note**: default encrypted home support.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

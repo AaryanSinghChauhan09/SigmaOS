@@ -1,1 +1,0 @@
-# Package provenance metadata\n\n**Area**: packaging-build-reproducibility\n**Source**: Nix\n**Note**: commit hashes and builder IDs in packages.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

@@ -1,1 +1,0 @@
-# ONNX runtime packaging + quantized models\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Nix/Fedora\n**Note**: local offline inference runtime.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

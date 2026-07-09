@@ -1,1 +1,0 @@
-# Deterministic build farm orchestration\n\n**Area**: packaging-build-reproducibility\n**Source**: Nix/Fedora\n**Note**: containerized reproducible builders.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

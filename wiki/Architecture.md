@@ -1,195 +1,279 @@
 # SigmaOS Architecture
 
-> Canonical architecture reference. For the privilege/isolation boundary doc, see [Architecture.md](Architecture.md).
+## Overview
 
----
+SigmaOS is a sovereign operating system built with Rust and Nim, designed for security, performance, and independence from external dependencies. This document describes the high-level architecture and design principles.
 
-## System Layers
+## Design Principles
+
+1. **Zero-Dependency Policy**: No external third-party crates in kernel and core components
+2. **No-Std First**: Kernel and core modules use `no_std` to avoid standard library dependencies
+3. **Sovereign Security**: Capability-based security model with fine-grained access control
+4. **Performance First**: Zero-allocation optimizations and efficient data structures
+5. **Modular Design**: Clear separation between kernel, userland, and tools
+
+## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  USER SPACE (Ring 3 / EL0)                                      │
-│  PWAs · Zenith Desktop · profession apps · sigma-ai LLM         │
-├─────────────────────────────────────────────────────────────────┤
-│  BROWSER SHELL (optional profile)                               │
-│  Custom Chromium + navigator.sigmaos.* API bridge               │
-├─────────────────────────────────────────────────────────────────┤
-│  SYSTEM DAEMONS (Ring 3, capability-restricted)                 │
-│  sigmad-health · sigmad-pkg · sigmad-netd · sigmad-vault        │
-│  sigmad-watchdog · sigmad-metrics · sigmad-cloudsync            │
-├─────────────────────────────────────────────────────────────────┤
-│  SYSCALL INTERFACE                                              │
-│  sigma_pledge (allowlist) + sigma_unveil (path restriction)     │
-│  seccomp-BPF filter · AVC O(1) MAC cache                        │
-├─────────────────────────────────────────────────────────────────┤
-│  KERNEL (Ring 0 / EL1 / S-Mode) — freestanding, no glibc       │
-│  ┌──────────┬──────────┬──────────┬──────────┬───────────────┐  │
-│  │ Scheduler│ Memory   │ Security │ Network  │ Filesystem    │  │
-│  │ MLFQ+EDF │ Buddy+   │ pledge/  │ TLS1.3+  │ VFS + SigmaFS │  │
-│  │ + CFS    │ Slab+    │ unveil+  │ Kyber+   │ Ext4 + Tmpfs  │  │
-│  │ + RT     │ 4-level  │ AVC+     │ DNS/DoH+ │ + dm-verity   │  │
-│  │ + AI     │ paging   │ ZeroTrust│ DHCP+    │ + OSTree A/B  │  │
-│  │          │ + ASLR   │ + TPM2   │ WPA3+    │               │  │
-│  │          │ + W^X    │ + PQC    │ Firewall │               │  │
-│  └──────────┴──────────┴──────────┴──────────┴───────────────┘  │
-│  IPC · IRQ/APIC · cgroups · namespaces · eBPF · kprobes         │
-├─────────────────────────────────────────────────────────────────┤
-│  HARDWARE ABSTRACTION (SovereignHAL)                            │
-│  x86_64 · ARM64 · RISC-V RV64GC                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  HARDWARE                                                       │
-│  CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI                     │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     Userland Applications                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ Office Tools │  │ System APIs  │  │ Core Utils   │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                      System Call Interface                    │
+│                    (Syscall Dispatch Table)                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                         Kernel Core                           │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │Scheduler │  │Memory Mgmt│  │Security  │  │IPC       │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                      Hardware Abstraction                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │APIC/PIC  │  │Timer     │  │Framebuffer│  │ACPI      │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                      Bootloader (UEFI)                        │
+└─────────────────────────────────────────────────────────────┘
 ```
 
----
+## Core Components
 
-## Core Subsystems
+### 1. Bootloader (UEFI)
 
-### Scheduler (`kernel/sched/`)
+- **Location**: `bootloader/uefi/sigma_boot.rs`
+- **Purpose**: Minimal UEFI bootloader that loads the kernel
+- **Features**:
+  - UEFI protocol initialization
+  - Memory map acquisition
+  - Kernel memory allocation
+  - Framebuffer setup
+  - ACPI RSDP location
+  - Jump to kernel entry point
 
-- **MLFQ**: 4 queues with aging — interactive tasks stay responsive
+### 2. Memory Management
 
-- **CFS clone**: vruntime + red-black tree for fair CPU sharing
+#### Buddy Allocator
+- **Location**: `kernel/mm/buddy_allocator.rs`
+- **Purpose**: Physical memory allocation using buddy system
+- **Features**:
+  - Linked list free lists per order
+  - Block splitting and merging
+  - Static frame table for tracking
+  - No heap allocations
 
-- **EDF**: Earliest-Deadline-First for `release/rtos` hard real-time tasks
+#### Slab Allocator
+- **Location**: `kernel/mm/slab_allocator.rs`
+- **Purpose**: Kernel object allocation
+- **Features**:
+  - Per-object-type caches
+  - Efficient small object allocation
+  - Cache management
 
-- **SCHED_SOVEREIGN RT**: bounded IRQ latency < 10 µs target
+#### Page Table Walker
+- **Location**: `kernel/mm/page_table_walker.rs`
+- **Purpose**: Virtual memory management
+- **Features**:
+  - Page table traversal
+  - Page mapping/unmapping
+  - Permission management
 
-- **sigma-ai predictive**: TinyLlama pre-warming for hot code paths (Phase H)
+### 3. Process Scheduling
 
-- **NUMA-aware**: reads ACPI SRAT table for memory locality placement
+#### Round-Robin Scheduler
+- **Location**: `kernel/scheduler/round_robin_scheduler.rs`
+- **Purpose**: Basic CPU scheduling
+- **Features**:
+  - Task queue management
+  - Time slice quantum
+  - Context switching
+  - RDTSC-based timestamps
 
-### Memory Manager (`kernel/memory/`, `kernel/mm/`)
+### 4. Hardware Abstraction
 
-- **Buddy allocator**: 2^n page-frame management, O(log n) alloc/free
+#### APIC/PIC
+- **Location**: `kernel/core/hal/sigma_pic.rs`
+- **Purpose**: Interrupt controller management
+- **Features**:
+  - PIC initialization
+  - APIC setup
+  - IRQ routing
 
-- **Slab allocator**: kmalloc via object caches, minimises fragmentation
+#### Timer
+- **Location**: `kernel/core/hal/sigma_timer.rs`
+- **Purpose**: System timer management
+- **Features**:
+  - HPET initialization
+  - APIC timer setup
+  - Timer interrupts
 
-- **4-level paging** (x86_64 PML4): per-process virtual address spaces
+#### Framebuffer
+- **Location**: `kernel/gfx/sigma_framebuffer.rs`
+- **Purpose**: Graphics output
+- **Features**:
+  - VESA/VBE support
+  - UEFI GOP support
+  - Pixel manipulation
+  - Console output
 
-- **ASLR**: 42-bit entropy per VMA region
+### 5. Security
 
-- **W^X enforcement**: no page is simultaneously writable and executable
+#### Capability System
+- **Location**: `kernel/security/sigma_capability.rs`
+- **Purpose**: Linux-compatible capability model
+- **Features**:
+  - Per-process capability sets
+  - Capability derivation
+  - Revocation support
 
-### Security (`security/`, `kernel/security/`)
+#### Capability Table
+- **Location**: `kernel/core/capability_table.rs`
+- **Purpose**: Sovereign Capability Derivation Forest
+- **Features**:
+  - Sparse derivation tree
+  - Revocation-safe design
+  - Zero-allocation implementation
 
-- **sigma_pledge**: process declares capabilities at exec; kernel enforces allowlist
+### 6. System Services
 
-- **sigma_unveil**: process declares filesystem paths; all others denied
+#### Init System
+- **Location**: `init/sigma_init.rs`
+- **Purpose**: Process 1 and service management
+- **Features**:
+  - Service lifecycle management
+  - Boot targets
+  - Restart policies
 
-- **AVC**: O(1) SELinux-inspired access vector cache for MAC decisions
+#### Init Abstraction
+- **Location**: `kernel/init/init_abstraction.rs`
+- **Purpose**: Support for multiple init systems
+- **Features**:
+  - SigmaInit (default)
+  - Runit support
+  - S6 support
+  - Dinit support
+  - Sysvinit support
+  - OpenRC support
 
-- **Zero-trust**: SPIFFE workload identities, per-syscall cryptographic attestation
+### 7. Standard Library
 
-- **PQC**: Kyber-1024 KEM + Dilithium-5 signatures baked into TLS, packages, boot
+#### Sigma Libc
+- **Location**: `lib/sigma_libc/sigma_libc.rs`
+- **Purpose**: Musl-compatible C standard library
+- **Features**:
+  - Memory allocation
+  - String manipulation
+  - File I/O
+  - Process management
 
-- **TPM2**: seals CryptFS key derivation; remote attestation via sigma-trustd
+#### Zero-Allocation Optimizations
+- **Location**: `kernel/core/sigma_zero_alloc.rs`
+- **Purpose**: String and memory operations without heap
+- **Features**:
+  - Fixed-size strings
+  - Zero-allocation sprintf
+  - Temporary buffer pool
 
-### Networking (`net/`, `kernel/net/`)
+### 8. Feature Flags
 
-- **Stack**: IPv4/IPv6 · TCP · UDP · ICMP · ARP
+- **Location**: `tools/feature_flags/sigma_features.rs`
+- **Purpose**: Runtime feature toggling
+- **Features**:
+  - Feature registration
+  - Dependency resolution
+  - Conflict detection
+  - Runtime enable/disable
 
-- **TLS 1.3**: X25519/Kyber-1024 hybrid key exchange
+## Userland Components
 
-- **DNS**: UDP/TCP/DoH + DNSSEC + LRU cache
+### Office Tools
 
-- **DHCP**: full RFC 2131/2132 state machine
+#### Word Processor
+- **Location**: `applications/wordprocessor/sigma_wordprocessor.rs`
+- **Features**: Document editing, formatting, export (DOCX, ODT, PDF, TXT)
 
-- **WPA3/SAE**: dragonfly key exchange (P-256)
+#### Spreadsheet
+- **Location**: `applications/spreadsheet/sigma_spreadsheet.rs`
+- **Features**: Cell management, formulas, charts, export (XLSX, ODS, CSV)
 
-- **Firewall**: stateful + NAT + conntrack
+#### Presentation
+- **Location**: `applications/presentation/sigma_presentation.rs`
+- **Features**: Slide management, animations, transitions, export (PDF, PPTX, ODP)
 
-- **Mesh**: CRDT offline-first sync, ZeroNet (release/distributed)
+#### Email Client
+- **Location**: `applications/email_advanced/sigma_email_advanced.rs`
+- **Features**: Email accounts, contacts, calendar, tasks
 
-### Filesystem (`fs/`, `kernel/fs/`)
+#### Database Client
+- **Location**: `applications/database/sigma_database.rs`
+- **Features**: Multiple database types, query execution, table listing
 
-- **VFS**: generic inode/dentry/file layer
+### System APIs
 
-- **SigmaFS**: native CoW journaling filesystem (Phase G)
+#### Control Center
+- **Location**: `userland/system_api/control_center/`
+- **Features**: System monitoring, GPU monitoring, logging
 
-- **Ext4**: read/write with JBD2 ordered journaling
+#### AI Integration
+- **Location**: `userland/system_api/ai_integration/`
+- **Features**: LLM integration, model downloads, inference
 
-- **FAT32**: for EFI system partitions
+#### Dev Studio
+- **Location**: `userland/system_api/dev_studio/`
+- **Features**: Git integration, API testing, Docker/Kubernetes support
 
-- **Tmpfs**: RAM-backed ephemeral storage
+## Tools
 
-- **dm-verity**: block-level integrity verification (release/cloud)
+### ISO Builder
+- **Location**: `tools/sigma_iso_builder.rs`
+- **Purpose**: Create bootable ISO images
+- **Features**: GPT partition table, EFI System Partition
 
-- **OSTree A/B**: atomic updates (release/cloud, release/standalone)
+### Feature Flags
+- **Location**: `tools/feature_flags/`
+- **Purpose**: Feature flag management
 
-### HAL (`hal/`, `arch/`)
+## Build System
 
-- Multi-arch: x86_64, ARM64, RISC-V RV64GC
+SigmaOS uses a multi-language build system:
 
-- PCI/PCIe enumeration + MSI-X interrupt routing
+- **Rust**: Kernel, bootloader, most userland components
+- **Nim**: Some userland suites and tools
+- **Shell**: Build scripts and ISO generation
 
-- ACPI tables (MADT/SRAT/DSDT) parsing
+## Security Model
 
-- UEFI runtime services via sigma-boot.efi (Phase G)
+SigmaOS uses a capability-based security model:
 
-### Sovereign Driver Framework (SDF) (`drivers/`)
+1. **Capabilities**: Fine-grained permissions (CAP_CHOWN, CAP_NET_ADMIN, etc.)
+2. **Derivation Forest**: Tree-based capability derivation with revocation
+3. **Audit Logging**: All capability checks are logged
+4. **Bounding Sets**: Prevent privilege escalation
 
-- Each driver: `probe()` → `init()` → `shutdown()` lifecycle
+## Performance Optimizations
 
-- Ring-3 driver launch for fault isolation (Phase G)
+1. **Zero-Allocation**: Core operations avoid heap allocations
+2. **Static Data Structures**: Fixed-size arrays instead of dynamic allocations
+3. **Efficient Algorithms**: Buddy allocator, round-robin scheduler
+4. **Inline Assembly**: Critical paths use inline assembly for performance
 
-- Auto-registered via `SIGMA_SDF_REGISTER_DRIVER` macro
+## Future Roadmap
 
----
+See [ROADMAP.md](./ROADMAP.md) for detailed implementation plans.
 
-## Shard System
+## Contributing
 
-SigmaOS code is organised into **600+ shards** — atomic, independently-testable modules. Shards are identified by `S<N>_<Name>` and live in `suites/`.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
 
-Key shard groups:
+## License
 
-- **S01–S14**: Genesis, Silicon, ZenithUI, HAL, Memory, Storage, Network, Security, Intelligence, Registry, Virtualisation, Ecosystem, LuaBridge, Transcendence
-
-- **S034–S500+**: Extended capability shards (IPC, crypto, observability, AI, etc.)
-
----
-
-## Deployment Profiles
-
-8 profiles compiled from one codebase via CMake feature flags:
-
-| Profile | Key Difference |
-|---------|---------------|
-| `standalone` | Full Zenith DE, profession apps, sigma-ai |
-| `browser` | `navigator.sigmaos.*` API, Chromium shell |
-| `microkernel` | < 512 KB kernel, < 8 MB RAM, sigma-bus IPC |
-| `mobile` | ARM64 GIC, touch UI, NEON Kyber |
-| `rtos` | EDF scheduler, < 10 µs IRQ latency |
-| `dual-boot` | EFI boot entry, NTFS read, GRUB chainload |
-| `cloud` | Immutable root, A/B partitions, sigma-pod |
-| `distributed` | CRDT mesh, SovereignCloudFS, ZeroNet |
-
----
-
-## Directory Map
-
-| Directory | Purpose |
-|-----------|---------|
-| `kernel/` | Core microkernel |
-| `arch/` | CPU-specific code (x86_64, arm64, riscv64) |
-| `drivers/` | SDF hardware drivers |
-| `hal/` | Hardware abstraction layer |
-| `fs/` | Filesystems |
-| `net/` | Network stack |
-| `security/` | Security subsystems |
-| `crypto/` | PQC crypto primitives |
-| `memory/` | Physical memory management |
-| `scheduling/` | Scheduler implementations |
-| `ui/` | Desktop compositor + UI toolkit |
-| `userland/` | Shell, coreutils, system daemons |
-| `suites/` | 600+ capability shards |
-| `include/` | All headers |
-| `docs/` | Extended documentation |
-| `wiki_repo/` | GitHub Wiki source |
-| `tests/` | Unit, integration, regression, fuzz tests |
-| `scripts/` | Build, CI, release automation |
-
----
-
-*See also: [Wiki: Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview) · [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md)*
+MIT License - See [LICENSE](../LICENSE) for details.

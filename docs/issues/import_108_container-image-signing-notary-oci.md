@@ -1,1 +1,0 @@
-# Container image signing (Notary/OCI)\n\n**Area**: security-sandboxing-forensics\n**Source**: Docker/Notary\n**Note**: verify container provenance.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

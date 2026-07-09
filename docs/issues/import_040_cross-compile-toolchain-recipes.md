@@ -1,1 +1,0 @@
-# Cross‑compile toolchain recipes\n\n**Area**: packaging-build-reproducibility\n**Source**: Debian/Nix\n**Note**: reproducible embedded builds.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

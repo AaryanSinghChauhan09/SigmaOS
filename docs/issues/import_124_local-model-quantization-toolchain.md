@@ -1,1 +1,0 @@
-# Local model quantization toolchain\n\n**Area**: ai-data-science-observability-dev-tools\n**Source**: Nix/Fedora\n**Note**: reduce model size for offline use.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

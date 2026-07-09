@@ -1,1 +1,0 @@
-# NVMe driver tuning defaults\n\n**Area**: kernel-drivers\n**Source**: linux\n**Note**: SSD queue and scheduler presets for responsiveness.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

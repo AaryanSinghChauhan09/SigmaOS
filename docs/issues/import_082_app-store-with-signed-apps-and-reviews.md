@@ -1,1 +1,0 @@
-# App store with signed apps and reviews\n\n**Area**: desktop-compositor-ux\n**Source**: Fedora/Ubuntu\n**Note**: curated, audited marketplace.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

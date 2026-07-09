@@ -1,1 +1,0 @@
-# Compositor performance benchmark suite\n\n**Area**: desktop-compositor-ux\n**Source**: Arch/Fedora\n**Note**: automated latency/frame tests.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

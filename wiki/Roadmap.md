@@ -1,371 +1,190 @@
 # SigmaOS Development Roadmap
 
-**Version:** v16.6.0 Foundation  
-**Last Updated:** July 6, 2026  
-**Target Version:** v19.0.0 Transcendence
-
----
-
-## Overview
-
-This document outlines the transparent development roadmap for SigmaOS, a full-fledged operating system designed to compete with established Linux distributions. The roadmap is organized into phases, each with specific deliverables and timelines.
-
----
-
-## Phase 1: Critical Kernel Foundation ✅ COMPLETED
-
-**Timeline:** Weeks 1-12  
-**Status:** 95% Complete
-
-### Completed Components
-- Round-Robin Scheduler
-- Buddy Physical Allocator
-- Slab Allocator
-- Page Table Walker
-- APIC/PIC Initialization
-- HPET/APIC Timer
-- Syscall Dispatcher
-- Framebuffer Driver
-- UEFI Bootloader
-- Bootable ISO Generation
-
-### Remaining Work
-- Additional timer optimizations
-- Enhanced syscall performance
-
----
-
-## Phase 2: Essential Drivers 🚧 IN PROGRESS
-
-**Timeline:** Weeks 13-24  
-**Status:** 95% Complete
-
-### Completed Components
-- GPU Drivers (NVIDIA, AMD, Intel, VIA, SiS, Matrox) - OOP-based with Device/GpuDevice traits
-- USB Controller Drivers (XHCI, EHCI, UHCI, OHCI) - Full USB controller family with UsbController trait
-- Audio Drivers (HDA/ALSA compatibility) - Intel HDA driver with AudioDevice trait
-- Storage Drivers (NVMe, AHCI) - NVMe and SATA AHCI drivers with StorageDevice trait
-- Network Drivers (e1000e) - Intel e1000e Ethernet driver with EthernetDevice trait
-- Input Drivers (PS/2 keyboard/mouse, Synaptics, ELAN touchpads) - PS/2 keyboard/mouse and touchpad drivers with InputDevice trait
-- Camera Drivers (UVC/V4L2 compatibility) - USB Video Class driver with CameraDevice trait
-- Printer Drivers (USB/CUPS compatibility) - USB printer driver with PrinterDevice trait
-- Wi-Fi Drivers (iwlwifi, MT7921, RTW88) - Intel, MediaTek, Realtek Wi-Fi drivers with WifiDevice trait
-- Bluetooth Driver (BlueZ compatibility) - BlueZ-compatible adapter with BluetoothDevice trait
-- ARM Board Support (Raspberry Pi BCM2835, BCM2711) - SoC drivers with GPIO, UART, SPI, I2C support
-
-### Remaining Work
-- Full DRM/KMS Layer implementation
-
----
-
-## Phase 3: Filesystem Layer 🚧 IN PROGRESS
-
-**Timeline:** Weeks 25-36  
-**Status:** 40% Complete
-
-### Completed Components
-- Basic VFS implementation
-- SigmaFS (Copy-on-Write filesystem)
-- Ext2/3/4 support (basic)
-
-### Remaining Work
-- Complete Btrfs support
-- ZFS integration
-- Advanced Btrfs features
-- FUSE support
-- Network filesystems (NFS, SMB)
-
----
-
-## Phase 4: Package Management 🚧 IN PROGRESS
-
-**Timeline:** Weeks 37-48  
-**Status:** 50% Complete
-
-### Completed Components
-- SigmaPKG Package Manager core (basic)
-- Package registry format
-- ED25519 signature verification
-- SBOM generation
-
-### Remaining Work
-- Complete dependency resolver
-- Central Repositories with Mirrors
-- Rollback Functionality
-- AI-Assisted Dependency Resolution
-- Sandboxed package installs
-- Delta updates support
-
----
-
-## Phase 5: Atomic Updates 🚧 PLANNED
-
-**Timeline:** Weeks 49-60  
-**Status:** Not Started
-
-### Planned Components
-- Basic transaction support
-- A/B partition scheme
-- Rollback on boot failure
-- Atomic system updates
-- Safe upgrade mechanism
-
----
-
-## Phase 6: Performance Optimization 🚧 IN PROGRESS
-
-**Timeline:** Weeks 61-72  
-**Status:** 60% Complete
-
-### Completed Components
-- Basic profiling tools
-- Kernel performance tuning (basic)
-- I/O optimization (basic)
-- Memory management improvements
-- CPU scheduler enhancements
-
-### Remaining Work
-- Advanced profiling tools
-- Comprehensive performance tuning
-
----
-
-## Phase 7: Security Hardening 🚧 IN PROGRESS
-
-**Timeline:** Weeks 73-84  
-**Status:** 30% Complete
-
-### Completed Components
-- Capability-based access control
-- Basic sandboxing
-- AI Transparency Logging
-- Basic crypto integration
-
-### Remaining Work
-- QubesOS-Style Sandboxing
-- Suricata IDS Integration
-- Snort IDS Integration
-- fail2ban Integration
-- Full Crypto Integration (GnuPG, OpenSSL, Vault)
-- SELinux/AppArmor-style MAC implementation
-- Secure Boot integration with TPM
-- PGP key generation for security@sigmaos.dev
-
----
-
-## Phase 8: Cloud Integration 🚧 PLANNED
-
-**Timeline:** Weeks 85-96  
-**Status:** Not Started
-
-### Planned Components
-- Cloud storage integration
-- Container support (Docker/Podman)
-- Kubernetes integration
-- Cloud-native tooling
-
----
-
-## Phase 9: Desktop Experience 🚧 IN PROGRESS
-
-**Timeline:** Weeks 97-108  
-**Status:** 40% Complete
-
-### Completed Components
-- Zenith Desktop (Native SigmaOS DE - experimental)
-- Basic window manager (tiling)
-- Theme engine (basic)
-
-### Remaining Work
-- GNOME Desktop Environment integration
-- KDE Plasma Desktop Environment integration
-- XFCE Desktop Environment integration
-- LXQt Desktop Environment integration
-- Theme Store and Extensions
-- Accessibility Tools (screen readers, magnifiers)
-- Indic Language Packs
-- Touch/gesture support for tablets
-- Unified Control Center
-- Onboarding wizard for new users
-
----
-
-## Phase 10: Developer Tools 🚧 IN PROGRESS
-
-**Timeline:** Weeks 109-120  
-**Status:** 50% Complete
-
-### Completed Components
-- Natural Language to CLI Translator (basic)
-- AI Error Explanation Layer (basic)
-- GitHub Actions CI/CD pipeline
-- Basic debugging tools
-
-### Remaining Work
-- Adaptive CLI Suggestions
-- IDE integration (VS Code, JetBrains, Eclipse plugins)
-- Custom build system with modular configs
-- Advanced debugging tools (kernel logs, crash analyzers, profilers)
-- Performance benchmarking tools
-
----
-
-## Phase 11: Advanced System Configuration 🚧 PLANNED
-
-**Timeline:** Weeks 121-132  
-**Status:** Not Started
-
-### Planned Components
-- System configuration management
-- Service management
-- Boot configuration
-
----
-
-## Phase 12: Industry-Standard Application Suite 🚧 PLANNED
-
-**Timeline:** Weeks 133-144  
-**Status:** Not Started
-
-### Planned Components
-- SigmaDB (Database System)
-- SigmaQuery (Query Engine)
-- SigmaAnalytics (Data Analytics)
-- SigmaVisual (Data Visualization)
-- SigmaETL (Data Processing)
-- SigmaStorage (Object Storage)
-- SigmaML (Machine Learning)
-- SigmaWeb (Web Scraping)
-- SigmaPython (Python Runtime)
-- SigmaR (R Statistical Runtime)
-
----
-
-## Phase 13: Core OS Foundation 🚧 IN PROGRESS
-
-**Timeline:** July 2026  
-**Status:** 50% Complete
-
-### Completed Components
-- Basic kernel foundation
-- GPU Driver Support (stub implementations)
-- Wi-Fi Driver Support (stub)
-- SigmaPKG Package Manager (basic)
-- Zenith Desktop (experimental)
-- Basic security features
-- AI Features (NL2CLI, Error Explanation - basic)
-- CI/CD Pipelines
-
-### Remaining Work
-- Linux Kernel Integration
-- Complete GPU Driver Support (NVIDIA, AMD, Intel)
-- Complete Wi-Fi Driver Support
-- Calamares-Style Installer
-- Central Repositories with Mirrors
-- Signed Packages Support
-- Desktop Environments (GNOME, KDE, XFCE, LXQt)
-- Complete Security (Sandboxing, IDS, Crypto)
-- Complete AI Features (NL2CLI, Error Explanation)
-- GitHub Issue Labels
-- Plugin Architecture
-
----
-
-## Phase 14: Community Governance 🚧 IN PROGRESS
-
-**Timeline:** Weeks 145-156  
-**Status:** 40% Complete
-
-### Completed Components
-- Transparent Roadmap (this document)
-- Contributor Onboarding (basic)
-
-### Remaining Work
-- Plugin Architecture
-- Migration Guides
-- Community Governance Model
-- SigmaOS Foundation establishment
-- Contributor programs and hackathons
-- Documentation sprints
-- Bounty programs for security bugs
-
----
-
-## Phase 15: Education & Professional Tools 🚧 PLANNED
-
-**Timeline:** Weeks 157-168  
-**Status:** Not Started
-
-### Planned Components
-- SigmaMath (GeoGebra, Scilab, Octave alternatives)
-- SigmaClassroom (OpenBoard, Moodle alternatives)
-- SigmaERP (ERPNext, Koha, GNUCash alternatives)
-- SigmaGIS (QGIS alternative)
-- SigmaHealth (OpenMRS alternative)
-- SigmaCAD (FreeCAD alternative)
-
----
-
-## Phase 16: System Optimization 🚧 PLANNED
-
-**Timeline:** Weeks 169-180  
-**Status:** Not Started
-
-### Planned Components
-- systemd-coredump (SigmaCoredump)
-- BusyBox Integration
-- musl libc Integration (SigmaLibC)
-- Systemd alternatives (native implementations)
+9 phases over 60 months from "design document" to "1,000 villages running SigmaOS".
+Full details: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap
 
 ---
 
 ## Milestones
 
-### v16.0.0 Foundation (Current) ✅
-- Core OS foundation complete
-- Bare-Metal Microkernel Subsystems implemented (CFS Scheduler, Buddy/Slab Allocator, VFS, atomic IPC rings)
-- Zero-Dependency TCP/IPv4 Network Stack & ChaCha20 Cryptography
-- Package management system operational with secure ED25519 & SBOM Verification
-- Sovereignty-first Application Suite Stubs (SigmaWriter, SigmaSheet, SigmaVector)
-- Multiple desktop environments available (Zenith, GNOME, KDE, XFCE)
-- Security framework in place (Capability-gated access control)
-- AI features integrated
-- Filesystem layer complete
-- Atomic updates implemented
-- Performance optimization complete
-- Security hardening complete
-- Cloud integration complete
-- Desktop experience complete
-- Developer tools complete & GitHub Actions CI/CD with auto-SBOM verification pipeline
-
-### v17.0.0 Stability (Planned)
-- Enhanced filesystem support
-- Improved driver coverage
-- System stability improvements
-- Performance optimizations
-
-### v18.0.0 Integration (Planned)
-- Cloud integration complete
-- Container support
-- Enhanced developer tools
-- Professional application suite
-
-### v19.0.0 Transcendence (Target)
-- Full feature parity with major distributions
-- Advanced AI integration
-- Complete security hardening
-- Production-ready stability
+| Milestone | Month | Definition of Done |
+| --- | --- | --- |
+| M0: First Boot | 3 | `qemu-system-x86_64 -cdrom SigmaOS.iso` reaches shell |
+| M1: Real Hardware | 6 | Boots on real x86 laptop, WiFi + packages work |
+| M2: First Desktop | 9 | Zenith DE, DID login, Hindi IME, sigma-ai local |
+| M3: India Stack Live | 14 | CA files GSTR, doctor writes ABDM prescription |
+| M4: Security Audit | 18 | Zero critical CVEs, full PQ crypto, TPM2 boot chain |
+| M5: ARM64 | 21 | Raspberry Pi 4 + sigma-ultra on Pi Zero |
+| M6: AI Native | 24 | sigma-heal+sigma-lex+sigma-fedlearn all live |
+| M7: Govt Pilot | 30 | 1,000 NIC machines, BharatOS pilot |
+| M8: 1,000 Villages | 42 | sigma-RuralStack in 1,000 villages across 5 states |
+| M9: Verified Kernel | 60 | Formally verified IPC + scheduler, Rust network stack |
 
 ---
 
-## Contributing
+## Phase Summary
 
-We welcome contributions from the community. Please see the [Contributing Guide](CONTRIBUTING.md) for details on how to get involved.
+### Phase 0 — Foundation (Months 1–3): MAKE IT BOOT
 
-## Governance
+- kernel/core/{sched,mm,syscall_dispatch,irq}.cpp
 
-SigmaOS follows a transparent governance model with community input on major decisions. See the [Governance Document](GOVERNANCE.md) for details.
+- sigma-boot.efi (UEFI PE binary)
 
-## License
+- VESA/GOP framebuffer
 
-SigmaOS is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+- `make iso` → bootable ISO
+
+- QEMU CI in GitHub Actions
+
+### Phase 1 — Networking & Packages (Months 3–6): MAKE IT CONNECT
+
+- TCP/UDP/IPv6 stack
+
+- Ethernet + WiFi SDF drivers (e1000, virtio-net, r8169, iwlwifi, mt7921)
+
+- sigma-repo-server + India CDN mirror
+
+- sigma-pkg end-to-end install
+
+- Argon2id CryptFS (fix Issue #44)
+
+### Phase 2 — Desktop & Identity (Months 6–9): MAKE IT USABLE
+
+- GPU drivers (i915, amdgpu, virtio-gpu)
+
+- Zenith compositor live on DRM/KMS
+
+- DID-based login (QR scan → desktop)
+
+- Indian language IME (Inscript + phonetic)
+
+- sigma-bhashini offline models
+
+- sigma-ai local LLM (Sarvam-1, 4GB RAM)
+
+### Phase 3 — India Stack Live (Months 9–14): MAKE IT INDIAN
+
+- ABDM FHIR client (Health ID, PHR, PMJAY)
+
+- GST IRN + e-Way Bill + GSTR filing
+
+- UPI Autopay + e-RUPI + AA consent
+
+- NavIC integration
+
+- sigma-accounts + sigma-health production ready
+
+### Phase 4 — Security Hardening (Months 12–18): MAKE IT TRUSTED
+
+- ML-KEM/ML-DSA/SLH-DSA (FIPS 203/204/205 final)
+
+- Continuous auth live (biometric all signals)
+
+- sigma-mac policy engine live
+
+- sigma-ids + sigma-heal integration
+
+- TPM2 full Secure Boot chain
+
+### Phase 5 — Multi-Platform (Months 15–21): MAKE IT EVERYWHERE
+
+- ARM64: Raspberry Pi 4/5, sigma-ultra on Pi Zero
+
+- RISC-V build toolchain
+
+- sigma-commnet: TRAI-certified, BharatNet PoP
+
+- sigma-ultra USSD mode on 2G
+
+### Phase 6 — AI & Advanced (Months 18–24): MAKE IT SMART
+
+- Federated learning coordinator live
+
+- sigma-heal AI crash analysis real
+
+- sigma-lex Gazette parser live
+
+- sigma-twin with real IoT sensors
+
+- ZK proofs working (groth16)
+
+### Phase 7 — Enterprise & Government (Months 24–36): MAKE IT OFFICIAL
+
+- BharatOS pilot: 1,000 NIC machines
+
+- sigma-fleet: 10,000+ device management
+
+- Hardware partnerships: Lava/Micromax OEM
+
+- STQC + MeitY empanelment
+
+- sigma-defense DRDO evaluation
+
+### Phase 8 — Rural India (Months 30–42): MAKE IT UNIVERSAL
+
+- sigma-RuralStack: 1,000 pilot villages
+
+- BharatNet PoP certification
+
+- sigma-gram for all 250,000 panchayats
+
+- MGNREGS payment latency < 24 hours
+
+### Phase 9 — Research (Months 36–60): MAKE IT FOREVER
+
+- Formal verification: IPC + scheduler (IIT/IISc collab)
+
+- Rust migration complete: zero memory-safety CVEs
+
+- sigma-telco: O-RAN 5G on SigmaOS
+
+- sigma-zkvm: banks share risk models without raw data
+
+- ONEST: 1M DID-signed skill credentials
+
+---
+
+## Critical Path (What Blocks What)
+
+```
+Kernel implementations (Phase 0)
+    └── ISO build
+        └── QEMU CI
+            └── Real hardware boot
+                └── Network stack (Phase 1)
+                    └── Package repo
+                        └── GPU drivers (Phase 2)
+                            └── Zenith desktop
+                                └── DID login
+                                    └── IME + sigma-ai
+                                        └── India Stack APIs (Phase 3)
+                                            └── Production launch
+```
+
+The kernel implementations in Phase 0 are the single critical-path item.
+Everything else is blocked until a real scheduler, MM, and syscall table exist.
+
+---
+
+## How to Contribute
+
+### Phase 0 needs most urgently:
+
+- C++ kernel engineers (scheduler, memory manager)
+
+- UEFI/EDK2 engineers (bootloader)
+
+- Build system engineers (ISO pipeline)
+
+### Phase 2–3 needs:
+
+- Rust engineers (network stack, VFS)
+
+- India fintech engineers (GST, ABDM, UPI API clients)
+
+- GPU/graphics engineers (DRM/KMS, Mesa)
+
+- Language/NLP engineers (IME, LLM integration)
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to get involved.
+See the [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap) for full phase details.

@@ -1,1 +1,0 @@
-# Secure Boot shim + key mgmt\n\n**Area**: kernel-drivers\n**Source**: Debian/Fedora\n**Note**: guided key enrollment and verification.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n

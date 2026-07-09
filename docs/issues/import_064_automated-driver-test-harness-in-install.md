@@ -1,1 +1,0 @@
-# Automated driver test harness in installer\n\n**Area**: installer-imaging-first-run\n**Source**: Fedora\n**Note**: run hardware tests on first boot.\n\n## Checklist\n- [ ] Reproducible build job\n- [ ] Tests\n- [ ] SBOM Generation\n- [ ] Documentation entry\n- [ ] Reviewer sign-off\n
