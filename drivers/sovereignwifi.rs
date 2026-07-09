@@ -6,13 +6,7 @@
 #![no_std]
 #![allow(dead_code)]
 
-type SigmaU8 = u8;
-type SigmaU16 = u16;
-type SigmaU32 = u32;
-type SigmaU64 = u64;
-type SigmaUsize = usize;
-type SigmaBool = bool;
-type SigmaI32 = i32;
+use crate::drivers::common_types::{SigmaU8, SigmaU16, SigmaU32, SigmaU64, SigmaUsize, SigmaBool, SigmaI32};
 
 pub const SIGMA_OK: SigmaI32 = 0;
 pub const SIGMA_ERR_DISCONNECTED: SigmaI32 = -1;

@@ -5,16 +5,7 @@
 #![no_std]
 #![allow(dead_code)]
 
-type SigmaU8 = u8;
-type SigmaU16 = u16;
-type SigmaU32 = u32;
-type SigmaU64 = u64;
-type SigmaI32 = i32;
-type SigmaI64 = i64;
-type SigmaF32 = f32;
-type SigmaF64 = f64;
-type SigmaBool = bool;
-type SigmaUsize = usize;
+use crate::drivers::common_types::{SigmaU8, SigmaU16, SigmaU32, SigmaU64, SigmaI32, SigmaI64, SigmaF32, SigmaF64, SigmaBool, SigmaUsize};
 
 /// Pixel format
 #[repr(C)]
