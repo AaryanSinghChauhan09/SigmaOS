@@ -1,61 +1,92 @@
-# SigmaOS Security Architecture & Enforcement
+# Security Policy — SigmaOS
 
-## Overview
-SigmaOS implements a Zero-Trust, capability-first security architecture that completely eliminates legacy sudo access or raw root accounts. To guarantee application isolation, the system couples a fine-grained capability-based token system with modern Mandatory Access Control (MAC) policies, running Landlock and seccomp filters at the kernel boundary.
+## Supported Versions
 
-## Security Architecture
-The security layer operates at the system call dispatcher. Every requested system call passes through a capability validation check before execution.
+| Version | Supported |
+|---------|-----------|
+| `main` (rolling) | ✅ Active |
+| Tagged releases | ✅ Latest tag only |
+| Older tags | ❌ Not backported |
+
+---
+
+## Reporting a Vulnerability
+
+### Do NOT open a public GitHub issue for security vulnerabilities.
+
+Instead, use one of the following private channels:
+
+### Option A — GitHub Private Security Advisory (preferred)
+
+1. Go to the [Security tab](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories) of this repo.
+
+2. Click **"Report a vulnerability"**.
+
+3. Fill in the advisory form. We aim to acknowledge within **48 hours**.
+
+### Option B — Email (Temporary)
+
+Send a PGP-encrypted email to: **aaryansinghchauhan09@github** *(temporary until security@sigmaos.dev is set up)*
 
 ```
- [Application Syscall Request]
-               │
-               ▼
-   [Capabilities Validator]  ──► Invalid? ──► Terminate
-               │
-               ▼ Valid
-      [MAC / Landlock Audit] ──► Blocked File? ──► Access Denied
-               │
-               ▼ Approved
-      [Kernel Execution]
+PGP Key Fingerprint: See docs/security/pgp-key.asc
 ```
 
-## Security Configuration
-MAC profiles are defined declaratively in `/etc/sigma/security/profiles.d/`.
+Full public key: `docs/security/pgp-key.asc`
 
-Example profile (`user-app.sigma`):
-```toml
-[profile]
-name = "user-app"
-inherit = "base-sandbox"
+*Note: Email contact is temporary. Use GitHub Security Advisory (Option A) for fastest response.*
 
-[capabilities]
-allow_net_connect = false
-allow_fs_write = ["/home/user/downloads", "/tmp"]
-allow_fs_read = ["/home/user/documents", "/usr/share"]
+---
 
-[syscalls]
-allow = ["read", "write", "exit", "futex", "epoll_wait"]
-deny = ["ptrace", "sys_chroot", "reboot"]
-```
+## Disclosure Timeline
 
-## Technical Implementation
-The token-based sandbox checks process capabilities stored in the task control block (TCB).
+| Stage | Target |
+|-------|--------|
+| Initial acknowledgement | 48 hours |
+| Triage & severity assessment | 7 days |
+| Fix development | 30 days (critical) / 90 days (high) |
+| Public disclosure (CVE + advisory) | Upon fix release |
 
-```rust
-// kernel/security/capability.rs
-pub const CAP_NET_CONNECT: u64 = 1 << 0;
-pub const CAP_FS_WRITE: u64 = 1 << 1;
+We follow coordinated disclosure — we will not publish details until a fix is available, and we will credit reporters unless they prefer anonymity.
 
-pub fn validate_capability(current_mask: u64, requested_cap: u64) -> Result<(), SecurityError> {
-    if (current_mask & requested_cap) == 0 {
-        return Err(SecurityError::PermissionDenied);
-    }
-    Ok(())
-}
-```
+---
 
-## Roadmap & Milestones
-- **Phase 1 (Months 0-3)**: Implementation of capability-token bitmasks in the task manager.
-- **Phase 2 (Months 3-6)**: Integration of Landlock filesystem sandboxing hooks.
-- **Phase 3 (Months 6-9)**: Automated profiling tool (`sigtrace`) that generates sandboxing manifests by tracing system calls.
-- **Phase 4 (Months 9-12)**: System-wide Zero-Trust verification requiring cryptographically signed capability tokens for all IPC interactions.
+## Scope
+
+Security bugs that are **in scope**:
+
+- Kernel privilege escalation (Ring 3 → Ring 0)
+
+- Memory safety violations in `kernel/`, `crypto/`, `security/`
+
+- Capability / Zero-Trust enforcement bypass in `security/`
+
+- Cryptographic implementation errors (especially in `crypto/cryptfs/`)
+
+- Supply-chain attacks against signed release artifacts
+
+### Out of scope (for this project stage):
+
+- Bugs in third-party dependencies (report upstream)
+
+- Theoretical / non-exploitable issues without a PoC
+
+- Social engineering
+
+---
+
+## Severity Rating
+
+We use [CVSS v3.1](https://www.first.org/cvss/) for scoring. Critical (≥9.0) and High (≥7.0) findings are given priority treatment.
+
+---
+
+## Bug Bounty
+
+There is no monetary bounty program at this stage. Reporters of significant findings will be credited in:
+
+- The GitHub Security Advisory
+
+- The `CHANGELOG.md` release notes
+
+- The `CONTRIBUTORS.md` file (if desired)

@@ -1,53 +1,317 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in contributing to the Sovereign Lattice!
+SigmaOS is a community-driven, sovereign OS. We welcome contributions of all kinds — kernel code, userspace tools, drivers, documentation, workflow templates, AI agent plugins, and package recipes.
 
-## Getting Started
+See [Community Governance](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Community-Governance) for the full governance model, contributor roles, and decision-making process.
 
-### 1. Prerequisites
+---
 
-- `gcc-x86-64-linux-gnu`
+## Kernel-Style Contribution Workflow
 
-- `nasm`
+SigmaOS follows Linux kernel development practices adapted for our polyglot codebase.
 
-- `make`
+### Signed-off-by Requirement
 
-- `python3` (for scripts)
+All commits must include a `Signed-off-by` line to certify the Developer Certificate of Origin (DCO):
 
-- `qemu-system-x86` (for local emulation)
+```
+kernel/scheduler: implement adaptive EWMA scheduling
 
-### Alternatively, use the provided `Dockerfile` for a zero-setup, cross-platform build environment
+Implement exponential weighted moving average for runtime estimation
+to improve task scheduling fairness and responsiveness.
 
-### 2. Building
+Signed-off-by: Your Name <your.email@example.com>
+```
 
-Run the following to compile the entire OS:
+To automatically add this, configure git:
+
+```bash
+git config --local commit.template .git/commit-template
+```
+
+### Commit Message Format
+
+Follow the conventional commit format with subsystem prefix:
+
+```
+subsystem: short description (≤50 chars)
+
+Detailed explanation of the change, including:
+
+- Motivation for the change
+
+- Technical details of implementation
+
+- Testing performed
+
+- Performance impact (if any)
+
+References: Issue #123, PR #456
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+**Valid subsystems:** `kernel`, `drivers`, `userland`, `security`, `fs`, `net`, `docs`, `ci`, `build`
+
+**Commit types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `security`, `perf`
+
+### Branch Naming Convention
+
+```
+feature/subsystem-description
+fix/subsystem-bug-description
+docs/subject
+refactor/subject
+security/subject
+```
+
+Examples:
+
+- `feature/kernel-adaptive-scheduler`
+
+- `fix/drivers-e1000-rx-overflow`
+
+- `docs/api-syscall-reference`
+
+- `security/kernel-seccomp-filter`
+
+---
+
+## Language Policy
+
+SigmaOS uses a polyglot codebase. Each language has a specific domain:
+
+| Language | Domain | Rules |
+|---|---|---|
+| **Rust** | Kernel core, drivers, critical subsystems | `#![no_std]` in kernel; no unsafe outside `kabi/` boundary |
+| **Nim** | Userspace tools, CLI helpers, package manager | Compiled to C backend; no external packages |
+| **Zig** | HAL, leaf performance-sensitive drivers | Static compilation only; no dynamic allocation |
+| **Ada/SPARK** | Formal-verified security checkers | Must pass `gnatprove` before merge |
+| **Assembly** | Boot, context switch, VMM fast paths | Only in `arch/` |
+| **C** | Legacy driver compat shims in `drivers/linux/` | No new C in non-compat code |
+
+Cross-language calls go through `kabi/` using `#[repr(C)]` structs.
+
+---
+
+## Quick Start
 
 ```bash
 
-make all
+# 1. Fork and clone
+
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS
+cd SigmaOS
+
+# 2. Set up dev environment
+
+./scripts/setup.sh          # installs Rust, Nim, Zig, QEMU toolchain
+
+# 3. Build
+
+cargo build --release       # Rust kernel + tools
+
+nim c -d:release userland/agent/sigma_agent_main.nim  # Nim CLI tools
+
+# 4. Run tests
+
+cargo test                  # Rust unit tests
+
+./sigma-agent benchmark quick  # Agent quality tests
+
+# 5. Run in QEMU
+
+make PROFILE=standalone qemu
+```
+
+---
+
+## What to Work On
+
+### Easy (good first issues)
+
+- New sigma-agent workflow templates (`userland/agent/sigma_agent_workflow.nim`)
+
+- New sigma-agent plugin (`sigma-agent plugin create my-skill`)
+
+- Wiki page improvements (`wiki_repo/`)
+
+- New package recipes (`sigma_pkg_registry/recipes/`)
+
+- sigma-agent training samples (`userland/agent/sigma_agent_seed_v2.jsonl`)
+
+- Translation/localisation (`locales/`)
+
+### Medium
+
+- New sigma-agent tools (implement `Tool` trait in `userland/agent/sigma_agent.rs`)
+
+- New sigma-agent explain topics (`userland/agent/sigma_agent_explain.nim`)
+
+- Package absorption improvements (`pkg/sigma_pkg_absorb.nim`)
+
+- Linux compatibility shim (`userland/compat/sigma_linux_compat.nim`)
+
+- New SDF drivers (`drivers/`)
+
+- Benchmark test cases (`userland/agent/sigma_agent_benchmark.nim`)
+
+### Hard (core team review required)
+
+- Kernel subsystem changes (`kernel/`)
+
+- Syscall interface changes (`kernel/syscalls/`)
+
+- Security policy changes (`security/`)
+
+- ABI changes (`kabi/`)
+
+---
+
+## Code Review Process
+
+### Review Requirements
+
+- **Kernel changes**: Must be reviewed by at least one kernel maintainer
+
+- **Driver changes**: Must be reviewed by subsystem maintainer
+
+- **Security changes**: Must be reviewed by security team
+
+- **ABI changes**: Require sign-off from kabi maintainer
+
+### Review Checklist
+
+Reviewers should verify:
+
+- [ ] Code follows language policy and style guidelines
+
+- [ ] Commit messages are properly formatted with Signed-off-by
+
+- [ ] Tests are included for new functionality
+
+- [ ] Documentation is updated where necessary
+
+- [ ] No unsafe code without justification (Rust)
+
+- [ ] No external dependencies added without review
+
+- [ ] CI pipeline passes all checks
+
+---
+
+## CI Requirements
+
+All PRs must pass the 12-job CI pipeline:
+
+- Rust build + clippy (kernel + tools)
+
+- Nim build + type check (7 agent modules)
+
+- 21-tool smoke tests
+
+- GUI mirror validation (60+ mappings)
+
+- Workflow automation tests
+
+- Benchmark quick suite
+
+- Shell integration test
+
+- Training data seed generation
+
+---
+
+## Adding a sigma-agent Workflow Template
+
+The fastest way to contribute automation value:
+
+```bash
+
+# 1. Write the YAML
+
+# 2. Add to WORKFLOW_TEMPLATES in userland/agent/sigma_agent_workflow.nim
+
+# 3. Test
+
+sigma-agent workflow install my-template --dry-run
+
+# 4. Submit PR
 
 ```
 
-### 3. Architecture Rules
+---
 
-- **No External Dependencies:** We rely on `sigma_libc.h` and the Sovereign SDK. Do not include standard libraries like `<stdio.h>` in the kernel suites.
+## Adding a sigma-agent Plugin
 
-- **Zero-Trust:** Assume other shards are hostile. Verify inputs when exposing handlers to the Sovereign Event Bus.
+No core PR needed for plugins:
 
-## Coding Standards
+```bash
+sigma-agent plugin create my-skill
 
-- Use C11.
+# Edit ~/.config/sigma/agent/plugins/my-skill/plugin.toml
 
-- Variables should be `snake_case`. Macros must be `UPPER_SNAKE_CASE`.
+# Add commands, training.jsonl samples
 
-- Indentation is 4 spaces.
+# Publish to sigma_pkg_registry as sigma-agent-plugin-my-skill
 
-## PR Workflow
+```
 
-1. Fork the repo and create your branch from `main`.
+---
 
-2. Add your shard to the appropriate `SXX_` suite directory.
+## Documentation
 
-3. Ensure the CI passes (we check for dependencies and run static analysis).
+- New wiki page → `wiki_repo/<Name>.md`
 
-4. Issue a PR with a clear description of the shard's purpose.
+- New code doc → comment in the source file
+
+- API reference → `docs/API_Reference.md`
+
+- Do not duplicate existing canonical files (check `docs/README.md`)
+
+---
+
+## Licensing
+
+All contributions use **MIT** for userspace and **GPL-2.0-or-later** for kernel code.
+
+Add the appropriate SPDX header:
+```rust
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 SigmaOS Project
+```
+
+---
+
+## Security Vulnerability Reporting
+
+For security vulnerabilities, please follow the process in [SECURITY.md](SECURITY.md).
+
+---
+
+## Getting Help
+
+- GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
+
+- Issues: https://github.com/AaryanSinghChauhan19/SigmaOS/issues
+
+- Wiki: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+
+- Ask sigma-agent: `sigma-agent "how do I contribute to SigmaOS"`
+
+---
+
+## Maintainer Responsibilities
+
+See [MAINTAINERS](MAINTAINERS) for the full list of subsystem maintainers and their responsibilities.
+
+Maintainers are expected to:
+
+- Review PRs in their subsystem within 7 days
+
+- Ensure code quality and adherence to standards
+
+- Participate in architecture reviews
+
+- Mentor new contributors
+
+- Update documentation for their subsystem
