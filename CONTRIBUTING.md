@@ -1,317 +1,37 @@
 # Contributing to SigmaOS
 
-SigmaOS is a community-driven, sovereign OS. We welcome contributions of all kinds — kernel code, userspace tools, drivers, documentation, workflow templates, AI agent plugins, and package recipes.
+Thank you for your interest in advancing Sovereign Silicon! Contributing to SigmaOS requires adhering to strict architectural constraints.
 
-See [Community Governance](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Community-Governance) for the full governance model, contributor roles, and decision-making process.
+## The Prime Directive: Zero Dependencies
 
----
+SigmaOS guarantees computational sovereignty. Under no circumstances may a contributor:
 
-## Kernel-Style Contribution Workflow
+1. `#include <stdio.h>`, `<stdlib.h>`, `<string.h>`, or any standard library header.
 
-SigmaOS follows Linux kernel development practices adapted for our polyglot codebase.
+2. Link against `glibc`, `musl`, or any pre-compiled system library.
 
-### Signed-off-by Requirement
+3. Import external logic that relies on POSIX standards.
 
-All commits must include a `Signed-off-by` line to certify the Developer Certificate of Origin (DCO):
+## Writing a Sovereign Driver
 
-```
-kernel/scheduler: implement adaptive EWMA scheduling
+When writing a driver, integrate it with the Universal Driver Framework (`sigma_driver_fw.cpp`).
 
-Implement exponential weighted moving average for runtime estimation
-to improve task scheduling fairness and responsiveness.
+1. **Hardware Direct**: Use MMIO or port I/O directly.
 
-Signed-off-by: Your Name <your.email@example.com>
-```
+2. **Metadata**: Define a `SigmaDriverMetadata` block matching vendor/device IDs.
 
-To automatically add this, configure git:
+3. **Registration**: Expose an initialization function that calls `sigma_register_driver()`.
 
-```bash
-git config --local commit.template .git/commit-template
-```
+## Writing a Sovereign Tool
 
-### Commit Message Format
+When building a new utility (e.g., a clone of a GNU tool):
 
-Follow the conventional commit format with subsystem prefix:
+1. **Standalone**: Create `tools/utilities/sigma_<name>.cpp`.
 
-```
-subsystem: short description (≤50 chars)
+2. **Interface**: Expose `extern "C" int sigma_<name>_main(int argc, char** argv)`.
 
-Detailed explanation of the change, including:
+3. **I/O**: Only use `sigma_vga_puts()`, `sigma_vga_printf()`, or the VFS read/write functions.
 
-- Motivation for the change
+4. **Integration**: Register your tool in the `sigma_sh.cpp` shell dispatcher.
 
-- Technical details of implementation
-
-- Testing performed
-
-- Performance impact (if any)
-
-References: Issue #123, PR #456
-Signed-off-by: Your Name <your.email@example.com>
-```
-
-**Valid subsystems:** `kernel`, `drivers`, `userland`, `security`, `fs`, `net`, `docs`, `ci`, `build`
-
-**Commit types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `security`, `perf`
-
-### Branch Naming Convention
-
-```
-feature/subsystem-description
-fix/subsystem-bug-description
-docs/subject
-refactor/subject
-security/subject
-```
-
-Examples:
-
-- `feature/kernel-adaptive-scheduler`
-
-- `fix/drivers-e1000-rx-overflow`
-
-- `docs/api-syscall-reference`
-
-- `security/kernel-seccomp-filter`
-
----
-
-## Language Policy
-
-SigmaOS uses a polyglot codebase. Each language has a specific domain:
-
-| Language | Domain | Rules |
-|---|---|---|
-| **Rust** | Kernel core, drivers, critical subsystems | `#![no_std]` in kernel; no unsafe outside `kabi/` boundary |
-| **Nim** | Userspace tools, CLI helpers, package manager | Compiled to C backend; no external packages |
-| **Zig** | HAL, leaf performance-sensitive drivers | Static compilation only; no dynamic allocation |
-| **Ada/SPARK** | Formal-verified security checkers | Must pass `gnatprove` before merge |
-| **Assembly** | Boot, context switch, VMM fast paths | Only in `arch/` |
-| **C** | Legacy driver compat shims in `drivers/linux/` | No new C in non-compat code |
-
-Cross-language calls go through `kabi/` using `#[repr(C)]` structs.
-
----
-
-## Quick Start
-
-```bash
-
-# 1. Fork and clone
-
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS
-cd SigmaOS
-
-# 2. Set up dev environment
-
-./scripts/setup.sh          # installs Rust, Nim, Zig, QEMU toolchain
-
-# 3. Build
-
-cargo build --release       # Rust kernel + tools
-
-nim c -d:release userland/agent/sigma_agent_main.nim  # Nim CLI tools
-
-# 4. Run tests
-
-cargo test                  # Rust unit tests
-
-./sigma-agent benchmark quick  # Agent quality tests
-
-# 5. Run in QEMU
-
-make PROFILE=standalone qemu
-```
-
----
-
-## What to Work On
-
-### Easy (good first issues)
-
-- New sigma-agent workflow templates (`userland/agent/sigma_agent_workflow.nim`)
-
-- New sigma-agent plugin (`sigma-agent plugin create my-skill`)
-
-- Wiki page improvements (`wiki_repo/`)
-
-- New package recipes (`sigma_pkg_registry/recipes/`)
-
-- sigma-agent training samples (`userland/agent/sigma_agent_seed_v2.jsonl`)
-
-- Translation/localisation (`locales/`)
-
-### Medium
-
-- New sigma-agent tools (implement `Tool` trait in `userland/agent/sigma_agent.rs`)
-
-- New sigma-agent explain topics (`userland/agent/sigma_agent_explain.nim`)
-
-- Package absorption improvements (`pkg/sigma_pkg_absorb.nim`)
-
-- Linux compatibility shim (`userland/compat/sigma_linux_compat.nim`)
-
-- New SDF drivers (`drivers/`)
-
-- Benchmark test cases (`userland/agent/sigma_agent_benchmark.nim`)
-
-### Hard (core team review required)
-
-- Kernel subsystem changes (`kernel/`)
-
-- Syscall interface changes (`kernel/syscalls/`)
-
-- Security policy changes (`security/`)
-
-- ABI changes (`kabi/`)
-
----
-
-## Code Review Process
-
-### Review Requirements
-
-- **Kernel changes**: Must be reviewed by at least one kernel maintainer
-
-- **Driver changes**: Must be reviewed by subsystem maintainer
-
-- **Security changes**: Must be reviewed by security team
-
-- **ABI changes**: Require sign-off from kabi maintainer
-
-### Review Checklist
-
-Reviewers should verify:
-
-- [ ] Code follows language policy and style guidelines
-
-- [ ] Commit messages are properly formatted with Signed-off-by
-
-- [ ] Tests are included for new functionality
-
-- [ ] Documentation is updated where necessary
-
-- [ ] No unsafe code without justification (Rust)
-
-- [ ] No external dependencies added without review
-
-- [ ] CI pipeline passes all checks
-
----
-
-## CI Requirements
-
-All PRs must pass the 12-job CI pipeline:
-
-- Rust build + clippy (kernel + tools)
-
-- Nim build + type check (7 agent modules)
-
-- 21-tool smoke tests
-
-- GUI mirror validation (60+ mappings)
-
-- Workflow automation tests
-
-- Benchmark quick suite
-
-- Shell integration test
-
-- Training data seed generation
-
----
-
-## Adding a sigma-agent Workflow Template
-
-The fastest way to contribute automation value:
-
-```bash
-
-# 1. Write the YAML
-
-# 2. Add to WORKFLOW_TEMPLATES in userland/agent/sigma_agent_workflow.nim
-
-# 3. Test
-
-sigma-agent workflow install my-template --dry-run
-
-# 4. Submit PR
-
-```
-
----
-
-## Adding a sigma-agent Plugin
-
-No core PR needed for plugins:
-
-```bash
-sigma-agent plugin create my-skill
-
-# Edit ~/.config/sigma/agent/plugins/my-skill/plugin.toml
-
-# Add commands, training.jsonl samples
-
-# Publish to sigma_pkg_registry as sigma-agent-plugin-my-skill
-
-```
-
----
-
-## Documentation
-
-- New wiki page → `wiki_repo/<Name>.md`
-
-- New code doc → comment in the source file
-
-- API reference → `docs/API_Reference.md`
-
-- Do not duplicate existing canonical files (check `docs/README.md`)
-
----
-
-## Licensing
-
-All contributions use **MIT** for userspace and **GPL-2.0-or-later** for kernel code.
-
-Add the appropriate SPDX header:
-```rust
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2024-2026 SigmaOS Project
-```
-
----
-
-## Security Vulnerability Reporting
-
-For security vulnerabilities, please follow the process in [SECURITY.md](SECURITY.md).
-
----
-
-## Getting Help
-
-- GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
-
-- Issues: https://github.com/AaryanSinghChauhan19/SigmaOS/issues
-
-- Wiki: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
-
-- Ask sigma-agent: `sigma-agent "how do I contribute to SigmaOS"`
-
----
-
-## Maintainer Responsibilities
-
-See [MAINTAINERS](MAINTAINERS) for the full list of subsystem maintainers and their responsibilities.
-
-Maintainers are expected to:
-
-- Review PRs in their subsystem within 7 days
-
-- Ensure code quality and adherence to standards
-
-- Participate in architecture reviews
-
-- Mentor new contributors
-
-- Update documentation for their subsystem
+Please open an RFC issue before initiating massive architectural shifts or adding entirely new file systems!
