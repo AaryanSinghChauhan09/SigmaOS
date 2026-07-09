@@ -387,6 +387,20 @@ Comprehensive trait-based scheduler interface:
 
 **Benefits**: Type-safe scheduling, compile-time polymorphism, zero runtime overhead
 
+### Custom Async/Await Runtime
+
+Implemented zero-allocation async/await runtime:
+
+- **SigmaExecutor**: Custom async executor for task execution
+- **TaskSpawner**: Task spawning mechanism
+- **DelayFuture**: Async sleep operations
+- **JoinFuture**: Concurrent future execution
+- **SelectFuture**: Racing futures with Either result
+- **AsyncChannel**: Inter-task communication channels
+- **AsyncMutex**: Async mutual exclusion primitives
+
+**Performance**: Zero-allocation design, optimized for embedded systems
+
 ## Future Optimizations
 
 - [x] SIMD-optimized string operations
@@ -399,7 +413,7 @@ Comprehensive trait-based scheduler interface:
 - [x] Custom hash map
 - [x] SIMD memory operations
 - [x] OOP scheduler traits
-- [ ] Custom async/await runtime
+- [x] Custom async/await runtime
 
 ## References
 
