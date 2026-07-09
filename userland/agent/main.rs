@@ -29,6 +29,7 @@ mod sigma_llm;
 mod sigma_agent_planner;
 mod sigma_agent_code;
 mod collections;
+mod simd_string;
 
 use collections::{SigmaMap, SigmaVec, SigmaStringBuilder};
 use sigma_agent_core::{Agent, AgentModel};
@@ -197,7 +198,10 @@ fn build_agent(args: &CliArgs) -> Agent {
 // ── Dry-run / trust enforcement ───────────────────────────────────────────────
 
 fn check_trust(cmd: &str, trust: TrustLevel) -> bool {
-    let lower = cmd.to_ascii_lowercase();
+    let mut cmd_bytes = cmd.as_bytes().to_vec();
+    simd_string::to_lowercase(&mut cmd_bytes);
+    let lower = core::str::from_utf8(&cmd_bytes).unwrap_or(cmd);
+    
     match trust {
         TrustLevel::Safe => {
             // Only allow reads
