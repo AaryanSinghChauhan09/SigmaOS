@@ -126,7 +126,7 @@ impl SovereignVmm {
         *pt_ptr.add(pt_index) = phys_aligned | pte_flags | PTE_PRESENT;
         
         // Invalidate TLB entry
-        core::arch::asm!("invlpg ({})", in(reg) virt_aligned);
+        core::arch::asm!("invlpg [{}]", in(reg) virt_aligned, options(nostack, preserves_flags));
         
         0 // Success
     }
@@ -164,7 +164,7 @@ impl SovereignVmm {
         *pt_ptr.add(pt_index) = 0;
         
         // Invalidate TLB
-        core::arch::asm!("invlpg ({})", in(reg) virt_aligned);
+        core::arch::asm!("invlpg [{}]", in(reg) virt_aligned, options(nostack, preserves_flags));
         
         0 // Success
     }

@@ -39,30 +39,30 @@ PROFILE="$(profile_for_branch "$BRANCH")"
 FAIL=0
 
 CORE_FILES=(
-  kernel/net/sigma_net.c
-  kernel/net/sigma_net_socket.cpp
-  userland/tools/sigma_pod_cli.cpp
-  kernel/core/boot/sigma_boot.c
+  kernel/net/sigma_net.rs
+  kernel/net/sigma_socket.rs
+  userland/tools/sigma_pod_cli.nim
+  kernel/core/boot/sigma_boot.rs
   scripts/sigma_automation.sh
   scripts/sigma_git_sync.sh
-  userland/tools/sigma_cli.cpp
-  FEATURE_MATRIX.md
-  PHASE_A_EXECUTION_CHECKLIST.md
-  PHASE_B_EXECUTION_CHECKLIST.md
+  userland/tools/sigma_cli.nim
+  wiki_repo/FEATURE_MATRIX.md
+  wiki_repo/PHASE_A_EXECUTION_CHECKLIST.md
+  wiki_repo/PHASE_B_EXECUTION_CHECKLIST.md
   scripts/sigma_branch_sync.sh
 )
 
 META_SCaffold=(
-  kernel/subsystems/sigma_meta_distro.c
-  kernel/subsystems/sigma_game_layer.c
-  kernel/scheduler/sigma_sched.c
-  kernel/scheduler/sigma_sched_profiles.c
-  kernel/core/boot/sigma_immutable_root.c
-  kernel/recovery/sigma_recovery.c
-  kernel/recovery/sigma_recovery_gui.c
-  sigma_pkg_registry/README.md
-  zenith_desktop/zenith_unified_init.cpp
-  include/sigma_meta_distro.h
+  kernel/subsystems/sigma_meta_distro.rs
+  kernel/subsystems/sigma_game_layer.rs
+  kernel/scheduler/sigma_sched.rs
+  kernel/scheduler/sigma_sched_profiles.rs
+  kernel/core/boot/sigma_immutable_root.rs
+  kernel/recovery/sigma_recovery.rs
+  kernel/recovery/sigma_recovery_gui.rs
+  sigma_pkg_registry/Cargo.toml
+  desktop/zenith/sigma_zenith.rs
+  include/sigma_meta_distro.rs
 )
 
 DESKTOP_FILES=(

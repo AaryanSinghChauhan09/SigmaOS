@@ -73,11 +73,16 @@ jobs:
       - name: Install Rust target
         run: |
           rustup toolchain install nightly
-          rustup target add ${{ matrix.arch }}-unknown-none --toolchain nightly
+          TARGET="${{ matrix.arch }}-unknown-none"
+          if [ "${{ matrix.arch }}" = "riscv64gc" ]; then
+            TARGET="riscv64gc-unknown-none-elf"
+          fi
+          rustup target add $TARGET --toolchain nightly
+          echo "TARGET=$TARGET" >> $GITHUB_ENV
       - name: Build kernel core (no_std)
         run: |
           cd kernel/rust
-          cargo +nightly build --target ${{ matrix.arch }}-unknown-none --release || true
+          cargo +nightly build --target ${{ env.TARGET }} --release || true
 
   # ── 5. Clippy (Rust) ────────────────────────────────────────────────────────
   clippy:

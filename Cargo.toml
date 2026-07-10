@@ -19,6 +19,7 @@ members = [
     "userland/ui/design_system",
     "userland/system_api/common",
 ]
+default-members = ["kernel"]
 
 [workspace.package]
 version     = "15.0.0"
