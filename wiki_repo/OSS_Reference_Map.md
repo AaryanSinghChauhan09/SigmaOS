@@ -5,7 +5,7 @@
 >
 > ⚠️ **Cleanroom rule**: SigmaOS is MIT/BSD licensed. We study interfaces, patterns,
 > and ideas from GPL projects — we never copy GPL code. All implementations are
-> original. See [CANONICAL_CLEANROOM_ABSORPTION](CANONICAL_CLEANROOM_ABSORPTION).
+> original. See [CANONICAL_CLEANROOM_ABSORPTION.md](../wiki_repo/CANONICAL_CLEANROOM_ABSORPTION.md).
 
 ---
 
@@ -162,8 +162,8 @@
 
 4. **Cleanroom process**: document what you studied, implement independently, do not reference GPL source during implementation.
 
-5. See [CANONICAL_CLEANROOM_ABSORPTION](CANONICAL_CLEANROOM_ABSORPTION) for the full cleanroom process.
+5. See [CANONICAL_CLEANROOM_ABSORPTION.md](../wiki_repo/CANONICAL_CLEANROOM_ABSORPTION.md) for the full cleanroom process.
 
 ---
 
-*See also: [Open Source Drivers](Open-Source-Drivers) · [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) · [LICENCE](LICENCE)*
+*See also: [docs/Open_Source_Drivers.md](Open_Source_Drivers.md) · [CONTRIBUTING.md](../CONTRIBUTING.md) · [LICENCE.md](../wiki_repo/LICENCE.md)*

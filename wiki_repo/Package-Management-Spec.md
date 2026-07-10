@@ -185,6 +185,11 @@ pub struct SystemState {
 }
 ```
 
+**Status:** ✅ Implemented
+- Location: `tools/sigma_pkg.rs`
+- Features: Snapshot-based rollback system with circular buffer (10 snapshots)
+- C-ABI exports: `sigma_pkg_create_snapshot()`, `sigma_pkg_rollback()`
+
 ## Delta Updates
 
 ### Binary Delta Implementation
@@ -212,6 +217,40 @@ pub enum CompressionAlgorithm {
 3. Compress delta with ZSTD
 4. Sign delta with repository key
 5. Upload to repository
+
+**Status:** ✅ Implemented
+- Location: `tools/sigma_pkg.rs`
+- Features: Binary patch application with version verification
+- C-ABI export: `sigma_pkg_apply_delta()`
+- Structures: `DeltaPatch`, `PackageVersion`
+
+## Sandboxed Package Installation
+
+### Sandbox Implementation
+
+**Implementation:**
+```rust
+pub struct SandboxConfig {
+    pub network_isolated: bool,
+    pub filesystem_isolated: bool,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub allowed_syscalls: [u32; 64],
+}
+```
+
+**Sandbox Features:**
+- Network namespace isolation
+- Filesystem mount isolation
+- Memory limits via cgroups
+- CPU limits via cgroups
+- Seccomp syscall filtering
+
+**Status:** ✅ Implemented
+- Location: `tools/sigma_pkg.rs`
+- Features: Network/filesystem isolation with resource limits
+- C-ABI export: `sigma_pkg_install_sandboxed()`
+- Structures: `SandboxConfig`
 
 ## Content-Addressed Storage
 

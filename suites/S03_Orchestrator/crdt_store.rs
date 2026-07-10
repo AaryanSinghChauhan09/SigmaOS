@@ -5,13 +5,11 @@
 //! This is the production persistence backend for distributed shard state.
 //! =============================================================================
 
-//! =============================================================================
-//! Σ SIGMAOS: CRDT PERSISTENCE BACKEND
-
 extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::cell::{Cell, RefCell};
 
 use crate::crdt_lww::{LwwRegister, LwwEntry};
 use crate::persistence_ops::{
@@ -20,49 +18,47 @@ use crate::persistence_ops::{
 };
 
 pub struct CrdtPersistenceStore {
-    pub register: LwwRegister,
-    pub checkpoint_counter: u64,
+    pub register: RefCell<LwwRegister>,
+    pub checkpoint_counter: Cell<u64>,
 }
 
 impl CrdtPersistenceStore {
     pub fn new(node_id: &str) -> Self {
         CrdtPersistenceStore {
-            register: LwwRegister::new(node_id),
-            checkpoint_counter: 0,
+            register: RefCell::new(LwwRegister::new(node_id)),
+            checkpoint_counter: Cell::new(0),
         }
     }
 }
 
 impl PersistenceOps for CrdtPersistenceStore {
     fn write(&self, seq_id: u64, key: &StateKey, value: &StateValue) -> Result<u64, PersistError> {
-        // SAFETY: interior mutability via raw ptr is safe here (single-threaded kernel context)
-        let this = unsafe { &mut *(self as *const _ as *mut CrdtPersistenceStore) };
-        
+        let mut reg = self.register.borrow_mut();
         // For CRDTs, we use the sequence ID as the Lamport Clock timestamp
         // to guarantee strict monotonic ordering of replicated state.
-        this.register.clock = seq_id;
-        this.register.write(key.as_str(), value.clone());
+        reg.clock = seq_id;
+        reg.write(key.as_str(), value.clone());
         Ok(seq_id)
     }
 
     fn rollback(&self, seq_id: u64) -> Result<(), PersistError> {
-        let this = unsafe { &mut *(self as *const _ as *mut CrdtPersistenceStore) };
+        let mut reg = self.register.borrow_mut();
         // Rollback removes any entry matching the exact failed sequence ID
-        this.register.entries.retain(|e| e.timestamp != seq_id);
+        reg.entries.retain(|e| e.timestamp != seq_id);
         Ok(())
     }
 
     fn checkpoint(&self, shard_id: &ShardId) -> Result<CheckpointHandle, PersistError> {
-        let this = unsafe { &mut *(self as *const _ as *mut CrdtPersistenceStore) };
-        this.checkpoint_counter += 1;
+        let count = self.checkpoint_counter.get() + 1;
+        self.checkpoint_counter.set(count);
         Ok(CheckpointHandle {
             shard_id: shard_id.clone(),
-            checkpoint_id: alloc::format!("crdt-chkpt-{}", this.checkpoint_counter),
+            checkpoint_id: alloc::format!("crdt-chkpt-{}", count),
         })
     }
 
     fn replicate(&self, _seq_id: u64, key: &StateKey, _target_shards: &[ShardId]) -> Result<(), PersistError> {
-        if self.register.read(key.as_str()).is_none() {
+        if self.register.borrow().read(key.as_str()).is_none() {
             return Err(PersistError::NotFound);
         }
         Ok(())
@@ -70,7 +66,7 @@ impl PersistenceOps for CrdtPersistenceStore {
 
     fn recover(&self, checkpoint: &CheckpointHandle) -> Result<StateSnapshot, PersistError> {
         // Recover by exporting the current CRDT state as the snapshot
-        let data: Vec<(StateKey, StateValue)> = self.register.snapshot()
+        let data: Vec<(StateKey, StateValue)> = self.register.borrow().snapshot()
             .iter()
             .map(|e| (e.key.clone(), e.value.clone()))
             .collect();
@@ -82,7 +78,7 @@ impl PersistenceOps for CrdtPersistenceStore {
 
     fn verify(&self, key: &StateKey) -> Result<bool, PersistError> {
         // Verify the key exists and has valid (non-empty) data
-        match self.register.read(key.as_str()) {
+        match self.register.borrow().read(key.as_str()) {
             Some(v) if !v.is_empty() => Ok(true),
             Some(_) => Err(PersistError::IntegrityFailure),
             None => Err(PersistError::NotFound),
