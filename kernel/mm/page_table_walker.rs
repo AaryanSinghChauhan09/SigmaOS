@@ -2,8 +2,7 @@
 /// Phase G Blocker #4: x86-64 page table walker
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 
-#![no_std]
-#![allow(dead_code)]
+#[allow(dead_code)]
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 

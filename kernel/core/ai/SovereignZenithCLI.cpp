@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Zenith CLI Bridge — kernel-native GUI→CLI mapping for sigma-agent.
  */

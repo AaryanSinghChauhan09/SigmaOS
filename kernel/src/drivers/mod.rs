@@ -1,6 +1,8 @@
 pub mod vga;
 pub mod bus;
 pub mod nic;
+#[path = "../../drivers/framebuffer.rs"]
+pub mod framebuffer;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DeviceClass {
