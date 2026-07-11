@@ -8,16 +8,11 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
 [dependencies]
 # Native replacements for external crates:
-# - sigma_time: replaces chrono
-# - sigma_uuid: replaces uuid
-# - sigma_regex: replaces regex (simple pattern matching)
+# - native_http: replaces reqwest
+# - native_log: replaces log and env_logger
 # serde and serde_json kept for serialization (can be replaced later if needed)
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
-# HTTP client for model downloads (native implementation planned)
-# For now, keep reqwest but mark for replacement
-reqwest = { version = "0.11", features = ["json"] }
 
 # Async runtime (keep for now, consider native async)
 tokio = { version = "1.0", features = ["full"] }
@@ -25,10 +20,6 @@ tokio = { version = "1.0", features = ["full"] }
 # AI/ML dependencies (optional, for actual LLM integration)
 llama-cpp = { version = "0.1", optional = true }
 candle-core = { version = "0.3", optional = true }
-
-# Logging
-log = "0.4"
-env_logger = "0.11"
 
 [features]
 default = []

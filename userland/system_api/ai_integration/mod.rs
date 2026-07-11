@@ -9,6 +9,9 @@ mod system_control;
 mod troubleshooting;
 mod automation;
 mod privacy;
+mod web_interface;
+mod native_http;
+mod native_log;
 
 pub use local_llm::LocalLLM;
 pub use nlp_engine::NLPEngine;
@@ -18,6 +21,9 @@ pub use system_control::SystemControl;
 pub use troubleshooting::TroubleshootingEngine;
 pub use automation::AutomationEngine;
 pub use privacy::PrivacyManager;
+pub use web_interface::AiWebServer;
+pub use native_http::HttpClient;
+pub use native_log::{Logger, LogLevel, init_logger};
 
 use serde::{Deserialize, Serialize};
 
