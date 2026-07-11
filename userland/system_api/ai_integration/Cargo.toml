@@ -6,6 +6,9 @@ authors = ["SigmaOS Project"]
 license = "MIT"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
+[lib]
+path = "mod.rs"
+
 [dependencies]
 # Native replacements for external crates:
 # - sigma_time: replaces chrono
@@ -23,7 +26,7 @@ reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1.0", features = ["full"] }
 
 # AI/ML dependencies (optional, for actual LLM integration)
-llama-cpp = { version = "0.1", optional = true }
+llama_cpp = { version = "0.3", optional = true }
 candle-core = { version = "0.3", optional = true }
 
 # Logging
@@ -32,7 +35,7 @@ env_logger = "0.11"
 
 [features]
 default = []
-local-llm = ["llama-cpp"]
+local-llm = ["llama_cpp"]
 ml-inference = ["candle-core"]
 
 [dev-dependencies]

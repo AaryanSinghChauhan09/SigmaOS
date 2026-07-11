@@ -6,6 +6,9 @@ authors = ["SigmaOS Project"]
 license = "MIT"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
+[lib]
+path = "mod.rs"
+
 [dependencies]
 # Native replacements for external crates:
 # - sigma_time: replaces chrono

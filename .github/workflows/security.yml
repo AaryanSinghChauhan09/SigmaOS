@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [c-cpp, javascript-typescript]
+        language: [rust, javascript-typescript]
     steps:
       - uses: actions/checkout@v4
       - uses: github/codeql-action/init@v3
@@ -83,6 +83,6 @@ jobs:
         run: npm outdated --prefix . || true
       - name: Check Cargo.toml exists for audit
         run: |
-          if [ -f tools/Cargo.toml ]; then
+          if [ -f Cargo.toml ]; then
             echo "Cargo.toml found — cargo-audit runs in cargo-audit job."
           fi

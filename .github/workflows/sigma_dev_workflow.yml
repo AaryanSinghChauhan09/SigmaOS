@@ -103,7 +103,7 @@ jobs:
       - name: Install Rust toolchain
         run: |
           rustup toolchain install nightly-2026-06-01 \
-            --component clippy rustfmt rust-src \
+            --component clippy --component rustfmt --component rust-src \
             --target "${{ matrix.target }}"
 
       - name: rustfmt check
