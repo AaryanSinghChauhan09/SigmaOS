@@ -333,8 +333,6 @@ impl RoundRobinScheduler {
             let mut high: u32;
             core::arch::asm!(
                 "rdtsc",
-                "mov edx, eax",
-                "mov eax, 0",
                 out("eax") low,
                 out("edx") high,
                 options(nomem, nostack)
