@@ -24,7 +24,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
-        languages: 'cpp'
+        languages: 'rust'
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v2
@@ -36,4 +36,4 @@ jobs:
       run: |
         echo "Performing Shannon Entropy Analysis on silicon shards..."
         # Simulate an entropy check for crypto-randomness
-        find kernel/core -name "*.cpp" -exec grep -l "Sovereign" {} +
+        find kernel/core -name "*.rs" -exec grep -l "Sovereign" {} +
