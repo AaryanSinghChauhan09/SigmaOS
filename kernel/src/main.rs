@@ -8,9 +8,13 @@ mod panic;
 mod log;
 
 // Phase G kernel components
+#[path = "../scheduler.rs"]
 mod scheduler;
+#[path = "../mm.rs"]
 mod mm;
+#[path = "../hal.rs"]
 mod hal;
+#[path = "../syscalls.rs"]
 mod syscalls;
 
 use core::panic::PanicInfo;
@@ -39,6 +43,10 @@ pub struct BootInfo {
     pub kernel_sz: u64,
     pub initramfs_phys: u64,
     pub initramfs_sz: u64,
+}
+
+extern "C" {
+    fn sigma_fb_init_gop(fb: u64, width: u32, height: u32, stride: u32, bpp: u32) -> i32;
 }
 
 /// The main entry point for the kernel.
@@ -145,7 +153,7 @@ pub extern "C" fn kernel_main(boot_info: *const BootInfo) -> ! {
         if !boot_info.is_null() {
             let info = &*boot_info;
             if info.framebuffer != 0 {
-                if drivers::framebuffer::sigma_fb_init_gop(
+                if sigma_fb_init_gop(
                     info.framebuffer,
                     info.fb_width,
                     info.fb_height,

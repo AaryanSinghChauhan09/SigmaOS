@@ -33,13 +33,16 @@ cmd_meta_check() {
   log "Meta-distro subsystem file scan..."
   local ok=0
   for f in \
-    kernel/subsystems/sigma_meta_distro.c \
-    kernel/subsystems/sigma_game_layer.c \
-    kernel/scheduler/sigma_sched.c \
-    kernel/core/boot/sigma_immutable_root.c \
-    kernel/recovery/sigma_recovery_gui.c \
-    zenith_desktop/zenith_unified_init.cpp \
-    sigma_pkg_registry/README.md; do
+    kernel/subsystems/sigma_meta_distro.rs \
+    kernel/subsystems/sigma_game_layer.rs \
+    kernel/scheduler/sigma_sched.rs \
+    kernel/scheduler/sigma_sched_profiles.rs \
+    kernel/core/boot/sigma_immutable_root.rs \
+    kernel/recovery/sigma_recovery.rs \
+    kernel/recovery/sigma_recovery_gui.rs \
+    sigma_pkg_registry/Cargo.toml \
+    desktop/zenith/sigma_zenith.rs \
+    include/sigma_meta_distro.rs; do
     if [[ -f "${ROOT}/${f}" ]]; then
       log "OK  ${f}"
     else
@@ -54,9 +57,9 @@ cmd_recovery_check() {
   log "Recovery readiness scan..."
   local ok=0
   for f in \
-    kernel/resilience/sigma_rollback.cpp \
-    kernel/resilience/sigma_micro_fallback.cpp \
-    kernel/core/sigma_kernel_main.c; do
+    kernel/resilience/sigma_rollback.rs \
+    kernel/resilience/sigma_micro_fallback.rs \
+    kernel/core/sovereign_kernel_main.rs; do
     if [[ -f "${ROOT}/${f}" ]]; then
       log "OK  ${f}"
     else
