@@ -54,9 +54,9 @@ cmd_recovery_check() {
   log "Recovery readiness scan..."
   local ok=0
   for f in \
-    kernel/resilience/sigma_rollback.cpp \
-    kernel/resilience/sigma_micro_fallback.cpp \
-    kernel/core/sigma_kernel_main.c; do
+    kernel/resilience/sigma_rollback.rs \
+    kernel/resilience/sigma_micro_fallback.rs \
+    kernel/src/main.rs; do
     if [[ -f "${ROOT}/${f}" ]]; then
       log "OK  ${f}"
     else

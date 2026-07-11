@@ -28,7 +28,9 @@ mod sigma_agent_tools_ext;
 mod sigma_llm;
 mod sigma_agent_planner;
 mod sigma_agent_code;
+#[path = "src/collections.rs"]
 mod collections;
+#[path = "src/simd_string.rs"]
 mod simd_string;
 
 use collections::{SigmaMap, SigmaVec, SigmaStringBuilder};

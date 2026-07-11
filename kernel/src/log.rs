@@ -1,9 +1,6 @@
 /// SigmaOS: Kernel Logging System
 /// Provides structured logging with different log levels
 
-#![no_std]
-#![allow(dead_code)]
-
 use core::fmt::Write;
 
 // ─── Log Levels ───────────────────────────────────────────────────────────
@@ -50,7 +47,7 @@ impl Logger {
 
     /// Log a message at the specified level
     pub fn log(&mut self, level: LogLevel, module: &str, message: &str) {
-        if level as u8 < self.min_level as u8 {
+        if (level as u8) < (self.min_level as u8) {
             return;
         }
 

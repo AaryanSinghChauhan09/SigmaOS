@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /**
  * Zenith CLI Bridge — kernel-native GUI→CLI mapping for sigma-agent.
  */

@@ -2,8 +2,9 @@
 /// Phase G Blocker #3: Slab allocator (kmalloc)
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 
-#![no_std]
-#![allow(dead_code)]
+extern "C" {
+    fn sigma_buddy_alloc(order: u8) -> u64;
+}
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -36,6 +37,7 @@ pub struct SlabObject {
 // ─── Slab ─────────────────────────────────────────────────────────────────
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 pub struct Slab {
     pub objects: [SlabObject; SLAB_OBJ_PER_SLAB],
     pub free_count: SigmaUsize,
@@ -47,6 +49,7 @@ pub struct Slab {
 // ─── Slab Cache ───────────────────────────────────────────────────────────
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 pub struct SlabCache {
     pub object_size: SigmaUsize,
     pub slab_count: SigmaUsize,
@@ -132,27 +135,32 @@ impl SlabAllocator {
             return None;
         }
 
-        let cache = &mut self.caches[cache_idx];
+        // Copy the needed parameters out so we don't keep self borrowed mutably
+        let (object_size, partial_slabs, free_slabs) = {
+            let cache = &self.caches[cache_idx];
+            (cache.object_size, cache.partial_slabs, cache.free_slabs)
+        };
 
         // Try partial slabs first
-        if let Some(slab_addr) = cache.partial_slabs {
-            if let Some(obj_addr) = self.alloc_from_slab(slab_addr, cache.object_size) {
-                cache.free_objects -= 1;
+        if let Some(slab_addr) = partial_slabs {
+            if let Some(obj_addr) = self.alloc_from_slab(slab_addr, object_size) {
+                self.caches[cache_idx].free_objects -= 1;
                 return Some(obj_addr);
             }
         }
 
         // Try free slabs
-        if let Some(slab_addr) = cache.free_slabs {
-            if let Some(obj_addr) = self.alloc_from_slab(slab_addr, cache.object_size) {
-                cache.free_objects -= 1;
+        if let Some(slab_addr) = free_slabs {
+            if let Some(obj_addr) = self.alloc_from_slab(slab_addr, object_size) {
+                self.caches[cache_idx].free_objects -= 1;
                 return Some(obj_addr);
             }
         }
 
         // Allocate new slab
-        if let Some(slab_addr) = self.alloc_new_slab(cache.object_size) {
-            if let Some(obj_addr) = self.alloc_from_slab(slab_addr, cache.object_size) {
+        if let Some(slab_addr) = self.alloc_new_slab(object_size) {
+            if let Some(obj_addr) = self.alloc_from_slab(slab_addr, object_size) {
+                let cache = &mut self.caches[cache_idx];
                 cache.slab_count += 1;
                 cache.total_objects += SLAB_OBJ_PER_SLAB;
                 cache.free_objects = SLAB_OBJ_PER_SLAB as SigmaU64 - 1;
@@ -179,17 +187,17 @@ impl SlabAllocator {
             return Err("Invalid size");
         }
 
-        let cache = &mut self.caches[cache_idx];
+        let object_size = self.caches[cache_idx].object_size;
 
         // Find slab containing this pointer
-        let slab_addr = self.find_slab_for_ptr(ptr, cache.object_size);
+        let slab_addr = self.find_slab_for_ptr(ptr, object_size);
         if slab_addr == 0 {
             return Err("Invalid pointer");
         }
 
         // Free object in slab
-        self.free_in_slab(slab_addr, ptr, cache.object_size);
-        cache.free_objects += 1;
+        self.free_in_slab(slab_addr, ptr, object_size);
+        self.caches[cache_idx].free_objects += 1;
 
         Ok(())
     }

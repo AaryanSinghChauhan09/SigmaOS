@@ -2,6 +2,8 @@ pub mod vga;
 pub mod bus;
 pub mod nic;
 pub mod traits;
+#[path = "../../drivers/framebuffer.rs"]
+pub mod framebuffer;
 
 // Re-export the improved OOP traits
 pub use traits::*;

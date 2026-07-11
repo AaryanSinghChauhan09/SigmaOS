@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /**
  * Sovereign Copilot — agent runtime inspired by Claude Code, openclaw, hermes-ide.
  */

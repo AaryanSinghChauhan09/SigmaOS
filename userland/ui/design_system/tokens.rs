@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SigmaOS Design System - Design Tokens
 
-use super::{colors::ColorPalette, typography::TypographySystem, spacing::SpacingScale, DesignSystemConfig};
+use super::{colors::ColorPalette, typography::{TypographySystem, FontFamilies}, spacing::SpacingScale, DesignSystemConfig};
 
 /// Design tokens
 #[derive(Debug, Clone)]
@@ -15,7 +15,10 @@ impl DesignTokens {
     pub fn new(config: &DesignSystemConfig) -> Self {
         Self {
             colors: ColorPalette::default(),
-            typography: config.font_scale.clone(),
+            typography: TypographySystem {
+                font_families: FontFamilies::default(),
+                font_scale: config.font_scale.clone(),
+            },
             spacing: config.spacing_scale.clone(),
         }
     }
@@ -47,12 +50,12 @@ impl DesignTokens {
     /// Get a typography token
     pub fn font_size(&self, name: &str) -> u32 {
         match name {
-            "xs" => self.typography.xs.size,
-            "sm" => self.typography.sm.size,
-            "base" => self.typography.base.size,
-            "lg" => self.typography.lg.size,
-            "xl" => self.typography.xl.size,
-            _ => self.typography.base.size,
+            "xs" => self.typography.font_scale.xs.size,
+            "sm" => self.typography.font_scale.sm.size,
+            "base" => self.typography.font_scale.base.size,
+            "lg" => self.typography.font_scale.lg.size,
+            "xl" => self.typography.font_scale.xl.size,
+            _ => self.typography.font_scale.base.size,
         }
     }
 }

@@ -2,9 +2,6 @@
 /// Phase G Blocker #7: VESA/GOP framebuffer
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 
-#![no_std]
-#![allow(dead_code)]
-
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
 type SigmaU8  = u8;
@@ -223,7 +220,7 @@ impl FramebufferDriver {
             }
 
             let e2 = 2 * err;
-            if e2 > -dy as SigmaI32 {
+            if e2 > -(dy as SigmaI32) {
                 err -= dy as SigmaI32;
                 x += sx;
             }

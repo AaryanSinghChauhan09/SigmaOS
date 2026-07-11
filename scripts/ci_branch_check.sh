@@ -39,30 +39,27 @@ PROFILE="$(profile_for_branch "$BRANCH")"
 FAIL=0
 
 CORE_FILES=(
-  kernel/net/sigma_net.c
-  kernel/net/sigma_net_socket.cpp
-  userland/tools/sigma_pod_cli.cpp
-  kernel/core/boot/sigma_boot.c
+  kernel/net/sigma_net.rs
+  kernel/net/sigma_socket.rs
+  userland/agent/main.rs
   scripts/sigma_automation.sh
   scripts/sigma_git_sync.sh
-  userland/tools/sigma_cli.cpp
-  FEATURE_MATRIX.md
-  PHASE_A_EXECUTION_CHECKLIST.md
-  PHASE_B_EXECUTION_CHECKLIST.md
+  wiki/Feature-Matrix.md
+  wiki/Phase-A-Execution-Checklist.md
   scripts/sigma_branch_sync.sh
 )
 
 META_SCaffold=(
-  kernel/subsystems/sigma_meta_distro.c
-  kernel/subsystems/sigma_game_layer.c
-  kernel/scheduler/sigma_sched.c
-  kernel/scheduler/sigma_sched_profiles.c
-  kernel/core/boot/sigma_immutable_root.c
-  kernel/recovery/sigma_recovery.c
-  kernel/recovery/sigma_recovery_gui.c
+  kernel/subsystems/sigma_meta_distro.rs
+  kernel/subsystems/sigma_game_layer.rs
+  kernel/sigma_scheduler.rs
+  kernel/sigma_perf_tuning.rs
+  kernel/security/sigma_immutable_audit_trail.rs
+  kernel/self_healing/recovery.rs
+  kernel/gui/sigma_recovery_gui.rs
   sigma_pkg_registry/README.md
-  zenith_desktop/zenith_unified_init.cpp
-  include/sigma_meta_distro.h
+  userland/ui/design_system/mod.rs
+  kernel/include/sigma_abi.rs
 )
 
 DESKTOP_FILES=(

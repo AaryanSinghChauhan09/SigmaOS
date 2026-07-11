@@ -2,9 +2,6 @@
 /// Phase G Blocker #2: Buddy physical allocator
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 
-#![no_std]
-#![allow(dead_code)]
-
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
 type SigmaU8  = u8;
