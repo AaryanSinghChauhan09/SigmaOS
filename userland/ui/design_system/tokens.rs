@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SigmaOS Design System - Design Tokens
 
-use super::{colors::ColorPalette, typography::TypographySystem, spacing::SpacingScale, DesignSystemConfig};
+use super::{colors::ColorPalette, typography::{TypographySystem, FontFamilies}, spacing::SpacingScale, DesignSystemConfig};
 
 /// Design tokens
 #[derive(Debug, Clone)]

@@ -2,6 +2,8 @@ pub mod vga;
 pub mod bus;
 pub mod nic;
 pub mod traits;
+#[path = "../../drivers/framebuffer.rs"]
+pub mod framebuffer;
 
 #[path = "../../drivers/framebuffer.rs"]
 pub mod framebuffer;

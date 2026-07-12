@@ -250,6 +250,7 @@ impl RoundRobinScheduler {
         if let Some(tid) = next_tid {
             let ts = self.get_timestamp();
             let tid_usize = tid as usize;
+            let timestamp = self.get_timestamp();
             if let Some(ref mut tcb) = self.task_table[tid_usize] {
                 tcb.state.running = true;
                 tcb.state.ready = false;

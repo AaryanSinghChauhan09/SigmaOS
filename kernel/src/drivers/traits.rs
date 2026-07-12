@@ -160,7 +160,7 @@ pub enum InputType {
 /// Driver registry for managing multiple drivers
 pub trait DriverRegistry {
     /// Register a driver
-    fn register(&mut self, driver: Box<dyn Driver>) -> Result<(), DriverError>;
+    fn register(&mut self, driver: &'static dyn Driver) -> Result<(), DriverError>;
     
     /// Unregister a driver by name
     fn unregister(&mut self, name: &str) -> Result<(), DriverError>;
