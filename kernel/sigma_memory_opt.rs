@@ -85,6 +85,47 @@ pub struct MemoryManager {
     pub initialized: SigmaBool,
 }
 
+// ─── OOP Traits for Memory Management ─────────────────────────────────────────────
+
+/// MemoryAllocation trait for memory allocation operations
+pub trait MemoryAllocation {
+    fn allocate(&mut self, size: SigmaUsize, flags: AllocFlags) -> *mut u8;
+    fn free(&mut self, ptr: *mut u8);
+    fn get_stats(&self) -> MemoryStats;
+}
+
+/// MemoryCompaction trait for memory compaction operations
+pub trait MemoryCompaction {
+    fn enable_compaction(&mut self, enabled: SigmaBool);
+    fn is_compaction_enabled(&self) -> SigmaBool;
+    fn compact_memory(&mut self) -> SigmaI32;
+    fn get_compaction_stats(&self) -> CompactionStats;
+}
+
+/// MemoryZone trait for zone-specific operations
+pub trait MemoryZoneTrait {
+    fn get_zone_stats(&self, zone: MemoryZone) -> Option<ZoneStats>;
+    fn set_watermark(&mut self, zone: MemoryZone, min: SigmaU64, low: SigmaU64, high: SigmaU64);
+    fn get_zone_free(&self, zone: MemoryZone) -> SigmaU64;
+}
+
+/// MemoryOptimization trait for optimization features
+pub trait MemoryOptimization {
+    fn enable_thp(&mut self, enabled: SigmaBool);
+    fn is_thp_enabled(&self) -> SigmaBool;
+    fn enable_ksm(&mut self, enabled: SigmaBool);
+    fn is_ksm_enabled(&self) -> SigmaBool;
+    fn set_min_free(&mut self, kbytes: SigmaU32);
+    fn get_min_free(&self) -> SigmaU32;
+}
+
+/// MemoryOvercommit trait for overcommit management
+pub trait MemoryOvercommit {
+    fn set_overcommit_ratio(&mut self, ratio: SigmaU32);
+    fn get_overcommit_ratio(&self) -> SigmaU32;
+    fn check_overcommit(&self, requested: SigmaU64) -> SigmaBool;
+}
+
 static mut MEMORY_MANAGER: Option<MemoryManager> = None;
 
 /// Initialize memory manager
@@ -158,6 +199,134 @@ pub unsafe extern "C" fn memory_manager_init() -> SigmaI32 {
     }
 
     -1
+}
+
+// ─── Trait Implementations for MemoryManager ─────────────────────────────────────
+
+impl MemoryAllocation for MemoryManager {
+    fn allocate(&mut self, size: SigmaUsize, _flags: AllocFlags) -> *mut u8 {
+        if !self.initialized {
+            return core::ptr::null_mut();
+        }
+        // In real implementation, allocate memory
+        // Stub: return null
+        core::ptr::null_mut()
+    }
+
+    fn free(&mut self, _ptr: *mut u8) {
+        if !self.initialized {
+            return;
+        }
+        // In real implementation, free memory
+    }
+
+    fn get_stats(&self) -> MemoryStats {
+        self.stats
+    }
+}
+
+impl MemoryCompaction for MemoryManager {
+    fn enable_compaction(&mut self, enabled: SigmaBool) {
+        self.compaction_enabled = enabled;
+    }
+
+    fn is_compaction_enabled(&self) -> SigmaBool {
+        self.compaction_enabled
+    }
+
+    fn compact_memory(&mut self) -> SigmaI32 {
+        if !self.initialized || !self.compaction_enabled {
+            return -1;
+        }
+        // In real implementation, compact memory
+        0
+    }
+
+    fn get_compaction_stats(&self) -> CompactionStats {
+        self.compaction_stats
+    }
+}
+
+impl MemoryZoneTrait for MemoryManager {
+    fn get_zone_stats(&self, zone: MemoryZone) -> Option<ZoneStats> {
+        if !self.initialized {
+            return None;
+        }
+        for stats in &self.zone_stats {
+            if stats.zone == zone {
+                return Some(*stats);
+            }
+        }
+        None
+    }
+
+    fn set_watermark(&mut self, zone: MemoryZone, min: SigmaU64, low: SigmaU64, high: SigmaU64) {
+        if !self.initialized {
+            return;
+        }
+        for stats in &mut self.zone_stats {
+            if stats.zone == zone {
+                stats.pages_min = min;
+                stats.pages_low = low;
+                stats.pages_high = high;
+                break;
+            }
+        }
+    }
+
+    fn get_zone_free(&self, zone: MemoryZone) -> SigmaU64 {
+        if let Some(stats) = self.get_zone_stats(zone) {
+            stats.pages_free
+        } else {
+            0
+        }
+    }
+}
+
+impl MemoryOptimization for MemoryManager {
+    fn enable_thp(&mut self, enabled: SigmaBool) {
+        self.transparent_hugepage_enabled = enabled;
+    }
+
+    fn is_thp_enabled(&self) -> SigmaBool {
+        self.transparent_hugepage_enabled
+    }
+
+    fn enable_ksm(&mut self, enabled: SigmaBool) {
+        self.ksm_enabled = enabled;
+    }
+
+    fn is_ksm_enabled(&self) -> SigmaBool {
+        self.ksm_enabled
+    }
+
+    fn set_min_free(&mut self, kbytes: SigmaU32) {
+        self.min_free_kbytes = kbytes;
+    }
+
+    fn get_min_free(&self) -> SigmaU32 {
+        self.min_free_kbytes
+    }
+}
+
+impl MemoryOvercommit for MemoryManager {
+    fn set_overcommit_ratio(&mut self, ratio: SigmaU32) {
+        self.overcommit_ratio = ratio;
+    }
+
+    fn get_overcommit_ratio(&self) -> SigmaU32 {
+        self.overcommit_ratio
+    }
+
+    fn check_overcommit(&self, requested: SigmaU64) -> SigmaBool {
+        if !self.initialized {
+            return false;
+        }
+        // Check if requested memory exceeds overcommit limit
+        let available = self.stats.available;
+        let limit = (available as SigmaU64 * self.overcommit_ratio as SigmaU64) / 100;
+        requested <= limit
+    }
 }
 
 /// Get memory statistics
