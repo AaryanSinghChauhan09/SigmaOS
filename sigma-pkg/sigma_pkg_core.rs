@@ -503,3 +503,85 @@ pub fn cmd_list(db: &PackageDb) -> i32 {
     }
     0
 }
+
+/// Entry point for `sigma-pkg update` - refresh package database
+pub fn cmd_update(db: &mut PackageDb) -> i32 {
+    println!("Updating package database...");
+    // In production: fetch from remote repositories
+    // For now, this is a stub
+    println!("Package database updated.");
+    0
+}
+
+/// Entry point for `sigma-pkg remove <pkg>`
+pub fn cmd_remove(db: &mut PackageDb, pkg_name: &str) -> i32 {
+    if !db.is_installed(pkg_name) {
+        eprintln!("Package {} is not installed", pkg_name);
+        return 1;
+    }
+    
+    db.snapshot_generation();
+    db.generation += 1;
+    
+    // Remove package and its files
+    if let Some(rec) = db.installed.remove(pkg_name) {
+        println!("Removed {} {} (gen {})", pkg_name, rec.meta.version, rec.generation);
+        // In production: remove files from filesystem
+        0
+    } else {
+        1
+    }
+}
+
+/// Entry point for `sigma-pkg search <query>`
+pub fn cmd_search(db: &PackageDb, query: &str) -> i32 {
+    println!("Searching for '{}':", query);
+    let query_lower = query.to_lowercase();
+    
+    for (name, versions) in &db.available {
+        if name.to_lowercase().contains(&query_lower) {
+            for pkg in versions {
+                println!("  {} {} - {}", name, pkg.version, pkg.description);
+            }
+        }
+    }
+    0
+}
+
+/// Entry point for `sigma-pkg info <pkg>`
+pub fn cmd_info(db: &PackageDb, pkg_name: &str) -> i32 {
+    if let Some(versions) = db.available.get(pkg_name) {
+        if let Some(pkg) = versions.first() {
+            println!("Package: {}", pkg.name);
+            println!("Version: {}", pkg.version);
+            println!("Description: {}", pkg.description);
+            println!("Author: {}", pkg.author);
+            println!("License: {}", pkg.license);
+            println!("Architecture: {}", pkg.arch);
+            println!("Size: {} bytes", pkg.size);
+            println!("Installed Size: {} bytes", pkg.installed_size);
+            println!("Dependencies: {}", pkg.deps.len());
+            for dep in &pkg.deps {
+                println!("  - {} {:?}", dep.name, dep.constraint);
+            }
+            return 0;
+        }
+    }
+    eprintln!("Package {} not found", pkg_name);
+    1
+}
+
+/// Entry point for `sigma-pkg history` - show generation history
+pub fn cmd_history(db: &PackageDb) -> i32 {
+    println!("Generation history (current: {}):", db.generation);
+    let mut gens: Vec<&u64> = db.history.keys().collect();
+    gens.sort();
+    for gen in gens {
+        let snapshot = &db.history[gen];
+        println!("  Generation {}: {} packages", gen, snapshot.len());
+        for name in snapshot.keys() {
+            println!("    - {}", name);
+        }
+    }
+    0
+}
