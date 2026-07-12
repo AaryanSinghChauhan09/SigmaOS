@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Zenith Desktop</title>
+    <!-- Use Outfit and JetBrains Mono fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Link to the premium CSS framework -->
+    <link rel="stylesheet" href="/zenith_desktop.css">
+    <style>
+        /* Additional minor polish for simulated screen reader feedback card */
+        .screen-reader-log {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            background: rgba(5, 5, 6, 0.9);
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(200, 150, 50, 0.2);
+            z-index: 10000;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .screen-reader-log.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .screen-reader-title {
+            color: var(--accent-gold-bright);
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .screen-reader-text {
+            color: #ffffff;
+            line-height: 1.4;
+            max-height: 120px;
+            overflow-y: auto;
+            word-break: break-word;
+        }
+        /* Custom focus styles for better keyboard navigation */
+        :focus-visible {
+            outline: 3px solid var(--accent-gold-bright) !important;
+            outline-offset: 4px;
+            box-shadow: 0 0 15px var(--accent-gold) !important;
+        }
+        .reduced-motion * {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
+</head>
+<body class="theme-default">
+    <!-- Ambient Mouse Glow -->
+    <div id="mouse-glow" aria-hidden="true"></div>
+
+    <!-- Premium Top Bar -->
+    <header class="top-bar" role="banner">
+        <div class="top-bar-left">
+            <div class="top-bar-brand" aria-label="SigmaOS logo">
+                <span>Σ</span> SIGMA<span>OS</span>
+            </div>
+            <span class="capsule-badge" role="status" aria-label="System status">Zenith v15.0</span>
+        </div>
+        <div class="top-bar-center" role="status" aria-label="System telemetry">
+            <div class="vital-item" title="CPU usage">
+                <span>CPU</span> <span id="cpu-load">02%</span>
+            </div>
+            <div class="vital-item" title="Memory usage">
+                <span>MEM</span> <span id="mem-load">14%</span>
+            </div>
+            <div class="vital-item" title="Network state">
+                <span>NET</span> <span id="net-state">ONLINE</span>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <div id="clock-container" aria-label="Current date and time" role="timer">
+                <span id="clock-time">12:00:00</span>
+                <span id="clock-date">SAT, JUL 11</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Launcher (Zorin-Style) -->
+    <div id="app-launcher" class="app-launcher-overlay" role="dialog" aria-modal="true" aria-label="Application Launcher">
+        <div class="launcher-header">
+            <h3>Zenith Launcher</h3>
+            <input type="search" id="launcher-search" class="launcher-search" placeholder="Search apps (e.g. terminal, settings, browser)..." aria-label="Search applications">
+        </div>
+        <div class="launcher-category">
+            <h4>System Utilities</h4>
+            <div class="launcher-app" data-target="terminal" tabindex="0" role="button" aria-label="Launch Terminal Emulator">
+                <span>💻</span> OmniShell Terminal
+            </div>
+            <div class="launcher-app" data-target="file-manager" tabindex="0" role="button" aria-label="Launch File Explorer">
+                <span>📁</span> Sovereign Explorer
+            </div>
+            <div class="launcher-app" data-target="settings" tabindex="0" role="button" aria-label="Launch System Settings">
+                <span>⚙️</span> Control Center
+            </div>
+        </div>
+    </div>
+
+    <!-- Window: Terminal Emulator -->
+    <div id="win-terminal" class="window" role="dialog" aria-label="OmniShell Terminal" tabindex="-1" style="top: 100px; left: 80px; display: none;">
+        <div class="window-header">
+            <div class="window-title">
+                <span>💻</span> OmniShell <span>Terminal</span>
+            </div>
+            <div class="window-controls">
+                <button class="control-dot close" aria-label="Close terminal window" onclick="toggleWindow('win-terminal')"></button>
+                <button class="control-dot min" aria-label="Minimize terminal window" onclick="toggleWindow('win-terminal')"></button>
+                <button class="control-dot max" aria-label="Maximize terminal window" onclick="toggleWindow('win-terminal')"></button>
+            </div>
+        </div>
+        <div class="window-body terminal-container">
+            <div class="terminal-output" id="terminal-output" role="log" aria-live="polite">
+                <div class="term-line success">Welcome to SigmaOS Zenith OmniShell v15.0</div>
+                <div class="term-line">Type 'help' to see available system commands.</div>
+            </div>
+            <div class="terminal-input-line">
+                <span class="term-prompt">sigma@root:~$</span>
+                <input type="text" id="terminal-input" class="terminal-input" autocomplete="off" aria-label="Terminal command line prompt" placeholder="Enter command...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Window: File Manager -->
+    <div id="win-file-manager" class="window" role="dialog" aria-label="Sovereign File Explorer" tabindex="-1" style="top: 150px; left: 200px; display: none;">
+        <div class="window-header">
+            <div class="window-title">
+                <span>📁</span> Sovereign <span>Explorer</span>
+            </div>
+            <div class="window-controls">
+                <button class="control-dot close" aria-label="Close File Explorer window" onclick="toggleWindow('win-file-manager')"></button>
+                <button class="control-dot min" aria-label="Minimize File Explorer window" onclick="toggleWindow('win-file-manager')"></button>
+                <button class="control-dot max" aria-label="Maximize File Explorer window" onclick="toggleWindow('win-file-manager')"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="fm-layout">
+                <div class="fm-toolbar">
+                    <button class="fm-btn" id="fm-back-btn" aria-label="Go back" disabled>↩ Back</button>
+                    <div class="fm-breadcrumbs" aria-live="polite">root / <span id="fm-current-dir">home</span></div>
+                </div>
+                <div class="fm-grid" id="fm-grid" role="grid" aria-label="Files list">
+                    <!-- Dynamic explorer grid items -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Window: Control Center / Settings -->
+    <div id="win-settings" class="window" role="dialog" aria-label="Control Center" tabindex="-1" style="top: 120px; left: 350px; display: none;">
+        <div class="window-header">
+            <div class="window-title">
+                <span>⚙️</span> Control <span>Center</span>
+            </div>
+            <div class="window-controls">
+                <button class="control-dot close" aria-label="Close Control Center window" onclick="toggleWindow('win-settings')"></button>
+                <button class="control-dot min" aria-label="Minimize Control Center window" onclick="toggleWindow('win-settings')"></button>
+                <button class="control-dot max" aria-label="Maximize Control Center window" onclick="toggleWindow('win-settings')"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="settings-layout">
+                <div class="settings-tabs" role="tablist">
+                    <button class="settings-tab active" id="tab-themes" role="tab" aria-selected="true" aria-controls="panel-themes" tabindex="0">🎨 Themes</button>
+                    <button class="settings-tab" id="tab-accessibility" role="tab" aria-selected="false" aria-controls="panel-accessibility" tabindex="-1">♿ Accessibility</button>
+                </div>
+                <div class="settings-content">
+                    <!-- Themes Tab Panel -->
+                    <div id="panel-themes" class="settings-group" role="tabpanel" aria-labelledby="tab-themes">
+                        <h4>Sovereign Accent Themes</h4>
+                        <div class="theme-selector-grid">
+                            <button class="theme-button theme-cyan" aria-label="Activate Cyan theme" onclick="setTheme('default')">Cyan</button>
+                            <button class="theme-button theme-gold" aria-label="Activate Gold theme" onclick="setTheme('gold')">Gold</button>
+                            <button class="theme-button theme-solar" aria-label="Activate Solar theme" onclick="setTheme('solar')">Solar</button>
+                            <button class="theme-button theme-crimson" aria-label="Activate Crimson theme" onclick="setTheme('crimson')">Crimson</button>
+                        </div>
+                    </div>
+
+                    <!-- Accessibility Tab Panel -->
+                    <div id="panel-accessibility" class="settings-group" role="tabpanel" aria-labelledby="tab-accessibility" style="display: none;">
+                        <h4>Accessibility Controls</h4>
+
+                        <div class="form-switch">
+                            <span>High Contrast Mode (WCAG AAA)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-high-contrast" aria-label="Toggle High Contrast Theme">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-switch">
+                            <span>Reduced Motion (Zero Animations)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-reduced-motion" aria-label="Toggle Reduced Motion Mode">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-switch">
+                            <span>Simulate Screen Reader (Speech Output Log)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-screen-reader" aria-label="Toggle Simulated Screen Reader">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Screen Reader Output log (UX Accessibility touch) -->
+    <div id="screen-reader-log" class="screen-reader-log" aria-live="assertive" role="status">
+        <div class="screen-reader-title">
+            <span>🔊</span> SCREEN READER SPEAKER
+        </div>
+        <div id="screen-reader-text" class="screen-reader-text">Screen reader simulator is ready. Turn it on in Control Center.</div>
+    </div>
+
+    <!-- Glassmorphic Dock Container -->
+    <nav class="dock-container" role="navigation" aria-label="Desktop taskbar dock">
+        <button class="dock-icon" id="dock-launcher" data-tooltip="App Launcher" aria-label="Open Application Launcher" aria-expanded="false">
+            🚀
+        </button>
+        <button class="dock-icon" id="dock-terminal" data-tooltip="OmniShell Terminal" aria-label="Open OmniShell Terminal Window">
+            💻
+        </button>
+        <button class="dock-icon" id="dock-file-manager" data-tooltip="Sovereign File Explorer" aria-label="Open Sovereign File Explorer Window">
+            📁
+        </button>
+        <button class="dock-icon" id="dock-settings" data-tooltip="Control Center" aria-label="Open Control Center Window">
+            ⚙️
+        </button>
+    </nav>
+
+    <!-- Main Entry Module JS -->
+    <script type="module" src="/zenith_desktop/index.js"></script>
+</body>
+</html>
