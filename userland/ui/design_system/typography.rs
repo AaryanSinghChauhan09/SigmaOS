@@ -55,16 +55,56 @@ pub struct FontScale {
 impl Default for FontScale {
     fn default() -> Self {
         Self {
-            xs: FontSize { size: 12, line_height: 1.5, letter_spacing: 0.0 },
-            sm: FontSize { size: 14, line_height: 1.5, letter_spacing: 0.0 },
-            base: FontSize { size: 16, line_height: 1.5, letter_spacing: 0.0 },
-            lg: FontSize { size: 18, line_height: 1.5, letter_spacing: 0.0 },
-            xl: FontSize { size: 20, line_height: 1.5, letter_spacing: 0.0 },
-            xl2: FontSize { size: 24, line_height: 1.5, letter_spacing: 0.0 },
-            xl3: FontSize { size: 30, line_height: 1.5, letter_spacing: 0.0 },
-            xl4: FontSize { size: 36, line_height: 1.5, letter_spacing: 0.0 },
-            xl5: FontSize { size: 48, line_height: 1.5, letter_spacing: 0.0 },
-            xl6: FontSize { size: 60, line_height: 1.5, letter_spacing: 0.0 },
+            xs: FontSize {
+                size: 12,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            sm: FontSize {
+                size: 14,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            base: FontSize {
+                size: 16,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            lg: FontSize {
+                size: 18,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            xl: FontSize {
+                size: 20,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            xl2: FontSize {
+                size: 24,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            xl3: FontSize {
+                size: 30,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            xl4: FontSize {
+                size: 36,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            xl5: FontSize {
+                size: 48,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            xl6: FontSize {
+                size: 60,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
         }
     }
 }

@@ -11,6 +11,8 @@ pub struct Button {
     pub disabled: bool,
     pub loading: bool,
     pub label: String,
+    pub aria_label: Option<String>,
+    pub full_width: bool,
 }
 
 impl Button {
@@ -21,6 +23,8 @@ impl Button {
             disabled: false,
             loading: false,
             label: label.to_string(),
+            aria_label: None,
+            full_width: false,
         }
     }
 
@@ -36,6 +40,16 @@ impl Button {
 
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
+        self
+    }
+
+    pub fn aria_label(mut self, aria_label: &str) -> Self {
+        self.aria_label = Some(aria_label.to_string());
+        self
+    }
+
+    pub fn full_width(mut self, full_width: bool) -> Self {
+        self.full_width = full_width;
         self
     }
 }
@@ -63,6 +77,15 @@ pub struct Input {
     pub disabled: bool,
     pub error: Option<String>,
     pub size: InputSize,
+    pub helper_text: Option<String>,
+    pub aria_describedby: Option<String>,
+    pub full_width: bool,
+}
+
+impl Default for Input {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Input {
@@ -73,6 +96,9 @@ impl Input {
             disabled: false,
             error: None,
             size: InputSize::Medium,
+            helper_text: None,
+            aria_describedby: None,
+            full_width: false,
         }
     }
 
@@ -83,6 +109,21 @@ impl Input {
 
     pub fn value(mut self, value: &str) -> Self {
         self.value = value.to_string();
+        self
+    }
+
+    pub fn helper_text(mut self, helper_text: &str) -> Self {
+        self.helper_text = Some(helper_text.to_string());
+        self
+    }
+
+    pub fn aria_describedby(mut self, aria_describedby: &str) -> Self {
+        self.aria_describedby = Some(aria_describedby.to_string());
+        self
+    }
+
+    pub fn full_width(mut self, full_width: bool) -> Self {
+        self.full_width = full_width;
         self
     }
 }
@@ -155,4 +196,34 @@ pub enum ModalSize {
     Medium,
     Large,
     Fullscreen,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_button_accessibility_and_adaptability() {
+        let btn = Button::new("Submit")
+            .aria_label("Submit form data")
+            .full_width(true);
+
+        assert_eq!(btn.label, "Submit");
+        assert_eq!(btn.aria_label, Some("Submit form data".to_string()));
+        assert!(btn.full_width);
+    }
+
+    #[test]
+    fn test_input_accessibility_and_adaptability() {
+        let input = Input::new()
+            .placeholder("Enter username")
+            .helper_text("Must be alphanumeric")
+            .aria_describedby("username-helper")
+            .full_width(true);
+
+        assert_eq!(input.placeholder, "Enter username");
+        assert_eq!(input.helper_text, Some("Must be alphanumeric".to_string()));
+        assert_eq!(input.aria_describedby, Some("username-helper".to_string()));
+        assert!(input.full_width);
+    }
 }

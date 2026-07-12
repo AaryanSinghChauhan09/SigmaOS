@@ -2,16 +2,16 @@
 // SigmaOS Design System - UI Component Library
 
 mod colors;
-mod typography;
-mod spacing;
 mod components;
+mod spacing;
 mod tokens;
+mod typography;
 
 pub use colors::{ColorPalette, ThemeColors};
-pub use typography::{TypographySystem, FontScale, FontWeight};
-pub use spacing::{SpacingScale};
-pub use components::{Button, Input, Card, Modal};
-pub use tokens::{DesignTokens};
+pub use components::{Button, Card, Input, Modal};
+pub use spacing::SpacingScale;
+pub use tokens::DesignTokens;
+pub use typography::{FontScale, FontWeight, TypographySystem};
 
 use serde::{Deserialize, Serialize};
 
@@ -51,11 +51,8 @@ impl DesignSystem {
     /// Create a new Design System instance
     pub fn new(config: DesignSystemConfig) -> Self {
         let tokens = DesignTokens::new(&config);
-        
-        Self {
-            config,
-            tokens,
-        }
+
+        Self { config, tokens }
     }
 
     /// Get design tokens
