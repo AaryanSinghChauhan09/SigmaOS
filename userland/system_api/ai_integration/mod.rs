@@ -55,7 +55,7 @@ impl Default for AIConfig {
 }
 
 /// Privacy level
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PrivacyLevel {
     Minimal,
     Standard,
@@ -90,7 +90,7 @@ impl AIIntegration {
         let system_control = SystemControl::new()?;
         let troubleshooting = TroubleshootingEngine::new()?;
         let automation = AutomationEngine::new()?;
-        let privacy_manager = PrivacyManager::new(config.privacy_level)?;
+        let privacy_manager = PrivacyManager::new(config.privacy_level.clone())?;
 
         Ok(Self {
             config,

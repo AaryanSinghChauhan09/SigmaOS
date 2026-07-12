@@ -35,18 +35,29 @@ impl HttpResponse {
     pub const fn new() -> Self {
         Self {
             status: HttpStatus::Ok,
-            content_type: *b"text/html; charset=utf-8\0",
+            content_type: [
+                b't', b'e', b'x', b't', b'/', b'h', b't', b'm', b'l', b';', b' ',
+                b'c', b'h', b'a', b'r', b's', b'e', b't', b'=', b'u', b't', b'f', b'-', b'8',
+                0, 0, 0, 0, 0, 0, 0, 0
+            ],
             body: [0u8; 8192],
             body_len: 0,
         }
     }
 
     pub fn set_json(&mut self) {
-        self.content_type = *b"application/json\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+        self.content_type = [
+            b'a', b'p', b'p', b'l', b'i', b'c', b'a', b't', b'i', b'o', b'n', b'/', b'j', b's', b'o', b'n',
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ];
     }
 
     pub fn set_html(&mut self) {
-        self.content_type = *b"text/html; charset=utf-8\0";
+        self.content_type = [
+            b't', b'e', b'x', b't', b'/', b'h', b't', b'm', b'l', b';', b' ',
+            b'c', b'h', b'a', b'r', b's', b'e', b't', b'=', b'u', b't', b'f', b'-', b'8',
+            0, 0, 0, 0, 0, 0, 0, 0
+        ];
     }
 }
 
@@ -189,7 +200,15 @@ impl AiWebServer {
             results.forEach(result => {
                 const card = document.createElement('div');
                 card.className = 'response-card';
-                card.innerHTML = '<h3>' + result.model + '</h3><p>' + result.response + '</p>';
+
+                const h3 = document.createElement('h3');
+                h3.textContent = result.model;
+                card.appendChild(h3);
+
+                const p = document.createElement('p');
+                p.textContent = result.response;
+                card.appendChild(p);
+
                 container.appendChild(card);
             });
         });
