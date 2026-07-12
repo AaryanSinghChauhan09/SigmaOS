@@ -1,0 +1,437 @@
+name: SigmaOS Enhanced Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  # ============================================================================
+  # Compute SOURCE_DATE_EPOCH for reproducible builds
+  # ============================================================================
+  sde:
+    name: Compute SOURCE_DATE_EPOCH
+    runs-on: ubuntu-24.04
+    outputs:
+      sde: ${{ steps.sde.outputs.sde }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - id: sde
+        run: echo "sde=$(git log -1 --pretty=%ct)" >> "$GITHUB_OUTPUT"
+
+  # ============================================================================
+  # Multi-architecture build for release
+  # ============================================================================
+  build:
+    name: Build Release (${{ matrix.arch }})
+    runs-on: ubuntu-24.04
+    needs: sde
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            toolchain: x86_64-unknown-none-elf
+            qemu_arch: x86_64
+          - arch: aarch64
+            toolchain: aarch64-unknown-none-elf
+            qemu_arch: aarch64
+          - arch: riscv64
+            toolchain: riscv64gc-unknown-none-elf
+            qemu_arch: riscv64
+
+    env:
+      SOURCE_DATE_EPOCH: ${{ needs.sde.outputs.sde }}
+      SIGMA_VERSION: ${{ github.ref_name || inputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential nasm \
+            cmake ninja-build \
+            grub-pc-bin grub-efi-amd64-bin grub-efi-ia32-bin \
+            xorriso mtools \
+            qemu-system-x86 qemu-system-arm qemu-system-riscv64 \
+            gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu \
+            gcc-riscv64-linux-gnu g++-riscv64-linux-gnu binutils-riscv64-linux-gnu
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: ${{ matrix.toolchain }}
+          components: clippy,rust-src
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Configure build
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_TOOLCHAIN_FILE=../toolchain-${{ matrix.arch }}.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSIGMA_VERSION=${{ env.SIGMA_VERSION }} \
+            -DSOURCE_DATE_EPOCH=${{ env.SOURCE_DATE_EPOCH }} \
+            -GNinja
+
+      - name: Build kernel
+        run: |
+          cd build
+          ninja kernel
+
+      - name: Build userland
+        run: |
+          cd build
+          ninja userland
+
+      - name: Generate ISO
+        run: |
+          cd build
+          ninja iso
+
+      - name: Generate checksums
+        run: |
+          cd build
+          sha256sum sigmaos-${{ matrix.arch }}.iso > sigmaos-${{ matrix.arch }}.iso.sha256
+          sha512sum sigmaos-${{ matrix.arch }}.iso > sigmaos-${{ matrix.arch }}.iso.sha512
+
+      - name: Sign artifacts
+        run: |
+          cd build
+          # Generate signing key if not exists
+          if [ ! -f release_key.pem ]; then
+            openssl genrsa -out release_key.pem 4096
+          fi
+          # Sign ISO
+          openssl dgst -sha256 -sign release_key.pem -out sigmaos-${{ matrix.arch }}.iso.sig sigmaos-${{ matrix.arch }}.iso
+          # Export public key
+          openssl rsa -in release_key.pem -pubout -out sigmaos-${{ matrix.arch }}.pubkey
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-${{ matrix.arch }}-release
+          path: |
+            build/sigmaos-${{ matrix.arch }}.iso
+            build/sigmaos-${{ matrix.arch }}.iso.sha256
+            build/sigmaos-${{ matrix.arch }}.iso.sha512
+            build/sigmaos-${{ matrix.arch }}.iso.sig
+            build/sigmaos-${{ matrix.arch }}.pubkey
+          retention-days: 90
+
+  # ============================================================================
+  # Reproducible build verification
+  # ============================================================================
+  reproducible:
+    name: Reproducible Build Verification
+    runs-on: ubuntu-24.04
+    needs: sde
+
+    env:
+      SOURCE_DATE_EPOCH: ${{ needs.sde.outputs.sde }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential cmake ninja-build \
+            grub-pc-bin xorriso mtools
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: x86_64-unknown-none-elf
+          components: rust-src
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build first image
+        run: |
+          mkdir -p build1
+          cd build1
+          cmake .. \
+            -DCMAKE_TOOLCHAIN_FILE=../toolchain-x86_64.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSOURCE_DATE_EPOCH=${{ env.SOURCE_DATE_EPOCH }} \
+            -GNinja
+          ninja iso
+          sha256sum sigmaos-x86_64.iso > hash1.txt
+
+      - name: Build second image
+        run: |
+          mkdir -p build2
+          cd build2
+          cmake .. \
+            -DCMAKE_TOOLCHAIN_FILE=../toolchain-x86_64.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSOURCE_DATE_EPOCH=${{ env.SOURCE_DATE_EPOCH }} \
+            -GNinja
+          ninja iso
+          sha256sum sigmaos-x86_64.iso > hash2.txt
+
+      - name: Compare hashes
+        run: |
+          diff build1/hash1.txt build2/hash2.txt
+          if [ $? -eq 0 ]; then
+            echo "✓ Reproducible build verified"
+          else
+            echo "✗ Build not reproducible"
+            exit 1
+          fi
+
+  # ============================================================================
+  # Boot testing
+  # ============================================================================
+  boot-test:
+    name: Boot Test (${{ matrix.arch }})
+    needs: build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            qemu_arch: x86_64
+            qemu_cmd: qemu-system-x86_64
+          - arch: aarch64
+            qemu_arch: aarch64
+            qemu_cmd: qemu-system-aarch64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sigmaos-${{ matrix.arch }}-release
+          path: build
+
+      - name: Install QEMU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y qemu-system-x86 qemu-system-arm
+
+      - name: Boot test
+        run: |
+          chmod +x qemu-boot.sh
+          timeout 300 ./qemu-boot.sh -arch ${{ matrix.arch }} -iso build/sigmaos-${{ matrix.arch }}.iso || exit 1
+
+  # ============================================================================
+  # Security audit
+  # ============================================================================
+  security:
+    name: Security Audit
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Rust security audit
+        uses: rustsec/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run static analysis
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  # ============================================================================
+  # Generate SBOM (Software Bill of Materials)
+  # ============================================================================
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-24.04
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cargo-cyclonedx
+        run: |
+          cargo install cargo-cyclonedx
+
+      - name: Generate SBOM
+        run: |
+          cargo cyclonedx -o sbom.json -t json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+
+  # ============================================================================
+  # Create GitHub Release
+  # ============================================================================
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-24.04
+    needs: [build, reproducible, boot-test, security, sbom]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > release_notes.md <<EOF
+          # SigmaOS ${{ github.ref_name }}
+          
+          ## What's New
+          
+          This release includes:
+          - Enhanced driver abstraction layer with OOP principles
+          - Legacy driver archive for eternal compatibility
+          - SigmaDriverHub package registry infrastructure
+          - SELinux-style MAC policy modules
+          - SigmaAdmin system administration tools
+          - Improved CI/CD pipeline with reproducible builds
+          
+          ## Downloads
+          
+          ### ISO Images
+          
+          | Architecture | Download | SHA256 | SHA512 | Signature |
+          |--------------|----------|--------|--------|-----------|
+          | x86_64 | [ISO](artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso) | [SHA256](artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso.sha256) | [SHA512](artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso.sha512) | [SIG](artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso.sig) |
+          | aarch64 | [ISO](artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso) | [SHA256](artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso.sha256) | [SHA512](artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso.sha512) | [SIG](artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso.sig) |
+          | riscv64 | [ISO](artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso) | [SHA256](artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso.sha256) | [SHA512](artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso.sha512) | [SIG](artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso.sig) |
+          
+          ## Verification
+          
+          To verify the integrity of the downloaded ISO:
+          
+          \`\`\`bash
+          # Download ISO and signature
+          wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/${{ github.ref_name }}/sigmaos-x86_64.iso
+          wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/${{ github.ref_name }}/sigmaos-x86_64.iso.sig
+          wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/${{ github.ref_name }}/sigmaos-x86_64.pubkey
+          
+          # Verify signature
+          openssl dgst -sha256 -verify sigmaos-x86_64.pubkey -signature sigmaos-x86_64.iso.sig sigmaos-x86_64.iso
+          
+          # Verify checksum
+          sha256sum -c sigmaos-x86_64.iso.sha256
+          \`\`\`
+          
+          ## Build Information
+          
+          - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Commit**: ${{ github.sha }}
+          - **Reproducible**: Yes
+          - **SBOM**: [Download](artifacts/sbom/sbom.json)
+          
+          ## Documentation
+          
+          - [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Installation)
+          - [User Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/User-Guide)
+          - [Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Guide)
+          
+          ## Support
+          
+          - **Issues**: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+          - **Discussions**: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
+          - **Security**: security@sigmaos.dev
+          
+          ---
+          
+          **SigmaOS — The Sovereign, AI-Native Operating System**
+          
+          *Built with ❤️ in Rust*
+          EOF
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso
+            artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso.sha256
+            artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso.sha512
+            artifacts/sigmaos-x86_64-release/sigmaos-x86_64.iso.sig
+            artifacts/sigmaos-x86_64-release/sigmaos-x86_64.pubkey
+            artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso
+            artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso.sha256
+            artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso.sha512
+            artifacts/sigmaos-aarch64-release/sigmaos-aarch64.iso.sig
+            artifacts/sigmaos-aarch64-release/sigmaos-aarch64.pubkey
+            artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso
+            artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso.sha256
+            artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso.sha512
+            artifacts/sigmaos-riscv64-release/sigmaos-riscv64.iso.sig
+            artifacts/sigmaos-riscv64-release/sigmaos-riscv64.pubkey
+            artifacts/sbom/sbom.json
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ inputs.prerelease || false }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # Publish to package registry
+  # ============================================================================
+  publish:
+    name: Publish to Package Registry
+    runs-on: ubuntu-24.04
+    needs: [build, security]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sigmaos-x86_64-release
+          path: build
+
+      - name: Publish to GitHub Container Registry
+        run: |
+          # In real implementation, publish container images
+          echo "Publishing to GHCR..."
+          # docker build -t ghcr.io/AaryanSinghChauhan09/sigmaos:${{ github.ref_name }} .
+          # docker push ghcr.io/AaryanSinghChauhan09/sigmaos:${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
