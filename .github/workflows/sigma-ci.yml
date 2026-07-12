@@ -97,7 +97,7 @@ jobs:
         ninja iso
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sigmaos-${{ matrix.arch }}-iso
         path: build/sigmaos-${{ matrix.arch }}.iso
@@ -226,7 +226,7 @@ jobs:
         cat provenance.json
 
     - name: Upload provenance
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-provenance
         path: provenance.json
@@ -269,7 +269,7 @@ jobs:
           --output benchmark-report.md
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
         path: |
