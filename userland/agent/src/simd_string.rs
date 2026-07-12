@@ -7,7 +7,6 @@
 use core::arch::x86_64::*;
 
 /// SIMD-optimized string comparison using SSE4.2
-#[inline(always)]
 #[target_feature(enable = "sse4.2")]
 pub unsafe fn simd_strcmp(a: &[u8], b: &[u8]) -> bool {
     if a.len() != b.len() {
@@ -54,7 +53,6 @@ pub unsafe fn simd_strcmp(a: &[u8], b: &[u8]) -> bool {
 }
 
 /// SIMD-optimized string length calculation
-#[inline(always)]
 #[target_feature(enable = "sse4.2")]
 pub unsafe fn simd_strlen(s: &[u8]) -> usize {
     let len = s.len();
@@ -77,7 +75,7 @@ pub unsafe fn simd_strlen(s: &[u8]) -> usize {
         );
         
         if result < 16 {
-            return i * 16 + result;
+            return i * 16 + result as usize;
         }
     }
     
@@ -95,7 +93,6 @@ pub unsafe fn simd_strlen(s: &[u8]) -> usize {
 }
 
 /// SIMD-optimized string copy
-#[inline(always)]
 #[target_feature(enable = "sse2")]
 pub unsafe fn simd_memcpy(dst: *mut u8, src: *const u8, len: usize) {
     let chunks = len / 16;
@@ -117,7 +114,6 @@ pub unsafe fn simd_memcpy(dst: *mut u8, src: *const u8, len: usize) {
 }
 
 /// SIMD-optimized string search (find substring)
-#[inline(always)]
 #[target_feature(enable = "sse4.2")]
 pub unsafe fn simd_strstr(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if needle.is_empty() {
@@ -170,7 +166,6 @@ pub unsafe fn simd_strstr(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 }
 
 /// SIMD-optimized string to lowercase conversion
-#[inline(always)]
 #[target_feature(enable = "sse2")]
 pub unsafe fn simd_to_lowercase(s: &mut [u8]) {
     let len = s.len();
@@ -210,7 +205,6 @@ pub unsafe fn simd_to_lowercase(s: &mut [u8]) {
 }
 
 /// SIMD-optimized string to uppercase conversion
-#[inline(always)]
 #[target_feature(enable = "sse2")]
 pub unsafe fn simd_to_uppercase(s: &mut [u8]) {
     let len = s.len();
@@ -224,13 +218,13 @@ pub unsafe fn simd_to_uppercase(s: &mut [u8]) {
         let vec = _mm_loadu_si128(ptr.add(i * 16) as *const __m128i);
         
         // Convert lowercase to uppercase using bit operations
-        let mask = _mm_set1_epi8(0xDF); // ~0x20
+        let mask = _mm_set1_epi8(0x20);
         let lowercase_mask = _mm_cmpgt_epi8(vec, _mm_set1_epi8(0x60)); // > 'a'-1
         let uppercase_mask = _mm_cmpgt_epi8(vec, _mm_set1_epi8(0x7A)); // > 'z'
         let in_range = _mm_andnot_si128(uppercase_mask, lowercase_mask);
         
-        let and_mask = _mm_and_si128(in_range, mask);
-        let result = _mm_and_si128(vec, and_mask);
+        let clear_mask = _mm_and_si128(in_range, mask);
+        let result = _mm_andnot_si128(clear_mask, vec);
         
         _mm_storeu_si128(ptr.add(i * 16) as *mut __m128i, result);
     }
@@ -374,5 +368,36 @@ pub fn to_uppercase(s: &mut [u8]) {
     #[cfg(not(target_arch = "x86_64"))]
     {
         fallback::to_uppercase(s)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_to_lowercase() {
+        let mut s = *b"HELLO, SIGMAOS! 123";
+        to_lowercase(&mut s);
+        assert_eq!(&s, b"hello, sigmaos! 123");
+    }
+
+    #[test]
+    fn test_to_uppercase() {
+        let mut s = *b"hello, sigmaos! 123";
+        to_uppercase(&mut s);
+        assert_eq!(&s, b"HELLO, SIGMAOS! 123");
+    }
+
+    #[test]
+    fn test_strcmp() {
+        assert!(strcmp(b"hello", b"hello"));
+        assert!(!strcmp(b"hello", b"world"));
+    }
+
+    #[test]
+    fn test_strlen() {
+        assert_eq!(strlen(b"hello\0world"), 5);
+        assert_eq!(strlen(b"test"), 4);
     }
 }

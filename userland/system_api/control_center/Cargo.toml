@@ -6,6 +6,9 @@ authors = ["SigmaOS Project"]
 license = "MIT"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
+[lib]
+path = "mod.rs"
+
 [dependencies]
 # Native replacements for external crates:
 # - sigma_time: replaces chrono
@@ -17,7 +20,7 @@ serde_json = "1.0"
 
 # GPU monitoring (optional)
 nvml-wrapper = { version = "0.9", optional = true }
-amdgpu = { version = "0.1", optional = true }
+amdgpu = { version = "1.0", optional = true }
 
 # Logging
 log = "0.4"

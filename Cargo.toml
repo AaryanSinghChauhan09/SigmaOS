@@ -3,11 +3,9 @@ resolver = "2"
 members = [
     "kabi",
     "kernel",
-    "meta/config",
     "sdk/driver",
     "sigma-sh",
     "suites/S03_Orchestrator",
-    "tools",
     "tools/sigma-cli-bin",
     "userland/agent",
     "userland/coreutils",
@@ -34,6 +32,7 @@ repository  = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 opt-level    = 1
 debug        = true
 overflow-checks = true
+panic        = "abort"
 
 [profile.release]
 opt-level  = "z"     # size-optimised
