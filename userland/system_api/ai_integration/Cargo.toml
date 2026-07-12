@@ -13,12 +13,12 @@ path = "mod.rs"
 # Native replacements for external crates:
 # - native_http: replaces reqwest
 # - native_log: replaces log and env_logger
+# - sigma_time: replaces chrono
+# - sigma_uuid: replaces uuid
+# - sigma_regex: replaces regex
 # serde and serde_json kept for serialization (can be replaced later if needed)
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-chrono = { version = "0.4" }
-uuid = { version = "1.0", features = ["v4", "serde"] }
-regex = { version = "1.10" }
 
 # Async runtime (keep for now, consider native async)
 tokio = { version = "1.0", features = ["full"] }

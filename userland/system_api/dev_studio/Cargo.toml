@@ -13,6 +13,8 @@ path = "mod.rs"
 # Native replacements for external crates:
 # - sigma_time: replaces chrono
 # - sigma_uuid: replaces uuid
+# - native_http: replaces reqwest
+# - native_log: replaces log and env_logger
 # serde and serde_json kept for serialization (can be replaced later if needed)
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -20,10 +22,6 @@ serde_json = "1.0"
 # Git integration (native implementation planned)
 # For now, keep git2 but mark for replacement
 git2 = "0.20.4"
-
-# HTTP client for API testing (native implementation planned)
-# For now, keep reqwest but mark for replacement
-reqwest = { version = "0.11", features = ["json"] }
 
 # Async runtime (keep for now, consider native async)
 tokio = { version = "1.0", features = ["full"] }
@@ -42,10 +40,6 @@ k8s-openapi = { version = "0.22.0", optional = true }
 sqlx = { version = "0.8.1", features = ["runtime-tokio", "mysql", "postgres", "sqlite"], optional = true }
 mongodb = { version = "3.2.5", optional = true }
 redis = { version = "0.24", features = ["tokio-comp"], optional = true }
-
-# Logging
-log = "0.4"
-env_logger = "0.11"
 
 [features]
 default = []
