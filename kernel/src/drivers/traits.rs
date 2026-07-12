@@ -4,6 +4,10 @@
 // OOP-based driver framework traits
 // Zero-allocation, performance-optimized driver interfaces
 
+pub struct Box<T: ?Sized> {
+    _ptr: *mut T,
+}
+
 /// Core driver trait - all drivers must implement this
 pub trait Driver {
     /// Initialize the driver

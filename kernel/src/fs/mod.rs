@@ -2,6 +2,10 @@
 /// This module provides the OOP-based traits for mounting and interacting with
 /// diverse file systems (FAT32, Ext2, and the future Sovereign FS).
 
+pub struct Box<T: ?Sized> {
+    _ptr: *mut T,
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum FsError {
     NotFound,
