@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Sovereign Copilot — agent runtime inspired by Claude Code, openclaw, hermes-ide.
  */

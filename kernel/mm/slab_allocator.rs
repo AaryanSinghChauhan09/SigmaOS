@@ -35,6 +35,10 @@ pub struct SlabObject {
     pub next: Option<SigmaU64>,
 }
 
+extern "C" {
+    fn sigma_buddy_alloc(order: SigmaU8) -> SigmaU64;
+}
+
 // ─── Slab ─────────────────────────────────────────────────────────────────
 
 #[repr(C)]

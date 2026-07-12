@@ -10,8 +10,7 @@ use core::fmt::Write;
 // ─── Panic Handler ───────────────────────────────────────────────────────
 
 /// Enhanced panic handler with detailed error reporting
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+pub fn panic_handler(info: &PanicInfo) -> ! {
     // Try to print panic information
     let mut writer = PanicWriter::new();
     

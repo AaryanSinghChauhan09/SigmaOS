@@ -70,7 +70,7 @@ impl DesignSystem {
 
     /// Update configuration
     pub fn update_config(&mut self, config: DesignSystemConfig) {
-        self.config = config;
         self.tokens = DesignTokens::new(&config);
+        self.config = config;
     }
 }

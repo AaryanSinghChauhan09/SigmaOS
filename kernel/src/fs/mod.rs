@@ -23,7 +23,7 @@ pub trait FileSystem {
     fn unmount(&mut self) -> Result<(), FsError>;
 
     /// Open a file and return a descriptor/inode.
-    fn open(&self, path: &str) -> Result<Box<dyn Inode>, FsError>;
+    fn open(&self, path: &str) -> Result<&'static dyn Inode, FsError>;
 }
 
 /// Represents a generic file or directory node (Inode).
