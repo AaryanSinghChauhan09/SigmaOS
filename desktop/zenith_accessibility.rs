@@ -106,6 +106,17 @@ impl ScreenReader {
     }
 }
 
+/// Accessibility Manager structure
+#[derive(Debug, Clone)]
+pub struct AccessibilityManager {
+    pub theme: Theme,
+    pub magnifier: Magnifier,
+    pub keyboard_nav: KeyboardNav,
+    pub screen_reader_enabled: bool,
+    pub reduced_motion: bool,
+    pub initialized: bool,
+}
+
 /// Add screen reader to accessibility manager
 impl AccessibilityManager {
     pub fn new() -> Self {
