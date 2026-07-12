@@ -65,8 +65,7 @@ pub trait LlmBackend: Send + Sync {
     fn name(&self)       -> &'static str;
     fn is_available(&self) -> bool;
     fn generate(&self, messages: &[Message], params: &GenParams) -> Result<String, LlmError>;
-    fn generate_stream<F>(&self, messages: &[Message], params: &GenParams, on_token: F) -> Result<(), LlmError>
-    where F: FnMut(&str) + Send;
+    fn generate_stream(&self, messages: &[Message], params: &GenParams, on_token: &mut (dyn FnMut(&str) + Send)) -> Result<(), LlmError>;
 }
 
 #[derive(Debug)]
@@ -175,8 +174,7 @@ impl LlmBackend for LlamaCppBackend {
         }
     }
 
-    fn generate_stream<F>(&self, messages: &[Message], params: &GenParams, mut on_token: F) -> Result<(), LlmError>
-    where F: FnMut(&str) + Send {
+    fn generate_stream(&self, messages: &[Message], params: &GenParams, on_token: &mut (dyn FnMut(&str) + Send)) -> Result<(), LlmError> {
         if !self.is_available() { return Err(LlmError::NotAvailable); }
         let prompt = self.format_prompt(messages);
         let mut child = Command::new(&self.cli_path)
@@ -262,11 +260,9 @@ impl LlmBackend for SigmaAiBackend {
         Ok(response.trim().to_owned())
     }
 
-    fn generate_stream<F>(&self, messages: &[Message], params: &GenParams, on_token: F) -> Result<(), LlmError>
-    where F: FnMut(&str) + Send {
+    fn generate_stream(&self, messages: &[Message], params: &GenParams, on_token: &mut (dyn FnMut(&str) + Send)) -> Result<(), LlmError> {
         // Fallback: generate then call on_token with full response
         let response = self.generate(messages, params)?;
-        let mut on_token = on_token;
         for word in response.split_whitespace() { on_token(word); on_token(" "); }
         Ok(())
     }
@@ -321,10 +317,8 @@ impl LlmBackend for OllamaBackend {
         Err(LlmError::ParseError(resp))
     }
 
-    fn generate_stream<F>(&self, messages: &[Message], params: &GenParams, on_token: F) -> Result<(), LlmError>
-    where F: FnMut(&str) + Send {
+    fn generate_stream(&self, messages: &[Message], params: &GenParams, on_token: &mut (dyn FnMut(&str) + Send)) -> Result<(), LlmError> {
         let response = self.generate(messages, params)?;
-        let mut on_token = on_token;
         for ch in response.chars() { let s = ch.to_string(); on_token(&s); }
         Ok(())
     }
@@ -358,8 +352,9 @@ impl LlmBackend for AutoBackend {
     fn generate(&self, messages: &[Message], params: &GenParams) -> Result<String, LlmError> {
         self.inner.generate(messages, params)
     }
-    fn generate_stream<F>(&self, messages: &[Message], params: &GenParams, on_token: F) -> Result<(), LlmError>
-    where F: FnMut(&str) + Send { self.inner.generate_stream(messages, params, on_token) }
+    fn generate_stream(&self, messages: &[Message], params: &GenParams, on_token: &mut (dyn FnMut(&str) + Send)) -> Result<(), LlmError> {
+        self.inner.generate_stream(messages, params, on_token)
+    }
 }
 
 // ── Null Backend (offline fallback) ──────────────────────────────────────────
@@ -375,10 +370,9 @@ impl LlmBackend for NullBackend {
 Install sigma-ai with: sigma-pkg install sigma-ai\n\
 Or use sigma-agent in tool mode: sigma-agent run <command>", &last[..last.len().min(60)]))
     }
-    fn generate_stream<F>(&self, messages: &[Message], params: &GenParams, on_token: F) -> Result<(), LlmError>
-    where F: FnMut(&str) + Send {
+    fn generate_stream(&self, messages: &[Message], params: &GenParams, on_token: &mut (dyn FnMut(&str) + Send)) -> Result<(), LlmError> {
         let r = self.generate(messages, params)?;
-        let mut on_token = on_token; on_token(&r); Ok(())
+        on_token(&r); Ok(())
     }
 }
 

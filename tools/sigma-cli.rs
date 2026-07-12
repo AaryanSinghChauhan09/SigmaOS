@@ -37,7 +37,6 @@ pub struct DoctorCmd;
 pub struct ConfigCmd;
 pub struct BenchCmd;
 pub struct ProfileCmd;
-pub struct ShardCmd;
 
 // Helper to log messages in premium format
 fn log_info(msg: &str, json_mode: bool) {

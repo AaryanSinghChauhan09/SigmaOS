@@ -215,12 +215,52 @@ pub unsafe fn fill_rect(x: u32, y: u32, w: u32, h: u32, color: Color) {
         None => return,
     };
 
+    let x_start = x.min(info.width);
+    let y_start = y.min(info.height);
     let x_end = (x + w).min(info.width);
     let y_end = (y + h).min(info.height);
 
-    for py in y..y_end {
-        for px in x..x_end {
-            putpixel(px, py, color);
+    if x_start >= x_end || y_start >= y_end {
+        return;
+    }
+
+    let stride = info.stride as usize;
+
+    match info.bpp {
+        32 => {
+            let c = color.to_u32();
+            for py in y_start..y_end {
+                let row_offset = py as usize * stride;
+                let row_ptr = G_FRAMEBUFFER_PTR.add(row_offset) as *mut u32;
+                let line_start = row_ptr.add(x_start as usize);
+                let line_len = (x_end - x_start) as usize;
+                for i in 0..line_len {
+                    *line_start.add(i) = c;
+                }
+            }
+        }
+        16 => {
+            let r = (color.r as u32 >> 3) & 0x1F;
+            let g = (color.g as u32 >> 2) & 0x3F;
+            let b = (color.b as u32 >> 3) & 0x1F;
+            let c = ((r << 11) | (g << 5) | b) as u16;
+            for py in y_start..y_end {
+                let row_offset = py as usize * stride;
+                let row_ptr = G_FRAMEBUFFER_PTR.add(row_offset) as *mut u16;
+                let line_start = row_ptr.add(x_start as usize);
+                let line_len = (x_end - x_start) as usize;
+                for i in 0..line_len {
+                    *line_start.add(i) = c;
+                }
+            }
+        }
+        _ => {
+            // Fallback
+            for py in y_start..y_end {
+                for px in x_start..x_end {
+                    putpixel(px, py, color);
+                }
+            }
         }
     }
 }
@@ -250,13 +290,40 @@ pub unsafe fn blit(src_x: u32, src_y: u32, dst_x: u32, dst_y: u32, w: u32, h: u3
         None => return,
     };
 
-    let x_end = w.min(info.width - src_x.max(dst_x));
-    let y_end = h.min(info.height - src_y.max(dst_y));
+    let x_max = src_x.max(dst_x);
+    let y_max = src_y.max(dst_y);
+    if x_max >= info.width || y_max >= info.height {
+        return;
+    }
+    let x_end = w.min(info.width - x_max);
+    let y_end = h.min(info.height - y_max);
 
-    for py in 0..y_end {
-        for px in 0..x_end {
-            if let Some(color) = getpixel(src_x + px, src_y + py) {
-                putpixel(dst_x + px, dst_y + py, color);
+    if x_end == 0 || y_end == 0 {
+        return;
+    }
+
+    let stride = info.stride as usize;
+    let bpp_bytes = (info.bpp / 8) as usize;
+
+    if info.bpp == 32 || info.bpp == 16 {
+        let line_bytes = x_end as usize * bpp_bytes;
+        // Determine if copying downward to handle vertical overlap safely
+        let reverse = dst_y > src_y && dst_y < src_y + h;
+        for py in 0..y_end {
+            let sy = if reverse { y_end - 1 - py } else { py };
+            let src_row_offset = (src_y + sy) as usize * stride + src_x as usize * bpp_bytes;
+            let dst_row_offset = (dst_y + sy) as usize * stride + dst_x as usize * bpp_bytes;
+            let src_ptr = G_FRAMEBUFFER_PTR.add(src_row_offset);
+            let dst_ptr = G_FRAMEBUFFER_PTR.add(dst_row_offset);
+            core::ptr::copy(src_ptr, dst_ptr, line_bytes);
+        }
+    } else {
+        // Fallback
+        for py in 0..y_end {
+            for px in 0..x_end {
+                if let Some(color) = getpixel(src_x + px, src_y + py) {
+                    putpixel(dst_x + px, dst_y + py, color);
+                }
             }
         }
     }

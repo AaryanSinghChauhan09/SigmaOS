@@ -8,19 +8,16 @@ mod panic;
 mod log;
 
 // Phase G kernel components
+#[path = "../scheduler.rs"]
 mod scheduler;
+#[path = "../mm.rs"]
 mod mm;
+#[path = "../hal.rs"]
 mod hal;
+#[path = "../syscalls.rs"]
 mod syscalls;
 
-use core::panic::PanicInfo;
 use drivers::DriverRegistry;
-
-/// This function is called on panic.
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    panic::panic_handler(info);
-}
 
 /// Boot info structure passed from UEFI bootloader
 #[repr(C)]

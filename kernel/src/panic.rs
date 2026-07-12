@@ -1,8 +1,8 @@
 /// SigmaOS: Kernel Panic Handler
 /// Enhanced panic handler with detailed error reporting
 
-#![no_std]
-#![allow(dead_code)]
+
+#[allow(dead_code)]
 
 use core::panic::PanicInfo;
 use core::fmt::Write;
@@ -37,12 +37,11 @@ fn panic(info: &PanicInfo) -> ! {
         writer.write_str("\n");
     }
     
-    if let Some(message) = info.message() {
-        writer.write_str("Message: ");
-        // Try to format the message
-        let _ = write!(writer, "{}", message);
-        writer.write_str("\n");
-    }
+    let message = info.message();
+    writer.write_str("Message: ");
+    // Try to format the message
+    let _ = write!(writer, "{}", message);
+    writer.write_str("\n");
     
     writer.write_str("==================\n");
     writer.write_str("System halted.\n");
