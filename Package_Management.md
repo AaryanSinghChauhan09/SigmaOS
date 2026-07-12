@@ -139,7 +139,7 @@ pub fn verify_package_integrity(package_path: &Path, expected_hash: &str) -> Res
     let mut file = File::open(package_path)?;
     let mut hasher = Sha256::new();
     let mut buffer = [0u8; 8192];
-    
+
     loop {
         let n = file.read(&mut buffer)?;
         if n == 0 {
@@ -147,10 +147,10 @@ pub fn verify_package_integrity(package_path: &Path, expected_hash: &str) -> Res
         }
         hasher.update(&buffer[..n]);
     }
-    
+
     let result = hasher.finalize();
     let actual_hash = format!("{:x}", result);
-    
+
     Ok(actual_hash == expected_hash)
 }
 
@@ -161,7 +161,7 @@ pub fn verify_gpg_signature(package_path: &Path, signature_path: &Path) -> Resul
         .arg(signature_path)
         .arg(package_path)
         .output()?;
-    
+
     Ok(output.status.success())
 }
 ```
@@ -183,20 +183,20 @@ impl DependencyResolver {
             graph: Graph::new(),
         }
     }
-    
+
     pub fn add_package(&mut self, name: &str, dependencies: &[String]) {
         let package_idx = self.graph.add_node(name.to_string());
-        
+
         for dep in dependencies {
             let dep_idx = self.graph.add_node(dep.clone());
             self.graph.add_edge(package_idx, dep_idx, ());
         }
     }
-    
+
     pub fn resolve_order(&self) -> Result<Vec<String>, ResolveError> {
         let mut order = Vec::new();
         toposort(&self.graph, Some(&mut order))?;
-        
+
         Ok(order.into_iter().map(|idx| {
             self.graph[idx].clone()
         }).collect())
@@ -218,29 +218,29 @@ impl ContentAddressedStore {
     pub fn new(base_path: PathBuf) -> Self {
         ContentAddressedStore { base_path }
     }
-    
+
     pub fn add_path(&self, path: &Path) -> Result<String, StoreError> {
         let hash = self.compute_hash(path)?;
         let store_path = self.store_path(&hash);
-        
+
         // Copy to store
         std::fs::create_dir_all(&store_path)?;
         std::fs::copy(path, store_path.join("content"))?;
-        
+
         Ok(hash)
     }
-    
+
     pub fn get_path(&self, hash: &str) -> PathBuf {
         self.store_path(hash).join("content")
     }
-    
+
     fn compute_hash(&self, path: &Path) -> Result<String, StoreError> {
         let mut file = File::open(path)?;
         let mut hasher = Sha256::new();
         std::io::copy(&mut file, &mut hasher)?;
         Ok(format!("{:x}", hasher.finalize()))
     }
-    
+
     fn store_path(&self, hash: &str) -> PathBuf {
         self.base_path.join(&hash[..2]).join(&hash[2..])
     }
@@ -272,27 +272,27 @@ impl ImmutableUpdater {
     pub fn update_system(&mut self, new_profile: &Profile) -> Result<(), UpdateError> {
         // Determine inactive partition
         let target_partition = self.boot_config.inactive_partition();
-        
+
         // Mount target partition
         let mount_point = self.mount_partition(target_partition)?;
-        
+
         // Install new system
         self.install_profile(&mount_point, new_profile)?;
-        
+
         // Update boot configuration
         self.boot_config.set_next_boot(target_partition)?;
-        
+
         // Unmount
         self.unmount_partition(mount_point)?;
-        
+
         Ok(())
     }
-    
+
     pub fn rollback(&mut self) -> Result<(), UpdateError> {
         // Switch to previous partition
         let previous_partition = self.boot_config.inactive_partition();
         self.boot_config.set_next_boot(previous_partition)?;
-        
+
         Ok(())
     }
 }

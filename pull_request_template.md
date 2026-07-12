@@ -42,25 +42,25 @@
 
 ## Type of change
 
-- [ ] `feat` — new feature
+- [ ] `feat` \x97 new feature
 
-- [ ] `fix` — bug fix
+- [ ] `fix` \x97 bug fix
 
-- [ ] `impl` — implements a roadmap item
+- [ ] `impl` \x97 implements a roadmap item
 
-- [ ] `perf` — performance improvement
+- [ ] `perf` \x97 performance improvement
 
-- [ ] `security` — security fix/hardening
+- [ ] `security` \x97 security fix/hardening
 
-- [ ] `refactor` — code refactoring (no behaviour change)
+- [ ] `refactor` \x97 code refactoring (no behaviour change)
 
-- [ ] `driver` — new or updated hardware driver
+- [ ] `driver` \x97 new or updated hardware driver
 
-- [ ] `docs` — documentation only
+- [ ] `docs` \x97 documentation only
 
-- [ ] `ci` — CI/workflow changes
+- [ ] `ci` \x97 CI/workflow changes
 
-- [ ] `test` — tests only
+- [ ] `test` \x97 tests only
 
 ## Roadmap item (if applicable)
 
@@ -70,7 +70,7 @@ Item: ___
 
 ## Testing done
 
-<!-- Required — describe what you tested and how -->
+<!-- Required \x97 describe what you tested and how -->
 
 ### Build targets tested:
 
@@ -134,7 +134,7 @@ $ sigma-pkg install ...
 
 - [ ] ABI-compatible extension (new fields at end of struct)
 
-- [ ] ABI break — requires kabi version bump and MAINTAINERS notification
+- [ ] ABI break \x97 requires kabi version bump and MAINTAINERS notification
 
 ## Commit Message Format
 

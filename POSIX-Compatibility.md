@@ -165,7 +165,7 @@ int main() {
 
     char buffer[1024];
     ssize_t bytes_read = read(fd, buffer, sizeof(buffer));
-    
+
     close(fd);
     return 0;
 }

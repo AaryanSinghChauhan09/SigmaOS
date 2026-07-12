@@ -153,25 +153,25 @@ EFI_STATUS enroll_mok(EFI_HANDLE image_handle) {
     EFI_GUID mok_protocol_guid = MOK_PROTOCOL_GUID;
     MOK_PROTOCOL *mok_protocol;
     EFI_STATUS status;
-    
+
     // Locate MOK protocol
     status = gBS->LocateProtocol(&mok_protocol_guid, NULL, (void**)&mok_protocol);
     if (EFI_ERROR(status)) {
         return status;
     }
-    
+
     // Generate MOK
     status = mok_protocol->GenerateKey();
     if (EFI_ERROR(status)) {
         return status;
     }
-    
+
     // Enroll MOK
     status = mok_protocol->EnrollKey();
     if (EFI_ERROR(status)) {
         return status;
     }
-    
+
     return EFI_SUCCESS;
 }
 ```
@@ -199,12 +199,12 @@ int encrypt_device(const char *device, const char *passphrase) {
         .data_alignment = 0,
         .data_device = NULL,
     };
-    
+
     int r = crypt_init(&cd, device);
     if (r < 0) return r;
 
     // Format as LUKS2
-    r = crypt_format(cd, CRYPT_LUKS2, "aes", "xts-plain64", 
+    r = crypt_format(cd, CRYPT_LUKS2, "aes", "xts-plain64",
                      "sha256", NULL, 512, &params);
     if (r < 0) {
         crypt_free(cd);
@@ -219,7 +219,7 @@ int encrypt_device(const char *device, const char *passphrase) {
         .max_memory_kb = 1024 * 1024,
         .parallel_threads = 4,
     };
-    
+
     r = crypt_set_pbkdf_type(cd, &pbkdf);
     if (r < 0) {
         crypt_free(cd);
@@ -227,7 +227,7 @@ int encrypt_device(const char *device, const char *passphrase) {
     }
 
     // Add keyslot
-    r = crypt_keyslot_add_by_passphrase(cd, CRYPT_ANY_KEYSLOT, NULL, 0, 
+    r = crypt_keyslot_add_by_passphrase(cd, CRYPT_ANY_KEYSLOT, NULL, 0,
                                        passphrase, strlen(passphrase));
     crypt_free(cd);
     return r;
@@ -249,25 +249,25 @@ int encrypt_device(const char *device, const char *passphrase) {
 int bind_to_tpm2(const char *device, const char *passphrase) {
     TPM2_RC rc;
     TPM2_HANDLE handle;
-    
+
     // Initialize TPM2
     rc = Tss2_Sys_Initialize();
     if (rc != TPM2_RC_SUCCESS) {
         return -1;
     }
-    
+
     // Create primary key
     rc = Tss2_Sys_CreatePrimary(..., &handle);
     if (rc != TPM2_RC_SUCCESS) {
         return -1;
     }
-    
+
     // Seal passphrase to TPM2
     rc = Tss2_Sys_Create(..., handle, passphrase, ...);
     if (rc != TPM2_RC_SUCCESS) {
         return -1;
     }
-    
+
     return 0;
 }
 ```

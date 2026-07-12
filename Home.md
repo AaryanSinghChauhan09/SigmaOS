@@ -69,4 +69,17 @@ graph TD
 
 ## Getting Started
 
-See [INSTALL.md](INSTALL.md) for build instructions using the new `Justfile` toolchain.
+See [Installation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Installation) for build instructions using the new `Justfile` toolchain.
+
+## Documentation
+
+Comprehensive documentation is available in the [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki):
+
+- [Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture) - System architecture and design
+- [Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap) - Development roadmap and milestones
+- [Installation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Installation) - Build and installation guide
+- [Quickstart](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quickstart) - Quick start guide
+- [Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing) - Contribution guidelines
+- [Security](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security) - Security policy and reporting
+- [Testing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Testing) - Testing framework and tools
+- [Developer Tools](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Tools) - Development tools and IDE integration

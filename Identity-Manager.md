@@ -61,7 +61,7 @@ Admin revokes shard
 
 ```c
 // Issue a new identity token for a shard
-int identity_token_issue(shard_id_t shard_id, const char **capabilities, 
+int identity_token_issue(shard_id_t shard_id, const char **capabilities,
                         size_t cap_count, identity_token_t *token);
 
 // Verify an identity token

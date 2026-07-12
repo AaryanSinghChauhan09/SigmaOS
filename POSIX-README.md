@@ -111,10 +111,10 @@ int main() {
     // Read from file
     char buffer[1024];
     ssize_t bytes_read = read(fd, buffer, sizeof(buffer));
-    
+
     // Close file
     close(fd);
-    
+
     return 0;
 }
 ```

@@ -140,7 +140,7 @@ impl ZenithCompositor {
         let swapchain = Self::create_swapchain(&vk_device)?;
         let accessibility_service = AccessibilityService::new()?;
         let input_method = InputMethodManager::new("ibus-m17n")?;
-        
+
         Ok(Self {
             vk_device,
             swapchain,
@@ -149,20 +149,20 @@ impl ZenithCompositor {
             input_method,
         })
     }
-    
+
     pub fn draw_desktop_elements(&self) -> Result<(), CompositorError> {
         // GPU accelerated composite rendering of panels, taskbars and windows
         self.render_panels()?;
         self.render_windows()?;
         self.render_overlays()?;
-        
+
         if self.screen_reader_active {
             self.announce_accessibility_focus()?;
         }
-        
+
         Ok(())
     }
-    
+
     pub fn handle_wayland_event(&mut self, event: WaylandEvent) -> Result<(), CompositorError> {
         match event {
             WaylandEvent::Keyboard(input) => {
@@ -177,7 +177,7 @@ impl ZenithCompositor {
         }
         Ok(())
     }
-    
+
     pub fn toggle_screen_reader(&mut self) -> Result<(), CompositorError> {
         self.screen_reader_active = !self.screen_reader_active;
         if self.screen_reader_active {
@@ -208,22 +208,22 @@ impl WindowManager {
             layout_manager: LayoutManager::new(),
         }
     }
-    
+
     pub fn add_window(&mut self, window: Window) {
         self.windows.push(window);
         self.layout_manager.relayout(&mut self.windows);
     }
-    
+
     pub fn focus_window(&mut self, window_id: usize) {
         self.focused_window = Some(window_id);
         self.windows[window_id].set_focused(true);
-        
+
         // Announce to screen reader
         if let Some(ref mut sr) = self.screen_reader {
             sr.announce_window_focus(&self.windows[window_id]);
         }
     }
-    
+
     pub fn close_window(&mut self, window_id: usize) {
         self.windows.remove(window_id);
         self.layout_manager.relayout(&mut self.windows);
@@ -245,14 +245,14 @@ impl AccessibilityService {
     pub fn new() -> Result<Self, AccessibilityError> {
         let screen_reader = ScreenReader::new()?;
         let braille_display = BrailleDisplay::detect()?;
-        
+
         Ok(Self {
             screen_reader,
             braille_display,
             high_contrast_mode: false,
         })
     }
-    
+
     pub fn enable(&mut self) -> Result<(), AccessibilityError> {
         self.screen_reader.enable()?;
         if let Some(ref mut bd) = self.braille_display {
@@ -260,12 +260,12 @@ impl AccessibilityService {
         }
         Ok(())
     }
-    
+
     pub fn announce_window_focus(&self, window: &Window) {
         let text = format!("Window focused: {}", window.title());
         self.screen_reader.speak(&text);
     }
-    
+
     pub fn announce_text_change(&self, text: &str) {
         self.screen_reader.speak(text);
     }
@@ -288,19 +288,19 @@ impl InputMethodManager {
             "fcitx" => InputMethodBackend::Fcitx,
             _ => return Err(InputMethodError::InvalidBackend),
         };
-        
+
         Ok(Self {
             backend,
             current_locale: "en_US".to_string(),
         })
     }
-    
+
     pub fn set_locale(&mut self, locale: &str) -> Result<(), InputMethodError> {
         self.current_locale = locale.to_string();
         self.backend.set_locale(locale)?;
         Ok(())
     }
-    
+
     pub fn handle_input(&self, input: InputEvent) -> Result<String, InputMethodError> {
         match self.backend {
             InputMethodBackend::IBus => self.handle_ibus_input(input),
@@ -531,7 +531,7 @@ impl Plugin for SystemMonitorPlugin {
     fn name(&self) -> &str {
         "System Monitor"
     }
-    
+
     fn handle_event(&mut self, event: &Event) -> Result<(), PluginError> {
         match event {
             Event::Timer => self.update_stats(),

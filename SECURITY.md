@@ -116,19 +116,19 @@ pub fn validate_token(token: &CapabilityToken, process_id: u64) -> Result<(), Se
     if token.process_id != process_id {
         return Err(SecurityError::InvalidToken);
     }
-    
+
     // Check expiry
     if let Some(expiry) = token.expiry {
         if get_timestamp() > expiry {
             return Err(SecurityError::TokenExpired);
         }
     }
-    
+
     // Verify signature
     if !verify_signature(token) {
         return Err(SecurityError::InvalidSignature);
     }
-    
+
     Ok(())
 }
 ```
@@ -145,15 +145,15 @@ impl CapabilityManager {
     pub fn assign_capability(&mut self, process_id: u64, capability: u64) -> Result<(), SecurityError> {
         let token = self.tokens.get_mut(&process_id)
             .ok_or(SecurityError::ProcessNotFound)?;
-        
+
         token.mask |= capability;
         Ok(())
     }
-    
+
     pub fn revoke_capability(&mut self, process_id: u64, capability: u64) -> Result<(), SecurityError> {
         let token = self.tokens.get_mut(&process_id)
             .ok_or(SecurityError::ProcessNotFound)?;
-        
+
         token.mask &= !capability;
         Ok(())
     }
@@ -206,12 +206,12 @@ pub fn create_sandbox(rules: &[SandboxRule]) -> Result<Ruleset, LandlockError> {
     let mut ruleset = Ruleset::new()
         .handle_access(Access::FS_READ_FILE)
         .handle_access(Access::FS_WRITE_FILE);
-    
+
     for rule in rules {
         let path_beneath = PathBeneath::new(rule.path.clone(), rule.access);
         ruleset.add_rule(path_beneath)?;
     }
-    
+
     Ok(ruleset)
 }
 
@@ -230,16 +230,16 @@ pub struct SandboxRule {
 
 profile user-app /usr/bin/user-app {
   #include <abstractions/base>
-  
+
   # Allow reading user documents
   owner /home/user/documents/** r,
-  
+
   # Allow writing to downloads
   owner /home/user/downloads/** rw,
-  
+
   # Deny network access
   deny network,
-  
+
   # Deny raw devices
   deny /dev/** rw,
 }
@@ -255,17 +255,17 @@ use seccomp::{SeccompFilter, SeccompAction, SeccompCondition};
 
 pub fn create_seccomp_filter() -> Result<SeccompFilter, SeccompError> {
     let mut filter = SeccompFilter::new(SeccompAction::Allow)?;
-    
+
     // Allow basic syscalls
     filter.add_rule(SeccompCondition::new(libc::SYS_read, SeccompAction::Allow))?;
     filter.add_rule(SeccompCondition::new(libc::SYS_write, SeccompAction::Allow))?;
     filter.add_rule(SeccompCondition::new(libc::SYS_exit, SeccompAction::Allow))?;
-    
+
     // Deny dangerous syscalls
     filter.add_rule(SeccompCondition::new(libc::SYS_ptrace, SeccompAction::KillProcess))?;
     filter.add_rule(SeccompCondition::new(libc::SYS_chroot, SeccompAction::KillProcess))?;
     filter.add_rule(SeccompCondition::new(libc::SYS_reboot, SeccompAction::KillProcess))?;
-    
+
     Ok(filter)
 }
 ```
@@ -356,30 +356,30 @@ System Files
 pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
     // Verify bootloader signature
     verify_bootloader_signature()?;
-    
+
     // Verify kernel signature
     verify_kernel_signature()?;
-    
+
     // Verify initramfs signature
     verify_initramfs_signature()?;
-    
+
     // Verify module signatures
     verify_module_signatures()?;
-    
+
     Ok(())
 }
 
 pub fn verify_kernel_signature() -> Result<(), SecurityError> {
     let kernel_path = "/boot/vmlinuz-sigmaos";
     let signature_path = "/boot/vmlinuz-sigmaos.sig";
-    
+
     let kernel_data = read_file(kernel_path)?;
     let signature_data = read_file(signature_path)?;
-    
+
     if !verify_signature(&kernel_data, &signature_data, &SYSTEM_PUBLIC_KEY) {
         return Err(SecurityError::SignatureVerificationFailed);
     }
-    
+
     Ok(())
 }
 ```
@@ -410,20 +410,20 @@ sigma-repo verify --key sigmaos-keyring.asc
 pub fn verify_package(package_path: &Path, signature_path: &Path) -> Result<(), SecurityError> {
     let package_data = read_file(package_path)?;
     let signature_data = read_file(signature_path)?;
-    
+
     // Verify GPG signature
     if !verify_gpg_signature(&package_data, &signature_data) {
         return Err(SecurityError::SignatureVerificationFailed);
     }
-    
+
     // Verify checksum
     let expected_hash = get_package_hash(package_path)?;
     let actual_hash = compute_hash(&package_data)?;
-    
+
     if expected_hash != actual_hash {
         return Err(SecurityError::ChecksumMismatch);
     }
-    
+
     Ok(())
 }
 ```

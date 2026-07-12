@@ -322,21 +322,21 @@ pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
    ```rust
    // kernel/drivers/my_driver.rs
    use kernel::drivers::Driver;
-   
+
    pub struct MyDriver {
        // Driver state
    }
-   
+
    impl Driver for MyDriver {
        fn name(&self) -> &str {
            "my_driver"
        }
-       
+
        fn init(&mut self) -> Result<(), DriverError> {
            // Initialize hardware
            Ok(())
        }
-       
+
        // Implement other methods
    }
    ```
@@ -345,7 +345,7 @@ pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
    ```rust
    // kernel/drivers/mod.rs
    pub mod my_driver;
-   
+
    pub fn init_drivers() {
        let mut driver = my_driver::MyDriver::new();
        driver.init().expect("Failed to init driver");

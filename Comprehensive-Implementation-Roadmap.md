@@ -2,8 +2,8 @@
 
 ## Complete Implementation Plan for All Unimplemented Features
 
-**Version:** 2.0  
-**Date:** July 2026  
+**Version:** 2.0
+**Date:** July 2026
 **Status:** Active Implementation Plan
 
 ---
@@ -74,7 +74,7 @@ impl BuddyAllocator {
     pub fn alloc(&mut self, order: usize) -> Option<PhysicalAddress> {
         // Buddy allocation algorithm
     }
-    
+
     pub fn free(&mut self, addr: PhysicalAddress, order: usize) {
         // Buddy deallocation with coalescing
     }
@@ -141,7 +141,7 @@ impl InterruptController {
     pub fn init(&mut self) {
         // Initialize APIC and IOAPIC
     }
-    
+
     pub fn enable_irq(&mut self, irq: u8) {
         // Enable specific IRQ
     }
@@ -282,7 +282,7 @@ impl VirtIOGpu {
     pub fn create_scanout(&mut self, width: u32, height: u32) {
         // VirtIO-GPU scanout creation
     }
-    
+
     pub fn flush(&mut self) {
         // Flush framebuffer to display
     }
@@ -370,7 +370,7 @@ impl E1000 {
     pub fn transmit(&mut self, packet: &[u8]) {
         // Transmit packet via e1000
     }
-    
+
     pub fn receive(&mut self) -> Option<Vec<u8>> {
         // Receive packet from e1000
     }

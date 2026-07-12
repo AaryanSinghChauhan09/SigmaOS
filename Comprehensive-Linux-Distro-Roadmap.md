@@ -1,8 +1,8 @@
 # SigmaOS Future Development Roadmap
 ## Based on Modern Linux Distribution Best Practices
 
-**Version:** 1.0  
-**Date:** July 2026  
+**Version:** 1.0
+**Date:** July 2026
 **Target:** Next-Generation Operating System Excellence
 
 ---
@@ -198,11 +198,11 @@ repositories:
     url: https://packages.sigmaos.org/core
     priority: 1
     gpg_key: /etc/sigma/keys/core.gpg
-    
+
   - name: community
     url: https://packages.sigmaos.org/community
     priority: 2
-    
+
   - name: extra
     url: https://packages.sigmaos.org/extra
     priority: 3

@@ -192,7 +192,7 @@ pub unsafe fn sigma_apic_timer_init(frequency: u64) -> i32 {
 pub unsafe fn timer_interrupt_handler() {
     // Call scheduler tick
     let next_task = sigma_sched_tick();
-    
+
     // If task switch needed
     if next_task != 0 {
         context_switch(next_task);

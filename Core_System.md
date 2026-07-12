@@ -173,15 +173,15 @@ pub fn determine_system_profile() -> SystemProfile {
 pub fn initialize_hardware() -> Result<(), InitError> {
     // Detect hardware
     let hardware = detect_hardware();
-    
+
     // Load appropriate drivers
     load_drivers(&hardware)?;
-    
+
     // Publish to HCL if enabled
     if config.hcl.telemetry_enabled {
         publish_hcl_status(hardware);
     }
-    
+
     Ok(())
 }
 ```
@@ -201,22 +201,22 @@ impl Repository {
     pub fn sync(&self) -> Result<(), RepoError> {
         // Fetch repository index
         let index = self.fetch_index()?;
-        
+
         // Verify GPG signature
         self.verify_signature(&index)?;
-        
+
         // Update local cache
         self.update_cache(index)?;
-        
+
         Ok(())
     }
-    
+
     pub fn get_package(&self, name: &str) -> Result<Package, RepoError> {
         // Search local cache
         if let Some(pkg) = self.cache.get(name) {
             return Ok(pkg.clone());
         }
-        
+
         // Fetch from remote
         self.fetch_package(name)
     }
@@ -272,27 +272,27 @@ impl DriverManager {
         if self.loaded_drivers.contains_key(name) {
             return Ok(());
         }
-        
+
         // Load driver from registry
         let driver = self.driver_registry.get(name)?;
-        
+
         // Initialize driver
         driver.initialize()?;
-        
+
         // Register driver
         self.loaded_drivers.insert(name.to_string(), driver);
-        
+
         Ok(())
     }
-    
+
     pub fn unload_driver(&mut self, name: &str) -> Result<(), DriverError> {
         // Check if loaded
         let driver = self.loaded_drivers.remove(name)
             .ok_or(DriverError::NotLoaded)?;
-        
+
         // Cleanup driver
         driver.cleanup()?;
-        
+
         Ok(())
     }
 }
@@ -315,16 +315,16 @@ impl DriverManager {
 pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
     // Verify bootloader signature
     verify_bootloader()?;
-    
+
     // Verify kernel signature
     verify_kernel()?;
-    
+
     // Verify initramfs signature
     verify_initramfs()?;
-    
+
     // Verify driver signatures
     verify_drivers()?;
-    
+
     Ok(())
 }
 ```

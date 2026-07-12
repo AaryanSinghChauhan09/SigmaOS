@@ -16,7 +16,7 @@ This document outlines the foundational components required to make SigmaOS comp
   - Leverage Linux driver ecosystem while maintaining SigmaOS kernel
   - Loadable kernel modules for GPU, Wi-Fi, printer, USB, audio
   - Compatibility layer for Linux syscalls
-  
+
 - **GPU Drivers**
   - NVIDIA (Nouveau + proprietary via LKM)
   - AMD (AMDGPU)

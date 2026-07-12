@@ -225,12 +225,12 @@ All drivers need to access PCI configuration space to probe for devices and read
 ```rust
 /// Read 8-bit value from PCI configuration space
 unsafe fn read_pci_config_u8(bus: U8, device: U8, function: U8, offset: U8) -> U8 {
-    let config_address = ((1u32 << 31) | 
-                          ((bus as u32) << 16) | 
-                          ((device as u32) << 11) | 
-                          ((function as u32) << 8) | 
+    let config_address = ((1u32 << 31) |
+                          ((bus as u32) << 16) |
+                          ((device as u32) << 11) |
+                          ((function as u32) << 8) |
                           ((offset as u32) & 0xFC)) as u32;
-    
+
     outl(0xCF8, config_address);
     let value = inl(0xCFC);
     let shift = ((offset & 3) as u32) * 8;
@@ -239,12 +239,12 @@ unsafe fn read_pci_config_u8(bus: U8, device: U8, function: U8, offset: U8) -> U
 
 /// Read 16-bit value from PCI configuration space
 unsafe fn read_pci_config_u16(bus: U8, device: U8, function: U8, offset: U8) -> U16 {
-    let config_address = ((1u32 << 31) | 
-                          ((bus as u32) << 16) | 
-                          ((device as u32) << 11) | 
-                          ((function as u32) << 8) | 
+    let config_address = ((1u32 << 31) |
+                          ((bus as u32) << 16) |
+                          ((device as u32) << 11) |
+                          ((function as u32) << 8) |
                           ((offset as u32) & 0xFC)) as u32;
-    
+
     outl(0xCF8, config_address);
     let value = inl(0xCFC);
     let shift = ((offset & 2) as u32) * 8;
@@ -253,12 +253,12 @@ unsafe fn read_pci_config_u16(bus: U8, device: U8, function: U8, offset: U8) -> 
 
 /// Read 32-bit value from PCI configuration space
 unsafe fn read_pci_config_u32(bus: U8, device: U8, function: U8, offset: U8) -> U32 {
-    let config_address = ((1u32 << 31) | 
-                          ((bus as u32) << 16) | 
-                          ((device as u32) << 11) | 
-                          ((function as u32) << 8) | 
+    let config_address = ((1u32 << 31) |
+                          ((bus as u32) << 16) |
+                          ((device as u32) << 11) |
+                          ((function as u32) << 8) |
                           ((offset as u32) & 0xFC)) as u32;
-    
+
     outl(0xCF8, config_address);
     inl(0xCFC)
 }
@@ -274,7 +274,7 @@ Drivers should implement a probe function to scan the PCI bus for supported devi
 #[no_mangle]
 pub unsafe extern "C" fn my_driver_probe() -> I32 {
     let mut found_devices = 0;
-    
+
     // Scan PCI buses 0-255
     for bus in 0..256u8 {
         // Scan devices 0-31
@@ -283,14 +283,14 @@ pub unsafe extern "C" fn my_driver_probe() -> I32 {
             for function in 0..8u8 {
                 let device_id = read_pci_config_u16(bus, device, function, 0x02);
                 let vendor_id = read_pci_config_u16(bus, device, function, 0x00);
-                
+
                 // Check if this is a supported device
                 if vendor_id == MY_VENDOR_ID && is_my_device(device_id) {
                     let bar0 = read_pci_config_u32(bus, device, function, 0x10);
                     let mmio_base = (bar0 & 0xFFFFFFF0) as U64;
-                    
+
                     let result = G_MY_DRIVER.init(mmio_base, device_id);
-                    
+
                     if result == DRIVER_OK {
                         found_devices += 1;
                         return DRIVER_OK;
@@ -299,7 +299,7 @@ pub unsafe extern "C" fn my_driver_probe() -> I32 {
             }
         }
     }
-    
+
     if found_devices > 0 {
         DRIVER_OK
     } else {

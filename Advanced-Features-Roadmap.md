@@ -1,8 +1,8 @@
 # SigmaOS Advanced Features Roadmap
 ## Based on Additional Linux Distribution Research
 
-**Version:** 2.0  
-**Date:** July 2026  
+**Version:** 2.0
+**Date:** July 2026
 **Status:** Draft
 
 ---
@@ -313,7 +313,7 @@ impl<T> Lazy<T> {
             init,
         }
     }
-    
+
     pub fn get(&self) -> &T {
         self.cell.get_or_init(|| (self.init)())
     }
@@ -627,6 +627,6 @@ pub struct CapabilityManager {
 
 ---
 
-**Document Version:** 2.0  
-**Last Updated:** July 2026  
+**Document Version:** 2.0
+**Last Updated:** July 2026
 **Next Review:** October 2026
