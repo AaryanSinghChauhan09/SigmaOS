@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SigmaOS Design System - Color System
 
-use serde::{Deserialize, Serialize};
 use super::Theme;
+use serde::{Deserialize, Serialize};
 
 /// Color palette
 #[derive(Debug, Clone, Serialize, Deserialize)]

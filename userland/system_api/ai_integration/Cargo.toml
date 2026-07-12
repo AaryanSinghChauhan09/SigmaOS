@@ -18,7 +18,7 @@ serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }
 
 # AI/ML dependencies (optional, for actual LLM integration)
-llama-cpp = { version = "0.1", optional = true }
+llama-cpp = { version = "0.1", optional = true, package = "llama_cpp" }
 candle-core = { version = "0.3", optional = true }
 
 [features]
