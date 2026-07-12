@@ -7,6 +7,8 @@ members = [
     "sigma-sh",
     "suites/S03_Orchestrator",
     "tools/sigma-cli-bin",
+    "tools/sigma-format",
+    "tools/sigma-lint",
     "userland/agent",
     "userland/coreutils",
     "userland/sigpkg",

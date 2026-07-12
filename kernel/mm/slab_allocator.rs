@@ -18,6 +18,10 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
+extern "C" {
+    fn sigma_buddy_alloc(order: SigmaU8) -> SigmaU64;
+}
+
 // ─── Constants ─────────────────────────────────────────────────────────────
 
 pub const SLAB_MIN_SIZE: usize = 8;
