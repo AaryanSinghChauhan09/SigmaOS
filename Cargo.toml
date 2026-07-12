@@ -3,12 +3,9 @@ resolver = "2"
 members = [
     "kabi",
     "kernel",
-    "meta/config",
     "sdk/driver",
     "sigma-sh",
     "suites/S03_Orchestrator",
-    "tools",
-    "tools/sigma-cli-bin",
     "userland/agent",
     "userland/coreutils",
     "userland/sigpkg",

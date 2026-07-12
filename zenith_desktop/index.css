@@ -1,0 +1,12 @@
+/* Accessibility high contrast media queries */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #000;
+  }
+}
+@media (forced-colors: active) {
+  /* High contrast mode styling */
+}
+.high-contrast {
+  border: 1px solid #fff;
+}

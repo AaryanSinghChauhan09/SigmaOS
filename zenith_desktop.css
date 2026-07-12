@@ -801,6 +801,19 @@ body.high-contrast-active .wizard-btn {
     border: 2px solid #ffffff !important;
     font-weight: 900 !important;
 }
+
+/* Accessibility focus indicators for keyboard navigation (WCAG 2.1 Level AA) */
+:focus-visible {
+    outline: 3px solid var(--accent-gold, #ffaa00) !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.2), 0 0 15px var(--accent-gold-glow, rgba(255, 170, 0, 0.4)) !important;
+}
+
+body.high-contrast-active :focus-visible {
+    outline: 4px solid #ffffff !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 0 8px #000000, 0 0 0 12px #ffffff !important;
+}
  
 .auto-style-1 { display:flex; justify-content:space-between; align-items:center; width:100%; }
 
