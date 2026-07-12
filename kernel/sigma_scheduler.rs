@@ -111,6 +111,44 @@ pub struct SchedulerConfig {
     pub sched_latency_ns: SigmaU32,
 }
 
+// ─── OOP Traits for Scheduler ─────────────────────────────────────────────────────
+
+/// SchedulingPolicy trait for different scheduling strategies
+pub trait SchedulingPolicy {
+    fn set_policy(&mut self, pid: SigmaU32, policy: SchedulerPolicy, priority: SigmaI32) -> SigmaI32;
+    fn get_policy(&self, pid: SigmaU32) -> Option<(SchedulerPolicy, SigmaI32)>;
+    fn get_policy_name(&self) -> &'static str;
+}
+
+/// CpuAffinity trait for CPU affinity management
+pub trait CpuAffinity {
+    fn set_affinity(&mut self, pid: SigmaU32, cpu_mask: SigmaU64) -> SigmaI32;
+    fn get_affinity(&self, pid: SigmaU32) -> Option<SigmaU64>;
+    fn get_cpu_count(&self) -> SigmaU32;
+}
+
+/// TaskManagement trait for task operations
+pub trait TaskManagement {
+    fn set_nice(&mut self, pid: SigmaU32, nice: SigmaI32) -> SigmaI32;
+    fn get_nice(&self, pid: SigmaU32) -> Option<SigmaI32>;
+    fn get_task_info(&self, pid: SigmaU32) -> Option<TaskInfo>;
+    fn get_stats(&self) -> SchedulerStats;
+}
+
+/// LoadBalancing trait for load balancing operations
+pub trait LoadBalancing {
+    fn enable_auto_balance(&mut self, enabled: SigmaBool);
+    fn is_auto_balance_enabled(&self) -> SigmaBool;
+    fn balance_load(&mut self) -> SigmaI32;
+}
+
+/// PowerManagement trait for power saving operations
+pub trait PowerManagement {
+    fn enable_power_saving(&mut self, enabled: SigmaBool);
+    fn is_power_saving_enabled(&self) -> SigmaBool;
+    fn get_power_state(&self) -> SigmaU32;
+}
+
 /// Scheduler
 #[repr(C)]
 pub struct SigmaScheduler {
@@ -121,6 +159,124 @@ pub struct SigmaScheduler {
     pub auto_balance: SigmaBool,
     pub power_saving: SigmaBool,
     pub initialized: SigmaBool,
+}
+
+// ─── Trait Implementations for SigmaScheduler ─────────────────────────────────────
+
+impl SchedulingPolicy for SigmaScheduler {
+    fn set_policy(&mut self, pid: SigmaU32, policy: SchedulerPolicy, priority: SigmaI32) -> SigmaI32 {
+        if !self.initialized {
+            return -1;
+        }
+        // In real implementation, set scheduler policy
+        0
+    }
+
+    fn get_policy(&self, pid: SigmaU32) -> Option<(SchedulerPolicy, SigmaI32)> {
+        if !self.initialized {
+            return None;
+        }
+        // In real implementation, get scheduler policy
+        Some((SchedulerPolicy::Normal, 0))
+    }
+
+    fn get_policy_name(&self) -> &'static str {
+        "SigmaScheduler"
+    }
+}
+
+impl CpuAffinity for SigmaScheduler {
+    fn set_affinity(&mut self, pid: SigmaU32, cpu_mask: SigmaU64) -> SigmaI32 {
+        if !self.initialized {
+            return -1;
+        }
+        // In real implementation, set CPU affinity
+        0
+    }
+
+    fn get_affinity(&self, pid: SigmaU32) -> Option<SigmaU64> {
+        if !self.initialized {
+            return None;
+        }
+        // In real implementation, get CPU affinity
+        Some(0xFFFFFFFFFFFFFFFF)
+    }
+
+    fn get_cpu_count(&self) -> SigmaU32 {
+        self.cpu_count
+    }
+}
+
+impl TaskManagement for SigmaScheduler {
+    fn set_nice(&mut self, pid: SigmaU32, nice: SigmaI32) -> SigmaI32 {
+        if !self.initialized {
+            return -1;
+        }
+        // In real implementation, set nice value
+        0
+    }
+
+    fn get_nice(&self, pid: SigmaU32) -> Option<SigmaI32> {
+        if !self.initialized {
+            return None;
+        }
+        // In real implementation, get nice value
+        Some(0)
+    }
+
+    fn get_task_info(&self, pid: SigmaU32) -> Option<TaskInfo> {
+        if !self.initialized {
+            return None;
+        }
+        // In real implementation, get task info
+        Some(TaskInfo {
+            pid,
+            tid: pid,
+            state: TaskState::Running,
+            policy: SchedulerPolicy::Normal,
+            priority: ProcessPriority::Normal,
+            nice: 0,
+            cpu_affinity: 0xFFFFFFFFFFFFFFFF,
+            cpu_time: 0,
+            runtime: 0,
+        })
+    }
+
+    fn get_stats(&self) -> SchedulerStats {
+        self.stats
+    }
+}
+
+impl LoadBalancing for SigmaScheduler {
+    fn enable_auto_balance(&mut self, enabled: SigmaBool) {
+        self.auto_balance = enabled;
+    }
+
+    fn is_auto_balance_enabled(&self) -> SigmaBool {
+        self.auto_balance
+    }
+
+    fn balance_load(&mut self) -> SigmaI32 {
+        if !self.initialized || !self.auto_balance {
+            return -1;
+        }
+        // In real implementation, balance load across CPUs
+        0
+    }
+}
+
+impl PowerManagement for SigmaScheduler {
+    fn enable_power_saving(&mut self, enabled: SigmaBool) {
+        self.power_saving = enabled;
+    }
+
+    fn is_power_saving_enabled(&self) -> SigmaBool {
+        self.power_saving
+    }
+
+    fn get_power_state(&self) -> SigmaU32 {
+        if self.power_saving { 1 } else { 0 }
+    }
 }
 
 static mut SCHEDULER: Option<SigmaScheduler> = None;
