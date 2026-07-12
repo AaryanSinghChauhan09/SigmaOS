@@ -1,6 +1,6 @@
-/// SigmaOS: userland/system_api/ai_integration/local_llm.rs
-/// Local LLM Inference Wrapper and Context Manager.
-/// no_std | no alloc | no external crates.
+// SigmaOS: userland/system_api/ai_integration/local_llm.rs
+// Local LLM Inference Wrapper and Context Manager.
+// no_std | no alloc | no external crates.
 
 #![no_std]
 #![allow(dead_code)]
@@ -117,4 +117,40 @@ pub unsafe extern "C" fn llm_execute_inference(
     core::ptr::copy_nonoverlapping(canned_response.as_ptr(), out_buf, len);
     
     len as SigmaI32
+}
+
+pub struct LocalLLM {
+    pub model_name: String,
+}
+
+impl LocalLLM {
+    pub fn new(model_name: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        Ok(Self {
+            model_name: model_name.to_string(),
+        })
+    }
+
+    pub fn generate(&self, parameters: &[String]) -> Result<crate::AIResponse, Box<dyn std::error::Error>> {
+        let prompt = if parameters.is_empty() {
+            "Default prompt"
+        } else {
+            &parameters[0]
+        };
+
+        let mut out_buf = [0u8; 256];
+        unsafe {
+            llm_execute_inference(prompt.as_ptr(), prompt.len() as u32, out_buf.as_mut_ptr(), out_buf.len() as u32);
+        }
+
+        let response_str = std::str::from_utf8(&out_buf)
+            .unwrap_or("Default response")
+            .trim_matches('\0')
+            .to_string();
+
+        Ok(crate::AIResponse {
+            message: response_str,
+            confidence: 0.9,
+            action: None,
+        })
+    }
 }

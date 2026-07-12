@@ -12,12 +12,12 @@ impl SystemControl {
     /// Create a new System Control
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
-            capabilities: Self::get_capabilities(),
+            capabilities: Self::get_default_capabilities(),
         })
     }
 
     /// Get available system control capabilities
-    fn get_capabilities() -> Vec<SystemCapability> {
+    fn get_default_capabilities() -> Vec<SystemCapability> {
         vec![
             SystemCapability {
                 name: "install_software".to_string(),

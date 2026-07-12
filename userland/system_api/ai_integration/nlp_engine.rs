@@ -183,7 +183,7 @@ mod tests {
     fn test_analyze_intent() {
         let engine = NLPEngine::new().unwrap();
         let intent = engine.analyze_intent("install cuda").unwrap();
-        assert!(matches!(intent.action_type, super::ActionType::SystemControl));
+        assert!(matches!(intent.action_type, crate::ActionType::SystemControl));
         assert!(intent.confidence > 0.5);
     }
 }

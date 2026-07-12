@@ -109,8 +109,8 @@ impl PrivacyManager {
 
     /// Set privacy level
     pub fn set_privacy_level(&mut self, level: super::PrivacyLevel) {
-        self.privacy_level = level;
         self.data_retention_policy = Self::default_retention_policy(&level);
+        self.privacy_level = level;
     }
 
     /// Get data retention policy
@@ -232,19 +232,19 @@ mod tests {
 
     #[test]
     fn test_privacy_manager_creation() {
-        let manager = PrivacyManager::new(super::PrivacyLevel::Standard);
+        let manager = PrivacyManager::new(crate::PrivacyLevel::Standard);
         assert!(manager.is_ok());
     }
 
     #[test]
     fn test_can_process() {
-        let manager = PrivacyManager::new(super::PrivacyLevel::Standard).unwrap();
+        let manager = PrivacyManager::new(crate::PrivacyLevel::Standard).unwrap();
         assert!(manager.can_process("hello").unwrap());
     }
 
     #[test]
     fn test_anonymize() {
-        let manager = PrivacyManager::new(super::PrivacyLevel::Standard).unwrap();
+        let manager = PrivacyManager::new(crate::PrivacyLevel::Standard).unwrap();
         let anonymized = manager.anonymize("my password is secret");
         assert!(anonymized.contains("password"));
     }
