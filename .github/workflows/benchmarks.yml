@@ -47,7 +47,7 @@ jobs:
         run: |
           for i in 1 2 3; do
             echo "--- Attempt $i ---"
-            cargo +nightly test --manifest-path tools/Cargo.toml 2>&1 || true
+            cargo +nightly test -p sigma-cli -p sigma-format -p sigma-lint 2>&1 || true
           done
 
   # Fuzzing (scheduled only)
