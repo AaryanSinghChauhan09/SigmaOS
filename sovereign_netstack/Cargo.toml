@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# No external dependencies - implementing from first principles
+blake3 = "1.5"
+# No other external dependencies - implementing from first principles
 
 [lib]
 name = "sovereign_netstack"

@@ -211,31 +211,23 @@ impl FirewallRule {
         dest_ip: &Option<IPAddress>,
         protocol: &Option<Protocol>,
     ) -> [u8; 32] {
-        // Placeholder for actual BLAKE3 hash
-        let mut hash = [0u8; 32];
+        use blake3::{hash, Hasher};
+        
+        let mut hasher = Hasher::new();
         
         if let Some(ip) = source_ip {
-            let ip_str = format!("{}", ip);
-            let bytes = ip_str.as_bytes();
-            for (i, &byte) in bytes.iter().enumerate() {
-                hash[i % 32] = hash[i % 32].wrapping_add(byte);
-            }
+            hasher.update(format!("{}", ip).as_bytes());
         }
         
         if let Some(ip) = dest_ip {
-            let ip_str = format!("{}", ip);
-            let bytes = ip_str.as_bytes();
-            for (i, &byte) in bytes.iter().enumerate() {
-                hash[(i + 16) % 32] = hash[(i + 16) % 32].wrapping_add(byte);
-            }
+            hasher.update(format!("{}", ip).as_bytes());
         }
         
         if let Some(proto) = protocol {
-            let proto_val = proto.as_u8();
-            hash[31] = hash[31].wrapping_add(proto_val);
+            hasher.update(&[proto.as_u8()]);
         }
         
-        hash
+        hasher.finalize().into()
     }
     
     pub fn matches(&self, socket: &Socket) -> bool {
