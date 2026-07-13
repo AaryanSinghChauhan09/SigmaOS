@@ -10,4 +10,4 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 path = "mod.rs"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
+# Zero external dependencies - all UI components implemented manually

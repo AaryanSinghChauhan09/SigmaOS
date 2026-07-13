@@ -10,24 +10,5 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 path = "mod.rs"
 
 [dependencies]
-# Native replacements for external crates:
-# - sigma_time: replaces chrono
-# - sigma_uuid: replaces uuid
-# - sigma_sysinfo: replaces sysinfo
-# - native_log: replaces log and env_logger
-# serde and serde_json kept for serialization (can be replaced later if needed)
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-
-# GPU monitoring (optional)
-nvml-wrapper = { version = "0.9", optional = true }
-amdgpu = { version = "1.0", optional = true }
-
-[features]
-default = []
-nvidia-gpu = ["nvml-wrapper"]
-amd-gpu = ["amdgpu"]
-all-gpu = ["nvidia-gpu", "amd-gpu"]
-
-[dev-dependencies]
-tokio = { version = "1.0", features = ["full"] }
+# Zero external dependencies - all functionality implemented manually
+# GPU monitoring will be implemented via direct hardware access

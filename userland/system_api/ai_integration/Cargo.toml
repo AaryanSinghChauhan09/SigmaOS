@@ -10,27 +10,5 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 path = "mod.rs"
 
 [dependencies]
-# Native replacements for external crates:
-# - native_http: replaces reqwest
-# - native_log: replaces log and env_logger
-# - sigma_time: replaces chrono
-# - sigma_uuid: replaces uuid
-# - sigma_regex: replaces regex
-# serde and serde_json kept for serialization (can be replaced later if needed)
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-
-# Async runtime (keep for now, consider native async)
-tokio = { version = "1.0", features = ["full"] }
-
-# AI/ML dependencies (optional, for actual LLM integration)
-llama_cpp = { version = "0.3", optional = true }
-candle-core = { version = "0.3", optional = true }
-
-[features]
-default = []
-local-llm = ["llama_cpp"]
-ml-inference = ["candle-core"]
-
-[dev-dependencies]
-tokio = { version = "1.0", features = ["full"] }
+# Zero external dependencies - all AI integration implemented manually
+# LLM integration will use direct GGUF loading

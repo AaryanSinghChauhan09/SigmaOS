@@ -2,7 +2,7 @@
 name = "sigma_pkg_registry"
 version = "0.1.0"
 edition = "2021"
+description = "SigmaOS Package Registry - recipe loader and parser"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-toml = "0.8"
+# Zero external dependencies - all parsing implemented manually

@@ -10,6 +10,9 @@ license = "MIT"
 name = "sigma-lint"
 path = "src/main.rs"
 
+[dependencies]
+# Zero external dependencies - all linting implemented manually
+
 [profile.release]
 opt-level = "z"
 lto = true

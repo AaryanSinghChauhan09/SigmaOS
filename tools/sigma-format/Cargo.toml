@@ -10,6 +10,9 @@ license = "MIT"
 name = "sigma-format"
 path = "src/main.rs"
 
+[dependencies]
+# Zero external dependencies - all formatting implemented manually
+
 [profile.release]
 opt-level = "z"
 lto = true

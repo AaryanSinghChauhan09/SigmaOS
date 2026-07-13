@@ -8,3 +8,6 @@ license     = "MIT"
 [[bin]]
 name = "sigma-coreutils"
 path = "src/main.rs"
+
+[dependencies]
+# Zero external dependencies - all utilities implemented manually
