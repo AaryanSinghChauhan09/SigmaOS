@@ -186,10 +186,12 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## 📚 Documentation
 
 - [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) — Full documentation
-- [Architecture](Architecture.md) — System design
-- [Roadmap](ROADMAP.md) — Development plan
-- [INSTALL.md](INSTALL.md) — Build instructions
-- [FAQ](FAQ.md) — Common questions
+- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
+- [Roadmap](Roadmap.md) — Development plan
+- [INSTALL.md](INSTALL.md) — Build instructions (coming soon)
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines (coming soon)
+- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy (coming soon)
+- [FAQ](FAQ.md) — Common questions (coming soon)
 
 ---
 

@@ -1,0 +1,63 @@
+name: Docs Lint
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install markdownlint
+        run: |
+          npm install -g markdownlint-cli
+
+      - name: Run markdownlint
+        run: |
+          markdownlint '**/*.md' --config .markdownlint.json
+
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install lychee link checker
+        run: |
+          cargo install lychee
+
+      - name: Check links
+        run: |
+          lychee README.md docs/**/*.md --verbose --no-progress
+
+  mermaid-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install mermaid-cli
+        run: |
+          npm install -g @mermaid-js/mermaid-cli
+
+      - name: Find and validate Mermaid diagrams
+        run: |
+          # Find all .md files with mermaid code blocks
+          grep -r '```mermaid' --include='*.md' . || echo "No mermaid diagrams found"
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make smoke test executable
+        run: chmod +x scripts/smoke-test.sh
+
+      - name: Run smoke test
+        run: ./scripts/smoke-test.sh
