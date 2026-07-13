@@ -26,11 +26,18 @@ extern "C" {
     fn vfs_write(fd: i32, buf: *const u8, count: usize) -> SigmaI64;
     fn vfs_open(pathname: *const u8, flags: i32, mode: u32) -> SigmaI64;
     fn vfs_close(fd: i32) -> SigmaI64;
+
+    // VMM abstractions
+    fn vmm_mmap(addr: u64, length: u64, prot: u64, flags: u64, fd: i32, offset: u64) -> SigmaI64;
+    fn vmm_munmap(addr: u64, length: u64) -> SigmaI64;
+    fn vmm_mprotect(addr: u64, length: u64, prot: u64) -> SigmaI64;
+    fn heap_brk(brk: u64) -> SigmaI64;
 }
 
 // Capability permissions based on capability.rs
 const CAP_READ: SigmaU64 = 1 << 0;
 const CAP_WRITE: SigmaU64 = 1 << 1;
+const CAP_MEMORY: SigmaU64 = 1 << 5;
 
 // ─── System Call Numbers ─────────────────────────────────────────────────────
 
@@ -309,15 +316,29 @@ impl SyscallDispatcher {
             return -1;
         }
         
-        // For now, return a dummy address
-        // TODO: Integrate with VMM
-        0x1000000
+        let token = current_thread_capability_token();
+        if !capability_check_permission(token, CAP_MEMORY) {
+            return -1; // EACCES
+        }
+        
+        vmm_mmap(addr, length, prot, flags, fd, offset)
     }
 
     unsafe fn sys_mprotect(&self, args: SyscallArgs) -> SigmaI64 {
-        // TODO: Implement mprotect syscall
-        let _ = args;
-        0
+        let addr = args.arg0;
+        let length = args.arg1;
+        let prot = args.arg2;
+
+        if length == 0 {
+            return -1;
+        }
+
+        let token = current_thread_capability_token();
+        if !capability_check_permission(token, CAP_MEMORY) {
+            return -1; // EACCES
+        }
+
+        vmm_mprotect(addr, length, prot)
     }
 
     unsafe fn sys_munmap(&self, args: SyscallArgs) -> SigmaI64 {
@@ -328,17 +349,23 @@ impl SyscallDispatcher {
             return -1;
         }
         
-        // For now, return success
-        // TODO: Integrate with VMM
-        0
+        let token = current_thread_capability_token();
+        if !capability_check_permission(token, CAP_MEMORY) {
+            return -1; // EACCES
+        }
+        
+        vmm_munmap(addr, length)
     }
 
     unsafe fn sys_brk(&self, args: SyscallArgs) -> SigmaI64 {
         let brk = args.arg0;
         
-        // For now, return the brk address
-        // TODO: Integrate with heap manager
-        brk as SigmaI64
+        let token = current_thread_capability_token();
+        if !capability_check_permission(token, CAP_MEMORY) {
+            return -1; // EACCES
+        }
+        
+        heap_brk(brk)
     }
 
     unsafe fn sys_madvise(&self, args: SyscallArgs) -> SigmaI64 {
