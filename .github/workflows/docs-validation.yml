@@ -1,0 +1,39 @@
+name: "Docs Validation"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "wiki_repo/**"
+      - "**.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "wiki_repo/**"
+      - "**.md"
+
+jobs:
+  docs-validation:
+    name: "Validate Docs, Links & Diagrams"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Linting Tools
+        run: npm install -g markdownlint-cli
+
+      - name: Lint Markdown Files
+        run: |
+          markdownlint --config .markdownlint.json "**/*.md" --ignore node_modules --ignore wiki_repo/node_modules || true
+
+      - name: Validate Links (markdown-link-check)
+        run: |
+          npm install -g markdown-link-check
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./wiki_repo/node_modules/*" -exec markdown-link-check {} \; || true
