@@ -1,0 +1,19 @@
+{
+  "profiles": [
+    {
+      "name": "virtio-net",
+      "qemu_args": "-device virtio-net-pci,netdev=net0 -netdev user,id=net0",
+      "target_drivers": ["linux-virtio-net"]
+    },
+    {
+      "name": "e1000",
+      "qemu_args": "-device e1000,netdev=net0 -netdev user,id=net0",
+      "target_drivers": ["linux-e1000", "linux-e1000e"]
+    },
+    {
+      "name": "nvme",
+      "qemu_args": "-drive file=dummy.img,if=none,id=drv0 -device nvme,drive=drv0,serial=1234",
+      "target_drivers": ["linux-nvme"]
+    }
+  ]
+}
