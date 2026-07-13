@@ -44,6 +44,8 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Pop!_OS** | Context-aware scheduler, hybrid graphics prime toggle | [Distro_Absorption_PopOS](Distro_Absorption_PopOS) |
 | **Manjaro** | Automated driver provisioning (MHWD), kernel manager | [Distro_Absorption_Manjaro](Distro_Absorption_Manjaro) |
 | **elementary OS** | Wayland HIG stylesheet enforcement, pay-what-you-can store | [Distro_Absorption_elementaryOS](Distro_Absorption_elementaryOS) |
+| **SteamOS** | Nested micro-compositor sessions (Gamescope), developer overlays | [Distro_Absorption_SteamOS](Distro_Absorption_SteamOS) |
+| **Solus** | Curated rolling release updates, testing channel automation | [Distro_Absorption_Solus](Distro_Absorption_Solus) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -75,6 +77,14 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **NGINX** | Asynchronous HTTP gateway, domain proxy rules | [OSS_Absorption_NGINX](OSS_Absorption_NGINX) |
 | **Redis** | In-memory key-value data bus, pub/sub IPC | [OSS_Absorption_Redis](OSS_Absorption_Redis) |
 | **Kafka** | Partitioned commit logs, consumer group streams | [OSS_Absorption_Kafka](OSS_Absorption_Kafka) |
+| **OpenSSL** | Assembly-optimized cryptcore, constant-time algorithms | [OSS_Absorption_OpenSSL](OSS_Absorption_OpenSSL) |
+| **PostgreSQL** | Write-Ahead Logging (WAL) state protection, MVCC concurrency | [OSS_Absorption_PostgreSQL](OSS_Absorption_PostgreSQL) |
+| **Docker** | OCI Image Layering cache, registry format compatibility | [OSS_Absorption_Docker](OSS_Absorption_Docker) |
+| **HAProxy** | Dynamic load balancer backends, non-blocking routing loops | [OSS_Absorption_HAProxy](OSS_Absorption_HAProxy) |
+| **RabbitMQ** | Message routing exchanges (direct/topic/fanout), IPC broker | [OSS_Absorption_RabbitMQ](OSS_Absorption_RabbitMQ) |
+| **Elasticsearch** | Inverted indices filesystem search, distributed sharding | [OSS_Absorption_Elasticsearch](OSS_Absorption_Elasticsearch) |
+| **Grafana** | Unified telemetry dashboard metrics visualization | [OSS_Absorption_Grafana](OSS_Absorption_Grafana) |
+| **Ceph** | CRUSH algorithm deterministic hashing, software storage | [OSS_Absorption_Ceph](OSS_Absorption_Ceph) |
 
 ## 🚀 Total Singularity
 
