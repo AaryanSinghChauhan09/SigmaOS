@@ -56,6 +56,9 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Alpine Linux** | Sub-5MB container base image, APK atomic installs, PIE hardening | [Distro_Absorption_Alpine](Distro_Absorption_Alpine) |
 | **Tails** | Amnesic RAM-only boot, forced Tor routing, anti-forensic shutdown | [Distro_Absorption_Tails](Distro_Absorption_Tails) |
 | **Qubes OS** | Capability-enforced compartments, disposable VMs, secure clipboard | [Distro_Absorption_Qubes](Distro_Absorption_Qubes) |
+| **Chrome OS** | Verified boot chain (dm-verity), stateless rootfs, containerized apps | [Distro_Absorption_ChromeOS](Distro_Absorption_ChromeOS) |
+| **Kali Linux** | sigma-sec-audit tooling bundle, forensics read-only mount mode | [Distro_Absorption_Kali](Distro_Absorption_Kali) |
+| **Clear Linux** | Hardware-optimized profiles, AVX-512 dispatch, stateless bundles | [Distro_Absorption_ClearLinux](Distro_Absorption_ClearLinux) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -110,6 +113,10 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Consul** | Service catalog with health checks, KV config store, intention ACLs | [OSS_Absorption_Consul](OSS_Absorption_Consul) |
 | **etcd** | Raft consensus engine, watch/notify API, lease-based ephemeral keys | [OSS_Absorption_etcd](OSS_Absorption_etcd) |
 | **Jaeger** | Distributed tracing with trace propagation, adaptive sampling | [OSS_Absorption_Jaeger](OSS_Absorption_Jaeger) |
+| **OpenZFS** | RAIDZ storage pools, instant snapshots, self-healing BLAKE3 checksums | [OSS_Absorption_OpenZFS](OSS_Absorption_OpenZFS) |
+| **LLVM/Clang** | Sanitizer suite, LTO+PGO production builds, lld deterministic linking | [OSS_Absorption_LLVM](OSS_Absorption_LLVM) |
+| **Istio** | mTLS-by-default service mesh, traffic shifting, canary deployments | [OSS_Absorption_Istio](OSS_Absorption_Istio) |
+| **FoundationDB** | Multi-key ACID distributed transactions, transactional watch API | [OSS_Absorption_FoundationDB](OSS_Absorption_FoundationDB) |
 
 ## 🚀 Total Singularity
 
