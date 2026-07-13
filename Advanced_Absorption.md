@@ -49,6 +49,12 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Podman** | Daemonless containers, rootless, OCI runtime | [OSS_Absorption_Podman](OSS_Absorption_Podman) |
 | **WireGuard** | Kernel VPN, mesh networking, PQC key exchange | [OSS_Absorption_WireGuard](OSS_Absorption_WireGuard) |
 | **Btrfs/ZFS** | CoW snapshots, checksumming, RAIDZ, compression | [OSS_Absorption_Btrfs_ZFS](OSS_Absorption_Btrfs_ZFS) |
+| **seL4** | Formally verified microkernel, capability security | [OSS_Absorption_seL4](OSS_Absorption_seL4) |
+| **Coreboot/UEFI** | Millisecond initialization, cryptographically secure boot | [OSS_Absorption_Coreboot](OSS_Absorption_Coreboot) |
+| **QEMU/KVM/Firecracker** | Full hardware emulation, microVMs, hardware virtualization | [OSS_Absorption_QEMU_KVM](OSS_Absorption_QEMU_KVM) |
+| **SerenityOS** | Cohesive GUI toolkit, Ladybird browser integration | [OSS_Absorption_SerenityOS](OSS_Absorption_SerenityOS) |
+| **RedoxOS** | Scheme-based IPC routing, userspace driver architecture | [OSS_Absorption_RedoxOS](OSS_Absorption_RedoxOS) |
+| **ReactOS/Wine** | Win32 API compatibility, DirectX to Vulkan translation | [OSS_Absorption_ReactOS](OSS_Absorption_ReactOS) |
 
 ## 🚀 Total Singularity
 
