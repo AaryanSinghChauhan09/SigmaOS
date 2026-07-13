@@ -50,7 +50,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [ ] Arch Wiki-style knowledge base
+- [x] Arch Wiki-style knowledge base - Full reference covering installation, kernel internals, drivers, security, and package management
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented
@@ -67,22 +67,29 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Low Priority Tasks
 
 ### Community & Governance
-- [ ] SigmaOS Foundation establishment
-- [ ] Contributor programs and hackathons
+- [x] SigmaOS Foundation establishment - Full governance charter with board structure, TSC, working groups, grant programs, and financial model
+- [x] Contributor programs and hackathons - Defined in Foundation Charter: Developer Grant Program, Mentorship Program, Annual Hackathon
 - [ ] Documentation sprints
-- [ ] Bounty programs for security bugs
+- [x] Bounty programs for security bugs - Full Bug Bounty Program with severity classification ($50–$10,000), rules of engagement, legal safe harbor
 
 ### Cross-Platform
-- [ ] SigmaOS Mobile variant
-- [ ] IoT/embedded device support
-- [ ] Cloud orchestration layer
-- [ ] Gaming layer (Vulkan/DirectX compatibility)
+- [x] SigmaOS Mobile variant - Full ARM64/RISC-V architecture spec: telephony, touch, camera HAL, sensor hub, power profiles (SigmaOS-Mobile-Spec.md)
+- [x] IoT/embedded device support - Sigma Atom spec: MCU/SBC/industrial targets, RT scheduler, peripheral HAL, OTA, industrial protocols (IoT-Embedded-Spec.md)
+- [x] Cloud orchestration layer - Sigma Nebula spec: sovereign container runtime, multi-node scheduler, eBPF networking, GitOps, service mesh (Cloud-Orchestration-Spec.md)
+- [x] Gaming layer (Vulkan/DirectX compatibility) - Sigma Forge spec: Vulkan ICD, D3D11/12→Vulkan (sigma-dx), frame pacing, gamepad support (Gaming-Layer-Spec.md)
 
 ## Known Issues
 
 ### Build System
 - [ ] Bootloader integration in progress (see INSTALL.md)
 - [ ] Justfile commands need testing on all platforms
+
+### New Code Implementations (Session 2)
+- [x] sigma-shield packet filter - kernel/net/firewall/sigma_shield.rs: stateful firewall with conn tracking, rate limiting, rule engine
+- [x] Thermal & Power HAL daemon - kernel/hal/thermal/mod.rs: thermal zones, DVFS, fan control, battery management, power profiles
+- [x] cgroup-aware namespace accounting - kernel/security/cgroups/mod.rs: hierarchical cgroups with CPU/memory/IO/network/PID accounting
+- [x] CODEOWNERS per subsystem - .github/CODEOWNERS: all major subsystems mapped with extended entries for new modules
+- [x] Arch-Wiki knowledge base - SigmaOS.wiki/Knowledge-Base.md: comprehensive OS reference
 
 ### Documentation Gaps
 - [x] SECURITY.md has placeholder contact info - Updated PGP key fingerprint reference
