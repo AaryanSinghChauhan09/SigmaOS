@@ -6,6 +6,12 @@ mod io;
 mod fs;
 mod panic;
 mod log;
+pub mod linux_compat;
+pub mod compat {
+    pub mod wine {
+        pub mod vsock;
+    }
+}
 
 // Phase G kernel components - using stub implementations for build
 // TODO: Integrate actual implementations from kernel/scheduler, kernel/mm, kernel/hal, kernel/syscalls
