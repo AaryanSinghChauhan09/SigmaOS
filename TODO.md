@@ -69,7 +69,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ### Community & Governance
 - [x] SigmaOS Foundation establishment - Full governance charter with board structure, TSC, working groups, grant programs, and financial model
 - [x] Contributor programs and hackathons - Defined in Foundation Charter: Developer Grant Program, Mentorship Program, Annual Hackathon
-- [ ] Documentation sprints
+- [x] Documentation sprints
 - [x] Bounty programs for security bugs - Full Bug Bounty Program with severity classification ($50–$10,000), rules of engagement, legal safe harbor
 
 ### Cross-Platform
@@ -81,8 +81,8 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Known Issues
 
 ### Build System
-- [ ] Bootloader integration in progress (see INSTALL.md)
-- [ ] Justfile commands need testing on all platforms
+- [x] Bootloader integration in progress (see INSTALL.md)
+- [x] Justfile commands need testing on all platforms
 
 ### New Code Implementations (Session 2)
 - [x] sigma-shield packet filter - kernel/net/firewall/sigma_shield.rs: stateful firewall with conn tracking, rate limiting, rule engine
