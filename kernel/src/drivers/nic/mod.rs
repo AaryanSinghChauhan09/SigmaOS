@@ -1,7 +1,7 @@
 /// Scaffold for Network Interface Controller (NIC) subsystem
 /// This defines the standard abstraction for all networking hardware in SigmaOS.
 
-use super::{Driver, DeviceClass};
+use super::Driver;
 
 pub trait NetworkInterface: Driver {
     /// Send a packet over the network interface.
