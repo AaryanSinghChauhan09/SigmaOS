@@ -39,6 +39,11 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Tails** | Amnesic live profile, transparent Tor routing | [Distro_Absorption_Tails](Distro_Absorption_Tails) |
 | **Kali Linux** | Offensive profile, mac80211 injection, undercover mode | [Distro_Absorption_Kali](Distro_Absorption_Kali) |
 | **Slackware** | Upstream purity, text-based fallback config | [Distro_Absorption_Slackware](Distro_Absorption_Slackware) |
+| **RHEL** | Live kernel patching, enterprise kABI stability | [Distro_Absorption_RHEL](Distro_Absorption_RHEL) |
+| **Linux Mint** | Tiered safety updates, Pre-flight snapshots | [Distro_Absorption_LinuxMint](Distro_Absorption_LinuxMint) |
+| **Pop!_OS** | Context-aware scheduler, hybrid graphics prime toggle | [Distro_Absorption_PopOS](Distro_Absorption_PopOS) |
+| **Manjaro** | Automated driver provisioning (MHWD), kernel manager | [Distro_Absorption_Manjaro](Distro_Absorption_Manjaro) |
+| **elementary OS** | Wayland HIG stylesheet enforcement, pay-what-you-can store | [Distro_Absorption_elementaryOS](Distro_Absorption_elementaryOS) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -65,6 +70,11 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Open vSwitch** | Virtual switching, programmatic network flows | [OSS_Absorption_Open_vSwitch](OSS_Absorption_Open_vSwitch) |
 | **cURL/QUIC** | Universal transfer API, HTTP/3 QUIC integration | [OSS_Absorption_cURL](OSS_Absorption_cURL) |
 | **gVisor/Firejail** | Userspace syscall interception, isolation profiles | [OSS_Absorption_gVisor](OSS_Absorption_gVisor) |
+| **Kubernetes** | Node clustering, declarative workload reconciliation | [OSS_Absorption_Kubernetes](OSS_Absorption_Kubernetes) |
+| **Prometheus** | Metric exposition format, alert daemon integration | [OSS_Absorption_Prometheus](OSS_Absorption_Prometheus) |
+| **NGINX** | Asynchronous HTTP gateway, domain proxy rules | [OSS_Absorption_NGINX](OSS_Absorption_NGINX) |
+| **Redis** | In-memory key-value data bus, pub/sub IPC | [OSS_Absorption_Redis](OSS_Absorption_Redis) |
+| **Kafka** | Partitioned commit logs, consumer group streams | [OSS_Absorption_Kafka](OSS_Absorption_Kafka) |
 
 ## 🚀 Total Singularity
 
