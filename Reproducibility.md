@@ -1,75 +1,45 @@
-# Declarative Reproducibility Specification (NixOS Parity)
+# Deterministic Reproducibility
 
-This specification outlines the declarative system model, immutable file structures, and content-addressed package store (`sigpkg`) that ensure reproducible builds and configurations across all SigmaOS installations.
+> **Status**: ACTIVE | **Component**: `sigpkg` & `sigma-sdk`
 
----
-
-## ❄️ Declarative System Configuration (`sigma.toml`)
-
-All system states, cgroups, network interfaces, and installed packages are declared in `/etc/sigma.toml`. Booting the system parses this configuration and builds the transient environment in memory.
-
-```toml
-# /etc/sigma.toml
-[system]
-hostname = "sovereign-node"
-profile = "desktop"
-kernel_channel = "stable"
-
-[packages]
-installed = [
-    "zenith-desktop-core",
-    "sigma-shell",
-    "sigma-browser"
-]
-
-[network]
-interfaces.eth0 = { dhcp = true }
-firewall.ingress_policy = "drop"
-```
+SigmaOS guarantees that every system binary and Sovereign Shard is **100% bit-for-bit reproducible**. This eliminates "trusting the builder" and ensures that malicious code cannot be injected during the compilation pipeline without detection.
 
 ---
 
-## 📦 Content-Addressed Store (`sigpkg`)
+## 1. Deterministic Build Architecture
 
-`sigpkg` uses a content-addressed storage (CAS) model for all package versions, preventing dependency conflicts or state corruption. Packages are identified by the SHA-256 hash of their contents.
+To achieve absolute reproducibility, the `sigma-sdk` build pipeline controls all sources of non-determinism:
 
+*   **Compiler Sandboxing**: Builds occur within a pristine Sovereign Sandbox. Host environment variables (e.g., `USER`, `HOME`) are stripped.
+*   **Normalized Timestamps**: All file modification times (`mtime`) in the build output are set to the `SOURCE_DATE_EPOCH` (typically the timestamp of the git commit).
+*   **Path Stripping**: Absolute paths are stripped from debug symbols and panic handlers using `-Z remap-cwd-prefix` (Rust) and `-fdebug-prefix-map` (C/C++).
+*   **Seeded RNG**: The compiler's random number generators (used for symbol generation) are seeded deterministically based on the package hash.
+
+## 2. The Sovereign Finality Certificate
+
+When a package is published to the `sigma-recipes` repository, it is accompanied by a **Sovereign Finality Certificate (SFC)**. 
+
+The SFC contains:
+1. The BLAKE3 hash of the source code.
+2. The exact compiler version and environment parameters.
+3. The expected BLAKE3 hash of the final `.spkg` binary.
+4. A Dilithium5 post-quantum cryptographic signature.
+
+## 3. Verification by `sigpkg`
+
+When a user runs `sigpkg install <shard>`, the package manager performs the following checks:
+
+1. Downloads the `.spkg` and the SFC.
+2. Validates the Dilithium5 signature on the SFC.
+3. Computes the BLAKE3 hash of the downloaded `.spkg`.
+4. Asserts that the computed hash matches the expected hash in the SFC **exactly**.
+
+If the hashes mismatch by even a single bit, the installation is aborted, and an anomaly is logged to the forensic audit ring.
+
+## 4. Local Rebuild Verification
+
+Any user can independently verify a package by running:
+```bash
+sigma-sdk verify --rebuild <package-name>
 ```
-/sigma/store/
-├── hash-package-name-version/
-│   ├── bin/
-│   ├── lib/
-│   └── share/
-```
-
-When a package is installed, it is placed into a hash-specific folder in `/sigma/store`. Symbolic links are then created in `/usr/bin` or `/usr/lib` pointing to the exact content-addressed files.
-
----
-
-## 🔄 Immutable A/B Upgrades & OSTree-Style Rollbacks
-
-The boot partition is set as **Read-Only** during normal execution. System updates are written to a secondary partition, which is verified before swapping the boot pointer.
-
-```
-                    [Active System Partition (A) - Read-Only]
-                                       │
-                      Update triggered via sigpkg
-                                       │
-                                       ▼
-                 [Write update to Standby Partition (B)]
-                                       │
-                                       ▼
-                  [Validate PQC signature on boot image]
-                                       │
-                                       ▼
-                  [Configure bootloader to boot from B]
-                   /                               \
-                  /                                 \
-             (Success)                            (Failure)
-                /                                     \
-               ▼                                       ▼
-[Commit B as new Active]                [Auto-rollback to Partition A]
-```
-
-### Self-Healing & Automatic Recovery
-
-If the kernel fails to boot or a critical service crashes within 60 seconds of a system update, the bootloader automatically reverts the boot pointer to the previous working partition (Partition A), ensuring a 100% recovery rate from corrupted updates.
+This command downloads the source, recompiles it locally in a sandbox, and proves that the resulting binary hash matches the upstream SFC.
