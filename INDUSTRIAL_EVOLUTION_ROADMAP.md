@@ -28,11 +28,11 @@ Qubes:     "Security-first"     → SigmaOS: Security AND usable
 
 | Source Distro | Feature Absorbed | SigmaOS Shard | Status |
 |---|---|---|---|
-| Ubuntu | APT-compatible package layer | `SovereignAPT.shard` | ✅ Done |
-| Arch Linux | AUR-style community recipes | `SigmaRecipes.shard` | ✅ Done |
-| NixOS | Atomic reproducible builds | `SovereignAtomicUpdater.shard` | ✅ Done |
-| Debian | Policy compliance engine | `DebianParity.shard` | ✅ Done |
-| Fedora | RPM-spec absorption pipeline | `RPMAbsorber.shard` | ✅ Done |
+| Ubuntu | APT-compatible package layer | [SovereignAPT.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_Ubuntu.md) | ✅ Done |
+| Arch Linux | AUR-style community recipes | [SigmaRecipes.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_Arch.md) | ✅ Done |
+| NixOS | Atomic reproducible builds | [SovereignAtomicUpdater.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_NixOS.md) | ✅ Done |
+| Debian | Policy compliance engine | [DebianParity.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_Debian.md) | ✅ Done |
+| Fedora | RPM-spec absorption pipeline | [RPMAbsorber.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_Fedora.md) | ✅ Done |
 
 ### 1.2 Security Supremacy
 
