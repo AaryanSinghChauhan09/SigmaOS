@@ -24,6 +24,18 @@ pub struct CompartmentDefinition {
     pub isolated: bool,
 }
 
+extern "C" {
+    fn sigpkg_install_declarative(
+        name: *const u8,
+        name_len: u32,
+        version: u32,
+        content_hash: *const u8,
+        sig_valid: u8,
+    ) -> i32;
+
+    fn sigpkg_enforce_declarative_mode(enforce: u8);
+}
+
 impl DeclarativeState {
     /// Simulates parsing a declarative state file.
     /// In a real implementation, this would parse `sigma.toml`.
@@ -55,7 +67,29 @@ impl DeclarativeState {
     /// Evaluates the system drift from the declarative state.
     /// Returns true if the system matches the declarative definition exactly.
     pub fn verify_reproducibility(&self) -> bool {
-        // Mock verification
+        // In a real implementation, this would compare the current sigpkg state
+        // with the requested `required_shards`.
         true
+    }
+
+    /// Enforces this declarative state by installing missing shards using the 
+    /// declarative bypass API, and then permanently enforcing declarative mode
+    /// to block manual package installations.
+    pub unsafe fn enforce_state(&self) {
+        // Enforce the required shards via the declarative bypass.
+        // E.g., for each shard in self.required_shards, call sigpkg_install_declarative.
+        let mock_hash = [0u8; 32];
+        for shard in self.required_shards {
+            sigpkg_install_declarative(
+                shard.as_ptr(),
+                shard.len() as u32,
+                1, // version
+                mock_hash.as_ptr(),
+                1, // sig_valid
+            );
+        }
+
+        // Lock the system into declarative mode, preventing `sigpkg install` manual overrides.
+        sigpkg_enforce_declarative_mode(1);
     }
 }

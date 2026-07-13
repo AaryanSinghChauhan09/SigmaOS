@@ -70,6 +70,8 @@ pub struct SigPkgManager {
     in_transaction: bool,
     tx_backup: [SigPkgRecord; MAX_PACKAGES],
     tx_count_backup: U32,
+    // Declarative State Enforcement (NixOS Parity)
+    declarative_mode_enforced: bool,
 }
 
 impl SigPkgManager {
@@ -81,6 +83,7 @@ impl SigPkgManager {
             in_transaction: false,
             tx_backup:   [SigPkgRecord::empty(); MAX_PACKAGES],
             tx_count_backup: 0,
+            declarative_mode_enforced: false,
         }
     }
 
@@ -108,7 +111,7 @@ impl SigPkgManager {
 
     // ── Core Operations ────────────────────────────────────────────────────
 
-    /// Register a new package into the sovereign registry.
+    /// Register a new package into the sovereign registry (Manual).
     pub fn install(
         &mut self,
         name:         &[u8],
@@ -118,6 +121,8 @@ impl SigPkgManager {
     ) -> SigmaStatus {
         if !self.initialized       { return SIGMA_ERROR; }
         if self.count as usize >= MAX_PACKAGES { return SIGMA_ERROR; }
+        // NixOS Parity: Block manual state mutations if declarative mode is enforced
+        if self.declarative_mode_enforced { return SIGMA_ERROR; }
 
         let name_hash = Self::fnv1a_hash(name);
         let slot = self.count as usize;
@@ -135,6 +140,22 @@ impl SigPkgManager {
 
         self.count += 1;
         SIGMA_OK
+    }
+
+    /// Register a new package into the sovereign registry (Declarative Override).
+    /// Bypasses the manual declarative mode check.
+    pub fn install_declarative(
+        &mut self,
+        name:         &[u8],
+        version:      U32,
+        content_hash: &[u8; HASH_LEN],
+        sig_valid:    bool,
+    ) -> SigmaStatus {
+        let was_enforced = self.declarative_mode_enforced;
+        self.declarative_mode_enforced = false;
+        let status = self.install(name, version, content_hash, sig_valid);
+        self.declarative_mode_enforced = was_enforced;
+        status
     }
 
     /// Remove a package by name hash.
@@ -205,6 +226,8 @@ impl SigPkgManager {
     /// Update a package to a new version
     pub fn update(&mut self, name: &[u8], new_version: U32) -> SigmaStatus {
         if !self.initialized { return SIGMA_ERROR; }
+        // NixOS Parity: Block manual state mutations if declarative mode is enforced
+        if self.declarative_mode_enforced { return SIGMA_ERROR; }
         let name_hash = Self::fnv1a_hash(name);
         let mut i = 0;
         while i < self.count as usize {
@@ -280,6 +303,11 @@ static mut G_PKG_MGR: SigPkgManager = SigPkgManager::new();
 // ── C-ABI Exports (Replacing SovereignPkgManager.cpp / sigma_pkg.c) ────────
 
 #[no_mangle]
+pub unsafe extern "C" fn sigpkg_enforce_declarative_mode(enforce: u8) {
+    G_PKG_MGR.declarative_mode_enforced = enforce != 0;
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn sigpkg_init() -> SigmaStatus {
     G_PKG_MGR.init()
 }
@@ -295,6 +323,19 @@ pub unsafe extern "C" fn sigpkg_install(
     let name_slice = core::slice::from_raw_parts(name, name_len as usize);
     let hash_arr   = &*(content_hash as *const [u8; HASH_LEN]);
     G_PKG_MGR.install(name_slice, version, hash_arr, sig_valid != 0)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_install_declarative(
+    name:         *const u8,
+    name_len:     U32,
+    version:      U32,
+    content_hash: *const u8,
+    sig_valid:    u8,
+) -> SigmaStatus {
+    let name_slice = core::slice::from_raw_parts(name, name_len as usize);
+    let hash_arr   = &*(content_hash as *const [u8; HASH_LEN]);
+    G_PKG_MGR.install_declarative(name_slice, version, hash_arr, sig_valid != 0)
 }
 
 #[no_mangle]

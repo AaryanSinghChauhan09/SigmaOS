@@ -6,6 +6,16 @@
 type SigmaU32 = u32;
 type SigmaU64 = u64;
 
+/// Represents an OCI (Open Container Initiative) container specification.
+/// Used to run Docker/Podman containers natively within SigmaOS Compartments.
+pub struct OciSpec {
+    pub image_name: &'static str,
+    pub entrypoint: &'static str,
+    pub requires_network: bool,
+    pub requires_storage: bool,
+    pub required_capabilities: SigmaU64,
+}
+
 /// A strict execution compartment, analogous to a QubesOS "Qube" or a lightweight VM sandbox.
 /// SigmaOS compartments rely on Ring 1/Ring 3 paging separation + Capability tokens.
 pub struct Compartment {
@@ -33,6 +43,20 @@ impl Compartment {
             network_isolated: true,
             storage_isolated: true,
             capability_token: 0, // Uninitialized token
+        }
+    }
+
+    /// Dynamically configures a Compartment based on an OCI container specification.
+    /// This allows native execution of Linux containers within SigmaOS strict sandboxes.
+    pub const fn from_oci_spec(id: SigmaU32, spec: &OciSpec, base_addr: SigmaU64, limit_addr: SigmaU64) -> Self {
+        Self {
+            id,
+            name: spec.image_name,
+            base_addr,
+            limit_addr,
+            network_isolated: !spec.requires_network,
+            storage_isolated: !spec.requires_storage,
+            capability_token: spec.required_capabilities,
         }
     }
 

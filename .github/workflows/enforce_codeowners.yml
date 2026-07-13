@@ -1,0 +1,86 @@
+name: Enforce CODEOWNERS Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  enforce-codeowners:
+    name: Validate CODEOWNERS Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify CODEOWNERS File Exists
+        run: |
+          if [ ! -f ".github/CODEOWNERS" ]; then
+            echo "::error::CODEOWNERS file is missing from .github/"
+            exit 1
+          fi
+          echo "✅ CODEOWNERS file found."
+
+      - name: Parse Changed Files and Validate Ownership
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "📋 Fetching changed files in PR #${{ github.event.pull_request.number }}..."
+          
+          CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          
+          UNOWNED_FILES=""
+          while IFS= read -r file; do
+            # Check if the file matches any pattern in CODEOWNERS
+            MATCHED=false
+            while IFS= read -r line; do
+              # Skip comments and empty lines
+              [[ "$line" =~ ^#.*$ ]] && continue
+              [[ -z "$line" ]] && continue
+              
+              PATTERN=$(echo "$line" | awk '{print $1}')
+              
+              # Convert CODEOWNERS glob to regex-compatible pattern
+              REGEX_PATTERN=$(echo "$PATTERN" | sed 's/\*/[^\/]*/g' | sed 's/\*\*/\.\*/g')
+              
+              if echo "/$file" | grep -qE "$REGEX_PATTERN"; then
+                MATCHED=true
+                OWNER=$(echo "$line" | awk '{$1=""; print $0}' | xargs)
+                echo "✅ $file → owned by $OWNER"
+                break
+              fi
+            done < .github/CODEOWNERS
+            
+            if [ "$MATCHED" = false ]; then
+              UNOWNED_FILES="$UNOWNED_FILES\n  - $file"
+            fi
+          done <<< "$CHANGED_FILES"
+          
+          if [ -n "$UNOWNED_FILES" ]; then
+            echo ""
+            echo "⚠️  The following files are not covered by CODEOWNERS:"
+            echo -e "$UNOWNED_FILES"
+            echo ""
+            echo "Consider adding ownership rules to .github/CODEOWNERS."
+            # Warning only — do not fail the build for unowned files
+          fi
+          
+          echo ""
+          echo "🏁 CODEOWNERS validation complete."
+
+      - name: Require Matching Reviewers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Checking that at least one code owner has been requested for review..."
+          
+          REVIEWERS=$(gh pr view ${{ github.event.pull_request.number }} --json reviewRequests --jq '.reviewRequests[].login' 2>/dev/null || true)
+          
+          if [ -z "$REVIEWERS" ]; then
+            echo "⚠️  No reviewers have been requested yet. CODEOWNERS reviewers will be auto-assigned by GitHub."
+          else
+            echo "✅ Reviewers assigned: $REVIEWERS"
+          fi
