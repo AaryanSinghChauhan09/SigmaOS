@@ -1,0 +1,15 @@
+[package]
+name = "sigma_storage"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sigma_storage"
+path = "src/lib.rs"
+
+[[bin]]
+name = "storage_driver"
+path = "src/bin/storage_driver.rs"
