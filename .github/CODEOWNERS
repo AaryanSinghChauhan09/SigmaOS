@@ -60,6 +60,18 @@ kernel/core/sigma_unveil.rs @AaryanSinghChauhan09
 net/tcp/              @AaryanSinghChauhan09
 net/udp/              @AaryanSinghChauhan09
 net/dhcp/             @AaryanSinghChauhan09
+/kernel/net/firewall/ @AaryanSinghChauhan09
+/kernel/net/vpn/      @AaryanSinghChauhan09
+/kernel/net/dns/      @AaryanSinghChauhan09
+
+# Thermal & Power HAL (HAL Lead)
+/kernel/hal/          @AaryanSinghChauhan09
+/kernel/hal/thermal/  @AaryanSinghChauhan09
+/hal/                 @AaryanSinghChauhan09
+
+# cgroup Namespace Accounting (Security/Kernel Lead)
+/kernel/security/cgroups/ @AaryanSinghChauhan09
+
 
 # Package Manager & Build (Packaging Lead)
 /sigma-pkg/           @AaryanSinghChauhan09
