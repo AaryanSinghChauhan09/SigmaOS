@@ -34,6 +34,11 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Gentoo** | Portage, USE flags, native compilation | [Distro_Absorption_Gentoo](Distro_Absorption_Gentoo) |
 | **Void Linux** | runit, XBPS, musl variant | [Distro_Absorption_Void](Distro_Absorption_Void) |
 | **Clear Linux** | Auto-Spec FMV, stateless design, swupd | [Distro_Absorption_ClearLinux](Distro_Absorption_ClearLinux) |
+| **ChromeOS** | A/B partitioning, verified boot, powerwash | [Distro_Absorption_ChromeOS](Distro_Absorption_ChromeOS) |
+| **Qubes OS** | Hardware-isolated compartments, secure peripherals | [Distro_Absorption_QubesOS](Distro_Absorption_QubesOS) |
+| **Tails** | Amnesic live profile, transparent Tor routing | [Distro_Absorption_Tails](Distro_Absorption_Tails) |
+| **Kali Linux** | Offensive profile, mac80211 injection, undercover mode | [Distro_Absorption_Kali](Distro_Absorption_Kali) |
+| **Slackware** | Upstream purity, text-based fallback config | [Distro_Absorption_Slackware](Distro_Absorption_Slackware) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -55,6 +60,11 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **SerenityOS** | Cohesive GUI toolkit, Ladybird browser integration | [OSS_Absorption_SerenityOS](OSS_Absorption_SerenityOS) |
 | **RedoxOS** | Scheme-based IPC routing, userspace driver architecture | [OSS_Absorption_RedoxOS](OSS_Absorption_RedoxOS) |
 | **ReactOS/Wine** | Win32 API compatibility, DirectX to Vulkan translation | [OSS_Absorption_ReactOS](OSS_Absorption_ReactOS) |
+| **SQLite** | Universal metadata storage, ACID configuration | [OSS_Absorption_SQLite](OSS_Absorption_SQLite) |
+| **Wasmtime** | Sandboxed plugins, WASI runtime | [OSS_Absorption_Wasmtime](OSS_Absorption_Wasmtime) |
+| **Open vSwitch** | Virtual switching, programmatic network flows | [OSS_Absorption_Open_vSwitch](OSS_Absorption_Open_vSwitch) |
+| **cURL/QUIC** | Universal transfer API, HTTP/3 QUIC integration | [OSS_Absorption_cURL](OSS_Absorption_cURL) |
+| **gVisor/Firejail** | Userspace syscall interception, isolation profiles | [OSS_Absorption_gVisor](OSS_Absorption_gVisor) |
 
 ## 🚀 Total Singularity
 
