@@ -1,0 +1,15 @@
+[package]
+name = "sovereign_netstack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sovereign_netstack"
+path = "src/lib.rs"
+
+[[bin]]
+name = "netstack"
+path = "src/bin/netstack.rs"
