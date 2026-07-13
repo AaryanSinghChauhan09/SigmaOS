@@ -9,6 +9,8 @@ description = "Core kernel for SigmaOS"
 name = "sigma-kernel"
 path = "src/main.rs"
 
+[dependencies]
+
 [profile.dev]
 panic = "abort" # Disable unwinding on panic
 opt-level = 1   # Some optimization even in dev
@@ -21,3 +23,7 @@ lto = true      # Link-time optimization
 codegen-units = 1 # Single codegen unit
 strip = true    # Strip symbols
 overflow-checks = false # Disable for performance
+
+# Build for bare metal x86_64
+[build]
+target = "x86_64-unknown-none"

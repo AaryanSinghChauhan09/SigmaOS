@@ -5,9 +5,6 @@ pub mod traits;
 #[path = "../../drivers/framebuffer.rs"]
 pub mod framebuffer;
 
-#[path = "../../drivers/framebuffer.rs"]
-pub mod framebuffer;
-
 // Re-export the improved OOP traits
 pub use traits::*;
 
