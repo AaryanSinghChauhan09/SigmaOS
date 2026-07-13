@@ -84,7 +84,7 @@ impl DockerManager {
                             bollard::container::PortMap::Tcp(vec![bollard::container::PortBinding {
                                 host_ip: Some("0.0.0.0".to_string()),
                                 host_port: Some(parts.get(1).unwrap_or(&"80").to_string()),
-                            })])
+                            }])
                         }).collect()),
                         ..Default::default()
                     },

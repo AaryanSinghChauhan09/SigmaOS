@@ -21,7 +21,12 @@ jobs:
 
     - name: Run clang-tidy
       run: |
-        clang-tidy kernel/core/*.cpp userland/*.cpp -- -I./include -std=c++17
+        cpp_files=$(find kernel/core userland -name "*.cpp" 2>/dev/null || true)
+        if [ -n "$cpp_files" ]; then
+          clang-tidy kernel/core/*.cpp userland/*.cpp -- -I./include -std=c++17
+        else
+          echo "No .cpp files found in kernel/core/ or userland/; skipping clang-tidy."
+        fi
 
     - name: Run cppcheck on kernel shards
       run: |

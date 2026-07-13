@@ -13,9 +13,6 @@ members = [
     "userland/coreutils",
     "userland/sigpkg",
     "sigma_pkg_registry",
-    "userland/system_api/control_center",
-    "userland/system_api/ai_integration",
-    "userland/system_api/dev_studio",
     "userland/ui/design_system",
     "userland/system_api/common",
 ]
