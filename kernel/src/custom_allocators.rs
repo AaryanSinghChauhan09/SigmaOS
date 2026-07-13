@@ -72,7 +72,7 @@ pub struct PoolAllocator<T, const N: usize> {
 impl<T, const N: usize> PoolAllocator<T, N> {
     pub const fn new() -> Self {
         Self {
-            pool: [None; N],
+            pool: [const { None }; N],
             free_list: [true; N],
         }
     }
@@ -115,6 +115,8 @@ pub struct BumpAllocator {
     current: AtomicUsize,
     end: *mut u8,
 }
+
+unsafe impl Sync for BumpAllocator {}
 
 unsafe impl GlobalAlloc for BumpAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {

@@ -96,6 +96,32 @@ else
 fi
 echo ""
 
+# Test 8: Check kernel build (if kernel directory exists)
+echo "8. Checking kernel build..."
+if [ -d "kernel" ]; then
+    if command -v cargo &> /dev/null; then
+        cd kernel && cargo check --target x86_64-unknown-none 2>/dev/null && cd .. && report_test 0 "Kernel build check passed" || report_test 1 "Kernel build check failed"
+    else
+        report_test 1 "Cargo not found for kernel check"
+    fi
+else
+    report_test 1 "kernel directory missing"
+fi
+echo ""
+
+# Test 9: Check sigpkg build (if userland/sigpkg directory exists)
+echo "9. Checking sigpkg build..."
+if [ -d "userland/sigpkg" ]; then
+    if command -v cargo &> /dev/null; then
+        cd userland/sigpkg && cargo check 2>/dev/null && cd ../.. && report_test 0 "sigpkg build check passed" || report_test 1 "sigpkg build check failed"
+    else
+        report_test 1 "Cargo not found for sigpkg check"
+    fi
+else
+    report_test 1 "userland/sigpkg directory missing"
+fi
+echo ""
+
 # Summary
 echo "====================="
 echo "Smoke Test Summary"

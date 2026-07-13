@@ -1,7 +1,7 @@
 /// Scaffold for Bus subsystem (e.g., PCI, USB)
 /// In the Linux equivalent, this handles device discovery and bus enumeration.
 
-use super::{Driver, BusType};
+use super::BusType;
 
 pub mod pci;
 

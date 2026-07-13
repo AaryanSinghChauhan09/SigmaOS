@@ -18,4 +18,9 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
+/// Per-shard telemetry collection (CPU, IPC, memory, page faults)
 pub mod shard;
+
+/// The Sovereign Profiler — high-frequency metrics aggregation and broadcast.
+/// Provides lock-free per-shard metrics at 10Hz via /sigma/metrics shared memory.
+pub mod sovereign_profiler;

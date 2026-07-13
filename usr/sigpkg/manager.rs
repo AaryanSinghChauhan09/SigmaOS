@@ -36,6 +36,9 @@ pub struct SigPkgRecord {
     installed:   bool,
     sig_valid:   bool,
     content_hash: [u8; HASH_LEN],
+    // Rollback / Version History state
+    previous_version: U32,
+    previous_content_hash: [u8; HASH_LEN],
 }
 
 impl SigPkgRecord {
@@ -46,6 +49,8 @@ impl SigPkgRecord {
             installed:    false,
             sig_valid:    false,
             content_hash: [0u8; HASH_LEN],
+            previous_version: 0,
+            previous_content_hash: [0u8; HASH_LEN],
         }
     }
 
@@ -61,6 +66,12 @@ pub struct SigPkgManager {
     packages:  [SigPkgRecord; MAX_PACKAGES],
     count:     U32,
     initialized: bool,
+    // Transactional state for rollbacks
+    in_transaction: bool,
+    tx_backup: [SigPkgRecord; MAX_PACKAGES],
+    tx_count_backup: U32,
+    // Declarative State Enforcement (NixOS Parity)
+    declarative_mode_enforced: bool,
 }
 
 impl SigPkgManager {
@@ -69,6 +80,10 @@ impl SigPkgManager {
             packages:    [SigPkgRecord::empty(); MAX_PACKAGES],
             count:       0,
             initialized: false,
+            in_transaction: false,
+            tx_backup:   [SigPkgRecord::empty(); MAX_PACKAGES],
+            tx_count_backup: 0,
+            declarative_mode_enforced: false,
         }
     }
 
@@ -96,7 +111,7 @@ impl SigPkgManager {
 
     // ── Core Operations ────────────────────────────────────────────────────
 
-    /// Register a new package into the sovereign registry.
+    /// Register a new package into the sovereign registry (Manual).
     pub fn install(
         &mut self,
         name:         &[u8],
@@ -106,6 +121,8 @@ impl SigPkgManager {
     ) -> SigmaStatus {
         if !self.initialized       { return SIGMA_ERROR; }
         if self.count as usize >= MAX_PACKAGES { return SIGMA_ERROR; }
+        // NixOS Parity: Block manual state mutations if declarative mode is enforced
+        if self.declarative_mode_enforced { return SIGMA_ERROR; }
 
         let name_hash = Self::fnv1a_hash(name);
         let slot = self.count as usize;
@@ -123,6 +140,22 @@ impl SigPkgManager {
 
         self.count += 1;
         SIGMA_OK
+    }
+
+    /// Register a new package into the sovereign registry (Declarative Override).
+    /// Bypasses the manual declarative mode check.
+    pub fn install_declarative(
+        &mut self,
+        name:         &[u8],
+        version:      U32,
+        content_hash: &[u8; HASH_LEN],
+        sig_valid:    bool,
+    ) -> SigmaStatus {
+        let was_enforced = self.declarative_mode_enforced;
+        self.declarative_mode_enforced = false;
+        let status = self.install(name, version, content_hash, sig_valid);
+        self.declarative_mode_enforced = was_enforced;
+        status
     }
 
     /// Remove a package by name hash.
@@ -193,10 +226,20 @@ impl SigPkgManager {
     /// Update a package to a new version
     pub fn update(&mut self, name: &[u8], new_version: U32) -> SigmaStatus {
         if !self.initialized { return SIGMA_ERROR; }
+        // NixOS Parity: Block manual state mutations if declarative mode is enforced
+        if self.declarative_mode_enforced { return SIGMA_ERROR; }
         let name_hash = Self::fnv1a_hash(name);
         let mut i = 0;
         while i < self.count as usize {
             if self.packages[i].name_hash == name_hash {
+                // Save version history for potential rollback
+                self.packages[i].previous_version = self.packages[i].version;
+                let mut j = 0;
+                while j < HASH_LEN {
+                    self.packages[i].previous_content_hash[j] = self.packages[i].content_hash[j];
+                    j += 1;
+                }
+                
                 self.packages[i].version = new_version;
                 return SIGMA_OK;
             }
@@ -204,12 +247,65 @@ impl SigPkgManager {
         }
         SIGMA_ERROR
     }
+
+    // ── Transactions ───────────────────────────────────────────────────────
+
+    /// Begin a new package transaction
+    pub fn transaction_begin(&mut self) -> SigmaStatus {
+        if !self.initialized || self.in_transaction { return SIGMA_ERROR; }
+        
+        // Backup current state
+        self.tx_count_backup = self.count;
+        let mut i = 0;
+        while i < self.count as usize {
+            self.tx_backup[i] = self.packages[i];
+            i += 1;
+        }
+        
+        self.in_transaction = true;
+        SIGMA_OK
+    }
+
+    /// Commit the current transaction
+    pub fn transaction_commit(&mut self) -> SigmaStatus {
+        if !self.in_transaction { return SIGMA_ERROR; }
+        
+        self.in_transaction = false;
+        // The current state in self.packages is kept
+        SIGMA_OK
+    }
+
+    /// Rollback the transaction to the state before transaction_begin
+    pub fn transaction_rollback(&mut self) -> SigmaStatus {
+        if !self.in_transaction { return SIGMA_ERROR; }
+        
+        // Restore backup state
+        self.count = self.tx_count_backup;
+        let mut i = 0;
+        while i < self.count as usize {
+            self.packages[i] = self.tx_backup[i];
+            i += 1;
+        }
+        // Zero out any newly installed packages during the transaction
+        while i < MAX_PACKAGES {
+            self.packages[i] = SigPkgRecord::empty();
+            i += 1;
+        }
+        
+        self.in_transaction = false;
+        SIGMA_OK
+    }
 }
 
 // ── Global Singleton ───────────────────────────────────────────────────────
 static mut G_PKG_MGR: SigPkgManager = SigPkgManager::new();
 
 // ── C-ABI Exports (Replacing SovereignPkgManager.cpp / sigma_pkg.c) ────────
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_enforce_declarative_mode(enforce: u8) {
+    G_PKG_MGR.declarative_mode_enforced = enforce != 0;
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn sigpkg_init() -> SigmaStatus {
@@ -227,6 +323,19 @@ pub unsafe extern "C" fn sigpkg_install(
     let name_slice = core::slice::from_raw_parts(name, name_len as usize);
     let hash_arr   = &*(content_hash as *const [u8; HASH_LEN]);
     G_PKG_MGR.install(name_slice, version, hash_arr, sig_valid != 0)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_install_declarative(
+    name:         *const u8,
+    name_len:     U32,
+    version:      U32,
+    content_hash: *const u8,
+    sig_valid:    u8,
+) -> SigmaStatus {
+    let name_slice = core::slice::from_raw_parts(name, name_len as usize);
+    let hash_arr   = &*(content_hash as *const [u8; HASH_LEN]);
+    G_PKG_MGR.install_declarative(name_slice, version, hash_arr, sig_valid != 0)
 }
 
 #[no_mangle]
@@ -262,4 +371,19 @@ pub unsafe extern "C" fn sigpkg_search(pattern: *const u8, pattern_len: U32) -> 
 pub unsafe extern "C" fn sigpkg_update(name: *const u8, name_len: U32, new_version: U32) -> SigmaStatus {
     let name_slice = core::slice::from_raw_parts(name, name_len as usize);
     G_PKG_MGR.update(name_slice, new_version)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_transaction_begin() -> SigmaStatus {
+    G_PKG_MGR.transaction_begin()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_transaction_commit() -> SigmaStatus {
+    G_PKG_MGR.transaction_commit()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_transaction_rollback() -> SigmaStatus {
+    G_PKG_MGR.transaction_rollback()
 }

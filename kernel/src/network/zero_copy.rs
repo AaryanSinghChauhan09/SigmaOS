@@ -7,6 +7,11 @@
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use alloc::vec;
+use alloc::alloc::{alloc, dealloc};
+
 /// Zero-copy network buffer
 /// Shared between network layers without copying
 pub struct ZeroCopyBuffer {
@@ -19,7 +24,7 @@ pub struct ZeroCopyBuffer {
 impl ZeroCopyBuffer {
     pub fn new(capacity: usize) -> Option<Self> {
         let layout = core::alloc::Layout::from_size_align(capacity, 1).ok()?;
-        let data = unsafe { core::alloc::alloc(layout) };
+        let data = unsafe { alloc(layout) };
         
         if data.is_null() {
             return None;
@@ -87,7 +92,7 @@ impl Drop for ZeroCopyBuffer {
         if self.ref_count.fetch_sub(1, Ordering::Release) == 1 {
             unsafe {
                 let layout = core::alloc::Layout::from_size_align(self.capacity, 1).unwrap();
-                core::alloc::dealloc(self.data.as_ptr(), layout);
+                dealloc(self.data.as_ptr(), layout);
             }
         }
     }

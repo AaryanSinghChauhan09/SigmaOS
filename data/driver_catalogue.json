@@ -1,0 +1,1244 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-07-09T00:00:00Z",
+  "source": "seed",
+  "drivers": [
+    {
+      "id": "linux-e1000",
+      "display_name": "Intel PRO/1000 (e1000)",
+      "description": "Intel PRO/1000 Gigabit Ethernet driver. One of the most widely-used NIC drivers, supporting Intel 82540/82541/82542/82543/82544/82545/82546/82547 controllers.",
+      "category": "network",
+      "status": "active",
+      "compat_status": "native",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x100E"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x100F"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1010"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1011"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1012"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1019"
+        }
+      ],
+      "min_kernel": "2.4.0",
+      "kernel_path": "drivers/net/ethernet/intel/e1000",
+      "vendor": "Intel",
+      "chipset_family": "Intel 82540EM",
+      "sigma_module": "sigma-e1000",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "intel",
+        "gigabit",
+        "pci"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "Intel Wired Networking <e1000-devel@lists.sourceforge.net>"
+    },
+    {
+      "id": "linux-e1000e",
+      "display_name": "Intel PRO/1000 PCI-Express (e1000e)",
+      "description": "Intel PRO/1000 PCIe Ethernet driver for 82563/82566/82567/82571/82572/82573/82574/82583 and ICH8-ICH10/PCH controllers.",
+      "category": "network",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x105E"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x10A4"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x10BD"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x10C0"
+        }
+      ],
+      "min_kernel": "2.6.24",
+      "kernel_path": "drivers/net/ethernet/intel/e1000e",
+      "vendor": "Intel",
+      "chipset_family": "Intel 82571/82572/ICH",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "intel",
+        "pcie"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "Intel Wired Networking"
+    },
+    {
+      "id": "linux-r8169",
+      "display_name": "Realtek RTL8169/RTL8168/RTL8101/RTL8125",
+      "description": "Realtek Gigabit/2.5G Ethernet driver. Supports RTL8169, RTL8168, RTL8101E, RTL8125 families. Found on most consumer motherboards.",
+      "category": "network",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x10EC",
+          "device": "0x8168"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10EC",
+          "device": "0x8169"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10EC",
+          "device": "0x8136"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10EC",
+          "device": "0x8125"
+        }
+      ],
+      "min_kernel": "2.4.0",
+      "kernel_path": "drivers/net/ethernet/realtek",
+      "vendor": "Realtek",
+      "chipset_family": "RTL8111/RTL8168",
+      "dependencies": [
+        {
+          "name": "rtl_nic/rtl8168h-2.fw",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": false
+        }
+      ],
+      "tags": [
+        "network",
+        "ethernet",
+        "realtek",
+        "gigabit",
+        "2.5gbe"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "Heiner Kallweit <hkallweit1@gmail.com>"
+    },
+    {
+      "id": "linux-igb",
+      "display_name": "Intel I210/I211/I350/82575/82576 (igb)",
+      "description": "Intel Gigabit Ethernet driver for server-class NICs. Supports 82575/82576/82580/I210/I211/I350/I354 controllers with SR-IOV.",
+      "category": "network",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1521"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1533"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x1536"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x150E"
+        }
+      ],
+      "min_kernel": "2.6.24",
+      "kernel_path": "drivers/net/ethernet/intel/igb",
+      "vendor": "Intel",
+      "chipset_family": "Intel I210/I350",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "intel",
+        "server",
+        "sriov"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "Intel Wired Networking"
+    },
+    {
+      "id": "linux-iwlwifi",
+      "display_name": "Intel Wi-Fi 6/6E/7 (iwlwifi)",
+      "description": "Intel Wireless driver supporting Wi-Fi 6 (AX200/AX201), Wi-Fi 6E (AX210/AX211), and Wi-Fi 7 (BE200). Requires firmware blobs.",
+      "category": "wireless",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x2723"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x2725"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x272B"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x7A70"
+        }
+      ],
+      "min_kernel": "3.2.0",
+      "kernel_path": "drivers/net/wireless/intel/iwlwifi",
+      "vendor": "Intel",
+      "chipset_family": "Intel AX200/AX210/BE200",
+      "dependencies": [
+        {
+          "name": "iwlwifi-ty-a0-gf-a0-89.ucode",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": true
+        },
+        {
+          "name": "iwlwifi-so-a0-hr-b0-83.ucode",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": true
+        }
+      ],
+      "tags": [
+        "wireless",
+        "wifi",
+        "intel",
+        "wifi6",
+        "wifi6e",
+        "wifi7",
+        "ax200",
+        "ax210"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "Intel Linux Wireless <linuxwifi@intel.com>"
+    },
+    {
+      "id": "linux-ath9k",
+      "display_name": "Qualcomm Atheros AR9xxx (ath9k)",
+      "description": "Open-source Atheros Wi-Fi driver for AR9220/AR9280/AR9285/AR9287/AR9380/AR9462/AR9485/AR9565. Fully open — no firmware blob required.",
+      "category": "wireless",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x168C",
+          "device": "0x0029"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x168C",
+          "device": "0x002A"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x168C",
+          "device": "0x002B"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x168C",
+          "device": "0x0030"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x168C",
+          "device": "0x0032"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x168C",
+          "device": "0x0036"
+        }
+      ],
+      "min_kernel": "2.6.27",
+      "kernel_path": "drivers/net/wireless/ath/ath9k",
+      "vendor": "Qualcomm Atheros",
+      "chipset_family": "AR9285/AR9462",
+      "dependencies": [],
+      "tags": [
+        "wireless",
+        "wifi",
+        "atheros",
+        "qualcomm",
+        "open-source",
+        "no-firmware"
+      ],
+      "license": "ISC",
+      "maintainer": "ath9k-devel@qca.qualcomm.com"
+    },
+    {
+      "id": "linux-ath11k",
+      "display_name": "Qualcomm Wi-Fi 6/6E (ath11k)",
+      "description": "Qualcomm Wi-Fi 6 driver for QCA6390/WCN6855/QCN9074/IPQ8074. Supports Wi-Fi 6E tri-band operation.",
+      "category": "wireless",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x17CB",
+          "device": "0x1103"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x17CB",
+          "device": "0x1101"
+        }
+      ],
+      "min_kernel": "5.6.0",
+      "kernel_path": "drivers/net/wireless/ath/ath11k",
+      "vendor": "Qualcomm",
+      "chipset_family": "QCA6390/WCN6855",
+      "dependencies": [
+        {
+          "name": "ath11k/WCN6855/hw2.1/",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": true
+        }
+      ],
+      "tags": [
+        "wireless",
+        "wifi",
+        "qualcomm",
+        "wifi6",
+        "wifi6e"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "ath11k@lists.infradead.org"
+    },
+    {
+      "id": "linux-mt76",
+      "display_name": "MediaTek MT76xx Wi-Fi (mt76)",
+      "description": "MediaTek Wi-Fi driver for MT7610/MT7612/MT7615/MT7622/MT7663/MT7915/MT7921/MT7922/MT7925. Budget and mid-range Wi-Fi 6/6E.",
+      "category": "wireless",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x14C3",
+          "device": "0x7961"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x14C3",
+          "device": "0x7922"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x14C3",
+          "device": "0x7925"
+        },
+        {
+          "bus": "usb",
+          "vendor": "0x0E8D",
+          "product": "0x7961"
+        }
+      ],
+      "min_kernel": "4.18.0",
+      "kernel_path": "drivers/net/wireless/mediatek/mt76",
+      "vendor": "MediaTek",
+      "chipset_family": "MT7921/MT7922",
+      "dependencies": [
+        {
+          "name": "mediatek/WIFI_MT7961_patch_mcu_1_2_hdr.bin",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": true
+        }
+      ],
+      "tags": [
+        "wireless",
+        "wifi",
+        "mediatek",
+        "wifi6",
+        "budget"
+      ],
+      "license": "ISC",
+      "maintainer": "Felix Fietkau <nbd@nbd.name>"
+    },
+    {
+      "id": "linux-nvme",
+      "display_name": "NVM Express (nvme)",
+      "description": "NVMe SSD driver. Supports all NVMe 1.x/2.x compliant drives via PCI Express. High-performance direct-to-hardware I/O.",
+      "category": "storage",
+      "status": "active",
+      "compat_status": "native",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0xF1A8",
+          "class": "0x010802"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x144D",
+          "device": "0xA808",
+          "class": "0x010802"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x144D",
+          "device": "0xA809",
+          "class": "0x010802"
+        }
+      ],
+      "min_kernel": "3.3.0",
+      "kernel_path": "drivers/nvme/host",
+      "vendor": "NVM Express Consortium",
+      "chipset_family": "NVMe generic",
+      "sigma_module": "sigma-nvme",
+      "dependencies": [],
+      "tags": [
+        "storage",
+        "nvme",
+        "ssd",
+        "pcie",
+        "high-performance"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "Keith Busch <kbusch@kernel.org>"
+    },
+    {
+      "id": "linux-ahci",
+      "display_name": "AHCI SATA Controller (ahci)",
+      "description": "Advanced Host Controller Interface driver for SATA. Supports hot-plug, NCQ, port multiplier. Standard for all modern SATA controllers.",
+      "category": "storage",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x2922"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0xA352"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0x4390"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0x4391"
+        }
+      ],
+      "min_kernel": "2.6.19",
+      "kernel_path": "drivers/ata",
+      "vendor": "Generic",
+      "chipset_family": "AHCI",
+      "dependencies": [],
+      "tags": [
+        "storage",
+        "sata",
+        "ahci",
+        "hdd",
+        "ssd"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "linux-ide@vger.kernel.org"
+    },
+    {
+      "id": "linux-i915",
+      "display_name": "Intel HD/UHD/Iris/Arc Graphics (i915)",
+      "description": "Intel integrated and discrete GPU driver. Supports Gen4 through Gen12+ (Haswell, Skylake, Tiger Lake, Alder Lake, Arc). KMS, GEM, GuC/HuC firmware.",
+      "category": "gpu",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x9A49"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x4680"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x46A6"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x5690"
+        }
+      ],
+      "min_kernel": "2.6.28",
+      "kernel_path": "drivers/gpu/drm/i915",
+      "vendor": "Intel",
+      "chipset_family": "Intel Gen9-Gen13",
+      "dependencies": [
+        {
+          "name": "i915/tgl_guc_70.bin",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": false
+        },
+        {
+          "name": "i915/tgl_huc.bin",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": false
+        }
+      ],
+      "tags": [
+        "gpu",
+        "graphics",
+        "intel",
+        "kms",
+        "vulkan",
+        "opengl"
+      ],
+      "license": "GPL-2.0-only AND MIT",
+      "maintainer": "Intel Graphics <intel-gfx@lists.freedesktop.org>"
+    },
+    {
+      "id": "linux-amdgpu",
+      "display_name": "AMD Radeon Graphics (amdgpu)",
+      "description": "AMD GPU driver for Radeon RX 400+ (Polaris, Vega, RDNA 1/2/3). Open-source kernel driver with Mesa userspace. Supports Vulkan, OpenGL, compute.",
+      "category": "gpu",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0x67DF"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0x731F"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0x73BF"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0x744C"
+        }
+      ],
+      "min_kernel": "4.2.0",
+      "kernel_path": "drivers/gpu/drm/amd/amdgpu",
+      "vendor": "AMD",
+      "chipset_family": "Radeon RX 400-7000",
+      "dependencies": [
+        {
+          "name": "amdgpu/navi10_gpu_info.bin",
+          "kind": "firmware",
+          "source": "linux-firmware",
+          "required": true
+        }
+      ],
+      "tags": [
+        "gpu",
+        "graphics",
+        "amd",
+        "radeon",
+        "vulkan",
+        "mesa",
+        "compute"
+      ],
+      "license": "GPL-2.0-only AND MIT",
+      "maintainer": "amd-gfx@lists.freedesktop.org"
+    },
+    {
+      "id": "linux-nouveau",
+      "display_name": "NVIDIA Open GPU (nouveau)",
+      "description": "Community open-source NVIDIA GPU driver. Supports GeForce 6 through Turing (limited). No firmware needed for pre-Maxwell. Limited reclocking.",
+      "category": "gpu",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x10DE",
+          "device": "0x1B80"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10DE",
+          "device": "0x1E04"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10DE",
+          "device": "0x2204"
+        }
+      ],
+      "min_kernel": "2.6.33",
+      "kernel_path": "drivers/gpu/drm/nouveau",
+      "vendor": "NVIDIA (Community)",
+      "chipset_family": "GeForce GTX/RTX",
+      "dependencies": [],
+      "tags": [
+        "gpu",
+        "graphics",
+        "nvidia",
+        "nouveau",
+        "open-source"
+      ],
+      "license": "GPL-2.0-only AND MIT",
+      "maintainer": "nouveau@lists.freedesktop.org"
+    },
+    {
+      "id": "linux-snd-hda-intel",
+      "display_name": "Intel HD Audio (snd-hda-intel)",
+      "description": "Intel High Definition Audio controller driver. Standard audio on all modern Intel and AMD motherboards. Supports HDA codecs: Realtek, Conexant, IDT, Cirrus Logic.",
+      "category": "audio",
+      "status": "active",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0xA0C8"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x43C8"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1002",
+          "device": "0xAB38"
+        }
+      ],
+      "min_kernel": "2.6.13",
+      "kernel_path": "sound/pci/hda",
+      "vendor": "Intel/Generic",
+      "chipset_family": "HDA Controller",
+      "dependencies": [],
+      "tags": [
+        "audio",
+        "sound",
+        "hda",
+        "intel",
+        "realtek"
+      ],
+      "license": "GPL-2.0-or-later",
+      "maintainer": "alsa-devel@alsa-project.org"
+    },
+    {
+      "id": "linux-xhci-hcd",
+      "display_name": "USB 3.x Host Controller (xhci-hcd)",
+      "description": "eXtensible Host Controller Interface driver for USB 3.0/3.1/3.2 controllers. Universal driver for all USB 3.x ports.",
+      "category": "usb",
+      "status": "active",
+      "compat_status": "native",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0xA36D",
+          "class": "0x0C0330"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x8086",
+          "device": "0x43ED",
+          "class": "0x0C0330"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1022",
+          "device": "0x149C",
+          "class": "0x0C0330"
+        }
+      ],
+      "min_kernel": "2.6.31",
+      "kernel_path": "drivers/usb/host",
+      "vendor": "USB-IF",
+      "chipset_family": "xHCI generic",
+      "sigma_module": "sigma-xhci",
+      "dependencies": [],
+      "tags": [
+        "usb",
+        "usb3",
+        "xhci",
+        "host-controller"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "linux-usb@vger.kernel.org"
+    },
+    {
+      "id": "linux-virtio-net",
+      "display_name": "VirtIO Network Device (virtio-net)",
+      "description": "Paravirtualized network driver for KVM/QEMU virtual machines. High-performance with vhost acceleration.",
+      "category": "virtio",
+      "status": "active",
+      "compat_status": "native",
+      "hardware_ids": [
+        {
+          "bus": "virtio",
+          "device_id": 1,
+          "vendor_id": 6900
+        }
+      ],
+      "min_kernel": "2.6.25",
+      "kernel_path": "drivers/net/virtio_net.c",
+      "vendor": "Red Hat",
+      "chipset_family": "VirtIO",
+      "sigma_module": "sigma-virtio-net",
+      "dependencies": [],
+      "tags": [
+        "virtio",
+        "network",
+        "kvm",
+        "qemu",
+        "virtual"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "virtualization@lists.linux.dev"
+    },
+    {
+      "id": "linux-virtio-blk",
+      "display_name": "VirtIO Block Device (virtio-blk)",
+      "description": "Paravirtualized block device driver for KVM/QEMU. Provides high-performance virtual disk I/O.",
+      "category": "virtio",
+      "status": "active",
+      "compat_status": "native",
+      "hardware_ids": [
+        {
+          "bus": "virtio",
+          "device_id": 2,
+          "vendor_id": 6900
+        }
+      ],
+      "min_kernel": "2.6.25",
+      "kernel_path": "drivers/block/virtio_blk.c",
+      "vendor": "Red Hat",
+      "chipset_family": "VirtIO",
+      "sigma_module": "sigma-virtio-blk",
+      "dependencies": [],
+      "tags": [
+        "virtio",
+        "storage",
+        "block",
+        "kvm",
+        "qemu",
+        "virtual"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "virtualization@lists.linux.dev"
+    },
+    {
+      "id": "linux-3c59x",
+      "display_name": "3Com Vortex/Boomerang (3c59x)",
+      "description": "3Com EtherLink PCI III/XL, Hurricane, Tornado series. Legacy but still widely used in older systems and QEMU emulation.",
+      "category": "network",
+      "status": "deprecated",
+      "compat_status": "shimmed",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x10B7",
+          "device": "0x5900"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10B7",
+          "device": "0x5950"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10B7",
+          "device": "0x5951"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10B7",
+          "device": "0x9200"
+        }
+      ],
+      "min_kernel": "2.0.0",
+      "kernel_path": "drivers/net/ethernet/3com/3c59x.c",
+      "vendor": "3Com",
+      "chipset_family": "3Com Vortex 3c905",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "3com",
+        "legacy",
+        "vortex",
+        "qemu"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-tulip",
+      "display_name": "DEC Tulip (tulip)",
+      "description": "Digital Equipment Corporation / Intel 21140/21142/21143 Ethernet driver. Classic 100Mbit NIC, extremely popular in the 1990s.",
+      "category": "network",
+      "status": "deprecated",
+      "compat_status": "shimmed",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x1011",
+          "device": "0x0009"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1011",
+          "device": "0x0019"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x1317",
+          "device": "0x0985"
+        }
+      ],
+      "min_kernel": "2.0.0",
+      "kernel_path": "drivers/net/ethernet/dec/tulip",
+      "vendor": "DEC/Intel",
+      "chipset_family": "DEC 21140/21143",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "dec",
+        "tulip",
+        "legacy",
+        "vintage"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-rtl8139",
+      "display_name": "Realtek RTL8139 (8139too)",
+      "description": "Realtek RTL8139/RTL8130 10/100 Ethernet driver. Extremely common in budget PCs and virtual machines. QEMU default NIC.",
+      "category": "network",
+      "status": "deprecated",
+      "compat_status": "shimmed",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x10EC",
+          "device": "0x8139"
+        },
+        {
+          "bus": "pci",
+          "vendor": "0x10EC",
+          "device": "0x8138"
+        }
+      ],
+      "min_kernel": "2.4.0",
+      "kernel_path": "drivers/net/ethernet/realtek/8139too.c",
+      "vendor": "Realtek",
+      "chipset_family": "RTL8139",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "realtek",
+        "legacy",
+        "qemu",
+        "100mbit"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-vesafb",
+      "display_name": "VESA Framebuffer (vesafb)",
+      "description": "Generic VESA VBE framebuffer driver. Universal fallback when no GPU-specific driver is available. Basic 2D only, no acceleration.",
+      "category": "display",
+      "status": "active",
+      "compat_status": "shimmed",
+      "hardware_ids": [],
+      "min_kernel": "2.2.0",
+      "kernel_path": "drivers/video/fbdev/vesafb.c",
+      "vendor": "VESA Consortium",
+      "chipset_family": "VESA VBE generic",
+      "dependencies": [],
+      "tags": [
+        "display",
+        "framebuffer",
+        "vesa",
+        "fallback",
+        "universal"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-usb-storage",
+      "display_name": "USB Mass Storage (usb-storage)",
+      "description": "USB Mass Storage class driver. Supports virtually all USB flash drives, external HDDs, card readers, and USB optical drives.",
+      "category": "usb",
+      "status": "active",
+      "compat_status": "shimmed",
+      "hardware_ids": [],
+      "min_kernel": "2.4.0",
+      "kernel_path": "drivers/usb/storage",
+      "vendor": "USB-IF",
+      "chipset_family": "USB MSC generic",
+      "dependencies": [],
+      "tags": [
+        "usb",
+        "storage",
+        "mass-storage",
+        "flash-drive",
+        "universal"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": "linux-usb@vger.kernel.org"
+    },
+    {
+      "id": "linux-3c501",
+      "display_name": "3Com 3c501 EtherLink",
+      "description": "One of the first Ethernet adapters, ISA bus, 10 Mbit. Notoriously slow — the driver source contained the comment 'avoid this like the plague'. Removed in kernel 6.1.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "shimmed",
+      "hardware_ids": [],
+      "min_kernel": "1.0.0",
+      "max_kernel": "6.0.0",
+      "removed_in": "6.1.0",
+      "kernel_path": "drivers/net/ethernet/3com/3c501.c",
+      "removal_commit": "a2dd5bb0a6e3",
+      "removal_date": "2022-10-01",
+      "last_commit": "a2dd5bb0a6e3~1",
+      "vendor": "3Com",
+      "chipset_family": "3c501 EtherLink",
+      "recovery_cmd": "git show a2dd5bb0a6e3~1:drivers/net/ethernet/3com/3c501.c",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "3com",
+        "isa",
+        "vintage",
+        "removed",
+        "historic"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-3c505",
+      "display_name": "3Com 3c505 EtherLink Plus",
+      "description": "3Com EtherLink Plus ISA adapter with on-board 80186 processor. Removed in kernel 6.1.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [],
+      "min_kernel": "1.0.0",
+      "max_kernel": "6.0.0",
+      "removed_in": "6.1.0",
+      "kernel_path": "drivers/net/ethernet/3com/3c505.c",
+      "removal_commit": "a2dd5bb0a6e3",
+      "removal_date": "2022-10-01",
+      "last_commit": "a2dd5bb0a6e3~1",
+      "vendor": "3Com",
+      "chipset_family": "3c505 EtherLink Plus",
+      "recovery_cmd": "git show a2dd5bb0a6e3~1:drivers/net/ethernet/3com/3c505.c",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "3com",
+        "isa",
+        "vintage",
+        "removed"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-3c515",
+      "display_name": "3Com 3c515 ISA Fast EtherLink",
+      "description": "3Com ISA 100 Mbit Ethernet adapter. One of the last ISA network cards. Removed in kernel 6.1.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [],
+      "min_kernel": "2.0.0",
+      "max_kernel": "6.0.0",
+      "removed_in": "6.1.0",
+      "kernel_path": "drivers/net/ethernet/3com/3c515.c",
+      "removal_commit": "a2dd5bb0a6e3",
+      "removal_date": "2022-10-01",
+      "last_commit": "a2dd5bb0a6e3~1",
+      "vendor": "3Com",
+      "chipset_family": "3c515",
+      "recovery_cmd": "git show a2dd5bb0a6e3~1:drivers/net/ethernet/3com/3c515.c",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "3com",
+        "isa",
+        "removed"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-ne2000",
+      "display_name": "NE2000 ISA Ethernet (ne)",
+      "description": "NE2000-compatible ISA Ethernet adapter driver. Based on the National Semiconductor DP8390 chip. Extremely common in the 1990s. Removed from modern kernels.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [],
+      "min_kernel": "1.0.0",
+      "max_kernel": "5.18.0",
+      "removed_in": "5.19.0",
+      "kernel_path": "drivers/net/ethernet/8390/ne.c",
+      "removal_commit": "",
+      "removal_date": "2022-06-01",
+      "last_commit": "",
+      "vendor": "Novell/National Semiconductor",
+      "chipset_family": "NE2000/DP8390",
+      "recovery_cmd": "git log --all --diff-filter=D -- 'drivers/net/ethernet/8390/ne.c'",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "ne2000",
+        "isa",
+        "vintage",
+        "removed",
+        "dp8390"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-de4x5",
+      "display_name": "DEC DE4x5 EtherWORKS",
+      "description": "Digital Equipment Corporation DE425/DE434/DE435/DE450/DE500 Ethernet driver. Supported both EISA and PCI. Superseded by tulip driver.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x1011",
+          "device": "0x0002"
+        }
+      ],
+      "min_kernel": "1.2.0",
+      "max_kernel": "5.6.0",
+      "removed_in": "5.7.0",
+      "kernel_path": "drivers/net/ethernet/dec/tulip/de4x5.c",
+      "removal_commit": "4d258773f889",
+      "removal_date": "2020-03-01",
+      "last_commit": "4d258773f889~1",
+      "vendor": "DEC",
+      "chipset_family": "DEC DE4x5/21040",
+      "recovery_cmd": "git show 4d258773f889~1:drivers/net/ethernet/dec/tulip/de4x5.c",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "ethernet",
+        "dec",
+        "eisa",
+        "removed",
+        "vintage"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-oss-dmasound",
+      "display_name": "OSS DMA Sound (dmasound)",
+      "description": "Old Sound System DMA-based audio driver for Atari, Amiga, and early Mac. Replaced by ALSA. Removed in kernel 5.14.",
+      "category": "audio",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [],
+      "min_kernel": "2.2.0",
+      "max_kernel": "5.13.0",
+      "removed_in": "5.14.0",
+      "kernel_path": "sound/oss/dmasound/",
+      "removal_commit": "15c75b09e4a8",
+      "removal_date": "2021-06-01",
+      "last_commit": "15c75b09e4a8~1",
+      "vendor": "OSS",
+      "chipset_family": "DMA Sound (Atari/Amiga/Mac)",
+      "recovery_cmd": "git show 15c75b09e4a8~1:sound/oss/dmasound/",
+      "dependencies": [],
+      "tags": [
+        "audio",
+        "oss",
+        "dma",
+        "atari",
+        "amiga",
+        "mac",
+        "removed",
+        "vintage"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-arcnet",
+      "display_name": "ARCnet Networking (arcnet)",
+      "description": "Attached Resource Computer NETwork driver. 2.5 Mbit token-passing network from the 1970s. Used in industrial control systems. Removed in kernel 6.8.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [],
+      "min_kernel": "1.0.0",
+      "max_kernel": "6.7.0",
+      "removed_in": "6.8.0",
+      "kernel_path": "drivers/net/arcnet/",
+      "removal_commit": "",
+      "removal_date": "2024-01-01",
+      "last_commit": "",
+      "vendor": "Datapoint",
+      "chipset_family": "ARCnet COM90xx",
+      "recovery_cmd": "git log --all --diff-filter=D -- 'drivers/net/arcnet/'",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "arcnet",
+        "token-ring",
+        "industrial",
+        "vintage",
+        "removed"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-fddi-defxx",
+      "display_name": "DEC FDDIcontroller (defxx)",
+      "description": "Digital Equipment FDDI controller driver for DEFPA/DEFEA/DEFTA adapters. 100 Mbit fiber-optic ring network. Removed in kernel 6.5.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [
+        {
+          "bus": "pci",
+          "vendor": "0x1011",
+          "device": "0x000F"
+        }
+      ],
+      "min_kernel": "2.0.0",
+      "max_kernel": "6.4.0",
+      "removed_in": "6.5.0",
+      "kernel_path": "drivers/net/fddi/defxx.c",
+      "removal_commit": "",
+      "removal_date": "2023-08-01",
+      "last_commit": "",
+      "vendor": "DEC",
+      "chipset_family": "DEFPA/DEFEA FDDI",
+      "recovery_cmd": "git log --all --diff-filter=D -- 'drivers/net/fddi/defxx.c'",
+      "dependencies": [],
+      "tags": [
+        "network",
+        "fddi",
+        "fiber",
+        "dec",
+        "removed",
+        "vintage"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    },
+    {
+      "id": "linux-parport-plip",
+      "display_name": "Parallel Line Internet Protocol (plip)",
+      "description": "Network driver over parallel port (LPT) cable. Peer-to-peer networking at 40-80 KB/s. Used before Ethernet was affordable. Removed in kernel 6.7.",
+      "category": "network",
+      "status": "removed",
+      "compat_status": "untested",
+      "hardware_ids": [],
+      "min_kernel": "1.0.0",
+      "max_kernel": "6.6.0",
+      "removed_in": "6.7.0",
+      "kernel_path": "drivers/net/plip/plip.c",
+      "removal_commit": "",
+      "removal_date": "2023-12-01",
+      "last_commit": "",
+      "vendor": "Generic",
+      "chipset_family": "Parallel Port",
+      "recovery_cmd": "git log --all --diff-filter=D -- 'drivers/net/plip/'",
+      "dependencies": [
+        {
+          "name": "CONFIG_PARPORT",
+          "kind": "kernel_config",
+          "source": "",
+          "required": true
+        }
+      ],
+      "tags": [
+        "network",
+        "parallel-port",
+        "plip",
+        "lpt",
+        "removed",
+        "vintage"
+      ],
+      "license": "GPL-2.0-only",
+      "maintainer": ""
+    }
+  ]
+}

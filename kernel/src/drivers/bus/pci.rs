@@ -1,4 +1,4 @@
-use crate::io::Port;
+// crate::io::Port is not needed here: PCI config space uses raw inline asm for u32 I/O.
 use super::{BusController, BusType};
 use crate::drivers::DriverStatus;
 

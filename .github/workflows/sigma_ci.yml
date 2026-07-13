@@ -52,3 +52,19 @@ jobs:
         with:
           name: sigmaos-sbom
           path: bom.xml
+
+  userland_tests:
+    name: Userland Unit & Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run SigPkg Unit Tests
+        run: cargo test
+        working-directory: ./userland/sigpkg
+      - name: Make Smoke Test Executable
+        run: chmod +x ./scripts/smoke-test.sh
+      - name: Run Smoke Tests
+        run: ./scripts/smoke-test.sh
