@@ -46,6 +46,12 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **elementary OS** | Wayland HIG stylesheet enforcement, pay-what-you-can store | [Distro_Absorption_elementaryOS](Distro_Absorption_elementaryOS) |
 | **SteamOS** | Nested micro-compositor sessions (Gamescope), developer overlays | [Distro_Absorption_SteamOS](Distro_Absorption_SteamOS) |
 | **Solus** | Curated rolling release updates, testing channel automation | [Distro_Absorption_Solus](Distro_Absorption_Solus) |
+| **Zorin OS** | Desktop adaptive stylesheet layouts (macOS/Windows themes) | [Distro_Absorption_ZorinOS](Distro_Absorption_ZorinOS) |
+| **Rocky/CentOS** | Enterprise binary rebuild compliance, automated migration tool | [Distro_Absorption_RockyLinux](Distro_Absorption_RockyLinux) |
+| **EndeavourOS** | Terminal welcome diagnostics dashboard, helper configurations | [Distro_Absorption_EndeavourOS](Distro_Absorption_EndeavourOS) |
+| **Mageia** | Integrated Control Center admin unified settings database | [Distro_Absorption_Mageia](Distro_Absorption_Mageia) |
+| **MX Linux** | Native system toolkit suite (sigma-tools), curated admin utilities | [Distro_Absorption_MXLinux](Distro_Absorption_MXLinux) |
+| **Garuda Linux** | Process niceness daemon (sigma-prio), auto-ZRAM compression | [Distro_Absorption_Garuda](Distro_Absorption_Garuda) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -85,6 +91,16 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Elasticsearch** | Inverted indices filesystem search, distributed sharding | [OSS_Absorption_Elasticsearch](OSS_Absorption_Elasticsearch) |
 | **Grafana** | Unified telemetry dashboard metrics visualization | [OSS_Absorption_Grafana](OSS_Absorption_Grafana) |
 | **Ceph** | CRUSH algorithm deterministic hashing, software storage | [OSS_Absorption_Ceph](OSS_Absorption_Ceph) |
+| **PG Extensions** | Multi-model timeseries, vector search, spatial databases | [OSS_Absorption_PostgreSQL_Extensions](OSS_Absorption_PostgreSQL_Extensions) |
+| **NGINX Unit** | Zero-reload dynamic multi-language application server | [OSS_Absorption_Nginx_Unit](OSS_Absorption_Nginx_Unit) |
+| **Alertmanager** | Alert routing trees, inhibition rules, silences | [OSS_Absorption_Prometheus_Grafana_Alerting](OSS_Absorption_Prometheus_Grafana_Alerting) |
+| **KeyDB** | Multithreaded concurrent key-value IPC message bus | [OSS_Absorption_KeyDB](OSS_Absorption_KeyDB) |
+| **MinIO** | High-performance erasure-coded S3 object storage | [OSS_Absorption_MinIO](OSS_Absorption_MinIO) |
+| **Caddy** | Automatic HTTPS certificate provisioning, zero-config TLS | [OSS_Absorption_Caddy](OSS_Absorption_Caddy) |
+| **Vault** | TPM-sealed secrets, dynamic credential injection per app | [OSS_Absorption_Vault](OSS_Absorption_Vault) |
+| **Terraform/OpenTofu** | Declarative plan/apply system provisioning, state file model | [OSS_Absorption_Terraform](OSS_Absorption_Terraform) |
+| **Ansible** | Agentless YAML fleet config automation, idempotent playbooks | [OSS_Absorption_Ansible](OSS_Absorption_Ansible) |
+| **Git** | Config-as-repository with full audit trail and revert semantics | [OSS_Absorption_Git](OSS_Absorption_Git) |
 
 ## 🚀 Total Singularity
 
