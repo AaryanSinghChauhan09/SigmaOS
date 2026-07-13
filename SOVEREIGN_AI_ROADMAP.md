@@ -48,6 +48,8 @@ This document defines the complete roadmap for native AI integration in SigmaOS 
 
 ### 1.1 Local Inference Runtime
 
+> 📄 Full specification: [AI_SovereignGGML_Inference.md](AI_SovereignGGML_Inference)
+
 ```rust
 // kernel/ai/inference/mod.rs
 
@@ -119,6 +121,8 @@ $ sigma ask "set up a firewall rule to block port 22 from internet"
 ## Phase 2: Intelligent System Management (Q3-Q4)
 
 ### 2.1 AI Scheduler Tuning
+
+> 📄 Full specification: [AI_SchedulerNet_Autotune.md](AI_SchedulerNet_Autotune)
 
 The `sigma_kernel_autotuner` uses a lightweight neural network to predict optimal EEVDF scheduler parameters:
 
@@ -239,6 +243,8 @@ impl PredictiveLauncher {
 
 ### 3.3 Semantic File Search
 
+> 📄 Full specification: [AI_Semantic_Search_Lattice.md](AI_Semantic_Search_Lattice)
+
 ```bash
 $ sigma find "the tax document from last March"
 # Searching semantically... (local embeddings)
@@ -257,6 +263,8 @@ $ sigma find "my python script that processes CSV files"
 ## Phase 4: Federated Intelligence (Year 3)
 
 ### 4.1 Federated Learning Architecture
+
+> 📄 Full specification: [AI_Federated_Learning_Mesh.md](AI_Federated_Learning_Mesh)
 
 ```
 ┌────────────────────────────────────────────────────────────┐
