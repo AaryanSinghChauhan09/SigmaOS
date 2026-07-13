@@ -36,6 +36,9 @@ pub struct SigPkgRecord {
     installed:   bool,
     sig_valid:   bool,
     content_hash: [u8; HASH_LEN],
+    // Rollback / Version History state
+    previous_version: U32,
+    previous_content_hash: [u8; HASH_LEN],
 }
 
 impl SigPkgRecord {
@@ -46,6 +49,8 @@ impl SigPkgRecord {
             installed:    false,
             sig_valid:    false,
             content_hash: [0u8; HASH_LEN],
+            previous_version: 0,
+            previous_content_hash: [0u8; HASH_LEN],
         }
     }
 
@@ -61,6 +66,10 @@ pub struct SigPkgManager {
     packages:  [SigPkgRecord; MAX_PACKAGES],
     count:     U32,
     initialized: bool,
+    // Transactional state for rollbacks
+    in_transaction: bool,
+    tx_backup: [SigPkgRecord; MAX_PACKAGES],
+    tx_count_backup: U32,
 }
 
 impl SigPkgManager {
@@ -69,6 +78,9 @@ impl SigPkgManager {
             packages:    [SigPkgRecord::empty(); MAX_PACKAGES],
             count:       0,
             initialized: false,
+            in_transaction: false,
+            tx_backup:   [SigPkgRecord::empty(); MAX_PACKAGES],
+            tx_count_backup: 0,
         }
     }
 
@@ -197,12 +209,68 @@ impl SigPkgManager {
         let mut i = 0;
         while i < self.count as usize {
             if self.packages[i].name_hash == name_hash {
+                // Save version history for potential rollback
+                self.packages[i].previous_version = self.packages[i].version;
+                let mut j = 0;
+                while j < HASH_LEN {
+                    self.packages[i].previous_content_hash[j] = self.packages[i].content_hash[j];
+                    j += 1;
+                }
+                
                 self.packages[i].version = new_version;
                 return SIGMA_OK;
             }
             i += 1;
         }
         SIGMA_ERROR
+    }
+
+    // ── Transactions ───────────────────────────────────────────────────────
+
+    /// Begin a new package transaction
+    pub fn transaction_begin(&mut self) -> SigmaStatus {
+        if !self.initialized || self.in_transaction { return SIGMA_ERROR; }
+        
+        // Backup current state
+        self.tx_count_backup = self.count;
+        let mut i = 0;
+        while i < self.count as usize {
+            self.tx_backup[i] = self.packages[i];
+            i += 1;
+        }
+        
+        self.in_transaction = true;
+        SIGMA_OK
+    }
+
+    /// Commit the current transaction
+    pub fn transaction_commit(&mut self) -> SigmaStatus {
+        if !self.in_transaction { return SIGMA_ERROR; }
+        
+        self.in_transaction = false;
+        // The current state in self.packages is kept
+        SIGMA_OK
+    }
+
+    /// Rollback the transaction to the state before transaction_begin
+    pub fn transaction_rollback(&mut self) -> SigmaStatus {
+        if !self.in_transaction { return SIGMA_ERROR; }
+        
+        // Restore backup state
+        self.count = self.tx_count_backup;
+        let mut i = 0;
+        while i < self.count as usize {
+            self.packages[i] = self.tx_backup[i];
+            i += 1;
+        }
+        // Zero out any newly installed packages during the transaction
+        while i < MAX_PACKAGES {
+            self.packages[i] = SigPkgRecord::empty();
+            i += 1;
+        }
+        
+        self.in_transaction = false;
+        SIGMA_OK
     }
 }
 
@@ -262,4 +330,19 @@ pub unsafe extern "C" fn sigpkg_search(pattern: *const u8, pattern_len: U32) -> 
 pub unsafe extern "C" fn sigpkg_update(name: *const u8, name_len: U32, new_version: U32) -> SigmaStatus {
     let name_slice = core::slice::from_raw_parts(name, name_len as usize);
     G_PKG_MGR.update(name_slice, new_version)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_transaction_begin() -> SigmaStatus {
+    G_PKG_MGR.transaction_begin()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_transaction_commit() -> SigmaStatus {
+    G_PKG_MGR.transaction_commit()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sigpkg_transaction_rollback() -> SigmaStatus {
+    G_PKG_MGR.transaction_rollback()
 }
