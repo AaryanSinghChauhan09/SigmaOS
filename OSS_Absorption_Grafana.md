@@ -1,27 +1,53 @@
-# OSS Absorption: Grafana — Telemetry Visualization
+# OSS Absorption: Grafana — Operational Dashboards
 
-> **Status**: 📋 Planned | **Source Project**: Grafana | **Target Shard**: `SigmaOS Dashboard Layer`
+> **Status**: 📋 Planned | **Source Project**: Grafana Labs | **Target Shard**: `SigmaOS Zenith Telemetry UI`
 
 ---
 
 ## 1. Executive Summary
 
-Grafana is a multi-platform open-source analytics and interactive visualization web application. It provides charts, graphs, and alerts when connected to supported data sources.
+Grafana is the industry-standard open-source platform for monitoring and observability. It allows users to query, visualize, alert on, and understand metrics no matter where they are stored, transforming time-series database data (like Prometheus) into beautiful graphs and dashboards.
 
-SigmaOS absorbs the **unified dashboard schema model** of Grafana, implementing `sigma-dash` — a native, local Web/Terminal UI that queries the system's time-series database to visually display system performance, thermal states, and network loads.
+SigmaOS absorbs Grafana's **dashboard-as-code philosophy**, **flexible visualization panels**, and **unified alerting** into the `SigmaOS Telemetry UI`, providing system administrators with instant visual insight into OS performance.
 
 ---
 
-## 2. Key Features Absorbed
+## 2. Key Features to Absorb
 
-### 2.1 Unified Local Dashboard
+### 2.1 Native Telemetry Dashboard
 
-`sigma-dash` provides real-time visualization of all hardware sensors, process memory maps, and network throughput in a customizable dashboard, rendering directly in both the Web panel and TUI (Terminal User Interface).
+Instead of launching an external web server, SigmaOS includes a native graphical dashboard in the Zenith Desktop environment (`sigma-dashboard`). It visualizes OTLP metrics collected from the kernel and applications in real-time.
 
 ```bash
-$ sigma dash
-Σ [DASHBOARD] Initializing TUI metrics visualization...
+$ sigma dashboard --panel cpu
+Σ [DASHBOARD] Opening native Zenith telemetry UI...
 ```
+
+### 2.2 Dashboard-as-Code
+
+All dashboards in SigmaOS are defined declaratively as TOML files, making them version-controllable and easily shareable.
+
+```toml
+# /etc/sigma/dashboards/network.toml
+[dashboard]
+title = "Network Throughput"
+refresh = "1s"
+
+[[panel]]
+type = "timeseries"
+title = "Inbound Traffic"
+query = "rate(sigma_net_rx_bytes[1m])"
+color = "blue"
+
+[[panel]]
+type = "gauge"
+title = "Active Connections"
+query = "sigma_net_tcp_active"
+```
+
+### 2.3 Unified Alerting Rules
+
+Alerts are defined alongside the visualizations. If a metric crosses a threshold, SigmaOS routes the alert through the native notification system (Zenith Notifications) rather than relying on external webhooks.
 
 ---
 

@@ -62,6 +62,10 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **NixOS** | Declarative configuration layer, atomic generation rollback | [Distro_Absorption_NixOS](Distro_Absorption_NixOS) |
 | **Fedora** | Formal change process (SCP), beta-first technology adoption | [Distro_Absorption_Fedora](Distro_Absorption_Fedora) |
 | **Debian** | Three-tier release model (next/beta/stable), Social Contract | [Distro_Absorption_Debian](Distro_Absorption_Debian) |
+| **Pop!_OS** | Auto-tiling COSMIC WM, hybrid graphics switching, power profiles | [Distro_Absorption_PopOS](Distro_Absorption_PopOS) |
+| **Slackware** | KISS principle, transparent rc.d initialization, plain text configs | [Distro_Absorption_Slackware](Distro_Absorption_Slackware) |
+| **Manjaro** | MHWD hardware detection, staged rolling release channels | [Distro_Absorption_Manjaro](Distro_Absorption_Manjaro) |
+| **elementary OS** | Strict HIG for first-party apps, curated AppCenter, Focus mode | [Distro_Absorption_elementaryOS](Distro_Absorption_elementaryOS) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -126,6 +130,11 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Theseus OS** | Live kernel module hot-swapping, cell-based memory isolation | [OSS_Absorption_TheseusOS](OSS_Absorption_TheseusOS) |
 | **Fuchsia OS** | Handle-based capability system, component framework manifest | [OSS_Absorption_FuchsiaOS](OSS_Absorption_FuchsiaOS) |
 | **RISC-V** | Open ISA, RV64GC boot sequence, sovereign hardware targeting | [OSS_Absorption_RISCV](OSS_Absorption_RISCV) |
+| **NGINX** | Event-driven non-blocking I/O, zero-copy static file serving (sendfile) | [OSS_Absorption_NGINX](OSS_Absorption_NGINX) |
+| **Redis** | In-memory data structures, Pub/Sub IPC messaging, AOF persistence | [OSS_Absorption_Redis](OSS_Absorption_Redis) |
+| **PostgreSQL** | MVCC architecture, Write-Ahead Logging (WAL), JSONB indexing | [OSS_Absorption_PostgreSQL](OSS_Absorption_PostgreSQL) |
+| **Elasticsearch** | Inverted index search, distributed sharding, hybrid vector search | [OSS_Absorption_Elasticsearch](OSS_Absorption_Elasticsearch) |
+| **Grafana** | Dashboard-as-code (TOML), native telemetry UI, unified alerting | [OSS_Absorption_Grafana](OSS_Absorption_Grafana) |
 
 ## 🚀 Total Singularity
 

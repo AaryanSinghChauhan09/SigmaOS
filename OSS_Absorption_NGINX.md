@@ -1,41 +1,50 @@
-# OSS Absorption: NGINX — Event-Driven Architecture
+# OSS Absorption: NGINX — High-Performance Event-Driven Web Server
 
-> **Status**: 📋 Planned | **Source Project**: NGINX | **Target Shard**: `SigmaOS Network Gateway`
+> **Status**: 📋 Planned | **Source Project**: NGINX | **Target Shard**: `SigmaOS Sovereign Gateway`
 
 ---
 
 ## 1. Executive Summary
 
-NGINX popularized the asynchronous, event-driven approach to handling network connections, allowing a single thread to handle tens of thousands of concurrent HTTP requests efficiently, fundamentally outperforming process-per-connection models like Apache.
+NGINX is a high-performance HTTP server, reverse proxy, and load balancer. Its primary innovation was its asynchronous, event-driven architecture, which solved the C10K problem (handling 10,000 concurrent connections) while using a fraction of the memory required by traditional process-per-connection servers like Apache.
 
-SigmaOS absorbs the **asynchronous event loop** and **Reverse Proxy** concepts, embedding them directly into the `sigma-net` stack to provide a zero-configuration HTTP gateway for local services.
+SigmaOS absorbs NGINX's **event-driven non-blocking I/O model**, **static file serving optimizations (sendfile)**, and **reverse proxy caching** into `sigma-gateway`.
 
 ---
 
-## 2. Key Features Absorbed
+## 2. Key Features to Absorb
 
-### 2.1 The Kernel-level Gateway
+### 2.1 Event-Driven Non-Blocking Architecture
 
-Instead of running NGINX in userspace and context-switching for every packet, SigmaOS leverages eBPF (like Cloudflare's pingora) and the kernel's io_uring equivalent to parse HTTP headers and route traffic dynamically.
+`sigma-gateway` uses a single-threaded event loop per CPU core, leveraging the kernel's `io_uring` (via `sigma-io`) to handle tens of thousands of concurrent connections without context-switching overhead.
 
-If an incoming request hits port 80/443, the kernel looks at the Host header and forwards the connection directly to the sandboxed application's file descriptor without waking up an intermediate proxy daemon.
-
-### 2.2 Declarative Proxy Rules
-
-Local web developers or system administrators can map domains to containers via simple configuration, and the system handles the rest (including ACME/Let's Encrypt certificates).
-
-```toml
-# /etc/sigma/gateway.toml
-[[route]]
-domain = "app.local"
-target = "container:webapp_1"
-port = 3000
-tls = "auto"
+```mermaid
+graph LR
+    Client1[Client] --> Worker1[Gateway Worker 1 (Core 0)]
+    Client2[Client] --> Worker1
+    Client3[Client] --> Worker2[Gateway Worker 2 (Core 1)]
+    Worker1 -->|io_uring| Kernel[SigmaOS Kernel]
 ```
+
+### 2.2 Zero-Copy Static File Serving
+
+When serving static files, `sigma-gateway` uses zero-copy I/O. The kernel reads data directly from the filesystem cache and writes it to the network socket, entirely bypassing user-space memory buffers.
+
+```bash
+$ sigma gateway stats
+Σ [GATEWAY] Performance metrics:
+  Connections:    24,512 active
+  Throughput:     18.4 Gbps
+  Zero-copy hits: 98% (static assets)
+  CPU usage:      14%
+```
+
+### 2.3 Reverse Proxy Micro-Caching
+
+`sigma-gateway` can cache responses from backend microservices in memory or on disk, significantly reducing load on application shards during traffic spikes.
 
 ---
 
 ## 3. References & Standards
 
-- NGINX — `nginx.org` (BSD-2-Clause)
-- Pingora — Cloudflare's Rust proxy
+- NGINX — `nginx.org` (2-clause BSD)

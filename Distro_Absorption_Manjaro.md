@@ -1,41 +1,37 @@
-# Distro Absorption: Manjaro Linux
+# Distro Absorption: Manjaro — Accessible Arch Linux
 
-> **Status**: 📋 Planned | **Source Paradigm**: Manjaro | **Target Shard**: `SigmaOS Hardware Detection`
+> **Status**: 📋 Planned | **Source Paradigm**: Manjaro Linux | **Target Shard**: `SigmaOS Zenith Hardware Detection & Rolling Release`
 
 ---
 
 ## 1. Executive Summary
 
-Manjaro brings the bleeding-edge software of Arch Linux to a broader audience by introducing user-friendly hardware detection and multiple-kernel management. 
+Manjaro is an Arch Linux-based distribution that aims to make Arch's rolling-release model accessible to everyday users. Its defining features are **MHWD (Manjaro Hardware Detection)** for automatic proprietary driver installation, and **staged rolling releases** (delaying Arch updates to test for stability).
 
-SigmaOS absorbs the **MHWD (Manjaro Hardware Detection)** philosophy, providing users with a GUI and CLI tool that automatically identifies PCI/USB IDs and seamlessly provisions the correct proprietary or open-source drivers.
+SigmaOS absorbs Manjaro's **automatic hardware configuration tool** and **staged rolling release channels** to provide bleeding-edge software without the typical breakage of a pure rolling release.
 
 ---
 
 ## 2. Key Features to Absorb
 
-### 2.1 Automated Hardware Provisioning (`sigma-hw`)
+### 2.1 Sigma Hardware Detection (`sigma-hwd`)
 
-Instead of hunting for forum posts to install a Wi-Fi driver, SigmaOS scans the hardware at boot or on command, cross-references a verified hardware database, and safely installs the required kernel modules.
+Modeled after Manjaro's MHWD, `sigma-hwd` automatically detects system hardware (especially graphics cards and network adapters) and can install the optimal drivers—including proprietary ones like NVIDIA—with a single command.
 
 ```bash
-$ sigma hw auto-install
-Σ [HW] Scanning PCI/USB buses...
-  Detected: NVIDIA Corporation TU117M [GeForce GTX 1650 Mobile / Max-Q]
-  Selected: sigma-driver-nvidia-proprietary (v535)
-  Detected: Realtek Semiconductor RTL8822CE 802.11ac PCIe Wireless Network Adapter
-  Selected: sigma-driver-rtw88
-
-Σ [HW] Installing drivers and rebuilding initramfs...
+$ sigma-hwd auto --video
+Σ [HWD] Detected NVIDIA RTX 4070.
+  Installing: sigma-driver-nvidia-proprietary (550.x)
+  Configuring Zenith Desktop for hybrid graphics...
+  Done. Reboot required.
 ```
 
-### 2.2 Kernel Switching GUI
+### 2.2 Staged Rolling Release
 
-Manjaro allows users to easily swap between Linux 5.15 LTS, 6.1 LTS, and 6.6 via a simple GUI. SigmaOS takes this further. Because SigmaOS manages boot parameters declaratively, the UI allows users to install multiple kernel versions and explicitly assign them to different boot profiles in `sigma-boot`.
+While SigmaOS's `sigma.next` channel is a pure rolling release, the `sigma.beta` channel acts like Manjaro's stable branch: updates from `sigma.next` are held in testing for a week. If significant breakage is reported, the packages are held back until fixed, insulating normal users from upstream regressions.
 
 ---
 
 ## 3. References & Standards
 
 - Manjaro Linux — `manjaro.org`
-- mhwd source (GPL)
