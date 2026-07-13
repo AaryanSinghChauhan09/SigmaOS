@@ -1,12 +1,23 @@
 #![no_std] // don't link the Rust standard library
 #![no_main] // disable all Rust-level entry points
 
+extern crate alloc;
+
 mod drivers;
 mod io;
 mod fs;
 mod panic;
 mod log;
 pub mod linux_compat;
+pub mod network;
+mod custom_allocators;
+
+#[global_allocator]
+static ALLOCATOR: custom_allocators::BumpAllocator = unsafe {
+    static mut HEAP_MEM: [u8; 16 * 1024 * 1024] = [0; 16 * 1024 * 1024];
+    custom_allocators::BumpAllocator::new(HEAP_MEM.as_mut_ptr(), 16 * 1024 * 1024)
+};
+
 pub mod compat {
     pub mod wine {
         pub mod vsock;
