@@ -1,55 +1,42 @@
 # SOVEREIGN CONSTITUTION
 
-1
+> **Document Classification**: Core Governance | **Status**: Ratified
 
-1
-
-This document serves as the supreme law of the SigmaOS codebase. Every shard, suite, and algorithm must adhere to these directives.
+The Sovereign Constitution defines the unalterable rights of the User and the immutable responsibilities of the SigmaOS ecosystem. It serves as the highest authority in resolving architectural and governance disputes.
 
 ---
 
-1
+## Article I: Absolute User Sovereignty
 
-1. **LATTICE PURITY**: Kernel, drivers, bootloader, HAL must be hand-coded Assembly and C only.
+**Section 1.** The User is the ultimate authority over their hardware and software. SigmaOS shall never override a deliberate, authenticated User command, even if that command compromises system stability.
 
-2. **ZERO DEPENDENCY**: No glibc, no OpenSSL, no external libraries. Every function is bespoke.
+**Section 2.** SigmaOS shall not transmit telemetry, usage statistics, crash logs, or any other data to remote servers without explicit, opt-in consent from the User. Consent must be cryptographic and verifiable.
 
-3. **C11 COMPLIANCE**: Enforce strict C11/Assembly standards. No foreign runtime overhead.
+**Section 3.** The User has the right to completely replace, modify, or delete any Sovereign Shard, including core system components, without artificial hindrance (e.g., locked bootloaders, unremovable packages).
 
-4. **AI PURITY**: AI inference must be hand-coded C with SIMD intrinsics; zero Python in the inference path.
+## Article II: Transparent Execution
 
-1
+**Section 1.** The system shall maintain a cryptographically verifiable Audit Log (the Forensic Ring) of all state changes, capability grants, and IPC communications. 
 
-1. **DAG ORCHESTRATION**: No circular dependencies. The system is a strict Directed Acyclic Graph.
+**Section 2.** "Black box" execution is strictly prohibited within Core and Security shards. All AI and ML models utilized by the system must be open-weights and run entirely locally.
 
-2. **SOVEREIGN INTERFACE**: Every module exposes `init()`, `deinit()`, and `health_check()`.
+## Article III: Security by Mathematics
 
-3. **ISOLATION**: Modules communicate via well-defined message types; global variables are forbidden.
+**Section 1.** Security must rely on mathematical guarantees (e.g., Post-Quantum Cryptography, Capability-based addressing, memory-safe languages) rather than procedural obscurity.
 
-4. **HEADER HIERARCHY**: Suite-specific headers must reside in `include/suites/SXX_Name/`. Only global primitives reside in the root `include/`.
+**Section 2.** All system binaries must be deterministically reproducible.
 
-5. **LATENCY GUARANTEES**: Every module declares its maximum memory footprint and worst-case latency.
+## Article IV: The Principle of Least Privilege
 
-1
+**Section 1.** No process, shard, or user shall be granted more capabilities than strictly necessary to perform its stated function. 
 
-1. **DATA TRANSPARENCY**: Every command must support `--json` and `--binary` output.
+**Section 2.** The Root (Administrator) account is a concept of the past. Administrative actions require specific capability tokens, issued dynamically and audited permanently.
 
-2. **HELP LATTICE**: Every tool accepts `--help` with structured usage telemetry.
+## Article V: Perpetual Evolution
 
-3. **STATELESSNESS**: Configuration is specified via flags or config files; no global state cache.
+**Section 1.** The architecture of SigmaOS must facilitate continuous, uninterrupted evolution. System updates must be atomic, safely interruptible, and instantly roll-backable.
 
-4. **IDEMPOTENCY**: Commands must be safe to run multiple times with predictable outcomes.
-
-1
-
-1. **IMMUTABLE AUDIT**: Every automation event is written to the immutable Sovereign Forensic Lattice.
-
-2. **SIMULATION MODE**: Every automation supports `--simulate` to predict outcomes without execution.
-
-3. **ROLLBACK PROTOCOL**: Automations must define hardware-safe rollback procedures.
-
-4. **RESOURCE BUDGETING**: Automations declare hardware requirements before execution.
+**Section 2.** Legacy compatibility is a feature, not an anchor. When legacy paradigms conflict with Sovereign Principles, compatibility must be sandboxed or discarded in favor of architectural purity.
 
 ---
-
-1
+*Ratified by the SigmaOS Core Maintainers.*

@@ -1,46 +1,49 @@
-# WASM-Runtime
+# WASM Runtime Integration
 
-1
+> **Component**: `kernel/wasm/` | **Status**: ACTIVE
 
-1
+SigmaOS integrates a native WebAssembly (WASM) runtime directly into the kernel, allowing for ultra-fast, securely sandboxed execution of user-provided code without the overhead of a full virtual machine or container.
 
-The SigmaOS WASM Runtime provides a high-performance, sandboxed execution environment for userland applications and isolated kernel tasks. Leveraging the **Sovereign PSE (Portable Shard Execution)** model, WASM modules can run natively on the silicon bus without traditional instruction set translation overhead.
+---
 
-1
+## Architecture
 
-graph LR
-    Shard[WASM Shard] --> Engine[SovereignWasmEngine]
-    Engine --> LinearMem[Isolated Linear Memory]
-    Engine --> Syscalls[Sovereign Syscall Bridge]
-    LinearMem --> PMM[SovereignPMM]
+The SigmaOS WASM runtime is built on a `no_std` compatible interpreter (and eventual JIT compiler) that runs within its own Sovereign Shard (`S07_WASM_Runtime`). 
 
-1
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SIGMA WASM RUNTIME                       │
+│                                                             │
+│  ┌───────────────┐  ┌────────────────┐  ┌──────────────┐  │
+│  │ WASM Module   │  │ Sandboxed Mem  │  │ WASI Compat  │  │
+│  │ Loader        │  │ Allocator      │  │ Layer        │  │
+│  └───────┬───────┘  └────────┬───────┘  └──────┬───────┘  │
+│          │                   │                  │          │
+│  ┌───────┴───────────────────┴──────────────────┴───────┐  │
+│  │              SIGMA-BUS DISPATCH TABLE                │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
 
-1
+## Features
 
-1
+1. **Near-Native Performance**: By compiling WASM ahead-of-time (AOT) during package installation, SigmaOS achieves near-native execution speeds for WASM shards.
+2. **Strict Sandboxing**: WASM modules execute in a linearly addressed memory space. Buffer overflows or illegal memory accesses are mathematically impossible to escape into the kernel.
+3. **WASI Compatibility**: The runtime implements a subset of the WebAssembly System Interface (WASI), mapped directly to `sigma-bus` IPC calls, allowing standard WASM modules (compiled from Rust, C/C++, Go) to run unmodified.
+4. **Hot-Swappable Capabilities**: Capabilities (network access, disk access) are injected at runtime via capability handles, adhering to the Sovereign Principles of least-privilege.
 
-1
+## Usage
 
-1
+Running a WASM binary natively from the shell:
 
-The runtime is implemented as a modular C++ singleton:
+```bash
+# Execute a WASM module
+sigma wasm run /path/to/module.wasm
 
-1
+# Execute with specific capabilities
+sigma wasm run --cap-net --cap-fs-read=/tmp /path/to/module.wasm
+```
 
-class SovereignWasmEngine {
-public:
-    static SovereignWasmEngine& getInstance();
-    void loadShard(const uint8_t* bytecode, size_t size);
-    void execute();
-private:
-    // ...
-};
+## Integration with Shards
 
-1
-
-1
-
-1
-
-1
+Future iterations of the Sovereign Registry will allow WASM modules to register themselves as full system Shards, enabling developers to write core system services in any WASM-targetable language while retaining the security guarantees of the Sovereign Sandbox.
