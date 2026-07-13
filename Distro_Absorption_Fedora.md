@@ -1,69 +1,52 @@
-# Distro Absorption: Fedora RPM Format & SELinux Hardening
+# Distro Absorption: Fedora — Bleeding-Edge Innovation Distro
 
-> **Status**: ✅ Absorbed | **Target Shards**: `RPMAbsorber.shard`, `SovereignSELinux.shard` | **Source Distro**: Fedora Linux
+> **Status**: 📋 Planned | **Source Paradigm**: Fedora Linux | **Target Shard**: `SigmaOS Innovation Fast-Track`
 
 ---
 
 ## 1. Executive Summary
 
-Fedora is known for its focus on modern technology, the RPM package format (`.rpm` / DNF), and strict security policies via Security-Enhanced Linux (SELinux). Transitioning from Fedora requires supporting RPM packages and adapting SELinux's Role-Based Access Control (RBAC) and Type Enforcement policies.
+Fedora is Red Hat's upstream innovation distribution — the proving ground where new Linux technologies (Wayland, Btrfs default, systemd, Flatpak, Pipewire) debut before being stabilized in RHEL. Fedora's **Fedora Change Process** ensures that breaking changes are proposed, tracked, and communicated transparently.
 
-The `RPMAbsorber.shard` handles RPM archive extraction and dependency analysis, while `SovereignSELinux.shard` converts complex SELinux policy rules into native microkernel access tokens.
-
----
-
-## 2. Technical Features & Absorption Strategy
-
-### 2.1 RPM Package Translator (`RPMAbsorber.shard`)
-- **Fedora Concept**: Package archives (`.rpm`) contain compiled binaries, resource files, and system scripts, configured via `.spec` files.
-- **Sovereign Implementation**: `RPMAbsorber` parses RPM file formats, extracts resources, and generates dependency graphs to automatically run packages inside sandboxed execution rooms.
-
-### 2.2 SELinux Policy Conversion (`SovereignSELinux.shard`)
-- **Fedora Concept**: SELinux enforces security policies using Type Enforcement (TE), Role-Based Access Control (RBAC), and Multi-Level Security (MLS) to restrict application actions.
-- **Sovereign Implementation**: The `SovereignSELinux` engine parses Fedora’s policy files and maps their subjects, roles, and types to the capability tokens used by the SigmaOS microkernel. This provides SELinux-level security with microkernel-enforced memory isolation.
+SigmaOS adopts Fedora's **formal feature change process** and **beta-first technology adoption** model, creating a structured pipeline for evaluating and integrating new kernel features and userland innovations.
 
 ---
 
-## 3. Shard Architecture
+## 2. Key Features to Absorb
 
-```
-┌─────────────────────────────────────────────────────────┐
-│               FEDORA ABSORPTION MATRIX                  │
-├─────────────────────────────────────────────────────────┤
-│  ┌───────────────────────┐   ┌───────────────────────┐  │
-│  │   RPMAbsorber.shard   │   │SovereignSELinux.shard │  │
-│  │ (RPM Archive Extractor)│   │ (Policy to Token Map) │  │
-│  └───────────┬───────────┘   └───────────┬───────────┘  │
-│              └─────────────┬─────────────┘              │
-│              ┌─────────────▼─────────────┐              │
-│              │      SELinux Sandbox      │              │
-│              │    (Enforced Access Room) │              │
-│              └───────────────────────────┘              │
-└─────────────────────────────────────────────────────────┘
+### 2.1 Sigma Change Process (SCP)
+
+Modeled after Fedora's Change Process, every significant technology addition to SigmaOS must go through the Sigma Change Process:
+
+```markdown
+## SCP-001: Enable Huge Transparent Pages (THP) by Default
+- Owner: @kernel-team
+- Status: FinalBeta
+- Self-Contained: Yes
+- Summary: Enable THP for all anonymous mappings >1MB
+- Benefit: 8-15% speedup in compilation and database workloads
+- Contingency: Revert to madvise-only if OOM regression detected
+- Completion: Included in SigmaOS 0.4
 ```
 
----
+### 2.2 Sigma.next — Innovation Fast Track
 
-## 4. Usage & Commands
+`sigma.next` is SigmaOS's equivalent of Fedora Rawhide — a rolling-release branch that always tracks `main` plus the latest experimental features. Users can opt in for maximum freshness with minimal stability guarantees.
 
-To list and execute Fedora absorption:
+```bash
+$ sigma-pkg channel set sigma.next
+Σ [PKG] Channel changed to sigma.next (rolling, experimental)
+  Warning: sigma.next receives daily updates; regressions possible.
+  Backup snapshots recommended before update.
 
-```powershell
-$ sigma distro list
-Σ [INFO] Sovereign Linux Distro Absorption Registry:
-  * Fedora       -> RPMAbsorber.shard           [Active]  (RPM-spec absorption pipeline)
-  ...
-
-$ sigma distro absorb fedora
-Σ [INFO] Starting Deep-Lattice absorption of 'fedora' paradigm...
-Σ [INFO]   -> Loading RPMAbsorber.shard & SovereignSELinux.shard...
-Σ [INFO]   -> Compiling RPM spec parser...
-Σ [SUCCESS] Fedora RPM absorber and SELinux engine absorbed successfully!
+$ sigma update
+Σ [UPDATE] sigma.next update:
+  87 packages updated, 3 new features activated.
 ```
 
 ---
 
-## 5. References & Standards
-- RPM File Format and Packaging Specifications
-- SELinux Architecture and Policy Enforcement Specifications
-- Fedora packaging guidelines and DNF architecture
+## 3. References & Standards
+
+- Fedora Linux — `fedoraproject.org` (GPL-2.0+)
+- Fedora Change Process — `docs.fedoraproject.org/en-US/program_management/changes_policy`

@@ -1,69 +1,53 @@
-# Distro Absorption: Debian Stability & Policy Parity
+# Distro Absorption: Debian — Universal OS Stability Model
 
-> **Status**: ✅ Absorbed | **Target Shard**: `DebianParity.shard` | **Source Distro**: Debian GNU/Linux
+> **Status**: 📋 Planned | **Source Paradigm**: Debian GNU/Linux | **Target Shard**: `SigmaOS Stable Release Engineering`
 
 ---
 
 ## 1. Executive Summary
 
-Debian's longevity and stability rely on the **Debian Policy Manual**, a strict set of technical guidelines governing package structures, file locations, dependency rules, and licensing requirements. This rigorous validation ensures that Debian releases are stable and maintainable.
+Debian is the granddaddy of stability-first Linux distributions. Its **three-tier release model** (stable/testing/unstable), **social contract**, and **DFSG (Debian Free Software Guidelines)** have been adopted and adapted by hundreds of downstream distributions including Ubuntu. Debian's release process is legendary for its rigor.
 
-The `DebianParity.shard` absorbs these rules into an automated compliance checker. When a package is submitted to the SigmaOS registry, the checker runs static analysis to verify file structure, library linking, and license metadata, ensuring it matches Debian policy standards.
-
----
-
-## 2. Technical Features & Absorption Strategy
-
-### 2.1 Policy Compliance Validator
-- **Debian Concept**: Manual validation and lint checkers (`lintian`) inspect packages to ensure compliance with policy manuals.
-- **Sovereign Implementation**: `DebianParity` parses metadata and build artifacts, checking for common packaging errors, missing manual pages, invalid permissions, and library dependency conflicts.
-
-### 2.2 FHS Directory Translation
-- **Debian Concept**: Packages must follow the Filesystem Hierarchy Standard (FHS) to guarantee predictable file paths.
-- **Sovereign Implementation**: Since SigmaOS uses a unified virtual namespace rather than a traditional Unix hierarchy, the `DebianParity` layer translates standard paths (e.g., `/usr/share`, `/etc/init.d`) into virtual namespaces dynamically during application load.
+SigmaOS adopts Debian's **three-tier release model** and **freeze-based stabilization** process to ensure production reliability alongside the innovation `sigma.next` channel.
 
 ---
 
-## 3. Shard Architecture
+## 2. Key Features to Absorb
 
-```
-┌─────────────────────────────────────────────────────────┐
-│               DEBIAN PARITY COMPLIANCE                  │
-├─────────────────────────────────────────────────────────┤
-│  ┌───────────────────────┐   ┌───────────────────────┐  │
-│  │     Policy Linter     │   │     FHS Translator    │  │
-│  │ (Automated Code Rules)│   │ (Virtual Path Mapper) │  │
-│  └───────────┬───────────┘   └───────────┬───────────┘  │
-│              └─────────────┬─────────────┘              │
-│              ┌─────────────▼─────────────┐              │
-│              │      Stable Validation    │              │
-│              │     (Dependency Check)    │              │
-│              └───────────────────────────┘              │
-└─────────────────────────────────────────────────────────┘
+### 2.1 Three-Tier Release Model
+
+| Channel | SigmaOS Name | Stability | Update Frequency |
+|:--------|:-------------|:---------|:----------------|
+| `unstable` | `sigma.next` | Experimental | Daily |
+| `testing` | `sigma.beta` | Mostly stable | Weekly |
+| `stable` | `sigma.stable` | Production | Quarterly LTS |
+
+```bash
+$ sigma-pkg channel list
+Σ [PKG] Available channels:
+  sigma.next   (Σ-next)   — Rolling, experimental, daily updates
+  sigma.beta   (Σ-beta)   — Pre-release, weekly, mostly stable
+  sigma.stable (Σ-stable) — Production LTS, quarterly security-only
+
+$ sigma-pkg channel set sigma.stable
+Σ [PKG] Channel set to sigma.stable (LTS). No experimental features.
 ```
 
----
+### 2.2 Social Contract & DFSG
 
-## 4. Usage & Commands
+SigmaOS adopts a formal Social Contract committing to:
+1. SigmaOS will always be 100% open source (MIT/Apache-2.0).
+2. We will give back to the communities whose work we absorb.
+3. We will never hide problems — all bugs are public in the issue tracker.
+4. The needs of users come before the needs of the project.
 
-To list and verify Debian parity layers:
+### 2.3 Freeze-Based Stabilization
 
-```powershell
-$ sigma distro list
-Σ [INFO] Sovereign Linux Distro Absorption Registry:
-  * Debian       -> DebianParity.shard          [Active]  (Policy compliance engine)
-  ...
-
-$ sigma distro absorb debian
-Σ [INFO] Starting Deep-Lattice absorption of 'debian' paradigm...
-Σ [INFO]   -> Loading DebianParity.shard...
-Σ [INFO]   -> Importing Debian policy guidelines...
-Σ [SUCCESS] Debian policy compliance engine absorbed successfully!
-```
+Before every `sigma.stable` release, a **freeze period** begins: only security fixes and critical bug fixes can enter the channel. New features wait for the next cycle.
 
 ---
 
-## 5. References & Standards
-- Debian Policy Manual (latest stable release guidelines)
-- Lintian package validation tool design
-- Filesystem Hierarchy Standard (FHS) 3.0 mapping
+## 3. References & Standards
+
+- Debian — `debian.org` (DFSG-compliant licenses)
+- Debian Social Contract — `debian.org/social_contract`

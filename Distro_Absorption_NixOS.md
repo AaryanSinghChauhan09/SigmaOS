@@ -1,69 +1,77 @@
-# Distro Absorption: NixOS Declarative & Atomic Updates
+# Distro Absorption: NixOS — Declarative, Reproducible OS
 
-> **Status**: ✅ Absorbed | **Target Shard**: `SovereignAtomicUpdater.shard` | **Source Distro**: NixOS
+> **Status**: 📋 Planned | **Source Paradigm**: NixOS | **Target Shard**: `SigmaOS Declarative Configuration Layer`
 
 ---
 
 ## 1. Executive Summary
 
-NixOS provides reproducibility and reliability through its declarative configuration system and atomic package store. It stores files in read-only paths under `/nix/store` with unique hashes representing their exact dependency trees. This eliminates dependency conflicts and allows instant, crash-free system rollbacks.
+NixOS is a Linux distribution built entirely around the Nix package manager's functional, declarative configuration model. The entire operating system — packages, services, users, files — is described in a single Nix expression. Any change generates a new system generation that can be rolled back atomically.
 
-In **SigmaOS Zenith**, the `SovereignAtomicUpdater.shard` implements this concept natively using content-addressed file structures within the microkernel's filesystem (`sigma-fs`), offering atomic system deployments, instant rollbacks, and amnesic session profiles.
-
----
-
-## 2. Technical Features & Absorption Strategy
-
-### 2.1 Content-Addressed Store (`/sigma/store`)
-- **NixOS Concept**: Packages are stored in isolation using cryptographic hashes of their source code, build parameters, and dependency tree (e.g., `/nix/store/h3v...-bash-5.2`).
-- **Sovereign Implementation**: The filesystem uses block-level de-duplication and hash-addressed directories (`/sigma/store/sha256-...`). This guarantees that packages cannot modify each other's files.
-
-### 2.2 Atomic Generation Switching
-- **NixOS Concept**: Modifying the system configuration creates a new "generation" directory containing symlinks to packages. The bootloader is updated to point to this new generation.
-- **Sovereign Implementation**: Systems boot by mounting a virtual filesystem index representing the current generation. Upgrading the system simply updates an atomic pointer to a new virtual index. If an upgrade fails or is rejected, the system falls back to the previous index instantly.
+SigmaOS absorbs NixOS's **whole-system declarative configuration** and **generation-based rollback** as `sigma-declare`, giving administrators full system reproducibility without NixOS's learning curve.
 
 ---
 
-## 3. Shard Architecture
+## 2. Key Features to Absorb
 
-```
-┌─────────────────────────────────────────────────────────┐
-│               NIXOS ABSORPTION ENGINE                   │
-├─────────────────────────────────────────────────────────┤
-│  ┌───────────────────────┐   ┌───────────────────────┐  │
-│  │Content-Addressed Store│   │ Generation Manager    │  │
-│  │   (/sigma/store)      │   │ (Atomic Pointer Swap) │  │
-│  └───────────┬───────────┘   └───────────┬───────────┘  │
-│              └─────────────┬─────────────┘              │
-│              ┌─────────────▼─────────────┐              │
-│              │     Amnesic Boot Engine   │              │
-│              │   (Zero-Downtime Rollback)│              │
-│              └───────────────────────────┘              │
-└─────────────────────────────────────────────────────────┘
-```
+### 2.1 Whole-System Declarative Configuration
 
----
+A single `system.toml` file describes the desired state of the entire system: installed packages, enabled services, user accounts, firewall rules, and kernel parameters.
 
-## 4. Usage & Commands
+```toml
+# /etc/sigma/system.toml — Complete system declaration
+[system]
+hostname = "sigma-workstation"
+timezone = "Asia/Kolkata"
 
-To verify and run NixOS-inspired atomic updates:
+[packages]
+installed = [
+  "helix", "rust", "python3", "nodejs",
+  "sigma-devtools", "sigma-forensic"
+]
 
-```powershell
-$ sigma distro list
-Σ [INFO] Sovereign Linux Distro Absorption Registry:
-  * NixOS        -> SovereignAtomicUpdater.shard[Done]    (Atomic updates & rollback)
-  ...
+[services]
+enabled = ["sshd", "sigma-agent", "sigma-gateway"]
 
-$ sigma distro absorb nixos
-Σ [INFO] Starting Deep-Lattice absorption of 'nixos' paradigm...
-Σ [INFO]   -> Loading SovereignAtomicUpdater.shard...
-Σ [INFO]   -> Setting up Nix-like read-only store...
-Σ [SUCCESS] NixOS atomic reproducible build system absorbed successfully!
+[users.developer]
+groups = ["sudo", "network", "audio"]
+shell = "sigma-sh"
+
+[firewall]
+default_policy = "drop"
+allow_in = ["tcp:22", "tcp:443"]
 ```
 
+```bash
+$ sigma-declare apply
+Σ [DECLARE] Computing delta from current state...
+  + Install: helix, sigma-forensic (2 new packages)
+  ~ Change: firewall.allow_in (added tcp:443)
+  Applying... done. Generation 14 created.
+```
+
+### 2.2 Generation-Based Atomic Rollback
+
+Every `sigma-declare apply` creates a new immutable system generation. Rollback to any previous generation takes under 1 second.
+
+```bash
+$ sigma-declare generations
+  GEN  DATE                  DESCRIPTION
+  14   2026-07-13 16:30      Added helix + forensic tools
+  13   2026-07-12 09:15      SSH hardening
+  12   2026-07-10 14:00      Initial install
+
+$ sigma-declare rollback 12
+Σ [DECLARE] Rolled back to generation 12 in 0.4s. Reboot to apply kernel changes.
+```
+
+### 2.3 Flake-Inspired Pinned Dependencies
+
+All package inputs are locked to exact content-addressed hashes, ensuring identical environments across time and machines.
+
 ---
 
-## 5. References & Standards
-- Nix Package Manager design model (Eelco Dolstra, 2006)
-- Content-addressed storage (CAS) structures
-- Declarative profile schemas in SigmaOS (`sigma.toml`)
+## 3. References & Standards
+
+- NixOS — `nixos.org` (MIT)
+- Nix Package Manager — `nixos.org/manual/nix`

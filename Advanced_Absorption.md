@@ -59,6 +59,9 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Chrome OS** | Verified boot chain (dm-verity), stateless rootfs, containerized apps | [Distro_Absorption_ChromeOS](Distro_Absorption_ChromeOS) |
 | **Kali Linux** | sigma-sec-audit tooling bundle, forensics read-only mount mode | [Distro_Absorption_Kali](Distro_Absorption_Kali) |
 | **Clear Linux** | Hardware-optimized profiles, AVX-512 dispatch, stateless bundles | [Distro_Absorption_ClearLinux](Distro_Absorption_ClearLinux) |
+| **NixOS** | Declarative configuration layer, atomic generation rollback | [Distro_Absorption_NixOS](Distro_Absorption_NixOS) |
+| **Fedora** | Formal change process (SCP), beta-first technology adoption | [Distro_Absorption_Fedora](Distro_Absorption_Fedora) |
+| **Debian** | Three-tier release model (next/beta/stable), Social Contract | [Distro_Absorption_Debian](Distro_Absorption_Debian) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -117,6 +120,12 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **LLVM/Clang** | Sanitizer suite, LTO+PGO production builds, lld deterministic linking | [OSS_Absorption_LLVM](OSS_Absorption_LLVM) |
 | **Istio** | mTLS-by-default service mesh, traffic shifting, canary deployments | [OSS_Absorption_Istio](OSS_Absorption_Istio) |
 | **FoundationDB** | Multi-key ACID distributed transactions, transactional watch API | [OSS_Absorption_FoundationDB](OSS_Absorption_FoundationDB) |
+| **Rust** | Ownership memory safety, zero-unsafe-code policy, Cargo workspace | [OSS_Absorption_Rust](OSS_Absorption_Rust) |
+| **Linux Kernel** | EEVDF scheduler, io_uring async I/O, THP, page cache reclaim | [OSS_Absorption_LinuxKernel](OSS_Absorption_LinuxKernel) |
+| **OpenTelemetry** | Unified tracing/metrics/logs, kernel auto-instrumentation, OTLP | [OSS_Absorption_OpenTelemetry](OSS_Absorption_OpenTelemetry) |
+| **Theseus OS** | Live kernel module hot-swapping, cell-based memory isolation | [OSS_Absorption_TheseusOS](OSS_Absorption_TheseusOS) |
+| **Fuchsia OS** | Handle-based capability system, component framework manifest | [OSS_Absorption_FuchsiaOS](OSS_Absorption_FuchsiaOS) |
+| **RISC-V** | Open ISA, RV64GC boot sequence, sovereign hardware targeting | [OSS_Absorption_RISCV](OSS_Absorption_RISCV) |
 
 ## 🚀 Total Singularity
 
