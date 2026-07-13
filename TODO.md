@@ -87,7 +87,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ### Documentation Gaps
 - [x] SECURITY.md has placeholder contact info - Updated PGP key fingerprint reference
 - [x] Missing docs/security/pgp-key.asc - File exists with placeholder PGP key
-- [ ] Missing scripts/sign_release.sh
+- [x] Missing scripts/sign_release.sh - Implemented signature flow with GPG and Cosign PQC fallback
 - [x] MAINTAINERS file has formatting errors - File verified, no formatting errors found
 
 ### Testing
