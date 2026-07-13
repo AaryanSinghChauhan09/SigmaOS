@@ -28,11 +28,11 @@ Qubes:     "Security-first"     → SigmaOS: Security AND usable
 
 | Source Distro | Feature Absorbed | SigmaOS Shard | Status |
 |---|---|---|---|
-| Ubuntu | APT-compatible package layer | `SovereignAPT.shard` | 🔄 Active |
-| Arch Linux | AUR-style community recipes | `SigmaRecipes.shard` | 📋 Planned |
+| Ubuntu | APT-compatible package layer | `SovereignAPT.shard` | ✅ Done |
+| Arch Linux | AUR-style community recipes | `SigmaRecipes.shard` | ✅ Done |
 | NixOS | Atomic reproducible builds | `SovereignAtomicUpdater.shard` | ✅ Done |
-| Debian | Policy compliance engine | `DebianParity.shard` | 📋 Planned |
-| Fedora | RPM-spec absorption pipeline | `RPMAbsorber.shard` | 📋 Planned |
+| Debian | Policy compliance engine | `DebianParity.shard` | ✅ Done |
+| Fedora | RPM-spec absorption pipeline | `RPMAbsorber.shard` | ✅ Done |
 
 ### 1.2 Security Supremacy
 
