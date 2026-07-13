@@ -1,62 +1,52 @@
-# Distro Absorption: Kali Linux
+# Distro Absorption: Kali Linux — Penetration Testing OS
 
-> **Status**: 📋 Planned | **Source Paradigm**: Kali Linux (Offensive Security) | **Target Shard**: `SigmaOS Offensive / Cybernetics Profile`
+> **Status**: 📋 Planned | **Source Paradigm**: Kali Linux (Offensive Security) | **Target Shard**: `SigmaOS Security Audit Suite`
 
 ---
 
 ## 1. Executive Summary
 
-Kali Linux is the industry-standard distribution for penetration testing, digital forensics, and reverse engineering. Its core value is not a novel kernel architecture, but rather an immense, meticulously curated repository of thousands of security tools combined with a kernel patched for wireless packet injection.
+Kali Linux is the industry standard penetration testing distribution from Offensive Security. It ships with 600+ security tools pre-installed, a forensics mode that prevents disk writes, and specialized kernels with wireless injection patches.
 
-SigmaOS absorbs the **Offensive Profile**, providing a sandboxed, ephemeral toolkit environment (`sigma-kali`) alongside a kernel capable of all advanced radio frequency and network packet manipulation required by security researchers.
+SigmaOS absorbs Kali's **security audit tooling integration** and **forensics mode** into `sigma-sec-audit`, providing security professionals with a native, capability-enforced penetration testing environment that doesn't require a separate boot.
 
 ---
 
 ## 2. Key Features to Absorb
 
-### 2.1 The `sigma-kali` Metapackage Shard
+### 2.1 sigma-sec-audit Tooling Bundle
 
-Rather than dual-booting or running a VM, SigmaOS users can invoke an ephemeral OCI container or overlay environment packed with Kali's toolset.
+A curated collection of security tools installed as a `sigma-pkg` group, sandboxed with fine-grained capabilities so they can only operate within explicitly authorized network ranges.
 
 ```bash
-$ sigma env --profile offensive
-Σ [ENV] Dropping into Offensive Security Profile...
-  Mounting toolset (Metasploit, Nmap, Wireshark, Aircrack-ng, Burp Suite)
-  Configuring network shard for raw socket access
+$ sigma-pkg group install sec-audit
+Σ [PKG] Installing sigma-sec-audit group (42 tools):
+  nmap, rustscan, masscan      — Network scanning
+  sigma-burp, mitmproxy        — HTTP interception
+  hashcat, john                — Password auditing
+  sigma-forensic               — Disk forensics
+  sigma-exploit-kit            — CVE exploit PoCs (sandboxed)
+
+$ sigma-sec capability-grant --tool nmap --allow "10.0.0.0/8" --deny internet
+Σ [SEC] nmap granted: scan 10.0.0.0/8 only
 ```
 
-### 2.2 Kernel Patches for Wireless Injection
+### 2.2 Forensics Mode
 
-Standard Linux kernels often restrict WiFi drivers. SigmaOS's kernel (`sigma-kernel`) is pre-patched with mac80211 injection support for all supported wireless chipsets (Atheros, Realtek, Ralink).
-
-```bash
-# Enable monitor mode and injection
-$ sigma net wifi monitor wlan0 enable
-Σ [NET] wlan0 is now in monitor mode (mon0). Packet injection enabled.
-
-# Test injection
-$ aireplay-ng --test mon0
-12:34:56  Trying broadcast probe requests...
-12:34:56  Injection is working!
-```
-
-### 2.3 Undercover Mode
-
-Kali Linux features an "Undercover Mode" that themes the desktop to look exactly like Windows 10/11, preventing suspicion in public places or physical engagements. 
-
-SigmaOS achieves this via a single command that completely swaps the Zenith compositor theme, icon set, and behavior.
+In forensics mode, `sigma-init` mounts all local disks read-only. No swap is activated. No automount occurs. The system is ready for evidence collection without contaminating the target media.
 
 ```bash
-$ sigma ui set-theme win-undercover
-Σ [UI] Applying Windows 11 camouflage...
-  Taskbar moved to bottom
-  Window borders and icons swapped
-  (To revert, run: sigma ui set-theme default)
+$ sigma boot --mode forensics /dev/sda
+Σ [BOOT] Forensics Mode:
+  /dev/sda  → mounted READ-ONLY (no writes)
+  Swap:     → DISABLED
+  Journal:  → RAM only
+  Evidence hash: blake3:a1b2c3d4... (of /dev/sda at mount time)
 ```
 
 ---
 
 ## 3. References & Standards
 
-- Kali Linux — `kali.org` (GPL-2.0 / various)
-- mac80211 injection patches
+- Kali Linux — `kali.org` (Debian-based, mixed licenses)
+- Offensive Security — `offsec.com`
