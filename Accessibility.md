@@ -1,20 +1,31 @@
-# Accessibility
+# Accessibility & Assistive Standards
 
-1 SigmaOS is dedicated to providing a **Sovereign Experience for All**. We prioritize inclusive design and low-latency assistive technologies.
-1 1
-1 1
-1 1
-1 When building new shards for SigmaOS, please adhere to:
+This specification details the user-interface contrast metrics, hardware magnification modes, and text-to-speech systems that ensure a sovereign experience for users with differing accessibility needs.
 
-1. **Contrast Ratios**: Ensure a minimum 4.5:1 ratio for text.
+---
 
-2. **Focus States**: All interactive elements must have a visible focal glow.
+## 👁️ Visual Accessibility
 
-3. **Semantic Sharding**: Use standard UI primitives to ensure screen reader compatibility.
+### 1. High-Contrast Rendering Mode
+Zenith enforces WCAG AAA standard palettes:
+- **Default Contrast Ratio**: Min **7.0:1** for normal text.
+- **Toggle Mode**: Increases text weights and swaps borders to high-contrast monochrome surfaces (`#000000` / `#FFFFFF`).
 
-4. **ARIA Labels**: Every `<input>` or interactive component must have a descriptive `aria-label`.
+### 2. Magnification Engine
+The system magnifier (`sigma_magnifier.rs`) utilizes direct framebuffer crops:
+- **Scale Range**: **2x to 16x** zoom.
+- **Pacing**: Follows focus cursor position with smooth viewport transitions, running at display refresh rates.
 
-1 1
-1 ---
+---
 
-1
+## 🗣️ Auditory Accessibility
+
+### 1. Screen Reader Text-to-Speech (`sigma_screen_reader.rs`)
+- Emits voice output describing the currently active window, selected UI element, and text inputs.
+- Synthesizes speech from ARIA labels and title descriptors.
+- Supports customizable voice speed, pitch, and localization.
+
+### 2. Visual Alerts
+System warnings (bell, error tones) are mapped to desktop indicators:
+- Flash screen borders.
+- Display transient on-screen notifications.
