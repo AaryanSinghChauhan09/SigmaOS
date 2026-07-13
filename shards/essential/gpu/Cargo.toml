@@ -1,0 +1,15 @@
+[package]
+name = "sigma_gpu"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sigma_gpu"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gpu_driver"
+path = "src/bin/gpu_driver.rs"
