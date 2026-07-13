@@ -10,6 +10,7 @@ mod panic;
 mod log;
 pub mod linux_compat;
 pub mod network;
+pub mod ai;
 mod custom_allocators;
 
 #[global_allocator]
