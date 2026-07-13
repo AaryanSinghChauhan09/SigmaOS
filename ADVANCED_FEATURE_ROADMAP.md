@@ -223,8 +223,8 @@ pub trait GpuDriver: SigmaDriver {
 
 | Phase | Features | Timeline | Status |
 |---|---|---|---|
-| Phase 1 | Theme engine, Settings hub, Unified search | Q1-Q2 | 🔄 Active |
-| Phase 2 | Task scheduler, Macros, Auto-optimization | Q3-Q4 | 📋 Planned |
+| Phase 1 | Theme engine, Settings hub, Unified search | Q1-Q2 | ✅ Done |
+| Phase 2 | Task scheduler, Macros, Auto-optimization | Q3-Q4 | 🔄 Active |
 | Phase 3 | DAL, Package UI, System Dashboard | Year 2 | 📋 Planned |
 
 ---
