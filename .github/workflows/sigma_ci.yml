@@ -68,3 +68,29 @@ jobs:
         run: chmod +x ./scripts/smoke-test.sh
       - name: Run Smoke Tests
         run: ./scripts/smoke-test.sh
+
+  zig_and_nim_validation:
+    name: Zig & Nim Compiler Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Zig Compiler
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.11.0
+
+      - name: Verify Zig Drivers Compilation
+        run: |
+          zig build-obj -target x86_64-freestanding-none -O ReleaseFast drivers/bsd/bsd_compat.zig -femit-bin=bsd_compat.o
+
+      - name: Setup Nim Compiler
+        uses: alaviss/setup-nim@v1
+        with:
+          path: 'nim'
+          version: '2.0.2'
+
+      - name: Verify Nim Daemons Compilation
+        run: |
+          nim c --compileOnly --os:standalone --cpu:amd64 userland/daemons/sigma-notify/sigma_notify.nim
