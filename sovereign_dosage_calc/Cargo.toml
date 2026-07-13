@@ -1,0 +1,15 @@
+[package]
+name = "sovereign_dosage_calc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sovereign_dosage_calc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dosage_calc"
+path = "src/bin/dosage_calc.rs"
