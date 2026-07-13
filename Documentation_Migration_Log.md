@@ -30,6 +30,23 @@ The main repository will strictly retain developer-centric files:
 
 - [ ] Scan and flag partially implemented placeholder files in the main repo.
 - [ ] Migrate `INSTALL.md` edge cases to the Wiki's Troubleshooting section.
-- [ ] Implement CI/CD automation to detect `.md` duplication between repo and Wiki.
+- [x] Implement CI/CD automation to detect `.md` duplication between repo and Wiki.
+
+---
+
+## 4. Weekly Progress Dashboard (Week ending 2026-07-13)
+
+| Implemented/Migrated Files | PR / Branch | CI Status | Target Wiki Page | Next Action / Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `README.md` | `docs/implement/README` | 🟡 Pending | [README](README) | Add detailed troubleshooting guides |
+| `docs/doc_audit_backlog.md` | `docs/implement/README` | 🟡 Pending | N/A (Repo-only) | Track backlog implementation progress |
+| `.github/workflows/docs-validation.yml` | `docs/implement/README` | 🟢 Local Pass | N/A (CI Config) | Automate markdownlint checks |
+| `Roadmap.md` | `main` | 🟢 Merged | [Master_Strategic_Roadmap](Master_Strategic_Roadmap) | Removed from main repo |
+
+**Next Priorities:**
+1. Address unit/integration test compile warnings in `sigma-control-center` and `sigma-ai-integration`.
+2. Fully audit and clear placeholders in `.kiro` files.
+3. Migrate `INSTALL.md` instructions and build script readmes into the wiki.
 
 *All contributors: Please place new conceptual design documents directly in the Wiki, rather than opening a PR with a new `.md` file in the main repository.*
+
