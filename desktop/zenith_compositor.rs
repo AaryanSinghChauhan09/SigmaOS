@@ -58,6 +58,38 @@ pub enum Layout {
     Tabbed,         // Tabbed interface
 }
 
+// ─── Animation Types ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy)]
+pub enum Animation {
+    None,
+    FadeIn(f32), // Current progress 0.0-1.0
+    FadeOut(f32),
+    SlideIn(i32, i32), // Target x, y
+    Scale(f32), // Current scale
+}
+
+// ─── Window Effects ────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy)]
+pub struct WindowEffects {
+    pub shadow: bool,
+    pub blur: bool,
+    pub transparency: u8, // 0-255
+    pub animation: Animation,
+}
+
+impl Default for WindowEffects {
+    fn default() -> Self {
+        Self {
+            shadow: true,
+            blur: false,
+            transparency: 255,
+            animation: Animation::None,
+        }
+    }
+}
+
 // ─── Zenith Compositor ─────────────────────────────────────────────────────────
 
 pub struct ZenithCompositor {
@@ -66,12 +98,15 @@ pub struct ZenithCompositor {
     pub framebuffer: Vec<u8>,
     pub windows: HashMap<u32, Window>,
     pub surfaces: HashMap<u32, Surface>,
+    pub effects: HashMap<u32, WindowEffects>,
     pub focused_window: Option<u32>,
     pub cursor_x: i32,
     pub cursor_y: i32,
     pub layout: Layout,
     pub master_window: Option<u32>,
     pub initialized: bool,
+    pub vsync_enabled: bool,
+    pub frame_count: u64,
 }
 
 impl ZenithCompositor {
@@ -83,12 +118,15 @@ impl ZenithCompositor {
             framebuffer: vec![0u8; framebuffer_size],
             windows: HashMap::new(),
             surfaces: HashMap::new(),
+            effects: HashMap::new(),
             focused_window: None,
             cursor_x: (width / 2) as i32,
             cursor_y: (height / 2) as i32,
             layout: Layout::MasterStack,
             master_window: None,
             initialized: false,
+            vsync_enabled: true,
+            frame_count: 0,
         }
     }
 
@@ -123,6 +161,7 @@ impl ZenithCompositor {
         };
         
         self.windows.insert(window_id, window);
+        self.effects.insert(window_id, WindowEffects::default());
         window_id
     }
 
@@ -130,6 +169,7 @@ impl ZenithCompositor {
     pub fn destroy_window(&mut self, window_id: u32) -> Result<(), String> {
         if self.windows.remove(&window_id).is_some() {
             self.surfaces.remove(&window_id);
+            self.effects.remove(&window_id);
             if self.focused_window == Some(window_id) {
                 self.focused_window = None;
             }
@@ -221,6 +261,8 @@ impl ZenithCompositor {
             return Err("Compositor not initialized".to_string());
         }
 
+        self.frame_count += 1;
+
         // Clear framebuffer to background color
         let bg_color = [0x20, 0x20, 0x30, 0xFF]; // Dark blue-gray
         for i in (0..self.framebuffer.len()).step_by(4) {
@@ -242,6 +284,16 @@ impl ZenithCompositor {
 
                 if let Some(surface) = self.surfaces.get(&window_id) {
                     self.blit_surface(surface, window.x, window.y);
+                }
+
+                // Apply window effects
+                if let Some(effects) = self.effects.get(&window_id) {
+                    if effects.shadow {
+                        self.draw_shadow(window.x, window.y, window.width, window.height);
+                    }
+                    if effects.transparency < 255 {
+                        self.apply_transparency(window.x, window.y, window.width, window.height, effects.transparency);
+                    }
                 }
 
                 // Draw window border if focused
@@ -352,6 +404,73 @@ impl ZenithCompositor {
                 }
             }
         }
+    }
+
+    /// Draw window shadow
+    fn draw_shadow(&mut self, x: i32, y: i32, width: u32, height: u32) {
+        let shadow_offset = 8;
+        let shadow_color = [0x00, 0x00, 0x00, 0x80]; // Semi-transparent black
+        let fb_width = self.width as usize;
+
+        let x = x as usize;
+        let y = y as usize;
+        let width = width as usize;
+        let height = height as usize;
+
+        // Draw shadow offset
+        for sy in y..(y + height).min(self.height as usize) {
+            for sx in x..(x + width).min(self.width as usize) {
+                let shadow_x = sx + shadow_offset;
+                let shadow_y = sy + shadow_offset;
+
+                if shadow_x < self.width as usize && shadow_y < self.height as usize {
+                    let idx = (shadow_y * fb_width + shadow_x) * 4;
+                    if idx + 3 < self.framebuffer.len() {
+                        // Simple alpha blending for shadow
+                        let alpha = shadow_color[3] as f32 / 255.0;
+                        let inv_alpha = 1.0 - alpha;
+                        for c in 0..4 {
+                            let src_val = shadow_color[c] as f32;
+                            let dst_val = self.framebuffer[idx + c] as f32;
+                            self.framebuffer[idx + c] = (src_val * alpha + dst_val * inv_alpha) as u8;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Apply transparency to window area
+    fn apply_transparency(&mut self, x: i32, y: i32, width: u32, height: u32, transparency: u8) {
+        let alpha = transparency as f32 / 255.0;
+        let fb_width = self.width as usize;
+
+        let x = x as usize;
+        let y = y as usize;
+        let width = width as usize;
+        let height = height as usize;
+
+        for wy in y..(y + height).min(self.height as usize) {
+            for wx in x..(x + width).min(self.width as usize) {
+                let idx = (wy * fb_width + wx) * 4;
+                if idx + 3 < self.framebuffer.len() {
+                    // Apply transparency to RGB channels
+                    for c in 0..3 {
+                        self.framebuffer[idx + c] = (self.framebuffer[idx + c] as f32 * alpha) as u8;
+                    }
+                }
+            }
+        }
+    }
+
+    /// Enable/disable VSync
+    pub fn set_vsync(&mut self, enabled: bool) {
+        self.vsync_enabled = enabled;
+    }
+
+    /// Get current frame count
+    pub fn get_frame_count(&self) -> u64 {
+        self.frame_count
     }
 
     /// Update cursor position
