@@ -52,6 +52,10 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Mageia** | Integrated Control Center admin unified settings database | [Distro_Absorption_Mageia](Distro_Absorption_Mageia) |
 | **MX Linux** | Native system toolkit suite (sigma-tools), curated admin utilities | [Distro_Absorption_MXLinux](Distro_Absorption_MXLinux) |
 | **Garuda Linux** | Process niceness daemon (sigma-prio), auto-ZRAM compression | [Distro_Absorption_Garuda](Distro_Absorption_Garuda) |
+| **Void Linux** | runit-style init supervision, XBPS recipe builds, musl-first profile | [Distro_Absorption_Void](Distro_Absorption_Void) |
+| **Alpine Linux** | Sub-5MB container base image, APK atomic installs, PIE hardening | [Distro_Absorption_Alpine](Distro_Absorption_Alpine) |
+| **Tails** | Amnesic RAM-only boot, forced Tor routing, anti-forensic shutdown | [Distro_Absorption_Tails](Distro_Absorption_Tails) |
+| **Qubes OS** | Capability-enforced compartments, disposable VMs, secure clipboard | [Distro_Absorption_Qubes](Distro_Absorption_Qubes) |
 
 ## 🔧 Open Source Project Absorptions
 
@@ -101,6 +105,11 @@ SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most
 | **Terraform/OpenTofu** | Declarative plan/apply system provisioning, state file model | [OSS_Absorption_Terraform](OSS_Absorption_Terraform) |
 | **Ansible** | Agentless YAML fleet config automation, idempotent playbooks | [OSS_Absorption_Ansible](OSS_Absorption_Ansible) |
 | **Git** | Config-as-repository with full audit trail and revert semantics | [OSS_Absorption_Git](OSS_Absorption_Git) |
+| **Envoy** | xDS dynamic config, L7 filter chains, circuit breaking, outlier detection | [OSS_Absorption_Envoy](OSS_Absorption_Envoy) |
+| **Traefik** | Auto service discovery, declarative middleware chains, ACME TLS | [OSS_Absorption_Traefik](OSS_Absorption_Traefik) |
+| **Consul** | Service catalog with health checks, KV config store, intention ACLs | [OSS_Absorption_Consul](OSS_Absorption_Consul) |
+| **etcd** | Raft consensus engine, watch/notify API, lease-based ephemeral keys | [OSS_Absorption_etcd](OSS_Absorption_etcd) |
+| **Jaeger** | Distributed tracing with trace propagation, adaptive sampling | [OSS_Absorption_Jaeger](OSS_Absorption_Jaeger) |
 
 ## 🚀 Total Singularity
 

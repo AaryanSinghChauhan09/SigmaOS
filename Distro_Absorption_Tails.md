@@ -1,77 +1,53 @@
-# Distro Absorption: Tails
+# Distro Absorption: Tails — Amnesic Privacy OS
 
-> **Status**: 📋 Planned | **Source Paradigm**: Tails (The Amnesic Incognito Live System) | **Target Shard**: `SigmaOS Amnesic Network Profile`
+> **Status**: 📋 Planned | **Source Paradigm**: Tails OS | **Target Shard**: `SigmaOS Privacy Mode`
 
 ---
 
 ## 1. Executive Summary
 
-Tails is a portable Linux distribution designed to protect against surveillance and censorship. It forces all outbound network connections through the Tor network and is "amnesic" — it leaves no trace on the host computer unless explicitly configured to do so.
+Tails (The Amnesic Incognito Live System) is a portable Debian-based OS that routes all network traffic through Tor, leaves no trace on the host machine, and provides built-in encryption tools. It is the gold standard for journalist and activist privacy.
 
-SigmaOS absorbs the **Amnesic Live Profile** and **Transparent Tor Routing** features, allowing any SigmaOS installation to dynamically switch into a mathematically secure, trace-free state.
+SigmaOS absorbs Tails' **amnesic boot** (no persistent state by default), **forced Tor routing**, and **forensic resistance** patterns into a dedicated `PROFILE=privacy` deployment mode.
 
 ---
 
 ## 2. Key Features to Absorb
 
-### 2.1 The Amnesic State (`sigma-amnesia`)
+### 2.1 Amnesic Boot Mode
 
-When SigmaOS is booted in (or switched to) Amnesic Mode, it immediately unmounts all persistent storage, running entirely from RAM (`tmpfs`). 
-
-```bash
-$ sigma mode enter amnesic
-Σ [AMNESIA] Transitioning to Amnesic Mode...
-  Locking and unmounting /home
-  Locking and unmounting /var/log
-  Creating 4GB tmpfs overlay...
-  Done. All future writes will vanish on power loss.
-```
-
-To ensure memory forensics cannot recover data after shutdown, SigmaOS implements a kernel shutdown hook that explicitly overwrites all RAM with random noise before the ACPI power-off signal is sent (`sdmem` equivalent).
-
-### 2.2 Transparent Tor Proxying
-
-In the Amnesic profile, the `sigma-networking` shard configures `sigma-net-policy` (eBPF firewall) to drop all non-Tor traffic.
-
-```rust
-// kernel/net/amnesic_policy.rs
-// SPDX-License-Identifier: MIT
-
-#[xdp_program]
-pub fn amnesic_packet_filter(ctx: XdpContext) -> XdpAction {
-    // Only allow traffic from the tor daemon (UID tor)
-    if get_socket_uid(ctx) != UID_TOR {
-        return XdpAction::Drop; // Block leaks entirely at the driver level
-    }
-    
-    XdpAction::Pass
-}
-```
+When SigmaOS boots in privacy mode, all filesystem writes go to a RAM-backed tmpfs. On shutdown, all data is zeroed. No disk writes occur unless the user explicitly enables an encrypted persistent volume.
 
 ```bash
-# Verify network isolation
-$ sigma net status
-Σ [NET] Amnesic Profile Active:
-  All outbound TCP routed through Tor proxy (127.0.0.1:9050)
-  All UDP dropped (except DNS over Tor)
-  IPv6 disabled to prevent leaks
-  Current Tor Exit Node: CH (Switzerland)
+$ sigma boot --profile privacy
+Σ [BOOT] Privacy Mode activated:
+  Filesystem:  RAM-only (tmpfs, 2GB)
+  Persistence: DISABLED (enable with --persist /dev/sda2)
+  Network:     Tor-only (all clearnet blocked)
+  On shutdown: RAM wipe + secure erase
 ```
 
-### 2.3 MAC Address Spoofing
+### 2.2 Forced Tor Network Routing
 
-Before bringing up any physical network interface, SigmaOS automatically randomizes the hardware MAC address to prevent tracking across physical locations.
+In privacy mode, the `sigma-net` shard enforces that **all** outbound traffic passes through a Tor circuit. Direct clearnet connections are blocked at the firewall level. DNS requests go through Tor's DNS resolver.
 
 ```bash
-Σ [NET] wlan0 initializing...
-  Real MAC: a4:83:e7:xx:xx:xx
-  Spoofed MAC: 00:50:56:xx:xx:xx (Vendor: VMware)
+$ sigma net status --profile privacy
+Σ [NET] Privacy network status:
+  Tor circuit:  ESTABLISHED (3 hops)
+  Exit node:    de-exit-42
+  DNS:          Tor DNS resolver
+  Clearnet:     BLOCKED (all ports)
+  Leak test:    PASS ✓
 ```
+
+### 2.3 Anti-Forensic Shutdown
+
+On shutdown, SigmaOS privacy mode overwrites all RAM pages with cryptographic random data before powering off, preventing cold-boot attacks.
 
 ---
 
 ## 3. References & Standards
 
-- Tails Project — `tails.net` (GPL-3.0)
-- Tor Project — `torproject.org` (BSD-3-Clause)
-- macchanger — `github.com/alobbs/macchanger` (GPL-2.0)
+- Tails — `tails.net` (GPL-3.0)
+- Tor Project — `torproject.org`

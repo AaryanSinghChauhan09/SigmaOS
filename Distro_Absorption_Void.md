@@ -1,170 +1,66 @@
 # Distro Absorption: Void Linux
 
-> **Status**: 📋 Planned | **Source Paradigm**: Void Linux | **Target Shard**: `SigmaOS Init + Package Layer`
+> **Status**: 📋 Planned | **Source Paradigm**: Void Linux | **Target Shard**: `SigmaOS Minimal Init & Package Layer`
 
 ---
 
 ## 1. Executive Summary
 
-Void Linux is a general-purpose independent distribution with two innovations worth absorbing:
+Void Linux is an independent, rolling-release distribution built from scratch (not forked from any other distro). It is renowned for using **runit** as its init system (instead of systemd), its custom **XBPS** package manager, and its first-class **musl libc** support as an alternative to glibc.
 
-- **runit** — a minimalist, supervision-tree init system (10x simpler than systemd, 100x simpler than SysVinit)
-- **XBPS** (X Binary Package System) — a fast, dependency-resolving binary package manager with delta updates and atomic transactions
-
-Void also pioneered the **musl libc variant** as a first-class build target, proving that a full desktop Linux can run entirely on musl — a philosophy SigmaOS adopts for its minimal profile.
+SigmaOS absorbs Void's philosophy of **simplicity-first init management** and **musl-native userland** to offer an ultra-minimal system profile that boots in under 2 seconds with a tiny memory footprint.
 
 ---
 
 ## 2. Key Features to Absorb
 
-### 2.1 runit-Inspired Service Supervision (`sigma-runit`)
+### 2.1 runit-Inspired Init (`sigma-init`)
 
-runit's simplicity is its strength: each service is a directory containing a `run` script. Supervision is automatic — if a service crashes, it is restarted instantly.
+Instead of the complexity of systemd unit files, SigmaOS offers a runit-style init where each service is a directory containing a `run` script. The init system supervises each service and restarts it on crash.
 
 ```
 /etc/sigma/services/
-├── sigma-networking/
-│   ├── run              # Start script
-│   ├── finish           # Cleanup on exit
-│   ├── log/
-│   │   └── run          # Dedicated log process
-│   └── supervise/       # Runtime state (managed by sigma-init)
-├── sigma-sshd/
-│   ├── run
-│   └── log/run
-└── sigma-resolved/
-    ├── run
-    └── log/run
+├── sshd/
+│   └── run          # #!/bin/sh\nexec /usr/bin/sshd -D
+├── sigma-gateway/
+│   └── run          # #!/bin/sh\nexec sigma-gateway serve
+└── sigma-agent/
+    └── run          # #!/bin/sh\nexec sigma-agent daemon
 ```
 
 ```bash
-# Service run script — just a shell script
-$ cat /etc/sigma/services/sigma-sshd/run
-#!/bin/sh
-exec chpst -u root sigma-sshd -D -e
-
-# Service management
-$ sigma sv status sigma-sshd
-Σ [SV] sigma-sshd: running (pid 1234, uptime 5d 3h 12m)
-
-$ sigma sv restart sigma-networking
-Σ [SV] sigma-networking: restarted (pid 5678)
-
-$ sigma sv down sigma-bluetooth
-Σ [SV] sigma-bluetooth: stopped
-
-# Enable/disable services (symlink-based, like runit)
-$ sigma sv enable sigma-bluetooth     # Creates symlink to service dir
-$ sigma sv disable sigma-bluetooth    # Removes symlink
+$ sigma service status
+Σ [INIT] Service supervision:
+  sshd            UP (pid 312)  uptime 4h
+  sigma-gateway   UP (pid 418)  uptime 4h
+  sigma-agent     UP (pid 501)  uptime 3h59m
 ```
 
-```rust
-// kernel/init/supervisor.rs
-// SPDX-License-Identifier: MIT
+### 2.2 XBPS-Inspired Template Build System
 
-pub struct ServiceSupervisor {
-    services: HashMap<String, SupervisedService>,
-    scan_dir: PathBuf,   // /etc/sigma/services/
-}
+Void's `xbps-src` uses simple shell templates to build packages. SigmaOS adapts this as `sigma-recipe`, where each package is defined by a short TOML recipe file.
 
-pub struct SupervisedService {
-    pub name:       String,
-    pub pid:        Option<Pid>,
-    pub state:      ServiceState,
-    pub restart_count: u32,
-    pub uptime:     Duration,
-    pub log_pid:    Option<Pid>,
-}
+```toml
+# recipes/helix-editor.toml
+[package]
+name = "helix"
+version = "24.7"
+source = "https://github.com/helix-editor/helix/archive/24.07.tar.gz"
+checksum = "blake3:a1b2c3d4..."
 
-pub enum ServiceState {
-    Running,
-    Finishing,   // Running `finish` script
-    Down,        // Administratively stopped
-    Failed,      // Crashed — will auto-restart after backoff
-}
-
-impl ServiceSupervisor {
-    /// Main supervision loop — runs as sigma-init child
-    pub fn supervise_loop(&mut self) {
-        loop {
-            for svc in self.services.values_mut() {
-                match svc.state {
-                    ServiceState::Failed => {
-                        let backoff = exponential_backoff(svc.restart_count);
-                        if svc.time_since_failure() > backoff {
-                            svc.restart();
-                        }
-                    }
-                    ServiceState::Running => {
-                        if !svc.is_alive() {
-                            svc.run_finish_script();
-                            svc.state = ServiceState::Failed;
-                            svc.restart_count += 1;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            std::thread::sleep(Duration::from_millis(100));
-        }
-    }
-}
+[build]
+system = "cargo"
+features = ["default"]
 ```
 
-### 2.2 XBPS-Inspired Package Management
+### 2.3 musl libc Support for Minimal Profile
 
-XBPS provides:
-- **Delta updates**: download only the binary diff between versions (~70% bandwidth savings)
-- **Atomic transactions**: package operations either fully succeed or fully roll back
-- **Package alternatives**: multiple packages can provide the same command (e.g., `vi` → `vim` or `nvi`)
-
-```bash
-# XBPS-equivalent commands in SigmaOS
-$ sigma pkg install neovim        # Install package
-$ sigma pkg update                # Update all packages (delta download)
-$ sigma pkg remove --recursive vim  # Remove package + orphan deps
-$ sigma pkg search "text editor"  # Search repository
-$ sigma pkg alternatives vi       # List providers of 'vi' command
-
-Σ [PKG] Alternatives for 'vi':
-  * neovim   /sigma/store/neovim/bin/nvim   [active]
-    vim      /sigma/store/vim/bin/vim
-    nvi      /sigma/store/nvi/bin/nvi
-
-$ sigma pkg set-alternative vi vim   # Switch 'vi' to use vim
-```
-
-### 2.3 Rolling Release with Snapshot Safety
-
-Void's rolling-release model (no versioned releases — always the latest) combined with SigmaOS's snapshot system:
-
-```bash
-$ sigma pkg update --full-system
-Σ [PKG] Rolling update: 47 packages to upgrade
-  Creating pre-update snapshot... done (#12)
-  Downloading deltas... [██████████] 100% (34MB saved via delta)
-  Applying packages...  [██████████] 100%
-
-  If anything breaks:
-  $ sigma snap rollback 12
-```
+SigmaOS `PROFILE=microkernel` targets musl libc instead of glibc, producing statically linked binaries with zero runtime dependencies, ideal for embedded and container deployments.
 
 ---
 
-## 3. Boot Time Comparison
+## 3. References & Standards
 
-| Init System | Time to Login Prompt | Complexity (LoC) |
-|:-----------|:--------------------|:-----------------|
-| SysVinit | ~8s | 10,000 |
-| systemd | ~2s | 1,400,000+ |
-| runit | ~1.5s | 2,500 |
-| sigma-init (runit-inspired) | ~0.8s | 4,000 (Rust) |
-
----
-
-## 4. References & Standards
-
-- Void Linux — `voidlinux.org` (BSD-like, multiple licenses)
+- Void Linux — `voidlinux.org`
 - runit — `smarden.org/runit` (BSD)
 - XBPS — `github.com/void-linux/xbps` (BSD-2-Clause)
-- daemontools (runit predecessor) — D.J. Bernstein
