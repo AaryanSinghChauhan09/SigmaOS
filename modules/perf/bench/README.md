@@ -6,7 +6,7 @@ used to catch performance regressions before they reach `main`.
 ## Benchmark Categories
 
 | Category | Scope | Key Metric |
-|---|---|---|
+| --- | --- | --- |
 | `kernel/syscall` | Syscall dispatcher round-trip | ns/call |
 | `kernel/ipc` | Zero-copy IPC throughput | GB/s |
 | `mm/alloc` | Slab allocator latency | ns/op |
@@ -19,16 +19,21 @@ used to catch performance regressions before they reach `main`.
 ## Running Benchmarks
 
 ```bash
+
 # Run all benchmarks
+
 just bench
 
 # Run only IPC benchmarks
+
 just bench -- kernel/ipc
 
 # Generate flamegraph
+
 just bench-flamegraph
 
 # Compare against baseline
+
 just bench-compare baseline.json
 ```
 
@@ -50,10 +55,14 @@ All benchmarks run nightly on bare-metal CI (not in QEMU ΓÇö timing is not
 meaningful in a VM). A regression of > 5% triggers a blocking CI alert.
 
 ```yaml
+
 # .github/workflows/bench.yml
+
 on:
   schedule:
+
     - cron: '0 2 * * *'   # 02:00 UTC nightly
+
 ```
 
 ## Roadmap
@@ -66,6 +75,7 @@ on:
 - [ ] Automated regression detection (┬▒ 5% threshold)
 - [ ] Flamegraph generation pipeline
 - [ ] Historical results dashboard (GitHub Pages)
+
 
 ## Related Modules
 

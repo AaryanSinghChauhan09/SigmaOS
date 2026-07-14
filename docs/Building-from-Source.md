@@ -18,6 +18,7 @@
 9. [CI/CD Pipeline](#cicd-pipeline)
 10. [Troubleshooting](#troubleshooting)
 
+
 ---
 
 ## Prerequisites
@@ -50,7 +51,9 @@ cargo install cargo-xbuild  # For cross-compiling core
 ### Zig (freestanding)
 
 ```bash
+
 # Download Zig 0.12.0 binary (first-principles, no package manager dependency)
+
 curl -fsSL https://ziglang.org/download/0.12.0/zig-linux-x86_64-0.12.0.tar.xz | tar xJ
 export PATH="$PWD/zig-linux-x86_64-0.12.0:$PATH"
 zig version   # Should print 0.12.0
@@ -59,7 +62,9 @@ zig version   # Should print 0.12.0
 ### Nim (freestanding/nosdk)
 
 ```bash
+
 # Via choosenim (recommended)
+
 curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 nimble install  # From project root (no external packages — only std lib guard)
 nim --version   # Should print 2.0.x
@@ -74,6 +79,7 @@ git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
 # Clone the Wiki as a sub-directory (for doc migration)
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git wiki_repo
 ```
 
@@ -97,17 +103,21 @@ git clone https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git wiki_repo
 The kernel is a **`#![no_std]` Rust** binary with Zig FFI bridges for drivers.
 
 ```bash
+
 # Step 1: Build Rust kernel crate
+
 cd kernel
 cargo build --release --target x86_64-unknown-none
 
 # Step 2: Build Zig driver objects and link
+
 zig build-obj src/drivers/sigma_driver.zig \
     -target x86_64-freestanding-none \
     -O ReleaseFast \
     -femit-llvm-ir=false
 
 # Step 3: Link everything into ELF
+
 zig build-exe \
     --name sigma-kernel \
     -target x86_64-freestanding-none \
@@ -130,7 +140,9 @@ zig build-exe \
 SigmaOS daemons are **freestanding Nim** programs compiled with `--mm:none` and `--os:linux` for target-neutral binaries.
 
 ```bash
+
 # Build the notification daemon
+
 nim compile \
     --mm:none \
     --verbosity:0 \
@@ -138,6 +150,7 @@ nim compile \
     userland/daemons/sigma-notify/sigma_notify.nim
 
 # Build the cloud orchestration daemon (sigma-nebula)
+
 nim compile \
     --mm:none \
     --verbosity:0 \
@@ -145,6 +158,7 @@ nim compile \
     userland/nebula/sigma_nebula.nim
 
 # Build the desktop control center
+
 nim compile \
     --mm:none \
     --verbosity:0 \
@@ -166,6 +180,7 @@ zig build-lib sigma_fs.zig \
     --name sigma_fs
 
 # Run Zig unit tests
+
 zig test sigma_fs.zig
 ```
 
@@ -174,17 +189,22 @@ zig test sigma_fs.zig
 ## Running the Smoke Tests
 
 ```bash
+
 # Full smoke-test (requires QEMU)
+
 ./scripts/smoke-test.sh
 
 # Rust kernel unit tests (no QEMU needed)
+
 cd kernel && cargo test --target x86_64-unknown-linux-gnu -- --test-threads=1
 
 # Zig unit tests
+
 zig test kernel/src/fs/sigma_fs.zig
 zig test kernel/src/drivers/sigma_driver.zig
 
 # Nim unit tests
+
 nim compile --run userland/nebula/sigma_nebula.nim
 nim compile --run userland/gui/sigma_control_center.nim
 ```
@@ -212,6 +232,7 @@ CI runs automatically on every push via `.github/workflows/sigma_ci.yml`.
 ### `error: no_std requires panic_handler`
 
 Add to `kernel/src/main.rs`:
+
 ```rust
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! { loop {} }
@@ -220,6 +241,7 @@ fn panic(_: &core::panic::PanicInfo) -> ! { loop {} }
 ### Zig: `error: unable to find zig installation`
 
 Ensure `zig` is on `PATH`:
+
 ```bash
 export PATH="/path/to/zig-linux-x86_64-0.12.0:$PATH"
 ```
@@ -227,6 +249,7 @@ export PATH="/path/to/zig-linux-x86_64-0.12.0:$PATH"
 ### Nim: `Error: cannot find module 'system'`
 
 This indicates the Nim choosenim path is not configured. Run:
+
 ```bash
 source ~/.nimble/env.sh
 ```
@@ -234,6 +257,7 @@ source ~/.nimble/env.sh
 ### QEMU hangs at boot
 
 Check that the linker script `kernel/linker.ld` sets the entry point correctly:
+
 ```ld
 ENTRY(_start)
 SECTIONS { . = 0x100000; }

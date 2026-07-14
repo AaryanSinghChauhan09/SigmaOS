@@ -7,7 +7,7 @@ HAL backend ΓÇö nothing else needs to change.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `hal.rs` | Core HAL trait definitions and dispatch table |
 | `hw_detect.rs` | Runtime CPU / ACPI / DTB hardware discovery |
 | `accel_hal.rs` | Hardware accelerator HAL (GPU compute / NPU / DSP) |
@@ -15,7 +15,7 @@ HAL backend ΓÇö nothing else needs to change.
 ## Supported Targets
 
 | Architecture | Status |
-|---|---|
+| --- | --- |
 | x86_64 | Γ£à Active |
 | AArch64 (ARM64) | ≡ƒöº In-progress |
 | RISC-V RV64GC | ≡ƒôï Planned |
@@ -47,7 +47,7 @@ sigma_arch_t hal_detect_arch(void);
 `hw_detect.rs` interrogates ACPI RSDP / MADT / SRAT on x86_64 and the
 Flattened Device Tree on ARM/RISC-V to build a unified topology map:
 
-```
+```text
 ACPI RSDP ΓåÆ XSDT ΓåÆ MADT   (interrupt routing)
                   ΓåÆ SRAT   (NUMA node topology)
                   ΓåÆ MCFG   (PCIe ECAM base)
@@ -62,6 +62,7 @@ ACPI RSDP ΓåÆ XSDT ΓåÆ MADT   (interrupt routing)
 - [ ] RISC-V PLIC / CLINT integration
 - [ ] ACPI Power Management (S3/S4 sleep states)
 - [ ] Secure Enclave HAL (SGX / TrustZone)
+
 
 ## Related Modules
 

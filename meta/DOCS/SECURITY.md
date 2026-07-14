@@ -31,6 +31,7 @@ When a CVE or vulnerability report is received:
 7. **Release** patch on `main` and draft a GitHub Security Advisory
 8. **Publish** CVE assignment and advisory simultaneously
 
+
 ---
 
 ## Private Disclosure Channel
@@ -40,11 +41,13 @@ All unpatched CVEs are discussed in:
 - **GitHub Private Vulnerability Reporting** (preferred)
 - **Encrypted Email**: security@sigmaos.dev (PGP required)
 
+
 Do **not** discuss unpatched issues in:
 
 - Public GitHub Issues
 - Discord/community channels
 - Social media
+
 
 ---
 
@@ -58,6 +61,7 @@ Before each release, the following checks must pass:
 - [ ] PQC signature verification test suite
 - [ ] Silo isolation smoke tests (`modules/security/isolation/`)
 - [ ] Secure boot chain validation (`modules/security/secure_boot/`)
+
 
 ---
 

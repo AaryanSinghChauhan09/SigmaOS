@@ -19,6 +19,7 @@ Essential shards include drivers for common hardware:
 - **Input Drivers**: HID devices, touchscreens, keyboards
 - **Audio Drivers**: Sound cards, audio interfaces
 
+
 ### Filesystem Shards
 
 Additional filesystem implementations beyond the core:
@@ -27,6 +28,7 @@ Additional filesystem implementations beyond the core:
 - **FAT32**: Windows compatibility
 - **NTFS**: Windows filesystem support
 - **exFAT**: Flash storage compatibility
+
 
 ### Security Shards
 
@@ -37,6 +39,7 @@ Additional security components:
 - **Disk Encryption**: Full disk encryption
 - **Key Management**: Cryptographic key storage
 
+
 ## Essential Shards List
 
 ### GPU Drivers
@@ -44,10 +47,12 @@ Additional security components:
 **Description**: Graphics drivers for rendering and display.
 
 **Features**:
+
 - GPU initialization and mode setting
 - Framebuffer management
 - 2D/3D acceleration
 - Display server integration
+
 
 **Prototype**: `shards/essential/gpu/`
 
@@ -56,10 +61,12 @@ Additional security components:
 **Description**: Network interface card drivers.
 
 **Features**:
+
 - NIC initialization
 - Packet transmission/reception
 - Interrupt handling
 - DMA operations
+
 
 **Prototype**: `shards/essential/network/`
 
@@ -68,10 +75,12 @@ Additional security components:
 **Description**: Storage controller drivers.
 
 **Features**:
+
 - NVMe controller support
 - AHCI SATA support
 - Block device interface
 - I/O scheduling
+
 
 **Prototype**: `shards/essential/storage/`
 
@@ -80,10 +89,12 @@ Additional security components:
 **Description**: Input device drivers.
 
 **Features**:
+
 - Keyboard driver (USB HID)
 - Mouse driver (USB HID)
 - Touchscreen support
 - Generic HID support
+
 
 **Prototype**: `shards/essential/input/`
 
@@ -92,10 +103,12 @@ Additional security components:
 **Description**: Audio subsystem drivers.
 
 **Features**:
+
 - Audio codec initialization
 - PCM audio playback
 - Audio capture
 - Mixer controls
+
 
 **Prototype**: `shards/essential/audio/`
 
@@ -122,10 +135,11 @@ All essential shards implement:
 - **Signed Drivers**: Driver signature verification
 - **Sandboxing**: Driver isolation from kernel
 
+
 ## Implementation Status
 
 | Shard | Documentation | Prototype | Status |
-|-------|--------------|-----------|--------|
+| ------- | -------------- | ----------- | -------- |
 | GPU Drivers | ✅ Complete | ⏳ Pending | ⏳ Not Started |
 | Network Drivers | ✅ Complete | ⏳ Pending | ⏳ Not Started |
 | Storage Drivers | ✅ Complete | ⏳ Pending | ⏳ Not Started |
@@ -139,6 +153,7 @@ All essential shards implement:
 3. Implement storage driver prototype (Rust)
 4. Implement input driver prototype (Zig)
 5. Implement audio driver prototype (Rust)
+
 
 ---
 

@@ -6,7 +6,7 @@ execute inside SigmaOS user space without requiring the Linux ABI.
 ## Supported Runtimes
 
 | Runtime | Language | Format | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `sigma-wasm` | WebAssembly | `.wasm` | ≡ƒöº In-progress |
 | `sigma-luajit` | Lua 5.4 | `.lua` | ≡ƒôï Planned |
 | `sigma-python` | Python 3.x | `.py` | ≡ƒôï Planned |
@@ -19,7 +19,7 @@ and JIT that sandboxes apps with hardware capability tokens.
 
 ### Execution Model
 
-```
+```text
 .wasm module
   ΓööΓöÇ sigma-wasm validator   (type checking, memory bounds)
         ΓööΓöÇ Interpreter      (boot-time, no JIT dependency)
@@ -30,7 +30,7 @@ and JIT that sandboxes apps with hardware capability tokens.
 ### WASI Sovereign Mapping
 
 | WASI Syscall | SigmaOS Translation |
-|---|---|
+| --- | --- |
 | `fd_read` | `sigma_vfs_read()` |
 | `fd_write` | `sigma_vfs_write()` |
 | `sock_send` | `sigma_net_send()` |
@@ -61,6 +61,7 @@ void sigma_wasm_destroy(wasm_instance_t *inst);
 - [ ] Lua 5.4 interpreter port (no C stdlib)
 - [ ] Python 3 minimal port (for scripting tools)
 - [ ] Runtime hot-swap (update runtime without reboot)
+
 
 ## Related Modules
 

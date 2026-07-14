@@ -1,4 +1,5 @@
 # SigmaOS Text Editor Absorption - Zed
+
 ## Making zed-industries/zed Irrelevant
 
 > **Absorption Target**: https://github.com/zed-industries/zed  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Zed by implementing a native collaborative te
 ## Absorbed Features & Capabilities
 
 ### 1. Collaborative Editing
+
 **Original**: Zed's collaborative editing  
 **SigmaOS**: Native collaborative editing with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaEdit {
 ```
 
 **Collaboration Features**:
+
 - Native collaborative editing with OS-level optimization
 - CRDT-based synchronization with conflict resolution
 - Real-time collaboration with sub-millisecond latency
@@ -36,11 +39,14 @@ pub struct SigmaEdit {
 - Collaboration validation with automatic checking
 - Collaboration monitoring with real-time metrics
 
+
 ### 2. CRDT Engine
+
 **Original**: Zed's CRDT implementation  
 **SigmaOS**: Native CRDT with enhanced features
 
 **CRDT Features**:
+
 - Native CRDT engine with OS-level optimization
 - Conflict-free replication with automatic resolution
 - CRDT compression with intelligent optimization
@@ -48,11 +54,14 @@ pub struct SigmaEdit {
 - CRDT monitoring with real-time metrics
 - CRDT profiles with automatic switching
 
+
 ### 3. LSP Integration
+
 **Original**: Zed's LSP client  
 **SigmaOS**: Native LSP with enhanced features
 
 **LSP Features**:
+
 - Native LSP client with OS-level optimization
 - LSP server management with automatic startup
 - LSP diagnostics with real-time updates
@@ -60,11 +69,14 @@ pub struct SigmaEdit {
 - LSP completion with context-aware results
 - LSP monitoring with real-time metrics
 
+
 ### 4. AI Integration
+
 **Original**: Zed's AI integration  
 **SigmaOS**: Native AI with enhanced features
 
 **AI Features**:
+
 - Native AI integration with OS-level optimization
 - AI code completion with context awareness
 - AI code generation with intelligent suggestions
@@ -72,11 +84,14 @@ pub struct SigmaEdit {
 - AI profiles with automatic switching
 - AI monitoring with real-time metrics
 
+
 ### 5. Remote Development
+
 **Original**: Zed's remote development  
 **SigmaOS**: Native remote development with enhanced features
 
 **Remote Features**:
+
 - Native remote development with OS-level optimization
 - Remote file editing with zero-latency feel
 - Remote terminal integration with native support
@@ -84,11 +99,14 @@ pub struct SigmaEdit {
 - Remote profiles with automatic switching
 - Remote monitoring with real-time metrics
 
+
 ### 6. Plugin System
+
 **Original**: Zed's plugin system  
 **SigmaOS**: Native plugin system with enhanced features
 
 **Plugin Features**:
+
 - Native plugin system with capability-based security
 - Plugin sandboxing with hardware enforcement
 - Plugin marketplace with reputation system
@@ -96,12 +114,13 @@ pub struct SigmaEdit {
 - Plugin composition with inheritance
 - Plugin API with OS integration
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Zed | SigmaOS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | Editor Performance | Rust overhead | Native OS-level | ✅ 2-3x |
 | Collaboration Performance | CRDT overhead | Native optimization | ✅ 2x |
 | LSP Performance | Async overhead | Native OS-level | ✅ 3x |
@@ -116,6 +135,7 @@ pub struct SigmaEdit {
 ## Implementation Details
 
 ### Native Collaboration Engine
+
 ```rust
 pub mod collaboration {
     use sigma_edit::collaboration::CollaborationEngine;
@@ -139,6 +159,7 @@ pub mod collaboration {
 ```
 
 ### Native CRDT Engine
+
 ```rust
 pub mod crdt {
     pub struct CRDTEngine {
@@ -165,26 +186,36 @@ pub mod crdt {
 ### For Users of Zed
 
 **Before** (using Zed):
+
 ```bash
+
 # Install Zed
+
 # Download and install Zed
 
 # Configure Zed
+
 ~/.config/zed/settings.json
 
 # Run Zed
+
 zed
 ```
 
 **After** (using SigmaEdit):
+
 ```bash
+
 # Enable editor shard (native)
+
 sigma-shard enable text-editor
 
 # Use Zed-compatible configuration
+
 sigma-edit config --zed-compatible
 
 # Native commands
+
 sigma-edit
 ```
 
@@ -193,7 +224,7 @@ sigma-edit
 ## Performance Benchmarks
 
 | Operation | Zed | SigmaEdit | Improvement |
-|-----------|-----|----------|-------------|
+| ----------- | ----- | ---------- | ------------- |
 | Editor Startup | 200ms | 70ms | 2.9x faster |
 | File Open (large) | 500ms | 180ms | 2.8x faster |
 | Collaboration Sync | 50ms | 20ms | 2.5x faster |

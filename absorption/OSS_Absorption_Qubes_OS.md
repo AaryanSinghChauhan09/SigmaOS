@@ -1,4 +1,5 @@
 # SigmaOS Security Absorption - Qubes OS
+
 ## Making QubesOS/qubes-doc Irrelevant
 
 > **Absorption Target**: https://github.com/QubesOS/qubes-doc  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Qubes OS by implementing a native capability-
 ## Absorbed Features & Capabilities
 
 ### 1. Domain-Based Compartmentalization
+
 **Original**: Qubes' domain-based isolation  
 **SigmaOS**: Native capability-based compartmentalization
 
@@ -29,6 +31,7 @@ pub struct SigmaSecurity {
 ```
 
 **Compartment Features**:
+
 - Native compartmentalization with capability-based isolation
 - Domain management with automatic organization
 - Compartment profiles with automatic generation
@@ -36,11 +39,14 @@ pub struct SigmaSecurity {
 - Compartment cleanup with automatic reclamation
 - Compartment composition with inheritance
 
+
 ### 2. Domain System
+
 **Original**: Qubes' domain system (dom0, domU)  
 **SigmaOS**: Native domain system with enhanced features
 
 **Domain Features**:
+
 - Native domain management with capability-based access
 - Domain isolation with hardware enforcement
 - Domain communication with capability-based IPC
@@ -48,11 +54,14 @@ pub struct SigmaSecurity {
 - Domain profiles with automatic switching
 - Domain validation with automatic checking
 
+
 ### 3. Template System
+
 **Original**: Qubes' template-based VMs  
 **SigmaOS**: Native template system with enhanced features
 
 **Template Features**:
+
 - Native template management with capability-based access
 - Template inheritance with composition
 - Template validation with automatic checking
@@ -60,11 +69,14 @@ pub struct SigmaSecurity {
 - Template distribution with content-addressed storage
 - Template profiles with automatic switching
 
+
 ### 4. Inter-Domain Communication
+
 **Original**: Qubes' qrexec for inter-domain communication  
 **SigmaOS**: Native IPC with capability-based control
 
 **IPC Features**:
+
 - Native inter-domain communication with capability-based access
 - IPC channels with zero-copy optimization
 - IPC filtering with automatic rules
@@ -72,11 +84,14 @@ pub struct SigmaSecurity {
 - IPC profiles with automatic switching
 - IPC validation with automatic checking
 
+
 ### 5. GUI Virtualization
+
 **Original**: Qubes' GUI domain isolation  
 **SigmaOS**: Native GUI isolation with capability-based control
 
 **GUI Features**:
+
 - Native GUI isolation with capability-based access
 - GUI virtualization with hardware acceleration
 - GUI filtering with automatic rules
@@ -84,11 +99,14 @@ pub struct SigmaSecurity {
 - GUI profiles with automatic switching
 - GUI validation with automatic checking
 
+
 ### 6. Security Model
+
 **Original**: Qubes' security by compartmentalization  
 **SigmaOS**: Native security with capability-based control
 
 **Security Features**:
+
 - Native security model with capability-based access
 - Security policies with automatic generation
 - Security monitoring with real-time metrics
@@ -96,12 +114,13 @@ pub struct SigmaSecurity {
 - Security testing with automated tools
 - Security validation with formal verification
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Qubes OS | SigmaOS | Advantage |
-|---------|---------|---------|------------|
+| --------- | --------- | --------- | ------------ |
 | Compartment Performance | VM overhead | Native capability | ✅ 10-100x |
 | Domain Performance | Xen overhead | Native OS-level | ✅ 10x |
 | Template Performance | VM overhead | Native capability | ✅ 10x |
@@ -116,6 +135,7 @@ pub struct SigmaSecurity {
 ## Implementation Details
 
 ### Native Compartment Manager
+
 ```rust
 pub mod compartment {
     use sigma_security::compartment::CompartmentManager;
@@ -144,6 +164,7 @@ pub mod compartment {
 ```
 
 ### Native Domain System
+
 ```rust
 pub mod domain {
     pub struct DomainSystem {
@@ -169,32 +190,44 @@ pub mod domain {
 ### For Users of Qubes OS
 
 **Before** (using Qubes OS):
+
 ```bash
+
 # Install Qubes OS
+
 # Boot into Qubes
 
 # Create domain
+
 qvm-create domain
 
 # Run in domain
+
 qvm-run domain program
 
 # Check status
+
 qvm-ls
 ```
 
 **After** (using SigmaSecurity):
+
 ```bash
+
 # Enable security shard (native)
+
 sigma-shard enable security-system
 
 # Create compartment
+
 sigma-security compartment create --domain domain
 
 # Run in compartment
+
 sigma-security compartment run --name domain program
 
 # Check status
+
 sigma-security compartment list
 ```
 
@@ -203,7 +236,7 @@ sigma-security compartment list
 ## Performance Benchmarks
 
 | Operation | Qubes OS | SigmaSecurity | Improvement |
-|-----------|---------|---------------|-------------|
+| ----------- | --------- | --------------- | ------------- |
 | Compartment Create | 2s (VM boot) | 50ms | 40x faster |
 | Domain Create | 1s (VM setup) | 20ms | 50x faster |
 | IPC Message | 5ms (Xen channel) | 0.5ms (native) | 10x faster |

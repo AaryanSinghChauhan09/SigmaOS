@@ -33,7 +33,7 @@ This directory contains design documents, specifications, coding standards, and 
 
 ## Documentation Architecture
 
-```
+```text
 docs/
 ├── README.md                   ← this file
 ├── CONTRIBUTING.md             ← docs contribution guide
@@ -54,6 +54,7 @@ SigmaOS follows a **wiki-first documentation strategy**:
 1. **In-repo `docs/`**: Engineering specs, design decisions, build guides, and contribution guidelines — content that lives close to the code.
 2. **GitHub Wiki (`wiki_repo/`)**: High-level conceptual documentation, roadmaps, guides, and user-facing pages.
 3. **Module READMEs**: Every module directory under `modules/` contains a `README.md` explaining purpose, API, and roadmap.
+
 
 ---
 

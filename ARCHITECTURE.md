@@ -150,6 +150,7 @@ SigmaOS has four categories of shards:
 3. **Optional Shards**: Desktop and AI features (Nim)
 4. **Infinite Shards**: Experimental features (Zig)
 
+
 ### Shard Loading
 
 ```mermaid
@@ -725,6 +726,7 @@ SigmaOS architecture is designed around the following principles:
 3. **Performance**: Zero-copy operations and O(1) scheduling
 4. **Sovereignty**: Post-quantum cryptography and local-first design
 5. **Extensibility**: Support for experimental and self-evolving features
+
 
 The architecture enables SigmaOS to be deployed in various environments from embedded systems to cloud platforms while maintaining security and performance.
 

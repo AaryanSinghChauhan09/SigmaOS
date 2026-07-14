@@ -6,7 +6,7 @@ experimental galactic-scale mesh routing.
 
 ## Architecture
 
-```
+```text
 Application Layer
    ΓööΓöÇ socket.rs          (POSIX-style socket API)
          ΓööΓöÇ tcpip.rs     (TCP/IP stack)
@@ -21,7 +21,7 @@ Application Layer
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `socket.rs` | POSIX-compatible socket API (`create`, `bind`, `connect`, `send`, `recv`) |
 | `tcp.rs` | TCP state machine (SYNΓåÆESTABLISHEDΓåÆFIN) |
 | `tcpip.rs` | IPv4/IPv6 dual-stack with ARP/NDP |
@@ -57,7 +57,7 @@ void init_core_net(void);
 All `sovereign_net.rs` channels use a **hybrid** scheme:
 
 | Layer | Algorithm | Standard |
-|---|---|---|
+| --- | --- | --- |
 | Key Exchange | X25519 + Kyber-768 | NIST ML-KEM |
 | Encryption | ChaCha20-Poly1305 | RFC 8439 |
 | Integrity | BLAKE3 MAC | ΓÇö |
@@ -74,6 +74,7 @@ All `sovereign_net.rs` channels use a **hybrid** scheme:
 - [ ] DNSSEC resolver integration
 - [ ] WireGuard-inspired VPN tunnel
 - [ ] Formal Kani proofs for TCP state machine
+
 
 ## Related Modules
 

@@ -6,7 +6,7 @@ kernel and user-space shards.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `logger.rs` | Ring-buffer structured logger (`SIGMA_LOG_*` macros) |
 | `profiler.rs` | CPU cycle + PMU counter-based profiler |
 | `syscall_tracer.rs` | Strace-equivalent syscall intercept + timeline recorder |
@@ -25,7 +25,8 @@ sigma_log!(WARN, "net", "tcp_retransmit";
 ```
 
 Output format (journal-compatible):
-```
+
+```text
 2026-07-05T14:30:00.000Z INFO  kernel  shard 42 started in 1200┬╡s
 ```
 
@@ -87,6 +88,7 @@ void tracer_dump(const char *path);
 - [ ] Log shipping to Sovereign Audit Chain
 - [ ] Distributed tracing (OpenTelemetry-compatible spans)
 - [ ] Interactive TUI dashboard (`sigma-top`)
+
 
 ## Related Modules
 

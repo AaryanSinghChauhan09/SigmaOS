@@ -6,7 +6,7 @@ policy evaluation** and an immutable audit chain.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `audit_chain.rs` | Append-only, BLAKE3-chained audit log of all policy decisions |
 
 ## Access Control Model
@@ -17,7 +17,8 @@ SigmaOS uses a **Lattice-Based Access Control** (LBAC) model:
 - Every **object** (file, socket, IPC endpoint) carries a sensitivity label.
 - Operations are permitted only when the lattice partial order is satisfied.
 
-```
+
+```text
 ALLOW browser_shard READ  /media          # read public data
 DENY  browser_shard ANY   /sys            # no kernel inspection
 ALLOW ssh_daemon    BIND  net:22          # bind privileged port
@@ -27,7 +28,7 @@ ALLOW ssh_daemon    BIND  net:22          # bind privileged port
 
 Every policy decision is appended to a BLAKE3-linked chain:
 
-```
+```text
 Entry N: { timestamp, subject, object, action, decision, hash(Entry N-1) }
 ```
 
@@ -55,13 +56,16 @@ void init_security_access_control(void);
 
 ## Policy Language
 
-```
+```text
+
 # Allow app_shard to read /home, write /tmp
+
 ALLOW app_shard   READ  /home
 ALLOW app_shard   WRITE /tmp
 DENY  app_shard   ANY   /etc/shadow
 
 # Network policies
+
 ALLOW web_shard   CONNECT net:443
 DENY  web_shard   BIND    net:*
 ```
@@ -74,6 +78,7 @@ DENY  web_shard   BIND    net:*
 - [ ] Label assignment to all shards at boot
 - [ ] Policy hot-reload (without reboot)
 - [ ] GUI policy editor for Zenith Desktop
+
 
 ## Related Modules
 

@@ -20,9 +20,10 @@ Send encrypted email to: **security@sigmaos.dev**
 - Affected versions
 - Suggested fix (if any)
 
+
 ### PGP Key
 
-```
+```text
 Key ID: 0x1234567890ABCDEF
 Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
 ```
@@ -34,12 +35,14 @@ Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
 - **Zero-Trust Architecture**: Continuous authentication
 - **Memory Safety**: W^X enforcement, ASLR, stack canaries
 
+
 ## Security Architecture
 
 - **Kernel Hardening**: sigma_pledge, sigma_unveil, AVC
 - **Secure Boot**: UEFI Secure Boot with custom keys
 - **TPM Integration**: Hardware attestation and key sealing
 - **Audit Trail**: Immutable BLAKE2b hash chains
+
 
 ## Incident Response
 
@@ -50,6 +53,7 @@ Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
 - **Medium**: 72 hours response, 30 days fix
 - **Low**: 1 week response, 90 days fix
 
+
 ### Process
 
 1. Acknowledge receipt within SLA
@@ -59,6 +63,7 @@ Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
 5. Release security advisory
 6. Update documentation
 
+
 ## Security Audits
 
 - **Static Analysis**: cppcheck, clang-tidy, custom rules
@@ -66,11 +71,13 @@ Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
 - **Formal Verification**: SPARK proofs for critical components
 - **Third-Party Audits**: Annual external security review
 
+
 ## Contact Information
 
 - **Security**: security@sigmaos.dev (PGP encrypted)
 - **General**: support@sigmaos.dev
 - **GitHub**: https://github.com/AaryanSinghChauhan09/SigmaOS/security
+
 
 ## Acknowledgments
 

@@ -15,11 +15,13 @@ Optional shards provide enhanced functionality and user experience improvements.
 - **Desktop Shell**: Panel, launcher, window management
 - **Theme Engine**: System theming and customization
 
+
 ### AI & Automation
 
 - **LLM Integration**: Local LLM inference interface
 - **AI Assistant**: AI-powered system assistant
 - **Automation Framework**: Task automation and scripting
+
 
 ### Cloud Integration
 
@@ -27,11 +29,13 @@ Optional shards provide enhanced functionality and user experience improvements.
 - **Backup Manager**: Automated backup system
 - **Remote Access**: Remote desktop and management
 
+
 ### Development Tools
 
 - **Package Manager**: sigma-pkg package management
 - **Build System**: Automated build and compilation
 - **Debug Tools**: System debugging and profiling
+
 
 ## Optional Shards List
 
@@ -40,10 +44,12 @@ Optional shards provide enhanced functionality and user experience improvements.
 **Description**: Wayland compositor for SigmaOS desktop.
 
 **Features**:
+
 - Wayland protocol implementation
 - Hardware acceleration
 - Multi-monitor support
 - Touch and gesture support
+
 
 **Prototype**: `shards/optional/zenith/`
 
@@ -52,10 +58,12 @@ Optional shards provide enhanced functionality and user experience improvements.
 **Description**: Desktop environment shell and panel.
 
 **Features**:
+
 - Application launcher
 - System panel (tray)
 - Window management
 - System settings
+
 
 **Prototype**: `shards/optional/desktop/`
 
@@ -64,10 +72,12 @@ Optional shards provide enhanced functionality and user experience improvements.
 **Description**: Local LLM inference interface.
 
 **Features**:
+
 - LLM model loading
 - Inference API
 - System integration
 - Privacy-focused (local only)
+
 
 **Prototype**: `shards/optional/llm/`
 
@@ -76,17 +86,19 @@ Optional shards provide enhanced functionality and user experience improvements.
 **Description**: sigma-pkg package management system.
 
 **Features**:
+
 - Package repository
 - Dependency resolution
 - Installation and updates
 - Rollback support
+
 
 **Prototype**: `shards/optional/pkg/`
 
 ## Implementation Status
 
 | Shard | Documentation | Prototype | Status |
-|-------|--------------|-----------|--------|
+| ------- | -------------- | ----------- | -------- |
 | Zenith Compositor | ✅ Complete | ⏳ Pending | ⏳ Not Started |
 | Desktop Shell | ✅ Complete | ⏳ Pending | ⏳ Not Started |
 | LLM Integration | ✅ Complete | ⏳ Pending | ⏳ Not Started |
@@ -98,6 +110,7 @@ Optional shards provide enhanced functionality and user experience improvements.
 2. Implement desktop shell prototype (Nim)
 3. Implement LLM integration prototype (Nim)
 4. Implement package manager prototype (Nim)
+
 
 ---
 

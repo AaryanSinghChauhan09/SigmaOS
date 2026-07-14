@@ -5,7 +5,7 @@ driver cannot crash the kernel or corrupt unrelated subsystems.
 
 ## Architecture
 
-```
+```text
 ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
 Γöé                  Kernel Core (Ring 0)                Γöé
 Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
@@ -20,7 +20,7 @@ driver cannot crash the kernel or corrupt unrelated subsystems.
 ## Source Files
 
 | File | Exported Function | Description |
-|---|---|---|
+| --- | --- | --- |
 | `audio.rs` | `audio_init()` | HD Audio / AC97 subsystem init |
 | `gpu.rs` | `gpu_init()` | GPU framebuffer + DRM/KMS stub |
 | `pci.rs` | `pci_init()` | PCIe bus enumeration & BAR mapping |
@@ -74,6 +74,7 @@ Each driver shard must declare its required capabilities in `module.json`:
 - [ ] Bluetooth HCI driver
 - [ ] Formal DDK API header (`ddk_api.h`)
 - [ ] CBMC/Kani safety proofs for DMA paths
+
 
 ## Related Modules
 

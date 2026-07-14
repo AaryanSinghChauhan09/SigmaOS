@@ -6,7 +6,7 @@ monolithic blob.
 
 ## Architecture
 
-```
+```text
               ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
               Γöé          kernel_main.rs          Γöé
               Γöé  (boot ΓåÆ init subsystems ΓåÆ idle) Γöé
@@ -23,7 +23,7 @@ monolithic blob.
 ## Key Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `kernel.rs` / `kernel_main.rs` | Boot entry ΓÇö wires all sovereign subsystems |
 | `init.rs` | Early hardware init (GDT, IDT, TSS) |
 | `interrupts.rs` | IRQ/exception handler table |
@@ -80,6 +80,7 @@ Every shard is granted a minimal capability set at spawn time:
 - [ ] Live kernel patching (hot-patch without reboot)
 - [ ] Microkernel split: move drivers fully out of Ring 0
 
+
 ## Sub-Directories
 
 - [`memory/`](memory/) ΓÇö Paging, slab allocator, NUMA topology
@@ -87,6 +88,7 @@ Every shard is granted a minimal capability set at spawn time:
 - [`security/`](security/) ΓÇö Capability enforcement hooks
 - [`syscalls/`](syscalls/) ΓÇö Per-syscall implementation shards
 - [`hypervisor/`](hypervisor/) ΓÇö Type-1 hypervisor (VT-x / AMD-V)
+
 
 ## Related Modules
 

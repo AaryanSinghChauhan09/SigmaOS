@@ -1,4 +1,5 @@
 # SigmaOS Terminal Absorption - WezTerm
+
 ## Making wez/wezterm Irrelevant
 
 > **Absorption Target**: https://github.com/wez/wezterm  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed WezTerm by implementing a native GPU terminal
 ## Absorbed Features & Capabilities
 
 ### 1. GPU Rendering
+
 **Original**: WezTerm's GPU rendering  
 **SigmaOS**: Native GPU rendering with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaTerm {
 ```
 
 **GPU Features**:
+
 - Native GPU rendering with OpenGL/Vulkan
 - Hardware-accelerated text rendering with sub-pixel precision
 - GPU-accelerated scrolling with smooth animations
@@ -36,11 +39,14 @@ pub struct SigmaTerm {
 - GPU monitoring with real-time metrics
 - GPU profiles with automatic switching
 
+
 ### 2. Multiplexing
+
 **Original**: WezTerm's multiplexing (tmux-like)  
 **SigmaOS**: Native multiplexing with enhanced features
 
 **Multiplexing Features**:
+
 - Native multiplexing with OS-level optimization
 - Session management with automatic persistence
 - Tab and pane management with intelligent organization
@@ -48,11 +54,14 @@ pub struct SigmaTerm {
 - Session profiles with import/export
 - Session monitoring with real-time metrics
 
+
 ### 3. Configuration System
+
 **Original**: WezTerm's Lua configuration  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
+
 - Native configuration with type safety
 - Lua-compatible configuration with automatic conversion
 - Real-time configuration reload
@@ -60,11 +69,14 @@ pub struct SigmaTerm {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
+
 ### 4. Font Rendering
+
 **Original**: WezTerm's font rendering  
 **SigmaOS**: Native font rendering with enhanced features
 
 **Font Features**:
+
 - Native font rendering with GPU acceleration
 - Font ligatures with automatic support
 - Font fallback with intelligent selection
@@ -72,11 +84,14 @@ pub struct SigmaTerm {
 - Font profiles with automatic switching
 - Font monitoring with real-time metrics
 
+
 ### 5. Shell Integration
+
 **Original**: WezTerm's shell integration  
 **SigmaOS**: Native shell integration with enhanced features
 
 **Shell Integration Features**:
+
 - Native shell integration with OS-level optimization
 - Shell protocol with automatic detection
 - Shell synchronization with automatic management
@@ -84,11 +99,14 @@ pub struct SigmaTerm {
 - Shell validation with automatic checking
 - Shell monitoring with real-time metrics
 
+
 ### 6. Cross-Platform
+
 **Original**: WezTerm's cross-platform support  
 **SigmaOS**: Native cross-platform with enhanced features
 
 **Cross-Platform Features**:
+
 - Native cross-platform support with automatic adaptation
 - Platform-specific optimizations with automatic selection
 - Platform profiles with automatic switching
@@ -96,12 +114,13 @@ pub struct SigmaTerm {
 - Platform monitoring with real-time metrics
 - Platform inheritance with composition
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | WezTerm | SigmaOS | Advantage |
-|---------|---------|---------|------------|
+| --------- | --------- | --------- | ------------ |
 | Rendering Performance | GPU-accelerated | Native GPU + optimization | ✅ 2-3x |
 | Multiplexing Performance | Lua overhead | Native OS-level | ✅ 5x |
 | Configuration Performance | Lua overhead | Native type-safe | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaTerm {
 ## Implementation Details
 
 ### Native GPU Renderer
+
 ```rust
 pub mod gpu {
     use sigma_term::gpu::GPURenderer;
@@ -139,6 +159,7 @@ pub mod gpu {
 ```
 
 ### Native Multiplexer
+
 ```rust
 pub mod multiplex {
     pub struct Multiplexer {
@@ -165,26 +186,36 @@ pub mod multiplex {
 ### For Users of WezTerm
 
 **Before** (using WezTerm):
+
 ```bash
+
 # Install WezTerm
+
 # Download and install WezTerm
 
 # Configure WezTerm
+
 ~/.wezterm.lua
 
 # Run WezTerm
+
 wezterm
 ```
 
 **After** (using SigmaTerm):
+
 ```bash
+
 # Enable terminal shard (native)
+
 sigma-shard enable terminal
 
 # Use WezTerm-compatible configuration
+
 sigma-term config --wezterm-compatible
 
 # Run native terminal
+
 sigma-term
 ```
 
@@ -193,7 +224,7 @@ sigma-term
 ## Performance Benchmarks
 
 | Operation | WezTerm | SigmaTerm | Improvement |
-|-----------|---------|-----------|-------------|
+| ----------- | --------- | ----------- | ------------- |
 | Terminal Startup | 150ms | 40ms | 3.8x faster |
 | Render Frame (60fps) | 16ms | 8ms | 2x faster |
 | Session Create | 80ms | 15ms | 5.3x faster |

@@ -1,4 +1,5 @@
 # SigmaOS ELF Loader Absorption - ld.so
+
 ## Making bminor/glibc (ld.so) Irrelevant
 
 > **Absorption Target**: https://github.com/bminor/glibc (ld.so dynamic linker)  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed ld.so by implementing a native ELF binary loa
 ## Absorbed Features & Capabilities
 
 ### 1. ELF Parsing
+
 **Original**: ld.so's ELF binary parsing  
 **SigmaOS**: Native ELF parsing with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaLoader {
 ```
 
 **ELF Features**:
+
 - Native ELF parser with OS-level optimization
 - Support for ELF32 and ELF64 with automatic detection
 - Section parsing with intelligent validation
@@ -36,11 +39,14 @@ pub struct SigmaLoader {
 - ELF validation with automatic checking
 - ELF monitoring with real-time metrics
 
+
 ### 2. Dynamic Linking
+
 **Original**: ld.so's dynamic linking  
 **SigmaOS**: Native linking with enhanced features
 
 **Linking Features**:
+
 - Native dynamic linking with OS-level optimization
 - Shared library loading with capability-based access
 - Symbol resolution with intelligent caching
@@ -48,11 +54,14 @@ pub struct SigmaLoader {
 - Linking validation with automatic checking
 - Linking monitoring with real-time metrics
 
+
 ### 3. Relocation Processing
+
 **Original**: ld.so's relocation handling  
 **SigmaOS**: Native relocation with enhanced features
 
 **Relocation Features**:
+
 - Native relocation processing with OS-level optimization
 - Automatic relocation with intelligent algorithms
 - Relocation validation with automatic checking
@@ -60,11 +69,14 @@ pub struct SigmaLoader {
 - Relocation monitoring with real-time metrics
 - Relocation composition with inheritance
 
+
 ### 4. Symbol Resolution
+
 **Original**: ld.so's symbol resolution  
 **SigmaOS**: Native symbol resolution with enhanced features
 
 **Symbol Features**:
+
 - Native symbol resolution with OS-level optimization
 - Symbol caching with intelligent invalidation
 - Symbol versioning with automatic management
@@ -72,11 +84,14 @@ pub struct SigmaLoader {
 - Symbol validation with automatic checking
 - Symbol monitoring with real-time metrics
 
+
 ### 5. Memory Mapping
+
 **Original**: ld.so's memory mapping (mmap)  
 **SigmaOS**: Native memory mapping with enhanced features
 
 **Mapping Features**:
+
 - Native memory mapping with OS-level optimization
 - Virtual memory management with automatic paging
 - Memory protection with capability-based access
@@ -84,11 +99,14 @@ pub struct SigmaLoader {
 - Mapping validation with automatic checking
 - Mapping monitoring with real-time metrics
 
+
 ### 6. Library Search
+
 **Original**: ld.so's library search (LD_LIBRARY_PATH)  
 **SigmaOS**: Native library search with enhanced features
 
 **Search Features**:
+
 - Native library search with OS-level optimization
 - Library path resolution with intelligent algorithms
 - Library caching with automatic invalidation
@@ -96,12 +114,13 @@ pub struct SigmaLoader {
 - Search validation with automatic checking
 - Search monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | ld.so | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | ELF Parsing Performance | C overhead | Native Rust | ✅ 3-5x |
 | Linking Performance | Runtime overhead | Native OS-level | ✅ 5x |
 | Relocation Performance | Runtime overhead | Native optimization | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaLoader {
 ## Implementation Details
 
 ### Native ELF Parser
+
 ```rust
 pub mod elf {
     use sigma_loader::elf::ELFParser;
@@ -139,6 +159,7 @@ pub mod elf {
 ```
 
 ### Native Linker
+
 ```rust
 pub mod linker {
     pub struct Linker {
@@ -166,23 +187,33 @@ pub mod linker {
 ### For Linux Binaries Using ld.so
 
 **Before** (using ld.so):
+
 ```bash
+
 # Run Linux binary
+
 ./program
 
 # ld.so handles loading automatically
+
 # LD_LIBRARY_PATH for library search
+
 ```
 
 **After** (using SigmaLoader):
+
 ```bash
+
 # Enable loader shard (native)
+
 sigma-shard enable elf-loader
 
 # Run Linux binary
+
 sigma-loader run --binary program
 
 # Native library resolution
+
 sigma-loader library --path /custom/path
 ```
 
@@ -191,7 +222,7 @@ sigma-loader library --path /custom/path
 ## Performance Benchmarks
 
 | Operation | ld.so | SigmaLoader | Improvement |
-|-----------|-------|------------|-------------|
+| ----------- | ------- | ------------ | ------------- |
 | ELF Parse | 50ms | 10ms | 5x faster |
 | Dynamic Link | 100ms | 20ms | 5x faster |
 | Relocation | 80ms | 16ms | 5x faster |

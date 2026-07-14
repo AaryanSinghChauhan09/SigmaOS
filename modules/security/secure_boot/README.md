@@ -5,7 +5,7 @@ Ensures that every component loaded during the SigmaOS boot sequence is
 
 ## Boot Chain of Trust
 
-```
+```text
 UEFI Firmware (OEM key)
    ΓööΓöÇ SigmaOS UEFI shim (signed with Sovereign Root CA)
          ΓööΓöÇ sigma-boot (Rust UEFI bootloader)
@@ -19,9 +19,12 @@ UEFI Firmware (OEM key)
 1. Load component into memory.
 2. Compute BLAKE3 hash of the raw bytes.
 3. Verify Ed25519 signature (from the Sovereign Root CA public key embedded
+
    in the bootloader).
+
 4. If verification fails ΓåÆ halt with error code and log to TPM event log.
 5. If verification passes ΓåÆ transfer execution.
+
 
 ## Rollback Protection
 
@@ -54,7 +57,7 @@ void init_security_secure_boot(void);
 ## Key Management
 
 | Key | Purpose | Storage |
-|---|---|---|
+| --- | --- | --- |
 | Sovereign Root CA | Signs all official SigmaOS releases | HSM / offline |
 | Platform Key (PK) | UEFI Secure Boot anchor | UEFI NVRAM |
 | Key Exchange Key (KEK) | Update DB / DBX | UEFI NVRAM |
@@ -68,6 +71,7 @@ void init_security_secure_boot(void);
 - [ ] Rollback counter in TPM NV
 - [ ] Measured Boot report (for remote attestation)
 - [ ] Post-quantum upgrade path (Dilithium3 signatures)
+
 
 ## Related Modules
 

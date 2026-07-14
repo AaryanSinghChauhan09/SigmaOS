@@ -1,4 +1,5 @@
 # SigmaOS Security Absorption - Bubblewrap
+
 ## Making containers/bubblewrap Irrelevant
 
 > **Absorption Target**: https://github.com/containers/bubblewrap  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Bubblewrap by implementing a native capabilit
 ## Absorbed Features & Capabilities
 
 ### 1. Container Sandboxing
+
 **Original**: Bubblewrap's user namespace sandboxing  
 **SigmaOS**: Native capability-based container sandboxing
 
@@ -29,6 +31,7 @@ pub struct SigmaSecurity {
 ```
 
 **Sandbox Features**:
+
 - Native container sandboxing with capability-based isolation
 - User namespace isolation with automatic management
 - Mount namespace isolation with automatic setup
@@ -36,11 +39,14 @@ pub struct SigmaSecurity {
 - PID namespace isolation with automatic management
 - IPC namespace isolation with automatic setup
 
+
 ### 2. Mount System
+
 **Original**: Bubblewrap's mount namespace setup  
 **SigmaOS**: Native mount system with enhanced features
 
 **Mount Features**:
+
 - Native mount management with capability-based control
 - Mount profiles with automatic generation
 - Mount validation with automatic checking
@@ -48,11 +54,14 @@ pub struct SigmaSecurity {
 - Mount caching with automatic invalidation
 - Mount composition with inheritance
 
+
 ### 3. Bind Mounts
+
 **Original**: Bubblewrap's bind mount support  
 **SigmaOS**: Native bind mounts with enhanced features
 
 **Bind Mount Features**:
+
 - Native bind mount support with capability-based access
 - Read-only bind mounts with automatic enforcement
 - Read-write bind mounts with capability control
@@ -60,11 +69,14 @@ pub struct SigmaSecurity {
 - Bind mount monitoring with real-time metrics
 - Bind mount validation with automatic checking
 
+
 ### 4. Device Access
+
 **Original**: Bubblewrap's device node access  
 **SigmaOS**: Native device access with capability-based control
 
 **Device Features**:
+
 - Native device access with capability-based permissions
 - Device filtering with automatic rules
 - Device monitoring with real-time metrics
@@ -72,11 +84,14 @@ pub struct SigmaSecurity {
 - Device validation with automatic checking
 - Device sandboxing with hardware enforcement
 
+
 ### 5. Environment Variables
+
 **Original**: Bubblewrap's environment variable control  
 **SigmaOS**: Native environment management with enhanced features
 
 **Environment Features**:
+
 - Native environment variable control with capability-based access
 - Environment profiles with automatic switching
 - Environment validation with automatic checking
@@ -84,11 +99,14 @@ pub struct SigmaSecurity {
 - Environment composition with inheritance
 - Environment sandboxing with automatic isolation
 
+
 ### 6. Seccomp Filters
+
 **Original**: Bubblewrap's seccomp filter support  
 **SigmaOS**: Native syscall filtering with capability-based control
 
 **Seccomp Features**:
+
 - Native syscall filtering with capability-based control
 - Seccomp profiles with automatic generation
 - Seccomp validation with automatic checking
@@ -96,12 +114,13 @@ pub struct SigmaSecurity {
 - Seccomp composition with inheritance
 - Seccomp compatibility with automatic translation
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Bubblewrap | SigmaOS | Advantage |
-|---------|-----------|---------|------------|
+| --------- | ----------- | --------- | ------------ |
 | Sandbox Performance | Namespace overhead | Capability-based | ✅ 5-10x |
 | Mount Performance | Mount overhead | Native capability | ✅ 5x |
 | Bind Mount Performance | Namespace overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaSecurity {
 ## Implementation Details
 
 ### Native Container Sandbox
+
 ```rust
 pub mod container {
     use sigma_security::container::ContainerSandbox;
@@ -144,6 +164,7 @@ pub mod container {
 ```
 
 ### Native Mount Manager
+
 ```rust
 pub mod mount {
     pub struct MountManager {
@@ -171,26 +192,37 @@ pub mod mount {
 ### For Users of Bubblewrap
 
 **Before** (using Bubblewrap):
+
 ```bash
+
 # Install Bubblewrap
+
 sudo apt install bubblewrap
 
 # Run container
+
 bwrap --ro-bind /usr /usr --dev /dev --proc /proc program
 
 # Check status
+
 # (No status command available)
+
 ```
 
 **After** (using SigmaSecurity):
+
 ```bash
+
 # Enable security shard (native)
+
 sigma-shard enable security-system
 
 # Run container
+
 sigma-security container run --binds /usr:ro,/dev,/proc program
 
 # Check status
+
 sigma-security container list
 ```
 
@@ -199,7 +231,7 @@ sigma-security container list
 ## Performance Benchmarks
 
 | Operation | Bubblewrap | SigmaSecurity | Improvement |
-|-----------|-----------|---------------|-------------|
+| ----------- | ----------- | --------------- | ------------- |
 | Container Create | 80ms | 12ms | 6.7x faster |
 | Mount Setup | 40ms | 8ms | 5x faster |
 | Bind Mount | 20ms | 4ms | 5x faster |

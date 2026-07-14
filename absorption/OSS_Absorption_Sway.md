@@ -1,4 +1,5 @@
 # SigmaOS Window Manager Absorption - Sway
+
 ## Making swaywm/sway Irrelevant
 
 > **Absorption Target**: https://github.com/swaywm/sway  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Sway by implementing a native window manager 
 ## Absorbed Features & Capabilities
 
 ### 1. Tiling Window Manager
+
 **Original**: Sway's i3-compatible tiling  
 **SigmaOS**: Native tiling with enhanced algorithms
 
@@ -29,6 +31,7 @@ pub struct SigmaWM {
 ```
 
 **Tiling Features**:
+
 - Native tiling with intelligent layout algorithms
 - i3-compatible configuration with enhanced syntax
 - Automatic tiling with adaptive layouts
@@ -36,11 +39,14 @@ pub struct SigmaWM {
 - Native floating window support
 - Tabbed and stacked layouts
 
+
 ### 2. Wayland Compositor
+
 **Original**: Sway's Wayland compositor  
 **SigmaOS**: Native compositor with OS integration
 
 **Compositor Features**:
+
 - Native Wayland compositor with GPU acceleration
 - Hardware-accelerated rendering with OpenGL/Vulkan
 - Native input handling with low latency
@@ -48,11 +54,14 @@ pub struct SigmaWM {
 - Native layer shell support
 - XDG shell protocol implementation
 
+
 ### 3. Workspace Management
+
 **Original**: Sway's workspace system  
 **SigmaOS**: Native workspace with enhanced features
 
 **Workspace Features**:
+
 - Native workspace management with automatic organization
 - Workspace persistence with automatic restoration
 - Workspace monitoring with real-time metrics
@@ -60,11 +69,14 @@ pub struct SigmaWM {
 - Workspace profiles with import/export
 - Workspace synchronization across devices
 
+
 ### 4. Keybinding System
+
 **Original**: Sway's keybinding configuration  
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
+
 - Native keybinding system with type safety
 - Mode-based keybindings with automatic switching
 - Keybinding inheritance with composition
@@ -72,11 +84,14 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
+
 ### 5. Bar System
+
 **Original**: Sway's bar (waybar)  
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
+
 - Native bar with hardware acceleration
 - Bar modules with native integration
 - Bar theming with live preview
@@ -84,11 +99,14 @@ pub struct SigmaWM {
 - Bar profiles with automatic switching
 - Bar integration with system notifications
 
+
 ### 6. IPC Interface
+
 **Original**: Sway's IPC interface  
 **SigmaOS**: Native IPC with enhanced features
 
 **IPC Features**:
+
 - Native IPC with zero-copy optimization
 - IPC events with real-time delivery
 - IPC commands with type safety
@@ -96,12 +114,13 @@ pub struct SigmaWM {
 - IPC versioning with backward compatibility
 - IPC monitoring with native metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Sway | SigmaOS | Advantage |
-|---------|------|---------|------------|
+| --------- | ------ | --------- | ------------ |
 | Tiling Performance | C overhead | Native Rust | ✅ 3-5x |
 | Compositor Performance | wlroots overhead | Native GPU | ✅ 3-5x |
 | Keybinding Latency | 10ms | 2ms | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaWM {
 ## Implementation Details
 
 ### Native Tiling Engine
+
 ```rust
 pub mod tiling {
     use sigma_wm::tiling::TilingEngine;
@@ -144,6 +164,7 @@ pub mod tiling {
 ```
 
 ### Native Wayland Compositor
+
 ```rust
 pub mod compositor {
     pub struct WaylandCompositor {
@@ -173,26 +194,36 @@ pub mod compositor {
 ### For Users of Sway
 
 **Before** (using Sway):
+
 ```bash
+
 # Install Sway
+
 sudo apt install sway
 
 # Configure Sway
+
 ~/.config/sway/config
 
 # Use Sway commands
+
 swaymsg command
 ```
 
 **After** (using SigmaWM):
+
 ```bash
+
 # Enable window manager shard (native)
+
 sigma-shard enable window-manager
 
 # Use Sway-compatible configuration
+
 sigma-wm config --sway-compatible
 
 # Native commands
+
 sigma-wm command
 ```
 
@@ -201,7 +232,7 @@ sigma-wm command
 ## Performance Benchmarks
 
 | Operation | Sway | SigmaWM | Improvement |
-|-----------|------|---------|-------------|
+| ----------- | ------ | --------- | ------------- |
 | Window Tile | 50ms | 12ms | 4.2x faster |
 | Workspace Switch | 30ms | 8ms | 3.8x faster |
 | Keybinding Execute | 10ms | 2ms | 5x faster |

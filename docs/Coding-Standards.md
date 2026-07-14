@@ -18,6 +18,7 @@
 9. [Testing Requirements](#testing-requirements)
 10. [Documentation Standards](#documentation-standards)
 
+
 ---
 
 ## Language Policy
@@ -54,6 +55,7 @@ extern crate alloc;
 - Every `[dependencies]` entry must have a `# JUSTIFICATION:` comment.
 - Implement all data structures from scratch (ring buffer, hash map, etc.).
 
+
 ### Zig (freestanding)
 
 ```zig
@@ -70,14 +72,18 @@ const builtin = @import("builtin");  // ✅ Target/arch detection only
 ### Nim (`--mm:none`)
 
 ```nim
+
 # REQUIRED compiler flags for all daemons:
+
 # nim compile --mm:none --verbosity:0
 
 # FORBIDDEN:
+
 import os        # ❌ No OS-level imports
 import strutils  # ❌ No standard library imports
 
 # REQUIRED:
+
 {.push raises: [].}  # ✅ Force explicit error types
 ```
 
@@ -91,6 +97,7 @@ SigmaOS mandates the four core OOP pillars across all languages:
 
 - All internal state is `private` or `pub(crate)`.
 - Public API is defined via **trait** (Rust), **vtable struct** (Zig), or **method** (Nim).
+
 
 ```rust
 // ✅ CORRECT: encapsulated internal state
@@ -108,6 +115,7 @@ impl SigmaAllocator {
 - Abstract interfaces must be defined before concrete types.
 - Rust: use `trait`, Zig: use vtable `struct`, Nim: use `ref object of RootObj`.
 
+
 ```zig
 // ✅ CORRECT: abstract vtable defined before concrete impl
 pub const DriverVtable = struct {
@@ -121,14 +129,18 @@ pub const DriverVtable = struct {
 - **Prefer composition over inheritance** (except for Nim `ref object` hierarchies).
 - Rust: embed structs as fields; Zig: embed pointers to sub-systems.
 
+
 ### 4. Polymorphism
 
 - Rust: `dyn Trait` for runtime dispatch; generics for compile-time.
 - Zig: function pointer vtables for runtime dispatch; `comptime` for static.
 - Nim: `method` + `procCall` for virtual dispatch.
 
+
 ```nim
+
 # ✅ CORRECT: Nim polymorphic method dispatch
+
 type
   BaseWidget* = ref object of RootObj
     id*: uint32
@@ -164,10 +176,12 @@ method paint*(self: ButtonWidget) =
 - Never use `mem::transmute` without explicit justification.
 - Prefer `*const` over `*mut` wherever possible.
 
+
 ### Memory
 
 - Use `BumpAllocator` for kernel heap (from `kernel/src/custom_allocators.rs`).
 - Never call `Box::new`, `Vec::new`, or other `alloc` APIs without registering the global allocator.
+
 
 ---
 
@@ -187,10 +201,12 @@ method paint*(self: ButtonWidget) =
 - Use `comptime` constants and generic functions instead of runtime dispatch where performance is critical.
 - Mark compile-time-only values with `comptime` keyword.
 
+
 ### Error handling
 
 - Use `error{}` union types for all fallible operations.
 - Never use `unreachable` in production paths without a `// PROOF:` comment.
+
 
 ---
 
@@ -199,10 +215,15 @@ method paint*(self: ButtonWidget) =
 ### File header (mandatory)
 
 ```nim
+
 ## <filename>.nim — <Short description>
+
 ## Language: Nim (freestanding — no stdlib, no third-party packages)
+
 ## OOP: <BaseType> (abstract), <DerivedType> (derived)
+
 ## Specification: <wiki or docs link>
+
 {.push raises: [].}
 ```
 
@@ -212,10 +233,12 @@ method paint*(self: ButtonWidget) =
 - Never use Nim's `string`, `seq`, or `Table` types in kernel-facing code.
 - Use fixed-size `array` types only.
 
+
 ### Method dispatch
 
 - Use `method` for virtual dispatch; `proc` for non-virtual.
 - Always call `procCall self.BaseType.method()` in overriding methods.
+
 
 ---
 
@@ -238,6 +261,7 @@ method paint*(self: ButtonWidget) =
 - **Never use `unwrap()`** in production paths. Always match or propagate.
 - Map errors from lower layers to higher-level domain errors at subsystem boundaries.
 
+
 ```rust
 // ❌ FORBIDDEN in kernel paths:
 let v = result.unwrap();
@@ -259,9 +283,11 @@ Every module **must** include unit tests:
 | Nim | `proc test*()` returning `bool` at bottom | `nim compile --run` |
 
 Minimum coverage requirements:
+
 - Happy path: **required**.
 - At least one error path: **required**.
 - Boundary conditions (e.g., buffer full, empty input): **strongly recommended**.
+
 
 ---
 
@@ -284,6 +310,7 @@ pub fn my_function(param: u32) -> Result<u32, KernelError> { ... }
 ```
 
 For Zig:
+
 ```zig
 /// Short summary.
 /// Returns the number of bytes written, or FsError on failure.
@@ -291,9 +318,13 @@ pub fn write(self: *SigmaExt4, inode: Inode, ...) FsError!Usize { ... }
 ```
 
 For Nim:
+
 ```nim
+
 ## Short summary.
+
 ## Returns true if operation succeeded.
+
 proc doThing*(self: BaseWidget): bool = ...
 ```
 

@@ -1,4 +1,5 @@
 # SigmaOS Kernel Absorption - seL4
+
 ## Making seL4/seL4 Irrelevant
 
 > **Absorption Target**: https://github.com/seL4/seL4  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed seL4 by implementing a native microkernel wit
 ## Absorbed Features & Capabilities
 
 ### 1. Formal Verification
+
 **Original**: seL4's mathematically proven kernel  
 **SigmaOS**: Native formal verification with enhanced proofs
 
@@ -29,6 +31,7 @@ pub struct FormalVerification {
 ```
 
 **Verification Features**:
+
 - Mathematical proofs of kernel correctness
 - Formal specification with Isabelle/HOL
 - Model checking with automatic verification
@@ -36,11 +39,14 @@ pub struct FormalVerification {
 - Code generation from formal specifications
 - Continuous verification with automated checking
 
+
 ### 2. Capability-Based Security
+
 **Original**: seL4's capability system  
 **SigmaOS**: Native capability system with hardware enforcement
 
 **Capability Features**:
+
 - Fine-grained capability rights with formal proofs
 - Object handles with mathematically verified access
 - Capability transfer with proven security
@@ -48,11 +54,14 @@ pub struct FormalVerification {
 - Hierarchical capabilities with verified inheritance
 - Capability auditing with tamper-proof logs
 
+
 ### 3. Microkernel Architecture
+
 **Original**: seL4's minimal microkernel  
 **SigmaOS**: Native microkernel with enhanced features
 
 **Microkernel Features**:
+
 - Minimal kernel with verified components
 - User-level device drivers with capability isolation
 - IPC with formal timing guarantees
@@ -60,11 +69,14 @@ pub struct FormalVerification {
 - Memory management with proven isolation
 - Interrupt handling with verified correctness
 
+
 ### 4. Real-Time Guarantees
+
 **Original**: seL4's real-time capabilities  
 **SigmaOS**: Native real-time with formal guarantees
 
 **Real-Time Features**:
+
 - Bounded IPC latency with formal proofs
 - Deterministic scheduling with verified timing
 - Priority inheritance with proven correctness
@@ -72,11 +84,14 @@ pub struct FormalVerification {
 - Interrupt latency with bounded worst-case
 - Real-time monitoring with formal verification
 
+
 ### 5. Memory Safety
+
 **Original**: seL4's memory isolation  
 **SigmaOS**: Native memory safety with formal proofs
 
 **Memory Features**:
+
 - Proven memory isolation between processes
 - Capability-based memory access with verification
 - ASLR with formally verified randomness
@@ -84,11 +99,14 @@ pub struct FormalVerification {
 - Memory sharing with verified access control
 - Memory cleanup with proven reclamation
 
+
 ### 6. Information Flow Security
+
 **Original**: seL4's information flow control  
 **SigmaOS**: Native information flow with formal guarantees
 
 **Information Flow Features**:
+
 - Proven non-interference between components
 - Capability-based information flow control
 - Covert channel analysis with formal methods
@@ -96,12 +114,13 @@ pub struct FormalVerification {
 - Data sanitization with proven effectiveness
 - Audit logging with tamper-proof records
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | seL4 | SigmaOS | Advantage |
-|---------|------|---------|------------|
+| --------- | ------ | --------- | ------------ |
 | Formal Verification | Isabelle/HOL | Enhanced Isabelle/HOL | ✅ 2x |
 | Capability Security | Software | Hardware + formal | ✅ 10x |
 | Real-Time Guarantees | Bounded latency | Enhanced bounded | ✅ 2x |
@@ -116,6 +135,7 @@ pub struct FormalVerification {
 ## Implementation Details
 
 ### Native Formal Verification
+
 ```rust
 pub mod formal_verification {
     use sigma_verify::isabelle::TheoremProver;
@@ -145,6 +165,7 @@ pub mod formal_verification {
 ```
 
 ### Native Capability System with Formal Proofs
+
 ```rust
 pub mod capability {
     pub struct CapabilitySystem {
@@ -172,26 +193,39 @@ pub mod capability {
 ### For Users of seL4
 
 **Before** (using seL4):
+
 ```bash
+
 # Build seL4
+
 # Boot into seL4
+
 # Use formal verification tools
+
 # Capability-based security
+
 # Limited hardware support
+
 ```
 
 **After** (using SigmaOS):
+
 ```bash
+
 # Enable seL4-inspired verification
+
 sigma-kernel verify --formal
 
 # Create formally verified capability
+
 sigma-capability create --object target --rights read,write
 
 # Verify kernel properties
+
 sigma-verify property --isolation
 
 # Hardware-enforced security
+
 sigma-security enforce --hardware --formal
 ```
 
@@ -200,7 +234,7 @@ sigma-security enforce --hardware --formal
 ## Performance Benchmarks
 
 | Operation | seL4 | SigmaOS | Improvement |
-|-----------|------|---------|-------------|
+| ----------- | ------ | --------- | ------------- |
 | Capability Check | 60ns | 25ns | 2.4x faster |
 | IPC Latency (worst-case) | 500ns | 200ns | 2.5x faster |
 | Context Switch | 1μs | 400ns | 2.5x faster |

@@ -60,18 +60,24 @@
 ## 5. Prioritized Implementation Backlog (New)
 
 ### 🔴 High Priority — Unimplemented
+
 1. **`CLOUD_NATIVE.md`** → Nim prototype: `userland/nebula/sigma_nebula.nim`
 2. **`Desktop-UX.md`** → Nim prototype: `userland/gui/sigma_control_center.nim`
 3. **`sigma-agent.md`** → Rust prototype: `userland/agent/src/ipc_agent.rs`
 4. **`Building-from-Source.md`** → Full Rust/Zig/Nim build instructions with `USAGE.md`
 
+
 ### 🟡 Medium Priority — Partial
+
 5. **`Coding-Standards.md`** → Add no-std / no-predefined-libs guidance sections
 6. **`Contributor-Guidelines.md`** → Add OOP/Trait design pattern requirements
 
+
 ### 🟢 Low Priority — Cleanup
+
 7. **Merge duplicate wiki roadmap pages** (`Roadmap.md` vs `Master_Strategic_Roadmap.md`)
 8. **Deduplicate CLOUD_NATIVE variants**: `CLOUD_NATIVE.md` vs `CLOUD_ABSORPTION_ROADMAP.md`
+
 
 ---
 

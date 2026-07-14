@@ -1,4 +1,5 @@
 # SigmaOS Text Editor Absorption - Neovim
+
 ## Making neovim/neovim Irrelevant
 
 > **Absorption Target**: https://github.com/neovim/neovim  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Neovim by implementing a native text editor d
 ## Absorbed Features & Capabilities
 
 ### 1. Lua API
+
 **Original**: Neovim's Lua API  
 **SigmaOS**: Native Lua API with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaEdit {
 ```
 
 **Lua Features**:
+
 - Native Lua engine with OS-level optimization
 - Lua API with type safety
 - Automatic hot-reload with intelligent validation
@@ -36,11 +39,14 @@ pub struct SigmaEdit {
 - Lua profiling with real-time metrics
 - Lua debugging with native tools
 
+
 ### 2. LSP Integration
+
 **Original**: Neovim's LSP client  
 **SigmaOS**: Native LSP with enhanced features
 
 **LSP Features**:
+
 - Native LSP client with OS-level optimization
 - LSP server management with automatic startup
 - LSP diagnostics with real-time updates
@@ -48,11 +54,14 @@ pub struct SigmaEdit {
 - LSP completion with context-aware results
 - LSP monitoring with real-time metrics
 
+
 ### 3. Plugin System
+
 **Original**: Neovim's plugin system  
 **SigmaOS**: Native plugin system with enhanced features
 
 **Plugin Features**:
+
 - Native plugin system with capability-based security
 - Plugin sandboxing with hardware enforcement
 - Plugin marketplace with reputation system
@@ -60,11 +69,14 @@ pub struct SigmaEdit {
 - Plugin composition with inheritance
 - Plugin API with OS integration
 
+
 ### 4. Tree-sitter
+
 **Original**: Neovim's tree-sitter integration  
 **SigmaOS**: Native tree-sitter with enhanced features
 
 **Tree-sitter Features**:
+
 - Native tree-sitter with OS-level optimization
 - Syntax highlighting with intelligent parsing
 - Code navigation with AST-based search
@@ -72,11 +84,14 @@ pub struct SigmaEdit {
 - Tree-sitter caching with intelligent invalidation
 - Tree-sitter monitoring with real-time metrics
 
+
 ### 5. Completion System
+
 **Original**: Neovim's completion system (nvim-cmp)  
 **SigmaOS**: Native completion with enhanced features
 
 **Completion Features**:
+
 - Native completion with intelligent algorithms
 - LSP-based completion with context awareness
 - Snippet completion with automatic expansion
@@ -84,11 +99,14 @@ pub struct SigmaEdit {
 - Completion profiles with automatic switching
 - Completion monitoring with real-time metrics
 
+
 ### 6. Remote Development
+
 **Original**: Neovim's remote development (neovim-remote)  
 **SigmaOS**: Native remote development with enhanced features
 
 **Remote Features**:
+
 - Native remote development with OS-level optimization
 - Remote file editing with zero-latency feel
 - Remote terminal integration with native support
@@ -96,12 +114,13 @@ pub struct SigmaEdit {
 - Remote profiles with automatic switching
 - Remote monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Neovim | SigmaOS | Advantage |
-|---------|--------|---------|------------|
+| --------- | -------- | --------- | ------------ |
 | Editor Performance | Lua overhead | Native Rust | ✅ 3-5x |
 | LSP Performance | Lua overhead | Native OS-level | ✅ 5x |
 | Plugin Performance | Lua overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaEdit {
 ## Implementation Details
 
 ### Native Lua Engine
+
 ```rust
 pub mod lua {
     use sigma_edit::lua::LuaEngine;
@@ -143,6 +163,7 @@ pub mod lua {
 ```
 
 ### Native LSP Client
+
 ```rust
 pub mod lsp {
     pub struct LSPClient {
@@ -172,26 +193,37 @@ pub mod lsp {
 ### For Users of Neovim
 
 **Before** (using Neovim):
+
 ```bash
+
 # Install Neovim
+
 sudo apt install neovim
 
 # Configure Neovim
+
 ~/.config/nvim/init.lua
 
 # Install plugins
+
 # Use plugin manager (vim-plug, packer, etc.)
+
 ```
 
 **After** (using SigmaEdit):
+
 ```bash
+
 # Enable editor shard (native)
+
 sigma-shard enable text-editor
 
 # Use Neovim-compatible configuration
+
 sigma-edit config --neovim-compatible
 
 # Native commands
+
 sigma-edit
 ```
 
@@ -200,7 +232,7 @@ sigma-edit
 ## Performance Benchmarks
 
 | Operation | Neovim | SigmaEdit | Improvement |
-|-----------|--------|-----------|-------------|
+| ----------- | -------- | ----------- | ------------- |
 | Editor Startup | 100ms | 25ms | 4x faster |
 | File Open (large) | 500ms | 100ms | 5x faster |
 | LSP Diagnostics | 200ms | 40ms | 5x faster |

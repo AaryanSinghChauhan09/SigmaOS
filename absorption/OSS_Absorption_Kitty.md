@@ -1,4 +1,5 @@
 # SigmaOS Terminal Absorption - Kitty
+
 ## Making kovidgoyal/kitty Irrelevant
 
 > **Absorption Target**: https://github.com/kovidgoyal/kitty  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Kitty by implementing a native GPU terminal d
 ## Absorbed Features & Capabilities
 
 ### 1. GPU Rendering
+
 **Original**: Kitty's GPU rendering with OpenGL  
 **SigmaOS**: Native GPU rendering with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaTerm {
 ```
 
 **GPU Features**:
+
 - Native GPU rendering with OpenGL/Vulkan
 - Hardware-accelerated text rendering with sub-pixel precision
 - GPU-accelerated scrolling with smooth animations
@@ -36,11 +39,14 @@ pub struct SigmaTerm {
 - GPU monitoring with real-time metrics
 - GPU profiles with automatic switching
 
+
 ### 2. Tab System
+
 **Original**: Kitty's tab system  
 **SigmaOS**: Native tab system with enhanced features
 
 **Tab Features**:
+
 - Native tab management with GPU acceleration
 - Tab synchronization with automatic management
 - Tab profiles with automatic switching
@@ -48,11 +54,14 @@ pub struct SigmaTerm {
 - Tab monitoring with real-time metrics
 - Tab inheritance with composition
 
+
 ### 3. Kitten System
+
 **Original**: Kitty's kitten (plugin) system  
 **SigmaOS**: Native plugin system with enhanced features
 
 **Plugin Features**:
+
 - Native plugin system with capability-based security
 - Plugin sandboxing with hardware enforcement
 - Plugin marketplace with reputation system
@@ -60,11 +69,14 @@ pub struct SigmaTerm {
 - Plugin composition with inheritance
 - Plugin API with OS integration
 
+
 ### 4. Font Rendering
+
 **Original**: Kitty's font rendering  
 **SigmaOS**: Native font rendering with enhanced features
 
 **Font Features**:
+
 - Native font rendering with GPU acceleration
 - Font ligatures with automatic support
 - Font fallback with intelligent selection
@@ -72,11 +84,14 @@ pub struct SigmaTerm {
 - Font profiles with automatic switching
 - Font monitoring with real-time metrics
 
+
 ### 5. Layout System
+
 **Original**: Kitty's layout system  
 **SigmaOS**: Native layout system with enhanced features
 
 **Layout Features**:
+
 - Native layout system with intelligent algorithms
 - Layout presets with automatic selection
 - Layout customization with live preview
@@ -84,11 +99,14 @@ pub struct SigmaTerm {
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
 
+
 ### 6. Shell Integration
+
 **Original**: Kitty's shell integration  
 **SigmaOS**: Native shell integration with enhanced features
 
 **Shell Integration Features**:
+
 - Native shell integration with OS-level optimization
 - Shell protocol with automatic detection
 - Shell synchronization with automatic management
@@ -96,12 +114,13 @@ pub struct SigmaTerm {
 - Shell validation with automatic checking
 - Shell monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Kitty | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Rendering Performance | GPU-accelerated | Native GPU + optimization | ✅ 2-3x |
 | Tab Performance | Python overhead | Native capability | ✅ 5x |
 | Plugin Performance | Python overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaTerm {
 ## Implementation Details
 
 ### Native GPU Renderer
+
 ```rust
 pub mod gpu {
     use sigma_term::gpu::GPURenderer;
@@ -139,6 +159,7 @@ pub mod gpu {
 ```
 
 ### Native Tab Manager
+
 ```rust
 pub mod tab {
     pub struct TabManager {
@@ -165,26 +186,36 @@ pub mod tab {
 ### For Users of Kitty
 
 **Before** (using Kitty):
+
 ```bash
+
 # Install Kitty
+
 sudo apt install kitty
 
 # Configure Kitty
+
 ~/.config/kitty/kitty.conf
 
 # Run Kitty
+
 kitty
 ```
 
 **After** (using SigmaTerm):
+
 ```bash
+
 # Enable terminal shard (native)
+
 sigma-shard enable terminal
 
 # Use Kitty-compatible configuration
+
 sigma-term config --kitty-compatible
 
 # Run native terminal
+
 sigma-term
 ```
 
@@ -193,7 +224,7 @@ sigma-term
 ## Performance Benchmarks
 
 | Operation | Kitty | SigmaTerm | Improvement |
-|-----------|-------|-----------|-------------|
+| ----------- | ------- | ----------- | ------------- |
 | Terminal Startup | 120ms | 35ms | 3.4x faster |
 | Render Frame (60fps) | 16ms | 8ms | 2x faster |
 | Tab Switch | 30ms | 6ms | 5x faster |

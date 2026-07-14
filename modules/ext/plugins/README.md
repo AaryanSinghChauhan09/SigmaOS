@@ -6,7 +6,7 @@ verified, capability-gated capsules** without rebuilding the kernel.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `extension_api.rs` | Public trait definitions for all plugin types |
 | `capsule.rs` | Capsule packaging: sign, verify, load, unload |
 | `auto_driver_builder.rs` | AI-assisted driver scaffolding from hardware IDs |
@@ -16,7 +16,7 @@ verified, capability-gated capsules** without rebuilding the kernel.
 
 A capsule is a signed tar-like archive:
 
-```
+```text
 capsule.shard
 Γö£ΓöÇΓöÇ manifest.json   # name, version, capabilities, author, signature
 Γö£ΓöÇΓöÇ code.wasm       # or code.elf (sovereign ELF)
@@ -45,9 +45,12 @@ pub fn plugin_unload(id: PluginId) -> SigmaResult<()>;
 ## Security Model
 
 1. Every capsule must carry an **Ed25519 signature** from a key in the Sovereign
+
    Trust Root.
+
 2. The kernel validates the signature before mapping any code page.
 3. Capabilities are enforced at IPC call boundaries ΓÇö a plugin cannot exceed its
+
    declared capability set.
 
 ## Roadmap
@@ -60,6 +63,7 @@ pub fn plugin_unload(id: PluginId) -> SigmaResult<()>;
 - [ ] Hot-reload (swap capsule version without reboot)
 - [ ] Capsule sandboxing via `modules/tools/sandbox`
 - [ ] GUI app-store frontend for capsule discovery
+
 
 ## Related Modules
 

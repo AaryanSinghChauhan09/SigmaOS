@@ -1,4 +1,5 @@
 # SigmaOS Data Science Absorption - Applied ML
+
 ## Making eugeneyan/applied-ml Irrelevant
 
 > **Absorption Target**: https://github.com/eugeneyan/applied-ml  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Applied ML by implementing a native applied m
 ## Absorbed Features & Capabilities
 
 ### 1. Applied ML Curriculum
+
 **Original**: Applied ML course content  
 **SigmaOS**: Native curriculum with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaDataScience {
 ```
 
 **Curriculum Features**:
+
 - Native ML curriculum with OS-level optimization
 - Adaptive learning with AI personalization
 - Real-world projects with automatic generation
@@ -36,11 +39,14 @@ pub struct SigmaDataScience {
 - Curriculum validation with automatic checking
 - Curriculum monitoring with real-time metrics
 
+
 ### 2. ML Projects
+
 **Original**: Real-world ML projects  
 **SigmaOS**: Native projects with enhanced features
 
 **Project Features**:
+
 - Native project engine with OS-level optimization
 - Project templates with automatic generation
 - Project collaboration with capability-based access
@@ -48,11 +54,14 @@ pub struct SigmaDataScience {
 - Project validation with automatic checking
 - Project monitoring with real-time metrics
 
+
 ### 3. ML Assessment
+
 **Original**: ML assessment and evaluation  
 **SigmaOS**: Native assessment with enhanced features
 
 **Assessment Features**:
+
 - Native assessment engine with AI evaluation
 - Automated grading with intelligent feedback
 - Skill tracking with automatic progression
@@ -60,11 +69,14 @@ pub struct SigmaDataScience {
 - Assessment validation with automatic checking
 - Assessment monitoring with real-time metrics
 
+
 ### 4. ML Mentorship
+
 **Original**: ML mentorship and guidance  
 **SigmaOS**: Native mentorship with enhanced features
 
 **Mentorship Features**:
+
 - Native mentorship system with AI assistance
 - Code review with automated suggestions
 - Progress tracking with real-time updates
@@ -72,11 +84,14 @@ pub struct SigmaDataScience {
 - Mentorship validation with automatic checking
 - Mentorship monitoring with real-time metrics
 
+
 ### 5. ML Tools Integration
+
 **Original**: Integration with ML tools  
 **SigmaOS**: Native tool integration with enhanced features
 
 **Tool Features**:
+
 - Native tool integration with OS-level optimization
 - ML framework support with automatic detection
 - Tool profiles with automatic switching
@@ -84,11 +99,14 @@ pub struct SigmaDataScience {
 - Tool monitoring with real-time metrics
 - Tool composition with inheritance
 
+
 ### 6. ML Resources
+
 **Original**: ML resources and references  
 **SigmaOS**: Native resources with enhanced features
 
 **Resource Features**:
+
 - Native resource library with intelligent curation
 - Resource recommendations with ML algorithms
 - Resource profiles with automatic switching
@@ -96,12 +114,13 @@ pub struct SigmaDataScience {
 - Resource monitoring with real-time metrics
 - Resource composition with inheritance
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Applied ML | SigmaOS | Advantage |
-|---------|-----------|---------|------------|
+| --------- | ----------- | --------- | ------------ |
 | Curriculum Performance | Web overhead | Native OS-level | ✅ 5-10x |
 | Project Performance | Manual setup | Auto-generation | ✅ 10x |
 | Assessment Performance | Manual grading | AI evaluation | ✅ 10x |
@@ -116,6 +135,7 @@ pub struct SigmaDataScience {
 ## Implementation Details
 
 ### Native ML Curriculum
+
 ```rust
 pub mod curriculum {
     use sigma_datascience::curriculum::MLCurriculum;
@@ -139,6 +159,7 @@ pub mod curriculum {
 ```
 
 ### Native Project Engine
+
 ```rust
 pub mod project {
     pub struct ProjectEngine {
@@ -165,26 +186,37 @@ pub mod project {
 ### For Users of Applied ML
 
 **Before** (using Applied ML):
+
 ```bash
+
 # Clone applied ML
+
 git clone https://github.com/eugeneyan/applied-ml.git
 
 # Follow curriculum
+
 # Read through course content
 
 # Complete projects
+
 # Manually set up and implement projects
+
 ```
 
 **After** (using SigmaDataScience):
+
 ```bash
+
 # Enable data science shard (native)
+
 sigma-shard enable data-science
 
 # Use native curriculum
+
 sigma-datascience curriculum --applied-ml
 
 # Generate project
+
 sigma-datascience project --generate --topic topic
 ```
 
@@ -193,7 +225,7 @@ sigma-datascience project --generate --topic topic
 ## Performance Benchmarks
 
 | Operation | Applied ML | SigmaDataScience | Improvement |
-|-----------|-----------|-----------------|-------------|
+| ----------- | ----------- | ----------------- | ------------- |
 | Curriculum Load | 3s | 300ms | 10x faster |
 | Project Generation | Manual (hours) | Auto (seconds) | 100x faster |
 | Assessment Grading | Manual (hours) | AI (seconds) | 100x faster |

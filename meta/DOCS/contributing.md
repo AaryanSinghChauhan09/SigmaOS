@@ -7,6 +7,7 @@ The `meta/` directory contains internal governance, maintainer-facing documentat
 - `docs/` — Engineering specifications and user-facing technical documentation
 - `wiki_repo/` — GitHub Wiki content synchronized to the public wiki
 
+
 ---
 
 ## What Belongs in `meta/DOCS/`
@@ -30,6 +31,7 @@ All markdown files in `meta/DOCS/` must:
 - Pass `markdownlint` with the repo's `.markdownlint.json` config
 - Not contain external image embeds or CDN dependencies
 
+
 ---
 
 ## Adding New Metadata Files
@@ -38,6 +40,7 @@ All markdown files in `meta/DOCS/` must:
 2. Add the file to this index (update the table above)
 3. If the file is tooling-consumed, document the tool that reads it in a comment at the top of the file
 4. Commit with prefix `meta: add <filename> — <purpose>`
+
 
 ---
 
@@ -48,6 +51,7 @@ Security-related metadata files (`SECURITY.md`) contain:
 - Internal incident response contacts
 - CVE triage procedures
 - Private disclosure channels
+
 
 These files should not duplicate the public-facing [SECURITY.md](../../SECURITY.md) in the repository root, but may cross-reference it.
 

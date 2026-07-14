@@ -7,12 +7,12 @@ set ΓÇö not even with a kernel exploit.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `sandbox.rs` | Shard sandbox: spawn, constrain, monitor, destroy |
 
 ## Isolation Model
 
-```
+```text
 Untrusted App (WASM / ELF)
    ΓööΓöÇ sigma_sandbox_create()         ΓåÉ assigns capability token
          ΓööΓöÇ Shard Boundary (hardware ring separation)
@@ -74,6 +74,7 @@ is blocked at the dispatcher and logged to the audit chain:
 - [ ] Sandbox live introspection API
 - [ ] Escape detection via invariant checking
 - [ ] Formal proof: sandbox capability confinement (Isabelle/HOL)
+
 
 ## Related Modules
 

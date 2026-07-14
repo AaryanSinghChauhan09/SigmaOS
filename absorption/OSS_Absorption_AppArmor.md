@@ -1,4 +1,5 @@
 # SigmaOS Security Absorption - AppArmor
+
 ## Making apparmor/apparmor Irrelevant
 
 > **Absorption Target**: https://github.com/apparmor/apparmor  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed AppArmor by implementing a native capability-
 ## Absorbed Features & Capabilities
 
 ### 1. Profile System
+
 **Original**: AppArmor's profile-based confinement  
 **SigmaOS**: Native capability system with enhanced profiles
 
@@ -29,6 +31,7 @@ pub struct SigmaSecurity {
 ```
 
 **Profile Features**:
+
 - Native profile definitions with type safety
 - Profile inheritance with composition
 - Profile versioning with automatic updates
@@ -36,11 +39,14 @@ pub struct SigmaSecurity {
 - Profile caching with automatic invalidation
 - Profile distribution with content-addressed storage
 
+
 ### 2. Policy Language
+
 **Original**: AppArmor's policy language  
 **SigmaOS**: Native policy language with enhanced syntax
 
 **Policy Features**:
+
 - Declarative policy definitions with type safety
 - Policy composition with inheritance
 - Policy validation with automatic checking
@@ -48,11 +54,14 @@ pub struct SigmaSecurity {
 - Policy auditing with tamper-proof logs
 - Policy versioning with backward compatibility
 
+
 ### 3. Enforcement Engine
+
 **Original**: AppArmor's kernel-space enforcement  
 **SigmaOS**: Native enforcement with hardware acceleration
 
 **Enforcement Features**:
+
 - Native enforcement with hardware acceleration
 - Real-time policy evaluation with sub-microsecond latency
 - Capability checking with hardware enforcement
@@ -60,11 +69,14 @@ pub struct SigmaSecurity {
 - Enforcement monitoring with real-time metrics
 - Enforcement optimization with automatic tuning
 
+
 ### 4. File Access Control
+
 **Original**: AppArmor's file path rules  
 **SigmaOS**: Native file access with capability-based control
 
 **File Access Features**:
+
 - Native file access control with capability-based permissions
 - File path matching with optimized algorithms
 - File access logging with tamper-proof records
@@ -72,11 +84,14 @@ pub struct SigmaSecurity {
 - File access caching with automatic invalidation
 - File access composition with inheritance
 
+
 ### 5. Network Access Control
+
 **Original**: AppArmor's network rules  
 **SigmaOS**: Native network access with capability-based control
 
 **Network Access Features**:
+
 - Native network access control with capability-based permissions
 - Network port filtering with hardware acceleration
 - Network access logging with tamper-proof records
@@ -84,11 +99,14 @@ pub struct SigmaSecurity {
 - Network access caching with automatic invalidation
 - Network access composition with inheritance
 
+
 ### 6. Capability Compatibility
+
 **Original**: AppArmor's capability mapping  
 **SigmaOS**: Native capability system with AppArmor compatibility
 
 **Compatibility Features**:
+
 - AppArmor profile translation with automatic conversion
 - AppArmor policy compatibility layer
 - AppArmor command-line interface compatibility
@@ -96,12 +114,13 @@ pub struct SigmaSecurity {
 - AppArmor tool integration with native tools
 - AppArmor migration with automatic conversion
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | AppArmor | SigmaOS | Advantage |
-|---------|----------|---------|------------|
+| --------- | ---------- | --------- | ------------ |
 | Policy Performance | Kernel overhead | Native + hardware | ✅ 5-10x |
 | Enforcement Latency | Microsecond | Sub-microsecond | ✅ 5x |
 | Profile Management | Text files | Native database | ✅ 10x |
@@ -116,6 +135,7 @@ pub struct SigmaSecurity {
 ## Implementation Details
 
 ### Native Capability System
+
 ```rust
 pub mod capability {
     use sigma_security::capability::CapabilityManager;
@@ -144,6 +164,7 @@ pub mod capability {
 ```
 
 ### Native Policy Engine
+
 ```rust
 pub mod policy {
     pub struct PolicyEngine {
@@ -170,32 +191,44 @@ pub mod policy {
 ### For Users of AppArmor
 
 **Before** (using AppArmor):
+
 ```bash
+
 # Install AppArmor
+
 sudo apt install apparmor
 
 # Define profile
+
 /etc/apparmor.d/profile
 
 # Load profile
+
 sudo apparmor_parser -r /etc/apparmor.d/profile
 
 # Check status
+
 sudo aa-status
 ```
 
 **After** (using SigmaSecurity):
+
 ```bash
+
 # Enable security shard (native)
+
 sigma-shard enable security-system
 
 # Define profile
+
 sigma-security profile create --policy policy.sigma
 
 # Load profile
+
 sigma-security profile load --name profile
 
 # Check status
+
 sigma-security status
 ```
 
@@ -204,7 +237,7 @@ sigma-security status
 ## Performance Benchmarks
 
 | Operation | AppArmor | SigmaSecurity | Improvement |
-|-----------|----------|---------------|-------------|
+| ----------- | ---------- | --------------- | ------------- |
 | Policy Load | 50ms | 5ms | 10x faster |
 | Enforcement Check | 1μs | 0.2μs | 5x faster |
 | Profile Validation | 100ms | 10ms | 10x faster |

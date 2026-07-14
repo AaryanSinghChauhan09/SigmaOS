@@ -5,7 +5,7 @@ real-time lanes, energy efficiency, and AI-driven workload prediction**.
 
 ## Scheduler Class Hierarchy
 
-```
+```text
 SovereignScheduler (abstract)
   Γö£ΓöÇ RoundRobin     ΓÇö fair-share for interactive tasks
   Γö£ΓöÇ EDF            ΓÇö Earliest Deadline First for real-time shards
@@ -36,6 +36,7 @@ shard_spawn(SpawnRequest {
 - Inference latency < 50 ┬╡s on baseline x86_64
 - Signals pre-warming of cache lines for known bursty workloads
 
+
 ## API Interface
 
 ```c
@@ -55,7 +56,7 @@ void init_perf_scheduler(void);
 ## Context Switch Latency Targets
 
 | Class | Target Latency |
-|---|---|
+| --- | --- |
 | RTLane | < 5 ┬╡s |
 | EDF | < 50 ┬╡s |
 | RoundRobin | < 500 ┬╡s |
@@ -71,6 +72,7 @@ void init_perf_scheduler(void);
 - [ ] AI prediction hook from `res_alloc_ai.rs`
 - [ ] Formal scheduling analysis (response-time analysis)
 - [ ] `schedtool`-compatible CLI for shard priority adjustment
+
 
 ## Related Modules
 

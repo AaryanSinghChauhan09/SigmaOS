@@ -15,6 +15,7 @@ Thank you for your interest in contributing to SigmaOS! This document provides g
 - [Pull Request Process](#pull-request-process)
 - [Community Guidelines](#community-guidelines)
 
+
 ---
 
 ## Code of Conduct
@@ -31,19 +32,25 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). By participati
 - Have a GitHub account
 - Understand the basic concepts of operating systems and kernel development
 
+
 ### First Steps
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/SigmaOS.git
    cd SigmaOS
    ```
+
 3. **Add the upstream remote**:
+
    ```bash
    git remote add upstream https://github.com/AaryanSinghChauhan09/SigmaOS.git
    ```
+
 4. **Create a branch** for your work:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -62,17 +69,20 @@ Use descriptive branch names following these patterns:
 - `refactor/<area>/<description>` - Code refactoring
 - `test/<area>/<description>` - Test additions
 
+
 Examples:
+
 - `feature/network/tcp-stack`
 - `fix/memory/allocator-leak`
 - `docs/kernel/scheduler`
 - `refactor/drivers/usb-interface`
 
+
 ### Commit Message Convention
 
 Follow conventional commit format:
 
-```
+```text
 <type>(<scope>): <subject>
 
 <body>
@@ -83,7 +93,8 @@ Follow conventional commit format:
 **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 **Examples**:
-```
+
+```text
 feat(kernel): implement EEVDF scheduler
 
 Add Earliest Eligible Virtual Deadline First scheduler
@@ -92,7 +103,7 @@ with support for real-time tasks and CPU affinity.
 Closes #123
 ```
 
-```
+```text
 fix(drivers): resolve USB xHCI interrupt handling
 
 Fix race condition in interrupt handler that caused
@@ -113,6 +124,7 @@ Fixes #456
 8. **Push to your fork**
 9. **Open a pull request**
 
+
 ---
 
 ## Coding Standards
@@ -127,6 +139,7 @@ SigmaOS uses multiple languages for different purposes:
 - **C**: Legacy compatibility, hardware-specific code (minimal)
 - **Ada/SPARK**: Formal verification, safety-critical components
 
+
 See [LANGUAGE_POLICY.md](LANGUAGE_POLICY.md) for detailed language usage guidelines.
 
 ### Rust Guidelines
@@ -137,6 +150,7 @@ See [LANGUAGE_POLICY.md](LANGUAGE_POLICY.md) for detailed language usage guideli
 - Document all public APIs with `///`
 - Use `#[derive(Debug)]` for public structs
 
+
 ### Zig Guidelines
 
 - Follow Zig style guide
@@ -144,12 +158,14 @@ See [LANGUAGE_POLICY.md](LANGUAGE_POLICY.md) for detailed language usage guideli
 - Document all public functions
 - Prefer comptime for constants
 
+
 ### Nim Guidelines
 
 - Follow Nim style guide
 - Use `nimpretty` for formatting
 - Document all exported procedures
 - Prefer explicit types over inference
+
 
 ### General Guidelines
 
@@ -159,6 +175,7 @@ See [LANGUAGE_POLICY.md](LANGUAGE_POLICY.md) for detailed language usage guideli
 - **Write clear, self-documenting code**
 - **Add comments for complex logic**
 - **Keep functions focused and small**
+
 
 ---
 
@@ -200,7 +217,9 @@ Add smoke tests in `scripts/smoke-test-*.sh`:
 
 ```bash
 #!/bin/bash
+
 # Smoke test for your feature
+
 ```
 
 ### Test Coverage
@@ -209,19 +228,25 @@ Add smoke tests in `scripts/smoke-test-*.sh`:
 - All critical paths must be tested
 - Security-related code requires 100% coverage
 
+
 ### Running Tests
 
 ```bash
+
 # Run all tests
+
 make test
 
 # Run unit tests only
+
 make test-unit
 
 # Run integration tests
+
 make test-integration
 
 # Run smoke tests
+
 ./scripts/smoke-test.sh
 ```
 
@@ -235,11 +260,13 @@ make test-integration
 - Use doc tests for examples
 - Include usage examples in documentation
 
+
 ### README Updates
 
 Update relevant README files in subsystem directories:
 
 ```markdown
+
 ## Feature Name
 
 Brief description of the feature.
@@ -247,13 +274,15 @@ Brief description of the feature.
 ### Usage
 
 ```rust
+
 let result = feature_function();
+
 ```
 
 ### Configuration
 
 Configuration options and examples.
-```
+```text
 
 ### Architecture Documentation
 
@@ -275,18 +304,21 @@ For public APIs, add documentation to the appropriate spec file.
 ### Before Opening a PR
 
 1. **Ensure your branch is up to date**:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 2. **Run all tests**:
+
    ```bash
    make test
    ./scripts/smoke-test.sh
    ```
 
 3. **Run linters**:
+
    ```bash
    cargo fmt
    cargo clippy
@@ -294,12 +326,14 @@ For public APIs, add documentation to the appropriate spec file.
 
 4. **Update documentation** as needed
 
+
 ### Opening a PR
 
 1. Use the [PR template](docs/pr_template.md)
 2. Fill in all required sections
 3. Link to related issues
 4. Request review from maintainers
+
 
 ### PR Checklist
 
@@ -311,6 +345,7 @@ For public APIs, add documentation to the appropriate spec file.
 - [ ] CI checks passing
 - [ ] No merge conflicts
 
+
 ### Review Process
 
 1. **Automated checks** must pass (CI, linting, tests)
@@ -319,6 +354,7 @@ For public APIs, add documentation to the appropriate spec file.
 4. **Update PR** based on feedback
 5. **Squash commits** if requested
 6. **Merge** using `--no-ff` to preserve history
+
 
 ---
 
@@ -331,12 +367,14 @@ For public APIs, add documentation to the appropriate spec file.
 - **Discord**: Real-time chat (invite in README)
 - **Mailing List**: Announcements, discussions
 
+
 ### Getting Help
 
 - Search existing issues and discussions first
 - Provide clear, reproducible bug reports
 - Include system information and error logs
 - Be patient and respectful
+
 
 ### Reporting Security Issues
 
@@ -355,12 +393,14 @@ Looking for something to work on? Check these high-impact areas:
 - **IPC**: Zero-latency inter-process communication
 - **Syscalls**: POSIX compatibility layer
 
+
 ### Drivers
 
 - **GPU**: NVIDIA, AMD, Intel drivers
 - **Network**: Ethernet NIC drivers, Wi-Fi
 - **Storage**: NVMe, AHCI improvements
 - **Input**: HID devices, touchscreens
+
 
 ### Userland
 
@@ -369,12 +409,14 @@ Looking for something to work on? Check these high-impact areas:
 - **Desktop**: Zenith compositor improvements
 - **Applications**: Core utilities
 
+
 ### Documentation
 
 - **Architecture**: System design documents
 - **API**: Internal API documentation
 - **Guides**: Tutorial and how-to guides
 - **Translations**: Multi-language support
+
 
 See [TODO.md](TODO.md) and [Roadmap.md](Roadmap.md) for more details.
 
@@ -389,6 +431,7 @@ Contributors are recognized in:
 - **GitHub** - Contribution graph
 - **Community** - Shoutouts in discussions
 
+
 ---
 
 ## License
@@ -402,6 +445,7 @@ By contributing, you agree that your contributions will be licensed under the pr
 - Check [FAQ.md](FAQ.md) for common questions
 - Ask in [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
 - Contact maintainers via [SECURITY_POLICY.md](SECURITY_POLICY.md) for security issues
+
 
 ---
 

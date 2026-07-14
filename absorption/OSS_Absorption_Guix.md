@@ -1,4 +1,5 @@
 # SigmaOS Package Management Absorption - Guix
+
 ## Making guix-gnu/guix Irrelevant
 
 > **Absorption Target**: https://github.com/guix-gnu/guix  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Guix by implementing a native functional pack
 ## Absorbed Features & Capabilities
 
 ### 1. Functional Package Management
+
 **Original**: Guix's functional package paradigm  
 **SigmaOS**: Native functional package management with optimizations
 
@@ -29,6 +31,7 @@ pub struct SigmaPkg {
 ```
 
 **Functional Features**:
+
 - Immutable package store with content-addressed storage
 - Reproducible builds with deterministic outputs
 - Transactional updates with automatic rollback
@@ -36,11 +39,14 @@ pub struct SigmaPkg {
 - Garbage collection with automatic cleanup
 - Build isolation with sandboxing
 
+
 ### 2. Declarative Package Definitions
+
 **Original**: Guix's Scheme-based package definitions  
 **SigmaOS**: Native declarative definitions with enhanced syntax
 
 **Definition Features**:
+
 - Declarative package definitions with type safety
 - Automatic dependency resolution with SAT solver
 - Package variants with conditional compilation
@@ -48,11 +54,14 @@ pub struct SigmaPkg {
 - Build hooks with automatic execution
 - Patch management with automatic application
 
+
 ### 3. Build System Integration
+
 **Original**: Guix's build daemon (guix-daemon)  
 **SigmaOS**: Native build system with OS integration
 
 **Build Features**:
+
 - Native build daemon with OS-level optimization
 - Distributed builds with automatic load balancing
 - Build caching with automatic invalidation
@@ -60,11 +69,14 @@ pub struct SigmaPkg {
 - Build verification with cryptographic hashes
 - Build isolation with capability-based sandboxing
 
+
 ### 4. Profile Management
+
 **Original**: Guix's profile system  
 **SigmaOS**: Native profile management with enhanced features
 
 **Profile Features**:
+
 - Multiple profile generations with automatic management
 - Profile inheritance with composition
 - Profile rollback with instant switching
@@ -72,11 +84,14 @@ pub struct SigmaPkg {
 - Profile export/import with portability
 - Profile validation with automatic checking
 
+
 ### 5. Service Management
+
 **Original**: Guix's service configuration  
 **SigmaOS**: Native service management with OS integration
 
 **Service Features**:
+
 - Declarative service definitions
 - Service dependency management
 - Service lifecycle management
@@ -84,11 +99,14 @@ pub struct SigmaPkg {
 - Service logging with aggregation
 - Service composition with orchestration
 
+
 ### 6. Reproducibility
+
 **Original**: Guix's reproducible builds  
 **SigmaOS**: Enhanced reproducibility with formal verification
 
 **Reproducibility Features**:
+
 - Deterministic builds with proven correctness
 - Build environment isolation with containers
 - Source code verification with cryptographic hashes
@@ -96,12 +114,13 @@ pub struct SigmaPkg {
 - Binary transparency with audit logs
 - Continuous reproducibility verification
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Guix | SigmaOS | Advantage |
-|---------|------|---------|------------|
+| --------- | ------ | --------- | ------------ |
 | Build Performance | Scheme overhead | Native Rust | ✅ 5-10x |
 | Dependency Resolution | SAT solver | Enhanced SAT + ML | ✅ 3x |
 | Reproducibility | Deterministic | Deterministic + formal | ✅ 2x |
@@ -116,6 +135,7 @@ pub struct SigmaPkg {
 ## Implementation Details
 
 ### Native Functional Package Management
+
 ```rust
 pub mod package_management {
     use sigma_pkg::store::PackageStore;
@@ -145,6 +165,7 @@ pub mod package_management {
 ```
 
 ### Native Build System
+
 ```rust
 pub mod build_system {
     pub struct BuildSystem {
@@ -178,11 +199,15 @@ pub mod build_system {
 ### For Users of Guix
 
 **Before** (using Guix):
+
 ```bash
+
 # Install Guix
+
 guix install guix
 
 # Define packages in Scheme
+
 (define my-package
   (package
     (name "my-package")
@@ -192,24 +217,32 @@ guix install guix
     (inputs ...)))
 
 # Build package
+
 guix build my-package
 
 # Create profile
+
 guix package -i my-package
 ```
 
 **After** (using SigmaPkg):
+
 ```bash
+
 # Enable package shard (native)
+
 sigma-shard enable package-management
 
 # Define package in native syntax
+
 sigma-pkg define --name my-package --version 1.0
 
 # Build package with verification
+
 sigma-pkg build --package my-package
 
 # Create profile
+
 sigma-pkg profile create --packages my-package
 ```
 
@@ -218,7 +251,7 @@ sigma-pkg profile create --packages my-package
 ## Performance Benchmarks
 
 | Operation | Guix | SigmaPkg | Improvement |
-|-----------|------|----------|-------------|
+| ----------- | ------ | ---------- | ------------- |
 | Package Build (simple) | 45s | 12s | 3.8x faster |
 | Dependency Resolution | 8s | 2s | 4x faster |
 | Profile Switch | 3s | 0.5s | 6x faster |

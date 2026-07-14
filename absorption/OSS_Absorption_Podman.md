@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - Podman
+
 ## Making containers/podman Irrelevant
 
 > **Absorption Target**: https://github.com/containers/podman  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Podman by implementing a native container run
 ## Absorbed Features & Capabilities
 
 ### 1. Daemonless Architecture
+
 **Original**: Podman's daemonless container runtime  
 **SigmaOS**: Native daemonless runtime with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaContainer {
 ```
 
 **Daemonless Features**:
+
 - Native daemonless runtime with OS-level optimization
 - Process-per-container with automatic management
 - Capability-based sandboxing with hardware enforcement
@@ -36,11 +39,14 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
+
 ### 2. Rootless Containers
+
 **Original**: Podman's rootless container support  
 **SigmaOS**: Native rootless with enhanced features
 
 **Rootless Features**:
+
 - Native rootless containers with capability-based access
 - User namespace isolation with automatic management
 - Rootless networking with automatic configuration
@@ -48,11 +54,14 @@ pub struct SigmaContainer {
 - Rootless monitoring with real-time metrics
 - Rootless profiles with automatic switching
 
+
 ### 3. Pod System
+
 **Original**: Podman's pod system for container groups  
 **SigmaOS**: Native pod system with enhanced features
 
 **Pod Features**:
+
 - Native pod management with capability-based access
 - Pod isolation with automatic configuration
 - Pod networking with automatic setup
@@ -60,11 +69,14 @@ pub struct SigmaContainer {
 - Pod profiles with automatic switching
 - Pod composition with inheritance
 
+
 ### 4. Image Management
+
 **Original**: Podman's image system (compatible with Docker)  
 **SigmaOS**: Native image system with enhanced features
 
 **Image Features**:
+
 - Native image management with content-addressed storage
 - Docker-compatible image format with automatic conversion
 - Image caching with intelligent invalidation
@@ -72,11 +84,14 @@ pub struct SigmaContainer {
 - Image distribution with content-addressed storage
 - Image profiles with automatic switching
 
+
 ### 5. Network Management
+
 **Original**: Podman's network system (slirp4netns)  
 **SigmaOS**: Native network system with enhanced features
 
 **Network Features**:
+
 - Native network management with capability-based access
 - Rootless networking with automatic configuration
 - Network filtering with hardware acceleration
@@ -84,11 +99,14 @@ pub struct SigmaContainer {
 - Network profiles with automatic switching
 - Network composition with inheritance
 
+
 ### 6. Docker Compatibility
+
 **Original**: Podman's Docker CLI compatibility  
 **SigmaOS**: Native Docker compatibility with enhanced features
 
 **Compatibility Features**:
+
 - Native Docker CLI compatibility with automatic translation
 - Docker API compatibility with native implementation
 - Docker Compose compatibility with native orchestration
@@ -96,12 +114,13 @@ pub struct SigmaContainer {
 - Docker registry compatibility with native integration
 - Docker tooling compatibility with native tools
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Podman | SigmaOS | Advantage |
-|---------|--------|---------|------------|
+| --------- | -------- | --------- | ------------ |
 | Container Performance | Go overhead | Native Rust | ✅ 5-10x |
 | Rootless Performance | User namespace overhead | Native capability | ✅ 5x |
 | Pod Performance | Group overhead | Native capability | ✅ 3-5x |
@@ -116,6 +135,7 @@ pub struct SigmaContainer {
 ## Implementation Details
 
 ### Native Daemonless Runtime
+
 ```rust
 pub mod daemonless {
     use sigma_container::runtime::ContainerRuntime;
@@ -144,6 +164,7 @@ pub mod daemonless {
 ```
 
 ### Native Rootless Manager
+
 ```rust
 pub mod rootless {
     pub struct RootlessManager {
@@ -171,32 +192,44 @@ pub mod rootless {
 ### For Users of Podman
 
 **Before** (using Podman):
+
 ```bash
+
 # Install Podman
+
 sudo apt install podman
 
 # Run rootless container
+
 podman run myapp
 
 # Create pod
+
 podman pod create --name mypod
 
 # Add to pod
+
 podman pod add mypod myapp
 ```
 
 **After** (using SigmaContainer):
+
 ```bash
+
 # Enable container shard (native)
+
 sigma-shard enable container-runtime
 
 # Run rootless container
+
 sigma-container run --image myapp --rootless
 
 # Create pod
+
 sigma-container pod create --name mypod
 
 # Add to pod
+
 sigma-container pod add --pod mypod --container myapp
 ```
 
@@ -205,7 +238,7 @@ sigma-container pod add --pod mypod --container myapp
 ## Performance Benchmarks
 
 | Operation | Podman | SigmaContainer | Improvement |
-|-----------|--------|----------------|-------------|
+| ----------- | -------- | ---------------- | ------------- |
 | Container Create | 400ms | 70ms | 5.7x faster |
 | Rootless Setup | 100ms | 20ms | 5x faster |
 | Pod Create | 150ms | 30ms | 5x faster |

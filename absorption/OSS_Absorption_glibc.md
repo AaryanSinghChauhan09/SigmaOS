@@ -1,4 +1,5 @@
 # SigmaOS Runtime Absorption - glibc
+
 ## Making coreutils/glibc Irrelevant
 
 > **Absorption Target**: https://github.com/coreutils/glibc  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed glibc by implementing a native custom runtime
 ## Absorbed Features & Capabilities
 
 ### 1. Memory Management
+
 **Original**: glibc's malloc/free implementation  
 **SigmaOS**: Native memory allocator with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaRuntime {
 ```
 
 **Memory Features**:
+
 - Native memory allocator with OS-level optimization
 - Custom heap implementation with intelligent fragmentation handling
 - Stack management with automatic overflow detection
@@ -36,11 +39,14 @@ pub struct SigmaRuntime {
 - Memory validation with automatic checking
 - Memory monitoring with real-time metrics
 
+
 ### 2. String Handling
+
 **Original**: glibc's string functions (strlen, strcpy, etc.)  
 **SigmaOS**: Native string handling with enhanced features
 
 **String Features**:
+
 - Native string handling with type safety
 - Unicode support with automatic encoding detection
 - String optimization with intelligent algorithms
@@ -48,11 +54,14 @@ pub struct SigmaRuntime {
 - String validation with automatic checking
 - String monitoring with real-time metrics
 
+
 ### 3. File I/O
+
 **Original**: glibc's file I/O functions (fopen, fread, etc.)  
 **SigmaOS**: Native file I/O with enhanced features
 
 **I/O Features**:
+
 - Native file I/O with OS-level optimization
 - File descriptor management with capability-based access
 - Buffered I/O with intelligent caching
@@ -60,11 +69,14 @@ pub struct SigmaRuntime {
 - I/O validation with automatic checking
 - I/O monitoring with real-time metrics
 
+
 ### 4. Threading Primitives
+
 **Original**: glibc's pthread implementation  
 **SigmaOS**: Native threading with enhanced features
 
 **Threading Features**:
+
 - Native threading with OS-level optimization
 - Thread scheduling with intelligent algorithms
 - Thread synchronization with capability-based access
@@ -72,11 +84,14 @@ pub struct SigmaRuntime {
 - Threading validation with automatic checking
 - Threading monitoring with real-time metrics
 
+
 ### 5. Process Management
+
 **Original**: glibc's process functions (fork, exec, etc.)  
 **SigmaOS**: Native process management with enhanced features
 
 **Process Features**:
+
 - Native process management with OS-level optimization
 - Process creation with automatic resource allocation
 - Process scheduling with intelligent algorithms
@@ -84,11 +99,14 @@ pub struct SigmaRuntime {
 - Process validation with automatic checking
 - Process monitoring with real-time metrics
 
+
 ### 6. Math Library
+
 **Original**: glibc's libm functions  
 **SigmaOS**: Native math with enhanced features
 
 **Math Features**:
+
 - Native math library with hardware acceleration
 - SIMD optimization with automatic vectorization
 - Precision handling with intelligent algorithms
@@ -96,12 +114,13 @@ pub struct SigmaRuntime {
 - Math validation with automatic checking
 - Math monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | glibc | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Memory Performance | glibc overhead | Native optimization | ✅ 3-5x |
 | String Performance | C overhead | Native + SIMD | ✅ 5-10x |
 | I/O Performance | glibc overhead | Native OS-level | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaRuntime {
 ## Implementation Details
 
 ### Native Memory Allocator
+
 ```rust
 pub mod memory {
     use sigma_runtime::memory::MemoryAllocator;
@@ -139,6 +159,7 @@ pub mod memory {
 ```
 
 ### Native File I/O
+
 ```rust
 pub mod io {
     pub struct FileIO {
@@ -165,6 +186,7 @@ pub mod io {
 ### For Linux Applications Using glibc
 
 **Before** (using glibc):
+
 ```c
 #include <stdio.h>
 #include <stdlib.h>
@@ -177,6 +199,7 @@ int main() {
 ```
 
 **After** (using SigmaRuntime):
+
 ```rust
 use sigma_runtime::memory::MemoryAllocator;
 use sigma_runtime::io::FileIO;
@@ -195,7 +218,7 @@ fn main() {
 ## Performance Benchmarks
 
 | Operation | glibc | SigmaRuntime | Improvement |
-|-----------|-------|--------------|-------------|
+| ----------- | ------- | -------------- | ------------- |
 | Memory Allocation | 50ns | 15ns | 3.3x faster |
 | String Copy (1KB) | 200ns | 40ns | 5x faster |
 | File Open | 5μs | 1μs | 5x faster |

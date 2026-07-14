@@ -1,4 +1,5 @@
 # SigmaOS Security Absorption - Firejail
+
 ## Making netblue30/firejail Irrelevant
 
 > **Absorption Target**: https://github.com/netblue30/firejail  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Firejail by implementing a native capability-
 ## Absorbed Features & Capabilities
 
 ### 1. Process Sandboxing
+
 **Original**: Firejail's namespace-based sandboxing  
 **SigmaOS**: Native capability-based sandboxing
 
@@ -29,6 +31,7 @@ pub struct SigmaSecurity {
 ```
 
 **Sandbox Features**:
+
 - Native sandboxing with capability-based isolation
 - Namespace isolation with automatic management
 - Resource limiting with hardware enforcement
@@ -36,11 +39,14 @@ pub struct SigmaSecurity {
 - Sandbox monitoring with real-time metrics
 - Sandbox cleanup with automatic reclamation
 
+
 ### 2. Profile System
+
 **Original**: Firejail's profile-based configuration  
 **SigmaOS**: Native profile system with enhanced features
 
 **Profile Features**:
+
 - Native profile definitions with type safety
 - Profile inheritance with composition
 - Profile validation with formal verification
@@ -48,11 +54,14 @@ pub struct SigmaSecurity {
 - Profile distribution with content-addressed storage
 - Profile templates with automatic generation
 
+
 ### 3. Network Isolation
+
 **Original**: Firejail's network namespace isolation  
 **SigmaOS**: Native network isolation with capability-based control
 
 **Network Features**:
+
 - Native network isolation with capability-based access
 - Network filtering with hardware acceleration
 - Network monitoring with real-time metrics
@@ -60,11 +69,14 @@ pub struct SigmaSecurity {
 - Network simulation with virtual networks
 - Network testing with automated tools
 
+
 ### 4. Filesystem Isolation
+
 **Original**: Firejail's filesystem namespace isolation  
 **SigmaOS**: Native filesystem isolation with capability-based control
 
 **Filesystem Features**:
+
 - Native filesystem isolation with capability-based access
 - Filesystem overlay with copy-on-write
 - Filesystem filtering with automatic rules
@@ -72,11 +84,14 @@ pub struct SigmaSecurity {
 - Filesystem profiles with automatic switching
 - Filesystem testing with automated tools
 
+
 ### 5. Resource Limiting
+
 **Original**: Firejail's cgroup-based resource limits  
 **SigmaOS**: Native resource limiting with hardware enforcement
 
 **Resource Features**:
+
 - Native resource limiting with hardware enforcement
 - CPU limiting with automatic balancing
 - Memory limiting with automatic compression
@@ -84,11 +99,14 @@ pub struct SigmaSecurity {
 - Network limiting with automatic shaping
 - Resource monitoring with real-time metrics
 
+
 ### 6. Security Features
+
 **Original**: Firejail's seccomp filters  
 **SigmaOS**: Native security with capability-based control
 
 **Security Features**:
+
 - Native syscall filtering with capability-based control
 - Seccomp compatibility with automatic translation
 - Security profiles with automatic generation
@@ -96,12 +114,13 @@ pub struct SigmaSecurity {
 - Security auditing with tamper-proof logs
 - Security testing with automated tools
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Firejail | SigmaOS | Advantage |
-|---------|----------|---------|------------|
+| --------- | ---------- | --------- | ------------ |
 | Sandbox Performance | Namespace overhead | Capability-based | ✅ 5-10x |
 | Profile Management | Text files | Native database | ✅ 10x |
 | Network Isolation | Namespace overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaSecurity {
 ## Implementation Details
 
 ### Native Sandbox Manager
+
 ```rust
 pub mod sandbox {
     use sigma_security::sandbox::SandboxManager;
@@ -144,6 +164,7 @@ pub mod sandbox {
 ```
 
 ### Native Resource Limiter
+
 ```rust
 pub mod resource {
     pub struct ResourceLimiter {
@@ -170,32 +191,44 @@ pub mod resource {
 ### For Users of Firejail
 
 **Before** (using Firejail):
+
 ```bash
+
 # Install Firejail
+
 sudo apt install firejail
 
 # Define profile
+
 /etc/firejail/profile.profile
 
 # Run sandboxed
+
 firejail program
 
 # Check status
+
 firejail --list
 ```
 
 **After** (using SigmaSecurity):
+
 ```bash
+
 # Enable security shard (native)
+
 sigma-shard enable security-system
 
 # Define profile
+
 sigma-security profile create --name program
 
 # Run sandboxed
+
 sigma-security sandbox run --program program
 
 # Check status
+
 sigma-security sandbox list
 ```
 
@@ -204,7 +237,7 @@ sigma-security sandbox list
 ## Performance Benchmarks
 
 | Operation | Firejail | SigmaSecurity | Improvement |
-|-----------|----------|---------------|-------------|
+| ----------- | ---------- | --------------- | ------------- |
 | Sandbox Create | 100ms | 15ms | 6.7x faster |
 | Process Isolate | 50ms | 8ms | 6.3x faster |
 | Profile Load | 30ms | 5ms | 6x faster |

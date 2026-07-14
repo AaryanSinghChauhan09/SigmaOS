@@ -26,11 +26,13 @@ WASM sandboxing is a key differentiator for SigmaOS, enabling secure application
    - Add capability-based resource access controls
    - Create sandbox initialization and teardown
 
+
 2. **Application Loading**
    - Implement WASM binary loader and validator
    - Add support for WASM component model
    - Create manifest format for WASM apps (permissions, capabilities)
    - Implement dynamic linking for WASM modules
+
 
 3. **Tooling and CLI**
    - Create sigma-wasm CLI tool for running WASM apps
@@ -38,47 +40,65 @@ WASM sandboxing is a key differentiator for SigmaOS, enabling secure application
    - Implement development SDK for WASM app authors
    - Create example WASM applications (web server, SQLite)
 
+
 4. **Security Hardening**
    - Implement resource limits (memory, CPU, file descriptors)
    - Add capability-based permission system
    - Implement secure IPC between WASM apps and kernel
    - Add audit logging for WASM app operations
 
+
 ### Files to Modify/Create
 
 - `runtime/wasm/mod.rs` - New WASM runtime module
 
+
 - `runtime/wasm/wasi_layer.rs` - WASI syscall implementation
+
 
 - `runtime/wasm/sandbox.rs` - Sandbox implementation
 
+
 - `runtime/wasm/manifest.rs` - WASM app manifest format
+
 
 - `tools/sigma-wasm/src/main.rs` - New CLI tool
 
+
 - `sigma-pkg/src/wasm.rs` - WASM package support
+
 
 - `examples/wasm-web-server/` - Example WASM app
 
+
 - `examples/wasm-sqlite/` - Example WASM app
+
 
 ## Success Criteria
 
 - [ ] WASM runtime integrated and functional
 
+
 - [ ] WASI syscalls implemented for common operations
+
 
 - [ ] Example web server runs in WASM sandbox
 
+
 - [ ] Example SQLite runs in WASM sandbox
+
 
 - [ ] Capability-based permissions enforced
 
+
 - [ ] Resource limits prevent resource exhaustion
+
 
 - [ ] sigma-wasm CLI tool operational
 
+
 - [ ] Documentation and examples provided
+
 
 ## Estimated Effort
 
@@ -89,13 +109,17 @@ WASM sandboxing is a key differentiator for SigmaOS, enabling secure application
 
 - Phase 0: Basic kernel and userland (for WASI syscall layer)
 
+
 - Phase 1: Filesystem support (for WASI file operations)
+
 
 ## Related Issues
 
 - Phase 2: App ecosystem, packaging & sandboxing
 
+
 - ROADMAP_NEW.md Phase 2 deliverables
+
 
 ## Implementation Notes
 
@@ -103,20 +127,28 @@ Key considerations:
 
 - Use Wasmtime for mature WASI support
 
+
 - Implement capability model similar to OpenBSD pledge/unveil
+
 
 - Start with basic WASI subset (clock, random, file I/O)
 
+
 - Consider using WASI preview2 for better modularity
 
+
 - Ensure compatibility with standard WASI toolchains (wasm32-wasi)
+
 
 ## Resources
 
 - [Wasmtime](https://github.com/bytecodealliance/wasmtime)
 
+
 - [WASI System Interface](https://wasi.dev/)
 
+
 - [WASM Component Model](https://github.com/WebAssembly/component-model)
+
 
 - [WASI Capabilities](https://github.com/WebAssembly/wasi-capabilities)

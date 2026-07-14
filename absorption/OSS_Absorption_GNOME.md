@@ -1,4 +1,5 @@
 # SigmaOS Desktop Environment Absorption - GNOME
+
 ## Making GNOME/gnome-shell Irrelevant
 
 > **Absorption Target**: https://github.com/GNOME/gnome-shell  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed GNOME by implementing a native desktop enviro
 ## Absorbed Features & Capabilities
 
 ### 1. Shell Design
+
 **Original**: GNOME Shell with JavaScript extensions  
 **SigmaOS**: Native shell with Rust implementation
 
@@ -29,6 +31,7 @@ pub struct SigmaDesktop {
 ```
 
 **Shell Features**:
+
 - Native shell with hardware-accelerated rendering
 - Activity overview with intelligent search
 - Application launcher with adaptive suggestions
@@ -36,11 +39,14 @@ pub struct SigmaDesktop {
 - Native extensions with capability-based security
 - Gesture support with native recognition
 
+
 ### 2. Window Management
+
 **Original**: GNOME's Mutter window manager  
 **SigmaOS**: Native window manager with enhanced features
 
 **Window Features**:
+
 - Native window management with GPU acceleration
 - Tiling and floating window support
 - Window snapping with automatic layout
@@ -48,11 +54,14 @@ pub struct SigmaDesktop {
 - Native window decorations with theming
 - Window focus management with intelligent tracking
 
+
 ### 3. Panel System
+
 **Original**: GNOME's top bar with app indicators  
 **SigmaOS**: Native panel system with enhanced features
 
 **Panel Features**:
+
 - Native panel with hardware acceleration
 - System indicators with native integration
 - Application indicators with capability-based access
@@ -60,11 +69,14 @@ pub struct SigmaDesktop {
 - Native notification integration
 - Customizable panel with drag-and-drop
 
+
 ### 4. Application Integration
+
 **Original**: GNOME's application integration (GTK)  
 **SigmaOS**: Native application framework with compatibility
 
 **Application Features**:
+
 - Native application framework with type safety
 - GTK compatibility layer for existing apps
 - Native application menus with automatic generation
@@ -72,11 +84,14 @@ pub struct SigmaDesktop {
 - Application updates with automatic notification
 - Application discovery with intelligent recommendations
 
+
 ### 5. Settings System
+
 **Original**: GNOME's Settings application  
 **SigmaOS**: Native settings system with unified configuration
 
 **Settings Features**:
+
 - Unified settings interface with categories
 - Native configuration management with validation
 - Real-time preview of changes
@@ -84,11 +99,14 @@ pub struct SigmaDesktop {
 - Native theme customization
 - Hardware configuration with automatic detection
 
+
 ### 6. Notification System
+
 **Original**: GNOME's notification daemon  
 **SigmaOS**: Native notification system with enhanced features
 
 **Notification Features**:
+
 - Native notification system with OS integration
 - Notification grouping with intelligent categorization
 - Do not disturb mode with automatic rules
@@ -96,12 +114,13 @@ pub struct SigmaDesktop {
 - Notification history with search
 - Native notification sounds with custom audio
 
-```
+
+```text
 
 ## SigmaOS Superiority Matrix
 
 | Feature | GNOME | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Shell Performance | JavaScript overhead | Native Rust | ✅ 5-10x |
 | Window Management | Mutter | Native GPU-accelerated | ✅ 3-5x |
 | Panel Performance | Software rendering | GPU-accelerated | ✅ 5x |
@@ -116,7 +135,9 @@ pub struct SigmaDesktop {
 ## Implementation Details
 
 ### Native Desktop Shell
+
 ```rust
+
 pub mod desktop {
     use sigma_desktop::shell::DesktopShell;
     use sigma_desktop::window::WindowManager;
@@ -141,10 +162,13 @@ pub mod desktop {
         }
     }
 }
+
 ```
 
 ### Native Notification System
+
 ```rust
+
 pub mod notification {
     pub struct NotificationSystem {
         notification_daemon: NotificationDaemon,
@@ -160,6 +184,7 @@ pub mod notification {
         }
     }
 }
+
 ```
 
 ---
@@ -170,29 +195,40 @@ pub mod notification {
 
 **Before** (using GNOME):
 ```bash
+
 # Install GNOME
+
 sudo apt install gnome-shell
 
 # Use GNOME extensions
+
 gnome-extensions install extension
 
 # Configure GNOME
+
 gnome-tweaks
+
 ```
 
 **After** (using SigmaDesktop):
 ```bash
+
 # Enable desktop shard (native)
+
 sigma-shard enable desktop-environment
 
 # Use GNOME-inspired theme
+
 sigma-desktop theme --gnome
 
 # Native extensions
+
 sigma-desktop extension install --name extension
 
 # Configure settings
+
 sigma-settings
+
 ```
 
 ---
@@ -200,7 +236,7 @@ sigma-settings
 ## Performance Benchmarks
 
 | Operation | GNOME | SigmaDesktop | Improvement |
-|-----------|-------|--------------|-------------|
+| ----------- | ------- | -------------- | ------------- |
 | Shell Launch startup | 3s | 0.8s | 3.8x faster |
 | Window Open | 200ms | 50ms | 4x faster |
 | Panel Render | 50ms | 10ms | 5x faster |

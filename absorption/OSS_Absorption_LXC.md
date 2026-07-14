@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - LXC
+
 ## Making lxc/lxc Irrelevant
 
 > **Absorption Target**: https://github.com/lxc/lxc  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed LXC by implementing a native system container
 ## Absorbed Features & Capabilities
 
 ### 1. System Containers
+
 **Original**: LXC's system container support  
 **SigmaOS**: Native system containers with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaContainer {
 ```
 
 **System Container Features**:
+
 - Native system containers with OS-level optimization
 - Capability-based sandboxing with hardware enforcement
 - System container lifecycle with automatic management
@@ -36,11 +39,14 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
+
 ### 2. Template System
+
 **Original**: LXC's template system for container creation  
 **SigmaOS**: Native template system with enhanced features
 
 **Template Features**:
+
 - Native template management with capability-based access
 - Template validation with automatic checking
 - Template caching with intelligent invalidation
@@ -48,11 +54,14 @@ pub struct SigmaContainer {
 - Template profiles with automatic switching
 - Template composition with inheritance
 
+
 ### 3. Network Management
+
 **Original**: LXC's network configuration  
 **SigmaOS**: Native network system with enhanced features
 
 **Network Features**:
+
 - Native network management with capability-based access
 - Network isolation with automatic configuration
 - Network filtering with hardware acceleration
@@ -60,11 +69,14 @@ pub struct SigmaContainer {
 - Network profiles with automatic switching
 - Network composition with inheritance
 
+
 ### 4. Storage Management
+
 **Original**: LXC's storage backends (dir, btrfs, zfs, lvm)  
 **SigmaOS**: Native storage system with enhanced features
 
 **Storage Features**:
+
 - Native storage management with capability-based access
 - Storage backends with automatic selection
 - Storage caching with intelligent optimization
@@ -72,11 +84,14 @@ pub struct SigmaContainer {
 - Storage profiles with automatic switching
 - Storage composition with inheritance
 
+
 ### 5. Cgroup Integration
+
 **Original**: LXC's cgroup configuration  
 **SigmaOS**: Native cgroup management with enhanced features
 
 **Cgroup Features**:
+
 - Native cgroup management with capability-based access
 - Resource limiting with hardware enforcement
 - Cgroup monitoring with real-time metrics
@@ -84,11 +99,14 @@ pub struct SigmaContainer {
 - Cgroup composition with inheritance
 - Cgroup validation with automatic checking
 
+
 ### 6. Snapshot/Clone
+
 **Original**: LXC's snapshot and clone features  
 **SigmaOS**: Native snapshot system with enhanced features
 
 **Snapshot Features**:
+
 - Native snapshot management with capability-based access
 - Snapshot cloning with automatic optimization
 - Snapshot caching with intelligent invalidation
@@ -96,12 +114,13 @@ pub struct SigmaContainer {
 - Snapshot profiles with automatic switching
 - Snapshot composition with inheritance
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | LXC | SigmaOS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | Container Performance | C overhead | Native Rust | ✅ 5-10x |
 | Template Performance | Script overhead | Native capability | ✅ 5x |
 | Network Performance | Bridge overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaContainer {
 ## Implementation Details
 
 ### Native System Container
+
 ```rust
 pub mod system_container {
     use sigma_container::system::SystemContainer;
@@ -139,6 +159,7 @@ pub mod system_container {
 ```
 
 ### Native Template Manager
+
 ```rust
 pub mod template {
     pub struct TemplateManager {
@@ -165,32 +186,44 @@ pub mod template {
 ### For Users of LXC
 
 **Before** (using LXC):
+
 ```bash
+
 # Install LXC
+
 sudo apt install lxc
 
 # Create container
+
 lxc-create -t ubuntu -n mycontainer
 
 # Start container
+
 lxc-start -n mycontainer
 
 # Attach to container
+
 lxc-attach -n mycontainer
 ```
 
 **After** (using SigmaContainer):
+
 ```bash
+
 # Enable container shard (native)
+
 sigma-shard enable container-runtime
 
 # Create container
+
 sigma-container system create --template ubuntu --name mycontainer
 
 # Start container
+
 sigma-container system start --name mycontainer
 
 # Attach to container
+
 sigma-container system attach --name mycontainer
 ```
 
@@ -199,7 +232,7 @@ sigma-container system attach --name mycontainer
 ## Performance Benchmarks
 
 | Operation | LXC | SigmaContainer | Improvement |
-|-----------|-----|----------------|-------------|
+| ----------- | ----- | ---------------- | ------------- |
 | Container Create | 2s | 300ms | 6.7x faster |
 | Template Apply | 1s | 150ms | 6.7x faster |
 | Network Setup | 100ms | 20ms | 5x faster |

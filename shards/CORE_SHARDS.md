@@ -16,6 +16,7 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 - **Performance**: Load only required shards
 - **Maintainability**: Easy to update individual components
 
+
 ## Core Shards List
 
 ### S-MM (Memory Manager)
@@ -23,10 +24,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: Manages physical and virtual memory with capability-based access control.
 
 **Features**:
+
 - Buddy allocator for physical memory
 - Paging for virtual memory
 - Capability-based memory protection
 - Zero-copy where possible
+
 
 **Prototype**: `shards/core/s_mm/`
 
@@ -35,10 +38,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: EEVDF (Earliest Eligible Virtual Deadline First) scheduler with real-time support.
 
 **Features**:
+
 - O(1) scheduling algorithm
 - CPU affinity support
 - Real-time task priorities
 - Load balancing across cores
+
 
 **Prototype**: `shards/core/s_sched/`
 
@@ -47,10 +52,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: POSIX-compatible TCP/IP stack with zero-trust firewall isolation.
 
 **Features**:
+
 - TCP/UDP/ICMP implementation
 - IPv4/IPv6 support
 - Zero-trust firewall rules
 - Capability-based network access
+
 
 **Prototype**: `sovereign_netstack/` (already implemented)
 
@@ -59,10 +66,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: Capability-based filesystem with POSIX compatibility.
 
 **Features**:
+
 - VFS layer for multiple filesystems
 - Capability-based file access
 - Journaling support
 - POSIX file operations
+
 
 **Prototype**: `shards/core/s_fs/`
 
@@ -71,10 +80,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: Zero-latency IPC with capability-based security.
 
 **Features**:
+
 - Message passing
 - Shared memory with capabilities
 - Synchronous and asynchronous modes
 - Zero-copy data transfer
+
 
 **Prototype**: `shards/core/s_ipc/`
 
@@ -83,10 +94,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: Central security coordinator with capability enforcement.
 
 **Features**:
+
 - Capability management
 - Access control enforcement
 - Audit logging
 - Post-quantum cryptography integration
+
 
 **Prototype**: `shards/core/s_sec/`
 
@@ -95,10 +108,12 @@ SigmaOS uses a shard-based architecture where each core component is an independ
 **Description**: POSIX-compatible syscall interface with capability checks.
 
 **Features**:
+
 - POSIX syscall compatibility
 - Capability validation on syscalls
 - Performance monitoring
 - Syscall filtering
+
 
 **Prototype**: `shards/core/s_sys/`
 
@@ -110,6 +125,7 @@ Shards communicate through well-defined interfaces:
 - **Shared Memory Regions**: With capability-based access
 - **Event Notifications**: Asynchronous event system
 - **Service Discovery**: Dynamic shard registration
+
 
 ## Loading and Unloading
 
@@ -132,10 +148,11 @@ Each shard operates with the principle of least privilege:
 - **Capability Revocation**: Capabilities can be revoked
 - **Audit Trail**: All capability changes logged
 
+
 ## Implementation Status
 
 | Shard | Documentation | Prototype | Status |
-|-------|--------------|-----------|--------|
+| ------- | -------------- | ----------- | -------- |
 | S-MM | ✅ Complete | ⏳ In Progress | ⏳ Implementing |
 | S-SCHED | ✅ Complete | ⏳ In Progress | ⏳ Implementing |
 | S-NET | ✅ Complete | ✅ Complete | ✅ Done |
@@ -152,6 +169,7 @@ Each shard operates with the principle of least privilege:
 4. Implement S-IPC IPC prototype
 5. Implement S-SEC security manager prototype
 6. Implement S-SYS syscall interface prototype
+
 
 ---
 

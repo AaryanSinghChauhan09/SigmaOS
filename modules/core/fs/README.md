@@ -5,7 +5,7 @@ filesystem backends without kernel recompilation.
 
 ## Architecture
 
-```
+```text
 User Process
    ΓööΓöÇ sigma_vfs_open("/data/file.txt")
          ΓööΓöÇ VFS Router (vfs.rs)
@@ -18,7 +18,7 @@ User Process
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `vfs.rs` | Virtual Filesystem Switch ΓÇö routes open/read/write to backends |
 | `sigmafs.rs` | SovereignFS: CoW, journaling, BLAKE3 block integrity |
 | `ext4.rs` | Read-compatible Ext4 driver (no journal write support yet) |
@@ -48,13 +48,16 @@ int sigma_vfs_rollback(const char *tag);
 
 ## SovereignFS On-Disk Layout
 
-```
+```text
 [Superblock 4K] [Journal 64MB] [Inode Table] [Data Extents ...]
 ```
 
 - **Copy-on-Write:** every write creates a new extent; old data preserved until
+
   explicitly pruned ΓÇö enables instant snapshots.
+
 - **Block Integrity:** each 4 KB block carries a BLAKE3 checksum; the kernel
+
   rejects tampered blocks at read time.
 
 ## Roadmap
@@ -68,6 +71,7 @@ int sigma_vfs_rollback(const char *tag);
 - [ ] SPARK formal proofs for journal replay
 - [ ] OverlayFS shim for container layers
 - [ ] NVMe queue-depth optimisation in VFS
+
 
 ## Related Modules
 

@@ -14,6 +14,7 @@ Unlike conventional testing that samples inputs, **formal verification** exhaust
 - Cryptographic protocol correctness (Kyber-1024, Dilithium-5)
 - IPC message safety (no buffer overflows across shard boundaries)
 
+
 ---
 
 ## Verification Approaches Used
@@ -25,7 +26,9 @@ Used for: Kernel scheduler, IPC bus, memory allocator.
 Tool: [CBMC](https://www.cprover.org/cbmc/) for C components, `kani` for Rust.
 
 ```bash
+
 # Run Kani verification on the buddy allocator
+
 cargo kani --package sigma-mm --harness verify_buddy_alloc
 ```
 
@@ -72,17 +75,22 @@ Used for: Entire codebase.
 ## Running the Verification Suite
 
 ```bash
+
 # Full verification suite (slow, thorough)
+
 make verify-all
 
 # Quick property tests only
+
 cargo test --features proptest
 
 # Kani formal proofs (requires kani installed)
+
 cargo kani --package sigma-mm
 cargo kani --package sigma-crypto
 
 # CodeQL (requires GitHub Advanced Security or local runner)
+
 make codeql-analyze
 ```
 
@@ -109,6 +117,7 @@ make codeql-analyze
 4. Add it to the `verify-all` Makefile target
 5. Document it in the table above
 
+
 ---
 
 ## Roadmap
@@ -120,6 +129,7 @@ make codeql-analyze
 - [ ] Automated verification CI gate on every PR
 - [ ] seL4-inspired formal proof of scheduler isolation
 - [ ] Tamarin prover for PQC protocol analysis
+
 
 ---
 

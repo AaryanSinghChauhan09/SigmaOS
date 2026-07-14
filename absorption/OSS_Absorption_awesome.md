@@ -1,4 +1,5 @@
 # SigmaOS Window Manager Absorption - awesome
+
 ## Making awesomeWM/awesome Irrelevant
 
 > **Absorption Target**: https://github.com/awesomeWM/awesome  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed awesome by implementing a native window manag
 ## Absorbed Features & Capabilities
 
 ### 1. Lua Scripting
+
 **Original**: awesome's Lua-based configuration  
 **SigmaOS**: Native Lua scripting with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaWM {
 ```
 
 **Scripting Features**:
+
 - Native Lua engine with OS-level optimization
 - Lua API with type safety
 - Automatic hot-reload with intelligent validation
@@ -36,11 +39,14 @@ pub struct SigmaWM {
 - Lua profiling with real-time metrics
 - Lua debugging with native tools
 
+
 ### 2. Widget System
+
 **Original**: awesome's wibox widget system  
 **SigmaOS**: Native widget system with enhanced features
 
 **Widget Features**:
+
 - Native widget system with type safety
 - Widget composition with inheritance
 - Widget sandboxing with capability-based access
@@ -48,11 +54,14 @@ pub struct SigmaWM {
 - Widget updates with automatic notification
 - Widget API with OS integration
 
+
 ### 3. Layout System
+
 **Original**: awesome's layout system  
 **SigmaOS**: Native layout system with enhanced features
 
 **Layout Features**:
+
 - Native layout system with intelligent algorithms
 - Layout presets with automatic selection
 - Layout customization with live preview
@@ -60,11 +69,14 @@ pub struct SigmaWM {
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
 
+
 ### 4. Tag System
+
 **Original**: awesome's tag-based workspaces  
 **SigmaOS**: Native tag system with enhanced features
 
 **Tag Features**:
+
 - Native tag management with automatic organization
 - Tag persistence with automatic restoration
 - Tag monitoring with real-time metrics
@@ -72,11 +84,14 @@ pub struct SigmaWM {
 - Tag profiles with import/export
 - Tag synchronization across devices
 
+
 ### 5. Keybinding System
+
 **Original**: awesome's keybinding configuration  
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
+
 - Native keybinding system with type safety
 - Mode-based keybindings with automatic switching
 - Keybinding inheritance with composition
@@ -84,11 +99,14 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
+
 ### 6. Client Management
+
 **Original**: awesome's client management  
 **SigmaOS**: Native client management with enhanced features
 
 **Client Features**:
+
 - Native client management with capability-based access
 - Client rules with automatic application
 - Client monitoring with real-time metrics
@@ -96,12 +114,13 @@ pub struct SigmaWM {
 - Client validation with automatic checking
 - Client composition with inheritance
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | awesome | SigmaOS | Advantage |
-|---------|---------|---------|------------|
+| --------- | --------- | --------- | ------------ |
 | WM Performance | Lua overhead | Native Rust | ✅ 3-5x |
 | Scripting Performance | Lua overhead | Native Lua engine | ✅ 2-3x |
 | Widget Performance | Lua overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaWM {
 ## Implementation Details
 
 ### Native Lua Engine
+
 ```rust
 pub mod lua {
     use sigma_wm::lua::LuaEngine;
@@ -143,6 +163,7 @@ pub mod lua {
 ```
 
 ### Native Widget System
+
 ```rust
 pub mod widget {
     pub struct WidgetSystem {
@@ -168,26 +189,37 @@ pub mod widget {
 ### For Users of awesome
 
 **Before** (using awesome):
+
 ```bash
+
 # Install awesome
+
 sudo apt install awesome
 
 # Configure awesome
+
 ~/.config/awesome/rc.lua
 
 # Use awesome
+
 # Start X with awesome
+
 ```
 
 **After** (using SigmaWM):
+
 ```bash
+
 # Enable window manager shard (native)
+
 sigma-shard enable window-manager
 
 # Use awesome-compatible configuration
+
 sigma-wm config --awesome-compatible
 
 # Native commands
+
 sigma-wm command
 ```
 
@@ -196,7 +228,7 @@ sigma-wm command
 ## Performance Benchmarks
 
 | Operation | awesome | SigmaWM | Improvement |
-|-----------|---------|---------|-------------|
+| ----------- | --------- | --------- | ------------- |
 | Window Tile | 45ms | 12ms | 3.8x faster |
 | Tag Switch | 20ms | 4ms | 5x faster |
 | Keybinding Execute | 5ms | 1ms | 5x faster |

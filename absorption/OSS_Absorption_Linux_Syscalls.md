@@ -1,4 +1,5 @@
 # SigmaOS Syscall Absorption - Linux Kernel Syscalls
+
 ## Making torvalds/linux (syscalls) Irrelevant
 
 > **Absorption Target**: https://github.com/torvalds/linux (kernel syscall interface)  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Linux kernel syscalls by implementing a nativ
 ## Absorbed Features & Capabilities
 
 ### 1. Syscall Dispatcher
+
 **Original**: Linux kernel syscall table  
 **SigmaOS**: Native dispatcher with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaSyscall {
 ```
 
 **Dispatcher Features**:
+
 - Native syscall dispatcher with OS-level optimization
 - Zero-copy syscall handling with intelligent optimization
 - Syscall validation with automatic checking
@@ -36,11 +39,14 @@ pub struct SigmaSyscall {
 - Dispatcher validation with automatic checking
 - Dispatcher monitoring with real-time metrics
 
+
 ### 2. File Syscalls
+
 **Original**: Linux file syscalls (open, read, write, etc.)  
 **SigmaOS**: Native file syscalls with enhanced features
 
 **File Features**:
+
 - Native file syscalls with OS-level optimization
 - File descriptor management with capability-based access
 - File operation caching with intelligent invalidation
@@ -48,11 +54,14 @@ pub struct SigmaSyscall {
 - File validation with automatic checking
 - File monitoring with real-time metrics
 
+
 ### 3. Process Syscalls
+
 **Original**: Linux process syscalls (fork, exec, exit, etc.)  
 **SigmaOS**: Native process syscalls with enhanced features
 
 **Process Features**:
+
 - Native process syscalls with OS-level optimization
 - Process creation with automatic resource allocation
 - Process scheduling with intelligent algorithms
@@ -60,11 +69,14 @@ pub struct SigmaSyscall {
 - Process validation with automatic checking
 - Process monitoring with real-time metrics
 
+
 ### 4. Memory Syscalls
+
 **Original**: Linux memory syscalls (mmap, brk, etc.)  
 **SigmaOS**: Native memory syscalls with enhanced features
 
 **Memory Features**:
+
 - Native memory syscalls with OS-level optimization
 - Virtual memory management with automatic paging
 - Memory protection with capability-based access
@@ -72,11 +84,14 @@ pub struct SigmaSyscall {
 - Memory validation with automatic checking
 - Memory monitoring with real-time metrics
 
+
 ### 5. Network Syscalls
+
 **Original**: Linux network syscalls (socket, bind, connect, etc.)  
 **SigmaOS**: Native network syscalls with enhanced features
 
 **Network Features**:
+
 - Native network syscalls with OS-level optimization
 - Socket management with capability-based access
 - Network operation caching with intelligent optimization
@@ -84,11 +99,14 @@ pub struct SigmaSyscall {
 - Network validation with automatic checking
 - Network monitoring with real-time metrics
 
+
 ### 6. IPC Syscalls
+
 **Original**: Linux IPC syscalls (shm, sem, msg, etc.)  
 **SigmaOS**: Native IPC syscalls with enhanced features
 
 **IPC Features**:
+
 - Native IPC syscalls with OS-level optimization
 - Shared memory with capability-based access
 - Semaphore management with automatic synchronization
@@ -96,12 +114,13 @@ pub struct SigmaSyscall {
 - IPC validation with automatic checking
 - IPC monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Linux Syscalls | SigmaOS | Advantage |
-|---------|---------------|---------|------------|
+| --------- | --------------- | --------- | ------------ |
 | Syscall Dispatch Performance | Kernel overhead | Native OS-level | ✅ 5-10x |
 | File Syscall Performance | VFS overhead | Native capability | ✅ 5x |
 | Process Syscall Performance | Scheduler overhead | Native optimization | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaSyscall {
 ## Implementation Details
 
 ### Native Syscall Dispatcher
+
 ```rust
 pub mod syscall {
     use sigma_syscall::dispatcher::SyscallDispatcher;
@@ -140,6 +160,7 @@ pub mod syscall {
 ```
 
 ### Native File Syscalls
+
 ```rust
 pub mod file {
     pub struct FileSyscalls {
@@ -166,6 +187,7 @@ pub mod file {
 ### For Linux Applications Using Syscalls
 
 **Before** (using Linux syscalls):
+
 ```c
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -178,6 +200,7 @@ int main() {
 ```
 
 **After** (using SigmaSyscall):
+
 ```rust
 use sigma_syscall::dispatcher::SyscallDispatcher;
 
@@ -194,7 +217,7 @@ fn main() {
 ## Performance Benchmarks
 
 | Operation | Linux Syscalls | SigmaSyscall | Improvement |
-|-----------|---------------|--------------|-------------|
+| ----------- | --------------- | -------------- | ------------- |
 | Syscall Dispatch | 1μs | 0.2μs | 5x faster |
 | File Open | 5μs | 1μs | 5x faster |
 | Process Fork | 100μs | 20μs | 5x faster |

@@ -6,7 +6,7 @@ fuzz targets, and integration tests without risking the production kernel state.
 ## Use Cases
 
 | Use Case | Description |
-|---|---|
+| --- | --- |
 | **Fuzz testing** | Execute AFL++/libFuzzer harnesses in an isolated shard |
 | **CI integration tests** | Run full kernel subsystem tests in a QEMU-backed sandbox |
 | **Third-party capsules** | Test unverified plugins before signing |
@@ -14,7 +14,7 @@ fuzz targets, and integration tests without risking the production kernel state.
 
 ## Architecture
 
-```
+```text
 Test Runner
    ΓööΓöÇ sandbox_create(config)
          ΓööΓöÇ Isolated shard (separate memory domain, IOMMU)
@@ -56,13 +56,17 @@ void init_tools_sandbox(void);
 ## Fuzz Integration
 
 ```bash
+
 # Build a fuzz harness
+
 sigma build --fuzz target/fuzz_net_parser
 
 # Run under AFL++
+
 sigma fuzz --target fuzz_net_parser --timeout 3600
 
 # Triage a crash
+
 sigma sandbox run --repro crash-001.bin --target fuzz_net_parser
 ```
 
@@ -75,6 +79,7 @@ sigma sandbox run --repro crash-001.bin --target fuzz_net_parser
 - [ ] QEMU-backed hardware simulation (virtio-blk, virtio-net)
 - [ ] Coverage-guided fuzzing via KCOV equivalent
 - [ ] Distributed sandbox pool for CI parallelism
+
 
 ## Related Modules
 

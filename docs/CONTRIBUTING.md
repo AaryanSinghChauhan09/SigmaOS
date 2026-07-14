@@ -15,6 +15,7 @@ For general code contributions, see the top-level [CONTRIBUTING.md](../CONTRIBUT
 - [Reviewing Existing Docs](#reviewing-existing-docs)
 - [Syncing to the Wiki](#syncing-to-the-wiki)
 
+
 ---
 
 ## Documentation Philosophy
@@ -25,6 +26,7 @@ SigmaOS documentation aims to be:
 - **Concise**: Prefer clear, short explanations over verbose prose
 - **Structured**: Use headings, tables, and code blocks consistently
 - **Sovereign**: All docs must work without external CDN, Google Fonts, or analytics embeds
+
 
 ---
 
@@ -51,6 +53,7 @@ SigmaOS documentation aims to be:
 - Maximum line length: 120 characters
 - End all files with a single newline character
 
+
 ### Code Block Rules
 
 ```rust
@@ -69,6 +72,7 @@ fn main() {}
 5. Use a `## Table of Contents` for documents > 200 lines
 6. Run `py scripts/maintenance/fix_markdown_lint.py` before committing
 
+
 ---
 
 ## Reviewing Existing Docs
@@ -80,6 +84,7 @@ When reviewing documentation PRs:
 - Ensure content matches the current implementation in source files
 - Flag aspirational/future content with an `> [!NOTE] Planned Feature` callout
 
+
 ---
 
 ## Syncing to the Wiki
@@ -89,6 +94,7 @@ Premium documentation pages are mirrored to the GitHub Wiki at `wiki_repo/`. To 
 1. Copy the file to `wiki_repo/<Title>.md`
 2. Update any relative links to wiki-relative links
 3. Commit both files together:
+
    ```bash
    git add docs/My-Doc.md wiki_repo/My-Doc.md
    git commit -m "docs: add My-Doc to docs and sync to wiki"
