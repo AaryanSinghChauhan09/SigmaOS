@@ -19,6 +19,9 @@ This report documents the completion of **Batch 1** in the massive repository mi
 4. **SigmaContainers (Container & MicroVM Runtime)**:
    - Validated and merged `sigma_containers` module in `userland/sigma_containers/`.
    - Implemented `ContainerRuntime`, `ImageManager`, `NetworkManager`, `VolumeManager`, and `MicroVMEngine` to effectively replace Docker, Podman, LXC, and Firecracker.
+5. **SigmaCompositor (UI Compositor & Window Manager)**:
+   - Validated and merged `sigma_compositor` module in `userland/sigma_compositor/`.
+   - Implemented `ZenithCompositor`, `WindowManager` (with dynamic tiling matching Hyprland/Sway), and `SigmaDesktop` (top bar panels and settings support) to replace X11, Wayland, GNOME, and KDE. All unit tests successfully compiled and passed.
 
 ## 📁 .md Files Migrated and Removed
 
@@ -38,6 +41,12 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 12. `OSS_Absorption_LXC.md` (Batch 3)
 13. `OSS_Absorption_QEMU.md` (Batch 3)
 14. `OSS_Absorption_Firecracker.md` (Batch 3)
+15. `OSS_Absorption_GNOME.md` (Batch 4)
+16. `OSS_Absorption_KDE_Plasma.md` (Batch 4)
+17. `OSS_Absorption_Wayland.md` (Batch 4)
+18. `OSS_Absorption_X11.md` (Batch 4)
+19. `OSS_Absorption_Sway.md` (Batch 4)
+20. `OSS_Absorption_Hyprland.md` (Batch 4)
 
 ## 🔀 Branches Merged and Removed
 
@@ -56,7 +65,7 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 2. **Merge Conflicts**: `DEFEATING_LINUX_DISTROS_BLUEPRINT.md` had competing versions of formatting. **Fix**: Python-based conflict resolution script authored to select the updated stylistic branch automatically.
 3. **Workspace Misalignment**: Legacy `sigmapkg` folder remained outside of the cargo workspace hierarchy. **Fix**: Identified active Rust codebase as `userland/sigpkg` and executed tests correctly from root context.
 
-## ➡️ Next Recommended Steps (Batch 4)
+## ➡️ Next Recommended Steps (Batch 5)
 
-- Target Desktop Environment and Wayland absorption (`OSS_Absorption_GNOME.md`, `KDE_Plasma.md`, `Wayland.md`, `X11.md`).
-- Implement the UI/UX Compositor stubs in `userland/ui/design_system`.
+- Target GPU and Media server subsystems (`OSS_Absorption_Alacritty.md`, `Kitty.md`, `WezTerm.md`, `FFmpeg.md`, `PipeWire.md`).
+- Implement GPU-accelerated terminal emulation and system sound servers.
