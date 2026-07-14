@@ -164,6 +164,9 @@ version = "15.0.0"
 [[package]]
 name = "sigma_compositor"
 version = "15.0.0"
+dependencies = [
+ "sigma-design-system",
+]
 
 [[package]]
 name = "sigma_containers"

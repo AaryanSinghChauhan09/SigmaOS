@@ -4,7 +4,7 @@ pub mod policy;
 pub mod enforcement;
 
 pub use capability::CapabilityManager;
-pub use profile::ProfileSystem;
+pub use profile::{ProfileSystem, SigmaProfile, SigmaContext};
 pub use policy::{PolicyEngine, Policy};
 pub use enforcement::{EnforcementEngine, Operation, EnforcementResult};
 
