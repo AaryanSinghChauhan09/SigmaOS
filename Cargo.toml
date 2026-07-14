@@ -23,7 +23,7 @@ members = [
     "userland/sigma_ml",
     "userland/sigma_data",
     "userland/sigma_net",
-    "userland/sigma_fs",
+    "userland/sigma_fs", "userland/sigma_init",
 ]
 default-members = ["kernel"]
 
