@@ -2,8 +2,9 @@
 #![no_main]
 
 /// OOP-based Performance Profiler for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 191
-/// Implements CPU and memory profiling
+/// Based on 100-Improvement-Ideas.md #78: Code profiler + visualizer
+/// Implements comprehensive CPU, memory, I/O, and network profiling
+/// with call graph analysis and hotspot detection
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;

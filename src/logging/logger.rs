@@ -362,11 +362,8 @@ impl Logger for SimpleLogger {
 
 /// Get current time (nanoseconds)
 fn get_current_time() -> u64 {
-    static mut COUNTER: u64 = 0;
-    unsafe {
-        COUNTER += 1_000_000;
-        COUNTER
-    }
+    static COUNTER: AtomicUsize = AtomicUsize::new(0);
+    COUNTER.fetch_add(1_000_000, Ordering::SeqCst) as u64
 }
 
 /// Simple Vec implementation for no_std

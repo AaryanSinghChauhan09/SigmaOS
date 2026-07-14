@@ -2,8 +2,9 @@
 #![no_main]
 
 /// OOP-based Battery Management for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 251
-/// Implements battery monitoring and power management
+/// Based on 100-Improvement-Ideas.md #15: Battery saver mode
+/// Implements comprehensive battery monitoring, health tracking,
+/// and intelligent power saving for optimal battery life
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -12,7 +13,7 @@ pub type BatteryID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3 }
+pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3, Critical = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

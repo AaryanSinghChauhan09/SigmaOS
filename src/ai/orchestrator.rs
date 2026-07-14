@@ -2,8 +2,9 @@
 #![no_main]
 
 /// OOP-based AI Orchestrator for SigmaOS
-/// Based on Ideas-999-Structured: AI & Automation Item 335
-/// Implements sigma-ai core with multi-agent coordination
+/// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
+/// Implements sigma-ai core with multi-agent coordination, workflow automation,
+/// and self-diagnosis capabilities for system optimization
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -12,11 +13,11 @@ pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3 }
+pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum AgentError { Success = 0, NotFound = 1, ExecutionFailed = 2, Timeout = 3 }
+pub enum AgentError { Success = 0, NotFound = 1, ExecutionFailed = 2, Timeout = 3, InvalidInput = 4 }
 
 pub trait AIAgent {
     fn id(&self) -> AgentID;

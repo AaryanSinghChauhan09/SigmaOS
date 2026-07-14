@@ -2,8 +2,9 @@
 #![no_main]
 
 /// OOP-based Metrics Collection for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 151
-/// Implements system metrics collection and monitoring
+/// Based on 100-Improvement-Ideas.md #78: Code profiler + visualizer
+/// Implements comprehensive system metrics collection, monitoring,
+/// and export capabilities for observability and performance analysis
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -12,7 +13,7 @@ pub type MetricID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum MetricType { Counter = 0, Gauge = 1, Histogram = 2, Summary = 3 }
+pub enum MetricType { Counter = 0, Gauge = 1, Histogram = 2, Summary = 3, Trend = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

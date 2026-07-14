@@ -2,8 +2,9 @@
 #![no_main]
 
 /// OOP-based Power Management Stack for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 8
-/// Implements advanced power profiles, CPU governor tuning, thermal management
+/// Based on 100-Improvement-Ideas.md #15: Battery saver mode
+/// Implements advanced power profiles, CPU governor tuning, thermal management,
+/// and adaptive power saving for extended battery life
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;

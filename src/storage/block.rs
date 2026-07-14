@@ -2,8 +2,9 @@
 #![no_main]
 
 /// OOP-based Block Storage for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 101
-/// Implements block device abstraction and storage management
+/// Based on 100-Improvement-Ideas.md storage management concepts
+/// Implements comprehensive block device abstraction, partition management,
+/// and caching for high-performance storage operations
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -12,7 +13,7 @@ pub type BlockDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BlockDeviceType { HDD = 0, SSD = 1, NVMe = 2, Virtual = 3 }
+pub enum BlockDeviceType { HDD = 0, SSD = 1, NVMe = 2, Virtual = 3, RAMDisk = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
