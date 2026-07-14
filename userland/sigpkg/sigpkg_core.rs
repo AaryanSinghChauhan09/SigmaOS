@@ -315,12 +315,50 @@ pub unsafe extern "C" fn sigpkg_update() -> SigmaI32 {
 
 /// Fetch packages from repository
 unsafe fn fetch_repository_packages(pkg: &mut SigPkg, repo_idx: usize) {
-    // Simplified package fetching
-    // In a real implementation, this would:
-    // 1. Download package index from repository
-    // 2. Parse package metadata
-    // 3. Add to package cache
-    // 4. Verify signatures if enabled
+    // OOP: RepositoryFetcher class for fetching packages
+    // Implementation without predefined HTTP functions
+    
+    let repo = &pkg.repositories[repo_idx];
+    if !repo.enabled {
+        return;
+    }
+    
+    // Simulate package index parsing
+    // In real implementation, this would:
+    // 1. Establish TCP connection to repo.url
+    // 2. Send HTTP GET request for package index
+    // 3. Parse response (manual HTTP parsing)
+    // 4. Extract package metadata
+    // 5. Add to package cache
+    
+    // Add sample packages for demonstration
+    if pkg.package_count < 4096 {
+        let idx = pkg.package_count as usize;
+        
+        // Add sample package: sigma-edit
+        let name = b"sigma-edit\0";
+        for i in 0..name.len().min(64) {
+            pkg.packages[idx].name[i] = name[i];
+        }
+        
+        let version = b"1.0.0\0";
+        for i in 0..version.len().min(32) {
+            pkg.packages[idx].version[i] = version[i];
+        }
+        
+        let desc = b"SigmaOS text editor\0";
+        for i in 0..desc.len().min(256) {
+            pkg.packages[idx].description[i] = desc[i];
+        }
+        
+        pkg.packages[idx].priority = PackagePriority::Standard;
+        pkg.packages[idx].size = 1024 * 1024; // 1MB
+        pkg.packages[idx].installed_size = 2 * 1024 * 1024; // 2MB
+        pkg.packages[idx].state = PackageState::NotInstalled;
+        pkg.packages[idx].signed = true;
+        
+        pkg.package_count += 1;
+    }
 }
 
 /// Install package
@@ -550,12 +588,50 @@ unsafe fn add_to_transaction(
 
 /// Resolve dependencies
 unsafe fn resolve_dependencies(pkg: &mut SigPkg) {
-    // Simplified dependency resolution
-    // In a real implementation, this would:
-    // 1. Build dependency graph
-    // 2. Detect circular dependencies
-    // 3. Add required packages to transaction
-    // 4. Handle conflicts
+    // OOP: DependencyResolver class for resolving package dependencies
+    // Implementation without predefined graph algorithms
+    
+    // Build dependency graph manually
+    for i in 0..pkg.transaction_count as usize {
+        let item = &pkg.current_transaction[i];
+        let package = find_package(pkg, item.package_name.as_ptr());
+        
+        if let Some(pkg_data) = package {
+            // Process dependencies
+            for j in 0..pkg_data.dep_count as usize {
+                let dep = &pkg_data.dependencies[j];
+                
+                // Check if dependency is already in transaction
+                let mut already_in_transaction = false;
+                for k in 0..pkg.transaction_count as usize {
+                    if names_equal(pkg.current_transaction[k].package_name.as_ptr(), dep.package_name.as_ptr()) {
+                        already_in_transaction = true;
+                        break;
+                    }
+                }
+                
+                // Add dependency to transaction if not present
+                if !already_in_transaction {
+                    if pkg.transaction_count < 256 {
+                        let dep_idx = pkg.transaction_count as usize;
+                        pkg.current_transaction[dep_idx] = TransactionItem {
+                            package_name: [0; 64],
+                            version: [0; 32],
+                            operation: TransactionOp::Install,
+                            auto_installed: true,
+                        };
+                        
+                        // Copy dependency name
+                        for m in 0..63.min(name_len(dep.package_name.as_ptr())) {
+                            pkg.current_transaction[dep_idx].package_name[m] = *dep.package_name.as_ptr().add(m);
+                        }
+                        
+                        pkg.transaction_count += 1;
+                    }
+                }
+            }
+        }
+    }
 }
 
 /// AI-assisted dependency resolution
@@ -613,14 +689,41 @@ unsafe fn execute_transaction(pkg: &mut SigPkg) -> SigmaI32 {
 
 /// Install package
 unsafe fn install_package(pkg: &mut SigPkg, name: &[SigmaU8]) -> SigmaI32 {
-    // Simplified package installation
-    // In a real implementation, this would:
-    // 1. Download package
-    // 2. Verify signature
-    // 3. Extract files
-    // 4. Run pre-install scripts
-    // 5. Configure package
-    // 6. Run post-install scripts
+    // OOP: PackageInstaller class for installing packages
+    // Implementation without predefined archive functions
+    
+    // Find package in available packages
+    let package = find_package(pkg, name.as_ptr());
+    if package.is_none() {
+        return -1;
+    }
+    
+    let pkg_data = package.unwrap();
+    
+    // Verify signature before installation
+    if pkg_data.signed {
+        let sig_result = sigpkg_verify_package_signature(name.as_ptr());
+        if sig_result != 0 {
+            return -2; // Signature verification failed
+        }
+    }
+    
+    // Add to installed packages
+    if pkg.installed_count < 2048 {
+        let idx = pkg.installed_count as usize;
+        pkg.installed_packages[idx] = *pkg_data;
+        pkg.installed_packages[idx].state = PackageState::Installed;
+        pkg.installed_count += 1;
+    }
+    
+    // Update package state
+    for i in 0..pkg.package_count as usize {
+        if names_equal(pkg.packages[i].name.as_ptr(), name.as_ptr()) {
+            pkg.packages[i].state = PackageState::Installed;
+            break;
+        }
+    }
+    
     0
 }
 
@@ -649,11 +752,32 @@ unsafe fn upgrade_package(pkg: &mut SigPkg, name: &[SigmaU8]) -> SigmaI32 {
 
 /// Rollback transaction
 unsafe fn rollback_transaction(pkg: &mut SigPkg) {
-    // Simplified rollback
-    // In a real implementation, this would:
-    // 1. Reverse completed operations
-    // 2. Restore previous state
-    // 3. Clean up partial installations
+    // OOP: TransactionRollback class for rolling back failed transactions
+    // Implementation without predefined transaction management
+    
+    // Reverse completed operations in reverse order
+    for i in (0..pkg.transaction_count as usize).rev() {
+        let item = &pkg.current_transaction[i];
+        
+        match item.operation {
+            TransactionOp::Install => {
+                // Remove package that was installed
+                let _ = remove_package(pkg, &item.package_name);
+            }
+            TransactionOp::Remove => {
+                // Reinstall package that was removed
+                let _ = install_package(pkg, &item.package_name);
+            }
+            TransactionOp::Upgrade => {
+                // Downgrade to previous version (simplified)
+                // In real implementation, would restore previous version
+            }
+            _ => {}
+        }
+    }
+    
+    // Clear transaction
+    pkg.transaction_count = 0;
     pkg.transaction_state = TransactionState::RolledBack;
 }
 
@@ -677,19 +801,99 @@ pub unsafe extern "C" fn sigpkg_set_ai_assisted(enabled: SigmaBool) -> SigmaI32 
     -1
 }
 
-/// Compare version strings
+/// Compare version strings (manual SemVer comparison)
 unsafe fn compare_versions(v1: *const SigmaU8, v2: *const SigmaU8) -> SigmaI32 {
-    // Simplified version comparison
-    // In a real implementation, this would:
-    // 1. Parse version strings
-    // 2. Compare major, minor, patch
-    // 3. Handle pre-release and build metadata
-    0
+    // OOP: VersionComparator class for semantic version comparison
+    // Implementation without predefined version parsing libraries
+    
+    // Parse version strings manually (major.minor.patch format)
+    let mut v1_parts: [SigmaU32; 3] = [0, 0, 0];
+    let mut v2_parts: [SigmaU32; 3] = [0, 0, 0];
+    
+    // Parse v1
+    let mut part_idx = 0;
+    let mut current_num: SigmaU32 = 0;
+    let mut i = 0;
+    
+    while part_idx < 3 && *v1.add(i) != 0 {
+        let c = *v1.add(i) as char;
+        if c == '.' {
+            v1_parts[part_idx] = current_num;
+            current_num = 0;
+            part_idx += 1;
+        } else if c.is_ascii_digit() {
+            current_num = current_num * 10 + (c as SigmaU32 - '0' as SigmaU32);
+        }
+        i += 1;
+    }
+    if part_idx < 3 {
+        v1_parts[part_idx] = current_num;
+    }
+    
+    // Parse v2
+    part_idx = 0;
+    current_num = 0;
+    i = 0;
+    
+    while part_idx < 3 && *v2.add(i) != 0 {
+        let c = *v2.add(i) as char;
+        if c == '.' {
+            v2_parts[part_idx] = current_num;
+            current_num = 0;
+            part_idx += 1;
+        } else if c.is_ascii_digit() {
+            current_num = current_num * 10 + (c as SigmaU32 - '0' as SigmaU32);
+        }
+        i += 1;
+    }
+    if part_idx < 3 {
+        v2_parts[part_idx] = current_num;
+    }
+    
+    // Compare parts
+    for i in 0..3 {
+        if v1_parts[i] > v2_parts[i] {
+            return 1;
+        } else if v1_parts[i] < v2_parts[i] {
+            return -1;
+        }
+    }
+    
+    0 // Versions are equal
 }
 
-/// Check if string contains substring
+/// Check if string contains substring (manual substring search)
 unsafe fn string_contains(s: *const SigmaU8, substr: *const SigmaU8) -> SigmaBool {
-    // Simplified substring search
+    // OOP: StringMatcher class for pattern matching
+    // Implementation without predefined string functions
+    
+    let s_len = name_len(s);
+    let substr_len = name_len(substr);
+    
+    if substr_len == 0 {
+        return true;
+    }
+    
+    if substr_len > s_len {
+        return false;
+    }
+    
+    // Naive substring search
+    for i in 0..=(s_len - substr_len) {
+        let mut match_found = true;
+        
+        for j in 0..substr_len {
+            if *s.add(i + j) != *substr.add(j) {
+                match_found = false;
+                break;
+            }
+        }
+        
+        if match_found {
+            return true;
+        }
+    }
+    
     false
 }
 
