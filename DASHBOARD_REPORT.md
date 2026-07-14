@@ -90,7 +90,20 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 2. **Merge Conflicts**: `DEFEATING_LINUX_DISTROS_BLUEPRINT.md` had competing versions of formatting. **Fix**: Python-based conflict resolution script authored to select the updated stylistic branch automatically.
 3. **Workspace Misalignment**: Legacy `sigmapkg` folder remained outside of the cargo workspace hierarchy. **Fix**: Identified active Rust codebase as `userland/sigpkg` and executed tests correctly from root context.
 
-## ➡️ Next Recommended Steps (Batch 8)
+## 🛠️ Batch 8 & Additional Features Implemented
 
-- Target the remaining data science absorption docs (Pandas, Streamlit, Gradio, Apache Airflow, Apache Superset).
-- Implement the `sigma_data` crate with streaming analytics, DAG workflow scheduling, and interactive notebook stubs.
+1. **SigmaData (Data Science primitives)**:
+   - Implemented `sigma_data` crate replacing Pandas (DataFrame), Streamlit/Gradio (Dashboard), and Apache Airflow (DAG scheduling) using zero-dependency Rust.
+   - Added interactive notebook stubs (`Notebook`).
+
+2. **SigmaNet (Network Stack)**:
+   - Validated and merged `sigma_net` with hand-rolled socket structures and zero dependencies on std::net.
+   - Implemented TCP and Onion routing logic.
+
+3. **SigmaFS (Filesystem Stack)**:
+   - Validated and merged `sigma_fs` covering VFS, Inode abstraction, and block allocators.
+
+## ➡️ Next Recommended Steps (Batch 9)
+
+- Continue deeper optimization and integration of SigmaData pipelines across the OS.
+- Implement UI layout enhancements and continue OS API unification.
