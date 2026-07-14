@@ -3,12 +3,18 @@ pub mod image;
 pub mod network;
 pub mod volume;
 pub mod microvm;
+pub mod sandbox;
+pub mod permission;
+pub mod bundle;
 
 pub use runtime::{ContainerRuntime, Container, ContainerConfig};
 pub use image::{ImageManager, Image};
 pub use network::NetworkManager;
 pub use volume::VolumeManager;
 pub use microvm::MicroVMEngine;
+pub use sandbox::{SandboxManager, SandboxConfig};
+pub use permission::PermissionSystem;
+pub use bundle::{BundleManager, Bundle};
 
 /// SigmaContainer: The native OS-level container and micro-VM engine.
 /// Displaces Docker, Podman, LXC, and Firecracker with a unified, capability-based runtime.
@@ -18,6 +24,9 @@ pub struct SigmaContainer {
     pub network_manager: NetworkManager,
     pub volume_manager: VolumeManager,
     pub microvm_engine: MicroVMEngine,
+    pub sandbox: SandboxManager,
+    pub permission_system: PermissionSystem,
+    pub bundle_manager: BundleManager,
 }
 
 impl Default for SigmaContainer {
@@ -34,6 +43,9 @@ impl SigmaContainer {
             network_manager: NetworkManager::new(),
             volume_manager: VolumeManager::new(),
             microvm_engine: MicroVMEngine::new(),
+            sandbox: SandboxManager::new(),
+            permission_system: PermissionSystem::new(),
+            bundle_manager: BundleManager::new(),
         }
     }
 
