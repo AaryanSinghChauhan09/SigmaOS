@@ -15,3 +15,9 @@
 **Vulnerability:** Package managers that rely solely on hash verification (SHA-256) are vulnerable to supply-chain attacks where an attacker compromises the distribution server and replaces both the package binary AND its hash. Without cryptographic signature verification against a trusted public key, users have no way to distinguish legitimate packages from tampered ones.
 **Learning:** Hash verification alone proves integrity (the file hasn't been corrupted), but NOT authenticity (the file came from a trusted source). Ed25519 signature verification against a Sovereign Keyring (`/etc/sigma/keys`) provides both, creating a two-layer defense: the hash catches bit-rot, the signature catches impersonation.
 **Prevention:** Always require both hash verification AND Ed25519 signature verification for all package transactions. Reject packages with `sig:ed25519:unknown` prefixes in production mode. Never ship a package manager that trusts hashes alone.
+
+## 2026-07-14 - Desktop Launcher Capability Sandboxing (`sigma_desktop`)
+
+**Vulnerability:** Traditional Linux application launchers (.desktop files) allow executing arbitrary command lines under the user's full privileges. A malicious `.desktop` file dropped into `~/.local/share/applications` could quietly launch a reverse shell when the user clicks a seemingly benign icon (e.g. a calculator).
+**Learning:** Application launchers are a prime pivot point for userland persistence. The `sigma_desktop` Dash must never blindly `exec` processes.
+**Prevention:** Integrate the desktop launcher (`sigma_desktop::Dash`) directly with the `sigma_containers` runtime. When an app is launched, it MUST be wrapped in a namespace sandbox restricting network and filesystem access to its explicitly declared manifest capabilities, even if it's a native GUI application.

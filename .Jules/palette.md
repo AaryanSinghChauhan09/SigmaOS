@@ -12,3 +12,8 @@
 
 **Learning:** In `sigma_compositor`, blindly redrawing the entire screen on every frame is an enormous waste of GPU cycles. By tracking exactly which surface IDs have been "damaged" (changed), the compositor can limit redraws to only the affected regions. This is the same principle behind Wayland's `wl_surface.damage_buffer` — a `HashSet<u64>` of damaged surface IDs that gets drained on each frame commit reduces power consumption and increases perceived smoothness, especially on battery-powered devices.
 **Action:** Always implement damage tracking in compositors. Use `take_damage()` to atomically drain the set and only composite the returned surfaces.
+
+## 2026-07-14 - Predictable Spatial Models in Desktop Panels
+
+**Learning:** When developing the `sigma_desktop` Dash and Panel, scattering system tray icons and application launchers haphazardly reduces spatial memory retention. The cognitive load required to find the network icon increases if it shifts position when a notification pops up. By adopting fixed spatial anchoring (e.g., launchers always left-aligned, clock always centered, tray always right-aligned), users can rely on muscle memory.
+**Action:** Strictly enforce flexbox-style fixed alignments (Start, Center, End) in the `Panel` UI layout engine. Do not allow elements in one anchor group to displace elements in another group.
