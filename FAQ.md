@@ -1,340 +1,449 @@
-# SigmaOS FAQ
+# Frequently Asked Questions (FAQ)
+
+> **Last Updated**: 2026-07-13
+
+This document answers common questions about SigmaOS, its architecture, development, and usage.
 
 ## General Questions
 
 ### What is SigmaOS?
 
-SigmaOS is a sovereign operating system built with Rust and Nim, designed for security, performance, and independence from external dependencies. It features a capability-based security model, zero-dependency policy, and native implementations of office productivity tools.
+SigmaOS is a sovereign microkernel operating system built on the principle of capability-based security. It uses a modular architecture called "shards" that can be loaded, unloaded, and updated independently. SigmaOS is designed for security, performance, and sovereignty with post-quantum cryptography integration.
 
-### Why create another operating system?
+### What makes SigmaOS different from other operating systems?
 
-SigmaOS addresses specific needs:
+SigmaOS differs from other operating systems in several ways:
 
-- **Sovereignty**: Complete control over the OS stack
-- **Security**: Capability-based security model from the ground up
-- **Independence**: No reliance on external third-party dependencies
-- **Indian Context**: Built for India's digital infrastructure (ABDM, GST, UPI)
-- **Performance**: Zero-allocation optimizations and efficient algorithms
+- **Capability-Based Security**: All access is granted through capabilities with default deny policy
+- **Modular Shard Architecture**: Components can be loaded/unloaded independently
+- **Post-Quantum Cryptography**: Built-in support for Kyber-1024 KEM and Dilithium-5 signatures
+- **Zero-Trust Network Stack**: Built-in zero-trust firewall with capability-based access
+- **Multi-Language Support**: Rust for kernel components, Zig for low-level drivers, Nim for tooling
+- **Sovereign Design**: Local-first with minimal external dependencies
+
 
 ### What platforms does SigmaOS support?
 
-Currently:
+SigmaOS is designed to support multiple platforms:
 
-- x86_64 (primary target)
-- UEFI boot
+- **x86_64**: Desktop and server systems
+- **ARM64**: Mobile and embedded systems
+- **RISC-V**: Experimental support
 
-Planned:
 
-- ARM64 (Raspberry Pi)
-- RISC-V
+### Is SigmaOS production-ready?
 
-### Is SigmaOS open source?
+SigmaOS is currently in active development. The core architecture is defined, and prototypes are being implemented. It is not yet production-ready but is suitable for testing and development.
 
-Yes, SigmaOS is licensed under the MIT License. See the [LICENSE](../LICENSE) file for details.
+## Architecture
 
-## Technical Questions
+### What is the shard architecture?
 
-### What programming languages are used?
+The shard architecture is SigmaOS's modular component system. Each shard is an independent module that provides specific functionality:
 
-- **Rust**: Kernel, bootloader, most userland components
-- **Nim**: Some userland suites and tools
-- **Assembly**: Low-level hardware interaction
-- **C**: Legacy compatibility layer
+- **Core Shards**: Essential kernel components (memory manager, scheduler, network stack, etc.)
+- **Essential Shards**: Hardware drivers (GPU, storage, audio, network, input)
+- **Optional Shards**: Desktop environment and AI features
+- **Infinite Shards**: Experimental and self-evolving features
 
-### Why Rust?
 
-Rust provides:
+### How do shards communicate?
 
-- Memory safety without garbage collection
-- Zero-cost abstractions
-- Strong type system
-- Excellent tooling (cargo, clippy)
-- Growing ecosystem
+Shards communicate through well-defined interfaces:
 
-### Why Nim?
+- **Capability Channels**: Secure message passing
+- **Shared Memory Regions**: With capability-based access control
+- **Event Notifications**: Asynchronous event system
+- **Service Discovery**: Dynamic shard registration
 
-Nim provides:
 
-- Python-like syntax
-- C-level performance
-- Small binary size
-- Easy FFI
-- Metaprogramming capabilities
+### What is capability-based security?
 
-### Does SigmaOS use the Linux kernel?
+Capability-based security is a security model where all access to resources is granted through capabilities. Key principles:
 
-No, SigmaOS has its own kernel written from scratch in Rust. This allows for:
+- **Default Deny**: All access is denied by default
+- **Explicit Grant**: Access must be explicitly granted via capabilities
+- **Capability Revocation**: Capabilities can be revoked
+- **Least Privilege**: Components only have access to what they need
+- **Audit Trail**: All capability changes are logged
 
-- Complete control over kernel design
-- Capability-based security model
-- Zero external dependencies
-- Tailored for SigmaOS requirements
 
-### What filesystems does SigmaOS support?
-
-Currently:
-
-- Basic VFS layer
-- Ext2/Ext3 (planned)
-- FAT32 (planned)
-- CryptFS (Argon2id encrypted, planned)
-
-### What graphics stack does SigmaOS use?
+### What post-quantum cryptography does SigmaOS use?
 
 SigmaOS uses:
 
-- VESA/VBE for basic framebuffer
-- UEFI GOP for UEFI systems
-- DRM/KMS for GPU drivers (planned)
-- Zenith compositor (planned)
+- **Kyber-1024**: Key Encapsulation Mechanism (KEM) for key exchange
+- **Dilithium-5**: Digital signature algorithm for authentication
+- **Hybrid Mode**: Combines post-quantum with classical algorithms for compatibility
 
-## Security Questions
 
-### What is the security model?
+## Development
 
-SigmaOS uses a capability-based security model:
+### What programming languages are used?
 
-- Fine-grained capabilities (CAP_CHOWN, CAP_NET_ADMIN, etc.)
-- Sovereign Capability Derivation Forest
-- Mandatory Access Control (MAC) policies
-- Landlock filesystem sandboxing
-- seccomp syscall filtering
+SigmaOS uses multiple languages based on component requirements:
 
-### Is there a root user?
+- **Rust**: Kernel components and core shards (memory safety, performance)
+- **Zig**: Low-level drivers and runtime (control, performance)
+- **Nim**: Tooling and automation (expressiveness, ease of use)
 
-No, SigmaOS eliminates the traditional root user in favor of a capability-based system. Processes only have the capabilities they need, and capabilities can be derived and revoked.
 
-### How does SigmaOS handle vulnerabilities?
+### How do I build SigmaOS?
 
-- Zero-dependency policy reduces attack surface
-- Memory-safe Rust code prevents memory-safety CVEs
-- Formal verification planned for critical components
-- Continuous security auditing
-- Automated vulnerability scanning
+See the [INSTALL.md](INSTALL.md) for detailed build instructions. The basic steps:
 
-### Does SigmaOS support Secure Boot?
+1. Install Rust toolchain
+2. Install Zig compiler
+3. Install Nim compiler
+4. Clone the repository
+5. Run `cargo build` for Rust components
+6. Run `zig build` for Zig components
+7. Run `nim build` for Nim components
 
-Yes, SigmaOS supports UEFI Secure Boot with TPM2 integration (planned for Phase 4).
 
-## Usage Questions
+### How do I contribute to SigmaOS?
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. The basic process:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+
+### What are the coding standards?
+
+SigmaOS follows these coding standards:
+
+- **Rust**: Follow Rust style guide, use `cargo fmt` and `cargo clippy`
+- **Zig**: Follow Zig style guide, use `zig fmt`
+- **Nim**: Follow Nim style guide, use `nimpretty`
+- **No External Dependencies**: Implement from first principles where possible
+- **Documentation**: Document all public APIs
+
+
+### How do I run tests?
+
+Run tests for each component:
+
+```bash
+
+# Rust components
+
+cargo test
+
+# Zig components
+
+zig build test
+
+# Nim components
+
+nim test
+```
+
+Run smoke tests:
+
+```bash
+./scripts/smoke-test.sh
+```
+
+## Security
+
+### How does SigmaOS ensure security?
+
+SigmaOS ensures security through:
+
+- **Capability-Based Security**: All access controlled via capabilities
+- **Post-Quantum Cryptography**: Quantum-resistant algorithms
+- **Zero-Trust Network**: Default deny firewall policy
+- **Memory Safety**: Rust's memory safety guarantees
+- **Minimal Attack Surface**: Only load required shards
+- **Audit Logging**: All security events logged
+
+
+### What is the threat model?
+
+SigmaOS's threat model includes:
+
+- **Malicious Applications**: Isolated via capabilities
+- **Network Attacks**: Protected by zero-trust firewall
+- **Quantum Attacks**: Protected by post-quantum crypto
+- **Supply Chain Attacks**: Minimal dependencies, signed drivers
+- **Hardware Attacks**: TPM integration, secure boot
+
+
+### How are vulnerabilities handled?
+
+See the [SECURITY_POLICY.md](SECURITY_POLICY.md) for vulnerability reporting. The process:
+
+1. Report vulnerability via security email
+2. Security team reviews and validates
+3. Fix is developed and tested
+4. Security advisory is published
+5. Patch is released
+
+
+## Usage
 
 ### How do I install SigmaOS?
 
-Currently, SigmaOS is in early development. Installation instructions will be provided when the system reaches a stable state. For now, you can test it in QEMU:
+See the [INSTALL.md](INSTALL.md) for installation instructions. SigmaOS can be installed:
+
+- **Standalone**: Full desktop installation
+- **Microkernel**: Minimal embedded installation
+- **Cloud**: Headless cloud image
+- **Container**: Containerized deployment
+
+
+### How do I configure SigmaOS?
+
+SigmaOS is configured via:
+
+- **Boot Parameters**: Kernel boot parameters
+- **Configuration Files**: TOML-based configuration
+- **Runtime Configuration**: Dynamic configuration via CLI
+- **Feature Flags**: Enable/disable features at build time
+
+
+### What deployment profiles are available?
+
+SigmaOS supports multiple deployment profiles:
+
+- **Standalone**: Full desktop with all features
+- **Microkernel**: Minimal kernel for embedded systems
+- **RTOS**: Real-time OS for industrial control
+- **Cloud**: Headless image for cloud platforms
+- **Mobile**: Touch-optimized for mobile devices
+- **Browser**: WebAssembly for browser deployment
+
+
+### How do I manage packages?
+
+SigmaOS uses `sigma-pkg` for package management:
 
 ```bash
-qemu-system-x86_64 -cdrom sigmaos.iso -m 2G
+
+# Search packages
+
+sigma-pkg search <package>
+
+# Install package
+
+sigma-pkg install <package>
+
+# Update package
+
+sigma-pkg update <package>
+
+# Remove package
+
+sigma-pkg remove <package>
 ```
 
-### What applications are available?
+## Troubleshooting
 
-SigmaOS includes native implementations of:
+### Build fails with Rust error
 
-- Word processor (sigma-wordprocessor)
-- Spreadsheet (sigma-spreadsheet)
-- Presentation (sigma-presentation)
-- Email client (sigma-email)
-- Database client (sigma-database)
+Ensure you have the latest Rust toolchain:
 
-Plus core utilities and system tools.
+```bash
+rustup update
+rustup default stable
+```
 
-### Can I run Linux applications on SigmaOS?
+### Build fails with Zig error
 
-Not directly. SigmaOS has its own syscall interface and ABI. However, we plan to implement:
+Ensure you have the latest Zig compiler:
 
-- Linux compatibility layer (optional)
-- Wine-like compatibility for Windows applications (future)
+```bash
+zig version  # Should be 0.11.0 or later
+```
 
-### How do I develop for SigmaOS?
+### Build fails with Nim error
 
-See the [Development Guide](./DEVELOPMENT.md) for detailed instructions. Basic steps:
+Ensure you have the latest Nim compiler:
 
-1. Install Rust and Nim
-2. Clone the repository
-3. Build the project
-4. Follow contribution guidelines
+```bash
+nim --version  # Should be 2.0.0 or later
+```
 
-## Performance Questions
+### Driver not detected
 
-### How does SigmaOS performance compare to Linux?
+Check that the shard is loaded:
 
-SigmaOS is optimized for:
+```bash
 
-- Zero-allocation operations
-- Efficient data structures
-- Minimal overhead
-- Specialized for SigmaOS use cases
+# List loaded shards
 
-Benchmarks will be provided as the system matures.
+shard list
 
-### What are the system requirements?
+# Load shard
 
-Minimum (for development):
+shard load <shard-name>
+```
 
-- x86_64 CPU
-- 2GB RAM
-- 10GB disk space
-- UEFI firmware
+### Network not working
 
-Recommended:
+Check firewall rules:
 
-- x86_64 CPU with virtualization support
-- 4GB+ RAM
-- 20GB+ disk space
-- UEFI 2.3.1+
+```bash
 
-## Development Questions
+# List firewall rules
 
-### How can I contribute?
+firewall list
 
-See the [Contributing Guide](../CONTRIBUTING.md) for details. Key areas:
+# Add allow rule
 
-- Kernel development
-- Driver development
-- Application development
-- Documentation
-- Testing
+firewall add allow <source-ip> <dest-ip> <protocol>
+```
 
-### What are the most needed contributions?
+## Performance
 
-Currently (Phase 0):
+### How does SigmaOS achieve high performance?
 
-- C++/Rust kernel engineers
-- UEFI/EDK2 bootloader engineers
-- Build system engineers
+SigmaOS achieves high performance through:
 
-Future phases:
+- **Zero-Copy Operations**: Minimize data copying
+- **O(1) Scheduling**: EEVDF scheduler
+- **Minimal Overhead**: Microkernel design
+- **Efficient IPC**: Capability-based IPC
+- **Hardware Acceleration**: GPU acceleration where available
 
-- Network stack engineers
-- GPU/graphics engineers
-- India Stack API integration
-- AI/ML integration
 
-### How do I report bugs?
+### What is the EEVDF scheduler?
 
-Report bugs via GitHub Issues:
-https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+EEVDF (Earliest Eligible Virtual Deadline First) is an O(1) scheduling algorithm that provides:
 
-Include:
+- **Fairness**: Fair CPU allocation
+- **Low Latency**: Low response time
+- **Real-Time Support**: Real-time task priorities
+- **Predictable**: Deterministic timing
 
-- System information
-- Error messages
-- Steps to reproduce
-- Debug logs if available
 
-## Future Questions
+### How does SigmaOS handle memory?
 
-### What's the roadmap?
+SigmaOS uses:
 
-See the [Roadmap](./ROADMAP.md) for detailed plans. Key milestones:
+- **Buddy Allocator**: Efficient physical memory allocation
+- **Paging**: Virtual memory with capability-based protection
+- **Zero-Copy**: Minimize memory copying
+- **Memory Pooling**: Reuse memory allocations
 
-- M0: First Boot (Month 3)
-- M1: Real Hardware (Month 6)
-- M2: First Desktop (Month 9)
-- M3: India Stack Live (Month 14)
-- M4: Security Audit (Month 18)
+
+## Future
+
+### What are the future plans for SigmaOS?
+
+Future plans include:
+
+- **Self-Evolving System**: Genetic algorithms and reinforcement learning
+- **AI-Native OS**: ML-based scheduling and resource management
+- **Quantum Computing**: Quantum algorithm integration
+- **Enhanced Desktop**: Improved desktop environment
+- **Cloud Integration**: Better cloud platform support
+
 
 ### When will SigmaOS be production-ready?
 
-Target for production use: Month 14 (India Stack Live)
-Target for general availability: Month 18+ (after security audit)
+SigmaOS is currently in active development. Production readiness depends on:
 
-### Will SigmaOS support ARM?
+- Completion of core shards
+- Completion of essential drivers
+- Security audits
+- Performance testing
+- User feedback
 
-Yes, ARM64 support is planned for Phase 5 (Month 21), targeting Raspberry Pi 4/5.
 
-### What about mobile support?
+Estimated timeline: 2027-2028
 
-Mobile support is not currently planned but may be considered in future phases.
+### How can I help with development?
 
-## India-Specific Questions
+You can help by:
 
-### What India Stack integrations are planned?
+- **Contributing Code**: Submit pull requests
+- **Testing**: Test on various hardware
+- **Documentation**: Improve documentation
+- **Reporting Bugs**: Report issues
+- **Spreading the Word**: Share SigmaOS with others
 
-- ABDM (Ayushman Bharat Digital Mission)
-- GST (Goods and Services Tax)
-- UPI (Unified Payments Interface)
-- e-RUPI
-- Account Aggregator (AA)
-- NavIC (Indian GPS)
 
-### Will SigmaOS support Indian languages?
-
-Yes, SigmaOS will support:
-
-- Hindi IME (Inscript + phonetic)
-- Other regional languages
-- Offline speech recognition (sigma-bhashini)
-- Text-to-speech
-
-### How will SigmaOS help rural India?
-
-SigmaOS includes:
-
-- sigma-RuralStack for village-level services
-- Offline-first design for low connectivity
-- Low hardware requirements
-- Local language support
-- Digital literacy tools
-
-## Licensing Questions
-
-### Can I use SigmaOS commercially?
-
-Yes, SigmaOS is licensed under the permissive MIT License, allowing commercial use.
-
-### Can I modify and redistribute SigmaOS?
-
-Yes, the MIT License allows modification and redistribution, provided the license and copyright notice are included.
-
-### Are there any restrictions?
-
-The MIT License has minimal restrictions. You must:
-
-- Include the license and copyright notice
-- State any significant changes made
-
-## Support Questions
+## Community
 
 ### Where can I get help?
 
-- GitHub Issues: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
-- GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
-- Documentation: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
-- Email: (to be announced)
+Get help through:
 
-### Is commercial支持 available?
+- **GitHub Issues**: Report bugs and ask questions
+- **Discord**: Join the SigmaOS Discord server
+- **Mailing List**: Join the development mailing list
+- **Documentation**: Read the documentation
 
-Commercial support options will be announced as the system matures.
 
-### Is there training available?
+### How do I join the community?
 
-Training materials and courses will be developed as the system approaches production readiness.
+Join the community by:
 
-## Miscellaneous Questions
+- **Starring the Repository**: Show your support
+- **Following Updates**: Watch the repository
+- **Joining Discord**: Participate in discussions
+- **Contributing**: Submit code and documentation
 
-### Why the name "SigmaOS"?
 
-Sigma (Σ) represents summation and completeness, reflecting our goal of creating a complete, sovereign operating system.
+### What is the code of conduct?
 
-### Who is behind SigmaOS?
+See the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for the code of conduct. Key points:
 
-SigmaOS is developed by the SigmaOS Project team. See the [CONTRIBUTING.md](../CONTRIBUTING.md) for information on how to join.
+- Be respectful and inclusive
+- Welcome newcomers
+- Focus on constructive feedback
+- Respect privacy and confidentiality
 
-### How is SigmaOS funded?
 
-SigmaOS is currently a community-driven project. Funding models for sustainability are being explored.
+## Licensing
 
-### Can I donate?
+### What license is SigmaOS under?
 
-Donation options will be announced in the future.
+SigmaOS is under the BSD 2-Clause License. See [LICENSE.md](LICENSE.md) for details.
 
-## Still Have Questions?
+### Can I use SigmaOS commercially?
 
-If your question isn't answered here:
+Yes, SigmaOS is under the permissive BSD 2-Clause License, which allows commercial use.
 
-1. Check the [Documentation](./)
-2. Search [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-3. Search the [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-4. Ask in [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
-5. Create a new Issue with your question
+### Can I contribute to SigmaOS under a different license?
+
+Contributions must be under the BSD 2-Clause License or a compatible license.
+
+## Additional Resources
+
+### Where can I learn more?
+
+Learn more through:
+
+- **README.md**: Project overview
+- **ARCHITECTURE.md**: System architecture
+- **INSTALL.md**: Installation guide
+- **CONTRIBUTING.md**: Contribution guidelines
+- **SECURITY_POLICY.md**: Security policy
+- **SUPPORT.md**: Support resources
+
+
+### Where can I find the source code?
+
+Source code is available on GitHub:
+
+https://github.com/AaryanSinghChauhan09/SigmaOS
+
+### How do I report a security vulnerability?
+
+Report security vulnerabilities via:
+
+- Email: security@sigmaos.org
+- PGP Key: Available on GitHub
+
+
+See [SECURITY_POLICY.md](SECURITY_POLICY.md) for details.
+
+---
+
+*Last Updated: 2026-07-13*
