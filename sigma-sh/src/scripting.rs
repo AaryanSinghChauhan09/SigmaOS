@@ -451,6 +451,126 @@ fn execute_script_line_with_lineno(line: &str, env: &mut ShellEnv, lineno: usize
     code
 }
 
+// ─── Function Definition Parsing ───────────────────────────────────────────────
+
+pub fn parse_function_definition(line: &str, lines: &[String], start: usize) -> Result<(String, Vec<String>, Vec<String>, usize), String> {
+    // Parse: function_name() { or function_name param1 param2 {
+    let line = line.trim();
+    
+    if !line.starts_with("function ") {
+        return Err("Not a function definition".to_string());
+    }
+    
+    let rest = &line["function ".len()..];
+    let paren_pos = rest.find('(').ok_or("Missing '(' in function definition")?;
+    
+    let name = rest[..paren_pos].trim().to_string();
+    let after_paren = &rest[paren_pos + 1..];
+    
+    let brace_pos = after_paren.find('{').ok_or("Missing '{' in function definition")?;
+    let params_str = after_paren[..brace_pos].trim().trim_end_matches(')');
+    
+    let params: Vec<String> = if params_str.is_empty() {
+        Vec::new()
+    } else {
+        params_str.split_whitespace().map(|s| s.to_string()).collect()
+    };
+    
+    let mut body = Vec::new();
+    let mut i = start + 1;
+    let mut depth = 1;
+    
+    while i < lines.len() {
+        let l = lines[i].trim();
+        if l.contains('{') { depth += 1; }
+        if l.contains('}') { depth -= 1; }
+        if depth == 0 { return Ok((name, params, body, i + 1)); }
+        if depth > 0 && !l.contains('}') {
+            body.push(lines[i].clone());
+        }
+        i += 1;
+    }
+    
+    Err("Unterminated function definition".to_string())
+}
+
+// ─── Control Flow Parsing ─────────────────────────────────────────────────────
+
+fn parse_if_block(lines: &[String], start: usize) -> Result<(Vec<String>, Option<Vec<String>>, usize), String> {
+    let mut then_lines = Vec::new();
+    let mut else_lines: Option<Vec<String>> = None;
+    let mut in_else = false;
+    let mut depth = 1;
+    let mut i = start + 1;
+
+    while i < lines.len() {
+        let l = lines[i].trim();
+        if l.starts_with("if ") { depth += 1; }
+        if l == "fi" {
+            depth -= 1;
+            if depth == 0 { return Ok((then_lines, else_lines, i + 1)); }
+        }
+        if depth == 1 && l == "else" {
+            in_else = true;
+            i += 1;
+            else_lines = Some(Vec::new());
+            continue;
+        }
+        if in_else {
+            else_lines.as_mut().unwrap().push(lines[i].clone());
+        } else {
+            if l != "then" { then_lines.push(lines[i].clone()); }
+        }
+        i += 1;
+    }
+    Err("unterminated if block".to_string())
+}
+
+fn parse_for_loop(lines: &[String], start: usize) -> Result<(String, Vec<String>, Vec<String>, usize), String> {
+    // "for VAR in item1 item2 ...; do"
+    let header = lines[start].trim()["for ".len()..].to_string();
+    let in_pos = header.find(" in ").ok_or("invalid for syntax")?;
+    let var = header[..in_pos].trim().to_string();
+    let rest = header[in_pos + 4..].trim_end_matches("; do").trim_end_matches(" do").to_string();
+    let items: Vec<String> = rest.split_whitespace().map(|s| s.to_string()).collect();
+
+    let mut body = Vec::new();
+    let mut i = start + 1;
+    while i < lines.len() {
+        let l = lines[i].trim();
+        if l == "done" { return Ok((var, items, body, i + 1)); }
+        if l != "do" { body.push(lines[i].clone()); }
+        i += 1;
+    }
+    Err("unterminated for loop".to_string())
+}
+
+fn parse_while_loop(lines: &[String], start: usize) -> Result<(String, Vec<String>, usize), String> {
+    let cond = lines[start].trim()["while ".len()..].trim_end_matches("; do").trim_end_matches(" do").to_string();
+    let mut body = Vec::new();
+    let mut i = start + 1;
+    while i < lines.len() {
+        let l = lines[i].trim();
+        if l == "done" { return Ok((cond, body, i + 1)); }
+        if l != "do" { body.push(lines[i].clone()); }
+        i += 1;
+    }
+    Err("unterminated while loop".to_string())
+}
+        if let Some(name) = cmd.argv.first() {
+            if let Some(body) = env.functions.get(name).cloned() {
+                let code = run_lines(&body, env).unwrap_or(1);
+                env.last_exit = code;
+                return code;
+            }
+        }
+    }
+
+    let code = crate::executor::execute(&ast, env);
+    env.last_exit = code;
+    code
+}
+
 // ---- Parsing helpers for control flow ----
 
 fn parse_if_block(lines: &[String], start: usize) -> Result<(Vec<String>, Option<Vec<String>>, usize), String> {
