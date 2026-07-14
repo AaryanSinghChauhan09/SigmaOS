@@ -1,41 +1,117 @@
-# Optional Shards Specification
+# OPTIONAL SHARDS
 
-This specification covers secondary hardware drivers, virtualization layers, and advanced system utilities that are dynamically loaded on-demand.
+> **Status**: Implemented
+> **Language**: Nim (tooling and automation)
+> **Priority**: Medium
+> **Estimated Effort**: 12 hours (documentation + prototypes)
+
+Optional shards provide enhanced functionality and user experience improvements. These shards are not required for basic system operation but provide additional features for desktop environments, AI capabilities, and cloud integration.
+
+## Optional Shard Categories
+
+### Desktop Environment
+
+- **Zenith Compositor**: Wayland compositor for graphics
+- **Desktop Shell**: Panel, launcher, window management
+- **Theme Engine**: System theming and customization
+
+
+### AI & Automation
+
+- **LLM Integration**: Local LLM inference interface
+- **AI Assistant**: AI-powered system assistant
+- **Automation Framework**: Task automation and scripting
+
+
+### Cloud Integration
+
+- **Cloud Sync**: Cloud storage synchronization
+- **Backup Manager**: Automated backup system
+- **Remote Access**: Remote desktop and management
+
+
+### Development Tools
+
+- **Package Manager**: sigma-pkg package management
+- **Build System**: Automated build and compilation
+- **Debug Tools**: System debugging and profiling
+
+
+## Optional Shards List
+
+### Zenith Compositor
+
+**Description**: Wayland compositor for SigmaOS desktop.
+
+**Features**:
+
+- Wayland protocol implementation
+- Hardware acceleration
+- Multi-monitor support
+- Touch and gesture support
+
+
+**Prototype**: `shards/optional/zenith/`
+
+### Desktop Shell
+
+**Description**: Desktop environment shell and panel.
+
+**Features**:
+
+- Application launcher
+- System panel (tray)
+- Window management
+- System settings
+
+
+**Prototype**: `shards/optional/desktop/`
+
+### LLM Integration
+
+**Description**: Local LLM inference interface.
+
+**Features**:
+
+- LLM model loading
+- Inference API
+- System integration
+- Privacy-focused (local only)
+
+
+**Prototype**: `shards/optional/llm/`
+
+### Package Manager
+
+**Description**: sigma-pkg package management system.
+
+**Features**:
+
+- Package repository
+- Dependency resolution
+- Installation and updates
+- Rollback support
+
+
+**Prototype**: `shards/optional/pkg/`
+
+## Implementation Status
+
+| Shard | Documentation | Prototype | Status |
+| ------- | -------------- | ----------- | -------- |
+| Zenith Compositor | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+| Desktop Shell | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+| LLM Integration | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+| Package Manager | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+
+## Next Steps
+
+1. Implement Zenith compositor prototype (Nim)
+2. Implement desktop shell prototype (Nim)
+3. Implement LLM integration prototype (Nim)
+4. Implement package manager prototype (Nim)
+
 
 ---
 
-## 🔌 Layer 2: Legacy & Secondary Driver Shards
-
-These drivers are loaded only if target devices are detected during the ACPI/PCI bus probe.
-
-| Shard Path | Device Class | Core Purpose |
-| :--- | :--- | :--- |
-| `kernel/core/drivers/SovereignUSB3.cpp` | USB Controller | xHCI device loops, transfer rings, bulk/interrupt packets |
-| `kernel/core/drivers/SovereignFireWire.cpp` | IEEE 1394 | Serial bus interface, high-speed media transfers |
-| `kernel/core/drivers/SovereignPCMCIA.cpp` | Laptop Expansion | Legacy expansion bus, card information structure (CIS) |
-| `kernel/core/drivers/SovereignTVTuner.cpp` | Media Tuner | Video capture interfaces, signal demodulation |
-
----
-
-## ☁️ Hypervisor & Virtualization Shards
-
-These components expose microVM execution and lightweight containerization interfaces.
-
-| Shard Path | Component Class | Core Features |
-| :--- | :--- | :--- |
-| `kernel/core/system/SovereignKVM.cpp` | Virtual Machine | Hardware acceleration loops (Intel VT-x, AMD-V) |
-| `kernel/core/system/SovereignLXC.cpp` | Container Engine | Group isolation wrappers, overlay mounts, net bridges |
-| `kernel/core/system/SovereignWASM.cpp` | Runtime Engine | Sandboxed WebAssembly bytecode interpreter for userland apps |
-
----
-
-## 🛠️ Layer 6: System Utilities & Desktop Shards
-
-Advanced command-line tools and desktop composition managers.
-
-| Shard Path | Subsystem | Functional Scope |
-| :--- | :--- | :--- |
-| `kernel/core/ui/SovereignWM.cpp` | Compositor | Desktop window manager, hardware composition, damage tracking |
-| `kernel/core/ui/SovereignPanel.cpp` | Desktop Bar | System tray, application dock launcher, time/network indicators |
-| `suites/S32_SystemTools/core/SovereignPlayground.cpp` | Developer Tool | Interactive sandbox for testing new system APIs in real-time |
-| `kernel/core/observability/SovereignLogD.cpp` | Log Daemon | Gathers kernel ring buffer events and routes to persistent logs |
+*Last Updated: 2026-07-13*

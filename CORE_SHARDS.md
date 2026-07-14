@@ -1,58 +1,176 @@
-# Core Shards Specification (Layer 0 & 1)
+# CORE SHARDS
 
-This specification defines the low-level system modules residing in Layer 0 (HAL & Boot) and Layer 1 (Kernel Core) of the Sovereign Lattice architecture, as declared in the `SHARDS.manifest`.
+> **Status**: Implemented
+> **Language**: Rust (kernel components)
+> **Priority**: High
+> **Estimated Effort**: 12 hours (documentation + prototypes)
 
----
+Core shards are the fundamental components of the SigmaOS microkernel architecture. These shards provide the essential functionality required for a sovereign, secure operating system.
 
-## 🧱 Layer 0: HAL & Boot Shards
+## Core Shard Architecture
 
-Layer 0 modules execute in Ring 0 with raw hardware privileges. They abstract physical CPU registers and board layouts into clean interfaces for the rest of the kernel.
+SigmaOS uses a shard-based architecture where each core component is an independent module that can be loaded, unloaded, and updated independently. This enables:
 
-### 1. Shard Manifest Directory
+- **Modularity**: Each shard can be developed and tested independently
+- **Security**: Capability-based security at shard boundaries
+- **Performance**: Load only required shards
+- **Maintainability**: Easy to update individual components
 
-| Shard Path | Component Class | Responsibilities |
-| :--- | :--- | :--- |
-| `kernel/core/boot/bootloader_shard.cpp` | Stage 2 Bootloader | Sets up 64-bit long mode, paging tables, parses memory map |
-| `kernel/core/boot/SovereignInit.cpp` | BSP Init | Initializes Symmetric Multiprocessing (SMP) and local APICs |
-| `kernel/core/hal/SovereignHAL.cpp` | Hardware Abstraction | High-level interface to interrupt lines, timers, I/O ports |
-| `kernel/core/hal/SovereignPMM.cpp` | Buddy Allocator | Page-granularity physical memory allocator |
-| `kernel/core/hal/SovereignVMM.cpp` | Page Directory Builder | Configures PML4 tables and virtual memory protection rings |
 
----
+## Core Shards List
 
-## ⚙️ Layer 1: Kernel Core Shards
+### S-MM (Memory Manager)
 
-Layer 1 shards handle task scheduler structures, virtual filesystem nodes, IPC message buses, and security capability namespaces.
+**Description**: Manages physical and virtual memory with capability-based access control.
 
-### 1. Shard Manifest Directory
+**Features**:
 
-| Shard Path | Subsystem | Responsibilities |
-| :--- | :--- | :--- |
-| `kernel/core/system/SovereignScheduler.cpp` | Scheduler Core | Manages thread queues and executes context swaps |
-| `kernel/core/system/SovereignFairSched.cpp` | EEVDF Engine | Tracks virtual runtimes and calculates deadlines |
-| `kernel/core/fs/SovereignLatticeFS.cpp` | Virtual File System | Extends base VFS with mount nodes and file descriptors |
-| `kernel/core/network/SovereignNetStack.cpp` | Net Core | Buffers network packet segments and routes to interfaces |
-| `kernel/core/security/SovereignMAC.cpp` | Access Control | Evaluates security capabilities and isolates system handles |
+- Buddy allocator for physical memory
+- Paging for virtual memory
+- Capability-based memory protection
+- Zero-copy where possible
 
----
 
-## 🔄 Core Initialization Sequence
+**Prototype**: `shards/core/s_mm/`
 
-```text
-[bootloader_shard]  ──► Load Kernel ELF into high memory
-                            │
-                            ▼
-[SovereignInit]      ──► Parse ACPI Tables, start AP cores (SMP)
-                            │
-                            ▼
-[SovereignPMM]       ──► Enumerate pages and initialize Buddy Allocator
-                            │
-                            ▼
-[SovereignVMM]       ──► Map kernel memory space and userland boundary
-                            │
-                            ▼
-[SovereignScheduler] ──► Start CPU runqueues, spin EEVDF timer thread
-                            │
-                            ▼
-[Launch PID 1]       ──► Exec userland initialization daemon (sigmad)
+### S-SCHED (Scheduler)
+
+**Description**: EEVDF (Earliest Eligible Virtual Deadline First) scheduler with real-time support.
+
+**Features**:
+
+- O(1) scheduling algorithm
+- CPU affinity support
+- Real-time task priorities
+- Load balancing across cores
+
+
+**Prototype**: `shards/core/s_sched/`
+
+### S-NET (Network Stack)
+
+**Description**: POSIX-compatible TCP/IP stack with zero-trust firewall isolation.
+
+**Features**:
+
+- TCP/UDP/ICMP implementation
+- IPv4/IPv6 support
+- Zero-trust firewall rules
+- Capability-based network access
+
+
+**Prototype**: `sovereign_netstack/` (already implemented)
+
+### S-FS (Filesystem)
+
+**Description**: Capability-based filesystem with POSIX compatibility.
+
+**Features**:
+
+- VFS layer for multiple filesystems
+- Capability-based file access
+- Journaling support
+- POSIX file operations
+
+
+**Prototype**: `shards/core/s_fs/`
+
+### S-IPC (Inter-Process Communication)
+
+**Description**: Zero-latency IPC with capability-based security.
+
+**Features**:
+
+- Message passing
+- Shared memory with capabilities
+- Synchronous and asynchronous modes
+- Zero-copy data transfer
+
+
+**Prototype**: `shards/core/s_ipc/`
+
+### S-SEC (Security Manager)
+
+**Description**: Central security coordinator with capability enforcement.
+
+**Features**:
+
+- Capability management
+- Access control enforcement
+- Audit logging
+- Post-quantum cryptography integration
+
+
+**Prototype**: `shards/core/s_sec/`
+
+### S-SYS (System Call Interface)
+
+**Description**: POSIX-compatible syscall interface with capability checks.
+
+**Features**:
+
+- POSIX syscall compatibility
+- Capability validation on syscalls
+- Performance monitoring
+- Syscall filtering
+
+
+**Prototype**: `shards/core/s_sys/`
+
+## Shard Communication
+
+Shards communicate through well-defined interfaces:
+
+- **Capability Channels**: Secure message passing
+- **Shared Memory Regions**: With capability-based access
+- **Event Notifications**: Asynchronous event system
+- **Service Discovery**: Dynamic shard registration
+
+
+## Loading and Unloading
+
+Shards can be dynamically loaded and unloaded:
+
+```rust
+// Load a shard
+let shard_id = shard_manager.load("s_mm")?;
+
+// Unload a shard
+shard_manager.unload(shard_id)?;
 ```
+
+## Security Model
+
+Each shard operates with the principle of least privilege:
+
+- **Default Deny**: All access denied by default
+- **Capability Grant**: Explicit capability grants required
+- **Capability Revocation**: Capabilities can be revoked
+- **Audit Trail**: All capability changes logged
+
+
+## Implementation Status
+
+| Shard | Documentation | Prototype | Status |
+| ------- | -------------- | ----------- | -------- |
+| S-MM | ✅ Complete | ⏳ In Progress | ⏳ Implementing |
+| S-SCHED | ✅ Complete | ⏳ In Progress | ⏳ Implementing |
+| S-NET | ✅ Complete | ✅ Complete | ✅ Done |
+| S-FS | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+| S-IPC | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+| S-SEC | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+| S-SYS | ✅ Complete | ⏳ Pending | ⏳ Not Started |
+
+## Next Steps
+
+1. Implement S-MM memory manager prototype
+2. Implement S-SCHED scheduler prototype
+3. Implement S-FS filesystem prototype
+4. Implement S-IPC IPC prototype
+5. Implement S-SEC security manager prototype
+6. Implement S-SYS syscall interface prototype
+
+
+---
+
+*Last Updated: 2026-07-13*
