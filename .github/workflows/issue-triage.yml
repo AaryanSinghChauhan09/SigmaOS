@@ -144,15 +144,16 @@ Please edit your issue to include this information. We'll review it as soon as p
             
             // Add comment for security issues
             if (labels.includes('security')) {
+              const securityComment = '⚠️ **Security Issue Detected**\n\n' +
+                'This issue appears to be related to security. For security vulnerabilities, please follow our [Security Policy](https://github.com/' + 
+                context.repo.owner + '/' + context.repo.repo + '/blob/main/SECURITY_POLICY.md) and report vulnerabilities privately to security@sigmaos.dev.\n\n' +
+                'If this is not a security vulnerability, please update the issue title and description to clarify.';
+              
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: `⚠️ **Security Issue Detected**
-
-This issue appears to be related to security. For security vulnerabilities, please follow our [Security Policy](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/SECURITY_POLICY.md) and report vulnerabilities privately to security@sigmaos.dev.
-
-If this is not a security vulnerability, please update the issue title and description to clarify.`
+                body: securityComment
               });
               
               // Remove security label if not confirmed
