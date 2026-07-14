@@ -103,7 +103,16 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 3. **SigmaFS (Filesystem Stack)**:
    - Validated and merged `sigma_fs` covering VFS, Inode abstraction, and block allocators.
 
-## ➡️ Next Recommended Steps (Batch 9)
+## 🛠️ Batch 9 & UI/Container Enhancements Implemented
 
-- Continue deeper optimization and integration of SigmaData pipelines across the OS.
-- Implement UI layout enhancements and continue OS API unification.
+1. **SigmaContainers (Flatpak Absorption)**:
+   - Absorbed Flatpak's native sandboxing and bundle management directly into `sigma_containers`.
+   - Introduced `SandboxManager`, `PermissionSystem` (Portals), and `BundleManager` into the unified capability-based runtime.
+
+2. **Design System & Layout Unification**:
+   - Expanded `userland/ui/design_system` to include native `Grid`, `Flex`, and `TilingNode` layouts, paving the way for Wayland/Sway abstraction in `sigma_compositor`.
+
+## ➡️ Next Recommended Steps (Batch 10)
+
+- Deepen the integration of `TilingNode` layouts into the `ZenithCompositor`.
+- Continue absorption of ML framework pipelines (e.g. Ray) into the `sigma_ml` distributed engine.
