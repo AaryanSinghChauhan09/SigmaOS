@@ -370,7 +370,7 @@ pub unsafe extern "C" fn pqc_init() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mlkem_keypair(
+pub extern "C" fn mlkem_keypair(
     algo: u8,
     pk: *mut MlKemPublicKey,
     sk: *mut MlKemSecretKey,
@@ -386,7 +386,7 @@ pub unsafe extern "C" fn mlkem_keypair(
         return -1;
     }
 
-    let result = mlkem_keygen(algorithm, &mut *pk, &mut *sk);
+    let result = mlkem_keygen(algorithm, unsafe { &mut *pk }, unsafe { &mut *sk });
     if result {
         G_PQC_STATE.keygen_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -396,7 +396,7 @@ pub unsafe extern "C" fn mlkem_keypair(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mlkem_encaps(
+pub extern "C" fn mlkem_encaps(
     pk: *const MlKemPublicKey,
     ct: *mut MlKemCiphertext,
     ss: *mut u8,
@@ -405,8 +405,8 @@ pub unsafe extern "C" fn mlkem_encaps(
         return -1;
     }
 
-    let shared_secret = core::slice::from_raw_parts_mut(ss, MLKEM_SHARED_SECRET_SIZE);
-    let result = mlkem_encaps(&*pk, &mut *ct, shared_secret);
+    let shared_secret = unsafe { core::slice::from_raw_parts_mut(ss, MLKEM_SHARED_SECRET_SIZE) };
+    let result = mlkem_encaps(unsafe { &*pk }, unsafe { &mut *ct }, shared_secret);
     if result {
         G_PQC_STATE.encap_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -416,7 +416,7 @@ pub unsafe extern "C" fn mlkem_encaps(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mlkem_decaps(
+pub extern "C" fn mlkem_decaps(
     ct: *const MlKemCiphertext,
     sk: *const MlKemSecretKey,
     ss: *mut u8,
@@ -425,8 +425,8 @@ pub unsafe extern "C" fn mlkem_decaps(
         return -1;
     }
 
-    let shared_secret = core::slice::from_raw_parts_mut(ss, MLKEM_SHARED_SECRET_SIZE);
-    let result = mlkem_decaps(&*ct, &*sk, shared_secret);
+    let shared_secret = unsafe { core::slice::from_raw_parts_mut(ss, MLKEM_SHARED_SECRET_SIZE) };
+    let result = mlkem_decaps(unsafe { &*ct }, unsafe { &*sk }, shared_secret);
     if result {
         G_PQC_STATE.decap_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -436,7 +436,7 @@ pub unsafe extern "C" fn mlkem_decaps(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mldsa_keypair(
+pub extern "C" fn mldsa_keypair(
     algo: u8,
     pk: *mut MlDsaPublicKey,
     sk: *mut MlDsaSecretKey,
@@ -451,7 +451,7 @@ pub unsafe extern "C" fn mldsa_keypair(
         return -1;
     }
 
-    let result = mldsa_keygen(algorithm, &mut *pk, &mut *sk);
+    let result = mldsa_keygen(algorithm, unsafe { &mut *pk }, unsafe { &mut *sk });
     if result {
         G_PQC_STATE.keygen_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -461,7 +461,7 @@ pub unsafe extern "C" fn mldsa_keypair(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mldsa_sign(
+pub extern "C" fn mldsa_sign(
     sk: *const MlDsaSecretKey,
     message: *const u8,
     msg_len: usize,
@@ -471,8 +471,8 @@ pub unsafe extern "C" fn mldsa_sign(
         return -1;
     }
 
-    let msg_slice = core::slice::from_raw_parts(message, msg_len);
-    let result = mldsa_sign(&*sk, msg_slice, &mut *sig);
+    let msg_slice = unsafe { core::slice::from_raw_parts(message, msg_len) };
+    let result = mldsa_sign(unsafe { &*sk }, msg_slice, unsafe { &mut *sig });
     if result {
         G_PQC_STATE.sign_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -482,7 +482,7 @@ pub unsafe extern "C" fn mldsa_sign(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mldsa_verify(
+pub extern "C" fn mldsa_verify(
     pk: *const MlDsaPublicKey,
     message: *const u8,
     msg_len: usize,
@@ -492,8 +492,8 @@ pub unsafe extern "C" fn mldsa_verify(
         return -1;
     }
 
-    let msg_slice = core::slice::from_raw_parts(message, msg_len);
-    let result = mldsa_verify(&*pk, msg_slice, &*sig);
+    let msg_slice = unsafe { core::slice::from_raw_parts(message, msg_len) };
+    let result = mldsa_verify(unsafe { &*pk }, msg_slice, unsafe { &*sig });
     if result {
         G_PQC_STATE.verify_count.fetch_add(1, Ordering::Relaxed);
         1
@@ -503,7 +503,7 @@ pub unsafe extern "C" fn mldsa_verify(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn slhdsa_keypair(
+pub extern "C" fn slhdsa_keypair(
     algo: u8,
     pk: *mut SlhDsaPublicKey,
     sk: *mut SlhDsaSecretKey,
@@ -520,7 +520,7 @@ pub unsafe extern "C" fn slhdsa_keypair(
         return -1;
     }
 
-    let result = slhdsa_keygen(algorithm, &mut *pk, &mut *sk);
+    let result = slhdsa_keygen(algorithm, unsafe { &mut *pk }, unsafe { &mut *sk });
     if result {
         G_PQC_STATE.keygen_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -530,7 +530,7 @@ pub unsafe extern "C" fn slhdsa_keypair(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn slhdsa_sign(
+pub extern "C" fn slhdsa_sign(
     sk: *const SlhDsaSecretKey,
     message: *const u8,
     msg_len: usize,
@@ -540,8 +540,8 @@ pub unsafe extern "C" fn slhdsa_sign(
         return -1;
     }
 
-    let msg_slice = core::slice::from_raw_parts(message, msg_len);
-    let result = slhdsa_sign(&*sk, msg_slice, &mut *sig);
+    let msg_slice = unsafe { core::slice::from_raw_parts(message, msg_len) };
+    let result = slhdsa_sign(unsafe { &*sk }, msg_slice, unsafe { &mut *sig });
     if result {
         G_PQC_STATE.sign_count.fetch_add(1, Ordering::Relaxed);
         0
@@ -551,7 +551,7 @@ pub unsafe extern "C" fn slhdsa_sign(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn slhdsa_verify(
+pub extern "C" fn slhdsa_verify(
     pk: *const SlhDsaPublicKey,
     message: *const u8,
     msg_len: usize,
@@ -561,8 +561,8 @@ pub unsafe extern "C" fn slhdsa_verify(
         return -1;
     }
 
-    let msg_slice = core::slice::from_raw_parts(message, msg_len);
-    let result = slhdsa_verify(&*pk, msg_slice, &*sig);
+    let msg_slice = unsafe { core::slice::from_raw_parts(message, msg_len) };
+    let result = slhdsa_verify(unsafe { &*pk }, msg_slice, unsafe { &*sig });
     if result {
         G_PQC_STATE.verify_count.fetch_add(1, Ordering::Relaxed);
         1
@@ -572,7 +572,7 @@ pub unsafe extern "C" fn slhdsa_verify(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pqc_cnsa2_compliant(algo: u8) -> i32 {
+pub extern "C" fn pqc_cnsa2_compliant(algo: u8) -> i32 {
     let algorithm = match algo {
         0..=8 => PqcAlgorithm::from(algo),
         _ => return 0,
@@ -582,26 +582,26 @@ pub unsafe extern "C" fn pqc_cnsa2_compliant(algo: u8) -> i32 {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pqc_keygen_count() -> u64 {
+pub extern "C" fn pqc_keygen_count() -> u64 {
     G_PQC_STATE.keygen_count()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pqc_encap_count() -> u64 {
+pub extern "C" fn pqc_encap_count() -> u64 {
     G_PQC_STATE.encap_count()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pqc_decap_count() -> u64 {
+pub extern "C" fn pqc_decap_count() -> u64 {
     G_PQC_STATE.decap_count()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pqc_sign_count() -> u64 {
+pub extern "C" fn pqc_sign_count() -> u64 {
     G_PQC_STATE.sign_count()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pqc_verify_count() -> u64 {
+pub extern "C" fn pqc_verify_count() -> u64 {
     G_PQC_STATE.verify_count()
 }
