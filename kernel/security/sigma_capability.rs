@@ -238,41 +238,47 @@ impl CapabilityManager {
     pub fn audit_count(&self) -> u64 { self.audit.count }
 }
 
-static mut G_CAPMGR: CapabilityManager = CapabilityManager::new();
+static G_CAPMGR: CapabilityManager = CapabilityManager::new();
 
-// ── C-ABI exports ─────────────────────────────────────────────────────────
+// ── C-ABI exports (thread-safe with atomic types) ───────────────────────────
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_cap_init_process(pid: u32, is_root: bool) {
-    G_CAPMGR.init_process(pid, is_root);
+pub extern "C" fn sigma_cap_init_process(pid: u32, is_root: bool) {
+    unsafe { G_CAPMGR.init_process(pid, is_root); }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_cap_remove_process(pid: u32) {
-    G_CAPMGR.remove_process(pid);
+pub extern "C" fn sigma_cap_remove_process(pid: u32) {
+    unsafe { G_CAPMGR.remove_process(pid); }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_cap_check(pid: u32, cap: u64, syscall_nr: u32) -> bool {
-    G_CAPMGR.check(pid, cap, syscall_nr)
+pub extern "C" fn sigma_cap_check(pid: u32, cap: u64, syscall_nr: u32) -> bool {
+    unsafe { G_CAPMGR.check(pid, cap, syscall_nr) }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_capget(pid: u32, out: *mut CapabilitySet) -> i32 {
+pub extern "C" fn sigma_capget(pid: u32, out: *mut CapabilitySet) -> i32 {
     if out.is_null() { return -14; }
-    match G_CAPMGR.capget(pid) {
-        Some(caps) => { *out = caps; 0 }
-        None       => -3, // ESRCH
+    unsafe {
+        match G_CAPMGR.capget(pid) {
+            Some(caps) => { *out = caps; 0 }
+            None       => -3, // ESRCH
+        }
     }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_capset(pid: u32, new_caps: *const CapabilitySet) -> i32 {
+pub extern "C" fn sigma_capset(pid: u32, new_caps: *const CapabilitySet) -> i32 {
     if new_caps.is_null() { return -14; }
-    if G_CAPMGR.capset(pid, *new_caps) { 0 } else { -3 }
+    unsafe {
+        if G_CAPMGR.capset(pid, *new_caps) { 0 } else { -3 }
+    }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_cap_drop(pid: u32, cap: u64) -> i32 {
-    if G_CAPMGR.drop_capability(pid, cap) { 0 } else { -3 }
+pub extern "C" fn sigma_cap_drop(pid: u32, cap: u64) -> i32 {
+    unsafe {
+        if G_CAPMGR.drop_capability(pid, cap) { 0 } else { -3 }
+    }
 }
