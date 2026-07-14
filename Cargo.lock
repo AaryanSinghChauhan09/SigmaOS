@@ -158,8 +158,40 @@ name = "sigma-sh"
 version = "0.2.0"
 
 [[package]]
+name = "sigma_app"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_compositor"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_containers"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_data"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_fs"
+version = "15.0.0"
+
+[[package]]
 name = "sigma_kernel"
 version = "0.1.0"
+
+[[package]]
+name = "sigma_media"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_ml"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_net"
+version = "15.0.0"
 
 [[package]]
 name = "sigma_pkg_registry"

@@ -21,6 +21,9 @@ members = [
     "userland/sigma_media",
     "userland/sigma_app",
     "userland/sigma_ml",
+    "userland/sigma_data",
+    "userland/sigma_net",
+    "userland/sigma_fs",
 ]
 default-members = ["kernel"]
 
