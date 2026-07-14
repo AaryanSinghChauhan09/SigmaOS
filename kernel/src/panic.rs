@@ -10,6 +10,7 @@ use core::fmt::Write;
 // ─── Panic Handler ───────────────────────────────────────────────────────
 
 /// Enhanced panic handler with detailed error reporting
+#[cfg(not(test))]
 #[panic_handler]
 pub fn panic_handler(info: &PanicInfo) -> ! {
     // Try to print panic information

@@ -55,6 +55,7 @@ extern "C" {
 
 /// The main entry point for the kernel.
 /// Called from UEFI bootloader with boot info.
+#[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn kernel_main(_boot_info: *const BootInfo) -> ! {
     // Initialize logging system
@@ -82,6 +83,7 @@ pub extern "C" fn kernel_main(_boot_info: *const BootInfo) -> ! {
 }
 
 /// Legacy entry point for compatibility
+#[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     kernel_main(core::ptr::null())

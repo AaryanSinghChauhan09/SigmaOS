@@ -9,7 +9,9 @@ description = "S03 Decentralized Persistence Layer — CRDT, IPC, Process Orches
 [lib]
 name       = "sigma_orchestrator"
 path       = "lib.rs"
-crate-type = ["staticlib", "rlib"]
+crate-type = ["rlib"]
+test       = false
+bench      = false
 
 [dependencies]
 # No external deps — pure no_std bare-metal
@@ -18,14 +20,3 @@ crate-type = ["staticlib", "rlib"]
 #   [build]
 #   target = "aarch64-unknown-none"
 # Or pass --target aarch64-unknown-none explicitly
-
-[profile.release]
-opt-level = "z"     # Optimize for binary size (kernel)
-lto       = true
-codegen-units = 1
-panic     = "abort"
-strip     = "symbols"
-
-[profile.dev]
-panic     = "abort"
-opt-level = 0
