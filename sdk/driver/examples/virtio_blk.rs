@@ -39,32 +39,34 @@ impl Driver for VirtioBlkDriver {
         // Map BAR0 (VirtIO legacy config registers, 256 bytes)
         ctx.map_bar0(256)?;
 
-        let mmio = ctx.mmio.as_ref().ok_or(DriverError::HardwareError(
-            "BAR0 not mapped".into()
-        ))?;
+        {
+            let mmio = ctx.mmio.as_ref().ok_or(DriverError::HardwareError(
+                "BAR0 not mapped".into()
+            ))?;
 
-        // Read device features (VirtIO spec 4.1.4)
-        let features = unsafe { mmio.read32(0x00) };
-        println!("[virtio-blk] Device features: 0x{:08x}", features);
+            // Read device features (VirtIO spec 4.1.4)
+            let features = unsafe { mmio.read32(0x00) };
+            println!("[virtio-blk] Device features: 0x{:08x}", features);
 
-        // Acknowledge device + driver
-        unsafe {
-            mmio.write32(0x12, 0x00);  // reset
-            mmio.write32(0x12, 0x01);  // ACKNOWLEDGE
-            mmio.write32(0x12, 0x03);  // ACKNOWLEDGE | DRIVER
+            // Acknowledge device + driver
+            unsafe {
+                mmio.write32(0x12, 0x00);  // reset
+                mmio.write32(0x12, 0x01);  // ACKNOWLEDGE
+                mmio.write32(0x12, 0x03);  // ACKNOWLEDGE | DRIVER
+            }
+
+            // Read capacity from config space (offset 0x14 in legacy VirtIO)
+            self.sector_count = unsafe { mmio.read64(0x14) };
+            self.block_size   = unsafe { mmio.read32(0x1C) };
+            if self.block_size == 0 { self.block_size = 512; }
+
+            println!("[virtio-blk] Capacity: {} sectors ({} MB)",
+                     self.sector_count,
+                     self.sector_count * self.block_size as u64 / 1_048_576);
+
+            // Set FEATURES_OK
+            unsafe { mmio.write32(0x12, 0x0B); } // ACKNOWLEDGE|DRIVER|FEATURES_OK
         }
-
-        // Read capacity from config space (offset 0x14 in legacy VirtIO)
-        self.sector_count = unsafe { mmio.read64(0x14) };
-        self.block_size   = unsafe { mmio.read32(0x1C) };
-        if self.block_size == 0 { self.block_size = 512; }
-
-        println!("[virtio-blk] Capacity: {} sectors ({} MB)",
-                 self.sector_count,
-                 self.sector_count * self.block_size as u64 / 1_048_576);
-
-        // Set FEATURES_OK
-        unsafe { mmio.write32(0x12, 0x0B); } // ACKNOWLEDGE|DRIVER|FEATURES_OK
 
         // Allocate a DMA buffer for the request ring
         let _ring_buf = ctx.alloc_dma(4096)?;
@@ -72,8 +74,13 @@ impl Driver for VirtioBlkDriver {
         // Bind IRQ
         ctx.bind_irq()?;
 
-        // Set DRIVER_OK
-        unsafe { mmio.write32(0x12, 0x0F); }
+        {
+            let mmio = ctx.mmio.as_ref().ok_or(DriverError::HardwareError(
+                "BAR0 not mapped".into()
+            ))?;
+            // Set DRIVER_OK
+            unsafe { mmio.write32(0x12, 0x0F); }
+        }
 
         println!("[virtio-blk] ✓ Initialized successfully");
         Ok(())

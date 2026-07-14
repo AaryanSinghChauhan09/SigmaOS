@@ -26,7 +26,7 @@ impl From<io::Error> for FormatError {
 /// This is a minimal implementation that can be expanded
 fn format_code(input: &str) -> String {
     let mut output = String::new();
-    let mut indent_level = 0;
+    let mut indent_level: usize = 0;
     const INDENT: &str = "    ";
     
     for line in input.lines() {
