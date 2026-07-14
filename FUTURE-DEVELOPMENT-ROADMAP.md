@@ -41,6 +41,7 @@ To achieve maturity and distro-parity, SigmaOS is analyzed against the four pill
 | **Rollback Capability** | Manual / Apt-clone (risky) | System snapshotting (Btrfs) | History rollbacks (RPM db) | **Native Generations** (O(1) revert) | **O(1) Generation Rollback** via SQLite/history snapshot |
 
 ### 🔍 Identified Gaps in SigmaOS Prototype
+
 1. **Dependency Resolution Resilience**: The primitive parser could fail on circular/cyclic dependencies. We must adopt a full DPLL (Davis-Putnam-Logemann-Loveland) SAT solver that optimizes install routes.
 2. **Atomic Rollback & Generation Management**: A broken upgrade should leave the system completely unharmed. We require O(1) symlink-based switching.
 3. **Sandbox Isolation for Installs**: Running package install-hooks (`postinst` / `preinst`) poses extreme security risks. SigmaOS must execute these hooks within heavily restricted Bubblewrap and Landlock micro-sandboxes.
@@ -52,7 +53,7 @@ To achieve maturity and distro-parity, SigmaOS is analyzed against the four pill
 
 `sigpkg` is designed as a zero-dependency, zero-allocation-ready, safe Rust package manager that enforces absolute atomicity.
 
-```
+```text
                   [ Declarative Profile: sigma.toml ]
                                   │
                                   ▼
@@ -81,6 +82,7 @@ To achieve maturity and distro-parity, SigmaOS is analyzed against the four pill
 ```
 
 ### ⚙️ Core Modules & Mechanics
+
 * **SAT-Solver Resolver**: Translates packages and constraints into boolean clauses. Solves dependencies deterministically, identifying conflicts prior to downloading.
 * **Content-Addressed Store**: Every compiled artifact resides under `/var/sigma-pkg/store/<sha3-256-hash>-<package-name>/`. Multiple versions coexist flawlessly.
 * **Sandbox Extractor**: Unpacks files using user-space namespaces (`CLONE_NEWUSER`, `CLONE_NEWNS`). No write permissions outside the designated directory are granted.
@@ -94,7 +96,7 @@ SigmaOS implements translation and compatibility wrappers to digest packages fro
 
 ### 📥 Translation Compartments
 
-```
+```text
                ┌────────────────────────────────────────┐
                │         Linux Package Source           │
                │   (APT .deb / Pacman .tar.zst / RPM)   │
@@ -114,19 +116,23 @@ SigmaOS implements translation and compatibility wrappers to digest packages fro
 ```
 
 #### 1. APT Compatibility Layer (`apt-compat`)
-- **Metadata Translator**: Translates Debian control files (`control`) to standard `sigma.toml` metadata.
-- **Hook Sandboxing**: Executes complex bash-based `preinst`/`postinst` scripts inside a clean-slate bubblewrap compartment where `/etc`, `/var`, and `/usr` are mounted as read-only.
-- **Paths Remapping**: Intercepts absolute paths (e.g., `/lib/x86_64-linux-gnu`) and points them to content-addressed stores.
+
+* **Metadata Translator**: Translates Debian control files (`control`) to standard `sigma.toml` metadata.
+* **Hook Sandboxing**: Executes complex bash-based `preinst`/`postinst` scripts inside a clean-slate bubblewrap compartment where `/etc`, `/var`, and `/usr` are mounted as read-only.
+* **Paths Remapping**: Intercepts absolute paths (e.g., `/lib/x86_64-linux-gnu`) and points them to content-addressed stores.
 
 #### 2. Pacman Compatibility Layer (`pacman-compat`)
-- **ALPM Bridge**: Translates `.PKGINFO` and database specifications.
-- **Dependency Map**: Matches Arch packaging definitions with local equivalents.
+
+* **ALPM Bridge**: Translates `.PKGINFO` and database specifications.
+* **Dependency Map**: Matches Arch packaging definitions with local equivalents.
 
 #### 3. DNF/RPM Compatibility Layer (`dnf-compat`)
-- **RPM Header Extraction**: Intercepts CPIO archives within `.rpm` packages and unpacks them into content-addressed destinations.
+
+* **RPM Header Extraction**: Intercepts CPIO archives within `.rpm` packages and unpacks them into content-addressed destinations.
 
 #### 4. Nix Derivation Consumer (`nix-compat`)
-- **Hermetic Build Import**: Consumes Nix store paths directly. Since Nix store paths are already content-addressed and isolated, they map perfectly to `/var/sigma-pkg/store/`.
+
+* **Hermetic Build Import**: Consumes Nix store paths directly. Since Nix store paths are already content-addressed and isolated, they map perfectly to `/var/sigma-pkg/store/`.
 
 ---
 
@@ -135,21 +141,23 @@ SigmaOS implements translation and compatibility wrappers to digest packages fro
 To maintain a pristine mainline branch, SigmaOS employs an automated pipeline for feature branches.
 
 ### 🌲 Active Branch Registrations
+
 * **Drivers (Shards)**:
-  - `feature/shards/audio-driver` (Rust audio prototype)
-  - `feature/shards/essential-drivers` (GPU and core framework)
-  - `feature/shards/input-driver` (Zig-based HID driver)
-  - `feature/shards/network-driver` (Zig-based NIC driver)
-  - `feature/shards/storage-driver` (Rust storage framework)
+  * `feature/shards/audio-driver` (Rust audio prototype)
+  * `feature/shards/essential-drivers` (GPU and core framework)
+  * `feature/shards/input-driver` (Zig-based HID driver)
+  * `feature/shards/network-driver` (Zig-based NIC driver)
+  * `feature/shards/storage-driver` (Rust storage framework)
 * **Sovereign Systems**:
-  - `feature/sovereign/adr-tracker` (ADR verification)
-  - `feature/sovereign/dosage-calc` (Healthcare safety module)
-  - `feature/sovereign/gst-calculator` (Financial localization)
-  - `feature/sovereign/load-calc` (Predictive load calculator)
-  - `feature/sovereign/msme-registry` (Indian industrial compliance)
-  - `feature/sovereign/netstack` (Sovereign TCP/IP stack)
+  * `feature/sovereign/adr-tracker` (ADR verification)
+  * `feature/sovereign/dosage-calc` (Healthcare safety module)
+  * `feature/sovereign/gst-calculator` (Financial localization)
+  * `feature/sovereign/load-calc` (Predictive load calculator)
+  * `feature/sovereign/msme-registry` (Indian industrial compliance)
+  * `feature/sovereign/netstack` (Sovereign TCP/IP stack)
 
 ### 🔄 Branch Integration & Merge Workflow
+
 1. **Automated Rebase**: For each branch, pull latest `main`, perform non-interactive rebase.
 2. **Conflict Scrubber**: Run `scrub_conflicts.ps1` or similar cleanup tools.
 3. **Build & Test Isolation**: Execute compilation against standalone, rtos, and cloud profiles.
@@ -163,9 +171,11 @@ To maintain a pristine mainline branch, SigmaOS employs an automated pipeline fo
 SigmaOS documentation is living. Once a feature or specification is fully coded, its design documents are migrated from the source repository to the centralized GitHub Wiki.
 
 ### 📋 Migration Workflow
-```
+
+```text
 [ Finalized Code Implementation ] ──► [ Convert Doc to Wiki Slug Format ] ──► [ Copy to wiki_repo/ ] ──► [ Delete original .md in Repo ]
 ```
+
 * **Deduplication Safeguard**: Prevents file sync confusion.
 * **Slug conversion**: Spaces in `.md` filenames are transformed into dashes natively (e.g., `doc_audit_backlog.md` -> `Doc-Audit-Backlog.md`).
 * **Canonical Index**: `Advanced_Absorption` serves as the primary gateway for all distro absorption maps.
@@ -175,6 +185,7 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 ## 6. Performance Optimization Strategy (Bolt's Journal)
 
 ### ⚡ Optimization Guidelines
+
 * **Avoid Nested Loops**: Avoid O(N²) iterations; swap with HashMaps or pre-indexed static tables.
 * **Hoisting Operations**: Hoist checks, matches, and reference dereferences out of tight render and pixel loops.
 * **Zero-Allocation**: Utilize stack allocations or static buffers where possible to eliminate heap overhead in microkernel paths.
@@ -182,14 +193,17 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 ### 📝 Bolt's Performance Journal Entries
 
 #### 2026-07-13 - SIMD String bitwise operations
+
 * **Learning**: Direct bitwise conversions can introduce silent bugs in non-lowercase ASCII ranges.
 * **Action**: Apply inverse logical masking (`_mm_andnot_si128`) to properly preserve delimiters and special characters.
 
 #### 2026-07-13 - Hoisting Pixel Loop Checks
+
 * **Learning**: Doing high-frequency pixel drawing by matching options inside the loop creates massive branch-prediction overhead.
 * **Action**: Hoist state checking outside of the loops; perform bulk row copies using `core::ptr::copy` (representing SIMD-optimized `memmove`).
 
 #### 2026-07-14 - Allocation-Free SemVer Comparison in Package Manager
+
 * **Learning**: Doing repetitive SemVer comparisons using string splitting and dynamic vector collections creates heavy allocation pressures in performance-critical dependency-resolution loops.
 * **Action**: Implement an allocation-free SemVer parser with inline iterator walks that parse and compare numeric major/minor/patch segments without allocating dynamic arrays.
 
@@ -198,6 +212,7 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 ## 7. UX, Delight & Accessibility Design (Palette's Standards)
 
 ### 🎨 Visual & Access Standards
+
 * **Keyboard-First Navigation**: Ensure all controls support Tab-focus state tracking (`focus-visible`).
 * **ARIA Integrity**: Icon-only buttons must supply a descriptive `aria-label`.
 * **State Indicators**: Async actions require immediate disabled button states and circular loading spinners to prevent double-submit.
@@ -209,6 +224,7 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 ## 8. Security & Defense in Depth (Sentinel's Playbook)
 
 ### 🛡️ Core Security Postulates
+
 * **Input Validation**: Never trust inputs. Validate string bounds, parameter values, and format descriptors at every boundaries.
 * **Secure Error Responses**: Never leak kernel addresses, file paths, or stack traces in userland error responses.
 * **Zero-Secrets Policy**: Absolutely no API keys, credentials, or development passwords should exist in code; feed them via secure environment descriptors or TPM-backed keychain modules.
@@ -222,34 +238,39 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 ### 📢 Daily Distro Tracking - July 13, 2026
 
 #### 📦 1. Arch Linux Upstream: Pacman 7.1.0 Release
+
 * **What's New**:
-  - Downloader sandbox overhaul using **Landlock** and `NO_NEW_PRIVS` to lock down network download processes.
-  - Strict default database and package verification: `SigLevel = Required` is now enforced.
-  - Parallel compilation stripping and reproducible source tarball sorting.
+  * Downloader sandbox overhaul using **Landlock** and `NO_NEW_PRIVS` to lock down network download processes.
+  * Strict default database and package verification: `SigLevel = Required` is now enforced.
+  * Parallel compilation stripping and reproducible source tarball sorting.
 * **Absorption Blueprint for SigmaOS**:
-  - **Landlock integration**: We can adopt the Landlock system call gating model into `sigpkg`'s fetcher module. By pinning the downloader process to allow only the networking socket creation syscalls (`socket`, `connect`, `sendto`, `recvfrom`), we insulate SigmaOS from remote exploits during package downloads.
+  * **Landlock integration**: We can adopt the Landlock system call gating model into `sigpkg`'s fetcher module. By pinning the downloader process to allow only the networking socket creation syscalls (`socket`, `connect`, `sendto`, `recvfrom`), we insulate SigmaOS from remote exploits during package downloads.
 
 #### 📦 2. Debian/Ubuntu Upstream: APT 2.9 & 3.0 UI Paradigm
+
 * **What's New**:
-  - Transitioning to terminal-based columnar grids, structured progress bars, and localized color pallets to improve human parse speeds on heavy package transactions.
+  * Transitioning to terminal-based columnar grids, structured progress bars, and localized color pallets to improve human parse speeds on heavy package transactions.
 * **Absorption Blueprint for SigmaOS**:
-  - **Beautiful CLI output**: Inject APT-style structured columns and color-coded transaction summary reports into `sigpkg`'s CLI interface.
+  * **Beautiful CLI output**: Inject APT-style structured columns and color-coded transaction summary reports into `sigpkg`'s CLI interface.
 
 #### 📦 3. RedHat/Fedora Upstream: DNF5 / Libdnf consolidation
+
 * **What's New**:
-  - DNF5 consolidates all backend operations into a unified, high-performance C++ core, slashing footprint sizes and execution overhead by up to 40%.
+  * DNF5 consolidates all backend operations into a unified, high-performance C++ core, slashing footprint sizes and execution overhead by up to 40%.
 * **Absorption Blueprint for SigmaOS**:
-  - **Unified C-FFI API**: Replicate DNF5's architecture by exposing standard C-FFI hooks from `sigpkg` (such as `sigpkg_create_tx` and `sigpkg_tx_commit`). This allows SigmaOS's multi-language userland services (written in Rust, Nim, and Go) to drive atomic updates with absolute minimum memory footprint.
+  * **Unified C-FFI API**: Replicate DNF5's architecture by exposing standard C-FFI hooks from `sigpkg` (such as `sigpkg_create_tx` and `sigpkg_tx_commit`). This allows SigmaOS's multi-language userland services (written in Rust, Nim, and Go) to drive atomic updates with absolute minimum memory footprint.
 
 #### 📦 4. NixOS Upstream: Functional Evaluation Cache Optimizations
+
 * **What's New**:
-  - Extremely fast evaluation caching for declarative inputs, improving evaluation times on massive system states.
+  * Extremely fast evaluation caching for declarative inputs, improving evaluation times on massive system states.
 * **Absorption Blueprint for SigmaOS**:
-  - **Lockfile Caching**: Implement similar input-hashed caching in `sigpkg`'s resolver. If the input `sigma.toml` has not modified its dependency hashes, the solver bypasses clause generation, speeding up dry-runs to < 5ms.
+  * **Lockfile Caching**: Implement similar input-hashed caching in `sigpkg`'s resolver. If the input `sigma.toml` has not modified its dependency hashes, the solver bypasses clause generation, speeding up dry-runs to < 5ms.
 
 ---
 
 ## 🎯 Proposed Next Steps & Recommendations
+
 1. **PQC Signatures Activation**: Integrate the kernel Dilithium-5 verify hooks directly into the `sigpkg_tx_verify` routine to prevent supply-chain attacks.
 2. **Auto-Rebase CI Integration**: Write a Github Action to automatically rebase all listed feature branches against `main` once daily.
 3. **APT/Pacman Translation Module Tests**: Write concrete mock test harnesses that feed standard `.deb` metadata to verify correct translation to `sigma.toml`.
