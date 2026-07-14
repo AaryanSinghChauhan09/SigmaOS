@@ -1,0 +1,274 @@
+name: AI Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+
+jobs:
+  triage-issues:
+    name: AI Issue Triage
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: AI Issue Triage
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const action = context.payload.action;
+            
+            // Skip if issue is already labeled
+            if (issue.labels.length > 0) {
+              console.log('Issue already has labels, skipping triage');
+              return;
+            }
+            
+            // Analyze issue title and body
+            const title = issue.title.toLowerCase();
+            const body = (issue.body || '').toLowerCase();
+            const content = title + ' ' + body;
+            
+            // Define label rules
+            const rules = [
+              {
+                labels: ['bug'],
+                keywords: ['bug', 'crash', 'error', 'fail', 'broken', 'not working', 'issue', 'problem', 'segfault', 'panic'],
+                priority: 1
+              },
+              {
+                labels: ['enhancement', 'feature-request'],
+                keywords: ['feature', 'enhancement', 'improve', 'add', 'new', 'support', 'implement', 'request'],
+                priority: 2
+              },
+              {
+                labels: ['documentation'],
+                keywords: ['doc', 'documentation', 'readme', 'guide', 'tutorial', 'example', 'explain'],
+                priority: 3
+              },
+              {
+                labels: ['question'],
+                keywords: ['how', 'what', 'why', 'help', 'question', 'ask', 'clarify', 'explain'],
+                priority: 4
+              },
+              {
+                labels: ['performance'],
+                keywords: ['slow', 'performance', 'latency', 'optimize', 'speed', 'benchmark', 'fast'],
+                priority: 2
+              },
+              {
+                labels: ['security'],
+                keywords: ['security', 'vulnerability', 'exploit', 'cve', 'attack', 'hack', 'secure'],
+                priority: 1
+              },
+              {
+                labels: ['driver'],
+                keywords: ['driver', 'gpu', 'network', 'storage', 'audio', 'input', 'hardware', 'device'],
+                priority: 2
+              },
+              {
+                labels: ['kernel'],
+                keywords: ['kernel', 'scheduler', 'memory', 'ipc', 'syscall', 'shard'],
+                priority: 2
+              },
+              {
+                labels: ['userland'],
+                keywords: ['userland', 'shell', 'package', 'desktop', 'application', 'gui'],
+                priority: 2
+              },
+              {
+                labels: ['ai'],
+                keywords: ['ai', 'llm', 'agent', 'automation', 'workflow', 'inference'],
+                priority: 2
+              }
+            ];
+            
+            // Find matching labels
+            const matchedLabels = new Set();
+            let maxPriority = 0;
+            
+            for (const rule of rules) {
+              for (const keyword of rule.keywords) {
+                if (content.includes(keyword)) {
+                  if (rule.priority >= maxPriority) {
+                    maxPriority = rule.priority;
+                    rule.labels.forEach(label => matchedLabels.add(label));
+                  }
+                }
+              }
+            }
+            
+            // Add default label if no matches
+            if (matchedLabels.size === 0) {
+              matchedLabels.add('needs-triage');
+            }
+            
+            // Add labels to issue
+            const labels = Array.from(matchedLabels);
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: labels
+            });
+            
+            console.log(`Added labels: ${labels.join(', ')}`);
+            
+            // Add comment for issues needing more information
+            if (content.length < 50) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `Thank you for opening this issue! 🎉
+
+To help us understand and address this issue better, please provide more information:
+
+- **SigmaOS version**: What version are you running? (\`sigctl version\`)
+- **Hardware**: What hardware are you using?
+- **Steps to reproduce**: How can we reproduce this issue?
+- **Expected behavior**: What did you expect to happen?
+- **Actual behavior**: What actually happened?
+- **Logs**: Any relevant logs or error messages?
+
+Please edit your issue to include this information. We'll review it as soon as possible.`
+              });
+            }
+            
+            // Add comment for security issues
+            if (labels.includes('security')) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `⚠️ **Security Issue Detected**
+
+This issue appears to be related to security. For security vulnerabilities, please follow our [Security Policy](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/SECURITY_POLICY.md) and report vulnerabilities privately to security@sigmaos.dev.
+
+If this is not a security vulnerability, please update the issue title and description to clarify.`
+              });
+              
+              // Remove security label if not confirmed
+              await github.rest.issues.removeLabel({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'security'
+              });
+            }
+
+  assign-maintainer:
+    name: Assign Maintainer
+    needs: triage-issues
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    if: github.event_name == 'issues'
+
+    steps:
+      - name: Assign Maintainer
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            
+            // Define maintainer assignments
+            const maintainers = {
+              'kernel': ['kernel-maintainer'],
+              'driver': ['driver-maintainer'],
+              'userland': ['userland-maintainer'],
+              'ai': ['ai-maintainer'],
+              'security': ['security-maintainer'],
+              'documentation': ['docs-maintainer'],
+              'performance': ['performance-maintainer']
+            };
+            
+            // Find appropriate maintainer
+            let assignee = null;
+            for (const label of labels) {
+              if (maintainers[label]) {
+                assignee = maintainers[label][0];
+                break;
+              }
+            }
+            
+            // Assign if found
+            if (assignee) {
+              await github.rest.issues.addAssignees({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                assignees: [assignee]
+              });
+              console.log(`Assigned to: ${assignee}`);
+            }
+
+  add-to-project:
+    name: Add to Project Board
+    needs: triage-issues
+    runs-on: ubuntu-latest
+    permissions:
+      projects: write
+    if: github.event_name == 'issues'
+
+    steps:
+      - name: Add to Project Board
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            
+            // Define project mappings
+            const projects = {
+              'bug': 'Bug Triage',
+              'enhancement': 'Feature Requests',
+              'feature-request': 'Feature Requests',
+              'documentation': 'Documentation',
+              'question': 'Questions',
+              'performance': 'Performance',
+              'security': 'Security',
+              'driver': 'Drivers',
+              'kernel': 'Kernel',
+              'userland': 'Userland',
+              'ai': 'AI & Automation'
+            };
+            
+            // Find appropriate project
+            let projectName = null;
+            for (const label of labels) {
+              if (projects[label]) {
+                projectName = projects[label];
+                break;
+              }
+            }
+            
+            // Add to project if found (requires project ID configuration)
+            if (projectName) {
+              console.log(`Would add to project: ${projectName}`);
+              // Note: Actual project board integration requires project ID
+              // This is a placeholder for the actual implementation
+            }
+
+  summary:
+    name: Triage Summary
+    needs: [triage-issues, assign-maintainer, add-to-project]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## Issue Triage Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Issue #${{ github.event.issue.number }} has been triaged." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Issue](https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }})" >> $GITHUB_STEP_SUMMARY
