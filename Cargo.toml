@@ -20,6 +20,7 @@ members = [
     "userland/sigma_compositor",
     "userland/sigma_media",
     "userland/sigma_app",
+    "userland/sigma_ml",
 ]
 default-members = ["kernel"]
 

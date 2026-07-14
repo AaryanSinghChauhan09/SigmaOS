@@ -1,0 +1,11 @@
+[package]
+name = "sigma_ml"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Native AI/ML and distributed execution framework for SigmaOS, displacing Keras, Ray, Scikit-Learn, and Applied ML toolkits"
+
+[dependencies]
+# Standard library is available in userland
