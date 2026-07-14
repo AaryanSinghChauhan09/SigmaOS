@@ -24,8 +24,13 @@ Use bitwise inverse logical AND (`_mm_andnot_si128`) instead of direct bitwise A
 
 ## 2026-07-14 - DAG Topological Sort for Service Dependency Resolution
 
-**Learning:** When implementing an init system (`sigma_init`) that models services as a Directed Acyclic Graph, using a Kahn's algorithm with in-degree counting is significantly more performant and debuggable than recursive DFS-based approaches. Kahn's algorithm naturally detects cycles (when the sorted output length doesn't match node count) and provides a deterministic, breadth-first service start order. Crucially, the queue-based approach avoids stack overflows on deeply nested dependency chains that DFS would cause in `no_std` environments.
-**Action:** Prefer Kahn's in-degree algorithm over DFS for topological sorting in service DAGs. Always check `order.len() != nodes.len()` as the canonical cycle detection guard.
+**Learning:** When developing `.Jules` rules or `sigma_init` services, deep dependency trees can cause lock inversions or circular wait conditions if not sorted topologically. Kahn's Algorithm provides a linear-time (`O(V+E)`) approach to resolving dependencies, which guarantees safety and avoids deadlocks during system boot or test executions.
+**Action:** When evaluating a set of dependencies (e.g., in a boot script or package resolution), always perform a topological sort (Kahn's) and fail fast on cycle detection rather than attempting a naive iterative traversal.
+
+## 2026-07-14 - On-Device AI Inference Memory Management (`sigma_ai`)
+
+**Learning:** Running local AI models (like LLMs or ONNX Neural Nets) for a Neural UI inside `sigma_ai` causes massive memory spikes during weight loading. If the OS allocates the weights into the same memory space as active desktop applications, an OOM killer will likely terminate the compositor or the AI engine itself, freezing the UX.
+**Action:** Always map AI model weights using memory-mapped files (`mmap`) rather than loading them strictly into heap RAM. This allows the kernel (`sigma_fs`) to page the weights in and out of the swap/disk dynamically without triggering OOM events.
 
 ## 2026-07-14 - Zero-Copy Ring Buffers for Audio Latency
 

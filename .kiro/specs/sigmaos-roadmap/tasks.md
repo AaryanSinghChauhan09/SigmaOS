@@ -233,17 +233,17 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
 
-  - [ ] 7.8 Write unit tests for Enterprise Dashboard
+  - [x] 7.8 Write unit tests for Enterprise Dashboard
     - Test SSE metric update, disconnection indicator, and exponential backoff timing
     - _Test file: `tests/unit/apps/enterpriseDashboard.test.js`_
 
 
-- [ ] 8. Checkpoint — Phase 2 app tests pass
+- [x] 8. Checkpoint — Phase 2 app tests pass
   - Ensure all Phase 2 unit tests pass and latency assertions are met. Ask the user if questions arise.
 
 
-- [ ] 9. Phase 3 — Platform Features: Zero-Install Sandbox
-  - [ ] 9.1 Implement Go sandbox manager parsing package manifest and building bwrap command (`sigmad-sandbox/main.go`)
+- [x] 9. Phase 3 — Platform Features: Zero-Install Sandbox
+  - [x] 9.1 Implement Go sandbox manager parsing package manifest and building bwrap command (`sigmad-sandbox/main.go`)
     - Define `PackageManifest{Name, Command, Capabilities[]}`; parse from JSON file path argument
     - Build `bwrap` invocation array: `--ro-bind /usr /usr`, `--ro-bind /lib /lib`, `--tmpfs /tmp`, `--unshare-all`, `--die-with-parent`
     - Map capabilities (`network`→`--share-net`, `filesystem.read`→`--ro-bind /home /home`) from manifest
