@@ -11,10 +11,6 @@ name = "sigma-agent-core"
 version = "15.0.0"
 
 [[package]]
-name = "sigma-ai-integration"
-version = "0.1.0"
-
-[[package]]
 name = "sigma-cli"
 version = "15.0.0"
 
@@ -23,19 +19,11 @@ name = "sigma-common"
 version = "0.1.0"
 
 [[package]]
-name = "sigma-control-center"
-version = "0.1.0"
-
-[[package]]
 name = "sigma-coreutils"
 version = "15.0.0"
 
 [[package]]
 name = "sigma-design-system"
-version = "0.1.0"
-
-[[package]]
-name = "sigma-dev-studio"
 version = "0.1.0"
 
 [[package]]
