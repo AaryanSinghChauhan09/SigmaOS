@@ -37,11 +37,11 @@ pub struct SovereignFileSystemZenith {
 }
 
 /// method â€” OOP singleton pattern.
-pub struct method {
+pub struct SigmaFSManager {
     pub initialized: SigmaBool,
 }
 
-impl method {
+impl SigmaFSManager {
     pub const fn new() -> Self {
         Self { initialized: false }
     }
@@ -88,36 +88,56 @@ impl method {
 
 }
 
-static mut INSTANCE: method = method::new();
+static INSTANCE: SigmaFSManager = SigmaFSManager::new();
 
 #[no_mangle]
-pub unsafe extern "C" fn vfs_raw_write_shard() {
-    INSTANCE.initialized = true;
+pub extern "C" fn vfs_raw_write_shard(block_id: u64, data_ptr: *const u8, data_len: usize) -> i32 {
+    if data_ptr.is_null() || data_len == 0 { return -1; }
+    // Placeholder: implement journaling write
+    0
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vfs_init() {
+pub extern "C" fn vfs_init() -> i32 {
     INSTANCE.initialized = true;
+    0
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vfs_write_native() {
-    INSTANCE.initialized = true;
+pub extern "C" fn vfs_write_native(resource_id: u64, data_ptr: *const u8, data_len: usize) -> i32 {
+    if data_ptr.is_null() || data_len == 0 { return -1; }
+    // Placeholder: implement audit write
+    0
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vfs_list() {
-    INSTANCE.initialized = true;
+pub extern "C" fn vfs_list(inode: u64) -> i32 {
+    // Placeholder: list directory
+    0
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vfs_audit() {
-    INSTANCE.initialized = true;
+pub extern "C" fn vfs_audit(operation: u8, resource_id: u64, success: bool) -> i32 {
+    // Placeholder: record audit entry
+    0
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn start_vfs_zenith() {
+pub extern "C" fn start_vfs_zenith() -> i32 {
     INSTANCE.initialized = true;
+    0
+}
+
+#[no_mangle]
+pub extern "C" fn sync_replicas() -> i32 {
+    // Placeholder: sync to replica nodes
+    0
+}
+
+#[no_mangle]
+pub extern "C" fn recover_from_journal() -> i32 {
+    // Placeholder: recover from crash
+    0
 }
 
 
