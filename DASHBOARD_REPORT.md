@@ -253,8 +253,28 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 5. **Distro Absorption Documentation**:
    - Created `WIKI/OSS_Absorption_OSTree.md`, `WIKI/Distro_Absorption_RHEL.md`, and `WIKI/Distro_Absorption_Ubuntu.md`.
 
-## ➡️ Next Recommended Steps (Batch 12)
+## 🛠️ Batch 12 & Core System Absorption Implemented
 
-- Implement `sigma_init` to absorb systemd's service management, socket activation, and dependency ordering.
-- Deepen `sigma_net` with native DHCP client, DNS resolver, and NTP synchronization.
-- Expand `sigpkg` with delta updates and signature verification against a sovereign keyring.
+1. **Systemd Absorption (`sigma_init`)**:
+   - Created native typed `sigma_init` engine.
+   - Introduced `Service` structs, replacing text-based `.service` files.
+   - Implemented `DependencyGraph` for robust DAG-based parallel service launching.
+   - Integrated native Socket Activation, allowing services to launch on-demand.
+
+2. **NetworkManager / DNS / NTP Absorption (`sigma_net`)**:
+   - `dhcp.rs`: Implemented native IPv4 DHCP client for zero-dependency leasing.
+   - `dns.rs`: Implemented internal stub resolver, displacing `systemd-resolved`.
+   - `ntp.rs`: Implemented SNTP client for time sync, displacing `systemd-timesyncd` and `chrony`.
+
+3. **Package Crypto & Delta Updates (`sigpkg`)**:
+   - Integrated strict `Ed25519` signature verification against Sovereign Keyrings.
+   - `delta.rs`: Implemented binary delta patch primitive to displace massive full downloads with efficient diffs.
+
+4. **WIKI Documentation Expansion**:
+   - Added `WIKI/OSS_Absorption_Systemd.md` and `WIKI/OSS_Absorption_NetworkManager.md`.
+
+## ➡️ Next Recommended Steps (Batch 13)
+
+- Merge UI elements and complete Zenith Compositor rendering (`sigma_compositor` + `userland/ui`).
+- Solidify `sigma_app` with native DBus-equivalent IPC (`sigma_ipc`) for application messaging.
+- Package the entire OS into an initial bootable virtual prototype (QEMU target).
