@@ -1,9 +1,12 @@
 /// SigmaOS: cli_main module
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
+/// PERFORMANCE FIX: Replaced unsafe static mut with atomic types for thread safety.
 
 #![no_std]
 #![allow(dead_code)]
+
+use core::sync::atomic::{AtomicBool, Ordering};
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -18,42 +21,43 @@ type SigmaUsize = usize;
 
 // ─── Module: SigmaOS::ForensicEngine ─────────────────────
 
-/// ForensicEngine — OOP singleton pattern.
+/// ForensicEngine — OOP singleton pattern with atomic initialization.
 pub struct ForensicEngine {
-    pub initialized: SigmaBool,
+    pub initialized: AtomicBool,
 }
 
 impl ForensicEngine {
     pub const fn new() -> Self {
-        Self { initialized: false }
+        Self { initialized: AtomicBool::new(false) }
     }
 
-    pub unsafe fn carveFiles(&mut self) {
-        // Migrated: carveFiles
-        self.initialized = true;
+    pub fn carveFiles(&self) {
+        // Migrated: carveFiles - now thread-safe with atomic
+        self.initialized.store(true, Ordering::SeqCst);
     }
 
-    pub unsafe fn print_help(&mut self) {
-        // Migrated: print_help
-        self.initialized = true;
+    pub fn print_help(&self) {
+        // Migrated: print_help - now thread-safe with atomic
+        self.initialized.store(true, Ordering::SeqCst);
     }
 
-    pub unsafe fn main(&mut self) {
-        // Migrated: main
-        self.initialized = true;
+    pub fn main(&self) {
+        // Migrated: main - now thread-safe with atomic
+        self.initialized.store(true, Ordering::SeqCst);
     }
 
 }
 
-static mut INSTANCE: ForensicEngine = ForensicEngine::new();
+// Thread-safe singleton using atomic types (PERFORMANCE FIX)
+static INSTANCE: ForensicEngine = ForensicEngine::new();
 
 #[no_mangle]
-pub unsafe extern "C" fn carveFiles() {
-    INSTANCE.initialized = true;
+pub extern "C" fn carveFiles() {
+    INSTANCE.carveFiles();
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn print_help() {
-    INSTANCE.initialized = true;
+pub extern "C" fn print_help() {
+    INSTANCE.print_help();
 }
 

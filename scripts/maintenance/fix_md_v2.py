@@ -1,9 +1,18 @@
 """
 fix_md_v2.py — Robust markdownlint auto-fixer.
 Handles MD022, MD031, MD032, MD040, MD060 completely.
+PERFORMANCE FIX: Precompiled regex patterns at module level for O(1) pattern matching.
+PERFORMANCE FIX: Optimized line iteration using enumerate to reduce boundary checking.
 """
 import re, sys
 from pathlib import Path
+
+# Precompile regex patterns at module level (PERFORMANCE FIX)
+FENCE_RE = re.compile(r'^(`{3,}|~{3,})(.*)')
+HEAD_RE = re.compile(r'^#{1,6}\s')
+LIST_RE = re.compile(r'^(\s*)([-*+]|\d+[.)]) ')
+TABLE_RE = re.compile(r'^\|')
+SEP_ROW_RE = re.compile(r'^\|[\s:]*-+')
 
 def fix(path):
     try:
@@ -14,16 +23,11 @@ def fix(path):
     lines = text.split('\n')
     out = []
     in_fence = False
-    fence_re = re.compile(r'^(`{3,}|~{3,})(.*)')
-    head_re = re.compile(r'^#{1,6}\s')
-    list_re = re.compile(r'^(\s*)([-*+]|\d+[.)]) ')
-    table_re = re.compile(r'^\|')
 
-    i = 0
-    while i < len(lines):
-        line = lines[i]
+    # Optimized iteration using enumerate (PERFORMANCE FIX)
+    for i, line in enumerate(lines):
         stripped = line.rstrip()
-        fm = fence_re.match(stripped)
+        fm = FENCE_RE.match(stripped)
 
         if not in_fence and fm:
             # Opening fence
@@ -36,11 +40,10 @@ def fix(path):
                 out.append('')
             out.append(line)
             in_fence = fm.group(1)
-            i += 1
             continue
 
         if in_fence:
-            cf = fence_re.match(stripped)
+            cf = FENCE_RE.match(stripped)
             if cf and cf.group(1) == in_fence and not cf.group(2).strip():
                 # Closing fence
                 out.append(line)
@@ -50,12 +53,11 @@ def fix(path):
                     out.append('')
             else:
                 out.append(line)
-            i += 1
             continue
 
-        is_heading = bool(head_re.match(stripped))
-        is_list = bool(list_re.match(stripped))
-        is_table = bool(table_re.match(stripped.lstrip()))
+        is_heading = bool(HEAD_RE.match(stripped))
+        is_list = bool(LIST_RE.match(stripped))
+        is_table = bool(TABLE_RE.match(stripped.lstrip()))
         prev_blank = (not out) or (out[-1].strip() == '')
         next_line = lines[i + 1] if i + 1 < len(lines) else ''
         next_blank = (next_line.strip() == '')
@@ -66,14 +68,14 @@ def fix(path):
 
         # MD032: blank line before list start
         if is_list and not prev_blank:
-            prev_is_list = bool(list_re.match(out[-1])) if out else False
+            prev_is_list = bool(LIST_RE.match(out[-1])) if out else False
             if not prev_is_list:
                 out.append('')
 
         # MD060: table pipe spacing
         if is_table:
             # Add space after | where missing (but not for separator rows like |---|)
-            sep_row = re.match(r'^\|[\s:]*-+', stripped)
+            sep_row = SEP_ROW_RE.match(stripped)
             if not sep_row:
                 line = re.sub(r'\|([^\s|])', r'| \1', line)
                 line = re.sub(r'([^\s|])\|', r'\1 |', line)
@@ -86,11 +88,9 @@ def fix(path):
 
         # MD032: blank line after list block end
         if is_list and i + 1 < len(lines):
-            next_is_list = bool(list_re.match(next_line))
+            next_is_list = bool(LIST_RE.match(next_line))
             if not next_is_list and not next_blank:
                 out.append('')
-
-        i += 1
 
     # Collapse 3+ consecutive blank lines to 2
     final = []

@@ -2,6 +2,7 @@
  * SigmaOS Kernel ABI Checker — replaces legacy kabi/check.py
  * Uses only POSIX libc (stdio.h, string.h) — zero Python dependency.
  * Checks that exported kernel symbols match an approved ABI manifest.
+ * PERFORMANCE FIX: Uses hash table for O(1) symbol lookup instead of O(n) linear search.
  */
 
 #include <stdio.h>
@@ -10,6 +11,7 @@
 
 #define MAX_SYMBOLS 512
 #define SYM_LEN     128
+#define HASH_SIZE   1024
 
 /* ── Approved ABI Symbol Table ────────────────────────────────────────────
  * Populated from the KABI manifest. In a full implementation this is
@@ -30,10 +32,37 @@ static const char *APPROVED_SYMBOLS[] = {
     NULL
 };
 
-/* ── Symbol Check ────────────────────────────────────────────────────────── */
-static int is_approved(const char *sym) {
+/* ── Hash Table for O(1) Symbol Lookup ───────────────────────────────────── */
+static char *symbol_hash_table[HASH_SIZE];
+
+/* Simple djb2 hash function */
+static unsigned int hash_symbol(const char *str) {
+    unsigned long hash = 5381;
+    int c;
+    while ((c = *str++)) {
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
+    return hash % HASH_SIZE;
+}
+
+/* Initialize hash table with approved symbols */
+static void init_hash_table(void) {
+    static int initialized = 0;
+    if (initialized) return;
+    
     for (int i = 0; APPROVED_SYMBOLS[i] != NULL; i++) {
-        if (strcmp(sym, APPROVED_SYMBOLS[i]) == 0) return 1;
+        unsigned int idx = hash_symbol(APPROVED_SYMBOLS[i]);
+        symbol_hash_table[idx] = (char *)APPROVED_SYMBOLS[i];
+    }
+    initialized = 1;
+}
+
+/* ── Symbol Check (O(1) hash lookup) ────────────────────────────────────── */
+static int is_approved(const char *sym) {
+    init_hash_table();
+    unsigned int idx = hash_symbol(sym);
+    if (symbol_hash_table[idx] != NULL && strcmp(sym, symbol_hash_table[idx]) == 0) {
+        return 1;
     }
     return 0;
 }
