@@ -54,7 +54,7 @@ impl WorkflowStep for SimpleWorkflowStep {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    
+
     fn execute(&mut self) -> Result<Vec<u8>, WorkflowError> {
         self.completed.store(1, Ordering::SeqCst);
         let mut output = Vec::new();
@@ -68,7 +68,7 @@ impl WorkflowStep for SimpleWorkflowStep {
         output.push(b'e');
         Ok(output)
     }
-    
+
     fn is_complete(&self) -> bool { self.completed.load(Ordering::SeqCst) == 1 }
 }
 
@@ -111,16 +111,16 @@ impl Workflow for SimpleWorkflow {
         &self.name[..len]
     }
     fn state(&self) -> WorkflowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn add_step(&mut self, step: Box<dyn WorkflowStep>) -> Result<(), WorkflowError> {
         self.steps.push(Some(step));
         Ok(())
     }
-    
+
     fn execute(&mut self) -> Result<Vec<u8>, WorkflowError> {
         self.state.store(WorkflowState::Active as usize, Ordering::SeqCst);
         let mut results = Vec::new();
-        
+
         for step_option in &mut self.steps {
             if let Some(ref mut step) = *step_option {
                 match step.execute() {
@@ -135,7 +135,7 @@ impl Workflow for SimpleWorkflow {
                 }
             }
         }
-        
+
         self.state.store(WorkflowState::Completed as usize, Ordering::SeqCst);
         Ok(results)
     }
@@ -172,7 +172,7 @@ impl SimpleTrigger {
 impl Trigger for SimpleTrigger {
     fn id(&self) -> usize { self.id }
     fn check(&self) -> bool { self.condition.load(Ordering::SeqCst) == 1 }
-    
+
     fn fire(&mut self) -> Result<Vec<u8>, WorkflowError> {
         self.condition.store(0, Ordering::SeqCst);
         let mut output = Vec::new();
@@ -219,15 +219,15 @@ impl WorkflowEngine for SimpleWorkflowEngine {
         self.workflows.push(Some(workflow));
         Ok(id)
     }
-    
+
     fn add_trigger(&mut self, workflow_id: WorkflowID, trigger: Box<dyn Trigger>) -> Result<(), WorkflowError> {
         self.triggers.push((workflow_id, Some(trigger)));
         Ok(())
     }
-    
+
     fn process_triggers(&mut self) -> Vec<WorkflowID> {
         let mut triggered_workflows = Vec::new();
-        
+
         for &(workflow_id, ref trigger_option) in &mut self.triggers {
             if let Some(ref mut trigger) = *trigger_option {
                 if trigger.check() {
@@ -235,10 +235,10 @@ impl WorkflowEngine for SimpleWorkflowEngine {
                 }
             }
         }
-        
+
         triggered_workflows
     }
-    
+
     fn execute_workflow(&mut self, workflow_id: WorkflowID) -> Result<Vec<u8>, WorkflowError> {
         for workflow_option in &mut self.workflows {
             if let Some(ref mut workflow) = *workflow_option {
@@ -277,11 +277,11 @@ impl Scheduler for SimpleScheduler {
         self.scheduled.push((workflow_id, current_time, execute_time));
         Ok(())
     }
-    
+
     fn check_scheduled(&mut self) -> Vec<WorkflowID> {
         let mut ready = Vec::new();
         let current_time = 1000000u64;
-        
+
         let mut i = 0;
         while i < self.scheduled.len() {
             if self.scheduled[i].2 <= current_time {
@@ -291,10 +291,10 @@ impl Scheduler for SimpleScheduler {
                 i += 1;
             }
         }
-        
+
         ready
     }
-    
+
     fn cancel_schedule(&mut self, workflow_id: WorkflowID) -> Result<(), WorkflowError> {
         for i in 0..self.scheduled.len() {
             if self.scheduled[i].0 == workflow_id {

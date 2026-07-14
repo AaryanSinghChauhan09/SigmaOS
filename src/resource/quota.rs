@@ -51,15 +51,15 @@ impl Quota for SimpleQuota {
     fn resource_type(&self) -> ResourceType { unsafe { core::mem::transmute(self.resource_type.load(Ordering::SeqCst)) } }
     fn limit(&self) -> u64 { self.limit.load(Ordering::SeqCst) as u64 }
     fn usage(&self) -> u64 { self.usage.load(Ordering::SeqCst) as u64 }
-    
+
     fn set_limit(&mut self, limit: u64) {
         self.limit.store(limit as usize, Ordering::SeqCst);
     }
-    
+
     fn add_usage(&mut self, amount: u64) -> Result<(), QuotaError> {
         let current = self.usage.load(Ordering::SeqCst);
         let limit = self.limit.load(Ordering::SeqCst);
-        
+
         if current + amount as usize > limit {
             Err(QuotaError::Exceeded)
         } else {
@@ -99,7 +99,7 @@ impl QuotaManager for SimpleQuotaManager {
         self.quotas.push(Some(Box::new(quota)));
         Ok(id)
     }
-    
+
     fn delete_quota(&mut self, id: QuotaID) -> Result<(), QuotaError> {
         for quota_option in &mut self.quotas {
             if let Some(ref quota) = *quota_option {
@@ -110,7 +110,7 @@ impl QuotaManager for SimpleQuotaManager {
         }
         Err(QuotaError::NotFound)
     }
-    
+
     fn get_quota(&self, id: QuotaID) -> Option<&dyn Quota> {
         for quota_option in &self.quotas {
             if let Some(ref quota) = *quota_option {
@@ -119,12 +119,12 @@ impl QuotaManager for SimpleQuotaManager {
         }
         None
     }
-    
+
     fn check_quota(&self, id: QuotaID, amount: u64) -> Result<(), QuotaError> {
         if let Some(quota) = self.get_quota(id) {
             let current = quota.usage();
             let limit = quota.limit();
-            
+
             if current + amount > limit {
                 Err(QuotaError::Exceeded)
             } else {
@@ -134,7 +134,7 @@ impl QuotaManager for SimpleQuotaManager {
             Err(QuotaError::NotFound)
         }
     }
-    
+
     fn reset_usage(&mut self, id: QuotaID) -> Result<(), QuotaError> {
         for quota_option in &mut self.quotas {
             if let Some(ref mut quota) = *quota_option {
@@ -175,7 +175,7 @@ impl ResourceEnforcer for SimpleResourceEnforcer {
         }
         Err(QuotaError::NotFound)
     }
-    
+
     fn get_usage(&self, resource_type: ResourceType) -> u64 {
         for quota_option in &self.manager.quotas {
             if let Some(ref quota) = *quota_option {

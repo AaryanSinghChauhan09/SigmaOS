@@ -62,21 +62,21 @@ impl Service for SimpleService {
     }
     fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
-    
+
     fn start(&mut self) -> Result<(), InitError> {
         self.state.store(ServiceState::Starting as usize, Ordering::SeqCst);
         self.state.store(ServiceState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn stop(&mut self) -> Result<(), InitError> {
         self.state.store(ServiceState::Stopping as usize, Ordering::SeqCst);
         self.state.store(ServiceState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn restart(&mut self) -> Result<(), InitError> {
         self.stop()?;
         self.start()?;
@@ -107,11 +107,11 @@ impl SigmaInit {
             parallel_startup: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn enable_parallel_startup(&mut self) {
         self.parallel_startup.store(1, Ordering::SeqCst);
     }
-    
+
     pub fn disable_parallel_startup(&mut self) {
         self.parallel_startup.store(0, Ordering::SeqCst);
     }
@@ -123,7 +123,7 @@ impl InitSystem for SigmaInit {
         self.services.push(Some(service));
         Ok(id)
     }
-    
+
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError> {
         for svc_option in &mut self.services {
             if let Some(ref mut svc) = *svc_option {
@@ -138,7 +138,7 @@ impl InitSystem for SigmaInit {
         }
         Err(InitError::ServiceNotFound)
     }
-    
+
     fn stop_service(&mut self, id: ServiceID) -> Result<(), InitError> {
         for svc_option in &mut self.services {
             if let Some(ref mut svc) = *svc_option {
@@ -149,7 +149,7 @@ impl InitSystem for SigmaInit {
         }
         Err(InitError::ServiceNotFound)
     }
-    
+
     fn get_service(&self, id: ServiceID) -> Option<&dyn Service> {
         for svc_option in &self.services {
             if let Some(ref svc) = *svc_option {
@@ -158,7 +158,7 @@ impl InitSystem for SigmaInit {
         }
         None
     }
-    
+
     fn get_all_services(&self) -> Vec<ServiceID> {
         let mut ids = Vec::new();
         for svc_option in &self.services {
@@ -188,26 +188,26 @@ impl DependencyResolver for SimpleDependencyResolver {
     fn resolve_startup_order(&self, services: &[ServiceID]) -> Result<Vec<ServiceID>, InitError> {
         let mut order = Vec::new();
         let mut visited = Vec::new();
-        
+
         for &id in services {
             if !visited.contains(&id) {
                 self.visit(id, &mut order, &mut visited)?;
             }
         }
-        
+
         Ok(order)
     }
-    
+
     fn detect_cycles(&self, services: &[ServiceID]) -> bool {
         let mut visited = Vec::new();
         let mut rec_stack = Vec::new();
-        
+
         for &id in services {
             if self.has_cycle(id, &mut visited, &mut rec_stack) {
                 return true;
             }
         }
-        
+
         false
     }
 }
@@ -217,23 +217,23 @@ impl SimpleDependencyResolver {
         if visited.contains(&id) {
             return Ok(());
         }
-        
+
         visited.push(id);
-        
+
         if let Some(svc) = self.init.get_service(id) {
             for dep_id in svc.dependencies() {
                 self.visit(dep_id, order, visited)?;
             }
         }
-        
+
         order.push(id);
         Ok(())
     }
-    
+
     fn has_cycle(&self, id: ServiceID, visited: &mut Vec<ServiceID>, rec_stack: &mut Vec<ServiceID>) -> bool {
         visited.push(id);
         rec_stack.push(id);
-        
+
         if let Some(svc) = self.init.get_service(id) {
             for dep_id in svc.dependencies() {
                 if !visited.contains(&dep_id) {
@@ -245,7 +245,7 @@ impl SimpleDependencyResolver {
                 }
             }
         }
-        
+
         rec_stack.pop();
         false
     }
@@ -282,14 +282,14 @@ impl ServiceMonitor for SimpleServiceMonitor {
         self.monitored.push(id);
         Ok(())
     }
-    
+
     fn auto_restart(&mut self, id: ServiceID) -> Result<(), InitError> {
         if self.auto_restart_enabled.load(Ordering::SeqCst) == 0 {
             return Err(InitError::StartFailed);
         }
         self.init.restart_service(id)
     }
-    
+
     fn get_service_status(&self, id: ServiceID) -> Option<ServiceState> {
         self.init.get_service(id).map(|svc| svc.state())
     }

@@ -53,21 +53,21 @@ impl Builder for SimpleBuilder {
     fn id(&self) -> BuilderID { self.id }
     fn architecture(&self) -> Architecture { unsafe { core::mem::transmute(self.architecture.load(Ordering::SeqCst)) } }
     fn state(&self) -> BuilderState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn start_build(&mut self, target: &[u8]) -> Result<(), BuildError> {
         if self.state.load(Ordering::SeqCst) != BuilderState::Idle as usize {
             return Err(BuildError::BuilderBusy);
         }
-        
+
         let len = target.len().min(127);
         for i in 0..len {
             self.current_target[i] = target[i];
         }
-        
+
         self.state.store(BuilderState::Building as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn get_status(&self) -> BuilderState { self.state() }
 }
 
@@ -94,14 +94,14 @@ impl SimpleBuildFarm {
             build_queue: Vec::new(),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let builder1 = SimpleBuilder::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::X86_64);
         self.builders.push(Some(Box::new(builder1)));
-        
+
         let builder2 = SimpleBuilder::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::ARM64);
         self.builders.push(Some(Box::new(builder2)));
-        
+
         let builder3 = SimpleBuilder::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::RISCV64);
         self.builders.push(Some(Box::new(builder3)));
     }
@@ -113,7 +113,7 @@ impl BuildFarm for SimpleBuildFarm {
         self.builders.push(Some(builder));
         Ok(id)
     }
-    
+
     fn remove_builder(&mut self, id: BuilderID) -> Result<(), BuildError> {
         for builder_option in &mut self.builders {
             if let Some(ref builder) = *builder_option {
@@ -124,7 +124,7 @@ impl BuildFarm for SimpleBuildFarm {
         }
         Err(BuildError::InvalidTarget)
     }
-    
+
     fn get_builder(&self, id: BuilderID) -> Option<&dyn Builder> {
         for builder_option in &self.builders {
             if let Some(ref builder) = *builder_option {
@@ -133,7 +133,7 @@ impl BuildFarm for SimpleBuildFarm {
         }
         None
     }
-    
+
     fn find_idle_builder(&self, architecture: Architecture) -> Option<BuilderID> {
         for builder_option in &self.builders {
             if let Some(ref builder) = *builder_option {
@@ -144,7 +144,7 @@ impl BuildFarm for SimpleBuildFarm {
         }
         None
     }
-    
+
     fn queue_build(&mut self, target: &[u8], architecture: Architecture) -> Result<(), BuildError> {
         let mut target_array = [0u8; 128];
         let target_len = target.len().min(127);
@@ -197,9 +197,9 @@ impl BuildScheduler for SimpleBuildScheduler {
         }
         Ok(())
     }
-    
+
     fn get_queue_size(&self) -> usize { self.farm.build_queue.len() }
-    
+
     fn get_active_builds(&self) -> Vec<BuilderID> {
         let mut active = Vec::new();
         for builder_option in &self.farm.builders {
@@ -242,7 +242,7 @@ impl BuildArtifact for SimpleBuildArtifact {
         self.artifacts.push((builder_id, artifact_array));
         Ok(())
     }
-    
+
     fn retrieve_artifact(&self, builder_id: BuilderID) -> Option<&[u8]> {
         for &(id, ref artifact) in &self.artifacts {
             if id == builder_id {
@@ -252,7 +252,7 @@ impl BuildArtifact for SimpleBuildArtifact {
         }
         None
     }
-    
+
     fn list_artifacts(&self) -> Vec<BuilderID> {
         let mut ids = Vec::new();
         for &(id, _) in &self.artifacts {

@@ -64,7 +64,7 @@ impl RFC for SimpleRFC {
         &self.author[..len]
     }
     fn status(&self) -> RFCStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
-    
+
     fn set_status(&mut self, status: RFCStatus) -> Result<(), GovernanceError> {
         self.status.store(status as usize, Ordering::SeqCst);
         Ok(())
@@ -99,7 +99,7 @@ impl RFCRepository for SimpleRFCRepository {
         self.rfcs.push(Some(rfc));
         Ok(id)
     }
-    
+
     fn get(&self, id: RFCID) -> Option<&dyn RFC> {
         for rfc_option in &self.rfcs {
             if let Some(ref rfc) = *rfc_option {
@@ -108,7 +108,7 @@ impl RFCRepository for SimpleRFCRepository {
         }
         None
     }
-    
+
     fn list_by_status(&self, status: RFCStatus) -> Vec<RFCID> {
         let mut ids = Vec::new();
         for rfc_option in &self.rfcs {
@@ -120,7 +120,7 @@ impl RFCRepository for SimpleRFCRepository {
         }
         ids
     }
-    
+
     fn list_by_author(&self, author: &[u8]) -> Vec<RFCID> {
         let mut ids = Vec::new();
         for rfc_option in &self.rfcs {
@@ -163,11 +163,11 @@ impl VotingSystem for SimpleVotingSystem {
         self.votes.push((rfc_id, voter_array, vote));
         Ok(())
     }
-    
+
     fn get_vote_count(&self, rfc_id: RFCID) -> (usize, usize) {
         let mut for_votes = 0;
         let mut against_votes = 0;
-        
+
         for &(id, _, vote) in &self.votes {
             if id == rfc_id {
                 if vote {
@@ -177,10 +177,10 @@ impl VotingSystem for SimpleVotingSystem {
                 }
             }
         }
-        
+
         (for_votes, against_votes)
     }
-    
+
     fn has_voted(&self, rfc_id: RFCID, voter: &[u8]) -> bool {
         for &(id, ref v, _) in &self.votes {
             if id == rfc_id {
@@ -227,7 +227,7 @@ impl ContributorProgram for SimpleContributorProgram {
         self.contributors.push((name_array, email_array, Vec::new()));
         Ok(id)
     }
-    
+
     fn add_contribution(&mut self, contributor_id: usize, contribution: &[u8]) -> Result<(), GovernanceError> {
         if contributor_id > 0 && contributor_id <= self.contributors.len() {
             let mut contrib_array = [0u8; 256];
@@ -239,7 +239,7 @@ impl ContributorProgram for SimpleContributorProgram {
             Err(GovernanceError::NotFound)
         }
     }
-    
+
     fn get_contributions(&self, contributor_id: usize) -> Vec<&[u8]> {
         if contributor_id > 0 && contributor_id <= self.contributors.len() {
             let mut contributions = Vec::new();
@@ -281,21 +281,21 @@ impl CommunityGovernance for SimpleCommunityGovernance {
         let rfc = SimpleRFC::new(id, title, author);
         self.repository.submit(Box::new(rfc))
     }
-    
+
     fn vote_on_rfc(&mut self, rfc_id: RFCID, voter: &[u8], vote: bool) -> Result<(), GovernanceError> {
         self.voting.cast_vote(rfc_id, voter, vote)
     }
-    
+
     fn finalize_rfc(&mut self, rfc_id: RFCID) -> Result<(), GovernanceError> {
         let (for_votes, against_votes) = self.voting.get_vote_count(rfc_id);
-        
+
         if for_votes > against_votes {
             if let Some(rfc) = self.repository.get(rfc_id) {
                 let mut rfc_status = RFCStatus::Accepted;
                 return rfc.set_status(rfc_status);
             }
         }
-        
+
         Err(GovernanceError::InvalidState)
     }
 }

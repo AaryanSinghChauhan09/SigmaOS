@@ -51,11 +51,11 @@ impl Breakpoint for SimpleBreakpoint {
     fn address(&self) -> usize { self.address.load(Ordering::SeqCst) }
     fn breakpoint_type(&self) -> BreakpointType { unsafe { core::mem::transmute(self.breakpoint_type.load(Ordering::SeqCst)) } }
     fn is_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
-    
+
     fn enable(&mut self) {
         self.enabled.store(1, Ordering::SeqCst);
     }
-    
+
     fn disable(&mut self) {
         self.enabled.store(0, Ordering::SeqCst);
     }
@@ -94,7 +94,7 @@ impl Debugger for SimpleDebugger {
         self.breakpoints.push(Some(Box::new(breakpoint)));
         Ok(id)
     }
-    
+
     fn remove_breakpoint(&mut self, id: BreakpointID) -> Result<(), DebuggerError> {
         for breakpoint_option in &mut self.breakpoints {
             if let Some(ref breakpoint) = *breakpoint_option {
@@ -105,7 +105,7 @@ impl Debugger for SimpleDebugger {
         }
         Err(DebuggerError::NotFound)
     }
-    
+
     fn get_breakpoint(&self, id: BreakpointID) -> Option<&dyn Breakpoint> {
         for breakpoint_option in &self.breakpoints {
             if let Some(ref breakpoint) = *breakpoint_option {
@@ -114,7 +114,7 @@ impl Debugger for SimpleDebugger {
         }
         None
     }
-    
+
     fn hit_breakpoint(&self, address: usize) -> Option<BreakpointID> {
         for breakpoint_option in &self.breakpoints {
             if let Some(ref breakpoint) = *breakpoint_option {
@@ -125,12 +125,12 @@ impl Debugger for SimpleDebugger {
         }
         None
     }
-    
+
     fn step(&mut self) -> Result<(), DebuggerError> {
         self.stopped.store(0, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn continue_execution(&mut self) -> Result<(), DebuggerError> {
         self.stopped.store(0, Ordering::SeqCst);
         Ok(())
@@ -166,7 +166,7 @@ impl RegisterViewer for SimpleRegisterViewer {
             Err(DebuggerError::NotFound)
         }
     }
-    
+
     fn write_register(&mut self, register_id: usize, value: u64) -> Result<(), DebuggerError> {
         if register_id < self.registers.len() {
             self.registers[register_id] = value;
@@ -175,7 +175,7 @@ impl RegisterViewer for SimpleRegisterViewer {
             Err(DebuggerError::NotFound)
         }
     }
-    
+
     fn list_registers(&self) -> Vec<usize> {
         let mut ids = Vec::new();
         for i in 0..self.registers.len() {

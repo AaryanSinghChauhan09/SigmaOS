@@ -85,7 +85,7 @@ impl TPMOperations for SimpleTPMOperations {
         }
         Ok(key)
     }
-    
+
     fn seal_data(&mut self, _tpm_id: TPMID, data: &[u8]) -> Result<Vec<u8>, TPMError> {
         let mut sealed = Vec::new();
         for &byte in data {
@@ -93,7 +93,7 @@ impl TPMOperations for SimpleTPMOperations {
         }
         Ok(sealed)
     }
-    
+
     fn unseal_data(&mut self, _tpm_id: TPMID, sealed: &[u8]) -> Result<Vec<u8>, TPMError> {
         let mut data = Vec::new();
         for &byte in sealed {
@@ -101,7 +101,7 @@ impl TPMOperations for SimpleTPMOperations {
         }
         Ok(data)
     }
-    
+
     fn measure_boot(&mut self, _tpm_id: TPMID, _pcr: u8, _data: &[u8]) -> Result<(), TPMError> {
         Ok(())
     }
@@ -133,7 +133,7 @@ impl Attestation for SimpleAttestation {
         attestation.push(0xBB);
         Ok(attestation)
     }
-    
+
     fn verify_attestation(&self, attestation: &[u8], nonce: &[u8]) -> Result<bool, TPMError> {
         if attestation.len() >= 2 && attestation[attestation.len() - 2] == 0xAA {
             Ok(true)

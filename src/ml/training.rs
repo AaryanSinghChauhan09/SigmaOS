@@ -76,11 +76,11 @@ impl SimpleOptimizer {
 impl Optimizer for SimpleOptimizer {
     fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst)) } }
     fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
-    
+
     fn set_learning_rate(&mut self, rate: f32) {
         self.learning_rate.store((rate * 10000.0) as usize, Ordering::SeqCst);
     }
-    
+
     fn update(&mut self, weights: &mut [f32], gradients: &[f32]) {
         let lr = self.learning_rate();
         for i in 0..weights.len().min(gradients.len()) {
@@ -119,33 +119,33 @@ impl Trainer for SimpleTrainer {
         self.sessions.push(Some(Box::new(session)));
         Ok(id)
     }
-    
+
     fn train_step(&mut self, session_id: TrainingID, inputs: &[f32], targets: &[f32]) -> Result<(), TrainingError> {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == session_id {
                     let epoch = session.epoch.fetch_add(1, Ordering::SeqCst);
-                    
+
                     let mut loss: f32 = 0.0;
                     for i in 0..inputs.len().min(targets.len()) {
                         let diff = inputs[i] - targets[i];
                         loss += diff * diff;
                     }
                     loss /= inputs.len() as f32;
-                    
+
                     session.loss.store((loss * 10000.0) as usize, Ordering::SeqCst);
-                    
+
                     if epoch >= 1000 {
                         session.complete.store(1, Ordering::SeqCst);
                     }
-                    
+
                     return Ok(());
                 }
             }
         }
         Err(TrainingError::InvalidData)
     }
-    
+
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
         for session_option in &self.sessions {
             if let Some(ref session) = *session_option {
@@ -181,29 +181,29 @@ impl SimpleDataLoader {
 
 impl DataLoader for SimpleDataLoader {
     fn batch_size(&self) -> usize { self.batch_size.load(Ordering::SeqCst) }
-    
+
     fn next_batch(&mut self) -> Option<(Vec<f32>, Vec<f32>)> {
         let batch_size = self.batch_size();
         let start = self.index.load(Ordering::SeqCst);
-        
+
         if start >= self.data.len() {
             return None;
         }
-        
+
         let end = (start + batch_size).min(self.data.len());
         self.index.store(end, Ordering::SeqCst);
-        
+
         let mut inputs = Vec::new();
         let mut targets = Vec::new();
-        
+
         for i in start..end {
             inputs.push(self.data[i].0);
             targets.push(self.data[i].1);
         }
-        
+
         Some((inputs, targets))
     }
-    
+
     fn reset(&mut self) {
         self.index.store(0, Ordering::SeqCst);
     }

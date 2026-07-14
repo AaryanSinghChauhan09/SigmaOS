@@ -43,9 +43,9 @@ impl KeyboardDevice for SimpleKeyboardDevice {
     fn read_key(&mut self) -> Option<(KeyCode, KeyState)> {
         None
     }
-    
+
     fn get_modifiers(&self) -> u8 { self.modifiers.load(Ordering::SeqCst) as u8 }
-    
+
     fn set_leds(&mut self, caps: bool, num: bool, scroll: bool) {
         let mut leds = 0;
         if caps { leds |= 1; }
@@ -88,7 +88,7 @@ impl KeyMapper for SimpleKeyMapper {
             _ => '\0',
         }
     }
-    
+
     fn set_layout(&mut self, layout: &[u8]) {
         let mut layout_array = [0u8; 32];
         let layout_len = layout.len().min(31);
@@ -128,7 +128,7 @@ impl InputBuffer for SimpleInputBuffer {
             self.buffer.push(key);
         }
     }
-    
+
     fn pop_key(&mut self) -> Option<char> {
         if !self.buffer.is_empty() {
             Some(self.buffer.remove(0))
@@ -136,7 +136,7 @@ impl InputBuffer for SimpleInputBuffer {
             None
         }
     }
-    
+
     fn peek_key(&self) -> Option<char> {
         if !self.buffer.is_empty() {
             Some(self.buffer[0])
@@ -144,7 +144,7 @@ impl InputBuffer for SimpleInputBuffer {
             None
         }
     }
-    
+
     fn is_empty(&self) -> bool { self.buffer.is_empty() }
 }
 
@@ -172,7 +172,7 @@ impl KeyboardHandler for SimpleKeyboardHandler {
             callback(key, state, modifiers);
         }
     }
-    
+
     fn register_callback(&mut self, callback: fn(KeyCode, KeyState, u8)) {
         self.callbacks.push(callback);
     }

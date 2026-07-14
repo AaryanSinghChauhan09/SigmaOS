@@ -64,7 +64,7 @@ impl ClusterNode for SimpleClusterNode {
         &self.ip_address[..len]
     }
     fn state(&self) -> NodeState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn set_state(&mut self, state: NodeState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -101,7 +101,7 @@ impl ClusterManager for SimpleClusterManager {
         self.nodes.push(Some(node));
         Ok(id)
     }
-    
+
     fn remove_node(&mut self, id: NodeID) -> Result<(), ClusterError> {
         for node_option in &mut self.nodes {
             if let Some(ref node) = *node_option {
@@ -112,7 +112,7 @@ impl ClusterManager for SimpleClusterManager {
         }
         Err(ClusterError::NotFound)
     }
-    
+
     fn get_node(&self, id: NodeID) -> Option<&dyn ClusterNode> {
         for node_option in &self.nodes {
             if let Some(ref node) = *node_option {
@@ -121,7 +121,7 @@ impl ClusterManager for SimpleClusterManager {
         }
         None
     }
-    
+
     fn list_nodes(&self) -> Vec<NodeID> {
         let mut ids = Vec::new();
         for node_option in &self.nodes {
@@ -131,7 +131,7 @@ impl ClusterManager for SimpleClusterManager {
         }
         ids
     }
-    
+
     fn elect_leader(&mut self) -> Result<NodeID, ClusterError> {
         if !self.nodes.is_empty() {
             if let Some(ref node) = *self.nodes[0] {
@@ -175,7 +175,7 @@ impl Consensus for SimpleConsensus {
         self.proposals.push((id, value_array, Vec::new()));
         Ok(())
     }
-    
+
     fn vote(&mut self, proposal_id: usize, accept: bool) -> Result<(), ClusterError> {
         for proposal in &mut self.proposals {
             if proposal.0 == proposal_id {
@@ -185,7 +185,7 @@ impl Consensus for SimpleConsensus {
         }
         Err(ClusterError::NotFound)
     }
-    
+
     fn get_consensus(&self) -> Option<&[u8]> {
         for proposal in &self.proposals {
             let accepts = proposal.2.iter().filter(|&&v| v).count();

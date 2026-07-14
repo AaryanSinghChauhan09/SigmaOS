@@ -38,12 +38,12 @@ impl SimpleSigningKey {
     pub fn new(id: KeyID, algorithm: SignatureAlgorithm) -> Self {
         let mut public = [0u8; 64];
         let mut private = [0u8; 64];
-        
+
         for i in 0..64 {
             public[i] = ((i * 17 + 31) % 256) as u8;
             private[i] = ((i * 23 + 47) % 256) as u8;
         }
-        
+
         SimpleSigningKey {
             id,
             algorithm: AtomicUsize::new(algorithm as usize),
@@ -57,34 +57,34 @@ impl SigningKey for SimpleSigningKey {
     fn id(&self) -> KeyID { self.id }
     fn algorithm(&self) -> SignatureAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
     fn public_key(&self) -> &[u8] { &self.public_key }
-    
+
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError> {
         let mut signature = Vec::new();
         let mut hash: usize = 0;
-        
+
         for &byte in data {
             hash = hash.wrapping_add(byte as usize);
         }
-        
+
         for i in 0..64 {
             signature.push(((hash + i * 17) % 256) as u8);
         }
-        
+
         Ok(signature)
     }
-    
+
     fn verify(&self, data: &[u8], signature: &[u8]) -> Result<bool, SigningError> {
         let expected = self.sign(data)?;
         if signature.len() != expected.len() {
             return Ok(false);
         }
-        
+
         for i in 0..signature.len() {
             if signature[i] != expected[i] {
                 return Ok(false);
             }
         }
-        
+
         Ok(true)
     }
 }
@@ -114,7 +114,7 @@ impl SimplePackageAttestation {
             keys: Vec::new(),
         }
     }
-    
+
     pub fn add_key(&mut self, key: Box<dyn SigningKey>) {
         self.keys.push(Some(key));
     }
@@ -127,21 +127,21 @@ impl PackageAttestation for SimplePackageAttestation {
                 if key.id() == key_id {
                     let signature = key.sign(package)?;
                     let mut attestation = Vec::new();
-                    
+
                     let header = b"SIGPKG-ATTESTATION";
                     for &byte in header { attestation.push(byte); }
-                    
+
                     for &byte in signature { attestation.push(byte); }
-                    
+
                     for &byte in package { attestation.push(byte); }
-                    
+
                     return Ok(attestation);
                 }
             }
         }
         Err(SigningError::KeyNotFound)
     }
-    
+
     fn verify_attestation(&self, attestation: &[u8], key_id: KeyID) -> Result<bool, SigningError> {
         for key_option in &self.keys {
             if let Some(ref key) = *key_option {
@@ -149,27 +149,27 @@ impl PackageAttestation for SimplePackageAttestation {
                     if attestation.len() < 64 {
                         return Ok(false);
                     }
-                    
+
                     let signature = &attestation[18..82];
                     let package = &attestation[82..];
-                    
+
                     return key.verify(package, signature);
                 }
             }
         }
         Err(SigningError::KeyNotFound)
     }
-    
+
     fn get_provenance(&self, attestation: &[u8]) -> ProvenanceData {
         let mut builder = [0u8; 64];
         let mut source_hash = [0u8; 32];
-        
+
         if attestation.len() >= 82 {
             for i in 0..32.min(attestation.len() - 82) {
                 source_hash[i] = attestation[82 + i];
             }
         }
-        
+
         ProvenanceData {
             builder,
             build_time: 0,
@@ -207,7 +207,7 @@ impl KeyManager for SimpleKeyManager {
         self.keys.push(Some(Box::new(key)));
         Ok(id)
     }
-    
+
     fn revoke_key(&mut self, id: KeyID) -> Result<(), SigningError> {
         for key_option in &mut self.keys {
             if let Some(ref key) = *key_option {
@@ -218,7 +218,7 @@ impl KeyManager for SimpleKeyManager {
         }
         Err(SigningError::KeyNotFound)
     }
-    
+
     fn list_keys(&self) -> Vec<KeyID> {
         let mut ids = Vec::new();
         for key_option in &self.keys {
@@ -258,7 +258,7 @@ impl SupplyChainAttestation for SimpleSupplyChainAttestation {
         }
         self.builders.push((builder_array, key_id));
     }
-    
+
     fn verify_builder(&self, _attestation: &[u8], builder: &[u8]) -> bool {
         for &(ref b, _) in &self.builders {
             let len = b.iter().position(|&byte| byte == 0).unwrap_or(64);
@@ -268,7 +268,7 @@ impl SupplyChainAttestation for SimpleSupplyChainAttestation {
         }
         false
     }
-    
+
     fn get_chain(&self, _package: &[u8]) -> Vec<[u8; 64]> {
         let mut chain = Vec::new();
         for &(ref builder, _) in &self.builders {

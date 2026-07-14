@@ -51,7 +51,7 @@ impl WirelessDevice for SimpleWirelessDevice {
     fn id(&self) -> WirelessDeviceID { self.id }
     fn device_type(&self) -> WirelessType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
     fn mac_address(&self) -> &[u8] { &self.mac_address }
-    
+
     fn scan_networks(&mut self) -> Result<Vec<([u8; 32], i8)>, WirelessError> {
         let mut networks = Vec::new();
         networks.push((*b"SigmaOS-Network", -50));
@@ -88,15 +88,15 @@ impl WiFiConnection for SimpleWiFiConnection {
         self.signal_strength.store(60, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn disconnect(&mut self) -> Result<(), WirelessError> {
         self.connected.store(0, Ordering::SeqCst);
         self.signal_strength.store(0, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
-    
+
     fn get_signal_strength(&self) -> i8 { self.signal_strength.load(Ordering::SeqCst) as i8 }
 }
 
@@ -127,7 +127,7 @@ impl WirelessManager for SimpleWirelessManager {
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn get_device(&self, id: WirelessDeviceID) -> Option<&dyn WirelessDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -136,7 +136,7 @@ impl WirelessManager for SimpleWirelessManager {
         }
         None
     }
-    
+
     fn list_devices(&self) -> Vec<WirelessDeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -173,9 +173,9 @@ impl WirelessSecurity for SimpleWirelessSecurity {
     fn set_security_mode(&mut self, mode: u8) {
         self.security_mode.store(mode as usize, Ordering::SeqCst);
     }
-    
+
     fn get_security_mode(&self) -> u8 { self.security_mode.load(Ordering::SeqCst) as u8 }
-    
+
     fn enable_wpa3(&mut self, enabled: bool) {
         self.wpa3_enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }

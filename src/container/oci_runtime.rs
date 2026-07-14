@@ -59,19 +59,19 @@ impl Container for SimpleContainer {
         &self.name[..len]
     }
     fn state(&self) -> ContainerState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn start(&mut self) -> Result<(), ContainerError> {
         self.state.store(ContainerState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn stop(&mut self) -> Result<(), ContainerError> {
         self.state.store(ContainerState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn pause(&mut self) -> Result<(), ContainerError> {
         if self.state.load(Ordering::SeqCst) != ContainerState::Running as usize {
             return Err(ContainerError::StartFailed);
@@ -79,7 +79,7 @@ impl Container for SimpleContainer {
         self.state.store(ContainerState::Paused as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn resume(&mut self) -> Result<(), ContainerError> {
         if self.state.load(Ordering::SeqCst) != ContainerState::Paused as usize {
             return Err(ContainerError::StartFailed);
@@ -117,7 +117,7 @@ impl OCISpec for SimpleOCISpec {
         self.containers.push(Some(Box::new(container)));
         Ok(id)
     }
-    
+
     fn validate_spec(&self, _spec: &[u8]) -> Result<(), ContainerError> {
         Ok(())
     }
@@ -155,12 +155,12 @@ impl Sandbox for SimpleSandbox {
         self.namespaces.push((container_id, ns_type));
         Ok(())
     }
-    
+
     fn set_cgroup(&mut self, container_id: ContainerID, cpu_limit: usize, mem_limit: usize) -> Result<(), ContainerError> {
         self.cgroups.push((container_id, (cpu_limit, mem_limit)));
         Ok(())
     }
-    
+
     fn set_seccomp(&mut self, container_id: ContainerID, profile: &[u8]) -> Result<(), ContainerError> {
         let mut profile_array = [0u8; 256];
         let len = profile.len().min(255);
@@ -205,11 +205,11 @@ impl ImageManager for SimpleImageManager {
         self.images.push((name_array, digest_array));
         Ok(())
     }
-    
+
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
         self.images.clone()
     }
-    
+
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
         for i in 0..self.images.len() {
             let img_name = &self.images[i].0;
@@ -253,14 +253,14 @@ impl ContainerRuntime for SimpleContainerRuntime {
         self.image_manager.pull_image(image, b"latest")?;
         let spec = name;
         let id = self.oci_spec.create_from_spec(spec)?;
-        
+
         self.sandbox.set_namespace(id, Namespace::PID)?;
         self.sandbox.set_namespace(id, Namespace::Network)?;
         self.sandbox.set_cgroup(id, 100, 512)?;
-        
+
         Ok(id)
     }
-    
+
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
         for container_option in &mut self.oci_spec.containers {
             if let Some(ref mut container) = *container_option {
@@ -271,7 +271,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
         }
         Err(ContainerError::InvalidConfig)
     }
-    
+
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
         for container_option in &mut self.oci_spec.containers {
             if let Some(ref mut container) = *container_option {
@@ -282,7 +282,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
         }
         Err(ContainerError::InvalidConfig)
     }
-    
+
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
         self.stop_container(id)?;
         for i in 0..self.oci_spec.containers.len() {
@@ -295,7 +295,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
         }
         Err(ContainerError::InvalidConfig)
     }
-    
+
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
         for container_option in &self.oci_spec.containers {

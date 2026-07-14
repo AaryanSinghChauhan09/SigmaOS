@@ -93,7 +93,7 @@ impl VolumeManager for SimpleVolumeManager {
         self.volumes.push(Some(Box::new(volume)));
         Ok(id)
     }
-    
+
     fn delete_volume(&mut self, id: VolumeID) -> Result<(), VolumeError> {
         for volume_option in &mut self.volumes {
             if let Some(ref volume) = *volume_option {
@@ -104,7 +104,7 @@ impl VolumeManager for SimpleVolumeManager {
         }
         Err(VolumeError::NotFound)
     }
-    
+
     fn get_volume(&self, id: VolumeID) -> Option<&dyn Volume> {
         for volume_option in &self.volumes {
             if let Some(ref volume) = *volume_option {
@@ -113,7 +113,7 @@ impl VolumeManager for SimpleVolumeManager {
         }
         None
     }
-    
+
     fn mount_volume(&mut self, id: VolumeID) -> Result<(), VolumeError> {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
@@ -125,7 +125,7 @@ impl VolumeManager for SimpleVolumeManager {
         }
         Err(VolumeError::NotFound)
     }
-    
+
     fn unmount_volume(&mut self, id: VolumeID) -> Result<(), VolumeError> {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
@@ -164,7 +164,7 @@ impl SnapshotManager for SimpleSnapshotManager {
         self.snapshots.push((volume_id, snapshot_id));
         Ok(snapshot_id)
     }
-    
+
     fn delete_snapshot(&mut self, snapshot_id: VolumeID) -> Result<(), VolumeError> {
         for i in 0..self.snapshots.len() {
             if self.snapshots[i].1 == snapshot_id {
@@ -174,7 +174,7 @@ impl SnapshotManager for SimpleSnapshotManager {
         }
         Err(VolumeError::NotFound)
     }
-    
+
     fn restore_snapshot(&mut self, _volume_id: VolumeID, _snapshot_id: VolumeID) -> Result<(), VolumeError> {
         Ok(())
     }

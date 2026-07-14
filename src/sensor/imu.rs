@@ -50,18 +50,18 @@ impl SimpleIMUSensor {
 impl IMUSensor for SimpleIMUSensor {
     fn id(&self) -> SensorID { self.id }
     fn sensor_type(&self) -> SensorType { unsafe { core::mem::transmute(self.sensor_type.load(Ordering::SeqCst)) } }
-    
+
     fn read_acceleration(&self) -> (f32, f32, f32) {
         let x = (self.accel_x.load(Ordering::SeqCst) as f32) / 1000.0;
         let y = (self.accel_y.load(Ordering::SeqCst) as f32) / 1000.0;
         let z = (self.accel_z.load(Ordering::SeqCst) as f32) / 1000.0;
         (x, y, z)
     }
-    
+
     fn read_gyroscope(&self) -> (f32, f32, f32) {
         (0.0, 0.0, 0.0)
     }
-    
+
     fn read_magnetometer(&self) -> (f32, f32, f32) {
         (0.0, 0.0, 0.0)
     }
@@ -95,7 +95,7 @@ impl SensorManager for SimpleSensorManager {
         self.sensors.push(Some(sensor));
         Ok(id)
     }
-    
+
     fn remove_sensor(&mut self, id: SensorID) -> Result<(), SensorError> {
         for sensor_option in &mut self.sensors {
             if let Some(ref sensor) = *sensor_option {
@@ -106,7 +106,7 @@ impl SensorManager for SimpleSensorManager {
         }
         Err(SensorError::NotFound)
     }
-    
+
     fn get_sensor(&self, id: SensorID) -> Option<&dyn IMUSensor> {
         for sensor_option in &self.sensors {
             if let Some(ref sensor) = *sensor_option {
@@ -115,7 +115,7 @@ impl SensorManager for SimpleSensorManager {
         }
         None
     }
-    
+
     fn calibrate(&mut self, id: SensorID) -> Result<(), SensorError> {
         for sensor_option in &mut self.sensors {
             if let Some(ref mut sensor) = *sensor_option {
@@ -150,7 +150,7 @@ impl SimpleSensorFusion {
 impl SensorFusion for SimpleSensorFusion {
     fn update(&mut self, _accel: (f32, f32, f32), _gyro: (f32, f32, f32)) {
     }
-    
+
     fn get_orientation(&self) -> (f32, f32, f32) {
         let x = (self.orientation[0].load(Ordering::SeqCst) as f32) / 1000.0 * 3.14159 / 180.0;
         let y = (self.orientation[1].load(Ordering::SeqCst) as f32) / 1000.0 * 3.14159 / 180.0;

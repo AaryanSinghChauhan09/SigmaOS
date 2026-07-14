@@ -89,23 +89,23 @@ impl SimpleCompatibilityMatrix {
             next_id: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let gpu1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x10DE, 0x1C02, b"NVIDIA GeForce RTX 3060", SupportStatus::Supported);
         self.devices.push(Some(Box::new(gpu1)));
-        
+
         let gpu2 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x1002, 0x73DF, b"AMD Radeon RX 6800 XT", SupportStatus::Supported);
         self.devices.push(Some(Box::new(gpu2)));
-        
+
         let wifi1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::WiFi, 0x8086, 0x2723, b"Intel Wi-Fi 6 AX200", SupportStatus::Supported);
         self.devices.push(Some(Box::new(wifi1)));
-        
+
         let wifi2 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::WiFi, 0x168C, 0x003A, b"Realtek RTL8852AE", SupportStatus::Partial);
         self.devices.push(Some(Box::new(wifi2)));
-        
+
         let printer1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::Printer, 0x03F0, 0x4A17, b"HP LaserJet Pro M404n", SupportStatus::Supported);
         self.devices.push(Some(Box::new(printer1)));
-        
+
         let chipset1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::Chipset, 0x8086, 0x1C02, b"Intel Z590", SupportStatus::Supported);
         self.devices.push(Some(Box::new(chipset1)));
     }
@@ -117,7 +117,7 @@ impl CompatibilityMatrix for SimpleCompatibilityMatrix {
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn remove_device(&mut self, id: DeviceID) -> Result<(), ()> {
         for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
@@ -128,7 +128,7 @@ impl CompatibilityMatrix for SimpleCompatibilityMatrix {
         }
         Err(())
     }
-    
+
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -137,7 +137,7 @@ impl CompatibilityMatrix for SimpleCompatibilityMatrix {
         }
         None
     }
-    
+
     fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -148,7 +148,7 @@ impl CompatibilityMatrix for SimpleCompatibilityMatrix {
         }
         None
     }
-    
+
     fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -160,7 +160,7 @@ impl CompatibilityMatrix for SimpleCompatibilityMatrix {
         }
         ids
     }
-    
+
     fn list_supported(&self) -> Vec<DeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -201,7 +201,7 @@ impl DriverManager for SimpleDriverManager {
         self.loaded_drivers.push(device_id);
         Ok(())
     }
-    
+
     fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
         for i in 0..self.loaded_drivers.len() {
             if self.loaded_drivers[i] == device_id {
@@ -211,7 +211,7 @@ impl DriverManager for SimpleDriverManager {
         }
         Err(())
     }
-    
+
     fn get_driver_status(&self, device_id: DeviceID) -> bool {
         self.loaded_drivers.contains(&device_id)
     }
@@ -250,7 +250,7 @@ impl HardwareDiagnostics for SimpleHardwareDiagnostics {
             DiagnosticResult::Unknown
         }
     }
-    
+
     fn run_full_scan(&self) -> Vec<(DeviceID, DiagnosticResult)> {
         let mut results = Vec::new();
         for device_option in &self.matrix.devices {

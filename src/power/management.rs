@@ -108,9 +108,9 @@ impl CPUGovernor for SimpleCPUGovernor {
         }
         Ok(())
     }
-    
+
     fn get_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.current_governor.load(Ordering::SeqCst)) } }
-    
+
     fn set_frequency(&mut self, freq_khz: usize) -> Result<(), PowerError> {
         let max = self.max_freq.load(Ordering::SeqCst);
         let min = self.min_freq.load(Ordering::SeqCst);
@@ -120,7 +120,7 @@ impl CPUGovernor for SimpleCPUGovernor {
         self.current_freq.store(freq_khz, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn get_frequency(&self) -> usize { self.current_freq.load(Ordering::SeqCst) }
 }
 
@@ -150,13 +150,13 @@ impl SimpleThermalManager {
 
 impl ThermalManager for SimpleThermalManager {
     fn get_temperature(&self) -> i32 { self.current_temp.load(Ordering::SeqCst) as i32 }
-    
+
     fn set_threshold(&mut self, temp_celsius: i32) {
         self.critical_threshold.store(temp_celsius as usize, Ordering::SeqCst);
     }
-    
+
     fn get_threshold(&self) -> i32 { self.critical_threshold.load(Ordering::SeqCst) as i32 }
-    
+
     fn is_critical(&self) -> bool {
         self.current_temp.load(Ordering::SeqCst) >= self.critical_threshold.load(Ordering::SeqCst)
     }
@@ -188,16 +188,16 @@ impl SimplePowerManager {
             next_id: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn create_default_profiles(&mut self) {
         let perf_id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let perf_profile = SimplePowerProfile::new(perf_id, b"performance", PowerProfile::Performance, CPUGovernor::Performance);
         self.profiles.push(Some(Box::new(perf_profile)));
-        
+
         let balanced_id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let balanced_profile = SimplePowerProfile::new(balanced_id, b"balanced", PowerProfile::Balanced, CPUGovernor::Ondemand);
         self.profiles.push(Some(Box::new(balanced_profile)));
-        
+
         let powersave_id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let powersave_profile = SimplePowerProfile::new(powersave_id, b"powersave", PowerProfile::PowerSaver, CPUGovernor::Powersave);
         self.profiles.push(Some(Box::new(powersave_profile)));
@@ -210,7 +210,7 @@ impl PowerManager for SimplePowerManager {
         self.profiles.push(Some(profile));
         Ok(id)
     }
-    
+
     fn set_profile(&mut self, id: PowerProfileID) -> Result<(), PowerError> {
         for profile_option in &self.profiles {
             if let Some(ref profile) = *profile_option {
@@ -223,7 +223,7 @@ impl PowerManager for SimplePowerManager {
         }
         Err(PowerError::InvalidProfile)
     }
-    
+
     fn get_profile(&self, id: PowerProfileID) -> Option<&dyn PowerProfile> {
         for profile_option in &self.profiles {
             if let Some(ref profile) = *profile_option {
@@ -232,7 +232,7 @@ impl PowerManager for SimplePowerManager {
         }
         None
     }
-    
+
     fn get_current_profile(&self) -> Option<PowerProfileID> {
         let id = self.current_profile.load(Ordering::SeqCst);
         if id == 0 { None } else { Some(id) }
@@ -269,11 +269,11 @@ impl SimpleBatteryManager {
 
 impl BatteryManager for SimpleBatteryManager {
     fn get_capacity(&self) -> i32 { self.capacity.load(Ordering::SeqCst) as i32 }
-    
+
     fn get_status(&self) -> BatteryStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
-    
+
     fn is_charging(&self) -> bool { self.is_charging_flag.load(Ordering::SeqCst) == 1 }
-    
+
     fn get_time_remaining(&self) -> i32 {
         let capacity = self.capacity.load(Ordering::SeqCst) as i32;
         if capacity <= 0 { return 0; }

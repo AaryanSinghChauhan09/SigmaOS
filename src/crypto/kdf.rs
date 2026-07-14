@@ -42,19 +42,19 @@ impl SimpleKeyDerivation {
 impl KeyDerivation for SimpleKeyDerivation {
     fn id(&self) -> KDFID { self.id }
     fn algorithm(&self) -> KDFAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
-    
+
     fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         let mut derived = Vec::new();
         let mut hash: usize = 0;
-        
+
         for &byte in key { hash = hash.wrapping_add(byte as usize); }
         for &byte in salt { hash = hash.wrapping_add(byte as usize); }
         for &byte in info { hash = hash.wrapping_add(byte as usize); }
-        
+
         for i in 0..length {
             derived.push(((hash + i * 31) % 256) as u8);
         }
-        
+
         Ok(derived)
     }
 }
@@ -77,11 +77,11 @@ impl SimpleKDFManager {
             next_id: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let hkdf = SimpleKeyDerivation::new(self.next_id.fetch_add(1, Ordering::SeqCst), KDFAlgorithm::HKDF_SHA256);
         self.kdfs.push(Some(Box::new(hkdf)));
-        
+
         let pbkdf2 = SimpleKeyDerivation::new(self.next_id.fetch_add(1, Ordering::SeqCst), KDFAlgorithm::PBKDF2);
         self.kdfs.push(Some(Box::new(pbkdf2)));
     }
@@ -93,7 +93,7 @@ impl KDFManager for SimpleKDFManager {
         self.kdfs.push(Some(kdf));
         Ok(id)
     }
-    
+
     fn derive_key(&self, algorithm: KDFAlgorithm, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         for kdf_option in &self.kdfs {
             if let Some(ref kdf) = *kdf_option {
@@ -126,20 +126,20 @@ impl PasswordHashing for SimplePasswordHashing {
     fn hash_password(&self, password: &[u8], salt: &[u8]) -> Result<Vec<u8>, KDFError> {
         self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, b"password", 32)
     }
-    
+
     fn verify_password(&self, password: &[u8], salt: &[u8], hash: &[u8]) -> Result<bool, KDFError> {
         let computed = self.hash_password(password, salt)?;
-        
+
         if computed.len() != hash.len() {
             return Ok(false);
         }
-        
+
         for i in 0..computed.len() {
             if computed[i] != hash[i] {
                 return Ok(false);
             }
         }
-        
+
         Ok(true)
     }
 }

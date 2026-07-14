@@ -87,10 +87,10 @@ impl DeltaGenerator for SimpleDeltaGenerator {
     fn generate_delta(&mut self, old_data: &[u8], new_data: &[u8]) -> Result<PatchID, DeltaError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let mut patch = SimpleDeltaPatch::new(id, b"1.0.0", b"1.1.0");
-        
+
         let mut ops = Vec::new();
         let min_len = old_data.len().min(new_data.len());
-        
+
         for i in 0..min_len {
             if old_data[i] != new_data[i] {
                 let mut op = [0u8; 256];
@@ -100,7 +100,7 @@ impl DeltaGenerator for SimpleDeltaGenerator {
                 ops.push(op);
             }
         }
-        
+
         if new_data.len() > old_data.len() {
             for i in min_len..new_data.len() {
                 let mut op = [0u8; 256];
@@ -110,14 +110,14 @@ impl DeltaGenerator for SimpleDeltaGenerator {
                 ops.push(op);
             }
         }
-        
+
         patch.size.store(ops.len() * 256, Ordering::SeqCst);
         patch.operations = ops;
-        
+
         self.patches.push(Some(Box::new(patch)));
         Ok(id)
     }
-    
+
     fn optimize_delta(&mut self, patch_id: PatchID) -> Result<(), DeltaError> {
         for patch_option in &mut self.patches {
             if let Some(ref mut patch) = *patch_option {
@@ -176,7 +176,7 @@ impl DeltaApplier for SimpleDeltaApplier {
         }
         Err(DeltaError::InvalidPatch)
     }
-    
+
     fn verify_patch(&self, patch_id: PatchID) -> Result<bool, DeltaError> {
         for patch_option in &self.generator.patches {
             if let Some(ref patch) = *patch_option {
@@ -219,7 +219,7 @@ impl BandwidthOptimizer for SimpleBandwidthOptimizer {
         }
         0
     }
-    
+
     fn estimate_download_time(&self, patch_id: PatchID, bandwidth_kbps: usize) -> usize {
         for patch_option in &self.generator.patches {
             if let Some(ref patch) = *patch_option {

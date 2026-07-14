@@ -77,7 +77,7 @@ impl InputDispatcher for SimpleInputDispatcher {
         }
         Ok(())
     }
-    
+
     fn register_handler(&mut self, event_type: InputEventType, handler: fn(&dyn InputEvent)) {
         for &mut (et, ref mut handlers) in &mut self.handlers {
             if et == event_type {
@@ -87,7 +87,7 @@ impl InputDispatcher for SimpleInputDispatcher {
         }
         self.handlers.push((event_type, vec![handler]));
     }
-    
+
     fn get_handlers(&self, event_type: InputEventType) -> Vec<fn(&dyn InputEvent)> {
         for &(et, ref handlers) in &self.handlers {
             if et == event_type {
@@ -125,7 +125,7 @@ impl GestureRecognizer for SimpleGestureRecognizer {
         }
         recognized
     }
-    
+
     fn add_gesture(&mut self, name: &[u8], pattern: Vec<InputEventType>) {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);

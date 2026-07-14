@@ -94,7 +94,7 @@ impl Hypervisor for SimpleHypervisor {
         self.guests.push(Some(Box::new(guest)));
         Ok(id)
     }
-    
+
     fn destroy_guest(&mut self, id: GuestID) -> Result<(), HypervisorError> {
         for guest_option in &mut self.guests {
             if let Some(ref guest) = *guest_option {
@@ -105,7 +105,7 @@ impl Hypervisor for SimpleHypervisor {
         }
         Err(HypervisorError::NotFound)
     }
-    
+
     fn start_guest(&mut self, id: GuestID) -> Result<(), HypervisorError> {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
@@ -117,7 +117,7 @@ impl Hypervisor for SimpleHypervisor {
         }
         Err(HypervisorError::NotFound)
     }
-    
+
     fn stop_guest(&mut self, id: GuestID) -> Result<(), HypervisorError> {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
@@ -129,7 +129,7 @@ impl Hypervisor for SimpleHypervisor {
         }
         Err(HypervisorError::NotFound)
     }
-    
+
     fn pause_guest(&mut self, id: GuestID) -> Result<(), HypervisorError> {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
@@ -141,7 +141,7 @@ impl Hypervisor for SimpleHypervisor {
         }
         Err(HypervisorError::NotFound)
     }
-    
+
     fn resume_guest(&mut self, id: GuestID) -> Result<(), HypervisorError> {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
@@ -183,7 +183,7 @@ impl VMExitHandler for SimpleVMExitHandler {
         }
         Err(HypervisorError::InvalidConfig)
     }
-    
+
     fn register_handler(&mut self, exit_reason: u64, handler: fn(GuestID, u64)) {
         self.handlers.push((exit_reason, handler));
     }

@@ -71,7 +71,7 @@ impl EnclaveOperations for SimpleEnclaveOperations {
         self.enclaves.push(Some(Box::new(enclave)));
         Ok(id)
     }
-    
+
     fn destroy_enclave(&mut self, id: EnclaveID) -> Result<(), EnclaveError> {
         for enclave_option in &mut self.enclaves {
             if let Some(ref enclave) = *enclave_option {
@@ -82,7 +82,7 @@ impl EnclaveOperations for SimpleEnclaveOperations {
         }
         Err(EnclaveError::NotFound)
     }
-    
+
     fn execute(&mut self, enclave_id: EnclaveID, _code: &[u8]) -> Result<Vec<u8>, EnclaveError> {
         for enclave_option in &self.enclaves {
             if let Some(ref enclave) = *enclave_option {
@@ -126,7 +126,7 @@ impl SecureStorage for SimpleSecureStorage {
         self.storage.push((enclave_id, key_array, value_vec));
         Ok(())
     }
-    
+
     fn retrieve_secret(&self, enclave_id: EnclaveID, key: &[u8]) -> Result<Vec<u8>, EnclaveError> {
         for &(id, ref stored_key, ref value) in &self.storage {
             if id == enclave_id {

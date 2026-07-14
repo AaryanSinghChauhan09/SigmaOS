@@ -92,7 +92,7 @@ impl CameraManager for SimpleCameraManager {
         self.cameras.push(Some(camera));
         Ok(id)
     }
-    
+
     fn remove_camera(&mut self, id: CameraID) -> Result<(), CameraError> {
         for camera_option in &mut self.cameras {
             if let Some(ref camera) = *camera_option {
@@ -103,7 +103,7 @@ impl CameraManager for SimpleCameraManager {
         }
         Err(CameraError::NotFound)
     }
-    
+
     fn get_camera(&self, id: CameraID) -> Option<&dyn Camera> {
         for camera_option in &self.cameras {
             if let Some(ref camera) = *camera_option {
@@ -112,23 +112,23 @@ impl CameraManager for SimpleCameraManager {
         }
         None
     }
-    
+
     fn capture_frame(&self, id: CameraID, buffer: &mut [u8]) -> Result<usize, CameraError> {
         if let Some(camera) = self.get_camera(id) {
             let width = camera.width();
             let height = camera.height();
             let frame_size = (width * height * 3) as usize;
-            
+
             for byte in buffer.iter_mut().take(frame_size) {
                 *byte = 128u8;
             }
-            
+
             Ok(frame_size.min(buffer.len()))
         } else {
             Err(CameraError::NotFound)
         }
     }
-    
+
     fn set_format(&mut self, id: CameraID, format: CameraFormat) -> Result<(), CameraError> {
         for camera_option in &mut self.cameras {
             if let Some(ref mut camera) = *camera_option {
@@ -171,7 +171,7 @@ impl VideoRecorder for SimpleVideoRecorder {
         self.recording.push((camera_id, output_array));
         Ok(())
     }
-    
+
     fn stop_recording(&mut self, camera_id: CameraID) -> Result<(), CameraError> {
         for i in 0..self.recording.len() {
             if self.recording[i].0 == camera_id {
@@ -181,7 +181,7 @@ impl VideoRecorder for SimpleVideoRecorder {
         }
         Err(CameraError::NotFound)
     }
-    
+
     fn is_recording(&self, camera_id: CameraID) -> bool {
         for &(id, _) in &self.recording {
             if id == camera_id {

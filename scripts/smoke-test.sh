@@ -22,11 +22,12 @@ TESTS_FAILED=0
 report_test() {
     if [ $1 -eq 0 ]; then
         echo -e "${GREEN}✓${NC} $2"
-        ((TESTS_PASSED++))
+        ((TESTS_PASSED++)) || true
     else
         echo -e "${RED}✗${NC} $2"
-        ((TESTS_FAILED++))
+        ((TESTS_FAILED++)) || true
     fi
+    return 0
 }
 
 # Test 1: Check if critical files exist

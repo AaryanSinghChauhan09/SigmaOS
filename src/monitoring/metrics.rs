@@ -58,7 +58,7 @@ impl Metric for SimpleMetric {
     }
     fn metric_type(&self) -> MetricType { unsafe { core::mem::transmute(self.metric_type.load(Ordering::SeqCst)) } }
     fn value(&self) -> f64 { (self.value.load(Ordering::SeqCst) as f64) / 10000.0 }
-    
+
     fn set_value(&mut self, value: f64) {
         self.value.store((value * 10000.0) as usize, Ordering::SeqCst);
     }
@@ -93,7 +93,7 @@ impl MetricsCollector for SimpleMetricsCollector {
         self.metrics.push(Some(metric));
         Ok(id)
     }
-    
+
     fn unregister_metric(&mut self, id: MetricID) -> Result<(), MetricError> {
         for metric_option in &mut self.metrics {
             if let Some(ref metric) = *metric_option {
@@ -104,7 +104,7 @@ impl MetricsCollector for SimpleMetricsCollector {
         }
         Err(MetricError::NotFound)
     }
-    
+
     fn get_metric(&self, id: MetricID) -> Option<&dyn Metric> {
         for metric_option in &self.metrics {
             if let Some(ref metric) = *metric_option {
@@ -113,7 +113,7 @@ impl MetricsCollector for SimpleMetricsCollector {
         }
         None
     }
-    
+
     fn increment(&mut self, id: MetricID, delta: f64) -> Result<(), MetricError> {
         for metric_option in &mut self.metrics {
             if let Some(ref mut metric) = *metric_option {
@@ -126,7 +126,7 @@ impl MetricsCollector for SimpleMetricsCollector {
         }
         Err(MetricError::NotFound)
     }
-    
+
     fn set(&mut self, id: MetricID, value: f64) -> Result<(), MetricError> {
         for metric_option in &mut self.metrics {
             if let Some(ref mut metric) = *metric_option {
@@ -166,17 +166,17 @@ impl MetricsExporter for SimpleMetricsExporter {
         }
         lines
     }
-    
+
     fn export_prometheus(&self) -> Vec<u8> {
         let mut output = Vec::new();
         for metric_option in &self.collector.metrics {
             if let Some(ref metric) = *metric_option {
                 let name = metric.name();
                 let value = metric.value();
-                
+
                 for &byte in name { output.push(byte); }
                 output.push(b' ');
-                
+
                 let value_str = format_simple(value);
                 for &byte in &value_str { output.push(byte); }
                 output.push(b'\n');
@@ -189,13 +189,13 @@ impl MetricsExporter for SimpleMetricsExporter {
 fn format_simple(value: f64) -> Vec<u8> {
     let int_part = value as i32;
     let frac_part = ((value - int_part as f64) * 1000.0) as i32;
-    
+
     let mut result = Vec::new();
-    
+
     if int_part < 0 {
         result.push(b'-');
     }
-    
+
     let mut n = (int_part as i32).abs();
     if n == 0 {
         result.push(b'0');
@@ -209,7 +209,7 @@ fn format_simple(value: f64) -> Vec<u8> {
             result.push(digits.pop().unwrap());
         }
     }
-    
+
     if frac_part != 0 {
         result.push(b'.');
         let frac_abs = frac_part.abs();
@@ -225,7 +225,7 @@ fn format_simple(value: f64) -> Vec<u8> {
             result.push(digits.pop().unwrap());
         }
     }
-    
+
     result
 }
 

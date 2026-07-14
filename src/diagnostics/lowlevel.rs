@@ -93,12 +93,12 @@ impl SimpleThermalMonitor {
             critical_threshold: AtomicUsize::new(90),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let cpu_temp = SimpleSensor::new(self.next_id.fetch_add(1, Ordering::SeqCst), SensorType::Temperature, b"CPU Core 0", b"C");
         cpu_temp.value.store(45, Ordering::SeqCst);
         self.sensors.push(Some(Box::new(cpu_temp)));
-        
+
         let gpu_temp = SimpleSensor::new(self.next_id.fetch_add(1, Ordering::SeqCst), SensorType::Temperature, b"GPU Core", b"C");
         gpu_temp.value.store(55, Ordering::SeqCst);
         self.sensors.push(Some(Box::new(gpu_temp)));
@@ -111,7 +111,7 @@ impl ThermalMonitor for SimpleThermalMonitor {
         self.sensors.push(Some(sensor));
         Ok(id)
     }
-    
+
     fn get_temperature(&self, sensor_id: SensorID) -> Option<i32> {
         for sensor_option in &self.sensors {
             if let Some(ref sensor) = *sensor_option {
@@ -122,7 +122,7 @@ impl ThermalMonitor for SimpleThermalMonitor {
         }
         None
     }
-    
+
     fn get_max_temperature(&self) -> i32 {
         let mut max = 0;
         for sensor_option in &self.sensors {
@@ -135,12 +135,12 @@ impl ThermalMonitor for SimpleThermalMonitor {
         }
         max
     }
-    
+
     fn check_thresholds(&self) -> Vec<(SensorID, HealthStatus)> {
         let mut results = Vec::new();
         let warning = self.warning_threshold.load(Ordering::SeqCst) as i32;
         let critical = self.critical_threshold.load(Ordering::SeqCst) as i32;
-        
+
         for sensor_option in &self.sensors {
             if let Some(ref sensor) = *sensor_option {
                 if sensor.sensor_type() == SensorType::Temperature {
@@ -186,7 +186,7 @@ impl SimpleSMARTMonitor {
             devices: Vec::new(),
         }
     }
-    
+
     pub fn add_device(&mut self, device_id: usize, data: SMARTData) {
         self.devices.push((device_id, data));
     }
@@ -201,7 +201,7 @@ impl SMARTMonitor for SimpleSMARTMonitor {
         }
         None
     }
-    
+
     fn predict_failure(&self, device_id: usize) -> HealthStatus {
         if let Some(data) = self.get_smart_data(device_id) {
             if data.reallocated_sectors > 10 || data.pending_sectors > 5 {
@@ -212,7 +212,7 @@ impl SMARTMonitor for SimpleSMARTMonitor {
         }
         HealthStatus::Healthy
     }
-    
+
     fn get_attribute(&self, device_id: usize, _attribute_id: u8) -> Option<u8> {
         if let Some(data) = self.get_smart_data(device_id) {
             return Some(data.health_percentage);
@@ -241,7 +241,7 @@ impl SimplePowerTelemetry {
             rails: Vec::new(),
         }
     }
-    
+
     pub fn add_rail(&mut self, name: &[u8], voltage: u32, current: u32) {
         let mut name_array = [0u8; 16];
         let name_len = name.len().min(15);
@@ -256,7 +256,7 @@ impl PowerTelemetry for SimplePowerTelemetry {
     fn get_power_consumption(&self) -> u32 {
         self.total_power.load(Ordering::SeqCst) as u32
     }
-    
+
     fn get_voltage(&self, rail: &[u8]) -> Option<u32> {
         for &(name, (ref voltage, _)) in &self.rails {
             let len = name.iter().position(|&b| b == 0).unwrap_or(16);
@@ -266,7 +266,7 @@ impl PowerTelemetry for SimplePowerTelemetry {
         }
         None
     }
-    
+
     fn get_current(&self, rail: &[u8]) -> Option<u32> {
         for &(name, (_, ref current)) in &self.rails {
             let len = name.iter().position(|&b| b == 0).unwrap_or(16);
@@ -276,7 +276,7 @@ impl PowerTelemetry for SimplePowerTelemetry {
         }
         None
     }
-    
+
     fn calculate_efficiency(&self) -> u32 {
         let total_power = self.total_power.load(Ordering::SeqCst) as u32;
         if total_power == 0 { return 0; }
@@ -307,10 +307,10 @@ impl SimpleDiagnosticsReport {
 impl DiagnosticsReport for SimpleDiagnosticsReport {
     fn generate_report(&self) -> Vec<u8> {
         let mut report = Vec::new();
-        
+
         let header = b"=== SigmaOS Diagnostics Report ===\n";
         for &byte in header { report.push(byte); }
-        
+
         let thermal_header = b"\nThermal Status:\n";
         for &byte in thermal_header { report.push(byte); }
         let max_temp = self.thermal.get_max_temperature();
@@ -325,7 +325,7 @@ impl DiagnosticsReport for SimpleDiagnosticsReport {
         report.push(temp_str[1]);
         report.push(b'C');
         report.push(b'\n');
-        
+
         let power_header = b"\nPower Consumption:\n";
         for &byte in power_header { report.push(byte); }
         let power = self.power.get_power_consumption();
@@ -340,10 +340,10 @@ impl DiagnosticsReport for SimpleDiagnosticsReport {
         report.push(b'0' + (power / 100) as u8);
         report.push(b'W');
         report.push(b'\n');
-        
+
         report
     }
-    
+
     fn get_health_summary(&self) -> HealthStatus {
         let thermal_status = self.thermal.check_thresholds();
         for &(_, status) in &thermal_status {

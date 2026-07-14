@@ -11,6 +11,9 @@ pub struct ResolvedPackage {
 
 /// Resolve a package and all its transitive dependencies (topologically sorted)
 pub fn resolve(package: &str) -> Result<Vec<ResolvedPackage>, String> {
+    // Sentinel 🛡️: Validate package name to prevent path traversal and shell injection
+    crate::crypto::validate_package_name(package)?;
+
     // In a real implementation this would:
     // 1. Fetch package manifest from sovereign registry
     // 2. Parse SemVer constraints
@@ -50,15 +53,13 @@ pub fn check_conflicts(pkgs_a: &[ResolvedPackage], pkgs_b: &[ResolvedPackage]) -
 
 /// Compare two SemVer strings: returns Ordering
 pub fn semver_cmp(a: &str, b: &str) -> std::cmp::Ordering {
+    // Bolt ⚡: Optimized allocation-free SemVer parser to avoid heavy vector allocations inside core loops.
     let parse = |s: &str| -> (u64, u64, u64) {
-        let parts: Vec<u64> = s.split('.')
-            .map(|x| x.parse().unwrap_or(0))
-            .collect();
-        (
-            parts.get(0).copied().unwrap_or(0),
-            parts.get(1).copied().unwrap_or(0),
-            parts.get(2).copied().unwrap_or(0),
-        )
+        let mut parts = s.split('.').map(|x| x.parse::<u64>().unwrap_or(0));
+        let major = parts.next().unwrap_or(0);
+        let minor = parts.next().unwrap_or(0);
+        let patch = parts.next().unwrap_or(0);
+        (major, minor, patch)
     };
     parse(a).cmp(&parse(b))
 }

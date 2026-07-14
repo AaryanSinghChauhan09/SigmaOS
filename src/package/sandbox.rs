@@ -56,22 +56,22 @@ impl SimpleBuildSandbox {
 impl BuildSandbox for SimpleBuildSandbox {
     fn id(&self) -> SandboxID { self.id }
     fn state(&self) -> SandboxState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn create(&mut self) -> Result<(), SandboxError> {
         self.state.store(SandboxState::Created as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn start(&mut self) -> Result<(), SandboxError> {
         self.state.store(SandboxState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn stop(&mut self) -> Result<(), SandboxError> {
         self.state.store(SandboxState::Stopped as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn execute_command(&mut self, _command: &[u8]) -> Result<(), SandboxError> {
         if self.state.load(Ordering::SeqCst) != SandboxState::Running as usize {
             return Err(SandboxError::StartFailed);
@@ -105,11 +105,11 @@ impl NetworkIsolation for SimpleNetworkIsolation {
     fn enable_network(&mut self, enabled: bool) {
         self.network_enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
-    
+
     fn set_allowed_hosts(&mut self, hosts: Vec<[u8; 128]>) {
         self.allowed_hosts = hosts;
     }
-    
+
     fn is_network_enabled(&self) -> bool { self.network_enabled.load(Ordering::SeqCst) == 1 }
 }
 
@@ -138,14 +138,14 @@ impl FilesystemIsolation for SimpleFilesystemIsolation {
         let mut target_array = [0u8; 256];
         let source_len = source.len().min(255);
         let target_len = target.len().min(255);
-        
+
         for i in 0..source_len { source_array[i] = source[i]; }
         for i in 0..target_len { target_array[i] = target[i]; }
-        
+
         self.mounts.push((source_array, target_array, AtomicUsize::new(0)));
         Ok(())
     }
-    
+
     fn set_readonly(&mut self, path: &[u8], readonly: bool) -> Result<(), SandboxError> {
         for mount in &mut self.mounts {
             let target = &mount.1;
@@ -157,7 +157,7 @@ impl FilesystemIsolation for SimpleFilesystemIsolation {
         }
         Err(SandboxError::CreateFailed)
     }
-    
+
     fn create_tmpfs(&mut self, path: &[u8], _size_mb: usize) -> Result<(), SandboxError> {
         let mut path_array = [0u8; 256];
         let path_len = path.len().min(255);
@@ -196,7 +196,7 @@ impl SandboxManager for SimpleSandboxManager {
         self.sandboxes.push(Some(Box::new(sandbox)));
         Ok(id)
     }
-    
+
     fn destroy_sandbox(&mut self, id: SandboxID) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
@@ -207,7 +207,7 @@ impl SandboxManager for SimpleSandboxManager {
         }
         Err(SandboxError::CreateFailed)
     }
-    
+
     fn get_sandbox(&self, id: SandboxID) -> Option<&dyn BuildSandbox> {
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
@@ -216,7 +216,7 @@ impl SandboxManager for SimpleSandboxManager {
         }
         None
     }
-    
+
     fn list_sandboxes(&self) -> Vec<SandboxID> {
         let mut ids = Vec::new();
         for sandbox_option in &self.sandboxes {
@@ -259,7 +259,7 @@ impl ResourceQuota for SimpleResourceQuota {
         }
         Err(SandboxError::CreateFailed)
     }
-    
+
     fn set_cpu_quota(&mut self, sandbox_id: SandboxID, cores: usize) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
@@ -273,7 +273,7 @@ impl ResourceQuota for SimpleResourceQuota {
         }
         Err(SandboxError::CreateFailed)
     }
-    
+
     fn set_disk_quota(&mut self, _sandbox_id: SandboxID, _bytes: usize) -> Result<(), SandboxError> {
         Ok(())
     }

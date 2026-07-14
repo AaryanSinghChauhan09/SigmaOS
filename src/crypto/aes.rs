@@ -45,56 +45,56 @@ impl BlockCipher for SimpleAES {
     fn id(&self) -> CipherID { self.id }
     fn block_size(&self) -> usize { 16 }
     fn key_size(&self) -> usize { 32 }
-    
+
     fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
-        
+
         let mut ciphertext = Vec::new();
         let mut key_hash: usize = 0;
-        
+
         for &byte in key {
             key_hash = key_hash.wrapping_add(byte as usize);
         }
-        
+
         if let Some(iv_data) = iv {
             for &byte in iv_data {
                 key_hash = key_hash.wrapping_add(byte as usize);
             }
         }
-        
+
         for &byte in plaintext {
             ciphertext.push(byte.wrapping_add((key_hash % 256) as u8));
             key_hash = key_hash.wrapping_mul(17);
         }
-        
+
         Ok(ciphertext)
     }
-    
+
     fn decrypt(&self, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
-        
+
         let mut plaintext = Vec::new();
         let mut key_hash: usize = 0;
-        
+
         for &byte in key {
             key_hash = key_hash.wrapping_add(byte as usize);
         }
-        
+
         if let Some(iv_data) = iv {
             for &byte in iv_data {
                 key_hash = key_hash.wrapping_add(byte as usize);
             }
         }
-        
+
         for &byte in ciphertext {
             plaintext.push(byte.wrapping_sub((key_hash % 256) as u8));
             key_hash = key_hash.wrapping_mul(17);
         }
-        
+
         Ok(plaintext)
     }
 }
@@ -119,14 +119,14 @@ impl SimpleCipherManager {
             next_id: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let aes_ecb = SimpleAES::new(self.next_id.fetch_add(1, Ordering::SeqCst), CipherMode::ECB);
         self.ciphers.push(Some(Box::new(aes_ecb)));
-        
+
         let aes_cbc = SimpleAES::new(self.next_id.fetch_add(1, Ordering::SeqCst), CipherMode::CBC);
         self.ciphers.push(Some(Box::new(aes_cbc)));
-        
+
         let aes_gcm = SimpleAES::new(self.next_id.fetch_add(1, Ordering::SeqCst), CipherMode::GCM);
         self.ciphers.push(Some(Box::new(aes_gcm)));
     }
@@ -138,7 +138,7 @@ impl CipherManager for SimpleCipherManager {
         self.ciphers.push(Some(cipher));
         Ok(id)
     }
-    
+
     fn get_cipher(&self, id: CipherID) -> Option<&dyn BlockCipher> {
         for cipher_option in &self.ciphers {
             if let Some(ref cipher) = *cipher_option {
@@ -147,7 +147,7 @@ impl CipherManager for SimpleCipherManager {
         }
         None
     }
-    
+
     fn encrypt_data(&self, cipher_id: CipherID, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if let Some(cipher) = self.get_cipher(cipher_id) {
             cipher.encrypt(plaintext, key, iv)
@@ -155,7 +155,7 @@ impl CipherManager for SimpleCipherManager {
             Err(CipherError::InvalidKey)
         }
     }
-    
+
     fn decrypt_data(&self, cipher_id: CipherID, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if let Some(cipher) = self.get_cipher(cipher_id) {
             cipher.decrypt(ciphertext, key, iv)
@@ -184,43 +184,43 @@ impl SimpleAuthenticatedEncryption {
 impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
     fn encrypt_auth(&self, plaintext: &[u8], key: &[u8], iv: &[u8], aad: &[u8]) -> Result<(Vec<u8>, Vec<u8>), CipherError> {
         let ciphertext = self.cipher_manager.encrypt_data(3, plaintext, key, Some(iv))?;
-        
+
         let mut tag = Vec::new();
         let mut tag_hash: usize = 0;
         for &byte in key { tag_hash = tag_hash.wrapping_add(byte as usize); }
         for &byte in iv { tag_hash = tag_hash.wrapping_add(byte as usize); }
         for &byte in aad { tag_hash = tag_hash.wrapping_add(byte as usize); }
-        
+
         for i in 0..16 {
             tag.push(((tag_hash + i * 13) % 256) as u8);
         }
-        
+
         Ok((ciphertext, tag))
     }
-    
+
     fn decrypt_auth(&self, ciphertext: &[u8], tag: &[u8], key: &[u8], iv: &[u8], aad: &[u8]) -> Result<Vec<u8>, CipherError> {
         let plaintext = self.cipher_manager.decrypt_data(3, ciphertext, key, Some(iv))?;
-        
+
         let mut tag_hash: usize = 0;
         for &byte in key { tag_hash = tag_hash.wrapping_add(byte as usize); }
         for &byte in iv { tag_hash = tag_hash.wrapping_add(byte as usize); }
         for &byte in aad { tag_hash = tag_hash.wrapping_add(byte as usize); }
-        
+
         let mut expected_tag = Vec::new();
         for i in 0..16 {
             expected_tag.push(((tag_hash + i * 13) % 256) as u8);
         }
-        
+
         if tag.len() != expected_tag.len() {
             return Err(CipherError::EncryptionFailed);
         }
-        
+
         for i in 0..tag.len() {
             if tag[i] != expected_tag[i] {
                 return Err(CipherError::EncryptionFailed);
             }
         }
-        
+
         Ok(plaintext)
     }
 }

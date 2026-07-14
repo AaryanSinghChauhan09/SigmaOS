@@ -15,32 +15,27 @@ pub struct PackageEntry {
 pub fn search(query: &str) -> Vec<PackageEntry> {
     // In production: query the sovereign registry API / local mirror
     let query = query.to_lowercase();
-    KNOWN_PACKAGES.iter()
+    known_packages().into_iter()
         .filter(|p| p.name.contains(&query) || p.description.to_lowercase().contains(&query))
-        .cloned()
         .collect()
 }
 
 /// Get detailed info for a specific package
 pub fn info(name: &str) -> Option<PackageEntry> {
-    KNOWN_PACKAGES.iter().find(|p| p.name == name).cloned()
+    known_packages().into_iter().find(|p| p.name == name)
 }
 
 /// List installed packages for a profile
 pub fn list_installed(profile: &str) -> Vec<PackageEntry> {
     // In production: read /var/lib/sigpkg/installed.db
     if profile == "all" {
-        KNOWN_PACKAGES.to_vec()
+        known_packages()
     } else {
-        KNOWN_PACKAGES.iter()
+        known_packages().into_iter()
             .filter(|p| p.profile == profile || p.profile == "sigma-core")
-            .cloned()
             .collect()
     }
 }
-
-// Static package registry (replace with file/network registry in production)
-static KNOWN_PACKAGES: &[PackageEntry] = &[];
 
 // We need lazy static for runtime Vec construction — use fn instead
 fn known_packages() -> Vec<PackageEntry> {

@@ -49,6 +49,9 @@ codegen-units = 1
 strip      = false  # Keep symbols for profiling
 panic      = "abort"
 
+[profile.test]
+panic      = "abort"
+
 [profile.bench]
 inherits   = "release"
 opt-level  = 3
@@ -56,6 +59,7 @@ lto        = true
 codegen-units = 1
 strip      = false
 debug      = true
+panic      = "abort"
 
 [profile.kernel]
 inherits   = "release"

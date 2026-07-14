@@ -72,16 +72,16 @@ impl Window for SimpleWindow {
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
     fn state(&self) -> WindowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn set_state(&mut self, state: WindowState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
-    
+
     fn move_to(&mut self, x: i32, y: i32) {
         self.x.store(x as usize, Ordering::SeqCst);
         self.y.store(y as usize, Ordering::SeqCst);
     }
-    
+
     fn resize(&mut self, width: u32, height: u32) {
         self.width.store(width as usize, Ordering::SeqCst);
         self.height.store(height as usize, Ordering::SeqCst);
@@ -120,7 +120,7 @@ impl WindowManager for SimpleWindowManager {
         self.windows.push(Some(Box::new(window)));
         Ok(id)
     }
-    
+
     fn destroy_window(&mut self, id: WindowID) -> Result<(), WindowError> {
         for window_option in &mut self.windows {
             if let Some(ref window) = *window_option {
@@ -131,7 +131,7 @@ impl WindowManager for SimpleWindowManager {
         }
         Err(WindowError::NotFound)
     }
-    
+
     fn get_window(&self, id: WindowID) -> Option<&dyn Window> {
         for window_option in &self.windows {
             if let Some(ref window) = *window_option {
@@ -140,7 +140,7 @@ impl WindowManager for SimpleWindowManager {
         }
         None
     }
-    
+
     fn focus_window(&mut self, id: WindowID) -> Result<(), WindowError> {
         for window_option in &self.windows {
             if let Some(ref window) = *window_option {
@@ -152,7 +152,7 @@ impl WindowManager for SimpleWindowManager {
         }
         Err(WindowError::NotFound)
     }
-    
+
     fn list_windows(&self) -> Vec<WindowID> {
         let mut ids = Vec::new();
         for window_option in &self.windows {
@@ -185,11 +185,11 @@ impl WindowDecoration for SimpleWindowDecoration {
     fn set_border(&mut self, _window_id: WindowID, _width: u32, _color: u32) -> Result<(), WindowError> {
         Ok(())
     }
-    
+
     fn set_title_bar(&mut self, _window_id: WindowID, _height: u32, _color: u32) -> Result<(), WindowError> {
         Ok(())
     }
-    
+
     fn set_shadow(&mut self, _window_id: WindowID, _enabled: bool, _blur: u32) -> Result<(), WindowError> {
         Ok(())
     }

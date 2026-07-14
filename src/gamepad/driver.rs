@@ -105,7 +105,7 @@ impl GamepadManager for SimpleGamepadManager {
         self.gamepads.push(Some(gamepad));
         Ok(id)
     }
-    
+
     fn remove_gamepad(&mut self, id: GamepadID) -> Result<(), GamepadError> {
         for gamepad_option in &mut self.gamepads {
             if let Some(ref gamepad) = *gamepad_option {
@@ -116,7 +116,7 @@ impl GamepadManager for SimpleGamepadManager {
         }
         Err(GamepadError::NotFound)
     }
-    
+
     fn get_gamepad(&self, id: GamepadID) -> Option<&dyn Gamepad> {
         for gamepad_option in &self.gamepads {
             if let Some(ref gamepad) = *gamepad_option {
@@ -125,7 +125,7 @@ impl GamepadManager for SimpleGamepadManager {
         }
         None
     }
-    
+
     fn set_rumble(&mut self, _id: GamepadID, _left: u8, _right: u8) -> Result<(), GamepadError> {
         Ok(())
     }
@@ -159,13 +159,13 @@ impl InputMapping for SimpleInputMapping {
             self.button_map[physical as usize] = virtual;
         }
     }
-    
+
     fn map_axis(&mut self, physical: u8, virtual: u8) {
         if physical < 4 {
             self.axis_map[physical as usize] = virtual;
         }
     }
-    
+
     fn get_mapped_button(&self, physical: u8) -> u8 {
         if physical < 16 {
             self.button_map[physical as usize]
@@ -173,7 +173,7 @@ impl InputMapping for SimpleInputMapping {
             physical
         }
     }
-    
+
     fn get_mapped_axis(&self, physical: u8) -> u8 {
         if physical < 4 {
             self.axis_map[physical as usize]

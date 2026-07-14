@@ -90,7 +90,7 @@ impl ThermalManager for SimpleThermalManager {
         self.sensors.push(Some(sensor));
         Ok(id)
     }
-    
+
     fn remove_sensor(&mut self, id: SensorID) -> Result<(), ThermalError> {
         for sensor_option in &mut self.sensors {
             if let Some(ref sensor) = *sensor_option {
@@ -101,7 +101,7 @@ impl ThermalManager for SimpleThermalManager {
         }
         Err(ThermalError::NotFound)
     }
-    
+
     fn get_sensor(&self, id: SensorID) -> Option<&dyn ThermalSensor> {
         for sensor_option in &self.sensors {
             if let Some(ref sensor) = *sensor_option {
@@ -110,7 +110,7 @@ impl ThermalManager for SimpleThermalManager {
         }
         None
     }
-    
+
     fn get_thermal_state(&self) -> ThermalState {
         let mut max_temp = 0;
         for sensor_option in &self.sensors {
@@ -121,7 +121,7 @@ impl ThermalManager for SimpleThermalManager {
                 }
             }
         }
-        
+
         if max_temp > 90 {
             ThermalState::Shutdown
         } else if max_temp > 80 {
@@ -132,7 +132,7 @@ impl ThermalManager for SimpleThermalManager {
             ThermalState::Normal
         }
     }
-    
+
     fn update_temperature(&mut self, id: SensorID, temperature: i32) -> Result<(), ThermalError> {
         for sensor_option in &mut self.sensors {
             if let Some(ref mut sensor) = *sensor_option {
@@ -171,11 +171,11 @@ impl ThermalThrottling for SimpleThermalThrottling {
     fn enable_throttling(&mut self, enabled: bool) {
         self.enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
-    
+
     fn set_throttle_level(&mut self, level: u32) {
         self.throttle_level.store(level as usize, Ordering::SeqCst);
     }
-    
+
     fn get_throttle_level(&self) -> u32 { self.throttle_level.load(Ordering::SeqCst) as u32 }
 }
 

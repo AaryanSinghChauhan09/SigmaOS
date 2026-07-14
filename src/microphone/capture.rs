@@ -89,7 +89,7 @@ impl AudioCapture for SimpleAudioCapture {
         self.capturing.push(mic_id);
         Ok(())
     }
-    
+
     fn stop_capture(&mut self, mic_id: MicID) -> Result<(), MicError> {
         for i in 0..self.capturing.len() {
             if self.capturing[i] == mic_id {
@@ -99,7 +99,7 @@ impl AudioCapture for SimpleAudioCapture {
         }
         Err(MicError::NotFound)
     }
-    
+
     fn read_samples(&self, _mic_id: MicID, buffer: &mut [u8]) -> Result<usize, MicError> {
         for byte in buffer.iter_mut() {
             *byte = 0u8;
@@ -136,7 +136,7 @@ impl VoiceActivityDetection for SimpleVoiceActivityDetection {
         }
         false
     }
-    
+
     fn set_threshold(&mut self, threshold: f32) {
         self.threshold.store(threshold as usize, Ordering::SeqCst);
     }

@@ -54,7 +54,7 @@ impl AIAgent for SimpleAIAgent {
         &self.name[..len]
     }
     fn state(&self) -> AgentState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
         self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
@@ -96,7 +96,7 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         self.agents.push(Some(agent));
         Ok(id)
     }
-    
+
     fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
             for agent_option in &mut self.agents {
@@ -118,7 +118,7 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
             Err(AgentError::NotFound)
         }
     }
-    
+
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
         for agent_option in &self.agents {
             if let Some(ref agent) = *agent_option {
@@ -127,7 +127,7 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         }
         None
     }
-    
+
     fn list_agents(&self) -> Vec<AgentID> {
         let mut ids = Vec::new();
         for agent_option in &self.agents {
@@ -168,31 +168,31 @@ impl TaskQueue for SimpleTaskQueue {
         }
         self.tasks.push((task_array, priority));
     }
-    
+
     fn dequeue(&mut self) -> Option<[u8; 256]> {
         if self.tasks.is_empty() {
             return None;
         }
         let mut highest_idx = 0;
         let mut highest_priority = 0;
-        
+
         for (i, (_, priority)) in self.tasks.iter().enumerate() {
             if *priority > highest_priority {
                 highest_priority = *priority;
                 highest_idx = i;
             }
         }
-        
+
         Some(self.tasks.remove(highest_idx).0)
     }
-    
+
     fn peek(&self) -> Option<&[u8]> {
         if self.tasks.is_empty() {
             return None
         }
         Some(&self.tasks[0].0)
     }
-    
+
     fn size(&self) -> usize { self.tasks.len() }
 }
 
@@ -225,7 +225,7 @@ impl AgentCommunication for SimpleAgentCommunication {
         self.messages.push((from, to, msg_array));
         Ok(())
     }
-    
+
     fn receive_message(&mut self, agent_id: AgentID) -> Option<[u8; 256]> {
         for i in 0..self.messages.len() {
             if self.messages[i].1 == agent_id {
@@ -234,7 +234,7 @@ impl AgentCommunication for SimpleAgentCommunication {
         }
         None
     }
-    
+
     fn broadcast(&mut self, from: AgentID, message: &[u8]) {
         let mut msg_array = [0u8; 256];
         let msg_len = message.len().min(255);

@@ -69,7 +69,7 @@ impl Tokenizer for SimpleTokenizer {
         let mut tokens = Vec::new();
         let mut current_token = [0u8; 64];
         let mut token_index = 0;
-        
+
         for &byte in input {
             if byte == b' ' || byte == b'\n' || byte == b'\t' {
                 if token_index > 0 {
@@ -84,14 +84,14 @@ impl Tokenizer for SimpleTokenizer {
                 }
             }
         }
-        
+
         if token_index > 0 {
             tokens.push(current_token);
         }
-        
+
         tokens
     }
-    
+
     fn normalize(&self, token: &[u8]) -> [u8; 64] {
         let mut normalized = [0u8; 64];
         let len = token.len().min(63);
@@ -122,17 +122,17 @@ impl SimpleIntentClassifier {
     pub fn new() -> Self {
         let mut command_keywords = Vec::new();
         let mut query_keywords = Vec::new();
-        
+
         command_keywords.push(*b"run");
         command_keywords.push(*b"execute");
         command_keywords.push(*b"start");
         command_keywords.push(*b"launch");
-        
+
         query_keywords.push(*b"what");
         query_keywords.push(*b"how");
         query_keywords.push(*b"show");
         query_keywords.push(*b"list");
-        
+
         SimpleIntentClassifier {
             command_keywords,
             query_keywords,
@@ -145,14 +145,14 @@ impl IntentClassifier for SimpleIntentClassifier {
         for token in tokens {
             let len = token.iter().position(|&b| b == 0).unwrap_or(64);
             let token_str = &token[..len];
-            
+
             for &keyword in &self.command_keywords {
                 let klen = keyword.iter().position(|&b| b == 0).unwrap_or(32);
                 if token_str == &keyword[..klen] {
                     return Ok(IntentType::ExecuteCommand);
                 }
             }
-            
+
             for &keyword in &self.query_keywords {
                 let klen = keyword.iter().position(|&b| b == 0).unwrap_or(32);
                 if token_str == &keyword[..klen] {
@@ -160,10 +160,10 @@ impl IntentClassifier for SimpleIntentClassifier {
                 }
             }
         }
-        
+
         Ok(IntentType::Unknown)
     }
-    
+
     fn extract_parameters(&self, tokens: &[[u8; 64]], _intent_type: IntentType) -> Vec<[u8; 64]> {
         let mut parameters = Vec::new();
         for token in tokens {
@@ -189,12 +189,12 @@ pub struct SimpleCommandTranslator {
 impl SimpleCommandTranslator {
     pub fn new() -> Self {
         let mut templates = Vec::new();
-        
+
         templates.push((IntentType::ExecuteCommand, *b"sigma-exec {args}"));
         templates.push((IntentType::QuerySystem, *b"sigma-query {args}"));
         templates.push((IntentType::Configure, *b"sigma-config {args}"));
         templates.push((IntentType::Help, *b"sigma-help {args}"));
-        
+
         SimpleCommandTranslator { templates }
     }
 }
@@ -203,11 +203,11 @@ impl CommandTranslator for SimpleCommandTranslator {
     fn translate(&self, intent: &dyn Intent) -> Result<Vec<u8>, NLLError> {
         let template = self.get_template(intent.intent_type());
         let mut command = Vec::new();
-        
+
         for &byte in template {
             command.push(byte);
         }
-        
+
         for param in intent.parameters() {
             let len = param.iter().position(|&b| b == 0).unwrap_or(64);
             command.push(b' ');
@@ -215,10 +215,10 @@ impl CommandTranslator for SimpleCommandTranslator {
                 command.push(byte);
             }
         }
-        
+
         Ok(command)
     }
-    
+
     fn get_template(&self, intent_type: IntentType) -> &[u8] {
         for &(itype, ref template) in &self.templates {
             if itype == intent_type {
@@ -257,16 +257,16 @@ impl SimpleNLInterface {
 impl NLInterface for SimpleNLInterface {
     fn process_input(&mut self, input: &[u8]) -> Result<Vec<u8>, NLLError> {
         let tokens = self.tokenizer.tokenize(input);
-        
+
         let intent_type = self.classifier.classify(&tokens)?;
         let parameters = self.classifier.extract_parameters(&tokens, intent_type);
-        
+
         let mut intent = SimpleIntent::new(self.next_id.fetch_add(1, Ordering::SeqCst), intent_type, 0.95);
         intent.parameters = parameters;
-        
+
         self.translator.translate(&intent)
     }
-    
+
     fn add_training_example(&mut self, _input: &[u8], _expected_intent: IntentType) {
     }
 }

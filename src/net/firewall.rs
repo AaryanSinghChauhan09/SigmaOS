@@ -101,7 +101,7 @@ impl Firewall for SimpleFirewall {
         self.rules.push(Some(rule));
         Ok(id)
     }
-    
+
     fn remove_rule(&mut self, id: RuleID) -> Result<(), FirewallError> {
         for rule_option in &mut self.rules {
             if let Some(ref rule) = *rule_option {
@@ -112,7 +112,7 @@ impl Firewall for SimpleFirewall {
         }
         Err(FirewallError::NotFound)
     }
-    
+
     fn get_rule(&self, id: RuleID) -> Option<&dyn FirewallRule> {
         for rule_option in &self.rules {
             if let Some(ref rule) = *rule_option {
@@ -121,7 +121,7 @@ impl Firewall for SimpleFirewall {
         }
         None
     }
-    
+
     fn filter_packet(&self, protocol: Protocol, source_ip: &[u8], destination_ip: &[u8], source_port: u16, destination_port: u16) -> RuleAction {
         for rule_option in &self.rules {
             if let Some(ref rule) = *rule_option {
@@ -169,7 +169,7 @@ impl NAT for SimpleNAT {
         self.mappings.push((ip_array, internal_port, external_port));
         Ok(())
     }
-    
+
     fn remove_mapping(&mut self, internal_port: u16) -> Result<(), FirewallError> {
         for i in 0..self.mappings.len() {
             if self.mappings[i].1 == internal_port {
@@ -179,7 +179,7 @@ impl NAT for SimpleNAT {
         }
         Err(FirewallError::NotFound)
     }
-    
+
     fn translate(&self, internal_ip: &[u8], internal_port: u16) -> Option<(u16, [u8; 4])> {
         for &(ref ip, int_port, ext_port) in &self.mappings {
             if ip == internal_ip && int_port == internal_port {

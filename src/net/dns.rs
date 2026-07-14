@@ -101,13 +101,13 @@ impl DNSResolver for SimpleDNSResolver {
         data[1] = 168;
         data[2] = 1;
         data[3] = 1;
-        
+
         let record = SimpleDNSRecord::new(id, hostname, record_type, 3600, &data);
         let mut result = Vec::new();
         result.push(Box::new(record));
         Ok(result)
     }
-    
+
     fn add_server(&mut self, server: &[u8]) {
         let mut server_array = [0u8; 16];
         let server_len = server.len().min(15);
@@ -116,7 +116,7 @@ impl DNSResolver for SimpleDNSResolver {
         }
         self.servers.push(server_array);
     }
-    
+
     fn get_servers(&self) -> Vec<&[u8]> {
         let mut result = Vec::new();
         for server in &self.servers {
@@ -150,7 +150,7 @@ impl DNSCache for SimpleDNSCache {
     fn cache_record(&mut self, record: Box<dyn DNSRecord>) {
         self.records.push(Some(record));
     }
-    
+
     fn lookup(&self, hostname: &[u8], record_type: RecordType) -> Option<&dyn DNSRecord> {
         for record_option in &self.records {
             if let Some(ref record) = *record_option {
@@ -161,7 +161,7 @@ impl DNSCache for SimpleDNSCache {
         }
         None
     }
-    
+
     fn expire_records(&mut self) {
         let mut i = 0;
         while i < self.records.len() {

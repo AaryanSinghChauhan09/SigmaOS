@@ -48,12 +48,12 @@ impl SimpleTransaction {
 impl Transaction for SimpleTransaction {
     fn id(&self) -> TransactionID { self.id }
     fn state(&self) -> TransactionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn begin(&mut self) -> Result<(), UpdateError> {
         self.state.store(TransactionState::InProgress as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn commit(&mut self) -> Result<(), UpdateError> {
         if self.state.load(Ordering::SeqCst) != TransactionState::InProgress as usize {
             return Err(UpdateError::InvalidState);
@@ -61,7 +61,7 @@ impl Transaction for SimpleTransaction {
         self.state.store(TransactionState::Committed as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn rollback(&mut self) -> Result<(), UpdateError> {
         let current_state = self.state.load(Ordering::SeqCst);
         if current_state != TransactionState::InProgress as usize && current_state != TransactionState::Failed as usize {
@@ -101,7 +101,7 @@ impl AtomicUpdateManager for SimpleAtomicUpdateManager {
         self.transactions.push(Some(Box::new(tx)));
         Ok(id)
     }
-    
+
     fn add_operation(&mut self, tx_id: TransactionID, operation: &[u8]) -> Result<(), UpdateError> {
         for tx_option in &mut self.transactions {
             if let Some(ref mut tx) = *tx_option {
@@ -120,7 +120,7 @@ impl AtomicUpdateManager for SimpleAtomicUpdateManager {
         }
         Err(UpdateError::TransactionFailed)
     }
-    
+
     fn execute_transaction(&mut self, tx_id: TransactionID) -> Result<(), UpdateError> {
         for tx_option in &mut self.transactions {
             if let Some(ref mut tx) = *tx_option {
@@ -139,7 +139,7 @@ impl AtomicUpdateManager for SimpleAtomicUpdateManager {
         }
         Err(UpdateError::TransactionFailed)
     }
-    
+
     fn get_transaction(&self, tx_id: TransactionID) -> Option<&dyn Transaction> {
         for tx_option in &self.transactions {
             if let Some(ref tx) = *tx_option {
@@ -182,7 +182,7 @@ impl RollbackManager for SimpleRollbackManager {
         self.checkpoints.push((name_array, Vec::new()));
         Ok(id)
     }
-    
+
     fn restore_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), UpdateError> {
         for i in 0..self.checkpoints.len() {
             if i + 1 == checkpoint_id {
@@ -191,7 +191,7 @@ impl RollbackManager for SimpleRollbackManager {
         }
         Err(UpdateError::TransactionFailed)
     }
-    
+
     fn list_checkpoints(&self) -> Vec<usize> {
         let mut ids = Vec::new();
         for i in 0..self.checkpoints.len() {
@@ -230,7 +230,7 @@ impl PackageUpdater for SimplePackageUpdater {
         self.update_manager.add_operation(tx_id, b"verify")?;
         Ok(tx_id)
     }
-    
+
     fn apply_update(&mut self, tx_id: TransactionID) -> Result<(), UpdateError> {
         self.rollback_manager.create_checkpoint(b"pre-update")?;
         let result = self.update_manager.execute_transaction(tx_id);
@@ -239,7 +239,7 @@ impl PackageUpdater for SimplePackageUpdater {
         }
         result
     }
-    
+
     fn auto_rollback_on_failure(&mut self, tx_id: TransactionID) -> Result<(), UpdateError> {
         if let Some(tx) = self.update_manager.get_transaction(tx_id) {
             if tx.state() == TransactionState::Failed {

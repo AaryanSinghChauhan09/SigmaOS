@@ -78,20 +78,20 @@ impl DependencyResolver for SimpleDependencyResolver {
         self.dependencies.push(Some(dep));
         Ok(())
     }
-    
+
     fn resolve(&self, target: PackageID) -> Result<Vec<PackageID>, ResolverError> {
         let mut resolved = Vec::new();
         let mut visited = Vec::new();
-        
+
         self.visit(target, &mut resolved, &mut visited)?;
-        
+
         Ok(resolved)
     }
-    
+
     fn detect_conflicts(&self, target: PackageID) -> Vec<(PackageID, PackageID)> {
         let mut conflicts = Vec::new();
         let mut all_deps = Vec::new();
-        
+
         for dep_option in &self.dependencies {
             if let Some(ref dep) = *dep_option {
                 if dep.package_id() == target {
@@ -100,7 +100,7 @@ impl DependencyResolver for SimpleDependencyResolver {
                 }
             }
         }
-        
+
         for &dep_id in &all_deps {
             for dep_option in &self.dependencies {
                 if let Some(ref dep) = *dep_option {
@@ -114,15 +114,15 @@ impl DependencyResolver for SimpleDependencyResolver {
                 }
             }
         }
-        
+
         conflicts
     }
-    
+
     fn detect_cycles(&self) -> Vec<PackageID> {
         let mut cycles = Vec::new();
         let mut visited = Vec::new();
         let mut rec_stack = Vec::new();
-        
+
         for dep_option in &self.dependencies {
             if let Some(ref dep) = *dep_option {
                 let id = dep.package_id();
@@ -133,7 +133,7 @@ impl DependencyResolver for SimpleDependencyResolver {
                 }
             }
         }
-        
+
         cycles
     }
 }
@@ -143,9 +143,9 @@ impl SimpleDependencyResolver {
         if visited.contains(&id) {
             return Err(ResolverError::Cycle);
         }
-        
+
         visited.push(id);
-        
+
         for dep_option in &self.dependencies {
             if let Some(ref dep) = *dep_option {
                 if dep.package_id() == id {
@@ -155,18 +155,18 @@ impl SimpleDependencyResolver {
                 }
             }
         }
-        
+
         if !resolved.contains(&id) {
             resolved.push(id);
         }
-        
+
         Ok(())
     }
-    
+
     fn has_cycle(&self, id: PackageID, visited: &mut Vec<PackageID>, rec_stack: &mut Vec<PackageID>) -> bool {
         visited.push(id);
         rec_stack.push(id);
-        
+
         for dep_option in &self.dependencies {
             if let Some(ref dep) = *dep_option {
                 if dep.package_id() == id {
@@ -182,7 +182,7 @@ impl SimpleDependencyResolver {
                 }
             }
         }
-        
+
         rec_stack.pop();
         false
     }
@@ -221,7 +221,7 @@ impl VersionConstraint for SimpleVersionConstraint {
     fn satisfies(&self, version: &[u8]) -> bool {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
         let constraint_version = &self.version[..len];
-        
+
         match self.constraint_type {
             ConstraintType::Exact => constraint_version == version,
             ConstraintType::Greater => version > constraint_version,
@@ -230,7 +230,7 @@ impl VersionConstraint for SimpleVersionConstraint {
             ConstraintType::LessEqual => version <= constraint_version,
         }
     }
-    
+
     fn to_string(&self) -> &[u8] {
         match self.constraint_type {
             ConstraintType::Exact => b"==",
@@ -273,7 +273,7 @@ impl ConflictResolver for SimpleConflictResolver {
             ResolutionStrategy::Manual => Err(ResolverError::Conflict),
         }
     }
-    
+
     fn get_resolution_strategy(&self) -> ResolutionStrategy {
         unsafe { core::mem::transmute(self.strategy.load(Ordering::SeqCst)) }
     }

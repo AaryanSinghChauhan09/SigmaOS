@@ -108,7 +108,7 @@ impl PKIManager for SimplePKIManager {
         self.certificates.push(Some(cert));
         Ok(id)
     }
-    
+
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError> {
         for cert_option in &self.certificates {
             if let Some(ref cert) = *cert_option {
@@ -120,7 +120,7 @@ impl PKIManager for SimplePKIManager {
         }
         Err(PKIError::NotFound)
     }
-    
+
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate> {
         for cert_option in &self.certificates {
             if let Some(ref cert) = *cert_option {
@@ -129,7 +129,7 @@ impl PKIManager for SimplePKIManager {
         }
         None
     }
-    
+
     fn verify_certificate(&self, id: CertificateID, _issuer_id: CertificateID) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
             if self.revoked.contains(&id) {
@@ -165,7 +165,7 @@ impl CRL for SimpleCRL {
     fn add_to_crl(&mut self, cert_id: CertificateID, reason: u32) {
         self.revoked.push((cert_id, reason));
     }
-    
+
     fn is_revoked(&self, cert_id: CertificateID) -> bool {
         for &(id, _) in &self.revoked {
             if id == cert_id {
@@ -174,7 +174,7 @@ impl CRL for SimpleCRL {
         }
         false
     }
-    
+
     fn get_crl(&self) -> Vec<(CertificateID, u32)> {
         self.revoked.clone()
     }

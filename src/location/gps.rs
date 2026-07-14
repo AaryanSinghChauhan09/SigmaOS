@@ -79,7 +79,7 @@ impl GPS for SimpleGPS {
     fn id(&self) -> LocationID { self.id }
     fn has_fix(&self) -> bool { self.has_fix.load(Ordering::SeqCst) == 1 }
     fn get_location(&self) -> &dyn Location { &self.location }
-    
+
     fn update_location(&mut self, lat: f64, lon: f64, alt: f64) {
         self.location.latitude.store((lat * 1000000.0) as usize, Ordering::SeqCst);
         self.location.longitude.store((lon * 1000000.0) as usize, Ordering::SeqCst);
@@ -118,7 +118,7 @@ impl LocationTracker for SimpleLocationTracker {
         self.gps_devices.push(Some(gps));
         Ok(id)
     }
-    
+
     fn remove_gps(&mut self, id: LocationID) -> Result<(), LocationError> {
         for gps_option in &mut self.gps_devices {
             if let Some(ref gps) = *gps_option {
@@ -129,7 +129,7 @@ impl LocationTracker for SimpleLocationTracker {
         }
         Err(LocationError::NotFound)
     }
-    
+
     fn get_gps(&self, id: LocationID) -> Option<&dyn GPS> {
         for gps_option in &self.gps_devices {
             if let Some(ref gps) = *gps_option {
@@ -138,7 +138,7 @@ impl LocationTracker for SimpleLocationTracker {
         }
         None
     }
-    
+
     fn track_route(&mut self, gps_id: LocationID) -> Result<(), LocationError> {
         self.routes.push((gps_id, Vec::new()));
         Ok(())

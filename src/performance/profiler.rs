@@ -91,7 +91,7 @@ impl Profiler for SimpleProfiler {
         self.profiles.push(Some(Box::new(profile)));
         Ok(id)
     }
-    
+
     fn stop_profile(&mut self, id: ProfileID) -> Result<(), ProfilerError> {
         for profile_option in &mut self.profiles {
             if let Some(ref mut profile) = *profile_option {
@@ -103,7 +103,7 @@ impl Profiler for SimpleProfiler {
         }
         Err(ProfilerError::NotFound)
     }
-    
+
     fn get_profile(&self, id: ProfileID) -> Option<&dyn Profile> {
         for profile_option in &self.profiles {
             if let Some(ref profile) = *profile_option {
@@ -112,9 +112,9 @@ impl Profiler for SimpleProfiler {
         }
         None
     }
-    
+
     fn get_cpu_usage(&self) -> f32 { (self.cpu_usage.load(Ordering::SeqCst) as f32) / 100.0 }
-    
+
     fn get_memory_usage(&self) -> f32 { (self.memory_usage.load(Ordering::SeqCst) as f32) / 100.0 }
 }
 
@@ -148,7 +148,7 @@ impl CallGraph for SimpleCallGraph {
         }
         self.nodes.push(func_array);
     }
-    
+
     fn add_edge(&mut self, caller: &[u8], callee: &[u8]) {
         let mut caller_array = [0u8; 128];
         let mut callee_array = [0u8; 128];
@@ -158,7 +158,7 @@ impl CallGraph for SimpleCallGraph {
         for i in 0..callee_len { callee_array[i] = callee[i]; }
         self.edges.push((caller_array, callee_array));
     }
-    
+
     fn get_hotspots(&self) -> Vec<&[u8]> {
         let mut hotspots = Vec::new();
         for node in &self.nodes {

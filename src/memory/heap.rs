@@ -42,7 +42,7 @@ impl HeapBlock for SimpleHeapBlock {
     fn id(&self) -> BlockID { self.id }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn is_free(&self) -> bool { self.free.load(Ordering::SeqCst) == 1 }
-    
+
     fn set_free(&mut self, free: bool) {
         self.free.store(if free { 1 } else { 0 }, Ordering::SeqCst);
     }
@@ -86,21 +86,21 @@ impl HeapAllocator for SimpleHeapAllocator {
                 }
             }
         }
-        
+
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let block = SimpleHeapBlock::new(id, size);
         self.blocks.push(Some(Box::new(block)));
-        
+
         let offset = id * 4096;
         let heap_start = self.heap_start.load(Ordering::SeqCst);
         Ok((heap_start + offset) as *mut u8)
     }
-    
+
     fn deallocate(&mut self, ptr: *mut u8) -> Result<(), HeapError> {
         let heap_start = self.heap_start.load(Ordering::SeqCst);
         let offset = (ptr as usize) - heap_start;
         let block_id = offset / 4096;
-        
+
         for block_option in &mut self.blocks {
             if let Some(ref mut block) = *block_option {
                 if block.id() == block_id {
@@ -109,20 +109,20 @@ impl HeapAllocator for SimpleHeapAllocator {
                 }
             }
         }
-        
+
         Err(HeapError::InvalidPointer)
     }
-    
+
     fn reallocate(&mut self, ptr: *mut u8, new_size: usize) -> Result<*mut u8, HeapError> {
         self.deallocate(ptr)?;
         self.allocate(new_size)
     }
-    
+
     fn get_stats(&self) -> (usize, usize, usize) {
         let mut total = 0;
         let mut used = 0;
         let mut free = 0;
-        
+
         for block_option in &self.blocks {
             if let Some(ref block) = *block_option {
                 total += block.size();
@@ -133,7 +133,7 @@ impl HeapAllocator for SimpleHeapAllocator {
                 }
             }
         }
-        
+
         (total, used, free)
     }
 }
@@ -157,7 +157,7 @@ impl SimpleHeapDefragmenter {
 impl HeapDefragmenter for SimpleHeapDefragmenter {
     fn defragment(&mut self) -> Result<(), HeapError> {
         let mut compacted = Vec::new();
-        
+
         for block_option in &mut self.allocator.blocks {
             if let Some(ref block) = *block_option {
                 if !block.is_free() {
@@ -165,7 +165,7 @@ impl HeapDefragmenter for SimpleHeapDefragmenter {
                 }
             }
         }
-        
+
         self.allocator.blocks = Vec::new();
         for size in compacted {
             let id = self.allocator.next_id.fetch_add(1, Ordering::SeqCst);
@@ -173,10 +173,10 @@ impl HeapDefragmenter for SimpleHeapDefragmenter {
             block.set_free(false);
             self.allocator.blocks.push(Some(Box::new(block)));
         }
-        
+
         Ok(())
     }
-    
+
     fn coalesce(&mut self) -> Result<(), HeapError> {
         let mut i = 0;
         while i < self.allocator.blocks.len() - 1 {
@@ -185,13 +185,13 @@ impl HeapDefragmenter for SimpleHeapDefragmenter {
             } else {
                 false
             };
-            
+
             let next_free = if let Some(ref block) = self.allocator.blocks[i + 1] {
                 block.is_free()
             } else {
                 false
             };
-            
+
             if current_free && next_free {
                 if let Some(ref mut block) = *self.allocator.blocks[i] {
                     let current_size = block.size();
@@ -204,7 +204,7 @@ impl HeapDefragmenter for SimpleHeapDefragmenter {
                 i += 1;
             }
         }
-        
+
         Ok(())
     }
 }

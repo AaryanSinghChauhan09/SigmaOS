@@ -50,7 +50,7 @@ impl USBDevice for SimpleUSBDevice {
     fn vendor_id(&self) -> u16 { self.vendor_id.load(Ordering::SeqCst) as u16 }
     fn product_id(&self) -> u16 { self.product_id.load(Ordering::SeqCst) as u16 }
     fn device_type(&self) -> USBDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
-    
+
     fn initialize(&mut self) -> Result<(), USBError> {
         Ok(())
     }
@@ -88,13 +88,13 @@ impl USBController for SimpleUSBController {
         }
         ids
     }
-    
+
     fn register_device(&mut self, device: Box<dyn USBDevice>) -> Result<USBDeviceID, USBError> {
         let id = device.id();
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn unregister_device(&mut self, id: USBDeviceID) -> Result<(), USBError> {
         for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
@@ -105,7 +105,7 @@ impl USBController for SimpleUSBController {
         }
         Err(USBError::NotFound)
     }
-    
+
     fn get_device(&self, id: USBDeviceID) -> Option<&dyn USBDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -140,7 +140,7 @@ impl USBTransfer for SimpleUSBTransfer {
             Err(USBError::NotFound)
         }
     }
-    
+
     fn control_transfer(&mut self, device_id: USBDeviceID, _request_type: u8, _request: u8, _value: u16, _index: u16, _data: &mut [u8]) -> Result<(), USBError> {
         if self.controller.get_device(device_id).is_some() {
             Ok(())
@@ -173,7 +173,7 @@ impl USBHub for SimpleUSBHub {
     fn add_port(&mut self, port_num: u8) {
         self.ports.push((port_num, Vec::new()));
     }
-    
+
     fn remove_port(&mut self, port_num: u8) {
         for i in 0..self.ports.len() {
             if self.ports[i].0 == port_num {
@@ -182,7 +182,7 @@ impl USBHub for SimpleUSBHub {
             }
         }
     }
-    
+
     fn get_connected_devices(&self, port_num: u8) -> Vec<USBDeviceID> {
         for &(port, ref devices) in &self.ports {
             if port == port_num {

@@ -38,7 +38,7 @@ jobs:
 
     - name: Check Markdown linting
       run: |
-        markdownlint docs/*.md *.md
+        markdownlint docs/*.md *.md --ignore THIRD-PARTY-NOTICES.md
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v4
