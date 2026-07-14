@@ -1,0 +1,15 @@
+[package]
+name = "sovereign_adr_tracker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sovereign_adr_tracker"
+path = "src/lib.rs"
+
+[[bin]]
+name = "adr_tracker"
+path = "src/bin/adr_tracker.rs"

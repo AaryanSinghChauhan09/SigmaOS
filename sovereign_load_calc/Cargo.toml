@@ -1,0 +1,15 @@
+[package]
+name = "sovereign_load_calc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sovereign_load_calc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "load_calc"
+path = "src/bin/load_calc.rs"

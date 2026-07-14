@@ -1,0 +1,15 @@
+[package]
+name = "sovereign_msme_registry"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sovereign_msme_registry"
+path = "src/lib.rs"
+
+[[bin]]
+name = "msme_registry"
+path = "src/bin/msme_registry.rs"

@@ -90,6 +90,55 @@ For a detailed review of all security policies, see the canonical [Security Fram
 
 ## 📚 Canonical Documentation (GitHub Wiki)
 
+```
+Phase F (Competitor Crusher)   ████████████████████  100% ✅
+Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
+Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
+```
+
+### Current Status
+- ✅ Kernel scheduler (MLFQ+CFS+EDF)
+- ✅ Syscalls (I/O + Process)
+- ✅ Physical MM (buddy allocator)
+- 🔄 Virtual MM (paging) - Partial
+- ✅ APIC + timer
+- ✅ sigma_pledge + sigma_unveil
+- ✅ Kyber-1024 KEM + Dilithium-5
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
+- ✅ Zenith Desktop prototype
+- ✅ sigma-pkg CLI
+- ⬜ Bootable ISO (Phase G)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### High-Impact Areas
+- Round-robin scheduler implementation
+- Buddy allocator completion
+- sigma-sh REPL
+- USB HID keyboard driver
+- VESA framebuffer driver
+- Package recipes
+
+---
+
+## 📚 Documentation
+
+### Repository Documentation
+- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
+- [Roadmap](Roadmap.md) — Development plan
+- [INSTALL.md](INSTALL.md) — Build instructions
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
+- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy
+- [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
+- [FAQ](FAQ.md) — Common questions (coming soon)
+
+### GitHub Wiki (Canonical Documentation)
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)

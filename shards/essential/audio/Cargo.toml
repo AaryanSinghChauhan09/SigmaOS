@@ -1,0 +1,15 @@
+[package]
+name = "sigma_audio"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sigma_audio"
+path = "src/lib.rs"
+
+[[bin]]
+name = "audio_driver"
+path = "src/bin/audio_driver.rs"

@@ -1,6 +1,6 @@
-/// SigmaOS: userland/system_api/control_center/security_center.rs
-/// Security Center Daemon - Monitors kernel audit logs and enforces heuristics.
-/// no_std | no alloc | no external crates.
+// SigmaOS: userland/system_api/control_center/security_center.rs
+// Security Center Daemon - Monitors kernel audit logs and enforces heuristics.
+// no_std | no alloc | no external crates.
 
 #![no_std]
 #![allow(dead_code)]

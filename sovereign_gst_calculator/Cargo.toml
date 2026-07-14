@@ -1,0 +1,15 @@
+[package]
+name = "sovereign_gst_calculator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# No external dependencies - implementing from first principles
+
+[lib]
+name = "sovereign_gst_calculator"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gst_calculator"
+path = "src/bin/gst_calculator.rs"
