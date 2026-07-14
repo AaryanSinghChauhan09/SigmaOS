@@ -1,0 +1,11 @@
+[package]
+name = "sigma_containers"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Native container and micro-VM runtime for SigmaOS, displacing Docker, Podman, and Firecracker"
+
+[dependencies]
+# Standard library is available in userland

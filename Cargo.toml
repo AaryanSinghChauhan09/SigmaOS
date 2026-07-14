@@ -16,6 +16,7 @@ members = [
     "userland/ui/design_system",
     "userland/system_api/common",
     "userland/sigma_security",
+    "userland/sigma_containers",
 ]
 default-members = ["kernel"]
 
