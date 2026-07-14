@@ -6,7 +6,6 @@ Intelligently select the most informative unlabelled samples for human annotatio
 - Uncertainty sampling using prediction entropy
 - Query-by-committee ensemble strategy
 
-
 ## Key Milestones
 
 - [ ] Entropy-based sample scoring

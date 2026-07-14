@@ -10,12 +10,9 @@
 
 1. **Sovereign** — The OS respects you. No dark patterns, no manipulative UI, no ads.
 
-
 2. **Fluid** — Motion is physics-based, not arbitrary. Every animation has purpose.
 
-
 3. **Legible** — Content is always readable. Contrast ratios ≥ 4.5:1 (WCAG AA).
-
 
 ---
 
@@ -89,12 +86,9 @@ Fallback:   system-ui, -apple-system, sans-serif
 
 - Letter-spacing: `-0.01em` for large headings, `0` for body
 
-
 - Paragraph max-width: 65 characters (44rem at 14px)
 
-
 - Optical size on variable fonts enabled
-
 
 ---
 
@@ -163,15 +157,11 @@ radius-full: 9999px — pills, badges, avatars, circular icons
 
 - **Style**: Outlined, 1.5px stroke weight
 
-
 - **Corners**: 2px radius on all sharp corners
-
 
 - **Optical sizing**: icons scaled to 16/20/24/32/48px variants
 
-
 - **Color**: always uses `currentColor` (inherits text color)
-
 
 ### Icon library (planned)
 
@@ -217,18 +207,13 @@ slowest: 700ms   — onboarding, first-launch
 
 1. **Enter with ease-out** (decelerates as it arrives = natural)
 
-
 2. **Exit with ease-in** (accelerates as it leaves = natural)
-
 
 3. **Position springs** with stiffness=280, damping=28 (responsive feel)
 
-
 4. **Scale springs** with stiffness=350, damping=35 (snappy)
 
-
 5. **Respect reduce-motion**: all animations → instant when enabled
-
 
 ---
 

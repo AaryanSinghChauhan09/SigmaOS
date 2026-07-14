@@ -15,12 +15,9 @@ Report security issues privately:
 
 1. Email: security@sigmaos.dev (or open a private GitHub Security Advisory)
 
-
 2. Include: affected component, reproduction steps, potential impact
 
-
 3. Response SLA: acknowledge within 48 hours, patch within 14 days for critical
-
 
 ## Security Architecture Overview
 
@@ -28,60 +25,43 @@ Report security issues privately:
 
 - **KEM:** Kyber-1024 (FIPS 203 / CRYSTALS-Kyber)
 
-
 - **Signatures:** Dilithium-5 (FIPS 204 / CRYSTALS-Dilithium)
-
 
 - **Hash:** BLAKE3 for package integrity, BLAKE2b for audit trails
 
-
 - **TLS:** 1.3 with X25519/Kyber-1024 hybrid key exchange
-
 
 ### Kernel Hardening
 
 - W^X (Write XOR Execute) enforcement on all memory regions
 
-
 - ASLR 42-bit per-region randomisation
-
 
 - sigma_pledge: per-process syscall allowlist
 
-
 - sigma_unveil: per-process filesystem path restriction
-
 
 - AVC (Access Vector Cache): O(1) MAC policy enforcement
 
-
 - Zero-trust SPIFFE workload identities
 
-
 - Namespace isolation (unshare/pivot_root/seccomp)
-
 
 ### Boot Security
 
 - TPM2 attestation + key unsealing (CryptFS)
 
-
 - Immutable audit trail (append-only, cryptographically chained)
 
-
 - Verified boot pipeline (planned: sigma-boot.efi with signed stages)
-
 
 ### Package Security
 
 - All `.spkg` packages signed with Dilithium-5
 
-
 - BLAKE2b content hashes verified before installation
 
-
 - Reproducible builds enforced via `sigma-repro-build`
-
 
 ## Known Open Issues
 
@@ -95,12 +75,9 @@ Report security issues privately:
 
 - Maintainer: @AaryanSinghChauhan09
 
-
 - Security label: `security` on GitHub Issues
 
-
 - CVE tracking: see `wiki_repo/CVE_TRIAGE.md`
-
 
 ---
 

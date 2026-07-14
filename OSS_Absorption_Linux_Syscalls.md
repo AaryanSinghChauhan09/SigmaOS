@@ -2,8 +2,8 @@
 
 ## Making torvalds/linux (syscalls) Irrelevant
 
-> **Absorption Target**: https://github.com/torvalds/linux (kernel syscall interface)  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/torvalds/linux (kernel syscall interface)
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaSyscall - Native Syscall Dispatcher
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Linux kernel syscalls by implementing a nativ
 
 ### 1. Syscall Dispatcher
 
-**Original**: Linux kernel syscall table  
+**Original**: Linux kernel syscall table
 **SigmaOS**: Native dispatcher with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaSyscall {
 - Dispatcher validation with automatic checking
 - Dispatcher monitoring with real-time metrics
 
-
 ### 2. File Syscalls
 
-**Original**: Linux file syscalls (open, read, write, etc.)  
+**Original**: Linux file syscalls (open, read, write, etc.)
 **SigmaOS**: Native file syscalls with enhanced features
 
 **File Features**:
@@ -54,10 +53,9 @@ pub struct SigmaSyscall {
 - File validation with automatic checking
 - File monitoring with real-time metrics
 
-
 ### 3. Process Syscalls
 
-**Original**: Linux process syscalls (fork, exec, exit, etc.)  
+**Original**: Linux process syscalls (fork, exec, exit, etc.)
 **SigmaOS**: Native process syscalls with enhanced features
 
 **Process Features**:
@@ -69,10 +67,9 @@ pub struct SigmaSyscall {
 - Process validation with automatic checking
 - Process monitoring with real-time metrics
 
-
 ### 4. Memory Syscalls
 
-**Original**: Linux memory syscalls (mmap, brk, etc.)  
+**Original**: Linux memory syscalls (mmap, brk, etc.)
 **SigmaOS**: Native memory syscalls with enhanced features
 
 **Memory Features**:
@@ -84,10 +81,9 @@ pub struct SigmaSyscall {
 - Memory validation with automatic checking
 - Memory monitoring with real-time metrics
 
-
 ### 5. Network Syscalls
 
-**Original**: Linux network syscalls (socket, bind, connect, etc.)  
+**Original**: Linux network syscalls (socket, bind, connect, etc.)
 **SigmaOS**: Native network syscalls with enhanced features
 
 **Network Features**:
@@ -99,10 +95,9 @@ pub struct SigmaSyscall {
 - Network validation with automatic checking
 - Network monitoring with real-time metrics
 
-
 ### 6. IPC Syscalls
 
-**Original**: Linux IPC syscalls (shm, sem, msg, etc.)  
+**Original**: Linux IPC syscalls (shm, sem, msg, etc.)
 **SigmaOS**: Native IPC syscalls with enhanced features
 
 **IPC Features**:
@@ -113,7 +108,6 @@ pub struct SigmaSyscall {
 - IPC profiles with automatic switching
 - IPC validation with automatic checking
 - IPC monitoring with real-time metrics
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaSyscall {
 pub mod syscall {
     use sigma_syscall::dispatcher::SyscallDispatcher;
     use sigma_syscall::table::SyscallTable;
-    
+
     pub struct SigmaSyscall {
         syscall_dispatcher: SyscallDispatcher,
         syscall_table: SyscallTable,
         capability_checker: CapabilityChecker,
     }
-    
+
     impl SigmaSyscall {
         pub fn dispatch(&self, syscall: Syscall) -> SyscallResult {
             // Native syscall dispatch
@@ -168,7 +162,7 @@ pub mod file {
         descriptor_manager: DescriptorManager,
         capability_manager: CapabilityManager,
     }
-    
+
     impl FileSyscalls {
         pub fn sys_open(&self, path: Path, flags: Flags) -> FileDescriptor {
             // Native open syscall

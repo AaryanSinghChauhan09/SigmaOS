@@ -1,6 +1,6 @@
 # SigmaOS Contributor Onboarding Guide
 
-**Last Updated:** July 6, 2026  
+**Last Updated:** July 6, 2026
 **Version:** v16.3.0 Foundation
 
 ---
@@ -23,7 +23,6 @@ Thank you for your interest in contributing to SigmaOS! This guide will help you
 8. [Communication](#communication)
 9. [Resources](#resources)
 
-
 ---
 
 ## Getting Started
@@ -36,7 +35,6 @@ Before contributing, ensure you have:
 - **Git**: Version 2.30+
 - **QEMU**: For testing (optional but recommended)
 - **Linux host**: For cross-compilation (optional)
-
 
 ### Fork and Clone
 
@@ -102,7 +100,6 @@ cargo test -- --nocapture
 - **Clippy**: Linting tool
 - **Rustfmt**: Code formatting
 
-
 Install development tools:
 
 ```bash
@@ -149,25 +146,21 @@ SigmaOS/
 - **Network**: Wi-Fi, Ethernet (r8169, igb, ixgbe)
 - **USB**: EHCI, XHCI, UHCI, OHCI controllers
 
-
 #### Kernel (`kernel/`)
 
 - Custom kernel with latest Linux integration
 - Native scheduler, memory management
 - No dependency on external kernel implementations
 
-
 #### Libraries (`lib/`)
 
 - **sigma_libc**: Custom libc reducing dependency on musl
 - Native implementations of common C library functions
 
-
 #### System Services (`system/`)
 
 - **sigma_coredump**: Core dump management
 - **sigma_workflow**: Workflow automation replacing n8n
-
 
 #### Application Suites
 
@@ -176,7 +169,6 @@ SigmaOS/
 - **GIS**: Geographic information system
 - **Healthcare**: Electronic health records
 - **Engineering**: CAD system
-
 
 ---
 
@@ -191,7 +183,6 @@ Check the [Implementation Progress](Implementation-Progress.md) and GitHub Issue
 3. **Performance**: Optimization improvements
 4. **Documentation**: Wiki updates and guides
 
-
 ### Types of Contributions
 
 - **Bug Fixes**: Address reported issues
@@ -200,14 +191,12 @@ Check the [Implementation Progress](Implementation-Progress.md) and GitHub Issue
 - **Testing**: Add test coverage
 - **Refactoring**: Improve code quality
 
-
 ### Before Starting
 
 1. Check existing Issues to avoid duplication
 2. Comment on the Issue you plan to work on
 3. Create a branch for your work (even though we only have main, use a local branch)
 4. Follow the code standards below
-
 
 ---
 
@@ -249,21 +238,20 @@ pub unsafe extern "C" fn function_name() -> SigmaI32 {
 - **Constants**: `SCREAMING_SNAKE_CASE`
 - **Modules**: `snake_case`
 
-
 #### Documentation
 
 Add doc comments to public APIs:
 
 ```rust
 /// Initialize the GPU driver
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `device_id` - PCI device ID
 /// * `mmio_base` - Memory-mapped I/O base address
-/// 
+///
 /// # Returns
-/// 
+///
 /// * `SigmaI32` - 0 on success, negative on error
 #[no_mangle]
 pub unsafe extern "C" fn gpu_init(device_id: SigmaU32, mmio_base: SigmaU64) -> SigmaI32 {
@@ -329,7 +317,6 @@ All changes must pass CI/CD pipeline. The pipeline runs:
 - Linting (clippy)
 - Formatting checks (rustfmt)
 
-
 ---
 
 ## Submitting Changes
@@ -355,7 +342,6 @@ Types:
 - `refactor`: Code refactoring
 - `test`: Test changes
 - `chore`: Maintenance tasks
-
 
 Examples:
 
@@ -385,16 +371,13 @@ Closes #123
 
 3. Create Pull Request on GitHub
 
-
 4. Fill PR template:
    - Description of changes
    - Related issues
    - Testing performed
    - Breaking changes (if any)
 
-
 5. Wait for review and address feedback
-
 
 ### Review Process
 
@@ -402,7 +385,6 @@ Closes #123
 - Address all review comments
 - Update PR as needed
 - Once approved, maintainers will merge to main
-
 
 ---
 
@@ -417,7 +399,6 @@ Use GitHub Issues for:
 - Questions
 - Discussions
 
-
 Include:
 
 - Clear title
@@ -425,7 +406,6 @@ Include:
 - Steps to reproduce (for bugs)
 - Expected vs actual behavior
 - Environment information
-
 
 ### Discussions
 
@@ -436,7 +416,6 @@ Use GitHub Discussions for:
 - Feature brainstorming
 - Community building
 
-
 ### Code of Conduct
 
 SigmaOS maintains a respectful and inclusive community:
@@ -445,7 +424,6 @@ SigmaOS maintains a respectful and inclusive community:
 - Welcome newcomers and help them learn
 - Focus on constructive feedback
 - Assume good intentions
-
 
 ---
 
@@ -457,14 +435,12 @@ SigmaOS maintains a respectful and inclusive community:
 - [Migration Guides](Migration-Guides.md) - User migration documentation
 - [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) - Additional documentation
 
-
 ### External Resources
 
 - [Rust Book](https://doc.rust-lang.org/book/)
 - [Rust by Example](https://doc.rust-lang.org/rust-by-example/)
 - [The Rustonomicon](https://doc.rust-lang.org/nomicon/) - Unsafe Rust guide
 - [Linux Kernel Documentation](https://www.kernel.org/doc/html/latest/)
-
 
 ### Project Goals
 
@@ -475,7 +451,6 @@ SigmaOS aims to:
 - Improve performance, speed, and capabilities
 - Provide comprehensive hardware support
 - Replace industry-standard tools with native implementations
-
 
 ---
 
@@ -488,7 +463,6 @@ If you need help:
 3. Create a new Issue with your question
 4. Join community discussions
 
-
 ---
 
 ## Recognition
@@ -498,7 +472,6 @@ Contributors are recognized in:
 - CONTRIBUTORS.md file
 - Release notes
 - Project acknowledgments
-
 
 All contributions are valued, regardless of size!
 

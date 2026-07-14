@@ -81,12 +81,9 @@ impl IconAtlas {
 
 - Phase 1: 8×16 VGA bitmap font (already in sigma_vesa.zig)
 
-
 - Phase 2: PSF (PC Screen Font) loader for richer glyphs
 
-
 - Phase 3: TrueType outline rasterizer (Bézier curve renderer)
-
 
 ```rust
 pub trait FontEngine {
@@ -113,18 +110,13 @@ pub trait Themed {
 
 - [ ] All interactive elements have hover + active + focus states
 
-
 - [ ] All text meets 4.5:1 contrast (auto-verified by `sigma-a11y-check`)
-
 
 - [ ] Consistent 8px grid for all spacing
 
-
 - [ ] Icons at 16/20/24/32px only (no non-standard sizes)
 
-
 - [ ] Animations respect `reduce_motion` system preference
-
 
 ---
 
@@ -145,18 +137,13 @@ Key implementation tasks:
 
 1. `TermGrid`: 2D array of `Cell { char, fg, bg, attrs }`
 
-
 2. `PtyFork`: fork sigma-sh with PTY master/slave
-
 
 3. `VtParser`: ANSI/VT100/VT220 escape sequence parser
 
-
 4. `TermRenderer`: render grid to sigma_renderer DrawCmds
 
-
 5. `InputBridge`: route keyboard events → PTY write
-
 
 #### sigma-files
 
@@ -171,18 +158,13 @@ Key tasks:
 
 1. `DirectoryModel`: async dir read + sort/filter
 
-
 2. `ListView`: virtual scrolling (only render visible rows)
-
 
 3. `PreviewPanel`: file type detection → preview renderer
 
-
 4. `OperationQueue`: copy/move/delete as cancellable async ops
 
-
 5. `BookmarkStore`: persistent bookmarks via sigma-vault
-
 
 #### sigma-edit
 
@@ -197,18 +179,13 @@ Key tasks:
 
 1. `PieceTree`: O(1) insert/delete, O(log n) line query
 
-
 2. `SyntaxHighlighter`: regex-based tokeniser per language
-
 
 3. `CursorManager`: multiple cursors with selection regions
 
-
 4. `LspClient`: Language Server Protocol over sigma-bus IPC
 
-
 5. `GutterRenderer`: line numbers + git diff + breakpoints
-
 
 ### 2.2 App Framework (shared infrastructure)
 
@@ -293,9 +270,7 @@ Required:
 
 - BottomNavigationBar widget
 
-
 - SplitView container
-
 
 - AdaptiveLayout wrapper that switches based on screen size
 
@@ -347,15 +322,11 @@ Actions:
 
 1. Lazy daemon startup: only start sigmad-metrics when first queried
 
-
 2. Shard compression: compress loaded shards > 1MB with zstd
-
 
 3. Arena allocator for widget trees (free all at once on screen change)
 
-
 4. String interning for frequently repeated strings (paths, app names)
-
 
 5. Shared read-only pages between processes (same code pages)
 
@@ -494,71 +465,51 @@ impl<S: Clone, A> Store<S, A> {
 
 - [ ] Design tokens → `sigma_design_tokens.rs`
 
-
 - [ ] Damage tracking in compositor
-
 
 - [ ] Toggle + Slider + ListView widgets
 
-
 - [ ] sigma-terminal MVP (PTY + VTE + basic ANSI)
-
 
 ### Sprint 2 (Month 2–3): Usability
 
 - [ ] Onboarding wizard (5 steps)
 
-
 - [ ] Quick Settings panel
-
 
 - [ ] Font rendering (PSF bitmap)
 
-
 - [ ] App Switcher (Super key)
-
 
 ### Sprint 3 (Month 3–4): Apps
 
 - [ ] sigma-files MVP (browse + basic ops)
 
-
 - [ ] sigma-edit MVP (open/edit/save)
-
 
 - [ ] sigma-calc complete
 
-
 - [ ] sigma-screenshot
-
 
 ### Sprint 4 (Month 4–6): Performance
 
 - [ ] GPU compositing via VirtIO-GPU
 
-
 - [ ] Boot time < 2.5s on QEMU
-
 
 - [ ] sigma-pkg online registry live
 
-
 - [ ] sigma-bench CI gates
-
 
 ### Sprint 5 (Month 6–9): Polish
 
 - [ ] Accessibility TTS
 
-
 - [ ] Mobile adaptive layouts
-
 
 - [ ] ARM64 RPi4 boot
 
-
 - [ ] First public alpha release
-
 
 ---
 

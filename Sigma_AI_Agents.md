@@ -26,11 +26,10 @@ The `sigma-ai-daemon` runs natively on NPU (Neural Processing Unit) or GPU silic
 
 ### 3.2 Predictive Maintenance Agents
 
-An autonomous agent constantly monitors hardware telemetry (SMART data, thermal sensors, memory ECC faults) via eBPF. 
+An autonomous agent constantly monitors hardware telemetry (SMART data, thermal sensors, memory ECC faults) via eBPF.
 
 - If an SSD shows signs of imminent failure, the agent preemptively triggers a cryptographic snapshot to external storage.
 - If a kernel memory leak is detected, the agent identifies the offending service and gracefully restarts it.
-
 
 ### 3.3 Adaptive UX Agents
 
@@ -38,7 +37,6 @@ The desktop environment dynamically adapts to the user's workload.
 
 - **Developer Mode**: When IDEs are launched, the UX agent disables notifications, routes maximum CPU resources to compilers, and dims background elements.
 - **Gamer Mode**: When a Vulkan context opens, the UX agent aggressively parks background tasks and tunes the CPU scheduler for minimum latency.
-
 
 ### 3.4 Legal / Compliance Overlays
 
@@ -49,6 +47,6 @@ $ sigma compliance report --standard SOC2
 Σ [AI] Generating SOC2 Compliance Dashboard...
   [PASS] Encryption at rest verified (AES-256-XTS)
   [PASS] Network policies restrict unauthorized egress
-  [WARN] User 'guest' has excessive sudo privileges. 
+  [WARN] User 'guest' has excessive sudo privileges.
   -> Auto-generate remediation policy? [Y/n]
 ```

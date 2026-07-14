@@ -14,7 +14,6 @@ SigmaOS implements a **unified MAC layer** (`sigma-mac`) that draws from all thr
 - **AppArmor** philosophy: Path-based profiles with human-readable syntax — absorbed for desktop application profiles
 - **Landlock** philosophy: Unprivileged, stackable, userspace-composable filesystem restrictions — absorbed as the default mechanism for every sandboxed shard
 
-
 ---
 
 ## 2. sigma-mac Architecture

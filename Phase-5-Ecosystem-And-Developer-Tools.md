@@ -34,9 +34,7 @@ The **SigmaOS App SDK** enables native sovereign applications:
 
 - **Sovereign ABI**: Apps talk to the kernel via the Sovereign Syscall Gate — no POSIX shim required.
 
-
 - **Rust UI bindings**: `sdk::app::zenith::Widget` trait and Zenith Desktop bindings.
-
 
 ---
 
@@ -87,18 +85,13 @@ SigmaOS follows an Ubuntu-inspired governance model:
 
 1. **Fork & Branch**: Create a feature branch off `main`.
 
-
 2. **Code Style**: C++17, SPDX headers required, `clang-format` enforced.
-
 
 3. **Testing**: All PRs must maintain 100% existing test pass rate.
 
-
 4. **Review**: 2 core maintainer approvals required for kernel changes.
 
-
 5. **CI**: All 9 CI jobs (3 profiles × 3 targets) must pass green.
-
 
 See [CONTRIBUTING.md](CONTRIBUTING) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT) for full details.
 
@@ -119,14 +112,10 @@ See [CONTRIBUTING.md](CONTRIBUTING) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT) fo
 
 - [Phase 4: CI/CD & Testing](Phase-4-CICD-And-Testing)
 
-
 - [Phase 6: Long-Term Vision](Phase-6-Long-Term-Vision)
-
 
 - [Contributor Guidelines](Contributor-Guidelines)
 
-
 - [API Reference](API-Reference)
-
 
 - [Getting Started](Getting-Started)

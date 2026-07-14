@@ -14,7 +14,6 @@ The automatic wiki sync has encountered technical issues with git processes on W
 4. Paste into the wiki editor
 5. Save each page
 
-
 ### Option 2: Using Git Command Line (Manual)
 
 ```powershell
@@ -65,7 +64,6 @@ The following files in `wiki_repo/` need to be synchronized:
 5. **Bootloader.md** - Bootloader documentation
 6. **Security-Privacy-Roadmap.md** - Security and privacy roadmap
 
-
 ## Troubleshooting
 
 If you encounter git locking issues:
@@ -74,7 +72,6 @@ If you encounter git locking issues:
 2. Run: `git clean -fd` to remove untracked files
 3. Run: `git reset --hard HEAD` to reset to last commit
 4. Try the sync again
-
 
 ## Verification
 

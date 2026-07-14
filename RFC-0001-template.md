@@ -2,27 +2,19 @@
 
 - **RFC number**: NNNN (assigned by maintainers)
 
-
 - **Author(s)**: Full Name <email or GitHub @handle>
-
 
 - **Subsystem**: (kernel/net/security/desktop/sdk/ci/...)
 
-
 - **Status**: Draft | Under Discussion | Accepted | Rejected | Implemented
-
 
 - **Date proposed**: YYYY-MM-DD
 
-
 - **Date accepted**: YYYY-MM-DD (fill when accepted)
-
 
 - **Tracking issue**: #(GitHub issue number)
 
-
 - **Implementation PR**: #(GitHub PR number, when started)
-
 
 ---
 
@@ -91,17 +83,13 @@ flowchart TD
 
 - Pros: ...
 
-
 - Cons: ...
-
 
 ### Alternative B: ...
 
 - Pros: ...
 
-
 - Cons: ...
-
 
 ---
 
@@ -127,12 +115,9 @@ flowchart TD
 
 - [ ] No ABI change
 
-
 - [ ] ABI-compatible addition
 
-
 - [ ] ABI break — requires kabi version bump
-
 
 ---
 
@@ -142,12 +127,9 @@ flowchart TD
 
 1. Stage 1: ...
 
-
 2. Stage 2: ...
 
-
 3. Stage 3: ...
-
 
 **Estimated effort**: Small (< 1 week) / Medium (1–4 weeks) / Large (> 1 month)
 
@@ -161,9 +143,7 @@ flowchart TD
 
 1. ...
 
-
 2. ...
-
 
 ---
 
@@ -173,9 +153,7 @@ flowchart TD
 
 - [Linux: relevant subsystem doc](https://...)
 
-
 - [Prior discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/issues/...)
-
 
 ---
 

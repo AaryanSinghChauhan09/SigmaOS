@@ -6,7 +6,6 @@ Programmable network control plane for SigmaOS clusters.
 - OpenFlow-inspired flow table management
 - Policy-based routing from sigma.toml
 
-
 ## Key Milestones
 
 - [ ] Flow table hash map (static)

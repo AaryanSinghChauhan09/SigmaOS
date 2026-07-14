@@ -94,7 +94,6 @@ The design system enforces high-contrast palettes programmatically:
 2. **Dark Mode**: Main text `#F8F9FA` on background `#121212` (Contrast Ratio 19.5:1)
 3. **Accent Profiles**: Custom colors must satisfy a minimum **7.0:1** contrast ratio against their respective background surface card colors.
 
-
 ---
 
 ## 🎮 Keyboard Navigation Hotkeys

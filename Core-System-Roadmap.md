@@ -12,7 +12,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - Basic hardware support (e1000 NIC, VGA framebuffer)
 - Limited driver coverage
 
-
 ### Target State
 
 - **Adopt latest stable Linux kernel (6.8+) as LKMs**
@@ -20,13 +19,11 @@ This document outlines the foundational components required to make SigmaOS comp
   - Loadable kernel modules for GPU, Wi-Fi, printer, USB, audio
   - Compatibility layer for Linux syscalls
 
-
 - **GPU Drivers**
   - NVIDIA (Nouveau + proprietary via LKM)
   - AMD (AMDGPU)
   - Intel (i915)
   - Vulkan/OpenGL acceleration
-
 
 - **Network Drivers**
   - Intel (e1000e, igb, ixgbe)
@@ -34,18 +31,15 @@ This document outlines the foundational components required to make SigmaOS comp
   - Broadcom (tg3)
   - Wi-Fi (iwlwifi, ath9k, brcmfmac)
 
-
 - **Storage Drivers**
   - NVMe (nvme)
   - AHCI SATA (ahci)
   - USB storage (usb-storage)
 
-
 - **Input Drivers**
   - Keyboard/Mouse (hid-generic, usbhid)
   - Touchpad (synaptics, libinput)
   - Touchscreen (hid-multitouch)
-
 
 ### Implementation Tasks
 
@@ -55,7 +49,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - [ ] Port storage and input drivers
 - [ ] Hardware compatibility testing matrix
 - [ ] Driver auto-detection on boot
-
 
 ### Estimated Timeline: 3-4 months
 
@@ -68,7 +61,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - Basic installer stub exists
 - Manual dual-boot process
 
-
 ### Target State
 
 - **Polished Installer (Calamares-based or custom)**
@@ -79,13 +71,11 @@ This document outlines the foundational components required to make SigmaOS comp
   - Live USB creation
   - Network installation support
 
-
 - **Bootloader Options**
   - GRUB2 with SigmaOS branding
   - systemd-boot (UEFI)
   - Secure Boot support
   - Btrfs snapshot boot menu
-
 
 ### Implementation Tasks
 
@@ -95,7 +85,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - [ ] Create VM image builder
 - [ ] Secure Boot signing infrastructure
 - [ ] Bootloader theme customization
-
 
 ### Estimated Timeline: 2 months
 
@@ -107,13 +96,11 @@ This document outlines the foundational components required to make SigmaOS comp
 
 - Custom init system (minimal)
 
-
 ### Target State
 
 - **Decision: Adopt systemd or Build SigmaOS-native init**
   - Option A: systemd (proven, compatible, complex)
   - Option B: SigmaOS-native init (simpler, sovereign, less compatible)
-
 
 ### Recommended: SigmaOS-Native Init
 
@@ -124,7 +111,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - cgroups integration
 - DID-based service authentication
 
-
 ### Implementation Tasks
 
 - [ ] Design init system architecture
@@ -133,7 +119,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - [ ] Build logging system with DID signatures
 - [ ] Create service migration tools from systemd
 - [ ] Documentation for service authors
-
 
 ### Estimated Timeline: 2-3 months
 
@@ -147,7 +132,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - Basic ext4 support
 - FAT32 support
 
-
 ### Target State
 
 - **Multi-filesystem support**
@@ -157,12 +141,10 @@ This document outlines the foundational components required to make SigmaOS comp
   - XFS (large files)
   - FAT32/exFAT (compatibility)
 
-
 - **SigmaFS as overlay**
   - Semantic indexing layer
   - Time-travel versioning
   - Works on top of ext4/Btrfs
-
 
 ### Implementation Tasks
 
@@ -172,7 +154,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - [ ] Add filesystem conversion tools
 - [ ] Optimize SigmaFS overlay performance
 - [ ] Filesystem repair tools
-
 
 ### Estimated Timeline: 2 months
 
@@ -184,7 +165,6 @@ This document outlines the foundational components required to make SigmaOS comp
 
 - Limited testing on few machines
 
-
 ### Target State
 
 - **Comprehensive hardware database**
@@ -193,7 +173,6 @@ This document outlines the foundational components required to make SigmaOS comp
   - Driver recommendations
   - Community-contributed reports
 
-
 ### Implementation Tasks
 
 - [ ] Build hardware reporting tool
@@ -201,7 +180,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - [ ] Add hardware detection to installer
 - [ ] Community submission portal
 - [ ] Automated testing on CI
-
 
 ### Estimated Timeline: 1-2 months
 
@@ -212,7 +190,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - Package Ecosystem (for driver packages)
 - Security (for secure boot, signed drivers)
 - User Experience (installer UI)
-
 
 ---
 
@@ -225,7 +202,6 @@ This document outlines the foundational components required to make SigmaOS comp
 - Dual-boot with Windows 10/11 working
 - VM images for VirtualBox, VMware, QEMU
 
-
 ---
 
 ## Next Steps
@@ -234,7 +210,6 @@ This document outlines the foundational components required to make SigmaOS comp
 2. Survey hardware compatibility priorities
 3. Design installer UI mockups
 4. Decide on init system approach (community vote)
-
 
 ---
 

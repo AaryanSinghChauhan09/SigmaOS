@@ -10,15 +10,11 @@ The Animator Profile is designed for animation excellence, motion graphics, and 
 
 - **SigmaMotion**: Animation suite with rigging and timeline tools.
 
-
 - **SigmaRender**: GPU-accelerated rendering pipeline.
-
 
 - **SigmaStoryboard**: Storyboarding and pre-visualization tools.
 
-
 - **SigmaAsset**: Character and prop asset management.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Animator Profile is designed for animation excellence, motion graphics, and 
 
 - **Theme**: Animation Dark (Creative Standard)
 
-
 - **Layout**: Animation Dashboard (Timeline, Viewport, Assets)
 
-
 - **Personalization**: Custom hotkeys and gesture controls.
-
 
 ---
 

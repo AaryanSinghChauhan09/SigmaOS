@@ -10,15 +10,11 @@ The AI/ML Scientist Profile is designed for AI excellence, machine learning rese
 
 - **SigmaModel**: Model development and training management.
 
-
 - **SigmaData**: Dataset management and preprocessing.
-
 
 - **SigmaExperiment**: Experiment tracking and hyperparameter tuning.
 
-
 - **SigmaDeploy**: Model deployment and monitoring.
-
 
 ---
 
@@ -26,12 +22,9 @@ The AI/ML Scientist Profile is designed for AI excellence, machine learning rese
 
 - **Theme**: AI Purple (Machine Learning Standard)
 
-
 - **Layout**: AI Dashboard (Model, Data, Experiment)
 
-
 - **Personalization**: Custom ML pipelines and automated training.
-
 
 ---
 

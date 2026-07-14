@@ -20,7 +20,6 @@ Today's world:
                                - No PQC, no India Stack, no DID
                                - Telemetry, vendor lock-in
 
-
 SigmaOS vision:
   SigmaOS IS the OS        →  every Linux distro runs as a sigma-pod app
   sigma-linux exec ubuntu  →  Ubuntu 24.04 shell in < 2 seconds

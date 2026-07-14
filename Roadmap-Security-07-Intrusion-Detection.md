@@ -6,7 +6,6 @@ Use ML anomaly detection to identify intrusion patterns in real time.
 - Sequence modelling on IPC event stream
 - LSTM-based anomaly sequence detector
 
-
 ## Key Milestones
 
 - [ ] IPC event sequence feature extraction

@@ -12,7 +12,6 @@ eBPF (extended Berkeley Packet Filter) is the most significant Linux kernel inno
 - **Enforce** network policy at line rate (replacing iptables — 10x faster)
 - **Profile** CPU flamegraphs, lock contention, memory leaks in production without code changes
 
-
 SigmaOS integrates eBPF as the backbone of `sigma-observe` (observability), `sigma-net-policy` (network firewall), and `sigma-perf` (continuous performance profiling).
 
 ---

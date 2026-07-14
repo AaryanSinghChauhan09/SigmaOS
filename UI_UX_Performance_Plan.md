@@ -122,12 +122,9 @@ pub trait FontEngine { fn rasterize(&mut self, c: char, size: u32) -> &[u8]; }
 
 - 5×5 Gaussian blur (better visual quality)
 
-
 - Luminance-adaptive border (brighter border on dark bg, dimmer on light)
 
-
 - Vibrancy: average surrounding pixel colour as tint
-
 
 ### 2.4 Responsive Layouts
 
@@ -187,15 +184,11 @@ Query pipeline: tokenise → search_apps → search_files → search_settings �
 
 - Grouped notifications (by app)
 
-
 - Swipe-to-dismiss gesture
-
 
 - Action buttons rendered in-notification
 
-
 - History panel (last 48h)
-
 
 ### 3.4 Quick Settings Panel
 
@@ -236,15 +229,11 @@ pub struct AppSwitcher {
 
 - `#[repr(packed)]` structs to reduce memory layout waste
 
-
 - Arena allocators for short-lived objects
-
 
 - Slab cache reuse for frequent allocations
 
-
 - Lazy shard loading (load on first use)
-
 
 ### 4.2 I/O Stack Optimisation
 
@@ -266,12 +255,9 @@ Target:  syscall → VFS → io_uring ring → zero-copy to mmap'd user buffer
 
 - **Interactive boost**: bump priority +2 for process receiving keyboard input
 
-
 - **Anticipatory I/O**: prefetch next likely read based on access pattern
 
-
 - **CPU affinity**: pin kernel threads to CPU 0, user threads spread across rest
-
 
 ---
 
@@ -288,34 +274,25 @@ pub enum MultiMonArrangement { Mirror, Extend(ExtendDir), Independent }
 
 - 1.25×, 1.5×, 2.0× rendering scale
 
-
 - Logical pixel coordinates throughout UI
 
-
 - Automatic detection from EDID display info
-
 
 ### 5.3 Wayland Protocol Compatibility
 
 - Implement xdg-shell, xdg-output, wlr-layer-shell protocols
 
-
 - Allow Wayland apps to run on Zenith compositor
 
-
 - `navigator.sigmaos.wayland` API for web apps
-
 
 ### 5.4 Mobile UI Adaptation
 
 - Breakpoints: phone (< 600px) / tablet (600-1024px) / desktop (> 1024px)
 
-
 - Touch-first interactions on phone
 
-
 - Bottom navigation bar on phone, side rail on tablet
-
 
 ---
 

@@ -6,7 +6,6 @@ Automated, encrypted, incremental backups with deduplication.
 - Content-addressed deduplication (BLAKE3 hash)
 - Encrypted backup archives with sigma-vault keys
 
-
 ## Key Milestones
 
 - [ ] Chunk-based deduplication pipeline

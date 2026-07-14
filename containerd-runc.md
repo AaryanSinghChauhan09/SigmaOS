@@ -143,8 +143,6 @@ sigma-container stop <container-id>
 
 - `sigma-container run sigmaos/hello:latest` prints `Hello from SigmaOS!`
 
-
 - Container process is constrained by `sigma_pledge`; any syscall outside the pledge causes SIGKILL.
-
 
 - `sigma-container ps` lists running containers with their SVID identities.

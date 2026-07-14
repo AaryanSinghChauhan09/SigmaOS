@@ -108,12 +108,9 @@ All core SigmaOS packages satisfy:
 
 - **No libc**: Uses `sigma_libc.h` (freestanding).
 
-
 - **No POSIX syscalls**: Routed through the Sovereign Syscall Gate.
 
-
 - **No dynamic linker**: All core packages are statically linked.
-
 
 ---
 
@@ -121,11 +118,8 @@ All core SigmaOS packages satisfy:
 
 - [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
 
-
 - [Phase 4: CI/CD & Testing](Phase-4-CICD-And-Testing)
 
-
 - [Sovereign Packaging Specification](Sovereign-Packaging-Specification)
-
 
 - [Zero Dependency Architecture](Zero-Dependency-Architecture)

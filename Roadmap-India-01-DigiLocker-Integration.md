@@ -6,7 +6,6 @@ Access Indian government documents via DigiLocker API natively.
 - OAuth2 DigiLocker API client
 - Secure document download and storage in sigma-vault
 
-
 ## Key Milestones
 
 - [ ] DigiLocker API OAuth2 flow

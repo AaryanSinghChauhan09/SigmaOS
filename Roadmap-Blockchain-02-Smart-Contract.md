@@ -6,7 +6,6 @@ Run EVM-compatible smart contracts locally for audit and testing.
 - Minimal EVM interpreter in sigma-pod container
 - Hardhat-compatible test runner
 
-
 ## Key Milestones
 
 - [ ] EVM opcode interpreter (256-bit stack)

@@ -6,7 +6,6 @@ Automatically restart failed services and restore state after kernel panic.
 - Watchdog timer with exponential backoff restart
 - State snapshot before every critical operation
 
-
 ## Key Milestones
 
 - [ ] Service dependency graph in sigma_logic

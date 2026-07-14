@@ -22,24 +22,17 @@ All four multiply — weakness in any one collapses the product.
 
 - [ ] Bootable ISO that installs on real x86_64 hardware
 
-
 - [ ] sigma-sh working with tab completion and history
-
 
 - [ ] sigma-pkg: install/remove/update from online registry
 
-
 - [ ] 50 essential packages: browser, editor, git, curl, Python, Node
-
 
 - [ ] Drivers: e1000, NVMe, xHCI, HDA, Intel i915 modesetting
 
-
 - [ ] Dual-boot installer alongside Windows/Linux
 
-
 - [ ] Live USB with persistence option
-
 
 ### Target Users
 
@@ -72,23 +65,17 @@ Students exploring OS internals, developers wanting a clean privacy-first deskto
 
 - sigma-sdk v1.0: Clang toolchain + sigma-pkg + navigator.sigmaos.* types
 
-
 - Template apps for Rust, TypeScript/Electron, Python, Java
 
-
 - docs.sigmaos.app: searchable API reference
-
 
 ### Community Packages
 
 - Community sigpkg registry at pkg.sigmaos.app
 
-
 - PKGBUILD recipe format: contributor submits → CI builds → signs → publishes
 
-
 - Target: 500 packages by v1.0
-
 
 ### Success Metric
 
@@ -120,15 +107,11 @@ A developer can install SigmaOS, open sigma-edit, write code, compile, test — 
 
 - HackerNews: "Show HN: SigmaOS — PQC-signed, multi-format OS from one codebase"
 
-
 - r/linux, r/selfhosted, r/netsec
-
 
 - FOSDEM / LCA / PyCon lightning talks
 
-
 - University CS departments (educational positioning)
-
 
 ---
 
@@ -142,45 +125,33 @@ A developer can install SigmaOS, open sigma-edit, write code, compile, test — 
 
 - HIPAA-compliant profile (encrypted storage + audit log)
 
-
 - DICOM viewer, HL7 FHIR integration
 
-
 - Air-gapped deployment for medical devices
-
 
 ### Industrial / RTOS
 
 - DO-178C DAL-B safety profile (IEC 61131-3 PLC runtime)
 
-
 - VxWorks replacement positioning
 
-
 - Automotive AUTOSAR compatibility layer
-
 
 ### Cloud / DevOps
 
 - FedRAMP-ready cloud image
 
-
 - GitOps-native: apply sigma.yaml → machine state
 
-
 - sigma-pod OCI runtime as Firecracker replacement
-
 
 ### Defence / Government
 
 - CC EAL4+ target configuration
 
-
 - MLS (Multi-Level Security) label model
 
-
 - Air-gap verified update bundles
-
 
 ---
 
@@ -190,43 +161,31 @@ A developer can install SigmaOS, open sigma-edit, write code, compile, test — 
 
 - [ ] GitHub Discussions: enable Q&A + announcements
 
-
 - [ ] Good-first-issue labels on kernel/sigma-sh tasks
-
 
 - [ ] CONTRIBUTING.md: 5-minute contribution guide
 
-
 - [ ] Weekly dev update post in Discussions
-
 
 ### Short-term (Month 3-6)
 
 - [ ] Discord server: #kernel, #drivers, #userland, #apps, #help
 
-
 - [ ] Monthly contributor digest email
-
 
 - [ ] sigma-bounty: $50–500 bounties for critical bugs
 
-
 - [ ] "Office hours" video call for contributors
-
 
 ### Long-term (Month 6+)
 
 - [ ] sigma-conf: annual developer conference
 
-
 - [ ] University partnerships: CS curriculum integration
-
 
 - [ ] sigma-foundation: non-profit governance + fundraising
 
-
 - [ ] Hardware certification programme
-
 
 ---
 
@@ -236,15 +195,11 @@ A developer can install SigmaOS, open sigma-edit, write code, compile, test — 
 
 - Zero telemetry by default — hard off, not opt-out
 
-
 - No analytics SDKs in any bundled app
-
 
 - Local-only crash reports
 
-
 - DNS-over-HTTPS enforced
-
 
 ### Security Maturity Milestones
 

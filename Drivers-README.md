@@ -13,12 +13,9 @@ This gives us:
 
 - Hardware support tested against every kernel change.
 
-
 - No unsigned code executing in Ring 0.
 
-
 - Community contributors can improve drivers without vendor permission.
-
 
 Proprietary blobs (NVIDIA closed, Broadcom Wi-Fi firmware) are supported as an **opt-in**
 via `sigma-pkg install sigma-nonfree/<driver>` — isolated, integrity-checked, and audited.
@@ -99,21 +96,15 @@ drivers/
 
 - `sigma-amdgpu` — AMD Radeon RX 400+ open driver
 
-
 - `sigma-nouveau` — Community NVIDIA open driver
-
 
 - `sigma-xe` — Intel Arc open driver
 
-
 - `sigma-mesa` — Mesa OpenGL 4.6 / Vulkan 1.3
-
 
 - `sigma-bluez` — Bluetooth stack
 
-
 - `sigma-ath9k` / `sigma-ath11k` — Qualcomm Wi-Fi
-
 
 ---
 

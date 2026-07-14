@@ -17,7 +17,6 @@
 11. **Developer SDK and Templates**: Package templates, CI templates, and local dev sandboxes.
 12. **Comprehensive Docs**: Expand the Wiki into a single source of truth for building, packaging, testing, and contributing.
 
-
 ## Phased Roadmap (12 Months)
 
 - **Q1**: Merge Linux LTS kernel branch, sigpkg spec v0.1 with signing keys, Installer Prototype.

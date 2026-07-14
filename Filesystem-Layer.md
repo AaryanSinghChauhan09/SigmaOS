@@ -64,34 +64,24 @@ int sigma_vfs_rollback(const char *tag);
 
 - [x] VFS router (`vfs.rs`)
 
-
 - [x] SovereignFS basic CoW layout (`sigmafs.rs`)
-
 
 - [x] Ext4 read-only driver (`ext4.rs`)
 
-
 - [x] FAT32 r/w driver (`fat32.rs`)
-
 
 - [ ] SovereignFS journal format spec
 
-
 - [ ] `sfs_mkfs` userland tool
-
 
 - [ ] SPARK formal proofs for journal replay
 
-
 - [ ] OverlayFS shim for container layers
 
-
 - [ ] NVMe queue-depth optimisation in VFS
-
 
 ## Related Modules
 
 - [`modules/core/kernel`](../kernel/README.md) — Kernel memory management
-
 
 - [`modules/security/isolation`](../../security/isolation/README.md) — FS namespace isolation

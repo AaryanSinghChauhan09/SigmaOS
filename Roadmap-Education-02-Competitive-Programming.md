@@ -6,7 +6,6 @@ Pre-configured environment for ICPC, IOI, and CodeChef contestants.
 - GCC 13 with O2/O3 optimisations pre-configured
 - Common CP library templates bundled
 
-
 ## Key Milestones
 
 - [ ] sigma-cp CLI: compile, run, judge

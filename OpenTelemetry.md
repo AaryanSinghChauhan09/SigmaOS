@@ -172,8 +172,6 @@ panels:
 
 - Traces from sigma-bus IPC calls are visible in Jaeger UI at `http://localhost:16686`.
 
-
 - `sigma_bus_ipc_calls_total` metric is scraped by Prometheus at `:8888/metrics`.
-
 
 - sigma-otel-collector shard restarts automatically on crash (sigma-bus supervisor policy).

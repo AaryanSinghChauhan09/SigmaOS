@@ -131,15 +131,11 @@ public:
 
 - **Issue - Kinematic Singularity Lockups:** Robotic arm trajectories passing through mathematical singular configurations cause infinite joint velocity calculations (`NaN`).
 
-
 - *Fix Strategy:* The robotics planner implements **Damped Least Squares (Levenberg-Marquardt)** inverse kinematics, capping maximum joint velocities and automatically bypassing singular matrices.
-
 
 - **Issue - Sensor Desynchronization Jitter:** Asynchronous LIDAR packets arriving over network interfaces cause Kalman filter state divergence.
 
-
 - *Fix Strategy:* S-ZFS VFS wrappers timestamp incoming peripheral packets at the exact hardware interrupt level (`sigma_timestamp()`), allowing the EKF engine to interpolate exact temporal offsets.
-
 
 ---
 > **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED

@@ -29,39 +29,27 @@ Describe any alternative solutions or features you've considered.
 
 - [ ] Kernel Core (scheduler, memory, syscalls)
 
-
 - [ ] Drivers (network, storage, GPU, USB)
-
 
 - [ ] Filesystem
 
-
 - [ ] Network Stack
-
 
 - [ ] Security
 
-
 - [ ] Package Manager
-
 
 - [ ] Boot/ISO
 
-
 - [ ] Desktop/GUI
-
 
 - [ ] Shell/Userland
 
-
 - [ ] Documentation
-
 
 - [ ] CI/CD
 
-
 - [ ] Other (specify)
-
 
 ## Implementation Plan
 

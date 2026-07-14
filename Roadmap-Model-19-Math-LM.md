@@ -6,7 +6,6 @@ Embed a model specialised for symbolic mathematics and theorem proving.
 - DeepSeek-Math or Mathstral-7B quantised inference
 - Symbolic expression parser integrated with sigma_math.rs
 
-
 ## Key Milestones
 
 - [ ] LaTeX math expression tokeniser

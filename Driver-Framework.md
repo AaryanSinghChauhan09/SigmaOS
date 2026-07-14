@@ -129,15 +129,11 @@ Benefits:
 
 - Driver crash → kernel keeps running, driver process restarted
 
-
 - Driver bug → contained in sandbox, no kernel memory corruption
-
 
 - `sigma_pledge` per driver limits syscall access
 
-
 - Easier debugging (driver is a normal process)
-
 
 Cost: ~1–5µs per operation for IPC crossing.
 

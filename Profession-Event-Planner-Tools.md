@@ -10,15 +10,11 @@ The Event Planner Profile is designed for event excellence, venue management, an
 
 - **SigmaEvent**: Event planning and coordination system.
 
-
 - **SigmaVenue**: Venue management and booking tools.
-
 
 - **SigmaGuest**: Guest list management and RSVP tracking.
 
-
 - **SigmaBudget**: Budget tracking and vendor payment management.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Event Planner Profile is designed for event excellence, venue management, an
 
 - **Theme**: Celebration Pink (Event Standard)
 
-
 - **Layout**: Event Dashboard (Planning, Venue, Guests)
 
-
 - **Personalization**: Custom event templates and automated reminders.
-
 
 ---
 

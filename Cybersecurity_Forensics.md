@@ -7,11 +7,9 @@ SigmaOS provides a world-class environment for security analysts and forensic in
 - **Offensive Security:** Metasploit, Burp Suite (Community Edition), Nmap.
 - **Network Analysis:** Wireshark, Suricata, Snort (integrated tightly with MicroVM network namespaces).
 
-
 ## Incident Response & Forensics
 
 - **Forensics Mode:** Boot into a read-only environment to utilize Autopsy, Sleuth Kit, and Volatility directly against physical memory and block devices.
-
 
 ## Secrets Management
 

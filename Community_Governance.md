@@ -13,7 +13,6 @@ SigmaOS operates under a decentralized, open-source governance charter. Project 
 - **Inclusive**: Open to all contributors
 - **Secure**: Cryptographic verification of all votes
 
-
 ## Governance Structure
 
 ### Steering Committee
@@ -26,7 +25,6 @@ SigmaOS operates under a decentralized, open-source governance charter. Project 
 - Geographic diversity requirement
 - Technical expertise requirement
 
-
 **Responsibilities**:
 
 - Technical direction decisions
@@ -34,7 +32,6 @@ SigmaOS operates under a decentralized, open-source governance charter. Project 
 - Budget allocation
 - Contributor status approval
 - Conflict resolution
-
 
 ### Contributor Voting & Onboarding
 
@@ -130,7 +127,7 @@ pub fn lookup_contributor_key(voter_did: &str) -> PublicKey {
     let did = DID::parse(voter_did);
     let resolver = DIDResolver::new();
     let doc = resolver.resolve(did).unwrap();
-    
+
     // Extract public key from DID document
     doc.public_key().clone()
 }
@@ -155,42 +152,42 @@ impl RFCProcess {
     pub fn submit_rfc(&self, rfc: RFC) -> Result<(), GovernanceError> {
         // Validate RFC format
         self.validate_rfc(&rfc)?;
-        
+
         // Open discussion period
         self.open_discussion(&rfc)?;
-        
+
         // Wait for discussion period
         tokio::time::sleep(tokio::time::Duration::from_secs(
             self.discussion_period as u64 * 86400
         )).await;
-        
+
         // Open voting period
         self.open_voting(&rfc)?;
-        
+
         // Wait for voting period
         tokio::time::sleep(tokio::time::Duration::from_secs(
             self.voting_period as u64 * 86400
         )).await;
-        
+
         // Tally votes
         let result = self.tally_votes(&rfc)?;
-        
+
         // Apply decision
         self.apply_decision(&rfc, &result)?;
-        
+
         Ok(())
     }
-    
+
     fn tally_votes(&self, rfc: &RFC) -> VoteResult {
         let votes = self.collect_votes(rfc);
-        
+
         let for_votes = votes.iter().filter(|v| v.vote == VoteType::For).count();
         let against_votes = votes.iter().filter(|v| v.vote == VoteType::Against).count();
         let total_votes = for_votes + against_votes;
-        
+
         let quorum_met = total_votes >= (self.quorum * self.total_contributors() as f32) as usize;
         let passed = for_votes > against_votes && (for_votes as f32 / total_votes as f32) > 0.6;
-        
+
         VoteResult {
             for_votes,
             against_votes,
@@ -233,20 +230,20 @@ impl DIDRegistry {
             documents: HashMap::new(),
         }
     }
-    
+
     pub fn register(&mut self, did: String, document: DIDDocument) -> Result<(), DIDError> {
         // Validate DID format
         self.validate_did(&did)?;
-        
+
         // Validate document
         self.validate_document(&document)?;
-        
+
         // Register
         self.documents.insert(did, document);
-        
+
         Ok(())
     }
-    
+
     pub fn resolve(&self, did: &str) -> Option<&DIDDocument> {
         self.documents.get(did)
     }
@@ -265,14 +262,12 @@ impl DIDRegistry {
 - Accepted Code of Conduct
 - Valid DID
 
-
 **Benefits**:
 
 - Voting rights on RFCs
 - Eligibility for Steering Committee
 - Access to contributor-only channels
 - Recognition in contributor list
-
 
 ### Contributor License Agreement (CLA)
 
@@ -294,7 +289,6 @@ You hereby grant to the SigmaOS project and its successors a perpetual, worldwid
 - Zero tolerance for harassment
 - Conflict resolution process
 
-
 ## RFC Process
 
 ### RFC Lifecycle
@@ -305,7 +299,6 @@ You hereby grant to the SigmaOS project and its successors a perpetual, worldwid
 4. **Decision**: Steering committee decision
 5. **Implementation**: Implementation phase
 6. **Review**: Post-implementation review
-
 
 ### RFC Template
 
@@ -321,7 +314,6 @@ You hereby grant to the SigmaOS project and its successors a perpetual, worldwid
 - [ ] Accepted
 - [ ] Rejected
 - [ ] Implemented
-
 
 ## Motivation
 
@@ -351,7 +343,6 @@ What questions remain unanswered?
 - No conflicts of interest
 - Geographic diversity consideration
 
-
 **Process**:
 
 1. Nomination period (7 days)
@@ -360,14 +351,12 @@ What questions remain unanswered?
 4. Vote tallying
 5. Results announcement
 
-
 **Voting System**:
 
 - Single transferable vote (STV)
 - Cryptographically signed ballots
 - Public verification
 - Audit trail
-
 
 ## Best Practices
 
@@ -378,7 +367,6 @@ What questions remain unanswered?
 3. **Merit-Based**: Recognition based on contributions
 4. **Security**: Cryptographic verification of all votes
 
-
 ### Contribution
 
 1. **Quality**: Focus on high-quality contributions
@@ -386,14 +374,12 @@ What questions remain unanswered?
 3. **Documentation**: Document all changes
 4. **Testing**: Test all contributions thoroughly
 
-
 ### Conflict Resolution
 
 1. **Escalation**: Clear escalation path
 2. **Mediation**: Neutral mediation process
 3. **Appeals**: Right to appeal decisions
 4. **Documentation**: Document all conflicts
-
 
 ## Roadmap & Milestones
 
@@ -404,14 +390,12 @@ What questions remain unanswered?
 - Basic governance structure
 - RFC process definition
 
-
 ### Phase 2 (Months 3-6)
 
 - GitHub bot for RFC votes
 - PGP/MOK signature parsing
 - DID registry implementation
 - Vote verification system
-
 
 ### Phase 3 (Months 6-9)
 
@@ -420,14 +404,12 @@ What questions remain unanswered?
 - Contributor management system
 - Conflict resolution process
 
-
 ### Phase 4 (Months 9-12)
 
 - Foundation establishment
 - Intellectual property protection trust
 - Advanced governance features
 - Community outreach programs
-
 
 ## References
 

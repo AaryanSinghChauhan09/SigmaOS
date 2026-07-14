@@ -6,7 +6,6 @@ Dynamic kernel tracing and network filtering without kernel rebuilds.
 - Safe bytecode VM executing in kernel context
 - Attach probes to IPC, syscall, and network events
 
-
 ## Key Milestones
 
 - [ ] Minimal register-based bytecode VM

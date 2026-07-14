@@ -16,7 +16,6 @@ Each driver package contains:
 - **Signer public key** (32 bytes)
 - **Compatibility metadata** (vendor/device IDs, min kernel version)
 
-
 ## Update Flow
 
 ```text
@@ -52,7 +51,6 @@ Each driver package contains:
   - `check_compatibility(pkg, kernel)` — HCL + kernel version
   - `install_driver(pkg, kernel)` — atomic install with rollback
   - `rollback()` — revert to previous driver
-
 
 ## Security
 

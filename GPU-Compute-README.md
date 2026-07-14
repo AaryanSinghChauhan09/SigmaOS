@@ -18,19 +18,14 @@ User App
 
 - Compute kernels launched via structured shard messages
 
-
 - Deterministic memory mapping (GPU VRAM ↔ RAM) with cryptographic attestation
 
-
 - Zero vendor lock-in
-
 
 ## Roadmap
 
 - [ ] Shader compiler (SPIR-V front-end)
 
-
 - [ ] Command buffer submission
-
 
 - [ ] Memory allocator (GPU VRAM)

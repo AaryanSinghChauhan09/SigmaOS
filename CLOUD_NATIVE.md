@@ -1,7 +1,7 @@
 # SigmaOS Cloud Native — sigma-nebula Architecture
 
-> **Status**: ✅ Implemented — prototype in `userland/nebula/sigma_nebula.nim`  
-> **Language**: Nim (freestanding, OOP)  
+> **Status**: ✅ Implemented — prototype in `userland/nebula/sigma_nebula.nim`
+> **Language**: Nim (freestanding, OOP)
 > **Branch**: `feature/multi-lang-impl-batch1`
 
 ---
@@ -48,7 +48,6 @@ Each container has explicit resource caps enforced at creation:
 - **Base**: `ContainerRuntime ref object of RootObj` — abstract init/shutdown
 - **Derived**: `SovereignContainer` — state machine + PID tracking
 - **Composition**: `ContainerScheduler` — array of up to 64 containers, round-robin scheduling
-
 
 ## API (inter-daemon IPC)
 

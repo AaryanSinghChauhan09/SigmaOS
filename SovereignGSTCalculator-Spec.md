@@ -22,7 +22,6 @@ Memory is allocated via `sigma_malloc` direct hardware paging to ensure secure, 
 - **Input Tax Credit (ITC)**: Automated ITC calculation and reconciliation
 - **Reverse Charge Mechanism**: RCM calculation and tracking
 
-
 ### 2. Invoice Management
 
 - **E-Invoice Generation**: GST-compliant e-invoice generation with IRN (Invoice Reference Number)
@@ -30,14 +29,12 @@ Memory is allocated via `sigma_malloc` direct hardware paging to ensure secure, 
 - **QR Code Generation**: Dynamic QR code for invoice verification
 - **Invoice Archival**: Secure invoice storage with SigmaFS
 
-
 ### 3. Return Filing
 
 - **GSTR-1**: Outward supply return preparation and filing
 - **GSTR-3B**: Summary return filing with tax payment
 - **GSTR-9**: Annual return preparation
 - **Auto-Reconciliation**: Automatic data reconciliation between returns
-
 
 ## Data Model
 
@@ -81,7 +78,6 @@ pub struct TaxBreakdown {
 - `gst_itc_reconcile(purchases, sales) -> Result<ITCReport>`
 - `gst_reverse_charge(supply_type) -> Result<bool>`
 
-
 ### Invoice Operations
 
 - `invoice_create(invoice_data) -> Result<InvoiceId>`
@@ -89,14 +85,12 @@ pub struct TaxBreakdown {
 - `invoice_sign(invoice_id, private_key) -> Result<Signature>`
 - `invoice_verify(invoice_id) -> Result<bool>`
 
-
 ### Return Operations
 
 - `return_prepare_gstr1(period) -> Result<GSTR1Data>`
 - `return_prepare_gstr3b(period) -> Result<GSTR3BData>`
 - `return_file_gstr1(data, credentials) -> Result<FilingStatus>`
 - `return_reconcile(period) -> Result<ReconciliationReport>`
-
 
 ## Security Requirements
 
@@ -107,7 +101,6 @@ pub struct TaxBreakdown {
 - **Hash**: BLAKE3 for data integrity
 - **Random**: Hardware entropy via TPM
 
-
 ### Access Control
 
 - **Role-Based Access**: Tax practitioner, accountant, admin roles
@@ -115,14 +108,12 @@ pub struct TaxBreakdown {
 - **Audit Trail**: Complete tax filing lifecycle logging
 - **Zero-Trust**: Continuous authentication
 
-
 ### Data Protection
 
 - **Financial Privacy**: All financial data encrypted at rest
 - **Secure Transmission**: TLS 1.3 with hybrid key exchange
 - **Backup Encryption**: Encrypted backups with separate keys
 - **Retention Policy**: 7-year retention per GST Act
-
 
 ## Compliance Matrix
 
@@ -143,7 +134,6 @@ pub struct TaxBreakdown {
 - **Return Filing**: < 10s
 - **Reconciliation**: < 30s for monthly data
 
-
 ## Integration Points
 
 ### External Systems
@@ -153,14 +143,12 @@ pub struct TaxBreakdown {
 - **Payment Gateway**: Tax payment integration with UPI
 - **Bank Integration**: Auto-reconciliation with bank statements
 
-
 ### Internal SigmaOS Services
 
 - **SigmaFS**: Secure invoice storage
 - **SigmaVault**: Key management for signatures
 - **SigmaAudit**: Audit trail integration
 - **SigmaAI**: Anomaly detection in tax data
-
 
 ## Deployment
 
@@ -179,7 +167,6 @@ features = ["taxation", "crypto", "compliance"]
 - **CPU**: Dual core recommended
 - **Network**: Required for GSTN integration
 
-
 ## Testing
 
 ### Unit Tests
@@ -189,7 +176,6 @@ features = ["taxation", "crypto", "compliance"]
 - ITC reconciliation
 - Invoice generation
 
-
 ### Integration Tests
 
 - End-to-end return filing
@@ -197,14 +183,12 @@ features = ["taxation", "crypto", "compliance"]
 - Performance under load
 - Security validation
 
-
 ### Compliance Tests
 
 - Regulatory requirement validation
 - Invoice format validation
 - Return data validation
 - Audit trail verification
-
 
 ## Maintenance
 
@@ -214,7 +198,6 @@ features = ["taxation", "crypto", "compliance"]
 - **Regulatory Updates**: Quarterly review of GST rules
 - **Security Patches**: Immediate for CVEs
 - **Feature Updates**: Monthly release cycle
-
 
 ### Monitoring
 

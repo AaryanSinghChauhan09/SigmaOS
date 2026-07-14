@@ -63,38 +63,28 @@ on:
 
     - cron: '0 2 * * *'   # 02:00 UTC nightly
 
-
 ```
 
 ## Roadmap
 
 - [ ] Syscall round-trip benchmark
 
-
 - [ ] IPC throughput benchmark
-
 
 - [ ] Memory allocator latency suite
 
-
 - [ ] Filesystem IOPS benchmark
-
 
 - [ ] Network TCP throughput benchmark
 
-
 - [ ] Automated regression detection (± 5% threshold)
-
 
 - [ ] Flamegraph generation pipeline
 
-
 - [ ] Historical results dashboard (GitHub Pages)
-
 
 ## Related Modules
 
 - [`modules/perf/scheduler`](../scheduler/README.md) — Scheduler performance
-
 
 - [`modules/perf/mm`](../mm/README.md) — Memory manager benchmarks

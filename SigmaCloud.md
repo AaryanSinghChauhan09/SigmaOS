@@ -18,7 +18,6 @@ Decentralized cloud file storage (Google Drive alternative):
 - AI-powered file organization and search
 - Cross-device sync (desktop, mobile, web)
 
-
 ### SigmaMail (Email Client)
 
 Secure, encrypted mailing (Gmail alternative):
@@ -34,7 +33,6 @@ Secure, encrypted mailing (Gmail alternative):
 - Smart replies and compose suggestions
 - Offline mode with sync
 
-
 ### SigmaCalendar (Calendar & Scheduling)
 
 Sync and scheduling tools:
@@ -49,7 +47,6 @@ Sync and scheduling tools:
 - AI-powered scheduling suggestions
 - Export to iCal format
 
-
 ### SigmaContacts (Contacts Management)
 
 Contact management and synchronization:
@@ -61,7 +58,6 @@ Contact management and synchronization:
 - Contact sharing
 - AI-powered contact deduplication
 - Sync with mobile devices
-
 
 ## Architecture
 
@@ -94,7 +90,6 @@ SigmaCloud Suite
 - **Capability-based sharing**: Fine-grained access control via capability tokens
 - **Post-quantum ready**: Uses Kyber-768 for key exchange
 - **Secure boot integration**: Verified boot chain for cloud clients
-
 
 ## API Interface
 
@@ -137,7 +132,6 @@ int sigma_contacts_export_vcard(const char *contact_id, const char *path);
 - **Zenith Desktop Integration**: Native Zenith UI with notifications
 - **Mobile Sync**: SigmaOS Mobile app for on-the-go access
 
-
 ## Performance Characteristics
 
 | Application | Sync Speed | Encryption | Offline Support |
@@ -159,7 +153,6 @@ int sigma_contacts_export_vcard(const char *contact_id, const char *path);
 - [ ] Mobile apps (SigmaOS Mobile, iOS, Android)
 - [ ] Web interface (SigmaOS Cloud)
 - [ ] Enterprise features (SSO, admin console, audit logs)
-
 
 ## Related Modules
 

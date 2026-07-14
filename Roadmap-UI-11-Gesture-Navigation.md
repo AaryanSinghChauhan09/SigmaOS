@@ -6,7 +6,6 @@ Navigate the Zenith Desktop using swipe gestures on touchpad and touchscreen.
 - 3/4-finger swipe for workspace switching
 - Pinch-to-zoom for window scaling
 
-
 ## Key Milestones
 
 - [ ] Multi-finger gesture classifier

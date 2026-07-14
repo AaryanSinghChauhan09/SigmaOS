@@ -282,25 +282,18 @@ fi
 
 - Use `set -e` idiom equivalent: `cmd || exit 1` to fail fast
 
-
 - Quote variables: `"$var"` prevents word splitting
-
 
 - Use `$()` instead of backticks `` `cmd` `` — cleaner nesting
 
-
 - Check exit codes: `$?` immediately after the command
 
-
 - Use `sigma-fix scan` before deploying scripts to catch common issues
-
 
 ## See Also
 
 - [CLI Reference](CLI-Reference) — all sigma CLI commands
 
-
 - [sigma-sh Manual](sigma-sh) — interactive shell usage
-
 
 - [Coreutils](Coreutils) — standard utilities available in scripts

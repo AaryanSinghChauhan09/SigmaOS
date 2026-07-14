@@ -6,7 +6,6 @@ Upscale low-resolution images and videos using neural networks.
 - Real-ESRGAN 4x upscaler (ONNX Q8)
 - Integrated into Zenith image viewer
 
-
 ## Key Milestones
 
 - [ ] Residual-in-Residual Dense Block inference

@@ -12,9 +12,7 @@ NIST finalised the first PQC standards in 2024:
 
 - **FIPS 203** — ML-KEM (Kyber-1024) for key encapsulation
 
-
 - **FIPS 204** — ML-DSA (Dilithium-5) for digital signatures
-
 
 SigmaOS implements both, everywhere classical crypto would appear.
 
@@ -104,17 +102,13 @@ The bootloader will be signed with Dilithium-5 and verified against a TPM2-seale
 
 - Kyber NTT (Number Theoretic Transform) vectorised with AVX-512
 
-
 - Target: ≥ 5.8 M Kyber-1024 ops/sec on modern Intel Xeon
-
 
 ### ARM NEON — `crypto/sigma_kyber_neon.cpp`
 
 - Kyber NTT on ARM Cortex-A72+ (Raspberry Pi 4/5)
 
-
 - Target: ≥ 1.2 M Kyber-1024 ops/sec
-
 
 ---
 

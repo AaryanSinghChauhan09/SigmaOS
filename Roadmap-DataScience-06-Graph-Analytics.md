@@ -6,7 +6,6 @@ Process and analyse network graphs from process/capability dependency data.
 - BFS/DFS on static adjacency lists
 - PageRank for process influence scoring
 
-
 ## Key Milestones
 
 - [ ] Adjacency list from capability token graph

@@ -6,7 +6,6 @@ Generate unique, daily wallpapers using the on-device Stable Diffusion model.
 - Daily prompt rotation from curated prompt library
 - User style preference personalisation
 
-
 ## Key Milestones
 
 - [ ] Prompt library in sigma_db (100+ prompts)

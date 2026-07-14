@@ -19,41 +19,29 @@ This document provides detailed implementation plans for the highest-priority op
 
 - [ ] Add Wasmtime as dependency in Cargo.toml
 
-
 - [ ] Create sigmad-sandbox/wasm-runtime module
-
 
 - [ ] Implement basic WASM execution wrapper
 
-
 - [ ] Add capability-based syscall filtering
-
 
 - [ ] Create WASI syscalls mapping to SigmaOS syscalls
 
-
 - [ ] Add basic resource limits (memory, CPU)
-
 
 ### Sprint 2: Advanced Features
 
 - [ ] Implement WASI filesystem access with pledge/unveil
 
-
 - [ ] Add network capability filtering
-
 
 - [ ] Implement WASM module caching
 
-
 - [ ] Add performance monitoring and profiling
-
 
 - [ ] Create WASM package format for sigpkg
 
-
 - [ ] Write integration tests
-
 
 **Repository Mapping**: sigmad-sandbox/wasm-runtime
 **Branch**: sigmad-sandbox
@@ -123,49 +111,35 @@ impl WasmRuntime {
 
 - [ ] Add smoltcp as dependency
 
-
 - [ ] Create net/smoltcp module
-
 
 - [ ] Implement basic Ethernet driver interface
 
-
 - [ ] Add ARP support
 
-
 - [ ] Implement basic IPv4 stack
-
 
 ### Week 2: Advanced Features
 
 - [ ] Add TCP/UDP support
 
-
 - [ ] Implement DNS client
-
 
 - [ ] Add DHCP client
 
-
 - [ ] Create network configuration API
 
-
 - [ ] Add packet filtering support
-
 
 ### Week 3: Integration & Testing
 
 - [ ] Integrate with VirtIO network driver
 
-
 - [ ] Add network performance tests
-
 
 - [ ] Create network monitoring tools
 
-
 - [ ] Write documentation
-
 
 **Repository Mapping**: net/smoltcp
 **Branch**: drivers-dev
@@ -239,49 +213,35 @@ impl SigmaNetworkStack {
 
 - [ ] Add libsodium-sys as dependency
 
-
 - [ ] Create crypto/libsodium wrapper
-
 
 - [ ] Implement key generation functions
 
-
 - [ ] Add encryption/decryption wrappers
 
-
 - [ ] Implement signature functions
-
 
 ### Week 2: SigmaOS Integration
 
 - [ ] Integrate with capability system
 
-
 - [ ] Add hardware acceleration support
-
 
 - [ ] Implement secure key storage
 
-
 - [ ] Add key derivation functions
 
-
 - [ ] Create crypto performance benchmarks
-
 
 ### Week 3: Testing & Documentation
 
 - [ ] Add comprehensive tests
 
-
 - [ ] Write security documentation
-
 
 - [ ] Create crypto API reference
 
-
 - [ ] Add integration with TPM
-
 
 **Repository Mapping**: crypto/libsodium
 **Branch**: main
@@ -373,41 +333,29 @@ impl SigmaCrypto {
 
 - [ ] Add wlroots as dependency
 
-
 - [ ] Create desktop/graphics module
-
 
 - [ ] Implement basic compositor loop
 
-
 - [ ] Add output management
-
 
 - [ ] Implement input handling
 
-
 - [ ] Add basic window management
-
 
 ### Sprint 2: Advanced Features
 
 - [ ] Implement layer shell protocol
 
-
 - [ ] Add XDG shell support
-
 
 - [ ] Implement drag-and-drop
 
-
 - [ ] Add screenshot support
-
 
 - [ ] Integrate with SigmaOS graphics drivers
 
-
 - [ ] Add performance optimizations
-
 
 **Repository Mapping**: desktop/graphics
 **Branch**: release/standalone
@@ -483,49 +431,35 @@ impl CompositorHandler for SigmaCompositor {
 
 - [ ] Add tokio as dependency
 
-
 - [ ] Create userland/libs/rust-async module
-
 
 - [ ] Implement async syscall wrappers
 
-
 - [ ] Add async I/O operations
 
-
 - [ ] Create async task scheduler
-
 
 ### Week 2: SigmaOS Integration
 
 - [ ] Integrate with capability system
 
-
 - [ ] Add async network stack integration
-
 
 - [ ] Implement async filesystem operations
 
-
 - [ ] Add async process management
 
-
 - [ ] Create async IPC mechanisms
-
 
 ### Week 3: Testing & Documentation
 
 - [ ] Add async performance tests
 
-
 - [ ] Write async programming guide
-
 
 - [ ] Create async examples
 
-
 - [ ] Add async debugging tools
-
 
 **Repository Mapping**: userland/libs/rust-async
 **Branch**: main
@@ -588,49 +522,35 @@ pub async fn async_read(fd: i32, buf: &mut [u8]) -> Result<usize> {
 
 - [ ] Add rusqlite as dependency
 
-
 - [ ] Create userland/lib/sqlite module
-
 
 - [ ] Implement database schema for sigpkg
 
-
 - [ ] Add migration system
 
-
 - [ ] Create query builders
-
 
 ### Week 2: SigmaOS Integration
 
 - [ ] Integrate with sigpkg registry
 
-
 - [ ] Add transaction support
-
 
 - [ ] Implement caching layer
 
-
 - [ ] Add backup/restore
 
-
 - [ ] Create performance optimizations
-
 
 ### Week 3: Testing & Documentation
 
 - [ ] Add database tests
 
-
 - [ ] Write database documentation
-
 
 - [ ] Create migration scripts
 
-
 - [ ] Add database monitoring
-
 
 **Repository Mapping**: userland/lib/sqlite
 **Branch**: sigma-pkg
@@ -698,49 +618,35 @@ impl SigmaDatabase {
 
 - [ ] Add prometheus-client as dependency
 
-
 - [ ] Create userland/observability module
-
 
 - [ ] Implement metric registry
 
-
 - [ ] Add counter/gauge/histogram metrics
 
-
 - [ ] Create metric exporters
-
 
 ### Week 2: SigmaOS Integration
 
 - [ ] Add kernel metrics collection
 
-
 - [ ] Implement process metrics
-
 
 - [ ] Add network metrics
 
-
 - [ ] Create metrics API
 
-
 - [ ] Add metrics aggregation
-
 
 ### Week 3: Testing & Documentation
 
 - [ ] Add metrics tests
 
-
 - [ ] Write metrics documentation
-
 
 - [ ] Create metrics dashboard
 
-
 - [ ] Add alerting integration
-
 
 **Repository Mapping**: userland/observability
 **Branch**: main
@@ -814,49 +720,35 @@ impl SigmaMetrics {
 
 - [ ] Add opentelemetry-rust as dependency
 
-
 - [ ] Create kernel/tracing module
-
 
 - [ ] Implement trace context propagation
 
-
 - [ ] Add span creation
 
-
 - [ ] Create trace exporters
-
 
 ### Week 2: SigmaOS Integration
 
 - [ ] Add kernel tracing points
 
-
 - [ ] Implement syscall tracing
-
 
 - [ ] Add driver tracing
 
-
 - [ ] Create trace aggregation
 
-
 - [ ] Add trace visualization
-
 
 ### Week 3: Testing & Documentation
 
 - [ ] Add tracing tests
 
-
 - [ ] Write tracing documentation
-
 
 - [ ] Create tracing examples
 
-
 - [ ] Add trace analysis tools
-
 
 **Repository Mapping**: kernel/tracing
 **Branch**: main
@@ -912,49 +804,35 @@ impl SigmaTracer {
 
 - [ ] Add cosign-rs as dependency
 
-
 - [ ] Create release/signing module
-
 
 - [ ] Implement signing with Dilithium-5
 
-
 - [ ] Add signature verification
 
-
 - [ ] Create provenance generation
-
 
 ### Week 2: SigmaOS Integration
 
 - [ ] Integrate with build pipeline
 
-
 - [ ] Add package signing
-
 
 - [ ] Implement signature verification in sigpkg
 
-
 - [ ] Add provenance publishing
 
-
 - [ ] Create signature verification UI
-
 
 ### Week 3: Testing & Documentation
 
 - [ ] Add signing tests
 
-
 - [ ] Write security documentation
-
 
 - [ ] Create signing examples
 
-
 - [ ] Add key management
-
 
 **Repository Mapping**: release/signing
 **Branch**: main
@@ -1018,41 +896,29 @@ impl SigmaSigner {
 
 - [ ] Add Firecracker as dependency
 
-
 - [ ] Create runtime/vmm module
-
 
 - [ ] Implement basic VM creation
 
-
 - [ ] Add VM lifecycle management
-
 
 - [ ] Implement resource limits
 
-
 - [ ] Add VM networking
-
 
 ### Sprint 2: Advanced Features
 
 - [ ] Add snapshot/restore
 
-
 - [ ] Implement VM metrics
-
 
 - [ ] Add VM security features
 
-
 - [ ] Integrate with sigpkg
-
 
 - [ ] Create VM orchestration
 
-
 - [ ] Add performance optimizations
-
 
 **Repository Mapping**: runtime/vmm
 **Branch**: release/cloud
@@ -1104,45 +970,33 @@ impl SigmaMicroVM {
 
 - WASM Runtime (Wasmtime)
 
-
 - Network Stack (smoltcp)
 
-
 - Crypto Primitives (libsodium)
-
 
 ### Week 4-6 (Sprint 2)
 
 - Wayland Compositor (wlroots) - continues
 
-
 - Async Runtime (Tokio)
 
-
 - Embedded Database (SQLite)
-
 
 ### Week 7-9 (Sprint 3)
 
 - Metrics Collection (Prometheus)
 
-
 - Tracing (OpenTelemetry)
 
-
 - Signing & Provenance (Sigstore/Cosign)
-
 
 ### Week 10-12 (Sprint 4)
 
 - MicroVM Runtime (Firecracker) - continues
 
-
 - Integration testing
 
-
 - Documentation
-
 
 ## Resource Requirements
 
@@ -1150,23 +1004,17 @@ impl SigmaMicroVM {
 
 - **Total Effort**: 30 engineer-weeks
 
-
 - **Peak Concurrent**: 4 engineers
 
-
 - **Timeline**: 12 weeks (3 months)
-
 
 ### Dependencies
 
 - All selected projects have permissive licenses
 
-
 - No GPL compliance issues
 
-
 - Can be integrated directly with attribution
-
 
 ## Risk Mitigation
 
@@ -1174,23 +1022,17 @@ impl SigmaMicroVM {
 
 - **Integration complexity**: Start with minimal integration, expand gradually
 
-
 - **Performance impact**: Add performance benchmarks for each integration
 
-
 - **Security concerns**: Security review before integration
-
 
 ### License Risks
 
 - **All selected projects have permissive licenses**
 
-
 - **Attribution requirements documented**
 
-
 - **No copyleft compliance needed**
-
 
 ## Success Criteria
 
@@ -1198,26 +1040,19 @@ impl SigmaMicroVM {
 
 - All 10 projects integrated successfully
 
-
 - Performance benchmarks meet targets
-
 
 - Security review passed
 
-
 - Documentation complete
-
 
 ### Roadmap Impact
 
 - Phase 1 goals achieved (network stack, drivers)
 
-
 - Phase 2 goals achieved (WASM runtime, sigpkg)
 
-
 - Phase 3 goals achieved (observability, tracing)
-
 
 ---
 

@@ -10,12 +10,9 @@ Every SigmaOS lattice state is defined by a single manifest. Changing the manife
 
 - **Immutable Shards**: Shards are read-only and PQC-sealed. Updates happen via atomic symlink swaps.
 
-
 - **Rollback Utilities**: Every update creates a snapshot. Run `sigma-cli rollback` to instantly revert to a previous lattice state.
 
-
 - **Reproducible Builds**: `sigma-pkg` ensures that the same manifest always produces a bit-identical lattice.
-
 
 ## 🛠 Usage
 

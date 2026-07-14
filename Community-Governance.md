@@ -30,37 +30,27 @@ Project Lead (BDFN)
 
 - Any maintainer can approve and merge.
 
-
 - No RFC required.
 
-
 - CI must pass.
-
 
 ### Significant decisions (new subsystems, API changes, security)
 
 - RFC (Request For Comments) required: copy `wiki_repo/RFC-Template.md`
 
-
 - 7-day comment period on the RFC issue
-
 
 - Core team votes (simple majority)
 
-
 - Decision documented in wiki
-
 
 ### Strategic decisions (roadmap, governance changes)
 
 - Community RFC with 14-day comment period
 
-
 - All contributors can vote (1 contributor = 1 vote, based on merged PRs)
 
-
 - Requires 2/3 supermajority
-
 
 ---
 
@@ -70,51 +60,37 @@ Project Lead (BDFN)
 
 - Anyone who opens a PR, files an issue, or improves the wiki
 
-
 - No special access required
 
-
 - Recognized in CONTRIBUTORS file
-
 
 ### Maintainer
 
 - Sustained contribution over 3+ months
 
-
 - Granted write access to their subsystem
-
 
 - Responsibilities: review PRs, triage issues, keep CI green
 
-
 - Nominated by existing maintainers, confirmed by core team
-
 
 ### Core Team Member
 
 - Deep expertise in a critical subsystem
 
-
 - Merge authority across related areas
-
 
 - Participates in strategic decisions
 
-
 - Nominated by project lead or existing core members
-
 
 ### Project Lead
 
 - Final decision authority when consensus fails
 
-
 - Sets strategic direction
 
-
 - Manages releases and security disclosures
-
 
 ---
 
@@ -148,12 +124,9 @@ cd SigmaOS
 
 - Browse [issues labeled `good-first-issue`](https://github.com/AaryanSinghChauhan09/SigmaOS/issues?q=label%3Agood-first-issue)
 
-
 - Check the [DEVELOPMENT_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DEVELOPMENT_ROADMAP.md)
 
-
 - Ask in Discussions what's needed
-
 
 ### 3. Branch naming convention
 
@@ -179,15 +152,11 @@ Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `security`
 
 - CI must pass (12-job pipeline)
 
-
 - At least 1 maintainer approval
-
 
 - Update wiki if adding user-facing features
 
-
 - Include tests for new functionality
-
 
 ---
 
@@ -263,15 +232,11 @@ Contributors are recognized in:
 
 - `CONTRIBUTORS` file (all code contributors)
 
-
 - Release notes (features attributed to their authors)
-
 
 - Wiki maintainers section
 
-
 - GitHub contributor graph
-
 
 ---
 
@@ -281,15 +246,11 @@ SigmaOS follows the [Contributor Covenant](CODE_OF_CONDUCT). In short:
 
 - Be respectful and constructive
 
-
 - Harassment of any kind is not tolerated
-
 
 - Focus on the work, not the person
 
-
 - Disagreement is fine; personal attacks are not
-
 
 Report issues to: conduct@sigmaos.dev (or open a private GitHub issue)
 
@@ -301,15 +262,11 @@ Every quarter, contributors can vote on the next quarter's priorities:
 
 1. Core team proposes a list of features/improvements
 
-
 2. All contributors with ≥1 merged PR get 3 votes each
-
 
 3. Results published as the quarterly roadmap
 
-
 4. Tracked in DEVELOPMENT_ROADMAP.md
-
 
 ---
 

@@ -14,21 +14,15 @@ Use this skill when the user wants to do something they would normally click in 
 
 - Change layout, theme, or workspace
 
-
 - Launch or close apps (settings, files, browser, terminal, dashboard)
-
 
 - Read/write settings (language, accessibility, network)
 
-
 - Semantic file search, tree view, open files
-
 
 - Browser navigation
 
-
 - System dashboard metrics and AI diagnosis
-
 
 ## CLI (preferred)
 

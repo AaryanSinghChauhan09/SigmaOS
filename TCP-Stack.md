@@ -82,15 +82,11 @@ Planned BBR/CUBIC implementation:
 
 - Slow start
 
-
 - Congestion avoidance
-
 
 - Fast retransmit (3 duplicate ACKs)
 
-
 - Fast recovery
-
 
 ---
 
@@ -100,12 +96,9 @@ Each socket has:
 
 - 64 KB RX ring buffer
 
-
 - 64 KB TX ring buffer
 
-
 - MSS = 1460 bytes (standard Ethernet - IP - TCP headers)
-
 
 ---
 

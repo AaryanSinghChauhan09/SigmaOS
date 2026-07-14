@@ -6,7 +6,6 @@ Markowitz mean-variance portfolio optimisation for personal finance.
 - Efficient frontier computation
 - Risk-parity alternative allocation
 
-
 ## Key Milestones
 
 - [ ] Covariance matrix estimation

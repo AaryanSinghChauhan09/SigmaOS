@@ -9,7 +9,6 @@ An adaptive kernel subsystem that tracks historical metrics for every executing 
 * **Pre-warming:** Predicts the memory required for incoming tasks to aggressively pre-allocate buffers.
 * **Scheduling Hint:** Anticipates execution time to inform CFS and EDF scheduling queues dynamically.
 
-
 ## Natural Language Translator (`sigma_ai_agent.rs`)
 
 A userland stub tool designed to convert natural language queries (e.g., "how much free memory do I have?") into executable shell commands (e.g., `free -h`). Future integration includes a fully offline llama.cpp LLM backend communicating via IPC.

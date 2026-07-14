@@ -11,7 +11,6 @@ As part of the Low-Level Independence and Zero-Bloat Ecosystem principles, Sigma
 3. **Hardware Isolation**: Allocations for different microVMs must be strictly segregated at the page level. A compromised process should never be able to corrupt the metadata of another slab.
 4. **No Standard Library Dependency**: Built purely in `no_std` Rust using atomic intrinsics.
 
-
 ## Implementation Details
 
 ### Slab Allocator
@@ -20,7 +19,6 @@ The kernel maintains a series of pre-allocated page pools for common sizes: 32B,
 
 - **Fast Path**: Lock-free pop from a per-CPU core cache.
 - **Slow Path**: Spinlock-protected allocation from the global slab pool.
-
 
 ### Large Object Allocator (Buddy System)
 
@@ -31,7 +29,6 @@ For allocations > 4KB, a standard Buddy Allocator is used, merging adjacent free
 - `sigpkg`: Will use a specialized version of this allocator tailored for string hashing and transaction logs.
 - `Zenith`: Will use the slab allocator for rapid UI event processing.
 - `kernel`: Native `GlobalAlloc` implementation in Rust.
-
 
 ## Future Roadmap
 

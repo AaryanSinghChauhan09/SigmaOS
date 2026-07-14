@@ -27,15 +27,11 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 
 1. **Universal SDK**: Allowing any developer to contribute shards easily.
 
-
 2. **Package Submission Pipeline**: Automated PQC-signing of all community shards.
-
 
 3. **OEM Partnerships**: Working with sovereign hardware vendors for pre-installs.
 
-
 4. **Trust Graph UI**: A visual dashboard showing exactly where every bit of code came from.
-
 
 ---
 

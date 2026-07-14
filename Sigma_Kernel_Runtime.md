@@ -22,7 +22,7 @@ Legacy Linux relies heavily on monolithic kernel modules and massive userspace i
 
 ### 3.1 Capability-Native Runtime
 
-Instead of relying solely on Discretionary Access Control (users/groups), SigmaOS enforces capability-based tokens at the syscall level. A service cannot open a socket or read a file unless it has been explicitly granted a cryptographic capability token during initialization. 
+Instead of relying solely on Discretionary Access Control (users/groups), SigmaOS enforces capability-based tokens at the syscall level. A service cannot open a socket or read a file unless it has been explicitly granted a cryptographic capability token during initialization.
 
 ```rust
 // kernel/runtime/capability.rs
@@ -34,7 +34,7 @@ pub fn spawn_service(name: &str) -> Result<Process> {
         .allow_network("tcp", 80)
         .allow_read("/var/www")
         .deny_all_others();
-        
+
     ProcessBuilder::new(name)
         .with_capabilities(token)
         .spawn()

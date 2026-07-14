@@ -4,33 +4,23 @@
 
 - **name** `string`
 
-
 - **value** `string`
-
 
 - **expires** `Date|number` (optional)
 
-
 - **maxAge** `number` (optional)
-
 
 - **domain** `string` (optional)
 
-
 - **path** `string` (optional)
-
 
 - **secure** `boolean` (optional)
 
-
 - **httpOnly** `boolean` (optional)
-
 
 - **sameSite** `'String'|'Lax'|'None'` (optional)
 
-
 - **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
-
 
 ## `deleteCookie(headers, name[, attributes])`
 
@@ -49,12 +39,9 @@ Arguments:
 
 - **headers** `Headers`
 
-
 - **name** `string`
 
-
 - **attributes** `{ path?: string, domain?: string }` (optional)
-
 
 Returns: `void`
 
@@ -75,7 +62,6 @@ console.log(getCookies(headers)) // { get: 'cookies', and: 'attributes' }
 Arguments:
 
 - **headers** `Headers`
-
 
 Returns: `Record<string, string>`
 
@@ -103,7 +89,6 @@ Arguments:
 
 - **headers** `Headers`
 
-
 Returns: `Cookie[]`
 
 ## `parseCookie(cookie)`
@@ -126,14 +111,11 @@ Notes:
 
 - The cookie value is returned as it appears in the header. Percent-encoded sequences such as `%20` or `%0D%0A` are **not** decoded.
 
-
 - `sameSite` is only set for exact case-insensitive matches of `Strict`, `Lax`, or `None`.
-
 
 Arguments:
 
 - **cookie** `string`
-
 
 Returns: `Cookie | null`
 
@@ -154,8 +136,6 @@ Arguments:
 
 - **headers** `Headers`
 
-
 - **cookie** `Cookie`
-
 
 Returns: `void`

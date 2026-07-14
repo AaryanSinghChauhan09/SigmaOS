@@ -8,18 +8,13 @@ Key properties:
 
 - Isolated address space with ASLR
 
-
 - A capability token issued at registration (256-bit, unforgeable)
-
 
 - A `sigma_pledge` syscall allowlist (shrinkable only)
 
-
 - A `sigma_unveil` filesystem path allowlist (additive, irreversible)
 
-
 - All I/O via **sigma-bus** typed message passing
-
 
 ---
 

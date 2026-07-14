@@ -6,7 +6,6 @@ Add SCHED_RT support for hard real-time audio and robotics workloads.
 - EDF (Earliest Deadline First) scheduling
 - Priority inversion protection via priority inheritance
 
-
 ## Key Milestones
 
 - [ ] RT task flag in capability token

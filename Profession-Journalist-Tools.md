@@ -10,15 +10,11 @@ The Journalist Profile is designed for investigative excellence, content managem
 
 - **SigmaNews**: Newsroom management system with story tracking and editorial workflow.
 
-
 - **SigmaResearch**: Investigative research tools with source verification.
-
 
 - **SigmaPublish**: Content publishing and distribution platform.
 
-
 - **SigmaArchive**: Digital archive with search and retrieval capabilities.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Journalist Profile is designed for investigative excellence, content managem
 
 - **Theme**: Editorial Gray (Journalism Standard)
 
-
 - **Layout**: Newsroom Dashboard (Stories, Research, Archive)
 
-
 - **Personalization**: Real-time alerts and deadline tracking.
-
 
 ---
 

@@ -15,12 +15,9 @@ SigmaOS provides a deterministic IPC lattice featuring:
 
 - **Message Queues:** Asynchronous, typed message passing.
 
-
 - **Shared Memory:** Zero-copy memory regions with explicit lifecycle attachment.
 
-
 - **Counting Semaphores:** Hardware-backed concurrency primitives.
-
 
 ## 2. Unix-Style Pipes
 
@@ -52,12 +49,9 @@ Exposes the internal runtime state of the Zenith microkernel via a readable synt
 
 - `/proc/cpuinfo`: Hardware capabilities, cache layouts, and active flags.
 
-
 - `/proc/meminfo`: Slab allocation, paging, and available physical memory.
 
-
 - `/proc/loadavg` & `/proc/uptime`: Kernel scheduling metrics.
-
 
 ## 6. Kernel Ring Buffer (dmesg)
 
@@ -75,9 +69,7 @@ SigmaOS abandons user-space daemon reliance, migrating essential network bootstr
 
 - **ARP Resolver:** Maintains reachable, stale, and delayed state machines for Ethernet-to-IPv4 address resolution.
 
-
 - **DHCP Engine:** Executes the strict DORA (Discover, Offer, Request, Acknowledge) handshake to lease IP configurations autonomously on boot.
-
 
 ## 8. Sovereign Environment Variable Registry
 

@@ -53,7 +53,6 @@ sigma-snap diff --from 3 --to 5
   - `list_bootable()` — for GRUB integration
   - `diff_snapshots(id_a, id_b)` — delta analysis
 
-
 ## Auto-Cleanup
 
 When the snapshot limit is reached (`max_snapshots`, default 50):
@@ -61,7 +60,6 @@ When the snapshot limit is reached (`max_snapshots`, default 50):
 1. Oldest **non-bootable** snapshots are pruned first
 2. Bootable snapshots are preserved until explicitly removed
 3. The cleanup is automatic if `auto_cleanup` is enabled
-
 
 ## GRUB Integration
 

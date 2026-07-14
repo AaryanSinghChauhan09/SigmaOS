@@ -6,7 +6,6 @@ Query sigma_db and system telemetry using SQL-like syntax.
 - SELECT / WHERE / GROUP BY / ORDER BY support
 - Query execution on static-array backed tables
 
-
 ## Key Milestones
 
 - [ ] SQL lexer and parser (recursive descent)

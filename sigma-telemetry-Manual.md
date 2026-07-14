@@ -33,12 +33,9 @@ Colour coding:
 
 - Green: p99 < 100 µs (fast)
 
-
 - Yellow: p99 100–1000 µs (moderate)
 
-
 - Red: p99 > 1000 µs (slow — investigate)
-
 
 ### `export [endpoint]`
 

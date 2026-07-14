@@ -6,7 +6,6 @@ A lightweight ROS-compatible robotics middleware layer.
 - Pub/Sub messaging over IPC ring buffers
 - Hardware abstraction for GPIO, PWM, I2C, SPI
 
-
 ## Key Milestones
 
 - [ ] Topic/subscription API over sigma IPC

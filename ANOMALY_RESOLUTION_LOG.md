@@ -259,7 +259,6 @@ To report a new anomaly:
 3. Attach kernel panic logs from `/var/log/sigma/kernel.log`
 4. Self-healing system will attempt auto-diagnosis and comment on the issue
 
-
 ---
 
 *Log maintained by the SigmaOS Self-Healing subsystem and human maintainers.*

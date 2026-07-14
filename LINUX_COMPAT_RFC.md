@@ -18,12 +18,9 @@ Without a Linux compatibility story, SigmaOS adoption is blocked by:
 
 - Users can't run their existing Linux applications
 
-
 - Servers can't migrate without rewriting every service
 
-
 - Containers (Docker/OCI) are the dominant deployment unit
-
 
 The goal is **zero-friction migration** for Linux workloads while keeping the SigmaOS kernel clean.
 
@@ -122,21 +119,15 @@ Ordered by frequency across top-100 server workloads (profiler data):
 
 1. Validate ELF magic: `\x7fELF`
 
-
 2. Check `e_machine = EM_X86_64`
-
 
 3. Parse `PT_LOAD` segments, map to virtual addresses
 
-
 4. Set up `auxv` (auxiliary vector) for glibc
-
 
 5. Place `argc`/`argv`/`envp` on stack per Linux ABI
 
-
 6. Set `%rsp` to stack top, jump to entry point
-
 
 The process runs in a "linux-compat namespace" — all syscalls routed through `sigma_syscall_dispatch()` which translates them.
 
@@ -150,12 +141,9 @@ The vDSO exposes:
 
 - `__vdso_clock_gettime` → `sigma_clock_ns()`
 
-
 - `__vdso_gettimeofday` → derived from above
 
-
 - `__vdso_time` → Unix epoch
-
 
 ---
 
@@ -191,15 +179,11 @@ They cannot access kernel internal structures. The syscall translation layer app
 
 1. **LTP subset**: Run Linux Test Project on linux-compat ELF loader
 
-
 2. **nginx**: Multi-threaded server must pass basic load test
-
 
 3. **glibc**: Verify pthread_create, mutex, condvar work via futex translation
 
-
 4. **OCI images**: Top-20 server images must boot in microVM
-
 
 ---
 

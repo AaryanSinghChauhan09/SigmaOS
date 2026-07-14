@@ -23,7 +23,7 @@ To leap ahead of legacy Linux file systems (ext4, XFS) and modern CoW solutions 
 
 ### 3.1 SigmaFS: Forensic Snapshots & Rollback
 
-SigmaFS isn't just CoW; it’s *forensic*. Every snapshot includes a cryptographic Merkle root of the file system state, signed by the kernel. 
+SigmaFS isn't just CoW; it’s *forensic*. Every snapshot includes a cryptographic Merkle root of the file system state, signed by the kernel.
 
 ```bash
 $ sigma fs snapshot create --forensic "Pre-update state"

@@ -46,18 +46,13 @@
 
 1. **Typed error hierarchy** — `SigmaError { Kernel | Fs | Net | Security | Crypto }`
 
-
 2. **Capability-typed API** — phantom types prevent privilege escalation at compile time
-
 
 3. **Plugin system** — `Plugin` trait + dynamic loading via sigpkg
 
-
 4. **Reactive state (MVI)** — `Store<S,A>` with reducer + subscribers for all app state
 
-
 5. **Async/await** — `sigma-async` cooperative runtime, no_std compatible
-
 
 ---
 

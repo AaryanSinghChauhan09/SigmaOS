@@ -6,7 +6,6 @@ A complete SDK for building native SigmaOS applications.
 - Rust and C API bindings for all OS primitives
 - Auto-generated docs from inline annotations
 
-
 ## Key Milestones
 
 - [ ] sigma-sdk crate with typed wrappers

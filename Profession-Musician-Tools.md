@@ -10,15 +10,11 @@ The Musician Profile is designed for musical excellence, composition, and effici
 
 - **SigmaStudio**: Digital audio workstation with multi-track recording.
 
-
 - **SigmaCompose**: Music composition and notation tools.
-
 
 - **SigmaMix**: Audio mixing and mastering suite.
 
-
 - **SigmaPublish**: Music distribution and royalty management.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Musician Profile is designed for musical excellence, composition, and effici
 
 - **Theme**: Studio Dark (Music Standard)
 
-
 - **Layout**: Studio Dashboard (Tracks, Mixer, Library)
 
-
 - **Personalization**: MIDI controller integration and custom macros.
-
 
 ---
 

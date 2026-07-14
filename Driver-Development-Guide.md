@@ -13,7 +13,6 @@ SigmaOS uses an Object-Oriented Programming (OOP) approach with Rust traits to d
 - **Encapsulation**: Device-specific implementation details are hidden behind trait abstractions
 - **Extensibility**: New drivers can be added by implementing standard traits
 
-
 ## Driver Categories
 
 ### 1. Network Drivers
@@ -25,7 +24,6 @@ Located in `drivers/net/`
 - **e1000e**: Intel e1000e Ethernet Controller (I219-V, I219-LM, etc.)
 - **r8169**: Realtek r8169/r8168 Ethernet Controller (8169, 8168, 8411, etc.)
 - **sigma_virtio_net**: VirtIO network driver for virtualized environments
-
 
 #### Base Trait: `EthernetDevice`
 
@@ -113,7 +111,6 @@ Located in `drivers/storage/`
 - **nvme**: NVMe SSD Controller
 - **sigma_virtio_blk**: VirtIO block driver for virtualized environments
 
-
 #### Base Trait: `StorageDevice`
 
 ```rust
@@ -148,7 +145,6 @@ Located in `drivers/gpu/`
 - **sigma_nvidia**: NVIDIA GPU (Kepler, Maxwell, Pascal)
 - **sigma_virtio_gpu**: VirtIO GPU driver for virtualized environments
 
-
 #### Base Trait: `GpuDevice`
 
 ```rust
@@ -174,7 +170,6 @@ Located in `drivers/usb/`
 - **ehci**: USB 2.0 EHCI Controller
 - **uhci**: USB 1.1 UHCI Controller
 - **ohci**: USB 1.1 OHCI Controller
-
 
 #### Base Trait: `UsbController`
 
@@ -207,7 +202,6 @@ Located in `drivers/input/`
 - **ps2_mouse**: PS/2 Mouse driver
 - **synaptics**: Synaptics Touchpad driver
 - **elan**: ELAN Touchpad driver
-
 
 #### Base Trait: `HidDriver`
 
@@ -386,7 +380,6 @@ pub unsafe extern "C" fn my_driver_shutdown() -> I32 {
 6. **Documentation**: Document register offsets, bit fields, and device-specific quirks
 7. **Testing**: Implement unit tests for driver logic where possible
 
-
 ## Linux Kernel Driver References
 
 When developing SigmaOS drivers, reference the following Linux kernel drivers:
@@ -396,7 +389,6 @@ When developing SigmaOS drivers, reference the following Linux kernel drivers:
 - **GPU**: `drivers/gpu/drm/amd/amdgpu/`, `drivers/gpu/drm/i915/`
 - **USB**: `drivers/usb/host/`
 - **Input**: `drivers/hid/`, `drivers/input/keyboard/`, `drivers/input/mouse/`
-
 
 ## Contributing
 
@@ -409,7 +401,6 @@ When contributing a new driver:
 5. Add error handling for all failure cases
 6. Test on real hardware when possible
 7. Update this guide with device-specific information
-
 
 ## License
 

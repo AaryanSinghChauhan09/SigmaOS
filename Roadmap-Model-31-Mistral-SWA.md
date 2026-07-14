@@ -6,7 +6,6 @@ Implement a zero-allocation sliding window cache for Mistral 7B models.
 - Strictly bound peak attention memory regardless of context length.
 - Implement token eviction policies designed for low-memory platforms.
 
-
 ## Key Milestones
 
 - [ ] SWA cache controller

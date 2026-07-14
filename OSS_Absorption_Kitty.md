@@ -2,8 +2,8 @@
 
 ## Making kovidgoyal/kitty Irrelevant
 
-> **Absorption Target**: https://github.com/kovidgoyal/kitty  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/kovidgoyal/kitty
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaTerm - Native GPU Terminal with Kitty-inspired Features
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Kitty by implementing a native GPU terminal d
 
 ### 1. GPU Rendering
 
-**Original**: Kitty's GPU rendering with OpenGL  
+**Original**: Kitty's GPU rendering with OpenGL
 **SigmaOS**: Native GPU rendering with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaTerm {
 - GPU monitoring with real-time metrics
 - GPU profiles with automatic switching
 
-
 ### 2. Tab System
 
-**Original**: Kitty's tab system  
+**Original**: Kitty's tab system
 **SigmaOS**: Native tab system with enhanced features
 
 **Tab Features**:
@@ -54,10 +53,9 @@ pub struct SigmaTerm {
 - Tab monitoring with real-time metrics
 - Tab inheritance with composition
 
-
 ### 3. Kitten System
 
-**Original**: Kitty's kitten (plugin) system  
+**Original**: Kitty's kitten (plugin) system
 **SigmaOS**: Native plugin system with enhanced features
 
 **Plugin Features**:
@@ -69,10 +67,9 @@ pub struct SigmaTerm {
 - Plugin composition with inheritance
 - Plugin API with OS integration
 
-
 ### 4. Font Rendering
 
-**Original**: Kitty's font rendering  
+**Original**: Kitty's font rendering
 **SigmaOS**: Native font rendering with enhanced features
 
 **Font Features**:
@@ -84,10 +81,9 @@ pub struct SigmaTerm {
 - Font profiles with automatic switching
 - Font monitoring with real-time metrics
 
-
 ### 5. Layout System
 
-**Original**: Kitty's layout system  
+**Original**: Kitty's layout system
 **SigmaOS**: Native layout system with enhanced features
 
 **Layout Features**:
@@ -99,10 +95,9 @@ pub struct SigmaTerm {
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
 
-
 ### 6. Shell Integration
 
-**Original**: Kitty's shell integration  
+**Original**: Kitty's shell integration
 **SigmaOS**: Native shell integration with enhanced features
 
 **Shell Integration Features**:
@@ -113,7 +108,6 @@ pub struct SigmaTerm {
 - Shell profiles with automatic switching
 - Shell validation with automatic checking
 - Shell monitoring with real-time metrics
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaTerm {
 pub mod gpu {
     use sigma_term::gpu::GPURenderer;
     use sigma_term::font::FontManager;
-    
+
     pub struct SigmaTerm {
         gpu_renderer: GPURenderer,
         font_manager: FontManager,
         tab_manager: TabManager,
     }
-    
+
     impl SigmaTerm {
         pub fn render(&self, buffer: Buffer) -> RenderedBuffer {
             // Native GPU rendering
@@ -167,7 +161,7 @@ pub mod tab {
         tab_synchronizer: TabSynchronizer,
         tab_profiler: TabProfiler,
     }
-    
+
     impl TabManager {
         pub fn create_tab(&self, config: TabConfig) -> Tab {
             // Native tab creation

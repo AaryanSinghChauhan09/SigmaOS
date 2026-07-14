@@ -2,8 +2,8 @@
 
 ## Making hyprwm/Hyprland Irrelevant
 
-> **Absorption Target**: https://github.com/hyprwm/Hyprland  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/hyprwm/Hyprland
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaWM - Native Window Manager with Hyprland-inspired Dynamic Tiling
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Hyprland by implementing a native window mana
 
 ### 1. Dynamic Tiling
 
-**Original**: Hyprland's dynamic tiling with master stack  
+**Original**: Hyprland's dynamic tiling with master stack
 **SigmaOS**: Native dynamic tiling with enhanced algorithms
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaWM {
 - Native floating window support
 - Custom layout rules with automatic application
 
-
 ### 2. Animation System
 
-**Original**: Hyprland's smooth animations  
+**Original**: Hyprland's smooth animations
 **SigmaOS**: Native animation engine with GPU acceleration
 
 **Animation Features**:
@@ -54,10 +53,9 @@ pub struct SigmaWM {
 - Animation performance monitoring
 - Animation optimization with automatic tuning
 
-
 ### 3. Window Decorations
 
-**Original**: Hyprland's custom decorations  
+**Original**: Hyprland's custom decorations
 **SigmaOS**: Native decoration system with enhanced features
 
 **Decoration Features**:
@@ -69,10 +67,9 @@ pub struct SigmaWM {
 - Border colors with automatic theming
 - Decoration profiles with automatic switching
 
-
 ### 4. Plugin System
 
-**Original**: Hyprland's plugin system  
+**Original**: Hyprland's plugin system
 **SigmaOS**: Native plugin system with capability-based security
 
 **Plugin Features**:
@@ -84,10 +81,9 @@ pub struct SigmaWM {
 - Plugin composition with inheritance
 - Native plugin API with OS integration
 
-
 ### 5. Input Handling
 
-**Original**: Hyprland's input system  
+**Original**: Hyprland's input system
 **SigmaOS**: Native input handling with 0.5ms latency
 
 **Input Features**:
@@ -99,10 +95,9 @@ pub struct SigmaWM {
 - Input device management with automatic configuration
 - Input profiles with automatic switching
 
-
 ### 6. Configuration System
 
-**Original**: Hyprland's configuration (hyprland.conf)  
+**Original**: Hyprland's configuration (hyprland.conf)
 **SigmaOS**: Native configuration with enhanced syntax
 
 **Configuration Features**:
@@ -113,7 +108,6 @@ pub struct SigmaWM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 - Configuration monitoring with automatic backup
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaWM {
 pub mod dynamic_tiling {
     use sigma_wm::dynamic::DynamicTiler;
     use sigma_wm::layout::LayoutAlgorithm;
-    
+
     pub struct SigmaWM {
         dynamic_tiler: DynamicTiler,
         animation_engine: AnimationEngine,
         decoration_manager: DecorationManager,
     }
-    
+
     impl SigmaWM {
         pub fn tile_dynamically(&self, windows: Vec<Window>) -> DynamicLayout {
             // Native dynamic tiling
@@ -154,7 +148,7 @@ pub mod dynamic_tiling {
             let animated = self.animation_engine.animate(layout);
             DynamicLayout::hyprland_compatible(animated)
         }
-        
+
         pub fn apply_decorations(&self, window: Window) -> DecoratedWindow {
             // Native decoration application
             self.decoration_manager.apply(window)
@@ -172,7 +166,7 @@ pub mod animation {
         easing_functions: EasingLibrary,
         animation_scheduler: AnimationScheduler,
     }
-    
+
     impl AnimationEngine {
         pub fn animate(&self, transition: Transition) -> AnimatedTransition {
             // GPU-accelerated animation

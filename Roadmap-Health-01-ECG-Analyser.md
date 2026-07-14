@@ -6,7 +6,6 @@ Analyse ECG waveforms using ML for cardiac anomaly detection.
 - R-peak detection (Pan-Tompkins algorithm)
 - LSTM arrhythmia classifier from 12-lead ECG
 
-
 ## Key Milestones
 
 - [ ] Pan-Tompkins real-time R-peak detector

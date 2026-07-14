@@ -29,7 +29,6 @@ The security lattice is defined as a partial order `(L, ≤)` where:
 - **Objects** have sensitivity labels
 - **Operations** are permitted when `subject_label ≥ object_label`
 
-
 ```text
 Top (SYSTEM_ADMIN)
 ├── High (CONFIDENTIAL, HIGH_INTEGRITY)
@@ -117,7 +116,6 @@ MAC policies are enforced at multiple kernel entry points:
 - [ ] Policy hot-reload (without reboot)
 - [ ] Formal verification of policy correctness
 - [ ] SELinux policy import tool
-
 
 ## Related Modules
 

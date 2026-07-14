@@ -16,7 +16,6 @@ The system provides:
 - **Policy-as-Code**: GitOps-based deployment pipeline
 - **Observability**: Native OpenTelemetry integration
 
-
 ---
 
 ## Architecture
@@ -54,7 +53,6 @@ The node agent runs on every SigmaOS node and is responsible for:
 - Enforcing network policies via eBPF
 - Health checking and self-healing
 
-
 ```toml
 
 # /etc/sigma-nebula/node.toml
@@ -84,7 +82,6 @@ Multi-resource aware bin-packing scheduler with:
 - **Scheduling policies**: BestFit, MostPacked, Spread, AntiAffinity
 - **Priority classes**: Critical (preemptible targets), High, Normal, Low, BestEffort
 - **Gang scheduling**: Atomic placement for distributed ML training jobs
-
 
 ```rust
 pub struct SchedulingRequest {
@@ -141,7 +138,6 @@ eBPF-based networking with:
 - Network policies enforced in kernel eBPF (zero-copy path)
 - Service discovery via internal DNS (sigma-dns)
 
-
 ### 5. sigma-proxy (Service Mesh)
 
 Zero-trust service mesh with:
@@ -151,7 +147,6 @@ Zero-trust service mesh with:
 - Traffic splitting (canary, A/B)
 - Rate limiting per service
 - Distributed tracing (sigma-trace → OpenTelemetry)
-
 
 ---
 

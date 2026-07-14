@@ -42,7 +42,6 @@ SigmaOS adopts a formal Social Contract committing to:
 3. We will never hide problems — all bugs are public in the issue tracker.
 4. The needs of users come before the needs of the project.
 
-
 ### 2.3 Freeze-Based Stabilization
 
 Before every `sigma.stable` release, a **freeze period** begins: only security fixes and critical bug fixes can enter the channel. New features wait for the next cycle.

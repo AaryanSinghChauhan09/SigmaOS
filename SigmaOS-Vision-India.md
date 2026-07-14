@@ -10,15 +10,11 @@ India has 1.4 billion people, 63 million MSMEs, 400,000 CAs, 300,000 doctors, 15
 
 - **Tally** — closed source, aging UI, no mobile, no direct GST filing
 
-
 - **Zoho** — ₹2,800/user/month, data in their servers, requires internet
-
 
 - **SAP** — for the top 500 companies only, ignores 63 million MSMEs
 
-
 - **Windows** — built for the US, bolted onto India as an afterthought
-
 
 SigmaOS is built *from the ground up* for India's professionals, laws, languages, and infrastructure constraints.
 
@@ -115,18 +111,13 @@ Features:
 
 - QoS fair-share: each household gets equal bandwidth
 
-
 - Offline cache: NCERT, DigiLocker, e-NAM, PM-KISAN always available
-
 
 - DID access control: only enrolled community members can connect
 
-
 - Community billing: shares actual ISP cost equally — no profit, no markup
 
-
 - TRAI compliant: cost-sharing (not reselling) is permitted
-
 
 ---
 
@@ -157,18 +148,13 @@ Five things that take competitors 5+ years to replicate:
 
 1. **sigma-bus at OS level** — payroll auto-feeds accounts, legal auto-bills clients. Zoho has this between Zoho apps only. sigma-bus is available to any app.
 
-
 2. **Offline-capable fleet sync** — 10 shops sync peer-to-peer, no cloud. Works in Assam without 4G.
-
 
 3. **DID-verified transactions** — every accounting entry cryptographically signed. `sigma-ca verify 2024-GST-003` proves authenticity to tax officers.
 
-
 4. **Local AI** — sigma-ai (TinyLlama) runs entirely on-device. Your P&L never leaves your office.
 
-
 5. **Indian law at OS level** — BNS 2023 in sigma-legal, updated automatically. Competitors need software releases for every law change.
-
 
 ---
 

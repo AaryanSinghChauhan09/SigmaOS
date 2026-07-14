@@ -21,12 +21,9 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 - `kernel/core/system/SovereignHypervisor.cpp`
 
-
 - `kernel/core/system/SovereignKVM.cpp`
 
-
 - `kernel/core/system/SovereignLXC.cpp`
-
 
 ---
 
@@ -34,8 +31,6 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 - [ ] Enable **SovereignKVM** for hardware-accelerated virtualization.
 
-
 - [ ] Configure **SovereignBackup** for nightly shard snapshots.
-
 
 - [ ] Run **SovereignCleanup** after major version upgrades to reclaim lattice space.

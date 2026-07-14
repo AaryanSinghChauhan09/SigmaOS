@@ -165,8 +165,6 @@ let gbm_device = GbmDevice::new(drm_fd).unwrap();
 
 - `weston-terminal` runs on Zenith compositor in QEMU with virtio-gpu.
 
-
 - Keyboard input and window focus work correctly.
-
 
 - `cargo test -p zenith-compositor` passes Smithay unit tests.

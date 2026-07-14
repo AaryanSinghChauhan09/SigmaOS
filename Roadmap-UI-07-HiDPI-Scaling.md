@@ -6,7 +6,6 @@ Perfect rendering on 4K, retina, and mixed-DPI multi-monitor setups.
 - Per-monitor scale factor (1x, 1.5x, 2x, 3x)
 - Sub-pixel font hinting at all DPI levels
 
-
 ## Key Milestones
 
 - [ ] Scale factor negotiation in Wayland protocol

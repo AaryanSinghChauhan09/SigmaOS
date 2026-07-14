@@ -59,7 +59,6 @@ pub trait Driver {
 - DMA transfers
 - Jumbo frames
 
-
 **Initialization**:
 
 ```rust
@@ -81,7 +80,6 @@ pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
 - PCI interface
 - Hardware checksumming
 
-
 #### Virtio-net
 
 **Location**: `kernel/drivers/net/virtio_net.rs`
@@ -91,7 +89,6 @@ pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
 - Paravirtualized network
 - High performance in VMs
 - Multi-queue support
-
 
 ### Wireless Drivers
 
@@ -105,7 +102,6 @@ pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
 - MIMO
 - WPA2/WPA3 encryption
 
-
 #### MediaTek mt7921
 
 **Location**: `kernel/drivers/net/mt7921.rs`
@@ -115,7 +111,6 @@ pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
 - 802.11ax (Wi-Fi 6)
 - Bluetooth coexistence
 - Low power consumption
-
 
 ## Storage Drivers
 
@@ -128,7 +123,6 @@ pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
 - SATA 3.0 support
 - NCQ (Native Command Queuing)
 - Hot-plug support
-
 
 **Initialization**:
 
@@ -151,7 +145,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - High performance
 - Multiple namespaces
 
-
 ### Virtio-blk
 
 **Location**: `kernel/drivers/storage/virtio_blk.rs`
@@ -161,7 +154,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - Paravirtualized block device
 - High performance in VMs
 - Support for multiple queues
-
 
 ## Graphics Drivers
 
@@ -175,7 +167,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - DRM/KMS support
 - Hardware acceleration
 
-
 ### AMD amdgpu
 
 **Location**: `kernel/drivers/gpu/amdgpu.rs`
@@ -186,7 +177,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - Vulkan support
 - Hardware video decoding
 
-
 ### Virtio-gpu
 
 **Location**: `kernel/drivers/gpu/virtio_gpu.rs`
@@ -196,7 +186,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - Paravirtualized GPU
 - 2D acceleration
 - 3D support (virgl)
-
 
 ## Input Drivers
 
@@ -210,7 +199,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - USB keyboard support
 - Layout configuration
 
-
 ### Mouse
 
 **Location**: `kernel/drivers/input/mouse.rs`
@@ -220,7 +208,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - PS/2 mouse support
 - USB mouse support
 - Scroll wheel support
-
 
 ## Audio Drivers
 
@@ -234,7 +221,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - Multi-channel support
 - Hardware mixing
 
-
 ### USB Audio
 
 **Location**: `kernel/drivers/audio/usb_audio.rs`
@@ -244,7 +230,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - USB audio class
 - Plug-and-play
 - Low latency
-
 
 ## Interrupt Controller Drivers
 
@@ -258,7 +243,6 @@ pub unsafe fn ahci_init(abar: u64) -> Result<(), DriverError> {
 - I/O APIC
 - Interrupt routing
 - MSI support
-
 
 **Initialization**:
 
@@ -281,7 +265,6 @@ pub unsafe fn apic_init() -> Result<(), DriverError> {
 - Cascade mode
 - IRQ masking
 
-
 ## Timer Drivers
 
 ### HPET
@@ -294,7 +277,6 @@ pub unsafe fn apic_init() -> Result<(), DriverError> {
 - Nanosecond precision
 - Multiple timers
 
-
 ### APIC Timer
 
 **Location**: `kernel/core/hal/apic_timer.rs`
@@ -305,7 +287,6 @@ pub unsafe fn apic_init() -> Result<(), DriverError> {
 - One-shot mode
 - Periodic mode
 
-
 ## UART/Serial Driver
 
 **Location**: `kernel/drivers/uart.rs`
@@ -315,7 +296,6 @@ pub unsafe fn apic_init() -> Result<(), DriverError> {
 - 16550 UART compatibility
 - Configurable baud rate
 - Interrupt-driven I/O
-
 
 **Initialization**:
 
@@ -339,7 +319,6 @@ pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
 - Hub support
 - Device enumeration
 
-
 ### USB Host Controllers
 
 #### EHCI (USB 2.0)
@@ -352,7 +331,6 @@ pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
 - High-speed USB
 - Isochronous transfers
 
-
 #### XHCI (USB 3.0)
 
 **Location**: `kernel/drivers/usb/xhci.rs`
@@ -362,7 +340,6 @@ pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
 - Extensible Host Controller Interface
 - SuperSpeed USB
 - USB 3.1 support
-
 
 ## Driver Development
 
@@ -420,7 +397,6 @@ pub unsafe fn uart_init(base: u64, baud: u32) -> Result<(), DriverError> {
 4. **DMA**: Use proper DMA mappings
 5. **Power management**: Implement suspend/resume
 
-
 ## Driver Debugging
 
 ### Debug Output
@@ -471,14 +447,12 @@ pub fn trace_read(&self, offset: usize, value: u32) {
 4. **Fingerprint**: Biometric authentication
 5. **TPM**: Trusted Platform Module
 
-
 ### Research Areas
 
 1. **GPU compute**: OpenCL/CUDA support
 2. **AI accelerators**: NPU support
 3. **FPGA**: Programmable hardware
 4. **Quantum**: Quantum computing interfaces
-
 
 ## Troubleshooting
 
@@ -493,7 +467,6 @@ pub fn trace_read(&self, offset: usize, value: u32) {
 3. Check for resource conflicts
 4. Review debug output
 
-
 ### Device Not Working
 
 **Symptoms**: Device initialized but not functional
@@ -505,7 +478,6 @@ pub fn trace_read(&self, offset: usize, value: u32) {
 3. Test with different hardware
 4. Review driver logs
 
-
 ### Performance Issues
 
 **Symptoms**: Poor device performance
@@ -516,7 +488,6 @@ pub fn trace_read(&self, offset: usize, value: u32) {
 2. Use interrupts instead of polling
 3. Optimize buffer sizes
 4. Profile driver code
-
 
 ## References
 

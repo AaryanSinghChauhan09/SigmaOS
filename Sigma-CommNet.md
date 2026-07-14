@@ -35,18 +35,13 @@ The gateway node runs `sigma-commetd` and manages:
 
 - Upstream bandwidth (via `tc HTB` fair-share QoS)
 
-
 - DID-based access control (only enrolled members connect)
-
 
 - Local content cache (government sites, NCERT, eNAM served from local storage)
 
-
 - Billing (calculates exact cost per household, collects via UPI)
 
-
 - Access logs (mandatory DoT compliance)
-
 
 ---
 
@@ -74,12 +69,9 @@ Government websites, educational content, and farm data are cached locally on th
 
 - NCERT textbooks load instantly even on 2G-equivalent local Wi-Fi
 
-
 - eNAM mandi prices work even when upstream ISP is slow
 
-
 - Aadhaar-linked services serve cached responses for common queries
-
 
 ### Pre-seeded domains:
 
@@ -107,18 +99,13 @@ A web-based dashboard (accessible on the local mesh, no internet needed) shows:
 
 - Who is using how much bandwidth right now
 
-
 - Monthly usage per household
-
 
 - Cache hit ratio (bandwidth saved)
 
-
 - Upstream status (up/down)
 
-
 - Cost per household this month
-
 
 ### Billing — Flat Cost Share, No Profit
 
@@ -135,15 +122,11 @@ The billing system:
 
 - Calculates exact ISP cost ÷ enrolled members
 
-
 - Optionally weights by usage (members who use more pay proportionally more)
-
 
 - Generates UPI payment link for each member
 
-
 - Records payment via community UPI VPA
-
 
 **This is not reselling.** Cost-sharing among a defined community is permitted under TRAI guidelines.
 
@@ -153,15 +136,11 @@ When the upstream ISP fails, sigma-commnet switches to offline mode automaticall
 
 - All cached content (NCERT, government portals, health info) continues to work
 
-
 - sigma-gram panchayat records remain accessible
-
 
 - sigma-health local patient records remain accessible
 
-
 - Community dashboard shows "Offline since [time]"
-
 
 ### DID-Based Access Control
 
@@ -169,15 +148,11 @@ Only enrolled community members can connect. Enrollment is simple:
 
 1. Head of household submits their SigmaOS DID to the gateway admin
 
-
 2. Gateway admin approves
-
 
 3. All devices with registered MAC addresses get access
 
-
 4. Non-enrolled devices see a DID enrollment page
-
 
 Access logs are maintained for 6 months as required by DoT rules.
 
@@ -278,28 +253,21 @@ sigma-commnet access-log --from 2026-06-01 --to 2026-06-30
 
 - Any SigmaOS machine with 2 network interfaces (NICs)
 
-
 - 1 GB RAM, 10 GB storage (for cache)
 
-
 - Example: ₹3,000 Raspberry Pi 4 + USB ethernet adapter
-
 
 ### Community mesh:
 
 - Any 802.11n/ac Wi-Fi router or access point (acts as dumb AP)
 
-
 - Or: cat5e ethernet run to each house (PoE switches)
-
 
 ### Upstream:
 
 - Any single ISP connection: Jio Fiber, BSNL, ACT, Starlink
 
-
 - 4G LTE router as backup upstream
-
 
 ---
 

@@ -6,7 +6,6 @@ Update models incrementally on new data without catastrophic forgetting.
 - Elastic Weight Consolidation (EWC) regularisation
 - Progressive Neural Network (PNN) adapter layers
 
-
 ## Key Milestones
 
 - [ ] Fisher information matrix estimation

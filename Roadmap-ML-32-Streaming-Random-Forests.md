@@ -6,7 +6,6 @@ Update decision tree structures on incoming data streams without rebuilding from
 - Implement Hoeffding Adaptive Trees (HAT) for streaming regression and classification.
 - Support drift detection hooks per node split.
 
-
 ## Key Milestones
 
 - [ ] Hoeffding tree node update algorithm

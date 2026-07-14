@@ -2,8 +2,8 @@
 
 ## Making containerd/containerd Irrelevant
 
-> **Absorption Target**: https://github.com/containerd/containerd  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/containerd/containerd
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaContainer - Native Container Runtime with containerd Compatibility
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed containerd by implementing a native container
 
 ### 1. Container Runtime
 
-**Original**: containerd's OCI-compliant runtime  
+**Original**: containerd's OCI-compliant runtime
 **SigmaOS**: Native OCI runtime with OS integration
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
-
 ### 2. Snapshot Management
 
-**Original**: containerd's snapshot system  
+**Original**: containerd's snapshot system
 **SigmaOS**: Native snapshot system with enhanced features
 
 **Snapshot Features**:
@@ -54,10 +53,9 @@ pub struct SigmaContainer {
 - Snapshot distribution with content-addressed storage
 - Snapshot profiles with automatic switching
 
-
 ### 3. Content Management
 
-**Original**: containerd's content store  
+**Original**: containerd's content store
 **SigmaOS**: Native content system with enhanced features
 
 **Content Features**:
@@ -69,10 +67,9 @@ pub struct SigmaContainer {
 - Content profiles with automatic switching
 - Content composition with inheritance
 
-
 ### 4. Task Management
 
-**Original**: containerd's task system  
+**Original**: containerd's task system
 **SigmaOS**: Native task system with enhanced features
 
 **Task Features**:
@@ -84,10 +81,9 @@ pub struct SigmaContainer {
 - Task composition with inheritance
 - Task validation with automatic checking
 
-
 ### 5. Distribution
 
-**Original**: containerd's pull/push system  
+**Original**: containerd's pull/push system
 **SigmaOS**: Native distribution with enhanced features
 
 **Distribution Features**:
@@ -99,10 +95,9 @@ pub struct SigmaContainer {
 - Distribution profiles with automatic switching
 - Distribution composition with inheritance
 
-
 ### 6. CRI Plugin
 
-**Original**: containerd's CRI plugin for Kubernetes  
+**Original**: containerd's CRI plugin for Kubernetes
 **SigmaOS**: Native CRI with enhanced features
 
 **CRI Features**:
@@ -113,7 +108,6 @@ pub struct SigmaContainer {
 - CRI profiles with automatic switching
 - CRI composition with inheritance
 - CRI compatibility with Kubernetes
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaContainer {
 pub mod oci {
     use sigma_container::runtime::OCIRuntime;
     use sigma_container::snapshot::SnapshotManager;
-    
+
     pub struct SigmaContainer {
         runtime: OCIRuntime,
         snapshot_manager: SnapshotManager,
         content_manager: ContentManager,
     }
-    
+
     impl SigmaContainer {
         pub fn create_container(&self, spec: OCISpec) -> Container {
             // Native OCI container creation
@@ -168,7 +162,7 @@ pub mod snapshot {
         layer_manager: LayerManager,
         snapshot_verifier: SnapshotVerifier,
     }
-    
+
     impl SnapshotManager {
         pub fn create_snapshot(&self, content: Content) -> Snapshot {
             // Native snapshot creation

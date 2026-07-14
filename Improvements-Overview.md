@@ -115,9 +115,7 @@ A consolidated reference of all OS improvements implemented across seven rounds 
 
 - `Dilithium3` (ML-DSA-65) — for **signatures** (VM image verification, package signing)
 
-
 - `Kyber-1024` — for **key exchange only** (hypervisor↔guest encrypted channel)
-
 
 The `sigma-trustd` daemon (in `sigmad/trustd/`) enforces this separation: it issues Dilithium3-signed certificates and uses Kyber-1024 for the key exchange establishing the mTLS session.
 

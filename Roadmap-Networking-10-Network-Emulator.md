@@ -6,7 +6,6 @@ Emulate network conditions (latency, loss, bandwidth) for testing.
 - Token bucket shaping for bandwidth limits
 - Delay and loss injection in kernel network path
 
-
 ## Key Milestones
 
 - [ ] Token bucket rate limiter
@@ -27,7 +26,6 @@ Provide an S3-compatible object storage API for local and distributed data.
 
 - S3 REST API compatibility (PUT/GET/DELETE/LIST)
 - Multi-part upload for large objects
-
 
 ## Key Milestones
 

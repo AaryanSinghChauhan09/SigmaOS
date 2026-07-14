@@ -24,13 +24,11 @@ The RT kernel implements the **Priority Inheritance Protocol** to prevent priori
 3. On unlock, the holder's priority is **restored** to its original value
 4. The highest-priority waiter is **woken next**
 
-
 ## Deadline Scheduler (EDF)
 
 - **Admission control**: Verifies `Σ(runtime/period) ≤ 1.0` per CPU
 - **Earliest Deadline First**: Always runs the task with the nearest deadline
 - **Runtime budgeting**: Tasks are throttled if they exceed their runtime budget
-
 
 ## Threaded IRQs
 
@@ -39,7 +37,6 @@ All hardware interrupts are converted to **kernel threads** with configurable pr
 - Allows preemption of interrupt handlers by higher-priority RT tasks
 - Eliminates interrupt-induced latency spikes
 - Each IRQ thread has CPU affinity for NUMA-aware scheduling
-
 
 ## Implementation
 
@@ -50,7 +47,6 @@ All hardware interrupts are converted to **kernel threads** with configurable pr
   - `DeadlineScheduler::admit(task)` — admission control
   - `DeadlineScheduler::pick_next()` — EDF scheduling decision
   - `make_irq_threaded(irq, handler, priority)` — convert hardirq to thread
-
 
 ## Target Latency
 

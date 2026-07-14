@@ -6,7 +6,6 @@ Hide and extract data in image and audio files for secure communication.
 - LSB steganography for PNG images
 - DCT-domain steganography for JPEG
 
-
 ## Key Milestones
 
 - [ ] PNG pixel manipulation module

@@ -6,7 +6,6 @@ Address heavily skewed dataset distributions for anomaly detection models.
 - SMOTE and ADASYN algorithm implementations.
 - Robust classifier training for sparse security threats.
 
-
 ## Key Milestones
 
 - [ ] SMOTE algorithm implementation

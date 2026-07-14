@@ -151,8 +151,6 @@ pub fn init_egl_renderer(gbm_device: &GbmDevice) -> GlesRenderer {
 
 - `glxinfo | grep "OpenGL version"` reports `OpenGL version string: 4.6 (Compatibility Profile) Mesa ...` in QEMU.
 
-
 - Zenith compositor renders a Wayland client window using GlesRenderer in CI.
-
 
 - `sigma-glmark2` benchmark runs without crashes on virtio-gpu.

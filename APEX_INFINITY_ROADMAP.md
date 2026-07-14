@@ -40,7 +40,6 @@ SigmaOS Apex Infinity is the culmination of every roadmap, absorption plan, and 
 - [ ] EEVDF scheduler with AI-driven slice autotuning via `/sigma/metrics`
 - [ ] Kernel live-patching (`sigma_klp`) for security fixes without reboots
 
-
 ### 1.2 Post-Quantum Security Everywhere
 
 - [ ] Dilithium5 signatures on all shard binaries and package artifacts
@@ -48,14 +47,12 @@ SigmaOS Apex Infinity is the culmination of every roadmap, absorption plan, and 
 - [ ] BLAKE3 integrity trees for filesystem snapshots
 - [ ] PQC-enabled secure boot via `SovereignSecureBoot.shard`
 
-
 ### 1.3 Absorption Engine v2
 
 - [ ] Automated distro feature extraction pipeline (`sigma-absorb --distro ubuntu`)
 - [ ] FOSS license compliance scanner integrated into CI
 - [ ] Dynamic shard synthesis from upstream PKGBUILD/SPEC/deb rules
 - [ ] Feature parity matrix auto-updated on every absorption merge
-
 
 ```rust
 // Example: Absorption engine trigger
@@ -114,7 +111,6 @@ numa_aware = true
 - [ ] Mesh networking with DTN (Delay Tolerant Networking) for satellite links
 - [ ] Autonomous self-healing without ground control for 72+ hours
 
-
 ---
 
 ## Phase ∞-3: AI-Native OS Intelligence (Year 2)
@@ -145,14 +141,12 @@ The Neural Core is an always-on, privacy-preserving AI layer embedded directly i
 - Anomaly detection triggering shard quarantine
 - Natural language CLI (`sigma ask "why is disk usage high?"`)
 
-
 ### 3.2 Federated Learning Integration
 
 - Local model training on anonymized system telemetry
 - Differential privacy (ε=0.1) guarantees before any data leaves device
 - Cross-device model aggregation via sigma-bus mesh
 - Opt-in telemetry with cryptographic proof of anonymization
-
 
 ---
 
@@ -175,7 +169,6 @@ At this phase, SigmaOS becomes self-describing and self-improving:
 - Zero-knowledge proof of shard functionality claims
 - Automated compatibility testing against all 6 deployment profiles
 - Revenue sharing for community shard contributors
-
 
 ### 4.3 Global Deployment Targets
 
@@ -219,6 +212,5 @@ graph TD
 - 📋 Planned/scheduled
 - 🔬 Research phase
 - ∞ Perpetual (never-ending improvement)
-
 
 **Last updated**: Session-3 | **Horizon**: ∞

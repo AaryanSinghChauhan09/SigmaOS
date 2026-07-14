@@ -10,15 +10,11 @@ The Game Developer Profile is designed for game development excellence, engine i
 
 - **SigmaEngine**: Game engine with physics and rendering pipeline.
 
-
 - **SigmaBuild**: Build system with cross-platform compilation.
-
 
 - **SigmaDebug**: Real-time debugging and profiling tools.
 
-
 - **SigmaAsset**: Game asset management and version control.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Game Developer Profile is designed for game development excellence, engine i
 
 - **Theme**: Dev Purple (Game Development Standard)
 
-
 - **Layout**: Dev Dashboard (Editor, Console, Assets)
 
-
 - **Personalization**: Custom editor layouts and hotkey profiles.
-
 
 ---
 

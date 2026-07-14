@@ -136,21 +136,15 @@ The file `userland/roadmap/index.html` is a zero-dependency single-page app:
 
 - **Expandable phases** — click to drill into individual utilities
 
-
 - **Live filtering** — search by keyword, filter by category and priority
-
 
 - **Dependency tracking** — each item shows its upstream dependencies
 
-
 - **Priority badges** — Critical / High / Medium / Low with colour coding
-
 
 - **Status indicators** — In Progress / Planned / Completed
 
-
 - **Overview dashboard** — stats cards for totals, criticals, phases, categories
-
 
 No build step needed — open directly in any browser.
 

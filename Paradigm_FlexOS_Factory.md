@@ -19,18 +19,15 @@ In **SigmaOS Zenith**, the `SovereignFlex` shard implements a deterministic, har
 - **FlexOS Concept**: Fixed-priority scheduling with preemption points. A high-priority real-time task immediately preempts any userland or non-real-time kernel execution paths.
 - **Sovereign Implementation**: The `SovereignFlex` scheduler uses an EEVDF (Earliest Eligible Virtual Deadline First) model with dedicated real-time channels. Critical tasks are pinned to physical cores with cache isolation.
 
-
 ### 2.2 Hardware Interrupt Routing
 
 - **FlexOS Concept**: Direct mapping of hardware interrupts to driver processes without going through nested virtual machine or kernel layers.
 - **Sovereign Implementation**: Drivers registered with `SovereignFlex` bypass general-purpose OS IRQ handlers, routing signals directly to userspace event queues within 200 nanoseconds.
 
-
 ### 2.3 Deterministic System Call Paths
 
 - **FlexOS Concept**: Predictable, non-blocking system calls with constant time complexity ($O(1)$ operations).
 - **Sovereign Implementation**: Real-time system calls avoid lock contention by using lock-free ring buffers for all communications and microkernel operations.
-
 
 ---
 

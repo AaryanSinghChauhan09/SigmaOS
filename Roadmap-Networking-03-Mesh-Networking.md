@@ -6,7 +6,6 @@ Auto-configure WireGuard mesh for multi-device SigmaOS clusters.
 - Automatic peer discovery via mDNS
 - Key exchange and tunnel setup without manual config
 
-
 ## Key Milestones
 
 - [ ] mDNS service announcements

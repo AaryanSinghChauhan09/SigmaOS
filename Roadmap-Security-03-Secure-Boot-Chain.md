@@ -6,7 +6,6 @@ Establish cryptographic trust from UEFI firmware to user applications.
 - UEFI Secure Boot with custom MOK
 - Measured boot with TPM2 PCR extension
 
-
 ## Key Milestones
 
 - [ ] shim + SigmaOS signed bootloader

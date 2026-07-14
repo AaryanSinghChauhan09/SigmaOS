@@ -20,9 +20,9 @@ To support the AI Agent overlay, `sigma-db` is compiled with native vector index
 
 ```sql
 -- Querying semantic event patterns in system db
-SELECT log_id, content 
-FROM system_logs 
-ORDER BY embedding <=> '[0.12, 0.45, -0.09, ...]' 
+SELECT log_id, content
+FROM system_logs
+ORDER BY embedding <=> '[0.12, 0.45, -0.09, ...]'
 LIMIT 5;
 ```
 

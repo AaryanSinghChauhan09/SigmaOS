@@ -10,35 +10,25 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 1. **Universal CLI Access**: Every GUI operation accessible via CLI
 
-
 2. **Natural Language Interface**: Natural language → CLI translation
-
 
 3. **GUI Automation**: AI agent can control GUI elements
 
-
 4. **Task Orchestration**: Complex multi-step task automation
 
-
 5. **Learning & Adaptation**: Agent learns from user behavior
-
 
 ### Success Metrics
 
 - **GUI Coverage**: 100% of GUI operations accessible via CLI
 
-
 - **NL Accuracy**: >90% natural language translation accuracy
-
 
 - **Task Success**: >85% automated task completion rate
 
-
 - **Response Time**: <2 seconds for command translation
 
-
 - **Learning Rate**: Agent improves with usage
-
 
 ## Inspiration & Analysis
 
@@ -48,60 +38,43 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 - **Focus**: Open-source AI agent for system control
 
-
 - **Key Features**: Natural language processing, command generation
-
 
 - **Architecture**: LLM-based command generation with validation
 
-
 - **Lessons**: Importance of command validation and safety mechanisms
-
 
 ### NVIDIA NemoClaw
 
 - **Focus**: AI agent for NVIDIA systems
 
-
 - **Key Features**: GPU-aware command generation, system optimization
-
 
 - **Architecture**: Specialized for hardware control
 
-
 - **Lessons**: Hardware-specific optimization and monitoring
-
 
 ### hermes-agent
 
 - **Focus**: Multi-agent orchestration system
 
-
 - **Key Features**: Agent communication, task delegation
-
 
 - **Architecture**: Distributed agent system with message passing
 
-
 - **Lessons**: Multi-agent coordination and task distribution
-
 
 ### Key Insights
 
 1. **Command Validation**: All generated commands must be validated before execution
 
-
 2. **Safety Mechanisms**: Sandbox execution for potentially dangerous commands
-
 
 3. **Context Awareness**: Agent must understand system state and context
 
-
 4. **Learning**: Agent should learn from successful and failed commands
 
-
 5. **Extensibility**: Architecture must support new GUI applications
-
 
 ## SigmaAI Agent Architecture
 
@@ -139,15 +112,11 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 - Intent recognition
 
-
 - Entity extraction
-
 
 - Command structure analysis
 
-
 - Context understanding
-
 
 **Implementation**:
 
@@ -187,15 +156,11 @@ impl NLParser {
 
 - Command template matching
 
-
 - Parameter substitution
-
 
 - Command sequence generation
 
-
 - Alternative command suggestions
-
 
 **Implementation**:
 
@@ -233,15 +198,11 @@ impl CommandGenerator {
 
 - Syntax validation
 
-
 - Permission checking
-
 
 - Safety analysis
 
-
 - Risk assessment
-
 
 **Implementation**:
 
@@ -283,15 +244,11 @@ impl CommandValidator {
 
 - System state tracking
 
-
 - User session management
-
 
 - Application context
 
-
 - File system awareness
-
 
 **Implementation**:
 
@@ -323,15 +280,11 @@ impl ContextManager {
 
 - Command history
 
-
 - Success/failure patterns
-
 
 - User preferences
 
-
 - Application-specific knowledge
-
 
 **Implementation**:
 
@@ -368,15 +321,11 @@ impl KnowledgeBase {
 
 - GUI element identification
 
-
 - Event simulation
-
 
 - Window management
 
-
 - Application control
-
 
 **Implementation**:
 
@@ -414,15 +363,11 @@ impl GUIBridge {
 
 - Text generation
 
-
 - Intent classification
-
 
 - Entity recognition
 
-
 - Context understanding
-
 
 **Implementation**:
 
@@ -454,15 +399,11 @@ impl LLMCore {
 
 - Command execution
 
-
 - Output capture
-
 
 - Error handling
 
-
 - Timeout management
-
 
 **Implementation**:
 
@@ -499,15 +440,11 @@ impl Executor {
 
 - Resource limits
 
-
 - Network isolation
-
 
 - File system isolation
 
-
 - Process isolation
-
 
 **Implementation**:
 
@@ -718,55 +655,39 @@ impl BrowserBridge {
 
 - Implement NL Parser
 
-
 - Implement Command Generator
-
 
 - Implement Command Validator
 
-
 - Implement Context Manager
-
 
 - Create basic LLM integration
 
-
 - Set up development environment
-
 
 **Deliverables**:
 
 - NL Parser functional
 
-
 - Command Generator working
-
 
 - Command Validator operational
 
-
 - Context Manager complete
-
 
 - LLM integration working
 
-
 - Development environment ready
-
 
 **Success Criteria**:
 
 - NL Parser accuracy >80%
 
-
 - Command generation success >75%
-
 
 - Validation coverage >90%
 
-
 - Context tracking accurate
-
 
 ### Phase 2: GUI Bridge (Weeks 5-8)
 
@@ -776,55 +697,39 @@ impl BrowserBridge {
 
 - Implement GUI Bridge
 
-
 - Implement Element Identifier
-
 
 - Implement Event Simulator
 
-
 - Create command mapping tables
-
 
 - Implement application-specific bridges
 
-
 - Test GUI automation
-
 
 **Deliverables**:
 
 - GUI Bridge functional
 
-
 - Element Identifier working
-
 
 - Event Simulator operational
 
-
 - Command mapping complete
-
 
 - Application bridges working
 
-
 - GUI automation tested
-
 
 **Success Criteria**:
 
 - Element identification >85% accuracy
 
-
 - Event simulation >90% success
-
 
 - Command mapping >80% coverage
 
-
 - Application bridges >5 major apps
-
 
 ### Phase 3: Knowledge & Learning (Weeks 9-12)
 
@@ -834,55 +739,39 @@ impl BrowserBridge {
 
 - Implement Knowledge Base
 
-
 - Implement pattern recognition
-
 
 - Implement learning algorithms
 
-
 - Create user preference system
-
 
 - Implement feedback mechanism
 
-
 - Test learning capabilities
-
 
 **Deliverables**:
 
 - Knowledge Base functional
 
-
 - Pattern recognition working
-
 
 - Learning algorithms operational
 
-
 - User preferences complete
-
 
 - Feedback mechanism working
 
-
 - Learning capabilities tested
-
 
 **Success Criteria**:
 
 - Pattern recognition >75% accuracy
 
-
 - Learning improvement >20% over time
-
 
 - User preference adaptation >80%
 
-
 - Feedback mechanism effective
-
 
 ### Phase 4: Integration & Optimization (Weeks 13-16)
 
@@ -892,55 +781,39 @@ impl BrowserBridge {
 
 - Integrate all components
 
-
 - Implement Executor
-
 
 - Implement Sandbox
 
-
 - Optimize performance
-
 
 - Add safety mechanisms
 
-
 - Test complete system
-
 
 **Deliverables**:
 
 - Complete system integrated
 
-
 - Executor functional
-
 
 - Sandbox operational
 
-
 - Performance optimized
-
 
 - Safety mechanisms working
 
-
 - System tested
-
 
 **Success Criteria**:
 
 - End-to-end success >85%
 
-
 - Response time <2 seconds
-
 
 - Safety incidents <1%
 
-
 - System stability >99%
-
 
 ## Resource Allocation
 
@@ -950,21 +823,15 @@ impl BrowserBridge {
 
 - **NL Engineer**: 1 engineer
 
-
 - **Bridge Engineer**: 1 engineer
-
 
 - **LLM Engineer**: 1 engineer
 
-
 - **Learning Engineer**: 1 engineer
-
 
 - **Safety Engineer**: 1 engineer
 
-
 - **Testing Engineer**: 1 engineer
-
 
 ### Effort Distribution
 
@@ -990,43 +857,31 @@ impl BrowserBridge {
 
 - Syntax checking
 
-
 - Permission verification
-
 
 - Risk assessment
 
-
 - Human confirmation for dangerous commands
-
 
 **Sandbox Execution**:
 
 - Resource limits
 
-
 - Network isolation
-
 
 - File system isolation
 
-
 - Process isolation
-
 
 **Learning Safety**:
 
 - Pattern validation
 
-
 - Preference validation
-
 
 - Feedback verification
 
-
 - Rollback capability
-
 
 ### Security Considerations
 
@@ -1034,43 +889,31 @@ impl BrowserBridge {
 
 - Local LLM deployment option
 
-
 - Data encryption
-
 
 - User consent
 
-
 - Data retention policies
-
 
 **Access Control**:
 
 - Permission system
 
-
 - User authentication
-
 
 - Role-based access
 
-
 - Audit logging
-
 
 **Attack Prevention**:
 
 - Input validation
 
-
 - Command injection prevention
-
 
 - Rate limiting
 
-
 - Anomaly detection
-
 
 ## Success Metrics
 
@@ -1078,43 +921,31 @@ impl BrowserBridge {
 
 - **NL Accuracy**: >90% translation accuracy
 
-
 - **Command Success**: >85% command execution success
-
 
 - **Response Time**: <2 seconds average response
 
-
 - **GUI Coverage**: >90% GUI operations accessible
-
 
 ### Learning Metrics
 
 - **Pattern Recognition**: >75% pattern accuracy
 
-
 - **Learning Rate**: >20% improvement over time
-
 
 - **User Adaptation**: >80% preference adaptation
 
-
 - **Feedback Effectiveness**: >90% feedback utilization
-
 
 ### Safety Metrics
 
 - **Validation Success**: >95% validation accuracy
 
-
 - **Sandbox Effectiveness**: >99% isolation success
-
 
 - **Safety Incidents**: <1% dangerous command execution
 
-
 - **Rollback Success**: >95% rollback success
-
 
 ## Conclusion
 
@@ -1129,18 +960,13 @@ This SigmaAI Agent & CLI Integration roadmap provides a comprehensive approach t
 
 1. Begin Phase 1 foundation development
 
-
 2. Implement NL Parser
-
 
 3. Implement Command Generator
 
-
 4. Implement Command Validator
 
-
 5. Set up development environment
-
 
 ---
 

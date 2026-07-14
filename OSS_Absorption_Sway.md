@@ -2,8 +2,8 @@
 
 ## Making swaywm/sway Irrelevant
 
-> **Absorption Target**: https://github.com/swaywm/sway  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/swaywm/sway
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaWM - Native Window Manager with Sway-inspired Tiling
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Sway by implementing a native window manager 
 
 ### 1. Tiling Window Manager
 
-**Original**: Sway's i3-compatible tiling  
+**Original**: Sway's i3-compatible tiling
 **SigmaOS**: Native tiling with enhanced algorithms
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaWM {
 - Native floating window support
 - Tabbed and stacked layouts
 
-
 ### 2. Wayland Compositor
 
-**Original**: Sway's Wayland compositor  
+**Original**: Sway's Wayland compositor
 **SigmaOS**: Native compositor with OS integration
 
 **Compositor Features**:
@@ -54,10 +53,9 @@ pub struct SigmaWM {
 - Native layer shell support
 - XDG shell protocol implementation
 
-
 ### 3. Workspace Management
 
-**Original**: Sway's workspace system  
+**Original**: Sway's workspace system
 **SigmaOS**: Native workspace with enhanced features
 
 **Workspace Features**:
@@ -69,10 +67,9 @@ pub struct SigmaWM {
 - Workspace profiles with import/export
 - Workspace synchronization across devices
 
-
 ### 4. Keybinding System
 
-**Original**: Sway's keybinding configuration  
+**Original**: Sway's keybinding configuration
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
@@ -84,10 +81,9 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
-
 ### 5. Bar System
 
-**Original**: Sway's bar (waybar)  
+**Original**: Sway's bar (waybar)
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
@@ -99,10 +95,9 @@ pub struct SigmaWM {
 - Bar profiles with automatic switching
 - Bar integration with system notifications
 
-
 ### 6. IPC Interface
 
-**Original**: Sway's IPC interface  
+**Original**: Sway's IPC interface
 **SigmaOS**: Native IPC with enhanced features
 
 **IPC Features**:
@@ -113,7 +108,6 @@ pub struct SigmaWM {
 - IPC authentication with capability-based access
 - IPC versioning with backward compatibility
 - IPC monitoring with native metrics
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaWM {
 pub mod tiling {
     use sigma_wm::tiling::TilingEngine;
     use sigma_wm::layout::LayoutManager;
-    
+
     pub struct SigmaWM {
         tiling_engine: TilingEngine,
         layout_manager: LayoutManager,
         workspace_manager: WorkspaceManager,
     }
-    
+
     impl SigmaWM {
         pub fn tile_windows(&self, windows: Vec<Window>) -> TiledLayout {
             // Native tiling with intelligent algorithms
@@ -154,7 +148,7 @@ pub mod tiling {
             let optimized = self.layout_manager.optimize(layout);
             TiledLayout::sway_compatible(optimized)
         }
-        
+
         pub fn manage_workspaces(&self) {
             // Native workspace management
             self.workspace_manager.start();
@@ -172,13 +166,13 @@ pub mod compositor {
         input_handler: InputHandler,
         output_manager: OutputManager,
     }
-    
+
     impl WaylandCompositor {
         pub fn render(&self, surface: Surface) -> RenderedSurface {
             // Hardware-accelerated rendering
             self.renderer.render(surface)
         }
-        
+
         pub fn handle_input(&self, event: InputEvent) {
             // Native input handling
             self.input_handler.process(event);

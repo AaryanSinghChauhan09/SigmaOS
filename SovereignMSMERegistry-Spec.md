@@ -22,7 +22,6 @@ Memory is allocated via `sigma_malloc` direct hardware paging to ensure secure, 
 - **Document Management**: PAN, Aadhaar, and business document storage
 - **Certificate Generation**: Digital MSME certificate with Dilithium-5 signatures
 
-
 ### 2. Compliance Management
 
 - **Annual Filing**: Automated annual return preparation and filing
@@ -30,14 +29,12 @@ Memory is allocated via `sigma_malloc` direct hardware paging to ensure secure, 
 - **Audit Readiness**: Document organization for audits
 - **Regulatory Updates**: Automatic notifications for regulatory changes
 
-
 ### 3. Trademark Management
 
 - **Trademark Search**: Search and availability check per Trademark Act
 - **Application Filing**: Trademark application preparation and filing
 - **Status Tracking**: Real-time trademark application status monitoring
 - **Renewal Management**: Automated trademark renewal reminders
-
 
 ## Data Model
 
@@ -83,7 +80,6 @@ pub struct Trademark {
 - `msme_get_certificate(reg_id) -> Result<Certificate>`
 - `msme_verify_certificate(reg_id) -> Result<bool>`
 
-
 ### Compliance Operations
 
 - `compliance_prepare_annual_return(reg_id, year) -> Result<AnnualReturn>`
@@ -91,14 +87,12 @@ pub struct Trademark {
 - `compliance_check_deadlines(reg_id) -> Result<Vec<Deadline>>`
 - `compliance_get_status(reg_id) -> Result<ComplianceStatus>`
 
-
 ### Trademark Operations
 
 - `trademark_search(term, class) -> Result<Vec<SearchResult>>`
 - `trademark_apply(application_data) -> Result<ApplicationId>`
 - `trademark_check_status(app_id) -> Result<TrademarkStatus>`
 - `trademark_renew(trademark_id) -> Result<RenewalStatus>`
-
 
 ## Security Requirements
 
@@ -109,7 +103,6 @@ pub struct Trademark {
 - **Hash**: BLAKE3 for data integrity
 - **Random**: Hardware entropy via TPM
 
-
 ### Access Control
 
 - **Role-Based Access**: Business owner, consultant, admin roles
@@ -117,14 +110,12 @@ pub struct Trademark {
 - **Audit Trail**: Complete registration lifecycle logging
 - **Zero-Trust**: Continuous authentication
 
-
 ### Data Protection
 
 - **Business Privacy**: All business data encrypted at rest
 - **Secure Transmission**: TLS 1.3 with hybrid key exchange
 - **Backup Encryption**: Encrypted backups with separate keys
 - **Retention Policy**: 10-year retention per regulations
-
 
 ## Compliance Matrix
 
@@ -145,7 +136,6 @@ pub struct Trademark {
 - **Trademark Search**: < 100ms
 - **Status Check**: < 50ms
 
-
 ## Integration Points
 
 ### External Systems
@@ -155,14 +145,12 @@ pub struct Trademark {
 - **PAN Verification**: PAN card verification API
 - **Aadhaar Verification**: Aadhaar-based authentication
 
-
 ### Internal SigmaOS Services
 
 - **SigmaFS**: Secure document storage
 - **SigmaVault**: Key management for certificates
 - **SigmaAudit**: Audit trail integration
 - **SigmaAI**: Compliance recommendation engine
-
 
 ## Deployment
 
@@ -181,7 +169,6 @@ features = ["business", "crypto", "compliance"]
 - **CPU**: Single core sufficient
 - **Network**: Required for government portal integration
 
-
 ## Testing
 
 ### Unit Tests
@@ -191,7 +178,6 @@ features = ["business", "crypto", "compliance"]
 - Trademark search
 - Certificate generation
 
-
 ### Integration Tests
 
 - End-to-end registration flow
@@ -199,14 +185,12 @@ features = ["business", "crypto", "compliance"]
 - Performance under load
 - Security validation
 
-
 ### Compliance Tests
 
 - Regulatory requirement validation
 - Certificate format validation
 - Trademark application validation
 - Audit trail verification
-
 
 ## Maintenance
 
@@ -216,7 +200,6 @@ features = ["business", "crypto", "compliance"]
 - **Classification Criteria**: Immediate for MSME notification updates
 - **Security Patches**: Immediate for CVEs
 - **Feature Updates**: Monthly release cycle
-
 
 ### Monitoring
 

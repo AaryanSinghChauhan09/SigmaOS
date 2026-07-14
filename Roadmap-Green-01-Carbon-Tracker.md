@@ -6,7 +6,6 @@ Measure and report the carbon footprint of compute workloads.
 - Watt-hour estimation from CPU/GPU utilisation
 - COâ‚‚ equivalent computation from regional grid intensity
 
-
 ## Key Milestones
 
 - [ ] Power draw estimation model

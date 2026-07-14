@@ -12,7 +12,6 @@ SigmaOS is built on a set of core principles that separate it from standard GNU/
 4. **Offline-first**: Ensure all help systems, reference manuals, local AI runtimes, and law/education databases are fully accessible without a network connection.
 5. **Unified UX**: Establish a consistent desktop experience via the custom Zenith Wayland compositor, built-in accessibility services, and comprehensive multilingual translations (with primary focus on Indic languages).
 
-
 ```text
    [System App / Utility]
              │
@@ -30,7 +29,6 @@ SigmaOS is built on a set of core principles that separate it from standard GNU/
 
 - **No Python/JS in PID 1**: The init system (`sigmad`) and the package manager (`sigpkg`) must compiled to standalone machine code without interpreter dependencies.
 - **Strict Capabilities**: Applications must not run as root. Root permissions are broken down into discrete capability tokens (`cap_network`, `cap_mount`, `cap_debug`).
-
 
 ## Implementation Checklist
 

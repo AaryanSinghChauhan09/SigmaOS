@@ -1,6 +1,6 @@
 # SigmaOS Future Development Roadmap
 
-With the foundational kernel subsystems, `no_std` coreutils, bespoke package manager (`sigpkg`), and security hooks implemented, SigmaOS is transitioning from foundational OS architecture to high-level integration and user-facing features. 
+With the foundational kernel subsystems, `no_std` coreutils, bespoke package manager (`sigpkg`), and security hooks implemented, SigmaOS is transitioning from foundational OS architecture to high-level integration and user-facing features.
 
 The following phases outline the next 12-18 months of development for SigmaOS.
 
@@ -12,7 +12,6 @@ The following phases outline the next 12-18 months of development for SigmaOS.
 - **Network Interface Drivers:** Implement e1000e (Intel Gigabit) and virtio-net drivers in the Sigma Driver Framework (SDF).
 - **Socket IPC:** Bridge the kernel network stack with userland via a POSIX-like, zero-copy socket API.
 
-
 ## Phase 9: Post-Quantum Cryptography (PQC)
 
 **Goal:** Solidify SigmaOS as a quantum-resistant platform.
@@ -20,7 +19,6 @@ The following phases outline the next 12-18 months of development for SigmaOS.
 - **Sigpkg PQC:** Replace the Ed25519 stubs in `sigma_pkg_repo.rs` with true Kyber/Dilithium implementations for package signing.
 - **Kernel Keystore:** Create a secure, memory-isolated keystore for PQC keys.
 - **Verified Boot:** Implement a post-quantum verifiable bootloader chain linking into `sigma_dmverity.rs`.
-
 
 ## Phase 10: AI LLM Integration
 
@@ -30,7 +28,6 @@ The following phases outline the next 12-18 months of development for SigmaOS.
 - **Agent IPC:** Connect the `sigma_ai_agent.rs` stub to the local LLM daemon via `sigma-bus`.
 - **System Telemetry RAG:** Pipe kernel telemetry and `sigma_audit.rs` logs into a localized vector database for real-time, context-aware AI debugging.
 
-
 ## Phase 11: The Zenith Compositor & GUI
 
 **Goal:** Deliver a modern, hardware-accelerated desktop experience.
@@ -38,7 +35,6 @@ The following phases outline the next 12-18 months of development for SigmaOS.
 - **KMS / DRM Subsystem:** Implement the Kernel Mode Setting and Direct Rendering Manager APIs.
 - **GPU Drivers:** Provide basic frame-buffer and virtio-gpu drivers.
 - **Wayland-Compatible Compositor:** Develop the Zenith Compositor using `no_alloc` paradigms, targeting 60FPS fluid UI with micro-animations.
-
 
 ## Phase 12: Hardware & Driver Ecosystem
 

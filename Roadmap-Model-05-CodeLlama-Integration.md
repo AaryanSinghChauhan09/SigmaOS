@@ -6,7 +6,6 @@ Embed CodeLlama 7B for code generation and debugging assistance.
 - Fill-in-the-Middle (FIM) mode for code completion
 - Rust, C, Python, and Bash support
 
-
 ## Key Milestones
 
 - [ ] FIM prompt format (<PRE>, <SUF>, <MID>)

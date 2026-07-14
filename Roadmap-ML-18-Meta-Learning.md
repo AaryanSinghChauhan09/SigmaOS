@@ -6,7 +6,6 @@ Adapt OS models to new tasks with very few examples.
 - MAML (Model-Agnostic Meta-Learning) training loop
 - 5-shot adaptation for new anomaly types
 
-
 ## Key Milestones
 
 - [ ] Inner/outer loop optimisation

@@ -2,8 +2,8 @@
 
 ## Making awesomeWM/awesome Irrelevant
 
-> **Absorption Target**: https://github.com/awesomeWM/awesome  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/awesomeWM/awesome
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaWM - Native Window Manager with Lua Scripting
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed awesome by implementing a native window manag
 
 ### 1. Lua Scripting
 
-**Original**: awesome's Lua-based configuration  
+**Original**: awesome's Lua-based configuration
 **SigmaOS**: Native Lua scripting with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaWM {
 - Lua profiling with real-time metrics
 - Lua debugging with native tools
 
-
 ### 2. Widget System
 
-**Original**: awesome's wibox widget system  
+**Original**: awesome's wibox widget system
 **SigmaOS**: Native widget system with enhanced features
 
 **Widget Features**:
@@ -54,10 +53,9 @@ pub struct SigmaWM {
 - Widget updates with automatic notification
 - Widget API with OS integration
 
-
 ### 3. Layout System
 
-**Original**: awesome's layout system  
+**Original**: awesome's layout system
 **SigmaOS**: Native layout system with enhanced features
 
 **Layout Features**:
@@ -69,10 +67,9 @@ pub struct SigmaWM {
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
 
-
 ### 4. Tag System
 
-**Original**: awesome's tag-based workspaces  
+**Original**: awesome's tag-based workspaces
 **SigmaOS**: Native tag system with enhanced features
 
 **Tag Features**:
@@ -84,10 +81,9 @@ pub struct SigmaWM {
 - Tag profiles with import/export
 - Tag synchronization across devices
 
-
 ### 5. Keybinding System
 
-**Original**: awesome's keybinding configuration  
+**Original**: awesome's keybinding configuration
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
@@ -99,10 +95,9 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
-
 ### 6. Client Management
 
-**Original**: awesome's client management  
+**Original**: awesome's client management
 **SigmaOS**: Native client management with enhanced features
 
 **Client Features**:
@@ -113,7 +108,6 @@ pub struct SigmaWM {
 - Client profiles with automatic switching
 - Client validation with automatic checking
 - Client composition with inheritance
-
 
 ---
 
@@ -140,20 +134,20 @@ pub struct SigmaWM {
 pub mod lua {
     use sigma_wm::lua::LuaEngine;
     use sigma_wm::scripting::ScriptingSystem;
-    
+
     pub struct SigmaWM {
         lua_engine: LuaEngine,
         scripting_system: ScriptingSystem,
         layout_manager: LayoutManager,
     }
-    
+
     impl SigmaWM {
         pub fn execute_lua(&self, script: LuaScript) -> LuaResult {
             // Native Lua execution
             let sandboxed = self.scripting_system.sandbox(script);
             self.lua_engine.execute(sandboxed)
         }
-        
+
         pub fn reload_config(&self, config: LuaConfig) {
             // Native config reload
             self.execute_lua(config);
@@ -171,7 +165,7 @@ pub mod widget {
         widget_sandbox: WidgetSandbox,
         widget_marketplace: WidgetMarketplace,
     }
-    
+
     impl WidgetSystem {
         pub fn load_widget(&self, widget: Widget) -> LoadedWidget {
             // Native widget loading

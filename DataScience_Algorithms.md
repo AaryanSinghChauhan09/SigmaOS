@@ -10,7 +10,6 @@ Perform high-performance scientific computations, statistical modeling, and data
 - **Statistical Fitting**: Welch's T-test, ANOVA.
 - **Time-Series Models**: ARIMA, LSTM workload prediction.
 
-
 ## 💾 Version Control
 
 The integration with `dvc`-like versioning allows tagging the datasets and training weights with SovereignFS snapshots for full experiment reproducibility.

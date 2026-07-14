@@ -2,8 +2,8 @@
 
 ## Making firecracker-microvm/firecracker Irrelevant
 
-> **Absorption Target**: https://github.com/firecracker-microvm/firecracker  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/firecracker-microvm/firecracker
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaVM - Native MicroVM with Firecracker Compatibility
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Firecracker by implementing a native microVM 
 
 ### 1. MicroVM Architecture
 
-**Original**: Firecracker's microVM design  
+**Original**: Firecracker's microVM design
 **SigmaOS**: Native microVM with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaVM {
 - MicroVM validation with automatic checking
 - MicroVM monitoring with real-time metrics
 
-
 ### 2. Jailer System
 
-**Original**: Firecracker's jailer for isolation  
+**Original**: Firecracker's jailer for isolation
 **SigmaOS**: Native jailer with enhanced features
 
 **Jailer Features**:
@@ -54,10 +53,9 @@ pub struct SigmaVM {
 - Jailer validation with automatic checking
 - Jailer monitoring with real-time metrics
 
-
 ### 3. Machine Configuration
 
-**Original**: Firecracker's machine configuration  
+**Original**: Firecracker's machine configuration
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -69,10 +67,9 @@ pub struct SigmaVM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
-
 ### 4. Boot Source
 
-**Original**: Firecracker's boot source management  
+**Original**: Firecracker's boot source management
 **SigmaOS**: Native boot with enhanced features
 
 **Boot Features**:
@@ -84,10 +81,9 @@ pub struct SigmaVM {
 - Boot validation with automatic checking
 - Boot monitoring with real-time metrics
 
-
 ### 5. Network Interface
 
-**Original**: Firecracker's network interface  
+**Original**: Firecracker's network interface
 **SigmaOS**: Native network with enhanced features
 
 **Network Features**:
@@ -99,10 +95,9 @@ pub struct SigmaVM {
 - Network validation with automatic checking
 - Network monitoring with real-time metrics
 
-
 ### 6. vsock Interface
 
-**Original**: Firecracker's vsock interface  
+**Original**: Firecracker's vsock interface
 **SigmaOS**: Native vsock with enhanced features
 
 **vsock Features**:
@@ -113,7 +108,6 @@ pub struct SigmaVM {
 - vsock validation with automatic checking
 - vsock monitoring with real-time metrics
 - vsock composition with inheritance
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaVM {
 pub mod microvm {
     use sigma_vm::microvm::MicroVMManager;
     use sigma_vm::jailer::Jailer;
-    
+
     pub struct SigmaVM {
         microvm_manager: MicroVMManager,
         jailer: Jailer,
         machine_config: MachineConfig,
     }
-    
+
     impl SigmaVM {
         pub fn create_microvm(&self, config: MicroVMConfig) -> MicroVM {
             // Native microVM creation
@@ -167,7 +161,7 @@ pub mod jailer {
         resource_limiter: ResourceLimiter,
         capability_manager: CapabilityManager,
     }
-    
+
     impl Jailer {
         pub fn isolate(&self, config: Config) -> IsolatedConfig {
             // Native isolation

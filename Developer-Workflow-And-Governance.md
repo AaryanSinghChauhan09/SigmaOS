@@ -18,12 +18,9 @@ This installs three git hooks:
 
 - **commit-msg**: enforces Conventional Commits format
 
-
 - **pre-commit**: runs rustfmt on staged `.rs` files
 
-
 - **prepare-commit-msg**: auto-appends `Signed-off-by:`
-
 
 ---
 
@@ -104,9 +101,7 @@ and you have the right to submit it.
 
 1. Fill in the PR template (`.github/PULL_REQUEST_TEMPLATE.md`) — every section matters.
 
-
 2. Reference the Ideas-999-Structured.md idea number if applicable.
-
 
 ### Review requirements
 
@@ -124,15 +119,11 @@ The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a c
 
 - Changed subsystems and file list
 
-
 - Suggested review checklist
-
 
 - Auto-detected test gaps
 
-
 - Affected CODEOWNERS
-
 
 ---
 
@@ -194,35 +185,25 @@ Significant changes require an RFC before implementation:
 
 1. Copy `docs/rfcs/RFC-0001-template.md` → `docs/rfcs/RFC-NNNN-<topic>.md`
 
-
 2. Open a GitHub Issue titled `RFC: <topic>` with label `rfc`
-
 
 3. Discussion period: minimum 7 days
 
-
 4. Maintainer signs off → RFC status becomes **Accepted**
 
-
 5. Implementation PR links back to the RFC
-
 
 ### RFCs are required for:
 
 - New syscalls
 
-
 - ABI-breaking changes
-
 
 - New kernel subsystems
 
-
 - Changes to `sigma_pledge` promise bits
 
-
 - Changes to the sigpkg format
-
 
 ---
 

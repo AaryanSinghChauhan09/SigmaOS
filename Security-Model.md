@@ -28,18 +28,13 @@ SigmaOS employs a **layered, capability-based security architecture** rooted in 
 
 - Kernel integrity (immutable after boot)
 
-
 - User credentials and secrets (`sigma-crypto-vault`)
-
 
 - Network communications (E2E encrypted)
 
-
 - Package supply chain (cryptographic chain of trust)
 
-
 - Filesystem data (VFS RBAC + optional encryption)
-
 
 ---
 
@@ -172,15 +167,11 @@ Userland (profile packages, sandboxed)
 
 - Two kernel slots: **Slot A** (active) and **Slot B** (backup)
 
-
 - On update: write to inactive slot → verify hash → flip active pointer atomically
-
 
 - If boot of new slot fails 3× → automatic rollback to previous slot
 
-
 - TPM extends PCR[9] with slot change events (audit trail)
-
 
 ### 5.3 Sovereign Root Key
 
@@ -188,12 +179,9 @@ The **sovereign root key** is an Ed25519 keypair:
 
 - Private key: HSM-protected, never leaves signing infrastructure
 
-
 - Public key: burned into firmware and distributed with the ISO
 
-
 - Key rotation: requires 3-of-5 multisig from SigmaOS core maintainers
-
 
 ---
 
@@ -203,21 +191,15 @@ The **sovereign root key** is an Ed25519 keypair:
 
 - **Magic cookie validation:** Every allocation tagged with `0xSIGMA5A5A`
 
-
 - **Guard pages:** Unmapped pages before/after each allocation region
-
 
 - **Randomized base:** ASLR + randomized heap layout per boot
 
-
 - **Use-after-free detection:** Poison freed memory with `0xDEADBEEF`
-
 
 - **Double-free detection:** Allocation bitmap tracks state
 
-
 - **Size segregation:** Separate arenas per size class (8, 16, 32, 64, 128, 256 bytes)
-
 
 ### 6.2 sigma_malloc ABI
 
@@ -269,12 +251,9 @@ Internet ──────► sigma-shield (BPF firewall)
 
 - GUI apps: **no** direct network access — all requests proxied via `sigma-netd`
 
-
 - DNS: DoH only (no cleartext UDP/53 from userland)
 
-
 - Outbound firewall: default-deny, whitelist per-app
-
 
 ---
 
@@ -284,18 +263,13 @@ Sovereign replacement for KeePass/Bitwarden:
 
 - Master key: Argon2id-derived from passphrase + hardware token (FIDO2/TPM)
 
-
 - Vault file: ChaCha20-Poly1305 encrypted, Ed25519-signed
-
 
 - No cloud sync by default — sovereign storage only
 
-
 - CLI: `sigma-vault get/set/delete/generate`
 
-
 - TOTP support built-in
-
 
 ---
 

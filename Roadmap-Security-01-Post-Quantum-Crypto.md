@@ -6,7 +6,6 @@ Protect against quantum computing attacks on all cryptographic operations.
 - CRYSTALS-Kyber for key encapsulation
 - CRYSTALS-Dilithium for digital signatures
 
-
 ## Key Milestones
 
 - [ ] Kyber-768 implementation (no_std)

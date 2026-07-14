@@ -6,7 +6,6 @@ Implement an ensemble tree classifier for tabular OS telemetry classification.
 - Static-array based decision tree nodes (no heap)
 - OOB (out-of-bag) error estimation
 
-
 ## Key Milestones
 
 - [ ] Decision tree node struct (no_std)

@@ -6,7 +6,6 @@ Predict crop yields using satellite imagery and weather data.
 - NDVI time-series from offline satellite cache
 - Random forest yield predictor
 
-
 ## Key Milestones
 
 - [ ] GeoTIFF raster parser

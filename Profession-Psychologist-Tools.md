@@ -10,15 +10,11 @@ The Psychologist Profile is designed for mental health excellence, therapy manag
 
 - **SigmaTherapy**: Therapy session management and notes.
 
-
 - **SigmaAssessment**: Psychological assessment and testing tools.
-
 
 - **SigmaProgress**: Patient progress tracking and outcomes.
 
-
 - **SigmaConfidentiality**: Secure patient data and privacy management.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Psychologist Profile is designed for mental health excellence, therapy manag
 
 - **Theme**: Mental Health Purple (Clinical Standard)
 
-
 - **Layout**: Clinical Dashboard (Therapy, Assessment, Progress)
 
-
 - **Personalization**: Custom therapy templates and automated reminders.
-
 
 ---
 

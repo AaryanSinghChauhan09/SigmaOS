@@ -36,7 +36,6 @@ The SigmaOS `sigma-appcenter` is a curated software boutique. Applications submi
 2. Adhere to the Zenith HIG.
 3. Integrate with the Zenith Desktop (notifications, search).
 
-
 ### 2.3 Focus-First Notifications
 
 Notifications in Zenith Desktop are non-intrusive. While in "Focus Mode" (inspired by elementary's Do Not Disturb), only critical system alerts bypass the filter; all other notifications are silently routed to the Notification Center.

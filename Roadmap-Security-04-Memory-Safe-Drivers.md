@@ -6,7 +6,6 @@ All device drivers written in safe Rust with formal verification stubs.
 - No unsafe in driver hot paths
 - Kani verifier proofs for critical drivers
 
-
 ## Key Milestones
 
 - [ ] Safe DMA abstraction layer

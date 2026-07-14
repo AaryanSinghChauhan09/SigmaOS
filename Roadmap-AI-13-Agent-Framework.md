@@ -4,9 +4,9 @@ Build an autonomous AI agent that can execute multi-step OS tasks.
 ## Goals
 
 - ReAct (Reason + Act) loop over OS tools
-- Tool definitions: 
+- Tool definitions:
 
-un_command, 
+un_command,
 ead_file, search_wiki
 
 ## Key Milestones

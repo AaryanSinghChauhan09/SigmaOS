@@ -20,7 +20,6 @@ This roadmap outlines strategic improvements for SigmaOS by leveraging proven te
 - Develop modern package management with dependency resolution
 - Improve user experience with declarative configuration and automation
 
-
 ---
 
 ## Current SigmaOS Architecture Analysis
@@ -32,7 +31,6 @@ This roadmap outlines strategic improvements for SigmaOS by leveraging proven te
 - **Security:** Security Center daemon, sovereign sandboxes
 - **UI/UX:** Object-oriented UI, BSP window manager, glassmorphism profiles
 
-
 ### Identified Improvement Areas
 
 - No atomic update/rollback mechanism
@@ -40,7 +38,6 @@ This roadmap outlines strategic improvements for SigmaOS by leveraging proven te
 - Missing comprehensive kernel tuning capabilities
 - No declarative system configuration management
 - Limited observability and monitoring tooling
-
 
 ---
 
@@ -58,7 +55,6 @@ This roadmap outlines strategic improvements for SigmaOS by leveraging proven te
   - **Low-Latency Profile:** For gaming, multimedia, real-time applications
   - **Throughput Profile:** For servers, HPC, batch processing
   - **Power-Efficiency Profile:** For laptops, mobile devices
-
 
 **Key Parameters:**
 
@@ -90,7 +86,6 @@ pub enum PreemptionMode {
 - Add transparent huge pages (THP) with smart defrag policies
 - Develop adaptive swappiness based on workload patterns
 
-
 **Configuration:**
 
 ```rust
@@ -119,7 +114,6 @@ pub struct MemoryConfig {
 - Integrate io_uring for async I/O operations
 - Develop intelligent read-ahead based on access patterns
 
-
 **Expected Impact:** 30-40% improvementin I/O throughput
 
 #### 1.4 Network Stack Optimization
@@ -131,7 +125,6 @@ pub struct MemoryConfig {
 - Default to BBR congestion control (vs cubic)
 - Implement TCP buffer auto-tuning
 - Add zero-copy networking for high-throughput scenarios
-
 
 **Configuration:**
 
@@ -159,7 +152,6 @@ pub struct NetworkConfig {
 - Implement latency-nice for latency-sensitive tasks
 - Add NUMA-aware scheduling for multi-socket systems
 
-
 **Expected Impact:** 10-15% improvement in task scheduling fairness
 
 #### 2.2 CPU Frequency Scaling
@@ -173,7 +165,6 @@ pub struct NetworkConfig {
   - **schedutil** for responsive desktop
   - **powersave** for battery life
 - Add per-CPU frequency control for heterogeneous CPUs (big.LITTLE)
-
 
 **Expected Impact:** 15-20% power efficiency improvement for mobile
 
@@ -218,7 +209,6 @@ pub enum DependencyResolver {
 - **Transaction history:** Rollback capability for package operations
 - **Content-addressed storage:** Deduplication like Nix/OSTree
 
-
 #### 1.2 Repository Structure
 
 **Inspired by:** Arch Linux, Fedora CoreOS layered approach
@@ -254,7 +244,6 @@ repositories:
 - **Metadata:** Includes dependencies, conflicts, provides, checksums
 - **Signatures:** Ed25519 cryptographic signatures
 
-
 ### Phase 2: Advanced Package Features (Priority: MEDIUM)
 
 #### 2.1 Transactional Package Operations
@@ -266,7 +255,6 @@ repositories:
 - All package operations are transactional
 - Automatic rollback on failure
 - Transaction history with undo capability
-
 
 ```rust
 pub struct PackageTransaction {
@@ -293,7 +281,6 @@ pub enum PackageOperation {
 - Custom layers for derivatives
 - Package overrides for security fixes
 
-
 ---
 
 ## Security Hardening & Isolation
@@ -309,7 +296,6 @@ pub enum PackageOperation {
 - Extend existing capability tokens with MAC policies
 - Implement profile-based confinement like AppArmor
 - Add per-process security contexts
-
 
 ```rust
 pub struct SecurityContext {
@@ -338,7 +324,6 @@ pub struct SeccompFilter {
 - Kernel pointer restriction
 - Stack protection and address space layout
 
-
 **Configuration:**
 
 ```rust
@@ -364,7 +349,6 @@ pub struct KernelHardening {
 - Add seccomp-bpf syscall filtering
 - Integrate with existing capability tokens
 
-
 ```rust
 pub struct EnhancedSandbox {
     pub cpu_limit: Option<ResourceLimit>,
@@ -386,7 +370,6 @@ pub struct EnhancedSandbox {
 - Add real-time threat detection
 - Implement temporal decay heuristics (existing)
 - Add automated incident response
-
 
 **Monitoring:**
 
@@ -412,7 +395,6 @@ pub struct SecurityMonitor {
   - **FUTURE:** Forward-looking, stronger algorithms
   - **LEGACY:** Maximum compatibility
   - **FIPS:** FIPS 140-3 compliant
-
 
 ```rust
 pub enum CryptoPolicy {
@@ -472,7 +454,6 @@ pub enum DeploymentStatus {
 - **Deduplication:** Content-addressed storage
 - **Delta updates:** Binary diffs for efficiency
 
-
 #### 1.2 Boot Configuration Management
 
 **Inspired by:** OSTree bootloader integration
@@ -483,7 +464,6 @@ pub enum DeploymentStatus {
 - Automatic bootloader configuration
 - Support for multiple kernel versions
 - Secure Boot compatibility
-
 
 ### Phase 2: Snapshot-Based Rollback (Priority: HIGH)
 
@@ -520,7 +500,6 @@ pub struct Snapshot {
 - Timeline-based retention
 - Boot verification before promotion
 
-
 ### Phase 3: Health Checking (Priority: MEDIUM)
 
 #### 3.1 Automated Health Verification
@@ -533,7 +512,6 @@ pub struct Snapshot {
 - Service readiness verification
 - Automatic rollback on failure
 - Health check API for custom services
-
 
 ```rust
 pub struct HealthChecker {
@@ -564,7 +542,6 @@ pub trait HealthCheck {
 - Add machine configuration for system-wide settings
 - Implement configuration validation and testing
 
-
 ```yaml
 
 # /etc/sigma/system.yaml
@@ -580,7 +557,6 @@ kernel:
 
     - "quiet"
     - "splash"
-
 
 network:
   interfaces:
@@ -601,7 +577,6 @@ packages:
   - name: "sigma-terminal"
   - name: "development-tools"
 
-
 security:
   mac_policy: "enforcing"
   firewall: "enabled"
@@ -618,7 +593,6 @@ security:
 - Automatic remediation options
 - Configuration versioning
 
-
 ### Phase 2: Enhanced Desktop Experience (Priority: MEDIUM)
 
 #### 2.1 Zenith Desktop Enhancements
@@ -631,7 +605,6 @@ security:
 - Implement dynamic workspace management
 - Add gesture support for touch devices
 - Enhance glassmorphism theming system
-
 
 ```rust
 pub struct DesktopConfig {
@@ -660,7 +633,6 @@ pub struct WindowManagerConfig {
 - Automated troubleshooting assistance
 - Performance optimization recommendations
 
-
 ### Phase 3: Developer Experience (Priority: MEDIUM)
 
 #### 3.1 Development Environment
@@ -673,7 +645,6 @@ pub struct WindowManagerConfig {
 - Containerized development environments
 - Integrated toolchain management
 - Project templates and scaffolding
-
 
 ```rust
 pub struct DevEnvironment {
@@ -695,7 +666,6 @@ pub struct DevEnvironment {
 - Built-in diagnostic tools
 - Community contribution platform
 
-
 ---
 
 ## Observability and Monitoring
@@ -712,7 +682,6 @@ pub struct DevEnvironment {
 - Add distributed tracing support
 - Implement log aggregation
 - Add alerting and notification
-
 
 ```rust
 pub struct ObservabilityStack {
@@ -742,7 +711,6 @@ pub struct MetricsCollector {
 - eBPF-based tracing
 - Performance regression detection
 
-
 ### Phase 2: Diagnostic Tools (Priority: LOW)
 
 #### 2.1 System Diagnostics
@@ -756,7 +724,6 @@ pub struct MetricsCollector {
 - Performance bottleneck detection
 - System health reports
 
-
 ---
 
 ## Implementation Timeline
@@ -767,13 +734,11 @@ pub struct MetricsCollector {
 - **Weeks 5-8:** Kernel tuning profile system
 - **Weeks 9-12:** Basic package manager infrastructure
 
-
 ### Quarter 2: Core Features
 
 - **Weeks 13-16:** Atomic update system (OSTree integration)
 - **Weeks 17-20:** Enhanced security monitoring
 - **Weeks 21-24:** I/O and network optimization
-
 
 ### Quarter 3: Advanced Features
 
@@ -781,13 +746,11 @@ pub struct MetricsCollector {
 - **Weeks 29-32:** Snapshot-based rollback
 - **Weeks 33-36:** Declarative configuration system
 
-
 ### Quarter 4: Polish and Integration
 
 - **Weeks 37-40:** Desktop experience enhancements
 - **Weeks 41-44:** Observability and monitoring
 - **Weeks 45-48:** Documentation, testing, and stabilization
-
 
 ---
 
@@ -801,7 +764,6 @@ pub struct MetricsCollector {
 - **UI/UX Developers:** 2 engineers for desktop improvements
 - **QA Engineers:** 2-3 engineers for testing and validation
 
-
 ### Infrastructure
 
 - **Build Servers:** CI/CD pipeline for multiple architectures
@@ -809,14 +771,12 @@ pub struct MetricsCollector {
 - **Testing Infrastructure:** Automated testing on various hardware
 - **Documentation Platform:** Wiki and documentation hosting
 
-
 ### External Dependencies
 
 - **OSTree:** For atomic updates
 - **Libsolv:** For SAT-based dependency resolution
 - **eBPF tooling:** For observability and tracing
 - **Modern Rust ecosystem:** For core components
-
 
 ---
 
@@ -830,14 +790,12 @@ pub struct MetricsCollector {
 - **Network Throughput:** 25-35% improvement with BBR
 - **Memory Efficiency:** 20-30% reduction in memory pressure
 
-
 ### Security Metrics
 
 - **Vulnerability Response Time:** < 24 hours for critical CVEs
 - **Security Coverage:** 100% of services with MAC profiles
 - **Audit Completeness:** 100% of security events logged
 - **Sandbox Adoption:** 100% of unprivileged code sandboxed
-
 
 ### Reliability Metrics
 
@@ -846,14 +804,12 @@ pub struct MetricsCollector {
 - **System Uptime:** > 99.9% for production systems
 - **Mean Time to Recovery:** < 5 minutes with rollback
 
-
 ### User Experience Metrics
 
 - **Configuration Time:** < 10 minutes for initial setup
 - **Learning Curve:** < 2 hours for basic tasks
 - **Documentation Coverage:** 100% of features documented
 - **Community Satisfaction:** > 4.5/5 rating
-
 
 ---
 
@@ -868,7 +824,6 @@ pub struct MetricsCollector {
 - **Atomic Update Integration:** OSTree integration complexity
   - *Mitigation:* Phased implementation, fallback mechanisms
 
-
 ### Resource Risks
 
 - **Development Time:** Ambitious timeline
@@ -876,14 +831,12 @@ pub struct MetricsCollector {
 - **Expertise Availability:** Specialized skills required
   - *Mitigation:* Training, hiring, consultant engagement
 
-
 ### Adoption Risks
 
 - **Backward Compatibility:** Breaking changes
   - *Mitigation:* Migration paths, compatibility layers
 - **Community Buy-in:** Resistance to changes
   - *Mitigation:* Early community involvement, transparent process
-
 
 ---
 
@@ -899,7 +852,6 @@ The focus on performance optimization, atomic updates, security hardening, and e
 2. Establish development team and resources
 3. Begin Quarter 1 foundation work
 4. Engage community for feedback and contributions
-
 
 ---
 
@@ -918,7 +870,6 @@ The focus on performance optimization, atomic updates, security hardening, and e
 - Parallel build optimization with intelligent job scheduling
 - ccache integration for faster rebuilds
 - tmpfs-based build directory for in-RAM compilation
-
 
 **Configuration:**
 
@@ -951,7 +902,6 @@ pub struct PerPackageConfig {
 - Automated PGO build pipeline
 - Profile collection and application
 
-
 **Expected Impact:** 5-10% performance improvement for PGO-enabled packages
 
 ### Phase 2: Reproducible Builds (Priority: MEDIUM)
@@ -966,7 +916,6 @@ pub struct PerPackageConfig {
 - Deterministic builds with fixed inputs
 - Build isolation to prevent undeclared dependencies
 - Binary cache for pre-built packages
-
 
 **Architecture:**
 
@@ -1003,7 +952,6 @@ pub struct BuildInputs {
 - Container-optimized base images
 - Security-focused minimal attack surface
 
-
 **Configuration:**
 
 ```rust
@@ -1032,7 +980,6 @@ pub enum LibcVariant {
 - Layer caching optimization
 - Security-scanned images
 
-
 **Expected Impact:** 50-60% smaller container images, faster deployment
 
 ---
@@ -1052,7 +999,6 @@ pub enum LibcVariant {
 - Multiple desktop environment editions (Budgie, GNOME, Plasma, Xfce)
 - Hardware-specific optimizations
 - Out-of-the-box software experience
-
 
 **Desktop Editions:**
 
@@ -1085,7 +1031,6 @@ pub struct DesktopConfig {
 - Enhanced input device support
 - Improved security with Wayland isolation
 
-
 **Expected Impact:** Better security, modern graphics stack, future-proof architecture
 
 ---
@@ -1104,7 +1049,6 @@ pub struct DesktopConfig {
 - Kubernetes node optimization
 - Container image building tools
 - Container security policies
-
 
 **Architecture:**
 
@@ -1135,7 +1079,6 @@ pub enum ContainerRuntimeType {
 - Image customization and hardening
 - CI/CD integration for image updates
 
-
 **Expected Impact:** Faster cloud deployment, consistent environments
 
 ---
@@ -1154,7 +1097,6 @@ pub enum ContainerRuntimeType {
 - Automatic hardware detection
 - Driver signing and verification
 - Out-of-tree driver support
-
 
 **Architecture:**
 
@@ -1186,7 +1128,6 @@ pub struct Driver {
 - Compute shader support for AI workloads
 - Multi-GPU support
 
-
 **Expected Impact:** Enhanced graphics performance, better AI acceleration
 
 ### Phase 2: Firmware Management (Priority: MEDIUM)
@@ -1201,7 +1142,6 @@ pub struct Driver {
 - Vendor-specific firmware support
 - Secure firmware verification
 - Firmware rollback capability
-
 
 **Expected Impact:** Improved hardware support, security updates for firmware
 
@@ -1221,7 +1161,6 @@ pub struct Driver {
 - Multiple language runtimes (Rust, Go, Python, Node.js)
 - Containerized development environments
 - Integrated debugging and profiling tools
-
 
 **Development Profiles:**
 
@@ -1256,7 +1195,6 @@ pub enum Language {
 - Automated testing and validation
 - Package signing and distribution
 
-
 **Expected Impact:** Easier package creation, better package quality
 
 ---
@@ -1270,14 +1208,12 @@ pub enum Language {
 - **Weeks 9-12:** Basic package manager infrastructure
 - **Weeks 13-16:** Source-based build system research
 
-
 ### Quarter 2: Core Features (Extended)
 
 - **Weeks 17-20:** Atomic update system (OSTree integration)
 - **Weeks 21-24:** Enhanced security monitoring
 - **Weeks 25-28:** I/O and network optimization
 - **Weeks 29-32:** Minimal footprint variant development
-
 
 ### Quarter 3: Advanced Features (Extended)
 
@@ -1286,7 +1222,6 @@ pub enum Language {
 - **Weeks 41-44:** Declarative configuration system
 - **Weeks 45-48:** Reproducible build system
 
-
 ### Quarter 4: Polish and Integration (Extended)
 
 - **Weeks 49-52:** Desktop experience enhancements
@@ -1294,7 +1229,6 @@ pub enum Language {
 - **Weeks 57-60:** Hardware support and driver framework
 - **Weeks 61-64:** Developer tools and ecosystem
 - **Weeks 65-68:** Documentation, testing, and stabilization
-
 
 ---
 
@@ -1314,7 +1248,6 @@ pub enum Language {
 - **Alpine Linux:** Minimal footprint, musl libc, container optimization
 - **Solus:** Sane defaults, curated software, Wayland transition
 
-
 ### Key Technologies
 
 - **OSTree:** Atomic updates and rollback
@@ -1324,7 +1257,6 @@ pub enum Language {
 - **io_uring:** High-performance async I/O
 - **BBR:** Modern TCP congestion control
 - **EEVDF:** Advanced task scheduling
-
 
 ### Documentation and Guides
 

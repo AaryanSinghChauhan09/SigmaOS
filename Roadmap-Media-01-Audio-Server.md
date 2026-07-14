@@ -6,7 +6,6 @@ Low-latency audio server replacing ALSA/PulseAudio.
 - Graph-based audio routing (sigma-pipe)
 - <5ms round-trip latency on ALSA hardware
 
-
 ## Key Milestones
 
 - [ ] ALSA PCM driver integration in HAL

@@ -30,8 +30,6 @@ drivers/ddk/
 
 - [ ] DMA management API
 
-
 - [ ] IRQ arbitration layer
-
 
 - [ ] Formal verification harness (CBMC / Frama-C integration)

@@ -17,29 +17,21 @@ sigma-boot.zig has a Zig UEFI implementation that loads the kernel ELF. Needs:
 
 - Test with QEMU OVMF firmware
 
-
 - Verify memory map hand-off to sigma_kernel_main
-
 
 - Add GOP framebuffer setup
 
-
 - Add Secure Boot signature verification (Dilithium-5)
-
 
 ### Acceptance Criteria:
 
 - [ ] QEMU boots with `-bios /usr/share/ovmf/OVMF.fd`
 
-
 - [ ] Serial output: `SigmaOS Boot v15.0`
-
 
 - [ ] Kernel receives valid BootInfo struct
 
-
 - [ ] Memory map passed to buddy allocator
-
 
 ---
 
@@ -56,15 +48,11 @@ GDT, IDT, and IRQ files now exist. Need to call them from sigma_kernel_main.
 
 - [ ] `sigma_gdt_init(kernel_stack_top)` called at boot
 
-
 - [ ] `sigma_idt_init()` called at boot
-
 
 - [ ] Timer IRQ fires at 1000 Hz (verify with JIFFIES counter in serial log)
 
-
 - [ ] Keyboard IRQ fires on keypress
-
 
 ---
 
@@ -79,23 +67,17 @@ sigma_sched.rs has MLFQ+CFS+EDF. For initial boot, needs:
 
 - Integration with timer IRQ (call `sched_tick()` from IRQ handler)
 
-
 - Process table linking (fork/exec)
 
-
 - Context switch using `arch/x86_64/switch.asm`
-
 
 ### Acceptance Criteria:
 
 - [ ] 2 tasks scheduled round-robin visible in serial log
 
-
 - [ ] `sched_tick()` called from PIT handler
 
-
 - [ ] Context switch saves/restores all registers
-
 
 ---
 
@@ -112,12 +94,9 @@ sigma_mm.rs has buddy+slab. Need to initialize from BootInfo memory map.
 
 - [ ] `sigma_slab_init()` uses memory map from UEFI
 
-
 - [ ] Allocate/free 1000 objects without leak
 
-
 - [ ] `sigma_mm_free_pages()` returns correct count
-
 
 ---
 
@@ -134,12 +113,9 @@ VFS and Tmpfs are implemented. Need to wire open/read/write syscalls to them.
 
 - [ ] `sigma-sh` can `echo hello > /tmp/test && cat /tmp/test`
 
-
 - [ ] `mkdir /tmp/mydir` works
 
-
 - [ ] `stat /tmp/test` returns correct size
-
 
 ---
 
@@ -156,15 +132,11 @@ Syscall dispatch exists but read/write/open/close return ENOSYS.
 
 - [ ] `write(1, "hello\n", 6)` writes to serial/VGA
 
-
 - [ ] `open("/tmp/test", O_RDONLY)` returns valid fd
-
 
 - [ ] `read(fd, buf, 100)` reads tmpfs file content
 
-
 - [ ] `close(fd)` frees fd slot
-
 
 ---
 
@@ -183,12 +155,9 @@ Implement ext4 read-only mounting from a block device.
 
 - [ ] Mount ext4 image: `sigma_vfs_mount("/", dev, &EXT4_OPS)`
 
-
 - [ ] `cat /etc/hostname` reads from ext4
 
-
 - [ ] `ls /` lists root directory
-
 
 ---
 
@@ -205,12 +174,9 @@ Implement /dev/console, /dev/null, /dev/zero, /dev/random.
 
 - [ ] `write(1, buf, len)` → output on VGA + serial
 
-
 - [ ] `read` from /dev/null returns 0
 
-
 - [ ] `read` from /dev/random returns pseudo-random bytes
-
 
 ---
 
@@ -227,15 +193,11 @@ Implement full RFC 793 TCP state machine: SYN, SYN-ACK, ESTABLISHED, FIN.
 
 - [ ] TCP 3-way handshake completes with QEMU user networking
 
-
 - [ ] `connect(fd, &addr, sizeof(addr))` works
-
 
 - [ ] `send/recv` exchange data
 
-
 - [ ] FIN/RST handled correctly
-
 
 ---
 
@@ -252,12 +214,9 @@ sigma_pledge.rs has the data structure. Need to wire it to every syscall.
 
 - [ ] Process calls `sigma_pledge("stdio")`, then attempts `open("/etc/passwd")` → SIGKILL
 
-
 - [ ] Audit log entry written for every violation
 
-
 - [ ] `getpid()` allowed under any pledge
-
 
 ---
 
@@ -276,12 +235,9 @@ Implement DRM/KMS mode setting for VirtIO-GPU (QEMU).
 
 - [ ] Framebuffer available at boot
 
-
 - [ ] Can set 1024×768 resolution
 
-
 - [ ] Zenith compositor can write pixels
-
 
 ---
 
@@ -298,12 +254,9 @@ Wire Zenith desktop compositor to VirtIO-GPU + input driver.
 
 - [ ] Desktop window appears in QEMU display
 
-
 - [ ] Mouse input routes to windows
 
-
 - [ ] Keyboard input works in terminal
-
 
 ---
 
@@ -322,15 +275,11 @@ Implement complete package install flow.
 
 - [ ] `sigma-pkg install htop` downloads, verifies, installs
 
-
 - [ ] Dilithium-5 signature verified
-
 
 - [ ] `sigma-pkg remove htop` cleans up
 
-
 - [ ] Rollback works if install fails
-
 
 ---
 
@@ -347,15 +296,11 @@ Implement GNU coreutils equivalents in Rust.
 
 - [ ] `ls /tmp` lists files with permissions
 
-
 - [ ] `cat /etc/hostname` reads file
-
 
 - [ ] `grep pattern /tmp/file` matches lines
 
-
 - [ ] `echo hello | sed s/hello/world/` outputs `world`
-
 
 ---
 

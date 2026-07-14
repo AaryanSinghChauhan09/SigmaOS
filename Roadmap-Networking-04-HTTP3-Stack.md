@@ -6,7 +6,6 @@ Modern HTTP/3 transport for the sigma-web browser and package manager.
 - QUIC protocol implementation (RFC 9000)
 - HTTP/3 request multiplexing
 
-
 ## Key Milestones
 
 - [ ] QUIC packet parser

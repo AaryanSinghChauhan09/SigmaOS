@@ -22,8 +22,6 @@ Telemetry report filed to Sovereign Audit Log
 
 - [ ] Watchdog timer integration
 
-
 - [ ] Snapshot restore from SovereignFS
-
 
 - [ ] Fault classifier training data collection

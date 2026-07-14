@@ -14,77 +14,53 @@
 
 - [ ] kernel/core (scheduler, MM, syscalls, IRQ, boot)
 
-
 - [ ] kernel/fs (VFS, tmpfs, sigmafs, ext4)
-
 
 - [ ] kernel/net (TCP, UDP, sockets, Wi-Fi, DHCP, DNS)
 
-
 - [ ] kernel/security (pledge, unveil, seccomp, PQC, audit)
-
 
 - [ ] drivers (NVMe, USB, GPU, Wi-Fi, audio, input, storage)
 
-
 - [ ] arch (x86_64, ARM64, RISC-V)
-
 
 - [ ] sigma-sh (shell REPL)
 
-
 - [ ] sigma-pkg (package manager, registry)
-
 
 - [ ] zenith_desktop (compositor, WM, GUI)
 
-
 - [ ] userland/ai (sigma-ai, GGUF, NL-CLI)
-
 
 - [ ] sdk (driver DDK, app SDK)
 
-
 - [ ] ci / build system
-
 
 - [ ] docs / wiki
 
-
 - [ ] other: ___
-
 
 ## Type of change
 
 - [ ] `feat` \x97 new feature
 
-
 - [ ] `fix` \x97 bug fix
-
 
 - [ ] `impl` \x97 implements a roadmap item
 
-
 - [ ] `perf` \x97 performance improvement
-
 
 - [ ] `security` \x97 security fix/hardening
 
-
 - [ ] `refactor` \x97 code refactoring (no behaviour change)
-
 
 - [ ] `driver` \x97 new or updated hardware driver
 
-
 - [ ] `docs` \x97 documentation only
-
 
 - [ ] `ci` \x97 CI/workflow changes
 
-
 - [ ] `test` \x97 tests only
-
 
 ## Roadmap item (if applicable)
 
@@ -100,32 +76,23 @@ Item: ___
 
 - [ ] x86_64-unknown-none (kernel no_std)
 
-
 - [ ] aarch64-unknown-none
-
 
 - [ ] riscv64gc-unknown-none-elf
 
-
 - [ ] x86_64-unknown-linux-gnu (host tools / sigma-sh)
-
 
 ### Tests run:
 
 - [ ] `cargo test` passes
 
-
 - [ ] `cargo clippy -- -D warnings` clean
-
 
 - [ ] `cargo fmt --check` clean
 
-
 - [ ] QEMU boot smoke test (`make qemu` or `./qemu-boot.sh smoke`)
 
-
 - [ ] Manual testing: describe below
-
 
 ```text
 
@@ -139,9 +106,7 @@ $ sigma-pkg install ...
 
 - [ ] QEMU virtio
 
-
 - [ ] Physical hardware: ___
-
 
 ## Safety / Security considerations
 
@@ -149,24 +114,17 @@ $ sigma-pkg install ...
 
 - [ ] All `unsafe` blocks have `// SAFETY:` explanation comments
 
-
 - [ ] No new `unsafe` blocks without justification
-
 
 - [ ] `sigma_pledge` / `sigma_unveil` calls are correct for new syscalls
 
-
 - [ ] New syscalls added to syscall dispatcher and pledge mapping
-
 
 - [ ] PQC signatures verified on any new binary artifacts
 
-
 - [ ] No secret material (keys, tokens) in the diff
 
-
 - [ ] Security review completed for security-critical changes
-
 
 ## ABI / compatibility impact
 
@@ -174,12 +132,9 @@ $ sigma-pkg install ...
 
 - [ ] No ABI change
 
-
 - [ ] ABI-compatible extension (new fields at end of struct)
 
-
 - [ ] ABI break \x97 requires kabi version bump and MAINTAINERS notification
-
 
 ## Commit Message Format
 
@@ -187,41 +142,29 @@ $ sigma-pkg install ...
 
 - [ ] Title follows format: `subsystem: short description (=50 chars)`
 
-
 - [ ] Commits include detailed explanation (motivation, technical details, testing)
-
 
 - [ ] Commits include `Signed-off-by: Name <email>` (DCO requirement)
 
-
 - [ ] References included (Issue #123, PR #456)
-
 
 ## Checklist
 
 - [ ] Title follows Conventional Commits: `type(scope): description`
 
-
 - [ ] Commits touching `kernel/` or `drivers/` have `Signed-off-by: Name <email>`
-
 
 - [ ] SPDX-License-Identifier on all new source files
 
-
 - [ ] MAINTAINERS updated if adding a new subsystem or driver
-
 
 - [ ] Wiki / docs updated if behaviour changes are user-visible
 
-
 - [ ] CODEOWNERS updated if adding new directories
-
 
 - [ ] Tests added for new functionality
 
-
 - [ ] No external dependencies added without review
-
 
 ## Linked issues
 

@@ -4,7 +4,7 @@ SigmaOS features a hardened, defense-in-depth kernel architecture tailored for s
 
 ## Mandatory Access Control (MAC)
 
-Implemented in `sigma_mac.rs`. 
+Implemented in `sigma_mac.rs`.
 Similar to SELinux, it relies on static subject/object contexts and permission bitmasks (`READ`, `WRITE`, `EXEC`, `TRANS`). If a policy rule doesn't explicitly allow an action, it defaults to deny.
 
 ## Seccomp-BPF Syscall Filter

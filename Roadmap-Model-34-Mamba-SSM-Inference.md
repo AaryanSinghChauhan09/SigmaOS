@@ -6,7 +6,6 @@ Interface Mamba SSM models directly with SIMD vector instructions on CPU/GPU.
 - Leverage hardware-level parallelism for selective scan operations.
 - Under 1ms latency for processing log window buffers.
 
-
 ## Key Milestones
 
 - [ ] AVX2/NEON intrinsics selective scan

@@ -10,15 +10,11 @@ The Marketing Professional Profile is designed for marketing excellence, campaig
 
 - **SigmaCampaign**: Campaign management with multi-channel coordination.
 
-
 - **SigmaAnalytics**: Marketing analytics and ROI tracking.
-
 
 - **SigmaContent**: Content creation and social media management.
 
-
 - **SigmaCRM**: Customer relationship management and lead tracking.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Marketing Professional Profile is designed for marketing excellence, campaig
 
 - **Theme**: Brand Purple (Marketing Standard)
 
-
 - **Layout**: Marketing Dashboard (Campaigns, Analytics, Content)
 
-
 - **Personalization**: Custom campaign templates and automation rules.
-
 
 ---
 

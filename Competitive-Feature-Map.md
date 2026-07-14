@@ -119,33 +119,23 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 
 1. **Security**: Post-quantum cryptography, capability-based security, zero-trust architecture
 
-
 2. **Performance**: Sub-2s boot, <150MB idle memory, <500ns context switch
-
 
 3. **Supply Chain**: Mandatory reproducible builds, signed artifacts, build provenance
 
-
 4. **App Ecosystem**: WASM-first, signed packages, curated app store
-
 
 5. **Developer Experience**: Reproducible SDK, one-command cross-compile, integrated debugging
 
-
 6. **Enterprise**: Atomic updates, rollback, native fleet orchestration
-
 
 7. **Cloud-Native**: Built-in service mesh, serverless, container runtime
 
-
 8. **Edge Computing**: Lightweight runtime, offline-first, edge AI/ML
-
 
 9. **Quantum Ready**: Post-quantum crypto, quantum simulation, hybrid computing
 
-
 10. **AI Integration**: Local LLM, predictive optimization, anomaly detection
-
 
 ---
 

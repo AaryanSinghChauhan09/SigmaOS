@@ -6,7 +6,6 @@ Complete IPv6 support alongside IPv4 in the sigma_tcp.rs stack.
 - Dual-stack socket API
 - NDP (Neighbour Discovery Protocol)
 
-
 ## Key Milestones
 
 - [ ] IPv6 header parser

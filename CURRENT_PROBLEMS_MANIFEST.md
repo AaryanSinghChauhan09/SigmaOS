@@ -75,11 +75,11 @@ Open an issue at: `https://github.com/sigmaos/kernel/issues`
 Use the template:
 
 ```text
-**Component**: 
+**Component**:
 **Severity**: P0 / P1 / P2 / P3
-**Description**: 
-**Reproduction Steps**: 
-**Expected Behavior**: 
-**Actual Behavior**: 
+**Description**:
+**Reproduction Steps**:
+**Expected Behavior**:
+**Actual Behavior**:
 **Logs**: (attach sigma-journal output)
 ```

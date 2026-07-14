@@ -69,13 +69,11 @@ void init_storage(void);
 - Old data preserved until explicitly pruned
 - Enables instant snapshots without data duplication
 
-
 ### Journaling
 
 - Write-ahead logging for crash consistency
 - Atomic operations for metadata updates
 - Fast recovery after power failure
-
 
 ### Block Integrity
 
@@ -83,14 +81,12 @@ void init_storage(void);
 - Kernel rejects tampered blocks at read time
 - Detects silent data corruption
 
-
 ### Snapshots
 
 - Instant point-in-time filesystem state
 - Minimal space overhead (CoW)
 - Tag-based snapshot management
 - Automatic snapshot retention policy
-
 
 ## Block Device Drivers
 
@@ -102,7 +98,6 @@ void init_storage(void);
 - Namespace management
 - Power management and thermal throttling
 
-
 ### AHCI SATA Driver
 
 - SATA 3.0 (6 Gbps) support
@@ -110,14 +105,12 @@ void init_storage(void);
 - SMART monitoring
 - Hot-plug support
 
-
 ### USB Storage Driver
 
 - USB Mass Storage Class (MSC) support
 - Bulk-only transport (BOT)
 - UASP (USB Attached SCSI Protocol)
 - Automatic device detection
-
 
 ## Performance Characteristics
 
@@ -137,7 +130,6 @@ void init_storage(void);
 - **Secure erase**: Cryptographically secure data deletion
 - **Audit logging**: All storage operations logged to audit chain
 
-
 ## Roadmap
 
 - [x] SovereignFS basic implementation
@@ -153,7 +145,6 @@ void init_storage(void);
 - [ ] Storage tiering (SSD cache + HDD archive)
 - [ ] Compression (zstd, lz4)
 - [ ] Deduplication
-
 
 ## Related Modules
 

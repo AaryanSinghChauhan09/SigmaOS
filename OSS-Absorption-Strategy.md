@@ -19,15 +19,11 @@
 
 - Linux: `Documentation/ABI/` for stable ABI patterns; `drivers/` for SDF driver model
 
-
 - Redox: `kernel/src/` for memory-safe system calls; `drivers/` for Rust driver traits
-
 
 - Serenity: `Userland/` for GUI app patterns; `Kernel/` for clean kernel architecture
 
-
 - QubesOS: `qubes/` for domain isolation; `core-admin/` for policy enforcement
-
 
 ### 2. AI & CLI Integration
 
@@ -44,15 +40,11 @@
 
 - llama.cpp: `src/llama.cpp` for GGUF parsing; `examples/server/` for HTTP inference API
 
-
 - ai-shell: `src/commands/` for NL→command translation pipeline
-
 
 - Aider: `aider/coders/` for diff-based code editing; `aider/history.py` for session memory
 
-
 - Claude Code: `src/tools/` for tool schema design; system prompt patterns
-
 
 ### 3. Automation & Orchestration
 
@@ -66,12 +58,9 @@
 
 - n8n: `packages/nodes-base/nodes/` for trigger/action node design
 
-
 - azure-cli: `azure-cli/src/azure-cli/azure/cli/command_modules/` for namespace pattern
 
-
 - copilot-cli: `src/commands/` for context-aware suggestion UX
-
 
 ### 4. Security & Sovereignty
 
@@ -85,9 +74,7 @@
 
 - OpenBSD: `sys/kern/kern_pledge.c` for pledge() implementation
 
-
 - QubesOS: `dom0/` for policy engine design
-
 
 ### 5. Package Ecosystem
 
@@ -101,9 +88,7 @@
 
 - nixpkgs: `pkgs/` for derivation patterns; `lib/` for version resolution
 
-
 - flatpak: `common/flatpak-oci-utils.c` for OCI bundle packaging
-
 
 ---
 
@@ -132,21 +117,15 @@
 
 1. Pick a project from the list above
 
-
 2. Study it cleanroom (read the code, don't copy)
-
 
 3. Build a SigmaOS-sovereign equivalent
 
-
 4. Add training samples to `sigma_agent_seed_v2.jsonl`
-
 
 5. Add to OSS Reference Map (`docs/OSS_Reference_Map.md`)
 
-
 6. Submit a PR
-
 
 **Important:** All absorbed ideas must be implemented from scratch in SigmaOS's languages (Rust/Nim/Zig/Ada). We never copy GPL code. We study patterns and build sovereign replacements.
 

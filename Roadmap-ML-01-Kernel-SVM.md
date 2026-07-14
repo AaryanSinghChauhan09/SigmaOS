@@ -6,7 +6,6 @@ Implement a Support Vector Machine classifier natively in sigma_data.rs.
 - SMO (Sequential Minimal Optimisation) solver in zero-alloc Rust
 - RBF and polynomial kernel support
 
-
 ## Key Milestones
 
 - [ ] SMO solver implementation

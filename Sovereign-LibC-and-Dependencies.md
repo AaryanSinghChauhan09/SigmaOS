@@ -19,15 +19,11 @@ One of SigmaOS's core sovereignty principles is **eliminating hidden dependencie
 
 - **musl libc** (Alpine Linux): Lean, spec-compliant, no hidden surprises.
 
-
 - **diet libc**: Radically minimal for embedded targets.
-
 
 - **Linux kernel `lib/`**: In-tree string helpers used where libc is unavailable.
 
-
 - **BusyBox**: Replacing heavy glibc calls with inline helpers throughout.
-
 
 ---
 
@@ -101,15 +97,11 @@ The following rules are enforced across the entire SigmaOS codebase:
 
 - **No hidden glibc allocator state**: No `ptmalloc` bins that can be heap-groomed.
 
-
 - **Audit trail**: Every byte of `sigma_malloc`/`sigma_free` is traceable.
-
 
 - **No format string exploits**: `sys_print` handles only known format specifiers — unknown `%` tokens emit `?`.
 
-
 - **Heap corruption detection**: Each block carries a `0xSIGMA5A5` magic cookie; `sigma_free` validates it before marking the block free.
-
 
 ---
 

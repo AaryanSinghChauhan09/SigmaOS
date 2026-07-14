@@ -6,7 +6,6 @@ Support FIDO2/WebAuthn and OpenPGP smart cards for authentication.
 - USB HID FIDO2 authenticator driver
 - PKCS#11 interface for smart cards
 
-
 ## Key Milestones
 
 - [ ] USB HID driver extension in HAL

@@ -44,7 +44,6 @@ graph TD
 - Hardware capability detection and reporting
 - Low-level interrupt routing and management
 
-
 ### Layer 2: Genesis Kernel & Scheduling
 
 - IRQ/IDT handling and interrupt dispatch
@@ -52,7 +51,6 @@ graph TD
 - SHS (Sovereign Hybrid Scheduler) implementation
 - Process lifecycle management
 - System call interface
-
 
 ### Layer 3: Sovereign Virtual Filesystem
 
@@ -62,7 +60,6 @@ graph TD
 - Path resolution and namespace management
 - File locking and synchronization
 
-
 ### Layer 4: Capability-Gated Security
 
 - PQC (Kyber/Dilithium) cryptographic operations
@@ -70,7 +67,6 @@ graph TD
 - Capability-based access control (sigma_pledge)
 - Mandatory Access Control (MAC) enforcement
 - Secure boot chain verification
-
 
 ### Layer 5: Sovereign Package Ecosystem
 
@@ -80,7 +76,6 @@ graph TD
 - Package repository management
 - Delta update support
 
-
 ### Layer 6: Zenith UI & Morphic Shell
 
 - Wayland-native compositor
@@ -88,7 +83,6 @@ graph TD
 - Input device handling
 - Window management and composition
 - Display server integration
-
 
 ### Layer 7: Sovereign AI & Orchestration
 
@@ -98,7 +92,6 @@ graph TD
 - Workload classification and analysis
 - AI-assisted decision making
 
-
 ### Layer 8: Sovereign Claw AI Automation
 
 - Autonomous AI agent gateway
@@ -106,7 +99,6 @@ graph TD
 - Intent decomposition and planning
 - Capability validation and sandboxing
 - Live canvas conversational interface
-
 
 ### Layer 9: Ecosystem Abstraction (S99)
 
@@ -116,7 +108,6 @@ graph TD
 - Library compatibility shims
 - Legacy application support
 
-
 ### Layer 10: Sovereign Nexus - Enterprise Suite
 
 - Integrated Enterprise (ERP/CRM) suite
@@ -124,7 +115,6 @@ graph TD
 - Professional tool integration
 - Business process automation
 - Enterprise data management
-
 
 ---
 
@@ -139,7 +129,6 @@ Merges the stability of Fedora's CFS with the priority-based preemptive scheduli
 - AI-enhanced workload prediction
 - Adaptive quantum management
 
-
 ### Snapshot & Restore
 
 Combines openSUSE Snapper-style CoW snapshots with Windows-style System Restore checkpoints:
@@ -148,7 +137,6 @@ Combines openSUSE Snapper-style CoW snapshots with Windows-style System Restore 
 - Instant rollback capability
 - Space-efficient storage via copy-on-write
 - Boot-time snapshot verification
-
 
 ### Zero-Trust Inter-Shard Communication
 
@@ -159,7 +147,6 @@ All inter-shard communication in v15.0 is Zero-Trust:
 - Origin authentication required
 - Audit logging for all communications
 
-
 ### Fast Startup Mechanism
 
 SigmaOS implements a Fast Startup mechanism inspired by Windows:
@@ -168,7 +155,6 @@ SigmaOS implements a Fast Startup mechanism inspired by Windows:
 - Critical driver shards preserved
 - Bypasses traditional hardware re-init during boot
 - System restores in under 0.8s
-
 
 ### Neural Memory Management
 
@@ -179,7 +165,6 @@ The memory manager uses a Neural Network (S09) to predict shard access:
 - Reduces effective latency to near-zero
 - Adapts to usage patterns over time
 
-
 ### GPU-Accelerated UI
 
 The Zenith compositor utilizes EGL/Vulkan integration:
@@ -188,7 +173,6 @@ The Zenith compositor utilizes EGL/Vulkan integration:
 - Ensures fluid 120Hz interface under heavy load
 - Hardware-accelerated shader effects
 - Efficient memory bandwidth utilization
-
 
 ---
 
@@ -199,7 +183,6 @@ The Zenith compositor utilizes EGL/Vulkan integration:
 3. **Selection**: SHS selects next task based on virtual runtime and AI priority
 4. **Quantum Enforcement**: Budget enforcement via RDTSC
 5. **Context Restore**: Resumes execution of selected process
-
 
 ---
 
@@ -212,7 +195,6 @@ SigmaOS integrates reinforcement learning models directly into kernel subsystems
 - **Memory Predictor**: Forecasts memory access patterns for pre-fetching
 - **Anomaly Detection**: Identifies and mitigates unusual system behavior
 
-
 ---
 
 ## Logging & Telemetry
@@ -224,7 +206,6 @@ All sovereign events are logged in structured JSON/CSV formats:
 - **Structured Logging**: Machine-readable event streams
 - **Performance Metrics**: Real-time system health monitoring
 
-
 ---
 
 ## Hardware Abstraction Layer
@@ -235,7 +216,6 @@ The HAL (S04) implements plug-and-play detection:
 - Fallback drivers ensure basic I/O availability
 - Capability-based device access
 - Hot-plug device support
-
 
 ---
 
@@ -249,7 +229,6 @@ Inspired by Windows Registry but reimagined for sovereignty:
 - Version-controlled configuration history
 - PQC-encrypted sensitive configuration data
 
-
 ---
 
 ## Design Principles
@@ -258,7 +237,6 @@ Inspired by Windows Registry but reimagined for sovereignty:
 2. **Security Next**: TPM Attestation + PQC Encryption for cryptographic resilience
 3. **Resilience**: Self-Healing Snapshots + AI Watchdog for system stability
 4. **Differentiation**: Adaptive UI + Sovereign AI Assistant for unique capabilities
-
 
 ---
 

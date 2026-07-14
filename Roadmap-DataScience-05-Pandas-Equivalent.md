@@ -6,7 +6,6 @@ A zero-allocation columnar data store for data science workloads.
 - Column-oriented storage with type inference
 - GroupBy, Merge, Pivot operations
 
-
 ## Key Milestones
 
 - [ ] Column descriptor struct (type + length)

@@ -31,20 +31,17 @@ Application Layer
 - Post-quantum resistant tunnel establishment
 - Fallback to classical crypto if PQC unavailable
 
-
 ### Shard Identity Tokens
 
 - Dilithium3 signatures for shard authentication
 - Immutable identity verification
 - Revocation via CRL (Certificate Revocation List)
 
-
 ### Shard Manifest Signatures
 
 - SPM (Sigma Package Manager) uses Dilithium for package signing
 - BLAKE3 for package integrity verification
 - Trust root anchored in Secure Boot
-
 
 ## API Interface
 
@@ -82,7 +79,6 @@ void init_security_pqc(void);
 - **Constant-time**: All operations are constant-time to prevent timing attacks
 - **Side-channel resistant**: Implements blinding and masking techniques
 
-
 ## Roadmap
 
 - [x] BLAKE3 hashing implementation
@@ -93,7 +89,6 @@ void init_security_pqc(void);
 - [ ] PQC algorithm agility (support for multiple KEM/DSA algorithms)
 - [ ] Formal verification of PQC implementations
 - [ ] NIST PQC standard updates tracking
-
 
 ## Related Modules
 

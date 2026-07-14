@@ -6,7 +6,6 @@ Analyse kernel IPC messages using autoencoders to identify architectural bottlen
 - Train autoencoders on normal IPC message payload sizes and destinations.
 - Tag messages with anomalous delays or structural properties.
 
-
 ## Key Milestones
 
 - [ ] IPC message trace capture module

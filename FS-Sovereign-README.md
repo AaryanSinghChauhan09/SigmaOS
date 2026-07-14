@@ -27,11 +27,8 @@ write latency, cryptographic block integrity, and native rollback support.
 
 - [ ] Superblock & journal format specification
 
-
 - [ ] `sfs_mkfs` tool
 
-
 - [ ] Kernel VFS integration
-
 
 - [ ] Snapshot/rollback API

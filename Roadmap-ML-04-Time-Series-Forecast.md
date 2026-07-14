@@ -6,7 +6,6 @@ Forecast CPU, memory, and IO load trends using embedded ARIMA and LSTM.
 - ARIMA model fitting on rolling telemetry windows
 - LSTM 8-step lookahead for scheduler hints
 
-
 ## Key Milestones
 
 - [ ] Rolling window ring buffer

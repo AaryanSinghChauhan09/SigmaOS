@@ -14,15 +14,11 @@ SigmaOS boots through five distinct stages, from UEFI firmware to the `sigma-sh`
 
 1. UEFI POST: memory init, PCI enumeration, ACPI table construction
 
-
 2. UEFI Boot Manager loads `\EFI\SIGMA\sigma-boot.efi` from the ESP
-
 
 3. Secure Boot validates `sigma-boot.efi` against the SigmaOS UEFI certificate
 
-
 4. TPM2 PCR 4 is extended with the hash of `sigma-boot.efi`
-
 
 **File**: `arch/boot/sigma-boot.efi` (PE32+ EFI application, built from `arch/boot/sovereign_boot.asm` + EFI stub)
 
@@ -30,9 +26,7 @@ SigmaOS boots through five distinct stages, from UEFI firmware to the `sigma-sh`
 
 - [ ] Implement UEFI shim for third-party Secure Boot keys
 
-
 - [ ] Add UEFI capsule update support for ESP firmware updates
-
 
 ---
 
@@ -44,27 +38,19 @@ SigmaOS boots through five distinct stages, from UEFI firmware to the `sigma-sh`
 
 1. Call `GetMemoryMap()` — retrieve UEFI memory map
 
-
 2. Locate `sigma-kernel.elf` on ESP (`\EFI\SIGMA\sigma-kernel.elf`)
-
 
 3. Parse ELF PT_LOAD headers, allocate memory via `AllocatePages(EfiLoaderData)`
 
-
 4. Load kernel ELF segments into allocated physical pages
-
 
 5. Build `SigmaBootInfo` struct: memory map, ACPI RSDP pointer, framebuffer info
 
-
 6. TPM2: extend PCR 8 with SHA-256 of `sigma-kernel.elf`
-
 
 7. Call `ExitBootServices()` — UEFI releases control
 
-
 8. Jump to kernel entry point (ELF `e_entry`)
-
 
 **File**: `arch/boot/sigma-boot.efi`
 
@@ -72,9 +58,7 @@ SigmaOS boots through five distinct stages, from UEFI firmware to the `sigma-sh`
 
 - [ ] Implement kernel ASLR relocation before `ExitBootServices`
 
-
 - [ ] Add measured boot for initramfs (PCR 9)
-
 
 ---
 
@@ -115,9 +99,7 @@ kernel_main(boot_info)
 
 - [ ] SMP: wake secondary CPUs via INIT-SIPI-SIPI, clone GDT/IDT per CPU
 
-
 - [ ] NUMA: query ACPI SRAT table, set up per-node buddy allocators
-
 
 ---
 
@@ -129,40 +111,29 @@ kernel_main(boot_info)
 
 1. Mount SigmaFS root from `sigma-rootfs.img` (virtio-blk or embedded initramfs)
 
-
 2. Mount `tmpfs` at `/tmp` and `/run`
-
 
 3. Mount `devfs` at `/dev`
 
-
 4. Extract initramfs overlay (gzip/zstd CPIO) to `/`
-
 
 5. Verify initramfs SHA-256 against boot manifest (TPM2 PCR 9 check)
 
-
 6. `execve("/sbin/sigma-init", ["sigma-init"], envp)` — PID 1
-
 
 **Files**:
 
 - `kernel/src/fs/vfs.rs` — VFS mount table
 
-
 - `kernel/src/fs/sigma_fs.rs` — SigmaFS kernel driver
 
-
 - `userland/sigma_init/src/main.rs` — PID 1 init
-
 
 **TODO**:
 
 - [ ] dm-verity: verify root filesystem hash tree at mount time
 
-
 - [ ] initramfs encryption: decrypt with TPM2-unsealed key before extract
-
 
 ---
 
@@ -174,22 +145,17 @@ kernel_main(boot_info)
 
 1. Read `/etc/sigma/init.toml` — shard dependency graph
 
-
 2. Start system shards in dependency order:
    - `sigma-logger` (audit log)
    - `sigma-net` (networking, DHCP)
    - `sigma-audiod` (on desktop profile)
    - `sigma-otel-collector` (observability)
 
-
 3. Check TPM2 boot health counter (rollback if >= 3 failures)
-
 
 4. Spawn `sigma-sh` on the primary TTY
 
-
 5. Print boot banner + `sigma-sh` prompt
-
 
 **File**: `userland/sigma_init/src/main.rs`
 
@@ -197,9 +163,7 @@ kernel_main(boot_info)
 
 - [ ] Parallel shard startup (topological sort + async spawn)
 
-
 - [ ] sigma-init crash recovery: restart any shard that exits non-zero
-
 
 ---
 

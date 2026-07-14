@@ -46,7 +46,6 @@ SigmaOS utilizes ARM64 security exception levels as follows:
 - **EL1**: Sovereign Kernel (Scheduler, Memory management, VFS)
 - **EL0**: Userland / Applications (`sigpkg`, `sigma-shell`, `zenith-desktop`)
 
-
 ---
 
 ## 🛠️ Peripheral Interconnection Core
@@ -67,7 +66,7 @@ impl Pl011Uart {
     pub unsafe fn write_char(&self, c: char) {
         let dr = self.base_address as *mut u32;
         let fr = (self.base_address + 0x18) as *const u32;
-        
+
         // Wait until transmit FIFO is not full
         while (*fr & (1 << 5)) != 0 {}
         *dr = c as u32;

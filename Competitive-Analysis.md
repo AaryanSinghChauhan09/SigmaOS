@@ -24,21 +24,15 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 - **Sovereign Shard Lattice**: Asynchronous Shard Ignition (ASI), hot-swappable modules.
 
-
 - **Post-Quantum Security**: Dilithium-5 and Kyber-1024 at shard boundaries.
-
 
 - **Modular Networking (`S-NET`)**: Zero-trust TCP/IP with PQC-encrypted sockets.
 
-
 - **Storage (`S-STOR`)**: Lattice File System with atomic commits and VFS abstraction.
-
 
 - **Real-Time Scheduler (`S-SCHED`)**: Deterministic CFS-style scheduling with EDF support.
 
-
 - **AI Telemetry (`S-AI-TEL`)**: Predictive failure analysis and anomaly detection hooks.
-
 
 ***Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery, verification, and**incremental delta updates**.
 
@@ -64,15 +58,11 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 - **Immediate**: Networking + storage shards, driver expansion, package manager.
 
-
 - **Medium Term**: CI/CD with cross-arch boot tests, stress/security regressions.
-
 
 - **Long Term**: AI telemetry for predictive monitoring and adaptive scheduling.
 
-
 - **Community**: Expand Wiki into a contributor hub with tutorials, diagrams, and roadmap transparency.
-
 
 ## 🛡 The "Sovereignty" Difference
 

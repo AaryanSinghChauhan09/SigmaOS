@@ -6,7 +6,6 @@ Pre-launch apps the user is likely to open next based on time and context.
 - Markov chain of app-launch sequences
 - Pre-spawn process in background capability shard
 
-
 ## Key Milestones
 
 - [ ] App launch sequence log

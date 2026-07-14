@@ -22,12 +22,9 @@ SigmaOS approach:
 
 - Scheduler uses AI to predict which process needs CPU next (ML-based MLFQ boost)
 
-
 - sigma-ids runs inference in interrupt context to catch anomalies at nanosecond latency
 
-
 - sigma-heal diagnoses kernel panics during recovery kernel boot before userspace loads
-
 
 **Why no Linux distro has this:** Linux's kernel/userspace boundary is sacred. Adding an inference engine to the kernel is architecturally controversial. SigmaOS's microkernel-inspired design makes it natural.
 
@@ -125,15 +122,11 @@ sigma-query "all GST invoices over ₹1 lakh this quarter"
 
 - SemanticFS xattrs store `SIGMA:CLASS`, `SIGMA:TOPIC`, `SIGMA:DATE`, `SIGMA:PERSON`
 
-
 - sigma-ai assigns these xattrs on file create/modify (local inference, no cloud)
-
 
 - sigmad/indexd maintains O(log n) query index
 
-
 - Every sigma-* app writes structured metadata when creating files
-
 
 **Why no Linux distro has this:** ext4/btrfs/ZFS are path-based by design. Adding semantic indexing at filesystem level requires either a new filesystem (SemanticFS) or a mandatory xattr indexing daemon (sigmad/indexd). Linux has no equivalent — GNOME Tracker/Baloo are userspace hacks that break constantly.
 

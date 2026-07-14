@@ -123,9 +123,7 @@ Optional object for additional system-level permissions:
 
 - **`notifications`**: Allow the app to show notifications via the Notification Center.
 
-
 - **`autostart`**: Start the app automatically when the user logs in.
-
 
 ---
 
@@ -200,12 +198,9 @@ At runtime, the SigmaOS extension checks every `navigator.sigmaos.*` call agains
 
 1. Is this origin an installed SigmaOS app? (verified against the app registry)
 
-
 2. Does the app's manifest include the capability required for this API call?
 
-
 3. Was the capability granted by the user at install time?
-
 
 If any check fails, the call rejects with `PermissionDeniedError` before reaching any daemon.
 

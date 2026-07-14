@@ -85,14 +85,10 @@ To achieve industrial supremacy, SigmaOS follows a distinct strategic sequence:
 
 1. **Usability First**: Deliver the **Zenith Compositor**and**`sigma-pkg`** to ensure immediate developer utility.
 
-
 2. **Security Next**: Hardened **TPM Attestation**and**PQC Encryption** to lock down the lattice.
-
 
 3. **Resilience**: Deploy the **AI Watchdog**and**Self-Healing Snapshots** to neutralize system failure.
 
-
 4. **Differentiation**: Scale toward **Sovereign Autonomy** with the Intent Shell and Adaptive UI.
-
 
 > "SigmaOS doesn't just compete with Linux; it transcends the monolithic era by offering sovereignty as a service."

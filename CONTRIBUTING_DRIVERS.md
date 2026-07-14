@@ -8,15 +8,11 @@ Step-by-step guide to contributing a hardware driver to SigmaOS.
 
 1. Check if the driver already exists: `sigma-ddk-vendors list`
 
-
 2. Check hardware status: [Linux-Parity-Roadmap](../wiki_repo/Linux-Parity-Roadmap.md)
-
 
 3. Find the Linux upstream driver for reference (GPL source, cleanroom study only — don't copy code)
 
-
 4. Get the vendor datasheet if available (preferred for register definitions)
-
 
 ---
 
@@ -163,27 +159,19 @@ Before submitting a PR:
 
 - [ ] sigma_pledge() called at start of init()
 
-
 - [ ] IRQ handler returns correct bool (true = handled)
-
 
 - [ ] shutdown() quiesces hardware (no DMA after shutdown)
 
-
 - [ ] No unsafe code without `// SAFETY:` comment
-
 
 - [ ] No predefined stdlib functions (kernel drivers: `#![no_std]`)
 
-
 - [ ] `sigma-ddk validate` passes
-
 
 - [ ] QEMU smoke test passes
 
-
 - [ ] Hardware register definitions from datasheet (not copied from Linux)
-
 
 ---
 
@@ -203,15 +191,11 @@ PR description must include:
 
 - Hardware name and PCI IDs
 
-
 - Test results (QEMU output)
-
 
 - `sigma-ddk validate` output
 
-
 - Link to datasheet or reference
-
 
 ---
 

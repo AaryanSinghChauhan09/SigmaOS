@@ -24,8 +24,6 @@ Functions: `SovereignPkg_Register`, `SovereignPkg_Audit`, `SovereignPkg_Rollback
 
 1. Add recipe under `recipes/`.
 
-
 2. Open PR; CI runs `ci_branch_check.sh`.
-
 
 3. Wiki documents package via `sigma_automation.sh wiki-sync`.

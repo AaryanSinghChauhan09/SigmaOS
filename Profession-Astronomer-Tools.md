@@ -10,15 +10,11 @@ The Astronomer Profile is designed for astronomical excellence, observation mana
 
 - **SigmaObservatory**: Observatory management and scheduling.
 
-
 - **SigmaData**: Astronomical data collection and analysis.
-
 
 - **SigmaImaging**: Telescope imaging and processing.
 
-
 - **SigmaResearch**: Research collaboration and publication.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Astronomer Profile is designed for astronomical excellence, observation mana
 
 - **Theme**: Space Dark (Astronomy Standard)
 
-
 - **Layout**: Observatory Dashboard (Observation, Data, Imaging)
 
-
 - **Personalization**: Custom observation schedules and automated analysis.
-
 
 ---
 

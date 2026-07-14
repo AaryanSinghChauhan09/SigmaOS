@@ -29,24 +29,17 @@ For each app, moving from `.h` to production requires:
 
 1. Core business logic (.cpp body)      ← implement API functions
 
-
 2. CLI entry point (sigma-<app> main)   ← command-line interface
-
 
 3. India Stack API client               ← live government API integration
 
-
 4. Offline data bundle                  ← work without internet
-
 
 5. DID signature integration            ← tamper-proof audit trail
 
-
 6. sigma-bus IPC registration           ← OS-level integration
 
-
 7. sigma-pkg recipe                     ← installable as .spkg
-
 
 8. Tests + CI                           ← regression prevention
 
@@ -843,21 +836,15 @@ sigma-site build --include profession-gallery
 
 1. Core business logic `.cpp` body complete
 
-
 2. India Stack API integrated (sandbox, then production)
-
 
 3. Offline fallback for no-internet use
 
-
 4. DID signature on all outputs
-
 
 5. Man page written
 
-
 6. sigma-pkg recipe signed + tested
-
 
 ---
 

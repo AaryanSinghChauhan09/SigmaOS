@@ -110,7 +110,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-
       - name: Install cosign
 
         uses: sigstore/cosign-installer@v3
@@ -177,8 +176,6 @@ pub fn verify_package(pkg_path: &str) -> Result<(), VerifyError> {
 
 - Every CI artifact in `dist/` has a corresponding `.sig` and `provenance.json`.
 
-
 - `sigma-pkg verify sigma-edit` exits 0 and prints `Signature verified`.
-
 
 - Rekor log entry for each artifact is queryable via `rekor-cli get --log-index <n>`.

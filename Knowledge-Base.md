@@ -13,7 +13,6 @@
 - [First Configuration](#first-configuration)
 - [System Update](#system-update)
 
-
 ### Kernel & Core
 
 - [Kernel Architecture](#kernel-architecture)
@@ -21,14 +20,12 @@
 - [Memory Management](#memory-management)
 - [IPC System](#ipc-system)
 
-
 ### Hardware
 
 - [Driver Framework](#driver-framework)
 - [GPU Drivers](#gpu-drivers)
 - [Networking Hardware](#networking-hardware)
 - [Thermal & Power Management](#thermal--power-management)
-
 
 ### Security
 
@@ -38,13 +35,11 @@
 - [sigma-shield Firewall](#sigma-shield-firewall)
 - [Post-Quantum Cryptography](#post-quantum-cryptography)
 
-
 ### Package Management
 
 - [sigpkg Overview](#sigpkg-overview)
 - [Creating Packages](#creating-packages)
 - [Package Signing](#package-signing)
-
 
 ### Development
 
@@ -52,7 +47,6 @@
 - [Writing Drivers](#writing-drivers)
 - [Kernel Hacking Guide](#kernel-hacking-guide)
 - [SDK Reference](#sdk-reference)
-
 
 ---
 
@@ -146,7 +140,6 @@ SigmaOS uses a **hybrid microkernel** architecture:
 - **Ring 1**: Trusted drivers (GPU, NVMe, network — elevated but isolated)
 - **Ring 3**: Userland (applications, untrusted drivers, POSIX compat layer)
 
-
 ```text
 ┌─────────────────────────────────────────────────────┐
 │                    Applications                      │  Ring 3
@@ -181,7 +174,6 @@ SigmaOS uses the **EEVDF (Earliest Eligible Virtual Deadline First)** scheduler,
 - AI-assisted workload prediction (optional)
 - CPU affinity and NUMA-awareness
 
-
 ### Tuning
 
 ```toml
@@ -208,14 +200,12 @@ SigmaOS uses a **buddy allocator** for physical memory management:
 - Huge page (2 MiB, 1 GiB) support
 - Memory hotplug support
 
-
 ### Virtual Memory (VMM)
 
 - 4-level paging (PML4 on x86_64)
 - Copy-on-Write (CoW) for process fork
 - Memory-mapped files with page cache
 - `mmap`, `mprotect`, `mlock` sovereign equivalents
-
 
 ### OOM Handling
 
@@ -224,7 +214,6 @@ When memory pressure is critical, the **Sovereign OOM Daemon** (`sigma-oom`) sel
 1. cgroup memory limits
 2. Process OOM score
 3. Process uptime and priority
-
 
 ---
 
@@ -478,7 +467,6 @@ sigpkg verify --key /etc/sigma/pqc/public.dilithium5 package.spkg
 1. Boot with `sigma.loglevel=7` for verbose output
 2. Check serial console output (COM1 at 115200 baud)
 3. Inspect `/sigma/logs/kernel.log` from recovery shell
-
 
 ### Package Install Fails
 

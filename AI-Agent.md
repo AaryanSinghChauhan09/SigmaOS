@@ -48,7 +48,7 @@ pub fn parse_intent_to_cmd(prompt: &str, runtime: &SigmaAIRuntime) -> Result<Str
     let system_instructions = "Translate the prompt to a safe POSIX command.";
     let formatted_prompt = format!("{} Prompt: {}", system_instructions, prompt);
     let raw_output = runtime.infer(&formatted_prompt)?;
-    
+
     // Validate command safety before returning
     if is_command_malicious(&raw_output) {
         return Err(AgentError::MaliciousCommandBlocked);

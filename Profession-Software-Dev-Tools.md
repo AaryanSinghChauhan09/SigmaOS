@@ -10,15 +10,11 @@ The Developer Profile is engineered for maximum throughput, low-latency executio
 
 - **ShardTracer**: Real-time syscall tracing and performance profiling.
 
-
 - **GitLattice**: High-speed, P2P git synchronization with built-in audit logs.
-
 
 - **PQC-SDK**: Libraries and tools for building quantum-resistant applications.
 
-
 - **Lattice-Containers**: Sub-millisecond startup times for isolated developer environments.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Developer Profile is engineered for maximum throughput, low-latency executio
 
 - **Theme**: Cyber Midnight (High Contrast)
 
-
 - **Layout**: Tri-pane (Terminal, Editor, Shard Monitor)
 
-
 - **Personalization**: Adaptive font scaling and focus-mode triggers.
-
 
 ---
 

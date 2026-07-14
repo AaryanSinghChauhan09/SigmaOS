@@ -13,7 +13,6 @@ PipeWire is the modern Linux audio and video server that unifies PulseAudio (con
 - **Camera/video routing** for screen sharing, video conferencing, and OBS Studio
 - **Per-application volume control, routing, and effects processing**
 
-
 SigmaOS implements `sigma-audio` as a PipeWire-compatible media server with the Sovereign Lattice's capability-based access model for camera/microphone permissions.
 
 ---

@@ -6,7 +6,6 @@ System-wide dark/light mode switching with smooth animated transitions.
 - Time-based automatic mode switching
 - Per-app colour scheme overrides
 
-
 ## Key Milestones
 
 - [ ] Colour palette abstraction in ui_core.rs

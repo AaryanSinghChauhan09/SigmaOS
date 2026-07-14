@@ -42,7 +42,6 @@ Data can only flow **downward** (from less trusted to more trusted contexts):
 - **Standard** → Can share with Standard and Trusted
 - **Trusted** → Can share with Trusted only
 
-
 ## Implementation
 
 - **Source**: `security/sigma_microvm_isolation.rs`
@@ -51,7 +50,6 @@ Data can only flow **downward** (from less trusted to more trusted contexts):
   - `boot_domain_vm(domain)` — launch an isolated MicroVM
   - `is_transfer_allowed(from, to)` — enforce transfer policy
   - `list_active_domains()` — enumerate running domains
-
 
 ## Integration Points
 

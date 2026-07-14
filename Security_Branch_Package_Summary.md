@@ -12,7 +12,7 @@ This document serves as the master tracking page for these efforts.
 
 ## 2. Package Consolidation: `SigmaPkg`
 
-SigmaOS is actively absorbing the behavior of various Linux package managers (`apt`, `pacman`, `dnf`, `nix`) into a single, unified compatibility layer known as **SigmaPkg**. 
+SigmaOS is actively absorbing the behavior of various Linux package managers (`apt`, `pacman`, `dnf`, `nix`) into a single, unified compatibility layer known as **SigmaPkg**.
 
 Instead of duplicating scripts across the main repository for parsing `.deb`, `.rpm`, or `.pkg.tar.zst` files, `SigmaPkg` exposes a unified API.
 
@@ -37,18 +37,16 @@ To maintain a clean Git history, feature branches are actively audited, tested, 
 - `feat/sigma-media-ai` → **Merged** into `main`. Branch deleted.
 - `chore/docs-cleanup` → **Active**. Currently tracking migration of `.md` files to Wiki.
 
-
 *Note: For the definitive list of merged Pull Requests, please see the GitHub repository PR tab. We enforce a linear commit history on `main`.*
 
 ---
 
 ## 4. Security Policy Synchronization
 
-Security documentation is critical and must not diverge. 
+Security documentation is critical and must not diverge.
 
-- The `SECURITY.md` in the main repository is the **Single Source of Truth** for reporting vulnerabilities. 
+- The `SECURITY.md` in the main repository is the **Single Source of Truth** for reporting vulnerabilities.
 - It contains our PGP public keys and security embargo policies.
 - The Wiki only references `SECURITY.md` to prevent duplication.
-
 
 *If you discover a vulnerability, please consult the `SECURITY.md` file in the root of the SigmaOS GitHub repository.*

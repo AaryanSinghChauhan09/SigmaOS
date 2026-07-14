@@ -6,7 +6,6 @@ Detect abnormal process behaviour using unsupervised ML on kernel telemetry.
 - Online Isolation Forest trained on CPU/mem/IPC patterns
 - Alert Security Center Daemon on anomaly score > threshold
 
-
 ## Key Milestones
 
 - [ ] Feature extraction from sigma_monitoring.rs

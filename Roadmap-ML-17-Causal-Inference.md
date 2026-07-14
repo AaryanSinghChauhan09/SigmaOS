@@ -6,7 +6,6 @@ Identify causal relationships between system events and failures.
 - PC algorithm for causal DAG discovery
 - Counterfactual reasoning for root-cause
 
-
 ## Key Milestones
 
 - [ ] Conditional independence test (chi-square)

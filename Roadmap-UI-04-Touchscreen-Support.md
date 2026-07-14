@@ -6,7 +6,6 @@ Support touchscreen devices and drawing tablets natively.
 - libinput-equivalent multi-touch event handling
 - Pressure-sensitive stylus for creative apps
 
-
 ## Key Milestones
 
 - [ ] HID multi-touch report parser

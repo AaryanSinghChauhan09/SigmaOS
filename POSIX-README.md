@@ -31,7 +31,6 @@ The SigmaOS POSIX Compatibility Layer is a selective compatibility layer that pr
 - Signal definitions
 - Socket definitions
 
-
 ### 2. File I/O (`posix_file.rs`)
 
 - `open()` - Open/create files with standard flags
@@ -45,7 +44,6 @@ The SigmaOS POSIX Compatibility Layer is a selective compatibility layer that pr
 - `unlink()` - Remove files
 - `access()` - Check file accessibility
 
-
 ### 3. Process Management (`posix_process.rs`)
 
 - `spawn()` - Modern process spawning (alternative to fork/exec)
@@ -56,7 +54,6 @@ The SigmaOS POSIX Compatibility Layer is a selective compatibility layer that pr
 - `kill()` - Send signals to processes
 - `raise()` - Send signal to current process
 - `abort()` - Abort current process
-
 
 ### 4. Signals & IPC (`posix_signal.rs`)
 
@@ -71,7 +68,6 @@ The SigmaOS POSIX Compatibility Layer is a selective compatibility layer that pr
 - `sigwait()` - Wait for signal synchronously
 - `pipe()` / `pipe2()` - Create pipes
 
-
 ### 5. Sockets (`posix_socket.rs`)
 
 - `socket()` - Create socket
@@ -84,7 +80,6 @@ The SigmaOS POSIX Compatibility Layer is a selective compatibility layer that pr
 - `shutdown()` - Shutdown socket
 - `getsockopt()` / `setsockopt()` - Socket options
 
-
 ### 6. Minimal libc (`sigma_libc.rs`)
 
 - **String functions**: `strlen`, `strcpy`, `strncpy`, `strcmp`, `strncmp`, `strchr`, `strstr`, `strcat`, `strncat`, `strdup`
@@ -93,7 +88,6 @@ The SigmaOS POSIX Compatibility Layer is a selective compatibility layer that pr
 - **Math functions**: `atoi`, `atol`, `strtol`, `strtoul`, `abs`, `labs`, `itoa`
 - **Error handling**: `strerror`, `__errno_location`
 - **Exit functions**: `exit`, `_exit`, `abort`
-
 
 ## Usage
 
@@ -307,7 +301,6 @@ Current test coverage includes:
 - Pipe creation and usage
 - Socket operations (TCP/UDP)
 
-
 ## Performance Considerations
 
 The POSIX compatibility layer adds minimal overhead:
@@ -316,7 +309,6 @@ The POSIX compatibility layer adds minimal overhead:
 - No unnecessary abstraction layers
 - Efficient file descriptor management
 - Optimized memory allocation
-
 
 ## Security
 
@@ -327,7 +319,6 @@ The POSIX compatibility layer maintains SigmaOS's security model:
 - Proper error handling and validation
 - Memory-safe Rust implementation
 
-
 ## Future Extensions
 
 The following may be added based on demand:
@@ -337,7 +328,6 @@ The following may be added based on demand:
 - Extended file operations (mmap, etc.)
 - Additional libc functions
 - POSIX threads subset (if needed)
-
 
 ## Contributing
 
@@ -350,13 +340,11 @@ When contributing to the POSIX compatibility layer:
 5. Test on real hardware when possible
 6. Update this README with new features
 
-
 ## References
 
 - [POSIX_CAPABLE_SPEC.md](POSIX_CAPABLE_SPEC.md) - Detailed specification
 - [SigmaOS Architecture](../Architecture.md) - Overall system architecture
 - [Driver Development Guide](../drivers/DRIVER_DEVELOPMENT_GUIDE.md) - Driver development information
-
 
 ## License
 

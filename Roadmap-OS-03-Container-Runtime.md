@@ -6,7 +6,6 @@ Run OCI-compliant containers natively on SigmaOS without Docker daemon.
 - OCI bundle extraction and namespace setup
 - cgroup v2 resource limits via HAL
 
-
 ## Key Milestones
 
 - [ ] OCI spec JSON parser

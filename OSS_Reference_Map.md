@@ -156,18 +156,13 @@
 
 1. **Never copy GPL code** into SigmaOS source files — SigmaOS is MIT/BSD.
 
-
 2. **Ideas and interfaces are not copyrightable** — studying a GPL project's design is legal.
-
 
 3. **LGPL libraries** (libparted, wlroots, Smithay parts) may be dynamically linked by userland apps with proper attribution — check per-library terms.
 
-
 4. **Cleanroom process**: document what you studied, implement independently, do not reference GPL source during implementation.
 
-
 5. See [CANONICAL_CLEANROOM_ABSORPTION.md](../wiki_repo/CANONICAL_CLEANROOM_ABSORPTION.md) for the full cleanroom process.
-
 
 ---
 

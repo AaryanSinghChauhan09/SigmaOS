@@ -6,7 +6,6 @@ Search installed apps, files, and settings using natural-language queries in the
 - Vector embedding of app names and descriptions stored in sigma_db
 - Cosine similarity ranking without GPU requirement
 
-
 ## Key Milestones
 
 - [ ] MiniLM-L6 embedding model integration

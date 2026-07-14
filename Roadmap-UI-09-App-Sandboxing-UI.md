@@ -6,7 +6,6 @@ Visual permission management for sandboxed application capabilities.
 - Per-app capability grant/revoke dialog
 - Real-time capability usage monitor
 
-
 ## Key Milestones
 
 - [ ] Capability permission schema in sigma_db

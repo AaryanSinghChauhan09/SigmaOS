@@ -10,15 +10,11 @@ The Teacher Profile is designed for educational excellence, classroom management
 
 - **SigmaClassroom**: Classroom management system with student tracking and attendance.
 
-
 - **SigmaGrading**: Automated grading system with rubric support and analytics.
-
 
 - **SigmaLesson**: Lesson planning and curriculum management tools.
 
-
 - **SigmaEdu**: Educational resource library and content sharing platform.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Teacher Profile is designed for educational excellence, classroom management
 
 - **Theme**: Academic Blue (Educational Standard)
 
-
 - **Layout**: Classroom Dashboard (Students, Lessons, Resources)
 
-
 - **Personalization**: Interactive whiteboard integration and multimedia support.
-
 
 ---
 

@@ -107,11 +107,8 @@ features:
 
 - [Phase 1: Foundation & Branch Unification](Phase-1-Foundation-And-Branch-Unification)
 
-
 - [Phase 3: Package & Update System](Phase-3-Package-And-Update-System)
 
-
 - [OS Formats](OS_FORMATS)
-
 
 - [Build Guide](BuildGuide)

@@ -6,7 +6,6 @@ Implement PID, mount, network, user, and IPC namespaces.
 - Complete process isolation for containers
 - User namespace mapping (UID 0 inside â†’ UID 1000 outside)
 
-
 ## Key Milestones
 
 - [ ] PID namespace fork isolation

@@ -69,20 +69,14 @@ SIGMA_SERVICE_REGISTER(my_service, .start = my_start, .stop = my_stop);
 
 - [x] Basic 5-phase boot sequence
 
-
 - [x] Service registry table (compile-time)
-
 
 - [ ] Dynamic service dependencies (DAG-based ordering)
 
-
 - [ ] Parallel service startup (topological sort)
-
 
 - [ ] Service restart policies (always / on-failure / never)
 
-
 - [ ] Watchdog integration (`modules/core/kernel/watchdog.rs`)
-
 
 - [ ] Journal-based service logs (`modules/tools/diag/logger.rs`)

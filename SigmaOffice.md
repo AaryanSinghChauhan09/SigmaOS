@@ -17,7 +17,6 @@ Document editing with advanced formatting (Word alternative):
 - Spell check and grammar check
 - Mail merge functionality
 
-
 ### SigmaSheet (Spreadsheets)
 
 Data manipulation, formulas, and charting (Excel alternative):
@@ -31,7 +30,6 @@ Data manipulation, formulas, and charting (Excel alternative):
 - Import/export CSV, XLSX, ODS
 - Real-time collaboration
 
-
 ### SigmaPresent (Presentations)
 
 Slide decks and presentation tools (PowerPoint alternative):
@@ -43,7 +41,6 @@ Slide decks and presentation tools (PowerPoint alternative):
 - Export to PDF, PPTX, ODP
 - Collaboration and commenting
 - Presentation mode with laser pointer
-
 
 ## Architecture
 
@@ -106,7 +103,6 @@ int sigma_present_start_present(const present_deck_t *deck);
 - **SigmaCloud Integration**: Real-time collaboration via SovereignNet
 - **Zenith Desktop Integration**: Native Zenith UI components
 
-
 ## Roadmap
 
 - [x] Architecture design and component specification
@@ -119,7 +115,6 @@ int sigma_present_start_present(const present_deck_t *deck);
 - [ ] SigmaScript macro language
 - [ ] Mobile versions (SigmaOS Mobile)
 - [ ] Web versions (SigmaOS Cloud)
-
 
 ## Related Modules
 

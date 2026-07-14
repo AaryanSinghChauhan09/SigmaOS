@@ -134,7 +134,6 @@ The model is trained to recognize and optimize for five workload archetypes:
 - **Realtime** (Audio/Video): Ultra-short slices with CPU pinning
 - **Idle**: Minimal preemptions, power-saving parameters
 
-
 ---
 
 ## 4. Verification

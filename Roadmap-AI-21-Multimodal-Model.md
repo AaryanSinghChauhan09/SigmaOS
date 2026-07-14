@@ -6,7 +6,6 @@ Run a unified multimodal model that understands text, images, and audio on-devic
 - LLaVA-1.5 or MiniCPM-V for vision-language tasks
 - Audio spectrogram to text via Whisper shared pipeline
 
-
 ## Key Milestones
 
 - [ ] Image encoder (CLIP ViT-B/32 Q8)

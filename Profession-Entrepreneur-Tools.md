@@ -10,15 +10,11 @@ The Entrepreneur Profile is designed for business innovation, startup management
 
 - **SigmaVenture**: Startup management system with investor tracking and milestones.
 
-
 - **SigmaPitch**: Pitch deck creation and presentation tools.
-
 
 - **SigmaFinance**: Financial modeling and cash flow management.
 
-
 - **SigmaNetwork**: Contact management and networking tools.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Entrepreneur Profile is designed for business innovation, startup management
 
 - **Theme**: Innovation Blue (Entrepreneur Standard)
 
-
 - **Layout**: Venture Dashboard (Pitch, Finance, Network)
 
-
 - **Personalization**: AI-powered market insights and trend analysis.
-
 
 ---
 

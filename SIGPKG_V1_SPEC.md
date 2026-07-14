@@ -11,7 +11,6 @@
 3. **Instant Rollback:** If an update causes boot failure or kernel panic, the system automatically pivots back to the previous snapshot.
 4. **Delta Updates:** Network bandwidth is preserved by fetching binary deltas (bsdiff/courgette style) rather than full tarballs.
 
-
 ## 3. Package Structure (.sigpkg)
 
 A `.sigpkg` file is an uncompressed archive containing:
@@ -20,7 +19,6 @@ A `.sigpkg` file is an uncompressed archive containing:
 - `payload.tar.zst`: Zstandard compressed binary payload.
 - `manifest.json`: SHA-256 hashes of every file in the payload.
 - `sigpkg.sig`: Detached Ed25519 signature of the `meta.toml` + `manifest.json`.
-
 
 ## 4. Transaction State Machine
 
@@ -32,7 +30,6 @@ The `sigpkg` daemon uses a rigorous state machine (implemented in `userland/sigp
 - `STAGING`: Extracting payload to the passive snapshot `/mnt/sigma_staging`.
 - `COMMITTING`: Swapping the active bootloader entry to the staged snapshot.
 - `SUCCESS / FAILED / ROLLEDBACK`: Final outcome tracking.
-
 
 ## 5. Security Posture
 

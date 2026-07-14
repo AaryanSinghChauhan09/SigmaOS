@@ -12,7 +12,6 @@
 * **Cache Line Alignment**: All allocations are aligned to at least the L1 cache line size (64 bytes on x86_64) to prevent false sharing between threads.
 * **NUMA Awareness**: The allocator tracks physical memory topology. Applications are pinned to specific NUMA nodes, and `SigmaAlloc` ensures memory is allocated on the same die as the executing thread.
 
-
 ---
 
 ## 2. Kernel Live Patching (KLP) Engine
@@ -26,7 +25,6 @@
 3. It overwrites the first 5 bytes of the target function with a relative `JMP` instruction (ftrace-style trampoline) pointing to the new patched function.
 4. The machine resumes. All future calls to the buggy function are instantly redirected to the patched version.
 
-
 ---
 
 ## 3. High-Performance Secure IPC Bus
@@ -38,7 +36,6 @@
 * **Zero-Copy Ring Buffers**: Instead of copying payloads between process memory spaces, the IPC broker uses memory-mapped ring buffers. The sender writes the payload once, and the broker passes a pointer to the receiver.
 * **Capability Tokens**: Every IPC endpoint defines a `required_caps` bitmask. Senders must possess a matching `CapabilityToken` to enqueue a message, enforcing strict access control at memory speeds.
 
-
 ---
 
 ## 4. Universal Driver Translation Layer (UDTL)
@@ -49,7 +46,6 @@
 
 * **Memory Allocation**: The UDTL intercepts `kmalloc` (Linux) or `ExAllocatePool` (Windows) requests and maps them securely to `SigmaAlloc`.
 * **IRQ Routing**: Hardware interrupts are bound to microVM event sockets. When the physical IRQ fires, the UDTL safely triggers the driver's handler inside the isolated sandbox.
-
 
 ---
 

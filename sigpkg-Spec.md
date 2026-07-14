@@ -128,7 +128,6 @@ Every `sigpkg install` and `sigpkg upgrade` wraps mutations in a transaction:
 3. If any step fails → `sigpkg_transaction_rollback()` restores the snapshot.
 4. If all steps succeed → `sigpkg_transaction_commit()` finalizes.
 
-
 This guarantees that a failed multi-package upgrade never leaves the system in a half-updated state.
 
 ---
@@ -142,7 +141,6 @@ All packages are signed with **Dilithium5** (FIPS 204). The verification flow:
 3. Compute the BLAKE3 hash of the `.spkg`.
 4. Assert hash matches the SFC exactly.
 5. If mismatch → abort and log anomaly.
-
 
 ---
 

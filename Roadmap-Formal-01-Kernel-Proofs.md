@@ -6,7 +6,6 @@ Use Kani/Creusot to formally verify correctness of critical kernel paths.
 - Memory safety proofs for IPC ring buffer
 - Capability token non-forgeability proof
 
-
 ## Key Milestones
 
 - [ ] Kani harnesses for ipc.rs

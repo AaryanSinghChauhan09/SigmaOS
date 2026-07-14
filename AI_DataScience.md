@@ -9,7 +9,6 @@ SigmaOS bundles critical Data Science stacks, ensuring they are compiled reprodu
 - **Visualization:** Matplotlib, Seaborn, Plotly.
 - **MLOps:** MLflow, DVC, Airflow.
 
-
 ## Local AI Runtime Integration
 
 These tools interface directly with the `SigmaAI` runtime, utilizing ONNX Runtime and Hugging Face Transformers for local, quantized model execution.

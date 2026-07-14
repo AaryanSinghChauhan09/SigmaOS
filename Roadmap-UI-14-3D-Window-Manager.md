@@ -6,7 +6,6 @@ A stunning 3D desktop mode with spatial window arrangement (optional).
 - Rotating desktop cube for workspace switching
 - Z-depth window stacking in Vulkan compositor
 
-
 ## Key Milestones
 
 - [ ] 3D transform matrix per workspace

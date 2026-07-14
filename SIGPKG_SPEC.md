@@ -144,15 +144,11 @@ Slot B (inactive): /sigma/system-b/  ← update target
 
 1. sigma-pkg downloads + verifies new packages to slot B
 
-
 2. Signature + dm-verity hash computed for slot B
-
 
 3. Boot pointer updated to slot B
 
-
 4. Reboot
-
 
 5. If boot fails → automatic rollback to slot A
 
@@ -166,15 +162,11 @@ Every package must:
 
 1. Be signed with the author's Dilithium-5 key
 
-
 2. Have a `sha256` checksum that matches the downloaded archive
-
 
 3. Declare `pledge` + `unveil` permissions in `sigma.toml`
 
-
 4. For "Certified" status: pass SigmaOS team security review
-
 
 Verification at install time:
 

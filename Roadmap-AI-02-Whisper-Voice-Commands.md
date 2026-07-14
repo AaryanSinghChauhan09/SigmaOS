@@ -6,7 +6,6 @@ Enable spoken natural-language commands to control the OS without network access
 - Run openai/whisper-tiny and whisper-base locally
 - Pipe recognised text to SigmaAI Agent CLI translator
 
-
 ## Key Milestones
 
 - [ ] Ring-buffer audio capture from HAL audio driver

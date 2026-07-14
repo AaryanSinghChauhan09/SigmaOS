@@ -6,7 +6,6 @@ Low-latency 3D spatial audio for games using HRTF processing.
 - OpenAL-equivalent 3D audio API
 - HRTF convolution for headphone surround
 
-
 ## Key Milestones
 
 - [ ] HRTF dataset integration

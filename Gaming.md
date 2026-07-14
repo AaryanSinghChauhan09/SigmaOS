@@ -47,13 +47,13 @@ impl SovereignD3D12Device {
             .queue_family_index(self.queue_family)
             .flags(ash::vk::CommandPoolCreateFlags::RESET_COMMAND_BUFFER);
         let pool = self.vk_device.create_command_pool(&pool_info, None)?;
-        
+
         let alloc_info = ash::vk::CommandBufferAllocateInfo::builder()
             .command_pool(pool)
             .level(ash::vk::CommandBufferLevel::PRIMARY)
             .command_buffer_count(1);
         let buffers = self.vk_device.allocate_command_buffers(&alloc_info)?;
-        
+
         Ok(D3D12CommandList::new(buffers[0], pool))
     }
 }

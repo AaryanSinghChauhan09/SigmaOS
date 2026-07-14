@@ -6,7 +6,6 @@ Implement a memory-gated GBDT implementation designed for microcontrollers and V
 - Strict memory ceiling constraints on tree construction.
 - No dynamic memory allocation during model evaluation.
 
-
 ## Key Milestones
 
 - [ ] Memory-gated training allocator

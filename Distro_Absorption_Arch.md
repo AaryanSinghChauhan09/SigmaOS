@@ -19,12 +19,10 @@ The `SigmaRecipes.shard` absorbs this philosophy by implementing a sandboxed pac
 - **Arch Concept**: A bash-based build description file (`PKGBUILD`) defining source URLs, integrity hashes, and compilation instructions (`build()`, `package()`).
 - **Sovereign Implementation**: `SigmaRecipes` runs a secure, sandboxed shell engine that executes PKGBUILD procedures within a temporary, isolated namespace, capturing output file changes to build the package.
 
-
 ### 2.2 Sandboxed Source Builder
 
 - **Arch Concept**: Compilation typically runs with the permissions of the building user, which risks system compromise if a PKGBUILD is malicious.
 - **Sovereign Implementation**: Compilations are isolated in microVM templates with read-only network access (except for downloading source files). Once build completes, files are signed and saved as immutable objects.
-
 
 ---
 

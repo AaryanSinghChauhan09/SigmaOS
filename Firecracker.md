@@ -8,9 +8,7 @@ SigmaOS uses Firecracker as a **secure microVM fallback runtime** for two scenar
 
 1. **OCI container isolation** — running untrusted OCI images inside a microVM instead of a process-level namespace, giving hardware-enforced separation.
 
-
 2. **FaaS cold start** — spinning up short-lived function execution environments with predictable latency.
-
 
 ---
 
@@ -59,9 +57,7 @@ sigma-container run <image>
 
 - `virtualization/ocirunner/firecracker_launcher.rs` — Rust launcher
 
-
 - `virtualization/ocirunner/README.md` — OCI runner overview
-
 
 ---
 
@@ -170,7 +166,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-
       - name: Install Firecracker
 
         run: |
@@ -197,12 +192,9 @@ download/v1.7.0/firecracker-v1.7.0-x86_64.tgz | tar xz
 
 - `sigma-container run sigmaos/hello:latest` boots in a Firecracker microVM and prints `Hello`.
 
-
 - Cold start (spawn → guest login prompt) measured at **< 125ms** in QEMU mode.
 
-
 - The equivalent QEMU command `qemu-system-x86_64 -machine microvm` boots a Linux guest and confirms the hardware model matches.
-
 
 ---
 

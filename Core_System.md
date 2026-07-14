@@ -30,14 +30,12 @@ The Core System is the foundation of SigmaOS, providing kernel-level functionali
 - Cutting-edge features and improvements
 - Target audience: Developers, enthusiasts, early adopters
 
-
 **Enterprise Stream (Stable)**:
 
 - Frozen, hardened packages on 6-month cycles
 - Extended support and security patches
 - Predictable update schedule
 - Target audience: Enterprises, production systems, stability-focused users
-
 
 **Configuration**:
 
@@ -60,7 +58,6 @@ Following Arch's minimal core footprint philosophy:
 - Basic terminal utilities
 - Hardware abstraction layer
 
-
 **Everything as Packages**:
 
 - Desktop environments
@@ -69,14 +66,12 @@ Following Arch's minimal core footprint philosophy:
 - Security tools
 - All user-facing applications
 
-
 **Benefits**:
 
 - Smaller attack surface
 - Faster boot times
 - Easier maintenance
 - Customizable installations
-
 
 ### 3. Hardware Compatibility Matrix
 
@@ -87,7 +82,6 @@ Following Arch's minimal core footprint philosophy:
 - Automated HCL generation from user telemetry
 - Hardware-specific optimizations for Indian market
 
-
 **Hardware Compatibility List (HCL)**:
 
 - Published automatically from telemetry
@@ -95,14 +89,12 @@ Following Arch's minimal core footprint philosophy:
 - Tested and verified hardware
 - Community-contributed compatibility reports
 
-
 **Target Hardware**:
 
 - Intel/AMD laptops (common in India)
 - Broadcom Wi-Fi chipsets
 - NVIDIA/AMD GPUs
 - Indian-specific peripherals
-
 
 ### 4. Fedora Infrastructure Integration
 
@@ -113,7 +105,6 @@ Following Arch's minimal core footprint philosophy:
 - Build artifact management
 - Build farm orchestration
 
-
 **Update Gating (Bodhi-inspired)**:
 
 - Hardware testing feedback loops
@@ -121,14 +112,12 @@ Following Arch's minimal core footprint philosophy:
 - Update approval workflow
 - Rollback capabilities
 
-
 **Mirror Management (MirrorManager-inspired)**:
 
 - High-speed local driver package delivery
 - Geographic mirror selection
 - CDN integration
 - Bandwidth optimization
-
 
 ## System Configuration
 
@@ -333,7 +322,6 @@ impl DriverManager {
 4. Initramfs verifies drivers
 5. Drivers verify modules
 
-
 **Implementation**:
 
 ```rust
@@ -364,7 +352,6 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 - Custom policies for SigmaOS
 - Policy management tools
 
-
 ## Performance Optimizations
 
 ### Boot Performance
@@ -376,13 +363,11 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 - Cached hardware detection
 - Optimized init scripts
 
-
 **Metrics**:
 
 - Target boot time: < 10 seconds
 - Service startup: < 2 seconds
 - Driver loading: < 1 second
-
 
 ### Runtime Performance
 
@@ -393,7 +378,6 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 - JIT compilation for hot paths
 - Profile-guided optimization
 
-
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
@@ -403,14 +387,12 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 - Core HAL implementation
 - Basic driver management
 
-
 ### Phase 2 (Months 3-6)
 
 - Hardware detection suite
 - Automated HCL publication
 - Fedora infrastructure integration
 - Stable release repository
-
 
 ### Phase 3 (Months 6-9)
 
@@ -419,14 +401,12 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 - Driver reproducibility
 - Build farm automation
 
-
 ### Phase 4 (Months 9-12)
 
 - Upstream driver submission
 - Automated compatibility warnings
 - Advanced security features
 - Performance optimization
-
 
 ## Best Practices
 
@@ -437,7 +417,6 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 3. **Documentation**: Document all public interfaces
 4. **Testing**: Comprehensive unit and integration tests
 
-
 ### Security
 
 1. **Principle of Least Privilege**: Minimize privileges
@@ -445,14 +424,12 @@ pub fn verify_chain_of_trust() -> Result<(), SecurityError> {
 3. **Secure by Default**: Enable security features by default
 4. **Regular Audits**: Regular security audits
 
-
 ### Performance
 
 1. **Measure First**: Profile before optimizing
 2. **Optimize Hot Paths**: Focus on frequently used code
 3. **Avoid Premature Optimization**: Optimize based on measurements
 4. **Continuous Monitoring**: Monitor performance metrics
-
 
 ## References
 

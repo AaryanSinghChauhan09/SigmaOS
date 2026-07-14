@@ -41,7 +41,7 @@ pub async fn secure_transfer(url: &str) -> Result<Vec<u8>> {
     // falling back to HTTP/2 over TCP.
     let client = SigmaNetClient::new();
     let response = client.get(url).send().await?;
-    
+
     Ok(response.bytes().await?)
 }
 ```

@@ -10,15 +10,11 @@ The Banker Profile is designed for financial excellence, banking operations, and
 
 - **SigmaBank**: Core banking system with account management and transaction processing.
 
-
 - **SigmaLending**: Loan origination and credit assessment tools.
-
 
 - **SigmaCompliance**: Regulatory compliance and risk management.
 
-
 - **SigmaAnalytics**: Financial analytics and reporting dashboard.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Banker Profile is designed for financial excellence, banking operations, and
 
 - **Theme**: Trust Blue (Banking Standard)
 
-
 - **Layout**: Banking Dashboard (Accounts, Lending, Compliance)
 
-
 - **Personalization**: Customer relationship management integration.
-
 
 ---
 

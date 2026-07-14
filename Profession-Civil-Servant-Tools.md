@@ -10,15 +10,11 @@ The Civil Servant Profile is designed for public service excellence, citizen ser
 
 - **SigmaService**: Citizen service request management.
 
-
 - **SigmaRecords**: Public records management and archiving.
-
 
 - **SigmaCompliance**: Regulatory compliance and reporting.
 
-
 - **SigmaTransparency**: Open data and transparency tools.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Civil Servant Profile is designed for public service excellence, citizen ser
 
 - **Theme**: Government Blue (Public Service Standard)
 
-
 - **Layout**: Service Dashboard (Requests, Records, Compliance)
 
-
 - **Personalization**: Custom workflows and automated responses.
-
 
 ---
 

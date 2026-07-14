@@ -6,7 +6,6 @@ Reward security researchers for discovering vulnerabilities.
 - Documented responsible disclosure policy
 - Bounty tiers based on severity (CVSS score)
 
-
 ## Key Milestones
 
 - [ ] Security advisory template

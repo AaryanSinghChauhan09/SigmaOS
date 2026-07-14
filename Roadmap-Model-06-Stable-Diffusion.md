@@ -6,7 +6,6 @@ Generate icons, wallpapers, and UI assets locally using SD-Turbo.
 - SD-Turbo 4-step inference for fast asset generation
 - Integration with Zenith theme engine
 
-
 ## Key Milestones
 
 - [ ] CLIP text encoder stub

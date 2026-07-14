@@ -28,7 +28,6 @@ The **SigmaOS Sovereign Sandbox** provides multi-layer isolation for untrusted a
 - Malicious user with root access to host
 - Quantum-capable adversaries (deferred to PQC layer)
 
-
 ---
 
 ## Architecture

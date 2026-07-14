@@ -6,7 +6,6 @@ Classify system and app logs into multiple security, operation, and performance 
 - Binary relevance ensemble classifiers.
 - Multi-label classification throughput above 10,000 logs/sec on single core.
 
-
 ## Key Milestones
 
 - [ ] Feature extraction from log formats

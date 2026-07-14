@@ -123,15 +123,11 @@ S2DE2 includes a fully integrated Hardware-in-the-Loop diagnostic pipeline (`sig
 
 - **Issue - Unaligned SIMD Memory Access Traps:** Casting arbitrary userland buffers to AVX-512 registers triggers fatal `#GP` general protection faults.
 
-
 - *Fix Strategy:* S2DE2 automatically intercepts unaligned memory allocations, routes them through `sigma_kmalloc_aligned(size, 64)`, and executes zero-copy DMA memory pinning.
-
 
 - **Issue - NPU Thermal Throttling & Clock Drifts:** Intensive matrix multiplications overheat silicon dies, leading to silent calculation errors or kernel stalls.
 
-
 - *Fix Strategy:* S2DE2 monitors physical core temperature sensors via `sigma_power_tuner.cpp`, dynamically scaling SIMD clock frequencies and interleaving sleep cycles to maintain thermal equilibrium.
-
 
 ---
 > **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED

@@ -25,24 +25,17 @@
 
 1. **No C or C++** — zero C/C++ files in `kernel/`, `drivers/`, `security/`, `crypto/`
 
-
 2. **No `unsafe` without justification comment** — every `unsafe` block documents why
-
 
 3. **No `std`/`libc` in kernel crates** — `#![no_std]` enforced
 
-
 4. **No pre-defined stdlib functions in kernel** — implement from scratch
-
 
 5. **No third-party crates in kernel** — only `sigma-*` internal crates
 
-
 6. **OOP via Traits** — use Rust Traits + Structs; no inheritance anti-patterns
 
-
 7. **No dynamic dispatch in hot paths** — prefer generics over `dyn Trait`
-
 
 ---
 

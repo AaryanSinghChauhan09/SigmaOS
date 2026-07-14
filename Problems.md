@@ -27,9 +27,7 @@ Fuzzing vectors execute random register inputs across all 256 syscall entry vect
 
 - **Boundary Validation**: Blocks negative sector indices, buffer overruns, and out-of-bounds pointer transitions.
 
-
 - **Attestation Audits**: Verifies that invalid cryptographic payload signatures are caught and blocked in under 2 clock cycles.
-
 
 ### 2. QEMU Interactive Boot Validation
 
@@ -43,8 +41,6 @@ Attestation checks expect standard stage outputs:
 
 - `[BOOT] SSB: Initializing Sovereign System Boot Nexus...`
 
-
 - `[BOOT] SSB: Commencing Lattice Ignition...`
-
 
 - `[BOOT] SSB: Ignition COMPLETE. 600 shards active.`

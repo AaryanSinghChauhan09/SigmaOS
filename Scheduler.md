@@ -18,7 +18,6 @@ SigmaOS implements a round-robin scheduler for CPU time management. This documen
 - Context switching
 - RDTSC-based timestamps
 
-
 **Data Structures**:
 
 ```rust
@@ -97,20 +96,17 @@ pub unsafe fn sigma_sched_get_switches() -> u64;
    - Switch context to new task
 5. **Yield**: Voluntarily give up CPU time
 
-
 ### Time Slice Management
 
 - **Default**: 10ms quantum
 - **Configurable**: Can be adjusted per system
 - **Per-Task**: Each task has its own time slice counter
 
-
 ### Task States
 
 - **Running**: Task currently executing on CPU
 - **Ready**: Task waiting for CPU time
 - **Blocked**: Task waiting for I/O or resource
-
 
 ## Context Switching
 
@@ -124,7 +120,6 @@ When switching away from a task:
 5. Save flags
 6. Save page table base (CR3)
 
-
 ### Context Restore
 
 When switching to a task:
@@ -134,7 +129,6 @@ When switching to a task:
 3. Restore instruction pointer
 4. Restore stack pointer
 5. Restore general-purpose registers
-
 
 ### Switch Assembly
 
@@ -220,7 +214,6 @@ Each task has a static priority level:
 - **64-95**: Normal tasks
 - **96-127**: Background tasks
 
-
 ### Dynamic Priority
 
 Dynamic priority adjusts based on:
@@ -229,7 +222,6 @@ Dynamic priority adjusts based on:
 - I/O wait time
 - Nice value
 
-
 ### Priority Inheritance
 
 To prevent priority inversion:
@@ -237,7 +229,6 @@ To prevent priority inversion:
 - High-priority task waiting on low-priority task
 - Temporarily boost low-priority task's priority
 - Restore priority after resource release
-
 
 ## Scheduler Statistics
 
@@ -266,14 +257,12 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 4. **Load balancing**: Distribute tasks across CPUs
 5. **Power management**: CPU frequency scaling
 
-
 ### Research Areas
 
 1. **Predictive scheduling**: AI-based task placement
 2. **Energy-aware scheduling**: Minimize power consumption
 3. **Heterogeneous scheduling**: Big.LITTLE CPU support
 4. **Deadline scheduling**: Real-time deadline guarantees
-
 
 ## Best Practices
 
@@ -285,7 +274,6 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 4. Consider priority when designing interfaces
 5. Test with various workloads
 
-
 ### For Userland Developers
 
 1. Use yield() when waiting for I/O
@@ -293,7 +281,6 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 3. Avoid busy-wait loops
 4. Profile CPU usage
 5. Consider batch processing for CPU-intensive tasks
-
 
 ## Troubleshooting
 
@@ -308,7 +295,6 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 3. Check for busy-wait loops
 4. Profile scheduler behavior
 
-
 ### Starvation
 
 **Symptoms**: Task never gets CPU time
@@ -320,7 +306,6 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 3. Review scheduling algorithm
 4. Implement priority boosting
 
-
 ### Latency Issues
 
 **Symptoms**: Poor interactive response
@@ -331,7 +316,6 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 2. Implement priority boosting
 3. Use multi-level feedback queue
 4. Profile interrupt latency
-
 
 ## References
 

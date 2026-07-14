@@ -6,7 +6,6 @@ W3C DID-based identity system replacing traditional username/password.
 - did:key method with Ed25519 keys
 - Verifiable Credentials issuance and verification
 
-
 ## Key Milestones
 
 - [ ] Ed25519 key generation in sigma-vault

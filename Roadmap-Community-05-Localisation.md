@@ -6,7 +6,6 @@ Translate the OS, documentation, and installer into 20+ languages.
 - Gettext-based translation pipeline
 - Community translation portal (Weblate-compatible)
 
-
 ## Key Milestones
 
 - [ ] POT file extraction from all UI strings

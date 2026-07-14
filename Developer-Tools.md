@@ -20,7 +20,6 @@ The SigmaOS VS Code extension provides seamless integration with the SigmaOS dev
 - Package manager integration (sigma-pkg)
 - Remote development support for SigmaOS targets
 
-
 **Installation:**
 
 ```bash
@@ -51,7 +50,6 @@ The JetBrains plugin supports CLion, IntelliJ IDEA, and other JetBrains IDEs.
 - Refactoring support
 - Version control integration
 
-
 **Installation:**
 Install from the JetBrains Marketplace or download from the SigmaOS releases page.
 
@@ -67,7 +65,6 @@ The Eclipse plugin provides CDT integration for SigmaOS development.
 - Memory analysis
 - Static analysis integration
 
-
 ## Build System
 
 ### Custom Build System with Modular Configs
@@ -82,7 +79,6 @@ SigmaOS uses a modular build system based on CMake with custom configurations fo
 - `mobile` - ARM64/RISC-V mobile profile
 - `rtos` - Hard real-time profile
 - `distributed` - Multi-node distributed cluster
-
 
 **Configuration:**
 
@@ -144,7 +140,6 @@ SigmaOS provides comprehensive kernel logging with multiple log levels and filte
 - `INFO` - Informational (informational messages)
 - `DEBUG` - Debug (debug-level messages)
 
-
 **Usage:**
 
 ```bash
@@ -192,7 +187,6 @@ SigmaOS includes advanced crash analysis tools for debugging kernel panics and u
 - Register state display
 - Symbol resolution
 - Crash report generation
-
 
 **Usage:**
 
@@ -824,7 +818,6 @@ sudo sysctl kernel.perf_event_paranoid=0
 - [Package Manager Usage](Package-Manager-Usage.md)
 - [Security Documentation](Security.md)
 - [API Documentation](https://sigmaos.dev/docs/api)
-
 
 ## License
 

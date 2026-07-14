@@ -72,7 +72,6 @@ pub struct ABDeployment {
 5. Set new deployment as default
 6. Reboot to activate
 
-
 ### Boot Configuration
 
 **Swapped Directory Pattern:**
@@ -127,12 +126,11 @@ snapshots:
     - before_package_install: false
     - schedule: daily
 
-  
   retention:
     daily: 7
     weekly: 4
     monthly: 6
-    
+
   bootable:
     keep_last: 5
     verify_before_promote: true
@@ -200,7 +198,7 @@ checks:
     type: boot
     critical: true
     timeout: 30
-    
+
   - name: essential_services
 
     type: service
@@ -210,12 +208,12 @@ checks:
       - sigma-security
 
     critical: true
-    
+
   - name: network_connectivity
 
     type: network
     critical: false
-    
+
   - name: filesystem_integrity
 
     type: filesystem
@@ -268,7 +266,6 @@ pub fn rollback_to_snapshot(id: &str) -> Result<()> {
 5. Confirm rollback with user
 6. Perform atomic swap
 7. Reboot system
-
 
 ## Delta Updates
 
@@ -353,17 +350,17 @@ updates:
   auto_update: true
   update_schedule: "weekly"
   auto_reboot: false
-  
+
 ostree:
   repo_path: /ostree/repo
   remote_url: https://updates.sigmaos.org
   gpg_verify: true
-  
+
 rollback:
   automatic_on_failure: true
   keep_deployments: 5
   keep_snapshots: 10
-  
+
 bootloader:
   timeout: 5
   default_entry: latest
@@ -418,7 +415,6 @@ sigma-update health-check
 - Shared references between deployments
 - Efficient storage utilization
 
-
 ### Compression
 
 **Compression Levels:**
@@ -426,7 +422,6 @@ sigma-update health-check
 - ZSTD level 3 for package data
 - ZSTD level 15 for metadata
 - LZ4 for boot-time critical data
-
 
 ## Security Features
 
@@ -472,7 +467,6 @@ pub fn enforce_immutability() -> Result<()> {
 3. **Phase 3 (Weeks 45-48):** Health checking system
 4. **Phase 4 (Weeks 49-52):** Delta updates and optimization
 
-
 ## Testing
 
 ### Test Suite
@@ -484,7 +478,6 @@ pub fn enforce_immutability() -> Result<()> {
 - Signature verification tests
 - Performance benchmarks
 
-
 ### Validation Criteria
 
 - 100% rollback success rate
@@ -492,7 +485,6 @@ pub fn enforce_immutability() -> Result<()> {
 - Zero data loss during rollback
 - Boot verification before promotion
 - Secure boot compatibility
-
 
 ## References
 

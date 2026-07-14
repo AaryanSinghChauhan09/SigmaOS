@@ -7,7 +7,6 @@ SigmaOS provides a complete set of GNU-compatible core utilities and shell primi
 - **Environment & History (`sigma_env.rs`)**: Manages static arrays for shell environment variables and command history, avoiding heap usage.
 - **Tab Completion (`sigma_complete.rs`)**: Prefix matching engine for autocomplete of built-in commands.
 
-
 ## Custom Coreutils
 
 SigmaOS has its own custom implementations of common CLI tools:

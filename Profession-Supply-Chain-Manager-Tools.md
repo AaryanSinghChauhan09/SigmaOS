@@ -10,15 +10,11 @@ The Supply Chain Manager Profile is designed for supply chain excellence, logist
 
 - **SigmaLogistics**: Logistics planning and optimization.
 
-
 - **SigmaInventory**: Inventory management and forecasting.
-
 
 - **SigmaSupplier**: Supplier relationship management.
 
-
 - **SigmaTracking**: Real-time shipment tracking and monitoring.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Supply Chain Manager Profile is designed for supply chain excellence, logist
 
 - **Theme**: Supply Chain Blue (Operations Standard)
 
-
 - **Layout**: Supply Chain Dashboard (Logistics, Inventory, Supplier)
 
-
 - **Personalization**: Custom routing algorithms and automated alerts.
-
 
 ---
 

@@ -11,7 +11,6 @@ This document formalizes the tracking of critical bugs and gaps across the Sigma
   - Upstream drivers wherever possible; fund bounties for Broadcom/NVIDIA support.
   - Audit current kernel tree and run rigorous regression tests.
 
-
 ## 2. Package Manager (sigpkg)
 
 - **Problem**: Dependency resolution errors, no rollback logic, unsigned packages.
@@ -19,7 +18,6 @@ This document formalizes the tracking of critical bugs and gaps across the Sigma
   - Implement atomic updates with transaction state and rollback logic.
   - Add GPG/Ed25519 signing for all packages and metadata.
   - Build reproducible package metadata (SBOMs).
-
 
 ## 3. Installer
 
@@ -29,7 +27,6 @@ This document formalizes the tracking of critical bugs and gaps across the Sigma
   - Add secure boot and encrypted home defaults anchored to TPM.
   - Rigorously test and patch dual-boot integrations with Windows/Linux.
 
-
 ## 4. Desktop (Zenith)
 
 - **Problem**: Compositor crashes, input lag, missing accessibility options.
@@ -37,7 +34,6 @@ This document formalizes the tracking of critical bugs and gaps across the Sigma
   - Switch to a Wayland-first compositor with XWayland fallback.
   - Add a comprehensive accessibility suite (screen reader, high contrast, Indic language packs).
   - Optimize rendering pipeline for minimal latency and strict Vulkan/DRM rendering.
-
 
 ## 5. Security
 
@@ -47,7 +43,6 @@ This document formalizes the tracking of critical bugs and gaps across the Sigma
   - Add TPM attestation and signed kernel enforcement (measured boot).
   - Implement strict MAC policies (AppArmor/SELinux paradigm) across all userland daemons.
 
-
 ## 6. Build & CI
 
 - **Problem**: Lack of reproducible builds and automated CI/CD checks.
@@ -55,7 +50,6 @@ This document formalizes the tracking of critical bugs and gaps across the Sigma
   - Deploy a containerized build farm with deterministic timestamps.
   - Build GitHub Actions pipeline enforcing kernel + packages integrity.
   - Enable automated CVE scanning in the CI pipeline.
-
 
 ## 7. Documentation
 

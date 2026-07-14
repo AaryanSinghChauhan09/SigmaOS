@@ -6,7 +6,6 @@ Perform probabilistic reasoning over system event streams.
 - Naive Bayes classifier for log event classification
 - Bayesian network structure for dependency modelling
 
-
 ## Key Milestones
 
 - [ ] Prior/likelihood/posterior update loop

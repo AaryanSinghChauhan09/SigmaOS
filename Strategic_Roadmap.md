@@ -13,7 +13,6 @@ Make SigmaOS the standout Linux alternative by combining its existing low-level,
 5. **Polished, accessible UX** — Wayland-first Zenith desktop with multi-lingual and Indic support
 6. **All-in-one bundles** — persona bundles (Dev, Data, Security, Legal, Education) so users never need extra downloads
 
-
 ## Vision: Making SigmaOS Outshine All Linux Distros
 
 SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining their best practices (rolling/stable hybrid, reproducibility, polished UX, security isolation) with unique AI-native automation, legal/education modules, and sovereign driver strategy.
@@ -26,20 +25,17 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Stable LTS releases for enterprises (Fedora/Debian style)
 - Seamless migration between channels
 
-
 **Hardware compatibility**
 
 - Publish a Hardware Compatibility List (HCL)
 - Upstream drivers from Fedora, Arch, Debian, and kernel repos
 - Automated driver CI testing on certified hardware
 
-
 **Minimal base system**
 
 - Ship lean like Arch
 - Curated bundles for different personas (developer, designer, security analyst, student)
 - Optional meta-packages for specific use cases
-
 
 ### ⚙️ Package & Build
 
@@ -49,13 +45,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Functional package management paradigm
 - Deterministic dependency resolution
 
-
 **Atomic updates**
 
 - Fedora Silverblue's immutable OS model
 - Transactional updates with automatic rollback
 - A/B partition scheme for safe updates
-
 
 **Signed repos**
 
@@ -63,13 +57,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Provenance enforcement
 - Repository metadata verification
 
-
 **Reproducible build farm**
 
 - Deterministic builds for trust and debugging
 - Cross-verification by multiple builders
 - Public build logs and artifacts
-
 
 ### 🎨 Desktop & UX
 
@@ -79,13 +71,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - GPU-accelerated rendering pipeline
 - Low-latency input handling
 
-
 **Polished installer**
 
 - Calamares/Ubiquity style installer
 - Secure boot + encrypted home defaults
 - Automated partitioning with encryption
-
 
 **Accessibility suite**
 
@@ -94,13 +84,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - High contrast themes
 - Keyboard navigation enhancements
 
-
 **Unified UX**
 
 - Consistent design language across apps
 - GNOME's HIG-inspired guidelines
 - Theming system with dark/light modes
-
 
 ### 🔒 Security & Cybersecurity
 
@@ -110,13 +98,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Security analysis meta-packages
 - Forensics tools (Volatility, Autopsy, Sleuth Kit)
 
-
 **Compartmentalization**
 
 - QubesOS-style microVMs using Firecracker/gVisor
 - Per-application sandboxing
 - Network namespace isolation
-
 
 **Mandatory access control**
 
@@ -124,13 +110,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Capability-based security model
 - Least-privilege principle enforcement
 
-
 **Incident response tools**
 
 - Volatility for memory forensics
 - Autopsy for disk analysis
 - Sleuth Kit for file system forensics
-
 
 ### 🧠 AI & Automation
 
@@ -140,13 +124,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - CPU/GPU optimized inference engines
 - Model caching and provenance tracking
 
-
 **NL→CLI agent**
 
 - SigmaAI to translate natural language into safe system commands
 - Dry-run sandbox for command preview
 - Human-approval workflow for privileged actions
-
 
 **Workflow orchestration**
 
@@ -154,13 +136,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Automated data processing workflows
 - Pipeline versioning and rollback
 
-
 **Observability + self-healing**
 
 - Prometheus/Grafana dashboards
 - Anomaly detection using ML
 - Auto rollback on system degradation
-
 
 ### 📘 Education & Legal
 
@@ -170,7 +150,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Moodle for learning management
 - Interactive learning modules
 
-
 **Professional modules**
 
 - ERPNext for enterprise resource planning
@@ -178,20 +157,17 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - GNUCash for accounting
 - QGIS for geographic information systems
 
-
 **Indian law research tools**
 
 - APIs for Indian Kanoon database
 - SCC Online integration
 - Compliance workflows for legal professionals
 
-
 **Learning tools**
 
 - Flashcards and spaced repetition
 - Quizzes and practice tests
 - Interactive tutorials
-
 
 ## High-Impact Technical Roadmap (12 Months)
 
@@ -203,20 +179,17 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Establish hardware compatibility testing framework
 - Create driver tracking infrastructure
 
-
 **Package Management**
 
 - Create sigpkg spec v0.1 and CI skeleton that signs artifacts
 - Implement basic package manifest schema
 - Set up GPG key infrastructure
 
-
 **Documentation**
 
 - Publish initial HCL with 10 tested laptop models
 - Create automated test scripts for hardware
 - Document core system architecture
-
 
 ### Phase 1: Foundation (0–3 months)
 
@@ -226,13 +199,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - SBOM generation pipeline
 - Containerized deterministic builders
 
-
 **Installer**
 
 - Installer alpha (Calamares style) with encrypted home and secure boot
 - Automated partitioning with LUKS encryption
 - Secure boot configuration and key management
-
 
 **Desktop**
 
@@ -240,13 +211,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Accessibility baseline implementation
 - XWayland compatibility layer
 
-
 **CI/CD**
 
 - GitHub Actions workflow for reproducible builds
 - CVE scanning integration
 - Automated testing on HCL hardware
-
 
 ### Phase 2: Harden & Integrate (3–6 months)
 
@@ -256,13 +225,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Per-app policies and MAC defaults
 - TPM attestation support
 
-
 **AI Runtime**
 
 - Local AI runtime (quantized ONNX + HF adapters)
 - Safe NL→CLI agent with dry-run mode
 - Model marketplace with provenance
-
 
 **Packaging**
 
@@ -270,13 +237,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Offline documentation generation
 - Delta update infrastructure
 
-
 **Observability**
 
 - Lightweight metrics agent
 - Basic Grafana dashboards
 - Alerting infrastructure
-
 
 ### Phase 3: Scale & Polish (6–12 months)
 
@@ -286,13 +251,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Delta updates implementation
 - Atomic rollback system
 
-
 **Drivers**
 
 - Driver strategy: absorb upstream kernel drivers
 - Fedora/Arch packaging conversions
 - Driver CI tests on HCL hardware
-
 
 **Self-Healing**
 
@@ -300,20 +263,17 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Canary deployment system
 - Automated anomaly detection
 
-
 **Governance**
 
 - Governance charter
 - Contributor incubator program
 - Enterprise support offering
 
-
 **Ecosystem**
 
 - Persona bundles (Developer, Data, Security, Legal, Education)
 - App store with audited, signed applications
 - Partner integrations
-
 
 ## Concrete Implementation Playbook
 
@@ -325,20 +285,17 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - PR templates with required checklists
 - CI gates (build, reproducibility, SBOM, CVE scan)
 
-
 **Deterministic Builders**
 
 - Containerized toolchains
 - Fixed timestamps (SOURCE_DATE_EPOCH)
 - Artifact signing with GPG
 
-
 **Language Policy**
 
 - Critical system components in Rust/C
 - Replace Python/JS runtime dependencies with Rust/Nim binaries
 - Memory-safe languages for user-facing applications
-
 
 ### Packaging
 
@@ -350,14 +307,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Rollback hooks for failed updates
 - SBOM output for supply chain transparency
 
-
 **Package Conversion**
 
 - Conversion scripts for RPM → sigpkg
 - Conversion scripts for PKGBUILD → sigpkg
 - Conversion scripts for Deb → sigpkg
 - Automated dependency mapping
-
 
 ### Security
 
@@ -368,14 +323,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Signed kernels and modules
 - MicroVM isolation for untrusted apps
 
-
 **Security Meta-Package**
 
 - Suricata for network intrusion detection
 - Volatility for memory forensics
 - Wireshark for network analysis
 - Metasploit for penetration testing
-
 
 ### AI
 
@@ -386,14 +339,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Quantized models for efficient inference
 - CPU/GPU backend selection
 
-
 **NL→CLI Agent**
 
 - Dry-run sandbox for command preview
 - Human-approval workflow for privileged actions
 - Command history and audit logging
 - Safety validation before execution
-
 
 ### UX
 
@@ -404,14 +355,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Dataset bundles for specific use cases
 - One-click installation workflows
 
-
 **Accessibility**
 
 - Screen reader integration (Orca)
 - High-contrast themes
 - Indic input methods and fonts
 - Keyboard navigation enhancements
-
 
 ### Drivers
 
@@ -421,13 +370,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Maintain SigmaOS kernel branch
 - Hardware-specific patches
 
-
 **Driver Packaging**
 
 - Convert Fedora/Arch packaging into sigpkg
 - Run driver CI tests on HCL hardware
 - Automated driver compatibility testing
-
 
 ## Community, Governance, and Ecosystem
 
@@ -440,14 +387,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Small, actionable good-first-issues
 - Contributor recognition program
 
-
 **Governance**
 
 - Lightweight steering council (7 members)
 - RFC process for major changes
 - Roadmap voting for features
 - Transparent decision-making
-
 
 ### Commercial & Support
 
@@ -458,14 +403,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Enterprise support SLAs
 - Custom development services
 
-
 **Funding Model**
 
 - Enterprise LTS subscriptions
 - Driver certification fees
 - Support contracts
 - Bounties for critical features
-
 
 ### Partnerships
 
@@ -475,13 +418,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Hardware vendors for certification
 - Open source projects for integration
 
-
 **Academic Partnerships**
 
 - Indian academic institutions for localization
 - Research collaborations for AI features
 - Student contributor programs
-
 
 ## Metrics to Track Success
 
@@ -492,14 +433,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Mean time to patch CVE (target: < 48 hours)
 - Kernel crash rate on HCL hardware (target: < 0.1%)
 
-
 ### Adoption Metrics
 
 - Daily active installs
 - Persona bundle installs
 - Marketplace model downloads
 - HCL hardware coverage
-
 
 ### Community Metrics
 
@@ -508,14 +447,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Number of signed packages
 - Active contributors per month
 
-
 ### Business Metrics
 
 - Enterprise LTS subscriptions
 - Driver certification contracts
 - Support contract revenue
 - Bounty fulfillment rate
-
 
 ## Quick Wins to Ship This Quarter
 
@@ -526,24 +463,20 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
    - Publish HCL with 10 tested laptop models
    - Create automated test scripts
 
-
 2. **Package Management**
    - Commit sigpkg v0.1 spec to docs/
    - Create CI skeleton that builds signed kernel image
    - Implement basic manifest schema
-
 
 3. **Installer Alpha**
    - Release Installer Alpha image
    - Enable encrypted home by default
    - Enable secure boot configuration
 
-
 4. **Persona Bundle**
    - Launch Developer persona bundle
    - Include Rust toolchain, VSCodium, Git
    - Add reproducible build examples
-
 
 ## Gap Analysis and Immediate Actions
 
@@ -558,7 +491,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Import upstream drivers from kernel.org
 - Add driver CI tests on HCL hardware
 
-
 ### Missing Area: Robust Package Manager
 
 **Why it matters**: Atomic updates, rollbacks, and security are essential
@@ -569,7 +501,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Add GPG signing infrastructure
 - Implement delta updates
 - Add rollback hooks
-
 
 ### Missing Area: Installer and Imaging
 
@@ -582,7 +513,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Enable secure boot configuration
 - Create automated test images
 
-
 ### Missing Area: Stable Desktop Stack
 
 **Why it matters**: UX and performance depend on compositor
@@ -593,7 +523,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - XWayland compatibility layer
 - Compositor performance tests
 - Low-end fallback compositor
-
 
 ### Missing Area: Sandboxing and Isolation
 
@@ -606,7 +535,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Enable MAC policies by default
 - Add network namespace isolation
 
-
 ### Missing Area: Reproducible Builds and SBOMs
 
 **Why it matters**: Supply chain trust and debugging
@@ -617,7 +545,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - SBOM generation in CI
 - Public build logs
 - Cross-verification infrastructure
-
 
 ### Missing Area: Observability and Auto-Rollback
 
@@ -630,7 +557,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Staged canary updates
 - Auto rollback on anomalies
 
-
 ### Missing Area: Documentation and Governance
 
 **Why it matters**: Contributor onboarding and trust
@@ -642,7 +568,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Implement RFC process
 - Establish governance charter
 
-
 ## Technical Improvements to Boost Performance
 
 ### Kernel and Scheduler
@@ -652,7 +577,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Upstream critical patches
 - Maintain SigmaOS kernel branch
 
-
 ### I/O and Storage
 
 - Default to modern filesystem with snapshot support (Btrfs/ZFS)
@@ -660,14 +584,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - I/O scheduler (mq-deadline or bfq) profiles per persona
 - Enable compression for space savings
 
-
 ### Memory Management
 
 - Tune zswap/zram for low-RAM devices
 - Implement cgroup v2 defaults
 - Per-bundle memory limits
 - Avoid swapping spikes
-
 
 ### Graphics and Compositor
 
@@ -677,14 +599,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Reduce round trips to lower input latency
 - Ship lightweight fallback compositor for low-end hardware
 
-
 ### Startup and Services
 
 - Adopt minimal service manager policy (runit/OpenRC style)
 - Parallelized startup
 - Lazy service activation
 - Trim default enabled services
-
 
 ### Networking
 
@@ -693,7 +613,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Per-app WireGuard profiles for secure networking
 - Network namespace isolation
 
-
 ### Package Delivery
 
 - Use delta updates
@@ -701,14 +620,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - CDN mirrors to reduce update size and latency
 - Sign and verify every artifact
 
-
 ### AI Runtime Performance
 
 - Ship quantized ONNX runtime with CPU/GPU backends
 - Model caching
 - Safe dry-run mode for NL→CLI agents
 - Avoid expensive rollbacks
-
 
 ## Security, Reliability, and Developer Infrastructure
 
@@ -719,14 +636,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - TPM attestation for boot verification
 - Least-privilege app policies
 
-
 ### Sandboxing
 
 - Per-app microVMs for untrusted apps
 - Lightweight container sandboxes for developer workflows
 - AppArmor/SELinux profiles for system services
 - Network namespace isolation
-
 
 ### Reproducible CI
 
@@ -736,7 +651,6 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Signed releases
 - Enforce CI gates for merges
 
-
 ### Observability
 
 - Lightweight Prometheus client
@@ -745,14 +659,12 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Automated canary rollouts
 - Auto rollback on anomalies
 
-
 ### Forensics and Incident Response
 
 - Curated security meta-package (Wireshark, Volatility, Sleuth Kit)
 - Incident playbook in the Wiki
 - Automated log collection
 - Forensics tools integration
-
 
 ## 6-Month Implementation Roadmap
 
@@ -764,13 +676,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Create sigpkg spec v0.1
 - CI skeleton that builds signed kernel image
 
-
 **Documentation**
 
 - Hardware Compatibility List with 10 tested models
 - Automated test scripts for hardware
 - Core system architecture documentation
-
 
 ### Month 2–3
 
@@ -780,13 +690,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Secure boot test images
 - Automated partitioning with encryption
 
-
 **Desktop**
 
 - Zenith Wayland compositor POC
 - Low-end fallback compositor
 - XWayland compatibility layer
-
 
 ### Month 4–5
 
@@ -796,13 +704,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Delta updates implementation
 - Rollback system
 
-
 **Build Infrastructure**
 
 - Start reproducible build farm POC
 - SBOM generation pipeline
 - Containerized deterministic builders
-
 
 ### Month 6
 
@@ -812,13 +718,11 @@ SigmaOS will surpass Arch, Fedora, Kali, Ubuntu, NixOS, and Qubes by combining t
 - Per-app network policies
 - MAC policies by default
 
-
 **Ecosystem**
 
 - Ship persona bundles (Developer, Data, Security)
 - Offline docs/AI runtime v0.1
 - App store with signed applications
-
 
 ## Repo, Docs, and Community Actions
 
@@ -839,14 +743,12 @@ Add and commit these .md files to docs/:
 - Community_Governance.md
 - Strategic_Roadmap.md (this document)
 
-
 ### CI Policy
 
 - Protect main branch
 - Require PRs with passing CI
 - CI gates: build, reproducibility, SBOM, CVE scan
 - Automated testing on HCL hardware
-
 
 ### Issue Triage
 
@@ -855,7 +757,6 @@ Add and commit these .md files to docs/:
 - Assign mentors to new contributors
 - Track issue resolution time
 
-
 ### Performance Tests
 
 - Add automated benchmarks to CI
@@ -863,14 +764,12 @@ Add and commit these .md files to docs/:
 - Publish results in the Wiki
 - Track performance regressions
 
-
 ### Driver Bounties and Partnerships
 
 - Fund upstreaming of critical drivers
 - Partner with hardware vendors for certification
 - Create driver development bounties
 - Establish hardware testing program
-
 
 ## Conclusion
 

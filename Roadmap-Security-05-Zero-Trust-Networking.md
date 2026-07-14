@@ -6,7 +6,6 @@ Every network connection requires cryptographic mutual authentication.
 - WireGuard mesh for all inter-process network calls
 - mTLS enforcement for all user-facing services
 
-
 ## Key Milestones
 
 - [ ] WireGuard kernel module integration

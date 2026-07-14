@@ -16,7 +16,7 @@ The Sovereign Constitution defines the unalterable rights of the User and the im
 
 ## Article II: Transparent Execution
 
-**Section 1.** The system shall maintain a cryptographically verifiable Audit Log (the Forensic Ring) of all state changes, capability grants, and IPC communications. 
+**Section 1.** The system shall maintain a cryptographically verifiable Audit Log (the Forensic Ring) of all state changes, capability grants, and IPC communications.
 
 **Section 2.** "Black box" execution is strictly prohibited within Core and Security shards. All AI and ML models utilized by the system must be open-weights and run entirely locally.
 
@@ -28,7 +28,7 @@ The Sovereign Constitution defines the unalterable rights of the User and the im
 
 ## Article IV: The Principle of Least Privilege
 
-**Section 1.** No process, shard, or user shall be granted more capabilities than strictly necessary to perform its stated function. 
+**Section 1.** No process, shard, or user shall be granted more capabilities than strictly necessary to perform its stated function.
 
 **Section 2.** The Root (Administrator) account is a concept of the past. Administrative actions require specific capability tokens, issued dynamically and audited permanently.
 

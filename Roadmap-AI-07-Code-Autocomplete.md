@@ -6,7 +6,6 @@ Provide offline code completion in the Zenith text editor using CodeLlama.
 - CodeLlama-7B-Q4 inference inside the editor process
 - Language Server Protocol (LSP) stub for Rust, Python, C
 
-
 ## Key Milestones
 
 - [ ] LSP server stub in Rust

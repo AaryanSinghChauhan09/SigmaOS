@@ -10,15 +10,11 @@ The Energy Scientist Profile is designed for energy research excellence, renewab
 
 - **SigmaRenewable**: Renewable energy research and optimization.
 
-
 - **SigmaGrid**: Smart grid management and analysis.
-
 
 - **SigmaStorage**: Energy storage research and testing.
 
-
 - **SigmaEfficiency**: Energy efficiency analysis and reporting.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Energy Scientist Profile is designed for energy research excellence, renewab
 
 - **Theme**: Energy Yellow (Research Standard)
 
-
 - **Layout**: Energy Dashboard (Renewable, Grid, Storage)
 
-
 - **Personalization**: Custom energy models and automated monitoring.
-
 
 ---
 

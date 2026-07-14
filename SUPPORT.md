@@ -16,12 +16,9 @@ https://github.com/AaryanSinghChauhan09/SigmaOS/issues
 
 - Search existing issues first
 
-
 - Check [CURRENT_PROBLEMS_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST.md) \x97 your issue may already be tracked
 
-
 - Use the appropriate issue template (bug, feature, driver request, docs)
-
 
 ### Wiki
 

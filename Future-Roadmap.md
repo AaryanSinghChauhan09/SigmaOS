@@ -38,13 +38,11 @@
 - [ ] ACPI power management and suspend/resume
 - [ ] SMP scheduling with per-CPU runqueues
 
-
 #### Storage & Filesystem
 
 - [ ] OpenZFS / Btrfs CoW extent mapping → `sigmafs.rs`
 - [ ] `ext4` read-only compatibility mount
 - [ ] dm-verity root partition integrity checks
-
 
 #### Drivers
 
@@ -53,12 +51,10 @@
 - [ ] e1000 network, USB xHCI
 - [ ] Basic Intel / AMD GPU KMS support
 
-
 #### Security
 
 - [ ] Intel SGX secure enclave initialization
 - [ ] Firecracker microVM VMM integration
-
 
 **Exit Criteria:** Boot to Zenith Desktop in QEMU with VirtIO-GPU; NVMe validated; UEFI secure boot enabled.
 
@@ -77,7 +73,6 @@
 - [ ] WASM / WASI runtime with capability-limited execution
 - [ ] Unified absorption of `.deb`, `.rpm`, Flatpak, Snap formats
 
-
 #### Desktop & Compositor
 
 - [ ] i3 / AwesomeWM-style dynamic tiling layout engine in Zenith
@@ -86,13 +81,11 @@
 - [ ] polybar-style system status bars with live telemetry widgets
 - [ ] Multi-monitor support and dynamic workspace tiling
 
-
 #### Accessibility
 
 - [ ] Screen reader integration
 - [ ] High-contrast and magnification themes
 - [ ] Voice command input (Whisper model bridge)
-
 
 **Exit Criteria:** Install 100+ packages via `sigpkg`; tiling layouts and blur compositing running on real GPU.
 
@@ -112,20 +105,17 @@
 - [ ] Lynis system audit rules embedded in Security Center Daemon
 - [ ] QubesOS-style per-app hardware-capability compartmentalization
 
-
 #### Cryptography & Identity
 
 - [ ] WireGuard-native VPN tunnel via `sigma_networkmanager.rs`
 - [ ] TPM2 measured boot attestation
 - [ ] `sigma-vault` (HashiCorp Vault-inspired secrets store)
 
-
 #### Observability
 
 - [ ] OpenTelemetry trace export from kernel IPC spans
 - [ ] Live CPU/Memory dashboard widget in Zenith Dock
 - [ ] Crash dump analysis via systemd-coredump equivalent
-
 
 **Exit Criteria:** All Lynis audit checks pass; GnuPG-signed rolling updates with automatic rollback verified.
 
@@ -144,7 +134,6 @@
 - [ ] OpenCog AtomSpace semantic network integration
 - [ ] mlpack C++ linear algebra acceleration bridging `sigma_math.rs`
 
-
 #### Data Science
 
 - [ ] DVC-backed automatic telemetry snapshot via SovereignFS CoW
@@ -152,13 +141,11 @@
 - [ ] Apache Spark-style distributed aggregation using shard IPC
 - [ ] Jupyter kernel stub for interactive sigma-notebook sessions
 
-
 #### Automation
 
 - [ ] `sigma_logic.rs` node expansion: HTTP trigger, file-watch, webhook
 - [ ] n8n-style visual workflow editor in Zenith apps
 - [ ] AI-powered bug explainer: translate kernel panics to plain language
-
 
 **Exit Criteria:** Natural language CLI demo working offline; 5+ data science algorithms benchmarked.
 
@@ -177,14 +164,12 @@
 - [ ] OpenForge e-Gov SDK pre-installed
 - [ ] BOSS Linux regional language UI profiles import
 
-
 #### Education
 
 - [ ] GeoGebra math visualization wrapper → Zenith Apps
 - [ ] Scilab / GNU Octave scientific computing CLI
 - [ ] OpenBoard digital whiteboard app
 - [ ] Offline freeCodeCamp + Exercism curriculum server (`sigma_academy.rs`)
-
 
 #### Professional Suites
 
@@ -193,7 +178,6 @@
 - [ ] GST / TDS calculator embedded in `sigma_finance.rs`
 - [ ] ERPNext one-click deployment via `sigpkg`
 - [ ] KeePassXC-equivalent `sigma-vault` credential manager
-
 
 **Exit Criteria:** Full Hindi UI; CBSE curriculum running offline; GST tools deployed in 1 command.
 
@@ -205,7 +189,6 @@
 - [ ] Contributor onboarding with "good-first-bug" issues
 - [ ] Transparent phase-wise voting on feature priorities
 - [ ] Contributor recognition: badges, credits, and sponsorships
-
 
 ---
 

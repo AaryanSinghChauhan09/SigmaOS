@@ -6,7 +6,6 @@ Provide an automated ML pipeline tool for data scientists running SigmaOS.
 - Dataset ingestion from sigma_db or CSV
 - Automatic feature engineering and model selection
 
-
 ## Key Milestones
 
 - [ ] Pipeline DSL inside sigma_logic.rs

@@ -14,7 +14,6 @@ To achieve absolute mathematical proof of security and memory safety, we propose
 - **Verification of PMM Page Allocation**: Formally verify the buddy allocator memory map state machine against double-free errors.
 - **Toolchain**: Write Coq specs in `modules/tools/verification/coq/` and run `gnatprove` on Ada kernel modules.
 
-
 ---
 
 ## 🔑 2. Full Post-Quantum Cryptographic Migration

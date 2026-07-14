@@ -6,7 +6,6 @@ Uncertainty-aware regression for OS workload prediction.
 - Squared Exponential and MatÃ©rn kernels
 - Online GP update for streaming telemetry
 
-
 ## Key Milestones
 
 - [ ] Kernel function dispatch enum

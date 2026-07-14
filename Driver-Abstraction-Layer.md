@@ -40,7 +40,6 @@ Drivers declare their capabilities using the `DriverCapability` enum:
 - `Hotplug` - Hot-plug support
 - `PowerManagement` - Power management features
 
-
 ### Driver Lifecycle
 
 Drivers follow a well-defined lifecycle:
@@ -51,7 +50,6 @@ Drivers follow a well-defined lifecycle:
 4. **Suspended** - Driver is suspended (power saving)
 5. **Failed** - Driver failed to initialize
 6. **Deprecated** - Driver marked as deprecated
-
 
 ## BaseDriver Implementation
 
@@ -74,7 +72,6 @@ To create a custom driver:
 3. Add driver-specific functionality
 4. Register with the driver registry
 
-
 ```rust
 pub struct MyCustomDriver {
     base: BaseDriver,
@@ -89,7 +86,7 @@ impl DeviceDriver for MyCustomDriver {
         // Custom initialization
         0
     }
-    
+
     // Implement other trait methods...
 }
 ```
@@ -113,7 +110,6 @@ pub struct DriverRegistry {
 - `initialize_all()` - Initialize all registered drivers
 - `shutdown_all()` - Shutdown all registered drivers
 
-
 ## Driver Categories
 
 ### GPU Drivers
@@ -122,13 +118,11 @@ pub struct DriverRegistry {
 - Supports OpenGL, Vulkan, DirectX
 - Power management and overclocking
 
-
 ### Network Drivers
 
 - `sigma_wifi.rs` - Native Wi-Fi driver
 - `sigma_ethernet.rs` - Ethernet driver
 - Support for various chipsets
-
 
 ### Storage Drivers
 
@@ -136,20 +130,17 @@ pub struct DriverRegistry {
 - `sigma_ahci.rs` - SATA/AHCI driver
 - Support for modern storage devices
 
-
 ### Input Drivers
 
 - PS/2 keyboard and mouse
 - USB HID devices
 - Touchpad and touchscreen support
 
-
 ### Audio Drivers
 
 - HDA (High Definition Audio)
 - ALSA compatibility layer
 - Support for various audio codecs
-
 
 ## Integration with Legacy Drivers
 
@@ -159,7 +150,6 @@ The abstraction layer provides compatibility shims for legacy drivers:
 2. **Legacy emulation** - Emulate old hardware interfaces
 3. **Capability mapping** - Map legacy features to modern capabilities
 
-
 ## Performance Considerations
 
 - Zero-copy operations where possible
@@ -167,14 +157,12 @@ The abstraction layer provides compatibility shims for legacy drivers:
 - DMA support for high-throughput devices
 - Lock-free data structures for driver statistics
 
-
 ## Security
 
 - All drivers run in kernel space with privilege checks
 - Capability-based access control
 - Secure DMA with IOMMU
 - Signed driver modules
-
 
 ## Testing
 
@@ -185,14 +173,12 @@ Driver testing framework provides:
 - Performance benchmarks
 - Fuzzing for robustness
 
-
 ## Future Enhancements
 
 - Hot-plug support for all device types
 - Power management integration
 - Driver sandboxing for user-space drivers
 - Live driver updates without reboot
-
 
 ## References
 

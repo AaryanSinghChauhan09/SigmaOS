@@ -20,34 +20,25 @@ throughput.
 
 - Employs atomic compare-and-swap (CAS) loops to defragment active slabs in constant O(1) time
 
-
 - Eliminates pause sweeps entirely
 
-
 - Implementation: `klib/sigma_slab_lockfree.cpp`
-
 
 ### Core-Local Cache Affinity
 
 - Dynamically maps core-local memory partitions to specific hardware threads
 
-
 - Prevents NUMA cross-talk and bus saturation
 
-
 - Implementation: `kernel/mm/sigma_numa_affinity.h`
-
 
 ### Microsecond Context Switching
 
 - Streamlines Ring-0 to Ring-3 transition vectors
 
-
 - Target: < 12 clock cycles for syscall dispatcher latency
 
-
 - Implementation: `arch/x86_64/syscall_entry.asm`
-
 
 ```text
 Current Linux context switch:  500–2000 ns
@@ -63,37 +54,27 @@ SigmaOS target:                  < 50 ns   (custom asm SYSCALL entry)
 
 - Integrates filesystem and virtual memory caches
 
-
 - Enables direct DMA transfers from block controllers to user space without intermediate copies
 
-
 - Implementation: `kernel/fs/sigma_ubc.h`
-
 
 ### Relativistic Journaling
 
 - Circular log-structured ring buffers
 
-
 - Transforms multiple directory writes into sequential disk sweeps
-
 
 - Reduces write amplification on flash storage
 
-
 - Implementation: `kernel/fs/sigmafs/sigma_journal.h`
-
 
 ### Pre-emptive Read-Ahead
 
 - Analyzes sequential block access histories to fetch subsequent sectors before IO dispatch
 
-
 - Adaptive: learns per-file access patterns via sigma-ai inference
 
-
 - Implementation: `kernel/fs/sigma_readahead.cpp`
-
 
 ---
 
@@ -103,12 +84,9 @@ SigmaOS target:                  < 50 ns   (custom asm SYSCALL entry)
 
 - Pre-allocates Vulkan command queues to submit display updates concurrently
 
-
 - No CPU render-lock waits
 
-
 - Frame pipeline:
-
 
 ```text
 App render → sigma-display protocol → Vulkan command buffer (triple) → DRM/KMS → display
@@ -119,23 +97,17 @@ Target latency: 1 frame (8.3ms @ 120Hz)
 
 - Replaces standard loops with SIMD-vectorized floating-point math
 
-
 - Desktop scaling updates rendered instantly
 
-
 - AVX-512 on x86; NEON on ARM
-
 
 ### Zero-Alloc UI Styling
 
 - Bypasses dynamic heap requests inside Sovereign Window Manager
 
-
 - Static memory buffers cache window textures and styles
 
-
 - Zero allocations on the hot render path
-
 
 ---
 
@@ -159,23 +131,17 @@ Target throughput (KEM operations/sec):
 
 - Asynchronous public key audits execute in the background
 
-
 - System boots while cryptography checks run concurrently — no blocking
 
-
 - Implementation: `crypto/SovereignDilithium5.cpp`
-
 
 ### Secure Shard Ring Buffers
 
 - Pre-allocated circular rings for PQC key exchanges
 
-
 - Removes heap allocation overhead in networking tools
 
-
 - Zero-copy key material via DMA-BUF sharing
-
 
 ---
 
@@ -196,34 +162,25 @@ Target throughput (KEM operations/sec):
 
 - Continuous input fuzzing across all 256 syscall vectors
 
-
 - Detects edge-case boundaries before production
 
-
 - Integration: AFL++ + libFuzzer hybrid
-
 
 ### Deterministic Regression Sweeps
 
 - Strict structural validations after every branch merge
 
-
 - Prevents regression drift
 
-
 - CI gate: `make check-regressions` must pass on every PR
-
 
 ### PQC Cryptographic Verification
 
 - Verifies Dilithium signatures across all active userland binaries
 
-
 - Integrated into sigma-pkg install pipeline
 
-
 - Every package verified before exec permission granted
-
 
 ---
 
@@ -261,34 +218,25 @@ Target throughput (KEM operations/sec):
 
 - Allocates execution threads to nearest physical CPU memory node
 
-
 - Reduces cross-socket bus contention on multi-NUMA systems
 
-
 - Path: `kernel/sched/sigma_numa.cpp` reads ACPI SRAT at boot
-
 
 ### Lock-Free Concurrency Primitives
 
 - CAS loops inside task scheduling queues
 
-
 - Eliminates spinlock pauses under high-contention workloads
 
-
 - Path: `klib/sigma_lockfree.h` — Michael-Scott queue + Treiber stack
-
 
 ### Microsecond Ring Transitions
 
 - Custom-optimized Assembly entry points for `SYSCALL` / `SYSRET`
 
-
 - Target: < 12 clock cycles for context switch overhead
 
-
 - Path: `arch/x86_64/syscall_entry.asm`
-
 
 ### Axis 2 — Code, Programs & System Customization
 
@@ -296,23 +244,17 @@ Target throughput (KEM operations/sec):
 
 - Compiles without GNU `libc` headers
 
-
 - Custom: `sigma_memcpy`, `sigma_strlen`, slab allocator, no `malloc`/`free` in kernel paths
 
-
 - Path: `klib/include/sigma_nanolib.h`
-
 
 ### Declarative Configuration Manager
 
 - Boots by parsing Dilithium-signed `Config.sigma` registry
 
-
 - Configures: network adapters, memory segments, GPU shards, service topology
 
-
 - Parser: `userland/ignite/sigma_ignite.cpp`
-
 
 ### Profile-Based Hot-Swap
 
@@ -344,29 +286,21 @@ SigmaOS Zenith compositor path:
 
 - AT-SPI2 accessibility tree with hardware audio output via sigma-audio
 
-
 - Indian language TTS via sigma-bhashini (offline, 22 languages)
-
 
 - No round-trip through speech-dispatcher
 
-
 - WCAG 2.2 AA compliant
-
 
 ### Declarative UI Engine
 
 - UI configs defined as lightweight JSON schemas
 
-
 - Users customize dashboard without touching C++ source
-
 
 - Hot-reload: changes apply within 200 ms
 
-
 - Path: `userland/gui/sigma_ui_engine.h`
-
 
 ---
 
@@ -441,12 +375,9 @@ SigmaOS SDF driver:         driver crash → sigma-heal restarts it → zero dat
 
 - Automatic profile selection (embedded / desktop / server / gaming)
 
-
 - Silicon-aware scheduler tuning (Atom vs. Core, Zen 3 vs. Zen 4)
 
-
 - PGO (Profile-Guided Optimization) target selection at package build time
-
 
 ---
 
@@ -592,9 +523,7 @@ SigmaOS exposes three API surfaces to application developers:
 
 1. sigma-syscall ABI      — direct syscall interface (C/C++/Rust)
 
-
 2. sigma-sdk              — high-level C++ SDK with profession-app bindings
-
 
 3. sigma-web API          — browser-accessible JS API (24 Web API drivers)
 
@@ -604,15 +533,11 @@ SigmaOS exposes three API surfaces to application developers:
 
 - Zero-dependency: links against `klib/sigma_nanolib.h`, not GNU libc
 
-
 - India Stack bindings: ABDM, GST, UPI, DigiLocker built into SDK
-
 
 - PQC-first: all network calls use ML-KEM by default
 
-
 - Profession contexts: `sigma_sdk_ca`, `sigma_sdk_doctor`, `sigma_sdk_farmer` pre-configure the right API set
-
 
 ### ABI Stability Policy
 
@@ -696,15 +621,11 @@ sigma-cli boot rollback                   # revert to last known-good boot
 
 - History with Dilithium-signed audit log (tamper-evident command history)
 
-
 - Tab completion for all sigma-cli subcommands
-
 
 - Inline India Stack shortcuts: `gst <amount>`, `upi <vpa> <amount>`
 
-
 - Profile-aware prompt: shows active profile, PQC status, audit mode
-
 
 ### Documentation
 
@@ -765,26 +686,19 @@ sigma-ai architecture:
 
 - AVX-512 (Intel/AMD) — 8–12× faster than scalar inference
 
-
 - ARM SVE2 (Cortex-X4, Neoverse) — 6–9× speedup
-
 
 - Qualcomm Hexagon DSP — target for sigma-ultra on JioPhone
 
-
 - NPU/Neural accelerators — sigma-dna detects and routes inference to accelerator if present
-
 
 ### AI-enhanced kernel features:
 
 - Predictive scheduler: sigma-ai learns per-app CPU usage patterns, pre-warms scheduling state
 
-
 - Adaptive read-ahead: per-file access prediction from LLM inference rather than heuristics
 
-
 - sigma-ids anomaly detection: ML-based intrusion detection beyond signature matching
-
 
 ### Scalability
 
@@ -850,12 +764,9 @@ Critical for sigma-ultra devices and rural/edge deployments running on solar or 
 
 - `sigma-thermal`: reads ACPI thermal zones + hardware temperature sensors
 
-
 - Dynamic throttling before hitting thermal limits — avoids hard shutdowns
 
-
 - Per-core thermal state shared with sigma-ai scheduler for predictive throttle avoidance
-
 
 ---
 

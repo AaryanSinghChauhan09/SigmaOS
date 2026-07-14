@@ -43,7 +43,6 @@ This document provides guidelines for contributing to SigmaOS development.
 - Avoid `unwrap()` in production code
 - Use `Result` types for error handling
 
-
 ### Example Rust Code
 
 ```rust
@@ -65,7 +64,6 @@ pub fn example_function(input: u32) -> Result<u32, Error> {
 - Use snake_case for variables
 - Use PascalCase for types
 - Add doc comments
-
 
 ### Example Nim Code
 
@@ -249,7 +247,6 @@ cargo flamegraph
    - Add tests
    - Update documentation
 
-
 3. **Run Checks**
 
    ```bash
@@ -276,7 +273,6 @@ cargo flamegraph
 1. **Update Version**
    - Update `Cargo.toml` version
    - Update `CHANGELOG.md`
-
 
 2. **Tag Release**
 
@@ -305,14 +301,12 @@ cargo flamegraph
 2. Read the [Security Documentation](./SECURITY.md)
 3. Check existing issues and PRs
 
-
 ### Making Changes
 
 1. Keep changes focused and minimal
 2. Add tests for new functionality
 3. Update documentation
 4. Follow code style guidelines
-
 
 ### Submitting Changes
 
@@ -321,7 +315,6 @@ cargo flamegraph
 3. Make your changes
 4. Add tests and documentation
 5. Submit a pull request
-
 
 ## Project Structure
 
@@ -353,7 +346,6 @@ SigmaOS/
 3. Add to dispatch table
 4. Update documentation
 
-
 ### Adding a New Driver
 
 1. Create driver file in `kernel/drivers/`
@@ -361,14 +353,12 @@ SigmaOS/
 3. Register driver in init
 4. Add tests
 
-
 ### Adding a New Userland Application
 
 1. Create application directory
 2. Add `Cargo.toml`
 3. Implement application
 4. Add to workspace
-
 
 ## Troubleshooting
 
@@ -378,13 +368,11 @@ SigmaOS/
 - Update dependencies: `cargo update`
 - Clean build: `cargo clean`
 
-
 ### Test Failures
 
 - Run tests individually: `cargo test test_name`
 - Check test output: `cargo test -- --nocapture`
 - Enable backtrace: `RUST_BACKTRACE=1 cargo test`
-
 
 ### Runtime Errors
 
@@ -392,14 +380,12 @@ SigmaOS/
 - Enable serial logging
 - Use GDB for debugging
 
-
 ## Resources
 
 - [Rust Documentation](https://doc.rust-lang.org/)
 - [Nim Documentation](https://nim-lang.org/docs.html)
 - [UEFI Specification](https://uefi.org/specifications)
 - [x86_64 Architecture](https://software.intel.com/content/www/us/en/develop/articles/intel-sdm.html)
-
 
 ## Contact
 

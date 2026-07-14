@@ -6,7 +6,6 @@ Provide an offline mathematical reasoning SLM.
 - Parse equations into abstract syntax trees and output detailed step-by-step proofs.
 - Verify proofs mathematically via symbolic execution.
 
-
 ## Key Milestones
 
 - [ ] Math parser and tokeniser
@@ -25,7 +24,6 @@ Embed DNA and RNA sequences for offline bioinformatics research.
 
 - Run DNA-BERT models locally.
 - Extract functional region annotations from raw genomic sequences.
-
 
 ## Key Milestones
 

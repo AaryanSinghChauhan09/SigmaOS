@@ -10,15 +10,11 @@ The Architect Profile is designed for design excellence, building modeling, and 
 
 - **SigmaDesign**: Building design system with CAD integration and 3D modeling.
 
-
 - **SigmaStructural**: Structural analysis and engineering tools.
-
 
 - **SigmaProject**: Project management with timeline and budget tracking.
 
-
 - **SigmaCompliance**: Building code verification and regulatory compliance tools.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Architect Profile is designed for design excellence, building modeling, and 
 
 - **Theme**: Blueprint Blue (Architectural Standard)
 
-
 - **Layout**: Design Dashboard (Models, Analysis, Compliance)
 
-
 - **Personalization**: VR/AR visualization and gesture controls.
-
 
 ---
 

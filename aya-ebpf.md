@@ -180,8 +180,6 @@ fn panic(_: &core::panic::PanicInfo) -> ! { loop {} }
 
 - `sudo sigma-trace` attaches to `sys_enter` tracepoint and prints pid + syscall number for each syscall.
 
-
 - `sigma-ids --iface eth0` loads the XDP filter on eth0; `ping 203.0.113.1` times out (dropped).
-
 
 - `cargo build -p sigma-trace --target bpfel-unknown-none` succeeds.

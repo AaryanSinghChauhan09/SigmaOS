@@ -6,7 +6,6 @@ Integrate DeepSeek-Coder-1.3B for kernel and systems programming assistance.
 - Specialised for C/C++/Rust systems code
 - Best accuracy on OS-level code generation tasks
 
-
 ## Key Milestones
 
 - [ ] Context window up to 16K tokens

@@ -134,12 +134,9 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for technical mandates (Rust, no_std, no
 
 - **GitHub Issues** → [Report bugs / request features](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 
-
 - **GitHub Discussions** → [Ask questions / share ideas](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
 
-
 - **Wiki** → [Full documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-
 
 ---
 

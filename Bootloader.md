@@ -151,15 +151,11 @@ Planned: sigma-boot.efi will:
 
 1. Verify kernel ELF signature (Dilithium-5)
 
-
 2. Extend TPM PCR[0..4] with hashes of each boot stage
-
 
 3. Seal disk encryption key against PCR values
 
-
 4. Refuse to boot unsigned kernels
-
 
 ---
 

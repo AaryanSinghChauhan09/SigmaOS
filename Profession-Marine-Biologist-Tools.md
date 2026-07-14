@@ -10,15 +10,11 @@ The Marine Biologist Profile is designed for marine excellence, ocean research, 
 
 - **SigmaOcean**: Ocean research management and data collection.
 
-
 - **SigmaSpecies**: Marine species cataloging and tracking.
-
 
 - **SigmaEcosystem**: Ecosystem monitoring and analysis.
 
-
 - **SigmaConservation**: Conservation planning and impact assessment.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Marine Biologist Profile is designed for marine excellence, ocean research, 
 
 - **Theme**: Ocean Blue (Marine Standard)
 
-
 - **Layout**: Marine Dashboard (Ocean, Species, Ecosystem)
 
-
 - **Personalization**: Custom research protocols and automated monitoring.
-
 
 ---
 

@@ -11,7 +11,6 @@ SigmaOS's native filesystem (`sigma-fs`) absorbs the most valuable features from
 - **From Btrfs**: Copy-on-write snapshots, transparent compression, subvolumes, online defragmentation, send/receive for incremental backups
 - **From ZFS**: Data integrity checksumming (SHA-256), RAIDZ storage pools, deduplication, ARC-style adaptive caching, scrubbing
 
-
 `sigma-fs` is implemented in Rust with formal verification of critical data paths.
 
 ---

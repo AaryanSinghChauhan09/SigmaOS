@@ -20,15 +20,11 @@ All packages in the Sigma Store registry have:
 
 - Ed25519 or Dilithium-5 signatures
 
-
 - Declared capability requirements
-
 
 - A dependency graph
 
-
 - Atomic install/rollback via A/B staging
-
 
 ## COMMANDS
 
@@ -183,15 +179,11 @@ Every package in the Sigma Store is:
 
 1. Built reproducibly — bit-for-bit identical on all hardware
 
-
 2. Signed with Dilithium-5 (NIST FIPS 204) by the publisher
-
 
 3. Counter-signed by the Sigma Store registry CA
 
-
 4. Verified against the TPM PCR chain on install
-
 
 To manually verify a package signature:
 

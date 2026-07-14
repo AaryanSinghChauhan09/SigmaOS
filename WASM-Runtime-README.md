@@ -9,13 +9,11 @@ WASM gives SigmaOS a portable app format that is:
 
 1. **Architecture-neutral** — one binary runs on x86_64, ARM64, and RISC-V
 
-
 2. **Capability-sandboxed** — WASM modules can only access resources they
 
    have been explicitly granted
 
 1. **POSIX-free** — no libc needed
-
 
 ## Execution Model
 
@@ -27,11 +25,8 @@ WASM gives SigmaOS a portable app format that is:
 
 - [ ] WASM binary validator (MVP spec)
 
-
 - [ ] Interpreter (for boot, no JIT)
 
-
 - [ ] Cranelift-based JIT backend
-
 
 - [ ] WASI (WebAssembly System Interface) sovereign mapping

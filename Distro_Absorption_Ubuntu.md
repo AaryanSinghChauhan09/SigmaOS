@@ -1,76 +1,50 @@
-# Distro Absorption: Ubuntu Compatibility Layer
+# Distro Absorption: Ubuntu
 
-> **Status**: ✅ Absorbed | **Target Shards**: `SovereignAPT.shard`, `SovereignAppArmor.shard` | **Source Distro**: Ubuntu Linux
+## Overview
 
----
+Ubuntu is the most widely deployed Linux distribution for desktops, cloud instances, and IoT devices. Its success is driven by excellent hardware detection, cloud-init integration, Snap packaging, and the Debian package ecosystem.
 
-## 1. Executive Summary
+## Key Principles Absorbed
 
-Ubuntu's massive popularity stems from its broad software ecosystem centered around the Debian package format (`.deb` / APT) and its path-based AppArmor security containment model. For SigmaOS to replace Ubuntu, it must run Ubuntu applications seamlessly without introducing complex virtual machines or compromising microkernel security.
+### Cloud-Init & First-Boot Provisioning
 
-The Ubuntu compatibility layer is divided into two primary subsystems: `SovereignAPT.shard` for handling APT package index queries and extracting dependencies, and `SovereignAppArmor.shard` for parsing AppArmor profile paths and mapping them to SigmaOS Mandatory Access Control (MAC) capability rules.
+- Ubuntu's `cloud-init` system for automatic instance configuration is absorbed into SigmaOS's init subsystem.
+- Machine identity, network configuration, and package installation are declaratively specified.
+- SigmaOS replaces YAML-based cloud-init with native typed configuration structs.
 
----
+### Hardware Detection & Driver Management
 
-## 2. Technical Features & Absorption Strategy
+- Ubuntu's `ubuntu-drivers` tool for automatic GPU and peripheral detection is absorbed into the `sigma_drv` subsystem.
+- Hardware fingerprinting and driver binding occur at boot without external tooling.
 
-### 2.1 APT Package Interface (`SovereignAPT.shard`)
+### Snap / AppArmor Integration
 
-- **Ubuntu Concept**: APT interacts with remote deb repositories, downloads package packages, and resolves installation dependencies using the local `dpkg` database.
-- **Sovereign Implementation**: `SovereignAPT` parses deb package structures, mapping standard file layouts (`/usr`, `/bin`) to SigmaOS virtual namespace paths. Dependency graphs are resolved, and binaries are executed inside sandboxed compatibility zones.
+- Ubuntu's Snap confinement model (based on AppArmor profiles) is fully absorbed into `sigma_security`.
+- `SigmaProfile` provides path-based read/write/exec restrictions natively.
+- The `sigma_containers` `SandboxManager` replaces Snap's squashfs sandbox.
 
+### APT / dpkg Package Management
 
-### 2.2 AppArmor Security Engine (`SovereignAppArmor.shard`)
+- SigmaOS's `sigpkg` provides a superset of APT's dependency resolution.
+- The `tools/sigma_apt_compat_mesh.rs` compatibility layer enables migration from `.deb` packages.
 
-- **Ubuntu Concept**: AppArmor uses path-based rules to confine applications, restricting what directories and resources an executable can access.
-- **Sovereign Implementation**: Path-based profiles are parsed at load time. `SovereignAppArmor` translates these rules into microkernel capability tokens. When an application attempts an I/O system call, the kernel validates that the program presents the appropriate capability token.
+### Multipass & LXD
 
+- Ubuntu's lightweight VM/container tools are absorbed via `sigma_containers`.
+- `MicroVMEngine` replaces Multipass; `ContainerRuntime` replaces LXD.
 
----
+## Displaced Technologies
 
-## 3. Shard Architecture
+| Ubuntu Component | SigmaOS Replacement |
+| --- | --- |
+| cloud-init | Native typed init config |
+| ubuntu-drivers | `sigma_drv` hardware binding |
+| Snap + AppArmor | `sigma_security::SigmaProfile` + `sigma_containers::SandboxManager` |
+| APT / dpkg | `sigpkg` declarative resolver |
+| Multipass | `sigma_containers::MicroVMEngine` |
+| LXD | `sigma_containers::ContainerRuntime` |
+| Netplan | `sigma_net` native network config |
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│               UBUNTU ABSORPTION MATRIX                  │
-├─────────────────────────────────────────────────────────┤
-│  ┌───────────────────────┐   ┌───────────────────────┐  │
-│  │  SovereignAPT.shard   │   │SovereignAppArmor.shard│  │
-│  │ (APT & deb Package)   │   │ (Path-to-Cap Parser)  │  │
-│  └───────────┬───────────┘   └───────────┬───────────┘  │
-│              └─────────────┬─────────────┘              │
-│              ┌─────────────▼─────────────┐              │
-│              │    Lattice Compatibility  │              │
-│              │      Execution Sandbox    │              │
-│              └───────────────────────────┘              │
-└─────────────────────────────────────────────────────────┘
-```
+## Status
 
----
-
-## 4. Usage & Commands
-
-To test and simulate the Ubuntu absorption workflow:
-
-```powershell
-$ sigma distro list
-Σ [INFO] Sovereign Linux Distro Absorption Registry:
-
-  * Ubuntu       -> SovereignAPT.shard          [Active]  (APT package layer)
-
-  ...
-
-$ sigma distro absorb ubuntu
-Σ [INFO] Starting Deep-Lattice absorption of 'ubuntu' paradigm...
-Σ [INFO]   -> Loading SovereignAPT.shard...
-Σ [INFO]   -> Parsing deb-control schemas...
-Σ [SUCCESS] Ubuntu APT compatibility layer absorbed successfully!
-```
-
----
-
-## 5. Standards & Mapping
-
-- Debian Binary Package Format (deb) Specifications
-- AppArmor Profile Syntax Reference
-- FHS (Filesystem Hierarchy Standard) compatibility matrix in SigmaOS
+**Core Absorbed** — AppArmor profile model, container sandboxing, and package management are implemented. Cloud-init typed config and Netplan absorption are in progress.

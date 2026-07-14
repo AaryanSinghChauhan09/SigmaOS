@@ -4,15 +4,11 @@
 
 - **type** `string`
 
-
 - **subtype** `string`
-
 
 - **parameters** `Map<string, string>`
 
-
 - **essence** `string`
-
 
 ## `parseMIMEType(input)`
 
@@ -35,7 +31,6 @@ parseMIMEType('text/html; charset=gbk')
 Arguments:
 
 - **input** `string`
-
 
 Returns: `MIMEType|'failure'`
 
@@ -61,6 +56,5 @@ serializeAMimeType({
 Arguments:
 
 - **mimeType** `MIMEType`
-
 
 Returns: `string`

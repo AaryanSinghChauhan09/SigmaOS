@@ -6,7 +6,6 @@ Use active learning loops to discover optimal system limits (TCP window sizes, t
 - Query system configurations to find parameters that yield maximum throughput.
 - Target zero user intervention during optimization cycles.
 
-
 ## Key Milestones
 
 - [ ] Parameter configuration sampler

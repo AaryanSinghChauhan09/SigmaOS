@@ -20,7 +20,6 @@ The buddy allocator manages physical memory using the buddy system algorithm.
 - No heap allocations
 - Support for up to 1GB memory (262,144 frames)
 
-
 **Data Structures**:
 
 ```rust
@@ -69,14 +68,12 @@ pub unsafe fn sigma_buddy_get_total() -> u64;
 3. Mark block as allocated
 4. Update frame table
 
-
 **Free Algorithm**:
 
 1. Mark block as free
 2. Try to merge with buddy block
 3. If buddy is free, merge and repeat
 4. Add merged block to free list
-
 
 ### 2. Slab Allocator
 
@@ -90,7 +87,6 @@ The slab allocator manages kernel object allocation efficiently.
 - Efficient small object allocation
 - Cache management
 - Reduced fragmentation
-
 
 **Data Structures**:
 
@@ -132,7 +128,6 @@ The page table walker manages virtual memory and page tables.
 - Page mapping/unmapping
 - Permission management
 - Support for 4-level page tables
-
 
 **Data Structures**:
 
@@ -191,7 +186,6 @@ Kernel memory is allocated using:
 2. **Slab allocator** for small objects (structures, buffers)
 3. **Static allocation** for fixed-size data
 
-
 ### User Memory
 
 User memory is allocated using:
@@ -199,7 +193,6 @@ User memory is allocated using:
 1. **mmap system call** for memory regions
 2. **brk system call** for heap expansion
 3. **Anonymous mappings** for private memory
-
 
 ## Memory Protection
 
@@ -209,7 +202,6 @@ SigmaOS implements memory protection through:
 2. **User/supervisor mode**: Separate kernel and user space
 3. **Capability checks**: Memory access requires capabilities
 4. **NX bit**: No-execute bit for data pages
-
 
 ## Memory Optimization
 
@@ -277,7 +269,6 @@ When memory is low:
 3. Swap to disk (future)
 4. Kill low-priority processes (future)
 
-
 ## Future Enhancements
 
 ### Planned Features
@@ -288,14 +279,12 @@ When memory is low:
 4. **NUMA support**: Multi-socket systems
 5. **Memory hotplug**: Add/remove memory dynamically
 
-
 ### Research Areas
 
 1. **Automatic memory management**: Rust-style ownership in C
 2. **Persistent memory**: NVDIMM support
 3. **Heterogeneous memory**: HBM, CXL support
 4. **Memory tagging**: ARM MTE-style tagging
-
 
 ## Best Practices
 
@@ -307,7 +296,6 @@ When memory is low:
 4. Always check allocation return values
 5. Free memory when no longer needed
 
-
 ### For Userland Developers
 
 1. Use appropriate allocation sizes
@@ -315,7 +303,6 @@ When memory is low:
 3. Avoid fragmentation
 4. Use memory pools for frequent allocations
 5. Profile memory usage
-
 
 ## Troubleshooting
 
@@ -330,7 +317,6 @@ When memory is low:
 3. Reduce memory footprint
 4. Increase available memory
 
-
 ### Memory Corruption
 
 **Symptoms**: Crashes, unexpected behavior
@@ -342,7 +328,6 @@ When memory is low:
 3. Verify pointer arithmetic
 4. Use guard pages
 
-
 ### Fragmentation
 
 **Symptoms**: High memory usage, allocation failures
@@ -353,7 +338,6 @@ When memory is low:
 2. Reduce allocation size variance
 3. Compact memory
 4. Use memory pools
-
 
 ## References
 

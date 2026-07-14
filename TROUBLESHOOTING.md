@@ -127,20 +127,16 @@ This document provides solutions to common issues encountered when building, run
    - Check BIOS settings for UEFI mode
    - Disable Legacy/CSM boot
 
-
 2. Check Secure Boot:
    - Disable Secure Boot temporarily
    - Or sign the bootloader
 
-
 3. Verify boot order:
    - Set USB/CD as first boot device
-
 
 4. Try different USB ports:
    - USB 2.0 ports are more compatible
    - Avoid USB 3.0 ports if possible
-
 
 ### Kernel Panic
 
@@ -162,11 +158,9 @@ This document provides solutions to common issues encountered when building, run
    - Verify bootloader passes correct memory map
    - Check for memory region conflicts
 
-
 3. Verify kernel entry point:
    - Ensure kernel is loaded at correct address
    - Check ELF entry point matches expected
-
 
 ## Runtime Issues
 
@@ -180,16 +174,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify APIC/PIC initialization
    - Check interrupt handlers are registered
 
-
 2. Enable debug output:
    - Add serial console logging
    - Print debug messages at key points
 
-
 3. Check scheduler:
    - Verify task switching works
    - Check for deadlocks
-
 
 ### Memory Allocation Fails
 
@@ -201,7 +192,6 @@ This document provides solutions to common issues encountered when building, run
    - Verify initialization
    - Check free list integrity
 
-
 2. Increase available memory:
 
    ```bash
@@ -211,7 +201,6 @@ This document provides solutions to common issues encountered when building, run
 3. Check for memory leaks:
    - Verify allocations are freed
    - Check for double-free bugs
-
 
 ### Filesystem Errors
 
@@ -223,16 +212,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify filesystem is mounted
    - Check root directory exists
 
-
 2. Verify disk I/O:
    - Check disk driver is loaded
    - Verify disk is accessible
 
-
 3. Check permissions:
    - Verify capability checks
    - Check file permissions
-
 
 ## Development Issues
 
@@ -263,7 +249,6 @@ This document provides solutions to common issues encountered when building, run
 4. Check test environment:
    - Verify test dependencies
    - Check test configuration
-
 
 ### Clippy Warnings
 
@@ -306,10 +291,8 @@ This document provides solutions to common issues encountered when building, run
    - Ensure all public items have docs
    - Fix broken markdown
 
-
 3. Check external dependencies:
    - Some crates may have missing docs
-
 
 ## Network Issues
 
@@ -322,7 +305,6 @@ This document provides solutions to common issues encountered when building, run
 1. Check network driver:
    - Verify driver is loaded
    - Check device is recognized
-
 
 2. Configure network:
 
@@ -354,7 +336,6 @@ This document provides solutions to common issues encountered when building, run
    - Verify iwlwifi or mt7921 driver loaded
    - Check firmware is present
 
-
 2. Scan for networks:
 
    ```bash
@@ -379,16 +360,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify GOP/VESA initialization
    - Check framebuffer address
 
-
 2. Try text mode:
    - Disable framebuffer in bootloader
    - Use VGA text mode
 
-
 3. Check GPU driver:
    - Verify DRM/KMS driver loaded
    - Check GPU is recognized
-
 
 ### Display Corruption
 
@@ -400,16 +378,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify pixel format (RGB vs BGR)
    - Check bits per pixel
 
-
 2. Verify stride:
    - Ensure stride matches width
    - Check for alignment issues
 
-
 3. Test with different resolutions:
    - Try lower resolution
    - Check for memory bandwidth issues
-
 
 ## Security Issues
 
@@ -423,16 +398,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify process has required capabilities
    - Check capability derivation
 
-
 2. Review security policy:
    - Check MAC profile configuration
    - Verify Landlock rules
 
-
 3. Debug capability system:
    - Enable capability audit logging
    - Check capability derivation tree
-
 
 ### Permission Denied
 
@@ -444,16 +416,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify file mode bits
    - Check ownership
 
-
 2. Verify capabilities:
    - Check for CAP_CHOWN, CAP_DAC_OVERRIDE
    - Verify capability set is correct
 
-
 3. Review MAC policy:
    - Check Landlock filesystem rules
    - Verify seccomp filters
-
 
 ## Performance Issues
 
@@ -467,7 +436,6 @@ This document provides solutions to common issues encountered when building, run
    - Verify time slice quantum
    - Check for priority inversion
 
-
 2. Profile system:
 
    ```bash
@@ -477,7 +445,6 @@ This document provides solutions to common issues encountered when building, run
 3. Optimize hot paths:
    - Use inline assembly for critical code
    - Reduce allocations in hot paths
-
 
 ### High Memory Usage
 
@@ -489,16 +456,13 @@ This document provides solutions to common issues encountered when building, run
    - Verify allocations are freed
    - Check for reference cycles
 
-
 2. Optimize data structures:
    - Use smaller types where possible
    - Reduce padding in structs
 
-
 3. Enable memory compression:
    - Implement zswap/zram
    - Compress inactive pages
-
 
 ## Getting Help
 
@@ -517,7 +481,6 @@ If you encounter issues not covered here:
    - Provide error messages
    - Describe steps to reproduce
    - Include debug logs if available
-
 
 4. Join Discussions:
 
@@ -575,20 +538,17 @@ cat /var/log/syslog
 - Check for memory leaks
 - Reduce memory usage
 
-
 ### "Permission Denied"
 
 - Check file permissions
 - Verify capabilities
 - Review security policy
 
-
 ### "Device Not Found"
 
 - Check driver is loaded
 - Verify device is recognized
 - Check device tree
-
 
 ### "Connection Refused"
 

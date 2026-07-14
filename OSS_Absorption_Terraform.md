@@ -43,7 +43,6 @@ $ sigma provision plan
   + Install 4 packages
   + Enable sshd service
 
-
 $ sigma provision apply
 Σ [PROVISION] Applied. System state saved.
 ```

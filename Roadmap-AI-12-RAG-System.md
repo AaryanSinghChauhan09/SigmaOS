@@ -6,7 +6,6 @@ Ground LLM responses in local documents (man pages, wikis, code).
 - Vector store of chunked OS documentation in sigma_db
 - Top-K retrieval injected into LLM context window
 
-
 ## Key Milestones
 
 - [ ] Text chunking and embedding pipeline

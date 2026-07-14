@@ -6,7 +6,6 @@ Run genetic algorithms to automatically optimize prompt templates for local SLMs
 - Systematically mutate prompt wording to maximize LLM parse rate and JSON correctness.
 - Maintain a local leaderboard of prompt templates.
 
-
 ## Key Milestones
 
 - [ ] Prompt mutations generator
@@ -25,7 +24,6 @@ Construct a private relational graph of your local files, code projects, and tas
 
 - Graph database nodes and edges representing files, folders, commits, and meetings.
 - Fast subgraph search query engine.
-
 
 ## Key Milestones
 

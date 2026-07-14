@@ -6,7 +6,6 @@ Inject controlled noise into local database metrics to prevent reconstruction at
 - Strict mathematical epsilon-differential privacy bounds on all local system reports.
 - Support Laplace and Gaussian mechanism output transforms.
 
-
 ## Key Milestones
 
 - [ ] Noise generator (Laplace & Gaussian distributions)
@@ -27,7 +26,6 @@ Implement Sparse GP approximation methods to support continuous time-series mode
 
 - Reduce GP training complexity from O(NÂ³) to O(MÂ²N) where M is the number of inducing points.
 - Predict thread scheduling delays dynamically.
-
 
 ## Key Milestones
 

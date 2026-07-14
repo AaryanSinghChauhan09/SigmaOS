@@ -33,15 +33,11 @@ Self-healing actions:
 
 - Restart failed kernel threads
 
-
 - Flush and re-initialise corrupted driver state
-
 
 - Trigger OSTree A/B boot switch on unrecoverable faults
 
-
 - Write forensic log to immutable audit trail
-
 
 ---
 
@@ -122,18 +118,13 @@ A bootable recovery image (`sigma-rescue.iso`) will provide:
 
 - Full filesystem repair tools (`sigma-fsck`, `sigma-badblocks`)
 
-
 - Snapshot restore GUI
-
 
 - Forensic imaging (`sigma-dd`, `sigma-forensics`)
 
-
 - Network-accessible SSH recovery session
 
-
 - Factory reset option (wipes `/` but preserves `/data`)
-
 
 ---
 

@@ -13,7 +13,6 @@ SigmaOS is an AI-first microkernel operating system designed for modern hardware
 - Capability-based security model
 - Modular driver architecture
 
-
 ### AI-Native Design
 
 - Built-in AI orchestration and resource management
@@ -21,14 +20,12 @@ SigmaOS is an AI-first microkernel operating system designed for modern hardware
 - Self-healing capabilities with anomaly detection
 - Natural language to CLI translation
 
-
 ### Object-Oriented Programming
 
 - Rust traits for polymorphic interfaces
 - Struct-based abstractions for hardware devices
 - Type-safe driver development
 - Memory-safe kernel code
-
 
 ## Kernel Components
 
@@ -45,7 +42,6 @@ The scheduler manages CPU time allocation across processes using a round-robin a
 - Time quantum management
 - Task state tracking (Running, Ready, Blocked)
 - Load balancing across CPU cores
-
 
 **Data Structures:**
 
@@ -80,7 +76,6 @@ The memory management subsystem provides physical and virtual memory allocation.
 - Support for different page sizes (4KB, 2MB, 1GB)
 - Memory coalescing on free
 
-
 #### Slab Allocator
 
 **Location:** `kernel/mm/slab_allocator.rs`
@@ -90,7 +85,6 @@ The memory management subsystem provides physical and virtual memory allocation.
 - Reduced fragmentation for small objects
 - Fast allocation/deallocation
 
-
 #### Page Table Walker
 
 **Location:** `kernel/mm/page_table_walker.rs`
@@ -99,7 +93,6 @@ The memory management subsystem provides physical and virtual memory allocation.
 - Page table management
 - Memory protection flags
 - TLB management
-
 
 ### 3. Interrupt Handling
 
@@ -115,7 +108,6 @@ The interrupt handling subsystem manages hardware interrupts and exceptions.
 - Nested interrupt support
 - Interrupt affinity management
 
-
 ### 4. System Call Interface
 
 **Location:** `kernel/syscalls/syscall_dispatcher.rs`
@@ -129,7 +121,6 @@ The syscall interface provides controlled access to kernel services from user sp
 - IPC: pipe, socket, connect, bind, listen, accept
 - Memory: mmap, munmap, brk
 - Signal: sigaction, sigprocmask, kill
-
 
 ### 5. Filesystem Layer
 
@@ -146,7 +137,6 @@ The filesystem layer provides a unified interface for different filesystem types
 - Path resolution
 - File locking
 
-
 #### SigmaFS
 
 **Location:** `fs/sovereign_fs/`
@@ -156,7 +146,6 @@ The filesystem layer provides a unified interface for different filesystem types
 - Compression
 - Deduplication
 
-
 #### Ext2/3/4 Support
 
 **Location:** `fs/ext2.rs`
@@ -165,7 +154,6 @@ The filesystem layer provides a unified interface for different filesystem types
 - Journaling (ext3/4)
 - Extended attributes
 - ACLs
-
 
 ### 6. Driver Framework
 
@@ -193,14 +181,12 @@ pub trait Device {
 - EthernetPhy trait for PHY management
 - Supported: e1000e, r8169, virtio-net
 
-
 #### Storage Drivers
 
 **Location:** `drivers/storage/`
 
 - StorageDevice trait for storage devices
 - Supported: AHCI (SATA), NVMe, virtio-blk
-
 
 #### GPU Drivers
 
@@ -210,7 +196,6 @@ pub trait Device {
 - DRM/KMS layer for display management
 - Supported: amdgpu, i915, nouveau, virtio-gpu
 
-
 #### USB Drivers
 
 **Location:** `drivers/usb/`
@@ -218,14 +203,12 @@ pub trait Device {
 - UsbController trait for USB controllers
 - Supported: xHCI, EHCI, UHCI, OHCI
 
-
 #### Input Drivers
 
 **Location:** `drivers/input/`
 
 - InputDevice trait for input devices
 - Supported: PS/2 keyboard/mouse, HID, touchpads
-
 
 ### 7. Security Subsystem
 
@@ -242,7 +225,6 @@ The security subsystem provides access control and sandboxing.
 - Resource isolation
 - Policy enforcement
 
-
 #### Secure Boot
 
 **Location:** `boot/sigma_secureboot.rs`
@@ -251,7 +233,6 @@ The security subsystem provides access control and sandboxing.
 - Key management (PK, KEK, db, dbx)
 - Bootloader/kernel verification
 - TPM integration for measured boot
-
 
 ### 8. Cryptographic Primitives
 
@@ -266,7 +247,6 @@ The cryptographic subsystem provides essential crypto operations.
 - Ed25519-like signing
 - PGP key generation and management
 - Secure key derivation
-
 
 ### 9. AI Subsystem
 
@@ -283,7 +263,6 @@ The AI subsystem provides AI-native orchestration.
 - Anomaly detection
 - Self-healing
 
-
 #### Natural Language to CLI
 
 **Location:** `ai/nl2cli/sigma_nl2cli.rs`
@@ -293,7 +272,6 @@ The AI subsystem provides AI-native orchestration.
 - Command generation
 - Error explanation
 
-
 #### Error Explanation
 
 **Location:** `ai/error_explanation/sigma_error_explainer.rs`
@@ -302,7 +280,6 @@ The AI subsystem provides AI-native orchestration.
 - Root cause identification
 - Suggested fixes
 - Documentation generation
-
 
 ### 10. POSIX Compatibility Layer
 
@@ -318,7 +295,6 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - IPC (pipe, sockets)
 - Minimal libc subset (string, memory, I/O functions)
 
-
 ## Boot Process
 
 ### 1. UEFI Bootloader
@@ -330,7 +306,6 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Kernel loading
 - Handoff to kernel
 
-
 ### 2. Kernel Initialization
 
 - CPU initialization
@@ -339,7 +314,6 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Driver initialization
 - Filesystem mount
 - Init process spawn
-
 
 ### 3. Init System
 
@@ -350,7 +324,6 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Process supervision
 - System logging
 
-
 ## Inter-Process Communication
 
 ### Message Passing
@@ -359,19 +332,16 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Synchronous RPC
 - Shared memory regions
 
-
 ### Pipes
 
 - Anonymous pipes
 - Named pipes (FIFOs)
-
 
 ### Sockets
 
 - Unix domain sockets
 - TCP/IP sockets
 - UDP sockets
-
 
 ## Memory Layout
 
@@ -381,13 +351,11 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - 0xFFFF800000000000 - 0xFFFF800001000000: Physical memory map
 - 0xFFFF800002000000 - 0xFFFF800003000000: Device MMIO regions
 
-
 ### User Space
 
 - 0x0000000000000000 - 0x00007FFFFFFFFFFF: User code and data
 - 0x0000800000000000 - 0x0000FFFFFFFFFFFF: Shared libraries
 - 0xFFFF800000000000 - 0xFFFFFFFFFFFFFFFF: Kernel space
-
 
 ## Performance Optimizations
 
@@ -397,20 +365,17 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Per-CPU data structures
 - Atomic operations
 
-
 ### 2. Zero-Copy Operations
 
 - Direct memory access for I/O
 - Shared memory for IPC
 - Page flipping for graphics
 
-
 ### 3. Adaptive Scheduling
 
 - Priority inheritance
 - CPU affinity
 - Load balancing
-
 
 ## Security Features
 
@@ -420,7 +385,6 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - No global root user
 - Principle of least privilege
 
-
 ### 2. Memory Protection
 
 - Page-level protection
@@ -428,20 +392,17 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Stack canaries
 - NX bit enforcement
 
-
 ### 3. Secure Boot
 
 - Chain of trust verification
 - TPM measured boot
 - Kernel module signing
 
-
 ### 4. Sandbox Isolation
 
 - Process sandboxing
 - Filesystem namespace isolation
 - Network namespace isolation
-
 
 ## Debugging and Tracing
 
@@ -453,7 +414,6 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Per-component logging
 - Ring buffer for early boot logs
 
-
 ### Crash Analysis
 
 - Kernel panic handling
@@ -461,14 +421,12 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Memory dump generation
 - Post-mortem analysis
 
-
 ### Performance Profiling
 
 - CPU profiling
 - Memory profiling
 - I/O profiling
 - System call tracing
-
 
 ## Future Enhancements
 
@@ -478,13 +436,11 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Function hotpatching
 - Safe rollback
 
-
 ### 2. Heterogeneous Computing
 
 - GPU compute integration
 - FPGA acceleration
 - Neural processing units
-
 
 ### 3. Distributed Systems
 
@@ -492,14 +448,12 @@ The POSIX compatibility layer provides essential POSIX APIs for porting Unix/Lin
 - Distributed filesystem
 - Consensus algorithms
 
-
 ## References
 
 - [SigmaOS Architecture](../Architecture.md)
 - [Driver Development Guide](../drivers/DRIVER_DEVELOPMENT_GUIDE.md)
 - [POSIX Compatibility](../posix/README.md)
 - [Security Documentation](../docs/Security.md)
-
 
 ## License
 

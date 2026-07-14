@@ -6,7 +6,6 @@ Show WHY the AI made a decision, not just what it decided.
 - SHAP-like feature importance for ML classifiers
 - Attention map visualisation for LLM outputs
 
-
 ## Key Milestones
 
 - [ ] Shapley value approximation (sampling)

@@ -10,15 +10,11 @@ The Chemist Profile is designed for chemical excellence, laboratory management, 
 
 - **SigmaLab**: Laboratory management and inventory tracking.
 
-
 - **SigmaAnalysis**: Chemical analysis and spectroscopy tools.
-
 
 - **SigmaSynthesis**: Chemical synthesis and reaction monitoring.
 
-
 - **SigmaSafety**: Chemical safety compliance and hazard tracking.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Chemist Profile is designed for chemical excellence, laboratory management, 
 
 - **Theme**: Lab Green (Chemistry Standard)
 
-
 - **Layout**: Chemistry Dashboard (Lab, Analysis, Synthesis)
 
-
 - **Personalization**: Custom reaction protocols and automated safety alerts.
-
 
 ---
 

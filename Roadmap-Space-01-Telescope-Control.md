@@ -6,7 +6,6 @@ Control amateur telescopes via INDI protocol on SigmaOS.
 - INDI client for mount and camera control
 - Real-time sky chart overlay in Zenith
 
-
 ## Key Milestones
 
 - [ ] INDI XML protocol client

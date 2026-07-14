@@ -165,7 +165,6 @@ $ sigma find "my Python script that reads CSV and outputs charts"
 - Users can exclude directories via `~/.config/sigma/search-exclude.toml`
 - Index is fully user-owned; deleting it forces a full re-index
 
-
 ---
 
 ## 6. References & Standards

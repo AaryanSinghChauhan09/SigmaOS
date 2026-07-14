@@ -97,15 +97,11 @@ Moving from Linux to SigmaOS is designed to be zero-friction:
 
 1. **Dual boot** — install alongside your Linux distro ([Migration Guide](Migration-Guide))
 
-
 2. **Absorb packages** — `sigma-pkg absorb *.deb` converts your apps
-
 
 3. **Import dotfiles** — sigma-sh is POSIX-compatible, most scripts run as-is
 
-
 4. **Enhance** — use sigma-agent for automation, AI, security that Linux can't match
-
 
 ---
 

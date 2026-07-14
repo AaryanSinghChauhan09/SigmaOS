@@ -6,7 +6,6 @@ Allow SigmaOS machines to participate in privacy-preserving distributed training
 - Implement FedAvg aggregation protocol over IPC/network
 - Differential privacy noise injection
 
-
 ## Key Milestones
 
 - [ ] Local gradient computation module

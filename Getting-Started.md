@@ -157,15 +157,11 @@ SigmaOS/
 
 1. Check [12-Week-Milestone-Plan](12-Week-Milestone-Plan) for current priorities
 
-
 2. Look at [GITHUB_ISSUES.md](../docs/GITHUB_ISSUES.md) for open tasks
-
 
 3. Read [Linux-Parity-Roadmap](Linux-Parity-Roadmap) for what needs implementing
 
-
 4. Follow [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
-
 
 ---
 

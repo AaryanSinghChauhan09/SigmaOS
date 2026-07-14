@@ -76,12 +76,9 @@
 
 1. Open a [GitHub Discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) with label `idea`
 
-
 2. Or open a PR: add to `docs/IDEAS_1000.md` numbered from 1001
 
-
 3. One line per idea — spec detail in a separate `docs/` file
-
 
 ---
 

@@ -6,7 +6,6 @@ Orchestrate autonomous agent swarms running asynchronously across multiple local
 - Peer-to-peer task bidding using modified contract net protocol over WireGuard mesh.
 - Dynamic task decomposition and consensus verification (RAFT/Paxos-derived agent consensus).
 
-
 ## Key Milestones
 
 - [ ] P2P socket communication broker inside sigma_logic.rs

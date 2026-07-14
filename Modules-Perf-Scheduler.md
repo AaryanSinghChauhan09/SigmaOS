@@ -33,15 +33,11 @@ shard_spawn(SpawnRequest {
 
 - Lightweight LSTM trained on historical shard CPU/memory patterns
 
-
 - Runs in a sandboxed inference shard (no GPU required at boot)
-
 
 - Inference latency < 50 µs on baseline x86_64
 
-
 - Signals pre-warming of cache lines for known bursty workloads
-
 
 ## API Interface
 
@@ -72,31 +68,22 @@ void init_perf_scheduler(void);
 
 - [x] Round-Robin base scheduler
 
-
 - [x] EDF scheduler with deadline enforcement
-
 
 - [ ] RTLane preemption guarantees (< 5 µs verified)
 
-
 - [ ] NUMA topology detector integration
-
 
 - [ ] CPU frequency governor (P-state / DVFS)
 
-
 - [ ] AI prediction hook from `res_alloc_ai.rs`
-
 
 - [ ] Formal scheduling analysis (response-time analysis)
 
-
 - [ ] `schedtool`-compatible CLI for shard priority adjustment
-
 
 ## Related Modules
 
 - [`modules/core/kernel`](../../core/kernel/README.md) — Kernel scheduler host
-
 
 - [`modules/perf/bench`](../bench/README.md) — Context-switch benchmark

@@ -24,7 +24,6 @@
 - [ ] Note cron jobs: `crontab -l > my_cron.txt`
 - [ ] Note systemd services: `systemctl list-units --type=service --state=running`
 
-
 ---
 
 ## Installation

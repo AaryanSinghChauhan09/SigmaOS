@@ -6,7 +6,6 @@ Generate beautiful desktop color palettes and themes using text diffusion.
 - Custom mini diffusion model for generating consistent UI asset files.
 - Under 2-second generation times.
 
-
 ## Key Milestones
 
 - [ ] Palette diffusion model loader

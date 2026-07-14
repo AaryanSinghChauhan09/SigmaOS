@@ -2,8 +2,8 @@
 
 ## Making opencontainers/runc Irrelevant
 
-> **Absorption Target**: https://github.com/opencontainers/runc  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/opencontainers/runc
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaContainer - Native OCI Runtime with runc Compatibility
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed runc by implementing a native OCI runtime dir
 
 ### 1. OCI Runtime
 
-**Original**: runc's OCI-compliant runtime  
+**Original**: runc's OCI-compliant runtime
 **SigmaOS**: Native OCI runtime with OS integration
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
-
 ### 2. Spec Parsing
 
-**Original**: runc's OCI spec parsing  
+**Original**: runc's OCI spec parsing
 **SigmaOS**: Native spec parsing with enhanced features
 
 **Spec Features**:
@@ -54,10 +53,9 @@ pub struct SigmaContainer {
 - Spec composition with inheritance
 - Spec monitoring with real-time metrics
 
-
 ### 3. Namespace Management
 
-**Original**: runc's namespace creation  
+**Original**: runc's namespace creation
 **SigmaOS**: Native namespace management with enhanced features
 
 **Namespace Features**:
@@ -69,10 +67,9 @@ pub struct SigmaContainer {
 - Namespace composition with inheritance
 - Namespace validation with automatic checking
 
-
 ### 4. Cgroup Management
 
-**Original**: runc's cgroup configuration  
+**Original**: runc's cgroup configuration
 **SigmaOS**: Native cgroup management with enhanced features
 
 **Cgroup Features**:
@@ -84,10 +81,9 @@ pub struct SigmaContainer {
 - Cgroup composition with inheritance
 - Cgroup validation with automatic checking
 
-
 ### 5. Process Management
 
-**Original**: runc's process lifecycle  
+**Original**: runc's process lifecycle
 **SigmaOS**: Native process management with enhanced features
 
 **Process Features**:
@@ -99,10 +95,9 @@ pub struct SigmaContainer {
 - Process composition with inheritance
 - Process validation with automatic checking
 
-
 ### 6. Root Filesystem
 
-**Original**: runc's rootfs setup  
+**Original**: runc's rootfs setup
 **SigmaOS**: Native rootfs management with enhanced features
 
 **Rootfs Features**:
@@ -113,7 +108,6 @@ pub struct SigmaContainer {
 - Rootfs profiles with automatic switching
 - Rootfs composition with inheritance
 - Rootfs validation with automatic checking
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaContainer {
 pub mod oci {
     use sigma_container::runtime::OCIRuntime;
     use sigma_container::spec::SpecParser;
-    
+
     pub struct SigmaContainer {
         oci_runtime: OCIRuntime,
         spec_parser: SpecParser,
         namespace_manager: NamespaceManager,
     }
-    
+
     impl SigmaContainer {
         pub fn create_container(&self, spec_path: Path) -> Container {
             // Native OCI container creation
@@ -168,7 +162,7 @@ pub mod spec {
         spec_validator: SpecValidator,
         spec_optimizer: SpecOptimizer,
     }
-    
+
     impl SpecParser {
         pub fn parse(&self, spec_path: Path) -> OCISpec {
             // Native spec parsing

@@ -6,7 +6,6 @@ Automatically detect, diagnose, and repair OS configuration drift using ML.
 - Baseline config snapshot on every boot
 - Drift detection with cosine similarity comparison
 
-
 ## Key Milestones
 
 - [ ] Config serialisation to sigma_db

@@ -262,15 +262,11 @@ Plus from previous round (already committed):
 
 - `sigma-cs` Company Secretary header
 
-
 - `sigma-sebi` SEBI professionals header
-
 
 - `sigma-textile` Textile industry header
 
-
 - `sigma-trust` Religious institutions header
-
 
 ---
 

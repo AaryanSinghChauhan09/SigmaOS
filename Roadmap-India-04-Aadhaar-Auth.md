@@ -6,7 +6,6 @@ Offline Aadhaar QR code verification for identity authentication.
 - Offline Aadhaar XML parser and signature verify
 - Biometric stub for fingerprint matching
 
-
 ## Key Milestones
 
 - [ ] Aadhaar XML signature (XML-DSig) verification

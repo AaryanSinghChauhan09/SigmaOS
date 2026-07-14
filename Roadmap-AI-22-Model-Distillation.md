@@ -6,7 +6,6 @@ Compress large teacher models into tiny student models optimised for SigmaOS har
 - Knowledge Distillation (KD) training loop on local GPU
 - Student model 10x smaller than teacher with <5% accuracy loss
 
-
 ## Key Milestones
 
 - [ ] Teacher logit extraction pipeline

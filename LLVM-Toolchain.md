@@ -145,8 +145,6 @@ llvm-bolt sigma-kernel.elf \
 
 - `make sigma-kernel.elf CFLAGS="-Os -flto=thin"` succeeds; binary is ≥10% smaller than non-LTO build.
 
-
 - `clang --target=aarch64-linux-musl -Os kernel/main.c` cross-compiles without errors.
-
 
 - BOLT-optimized kernel boots in QEMU and shows reduced cold-start time in benchmarks.

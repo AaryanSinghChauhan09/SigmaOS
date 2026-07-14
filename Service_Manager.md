@@ -11,7 +11,6 @@ SigmaOS features a lightweight, dependency-aware service manager (`sigmad`) writ
 3. **Dependency tracking**: Directed Acyclic Graph (DAG) for parallel startup.
 4. **Self-healing**: Auto-restart on failure, crash rollback, and anomaly scoring.
 
-
 ```mermaid
 graph TD
     A[Bootloader] --> B[sigmad PID 1]

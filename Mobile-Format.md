@@ -21,12 +21,9 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 - `kernel/core/vis/SovereignVis.cpp`
 
-
 - `userland/ZenithDesktop.cpp`
 
-
 - `kernel/core/ui/SovereignWM.cpp`
-
 
 ---
 
@@ -34,8 +31,6 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 - [ ] Calibrate **ZenithCapture** for 60FPS recording.
 
-
 - [ ] Enforce **SovereignVault** rules for the browser sandbox.
-
 
 - [ ] Run **SovereignPDF** attestation on all financial shards.

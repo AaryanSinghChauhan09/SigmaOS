@@ -16,7 +16,6 @@ This document provides actionable solutions for known issues and tracks quality 
 - **PR**: #142 | **Anomaly**: ANOMALY-0001
 - **Status**: ✅ Fixed
 
-
 ### FIX-002: AMD Zen 4 Thermal Sensor Mismatch
 
 - **Issue**: HAL reporting Tctl instead of Tdie (15°C offset)
@@ -24,7 +23,6 @@ This document provides actionable solutions for known issues and tracks quality 
 - **Fix**: Family 19h → read Tdie directly
 - **PR**: #178 | **Anomaly**: ANOMALY-0002
 - **Status**: ✅ Fixed
-
 
 ### FIX-003: cgroup Memory Accounting After Restart
 
@@ -34,7 +32,6 @@ This document provides actionable solutions for known issues and tracks quality 
 - **PR**: #201 | **Anomaly**: ANOMALY-0003
 - **Status**: ✅ Fixed
 
-
 ### FIX-004: sigpkg Dry-Run Database Mutation
 
 - **Issue**: `--dry-run` modifying on-disk package database
@@ -42,7 +39,6 @@ This document provides actionable solutions for known issues and tracks quality 
 - **Fix**: Gate all mutations behind `DryRun::is_live()`
 - **PR**: #234 | **Anomaly**: ANOMALY-0004
 - **Status**: ✅ Fixed
-
 
 ### FIX-005: sigma-bus Ring-Buffer Stall
 
@@ -52,7 +48,6 @@ This document provides actionable solutions for known issues and tracks quality 
 - **PR**: #267 | **Anomaly**: ANOMALY-0005
 - **Status**: ✅ Fixed
 
-
 ### FIX-006: Dilithium5 ARM64 Alignment Fault
 
 - **Issue**: Package verification failing for >16MB packages on ARM64
@@ -60,7 +55,6 @@ This document provides actionable solutions for known issues and tracks quality 
 - **Fix**: `#[repr(align(16))]` + compile-time assertion
 - **PR**: #299 | **Anomaly**: ANOMALY-0006
 - **Status**: ✅ Fixed
-
 
 ---
 
@@ -73,14 +67,12 @@ This document provides actionable solutions for known issues and tracks quality 
 - **PR**: #331 | **Anomaly**: ANOMALY-0008
 - **Status**: ✅ Fixed (+18% compile throughput)
 
-
 ### FIX-008: Wiki Deduplication
 
 - **Issue**: sigma_automation.sh creating duplicate wiki pages
 - **Fix**: `--dedup` flag + cleanup script
 - **PR**: #312 | **Anomaly**: ANOMALY-0007
 - **Status**: ✅ Fixed
-
 
 ---
 

@@ -6,7 +6,6 @@ Incorporate Falcon Lite 1B as a low-memory OS orchestration fallback.
 - Optimise attention key-value caching to support multiple concurrent users on minimal RAM.
 - Strict sub-2GB RAM allocation boundary.
 
-
 ## Key Milestones
 
 - [ ] KV-cache quantization to 4-bit

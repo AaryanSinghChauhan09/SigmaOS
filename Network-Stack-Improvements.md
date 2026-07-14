@@ -11,11 +11,9 @@ The SovereignNetStack has been enhanced with proper cryptographic hashing for fi
 - **Previous**: Placeholder additive hashing using simple byte addition
 - **Current**: Proper BLAKE3 cryptographic hashing using `blake3::Hasher`
 
-
 #### 2. Dependency Addition
 
 - Added `blake3 = "1.5"` to `sovereign_netstack/Cargo.toml`
-
 
 ### Implementation Details
 
@@ -28,21 +26,21 @@ fn generate_rule_id(
     protocol: &Option<Protocol>,
 ) -> [u8; 32] {
     use blake3::{hash, Hasher};
-    
+
     let mut hasher = Hasher::new();
-    
+
     if let Some(ip) = source_ip {
         hasher.update(format!("{}", ip).as_bytes());
     }
-    
+
     if let Some(ip) = dest_ip {
         hasher.update(format!("{}", ip).as_bytes());
     }
-    
+
     if let Some(proto) = protocol {
         hasher.update(&[proto.as_u8()]);
     }
-    
+
     hasher.finalize().into()
 }
 ```
@@ -54,7 +52,6 @@ fn generate_rule_id(
 - **Performance**: BLAKE3 is optimized for both speed and security
 - **Consistency**: Matches SigmaOS cryptographic standards across the system
 
-
 ### Security Impact
 
 This improvement enhances the security posture of the network stack by:
@@ -62,7 +59,6 @@ This improvement enhances the security posture of the network stack by:
 - Preventing rule ID collisions that could be exploited
 - Providing cryptographically verifiable rule identifiers
 - Aligning with SigmaOS's post-quantum security requirements
-
 
 ## Future Enhancements
 

@@ -6,7 +6,6 @@ Integrate Falcon-1B for lightweight general reasoning tasks.
 - Falcon-1B Q4_K_M inference on 2GB RAM
 - Multi-query attention support in LLM backend
 
-
 ## Key Milestones
 
 - [ ] MQA attention mechanism support

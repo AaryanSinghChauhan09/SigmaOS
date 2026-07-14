@@ -11,7 +11,6 @@ SigmaOS avoids the complexity of eBPF, opting instead for a static tracepoint sy
 - **Tracepoints:** Placed at context switches, page faults, and syscall boundaries.
 - **Ring Buffer:** Trace events are dumped into a lockless per-CPU ring buffer in physical memory.
 
-
 ## 3. Metrics and the Prometheus Client
 
 - A lightweight, native Prometheus exporter daemon (`sigma-prom-agent`) runs as a low-priority system service.
@@ -20,7 +19,6 @@ SigmaOS avoids the complexity of eBPF, opting instead for a static tracepoint sy
   - Cache hit ratios (`sigma_ubc.rs`).
   - Slab allocator fragmentation.
   - MicroVM CPU quota throttling events.
-
 
 ## 4. Telemetry and Auto-Rollback
 

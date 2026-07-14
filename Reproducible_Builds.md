@@ -13,7 +13,6 @@ SigmaOS enforces 100% deterministic builds across its entire package ecosystem. 
 - **Transparency**: Make build process auditable and verifiable
 - **Cross-Verification**: Multiple independent builds for verification
 
-
 ## Deterministic Pipeline Flow
 
 ```text
@@ -105,11 +104,11 @@ use sha2::{Sha256, Digest};
 pub fn verify_binary_determinism(path_a: &Path, path_b: &Path) -> Result<bool, io::Error> {
     let bytes_a = fs::read(path_a)?;
     let bytes_b = fs::read(path_b)?;
-    
+
     if bytes_a.len() != bytes_b.len() {
         return Ok(false);
     }
-    
+
     Ok(bytes_a == bytes_b)
 }
 
@@ -123,9 +122,9 @@ pub fn compute_file_hash(path: &Path) -> Result<String, io::Error> {
 pub fn compare_builds(build_a: &Path, build_b: &Path) -> Result<BuildComparison, BuildError> {
     let files_a = collect_files(build_a)?;
     let files_b = collect_files(build_b)?;
-    
+
     let mut comparison = BuildComparison::new();
-    
+
     for file in files_a.keys() {
         if let Some(hash_a) = files_a.get(file) {
             if let Some(hash_b) = files_b.get(file) {
@@ -137,13 +136,13 @@ pub fn compare_builds(build_a: &Path, build_b: &Path) -> Result<BuildComparison,
             }
         }
     }
-    
+
     for file in files_b.keys() {
         if !files_a.contains_key(file) {
             comparison.add_missing_in_a(file.clone());
         }
     }
-    
+
     Ok(comparison)
 }
 ```
@@ -168,16 +167,16 @@ impl DeterministicCompiler {
             timezone: "UTC".to_string(),
         }
     }
-    
+
     pub fn compile(&self, source: &Path, output: &Path) -> Result<(), BuildError> {
         let mut cmd = Command::new("gcc");
-        
+
         // Set deterministic flags
         cmd.env("SOURCE_DATE_EPOCH", self.source_date_epoch.to_string());
         cmd.env("LANG", &self.locale);
         cmd.env("LC_ALL", &self.locale);
         cmd.env("TZ", &self.timezone);
-        
+
         // Deterministic compilation flags
         cmd.arg("-O2")
            .arg("-fno-strict-aliasing")
@@ -189,16 +188,16 @@ impl DeterministicCompiler {
            .arg("-ffile-prefix-map=./=")
            .arg("-g0") // No debug symbols
            .arg("-s");  // Strip
-        
+
         cmd.arg("-o").arg(output);
         cmd.arg(source);
-        
+
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(BuildError::CompilationFailed(String::from_utf8_lossy(&output.stderr).to_string()));
         }
-        
+
         Ok(())
     }
 }
@@ -222,16 +221,16 @@ impl SBOMGenerator {
             hash_algorithm: "sha256".to_string(),
         }
     }
-    
+
     pub fn generate(&self, package: &Package) -> Result<String, SBOMError> {
         let sbom = match self.format {
             SBOMFormat::SPDX => self.generate_spdx(package)?,
             SBOMFormat::CycloneDX => self.generate_cyclonedx(package)?,
         };
-        
+
         Ok(serde_json::to_string_pretty(&sbom)?)
     }
-    
+
     fn generate_spdx(&self, package: &Package) -> Result<serde_json::Value, SBOMError> {
         let sbom = json!({
             "SPDXID": "SPDXRef-DOCUMENT",
@@ -256,7 +255,7 @@ impl SBOMGenerator {
                 }]
             }]
         });
-        
+
         Ok(sbom)
     }
 }
@@ -312,23 +311,23 @@ impl BuildWorker {
         }
         Ok(())
     }
-    
+
     async fn process_build_task(&mut self, task: BuildTask) -> Result<(), WorkerError> {
         // Create isolated build environment
         let build_env = self.create_build_environment(&task)?;
-        
+
         // Build package
         let build_result = self.build_package(&task, build_env).await?;
-        
+
         // Verify determinism
         self.verify_determinism(&build_result)?;
-        
+
         // Generate SBOM
         let sbom = self.generate_sbom(&task, &build_result)?;
-        
+
         // Store artifacts
         self.store_artifacts(&task, &build_result, &sbom).await?;
-        
+
         Ok(())
     }
 }
@@ -345,7 +344,6 @@ impl BuildWorker {
 - Verify SBOM consistency
 - Detect build non-determinism
 
-
 ```rust
 // build-farm/src/verifier.rs
 pub struct BuildVerifier {
@@ -355,13 +353,13 @@ pub struct BuildVerifier {
 impl BuildVerifier {
     pub async fn cross_verify(&self, package: &Package) -> Result<VerificationResult, VerificationError> {
         let mut build_results = Vec::new();
-        
+
         // Build on multiple workers
         for worker in &self.workers {
             let result = worker.build_package(package).await?;
             build_results.push(result);
         }
-        
+
         // Compare results
         let mut all_match = true;
         for i in 1..build_results.len() {
@@ -370,7 +368,7 @@ impl BuildVerifier {
                 break;
             }
         }
-        
+
         Ok(VerificationResult {
             package: package.clone(),
             all_match,
@@ -406,7 +404,6 @@ diffoscope --text diff.txt build1/ build2/
 3. **Build Isolation**: Build in isolated containers
 4. **Verification**: Always verify builds against references
 
-
 ### CI/CD
 
 1. **Automated Verification**: Verify reproducibility in CI
@@ -414,14 +411,12 @@ diffoscope --text diff.txt build1/ build2/
 3. **Artifact Storage**: Store build artifacts with metadata
 4. **Monitoring**: Monitor build reproducibility metrics
 
-
 ### Security
 
 1. **Supply Chain Security**: Verify all dependencies
 2. **Signature Verification**: Sign all build artifacts
 3. **Audit Trail**: Maintain complete build logs
 4. **Transparency**: Make build process public
-
 
 ## Troubleshooting
 
@@ -437,7 +432,6 @@ diffoscope --text diff.txt build1/ build2/
    - Fix: Use deterministic build order
 4. Filesystem differences
    - Fix: Use containerized builds
-
 
 **Debugging Steps**:
 
@@ -469,14 +463,12 @@ env | sort
 - Basic deterministic compilation
 - Container-based builds
 
-
 ### Phase 2 (Months 3-6)
 
 - SPDX-compliant SBOM generator
 - Integration with sigpkg-build
 - GPG signing of SBOMs
 - SBOM database
-
 
 ### Phase 3 (Months 6-9)
 
@@ -485,14 +477,12 @@ env | sort
 - Automated reproducibility testing
 - Build farm orchestration
 
-
 ### Phase 4 (Months 9-12)
 
 - System-wide verification policies
 - Prevent installation of unsigned packages
 - Advanced threat detection
 - Community verification program
-
 
 ## References
 

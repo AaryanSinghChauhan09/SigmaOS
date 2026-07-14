@@ -10,15 +10,11 @@ The Statistician Profile is designed for statistical excellence, data analysis, 
 
 - **SigmaAnalysis**: Statistical analysis and modeling tools.
 
-
 - **SigmaData**: Dataset management and preprocessing.
-
 
 - **SigmaVisualization**: Statistical visualization and reporting.
 
-
 - **SigmaSimulation**: Monte Carlo simulation and modeling.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Statistician Profile is designed for statistical excellence, data analysis, 
 
 - **Theme**: Statistics Blue (Research Standard)
 
-
 - **Layout**: Statistics Dashboard (Analysis, Data, Visualization)
 
-
 - **Personalization**: Custom statistical models and automated analysis.
-
 
 ---
 

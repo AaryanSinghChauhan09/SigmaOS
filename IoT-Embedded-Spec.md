@@ -55,7 +55,6 @@
 - RTOS scheduler with 64 priority levels
 - Footprint: ~150 KB flash
 
-
 ### `sigma-atom-micro` (SBC target)
 
 - RAM: ≥ 128 MB
@@ -65,7 +64,6 @@
 - Footprint: ~32 MB
 - OTA update support
 
-
 ### `sigma-atom-industrial` (Industrial target)
 
 - RAM: ≥ 512 MB
@@ -73,7 +71,6 @@
 - Deterministic latency: < 50 µs worst-case interrupt response
 - EtherCAT, PROFINET, CAN FD support
 - Functional Safety hooks (IEC 61508 SIL-2 ready)
-
 
 ---
 
@@ -104,7 +101,6 @@ Deadline analysis:
 - Utilization bound check: `Σ(WCET/Period) ≤ n(2^(1/n) - 1)`
 - Response time analysis for each task
 - Assert all deadlines met at compile time (optional `#[sigma_rt_verify]`)
-
 
 ---
 
@@ -147,7 +143,6 @@ pub trait CanBus {
 - **Signature verification**: Dilithium5 signed update manifests
 - **Rollback protection**: Hardware fuse or anti-rollback counter
 
-
 ```toml
 
 # /etc/sigma-atom/ota.toml
@@ -186,7 +181,6 @@ rollback_count_max = 3
 - **Minimal Attack Surface**: Remove all non-required subsystems at compile time
 - **Capability-based I/O**: Each task has explicit I/O permissions
 - **Tamper Detection**: Enclosure tamper detection GPIO monitoring
-
 
 ---
 

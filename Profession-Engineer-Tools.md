@@ -10,15 +10,11 @@ The Engineer Profile is designed for technical precision, simulation capabilitie
 
 - **SigmaCAD**: Computer-aided design system with 2D/3D modeling capabilities.
 
-
 - **SigmaSimulation**: Engineering simulation platform for FEA, CFD, and thermal analysis.
-
 
 - **SigmaProject**: Project management for engineering with resource allocation and timeline tracking.
 
-
 - **SigmaAnalysis**: Data analysis for engineering with statistical analysis and signal processing.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Engineer Profile is designed for technical precision, simulation capabilitie
 
 - **Theme**: Technical Gray (Engineering Standard)
 
-
 - **Layout**: Engineering Dashboard (Design, Simulation, Analysis)
 
-
 - **Personalization**: Customizable toolbars for rapid access to engineering functions.
-
 
 ---
 

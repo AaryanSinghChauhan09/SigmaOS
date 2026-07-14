@@ -6,7 +6,6 @@ First-class support for Xbox, PlayStation, and generic HID controllers.
 - XInput and HID gamepad driver in HAL
 - Rumble / haptic feedback support
 
-
 ## Key Milestones
 
 - [ ] USB HID gamepad report parser

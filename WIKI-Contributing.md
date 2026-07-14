@@ -33,7 +33,6 @@ Wiki pages are Markdown files at the root of the wiki repository. The filename b
 
 - `Architecture-Overview.md` → `https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview`
 
-
 ### 3. Commit and push
 
 ```bash
@@ -63,7 +62,6 @@ git push origin master
 - Use `<!-- slide -->` comments only in carousel blocks
 - No HTML-only markup; use Markdown equivalents
 
-
 ---
 
 ## Syncing from `wiki_repo/`
@@ -88,7 +86,6 @@ git -C wiki_repo push origin master
 - Write how-to guides for common tasks
 - Add distro absorption analysis pages for new projects
 - Improve roadmap pages with concrete timelines
-
 
 ---
 

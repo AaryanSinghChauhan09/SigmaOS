@@ -6,7 +6,6 @@ An in-OS coding environment with instant feedback and AI hints.
 - Inline code execution in Zenith terminal
 - AI hint generation on compile error
 
-
 ## Key Milestones
 
 - [ ] Sandboxed code execution via sigma-pod

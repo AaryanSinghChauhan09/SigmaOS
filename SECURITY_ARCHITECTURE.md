@@ -10,21 +10,15 @@ SigmaOS implements a comprehensive security architecture focused on defense-in-d
 
 1. **Zero Trust**: Verify everything, trust nothing by default
 
-
 2. **Defense in Depth**: Multiple layers of security controls
-
 
 3. **Post-Quantum Ready**: Cryptography resistant to quantum attacks
 
-
 4. **Minimal TCB**: Smallest possible Trusted Computing Base
-
 
 5. **Verifiable Supply Chain**: Cryptographically verified build pipeline
 
-
 6. **Capability-Based Security**: Fine-grained, composable permissions
-
 
 ### Threat Model
 
@@ -715,15 +709,11 @@ SigmaOS aims to comply with:
 
 - **FIPS 140-3**: Cryptographic module validation
 
-
 - **Common Criteria (EAL4+)**: Security certification
-
 
 - **NIST SP 800-53**: Security controls
 
-
 - **ISO 27001**: Information security management
-
 
 ### Certification Roadmap
 

@@ -6,7 +6,6 @@ Solve algebra, calculus, and linear algebra problems with step-by-step explanati
 - Symbolic algebra engine (expression tree)
 - LLM-generated natural-language explanation
 
-
 ## Key Milestones
 
 - [ ] Expression parser (operator precedence)

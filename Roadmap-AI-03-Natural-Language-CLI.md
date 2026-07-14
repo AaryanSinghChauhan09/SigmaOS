@@ -3,9 +3,8 @@ Translate plain-English sentences into shell commands using the embedded LLM.
 
 ## Goals
 
-- sigma-ai "list all files modified today" â†’ ls -lt --time-style=+%F | grep 
+- sigma-ai "list all files modified today" â†’ ls -lt --time-style=+%F | grep
 - Zero network calls; all inference on-device
-
 
 ## Key Milestones
 

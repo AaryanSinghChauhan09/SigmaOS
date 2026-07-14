@@ -138,8 +138,6 @@ pub fn init_networking(nic: impl NicDevice) -> Interface {
 
 - `ping 8.8.8.8` works from `sigma-sh` in QEMU (virtio-net backend).
 
-
 - `sigma-curl https://example.com` completes an HTTP GET using smoltcp + rustls.
-
 
 - `cargo test -p sigma-net` passes all smoltcp integration tests.

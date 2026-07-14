@@ -6,7 +6,6 @@ Integrate Alibaba Qwen2.5 1.5B for efficient multilingual assistance.
 - Excellent Hindi and Chinese support out of box
 - 1.5B model fits in 2GB RAM at Q4
 
-
 ## Key Milestones
 
 - [ ] Qwen tokeniser (tiktoken compatible) port

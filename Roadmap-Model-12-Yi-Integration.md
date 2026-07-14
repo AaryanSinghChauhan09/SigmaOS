@@ -6,7 +6,6 @@ Integrate Yi-1.5-6B for long-context document analysis.
 - 200K token context window support
 - Efficient KV-cache eviction policy
 
-
 ## Key Milestones
 
 - [ ] Sliding window KV cache

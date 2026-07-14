@@ -15,7 +15,6 @@ This charter defines the governance structure, decision-making processes, and co
 - Community communications (issues, PRs, discussions, forums)
 - Release engineering and roadmap decisions
 
-
 ---
 
 ## 2. Governance Structure
@@ -53,14 +52,12 @@ The **Sovereign Council** is the steering committee responsible for the long-ter
 - Manage release engineering and signing keys
 - Represent SigmaOS in external partnerships
 
-
 **Composition**:
 
 - Minimum 3, maximum 7 members
 - Initial members: Project Founder(s) and early core contributors
 - New members elected by existing Council via simple majority
 - Term: 2 years, renewable
-
 
 **Decision Threshold**: Ordinary resolutions require simple majority (>50%). Charter amendments require supermajority (>66%).
 
@@ -113,7 +110,6 @@ Significant changes MUST follow the RFC process:
 - Security policy changes
 - Governance charter amendments
 
-
 ### 3.2 Ordinary PR Process
 
 Standard contributions follow:
@@ -131,7 +127,6 @@ For security-sensitive files (per `CODEOWNERS`), 2 security-team approvals are r
 2. **Level 2**: Relevant TC sub-committee votes
 3. **Level 3**: Full Sovereign Council vote
 4. **Level 4**: Community vote (binding for charter issues only)
-
 
 ---
 
@@ -156,7 +151,6 @@ A release MUST pass:
 - [ ] `sigpkg` package signing ceremony (Sovereign Council keys)
 - [ ] Release notes approved by Docs TC
 
-
 ### 4.3 Signing Keys
 
 Release artifacts are signed using:
@@ -165,7 +159,6 @@ Release artifacts are signed using:
 - **Key ceremony**: Requires 3-of-5 Council members with hardware tokens
 - **Key rotation**: Annual or upon member departure
 - **Public key**: Published at `https://sigmaos.dev/keys/release.pub`
-
 
 ---
 
@@ -177,7 +170,6 @@ Release artifacts are signed using:
 - **Userland tools**: MIT or Apache-2.0 dual-license
 - **Documentation**: CC-BY-SA-4.0
 - **Shard contributions**: Must be GPL-2.0-compatible
-
 
 All contributions require a Developer Certificate of Origin (DCO) sign-off:
 
@@ -194,7 +186,6 @@ When absorbing code from other projects:
 - Cleanroom reimplementation preferred for proprietary-inspired features
 - Legal review required for any code from non-FOSS sources
 
-
 ---
 
 ## 6. Code of Conduct
@@ -205,7 +196,6 @@ SigmaOS enforces a strict [Code of Conduct](CODE_OF_CONDUCT.md). We prioritize:
 - **Technical excellence**: Constructive, evidence-based technical discussion
 - **Constructive feedback**: Critique code, not people
 - **Transparency**: Decisions made in the open, reasoning documented
-
 
 **Enforcement**: CoC violations reported to `conduct@sigmaos.dev`. The Sovereign Council acts as final arbiter.
 
@@ -220,7 +210,6 @@ To amend this charter:
 3. Supermajority (>66%) Sovereign Council vote
 4. Amendment takes effect 14 days after ratification
 
-
 ---
 
 ## 8. Dissolution
@@ -231,7 +220,6 @@ In the unlikely event of project dissolution:
 - Wiki content migrates to a community-maintained archive
 - Signing keys are revoked and publicly announced
 - A 6-month maintenance window is provided for final releases
-
 
 ---
 

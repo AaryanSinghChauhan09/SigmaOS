@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-While SigmaOS is built on a Linux-compatible Sovereign Lattice, industrial users often rely on legacy Windows applications (CAD tools, proprietary PLC software, specialized data analysis). 
+While SigmaOS is built on a Linux-compatible Sovereign Lattice, industrial users often rely on legacy Windows applications (CAD tools, proprietary PLC software, specialized data analysis).
 
 SigmaOS absorbs the **Win32 API compatibility layers** pioneered by ReactOS (kernel-level compatibility) and Wine/Proton (userspace API translation), integrating them into an isolated `sigma-win32` execution shard.
 
@@ -39,10 +39,10 @@ A major advantage of SigmaOS is that Win32 applications run fully sandboxed. The
 
 pub fn spawn_win32(exe: &Path) -> Result<()> {
     let mut config = SandboxConfig::flatpak_default("win32-compat");
-    
+
     // Restrict access to virtual C: drive only
     config.rw_mounts = vec![ PathBuf::from("/home/user/.sigma/win32_prefix/") ];
-    
+
     // Drop all capabilities
     config.seccomp = SeccompProfile::Strict;
 

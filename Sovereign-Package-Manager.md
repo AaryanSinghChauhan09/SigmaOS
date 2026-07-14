@@ -77,31 +77,22 @@ sigpkg list --installed
 
 - [x] CLI skeleton (`sigpkg install`, `remove`, `rollback`)
 
-
 - [x] Signature verifier (`verifier.py`)
-
 
 - [x] Shard manifest schema
 
-
 - [ ] Registry server implementation
-
 
 - [ ] Reproducible build toolchain integration
 
-
 - [ ] Delta updates (only ship changed extents)
-
 
 - [ ] Multi-architecture cross-build support
 
-
 - [ ] GUI package browser for Zenith Desktop
-
 
 ## Related Modules
 
 - [`modules/tools/loader`](../../modules/tools/loader/README.md) — Module loader
-
 
 - [`modules/security/secure_boot`](../../modules/security/secure_boot/README.md) — Signature verification

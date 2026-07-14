@@ -6,7 +6,6 @@ Version, store, and roll back AI/ML models using SovereignFS snapshots.
 - MLflow-inspired experiment metadata store in sigma_db
 - Model artefact versioning with CoW snapshots
 
-
 ## Key Milestones
 
 - [ ] Model metadata schema in sigma_db
@@ -25,7 +24,6 @@ Run quantised image classification and object detection locally.
 
 - MobileNetV3-Q8 inference for desktop screenshot analysis
 - YOLO-nano for real-time webcam object detection
-
 
 ## Key Milestones
 

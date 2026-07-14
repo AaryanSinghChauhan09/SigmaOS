@@ -12,15 +12,11 @@ SigmaOS runs Linux apps through its compatibility layer. You don't need to give 
 
 - 4GB RAM minimum (8GB recommended)
 
-
 - 20GB disk space
-
 
 - x86_64, ARM64, or RISC-V processor
 
-
 - UEFI firmware (Legacy BIOS supported via dual-boot profile)
-
 
 ---
 

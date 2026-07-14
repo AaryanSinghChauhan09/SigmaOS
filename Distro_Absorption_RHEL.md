@@ -1,40 +1,43 @@
-# Distro Absorption: Red Hat Enterprise Linux (RHEL)
+# Distro Absorption: RHEL (Red Hat Enterprise Linux)
 
-> **Status**: 📋 Planned | **Source Paradigm**: RHEL | **Target Shard**: `SigmaOS Enterprise Reliability Layer`
+## Overview
 
----
+RHEL is the industry standard for enterprise Linux deployments, prized for its 10-year support lifecycle, strict ABI stability guarantees, and certified hardware/software ecosystem.
 
-## 1. Executive Summary
+## Key Principles Absorbed
 
-Red Hat Enterprise Linux (RHEL) is the gold standard for enterprise environments, renowned for its 10-year lifecycle guarantees, binary compatibility, and extreme reliability. 
+### Long-Term Support & ABI Stability
 
-SigmaOS absorbs RHEL's **Live Kernel Patching** and **kABI (Kernel Application Binary Interface) guarantees**, ensuring that mission-critical servers never have to reboot for security patches while maintaining unbreakable driver compatibility.
+- SigmaOS commits to a stable kernel ABI across major releases.
+- Internal crate versioning follows semantic versioning strictly.
+- The `sigpkg` transaction manager ensures deterministic rollback, matching RHEL's `rpm-ostree` model.
 
----
+### Enterprise Security (SELinux)
 
-## 2. Key Features to Absorb
+- RHEL's SELinux Mandatory Access Control has been absorbed into `sigma_security`.
+- `SigmaContext` (`user:role:type:level`) replaces SELinux's text-based policy language with native Rust types.
+- Context transition rules are enforced at the `ProfileSystem` level.
 
-### 2.1 Live Kernel Patching (kpatch)
+### Subscription & Entitlement Model
 
-SigmaOS implements a live-patching infrastructure that can hot-swap vulnerable kernel functions in memory without interrupting running services.
+- SigmaOS replaces RHEL's subscription-manager with a sovereign attestation model.
+- Device identity is established via TPM-backed keys rather than external entitlement servers.
 
-```bash
-$ sigma kernel patch apply CVE-2026-9999.patch
-Σ [KERNEL] Live Patching Active...
-  Redirecting vulnerable function sys_network_recv()
-  Memory swapped. No reboot required.
-  System Uptime: 450 days.
-```
+### Content Delivery (OSTree / rpm-ostree)
 
-Internally, this relies on the `sigma-trace` eBPF engine to safely redirect execution flow via ftrace-like mechanisms, guaranteeing that memory states remain consistent during the swap.
+- RHEL's image-based deployment model (Fedora CoreOS, Silverblue) is absorbed via `ContentAddressedStorage` in `sigpkg`.
+- Atomic deployments and rollbacks are native to the package manager.
 
-### 2.2 Unbreakable kABI
+## Displaced Technologies
 
-Enterprise users need third-party proprietary drivers (e.g., Nvidia, specialized hardware) to work across minor updates. SigmaOS maintains a strict Kernel ABI list. If a kernel update modifies a tracked data structure, the CI pipeline automatically rejects the commit, ensuring that any driver compiled for SigmaOS 15.0 will continue to work flawlessly on 15.9.
+| RHEL Component | SigmaOS Replacement |
+| --- | --- |
+| SELinux | `sigma_security::SigmaContext` |
+| rpm-ostree | `sigpkg::ContentAddressedStorage` |
+| subscription-manager | Sovereign TPM attestation |
+| systemd | `sigma_init` (planned) |
+| yum/dnf | `sigpkg` declarative resolver |
 
----
+## Status
 
-## 3. References & Standards
-
-- Red Hat Enterprise Linux — `redhat.com`
-- kpatch — `github.com/dynup/kpatch` (GPL-2.0)
+**Core Absorbed** — SELinux context model and OSTree deployment model are implemented. DNF compatibility layer exists in `tools/sigma_dnf_compat.rs`.

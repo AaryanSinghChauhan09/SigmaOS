@@ -19,18 +19,15 @@ In **SigmaOS Zenith**, the `SovereignKeyKOS` shard integrates this paradigm dire
 - **KeyKOS Concept**: A process can only reference resources (memory, IPC channels, files) for which it has been explicitly handed a "Key" (capability). Access rights are tied to the key itself, not the subject identity.
 - **Sovereign Implementation**: All kernel objects are referenced through unforgeable, kernel-managed capability registers (`CapRef`). Passing a capability to another process is performed via a zero-copy capability exchange system call.
 
-
 ### 2.2 Amnesic Persistent States
 
 - **KeyKOS Concept**: Single-level store. The system automatically takes periodic, atomic snapshots of the entire memory state. If a power loss occurs, the system restarts from the last valid snapshot as if it never went down.
 - **Sovereign Implementation**: The `SovereignKeyKOS` filesystem coordinates with the memory manager to commit copy-on-write page frames atomically to persistent flash blocks. This creates an amnesic, crash-resilient runtime state.
 
-
 ### 2.3 Eliminating the Confused Deputy
 
 - **KeyKOS Concept**: By requiring all authority to be passed explicitly along with a message, deputies cannot be tricked into using their ambient authority maliciously.
 - **Sovereign Implementation**: SigmaOS drivers and system servers run with zero ambient authority. All file reads, socket accesses, and hardware configurations require explicit token presentation per request.
-
 
 ---
 

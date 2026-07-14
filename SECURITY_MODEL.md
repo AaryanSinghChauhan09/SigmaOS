@@ -120,15 +120,11 @@ TPM2 seals disk encryption keys against PCR values:
 
 - PCR[0]: sigma-boot.efi hash
 
-
 - PCR[1]: kernel hash
-
 
 - PCR[2]: initramfs hash
 
-
 - PCR[3]: kernel command line
-
 
 If any boot stage is tampered with → TPM refuses to unseal → disk stays encrypted.
 
@@ -176,15 +172,11 @@ Every security event is logged:
 
 - pledge violations (SIGKILL)
 
-
 - capability denials
-
 
 - unveil path denials
 
-
 - TPM attestation events
-
 
 Logs are immutable (append-only) and signed with Dilithium-5.
 

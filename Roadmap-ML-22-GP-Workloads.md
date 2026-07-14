@@ -6,7 +6,6 @@ Model system load, thermals, and network patterns using Gaussian Processes.
 - Predict temperature spikes up to 10 seconds ahead.
 - Proactive fan control and core frequency scaling.
 
-
 ## Key Milestones
 
 - [ ] GP regression module

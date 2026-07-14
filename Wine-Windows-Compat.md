@@ -86,17 +86,17 @@ impl WineLauncher {
 
         // Send command via vsock CID to the guest Wine executor agent
         println!("Executing in guest: wine '{}'", windows_path);
-        
+
         let cid = self.vm.get_vsock_cid()?;
         let port = 8080; // Default guest agent port
-        
+
         let mut stream = std::os::unix::net::UnixStream::connect(format!("/var/run/firecracker/vsock_{}_{}", cid, port))
             .map_err(|_| WineError::ExecFailed)?;
-            
+
         let payload = format!(r#"{{"cmd": "wine", "args": ["{}"]}}"#, windows_path);
         std::io::Write::write_all(&mut stream, payload.as_bytes())
             .map_err(|_| WineError::ExecFailed)?;
-            
+
         Ok(())
     }
 }
@@ -173,8 +173,6 @@ sigma-pod run \
 
 - `sigma-wine-launcher run /data/windows/Notepad.exe` opens Notepad inside a Firecracker microVM.
 
-
 - SigmaFS files in `/home/user/` are accessible as `C:\Users\User\` within Wine.
-
 
 - Proton container runs a Windows game binary without crashing on boot.

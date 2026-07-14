@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-Traditional operating systems draw a strict boundary between the kernel, userland processes, and compiler runtimes. The **Symbolics Genera** paradigm rejects this division, implementing a single-address-space system where everything—from the file system to the window manager—is represented as interactive, inspectable, and dynamically extensible Lisp objects. 
+Traditional operating systems draw a strict boundary between the kernel, userland processes, and compiler runtimes. The **Symbolics Genera** paradigm rejects this division, implementing a single-address-space system where everything—from the file system to the window manager—is represented as interactive, inspectable, and dynamically extensible Lisp objects.
 
 In **SigmaOS Zenith**, this paradigm is absorbed via the `SovereignGenera` shard, which introduces a **Symbolic Lattice Namespace** where code and data coexist as editable objects, offering dynamic runtime customization without sacrificing the security of the underlying microkernel.
 
@@ -19,18 +19,15 @@ In **SigmaOS Zenith**, this paradigm is absorbed via the `SovereignGenera` shard
 - **Genera Concept**: No separation between compiler and runtime. All code runs in a shared virtual memory space, represented as interactive Lisp objects.
 - **Sovereign Implementation**: The `SovereignGenera` shard runs an isolated, multi-threaded WebAssembly/Lisp execution chamber that maps symbols to active microkernel memory pages. Users can inspect, trace, and redefine core utilities on-the-fly.
 
-
 ### 2.2 Dynamic Inspection & Object Editing
 
 - **Genera Concept**: Any element on the screen can be right-clicked to inspect its underlying object representation, variables, and methods.
 - **Sovereign Implementation**: Integrated into the Zenith Desktop UI. Pressing `Meta+Click` on any UI widget or terminal element triggers the **Sovereign Inspector**, allowing direct source-code navigation and live parameter editing.
 
-
 ### 2.3 Unified Symbolic Namespace
 
 - **Genera Concept**: Pathnames are not mere strings; they are structured logical objects (e.g., host, device, directory, name, type, version).
 - **Sovereign Implementation**: The file system API parses resource paths into rich symbolic references (`SymbolicPath`). This abstracts local storage, network shares, and temporary memory buffers into a single virtual object tree.
-
 
 ---
 

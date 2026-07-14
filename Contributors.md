@@ -8,7 +8,6 @@ This file acknowledges all contributors to the SigmaOS project.
   - GitHub: @AaryanSinghChauhan09
   - Email: aaryansinghchauhan09@github
 
-
 ## Contributors
 
 We welcome contributions from the community. If you have contributed to SigmaOS and would like to be listed here, please submit a PR adding your information.
@@ -29,7 +28,6 @@ We welcome contributions from the community. If you have contributed to SigmaOS 
 - Active Contributors: [To be updated via CI]
 - Lines of Code: [To be updated via CI]
 
-
 ## Recognition
 
 We recognize all contributions, including:
@@ -40,7 +38,6 @@ We recognize all contributions, including:
 - Testing and quality assurance
 - Design and architecture discussions
 - Community support and mentoring
-
 
 ## Security Contributors
 

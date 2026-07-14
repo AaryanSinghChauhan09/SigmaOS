@@ -6,7 +6,6 @@ A capability-aware stateful packet filter in the network stack.
 - Connection tracking table (static array)
 - Per-capability inbound/outbound rules
 
-
 ## Key Milestones
 
 - [ ] Connection tracking hash table
@@ -25,7 +24,6 @@ Production-grade storage with checksums, compression, and snapshots.
 
 - ZFS pool (zpool) driver wrapping SovereignFS
 - LZ4 / ZSTD transparent compression
-
 
 ## Key Milestones
 

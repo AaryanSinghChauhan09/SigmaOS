@@ -16,7 +16,6 @@ SigmaOS addresses specific needs:
 - **Indian Context**: Built for India's digital infrastructure (ABDM, GST, UPI)
 - **Performance**: Zero-allocation optimizations and efficient algorithms
 
-
 ### What platforms does SigmaOS support?
 
 Currently:
@@ -24,12 +23,10 @@ Currently:
 - x86_64 (primary target)
 - UEFI boot
 
-
 Planned:
 
 - ARM64 (Raspberry Pi)
 - RISC-V
-
 
 ### Is SigmaOS open source?
 
@@ -44,7 +41,6 @@ Yes, SigmaOS is licensed under the MIT License. See the [LICENSE](../LICENSE) fi
 - **Assembly**: Low-level hardware interaction
 - **C**: Legacy compatibility layer
 
-
 ### Why Rust?
 
 Rust provides:
@@ -54,7 +50,6 @@ Rust provides:
 - Strong type system
 - Excellent tooling (cargo, clippy)
 - Growing ecosystem
-
 
 ### Why Nim?
 
@@ -66,7 +61,6 @@ Nim provides:
 - Easy FFI
 - Metaprogramming capabilities
 
-
 ### Does SigmaOS use the Linux kernel?
 
 No, SigmaOS has its own kernel written from scratch in Rust. This allows for:
@@ -75,7 +69,6 @@ No, SigmaOS has its own kernel written from scratch in Rust. This allows for:
 - Capability-based security model
 - Zero external dependencies
 - Tailored for SigmaOS requirements
-
 
 ### What filesystems does SigmaOS support?
 
@@ -86,7 +79,6 @@ Currently:
 - FAT32 (planned)
 - CryptFS (Argon2id encrypted, planned)
 
-
 ### What graphics stack does SigmaOS use?
 
 SigmaOS uses:
@@ -95,7 +87,6 @@ SigmaOS uses:
 - UEFI GOP for UEFI systems
 - DRM/KMS for GPU drivers (planned)
 - Zenith compositor (planned)
-
 
 ## Security Questions
 
@@ -109,7 +100,6 @@ SigmaOS uses a capability-based security model:
 - Landlock filesystem sandboxing
 - seccomp syscall filtering
 
-
 ### Is there a root user?
 
 No, SigmaOS eliminates the traditional root user in favor of a capability-based system. Processes only have the capabilities they need, and capabilities can be derived and revoked.
@@ -121,7 +111,6 @@ No, SigmaOS eliminates the traditional root user in favor of a capability-based 
 - Formal verification planned for critical components
 - Continuous security auditing
 - Automated vulnerability scanning
-
 
 ### Does SigmaOS support Secure Boot?
 
@@ -147,7 +136,6 @@ SigmaOS includes native implementations of:
 - Email client (sigma-email)
 - Database client (sigma-database)
 
-
 Plus core utilities and system tools.
 
 ### Can I run Linux applications on SigmaOS?
@@ -157,7 +145,6 @@ Not directly. SigmaOS has its own syscall interface and ABI. However, we plan to
 - Linux compatibility layer (optional)
 - Wine-like compatibility for Windows applications (future)
 
-
 ### How do I develop for SigmaOS?
 
 See the [Development Guide](./DEVELOPMENT.md) for detailed instructions. Basic steps:
@@ -166,7 +153,6 @@ See the [Development Guide](./DEVELOPMENT.md) for detailed instructions. Basic s
 2. Clone the repository
 3. Build the project
 4. Follow contribution guidelines
-
 
 ## Performance Questions
 
@@ -179,7 +165,6 @@ SigmaOS is optimized for:
 - Minimal overhead
 - Specialized for SigmaOS use cases
 
-
 Benchmarks will be provided as the system matures.
 
 ### What are the system requirements?
@@ -191,14 +176,12 @@ Minimum (for development):
 - 10GB disk space
 - UEFI firmware
 
-
 Recommended:
 
 - x86_64 CPU with virtualization support
 - 4GB+ RAM
 - 20GB+ disk space
 - UEFI 2.3.1+
-
 
 ## Development Questions
 
@@ -212,7 +195,6 @@ See the [Contributing Guide](../CONTRIBUTING.md) for details. Key areas:
 - Documentation
 - Testing
 
-
 ### What are the most needed contributions?
 
 Currently (Phase 0):
@@ -221,14 +203,12 @@ Currently (Phase 0):
 - UEFI/EDK2 bootloader engineers
 - Build system engineers
 
-
 Future phases:
 
 - Network stack engineers
 - GPU/graphics engineers
 - India Stack API integration
 - AI/ML integration
-
 
 ### How do I report bugs?
 
@@ -242,7 +222,6 @@ Include:
 - Steps to reproduce
 - Debug logs if available
 
-
 ## Future Questions
 
 ### What's the roadmap?
@@ -254,7 +233,6 @@ See the [Roadmap](./ROADMAP.md) for detailed plans. Key milestones:
 - M2: First Desktop (Month 9)
 - M3: India Stack Live (Month 14)
 - M4: Security Audit (Month 18)
-
 
 ### When will SigmaOS be production-ready?
 
@@ -280,7 +258,6 @@ Mobile support is not currently planned but may be considered in future phases.
 - Account Aggregator (AA)
 - NavIC (Indian GPS)
 
-
 ### Will SigmaOS support Indian languages?
 
 Yes, SigmaOS will support:
@@ -289,7 +266,6 @@ Yes, SigmaOS will support:
 - Other regional languages
 - Offline speech recognition (sigma-bhashini)
 - Text-to-speech
-
 
 ### How will SigmaOS help rural India?
 
@@ -300,7 +276,6 @@ SigmaOS includes:
 - Low hardware requirements
 - Local language support
 - Digital literacy tools
-
 
 ## Licensing Questions
 
@@ -319,7 +294,6 @@ The MIT License has minimal restrictions. You must:
 - Include the license and copyright notice
 - State any significant changes made
 
-
 ## Support Questions
 
 ### Where can I get help?
@@ -328,7 +302,6 @@ The MIT License has minimal restrictions. You must:
 - GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
 - Documentation: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 - Email: (to be announced)
-
 
 ### Is commercial支持 available?
 

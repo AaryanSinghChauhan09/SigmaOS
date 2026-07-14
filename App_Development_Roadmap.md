@@ -142,27 +142,19 @@ Performance targets:
 
 1. **Build via sigma-sdk**: `sigma-sdk build --target sigpkg`
 
-
 2. **Use sigma_pledge on startup**: declare required capabilities
-
 
 3. **Zero telemetry**: no network calls without user action
 
-
 4. **Respond in < 100ms** to every user interaction (or show progress)
-
 
 5. **Support dark/light/high-contrast** themes via ThemeEngine
 
-
 6. **Respect reduce-motion** system preference
-
 
 7. **Export a PKGBUILD** recipe for reproducible builds
 
-
 8. **Sign with Dilithium-5** via sigma-sdk
-
 
 ### State Management Pattern
 

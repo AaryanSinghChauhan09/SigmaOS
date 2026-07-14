@@ -25,7 +25,6 @@ SigmaOS Foundation
 - Road-map approval
 - Infrastructure budget
 
-
 ---
 
 ## Decision Categories
@@ -48,7 +47,6 @@ SigmaOS Foundation
 4. **Vote**: 14-day voting window opens
 5. **Decision**: Quorum reached → Accepted/Rejected
 6. **Implementation**: Tracked in `task.md` and assigned milestone
-
 
 ### RFC Template
 
@@ -93,7 +91,6 @@ Open questions for community input.
 - Core team votes are weighted 3x
 - Results are announced in the SigmaOS forum and mailing list
 
-
 ---
 
 ## Code of Conduct
@@ -104,7 +101,6 @@ All participants must adhere to the [SigmaOS Code of Conduct](CODE_OF_CONDUCT.md
 - Constructive criticism only — critique code, not people
 - Zero tolerance for harassment, discrimination, or bad-faith participation
 - Violations reported to `conduct@sigmaos.dev`
-
 
 ---
 

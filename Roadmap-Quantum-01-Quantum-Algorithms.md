@@ -6,7 +6,6 @@ Embed a quantum circuit simulator for education and research.
 - Statevector simulator for up to 20 qubits
 - Common gate set: H, CNOT, T, Toffoli
 
-
 ## Key Milestones
 
 - [ ] Complex number type (no_std)

@@ -53,7 +53,6 @@ pub fn plugin_unload(id: PluginId) -> SigmaResult<()>;
 
 1. The kernel validates the signature before mapping any code page.
 
-
 2. Capabilities are enforced at IPC call boundaries — a plugin cannot exceed its
 
    declared capability set.
@@ -62,31 +61,22 @@ pub fn plugin_unload(id: PluginId) -> SigmaResult<()>;
 
 - [x] Extension API trait (`extension_api.rs`)
 
-
 - [x] Capsule signing & verification (`capsule.rs`)
-
 
 - [x] AI driver scaffolding stub (`auto_driver_builder.rs`)
 
-
 - [x] Policy module injection (`policy_modules.rs`)
-
 
 - [ ] WASM capsule JIT execution (Cranelift backend)
 
-
 - [ ] Hot-reload (swap capsule version without reboot)
-
 
 - [ ] Capsule sandboxing via `modules/tools/sandbox`
 
-
 - [ ] GUI app-store frontend for capsule discovery
-
 
 ## Related Modules
 
 - [`modules/tools/sandbox`](../../tools/sandbox/README.md) — Capsule isolation
-
 
 - [`modules/security/access_control`](../../security/access_control/README.md) — Capability enforcement

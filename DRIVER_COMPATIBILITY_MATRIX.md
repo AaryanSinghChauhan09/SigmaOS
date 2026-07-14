@@ -8,18 +8,13 @@ This document provides a comprehensive driver compatibility matrix for SigmaOS, 
 
 - ✅ **Supported**: Works out-of-the-box with SigmaOS
 
-
 - 🔄 **Partial Support**: Works with limitations or requires configuration
-
 
 - ⚠️ **Requires Driver**: Needs additional driver installation
 
-
 - ❌ **Not Supported**: Not currently supported
 
-
 - 📅 **Planned**: Support planned for future release
-
 
 ## Network Adapters
 
@@ -259,44 +254,31 @@ sigma-pkg update --driver wifi
 
 - **Wi-Fi**: 80%+ compatibility
 
-
 - **Ethernet**: 100% compatibility
-
 
 - **Graphics**: 70%+ compatibility (basic), 50%+ (full)
 
-
 - **Audio**: 90%+ compatibility
-
 
 - **Storage**: 100% compatibility
 
-
 - **Printers**: 70%+ compatibility
-
 
 - **Input Devices**: 100% compatibility
 
-
 - **Bluetooth**: 75%+ compatibility
 
-
 - **Cameras**: 95%+ compatibility
-
 
 ### Out-of-the-Box Support
 
 - **Desktop Systems**: 85%+ compatibility
 
-
 - **Laptops**: 75%+ compatibility
-
 
 - **Workstations**: 80%+ compatibility
 
-
 - **Servers**: 90%+ compatibility
-
 
 ## Future Support Plans
 
@@ -304,35 +286,25 @@ sigma-pkg update --driver wifi
 
 - Additional Wi-Fi drivers (MediaTek, Qualcomm)
 
-
 - Enhanced NVIDIA GPU support
-
 
 - Additional printer models
 
-
 - Improved touchpad support
 
-
 - Enhanced Bluetooth support
-
 
 ### v17.0 Planned Support
 
 - Full NVIDIA GPU support
 
-
 - Additional audio devices
-
 
 - More printer models
 
-
 - Enhanced camera support
 
-
 - Improved driver management
-
 
 ## Reporting Compatibility Issues
 
@@ -340,12 +312,9 @@ If your hardware is not listed or not working correctly:
 
 1. Run hardware detection: `sigma-hw-detect --report > hw-report.txt`
 
-
 2. Check the compatibility matrix for similar models
 
-
 3. Search existing issues on GitHub
-
 
 4. Create a new issue with:
    - Hardware details (manufacturer, model)
@@ -354,29 +323,23 @@ If your hardware is not listed or not working correctly:
    - Actual behavior
    - Steps to reproduce
 
-
 ## Contributing Drivers
 
 To contribute driver support:
 
 1. Fork the SigmaOS repository
 
-
 2. Create a driver in the appropriate directory
-
 
 3. Follow driver development guidelines
 
-
 4. Test on multiple hardware variants
-
 
 5. Submit pull request with:
    - Driver implementation
    - Hardware tested on
    - Test results
    - Documentation
-
 
 ---
 

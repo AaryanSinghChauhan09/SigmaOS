@@ -14,7 +14,6 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 - **IDE Integration**: VS Code, IntelliJ plugin support
 - **Documentation**: Comprehensive API documentation and examples
 
-
 ## Development Workflow
 
 ```text
@@ -39,12 +38,10 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 - Glibc 2.35
 - Kernel headers 6.1.0
 
-
 **Target Triple**:
 
 - `x86_64-sigmaos-elf`: Bare metal target
 - `x86_64-sigmaos-linux-gnu`: Userspace target
-
 
 ### Debugging Tools
 
@@ -55,13 +52,11 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 - Capability-aware debugging
 - Thread debugging
 
-
 **LLDB**:
 
 - LLDB server for remote debugging
 - Rust debugging support
 - Python scripting
-
 
 **perf**:
 
@@ -69,13 +64,11 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 - Memory profiling
 - Tracepoint support
 
-
 **LTTng**:
 
 - Kernel tracing
 - Userspace tracing
 - Event streaming
-
 
 ### Profiling Tools
 
@@ -85,20 +78,17 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 - Cache miss profiling
 - Branch prediction profiling
 
-
 **LTTng**:
 
 - System call tracing
 - Function tracing
 - Custom tracepoints
 
-
 **Valgrind**:
 
 - Memory leak detection
 - Thread error detection
 - Cache profiling
-
 
 ## Configuration
 
@@ -189,24 +179,24 @@ impl CrossCompiler {
             sysroot: sysroot.to_string(),
         }
     }
-    
+
     pub fn compile(&self, source: &Path, output: &Path) -> Result<(), CompileError> {
         let mut cmd = Command::new(format!("{}-gcc", self.target));
-        
+
         cmd.arg("--sysroot").arg(&self.sysroot);
         cmd.arg("-O2");
         cmd.arg("-g"); // Debug symbols
         cmd.arg("-o").arg(output);
         cmd.arg(source);
-        
+
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(CompileError::CompilationFailed(
                 String::from_utf8_lossy(&output.stderr).to_string()
             ));
         }
-        
+
         Ok(())
     }
 }
@@ -226,10 +216,10 @@ impl GDBServer {
     pub fn new(port: u16) -> Self {
         GDBServer { port }
     }
-    
+
     pub fn start(&self) -> Result<(), GDBError> {
         let listener = TcpListener::bind(format!("0.0.0.0:{}", self.port))?;
-        
+
         for stream in listener.incoming() {
             match stream {
                 Ok(stream) => {
@@ -240,19 +230,19 @@ impl GDBServer {
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     fn handle_connection(&self, stream: TcpStream) -> Result<(), GDBError> {
         // Handle GDB remote protocol
         let mut reader = BufReader::new(stream.try_clone()?);
         let mut writer = stream;
-        
+
         loop {
             let mut buffer = String::new();
             reader.read_line(&mut buffer)?;
-            
+
             if buffer.starts_with('$') {
                 let response = self.process_command(&buffer)?;
                 writer.write_all(response.as_bytes())?;
@@ -277,19 +267,19 @@ impl LTTngTracer {
         let session = Session::create(name)?;
         Ok(Self { session })
     }
-    
+
     pub fn enable_kernel_events(&mut self, events: &[&str]) -> Result<(), LTTngError> {
         for event in events {
             self.session.enable_kernel_event(event)?;
         }
         Ok(())
     }
-    
+
     pub fn start(&mut self) -> Result<(), LTTngError> {
         self.session.start()?;
         Ok(())
     }
-    
+
     pub fn stop(&mut self) -> Result<(), LTTngError> {
         self.session.stop()?;
         Ok(())
@@ -338,7 +328,7 @@ impl Task {
         }
         Ok(Task { inner })
     }
-    
+
     pub fn id(&self) -> u64 {
         unsafe { (*self.inner).id }
     }
@@ -389,7 +379,7 @@ SigmaTask* sigma_schedule_next(void);
 type
   TaskState = enum
     Running, Ready, Blocked, Terminated
-  
+
   SigmaTask = object
     id: uint64
     state: TaskState
@@ -423,7 +413,6 @@ proc id(task: Task): uint64 =
 - Debug configuration for GDB
 - Build task integration
 
-
 **Configuration**:
 
 ```json
@@ -452,7 +441,6 @@ proc id(task: Task): uint64 =
 - Run configurations
 - Debugger integration
 - Build system integration
-
 
 ## Build Farm Integration
 
@@ -505,7 +493,6 @@ bitbake sigmaos-image
 3. **Test on Target**: Test on actual hardware when possible
 4. **Version Control**: Use version control for all code
 
-
 ### Debugging
 
 1. **Use GDB**: Use GDB for interactive debugging
@@ -513,14 +500,12 @@ bitbake sigmaos-image
 3. **Profile Performance**: Use perf for performance profiling
 4. **Check Capabilities**: Verify capability permissions
 
-
 ### Building
 
 1. **Reproducible Builds**: Use deterministic build settings
 2. **Parallel Builds**: Use parallel compilation
 3. **Cache Builds**: Use ccache for faster builds
 4. **Clean Builds**: Periodically clean build artifacts
-
 
 ## Roadmap & Milestones
 
@@ -531,14 +516,12 @@ bitbake sigmaos-image
 - C and Rust bindings
 - GDB integration
 
-
 ### Phase 2 (Months 3-6)
 
 - GDB server porting
 - LLDB integration
 - perf integration
 - Basic profiling support
-
 
 ### Phase 3 (Months 6-9)
 
@@ -547,14 +530,12 @@ bitbake sigmaos-image
 - IDE plugins
 - Build farm integration
 
-
 ### Phase 4 (Months 9-12)
 
 - Yocto-style build farm
 - Automated release artifacts
 - Advanced debugging features
 - Performance optimization tools
-
 
 ## References
 

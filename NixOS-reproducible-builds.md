@@ -10,18 +10,13 @@ SigmaOS adopts **content-addressed, reproducible builds** inspired by Nix (LGPL)
 
 1. **Content-addressed outputs** — build output is stored at `/sigma/store/<hash>-<name>-<version>/`
 
-
 2. **SOURCE_DATE_EPOCH** — all timestamps clamped to the last Git commit timestamp
-
 
 3. **strip-deterministic** — debug symbols stripped with stable section ordering
 
-
 4. **Normalized ar archives** — `ar` archives have deterministic member order
 
-
 5. **Locale + timezone isolation** — builds run in `LANG=C TZ=UTC` environments
-
 
 ---
 
@@ -89,15 +84,11 @@ When `sigma-pkg install <pkg>` is invoked:
 
 1. Compute expected store path hash from SIGPKG
 
-
 2. Query substituter: `GET https://cache.sigmaos.dev/<hash>.narinfo`
-
 
 3. If found: download + verify + install (skip build)
 
-
 4. If not found: build locally, upload to cache
-
 
 ```text
 narinfo format:
@@ -139,8 +130,6 @@ If hashes differ, `sigma-rebuild` prints a diff of the first differing byte offs
 
 - `sigma-pkg rebuild sigma-edit` produces **identical hash** on two independent builds.
 
-
 - `sigma-pkg install sigma-edit` succeeds via binary substituter (no local build triggered).
-
 
 - CI job `reproducible-build-check` fails if any artifact's hash changes between runs.

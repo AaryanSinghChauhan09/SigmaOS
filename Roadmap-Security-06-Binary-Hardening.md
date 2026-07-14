@@ -6,7 +6,6 @@ Apply systematic binary hardening to all SigmaOS executables.
 - PIE + ASLR for all binaries
 - Stack canaries and CFI (Control Flow Integrity)
 
-
 ## Key Milestones
 
 - [ ] CFI forward-edge enforcement

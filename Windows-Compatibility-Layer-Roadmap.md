@@ -17,12 +17,9 @@ cleaner architecture.
 
 - `runtime/containers/sigma_linux_compat.cpp` — ELF64 loader + Linux syscall translator (15 syscalls mapped)
 
-
 - `userland/compat/POSIXShim.cpp` — POSIX open/read/write/close/fork/execve shim
 
-
 - `userland/compat/sigma_proton_bridge.cpp` — Proton-style syscall trap + `mapDxvkSurface()` stub
-
 
 **What needs to be built:** everything Win32.
 
@@ -131,12 +128,9 @@ include/compat/sigma_pe_types.h              ← IMAGE_DOS_HEADER, IMAGE_NT_HEAD
 
 1. Validate MZ magic (0x4D5A) + PE signature (0x50450000)
 
-
 2. Parse IMAGE_FILE_HEADER → machine type, section count, characteristics
 
-
 3. Parse IMAGE_OPTIONAL_HEADER64 → ImageBase, AddressOfEntryPoint, SizeOfImage
-
 
 4. Map PE sections via sigma_vmm_map_region():
 
@@ -147,12 +141,9 @@ include/compat/sigma_pe_types.h              ← IMAGE_DOS_HEADER, IMAGE_NT_HEAD
 
 1. Apply base relocations (IMAGE_BASE_RELOCATION) if loaded != preferred base
 
-
 2. Resolve imports (IMAGE_IMPORT_DESCRIPTOR) → fill IAT with sigma-ntdll stubs
 
-
 3. Handle TLS callbacks (IMAGE_TLS_DIRECTORY) before entry point
-
 
 4. Call entry point: DllMain(hmod, DLL_PROCESS_ATTACH, NULL) or WinMain
 
@@ -508,12 +499,9 @@ include/compat/sigma_wine.h
 
 - Manages cross-process kernel objects (events, mutexes, named pipes, shared memory)
 
-
 - Runs as a sigma-pod container alongside the Windows app
 
-
 - Uses sigma-bus for all IPC — no Unix domain sockets required
-
 
 ### CLI interface:
 

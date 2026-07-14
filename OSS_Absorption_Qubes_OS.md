@@ -2,8 +2,8 @@
 
 ## Making QubesOS/qubes-doc Irrelevant
 
-> **Absorption Target**: https://github.com/QubesOS/qubes-doc  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/QubesOS/qubes-doc
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaSecurity - Native Capability-Based Compartmentalization
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Qubes OS by implementing a native capability-
 
 ### 1. Domain-Based Compartmentalization
 
-**Original**: Qubes' domain-based isolation  
+**Original**: Qubes' domain-based isolation
 **SigmaOS**: Native capability-based compartmentalization
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaSecurity {
 - Compartment cleanup with automatic reclamation
 - Compartment composition with inheritance
 
-
 ### 2. Domain System
 
-**Original**: Qubes' domain system (dom0, domU)  
+**Original**: Qubes' domain system (dom0, domU)
 **SigmaOS**: Native domain system with enhanced features
 
 **Domain Features**:
@@ -54,10 +53,9 @@ pub struct SigmaSecurity {
 - Domain profiles with automatic switching
 - Domain validation with automatic checking
 
-
 ### 3. Template System
 
-**Original**: Qubes' template-based VMs  
+**Original**: Qubes' template-based VMs
 **SigmaOS**: Native template system with enhanced features
 
 **Template Features**:
@@ -69,10 +67,9 @@ pub struct SigmaSecurity {
 - Template distribution with content-addressed storage
 - Template profiles with automatic switching
 
-
 ### 4. Inter-Domain Communication
 
-**Original**: Qubes' qrexec for inter-domain communication  
+**Original**: Qubes' qrexec for inter-domain communication
 **SigmaOS**: Native IPC with capability-based control
 
 **IPC Features**:
@@ -84,10 +81,9 @@ pub struct SigmaSecurity {
 - IPC profiles with automatic switching
 - IPC validation with automatic checking
 
-
 ### 5. GUI Virtualization
 
-**Original**: Qubes' GUI domain isolation  
+**Original**: Qubes' GUI domain isolation
 **SigmaOS**: Native GUI isolation with capability-based control
 
 **GUI Features**:
@@ -99,10 +95,9 @@ pub struct SigmaSecurity {
 - GUI profiles with automatic switching
 - GUI validation with automatic checking
 
-
 ### 6. Security Model
 
-**Original**: Qubes' security by compartmentalization  
+**Original**: Qubes' security by compartmentalization
 **SigmaOS**: Native security with capability-based control
 
 **Security Features**:
@@ -113,7 +108,6 @@ pub struct SigmaSecurity {
 - Security auditing with tamper-proof logs
 - Security testing with automated tools
 - Security validation with formal verification
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaSecurity {
 pub mod compartment {
     use sigma_security::compartment::CompartmentManager;
     use sigma_security::capability::CapabilitySystem;
-    
+
     pub struct SigmaSecurity {
         compartment_manager: CompartmentManager,
         domain_system: DomainSystem,
         capability_system: CapabilitySystem,
     }
-    
+
     impl SigmaSecurity {
         pub fn create_compartment(&self, domain: Domain) -> Compartment {
             // Native compartment creation
@@ -154,7 +148,7 @@ pub mod compartment {
             let isolated = self.isolation_engine.isolate(capabilities);
             Compartment::native(isolated)
         }
-        
+
         pub fn communicate(&self, from: Compartment, to: Compartment, message: Message) {
             // Native inter-compartment communication
             self.ipc_manager.send(from, to, message);
@@ -172,7 +166,7 @@ pub mod domain {
         isolation_engine: IsolationEngine,
         communication_manager: CommunicationManager,
     }
-    
+
     impl DomainSystem {
         pub fn create_domain(&self, config: DomainConfig) -> Domain {
             // Native domain creation

@@ -6,7 +6,6 @@ Implement the Wayland protocol in the Zenith compositor for app compatibility.
 - Core Wayland protocol (wl_surface, wl_compositor)
 - XDG Shell protocol for window management
 
-
 ## Key Milestones
 
 - [ ] Unix socket Wayland server

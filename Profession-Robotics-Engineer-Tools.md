@@ -10,15 +10,11 @@ The Robotics Engineer Profile is designed for robotics excellence, system design
 
 - **SigmaDesign**: Robotics system design and simulation.
 
-
 - **SigmaControl**: Control system development and testing.
-
 
 - **SigmaIntegration**: Hardware-software integration tools.
 
-
 - **SigmaTesting**: Robotics testing and validation.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Robotics Engineer Profile is designed for robotics excellence, system design
 
 - **Theme**: Robotics Orange (Engineering Standard)
 
-
 - **Layout**: Engineering Dashboard (Design, Control, Integration)
 
-
 - **Personalization**: Custom simulation environments and automated testing.
-
 
 ---
 

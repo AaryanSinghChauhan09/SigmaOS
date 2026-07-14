@@ -111,7 +111,6 @@ Essential Shards are managed by the [Self-Healing Engine](Self-Healing.md). If a
 2. If `crash_count < 5`, the shard is restarted with exponential backoff (100ms, 200ms, 400ms, ...).
 3. If `crash_count >= 5`, the shard is **quarantined** and the user is notified via Zenith.
 
-
 ---
 
 *For Core (Ring 0) shards, see [CORE_SHARDS.md](shards/CORE_SHARDS.md). For optional shards, see [OPTIONAL_SHARDS.md](OPTIONAL_SHARDS.md).*

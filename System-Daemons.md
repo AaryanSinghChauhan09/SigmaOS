@@ -61,15 +61,11 @@ Monitors:
 
 - CPU usage, memory pressure, disk I/O
 
-
 - Process liveness (restart failed processes)
-
 
 - Network connectivity
 
-
 - sigma-bus channel saturation
-
 
 ```bash
 

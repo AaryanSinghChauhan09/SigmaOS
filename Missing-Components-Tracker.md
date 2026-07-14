@@ -21,15 +21,11 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - SigmaOS boots on real hardware (not just QEMU)
 
-
 - Multiple init systems can be selected during installation
-
 
 - Hardware drivers work for common devices
 
-
 - System can update itself without manual intervention
-
 
 **Estimated Effort**: Massive (10-15 engineers, 12-18 months)
 
@@ -52,15 +48,11 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - Users can install software via CLI and GUI
 
-
 - Multiple desktop environments can be installed and switched
-
 
 - Container runtime works out of the box
 
-
 - Package updates are transactional with rollback capability
-
 
 **Estimated Effort**: High (5-8 engineers, 6-9 months)
 
@@ -82,12 +74,9 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - Accessibility tools work for all major Indian languages
 
-
 - Users can customize appearance via theme store
 
-
 - Input methods support all Indic scripts
-
 
 **Estimated Effort**: Medium-High (3-5 engineers, 4-6 months)
 
@@ -113,12 +102,9 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - All CBSE-recommended tools work out of the box
 
-
 - Professional modules are pre-configured for Indian use cases
 
-
 - Multilingual UI works for all 22 official Indian languages
-
 
 **Estimated Effort**: Medium-High (3-5 engineers, 4-6 months)
 
@@ -140,12 +126,9 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - Applications run in isolated sandboxes
 
-
 - Network threats are detected and blocked
 
-
 - All AI actions are logged and auditable
-
 
 **Estimated Effort**: High (5-8 engineers, 4-6 months)
 
@@ -165,12 +148,9 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - Users can control system via natural language
 
-
 - Voice commands work for common tasks
 
-
 - AI explains errors in simple language
-
 
 **Estimated Effort**: High (5-8 engineers, 4-6 months)
 
@@ -190,15 +170,11 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - New contributors can onboard in under 1 hour
 
-
 - Migration guides exist for Windows, Ubuntu, Fedora users
-
 
 - Community can vote on roadmap priorities
 
-
 - Plugin system allows third-party extensions
-
 
 **Estimated Effort**: Medium (2-3 engineers, 3-4 months)
 
@@ -240,12 +216,9 @@ These gaps must be addressed before SigmaOS can boot on real hardware and functi
 
 - [Future Development Ideas](Future-Development-Ideas.md)
 
-
 - [Gap Analysis](Gap-Analysis.md)
 
-
 - [SigmaOS Vision for India](SigmaOS-Vision-India.md)
-
 
 ---
 

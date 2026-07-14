@@ -50,7 +50,7 @@ pub fn create_subvolume_snapshot(src: &str, dest: &str) -> Result<(), io::Error>
     // Low-level BTRFS_IOC_SNAP_CREATE_V2 ioctl call
     let src_file = File::open(src)?;
     let dest_dir = File::open(Path::new(dest).parent().unwrap())?;
-    
+
     unsafe {
         let res = ioctl(dest_dir.as_raw_fd(), BTRFS_IOC_SNAP_CREATE_V2, &args);
         if res < 0 {

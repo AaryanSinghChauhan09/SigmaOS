@@ -6,7 +6,6 @@ Control every aspect of the OS using voice commands alone.
 - Whisper voice input + NLâ†’command translation pipeline
 - Screen annotation mode (say "click on Save")
 
-
 ## Key Milestones
 
 - [ ] Continuous listening mode with VAD

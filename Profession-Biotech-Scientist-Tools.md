@@ -10,15 +10,11 @@ The Biotech Scientist Profile is designed for biotechnology excellence, genetic 
 
 - **SigmaGenetics**: Genetic research and sequencing management.
 
-
 - **SigmaLab**: Laboratory automation and sample tracking.
-
 
 - **SigmaCompliance**: Biotech regulatory compliance and documentation.
 
-
 - **SigmaCollaboration**: Research collaboration and data sharing.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Biotech Scientist Profile is designed for biotechnology excellence, genetic 
 
 - **Theme**: Biotech Blue (Research Standard)
 
-
 - **Layout**: Lab Dashboard (Genetics, Lab, Compliance)
 
-
 - **Personalization**: Custom lab protocols and automated alerts.
-
 
 ---
 

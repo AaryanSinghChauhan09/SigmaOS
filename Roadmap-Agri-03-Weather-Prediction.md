@@ -6,7 +6,6 @@ Run numerical weather prediction models locally for rural connectivity.
 - Simplified WRF-based atmospheric model
 - 48-hour rainfall and temperature forecast
 
-
 ## Key Milestones
 
 - [ ] Grid-based atmospheric state representation

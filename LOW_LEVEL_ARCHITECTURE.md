@@ -15,7 +15,6 @@ Modern operating systems often suffer from extreme bloat, pulling in massive hie
    - **Userland Core (Init, sigpkg, IPC)**: Written with minimal abstractions, avoiding heavy POSIX compatibility layers where not needed.
    - **Avoid Interpreted/JIT Languages for Core Services**: Python, Node.js, and Java are restricted to user application domains (e.g., AI models or UI layers) and are completely banned from system initialization, package management, and kernel modules.
 
-
 3. **Eliminating the Pre-Defined Function Crutch**
 
    Developers working on SigmaOS core components are encouraged to fully understand the underlying mechanics of their code. We discourage blindly using pre-defined helper functions from generic frameworks. If an algorithm requires a specific data structure, we implement a memory-efficient, highly-targeted version of it rather than pulling in a generalized hashmap or vector implementation with massive overhead.
@@ -27,7 +26,6 @@ Modern operating systems often suffer from extreme bloat, pulling in massive hie
 5. **Toolchain and Base Environment**
    - **Base Environment**: SigmaOS utilizes lightweight alternatives to heavy predefined libraries. We use `musl libc` instead of glibc where C is strictly required, and rely on `BusyBox` or a custom Rust equivalent for coreutils, rejecting bloated GNU equivalents for the base system.
    - **Toolchains**: We enforce minimal and strictly auditable toolchains (LLVM/Clang and GCC) without heavy wrappers or fragmented build systems.
-
 
 ## Roadmap Integration
 

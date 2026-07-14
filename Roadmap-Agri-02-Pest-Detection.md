@@ -6,7 +6,6 @@ Identify crop diseases from smartphone photos using on-device vision.
 - PlantVillage-trained MobileNetV3 Q8 model
 - 38-class disease classification
 
-
 ## Key Milestones
 
 - [ ] Camera frame capture via HAL

@@ -2,8 +2,8 @@
 
 ## Making coreutils/glibc Irrelevant
 
-> **Absorption Target**: https://github.com/coreutils/glibc  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/coreutils/glibc
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaRuntime - Native Custom Runtime
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed glibc by implementing a native custom runtime
 
 ### 1. Memory Management
 
-**Original**: glibc's malloc/free implementation  
+**Original**: glibc's malloc/free implementation
 **SigmaOS**: Native memory allocator with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaRuntime {
 - Memory validation with automatic checking
 - Memory monitoring with real-time metrics
 
-
 ### 2. String Handling
 
-**Original**: glibc's string functions (strlen, strcpy, etc.)  
+**Original**: glibc's string functions (strlen, strcpy, etc.)
 **SigmaOS**: Native string handling with enhanced features
 
 **String Features**:
@@ -54,10 +53,9 @@ pub struct SigmaRuntime {
 - String validation with automatic checking
 - String monitoring with real-time metrics
 
-
 ### 3. File I/O
 
-**Original**: glibc's file I/O functions (fopen, fread, etc.)  
+**Original**: glibc's file I/O functions (fopen, fread, etc.)
 **SigmaOS**: Native file I/O with enhanced features
 
 **I/O Features**:
@@ -69,10 +67,9 @@ pub struct SigmaRuntime {
 - I/O validation with automatic checking
 - I/O monitoring with real-time metrics
 
-
 ### 4. Threading Primitives
 
-**Original**: glibc's pthread implementation  
+**Original**: glibc's pthread implementation
 **SigmaOS**: Native threading with enhanced features
 
 **Threading Features**:
@@ -84,10 +81,9 @@ pub struct SigmaRuntime {
 - Threading validation with automatic checking
 - Threading monitoring with real-time metrics
 
-
 ### 5. Process Management
 
-**Original**: glibc's process functions (fork, exec, etc.)  
+**Original**: glibc's process functions (fork, exec, etc.)
 **SigmaOS**: Native process management with enhanced features
 
 **Process Features**:
@@ -99,10 +95,9 @@ pub struct SigmaRuntime {
 - Process validation with automatic checking
 - Process monitoring with real-time metrics
 
-
 ### 6. Math Library
 
-**Original**: glibc's libm functions  
+**Original**: glibc's libm functions
 **SigmaOS**: Native math with enhanced features
 
 **Math Features**:
@@ -113,7 +108,6 @@ pub struct SigmaRuntime {
 - Math profiles with automatic switching
 - Math validation with automatic checking
 - Math monitoring with real-time metrics
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaRuntime {
 pub mod memory {
     use sigma_runtime::memory::MemoryAllocator;
     use sigma_runtime::heap::HeapManager;
-    
+
     pub struct SigmaRuntime {
         memory_allocator: MemoryAllocator,
         heap_manager: HeapManager,
         stack_manager: StackManager,
     }
-    
+
     impl SigmaRuntime {
         pub fn allocate(&self, size: usize) -> *mut u8 {
             // Native memory allocation
@@ -167,7 +161,7 @@ pub mod io {
         buffer_manager: BufferManager,
         capability_manager: CapabilityManager,
     }
-    
+
     impl FileIO {
         pub fn open_file(&self, path: Path) -> FileDescriptor {
             // Native file opening

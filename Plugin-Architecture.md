@@ -181,5 +181,4 @@ All plugins must declare permissions in their manifest. Denied by default:
 - `secrets` — Sigma Vault access
 - `display` — Zenith compositor access
 
-
 Users are prompted to approve permissions on first install.

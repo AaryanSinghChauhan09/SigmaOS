@@ -6,9 +6,7 @@ The SigmaOS Syscall Dispatcher is a modular, zero-dependency C/C++ implementatio
 
 - `syscalls.h`: Defines sequential syscall identifiers (`SYSCALL_GETPID`, `SYSCALL_WRITE`, etc.) and function prototypes.
 
-
 - `dispatcher.c` / `dispatcher.cpp`: Implements direct table lookup O(1) dispatching, validating syscall numbers and forwarding register arguments directly to kernel handlers.
-
 
 ## Architecture
 
@@ -102,7 +100,6 @@ if (!syscall_check_capability(syscall_num, caller_cap)) {
 - **Zero-copy**: Arguments passed in registers, no kernel stack copy
 - **Minimal overhead**: ~50ns per syscall on modern x86_64
 
-
 ## Roadmap
 
 - [x] Basic syscall table and dispatcher
@@ -113,7 +110,6 @@ if (!syscall_check_capability(syscall_num, caller_cap)) {
 - [ ] Formal verification of syscall safety properties
 - [ ] seccomp-style syscall filtering
 - [ ] Syscall statistics and profiling
-
 
 ## Related Modules
 

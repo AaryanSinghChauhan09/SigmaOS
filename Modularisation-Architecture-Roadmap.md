@@ -593,15 +593,11 @@ sigma-ca --help --expert  # internal flags too
 
 1. Boot SigmaOS → language selection (30 s)
 
-
 2. Scan DID QR → ABHA linked (60 s)
-
 
 3. Profile auto-suggested by profession (30 s)
 
-
 4. sigma-pkg install sigma-ca (60 s)
-
 
 5. sigma-ca dashboard opens (30 s)
 

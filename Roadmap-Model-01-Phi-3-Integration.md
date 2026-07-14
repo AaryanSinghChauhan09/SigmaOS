@@ -6,7 +6,6 @@ Integrate Phi-3-mini (3.8B) as the default embedded reasoning model.
 - Phi-3-mini-Q4_K_M as sigma-brain default model
 - 4096-token context window management
 
-
 ## Key Milestones
 
 - [ ] GGUF loader context size config

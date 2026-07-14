@@ -38,18 +38,13 @@ git push origin release/v15.1.0
 
 - Run full CI matrix: x86_64, ARM64 cross-build
 
-
 - QEMU smoke test
-
 
 - Manual testing checklist from `PHASE_A_EXECUTION_CHECKLIST.md`
 
-
 - Fuzz PQC modules: `make fuzz TARGET=pqc`
 
-
 - Performance regression check: `scripts/regression_check.sh`
-
 
 ### 4. Changelog
 
@@ -96,12 +91,9 @@ node tools/sync_all_branches.js
 
 - GitHub Releases page
 
-
 - Update `wiki_repo/Release-Notes.md`
 
-
 - Update `wiki_repo/Home.md` version badge
-
 
 ---
 
@@ -111,15 +103,11 @@ node tools/sync_all_branches.js
 
 - **MAJOR**: architectural milestone (bootable OS, distributed, India Stack)
 
-
 - **MINOR**: feature release (new subsystem, profile, significant capability)
-
 
 - **PATCH**: security fix, critical bug fix
 
-
 - **CODENAME**: human-friendly name (Zenith, Apex, Sovereign, Transcendence)
-
 
 ---
 

@@ -15,7 +15,6 @@ build:
   - sigma-dev-toolchain rust
   - cargo build --release --target x86_64-sigma-none
 
-
 install:
 
   - cp target/x86_64-sigma-none/release/app $SIGPKG_STAGING/bin/app
@@ -35,7 +34,6 @@ build:
   - sigma-dev-toolchain gcc
   - make -j$(nproc)
 
-
 install:
 
   - make install DESTDIR=$SIGPKG_STAGING
@@ -54,7 +52,6 @@ build:
 
   - sigma-dev-toolchain node
   - npm install
-
 
 install:
 

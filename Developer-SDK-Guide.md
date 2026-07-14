@@ -11,7 +11,6 @@ Use the SDK to scaffold projects of various types:
 - `StaticLibrary`
 - `SharedLibrary`
 
-
 ## 2. Debugging & Telemetry
 
 - Supports remote GDB target attach.

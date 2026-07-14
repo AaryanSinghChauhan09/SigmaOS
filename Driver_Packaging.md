@@ -73,7 +73,6 @@ driver-name-version.sigpkg/
    - `%install` → installation instructions
    - `%post` → post-install scripts
 
-
 ### Conversion Example
 
 **Fedora RPM Spec**:
@@ -121,7 +120,6 @@ Conflicts: nouveau
    - `conflicts` → conflicts
    - `makedepends` → build dependencies
 
-
 ### Conversion Example
 
 **Arch PKGBUILD**:
@@ -165,7 +163,6 @@ conflicts=('nouveau')
    - `Depends` → dependencies
    - `Provides` → provides
    - `Conflicts` → conflicts
-
 
 ### Conversion Example
 
@@ -456,13 +453,11 @@ sigmaos-repo/
 - Use semantic versioning for SigmaOS-specific changes
 - Include kernel version in package version if required
 
-
 ### Dependencies
 
 - Specify minimum kernel version
 - List firmware dependencies
 - Avoid circular dependencies
-
 
 ### Security
 
@@ -470,13 +465,11 @@ sigmaos-repo/
 - Sign kernel modules for Secure Boot
 - Verify signatures before installation
 
-
 ### Documentation
 
 - Include README with usage instructions
 - Document configuration options
 - Provide troubleshooting guide
-
 
 ## Troubleshooting
 
@@ -486,20 +479,17 @@ sigmaos-repo/
 - Verify build dependencies
 - Review build logs
 
-
 ### Installation Issues
 
 - Verify package signature
 - Check kernel version compatibility
 - Review conflicts with other packages
 
-
 ### Runtime Issues
 
 - Check dmesg for driver errors
 - Verify firmware loading
 - Review configuration files
-
 
 ## References
 

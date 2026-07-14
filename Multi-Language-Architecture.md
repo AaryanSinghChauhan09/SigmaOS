@@ -135,12 +135,9 @@ The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 
 - Rust:     cargo build --target x86_64-unknown-none
 
-
 - Zig:      zig build-lib --target x86_64-freestanding-none
 
-
 - Nim:      nim c --noMain --noLinking --cpu:amd64
-
 
 - Ada/SPARK: gprbuild -P sigmaos.gpr
 
@@ -152,11 +149,8 @@ The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 
 - [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
 
-
 - [Phase 6: Long-Term Vision](Phase-6-Long-Term-Vision)
 
-
 - [Zero-Dependency Architecture](Zero-Dependency-Architecture)
-
 
 - [Roadmap](Roadmap)

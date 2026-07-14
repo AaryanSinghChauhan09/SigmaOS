@@ -6,7 +6,6 @@ Minimise power consumption using ML-predicted workload curves.
 - CPU frequency scaling based on predicted next-100ms load
 - GPU power-gate during idle UI frames
 
-
 ## Key Milestones
 
 - [ ] ACPI P-state control from HAL

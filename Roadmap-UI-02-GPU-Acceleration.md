@@ -6,7 +6,6 @@ Use Vulkan or OpenGL ES for compositor rendering.
 - Vulkan render pass for window compositing
 - GPU-resident texture atlas for UI elements
 
-
 ## Key Milestones
 
 - [ ] Vulkan instance and swapchain setup

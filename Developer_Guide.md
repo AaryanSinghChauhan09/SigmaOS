@@ -10,15 +10,11 @@ SigmaOS is designed with absolute sovereignty in mind, which means zero monolith
 
 - `cmake` (>= 3.20)
 
-
 - `clang` (>= 15) or GCC (>= 12)
-
 
 - `qemu-system-x86_64` (for local emulation)
 
-
 - `mtools` (for creating bootable FAT32 images)
-
 
 ### Compilation
 
@@ -55,12 +51,9 @@ SigmaOS does not use a monolithic kernel. It operates on a **Lattice Architectur
 
 - **Sovereign Init (`sigma-init`)**: Handles dependency-resolved parallel booting and process monitoring.
 
-
 - **Zero-Trust VFS (`sigma-pam-acl`)**: All resources are denied by default unless an explicit Role-Based Access Control (RBAC) entry allows it.
 
-
 - **Proton Bridge**: An opt-in compatibility layer (`sigma_proton_bridge`) that translates standard Linux POSIX syscalls into native SigmaOS IPC messages, allowing standard ELF binaries to run.
-
 
 ## 📝 Writing a Native Service
 

@@ -106,6 +106,7 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 ## 🛠️ Batch 9 & UI/Container Enhancements Implemented
 
 1. **SigmaContainers (Flatpak Absorption)**:
+
 # SigmaOS Dashboard Report
 
 **Date:** July 14, 2026
@@ -230,7 +231,30 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
    - Introduced `ObjectStore` for decentralized in-memory tensor tracking.
    - Introduced the `Actor` primitive for stateful task execution, displacing Ray logic with a native rust-based distributed ML engine.
 
-## ➡️ Next Recommended Steps (Batch 11)
+## 🛠️ Batch 11 & Security/Package Hardening Implemented
 
-- Enhance `sigma_pkg` by integrating OSTree-style content-addressed storage for OS image updates.
-- Refine security by applying `sigma_containers` capabilities to OS system services (AppArmor/SELinux absorption).
+1. **Markdown Lint Fixes (Repository-Wide)**:
+   - Updated `fix_md_lint.cjs` to accept multiple directory arguments and fix MD009 (trailing spaces) and MD012 (multiple blanks).
+   - Executed across the entire WIKI, fixing hundreds of markdown formatting issues automatically.
+
+2. **AppArmor Absorption (`sigma_security`)**:
+   - Introduced `SigmaProfile` with native path-based read/write/exec restriction lists.
+   - Replaces AppArmor's text-based profile configurations with type-safe Rust structs.
+
+3. **SELinux Absorption (`sigma_security`)**:
+   - Introduced `SigmaContext` with `user:role:type:level` label-based Mandatory Access Control.
+   - Context transition rules are enforced natively at the `ProfileSystem` level.
+
+4. **OSTree Absorption (`sigpkg`)**:
+   - Introduced `ContentHash` (32-byte SHA-256 digest), `CASObject`, and `CASObjectType` for content-addressed storage.
+   - Introduced `ContentAddressedStorage` engine with deduplication, atomic staging, deploy, and rollback.
+   - All implementations are `#[no_std]` compatible with zero dynamic allocation.
+
+5. **Distro Absorption Documentation**:
+   - Created `WIKI/OSS_Absorption_OSTree.md`, `WIKI/Distro_Absorption_RHEL.md`, and `WIKI/Distro_Absorption_Ubuntu.md`.
+
+## ➡️ Next Recommended Steps (Batch 12)
+
+- Implement `sigma_init` to absorb systemd's service management, socket activation, and dependency ordering.
+- Deepen `sigma_net` with native DHCP client, DNS resolver, and NTP synchronization.
+- Expand `sigpkg` with delta updates and signature verification against a sovereign keyring.

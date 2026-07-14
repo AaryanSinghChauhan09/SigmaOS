@@ -6,7 +6,6 @@ A persistent AI assistant aware of the user's tasks, calendar, and files.
 - Persistent memory across reboots using sigma_db
 - Task-aware suggestions from calendar events
 
-
 ## Key Milestones
 
 - [ ] Long-term memory schema in sigma_db

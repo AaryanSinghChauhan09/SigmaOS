@@ -9,21 +9,15 @@ SigmaOS drivers for their devices.
 
 - **Stable ABI**: a driver compiled today works on all future SigmaOS versions (DDK v1.0 frozen)
 
-
 - **Ring-3 isolation**: driver crashes don't take down the kernel — better UX for your customers
-
 
 - **sigma_pledge**: fine-grained capability declaration shows customers exactly what your driver does
 
-
 - **AI porting**: `sigma-driver-porter` generates a skeleton from your Linux driver in minutes
-
 
 - **Certification**: official "Sigma Certified" badge in the app store increases customer trust
 
-
 - **Open source incentive**: open drivers get higher transparency scores + community maintenance
-
 
 ---
 
@@ -33,12 +27,9 @@ Read:
 
 - [Driver Framework](../wiki_repo/Driver-Framework.md) — SDF architecture
 
-
 - [Kernel ABI Stability](../wiki_repo/Kernel-ABI-Stability.md) — DDK v1.0 guarantee
 
-
 - `drivers/ddk/sigma_ddk.rs` — descriptor format
-
 
 ---
 
@@ -165,19 +156,15 @@ cargo test --release
 
 1. Open a GitHub Issue titled: `"Driver Certification: MyCompany MyDevice"`
 
-
 2. Include:
    - Source code link (open source) or signed binary (closed source)
    - Hardware datasheet or register spec
    - Test results (QEMU + real hardware if possible)
    - `sigma-ddk validate` output
 
-
 3. SigmaOS team reviews and signs with Dilithium-5
 
-
 4. Driver appears as `SIGMA_DRV_FLAG_CERTIFIED` in the vendor registry
-
 
 ---
 
@@ -218,15 +205,11 @@ Scoring:
 
 - Open-source drivers: +50 points
 
-
 - Working drivers: +30 points
-
 
 - Certified: +20 points
 
-
 - Closed-source: -30 points penalty
-
 
 ---
 
@@ -234,12 +217,9 @@ Scoring:
 
 - Open a GitHub Discussion: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
 
-
 - Driver certification issues: tag with `driver-certification`
 
-
 - DDK questions: tag with `ddk`
-
 
 ---
 

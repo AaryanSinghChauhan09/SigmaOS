@@ -12,12 +12,9 @@ Zenith utilizes the **MLC Algorithm**, natively implemented in the `SovereignZen
 
 - **High-Fidelity Glassmorphism**: Real-time blur and saturation effects.
 
-
 - **Depth Shadowing**: Dynamic Z-index based drop shadows.
 
-
 - **Ultra-Smooth Transitions**: Sub-pixel motion rendering at 144Hz+.
-
 
 ---
 
@@ -29,12 +26,9 @@ As of the current stabilization phase, Zenith has migrated to a **Strict Utility
 
 - `--bg-primary`: The core lattice background.
 
-
 - `--accent-glow`: The primary interaction highlight.
 
-
 - `--glass-blur`: Adaptive intensity for morphic panels.
-
 
 ---
 
@@ -44,12 +38,9 @@ The `SovereignTelemetryUI` exposes deep kernel insights with sub-millisecond lat
 
 - **Network Entropy**: Real-time throughput and packet-level security.
 
-
 - **Workload Balancing**: Multi-die silicon usage and shard migration.
 
-
 - **Silicon Forensics**: Fault localization and machine-state diagnostics.
-
 
 ---
 
@@ -65,12 +56,9 @@ Integrated via `SovereignPersonalization` and the `SovereignClawGateway`, Zenith
 
 - **Adaptive Layouts**: The UI learns user habits and suggests window arrangements.
 
-
 - **Profession Profiles**: Instant workspace setup for Doctors, Lawyers, and Engineers.
 
-
 - **Context-Aware Widgets**: Dynamic dashboards that surface tools based on the current task.
-
 
 ---
 

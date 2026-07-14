@@ -167,11 +167,8 @@ Before merging to `main` or promoting a `release/*` branch:
 
 1. Kernel/network/boot smoke path passes in CI (`sigma_ci.yml`).
 
-
 2. Docs updated for every subsystem touched.
 
-
 3. `CURRENT_PROBLEMS_MANIFEST.md` reflects new status.
-
 
 4. Wiki page updated in `wiki_repo/` (auto-sync on push).

@@ -44,7 +44,6 @@ Linux's Page Frame Reclaim Algorithm (PFRA) and Transparent Huge Pages (THP) are
 - **sigma-pfra**: LRU-based page reclaim with proactive swapping.
 - **sigma-thp**: Automatic 2MB huge page promotion for large anonymous mappings.
 
-
 ---
 
 ## 3. Architecture Diagram

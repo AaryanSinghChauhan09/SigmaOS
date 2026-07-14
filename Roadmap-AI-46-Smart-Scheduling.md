@@ -6,7 +6,6 @@ Dynamically predict thread runtime resource requirements using a lightweight on-
 - Replace static heuristic schedulers with a forward-pass MLP predicting time-quantum exhaustion.
 - Core scheduling decision loop completed in under 500 nanoseconds.
 
-
 ## Key Milestones
 
 - [ ] Thread features extraction (IPC frequency, context switches, cache misses)

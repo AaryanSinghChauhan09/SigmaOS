@@ -8,16 +8,13 @@ To test the boot sequence and kernel initialization locally:
 
 1. Compile the kernel using the standard build script.
 
-
 2. Run the compiled binary using QEMU:
-
 
    ```bash
    qemu-system-x86_64 -kernel build/sigmaos_kernel.bin -serial stdio
    ```
 
 1. Watch the serial output for `[BOOT] SSB: Userland ready. Boot sequence COMPLETE.`, indicating a successful boot.
-
 
 ## 2. Regression Suites (kselftest equivalent)
 
@@ -37,14 +34,10 @@ Every Pull Request triggers the CI/CD pipeline which automatically:
 
 1. Builds the kernel for x86_64, ARM64, and RISC-V targets.
 
-
 2. Boots each image in a headless QEMU instance.
-
 
 3. Parses the serial output for kernel panics or test failures.
 
-
 4. If any test fails, the pipeline aborts and blocks the merge.
-
 
 For details on the pipeline configuration, see `.github/workflows/sigma-build.yml`.

@@ -72,21 +72,15 @@ Each QEMU test:
 
 1. Boots the ISO
 
-
 2. Waits for `sigma-sh>` prompt on serial
-
 
 3. Runs: `echo hello && sigma-pkg list && sigma-pkg install sigma-hello && sigma-hello`
 
-
 4. Asserts: exit 0, output contains "Hello from SigmaOS"
-
 
 5. Sends: `shutdown now`
 
-
 6. Asserts: QEMU exits with code 0
-
 
 ---
 

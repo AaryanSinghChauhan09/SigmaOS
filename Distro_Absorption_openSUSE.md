@@ -11,7 +11,6 @@ openSUSE offers two paradigms worth absorbing into SigmaOS:
 - **Tumbleweed** (rolling-release with massive QA): Contributes the `openQA` automated testing framework philosophy and the `zypper` transactional update concept.
 - **MicroOS** (immutable OS container host): Contributes the `transactional-update` atomic rootfs update model and `snapper` Btrfs snapshot management.
 
-
 Both projects are published under the GNU GPL and are cleanly re-implementable in Rust for the Sovereign Lattice.
 
 ---

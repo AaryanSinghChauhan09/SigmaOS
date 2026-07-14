@@ -10,18 +10,16 @@ SigmaOS shifts away from traditional Linux namespaces/cgroups (like Docker) in f
 - **CPU Quotas:** Enforced by the native Round-Robin scheduler (`sigma_rr_sched.rs`), guaranteeing precise CPU cycle allocation.
 - **Syscall Filtering:** Unlike BPF-based seccomp filters, the MicroVM traps on a strictly allow-listed set of system calls. Unlisted syscalls result in immediate VM termination.
 
-
 ## 3. Network Policies
 
-Each MicroVM is bound to a virtual network namespace. 
+Each MicroVM is bound to a virtual network namespace.
 
 - **Default Posture:** Complete network isolation (air-gapped).
 - **Explicit Grants:** Applications must request specific outbound port/IP combinations via a declarative manifesto. SigmaOS generates ephemeral WireGuard tunnels or NAT rules to facilitate this.
 
-
 ## 4. Developer Sandboxes (Ephemeral Dev)
 
-Developers can spawn instantaneous, ephemeral VMs containing complete language toolchains (Rust, C++, Python). 
+Developers can spawn instantaneous, ephemeral VMs containing complete language toolchains (Rust, C++, Python).
 
 - When the sandbox is destroyed, the diff layer is completely purged.
 - Ensures developer workstations do not suffer from "toolchain rot" or dependency conflicts.

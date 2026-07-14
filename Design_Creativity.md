@@ -9,5 +9,4 @@ To support creators without requiring them to navigate complex dependency hells,
 - **Video Editing:** Kdenlive, Shotcut.
 - **Audio Production:** LMMS, Ardour.
 
-
 All media applications are routed through the native Wayland Zenith compositor for zero-latency rendering and accurate color calibration profiles.

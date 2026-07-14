@@ -6,7 +6,6 @@ Automatically review code diffs for bugs, security issues, and style.
 - Diff parser feeding context to local LLM
 - Highlight issues inline in Zenith editor
 
-
 ## Key Milestones
 
 - [ ] Unified diff parser

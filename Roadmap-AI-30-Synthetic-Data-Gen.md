@@ -6,7 +6,6 @@ Generate synthetic datasets that preserve statistical properties without leaking
 - Gaussian Copula synthetic tabular data generator
 - Differential privacy guarantees (Îµ-DP)
 
-
 ## Key Milestones
 
 - [ ] Copula parameter fitting on real data

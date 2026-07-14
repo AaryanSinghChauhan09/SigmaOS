@@ -6,7 +6,6 @@ AI assistant for drafting and filing RTI applications.
 - LLM-guided RTI request drafting
 - Offline public authority database lookup
 
-
 ## Key Milestones
 
 - [ ] Public authority database in sigma_db

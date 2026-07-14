@@ -68,11 +68,8 @@ cmake -B build -DSIGMA_TARGET_OS=bsd && ninja -C build
 
 - [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
 
-
 - [Build Guide](BuildGuide)
 
-
 - [Driver Development](Driver-Development)
-
 
 - [CI Pipeline](CI-Pipeline)

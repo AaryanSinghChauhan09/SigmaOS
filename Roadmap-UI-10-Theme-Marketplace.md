@@ -6,7 +6,6 @@ A curated store for desktop themes, icon packs, and sound schemes.
 - sigpkg-based theme packages with preview
 - Community rating and one-click install
 
-
 ## Key Milestones
 
 - [ ] Theme package format specification

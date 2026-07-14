@@ -42,18 +42,13 @@ sigma-compat run python:3.12 python3 -c "print('hello from linux')"
 
 1. Pull OCI image via Docker
 
-
 2. Extract rootfs
-
 
 3. Boot minimal Linux kernel in QEMU microVM
 
-
 4. Mount rootfs as VirtIO-blk device
 
-
 5. Start container process inside VM
-
 
 **Security:** Linux kernel is inside the VM — SigmaOS kernel is not exposed.
 
@@ -69,51 +64,37 @@ Run Linux ELF binaries directly on the SigmaOS kernel via syscall translation.
 
 - Parses Linux ELF64 format
 
-
 - Maps segments with ASLR randomization
-
 
 - Sets up Linux-ABI initial stack (argc/argv/envp/auxv)
 
-
 - W^X enforcement (stricter than Linux)
-
 
 **vDSO Shim** (`kernel/linux_compat/vdso_shim.rs`):
 
 - `__vdso_clock_gettime` → `sigma_clock_ns()`
 
-
 - `__vdso_gettimeofday` → FILETIME conversion
 
-
 - `__vdso_time` → Unix seconds
-
 
 **/proc Shim** (`kernel/linux_compat/proc_shim.rs`):
 
 - `/proc/cpuinfo` → synthesized CPU info
 
-
 - `/proc/meminfo` → `sigma_mm_free_pages()` converted
-
 
 - `/proc/self/maps` → VMA list
 
-
 - `/dev/urandom` → sigma PRNG
 
-
 - `/sys/class/net/` → sigma-bus NIC channels
-
 
 **Syscall Dispatch** (`kernel/core/syscall_dispatch.rs`):
 
 - 50+ Linux syscall numbers mapped to SigmaOS primitives
 
-
 - Custom `SYS_SIGMA_*` extensions for pledge/unveil/attestation
-
 
 ---
 

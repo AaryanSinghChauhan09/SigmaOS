@@ -6,7 +6,6 @@ Integrate Mamba (State Space Model) for O(N) token throughput.
 - Mamba-2 inference kernel in Rust
 - Linear-time inference for long OS logs
 
-
 ## Key Milestones
 
 - [ ] Selective SSM scan operation

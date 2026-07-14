@@ -89,7 +89,9 @@ sigma profiler start   # delegates to sigma-profiler start
 ## EXAMPLES
 
 ```bash
+
 # Scaffold and build a driver
+
 sigma init my-nvme-driver
 sigma build --target aarch64 --release
 

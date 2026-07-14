@@ -12,7 +12,6 @@
 - **AI-assisted recommendations**
 - **GUI front-end** for desktop environments
 
-
 ---
 
 ## Quick Reference
@@ -62,13 +61,11 @@ The resolver uses a **DPLL-based SAT solver** to handle complex dependency graph
 4. Backtrack on conflicts
 5. Return a satisfying assignment = installation plan
 
-
 **Transaction model:**
 
 - All changes are applied atomically to a new **generation**
 - Generations are symlinked: `/usr/sigma-gen/current → gen-42`
 - Rollback = `sigpkg rollback` switches the symlink
-
 
 ---
 
@@ -110,7 +107,6 @@ The graphical front-end connects to the `sigpkgd` daemon via Unix socket and pro
 - Install/Remove with progress bar
 - Update manager with changelog preview
 - Snapshot and rollback management
-
 
 ---
 

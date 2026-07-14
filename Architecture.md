@@ -12,7 +12,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
 4. **Performance First**: Zero-allocation optimizations and efficient data structures
 5. **Modular Design**: Clear separation between kernel, userland, and tools
 
-
 ## System Architecture
 
 ```text
@@ -61,7 +60,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - ACPI RSDP location
   - Jump to kernel entry point
 
-
 ### 2. Memory Management
 
 #### Buddy Allocator
@@ -74,7 +72,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Static frame table for tracking
   - No heap allocations
 
-
 #### Slab Allocator
 
 - **Location**: `kernel/mm/slab_allocator.rs`
@@ -84,7 +81,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Efficient small object allocation
   - Cache management
 
-
 #### Page Table Walker
 
 - **Location**: `kernel/mm/page_table_walker.rs`
@@ -93,7 +89,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Page table traversal
   - Page mapping/unmapping
   - Permission management
-
 
 ### 3. Process Scheduling
 
@@ -107,7 +102,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Context switching
   - RDTSC-based timestamps
 
-
 ### 4. Hardware Abstraction
 
 #### APIC/PIC
@@ -119,7 +113,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - APIC setup
   - IRQ routing
 
-
 #### Timer
 
 - **Location**: `kernel/core/hal/sigma_timer.rs`
@@ -128,7 +121,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - HPET initialization
   - APIC timer setup
   - Timer interrupts
-
 
 #### Framebuffer
 
@@ -139,7 +131,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - UEFI GOP support
   - Pixel manipulation
   - Console output
-
 
 ### 5. Security
 
@@ -152,7 +143,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Capability derivation
   - Revocation support
 
-
 #### Capability Table
 
 - **Location**: `kernel/core/capability_table.rs`
@@ -161,7 +151,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Sparse derivation tree
   - Revocation-safe design
   - Zero-allocation implementation
-
 
 ### 6. System Services
 
@@ -173,7 +162,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Service lifecycle management
   - Boot targets
   - Restart policies
-
 
 #### Init Abstraction
 
@@ -187,7 +175,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Sysvinit support
   - OpenRC support
 
-
 ### 7. Standard Library
 
 #### Sigma Libc
@@ -200,7 +187,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - File I/O
   - Process management
 
-
 #### Zero-Allocation Optimizations
 
 - **Location**: `kernel/core/sigma_zero_alloc.rs`
@@ -209,7 +195,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Fixed-size strings
   - Zero-allocation sprintf
   - Temporary buffer pool
-
 
 ### 8. Feature Flags
 
@@ -221,7 +206,6 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
   - Conflict detection
   - Runtime enable/disable
 
-
 ## Userland Components
 
 ### Office Tools
@@ -231,30 +215,25 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
 - **Location**: `applications/wordprocessor/sigma_wordprocessor.rs`
 - **Features**: Document editing, formatting, export (DOCX, ODT, PDF, TXT)
 
-
 #### Spreadsheet
 
 - **Location**: `applications/spreadsheet/sigma_spreadsheet.rs`
 - **Features**: Cell management, formulas, charts, export (XLSX, ODS, CSV)
-
 
 #### Presentation
 
 - **Location**: `applications/presentation/sigma_presentation.rs`
 - **Features**: Slide management, animations, transitions, export (PDF, PPTX, ODP)
 
-
 #### Email Client
 
 - **Location**: `applications/email_advanced/sigma_email_advanced.rs`
 - **Features**: Email accounts, contacts, calendar, tasks
 
-
 #### Database Client
 
 - **Location**: `applications/database/sigma_database.rs`
 - **Features**: Multiple database types, query execution, table listing
-
 
 ### System APIs
 
@@ -263,18 +242,15 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
 - **Location**: `userland/system_api/control_center/`
 - **Features**: System monitoring, GPU monitoring, logging
 
-
 #### AI Integration
 
 - **Location**: `userland/system_api/ai_integration/`
 - **Features**: LLM integration, model downloads, inference
 
-
 #### Dev Studio
 
 - **Location**: `userland/system_api/dev_studio/`
 - **Features**: Git integration, API testing, Docker/Kubernetes support
-
 
 ## Tools
 
@@ -284,12 +260,10 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
 - **Purpose**: Create bootable ISO images
 - **Features**: GPT partition table, EFI System Partition
 
-
 ### Feature Flags
 
 - **Location**: `tools/feature_flags/`
 - **Purpose**: Feature flag management
-
 
 ## Build System
 
@@ -298,7 +272,6 @@ SigmaOS uses a multi-language build system:
 - **Rust**: Kernel, bootloader, most userland components
 - **Nim**: Some userland suites and tools
 - **Shell**: Build scripts and ISO generation
-
 
 ## Security Model
 
@@ -309,14 +282,12 @@ SigmaOS uses a capability-based security model:
 3. **Audit Logging**: All capability checks are logged
 4. **Bounding Sets**: Prevent privilege escalation
 
-
 ## Performance Optimizations
 
 1. **Zero-Allocation**: Core operations avoid heap allocations
 2. **Static Data Structures**: Fixed-size arrays instead of dynamic allocations
 3. **Efficient Algorithms**: Buddy allocator, round-robin scheduler
 4. **Inline Assembly**: Critical paths use inline assembly for performance
-
 
 ## Future Roadmap
 

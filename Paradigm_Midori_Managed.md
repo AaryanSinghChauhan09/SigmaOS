@@ -19,18 +19,15 @@ In **SigmaOS Zenith**, the `SovereignSingular` shard implements this model by ru
 - **Singularity Concept**: Processes are written in type-safe languages. The system does not allow arbitrary pointer manipulation, meaning processes cannot access memory outside their allocated bounds, even without MMU page table enforcement.
 - **Sovereign Implementation**: The `SovereignSingular` environment loads compiled binaries and performs verification. Verified type-safe code runs in a unified address space, while legacy binaries are routed through hardware-isolated pages.
 
-
 ### 2.2 Zero-Latency IPC Channels
 
 - **Singularity Concept**: IPC is performed by passing type-safe objects through compiler-verified communication channels (contracts) in shared memory, with zero data-copying or page-mapping overhead.
 - **Sovereign Implementation**: IPC channels between SIPs are implemented as typed lock-free queues. Message exchange is a simple pointer swap, dropping context switch latencies below 50 nanoseconds.
 
-
 ### 2.3 Strict Communication Contracts
 
 - **Singularity Concept**: All interactions between processes must adhere to channel contracts defined at compile time, eliminating race conditions and illegal message formatting.
 - **Sovereign Implementation**: SIP communication interfaces are defined using strict session types. The compiler and kernel loader guarantee that processes only send messages matching the agreed-upon state machine.
-
 
 ---
 

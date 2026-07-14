@@ -4,7 +4,7 @@
 
 ## 1. Executive Summary
 
-To leap ahead of legacy Linux distros, SigmaOS strategically absorbs their best innovations across file systems, media frameworks, AI agents, and kernel runtimes. 
+To leap ahead of legacy Linux distros, SigmaOS strategically absorbs their best innovations across file systems, media frameworks, AI agents, and kernel runtimes.
 
 This roadmap tracks the transition of these features from **Prototype Branches** into the **Main Repository**.
 
@@ -23,7 +23,6 @@ This roadmap tracks the transition of these features from **Prototype Branches**
   - *Branch*: `feat/sigma-media-graph`
   - *Status*: Real-time kernel thread scheduling optimization.
 
-
 ---
 
 ## 3. Mid-Term Priorities (3-9 Months)
@@ -37,7 +36,6 @@ This roadmap tracks the transition of these features from **Prototype Branches**
   - *Branch*: `feat/sigma-adaptive-ux`
   - *Status*: Designing eBPF hooks for telemetry gathering.
 - [ ] **Compliance Dashboards**: Real-time evaluation of GDPR, ISO, and SOC2 policies.
-
 
 ---
 
@@ -54,7 +52,6 @@ This roadmap tracks the transition of these features from **Prototype Branches**
 - [ ] **Zero-Trust Boot**: TPM-integrated cryptographic verification of the entire boot chain.
   - *Branch*: `feat/sigma-secure-boot`
   - *Status*: Integrating Post-Quantum cryptography.
-
 
 ---
 

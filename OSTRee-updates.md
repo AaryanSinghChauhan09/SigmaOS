@@ -167,8 +167,6 @@ pub fn check_boot_health() {
 
 - `sigma-update apply https://updates.sigmaos.dev/latest` stages update and sets next boot target.
 
-
 - System boots into new partition B after reboot.
-
 
 - Corrupt update triggers rollback to A after 3 failed boots.

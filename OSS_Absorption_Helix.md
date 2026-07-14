@@ -2,8 +2,8 @@
 
 ## Making helix-editor/helix Irrelevant
 
-> **Absorption Target**: https://github.com/helix-editor/helix  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/helix-editor/helix
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaEdit - Native Text Editor with Tree-sitter
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Helix by implementing a native text editor di
 
 ### 1. Tree-sitter Integration
 
-**Original**: Helix's tree-sitter integration  
+**Original**: Helix's tree-sitter integration
 **SigmaOS**: Native tree-sitter with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaEdit {
 - Tree-sitter caching with intelligent invalidation
 - Tree-sitter monitoring with real-time metrics
 
-
 ### 2. Selection System
 
-**Original**: Helix's multiple selection system  
+**Original**: Helix's multiple selection system
 **SigmaOS**: Native selection with enhanced features
 
 **Selection Features**:
@@ -54,10 +53,9 @@ pub struct SigmaEdit {
 - Selection validation with automatic checking
 - Selection monitoring with real-time metrics
 
-
 ### 3. Kakoune-style Editing
 
-**Original**: Helix's Kakoune-inspired editing  
+**Original**: Helix's Kakoune-inspired editing
 **SigmaOS**: Native Kakoune-style with enhanced features
 
 **Kakoune Features**:
@@ -69,10 +67,9 @@ pub struct SigmaEdit {
 - Kakoune profiles with automatic switching
 - Kakoune monitoring with real-time metrics
 
-
 ### 4. LSP Integration
 
-**Original**: Helix's LSP client  
+**Original**: Helix's LSP client
 **SigmaOS**: Native LSP with enhanced features
 
 **LSP Features**:
@@ -84,10 +81,9 @@ pub struct SigmaEdit {
 - LSP completion with context-aware results
 - LSP monitoring with real-time metrics
 
-
 ### 5. Configuration System
 
-**Original**: Helix's TOML configuration  
+**Original**: Helix's TOML configuration
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -99,10 +95,9 @@ pub struct SigmaEdit {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
-
 ### 6. Keybinding System
 
-**Original**: Helix's keybinding system  
+**Original**: Helix's keybinding system
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
@@ -113,7 +108,6 @@ pub struct SigmaEdit {
 - Native keybinding macros with recording
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaEdit {
 pub mod treesitter {
     use sigma_edit::treesitter::TreeSitter;
     use sigma_edit::ast::ASTManager;
-    
+
     pub struct SigmaEdit {
         tree_sitter: TreeSitter,
         ast_manager: ASTManager,
         selection_manager: SelectionManager,
     }
-    
+
     impl SigmaEdit {
         pub fn parse(&self, file: File) -> ParsedFile {
             // Native tree-sitter parsing
@@ -167,7 +161,7 @@ pub mod selection {
         cursor_manager: CursorManager,
         selection_synchronizer: SelectionSynchronizer,
     }
-    
+
     impl SelectionManager {
         pub fn create_selection(&self, range: Range) -> Selection {
             // Native selection creation

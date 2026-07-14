@@ -13,14 +13,12 @@ This document describes how to build SigmaOS from source.
 - **QEMU**: 7.0 or later (for testing)
 - **GRUB**: 2.06 or later (for ISO generation)
 
-
 ### Optional Tools
 
 - **Clang**: For alternative C compilation
 - **LLD**: For faster linking
 - **Docker**: For containerized builds
 - **Git**: For version control
-
 
 ## Building the Kernel
 
@@ -130,7 +128,6 @@ cargo build --profile dev
 - Debug info: Enabled
 - Overflow checks: Enabled
 
-
 ### Release Profile
 
 ```bash
@@ -143,7 +140,6 @@ cargo build --release
 - Strip: Symbols removed
 - Panic: Abort
 
-
 ### Kernel Profile
 
 ```bash
@@ -153,7 +149,6 @@ cargo build --profile kernel
 - Inherits from release
 - Optimizations: Size-optimized (`opt-level = "s"`)
 - Debug info: Disabled
-
 
 ## Cross-Compilation
 
@@ -270,7 +265,6 @@ If QEMU fails to boot the ISO:
 3. Try with more memory: `-m 4G`
 4. Enable serial output: `-serial stdio`
 
-
 ## Continuous Integration
 
 SigmaOS uses GitHub Actions for CI/CD. The workflow files are in `.github/workflows/`.
@@ -317,7 +311,6 @@ When contributing, ensure:
 2. Code compiles without warnings: `cargo clippy`
 3. Code is formatted: `cargo fmt`
 4. Documentation builds: `cargo doc`
-
 
 ## Additional Resources
 

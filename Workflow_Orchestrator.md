@@ -30,7 +30,6 @@ The Workflow Orchestrator enables users to define multi-step automated workflows
 - Failed tasks trigger **retry logic** (configurable max retries + delay)
 - Skipped tasks propagate when dependencies fail
 
-
 ## Implementation
 
 - **Source**: `ai/sigma_workflow_orchestrator.rs`
@@ -39,7 +38,6 @@ The Workflow Orchestrator enables users to define multi-step automated workflows
   - `topological_sort(tasks)` — DAG validation and ordering
   - `execute_workflow(workflow)` — full pipeline execution
   - Task dispatch to shell, AI, file, network, or container executors
-
 
 ## Error Handling
 

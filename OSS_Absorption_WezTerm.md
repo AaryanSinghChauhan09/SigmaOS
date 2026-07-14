@@ -2,8 +2,8 @@
 
 ## Making wez/wezterm Irrelevant
 
-> **Absorption Target**: https://github.com/wez/wezterm  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/wez/wezterm
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaTerm - Native GPU Terminal with Multiplexing
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed WezTerm by implementing a native GPU terminal
 
 ### 1. GPU Rendering
 
-**Original**: WezTerm's GPU rendering  
+**Original**: WezTerm's GPU rendering
 **SigmaOS**: Native GPU rendering with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaTerm {
 - GPU monitoring with real-time metrics
 - GPU profiles with automatic switching
 
-
 ### 2. Multiplexing
 
-**Original**: WezTerm's multiplexing (tmux-like)  
+**Original**: WezTerm's multiplexing (tmux-like)
 **SigmaOS**: Native multiplexing with enhanced features
 
 **Multiplexing Features**:
@@ -54,10 +53,9 @@ pub struct SigmaTerm {
 - Session profiles with import/export
 - Session monitoring with real-time metrics
 
-
 ### 3. Configuration System
 
-**Original**: WezTerm's Lua configuration  
+**Original**: WezTerm's Lua configuration
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -69,10 +67,9 @@ pub struct SigmaTerm {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
-
 ### 4. Font Rendering
 
-**Original**: WezTerm's font rendering  
+**Original**: WezTerm's font rendering
 **SigmaOS**: Native font rendering with enhanced features
 
 **Font Features**:
@@ -84,10 +81,9 @@ pub struct SigmaTerm {
 - Font profiles with automatic switching
 - Font monitoring with real-time metrics
 
-
 ### 5. Shell Integration
 
-**Original**: WezTerm's shell integration  
+**Original**: WezTerm's shell integration
 **SigmaOS**: Native shell integration with enhanced features
 
 **Shell Integration Features**:
@@ -99,10 +95,9 @@ pub struct SigmaTerm {
 - Shell validation with automatic checking
 - Shell monitoring with real-time metrics
 
-
 ### 6. Cross-Platform
 
-**Original**: WezTerm's cross-platform support  
+**Original**: WezTerm's cross-platform support
 **SigmaOS**: Native cross-platform with enhanced features
 
 **Cross-Platform Features**:
@@ -113,7 +108,6 @@ pub struct SigmaTerm {
 - Platform validation with automatic checking
 - Platform monitoring with real-time metrics
 - Platform inheritance with composition
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaTerm {
 pub mod gpu {
     use sigma_term::gpu::GPURenderer;
     use sigma_term::font::FontManager;
-    
+
     pub struct SigmaTerm {
         gpu_renderer: GPURenderer,
         font_manager: FontManager,
         multiplexer: Multiplexer,
     }
-    
+
     impl SigmaTerm {
         pub fn render(&self, buffer: Buffer) -> RenderedBuffer {
             // Native GPU rendering
@@ -167,7 +161,7 @@ pub mod multiplex {
         tab_manager: TabManager,
         pane_manager: PaneManager,
     }
-    
+
     impl Multiplexer {
         pub fn create_session(&self, config: SessionConfig) -> Session {
             // Native session creation

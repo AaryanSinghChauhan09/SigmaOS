@@ -12,9 +12,7 @@ A decentralized repository of PQC-verified shards. Every tool in the store is cr
 
 - **Shard Injection**: Seamlessly add new capabilities to the lattice at runtime.
 
-
 - **Provenance Verification**: Real-time attestation of developer identity and code integrity.
-
 
 ### 2. Cross-Platform Bridge (#69)
 
@@ -33,7 +31,6 @@ A privacy-first, local-only AI search engine. It semantically indexes the entire
 The **Zenith UI** uses local behavior telemetry to anticipate the next tool or layout a professional will need.
 
 - **Morphic Layering**: UI components physically adapt their shape and transparency based on task urgency.
-
 
 ***Smart Shortcuts**: Gesture and hotkey mapping tailored specifically to the user's**Profession Profile**.
 

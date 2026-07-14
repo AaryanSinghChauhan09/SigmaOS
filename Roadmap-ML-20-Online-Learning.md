@@ -6,7 +6,6 @@ Update classifiers continuously from streaming IPC events without retraining.
 - Hoeffding Tree for streaming classification
 - Concept drift detection (ADWIN)
 
-
 ## Key Milestones
 
 - [ ] Hoeffding bound split criterion

@@ -2,8 +2,8 @@
 
 ## Based on Additional Linux Distribution Research
 
-**Version:** 2.0  
-**Date:** July 2026  
+**Version:** 2.0
+**Date:** July 2026
 **Status:** Draft
 
 ---
@@ -30,7 +30,6 @@ This roadmap expands the comprehensive implementation roadmap with additional ad
 - **Description:** Define global and local feature flags
 - **Code Pattern:**
 
-
 ```rust
 #[repr(C)]
 pub struct FeatureFlag {
@@ -51,7 +50,6 @@ static mut FEATURE_FLAGS: [FeatureFlag; MAX_FEATURE_FLAGS] = [FeatureFlag::empty
 - **Location:** `etc/sigma/features.conf`
 - **Description:** Configuration file for feature flags
 - **Format:**
-
 
 ```text
 
@@ -97,13 +95,11 @@ packages:
   4. Apply profile defaults
   5. Apply user overrides
 
-
 #### Task 11.1.4: Feature Flag Integration with Build System
 
 - **Location:** `Cargo.toml` feature definitions
 - **Description:** Map feature flags to Cargo features
 - **Implementation:**
-
 
 ```toml
 [features]
@@ -119,7 +115,6 @@ wayland = ["dep:wayland-client"]
 - Conflicts are properly detected and reported
 - Profile defaults are correctly applied
 - User overrides take precedence
-
 
 **Estimated Time:** 3 weeks
 
@@ -138,7 +133,6 @@ wayland = ["dep:wayland-client"]
 - **Location:** `kernel/init/init_abstraction.rs`
 - **Description:** Define common interface for init systems
 - **Code Pattern:**
-
 
 ```rust
 pub trait InitSystem {
@@ -170,7 +164,6 @@ pub enum InitSystemType {
   - Stage 3: Shutdown tasks
   - Service scripts in `/etc/runit/`
 
-
 #### Task 11.2.3: S6 Implementation
 
 - **Location:** `kernel/init/s6.rs`
@@ -180,13 +173,11 @@ pub enum InitSystemType {
   - s6-rc service management
   - s6-notify-on-up service readiness
 
-
 #### Task 11.2.4: Init System Selection
 
 - **Location:** `bootloader/init_config.rs`
 - **Description:** Boot-time init system selection
 - **Configuration:** Kernel parameter `init=`
-
 
 **Testing Criteria:**
 
@@ -194,7 +185,6 @@ pub enum InitSystemType {
 - Service management works consistently across init systems
 - Init system switching is supported
 - Service status monitoring works
-
 
 **Estimated Time:** 4 weeks
 
@@ -218,7 +208,6 @@ pub enum InitSystemType {
   - Small stack support
   - No dynamic allocation in critical paths
 
-
 #### Task 11.3.2: Static Linking Optimization
 
 - **Location:** `tools/build/static_linker.rs`
@@ -227,7 +216,6 @@ pub enum InitSystemType {
   - Minimal static binaries under 10kB
   - Useful programs under 50kB
   - No external dependencies even for DNS, charset conversion
-
 
 #### Task 11.3.3: Musl Toolchain Integration
 
@@ -238,7 +226,6 @@ pub enum InitSystemType {
   - Cross-compilation support
   - Static linking by default
 
-
 #### Task 11.3.4: Dual Libc Support
 
 - **Location:** `userland/libc/dual_libc.rs`
@@ -248,14 +235,12 @@ pub enum InitSystemType {
   - Conditional compilation
   - ABI compatibility layer
 
-
 **Testing Criteria:**
 
 - Programs compile with both glibc and musl
 - Static-linked binaries work without external dependencies
 - Binary size targets are met
 - Performance benchmarks show improvement
-
 
 **Estimated Time:** 3 weeks
 
@@ -282,13 +267,11 @@ pub enum InitSystemType {
   - Memory allocation
   - I/O operations
 
-
 #### Task 12.1.2: Stack-Based Allocations
 
 - **Location:** `kernel/core/stack_alloc.rs`
 - **Description:** Replace heap allocations with stack allocations where possible
 - **Pattern:**
-
 
 ```rust
 #[inline(always)]
@@ -307,7 +290,6 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Network buffer pool
   - Page table pool
 
-
 #### Task 12.1.4: Memory Pool Elimination
 
 - **Location:** `kernel/mm/pool_elimination.rs`
@@ -317,14 +299,12 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Use static allocation for global structures
   - Eliminate dynamic allocation in error paths
 
-
 **Testing Criteria:**
 
 - No dynamic allocations in interrupt context
 - Critical path allocations eliminated
 - Memory usage reduced
 - Performance benchmarks show improvement
-
 
 **Estimated Time:** 4 weeks
 
@@ -348,7 +328,6 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Faster startup (no separate mapping/relocation)
   - Atomic upgrades possible
 
-
 #### Task 12.2.2: Parallel Initialization
 
 - **Location:** `kernel/init/parallel_init.rs`
@@ -358,13 +337,11 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Use thread pool for parallel init
   - Dependency graph for ordering
 
-
 #### Task 12.2.3: Lazy Initialization
 
 - **Location:** `kernel/core/lazy_init.rs`
 - **Description:** Defer initialization until first use
 - **Pattern:**
-
 
 ```rust
 pub struct Lazy<T> {
@@ -379,7 +356,7 @@ impl<T> Lazy<T> {
             init,
         }
     }
-    
+
     pub fn get(&self) -> &T {
         self.cell.get_or_init(|| (self.init)())
     }
@@ -396,14 +373,12 @@ impl<T> Lazy<T> {
   - Optimized kernel loading
   - Reduced boot messages
 
-
 **Testing Criteria:**
 
 - Boot time reduced by 30%
 - Dynamic linking overhead eliminated
 - Parallel initialization works correctly
 - Lazy initialization doesn't break dependencies
-
 
 **Estimated Time:** 4 weeks
 
@@ -422,7 +397,6 @@ impl<T> Lazy<T> {
 - **Location:** `kernel/security/capability.rs`
 - **Description:** Implement capability token system
 - **Code Pattern:**
-
 
 ```rust
 #[repr(C)]
@@ -451,7 +425,6 @@ pub struct CapabilityManager {
   - Device access
   - System calls
 
-
 #### Task 13.1.3: Capability Delegation
 
 - **Location:** `kernel/security/delegation.rs`
@@ -461,7 +434,6 @@ pub struct CapabilityManager {
   - Time-limited capabilities
   - Revocable capabilities
   - Audited delegation
-
 
 #### Task 13.1.4: Capability Audit
 
@@ -473,14 +445,12 @@ pub struct CapabilityManager {
   - Capability revocations
   - Capability violations
 
-
 **Testing Criteria:**
 
 - Capability checks prevent unauthorized access
 - All privileged operations require capabilities
 - Delegation works correctly
 - Audit trail is complete
-
 
 **Estimated Time:** 4 weeks
 
@@ -502,7 +472,6 @@ pub struct CapabilityManager {
   - Check certificate chain
   - Report verification status
 
-
 #### Task 13.2.2: Kernel Signing
 
 - **Location:** `tools/signing/kernel_sign.rs`
@@ -513,7 +482,6 @@ pub struct CapabilityManager {
   - Embed signature
   - Verify signature
 
-
 #### Task 13.2.3: Module Signing
 
 - **Location:** `tools/signing/module_sign.rs`
@@ -522,7 +490,6 @@ pub struct CapabilityManager {
   - All modules must be signed
   - Signature verification on load
   - Reject unsigned modules
-
 
 #### Task 13.2.4: Key Management
 
@@ -534,14 +501,12 @@ pub struct CapabilityManager {
   - Key rotation
   - Key backup
 
-
 **Testing Criteria:**
 
 - Secure Boot verification works
 - Signed kernel boots successfully
 - Unsigned kernel is rejected
 - Module signing and verification works
-
 
 **Estimated Time:** 3 weeks
 
@@ -565,7 +530,6 @@ pub struct CapabilityManager {
   - Incremental builds
   - Distributed builds
 
-
 #### Task 14.1.2: Dependency Resolution
 
 - **Location:** `tools/build/deps.rs`
@@ -575,7 +539,6 @@ pub struct CapabilityManager {
   - Version constraints
   - Alternative selection
   - Dependency graph visualization
-
 
 #### Task 14.1.3: Build Artifact Caching
 
@@ -587,7 +550,6 @@ pub struct CapabilityManager {
   - Documentation
   - Test results
 
-
 #### Task 14.1.4: Build Analytics
 
 - **Location:** `tools/build/analytics.rs`
@@ -598,14 +560,12 @@ pub struct CapabilityManager {
   - Test coverage
   - Code quality
 
-
 **Testing Criteria:**
 
 - Parallel builds are faster
 - Dependency resolution is correct
 - Cache hit rate is high
 - Analytics are accurate
-
 
 **Estimated Time:** 4 weeks
 
@@ -628,7 +588,6 @@ pub struct CapabilityManager {
   - Memory inspection
   - Register inspection
 
-
 #### Task 14.2.2: Performance Profiler
 
 - **Location:** `tools/prof/profiler.rs`
@@ -640,7 +599,6 @@ pub struct CapabilityManager {
   - I/O operation tracking
   - Flame graph generation
 
-
 #### Task 14.2.3: Memory Debugger
 
 - **Location:** `tools/debug/mem_debug.rs`
@@ -650,7 +608,6 @@ pub struct CapabilityManager {
   - Use-after-free detection
   - Buffer overflow detection
   - Memory usage analysis
-
 
 #### Task 14.2.4: System Tracing
 
@@ -662,14 +619,12 @@ pub struct CapabilityManager {
   - Network packet tracing
   - File operation tracing
 
-
 **Testing Criteria:**
 
 - Debugger works correctly
 - Profiler provides accurate data
 - Memory debugger finds issues
 - Tracing captures all events
-
 
 **Estimated Time:** 4 weeks
 
@@ -684,7 +639,6 @@ pub struct CapabilityManager {
 3. Zero-Allocation Optimizations (12.1)
 4. Capability-Based Security (13.1)
 
-
 ### Medium Priority (6-12 months)
 
 5. Musl Support (11.3)
@@ -692,11 +646,9 @@ pub struct CapabilityManager {
 7. Secure Boot Integration (13.2)
 8. Build System Enhancements (14.1)
 
-
 ### Low Priority (12-18 months)
 
 9. Debugging Tools (14.2)
-
 
 ---
 
@@ -709,7 +661,6 @@ pub struct CapabilityManager {
 - Memory usage reduced by 20%
 - Binary size reduced by 40% (musl)
 
-
 ### Security Metrics
 
 - All privileged operations require capabilities
@@ -717,14 +668,12 @@ pub struct CapabilityManager {
 - All modules signed
 - Zero vulnerabilities in critical paths
 
-
 ### Developer Experience Metrics
 
 - Build time reduced by 25%
 - Test coverage increased to 80%
 - Documentation coverage increased to 90%
 - Developer onboarding time reduced by 50%
-
 
 ---
 
@@ -736,12 +685,10 @@ pub struct CapabilityManager {
 - [musl - Introduction](https://www.musl-libc.org/intro.html)
 - [musl - About](http://musl.libc.org/about.html)
 
-
 ### Artix Linux
 
 - [Wiki | Main / runit](https://wiki.artixlinux.org/Main/Runit)
 - [GitHub - artix-linux/runit-artix](https://github.com/artix-linux/runit-artix)
-
 
 ### Gentoo
 
@@ -749,15 +696,13 @@ pub struct CapabilityManager {
 - [USE flags – Gentoo Development Guide](https://devmanual.gentoo.org/general-concepts/use-flags)
 - [USE flag index – Gentoo Linux](https://www.gentoo.org/support/use-flags/)
 
-
 ### Devuan
 
 - [Init Freedom | Devuan GNU+Linux](https://www.devuan.org/os/init-freedom)
 - [Devuan - Wikipedia](https://en.wikipedia.org/wiki/Devuan)
 
-
 ---
 
-**Document Version:** 2.0  
-**Last Updated:** July 2026  
+**Document Version:** 2.0
+**Last Updated:** July 2026
 **Next Review:** October 2026

@@ -241,18 +241,13 @@ The scheduler:
 
 - Runs schedule-based workflows at their configured time
 
-
 - Fires event-based workflows when conditions are met (CPU/disk/pkg)
-
 
 - Debounces event triggers (minimum 5 minutes between firings)
 
-
 - Logs every run to `~/.cache/sigma/agent/workflow_runs/`
 
-
 - Appends to audit log at `~/.cache/sigma/agent/workflow_audit.log`
-
 
 ---
 

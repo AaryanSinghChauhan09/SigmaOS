@@ -14,7 +14,6 @@ SigmaOS absorbs Gentoo's philosophy into the **Sovereign Build Layer** (`sigma-b
 - Toggle feature flags per-package to minimize binary size and attack surface
 - Build reproducible, verifiable system images from source (mirroring NixOS reproducibility with Gentoo-style flexibility)
 
-
 ---
 
 ## 2. Key Features to Absorb

@@ -21,12 +21,9 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 - `kernel/core/system/SovereignScheduler.cpp` (Deterministic Mode)
 
-
 - `kernel/core/hal/SovereignWatchdog.cpp`
 
-
 - `kernel/core/hal/SovereignArchRISCV.cpp`
-
 
 ---
 
@@ -34,8 +31,6 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 - [ ] Disable dynamic memory allocation (Zero-Alloc mode).
 
-
 - [ ] Pin critical shards to specific CPU cores.
-
 
 - [ ] Validate all task deadlines via **SovereignWCET**.

@@ -13,7 +13,6 @@ We absorb:
 - **Coreboot's** philosophy of extreme hardware initialization speed (booting to OS payload in milliseconds).
 - **Tianocore's (UEFI)** standard interfaces and Secure Boot validation mechanics, ensuring SigmaOS can run securely on modern x86 hardware.
 
-
 ---
 
 ## 2. Key Features Absorbed
@@ -34,7 +33,7 @@ $ sigma boot analyze
 
 ### 2.2 Immutable Secure Boot (Tianocore)
 
-SigmaOS acts as a UEFI payload, verifying its own kernel using post-quantum signatures before execution. 
+SigmaOS acts as a UEFI payload, verifying its own kernel using post-quantum signatures before execution.
 
 ```rust
 // bootloader/secure_boot.rs
@@ -43,7 +42,7 @@ SigmaOS acts as a UEFI payload, verifying its own kernel using post-quantum sign
 pub fn verify_kernel_signature(kernel_image: &[u8], signature: &[u8]) -> Result<()> {
     // 1. Check standard RSA-2048 (UEFI default)
     let rsa_valid = verify_rsa(kernel_image, signature);
-    
+
     // 2. Check SigmaOS Post-Quantum signature (Dilithium)
     let pqc_valid = verify_dilithium(kernel_image, signature);
 

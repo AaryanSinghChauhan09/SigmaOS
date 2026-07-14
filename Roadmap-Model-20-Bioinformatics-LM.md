@@ -6,7 +6,6 @@ Integrate a DNA/protein sequence model for bioinformatics workloads.
 - ESM-2 protein language model (650M Q8) integration
 - DNA BERT for genomic sequence analysis
 
-
 ## Key Milestones
 
 - [ ] Amino acid tokeniser (20 tokens)
@@ -27,7 +26,6 @@ Perform structural engineering simulations natively on SigmaOS.
 
 - 2D linear elastic FEA solver in sigma_scicomp.rs
 - Stiffness matrix assembly and LU solve
-
 
 ## Key Milestones
 

@@ -6,7 +6,6 @@ Design a systems scripting language tailored for SigmaOS automation.
 - Statically typed, memory-safe scripting language
 - Direct IPC and capability token API bindings
 
-
 ## Key Milestones
 
 - [ ] Lexer + recursive descent parser

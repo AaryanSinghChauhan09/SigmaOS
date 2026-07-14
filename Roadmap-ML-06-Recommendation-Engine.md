@@ -6,7 +6,6 @@ Recommend apps and settings based on user behaviour patterns.
 - Collaborative filtering on anonymised usage patterns
 - Matrix factorisation (SVD) in sigma_math.rs
 
-
 ## Key Milestones
 
 - [ ] User-app interaction log in sigma_db

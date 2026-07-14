@@ -11,21 +11,15 @@ The SigmaOS SDK lets you build applications that integrate natively with:
 
 - sigma-agent (AI CLI assistant)
 
-
 - sigma-bus (typed IPC)
-
 
 - sigma_pledge / sigma_unveil (security)
 
-
 - sigma-pkg (package distribution)
-
 
 - Zenith Desktop compositor
 
-
 - sigma-ai daemon (local LLM inference)
-
 
 **Languages:** Rust (primary), Nim (CLI tools), Zig (HAL/drivers), Ada/SPARK (security-critical)
 

@@ -20,7 +20,6 @@ SigmaOS utilizes an automated translation layer that reads upstream package defi
 4. **Verification & Signing**: The resulting binaries are scanned, hashed (BLAKE3), and signed using post-quantum cryptography (Dilithium5).
 5. **Publishing**: The signed package is published to the `sigma-recipes` repository.
 
-
 ## Supported Upstreams
 
 | Distro | Format | Status | Priority |

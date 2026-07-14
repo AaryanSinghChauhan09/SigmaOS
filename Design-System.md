@@ -9,12 +9,9 @@
 
 1. **Sovereign** — No dark patterns, no ads, no manipulation
 
-
 2. **Fluid** — Physics-based motion, every animation has purpose
 
-
 3. **Legible** — Contrast ≥ 4.5:1 (WCAG AA), always readable
-
 
 ---
 

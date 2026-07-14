@@ -10,15 +10,11 @@ The Pharmacist Profile is designed for pharmaceutical excellence, medication man
 
 - **SigmaMedication**: Medication inventory and dispensing management.
 
-
 - **SigmaPrescription**: Prescription processing and verification.
-
 
 - **SigmaPatient**: Patient medication history and counseling.
 
-
 - **SigmaSafety**: Drug interaction checking and safety alerts.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Pharmacist Profile is designed for pharmaceutical excellence, medication man
 
 - **Theme**: Pharmacy Green (Healthcare Standard)
 
-
 - **Layout**: Pharmacy Dashboard (Medication, Prescription, Patient)
 
-
 - **Personalization**: Custom dispensing workflows and automated safety checks.
-
 
 ---
 

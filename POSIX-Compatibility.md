@@ -37,7 +37,6 @@ The POSIX compatibility layer is designed as a bridge to the existing Unix/Linux
 - `unlink()` - Remove files
 - `access()` - Check file accessibility
 
-
 ### Process & Thread Model
 
 - `spawn()` - Modern process spawning (alternative to fork/exec)
@@ -46,7 +45,6 @@ The POSIX compatibility layer is designed as a bridge to the existing Unix/Linux
 - `getpid()` - Get process ID
 - `getppid()` - Get parent process ID
 - `kill()` - Send signals to processes
-
 
 ### Signals
 
@@ -58,12 +56,10 @@ The POSIX compatibility layer is designed as a bridge to the existing Unix/Linux
 - `sigismember()` - Check signal membership
 - Supported signals: SIGINT, SIGTERM, SIGKILL, SIGCHLD, SIGSTOP, SIGCONT, SIGHUP, SIGQUIT, SIGILL, SIGTRAP, SIGABRT, SIGBUS, SIGFPE, SIGUSR1, SIGSEGV, SIGUSR2, SIGPIPE, SIGALRM
 
-
 ### IPC (Inter-Process Communication)
 
 - `pipe()` / `pipe2()` - Create pipes
 - Socket-based IPC (see below)
-
 
 ### Networking Sockets
 
@@ -79,7 +75,6 @@ The POSIX compatibility layer is designed as a bridge to the existing Unix/Linux
 - Address families: AF_INET, AF_INET6, AF_UNIX
 - Socket types: SOCK_STREAM, SOCK_DGRAM, SOCK_RAW, SOCK_SEQPACKET
 
-
 ### Minimal libc Subset
 
 - **String functions**: `strlen`, `strcpy`, `strncpy`, `strcmp`, `strncmp`, `strchr`, `strstr`, `strcat`, `strncat`, `strdup`
@@ -88,7 +83,6 @@ The POSIX compatibility layer is designed as a bridge to the existing Unix/Linux
 - **Math functions**: `atoi`, `atol`, `strtol`, `strtoul`, `abs`, `labs`, `itoa`
 - **Error handling**: `strerror`, `errno`
 - **Exit functions**: `exit`, `_exit`, `abort`
-
 
 ## What's Excluded
 
@@ -103,13 +97,11 @@ No reimplementation of grep, awk, sed, etc. SigmaOS provides AI-native equivalen
 - No terminal control (termios)
 - No obscure POSIX APIs
 
-
 ### Heavy Compatibility Layers
 
 - No full POSIX threads (pthreads) - use SigmaOS native threading
 - No full POSIX IPC (System V IPC) - use SigmaOS native IPC
 - No full POSIX real-time extensions
-
 
 ## Key Differences from Full POSIX
 
@@ -266,14 +258,12 @@ int main() {
 3. **Avoid obscure POSIX features**: Stick to core POSIX primitives
 4. **Test thoroughly**: Test your application with the compatibility layer
 
-
 ### For Porting Applications
 
 1. **Identify POSIX dependencies**: Check which POSIX APIs your application uses
 2. **Verify compatibility**: Ensure all used APIs are in the POSIX capsule
 3. **Adapt to spawn()**: Replace fork/exec with spawn()
 4. **Test on SigmaOS**: Run tests on actual SigmaOS hardware or emulator
-
 
 ## Benefits
 
@@ -302,7 +292,6 @@ The POSIX compatibility layer adds minimal overhead:
 - Efficient file descriptor management
 - Optimized memory allocation
 
-
 ## Security
 
 The POSIX compatibility layer maintains SigmaOS's security model:
@@ -311,7 +300,6 @@ The POSIX compatibility layer maintains SigmaOS's security model:
 - No bypass of mandatory access control
 - Proper error handling and validation
 - Memory-safe Rust implementation
-
 
 ## Implementation Details
 
@@ -343,13 +331,11 @@ Current test coverage includes:
 - Pipe creation and usage
 - Socket operations (TCP/UDP)
 
-
 ### Future Testing
 
 - Port simple POSIX utilities (BusyBox)
 - Validate compatibility with common tools (curl, ssh)
 - Performance benchmarking
-
 
 ## Future Extensions
 
@@ -361,13 +347,11 @@ The following may be added based on demand:
 - Additional libc functions
 - POSIX threads subset (if needed)
 
-
 ## Documentation
 
 - [POSIX_CAPABLE_SPEC.md](../posix/POSIX_CAPABLE_SPEC.md) - Detailed specification
 - [README.md](../posix/README.md) - Usage guide and examples
 - [SigmaOS Architecture](Architecture.md) - Overall system architecture
-
 
 ## Contributing
 
@@ -379,7 +363,6 @@ When contributing to the POSIX compatibility layer:
 4. Add comprehensive documentation
 5. Test on real hardware when possible
 6. Update this wiki page with new features
-
 
 ## License
 

@@ -38,12 +38,9 @@ fn allocKPg(sz: usize) -> *mut u8 { ... }
 
 - **Never** use `.unwrap()` in kernel code — always propagate with `?` or explicit match
 
-
 - Use `Result<T, E>` for all fallible operations
 
-
 - Define domain-specific error enums (no `Box<dyn Error>` in `no_std`)
-
 
 ```rust
 // ✅ Good
@@ -63,12 +60,9 @@ fn alloc(size: usize) -> *mut u8 {
 
 - `unsafe` blocks require a `// SAFETY: <justification>` comment immediately above
 
-
 - Every `unsafe` block must be reviewed by 2 maintainers in PR
 
-
 - Minimize `unsafe` surface — wrap in safe abstractions immediately
-
 
 ```rust
 // ✅ Good
@@ -93,12 +87,9 @@ let val = unsafe { ptr.read() }; // no safety comment
 
 - All `pub` items **must** have `///` doc comments
 
-
 - Include `# Examples` sections for public API functions
 
-
 - Use `#[doc(hidden)]` only for true implementation details
-
 
 ```rust
 /// Allocate `size` bytes from the kernel heap.
@@ -121,18 +112,13 @@ pub fn sigma_malloc(size: usize) -> Result<*mut u8, MemoryError> { ... }
 
 - Use `comptime` for all generic code — no runtime dispatch where possible
 
-
 - Error unions: `!T` for all fallible functions
-
 
 - No heap allocation in hot paths without explicit `Allocator` parameter
 
-
 - All public functions documented with `/// ...` comments
 
-
 - Build: always go through `build.zig`, no raw `zig build-exe`
-
 
 ```zig
 // ✅ Good
@@ -152,15 +138,11 @@ pub fn readFile(path: []const u8) []u8 {
 
 - Every package spec (`.ads`) must have SPARK mode enabled: `pragma SPARK_Mode (On);`
 
-
 - All subprograms must have `Pre` and `Post` contracts
-
 
 - Run `gnatprove` in CI — no merge without 0 violations
 
-
 - No dynamic allocation in SPARK-proved subprograms
-
 
 ```ada
 -- ✅ Good
@@ -203,27 +185,19 @@ docs(wiki): add Absorption Matrix page
 
 - [ ] All CI checks pass (build, test, clippy, fmt)
 
-
 - [ ] `unsafe` code has `// SAFETY:` comments
-
 
 - [ ] New public APIs have `///` doc comments
 
-
 - [ ] Tests added for new functionality
-
 
 - [ ] No `unwrap()` in kernel code
 
-
 - [ ] No hardcoded paths or magic numbers (use named constants)
-
 
 - [ ] SPARK proofs pass for any `security/` changes
 
-
 - [ ] PR description references GitHub issue
-
 
 ---
 
@@ -233,23 +207,17 @@ docs(wiki): add Absorption Matrix page
 
 - Unit tests in `#[cfg(test)]` modules within each file
 
-
 - Integration tests in `kernel/tests/`
 
-
 - QEMU smoke tests run in CI via `sigma_qemu.yml`
-
 
 ### Userland Tests
 
 - `cargo test` for all crates
 
-
 - Property-based tests with `proptest` for parser/crypto code
 
-
 - `cargo bench` for performance-critical paths
-
 
 ### Minimum Coverage
 

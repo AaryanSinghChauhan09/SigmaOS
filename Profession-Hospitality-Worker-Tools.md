@@ -10,15 +10,11 @@ The Hospitality Worker Profile is designed for service excellence, task manageme
 
 - **SigmaTask**: Task assignment and completion tracking.
 
-
 - **SigmaSchedule**: Shift scheduling and time management.
-
 
 - **SigmaTraining**: Training modules and skill tracking.
 
-
 - **SigmaCommunication**: Team communication and coordination.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Hospitality Worker Profile is designed for service excellence, task manageme
 
 - **Theme**: Service Teal (Hospitality Standard)
 
-
 - **Layout**: Service Dashboard (Tasks, Schedule, Training)
 
-
 - **Personalization**: Custom task lists and priority settings.
-
 
 ---
 

@@ -6,7 +6,6 @@ Path planning algorithms for autonomous robots running SigmaOS.
 - A* and RRT* path planners
 - Dynamic obstacle avoidance (DWA)
 
-
 ## Key Milestones
 
 - [ ] Grid-based A* with heuristic priority queue

@@ -10,15 +10,11 @@ The Geologist Profile is designed for geological excellence, field research, and
 
 - **SigmaField**: Field research management and sample collection.
 
-
 - **SigmaAnalysis**: Geological analysis and mapping tools.
-
 
 - **SigmaSeismic**: Seismic data processing and monitoring.
 
-
 - **SigmaResearch**: Research collaboration and publication.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Geologist Profile is designed for geological excellence, field research, and
 
 - **Theme**: Earth Brown (Geology Standard)
 
-
 - **Layout**: Geology Dashboard (Field, Analysis, Seismic)
 
-
 - **Personalization**: Custom mapping tools and automated alerts.
-
 
 ---
 

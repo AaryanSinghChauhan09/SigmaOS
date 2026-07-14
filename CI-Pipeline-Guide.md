@@ -148,12 +148,9 @@ cargo update -p crate-name
 
 1. `arch/boot/sovereign_boot.asm` — does it print to serial?
 
-
 2. `kernel/core/sigma_irq.rs` — is serial console initialized (`serial_puts`)?
 
-
 3. `kernel/src/main.rs` — does it call `print_str("Welcome...")`?
-
 
 The QEMU boot test is currently **non-blocking** (warning only) until the kernel produces a stable boot.
 
@@ -169,9 +166,7 @@ The QEMU boot test is currently **non-blocking** (warning only) until the kernel
 
 - If removal is intentional: bump `kabi/src/version.rs`, run `python kabi/check.py snapshot`
 
-
 - If accidental: restore the symbol or add a compatibility shim
-
 
 ---
 
@@ -245,12 +240,9 @@ If a fuzz crash is found:
 
 1. Download the crash input from the artifact
 
-
 2. Open an issue with label `bug` `security` `fuzz-found`
 
-
 3. Reference `SECURITY_POLICY.md` if it's a security-sensitive crash
-
 
 ---
 

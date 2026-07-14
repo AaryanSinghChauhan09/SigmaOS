@@ -62,7 +62,7 @@ Block Distribution:
   Chunk 0 (64MB) → Node 1 (NVMe, fastest)
   Chunk 1 (64MB) → Node 1 (NVMe)
   Chunk 2 (22MB) → Node 2 (ARM64, medium speed)
-  
+
 Parity:
   Parity 0       → Node 3 (RISC-V, slowest, parity-only)
   Parity 1       → Node 2 (redundancy)
@@ -123,7 +123,6 @@ impl SigmaFs {
 - BLAKE3 integrity verification on every read
 - Compression: LZ4 for hot data, ZSTD for cold data
 
-
 ### ext4-compat (Legacy)
 
 For compatibility with existing Linux partitions:
@@ -131,7 +130,6 @@ For compatibility with existing Linux partitions:
 - Read-write support for ext4 with journaling
 - Transparent access to ext4 volumes via VFS
 - Migration tool: `sigma fs migrate --from ext4 --to sigma-fs`
-
 
 ### tmpfs-shard (RAM-backed)
 

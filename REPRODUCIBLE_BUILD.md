@@ -14,12 +14,9 @@ This allows:
 
 - Independent verification of official builds
 
-
 - Detection of compiler/build-system backdoors (XZ attack prevention)
 
-
 - Auditable supply chain for enterprise deployments
-
 
 ---
 

@@ -150,18 +150,13 @@ The generated `lib.rs` contains:
 
 - Correct SDF lifecycle (`probe/init/shutdown/irq`)
 
-
 - `sigma_pledge` call with inferred capabilities
-
 
 - `sigma_register_driver!` macro registration
 
-
 - TODO comments for register definitions (filled from vendor datasheet)
 
-
 - API mapping comments: `// Replace: ioremap → ddk::iomap`
-
 
 ### AI Translation Mode
 

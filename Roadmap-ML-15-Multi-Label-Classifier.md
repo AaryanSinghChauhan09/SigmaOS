@@ -6,7 +6,6 @@ Classify system log events into multiple categories simultaneously.
 - Binary Relevance approach for multi-label output
 - Threshold calibration per class
 
-
 ## Key Milestones
 
 - [ ] Log message tokeniser

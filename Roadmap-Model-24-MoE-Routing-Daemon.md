@@ -6,7 +6,6 @@ Provide a system-wide daemon that routes AI queries to specialized expert models
 - Gate routing based on input prompt classification.
 - Support hot-swapping expert weights dynamically.
 
-
 ## Key Milestones
 
 - [ ] MoE router daemon (moed.rs)

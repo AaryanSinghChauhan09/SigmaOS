@@ -13,7 +13,6 @@ The SigmaOS Gaming Layer provides first-class gaming support through:
 - **Performance Runtime**: Low-latency audio, high-priority GPU scheduling, frame pacing
 - **Game Store Integration**: Native `.spkg` game distribution with asset streaming
 
-
 ---
 
 ## Architecture
@@ -63,7 +62,6 @@ The SigmaOS Gaming Layer provides first-class gaming support through:
 - **Async Compute** queues for parallel GPU/CPU work
 - **Variable Rate Shading (VRS)** where supported
 
-
 ---
 
 ## DirectX Compatibility (sigma-dx)
@@ -101,7 +99,6 @@ sigma-dx is a translation layer that converts DirectX API calls to Vulkan, inspi
 - **Target**: < 1 ms frame timing variance at 60/120/144 Hz
 - Adaptive sync support (GSYNC, FreeSync, HDMI VRR)
 - Frame time prediction using exponential moving average
-
 
 ### Low-Latency Audio
 
@@ -201,7 +198,6 @@ vram_minimum_mb = 4096
 - **JIT compilation** for shaders not pre-compiled (sigma-shader-compiler)
 - **Shader cache** stored at `/var/cache/sigma/shaders/<game-hash>/`
 - **Online shader cache sharing** (opt-in): users contribute compiled shaders to improve experience for others
-
 
 ---
 

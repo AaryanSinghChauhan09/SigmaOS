@@ -6,7 +6,6 @@ Detect and warn when apps attempt to access sensitive data outside their sandbox
 - Capability access pattern baseline
 - Anomaly detection on cross-capability access
 
-
 ## Key Milestones
 
 - [ ] Access event log from capability token system

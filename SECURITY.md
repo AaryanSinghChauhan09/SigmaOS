@@ -14,7 +14,6 @@ SigmaOS implements a Zero-Trust, capability-first security architecture that com
 - **Signed Packages**: GPG-signed packages and repositories
 - **Audit Logging**: Comprehensive security audit trails
 
-
 ## Security Architecture
 
 ### System Call Flow
@@ -512,7 +511,6 @@ protocol = "syslog"
 - Failed authentication attempts
 - Suspicious file access patterns
 
-
 **Response**:
 
 1. Isolate affected system
@@ -522,13 +520,11 @@ protocol = "syslog"
 5. Implement remediation
 6. Update security policies
 
-
 **Tools**:
 
 - `sigma-audit`: Audit log analysis
 - `sigma-forensics`: Forensic data collection
 - `sigma-isolate`: System isolation
-
 
 ## Best Practices
 
@@ -539,7 +535,6 @@ protocol = "syslog"
 3. **Defense in Depth**: Multiple security layers
 4. **Audit Everything**: Comprehensive logging
 
-
 ### Configuration
 
 1. **Secure Defaults**: Enable security by default
@@ -547,14 +542,12 @@ protocol = "syslog"
 3. **Policy Review**: Regular policy reviews
 4. **Testing**: Security testing before deployment
 
-
 ### Monitoring
 
 1. **Real-time Monitoring**: Monitor security events
 2. **Alerting**: Automated alerting for incidents
 3. **Analysis**: Regular log analysis
 4. **Reporting**: Regular security reports
-
 
 ## Roadmap & Milestones
 
@@ -565,14 +558,12 @@ protocol = "syslog"
 - seccomp filter integration
 - Audit logging infrastructure
 
-
 ### Phase 2 (Months 3-6)
 
 - Integration of Landlock filesystem sandboxing
 - SELinux policy development
 - AppArmor profile support
 - Secure boot implementation
-
 
 ### Phase 3 (Months 6-9)
 
@@ -581,14 +572,12 @@ protocol = "syslog"
 - Advanced audit analysis
 - Incident response tools
 
-
 ### Phase 4 (Months 9-12)
 
 - System-wide Zero-Trust verification
 - Cryptographically signed capability tokens
 - IPC security enforcement
 - Advanced threat detection
-
 
 ## References
 

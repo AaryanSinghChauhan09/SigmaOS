@@ -14,13 +14,11 @@ The SigmaOS debugging suite integrates three industrial-strength debugging tools
 - Conditional breakpoints with hit counting
 - AI-suggested breakpoint placement around crash sites
 
-
 ### Perf Profiling
 
 - CPU cycle, cache miss, instruction, and branch miss counters
 - Configurable sample rate (default: 99 Hz)
 - Automatic **flamegraph generation** (SVG output)
-
 
 ### LTTng Kernel Tracing
 
@@ -28,13 +26,11 @@ The SigmaOS debugging suite integrates three industrial-strength debugging tools
 - Session-based recording with persistent trace storage
 - Output to `/var/log/sigma/traces/`
 
-
 ### AI-Assisted Analysis
 
 - **Stack trace analysis**: Detects SIGSEGV, SIGABRT, deadlock patterns
 - **Breakpoint suggestions**: Recommends breakpoint locations around crash sites
 - Powered by the local `sigma_ai_engine`
-
 
 ## Implementation
 
@@ -45,7 +41,6 @@ The SigmaOS debugging suite integrates three industrial-strength debugging tools
   - `startPerfProfile(pid, duration, sample_rate)` — launch perf recording
   - `createLttngSession(name)` — start kernel tracing
   - `analyzeStackTrace(trace)` — AI root-cause analysis
-
 
 ---
 
@@ -75,7 +70,6 @@ The SigmaOS debugging suite integrates three industrial-strength debugging tools
 - `SOURCE_DATE_EPOCH` override for deterministic timestamps
 - Environment clearing to prevent build pollution
 - SBOM generation in SPDX 2.3 format
-
 
 ## Implementation
 

@@ -1,7 +1,7 @@
 # SigmaOS Desktop UX — Zenith Control Center
 
-> **Status**: ✅ Implemented — prototype in `userland/gui/sigma_control_center.nim`  
-> **Language**: Nim (freestanding, OOP widget hierarchy)  
+> **Status**: ✅ Implemented — prototype in `userland/gui/sigma_control_center.nim`
+> **Language**: Nim (freestanding, OOP widget hierarchy)
 > **Branch**: `feature/multi-lang-impl-batch1`
 
 ---
@@ -34,7 +34,6 @@ DesktopWidget (ref object of RootObj)  ← abstract base
 - Format: ARGB8888 (`Pixel = SigmaU32`)
 - Operations: `setPixel`, `fillRect` — all bounds-checked, no exceptions
 - Background: `0xFF1A1A2E` (deep navy Sigma theme)
-
 
 ## Event System
 

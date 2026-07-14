@@ -14,21 +14,15 @@ sigma-ai is the on-device AI inference daemon for SigmaOS. It loads quantised GG
 
 - 100 % on-device: zero cloud API calls, zero telemetry
 
-
 - First token latency < 500 ms on x86_64 with AVX-512 (8B Q4 model)
-
 
 - Capability-gated access: processes must hold `"ai"` pledge token
 
-
 - Streaming token output via Server-Sent Events (REST) and sigma-bus stream IPC
-
 
 - Model packages distributed as `.sigpkg` format (same pipeline as regular packages)
 
-
 - Audit log: every inference request logged with requesting PID and token count
-
 
 ---
 
@@ -65,18 +59,13 @@ sigma-ai is the on-device AI inference daemon for SigmaOS. It loads quantised GG
 
 - Parse GGUF header: magic, version, metadata KV pairs, tensor descriptors
 
-
 - `mmap()` entire weight file — no heap copy; OS page cache handles eviction
-
 
 - Support quantisation types: Q4_0, Q4_K_M, Q8_0, F16, F32
 
-
 - Multi-model: up to 4 models loaded simultaneously (per-process mmap regions)
 
-
 - Model package format: standard `.sigpkg` with `payload/opt/sigma-ai/models/<name>.gguf`
-
 
 ---
 
@@ -131,15 +120,11 @@ Backend selected at daemon startup via CPUID / AT_HWCAP.
 
 - Per-PID token bucket: 10 000 tokens/minute burst, 1 000 tokens/minute sustained
 
-
 - System-wide cap: 50 000 tokens/minute total (configurable in `/etc/sigma-ai.conf`)
-
 
 - Exceeded: HTTP 429 / IPC `SIGMA_ERR_RATE_LIMITED`
 
-
 - Admin processes with `"ai_unlimited"` pledge bypass rate limiting
-
 
 ---
 
@@ -166,12 +151,9 @@ sigma-copilot is a thin shard (`suites/S034-AI/copilot/`) that wraps sigma-aid:
 
 - Shell completion: sends last 512 tokens of shell history as prompt; returns completion suggestion
 
-
 - Doc lookup: embeds query, cosine-searches local docs embedding index
 
-
 - Code assist: context-window injection of open file + cursor position
-
 
 ---
 
@@ -192,48 +174,33 @@ sigma-7b-q4-0.1.0-any.sigpkg
 
 - [ ] 1. GGUF header parser (`src/gguf.c`)
 
-
 - [ ] 2. mmap weight loader (`src/model_loader.c`)
-
 
 - [ ] 3. Tensor compute engine — scalar baseline (`src/compute_scalar.c`)
 
-
 - [ ] 4. AVX-512 backend (`src/compute_avx512.c`)
-
 
 - [ ] 5. NEON backend (`src/compute_neon.c`)
 
-
 - [ ] 6. KV cache manager (`src/kv_cache.c`)
-
 
 - [ ] 7. Tokenizer (BPE, loaded from model metadata)
 
-
 - [ ] 8. REST HTTP server (127.0.0.1:7734) with SSE streaming
-
 
 - [ ] 9. sigma-bus IPC endpoint
 
-
 - [ ] 10. Rate limiter (token bucket per PID)
-
 
 - [ ] 11. sigma_pledge self-restriction for sigma-aid
 
-
 - [ ] 12. Audit logger
-
 
 - [ ] 13. sigma-copilot shard (shell + docs + code assist)
 
-
 - [ ] 14. Model sigpkg installer hook
 
-
 - [ ] 15. Tests: GGUF load, tokenizer round-trip, rate limit, audit log
-
 
 ---
 

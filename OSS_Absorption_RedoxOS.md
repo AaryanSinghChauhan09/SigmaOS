@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-Redox is a Unix-like operating system written entirely in Rust, utilizing a microkernel architecture where drivers, filesystems, and network stacks run in userspace. 
+Redox is a Unix-like operating system written entirely in Rust, utilizing a microkernel architecture where drivers, filesystems, and network stacks run in userspace.
 
 SigmaOS absorbs Redox's **scheme-based URL routing** for IPC and its pure-Rust driver architecture, blending it with the high-performance Linux compatibility layer.
 

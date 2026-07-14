@@ -6,7 +6,6 @@ Use RL to auto-tune system parameters (scheduler quanta, memory pressure thresho
 - Q-Learning agent with discrete action space
 - Reward signal from benchmark telemetry
 
-
 ## Key Milestones
 
 - [ ] State representation from sigma_monitoring

@@ -6,7 +6,6 @@ Build a semantic knowledge graph linking OS components, errors, and documentatio
 - Entity-relation extraction from documentation
 - SPARQL-like query interface for the graph
 
-
 ## Key Milestones
 
 - [ ] Relation extraction pipeline (rule-based + LLM)
@@ -25,7 +24,6 @@ Auto-fill government and finance forms using stored user profile and LLM.
 
 - Structured field extraction from PDF forms
 - Privacy-preserving local profile store
-
 
 ## Key Milestones
 

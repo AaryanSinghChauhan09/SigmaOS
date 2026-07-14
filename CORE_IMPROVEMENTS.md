@@ -38,7 +38,6 @@ Target Y2: ~50,000 (via absorption pipeline + community recipes)
 - Flatpak hub integration for desktop applications
 - AppImage compatibility layer for portable apps
 
-
 ---
 
 ## 2. Kernel Core Improvements

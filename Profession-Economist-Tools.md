@@ -10,15 +10,11 @@ The Economist Profile is designed for economic analysis, policy research, and ef
 
 - **SigmaMacro**: Macroeconomic analysis and forecasting tools.
 
-
 - **SigmaModel**: Economic modeling and simulation environment.
-
 
 - **SigmaData**: Economic data aggregation and visualization.
 
-
 - **SigmaPolicy**: Policy impact analysis and scenario planning.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Economist Profile is designed for economic analysis, policy research, and ef
 
 - **Theme**: Analysis Teal (Economics Standard)
 
-
 - **Layout**: Research Dashboard (Models, Data, Policy)
 
-
 - **Personalization**: Custom economic indicators and automated reports.
-
 
 ---
 

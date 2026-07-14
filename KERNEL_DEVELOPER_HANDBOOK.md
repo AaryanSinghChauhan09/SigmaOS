@@ -85,15 +85,11 @@ let next_pid = sched_tick(now_ns);
 
 - **MLFQ**: 4 levels, aging every 200 ticks, interactive-friendly
 
-
 - **CFS**: vruntime + min-heap, fair CPU sharing
-
 
 - **EDF**: earliest deadline first, hard real-time guarantee
 
-
 - **Priority**: EDF > MLFQ > CFS > idle
-
 
 ### 4.2 Memory Manager (`kernel/core/sigma_mm.rs`)
 
@@ -108,15 +104,11 @@ sigma_mm_free_pages();  // check available physical pages
 
 - **Buddy allocator**: 2^n block sizes, O(log n) alloc/free
 
-
 - **Slab allocator**: 8 size classes (8–1024 bytes), O(1) alloc
-
 
 - **ASLR**: 42-bit entropy, randomized on every `mmap()`
 
-
 - **W^X**: write+exec simultaneously denied at `mmap()` level
-
 
 ### 4.3 IPC (`kernel/core/ipc/SovereignIPC.rs`)
 
@@ -159,12 +151,9 @@ After pledge, the kernel enforces:
 
 - Only declared syscalls allowed
 
-
 - `sigma_unveil()` limits filesystem access to declared paths
 
-
 - Violations: SIGKILL + audit log entry
-
 
 ---
 
@@ -228,21 +217,15 @@ cargo test -p kernel_core sched_mlfq_aging
 
 1. Branch from `main`: `git checkout -b feat/my-improvement`
 
-
 2. Write the code + tests
-
 
 3. Run: `cargo build --release && ./qemu-boot.sh standalone`
 
-
 4. Update wiki page in `wiki_repo/` if adding a new subsystem
-
 
 5. Open a PR — CI must be green
 
-
 6. PR description must include: what changed, QEMU smoke result, any new syscalls added
-
 
 ---
 
@@ -250,21 +233,15 @@ cargo test -p kernel_core sched_mlfq_aging
 
 - All kernel code: `#![no_std]`, no third-party crates, no `alloc` (use slab)
 
-
 - No `unsafe` without a `// SAFETY:` comment explaining why it's sound
-
 
 - Every `extern "C"` export must have a corresponding C header declaration
 
-
 - No `{s_name}` template placeholders left in code (check before PR)
-
 
 - W^X must be respected: never `mmap` with both WRITE and EXEC
 
-
 - `sigma_pledge()` must be called at the start of every new process
-
 
 ---
 

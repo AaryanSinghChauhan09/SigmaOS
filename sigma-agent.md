@@ -1,7 +1,7 @@
 # sigma-agent — Sovereign IPC Message Bus
 
-> **Status**: ✅ Implemented — prototype in `userland/agent/src/ipc_agent.rs`  
-> **Language**: Rust (`#![no_std]`, no external crates)  
+> **Status**: ✅ Implemented — prototype in `userland/agent/src/ipc_agent.rs`
+> **Language**: Rust (`#![no_std]`, no external crates)
 > **Branch**: `feature/multi-lang-impl-batch1`
 
 ---

@@ -26,33 +26,23 @@ Run a full system security audit covering 10 check categories:
 
 - Secure Boot state
 
-
 - Kernel hardening flags (SMEP, SMAP, stack protector)
-
 
 - Unexpected SUID binaries
 
-
 - SSH root login policy
-
 
 - Firewall status
 
-
 - Disk encryption
-
 
 - IMA integrity policy
 
-
 - PQC key presence
-
 
 - CVE database scan
 
-
 - Audit log daemon
-
 
 `--fix` automatically remediates any fixable findings.
 
@@ -86,12 +76,9 @@ Verify TPM 2.0 attestation chain:
 
 - Checks TPM chip presence
 
-
 - Verifies PCR[0] (boot) and PCR[7] (Secure Boot)
 
-
 - Validates quote signed by AIK
-
 
 ### `policy <list|set|export>`
 

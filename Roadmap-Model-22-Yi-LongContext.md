@@ -6,7 +6,6 @@ Enable large document understanding inside Zenith apps using Yi 6B.
 - Support up to 64K token contexts.
 - FlashAttention-2 CPU implementation for fast long-context computation.
 
-
 ## Key Milestones
 
 - [ ] FlashAttention kernel in Rust

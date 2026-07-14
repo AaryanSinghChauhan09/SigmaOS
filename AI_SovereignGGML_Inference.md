@@ -125,7 +125,6 @@ impl SigmaInference {
 - Models are stored in `/sigma/store/ai-models/` with content-addressed SHA-256 verification to prevent tampered model injection.
 - User prompts and query history are held only in RAM for the duration of the session; they are not persisted to disk unless explicitly requested.
 
-
 ---
 
 ## 6. References & Standards

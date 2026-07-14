@@ -6,7 +6,6 @@ Consolidate, compress, and prune episodic LLM conversational memory during OS id
 - Auto-extract semantic facts from chat logs, converting to key-value knowledge graphs in sigma_db.
 - Vector similarity pruning to maintain constant memory consumption bounds.
 
-
 ## Key Milestones
 
 - [ ] Fact extraction pipeline running on background low-priority queue
@@ -25,7 +24,6 @@ Interpret desktop UI layout, elements, and draw calls via visual model to detect
 
 - Screen raster rendering to local ViT visual parser.
 - Auto-detect UI overlaps, alignment issues, and color contrast failures locally.
-
 
 ## Key Milestones
 

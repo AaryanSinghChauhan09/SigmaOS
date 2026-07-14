@@ -9,7 +9,6 @@
 3. **PQC Signatures (WIP):** All packages `.spkg` are structurally validated via Ed25519 (and planned Dilithium/Kyber Post-Quantum) signatures against trusted repo public keys.
 4. **Mirrors:** Automatically rotates through redundant mirrors on latency timeout.
 
-
 ## Core Modules
 
 * `sigma_pkg_core.rs`: Main install, search, and remove entrypoints.

@@ -6,7 +6,6 @@ Build the foundation for AR/VR applications on SigmaOS.
 - OpenXR runtime integration
 - 6DoF pose tracking API in HAL
 
-
 ## Key Milestones
 
 - [ ] OpenXR instance and session management

@@ -19,18 +19,15 @@ In **SigmaOS Zenith**, the `SovereignAmoeba` shard implements this model by bind
 - **Amoeba Concept**: Resources are represented as objects with unique, random port identifiers. The client sends a request to the object ID, and the OS handles routing it to whichever machine currently holds that object.
 - **Sovereign Implementation**: Objects are registered in the **Global Sovereign Lattice**. If an application requests a shard execution, the system dynamically routes the request to the network node with the lowest CPU load.
 
-
 ### 2.2 Network-Wide Capability Tokens
 
 - **Amoeba Concept**: Security is managed through cryptographically secure capability tokens containing a service port, object index, rights bits, and a check field.
 - **Sovereign Implementation**: Capabilities are signed using Post-Quantum Cryptographic signatures (Dilithium5). Nodes verify access tokens without requiring a central login or identity server.
 
-
 ### 2.3 Transparent Process Migration
 
 - **Amoeba Concept**: Processes can be suspended, moved across the network to another node, and resumed transparently.
 - **Sovereign Implementation**: The `SovereignAmoeba` migration pipeline packages a running application's Wasm/SIP memory state and coordinates with the target node's scheduler to resume execution in sub-milliseconds.
-
 
 ---
 

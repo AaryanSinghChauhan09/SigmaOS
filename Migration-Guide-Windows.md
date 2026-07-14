@@ -22,7 +22,6 @@
 - [ ] Note which applications you use daily
 - [ ] Confirm hardware compatibility at `https://hardware.sigmaos.dev`
 
-
 ---
 
 ## Installation
@@ -40,7 +39,6 @@ Use **Rufus** (recommended):
 3. Select your USB drive
 4. Click Start (GPT partition for UEFI mode)
 
-
 Or use the SigmaOS USB Writer tool.
 
 ### Step 3: Enable UEFI Boot
@@ -50,14 +48,12 @@ Or use the SigmaOS USB Writer tool.
 3. Disable **Secure Boot** (or enroll the SigmaOS MOK key first)
 4. Set USB as first boot device
 
-
 ### Step 4: Install
 
 Boot from USB → "Install SigmaOS" → Choose partition layout:
 
 - **Wipe and install**: Replaces Windows entirely
 - **Dual boot**: Keeps Windows, installs SigmaOS alongside (GRUB manages boot)
-
 
 ---
 

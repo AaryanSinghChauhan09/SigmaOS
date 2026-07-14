@@ -48,12 +48,9 @@ Combinatorics analyzes the enumeration, combination, and permutation of discrete
 
 - **Rule of Product & Sum:** Fundamental counting principles calculating total execution paths across branched system states.
 
-
 - **Permutations ($P(n,r)$) & Combinations ($C(n,r)$):** Evaluates cryptographic key space arrangements and thread scheduling permutations.
 
-
 - **Pigeonhole Principle:** If $n+1$ items are placed into $n$ containers, at least one container must contain $\ge 2$ items. Used to mathematically prove hash table collision rates and cache thrashing boundaries.
-
 
 ### Arithmetic & Geometric Progression
 
@@ -87,15 +84,11 @@ Graph theory models pairwise relations between discrete objects using vertices (
 
 - **Directed & Undirected Graphs:** Represents process dependency trees, network routing topologies, and deadlock wait-for graphs.
 
-
 - **Graph Algorithms:** Integrates core searching and traversal primitives directly into the VFS and network routing shards:
-
 
 - **Breadth-First Search (BFS) & Depth-First Search (DFS):** Traverses hierarchical filesystem structures and AST dependency trees.
 
-
 - **Dijkstra's Shortest Path Algorithm:** Calculates minimum-latency network routing paths across active TCP/IP socket nodes.
-
 
 ```cpp
 // kernel/math/SovereignGraph.h
@@ -275,21 +268,15 @@ public:
 
 - **Issue - Algorithmic Complexity in Graph Traversals:** Unoptimized adjacency matrix scans yield $O(n^2)$ complexity, stalling network routing and deadlock detection.
 
-
 - *Fix Strategy:* Optimize complexity by replacing adjacency matrices with adjacency lists and Fibonacci heap priority queues, reducing Dijkstra's shortest path calculations from $O(V^2)$ to $O(E + V \log V)$.
-
 
 - **Issue - Deadlocks in Resource Allocation Graphs:** Circular wait dependencies between concurrent processes stall kernel execution.
 
-
 - *Fix Strategy:* Model process allocations as directed graphs, executing cycle detection via Tarjan's strongly connected components algorithm or topological sorting to break circular wait loops.
-
 
 - **Issue - Logical Fallacies in Rule Engines:** Incorrect predicate quantifier ordering ($\forall \exists$ vs $\exists \forall$) or flawed De Morgan expansions cause security policy bypasses.
 
-
 - *Fix Strategy:* Implement formal automated theorem proving and AST truth-table verification to guarantee tautological correctness across all policy branches.
-
 
 ---
 
@@ -297,15 +284,11 @@ public:
 
 - [Syllabus Implementation Map](Syllabus-Implementation-Map)
 
-
 - [SigmaDB SQL Engine](Syllabus-RDBMS)
-
 
 - [SigmaAI Intelligence Layer](Syllabus-AIML)
 
-
 - [SigmaStats Toolkit](Syllabus-Statistics)
-
 
 ---
 

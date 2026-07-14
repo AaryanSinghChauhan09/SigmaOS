@@ -6,7 +6,6 @@ Extend Zenith UI to 3D spatial environments for XR devices.
 - Scene graph for 3D widget placement
 - Hand-tracking gesture recognition
 
-
 ## Key Milestones
 
 - [ ] Scene graph node struct (no_std)

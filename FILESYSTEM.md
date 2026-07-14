@@ -66,7 +66,6 @@ pub trait Filesystem {
 - Extended attributes
 - Access control lists
 
-
 **Structure**:
 
 ```rust
@@ -97,7 +96,6 @@ pub struct Ext2Superblock {
 - Windows-compatible filesystem
 - Long filename support
 - Removable media support
-
 
 **Structure**:
 
@@ -130,7 +128,6 @@ pub struct Fat32BootSector {
 - AES-256-GCM encryption
 - Plausible deniability
 
-
 **Structure**:
 
 ```rust
@@ -157,7 +154,7 @@ pub struct CryptHeader {
 pub unsafe fn sys_open(path: *const u8, flags: i32, mode: u32) -> i32 {
     let path_str = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
     let vfs = get_current_vfs();
-    
+
     match vfs.open(path_str, flags as u32) {
         Ok(handle) => handle as i32,
         Err(e) => -e as i32,
@@ -171,7 +168,7 @@ pub unsafe fn sys_open(path: *const u8, flags: i32, mode: u32) -> i32 {
 pub unsafe fn sys_read(fd: i32, buf: *mut u8, count: usize) -> isize {
     let vfs = get_current_vfs();
     let handle = fd as FileHandle;
-    
+
     match vfs.read(handle, unsafe { slice_from_raw_parts_mut(buf, count) }) {
         Ok(n) => n as isize,
         Err(e) => -(e as isize),
@@ -185,7 +182,7 @@ pub unsafe fn sys_read(fd: i32, buf: *mut u8, count: usize) -> isize {
 pub unsafe fn sys_write(fd: i32, buf: *const u8, count: usize) -> isize {
     let vfs = get_current_vfs();
     let handle = fd as FileHandle;
-    
+
     match vfs.write(handle, unsafe { slice_from_raw_parts(buf, count) }) {
         Ok(n) => n as isize,
         Err(e) => -(e as isize),
@@ -201,7 +198,7 @@ pub unsafe fn sys_write(fd: i32, buf: *const u8, count: usize) -> isize {
 pub unsafe fn sys_mkdir(path: *const u8, mode: u32) -> i32 {
     let path_str = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
     let vfs = get_current_vfs();
-    
+
     match vfs.mkdir(path_str) {
         Ok(_) => 0,
         Err(e) => -e as i32,
@@ -215,7 +212,7 @@ pub unsafe fn sys_mkdir(path: *const u8, mode: u32) -> i32 {
 pub unsafe fn sys_rmdir(path: *const u8) -> i32 {
     let path_str = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
     let vfs = get_current_vfs();
-    
+
     match vfs.rmdir(path_str) {
         Ok(_) => 0,
         Err(e) => -e as i32,
@@ -242,7 +239,7 @@ pub struct FileInfo {
 pub unsafe fn sys_stat(path: *const u8, stat: *mut FileInfo) -> i32 {
     let path_str = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
     let vfs = get_current_vfs();
-    
+
     match vfs.stat(path_str) {
         Ok(info) => {
             unsafe { *stat = info };
@@ -262,7 +259,7 @@ pub unsafe fn sys_mount(source: *const u8, target: *const u8, fstype: *const u8,
     let source_str = unsafe { CStr::from_ptr(source) }.to_str().unwrap();
     let target_str = unsafe { CStr::from_ptr(target) }.to_str().unwrap();
     let fstype_str = unsafe { CStr::from_ptr(fstype) }.to_str().unwrap();
-    
+
     let vfs = get_vfs_manager();
     match vfs.mount(source_str, target_str, fstype_str, flags) {
         Ok(_) => 0,
@@ -277,7 +274,7 @@ pub unsafe fn sys_mount(source: *const u8, target: *const u8, fstype: *const u8,
 pub unsafe fn sys_umount(target: *const u8) -> i32 {
     let target_str = unsafe { CStr::from_ptr(target) }.to_str().unwrap();
     let vfs = get_vfs_manager();
-    
+
     match vfs.unmount(target_str) {
         Ok(_) => 0,
         Err(e) => -e as i32,
@@ -294,7 +291,6 @@ pub unsafe fn sys_umount(target: *const u8) -> i32 {
 3. **Component traversal**: Process each path component
 4. **Symbolic links**: Follow links (with cycle detection)
 5. **Mount points**: Cross mount boundaries
-
 
 ### Current Working Directory
 
@@ -387,7 +383,7 @@ pub struct CachedBuffer {
 pub fn check_permissions(mode: u32, uid: u32, gid: u32, required: u32) -> bool {
     let current_uid = get_current_uid();
     let current_gid = get_current_gid();
-    
+
     if current_uid == uid {
         // Owner permissions
         (mode & (required << 6)) != 0
@@ -409,7 +405,7 @@ pub fn check_file_capability(cap: u64, path: &str) -> bool {
     if !process.has_capability(cap) {
         return false;
     }
-    
+
     // Additional path-specific checks
     true
 }
@@ -452,14 +448,12 @@ pub fn write_back(cache: &mut PageCache) {
 4. **Distributed filesystems**: Ceph, GlusterFS
 5. **User-space filesystems**: FUSE support
 
-
 ### Research Areas
 
 1. **Persistent memory**: NVDIMM filesystems
 2. **Erasure coding**: Distributed storage
 3. **Deduplication**: Block-level deduplication
 4. **Compression**: Transparent compression
-
 
 ## Best Practices
 
@@ -471,7 +465,6 @@ pub fn write_back(cache: &mut PageCache) {
 4. Implement proper locking
 5. Test with various filesystems
 
-
 ### For Userland Developers
 
 1. Use standard file operations
@@ -479,7 +472,6 @@ pub fn write_back(cache: &mut PageCache) {
 3. Close file descriptors
 4. Use appropriate permissions
 5. Consider using mmap for large files
-
 
 ## Troubleshooting
 
@@ -494,7 +486,6 @@ pub fn write_back(cache: &mut PageCache) {
 3. Review driver logs
 4. Restore from backup
 
-
 ### Performance Issues
 
 **Symptoms**: Slow file operations
@@ -506,7 +497,6 @@ pub fn write_back(cache: &mut PageCache) {
 3. Review I/O patterns
 4. Consider different filesystem
 
-
 ### Mount Failures
 
 **Symptoms**: Cannot mount filesystem
@@ -517,7 +507,6 @@ pub fn write_back(cache: &mut PageCache) {
 2. Verify device is accessible
 3. Check for corruption
 4. Review mount options
-
 
 ## References
 

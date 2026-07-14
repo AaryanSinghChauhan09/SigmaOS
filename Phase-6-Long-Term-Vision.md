@@ -22,15 +22,11 @@ Official sovereign cloud images planned for:
 
 - AWS EC2 (x86_64 + ARM Graviton)
 
-
 - Azure (x86_64)
-
 
 - Google Cloud (x86_64 + ARM Ampere)
 
-
 - Bare-metal sovereign clouds (OVHcloud, Hetzner, Equinix Metal)
-
 
 ---
 
@@ -72,12 +68,9 @@ The Sovereign AI Scheduler (`klib/ai_scheduler.rs`) replaces static MLFQ with an
 
 - **`predict_demand(pid)`**: Forecasts per-process CPU and memory demand for a given PID.
 
-
 - **`adapt_quantum(demand)`**: Adjusts scheduling quantum dynamically based on prediction.
 
-
 - **Zero cloud dependency**: Model runs entirely on-device in the AI Engine shard, using no external ML libraries.
-
 
 ---
 
@@ -99,15 +92,11 @@ The `KernelWatchdog` struct monitors up to 32 registered kernel module shards. O
 
 - **`register_shard(name)`**: Registers a shard for monitoring.
 
-
 - **`report_failure(name)`**: Marks a shard as failed.
-
 
 - **`heal()`**: Scans all shards; restarts failed ones and returns the number of healed shards.
 
-
 - **Fault isolation**: Every subsystem runs in a Sovereign Shard with memory-sealed boundaries.
-
 
 ---
 
@@ -127,14 +116,10 @@ The `KernelWatchdog` struct monitors up to 32 registered kernel module shards. O
 
 - [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
 
-
 - [Roadmap](Roadmap)
-
 
 - [Security Model](Security-Model)
 
-
 - [PQC Hardening](PQC_HARDENING)
-
 
 - [Sovereign AI Roadmap](SOVEREIGN_AI_ROADMAP)

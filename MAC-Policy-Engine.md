@@ -22,11 +22,9 @@ pub struct SecurityContext {
 
 - Process, File, Directory, Socket, Device, IPC, System, Capability
 
-
 ### Permissions
 
 - Read, Write, Execute, Create, Delete, Append, Ioctl, Mmap, Connect, Bind, Accept, Send, Receive
-
 
 ## Policy Engine
 
@@ -49,7 +47,6 @@ pub struct PolicyEngine {
 4. If any rule allows → Allow
 5. If no rules match → default_deny ? Deny : Allow
 
-
 ## Capability System
 
 Linux-style capability sets:
@@ -59,7 +56,6 @@ Linux-style capability sets:
 - **Inheritable** - Inheritable by children
 - **Bounding** - Upper bound for all sets
 - **Ambient** - Preserved across exec
-
 
 ## API
 

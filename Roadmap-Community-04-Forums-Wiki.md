@@ -6,7 +6,6 @@ Build a self-hosted community knowledge base and discussion platform.
 - Discourse-equivalent self-hosted forum
 - Community-editable wiki (beyond GitHub Wiki)
 
-
 ## Key Milestones
 
 - [ ] Forum deployment on SigmaOS server image

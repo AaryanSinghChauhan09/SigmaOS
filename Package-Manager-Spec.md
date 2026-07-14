@@ -108,15 +108,11 @@ Every `.spkg` in the official registry is reproducibly built:
 
 1. Build environment is a hermetic sigma-pod container
 
-
 2. All inputs (source, deps, build tools) are content-addressed
-
 
 3. Build hash recorded in `build.proof`
 
-
 4. Any developer can verify: `sigma-pkg verify --repro firefox`
-
 
 ---
 

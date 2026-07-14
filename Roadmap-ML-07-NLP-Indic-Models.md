@@ -6,7 +6,6 @@ Embed multilingual NLP models supporting Hindi, Tamil, Bengali, and Gujarati.
 - IndicBERT or MuRIL quantised to Q4_K_M
 - Named entity recognition for Indic text
 
-
 ## Key Milestones
 
 - [ ] Tokeniser for Devanagari and Tamil scripts

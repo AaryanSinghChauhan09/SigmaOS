@@ -2,8 +2,8 @@
 
 ## Making GNOME/gnome-shell Irrelevant
 
-> **Absorption Target**: https://github.com/GNOME/gnome-shell  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/GNOME/gnome-shell
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaDesktop - Native Desktop Environment with GNOME-inspired Design
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed GNOME by implementing a native desktop enviro
 
 ### 1. Shell Design
 
-**Original**: GNOME Shell with JavaScript extensions  
+**Original**: GNOME Shell with JavaScript extensions
 **SigmaOS**: Native shell with Rust implementation
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaDesktop {
 - Native extensions with capability-based security
 - Gesture support with native recognition
 
-
 ### 2. Window Management
 
-**Original**: GNOME's Mutter window manager  
+**Original**: GNOME's Mutter window manager
 **SigmaOS**: Native window manager with enhanced features
 
 **Window Features**:
@@ -54,10 +53,9 @@ pub struct SigmaDesktop {
 - Native window decorations with theming
 - Window focus management with intelligent tracking
 
-
 ### 3. Panel System
 
-**Original**: GNOME's top bar with app indicators  
+**Original**: GNOME's top bar with app indicators
 **SigmaOS**: Native panel system with enhanced features
 
 **Panel Features**:
@@ -69,10 +67,9 @@ pub struct SigmaDesktop {
 - Native notification integration
 - Customizable panel with drag-and-drop
 
-
 ### 4. Application Integration
 
-**Original**: GNOME's application integration (GTK)  
+**Original**: GNOME's application integration (GTK)
 **SigmaOS**: Native application framework with compatibility
 
 **Application Features**:
@@ -84,10 +81,9 @@ pub struct SigmaDesktop {
 - Application updates with automatic notification
 - Application discovery with intelligent recommendations
 
-
 ### 5. Settings System
 
-**Original**: GNOME's Settings application  
+**Original**: GNOME's Settings application
 **SigmaOS**: Native settings system with unified configuration
 
 **Settings Features**:
@@ -99,10 +95,9 @@ pub struct SigmaDesktop {
 - Native theme customization
 - Hardware configuration with automatic detection
 
-
 ### 6. Notification System
 
-**Original**: GNOME's notification daemon  
+**Original**: GNOME's notification daemon
 **SigmaOS**: Native notification system with enhanced features
 
 **Notification Features**:
@@ -113,7 +108,6 @@ pub struct SigmaDesktop {
 - Notification actions with capability-based access
 - Notification history with search
 - Native notification sounds with custom audio
-
 
 ```text
 
@@ -141,13 +135,13 @@ pub struct SigmaDesktop {
 pub mod desktop {
     use sigma_desktop::shell::DesktopShell;
     use sigma_desktop::window::WindowManager;
-    
+
     pub struct SigmaDesktop {
         shell: DesktopShell,
         window_manager: WindowManager,
         panel_manager: PanelManager,
     }
-    
+
     impl SigmaDesktop {
         pub fn create_shell(&self, config: ShellConfig) -> DesktopShell {
             // Native shell creation
@@ -155,7 +149,7 @@ pub mod desktop {
             let themed = self.apply_gnome_theme(shell);
             DesktopShell::with_gnome_design(themed)
         }
-        
+
         pub fn manage_windows(&self) {
             // Native window management
             self.window_manager.start();
@@ -175,7 +169,7 @@ pub mod notification {
         grouping_engine: GroupingEngine,
         action_handler: ActionHandler,
     }
-    
+
     impl NotificationSystem {
         pub fn send_notification(&self, notification: Notification) {
             // Native notification delivery

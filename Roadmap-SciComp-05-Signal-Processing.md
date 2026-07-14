@@ -6,7 +6,6 @@ Comprehensive DSP tools for audio, radar, and sensor data.
 - FIR/IIR filter design and application
 - Short-Time Fourier Transform (STFT)
 
-
 ## Key Milestones
 
 - [ ] Kaiser window FIR design

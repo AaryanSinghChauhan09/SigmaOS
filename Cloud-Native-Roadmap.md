@@ -11,14 +11,12 @@ Cloud-native capabilities for SigmaOS including containerization, orchestration,
 - [ ] Container networking
 - [ ] Container storage
 
-
 ## Phase 2: Orchestration
 
 - [ ] Native orchestration system
 - [ ] Service discovery
 - [ ] Load balancing
 - [ ] Auto-scaling
-
 
 ## Phase 3: Cloud Integration
 
@@ -27,14 +25,12 @@ Cloud-native capabilities for SigmaOS including containerization, orchestration,
 - [ ] Cloud authentication
 - [ ] Hybrid deployment
 
-
 ## Phase 4: Serverless
 
 - [ ] Function-as-a-Service
 - [ ] Event-driven architecture
 - [ ] Serverless databases
 - [ ] Edge computing
-
 
 ## Timeline
 

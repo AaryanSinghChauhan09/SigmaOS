@@ -6,7 +6,6 @@ Embed a curated offline threat intelligence database in the Security Center.
 - STIX/TAXII threat feed import
 - IP/domain blocklist from curated offline feed
 
-
 ## Key Milestones
 
 - [ ] STIX JSON parser

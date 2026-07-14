@@ -7,7 +7,6 @@ Extend sigma_scicomp.rs with ODE solvers, FFT improvements, and linear algebra.
 - Cooley-Tukey FFT (radix-2, in-place)
 - LU decomposition for matrix inversion
 
-
 ## Key Milestones
 
 - [ ] RK4 solver implementation

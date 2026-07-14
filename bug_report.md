@@ -25,67 +25,47 @@ What actually happened. Include error messages, stack traces, or logs if availab
 
 1. Go to '...'
 
-
 2. Click on '....'
-
 
 3. Scroll down to '....'
 
-
 4. See error
-
 
 ## Environment
 
 - **SigmaOS Version**: (e.g., v0.1.0, commit hash)
 
-
 - **Architecture**: (e.g., x86_64, ARM64)
-
 
 - **Profile**: (e.g., standalone, cloud, microkernel)
 
-
 - **Hardware/VM**: (e.g., QEMU 8.0, Raspberry Pi 4, Dell XPS 15)
-
 
 ## Affected Subsystem
 
 - [ ] Kernel Core (scheduler, memory, syscalls)
 
-
 - [ ] Drivers (network, storage, GPU, USB)
-
 
 - [ ] Filesystem
 
-
 - [ ] Network Stack
-
 
 - [ ] Security
 
-
 - [ ] Package Manager
-
 
 - [ ] Boot/ISO
 
-
 - [ ] Desktop/GUI
-
 
 - [ ] Shell/Userland
 
-
 - [ ] Documentation
-
 
 - [ ] CI/CD
 
-
 - [ ] Other (specify)
-
 
 ## Additional Context
 

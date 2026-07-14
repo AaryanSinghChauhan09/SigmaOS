@@ -13,7 +13,6 @@ The CI pipeline is the ultimate source of truth.
 3. **Reproducibility Test (Future Phase):** The CI will build the kernel twice in completely disparate environments (different paths, different timezones) and verify the SHA-256 hashes match.
 4. **Cryptographic Signing:** The resultant kernel and `sigpkg` artifacts are signed via `sbsign` (mocked in CI currently) with the SigmaOS Secure Boot key.
 
-
 ## 3. Package Build Farm
 
 Similar to Nix/Guix, the SigmaOS package build farm utilizes isolated MicroVMs to compile packages.

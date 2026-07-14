@@ -6,7 +6,6 @@ Build a real-time interactive projection of high-dimensional OS state data.
 - Incremental UMAP projection updates.
 - Under 10ms frame rendering in Zenith dashboard.
 
-
 ## Key Milestones
 
 - [ ] Incremental UMAP algorithm

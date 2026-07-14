@@ -12,12 +12,9 @@ This document translates the strategic vision into concrete implementation tasks
 
 - SDF (Sovereign Driver Framework) v3 — implemented (`drivers/`)
 
-
 - 11 drivers loaded: net, storage, GPU, input, audio, USB
 
-
 - ABI stability checking — `sigma-drv abi check`
-
 
 ### New CLI Tool: `sigma-drv`
 
@@ -60,12 +57,9 @@ sigma-drv port --linux iwlwifi         # AI-assisted Linux driver porting guide
 
 - `sigma-pkg` implemented (`pkg/sigma_pkg_cli.nim`) with 12 commands
 
-
 - OCI container runtime: `userland/tools/sigma_pod_cli.nim`
 
-
 - Declarative config: `tools/cli/SovereignDeclarativeConfig.rs`
-
 
 ### Key Commands
 
@@ -166,15 +160,11 @@ sigma-ai (coordinator)
 
 - Dilithium-5 (NIST FIPS 204) — all packages and drivers signed
 
-
 - TPM 2.0 attestation — `sigma-secure attest`
-
 
 - NIST/RBI/HIPAA compliance — `sigma_compliance.nim`
 
-
 - sigma-fix AI-guided patching — `tools/sigma-fix.rs`
-
 
 ### Key Commands
 

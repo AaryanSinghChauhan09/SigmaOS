@@ -6,7 +6,6 @@ Use MoE architecture to serve multiple specialised models efficiently.
 - Top-2 expert routing with learned gating
 - Sparse activation for efficient memory use
 
-
 ## Key Milestones
 
 - [ ] Expert routing softmax gate

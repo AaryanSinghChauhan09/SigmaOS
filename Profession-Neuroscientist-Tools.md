@@ -10,15 +10,11 @@ The Neuroscientist Profile is designed for neuroscience excellence, brain resear
 
 - **SigmaBrain**: Brain imaging and analysis platform.
 
-
 - **SigmaExperiment**: Neuroscience experiment management.
-
 
 - **SigmaData**: Neural data processing and analysis.
 
-
 - **SigmaCollaboration**: Research collaboration and data sharing.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Neuroscientist Profile is designed for neuroscience excellence, brain resear
 
 - **Theme**: Neural Pink (Research Standard)
 
-
 - **Layout**: Neuroscience Dashboard (Brain, Experiment, Data)
 
-
 - **Personalization**: Custom analysis pipelines and automated processing.
-
 
 ---
 

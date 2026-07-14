@@ -6,12 +6,9 @@ All critical kernel paths in SigmaOS run without reliance on:
 
 - High-level language runtimes (Python, JS, Go)
 
-
 - Standard C/C++ libraries (stdlib, libc, stdio, string)
 
-
 - Pre-defined OS allocators (`malloc`, `free`)
-
 
 ## Custom Primitives
 

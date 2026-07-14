@@ -10,15 +10,11 @@ The Environmental Scientist Profile is designed for environmental excellence, ec
 
 - **SigmaEco**: Ecosystem monitoring and analysis.
 
-
 - **SigmaClimate**: Climate modeling and impact assessment.
-
 
 - **SigmaPollution**: Pollution tracking and remediation planning.
 
-
 - **SigmaSustainability**: Sustainability metrics and reporting.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Environmental Scientist Profile is designed for environmental excellence, ec
 
 - **Theme**: Environmental Green (Research Standard)
 
-
 - **Layout**: Environmental Dashboard (Eco, Climate, Pollution)
 
-
 - **Personalization**: Custom environmental models and automated alerts.
-
 
 ---
 

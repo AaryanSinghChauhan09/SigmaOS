@@ -6,7 +6,6 @@ A modern, stackable notification centre with AI filtering.
 - D-Bus-style notification protocol
 - ML-prioritised notification ranking
 
-
 ## Key Milestones
 
 - [ ] Notification daemon IPC channel

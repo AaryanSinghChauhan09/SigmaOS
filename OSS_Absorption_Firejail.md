@@ -2,8 +2,8 @@
 
 ## Making netblue30/firejail Irrelevant
 
-> **Absorption Target**: https://github.com/netblue30/firejail  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/netblue30/firejail
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaSecurity - Native Capability-Based Sandboxing
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Firejail by implementing a native capability-
 
 ### 1. Process Sandboxing
 
-**Original**: Firejail's namespace-based sandboxing  
+**Original**: Firejail's namespace-based sandboxing
 **SigmaOS**: Native capability-based sandboxing
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaSecurity {
 - Sandbox monitoring with real-time metrics
 - Sandbox cleanup with automatic reclamation
 
-
 ### 2. Profile System
 
-**Original**: Firejail's profile-based configuration  
+**Original**: Firejail's profile-based configuration
 **SigmaOS**: Native profile system with enhanced features
 
 **Profile Features**:
@@ -54,10 +53,9 @@ pub struct SigmaSecurity {
 - Profile distribution with content-addressed storage
 - Profile templates with automatic generation
 
-
 ### 3. Network Isolation
 
-**Original**: Firejail's network namespace isolation  
+**Original**: Firejail's network namespace isolation
 **SigmaOS**: Native network isolation with capability-based control
 
 **Network Features**:
@@ -69,10 +67,9 @@ pub struct SigmaSecurity {
 - Network simulation with virtual networks
 - Network testing with automated tools
 
-
 ### 4. Filesystem Isolation
 
-**Original**: Firejail's filesystem namespace isolation  
+**Original**: Firejail's filesystem namespace isolation
 **SigmaOS**: Native filesystem isolation with capability-based control
 
 **Filesystem Features**:
@@ -84,10 +81,9 @@ pub struct SigmaSecurity {
 - Filesystem profiles with automatic switching
 - Filesystem testing with automated tools
 
-
 ### 5. Resource Limiting
 
-**Original**: Firejail's cgroup-based resource limits  
+**Original**: Firejail's cgroup-based resource limits
 **SigmaOS**: Native resource limiting with hardware enforcement
 
 **Resource Features**:
@@ -99,10 +95,9 @@ pub struct SigmaSecurity {
 - Network limiting with automatic shaping
 - Resource monitoring with real-time metrics
 
-
 ### 6. Security Features
 
-**Original**: Firejail's seccomp filters  
+**Original**: Firejail's seccomp filters
 **SigmaOS**: Native security with capability-based control
 
 **Security Features**:
@@ -113,7 +108,6 @@ pub struct SigmaSecurity {
 - Security monitoring with real-time metrics
 - Security auditing with tamper-proof logs
 - Security testing with automated tools
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaSecurity {
 pub mod sandbox {
     use sigma_security::sandbox::SandboxManager;
     use sigma_security::capability::CapabilitySystem;
-    
+
     pub struct SigmaSecurity {
         sandbox_manager: SandboxManager,
         capability_system: CapabilitySystem,
         resource_limiter: ResourceLimiter,
     }
-    
+
     impl SigmaSecurity {
         pub fn create_sandbox(&self, profile: Profile) -> Sandbox {
             // Native sandbox creation
@@ -154,7 +148,7 @@ pub mod sandbox {
             let limited = self.resource_limiter.limit(capabilities);
             Sandbox::native(limited)
         }
-        
+
         pub fn isolate_process(&self, process: Process, sandbox: Sandbox) {
             // Native process isolation
             self.sandbox_manager.isolate(process, sandbox);
@@ -172,7 +166,7 @@ pub mod resource {
         memory_limiter: MemoryLimiter,
         io_limiter: IOLimiter,
     }
-    
+
     impl ResourceLimiter {
         pub fn limit_resources(&self, process: Process, limits: ResourceLimits) {
             // Hardware-enforced resource limiting

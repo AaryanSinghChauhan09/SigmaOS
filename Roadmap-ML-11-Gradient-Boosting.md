@@ -6,7 +6,6 @@ High-performance gradient boosted trees for tabular telemetry classification.
 - Histogram-based tree building (LightGBM-style)
 - Parallel tree construction using IPC thread pool
 
-
 ## Key Milestones
 
 - [ ] Histogram bin construction

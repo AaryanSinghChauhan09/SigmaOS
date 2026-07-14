@@ -6,7 +6,6 @@ Automatically discover optimal neural network architectures for SigmaOS tasks.
 - Evolutionary NAS with random mutations
 - Hardware-aware latency constraint
 
-
 ## Key Milestones
 
 - [ ] Architecture encoding (cell-based search space)

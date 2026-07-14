@@ -6,9 +6,7 @@ The SovereignVulkanLayer provides a direct, zero-wrapper C/C++ interface forward
 
 - Bypasses heavy Vulkan SDK runtime libraries entirely.
 
-
 - Streams pre-compiled SPIR-V binaries directly to memory-mapped GPU command queues (`VK_CMD_QUEUE`), achieving zero-copy shader execution.
-
 
 ## Architecture
 
@@ -54,7 +52,6 @@ void sigma_vulkan_destroy(void);
 - **No runtime overhead**: Bypasses Vulkan SDK validation layers
 - **Direct MMIO**: Commands are written directly to GPU memory-mapped I/O registers
 
-
 ## Roadmap
 
 - [x] Basic SPIR-V forwarding to GPU MMIO
@@ -63,7 +60,6 @@ void sigma_vulkan_destroy(void);
 - [ ] Error handling and GPU crash recovery
 - [ ] Integration with Zenith Desktop compositor
 - [ ] Vulkan 1.3 compatibility layer
-
 
 ## Related Modules
 

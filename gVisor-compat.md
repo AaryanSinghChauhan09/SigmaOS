@@ -149,8 +149,6 @@ pub fn load_linux_elf(path: &str) -> Result<u64, ElfError> {
 
 - `sigma-run /bin/hello-static` (a statically linked `puts("Hello, Linux!")` binary) runs and prints `Hello, Linux!`.
 
-
 - `sigma-run /bin/busybox-static ls /` lists the SigmaFS root directory.
-
 
 - Unimplemented syscalls return `ENOSYS` gracefully without panicking the kernel.

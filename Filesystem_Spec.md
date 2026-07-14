@@ -6,18 +6,13 @@ SigmaFS is SigmaOS's native filesystem. It is designed for correctness, security
 
 - **Copy-on-Write (CoW)** semantics for crash safety and snapshots
 
-
 - **Per-block zstd compression** for transparent space savings
-
 
 - **Per-volume encryption** (dm-crypt equivalent, AES-256-GCM)
 
-
 - **Journaling** for metadata consistency
 
-
 - **VFS integration** via the SigmaOS VFS layer
-
 
 ---
 
@@ -75,18 +70,13 @@ When a block is modified:
 
 1. Allocate a new physical block.
 
-
 2. Copy the original content to the new block.
-
 
 3. Apply the modification to the new block.
 
-
 4. Update the inode to point to the new block.
 
-
 5. Release the old block reference count (free if count == 0).
-
 
 This enables **snapshots**: freeze the inode table reference and create a new generation without copying any data.
 

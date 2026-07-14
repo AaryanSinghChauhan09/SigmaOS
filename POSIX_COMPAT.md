@@ -33,13 +33,11 @@ To allow binary compatibility with mainstream Linux distributions, SigmaOS inclu
    - Dispatch uses a binary search algorithm to look up the correct handler in **O(log n)** time.
 3. **`SyscallArgs`**: Represents the CPU registers used to pass arguments under the x86-64 Linux ABI (`rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9`).
 
-
 ## Implemented Syscalls
 
 - **File System**: `SYS_READ`, `SYS_WRITE`, `SYS_OPEN`, `SYS_CLOSE`, `SYS_STAT`, `SYS_LSEEK`, `SYS_CHMOD`, `SYS_UNLINK`, etc.
 - **Process Management**: `SYS_FORK`, `SYS_EXECVE`, `SYS_EXIT`, `SYS_KILL`, `SYS_GETPID`, `SYS_WAIT4`, etc.
 - **Memory Management**: `SYS_MMAP`, `SYS_MUNMAP`, `SYS_MPROTECT`, `SYS_BRK`, etc.
 - **Networking**: `SYS_SOCKET`, `SYS_CONNECT`, `SYS_ACCEPT`, `SYS_BIND`, `SYS_LISTEN`, etc.
-
 
 All handlers return standard negative POSIX errnos (e.g. `-EINVAL`, `-EBADF`, `-ENOSYS`) on failure.

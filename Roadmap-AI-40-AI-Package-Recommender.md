@@ -6,7 +6,6 @@ Suggest packages and tools based on the user's current project context.
 - Analyse open files and recent commands to detect project type
 - Match project type to curated sigpkg recommendations
 
-
 ## Key Milestones
 
 - [ ] Project type classifier (Rust/Python/C/Data)

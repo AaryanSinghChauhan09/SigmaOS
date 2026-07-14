@@ -6,7 +6,6 @@ Make UPI payments directly from the SigmaOS payment widget.
 - UPI deep-link and QR code generation
 - Payment status tracking via webhook
 
-
 ## Key Milestones
 
 - [ ] UPI URI scheme generator

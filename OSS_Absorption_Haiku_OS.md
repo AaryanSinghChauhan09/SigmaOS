@@ -2,8 +2,8 @@
 
 ## Making haiku/haiku Irrelevant
 
-> **Absorption Target**: https://github.com/haiku/haiku  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/haiku/haiku
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaKernel - Native Microkernel with Haiku-inspired UI
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Haiku OS by implementing a native microkernel
 
 ### 1. Lightweight UI Design
 
-**Original**: Haiku's responsive and lightweight UI  
+**Original**: Haiku's responsive and lightweight UI
 **SigmaOS**: Native SigmaCompositor with Haiku-inspired design
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaCompositor {
 - Native tab-based window management
 - Deskbar-inspired task management
 
-
 ### 2. BFS Filesystem Optimization
 
-**Original**: Be File System with attributes and indexing  
+**Original**: Be File System with attributes and indexing
 **SigmaOS**: SigmaFS with extended attribute support
 
 **Filesystem Features**:
@@ -54,10 +53,9 @@ pub struct SigmaCompositor {
 - Native metadata queries with SQL-like syntax
 - File versioning with automatic snapshots
 
-
 ### 3. Application Server
 
-**Original**: Haiku's application server for UI management  
+**Original**: Haiku's application server for UI management
 **SigmaOS**: Native SigmaAppServer with OS integration
 
 **App Server Features**:
@@ -69,10 +67,9 @@ pub struct SigmaCompositor {
 - Native drag-and-drop with type safety
 - Clipboard management with rich format support
 
-
 ### 4. Tracker File Manager
 
-**Original**: Haiku's innovative file manager  
+**Original**: Haiku's innovative file manager
 **SigmaOS**: SigmaFileManager with Tracker-inspired features
 
 **File Manager Features**:
@@ -84,10 +81,9 @@ pub struct SigmaCompositor {
 - Native file operations with zero-copy
 - Integrated terminal with command-line access
 
-
 ### 5. Media Kit
 
-**Original**: Haiku's multimedia framework  
+**Original**: Haiku's multimedia framework
 **SigmaOS**: SigmaMediaKit with hardware acceleration
 
 **Media Features**:
@@ -99,10 +95,9 @@ pub struct SigmaCompositor {
 - Native media format conversion
 - Hardware-accelerated video encoding/decoding
 
-
 ### 6. Network Stack
 
-**Original**: Haiku's network stack  
+**Original**: Haiku's network stack
 **SigmaOS**: SigmaNetStack with modern protocols
 
 **Network Features**:
@@ -113,7 +108,6 @@ pub struct SigmaCompositor {
 - Network transparency for file operations
 - Native VPN integration with WireGuard
 - Network monitoring with automatic diagnostics
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaCompositor {
 pub mod compositor {
     use sigma_graphics::gpu::GPURenderer;
     use sigma_ui::window::WindowManager;
-    
+
     pub struct SigmaCompositor {
         window_manager: WindowManager,
         renderer: GPURenderer,
         theme_engine: HaikuThemeEngine,
     }
-    
+
     impl SigmaCompositor {
         pub fn create_window(&self, config: WindowConfig) -> Window {
             // Haiku-inspired window creation
@@ -154,7 +148,7 @@ pub mod compositor {
             let themed = self.theme_engine.apply_haiku_style(window);
             Window::with_haiku_design(themed)
         }
-        
+
         pub fn render(&self, window: &Window) -> RenderedWindow {
             // Hardware-accelerated rendering
             self.renderer.render(window)
@@ -172,14 +166,14 @@ pub mod filesystem {
         index_engine: IndexEngine,
         journal: Journal,
     }
-    
+
     impl SigmaFS {
         pub fn set_attribute(&self, file: &File, attr: Attribute, value: Value) {
             // Native extended attributes
             self.attribute_store.set(file, attr, value);
             self.index_engine.update(file);
         }
-        
+
         pub fn query(&self, criteria: QueryCriteria) -> Vec<File> {
             // BFS-style file queries
             self.index_engine.query(criteria)

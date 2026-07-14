@@ -6,7 +6,6 @@ Centrally manage SigmaOS deployments across organisations.
 - OMA-DM compatible MDM protocol
 - Remote wipe, policy push, and inventory
 
-
 ## Key Milestones
 
 - [ ] MDM client daemon

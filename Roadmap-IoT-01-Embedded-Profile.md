@@ -6,7 +6,6 @@ A minimal SigmaOS image for microcontrollers and IoT devices.
 - Sub-1MB kernel image for Cortex-M4 targets
 - MQTT client for IoT device telemetry
 
-
 ## Key Milestones
 
 - [ ] Cortex-M4 HAL implementation

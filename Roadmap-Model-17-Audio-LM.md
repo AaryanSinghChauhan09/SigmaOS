@@ -6,7 +6,6 @@ Generate and understand audio events using a generative audio model.
 - AudioLM-style acoustic token prediction
 - System sound generation from text prompts
 
-
 ## Key Milestones
 
 - [ ] EnCodec audio tokeniser stub
@@ -25,7 +24,6 @@ Understand and summarise screen recordings and tutorials.
 
 - Frame sampling + CLIP visual embeddings
 - LLM-based video chapter summarisation
-
 
 ## Key Milestones
 

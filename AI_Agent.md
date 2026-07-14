@@ -14,7 +14,6 @@ SigmaOS incorporates a Natural Language-to-CLI shell agent (`SigmaAI Shell`) bui
 - **Interactive Confirmation**: User approval for sensitive operations
 - **Self-Healing**: Auto-correction of command syntax errors
 
-
 ## Architecture
 
 ### Safety Verification Flow
@@ -144,7 +143,7 @@ impl SigmaAIAgent {
     pub fn new(model_path: &str, safety_threshold: f32) -> Result<Self, AgentError> {
         let env = Environment::builder().build()?;
         let session = env.new_session(&model_path)?;
-        
+
         Ok(Self {
             model_path: model_path.to_string(),
             session,
@@ -152,72 +151,72 @@ impl SigmaAIAgent {
             capability_manager: CapabilityManager::new(),
         })
     }
-    
+
     pub fn parse_intent_to_cmd(&self, prompt: &str) -> Result<String, AgentError> {
         let system_instructions = "Translate the prompt to a safe POSIX command.";
         let formatted_prompt = format!("{} Prompt: {}", system_instructions, prompt);
-        
+
         // Run inference
         let raw_output = self.infer(&formatted_prompt)?;
-        
+
         // Validate command safety before returning
         if self.is_command_malicious(&raw_output) {
             return Err(AgentError::MaliciousCommandBlocked);
         }
-        
+
         Ok(raw_output)
     }
-    
+
     fn infer(&self, prompt: &str) -> Result<String, AgentError> {
         // Tokenize input
         let input_ids = self.tokenize(prompt)?;
-        
+
         // Create input tensor
         let input_tensor = Tensor::from_vec(input_ids)?;
-        
+
         // Run inference
         let outputs = self.session.run(vec![input_tensor])?;
-        
+
         // Decode output
         let output_text = self.decode_output(outputs)?;
-        
+
         Ok(output_text)
     }
-    
+
     fn is_command_malicious(&self, command: &str) -> bool {
         // Check against blocked commands
         let blocked_commands = vec!["rm -rf /", "mkfs", "dd", ":(){:|:&};:"];
-        
+
         for blocked in &blocked_commands {
             if command.contains(blocked) {
                 return true;
             }
         }
-        
+
         // Check safety score
         let safety_score = self.compute_safety_score(command);
         safety_score < self.safety_threshold
     }
-    
+
     fn compute_safety_score(&self, command: &str) -> f32 {
         // Simple heuristic-based safety scoring
         let mut score = 1.0;
-        
+
         // Penalize destructive operations
         if command.contains("rm") || command.contains("delete") {
             score -= 0.3;
         }
-        
+
         // Penalize system modifications
         if command.contains("chmod") || command.contains("chown") {
             score -= 0.2;
         }
-        
+
         // Penalize network operations
         if command.contains("curl") || command.contains("wget") {
             score -= 0.1;
         }
-        
+
         score.max(0.0)
     }
 }
@@ -239,14 +238,14 @@ impl SafetyValidator {
             policy_engine: PolicyEngine::new(),
         }
     }
-    
+
     pub fn validate_command(&self, command: &str, process_id: u64) -> Result<ValidationResult, ValidationError> {
         // Parse command
         let parsed_command = self.parse_command(command)?;
-        
+
         // Check against policy
         let policy_result = self.policy_engine.check(&parsed_command)?;
-        
+
         if !policy_result.allowed {
             return Ok(ValidationResult {
                 allowed: false,
@@ -254,10 +253,10 @@ impl SafetyValidator {
                 requires_confirmation: false,
             });
         }
-        
+
         // Check capabilities
         let capability_result = self.check_capabilities(&parsed_command, process_id)?;
-        
+
         if !capability_result.allowed {
             return Ok(ValidationResult {
                 allowed: false,
@@ -265,14 +264,14 @@ impl SafetyValidator {
                 requires_confirmation: false,
             });
         }
-        
+
         Ok(ValidationResult {
             allowed: true,
             reason: String::new(),
             requires_confirmation: self.requires_confirmation(&parsed_command),
         })
     }
-    
+
     fn requires_confirmation(&self, command: &ParsedCommand) -> bool {
         let sensitive_commands = vec!["rm", "mv", "chmod", "chown", "dd"];
         sensitive_commands.contains(&command.program.as_str())
@@ -295,25 +294,25 @@ impl CommandSandbox {
         let mut ruleset = Ruleset::new()
             .handle_access(Access::FS_READ_FILE)
             .handle_access(Access::FS_WRITE_FILE);
-        
+
         for path in allowed_paths {
             let path_beneath = PathBeneath::new(path.clone(), Access::all());
             ruleset.add_rule(path_beneath)?;
         }
-        
+
         Ok(Self { ruleset })
     }
-    
+
     pub fn execute_command(&self, command: &str) -> Result<CommandResult, SandboxError> {
         // Apply sandbox restrictions
         self.ruleset.apply()?;
-        
+
         // Execute command
         let output = Command::new("sh")
             .arg("-c")
             .arg(command)
             .output()?;
-        
+
         Ok(CommandResult {
             status: output.status,
             stdout: String::from_utf8_lossy(&output.stdout).to_string(),
@@ -332,7 +331,6 @@ impl CommandSandbox {
 - **Bengali (bn_IN)**: Bengali script support
 - **Tamil (ta_IN)**: Tamil script support
 - **Telugu (te_IN)**: Telugu script support
-
 
 ### Language Configuration
 
@@ -417,7 +415,6 @@ Continue? [y/N]: y
 3. **Confirmation**: Require confirmation for destructive operations
 4. **Sandboxing**: Execute commands in isolated sandbox
 
-
 ### Configuration
 
 1. **Model Selection**: Choose appropriate model for use case
@@ -425,14 +422,12 @@ Continue? [y/N]: y
 3. **Language Support**: Enable appropriate language models
 4. **Capability Limits**: Set appropriate capability limits
 
-
 ### Security
 
 1. **Validation**: Validate all commands before execution
 2. **Sandboxing**: Use sandbox for command execution
 3. **Audit Logging**: Log all command executions
 4. **User Consent**: Require user consent for sensitive operations
-
 
 ## Roadmap & Milestones
 
@@ -443,14 +438,12 @@ Continue? [y/N]: y
 - Basic safety validation
 - ONNX model integration
 
-
 ### Phase 2 (Months 3-6)
 
 - Sandbox execution environment
 - Advanced safety validation
 - Capability-based access control
 - Interactive confirmation system
-
 
 ### Phase 3 (Months 6-9)
 
@@ -459,14 +452,12 @@ Continue? [y/N]: y
 - Multi-language support
 - Indic language models
 
-
 ### Phase 4 (Months 9-12)
 
 - Self-healing shell integration
 - Auto-correction of syntax errors
 - Advanced context awareness
 - Learning from user behavior
-
 
 ## References
 

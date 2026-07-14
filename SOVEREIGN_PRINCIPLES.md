@@ -25,7 +25,6 @@ SigmaOS:           [Shard][Shard][Shard][Shard][Shard][...]
 - Shards can be updated, restarted, or replaced without reboot
 - Every shard has explicit capability declarations (least-privilege)
 
-
 ---
 
 ### Principle 2: Security Is the Substrate
@@ -78,7 +77,6 @@ SigmaOS is not an OS with AI bolted on — it is an OS **designed from the groun
 - Natural language CLI translates human intent to system commands
 - All AI runs **locally** with differential privacy guarantees
 
-
 **Privacy mandate**: No AI telemetry leaves the device without explicit, cryptographically-proven consent.
 
 ---
@@ -92,7 +90,6 @@ The user owns their computing environment completely. SigmaOS never:
 - Collects usage data without opt-in
 - Locks the user into vendor ecosystems
 - Hides system behavior behind opaque abstractions
-
 
 **Implementation**: Every system action is logged in the audit ring. Users can query `sigma audit why <event>` to understand any system action.
 
@@ -127,7 +124,6 @@ SigmaOS is never "done." The system is designed for continuous, safe evolution:
 - **AI autotuner** for continuous performance optimization
 - **Federated learning** for cross-device knowledge sharing (opt-in)
 
-
 **Guarantee**: Any SigmaOS installation from any era can be updated to the latest version in a single `sigma upgrade` command.
 
 ---
@@ -160,7 +156,6 @@ The `sigma_quality_check.sh` script validates:
 - No network calls without explicit user consent (P5)
 - No `unsafe` blocks without `// SAFETY:` justification (P2)
 - All new IPC uses sigma-bus, not ad-hoc channels (P3)
-
 
 ---
 

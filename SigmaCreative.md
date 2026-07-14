@@ -19,7 +19,6 @@ Scalable vector drawing tools (Illustrator alternative):
 - AI-powered vector tracing
 - Typography tools with OpenType features
 
-
 ### SigmaRaster (Raster Editing)
 
 Photo manipulation and layer-based image editing (Photoshop alternative):
@@ -36,7 +35,6 @@ Photo manipulation and layer-based image editing (Photoshop alternative):
 - AI-powered object selection and removal
 - Export to PNG, JPEG, TIFF, WebP, PSD
 
-
 ### SigmaVideo (Video Editing)
 
 Non-linear video editing (Premiere alternative):
@@ -51,7 +49,6 @@ Non-linear video editing (Premiere alternative):
 - Export to H.264, H.265, ProRes, VP9
 - AI-powered auto-captioning
 - Motion tracking and stabilization
-
 
 ## Architecture
 
@@ -123,7 +120,6 @@ int sigma_video_export(const video_project_t *proj, const char *path, codec_t co
 - **GPU Acceleration**: Vulkan-based rendering for real-time effects
 - **Zenith Desktop Integration**: Native Zenith UI components with touch/gesture support
 
-
 ## Performance Characteristics
 
 | Application | GPU Acceleration | Max Resolution | Real-time Preview |
@@ -144,7 +140,6 @@ int sigma_video_export(const video_project_t *proj, const char *path, codec_t co
 - [ ] Plugin system for third-party filters/effects
 - [ ] Mobile versions (SigmaOS Mobile)
 - [ ] Cloud collaboration (SigmaOS Cloud)
-
 
 ## Related Modules
 

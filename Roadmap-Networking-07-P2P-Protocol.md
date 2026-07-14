@@ -6,7 +6,6 @@ Decentralised peer-to-peer file sharing and messaging.
 - DHT-based peer discovery (Kademlia)
 - End-to-end encrypted messaging via PQC
 
-
 ## Key Milestones
 
 - [ ] Kademlia routing table (k-buckets)

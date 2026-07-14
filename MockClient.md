@@ -10,9 +10,7 @@ Arguments:
 
 - **origin** `string` - It should only include the **protocol, hostname, and port**.
 
-
 - **options** `MockClientOptions` - It extends the `Client` options.
-
 
 Returns: `MockClient`
 
@@ -21,7 +19,6 @@ Returns: `MockClient`
 Extends: `ClientOptions`
 
 - **agent** `Agent` - the agent to associate this MockClient with.
-
 
 ### Example - Basic MockClient instantiation
 

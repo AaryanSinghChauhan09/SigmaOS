@@ -66,20 +66,15 @@ Before opening a PR to `main`:
 
 1. CI must be green (`sigma_ci.yml`)
 
-
 2. Update `CURRENT_PROBLEMS_MANIFEST.md` if a bug is fixed
-
 
 3. New subsystems need a corresponding wiki page in `wiki_repo/`
 
-
 4. Kernel changes need a QEMU smoke test result in the PR description
-
 
 ## Deprecated Branches
 
 - `master` — legacy mirror of `main`. Do not use. Will be removed after v16.0.
-
 
 ---
 

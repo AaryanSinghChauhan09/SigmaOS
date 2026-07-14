@@ -46,15 +46,11 @@ Uses QEMU's `-M microvm` profile:
 
 - Minimal attack surface (no BIOS, no legacy devices)
 
-
 - VirtIO-blk for rootfs, VirtIO-net for networking
-
 
 - 256 MB RAM, 2 vCPUs by default
 
-
 - Boots in < 2 seconds
-
 
 ```bash
 
@@ -104,18 +100,13 @@ All containers run with:
 
 - sigma-compat namespace isolation
 
-
 - `sigma_pledge("stdio rpath wpath exec proc inet")`
-
 
 - W^X: no RWX memory regions
 
-
 - Optional read-only rootfs
 
-
 - Automatic cleanup on exit
-
 
 ---
 

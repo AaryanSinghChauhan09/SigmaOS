@@ -74,21 +74,15 @@ CI Pipeline duplicates:
 
 - [x] Create `ROADMAP.md` as canonical phase-based roadmap
 
-
 - [x] Create `DOWNLOAD.md` and `download.html`
-
 
 - [x] Create `QUICKSTART.md`
 
-
 - [ ] Add deprecation notice to `roadmap.md`: "See ROADMAP.md"
-
 
 - [ ] Add deprecation notice to `DEVELOPMENT_ROADMAP.md`
 
-
 - [ ] Delete `Architecture.md` (exact duplicate of `ARCHITECTURE.md`)
-
 
 ### Phase B — Wiki repo cleanup (batch PR)
 
@@ -108,12 +102,9 @@ The wiki has 500+ pages — many are valuable reference. The ones to consolidate
 
 - Keep all profession-specific pages (they're not duplicates)
 
-
 - Keep all shard manifest pages (they're not duplicates)
 
-
 - Keep all security / PQC pages (distinct content)
-
 
 ### Phase C — Contributor guidelines
 
@@ -122,7 +113,6 @@ The wiki has 500+ pages — many are valuable reference. The ones to consolidate
   of canonical files. New docs go in `docs/`. Wiki pages go in `wiki_repo/`."
 
 - Add `docs/README.md` with a table of what's in `docs/`
-
 
 ---
 
@@ -133,12 +123,9 @@ Doc sprawl is a trust signal. When a contributor opens the repo and finds
 
 - "Which one is current?"
 
-
 - "Has this project been abandoned and restarted multiple times?"
 
-
 - "Can I trust the documentation?"
-
 
 A clean, single-source-of-truth structure answers: *this project is organised,
 intentional, and ready for contributors.*
@@ -149,33 +136,23 @@ intentional, and ready for contributors.*
 
 - `CHANGELOG.md` — unique history
 
-
 - `FEATURE_MATRIX.md` — unique status table
-
 
 - `CURRENT_PROBLEMS_MANIFEST.md` — unique bug tracker
 
-
 - `GOVERNANCE.md` — unique governance policy
-
 
 - `SECURITY_POLICY.md` + `SECURITY.md` — unique security disclosures
 
-
 - `PROFILES.md` — unique profession profiles
-
 
 - All `Profession-*.md` wiki pages — unique per-profession content
 
-
 - All `Shard-*.md` wiki pages — unique shard reference
-
 
 - `LANGUAGE_POLICY.md` — unique ABI guide
 
-
 - `STRATEGIC_VISION.md` — unique high-level vision
-
 
 ---
 

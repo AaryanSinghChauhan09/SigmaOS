@@ -20,18 +20,13 @@
 
 1. **Design tokens** → `sigma_design_tokens.rs` (colours/spacing/radius/motion as constants)
 
-
 2. **Icon system** → 100+ 24×24 icons, SVG-to-bitmap rasterizer
-
 
 3. **Typography engine** → PSF bitmap → TrueType rasterizer
 
-
 4. **Dark/Light adaptive** → all components implement `Themed` trait
 
-
 5. **Consistency audit** → WCAG AA contrast, 8px grid, hover/active/focus on all elements
-
 
 ## Application Plan
 
@@ -62,18 +57,13 @@ Each app uses the **SigmaApp trait** (Model-View-Intent pattern).
 
 1. **Error hierarchy** — typed errors with context (not just `IoError`)
 
-
 2. **Capability-typed API** — phantom types prevent privilege escalation at compile time
-
 
 3. **Plugin system** — `Plugin` trait + `PluginManager` for extensibility
 
-
 4. **Reactive state** — MVI (Model-View-Intent) pattern for all app state
 
-
 5. **Async/await** — `sigma-async` no_std runtime for I/O-bound code
-
 
 ## Implementation Schedule
 

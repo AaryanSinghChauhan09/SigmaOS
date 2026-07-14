@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-OpenSSL is the industry-standard cryptography toolkit implementing SSL/TLS protocols and a wide range of cryptographic algorithms. 
+OpenSSL is the industry-standard cryptography toolkit implementing SSL/TLS protocols and a wide range of cryptographic algorithms.
 
 While SigmaOS targets memory safety through Rust-native cryptography (like `ring`), it absorbs OpenSSL's **assembly-optimized hardware acceleration** routines for x86_64 (AVX-512) and ARM (NEON/AES), wrapping them in a secure FFI layer to guarantee top-tier performance for cryptographic operations.
 

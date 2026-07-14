@@ -16,12 +16,9 @@ SigmaOS adopts this philosophy wholesale:
 
 - **Stability first**: kernel-integrated drivers are tested with every kernel change.
 
-
 - **Security by default**: no unsigned code executes in Ring 0 without PQC attestation.
 
-
 - **Community velocity**: open drivers attract contributors; proprietary blobs stagnate.
-
 
 ---
 
@@ -163,12 +160,9 @@ All proprietary blobs are:
 
 - Integrity-verified via SHA-256 + Dilithium-5 signature before load.
 
-
 - Isolated in a firmware namespace — cannot access user-space memory directly.
 
-
 - Logged by `sigmad-vault` for auditability.
-
 
 ---
 
@@ -208,15 +202,11 @@ Key rules:
 
 - **No global mutable state** outside the driver struct.
 
-
 - **No dynamic allocation** in `probe()` — use static probe tables.
-
 
 - **PQC attestation** via `SIGMA_SDF_REGISTER_DRIVER` macro at compile time.
 
-
 - **Ring-3 capable**: drivers annotated `#[sdf(ring3)]` run in user space (Phase G).
-
 
 ---
 
@@ -235,18 +225,13 @@ Key rules:
 
 1. Fork the repo and create `feat/driver-<name>` from `main`.
 
-
 2. Add your driver under `drivers/<category>/sigma_<name>.rs`.
-
 
 3. Register it with `sigma_sdf::register_driver!`.
 
-
 4. Add a QEMU smoke test in `tests/drivers/test_<name>.rs`.
 
-
 5. Open a PR to `main` — CI runs `sigma_ci.yml` including driver smoke tests.
-
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) and the
 [Driver API wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver-API).

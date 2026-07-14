@@ -6,7 +6,6 @@ Publish applications to the sigpkg registry with a single command.
 - sigma publish â†’ sign, upload, and index
 - Semantic versioning enforcement
 
-
 ## Key Milestones
 
 - [ ] Package manifest validation

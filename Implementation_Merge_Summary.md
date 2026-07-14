@@ -53,11 +53,9 @@ This dashboard tracks the implementation of roadmap features, the absorption of 
 2. **NixOS (Declarative Reproducibility)**: Declarative state enforcement blocking manual package mutations.
 3. **Arch Wiki (Knowledge Hub)**: Comprehensive `Knowledge-Base.md` covering installation, configuration, troubleshooting, and internals.
 
-
 ## 6. Conflicts Resolved
 
 - None — all merges were fast-forward.
-
 
 ## 7. Next Recommended Steps
 

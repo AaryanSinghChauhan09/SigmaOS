@@ -6,7 +6,6 @@ Detailed per-app energy accounting and sustainability dashboard.
 - Per-process CPU-time Ã— TDP energy estimation
 - Historical trend visualisation
 
-
 ## Key Milestones
 
 - [ ] Per-process energy accounting in scheduler

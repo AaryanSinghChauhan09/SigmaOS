@@ -8,7 +8,7 @@ SigmaOS integrates a native WebAssembly (WASM) runtime directly into the kernel,
 
 ## Architecture
 
-The SigmaOS WASM runtime is built on a `no_std` compatible interpreter (and eventual JIT compiler) that runs within its own Sovereign Shard (`S07_WASM_Runtime`). 
+The SigmaOS WASM runtime is built on a `no_std` compatible interpreter (and eventual JIT compiler) that runs within its own Sovereign Shard (`S07_WASM_Runtime`).
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -31,7 +31,6 @@ The SigmaOS WASM runtime is built on a `no_std` compatible interpreter (and even
 2. **Strict Sandboxing**: WASM modules execute in a linearly addressed memory space. Buffer overflows or illegal memory accesses are mathematically impossible to escape into the kernel.
 3. **WASI Compatibility**: The runtime implements a subset of the WebAssembly System Interface (WASI), mapped directly to `sigma-bus` IPC calls, allowing standard WASM modules (compiled from Rust, C/C++, Go) to run unmodified.
 4. **Hot-Swappable Capabilities**: Capabilities (network access, disk access) are injected at runtime via capability handles, adhering to the Sovereign Principles of least-privilege.
-
 
 ## Usage
 

@@ -6,7 +6,6 @@ Make SigmaOS a capable gaming platform with low-latency graphics.
 - Vulkan game driver support
 - Wine/Proton compatibility layer for Windows games
 
-
 ## Key Milestones
 
 - [ ] Vulkan driver integration

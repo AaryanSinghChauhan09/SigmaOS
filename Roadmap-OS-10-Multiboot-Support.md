@@ -6,7 +6,6 @@ First-class dual-boot support alongside Linux and Windows.
 - GRUB configuration generator for SigmaOS entry
 - UEFI boot manager entry management
 
-
 ## Key Milestones
 
 - [ ] sigma-boot UEFI application

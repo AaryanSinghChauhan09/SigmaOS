@@ -192,8 +192,6 @@ sigma-tpm2 seal --pcrs 0,4,7,8 --input /tmp/fde.key --output /boot/fde-sealed.bi
 
 - `sigma-trustd attest` produces a verified quote; verifier returns `{"status": "verified"}`.
 
-
 - FDE key unseals correctly on unmodified boot; fails after kernel replacement.
-
 
 - `sigma-tpm2 pcr-read 8` matches `sha256sum sigma-kernel.elf`.

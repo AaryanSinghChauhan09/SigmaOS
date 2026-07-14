@@ -198,12 +198,9 @@ VirtIO-GPU → DRM/KMS atomic → Mesa Gallium Vulkan ICD → VkSwapchain
 
 1. sigma-boot.zig: parallel DMA for kernel + initramfs load
 
-
 2. kernel: lazy driver init (probe only NVMe + e1000 at boot)
 
-
 3. sigma-init: parallel daemon start with dependency graph
-
 
 4. Zenith: show splash frame within 500ms of kernel start
 
@@ -268,18 +265,13 @@ Registry API:
 
 - [ ] Create v0.1.0 GitHub Release tag
 
-
 - [ ] Upload signed ISO to release assets
-
 
 - [ ] Write "Getting Started" blog post
 
-
 - [ ] Post to HackerNews + r/linux
 
-
 - [ ] Open GitHub Discussions for feedback
-
 
 ---
 

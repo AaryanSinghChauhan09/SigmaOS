@@ -26,21 +26,15 @@ Each activates different kernel features via CMake feature flags.
 
 - Full Zenith desktop environment (C++ compositor)
 
-
 - All profession tools pre-installed
-
 
 - sigma-ai local LLM daemon
 
-
 - Indian IME (Inscript + phonetic)
-
 
 - sigma-pkg GUI package manager
 
-
 - Auto-tiling window manager
-
 
 ### Build:
 
@@ -58,15 +52,11 @@ make PROFILE=standalone iso
 
 - `navigator.sigmaos.*` API for PWAs
 
-
 - Zero-install packages (stream from repo)
-
 
 - Boots to Chromium in < 3 seconds
 
-
 - No traditional desktop stack
-
 
 ### Build:
 
@@ -84,21 +74,15 @@ make PROFILE=browser iso
 
 - < 512 KB kernel image
 
-
 - < 8 MB RAM footprint
-
 
 - sigma-bus IPC
 
-
 - Capability token passing
-
 
 - No userland except sigma-sh
 
-
 - Formal verification target (Coq/Frama-C)
-
 
 ### Build:
 
@@ -116,21 +100,15 @@ make PROFILE=microkernel iso
 
 - ARM64 GIC interrupt controller
 
-
 - P/C-state aware scheduler
-
 
 - Touch-optimised Zenith UI
 
-
 - NEON-accelerated Kyber
-
 
 - sigma-ultra USSD text mode (Pi Zero)
 
-
 - RISC-V support (planned)
-
 
 ### Build:
 
@@ -148,21 +126,15 @@ make PROFILE=mobile ARCH=arm64 iso
 
 - EDF (earliest-deadline-first) scheduler
 
-
 - Priority inheritance protocol
-
 
 - Bounded IRQ latency < 10 µs
 
-
 - ROS 2 DDS middleware port
-
 
 - sigma-twin real IoT sensor path
 
-
 - PREEMPT_RT-style full preemption
-
 
 ### Build:
 
@@ -180,18 +152,13 @@ make PROFILE=rtos iso
 
 - EFI boot entry registration
 
-
 - Partition layout auto-detector
-
 
 - Windows NTFS read-only mount
 
-
 - GRUB chainload fallback
 
-
 - Non-destructive installer
-
 
 ### Build:
 
@@ -209,21 +176,15 @@ make PROFILE=dualboot iso
 
 - Immutable root filesystem
 
-
 - A/B partition atomic updates
-
 
 - Container-first, no GUI overhead
 
-
 - sigma-pod (cgroup + namespace)
-
 
 - sigma-fleet MDM agent
 
-
 - OpenTelemetry export
-
 
 ### Build:
 
@@ -241,21 +202,15 @@ make PROFILE=cloud iso
 
 - ZeroNet mesh networking
 
-
 - CRDT offline-first sync
-
 
 - SovereignCloudFS
 
-
 - sigma-mesh-compute scheduler
-
 
 - Container orchestration
 
-
 - DLT blockchain-lite
-
 
 ### Build:
 

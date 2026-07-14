@@ -11,7 +11,6 @@ Applications must declare their network requirements in their `sigpkg` manifest 
 - **Example:** A web browser package requests `OUTBOUND 80/tcp, 443/tcp`.
 - **Example:** A database requests `INBOUND 5432/tcp`.
 
-
 ## 3. MicroVM Network Namespaces
 
 When an application is launched, it is placed inside a `sigma_sandbox.rs` MicroVM.
@@ -19,7 +18,6 @@ When an application is launched, it is placed inside a `sigma_sandbox.rs` MicroV
 - A virtual network interface (`veth`) is generated for that specific VM.
 - Egress/Ingress iptables/nftables-equivalent rules are applied directly to that specific interface based on the declarative manifesto.
 - If an app attempts to connect to an unauthorized port, the packet is instantly dropped at the hypervisor level.
-
 
 ## 4. WireGuard Profiles
 

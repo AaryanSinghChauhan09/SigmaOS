@@ -6,7 +6,6 @@ Use LLM to analyse GDB backtraces and suggest root-cause fixes.
 - Parse GDB RSP output and feed to local LLM context
 - Generate fix suggestions with confidence scores
 
-
 ## Key Milestones
 
 - [ ] GDB backtrace structured parser

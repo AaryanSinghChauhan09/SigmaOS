@@ -6,7 +6,6 @@ Include ethical hacking tools in an isolated sigma-pod container.
 - nmap-equivalent port scanner
 - Burp-equivalent HTTP proxy in container
 
-
 ## Key Milestones
 
 - [ ] SYN port scanner (raw socket)

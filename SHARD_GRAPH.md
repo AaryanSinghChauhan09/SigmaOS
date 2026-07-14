@@ -164,5 +164,4 @@ Boot Order    Shard                 Dependencies
 4. **Single sink**: Only S33_Finality has zero dependents
 5. **Category ordering**: Core → Security → Registry → Infrastructure → Services → UI → Finality
 
-
 **Validation command**: `sigma registry validate-graph`

@@ -189,8 +189,6 @@ sigma-audio list
 
 - `sigma-play /usr/share/sounds/sigma-boot.wav` plays audio through PipeWire on real hardware.
 
-
 - `sigma-audio list` enumerates audio sources and sinks from the PipeWire graph.
-
 
 - sigma-audiod registers as a sigma-bus shard and responds to `capability: audio` queries.

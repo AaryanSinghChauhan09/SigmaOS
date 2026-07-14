@@ -4,7 +4,7 @@
 
 ## 1. Executive Summary
 
-To reduce duplicacy and redundancy across the SigmaOS ecosystem, all conceptual, architectural, and design documentation is being migrated to the GitHub Wiki. 
+To reduce duplicacy and redundancy across the SigmaOS ecosystem, all conceptual, architectural, and design documentation is being migrated to the GitHub Wiki.
 
 The main repository will strictly retain developer-centric files:
 
@@ -12,7 +12,6 @@ The main repository will strictly retain developer-centric files:
 - `CONTRIBUTING.md` (Build instructions, PR guidelines)
 - `SECURITY.md` (Vulnerability reporting policy)
 - `LICENSE`
-
 
 ---
 
@@ -34,7 +33,6 @@ The main repository will strictly retain developer-centric files:
 - [ ] Migrate `INSTALL.md` edge cases to the Wiki's Troubleshooting section.
 - [x] Implement CI/CD automation to detect `.md` duplication between repo and Wiki.
 
-
 ---
 
 ## 4. Weekly Progress Dashboard (Week ending 2026-07-13)
@@ -51,6 +49,5 @@ The main repository will strictly retain developer-centric files:
 1. Address unit/integration test compile warnings in `sigma-control-center` and `sigma-ai-integration`.
 2. Fully audit and clear placeholders in `.kiro` files.
 3. Migrate `INSTALL.md` instructions and build script readmes into the wiki.
-
 
 *All contributors: Please place new conceptual design documents directly in the Wiki, rather than opening a PR with a new `.md` file in the main repository.*

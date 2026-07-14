@@ -11,7 +11,6 @@ SigmaOS kernel development roadmap to achieve parity with established Linux dist
 - Basic process management
 - Minimal hardware compatibility
 
-
 ## Gap Analysis
 
 Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's kernel is still experimental.
@@ -26,7 +25,6 @@ Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's k
 - [ ] Add stack canaries
 - [ ] Implement kernel page table isolation (KPTI)
 
-
 ### Phase 2: Driver Stack Expansion
 
 - [ ] GPU drivers (NVIDIA, AMD, Intel)
@@ -35,7 +33,6 @@ Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's k
 - [ ] IoT device drivers
 - [ ] USB driver expansion
 - [ ] Bluetooth driver support
-
 
 ### Phase 3: Performance Optimization
 
@@ -46,7 +43,6 @@ Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's k
 - [ ] Memory management optimization (THP, KSM)
 - [ ] Power-aware scheduling (Clear Linux inspiration)
 
-
 ### Phase 4: Filesystem Support
 
 - [ ] ext4 support with full features
@@ -56,7 +52,6 @@ Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's k
 - [ ] F2FS support for SSDs
 - [ ] Filesystem encryption support
 
-
 ### Phase 5: Stability & Reliability
 
 - [ ] Kernel crash dumps
@@ -65,7 +60,6 @@ Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's k
 - [ ] Stress testing framework
 - [ ] Long-term support branches
 
-
 ## Timeline
 
 - Q3 2026: Phase 1 - Kernel Hardening
@@ -73,7 +67,6 @@ Linux has decades of optimizations, hardware drivers, and stability. SigmaOS's k
 - Q1 2027: Phase 3 - Performance Optimization
 - Q2 2027: Phase 4 - Filesystem Support
 - Q3 2027: Phase 5 - Stability & Reliability
-
 
 ## References
 

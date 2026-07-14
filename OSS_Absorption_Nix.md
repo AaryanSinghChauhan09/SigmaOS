@@ -14,7 +14,6 @@ SigmaOS absorbs three key Nix innovations:
 2. **Reproducible builds** — every SigmaOS package can be rebuilt bit-for-bit from its derivation
 3. **Nix Flakes**-style declarative system specs — `sigma.toml` (the NixOS-equivalent config)
 
-
 ---
 
 ## 2. Architecture

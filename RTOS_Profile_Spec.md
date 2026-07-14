@@ -14,15 +14,11 @@ Each real-time task is defined by:
 
 - **Period** `T` — task repeats every `T` microseconds
 
-
 - **Worst-Case Execution Time** `C` — maximum CPU time per period
-
 
 - **Deadline** `D` — must complete within `D` µs of period start (usually `D = T`)
 
-
 - **Utilisation** `U = C / T`
-
 
 ### Schedulability (Liu-Layland Bound)
 
@@ -84,18 +80,13 @@ Achieving < 10 µs IRQ-to-handler latency requires:
 
 1. **Interrupt nesting**: critical IRQs use a dedicated high-priority interrupt vector (x86: IOAPIC priority steering; ARM: GIC priority grouping).
 
-
 2. **No spin-lock contention in IRQ path**: all IRQ handlers are lock-free (use atomic operations + per-CPU data structures).
-
 
 3. **No dynamic allocation in IRQ context**: all buffers pre-allocated at init.
 
-
 4. **Minimal IRQ handler**: immediately post a message to a real-time task's mailbox, return.
 
-
 5. **Cache warming**: real-time task stacks pinned to L1 cache via `CLFLUSHOPT` prefetch.
-
 
 ### IRQ Latency Measurement
 

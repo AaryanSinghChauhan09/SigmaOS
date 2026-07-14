@@ -12,7 +12,6 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
 - **Build Farm**: Use controlled build environments
 - **Transparency**: Make build process auditable and verifiable
 
-
 ## Reproducible Build Requirements
 
 ### Build Environment
@@ -23,20 +22,17 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
    - Kernel headers version pinned
    - Build dependencies version pinned
 
-
 2. **Controlled Environment**:
    - Fixed base image (Docker/OCI)
    - Deterministic filesystem layout
    - Fixed timestamps
    - Controlled locale settings
 
-
 3. **Build Isolation**:
    - Containerized builds
    - Network isolation during build
    - Deterministic random seeds
    - Fixed build order
-
 
 ### Source Code
 
@@ -46,13 +42,11 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
    - Patches applied in deterministic order
    - No embedded build timestamps
 
-
 2. **Build Configuration**:
    - Fixed compiler flags
    - Deterministic optimization level
    - No debug symbols in release builds
    - Strip deterministic metadata
-
 
 ## Build Farm Architecture
 
@@ -277,33 +271,32 @@ on:
 
       - 'drivers/nvidia/**'
 
-
 jobs:
   reproducible-build:
     runs-on: ubuntu-latest
     container: sigmaos/build-env:6.1.0
-    
+
     steps:
 
       - name: Checkout code
 
         uses: actions/checkout@v3
-      
+
       - name: Build driver
 
         run: |
           ./scripts/reproducible-build.sh nvidia-driver 535.154.05
-      
+
       - name: Verify reproducibility
 
         run: |
           ./scripts/verify-build.sh nvidia-driver.ko
-      
+
       - name: Generate SBOM
 
         run: |
           ./scripts/generate-sbom.sh nvidia-driver
-      
+
       - name: Upload artifacts
 
         uses: actions/upload-artifact@v3
@@ -340,15 +333,15 @@ func (bv *BuildVerifier) VerifyBuild(binaryPath string) (bool, error) {
         return false, err
     }
     defer file.Close()
-    
+
     hash := sha256.New()
     if _, err := io.Copy(hash, file); err != nil {
         return false, err
     }
-    
+
     actualChecksum := hex.EncodeToString(hash.Sum(nil))
     expectedChecksum := bv.expectedChecksums[binaryPath]
-    
+
     return actualChecksum == expectedChecksum, nil
 }
 ```
@@ -381,7 +374,6 @@ diffoscope --max-depth 10 driver1.ko driver2.ko
 4. Filesystem differences
    - Fix: Use containerized builds
 
-
 **Debugging Steps**:
 
 ```bash
@@ -410,7 +402,6 @@ strings driver.ko | grep -i date
 3. Incomplete file list
    - Fix: Scan all source files
 
-
 ## Best Practices
 
 ### Development
@@ -420,7 +411,6 @@ strings driver.ko | grep -i date
 3. **Build Isolation**: Build in isolated containers
 4. **Verification**: Always verify builds against references
 
-
 ### CI/CD
 
 1. **Automated Verification**: Verify reproducibility in CI
@@ -428,14 +418,12 @@ strings driver.ko | grep -i date
 3. **Artifact Storage**: Store build artifacts with metadata
 4. **Monitoring**: Monitor build reproducibility metrics
 
-
 ### Security
 
 1. **Supply Chain Security**: Verify all dependencies
 2. **Signature Verification**: Sign all build artifacts
 3. **Audit Trail**: Maintain complete build logs
 4. **Transparency**: Make build process public
-
 
 ## References
 

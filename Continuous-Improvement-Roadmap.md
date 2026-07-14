@@ -99,65 +99,47 @@ Every PR to `main` or `release/*` must answer:
 
 - [ ] Logic is correct for happy path
 
-
 - [ ] Error paths return correct sigma_err_t codes
-
 
 - [ ] No silent failures (all errors propagated or logged)
 
-
 - [ ] No undefined behaviour (UB sanitizer clean)
-
 
 ### Security
 
 - [ ] No hardcoded credentials or secrets
 
-
 - [ ] SPDX-License-Identifier present on new files
-
 
 - [ ] No raw pointer arithmetic in public APIs
 
-
 - [ ] PII (Aadhaar/PAN) masked in any log output
-
 
 ### OOP / Design
 
 - [ ] Single responsibility: class does one thing
 
-
 - [ ] Depends on abstractions, not implementations (DIP)
-
 
 - [ ] [[nodiscard]] on all error-returning functions
 
-
 - [ ] RAII: resources released in destructor
-
 
 ### Testing
 
 - [ ] Unit test added or updated
 
-
 - [ ] Edge cases covered (empty input, OOM, timeout)
 
-
 - [ ] No test-only code compiled into production binary
-
 
 ### Documentation
 
 - [ ] CURRENT_PROBLEMS_MANIFEST.md updated if fixing a known issue
 
-
 - [ ] Public API has Doxygen comment (brief + @param + @return)
 
-
 - [ ] Man page updated if CLI changed
-
 
 - [ ] wiki_repo/ updated if new feature or behaviour change
 
@@ -191,12 +173,10 @@ Big decisions get an Architecture Decision Record before implementation:
   - MCS: real-time budget for safety-critical shards
   - Formal verification path via Frama-C
 
-
 ## Consequences:
 
   - Positive: provably bounded latency for RT shards
   - Negative: more complex than round-robin; implement in phases
-
 
 ## Alternatives rejected:
 
@@ -304,15 +284,11 @@ CURRENT_PROBLEMS_MANIFEST.md ← Active issues tracker
 
 - [ ] New public API has Doxygen comment (/// @brief, @param, @return)
 
-
 - [ ] CURRENT_PROBLEMS_MANIFEST.md updated if fixing known issue
-
 
 - [ ] Man page updated if any CLI command changed
 
-
 - [ ] wiki_repo/ page updated if user-visible behaviour changed
-
 
 - [ ] Example added to docs/examples/ if new capability introduced
 

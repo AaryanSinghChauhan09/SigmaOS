@@ -6,7 +6,6 @@ Summarise long documents, logs, and wikis on-device.
 - Extractive summarisation (TF-IDF sentence ranking)
 - Abstractive summarisation via local LLM
 
-
 ## Key Milestones
 
 - [ ] Sentence tokeniser (Rust, no_std)

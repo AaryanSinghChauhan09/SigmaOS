@@ -13,14 +13,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_mask**: Bitmask-precision permission system
 - Granular control over process capabilities
 
-
 ### Hardware-level PQC key isolation
 
 - **sigma_crypto**: Post-quantum cryptographic operations
 - **sigma_key**: Hardware key management
 - **sigma_sign**: Digital signature verification
 - Kyber-1024 and Dilithium-5 integration
-
 
 ### Ring-0 cron replacement with macro recording
 
@@ -29,14 +27,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_automate**: Task automation engine
 - Sub-second precision scheduling
 
-
 ### AI-driven predictive workflow macro engine
 
 - **sigma_ai_predict**: Predictive workflow suggestions
 - **sigma_ai_learn**: Self-learning pattern recognition
 - **sigma_ai_optimize**: Performance optimization
 - Machine learning integration
-
 
 ### Vendor-agnostic GPU compute dispatcher
 
@@ -45,14 +41,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_render**: Graphics pipeline control
 - Multi-vendor GPU support
 
-
 ### Self-learning PCIe driver shim generator
 
 - **sigma_pci**: PCIe device management
 - **sigma_driver**: Dynamic driver generation
 - **sigma_shim**: Hardware abstraction layer
 - Automatic device detection
-
 
 ### Hardware hang recovery timer
 
@@ -61,14 +55,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_health**: System health tracking
 - Fault tolerance mechanisms
 
-
 ### Zero-trust Ring-0 TCP/IP stack
 
 - **sigma_net**: Network protocol stack
 - **sigma_tcp**: TCP/IP implementation
 - **sigma_security**: Network security layer
 - Post-quantum network protocols
-
 
 ### Distributed, multi-node replicated filesystem
 
@@ -77,14 +69,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_sync**: Multi-node synchronization
 - High availability storage
 
-
 ### SovereignVFS bridging for Micro-VM containers
 
 - **sigma_vfs**: Virtual filesystem
 - **sigma_container**: Container filesystem bridge
 - **sigma_isolation**: Filesystem isolation
 - Secure container storage
-
 
 ### Adaptive ambient-aware UI theme switcher
 
@@ -93,14 +83,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_ui**: User interface adaptation
 - Context-aware display
 
-
 ### Ring-0 hardware-accelerated gesture recognition
 
 - **sigma_gesture**: Gesture input processing
 - **sigma_input**: Hardware input acceleration
 - **sigma_haptics**: Haptic feedback control
 - Low-latency input processing
-
 
 ### Persona-driven sovereign setup wizard
 
@@ -109,14 +97,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - **sigma_config**: Configuration automation
 - Personalized setup experience
 
-
 ### Contextual predictive quick-action engine
 
 - **sigma_quick**: Quick action prediction
 - **sigma_context**: Context awareness
 - **sigma_suggest**: Action suggestions
 - Intelligent workflow assistance
-
 
 ---
 
@@ -129,14 +115,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - File I/O operations
 - Inter-process communication
 
-
 ### Security APIs
 
 - Capability-based access control
 - Post-quantum cryptography
 - Secure key management
 - Audit trail generation
-
 
 ### Hardware Interfaces
 
@@ -145,7 +129,6 @@ Complete API mapping for all Sovereign Singleton shards.
 - Storage management
 - Device drivers
 
-
 ### User Experience
 
 - Display management
@@ -153,14 +136,12 @@ Complete API mapping for all Sovereign Singleton shards.
 - Audio processing
 - Theme system
 
-
 ### Automation
 
 - Task scheduling
 - Workflow automation
 - AI predictions
 - Performance optimization
-
 
 ---
 
@@ -174,7 +155,6 @@ Each API includes:
 - **Security considerations**: Capability requirements and restrictions
 - **Performance characteristics**: Latency and throughput metrics
 
-
 ---
 
 ## Development Guidelines
@@ -186,14 +166,12 @@ Each API includes:
 - **Zero-dependency**: Self-contained implementations
 - **Reproducible**: Deterministic behavior across executions
 
-
 ### Best Practices
 
 - Always check capability requirements before API calls
 - Handle errors gracefully with proper error codes
 - Use appropriate security contexts for sensitive operations
 - Follow capability least-privilege principles
-
 
 ---
 
@@ -204,7 +182,6 @@ APIs are versioned with semantic versioning:
 - **Major**: Breaking changes
 - **Minor**: New features, backward compatible
 - **Patch**: Bug fixes, backward compatible
-
 
 Minimum SigmaOS version requirements are specified for each API.
 

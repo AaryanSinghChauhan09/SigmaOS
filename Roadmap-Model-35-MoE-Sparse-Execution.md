@@ -6,7 +6,6 @@ Serve massive MoE models by dynamically loading only active expert weights from 
 - Zero-copy weight mapping using VFS mmap adapters.
 - Maintain minimal RAM footprint for multi-expert configurations.
 
-
 ## Key Milestones
 
 - [ ] Memory-mapped expert parameter registry

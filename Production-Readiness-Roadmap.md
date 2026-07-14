@@ -20,30 +20,21 @@ SigmaOS is production ready when a CA in Maharashtra can:
 
 1. Boot SigmaOS on a JioBook laptop (< 10 seconds)
 
-
 2. Log in via ABHA DID (no username/password)
-
 
 3. Open sigma-ca dashboard (< 2 seconds)
 
-
 4. Enter client GSTIN and generate GSTR-1 JSON (< 5 seconds)
-
 
 5. File GSTR-1 on GSTN portal (< 30 seconds, TLS 1.3 PQC-hybrid)
 
-
 6. Generate e-Invoice IRN + QR code (< 5 seconds)
-
 
 7. Share IRN-signed invoice to client via DID
 
-
 8. Close laptop lid → suspend-to-RAM (S3)
 
-
 9. Reopen → resume in < 3 seconds
-
 
 10. Entire workflow: no internet required except step 5 and 7
 
@@ -309,7 +300,6 @@ Month 1-3:  Foundation
   - Dev container verified on GitHub Codespaces
   - Architecture video walkthrough published
 
-
 Month 3-6:  First contributors
 
   - 10 external PRs merged (unit tests, docs, translations)
@@ -317,14 +307,12 @@ Month 3-6:  First contributors
   - ADR-001 through ADR-005 published
   - Bug bounty programme active
 
-
 Month 6-12: Community maturity
 
   - Hacktoberfest: 30+ issues labelled
   - 5 community-contributed profession app recipes
   - Community translation: Hindi + Tamil docs
   - First community-contributed SDF driver (BT or webcam)
-
 
 Month 12+:  Ecosystem
 
@@ -425,24 +413,20 @@ Migration priority:
     - Clean interface boundary (sigma-bus IPC)
     - Rust async networking (tokio-like, no-std)
 
-
   Phase 9.2 (Month 42): sigma-fs VFS layer → Rust
 
     - Complex state machine (mount, inode, dentry)
     - Rust ownership model eliminates use-after-free
-
 
   Phase 9.3 (Month 48): SDF driver framework → Rust
 
     - Ring-3 drivers: Rust + bindgen for hardware registers
     - All new drivers must use Rust bindings from this point
 
-
   Phase 9.4 (Month 54): sigma-tls → Rust
 
     - Leverage rustls or write minimal sovereign alternative
     - Zero unsafe blocks except at hardware boundary
-
 
   Target: By Month 60, 0 memory-safety CVEs for 12 months
 ```

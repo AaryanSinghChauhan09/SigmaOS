@@ -15,7 +15,6 @@ SigmaOS implements a declarative, reproducible package management ecosystem (`si
 - **Signed Repositories**: GPG-signed packages and repositories
 - **SBOM Generation**: Software Bill of Materials for all packages
 
-
 ## Architecture
 
 ### Package Management Flow
@@ -467,7 +466,6 @@ sigpkg repo verify stable
 4. **Documentation**: Provide comprehensive documentation
 5. **Testing**: Include test cases
 
-
 ### System Configuration
 
 1. **Version Control**: Keep system configuration in version control
@@ -476,7 +474,6 @@ sigpkg repo verify stable
 4. **Testing**: Test changes in VM before applying
 5. **Backups**: Keep backups of important data
 
-
 ### Security
 
 1. **Verify Signatures**: Always verify GPG signatures
@@ -484,7 +481,6 @@ sigpkg repo verify stable
 3. **Key Management**: Manage GPG keys securely
 4. **Regular Updates**: Keep packages updated
 5. **Audit Logs**: Review audit logs regularly
-
 
 ## Roadmap & Milestones
 
@@ -495,14 +491,12 @@ sigpkg repo verify stable
 - Basic package operations
 - CLI implementation
 
-
 ### Phase 2 (Months 3-6)
 
 - Immutable root file system mounting
 - A/B boot partition switching
 - Repository management
 - GPG signature verification
-
 
 ### Phase 3 (Months 6-9)
 
@@ -511,14 +505,12 @@ sigpkg repo verify stable
 - Dependency resolution
 - Transaction rollback
 
-
 ### Phase 4 (Months 9-12)
 
 - Automated rollbacks on health-check failures
 - Build farm integration
 - Automated testing
 - Performance optimization
-
 
 ## References
 

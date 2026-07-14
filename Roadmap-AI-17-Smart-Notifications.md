@@ -6,7 +6,6 @@ Prioritise and summarise system notifications using ML relevance scoring.
 - Classify notifications as Critical / Info / Background
 - Suppress low-priority alerts during focus mode
 
-
 ## Key Milestones
 
 - [ ] Notification metadata schema in sigma_db

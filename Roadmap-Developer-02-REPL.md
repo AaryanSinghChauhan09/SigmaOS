@@ -6,7 +6,6 @@ A live read-eval-print loop for OS scripting and exploration.
 - sigma-sh scripting language REPL
 - Auto-complete from installed command list
 
-
 ## Key Milestones
 
 - [ ] Line editor with history (no_std)

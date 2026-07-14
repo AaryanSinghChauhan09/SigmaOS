@@ -80,12 +80,9 @@ driver ecosystem built over decades. SigmaOS's answer: SDF + sigma-dna auto-prof
 
 - Auto-selects the right driver set for detected hardware
 
-
 - Tunes scheduler policy per silicon (Atom vs. Core, Zen 3 vs. Zen 4)
 
-
 - Selects PGO build targets at package install time
-
 
 ### Security Architecture
 
@@ -149,26 +146,19 @@ Windows' biggest moat: Win32 apps from 2001 still run. SigmaOS takes a different
 
 - Runs existing Linux ELF binaries inside SDF containers without modification
 
-
 - Translates Linux syscalls → sigma-syscall at the boundary
-
 
 - Opt-in: never compiled into default profiles (sovereignty is preserved)
 
-
 - Implementation: `runtime/containers/sigma_linux_compat.cpp` ✅ (done)
-
 
 **POSIX bridge** (future):
 
 - Optional POSIX compatibility shim for migration from Linux/macOS
 
-
 - Does not ship in default profiles — available as `sigma-pkg install sigma-posix-compat`
 
-
 - Keeps sovereignty-first design intact for users who don't need it
-
 
 ### Why this is better than Windows' approach:
 
@@ -188,15 +178,11 @@ as an *optional package* while keeping the default OS clean.
 
 - No daemon: `sigma-pod run-native` directly creates kernel namespaces
 
-
 - dm-verity verified images: tamper detection before exec
-
 
 - Cgroup v2 enforcement in kernel path — limits are real, not advisory
 
-
 - PQC-signed image registry by default
-
 
 ---
 
@@ -290,15 +276,11 @@ SigmaOS needs sovereign equivalents — ones that don't phone home to Redmond.
 
 - No central domain controller that becomes a single point of failure
 
-
 - Identity is a DID document — works offline, verified cryptographically
-
 
 - Rotating keys doesn't require a domain admin — user self-manages
 
-
 - Foreign to LDAP/Kerberos attack surface by design
-
 
 ### Cloud Integration
 

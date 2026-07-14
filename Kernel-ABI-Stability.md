@@ -17,15 +17,11 @@ This means:
 
 - NVIDIA must recompile their driver for every kernel update
 
-
 - Out-of-tree drivers break regularly
-
 
 - Vendors don't ship drivers because maintenance cost is too high
 
-
 - Users get "kernel update broke my Wi-Fi" experiences
-
 
 ## Windows Does It Right (for stability)
 
@@ -55,15 +51,11 @@ Rules that will **never be violated**:
 
 1. `KABI_VERSION_MAJOR` only increments for breaking changes (extremely rare)
 
-
 2. New fields are added **only at the end** of stable structs
-
 
 3. The `struct_size` field lets the loader detect and zero-fill unknown trailing fields
 
-
 4. Stable symbol names are frozen — internal implementation can change, exported names cannot
-
 
 ---
 

@@ -166,7 +166,6 @@ finish-args:
   - --filesystem=home
   - --talk-name=org.freedesktop.portal.Desktop
 
-
 modules:
 
   - name: sigma-edit
@@ -190,8 +189,6 @@ modules:
 
 - `flatpak run io.sigmaos.SigmaEdit` launches sigma-edit in a bubblewrap sandbox.
 
-
 - File open dialog uses sigma-portal; selected file is readable by the app.
-
 
 - Camera/microphone requests show sigma-portal confirmation dialog.

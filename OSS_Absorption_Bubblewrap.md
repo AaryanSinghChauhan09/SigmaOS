@@ -2,8 +2,8 @@
 
 ## Making containers/bubblewrap Irrelevant
 
-> **Absorption Target**: https://github.com/containers/bubblewrap  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/containers/bubblewrap
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaSecurity - Native Capability-Based Container Sandboxing
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Bubblewrap by implementing a native capabilit
 
 ### 1. Container Sandboxing
 
-**Original**: Bubblewrap's user namespace sandboxing  
+**Original**: Bubblewrap's user namespace sandboxing
 **SigmaOS**: Native capability-based container sandboxing
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaSecurity {
 - PID namespace isolation with automatic management
 - IPC namespace isolation with automatic setup
 
-
 ### 2. Mount System
 
-**Original**: Bubblewrap's mount namespace setup  
+**Original**: Bubblewrap's mount namespace setup
 **SigmaOS**: Native mount system with enhanced features
 
 **Mount Features**:
@@ -54,10 +53,9 @@ pub struct SigmaSecurity {
 - Mount caching with automatic invalidation
 - Mount composition with inheritance
 
-
 ### 3. Bind Mounts
 
-**Original**: Bubblewrap's bind mount support  
+**Original**: Bubblewrap's bind mount support
 **SigmaOS**: Native bind mounts with enhanced features
 
 **Bind Mount Features**:
@@ -69,10 +67,9 @@ pub struct SigmaSecurity {
 - Bind mount monitoring with real-time metrics
 - Bind mount validation with automatic checking
 
-
 ### 4. Device Access
 
-**Original**: Bubblewrap's device node access  
+**Original**: Bubblewrap's device node access
 **SigmaOS**: Native device access with capability-based control
 
 **Device Features**:
@@ -84,10 +81,9 @@ pub struct SigmaSecurity {
 - Device validation with automatic checking
 - Device sandboxing with hardware enforcement
 
-
 ### 5. Environment Variables
 
-**Original**: Bubblewrap's environment variable control  
+**Original**: Bubblewrap's environment variable control
 **SigmaOS**: Native environment management with enhanced features
 
 **Environment Features**:
@@ -99,10 +95,9 @@ pub struct SigmaSecurity {
 - Environment composition with inheritance
 - Environment sandboxing with automatic isolation
 
-
 ### 6. Seccomp Filters
 
-**Original**: Bubblewrap's seccomp filter support  
+**Original**: Bubblewrap's seccomp filter support
 **SigmaOS**: Native syscall filtering with capability-based control
 
 **Seccomp Features**:
@@ -113,7 +108,6 @@ pub struct SigmaSecurity {
 - Seccomp monitoring with real-time metrics
 - Seccomp composition with inheritance
 - Seccomp compatibility with automatic translation
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaSecurity {
 pub mod container {
     use sigma_security::container::ContainerSandbox;
     use sigma_security::capability::CapabilitySystem;
-    
+
     pub struct SigmaSecurity {
         container_sandbox: ContainerSandbox,
         capability_system: CapabilitySystem,
         mount_manager: MountManager,
     }
-    
+
     impl SigmaSecurity {
         pub fn create_container(&self, config: ContainerConfig) -> Container {
             // Native container creation
@@ -154,7 +148,7 @@ pub mod container {
             let mounted = self.mount_manager.setup(capabilities);
             Container::native(mounted)
         }
-        
+
         pub fn run_container(&self, container: Container) -> ContainerResult {
             // Native container execution
             self.container_sandbox.run(container)
@@ -172,7 +166,7 @@ pub mod mount {
         bind_manager: BindManager,
         mount_validator: MountValidator,
     }
-    
+
     impl MountManager {
         pub fn setup_mounts(&self, config: MountConfig) -> MountResult {
             // Native mount setup

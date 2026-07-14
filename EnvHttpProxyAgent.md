@@ -14,7 +14,6 @@ Arguments:
 
 - **options** `EnvHttpProxyAgentOptions` (optional) - extends the `Agent` options.
 
-
 Returns: `EnvHttpProxyAgent`
 
 ### Parameter: `EnvHttpProxyAgentOptions`
@@ -23,12 +22,9 @@ Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
 - **httpProxy** `string` (optional) - When set, it will override the `HTTP_PROXY` environment variable.
 
-
 - **httpsProxy** `string` (optional) - When set, it will override the `HTTPS_PROXY` environment variable.
 
-
 - **noProxy** `string` (optional) - When set, it will override the `NO_PROXY` environment variable.
-
 
 Examples:
 
@@ -137,7 +133,6 @@ Implements [`Dispatcher.dispatch(options, handler)`](/docs/docs/api/Dispatcher.m
 Extends: [`DispatchOptions`](/docs/docs/api/Dispatcher.md#parameter-dispatchoptions)
 
 - **origin** `string | URL`
-
 
 Implements [`Dispatcher.destroy([error, callback])`](/docs/docs/api/Dispatcher.md#dispatcherdestroyerror-callback-promise).
 

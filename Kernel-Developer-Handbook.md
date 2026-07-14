@@ -28,15 +28,11 @@ All kernel shards MUST acquire locks in the following order to prevent deadlocks
 
 1. SovereignMemoryPool::mutex
 
-
 2. SovereignScheduler::runqueue_lock
-
 
 3. SovereignNetStack::socket_lock
 
-
 4. SovereignFS::inode_lock
-
 
 ```text
 
@@ -58,15 +54,11 @@ Before merging any concurrency-related change:
 
 - [ ] Verified with `ThreadSanitizer` (`-fsanitize=thread`)
 
-
 - [ ] No `TOCTOU` (time-of-check/time-of-use) patterns introduced
-
 
 - [ ] Lock ordering documented in shard header comment
 
-
 - [ ] Stress-tested via `scripts/format_stress_test.sh`
-
 
 ---
 
@@ -74,15 +66,11 @@ Before merging any concurrency-related change:
 
 - **No `malloc`/`free`** in kernel shards — use `SovereignMemoryPool::alloc()`
 
-
 - **RTOS shards** are forbidden from ALL dynamic allocation
-
 
 - Run `SovereignMemoryPool::profile_leaks()` after each integration test
 
-
 - Buddy allocation handles blocks ≥ 4KB; slab handles < 4KB objects
-
 
 ---
 
@@ -92,15 +80,11 @@ Every shard MUST:
 
 1. Inherit from `SigmaOS::SigmaObject`
 
-
 2. Implement `type_name()` returning a unique string
-
 
 3. Use `SigmaSingleton<T>` if stateful
 
-
 4. Include only relative headers (`../../../include/`)
-
 
 ---
 
@@ -110,15 +94,11 @@ All PRs to `main` must pass:
 
 - `scripts/regression_check.sh` — functional correctness
 
-
 - `scripts/format_stress_test.sh` — concurrency stress
-
 
 - `scripts/fuzz_pqc.sh` — security/fuzzing
 
-
 - GitHub Actions: CodeQL scan must return 0 critical alerts
-
 
 ---
 

@@ -12,7 +12,6 @@ Virtualization is critical for both developer workloads and server deployments. 
 - **QEMU**: For full legacy hardware emulation.
 - **Firecracker**: For ultra-lightweight, fast-booting microVMs (serverless/functions).
 
-
 ---
 
 ## 2. Key Features Absorbed

@@ -25,34 +25,25 @@ Multi-dimensional comparison of **SigmaOS Zenith** against leading specialized O
 
 - Allocates execution threads to the nearest physical CPU memory node
 
-
 - Reduces cross-socket bus contention on multi-NUMA systems
 
-
 - Implementation: `kernel/sched/sigma_numa.cpp` — NUMA topology map read from ACPI SRAT table at boot
-
 
 ### Lock-Free Concurrency Primitives
 
 - Compare-and-swap (CAS) loops inside task scheduling queues
 
-
 - Completely eliminates spinlock pauses under high-contention workloads
 
-
 - Implementation: `klib/sigma_lockfree.h` — Michael-Scott queue + Treiber stack
-
 
 ### Microsecond Ring Transitions
 
 - Custom-optimized Assembly entry points for `SYSCALL` / `SYSRET`
 
-
 - Target: < 12 clock cycles for context switch overhead
 
-
 - Implementation: `arch/x86_64/syscall_entry.asm` — hand-tuned to avoid pipeline stalls
-
 
 ### Vectorized PQC Operations
 
@@ -69,29 +60,21 @@ CRYSTALS-Kyber NTT (Number Theoretic Transform):
 
 - Compiles without GNU `libc` headers
 
-
 - Custom inline string operations (`sigma_memcpy`, `sigma_strlen`, etc.)
-
 
 - Custom slab allocator — no `malloc`/`free` in kernel paths
 
-
 - Implementation: `klib/include/sigma_nanolib.h`
-
 
 ### Declarative Configuration Manager
 
 - System boots by parsing a Dilithium-signed configuration registry
 
-
 - Configures: network adapters, memory segments, GPU shards, service topology
-
 
 - Format: TOML with cryptographic attestation chain
 
-
 - Implementation: `Config.sigma` parsed by `userland/ignite/sigma_ignite.cpp`
-
 
 ### Profile-Based Hot-Swap
 
@@ -134,46 +117,33 @@ Features:
 
 - Smooth 120Hz animations with GPU-side easing curves
 
-
 - Dynamic layout scaling based on detected display DPI
-
 
 - Glassmorphism effects via Vulkan compute shaders (not CSS hacks)
 
-
 - Theme hot-swap without compositor restart
-
 
 ### High-Contrast Screen Reader
 
 - Low-level screen-scraping via AT-SPI2 accessibility tree
 
-
 - Hardware audio output directly via sigma-audio (PipeWire-equivalent)
-
 
 - No round-trip through speech-dispatcher
 
-
 - Indian language TTS via sigma-bhashini (offline)
 
-
 - WCAG 2.2 AA compliant
-
 
 ### Declarative UI Engine
 
 - UI configs defined as lightweight JSON schemas
 
-
 - Users customize dashboard without touching C++ source
-
 
 - Hot-reload: changes apply within 200ms
 
-
 - Implementation: `userland/gui/sigma_ui_engine.h`
-
 
 ---
 
@@ -240,21 +210,15 @@ These are structural advantages that take years to replicate, not features that 
 
 1. **India-native compliance stack** — 50+ profession apps covering every Indian regulator. No competitor can catch up without deep India domain knowledge.
 
-
 2. **Post-quantum by default** — Every API, every package, every connection uses PQC. Migrating an existing distro would require touching 200+ libraries.
-
 
 3. **Profession-based identity** — The OS knows you're a CA or doctor and configures itself. No generic OS can do this without becoming non-generic.
 
-
 4. **sigma-lex predictive compliance** — Monitors Gazette of India daily and auto-updates profession apps. Requires India-specific legal intelligence, not just software.
-
 
 5. **24-driver HAL architecture** — SDF userspace drivers with ABI stability. NVIDIA drivers that work forever. No DKMS. This requires designing the driver framework from scratch.
 
-
 6. **sigma-commnet village ISP** — Certified BharatNet last-mile distribution. Requires TRAI compliance, physical deployment, and India-specific regulatory knowledge.
-
 
 ---
 

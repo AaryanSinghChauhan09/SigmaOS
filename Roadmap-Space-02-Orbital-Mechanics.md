@@ -6,7 +6,6 @@ Compute satellite positions and orbital parameters locally.
 - SGP4 orbital propagator for TLE data
 - Ground track visualisation
 
-
 ## Key Milestones
 
 - [ ] SGP4 propagator implementation

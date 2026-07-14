@@ -66,7 +66,6 @@ The SigmaOS scheduler uses a three-tier composite model:
 - **Priority boost** every 100 ticks (anti-starvation)
 - **Context switch** saves full `CpuContext` (RIP, RSP, CR3, general-purpose registers)
 
-
 Source: [`kernel/sched/sigma_sched.rs`](../kernel/sched/sigma_sched.rs)
 
 ---
@@ -78,7 +77,6 @@ The VFS layer (`kernel/vfs/sigma_vfs.rs`) provides:
 - Mount table with up to 16 simultaneous mounts
 - Unified `open / read / write / close / stat / seek` interface
 - Backends: `tmpfs`, `SigmaFS`, `Btrfs`
-
 
 ### Filesystem Support
 
@@ -98,12 +96,11 @@ The VFS layer (`kernel/vfs/sigma_vfs.rs`) provides:
 - **PIC** (legacy 8259A) with cascade mode
 - **GIC v2** (`arch/arm64/sigma_gic.rs`) for ARM64
 
-
 ---
 
 ## Syscall Interface
 
-SigmaOS implements 30 core syscalls dispatched via `kernel/core/sigma_syscall_dispatch.rs`.  
+SigmaOS implements 30 core syscalls dispatched via `kernel/core/sigma_syscall_dispatch.rs`.
 Security gates enforced: **Pledge** (whitelist) + **Seccomp-BPF** style filtering.
 
 | # | Name | Description |

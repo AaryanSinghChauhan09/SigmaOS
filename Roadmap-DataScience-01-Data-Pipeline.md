@@ -6,7 +6,6 @@ Build a zero-allocation streaming data pipeline for real-time telemetry.
 - Source â†’ Transform â†’ Sink pipeline DSL
 - Support CSV, JSON, and binary telemetry formats
 
-
 ## Key Milestones
 
 - [ ] Pipeline node enum in sigma_logic.rs

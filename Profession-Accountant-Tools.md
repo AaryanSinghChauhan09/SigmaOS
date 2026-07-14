@@ -10,15 +10,11 @@ The Accountant Profile is designed for financial precision, regulatory complianc
 
 - **SigmaLedger**: Double-entry bookkeeping system with automated reconciliation.
 
-
 - **SigmaTax**: Tax compliance checking and automated filing preparation.
-
 
 - **SigmaAudit**: Internal audit tools with compliance verification.
 
-
 - **SigmaPayroll**: Payroll processing with tax withholding automation.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Accountant Profile is designed for financial precision, regulatory complianc
 
 - **Theme**: Professional Blue (Financial Standard)
 
-
 - **Layout**: Financial Dashboard (Ledger, Reports, Analytics)
 
-
 - **Personalization**: Keyboard shortcuts for rapid data entry.
-
 
 ---
 

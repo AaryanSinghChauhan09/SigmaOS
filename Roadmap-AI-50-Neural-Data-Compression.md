@@ -6,7 +6,6 @@ Compress system log files using context-adaptive arithmetic coding with neural p
 - Deep learning next-byte probability predictor.
 - Outperform standard Gzip/Zlib compression ratio by at least 40%.
 
-
 ## Key Milestones
 
 - [ ] Context-adaptive arithmetic coder implementation

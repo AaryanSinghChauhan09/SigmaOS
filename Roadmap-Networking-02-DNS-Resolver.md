@@ -6,7 +6,6 @@ DNS-over-HTTPS and DNS-over-TLS resolver built into the network stack.
 - DoH (RFC 8484) client
 - DNSSEC validation
 
-
 ## Key Milestones
 
 - [ ] HTTP/2 client for DoH

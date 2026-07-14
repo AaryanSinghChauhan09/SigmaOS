@@ -14,9 +14,7 @@ The `zenith-sdk` Rust crate wraps raw C symbols with memory safety guarantees (s
 
 - Exposes raw imports: `zenith_launch_app_sandboxed`, `sys_print`, and `sys_ipc_send`.
 
-
 - Exposes a safe, idiomatic Rust struct `Application` that automatically coordinates with the Sovereign Orchestrator under-the-hood.
-
 
 ```rust
 use zenith_sdk::Application;
@@ -53,28 +51,21 @@ The unified control center (`sigma_control_center.cpp`) dynamically manages syst
 
 - Enforces **read-only status** globally across all block devices.
 
-
 - Enforces Whonix-style default-deny gateway/workstation split rules.
 
-
 - Enforces cryptographically curated update channels.
-
 
 ### 2. `SIGMA_PROFILE_IOT` (Raspberry Pi OS optimized)
 
 - Limits containers to a strict **16MB resource budget**.
 
-
 - Locks system features to low-footprint, lean baseline processes.
-
 
 ### 3. `SIGMA_PROFILE_ENTERPRISE` (Audit Hardened)
 
 - Enforces mandatory **Zero-Trust VFS ACL checkups**.
 
-
 - Mandates fully traceable, deterministic logging.
-
 
 ### 4. `SIGMA_PROFILE_EDUCATION` (Exploratory overrides)
 

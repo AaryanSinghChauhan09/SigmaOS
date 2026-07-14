@@ -14,7 +14,6 @@ Zenith Desktop is the native, Wayland-first desktop environment for SigmaOS. Bui
 - **Performance**: Optimized for low-latency and smooth animations
 - **Extensible**: Plugin system for custom widgets and extensions
 
-
 ## Architecture
 
 ### Compositor Flow
@@ -326,7 +325,6 @@ impl InputMethodManager {
 - **Punjabi (pa_IN)**: Gurmukhi script
 - **Urdu (ur_IN)**: Perso-Arabic script
 
-
 ### Input Methods
 
 **IBus Integration**:
@@ -377,7 +375,6 @@ telugu = "Noto Sans Telugu"
 - Keyboard navigation support
 - Braille display support
 
-
 **Configuration**:
 
 ```toml
@@ -398,7 +395,6 @@ volume = 1.0
 - Focus indicators
 - Customizable color schemes
 
-
 **Configuration**:
 
 ```toml
@@ -417,7 +413,6 @@ text_scale = 1.2
 - Focus indicators
 - Tab navigation
 
-
 **Shortcuts**:
 
 - `Alt+Tab`: Switch windows
@@ -425,7 +420,6 @@ text_scale = 1.2
 - `Super+L`: Lock screen
 - `Ctrl+Alt+T`: Open terminal
 - `Super+E`: Open file manager
-
 
 ## Performance Optimization
 
@@ -437,7 +431,6 @@ text_scale = 1.2
 - Multi-threaded command buffers
 - Descriptor set management
 - Pipeline caching
-
 
 **Configuration**:
 
@@ -457,7 +450,6 @@ descriptor_cache = true
 - Memory pooling
 - Resource recycling
 - Lazy loading
-
 
 **Configuration**:
 
@@ -518,7 +510,6 @@ success = "#10b981"
 - Papirus
 - Numix
 
-
 **Configuration**:
 
 ```toml
@@ -576,7 +567,6 @@ impl Plugin for SystemMonitorPlugin {
 3. **Testing**: Comprehensive testing
 4. **Documentation**: Document all public APIs
 
-
 ### Performance
 
 1. **Profiling**: Profile regularly
@@ -584,14 +574,12 @@ impl Plugin for SystemMonitorPlugin {
 3. **Memory**: Minimize memory usage
 4. **GPU**: Utilize GPU efficiently
 
-
 ### Accessibility
 
 1. **Screen Reader**: Ensure screen reader compatibility
 2. **Keyboard**: Full keyboard support
 3. **High Contrast**: Support high contrast mode
 4. **Localization**: Full localization support
-
 
 ## Roadmap & Milestones
 
@@ -602,14 +590,12 @@ impl Plugin for SystemMonitorPlugin {
 - Basic window management
 - Panel and taskbar
 
-
 ### Phase 2 (Months 3-6)
 
 - IBus integration for Indic languages
 - Input method support
 - Layout engines
 - Font configuration
-
 
 ### Phase 3 (Months 6-9)
 
@@ -618,14 +604,12 @@ impl Plugin for SystemMonitorPlugin {
 - Braille display support
 - High contrast mode
 
-
 ### Phase 4 (Months 9-12)
 
 - Gestural accessibility control
 - Multi-display support
 - Color profiles
 - Plugin system
-
 
 ## References
 

@@ -6,7 +6,6 @@ A full ACID-compliant relational database engine for system applications.
 - B-tree index with WAL (Write-Ahead Log)
 - MVCC for concurrent read isolation
 
-
 ## Key Milestones
 
 - [ ] B-tree page cache (no_std)

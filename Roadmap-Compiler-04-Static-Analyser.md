@@ -6,7 +6,6 @@ A Clippy-equivalent static analyser for SigmaLang and OS code.
 - Data-flow analysis for null dereference
 - Capability token leak detection
 
-
 ## Key Milestones
 
 - [ ] Control flow graph construction

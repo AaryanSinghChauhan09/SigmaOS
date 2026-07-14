@@ -79,14 +79,14 @@ repositories:
     priority: 1
     gpg_key: /etc/sigma/keys/core.gpg
     auto_sync: true
-    
+
   - name: community
 
     url: https://packages.sigmaos.org/community
     priority: 2
     gpg_key: /etc/sigma/keys/community.gpg
     auto_sync: true
-    
+
   - name: extra
 
     url: https://packages.sigmaos.org/extra
@@ -149,7 +149,6 @@ pub struct Literal {
 4. Handle conflicts with user guidance
 5. Generate transaction plan
 
-
 ## Transaction Management
 
 ### Transaction Structure
@@ -204,7 +203,6 @@ pub struct SystemState {
 - Features: Snapshot-based rollback system with circular buffer (10 snapshots)
 - C-ABI exports: `sigma_pkg_create_snapshot()`, `sigma_pkg_rollback()`
 
-
 ## Delta Updates
 
 ### Binary Delta Implementation
@@ -235,14 +233,12 @@ pub enum CompressionAlgorithm {
 4. Sign delta with repository key
 5. Upload to repository
 
-
 **Status:** ✅ Implemented
 
 - Location: `tools/sigma_pkg.rs`
 - Features: Binary patch application with version verification
 - C-ABI export: `sigma_pkg_apply_delta()`
 - Structures: `DeltaPatch`, `PackageVersion`
-
 
 ## Sandboxed Package Installation
 
@@ -268,14 +264,12 @@ pub struct SandboxConfig {
 - CPU limits via cgroups
 - Seccomp syscall filtering
 
-
 **Status:** ✅ Implemented
 
 - Location: `tools/sigma_pkg.rs`
 - Features: Network/filesystem isolation with resource limits
 - C-ABI export: `sigma_pkg_install_sandboxed()`
 - Structures: `SandboxConfig`
-
 
 ## Content-Addressed Storage
 
@@ -300,7 +294,6 @@ pub struct StorePath {
 - Immutable storage
 - Easy garbage collection
 - Reproducible builds
-
 
 ## Build System Integration
 
@@ -374,7 +367,6 @@ pub enum SignatureAlgorithm {
 3. Check key revocation status
 4. Verify package checksum
 5. Only install if all checks pass
-
 
 ## CLI Interface
 
@@ -470,14 +462,12 @@ pub struct DownloadManager {
 - ZSTD level 15 for repository metadata
 - Delta updates use ZSTD level 5
 
-
 ## Implementation Priority
 
 1. **Phase 1 (Weeks 9-12):** Basic package manager infrastructure
 2. **Phase 2 (Weeks 33-36):** Advanced package management (SAT solver)
 3. **Phase 3 (Weeks 45-48):** Delta updates and optimization
 4. **Phase 4 (Weeks 61-64):** Package building tools
-
 
 ## Testing
 
@@ -489,7 +479,6 @@ pub struct DownloadManager {
 - Delta update tests
 - Signature verification tests
 - Performance benchmarks
-
 
 ## References
 

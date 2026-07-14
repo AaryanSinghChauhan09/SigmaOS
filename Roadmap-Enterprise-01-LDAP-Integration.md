@@ -6,7 +6,6 @@ Integrate enterprise identity management for corporate deployments.
 - LDAP v3 client for user authentication
 - Kerberos ticket support for AD environments
 
-
 ## Key Milestones
 
 - [ ] LDAP bind and search operations

@@ -103,7 +103,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-
       - name: Install QEMU
 
         run: |
@@ -176,8 +175,6 @@ The CI kernel boot appends `sigma.test=smoke` which triggers built-in driver smo
 
 - All 6 matrix jobs green on every PR.
 
-
 - Boot time (kernel start → `sigma-init: boot complete`) < 5s in TCG mode.
-
 
 - virtio-net, virtio-blk, virtio-rng driver smoke tests pass in all jobs.

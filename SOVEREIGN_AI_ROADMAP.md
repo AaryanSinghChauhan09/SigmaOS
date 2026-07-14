@@ -13,7 +13,6 @@ This document defines the complete roadmap for native AI integration in SigmaOS 
 3. **Transparent AI**: Every AI decision is explainable. Users can query why the system took any automated action.
 4. **Opt-in Only**: AI features are disabled by default; users explicitly enable them.
 
-
 ---
 
 ## Architecture: The Neural Core
@@ -111,7 +110,7 @@ $ sigma ask "why is my disk 98% full?"
 
 # Analyzing... (local inference, 0.3s)
 
-# 
+#
 
 # Top disk consumers:
 
@@ -295,13 +294,13 @@ $ sigma find "the tax document from last March"
 
 # Searching semantically... (local embeddings)
 
-# 
+#
 
 # Found: /home/user/Documents/taxes/2024_march_return.pdf
 
 #        /home/user/Downloads/tax_return_draft.docx
 
-# 
+#
 
 # Open first match? [y/N]
 
@@ -336,7 +335,6 @@ $ sigma find "my python script that processes CSV files"
 - Gradient clipping + Gaussian noise (ε=0.1 differential privacy)
 - PQC-encrypted gradient uploads
 - Zero-knowledge proof that gradient was computed from real local data
-
 
 ---
 

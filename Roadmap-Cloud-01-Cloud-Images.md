@@ -6,7 +6,6 @@ Publish SigmaOS cloud images for AWS, GCP, and Azure.
 - cloud-init compatible first-boot configuration
 - Minimal cloud image (<500MB compressed)
 
-
 ## Key Milestones
 
 - [ ] cloud-init data source parser

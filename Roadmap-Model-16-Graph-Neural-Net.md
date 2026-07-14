@@ -6,7 +6,6 @@ Use GNN to analyse process and capability dependency graphs.
 - GCN (Graph Convolutional Network) forward pass
 - Node classification for process risk scoring
 
-
 ## Key Milestones
 
 - [ ] Adjacency normalisation (symmetric)

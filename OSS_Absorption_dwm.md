@@ -2,8 +2,8 @@
 
 ## Making suckless/dwm Irrelevant
 
-> **Absorption Target**: https://github.com/suckless/dwm  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/suckless/dwm
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaWM - Native Minimal Window Manager
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed dwm by implementing a native minimal window m
 
 ### 1. Minimal Window Manager
 
-**Original**: dwm's minimal design philosophy  
+**Original**: dwm's minimal design philosophy
 **SigmaOS**: Native minimal WM with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaWM {
 - Native floating window support
 - Tag-based workspace management
 
-
 ### 2. Source-Based Configuration
 
-**Original**: dwm's source code configuration  
+**Original**: dwm's source code configuration
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -54,10 +53,9 @@ pub struct SigmaWM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
-
 ### 3. Tag System
 
-**Original**: dwm's tag-based workspaces  
+**Original**: dwm's tag-based workspaces
 **SigmaOS**: Native tag system with enhanced features
 
 **Tag Features**:
@@ -69,10 +67,9 @@ pub struct SigmaWM {
 - Tag profiles with import/export
 - Tag synchronization across devices
 
-
 ### 4. Keybinding System
 
-**Original**: dwm's keybinding configuration  
+**Original**: dwm's keybinding configuration
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
@@ -84,10 +81,9 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
-
 ### 5. Bar System
 
-**Original**: dwm's status bar  
+**Original**: dwm's status bar
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
@@ -99,10 +95,9 @@ pub struct SigmaWM {
 - Bar profiles with automatic switching
 - Bar integration with system notifications
 
-
 ### 6. Layout System
 
-**Original**: dwm's layout system  
+**Original**: dwm's layout system
 **SigmaOS**: Native layout system with enhanced features
 
 **Layout Features**:
@@ -113,7 +108,6 @@ pub struct SigmaWM {
 - Layout caching with intelligent invalidation
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaWM {
 pub mod minimal {
     use sigma_wm::minimal::MinimalEngine;
     use sigma_wm::layout::LayoutManager;
-    
+
     pub struct SigmaWM {
         minimal_engine: MinimalEngine,
         layout_manager: LayoutManager,
         tag_manager: TagManager,
     }
-    
+
     impl SigmaWM {
         pub fn tile_minimal(&self, windows: Vec<Window>) -> MinimalLayout {
             // Native minimal tiling
@@ -154,7 +148,7 @@ pub mod minimal {
             let optimized = self.layout_manager.optimize(layout);
             MinimalLayout::minimalist(optimized)
         }
-        
+
         pub fn manage_tags(&self) {
             // Native tag management
             self.tag_manager.start();
@@ -172,7 +166,7 @@ pub mod config {
         config_validator: ConfigValidator,
         config_reloader: ConfigReloader,
     }
-    
+
     impl ConfigSystem {
         pub fn reload_config(&self, config: Config) -> ReloadedConfig {
             // Native configuration reload

@@ -6,7 +6,6 @@ Integrate cross-encoder models to re-rank local search results with high semanti
 - Cross-encoder inference on candidate document list retrieved via TF-IDF.
 - Rank adjustment taking less than 50ms total.
 
-
 ## Key Milestones
 
 - [ ] Candidate retrieval optimization

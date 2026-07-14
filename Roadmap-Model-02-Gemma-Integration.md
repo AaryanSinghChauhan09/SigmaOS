@@ -6,7 +6,6 @@ Integrate Gemma-2B as a lightweight code and reasoning model.
 - Gemma-2B-Q4 for code completion and CLI translation
 - Fallback from Phi-3 on <4GB RAM devices
 
-
 ## Key Milestones
 
 - [ ] Model capability tier config in sigma.toml

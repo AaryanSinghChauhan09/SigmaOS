@@ -149,8 +149,6 @@ fn init_uart(p: &Peripherals) {
 
 - `make bsp-rp2040` generates `arch/arm64/bsp/rp2040/src/lib.rs` without errors.
 
-
 - `cargo build --target thumbv6m-none-eabi -p rp2040-pac` compiles successfully.
-
 
 - GPIO toggle example blinks the onboard LED on real RP2040 hardware.

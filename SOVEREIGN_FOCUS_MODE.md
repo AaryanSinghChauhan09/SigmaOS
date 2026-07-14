@@ -161,7 +161,6 @@ The Zenith desktop shows a subtle focus indicator in the header:
 - No behavioral telemetry without explicit opt-in
 - Focus data purged after 30 days (configurable)
 
-
 ---
 
 ## Configuration

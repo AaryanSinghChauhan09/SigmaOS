@@ -16,12 +16,9 @@ When the Firewall audits the Virtual File System or intercepts a process:
 
 1. Objects yielding `P(t) > 0.75` are classified as malicious strings.
 
-
 2. The execution context is securely locked via the **Sovereign Sandbox**.
 
-
 3. A notification is synchronously emitted to the UI/UX layer via the `NotificationCenter`.
-
 
 1
 

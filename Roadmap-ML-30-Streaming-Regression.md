@@ -6,7 +6,6 @@ Train and update linear and polynomial regression models incrementally.
 - Recursive Least Squares (RLS) solver.
 - Predict memory usage trends per process.
 
-
 ## Key Milestones
 
 - [ ] RLS algorithm implementation

@@ -2,8 +2,8 @@
 
 ## Making alacritty/alacritty Irrelevant
 
-> **Absorption Target**: https://github.com/alacritty/alacritty  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/alacritty/alacritty
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaTerm - Native GPU-Accelerated Terminal
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed Alacritty by implementing a native GPU-accele
 
 ### 1. GPU Acceleration
 
-**Original**: Alacritty's GPU-accelerated rendering  
+**Original**: Alacritty's GPU-accelerated rendering
 **SigmaOS**: Native GPU acceleration with enhanced features
 
 ```rust
@@ -39,10 +39,9 @@ pub struct SigmaTerm {
 - GPU monitoring with real-time metrics
 - GPU profiles with automatic switching
 
-
 ### 2. Font Rendering
 
-**Original**: Alacritty's font rendering  
+**Original**: Alacritty's font rendering
 **SigmaOS**: Native font rendering with enhanced features
 
 **Font Features**:
@@ -54,10 +53,9 @@ pub struct SigmaTerm {
 - Font profiles with automatic switching
 - Font monitoring with real-time metrics
 
-
 ### 3. Scrollback Buffer
 
-**Original**: Alacritty's scrollback buffer  
+**Original**: Alacritty's scrollback buffer
 **SigmaOS**: Native scrollback with enhanced features
 
 **Scrollback Features**:
@@ -69,10 +67,9 @@ pub struct SigmaTerm {
 - Scrollback validation with automatic checking
 - Scrollback monitoring with real-time metrics
 
-
 ### 4. Configuration System
 
-**Original**: Alacritty's YAML configuration  
+**Original**: Alacritty's YAML configuration
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -84,10 +81,9 @@ pub struct SigmaTerm {
 - Configuration inheritance with composition
 - Configuration monitoring with real-time metrics
 
-
 ### 5. Shell Integration
 
-**Original**: Alacritty's shell integration  
+**Original**: Alacritty's shell integration
 **SigmaOS**: Native shell integration with enhanced features
 
 **Shell Integration Features**:
@@ -99,10 +95,9 @@ pub struct SigmaTerm {
 - Shell validation with automatic checking
 - Shell monitoring with real-time metrics
 
-
 ### 6. Window Management
 
-**Original**: Alacritty's window management  
+**Original**: Alacritty's window management
 **SigmaOS**: Native window management with enhanced features
 
 **Window Features**:
@@ -113,7 +108,6 @@ pub struct SigmaTerm {
 - Window profiles with automatic switching
 - Window validation with automatic checking
 - Window monitoring with real-time metrics
-
 
 ---
 
@@ -140,13 +134,13 @@ pub struct SigmaTerm {
 pub mod gpu {
     use sigma_term::gpu::GPURenderer;
     use sigma_term::font::FontManager;
-    
+
     pub struct SigmaTerm {
         gpu_renderer: GPURenderer,
         font_manager: FontManager,
         scrollback_manager: ScrollbackManager,
     }
-    
+
     impl SigmaTerm {
         pub fn render(&self, buffer: Buffer) -> RenderedBuffer {
             // Native GPU rendering
@@ -167,7 +161,7 @@ pub mod scrollback {
         compression_engine: CompressionEngine,
         search_index: SearchIndex,
     }
-    
+
     impl ScrollbackManager {
         pub fn add_line(&self, line: Line) {
             // Intelligent scrollback management

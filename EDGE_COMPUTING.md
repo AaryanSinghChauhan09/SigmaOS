@@ -486,7 +486,6 @@ impl AdaptiveNetwork {
                   + reliability * 0.2
                   + (1.0 / cost) * 0.1;
 
-
         Ok(score)
     }
 }

@@ -116,11 +116,8 @@ pub fn build_tls_config() -> Arc<ClientConfig> {
 
 - `sigma-pkg install sigma-edit` downloads over HTTPS using rustls; cert verification passes.
 
-
 - `sigma-curl https://registry.sigmaos.dev/v1/index` returns HTTP 200.
 
-
 - TLS 1.3 is negotiated; TLS 1.0/1.1 connections are rejected.
-
 
 - Kyber-1024 hybrid KEX is logged in debug output when connecting to a PQC-enabled server.

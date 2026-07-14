@@ -28,7 +28,6 @@ SigmaOS Mobile is a sovereign, security-first mobile operating system built on t
 - Hardware memory tagging (MTE) for memory safety
 - TrustZone for secure enclave integration
 
-
 ---
 
 ## Architecture Overview
@@ -81,7 +80,6 @@ Features:
 - Emergency calling (E911/E112) compliance
 - SIM card management (single/dual SIM)
 
-
 ### 2. Touch Input Processing (sigma-touch)
 
 Multi-touch support with:
@@ -90,7 +88,6 @@ Multi-touch support with:
 - Pressure and stylus (Apple Pencil / USI 2.0 compatible)
 - Hover detection (5mm range)
 - Palm rejection ML model (TFLite inference)
-
 
 ```rust
 pub struct TouchEvent {
@@ -161,7 +158,6 @@ Mobile adds additional security layers:
 - **Permission Model**: Fine-grained runtime permissions (camera, mic, location, contacts)
 - **Baseband Isolation**: Modem in hardware-isolated compartment (IOMMU-enforced)
 - **Verified Boot**: Boot chain integrity check at every stage (sigma-boot → kernel → system)
-
 
 ---
 

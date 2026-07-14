@@ -69,15 +69,11 @@ All shards follow the **Dilithium-5** attestation protocol:
 
 1. **Creation**: Shard source is compiled and signed by a Sovereign Architect.
 
-
 2. **Distribution**: Shard is distributed via `sigma-pkg` over an encrypted lattice mesh.
-
 
 3. **Ignition**: The kernel verifies the signature before igniting the shard into memory.
 
-
 4. **Decommission**: Shards can be safely evacuated or rolled back at any time.
-
 
 ---
 

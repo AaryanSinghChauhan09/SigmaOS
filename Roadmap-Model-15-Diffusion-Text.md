@@ -6,7 +6,6 @@ Explore diffusion models for non-autoregressive parallel text generation.
 - MDLM (Masked Diffusion Language Model) inference
 - 10x faster generation than autoregressive for fixed-length outputs
 
-
 ## Key Milestones
 
 - [ ] Noise schedule (cosine) implementation

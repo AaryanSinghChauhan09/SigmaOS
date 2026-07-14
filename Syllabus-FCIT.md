@@ -396,18 +396,13 @@ public:
 
 - [Syllabus Implementation Map](Syllabus-Implementation-Map)
 
-
 - [HAL Driver Framework](HAL)
-
 
 - [Sovereign Memory Management](Sovereign-Memory-Management)
 
-
 - [S-ZFS Storage Pool](Sovereign_ZFS_Pool)
 
-
 - [SigmaAI Intelligence Layer](Syllabus-AIML)
-
 
 ---
 

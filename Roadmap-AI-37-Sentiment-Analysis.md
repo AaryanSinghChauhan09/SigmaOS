@@ -6,7 +6,6 @@ Analyse user feedback, bug reports, and community posts for sentiment trends.
 - VADER + Transformer hybrid sentiment scorer
 - Community health dashboard in wiki integration
 
-
 ## Key Milestones
 
 - [ ] VADER lexicon integration (no_std port)

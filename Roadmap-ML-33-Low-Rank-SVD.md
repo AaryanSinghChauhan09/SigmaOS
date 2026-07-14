@@ -6,7 +6,6 @@ Track latent factors in telemetry matrices using online singular value decomposi
 - Implement Brand's incremental SVD update algorithm in zero-alloc Rust.
 - Real-time dimensionality reduction of process feature matrices.
 
-
 ## Key Milestones
 
 - [ ] Incremental rank-one update algorithm

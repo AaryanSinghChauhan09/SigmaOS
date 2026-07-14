@@ -32,7 +32,6 @@ SigmaMedia integrates hardware-accelerated AI models directly into the pipeline 
 - **On-the-fly Denoising**: Native RNNoise integration removes background noise before it even reaches the application (e.g., Discord or Zoom).
 - **Video Upscaling**: Real-time AI upscaling for legacy video streams.
 
-
 ### 3.3 Declarative Routing
 
 Multimedia routing is no longer hidden in opaque graphical tools. SigmaOS uses declarative configurations to map endpoints:

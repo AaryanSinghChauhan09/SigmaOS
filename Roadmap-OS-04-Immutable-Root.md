@@ -6,7 +6,6 @@ Mount root as read-only with overlay for transient writes (OSTree-style).
 - dm-verity protected root partition
 - OverlayFS writable upper layer for /etc and /var
 
-
 ## Key Milestones
 
 - [ ] dm-verity hash tree construction tool

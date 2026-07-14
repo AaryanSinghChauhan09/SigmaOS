@@ -6,7 +6,6 @@ Incentivise and celebrate open-source contributions.
 - Tiered contributor badges (Bronze â†’ Diamond)
 - Monthly featured contributor spotlight
 
-
 ## Key Milestones
 
 - [ ] Contribution scoring algorithm

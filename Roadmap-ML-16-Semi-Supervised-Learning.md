@@ -6,7 +6,6 @@ Learn from large volumes of unlabelled logs with minimal labelled samples.
 - Label Propagation on k-NN graph of log embeddings
 - Self-training pseudo-label iteration
 
-
 ## Key Milestones
 
 - [ ] k-NN graph construction from MiniLM embeddings

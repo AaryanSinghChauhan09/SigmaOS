@@ -6,7 +6,6 @@ Fine-tune small language models on user-specific data without cloud upload.
 - LoRA adaptor training on local text corpus
 - 4-bit quantised base model + F16 LoRA weights
 
-
 ## Key Milestones
 
 - [ ] LoRA weight injection into GGUF loader

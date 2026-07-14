@@ -6,7 +6,6 @@ Run CI/CD pipelines natively on SigmaOS without Docker or cloud runners.
 - YAML pipeline definition (GitHub Actions-compatible)
 - sigma-pod for isolated build environments
 
-
 ## Key Milestones
 
 - [ ] YAML pipeline parser

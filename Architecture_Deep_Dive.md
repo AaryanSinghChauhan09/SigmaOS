@@ -27,15 +27,11 @@ A **shard** is SigmaOS's atomic capability unit — equivalent to a process in a
 
 - **Isolated address space**: each shard gets its own virtual address space (ASLR + guard pages)
 
-
 - **Capability token**: a 256-bit unforgeable token issued by the kernel at shard registration
-
 
 - **sigma_pledge**: an allowlist of IPC message types the shard may send/receive
 
-
 - **sigma_unveil**: a path allowlist for SigmaFS access (additive, irreversible per-call)
-
 
 ### Shard Communication via sigma-bus
 

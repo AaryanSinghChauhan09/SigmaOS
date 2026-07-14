@@ -77,12 +77,9 @@ The updater verifies before writing to the inactive slot:
 
 1. **SHA-256 checksum** — image integrity
 
-
 2. **Dilithium-5 signature** — authenticity (via `sigma-verify-sig`)
 
-
 3. **dm-verity hash** — written to `.sigma-verity` for boot-time check
-
 
 If any step fails, the update is aborted and the active slot is unchanged.
 

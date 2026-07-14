@@ -28,168 +28,119 @@ Full details: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-R
 
 - kernel/core/{sched,mm,syscall_dispatch,irq}.cpp
 
-
 - sigma-boot.efi (UEFI PE binary)
-
 
 - VESA/GOP framebuffer
 
-
 - `make iso` → bootable ISO
 
-
 - QEMU CI in GitHub Actions
-
 
 ### Phase 1 — Networking & Packages (Months 3–6): MAKE IT CONNECT
 
 - TCP/UDP/IPv6 stack
 
-
 - Ethernet + WiFi SDF drivers (e1000, virtio-net, r8169, iwlwifi, mt7921)
-
 
 - sigma-repo-server + India CDN mirror
 
-
 - sigma-pkg end-to-end install
 
-
 - Argon2id CryptFS (fix Issue #44)
-
 
 ### Phase 2 — Desktop & Identity (Months 6–9): MAKE IT USABLE
 
 - GPU drivers (i915, amdgpu, virtio-gpu)
 
-
 - Zenith compositor live on DRM/KMS
-
 
 - DID-based login (QR scan → desktop)
 
-
 - Indian language IME (Inscript + phonetic)
-
 
 - sigma-bhashini offline models
 
-
 - sigma-ai local LLM (Sarvam-1, 4GB RAM)
-
 
 ### Phase 3 — India Stack Live (Months 9–14): MAKE IT INDIAN
 
 - ABDM FHIR client (Health ID, PHR, PMJAY)
 
-
 - GST IRN + e-Way Bill + GSTR filing
-
 
 - UPI Autopay + e-RUPI + AA consent
 
-
 - NavIC integration
 
-
 - sigma-accounts + sigma-health production ready
-
 
 ### Phase 4 — Security Hardening (Months 12–18): MAKE IT TRUSTED
 
 - ML-KEM/ML-DSA/SLH-DSA (FIPS 203/204/205 final)
 
-
 - Continuous auth live (biometric all signals)
-
 
 - sigma-mac policy engine live
 
-
 - sigma-ids + sigma-heal integration
 
-
 - TPM2 full Secure Boot chain
-
 
 ### Phase 5 — Multi-Platform (Months 15–21): MAKE IT EVERYWHERE
 
 - ARM64: Raspberry Pi 4/5, sigma-ultra on Pi Zero
 
-
 - RISC-V build toolchain
-
 
 - sigma-commnet: TRAI-certified, BharatNet PoP
 
-
 - sigma-ultra USSD mode on 2G
-
 
 ### Phase 6 — AI & Advanced (Months 18–24): MAKE IT SMART
 
 - Federated learning coordinator live
 
-
 - sigma-heal AI crash analysis real
-
 
 - sigma-lex Gazette parser live
 
-
 - sigma-twin with real IoT sensors
 
-
 - ZK proofs working (groth16)
-
 
 ### Phase 7 — Enterprise & Government (Months 24–36): MAKE IT OFFICIAL
 
 - BharatOS pilot: 1,000 NIC machines
 
-
 - sigma-fleet: 10,000+ device management
-
 
 - Hardware partnerships: Lava/Micromax OEM
 
-
 - STQC + MeitY empanelment
 
-
 - sigma-defense DRDO evaluation
-
 
 ### Phase 8 — Rural India (Months 30–42): MAKE IT UNIVERSAL
 
 - sigma-RuralStack: 1,000 pilot villages
 
-
 - BharatNet PoP certification
-
 
 - sigma-gram for all 250,000 panchayats
 
-
 - MGNREGS payment latency < 24 hours
-
 
 ### Phase 9 — Research (Months 36–60): MAKE IT FOREVER
 
 - Formal verification: IPC + scheduler (IIT/IISc collab)
 
-
 - Rust migration complete: zero memory-safety CVEs
-
 
 - sigma-telco: O-RAN 5G on SigmaOS
 
-
 - sigma-zkvm: banks share risk models without raw data
 
-
 - ONEST: 1M DID-signed skill credentials
-
 
 ---
 
@@ -221,26 +172,19 @@ Everything else is blocked until a real scheduler, MM, and syscall table exist.
 
 - C++ kernel engineers (scheduler, memory manager)
 
-
 - UEFI/EDK2 engineers (bootloader)
 
-
 - Build system engineers (ISO pipeline)
-
 
 ### Phase 2–3 needs:
 
 - Rust engineers (network stack, VFS)
 
-
 - India fintech engineers (GST, ABDM, UPI API clients)
-
 
 - GPU/graphics engineers (DRM/KMS, Mesa)
 
-
 - Language/NLP engineers (IME, LLM integration)
-
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to get involved.
 See the [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap) for full phase details.

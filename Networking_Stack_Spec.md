@@ -26,21 +26,15 @@ The zero-copy path eliminates intermediate copies for large data transfers:
 
 1. **NIC DMA** fills an RX descriptor ring slot directly into a kernel-mapped physical page.
 
-
 2. **SigmaSmoltcpDevice::receive()** returns the physical page pointer — no copy.
-
 
 3. **smoltcp** processes IP/TCP headers in-place.
 
-
 4. **sigma-net** maps the page into the receiving app's address space using `sigma_map_shared`.
-
 
 5. App reads data directly from the shared page.
 
-
 6. App signals completion; kernel releases the page back to the DMA ring.
-
 
 Memory copies: **zero** between NIC DMA and application read.
 

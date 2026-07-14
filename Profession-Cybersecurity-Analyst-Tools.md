@@ -10,15 +10,11 @@ The Cybersecurity Analyst Profile is designed for security excellence, threat de
 
 - **SigmaThreat**: Threat detection and analysis system.
 
-
 - **SigmaMonitor**: Real-time security monitoring and alerting.
-
 
 - **SigmaForensic**: Digital forensics and incident response tools.
 
-
 - **SigmaAudit**: Security audit and compliance verification.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Cybersecurity Analyst Profile is designed for security excellence, threat de
 
 - **Theme**: Security Red (Cybersecurity Standard)
 
-
 - **Layout**: Security Dashboard (Threats, Monitor, Forensic)
 
-
 - **Personalization**: Custom alert rules and automated responses.
-
 
 ---
 

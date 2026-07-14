@@ -6,7 +6,6 @@ Simulate fluid flow for engineering and scientific research.
 - Lattice Boltzmann Method (LBM) solver
 - 2D flow visualisation in terminal
 
-
 ## Key Milestones
 
 - [ ] D2Q9 lattice Boltzmann kernel

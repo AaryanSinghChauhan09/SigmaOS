@@ -538,45 +538,33 @@ Qed.
 
 - **Branch**: drivers-dev + release/standalone
 
-
 - **Impact**: Unlocks visible UX
 
-
 - **Timeline**: 4 weeks
-
 
 ### sigpkg MVP + Web Registry with 50 Curated Apps
 
 - **Branch**: sigma-pkg, sigma_pkg_registry, app_store.html
 
-
 - **Impact**: User-visible package management
 
-
 - **Timeline**: 6 weeks
-
 
 ### QEMU Multi-Arch CI + Reproducible Build Job
 
 - **Branch**: .github/workflows
 
-
 - **Impact**: Actionable trust win
 
-
 - **Timeline**: 3 weeks
-
 
 ### Tiny POSIX Shim for Linux CLI Tools
 
 - **Branch**: runtime/compat
 
-
 - **Impact**: Demonstrates portability
 
-
 - **Timeline**: 4 weeks
-
 
 ## Prioritization Framework
 
@@ -584,18 +572,13 @@ Qed.
 
 1. Finish kernel-exp Phase 0 → required by almost everything
 
-
 2. Trust & reproducible builds → publishable proof of auditable supply chain
-
 
 3. App availability (sigpkg + WASM runtime) → user-visible win vs Linux fragmentation
 
-
 4. Driver coverage for common hardware → practical desktop/server parity
 
-
 5. Enterprise features (attestation, fleet, OTA) once base is stable
-
 
 ---
 

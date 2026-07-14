@@ -6,7 +6,6 @@ PCA, t-SNE, and UMAP for telemetry visualisation and embedding compression.
 - PCA via eigendecomposition (sigma_math.rs extension)
 - t-SNE for 2D embedding visualisation in Zenith
 
-
 ## Key Milestones
 
 - [ ] Power iteration for top-K eigenvalues

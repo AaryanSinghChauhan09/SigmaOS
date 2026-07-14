@@ -6,7 +6,6 @@ Meet SOC2, ISO 27001, and government compliance requirements.
 - Immutable audit log for all privilege escalations
 - Compliance report generation
 
-
 ## Key Milestones
 
 - [ ] Audit log schema (BLAKE3 chain)

@@ -6,7 +6,6 @@ Bypass intermediary text transcripts by mapping raw audio waveforms directly to 
 - Real-time end-to-end neural network translating voice directly to JSON structured actions.
 - Target latency under 100ms on desktop-grade CPUs.
 
-
 ## Key Milestones
 
 - [ ] Audio feature extraction (Log-Mel spectrograms in zero-alloc Rust)

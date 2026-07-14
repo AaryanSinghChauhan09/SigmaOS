@@ -31,10 +31,10 @@ While core system specs are declarative (`sigma.toml`), operational state and us
 
 pub fn query_portal_permissions(app_id: &str) -> Result<Vec<Permission>> {
     let conn = sqlite::open("/var/lib/sigma/portal_perms.db")?;
-    
+
     let mut stmt = conn.prepare("SELECT perm, state FROM portals WHERE app_id = ?")?;
     stmt.bind((1, app_id))?;
-    
+
     // ...
 }
 ```

@@ -53,7 +53,6 @@ sigma-dbus ──┬───────────────┘
   - `SupervisionTree::handle_failure(name)` — restart policy enforcement
   - `create_default_services()` — default SigmaOS boot configuration
 
-
 ## Health Checks
 
 Services can define a `health_check_cmd` that sigmad runs periodically. If the health check fails, sigmad treats it as a service failure and applies the restart policy.

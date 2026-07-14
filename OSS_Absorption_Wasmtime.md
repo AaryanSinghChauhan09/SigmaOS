@@ -40,15 +40,15 @@ Because WASM enforces strict memory isolation, SigmaOS utilizes it for applicati
 pub fn run_untrusted_plugin(wasm_bytes: &[u8]) -> Result<()> {
     let engine = Engine::default();
     let module = Module::from_binary(&engine, wasm_bytes)?;
-    
+
     // Store encapsulates the sandbox state
     let mut store = Store::new(&engine, ());
     let instance = Instance::new(&mut store, &module, &[])?;
-    
+
     // Invoke the entry point safely
     let start_func = instance.get_typed_func::<(), ()>(&mut store, "_start")?;
     start_func.call(&mut store, ())?;
-    
+
     Ok(())
 }
 ```

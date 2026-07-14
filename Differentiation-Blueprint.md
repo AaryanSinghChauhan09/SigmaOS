@@ -10,9 +10,7 @@ SigmaOS wins only if it is better in **both** axes:
 
 - **Technical sovereignty**: own critical runtime layers (boot, net, container isolation, libc primitives, driver path)
 
-
 - **UX and operations quality**: polished Zenith desktop, resilient recovery, automation, and transparent docs/release workflows
-
 
 Neither axis alone is sufficient. A technically perfect OS with bad UX loses. A beautiful OS with unreliable kernel loses.
 
@@ -38,44 +36,33 @@ Neither axis alone is sufficient. A technically perfect OS with bad UX loses. A 
 
 - Complete RX/TX driver-to-stack loop for active NICs
 
-
 - Enforce single socket ABI ownership
 
-
 - Remove duplicate APIs between `kernel/net/` and `net/sockets/`
-
 
 ### Containers
 
 - Finish orchestrator handling for native namespace/cgroup spec
 
-
 - `sigma-pod run-native` must apply limits in kernel path — not just CLI
-
 
 ### Boot Resilience
 
 - Promote safe-mode policy to default for repeated failed boot attempts
 
-
 - Recovery menu accessible from boot stage without userspace
-
 
 ### Minimal libc Path
 
 - Prioritize `sigma_memcpy`, `sigma_strlen`, formatted output on hot codepaths
 
-
 ### Exit Criteria:
 
 - Boot success ≥ 99% in CI virtual profiles
 
-
 - Packet TX/RX tests passing on ≥ 2 NIC targets
 
-
 - Native pod launch applies namespace + cgroup limits in kernel path
-
 
 ---
 
@@ -85,50 +72,37 @@ Neither axis alone is sufficient. A technically perfect OS with bad UX loses. A 
 
 - Stable compositor loop
 
-
 - Predictable window placement
-
 
 - Accessibility hooks (AT-SPI2)
 
-
 - Deterministic input handling
-
 
 ### Auto-Tiling WM
 
 - First-party tiling policy in Zenith
 
-
 - Profile-aware defaults (developer = tiling, gaming = fullscreen, standard = floating)
-
 
 ### Personalization Engine
 
 - Declarative `~/.sigma_profile` + theme/layout presets
 
-
 - Hot-reload without restart
-
 
 ### Recovery Surface
 
 - Recovery assistant for rollback/snapshot selection
 
-
 - Diagnostics export (logs, kernel panic traces, hardware info)
-
 
 ### Exit Criteria:
 
 - UI smoke suite passes across standard profile matrix
 
-
 - Recovery flow restores known-good boot without manual kernel edits
 
-
 - Profile-driven desktop state reliably restored after reboot
-
 
 ---
 
@@ -138,42 +112,31 @@ Neither axis alone is sufficient. A technically perfect OS with bad UX loses. A 
 
 - Deterministic build recipes
 
-
 - Dilithium3-signed packages
 
-
 - Provenance checks on every install
-
 
 ### Automation Hooks
 
 - Update/backup/recovery orchestration
 
-
 - Scheduler integration for background maintenance
-
 
 ### GitHub-First Transparency
 
 - Changelog discipline: every subsystem change → docs update
 
-
 - CI gating for kernel/driver/UI paths
 
-
 - Wiki pages map directly to maintained subsystem owners
-
 
 ### Exit Criteria:
 
 - Every subsystem PR includes test evidence + docs update
 
-
 - Release candidates include validated rollback + recovery evidence
 
-
 - Wiki pages map directly to maintained subsystem owners
-
 
 ---
 
@@ -199,15 +162,11 @@ No new subsystem is "done" unless it has:
 
 1. Runtime tests
 
-
 2. Recovery behavior documented
-
 
 3. Docs update committed
 
-
 4. Ownership declaration in `CODEOWNERS`
-
 
 **Prefer** replacing dependency hot paths incrementally over risky all-at-once rewrites.
 

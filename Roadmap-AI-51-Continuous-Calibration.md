@@ -6,7 +6,6 @@ Enable background self-calibration algorithms to prevent drift in model confiden
 - Compute temperature scaling parameters dynamically from local user feedback cycles.
 - Integrate verification steps inside local_llm.rs query routing.
 
-
 ## Key Milestones
 
 - [ ] Expected Calibration Error (ECE) metric tracking

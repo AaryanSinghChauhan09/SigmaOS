@@ -6,7 +6,6 @@ Provide automatic natural-language explanations for clustered log anomalies.
 - Feed feature weights of clustered anomalies to local LLM to describe behavior in plain text.
 - Connect clustering pipeline directly to Zenith Security Center.
 
-
 ## Key Milestones
 
 - [ ] Cluster silhouette and feature scoring module

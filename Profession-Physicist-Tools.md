@@ -10,15 +10,11 @@ The Physicist Profile is designed for physics excellence, theoretical research, 
 
 - **SigmaTheory**: Theoretical physics modeling and simulation.
 
-
 - **SigmaExperiment**: Experimental physics data management.
-
 
 - **SigmaAnalysis**: Physics data analysis and visualization.
 
-
 - **SigmaCollaboration**: Research collaboration and publication.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Physicist Profile is designed for physics excellence, theoretical research, 
 
 - **Theme**: Physics Blue (Research Standard)
 
-
 - **Layout**: Physics Dashboard (Theory, Experiment, Analysis)
 
-
 - **Personalization**: Custom simulation environments and automated analysis.
-
 
 ---
 

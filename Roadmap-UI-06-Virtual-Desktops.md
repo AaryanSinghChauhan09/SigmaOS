@@ -6,7 +6,6 @@ Multiple independent virtual desktops with smooth transition animations.
 - Up to 9 named workspaces
 - Per-workspace wallpaper and layout profiles
 
-
 ## Key Milestones
 
 - [ ] Workspace registry in Zenith compositor

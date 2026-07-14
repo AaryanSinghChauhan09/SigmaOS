@@ -14,7 +14,6 @@ SigmaOS is designed as an **AI-native OS** — not just an OS that runs AI appli
 - **Protocol:** HTTP API on `localhost:11434` (Ollama-compatible)
 - **Models supported:** Phi-3-mini, Gemma-2B, DeepSeek-Coder (GGUF format)
 
-
 ```bash
 sigma-ai run "explain this error"
 sigma-ai generate --model phi3 "write a Python hello world"
@@ -31,7 +30,6 @@ Built-in transformer inference without any Python or external ML library:
 - **Quantization:** F32/F16 full precision + Q4_K/Q8_0 planned
 - **Sampling:** temperature + top-p nucleus sampling
 - **Tokenizer:** BPE-compatible with greedy longest-match
-
 
 ### Supported Models (Planned Full Integration)
 
@@ -54,7 +52,6 @@ Built-in transformer inference without any Python or external ML library:
 - Features: IPC counter, cache miss rate, voluntary/involuntary context switches
 - Adjusts MLFQ level pre-emptively → 15–30% lower tail latency
 
-
 ### AI Intrusion Detection (`kernel/core/`)
 
 - Anomaly detection on syscall sequences
@@ -62,13 +59,11 @@ Built-in transformer inference without any Python or external ML library:
 - Alert: deviation > 3σ from baseline
 - Zero false-positive guarantee via conservative threshold
 
-
 ### Neural Memory Prefetcher
 
 - Trains on page access patterns
 - Prefetches pages before they fault
 - Implemented in `kernel/optimizations/`
-
 
 ---
 
@@ -103,7 +98,6 @@ All implemented without `std` or external crates:
 - Bayesian inference
 - Gaussian processes
 
-
 ---
 
 ## Data Science Tools
@@ -115,7 +109,6 @@ All implemented without `std` or external crates:
 - Linear regression
 - FFT (for signal processing)
 - Matrix operations: multiply, inverse, determinant, SVD
-
 
 ### sigma-data CLI
 
@@ -187,7 +180,6 @@ SigmaOS nodes can participate in federated model training:
 - Aggregation via Raft-based coordinator
 - No raw data leaves the device
 
-
 ```bash
 sigma-ai federate join --coordinator 192.168.1.100:9090
 sigma-ai federate contribute --model sigma-intrusion-v1
@@ -202,6 +194,5 @@ Every AI decision in SigmaOS can be explained:
 - Scheduler: "Task X moved to Q2 because CPU burst exceeded 8ms quantum"
 - IDS: "Alert: process opened 500 files in 1s (baseline: 5/s)"
 - Package recommender: "Suggested sigma-vim because 80% of developers also install it"
-
 
 This is implemented via attention weight visualization in `sigma_local_llm.rs`.

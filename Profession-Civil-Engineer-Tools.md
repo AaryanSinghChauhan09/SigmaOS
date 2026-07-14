@@ -10,15 +10,11 @@ The Civil Engineer Profile is designed for infrastructure excellence, project ma
 
 - **SigmaStructure**: Structural analysis and design tools.
 
-
 - **SigmaSurvey**: Survey data management and mapping.
-
 
 - **SigmaProject**: Civil project management and scheduling.
 
-
 - **SigmaCompliance**: Building code verification and regulatory compliance.
-
 
 ---
 
@@ -26,12 +22,9 @@ The Civil Engineer Profile is designed for infrastructure excellence, project ma
 
 - **Theme**: Engineering Blue (Civil Standard)
 
-
 - **Layout**: Engineering Dashboard (Structure, Survey, Project)
 
-
 - **Personalization**: CAD integration and automated calculations.
-
 
 ---
 

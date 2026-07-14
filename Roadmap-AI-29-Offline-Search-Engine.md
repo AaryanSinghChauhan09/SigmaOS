@@ -6,7 +6,6 @@ Index and semantically search all user documents without internet.
 - Full-text + semantic hybrid search over local files
 - Incremental index updates on file change events
 
-
 ## Key Milestones
 
 - [ ] File watcher integration with VFS events

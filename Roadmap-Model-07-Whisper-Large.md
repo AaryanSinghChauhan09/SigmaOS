@@ -6,7 +6,6 @@ Full transcription and dictation support using Whisper Large-v3.
 - Real-time transcription of meetings and lectures
 - Multi-language support including all Indic languages
 
-
 ## Key Milestones
 
 - [ ] Audio stream chunking (30-second windows)

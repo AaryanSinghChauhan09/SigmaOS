@@ -6,7 +6,6 @@ Translate text between English and Indic languages without internet.
 - IndicTrans2 quantised model integration
 - Bidirectional translation: EN â†” HI/TA/BN/GU
 
-
 ## Key Milestones
 
 - [ ] SentencePiece tokeniser port to Rust

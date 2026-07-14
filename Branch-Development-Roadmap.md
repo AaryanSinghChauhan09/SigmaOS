@@ -44,12 +44,9 @@ Every PR to `main` must pass `sigma_ci.yml` smoke tests.
 
 - Last merged: `tools-dev` with docs + compat headers
 
-
 - CI: GitHub Actions running on push
 
-
 - Wiki sync: automatic on push
-
 
 ### Next tasks for maintainers
 
@@ -65,9 +62,7 @@ Every PR to `main` must pass `sigma_ci.yml` smoke tests.
 
 - `make iso` produces bootable image (blocked on `kernel-exp`)
 
-
 - All CI checks green on every commit
-
 
 ---
 
@@ -82,9 +77,7 @@ that turn SigmaOS from a design document into a bootable OS.
 
 - Headers complete for scheduler, MM, syscall, IRQ
 
-
 - Bodies missing — all `.cpp` implementations are stubs
-
 
 ### Next tasks (ordered — do not skip ahead)
 
@@ -128,18 +121,13 @@ Depends on `kernel-exp` Phase 0 for the SDF Ring-3 launch mechanism.
 
 - NVMe driver: `drivers/storage/sigma_nvme.cpp` ✅
 
-
 - USB xHCI: `drivers/usb/sigma_xhci.cpp` ✅
-
 
 - e1000 NIC: `kernel/core/drivers/SovereignE1000.cpp` ✅
 
-
 - KMS/GPU: `drivers/graphics/sigma_kms.cpp` — framework only
 
-
 - Wi-Fi: not started
-
 
 ### Next tasks
 
@@ -189,15 +177,11 @@ and the unified buffer cache.
 
 - VFS header: `kernel/include/kernel/sigma_vfs.h` ✅
 
-
 - Ext4 journal rewrite: `fs/ext4_journal.c` ✅
-
 
 - SigmaFS: early design
 
-
 - UBC (Unified Buffer Cache): `kernel/fs/sigma_ubc.h` — header only
-
 
 ### Next tasks
 
@@ -218,9 +202,7 @@ and the unified buffer cache.
 
 - `sigma-sh` can `open`, `read`, `write`, `ls` on tmpfs
 
-
 - `sigma-pkg install` writes packages to SigmaFS partition
-
 
 ---
 
@@ -235,21 +217,15 @@ wiki sync, compat layer headers and stubs.
 
 - sigma-cli profiles/aliases: `userland/tools/sigma_cli.cpp`
 
-
 - sigma_automation.sh: `scripts/sigma_automation.sh`
-
 
 - sigma_git_sync.sh: `scripts/sigma_git_sync.sh`
 
-
 - ci_branch_check.sh: `scripts/ci_branch_check.sh`
-
 
 - Windows compat headers: `include/compat/*.h` (5 headers complete)
 
-
 - Windows compat skeletons: `runtime/compat/win32/*.cpp` (5 files complete)
-
 
 ### Next tasks
 
@@ -379,7 +355,6 @@ profession apps + sigma-ai local LLM.
 
 - First-time user boots → Zenith desktop → types Hindi → runs sigma-ai
 
-
 ---
 
 ## `release/microkernel` — Minimal Microkernel Profile
@@ -402,12 +377,9 @@ Target: under 512 KB kernel image, under 8 MB RAM footprint.
 
 - Boots in QEMU with 8 MB RAM
 
-
 - sigma-bus ping-pong IPC working
 
-
 - No userland except sigma-sh
-
 
 ---
 
@@ -433,9 +405,7 @@ BharatOS government machines, and sigma-fleet managed nodes.
 
 - `sigma-pod run-native demo.spkg --cpu=250 --mem=128` enforces limits in kernel
 
-
 - sigma-fleet agent registers with management console
-
 
 ---
 
@@ -600,36 +570,25 @@ release/dual-boot
 
 1. kernel-exp → main          (Phase 0: boot + QEMU CI passing)
 
-
 2. drivers-dev → main         (VESA + e1000 + VirtIO-GPU)
-
 
 3. fs-dev → main              (VFS + tmpfs + basic SigmaFS)
 
-
 4. tools-dev → main           (ongoing — after each green CI)
-
 
 5. performance-optimized → main (after kernel-exp merged)
 
-
 6. release/microkernel ← main (branch from stable main)
-
 
 7. release/standalone ← main  (after drivers-dev GPU merged)
 
-
 8. release/cloud ← main       (after cgroup enforcement)
-
 
 9. release/mobile ← main      (after ARM64 BSP done)
 
-
 10. release/rtos ← main       (after EDF scheduler)
 
-
 11. release/dual-boot ← main  (after sigma-boot.efi)
-
 
 12. release/distributed ← release/cloud
 

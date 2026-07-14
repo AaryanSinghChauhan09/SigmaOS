@@ -6,7 +6,6 @@ Transcribe, chapter-mark, and summarise podcasts and lectures offline.
 - Whisper Large-v3 transcription pipeline
 - LLM-generated chapter markers + summaries
 
-
 ## Key Milestones
 
 - [ ] Audio segmentation (silence detection)

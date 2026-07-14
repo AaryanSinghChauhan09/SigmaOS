@@ -6,7 +6,6 @@ Run SigmaOS as a Kubernetes worker node.
 - CRI-compatible container runtime (sigma-pod CRI shim)
 - CNI plugin for pod networking
 
-
 ## Key Milestones
 
 - [ ] CRI gRPC server stub

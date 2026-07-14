@@ -12,21 +12,15 @@ Ship a bootable ISO that:
 
 1. Boots on QEMU and real x86_64 hardware via UEFI.
 
-
 2. Presents a `sigma-sh` command prompt.
-
 
 3. Can install packages with `sigma-pkg install <name>`.
 
-
 4. Has a working network connection (DHCP on e1000 / VirtIO-net).
-
 
 5. Fits in under **150 MB** (ISO).
 
-
 6. Runs in **under 256 MB RAM**.
-
 
 This is the "Hello World" of SigmaOS. Everything else follows from this.
 
@@ -36,21 +30,15 @@ This is the "Hello World" of SigmaOS. Everything else follows from this.
 
 - No graphical desktop (Zenith comes in v1.0).
 
-
 - No Wi-Fi (wired/VirtIO only).
-
 
 - No audio.
 
-
 - No GPU acceleration.
-
 
 - No ARM64 (x86_64 only).
 
-
 - No online package registry (local sigpkg repo on ISO only).
-
 
 Keep it small. Keep it honest. Ship it.
 
@@ -248,24 +236,17 @@ These can be built **right now** without the bootable kernel:
 
 1. **sigma-pkg local mode** — write and test the package manager against a mock FS.
 
-
 2. **sigma-sh unit tests** — test the REPL logic against vitest / Rust tests in userspace.
-
 
 3. **sigpkg format spec** — define the `.sigpkg` archive format and metadata schema.
 
-
 4. **10-package starter repo** — build and sign the 10 bundled packages.
-
 
 5. **installer.html backend** — wire the existing GUI to the CLI installer logic.
 
-
 6. **Community setup** — GitHub Discussions, Discord, issue templates.
 
-
 7. **Quick-start guide** — `QUICKSTART.md` for contributors and early users.
-
 
 ---
 

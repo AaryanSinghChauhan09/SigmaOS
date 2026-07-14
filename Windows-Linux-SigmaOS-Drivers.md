@@ -29,12 +29,9 @@ This comes at a cost: Windows carries **decades of legacy baggage**:
 
 - Drivers run in **ring-0** with full kernel access — one driver bug = full BSOD
 
-
 - Closed drivers cannot be audited, patched by the community, or adapted
 
-
 - Backward compatibility means the kernel grows heavier with every release
-
 
 ---
 
@@ -55,18 +52,13 @@ Despite driver struggles, Linux wins in other areas:
 
 - **Open source** — anyone can audit, fork, fix drivers
 
-
 - **Security** — open drivers have fewer hidden backdoors
-
 
 - **Modularity** — strip to minimal install, no legacy bloat
 
-
 - **Community** — Intel, AMD, ARM all contribute upstream drivers
 
-
 - **Containers** — Docker/Flatpak/Snap solve legacy app compat without kernel baggage
-
 
 ---
 
@@ -182,15 +174,11 @@ Vendors who open-source drivers get:
 
 - Higher transparency score (shown on the app store)
 
-
 - Inclusion in the SigmaOS ISO for supported hardware
-
 
 - `SIGMA_DRV_FLAG_CERTIFIED` badge
 
-
 - Community bug fixes and maintenance
-
 
 ---
 
@@ -249,29 +237,21 @@ Windows drivers are closed because of **vendor business incentives**, not techni
 
 1. **IP protection** — register offsets, firmware formats, and optimization tricks are competitive advantages
 
-
 2. **Liability** — closed code means Microsoft/vendor can't be blamed for community modifications
-
 
 3. **WHQL process** — certification is easier to enforce with closed, signed binaries
 
-
 4. **Historical inertia** — the WDM model predates the open source movement; vendors never changed
-
 
 ### What Would Change If Windows Drivers Were Open
 
 - Security researchers could audit for backdoors and vulnerabilities
 
-
 - Community could port drivers to other platforms (like SigmaOS)
-
 
 - Hardware vendors could compete on hardware quality, not software lock-in
 
-
 - Driver bugs could be fixed by anyone, not just the vendor
-
 
 ### Linux's Open Driver Advantage
 
@@ -280,12 +260,9 @@ This means:
 
 - Drivers evolve with the hardware (day-0 support for new CPUs/GPUs)
 
-
 - Security issues fixed by the community, not just the vendor
 
-
 - SigmaOS can port these drivers cleanly via `sigma-driver-porter`
-
 
 ### SigmaOS's Stance
 
@@ -294,15 +271,11 @@ But the framework creates strong **incentives** for open drivers:
 
 - Ring-3 isolation means a closed driver still can't crash the kernel
 
-
 - Transparency scores visible to users in the app store
-
 
 - Open drivers get certified faster and included in the ISO
 
-
 - AI porting makes open-sourcing less work for vendors
-
 
 ---
 

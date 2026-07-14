@@ -6,7 +6,6 @@ Process IPC event streams with tumbling and sliding windows.
 - Tumbling window aggregation (count, sum, min/max)
 - Out-of-order event handling
 
-
 ## Key Milestones
 
 - [ ] Window buffer in ring-buffer form

@@ -1,6 +1,6 @@
 # SigmaOS Migration Guides
 
-**Last Updated:** July 6, 2026  
+**Last Updated:** July 6, 2026
 **Version:** v16.3.0 Foundation
 
 ---
@@ -23,7 +23,6 @@ This document provides comprehensive migration guides for users transitioning fr
 8. [Data Migration](#data-migration)
 9. [Configuration Migration](#configuration-migration)
 
-
 ---
 
 ## Migrating from Ubuntu
@@ -36,7 +35,6 @@ This document provides comprehensive migration guides for users transitioning fr
 - Export browser bookmarks and passwords
 - Save SSH keys and GPG keys
 
-
 ### Installation
 
 1. Download SigmaOS installer from official repository
@@ -44,7 +42,6 @@ This document provides comprehensive migration guides for users transitioning fr
 3. Boot from USB and run Calamares-style installer
 4. Select dual-boot option if keeping Ubuntu
 5. Complete installation and reboot
-
 
 ### Post-Installation
 
@@ -71,7 +68,6 @@ SigmaOS uses native implementations:
 - **systemd-networkd** → Native network drivers
 - **systemd-resolved** → Native DNS resolver
 
-
 #### Desktop Environment
 
 If using GNOME on Ubuntu, SigmaOS includes GNOME with Zenith Desktop integration. Your GNOME settings will be preserved during migration.
@@ -88,7 +84,6 @@ If using GNOME on Ubuntu, SigmaOS includes GNOME with Zenith Desktop integration
 - Export Wayland configurations
 - Note custom COPR repositories
 
-
 ### Installation
 
 1. Download SigmaOS installer
@@ -96,7 +91,6 @@ If using GNOME on Ubuntu, SigmaOS includes GNOME with Zenith Desktop integration
 3. Boot and run installer
 4. Select dual-boot if keeping Fedora
 5. Complete installation
-
 
 ### Post-Installation
 
@@ -135,7 +129,6 @@ SigmaOS supports Wayland natively. Your Wayland configurations should work with 
 - Export APT sources
 - Note custom kernel modules
 
-
 ### Installation
 
 1. Download SigmaOS installer
@@ -143,7 +136,6 @@ SigmaOS supports Wayland natively. Your Wayland configurations should work with 
 3. Boot and run installer
 4. Select dual-boot if keeping Debian
 5. Complete installation
-
 
 ### Post-Installation
 
@@ -178,7 +170,6 @@ Like Debian, SigmaOS emphasizes stability. The custom kernel with latest Linux i
 - Export custom PKGBUILD files
 - Note custom kernel parameters
 
-
 ### Installation
 
 1. Download SigmaOS installer
@@ -186,7 +177,6 @@ Like Debian, SigmaOS emphasizes stability. The custom kernel with latest Linux i
 3. Boot and run installer
 4. Select dual-boot if keeping Arch
 5. Complete installation
-
 
 ### Post-Installation
 
@@ -225,7 +215,6 @@ SigmaOS maintains the flexibility of Arch while providing pre-configured stabili
 - Document Windows-specific settings
 - Backup Windows Registry if needed
 
-
 ### Installation
 
 1. Download SigmaOS installer
@@ -234,7 +223,6 @@ SigmaOS maintains the flexibility of Arch while providing pre-configured stabili
 4. Run Calamares-style installer with dual-boot support
 5. Shrink Windows partition during installation
 6. Complete installation and reboot
-
 
 ### Post-Installation
 
@@ -250,7 +238,6 @@ Windows applications won't run natively. Use SigmaOS native alternatives:
 - **Adobe Photoshop** → GIMP (bundled)
 - **Chrome** → Native browser or Firefox
 - **Steam** → Native Steam with Proton for Windows games
-
 
 #### Drivers
 
@@ -272,7 +259,6 @@ SigmaOS installs GRUB as bootloader, allowing selection between Windows and Sigm
 - Document macOS-specific applications
 - Backup using Migration Assistant
 
-
 ### Installation
 
 1. Download SigmaOS installer
@@ -281,7 +267,6 @@ SigmaOS installs GRUB as bootloader, allowing selection between Windows and Sigm
 4. Run installer
 5. Partition disk for dual-boot
 6. Complete installation
-
 
 ### Post-Installation
 
@@ -297,7 +282,6 @@ macOS applications won't run natively. Use SigmaOS alternatives:
 - **Final Cut Pro** → Native video editor
 - **Logic Pro** → Native audio tools
 - **Safari** → Native browser or Firefox
-
 
 #### Hardware
 
@@ -359,7 +343,6 @@ Use the following methods to migrate user data:
 3. **Cloud Sync**: Upload to cloud, download to SigmaOS
 4. **Dual-Boot Access**: Access Windows/macOS partition from SigmaOS
 
-
 ### Application Data
 
 #### Browser Data
@@ -368,20 +351,17 @@ Use the following methods to migrate user data:
 - **Firefox**: Use Firefox Sync
 - **Edge**: Export bookmarks, import to SigmaOS browser
 
-
 #### Email
 
 - **Outlook**: Export to PST, import to Thunderbird
 - **Gmail**: Use IMAP to sync to native email client
 - **Apple Mail**: Export to mbox format
 
-
 #### Documents
 
 - **Office Documents**: Open directly in LibreOffice
 - **PDFs**: Native PDF viewer
 - **Images**: Native image viewer
-
 
 ---
 
@@ -492,7 +472,6 @@ If dual-boot doesn't work:
 3. Update GRUB configuration
 4. Check BIOS/UEFI boot order
 
-
 #### Driver Issues
 
 If hardware doesn't work:
@@ -501,7 +480,6 @@ If hardware doesn't work:
 2. Use `sigpkg install` for additional drivers
 3. Check kernel logs with `dmesg`
 4. Report issues on GitHub
-
 
 #### Application Issues
 
@@ -512,7 +490,6 @@ If applications don't work:
 3. Check application logs
 4. Use AI error explanation layer for help
 
-
 ---
 
 ## Additional Resources
@@ -521,7 +498,6 @@ If applications don't work:
 - [Implementation Progress](Implementation-Progress.md)
 - [Contributor Onboarding](Contributor-Onboarding.md)
 - [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-
 
 ---
 
@@ -533,7 +509,6 @@ For migration assistance:
 2. Search GitHub Issues
 3. Create new issue with detailed information
 4. Join community discussions
-
 
 ---
 

@@ -6,7 +6,6 @@ Scale down model context windows and speculative decoding runs depending on ther
 - Dynamically prune KV-caches and adjust batch sizes when battery level drops or temperature spikes.
 - Integrate with sigma_monitoring.rs telemetry streams.
 
-
 ## Key Milestones
 
 - [ ] Multi-tier fallback configuration in sigma.toml

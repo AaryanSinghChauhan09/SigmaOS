@@ -6,7 +6,6 @@ Extend existing K-Means with DBSCAN and Hierarchical clustering.
 - DBSCAN for anomaly cluster detection in system logs
 - Ward linkage hierarchical clustering for process grouping
 
-
 ## Key Milestones
 
 - [ ] DBSCAN epsilon-neighbourhood search (static array)

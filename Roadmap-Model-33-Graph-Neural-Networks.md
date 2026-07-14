@@ -6,7 +6,6 @@ Analyse process security graphs using multi-layer graph convolutional neural net
 - Run node classification on process capability graphs to highlight privilege escalation risks.
 - Integrate outputs with Zenith Security Center alerts.
 
-
 ## Key Milestones
 
 - [ ] Graph adjacency matrix normalizer

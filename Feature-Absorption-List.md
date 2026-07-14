@@ -26,19 +26,15 @@ This document details the architectural blueprints, system paradigms, and design
 
 - **Arch rolling model + Ubuntu usability**: Every `.sab` package runs inside an isolated, amnesic directory structure resembling a transactional SQLite database shard.
 
-
 - **Parity mechanism**: Packages can compile from source (Gentoo mode) or execute pre-built PQC-attested binaries.
-
 
 ### B. Core Security Hardening (`S-ARMOR`)
 
 - **Fedora MAC + Debian Stability**: Implements Ring-3 execution fences. Telemetry filters automatically detect if any system application attempts unauthorized access to key hardware MMIO zones, instantly generating a hardware interrupt trap to freeze the rogue process.
 
-
 ### C. Live Performance Tuning (`S-COMPILER-AUTO`)
 
 - **Gentoo compilation model**: The active telemetry loop inspects process runtime characteristics and dynamically switches standard binary loops to hardware-vectorized AVX-512 alternatives without interrupting running tasks.
-
 
 ---
 > **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED

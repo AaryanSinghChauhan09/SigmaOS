@@ -19,12 +19,9 @@ npm run dev
 
 1. Boot animation → 2 seconds
 
-
 2. Login screen → click "Enter Desktop"
 
-
 3. Desktop with dock → double-click **Device Manager** to see all 24 drivers
-
 
 ---
 
@@ -141,12 +138,9 @@ This browser demo serves three purposes:
 
 1. **Proof of concept** — shows SigmaOS architecture working before native hardware boot exists
 
-
 2. **Driver showcase** — demonstrates the 24-driver hardware abstraction layer that will map to native kernel drivers
 
-
 3. **Demo for users** — anyone can try SigmaOS immediately without downloading anything
-
 
 The mapping from browser drivers to native kernel drivers:
 

@@ -14,7 +14,6 @@ SigmaOS incorporates a complete educational and legal workstation suite. This in
 - **Secure API Workflows**: Encrypted API communications
 - **Compliance Tracking**: Automated compliance monitoring
 
-
 ## Architecture
 
 ### Legal Research Workflow
@@ -137,42 +136,42 @@ impl LegalEngine {
         let client = Client::builder()
             .timeout(std::time::Duration::from_secs(30))
             .build()?;
-        
+
         let cache = LegalCache::new("/var/lib/sigma-legal/cache")?;
-        
+
         Ok(Self {
             client,
             api_token,
             cache,
         })
     }
-    
+
     pub fn query_statute(&self, act_name: &str) -> Result<String, LegalError> {
         // Check cache first
         if let Some(cached) = self.cache.get(act_name) {
             return Ok(cached);
         }
-        
+
         // Query API
         let url = format!("https://api.indiankanoon.org/act/{}", act_name);
         let resp = self.client.get(&url)
             .header("Authorization", format!("Token {}", self.api_token))
             .send()?
             .text()?;
-        
+
         // Cache result
         self.cache.set(act_name, &resp)?;
-        
+
         Ok(resp)
     }
-    
+
     pub fn search_case_law(&self, query: &str) -> Result<Vec<Case>, LegalError> {
         let url = format!("https://api.indiankanoon.org/search/?q={}", query);
         let resp = self.client.get(&url)
             .header("Authorization", format!("Token {}", self.api_token))
             .send()?
             .json::<Value>()?;
-        
+
         let cases: Vec<Case> = serde_json::from_value(resp)?;
         Ok(cases)
     }
@@ -192,7 +191,7 @@ pub struct LegalCache {
 impl LegalCache {
     pub fn new(path: &str) -> Result<Self, CacheError> {
         let conn = Connection::open(path)?;
-        
+
         conn.execute(
             "CREATE TABLE IF NOT EXISTS documents (
                 id INTEGER PRIMARY KEY,
@@ -201,17 +200,17 @@ impl LegalCache {
                 timestamp INTEGER
             )"
         )?;
-        
+
         Ok(Self { conn })
     }
-    
+
     pub fn get(&self, key: &str) -> Option<String> {
         let mut stmt = self.conn
             .prepare("SELECT content FROM documents WHERE key = ?")
             .ok()?;
-        
+
         let mut rows = stmt.query(&[key]).ok()?;
-        
+
         if let Some(row) = rows.next() {
             let content: String = row.read(0).ok()?;
             Some(content)
@@ -219,17 +218,17 @@ impl LegalCache {
             None
         }
     }
-    
+
     pub fn set(&self, key: &str, content: &str) -> Result<(), CacheError> {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)?
             .as_secs();
-        
+
         self.conn.execute(
             "INSERT OR REPLACE INTO documents (key, content, timestamp) VALUES (?, ?, ?)",
             &[key, content, &timestamp.to_string()]
         )?;
-        
+
         Ok(())
     }
 }
@@ -245,7 +244,6 @@ impl LegalCache {
 - Geometry, algebra, calculus
 - Interactive graphing
 - CAS (Computer Algebra System)
-
 
 **Configuration**:
 
@@ -266,7 +264,6 @@ language = "en_US"
 - Control systems
 - Optimization
 
-
 **Configuration**:
 
 ```toml
@@ -284,7 +281,6 @@ toolboxes = ["signal", "control", "optimization"]
 - Numerical analysis
 - Linear algebra
 - Plotting and visualization
-
 
 **Configuration**:
 
@@ -306,7 +302,6 @@ packages = ["signal", "control", "image"]
 - Student tracking
 - Assessment tools
 
-
 **Configuration**:
 
 ```toml
@@ -326,7 +321,6 @@ storage = "/var/lib/moodle"
 - HR management
 - Inventory management
 
-
 **Configuration**:
 
 ```toml
@@ -345,7 +339,6 @@ storage = "/var/lib/erpnext"
 - Catalog management
 - Circulation control
 - Patron management
-
 
 **Configuration**:
 
@@ -368,13 +361,11 @@ storage = "/var/lib/koha"
 - Statute lookup
 - Legal document caching
 
-
 **API Endpoints**:
 
 - `/search/`: Search for cases
 - `/act/{act_name}`: Retrieve statute
 - `/doc/{doc_id}`: Retrieve document
-
 
 ### SCC Online Integration
 
@@ -385,13 +376,11 @@ storage = "/var/lib/koha"
 - Legal commentary
 - Case analysis
 
-
 **API Endpoints**:
 
 - `/api/search/`: Search cases
 - `/api/document/{id}`: Retrieve document
 - `/api/analysis/{id}`: Case analysis
-
 
 ## Compliance
 
@@ -411,16 +400,16 @@ impl ComplianceTracker {
             audit_log: AuditLog::new(),
         }
     }
-    
+
     pub fn checkCompliance(&self, document: &Document) -> ComplianceResult {
         let mut violations = Vec::new();
-        
+
         for regulation in &self.regulations {
             if !regulation.check(document) {
                 violations.push(regulation.clone());
             }
         }
-        
+
         ComplianceResult {
             compliant: violations.is_empty(),
             violations,
@@ -456,7 +445,6 @@ pub struct AuditEntry {
 3. **Security**: Encrypt all sensitive data
 4. **Caching**: Implement effective caching strategies
 
-
 ### Configuration
 
 1. **API Keys**: Secure API key management
@@ -464,14 +452,12 @@ pub struct AuditEntry {
 3. **Cache Expiry**: Set appropriate cache expiry
 4. **Localization**: Enable proper localization
 
-
 ### Compliance
 
 1. **Audit Logging**: Log all access to legal documents
 2. **Data Protection**: Protect sensitive legal data
 3. **Access Control**: Implement proper access controls
 4. **Regular Updates**: Keep legal databases updated
-
 
 ## Roadmap & Milestones
 
@@ -482,14 +468,12 @@ pub struct AuditEntry {
 - API integration for Indian Kanoon
 - Local cache setup
 
-
 ### Phase 2 (Months 3-6)
 
 - SQL database cache and schema design
 - Offline statute indices
 - SCC Online integration
 - Advanced search capabilities
-
 
 ### Phase 3 (Months 6-9)
 
@@ -498,14 +482,12 @@ pub struct AuditEntry {
 - Compliance tracking
 - Audit logging system
 
-
 ### Phase 4 (Months 9-12)
 
 - SCC Online enterprise integration
 - Custom SSO gateways
 - Advanced compliance features
 - Legal document analysis
-
 
 ## References
 

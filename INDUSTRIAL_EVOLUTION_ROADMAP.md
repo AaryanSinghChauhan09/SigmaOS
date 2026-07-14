@@ -43,7 +43,6 @@ The shards responsible for security absorption are already integrated into the `
 - `SovereignSecureBoot.shard` — Dilithium5 + UEFI Secure Boot integration
 - `SovereignSandbox.shard` — Qubes-inspired compartmentalization via Firecracker microVMs
 
-
 ### 1.3 Desktop Absorption
 
 ```mermaid
@@ -108,7 +107,6 @@ Goal: Run EVERY Linux application natively without compatibility layers
 3. **Flatpak Native** — SigmaOS-optimized Flatpak runtime
 4. **Wine-Sigma** — Windows application compatibility (D3D → Vulkan translation)
 
-
 ### 3.2 Developer Ecosystem
 
 | Tool | Status | Notes |
@@ -127,7 +125,7 @@ SigmaOS Marketplace = App Store + Package Manager + Shard Registry
 Features:
 
 - PQC-signed shard packages
-- Reputation scoring system  
+- Reputation scoring system
 - Automated compatibility matrix
 - Revenue sharing for contributors
 - Zero-knowledge proof of functionality
@@ -160,7 +158,6 @@ Features:
 - Cross-device authentication via sigma-mesh
 - Zero-knowledge proof of hardware attestation
 - No central authority required
-
 
 ---
 
@@ -225,7 +222,6 @@ Year 5 Targets (Singularity):
 3. **Sovereignty Preservation**: Every absorbed feature made more secure and efficient
 4. **No Regression**: Absorbed features must exceed original quality
 5. **Attribution**: Original projects credited in `THIRD_PARTY_LICENSES`
-
 
 ---
 

@@ -6,7 +6,6 @@ Use LLVM as an optional optimising backend for SigmaLang.
 - Emit LLVM IR from SigmaLang AST
 - Full O2/O3 optimisation pipeline
 
-
 ## Key Milestones
 
 - [ ] LLVM C API bindings wrapper

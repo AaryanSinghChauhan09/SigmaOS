@@ -7,7 +7,6 @@ Run small MLP networks (2-3 layers) for on-device classification tasks.
 - ReLU, Sigmoid, Softmax activations
 - INT8 quantisation support
 
-
 ## Key Milestones
 
 - [ ] Dense layer matrix multiply (reuse sigma_math.rs)

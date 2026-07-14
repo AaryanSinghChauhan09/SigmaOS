@@ -6,7 +6,6 @@ High-performance Monte Carlo methods for physics and finance simulations.
 - Mersenne Twister PRNG (no_std)
 - Stratified sampling and importance sampling
 
-
 ## Key Milestones
 
 - [ ] MT19937 implementation

@@ -9,14 +9,12 @@ SigmaOS integrates AI not as a cloud-dependent afterthought, but as a deeply emb
 - **Quantization:** The runtime is optimized for INT4 and INT8 quantized models to ensure they can run entirely on local CPUs/NPUs without requiring massive amounts of RAM.
 - **Signed Model Marketplace:** Users cannot arbitrarily download unverified weights from the internet and execute them in the system context. Models must be cryptographically signed by the SigmaOS trusted keyring, ensuring the supply chain of the model weights is untampered.
 
-
 ## 3. NL -> CLI with Dry-Run Safety
 
 When a user asks SigmaOS "Find all logs containing authentication failures":
 
 1. The AI translates this to `grep "auth fail" /var/log/*`.
 2. **Dry-Run Safety Engine:** The AI does *not* execute the command blindly. It stages the command into a safety buffer and prompts the user for explicit elevation and execution confirmation.
-
 
 ## 4. Privacy and Provenance
 

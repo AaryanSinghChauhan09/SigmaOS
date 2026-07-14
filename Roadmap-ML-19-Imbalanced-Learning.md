@@ -6,7 +6,6 @@ Handle heavily imbalanced OS event classes (e.g. 1% anomalies vs 99% normal).
 - SMOTE over-sampling in zero-alloc Rust
 - Cost-sensitive loss weighting
 
-
 ## Key Milestones
 
 - [ ] k-NN-based SMOTE synthetic sample generator

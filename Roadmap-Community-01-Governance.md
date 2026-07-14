@@ -6,7 +6,6 @@ Establish a transparent, community-driven governance structure.
 - RFC process for major changes
 - Steering committee with elected members
 
-
 ## Key Milestones
 
 - [ ] RFC template and numbering scheme
