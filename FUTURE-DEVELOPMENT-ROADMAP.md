@@ -189,6 +189,10 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 * **Learning**: Doing high-frequency pixel drawing by matching options inside the loop creates massive branch-prediction overhead.
 * **Action**: Hoist state checking outside of the loops; perform bulk row copies using `core::ptr::copy` (representing SIMD-optimized `memmove`).
 
+#### 2026-07-14 - Allocation-Free SemVer Comparison in Package Manager
+* **Learning**: Doing repetitive SemVer comparisons using string splitting and dynamic vector collections creates heavy allocation pressures in performance-critical dependency-resolution loops.
+* **Action**: Implement an allocation-free SemVer parser with inline iterator walks that parse and compare numeric major/minor/patch segments without allocating dynamic arrays.
+
 ---
 
 ## 7. UX, Delight & Accessibility Design (Palette's Standards)
@@ -198,6 +202,7 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 * **ARIA Integrity**: Icon-only buttons must supply a descriptive `aria-label`.
 * **State Indicators**: Async actions require immediate disabled button states and circular loading spinners to prevent double-submit.
 * **Action Pathway Clarity**: Form failures must highlight the exact field failing validation with human-readable corrective actions.
+* **Interactive CLI Empty States**: When lists or query results are empty, sigpkg displays a clear yellow status message accompanied by actionable next-step suggestions (such as exact commands or tips) to reduce user dropoff.
 
 ---
 
@@ -208,6 +213,7 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 * **Secure Error Responses**: Never leak kernel addresses, file paths, or stack traces in userland error responses.
 * **Zero-Secrets Policy**: Absolutely no API keys, credentials, or development passwords should exist in code; feed them via secure environment descriptors or TPM-backed keychain modules.
 * **Namespace Isolation**: Bubblewrap compartmentalizes third-party package runtimes, rejecting root access privileges.
+* **Strict Package Name Validation**: Pre-validate all user-supplied package inputs via strict alphanumeric boundaries (allowing only standard alphanumeric characters, dashes, and underscores) to eliminate Path Traversal (`../../`) and command injection vectors.
 
 ---
 

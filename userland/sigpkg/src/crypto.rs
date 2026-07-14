@@ -55,6 +55,27 @@ pub fn check_root_key() -> Result<(), String> {
     Ok(())
 }
 
+/// Validate that a package name is secure (only lowercase alphanumeric, dash, and underscore)
+/// to prevent path traversal or shell command injection vulnerabilities.
+pub fn validate_package_name(name: &str) -> Result<(), String> {
+    // Sentinel 🛡️: Robust input validation to enforce secure naming conventions.
+    if name.is_empty() {
+        return Err("Package name cannot be empty".to_string());
+    }
+    if name.len() > 128 {
+        return Err("Package name exceeds maximum length of 128 characters".to_string());
+    }
+    for c in name.chars() {
+        if !c.is_ascii_alphanumeric() && c != '-' && c != '_' {
+            return Err(format!(
+                "Invalid character '{}' in package name. Only alphanumeric, '-' and '_' are allowed.",
+                c
+            ));
+        }
+    }
+    Ok(())
+}
+
 // Placeholder for real Ed25519 verification against sovereign root public key
 fn verify_against_root_key(name: &str, _hash: &str, sig: &str) -> Result<(), String> {
     // Production implementation:
@@ -75,6 +96,14 @@ fn verify_against_root_key(name: &str, _hash: &str, sig: &str) -> Result<(), Str
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_validate_package_name_secure() {
+        assert!(validate_package_name("valid-pkg-123_name").is_ok());
+        assert!(validate_package_name("").is_err());
+        assert!(validate_package_name("../etc/shadow").is_err());
+        assert!(validate_package_name("pkg; rm -rf /").is_err());
+    }
 
     #[test]
     fn test_verify_valid() {

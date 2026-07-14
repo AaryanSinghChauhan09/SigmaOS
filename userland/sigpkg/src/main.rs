@@ -106,7 +106,9 @@ fn cmd_search(args: &[String]) -> i32 {
     println!("\x1b[1;34m[sigpkg]\x1b[0m Searching for '{}'...", query);
     let results = registry::search(query);
     if results.is_empty() {
-        println!("  No packages found matching '{}'.", query);
+        // Palette 🎨: Delightful empty state with actionable suggestions to guide the user
+        println!("  \x1b[33m⚠ No packages found matching '{}'.\x1b[0m", query);
+        println!("  💡 Protip: Try searching for 'sigma' or check spelling!");
     } else {
         println!("{:<25} {:<12} {}", "NAME", "VERSION", "DESCRIPTION");
         println!("{}", "-".repeat(65));
@@ -136,7 +138,9 @@ fn cmd_list(args: &[String]) -> i32 {
     println!("\x1b[1;34m[sigpkg]\x1b[0m Installed packages (profile: {}):", profile);
     let installed = registry::list_installed(profile);
     if installed.is_empty() {
-        println!("  (none)");
+        // Palette 🎨: Elegant and helpful empty state listing clear instructions/call-to-actions
+        println!("  \x1b[33m⚠ No packages currently installed for this profile.\x1b[0m");
+        println!("  💡 Protip: Run 'sigpkg install <pkg>' to install or 'sigpkg profile apply sigma-core' to setup.");
     } else {
         for pkg in &installed {
             println!("  {} v{}", pkg.name, pkg.version);
