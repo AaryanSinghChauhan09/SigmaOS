@@ -9,3 +9,4 @@ description = "Native display server, shell, and window manager compositor for S
 
 [dependencies]
 # Standard library is available in userland
+sigma-design-system = { path = "../ui/design_system" }
