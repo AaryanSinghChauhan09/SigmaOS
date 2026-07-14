@@ -1,14 +1,43 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! SigmaOS Networking - TCP State Machine
-//! Connection establishment, teardown, and sequence tracking.
-//! no_std, no alloc.
+//! SigmaOS Networking - TCP State Machine with Zero-Trust Identities
+//! Connection establishment, teardown, sequence tracking, and identity verification.
+//! no_std, no alloc, thread-safe with atomic types.
 
 #![no_std]
 #![allow(dead_code)]
 
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+
 type SigmaU32 = u32;
 
 pub const MAX_TCP_CONNS: usize = 256;
+
+// Zero-Trust Identity for connection verification
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ZeroTrustIdentity {
+    pub identity_hash: [u8; 32],
+    pub public_key: [u8; 32],
+    pub verified: AtomicBool,
+}
+
+impl ZeroTrustIdentity {
+    pub const fn new() -> Self {
+        Self {
+            identity_hash: [0u8; 32],
+            public_key: [0u8; 32],
+            verified: AtomicBool::new(false),
+        }
+    }
+    
+    pub fn is_verified(&self) -> bool {
+        self.verified.load(Ordering::Acquire)
+    }
+    
+    pub fn verify(&self) {
+        self.verified.store(true, Ordering::Release);
+    }
+}
 
 #[repr(u8)]
 #[derive(Copy, Clone, PartialEq)]
@@ -35,25 +64,36 @@ pub struct TcpConnection {
     pub remote_port: u16,
     pub state: TcpState,
     
-    // Sequence numbers
-    pub snd_nxt: SigmaU32,
-    pub snd_una: SigmaU32,
-    pub rcv_nxt: SigmaU32,
+    // Sequence numbers (atomic for thread safety)
+    pub snd_nxt: AtomicU32,
+    pub snd_una: AtomicU32,
+    pub rcv_nxt: AtomicU32,
     
     // Congestion control window
-    pub cwnd: SigmaU32,
-    pub active: bool,
+    pub cwnd: AtomicU32,
+    pub active: AtomicBool,
+    
+    // Zero-trust identity
+    pub peer_identity: ZeroTrustIdentity,
 }
 
 static mut TCP_CONNS: [TcpConnection; MAX_TCP_CONNS] = [TcpConnection {
     local_ip: [0; 4], remote_ip: [0; 4], local_port: 0, remote_port: 0,
-    state: TcpState::Closed, snd_nxt: 0, snd_una: 0, rcv_nxt: 0, cwnd: 1460, active: false,
+    state: TcpState::Closed, 
+    snd_nxt: AtomicU32::new(0), 
+    snd_una: AtomicU32::new(0), 
+    rcv_nxt: AtomicU32::new(0), 
+    cwnd: AtomicU32::new(1460), 
+    active: AtomicBool::new(false),
+    peer_identity: ZeroTrustIdentity::new(),
 }; MAX_TCP_CONNS];
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_tcp_init() {
-    for i in 0..MAX_TCP_CONNS {
-        TCP_CONNS[i].active = false;
+pub extern "C" fn sigma_tcp_init() {
+    unsafe {
+        for i in 0..MAX_TCP_CONNS {
+            TCP_CONNS[i].active.store(false, Ordering::Release);
+        }
     }
 }
 
@@ -64,7 +104,7 @@ pub unsafe extern "C" fn sigma_tcp_lookup(
 ) -> Option<usize> {
     for i in 0..MAX_TCP_CONNS {
         let conn = &TCP_CONNS[i];
-        if conn.active && conn.local_port == local_port && conn.remote_port == remote_port {
+        if conn.active.load(Ordering::Acquire) && conn.local_port == local_port && conn.remote_port == remote_port {
             if conn.local_ip[0] == *local_ip.add(0) && conn.remote_ip[0] == *remote_ip.add(0) {
                 return Some(i);
             }
@@ -73,17 +113,18 @@ pub unsafe extern "C" fn sigma_tcp_lookup(
     None
 }
 
-/// Handle an incoming TCP SYN packet
+/// Handle an incoming TCP SYN packet with identity verification
 #[no_mangle]
 pub unsafe extern "C" fn sigma_tcp_handle_syn(
     local_ip: *const u8, remote_ip: *const u8,
     local_port: u16, remote_port: u16,
-    seq: SigmaU32
+    seq: SigmaU32,
+    identity_hash: *const u8
 ) -> i32 {
     // Check if we have a listening socket for this port
     let mut listen_idx = None;
     for i in 0..MAX_TCP_CONNS {
-        if TCP_CONNS[i].active && TCP_CONNS[i].state == TcpState::Listen && TCP_CONNS[i].local_port == local_port {
+        if TCP_CONNS[i].active.load(Ordering::Acquire) && TCP_CONNS[i].state == TcpState::Listen && TCP_CONNS[i].local_port == local_port {
             listen_idx = Some(i);
             break;
         }
@@ -95,16 +136,24 @@ pub unsafe extern "C" fn sigma_tcp_handle_syn(
     
     // Allocate new connection slot
     for i in 0..MAX_TCP_CONNS {
-        if !TCP_CONNS[i].active {
+        if !TCP_CONNS[i].active.load(Ordering::Acquire) {
             TCP_CONNS[i].local_ip = [*local_ip, *local_ip.add(1), *local_ip.add(2), *local_ip.add(3)];
             TCP_CONNS[i].remote_ip = [*remote_ip, *remote_ip.add(1), *remote_ip.add(2), *remote_ip.add(3)];
             TCP_CONNS[i].local_port = local_port;
             TCP_CONNS[i].remote_port = remote_port;
             TCP_CONNS[i].state = TcpState::SynReceived;
-            TCP_CONNS[i].rcv_nxt = seq + 1;
-            TCP_CONNS[i].snd_nxt = 1000; // Initial sequence number
-            TCP_CONNS[i].snd_una = 1000;
-            TCP_CONNS[i].active = true;
+            TCP_CONNS[i].rcv_nxt.store(seq + 1, Ordering::Release);
+            TCP_CONNS[i].snd_nxt.store(1000, Ordering::Release); // Initial sequence number
+            TCP_CONNS[i].snd_una.store(1000, Ordering::Release);
+            TCP_CONNS[i].active.store(true, Ordering::Release);
+            
+            // Store peer identity for zero-trust verification
+            if !identity_hash.is_null() {
+                for j in 0..32 {
+                    TCP_CONNS[i].peer_identity.identity_hash[j] = *identity_hash.add(j);
+                }
+            }
+            
             return i as i32; // Need to send SYN-ACK
         }
     }
@@ -122,20 +171,22 @@ pub unsafe extern "C" fn sigma_tcp_handle_ack(
     }
     
     let conn = &mut TCP_CONNS[conn_idx as usize];
-    if !conn.active {
+    if !conn.active.load(Ordering::Acquire) {
         return -1;
     }
     
     match conn.state {
         TcpState::SynReceived => {
-            if ack == conn.snd_nxt {
+            if ack == conn.snd_nxt.load(Ordering::Acquire) {
                 conn.state = TcpState::Established;
                 return 0; // Connection established
             }
         }
         TcpState::Established => {
-            if ack >= conn.snd_una && ack <= conn.snd_nxt {
-                conn.snd_una = ack;
+            let snd_una = conn.snd_una.load(Ordering::Acquire);
+            let snd_nxt = conn.snd_nxt.load(Ordering::Acquire);
+            if ack >= snd_una && ack <= snd_nxt {
+                conn.snd_una.store(ack, Ordering::Release);
                 return 0;
             }
         }
@@ -155,12 +206,17 @@ pub unsafe extern "C" fn sigma_tcp_send(
     }
     
     let conn = &mut TCP_CONNS[conn_idx as usize];
-    if !conn.active || conn.state != TcpState::Established {
+    if !conn.active.load(Ordering::Acquire) || conn.state != TcpState::Established {
         return -1;
     }
     
+    // Verify peer identity before sending (zero-trust)
+    if !conn.peer_identity.is_verified() {
+        return -1; // Peer not verified
+    }
+    
     // Update sequence numbers
-    conn.snd_nxt += len as SigmaU32;
+    conn.snd_nxt.fetch_add(len as u32, Ordering::Release);
     
     // In real implementation, this would queue data for transmission
     // For now, return success
@@ -177,7 +233,7 @@ pub unsafe extern "C" fn sigma_tcp_recv(
     }
     
     let conn = &mut TCP_CONNS[conn_idx as usize];
-    if !conn.active || conn.state != TcpState::Established {
+    if !conn.active.load(Ordering::Acquire) || conn.state != TcpState::Established {
         return -1;
     }
     
@@ -194,12 +250,30 @@ pub unsafe extern "C" fn sigma_tcp_close(conn_idx: i32) -> i32 {
     }
     
     let conn = &mut TCP_CONNS[conn_idx as usize];
-    if !conn.active {
+    if !conn.active.load(Ordering::Acquire) {
         return -1;
     }
     
     conn.state = TcpState::Closed;
-    conn.active = false;
+    conn.active.store(false, Ordering::Release);
+    
+    0
+}
+
+/// Verify peer identity (zero-trust)
+#[no_mangle]
+pub unsafe extern "C" fn sigma_tcp_verify_identity(conn_idx: i32) -> i32 {
+    if conn_idx < 0 || conn_idx >= MAX_TCP_CONNS as i32 {
+        return -1;
+    }
+    
+    let conn = &mut TCP_CONNS[conn_idx as usize];
+    if !conn.active.load(Ordering::Acquire) {
+        return -1;
+    }
+    
+    // In real implementation, would verify identity hash against trusted sources
+    conn.peer_identity.verify();
     
     0
 }

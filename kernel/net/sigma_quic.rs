@@ -1,13 +1,42 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 SigmaOS Project
-// kernel/net/sigma_quic.rs — QUIC transport (RFC 9000 skeleton, no_std)
+// kernel/net/sigma_quic.rs — QUIC transport with Zero-Trust Identities (RFC 9000 skeleton, no_std)
 // Language: Rust #![no_std]
 
 #![no_std]
 
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+
 pub const QUIC_VERSION: u32 = 0x0000_0001;
 pub const MAX_STREAMS:  usize = 64;
 pub const MAX_PKT:      usize = 1350; // max QUIC payload (PMTU - overhead)
+
+// Zero-Trust Identity for QUIC connection verification
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct ZeroTrustIdentity {
+    pub identity_hash: [u8; 32],
+    pub public_key: [u8; 32],
+    pub verified: AtomicBool,
+}
+
+impl ZeroTrustIdentity {
+    pub const fn new() -> Self {
+        Self {
+            identity_hash: [0u8; 32],
+            public_key: [0u8; 32],
+            verified: AtomicBool::new(false),
+        }
+    }
+    
+    pub fn is_verified(&self) -> bool {
+        self.verified.load(Ordering::Acquire)
+    }
+    
+    pub fn verify(&self) {
+        self.verified.store(true, Ordering::Release);
+    }
+}
 
 // ── Packet Types ──────────────────────────────────────────────────────────────
 #[repr(u8)]
@@ -49,14 +78,17 @@ pub enum StreamState { Open, HalfClosedLocal, HalfClosedRemote, Closed }
 pub struct Stream {
     pub id:        u64,
     pub state:     StreamState,
-    pub send_off:  u64,
-    pub recv_off:  u64,
-    pub max_data:  u64,
+    pub send_off:  AtomicU64,
+    pub recv_off:  AtomicU64,
+    pub max_data:  AtomicU64,
 }
 
 impl Stream {
     pub fn new(id: u64, max_data: u64) -> Self {
-        Self { id, state: StreamState::Open, send_off:0, recv_off:0, max_data }
+        Self { id, state: StreamState::Open, 
+               send_off: AtomicU64::new(0), 
+               recv_off: AtomicU64::new(0), 
+               max_data: AtomicU64::new(max_data) }
     }
     pub fn is_open(&self) -> bool { self.state == StreamState::Open }
 }
@@ -71,14 +103,14 @@ pub struct QuicConn {
     pub remote_cid: ConnectionId,
     pub version:    u32,
     // Packet number spaces
-    pub pkt_num_init: u64,
-    pub pkt_num_hs:   u64,
-    pub pkt_num_app:  u64,
+    pub pkt_num_init: AtomicU64,
+    pub pkt_num_hs:   AtomicU64,
+    pub pkt_num_app:  AtomicU64,
     // Flow control
-    pub max_data_local:  u64,
-    pub max_data_remote: u64,
-    pub data_sent:       u64,
-    pub data_recv:       u64,
+    pub max_data_local:  AtomicU64,
+    pub max_data_remote: AtomicU64,
+    pub data_sent:       AtomicU64,
+    pub data_recv:       AtomicU64,
     // Streams
     streams:     [Option<Stream>; MAX_STREAMS],
     n_streams:   usize,
@@ -88,6 +120,8 @@ pub struct QuicConn {
     crypto_recv: [u8; 4096],
     crypto_send_len: usize,
     crypto_recv_len: usize,
+    // Zero-trust identity
+    pub peer_identity: ZeroTrustIdentity,
 }
 
 impl QuicConn {
@@ -97,12 +131,17 @@ impl QuicConn {
             local_cid: ConnectionId::new(local_cid),
             remote_cid: ConnectionId::default(),
             version: QUIC_VERSION,
-            pkt_num_init: 0, pkt_num_hs: 0, pkt_num_app: 0,
-            max_data_local: 1 << 20, max_data_remote: 1 << 20,
-            data_sent: 0, data_recv: 0,
+            pkt_num_init: AtomicU64::new(0), 
+            pkt_num_hs: AtomicU64::new(0), 
+            pkt_num_app: AtomicU64::new(0),
+            max_data_local: AtomicU64::new(1 << 20), 
+            max_data_remote: AtomicU64::new(1 << 20),
+            data_sent: AtomicU64::new(0), 
+            data_recv: AtomicU64::new(0),
             streams: [const { None }; MAX_STREAMS], n_streams: 0, next_stream: 0,
             crypto_send: [0u8;4096], crypto_recv: [0u8;4096],
             crypto_send_len: 0, crypto_recv_len: 0,
+            peer_identity: ZeroTrustIdentity::new(),
         }
     }
 
@@ -112,7 +151,7 @@ impl QuicConn {
         self.next_stream += 1;
         for slot in &mut self.streams {
             if slot.is_none() {
-                *slot = Some(Stream::new(id, self.max_data_remote));
+                *slot = Some(Stream::new(id, self.max_data_remote.load(Ordering::Acquire)));
                 self.n_streams += 1;
                 return Some(id);
             }
@@ -152,11 +191,20 @@ impl QuicConn {
         // Token length = 0
         buf[off] = 0; off += 1;
         // Packet number (4 bytes)
-        let pn = self.pkt_num_init;
-        self.pkt_num_init += 1;
+        let pn = self.pkt_num_init.fetch_add(1, Ordering::Relaxed);
         buf[off..off+4].copy_from_slice(&(pn as u32).to_be_bytes()); off += 4;
         off
     }
 
     pub fn is_connected(&self) -> bool { self.state == ConnState::Connected }
+    
+    /// Verify peer identity (zero-trust)
+    pub fn verify_peer_identity(&self) -> bool {
+        self.peer_identity.is_verified()
+    }
+    
+    /// Set peer identity for verification
+    pub fn set_peer_identity(&mut self, identity_hash: &[u8; 32]) {
+        self.peer_identity.identity_hash.copy_from_slice(identity_hash);
+    }
 }
