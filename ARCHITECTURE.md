@@ -831,6 +831,20 @@ const DeviceDriver = struct {
 
 **Performance and Security**: Custom functions can be tailored for performance (e.g., lock-free data structures) and security (e.g., capability checks).
 
+### Recent OOP Enhancements
+
+**Thread-Safe Atomic Types**: Implemented atomic types (AtomicBool, AtomicU64, AtomicU32) throughout the kernel for thread-safe state management in PQC, capability systems, and network stacks.
+
+**Capability-Based Security Model**: Replaced legacy ACLs with fine-grained capability-based permission model (S-CBAC) using atomic rights and capability tokens for thread-safe access control.
+
+**OOP Security Wrappers**: Enhanced sigma_unveil and sigma_pledge with OOP wrappers (UnveilPolicy, PledgePolicy) providing clean interfaces for filesystem and syscall restrictions.
+
+**Network Stack OOP**: Implemented ZeroTrustIdentity struct integrated into TCP, UDP, and QUIC stacks with atomic verification for zero-trust networking.
+
+**Package Management OOP**: Implemented ZchunkManager for delta updates with chunking, hash comparison, and atomic state tracking. SAT-based dependency resolver with OOP patterns for version constraints and conflict detection.
+
+**Filesystem OOP**: Enhanced SigmaFS with SigmaFSManager implementing journaling, replication, and audit trails using atomic types for thread-safe operations.
+
 ## Summary
 
 SigmaOS architecture is designed around the following principles:
