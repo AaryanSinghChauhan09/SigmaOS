@@ -1,179 +1,271 @@
-# Getting Started
+# Getting Started with SigmaOS
 
-Everything you need to build SigmaOS from source and test it in QEMU.
+Welcome to SigmaOS! This guide will help you get started with the world's most advanced sovereign, bare-metal operating system.
 
----
+## Table of Contents
 
-## Quick Start (5 minutes)
+- [System Requirements](#system-requirements)
+- [Installation](#installation)
+- [First Boot](#first-boot)
+- [Basic Configuration](#basic-configuration)
+- [Using the Package Manager](#using-the-package-manager)
+- [Development Setup](#development-setup)
+- [Getting Help](#getting-help)
+
+## System Requirements
+
+### Minimum Requirements
+
+- **CPU**: x86_64 (64-bit) processor with SSE4.2 support
+- **RAM**: 2 GB minimum, 4 GB recommended
+- **Storage**: 10 GB minimum, 20 GB recommended
+- **Graphics**: VESA-compatible GPU or supported GPU driver
+- **Boot**: UEFI with Secure Boot support (optional but recommended)
+
+### Recommended Requirements
+
+- **CPU**: Multi-core x86_64 processor (4+ cores)
+- **RAM**: 8 GB or more
+- **Storage**: 50 GB SSD or NVMe
+- **Graphics**: NVIDIA, AMD, or Intel GPU with supported driver
+- **Network**: Ethernet or Wi-Fi adapter
+
+### Supported Architectures
+
+- x86_64 (primary)
+- ARM64 (experimental)
+- RISC-V (experimental)
+
+## Installation
+
+### Downloading SigmaOS
+
+1. Visit the [SigmaOS Downloads](https://github.com/AaryanSinghChauhan09/SigmaOS/releases) page
+2. Download the latest stable release ISO image
+3. Verify the download using the provided BLAKE3 checksum
+
+### Creating Boot Media
+
+#### On Linux
 
 ```bash
+# Identify your USB device
+lsblk
 
-# Clone
+# Write the ISO to USB (replace /dev/sdX with your device)
+sudo dd if=SigmaOS-x.x.x.iso of=/dev/sdX bs=4M status=progress conv=fsync
+sync
+```
 
+#### On Windows
+
+Use [Rufus](https://rufus.ie/) or [Etcher](https://www.balena.io/etcher/) to write the ISO to your USB drive.
+
+### Booting the Installer
+
+1. Insert the boot media
+2. Boot from USB (usually F12 or F2 during boot)
+3. Select "SigmaOS Installer" from the boot menu
+4. Follow the graphical installer prompts
+
+### Installation Steps
+
+1. **Welcome**: Select your language and keyboard layout
+2. **Disk Setup**: Choose automatic partitioning or manual configuration
+3. **User Setup**: Create your user account and set password
+4. **Profile Selection**: Choose your deployment profile:
+   - **Standalone**: Full desktop experience
+   - **Server**: Headless server profile
+   - **Minimal**: Minimal footprint for embedded systems
+5. **Installation**: Review and confirm installation settings
+6. **Complete**: Reboot into your new SigmaOS system
+
+## First Boot
+
+### Initial Setup Wizard
+
+On first boot, SigmaOS will guide you through:
+
+1. **Network Configuration**: Set up wired or wireless networking
+2. **Time Zone**: Configure your time zone and NTP settings
+3. **System Updates**: Check for and install updates
+4. **Desktop Setup**: Configure Zenith Desktop (if selected)
+5. **Security Setup**: Set up capability-based security policies
+
+### Default Credentials
+
+- **Root**: Disabled by default (use sudo)
+- **User**: Created during installation
+
+## Basic Configuration
+
+### Updating the System
+
+```bash
+# Update package cache
+sigpkg update
+
+# Upgrade all packages
+sigpkg upgrade-all
+```
+
+### Enabling Services
+
+```bash
+# List available services
+sigctl list-services
+
+# Enable a service
+sigctl enable <service-name>
+
+# Start a service
+sigctl start <service-name>
+```
+
+### Configuring Capabilities
+
+SigmaOS uses capability-based security. Configure process capabilities:
+
+```bash
+# View process capabilities
+sigcap list <pid>
+
+# Grant capability to process
+sigcap grant <pid> <capability>
+
+# Revoke capability from process
+sigcap revoke <pid> <capability>
+```
+
+## Using the Package Manager
+
+SigmaOS uses `.spkg` (Sovereign Package) format with the `sigpkg` tool.
+
+### Basic Commands
+
+```bash
+# Search for packages
+sigpkg search <query>
+
+# Install a package
+sigpkg install <package-name>
+
+# Remove a package
+sigpkg remove <package-name>
+
+# Upgrade a package
+sigpkg upgrade <package-name>
+
+# List installed packages
+sigpkg list-installed
+```
+
+### Transaction Management
+
+SigmaPKG supports atomic transactions with rollback:
+
+```bash
+# Enable rollback
+sigpkg set-rollback true
+
+# View transaction history
+sigpkg history
+
+# Rollback to previous state
+sigpkg rollback <transaction-id>
+```
+
+### AI-Assisted Dependency Resolution
+
+Enable AI-assisted package management:
+
+```bash
+sigpkg set-ai-assisted true
+```
+
+## Development Setup
+
+### Prerequisites
+
+- Rust toolchain (stable)
+- Nim compiler
+- Zig compiler
+- QEMU (for testing)
+- Git
+
+### Setting Up Development Environment
+
+```bash
+# Clone the repository
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
-# Install Rust nightly (if not already)
+# Install Rust toolchain
+rustup install stable
+rustup component add clippy rustfmt
 
-rustup show   # confirms rust-toolchain.toml toolchain is active
+# Install Nim (see https://nim-lang.org/install.html)
+# Install Zig (see https://ziglang.org/download/)
 
-# Build the kernel
-
-cd kernel && cargo build --release
-
-# Run in QEMU
-
-cd .. && ./qemu-boot.sh standalone
-```
-SigmaOS/
-├── arch/x86_64/       → CPU entry, GDT, IDT, context switch (NASM)
-├── sigma-boot/        → UEFI bootloader (Zig)
-├── kernel/            → Core kernel (Rust #![no_std])
-│   ├── core/          → scheduler, MM, process, IPC, PCI, ACPI
-│   ├── net/           → IP, TCP, UDP, sockets
-│   ├── fs/            → VFS, tmpfs, ext4, procfs
-│   └── security/      → pledge, capabilities
-├── drivers/           → Hardware drivers
-├── kabi/              → Stable ABI library
-├── sdk/driver/        → Userspace driver SDK
-├── sigma-sh/          → Interactive shell
-├── userland/          → Shell, coreutils, daemons
-├── sigmad/            → System daemons (updater, health, metrics)
-├── virtualization/    → OCI container runtime
-└── wiki_repo/         → This wiki
+# Build SigmaOS
+make build
 ```
 
-Expected serial output:
-
-```text
-Σ SigmaOS Zenith Kernel Initializing (Rust)
-[IRQ] PIC remapped, PIT 1000Hz, IDT ready
-[MEM] Slab memory manager initialized
-[init] PID 1 running
-System Ready. Waiting for input...
-```
-
----
-
-## Prerequisites
-
-| Tool | Version | Purpose |
-| ------ | --------- | --------- |
-| Rust nightly | see `rust-toolchain.toml` | Kernel + userland |
-| NASM | ≥ 2.15 | x86 assembly |
-| Zig | 0.13.0 | Bootloader + HAL |
-| QEMU | ≥ 8.0 | Testing |
-| OVMF | any | UEFI testing |
-
-Install on Ubuntu/Debian:
+### Running in QEMU
 
 ```bash
-apt install nasm qemu-system-x86 ovmf
+# Run SigmaOS in QEMU
+make qemu
 ```
 
-Install on Windows:
-
-```powershell
-winget install NASM.NASM QEMU.QEMU
-```
-
----
-
-## Build Targets
+### Running Tests
 
 ```bash
+# Run all tests
+make test
 
-# Kernel (no_std Rust)
+# Run unit tests only
+make test-unit
 
-cd kernel && cargo build --release
-
-# All workspace crates
-
-cargo build --release --workspace
-
-# UEFI bootloader
-
-cd sigma-boot && zig build -Dtarget=x86_64-uefi
-
-# Shell
-
-cd sigma-sh && cargo build --release
-
-# Core utilities
-
-cd userland/coreutils && cargo build --release
-
-# Driver SDK
-
-cd sdk/driver && cargo build --release
+# Run integration tests
+make test-integration
 ```
 
----
+For detailed development guidelines, see [Contributing.md](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing).
 
-## UEFI Boot (Full Boot Path)
+## Getting Help
 
-```bash
+### Documentation
 
-# Set up EFI System Partition
+- [Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)
+- [Development Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap)
+- [Security Policy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security-Policy)
+- [Changelog](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Changelog)
 
-mkdir -p esp/EFI/BOOT esp/boot
-cp sigma-boot/zig-out/bin/sigma-boot.efi esp/EFI/BOOT/BOOTX64.EFI
-cp kernel/target/x86_64-sigmaos/release/sigma-kernel esp/boot/sigma-kernel.elf
+### Community
 
-# Boot with OVMF
+- **GitHub Issues**: [Report bugs](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
+- **Discord**: [Real-time chat](https://discord.gg/sigmaos)
 
-qemu-system-x86_64 \
-  -bios /usr/share/OVMF/OVMF.fd \
-  -drive format=raw,file=fat:rw:esp \
-  -serial stdio -m 256M -nographic
-```
+### Reporting Issues
 
----
+When reporting issues, please include:
 
-## Project Layout
+- SigmaOS version (`sigctl version`)
+- Hardware specifications
+- Error messages and logs
+- Steps to reproduce the issue
 
-```text
-SigmaOS/
-├── arch/x86_64/       → CPU entry, GDT, IDT, context switch (NASM)
-├── sigma-boot/        → UEFI bootloader (Zig)
-├── kernel/            → Core kernel (Rust #![no_std])
-│   ├── core/          → scheduler, MM, process, IPC, PCI, ACPI
-│   ├── net/           → IP, TCP, UDP, sockets
-│   ├── fs/            → VFS, tmpfs, ext4, procfs
-│   └── security/      → pledge, capabilities
-├── drivers/           → Hardware drivers
-├── kabi/              → Stable ABI library
-├── sdk/driver/        → Userspace driver SDK
-├── sigma-sh/          → Interactive shell
-├── userland/          → Shell, coreutils, daemons
-├── sigmad/            → System daemons (updater, health, metrics)
-├── virtualization/    → OCI container runtime
-└── wiki_repo/         → This wiki
-```
+For security vulnerabilities, see [Security Policy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security-Policy).
+
+## Next Steps
+
+- Explore the [Zenith Desktop](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Zenith-Desktop) environment
+- Learn about [AI & Automation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/AI-And-Automation) features
+- Set up [development environment](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing) to contribute
+- Read the [Architecture documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)
 
 ---
 
-## First Contribution
-
-1. Check [12-Week-Milestone-Plan](12-Week-Milestone-Plan) for current priorities
-
-2. Look at [GITHUB_ISSUES.md](../docs/GITHUB_ISSUES.md) for open tasks
-
-3. Read [Linux-Parity-Roadmap](Linux-Parity-Roadmap) for what needs implementing
-
-4. Follow [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
-
----
-
-## Common Fixes
-
-| Error | Fix |
-| ------- | ----- |
-| `can't find crate for std` | Normal for `#![no_std]` kernel crates |
-| `rust-lld not found` | `rustup component add llvm-tools-preview` |
-| QEMU no serial output | Add `-serial stdio -nographic` |
-| QEMU `No bootable device` | Ensure `esp/EFI/BOOT/BOOTX64.EFI` exists |
-
----
-
-*See also: [Architecture Overview](Architecture-Overview) · [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md) · [Contributing Drivers](../docs/CONTRIBUTING_DRIVERS.md)*
+*Last Updated: 2026-07-14*
