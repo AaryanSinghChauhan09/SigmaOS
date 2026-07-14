@@ -1,5 +1,8 @@
 use sigma_design_system::TilingNode;
 
+use crate::input::InputRouter;
+use crate::render::{DamageTracker, RenderBackend};
+
 #[derive(Debug, Clone)]
 pub struct Surface {
     pub id: u64,
@@ -17,6 +20,9 @@ pub struct Layout {
 
 pub struct ZenithCompositor {
     pub layout: Layout,
+    pub input_router: InputRouter,
+    pub damage_tracker: DamageTracker,
+    pub render_backend: RenderBackend,
 }
 
 impl Default for ZenithCompositor {
@@ -33,6 +39,9 @@ impl ZenithCompositor {
                 surfaces: Vec::new(),
                 root: TilingNode::Horizontal(Vec::new()),
             },
+            input_router: InputRouter::new(),
+            damage_tracker: DamageTracker::new(),
+            render_backend: RenderBackend,
         }
     }
 
