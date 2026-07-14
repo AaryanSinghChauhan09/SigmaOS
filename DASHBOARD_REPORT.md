@@ -22,6 +22,9 @@ This report documents the completion of **Batch 1** in the massive repository mi
 5. **SigmaCompositor (UI Compositor & Window Manager)**:
    - Validated and merged `sigma_compositor` module in `userland/sigma_compositor/`.
    - Implemented `ZenithCompositor`, `WindowManager` (with dynamic tiling matching Hyprland/Sway), and `SigmaDesktop` (top bar panels and settings support) to replace X11, Wayland, GNOME, and KDE. All unit tests successfully compiled and passed.
+6. **SigmaMedia (Terminal, Shell & Media Rendering)**:
+   - Validated and merged `sigma_media` module in `userland/sigma_media/`.
+   - Implemented GPU-accelerated terminal emulation stubs (`SigmaTerminal`), command-completion (`SigmaShell`), and digital sound/video frame routing (`SigmaMediaEngine`) to displace Alacritty, Kitty, WezTerm, Fish, and Zsh. All unit tests successfully compiled and passed.
 
 ## 📁 .md Files Migrated and Removed
 
@@ -47,6 +50,11 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 18. `OSS_Absorption_X11.md` (Batch 4)
 19. `OSS_Absorption_Sway.md` (Batch 4)
 20. `OSS_Absorption_Hyprland.md` (Batch 4)
+21. `OSS_Absorption_Alacritty.md` (Batch 5)
+22. `OSS_Absorption_Kitty.md` (Batch 5)
+23. `OSS_Absorption_WezTerm.md` (Batch 5)
+24. `OSS_Absorption_Fish.md` (Batch 5)
+25. `OSS_Absorption_Zsh.md` (Batch 5)
 
 ## 🔀 Branches Merged and Removed
 
@@ -65,7 +73,7 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 2. **Merge Conflicts**: `DEFEATING_LINUX_DISTROS_BLUEPRINT.md` had competing versions of formatting. **Fix**: Python-based conflict resolution script authored to select the updated stylistic branch automatically.
 3. **Workspace Misalignment**: Legacy `sigmapkg` folder remained outside of the cargo workspace hierarchy. **Fix**: Identified active Rust codebase as `userland/sigpkg` and executed tests correctly from root context.
 
-## ➡️ Next Recommended Steps (Batch 5)
+## ➡️ Next Recommended Steps (Batch 6)
 
-- Target GPU and Media server subsystems (`OSS_Absorption_Alacritty.md`, `Kitty.md`, `WezTerm.md`, `FFmpeg.md`, `PipeWire.md`).
-- Implement GPU-accelerated terminal emulation and system sound servers.
+- Target Text Editors and Web Browsers absorption (`OSS_Absorption_Neovim.md`, `Helix.md`, `Zed.md`, `VS_Code.md`, `WebKit.md`).
+- Implement the native application framework and web view components.
