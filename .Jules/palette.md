@@ -7,3 +7,8 @@
 
 **Learning:** When queries or search terms return empty lists on CLI tools, users are often left confused about their next action or input validity. Providing a color-coded warning message with a clear "Protip" suggestions drastically reduces friction and guides them seamlessly.
 **Action:** Always include delightful empty states with descriptive tips or actionable suggestions to help the user resolve the query.
+
+## 2026-07-14 - Compositor Damage Tracking for Smooth Visual Updates
+
+**Learning:** In `sigma_compositor`, blindly redrawing the entire screen on every frame is an enormous waste of GPU cycles. By tracking exactly which surface IDs have been "damaged" (changed), the compositor can limit redraws to only the affected regions. This is the same principle behind Wayland's `wl_surface.damage_buffer` — a `HashSet<u64>` of damaged surface IDs that gets drained on each frame commit reduces power consumption and increases perceived smoothness, especially on battery-powered devices.
+**Action:** Always implement damage tracking in compositors. Use `take_damage()` to atomically drain the set and only composite the returned surfaces.

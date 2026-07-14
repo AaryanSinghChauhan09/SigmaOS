@@ -21,3 +21,13 @@ Use bitwise inverse logical AND (`_mm_andnot_si128`) instead of direct bitwise A
 
 **Learning:** Executing recurrent string splitting and parsing within SemVer constraint checking allocates short-lived arrays or vectors (`Vec`) on the heap, introducing considerable heap fragmentation and slowing down topological sorting in deep dependency structures.
 **Action:** Replace heap-allocating string parsing with an inline, lazy iterator mapping process (`s.split('.').map(...)`) and retrieve components directly to completely avoid dynamic vector allocations.
+
+## 2026-07-14 - DAG Topological Sort for Service Dependency Resolution
+
+**Learning:** When implementing an init system (`sigma_init`) that models services as a Directed Acyclic Graph, using a Kahn's algorithm with in-degree counting is significantly more performant and debuggable than recursive DFS-based approaches. Kahn's algorithm naturally detects cycles (when the sorted output length doesn't match node count) and provides a deterministic, breadth-first service start order. Crucially, the queue-based approach avoids stack overflows on deeply nested dependency chains that DFS would cause in `no_std` environments.
+**Action:** Prefer Kahn's in-degree algorithm over DFS for topological sorting in service DAGs. Always check `order.len() != nodes.len()` as the canonical cycle detection guard.
+
+## 2026-07-14 - Zero-Copy Ring Buffers for Audio Latency
+
+**Learning:** For `sigma_audio`, using pre-allocated `Vec<f32>` ring buffers with head/tail pointer arithmetic eliminates all heap allocation during audio playback. The key insight is that audio streams are inherently bounded (e.g., 4096 samples per buffer at 48kHz), so a fixed-size ring buffer avoids the `Vec::push` reallocation overhead that causes audible glitches in real-time audio paths.
+**Action:** Always pre-allocate audio buffers to the maximum expected size and use modular index arithmetic (`head % capacity`) instead of dynamic resizing.

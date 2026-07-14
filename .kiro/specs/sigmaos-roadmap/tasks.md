@@ -8,7 +8,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
 
 ## Tasks
 
-- [ ] 1. Phase 0 — Kernel Stability: Foundations
+- [x] 1. Phase 0 — Kernel Stability: Foundations
   - [ ] 1.1 Implement IDT initialization (`sigma_idt.h` / `sigma_idt.cpp`)
     - Define `idt_entry_t` packed struct (offset_low, selector, IST, type_attr, offset_mid, offset_high)
     - Implement `sigma_idt_init()` populating 32 exception entries
