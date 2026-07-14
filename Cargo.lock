@@ -158,7 +158,19 @@ name = "sigma-sh"
 version = "0.2.0"
 
 [[package]]
+name = "sigma_ai"
+version = "15.0.0"
+
+[[package]]
 name = "sigma_app"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_audio"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_boot"
 version = "15.0.0"
 
 [[package]]
@@ -177,11 +189,27 @@ name = "sigma_data"
 version = "15.0.0"
 
 [[package]]
+name = "sigma_desktop"
+version = "15.0.0"
+
+[[package]]
 name = "sigma_fs"
 version = "15.0.0"
 
 [[package]]
+name = "sigma_fs_tools"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_hal"
+version = "15.0.0"
+
+[[package]]
 name = "sigma_init"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_ipc"
 version = "15.0.0"
 
 [[package]]
@@ -210,6 +238,14 @@ dependencies = [
 
 [[package]]
 name = "sigma_security"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_toolchain"
+version = "15.0.0"
+
+[[package]]
+name = "sigma_tracing"
 version = "15.0.0"
 
 [[package]]

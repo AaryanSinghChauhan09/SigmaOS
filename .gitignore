@@ -38,3 +38,4 @@ networking
 
 # Wiki temp / local scratch only (wiki_repo/ is tracked for GitHub Wiki CI sync)
 wiki_temp/
+SigmaOS.wiki/
