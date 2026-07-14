@@ -15,6 +15,11 @@ on:
       - 'DOWNLOAD.md'
       - 'QUICKSTART.md'
       - 'roadmap.md'
+      - 'CHANGELOG.md'
+      - 'ARCHITECTURE.md'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY_POLICY.md'
+      - 'SIGMAOS_DEVELOPMENT_ROADMAP.md'
 
   workflow_dispatch:
 
@@ -71,7 +76,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No wiki changes to push."
           else
-            git commit -m "wiki: sync from main — wiki_repo/, docs/, ROADMAP, DOWNLOAD, QUICKSTART
+            git commit -m "wiki: sync from main — wiki_repo/, docs/, ROADMAP, DOWNLOAD, QUICKSTART, CHANGELOG, ARCHITECTURE, CONTRIBUTING, SECURITY_POLICY, SIGMAOS_DEVELOPMENT_ROADMAP
 
 Auto-synced by GitHub Actions from commit ${{ github.sha }}"
             git push
