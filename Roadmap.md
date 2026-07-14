@@ -3,7 +3,7 @@
 9 phases over 60 months from "design document" to "1,000 villages running SigmaOS".
 Full details: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap
 
----
+## Roadmap Documents
 
 ## Milestones
 
@@ -20,7 +20,7 @@ Full details: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-R
 | M8: 1,000 Villages | 42 | sigma-RuralStack in 1,000 villages across 5 states |
 | M9: Verified Kernel | 60 | Formally verified IPC + scheduler, Rust network stack |
 
----
+## Quick Links
 
 ## Phase Summary
 

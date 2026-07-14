@@ -1,6 +1,6 @@
-# Sovereign Kernel & Scheduling Improvements (99 Points)
+# SigmaOS Kernel Internals
 
-This document defines exactly 99 highly technical architectural and algorithmic improvements implemented in the core SigmaOS microkernel scheduler and memory manager.
+The SigmaOS kernel is a freestanding microkernel — compiled with `-nostdlib -ffreestanding`, zero glibc symbols, runs the same binary on x86_64, ARM64, and RISC-V.
 
 1. **Implement**: Implement a shard-aware Completely Fair Scheduler (CFS) to balance task execution dynamically across computational units.
 

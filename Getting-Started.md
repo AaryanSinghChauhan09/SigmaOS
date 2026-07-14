@@ -25,6 +25,23 @@ cd kernel && cargo build --release
 
 cd .. && ./qemu-boot.sh standalone
 ```
+SigmaOS/
+├── arch/x86_64/       → CPU entry, GDT, IDT, context switch (NASM)
+├── sigma-boot/        → UEFI bootloader (Zig)
+├── kernel/            → Core kernel (Rust #![no_std])
+│   ├── core/          → scheduler, MM, process, IPC, PCI, ACPI
+│   ├── net/           → IP, TCP, UDP, sockets
+│   ├── fs/            → VFS, tmpfs, ext4, procfs
+│   └── security/      → pledge, capabilities
+├── drivers/           → Hardware drivers
+├── kabi/              → Stable ABI library
+├── sdk/driver/        → Userspace driver SDK
+├── sigma-sh/          → Interactive shell
+├── userland/          → Shell, coreutils, daemons
+├── sigmad/            → System daemons (updater, health, metrics)
+├── virtualization/    → OCI container runtime
+└── wiki_repo/         → This wiki
+```
 
 Expected serial output:
 
