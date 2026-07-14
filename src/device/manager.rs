@@ -55,11 +55,11 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass { unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) } }
-    
+
     fn initialize(&mut self) -> Result<(), DeviceError> {
         Ok(())
     }
-    
+
     fn shutdown(&mut self) -> Result<(), DeviceError> {
         Ok(())
     }
@@ -94,7 +94,7 @@ impl DeviceManager for SimpleDeviceManager {
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn unregister_device(&mut self, id: DeviceID) -> Result<(), DeviceError> {
         for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
@@ -105,7 +105,7 @@ impl DeviceManager for SimpleDeviceManager {
         }
         Err(DeviceError::NotFound)
     }
-    
+
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -114,7 +114,7 @@ impl DeviceManager for SimpleDeviceManager {
         }
         None
     }
-    
+
     fn list_devices(&self, device_class: DeviceClass) -> Vec<DeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -126,7 +126,7 @@ impl DeviceManager for SimpleDeviceManager {
         }
         ids
     }
-    
+
     fn scan_devices(&mut self) -> Vec<DeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -158,18 +158,18 @@ impl SimpleDeviceDriver {
 
 impl DeviceDriver for SimpleDeviceDriver {
     fn device_id(&self) -> DeviceID { self.device_id }
-    
+
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         for i in 0..buffer.len() {
             buffer[i] = 0u8;
         }
         Ok(buffer.len())
     }
-    
+
     fn write(&mut self, data: &[u8]) -> Result<usize, DeviceError> {
         Ok(data.len())
     }
-    
+
     fn ioctl(&mut self, _request: u32, _arg: usize) -> Result<(), DeviceError> {
         Ok(())
     }
@@ -204,13 +204,13 @@ impl DeviceHotplug for SimpleDeviceHotplug {
             self.added_devices.push(device_id);
         }
     }
-    
+
     fn on_device_removed(&mut self, device_id: DeviceID) {
         if self.enabled.load(Ordering::SeqCst) == 1 {
             self.removed_devices.push(device_id);
         }
     }
-    
+
     fn enable_hotplug(&mut self, enabled: bool) {
         self.enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }

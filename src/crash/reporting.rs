@@ -102,7 +102,7 @@ impl CoredumpCollector for SimpleCoredumpCollector {
         self.reports.push(Some(Box::new(report)));
         Ok(id)
     }
-    
+
     fn store_coredump(&mut self, report_id: CrashReportID, data: &[u8]) -> Result<(), CrashError> {
         let mut data_array = [0u8; 4096];
         let data_len = data.len().min(4095);
@@ -112,7 +112,7 @@ impl CoredumpCollector for SimpleCoredumpCollector {
         self.coredumps.push((report_id, data_array));
         Ok(())
     }
-    
+
     fn get_coredump(&self, report_id: CrashReportID) -> Option<&[u8]> {
         for &(id, ref data) in &self.coredumps {
             if id == report_id {
@@ -144,7 +144,7 @@ impl Anonymizer for SimpleAnonymizer {
     fn anonymize_report(&mut self, _report_id: CrashReportID) -> Result<(), CrashError> {
         Ok(())
     }
-    
+
     fn strip_pii(&self, data: &[u8]) -> Vec<u8> {
         let mut anonymized = Vec::new();
         for &byte in data {
@@ -181,7 +181,7 @@ impl CrashUploader for SimpleCrashUploader {
         self.uploaded_reports.push(report_id);
         Ok(())
     }
-    
+
     fn get_upload_status(&self, report_id: CrashReportID) -> bool {
         self.uploaded_reports.contains(&report_id)
     }
@@ -226,21 +226,21 @@ impl CrashPipeline for SimpleCrashPipeline {
         let report_id = self.collector.collect_coredump(pid)?;
         self.anonymizer.anonymize_report(report_id)?;
         self.uploader.upload_report(report_id)?;
-        
+
         self.statistics.total_crashes += 1;
-        
+
         Ok(report_id)
     }
-    
+
     fn generate_report(&self, report_id: CrashReportID) -> Vec<u8> {
         let mut report = Vec::new();
         let header = b"Crash Report #";
         for &byte in header { report.push(byte); }
-        
+
         let id_str = [b'0' + (report_id % 10) as u8];
         report.push(id_str[0]);
         report.push(b'\n');
-        
+
         if let Some(crash) = self.collector.reports.iter().filter_map(|r| r.as_ref()).find(|r| r.id() == report_id) {
             let type_str = match crash.crash_type() {
                 CrashType::SegmentationFault => b"Segmentation Fault",
@@ -251,16 +251,16 @@ impl CrashPipeline for SimpleCrashPipeline {
             };
             for &byte in type_str { report.push(byte); }
             report.push(b'\n');
-            
+
             let proc = b"Process: ";
             for &byte in proc { report.push(byte); }
             for &byte in crash.process_name() { report.push(byte); }
             report.push(b'\n');
         }
-        
+
         report
     }
-    
+
     fn get_statistics(&self) -> CrashStatistics {
         self.statistics
     }

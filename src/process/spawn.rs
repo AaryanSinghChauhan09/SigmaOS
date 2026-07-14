@@ -49,11 +49,11 @@ impl Process for SimpleProcess {
     fn id(&self) -> ProcessID { self.id }
     fn parent_id(&self) -> ProcessID { self.parent_id }
     fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn set_state(&mut self, state: ProcessState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
-    
+
     fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
 }
 
@@ -86,14 +86,14 @@ impl ProcessSpawner for SimpleProcessSpawner {
         self.processes.push(Some(Box::new(process)));
         Ok(id)
     }
-    
+
     fn fork(&mut self, parent_id: ProcessID) -> Result<ProcessID, ProcessError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let process = SimpleProcess::new(id, parent_id);
         self.processes.push(Some(Box::new(process)));
         Ok(id)
     }
-    
+
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for process_option in &mut self.processes {
             if let Some(ref mut process) = *process_option {
@@ -105,7 +105,7 @@ impl ProcessSpawner for SimpleProcessSpawner {
         }
         Err(ProcessError::NotFound)
     }
-    
+
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
         for process_option in &mut self.processes {
             if let Some(ref mut process) = *process_option {
@@ -148,7 +148,7 @@ impl ProcessWaiter for SimpleProcessWaiter {
         }
         Err(ProcessError::NotFound)
     }
-    
+
     fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for process_option in &self.spawner.processes {
             if let Some(ref process) = *process_option {
@@ -192,7 +192,7 @@ impl ProcessGroup for SimpleProcessGroup {
         self.groups.push((id, processes));
         Ok(id)
     }
-    
+
     fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError> {
         for group in &mut self.groups {
             if group.0 == group_id {
@@ -202,7 +202,7 @@ impl ProcessGroup for SimpleProcessGroup {
         }
         Err(ProcessError::NotFound)
     }
-    
+
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
         for group in &mut self.groups {
             if group.0 == group_id {

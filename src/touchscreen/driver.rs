@@ -82,7 +82,7 @@ impl SimpleTouchscreen {
 impl Touchscreen for SimpleTouchscreen {
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    
+
     fn get_touches(&self) -> Vec<&dyn TouchPoint> {
         let mut touches = Vec::new();
         for touch_option in &self.touches {
@@ -92,7 +92,7 @@ impl Touchscreen for SimpleTouchscreen {
         }
         touches
     }
-    
+
     fn set_touch(&mut self, touch: Box<dyn TouchPoint>) {
         self.touches.push(Some(touch));
     }
@@ -115,11 +115,11 @@ impl GestureRecognizer for SimpleGestureRecognizer {
     fn recognize_tap(&self, touches: &Vec<&dyn TouchPoint>) -> bool {
         touches.len() == 1
     }
-    
+
     fn recognize_swipe(&self, _touches: &Vec<&dyn TouchPoint>) -> bool {
         false
     }
-    
+
     fn recognize_pinch(&self, touches: &Vec<&dyn TouchPoint>) -> bool {
         touches.len() >= 2
     }

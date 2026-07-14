@@ -57,19 +57,19 @@ impl SimpleMicroVM {
 impl MicroVM for SimpleMicroVM {
     fn id(&self) -> VMID { self.id }
     fn state(&self) -> VMState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn start(&mut self) -> Result<(), VMError> {
         self.state.store(VMState::Starting as usize, Ordering::SeqCst);
         self.state.store(VMState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn stop(&mut self) -> Result<(), VMError> {
         self.state.store(VMState::Stopping as usize, Ordering::SeqCst);
         self.state.store(VMState::Stopped as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn pause(&mut self) -> Result<(), VMError> {
         if self.state.load(Ordering::SeqCst) != VMState::Running as usize {
             return Err(VMError::StartFailed);
@@ -77,7 +77,7 @@ impl MicroVM for SimpleMicroVM {
         self.state.store(VMState::Paused as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn resume(&mut self) -> Result<(), VMError> {
         if self.state.load(Ordering::SeqCst) != VMState::Paused as usize {
             return Err(VMError::StartFailed);
@@ -85,7 +85,7 @@ impl MicroVM for SimpleMicroVM {
         self.state.store(VMState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn get_memory_limit(&self) -> usize { self.memory_limit.load(Ordering::SeqCst) }
     fn get_cpu_count(&self) -> usize { self.cpu_count.load(Ordering::SeqCst) }
 }
@@ -124,7 +124,7 @@ impl VMMManager for SimpleVMMManager {
        self.vms.push(Some(Box::new(vm)));
         Ok(id)
     }
-    
+
     fn destroy_vm(&mut self, id: VMID) -> Result<(), VMError> {
         for vm_option in &mut self.vms {
             if let Some(ref vm) = *vm_option {
@@ -135,7 +135,7 @@ impl VMMManager for SimpleVMMManager {
         }
         Err(VMError::InvalidConfig)
     }
-    
+
     fn get_vm(&self, id: VMID) -> Option<&dyn MicroVM> {
         for vm_option in &self.vms {
             if let Some(ref vm) = *vm_option {
@@ -144,7 +144,7 @@ impl VMMManager for SimpleVMMManager {
         }
         None
     }
-    
+
     fn list_vms(&self) -> Vec<VMID> {
         let mut ids = Vec::new();
         for vm_option in &self.vms {
@@ -194,7 +194,7 @@ impl Sandbox for SimpleSandbox {
         self.isolated_pids.push(pid);
         Ok(())
     }
-    
+
     fn set_resource_limit(&mut self, pid: usize, memory_mb: usize) -> Result<(), VMError> {
         if !self.isolated_pids.contains(&pid) {
             return Err(VMError::InvalidConfig);
@@ -208,7 +208,7 @@ impl Sandbox for SimpleSandbox {
         self.resource_limits.push((pid, memory_mb * 1024 * 1024));
         Ok(())
     }
-    
+
     fn get_resource_usage(&self, pid: usize) -> Option<ResourceUsage> {
         for &(p, usage) in &self.resource_usage {
             if p == pid {
@@ -255,7 +255,7 @@ impl CapabilityBasedSecurity for SimpleCapabilitySecurity {
         self.capabilities.push((pid, caps));
         Ok(())
     }
-    
+
     fn revoke_capability(&mut self, pid: usize, capability: Capability) -> Result<(), VMError> {
         for i in 0..self.capabilities.len() {
             if self.capabilities[i].0 == pid {
@@ -265,7 +265,7 @@ impl CapabilityBasedSecurity for SimpleCapabilitySecurity {
         }
         Err(VMError::InvalidConfig)
     }
-    
+
     fn check_capability(&self, pid: usize, capability: Capability) -> bool {
         for &(p, ref caps) in &self.capabilities {
             if p == pid && caps.contains(&capability) {
@@ -299,14 +299,14 @@ impl FirecrackerIntegration for SimpleFirecrackerIntegration {
     fn create_firecracker_vm(&mut self, _kernel_path: &[u8], _rootfs_path: &[u8]) -> Result<VMID, VMError> {
         self.vmm.create_vm(512, 2)
     }
-    
+
     fn configure_vsock(&mut self, vm_id: VMID, _port: u16) -> Result<(), VMError> {
         if self.vmm.get_vm(vm_id).is_none() {
             return Err(VMError::InvalidConfig);
         }
         Ok(())
     }
-    
+
     fn attach_snapshot(&mut self, vm_id: VMID, _snapshot_path: &[u8]) -> Result<(), VMError> {
         if self.vmm.get_vm(vm_id).is_none() {
             return Err(VMError::InvalidConfig);

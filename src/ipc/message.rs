@@ -43,27 +43,27 @@ impl SimpleMessageChannel {
 impl MessageChannel for SimpleMessageChannel {
     fn id(&self) -> ChannelID { self.id }
     fn capacity(&self) -> usize { self.capacity.load(Ordering::SeqCst) }
-    
+
     fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
         if self.messages.len() >= self.capacity() {
             return Err(IPCError::ChannelFull);
         }
-        
+
         let mut msg_array = [0u8; 256];
         let msg_len = message.len().min(255);
         for i in 0..msg_len {
             msg_array[i] = message[i];
         }
-        
+
         self.messages.push(msg_array);
         Ok(())
     }
-    
+
     fn receive(&mut self) -> Result<Vec<u8>, IPCError> {
         if self.messages.is_empty() {
             return Err(IPCError::ChannelEmpty);
         }
-        
+
         let msg_array = self.messages.remove(0);
         let len = msg_array.iter().position(|&b| b == 0).unwrap_or(256);
         let mut result = Vec::new();
@@ -72,9 +72,9 @@ impl MessageChannel for SimpleMessageChannel {
         }
         Ok(result)
     }
-    
+
     fn is_empty(&self) -> bool { self.messages.is_empty() }
-    
+
     fn is_full(&self) -> bool { self.messages.len() >= self.capacity() }
 }
 
@@ -106,7 +106,7 @@ impl IPCManager for SimpleIPCManager {
         self.channels.push(Some(Box::new(channel)));
         Ok(id)
     }
-    
+
     fn destroy_channel(&mut self, id: ChannelID) -> Result<(), IPCError> {
         for channel_option in &mut self.channels {
             if let Some(ref channel) = *channel_option {
@@ -117,7 +117,7 @@ impl IPCManager for SimpleIPCManager {
         }
         Err(IPCError::InvalidChannel)
     }
-    
+
     fn get_channel(&mut self, id: ChannelID) -> Option<&mut dyn MessageChannel> {
         for channel_option in &mut self.channels {
             if let Some(ref mut channel) = *channel_option {
@@ -160,7 +160,7 @@ impl SharedMemory for SimpleSharedMemory {
         self.regions.push((id, data));
         Ok(id)
     }
-    
+
     fn deallocate(&mut self, id: usize) -> Result<(), IPCError> {
         for i in 0..self.regions.len() {
             if self.regions[i].0 == id {
@@ -170,7 +170,7 @@ impl SharedMemory for SimpleSharedMemory {
         }
         Err(IPCError::InvalidChannel)
     }
-    
+
     fn write(&mut self, id: usize, offset: usize, data: &[u8]) -> Result<(), IPCError> {
         for region in &mut self.regions {
             if region.0 == id {
@@ -186,7 +186,7 @@ impl SharedMemory for SimpleSharedMemory {
         }
         Err(IPCError::InvalidChannel)
     }
-    
+
     fn read(&self, id: usize, offset: usize, buffer: &mut [u8]) -> Result<(), IPCError> {
         for region in &self.regions {
             if region.0 == id {
@@ -235,7 +235,7 @@ impl Semaphore for SimpleSemaphore {
             Err(IPCError::ChannelEmpty)
         }
     }
-    
+
     fn release(&mut self) -> Result<(), IPCError> {
         let max = self.max_count.load(Ordering::SeqCst);
         let current = self.count.load(Ordering::SeqCst);
@@ -246,7 +246,7 @@ impl Semaphore for SimpleSemaphore {
             Err(IPCError::ChannelFull)
         }
     }
-    
+
     fn count(&self) -> usize { self.count.load(Ordering::SeqCst) }
 }
 

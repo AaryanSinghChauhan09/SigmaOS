@@ -58,7 +58,7 @@ impl GPUDevice for SimpleGPUDevice {
         &self.model[..len]
     }
     fn vram_size(&self) -> usize { self.vram_size.load(Ordering::SeqCst) }
-    
+
     fn initialize(&mut self) -> Result<(), GPUError> {
         Ok(())
     }
@@ -91,7 +91,7 @@ impl GPUManager for SimpleGPUManager {
         self.gpus.push(Some(gpu));
         Ok(id)
     }
-    
+
     fn get_primary_gpu(&self) -> Option<&dyn GPUDevice> {
         if !self.gpus.is_empty() {
             if let Some(ref gpu) = *self.gpus[0] {
@@ -100,7 +100,7 @@ impl GPUManager for SimpleGPUManager {
         }
         None
     }
-    
+
     fn list_gpus(&self) -> Vec<GPUDeviceID> {
         let mut ids = Vec::new();
         for gpu_option in &self.gpus {
@@ -142,7 +142,7 @@ impl Framebuffer for SimpleFramebuffer {
         self.framebuffers.push((id, width, height, format));
         Ok(id)
     }
-    
+
     fn bind_framebuffer(&mut self, fb_id: usize) -> Result<(), GPUError> {
         for &(id, _, _, _) in &self.framebuffers {
             if id == fb_id {
@@ -152,11 +152,11 @@ impl Framebuffer for SimpleFramebuffer {
         }
         Err(GPUError::NotFound)
     }
-    
+
     fn clear(&mut self, _color: u32) -> Result<(), GPUError> {
         Ok(())
     }
-    
+
     fn swap_buffers(&mut self) -> Result<(), GPUError> {
         Ok(())
     }
@@ -197,7 +197,7 @@ impl RenderPipeline for SimpleRenderPipeline {
         self.pipelines.push((id, vs_array, fs_array));
         Ok(id)
     }
-    
+
     fn bind_pipeline(&mut self, pipeline_id: usize) -> Result<(), GPUError> {
         for &(id, _, _) in &self.pipelines {
             if id == pipeline_id {
@@ -207,7 +207,7 @@ impl RenderPipeline for SimpleRenderPipeline {
         }
         Err(GPUError::NotFound)
     }
-    
+
     fn draw(&mut self, _vertex_count: usize) -> Result<(), GPUError> {
         Ok(())
     }

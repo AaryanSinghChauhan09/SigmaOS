@@ -58,17 +58,17 @@ impl LanguageRuntime for SimpleLanguageRuntime {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
         &self.version[..len]
     }
-    
+
     fn install(&mut self) -> Result<(), RuntimeError> {
         self.installed.store(1, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn uninstall(&mut self) -> Result<(), RuntimeError> {
         self.installed.store(0, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn is_installed(&self) -> bool { self.installed.load(Ordering::SeqCst) == 1 }
 }
 
@@ -108,7 +108,7 @@ impl RuntimeManager for SimpleRuntimeManager {
         self.runtimes.push(Some(runtime));
         Ok(id)
     }
-    
+
     fn get_runtime(&self, id: RuntimeID) -> Option<&dyn LanguageRuntime> {
         for runtime_option in &self.runtimes {
             if let Some(ref runtime) = *runtime_option {
@@ -117,7 +117,7 @@ impl RuntimeManager for SimpleRuntimeManager {
         }
         None
     }
-    
+
     fn list_installed(&self) -> Vec<RuntimeID> {
         let mut ids = Vec::new();
         for runtime_option in &self.runtimes {
@@ -129,7 +129,7 @@ impl RuntimeManager for SimpleRuntimeManager {
         }
         ids
     }
-    
+
     fn set_default(&mut self, language_type: LanguageType, id: RuntimeID) -> Result<(), RuntimeError> {
         let idx = language_type as usize;
         if idx < 5 {
@@ -170,7 +170,7 @@ impl PackageDependency for SimplePackageDependency {
         self.dependencies.push((runtime_id, package_array));
         Ok(())
     }
-    
+
     fn remove_dependency(&mut self, runtime_id: RuntimeID, package: &[u8]) -> Result<(), RuntimeError> {
         for i in 0..self.dependencies.len() {
             if self.dependencies[i].0 == runtime_id {
@@ -184,7 +184,7 @@ impl PackageDependency for SimplePackageDependency {
         }
         Err(RuntimeError::NotFound)
     }
-    
+
     fn list_dependencies(&self, runtime_id: RuntimeID) -> Vec<[u8; 128]> {
         let mut packages = Vec::new();
         for &(rt_id, ref pkg) in &self.dependencies {
@@ -228,7 +228,7 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
         self.venvs.push((id, runtime_id, name_array));
         Ok(id)
     }
-    
+
     fn activate_venv(&mut self, venv_id: usize) -> Result<(), RuntimeError> {
         for venv in &self.venvs {
             if venv.0 == venv_id {
@@ -237,7 +237,7 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
         }
         Err(RuntimeError::NotFound)
     }
-    
+
     fn delete_venv(&mut self, venv_id: usize) -> Result<(), RuntimeError> {
         for i in 0..self.venvs.len() {
             if self.venvs[i].0 == venv_id {

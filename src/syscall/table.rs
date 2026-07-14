@@ -70,32 +70,32 @@ impl SimpleSyscallTable {
             entries: Vec::new(),
         }
     }
-    
+
     pub fn register_common(&mut self) {
         let read_handler: SyscallHandler = |a, b, c, d, e, f| {
             (a + b + c + d + e + f) as i64
         };
         let read_entry = SimpleSyscallEntry::new(0, b"read", read_handler);
         self.entries.push(Some(Box::new(read_entry)));
-        
+
         let write_handler: SyscallHandler = |a, b, c, d, e, f| {
             (a + b + c + d + e + f) as i64
         };
         let write_entry = SimpleSyscallEntry::new(1, b"write", write_handler);
         self.entries.push(Some(Box::new(write_entry)));
-        
+
         let open_handler: SyscallHandler = |a, b, c, d, e, f| {
             (a + b + c + d + e + f) as i64
         };
         let open_entry = SimpleSyscallEntry::new(2, b"open", open_handler);
         self.entries.push(Some(Box::new(open_entry)));
-        
+
         let close_handler: SyscallHandler = |a, b, c, d, e, f| {
             (a + b + c + d + e + f) as i64
         };
         let close_entry = SimpleSyscallEntry::new(3, b"close", close_handler);
         self.entries.push(Some(Box::new(close_entry)));
-        
+
         let exit_handler: SyscallHandler = |a, b, c, d, e, f| {
             (a + b + c + d + e + f) as i64
         };
@@ -109,7 +109,7 @@ impl SyscallTable for SimpleSyscallTable {
         self.entries.push(Some(entry));
         Ok(())
     }
-    
+
     fn unregister(&mut self, number: SyscallNumber) -> Result<(), SyscallError> {
         for entry_option in &mut self.entries {
             if let Some(ref entry) = *entry_option {
@@ -120,7 +120,7 @@ impl SyscallTable for SimpleSyscallTable {
         }
         Err(SyscallError::NotRegistered)
     }
-    
+
     fn get_handler(&self, number: SyscallNumber) -> Option<SyscallHandler> {
         for entry_option in &self.entries {
             if let Some(ref entry) = *entry_option {
@@ -131,7 +131,7 @@ impl SyscallTable for SimpleSyscallTable {
         }
         None
     }
-    
+
     fn list_syscalls(&self) -> Vec<SyscallNumber> {
         let mut numbers = Vec::new();
         for entry_option in &self.entries {
@@ -168,11 +168,11 @@ impl SyscallFilter for SimpleSyscallFilter {
     fn allow(&mut self, number: SyscallNumber) {
         self.allowed.push(number);
     }
-    
+
     fn deny(&mut self, number: SyscallNumber) {
         self.denied.push(number);
     }
-    
+
     fn is_allowed(&self, number: SyscallNumber) -> Result<bool, SyscallError> {
         for &n in &self.denied {
             if n == number {
@@ -205,7 +205,7 @@ impl SyscallAuditor for SimpleSyscallAuditor {
     fn log_call(&mut self, number: SyscallNumber, args: [u64; 6], result: i64) {
         self.log.push((number, args, result));
     }
-    
+
     fn get_log(&self) -> Vec<(SyscallNumber, [u64; 6], i64)> {
         self.log.clone()
     }

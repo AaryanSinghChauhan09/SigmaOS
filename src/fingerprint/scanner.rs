@@ -78,14 +78,14 @@ impl FingerprintScanner for SimpleFingerprintScanner {
         let template = SimpleFingerprintTemplate::new(id, b"fingerprint_data", 95);
         Ok(Box::new(template))
     }
-    
+
     fn enroll(&mut self, user_id: usize) -> Result<FingerID, ScanError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let template = SimpleFingerprintTemplate::new(id, b"enrolled_template", 90);
         self.templates.push(Some(Box::new(template)));
         Ok(id)
     }
-    
+
     fn verify(&self, template: &dyn FingerprintTemplate) -> Result<bool, ScanError> {
         for stored_option in &self.templates {
             if let Some(ref stored) = *stored_option {
@@ -125,7 +125,7 @@ impl BiometricAuth for SimpleBiometricAuth {
         }
         Err(ScanError::NoMatch)
     }
-    
+
     fn register_user(&mut self, user_id: usize, template: Box<dyn FingerprintTemplate>) -> Result<(), ScanError> {
         self.users.push((user_id, template));
         Ok(())

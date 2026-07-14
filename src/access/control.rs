@@ -135,7 +135,7 @@ impl AccessController for SimpleAccessController {
         }
         Err(AccessError::InvalidRole)
     }
-    
+
     fn revoke_permission(&mut self, role_id: RoleID, permission_id: PermissionID) -> Result<(), AccessError> {
         for role_option in &mut self.roles {
             if let Some(ref mut role) = *role_option {
@@ -153,7 +153,7 @@ impl AccessController for SimpleAccessController {
         }
         Err(AccessError::InvalidRole)
     }
-    
+
     fn check_access(&self, role_id: RoleID, resource: &[u8], action: &[u8]) -> Result<bool, AccessError> {
         for role_option in &self.roles {
             if let Some(ref role) = *role_option {
@@ -198,14 +198,14 @@ impl ZeroTrustPolicy for SimpleZeroTrustPolicy {
     fn verify_identity(&self, _identity: &[u8]) -> Result<bool, AccessError> {
         Ok(true)
     }
-    
+
     fn check_device_trust(&self, device_id: usize) -> Result<bool, AccessError> {
         for &id in &self.trusted_devices {
             if id == device_id { return Ok(true); }
         }
         Ok(false)
     }
-    
+
     fn enforce_mfa(&self, _user_id: usize) -> Result<bool, AccessError> {
         Ok(true)
     }
@@ -239,7 +239,7 @@ impl AuditLogger for SimpleAuditLogger {
         for i in 0..action_len { action_array[i] = action[i]; }
         self.audit_trail.push((role_id, resource_array, action_array, granted));
     }
-    
+
     fn get_audit_trail(&self) -> Vec<(RoleID, [u8; 128], [u8; 64], bool)> {
         self.audit_trail.clone()
     }

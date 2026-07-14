@@ -106,17 +106,17 @@ impl PackageCache for SimplePackageCache {
         let package_size = package.size();
         let current = self.current_size.load(Ordering::SeqCst);
         let max = self.max_size.load(Ordering::SeqCst);
-        
+
         if current + package_size > max {
             return Err(CacheError::CacheFull);
         }
-        
+
         let id = package.id();
         self.current_size.fetch_add(package_size, Ordering::SeqCst);
         self.packages.push(Some(package));
         Ok(id)
     }
-    
+
     fn retrieve(&self, id: PackageID) -> Option<&dyn CachedPackage> {
         for package_option in &self.packages {
             if let Some(ref package) = *package_option {
@@ -125,7 +125,7 @@ impl PackageCache for SimplePackageCache {
         }
         None
     }
-    
+
     fn remove(&mut self, id: PackageID) -> Result<(), CacheError> {
         for package_option in &mut self.packages {
             if let Some(ref package) = *package_option {
@@ -138,7 +138,7 @@ impl PackageCache for SimplePackageCache {
         }
         Err(CacheError::NotFound)
     }
-    
+
     fn find_by_name(&self, name: &[u8]) -> Vec<PackageID> {
         let mut ids = Vec::new();
         for package_option in &self.packages {
@@ -150,7 +150,7 @@ impl PackageCache for SimplePackageCache {
         }
         ids
     }
-    
+
     fn get_usage(&self) -> CacheUsage {
         CacheUsage {
             total_size: self.current_size.load(Ordering::SeqCst),
@@ -196,11 +196,11 @@ impl CacheEviction for SimpleCacheEviction {
         }
         Err(CacheError::NotFound)
     }
-    
+
     fn evict_by_size(&mut self, target_size: usize) -> Result<Vec<PackageID>, CacheError> {
         let mut evicted = Vec::new();
         let mut freed = 0;
-        
+
         while freed < target_size && self.cache.packages.len() > 0 {
             if let Some(id) = self.evict_lru()? {
                 if let Some(package) = self.cache.retrieve(id) {
@@ -209,10 +209,10 @@ impl CacheEviction for SimpleCacheEviction {
                 }
             }
         }
-        
+
         Ok(evicted)
     }
-    
+
     fn set_eviction_policy(&mut self, policy: EvictionPolicy) {
         self.policy.store(policy as usize, Ordering::SeqCst);
     }
@@ -253,31 +253,31 @@ impl SimpleRegistryProxy {
 impl RegistryProxy for SimpleRegistryProxy {
     fn proxy_request(&mut self, package: &[u8]) -> Result<Vec<u8>, CacheError> {
         let ids = self.cache.find_by_name(package);
-        
+
         if !ids.is_empty() {
             if let Some(cached) = self.cache.retrieve(ids[0]) {
                 return Ok(cached.name().to_vec());
             }
         }
-        
+
         Err(CacheError::NotFound)
     }
-    
+
     fn cache_response(&mut self, package: &[u8], data: &[u8]) -> Result<(), CacheError> {
         let id = self.cache.next_id.fetch_add(1, Ordering::SeqCst);
         let mut cached = SimpleCachedPackage::new(id, package, b"1.0.0");
         cached.size.store(data.len(), Ordering::SeqCst);
         cached.cached_at.store(1000000, Ordering::SeqCst);
-        
+
         let data_len = data.len().min(4095);
         for i in 0..data_len {
             cached.data[i] = data[i];
         }
-        
+
         self.cache.store(Box::new(cached))?;
         Ok(())
     }
-    
+
     fn get_proxy_stats(&self) -> ProxyStats {
         self.stats
     }
@@ -308,9 +308,9 @@ impl OfflineMode for SimpleOfflineMode {
     fn enable_offline(&mut self, enabled: bool) {
         self.offline.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
-    
+
     fn is_offline(&self) -> bool { self.offline.load(Ordering::SeqCst) == 1 }
-    
+
     fn sync_when_online(&mut self) -> Result<(), CacheError> {
         if self.is_offline() {
             return Err(CacheError::NotFound);

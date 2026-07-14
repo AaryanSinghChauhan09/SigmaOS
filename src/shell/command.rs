@@ -48,7 +48,7 @@ impl ShellCommand for SimpleShellCommand {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
-    
+
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
         let mut output = Vec::new();
         let name = self.name();
@@ -60,7 +60,7 @@ impl ShellCommand for SimpleShellCommand {
         output.push(b'\n');
         Ok(output)
     }
-    
+
     fn help(&self) -> &[u8] {
         let len = self.description.iter().position(|&b| b == 0).unwrap_or(128);
         &self.description[..len]
@@ -87,7 +87,7 @@ impl CommandParser for SimpleCommandParser {
         let mut arg_index = 0;
         let mut in_command = true;
         let mut command_index = 0;
-        
+
         for &byte in input {
             if byte == b' ' || byte == b'\n' || byte == b'\t' {
                 if in_command && command_index > 0 {
@@ -111,14 +111,14 @@ impl CommandParser for SimpleCommandParser {
                 }
             }
         }
-        
+
         if arg_index > 0 {
             args.push(current_arg);
         }
-        
+
         Ok((command, args))
     }
-    
+
     fn validate(&self, _command: &[u8], _args: &[[u8; 64]]) -> Result<(), CommandError> {
         Ok(())
     }
@@ -142,17 +142,17 @@ impl SimpleCommandRegistry {
             commands: Vec::new(),
         }
     }
-    
+
     pub fn register_builtins(&mut self) {
         let echo = SimpleShellCommand::new(b"echo", b"Print arguments to stdout");
         self.commands.push(Some(Box::new(echo)));
-        
+
         let ls = SimpleShellCommand::new(b"ls", b"List directory contents");
         self.commands.push(Some(Box::new(ls)));
-        
+
         let cd = SimpleShellCommand::new(b"cd", b"Change directory");
         self.commands.push(Some(Box::new(cd)));
-        
+
         let pwd = SimpleShellCommand::new(b"pwd", b"Print working directory");
         self.commands.push(Some(Box::new(pwd)));
     }
@@ -163,7 +163,7 @@ impl CommandRegistry for SimpleCommandRegistry {
         self.commands.push(Some(command));
         Ok(())
     }
-    
+
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError> {
         for i in 0..self.commands.len() {
             if let Some(ref cmd) = self.commands[i] {
@@ -175,7 +175,7 @@ impl CommandRegistry for SimpleCommandRegistry {
         }
         Err(CommandError::NotFound)
     }
-    
+
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
         for command_option in &self.commands {
             if let Some(ref command) = *command_option {
@@ -186,7 +186,7 @@ impl CommandRegistry for SimpleCommandRegistry {
         }
         None
     }
-    
+
     fn list(&self) -> Vec<&[u8]> {
         let mut names = Vec::new();
         for command_option in &self.commands {
@@ -226,7 +226,7 @@ impl SimpleShellSession {
 impl ShellSession for SimpleShellSession {
     fn execute_line(&mut self, input: &[u8]) -> Result<Vec<u8>, CommandError> {
         let (command_name, args) = self.parser.parse(input)?;
-        
+
         if let Some(command) = self.registry.get(&command_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
             cmd.execute(&args)
@@ -234,7 +234,7 @@ impl ShellSession for SimpleShellSession {
             Err(CommandError::NotFound)
         }
     }
-    
+
     fn set_environment(&mut self, key: &[u8], value: &[u8]) {
         let mut key_array = [0u8; 64];
         let mut value_array = [0u8; 128];
@@ -244,7 +244,7 @@ impl ShellSession for SimpleShellSession {
         for i in 0..value_len { value_array[i] = value[i]; }
         self.environment.push((key_array, value_array));
     }
-    
+
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
         for &(ref k, ref v) in &self.environment {
             let len = k.iter().position(|&b| b == 0).unwrap_or(64);
@@ -287,7 +287,7 @@ impl CommandHistory for SimpleCommandHistory {
         self.history.push(cmd_array);
         self.current_index.store(self.history.len(), Ordering::SeqCst);
     }
-    
+
     fn get_previous(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx > 0 && idx <= self.history.len() {
@@ -297,7 +297,7 @@ impl CommandHistory for SimpleCommandHistory {
             None
         }
     }
-    
+
     fn get_next(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx < self.history.len() {
@@ -307,7 +307,7 @@ impl CommandHistory for SimpleCommandHistory {
             None
         }
     }
-    
+
     fn list(&self) -> Vec<&[u8]> {
         let mut commands = Vec::new();
         for cmd in &self.history {

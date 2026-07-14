@@ -91,16 +91,16 @@ impl LogRotator for SimpleLogRotator {
         self.log_files.push(Some(log_file));
         Ok(id)
     }
-    
+
     fn set_rotation_policy(&mut self, policy: RotationPolicy, threshold: usize) {
         self.policy.store(policy as usize, Ordering::SeqCst);
         self.threshold.store(threshold, Ordering::SeqCst);
     }
-    
+
     fn check_rotation(&mut self) -> Vec<LogFileID> {
         let mut to_rotate = Vec::new();
         let threshold = self.threshold.load(Ordering::SeqCst);
-        
+
         for log_file_option in &self.log_files {
             if let Some(ref log_file) = *log_file_option {
                 if log_file.size() >= threshold {
@@ -108,10 +108,10 @@ impl LogRotator for SimpleLogRotator {
                 }
             }
         }
-        
+
         to_rotate
     }
-    
+
     fn rotate(&mut self, id: LogFileID) -> Result<(), RotationError> {
         for log_file_option in &mut self.log_files {
             if let Some(ref mut log_file) = *log_file_option {
@@ -145,7 +145,7 @@ impl LogCompressor for SimpleLogCompressor {
         }
         Ok(compressed)
     }
-    
+
     fn decompress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
         let mut decompressed = Vec::new();
         for &byte in data {

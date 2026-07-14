@@ -85,7 +85,7 @@ impl BackupManager for SimpleBackupManager {
         self.snapshots.push(Some(Box::new(snapshot)));
         Ok(id)
     }
-    
+
     fn delete_snapshot(&mut self, id: SnapshotID) -> Result<(), BackupError> {
         for snapshot_option in &mut self.snapshots {
             if let Some(ref snapshot) = *snapshot_option {
@@ -96,7 +96,7 @@ impl BackupManager for SimpleBackupManager {
         }
         Err(BackupError::NotFound)
     }
-    
+
     fn get_snapshot(&self, id: SnapshotID) -> Option<&dyn Snapshot> {
         for snapshot_option in &self.snapshots {
             if let Some(ref snapshot) = *snapshot_option {
@@ -105,7 +105,7 @@ impl BackupManager for SimpleBackupManager {
         }
         None
     }
-    
+
     fn restore_snapshot(&mut self, id: SnapshotID) -> Result<(), BackupError> {
         if self.get_snapshot(id).is_some() {
             Ok(())
@@ -113,7 +113,7 @@ impl BackupManager for SimpleBackupManager {
             Err(BackupError::NotFound)
         }
     }
-    
+
     fn list_snapshots(&self) -> Vec<SnapshotID> {
         let mut ids = Vec::new();
         for snapshot_option in &self.snapshots {
@@ -152,7 +152,7 @@ impl BackupScheduler for SimpleBackupScheduler {
         self.schedules.push((id, interval_ms, SnapshotType::Incremental));
         Ok(id)
     }
-    
+
     fn cancel_backup(&mut self, schedule_id: usize) -> Result<(), BackupError> {
         for i in 0..self.schedules.len() {
             if self.schedules[i].0 == schedule_id {
@@ -162,7 +162,7 @@ impl BackupScheduler for SimpleBackupScheduler {
         }
         Err(BackupError::NotFound)
     }
-    
+
     fn run_scheduled_backups(&mut self) -> Vec<SnapshotID> {
         let mut created = Vec::new();
         for &(id, _, snapshot_type) in &self.schedules {

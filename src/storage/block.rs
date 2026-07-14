@@ -51,11 +51,11 @@ impl BlockDevice for SimpleBlockDevice {
     fn device_type(&self) -> BlockDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
     fn block_size(&self) -> usize { self.block_size.load(Ordering::SeqCst) }
     fn total_blocks(&self) -> usize { self.total_blocks.load(Ordering::SeqCst) }
-    
+
     fn read_block(&self, _block_num: usize, _buffer: &mut [u8]) -> Result<(), BlockError> {
         Ok(())
     }
-    
+
     fn write_block(&mut self, _block_num: usize, _data: &[u8]) -> Result<(), BlockError> {
         Ok(())
     }
@@ -89,7 +89,7 @@ impl BlockManager for SimpleBlockManager {
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn unregister_device(&mut self, id: BlockDeviceID) -> Result<(), BlockError> {
         for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
@@ -100,7 +100,7 @@ impl BlockManager for SimpleBlockManager {
         }
         Err(BlockError::NotFound)
     }
-    
+
     fn get_device(&self, id: BlockDeviceID) -> Option<&dyn BlockDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -109,7 +109,7 @@ impl BlockManager for SimpleBlockManager {
         }
         None
     }
-    
+
     fn list_devices(&self) -> Vec<BlockDeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -148,7 +148,7 @@ impl PartitionTable for SimplePartitionTable {
         self.partitions.push((device_id, id, start_block, size_blocks));
         Ok(id)
     }
-    
+
     fn delete_partition(&mut self, partition_id: usize) -> Result<(), BlockError> {
         for i in 0..self.partitions.len() {
             if self.partitions[i].1 == partition_id {
@@ -158,7 +158,7 @@ impl PartitionTable for SimplePartitionTable {
         }
         Err(BlockError::NotFound)
     }
-    
+
     fn list_partitions(&self, device_id: BlockDeviceID) -> Vec<(usize, usize, usize)> {
         let mut result = Vec::new();
         for &(dev_id, part_id, start, size) in &self.partitions {
@@ -200,22 +200,22 @@ impl BlockCache for SimpleBlockCache {
         }
         None
     }
-    
+
     fn write_cache(&mut self, device_id: BlockDeviceID, block_num: usize, data: &[u8]) {
         let max = self.max_entries.load(Ordering::SeqCst);
         if self.cache.len() >= max {
             self.cache.remove(0);
         }
-        
+
         let mut data_array = [0u8; 4096];
         let data_len = data.len().min(4095);
         for i in 0..data_len {
             data_array[i] = data[i];
         }
-        
+
         self.cache.push((device_id, block_num, data_array));
     }
-    
+
     fn invalidate(&mut self, device_id: BlockDeviceID, block_num: usize) {
         for i in 0..self.cache.len() {
             if self.cache[i].0 == device_id && self.cache[i].1 == block_num {

@@ -32,15 +32,15 @@ impl SimpleRSAKeyPair {
     pub fn new(id: KeyPairID) -> Result<Self, RSAError> {
         let mut public = [0u8; 512];
         let mut private = [0u8; 2048];
-        
+
         for i in 0..512 {
             public[i] = ((i * 17 + 31) % 256) as u8;
         }
-        
+
         for i in 0..2048 {
             private[i] = ((i * 23 + 47) % 256) as u8;
         }
-        
+
         Ok(SimpleRSAKeyPair {
             id,
             public_key: public,
@@ -72,32 +72,32 @@ impl RSAEncryption for SimpleRSAEncryption {
     fn encrypt(&self, plaintext: &[u8], public_key: &[u8]) -> Result<Vec<u8>, RSAError> {
         let mut ciphertext = Vec::new();
         let mut key_hash: usize = 0;
-        
+
         for &byte in public_key {
             key_hash = key_hash.wrapping_add(byte as usize);
         }
-        
+
         for &byte in plaintext {
             ciphertext.push(byte.wrapping_add((key_hash % 256) as u8));
             key_hash = key_hash.wrapping_mul(31);
         }
-        
+
         Ok(ciphertext)
     }
-    
+
     fn decrypt(&self, ciphertext: &[u8], private_key: &[u8]) -> Result<Vec<u8>, RSAError> {
         let mut plaintext = Vec::new();
         let mut key_hash: usize = 0;
-        
+
         for &byte in private_key {
             key_hash = key_hash.wrapping_add(byte as usize);
         }
-        
+
         for &byte in ciphertext {
             plaintext.push(byte.wrapping_sub((key_hash % 256) as u8));
             key_hash = key_hash.wrapping_mul(31);
         }
-        
+
         Ok(plaintext)
     }
 }
@@ -118,35 +118,35 @@ impl RSASignature for SimpleRSASignature {
     fn sign(&self, data: &[u8], private_key: &[u8]) -> Result<Vec<u8>, RSAError> {
         let mut signature = Vec::new();
         let mut hash: usize = 0;
-        
+
         for &byte in data {
             hash = hash.wrapping_add(byte as usize);
         }
-        
+
         for &byte in private_key {
             hash = hash.wrapping_add(byte as usize);
         }
-        
+
         for i in 0..512 {
             signature.push(((hash + i * 17) % 256) as u8);
         }
-        
+
         Ok(signature)
     }
-    
+
     fn verify(&self, data: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, RSAError> {
         let expected = self.sign(data, public_key)?;
-        
+
         if signature.len() != expected.len() {
             return Ok(false);
         }
-        
+
         for i in 0..signature.len() {
             if signature[i] != expected[i] {
                 return Ok(false);
             }
         }
-        
+
         Ok(true)
     }
 }
@@ -179,7 +179,7 @@ impl RSAKeyManager for SimpleRSAKeyManager {
         self.keypairs.push(Some(Box::new(keypair)));
         Ok(id)
     }
-    
+
     fn get_keypair(&self, id: KeyPairID) -> Option<&dyn RSAKeyPair> {
         for keypair_option in &self.keypairs {
             if let Some(ref keypair) = *keypair_option {
@@ -188,7 +188,7 @@ impl RSAKeyManager for SimpleRSAKeyManager {
         }
         None
     }
-    
+
     fn delete_keypair(&mut self, id: KeyPairID) -> Result<(), RSAError> {
         for keypair_option in &mut self.keypairs {
             if let Some(ref keypair) = *keypair_option {

@@ -64,7 +64,7 @@ impl Toolchain for SimpleToolchain {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
         &self.version[..len]
     }
-    
+
     fn compile(&mut self, source: &[u8]) -> Result<Vec<u8>, ToolchainError> {
         let mut binary = Vec::new();
         let header = [0x7F, 0x45, 0x4C, 0x46];
@@ -93,14 +93,14 @@ impl SimpleCrossCompiler {
             next_id: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let tc1 = SimpleToolchain::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::X86_64, b"x86_64-linux-gnu-gcc", b"12.2");
         self.toolchains.push(Some(Box::new(tc1)));
-        
+
         let tc2 = SimpleToolchain::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::ARM64, b"aarch64-linux-gnu-gcc", b"12.2");
         self.toolchains.push(Some(Box::new(tc2)));
-        
+
         let tc3 = SimpleToolchain::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::RISCV64, b"riscv64-linux-gnu-gcc", b"12.2");
         self.toolchains.push(Some(Box::new(tc3)));
     }
@@ -112,7 +112,7 @@ impl CrossCompiler for SimpleCrossCompiler {
         self.toolchains.push(Some(toolchain));
         Ok(id)
     }
-    
+
     fn compile_for_target(&mut self, source: &[u8], target: Architecture) -> Result<Vec<u8>, ToolchainError> {
         for toolchain_option in &mut self.toolchains {
             if let Some(ref mut toolchain) = *toolchain_option {
@@ -123,7 +123,7 @@ impl CrossCompiler for SimpleCrossCompiler {
         }
         Err(ToolchainError::NotFound)
     }
-    
+
     fn get_toolchain(&self, id: ToolchainID) -> Option<&dyn Toolchain> {
         for toolchain_option in &self.toolchains {
             if let Some(ref toolchain) = *toolchain_option {
@@ -163,11 +163,11 @@ impl SysrootManager for SimpleSysrootManager {
         self.sysroots.push((arch, path_array));
         Ok(())
     }
-    
+
     fn install_headers(&mut self, _sysroot: &[u8], _headers: &[u8]) -> Result<(), ToolchainError> {
         Ok(())
     }
-    
+
     fn install_libraries(&mut self, _sysroot: &[u8], _libs: &[u8]) -> Result<(), ToolchainError> {
         Ok(())
     }
@@ -211,21 +211,21 @@ impl BuildConfiguration for SimpleBuildConfiguration {
             self.config.cflags[i] = flags[i];
         }
     }
-    
+
     fn set_cppflags(&mut self, flags: &[u8]) {
         let len = flags.len().min(255);
         for i in 0..len {
             self.config.cppflags[i] = flags[i];
         }
     }
-    
+
     fn set_ldflags(&mut self, flags: &[u8]) {
         let len = flags.len().min(255);
         for i in 0..len {
             self.config.ldflags[i] = flags[i];
         }
     }
-    
+
     fn get_config(&self) -> BuildConfig { self.config }
 }
 
@@ -254,11 +254,11 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
     fn set_source_date_epoch(&mut self, epoch: u64) {
         self.source_date_epoch.store(epoch as usize, Ordering::SeqCst);
     }
-    
+
     fn enable_deterministic_mode(&mut self, enabled: bool) {
         self.deterministic_mode.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
-    
+
     fn verify_reproducibility(&self, binary1: &[u8], binary2: &[u8]) -> bool {
         if binary1.len() != binary2.len() {
             return false;

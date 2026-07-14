@@ -78,7 +78,7 @@ impl SimpleFilesystem {
 
 impl Filesystem for SimpleFilesystem {
     fn mount_id(&self) -> MountID { self.mount_id }
-    
+
     fn read_inode(&self, inode_id: InodeID) -> Option<&dyn Inode> {
         if inode_id > 0 && inode_id <= self.inodes.len() {
             if let Some(ref inode) = *self.inodes[inode_id - 1] {
@@ -87,7 +87,7 @@ impl Filesystem for SimpleFilesystem {
         }
         None
     }
-    
+
     fn read_data(&self, inode_id: InodeID, offset: usize, buffer: &mut [u8]) -> Result<usize, VFSError> {
         if inode_id > 0 && inode_id <= self.data.len() {
             let data = &self.data[inode_id - 1];
@@ -102,7 +102,7 @@ impl Filesystem for SimpleFilesystem {
             Err(VFSError::NotFound)
         }
     }
-    
+
     fn write_data(&mut self, inode_id: InodeID, offset: usize, data: &[u8]) -> Result<usize, VFSError> {
         if inode_id > 0 && inode_id <= self.data.len() {
             let file_data = &mut self.data[inode_id - 1];
@@ -158,7 +158,7 @@ impl VFS for SimpleVFS {
         self.mount_points.push((id, mount_array));
         Ok(id)
     }
-    
+
     fn unmount(&mut self, mount_id: MountID) -> Result<(), VFSError> {
         for i in 0..self.filesystems.len() {
             if let Some(ref fs) = *self.filesystems[i] {
@@ -169,7 +169,7 @@ impl VFS for SimpleVFS {
         }
         Err(VFSError::NotFound)
     }
-    
+
     fn resolve_path(&self, path: &[u8]) -> Result<(MountID, InodeID), VFSError> {
         for &(mount_id, ref mount_point) in &self.mount_points {
             let mount_len = mount_point.iter().position(|&b| b == 0).unwrap_or(256);
@@ -179,7 +179,7 @@ impl VFS for SimpleVFS {
         }
         Err(VFSError::NotFound)
     }
-    
+
     fn open_file(&mut self, path: &[u8], _flags: u32) -> Result<usize, VFSError> {
         let (mount_id, inode_id) = self.resolve_path(path)?;
         Ok(mount_id * 10000 + inode_id)
@@ -218,7 +218,7 @@ impl FileDescriptor for SimpleFileDescriptor {
     fn mount_id(&self) -> MountID { self.mount_id }
     fn inode_id(&self) -> InodeID { self.inode_id }
     fn offset(&self) -> usize { self.offset.load(Ordering::SeqCst) }
-    
+
     fn set_offset(&mut self, offset: usize) {
         self.offset.store(offset, Ordering::SeqCst);
     }

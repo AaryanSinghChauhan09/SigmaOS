@@ -46,7 +46,7 @@ impl Color for SimpleColor {
     fn g(&self) -> u8 { self.g.load(Ordering::SeqCst) as u8 }
     fn b(&self) -> u8 { self.b.load(Ordering::SeqCst) as u8 }
     fn a(&self) -> u8 { self.a.load(Ordering::SeqCst) as u8 }
-    
+
     fn to_rgba(&self) -> u32 {
         (self.r() as u32) << 24 | (self.g() as u32) << 16 | (self.b() as u32) << 8 | self.a() as u32
     }
@@ -87,7 +87,7 @@ impl Theme for SimpleTheme {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    
+
     fn get_color(&self, color_name: &[u8]) -> Option<&dyn Color> {
         for &(ref name, ref color_option) in &self.colors {
             let name_len = name.iter().position(|&b| b == 0).unwrap_or(32);
@@ -99,7 +99,7 @@ impl Theme for SimpleTheme {
         }
         None
     }
-    
+
     fn set_color(&mut self, color_name: &[u8], color: Box<dyn Color>) -> Result<(), ThemeError> {
         let mut name_array = [0u8; 32];
         let name_len = color_name.len().min(31);
@@ -141,7 +141,7 @@ impl ThemeManager for SimpleThemeManager {
         self.themes.push(Some(theme));
         Ok(id)
     }
-    
+
     fn get_theme(&self, id: ThemeID) -> Option<&dyn Theme> {
         for theme_option in &self.themes {
             if let Some(ref theme) = *theme_option {
@@ -150,7 +150,7 @@ impl ThemeManager for SimpleThemeManager {
         }
         None
     }
-    
+
     fn set_active_theme(&mut self, id: ThemeID) -> Result<(), ThemeError> {
         for theme_option in &self.themes {
             if let Some(ref theme) = *theme_option {
@@ -162,7 +162,7 @@ impl ThemeManager for SimpleThemeManager {
         }
         Err(ThemeError::NotFound)
     }
-    
+
     fn get_active_theme(&self) -> Option<&dyn Theme> {
         let active_id = self.active.load(Ordering::SeqCst);
         if active_id > 0 {

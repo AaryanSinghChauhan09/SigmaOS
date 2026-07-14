@@ -93,7 +93,7 @@ impl BatteryManager for SimpleBatteryManager {
         self.batteries.push(Some(battery));
         Ok(id)
     }
-    
+
     fn unregister_battery(&mut self, id: BatteryID) -> Result<(), BatteryError> {
         for battery_option in &mut self.batteries {
             if let Some(ref battery) = *battery_option {
@@ -104,7 +104,7 @@ impl BatteryManager for SimpleBatteryManager {
         }
         Err(BatteryError::NotFound)
     }
-    
+
     fn get_battery(&self, id: BatteryID) -> Option<&dyn Battery> {
         for battery_option in &self.batteries {
             if let Some(ref battery) = *battery_option {
@@ -113,7 +113,7 @@ impl BatteryManager for SimpleBatteryManager {
         }
         None
     }
-    
+
     fn get_primary_battery(&self) -> Option<&dyn Battery> {
         let primary_id = self.primary.load(Ordering::SeqCst);
         if primary_id > 0 {
@@ -122,7 +122,7 @@ impl BatteryManager for SimpleBatteryManager {
             None
         }
     }
-    
+
     fn update_charge(&mut self, id: BatteryID, charge: u32) -> Result<(), BatteryError> {
         for battery_option in &mut self.batteries {
             if let Some(ref mut battery) = *battery_option {
@@ -161,11 +161,11 @@ impl PowerSaver for SimplePowerSaver {
     fn enable_power_saver(&mut self, enabled: bool) {
         self.enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
-    
+
     fn set_threshold(&mut self, threshold: u32) {
         self.threshold.store(threshold as usize, Ordering::SeqCst);
     }
-    
+
     fn get_threshold(&self) -> u32 { self.threshold.load(Ordering::SeqCst) as u32 }
 }
 

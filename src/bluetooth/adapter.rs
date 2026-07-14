@@ -61,7 +61,7 @@ impl BluetoothAdapter for SimpleBluetoothAdapter {
     }
     fn address(&self) -> &[u8] { &self.address }
     fn state(&self) -> BluetoothState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn set_state(&mut self, state: BluetoothState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -96,7 +96,7 @@ impl BluetoothManager for SimpleBluetoothManager {
         self.adapters.push(Some(adapter));
         Ok(id)
     }
-    
+
     fn remove_adapter(&mut self, id: DeviceID) -> Result<(), BluetoothError> {
         for adapter_option in &mut self.adapters {
             if let Some(ref adapter) = *adapter_option {
@@ -107,7 +107,7 @@ impl BluetoothManager for SimpleBluetoothManager {
         }
         Err(BluetoothError::NotFound)
     }
-    
+
     fn get_adapter(&self, id: DeviceID) -> Option<&dyn BluetoothAdapter> {
         for adapter_option in &self.adapters {
             if let Some(ref adapter) = *adapter_option {
@@ -116,7 +116,7 @@ impl BluetoothManager for SimpleBluetoothManager {
         }
         None
     }
-    
+
     fn start_scan(&mut self, id: DeviceID) -> Result<(), BluetoothError> {
         for adapter_option in &mut self.adapters {
             if let Some(ref mut adapter) = *adapter_option {
@@ -128,7 +128,7 @@ impl BluetoothManager for SimpleBluetoothManager {
         }
         Err(BluetoothError::NotFound)
     }
-    
+
     fn stop_scan(&mut self, id: DeviceID) -> Result<(), BluetoothError> {
         for adapter_option in &mut self.adapters {
             if let Some(ref mut adapter) = *adapter_option {
@@ -171,7 +171,7 @@ impl DevicePairing for SimpleDevicePairing {
         self.paired.push((adapter_id, addr_array));
         Ok(())
     }
-    
+
     fn unpair_device(&mut self, adapter_id: DeviceID, device_address: &[u8]) -> Result<(), BluetoothError> {
         for i in 0..self.paired.len() {
             if self.paired[i].0 == adapter_id && &self.paired[i].1[..device_address.len()] == device_address {
@@ -181,7 +181,7 @@ impl DevicePairing for SimpleDevicePairing {
         }
         Err(BluetoothError::NotFound)
     }
-    
+
     fn get_paired_devices(&self, adapter_id: DeviceID) -> Vec<&[u8]> {
         let mut devices = Vec::new();
         for &(id, ref addr) in &self.paired {

@@ -60,7 +60,7 @@ impl DigitalIdentity for SimpleDigitalIdentity {
         &self.did[..len]
     }
     fn identity_type(&self) -> IdentityType { unsafe { core::mem::transmute(self.identity_type.load(Ordering::SeqCst)) } }
-    
+
     fn verify(&self, _challenge: &[u8]) -> Result<bool, IdentityError> {
         Ok(true)
     }
@@ -93,7 +93,7 @@ impl IdentityManager for SimpleIdentityManager {
         self.identities.push(Some(identity));
         Ok(id)
     }
-    
+
     fn resolve_did(&self, did: &[u8]) -> Option<IdentityID> {
         for identity_option in &self.identities {
             if let Some(ref identity) = *identity_option {
@@ -104,7 +104,7 @@ impl IdentityManager for SimpleIdentityManager {
         }
         None
     }
-    
+
     fn get_identity(&self, id: IdentityID) -> Option<&dyn DigitalIdentity> {
         for identity_option in &self.identities {
             if let Some(ref identity) = *identity_option {
@@ -146,11 +146,11 @@ impl CredentialManager for SimpleCredentialManager {
         self.credentials.push((issuer_id, subject_id, credential_array));
         Ok(())
     }
-    
+
     fn verify_credential(&self, _credential: &[u8]) -> Result<bool, IdentityError> {
         Ok(true)
     }
-    
+
     fn revoke_credential(&mut self, credential_id: usize) -> Result<(), IdentityError> {
         if credential_id < self.credentials.len() {
             self.revoked.push(credential_id);
@@ -185,7 +185,7 @@ impl DecentralizedAuth for SimpleDecentralizedAuth {
             Err(IdentityError::NotFound)
         }
     }
-    
+
     fn create_proof(&self, identity_id: IdentityID, _challenge: &[u8]) -> Result<Vec<u8>, IdentityError> {
         if self.identity_manager.get_identity(identity_id).is_some() {
             let mut proof = Vec::new();

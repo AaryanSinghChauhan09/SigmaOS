@@ -41,7 +41,7 @@ impl SimpleRandomGenerator {
 
 impl RandomGenerator for SimpleRandomGenerator {
     fn id(&self) -> RNGID { self.id }
-    
+
     fn next_byte(&mut self) -> Result<u8, RNGError> {
         let counter = self.counter.fetch_add(1, Ordering::SeqCst);
         let state = self.state.load(Ordering::SeqCst);
@@ -49,7 +49,7 @@ impl RandomGenerator for SimpleRandomGenerator {
         self.state.store(state.wrapping_mul(1103515245).wrapping_add(12345), Ordering::SeqCst);
         Ok(result)
     }
-    
+
     fn next_u32(&mut self) -> Result<u32, RNGError> {
         let mut result: u32 = 0;
         for i in 0..4 {
@@ -57,7 +57,7 @@ impl RandomGenerator for SimpleRandomGenerator {
         }
         Ok(result)
     }
-    
+
     fn next_u64(&mut self) -> Result<u64, RNGError> {
         let mut result: u64 = 0;
         for i in 0..8 {
@@ -65,7 +65,7 @@ impl RandomGenerator for SimpleRandomGenerator {
         }
         Ok(result)
     }
-    
+
     fn fill_bytes(&mut self, buffer: &mut [u8]) -> Result<(), RNGError> {
         for byte in buffer.iter_mut() {
             *byte = self.next_byte()?;
@@ -102,9 +102,9 @@ impl EntropyCollector for SimpleEntropyCollector {
         }
         self.entropy_estimate.fetch_add(data.len(), Ordering::SeqCst);
     }
-    
+
     fn get_entropy_estimate(&self) -> usize { self.entropy_estimate.load(Ordering::SeqCst) }
-    
+
     fn is_ready(&self) -> bool { self.entropy_estimate.load(Ordering::SeqCst) >= 256 }
 }
 
@@ -138,12 +138,12 @@ impl CSPRNG for SimpleCSPRNG {
         self.rng.state.store(seed_value, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn generate_secure(&mut self, length: usize) -> Result<Vec<u8>, RNGError> {
         if !self.entropy.is_ready() {
             return Err(RNGError::InsufficientEntropy);
         }
-        
+
         let mut result = Vec::new();
         for _ in 0..length {
             result.push(self.rng.next_byte()?);

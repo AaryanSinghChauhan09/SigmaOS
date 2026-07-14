@@ -58,7 +58,7 @@ impl AudioDevice for SimpleAudioDevice {
     }
     fn audio_type(&self) -> AudioType { unsafe { core::mem::transmute(self.audio_type.load(Ordering::SeqCst)) } }
     fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
-    
+
     fn initialize(&mut self) -> Result<(), AudioError> {
         Ok(())
     }
@@ -92,7 +92,7 @@ impl AudioManager for SimpleAudioManager {
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn get_default_playback(&self) -> Option<&dyn AudioDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -103,7 +103,7 @@ impl AudioManager for SimpleAudioManager {
         }
         None
     }
-    
+
     fn get_default_capture(&self) -> Option<&dyn AudioDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -114,7 +114,7 @@ impl AudioManager for SimpleAudioManager {
         }
         None
     }
-    
+
     fn list_devices(&self) -> Vec<AudioDeviceID> {
         let mut ids = Vec::new();
         for device_option in &self.devices {
@@ -156,7 +156,7 @@ impl AudioMixer for SimpleAudioMixer {
         self.volumes.push((device_id, AtomicUsize::new(volume as usize), AtomicUsize::new(0)));
         Ok(())
     }
-    
+
     fn get_volume(&self, device_id: AudioDeviceID) -> u8 {
         for &(id, ref volume, _) in &self.volumes {
             if id == device_id {
@@ -165,7 +165,7 @@ impl AudioMixer for SimpleAudioMixer {
         }
         100
     }
-    
+
     fn mute(&mut self, device_id: AudioDeviceID, muted: bool) -> Result<(), AudioError> {
         for i in 0..self.volumes.len() {
             if self.volumes[i].0 == device_id {
@@ -204,11 +204,11 @@ impl AudioStream for SimpleAudioStream {
         self.streams.push((id, device_id, channels, format));
         Ok(id)
     }
-    
+
     fn write_samples(&mut self, _stream_id: usize, _samples: &[u8]) -> Result<(), AudioError> {
         Ok(())
     }
-    
+
     fn read_samples(&mut self, _stream_id: usize, _buffer: &mut [u8]) -> Result<usize, AudioError> {
         Ok(0)
     }

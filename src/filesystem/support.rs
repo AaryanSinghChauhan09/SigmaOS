@@ -49,7 +49,7 @@ impl SimpleFilesystem {
 impl Filesystem for SimpleFilesystem {
     fn id(&self) -> FilesystemID { self.id }
     fn fs_type(&self) -> FilesystemType { unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst)) } }
-    
+
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
         let len = mountpoint.len().min(255);
         for i in 0..len {
@@ -58,7 +58,7 @@ impl Filesystem for SimpleFilesystem {
         self.mounted.store(1, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn unmount(&mut self) -> Result<(), FilesystemError> {
         self.mounted.store(0, Ordering::SeqCst);
         for i in 0..256 {
@@ -66,7 +66,7 @@ impl Filesystem for SimpleFilesystem {
         }
         Ok(())
     }
-    
+
     fn create_snapshot(&mut self, _name: &[u8]) -> Result<(), FilesystemError> {
         let fs_type = self.fs_type();
         match fs_type {
@@ -74,7 +74,7 @@ impl Filesystem for SimpleFilesystem {
             FilesystemType::Btrfs | FilesystemType::ZFS => Ok(()),
         }
     }
-    
+
     fn rollback(&mut self, _snapshot: &[u8]) -> Result<(), FilesystemError> {
         let fs_type = self.fs_type();
         match fs_type {
@@ -115,7 +115,7 @@ impl BtrfsFeatures for SimpleBtrfsFS {
         self.subvolumes.push(path_array);
         Ok(())
     }
-    
+
     fn delete_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
         for i in 0..self.subvolumes.len() {
             let subvol = &self.subvolumes[i];
@@ -127,7 +127,7 @@ impl BtrfsFeatures for SimpleBtrfsFS {
         }
         Err(FilesystemError::InvalidFS)
     }
-    
+
     fn list_subvolumes(&self) -> Vec<[u8; 256]> {
         self.subvolumes.clone()
     }
@@ -166,7 +166,7 @@ impl ZFSFeatures for SimpleZFS {
         self.datasets.push(path_array);
         Ok(())
     }
-    
+
     fn create_snapshot(&mut self, dataset: &[u8], snapshot: &[u8]) -> Result<(), FilesystemError> {
         let mut snap_path = [0u8; 256];
         let dataset_len = dataset.len().min(200);
@@ -181,7 +181,7 @@ impl ZFSFeatures for SimpleZFS {
         self.snapshots.push(snap_path);
         Ok(())
     }
-    
+
     fn rollback_snapshot(&mut self, snapshot: &[u8]) -> Result<(), FilesystemError> {
         for i in 0..self.snapshots.len() {
             let snap = &self.snapshots[i];
@@ -221,7 +221,7 @@ impl FilesystemManager for SimpleFilesystemManager {
         self.filesystems.push(Some(fs));
         Ok(id)
     }
-    
+
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
         for fs_option in &self.filesystems {
             if let Some(ref fs) = *fs_option {
@@ -230,7 +230,7 @@ impl FilesystemManager for SimpleFilesystemManager {
         }
         None
     }
-    
+
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
         for fs_option in &self.filesystems {

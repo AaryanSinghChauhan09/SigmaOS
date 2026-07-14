@@ -54,7 +54,7 @@ impl Smartcard for SimpleSmartcard {
         &self.atr[..len]
     }
     fn state(&self) -> CardState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn set_state(&mut self, state: CardState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -89,7 +89,7 @@ impl SmartcardReader for SimpleSmartcardReader {
         self.cards.push(Some(Box::new(card)));
         Ok(id)
     }
-    
+
     fn read_apdu(&self, card_id: CardID, _apdu: &[u8]) -> Result<Vec<u8>, CardError> {
         for card_option in &self.cards {
             if let Some(ref card) = *card_option {
@@ -103,7 +103,7 @@ impl SmartcardReader for SimpleSmartcardReader {
         }
         Err(CardError::NotFound)
     }
-    
+
     fn write_apdu(&self, card_id: CardID, _apdu: &[u8]) -> Result<(), CardError> {
         for card_option in &self.cards {
             if let Some(ref card) *card_option {
@@ -139,12 +139,12 @@ impl PKCS11 for SimplePKCS11 {
     fn initialize(&mut self) -> Result<(), CardError> {
         Ok(())
     }
-    
+
     fn login(&mut self, _pin: &[u8]) -> Result<(), CardError> {
         self.logged_in.store(1, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn logout(&mut self) -> Result<(), CardError> {
         self.logged_in.store(0, Ordering::SeqCst);
         Ok(())

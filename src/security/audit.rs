@@ -91,7 +91,7 @@ impl AuditLogger for SimpleAuditLogger {
         self.events.push(Some(event));
         Ok(id)
     }
-    
+
     fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
         for event_option in &self.events {
             if let Some(ref event) = *event_option {
@@ -100,7 +100,7 @@ impl AuditLogger for SimpleAuditLogger {
         }
         None
     }
-    
+
     fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
         let mut ids = Vec::new();
         for event_option in &self.events {
@@ -112,7 +112,7 @@ impl AuditLogger for SimpleAuditLogger {
         }
         ids
     }
-    
+
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
         let mut i = 0;
         while i < self.events.len() {
@@ -156,7 +156,7 @@ impl AuditPolicy for SimpleAuditPolicy {
             Ok(true)
         }
     }
-    
+
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
         if self.check_compliance(event).unwrap_or(false) {
             Ok(())

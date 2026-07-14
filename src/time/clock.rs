@@ -41,12 +41,12 @@ impl SimpleSystemClock {
 
 impl SystemClock for SimpleSystemClock {
     fn get_timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
-    
+
     fn get_nanoseconds(&self) -> u64 {
         let base = self.timestamp.load(Ordering::SeqCst) as u64;
         base * 1_000_000_000
     }
-    
+
     fn set_time(&mut self, timestamp: u64) -> Result<(), TimerError> {
         self.timestamp.store(timestamp as usize, Ordering::SeqCst);
         Ok(())
@@ -82,12 +82,12 @@ impl SimpleTimer {
 
 impl Timer for SimpleTimer {
     fn id(&self) -> TimerID { self.id }
-    
+
     fn is_expired(&self) -> bool {
         let current = 1000000usize;
         current >= self.expiry.load(Ordering::SeqCst)
     }
-    
+
     fn remaining_ms(&self) -> u64 {
         let current = 1000000usize;
         let expiry = self.expiry.load(Ordering::SeqCst);
@@ -97,7 +97,7 @@ impl Timer for SimpleTimer {
             (expiry - current) as u64
         }
     }
-    
+
     fn reset(&mut self) {
         let current = 1000000usize;
         let duration = self.duration.load(Ordering::SeqCst);
@@ -135,7 +135,7 @@ impl TimerManager for SimpleTimerManager {
         self.timers.push(Some(Box::new(timer)));
         Ok(id)
     }
-    
+
     fn cancel_timer(&mut self, id: TimerID) -> Result<(), TimerError> {
         for timer_option in &mut self.timers {
             if let Some(ref timer) = *timer_option {
@@ -146,7 +146,7 @@ impl TimerManager for SimpleTimerManager {
         }
         Err(TimerError::NotFound)
     }
-    
+
     fn get_expired_timers(&self) -> Vec<TimerID> {
         let mut expired = Vec::new();
         for timer_option in &self.timers {
@@ -158,7 +158,7 @@ impl TimerManager for SimpleTimerManager {
         }
         expired
     }
-    
+
     fn get_timer(&self, id: TimerID) -> Option<&dyn Timer> {
         for timer_option in &self.timers {
             if let Some(ref timer) = *timer_option {
@@ -196,7 +196,7 @@ impl Alarm for SimpleAlarm {
         self.alarms.push((id, timestamp, callback));
         Ok(id)
     }
-    
+
     fn cancel_alarm(&mut self, id: TimerID) -> Result<(), TimerError> {
         for i in 0..self.alarms.len() {
             if self.alarms[i].0 == id {
@@ -206,11 +206,11 @@ impl Alarm for SimpleAlarm {
         }
         Err(TimerError::NotFound)
     }
-    
+
     fn check_alarms(&mut self) -> Vec<fn()> {
         let mut triggered = Vec::new();
         let current = 1000000u64;
-        
+
         let mut i = 0;
         while i < self.alarms.len() {
             if self.alarms[i].1 <= current {
@@ -220,7 +220,7 @@ impl Alarm for SimpleAlarm {
                 i += 1;
             }
         }
-        
+
         triggered
     }
 }

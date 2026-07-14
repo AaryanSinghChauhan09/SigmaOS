@@ -83,7 +83,7 @@ impl SocketManager for SimpleSocketManager {
         self.sockets.push(Some(Box::new(socket)));
         Ok(id)
     }
-    
+
     fn close_socket(&mut self, id: SocketID) -> Result<(), SocketError> {
         for socket_option in &mut self.sockets {
             if let Some(ref socket) = *socket_option {
@@ -94,7 +94,7 @@ impl SocketManager for SimpleSocketManager {
         }
         Err(SocketError::NotFound)
     }
-    
+
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
             if let Some(ref socket) = *socket_option {
@@ -103,7 +103,7 @@ impl SocketManager for SimpleSocketManager {
         }
         None
     }
-    
+
     fn bind(&mut self, id: SocketID, _address: &[u8], _port: u16) -> Result<(), SocketError> {
         for socket_option in &mut self.sockets {
             if let Some(ref mut socket) = *socket_option {
@@ -115,7 +115,7 @@ impl SocketManager for SimpleSocketManager {
         }
         Err(SocketError::NotFound)
     }
-    
+
     fn connect(&mut self, id: SocketID, _address: &[u8], _port: u16) -> Result<(), SocketError> {
         for socket_option in &mut self.sockets {
             if let Some(ref mut socket) = *socket_option {
@@ -127,7 +127,7 @@ impl SocketManager for SimpleSocketManager {
         }
         Err(SocketError::NotFound)
     }
-    
+
     fn send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError> {
         if self.get_socket(id).is_some() {
             Ok(data.len())
@@ -135,7 +135,7 @@ impl SocketManager for SimpleSocketManager {
             Err(SocketError::NotFound)
         }
     }
-    
+
     fn receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError> {
         if self.get_socket(id).is_some() {
             for byte in buffer.iter_mut() {
@@ -168,7 +168,7 @@ impl SocketListener for SimpleSocketListener {
     fn listen(&mut self, _id: SocketID, _backlog: u32) -> Result<(), SocketError> {
         Ok(())
     }
-    
+
     fn accept(&mut self, _id: SocketID) -> Result<SocketID, SocketError> {
         let new_id = self.manager.next_id.fetch_add(1, Ordering::SeqCst);
         let socket = SimpleSocket::new(new_id, SocketType::Stream);

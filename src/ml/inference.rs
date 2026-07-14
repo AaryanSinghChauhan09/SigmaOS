@@ -56,15 +56,15 @@ impl MLModel for SimpleMLModel {
     fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) } }
     fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
     fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
-    
+
     fn infer(&self, input: &[f32]) -> Result<Vec<f32>, MLError> {
         let input_size = self.input_size();
         let output_size = self.output_size();
-        
+
         if input.len() != input_size {
             return Err(MLError::InvalidInput);
         }
-        
+
         let mut output = Vec::new();
         for i in 0..output_size {
             let mut sum: f32 = 0.0;
@@ -73,7 +73,7 @@ impl MLModel for SimpleMLModel {
             }
             output.push(sum.tanh());
         }
-        
+
         Ok(output)
     }
 }
@@ -106,7 +106,7 @@ impl InferenceEngine for SimpleInferenceEngine {
         self.models.push(Some(model));
         Ok(id)
     }
-    
+
     fn unload_model(&mut self, id: ModelID) -> Result<(), MLError> {
         for model_option in &mut self.models {
             if let Some(ref model) = *model_option {
@@ -117,7 +117,7 @@ impl InferenceEngine for SimpleInferenceEngine {
         }
         Err(MLError::ModelNotFound)
     }
-    
+
     fn get_model(&self, id: ModelID) -> Option<&dyn MLModel> {
         for model_option in &self.models {
             if let Some(ref model) = *model_option {
@@ -126,7 +126,7 @@ impl InferenceEngine for SimpleInferenceEngine {
         }
         None
     }
-    
+
     fn run_inference(&self, model_id: ModelID, input: &[f32]) -> Result<Vec<f32>, MLError> {
         if let Some(model) = self.get_model(model_id) {
             model.infer(input)
@@ -168,17 +168,17 @@ impl SimpleTensor {
 impl Tensor for SimpleTensor {
     fn shape(&self) -> &[usize] { &self.shape }
     fn data(&self) -> &[f32] { &self.data }
-    
+
     fn reshape(&mut self, new_shape: &[usize]) -> Result<(), MLError> {
         let mut new_size = 1;
         for &dim in new_shape {
             new_size *= dim;
         }
-        
+
         if new_size != self.data.len() {
             return Err(MLError::InvalidInput);
         }
-        
+
         self.shape = new_shape.to_vec();
         Ok(())
     }

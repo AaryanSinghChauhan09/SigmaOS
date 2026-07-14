@@ -100,7 +100,7 @@ impl ConfigLoader for SimpleConfigLoader {
         self.configs.push(Some(config));
         Ok(id)
     }
-    
+
     fn get_config(&self, key: &[u8]) -> Option<&dyn ConfigValue> {
         for config_option in &self.configs {
             if let Some(ref config) = *config_option {
@@ -109,7 +109,7 @@ impl ConfigLoader for SimpleConfigLoader {
         }
         None
     }
-    
+
     fn set_config(&mut self, key: &[u8], value: &[u8]) -> Result<(), ConfigError> {
         for config_option in &mut self.configs {
             if let Some(ref mut config) = *config_option {
@@ -120,7 +120,7 @@ impl ConfigLoader for SimpleConfigLoader {
         }
         Err(ConfigError::NotFound)
     }
-    
+
     fn save_config(&self) -> Result<(), ConfigError> {
         Ok(())
     }
@@ -154,7 +154,7 @@ impl ConfigWatcher for SimpleConfigWatcher {
         }
         self.watchers.push((key_array, callback));
     }
-    
+
     fn unwatch_key(&mut self, key: &[u8]) {
         for i in 0..self.watchers.len() {
             let len = self.watchers[i].0.iter().position(|&b| b == 0).unwrap_or(128);
@@ -164,7 +164,7 @@ impl ConfigWatcher for SimpleConfigWatcher {
             }
         }
     }
-    
+
     fn notify_change(&mut self, key: &[u8]) {
         for &(ref k, callback) in &self.watchers {
             let len = k.iter().position(|&b| b == 0).unwrap_or(128);

@@ -58,7 +58,7 @@ impl BootStage for SimpleBootStage {
     fn stage_type(&self) -> BootStage { unsafe { core::mem::transmute(self.stage_type.load(Ordering::SeqCst)) } }
     fn hash(&self) -> &Self::hash { &self.hash }
     fn signature(&self) -> &Self::signature { &self.signature }
-    
+
     fn verify(&self, _public_key: &[u8]) -> Result<bool, BootError> {
         Ok(true)
     }
@@ -90,7 +90,7 @@ impl BootChain for SimpleBootChain {
         self.stages.push(Some(stage));
         Ok(())
     }
-    
+
     fn verify_chain(&self, public_key: &[u8]) -> Result<bool, BootError> {
         for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
@@ -101,7 +101,7 @@ impl BootChain for SimpleBootChain {
         }
         Ok(true)
     }
-    
+
     fn get_stage(&self, id: BootStageID) -> Option<&dyn BootStage> {
         for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
@@ -139,14 +139,14 @@ impl SecureBoot for SimpleSecureBoot {
         self.enabled.store(1, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn disable(&mut self) -> Result<(), BootError> {
         self.enabled.store(0, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn is_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
-    
+
     fn set_enforcement_mode(&mut self, strict: bool) {
         self.strict_mode.store(if strict { 1 } else { 0 }, Ordering::SeqCst);
     }
@@ -182,7 +182,7 @@ impl KeyEnrollment for SimpleKeyEnrollment {
         self.keys.push((key_array, type_array));
         Ok(())
     }
-    
+
     fn revoke_key(&mut self, key_id: usize) -> Result<(), BootError> {
         if key_id < self.keys.len() {
             self.keys.remove(key_id);
@@ -191,7 +191,7 @@ impl KeyEnrollment for SimpleKeyEnrollment {
             Err(BootError::StageFailed)
         }
     }
-    
+
     fn list_keys(&self) -> Vec<(usize, [u8; 32])> {
         let mut result = Vec::new();
         for (i, (_, ref key_type)) in self.keys.iter().enumerate() {
@@ -230,7 +230,7 @@ impl BootMeasurement for SimpleBootMeasurement {
         }
         Ok(measurement)
     }
-    
+
     fn extend_pcr(&mut self, pcr_index: usize, measurement: &[u8]) -> Result<(), BootError> {
         if pcr_index < self.pcrs.len() {
             for i in 0..64.min(measurement.len()) {
@@ -241,7 +241,7 @@ impl BootMeasurement for SimpleBootMeasurement {
             Err(BootError::StageFailed)
         }
     }
-    
+
     fn get_pcr(&self, pcr_index: usize) -> Option<&[u8]> {
         if pcr_index < self.pcrs.len() {
             Some(&self.pcrs[pcr_index])

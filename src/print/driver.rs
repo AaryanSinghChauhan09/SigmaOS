@@ -55,7 +55,7 @@ impl Printer for SimplePrinter {
         &self.name[..len]
     }
     fn state(&self) -> PrinterState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    
+
     fn set_state(&mut self, state: PrinterState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -139,7 +139,7 @@ impl PrintManager for SimplePrintManager {
         self.printers.push(Some(printer));
         Ok(id)
     }
-    
+
     fn remove_printer(&mut self, id: PrinterID) -> Result<(), PrintError> {
         for printer_option in &mut self.printers {
             if let Some(ref printer) = *printer_option {
@@ -150,14 +150,14 @@ impl PrintManager for SimplePrintManager {
         }
         Err(PrintError::NotFound)
     }
-    
+
     fn submit_job(&mut self, printer_id: PrinterID, document: &[u8], pages: u32) -> Result<JobID, PrintError> {
         let id = self.next_job_id.fetch_add(1, Ordering::SeqCst);
         let job = SimplePrintJob::new(id, printer_id, document, pages);
         self.jobs.push(Some(Box::new(job)));
         Ok(id)
     }
-    
+
     fn cancel_job(&mut self, job_id: JobID) -> Result<(), PrintError> {
         for job_option in &mut self.jobs {
             if let Some(ref job) = *job_option {
@@ -168,7 +168,7 @@ impl PrintManager for SimplePrintManager {
         }
         Err(PrintError::NotFound)
     }
-    
+
     fn get_job_status(&self, job_id: JobID) -> Option<&dyn PrintJob> {
         for job_option in &self.jobs {
             if let Some(ref job) = *job_option {
