@@ -1,85 +1,97 @@
-# SigmaOS
+# SigmaOS Wiki — Home
 
-**SigmaOS** is a sovereign, zero-allocation, `no_std` operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
+Welcome to the official SigmaOS knowledge base.
 
-## Core Capabilities
+**SigmaOS** is a sovereign, zero-dependency, AI-native operating system built in Rust with capability-based security, post-quantum cryptography, and Indian industrial compliance at its core.
 
-SigmaOS has undergone a massive architectural upgrade to include modern Computer Science and Data Science paradigms natively.
+> **"Sovereignty is the ultimate efficiency."**
 
-### 1. Sovereign Kernel (`no_std`)
+---
 
-- **Capability Tokens**: A 64-bit hardware-enforced permission model (bypassing legacy ACLs).
+## 🚀 Quick Links
 
-- **Zero-Copy IPC**: SPSC ring-buffers for inter-shard communication.
+| | | |
+|---|---|---|
+| [🏗️ Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview) | [📦 Package Manager](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Package-Management-Spec) | [🔒 Security Model](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security) |
+| [🖥️ Zenith Desktop](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Zenith-Desktop) | [🤖 AI Subsystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/AI_Agent) | [🗺️ Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap) |
+| [📖 Getting Started](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Getting-Started) | [🤝 Contributing](Contributing.md) | [❓ FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ) |
 
-- **SigmaFS & VFS**: Copy-on-Write (CoW) filesystem with deterministic extent mapping.
+---
 
-- **Self-Healing Watchdogs**: Autonomous fault detection and exponential backoff restart policies.
+## 📚 Documentation Sections
 
-### 2. Artificial Intelligence & Data Science
+### 🏛️ Architecture
 
-- **Local LLM Backend**: An embedded AI Task Orchestrator that natively routes prioritized prompts (Background, Interactive, Critical) without requiring external userland wrappers.
+- [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview)
+- [Kernel Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel-Architecture)
+- [Shard System (CORE_SHARDS)](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CORE_SHARDS)
+- [Microkernel Design](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Microkernel-Core)
+- [IPC & Messaging](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/IPC)
 
-- **Embedded ML**: Zero-allocation K-Means Clustering and FFT algorithms baked into the OS telemetry layer for autonomous system optimization.
+### 🔒 Security
 
-### 3. Cyber Security & Isolation
+- [Security Model](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security)
+- [Post-Quantum Cryptography](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Post-Quantum-Cryptography)
+- [Mandatory Access Control](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Mandatory-Access-Control)
+- [Bug Bounty Program](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BUG_BOUNTY)
 
-- **Security Center Daemon**: Actively monitors the immutable, BLAKE3-linked kernel audit logs. Applies temporal decay heuristics to identify threats (e.g., sandbox escape attempts) and kills malicious shards autonomously.
+### 📦 Package Ecosystem
 
-- **Sovereign Sandboxes**: Strict CPU, Memory, and Network limits applied via CLI to untrusted code.
+- [sigma-pkg Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Package-Management-Spec)
+- [Package Registry](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Package-Registry)
+- [Shard Distribution Formats](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FORMATS)
 
-### 4. Zenith Desktop (UI/UX)
+### 🖥️ Desktop & UX
 
-- **Object-Oriented UI**: A Trait-based Widget framework operating entirely without heap allocations.
+- [Zenith Desktop](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Zenith-Desktop)
+- [Desktop UX Guidelines](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Desktop-UX)
+- [Wayland Integration](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/OSS_Absorption_Wayland)
 
-- **BSP Window Manager**: Binary Space Partitioning tiling engine.
+### 🤖 AI & Machine Learning
 
-- **Glassmorphism Profiles**: Declarative UI parsing via `~/.sigma_profile` supporting dynamic theming.
+- [AI Agent System](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/AI_Agent)
+- [AI Scheduler Autotune](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/AI_SchedulerNet_Autotune)
+- [Local LLM Inference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/AI_SovereignGGML_Inference)
 
-## System Architecture
+### 🌐 Networking
 
-```mermaid
-graph TD
-    subgraph Userland (Zenith Desktop)
-        UI[Zenith Compositor & Shell]
-        Logic[Sigma Logic Automation]
-        AI[Local LLM Context Mgr]
-    end
+- [Networking Stack](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Networking-Stack)
+- [Cloud Native](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CLOUD_NATIVE)
+- [Edge Computing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Edge-Computing)
 
-    subgraph Daemons
-        SEC[Security Center]
-        MONITOR[Observability Telemetry]
-        STORE[Sigma DB Key-Value]
-    end
+### 🛠️ Developer
 
-    subgraph Kernel (no_std)
-        IPC[SPSC Ring Buffer IPC]
-        CAP[Capability Token Auth]
-        VFS[Virtual File System]
-        MEM[Bitmap Page Allocator]
-    end
+- [Getting Started](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Getting-Started)
+- [Building from Source](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Building-from-Source)
+- [Developer SDK](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer_SDK)
+- [Contributing](Contributing.md)
+- [Coding Standards](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Coding-Standards)
 
-    UI <--> IPC
-    Logic <--> IPC
-    AI <--> IPC
-    SEC <--> CAP
-    MONITOR <--> MEM
-    IPC <--> CAP
-```
+### 🗺️ Roadmaps
 
-## Getting Started
+- [Master Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Roadmap)
+- [100-Item Backlog](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/100_Item_Roadmap)
+- [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Competitive-Analysis)
+- [Linux Distro Absorption](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Linux-Distro-Absorption-Roadmap)
 
-See [Installation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Installation) for build instructions using the new `Justfile` toolchain.
+---
 
-## Documentation
+## 🏆 Project Stats
 
-Comprehensive documentation is available in the [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki):
+- **Language**: Rust (primary), Nim, Zig, C (shards)
+- **Architecture**: Capability-based microkernel
+- **Cryptography**: Kyber-1024 KEM + Dilithium-5 signatures (NIST PQC)
+- **Targets**: x86_64, ARM64, RISC-V, WebAssembly
+- **License**: MIT + GPL-2.0 (dual)
 
-- [Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture) - System architecture and design
-- [Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap) - Development roadmap and milestones
-- [Installation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Installation) - Build and installation guide
-- [Quickstart](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quickstart) - Quick start guide
-- [Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing) - Contribution guidelines
-- [Security](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security) - Security policy and reporting
-- [Testing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Testing) - Testing framework and tools
-- [Developer Tools](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Tools) - Development tools and IDE integration
+---
+
+## 📞 Community
+
+- **GitHub**: [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
+- **Issues**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+- **Security**: security@sigmaos.dev
+
+---
+
+*This wiki is maintained by the SigmaOS contributors. See [Contributing](Contributing.md) to help improve it.*

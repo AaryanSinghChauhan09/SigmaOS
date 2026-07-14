@@ -1,6 +1,6 @@
 # DRIVER ECOSYSTEM
 
-SigmaOS ships hardware drivers as sovereign kernel shards — zero binary blobs,
+SigmaOS ships hardware drivers as sovereign kernel shards ΓÇö zero binary blobs,
 zero kernel-update breakage.
 
 ## Network Interface Controller (NIC)
@@ -40,15 +40,9 @@ transpiler.generate_driver_stub()?;
 ## Roadmap
 
 - [x] VirtIO-Net DMA ring buffer driver
-
 - [x] RTL8139 BMCR driver
-
 - [x] 802.11 WPA3 stub
-
 - [ ] NVIDIA GPU open-firmware driver
-
 - [ ] AMD AMDGPU driver
-
 - [ ] Intel i915 open-spec driver
-
 - [ ] Formal DDK verification harness
