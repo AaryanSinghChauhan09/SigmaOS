@@ -273,8 +273,24 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 4. **WIKI Documentation Expansion**:
    - Added `WIKI/OSS_Absorption_Systemd.md` and `WIKI/OSS_Absorption_NetworkManager.md`.
 
-## ➡️ Next Recommended Steps (Batch 13)
+## 🛠️ Batch 13 & UI/IPC Absorption Implemented
 
-- Merge UI elements and complete Zenith Compositor rendering (`sigma_compositor` + `userland/ui`).
-- Solidify `sigma_app` with native DBus-equivalent IPC (`sigma_ipc`) for application messaging.
-- Package the entire OS into an initial bootable virtual prototype (QEMU target).
+1. **Wayland/X11 Absorption (`sigma_compositor`)**:
+   - Completed `ZenithCompositor` architecture natively combining Window Manager and Display Server.
+   - Added `InputRouter` for secure, direct hardware event routing (preventing X11-style keyloggers).
+   - Added `DamageTracker` and `RenderBackend` stubs for high-performance localized screen redraws.
+
+2. **DBus Absorption (`sigma_ipc`)**:
+   - Created `sigma_ipc` crate for native typed peer-to-peer IPC.
+   - Implemented `IpcEngine` mapping capabilities, removing the need for a centralized `dbus-daemon` broker bottleneck.
+   - Designed strictly-typed `Message` and `Payload` variants, avoiding XML parsing overhead.
+
+3. **WIKI Documentation Expansion**:
+   - Added `WIKI/OSS_Absorption_Wayland.md`.
+   - Added `WIKI/OSS_Absorption_DBus.md`.
+
+## ➡️ Next Recommended Steps (Batch 14)
+
+- **QEMU Bootable Target (`sigma_boot`)**: Package the Kernel, `sigma_init`, `sigma_compositor`, and other daemons into a single bootable `initramfs` or RAW disk image for virtualization.
+- **Hardware Abstraction Layer (`sigma_hal`)**: Absorb `udev` concepts to natively manage dynamic device nodes and permissions in `/dev`.
+- **Audio Subsystem (`sigma_audio`)**: Absorb `PipeWire`/`PulseAudio` into a low-latency native audio router.
