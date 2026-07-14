@@ -324,8 +324,28 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 4. **WIKI Documentation Expansion**:
    - Migrated fully implemented absorption specs to WIKI: `OSS_Absorption_Flatpak.md`, `OSS_Absorption_Fuchsia.md`, `OSS_Absorption_SerenityOS.md`, `OSS_Absorption_i3.md`, `OSS_Absorption_ext4.md`.
 
-## ➡️ Next Recommended Steps (Batch 16)
+## 🛠️ Batch 16 & System Integration & UI Polish
 
-- **Service Integration Test**: Write a top-level integration test that actually spins up `sigma_boot`'s initramfs in QEMU and boots `sigma_init`.
-- **Desktop UI Polish**: Absorb ideas from modern Linux DEs (GNOME, KDE Plasma) into the `SigmaDesktop` module (Panel, Dash, Notification Center).
-- **Filesystem Tools (`sigma_fs_tools`)**: Create utilities for formatting and checking the `SigmaFS` volume (similar to `mkfs.ext4` and `fsck`).
+1. **System Integration (`sigma_boot` Tests)**:
+   - Built top-level integration tests (`tests/integration_test.rs`) that verify the `InitramfsBuilder` can successfully construct a QEMU-bootable initial RAM filesystem.
+
+2. **Desktop UI Polish (`sigma_desktop`)**:
+   - Created the native UI daemon to interact with `sigma_compositor`.
+   - Built struct scaffolding for the `Panel`, `Dash`, and `NotificationCenter`.
+
+3. **Filesystem Tools (`sigma_fs_tools`)**:
+   - Created the native CLI tool for `SigmaFS` administration.
+   - Built stubs for `mkfs` (superblock initialization) and `fsck` (B-Tree inode verification).
+
+4. **Roadmap & Journal Progress**:
+   - Updated `.kiro/specs/sigmaos-roadmap/tasks.md` to check off Phase 1 Shell Polish tasks.
+   - Added learning entries to `.Jules/palette.md` (UX alignment consistency) and `.Jules/sentinel.md` (Desktop launcher capability sandboxing).
+
+5. **WIKI Documentation Expansion**:
+   - Migrated fully implemented Window Manager absorption specs to WIKI: `OSS_Absorption_bspwm.md`, `OSS_Absorption_xmonad.md`.
+
+## ➡️ Next Recommended Steps (Batch 17)
+
+- **AI Inference Engine (`sigma_ai`)**: Build the on-device AI backend to power the Neural UI concepts.
+- **Cross-Compilation Toolchain (`sigma_toolchain`)**: Establish the build scripts to cross-compile SigmaOS components into a final ISO image.
+- **Final E2E Boot**: Run the entire system inside QEMU and execute a `sigma_app` using the `sigma_desktop` Dash.

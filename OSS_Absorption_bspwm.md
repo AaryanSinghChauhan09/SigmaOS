@@ -2,8 +2,8 @@
 
 ## Making baskerville/bspwm Irrelevant
 
-> **Absorption Target**: https://github.com/baskerville/bspwm
-> **Status**: ✅ Complete Feature Absorption
+> **Absorption Target**: https://github.com/baskerville/bspwm  
+> **Status**: ✅ Complete Feature Absorption  
 > **SigmaOS Equivalent**: SigmaWM - Native Window Manager with BSP Tiling
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed bspwm by implementing a native binary space p
 
 ### 1. Binary Space Partitioning
 
-**Original**: bspwm's BSP tiling algorithm
+**Original**: bspwm's BSP tiling algorithm  
 **SigmaOS**: Native BSP with enhanced algorithms
 
 ```rust
@@ -39,9 +39,10 @@ pub struct SigmaWM {
 - Native floating window support
 - Layout presets with automatic application
 
+
 ### 2. Configuration System
 
-**Original**: bspwm's configuration (bspwmrc)
+**Original**: bspwm's configuration (bspwmrc)  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -53,9 +54,10 @@ pub struct SigmaWM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
+
 ### 3. Workspace Management
 
-**Original**: bspwm's desktop system
+**Original**: bspwm's desktop system  
 **SigmaOS**: Native workspace with enhanced features
 
 **Workspace Features**:
@@ -67,9 +69,10 @@ pub struct SigmaWM {
 - Workspace profiles with import/export
 - Workspace synchronization across devices
 
+
 ### 4. Keybinding System
 
-**Original**: bspwm's sxhkd integration
+**Original**: bspwm's sxhkd integration  
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
@@ -81,9 +84,10 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
+
 ### 5. Bar System
 
-**Original**: bspwm's lemonbar integration
+**Original**: bspwm's lemonbar integration  
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
@@ -95,9 +99,10 @@ pub struct SigmaWM {
 - Bar profiles with automatic switching
 - Bar integration with system notifications
 
+
 ### 6. IPC Interface
 
-**Original**: bspwm's bspc command
+**Original**: bspwm's bspc command  
 **SigmaOS**: Native IPC with enhanced features
 
 **IPC Features**:
@@ -108,6 +113,7 @@ pub struct SigmaWM {
 - IPC authentication with capability-based access
 - IPC versioning with backward compatibility
 - IPC monitoring with native metrics
+
 
 ---
 
@@ -134,13 +140,13 @@ pub struct SigmaWM {
 pub mod bsp {
     use sigma_wm::bsp::BSPEngine;
     use sigma_wm::tree::TreeManager;
-
+    
     pub struct SigmaWM {
         bsp_engine: BSPEngine,
         tree_manager: TreeManager,
         workspace_manager: WorkspaceManager,
     }
-
+    
     impl SigmaWM {
         pub fn tile_bsp(&self, windows: Vec<Window>) -> BSPTree {
             // Native BSP tiling
@@ -148,7 +154,7 @@ pub mod bsp {
             let balanced = self.tree_manager.balance(tree);
             BSPTree::optimized(balanced)
         }
-
+        
         pub fn manage_workspaces(&self) {
             // Native workspace management
             self.workspace_manager.start();
@@ -166,7 +172,7 @@ pub mod ipc {
         command_handler: CommandHandler,
         event_dispatcher: EventDispatcher,
     }
-
+    
     impl IPCInterface {
         pub fn handle_command(&self, command: Command) -> CommandResult {
             // Native command handling
