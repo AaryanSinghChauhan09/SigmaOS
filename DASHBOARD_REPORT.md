@@ -16,6 +16,9 @@ This report documents the completion of **Batch 1** in the massive repository mi
 3. **SigmaSecurity (Capability-Based Native Security)**:
    - Validated and merged `sigma_security` module residing in `userland/sigma_security/`.
    - Implemented `CapabilityManager`, `ProfileSystem`, `PolicyEngine`, and `EnforcementEngine` to effectively replace AppArmor and Bubblewrap. All unit tests successfully compiled and passed.
+4. **SigmaContainers (Container & MicroVM Runtime)**:
+   - Validated and merged `sigma_containers` module in `userland/sigma_containers/`.
+   - Implemented `ContainerRuntime`, `ImageManager`, `NetworkManager`, `VolumeManager`, and `MicroVMEngine` to effectively replace Docker, Podman, LXC, and Firecracker.
 
 ## 📁 .md Files Migrated and Removed
 
@@ -28,6 +31,13 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 5. `OSS_Absorption_AppArmor.md` (Batch 2)
 6. `OSS_Absorption_Bubblewrap.md` (Batch 2)
 7. `OSS_Absorption_Firejail.md` (Batch 2)
+8. `OSS_Absorption_Docker.md` (Batch 3)
+9. `OSS_Absorption_Podman.md` (Batch 3)
+10. `OSS_Absorption_containerd.md` (Batch 3)
+11. `OSS_Absorption_runc.md` (Batch 3)
+12. `OSS_Absorption_LXC.md` (Batch 3)
+13. `OSS_Absorption_QEMU.md` (Batch 3)
+14. `OSS_Absorption_Firecracker.md` (Batch 3)
 
 ## 🔀 Branches Merged and Removed
 
@@ -46,8 +56,7 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
 2. **Merge Conflicts**: `DEFEATING_LINUX_DISTROS_BLUEPRINT.md` had competing versions of formatting. **Fix**: Python-based conflict resolution script authored to select the updated stylistic branch automatically.
 3. **Workspace Misalignment**: Legacy `sigmapkg` folder remained outside of the cargo workspace hierarchy. **Fix**: Identified active Rust codebase as `userland/sigpkg` and executed tests correctly from root context.
 
-## ➡️ Next Recommended Steps (Batch 3)
+## ➡️ Next Recommended Steps (Batch 4)
 
-- Implement core process isolation logic for Container engines (`absorption/OSS_Absorption_Docker.md`, `Podman.md`, `runc.md`).
-- Scaffold `userland/sigma_containers` and integrate lightweight micro-VM wrappers replacing Firecracker / QEMU.
-- Finalize the system daemon mapping (`systemd` equivalent).
+- Target Desktop Environment and Wayland absorption (`OSS_Absorption_GNOME.md`, `KDE_Plasma.md`, `Wayland.md`, `X11.md`).
+- Implement the UI/UX Compositor stubs in `userland/ui/design_system`.
