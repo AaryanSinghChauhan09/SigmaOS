@@ -10,4 +10,4 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 path = "mod.rs"
 
 [dependencies]
-# Zero external dependencies - all serialization implemented manually
+serde_json = "1.0"

@@ -3,12 +3,14 @@
 
 mod colors;
 mod components;
+mod layout;
 mod spacing;
 mod tokens;
 mod typography;
 
 pub use colors::{ColorPalette, ThemeColors};
 pub use components::{Button, Card, Input, Modal};
+pub use layout::{Flex, FlexAlign, FlexDirection, FlexJustify, Grid, TilingNode};
 pub use spacing::SpacingScale;
 pub use tokens::DesignTokens;
 pub use typography::{FontScale, FontWeight, TypographySystem};

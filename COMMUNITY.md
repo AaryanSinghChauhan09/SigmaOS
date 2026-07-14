@@ -15,12 +15,14 @@ Join the SigmaOS community through various channels:
 - **Mailing List**: Subscribe to the development mailing list
 - **Twitter**: Follow @SigmaOS for announcements
 
+
 ### First Steps
 
 1. **Read the Documentation**: Start with [README.md](README.md) for an overview
 2. **Explore the Architecture**: Read [ARCHITECTURE.md](ARCHITECTURE.md) to understand the system
 3. **Check the FAQ**: Review [FAQ.md](FAQ.md) for common questions
 4. **Set Up Development**: Follow [INSTALL.md](INSTALL.md) to set up your development environment
+
 
 ## Contributing
 
@@ -35,6 +37,7 @@ There are many ways to contribute to SigmaOS:
 - **Translation**: Translate documentation to other languages
 - **Community**: Help newcomers and answer questions
 
+
 ### Contribution Workflow
 
 1. **Fork the Repository**: Create your own fork on GitHub
@@ -45,6 +48,7 @@ There are many ways to contribute to SigmaOS:
 6. **Submit PR**: Open a pull request with a clear description
 7. **Review**: Address feedback from maintainers
 8. **Merge**: Your PR will be merged once approved
+
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
@@ -59,6 +63,7 @@ Follow these coding standards:
 - **Tests**: Include unit tests for new features
 - **No External Dependencies**: Implement from first principles where possible
 
+
 ### Pull Request Guidelines
 
 When submitting a pull request:
@@ -68,6 +73,7 @@ When submitting a pull request:
 - **Testing**: Describe how you tested your changes
 - **Documentation**: Update relevant documentation
 - **Breaking Changes**: Highlight any breaking changes
+
 
 ## Communication
 
@@ -81,12 +87,14 @@ Join our Discord server for real-time discussion:
 - **#announcements**: Project announcements
 - **#off-topic**: Casual conversation
 
+
 ### Mailing List
 
 Subscribe to the development mailing list:
 
 - **sigmaos-dev@lists.sigmaos.org**: Development discussion
 - **sigmaos-announce@lists.sigmaos.org**: Announcements only
+
 
 ### GitHub Discussions
 
@@ -97,6 +105,7 @@ Use GitHub Discussions for:
 - **Showcase**: Show what you've built with SigmaOS
 - **Feedback**: Provide feedback on the project
 
+
 ### Code of Conduct
 
 All community members must follow the [Code of Conduct](CODE_OF_CONDUCT.md). Key principles:
@@ -105,6 +114,7 @@ All community members must follow the [Code of Conduct](CODE_OF_CONDUCT.md). Key
 - **Constructive**: Focus on constructive feedback
 - **Welcome**: Welcome newcomers and help them learn
 - **Privacy**: Respect privacy and confidentiality
+
 
 ## Package Recipes
 
@@ -119,10 +129,12 @@ SigmaOS uses a SlackBuilds-style package recipe system:
 5. **CI Check**: CI runs `./scripts/ci_branch_check.sh`
 6. **Merge**: After merge, wiki sync publishes package notes
 
+
 ### Official vs Community Recipes
 
 - **Official Recipes**: Use `curation=official` and require maintainer signature
 - **Community Recipes**: Use `curation=community` and are community-maintained
+
 
 ### Recipe Format
 
@@ -158,6 +170,7 @@ Participate in community events:
 - **Workshops**: Educational workshops on SigmaOS development
 - **Conferences**: Presentations at open source conferences
 
+
 ### Organizing Events
 
 Want to organize an event?
@@ -167,6 +180,7 @@ Want to organize an event?
 3. **Promotion**: Promote the event through community channels
 4. **Execution**: Execute the event with community support
 5. **Follow-up**: Share results and feedback
+
 
 ## Recognition
 
@@ -179,6 +193,7 @@ Contributors are recognized through:
 - **Blog Posts**: Featured in blog posts
 - **Awards**: Annual community awards
 
+
 ### Becoming a Maintainer
 
 Experienced contributors can become maintainers:
@@ -188,6 +203,7 @@ Experienced contributors can become maintainers:
 3. **Community Engagement**: Active community participation
 4. **Mentorship**: Help mentor new contributors
 5. **Nomination**: Be nominated by existing maintainers
+
 
 ## Support
 
@@ -200,6 +216,7 @@ Get help through these channels:
 - **Mailing List**: Ask questions on the mailing list
 - **Documentation**: Read the documentation first
 
+
 ### Giving Help
 
 Help others by:
@@ -208,6 +225,7 @@ Help others by:
 - **Reviewing PRs**: Review pull requests from others
 - **Mentoring**: Mentor new contributors
 - **Writing Documentation**: Write guides and tutorials
+
 
 ### Support Policy
 
@@ -224,6 +242,7 @@ SigmaOS is governed by:
 - **Contributors**: Community members who contribute
 - **Community**: All users and interested parties
 
+
 ### Decision Making
 
 Decisions are made through:
@@ -231,6 +250,7 @@ Decisions are made through:
 - **Consensus**: Community consensus for major decisions
 - **Maintainer Vote**: Maintainer vote for technical decisions
 - **BDFL Decision**: BDFL makes final decision when needed
+
 
 ### Governance Changes
 
@@ -240,6 +260,7 @@ Propose governance changes by:
 2. **Proposal**: Create a formal proposal
 3. **Vote**: Community vote on the proposal
 4. **Implementation**: Implement approved changes
+
 
 ## Resources
 
@@ -253,6 +274,7 @@ Propose governance changes by:
 - [SECURITY_POLICY.md](SECURITY_POLICY.md): Security policy
 - [SUPPORT.md](SUPPORT.md): Support resources
 
+
 ### Development Resources
 
 - [GitHub Repository](https://github.com/AaryanSinghChauhan09/SigmaOS): Source code
@@ -260,12 +282,14 @@ Propose governance changes by:
 - [Pull Requests](https://github.com/AaryanSinghChauhan09/SigmaOS/pulls): Pull requests
 - [Actions](https://github.com/AaryanSinghChauhan09/SigmaOS/actions): CI/CD
 
+
 ### Learning Resources
 
 - [Rust Book](https://doc.rust-lang.org/book/): Learn Rust
 - [Zig Guide](https://ziglearn.org/): Learn Zig
 - [Nim Tutorial](https://nim-lang.org/docs/tutorial.html): Learn Nim
 - [Capability-Based Security](https://cap-lore.com/CapTheory/): Learn capabilities
+
 
 ## Contact
 
@@ -276,10 +300,12 @@ Propose governance changes by:
 - **Twitter**: @SigmaOS
 - **GitHub**: https://github.com/AaryanSinghChauhan09/SigmaOS
 
+
 ### Security Contact
 
 - **Email**: security@sigmaos.org
 - **PGP Key**: Available on GitHub
+
 
 See [SECURITY_POLICY.md](SECURITY_POLICY.md) for security reporting.
 

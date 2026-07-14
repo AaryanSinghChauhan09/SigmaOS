@@ -1,4 +1,5 @@
 # SigmaOS Filesystem Absorption - XFS
+
 ## Making torvalds/linux (XFS) Irrelevant
 
 > **Absorption Target**: https://github.com/torvalds/linux (XFS filesystem)  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed XFS by implementing a native POSIX-compatible
 ## Absorbed Features & Capabilities
 
 ### 1. Filesystem Structure
+
 **Original**: XFS's filesystem structure  
 **SigmaOS**: Native structure with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaFS {
 ```
 
 **Structure Features**:
+
 - Native filesystem structure with OS-level optimization
 - Allocation groups with intelligent management
 - B-tree indexing with automatic optimization
@@ -36,11 +39,14 @@ pub struct SigmaFS {
 - Structure profiles with automatic switching
 - Structure validation with automatic checking
 
+
 ### 2. Allocation Groups
+
 **Original**: XFS's allocation group system  
 **SigmaOS**: Native allocation groups with enhanced features
 
 **Allocation Features**:
+
 - Native allocation groups with OS-level optimization
 - Dynamic allocation with intelligent balancing
 - Group monitoring with real-time metrics
@@ -48,11 +54,14 @@ pub struct SigmaFS {
 - Allocation validation with automatic checking
 - Allocation monitoring with real-time metrics
 
+
 ### 3. B-Tree Indexing
+
 **Original**: XFS's B-tree indexing  
 **SigmaOS**: Native B-tree with enhanced features
 
 **B-Tree Features**:
+
 - Native B-tree indexing with OS-level optimization
 - B-tree caching with intelligent invalidation
 - B-tree balancing with automatic algorithms
@@ -60,11 +69,14 @@ pub struct SigmaFS {
 - B-tree validation with automatic checking
 - B-tree monitoring with real-time metrics
 
+
 ### 4. Extent Management
+
 **Original**: XFS's extent-based allocation  
 **SigmaOS**: Native extents with enhanced features
 
 **Extent Features**:
+
 - Native extent management with OS-level optimization
 - Extent allocation with intelligent algorithms
 - Extent compression with automatic optimization
@@ -72,11 +84,14 @@ pub struct SigmaFS {
 - Extent validation with automatic checking
 - Extent monitoring with real-time metrics
 
+
 ### 5. Journaling System
+
 **Original**: XFS's journaling  
 **SigmaOS**: Native journaling with enhanced features
 
 **Journaling Features**:
+
 - Native journaling with OS-level optimization
 - Write-ahead logging with automatic recovery
 - Journal compression with intelligent optimization
@@ -84,11 +99,14 @@ pub struct SigmaFS {
 - Journaling validation with automatic checking
 - Journaling monitoring with real-time metrics
 
+
 ### 6. Large File Support
+
 **Original**: XFS's large file support  
 **SigmaOS**: Native large files with enhanced features
 
 **Large File Features**:
+
 - Native large file support with OS-level optimization
 - Sparse file handling with intelligent algorithms
 - Large file caching with intelligent optimization
@@ -96,12 +114,13 @@ pub struct SigmaFS {
 - Large file validation with automatic checking
 - Large file monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | XFS | SigmaFS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | Filesystem Performance | Kernel overhead | Native OS-level | ✅ 3-5x |
 | Allocation Group Performance | Group overhead | Native optimization | ✅ 3x |
 | B-Tree Performance | B-tree overhead | Native + caching | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaFS {
 ## Implementation Details
 
 ### Native Filesystem Manager
+
 ```rust
 pub mod filesystem {
     use sigma_fs::filesystem::FilesystemManager;
@@ -139,6 +159,7 @@ pub mod filesystem {
 ```
 
 ### Native B-Tree Manager
+
 ```rust
 pub mod btree {
     pub struct BTreeManager {
@@ -165,24 +186,35 @@ pub mod btree {
 ### For Linux Applications Using XFS
 
 **Before** (using XFS):
+
 ```bash
+
 # Mount XFS filesystem
+
 mount /dev/sda1 /mnt -t xfs
 
 # Use XFS features
+
 # Large file operations
+
 ```
 
 **After** (using SigmaFS):
+
 ```bash
+
 # Enable filesystem shard (native)
+
 sigma-shard enable filesystem
 
 # Mount SigmaFS
+
 sigma-fs mount --device /dev/sda1 --mountpoint /mnt
 
 # Use POSIX-compatible operations
+
 # Native large file operations
+
 ```
 
 ---
@@ -190,7 +222,7 @@ sigma-fs mount --device /dev/sda1 --mountpoint /mnt
 ## Performance Benchmarks
 
 | Operation | XFS | SigmaFS | Improvement |
-|-----------|-----|---------|-------------|
+| ----------- | ----- | --------- | ------------- |
 | File Create | 4ms | 0.8ms | 5x faster |
 | File Read (10GB) | 10s | 2s | 5x faster |
 | File Write (10GB) | 12s | 2.4s | 5x faster |

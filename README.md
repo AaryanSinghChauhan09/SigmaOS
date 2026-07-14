@@ -10,11 +10,13 @@
 SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
 ### Core Pillars
+
 - **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
 - **Capability-Based Security**: 64-bit hardware-enforced permission model replacing legacy ACLs.
 - **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
+
 
 ---
 
@@ -39,6 +41,7 @@ graph TD
 - **S-SEC**: Security Framework (PQC + MAC + Sandbox).
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
 
+
 ---
 
 ## 🚀 Quick Start
@@ -48,22 +51,29 @@ graph TD
 Ensure you have the required compiler toolchain and emulation packages:
 
 ```bash
+
 # Install dependencies
+
 sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go xorriso
 
 # Clone the repository
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
 # Build the system image
+
 make clean && make all -j$(nproc)
 
 # Run in QEMU
+
 qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 ```
 
 ### Profile Builds
+
 SigmaOS supports declarative compilation profiles specified at build-time:
+
 ```bash
 make PROFILE=standalone all    # Full desktop ISO
 make PROFILE=rtos all          # Hard real-time ELF
@@ -90,13 +100,14 @@ For a detailed review of all security policies, see the canonical [Security Fram
 
 ## 📚 Canonical Documentation (GitHub Wiki)
 
-```
+```text
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
 Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
 Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
 ```
 
 ### Current Status
+
 - ✅ Kernel scheduler (MLFQ+CFS+EDF)
 - ✅ Syscalls (I/O + Process)
 - ✅ Physical MM (buddy allocator)
@@ -111,6 +122,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ sigma-pkg CLI
 - ⬜ Bootable ISO (Phase G)
 
+
 ---
 
 ## 🤝 Contributing
@@ -118,6 +130,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### High-Impact Areas
+
 - Round-robin scheduler implementation
 - Buddy allocator completion
 - sigma-sh REPL
@@ -125,11 +138,13 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - VESA framebuffer driver
 - Package recipes
 
+
 ---
 
 ## 📚 Documentation
 
 ### Repository Documentation
+
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -138,13 +153,17 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
 - [FAQ](FAQ.md) — Common questions (coming soon)
 
+
 ### GitHub Wiki (Canonical Documentation)
+
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
+
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
 - **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+
 
 ---
 

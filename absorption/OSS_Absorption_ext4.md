@@ -1,4 +1,5 @@
 # SigmaOS Filesystem Absorption - ext4
+
 ## Making torvalds/linux (ext4) Irrelevant
 
 > **Absorption Target**: https://github.com/torvalds/linux (ext4 filesystem)  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed ext4 by implementing a native POSIX-compatibl
 ## Absorbed Features & Capabilities
 
 ### 1. Filesystem Structure
+
 **Original**: ext4's filesystem structure  
 **SigmaOS**: Native structure with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaFS {
 ```
 
 **Structure Features**:
+
 - Native filesystem structure with OS-level optimization
 - POSIX-compatible semantics with automatic translation
 - Journaling with automatic recovery
@@ -36,11 +39,14 @@ pub struct SigmaFS {
 - Structure validation with automatic checking
 - Structure monitoring with real-time metrics
 
+
 ### 2. Inode Management
+
 **Original**: ext4's inode system  
 **SigmaOS**: Native inode with enhanced features
 
 **Inode Features**:
+
 - Native inode management with OS-level optimization
 - Inode caching with intelligent invalidation
 - Inode compression with automatic optimization
@@ -48,11 +54,14 @@ pub struct SigmaFS {
 - Inode validation with automatic checking
 - Inode monitoring with real-time metrics
 
+
 ### 3. Block Allocation
+
 **Original**: ext4's block allocation  
 **SigmaOS**: Native allocation with enhanced features
 
 **Allocation Features**:
+
 - Native block allocation with OS-level optimization
 - Extent-based allocation with intelligent algorithms
 - Block compression with automatic optimization
@@ -60,11 +69,14 @@ pub struct SigmaFS {
 - Allocation validation with automatic checking
 - Allocation monitoring with real-time metrics
 
+
 ### 4. Journaling System
+
 **Original**: ext4's journaling  
 **SigmaOS**: Native journaling with enhanced features
 
 **Journaling Features**:
+
 - Native journaling with OS-level optimization
 - Write-ahead logging with automatic recovery
 - Journal compression with intelligent optimization
@@ -72,11 +84,14 @@ pub struct SigmaFS {
 - Journaling validation with automatic checking
 - Journaling monitoring with real-time metrics
 
+
 ### 5. Directory Management
+
 **Original**: ext4's directory structure  
 **SigmaOS**: Native directory with enhanced features
 
 **Directory Features**:
+
 - Native directory management with OS-level optimization
 - Directory hashing with intelligent algorithms
 - Directory caching with automatic invalidation
@@ -84,11 +99,14 @@ pub struct SigmaFS {
 - Directory validation with automatic checking
 - Directory monitoring with real-time metrics
 
+
 ### 6. POSIX Semantics
+
 **Original**: ext4's POSIX compatibility  
 **SigmaOS**: Native POSIX with enhanced features
 
 **POSIX Features**:
+
 - Native POSIX semantics with OS-level optimization
 - File permissions with capability-based access
 - Symbolic links with automatic resolution
@@ -96,12 +114,13 @@ pub struct SigmaFS {
 - POSIX validation with automatic checking
 - POSIX monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | ext4 | SigmaFS | Advantage |
-|---------|------|---------|------------|
+| --------- | ------ | --------- | ------------ |
 | Filesystem Performance | Kernel overhead | Native OS-level | ✅ 3-5x |
 | Inode Performance | Inode table overhead | Native + caching | ✅ 5x |
 | Block Allocation Performance | Extent overhead | Native optimization | ✅ 3x |
@@ -116,6 +135,7 @@ pub struct SigmaFS {
 ## Implementation Details
 
 ### Native Filesystem Manager
+
 ```rust
 pub mod filesystem {
     use sigma_fs::filesystem::FilesystemManager;
@@ -139,6 +159,7 @@ pub mod filesystem {
 ```
 
 ### Native Journal Manager
+
 ```rust
 pub mod journal {
     pub struct JournalManager {
@@ -165,24 +186,35 @@ pub mod journal {
 ### For Linux Applications Using ext4
 
 **Before** (using ext4):
+
 ```bash
+
 # Mount ext4 filesystem
+
 mount /dev/sda1 /mnt
 
 # Use ext4 features
+
 # POSIX file operations
+
 ```
 
 **After** (using SigmaFS):
+
 ```bash
+
 # Enable filesystem shard (native)
+
 sigma-shard enable filesystem
 
 # Mount SigmaFS
+
 sigma-fs mount --device /dev/sda1 --mountpoint /mnt
 
 # Use POSIX-compatible operations
+
 # Native file operations
+
 ```
 
 ---
@@ -190,7 +222,7 @@ sigma-fs mount --device /dev/sda1 --mountpoint /mnt
 ## Performance Benchmarks
 
 | Operation | ext4 | SigmaFS | Improvement |
-|-----------|------|---------|-------------|
+| ----------- | ------ | --------- | ------------- |
 | File Create | 5ms | 1ms | 5x faster |
 | File Read (1GB) | 1s | 200ms | 5x faster |
 | File Write (1GB) | 1.2s | 240ms | 5x faster |

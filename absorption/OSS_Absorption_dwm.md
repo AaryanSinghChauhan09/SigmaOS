@@ -1,4 +1,5 @@
 # SigmaOS Window Manager Absorption - dwm
+
 ## Making suckless/dwm Irrelevant
 
 > **Absorption Target**: https://github.com/suckless/dwm  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed dwm by implementing a native minimal window m
 ## Absorbed Features & Capabilities
 
 ### 1. Minimal Window Manager
+
 **Original**: dwm's minimal design philosophy  
 **SigmaOS**: Native minimal WM with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaWM {
 ```
 
 **Minimal Features**:
+
 - Native minimal window manager with OS-level optimization
 - Source-based configuration with type safety
 - Automatic layout selection with intelligent algorithms
@@ -36,11 +39,14 @@ pub struct SigmaWM {
 - Native floating window support
 - Tag-based workspace management
 
+
 ### 2. Source-Based Configuration
+
 **Original**: dwm's source code configuration  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
+
 - Native configuration with type safety
 - dwm-compatible configuration with automatic conversion
 - Real-time configuration reload
@@ -48,11 +54,14 @@ pub struct SigmaWM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
+
 ### 3. Tag System
+
 **Original**: dwm's tag-based workspaces  
 **SigmaOS**: Native tag system with enhanced features
 
 **Tag Features**:
+
 - Native tag management with automatic organization
 - Tag persistence with automatic restoration
 - Tag monitoring with real-time metrics
@@ -60,11 +69,14 @@ pub struct SigmaWM {
 - Tag profiles with import/export
 - Tag synchronization across devices
 
+
 ### 4. Keybinding System
+
 **Original**: dwm's keybinding configuration  
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
+
 - Native keybinding system with type safety
 - Mode-based keybindings with automatic switching
 - Keybinding inheritance with composition
@@ -72,11 +84,14 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
+
 ### 5. Bar System
+
 **Original**: dwm's status bar  
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
+
 - Native bar with hardware acceleration
 - Bar modules with native integration
 - Bar theming with live preview
@@ -84,11 +99,14 @@ pub struct SigmaWM {
 - Bar profiles with automatic switching
 - Bar integration with system notifications
 
+
 ### 6. Layout System
+
 **Original**: dwm's layout system  
 **SigmaOS**: Native layout system with enhanced features
 
 **Layout Features**:
+
 - Native layout system with intelligent algorithms
 - Layout presets with automatic selection
 - Layout customization with live preview
@@ -96,12 +114,13 @@ pub struct SigmaWM {
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | dwm | SigmaOS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | WM Performance | C overhead | Native Rust | ✅ 3-5x |
 | Configuration Performance | Recompile overhead | Native reload | ✅ 10x |
 | Keybinding Latency | 5ms | 1ms | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaWM {
 ## Implementation Details
 
 ### Native Minimal Engine
+
 ```rust
 pub mod minimal {
     use sigma_wm::minimal::MinimalEngine;
@@ -144,6 +164,7 @@ pub mod minimal {
 ```
 
 ### Native Configuration System
+
 ```rust
 pub mod config {
     pub struct ConfigSystem {
@@ -170,26 +191,36 @@ pub mod config {
 ### For Users of dwm
 
 **Before** (using dwm):
+
 ```bash
+
 # Install dwm
+
 # Clone and build dwm
 
 # Configure dwm
+
 # Edit config.h and recompile
 
 # Run dwm
+
 dwm
 ```
 
 **After** (using SigmaWM):
+
 ```bash
+
 # Enable window manager shard (native)
+
 sigma-shard enable window-manager
 
 # Use dwm-compatible configuration
+
 sigma-wm config --dwm-compatible
 
 # Native commands
+
 sigma-wm command
 ```
 
@@ -198,7 +229,7 @@ sigma-wm command
 ## Performance Benchmarks
 
 | Operation | dwm | SigmaWM | Improvement |
-|-----------|-----|---------|-------------|
+| ----------- | ----- | --------- | ------------- |
 | Window Tile | 30ms | 7ms | 4.3x faster |
 | Tag Switch | 15ms | 3ms | 5x faster |
 | Keybinding Execute | 5ms | 1ms | 5x faster |

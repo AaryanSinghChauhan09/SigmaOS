@@ -15,6 +15,7 @@ This guide covers building and installing SigmaOS from source for various deploy
 - [Troubleshooting](#troubleshooting)
 - [Advanced Configuration](#advanced-configuration)
 
+
 ---
 
 ## Prerequisites
@@ -27,6 +28,7 @@ All builds require:
 - **Make**: For build orchestration
 - **CMake**: >= 3.15 for cross-platform builds
 - **Python 3**: >= 3.8 for build scripts
+
 
 ### Linux (Ubuntu/Debian)
 
@@ -61,10 +63,13 @@ brew install \
 ### Windows (WSL2)
 
 ```bash
+
 # Install WSL2 with Ubuntu
+
 wsl --install
 
 # Inside WSL2 Ubuntu:
+
 sudo apt-get update
 sudo apt-get install -y \
     build-essential \
@@ -379,7 +384,9 @@ make mrproper       # Remove everything including config
 ### Create Bootable USB (Linux)
 
 ```bash
+
 # Insert USB drive (replace /dev/sdX with your device)
+
 sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress
 sudo sync
 ```
@@ -387,7 +394,9 @@ sudo sync
 ### Create Bootable USB (macOS)
 
 ```bash
+
 # Insert USB drive (replace disk2 with your device)
+
 diskutil list
 sudo diskutil unmountDisk /dev/disk2
 sudo dd if=build/sigmaos.iso of=/dev/disk2 bs=4m
@@ -402,6 +411,7 @@ Use [Rufus](https://rufus.ie/) or [Etcher](https://www.balena.io/etcher/):
 2. Select `build/sigmaos.iso`
 3. Select your USB drive
 4. Click "Start"
+
 
 ---
 
@@ -432,6 +442,7 @@ All tests should pass.
 - Join the community at [COMMUNITY.md](COMMUNITY.md)
 - Report issues at [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 
+
 ---
 
 ## Getting Help
@@ -440,6 +451,7 @@ All tests should pass.
 - **Issues**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
 - **Support**: [SUPPORT.md](SUPPORT.md)
+
 
 ---
 

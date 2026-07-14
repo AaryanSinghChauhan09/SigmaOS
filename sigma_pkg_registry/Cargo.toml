@@ -5,4 +5,5 @@ edition = "2021"
 description = "SigmaOS Package Registry - recipe loader and parser"
 
 [dependencies]
-# Zero external dependencies - all parsing implemented manually
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"

@@ -14,11 +14,13 @@ Distro features define the different deployment profiles and configuration optio
 **Target**: Desktop/laptop hardware
 
 **Features**:
+
 - Full desktop environment
 - All drivers enabled
 - Zenith compositor
 - AI tools enabled
 - Package manager included
+
 
 **Output**: `sigmaos-standalone.iso`
 
@@ -27,10 +29,12 @@ Distro features define the different deployment profiles and configuration optio
 **Target**: Embedded systems, containers
 
 **Features**:
+
 - Minimal kernel only
 - Core shards only
 - No desktop environment
 - Minimal footprint
+
 
 **Output**: `sigmaos-microkernel.bin`
 
@@ -39,10 +43,12 @@ Distro features define the different deployment profiles and configuration optio
 **Target**: Industrial control, medical devices
 
 **Features**:
+
 - Hard real-time scheduler
 - Deterministic timing
 - Safety-critical features
 - Minimal latency
+
 
 **Output**: `sigmaos-rtos.elf`
 
@@ -51,10 +57,12 @@ Distro features define the different deployment profiles and configuration optio
 **Target**: AWS, GCP, Azure deployments
 
 **Features**:
+
 - Headless image
 - Cloud-init support
 - SSH access
 - Container support
+
 
 **Output**: `sigmaos-cloud.img.qcow2`
 
@@ -63,10 +71,12 @@ Distro features define the different deployment profiles and configuration optio
 **Target**: ARM64 Android/iOS devices
 
 **Features**:
+
 - Touch-optimized UI
 - Mobile drivers
 - Battery optimization
 - App store integration
+
 
 **Output**: `sigmaos-mobile.apk` or `.ipa`
 
@@ -75,10 +85,12 @@ Distro features define the different deployment profiles and configuration optio
 **Target**: Web browsers via WebAssembly
 
 **Features**:
+
 - WASM-compiled kernel
 - Web UI
 - Browser sandbox
 - Limited filesystem
+
 
 **Output**: `sigmaos-browser.wasm`
 
@@ -128,6 +140,7 @@ SigmaOS uses multiple package repositories:
 - **Community Repository**: Community-contributed packages
 - **Enterprise Repository**: Enterprise packages
 
+
 ### Package Recipes
 
 Package recipes define how to build packages:
@@ -147,7 +160,7 @@ dependencies = []
 
 Kernel boot parameters:
 
-```
+```text
 kernel.smm.enable=true
 kernel.sched.eevdf=true
 kernel.net.firewall=deny
@@ -166,7 +179,7 @@ services = ["network", "ssh", "desktop"]
 ## Implementation Status
 
 | Feature | Documentation | Implementation | Status |
-|---------|--------------|---------------|--------|
+| --------- | -------------- | --------------- | -------- |
 | Standalone Profile | ✅ Complete | ⏳ Pending | ⏳ Not Started |
 | Microkernel Profile | ✅ Complete | ⏳ Pending | ⏳ Not Started |
 | RTOS Profile | ✅ Complete | ⏳ Pending | ⏳ Not Started |
@@ -179,6 +192,7 @@ services = ["network", "ssh", "desktop"]
 1. Implement build configuration prototype (Nim)
 2. Implement package manager prototype (Nim)
 3. Implement init system prototype (Nim)
+
 
 ---
 

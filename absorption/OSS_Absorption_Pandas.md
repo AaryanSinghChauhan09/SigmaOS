@@ -1,4 +1,5 @@
 # SigmaOS Data Manipulation Framework Absorption - Pandas
+
 ## Making pandas-dev/pandas Irrelevant
 
 > **Absorption Target**: https://github.com/pandas-dev/pandas  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Pandas by implementing a native data manipula
 ## Absorbed Features & Capabilities
 
 ### 1. Native Data Manipulation Framework
+
 **Original**: Python library with NumPy backend  
 **SigmaOS**: Native OS-level data processing with Rust implementation
 
@@ -30,12 +32,14 @@ pub struct SigmaData {
 ```
 
 **Core Data Structures**:
+
 - **DataFrame**
   - Native columnar storage with automatic compression
   - Multi-index support with efficient operations
   - Categorical data with optimized storage
   - Time series with native datetime support
   - Sparse data structures for efficient memory usage
+
   
 - **Series**
   - Type-optimized storage
@@ -43,11 +47,14 @@ pub struct SigmaData {
   - Missing value handling with native NA type
   - String operations with optimized algorithms
 
+
 ### 2. Data I/O System
+
 **Original**: Various readers/writers for different formats  
 **SigmaOS**: Native I/O with automatic format detection
 
 **Supported Formats**:
+
 - CSV with automatic delimiter detection
 - JSON with schema inference
 - Parquet with column pruning
@@ -59,11 +66,14 @@ pub struct SigmaData {
 - Stata, SAS, SPSS formats
 - Cloud storage with direct access
 
+
 ### 3. Data Manipulation
+
 **Original**: Pandas operations with Python overhead  
 **SigmaOS**: Native operations with automatic optimization
 
 **Manipulation Features**:
+
 - Filtering with automatic query optimization
 - Sorting with multi-key support
 - Grouping with efficient aggregation
@@ -74,11 +84,14 @@ pub struct SigmaData {
 - Datetime operations with timezone support
 - Window functions with efficient computation
 
+
 ### 4. Data Aggregation
+
 **Original**: GroupBy operations with Python overhead  
 **SigmaOS**: Native aggregation with automatic optimization
 
 **Aggregation Features**:
+
 - GroupBy with automatic parallelization
 - Rolling and expanding windows
 - Resampling with efficient time operations
@@ -87,11 +100,14 @@ pub struct SigmaData {
 - Custom aggregation functions with JIT compilation
 - Multi-level grouping with hierarchical operations
 
+
 ### 5. Time Series
+
 **Original**: Basic time series support  
 **SigmaOS**: Native time series with advanced features
 
 **Time Series Features**:
+
 - Native datetime with timezone support
 - Resampling with various frequencies
 - Rolling windows with efficient computation
@@ -101,11 +117,14 @@ pub struct SigmaData {
 - Seasonal decomposition
 - Time series forecasting integration
 
+
 ### 6. Performance Optimization
+
 **Original**: Manual optimization with vectorization  
 **SigmaOS**: Automatic optimization with native implementation
 
 **Optimization Features**:
+
 - Automatic query optimization
 - Lazy evaluation with query planning
 - Memory-mapped data for large datasets
@@ -114,11 +133,14 @@ pub struct SigmaData {
 - SIMD optimization for numerical operations
 - Just-in-time compilation for custom functions
 
+
 ### 7. Data Cleaning
+
 **Original**: Manual data cleaning operations  
 **SigmaOS**: AI-powered automatic data cleaning
 
 **Cleaning Features**:
+
 - Automatic missing value detection and imputation
 - Outlier detection with statistical methods
 - Data type inference and conversion
@@ -127,12 +149,13 @@ pub struct SigmaData {
 - Data normalization and standardization
 - Text cleaning with NLP integration
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Pandas | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Performance | Python overhead | Native Rust | ✅ 5-15x |
 | Memory Efficiency | Python overhead | Native | ✅ 3-5x |
 | Large Dataset | Memory limited | Memory-mapped | ✅ 10x |
@@ -147,6 +170,7 @@ pub struct SigmaData {
 ## Implementation Details
 
 ### Native Data Manipulation Framework
+
 ```rust
 pub mod sigma_data {
     use sigma_core::storage::ColumnStore;
@@ -182,6 +206,7 @@ pub mod sigma_data {
 ```
 
 ### Query Optimization Engine
+
 ```rust
 pub mod query_optimizer {
     pub struct QueryOptimizer {
@@ -207,22 +232,27 @@ pub mod query_optimizer {
 ## API Comparison
 
 ### Pandas API
+
 ```python
 import pandas as pd
 
 # Manual data loading
+
 df = pd.read_csv('data.csv')
 
 # Manual data manipulation
+
 df_filtered = df[df['column'] > 0]
 df_grouped = df.groupby('category').mean()
 
 # Manual data cleaning
+
 df_clean = df.dropna()
 df_clean = df_clean.drop_duplicates()
 ```
 
 ### SigmaData API
+
 ```rust
 use sigma_data::SigmaData;
 
@@ -244,35 +274,48 @@ let clean = df.auto_clean();
 ### For Users of Pandas
 
 **Before** (using Pandas):
+
 ```python
+
 # Install pandas
+
 pip install pandas
 
 # Import and use
+
 import pandas as pd
 
 # Manual data loading
+
 df = pd.read_csv('large_file.csv')
 
 # Manual operations
+
 result = df.groupby('category').agg({'value': 'mean', 'count': 'sum'})
 
 # Manual optimization
+
 df = df.astype({'column': 'int32'})  # Manual type optimization
 ```
 
 **After** (using SigmaData):
+
 ```bash
+
 # Enable data shard (native, no installation)
+
 sigma-shard enable data-framework
 
 # Automatic data loading with optimization
+
 sigma-data read --file large_file.csv --auto-optimize
 
 # Automatic operations
+
 sigma-data group-by --category category --agg value:mean,count:sum
 
 # Automatic cleaning
+
 sigma-data clean --auto-impute --remove-outliers
 ```
 
@@ -281,7 +324,7 @@ sigma-data clean --auto-impute --remove-outliers
 ## Performance Benchmarks
 
 | Operation | Pandas | SigmaData | Improvement |
-|-----------|-------|-----------|-------------|
+| ----------- | ------- | ----------- | ------------- |
 | CSV Read (1GB) | 25s | 5s | 5x faster |
 | GroupBy (10M rows) | 18s | 3s | 6x faster |
 | Merge (5M rows) | 12s | 2.5s | 4.8x faster |
@@ -293,6 +336,7 @@ sigma-data clean --auto-impute --remove-outliers
 ## Advanced Features
 
 ### Distributed Data Processing
+
 ```rust
 pub struct DistributedDataProcessor {
     cluster: ClusterManager,
@@ -311,6 +355,7 @@ impl DistributedDataProcessor {
 ```
 
 ### Automatic Schema Evolution
+
 ```rust
 pub struct SchemaEvolution {
     schema_detector: SchemaDetector,

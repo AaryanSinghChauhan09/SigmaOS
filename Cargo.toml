@@ -15,6 +15,15 @@ members = [
     "sigma_pkg_registry",
     "userland/ui/design_system",
     "userland/system_api/common",
+    "userland/sigma_security",
+    "userland/sigma_containers",
+    "userland/sigma_compositor",
+    "userland/sigma_media",
+    "userland/sigma_app",
+    "userland/sigma_ml",
+    "userland/sigma_data",
+    "userland/sigma_net",
+    "userland/sigma_fs", "userland/sigma_init", "userland/sigma_ipc", "userland/sigma_hal", "userland/sigma_audio", "userland/sigma_boot", "userland/sigma_tracing", "userland/sigma_desktop", "tools/sigma_fs_tools", "userland/sigma_ai", "tools/sigma_toolchain",
 ]
 default-members = ["kernel"]
 

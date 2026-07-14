@@ -21,6 +21,7 @@ SigmaOS differs from other operating systems in several ways:
 - **Multi-Language Support**: Rust for kernel components, Zig for low-level drivers, Nim for tooling
 - **Sovereign Design**: Local-first with minimal external dependencies
 
+
 ### What platforms does SigmaOS support?
 
 SigmaOS is designed to support multiple platforms:
@@ -28,6 +29,7 @@ SigmaOS is designed to support multiple platforms:
 - **x86_64**: Desktop and server systems
 - **ARM64**: Mobile and embedded systems
 - **RISC-V**: Experimental support
+
 
 ### Is SigmaOS production-ready?
 
@@ -44,6 +46,7 @@ The shard architecture is SigmaOS's modular component system. Each shard is an i
 - **Optional Shards**: Desktop environment and AI features
 - **Infinite Shards**: Experimental and self-evolving features
 
+
 ### How do shards communicate?
 
 Shards communicate through well-defined interfaces:
@@ -52,6 +55,7 @@ Shards communicate through well-defined interfaces:
 - **Shared Memory Regions**: With capability-based access control
 - **Event Notifications**: Asynchronous event system
 - **Service Discovery**: Dynamic shard registration
+
 
 ### What is capability-based security?
 
@@ -63,6 +67,7 @@ Capability-based security is a security model where all access to resources is g
 - **Least Privilege**: Components only have access to what they need
 - **Audit Trail**: All capability changes are logged
 
+
 ### What post-quantum cryptography does SigmaOS use?
 
 SigmaOS uses:
@@ -70,6 +75,7 @@ SigmaOS uses:
 - **Kyber-1024**: Key Encapsulation Mechanism (KEM) for key exchange
 - **Dilithium-5**: Digital signature algorithm for authentication
 - **Hybrid Mode**: Combines post-quantum with classical algorithms for compatibility
+
 
 ## Development
 
@@ -80,6 +86,7 @@ SigmaOS uses multiple languages based on component requirements:
 - **Rust**: Kernel components and core shards (memory safety, performance)
 - **Zig**: Low-level drivers and runtime (control, performance)
 - **Nim**: Tooling and automation (expressiveness, ease of use)
+
 
 ### How do I build SigmaOS?
 
@@ -93,6 +100,7 @@ See the [INSTALL.md](INSTALL.md) for detailed build instructions. The basic step
 6. Run `zig build` for Zig components
 7. Run `nim build` for Nim components
 
+
 ### How do I contribute to SigmaOS?
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. The basic process:
@@ -102,6 +110,7 @@ See the [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. The basi
 3. Make your changes
 4. Add tests
 5. Submit a pull request
+
 
 ### What are the coding standards?
 
@@ -113,18 +122,23 @@ SigmaOS follows these coding standards:
 - **No External Dependencies**: Implement from first principles where possible
 - **Documentation**: Document all public APIs
 
+
 ### How do I run tests?
 
 Run tests for each component:
 
 ```bash
+
 # Rust components
+
 cargo test
 
 # Zig components
+
 zig build test
 
 # Nim components
+
 nim test
 ```
 
@@ -147,6 +161,7 @@ SigmaOS ensures security through:
 - **Minimal Attack Surface**: Only load required shards
 - **Audit Logging**: All security events logged
 
+
 ### What is the threat model?
 
 SigmaOS's threat model includes:
@@ -157,6 +172,7 @@ SigmaOS's threat model includes:
 - **Supply Chain Attacks**: Minimal dependencies, signed drivers
 - **Hardware Attacks**: TPM integration, secure boot
 
+
 ### How are vulnerabilities handled?
 
 See the [SECURITY_POLICY.md](SECURITY_POLICY.md) for vulnerability reporting. The process:
@@ -166,6 +182,7 @@ See the [SECURITY_POLICY.md](SECURITY_POLICY.md) for vulnerability reporting. Th
 3. Fix is developed and tested
 4. Security advisory is published
 5. Patch is released
+
 
 ## Usage
 
@@ -178,6 +195,7 @@ See the [INSTALL.md](INSTALL.md) for installation instructions. SigmaOS can be i
 - **Cloud**: Headless cloud image
 - **Container**: Containerized deployment
 
+
 ### How do I configure SigmaOS?
 
 SigmaOS is configured via:
@@ -186,6 +204,7 @@ SigmaOS is configured via:
 - **Configuration Files**: TOML-based configuration
 - **Runtime Configuration**: Dynamic configuration via CLI
 - **Feature Flags**: Enable/disable features at build time
+
 
 ### What deployment profiles are available?
 
@@ -198,21 +217,27 @@ SigmaOS supports multiple deployment profiles:
 - **Mobile**: Touch-optimized for mobile devices
 - **Browser**: WebAssembly for browser deployment
 
+
 ### How do I manage packages?
 
 SigmaOS uses `sigma-pkg` for package management:
 
 ```bash
+
 # Search packages
+
 sigma-pkg search <package>
 
 # Install package
+
 sigma-pkg install <package>
 
 # Update package
+
 sigma-pkg update <package>
 
 # Remove package
+
 sigma-pkg remove <package>
 ```
 
@@ -248,10 +273,13 @@ nim --version  # Should be 2.0.0 or later
 Check that the shard is loaded:
 
 ```bash
+
 # List loaded shards
+
 shard list
 
 # Load shard
+
 shard load <shard-name>
 ```
 
@@ -260,10 +288,13 @@ shard load <shard-name>
 Check firewall rules:
 
 ```bash
+
 # List firewall rules
+
 firewall list
 
 # Add allow rule
+
 firewall add allow <source-ip> <dest-ip> <protocol>
 ```
 
@@ -279,6 +310,7 @@ SigmaOS achieves high performance through:
 - **Efficient IPC**: Capability-based IPC
 - **Hardware Acceleration**: GPU acceleration where available
 
+
 ### What is the EEVDF scheduler?
 
 EEVDF (Earliest Eligible Virtual Deadline First) is an O(1) scheduling algorithm that provides:
@@ -288,6 +320,7 @@ EEVDF (Earliest Eligible Virtual Deadline First) is an O(1) scheduling algorithm
 - **Real-Time Support**: Real-time task priorities
 - **Predictable**: Deterministic timing
 
+
 ### How does SigmaOS handle memory?
 
 SigmaOS uses:
@@ -296,6 +329,7 @@ SigmaOS uses:
 - **Paging**: Virtual memory with capability-based protection
 - **Zero-Copy**: Minimize memory copying
 - **Memory Pooling**: Reuse memory allocations
+
 
 ## Future
 
@@ -309,6 +343,7 @@ Future plans include:
 - **Enhanced Desktop**: Improved desktop environment
 - **Cloud Integration**: Better cloud platform support
 
+
 ### When will SigmaOS be production-ready?
 
 SigmaOS is currently in active development. Production readiness depends on:
@@ -318,6 +353,7 @@ SigmaOS is currently in active development. Production readiness depends on:
 - Security audits
 - Performance testing
 - User feedback
+
 
 Estimated timeline: 2027-2028
 
@@ -331,6 +367,7 @@ You can help by:
 - **Reporting Bugs**: Report issues
 - **Spreading the Word**: Share SigmaOS with others
 
+
 ## Community
 
 ### Where can I get help?
@@ -342,6 +379,7 @@ Get help through:
 - **Mailing List**: Join the development mailing list
 - **Documentation**: Read the documentation
 
+
 ### How do I join the community?
 
 Join the community by:
@@ -351,6 +389,7 @@ Join the community by:
 - **Joining Discord**: Participate in discussions
 - **Contributing**: Submit code and documentation
 
+
 ### What is the code of conduct?
 
 See the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for the code of conduct. Key points:
@@ -359,6 +398,7 @@ See the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for the code of conduct. Key po
 - Welcome newcomers
 - Focus on constructive feedback
 - Respect privacy and confidentiality
+
 
 ## Licensing
 
@@ -387,6 +427,7 @@ Learn more through:
 - **SECURITY_POLICY.md**: Security policy
 - **SUPPORT.md**: Support resources
 
+
 ### Where can I find the source code?
 
 Source code is available on GitHub:
@@ -399,6 +440,7 @@ Report security vulnerabilities via:
 
 - Email: security@sigmaos.org
 - PGP Key: Available on GitHub
+
 
 See [SECURITY_POLICY.md](SECURITY_POLICY.md) for details.
 

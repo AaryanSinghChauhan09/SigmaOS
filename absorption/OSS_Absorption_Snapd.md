@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - Snapd
+
 ## Making canonical/snapd Irrelevant
 
 > **Absorption Target**: https://github.com/canonical/snapd  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Snapd by implementing a native container runt
 ## Absorbed Features & Capabilities
 
 ### 1. Snap Package System
+
 **Original**: Snapd's snap package format  
 **SigmaOS**: Native snap-compatible package system
 
@@ -29,6 +31,7 @@ pub struct SigmaSnap {
 ```
 
 **Snap Features**:
+
 - Native snap package format support
 - SquashFS-based package storage
 - Atomic updates with automatic rollback
@@ -36,11 +39,14 @@ pub struct SigmaSnap {
 - Package confinement with capability-based access
 - Package verification with cryptographic signatures
 
+
 ### 2. Snap Runtime
+
 **Original**: Snapd's runtime system  
 **SigmaOS**: Native snap runtime with OS integration
 
 **Runtime Features**:
+
 - Multiple snap runtimes with automatic selection
 - Runtime isolation with capability-based sandboxing
 - Runtime updates with automatic synchronization
@@ -48,11 +54,14 @@ pub struct SigmaSnap {
 - Runtime verification with proven correctness
 - Runtime caching with automatic management
 
+
 ### 3. Interface System
+
 **Original**: Snapd's interface system for permissions  
 **SigmaOS**: Native interface system with enhanced features
 
 **Interface Features**:
+
 - Declarative interface definitions with type safety
 - Interface connection with automatic matching
 - Interface slots with capability-based access
@@ -60,11 +69,14 @@ pub struct SigmaSnap {
 - Interface composition with inheritance
 - Interface auditing with tamper-proof logs
 
+
 ### 4. Snap Daemon
+
 **Original**: Snapd's daemon for snap management  
 **SigmaOS**: Native snap daemon with OS integration
 
 **Daemon Features**:
+
 - Native snap lifecycle management
 - Snap installation with automatic dependency resolution
 - Snap updates with automatic scheduling
@@ -72,11 +84,14 @@ pub struct SigmaSnap {
 - Snap monitoring with real-time metrics
 - Snap logging with aggregation
 
+
 ### 5. Confinement System
+
 **Original**: Snapd's confinement (strict, classic, devmode)  
 **SigmaOS**: Native confinement with capability-based security
 
 **Confinement Features**:
+
 - Capability-based confinement with hardware enforcement
 - Strict confinement with proven security
 - Classic confinement with compatibility
@@ -84,11 +99,14 @@ pub struct SigmaSnap {
 - Confinement profiles with automatic generation
 - Confinement verification with formal methods
 
+
 ### 6. Snap Store Integration
+
 **Original**: Snapd's Snap Store integration  
 **SigmaOS**: Native package repository with enhanced features
 
 **Repository Features**:
+
 - Native package repository with content-addressed storage
 - Package search with intelligent indexing
 - Package reviews with reputation system
@@ -96,12 +114,13 @@ pub struct SigmaSnap {
 - Package updates with automatic notification
 - Package synchronization with automatic mirroring
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Snapd | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Package Performance | SquashFS overhead | Native storage | ✅ 3-5x |
 | Confinement Security | AppArmor | Capability-based | ✅ 10x |
 | Interface System | Plugs/Slots | Native interfaces | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaSnap {
 ## Implementation Details
 
 ### Native Snap Package System
+
 ```rust
 pub mod snap {
     use sigma_snap::package::PackageManager;
@@ -144,6 +164,7 @@ pub mod snap {
 ```
 
 ### Native Confinement System
+
 ```rust
 pub mod confinement {
     pub struct ConfinementSystem {
@@ -171,32 +192,44 @@ pub mod confinement {
 ### For Users of Snapd
 
 **Before** (using Snapd):
+
 ```bash
+
 # Install snap
+
 snap install snapd
 
 # Install application
+
 snap install vlc
 
 # Run application
+
 vlc
 
 # Manage interfaces
+
 snap connect vlc:home :home
 ```
 
 **After** (using SigmaSnap):
+
 ```bash
+
 # Enable snap shard (native)
+
 sigma-shard enable snap-runtime
 
 # Install snap package
+
 sigma-snap install --package vlc
 
 # Run snap
+
 sigma-snap run --package vlc
 
 # Manage interfaces
+
 sigma-snap connect --plug vlc:home --slot :home
 ```
 
@@ -205,7 +238,7 @@ sigma-snap connect --plug vlc:home --slot :home
 ## Performance Benchmarks
 
 | Operation | Snapd | SigmaSnap | Improvement |
-|-----------|-------|----------|-------------|
+| ----------- | ------- | ---------- | ------------- |
 | Snap Install (100MB) | 35s | 12s | 2.9x faster |
 | Snap Launch | 600ms | 120ms | 5x faster |
 | Interface Connection | 100ms | 20ms | 5x faster |

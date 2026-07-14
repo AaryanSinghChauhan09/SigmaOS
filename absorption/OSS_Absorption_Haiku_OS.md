@@ -1,4 +1,5 @@
 # SigmaOS Kernel Absorption - Haiku OS
+
 ## Making haiku/haiku Irrelevant
 
 > **Absorption Target**: https://github.com/haiku/haiku  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Haiku OS by implementing a native microkernel
 ## Absorbed Features & Capabilities
 
 ### 1. Lightweight UI Design
+
 **Original**: Haiku's responsive and lightweight UI  
 **SigmaOS**: Native SigmaCompositor with Haiku-inspired design
 
@@ -29,6 +31,7 @@ pub struct SigmaCompositor {
 ```
 
 **UI Features**:
+
 - Instant window response with hardware acceleration
 - Clean, minimalist design with native theming
 - Consistent UI patterns across applications
@@ -36,11 +39,14 @@ pub struct SigmaCompositor {
 - Native tab-based window management
 - Deskbar-inspired task management
 
+
 ### 2. BFS Filesystem Optimization
+
 **Original**: Be File System with attributes and indexing  
 **SigmaOS**: SigmaFS with extended attribute support
 
 **Filesystem Features**:
+
 - Extended attributes with native support
 - Fast file indexing with automatic optimization
 - Journaling with crash recovery
@@ -48,11 +54,14 @@ pub struct SigmaCompositor {
 - Native metadata queries with SQL-like syntax
 - File versioning with automatic snapshots
 
+
 ### 3. Application Server
+
 **Original**: Haiku's application server for UI management  
 **SigmaOS**: Native SigmaAppServer with OS integration
 
 **App Server Features**:
+
 - Native application lifecycle management
 - Inter-application communication with native IPC
 - Resource sharing with capability-based access
@@ -60,11 +69,14 @@ pub struct SigmaCompositor {
 - Native drag-and-drop with type safety
 - Clipboard management with rich format support
 
+
 ### 4. Tracker File Manager
+
 **Original**: Haiku's innovative file manager  
 **SigmaOS**: SigmaFileManager with Tracker-inspired features
 
 **File Manager Features**:
+
 - Spatial file management with multiple windows
 - Native file queries with attribute search
 - Thumbnail generation with GPU acceleration
@@ -72,11 +84,14 @@ pub struct SigmaCompositor {
 - Native file operations with zero-copy
 - Integrated terminal with command-line access
 
+
 ### 5. Media Kit
+
 **Original**: Haiku's multimedia framework  
 **SigmaOS**: SigmaMediaKit with hardware acceleration
 
 **Media Features**:
+
 - Native audio/video playback with hardware acceleration
 - Codec support with automatic optimization
 - Media node architecture for flexible processing
@@ -84,11 +99,14 @@ pub struct SigmaCompositor {
 - Native media format conversion
 - Hardware-accelerated video encoding/decoding
 
+
 ### 6. Network Stack
+
 **Original**: Haiku's network stack  
 **SigmaOS**: SigmaNetStack with modern protocols
 
 **Network Features**:
+
 - Native TCP/IP stack with modern optimizations
 - Zero-copy networking for high performance
 - Native WiFi support with automatic configuration
@@ -96,12 +114,13 @@ pub struct SigmaCompositor {
 - Native VPN integration with WireGuard
 - Network monitoring with automatic diagnostics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Haiku OS | SigmaOS | Advantage |
-|---------|----------|---------|------------|
+| --------- | ---------- | --------- | ------------ |
 | UI Performance | Software rendering | GPU-accelerated | ✅ 5-10x |
 | Filesystem Performance | BFS | SigmaFS with optimizations | ✅ 2-3x |
 | Security | Basic permissions | Capability-based | ✅ 10x |
@@ -116,6 +135,7 @@ pub struct SigmaCompositor {
 ## Implementation Details
 
 ### Native Compositor with Haiku-Inspired Design
+
 ```rust
 pub mod compositor {
     use sigma_graphics::gpu::GPURenderer;
@@ -144,6 +164,7 @@ pub mod compositor {
 ```
 
 ### SigmaFS with Extended Attributes
+
 ```rust
 pub mod filesystem {
     pub struct SigmaFS {
@@ -174,26 +195,39 @@ pub mod filesystem {
 ### For Users of Haiku OS
 
 **Before** (using Haiku OS):
+
 ```bash
+
 # Install Haiku OS
+
 # Boot into Haiku
+
 # Use Haiku-specific applications
+
 # Limited hardware support
+
 # Basic security model
+
 ```
 
 **After** (using SigmaOS):
+
 ```bash
+
 # Enable Haiku-inspired theme
+
 sigma-desktop theme --haiku
 
 # Use Haiku-style file manager
+
 sigma-files --spatial
 
 # Native BFS-style queries
+
 sigma-files query --attribute "type=audio"
 
 # Hardware-accelerated media
+
 sigma-media play --hardware-accel
 ```
 
@@ -202,7 +236,7 @@ sigma-media play --hardware-accel
 ## Performance Benchmarks
 
 | Operation | Haiku OS | SigmaOS | Improvement |
-|-----------|----------|---------|-------------|
+| ----------- | ---------- | --------- | ------------- |
 | Window Open | 150ms | 30ms | 5x faster |
 | File Query (10K files) | 2.5s | 0.8s | 3.1x faster |
 | Video Playback (1080p) | 45fps | 60fps | 1.3x better |

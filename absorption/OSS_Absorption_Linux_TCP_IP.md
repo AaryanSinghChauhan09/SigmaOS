@@ -1,4 +1,5 @@
 # SigmaOS Networking Absorption - Linux TCP/IP Stack
+
 ## Making torvalds/linux (TCP/IP stack) Irrelevant
 
 > **Absorption Target**: https://github.com/torvalds/linux (networking stack)  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed the Linux TCP/IP stack by implementing a nati
 ## Absorbed Features & Capabilities
 
 ### 1. TCP/IP Stack
+
 **Original**: Linux's TCP/IP implementation  
 **SigmaOS**: Native TCP/IP with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaNet {
 ```
 
 **Stack Features**:
+
 - Native TCP/IP stack with OS-level optimization
 - Hardware-accelerated packet processing with GPU support
 - TCP congestion control with intelligent algorithms
@@ -36,11 +39,14 @@ pub struct SigmaNet {
 - Stack validation with automatic checking
 - Stack monitoring with real-time metrics
 
+
 ### 2. Socket API
+
 **Original**: Linux's socket API  
 **SigmaOS**: Native socket API with enhanced features
 
 **Socket Features**:
+
 - Native socket API with OS-level optimization
 - POSIX-compatible socket interface with automatic translation
 - Socket management with capability-based access
@@ -48,11 +54,14 @@ pub struct SigmaNet {
 - Socket validation with automatic checking
 - Socket monitoring with real-time metrics
 
+
 ### 3. Packet Processing
+
 **Original**: Linux's packet processing  
 **SigmaOS**: Native packet processing with enhanced features
 
 **Packet Features**:
+
 - Native packet processing with OS-level optimization
 - Zero-copy packet handling with intelligent optimization
 - Packet filtering with hardware acceleration
@@ -60,11 +69,14 @@ pub struct SigmaNet {
 - Packet validation with automatic checking
 - Packet monitoring with real-time metrics
 
+
 ### 4. Routing
+
 **Original**: Linux's routing system  
 **SigmaOS**: Native routing with enhanced features
 
 **Routing Features**:
+
 - Native routing with OS-level optimization
 - Intelligent route selection with ML algorithms
 - Route caching with automatic invalidation
@@ -72,11 +84,14 @@ pub struct SigmaNet {
 - Routing validation with automatic checking
 - Routing monitoring with real-time metrics
 
+
 ### 5. Network Drivers
+
 **Original**: Linux's network drivers  
 **SigmaOS**: Native drivers with enhanced features
 
 **Driver Features**:
+
 - Native network drivers with OS-level optimization
 - Direct hardware access with capability-based control
 - Driver auto-detection with automatic configuration
@@ -84,11 +99,14 @@ pub struct SigmaNet {
 - Driver validation with automatic checking
 - Driver monitoring with real-time metrics
 
+
 ### 6. Encryption
+
 **Original**: Linux's encryption (IPsec, TLS)  
 **SigmaOS**: Native encryption with enhanced features
 
 **Encryption Features**:
+
 - Native encryption with post-quantum algorithms
 - Hardware-accelerated encryption with native support
 - Automatic key management with intelligent rotation
@@ -96,12 +114,13 @@ pub struct SigmaNet {
 - Encryption validation with automatic checking
 - Encryption monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Linux TCP/IP | SigmaNet | Advantage |
-|---------|--------------|---------|------------|
+| --------- | -------------- | --------- | ------------ |
 | Stack Performance | Kernel overhead | Native OS-level | ✅ 5-10x |
 | Socket Performance | VFS overhead | Native capability | ✅ 5x |
 | Packet Processing | Software overhead | Hardware-accelerated | ✅ 10-50x |
@@ -116,6 +135,7 @@ pub struct SigmaNet {
 ## Implementation Details
 
 ### Native TCP Stack
+
 ```rust
 pub mod tcp {
     use sigma_net::tcp::TCPStack;
@@ -139,6 +159,7 @@ pub mod tcp {
 ```
 
 ### Native Socket API
+
 ```rust
 pub mod socket {
     pub struct SocketAPI {
@@ -165,6 +186,7 @@ pub mod socket {
 ### For Linux Applications Using Sockets
 
 **Before** (using Linux sockets):
+
 ```c
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -177,6 +199,7 @@ int main() {
 ```
 
 **After** (using SigmaNet):
+
 ```rust
 use sigma_net::socket::SocketAPI;
 
@@ -193,7 +216,7 @@ fn main() {
 ## Performance Benchmarks
 
 | Operation | Linux TCP/IP | SigmaNet | Improvement |
-|-----------|--------------|---------|-------------|
+| ----------- | -------------- | --------- | ------------- |
 | Socket Create | 10μs | 2μs | 5x faster |
 | TCP Connection | 100μs | 20μs | 5x faster |
 | Packet Throughput | 1Gbps | 10Gbps | 10x faster |

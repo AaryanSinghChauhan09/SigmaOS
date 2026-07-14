@@ -16,6 +16,7 @@ Examples of behavior that contributes to creating a positive environment include
 - **Focusing on what is best for the community**
 - **Showing empathy towards other community members**
 
+
 Examples of unacceptable behavior by participants include:
 
 - **The use of sexualized language or imagery and unwelcome sexual attention or advances**
@@ -23,6 +24,7 @@ Examples of unacceptable behavior by participants include:
 - **Public or private harassment**
 - **Publishing others' private information, such as a physical or electronic address, without explicit permission**
 - **Other conduct which could reasonably be considered inappropriate in a professional setting**
+
 
 ## Our Responsibilities
 
@@ -48,6 +50,7 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be repor
 4. **Resolution**: Appropriate action will be taken based on the investigation
 5. **Follow-up**: You will be informed of the resolution (within confidentiality limits)
 
+
 ### What to Include in a Report
 
 When reporting an incident, please include:
@@ -57,6 +60,7 @@ When reporting an incident, please include:
 - **Involved Parties**: Names or usernames of those involved
 - **Evidence**: Screenshots, logs, or other evidence if available
 - **Context**: Any relevant context or background information
+
 
 ### Confidentiality
 
@@ -72,6 +76,7 @@ The conduct team may take the following actions:
 - **Content Removal**: Removal of inappropriate content
 - **Public Statement**: Public statement about the incident (if appropriate)
 
+
 ### Appeal Process
 
 If you believe an enforcement action was taken in error:
@@ -81,11 +86,13 @@ If you believe an enforcement action was taken in error:
 3. **Decision**: You will be informed of the decision
 4. **Final**: The decision of the conduct team is final
 
+
 ## Contact Information
 
 - **Email**: conduct@sigmaos.org
 - **PGP Key**: Available on GitHub for secure communication
 - **Discord**: Direct message a conduct team member
+
 
 ## Attribution
 
@@ -98,6 +105,7 @@ Community Impact Guidelines were inspired by [Mozilla's code of conduct enforcem
 - [Contributor Covenant Homepage](https://www.contributor-covenant.org)
 - [Community Impact Guidelines](https://www.contributor-covenant.org/version/2/0/index.html#community-impact-guidelines)
 - [Mozilla Code of Conduct](https://github.com/mozilla/diversity)
+
 
 ---
 

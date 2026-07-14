@@ -5,7 +5,9 @@ edition = "2021"
 description = "SigmaOS Kernel ABI boundary types"
 
 [lib]
-crate-type = ["staticlib", "rlib"]
+crate-type = ["rlib"]
+test       = false
+bench      = false
 
 [dependencies]
 # Zero dependencies to remain compatible with no_std.

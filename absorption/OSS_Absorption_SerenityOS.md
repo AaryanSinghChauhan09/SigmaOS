@@ -1,4 +1,5 @@
 # SigmaOS Kernel Absorption - SerenityOS
+
 ## Making SerenityOS/serenity Irrelevant
 
 > **Absorption Target**: https://github.com/SerenityOS/serenity  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed SerenityOS by implementing a native microkern
 ## Absorbed Features & Capabilities
 
 ### 1. Modern GUI Toolkit
+
 **Original**: Serenity's LibGUI with clean API  
 **SigmaOS**: SigmaGUI with Serenity-inspired design
 
@@ -29,6 +31,7 @@ pub struct SigmaGUI {
 ```
 
 **GUI Features**:
+
 - Clean, intuitive widget API with type safety
 - Native layout management with automatic optimization
 - Theme system with declarative styling
@@ -36,11 +39,14 @@ pub struct SigmaGUI {
 - Native event handling with zero-copy
 - Accessibility features with native support
 
+
 ### 2. Browser Engine Integration
+
 **Original**: Serenity's Ladybird browser  
 **SigmaOS**: SigmaBrowser with modern web standards
 
 **Browser Features**:
+
 - Modern web standards support (HTML5, CSS3, ES6+)
 - Hardware-accelerated rendering with GPU
 - JavaScript engine with JIT compilation
@@ -48,11 +54,14 @@ pub struct SigmaGUI {
 - Privacy-focused browsing with tracker blocking
 - Extension system with capability-based security
 
+
 ### 3. Terminal Emulator
+
 **Original**: Serenity's Terminal app  
 **SigmaOS**: SigmaTerm with Serenity-inspired features
 
 **Terminal Features**:
+
 - Native terminal emulation with GPU acceleration
 - True color support with 24-bit colors
 - Unicode support with emoji rendering
@@ -60,11 +69,14 @@ pub struct SigmaGUI {
 - Split panes with flexible layouts
 - Native shell integration with sigma-shell
 
+
 ### 4. File Manager
+
 **Original**: Serenity's File Manager  
 **SigmaOS**: SigmaFileManager with Serenity-inspired design
 
 **File Manager Features**:
+
 - Clean, intuitive interface with keyboard shortcuts
 - Native file operations with zero-copy
 - Thumbnail generation with GPU acceleration
@@ -72,11 +84,14 @@ pub struct SigmaGUI {
 - Integrated terminal with command-line access
 - Network transparency with native protocols
 
+
 ### 5. Text Editor
+
 **Original**: Serenity's Text Editor  
 **SigmaOS**: SigmaEdit with Serenity-inspired features
 
 **Editor Features**:
+
 - Native text editing with syntax highlighting
 - Multiple file tabs with automatic saving
 - Search and replace with regex support
@@ -84,11 +99,14 @@ pub struct SigmaGUI {
 - Native encoding support with automatic detection
 - Plugin system with capability-based security
 
+
 ### 6. System Settings
+
 **Original**: Serenity's Settings app  
 **SigmaOS**: SigmaSettings with unified configuration
 
 **Settings Features**:
+
 - Unified settings interface with categories
 - Native configuration management with validation
 - Real-time preview of changes
@@ -96,12 +114,13 @@ pub struct SigmaGUI {
 - Native theme customization
 - Hardware configuration with automatic detection
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | SerenityOS | SigmaOS | Advantage |
-|---------|------------|---------|------------|
+| --------- | ------------ | --------- | ------------ |
 | GUI Performance | Software rendering | GPU-accelerated | ✅ 5-10x |
 | Browser Performance | Basic engine | Modern standards | ✅ 10x |
 | Terminal Performance | Basic emulation | GPU-accelerated | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaGUI {
 ## Implementation Details
 
 ### Native GUI with Serenity-Inspired Design
+
 ```rust
 pub mod gui {
     use sigma_graphics::gpu::GPURenderer;
@@ -144,6 +164,7 @@ pub mod gui {
 ```
 
 ### Native Browser Integration
+
 ```rust
 pub mod browser {
     pub struct SigmaBrowser {
@@ -171,26 +192,39 @@ pub mod browser {
 ### For Users of SerenityOS
 
 **Before** (using SerenityOS):
+
 ```bash
+
 # Build SerenityOS
+
 # Boot into Serenity
+
 # Use Serenity-specific applications
+
 # Limited hardware support
+
 # Basic security model
+
 ```
 
 **After** (using SigmaOS):
+
 ```bash
+
 # Enable Serenity-inspired theme
+
 sigma-desktop theme --serenity
 
 # Use Serenity-style file manager
+
 sigma-files --serenity-ui
 
 # Native browser with modern standards
+
 sigma-browser load --url example.com
 
 # Hardware-accelerated terminal
+
 sigma-term --gpu-accel
 ```
 
@@ -199,7 +233,7 @@ sigma-term --gpu-accel
 ## Performance Benchmarks
 
 | Operation | SerenityOS | SigmaOS | Improvement |
-|-----------|------------|---------|-------------|
+| ----------- | ------------ | --------- | ------------- |
 | Window Render | 200ms | 40ms | 5x faster |
 | Browser Page Load | 3.5s | 1.2s | 2.9x faster |
 | Terminal Render | 50ms | 10ms | 5x faster |

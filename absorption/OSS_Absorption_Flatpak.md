@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - Flatpak
+
 ## Making flatpak/flatpak Irrelevant
 
 > **Absorption Target**: https://github.com/flatpak/flatpak  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Flatpak by implementing a native container ru
 ## Absorbed Features & Capabilities
 
 ### 1. Container Runtime
+
 **Original**: Flatpak's container runtime  
 **SigmaOS**: Native container runtime with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaContainer {
 ```
 
 **Container Features**:
+
 - Native container runtime with OS-level optimization
 - Capability-based sandboxing with hardware enforcement
 - Permission system with fine-grained control
@@ -36,11 +39,14 @@ pub struct SigmaContainer {
 - Container isolation with proven security
 - Resource limiting with automatic enforcement
 
+
 ### 2. Application Bundles
+
 **Original**: Flatpak's application bundles  
 **SigmaOS**: Native application bundles with enhanced features
 
 **Bundle Features**:
+
 - Declarative bundle definitions with type safety
 - Runtime dependencies with automatic resolution
 - Extension system with modular composition
@@ -48,11 +54,14 @@ pub struct SigmaContainer {
 - Bundle compression with automatic optimization
 - Bundle caching with intelligent invalidation
 
+
 ### 3. Runtime Management
+
 **Original**: Flatpak's runtime system  
 **SigmaOS**: Native runtime management with OS integration
 
 **Runtime Features**:
+
 - Multiple runtime versions with automatic selection
 - Runtime sharing with deduplication
 - Runtime updates with automatic synchronization
@@ -60,11 +69,14 @@ pub struct SigmaContainer {
 - Runtime verification with proven correctness
 - Runtime caching with automatic management
 
+
 ### 4. Permission System
+
 **Original**: Flatpak's permission model (portals)  
 **SigmaOS**: Native permission system with enhanced features
 
 **Permission Features**:
+
 - Fine-grained permission control with capability-based access
 - Portal system with native integration
 - Permission inheritance with composition
@@ -72,11 +84,14 @@ pub struct SigmaContainer {
 - Permission auditing with tamper-proof logs
 - Permission templates with automatic application
 
+
 ### 5. Sandbox Isolation
+
 **Original**: Flatpak's bubblewrap-based sandbox  
 **SigmaOS**: Native sandbox with hardware enforcement
 
 **Sandbox Features**:
+
 - Capability-based sandboxing with hardware enforcement
 - Filesystem isolation with proven security
 - Network isolation with automatic filtering
@@ -84,11 +99,14 @@ pub struct SigmaContainer {
 - Device isolation with hardware control
 - Resource isolation with automatic limiting
 
+
 ### 6. Flatpak Compatibility
+
 **Original**: Flatpak ecosystem  
 **SigmaOS**: Native Flatpak compatibility layer
 
 **Compatibility Features**:
+
 - Flatpak bundle format support
 - Flatpak runtime compatibility
 - Flatpak permission translation
@@ -96,12 +114,13 @@ pub struct SigmaContainer {
 - Flatpak command-line compatibility
 - Flatpak repository support
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Flatpak | SigmaOS | Advantage |
-|---------|---------|---------|------------|
+| --------- | --------- | --------- | ------------ |
 | Container Performance | bubblewrap overhead | Native runtime | ✅ 5-10x |
 | Sandbox Security | User namespaces | Capability-based | ✅ 10x |
 | Permission System | Portals | Native permissions | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaContainer {
 ## Implementation Details
 
 ### Native Container Runtime
+
 ```rust
 pub mod container {
     use sigma_container::runtime::ContainerRuntime;
@@ -144,6 +164,7 @@ pub mod container {
 ```
 
 ### Native Permission System
+
 ```rust
 pub mod permission {
     pub struct PermissionSystem {
@@ -169,29 +190,40 @@ pub mod permission {
 ### For Users of Flatpak
 
 **Before** (using Flatpak):
+
 ```bash
+
 # Install Flatpak
+
 flatpak install flathub com.example.App
 
 # Run application
+
 flatpak run com.example.App
 
 # Manage permissions
+
 flatpak permission-reset com.example.App
 ```
 
 **After** (using SigmaContainer):
+
 ```bash
+
 # Enable container shard (native)
+
 sigma-shard enable container-runtime
 
 # Install application bundle
+
 sigma-container install --bundle com.example.App
 
 # Run container
+
 sigma-container run --app com.example.App
 
 # Manage permissions
+
 sigma-container permission --app com.example.App --reset
 ```
 
@@ -200,7 +232,7 @@ sigma-container permission --app com.example.App --reset
 ## Performance Benchmarks
 
 | Operation | Flatpak | SigmaContainer | Improvement |
-|-----------|---------|----------------|-------------|
+| ----------- | --------- | ---------------- | ------------- |
 | Container Launch | 800ms | 150ms | 5.3x faster |
 | Permission Check | 50ms | 10ms | 5x faster |
 | Bundle Install (100MB) | 30s | 10s | 3x faster |
