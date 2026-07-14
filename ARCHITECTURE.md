@@ -1,9 +1,9 @@
 # SigmaOS Architecture
 
 > **Status**: Implemented
-> **Last Updated**: 2026-07-13
+> **Last Updated**: 2026-07-14
 
-This document describes the high-level architecture of SigmaOS, including the microkernel design, shard architecture, security model, and component interactions.
+This document describes the high-level architecture of SigmaOS, including the microkernel design, shard architecture, security model, component interactions, and object-oriented design patterns.
 
 ## Overview
 
@@ -717,6 +717,120 @@ graph TB
     Predictive --> Smart
 ```
 
+## Object-Oriented Design Patterns
+
+SigmaOS employs object-oriented programming (OOP) principles throughout its architecture to enhance modularity, extensibility, and maintainability.
+
+### OOP Principles Applied
+
+**Encapsulation**: Each shard and subsystem exposes a well-defined interface, hiding internal state and implementation details.
+
+**Abstraction**: Traits (Rust), interfaces (Nim/Zig), and abstract base classes define contracts for drivers, filesystems, and IPC endpoints.
+
+**Inheritance and Composition**: Favor composition over inheritance where possible, but use inheritance for shared behaviors (e.g., device classes).
+
+**Polymorphism**: Runtime selection of implementations (e.g., different schedulers, allocators, filesystems) via trait objects or interface pointers.
+
+### Design Patterns
+
+**Singleton Pattern**: Used for global managers (e.g., Memory Manager, Security Manager) to ensure single instances.
+
+**Factory Pattern**: Used for driver instantiation and shard loading to create objects without specifying exact classes.
+
+**Observer Pattern**: Used for event notification between shards (e.g., device hot-plug events).
+
+**Strategy Pattern**: Used for pluggable algorithms (e.g., scheduler selection, allocator selection).
+
+### OOP in Rust
+
+**Traits and Trait Objects**: Define interfaces (e.g., Scheduler, Allocator, DeviceDriver), and trait objects (Box<dyn Trait>) for dynamic dispatch.
+
+```rust
+pub trait Scheduler {
+    fn schedule(&mut self, tasks: &mut Vec<Task>) -> Option<Task>;
+    fn add_task(&mut self, task: Task);
+}
+
+pub struct EEVDFScheduler {
+    // Implementation details
+}
+
+impl Scheduler for EEVDFScheduler {
+    fn schedule(&mut self, tasks: &mut Vec<Task>) -> Option<Task> {
+        // EEVDF scheduling logic
+    }
+    fn add_task(&mut self, task: Task) {
+        // Add task logic
+    }
+}
+```
+
+**Enums and State Machines**: Model stateful components (e.g., process states, device states) using enums and the state pattern.
+
+```rust
+pub enum ProcessState {
+    Created,
+    Ready,
+    Running,
+    Blocked,
+    Terminated,
+}
+
+pub struct Process {
+    state: ProcessState,
+    // Other fields
+}
+```
+
+**Ownership and Lifetimes**: Leverage Rust's ownership model to enforce safe resource management and prevent use-after-free.
+
+### OOP in Nim
+
+**Classes and Interfaces**: Use Nim's class system for OOP hierarchies; interfaces for polymorphic behavior.
+
+```nim
+type
+  ContainerRuntime* = ref object of RootObj
+    runtimeId*: SigmaU32
+    initialized*: SigmaBool
+
+  SovereignContainer* = ref object of ContainerRuntime
+    containerId*: SigmaU64
+    state*: ContainerState
+
+method runtimeInit*(self: ContainerRuntime) {.base.} =
+  self.initialized = true
+```
+
+**Destructors and Move Semantics**: Ensure deterministic resource cleanup, especially in kernel code.
+
+**Macros**: Generate boilerplate code for repetitive patterns (e.g., device registration).
+
+### OOP in Zig
+
+**Structs and Function Pointers**: Achieve OOP via structs with function pointers (akin to vtables), enabling dynamic dispatch.
+
+```zig
+const DeviceDriver = struct {
+    init: fn(*DeviceDriver) error!void,
+    read: fn(*DeviceDriver, []u8) error!usize,
+    write: fn(*DeviceDriver, []const u8) error!usize,
+    // Other function pointers
+};
+```
+
+**Comptime Interfaces**: Use comptime to enforce interface contracts at compile time.
+
+**Composition**: Favor composition for code reuse and flexibility.
+
+### User-Defined Functions and Minimal Dependencies
+
+**Custom Abstractions**: Define user-specific functions for core operations (e.g., memory allocation, IPC, scheduling) rather than relying on standard library or OS-provided primitives.
+
+**Kernel/Userland Separation**: Implement custom allocators, syscalls, and IPC mechanisms to avoid dependency on libc or POSIX APIs.
+
+**Performance and Security**: Custom functions can be tailored for performance (e.g., lock-free data structures) and security (e.g., capability checks).
+
 ## Summary
 
 SigmaOS architecture is designed around the following principles:
@@ -726,10 +840,11 @@ SigmaOS architecture is designed around the following principles:
 3. **Performance**: Zero-copy operations and O(1) scheduling
 4. **Sovereignty**: Post-quantum cryptography and local-first design
 5. **Extensibility**: Support for experimental and self-evolving features
+6. **Object-Oriented Design**: Encapsulation, abstraction, inheritance, composition, and polymorphism throughout the system
+7. **Minimal Dependencies**: Custom implementations of core functions to reduce reliance on external libraries
 
-
-The architecture enables SigmaOS to be deployed in various environments from embedded systems to cloud platforms while maintaining security and performance.
+The architecture enables SigmaOS to be deployed in various environments from embedded systems to cloud platforms while maintaining security, performance, and maintainability.
 
 ---
 
-*Last Updated: 2026-07-13*
+*Last Updated: 2026-07-14*

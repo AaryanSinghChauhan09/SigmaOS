@@ -31,7 +31,22 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). By participati
 - Follow the [INSTALL.md](INSTALL.md) guide to set up your development environment
 - Have a GitHub account
 - Understand the basic concepts of operating systems and kernel development
+- Familiarity with Rust, Nim, or Zig (depending on contribution area)
 
+### Development Environment Setup
+
+**Required Tools**:
+- Rust toolchain (stable, for kernel development)
+- Nim compiler (for userland tools)
+- Zig compiler (for low-level components)
+- QEMU (for testing)
+- Git (for version control)
+
+**Optional Tools**:
+- GDB (for debugging)
+- Valgrind (for memory analysis)
+- Clippy (Rust linter)
+- Nimpretty (Nim formatter)
 
 ### First Steps
 
@@ -53,6 +68,23 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). By participati
 
    ```bash
    git checkout -b feature/your-feature-name
+   ```
+
+5. **Set up development environment**:
+
+   ```bash
+   # Install Rust toolchain
+   rustup install stable
+   rustup component add clippy rustfmt
+
+   # Install Nim (if needed)
+   # See https://nim-lang.org/install.html
+
+   # Install Zig (if needed)
+   # See https://ziglang.org/download/
+
+   # Build SigmaOS
+   make build
    ```
 
 ---
@@ -139,10 +171,13 @@ SigmaOS uses multiple languages for different purposes:
 - **C**: Legacy compatibility, hardware-specific code (minimal)
 - **Ada/SPARK**: Formal verification, safety-critical components
 
-
+, inheritance, polymorphism
 See [LANGUAGE_POLICY.md](LANGUAGE_POLICY.md) for detailed language usage guidelines.
 
-### Rust Guidelines
+### Rust Guidelinesnd small**
+- **Minimize predefined function dependencies**
+- **Prefer user-defieabstraction over library functions**
+- **Docuent  custom implementations
 
 - Use `cargo fmt` for formatting
 - Use `cargo clippy` for linting
@@ -450,4 +485,44 @@ By contributing, you agree that your contributions will be licensed under the pr
 
 ---
 
-*Last Updated: 2026-07-13*
+## Contributor Onboarding
+
+### First Contribution Path
+
+New contributors should follow this path for their first contribution:
+
+1. **Choose a "good first issue"** from the issue tracker
+2. **Comment on the issue** to claim it (avoid duplicate work)
+3. **Set up development environment** (see above)
+4. **Make your changes** following coding standards
+5. **Write tests** for your changes
+6. **Submit a pull request** with the PR template
+7. **Address review feedback** promptly
+8. **Celebrate your first contribution!**
+
+### Mentorship Program
+
+SigmaOS offers mentorship for new contributors:
+
+- **Request a mentor** by commenting on your issue with `@sigmaos-mentors`
+- **Pair programming** sessions available via Discord
+- **Code review guidance** from experienced contributors
+- **Architecture discussions** for complex changes
+
+### Getting Help
+
+- **GitHub Discussions**: Ask questions in the appropriate category
+- **Discord**: Real-time help in #help channel
+- **Documentation**: Check existing docs before asking
+- **Search**: Search issues and discussions first
+
+### Development Resources
+
+- **Architecture Guide**: See [ARCHITECTURE.md](ARCHITECTURE.md)
+- **API Documentation**: See `docs/api/` directory
+- **Examples**: See `examples/` directory
+- **Tests**: See existing tests for patterns
+
+---
+
+*Last Updated: 2026-07-14*
