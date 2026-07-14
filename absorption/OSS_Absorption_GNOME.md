@@ -194,6 +194,7 @@ pub mod notification {
 ### For Users of GNOME
 
 **Before** (using GNOME):
+
 ```bash
 
 # Install GNOME
@@ -211,6 +212,7 @@ gnome-tweaks
 ```
 
 **After** (using SigmaDesktop):
+
 ```bash
 
 # Enable desktop shard (native)

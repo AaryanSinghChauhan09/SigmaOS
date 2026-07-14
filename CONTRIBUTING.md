@@ -282,6 +282,7 @@ let result = feature_function();
 ### Configuration
 
 Configuration options and examples.
+
 ```text
 
 ### Architecture Documentation
