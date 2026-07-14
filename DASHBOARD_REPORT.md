@@ -289,8 +289,25 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
    - Added `WIKI/OSS_Absorption_Wayland.md`.
    - Added `WIKI/OSS_Absorption_DBus.md`.
 
-## ➡️ Next Recommended Steps (Batch 14)
+## 🛠️ Batch 14 & Hardware/Audio Absorption Implemented
 
-- **QEMU Bootable Target (`sigma_boot`)**: Package the Kernel, `sigma_init`, `sigma_compositor`, and other daemons into a single bootable `initramfs` or RAW disk image for virtualization.
-- **Hardware Abstraction Layer (`sigma_hal`)**: Absorb `udev` concepts to natively manage dynamic device nodes and permissions in `/dev`.
-- **Audio Subsystem (`sigma_audio`)**: Absorb `PipeWire`/`PulseAudio` into a low-latency native audio router.
+1. **udev Absorption (`sigma_hal`)**:
+   - Created `DeviceManager` to listen to netlink uevents.
+   - Dynamic device nodes mapped tightly with `SigmaContext` SELinux labeling to prevent permission race conditions.
+
+2. **PipeWire / PulseAudio Absorption (`sigma_audio`)**:
+   - Created `AudioRouter` to handle native sound streams.
+   - Implemented zero-copy `RingBuffer` abstraction in Rust to eliminate IPC overhead and guarantee low-latency hardware playback.
+
+3. **Virtualization Target (`sigma_boot`)**:
+   - Created `InitramfsBuilder` to package `sigma_init` (PID 1) and core daemons into an initial RAM filesystem for QEMU booting.
+
+4. **WIKI Documentation Expansion**:
+   - Added `WIKI/OSS_Absorption_udev.md`.
+   - Added `WIKI/OSS_Absorption_PipeWire.md`.
+
+## ➡️ Next Recommended Steps (Batch 15)
+
+- **System Profiling & Telemetry Absorptions (`sigma_tracing`)**: Build a native, zero-overhead tracing and profiling daemon to absorb `perf`, `strace`, and `BPF` concepts.
+- **Service Integration Test**: Write a top-level integration test that actually spins up `sigma_boot`'s initramfs in QEMU and boots `sigma_init`.
+- **Desktop UI Polish**: Absorb ideas from modern Linux DEs (GNOME, KDE Plasma) into the `SigmaDesktop` module (Panel, Dash, Notification Center).
