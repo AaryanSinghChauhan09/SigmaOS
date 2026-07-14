@@ -20,6 +20,14 @@ require_file() {
     echo "OK   ${rel}"
     return 0
   fi
+  # Fallback to WIKI/ folder if checked path is under wiki_repo/
+  if [[ "$rel" == wiki_repo/* ]]; then
+    local filename="${rel#wiki_repo/}"
+    if [[ -f "${ROOT}/WIKI/${filename}" ]]; then
+      echo "OK   ${rel}"
+      return 0
+    fi
+  fi
   echo "MISS ${rel}"
   return 1
 }
