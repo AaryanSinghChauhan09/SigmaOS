@@ -12,9 +12,12 @@ This document translates the strategic vision into concrete implementation tasks
 
 - SDF (Sovereign Driver Framework) v3 — implemented (`drivers/`)
 
+
 - 11 drivers loaded: net, storage, GPU, input, audio, USB
 
+
 - ABI stability checking — `sigma-drv abi check`
+
 
 ### New CLI Tool: `sigma-drv`
 
@@ -38,7 +41,7 @@ sigma-drv port --linux iwlwifi         # AI-assisted Linux driver porting guide
 ### Roadmap Tasks
 
 | Task | Status | File |
-|------|--------|------|
+| ------ | -------- | ------ |
 | Stable SDF ABI v3 | ✅ Done | `drivers/ddk/` |
 | Driver hot-reload | ✅ Done | `sigma-drv reload` |
 | ABI stability check | ✅ Done | `sigma-drv abi` |
@@ -57,9 +60,12 @@ sigma-drv port --linux iwlwifi         # AI-assisted Linux driver porting guide
 
 - `sigma-pkg` implemented (`pkg/sigma_pkg_cli.nim`) with 12 commands
 
+
 - OCI container runtime: `userland/tools/sigma_pod_cli.nim`
 
+
 - Declarative config: `tools/cli/SovereignDeclarativeConfig.rs`
+
 
 ### Key Commands
 
@@ -84,7 +90,7 @@ sigma-pkg install --flatpak flathub:org.gimp.GIMP
 ### Roadmap Tasks
 
 | Task | Status | File |
-|------|--------|------|
+| ------ | -------- | ------ |
 | sigpkg format v1 | ✅ Done | `pkg/sigma-manifest.toml.example` |
 | sigma-pkg CLI | ✅ Done | `pkg/sigma_pkg_cli.nim` |
 | .deb absorption layer | 🔄 Planned | `tools/sigma_pkg_debian_compat.rs` |
@@ -128,7 +134,7 @@ sigma-ai translate "sigma update" --to hi        # translate CLI to Hindi
 
 ### Multi-Agent Architecture
 
-```
+```text
 sigma-ai (coordinator)
 ├── SysAdmin agent    → system health, updates, drivers
 ├── Security agent    → policy, CVEs, hardening
@@ -139,7 +145,7 @@ sigma-ai (coordinator)
 ### Roadmap Tasks
 
 | Task | Status | File |
-|------|--------|------|
+| ------ | -------- | ------ |
 | sigma-ai daemon (llama.cpp backend) | 🔄 Integration | `userland/ai/` |
 | NL → CLI translator | ✅ Done | `sigma-ai translate` |
 | Educational explain mode | ✅ Done | `sigma-ai explain` |
@@ -160,11 +166,15 @@ sigma-ai (coordinator)
 
 - Dilithium-5 (NIST FIPS 204) — all packages and drivers signed
 
+
 - TPM 2.0 attestation — `sigma-secure attest`
+
 
 - NIST/RBI/HIPAA compliance — `sigma_compliance.nim`
 
+
 - sigma-fix AI-guided patching — `tools/sigma-fix.rs`
+
 
 ### Key Commands
 
@@ -188,7 +198,7 @@ sigma-fix apply --id FIX-0001 --auto   # auto-apply SSH fix
 ### Roadmap Tasks
 
 | Task | Status | File |
-|------|--------|------|
+| ------ | -------- | ------ |
 | Dilithium-5 everywhere | ✅ Done | `crypto/dilithium.adb` |
 | IMA policy | ✅ Done | `security/SovereignKernelIntegrityChecker.adb` |
 | TPM attestation | ✅ Done | `sigma-secure attest` |
@@ -226,7 +236,8 @@ sigma-fleet lock --wipe               # remote lock/wipe
 ### Plugin Architecture
 
 Contribute a plugin with a single PR:
-```
+
+```text
 plugins/<name>/
   plugin.sigma.toml   # manifest
 
@@ -234,13 +245,14 @@ plugins/<name>/
 
   README.md
 ```
+
 Register: `sigma-pkg install myname-plugin`
 Discovery: any binary `sigma-<name>` on PATH is auto-discovered.
 
 ### Roadmap Tasks
 
 | Task | Status | File |
-|------|--------|------|
+| ------ | -------- | ------ |
 | Zenith desktop (Wayland) | 🔄 Building | `zenith_desktop/` |
 | sigma-fleet MDM | ✅ Done | `tools/sigma-fleet.rs` |
 | Plugin auto-discovery | ✅ Done | `sigma help` shows plugins |
@@ -277,7 +289,7 @@ sigma-ai script "add IPv6 routing"     # AI-generated automation
 ### Supported Languages
 
 | Language | Role |
-|----------|------|
+| ---------- | ------ |
 | Rust (`no_std`) | Kernel, drivers, CLI tools, sigma-sh |
 | Nim | Package manager, userspace tools, shell scripting |
 | Zig | Filesystem (SigmaFS), boot, HAL helpers |
@@ -289,7 +301,7 @@ sigma-ai script "add IPv6 routing"     # AI-generated automation
 ### Roadmap Tasks
 
 | Task | Status | File |
-|------|--------|------|
+| ------ | -------- | ------ |
 | sigma-sh v0.3 (full scripting) | ✅ Done | `sigma-sh/src/` |
 | sigma-coreutils (BusyBox-style) | ✅ Done | `userland/coreutils/src/main.rs` |
 | sigma_getopt (arg parser lib) | ✅ Done | `userland/tools/sigma_getopt.nim` |
@@ -303,7 +315,7 @@ sigma-ai script "add IPv6 routing"     # AI-generated automation
 ## Implementation Progress Summary
 
 | Pillar | Score | Key remaining |
-|--------|-------|---------------|
+| -------- | ------- | --------------- |
 | 1. Driver Support | 80% | WiFi drivers, vendor SDK |
 | 2. Package Ecosystem | 75% | .deb/.rpm absorption, mirror network |
 | 3. AI & Automation | 70% | llama.cpp integration, Bhashini |

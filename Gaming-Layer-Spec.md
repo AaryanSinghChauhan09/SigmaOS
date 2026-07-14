@@ -7,16 +7,18 @@
 ## Vision
 
 The SigmaOS Gaming Layer provides first-class gaming support through:
+
 - **Native Vulkan**: Direct Vulkan 1.3 implementation using the sovereign GPU HAL
 - **DirectX Compatibility (sigma-dx)**: DirectX 11/12 → Vulkan translation layer
 - **Performance Runtime**: Low-latency audio, high-priority GPU scheduling, frame pacing
 - **Game Store Integration**: Native `.spkg` game distribution with asset streaming
 
+
 ---
 
 ## Architecture
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │                     Games / Applications                    │
 │  Native Vulkan │ DirectX (via sigma-dx) │ OpenGL (via ANGLE)│
@@ -44,7 +46,7 @@ The SigmaOS Gaming Layer provides first-class gaming support through:
 ### Supported Extensions (Phase 1 Target)
 
 | Extension | Priority | Notes |
-|-----------|----------|-------|
+| ----------- | ---------- | ------- |
 | `VK_KHR_swapchain` | Critical | Display output |
 | `VK_KHR_synchronization2` | Critical | Modern sync primitives |
 | `VK_KHR_dynamic_rendering` | High | Renderpass simplification |
@@ -61,6 +63,7 @@ The SigmaOS Gaming Layer provides first-class gaming support through:
 - **Async Compute** queues for parallel GPU/CPU work
 - **Variable Rate Shading (VRS)** where supported
 
+
 ---
 
 ## DirectX Compatibility (sigma-dx)
@@ -70,7 +73,7 @@ sigma-dx is a translation layer that converts DirectX API calls to Vulkan, inspi
 ### Supported DirectX Versions
 
 | API | Status | Games Coverage |
-|-----|--------|---------------|
+| ----- | -------- | --------------- |
 | Direct3D 9 | Planned | Legacy (D9→Vulkan via ANGLE) |
 | Direct3D 11 | Planned | ~80% of PC game library |
 | Direct3D 12 | Planned | Modern titles |
@@ -81,7 +84,7 @@ sigma-dx is a translation layer that converts DirectX API calls to Vulkan, inspi
 ### D3D12 → Vulkan Mapping
 
 | D3D12 Concept | Vulkan Equivalent |
-|---------------|-------------------|
+| --------------- | ------------------- |
 | `ID3D12Device` | `VkDevice` |
 | `ID3D12CommandList` | `VkCommandBuffer` |
 | `ID3D12Fence` | `VkSemaphore` + `VkFence` |
@@ -98,6 +101,7 @@ sigma-dx is a translation layer that converts DirectX API calls to Vulkan, inspi
 - **Target**: < 1 ms frame timing variance at 60/120/144 Hz
 - Adaptive sync support (GSYNC, FreeSync, HDMI VRR)
 - Frame time prediction using exponential moving average
+
 
 ### Low-Latency Audio
 
@@ -116,7 +120,7 @@ Target latency: **< 10 ms** end-to-end (input → GPU → display)
 ### Input Pipeline
 
 | Input Source | Maximum Latency Target |
-|-------------|----------------------|
+| ------------- | ---------------------- |
 | Mouse/Keyboard | < 1 ms |
 | Gamepad (USB) | < 2 ms |
 | Gamepad (Bluetooth) | < 8 ms |
@@ -129,7 +133,7 @@ Target latency: **< 10 ms** end-to-end (input → GPU → display)
 ### Supported Protocols
 
 | Controller | Protocol | Notes |
-|-----------|----------|-------|
+| ----------- | ---------- | ------- |
 | Xbox Series X/S | USB + BT | Native XInput |
 | PlayStation DualSense | USB + BT | Native HID |
 | Nintendo Switch Pro | USB + BT | Nintendo HID |
@@ -156,7 +160,7 @@ pub trait Gamepad {
 The thermal daemon supports a `gaming` profile:
 
 | Setting | Value |
-|---------|-------|
+| --------- | ------- |
 | CPU max frequency | 5.2 GHz (all-core boost) |
 | GPU priority | Elevated (RT scheduling class) |
 | RAM prefetch | Aggressive |
@@ -198,12 +202,13 @@ vram_minimum_mb = 4096
 - **Shader cache** stored at `/var/cache/sigma/shaders/<game-hash>/`
 - **Online shader cache sharing** (opt-in): users contribute compiled shaders to improve experience for others
 
+
 ---
 
 ## Implementation Roadmap
 
 | Milestone | Target | Description |
-|-----------|--------|-------------|
+| ----------- | -------- | ------------- |
 | M1 | 2027 Q1 | Vulkan ICD skeleton + NV/AMD GPU HAL |
 | M2 | 2027 Q2 | D3D11→Vulkan translation (core) |
 | M3 | 2027 Q3 | D3D12→Vulkan (core) |

@@ -8,7 +8,7 @@
 ## Why Windows Has Better Device Support
 
 | Factor | Detail |
-|--------|--------|
+| -------- | -------- |
 | **Market dominance** | 90%+ desktop share — vendors have no choice but to target Windows first |
 | **Unified driver model** | WDM (Win2000+) and WDDM (Vista+) enforce consistent interfaces across hardware generations |
 | **Vendor-supplied drivers** | OEMs ship drivers with hardware, auto-updated via Windows Update |
@@ -24,20 +24,24 @@ vendors have **business incentives** (90% market share) to write and maintain dr
 This comes at a cost: Windows carries **decades of legacy baggage**:
 
 - The Win32 subsystem (ntdll.dll, kernel32.dll, user32.dll) ships with code paths
+
   from Windows NT 3.1 (1993) still active
 
 - Drivers run in **ring-0** with full kernel access — one driver bug = full BSOD
 
+
 - Closed drivers cannot be audited, patched by the community, or adapted
 
+
 - Backward compatibility means the kernel grows heavier with every release
+
 
 ---
 
 ## Why Linux Struggles With Drivers
 
 | Problem | Root Cause |
-|---------|------------|
+| --------- | ------------ |
 | **Fragmentation** | 1000+ distros, each with different kernels, ABIs, and release cycles |
 | **No stable kABI** | Linus Torvalds famously refuses to stabilize the kernel ABI — driver recompile required every update |
 | **Vendor reluctance** | Vendors fear GPL contamination of proprietary driver IP |
@@ -51,13 +55,18 @@ Despite driver struggles, Linux wins in other areas:
 
 - **Open source** — anyone can audit, fork, fix drivers
 
+
 - **Security** — open drivers have fewer hidden backdoors
+
 
 - **Modularity** — strip to minimal install, no legacy bloat
 
+
 - **Community** — Intel, AMD, ARM all contribute upstream drivers
 
+
 - **Containers** — Docker/Flatpak/Snap solve legacy app compat without kernel baggage
+
 
 ---
 
@@ -66,7 +75,7 @@ Despite driver struggles, Linux wins in other areas:
 SigmaOS synthesizes the best of Windows and Linux while adding capabilities
 neither OS has:
 
-```
+```text
 Windows:  Stable ABI  +  Vendor support  +  Unified framework
 Linux:    Open source  +  Community  +  Security
 ────────────────────────────────────────────────────────────
@@ -94,7 +103,7 @@ update. SigmaOS freezes DDK v1.0 forever — adding new fields only at the end.
 
 ### 2. Open + Closed Coexistence (pragmatic)
 
-```
+```text
 SIGMA_DRV_FLAG_OPEN_SOURCE  — community-audited, fork-able, higher trust score
 SIGMA_DRV_FLAG_CERTIFIED    — vendor-signed, tested by SigmaOS team
 SIGMA_DRV_FLAG_AI_PORTED    — generated from Linux driver patterns (cleanroom)
@@ -173,18 +182,22 @@ Vendors who open-source drivers get:
 
 - Higher transparency score (shown on the app store)
 
+
 - Inclusion in the SigmaOS ISO for supported hardware
+
 
 - `SIGMA_DRV_FLAG_CERTIFIED` badge
 
+
 - Community bug fixes and maintenance
+
 
 ---
 
 ## Backward Compatibility Without Bloat
 
 | Strategy | SigmaOS Implementation |
-|----------|----------------------|
+| ---------- | ---------------------- |
 | **No Win32 baggage** | Legacy apps run in `sigma-compat` (like Wine) not embedded in kernel |
 | **No legacy kernel APIs** | Old drivers deprecated fast with migration guides |
 | **Containerization** | Legacy Linux workloads run in `sigma-pod` (OCI containers) |
@@ -211,7 +224,7 @@ sigma-agent "convert to sigma-sh: $(cat deploy.sh)"
 ## Driver Status Matrix
 
 | Hardware | Linux | Windows | SigmaOS | File |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Intel NIC (e1000) | ✅ upstream | ✅ vendor | ✅ Working | `kernel/linux_compat/e1000_main.rs` |
 | NVMe SSD | ✅ | ✅ | ✅ Working | `drivers/sovereignnvme.rs` |
 | USB HID | ✅ | ✅ | 🔄 Partial | `drivers/sovereignusb.rs` |
@@ -236,21 +249,29 @@ Windows drivers are closed because of **vendor business incentives**, not techni
 
 1. **IP protection** — register offsets, firmware formats, and optimization tricks are competitive advantages
 
+
 2. **Liability** — closed code means Microsoft/vendor can't be blamed for community modifications
+
 
 3. **WHQL process** — certification is easier to enforce with closed, signed binaries
 
+
 4. **Historical inertia** — the WDM model predates the open source movement; vendors never changed
+
 
 ### What Would Change If Windows Drivers Were Open
 
 - Security researchers could audit for backdoors and vulnerabilities
 
+
 - Community could port drivers to other platforms (like SigmaOS)
+
 
 - Hardware vendors could compete on hardware quality, not software lock-in
 
+
 - Driver bugs could be fixed by anyone, not just the vendor
+
 
 ### Linux's Open Driver Advantage
 
@@ -259,9 +280,12 @@ This means:
 
 - Drivers evolve with the hardware (day-0 support for new CPUs/GPUs)
 
+
 - Security issues fixed by the community, not just the vendor
 
+
 - SigmaOS can port these drivers cleanly via `sigma-driver-porter`
+
 
 ### SigmaOS's Stance
 
@@ -270,11 +294,15 @@ But the framework creates strong **incentives** for open drivers:
 
 - Ring-3 isolation means a closed driver still can't crash the kernel
 
+
 - Transparency scores visible to users in the app store
+
 
 - Open drivers get certified faster and included in the ISO
 
+
 - AI porting makes open-sourcing less work for vendors
+
 
 ---
 

@@ -10,11 +10,15 @@ The Materials Scientist Profile is designed for materials excellence, material r
 
 - **SigmaMaterial**: Material characterization and analysis.
 
+
 - **SigmaSimulation**: Materials simulation and modeling.
+
 
 - **SigmaTesting**: Material testing and quality assurance.
 
+
 - **SigmaInnovation: New material discovery and optimization.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Materials Scientist Profile is designed for materials excellence, material r
 
 - **Theme**: Materials Blue (Research Standard)
 
+
 - **Layout**: Materials Dashboard (Material, Simulation, Testing)
 
+
 - **Personalization**: Custom simulation parameters and automated analysis.
+
 
 ---
 

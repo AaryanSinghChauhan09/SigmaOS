@@ -10,11 +10,15 @@ The Farmer Profile is designed for precision agriculture, crop management, and e
 
 - **SigmaFarm**: Farm management system with field mapping and planning.
 
+
 - **SigmaCrop**: Crop management platform with growth stage tracking and irrigation scheduling.
+
 
 - **SigmaLivestock**: Livestock management system with health tracking and production monitoring.
 
+
 - **SigmaAgriBiz**: Agricultural business management with financial tracking and market analysis.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Farmer Profile is designed for precision agriculture, crop management, and e
 
 - **Theme**: Earth Green (Agricultural Standard)
 
+
 - **Layout**: Farm Dashboard (Fields, Crops, Livestock)
 
+
 - **Personalization**: Weather integration and automated alerts.
+
 
 ---
 

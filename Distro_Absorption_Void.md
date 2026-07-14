@@ -18,7 +18,7 @@ SigmaOS absorbs Void's philosophy of **simplicity-first init management** and **
 
 Instead of the complexity of systemd unit files, SigmaOS offers a runit-style init where each service is a directory containing a `run` script. The init system supervises each service and restarts it on crash.
 
-```
+```text
 /etc/sigma/services/
 ├── sshd/
 │   └── run          # #!/bin/sh\nexec /usr/bin/sshd -D
@@ -41,7 +41,9 @@ $ sigma service status
 Void's `xbps-src` uses simple shell templates to build packages. SigmaOS adapts this as `sigma-recipe`, where each package is defined by a short TOML recipe file.
 
 ```toml
+
 # recipes/helix-editor.toml
+
 [package]
 name = "helix"
 version = "24.7"

@@ -62,7 +62,7 @@ Users must explicitly allow traffic by adding higher-priority rules.
 sigma-shield maintains a connection tracking table with 1024 entries. When a packet matches an `Accept` rule, a connection entry is created. Subsequent packets belonging to the same connection (matching `src_port`, `dst_port`, `protocol`) bypass the rule engine and are accepted immediately.
 
 | State | Description |
-|---|---|
+| --- | --- |
 | `New` | First packet seen for this flow |
 | `Established` | Reply packet received, connection confirmed |
 | `Related` | Associated connection (e.g., FTP data channel) |
@@ -75,26 +75,34 @@ sigma-shield maintains a connection tracking table with 1024 entries. When a pac
 ### CLI
 
 ```bash
+
 # Allow HTTPS inbound
+
 sigma-shield add --direction ingress --proto tcp --dst-port 443 --action accept
 
 # Rate-limit SSH to 10 connections/sec
+
 sigma-shield add --direction ingress --proto tcp --dst-port 22 --action rate-limit:10
 
 # Allow all outbound DNS
+
 sigma-shield add --direction egress --proto udp --dst-port 53 --action accept
 
 # View all rules
+
 sigma-shield list
 
 # View statistics
+
 sigma-shield stats
 ```
 
 ### TOML Configuration
 
 ```toml
+
 # /etc/sigma/firewall.toml
+
 [[rule]]
 id = 10
 priority = 10

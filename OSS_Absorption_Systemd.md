@@ -20,7 +20,9 @@ SigmaOS reimplements these as standalone Rust modules under the `sigma-init` umb
 ### 2.1 `sigma-networkd` — Declarative Networking (from `systemd-networkd`)
 
 ```toml
+
 # /etc/sigma/network.d/eth0.toml
+
 [match]
 name = "eth*"
 
@@ -106,7 +108,9 @@ $ sigma resolve --dnssec sigmaos.io
 Portable home directories: a user's home is a LUKS2-encrypted, content-addressed directory image. Move it between machines by copying one file.
 
 ```bash
+
 # Create a portable home for user "alice"
+
 $ sigma homed create alice --size 50G
 Σ [HOMED] Creating portable home for alice...
   Encrypted image: /var/lib/sigma/homes/alice.home
@@ -114,12 +118,14 @@ $ sigma homed create alice --size 50G
   Size: 50GB (sparse — uses only actual data)
 
 # Activate (mount + unlock) the home
+
 $ sigma homed activate alice
 Σ [HOMED] Unlocking alice's home (enter password):
   Passphrase: ****
   Mounted at: /home/alice
 
 # Export home for use on another SigmaOS machine
+
 $ sigma homed export alice alice.sigma-home
 $ scp alice.sigma-home other-machine:~/
 ```
@@ -150,7 +156,9 @@ impl SigmaJournal {
 ```
 
 ```bash
+
 # View logs (journalctl-compatible)
+
 $ sigma logs                          # Latest logs
 $ sigma logs -u sigma-networking      # Logs from a specific shard
 $ sigma logs --since "1 hour ago"     # Time-based filter
@@ -162,15 +170,20 @@ $ sigma logs --export journal.json    # Export as structured JSON
 ### 2.5 `sigma-boot` — UEFI Boot Manager (from `systemd-boot`)
 
 ```bash
+
 # List boot entries
+
 $ sigma boot list
 Σ [BOOT] UEFI Boot Entries:
+
   * SigmaOS 1.0 (current)    kernel/sigma-1.0.0    [default]
+
     SigmaOS 1.0 (snapshot 3) kernel/sigma-1.0.0 @snap3
     SigmaOS 0.9 (fallback)   kernel/sigma-0.9.5
     UEFI Firmware Setup
 
 # Set default boot entry
+
 $ sigma boot set-default "SigmaOS 0.9 (fallback)"
 ```
 
@@ -179,7 +192,7 @@ $ sigma boot set-default "SigmaOS 0.9 (fallback)"
 ## 3. What SigmaOS Explicitly DOES NOT Absorb from systemd
 
 | systemd Component | Reason Excluded |
-|:-----------------|:----------------|
+| :----------------- | :---------------- |
 | PID 1 (main daemon) | Replaced by `sigma-init` (Rust, capability-secure) |
 | `D-Bus` dependency | Replaced by `sigma-ipc` (cap-rights IPC) |
 | `polkit` | Replaced by `sigma-doas` (simpler, auditable) |

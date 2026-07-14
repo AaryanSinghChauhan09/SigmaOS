@@ -6,7 +6,7 @@ affected component without rebooting.
 
 ## Recovery Flow
 
-```
+```text
 Fault detected (watchdog / page-fault / assertion)
    ↓
 Fault classifier (heuristic + ML)
@@ -22,6 +22,8 @@ Telemetry report filed to Sovereign Audit Log
 
 - [ ] Watchdog timer integration
 
+
 - [ ] Snapshot restore from SovereignFS
+
 
 - [ ] Fault classifier training data collection

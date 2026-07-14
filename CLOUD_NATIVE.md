@@ -12,7 +12,7 @@
 
 ## Architecture
 
-```
+```text
 sigma-nebula
 ├── ContainerRuntime (abstract base)
 │   └── SovereignContainer (concrete — lifecycle state machine)
@@ -21,7 +21,7 @@ sigma-nebula
 
 ## Container Lifecycle
 
-```
+```text
 Created → Running → Paused → Running → Stopped → Exited
                                      → Failed
 ```
@@ -49,9 +49,10 @@ Each container has explicit resource caps enforced at creation:
 - **Derived**: `SovereignContainer` — state machine + PID tracking
 - **Composition**: `ContainerScheduler` — array of up to 64 containers, round-robin scheduling
 
+
 ## API (inter-daemon IPC)
 
-```
+```text
 sigma-nebula run   <image-hash>   [--mem=<MB>] [--cpu=<millicores>]
 sigma-nebula stop  <container-id>
 sigma-nebula pause <container-id>
@@ -62,7 +63,9 @@ sigma-nebula list
 
 ```nim
 proc testContainerLifecycle*(): bool
+
 # Created → Running → Paused → Resumed → Stopped
+
 ```
 
 ## Future Work

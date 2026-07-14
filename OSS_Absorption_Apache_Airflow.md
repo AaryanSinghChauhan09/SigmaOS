@@ -1,4 +1,5 @@
 # SigmaOS Workflow Orchestration Absorption - Apache Airflow
+
 ## Making apache/airflow Irrelevant
 
 > **Absorption Target**: https://github.com/apache/airflow  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Apache Airflow by implementing a native workf
 ## Absorbed Features & Capabilities
 
 ### 1. Native Workflow Orchestration Engine
+
 **Original**: Python-based DAG scheduler with web UI  
 **SigmaOS**: Native OS-level workflow engine with Rust implementation
 
@@ -30,12 +32,14 @@ pub struct SigmaFlow {
 ```
 
 **Core Capabilities**:
+
 - **Workflow Definition**
   - Native DAG definition with type safety
   - Automatic dependency resolution
   - Dynamic workflow generation
   - Conditional branching and loops
   - Sub-workflows and modular composition
+
   
 - **Scheduling**
   - Cron-based scheduling with timezone support
@@ -44,11 +48,14 @@ pub struct SigmaFlow {
   - Backfilling with automatic parallelization
   - SLA monitoring and alerting
 
+
 ### 2. Task Execution Engine
+
 **Original**: Task execution via Python operators  
 **SigmaOS**: Native task execution with OS-level optimization
 
 **Execution Features**:
+
 - Native task runners with automatic resource allocation
 - Container execution with native integration
 - Remote execution with automatic connection management
@@ -56,11 +63,14 @@ pub struct SigmaFlow {
 - Retry logic with exponential backoff
 - Timeout handling with graceful degradation
 
+
 ### 3. Data Pipeline Integration
+
 **Original**: XCom for data passing between tasks  
 **SigmaOS**: Native data passing with zero-copy operations
 
 **Data Features**:
+
 - Zero-copy data passing between tasks
 - Automatic data serialization and deserialization
 - Large dataset streaming with memory efficiency
@@ -68,11 +78,14 @@ pub struct SigmaFlow {
 - Data versioning with automatic storage
 - Data validation with automatic schema checking
 
+
 ### 4. Monitoring and Observability
+
 **Original**: Web UI with basic monitoring  
 **SigmaOS**: Native monitoring with OS-level integration
 
 **Monitoring Features**:
+
 - Real-time task execution monitoring
 - Resource utilization tracking (CPU, memory, I/O)
 - Performance metrics with automatic aggregation
@@ -81,11 +94,14 @@ pub struct SigmaFlow {
 - Log aggregation with automatic parsing
 - Distributed tracing with automatic context propagation
 
+
 ### 5. Workflow Optimization
+
 **Original**: Manual optimization and tuning  
 **SigmaOS**: AI-powered automatic workflow optimization
 
 **Optimization Features**:
+
 - Automatic task parallelization
 - Resource allocation optimization
 - Data locality optimization
@@ -93,11 +109,14 @@ pub struct SigmaFlow {
 - Workflow compression with task fusion
 - Predictive scaling based on historical data
 
+
 ### 6. Security and Governance
+
 **Original**: RBAC via Flask backend  
 **SigmaOS**: Capability-based security with hardware enforcement
 
 **Security Features**:
+
 - Capability-based access control
 - Hardware-enforced task isolation
 - Secret management with hardware encryption
@@ -106,11 +125,14 @@ pub struct SigmaFlow {
 - Compliance reporting with automated generation
 - Multi-tenancy with automatic data isolation
 
+
 ### 7. Integration Ecosystem
+
 **Original**: Provider packages for various services  
 **SigmaOS**: Native integration with OS-level optimization
 
 **Integrations**:
+
 - Native database connections with connection pooling
 - Cloud storage with direct access
 - Message queues with native protocols
@@ -119,12 +141,13 @@ pub struct SigmaFlow {
 - ML pipeline integration with SigmaML
 - Data processing integration with SigmaData
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Apache Airflow | SigmaOS | Advantage |
-|---------|----------------|---------|------------|
+| --------- | ---------------- | --------- | ------------ |
 | Performance | Python overhead | Native Rust | ✅ 5-10x |
 | Scheduling Precision | Second-level | Millisecond-level | ✅ 1000x |
 | Data Passing | XCom serialization | Zero-copy | ✅ 10x |
@@ -139,6 +162,7 @@ pub struct SigmaFlow {
 ## Implementation Details
 
 ### Native Workflow Orchestration Engine
+
 ```rust
 pub mod sigma_flow {
     use sigma_core::scheduler::Scheduler;
@@ -175,6 +199,7 @@ pub mod sigma_flow {
 ```
 
 ### Workflow Optimization Engine
+
 ```rust
 pub mod workflow_optimizer {
     pub struct WorkflowOptimizer {
@@ -202,6 +227,7 @@ pub mod workflow_optimizer {
 ## API Comparison
 
 ### Apache Airflow API
+
 ```python
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -220,6 +246,7 @@ with DAG('my_dag', start_date=datetime(2024, 1, 1)) as dag:
 ```
 
 ### SigmaFlow API
+
 ```rust
 use sigma_flow::SigmaFlow;
 
@@ -244,37 +271,52 @@ let result = sigma_flow::execute(scheduled);
 ### For Users of Apache Airflow
 
 **Before** (using Apache Airflow):
+
 ```bash
+
 # Install Airflow
+
 pip install apache-airflow
 
 # Initialize database
+
 airflow db init
 
 # Start scheduler and webserver
+
 airflow scheduler
 airflow webserver
 
 # Define DAGs in Python files
+
 # Place in dags/ directory
+
 # Monitor via web UI
+
 ```
 
 **After** (using SigmaFlow):
+
 ```bash
+
 # Enable workflow shard (native, no installation)
+
 sigma-shard enable workflow-orchestration
 
 # Define workflow
+
 sigma-flow define --file workflow.sigma
 
 # Automatic optimization
+
 sigma-flow optimize --workflow my_workflow
 
 # Schedule and execute
+
 sigma-flow schedule --workflow my_workflow --cron "0 * * * *"
 
 # Native monitoring
+
 sigma-flow monitor --workflow my_workflow
 ```
 
@@ -283,7 +325,7 @@ sigma-flow monitor --workflow my_workflow
 ## Performance Benchmarks
 
 | Operation | Apache Airflow | SigmaFlow | Improvement |
-|-----------|----------------|----------|-------------|
+| ----------- | ---------------- | ---------- | ------------- |
 | DAG Parsing (1000 tasks) | 2.5s | 0.3s | 8.3x faster |
 | Task Execution (100 tasks) | 45s | 12s | 3.8x faster |
 | Data Passing (1GB) | 8s | 0.8s | 10x faster |
@@ -295,6 +337,7 @@ sigma-flow monitor --workflow my_workflow
 ## Advanced Features
 
 ### AI-Powered Workflow Optimization
+
 ```rust
 pub struct AIWorkflowOptimizer {
     performance_model: PerformanceModel,
@@ -314,6 +357,7 @@ impl AIWorkflowOptimizer {
 ```
 
 ### Distributed Workflow Execution
+
 ```rust
 pub struct DistributedWorkflowExecutor {
     cluster: ClusterManager,

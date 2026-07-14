@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-telemetry <stats|export|power|input-latency|help> [options]
 ```
 
@@ -33,9 +33,12 @@ Colour coding:
 
 - Green: p99 < 100 µs (fast)
 
+
 - Yellow: p99 100–1000 µs (moderate)
 
+
 - Red: p99 > 1000 µs (slow — investigate)
+
 
 ### `export [endpoint]`
 
@@ -85,7 +88,7 @@ The 12-bucket histogram captures the full latency distribution from single-digit
 When pushing to a collector, the resource attributes include:
 
 | Attribute | Value |
-|-----------|-------|
+| ----------- | ------- |
 | `service.name` | `sigmaos-kernel` |
 | `host.name` | system hostname |
 
@@ -93,7 +96,7 @@ Each metric is named `sigma.syscall.latency.<syscall_name>` as a histogram metri
 
 ### Example Grafana query
 
-```
+```text
 histogram_quantile(0.99, rate(sigma_syscall_latency_read_bucket[5m]))
 ```
 

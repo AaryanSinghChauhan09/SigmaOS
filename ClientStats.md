@@ -8,6 +8,7 @@ Arguments:
 
 - **client** `Client` - Client from which to return stats.
 
+
 ## Instance Properties
 
 ### `ClientStats.connected`

@@ -8,7 +8,7 @@
 ## Status Legend
 
 | Icon | Meaning |
-|---|---|
+| --- | --- |
 | ✅ | Implemented and functional |
 | 🔄 | In progress / partial |
 | ⬜ | Planned, not started |
@@ -21,7 +21,7 @@
 ### Scheduler
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | MLFQ 4-queue with aging | 🆕 | `kernel/sched/sigma_mlfq.rs` |
 | CFS red-black tree + vruntime | 🆕 | `kernel/sched/sigma_mlfq.rs` |
 | EDF (earliest deadline first) | 🆕 | `kernel/sched/sigma_mlfq.rs` |
@@ -33,7 +33,7 @@
 ### Memory Manager
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | Buddy allocator (2^n blocks, O(log n)) | 🆕 | `kernel/memory/sigma_buddy.rs` |
 | Slab allocator (object caches) | 🆕 | `kernel/memory/sigma_buddy.rs` |
 | ASLR (42-bit entropy) | 🆕 | `kernel/memory/sigma_buddy.rs` |
@@ -47,7 +47,7 @@
 ### Syscall Dispatch
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | 50+ POSIX syscalls (complete table) | 🆕 | `kernel/syscalls/sigma_syscall_table.rs` |
 | sigma_pledge syscall | 🆕 | `kernel/syscalls/sigma_syscall_table.rs` |
 | sigma_unveil syscall | 🆕 | `kernel/syscalls/sigma_syscall_table.rs` |
@@ -62,7 +62,7 @@
 ## 2. Bootloader & Firmware
 
 | Component | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | sigma-boot.efi (UEFI PE/COFF) | ⬜ | Phase A blocker |
 | Secure Boot (Dilithium-5 verify) | ⬜ | Phase A |
 | TPM2 measured boot (PCR extend) | ⬜ | Phase A |
@@ -78,7 +78,7 @@
 ### Networking
 
 | Driver | Chip | Status | Priority |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | e1000 (Intel GbE) | Intel i210/i350 | ✅ | — |
 | VirtIO-net | QEMU | ✅ | — |
 | r8169 (Realtek Ethernet) | RTL8111/8168 | 🔄 | High |
@@ -91,7 +91,7 @@
 ### Storage
 
 | Driver | Status | Priority |
-|---|---|---|
+| --- | --- | --- |
 | NVMe (PCIe SSD) | ✅ | — |
 | VirtIO-blk | ✅ | — |
 | AHCI (SATA) | 🔄 | High |
@@ -102,7 +102,7 @@
 ### GPU/Graphics
 
 | Driver | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | VirtIO-GPU (QEMU) | 🔄 | `drivers/gpu/` |
 | i915 (Intel) | ⬜ | Phase C |
 | amdgpu | ⬜ | Phase C |
@@ -112,7 +112,7 @@
 ### USB
 
 | Component | Status |
-|---|---|
+| --- | --- |
 | xHCI host controller | ✅ |
 | HID (keyboard/mouse) | 🔄 |
 | Mass storage (USB disk) | ⬜ |
@@ -124,7 +124,7 @@
 ## 4. Filesystem
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | VFS layer | ✅ | `fs/sigma_vfs.zig` |
 | Ext4 read/write | ✅ | — |
 | Tmpfs | ✅ | — |
@@ -144,7 +144,7 @@
 ## 5. Network Stack
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | IPv4/IPv6 framework | ✅ | `kernel/net/` |
 | DNS/DoH/DNSSEC | ✅ | `net/dns/` |
 | DHCP | ✅ | — |
@@ -161,7 +161,7 @@
 ## 6. Security
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | sigma_pledge (OpenBSD-style) | ✅ | `kernel/security/` |
 | sigma_unveil (path restriction) | ✅ | `kernel/security/` |
 | AVC O(1) MAC cache | ✅ | `security/sigma_avc.rs` |
@@ -178,7 +178,7 @@
 ## 7. Userland & Shell
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | sigma-sh basic REPL | ✅ | `sigma-sh/src/` |
 | Globbing (* ? [a-z]) | 🆕 | `userland/shell/sigma_sh_features.rs` |
 | Parameter expansion (${VAR:-}) | 🆕 | `userland/shell/sigma_sh_features.rs` |
@@ -196,7 +196,7 @@
 ## 8. India Stack
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | ABDM FHIR patient search | 🆕 | `userland/indiastack/sigma_india_stack.rs` |
 | ABDM health record linking | 🆕 | `userland/indiastack/sigma_india_stack.rs` |
 | UPI payment URI generation | 🆕 | `userland/indiastack/sigma_india_stack.rs` |
@@ -213,7 +213,7 @@
 ## 9. Virtualisation & Containers
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | OCI container runtime (sigma-pod) | 🆕 | `virtualization/ocirunner/sigma_oci.rs` |
 | Namespace isolation (PID/net/IPC) | 🆕 | `virtualization/ocirunner/sigma_oci.rs` |
 | cgroup v2 resource limits | 🆕 | `virtualization/ocirunner/sigma_oci.rs` |
@@ -229,7 +229,7 @@
 ## 10. AI & ML
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | sigma-agent (35 modules) | ✅ | `userland/agent/` |
 | llama.cpp backends (4 providers) | ✅ | `userland/agent/sigma_llm.rs` |
 | RLHF feedback loop | ✅ | `userland/agent/sigma_agent_learn.nim` |
@@ -246,7 +246,7 @@
 ## 11. Package Ecosystem
 
 | Component | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | sigma-pkg core | 🔄 | `pkg/sigma_pkg_core.nim` |
 | .deb absorption | 🆕 | `pkg/sigma_pkg_absorb.nim` |
 | .rpm absorption | 🆕 | `pkg/sigma_pkg_absorb.nim` |
@@ -263,7 +263,7 @@
 ## Phase Roadmap
 
 | Phase | Timeline | Focus | Key Deliverables |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **A (Now)** | v15.x | AI agent complete, kernel foundations | sigma-agent 35 modules ✅, MLFQ ✅, buddy ✅, 50+ syscalls ✅ |
 | **B** | v16.x | Kernel stability, Wi-Fi, TCP, pkg repo | sigma-boot.efi, iwlwifi, ath11k, pkg repository server |
 | **C** | v17.x | GPU, desktop, containers | i915/amdgpu, Zenith DE, OCI runtime hardening |

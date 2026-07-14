@@ -17,7 +17,7 @@ The SigmaOS Bug Bounty Program rewards security researchers who responsibly disc
 ### In-Scope
 
 | Target | Component | Notes |
-|--------|-----------|-------|
+| -------- | ----------- | ------- |
 | SigmaOS Kernel | `kernel/` | All subsystems |
 | sigpkg | `sigma-pkg/`, `userland/sigpkg/` | Package installation, verification |
 | sigma-shield | `kernel/net/firewall/` | Firewall bypass, rule bypass |
@@ -38,6 +38,7 @@ The SigmaOS Bug Bounty Program rewards security researchers who responsibly disc
 - Bugs in non-current release branches (> 2 releases old)
 - Missing security headers on static documentation pages
 
+
 ---
 
 ## Severity Classification & Rewards
@@ -45,16 +46,20 @@ The SigmaOS Bug Bounty Program rewards security researchers who responsibly disc
 ### Critical — $3,000–$10,000
 
 Vulnerabilities that allow:
+
 - **Remote code execution** without authentication
 - **Kernel privilege escalation** from userland (Ring 3 → Ring 0)
 - **Secure Boot bypass** allowing unsigned kernel to boot
 - **Cryptographic key extraction** from TPM or PQC signing subsystem
 - **Full container/cgroup escape** to host
 
+
 Examples:
+
 - Buffer overflow in syscall handler allowing arbitrary kernel write
 - Dilithium5 signature forgery
 - UEFI Secure Boot bypass
+
 
 ### High — $1,000–$3,000
 
@@ -63,12 +68,14 @@ Examples:
 - **Package signature bypass** allowing unsigned package installation
 - **Remote code execution** requiring user interaction
 
+
 ### Medium — $250–$1,000
 
 - **Information disclosure** of sensitive kernel memory from userland
 - **Denial of service** in kernel network stack (no reboot required for recovery)
 - **Sandbox escape** within sigpkg sandboxed installs
 - **ASLR bypass** combined with another bug
+
 
 ### Low — $50–$250
 
@@ -77,11 +84,13 @@ Examples:
 - **Timing side channels** in non-cryptographic code
 - **Minor logic errors** with limited security impact
 
+
 ### Informational — Acknowledgment Only
 
 - Best practice recommendations
 - Missing security hardening (no direct impact)
 - Theoretical issues without practical exploitation path
+
 
 ---
 
@@ -95,6 +104,7 @@ Examples:
 4. **Provide a PoC**: Include a working proof-of-concept or detailed reproduction steps
 5. **Act in good faith**: Do not use discovered vulnerabilities for personal gain or to harm users
 
+
 ### We WILL:
 
 1. Acknowledge your report within **48 hours**
@@ -104,40 +114,51 @@ Examples:
 5. Pay rewards within **30 days** of fix validation
 6. Not pursue legal action against researchers acting in good faith
 
+
 ---
 
 ## Submission Template
 
-```
+```text
 Subject: [SIGMAOS-BUG-BOUNTY] Brief description
 
 ## Summary
+
 Brief description of the vulnerability.
 
 ## Severity (your assessment)
+
 [Critical / High / Medium / Low]
 
 ## Affected Component
+
 File paths, versions, build hashes.
 
 ## Reproduction Steps
+
 1. Step one
 2. Step two
 3. ...
 
+
 ## Expected Behavior
+
 What should happen.
 
 ## Actual Behavior
+
 What actually happens (potential security impact).
 
 ## Proof of Concept
+
 Code, commands, or screenshots demonstrating the issue.
 
 ## Suggested Fix (optional)
+
 If you have ideas on how to fix it.
 
 ## Your PGP Key or preferred contact
+
 For encrypted communications.
 ```
 
@@ -148,7 +169,7 @@ For encrypted communications.
 Researchers who have reported valid security issues are recognized here. Thank you for making SigmaOS safer!
 
 | Researcher | Issue | Severity | Year |
-|-----------|-------|----------|------|
+| ----------- | ------- | ---------- | ------ |
 | *(program launching — first reports pending)* | — | — | 2026 |
 
 ---
@@ -161,6 +182,7 @@ SigmaOS and the SigmaOS Foundation grant security researchers a **safe harbor** 
 - The researcher does not cause harm to users, systems, or data
 - The researcher does not disclose the vulnerability before the coordinated disclosure period expires
 - The researcher does not violate applicable laws beyond those that would be waived under good-faith security research
+
 
 We consider security research conducted under this policy to be **authorized** and will not initiate legal action.
 
@@ -175,6 +197,7 @@ We consider security research conducted under this policy to be **authorized** a
 5. **Day 60–90**: Fix released in patch/point release
 6. **Day 90**: Coordinated public disclosure (CVE assigned if applicable)
 7. **Day 90+**: Researcher may publish their own write-up
+
 
 For **Critical** severity issues, the Security WG may request a temporary embargo extension beyond 90 days with researcher agreement.
 

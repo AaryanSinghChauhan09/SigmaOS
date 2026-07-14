@@ -13,9 +13,11 @@
 SigmaOS has two sovereignty goals:
 
 1. **Technical sovereignty** — no critical dependency on foreign software,
+
    foreign cloud, or foreign standards that could be denied or compromised.
 
 1. **User sovereignty** — every user can define, extend, and own their OS
+
    behaviour without asking permission from any vendor.
 
 ---
@@ -30,7 +32,7 @@ and a sovereignty gap. This is the complete audit:
 #### Critical dependencies (currently blocks boot or basic function)
 
 | Dependency | Used for | Foreign risk | Sovereign replacement | Status |
-|-----------|---------|-------------|----------------------|--------|
+| ----------- | --------- | ------------- | ---------------------- | -------- |
 | GRUB | Bootloader (because sigma-boot.efi doesn't exist) | GNU/GRUB maintainers | `sigma-boot.efi` (UEFI PE binary) | ❌ not built |
 | QEMU | CI boot testing | Red Hat / various | Physical CI + sigma-vm | ⚠️ acceptable for dev |
 | GNU binutils (ld, as, nm) | Linking kernel | GNU Project | LLVM lld (already in toolchain) | ⚠️ migrate to lld |
@@ -40,7 +42,7 @@ and a sovereignty gap. This is the complete audit:
 #### High-priority dependencies (needed for features)
 
 | Dependency | Used for | Sovereign replacement | Target branch | Status |
-|-----------|---------|----------------------|--------------|--------|
+| ----------- | --------- | ---------------------- | -------------- | -------- |
 | liboqs | Real Kyber/Dilithium NTT | Sigma-native PQC NTT (pure C++, no external) | `performance-optimized` | ❌ NTT not written |
 | libargon2 | CryptFS key derivation (Issue #44) | Sigma-native Argon2id (pure C++) | `kernel-exp` | ❌ not implemented |
 | SQLite | Profession app data, registry | sigma-kv (sovereign key-value store) OR keep SQLite | `fs-dev` | ⚠️ SQLite is FOSS, low risk |
@@ -51,7 +53,7 @@ and a sovereignty gap. This is the complete audit:
 #### Acceptable dependencies (FOSS, low risk, difficult to replace near-term)
 
 | Dependency | Used for | Notes |
-|-----------|---------|-------|
+| ----------- | --------- | ------- |
 | HarfBuzz | Text shaping (Devanagari, Tamil) | Excellent FOSS project, no cloud dependency |
 | FreeType2 | Font rendering | Rock-solid FOSS |
 | clang/LLVM | Compiler toolchain | Apache-licensed, community-governed |
@@ -63,7 +65,7 @@ and a sovereignty gap. This is the complete audit:
 **Goal:** Replace liboqs with a sovereign NTT implementation that compiles
 to pure C++17 with no external dependencies.
 
-```
+```text
 sigma-pqc-native architecture:
   crypto/ntt/
     sigma_ntt_generic.cpp     — pure C++ reference NTT (any platform)
@@ -83,7 +85,7 @@ sigma-pqc-native architecture:
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Keccak-f\[1600\] state machine | `crypto/primitives/sigma_shake256.cpp` | `performance-optimized` | Pure C++, no external headers |
 | NTT butterfly (generic C++) | `crypto/ntt/sigma_ntt_generic.cpp` | `performance-optimized` | Cooley-Tukey NTT, modular arithmetic |
 | AVX-512 NTT butterfly | `crypto/ntt/sigma_ntt_avx512.cpp` | `performance-optimized` | 8-wide SIMD, 13× speedup |
@@ -100,7 +102,7 @@ sigma-pqc-native architecture:
 
 **Goal:** Boot without GRUB. sigma-boot.efi is a native UEFI PE binary.
 
-```
+```text
 sigma-boot.efi architecture:
   sigma-boot/
     sigma_boot.c              — UEFI efi_main() entry point
@@ -113,7 +115,7 @@ sigma-boot.efi architecture:
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `efi_main()` UEFI entry | `sigma-boot/sigma_boot.c` | `kernel-exp` | EDK2-free: use only UEFI firmware services |
 | EFI file protocol read | `sigma-boot/sigma_elf_loader.c` | `kernel-exp` | `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` |
 | GOP framebuffer setup | `sigma-boot/sigma_gop.c` | `kernel-exp` | `EFI_GRAPHICS_OUTPUT_PROTOCOL` |
@@ -126,7 +128,7 @@ sigma-boot.efi architecture:
 
 **Goal:** TLS 1.3 without OpenSSL. All India Stack API calls use sigma-tls.
 
-```
+```text
 net/tls/
   sigma_tls.cpp              — TLS 1.3 record layer
   sigma_tls_handshake.cpp    — Hybrid X25519+ML-KEM-1024 key exchange
@@ -136,7 +138,7 @@ net/tls/
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | TLS 1.3 record layer | `net/tls/sigma_tls.cpp` | `drivers-dev` | RFC 8446 ClientHello/ServerHello |
 | Hybrid KEM (X25519 + ML-KEM) | `net/tls/sigma_tls_handshake.cpp` | `drivers-dev` | Draft RFC hybrid KEM for TLS 1.3 |
 | AES-256-GCM (sovereign) | `crypto/primitives/sigma_aes_gcm.cpp` | `performance-optimized` | Pure C++ AES-NI intrinsics |
@@ -150,7 +152,7 @@ net/tls/
 **Current:** Uses GNU ld via gcc for linking.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Migrate to LLVM lld | `CMakeLists.txt` | all | `-fuse-ld=lld` — already in many CI configs |
 | Custom linker script | `linker.ld` | `kernel-exp` | Fine-tune section placement for shard lattice |
 | Verify lld reproducibility | `.github/workflows/sigma_ci.yml` | all | lld output SHA256 == gcc ld output SHA256 |
@@ -175,7 +177,7 @@ shard("sigma-net-tcp",
 ```
 
 | Task | File | Branch | Timeline |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | sigma-build DSL design | `docs/adr/adr-build-system.md` | `docs-update` | Document decision before Phase 9 |
 | Proof-of-concept build | `sigma-build/sigma_build.py` | Phase 9 | Build microkernel profile from DSL |
 | Keep CMake for v16.0–v17.0 | `CMakeLists.txt` | all | CMake acceptable until Phase 9 |
@@ -242,7 +244,7 @@ sigma-my-custom-tool check 1234
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma-contrib new-app` scaffold | `userland/tools/sigma_contrib_cli.cpp` | `tools-dev` | Generate full app skeleton from template |
 | sigma-script DSL | `userland/tools/sigma_script.cpp` | `tools-dev` | YAML + shell commands, no C++ needed |
 | sigma-script interpreter | `userland/tools/sigma_script.cpp` | `tools-dev` | Parse `.sigma-script`, dispatch via sigma-sh |
@@ -280,7 +282,7 @@ gst-check 27ABCDE1234F1Z5
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | User command directory `~/sigma-apps/bin/` | `userland/shell/sigma_shell.cpp` | `tools-dev` | Add to PATH at shell init |
 | `sigma-cli command register <name> <script>` | `userland/tools/sigma_cli.cpp` | `tools-dev` | Symlink to `~/sigma-apps/bin/`, add to completions |
 | `sigma-cli command list` | `userland/tools/sigma_cli.cpp` | `tools-dev` | Show user-defined + system commands |
@@ -327,7 +329,7 @@ pmkisan_credit    = false
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | VFS read `~/.sigma_profile` at login | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `kernel-exp` | `vfs_open()` after VFS init — currently blocked |
 | Apply `[custom_commands]` to PATH | `userland/shell/sigma_shell.cpp` | `tools-dev` | Each `key=value` → register as shell command |
 | Apply `[custom_aliases]` to sigma-sh | `userland/shell/sigma_shell.cpp` | `tools-dev` | Each `key=value` → shell alias |
@@ -363,7 +365,7 @@ sigma-zenith layout list       # shows built-in + user-defined
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Layout definition format | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | TOML: named regions with x/y/w/h percent |
 | Layout script interpreter | `zenith_desktop/wm/sigma_layout_script.cpp` | `release/standalone` | Apply layout definition to current windows |
 | `sigma-zenith layout install` | `userland/tools/sigma_zenith_cli.cpp` | `release/standalone` | Copy to `~/.sigma/layouts/`, register in WM |
@@ -415,7 +417,7 @@ animation_ms   = 200   # 0 to disable for accessibility
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Theme TOML parser | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Parse palette/typography/geometry/effects sections |
 | WCAG contrast auto-check | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Warn user if base/text contrast < 4.5:1 |
 | Hot-reload on file change | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Watch `~/.sigma/themes/`, apply in < 200 ms |
@@ -433,19 +435,24 @@ name: Morning GST & Legal Check
 description: Run every weekday morning
 
 steps:
+
   - name: Check GST filing due
+
     run: sigma-ca gst --remind --days 7
     if: profession == "chartered_accountant"
 
   - name: Check court hearings today
+
     run: sigma-legal cause-list --today
     if: profession == "advocate"
 
   - name: Check eNAM prices
+
     run: sigma-agri enam prices --mandi nearest
     if: profession == "farmer"
 
   - name: Remind if filing overdue
+
     notify: "{{ output }}"
     on_fail: sigma-cli health check
 
@@ -454,7 +461,7 @@ schedule: "0 9 * * 1-5"   # weekdays 9 AM
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-script YAML parser | `userland/tools/sigma_script.cpp` | `tools-dev` | Parse steps, conditions, notifications |
 | Conditional execution (`if:` field) | `userland/tools/sigma_script.cpp` | `tools-dev` | Evaluate `profession == "ca"` from `~/.sigma_profile` |
 | `{{ output }}` template interpolation | `userland/tools/sigma_script.cpp` | `tools-dev` | Replace `{{ output }}` with previous step's stdout |
@@ -471,7 +478,7 @@ schedule: "0 9 * * 1-5"   # weekdays 9 AM
 
 No user data ever leaves India by default.
 
-```
+```text
 Data residency policy:
   All profession app data → SigmaFS on local device
   Cloud sync → SovereignCloudFS (self-hosted on Indian servers only)
@@ -485,7 +492,7 @@ Data residency policy:
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Default DNS: NIC recursive resolver | `net/dns/sigma_dns_cache.cpp` | `drivers-dev` | Default upstream: `164.100.130.2` (NIC) not `8.8.8.8` |
 | Default NTP: NIC time server | `userland/daemons/sigma_netd.cpp` | `drivers-dev` | `time.nic.in` as default NTP |
 | Package CDN: India-hosted | `sigmad/repo/main.go` | `prepare-sigmaos-launch` | `packages.sigmaos.dev` served from NIC/DigitalIndia CDN |
@@ -521,7 +528,7 @@ sigma-gov login --portal mca21.gov.in
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma-trust did create` full impl | `security/SovereignDID.cpp` | `release/standalone` | Generate DID document + ML-DSA-87 keypair |
 | Local DID storage (encrypted) | `security/SovereignDID.cpp` | `release/standalone` | Encrypt DID private key with Argon2id-derived key |
 | DID → GSTN login | `userland/indiastack/sigma_gstn_client.cpp` | `release/standalone` | GSTN OAuth2 PKCE with DID instead of password |
@@ -534,7 +541,7 @@ sigma-gov login --portal mca21.gov.in
 SigmaOS never implements proprietary protocols. Every protocol is documented.
 
 | Protocol | Standard | Sovereign? | Notes |
-|----------|---------|-----------|-------|
+| ---------- | --------- | ----------- | ------- |
 | Boot: sigma-boot.efi | UEFI spec (open) | ✅ | EDK2-free implementation |
 | Network: TCP/IP | RFC 793, 8200 (open) | ✅ | — |
 | TLS: sigma-tls | RFC 8446 + hybrid KEM draft | ✅ | No OpenSSL |
@@ -555,7 +562,7 @@ SigmaOS never implements proprietary protocols. Every protocol is documented.
 ### QS1 — Quality: Additional Test Scenarios
 
 | Scenario | Test file | Branch | Detail |
-|----------|----------|--------|--------|
+| ---------- | ---------- | -------- | -------- |
 | Foreign dependency scan | `tests/sovereignty/test_no_foreign_dep.sh` | all | Verify no outbound HTTP to non-Indian IPs in tests |
 | sigma-pqc-native correctness | `tests/crypto/test_pqc_native.cpp` | `performance-optimized` | KAT (Known Answer Test) vs NIST test vectors |
 | sigma-tls vs GSTN TLS | `tests/net/test_sigma_tls.sh` | `drivers-dev` | Full handshake + HTTP GET to GSTN sandbox |
@@ -567,7 +574,7 @@ SigmaOS never implements proprietary protocols. Every protocol is documented.
 ### ST1 — Stability: Additional Crash Scenarios
 
 | Scenario | Test file | Branch | Target |
-|----------|----------|--------|--------|
+| ---------- | ---------- | -------- | -------- |
 | sigma-pqc-native OOM during keygen | `tests/chaos/test_pqc_oom.sh` | `performance-optimized` | Returns SIGMA_ERR_NOMEM, no hang |
 | sigma-tls connection reset mid-handshake | `tests/chaos/test_tls_reset.sh` | `drivers-dev` | Retry once, then return error |
 | User script infinite loop | `tests/chaos/test_script_loop.sh` | `tools-dev` | sigma-cron kills job after timeout |
@@ -580,7 +587,7 @@ SigmaOS never implements proprietary protocols. Every protocol is documented.
 ## Per-Branch Sovereignty Targets
 
 | Branch | Sovereignty task | Target |
-|--------|-----------------|--------|
+| -------- | ----------------- | -------- |
 | `kernel-exp` | sigma-boot.efi replaces GRUB | Before v16.0 |
 | `kernel-exp` | Argon2id replaces fake derive_key() | Before v16.0 |
 | `performance-optimized` | sigma-pqc-native replaces liboqs | Before v16.0 |
@@ -598,7 +605,7 @@ SigmaOS never implements proprietary protocols. Every protocol is documented.
 
 ## Master Sovereignty Checklist
 
-```
+```text
 [ ] sigma-boot.efi boots without GRUB
 [ ] Argon2id key derivation (fixes Issue #44)
 [ ] sigma-pqc-native: Kyber/Dilithium without liboqs

@@ -12,7 +12,7 @@ Zenith is SigmaOS's sovereign desktop compositor. It implements a full widget hi
 
 ## Architecture
 
-```
+```text
 WindowManager
 ├── Framebuffer (1920×1080, ARGB8888 pixels)
 ├── PanelWidget (top status bar — derives DesktopWidget)
@@ -21,7 +21,7 @@ WindowManager
 
 ## Widget Hierarchy (OOP)
 
-```
+```text
 DesktopWidget (ref object of RootObj)  ← abstract base
 ├── PanelWidget                         ← top bar
 ├── AppLauncher                         ← dock with icon grid
@@ -34,6 +34,7 @@ DesktopWidget (ref object of RootObj)  ← abstract base
 - Format: ARGB8888 (`Pixel = SigmaU32`)
 - Operations: `setPixel`, `fillRect` — all bounds-checked, no exceptions
 - Background: `0xFF1A1A2E` (deep navy Sigma theme)
+
 
 ## Event System
 
@@ -64,7 +65,9 @@ Events dispatched via `WindowManager.dispatchEvent()` → routed to each widget.
 
 ```nim
 proc testDesktopUX*(): bool
+
 # WindowManager init → Dock populated → Frame painted → Pixel verified
+
 ```
 
 ## Future Work

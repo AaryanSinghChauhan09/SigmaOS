@@ -7,11 +7,15 @@ The SovereignNetStack has been enhanced with proper cryptographic hashing for fi
 ### Changes Made
 
 #### 1. Firewall Rule ID Generation
+
 - **Previous**: Placeholder additive hashing using simple byte addition
 - **Current**: Proper BLAKE3 cryptographic hashing using `blake3::Hasher`
 
+
 #### 2. Dependency Addition
+
 - Added `blake3 = "1.5"` to `sovereign_netstack/Cargo.toml`
+
 
 ### Implementation Details
 
@@ -50,16 +54,20 @@ fn generate_rule_id(
 - **Performance**: BLAKE3 is optimized for both speed and security
 - **Consistency**: Matches SigmaOS cryptographic standards across the system
 
+
 ### Security Impact
 
 This improvement enhances the security posture of the network stack by:
+
 - Preventing rule ID collisions that could be exploited
 - Providing cryptographically verifiable rule identifiers
 - Aligning with SigmaOS's post-quantum security requirements
 
+
 ## Future Enhancements
 
 Potential future improvements to the network stack:
+
 - Integration with hardware-accelerated BLAKE3 instructions
 - Batch rule ID generation for performance optimization
 - Rule ID caching for frequently used rules

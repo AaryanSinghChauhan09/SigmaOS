@@ -13,13 +13,14 @@ PipeWire is the modern Linux audio and video server that unifies PulseAudio (con
 - **Camera/video routing** for screen sharing, video conferencing, and OBS Studio
 - **Per-application volume control, routing, and effects processing**
 
+
 SigmaOS implements `sigma-audio` as a PipeWire-compatible media server with the Sovereign Lattice's capability-based access model for camera/microphone permissions.
 
 ---
 
 ## 2. Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                    SIGMA AUDIO/VIDEO PIPELINE                    │
 │                                                                  │
@@ -116,13 +117,16 @@ $ sigma audio list
   Microphone        ██████████ 100%  → Discord (voice input)
 
 # Change volume for a specific app
+
 $ sigma audio set firefox 40%
 
 # Route Discord to headset, everything else to speakers
+
 $ sigma audio route discord --sink "USB Headset"
 $ sigma audio route --default --sink "Built-in Speakers"
 
 # Apply noise cancellation to microphone
+
 $ sigma audio filter mic --add noise-cancel
 Σ [AUDIO] Noise cancellation enabled on microphone (RNNoise model)
 ```
@@ -130,7 +134,9 @@ $ sigma audio filter mic --add noise-cancel
 ### 3.3 Pro Audio / JACK Compatibility
 
 ```bash
+
 # Enable low-latency mode for music production
+
 $ sigma audio set-profile pro-audio
 Σ [AUDIO] Switched to Pro Audio profile:
   Sample rate : 96kHz
@@ -139,6 +145,7 @@ $ sigma audio set-profile pro-audio
   JACK API    : Active (compatible with Ardour, Bitwig, Carla)
 
 # Connect MIDI keyboard to DAW
+
 $ sigma audio midi list
   Input:  Arturia KeyLab 88   (USB MIDI)
   Input:  Sigma Virtual MIDI  (software)
@@ -149,7 +156,9 @@ $ sigma audio midi route "Arturia KeyLab 88" ardour
 ### 3.4 Camera/Screen Sharing with Portal Integration
 
 ```bash
+
 # Screen sharing (via sigma-portals — no direct access to framebuffer)
+
 $ sigma audio screen-share start
 Σ [PORTAL] Screen sharing requested:
   [1] Entire screen (HDMI-1 — 2560x1440)
@@ -161,6 +170,7 @@ $ sigma audio screen-share start
   Consumer: Discord (screen share)
 
 # Camera access (requires portal permission)
+
 $ sigma audio camera list
   Webcam: Logitech C920 (USB, 1080p30)
   Status: ❌ No app has camera access
@@ -175,7 +185,7 @@ $ sigma audio camera grant discord
 ## 4. Latency Comparison
 
 | Audio System | Typical Latency | Pro-Audio Capable |
-|:------------|:---------------|:------------------|
+| :------------ | :--------------- | :------------------ |
 | PulseAudio | ~40ms | ❌ |
 | JACK | ~2ms | ✅ |
 | PipeWire (Linux) | ~3ms | ✅ |

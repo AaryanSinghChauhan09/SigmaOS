@@ -51,7 +51,9 @@ $ sigma consensus lease grant 30s
 Σ [CONSENSUS] Lease granted: id=7f3a2b1c ttl=30s
 
 $ sigma consensus put /services/my-api --lease=7f3a2b1c "10.0.1.5:8080"
+
 # Key auto-deletes if not renewed within 30s
+
 ```
 
 ---

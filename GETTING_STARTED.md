@@ -127,7 +127,8 @@ qemu-system-x86_64 \
 ```
 
 Expected output:
-```
+
+```text
 SigmaOS Boot v15.0
 [BOOT] Kernel loaded at 0x200000
 Σ SigmaOS Zenith Kernel Initializing (Rust)
@@ -141,7 +142,7 @@ System Ready. Waiting for input...
 
 ## Project Structure
 
-```
+```text
 SigmaOS/
 ├── arch/x86_64/       # CPU-specific: head64.asm, gdt.asm, idt.asm, context_switch.asm
 
@@ -227,7 +228,7 @@ git push origin feat/my-improvement
 ## Key Files to Read First
 
 | File | Why |
-|------|-----|
+| ------ | ----- |
 | `Architecture.md` | Complete system design |
 | `kernel/core/sovereign_kernel_main.rs` | Boot sequence |
 | `kernel/core/sigma_sched.rs` | Scheduler |

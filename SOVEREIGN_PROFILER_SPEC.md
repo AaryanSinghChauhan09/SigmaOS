@@ -8,7 +8,7 @@ The **SigmaOS Sovereign Profiler** is a high-frequency, zero-overhead observabil
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                   SOVEREIGN PROFILER                        │
 │                                                             │
@@ -37,7 +37,7 @@ The **SigmaOS Sovereign Profiler** is a high-frequency, zero-overhead observabil
 ### 1. Shard Health Vitals
 
 | Metric | Type | Resolution | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `shard.cpu_ns` | Counter | per-tick | CPU nanoseconds consumed |
 | `shard.ipc_msgs` | Counter | per-tick | sigma-bus messages sent/received |
 | `shard.ipc_latency_ns` | Histogram | μs buckets | IPC round-trip time |
@@ -48,7 +48,7 @@ The **SigmaOS Sovereign Profiler** is a high-frequency, zero-overhead observabil
 ### 2. Kernel Subsystem Metrics
 
 | Metric | Description |
-|---|---|
+| --- | --- |
 | `sigma.scheduler.eevdf_slice_ns` | Current EEVDF time-slice per priority class |
 | `sigma.mm.alloc_latency_ns` | Memory allocator P50/P95/P99 latency |
 | `sigma.ipc.ring_pressure` | sigma-bus ring-buffer fill percentage |
@@ -58,7 +58,7 @@ The **SigmaOS Sovereign Profiler** is a high-frequency, zero-overhead observabil
 
 ### 3. System-Wide Vitals
 
-```
+```text
 /sigma/metrics/system
 ├── cpu_util_percent[]      # per-core utilization
 ├── load_avg_1m             # 1-minute load average
@@ -183,29 +183,45 @@ int probe_shard_exit(struct pt_regs *ctx) {
 ## CLI Interface
 
 ```bash
+
 # Real-time shard vitals (like `top` but for shards)
+
 sigma top
 
 # Output:
+
 # SHARD              CPU%   MEM_KB   IPC_MSG/s  STATE
+
 # CoreLattice         3.2%    2048     45,230    RUNNING
+
 # SigmaScheduler      1.1%     512     12,100    RUNNING
+
 # NetworkStack        8.7%    8192    120,500    RUNNING
+
 # HelloWorld          0.0%       4         12    IDLE
+
 # SigmaShield         0.2%    1024      5,400    RUNNING
 
 # Historical stats (last 60s)
+
 sigma stats --shard CoreLattice --window 60s
 
 # Export to OpenTelemetry (Prometheus scrape endpoint)
+
 sigma metrics export --format prometheus --port 9090
 
 # Show IPC latency histogram
+
 sigma metrics histogram --metric ipc_latency_ns --shard NetworkStack
+
 # P50:  245ns
+
 # P95:  890ns
+
 # P99: 2100ns
+
 # MAX: 5400ns
+
 ```
 
 ---
@@ -214,7 +230,7 @@ sigma metrics histogram --metric ipc_latency_ns --shard NetworkStack
 
 Vitals are broadcast to the **Zenith Header** (desktop HUD) via sigma-bus at 10Hz:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │  CPU: ██░░░ 22%  MEM: 4.2/16GB  NET: ↑12MB/s ↓45MB/s       │
 │  TEMP: 48°C  SHARDS: 47 active  IPC: 180K msg/s  UPTIME: 5d │
@@ -226,7 +242,9 @@ Vitals are broadcast to the **Zenith Header** (desktop HUD) via sigma-bus at 10H
 ## OpenTelemetry Export
 
 ```yaml
+
 # /etc/sigma/otel-exporter.yaml
+
 exporters:
   prometheus:
     endpoint: "0.0.0.0:9090"
@@ -238,10 +256,12 @@ exporters:
 metrics:
   prefix: "sigmaos_"
   include:
+
     - "shard.*"
     - "sigma.scheduler.*"
     - "sigma.mm.*"
     - "sigma.net.*"
+
 ```
 
 ---
@@ -251,7 +271,7 @@ metrics:
 The profiler is designed for zero overhead in production:
 
 | Mode | CPU Overhead | Memory | Latency Impact |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Off | 0% | 0 | 0ns |
 | Minimal (counters only) | <0.1% | 256KB | <5ns per event |
 | Full (histograms) | <0.5% | 4MB | <20ns per event |

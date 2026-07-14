@@ -6,15 +6,21 @@ SigmaOS is a microkernel-based operating system with a strict capability isolati
 
 - **Kernel Ring Model** — Rings 0–3, with only the kernel and IRQ handlers in Ring 0
 
+
 - **Shard Isolation** — Every process is a shard with a capability token, sigma_pledge, and sigma_unveil
+
 
 - **sigma-bus IPC** — Typed message passing with O(1) capability verification on every message
 
+
 - **Memory Layout** — Kernel space vs user/shard space, zero-copy shared regions
+
 
 - **IPC Performance** — Target: < 500 ns round-trip (local), < 2 µs (cross-CPU)
 
+
 - **Security Chain** — pledge → unveil → AVC O(1) cache → PQC attestation → TPM2
+
 
 ## Full Document
 
@@ -24,6 +30,8 @@ SigmaOS is a microkernel-based operating system with a strict capability isolati
 
 - [Kernel Internals](Kernel)
 
+
 - [Security Model Deep Dive](Security-Model-Deep-Dive)
+
 
 - [Shard Development Guide](Shard-Development-Guide)

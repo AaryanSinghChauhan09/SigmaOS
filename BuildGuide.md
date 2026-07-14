@@ -21,6 +21,7 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
 
 1. **Compile the Orchestrator:**
 
+
    If you haven't already, compile the CLI:
 
    ```bash
@@ -30,6 +31,7 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
 
 1. **Select a Build Profile:**
 
+
    Configure the system for your target environment:
 
    ```bash
@@ -38,6 +40,7 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
    ```
 
 1. **Compile the Lattice:**
+
 
    Build the kernel and all enabled shards for the x86_64 architecture:
 
@@ -66,6 +69,7 @@ To run SigmaOS on actual hardware:
 
 1. Insert a USB flash drive.
 
+
 1
 
    ```bash
@@ -76,6 +80,7 @@ To run SigmaOS on actual hardware:
    ```
 
 1. Boot your machine from the USB drive. Ensure Legacy BIOS or UEFI compatibility mode is enabled in your firmware settings.
+
 
 1
 

@@ -27,11 +27,15 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 
 1. **Universal SDK**: Allowing any developer to contribute shards easily.
 
+
 2. **Package Submission Pipeline**: Automated PQC-signing of all community shards.
+
 
 3. **OEM Partnerships**: Working with sovereign hardware vendors for pre-installs.
 
+
 4. **Trust Graph UI**: A visual dashboard showing exactly where every bit of code came from.
+
 
 ---
 
@@ -40,13 +44,13 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 | Metric | Pop!_OS | CachyOS | SigmaOS |
 | :--- | :--- | :--- | :--- |
 
-| **Automation**| High (Desktop AI) | Moderate (Arch-based) |**Supreme** (Self-Healing) |
+| **Automation** | High (Desktop AI) | Moderate (Arch-based) | **Supreme** (Self-Healing) |
 
-| **Customization**| Moderate | High |**Modular** (Atomic Shards) |
+| **Customization** | Moderate | High | **Modular** (Atomic Shards) |
 
-| **UX Polish**| Extreme | Moderate |**Premium** (Zenith UI) |
+| **UX Polish** | Extreme | Moderate | **Premium** (Zenith UI) |
 
-| **Quantum-Ready**| No | No |**Yes** (Kyber/Dilithium) |
+| **Quantum-Ready** | No | No | **Yes** (Kyber/Dilithium) |
 
 ---
 

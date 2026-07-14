@@ -45,7 +45,9 @@ $ sigma telemetry dashboard
 All signals are exportable over OTLP to external Grafana/Prometheus/Jaeger instances for teams that already have monitoring infrastructure.
 
 ```toml
+
 # /etc/sigma/telemetry.toml
+
 [export]
 protocol = "otlp"
 endpoint = "https://monitoring.example.com:4317"

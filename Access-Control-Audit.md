@@ -6,7 +6,7 @@ policy evaluation** and an immutable audit chain.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `audit_chain.rs` | Append-only, BLAKE3-chained audit log of all policy decisions |
 
 ## Access Control Model
@@ -15,11 +15,14 @@ SigmaOS uses a **Lattice-Based Access Control** (LBAC) model:
 
 - Every **subject** (shard) carries a clearance label `{confidentiality, integrity}`.
 
+
 - Every **object** (file, socket, IPC endpoint) carries a sensitivity label.
+
 
 - Operations are permitted only when the lattice partial order is satisfied.
 
-```
+
+```text
 ALLOW browser_shard READ  /media          # read public data
 
 DENY  browser_shard ANY   /sys            # no kernel inspection
@@ -32,7 +35,7 @@ ALLOW ssh_daemon    BIND  net:22          # bind privileged port
 
 Every policy decision is appended to a BLAKE3-linked chain:
 
-```
+```text
 Entry N: { timestamp, subject, object, action, decision, hash(Entry N-1) }
 ```
 
@@ -60,7 +63,7 @@ void init_security_access_control(void);
 
 ## Policy Language
 
-```
+```text
 
 # Allow app_shard to read /home, write /tmp
 
@@ -78,18 +81,25 @@ DENY  web_shard   BIND    net:*
 
 - [x] Audit chain with BLAKE3 linking (`audit_chain.rs`)
 
+
 - [ ] Policy compiler (text → binary rule table)
+
 
 - [ ] Kernel enforcement hook in syscall dispatcher
 
+
 - [ ] Label assignment to all shards at boot
+
 
 - [ ] Policy hot-reload (without reboot)
 
+
 - [ ] GUI policy editor for Zenith Desktop
+
 
 ## Related Modules
 
 - [`modules/security/isolation`](../isolation/README.md) — Process isolation
+
 
 - [`modules/core/kernel`](../../core/kernel/README.md) — Syscall enforcement hooks

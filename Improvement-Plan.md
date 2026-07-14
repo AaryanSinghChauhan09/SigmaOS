@@ -7,7 +7,7 @@
 ## Overview
 
 | Area | Current | v1.0 Target | v2.0 Target |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Design System | ✅ Defined | All widgets use tokens | Live theming |
 | Applications | 0 installable | 8 Tier-1 apps | 20+ apps |
 | UI/UX | Core engine ✅ | Full widget set | Wayland compat |
@@ -20,13 +20,18 @@
 
 1. **Design tokens** → `sigma_design_tokens.rs` (colours/spacing/radius/motion as constants)
 
+
 2. **Icon system** → 100+ 24×24 icons, SVG-to-bitmap rasterizer
+
 
 3. **Typography engine** → PSF bitmap → TrueType rasterizer
 
+
 4. **Dark/Light adaptive** → all components implement `Themed` trait
 
+
 5. **Consistency audit** → WCAG AA contrast, 8px grid, hover/active/focus on all elements
+
 
 ## Application Plan
 
@@ -47,7 +52,7 @@ Each app uses the **SigmaApp trait** (Model-View-Intent pattern).
 ## Performance Targets
 
 | Metric | v0.1 | v1.0 | v2.0 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Boot to desktop | < 2.5s | < 1.5s | < 1.0s |
 | Frame time | < 16ms | < 8ms | < 4ms |
 | Input latency | < 10ms | < 5ms | < 2ms |
@@ -57,18 +62,23 @@ Each app uses the **SigmaApp trait** (Model-View-Intent pattern).
 
 1. **Error hierarchy** — typed errors with context (not just `IoError`)
 
+
 2. **Capability-typed API** — phantom types prevent privilege escalation at compile time
+
 
 3. **Plugin system** — `Plugin` trait + `PluginManager` for extensibility
 
+
 4. **Reactive state** — MVI (Model-View-Intent) pattern for all app state
 
+
 5. **Async/await** — `sigma-async` no_std runtime for I/O-bound code
+
 
 ## Implementation Schedule
 
 | Sprint | Duration | Focus |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Month 1–2 | Design tokens, damage tracking, core widgets, terminal MVP |
 | 2 | Month 2–3 | Onboarding, quick settings, font rendering, app switcher |
 | 3 | Month 3–4 | sigma-files, sigma-edit, sigma-calc, screenshots |
@@ -80,7 +90,7 @@ Each app uses the **SigmaApp trait** (Model-View-Intent pattern).
 ## All Planning Documents
 
 | Document | What it covers |
-|---|---|
+| --- | --- |
 | [Master Improvement Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Master_Improvement_Plan.md) | This overview |
 | [Design System](Design-System) | Colours, typography, spacing, motion |
 | [UI/UX Performance Plan](UI-UX-Performance) | Animation, renderer, input, panel, settings, a11y |

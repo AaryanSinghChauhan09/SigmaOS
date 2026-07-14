@@ -12,11 +12,15 @@ The wizard guides users through:
 
 1. **Welcome**: A clear explanation of what makes SigmaOS sovereign.
 
+
 2. **Profile Selection**: Direct toggle between Standard, Forensic (CAINE), IoT, Enterprise, and Education profiles.
+
 
 3. **Network Configuration**: Boots Whonix-style gateway/workstation firewall splits.
 
+
 4. **Declarative Config Import**: Import saved `settings.json` profiles from previous systems.
+
 
 ---
 
@@ -26,11 +30,15 @@ Zenith ships with a curated **Sovereign App Store** (`sigma_appstore.cpp`) inspi
 
 - All apps are listed with **explicit permission declarations** (Network access, FS scope, GPU usage).
 
+
 - Each installation fetches the `.srecipe` source build script from the Sovereign Registry.
+
 
 - Apps are compiled **locally** inside isolated orchestrator containers.
 
+
 - The final binary is cryptographically signed as a `.spkg` bundle before deployment.
+
 
 No untrusted pre-compiled binaries. Ever.
 
@@ -42,13 +50,17 @@ When you launch a GUI application on Zenith:
 
 1. **The Sandbox Bridge** (`sigma_sandbox_bridge.cpp`) intercepts the execution request.
 
+
 2. It sends an IPC request to the **Sovereign Orchestrator** to create a dedicated container shard.
+
 
 3. The Orchestrator assigns a unique `container_id` and strict resource quotas (CPU limits, chroot jail, and virtual IP block).
 
+
 4. The **Native Compositor** (`sigma_compositor.cpp`) maps the app's backing framebuffers to this exact `container_id`, preventing any unauthorized cross-app window read/writes.
 
-```
+
+```text
 +-------------------------------------------------------------+
 |                     Zenith Compositor                       |
 +------------------------------+------------------------------+
@@ -110,8 +122,11 @@ fn main() {
 
 - **M4b.1:** Defined unified SDK Architecture (`zenith.h`).
 
+
 - **M4b.2:** Released the initial Developer Preview with declarative C++ layout components and sandboxing hooks.
 
+
 - **M4b.3:** Rust crate (`zenith-sdk`) released for memory-safe app development.
+
 
 - **M4b.4:** Onboarding Wizard and Sovereign App Store launched.

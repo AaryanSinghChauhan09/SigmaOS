@@ -1,4 +1,5 @@
 # SigmaOS Virtualization Absorption - KVM
+
 ## Making torvalds/linux (KVM) Irrelevant
 
 > **Absorption Target**: https://github.com/torvalds/linux (KVM module)  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed KVM by implementing a native hardware virtual
 ## Absorbed Features & Capabilities
 
 ### 1. Hardware Virtualization
+
 **Original**: KVM's hardware virtualization support  
 **SigmaOS**: Native hardware virtualization with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaVM {
 ```
 
 **HV Features**:
+
 - Native hardware virtualization with OS-level optimization
 - VT-x/AMD-V support with automatic detection
 - Nested virtualization with automatic configuration
@@ -36,11 +39,14 @@ pub struct SigmaVM {
 - HV validation with automatic checking
 - HV monitoring with real-time metrics
 
+
 ### 2. VCPU Management
+
 **Original**: KVM's VCPU management  
 **SigmaOS**: Native VCPU with enhanced features
 
 **VCPU Features**:
+
 - Native VCPU management with OS-level optimization
 - VCPU scheduling with intelligent algorithms
 - VCPU hotplug with automatic management
@@ -48,11 +54,14 @@ pub struct SigmaVM {
 - VCPU validation with automatic checking
 - VCPU monitoring with real-time metrics
 
+
 ### 3. Memory Management
+
 **Original**: KVM's memory management (EPT/NPT)  
 **SigmaOS**: Native memory with enhanced features
 
 **Memory Features**:
+
 - Native memory management with OS-level optimization
 - EPT/NPT support with automatic detection
 - Memory ballooning with automatic adjustment
@@ -60,11 +69,14 @@ pub struct SigmaVM {
 - Memory profiles with automatic switching
 - Memory monitoring with real-time metrics
 
+
 ### 4. Interrupt Handling
+
 **Original**: KVM's interrupt handling  
 **SigmaOS**: Native interrupt with enhanced features
 
 **Interrupt Features**:
+
 - Native interrupt handling with OS-level optimization
 - Interrupt routing with intelligent algorithms
 - Interrupt injection with automatic management
@@ -72,11 +84,14 @@ pub struct SigmaVM {
 - Interrupt validation with automatic checking
 - Interrupt monitoring with real-time metrics
 
+
 ### 5. Device Assignment
+
 **Original**: KVM's device assignment (VFIO)  
 **SigmaOS**: Native device assignment with enhanced features
 
 **Device Features**:
+
 - Native device assignment with capability-based access
 - VFIO compatibility with automatic detection
 - Device passthrough with hardware enforcement
@@ -84,11 +99,14 @@ pub struct SigmaVM {
 - Device validation with automatic checking
 - Device monitoring with real-time metrics
 
+
 ### 6. I/O Virtualization
+
 **Original**: KVM's I/O virtualization  
 **SigmaOS**: Native I/O with enhanced features
 
 **I/O Features**:
+
 - Native I/O virtualization with OS-level optimization
 - Virtio support with automatic detection
 - I/O scheduling with intelligent algorithms
@@ -96,12 +114,13 @@ pub struct SigmaVM {
 - I/O validation with automatic checking
 - I/O monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | KVM | SigmaOS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | Virtualization Performance | Kernel overhead | Native OS-level | ✅ 2-3x |
 | VCPU Performance | Scheduler overhead | Native optimization | ✅ 2x |
 | Memory Performance | EPT overhead | Native capability | ✅ 2x |
@@ -116,6 +135,7 @@ pub struct SigmaVM {
 ## Implementation Details
 
 ### Native HV Manager
+
 ```rust
 pub mod hv {
     use sigma_vm::hv::HVManager;
@@ -140,6 +160,7 @@ pub mod hv {
 ```
 
 ### Native VCPU Manager
+
 ```rust
 pub mod vcpu {
     pub struct VCPUManager {
@@ -166,26 +187,36 @@ pub mod vcpu {
 ### For Users of KVM
 
 **Before** (using KVM):
+
 ```bash
+
 # Install KVM
+
 sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
 
 # Create VM
+
 virt-install --name myvm --ram 2048 --vcpus 2 --disk path=disk.img --cdrom iso.iso
 
 # Manage VM
+
 virsh start myvm
 ```
 
 **After** (using SigmaVM):
+
 ```bash
+
 # Enable VM shard (native)
+
 sigma-shard enable virtualization
 
 # Use KVM-compatible configuration
+
 sigma-vm create --kvm-compatible --config config.sigma
 
 # Run VM
+
 sigma-vm run --name myvm
 ```
 
@@ -194,7 +225,7 @@ sigma-vm run --name myvm
 ## Performance Benchmarks
 
 | Operation | KVM | SigmaVM | Improvement |
-|-----------|-----|---------|-------------|
+| ----------- | ----- | --------- | ------------- |
 | VM Boot | 3s | 1s | 3x faster |
 | VCPU Performance | 95% host | 98% host | 1.03x better |
 | Memory Access | 100ns | 40ns | 2.5x faster |

@@ -3,6 +3,7 @@
 **Goal**: Turn SigmaOS into a production-grade OS that outcompetes Arch, Fedora, Kali, and other distros by combining rock-solid foundations with unique AI-native capabilities.
 
 ## Top 12 High-Impact Development Ideas
+
 1. **Stable Kernel Baseline**: Adopt and maintain a tracked Linux LTS branch for hardware compatibility while continuing microkernel research.
 2. **Polished Graphical Installer**: Calamares-style GUI with partitioning, secure-boot, and enterprise imaging.
 3. **sigpkg v1**: Minimal, signed package format with deterministic metadata, atomic update, and rollback.
@@ -16,7 +17,9 @@
 11. **Developer SDK and Templates**: Package templates, CI templates, and local dev sandboxes.
 12. **Comprehensive Docs**: Expand the Wiki into a single source of truth for building, packaging, testing, and contributing.
 
+
 ## Phased Roadmap (12 Months)
+
 - **Q1**: Merge Linux LTS kernel branch, sigpkg spec v0.1 with signing keys, Installer Prototype.
 - **Q2**: Reproducible build farm, binary caches, atomic updates, vulnerability scanning CI.
 - **Q3**: Wayland compositor stabilization, accessibility suite, Flatpak/OCI integration.

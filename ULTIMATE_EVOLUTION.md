@@ -13,6 +13,7 @@ To make SigmaOS truly unmatched by any Linux distro, the future development stra
 *   **AI‑driven scheduling**: Adaptive resource allocation based on workload prediction (developer, gamer, server modes).
 *   **Zero‑trust boot**: TPM‑integrated cryptographic boot verification with immutable audit logs.
 
+
 ## 📦 Package Management & Ecosystem
 
 *   **SigmaPkg**: Declarative package manager with rollback, sandboxing, and reproducible builds.
@@ -20,11 +21,13 @@ To make SigmaOS truly unmatched by any Linux distro, the future development stra
 *   **Rolling + LTS channels**: Continuous updates with regression testing, plus enterprise‑grade stable releases.
 *   **App ecosystem**: SigmaOffice (productivity), SigmaDev (developer IDEs), SigmaCreative (media tools).
 
+
 ## 🔒 Security & Privacy
 
 *   **Beyond SELinux/AppArmor**: Policy modules mapped to capability tokens, with AI‑assisted anomaly detection.
 *   **Forensic snapshots**: Immutable system‑wide rollback for post‑incident recovery.
 *   **Privacy dashboard**: User‑controlled telemetry with transparent data governance.
+
 
 ## 🖥️ Zenith Desktop Evolution
 
@@ -33,6 +36,7 @@ To make SigmaOS truly unmatched by any Linux distro, the future development stra
 *   **Declarative theming**: `.sigma_profile` parser for instant theme switching.
 *   **Cross‑device sync**: Seamless integration with mobile and IoT devices.
 
+
 ## 🌍 Community & Contributor Ecosystem
 
 *   **SigmaWiki**: Arch‑style knowledge hub with tutorials, troubleshooting, and contributor guides.
@@ -40,12 +44,14 @@ To make SigmaOS truly unmatched by any Linux distro, the future development stra
 *   **Open governance**: Transparent roadmap voting and feature prioritization.
 *   **Global outreach**: Partnerships with universities and research labs to drive adoption.
 
+
 ## 🤖 AI & Automation
 
 *   **Embedded AI orchestrator**: Local LLM backend for task automation, code suggestions, and system optimization.
 *   **Predictive maintenance**: AI models to detect failing hardware/software before crashes.
 *   **Adaptive UX**: Personalized desktop profiles based on user behavior.
 *   **Legal & compliance overlays**: Built‑in dashboards for GDPR, ISO, SOC2 compliance.
+
 
 ---
 

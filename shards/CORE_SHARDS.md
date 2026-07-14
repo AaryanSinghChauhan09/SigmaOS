@@ -11,7 +11,7 @@ The SigmaOS Sovereign Lattice is built upon a decentralized hierarchy of "Shards
 Unlike monolithic kernels where all subsystems share Ring 0 memory, SigmaOS restricts Ring 0 exclusively to `S00_KERNEL` and `S01_MEM_MANAGER`. All other core shards operate in Ring 1 or Ring 3, isolated via hardware paging and interacting strictly via the `sigma-bus`.
 
 | ID | Name | Ring | Required Capabilities | Description |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **S00** | `S00_KERNEL` | 0 | `CAP_ADMIN` | The microkernel core. Manages interrupts, contexts, and capabilities. |
 | **S01** | `S01_MEM_MANAGER` | 0 | `CAP_MEMORY` | Virtual Memory Manager (VMM), Page Allocator, and hardware paging. |
 | **S02** | `S02_IPC_BROKER` | 1 | `CAP_IPC` | Routes `sigma-bus` zero-copy messages between all other shards. |
@@ -24,6 +24,7 @@ Core Shards enforce isolation at two levels:
 
 1.  **Hardware Level (Paging)**: `S01_MEM_MANAGER` creates distinct PML4 tables (x86_64) or translation tables (ARM64) for each shard. `S02` cannot read `S03`'s memory.
 2.  **Capability Level (Tokens)**: When a shard invokes a syscall (e.g., `sys_mmap`), the `syscall_dispatcher` validates its cryptographically signed Capability Token. If `S03_VFS` attempts to call `sys_mmap` without `CAP_MEMORY`, the request is rejected with `EACCES`.
+
 
 ## 3. Recovery Protocols
 

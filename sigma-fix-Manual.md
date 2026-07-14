@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-fix <command> [options]
 sigma-fix --version
 sigma-fix --help
@@ -89,7 +89,7 @@ sigma-fix list --json
 ## OPTIONS
 
 | Flag | Description |
-|------|-------------|
+| ------ | ------------- |
 | `--id <fix-id>` | Fix identifier (e.g. `FIX-0042`) |
 | `--path <dir>` | Directory to scan (default: `/`) |
 | `--auto` | Apply without confirmation |
@@ -101,7 +101,7 @@ sigma-fix list --json
 ## BUILT-IN FIX DATABASE
 
 | ID | Severity | Category | Title |
-|----|----------|----------|-------|
+| ---- | ---------- | ---------- | ------- |
 | FIX-0001 | CRITICAL | security | SSH root login enabled (`PermitRootLogin yes`) |
 | FIX-0002 | HIGH | security | 3 SUID binaries with unexpected permissions |
 | FIX-0003 | HIGH | pqc | Dilithium-5 keys missing — system using Ed25519 fallback |

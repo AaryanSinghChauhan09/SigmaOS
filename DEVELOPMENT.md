@@ -7,6 +7,7 @@ This document provides guidelines for contributing to SigmaOS development.
 ### Development Environment Setup
 
 1. **Install Required Tools**
+
    ```bash
    # Rust
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -20,12 +21,14 @@ This document provides guidelines for contributing to SigmaOS development.
    ```
 
 2. **Clone Repository**
+
    ```bash
    git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
    cd SigmaOS
    ```
 
 3. **Build Project**
+
    ```bash
    cargo build --release
    ```
@@ -39,6 +42,7 @@ This document provides guidelines for contributing to SigmaOS development.
 - Use `#![no_std]` for kernel code
 - Avoid `unwrap()` in production code
 - Use `Result` types for error handling
+
 
 ### Example Rust Code
 
@@ -62,10 +66,13 @@ pub fn example_function(input: u32) -> Result<u32, Error> {
 - Use PascalCase for types
 - Add doc comments
 
+
 ### Example Nim Code
 
 ```nim
+
 ## Example function
+
 proc exampleFunction(input: int): Result[int] =
   if input == 0:
     return err(InvalidInput)
@@ -105,13 +112,17 @@ fn test_integration() {
 ### Running Tests
 
 ```bash
+
 # Run all tests
+
 cargo test
 
 # Run specific test
+
 cargo test test_example
 
 # Run with output
+
 cargo test -- --nocapture
 ```
 
@@ -142,13 +153,17 @@ pub fn example_function(input: u32) -> Result<u32, Error> {
 ### Building Documentation
 
 ```bash
+
 # Build documentation
+
 cargo doc
 
 # Open documentation in browser
+
 cargo doc --open
 
 # Build documentation for all packages
+
 cargo doc --document-private-items
 ```
 
@@ -157,10 +172,13 @@ cargo doc --document-private-items
 ### QEMU Debugging
 
 ```bash
+
 # Start QEMU with GDB server
+
 qemu-system-x86_64 -cdrom sigmaos.iso -m 2G -s -S
 
 # Connect GDB
+
 gdb target/kernel
 (gdb) target remote :1234
 (gdb) break main
@@ -208,16 +226,20 @@ fn bench_example(b: &mut Bencher) {
 ### Profiling
 
 ```bash
+
 # Install flamegraph
+
 cargo install flamegraph
 
 # Generate flamegraph
+
 cargo flamegraph
 ```
 
 ## Code Review Process
 
 1. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/my-feature
    ```
@@ -227,7 +249,9 @@ cargo flamegraph
    - Add tests
    - Update documentation
 
+
 3. **Run Checks**
+
    ```bash
    cargo fmt
    cargo clippy
@@ -235,12 +259,14 @@ cargo flamegraph
    ```
 
 4. **Commit Changes**
+
    ```bash
    git add .
    git commit -m "Add my feature"
    ```
 
 5. **Push and Create PR**
+
    ```bash
    git push origin feature/my-feature
    ```
@@ -251,18 +277,22 @@ cargo flamegraph
    - Update `Cargo.toml` version
    - Update `CHANGELOG.md`
 
+
 2. **Tag Release**
+
    ```bash
    git tag -a v1.0.0 -m "Release 1.0.0"
    git push origin v1.0.0
    ```
 
 3. **Build Release**
+
    ```bash
    cargo build --release
    ```
 
 4. **Create ISO**
+
    ```bash
    ./scripts/build-iso.sh
    ```
@@ -275,12 +305,14 @@ cargo flamegraph
 2. Read the [Security Documentation](./SECURITY.md)
 3. Check existing issues and PRs
 
+
 ### Making Changes
 
 1. Keep changes focused and minimal
 2. Add tests for new functionality
 3. Update documentation
 4. Follow code style guidelines
+
 
 ### Submitting Changes
 
@@ -290,9 +322,10 @@ cargo flamegraph
 4. Add tests and documentation
 5. Submit a pull request
 
+
 ## Project Structure
 
-```
+```text
 SigmaOS/
 ├── bootloader/          # UEFI bootloader
 ├── kernel/              # Kernel code
@@ -320,6 +353,7 @@ SigmaOS/
 3. Add to dispatch table
 4. Update documentation
 
+
 ### Adding a New Driver
 
 1. Create driver file in `kernel/drivers/`
@@ -327,12 +361,14 @@ SigmaOS/
 3. Register driver in init
 4. Add tests
 
+
 ### Adding a New Userland Application
 
 1. Create application directory
 2. Add `Cargo.toml`
 3. Implement application
 4. Add to workspace
+
 
 ## Troubleshooting
 
@@ -342,11 +378,13 @@ SigmaOS/
 - Update dependencies: `cargo update`
 - Clean build: `cargo clean`
 
+
 ### Test Failures
 
 - Run tests individually: `cargo test test_name`
 - Check test output: `cargo test -- --nocapture`
 - Enable backtrace: `RUST_BACKTRACE=1 cargo test`
+
 
 ### Runtime Errors
 
@@ -354,12 +392,14 @@ SigmaOS/
 - Enable serial logging
 - Use GDB for debugging
 
+
 ## Resources
 
 - [Rust Documentation](https://doc.rust-lang.org/)
 - [Nim Documentation](https://nim-lang.org/docs.html)
 - [UEFI Specification](https://uefi.org/specifications)
 - [x86_64 Architecture](https://software.intel.com/content/www/us/en/develop/articles/intel-sdm.html)
+
 
 ## Contact
 

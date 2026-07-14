@@ -9,7 +9,7 @@ SigmaOS ships an optional **PREEMPT_RT kernel variant** that provides hard real-
 ## Scheduling Classes
 
 | Class        | Algorithm           | Use Case                    |
-|-------------|---------------------|-----------------------------|
+| ------------- | --------------------- | ----------------------------- |
 | FIFO        | First-in-first-out  | Audio DSP, PLC control      |
 | RoundRobin  | Time-sliced FIFO    | Multiple RT tasks, fairness |
 | Deadline    | Earliest Deadline   | Robotics, sensor fusion     |
@@ -24,18 +24,22 @@ The RT kernel implements the **Priority Inheritance Protocol** to prevent priori
 3. On unlock, the holder's priority is **restored** to its original value
 4. The highest-priority waiter is **woken next**
 
+
 ## Deadline Scheduler (EDF)
 
 - **Admission control**: Verifies `Σ(runtime/period) ≤ 1.0` per CPU
 - **Earliest Deadline First**: Always runs the task with the nearest deadline
 - **Runtime budgeting**: Tasks are throttled if they exceed their runtime budget
 
+
 ## Threaded IRQs
 
 All hardware interrupts are converted to **kernel threads** with configurable priorities:
+
 - Allows preemption of interrupt handlers by higher-priority RT tasks
 - Eliminates interrupt-induced latency spikes
 - Each IRQ thread has CPU affinity for NUMA-aware scheduling
+
 
 ## Implementation
 
@@ -47,10 +51,11 @@ All hardware interrupts are converted to **kernel threads** with configurable pr
   - `DeadlineScheduler::pick_next()` — EDF scheduling decision
   - `make_irq_threaded(irq, handler, priority)` — convert hardirq to thread
 
+
 ## Target Latency
 
 | Metric            | Target        | Measured       |
-|-------------------|---------------|----------------|
+| ------------------- | --------------- | ---------------- |
 | Worst-case jitter | < 50 µs       | In development |
 | IRQ response      | < 10 µs       | In development |
 | Context switch    | < 5 µs        | In development |

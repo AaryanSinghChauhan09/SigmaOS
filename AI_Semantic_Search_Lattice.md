@@ -18,7 +18,7 @@ No data is sent to external services — all indexing and retrieval is fully loc
 
 ### 2.1 System Components
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                   SEMANTIC SEARCH LATTICE                       │
 │                                                                 │
@@ -117,7 +117,7 @@ impl SigmaSemanticSearch {
 ## 3. Indexing Strategy & Supported Formats
 
 | File Type | Extraction Method | Average Tokens |
-|:----------|:------------------|:---------------|
+| :---------- | :------------------ | :--------------- |
 | `.txt`, `.md` | Direct UTF-8 | ~500 |
 | `.pdf` | pdftotext (sigma-pdftools) | ~800 |
 | `.rs`, `.py`, `.go` | AST-aware chunking | ~400 |
@@ -133,7 +133,9 @@ impl SigmaSemanticSearch {
 ## 4. Usage Examples
 
 ```bash
+
 # Semantic file search
+
 $ sigma find "the tax document from last March"
 Σ [INFO] Semantic search... (22ms, 3,412 indexed files)
 
@@ -146,6 +148,7 @@ $ sigma find "the tax document from last March"
 Open first match? [y/N]
 
 # Developer search — understands code intent
+
 $ sigma find "my Python script that reads CSV and outputs charts"
 Σ [INFO] Semantic search...
 
@@ -156,14 +159,17 @@ $ sigma find "my Python script that reads CSV and outputs charts"
 ---
 
 ## 5. Privacy & Storage
+
 - The HNSW index is stored at `/home/user/.cache/sigma/semantic-index/`
 - The index contains file vectors and path hashes only — **not file content**
 - Users can exclude directories via `~/.config/sigma/search-exclude.toml`
 - Index is fully user-owned; deleting it forces a full re-index
 
+
 ---
 
 ## 6. References & Standards
+
 - MiniLM-L6-v2 by Microsoft Research (MIT License)
 - HNSW: Hierarchical Navigable Small World Graphs — Malkov & Yashunin, 2018
 - Semantic search best practices — Hugging Face documentation

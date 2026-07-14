@@ -1,4 +1,5 @@
 # SigmaOS Browser Absorption - Gecko
+
 ## Making mozilla/gecko-dev Irrelevant
 
 > **Absorption Target**: https://github.com/mozilla/gecko-dev  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Gecko by implementing a native rendering engi
 ## Absorbed Features & Capabilities
 
 ### 1. Rendering Engine
+
 **Original**: Gecko's rendering engine  
 **SigmaOS**: Native rendering engine with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaBrowser {
 ```
 
 **Rendering Features**:
+
 - Native rendering engine with OS-level optimization
 - Hardware-accelerated rendering with GPU support
 - Layout engine with intelligent optimization
@@ -36,11 +39,14 @@ pub struct SigmaBrowser {
 - Rendering monitoring with real-time metrics
 - Rendering profiles with automatic switching
 
+
 ### 2. JavaScript Engine
+
 **Original**: Gecko's SpiderMonkey  
 **SigmaOS**: Native JavaScript engine with enhanced features
 
 **JavaScript Features**:
+
 - Native JavaScript engine with JIT compilation
 - ES6+ support with automatic optimization
 - WebAssembly support with native execution
@@ -48,11 +54,14 @@ pub struct SigmaBrowser {
 - JavaScript debugging with native tools
 - JavaScript security with capability-based access
 
+
 ### 3. Layout Engine
+
 **Original**: Gecko's layout engine  
 **SigmaOS**: Native layout engine with enhanced features
 
 **Layout Features**:
+
 - Native layout engine with intelligent algorithms
 - CSS3 support with automatic optimization
 - Flexbox and Grid layout with native implementation
@@ -60,11 +69,14 @@ pub struct SigmaBrowser {
 - Layout monitoring with real-time metrics
 - Layout profiles with automatic switching
 
+
 ### 4. Rust Components
+
 **Original**: Gecko's Rust components (stylo, quantum)  
 **SigmaOS**: Native Rust implementation with enhanced features
 
 **Rust Features**:
+
 - Native Rust implementation with type safety
 - Stylo-inspired CSS engine with native implementation
 - Quantum-inspired parallel rendering
@@ -72,11 +84,14 @@ pub struct SigmaBrowser {
 - Rust performance with zero-cost abstractions
 - Rust integration with OS-level components
 
+
 ### 5. Network Stack
+
 **Original**: Gecko's network stack (necko)  
 **SigmaOS**: Native network stack with enhanced features
 
 **Network Features**:
+
 - Native network stack with OS-level optimization
 - HTTP/2 and HTTP/3 support with automatic negotiation
 - TLS 1.3 with post-quantum support
@@ -84,11 +99,14 @@ pub struct SigmaBrowser {
 - Network monitoring with real-time metrics
 - Network profiles with automatic switching
 
+
 ### 6. Web Standards Support
+
 **Original**: Gecko's web standards support  
 **SigmaOS**: Native web standards with enhanced features
 
 **Web Standards Features**:
+
 - Native HTML5 support with automatic optimization
 - CSS3 support with automatic optimization
 - ES6+ support with automatic optimization
@@ -96,12 +114,13 @@ pub struct SigmaBrowser {
 - Web standards validation with automatic checking
 - Web standards monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Gecko | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Rendering Performance | C++/Rust overhead | Native Rust | ✅ 2-3x |
 | JavaScript Performance | SpiderMonkey overhead | Native JIT | ✅ 2-3x |
 | Layout Performance | Layout overhead | Native optimization | ✅ 3-5x |
@@ -116,6 +135,7 @@ pub struct SigmaBrowser {
 ## Implementation Details
 
 ### Native Rendering Engine
+
 ```rust
 pub mod rendering {
     use sigma_browser::render::RenderingEngine;
@@ -139,6 +159,7 @@ pub mod rendering {
 ```
 
 ### Native JavaScript Engine
+
 ```rust
 pub mod javascript {
     pub struct JavaScriptEngine {
@@ -165,11 +186,15 @@ pub mod javascript {
 ### For Users of Gecko
 
 **Before** (using Gecko):
+
 ```bash
+
 # Install Gecko
+
 sudo apt install libxul-dev
 
 # Use Gecko API
+
 #include <gecko/nsIWebBrowser.h>
 
 // Initialize Gecko
@@ -177,11 +202,15 @@ NS_InitEmbedding();
 ```
 
 **After** (using SigmaBrowser):
+
 ```bash
+
 # Enable browser shard (native)
+
 sigma-shard enable browser-engine
 
 # Use native API
+
 use sigma_browser::render::RenderingEngine;
 
 // Initialize native browser
@@ -193,7 +222,7 @@ let browser = SigmaBrowser::new();
 ## Performance Benchmarks
 
 | Operation | Gecko | SigmaBrowser | Improvement |
-|-----------|-------|--------------|-------------|
+| ----------- | ------- | -------------- | ------------- |
 | Page Render (simple) | 180ms | 55ms | 3.3x faster |
 | JavaScript Execution | 45ms | 18ms | 2.5x faster |
 | Layout Computation | 75ms | 23ms | 3.3x faster |

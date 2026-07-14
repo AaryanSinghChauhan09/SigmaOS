@@ -20,7 +20,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 #### Immediate fixes (blocks every security claim)
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Integrate liboqs Kyber-1024 NTT | `crypto/SovereignKyber.cpp` | `performance-optimized` | Replace `kyber_gen_matrix` with `pqcrystals_kyber1024_ref_keypair` |
 | Integrate liboqs Dilithium-5 | `crypto/SovereignDilithium5.cpp` | `performance-optimized` | Replace LFSR XOF with `pqcrystals_dilithium5_ref_keypair` |
 | SHAKE-256 / SHA-3 (Keccak) | `crypto/sigma_sha3.cpp` | `performance-optimized` | Keccak-f\[1600\] state machine, no external dep |
@@ -35,7 +35,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 #### PQC performance benchmarks (CI gates)
 
 | Algorithm | FIPS std | Target (AVX-512) | Target (NEON) | CI test |
-|-----------|---------|-----------------|---------------|---------|
+| ----------- | --------- | ----------------- | --------------- | --------- |
 | ML-KEM-1024 KeyGen | FIPS 203 | ≥ 10 M ops/sec | ≥ 3 M ops/sec | `tests/perf/bench_pqc.cpp` |
 | ML-KEM-1024 Encap | FIPS 203 | ≥ 8 M ops/sec | ≥ 2.5 M ops/sec | `tests/perf/bench_pqc.cpp` |
 | ML-DSA-87 Sign | FIPS 204 | ≥ 2 M sig/sec | ≥ 600 K sig/sec | `tests/perf/bench_pqc.cpp` |
@@ -46,7 +46,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 **Current:** `kernel/security/sigma_mac.cpp` header complete. No enforcement at syscall boundary.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | MAC label assignment at `execve` | `kernel/security/sigma_mac.cpp` | `kernel-exp` | Read `.sigma-policy` label for executable path |
 | MAC check at every syscall | `kernel/security/sigma_mac.cpp` | `kernel-exp` | Before `open/read/write/exec` — check subject→object label |
 | AVC cache (< 1 µs per check) | `kernel/security/sigma_mac_avc.cpp` | `kernel-exp` | Hash table: (subject, object, perm) → allow/deny |
@@ -59,7 +59,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 ### SH3 — Kernel Memory Safety
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | KASLR (kernel address randomisation) | `kernel/core/sigma_start.cpp` | `kernel-exp` | RDRAND-seeded base offset at boot |
 | W^X enforcement (no RWX pages) | `kernel/mm/sigma_vmm.cpp` | `kernel-exp` | No page simultaneously writable and executable |
 | CET shadow stack (Intel) | `arch/x86_64/sigma_cet.asm` | `kernel-exp` | Write `MSR_IA32_S_CET`; shadow stack for ROP mitigation |
@@ -72,7 +72,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 ### SH4 — Secure Supply Chain
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Dilithium3-sign every `.spkg` | `scripts/sign_release.sh` | `prepare-sigmaos-launch` | CI gate: unsigned package cannot install |
 | dm-verity on every package extract | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Hash tree check before extracting to VFS |
 | SBOM (CycloneDX) generation | `scripts/gen_sbom.sh` | `prepare-sigmaos-launch` | Every release includes machine-readable SBOM |
@@ -84,7 +84,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 ### SH5 — Secure Boot & Attestation
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-boot.efi (UEFI loader) | `sigma-boot/sigma_boot.c` | `kernel-exp` | EDK2 UEFI application — Phase 0 critical |
 | Kernel ML-DSA-87 signature verify | `sigma-boot/sigma_secboot.c` | `kernel-exp` | Verify kernel ELF before loading via sigma-boot |
 | TPM2 PCR measurement chain | `security/SovereignTPM.cpp` | `kernel-exp` | PCR 0 (firmware) + PCR 4 (bootloader) + PCR 8 (kernel) |
@@ -101,7 +101,7 @@ secure. Headers define correct API, bodies simulate via splitmix64.
 
 **Current:** Zero-copy packet queue + TCP header parse. No state machine.
 
-```
+```text
 Completeness progress:
   Layer 2 (Ethernet): ✅ e1000 TX/RX wired
   Layer 3 (IPv4/ICMP): ✅ ICMP echo, ⚠️ IP fragmentation stub
@@ -114,7 +114,7 @@ Completeness progress:
 ```
 
 | Priority | Task | File | Branch |
-|----------|------|------|--------|
+| ---------- | ------ | ------ | -------- |
 | 🔴 | TCP state machine (RFC 793) | `net/tcp/sigma_tcp.cpp` | `drivers-dev` |
 | 🔴 | UDP socket layer | `kernel/net/sigma_net_socket.cpp` | `drivers-dev` |
 | 🔴 | DNS resolver (stub + recursive) | `net/dns/sigma_dns.cpp` | `drivers-dev` |
@@ -128,7 +128,7 @@ Completeness progress:
 ### NS2 — Sigma-native Network Services
 
 | Service | File | Branch | Detail |
-|---------|------|--------|--------|
+| --------- | ------ | -------- | -------- |
 | sigma-netd (network manager daemon) | `userland/daemons/sigma_netd.cpp` | `drivers-dev` | Manage interfaces, DHCP leases, DNS cache |
 | sigma-firewall (stateful L4 filter) | `net/firewall/sigma_firewall.cpp` | `drivers-dev` | Connection tracking, iptables-compatible rules |
 | sigma-dns-cache (local resolver) | `net/dns/sigma_dns_cache.cpp` | `drivers-dev` | Cache DNS responses, DoH upstream option |
@@ -155,7 +155,7 @@ sigma-net bench tls --url https://abdm.gov.in # TLS handshake time
 ```
 
 | Task | File | Branch | Target |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | TCP throughput CI | `tests/net/bench_net.sh` | `drivers-dev` | ≥ 900 Mbps (1 GbE) inside QEMU |
 | TCP latency CI | `tests/net/bench_latency.sh` | `drivers-dev` | p99 RTT < 1 ms on loopback |
 | TLS handshake CI | `tests/net/bench_tls.sh` | `drivers-dev` | < 50 ms full handshake (PQC-TLS) |
@@ -171,7 +171,7 @@ sigma-net bench tls --url https://abdm.gov.in # TLS handshake time
 ### EF1 — Identity & Access Management
 
 | Feature | File | Branch | Detail |
-|---------|------|--------|--------|
+| --------- | ------ | -------- | -------- |
 | sigma-trustd DID server | `security/SovereignDID.cpp` | `release/cloud` | Resolve DIDs, issue/revoke credentials |
 | Group policy via `.sigma-policy` | `userland/tools/sigma_sec_cli.cpp` | `release/cloud` | Signed TOML policies pushed by sigma-fleet |
 | LDAP/AD bridge (read-only) | `userland/auth/sigma_ldap.cpp` | `release/cloud` | Government orgs can use existing AD for bootstrap |
@@ -214,7 +214,7 @@ sigma-fleet report compliance            # STQC / MeitY compliance report
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-fleet agent daemon | `userland/daemons/sigma_fleet_agent.cpp` | `release/cloud` | Heartbeat every 60 s, poll for new policy/update |
 | Fleet server (Go) | `sigmad/fleet/main.go` | `release/cloud` | REST API: device registry, policy push, audit collect |
 | sigma-fleet CLI | `userland/tools/sigma_fleet_cli.cpp` | `release/cloud` | All commands above |
@@ -240,7 +240,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-ids event collection | `kernel/security/sigma_ids.cpp` | `release/cloud` | sigma-ids → sigma-bus → sigma-siem pipeline |
 | Sigma detection rules parser | `userland/tools/sigma_siem_cli.cpp` | `release/cloud` | Parse `.yml` Sigma rules → sigma-ids patterns |
 | CERT-In JSON export | `userland/tools/sigma_siem_cli.cpp` | `release/cloud` | 6-hour mandatory disclosure format |
@@ -251,7 +251,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 **Target:** 1,000 NIC government machines (Phase 7, Month 30).
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | NIC single-sign-on integration | `userland/auth/sigma_nic_sso.cpp` | `release/cloud` | NIC SSO (eID) → sigma-trustd DID |
 | GeM marketplace integration | `userland/apps/sigma-gov/sigma_gov.cpp` | `release/standalone` | sigma-gov gem order via GeM API |
 | PFMS payment integration | `userland/apps/sigma-gov/sigma_gov.cpp` | `release/standalone` | Public Financial Management System |
@@ -268,7 +268,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 **Current:** `userland/ai/` directory exists. No LLM backend. sigma-heal/sigma-lex reference sigma-ai but it's a stub.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | llama.cpp integration | `userland/ai/sigma_ai_llama.cpp` | `release/standalone` | `llama_backend_init()` + `llama_load_model_from_file()` |
 | sigma-ai daemon IPC | `userland/ai/sigma_ai_daemon.cpp` | `release/standalone` | sigma-bus: `sigma_ai_ask(prompt, &response)` |
 | Model quality test (Hindi WER) | `tests/ai/test_sarvam1_hindi.sh` | `release/standalone` | Sarvam-1: WER < 15% on Hindi test set |
@@ -281,7 +281,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 ### AI2 — Federated Learning Quality
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | FL coordinator server (Go) | `sigmad/fl/main.go` | `release/distributed` | `fl.sigmaos.dev` — manage rounds, aggregate gradients |
 | Differential privacy (ε-DP) | `userland/ai/sigma_fedlearn.cpp` | `release/distributed` | Add calibrated Gaussian noise before gradient upload |
 | sigma-tax-anomaly FL network | `userland/apps/sigma-ca/sigma_ca_fedlearn.cpp` | `release/standalone` | 100 CAs training GST error detector |
@@ -292,7 +292,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 ### AI3 — sigma-bhashini Quality
 
 | Test | File | Branch | Target |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Hindi ASR WER | `tests/ai/test_bhashini_asr.sh` | `release/standalone` | < 15% Word Error Rate |
 | Tamil ASR WER | `tests/ai/test_bhashini_asr.sh` | `release/standalone` | < 20% WER |
 | Hindi TTS MOS score | `tests/ai/test_bhashini_tts.sh` | `release/standalone` | Mean Opinion Score ≥ 3.5/5 |
@@ -309,7 +309,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 **Current:** `sigma_locale.h` exists. Translation strings not written. `sigma_l10n.cpp` missing.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Message catalogue format | `userland/locales/sigma_l10n.cpp` | `tools-dev` | `.po` / `.sigma-l10n` TOML catalogue |
 | Hindi (hi) translation | `userland/locales/hi.sigma-l10n` | `release/standalone` | 200+ system messages |
 | Tamil (ta) translation | `userland/locales/ta.sigma-l10n` | `release/standalone` | 200+ system messages |
@@ -325,7 +325,7 @@ sigma-siem report cert-in         # CERT-In 6-hour disclosure format
 ### I18N2 — Input Method Quality
 
 | Test | File | Branch | Target |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Inscript-Devanagari layout | `tests/ime/test_inscript.cpp` | `release/standalone` | 47-key layout: every key produces correct Unicode |
 | Phonetic-Hindi round-trip | `tests/ime/test_phonetic.cpp` | `release/standalone` | 1,000 words: "namaste" → "नमस्ते", 0 errors |
 | Tamil 99 keyboard | `tests/ime/test_tamil99.cpp` | `release/standalone` | Tamil 99 standard layout compliance |
@@ -354,7 +354,7 @@ sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Saka national calendar | `userland/locales/sigma_cal.cpp` | `release/standalone` | Indian national calendar alongside Gregorian |
 | Public holiday database | `userland/locales/sigma_cal.cpp` | `release/standalone` | Central + all 28 states + 8 UTs offline SQLite |
 | GST compliance calendar | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTR-1/3B/9 deadlines per GSTIN registration type |
@@ -369,7 +369,7 @@ sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
 **Current:** `userland/apps/sigma-edu/sigma_edu.cpp` — partial implementation.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | UDISE+ school data API | `sigma_edu.cpp` | `release/standalone` | Pull school-level stats from UDISE+ |
 | DIKSHA content integration | `sigma_edu.cpp` | `release/standalone` | Offline download of DIKSHA e-textbooks |
 | NISHTHA teacher training | `sigma_edu.cpp` | `release/standalone` | Link NISHTHA course completion to service book |
@@ -382,7 +382,7 @@ sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
 ### RU1 — sigma-gram Rural Stack Quality
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | MGNREGS job card API | `userland/apps/sigma-gram/sigma_gram.cpp` | `release/mobile` | NREGASoft `POST /attendance` |
 | PM Gram Sadak Yojana | `sigma_gram.cpp` | `release/mobile` | PMGSY road project status + complaint |
 | Jal Jeevan Mission dashboard | `sigma_gram.cpp` | `release/mobile` | JJM sensor data → water supply hours |
@@ -395,7 +395,7 @@ sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
 ### RU2 — sigma-ultra (feature phone) Quality
 
 | Test | File | Branch | Target |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | USSD menu boot time | `tests/mobile/bench_ultra.sh` | `release/mobile` | < 2 s from power-on to menu |
 | 2G data efficiency | `tests/mobile/test_2g_compression.sh` | `release/mobile` | LZ4-compressed API responses < 1 KB |
 | UPI USSD (`*99#`) | `tests/mobile/test_upi_ussd.sh` | `release/mobile` | Pay flow completes in < 10 USSD messages |
@@ -410,7 +410,7 @@ sigma-cal pmfby-window --state PB   # PMFBY enrollment window Punjab
 ### CE1 — Contribution Quality Standards
 
 | Standard | Tool | Branch | Detail |
-|----------|------|--------|--------|
+| ---------- | ------ | -------- | -------- |
 | Commit message convention | `.conform.yaml` | all | Conventional commits: `feat/fix/docs/perf/security` |
 | Max PR size: 500 lines | `.github/PULL_REQUEST_TEMPLATE.md` | all | Large PRs must be split; CI warns if > 500 lines |
 | Every PR has test evidence | `.github/PULL_REQUEST_TEMPLATE.md` | all | Mandatory checkbox: "Tests added / updated" |
@@ -440,7 +440,7 @@ sigma-agri msp --crop wheat --year 2026  # test profession app
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `setup.sh` verified on Ubuntu 22.04 | `scripts/setup.sh` | all | CI matrix includes fresh Ubuntu install |
 | `setup.sh` verified on macOS (cross-compile) | `scripts/setup.sh` | all | macOS + cross-compiler for ARM64 |
 | Dev container verified | `.devcontainer/devcontainer.json` | all | `gh cs create` → working build environment |
@@ -453,7 +453,7 @@ sigma-agri msp --crop wheat --year 2026  # test profession app
 ### CE3 — Package Ecosystem Quality
 
 | Target | Metric | Branch | Detail |
-|--------|--------|--------|--------|
+| -------- | -------- | -------- | -------- |
 | Bootstrap packages (50) | All install cleanly | `tools-dev` | bash, coreutils, curl, git, Python, GCC, Go, vim, nano, htop |
 | Profession apps (55) | All installable | `release/standalone` | `sigma-pkg install sigma-ca` works |
 | Package signature verification | 100% | all | Every install checks Dilithium3 sig |
@@ -467,7 +467,7 @@ sigma-agri msp --crop wheat --year 2026  # test profession app
 
 ### sigmaos.dev/quality (target page)
 
-```
+```text
 Boot CI:        ████████████░░  92% pass rate (target: 99%)
 Unit Tests:     █████████████░  95% pass rate (target: 100%)
 Fuzzing:        ████░░░░░░░░░░  30% coverage  (target: 80%)
@@ -480,7 +480,7 @@ Fleet devices:  0              (target: 1,000 in BharatOS pilot)
 ```
 
 | Dashboard metric | Source | Branch | Update frequency |
-|-----------------|--------|--------|-----------------|
+| ----------------- | -------- | -------- | ----------------- |
 | Boot CI pass rate | GitHub Actions | all | Per commit |
 | Unit test coverage | gcov/llvm-cov | `kernel-exp` | Per commit |
 | Fuzz coverage | AFL++ coverage | `performance-optimized` | Nightly |
@@ -495,7 +495,7 @@ Fleet devices:  0              (target: 1,000 in BharatOS pilot)
 ## Summary: All Roadmap Documents
 
 | Document | Topics | Lines |
-|----------|--------|-------|
+| ---------- | -------- | ------- |
 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability S1-S4, Performance P1-P6, Quality Q1-Q5, UX U1-U6, Security SE1-SE2, Accessibility A1-A2, DX D1-D4, per-branch gates | ~1,000 |
 | [Stability-Performance-Extended](Stability-Performance-Extended) | Energy E1-E2, Reliability R1-R3, Observability O1-O2, Release RE1-RE2, Community C1-C2, Network NR1-NR2, India QA IQ1-IQ3, Testing TI1-TI3, Hardware HC1-HC2, Formal verification LE1-LE3, Rust migration, KPIs v15.1→v18 | ~900 |
 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux compat L1-L3, Win32 W1-W5, POSIX, File formats, Package formats, Automation A1-A5, Config.sigma, Profiles, Themes, sigma-cron, sigma-hook, ~/.sigma_profile, DID personalisation, Rural personalisation | ~700 |

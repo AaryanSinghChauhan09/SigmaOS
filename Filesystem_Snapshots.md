@@ -9,7 +9,7 @@ SigmaOS provides first-class filesystem snapshot support via Btrfs and ZFS backe
 ## Snapshot Types
 
 | Kind            | When Created                    | Bootable |
-|-----------------|----------------------------------|----------|
+| ----------------- | ---------------------------------- | ---------- |
 | Manual          | User-initiated via `sigma-snap`  | No       |
 | PreUpdate       | Before `sigma-pkg upgrade`       | ✅       |
 | PostUpdate      | After successful upgrade         | No       |
@@ -19,21 +19,25 @@ SigmaOS provides first-class filesystem snapshot support via Btrfs and ZFS backe
 ## Operations
 
 ### Create a Snapshot
+
 ```bash
 sigma-snap create --subvolume / --kind pre-update --desc "Before kernel 6.12"
 ```
 
 ### Rollback to a Snapshot
+
 ```bash
 sigma-snap rollback --id 5
 ```
 
 ### List Bootable Snapshots
+
 ```bash
 sigma-snap list --bootable
 ```
 
 ### Diff Two Snapshots
+
 ```bash
 sigma-snap diff --from 3 --to 5
 ```
@@ -49,17 +53,21 @@ sigma-snap diff --from 3 --to 5
   - `list_bootable()` — for GRUB integration
   - `diff_snapshots(id_a, id_b)` — delta analysis
 
+
 ## Auto-Cleanup
 
 When the snapshot limit is reached (`max_snapshots`, default 50):
+
 1. Oldest **non-bootable** snapshots are pruned first
 2. Bootable snapshots are preserved until explicitly removed
 3. The cleanup is automatic if `auto_cleanup` is enabled
 
+
 ## GRUB Integration
 
 Bootable snapshots are registered with the bootloader:
-```
+
+```text
 menuentry "SigmaOS - Snapshot #5 (Pre-Update 2025-01-15)" {
     set root='btrfs:/@snapshots/sigma-snap-5'
     linux /vmlinuz-sigma root=subvol=/@snapshots/sigma-snap-5

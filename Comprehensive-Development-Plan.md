@@ -17,20 +17,24 @@ Our roadmap identifies the most critical gap: SigmaOS doesn't boot yet. This is 
   - Benchmark against Linux (500ns) and macOS (3µs)
   - Use lock-free runqueues (compare-and-swap)
 
+
 - ✅ Complete Memory Manager (Klub: buddy_allocator, memory_pool, paging)
   - Buddy allocator: target 10,000 pages/sec alloc/free
   - Slab allocator: sub-100ns kmalloc for 64-byte allocations
   - Page table walker with TLB pre-loading
+
 
 - 🔄 IRQ/APIC Subsystem
   - Hardware timer to jiffies conversion
   - Support both PIC (legacy) and APIC (modern)
   - Target: <1µs IRQ dispatch overhead
 
+
 - 🔄 x86-64 Bootstrap (sigma-boot/)
   - UEFI loader → kernel entry point
   - Multi-boot 2 compliance for GRUB chainload
   - Generate bootable ISO with `make iso`
+
 
 #### Outcome:
 
@@ -45,6 +49,7 @@ Generalize driver support across x86-64, ARM64, and RISC-V.
 #### Action Items:
 
 - Create unified driver interface abstraction:
+
   ```rust
   trait SovereignDriver {
       fn probe(&self) -> Result<()>;
@@ -58,6 +63,7 @@ Generalize driver support across x86-64, ARM64, and RISC-V.
   - `arch/x86_64/hal_x86_64.rs`: PCI enumeration, ACPI parsing, APIC/MSI-X
   - `arch/arm64/hal_arm64.rs`: Device tree parsing, GIC, SMMU
   - `arch/riscv64/hal_riscv64.rs`: PLIC, IOMMU
+
 
 ---
 
@@ -74,23 +80,29 @@ Move from Round-Robin to multi-level feedback queue (MLFQ).
   - Output: dynamic priority boost for I/O-heavy vs. compute-bound tasks
   - Result: 15–20% better responsiveness than Linux CFS
 
+
 - **NUMA-Aware Placement**:
   - Read ACPI SRAT to build node topology
   - Migrate memory pages to CPU locality (minimize NUMA latency)
   - Target: <5% NUMA penalty vs. Linux's 10–15%
+
 
 - **EDF for Real-Time (Earliest-Deadline-First)**:
   - Deterministic task scheduling for RTOS profile
   - Guarantee 99.99% deadline miss-free operation
   - Compare: Linux lacks EDF; VxWorks has it but no memory safety
 
+
 #### Benchmarks to Track:
 
 - Syscall latency: <100ns (Linux: ~200ns)
 
+
 - Context switch: <50ns (Linux: 500ns, macOS: 3µs)
 
+
 - Boot time: <2s NVMe to login (Alpine: 4s, Ubuntu: 8s)
+
 
 ---
 
@@ -105,14 +117,17 @@ Implement page-level optimization beyond buddy allocator.
   - Decompress on fault (< 10µs latency)
   - Target: 30% memory reduction for web browsers (vs. 0% for Linux by default)
 
+
 - **Parallel Garbage Collection**:
   - Incremental mark-sweep for kernel metadata
   - Pause time: <100µs (Linux kernel rarely collects memory)
+
 
 - **ASLR+W^X Enhancement**:
   - 42-bit entropy (vs. 28-bit on Linux)
   - Hardware DEP (Data Execution Prevention) enforcement
   - Result: 10,000x harder to exploit than Linux
+
 
 ---
 
@@ -127,18 +142,22 @@ This is our biggest missing piece vs. Alpine/Arch.
   - Support 32-bit ARGB at any resolution
   - Target 60 FPS Zenith compositor
 
+
 - ✅ VirtIO-GPU for QEMU
   - Accelerated graphics in QEMU (for development)
   - 10x faster than software rendering
+
 
 - ✅ DRM/KMS Framework
   - Generic kernel driver abstraction
   - Support atomic mode setting (flicker-free display switches)
 
+
 - 🔄 GPU Drivers (Phased):
   - Intel i915 (Phase 2.1): 70% of laptops
   - AMD amdgpu (Phase 2.2): 25% of desktops
   - NVIDIA nouveau (Phase 2.3): reverse-engineered driver
+
 
 #### Outcome:
 
@@ -158,22 +177,27 @@ Build a modern TCP/IP stack from scratch.
   - Target 2–3x lower latency than Linux's Cubic
   - Measure: empty pipe latency + bandwidth product estimation
 
+
 - **QUIC Protocol (HTTP/3)**:
   - 0-RTT connection resumption
   - Multiplexing with independent packet loss
   - Result: 40% faster webpage loads vs. TCP+TLS on high-latency networks
 
+
 - **DNS over HTTPS (DoH) by Default**:
   - Privacy-first: no ISP-visible DNS queries
   - Cache optimization: 99% hit rate for popular domains
+
 
 - **WPA3/SAE Implementation**:
   - Post-quantum safe Wi-Fi 6E
   - No known classical attacks (vs. WPA2 vulnerabilities)
 
+
 - **WiFi Driver Stack**:
   - Intel WiFi 6 (iwlwifi): 2.4/5/6 GHz 802.11ax
   - Realtek USB adapters for compatibility
+
 
 ---
 
@@ -187,9 +211,11 @@ NVMe + filesystem innovation.
   - Target: 500,000 IOPS (vs. Linux: 350,000 IOPS on same hardware)
   - Zero-copy DMA with interrupt coalescing
 
+
 - ✅ ext4 Journaling Rewrite (already resolved):
   - Ordered journal mode for crash consistency
   - Atomic multi-block writes
+
 
 - 🔄 SigmaFS (Sovereign Native FS):
   - Copy-on-write (CoW) for instant snapshots
@@ -197,10 +223,12 @@ NVMe + filesystem innovation.
   - Built-in RAID support for data centers
   - Encryption at filesystem level
 
+
 - 🔄 dm-verity for Cloud:
   - Immutable root partitions
   - Cryptographic verification on every block read
   - Result: Zero chance of silent data corruption
+
 
 ---
 
@@ -217,13 +245,16 @@ Zero-day resistance through mathematical proof.
   - Tool: Coq proof assistant (similar to seL4 proofs)
   - Effort: 2–3 person-months
 
+
 - **Cryptographic Primitives**:
   - Prove Kyber-1024 implementation against side-channel attacks
   - Use Jasmin formal verification framework
 
+
 - **Scheduler Critical Section**:
   - Prove: no race conditions in runqueue manipulation
   - Result: eliminates 30% of kernel CVEs from concurrency bugs
+
 
 #### Outcome:
 
@@ -242,15 +273,18 @@ Every process is untrusted by default.
   - Mandatory TLS 1.3 for inter-process RPC
   - No shared memory by default (vs. Linux's POSIX IPC)
 
+
 - **Cryptographic Attestation**:
   - Each syscall must include a freshly-signed proof of the caller's identity
   - TPM 2.0 extends PCR on every security-relevant operation
   - Result: impossible to escalate privileges undetected
 
+
 - **Sandbox by Default**:
   - `sigma_pledge()`: declare max permissions upfront
   - Kernel enforces allowlist (no root backdoor)
   - Example: web browser can't read `/etc/passwd` even if exploit succeeds
+
 
 ---
 
@@ -265,13 +299,16 @@ Already partially done; complete and optimize.
   - AVX-512 for x86-64 (15x faster)
   - Integrate into TLS 1.3 handshake
 
+
 - ✅ Dilithium-5 Signatures (already implemented in klib/pqc.rs):
   - Batch verification: 100 signatures in 50ms
   - Integrate into package manager + boot verification
 
+
 - 🔄 Hybrid X25519/Kyber Key Exchange:
   - First fallback to classical if post-quantum fails
   - Provides immediate quantum-safe + classical interop
+
 
 #### Outcome:
 
@@ -292,16 +329,19 @@ Make SigmaOS irresistible for programmers.
   - Built-in debugging: `sigma-gdb` with kernel integration
   - Profiling: `sigma-perf` with flame graphs
 
+
 - **IDE Integration**:
   - VS Code extension for sigma-shell syntax + highlighting
   - Debugger adapter protocol support
   - Remote development: `sigma-ssh` for embedded devices
+
 
 - **Package Manager (sigma-pkg)**:
   - Deterministic builds: `sigma-pkg build --reproducible`
   - Cryptographic verification: Kyber-signed packages
   - Fast install: binary caching + delta updates
   - App store web UI for graphical package browsing
+
 
 ---
 
@@ -313,11 +353,15 @@ Beating Ubuntu's wiki by clarity.
 
 - Comprehensive man pages for all 500+ syscalls
 
+
 - Step-by-step driver porting guide (from Linux)
+
 
 - Video tutorials: kernel debugging, app development, cluster setup
 
+
 - Interactive playground: run SigmaOS in browser without installation
+
 
 ---
 
@@ -329,9 +373,12 @@ GitHub Discussions (already enabled).
 
 - Weekly office hours (live coding + Q&A)
 
+
 - Contributor ladder: docs → driver → kernel
 
+
 - Sponsorship for top 10 contributors per year
+
 
 ---
 
@@ -345,11 +392,15 @@ Crush iOS/Android on efficiency.
 
 - Port all crypto to NEON (5–10x faster Kyber on phones)
 
+
 - Implement GPIO/SPI/I2C drivers for IoT
+
 
 - Target: 10-day battery life (vs. 2 days on Android)
 
+
 - Mechanism: aggressive CPU frequency scaling + suspend-to-RAM
+
 
 #### Result:
 
@@ -365,9 +416,12 @@ Compete with Fedora CoreOS.
 
 - Immutable base system + atomic updates
 
+
 - A/B partition switching for zero-downtime upgrades
 
+
 - Kubernetes-compatible CNI + CRI interfaces
+
 
 #### Outcome:
 
@@ -385,13 +439,16 @@ Unique positioning for Indian markets.
   - Full RFC support for NPCI mandates
   - Offline-first transaction queuing
 
+
 - **ABDM Health Integration**:
   - FHIR API client for electronic health records
   - Encrypted storage of sensitive medical data
 
+
 - **Indian Language Support**:
   - Inscript keyboard for Hindi/Tamil/Telugu
   - Native rendering for Devanagari/Tamil scripts
+
 
 #### Result:
 
@@ -402,7 +459,7 @@ Only OS that's truly "made in India"
 ## 📊 COMPETITIVE ADVANTAGE MATRIX
 
 | Criterion | SigmaOS | Linux | macOS | Windows |
-|-----------|---------|-------|-------|---------|
+| ----------- | --------- | ------- | ------- | --------- |
 | Syscall latency | <100ns | 200ns | 1µs | 5µs |
 | Context switch | <50ns | 500ns | 3µs | 10µs |
 | Boot time | <2s | 4s | 8s | 15s |
@@ -420,7 +477,7 @@ Only OS that's truly "made in India"
 ## 🎯 KEY SUCCESS METRICS (18-Month Targets)
 
 | Metric | Target | How to Measure |
-|--------|--------|----------------|
+| -------- | -------- | ---------------- |
 | Bootability | Bootable ISO + 10,000 downloads | `make iso` → GitHub releases |
 | Performance | #1 OS for syscall latency | LMBench + sysbench benchmarks |
 | Security | 0 privilege escalation CVEs | Fuzzing + formal verification |
@@ -438,41 +495,57 @@ Only OS that's truly "made in India"
 
 - ☐ Finish kernel Phase 0 (scheduler + MM + IRQ)
 
+
 - ☐ Get bootable ISO via `make iso`
+
 
 - ☐ Wire QEMU boot to CI (.github/workflows/sigma_ci.yml)
 
+
 - ☐ Implement VESA/GOP framebuffer driver
+
 
 #### Priority 2 (Weeks 5-8):
 
 - ☐ Add MLFQ scheduler with AI predictor
 
+
 - ☐ Implement BBR TCP congestion control
+
 
 - ☐ Port Kyber/Dilithium to NEON (ARM64)
 
+
 - ☐ Launch sigma-pkg package manager
+
 
 #### Priority 3 (Weeks 9-12):
 
 - ☐ Formal verification for scheduler (Coq proofs)
 
+
 - ☐ Zero-trust SPIFFE workload identities
+
 
 - ☐ India Stack APIs (UPI, ABDM, IME)
 
+
 - ☐ Mobile profile for Raspberry Pi
+
 
 #### Priority 4 (Weeks 13-18):
 
 - ☐ Cloud/Kubernetes integration
 
+
 - ☐ GPU driver for Intel/AMD/NVIDIA
+
 
 - ☐ Developer SDK + IDE integration
 
+
 - ☐ Public launch with marketing
+
 
 ---
 
@@ -482,13 +555,18 @@ No other OS combines:
 
 - **Post-quantum cryptography at the core** ← Quantum-proof from day 1
 
+
 - **Formal verification** ← Mathematically proven security
+
 
 - **Multi-format from one codebase** ← Desktop + mobile + cloud + RTOS
 
+
 - **India Stack native** ← UPI/ABDM/regional languages
 
+
 - **Sovereign independence** ← Not controlled by US/Chinese vendors
+
 
 ---
 

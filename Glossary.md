@@ -1,7 +1,7 @@
 # SigmaOS Glossary
 
 | Term | Definition |
-|------|-----------|
+| ------ | ----------- |
 | **AVC** | Access Vector Cache — O(1) SELinux-inspired MAC policy cache |
 | **Buddy allocator** | Physical memory allocator using 2^n page-frame blocks |
 | **CFS** | Completely Fair Scheduler — red-black tree vruntime scheduler |

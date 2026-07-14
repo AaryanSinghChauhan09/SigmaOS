@@ -43,7 +43,9 @@ Using redundant arrays (RAID-Sigma), SigmaFS continuously scans block checksums 
 Instead of editing `/etc/fstab`, file systems in SigmaOS are managed declaratively:
 
 ```toml
+
 # /etc/sigma/storage.toml
+
 [[volume]]
 label = "user_data"
 path = "/home"

@@ -12,7 +12,9 @@ Arguments:
 
 - **url** `URL | string` - It should only include the **protocol, hostname, and port**.
 
+
 - **options** `PoolOptions` (optional)
+
 
 ### Parameter: `PoolOptions`
 
@@ -20,9 +22,12 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 - **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Client(origin, opts)`
 
+
 - **connections** `number | null` (optional) - Default: `null` - The number of `Client` instances to create. When set to `null`, the `Pool` instance will create an unlimited amount of `Client` instances.
 
+
 - **clientTtl** `number | null` (optional) - Default: `null` - The amount of time before a `Client` instance is removed from the `Pool` and closed.   When set to `null`, `Client` instances will not be removed or closed based on age.
+
 
 ## Instance Properties
 

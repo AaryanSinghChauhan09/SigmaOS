@@ -11,15 +11,21 @@ The SigmaOS SDK lets you build applications that integrate natively with:
 
 - sigma-agent (AI CLI assistant)
 
+
 - sigma-bus (typed IPC)
+
 
 - sigma_pledge / sigma_unveil (security)
 
+
 - sigma-pkg (package distribution)
+
 
 - Zenith Desktop compositor
 
+
 - sigma-ai daemon (local LLM inference)
+
 
 **Languages:** Rust (primary), Nim (CLI tools), Zig (HAL/drivers), Ada/SPARK (security-critical)
 
@@ -129,6 +135,7 @@ pub extern "C" fn sigma_tool_execute(
 ```
 
 Then declare in manifest:
+
 ```toml
 [integration]
 agent_tool = true
@@ -171,6 +178,7 @@ fn ask_sigma_ai(prompt: &str) -> Result<String, Box<dyn std::error::Error>> {
 ```
 
 Or via HTTP (when daemon is running):
+
 ```bash
 curl -X POST http://localhost:11430/v1/chat \
      -d '{"message":"explain this error: segfault in my-app"}'
@@ -278,6 +286,7 @@ sigma-sdk recipe create my-app
 ```
 
 Recipe format:
+
 ```toml
 [package]
 name     = "my-app"
@@ -335,14 +344,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
+
         with: {toolchain: stable}
+
       - run: cargo build --release
       - run: cargo test
+
       # Package for SigmaOS
 
       - run: |
+
           sigma-pkg install sigma-sdk || true
           sigma-sdk package --name my-app --version 0.1.0 || true
 ```
@@ -352,7 +366,7 @@ jobs:
 ## Examples
 
 | Example | Description | Location |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-edit` | Text editor | `sdk/examples/sigma-edit/` |
 | `sigma-calc` | Calculator | `sdk/examples/sigma-calc/` |
 | `sigma-files` | File manager | `sdk/examples/sigma-files/` |

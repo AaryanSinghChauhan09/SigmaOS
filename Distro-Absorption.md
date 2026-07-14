@@ -20,10 +20,11 @@ SigmaOS utilizes an automated translation layer that reads upstream package defi
 4. **Verification & Signing**: The resulting binaries are scanned, hashed (BLAKE3), and signed using post-quantum cryptography (Dilithium5).
 5. **Publishing**: The signed package is published to the `sigma-recipes` repository.
 
+
 ## Supported Upstreams
 
 | Distro | Format | Status | Priority |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Arch Linux | PKGBUILD | ✅ Active | High |
 | Alpine Linux | APKBUILD | 🔄 In Progress | High (for minimal containers) |
 | Debian | .deb / apt | 📋 Planned | Medium |
@@ -32,6 +33,7 @@ SigmaOS utilizes an automated translation layer that reads upstream package defi
 ## Example Translation
 
 **Arch PKGBUILD:**
+
 ```bash
 pkgname=hello
 pkgver=2.10
@@ -44,6 +46,7 @@ build() {
 ```
 
 **SigmaOS Recipe:**
+
 ```toml
 [package]
 name = "hello"

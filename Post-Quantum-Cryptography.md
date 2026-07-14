@@ -13,7 +13,7 @@ algorithms at the kernel level.
 
 ## Architecture
 
-```
+```text
 Application Layer
    └─ sigma_pqc_encrypt() / sigma_pqc_sign()
          └─ PQC Kernel Module
@@ -26,19 +26,25 @@ Application Layer
 ## Integration Points
 
 ### VPN Key Exchange
+
 - Kyber-768 hybrid with X25519 for forward secrecy
 - Post-quantum resistant tunnel establishment
 - Fallback to classical crypto if PQC unavailable
 
+
 ### Shard Identity Tokens
+
 - Dilithium3 signatures for shard authentication
 - Immutable identity verification
 - Revocation via CRL (Certificate Revocation List)
 
+
 ### Shard Manifest Signatures
+
 - SPM (Sigma Package Manager) uses Dilithium for package signing
 - BLAKE3 for package integrity verification
 - Trust root anchored in Secure Boot
+
 
 ## API Interface
 
@@ -64,7 +70,7 @@ void init_security_pqc(void);
 ## Performance Characteristics
 
 | Algorithm | Key Generation | Signing | Verification | Encapsulation | Decapsulation |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Kyber-768 | ~2ms | N/A | N/A | ~0.5ms | ~0.5ms |
 | Dilithium3 | ~3ms | ~0.8ms | ~0.3ms | N/A | N/A |
 | BLAKE3 | N/A | N/A | N/A | N/A | ~0.1ms/KB |
@@ -76,6 +82,7 @@ void init_security_pqc(void);
 - **Constant-time**: All operations are constant-time to prevent timing attacks
 - **Side-channel resistant**: Implements blinding and masking techniques
 
+
 ## Roadmap
 
 - [x] BLAKE3 hashing implementation
@@ -86,6 +93,7 @@ void init_security_pqc(void);
 - [ ] PQC algorithm agility (support for multiple KEM/DSA algorithms)
 - [ ] Formal verification of PQC implementations
 - [ ] NIST PQC standard updates tracking
+
 
 ## Related Modules
 

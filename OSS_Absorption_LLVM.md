@@ -24,7 +24,9 @@ $ sigma build --sanitize asan,ubsan
   Flags: -fsanitize=address,undefined -fno-omit-frame-pointer
 
 # Running produces detailed error reports:
+
 # ERROR: AddressSanitizer: heap-buffer-overflow on address 0x...
+
 ```
 
 ### 2.2 LTO + PGO for Production

@@ -18,7 +18,7 @@ Rather than relying on scattered text files, INI formats, or complex registries,
 
 While core system specs are declarative (`sigma.toml`), operational state and user metadata are stored in atomic SQLite databases. This guarantees ACID transactions — the OS state can never be corrupted by a power loss.
 
-```
+```text
 /var/lib/sigma/
 ├── telemetry.db     # System performance metrics
 ├── pkg_cache.db     # Package manager local index
@@ -46,7 +46,7 @@ SigmaOS exposes a unified SQL interface to query running system state (inspired 
 ```bash
 $ sigma sql "SELECT pid, name, memory_mb FROM processes ORDER BY memory_mb DESC LIMIT 5"
 | pid  | name     | memory_mb |
-|------|----------|-----------|
+| ------ | ---------- | ----------- |
 | 1450 | firefox  | 1450.2    |
 | 890  | zenith   | 412.5     |
 | 112  | sigma-db | 89.1      |

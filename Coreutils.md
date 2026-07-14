@@ -7,7 +7,7 @@
 ## Available Commands
 
 | Command | Description | Status |
-|---------|-------------|--------|
+| --------- | ------------- | -------- |
 | `ls` | List directory contents (`-l`, `-a`, `-la`) | ✅ |
 | `cat` | Concatenate and print files | ✅ |
 | `echo` | Print arguments (`-n` no-newline) | ✅ |
@@ -74,21 +74,30 @@ done
 
 - `sed` — stream editor (regex replacement)
 
+
 - `awk` — text processing
+
 
 - `find` — file search
 
+
 - `tar` — archive utility
+
 
 - `gzip` / `xz` — compression
 
+
 - `dd` — disk imager
+
 
 - `mount` / `umount` — filesystem mounting
 
+
 - `ps` — process list
 
+
 - `kill` — send signals
+
 
 ---
 

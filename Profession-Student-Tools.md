@@ -10,11 +10,15 @@ The Student Profile is designed for academic success, learning management, and e
 
 - **SigmaStudy**: Study management system with scheduling and progress tracking.
 
+
 - **SigmaNotes**: Note-taking and knowledge management tools.
+
 
 - **SigmaLearn**: Interactive learning platform with multimedia support.
 
+
 - **SigmaAssign**: Assignment tracking and submission management.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Student Profile is designed for academic success, learning management, and e
 
 - **Theme**: Focus Green (Student Standard)
 
+
 - **Layout**: Study Dashboard (Schedule, Notes, Assignments)
 
+
 - **Personalization**: Distraction-free mode and focus timers.
+
 
 ---
 

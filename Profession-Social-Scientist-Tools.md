@@ -10,11 +10,15 @@ The Social Scientist Profile is designed for social research excellence, data an
 
 - **SigmaSurvey**: Survey design and data collection.
 
+
 - **SigmaAnalysis**: Social data analysis and visualization.
+
 
 - **SigmaEthics**: Research ethics compliance and review.
 
+
 - **SigmaPublication**: Publication management and collaboration.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Social Scientist Profile is designed for social research excellence, data an
 
 - **Theme**: Social Purple (Research Standard)
 
+
 - **Layout**: Research Dashboard (Survey, Analysis, Ethics)
 
+
 - **Personalization**: Custom survey tools and automated analysis.
+
 
 ---
 

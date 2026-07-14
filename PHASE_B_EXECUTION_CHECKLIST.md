@@ -63,6 +63,8 @@ Repo: [SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS) · Wiki: [Phase
 
 1. `./scripts/ci_branch_check.sh` passes on `main`.
 
+
 2. `./scripts/sigma_automation.sh wiki-sync` before push.
+
 
 3. Wiki Action green after `wiki_repo/**` merge.

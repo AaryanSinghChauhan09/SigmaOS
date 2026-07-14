@@ -14,11 +14,12 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 - **Automated Installation**: Unattended installation support
 - **Rollback Capability**: Installation rollback on failure
 
+
 ## Installation Architecture
 
 ### Installation Flow
 
-```
+```text
  [Welcome Page] ──► [Select Profile] ──► [Partition Drive]
                                                  │
                                                  ▼
@@ -39,6 +40,7 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 7. **Configuration Module**: User and system configuration
 8. **Reboot Module**: Installation completion and reboot
 
+
 ## System Requirements
 
 ### Minimum Requirements
@@ -49,6 +51,7 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 - **Boot**: UEFI firmware with Secure Boot support
 - **Network**: Internet connection for package download
 
+
 ### Recommended Requirements
 
 - **CPU**: x86_64 processor, 4 cores or more
@@ -57,6 +60,7 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 - **Boot**: UEFI 2.3.1 or later
 - **Network**: High-speed internet connection
 
+
 ## Installation Profiles
 
 ### Minimal Profile
@@ -64,11 +68,13 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 **Target**: Developers, servers, minimal installations
 
 **Components**:
+
 - Base system (kernel, sigmad, sigpkg)
 - Terminal utilities
 - Network tools
 - SSH server
 - Basic development tools
+
 
 **Disk Space**: ~5 GB
 
@@ -77,12 +83,14 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 **Target**: General users, office work
 
 **Components**:
+
 - Base system
 - Zenith Desktop
 - Office suite (LibreOffice)
 - Web browser
 - Media player
 - System utilities
+
 
 **Disk Space**: ~15 GB
 
@@ -91,12 +99,14 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 **Target**: Software developers
 
 **Components**:
+
 - Base system
 - Development tools (GCC, Rust, Python)
 - IDE support
 - Version control (Git)
 - Documentation
 - Debugging tools
+
 
 **Disk Space**: ~20 GB
 
@@ -105,12 +115,14 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 **Target**: Students, educators
 
 **Components**:
+
 - Base system
 - Zenith Desktop
 - Education tools (GeoGebra, Scilab, Octave)
 - Office suite
 - Learning management system
 - Indian language support
+
 
 **Disk Space**: ~25 GB
 
@@ -119,12 +131,14 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 **Target**: Security professionals
 
 **Components**:
+
 - Base system
 - SigmaSec suite
 - Security tools (Kali tools)
 - Forensic tools
 - Network analysis tools
 - Documentation
+
 
 **Disk Space**: ~20 GB
 
@@ -133,18 +147,23 @@ The SigmaOS Installer (`siginstall`) provides a polished graphical and command-l
 ### Secure Boot
 
 **Requirements**:
+
 - UEFI firmware with Secure Boot support
 - SigmaOS signing key enrollment
 - Kernel and driver signature verification
 
+
 **Process**:
+
 1. Detect Secure Boot status
 2. Generate Machine Owner Key (MOK)
 3. Enroll MOK in firmware
 4. Sign kernel and initramfs
 5. Configure bootloader
 
+
 **Implementation**:
+
 ```c
 // installer/secure_boot.c
 #include <efi.h>
@@ -179,6 +198,7 @@ EFI_STATUS enroll_mok(EFI_HANDLE image_handle) {
 ### Disk Encryption
 
 **LUKS2 Configuration**:
+
 - Algorithm: AES-XTS
 - Key size: 512 bits
 - PBKDF: Argon2id
@@ -186,7 +206,9 @@ EFI_STATUS enroll_mok(EFI_HANDLE image_handle) {
 - Time cost: 5 iterations
 - Parallelism: 4 threads
 
+
 **Implementation**:
+
 ```c
 // installer/encryption.c
 #include <libcryptsetup.h>
@@ -237,11 +259,14 @@ int encrypt_device(const char *device, const char *passphrase) {
 ### TPM2 Integration
 
 **TPM2 Binding**:
+
 - Bind encryption key to TPM2
 - Automatic unlock on boot
 - Fallback to passphrase
 
+
 **Implementation**:
+
 ```c
 // installer/tpm2.c
 #include <tpm2-tss.h>
@@ -276,7 +301,7 @@ int bind_to_tpm2(const char *device, const char *passphrase) {
 
 ### Default Partition Layout
 
-```
+```text
 /dev/sda1  EFI System Partition  512 MB  FAT32
 /dev/sda2  Boot Partition       1 GB   ext4
 /dev/sda3  System Partition     50 GB  Btrfs (encrypted)
@@ -287,29 +312,36 @@ int bind_to_tpm2(const char *device, const char *passphrase) {
 ### Filesystem Options
 
 **Btrfs**:
+
 - Compression: zstd
 - Subvolumes: root, home, var, tmp
 - Snapshots: Enabled
 - RAID: Optional
 
+
 **ZFS**:
+
 - Compression: lz4
 - Dataset: root, home, var, tmp
 - Snapshots: Enabled
 - ZIL: Separate device
+
 
 ## User Interface
 
 ### Graphical Installer
 
 **Features**:
+
 - Modern, responsive design
 - Zenith toolkit widgets
 - Dark mode support
 - Accessibility features
 - Multi-language support
 
+
 **Screens**:
+
 1. Welcome screen with language selection
 2. Profile selection
 3. Disk partitioning
@@ -319,27 +351,36 @@ int bind_to_tpm2(const char *device, const char *passphrase) {
 7. Installation progress
 8. Completion
 
+
 ### Command-Line Installer
 
 **Features**:
+
 - Scripted installation
 - Configuration file support
 - Automated deployment
 - Remote installation
 
+
 **Usage**:
+
 ```bash
+
 # Interactive installation
+
 siginstall
 
 # Automated installation
+
 siginstall --config install.conf
 
 # Remote installation
+
 siginstall --ssh user@remote --config install.conf
 ```
 
 **Configuration File**:
+
 ```toml
 [installer]
 profile = "desktop"
@@ -370,22 +411,27 @@ dhcp = true
 ### Screen Reader Support
 
 **Features**:
+
 - Orca integration
 - Text-to-speech
 - Braille display support
 - Keyboard navigation
 
+
 ### Keyboard Navigation
 
 **Features**:
+
 - Full keyboard support
 - Keyboard shortcuts
 - Focus indicators
 - High contrast mode
 
+
 ### Indic Language Support
 
 **Supported Languages**:
+
 - Hindi
 - Bengali
 - Tamil
@@ -397,6 +443,7 @@ dhcp = true
 - Punjabi
 - Urdu
 
+
 ## Installation Process
 
 ### Pre-Installation Checks
@@ -406,6 +453,7 @@ dhcp = true
 3. **Disk Check**: Verify disk space
 4. **Network Check**: Verify network connectivity
 5. **Secure Boot Check**: Verify Secure Boot status
+
 
 ### Installation Steps
 
@@ -420,6 +468,7 @@ dhcp = true
 9. **Configuration**: Configure system settings
 10. **Reboot**: Reboot into installed system
 
+
 ### Post-Installation
 
 1. **First Boot**: Boot into installed system
@@ -428,22 +477,27 @@ dhcp = true
 4. **Install Packages**: Install additional packages
 5. **Configure Desktop**: Customize desktop environment
 
+
 ## Troubleshooting
 
 ### Installation Failures
 
 **Common Issues**:
+
 1. **Secure Boot Errors**: Disable Secure Boot temporarily
 2. **Disk Errors**: Check disk health with SMART
 3. **Memory Errors**: Run memory test
 4. **Network Errors**: Verify network configuration
 
+
 ### Boot Issues
 
 **Common Issues**:
+
 1. **Boot Loop**: Check bootloader configuration
 2. **Encryption Errors**: Verify passphrase
 3. **Driver Issues**: Boot in safe mode
+
 
 ## Best Practices
 
@@ -454,12 +508,14 @@ dhcp = true
 3. **Logging**: Detailed logging for debugging
 4. **Testing**: Test on various hardware configurations
 
+
 ### Security
 
 1. **Secure Defaults**: Enable security by default
 2. **Verification**: Verify all downloads and signatures
 3. **Encryption**: Encrypt sensitive data
 4. **Audit**: Regular security audits
+
 
 ### User Experience
 
@@ -468,31 +524,40 @@ dhcp = true
 3. **Accessibility**: Ensure accessibility features
 4. **Localization**: Full localization support
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Console-based interactive install script
 - ext4/btrfs filesystem support
 - Basic partitioning
 - User creation
 
+
 ### Phase 2 (Months 3-6)
+
 - LUKS2 volume configuration
 - Argon2id keyslots
 - TPM2 binding
 - Secure Boot detection
 
+
 ### Phase 3 (Months 6-9)
+
 - GUI installer front-end
 - Zenith toolkit widgets
 - Accessibility features
 - Indic language support
 
+
 ### Phase 4 (Months 9-12)
+
 - MOK Secure Boot configuration
 - Automated installation
 - Remote installation
 - Installation rollback
+
 
 ## References
 

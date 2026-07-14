@@ -11,13 +11,15 @@ sovereign, post-quantum secure, and with full hardware access.
 
 ## Strategic Context
 
-```
+```text
 Today's world:
   Linux distros ARE the OS  →  users are locked into distro choices
   Windows adds WSL2         →  Linux becomes an app, but:
+
                                - Microsoft controls the hypervisor
                                - No PQC, no India Stack, no DID
                                - Telemetry, vendor lock-in
+
 
 SigmaOS vision:
   SigmaOS IS the OS        →  every Linux distro runs as a sigma-pod app
@@ -27,19 +29,21 @@ SigmaOS vision:
   sigma-linux exec nixos   →  NixOS reproducible environment
   sigma-linux exec arch    →  Arch Linux rolling release app
   All with:
+
     - No real VM overhead (sigma-linux-compat + lightweight namespace)
     - PQC-TLS for all network traffic out of the Linux app
     - DID identity passed into the Linux environment
     - India Stack APIs accessible from inside Linux apps
     - sigma-audit tamper-evident log of everything inside Linux app
     - sigma-pod resource limits enforced (CPU/RAM/IO)
+
 ```
 
 ---
 
 ## Architecture: Linux Distro as sigma-pod
 
-```
+```text
 SigmaOS kernel (Ring-0)
   ├── sigma-sched (MLFQ + MCS)
   ├── sigma-mm (buddy + slab + VMM)
@@ -77,7 +81,7 @@ SigmaOS kernel (Ring-0)
 **Goal:** sigma-linux namespace infrastructure ready; static binaries run.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Expand syscall translator to 100 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Add: stat/fstat/lseek/pipe/dup2/clone/wait4/execve/mprotect/getcwd/socket/connect/send/recv/futex + 85 more |
 | `/proc/self/maps` via sigma-procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | glibc reads this at startup |
 | `/proc/cpuinfo` stub | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Expose physical CPU info to Linux app |
@@ -93,7 +97,7 @@ SigmaOS kernel (Ring-0)
 **Goal:** glibc-linked Ubuntu binaries run inside sigma-pod namespace.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-ldso (ELF dynamic linker) | `userland/ldso/sigma_ldso.cpp` | `tools-dev` | Load ld-linux.so.2 from the distro rootfs |
 | veth pair for Linux network namespace | `kernel/net/sigma_veth.cpp` | `drivers-dev` | Virtual ethernet: sigma-net ↔ Linux net namespace |
 | Linux rootfs .spkg image builder | `tools/sigma_rootfs_builder.sh` | `tools-dev` | `debootstrap` → `.spkg` (dm-verity + ML-DSA-87 signed) |
@@ -150,7 +154,7 @@ sigma-linux exec ubuntu -- code .              # VSCode from Ubuntu
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Expand syscall translator to 300 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Full Linux x86-64 ABI coverage |
 | X11/Wayland socket bridge | `zenith_desktop/compat/sigma_xwayland_bridge.cpp` | `release/standalone` | Linux X11 apps render in Zenith windows |
 | Vulkan ICD passthrough | `runtime/containers/sigma_linux_compat.cpp` | `release/standalone` | Linux apps use SigmaOS GPU via Vulkan |
@@ -191,7 +195,7 @@ sigma-linux app ubuntu --display sigma -- gimp  # GIMP in Zenith
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-xserver (X11 compatibility server) | `zenith_desktop/compat/sigma_xserver.cpp` | `release/standalone` | Minimal X11 server: maps X11 windows → Zenith surfaces |
 | XWayland bridge (reuse XWayland approach) | `zenith_desktop/compat/sigma_xwayland_bridge.cpp` | `release/standalone` | X11 → Wayland → sigma-display protocol |
 | Linux app icon extraction | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | Extract `.desktop` file icon → Zenith launcher |
@@ -205,7 +209,7 @@ sigma-linux app ubuntu --display sigma -- gimp  # GIMP in Zenith
 
 **Goal:** Linux apps inside sigma-pod are MORE secure than on native Linux.
 
-```
+```text
 Security advantages over native Linux:
 
   1. dm-verity rootfs  → distro rootfs tamper-detected on every read
@@ -216,10 +220,11 @@ Security advantages over native Linux:
   6. Network policy    → sigma-pod network rules: Kali can't reach GSTN
   7. Capability tokens → Firefox in Ubuntu can't access sigma-health data
   8. No root escape    → USER namespace: root inside = unprivileged outside
+
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-mac policy for Linux apps | `kernel/security/sigma_mac.cpp` | `release/standalone` | Apply `.sigma-policy` to Linux syscall boundary |
 | dm-verity on distro rootfs | `kernel/fs/sigma_dmverity.cpp` | `release/standalone` | Verify rootfs on every mount read |
 | PQC-TLS wrap all Linux outbound | `net/tls/sigma_tls.cpp` | `drivers-dev` | Transparent TLS upgrade for Linux app HTTP |
@@ -311,7 +316,7 @@ sigma-linux audit <distro> verify               # verify audit chain
 ```
 
 | Task | File | Branch | Priority |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | `sigma-linux install` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core |
 | `sigma-linux exec` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core |
 | `sigma-linux list/status/stop` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core |

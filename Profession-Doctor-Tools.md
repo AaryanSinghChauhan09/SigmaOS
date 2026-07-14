@@ -10,11 +10,15 @@ The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity 
 
 - **PatientLattice**: Decentralized, encrypted patient record management.
 
+
 - **DICOM Viewer**: GPU-accelerated medical imaging with sub-pixel clarity.
+
 
 - **HealthAudit**: Real-time monitoring of clinical data streams.
 
+
 - **Bio-Verify**: Multimodal biometric authentication for critical access.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity 
 
 - **Theme**: Clinical White (High Contrast)
 
+
 - **Layout**: Diagnostic Dashboard (Vital Stats, Imaging, Records)
 
+
 - **Personalization**: Voice-command integration for hands-free operation.
+
 
 ---
 

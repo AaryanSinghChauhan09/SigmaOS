@@ -14,7 +14,7 @@ SigmaOS integrates WireGuard natively into the kernel networking stack as `sigma
 
 ## 2. Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                    SIGMA VPN STACK                               │
 │                                                                  │
@@ -47,7 +47,9 @@ SigmaOS integrates WireGuard natively into the kernel networking stack as `sigma
 ### 3.1 Simple Configuration
 
 ```toml
+
 # /etc/sigma/vpn/wg0.toml
+
 [interface]
 private_key = "yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgB3fBmk="
 address     = "10.0.0.1/24"
@@ -65,13 +67,17 @@ keepalive   = 25   # seconds
 name        = "phone"
 public_key  = "TrMvSoP4jYQlY6RIzBgbssQqY3vxI2piVFBs2LzWZQA="
 allowed_ips = "10.0.0.3/32"
+
 # No endpoint — phone connects to us (NAT-friendly)
+
 ```
 
 ### 3.2 CLI Management
 
 ```bash
+
 # Bring up VPN tunnel
+
 $ sigma vpn up wg0
 Σ [VPN] Interface wg0 up:
   Address    : 10.0.0.1/24
@@ -79,6 +85,7 @@ $ sigma vpn up wg0
   Peers      : 2 configured
 
 # Check peer status
+
 $ sigma vpn status wg0
 Σ [VPN] wg0 — WireGuard tunnel:
   Peer: laptop (xTIBA5...)
@@ -92,12 +99,14 @@ $ sigma vpn status wg0
     Last handshake: never
 
 # Generate new keypair
+
 $ sigma vpn keygen
 Σ [VPN] New WireGuard keypair:
   Private: <saved to /etc/sigma/vpn/wg0.key>
   Public:  A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V=
 
 # Add a peer on-the-fly
+
 $ sigma vpn peer add wg0 \
     --name "server" \
     --public-key "A1B2C3..." \
@@ -110,7 +119,9 @@ $ sigma vpn peer add wg0 \
 Automatically connect all your SigmaOS machines into a private mesh network (inspired by Tailscale/ZeroTier, but fully self-hosted):
 
 ```bash
+
 # Initialize mesh network
+
 $ sigma mesh init --name "my-network" --cidr 10.100.0.0/16
 Σ [MESH] Mesh network "my-network" initialized:
   Coordination server: https://mesh.sigmaos.local
@@ -118,12 +129,14 @@ $ sigma mesh init --name "my-network" --cidr 10.100.0.0/16
   PQC key exchange: Kyber1024 + X25519 (hybrid)
 
 # Join from another machine
+
 $ sigma mesh join --token "sigma-mesh-abc123..."
 Σ [MESH] Joined "my-network" as 10.100.0.2
   Peers discovered: 3 (workstation, laptop, server)
   NAT traversal: STUN/TURN holepunching active
 
 # List mesh peers
+
 $ sigma mesh peers
 Σ [MESH] my-network (4 peers):
   workstation  10.100.0.1  online  (direct, 0.3ms)
@@ -165,7 +178,7 @@ impl PqcNoiseHandshake {
 ## 4. Performance
 
 | VPN Protocol | Throughput (1Gbps link) | Latency Overhead | Code Size |
-|:------------|:-----------------------|:----------------|:----------|
+| :------------ | :----------------------- | :---------------- | :---------- |
 | OpenVPN | ~400 Mbps | ~5ms | 100,000+ LoC |
 | IPsec (strongSwan) | ~700 Mbps | ~2ms | 400,000+ LoC |
 | WireGuard (Linux) | ~950 Mbps | ~0.5ms | ~4,000 LoC |

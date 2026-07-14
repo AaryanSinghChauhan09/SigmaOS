@@ -12,7 +12,7 @@ natural language → OS commands, n8n-style workflow automation, security auditi
 RLHF fine-tuning, multi-agent specialisation, persistent memory, voice input,
 self-diagnosis, smart completions, benchmarking, and plugin extensions.
 
-```
+```text
 σ ~/code › workflow run weekly-backup
 
 Σ Workflow: weekly-backup  [manual]
@@ -60,7 +60,7 @@ sigma-agent daemon start
 ## All Subcommands (20 subcommands, 35 modules)
 
 | Subcommand | What it does |
-|---|---|
+| --- | --- |
 | *(no args)* | Interactive REPL |
 | `"<command>"` | One-shot natural language |
 | `--script <file>` | Run a `.sa` script |
@@ -127,6 +127,7 @@ sigma-agent workflow scheduler
 ```
 
 Workflow YAML format:
+
 ```yaml
 name: my-workflow
 description: "What this does"
@@ -134,16 +135,22 @@ enabled: true
 trigger: schedule=daily 06:00    # or: manual, cpu>90, disk<10, pkg_update, boot
 
 steps:
+
   - name: update
+
     action: "run sigma-pkg update"
     on_fail: notify
     timeout: 300
     retries: 1
+
   - name: scan
+
     action: "security scan"
     condition: "exit_code_of(update) == 0"
     on_fail: continue
+
   - name: done
+
     action: "notify 'Done' 'Update and scan complete'"
 ```
 
@@ -154,7 +161,7 @@ Trigger formats: `manual`, `schedule=daily HH:MM`, `schedule=every friday 22:00`
 
 ## Files (35 modules)
 
-```
+```text
 userland/agent/
 ├── main.rs + Cargo.toml              Rust engine (sigma-agent-core)
 ├── sigma_agent.rs/.core.rs/...       Rust tool implementations

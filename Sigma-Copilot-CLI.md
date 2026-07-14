@@ -34,7 +34,7 @@ sigma-agent skill run zenith-gui '{"command":"theme cyber"}'
 ## Architecture
 
 | Layer | Component |
-|-------|-----------|
+| ------- | ----------- |
 | CLI | `userland/agent/sigma_agent_cli.cpp` |
 | Agent runtime | `kernel/core/ai/SovereignCopilot.cpp` |
 | GUI bridge | `kernel/core/ai/SovereignZenithCLI.cpp` |
@@ -47,17 +47,24 @@ Every major Zenith GUI app has CLI equivalents:
 
 - **Compositor** — start, stop, status, layout, theme, workspace
 
+
 - **zenith-settings** — settings get/set/list
+
 
 - **zenith-files** — search, tree, open
 
+
 - **zenith-browser** — navigate URL
+
 
 - **zenith-panel** — apps list, workspace switch
 
+
 - **sigma-dashboard** — metrics, AI diagnosis
 
+
 - **Window manager** — tiling, focus
+
 
 Fallback: `computer-use` skill (accessibility tree) when CLI mapping is insufficient.
 
@@ -72,5 +79,6 @@ cmake -S tests/cpp_host -B build/cpp_host && ctest --test-dir build/cpp_host
 ## Related
 
 - [Sigma Agent Platform](Sigma-Agent-Platform)
+
 
 - [Shell Reference (sigma-sh)](Shell-Reference)

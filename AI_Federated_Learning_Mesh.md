@@ -16,7 +16,7 @@ This eliminates the central-server bottleneck while providing differential priva
 
 ### 2.1 Network Topology
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │                FEDERATED SIGMA INTELLIGENCE MESH               │
 │                                                                │
@@ -116,7 +116,7 @@ impl FederatedLearner {
 ## 3. Privacy Guarantees
 
 | Guarantee | Implementation |
-|:----------|:---------------|
+| :---------- | :--------------- |
 | Local-only raw data | Training data never leaves the device |
 | Differential Privacy | ε=0.1 per-device budget; Gaussian noise σ=1.1 |
 | Gradient Clipping | L2 norm ≤ 1.0 to prevent individual influence |
@@ -133,7 +133,7 @@ impl FederatedLearner {
 ## 4. Supported Model Types
 
 | Model | Round Duration | Min Participants | Purpose |
-|:------|:--------------|:----------------|:--------|
+| :------ | :-------------- | :---------------- | :-------- |
 | SchedulerNet | 24h | 100 | Improve kernel autotune across hardware |
 | ShellCompletionLM | 48h | 500 | Improve shell AI for common usage patterns |
 | AnomalyDetector | 72h | 200 | Improve threat detection baseline |
@@ -161,6 +161,7 @@ $ sigma fedlearn opt-out
 ---
 
 ## 6. References & Standards
+
 - "Communication-Efficient Learning of Deep Networks from Decentralized Data" (McMahan et al., 2017)
 - NIST ML-KEM (Kyber1024) and ML-DSA (Dilithium5) PQC Standards
 - "Deep Learning with Differential Privacy" (Abadi et al., Google, 2016)

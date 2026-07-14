@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-pkg <command> [options] [packages...]
 sigma-pkg --version
 sigma-pkg --help
@@ -20,11 +20,15 @@ All packages in the Sigma Store registry have:
 
 - Ed25519 or Dilithium-5 signatures
 
+
 - Declared capability requirements
+
 
 - A dependency graph
 
+
 - Atomic install/rollback via A/B staging
+
 
 ## COMMANDS
 
@@ -149,7 +153,7 @@ The export format is `name==version` per line — compatible with `sigma-pkg ins
 ## OPTIONS
 
 | Flag | Description |
-|------|-------------|
+| ------ | ------------- |
 | `--dry-run` | Show what would happen without making changes |
 | `--force` | Override safety checks |
 | `--purge` | Remove package and all associated config/data |
@@ -164,7 +168,7 @@ The export format is `name==version` per line — compatible with `sigma-pkg ins
 Core packages that ship with every SigmaOS installation:
 
 | Package | Version | Description |
-|---------|---------|-------------|
+| --------- | --------- | ------------- |
 | `sigma-core` | 15.0.0 | Kernel core shards |
 | `sigma-sh` | 0.3.0 | Sovereign interactive shell |
 | `sigma-net` | 2.1.0 | Networking stack shard |
@@ -179,13 +183,18 @@ Every package in the Sigma Store is:
 
 1. Built reproducibly — bit-for-bit identical on all hardware
 
+
 2. Signed with Dilithium-5 (NIST FIPS 204) by the publisher
+
 
 3. Counter-signed by the Sigma Store registry CA
 
+
 4. Verified against the TPM PCR chain on install
 
+
 To manually verify a package signature:
+
 ```bash
 sigma-secure pqc verify sigma-core
 sigma-pkg info sigma-core --json | jq '.signature'

@@ -12,30 +12,39 @@
 - **AI-assisted recommendations**
 - **GUI front-end** for desktop environments
 
+
 ---
 
 ## Quick Reference
 
 ```bash
+
 # Install a package
+
 sigpkg install firefox
 
 # Remove a package
+
 sigpkg remove firefox
 
 # Update all packages
+
 sigpkg upgrade
 
 # Search for packages
+
 sigpkg search "text editor"
 
 # AI-powered recommendations
+
 sigpkg recommend "I want to browse the web"
 
 # Rollback to previous generation
+
 sigpkg rollback
 
 # List installed generations
+
 sigpkg list-generations
 ```
 
@@ -53,17 +62,20 @@ The resolver uses a **DPLL-based SAT solver** to handle complex dependency graph
 4. Backtrack on conflicts
 5. Return a satisfying assignment = installation plan
 
+
 **Transaction model:**
+
 - All changes are applied atomically to a new **generation**
 - Generations are symlinked: `/usr/sigma-gen/current → gen-42`
 - Rollback = `sigpkg rollback` switches the symlink
+
 
 ---
 
 ### Repository Manager (`sigma-pkg/sigma_pkg_repo.rs`)
 
 | Feature | Details |
-|---|---|
+| --- | --- |
 | Index format | `index.json.zst` (compressed JSON) |
 | Signature | Dilithium-5 over SHA-3-512 of index |
 | Mirrors | Priority-ordered, auto-failover |
@@ -71,6 +83,7 @@ The resolver uses a **DPLL-based SAT solver** to handle complex dependency graph
 | Transport | HTTPS only; TLS 1.3 minimum |
 
 **Repository configuration** (`/etc/sigma/repos.toml`):
+
 ```toml
 [[repo]]
 name = "sigma-main"
@@ -98,13 +111,14 @@ The graphical front-end connects to the `sigpkgd` daemon via Unix socket and pro
 - Update manager with changelog preview
 - Snapshot and rollback management
 
+
 ---
 
 ### AI Recommender (`sigma-pkg/sigma_pkg_ai_recommender.rs`)
 
 Uses the local AI agent to parse natural-language queries:
 
-```
+```text
 Input:  "I need something to edit photos"
 Output: [gimp, darktable, rawtherapee]
 ```
@@ -116,7 +130,7 @@ Ranked by: popularity + dependency footprint + compatibility score.
 ## Package Format (`.sigma`)
 
 | Field | Description |
-|---|---|
+| --- | --- |
 | Metadata | TOML header (name, version, deps, license) |
 | Content | Zstandard-compressed tar archive |
 | Signature | Dilithium-5 detached signature file |

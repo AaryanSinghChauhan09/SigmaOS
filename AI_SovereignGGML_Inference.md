@@ -16,7 +16,7 @@ All models are loaded in quantized formats (INT4, INT8, or FP16) to minimize mem
 
 ### 2.1 Core Components
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                      SIGMA GGML RUNTIME                         │
 ├─────────────────────────────────────────────────────────────────┤
@@ -95,7 +95,7 @@ impl SigmaInference {
 ## 3. Model Zoo
 
 | Model | Size (INT4) | Quantization | Primary Use Case | Backend |
-|:------|:------------|:-------------|:-----------------|:--------|
+| :------ | :------------ | :------------- | :----------------- | :-------- |
 | Gemma-2B | 1.2 GB | INT4 | NL-CLI, Chat | CPU/GPU |
 | Whisper-Small | 244 MB | FP16 | Voice commands / ASR | CPU |
 | MiniLM-L6 | 22 MB | INT8 | Semantic search embeddings | CPU |
@@ -107,7 +107,7 @@ impl SigmaInference {
 ## 4. Performance Targets
 
 | Hardware Tier | Backend | Expected Tokens/s |
-|:-------------|:--------|:-----------------|
+| :------------- | :-------- | :----------------- |
 | Budget (Celeron, 4GB RAM) | CPU AVX2 | ~3 tok/s |
 | Mainstream (Core i5, 8GB) | CPU AVX2 | ~12 tok/s |
 | Gaming (RTX 3060, 12GB VRAM) | CUDA | ~90 tok/s |
@@ -120,13 +120,16 @@ impl SigmaInference {
 ---
 
 ## 5. Privacy Guarantees
+
 - All inference runs **entirely locally** — no telemetry, no model calls to cloud endpoints.
 - Models are stored in `/sigma/store/ai-models/` with content-addressed SHA-256 verification to prevent tampered model injection.
 - User prompts and query history are held only in RAM for the duration of the session; they are not persisted to disk unless explicitly requested.
 
+
 ---
 
 ## 6. References & Standards
+
 - GGML Tensor Library — Georgi Gerganov (ggml.ai)
 - Gemma Model Architecture (Google DeepMind)
 - INT4/INT8 quantization for LLM inference (GPTQ, AWQ)

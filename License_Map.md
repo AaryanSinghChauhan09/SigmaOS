@@ -8,7 +8,7 @@
 ## Quick Reference
 
 | Directory / File | License | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `kernel/` | MIT | Freestanding, no glibc, original implementation |
 | `arch/` | MIT | Architecture-specific boot + paging code |
 | `drivers/` | MIT | SDF drivers; firmware blobs excluded (see below) |
@@ -100,9 +100,12 @@ Missing headers are a CI lint failure (`make check-spdx`).
 
 - `LICENSE` — MIT full text (root)
 
+
 - `wiki_repo/LICENSE.md` — MIT (wiki)
 
+
 - `wiki_repo/LICENCE.md` — BSD-2-Clause (where applicable)
+
 
 ---
 
@@ -113,11 +116,15 @@ If you incorporate SigmaOS code in a product:
 
 1. Keep the MIT copyright notice in source files.
 
+
 2. Include the LICENSE file in your distribution.
+
 
 3. Do not use "SigmaOS" branding without permission (trademark, not copyright).
 
+
 4. If you ship firmware blobs alongside SigmaOS, comply with each blob's vendor license.
+
 
 ---
 

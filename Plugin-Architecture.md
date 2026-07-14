@@ -11,7 +11,7 @@ SigmaOS supports a plugin architecture at multiple layers, allowing third-party 
 ## Plugin Layers
 
 | Layer | Mechanism | Use Cases |
-|---|---|---|
+| --- | --- | --- |
 | Kernel | eBPF programs | Custom tracing, network filters, security policies |
 | Init | `.service` drop-ins | Extend existing services |
 | Package Manager | Repo plugins | Custom package sources, formats |
@@ -26,13 +26,17 @@ SigmaOS supports a plugin architecture at multiple layers, allowing third-party 
 SigmaOS supports loading eBPF programs for safe kernel extensibility:
 
 ```bash
+
 # Load an eBPF program
+
 sigma-bpf load /etc/sigma/bpf/my_filter.o --type xdp --interface eth0
 
 # List loaded programs
+
 sigma-bpf list
 
 # Unload a program
+
 sigma-bpf unload my_filter
 ```
 
@@ -44,13 +48,15 @@ eBPF programs are verified by the kernel verifier before loading. They cannot cr
 
 Extend an existing service without modifying the original `.service` file:
 
-```
+```text
 /etc/sigma/services/nginx.service.d/
 └── 10-custom-limit.conf
 ```
 
 ```ini
+
 # 10-custom-limit.conf
+
 [Service]
 MemoryMax = 1G
 CPUWeight = 80
@@ -65,7 +71,9 @@ Drop-ins are automatically merged with the base service definition.
 Custom package sources can be added as plugins:
 
 ```toml
+
 # /etc/sigma/pkg-plugins/flatpak.toml
+
 [plugin]
 name = "flatpak"
 type = "source"
@@ -80,7 +88,7 @@ This allows `sigpkg install org.gnome.Builder` to transparently install from Fla
 
 Desktop extensions live in `/usr/share/zenith/extensions/` or `~/.zenith/extensions/`:
 
-```
+```text
 my-weather-applet/
 ├── manifest.json    — Extension metadata
 ├── index.js         — Main logic
@@ -98,9 +106,12 @@ my-weather-applet/
 ```
 
 Install via:
+
 ```bash
 sigpkg install sigma-ext-weather-applet
+
 # or manually:
+
 zenith-ext install ./my-weather-applet/
 ```
 
@@ -111,7 +122,9 @@ zenith-ext install ./my-weather-applet/
 Swap out the default AI model or inference backend:
 
 ```toml
+
 # /etc/sigma/ai-agent.toml
+
 [model]
 path = "/opt/models/llama-3-8b-q4.gguf"
 backend = "llama.cpp"
@@ -135,6 +148,7 @@ pub trait SigmaInferenceBackend {
 Extend `sigma-shell` with custom functions and completions:
 
 ```bash
+
 # ~/.sigmarc.d/my-functions.sh
 
 sigma_deploy() {
@@ -144,8 +158,11 @@ sigma_deploy() {
 ```
 
 Auto-completion plugins:
+
 ```bash
+
 # ~/.sigmarc.d/completions/my-tool.sh
+
 _my_tool_completions() {
     COMPREPLY=($(compgen -W "start stop status" "${COMP_WORDS[1]}"))
 }
@@ -163,5 +180,6 @@ All plugins must declare permissions in their manifest. Denied by default:
 - `kernel` — eBPF program loading
 - `secrets` — Sigma Vault access
 - `display` — Zenith compositor access
+
 
 Users are prompted to approve permissions on first install.

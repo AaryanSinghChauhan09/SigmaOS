@@ -13,11 +13,12 @@ The **SigmaOS Foundation** is a non-profit open governance body dedicated to the
 - **Community-driven** — with transparent decision-making at every level
 - **Globally accessible** — supporting users, developers, and organizations worldwide
 
+
 ---
 
 ## Organizational Structure
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                  SigmaOS Foundation                     │
 │                   (Legal Entity)                        │
@@ -39,6 +40,7 @@ The **SigmaOS Foundation** is a non-profit open governance body dedicated to the
 - Term: 2 years, staggered elections
 - Responsibilities: Legal, financial, trademark, high-level strategy
 
+
 ### Technical Steering Committee (TSC)
 
 - **7 members** — subsystem maintainers elected by contributors
@@ -46,10 +48,11 @@ The **SigmaOS Foundation** is a non-profit open governance body dedicated to the
 - Responsibilities: Technical roadmap, RFC approval, release management, merge criteria
 - Meeting cadence: Bi-weekly, public agenda + minutes
 
+
 ### Working Groups
 
 | Working Group | Scope | Chair Rotation |
-|---------------|-------|----------------|
+| --------------- | ------- | ---------------- |
 | Kernel WG | Core kernel, drivers, HAL | 6 months |
 | Security WG | PQC, MAC, audit, CVEs | 6 months |
 | Desktop WG | Zenith, UI/UX, accessibility | 6 months |
@@ -64,7 +67,7 @@ The **SigmaOS Foundation** is a non-profit open governance body dedicated to the
 ### Contributor Tiers
 
 | Tier | Criteria | Privileges |
-|------|----------|------------|
+| ------ | ---------- | ------------ |
 | **Community Member** | Any participant | Forum access, issue tracking |
 | **Contributor** | 1+ merged PR | Voting in community polls |
 | **Committer** | 10+ merged PRs + review quality | Repository write access to their area |
@@ -74,9 +77,11 @@ The **SigmaOS Foundation** is a non-profit open governance body dedicated to the
 ### Founding Contributors
 
 Founding contributors who established the initial codebase receive:
+
 - 3-year protected seat on Board of Directors
 - `@founder` badge on all Foundation platforms
 - Recognition in every SigmaOS release announcement
+
 
 ---
 
@@ -84,12 +89,14 @@ Founding contributors who established the initial codebase receive:
 
 ### RFC (Request for Comments) Process
 
-```
+```text
+
 1. DRAFT      → Author proposes RFC in GitHub Discussions
 2. REVIEW     → 14-day public comment period
 3. TSC VOTE   → Simple majority of TSC (5/7 to approve)
 4. ACCEPTED   → RFC merged into /docs/rfcs/
 5. IMPLEMENT  → Feature branch created, tracked in roadmap
+
 ```
 
 ### Release Decision Process
@@ -100,11 +107,13 @@ Founding contributors who established the initial codebase receive:
 4. TSC majority vote (4/7) to promote RC → stable
 5. Reproducible build verification (SLSA Level 3)
 
+
 ### Conflict Resolution
 
 1. **Technical disagreements** → TSC arbiter decision (final)
 2. **Conduct issues** → Community WG review + Code of Conduct enforcement
 3. **Trademark disputes** → Board of Directors + legal counsel
+
 
 ---
 
@@ -113,7 +122,7 @@ Founding contributors who established the initial codebase receive:
 ### Revenue Sources (Planned)
 
 | Source | % Target | Purpose |
-|--------|----------|---------|
+| -------- | ---------- | --------- |
 | Corporate sponsorship | 50% | Infrastructure, developer grants |
 | Individual donations | 20% | Community programs |
 | Foundation membership | 20% | Organizational support |
@@ -122,7 +131,7 @@ Founding contributors who established the initial codebase receive:
 ### Expenditure Budget (Year 1 Target)
 
 | Category | % Budget |
-|----------|----------|
+| ---------- | ---------- |
 | Infrastructure (CI/CD, mirrors, hosting) | 35% |
 | Developer grants & bounties | 30% |
 | Documentation & tutorials | 15% |
@@ -143,6 +152,7 @@ All financial records published quarterly at `foundation.sigmaos.org/financials`
 - **Project Grants** ($2,000–$15,000): For sustained 3–6 month development projects
 - **Research Grants** ($15,000–$50,000): For academic/industrial research aligned with SigmaOS
 
+
 Application process: Open quarterly, reviewed by TSC + Board.
 
 ### Mentorship Program
@@ -151,11 +161,13 @@ Application process: Open quarterly, reviewed by TSC + Board.
 - Paired with an experienced maintainer
 - Commitment: ~10 hrs/week, culminating in a merged feature
 
+
 ### Hackathon Program
 
 - **SigmaOS Hackathon**: Annual 48-hour event, prizes pool $25,000
 - **Security Sprint**: Bi-annual security-focused audit + bounty event
 - **Accessibility Jam**: Annual accessibility improvements sprint
+
 
 ### Bounty Program
 
@@ -170,12 +182,13 @@ See [Bug-Bounty.md](Bug-Bounty.md) for the full security bounty policy.
 - The Foundation holds the trademark but licenses usage freely to community forks using the word "SigmaOS" with appropriate attribution
 - Commercial use of trademarks requires a Foundation trademark license agreement
 
+
 ---
 
 ## Founding Timeline
 
 | Milestone | Target Date |
-|-----------|------------|
+| ----------- | ------------ |
 | Foundation charter published | 2026 Q3 |
 | Legal entity established | 2026 Q4 |
 | First Board of Directors elected | 2027 Q1 |
@@ -192,6 +205,7 @@ See [Bug-Bounty.md](Bug-Bounty.md) for the full security bounty policy.
 - **GitHub**: https://github.com/AaryanSinghChauhan09/SigmaOS
 - **Community forum**: forum.sigmaos.org *(pending)*
 - **Matrix/IRC**: #sigmaos on matrix.org *(pending)*
+
 
 ---
 

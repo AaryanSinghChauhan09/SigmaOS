@@ -8,7 +8,7 @@ SigmaOS implements a **Linux syscall compatibility layer** (`kernel/linux_compat
 
 ## Architecture
 
-```
+```text
 Linux ELF binary (statically linked)
         │  execve()
         ▼
@@ -25,7 +25,7 @@ The compatibility layer uses a **syscall translation table** that maps Linux x86
 
 ## File Layout
 
-```
+```text
 kernel/linux_compat/
 ├── README.md
 ├── sigma_linuxcompat.rs   # main compat layer
@@ -149,6 +149,8 @@ pub fn load_linux_elf(path: &str) -> Result<u64, ElfError> {
 
 - `sigma-run /bin/hello-static` (a statically linked `puts("Hello, Linux!")` binary) runs and prints `Hello, Linux!`.
 
+
 - `sigma-run /bin/busybox-static ls /` lists the SigmaFS root directory.
+
 
 - Unimplemented syscalls return `ENOSYS` gracefully without panicking the kernel.

@@ -17,7 +17,7 @@ collection of separate repos.
 
 ## Architecture: Three Layers
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  LAYER 3 — Labs (experimental, separate repos)             │
 │  SigmaOS-RTOS · SigmaOS-Distributed · SigmaOS-Mobile      │
@@ -38,7 +38,7 @@ collection of separate repos.
 
 Keep everything in `AaryanSinghChauhan09/SigmaOS`. Use subdirectory namespacing:
 
-```
+```text
 SigmaOS/
 ├── kernel/           # OS core
 
@@ -87,7 +87,7 @@ SigmaOS/
 Create `github.com/SigmaOS-Project` organization. Each repo is a component:
 
 | Repo | Description |
-|------|-------------|
+| ------ | ------------- |
 | `SigmaOS-Project/core` | Kernel, drivers, fs, net, security, crypto |
 | `SigmaOS-Project/apps` | All user-facing applications |
 | `SigmaOS-Project/tools` | sigma-pkg, sigma-sdk, sigma-monitor, sigma-disks |
@@ -104,11 +104,15 @@ Every repo follows the same:
 
 - Branch policy: `main` only, PRs required.
 
+
 - CI template: from `SigmaOS-Project/ci`.
+
 
 - Package output: each repo produces `.sigpkg` artifacts.
 
+
 - Branding: "SigmaOS Browser", "SigmaOS Editor", etc.
+
 
 ---
 
@@ -116,11 +120,15 @@ Every repo follows the same:
 
 - `AaryanSinghChauhan09/SigmaOS` = monorepo for core + early apps.
 
+
 - Create `SigmaOS-Project` GitHub org when the first external contributor joins.
+
 
 - Move experimental labs to separate repos under the org immediately (they're low-risk to separate).
 
+
 - Keep apps in the monorepo until they have their own maintainer.
+
 
 ---
 
@@ -168,9 +176,12 @@ arch    = ["x86_64", "arm64"]
 
 - No telemetry by default.
 
+
 - No network calls not documented in MANIFEST.toml.
 
+
 - Secrets only via `sigma-vault` API, never plain files.
+
 
 ### 5. Pass CI Gates
 
@@ -180,9 +191,12 @@ arch    = ["x86_64", "arm64"]
 
 - sigma-pkg build && sigma-pkg verify   # package builds and verifies
 
+
 - make test-<component>                 # component tests pass
 
+
 - sigma-pkg lint PKGBUILD               # PKGBUILD is valid
+
 
 ```
 
@@ -194,13 +208,18 @@ Users and developers find components via:
 
 1. `sigma-pkg search <keyword>` — command-line search.
 
+
 2. `app_store.html` — the sovereign app store UI.
+
 
 3. `download.html` — format-specific downloads.
 
+
 4. GitHub org page (when created).
 
+
 5. `docs.sigmaos.app` — developer documentation hub.
+
 
 ---
 
@@ -210,18 +229,22 @@ Every component must:
 
 - Use the prefix `sigma-` for CLI tools and daemons.
 
+
 - Use `SigmaOS <Name>` for GUI apps (e.g., "SigmaOS Browser", "SigmaOS Editor").
+
 
 - Include the Σ logo in any GUI launcher icon.
 
+
 - Reference `https://github.com/AaryanSinghChauhan09/SigmaOS` in package metadata.
+
 
 ---
 
 ## Current Component Status
 
 | Component | Location | sigpkg | CI | Status |
-|-----------|----------|--------|----|--------|
+| ----------- | ---------- | -------- | ---- | -------- |
 | Kernel core | `kernel/` | ⬜ | ✅ | 🔄 Boot in progress |
 | SDF drivers | `drivers/` | ⬜ | ✅ | 🔄 e1000/NVMe/USB done |
 | sigma-pkg | `userland/pkg/` | ⬜ | ✅ | 🔄 Local mode partial |

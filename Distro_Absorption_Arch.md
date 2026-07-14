@@ -15,18 +15,22 @@ The `SigmaRecipes.shard` absorbs this philosophy by implementing a sandboxed pac
 ## 2. Technical Features & Absorption Strategy
 
 ### 2.1 PKGBUILD Recipe Engine
+
 - **Arch Concept**: A bash-based build description file (`PKGBUILD`) defining source URLs, integrity hashes, and compilation instructions (`build()`, `package()`).
 - **Sovereign Implementation**: `SigmaRecipes` runs a secure, sandboxed shell engine that executes PKGBUILD procedures within a temporary, isolated namespace, capturing output file changes to build the package.
 
+
 ### 2.2 Sandboxed Source Builder
+
 - **Arch Concept**: Compilation typically runs with the permissions of the building user, which risks system compromise if a PKGBUILD is malicious.
 - **Sovereign Implementation**: Compilations are isolated in microVM templates with read-only network access (except for downloading source files). Once build completes, files are signed and saved as immutable objects.
+
 
 ---
 
 ## 3. Shard Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │               ARCH ABSORPTION ENGINE                    │
 ├─────────────────────────────────────────────────────────┤
@@ -51,7 +55,9 @@ To list and execute Arch absorption scripts:
 ```powershell
 $ sigma distro list
 Σ [INFO] Sovereign Linux Distro Absorption Registry:
+
   * Arch Linux   -> SigmaRecipes.shard          [Active]  (AUR-style recipe engine)
+
   ...
 
 $ sigma distro absorb arch
@@ -64,6 +70,7 @@ $ sigma distro absorb arch
 ---
 
 ## 5. References
+
 - Arch Linux PKGBUILD Specifications
 - Makepkg build tool guidelines
 - Secure sandboxing rules for automated source builds

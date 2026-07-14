@@ -8,7 +8,7 @@ L-Stream is the real-time event streaming and telemetry pipeline native to the S
 
 L-Stream operates as a ring-buffered messaging pipeline executing directly in Ring 0 with Ring 3 userland FFI endpoints.
 
-```
+```text
        [Sovereign Event Source (Kernel/Userland Shard)]
                               │
                               ▼  [Publish Event]

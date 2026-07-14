@@ -32,7 +32,9 @@ $ sigma mesh mtls status
 `sigma-mesh` can split traffic between service versions by percentage, enabling safe canary releases without DNS changes.
 
 ```toml
+
 # /etc/sigma/mesh/traffic/backend-api.toml
+
 [[route]]
 destination = "backend-api-v1"
 weight = 90

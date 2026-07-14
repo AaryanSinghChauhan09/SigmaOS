@@ -69,19 +69,27 @@ To run silicon-direct with zero dependencies, SigmaOS incorporates the optimizat
 
 - **Compiler Design & Linters (TypeScript, VS Code, Bun, Zed, Lapce, ShellCheck)**:
 
+
 - *Implementation*: Modular build generators parse configuration scripts, verifying C++ structures with strict compile-time checks, bypassing heavy runtime translation.
+
 
 - **Web Engine Abstraction (Angular, React, Waku, Flowbite, Radix UI, Mitosis)**:
 
+
 - *Implementation*: Zenith Desktop UI avoids heavy engines (like Chrome/Blink) by parsing layouts into a simplified native C++ visual tree with custom CSS render engines.
+
 
 - **Database & API Frameworks (Cassandra, Granian, DenoDB, FastUI, Hoppscotch, HTTPie, SurrealDB, TinyBase)**:
 
+
 - *Implementation*: Fast query dispatching via memory-mapped databases (ACID relational query engines) built into the data pipeline.
+
 
 - **AI/ML & Computational Engines (PyTorch, TensorFlow, OpenCV, Streamlit, TabbyML, Marimo)**:
 
+
 - *Implementation*: A tensor matrix mathematical pipeline (`SovereignOmniMatrix.cpp`) running AVX-512 FMA optimizations directly on CPU cores.
+
 
 ---
 
@@ -91,11 +99,15 @@ SigmaOS implements key integration protocols and desktop tools to deliver a comp
 
 - **Model Context Protocol (MCP)**:
 
+
 - *Implementation*: Implemented local IPC channels allowing the Sovereign Claw AI Agent to query files, execute shell utilities, and request system audits safely.
+
 
 - **System Tools (IT-Tools, DevToys, Files app)**:
 
+
 - *Implementation*: Native Zenith desktop suite packages formatting tools (XML, JSON, base64), system diagnostic views, and file layouts into a single C++ execution module.
+
 
 ---
 

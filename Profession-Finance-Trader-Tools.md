@@ -10,11 +10,15 @@ The Finance Trader Profile is designed for trading excellence, market analysis, 
 
 - **SigmaTrade**: Trading platform with real-time market data and execution.
 
+
 - **SigmaAnalytics**: Technical and fundamental analysis tools.
+
 
 - **SigmaRisk**: Risk management and position sizing calculators.
 
+
 - **SigmaPortfolio**: Portfolio management and performance tracking.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Finance Trader Profile is designed for trading excellence, market analysis, 
 
 - **Theme**: Market Green (Trading Standard)
 
+
 - **Layout**: Trading Dashboard (Charts, Order Book, Portfolio)
 
+
 - **Personalization**: Custom indicators and automated trading strategies.
+
 
 ---
 

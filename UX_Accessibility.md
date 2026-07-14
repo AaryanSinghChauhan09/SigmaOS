@@ -8,7 +8,7 @@ This specification outlines the sovereign user experience design guidelines, ada
 
 To facilitate frictionless transitions from mainstream operating systems, the **Sovereign Zenith Desktop** supports dynamic layout transformations via the **Sovereign Layout Engine (SLE)**.
 
-```
+```text
                   ┌───────────────────────────────┐
                   │      Zenith Desktop Hub       │
                   └───────────────┬───────────────┘
@@ -94,11 +94,12 @@ The design system enforces high-contrast palettes programmatically:
 2. **Dark Mode**: Main text `#F8F9FA` on background `#121212` (Contrast Ratio 19.5:1)
 3. **Accent Profiles**: Custom colors must satisfy a minimum **7.0:1** contrast ratio against their respective background surface card colors.
 
+
 ---
 
 ## 🎮 Keyboard Navigation Hotkeys
 
-```
+```text
 [Super] + [Arrow Keys]     ──► Snap Window / Tile Movement
 [Super] + [Space]          ──► Launch Search / Sovereign Launcher
 [Super] + [A]              ──► Activate Screen Reader TTS

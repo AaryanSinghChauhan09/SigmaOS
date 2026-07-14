@@ -10,11 +10,15 @@ The Hospitality Manager Profile is designed for hospitality excellence, guest se
 
 - **SigmaGuest**: Guest management and reservation system.
 
+
 - **SigmaService**: Housekeeping and maintenance coordination.
+
 
 - **SigmaRevenue**: Revenue management and pricing optimization.
 
+
 - **SigmaFeedback**: Guest feedback and satisfaction tracking.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Hospitality Manager Profile is designed for hospitality excellence, guest se
 
 - **Theme**: Hospitality Gold (Hotel Standard)
 
+
 - **Layout**: Hotel Dashboard (Guests, Service, Revenue)
 
+
 - **Personalization**: Custom guest profiles and automated service alerts.
+
 
 ---
 

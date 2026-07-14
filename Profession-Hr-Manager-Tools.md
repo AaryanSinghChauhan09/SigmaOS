@@ -10,11 +10,15 @@ The HR Manager Profile is designed for HR excellence, employee management, and e
 
 - **SigmaRecruit**: Recruitment and applicant tracking system.
 
+
 - **SigmaOnboard**: Employee onboarding and training management.
+
 
 - **SigmaPerformance**: Performance review and goal tracking.
 
+
 - **SigmaBenefits**: Benefits administration and payroll integration.
+
 
 ---
 
@@ -22,9 +26,12 @@ The HR Manager Profile is designed for HR excellence, employee management, and e
 
 - **Theme**: People Blue (HR Standard)
 
+
 - **Layout**: HR Dashboard (Recruit, Onboard, Performance)
 
+
 - **Personalization**: Custom workflows and automated notifications.
+
 
 ---
 

@@ -1,10 +1,12 @@
 # SigmaOS Natural Language CLI Agent (SigmaAI Shell)
 
 ## Overview
+
 SigmaOS incorporates a Natural Language-to-CLI shell agent (`SigmaAI Shell`) built directly into the terminal emulator. The agent parses user intent, translates it into safe command-line executions, and validates them against system capability tokens before execution, protecting the user from destructive commands.
 
 ## Architecture & Safety Verification
-```
+
+```text
  [User Prompt (e.g., "compress downloads")]
                      │
                      ▼
@@ -22,7 +24,9 @@ SigmaOS incorporates a Natural Language-to-CLI shell agent (`SigmaAI Shell`) bui
 ```
 
 ## System Properties
+
 The shell agent parameters are defined in `/etc/sigma/agent.conf`:
+
 ```toml
 [agent]
 enabled = true
@@ -35,6 +39,7 @@ blocked_commands = ["rm -rf /", "mkfs", "dd"]
 ```
 
 ## Technical Implementation
+
 The translation parser maps raw strings to executable shell tokens using localized model weights.
 
 ```rust
@@ -53,6 +58,7 @@ pub fn parse_intent_to_cmd(prompt: &str, runtime: &SigmaAIRuntime) -> Result<Str
 ```
 
 ## Roadmap & Milestones
+
 - **Phase 1 (Months 0-3)**: Intent mapping engine and local command translation CLI.
 - **Phase 2 (Months 3-6)**: Sandbox execution sandbox for testing proposed commands.
 - **Phase 3 (Months 6-9)**: Multi-step script generator with interactive step-by-step debugger.

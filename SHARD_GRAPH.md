@@ -95,7 +95,7 @@ graph TD
 Shards communicate exclusively via named sigma-bus channels:
 
 | Channel Name | Publisher | Subscribers | Message Type |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `sigma.boot.stage` | S03_Orchestrator | All | Boot stage transition |
 | `sigma.memory.pressure` | S05_Memory | S06, S16, S17 | OOM/pressure notification |
 | `sigma.sched.tune` | S17_AI | S06_Scheduler | EEVDF slice recommendation |
@@ -112,7 +112,7 @@ Shards communicate exclusively via named sigma-bus channels:
 
 ## Boot Order (Topological Sort)
 
-```
+```text
 Boot Order    Shard                 Dependencies
 ─────────────────────────────────────────────────
   1           S01_Genesis           (none)
@@ -141,7 +141,7 @@ Boot Order    Shard                 Dependencies
 ## Shard Size Footprint
 
 | Shard | Binary Size | RAM (Idle) | RAM (Active) |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | S01_Genesis | 8 KB | 32 KB | 32 KB |
 | S05_Memory | 64 KB | 256 KB | 2 MB |
 | S06_Scheduler | 48 KB | 128 KB | 512 KB |
@@ -163,5 +163,6 @@ Boot Order    Shard                 Dependencies
 3. **Single root**: Only S01_Genesis has zero dependencies
 4. **Single sink**: Only S33_Finality has zero dependents
 5. **Category ordering**: Core → Security → Registry → Infrastructure → Services → UI → Finality
+
 
 **Validation command**: `sigma registry validate-graph`

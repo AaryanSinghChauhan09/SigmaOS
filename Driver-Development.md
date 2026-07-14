@@ -51,7 +51,7 @@ SIGMA_SDF_REGISTER_DRIVER(SigmaMyDriver, "my_driver", MY_VENDOR, MY_DEVICE);
 ## Driver Categories
 
 | Category | Directory | Examples |
-|----------|-----------|---------|
+| ---------- | ----------- | --------- |
 | Display | `drivers/display/` | VESA, VirtIO-GPU, DRM/KMS |
 | Graphics | `drivers/graphics/` | Intel i915, AMD amdgpu |
 | Network | `drivers/net/` | e1000, iwlwifi, rtl8xxxu |
@@ -66,7 +66,7 @@ SIGMA_SDF_REGISTER_DRIVER(SigmaMyDriver, "my_driver", MY_VENDOR, MY_DEVICE);
 ## Current Driver Status
 
 | Driver | File | Status |
-|--------|------|--------|
+| -------- | ------ | -------- |
 | NVMe | `drivers/storage/sigma_nvme.cpp` | ✅ Done |
 | USB xHCI | `drivers/usb/sigma_xhci.cpp` | ✅ Done |
 | Intel e1000 NIC | `kernel/core/drivers/SovereignE1000.cpp` | ✅ Done |
@@ -87,17 +87,24 @@ SIGMA_SDF_REGISTER_DRIVER(SigmaMyDriver, "my_driver", MY_VENDOR, MY_DEVICE);
 
 1. **Create the file** in the appropriate `drivers/subsystem/` directory
 
+
 2. **Inherit** from `SovereignDriverBase`
+
 
 3. **Implement** `probe()`, `init()`, `shutdown()`
 
+
 4. **Register** with `SIGMA_SDF_REGISTER_DRIVER`
+
 
 5. **Add a test** in `tests/unit/drivers/`
 
+
 6. **Run in QEMU**: `make DRIVER=my_driver qemu-driver-test`
 
+
 7. **Update** `CURRENT_PROBLEMS_MANIFEST.md` — mark the driver as resolved
+
 
 ## PCI Driver Helpers
 
@@ -118,13 +125,18 @@ void* dma_buf = sigma_dma_alloc(size, &phys_addr);
 
 1. PR title: `driver: add <name> <subsystem> driver`
 
+
 2. Must pass `make fuzz DRIVER=<name>`
+
 
 3. Must pass QEMU smoke test (include screenshot/log in PR)
 
+
 4. Update `CURRENT_PROBLEMS_MANIFEST.md`
 
+
 5. Add wiki entry to [Driver-Shards](Driver-Shards) page
+
 
 ---
 

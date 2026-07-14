@@ -15,7 +15,7 @@ SigmaOS Mobile is a sovereign, security-first mobile operating system built on t
 ### Primary Targets (Phase 1)
 
 | Device Class | SoC | RAM | Storage | Status |
-|-------------|-----|-----|---------|--------|
+| ------------- | ----- | ----- | --------- | -------- |
 | Reference Phone | Qualcomm SM8650 | 12 GB | 256 GB UFS 3.1 | Planned |
 | Reference Tablet | MediaTek MT8195 | 8 GB | 128 GB UFS 3.1 | Planned |
 | Dev Board | Raspberry Pi 5 | 8 GB | 64 GB microSD | In progress |
@@ -28,11 +28,12 @@ SigmaOS Mobile is a sovereign, security-first mobile operating system built on t
 - Hardware memory tagging (MTE) for memory safety
 - TrustZone for secure enclave integration
 
+
 ---
 
 ## Architecture Overview
 
-```
+```text
 ┌──────────────────────────────────────────────────────────┐
 │                    Applications                           │
 │  Phone │ Messages │ Camera │ Maps │ Browser │ App Store  │
@@ -74,18 +75,22 @@ pub enum NetworkType { Gsm, Umts, Lte, Nr5G }
 ```
 
 Features:
+
 - 4G LTE and 5G NR support via AT command abstraction
 - VoLTE (Voice over LTE) call support
 - Emergency calling (E911/E112) compliance
 - SIM card management (single/dual SIM)
 
+
 ### 2. Touch Input Processing (sigma-touch)
 
 Multi-touch support with:
+
 - Up to 10 simultaneous touch points
 - Pressure and stylus (Apple Pencil / USI 2.0 compatible)
 - Hover detection (5mm range)
 - Palm rejection ML model (TFLite inference)
+
 
 ```rust
 pub struct TouchEvent {
@@ -127,7 +132,7 @@ pub struct CameraConfig {
 Mobile-specific extensions to the thermal daemon:
 
 | State | CPU Max | GPU | Modem | Display | Trigger |
-|-------|---------|-----|-------|---------|---------|
+| ------- | --------- | ----- | ------- | --------- | --------- |
 | Active | 100% | Full | Active | Full | Screen on |
 | Doze | 10% | Off | Idle | Off | Screen off 10min |
 | DeepSleep | 0% | Off | Minimal | Off | Screen off 1hr |
@@ -136,7 +141,7 @@ Mobile-specific extensions to the thermal daemon:
 ### 5. Sensor Hub (sigma-sensors)
 
 | Sensor | Interface | Sample Rate |
-|--------|-----------|------------|
+| -------- | ----------- | ------------ |
 | Accelerometer | I2C/SPI | 200 Hz |
 | Gyroscope | I2C/SPI | 200 Hz |
 | Magnetometer | I2C | 100 Hz |
@@ -150,11 +155,13 @@ Mobile-specific extensions to the thermal daemon:
 ## Security Model
 
 Mobile adds additional security layers:
+
 - **Secure Enclave**: ARM TrustZone integration for biometric keys, payment tokens
 - **App Sandboxing**: Each app in its own cgroup + namespace + MAC profile
 - **Permission Model**: Fine-grained runtime permissions (camera, mic, location, contacts)
 - **Baseband Isolation**: Modem in hardware-isolated compartment (IOMMU-enforced)
 - **Verified Boot**: Boot chain integrity check at every stage (sigma-boot → kernel → system)
+
 
 ---
 
@@ -180,7 +187,7 @@ activity_main = "camera.SigmaCameraActivity"
 ## Roadmap
 
 | Milestone | Target | Description |
-|-----------|--------|-------------|
+| ----------- | -------- | ------------- |
 | M1 | 2027 Q3 | ARM64 kernel boots on dev board |
 | M2 | 2027 Q4 | Touch input + basic display |
 | M3 | 2028 Q1 | Telephony stack (calls + SMS) |

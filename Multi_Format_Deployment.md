@@ -31,24 +31,32 @@ SigmaOS uses **Asynchronous Shard Ignition (ASI)**. Each service (Driver, FS, Ne
 
 - **To switch to Embedded**: Disable `SovereignDesktop` and `SovereignMedia` shards in `MANIFEST.json`.
 
+
 - **To switch to RTOS**: Enable the `Hard-RT` flag in the `SovereignScheduler`.
+
 
 ### 2. Implementation of Abstraction Layers
 
 - **HAL**: Standardized interfaces in `kernel/core/hal/` for x86, ARM, RISC-V.
 
+
 - **SysCall Abstraction**: POSIX-lite compliance ensures applications run across all formats.
+
 
 ### 3. Cross-Compile & Test
 
 - Build targets available: `make build-embedded`, `make build-rtos`, `make build-cloud`.
 
+
 - Automated testing in QEMU and real hardware.
+
 
 ### 4. Virtualization & Containers
 
 - Native `Virtio` support ensures SigmaOS runs as a first-class guest in KVM, VMware, and VirtualBox.
 
+
 - `SovereignLXC` allows for sub-millisecond containerization within the lattice.
+
 
 ### "The Shard is the unit of sovereignty; the Format is its expression."

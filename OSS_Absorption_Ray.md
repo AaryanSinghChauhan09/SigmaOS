@@ -1,4 +1,5 @@
 # SigmaOS Distributed Computing Absorption - Ray
+
 ## Making ray-project/ray Irrelevant
 
 > **Absorption Target**: https://github.com/ray-project/ray  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Ray by implementing a native distributed comp
 ## Absorbed Features & Capabilities
 
 ### 1. Native Distributed Computing Framework
+
 **Original**: Python library for distributed computing  
 **SigmaOS**: Native OS-level distributed computing with Rust implementation
 
@@ -30,11 +32,13 @@ pub struct SigmaDistributed {
 ```
 
 **Core Capabilities**:
+
 - **Distributed Task Execution**
   - Native task distribution with automatic load balancing
   - Fault tolerance with automatic retry and recovery
   - Dynamic scaling with automatic resource allocation
   - Task dependencies with automatic DAG optimization
+
   
 - **Actor System**
   - Native actor model with automatic supervision
@@ -42,11 +46,14 @@ pub struct SigmaDistributed {
   - Actor communication with zero-copy messaging
   - Actor lifecycle management with automatic scaling
 
+
 ### 2. Distributed Object Store
+
 **Original**: Ray object store for shared data  
 **SigmaOS**: Native distributed object store with OS optimization
 
 **Object Store Features**:
+
 - Zero-copy data sharing between tasks
 - Automatic data serialization and deserialization
 - Large object handling with streaming
@@ -54,11 +61,14 @@ pub struct SigmaDistributed {
 - Distributed caching with automatic invalidation
 - Memory-mapped objects for efficiency
 
+
 ### 3. Resource Management
+
 **Original**: Manual resource allocation and scheduling  
 **SigmaOS**: Automatic resource management with OS-level optimization
 
 **Resource Features**:
+
 - Automatic CPU allocation with affinity optimization
 - GPU allocation with automatic sharing
 - Memory management with automatic garbage collection
@@ -66,11 +76,14 @@ pub struct SigmaDistributed {
 - Resource quotas with automatic enforcement
 - Predictive resource allocation based on historical data
 
+
 ### 4. Distributed Machine Learning
+
 **Original**: Ray Train and Ray Tune for ML  
 **SigmaOS**: Native distributed ML with SigmaML integration
 
 **ML Features**:
+
 - Distributed training with automatic data parallelism
 - Model parallelism with automatic gradient synchronization
 - Hyperparameter tuning with distributed optimization
@@ -78,11 +91,14 @@ pub struct SigmaDistributed {
 - Model serving with automatic scaling
 - ML pipeline orchestration with automatic optimization
 
+
 ### 5. Fault Tolerance and Recovery
+
 **Original**: Basic fault tolerance with retries  
 **SigmaOS**: Comprehensive fault tolerance with automatic recovery
 
 **Fault Tolerance Features**:
+
 - Automatic task retry with exponential backoff
 - Checkpointing with automatic resume
 - Node failure detection with automatic migration
@@ -90,11 +106,14 @@ pub struct SigmaDistributed {
 - Leader election with automatic failover
 - Disaster recovery with automatic backup
 
+
 ### 6. Monitoring and Observability
+
 **Original**: Ray dashboard for monitoring  
 **SigmaOS**: Native monitoring with OS-level integration
 
 **Monitoring Features**:
+
 - Real-time task execution monitoring
 - Resource utilization tracking with automatic aggregation
 - Performance metrics with automatic collection
@@ -102,11 +121,14 @@ pub struct SigmaDistributed {
 - Custom metrics with automatic integration
 - Alerting with native notification system
 
+
 ### 7. Security and Governance
+
 **Original**: Basic security features  
 **SigmaOS**: Capability-based security with hardware enforcement
 
 **Security Features**:
+
 - Capability-based access control
 - Hardware-enforced task isolation
 - Secure communication with post-quantum cryptography
@@ -114,12 +136,13 @@ pub struct SigmaDistributed {
 - Data encryption at rest and in transit
 - Multi-tenancy with automatic data isolation
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Ray | SigmaOS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | Performance | Python overhead | Native Rust | ✅ 5-10x |
 | Task Scheduling | Python-based | Native OS | ✅ 10x |
 | Object Store | Python serialization | Zero-copy | ✅ 10x |
@@ -134,6 +157,7 @@ pub struct SigmaDistributed {
 ## Implementation Details
 
 ### Native Distributed Computing Framework
+
 ```rust
 pub mod sigma_distributed {
     use sigma_core::cluster::ClusterManager;
@@ -170,6 +194,7 @@ pub mod sigma_distributed {
 ```
 
 ### Distributed Task Scheduler
+
 ```rust
 pub mod task_scheduler {
     pub struct TaskScheduler {
@@ -194,6 +219,7 @@ pub mod task_scheduler {
 ## API Comparison
 
 ### Ray API
+
 ```python
 import ray
 
@@ -204,6 +230,7 @@ def remote_function(x):
 result = ray.get(remote_function.remote(10))
 
 # Actor
+
 @ray.remote
 class Counter:
     def __init__(self):
@@ -218,6 +245,7 @@ counter.increment.remote()
 ```
 
 ### SigmaDistributed API
+
 ```rust
 use sigma_distributed::SigmaDistributed;
 
@@ -240,37 +268,50 @@ let result = counter.increment();
 ### For Users of Ray
 
 **Before** (using Ray):
+
 ```bash
+
 # Install Ray
+
 pip install ray
 
 # Initialize Ray
+
 ray.init()
 
 # Define remote functions
+
 @ray.remote
 def remote_function():
     pass
 
 # Execute tasks
+
 result = ray.get(remote_function.remote())
 
 # Shutdown Ray
+
 ray.shutdown()
 ```
 
 **After** (using SigmaDistributed):
+
 ```bash
+
 # Enable distributed shard (native, no installation)
+
 sigma-shard enable distributed-computing
 
 # Execute remote task
+
 sigma-distributed execute --function my_function --args 10
 
 # Create actor
+
 sigma-distributed actor create --type counter
 
 # Monitor distributed system
+
 sigma-distributed monitor
 ```
 
@@ -279,7 +320,7 @@ sigma-distributed monitor
 ## Performance Benchmarks
 
 | Operation | Ray | SigmaDistributed | Improvement |
-|-----------|-----|-----------------|-------------|
+| ----------- | ----- | ----------------- | ------------- |
 | Task Execution (1000 tasks) | 25s | 5s | 5x faster |
 | Actor Creation (100 actors) | 8s | 1.5s | 5.3x faster |
 | Object Put (1GB) | 12s | 2s | 6x faster |
@@ -291,6 +332,7 @@ sigma-distributed monitor
 ## Advanced Features
 
 ### AI-Powered Resource Allocation
+
 ```rust
 pub struct AIResourceAllocator {
     workload_predictor: WorkloadPredictor,
@@ -310,6 +352,7 @@ impl AIResourceAllocator {
 ```
 
 ### Distributed Machine Learning
+
 ```rust
 pub struct DistributedML {
     data_parallelism: DataParallelism,

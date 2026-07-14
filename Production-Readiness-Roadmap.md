@@ -16,27 +16,37 @@ month-by-month development schedule through v18.0 Singularity.
 
 SigmaOS is production ready when a CA in Maharashtra can:
 
-```
+```text
 
 1. Boot SigmaOS on a JioBook laptop (< 10 seconds)
 
+
 2. Log in via ABHA DID (no username/password)
+
 
 3. Open sigma-ca dashboard (< 2 seconds)
 
+
 4. Enter client GSTIN and generate GSTR-1 JSON (< 5 seconds)
+
 
 5. File GSTR-1 on GSTN portal (< 30 seconds, TLS 1.3 PQC-hybrid)
 
+
 6. Generate e-Invoice IRN + QR code (< 5 seconds)
+
 
 7. Share IRN-signed invoice to client via DID
 
+
 8. Close laptop lid → suspend-to-RAM (S3)
+
 
 9. Reopen → resume in < 3 seconds
 
+
 10. Entire workflow: no internet required except step 5 and 7
+
 ```
 
 Every step must pass automated CI before v15.1 ships.
@@ -46,7 +56,7 @@ Every step must pass automated CI before v15.1 ships.
 #### Infrastructure gates
 
 | Gate | Measurement | Target | CI check |
-|------|------------|--------|---------|
+| ------ | ------------ | -------- | --------- |
 | Boot time (JioBook ARM64) | `bench_boot.sh` | < 10 s | Required |
 | Boot success rate | CI pass rate | ≥ 99.5% | Required |
 | Package install success | sigma-pkg CI | ≥ 99.9% | Required |
@@ -57,7 +67,7 @@ Every step must pass automated CI before v15.1 ships.
 #### Security gates
 
 | Gate | Tool | Target | CI check |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | Zero critical CVEs | sigma-sec status | 0 | Required |
 | PQC: real NTT (not PRNG) | bench_pqc.cpp | ≥ 1M ops/sec | Required |
 | CryptFS Argon2id working | `sigma-boot status` | Not fake | Required |
@@ -68,7 +78,7 @@ Every step must pass automated CI before v15.1 ships.
 #### Quality gates
 
 | Gate | Tool | Target | CI check |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | Unit test pass rate | GTest/ctest | 100% | Required |
 | Open 🔴 items | CURRENT_PROBLEMS | 0 | Required |
 | Stub count | `make check-stubs` | < 50 | Required |
@@ -79,7 +89,7 @@ Every step must pass automated CI before v15.1 ships.
 #### India Stack gates
 
 | Gate | Test | API | CI check |
-|------|------|-----|---------|
+| ------ | ------ | ----- | --------- |
 | GSTN GSTR-1 sandbox | `test_gstn_sandbox.sh` | GSTN IRP | Weekly |
 | ABDM ABHA create | `test_abdm_sandbox.sh` | ABDM NHA | Weekly |
 | sigma-agri MSP lookup | `test_msp_values.cpp` | Offline | Required |
@@ -95,7 +105,7 @@ Every step must pass automated CI before v15.1 ships.
 
 **Current:** sigma-ca has full API design. GSTN client is a stub.
 
-```
+```text
 Phase 1: GSTN Sandbox (Month 6-9)
   sigma-ca gst compute --gstin 27ABCDE1234F1Z5 --period 2026-06
   → Correct CGST/SGST/IGST amounts computed offline ✓ (already real)
@@ -118,7 +128,7 @@ Phase 3: Scale (Month 12+)
 ```
 
 | Task | File | Branch | Blocked by |
-|------|------|--------|------------|
+| ------ | ------ | -------- | ------------ |
 | GSTN IRP OAuth2 client | `userland/indiastack/sigma_gstn_client.cpp` | `release/standalone` | TLS 1.3 (sigma-tls) + TCP stack |
 | GSTR-1 JSON schema v1.4 | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN schema download |
 | IRN generation endpoint | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN sandbox credentials |
@@ -128,7 +138,7 @@ Phase 3: Scale (Month 12+)
 
 ### IL2 — ABDM Health Stack Go-Live
 
-```
+```text
 Phase 1: ABDM Sandbox (Month 9-12)
   sigma-health patient create --name "Ramesh Kumar"
   → Creates ABHA health ID on ABDM sandbox ← TARGET
@@ -151,7 +161,7 @@ Phase 3: Scale (Month 18+)
 ```
 
 | Task | File | Branch | Blocked by |
-|------|------|--------|------------|
+| ------ | ------ | -------- | ------------ |
 | ABDM OAuth2 M1 (ABHA create) | `userland/indiastack/sigma_abdm_client.cpp` | `release/standalone` | TLS client |
 | FHIR R4 bundle POST | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ABDM client |
 | NHCX claim API | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ABDM claim schema |
@@ -161,7 +171,7 @@ Phase 3: Scale (Month 18+)
 
 ### IL3 — Agriculture & Rural Go-Live
 
-```
+```text
 Phase 1: Offline stack (Month 3-6) — already partially real
   sigma-agri msp --crop wheat       ✓ (real MSP table)
   sigma-agri insurance premium      ✓ (PMFBY formula)
@@ -180,7 +190,7 @@ Phase 3: Rural stack (Month 9-18)
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | IMD weather API | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | `api.weather.imd.gov.in` REST |
 | eNAM commodity prices | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | enam.gov.in daily price API |
 | DILRMP land records | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | State land portal APIs |
@@ -193,7 +203,7 @@ Phase 3: Rural stack (Month 9-18)
 
 ### HD1 — SigmaOS Reference Hardware Tiers
 
-```
+```text
 Tier 1 — SigmaBook (target: ₹15,000)
   CPU:  MediaTek Dimensity 6020 (ARM Cortex-A55, 4-core)
   RAM:  4 GB LPDDR4X
@@ -244,7 +254,7 @@ sigma-hardware-cert run --device JioBook-2026
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Hardware cert test suite | `tests/hardware/sigma_cert.sh` | `prepare-sigmaos-launch` | 9-point checklist script |
 | Compatibility database | `wiki_repo/Hardware-Compatibility.md` | `docs-update` | Device × feature × status table |
 | sigma-dna hardware profiles | `kernel/core/sigma_dna.cpp` | `kernel-exp` | Pre-built profiles for certified devices |
@@ -277,7 +287,7 @@ public:
 ```
 
 | Priority driver | Target device | File | Branch |
-|-----------------|--------------|------|--------|
+| ----------------- | -------------- | ------ | -------- |
 | GPU DRM/KMS i915 | Intel UHD (SigmaPro) | `drivers/graphics/sigma_i915.cpp` | `drivers-dev` |
 | GPU DRM/KMS amdgpu | AMD Radeon (SigmaPro) | `drivers/graphics/sigma_amdgpu.cpp` | `drivers-dev` |
 | Wi-Fi mt7921 | JioBook (SigmaBook) | `drivers/net/sigma_mt7921.cpp` | `drivers-dev` |
@@ -291,34 +301,42 @@ public:
 
 ### CG1 — Open Source Community Strategy
 
-```
+```text
 Month 1-3:  Foundation
+
   - 20+ "good-first-issue" labels on Phase G items
   - CONTRIBUTING.md complete (5-minute setup)
   - Dev container verified on GitHub Codespaces
   - Architecture video walkthrough published
 
+
 Month 3-6:  First contributors
+
   - 10 external PRs merged (unit tests, docs, translations)
   - sigma-contrib scaffold tool live
   - ADR-001 through ADR-005 published
   - Bug bounty programme active
 
+
 Month 6-12: Community maturity
+
   - Hacktoberfest: 30+ issues labelled
   - 5 community-contributed profession app recipes
   - Community translation: Hindi + Tamil docs
   - First community-contributed SDF driver (BT or webcam)
 
+
 Month 12+:  Ecosystem
+
   - sigma-pkg community recipes: 50+ packages
   - sigma-theme community gallery: 20+ themes
   - sigma-script marketplace: 100+ automation scripts
   - Regional meetups: Delhi, Mumbai, Bangalore, Chennai
+
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Good-first-issues (20+) | GitHub Issues | all | Tag from Phase G list + sigma-nanolib functions |
 | CONTRIBUTING.md complete | `CONTRIBUTING.md` | `docs-update` | 5-minute setup guide verified |
 | Architecture video | `docs/videos/` | `docs-update` | 10-min walkthrough: kernel → SDF → Zenith → profession apps |
@@ -328,7 +346,7 @@ Month 12+:  Ecosystem
 
 ### CG2 — India Developer Ecosystem
 
-```
+```text
 Target: India becomes the primary contributor base for SigmaOS.
 
 Key activities:
@@ -341,7 +359,7 @@ Key activities:
 ```
 
 | Task | Detail | Timeline |
-|------|--------|---------|
+| ------ | -------- | --------- |
 | IIT collaboration MOU | Formal verification research agreement | Phase 9 |
 | NIC technical liaison | BharatOS pilot technical support | Phase 7 |
 | NASSCOM member | Access to developer community + events | Phase 3 |
@@ -355,33 +373,39 @@ Key activities:
 
 ### RA1 — Formal Verification Programme
 
-```
+```text
 Target: Publish formally-verified IPC + scheduler proofs at top venue.
 
 Verification targets (priority order):
+
   1. sigma-bus IPC: prove no deadlock, bounded message delay
+
      Tool: Frama-C WP plugin (deductive verification)
      Invariant: every published message delivered in < 100ms
 
   2. MLFQ scheduler: prove no starvation
+
      Tool: Frama-C + ACSL annotations
      Invariant: every task gets CPU in bounded time regardless of priority
 
   3. Buddy allocator: prove no double-free, no use-after-free
+
      Tool: Frama-C Value plugin
      Already has magic header detection — verify formally
 
   4. sigma-trustd DID chain: prove no impersonation
+
      Tool: ProVerif (cryptographic protocol verifier)
      Model: Dolev-Yao attacker, verify DID ownership proof
 
   5. sigma-tls handshake: prove forward secrecy
+
      Tool: Tamarin prover
      Model: ML-KEM + X25519 hybrid KEM security proof
 ```
 
 | Task | Tool | Branch | Timeline |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | sigma-bus deadlock proof | Frama-C WP | `release/microkernel` | Phase 9, Month 36 |
 | MLFQ no-starvation proof | Frama-C ACSL | `kernel-exp` | Phase 9, Month 42 |
 | Allocator correctness | Frama-C Value | `kernel-exp` | Phase 9, Month 40 |
@@ -391,33 +415,41 @@ Verification targets (priority order):
 
 ### RA2 — Rust Migration Research
 
-```
+```text
 Goal: Zero memory-safety CVEs in kernel for 12 consecutive months.
 
 Migration priority:
   Phase 9.1 (Month 36): sigma-net TCP stack → Rust
+
     - Highest attack surface
     - Clean interface boundary (sigma-bus IPC)
     - Rust async networking (tokio-like, no-std)
 
+
   Phase 9.2 (Month 42): sigma-fs VFS layer → Rust
+
     - Complex state machine (mount, inode, dentry)
     - Rust ownership model eliminates use-after-free
 
+
   Phase 9.3 (Month 48): SDF driver framework → Rust
+
     - Ring-3 drivers: Rust + bindgen for hardware registers
     - All new drivers must use Rust bindings from this point
 
+
   Phase 9.4 (Month 54): sigma-tls → Rust
+
     - Leverage rustls or write minimal sovereign alternative
     - Zero unsafe blocks except at hardware boundary
+
 
   Target: By Month 60, 0 memory-safety CVEs for 12 months
 ```
 
 ### RA3 — sigma-telco (5G/O-RAN Research)
 
-```
+```text
 Target: SigmaOS as the OS for BSNL private 5G cores.
 
 Research tasks:
@@ -435,7 +467,7 @@ Research tasks:
 ### G1 — Phase 0 (Months 1-3): Make It Boot
 
 | Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
+| ------- | --------------- | -------- | -------- |
 | 1 | Round-robin scheduler + buddy allocator | `kernel-exp` | `sigma_sched.cpp`, `sigma_mm.cpp` |
 | 1 | x86-64 page table walker + APIC | `kernel-exp` | `sigma_vmm.cpp`, `sigma_irq.cpp` |
 | 2 | 30-syscall dispatch table | `kernel-exp` | `sigma_syscall_dispatch.cpp` |
@@ -448,7 +480,7 @@ Research tasks:
 ### G2 — Phase 1 (Months 3-6): Make It Connect
 
 | Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
+| ------- | --------------- | -------- | -------- |
 | 3-4 | e1000 DMA TX/RX rings | `drivers-dev` | Real NIC driver |
 | 4 | TCP state machine RFC 793 | `drivers-dev` | `sigma_net_tcp.cpp` |
 | 4 | UDP + DNS + DHCP | `drivers-dev` | Basic networking |
@@ -461,7 +493,7 @@ Research tasks:
 ### G3 — Phase 2 (Months 6-9): Make It Visible
 
 | Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
+| ------- | --------------- | -------- | -------- |
 | 6-7 | VirtIO-GPU + DRM/KMS | `drivers-dev` | Zenith renders |
 | 7 | Compositor composite_window() | `release/standalone` | Windows blend |
 | 7-8 | Input event loop | `release/standalone` | Keyboard/mouse work |
@@ -474,7 +506,7 @@ Research tasks:
 ### G4 — Phase 3 (Months 9-14): Make It Indian
 
 | Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
+| ------- | --------------- | -------- | -------- |
 | 9-10 | sigma-ca GSTN sandbox | `release/standalone` | GSTR-1 filed |
 | 10-11 | sigma-health ABDM sandbox | `release/standalone` | ABHA created |
 | 10-11 | sigma-accounts IRN | `release/standalone` | e-Invoice generated |
@@ -487,7 +519,7 @@ Research tasks:
 ### G5 — Phase 4 (Months 12-18): Make It Trusted
 
 | Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
+| ------- | --------------- | -------- | -------- |
 | 12-13 | sigma-boot.efi + TPM2 PCR | `kernel-exp` | Secure boot chain |
 | 13 | ML-DSA FIPS 204 final | `performance-optimized` | Real NTT |
 | 13-14 | sigma-mac enforced | `kernel-exp` | Every syscall checked |
@@ -500,7 +532,7 @@ Research tasks:
 ### G6 — Phase 5-9 (Months 15-60): Make It Universal
 
 | Month | Milestone | Branch |
-|-------|-----------|--------|
+| ------- | ----------- | -------- |
 | 21 | ARM64 Raspberry Pi 4/5 boots | `release/mobile` |
 | 21 | sigma-ultra on Pi Zero | `release/mobile` |
 | 24 | sigma-ai + federated learning live | `release/standalone` |
@@ -522,7 +554,7 @@ Research tasks:
 ### KPI1 — Technical KPIs
 
 | KPI | v15.1 | v16.0 | v17.0 | v18.0 |
-|-----|-------|-------|-------|-------|
+| ----- | ------- | ------- | ------- | ------- |
 | Boot time (NVMe) | Unknown | < 2 s | < 1.5 s | < 1 s |
 | Boot time (ARM64 RPi4) | N/A | < 10 s | < 8 s | < 5 s |
 | Context switch p99 | Unknown | < 100 ns | < 50 ns | < 50 ns |
@@ -534,7 +566,7 @@ Research tasks:
 ### KPI2 — India Impact KPIs
 
 | KPI | v15.1 | v16.0 | v17.0 | v18.0 |
-|-----|-------|-------|-------|-------|
+| ----- | ------- | ------- | ------- | ------- |
 | Profession apps working | 3 | 10 | 30 | 55 |
 | CAs filing GST via sigma-ca | 0 | 10 | 1,000 | 10,000 |
 | Doctors using sigma-health | 0 | 10 | 1,000 | 10,000 |
@@ -548,7 +580,7 @@ Research tasks:
 
 ## 8. The North Star — Why SigmaOS Exists
 
-```
+```text
 By 2030, SigmaOS is:
 
 The only OS that is simultaneously:
@@ -594,7 +626,7 @@ Built in India. For India. By India.
 
 | # | Document | Lines | Key focus |
 
-|---|----------|-------|-----------|
+| --- | ---------- | ------- | ----------- |
 | 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | ~1,000 | S/P/Q/UX/Security/A11y/DX |
 | 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | ~900 | Energy/Reliability/Observability/Network |
 | 3 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | ~700 | Linux/Win32/POSIX, Automation, Custom |

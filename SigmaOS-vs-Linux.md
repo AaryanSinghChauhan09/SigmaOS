@@ -8,7 +8,7 @@
 ## Where SigmaOS Surpasses Linux
 
 | Feature | Linux Distros | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | **AI Integration** | External (TensorFlow, pip install) | Native system service (sigma-agent, 35 modules) |
 | **Automation** | cron + systemd + external tools | Built-in n8n-style workflow engine |
 | **CLI ↔ GUI** | Partial (varies by distro) | 100% parity — every GUI action = CLI command |
@@ -30,7 +30,7 @@
 ## Where Linux Distros Still Lead
 
 | Feature | Linux Status | SigmaOS Status |
-|---|---|---|
+| --- | --- | --- |
 | **Hardware drivers** | Decades of vendor support | SDF framework, expanding library |
 | **Package ecosystem** | Millions of packages (apt, dnf, pacman) | Growing registry; Linux pkgs absorbed via sigma-pkg |
 | **Container ecosystem** | Docker, Podman, LXC mature | sigma-pod (OCI-compatible, in progress) |
@@ -74,7 +74,7 @@ The compatibility architecture: [Linux Absorption Architecture](Linux-Absorption
 ## Side-by-Side: Common Tasks
 
 | Task | Ubuntu/Fedora | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | Install app | `apt install firefox` | `sigma-pkg install firefox` |
 | System update | `apt upgrade` | `sigma-pkg update` |
 | Firewall | `ufw enable` | `sigma-agent "settings set network firewall true"` |
@@ -97,18 +97,22 @@ Moving from Linux to SigmaOS is designed to be zero-friction:
 
 1. **Dual boot** — install alongside your Linux distro ([Migration Guide](Migration-Guide))
 
+
 2. **Absorb packages** — `sigma-pkg absorb *.deb` converts your apps
+
 
 3. **Import dotfiles** — sigma-sh is POSIX-compatible, most scripts run as-is
 
+
 4. **Enhance** — use sigma-agent for automation, AI, security that Linux can't match
+
 
 ---
 
 ## The Roadmap to Full Parity + Superiority
 
 | Phase | Timeline | Goal |
-|---|---|---|
+| --- | --- | --- |
 | Phase 1 (Now) | v15.x | AI agent complete (35 modules), workflow automation |
 | Phase 2 | v16.x | Linux binary compat (full gVisor-style), stable ABI |
 | Phase 3 | v17.x | Package ecosystem (1000+ packages), GPU driver maturity |

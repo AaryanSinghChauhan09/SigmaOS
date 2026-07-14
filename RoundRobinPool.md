@@ -14,7 +14,9 @@ Arguments:
 
 - **url** `URL | string` - It should only include the **protocol, hostname, and port**.
 
+
 - **options** `RoundRobinPoolOptions` (optional)
+
 
 ### Parameter: `RoundRobinPoolOptions`
 
@@ -22,9 +24,12 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 - **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Client(origin, opts)`
 
+
 - **connections** `number | null` (optional) - Default: `null` - The number of `Client` instances to create. When set to `null`, the `RoundRobinPool` instance will create an unlimited amount of `Client` instances.
 
+
 - **clientTtl** `number | null` (optional) - Default: `null` - The amount of time before a `Client` instance is removed from the `RoundRobinPool` and closed. When set to `null`, `Client` instances will not be removed or closed based on age.
+
 
 ## Use Case
 
@@ -32,9 +37,12 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 1. You connect to a single origin (e.g., `http://my-service.namespace.svc`)
 
+
 2. That origin is backed by a load balancer distributing TCP connections across multiple servers
 
+
 3. You want requests evenly distributed across all backend servers
+
 
 **Example**: In Kubernetes, when using a Service DNS name with multiple Pod replicas, kube-proxy load balances TCP connections. `RoundRobinPool` ensures each connection (and thus each Pod) receives an equal share of requests.
 
@@ -46,25 +54,34 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 - Assigns different backends to different TCP connections from the same client
 
+
 - Uses algorithms like: round-robin, random, least-connections (without client affinity)
 
+
 - Example: Default Kubernetes Services without `sessionAffinity`
+
 
 **âœ— Does NOT work when**:
 
 - Load balancer has client/source IP affinity (all connections from one IP â†’ same backend)
 
+
 - Load balancer uses source-IP-hash or sticky sessions
+
 
 ### How it works:
 
 1. `RoundRobinPool` creates N TCP connections to the load balancer endpoint
 
+
 2. Load balancer assigns each TCP connection to a backend (per its algorithm)
+
 
 3. `RoundRobinPool` cycles HTTP requests across those N connections
 
+
 4. Result: Requests distributed proportionally to how the LB distributed the connections
+
 
 If the load balancer assigns all connections to the same backend (e.g., due to session affinity), `RoundRobinPool` cannot overcome this. In such cases, consider using [`BalancedPool`](/docs/docs/api/BalancedPool.md) with direct backend addresses (e.g., individual pod IPs) instead of a load-balanced endpoint.
 
@@ -155,7 +172,9 @@ await pool.close()
 
 - [Pool](/docs/docs/api/Pool.md) - Connection pool without round-robin
 
+
 - [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
+
 
 - [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution
 

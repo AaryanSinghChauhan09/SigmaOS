@@ -10,11 +10,15 @@ The Mechanical Engineer Profile is designed for mechanical excellence, product d
 
 - **SigmaDesign**: Mechanical design and CAD integration.
 
+
 - **SigmaSimulation**: Mechanical simulation and analysis tools.
+
 
 - **SigmaManufacturing**: Manufacturing process planning and optimization.
 
+
 - **SigmaTesting**: Product testing and quality assurance.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Mechanical Engineer Profile is designed for mechanical excellence, product d
 
 - **Theme**: Mechanical Gray (Engineering Standard)
 
+
 - **Layout**: Engineering Dashboard (Design, Simulation, Manufacturing)
 
+
 - **Personalization**: Custom material libraries and automated analysis.
+
 
 ---
 

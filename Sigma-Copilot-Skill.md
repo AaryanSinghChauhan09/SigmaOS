@@ -13,15 +13,21 @@ The primary SigmaOS agent persona. Runs tool-use loops to accomplish OS tasks vi
 
 1. **Read persona** — `profiles/ai_agent/system_prompt.md`
 
+
 2. **Plan** — decompose user intent into tool calls
+
 
 3. **Execute** — dispatch tools (Read, Bash, ZenithGUI, Skill, Memory, …)
 
+
 4. **Observe** — collect tool results
+
 
 5. **Respond** — summarize outcome for the user
 
+
 6. **Persist** — JSONL session log under `.sigma/logs/agent/`
+
 
 ## Entry points
 
@@ -35,7 +41,7 @@ sigma-agent skill run zenith-gui '{"command":"layout tile"}'
 ## Tool catalog
 
 | Tool | Purpose |
-|------|---------|
+| ------ | --------- |
 | Read / Write / Edit | SemanticFS file operations |
 | Bash | sigma-sh commands |
 | Grep / Glob | Codebase search |
@@ -60,16 +66,22 @@ sigma_copilot_tool_dispatch(SIGMA_TOOL_GUI, "theme obsidian", result, sizeof(res
 
 - Persona: `profiles/ai_agent/system_prompt.md`
 
+
 - Tools schema: `profiles/ai_agent/tools.json`
 
+
 - Active skills: `profiles/ai_agent/config.json`
+
 
 ## Related skills
 
 - `zenith-gui` — GUI-specific commands
 
+
 - `computer-use` — accessibility automation fallback
 
+
 - `claude-skills` / `copilot-patterns` — IDE workflow patterns
+
 
 - `session-viewer` — review agent JSONL trajectories

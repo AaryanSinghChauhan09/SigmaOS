@@ -9,9 +9,11 @@ SigmaOS is designed as an **AI-native OS** — not just an OS that runs AI appli
 ## On-Device AI Stack
 
 ### sigma-ai Daemon
+
 - **Location:** `sigmad/sigma_ai_daemon.py` + `kernel/core/sigma_local_llm.rs`
 - **Protocol:** HTTP API on `localhost:11434` (Ollama-compatible)
 - **Models supported:** Phi-3-mini, Gemma-2B, DeepSeek-Coder (GGUF format)
+
 
 ```bash
 sigma-ai run "explain this error"
@@ -20,7 +22,9 @@ sigma-ai embed "text to embed" --model bert
 ```
 
 ### Inference Engine (`sigma_local_llm.rs`)
+
 Built-in transformer inference without any Python or external ML library:
+
 - **Attention:** scaled dot-product with RoPE positional encoding
 - **Normalization:** RMS norm
 - **Activation:** SiLU (Llama FFN style)
@@ -28,9 +32,11 @@ Built-in transformer inference without any Python or external ML library:
 - **Sampling:** temperature + top-p nucleus sampling
 - **Tokenizer:** BPE-compatible with greedy longest-match
 
+
 ### Supported Models (Planned Full Integration)
+
 | Model | Size | Use Case | Phase |
-|-------|------|----------|-------|
+| ------- | ------ | ---------- | ------- |
 | Phi-3-mini Q4_K | 2.3 GB | General / shell | M |
 | Gemma-2B Q4_K | 1.5 GB | Fast inference | M |
 | DeepSeek-Coder 1.3B | 0.8 GB | Code completion | M |
@@ -43,30 +49,37 @@ Built-in transformer inference without any Python or external ML library:
 ## AI in the Kernel
 
 ### Adaptive Scheduler (`kernel/sched/sigma_transformer_sched.rs`)
+
 - Predicts whether a task is I/O-bound or CPU-bound using a tiny 2-layer transformer
 - Features: IPC counter, cache miss rate, voluntary/involuntary context switches
 - Adjusts MLFQ level pre-emptively → 15–30% lower tail latency
 
+
 ### AI Intrusion Detection (`kernel/core/`)
+
 - Anomaly detection on syscall sequences
 - Baseline: normal process behavior profile
 - Alert: deviation > 3σ from baseline
 - Zero false-positive guarantee via conservative threshold
 
+
 ### Neural Memory Prefetcher
+
 - Trains on page access patterns
 - Prefetches pages before they fault
 - Implemented in `kernel/optimizations/`
+
 
 ---
 
 ## Machine Learning Algorithms (Built-In)
 
 ### Kernel Data Structures
+
 All implemented without `std` or external crates:
 
 | Algorithm | Location | Use |
-|-----------|----------|-----|
+| ----------- | ---------- | ----- |
 | Buddy allocator | `sigma_pmm.rs` | Physical memory |
 | Slab allocator | `sigma_mm.rs` | Kernel objects |
 | MLFQ scheduler | `sigma_sched.rs` | Process scheduling |
@@ -77,6 +90,7 @@ All implemented without `std` or external crates:
 | Bloom filter | `userland/pkg/` | Package cache |
 
 ### ML Algorithms (Phase M, `modules/sdk/sigma_ml_kit/`)
+
 - Linear regression + ridge
 - K-means clustering
 - Decision tree + random forest
@@ -89,18 +103,22 @@ All implemented without `std` or external crates:
 - Bayesian inference
 - Gaussian processes
 
+
 ---
 
 ## Data Science Tools
 
 ### Built-in (`kernel/core/sigma_stats_engine.rs`)
+
 - Descriptive statistics: mean, variance, std, percentiles
 - Hypothesis testing: t-test, chi-square, ANOVA
 - Linear regression
 - FFT (for signal processing)
 - Matrix operations: multiply, inverse, determinant, SVD
 
+
 ### sigma-data CLI
+
 ```bash
 sigma-data analyze /path/to/data.csv --stats
 sigma-data plot histogram --col age
@@ -113,8 +131,9 @@ sigma-data predict --model my_model.sigml --input features.json
 ## Computer Science Fundamentals
 
 ### Algorithms in Kernel
+
 | Category | Algorithms |
-|----------|-----------|
+| ---------- | ----------- |
 | Sorting | Timsort (process scheduling), Heapsort (priority queue) |
 | Graph | BFS/DFS (package deps), Dijkstra (routing), Bellman-Ford |
 | String | KMP (pattern matching in IDS), Rabin-Karp (virus scan) |
@@ -129,13 +148,17 @@ sigma-data predict --model my_model.sigml --input features.json
 ## AI Workflow Integration
 
 ### Shell Completion
+
 ```bash
+
 # Type partial command, AI suggests completion
+
 $ sigma-ai shell "list all files modified today"
 → find . -newermt $(date +%Y-%m-%d) -type f
 ```
 
 ### Error Explanation
+
 ```bash
 $ myapp
 Segmentation fault (core dumped)
@@ -146,6 +169,7 @@ $ sigma-explain last-error
 ```
 
 ### Code Review
+
 ```bash
 $ sigma-ai review --file my_driver.rs --focus safety
 → Line 47: unsafe block without bounds check on raw pointer.
@@ -157,10 +181,12 @@ $ sigma-ai review --file my_driver.rs --focus safety
 ## Federated Learning (Phase M)
 
 SigmaOS nodes can participate in federated model training:
+
 - Local gradient computation on private data
 - Differential privacy: add calibrated Gaussian noise (ε=1.0)
 - Aggregation via Raft-based coordinator
 - No raw data leaves the device
+
 
 ```bash
 sigma-ai federate join --coordinator 192.168.1.100:9090
@@ -172,8 +198,10 @@ sigma-ai federate contribute --model sigma-intrusion-v1
 ## Explainable AI
 
 Every AI decision in SigmaOS can be explained:
+
 - Scheduler: "Task X moved to Q2 because CPU burst exceeded 8ms quantum"
 - IDS: "Alert: process opened 500 files in 1s (baseline: 5/s)"
 - Package recommender: "Suggested sigma-vim because 80% of developers also install it"
+
 
 This is implemented via attention weight visualization in `sigma_local_llm.rs`.

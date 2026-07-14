@@ -38,11 +38,15 @@ When a write command targets a read-only lower file (e.g., `config.json` inside 
 
 1. **Intercepts** the write request before block commitment.
 
+
 2. **Copies** the lower file contents to the upper read-write layer (`/var/tmp`).
+
 
 3. **Applies** the new data directly to the upper variant.
 
+
 4. **Shadows** the lower file in the merged view, prioritizing the active upper variant.
+
 
 ---
 

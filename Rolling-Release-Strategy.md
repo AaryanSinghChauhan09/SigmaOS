@@ -10,9 +10,12 @@ SigmaOS does not have "point releases" in the traditional sense. Individual shar
 
 - **Incremental Shard Updater**: `sigma-pkg` only downloads the binary diff (delta) between your current shard and the latest version.
 
+
 - **Continuous Integration Builds**: Nightly builds for every shard target (x86, ARM, RISC-V).
 
+
 - **Snapshot Manager**: Automatic FS snapshots taken before every update for risk-free rolling.
+
 
 ## 🚀 Stay Current
 

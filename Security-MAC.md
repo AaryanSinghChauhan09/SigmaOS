@@ -10,6 +10,8 @@ Every shard in the lattice is assigned a **Capability Token**. Access to resourc
 
 - **PQC Policies**: Security policies are signed using CRYSTALS-Dilithium to prevent adversarial tampering.
 
+
 - **Micro-Segmentation**: Shards are isolated from each other by default; communication requires an explicit "Lattice Bridge".
+
 
 - **Audit Logging**: Every access request is logged to the `S-LOG` shard for forensic analysis.

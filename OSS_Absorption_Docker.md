@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - Docker
+
 ## Making docker/docker-ce Irrelevant
 
 > **Absorption Target**: https://github.com/docker/docker-ce  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Docker by implementing a native container run
 ## Absorbed Features & Capabilities
 
 ### 1. Container Runtime
+
 **Original**: Docker's container runtime (containerd + runc)  
 **SigmaOS**: Native container runtime with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaContainer {
 ```
 
 **Runtime Features**:
+
 - Native container runtime with OS-level optimization
 - Capability-based sandboxing with hardware enforcement
 - Container lifecycle management with automatic cleanup
@@ -36,11 +39,14 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
+
 ### 2. Image Management
+
 **Original**: Docker's image system (layered images)  
 **SigmaOS**: Native image system with enhanced features
 
 **Image Features**:
+
 - Native image management with content-addressed storage
 - Layered images with automatic deduplication
 - Image caching with intelligent invalidation
@@ -48,11 +54,14 @@ pub struct SigmaContainer {
 - Image distribution with content-addressed storage
 - Image profiles with automatic switching
 
+
 ### 3. Dockerfile Support
+
 **Original**: Docker's Dockerfile format  
 **SigmaOS**: Native Dockerfile compatibility with enhanced syntax
 
 **Dockerfile Features**:
+
 - Native Dockerfile parsing with type safety
 - Dockerfile validation with automatic checking
 - Dockerfile caching with intelligent optimization
@@ -60,11 +69,14 @@ pub struct SigmaContainer {
 - Dockerfile templates with automatic generation
 - Dockerfile monitoring with real-time metrics
 
+
 ### 4. Network Management
+
 **Original**: Docker's network system (bridge, overlay)  
 **SigmaOS**: Native network system with enhanced features
 
 **Network Features**:
+
 - Native network management with capability-based access
 - Network isolation with automatic configuration
 - Network filtering with hardware acceleration
@@ -72,11 +84,14 @@ pub struct SigmaContainer {
 - Network profiles with automatic switching
 - Network composition with inheritance
 
+
 ### 5. Volume Management
+
 **Original**: Docker's volume system  
 **SigmaOS**: Native volume system with enhanced features
 
 **Volume Features**:
+
 - Native volume management with capability-based access
 - Volume isolation with automatic configuration
 - Volume caching with intelligent optimization
@@ -84,11 +99,14 @@ pub struct SigmaContainer {
 - Volume profiles with automatic switching
 - Volume composition with inheritance
 
+
 ### 6. Docker Compose
+
 **Original**: Docker Compose for multi-container apps  
 **SigmaOS**: Native compose system with enhanced features
 
 **Compose Features**:
+
 - Native compose system with type safety
 - Compose validation with automatic checking
 - Compose orchestration with automatic optimization
@@ -96,12 +114,13 @@ pub struct SigmaContainer {
 - Compose profiles with automatic switching
 - Compose composition with inheritance
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Docker | SigmaOS | Advantage |
-|---------|--------|---------|------------|
+| --------- | -------- | --------- | ------------ |
 | Container Performance | Daemon overhead | Native runtime | ✅ 5-10x |
 | Image Performance | Layer overhead | Content-addressed | ✅ 3-5x |
 | Network Performance | Bridge overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaContainer {
 ## Implementation Details
 
 ### Native Container Runtime
+
 ```rust
 pub mod container {
     use sigma_container::runtime::ContainerRuntime;
@@ -144,6 +164,7 @@ pub mod container {
 ```
 
 ### Native Image Manager
+
 ```rust
 pub mod image {
     pub struct ImageManager {
@@ -170,32 +191,44 @@ pub mod image {
 ### For Users of Docker
 
 **Before** (using Docker):
+
 ```bash
+
 # Install Docker
+
 sudo apt install docker-ce
 
 # Build image
+
 docker build -t myapp .
 
 # Run container
+
 docker run myapp
 
 # Compose
+
 docker-compose up
 ```
 
 **After** (using SigmaContainer):
+
 ```bash
+
 # Enable container shard (native)
+
 sigma-shard enable container-runtime
 
 # Build image
+
 sigma-container build --tag myapp
 
 # Run container
+
 sigma-container run --image myapp
 
 # Compose
+
 sigma-compose up
 ```
 
@@ -204,7 +237,7 @@ sigma-compose up
 ## Performance Benchmarks
 
 | Operation | Docker | SigmaContainer | Improvement |
-|-----------|--------|----------------|-------------|
+| ----------- | -------- | ---------------- | ------------- |
 | Container Create | 500ms | 80ms | 6.3x faster |
 | Image Pull (100MB) | 30s | 10s | 3x faster |
 | Network Setup | 100ms | 20ms | 5x faster |

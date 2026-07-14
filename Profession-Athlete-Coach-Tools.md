@@ -10,11 +10,15 @@ The Athlete/Coach Profile is designed for athletic excellence, training manageme
 
 - **SigmaTraining**: Training program design and tracking.
 
+
 - **SigmaPerformance**: Performance analytics and metrics.
+
 
 - **SigmaRecovery**: Recovery management and injury prevention.
 
+
 - **SigmaTeam**: Team coordination and communication.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Athlete/Coach Profile is designed for athletic excellence, training manageme
 
 - **Theme**: Sports Red (Athletic Standard)
 
+
 - **Layout**: Sports Dashboard (Training, Performance, Recovery)
 
+
 - **Personalization**: Custom workout plans and automated alerts.
+
 
 ---
 

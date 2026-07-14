@@ -223,15 +223,21 @@ by owning the full stack. See [docs/PHASE_7_8_ROADMAP.md](PHASE_7_8_ROADMAP.md) 
 
 1. **Immutable base + Safe Mode** — match CoreOS/Flatcar; exceed with Fix-it menu (`sigma_boot_recovery_menu.c`).
 
+
 2. **Sovereign net + pods** — match RancherOS; exceed with no containerd/docker dependency.
+
 
 3. **Zenith desktop** — match Solus polish; exceed with auto-tiling + declarative profile.
 
+
 4. **Build registry + git sync** — match NixOS reproducibility via signed `.spkg` + CI provenance.
+
 
 5. **Recovery automation** — match Rescuezilla via `sigma_automation.sh recovery-check` + GUI assistant.
 
+
 6. **Performance** — match Clear Linux via scheduler + PGO release profiles.
+
 
 ---
 
@@ -241,11 +247,15 @@ Before merging to `main` or promoting a `release/*` branch:
 
 1. Kernel/network/boot smoke path passes in CI (`sigma_ci.yml`)
 
+
 2. Docs updated for every subsystem touched
+
 
 3. `CURRENT_PROBLEMS_MANIFEST.md` reflects new status
 
+
 4. Wiki page updated in `wiki_repo/` (auto-sync on push)
+
 
 ---
 

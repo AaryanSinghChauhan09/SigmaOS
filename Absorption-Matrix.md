@@ -9,7 +9,7 @@
 ## Legend
 
 | Status | Meaning |
-|---|---|
+| --- | --- |
 | ✅ Implemented | Core functionality exists in SigmaOS |
 | 🔄 In Progress | Actively being built |
 | 🎯 Planned | On the roadmap |
@@ -20,7 +20,7 @@
 ## 🔧 System Utilities
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | GNU Coreutils | `sigma-core-utils` (Rust) | 🔄 In Progress | P0 | BusyBox, uutils/coreutils |
 | BusyBox | `sigma-core-utils` (Rust) | 🔄 In Progress | P0 | BusyBox |
 | Bash / Zsh / Fish | `sigma-sh` (Rust) | 🔄 In Progress | P0 | Fish shell, elvish |
@@ -36,7 +36,7 @@
 ## 📂 File Systems & Storage
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | ext4 | `SovereignFS` (journaling, POSIX) | 🎯 Planned | P0 | xv6, Minoca OS |
 | btrfs | `SovereignFS` (snapshots, CoW) | 🎯 Planned | P1 | btrfs, ZFS |
 | ZFS | `sigma-zfs` integration | 🎯 Planned | P2 | OpenZFS |
@@ -52,7 +52,7 @@
 ## 🖥️ Developer Tools
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | GCC / Clang | `sigma-cc` (Rust/Zig frontend) | 🎯 Planned | P1 | LLVM, zig cc |
 | CMake / Meson | `sigpkg build` (Rust) | 🔄 In Progress | P1 | Zig build system |
 | Make / Ninja | `sigma-make` (Rust) | 🎯 Planned | P2 | just, ninja |
@@ -70,7 +70,7 @@
 ## 🌐 Networking & Internet
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | OpenSSH | `sigma-ssh` (Rust) | 🎯 Planned | P0 | russh, Dropbear |
 | curl / wget | `sigma-fetch` (Rust) | 🎯 Planned | P0 | — |
 | Firefox / Chromium | `sigma-browse` | 🔄 In Progress | P1 | Ladybird, NetSurf |
@@ -87,7 +87,7 @@
 ## 📦 Package Management
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | apt / dpkg | `sigpkg` (Rust) | 🔄 In Progress | P0 | Wolfi OS, apk |
 | rpm / yum | `sigpkg` (Rust) | 🔄 In Progress | P0 | — |
 | pacman | `sigpkg` (Rust) | 🔄 In Progress | P0 | — |
@@ -101,7 +101,7 @@
 ## 🔒 Security
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | SELinux | `sigma-sandbox` (capability) | 🎯 Planned | P0 | Capsicum |
 | AppArmor | `sigma-sandbox` | 🎯 Planned | P0 | — |
 | OpenSSL | `sigma-crypto` (Ada/SPARK) | 🔄 In Progress | P0 | libsodium, rustls |
@@ -119,7 +119,7 @@
 ## 🎨 Productivity & Media
 
 | External Tool | SigmaOS Sovereign Replacement | Status | Priority | Inspired By |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | LibreOffice (Writer) | `sigma-write` | 🎯 Planned | P2 | — |
 | LibreOffice (Calc) | `sigma-calc` | 🎯 Planned | P2 | — |
 | LibreOffice (Impress) | `sigma-present` | 🎯 Planned | P3 | — |
@@ -138,7 +138,7 @@
 ## 🏗️ Core OS Projects Absorbed
 
 | Source Project | What SigmaOS Absorbs | Status |
-|---|---|---|
+| --- | --- | --- |
 | **Redox OS** | Memory safety, microkernel modularity, Rust `#![no_std]` patterns | 💡 Inspired By |
 | **rCore** | Syscall design, RISC-V support, educational clarity | 💡 Inspired By |
 | **Unikraft** | Cloud-native unikernel profile architecture | 💡 Inspired By |
@@ -158,7 +158,7 @@
 ## 📊 Absorption Progress Summary
 
 | Category | Total Tools | ✅ Done | 🔄 In Progress | 🎯 Planned |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | System Utilities | 9 | 0 | 2 | 7 |
 | File Systems & Storage | 9 | 0 | 0 | 9 |
 | Developer Tools | 12 | 1 | 2 | 9 |

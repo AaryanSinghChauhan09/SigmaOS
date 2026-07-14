@@ -8,7 +8,7 @@ This specification outlines the architecture of **Infinite Sharding**, the dynam
 
 In traditional microkernels, changing system components requires recompiling the root system. SigmaOS replaces this constraint with the **Sovereign Lattice Shard Model**, where each component runs as a decoupled state machine communicating via the `sigma-bus` IPC event loop.
 
-```
+```text
        [sigma-bus (Zero-copy IPC Shared Ring Buffer)]
          ▲                     ▲                     ▲
          │                     │                     │

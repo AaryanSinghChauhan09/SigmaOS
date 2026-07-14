@@ -10,11 +10,15 @@ The Electrical Engineer Profile is designed for electrical excellence, circuit d
 
 - **SigmaCircuit**: Circuit design and simulation tools.
 
+
 - **SigmaPower**: Power system analysis and design.
+
 
 - **SigmaControl**: Control system design and automation.
 
+
 - **SigmaTesting**: Electrical testing and validation.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Electrical Engineer Profile is designed for electrical excellence, circuit d
 
 - **Theme**: Electrical Yellow (Engineering Standard)
 
+
 - **Layout**: Engineering Dashboard (Circuit, Power, Control)
 
+
 - **Personalization**: Component libraries and automated analysis.
+
 
 ---
 

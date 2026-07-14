@@ -29,7 +29,9 @@ $ sigma service register my-api --port 8080 --label env=prod
 Middleware transforms are composable TOML declarations applied per-route:
 
 ```toml
+
 # /etc/sigma/gateway/routes/my-api.toml
+
 [route]
 match = "Host(`my-api.sigma.local`)"
 service = "my-api"

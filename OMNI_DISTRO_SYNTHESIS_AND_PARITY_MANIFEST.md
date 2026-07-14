@@ -10,7 +10,7 @@
 
 The **SigmaOS Zenith Sovereign Omni-Matrix** achieves absolute industrial dominance by exhaustively extracting, refining, and implementing the architectural heuristics, package ecosystems, and hardware enablement primitives from **10 major Linux distribution categories** into a unified, failure-isolated C++ microkernel userland.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │              10 MAJOR LINUX DISTRIBUTION FAMILIES ASSIMILATED            │
 │   (Debian, Arch, Fedora, Alpine, Solus, Qubes, NixOS, CoreOS, Kali, RHEL)│
@@ -34,8 +34,8 @@ The **SigmaOS Zenith Sovereign Omni-Matrix** achieves absolute industrial domina
 | **3. Enterprise Server** | RHEL, SUSE Linux Enterprise | Live kernel patching (kpatch), SELinux mandatory access control, XFS/ZFS journaling. | `sigma_driver_server_enterprise.cpp` |
 | **4. Lightweight & Edge** | Alpine Linux, Void Linux | Musl libc minimalism, BusyBox freestanding toolsets, runit/OpenRC init speed. | `sigma_driver_lightweight_edge.cpp` |
 | **5. Declarative & Atomic** | NixOS, GNU Guix | Reproducible builds, Nix store symlink trees, atomic rollbacks. | `sigma_nix_config.cpp` |
-| **6. Hyper-Secure Privacy**| Qubes OS, Tails, Whonix | Xen-like Ring-3 micro-VM isolation, disposable Tor sandboxes, split-GPG keyrings. | `sigma_driver_privacy_qubes.cpp` |
-| **7. Cloud-Native Container**| Fedora CoreOS, RancherOS | Ignition declarative boot configs, read-only root filesystems, automated Cgroup v2 slicing. | `sigma_driver_container_coreos.cpp` |
+| **6. Hyper-Secure Privacy** | Qubes OS, Tails, Whonix | Xen-like Ring-3 micro-VM isolation, disposable Tor sandboxes, split-GPG keyrings. | `sigma_driver_privacy_qubes.cpp` |
+| **7. Cloud-Native Container** | Fedora CoreOS, RancherOS | Ignition declarative boot configs, read-only root filesystems, automated Cgroup v2 slicing. | `sigma_driver_container_coreos.cpp` |
 | **8. Forensics & Recovery** | SystemRescue, Clonezilla | S-ZFS snapshot differential extraction, bare-metal NVMe sector carving, memory scrubbing. | `sigma_forensics.cpp` |
 | **9. Offensive Security** | Kali Linux, ParrotSec | Wireshark promiscuous packet capture rings, Metasploit IPC bridging, containerized pentest tools. | `sigma_driver_sec_pentest.cpp` |
 | **10. Polished Desktop UX** | Solus, elementary OS, Mint | Budgie/Pantheon clean UI design tokens, zero-configuration audio mixing, stutter-free compositor. | `sigma_driver_rolling_solus.cpp` |
@@ -75,11 +75,15 @@ int SovereignOmniCompatLayer::dispatch_linux_syscall(int syscall_nr, Register64 
 
 - **Issue - Shared Library Collisions (`glibc` vs `musl`):** Running Arch Linux binaries alongside Alpine Linux binaries triggers fatal symbol lookup errors.
 
+
 - *Fix Strategy:* SigmaOS utilizes isolated NixOS symlink trees (`/sigma/store/...`), ensuring every assimilated binary links exclusively against its exact required library manifest without global namespace pollution.
+
 
 - **Issue - Package Manager Database Lock Deadlocks:** Concurrent execution of `apt-get` and `pacman` locks the global package registry.
 
+
 - *Fix Strategy:* SigmaOS decouples package management into transactional, Copy-on-Write SQLite shards (`sigma_gui_package_manager.cpp`), allowing parallel non-conflicting staging installations with instant rollback capability.
+
 
 ---
 > **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED

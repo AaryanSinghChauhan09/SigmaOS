@@ -10,9 +10,12 @@ The **SovereignCompliance** shard ensures that all cryptographic operations use 
 
 - **KAT (Known Answer Tests)**: Automated boot-time verification of AES-GCM, SHA-3, and HMAC implementations.
 
+
 - **Physical Isolation**: Cryptographic keys are bound to the hardware root of trust (TPM 2.0 / Secure Enclave).
 
+
 - **Immutable Audit Logs**: All security-critical events are logged in an append-only, PQC-signed lattice.
+
 
 ---
 
@@ -21,6 +24,7 @@ The **SovereignCompliance** shard ensures that all cryptographic operations use 
 SigmaOS utilizes **CRYSTALS-Kyber**and**CRYSTALS-Dilithium** as its primary cryptographic primitives for the Sovereign Lattice.
 
 - **Kyber (KEM)**: Secures inter-shard key exchange and network handshakes.
+
 
 ***Dilithium (Digital Signatures)**: Verifies the provenance and integrity of the**Universal Package Graph**.
 
@@ -32,9 +36,12 @@ The attestation framework verifies every shard before it is ignited in the latti
 
 1. **Provenance Check**: Verification of the shard's cryptographic origin.
 
+
 2. **Integrity Proof**: Dilithium-based signature verification of the shard binary.
 
+
 3. **Capability Gating**: Enforcing RBAC policies based on the attested identity.
+
 
 ---
 
@@ -59,11 +66,14 @@ SigmaOS has completed its initial internal audit and is currently in the "FIPS-1
 
 - **Audit Date**: 2026-05-11
 
+
 - **Validator**: Sovereign Compliance Engine (NIST-SP-800-208 Validated)
+
 
 ***Result**:**PASS** - 600 shards successfully attested via Dilithium proofs.
 
 - **Certification**: PQC-Certified for Industrial Sovereign Environments.
+
 
 ---
 

@@ -10,11 +10,15 @@ The Meteorologist Profile is designed for weather excellence, atmospheric resear
 
 - **SigmaWeather**: Weather modeling and forecasting platform.
 
+
 - **SigmaClimate**: Climate analysis and trend tracking.
+
 
 - **SigmaSatellite**: Satellite data processing and analysis.
 
+
 - **SigmaAlert**: Weather alert generation and distribution.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Meteorologist Profile is designed for weather excellence, atmospheric resear
 
 - **Theme**: Sky Blue (Meteorology Standard)
 
+
 - **Layout**: Weather Dashboard (Weather, Climate, Satellite)
 
+
 - **Personalization**: Custom forecasting models and automated alerts.
+
 
 ---
 

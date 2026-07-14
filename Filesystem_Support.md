@@ -1,12 +1,14 @@
 # SigmaOS Filesystem Support & Transactional Rollbacks
 
 ## Overview
+
 SigmaOS implements modern filesystem innovation by offering native support for ZFS and Btrfs snapshotting and rollback workflows directly within its storage layer. This architecture ensures that user home directories, configuration trees, and package repositories are transaction-safe, allowing instantaneous system state restoration.
 
 ## Snapshot & Rollback Architecture
+
 SigmaOS isolates system state using filesystem subvolumes and dataset snapshots. When a package is upgraded or a system configuration is updated via `sigpkg`, a filesystem snapshot is generated beforehand.
 
-```
+```text
                   [Current Running State]
                              │
             ┌────────────────┴────────────────┐
@@ -20,9 +22,11 @@ SigmaOS isolates system state using filesystem subvolumes and dataset snapshots.
 ```
 
 ## Configuration Specification
+
 File systems are mounted with copy-on-write (CoW) configurations defined in `/etc/sigmafs.conf`.
 
 Example configuration:
+
 ```toml
 [filesystem.root]
 type = "btrfs"
@@ -37,6 +41,7 @@ directory = "/.snapshots"
 ```
 
 ## Technical Implementation
+
 The storage daemon (`sigmad-storage`) invokes low-level filesystem ioctls directly using Rust bindings to control snapshots, minimizing overhead and dependency on complex shell execution.
 
 ```rust
@@ -57,6 +62,7 @@ pub fn create_subvolume_snapshot(src: &str, dest: &str) -> Result<(), io::Error>
 ```
 
 ## Roadmap & Milestones
+
 - **Phase 1 (Months 0-3)**: Implementation of raw Btrfs subvolume snapshot wrapper.
 - **Phase 2 (Months 3-6)**: ZFS pool dataset integration and automatic CLI rollback options.
 - **Phase 3 (Months 6-9)**: GUI rollback manager integrated with Zenith Desktop Control Center.

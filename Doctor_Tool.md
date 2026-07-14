@@ -10,11 +10,15 @@ Inspired by the concept of "self-healing silicon," the Doctor Tool performs deep
 
 - **Lattice Auscultation**: Listens to the heartbeats of all 600 shards via the `SovereignEventBus`.
 
+
 - **NPU Reflex Test**: Benchmarks the Neural Engine's response time to ensure PTO (Predictive Tensor Orchestration) is active.
+
 
 - **PQC Blood Test**: Verifies the entropy levels of the cryptographic pool to prevent "security anemia."
 
+
 - **Silicon Surgery**: Forcefully cycles the power state of individual silicon clusters to clear hardware-level stalls.
+
 
 ## 🚀 Usage (via sigma-cli)
 

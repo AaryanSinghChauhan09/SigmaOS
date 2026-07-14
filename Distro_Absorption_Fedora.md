@@ -19,7 +19,9 @@ SigmaOS adopts Fedora's **formal feature change process** and **beta-first techn
 Modeled after Fedora's Change Process, every significant technology addition to SigmaOS must go through the Sigma Change Process:
 
 ```markdown
+
 ## SCP-001: Enable Huge Transparent Pages (THP) by Default
+
 - Owner: @kernel-team
 - Status: FinalBeta
 - Self-Contained: Yes
@@ -27,6 +29,7 @@ Modeled after Fedora's Change Process, every significant technology addition to 
 - Benefit: 8-15% speedup in compilation and database workloads
 - Contingency: Revert to madvise-only if OOM regression detected
 - Completion: Included in SigmaOS 0.4
+
 ```
 
 ### 2.2 Sigma.next — Innovation Fast Track

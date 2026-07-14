@@ -10,11 +10,15 @@ The Pilot Profile is designed for aviation excellence, flight management, and ef
 
 - **SigmaFlight**: Flight planning and navigation management.
 
+
 - **SigmaWeather**: Aviation weather tracking and analysis.
+
 
 - **SigmaAircraft**: Aircraft status and maintenance tracking.
 
+
 - **SigmaCompliance**: Aviation regulatory compliance and logging.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Pilot Profile is designed for aviation excellence, flight management, and ef
 
 - **Theme**: Aviation Blue (Flight Standard)
 
+
 - **Layout**: Aviation Dashboard (Flight, Weather, Aircraft)
 
+
 - **Personalization**: Custom flight plans and automated alerts.
+
 
 ---
 

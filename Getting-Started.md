@@ -27,7 +27,8 @@ cd .. && ./qemu-boot.sh standalone
 ```
 
 Expected serial output:
-```
+
+```text
 Σ SigmaOS Zenith Kernel Initializing (Rust)
 [IRQ] PIC remapped, PIT 1000Hz, IDT ready
 [MEM] Slab memory manager initialized
@@ -40,7 +41,7 @@ System Ready. Waiting for input...
 ## Prerequisites
 
 | Tool | Version | Purpose |
-|------|---------|---------|
+| ------ | --------- | --------- |
 | Rust nightly | see `rust-toolchain.toml` | Kernel + userland |
 | NASM | ≥ 2.15 | x86 assembly |
 | Zig | 0.13.0 | Bootloader + HAL |
@@ -48,11 +49,13 @@ System Ready. Waiting for input...
 | OVMF | any | UEFI testing |
 
 Install on Ubuntu/Debian:
+
 ```bash
 apt install nasm qemu-system-x86 ovmf
 ```
 
 Install on Windows:
+
 ```powershell
 winget install NASM.NASM QEMU.QEMU
 ```
@@ -112,7 +115,7 @@ qemu-system-x86_64 \
 
 ## Project Layout
 
-```
+```text
 SigmaOS/
 ├── arch/x86_64/       → CPU entry, GDT, IDT, context switch (NASM)
 ├── sigma-boot/        → UEFI bootloader (Zig)
@@ -137,18 +140,22 @@ SigmaOS/
 
 1. Check [12-Week-Milestone-Plan](12-Week-Milestone-Plan) for current priorities
 
+
 2. Look at [GITHUB_ISSUES.md](../docs/GITHUB_ISSUES.md) for open tasks
+
 
 3. Read [Linux-Parity-Roadmap](Linux-Parity-Roadmap) for what needs implementing
 
+
 4. Follow [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
+
 
 ---
 
 ## Common Fixes
 
 | Error | Fix |
-|-------|-----|
+| ------- | ----- |
 | `can't find crate for std` | Normal for `#![no_std]` kernel crates |
 | `rust-lld not found` | `rustup component add llvm-tools-preview` |
 | QEMU no serial output | Add `-serial stdio -nographic` |

@@ -13,7 +13,7 @@ This guide details how SigmaOS integrates LLVM/Clang as its primary compiler too
 ## 1. Toolchain Components
 
 | Component | Version | Role |
-|:----------|:--------|:-----|
+| :---------- | :-------- | :----- |
 | `clang` | 18.x | C/C++ frontend (for C shims) |
 | `rustc` | nightly | Primary Rust compiler |
 | `lld` | 18.x | Linker (deterministic, fast) |
@@ -29,30 +29,43 @@ This guide details how SigmaOS integrates LLVM/Clang as its primary compiler too
 
 ```bash
 $ sigma build
+
 # Equivalent flags:
+
 # -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer
+
 # Fast compile, maximal debug info, sanitizers on
+
 ```
 
 ### Staging Profile
 
 ```bash
 $ sigma build --profile staging
+
 # Equivalent: -O2 -g1 (minimal debug)
+
 # No sanitizers. Used for integration testing.
+
 ```
 
 ### Production Profile (LTO + PGO)
 
 ```bash
+
 # Phase 1: Instrument
+
 $ sigma build --profile pgo-instrument
 $ sigma test --run-benchmarks      # generates profraw data
 
 # Phase 2: Optimize
+
 $ sigma build --profile production
+
 # Equivalent: -O3 -flto=full -fprofile-use=merged.profdata
+
 # + -march=native -fvectorize -fslp-vectorize
+
 ```
 
 ---
@@ -60,7 +73,7 @@ $ sigma build --profile production
 ## 3. Sanitizer Reference
 
 | Sanitizer | Flag | Detects |
-|:----------|:-----|:--------|
+| :---------- | :----- | :-------- |
 | AddressSanitizer | `-fsanitize=address` | Heap/stack overflow, UAF |
 | UndefinedBehavior | `-fsanitize=undefined` | Integer overflow, null deref |
 | ThreadSanitizer | `-fsanitize=thread` | Data races |

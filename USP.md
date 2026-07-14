@@ -36,9 +36,12 @@ Inspired by modern personal AI frameworks, SigmaOS transcends traditional comput
 
 - **S-PAI Shard**: A local, agentic AI orchestrator that manages context, memory, and skills.
 
+
 - **S-TELOS**: A goal-alignment engine that ensures every system action aligns with your professional and personal mission.
 
+
 - **S-PULSE**: A real-time dashboard tracking your "Current State" vs. "Desired State".
+
 
 ## 🛠 Professional Integration Examples
 
@@ -49,9 +52,9 @@ Inspired by modern personal AI frameworks, SigmaOS transcends traditional comput
 
 | **Architect** | Blender / FreeCAD | Real-time Stress-Mesh Viz |
 
-| **Indian Lawyer**| Indian Code (BNS 2023) |**S-BNS** Legal Lookup Shard |
+| **Indian Lawyer** | Indian Code (BNS 2023) | **S-BNS** Legal Lookup Shard |
 
-| **Indian Accountant**| GST/Income Tax (FY 24-25) |**S-IN-TOOLS** Tax Compliance |
+| **Indian Accountant** | GST/Income Tax (FY 24-25) | **S-IN-TOOLS** Tax Compliance |
 
 | **Data Engineer** | Apache Spark / DuckDB | Bare-metal DataMatrix Query |
 

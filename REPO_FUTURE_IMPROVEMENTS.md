@@ -8,7 +8,7 @@ This document outlines structural recommendations for code maintenance, automate
 
 We propose integrating `scripts/sigma_quality_check.sh` as a mandatory pre-commit hook to maintain zero-stub and zero-credential properties.
 
-```
+```text
                   [git commit triggered]
                             │
                             ▼
@@ -34,7 +34,9 @@ We propose integrating `scripts/sigma_quality_check.sh` as a mandatory pre-commi
 Expand the `test_runner.rs` to validate all five compile-time profiles dynamically during the CI pipeline.
 
 ```toml
+
 # .github/workflows/ci.yml (proposed matrix)
+
 strategy:
   matrix:
     profile: [desktop, microkernel, cloud, mobile, rtos]

@@ -7,7 +7,7 @@ with automatic rollback if the new system fails to boot.
 
 ## How It Works
 
-```
+```text
 Slot A (active):   /sigma/system-a/  ← currently running
 Slot B (inactive): /sigma/system-b/  ← update target
 
@@ -77,9 +77,12 @@ The updater verifies before writing to the inactive slot:
 
 1. **SHA-256 checksum** — image integrity
 
+
 2. **Dilithium-5 signature** — authenticity (via `sigma-verify-sig`)
 
+
 3. **dm-verity hash** — written to `.sigma-verity` for boot-time check
+
 
 If any step fails, the update is aborted and the active slot is unchanged.
 
@@ -88,7 +91,7 @@ If any step fails, the update is aborted and the active slot is unchanged.
 ## Comparison with Other Systems
 
 | System | Update Method | Rollback |
-|--------|--------------|---------|
+| -------- | -------------- | --------- |
 | Windows | In-place | System Restore |
 | Ubuntu | `apt upgrade` (in-place) | Manual |
 | Fedora | rpm-ostree A/B | Automatic |

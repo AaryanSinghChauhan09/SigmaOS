@@ -8,7 +8,7 @@ This guide explains how to convert driver packages from various Linux distributi
 
 ### Package Structure
 
-```
+```text
 driver-name-version.sigpkg/
 ├── SIGPKG_MANIFEST.json    # Package metadata
 ├── SIGPKG_SIGNATURE.sig    # GPG signature
@@ -60,6 +60,7 @@ driver-name-version.sigpkg/
 ### Analyzing RPM Spec
 
 1. **Extract RPM spec file**:
+
    ```bash
    rpm -qsp nvidia-driver-535.154.05-1.fc39.src.rpm
    ```
@@ -72,9 +73,11 @@ driver-name-version.sigpkg/
    - `%install` → installation instructions
    - `%post` → post-install scripts
 
+
 ### Conversion Example
 
 **Fedora RPM Spec**:
+
 ```spec
 Name: nvidia-driver
 Version: 535.154.05
@@ -86,6 +89,7 @@ Conflicts: nouveau
 ```
 
 **SigmaOS sigpkg Manifest**:
+
 ```json
 {
   "name": "nvidia-driver",
@@ -104,6 +108,7 @@ Conflicts: nouveau
 ### Analyzing PKGBUILD
 
 1. **Extract PKGBUILD**:
+
    ```bash
    wget https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=nvidia
    ```
@@ -116,9 +121,11 @@ Conflicts: nouveau
    - `conflicts` → conflicts
    - `makedepends` → build dependencies
 
+
 ### Conversion Example
 
 **Arch PKGBUILD**:
+
 ```bash
 pkgname=nvidia
 pkgver=535.154.05
@@ -128,6 +135,7 @@ conflicts=('nouveau')
 ```
 
 **SigmaOS sigpkg Manifest**:
+
 ```json
 {
   "name": "nvidia-driver",
@@ -146,6 +154,7 @@ conflicts=('nouveau')
 ### Analyzing debian/control
 
 1. **Extract control file**:
+
    ```bash
    dpkg -I nvidia-driver_535.154.05_amd64.deb
    ```
@@ -157,10 +166,12 @@ conflicts=('nouveau')
    - `Provides` → provides
    - `Conflicts` → conflicts
 
+
 ### Conversion Example
 
 **Debian Control**:
-```
+
+```text
 Package: nvidia-driver
 Version: 535.154.05-1
 Depends: linux-image-6.1.0, nvidia-firmware
@@ -169,6 +180,7 @@ Conflicts: nouveau
 ```
 
 **SigmaOS sigpkg Manifest**:
+
 ```json
 {
   "name": "nvidia-driver",
@@ -187,21 +199,25 @@ Conflicts: nouveau
 ### Build Environment
 
 1. **Set up build container**:
+
    ```bash
    sigma-build create-driver-env --kernel 6.1.0
    ```
 
 2. **Install build dependencies**:
+
    ```bash
    sigma-build install-deps nvidia-driver
    ```
 
 3. **Compile driver**:
+
    ```bash
    sigma-build compile nvidia-driver
    ```
 
 4. **Package driver**:
+
    ```bash
    sigma-build package nvidia-driver
    ```
@@ -210,25 +226,31 @@ Conflicts: nouveau
 
 ```bash
 #!/bin/bash
+
 # build-driver.sh
 
 DRIVER_NAME=$1
 KERNEL_VERSION=$2
 
 # Set up build environment
+
 export SIGMA_BUILD_ROOT=/tmp/sigma-build
 mkdir -p $SIGMA_BUILD_ROOT
 
 # Download source
+
 sigma-build download $DRIVER_NAME
 
 # Compile
+
 make -C /lib/modules/$KERNEL_VERSION/build M=$SIGMA_BUILD_ROOT/$DRIVER_NAME modules
 
 # Sign module
+
 sigmod-sign $SIGMA_BUILD_ROOT/$DRIVER_NAME/*.ko
 
 # Create sigpkg
+
 sigma-pkg create \
   --name $DRIVER_NAME \
   --kernel $KERNEL_VERSION \
@@ -240,16 +262,19 @@ sigma-pkg create \
 ### GPG Key Setup
 
 1. **Generate signing key**:
+
    ```bash
    gpg --full-generate-key --key-type RSA --key-length 4096
    ```
 
 2. **Export public key**:
+
    ```bash
    gpg --export --armor > sigmaos-keyring.asc
    ```
 
 3. **Sign package**:
+
    ```bash
    sigma-pkg sign nvidia-driver.sigpkg --key sigmaos-keyring
    ```
@@ -257,16 +282,19 @@ sigma-pkg create \
 ### Secure Boot Integration
 
 1. **Sign kernel module**:
+
    ```bash
    sigmod-sign nvidia.ko --key-db /var/lib/shim-signed/mok
    ```
 
 2. **Generate signature**:
+
    ```bash
    sigmod-sign --output nvidia.ko.sig nvidia.ko
    ```
 
 3. **Verify signature**:
+
    ```bash
    sigmod-verify nvidia.ko nvidia.ko.sig
    ```
@@ -275,7 +303,7 @@ sigma-pkg create \
 
 ### Firmware Structure
 
-```
+```text
 firmware.sigpkg/
 ├── SIGPKG_MANIFEST.json
 ├── SIGPKG_SIGNATURE.sig
@@ -308,7 +336,7 @@ firmware.sigpkg/
 
 ### Driver Configuration
 
-```
+```text
 config/driver.conf
 ```
 
@@ -330,15 +358,19 @@ PowerMizerLevel=1
 
 ```bash
 #!/bin/bash
+
 # post-install.sh
 
 # Load module
+
 modprobe nvidia
 
 # Create device nodes
+
 nvidia-smi
 
 # Update initramfs
+
 update-initramfs -u
 ```
 
@@ -347,29 +379,38 @@ update-initramfs -u
 ### Unit Tests
 
 ```bash
+
 # Test package structure
+
 sigma-pkg validate nvidia-driver.sigpkg
 
 # Test signature
+
 sigma-pkg verify nvidia-driver.sigpkg
 
 # Test installation
+
 sigma-pkg install --test nvidia-driver.sigpkg
 ```
 
 ### Integration Tests
 
 ```bash
+
 # Install package
+
 sigma-pkg install nvidia-driver.sigpkg
 
 # Load module
+
 modprobe nvidia
 
 # Test functionality
+
 nvidia-smi
 
 # Clean up
+
 modprobe -r nvidia
 sigma-pkg remove nvidia-driver
 ```
@@ -379,19 +420,23 @@ sigma-pkg remove nvidia-driver
 ### Adding to Repository
 
 ```bash
+
 # Add package to repository
+
 sigma-repo add nvidia-driver.sigpkg
 
 # Update repository index
+
 sigma-repo update
 
 # Sync repository
+
 sigma-repo sync
 ```
 
 ### Repository Structure
 
-```
+```text
 sigmaos-repo/
 ├── x86_64/
 │   ├── nvidia-driver-535.154.05.sigpkg
@@ -411,11 +456,13 @@ sigmaos-repo/
 - Use semantic versioning for SigmaOS-specific changes
 - Include kernel version in package version if required
 
+
 ### Dependencies
 
 - Specify minimum kernel version
 - List firmware dependencies
 - Avoid circular dependencies
+
 
 ### Security
 
@@ -423,11 +470,13 @@ sigmaos-repo/
 - Sign kernel modules for Secure Boot
 - Verify signatures before installation
 
+
 ### Documentation
 
 - Include README with usage instructions
 - Document configuration options
 - Provide troubleshooting guide
+
 
 ## Troubleshooting
 
@@ -437,17 +486,20 @@ sigmaos-repo/
 - Verify build dependencies
 - Review build logs
 
+
 ### Installation Issues
 
 - Verify package signature
 - Check kernel version compatibility
 - Review conflicts with other packages
 
+
 ### Runtime Issues
 
 - Check dmesg for driver errors
 - Verify firmware loading
 - Review configuration files
+
 
 ## References
 

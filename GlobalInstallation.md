@@ -31,7 +31,7 @@ const eventSource = new EventSource('https://example.com/events')
 The `install()` function adds the following classes to `globalThis`:
 
 | Class | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `fetch` | The fetch function for making HTTP requests |
 | `Headers` | HTTP headers management |
 | `Response` | HTTP response representation |
@@ -97,13 +97,18 @@ Global installation is useful for:
 
 - **Polyfilling environments** that don't have native fetch support
 
+
 - **Ensuring consistent behavior** across different Node.js versions
+
 
 - **Library compatibility** when third-party libraries expect global fetch
 
+
 - **Migration scenarios** where you want to replace built-in implementations
 
+
 - **Testing environments** where you need predictable fetch behavior
+
 
 ## Example: Polyfilling an Environment
 
@@ -139,8 +144,11 @@ test('fetch API test', async () => {
 
 - The `install()` function overwrites any existing global implementations
 
+
 - Classes installed are undici's implementations, not Node.js built-ins
 
+
 - This provides access to undici's latest features and performance improvements
+
 
 - The global installation persists for the lifetime of the process

@@ -16,9 +16,12 @@ SigmaOS adopts this philosophy wholesale:
 
 - **Stability first**: kernel-integrated drivers are tested with every kernel change.
 
+
 - **Security by default**: no unsigned code executes in Ring 0 without PQC attestation.
 
+
 - **Community velocity**: open drivers attract contributors; proprietary blobs stagnate.
+
 
 ---
 
@@ -31,7 +34,7 @@ loaded as PQC-attested kernel modules. They follow the
 ### Network Cards
 
 | Driver | Hardware | Source File | Status |
-|--------|----------|-------------|--------|
+| -------- | ---------- | ------------- | -------- |
 | `sigma-e1000` | Intel Gigabit (82540–82579) | `drivers/net/sigma_e1000.rs` | ✅ Stable |
 | `sigma-r8169` | Realtek Gigabit RTL8111/8168 | `drivers/net/sigma_r8169.rs` | 🔄 In Progress |
 | `sigma-virtio-net` | VirtIO network (QEMU/KVM) | `drivers/net/sigma_virtio_net.rs` | ✅ Stable |
@@ -40,7 +43,7 @@ loaded as PQC-attested kernel modules. They follow the
 ### Storage Controllers
 
 | Driver | Hardware | Source File | Status |
-|--------|----------|-------------|--------|
+| -------- | ---------- | ------------- | -------- |
 | `sigma-nvme` | NVMe SSDs (PCIe) | `drivers/sovereignnvme.rs` | ✅ Stable |
 | `sigma-ahci` | SATA AHCI controllers | `drivers/storage/sigma_ahci.rs` | 🔄 In Progress |
 | `sigma-virtio-blk` | VirtIO block device | `drivers/block/sigma_virtio_blk.rs` | ✅ Stable |
@@ -49,7 +52,7 @@ loaded as PQC-attested kernel modules. They follow the
 ### USB
 
 | Driver | Hardware | Source File | Status |
-|--------|----------|-------------|--------|
+| -------- | ---------- | ------------- | -------- |
 | `sigma-xhci` | USB 3.x xHCI host controller | `drivers/sovereignusb.rs` | ✅ Stable |
 | `sigma-hid` | USB HID (keyboard, mouse) | `drivers/input/sigma_hid.rs` | 🔄 In Progress |
 | `sigma-uvc` | USB webcams (UVC class) | `drivers/sigma/sigma_uvc.rs` | ⬜ Planned |
@@ -65,7 +68,7 @@ Intel graphics are **fully open source** under the MIT/GPL dual-license.
 SigmaOS targets the modern `Xe` architecture and legacy `i915`.
 
 | Driver | Chips | Source File | Status |
-|--------|-------|-------------|--------|
+| -------- | ------- | ------------- | -------- |
 | `sigma-i915` | Intel Gen 6–12 (HD/Iris/UHD) | `drivers/gpu/sigma_i915.rs` | 🔄 In Progress |
 | `sigma-xe` | Intel Arc (Alchemist/Battlemage) | `drivers/gpu/sigma_xe.rs` | ⬜ Planned |
 
@@ -78,14 +81,14 @@ AMD's open-source driver stack (`amdgpu` / `radeon`) is maintained upstream in
 the Linux kernel and Mesa.
 
 | Driver | Chips | Source File | Status |
-|--------|-------|-------------|--------|
+| -------- | ------- | ------------- | -------- |
 | `sigma-amdgpu` | AMD Radeon RX 400+ (GCN 4+) | `drivers/gpu/sigma_amdgpu.rs` | ⬜ Planned |
 | `sigma-radeon` | AMD Radeon HD 5000–7000 | `drivers/gpu/sigma_radeon.rs` | ⬜ Planned |
 
 ### NVIDIA (Open / Nouveau)
 
 | Driver | Notes | Status |
-|--------|-------|--------|
+| -------- | ------- | -------- |
 | `sigma-nouveau` | Community reverse-engineered open driver. No reclocking on Ampere+. | ⬜ Planned |
 | `sigma-nvidia-open` | NVIDIA's own open-source kernel modules (Turing+, R560+). Requires firmware blobs. | ⬜ Planned v16.0 |
 
@@ -99,7 +102,7 @@ the Linux kernel and Mesa.
 ### Wi-Fi
 
 | Driver | Hardware | Source File | Status |
-|--------|----------|-------------|--------|
+| -------- | ---------- | ------------- | -------- |
 | `sigma-iwlwifi` | Intel Wi-Fi 5/6/6E/7 (iwlwifi) | `drivers/sovereignwifi.rs` | 🔄 In Progress |
 | `sigma-ath9k` | Qualcomm Atheros 802.11n | `drivers/network/sigma_ath9k.rs` | ⬜ Planned |
 | `sigma-ath11k` | Qualcomm Wi-Fi 6 (QCA6390+) | `drivers/network/sigma_ath11k.rs` | ⬜ Planned |
@@ -113,7 +116,7 @@ the Linux kernel and Mesa.
 ### Bluetooth
 
 | Component | Description | Status |
-|-----------|-------------|--------|
+| ----------- | ------------- | -------- |
 | `sigma-bluez` | BlueZ Bluetooth stack port | ⬜ Planned |
 | `sigma-hci-usb` | HCI over USB transport | ⬜ Planned |
 | `sigma-hci-uart` | HCI over UART (embedded) | ⬜ Planned |
@@ -123,7 +126,7 @@ the Linux kernel and Mesa.
 ## 4. Community & Mesa Projects
 
 | Project | SigmaOS Integration | Status |
-|---------|-------------------|--------|
+| --------- | ------------------- | -------- |
 | **Mesa** | OpenGL 4.6, Vulkan 1.3 via `sigma-mesa` shard | ⬜ Planned v16.0 |
 | **Nouveau** | `sigma-nouveau` kernel module | ⬜ Planned |
 | **HPLIP** | HP printer driver port via `sigma-cups` | ⬜ Planned |
@@ -160,9 +163,12 @@ All proprietary blobs are:
 
 - Integrity-verified via SHA-256 + Dilithium-5 signature before load.
 
+
 - Isolated in a firmware namespace — cannot access user-space memory directly.
 
+
 - Logged by `sigmad-vault` for auditability.
+
 
 ---
 
@@ -202,18 +208,22 @@ Key rules:
 
 - **No global mutable state** outside the driver struct.
 
+
 - **No dynamic allocation** in `probe()` — use static probe tables.
+
 
 - **PQC attestation** via `SIGMA_SDF_REGISTER_DRIVER` macro at compile time.
 
+
 - **Ring-3 capable**: drivers annotated `#[sdf(ring3)]` run in user space (Phase G).
+
 
 ---
 
 ## 7. Driver Roadmap by Release
 
 | Version | Driver Milestone |
-|---------|----------------|
+| --------- | ---------------- |
 | v15.0 (now) | e1000, xHCI USB, NVMe, VirtIO-net/blk, iwlwifi stub |
 | v15.1 | r8169, AHCI, HID, i915 stub, sigma-firmware-loader |
 | v16.0 Apex | amdgpu, Nouveau, Mesa/Vulkan, PipeWire, BlueZ, Arc Xe |
@@ -225,13 +235,18 @@ Key rules:
 
 1. Fork the repo and create `feat/driver-<name>` from `main`.
 
+
 2. Add your driver under `drivers/<category>/sigma_<name>.rs`.
+
 
 3. Register it with `sigma_sdf::register_driver!`.
 
+
 4. Add a QEMU smoke test in `tests/drivers/test_<name>.rs`.
 
+
 5. Open a PR to `main` — CI runs `sigma_ci.yml` including driver smoke tests.
+
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) and the
 [Driver API wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver-API).

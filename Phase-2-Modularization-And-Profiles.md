@@ -11,7 +11,7 @@ Phase 2 separates SigmaOS into clean, independently-togglable subsystems and int
 Three first-class profiles ship with v15.0:
 
 | Profile | Config File | Use Case |
-|---------|------------|----------|
+| --------- | ------------ | ---------- |
 | `sigma-core` | `config/sigma.yaml` | Bare-metal, headless, POSIX-free sovereign kernel |
 | `sigma-desktop` | `config/sigma.yaml` (Zenith DE ON) | Full Zenith desktop + GPU, Wi-Fi, audio drivers |
 | `sigma-cloud` | `config/sigma.yaml` (HV + PQ-Net ON) | Distributed silicon sovereignty, hypervisor, PQC networking |
@@ -40,7 +40,7 @@ make TARGET_OS=sigma SIGMA_PROFILE=sigma-core -j$(nproc)
 
 ## Subsystem Map (Rust/Zig rewrite in progress)
 
-```
+```text
 kernel/
 ├── core/
 │   ├── memory/         # Sovereign VMM, slab allocator, PMM (Rewritten in Rust no_std)
@@ -64,7 +64,7 @@ kernel/
 ### USE-Flag Feature Toggles (CMake)
 
 | Flag | Default | Description |
-|------|---------|------------|
+| ------ | --------- | ------------ |
 | `SIGMA_USE_HYPERVISOR` | `ON` | Enable VMM / hypervisor shard |
 | `SIGMA_USE_AI_ENGINE` | `ON` | Neural AI engine for scheduling |
 | `SIGMA_USE_ZENITH_DE` | `ON` | Zenith desktop environment |
@@ -107,8 +107,11 @@ features:
 
 - [Phase 1: Foundation & Branch Unification](Phase-1-Foundation-And-Branch-Unification)
 
+
 - [Phase 3: Package & Update System](Phase-3-Package-And-Update-System)
 
+
 - [OS Formats](OS_FORMATS)
+
 
 - [Build Guide](BuildGuide)

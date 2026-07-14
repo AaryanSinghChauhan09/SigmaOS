@@ -4,11 +4,15 @@
 
 - **Author**: [Your Name/PQC Key ID]
 
+
 - **Status**: Draft / Under Review / Approved
+
 
 - **Date**: YYYY-MM-DD
 
+
 - **Branch Focus**: main / standalone / rtos / mobile / microkernel
+
 
 ---
 

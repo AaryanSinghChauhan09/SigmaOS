@@ -10,7 +10,7 @@ This document outlines how SigmaOS has closed (or is closing) the functional and
 
 SigmaOS has transitioned from a "personal desktop" narrative to a **"Distributed Sovereignty"** platform. It is designed for high-performance cloud-native orchestration, managing silicon-native shards across clusters with the efficiency of gVisor-inspired safety primitives.
 
-```
+```text
 BEFORE: SigmaOS = "Yet another Linux distro"
 AFTER:  SigmaOS = Sovereign Computation Substrate
                    that ABSORBS every distro's best features
@@ -24,7 +24,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 ### Category 1: Kernel & Architecture
 
 | Gap | Competitor Reference | SigmaOS Resolution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Monolithic kernel limitations | Linux (monolithic) | Microkernel + Shard architecture | ✅ Resolved |
 | Real-time scheduling | PREEMPT_RT patch (Linux) | Native EEVDF + RT shard profile | ✅ Resolved |
 | CPU hotplug | Linux 5.x+ | Shard-aware CPU online/offline | 🔄 In Progress |
@@ -36,7 +36,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 ### Category 2: Security
 
 | Gap | Competitor Reference | SigmaOS Resolution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | MAC framework | SELinux (Fedora), AppArmor (Ubuntu) | `SovereignMAC.shard` (policy engine) | 🔄 In Progress |
 | Secure boot chain | UEFI Secure Boot (all) | Dilithium5 + UEFI integration | ✅ Resolved |
 | Container isolation | Docker/Podman namespaces | Firecracker microVM + cgroup NS | ✅ Resolved |
@@ -48,7 +48,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 ### Category 3: Package Management & Software Ecosystem
 
 | Gap | Competitor Reference | SigmaOS Resolution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Mature package manager | APT, DNF, Pacman, Nix | `sigpkg` content-addressed store | ✅ Resolved |
 | Flatpak support | Ubuntu, Fedora | Native Flatpak runtime shard | 🔄 In Progress |
 | AUR-style community recipes | Arch Linux AUR | `sigma-recipes` community pipeline | 📋 Planned |
@@ -59,7 +59,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 ### Category 4: Desktop & UX
 
 | Gap | Competitor Reference | SigmaOS Resolution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Polished DE | GNOME, KDE, Elementary | Zenith Desktop (Wayland-native) | 🔄 In Progress |
 | Accessibility | Elementary OS, GNOME a11y | `Accessibility.shard` (WCAG 2.1 AA) | 🔄 In Progress |
 | Windows app compat | Wine, Proton (SteamOS) | Wine-Sigma integration | 📋 Planned |
@@ -70,7 +70,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 ### Category 5: Hardware & Drivers
 
 | Gap | Competitor Reference | SigmaOS Resolution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GPU drivers (NVIDIA) | Linux (proprietary + nouveau) | HAL abstraction + DKMS compat | 🔄 In Progress |
 | WiFi/BT (Realtek, Intel) | Linux firmware blobs | Firmware loader shard + blob hosting | 🔄 In Progress |
 | USB device class support | Linux USB subsystem | USB HCD shard (XHCI) | ✅ Resolved |
@@ -81,7 +81,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 ### Category 6: Enterprise & Cloud
 
 | Gap | Competitor Reference | SigmaOS Resolution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Container runtime (OCI) | Docker, Podman, CRI-O | `sigma-ctr` OCI-compatible runtime | 🔄 In Progress |
 | Kubernetes compatibility | k8s on Ubuntu/RHEL | `sigma-orch` lightweight k8s-compat | 📋 Planned |
 | Configuration management | Ansible, Puppet, Chef | `sigma-config` declarative state | 📋 Planned |
@@ -93,7 +93,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 
 ## Resolution Progress Summary
 
-```
+```text
                     Gap Resolution Progress
     ╔════════════════════════════════════════════╗
     ║  ✅ Resolved:     22 / 42  (52%)          ║
@@ -109,7 +109,7 @@ AFTER:  SigmaOS = Sovereign Computation Substrate
 These are features where SigmaOS leads and competitors must catch up:
 
 | Feature | SigmaOS Advantage | Nearest Competitor |
-|---|---|---|
+| --- | --- | --- |
 | Post-quantum cryptography | Native ML-KEM/ML-DSA in kernel | None (industry gap) |
 | Zero-copy shard IPC | sigma-bus <100ns latency | Fuchsia (zircon channels) |
 | AI-native kernel tuning | Neural Core + EEVDF autotuner | None |
@@ -122,7 +122,7 @@ These are features where SigmaOS leads and competitors must catch up:
 ## Quarterly Resolution Targets
 
 | Quarter | Target Gaps to Close | Focus Area |
-|---|---|---|
+| --- | --- | --- |
 | Q3 2025 | MAC framework, Flatpak, Multi-monitor | Security + Desktop |
 | Q4 2025 | Container runtime, WiFi drivers, Gaming | Cloud + Hardware |
 | Q1 2026 | AUR recipes, Kubernetes compat, Printer | Ecosystem |

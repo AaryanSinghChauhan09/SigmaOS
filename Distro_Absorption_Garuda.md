@@ -19,7 +19,9 @@ SigmaOS absorbs Garuda's **performance profiling daemon** and **automatic proces
 Instead of all processes competing equally for CPU cycles, `sigma-prio` is a system daemon that reads a curated database of known applications and their expected priority categories.
 
 ```toml
+
 # /etc/sigma/process_rules.toml
+
 [[rule]]
 process_name = "firefox"
 nice_level = -5

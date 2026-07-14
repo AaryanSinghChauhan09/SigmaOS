@@ -7,10 +7,13 @@ This document outlines community building, governance model, and contributor rec
 ## Phase 1: Wiki Expansion
 
 ### Current Status
+
 - Basic wiki exists
 - Limited documentation
 
+
 ### Target State
+
 - **Comprehensive Documentation**
   - Migration guides from Ubuntu/Windows
   - Installation guides for all scenarios
@@ -21,7 +24,9 @@ This document outlines community building, governance model, and contributor rec
   - Video tutorials
   - FAQ
 
+
 ### Implementation Tasks
+
 - [ ] Write Ubuntu → SigmaOS migration guide
 - [ ] Write Windows → SigmaOS migration guide
 - [ ] Write installation guides (dual-boot, VM, bare metal)
@@ -33,6 +38,7 @@ This document outlines community building, governance model, and contributor rec
 - [ ] Build FAQ database
 - [ ] Add search to wiki
 
+
 ### Estimated Timeline: 2-3 months
 
 ---
@@ -40,10 +46,13 @@ This document outlines community building, governance model, and contributor rec
 ## Phase 2: Contributor Documentation
 
 ### Current Status
+
 - Minimal contributor documentation
 - No onboarding
 
+
 ### Target State
+
 - **Comprehensive Contributor Guide**
   - Onboarding checklist
   - Coding standards
@@ -54,7 +63,9 @@ This document outlines community building, governance model, and contributor rec
   - Release process
   - Communication channels
 
+
 ### Implementation Tasks
+
 - [ ] Create contributor onboarding guide
 - [ ] Define coding standards (Rust, C, Python)
 - [ ] Document contribution workflow (PRs, issues)
@@ -65,6 +76,7 @@ This document outlines community building, governance model, and contributor rec
 - [ ] Set up communication channels (Discord, Matrix)
 - [ ] Create contributor portal
 
+
 ### Estimated Timeline: 1-2 months
 
 ---
@@ -72,10 +84,13 @@ This document outlines community building, governance model, and contributor rec
 ## Phase 3: Plugin Architecture
 
 ### Current Status
+
 - No plugin system
 - Monolithic architecture
 
+
 ### Target State
+
 - **Extensible Plugin System**
   - Plugin API specification
   - Plugin repository
@@ -84,28 +99,41 @@ This document outlines community building, governance model, and contributor rec
   - Plugin signing (Dilithium-3)
   - Plugin marketplace
 
+
 ### Features
+
 ```bash
+
 # Plugin manager
+
 sigma-plugin list
+
 # → Shows all available plugins
 
 sigma-plugin install sigma-dark-mode
+
 # → Installs plugin
 
 sigma-plugin enable sigma-dark-mode
+
 # → Enables plugin
 
 # Plugin development
+
 sigma-plugin create --name my-plugin
+
 # → Creates plugin scaffold
 
 # Plugin marketplace
+
 sigma-plugin browse --category themes
+
 # → Shows theme plugins
+
 ```
 
 ### Implementation Tasks
+
 - [ ] Design plugin API
 - [ ] Build plugin manager
 - [ ] Create plugin repository
@@ -115,6 +143,7 @@ sigma-plugin browse --category themes
 - [ ] Create plugin development guide
 - [ ] Add plugin testing framework
 
+
 ### Estimated Timeline: 3-4 months
 
 ---
@@ -122,10 +151,13 @@ sigma-plugin browse --category themes
 ## Phase 4: Governance Model
 
 ### Current Status
+
 - No formal governance
 - Founder-led
 
+
 ### Target State
+
 - **Transparent Governance System**
   - Roadmap voting system
   - RFC (Request for Comments) process
@@ -134,7 +166,9 @@ sigma-plugin browse --category themes
   - Transparent decision-making
   - Regular town halls
 
+
 ### Implementation Tasks
+
 - [ ] Design governance model
 - [ ] Create RFC process
 - [ ] Set up voting system
@@ -144,6 +178,7 @@ sigma-plugin browse --category themes
 - [ ] Define voting rights
 - [ ] Create governance documentation
 
+
 ### Estimated Timeline: 2-3 months
 
 ---
@@ -151,10 +186,13 @@ sigma-plugin browse --category themes
 ## Phase 5: Recognition Programs
 
 ### Current Status
+
 - No recognition system
 - Manual acknowledgment
 
+
 ### Target State
+
 - **Contributor Recognition**
   - Badge system
   - Sponsorship program
@@ -164,30 +202,47 @@ sigma-plugin browse --category themes
   - Merchandise for contributors
   - Conference speaking opportunities
 
+
 ### Features
+
 ```bash
+
 # Contributor profile
+
 sigma-contributor show @username
+
 # → Shows badges, contributions, stats
 
 # Badges
+
 # First PR, 10 PRs, 100 PRs
+
 # Bug hunter, Security researcher
+
 # Documentation hero, Community builder
+
 # Translation contributor, Theme designer
 
 # Sponsorship
+
 # Top contributors get sponsored hardware
+
 # Conference travel sponsorship
+
 # Swag packs
 
 # Credits
+
 # All contributors listed in About dialog
+
 # Contributors listed in release notes
+
 # Contributors listed on website
+
 ```
 
 ### Implementation Tasks
+
 - [ ] Design badge system
 - [ ] Create contributor profiles
 - [ ] Set up sponsorship program
@@ -197,6 +252,7 @@ sigma-contributor show @username
 - [ ] Create merchandise program
 - [ ] Set up conference speaking opportunities
 
+
 ### Estimated Timeline: 2-3 months
 
 ---
@@ -204,10 +260,13 @@ sigma-contributor show @username
 ## Phase 6: Community Platforms
 
 ### Current Status
+
 - GitHub only
 - No dedicated community platforms
 
+
 ### Target State
+
 - **Multi-Platform Community**
   - Discord server
   - Matrix server
@@ -218,7 +277,9 @@ sigma-contributor show @username
   - YouTube channel
   - Blog
 
+
 ### Implementation Tasks
+
 - [ ] Set up Discord server
 - [ ] Set up Matrix server
 - [ ] Set up Discourse forum
@@ -230,6 +291,7 @@ sigma-contributor show @username
 - [ ] Define community guidelines
 - [ ] Set up moderation team
 
+
 ### Estimated Timeline: 1-2 months
 
 ---
@@ -239,6 +301,7 @@ sigma-contributor show @username
 - Package Ecosystem (for plugin packages)
 - User Experience (for plugin UI)
 - Security (for plugin sandboxing)
+
 
 ---
 
@@ -252,6 +315,7 @@ sigma-contributor show @username
 - 1000+ Discord members
 - 5000+ forum posts
 
+
 ---
 
 ## Next Steps
@@ -262,6 +326,7 @@ sigma-contributor show @username
 4. Set up governance model
 5. Create recognition programs
 6. Launch community platforms
+
 
 ---
 

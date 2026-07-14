@@ -56,7 +56,7 @@ The PQC shard is the backbone of SigmaOS's zero-trust model. Every package insta
 **Supported Algorithms:**
 
 | Algorithm | NIST Standard | Key Size | Use Case |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Dilithium5 | FIPS 204 | 4864 B pub / 4032 B sec | Package & kernel module signatures |
 | Kyber-1024 | FIPS 203 | 1568 B pub / 3168 B sec | Key encapsulation for IPC encryption |
 | BLAKE3 | — | 256-bit digest | Content-addressable hashing |
@@ -110,6 +110,7 @@ Essential Shards are managed by the [Self-Healing Engine](Self-Healing.md). If a
 1. The watchdog logs the crash to the `PanicLog` ring buffer.
 2. If `crash_count < 5`, the shard is restarted with exponential backoff (100ms, 200ms, 400ms, ...).
 3. If `crash_count >= 5`, the shard is **quarantined** and the user is notified via Zenith.
+
 
 ---
 

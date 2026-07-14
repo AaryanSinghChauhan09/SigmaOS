@@ -21,9 +21,11 @@ Every file created in the `SigmaFS` user directories is asynchronously parsed an
 ```bash
 $ sigma search "cap-based security" --type document
 Σ [SEARCH] Found 3 results (4ms):
+
   1. /home/user/docs/architecture.md (score: 2.4)
   2. /home/user/downloads/paper.pdf (score: 1.8)
   3. /etc/sigma/policies.toml (score: 0.9)
+
 ```
 
 ### 2.2 Distributed Sharding & Replicas

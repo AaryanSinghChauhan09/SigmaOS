@@ -10,11 +10,15 @@ The Oceanographer Profile is designed for oceanographic excellence, marine resea
 
 - **SigmaOcean**: Ocean data collection and analysis platform.
 
+
 - **SigmaCurrent**: Current and tide modeling and tracking.
+
 
 - **SigmaMarine**: Marine ecosystem monitoring and research.
 
+
 - **SigmaClimate**: Ocean climate impact analysis.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Oceanographer Profile is designed for oceanographic excellence, marine resea
 
 - **Theme**: Ocean Blue (Research Standard)
 
+
 - **Layout**: Oceanography Dashboard (Ocean, Current, Marine)
 
+
 - **Personalization**: Custom ocean models and automated monitoring.
+
 
 ---
 

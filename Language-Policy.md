@@ -37,8 +37,11 @@
 ## Rationale for Nim and Zig
 
 - **Nim** compiles via a C backend, producing auditable, minimal C that then goes through
+
   our standard LLVM/GCC toolchain. With `--gc:none` and `--mm:none` it produces
   completely allocation-free binaries comparable to handwritten C.
+
 - **Zig** provides comptime evaluation, no hidden allocations, and direct C interop
+
   without a header layer, making it ideal for writing drivers and HAL components with
   compile-time verified memory layouts.

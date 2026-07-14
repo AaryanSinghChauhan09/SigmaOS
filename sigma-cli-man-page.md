@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma [--json] [--verbose] <command> [command-options]
 sigma --version
 sigma --help
@@ -20,14 +20,15 @@ sigma help <command>
 ## GLOBAL OPTIONS
 
 | Flag | Description |
-|------|-------------|
+| ------ | ------------- |
 | `--json` | Emit machine-readable JSON on stdout |
 | `--verbose` / `-v` | Extra diagnostic output |
 | `--version` / `-V` | Print version and exit |
 | `--help` / `-h` | Show help and exit |
 
 Any subcommand accepts `--help` for per-command detail:
-```
+
+```text
 sigma build --help
 sigma pkg --help
 ```
@@ -37,7 +38,7 @@ sigma pkg --help
 ### Development
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `init <name>` | Scaffold a new kernel module / driver / app |
 | `build [--target] [--release] [--profile]` | Unified CMake/Cargo/Ninja build |
 | `run [--headless] [--serial] [--debug]` | Boot image in QEMU |
@@ -52,27 +53,27 @@ sigma pkg --help
 ### Packaging & SDK
 
 | Command | Description |
-|---------|-------------|
-| `pkg add\|remove\|list\|search\|audit` | Sigma Store package manager |
+| --------- | ------------- |
+| `pkg add\ | remove\ | list\ | search\ | audit` | Sigma Store package manager |
 | `sdk <version>` | Cross-compiler toolchain manager |
 | `key [--algo] [--export]` | Identity & signing key management |
 | `update [--channel] [--dry-run]` | A/B OTA partition swap |
-| `profile list\|show\|set` | Build profiles (desktop/cloud/embedded/gaming) |
+| `profile list\ | show\ | set` | Build profiles (desktop/cloud/embedded/gaming) |
 
 ### Infrastructure
 
 | Command | Description |
-|---------|-------------|
-| `node enroll\|status\|upgrade\|logs` | Fleet/cluster node control |
-| `config validate\|show\|set` | sigma.toml management |
+| --------- | ------------- |
+| `node enroll\ | status\ | upgrade\ | logs` | Fleet/cluster node control |
+| `config validate\ | show\ | set` | sigma.toml management |
 | `doctor [--fix]` | Toolchain health check (detects real versions) |
 
 ### Meta
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `version` | Print version, build ID, Rust toolchain |
-| `completions bash\|zsh\|fish\|pwsh` | Generate shell completions |
+| `completions bash\ | zsh\ | fish\ | pwsh` | Generate shell completions |
 | `help [command]` | Detailed per-command help |
 
 ## PLUGIN SYSTEM
@@ -127,7 +128,7 @@ sigma doctor --json | jq '.[] | select(.status=="missing")'
 ## ENVIRONMENT VARIABLES
 
 | Variable | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | `SIGMA_BUILD_ID` | Injected at build time, shown by `version` |
 | `SIGMA_RUST_VERSION` | Rust toolchain version shown by `version` |
 

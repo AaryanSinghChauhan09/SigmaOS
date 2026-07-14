@@ -243,7 +243,7 @@ end Sigma.Crypto.Kyber;
 ### Pattern Inventory
 
 | Pattern | Where Used | Language |
-|---|---|---|
+| --- | --- | --- |
 | **Trait / Interface** | SdfDriver, FileSystem, AudioDevice, NicDevice, Widget, Benchmark | Rust |
 | **Builder** | FilterBuilder, Animation::with_*, AppEntry::with_* | Rust |
 | **State Machine** | TcpSocket, DhcpClient, WpaManager, NtpClient, QuicConn | Rust |
@@ -271,7 +271,7 @@ end Sigma.Crypto.Kyber;
 
 ### Rust
 
-```
+```text
 ✓ No naked unsafe blocks without justification comment
 ✓ Every public trait has a doc comment with contract
 ✓ No God structs > 500 lines — split into smaller types
@@ -284,7 +284,7 @@ end Sigma.Crypto.Kyber;
 
 ### Zig
 
-```
+```text
 ✓ Every struct has init() constructor
 ✓ No global mutable state outside AtomicXxx
 ✓ Comptime interfaces preferred over anytype where possible
@@ -293,7 +293,7 @@ end Sigma.Crypto.Kyber;
 
 ### Nim
 
-```
+```text
 ✓ Use ref object for heap types, object for value types
 ✓ method for virtual dispatch, proc for non-virtual
 ✓ No implicit globals — pass state explicitly
@@ -302,7 +302,7 @@ end Sigma.Crypto.Kyber;
 
 ### SPARK
 
-```
+```text
 ✓ All public subprograms have Pre + Post contracts
 ✓ SPARK_Mode => On for all crypto and memory subsystems
 ✓ gnatprove --level=2 passes with zero unproved VCs

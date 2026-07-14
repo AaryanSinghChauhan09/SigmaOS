@@ -8,7 +8,7 @@ SigmaOS uses [Mesa](https://mesa3d.org/) (MIT) as the userspace OpenGL and Vulka
 
 ## Architecture
 
-```
+```text
 App (OpenGL / Vulkan)
         │  libGL.so / libvulkan.so  (Mesa)
         ▼
@@ -23,7 +23,7 @@ App (OpenGL / Vulkan)
 
 ## File Layout
 
-```
+```text
 drivers/gpu/
 ├── sigma_virtio_gpu.rs   # virtio-gpu KMS driver stub
 
@@ -134,6 +134,7 @@ pub fn init_egl_renderer(gbm_device: &GbmDevice) -> GlesRenderer {
 # In sigma_qemu.yml:
 
 - name: Run QEMU with virtio-gpu
+
   run: |
     qemu-system-x86_64 \
       -machine q35,accel=tcg \
@@ -150,6 +151,8 @@ pub fn init_egl_renderer(gbm_device: &GbmDevice) -> GlesRenderer {
 
 - `glxinfo | grep "OpenGL version"` reports `OpenGL version string: 4.6 (Compatibility Profile) Mesa ...` in QEMU.
 
+
 - Zenith compositor renders a Wayland client window using GlesRenderer in CI.
+
 
 - `sigma-glmark2` benchmark runs without crashes on virtio-gpu.

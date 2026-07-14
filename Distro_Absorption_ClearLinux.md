@@ -17,7 +17,9 @@ SigmaOS absorbs Clear Linux's **hardware-specific build optimization** strategy 
 ### 2.1 Hardware-Optimized Build Profiles
 
 ```bash
+
 # Detect and build for native hardware capabilities
+
 $ sigma build --profile perf-intel
 Σ [BUILD] Detected: Intel Core Ultra 7 (Raptor Lake)
   Enabling: AVX-512, AMX, VAES, VPCLMULQDQ
@@ -25,7 +27,9 @@ $ sigma build --profile perf-intel
   Scheduler: Intel Thread Director aware
 
 # Output binary runs on ALL x86-64 but is maximally
+
 # fast on the builder hardware via multi-versioned dispatch
+
 ```
 
 ### 2.2 Stateless Package Bundles

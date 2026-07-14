@@ -19,18 +19,23 @@ SigmaOS absorbs elementary's **strict HIG enforcement for first-party apps** and
 Like elementary's HIG, Zenith Desktop enforces a strict, unified design language for all first-party applications. Applications are required to use the Zenith UI Toolkit, ensuring consistent padding, typography, dark mode support, and keyboard navigation.
 
 ```markdown
+
 # Zenith HIG Excerpt:
+
 - Every app MUST support a toggleable pure-black dark mode.
 - Custom window titlebars (Client-Side Decorations) are standard; the titlebar MUST contain primary navigation actions.
 - Minimum tap target size for touch/mouse is 44x44px.
+
 ```
 
 ### 2.2 Curated AppCenter
 
 The SigmaOS `sigma-appcenter` is a curated software boutique. Applications submitted to the AppCenter must:
+
 1. Be fully sandboxed using SigmaOS capabilities (no ambient filesystem access).
 2. Adhere to the Zenith HIG.
 3. Integrate with the Zenith Desktop (notifications, search).
+
 
 ### 2.3 Focus-First Notifications
 

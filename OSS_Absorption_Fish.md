@@ -1,4 +1,5 @@
 # SigmaOS Terminal Absorption - Fish Shell
+
 ## Making fish-shell/fish-shell Irrelevant
 
 > **Absorption Target**: https://github.com/fish-shell/fish-shell  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Fish Shell by implementing a native shell dir
 ## Absorbed Features & Capabilities
 
 ### 1. Syntax Highlighting
+
 **Original**: Fish's syntax highlighting  
 **SigmaOS**: Native syntax highlighting with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaShell {
 ```
 
 **Highlighting Features**:
+
 - Native syntax highlighting with GPU acceleration
 - Real-time highlighting with intelligent parsing
 - Theme support with live preview
@@ -36,11 +39,14 @@ pub struct SigmaShell {
 - Highlighting customization with type safety
 - Highlighting monitoring with real-time metrics
 
+
 ### 2. Autosuggestions
+
 **Original**: Fish's autosuggestions  
 **SigmaOS**: Native autosuggestions with enhanced features
 
 **Autosuggestion Features**:
+
 - Native autosuggestions with intelligent algorithms
 - History-based suggestions with automatic learning
 - Context-aware suggestions with ML enhancement
@@ -48,11 +54,14 @@ pub struct SigmaShell {
 - Suggestion customization with type safety
 - Suggestion monitoring with real-time metrics
 
+
 ### 3. Tab Completions
+
 **Original**: Fish's tab completion system  
 **SigmaOS**: Native completions with enhanced features
 
 **Completion Features**:
+
 - Native tab completions with intelligent algorithms
 - Command-specific completions with automatic generation
 - Context-aware completions with ML enhancement
@@ -60,11 +69,14 @@ pub struct SigmaShell {
 - Completion customization with type safety
 - Completion monitoring with real-time metrics
 
+
 ### 4. History System
+
 **Original**: Fish's history system  
 **SigmaOS**: Native history with enhanced features
 
 **History Features**:
+
 - Native history management with intelligent search
 - History synchronization across devices
 - History persistence with automatic backup
@@ -72,11 +84,14 @@ pub struct SigmaShell {
 - History validation with automatic checking
 - History monitoring with real-time metrics
 
+
 ### 5. Scripting Language
+
 **Original**: Fish's scripting language  
 **SigmaOS**: Native scripting with enhanced features
 
 **Scripting Features**:
+
 - Native scripting language with type safety
 - Fish-compatible syntax with automatic conversion
 - Script validation with automatic checking
@@ -84,11 +99,14 @@ pub struct SigmaShell {
 - Script debugging with native tools
 - Script security with capability-based access
 
+
 ### 6. Web-Based Configuration
+
 **Original**: Fish's web-based configuration  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
+
 - Native configuration with type safety
 - Real-time configuration reload
 - Configuration validation with automatic checking
@@ -96,12 +114,13 @@ pub struct SigmaShell {
 - Configuration inheritance with composition
 - Configuration monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Fish Shell | SigmaOS | Advantage |
-|---------|-----------|---------|------------|
+| --------- | ----------- | --------- | ------------ |
 | Shell Performance | C++ overhead | Native Rust | ✅ 3-5x |
 | Syntax Highlighting | Software rendering | GPU-accelerated | ✅ 5x |
 | Autosuggestions | Basic algorithms | ML-enhanced | ✅ 3x |
@@ -116,6 +135,7 @@ pub struct SigmaShell {
 ## Implementation Details
 
 ### Native Syntax Highlighter
+
 ```rust
 pub mod syntax {
     use sigma_shell::syntax::SyntaxHighlighter;
@@ -139,6 +159,7 @@ pub mod syntax {
 ```
 
 ### Native Autosuggester
+
 ```rust
 pub mod autosuggest {
     pub struct Autosuggester {
@@ -166,26 +187,36 @@ pub mod autosuggest {
 ### For Users of Fish Shell
 
 **Before** (using Fish):
+
 ```bash
+
 # Install Fish
+
 sudo apt install fish
 
 # Set as default shell
+
 chsh -s /usr/bin/fish
 
 # Configure Fish
+
 ~/.config/fish/config.fish
 ```
 
 **After** (using SigmaShell):
+
 ```bash
+
 # Enable shell shard (native)
+
 sigma-shard enable shell
 
 # Use Fish-compatible mode
+
 sigma-shell mode --fish
 
 # Configure shell
+
 sigma-shell config
 ```
 
@@ -194,7 +225,7 @@ sigma-shell config
 ## Performance Benchmarks
 
 | Operation | Fish Shell | SigmaShell | Improvement |
-|-----------|-----------|------------|-------------|
+| ----------- | ----------- | ------------ | ------------- |
 | Shell Startup | 50ms | 15ms | 3.3x faster |
 | Syntax Highlight | 5ms | 1ms | 5x faster |
 | Autosuggestion | 10ms | 3ms | 3.3x faster |

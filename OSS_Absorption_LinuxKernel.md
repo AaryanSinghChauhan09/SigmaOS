@@ -18,7 +18,7 @@ SigmaOS absorbs each of these as native implementations in Rust, targeting super
 
 Linux replaced the aging CFS scheduler with EEVDF (Earliest Eligible Virtual Deadline First) in kernel 6.6. SigmaOS's `S-SCHED` implements EEVDF natively, giving priority to latency-sensitive workloads like audio and UI while maintaining throughput.
 
-```
+```text
 Process eligible if: eligible_time <= current_vruntime
 Schedule: process with smallest virtual deadline among eligible tasks
 Result:   audio/UI tasks preempt CPU-bound tasks consistently
@@ -40,8 +40,10 @@ ring.submit_and_wait([read_op, write_op]).await?;
 ### 2.3 Memory Management — PFRA & Huge Pages
 
 Linux's Page Frame Reclaim Algorithm (PFRA) and Transparent Huge Pages (THP) are absorbed into SigmaOS's memory manager as:
+
 - **sigma-pfra**: LRU-based page reclaim with proactive swapping.
 - **sigma-thp**: Automatic 2MB huge page promotion for large anonymous mappings.
+
 
 ---
 

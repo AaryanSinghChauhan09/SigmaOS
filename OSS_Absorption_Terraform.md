@@ -17,7 +17,9 @@ SigmaOS absorbs the **plan-then-apply declarative workflow** and **state file mo
 ### 2.1 Plan/Apply for System Configuration
 
 ```hcl
+
 # /etc/sigma/provision.hcl
+
 resource "sigma_user" "dev" {
   name   = "developer"
   groups = ["sudo", "network"]
@@ -36,9 +38,11 @@ resource "sigma_service" "sshd" {
 ```bash
 $ sigma provision plan
 Σ [PROVISION] Changes to apply:
+
   + Create user 'developer' (groups: sudo, network)
   + Install 4 packages
   + Enable sshd service
+
 
 $ sigma provision apply
 Σ [PROVISION] Applied. System state saved.

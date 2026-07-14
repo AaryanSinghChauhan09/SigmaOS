@@ -8,7 +8,7 @@ This page documents the technical capabilities of SigmaOS that are genuinely uni
 
 Every Linux distro runs AI as a userspace application (Python, Node.js). SigmaOS runs inference directly in the kernel scheduling path.
 
-```
+```text
 Traditional Linux approach:
   App → libtorch → CUDA userspace → GPU driver → inference result
   Latency: 5–50ms per inference call
@@ -22,9 +22,12 @@ SigmaOS approach:
 
 - Scheduler uses AI to predict which process needs CPU next (ML-based MLFQ boost)
 
+
 - sigma-ids runs inference in interrupt context to catch anomalies at nanosecond latency
 
+
 - sigma-heal diagnoses kernel panics during recovery kernel boot before userspace loads
+
 
 **Why no Linux distro has this:** Linux's kernel/userspace boundary is sacred. Adding an inference engine to the kernel is architecturally controversial. SigmaOS's microkernel-inspired design makes it natural.
 
@@ -70,7 +73,7 @@ sigma-sec did professional-credential add --body ICAI --licence 123456
 
 Every Linux distro uses RSA/ECDSA/ECDH — all broken by quantum computers. SigmaOS uses NIST PQC algorithms everywhere by default, not as an add-on.
 
-```
+```text
 Linux (Ubuntu 24.04):
   SSH:          RSA-4096 or Ed25519 (quantum-vulnerable)
   TLS:          X25519 + AES-GCM (quantum-vulnerable key exchange)
@@ -122,11 +125,15 @@ sigma-query "all GST invoices over ₹1 lakh this quarter"
 
 - SemanticFS xattrs store `SIGMA:CLASS`, `SIGMA:TOPIC`, `SIGMA:DATE`, `SIGMA:PERSON`
 
+
 - sigma-ai assigns these xattrs on file create/modify (local inference, no cloud)
+
 
 - sigmad/indexd maintains O(log n) query index
 
+
 - Every sigma-* app writes structured metadata when creating files
+
 
 **Why no Linux distro has this:** ext4/btrfs/ZFS are path-based by design. Adding semantic indexing at filesystem level requires either a new filesystem (SemanticFS) or a mandatory xattr indexing daemon (sigmad/indexd). Linux has no equivalent — GNOME Tracker/Baloo are userspace hacks that break constantly.
 
@@ -377,7 +384,7 @@ sigma-sec landlock show --app sigma-accounts
 ## Performance Targets vs Best Linux Distros
 
 | Benchmark | Pop!_OS 22 | Arch (minimal) | Ubuntu 24.04 | SigmaOS Target |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Boot time (NVMe SSD) | 12s | 5s | 43s | **< 2s** |
 | Idle RAM (desktop) | 650 MB | 280 MB | 847 MB | **< 150 MB** |
 | App launch (cold) | 1.2s | 0.8s | 1.5s | **< 0.5s** |
@@ -391,7 +398,7 @@ sigma-sec landlock show --app sigma-accounts
 
 ## Security Depth Comparison
 
-```
+```text
 Ubuntu 24.04 default security stack:
   DAC (Unix permissions) ✓
   sudo (password escalation) ✓

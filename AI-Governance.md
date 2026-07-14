@@ -9,7 +9,7 @@ SigmaOS introduces the **AI-Native Governance Layer**, a completely unique orche
 SigmaOS executes tasks via short, sovereign commands. This grammar is optimized for AI-native execution without external dependencies.
 
 | Command | Purpose | Example |
-|---------|---------|---------|
+| --------- | --------- | --------- |
 | `agent.start` | Boot an autonomous agent | `agent.start` |
 | `agent.quota` | Assign resource quotas | `agent.quota set=GPU:80%` |
 | `agent.task` | Execute a kernel build or task | `agent.task run=compile_kernel` |
@@ -57,6 +57,7 @@ The `/agents/orchestration/CommandInterpreter.cpp` parses sovereign commands and
 3. **Executor**: Invokes the corresponding agent routine
 4. **Recovery**: Fallback to `/recovery/` hooks if execution fails
 
+
 ---
 
 ## Resource Allocation Strategy
@@ -88,6 +89,7 @@ public:
 - **I/O-Intensive**: Database operations, file transfers
 - **Memory-Intensive**: Large dataset processing, caching
 
+
 ---
 
 ## Governance Rules
@@ -113,12 +115,14 @@ public:
 - **Maximum Memory**: 80% of total RAM (20% reserved)
 - **Maximum Tensor Cores**: 100% per agent
 
+
 ### Priority Levels
 
 1. **Critical**: System services, security operations
 2. **High**: User-interactive applications
 3. **Medium**: Background tasks, batch processing
 4. **Low**: Maintenance, indexing, cleanup
+
 
 ---
 
@@ -130,6 +134,7 @@ The `agent.sync` command triggers an emergency synchronization:
 2. **Quota Rebalance**: Redistribute resources based on priority
 3. **Agent Migration**: Move agents to optimal compute nodes
 4. **Recovery**: Restore from last known good state if needed
+
 
 ---
 
@@ -151,6 +156,7 @@ agent.container stop=nginx
 - **Resource-Isolated**: Per-container quota enforcement
 - **Secure**: PQC-encrypted communication
 
+
 ---
 
 ## Gaming Stack Integration
@@ -170,6 +176,7 @@ agent.gaming optimize-latency
 - **Low-Latency Mode**: Sub-millisecond input processing
 - **Adaptive Quality**: Dynamic resolution scaling
 - **Resource Prioritization**: Gaming gets highest GPU priority
+
 
 ---
 
@@ -195,6 +202,7 @@ struct AgentHealth {
 - **Task Throughput**: Tasks completed per second
 - **Latency**: Average task completion time
 
+
 ---
 
 ## Security Considerations
@@ -207,6 +215,7 @@ Every agent command is verified against:
 - **Resource Availability**: Sufficient resources must be available
 - **Priority Rules**: Agent must respect priority hierarchy
 - **Quota Limits**: Agent must not exceed assigned quotas
+
 
 ### Audit Logging
 
@@ -234,12 +243,14 @@ All agent commands are logged:
 - Cross-node workload balancing
 - Fault-tolerant agent execution
 
+
 ### AI-Enhanced Governance
 
 - Predictive resource allocation
 - Automated quota optimization
 - Anomaly detection and mitigation
 - Self-healing agent recovery
+
 
 ---
 

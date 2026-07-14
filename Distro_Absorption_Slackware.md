@@ -19,7 +19,9 @@ While SigmaOS is highly modern, it absorbs Slackware's **Keep It Simple, Stupid 
 Before transitioning to the parallel `sigma-init` supervisor, early boot relies on simple, strictly sequential shell scripts that are easy to read and modify, inspired by Slackware's BSD-style `rc.d` scripts.
 
 ```bash
+
 # /etc/sigma/rc.S (System Initialization)
+
 echo "Mounting virtual filesystems..."
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys

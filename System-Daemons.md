@@ -7,7 +7,7 @@ SigmaOS system daemons run as capability-restricted userspace processes.
 ## Daemon Overview
 
 | Daemon | Language | Purpose | Status |
-|--------|----------|---------|--------|
+| -------- | ---------- | --------- | -------- |
 | `sigmad-health` | Go | System health monitoring | ✅ |
 | `sigmad-netd` | Go | Network configuration (DHCP, DNS) | ✅ |
 | `sigmad-vault` | Go | Secret management, TPM2 integration | ✅ |
@@ -23,7 +23,7 @@ SigmaOS system daemons run as capability-restricted userspace processes.
 
 All daemons communicate with the kernel via sigma-bus IPC channels:
 
-```
+```text
 Daemon           sigma-bus channel         Kernel
 sigmad-netd   ←→  IPC_CH_NET_RX (0x20)  ←→ NIC driver
 sigmad-health ←   IPC_CH_HOTPLUG (0x10) ←  Hotplug manager
@@ -61,11 +61,15 @@ Monitors:
 
 - CPU usage, memory pressure, disk I/O
 
+
 - Process liveness (restart failed processes)
+
 
 - Network connectivity
 
+
 - sigma-bus channel saturation
+
 
 ```bash
 
@@ -128,7 +132,7 @@ cgroup  = "services"
 
 ## Startup Order
 
-```
+```text
 sigma_kernel_main()
   └─ process_manager_init()      # PID 0 (idle), PID 1 (init)
 

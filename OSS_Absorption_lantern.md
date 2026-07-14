@@ -1,4 +1,5 @@
 # SigmaOS Database Absorption - Lantern
+
 ## Making lanterndata/lantern Irrelevant
 
 > **Absorption Target**: https://github.com/lanterndata/lantern  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Lantern by implementing a native vector datab
 ## Absorbed Features & Capabilities
 
 ### 1. Vector Storage
+
 **Original**: Lantern's vector storage system  
 **SigmaOS**: Native vector storage with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaDB {
 ```
 
 **Storage Features**:
+
 - Native vector storage with OS-level optimization
 - GPU-accelerated vector operations with hardware support
 - Automatic indexing with intelligent algorithms
@@ -36,11 +39,14 @@ pub struct SigmaDB {
 - Storage validation with automatic checking
 - Storage monitoring with real-time metrics
 
+
 ### 2. Indexing System
+
 **Original**: Lantern's indexing (HNSW, IVF)  
 **SigmaOS**: Native indexing with enhanced features
 
 **Indexing Features**:
+
 - Native indexing with GPU acceleration
 - HNSW and IVF with automatic selection
 - Index optimization with intelligent tuning
@@ -48,11 +54,14 @@ pub struct SigmaDB {
 - Index validation with automatic checking
 - Index monitoring with real-time metrics
 
+
 ### 3. Similarity Search
+
 **Original**: Lantern's similarity search  
 **SigmaOS**: Native similarity with enhanced features
 
 **Similarity Features**:
+
 - Native similarity search with GPU acceleration
 - Multiple distance metrics with automatic selection
 - Approximate search with intelligent algorithms
@@ -60,11 +69,14 @@ pub struct SigmaDB {
 - Similarity validation with automatic checking
 - Similarity monitoring with real-time metrics
 
+
 ### 4. PostgreSQL Integration
+
 **Original**: Lantern's PostgreSQL extension  
 **SigmaOS**: Native integration with enhanced features
 
 **Integration Features**:
+
 - Native PostgreSQL integration with OS-level optimization
 - Seamless vector operations with automatic translation
 - Hybrid queries with intelligent optimization
@@ -72,11 +84,14 @@ pub struct SigmaDB {
 - Integration validation with automatic checking
 - Integration monitoring with real-time metrics
 
+
 ### 5. Vector Operations
+
 **Original**: Lantern's vector operations  
 **SigmaOS**: Native operations with enhanced features
 
 **Operation Features**:
+
 - Native vector operations with GPU acceleration
 - Vector arithmetic with hardware support
 - Batch operations with automatic optimization
@@ -84,11 +99,14 @@ pub struct SigmaDB {
 - Operation validation with automatic checking
 - Operation monitoring with real-time metrics
 
+
 ### 6. Scaling System
+
 **Original**: Lantern's scaling capabilities  
 **SigmaOS**: Native scaling with enhanced features
 
 **Scaling Features**:
+
 - Native scaling with OS-level optimization
 - Automatic sharding with intelligent distribution
 - Load balancing with real-time monitoring
@@ -96,12 +114,13 @@ pub struct SigmaDB {
 - Scaling validation with automatic checking
 - Scaling monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Lantern | SigmaOS | Advantage |
-|---------|---------|---------|------------|
+| --------- | --------- | --------- | ------------ |
 | Vector Storage Performance | CPU-bound | GPU-accelerated | ✅ 10-100x |
 | Indexing Performance | CPU-bound | GPU-accelerated | ✅ 10-50x |
 | Similarity Search Performance | CPU-bound | GPU-accelerated | ✅ 10-100x |
@@ -116,6 +135,7 @@ pub struct SigmaDB {
 ## Implementation Details
 
 ### Native Vector Store
+
 ```rust
 pub mod vector {
     use sigma_db::vector::VectorStore;
@@ -139,6 +159,7 @@ pub mod vector {
 ```
 
 ### Native Similarity Engine
+
 ```rust
 pub mod similarity {
     pub struct SimilarityEngine {
@@ -165,6 +186,7 @@ pub mod similarity {
 ### For Users of Lantern
 
 **Before** (using Lantern):
+
 ```sql
 -- Install Lantern extension
 CREATE EXTENSION lantern;
@@ -180,17 +202,23 @@ SELECT * FROM items ORDER BY embedding <-> query LIMIT 10;
 ```
 
 **After** (using SigmaDB):
+
 ```bash
+
 # Enable database shard (native)
+
 sigma-shard enable database
 
 # Use native vector store
+
 sigma-db vector --create --dimension 768
 
 # Store vector
+
 sigma-db vector --store --data vector.data
 
 # Search vectors
+
 sigma-db vector --search --query query.data --k 10
 ```
 
@@ -199,7 +227,7 @@ sigma-db vector --search --query query.data --k 10
 ## Performance Benchmarks
 
 | Operation | Lantern | SigmaDB | Improvement |
-|-----------|---------|---------|-------------|
+| ----------- | --------- | --------- | ------------- |
 | Vector Insert (1M vectors) | 10s | 1s | 10x faster |
 | Index Build (1M vectors) | 30s | 3s | 10x faster |
 | Similarity Search (1M vectors) | 100ms | 5ms | 20x faster |

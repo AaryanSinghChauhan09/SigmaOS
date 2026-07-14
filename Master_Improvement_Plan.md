@@ -8,7 +8,7 @@
 ## Executive Summary
 
 | Area | Current State | Target (v1.0) | Target (v2.0) |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Design System | ✅ Defined | Implemented in all widgets | Live theming |
 | Applications | 0 installable | 8 Tier-1 apps | 20+ apps |
 | UI/UX | ✅ Core engine | Full widget set + animation | Wayland compat |
@@ -81,9 +81,12 @@ impl IconAtlas {
 
 - Phase 1: 8×16 VGA bitmap font (already in sigma_vesa.zig)
 
+
 - Phase 2: PSF (PC Screen Font) loader for richer glyphs
 
+
 - Phase 3: TrueType outline rasterizer (Bézier curve renderer)
+
 
 ```rust
 pub trait FontEngine {
@@ -110,13 +113,18 @@ pub trait Themed {
 
 - [ ] All interactive elements have hover + active + focus states
 
+
 - [ ] All text meets 4.5:1 contrast (auto-verified by `sigma-a11y-check`)
+
 
 - [ ] Consistent 8px grid for all spacing
 
+
 - [ ] Icons at 16/20/24/32px only (no non-standard sizes)
 
+
 - [ ] Animations respect `reduce_motion` system preference
+
 
 ---
 
@@ -126,7 +134,7 @@ pub trait Themed {
 
 #### sigma-terminal
 
-```
+```text
 File:   userland/apps/sigma_terminal.rs
 Lang:   Rust
 Engine: VTE grid + PTY + sigma-renderer
@@ -137,17 +145,22 @@ Key implementation tasks:
 
 1. `TermGrid`: 2D array of `Cell { char, fg, bg, attrs }`
 
+
 2. `PtyFork`: fork sigma-sh with PTY master/slave
+
 
 3. `VtParser`: ANSI/VT100/VT220 escape sequence parser
 
+
 4. `TermRenderer`: render grid to sigma_renderer DrawCmds
+
 
 5. `InputBridge`: route keyboard events → PTY write
 
+
 #### sigma-files
 
-```
+```text
 File:   userland/apps/sigma_files.rs
 Lang:   Rust
 Engine: sigma VFS API + sigma-renderer
@@ -158,17 +171,22 @@ Key tasks:
 
 1. `DirectoryModel`: async dir read + sort/filter
 
+
 2. `ListView`: virtual scrolling (only render visible rows)
+
 
 3. `PreviewPanel`: file type detection → preview renderer
 
+
 4. `OperationQueue`: copy/move/delete as cancellable async ops
+
 
 5. `BookmarkStore`: persistent bookmarks via sigma-vault
 
+
 #### sigma-edit
 
-```
+```text
 File:   userland/apps/sigma_edit.rs
 Lang:   Rust
 Engine: Piece-tree buffer + incremental highlight
@@ -179,21 +197,27 @@ Key tasks:
 
 1. `PieceTree`: O(1) insert/delete, O(log n) line query
 
+
 2. `SyntaxHighlighter`: regex-based tokeniser per language
+
 
 3. `CursorManager`: multiple cursors with selection regions
 
+
 4. `LspClient`: Language Server Protocol over sigma-bus IPC
+
 
 5. `GutterRenderer`: line numbers + git diff + breakpoints
 
+
 ### 2.2 App Framework (shared infrastructure)
 
-```
+```text
 File: userland/apps/sigma_app_framework.rs
 ```
 
 Every app uses:
+
 ```rust
 pub trait SigmaApp: Send {
     type Model: Clone + Default;
@@ -220,7 +244,7 @@ pub trait SigmaApp: Send {
 ### 3.1 Missing Widgets (priority order)
 
 | Widget | File | ETA |
-|---|---|---|
+| --- | --- | --- |
 | `Toggle` | sigma_widgets.rs | v0.1 |
 | `Slider` | sigma_widgets.rs | v0.1 |
 | `ListView` | sigma_widgets.rs | v0.1 |
@@ -237,7 +261,7 @@ pub trait SigmaApp: Send {
 ### 3.2 UX Flows to Implement
 
 | Flow | File | Priority |
-|---|---|---|
+| --- | --- | --- |
 | First-boot onboarding wizard | `userland/installer/sigma_onboarding.rs` | 🔴 |
 | App permissions prompt | `userland/desktop/sigma_permission_dialog.rs` | 🔴 |
 | Quick Settings panel (swipe down) | `userland/desktop/sigma_quick_settings.rs` | 🟠 |
@@ -250,7 +274,7 @@ pub trait SigmaApp: Send {
 ### 3.3 Accessibility Gaps
 
 | Gap | Action | File |
-|---|---|---|
+| --- | --- | --- |
 | TTS audio output | Integrate espeak-ng-style synthesizer | `userland/accessibility/sigma_tts.rs` |
 | Keyboard-only navigation | Focus order + ARIA roles on all widgets | sigma_widgets.rs |
 | Screen magnifier | Pixel-doubled overlay compositing | `userland/desktop/sigma_magnifier.rs` |
@@ -259,7 +283,7 @@ pub trait SigmaApp: Send {
 
 ### 3.4 Mobile/Adaptive UI
 
-```
+```text
 Breakpoints:
   < 480px  → phone layout (bottom nav, full-screen apps)
   480-1024px → tablet layout (split-view, floating panels)
@@ -269,9 +293,12 @@ Required:
 
 - BottomNavigationBar widget
 
+
 - SplitView container
 
+
 - AdaptiveLayout wrapper that switches based on screen size
+
 ```
 
 ---
@@ -280,13 +307,15 @@ Required:
 
 ### 4.1 Frame Rate Optimisation
 
-```
+```text
 Current bottleneck: Software fill_rect = O(W×H) pixels per frame
 Solution path:
+
   1. Damage tracking (only repaint changed regions)       ← IMPLEMENT NOW
   2. Layer caching (cache static layers as bitmaps)       ← v0.1
   3. GPU compositing via VirtIO-GPU + Mesa Vulkan          ← v1.0
   4. Hardware KMS direct scanout (no compositor copy)      ← v1.5
+
 ```
 
 **Immediate action — damage tracking**:
@@ -311,25 +340,30 @@ impl DamageTracker {
 
 ### 4.2 Memory Optimisation Plan
 
-```
+```text
 Target: < 256MB idle desktop RAM
 
 Actions:
 
 1. Lazy daemon startup: only start sigmad-metrics when first queried
 
+
 2. Shard compression: compress loaded shards > 1MB with zstd
+
 
 3. Arena allocator for widget trees (free all at once on screen change)
 
+
 4. String interning for frequently repeated strings (paths, app names)
 
+
 5. Shared read-only pages between processes (same code pages)
+
 ```
 
 ### 4.3 Boot Time Optimisation
 
-```
+```text
 Phase 1 (sigma-boot.zig):
   ├─ Read kernel + initramfs in parallel DMA transfers
   └─ Set GOP framebuffer before jumping to kernel (splash screen)
@@ -434,7 +468,7 @@ impl<S: Clone, A> Store<S, A> {
 ### 6.1 Near-term Capabilities
 
 | Capability | Status | Action |
-|---|---|---|
+| --- | --- | --- |
 | Bootable ISO | ⬜ | kernel scheduler + MM + VFS + shell |
 | sigma-pkg online | ⬜ | Set up pkg.sigmaos.app registry |
 | Wi-Fi connection UI | ⬜ | sigma-netctl GUI in settings |
@@ -444,7 +478,7 @@ impl<S: Clone, A> Store<S, A> {
 ### 6.2 Platform Capabilities Matrix
 
 | Feature | Desktop | Mobile | Cloud | RTOS | Browser |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Zenith DE | ✅ | Adaptive | ⬜ | — | ✅ WASM |
 | sigma-pkg | ✅ | ✅ | ✅ | Minimal | ✅ |
 | TLS 1.3+Kyber | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -460,51 +494,71 @@ impl<S: Clone, A> Store<S, A> {
 
 - [ ] Design tokens → `sigma_design_tokens.rs`
 
+
 - [ ] Damage tracking in compositor
+
 
 - [ ] Toggle + Slider + ListView widgets
 
+
 - [ ] sigma-terminal MVP (PTY + VTE + basic ANSI)
+
 
 ### Sprint 2 (Month 2–3): Usability
 
 - [ ] Onboarding wizard (5 steps)
 
+
 - [ ] Quick Settings panel
+
 
 - [ ] Font rendering (PSF bitmap)
 
+
 - [ ] App Switcher (Super key)
+
 
 ### Sprint 3 (Month 3–4): Apps
 
 - [ ] sigma-files MVP (browse + basic ops)
 
+
 - [ ] sigma-edit MVP (open/edit/save)
+
 
 - [ ] sigma-calc complete
 
+
 - [ ] sigma-screenshot
+
 
 ### Sprint 4 (Month 4–6): Performance
 
 - [ ] GPU compositing via VirtIO-GPU
 
+
 - [ ] Boot time < 2.5s on QEMU
+
 
 - [ ] sigma-pkg online registry live
 
+
 - [ ] sigma-bench CI gates
+
 
 ### Sprint 5 (Month 6–9): Polish
 
 - [ ] Accessibility TTS
 
+
 - [ ] Mobile adaptive layouts
+
 
 - [ ] ARM64 RPi4 boot
 
+
 - [ ] First public alpha release
+
 
 ---
 
@@ -523,7 +577,7 @@ sigma-loc-count  # lines of code by language
 ### Quality gates (no PR merges without passing)
 
 | Gate | Threshold |
-|---|---|
+| --- | --- |
 | Test coverage | ≥ 80% for kernel subsystems |
 | OOP trait documentation | 100% of public traits |
 | Performance regression | < 10% vs baseline |

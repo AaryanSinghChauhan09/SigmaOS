@@ -10,11 +10,15 @@ The Retail Worker Profile is designed for service excellence, customer service, 
 
 - **SigmaService**: Customer service and support management.
 
+
 - **SigmaTask**: Task assignment and completion tracking.
+
 
 - **SigmaTraining**: Product knowledge and training modules.
 
+
 - **Schedule**: Shift scheduling and time management.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Retail Worker Profile is designed for service excellence, customer service, 
 
 - **Theme**: Service Green (Retail Standard)
 
+
 - **Layout**: Service Dashboard (Service, Task, Schedule)
 
+
 - **Personalization**: Custom task lists and priority settings.
+
 
 ---
 

@@ -10,7 +10,7 @@ The wiki is the primary knowledge base for SigmaOS — covering architecture, fe
 
 The wiki is managed as a separate Git repository:
 
-```
+```text
 https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git
 ```
 
@@ -32,6 +32,7 @@ cd SigmaOS.wiki
 Wiki pages are Markdown files at the root of the wiki repository. The filename becomes the URL slug:
 
 - `Architecture-Overview.md` → `https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview`
+
 
 ### 3. Commit and push
 
@@ -62,6 +63,7 @@ git push origin master
 - Use `<!-- slide -->` comments only in carousel blocks
 - No HTML-only markup; use Markdown equivalents
 
+
 ---
 
 ## Syncing from `wiki_repo/`
@@ -69,7 +71,9 @@ git push origin master
 Pages in `wiki_repo/` inside the main repository are kept in sync with the live wiki:
 
 ```powershell
+
 # Push wiki_repo changes to GitHub Wiki
+
 git -C wiki_repo add .
 git -C wiki_repo commit -m "wiki: update pages"
 git -C wiki_repo push origin master
@@ -84,6 +88,7 @@ git -C wiki_repo push origin master
 - Write how-to guides for common tasks
 - Add distro absorption analysis pages for new projects
 - Improve roadmap pages with concrete timelines
+
 
 ---
 

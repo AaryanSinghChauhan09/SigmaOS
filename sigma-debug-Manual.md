@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-debug <command> [options]
 sigma-debug --version
 sigma-debug --help
@@ -102,7 +102,7 @@ Interactive debug REPL — simulates a session connected to `sigma-debugd`.
 ## OPTIONS
 
 | Flag | Description |
-|------|-------------|
+| ------ | ------------- |
 | `--pid <n>` | Target process ID |
 | `--addr <hex>` | Memory address (e.g. `0xffff000000001000`) |
 | `--len <n>` | Bytes to read/dump (default: 64) |

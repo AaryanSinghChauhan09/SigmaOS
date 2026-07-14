@@ -78,8 +78,11 @@ If SigmaOS fails to boot:
 
 1. Boot from SigmaOS Live USB
 
+
 2. Run `sovereign-recover --detect-partitions`
 
+
 3. Re-install GRUB: `sovereign-bootctl install --target=/dev/sdX`
+
 
 4. Verify: `sovereign-bootctl verify`

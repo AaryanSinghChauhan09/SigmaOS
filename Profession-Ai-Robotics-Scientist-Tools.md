@@ -10,11 +10,15 @@ The AI Robotics Scientist Profile is designed for robotics excellence, autonomou
 
 - **SigmaRobot**: Robot development and simulation platform.
 
+
 - **SigmaAutonomy**: Autonomous system design and testing.
+
 
 - **SigmaVision**: Computer vision and perception systems.
 
+
 - **SigmaControl**: Motion planning and control algorithms.
+
 
 ---
 
@@ -22,9 +26,12 @@ The AI Robotics Scientist Profile is designed for robotics excellence, autonomou
 
 - **Theme**: Robotics Orange (Research Standard)
 
+
 - **Layout**: Robotics Dashboard (Robot, Autonomy, Vision)
 
+
 - **Personalization**: Custom simulation environments and automated testing.
+
 
 ---
 

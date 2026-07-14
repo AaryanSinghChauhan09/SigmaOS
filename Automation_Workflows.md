@@ -8,7 +8,7 @@ Learn how to configure multi-step execution graphs in SigmaOS without human inte
 
 Workflows are modeled as Directed Acyclic Graphs (DAGs) in `sigma_logic.rs`.
 
-```
+```text
 [System Trigger / Metric Alert]
               │
               ▼
@@ -25,7 +25,9 @@ Workflows are modeled as Directed Acyclic Graphs (DAGs) in `sigma_logic.rs`.
 ```
 
 ## ⚙️ Example: Dev Environment Setup
+
 To setup a new development workspace, the agent automatically executes:
+
 1. `sigpkg install gcc git rust`
 2. `git clone <repository>`
 3. Set workspace environment variables

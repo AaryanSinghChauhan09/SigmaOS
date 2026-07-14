@@ -8,9 +8,11 @@ Provides a zero-dependency, bare-metal C runtime library (libc equivalent) for t
   - `sigma_memcpy`: Silicon-optimized memory copy.
   - `sigma_memset`: Quick block memory filling.
 
+
 - **String Formatting & I/O**:
   - `sigma_printf`: Standard string formatter printing to COM1 serial interface.
   - `sigma_strlen`, `sigma_strcmp`, `sigma_strncpy`: Classic string manipulators.
+
 
 - **Utility & Integrity**:
   - `sigma_atoi`: Basic numeric string converter.

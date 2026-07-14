@@ -9,17 +9,19 @@
 **Sigma Nebula** is the cloud-native orchestration layer for SigmaOS. It enables SigmaOS nodes to operate as a sovereign cloud platform — without dependence on Kubernetes, Docker, or AWS-proprietary control planes.
 
 The system provides:
+
 - **Sovereign Container Runtime**: Not dependent on OCI/containerd internals
 - **Distributed Scheduling**: Multi-node workload orchestration
 - **Service Mesh**: Zero-trust inter-service networking
 - **Policy-as-Code**: GitOps-based deployment pipeline
 - **Observability**: Native OpenTelemetry integration
 
+
 ---
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                   Management Plane                       │
 │   sigma-ctl CLI │ Web Dashboard │ GitOps Controller     │
@@ -52,8 +54,11 @@ The node agent runs on every SigmaOS node and is responsible for:
 - Enforcing network policies via eBPF
 - Health checking and self-healing
 
+
 ```toml
+
 # /etc/sigma-nebula/node.toml
+
 [node]
 name = "worker-01"
 control_plane = "https://sigma-ctl.cluster.local:6443"
@@ -79,6 +84,7 @@ Multi-resource aware bin-packing scheduler with:
 - **Scheduling policies**: BestFit, MostPacked, Spread, AntiAffinity
 - **Priority classes**: Critical (preemptible targets), High, Normal, Low, BestEffort
 - **Gang scheduling**: Atomic placement for distributed ML training jobs
+
 
 ```rust
 pub struct SchedulingRequest {
@@ -117,7 +123,7 @@ pub trait ContainerRuntime {
 Isolation stack per container:
 
 | Layer | Mechanism |
-|-------|-----------|
+| ------- | ----------- |
 | Process isolation | Linux namespaces (pid, mount, net, ipc, uts) |
 | Resource limits | cgroup v2 (sigma-cgroups) |
 | Network isolation | sigma-cni (eBPF-based) |
@@ -128,20 +134,24 @@ Isolation stack per container:
 ### 4. sigma-cni (Container Network Interface)
 
 eBPF-based networking with:
+
 - L3 routing without iptables overhead
 - **Latency**: < 10 µs pod-to-pod on same node
 - **Throughput**: Line rate (10/25/100 GbE)
 - Network policies enforced in kernel eBPF (zero-copy path)
 - Service discovery via internal DNS (sigma-dns)
 
+
 ### 5. sigma-proxy (Service Mesh)
 
 Zero-trust service mesh with:
+
 - Automatic mTLS between all services
 - Circuit breaking and retries
 - Traffic splitting (canary, A/B)
 - Rate limiting per service
 - Distributed tracing (sigma-trace → OpenTelemetry)
+
 
 ---
 
@@ -150,7 +160,9 @@ Zero-trust service mesh with:
 SigmaOS uses TOML-based workload manifests (not YAML):
 
 ```toml
+
 # workload.toml
+
 [metadata]
 name = "web-frontend"
 namespace = "production"
@@ -188,7 +200,7 @@ cpu_target_percent = 70
 
 ## GitOps Pipeline
 
-```
+```text
 Developer pushes → GitHub → sigma-gitops-controller detects change
                                      │
                             Validates manifest against schema
@@ -210,7 +222,7 @@ Developer pushes → GitHub → sigma-gitops-controller detects change
 
 ## Multi-Region Architecture
 
-```
+```text
 Region A (Primary)            Region B (Secondary)
 ┌─────────────────────┐      ┌─────────────────────┐
 │ Control Plane       │◄────►│ Control Plane        │
@@ -231,7 +243,7 @@ Global routing: Anycast DNS with health-aware failover (< 30 s RTO).
 ## Observability Stack
 
 | Component | Technology | Endpoint |
-|-----------|-----------|---------|
+| ----------- | ----------- | --------- |
 | Metrics | OpenTelemetry → sigma-prometheus | `/sigma/metrics` |
 | Traces | sigma-trace (distributed) | Jaeger-compatible |
 | Logs | sigma-log (structured JSON) | Loki-compatible |
@@ -243,7 +255,7 @@ Global routing: Anycast DNS with health-aware failover (< 30 s RTO).
 ## Pricing Model (Foundation-operated Cloud)
 
 | Tier | Resources | Monthly Price |
-|------|-----------|-------------|
+| ------ | ----------- | ------------- |
 | Dev | 2 CPU / 4 GB RAM / 20 GB | Free |
 | Standard | 8 CPU / 16 GB RAM / 100 GB | $49 |
 | Pro | 32 CPU / 64 GB RAM / 500 GB | $199 |
@@ -256,7 +268,7 @@ Global routing: Anycast DNS with health-aware failover (< 30 s RTO).
 ## Roadmap
 
 | Milestone | Target | Description |
-|-----------|--------|-------------|
+| ----------- | -------- | ------------- |
 | M1 | 2028 Q1 | sigma-cri on single node |
 | M2 | 2028 Q2 | Multi-node scheduling |
 | M3 | 2028 Q3 | sigma-cni eBPF networking |

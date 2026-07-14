@@ -6,7 +6,7 @@ The Zenith Desktop is SigmaOS's flagship UI — a sovereign, compositor-first de
 
 ## Architecture
 
-```
+```text
 Zenith Desktop (zenith_desktop/)
     │
     ├── Compositor (C++ native — Phase G)
@@ -34,7 +34,7 @@ Zenith Desktop (zenith_desktop/)
 ## Current State
 
 | Component | Status |
-|-----------|--------|
+| ----------- | -------- |
 | JS prototype (browser) | ✅ Working in browser profile |
 | C++ compositor | 🔄 In progress — Phase G |
 | Auto-tiling WM | 🔄 Implemented, needs input integration |
@@ -51,13 +51,15 @@ Zenith Desktop (zenith_desktop/)
 
 Zenith uses a **hybrid tiling + floating** window manager:
 
-```
+```text
 Workspaces: 1–9 (switch with Super+1 through Super+9)
 Tiling modes:
+
   - Master/stack (default)
   - Grid (Super+G)
   - Fullscreen (Super+F)
   - Floating (Super+Shift+Space)
+
 
 Key bindings (default):
   Super+Enter     New terminal
@@ -90,11 +92,15 @@ sigma-theme new my-theme --base midnight-sovereign
 
 - `midnight-sovereign` — dark blue/purple
 
+
 - `solar-zenith` — warm amber + white
+
 
 - `forest-minimal` — muted green
 
+
 - `arctic-pure` — clean white/grey
+
 
 Theme structure: CSS-like variables → compositor applies to all windows.
 
@@ -106,11 +112,15 @@ AI-driven adaptive UI using AVX-512 SIMD acceleration:
 
 - **Predictive pre-loading**: predicts next app the user will open based on context
 
+
 - **Adaptive layouts**: rearranges widgets based on usage patterns
+
 
 - **Smart notifications**: batches low-priority notifications, surfaces critical ones immediately
 
+
 - **Energy-aware rendering**: reduces refresh rate when battery low
+
 
 ---
 
@@ -118,15 +128,21 @@ AI-driven adaptive UI using AVX-512 SIMD acceleration:
 
 - **Sovereign Screen Reader (SSR)**: reads UI elements aloud via sigma-voice
 
+
 - **High-contrast themes**: automatic inversion for visual impairments
+
 
 - **Keyboard-only navigation**: full WCAG 2.1 AA compliance target
 
+
 - **Switch access**: single-switch scanning for motor impairments
+
 
 - **Font scaling**: 75%–300% without layout break
 
+
 - **Braille display**: planned via sigma-braille daemon (Phase H)
+
 
 ---
 
@@ -135,7 +151,7 @@ AI-driven adaptive UI using AVX-512 SIMD acceleration:
 Pre-installed widgets on the desktop panel:
 
 | Widget | File | Function |
-|--------|------|---------|
+| -------- | ------ | --------- |
 | System telemetry | `sigma_widget_sys_telemetry.cpp` | CPU/RAM/net graphs |
 | AI monitor | `sigma_widget_ai_monitor.cpp` | LLM inference usage |
 | Crypto shield | `sigma_widget_crypto_shield.cpp` | Active PQC connections |

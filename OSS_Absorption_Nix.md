@@ -9,15 +9,17 @@
 The Nix package manager is the world's most sophisticated approach to reproducible builds and declarative system configuration. Its core innovation is the **Nix store**: a content-addressed, immutable directory tree (`/nix/store/`) where every package is identified by a cryptographic hash of all its inputs (source, dependencies, build flags, compiler version).
 
 SigmaOS absorbs three key Nix innovations:
+
 1. **Content-addressed package store** — `sigma-store` (`/sigma/store/`)
 2. **Reproducible builds** — every SigmaOS package can be rebuilt bit-for-bit from its derivation
 3. **Nix Flakes**-style declarative system specs — `sigma.toml` (the NixOS-equivalent config)
+
 
 ---
 
 ## 2. Architecture
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │             SIGMA CONTENT-ADDRESSED PACKAGE STORE              │
 │                                                                │
@@ -105,7 +107,9 @@ impl SigmaStore {
 ### 3.2 Declarative System Configuration (`sigma.toml` — NixOS-style)
 
 ```toml
+
 # /etc/sigma/sigma.toml — Declarative system spec
+
 [system]
 hostname  = "my-workstation"
 timezone  = "Asia/Kolkata"
@@ -159,13 +163,16 @@ Apply changes? [y/N] y
 Σ [SUCCESS] System is now in desired state. Reboot required for kernel changes.
 
 # Roll back to previous state
+
 $ sigma system rollback
 ```
 
 ### 3.3 Flake-Style Reproducible Environments
 
 ```bash
+
 # Enter a reproducible dev environment (like nix develop)
+
 $ sigma env --with "rust@stable python@3.12 nodejs@20" bash
 Σ [ENV] Entering reproducible environment...
   rust    1.75.0  (/sigma/store/a1b2c3-rust-1.75.0/bin)
@@ -180,13 +187,16 @@ $ sigma env --from sigma.lock  # Reproduce environment exactly from lock
 ### 3.4 Binary Cache
 
 ```bash
+
 # Push a locally built package to a team binary cache
+
 $ sigma store push --cache https://cache.mycompany.com my-package
 Σ [STORE] Uploading /sigma/store/abc123-my-package...
   Signed with Dilithium5 key: mycompany-build-key
   Uploaded: 14.2MB in 3.2s
 
 # Everyone on the team fetches the pre-built binary:
+
 $ sigma pkg add my-package
 Σ [PKG] Binary cache hit! (company cache)
   Downloading: 14.2MB... done (2.1s)

@@ -21,11 +21,13 @@ SigmaOS kernel shards (drivers, schedulers, filesystems) can be hot-swapped at r
 ```bash
 $ sigma kernel swap S-SCHED sigma-sched-v2.spkg
 Σ [KERNEL] Hot-swapping S-SCHED:
+
   1. Load sigma-sched-v2.spkg into isolated memory cell
   2. Verify ABI compatibility (Dilithium5 signature OK)
   3. Drain existing scheduler connections (0.2ms grace)
   4. Atomically redirect IPC → sigma-sched-v2
   5. Unload sigma-sched-v1 (memory freed)
+
   Swap complete. No reboot required. ✓
 ```
 

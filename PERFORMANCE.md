@@ -60,7 +60,9 @@ impl KernelAutotuner {
 ## 💾 Memory Optimization
 
 ### 1. Transparent Buddy Page Merging
+
 The physical memory manager (`SovereignPMM`) scans physical page tables for identical read-only memory blocks (e.g. shared dynamic library memory, immutable app assets) and merges them into a single physical page frame with Copy-on-Write enabled, saving up to **35%** memory on dense container nodes.
 
 ### 2. Page Caching & Direct I/O
+
 The zero-copy virtual filesystem bypasses the OS buffer cache for NVMe storage devices, utilizing Direct DMA transfers from drive controller memory directly into the application space buffer.

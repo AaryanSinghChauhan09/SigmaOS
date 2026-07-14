@@ -9,7 +9,7 @@
 ## Crates Used
 
 | Crate | Version | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `vm-memory` | 0.14.1 | Guest physical memory abstractions (`GuestMemoryMmap`) |
 | `vmm-sys-util` | 0.12.1 | Linux KVM/eventfd/epoll wrappers |
 | `virtio-bindings` | 0.2.2 | Low-level virtio C struct bindings |
@@ -23,7 +23,7 @@
 
 All crates are vendored into `virtualization/rust-vmm-crates/` using `cargo vendor`:
 
-```
+```text
 cargo vendor --manifest-path virtualization/Cargo.toml virtualization/rust-vmm-crates
 ```
 
@@ -99,15 +99,21 @@ fn main() {
 
 1. Open `/dev/kvm`, create VM and vCPU with `kvm-ioctls`
 
+
 2. Allocate guest memory with `vm-memory::GuestMemoryMmap`
+
 
 3. Load Linux bzImage via `linux-loader`
 
+
 4. Set up initial CPU registers (CR0, CR4, EFER, CS, SS)
+
 
 5. Configure PIT/APIC via `vmm-sys-util` eventfd
 
+
 6. Enter KVM run loop; handle `KVM_EXIT_IO` (serial console)
+
 
 ---
 
@@ -115,6 +121,8 @@ fn main() {
 
 - Minimal Rust VMM prototype (`virtualization/sigma-vmm/`) boots a Linux bzImage in QEMU-KVM mode.
 
+
 - Guest prints kernel boot messages to serial; VMM exits cleanly on `poweroff`.
+
 
 - `cargo test -p sigma-vmm` passes with mock KVM backend.

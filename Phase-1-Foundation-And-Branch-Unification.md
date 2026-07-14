@@ -9,11 +9,11 @@ Phase 1 establishes the bedrock of SigmaOS. All divergent experimental branches 
 ## ✅ Completed
 
 | Task | Status | Notes |
-|------|--------|-------|
+| ------ | -------- | ------- |
 | Single `main` branch | ✅ Done | All 20+ branches merged & deleted |
 | Modular driver dirs | ✅ Done | `drivers/linux/`, `drivers/sigma/`, `drivers/bsd/` |
-| Root `CMakeLists.txt` | ✅ Done | `-DSIGMA_TARGET_OS=sigma\|ubuntu\|bsd` |
-| Root `Makefile` update | ✅ Done | `TARGET_OS=sigma\|ubuntu\|bsd` |
+| Root `CMakeLists.txt` | ✅ Done | `-DSIGMA_TARGET_OS=sigma\ | ubuntu\ | bsd` |
+| Root `Makefile` update | ✅ Done | `TARGET_OS=sigma\ | ubuntu\ | bsd` |
 | OS Profiles (YAML) | ✅ Done | `config/sigma.yaml`, `ubuntu.yaml`, `bsd.yaml` |
 | CI matrix | ✅ Done | 3× `target_os` × 3× `profile` build jobs |
 | 109 unit tests passing | ✅ Done | Vitest 10 suites, 109 tests |
@@ -24,7 +24,7 @@ Phase 1 establishes the bedrock of SigmaOS. All divergent experimental branches 
 
 The Sovereign Driver Interface enforces a clean ABI boundary: OS-specific drivers live in their own directories and are compiled *only* when that `TARGET_OS` is selected.
 
-```
+```text
 drivers/
 ├── linux/          # Ubuntu/Debian ABI wrappers (TARGET_OS=ubuntu)
 
@@ -68,8 +68,11 @@ cmake -B build -DSIGMA_TARGET_OS=bsd && ninja -C build
 
 - [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
 
+
 - [Build Guide](BuildGuide)
 
+
 - [Driver Development](Driver-Development)
+
 
 - [CI Pipeline](CI-Pipeline)

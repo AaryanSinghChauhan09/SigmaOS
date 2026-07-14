@@ -10,11 +10,15 @@ The Designer Profile is designed for creative excellence, visual design, and eff
 
 - **SigmaCreate**: Design suite with vector graphics and image editing.
 
+
 - **SigmaBrand**: Brand management and identity tools.
+
 
 - **SigmaPrototype**: Interactive prototyping and user testing.
 
+
 - **SigmaAsset**: Asset management and version control.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Designer Profile is designed for creative excellence, visual design, and eff
 
 - **Theme**: Creative Pink (Design Standard)
 
+
 - **Layout**: Design Dashboard (Canvas, Assets, Prototype)
 
+
 - **Personalization**: Custom keyboard shortcuts and gesture controls.
+
 
 ---
 

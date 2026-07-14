@@ -10,6 +10,7 @@ This document tracks all third-party components, drivers, tools, and features im
 4. **Document every import** in this file and mirror to the Wiki
 5. **Track license compliance** for each imported component and add attribution in LICENSES.md
 
+
 ## Source Distributions
 
 | Distro | Strength | Repo Types | Why Useful for SigmaOS |
@@ -36,6 +37,7 @@ This document tracks all third-party components, drivers, tools, and features im
 - [ ] Item 36: Binary delta update algorithm (Fedora/OSTree)
 - [ ] Items 1-5, 61: HCL and driver CI tests for top 10 devices
 
+
 ### Medium Priority (1-3 months)
 
 - [ ] Item 91: Firecracker microVM integration (Qubes/Firecracker)
@@ -48,11 +50,13 @@ This document tracks all third-party components, drivers, tools, and features im
 - [ ] Item 4: Broadcom Wi-Fi driver fixes (Debian/Fedora patches)
 - [ ] Item 5: Realtek Wi-Fi driver backports (Arch/Fedora)
 
+
 ### Long Term (3-12 months) - Low Priority
 
 - [ ] Item 31: Nix-style declarative package modules (NixOS)
 - [ ] Item 37: OSTree/Immutable OS model (Fedora Silverblue)
 - [ ] Item 112: Signed model marketplace (community repos)
+
 
 ## Detailed Import Records
 
@@ -216,6 +220,7 @@ All imported components must have their licenses tracked in this document and at
 - [ ] Mirror docs to Wiki via script that syncs docs/ to Wiki on merged PRs
 - [ ] Track license compliance for each imported component
 - [ ] Add attribution in LICENSES.md
+
 
 ---
 

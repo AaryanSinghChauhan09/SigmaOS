@@ -5,7 +5,9 @@
 ## Features
 
 ### SigmaWriter (Word Processor)
+
 Document editing with advanced formatting (Word alternative):
+
 - Rich text formatting (bold, italic, underline, fonts, colors)
 - Paragraph styles and templates
 - Tables, images, and embedded objects
@@ -15,8 +17,11 @@ Document editing with advanced formatting (Word alternative):
 - Spell check and grammar check
 - Mail merge functionality
 
+
 ### SigmaSheet (Spreadsheets)
+
 Data manipulation, formulas, and charting (Excel alternative):
+
 - Cell formatting and conditional formatting
 - 500+ built-in functions (math, statistical, financial, text, date/time)
 - Pivot tables and data analysis
@@ -26,8 +31,11 @@ Data manipulation, formulas, and charting (Excel alternative):
 - Import/export CSV, XLSX, ODS
 - Real-time collaboration
 
+
 ### SigmaPresent (Presentations)
+
 Slide decks and presentation tools (PowerPoint alternative):
+
 - Slide templates and themes
 - Transitions and animations
 - Speaker notes and presenter view
@@ -36,9 +44,10 @@ Slide decks and presentation tools (PowerPoint alternative):
 - Collaboration and commenting
 - Presentation mode with laser pointer
 
+
 ## Architecture
 
-```
+```text
 SigmaOffice Suite
    ├─ SigmaWriter (document engine)
    │   ├─ Rich text parser/renderer
@@ -57,7 +66,7 @@ SigmaOffice Suite
 ## File Formats
 
 | Application | Native Format | Import Formats | Export Formats |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SigmaWriter | .swriter | .docx, .odt, .txt, .rtf | .pdf, .docx, .odt, .html |
 | SigmaSheet | .ssheet | .xlsx, .ods, .csv | .pdf, .xlsx, .ods, .csv |
 | SigmaPresent | .spresent | .pptx, .odp | .pdf, .pptx, .odp |
@@ -97,6 +106,7 @@ int sigma_present_start_present(const present_deck_t *deck);
 - **SigmaCloud Integration**: Real-time collaboration via SovereignNet
 - **Zenith Desktop Integration**: Native Zenith UI components
 
+
 ## Roadmap
 
 - [x] Architecture design and component specification
@@ -109,6 +119,7 @@ int sigma_present_start_present(const present_deck_t *deck);
 - [ ] SigmaScript macro language
 - [ ] Mobile versions (SigmaOS Mobile)
 - [ ] Web versions (SigmaOS Cloud)
+
 
 ## Related Modules
 

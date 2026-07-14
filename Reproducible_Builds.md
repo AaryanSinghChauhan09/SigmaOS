@@ -13,9 +13,10 @@ SigmaOS enforces 100% deterministic builds across its entire package ecosystem. 
 - **Transparency**: Make build process auditable and verifiable
 - **Cross-Verification**: Multiple independent builds for verification
 
+
 ## Deterministic Pipeline Flow
 
-```
+```text
  [Source Code (Git Commit)] ──► [Neutralize Timestamps & Paths]
                                          │
                                          ▼
@@ -33,21 +34,25 @@ SigmaOS enforces 100% deterministic builds across its entire package ecosystem. 
 ### Container Isolation
 
 **Base Image**:
+
 ```dockerfile
 FROM sigmaos/build-base:6.1.0
 
 # Pin toolchain versions
+
 ENV GCC_VERSION=12.2.0
 ENV BINUTILS_VERSION=2.40
 ENV KERNEL_HEADERS=6.1.0
 
 # Set deterministic environment
+
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV SOURCE_DATE_EPOCH=1704067200
 ENV TZ=UTC
 
 # Clear build environment
+
 ENV PATH=/usr/bin:/bin
 ENV HOME=/build
 ```
@@ -261,7 +266,7 @@ impl SBOMGenerator {
 
 ### Build Farm Components
 
-```
+```text
 ┌─────────────────┐
 │  Build Queue    │
 │  (RabbitMQ)     │
@@ -334,10 +339,12 @@ impl BuildWorker {
 ### Cross-Verification
 
 **Multiple Independent Builds**:
+
 - Build same package on different workers
 - Compare binary hashes
 - Verify SBOM consistency
 - Detect build non-determinism
+
 
 ```rust
 // build-farm/src/verifier.rs
@@ -376,13 +383,17 @@ impl BuildVerifier {
 ### Diffoscope Integration
 
 ```bash
+
 # Compare builds
+
 diffoscope build1/ build2/ --html diff.html
 
 # Detailed comparison
+
 diffoscope --max-depth 10 build1/ build2/
 
 # Text output
+
 diffoscope --text diff.txt build1/ build2/
 ```
 
@@ -395,12 +406,14 @@ diffoscope --text diff.txt build1/ build2/
 3. **Build Isolation**: Build in isolated containers
 4. **Verification**: Always verify builds against references
 
+
 ### CI/CD
 
 1. **Automated Verification**: Verify reproducibility in CI
 2. **SBOM Generation**: Generate SBOMs for all builds
 3. **Artifact Storage**: Store build artifacts with metadata
 4. **Monitoring**: Monitor build reproducibility metrics
+
 
 ### Security
 
@@ -409,11 +422,13 @@ diffoscope --text diff.txt build1/ build2/
 3. **Audit Trail**: Maintain complete build logs
 4. **Transparency**: Make build process public
 
+
 ## Troubleshooting
 
 ### Non-Reproducible Builds
 
 **Common Causes**:
+
 1. Timestamps embedded in binary
    - Fix: Use `SOURCE_DATE_EPOCH`
 2. Different compiler versions
@@ -423,46 +438,61 @@ diffoscope --text diff.txt build1/ build2/
 4. Filesystem differences
    - Fix: Use containerized builds
 
+
 **Debugging Steps**:
+
 ```bash
+
 # Enable build logging
+
 make V=1 > build.log
 
 # Compare with reference build
+
 diffoscope build1/ build2/
 
 # Check for embedded timestamps
+
 strings binary | grep -i date
 
 # Verify environment
+
 env | sort
 ```
 
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Build environment isolation
 - Remove local paths, hostnames, and timestamps
 - Basic deterministic compilation
 - Container-based builds
 
+
 ### Phase 2 (Months 3-6)
+
 - SPDX-compliant SBOM generator
 - Integration with sigpkg-build
 - GPG signing of SBOMs
 - SBOM database
 
+
 ### Phase 3 (Months 6-9)
+
 - Re-builder farms
 - Cross-verification infrastructure
 - Automated reproducibility testing
 - Build farm orchestration
 
+
 ### Phase 4 (Months 9-12)
+
 - System-wide verification policies
 - Prevent installation of unsigned packages
 - Advanced threat detection
 - Community verification program
+
 
 ## References
 

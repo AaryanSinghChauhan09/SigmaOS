@@ -19,11 +19,14 @@ SigmaOS absorbs the **Declarative Control Loops** and **Service Mesh abstraction
 In traditional Linux, setting up a cluster requires installing massive external binaries (kubelet, etcd, apiserver). SigmaOS nodes can dynamically form a sovereign cluster using built-in IPC over WireGuard.
 
 ```bash
+
 # Node 1
+
 $ sigma cluster init
 Σ [NEBULA] Cluster 'sigma-prime' initialized. Join token: abc-123
 
 # Node 2
+
 $ sigma cluster join abc-123 --host 192.168.1.10
 Σ [NEBULA] Joined cluster. Workloads syncing...
 ```
@@ -33,14 +36,18 @@ $ sigma cluster join abc-123 --host 192.168.1.10
 SigmaOS processes declarative YAML configurations natively without a heavy Kubelet daemon. The OS kernel itself contains a control loop that constantly compares current state to desired state.
 
 ```yaml
+
 # /etc/sigma/workloads/web.yaml
+
 kind: SovereignWorkload
 name: frontend-web
 replicas: 3
 isolation: microvm # Uses Firecracker instead of Docker
 image: "registry.sigma/web:latest"
 ports:
+
   - 80:8080
+
 ```
 
 When this file is placed in the configuration directory, `sigma-nebula` instantly provisions the Firecracker VMs, configures the `sigma-vswitch` networking, and updates the local load balancer.

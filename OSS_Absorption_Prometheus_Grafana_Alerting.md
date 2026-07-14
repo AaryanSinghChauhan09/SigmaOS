@@ -19,13 +19,17 @@ SigmaOS absorbs the **alert routing trees, inhibition rules, and silencing** mod
 When hardware faults or resource over-utilization thresholds are crossed, `sigma-alerts` routes the event down a nested tree.
 
 ```yaml
+
 # /etc/sigma/alertmanager.yaml
+
 route:
   group_by: ['alertname', 'service']
   group_wait: 30s
   receiver: 'local-tui'
   routes:
+
     - match:
+
         severity: critical
       receiver: 'admin-page'
 ```

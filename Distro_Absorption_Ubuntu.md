@@ -15,18 +15,22 @@ The Ubuntu compatibility layer is divided into two primary subsystems: `Sovereig
 ## 2. Technical Features & Absorption Strategy
 
 ### 2.1 APT Package Interface (`SovereignAPT.shard`)
+
 - **Ubuntu Concept**: APT interacts with remote deb repositories, downloads package packages, and resolves installation dependencies using the local `dpkg` database.
 - **Sovereign Implementation**: `SovereignAPT` parses deb package structures, mapping standard file layouts (`/usr`, `/bin`) to SigmaOS virtual namespace paths. Dependency graphs are resolved, and binaries are executed inside sandboxed compatibility zones.
 
+
 ### 2.2 AppArmor Security Engine (`SovereignAppArmor.shard`)
+
 - **Ubuntu Concept**: AppArmor uses path-based rules to confine applications, restricting what directories and resources an executable can access.
 - **Sovereign Implementation**: Path-based profiles are parsed at load time. `SovereignAppArmor` translates these rules into microkernel capability tokens. When an application attempts an I/O system call, the kernel validates that the program presents the appropriate capability token.
+
 
 ---
 
 ## 3. Shard Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │               UBUNTU ABSORPTION MATRIX                  │
 ├─────────────────────────────────────────────────────────┤
@@ -51,7 +55,9 @@ To test and simulate the Ubuntu absorption workflow:
 ```powershell
 $ sigma distro list
 Σ [INFO] Sovereign Linux Distro Absorption Registry:
+
   * Ubuntu       -> SovereignAPT.shard          [Active]  (APT package layer)
+
   ...
 
 $ sigma distro absorb ubuntu
@@ -64,6 +70,7 @@ $ sigma distro absorb ubuntu
 ---
 
 ## 5. Standards & Mapping
+
 - Debian Binary Package Format (deb) Specifications
 - AppArmor Profile Syntax Reference
 - FHS (Filesystem Hierarchy Standard) compatibility matrix in SigmaOS

@@ -10,11 +10,15 @@ The Data Analyst Profile is designed for data excellence, business intelligence,
 
 - **SigmaAnalytics**: Data analytics and visualization platform.
 
+
 - **SigmaReport**: Automated reporting and dashboard creation.
+
 
 - **SigmaQuery**: SQL query builder and database management.
 
+
 - **SigmaInsight**: Business intelligence and trend analysis.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Data Analyst Profile is designed for data excellence, business intelligence,
 
 - **Theme**: Data Blue (Analytics Standard)
 
+
 - **Layout**: Analytics Dashboard (Data, Reports, Insights)
 
+
 - **Personalization**: Custom visualizations and automated alerts.
+
 
 ---
 

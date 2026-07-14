@@ -14,4 +14,5 @@ SigmaOS bundles a sovereign, zero-overhead implementation of standard Unix/GNU u
 - **df**: Display filesystem disk usage (`coreutil_df`)
 - **du**: Estimate directory space usage (`coreutil_du`)
 
+
 Refer to [sigma_coreutils.rs](file:///C:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS/kernel/core/sigma_coreutils.rs) for implementation details.

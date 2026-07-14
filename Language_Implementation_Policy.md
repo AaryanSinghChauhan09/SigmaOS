@@ -8,7 +8,7 @@
 ## Language Assignment by Domain
 
 | Domain | Language | Rationale |
-|--------|----------|-----------|
+| -------- | ---------- | ----------- |
 | Kernel core (scheduler, MM, IPC, syscall) | **Rust** (`#![no_std]`) | Memory safety, zero-cost abstractions, `no_std` |
 | HAL / boot / ISR stubs | **Zig** | Comptime, direct hardware access, no hidden allocations |
 | Formal-critical security (MACs, crypto proofs) | **SPARK/Ada** | Formal verification via `gnatprove`, proof-carrying code |
@@ -25,24 +25,31 @@
 
 1. **No C or C++** — zero C/C++ files in `kernel/`, `drivers/`, `security/`, `crypto/`
 
+
 2. **No `unsafe` without justification comment** — every `unsafe` block documents why
+
 
 3. **No `std`/`libc` in kernel crates** — `#![no_std]` enforced
 
+
 4. **No pre-defined stdlib functions in kernel** — implement from scratch
+
 
 5. **No third-party crates in kernel** — only `sigma-*` internal crates
 
+
 6. **OOP via Traits** — use Rust Traits + Structs; no inheritance anti-patterns
 
+
 7. **No dynamic dispatch in hot paths** — prefer generics over `dyn Trait`
+
 
 ---
 
 ## Migration Status (C/C++ → Modern Languages)
 
 | File/Subsystem | Old Language | New Language | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `kernel/core/sigma_sched.cpp` | C++ | Rust | ⬜ Planned |
 | `kernel/core/sigma_mm.cpp` | C++ | Rust | ⬜ Planned |
 | `kernel/core/sigma_irq.cpp` | C++ | Zig | ⬜ Planned |

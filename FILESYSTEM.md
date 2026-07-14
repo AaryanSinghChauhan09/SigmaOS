@@ -10,7 +10,7 @@ SigmaOS implements a Virtual Filesystem (VFS) layer with support for multiple fi
 
 The Virtual Filesystem (VFS) layer provides a unified interface for different filesystem types:
 
-```
+```text
 ┌─────────────────────────────────────┐
 │         Userland Applications       │
 └─────────────────────────────────────┘
@@ -60,12 +60,15 @@ pub trait Filesystem {
 **Location**: `kernel/fs/ext2.rs`
 
 **Features**:
+
 - Linux-compatible filesystem
 - Journaling (Ext3)
 - Extended attributes
 - Access control lists
 
+
 **Structure**:
+
 ```rust
 pub struct Ext2Filesystem {
     device: BlockDevice,
@@ -90,11 +93,14 @@ pub struct Ext2Superblock {
 **Location**: `kernel/fs/fat32.rs`
 
 **Features**:
+
 - Windows-compatible filesystem
 - Long filename support
 - Removable media support
 
+
 **Structure**:
+
 ```rust
 pub struct Fat32Filesystem {
     device: BlockDevice,
@@ -118,12 +124,15 @@ pub struct Fat32BootSector {
 **Location**: `kernel/fs/cryptfs.rs`
 
 **Features**:
+
 - Encrypted filesystem
 - Argon2id key derivation
 - AES-256-GCM encryption
 - Plausible deniability
 
+
 **Structure**:
+
 ```rust
 pub struct CryptFilesystem {
     device: BlockDevice,
@@ -286,6 +295,7 @@ pub unsafe fn sys_umount(target: *const u8) -> i32 {
 4. **Symbolic links**: Follow links (with cycle detection)
 5. **Mount points**: Cross mount boundaries
 
+
 ### Current Working Directory
 
 ```rust
@@ -442,12 +452,14 @@ pub fn write_back(cache: &mut PageCache) {
 4. **Distributed filesystems**: Ceph, GlusterFS
 5. **User-space filesystems**: FUSE support
 
+
 ### Research Areas
 
 1. **Persistent memory**: NVDIMM filesystems
 2. **Erasure coding**: Distributed storage
 3. **Deduplication**: Block-level deduplication
 4. **Compression**: Transparent compression
+
 
 ## Best Practices
 
@@ -459,6 +471,7 @@ pub fn write_back(cache: &mut PageCache) {
 4. Implement proper locking
 5. Test with various filesystems
 
+
 ### For Userland Developers
 
 1. Use standard file operations
@@ -467,6 +480,7 @@ pub fn write_back(cache: &mut PageCache) {
 4. Use appropriate permissions
 5. Consider using mmap for large files
 
+
 ## Troubleshooting
 
 ### Filesystem Corruption
@@ -474,30 +488,36 @@ pub fn write_back(cache: &mut PageCache) {
 **Symptoms**: Files not accessible, errors on read/write
 
 **Solutions**:
+
 1. Run filesystem check
 2. Check for hardware errors
 3. Review driver logs
 4. Restore from backup
+
 
 ### Performance Issues
 
 **Symptoms**: Slow file operations
 
 **Solutions**:
+
 1. Check cache settings
 2. Verify disk health
 3. Review I/O patterns
 4. Consider different filesystem
+
 
 ### Mount Failures
 
 **Symptoms**: Cannot mount filesystem
 
 **Solutions**:
+
 1. Check filesystem type
 2. Verify device is accessible
 3. Check for corruption
 4. Review mount options
+
 
 ## References
 

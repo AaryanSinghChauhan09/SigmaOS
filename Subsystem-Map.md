@@ -9,7 +9,7 @@
 ### Core
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | Scheduler (MLFQ+EDF+CFS) | `kernel/core/sigma_sched.rs` | Rust |
 | Memory (Buddy+Slab) | `kernel/core/sigma_mm.rs` | Rust |
 | Syscall dispatch (32 syscalls) | `kernel/core/sigma_syscall_dispatch.rs` | Rust |
@@ -23,7 +23,7 @@
 ### IPC
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-bus typed IPC | `kernel/ipc/sigma_bus.rs` | Rust |
 | Anonymous pipes | `kernel/ipc/sigma_pipe.rs` | Rust |
 | Shared memory | `kernel/ipc/sigma_shm.rs` | Rust |
@@ -31,7 +31,7 @@
 ### Memory
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | x86-64 4-level paging | `kernel/memory/sigma_vmm.zig` | Zig |
 | OOM killer | `kernel/memory/sigma_oom.rs` | Rust |
 | Huge pages (2MB/1GB) | `kernel/memory/sigma_hugepages.ads/.adb` | SPARK |
@@ -39,7 +39,7 @@
 ### Security
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma_pledge + sigma_unveil | `kernel/security/sigma_pledge.rs` | Rust |
 | ASLR 42-bit entropy | `kernel/security/sigma_aslr.rs` | Rust |
 | seccomp-BPF filter | `kernel/security/sigma_seccomp.rs` | Rust |
@@ -52,7 +52,7 @@
 ### Crypto
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | SHA-256 + HMAC | `kernel/crypto/sigma_sha256.rs` | Rust |
 | Kyber-1024 KEM | `crypto/sigma_kyber.rs` | Rust |
 | Dilithium-5 | `crypto/sigma_dilithium.ads/.adb` | SPARK |
@@ -60,7 +60,7 @@
 ### Networking
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | Ethernet + IPv4 + ARP + UDP | `kernel/net/sigma_net.rs` | Rust |
 | TCP state machine | `kernel/net/sigma_tcp.rs` | Rust |
 | ICMP echo/reply | `kernel/net/sigma_icmp.rs` | Rust |
@@ -76,7 +76,7 @@
 ### Filesystems
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | VFS + Tmpfs | `kernel/fs/sigma_vfs.rs` | Rust |
 | FAT32 read-only | `kernel/fs/sigma_fat32.rs` | Rust |
 | /proc virtual FS | `kernel/fs/sigma_procfs.rs` | Rust |
@@ -87,7 +87,7 @@
 ### Power
 
 | Subsystem | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | ACPI P/C-states | `kernel/power/sigma_power.zig` | Zig |
 
 ---
@@ -95,7 +95,7 @@
 ## Drivers (Zig + Rust)
 
 | Driver | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | Intel e1000 NIC | `drivers/net/sigma_e1000.rs` | Rust |
 | VirtIO-net | `drivers/net/sigma_virtio_net.rs` | Rust |
 | Wi-Fi framework + WPA2/3 | `drivers/net/sigma_wifi.rs` | Rust |
@@ -113,7 +113,7 @@
 ## Boot (Zig)
 
 | Component | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | UEFI EFI stub | `sigma-boot/sigma_boot.zig` | Zig |
 | IDT + APIC + PIC | `kernel/core/sigma_irq.zig` | Zig |
 
@@ -124,26 +124,26 @@
 ### Shell & Scripting
 
 | Tool | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-sh REPL | `userland/shell/sigma_shell.nim` | Nim |
 | Script runner | `userland/shell/sigma_scripting.nim` | Nim |
 
 ### Package Management
 
 | Tool | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-pkg | `userland/pkg/sigma_pkg.nim` | Nim |
 
 ### Core Utilities
 
 | Tool | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-coreutils (15 tools) | `userland/coreutils/sigma_coreutils.nim` | Nim |
 
 ### System Tools
 
 | Tool | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-monitor | `userland/tools/sigma_monitor.rs` | Rust |
 | sigma-disks | `userland/tools/sigma_disks.nim` | Nim |
 | sigma-logs | `userland/tools/sigma_logs.rs` | Rust |
@@ -154,7 +154,7 @@
 ### Network Tools
 
 | Tool | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-ssh | `userland/net/sigma_ssh.nim` | Nim |
 | sigma-curl (HTTP) | `userland/net/sigma_http.nim` | Nim |
 | sigma-vpn (WireGuard) | `userland/net/sigma_vpn.nim` | Nim |
@@ -163,7 +163,7 @@
 ### Desktop
 
 | Component | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | Zenith compositor | `userland/desktop/sigma_compositor.rs` | Rust |
 | Window manager (tiling/BSP/grid) | `userland/desktop/sigma_wm.rs` | Rust |
 | Theme engine (3 themes) | `userland/desktop/sigma_theme.rs` | Rust |
@@ -174,7 +174,7 @@
 ### Daemons
 
 | Daemon | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigmad-health | `userland/daemon/sigmad_health.rs` | Rust |
 | sigmad-netd | `userland/daemon/sigmad_netd.rs` | Rust |
 | sigmad-vault | `userland/daemon/sigmad_vault.rs` | Rust |
@@ -182,14 +182,14 @@
 ### Init & Update
 
 | Component | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-init (PID 1) | `userland/init/sigma_init.rs` | Rust |
 | sigma-update (A/B) | `userland/update/sigma_update.rs` | Rust |
 
 ### AI & Runtime
 
 | Component | File | Lang |
-|---|---|---|
+| --- | --- | --- |
 | sigma-ai (TinyLlama) | `userland/ai/sigma_ai.rs` | Rust |
 | WASM/WASI parser | `runtime/wasm/sigma_wasm.rs` | Rust |
 | sigma-pod OCI runtime | `runtime/containers/sigma_container.rs` | Rust |
@@ -200,7 +200,7 @@
 ## Language Summary
 
 | Language | % | Primary Use |
-|---|---|---|
+| --- | --- | --- |
 | **Rust** | 60% | Kernel core, security, net, fs, userland |
 | **Zig** | 20% | HAL, boot, IRQ, timers, drivers |
 | **Nim** | 15% | Shell, tools, daemons, CLI apps |

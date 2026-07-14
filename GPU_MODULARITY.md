@@ -16,6 +16,7 @@ Traditional OS kernels (Linux, Windows) rely on massive proprietary binary blobs
 
 1. Probes the GPU's PCIe BAR registers at boot
 
+
 1
 
 // Register a GPU with the sovereign framework

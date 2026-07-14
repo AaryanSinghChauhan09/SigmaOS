@@ -7,6 +7,7 @@ SigmaOS Mandatory Access Control (MAC) provides SELinux-style security with modu
 ## Key Components
 
 ### Security Context
+
 ```rust
 pub struct SecurityContext {
     pub user: [SigmaU8; 64],
@@ -18,14 +19,19 @@ pub struct SecurityContext {
 ```
 
 ### Security Classes
+
 - Process, File, Directory, Socket, Device, IPC, System, Capability
 
+
 ### Permissions
+
 - Read, Write, Execute, Create, Delete, Append, Ioctl, Mmap, Connect, Bind, Accept, Send, Receive
+
 
 ## Policy Engine
 
 ### Configuration
+
 ```rust
 pub struct PolicyEngine {
     pub modules: *mut PolicyModule,
@@ -36,20 +42,24 @@ pub struct PolicyEngine {
 ```
 
 ### Decision Process
+
 1. Check all enabled modules (by priority)
 2. Find matching rules
 3. If any rule denies → Deny
 4. If any rule allows → Allow
 5. If no rules match → default_deny ? Deny : Allow
 
+
 ## Capability System
 
 Linux-style capability sets:
+
 - **Effective** - Currently active
 - **Permitted** - Maximum allowed
 - **Inheritable** - Inheritable by children
 - **Bounding** - Upper bound for all sets
 - **Ambient** - Preserved across exec
+
 
 ## API
 

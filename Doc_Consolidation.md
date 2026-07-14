@@ -10,7 +10,7 @@
 
 The repo accumulated overlapping docs through rapid iteration:
 
-```
+```text
 Architecture duplicates:
   ARCHITECTURE.md          ← canonical ✅
   Architecture.md          ← duplicate (same content, different case)
@@ -53,7 +53,7 @@ CI Pipeline duplicates:
 ## Canonical Files (Single Source of Truth)
 
 | Topic | Canonical File | Supersedes |
-|---|---|---|
+| --- | --- | --- |
 | Architecture | `ARCHITECTURE.md` | `Architecture.md` (case dup) |
 | Growth Roadmap | `ROADMAP.md` | `roadmap.md`, `DEVELOPMENT_ROADMAP.md`, `PHASE_*` |
 | Competitive Analysis | `docs/Competitive_Analysis.md` | All wiki_repo/Competitive_* |
@@ -74,41 +74,55 @@ CI Pipeline duplicates:
 
 - [x] Create `ROADMAP.md` as canonical phase-based roadmap
 
+
 - [x] Create `DOWNLOAD.md` and `download.html`
+
 
 - [x] Create `QUICKSTART.md`
 
+
 - [ ] Add deprecation notice to `roadmap.md`: "See ROADMAP.md"
+
 
 - [ ] Add deprecation notice to `DEVELOPMENT_ROADMAP.md`
 
+
 - [ ] Delete `Architecture.md` (exact duplicate of `ARCHITECTURE.md`)
+
 
 ### Phase B — Wiki repo cleanup (batch PR)
 
 The wiki has 500+ pages — many are valuable reference. The ones to consolidate:
 
 - Remove or merge the ~15 overlapping Competitive_* pages into one
+
   `Competitive-Analysis.md` that points to `docs/Competitive_Analysis.md`
 
 - Remove or merge the ~8 overlapping Architecture_* pages into one
+
   `Architecture-Overview.md` that points to `ARCHITECTURE.md`
 
 - Archive `APEX_INFINITY_ROADMAP.md`, `EXPANSION_ROADMAP.md`,
+
   `ROADMAP_SEQUENCE.md` — redirect to `ROADMAP.md`
 
 - Keep all profession-specific pages (they're not duplicates)
 
+
 - Keep all shard manifest pages (they're not duplicates)
 
+
 - Keep all security / PQC pages (distinct content)
+
 
 ### Phase C — Contributor guidelines
 
 - Add to `CONTRIBUTING.md`: "Before creating a new doc, check this list
+
   of canonical files. New docs go in `docs/`. Wiki pages go in `wiki_repo/`."
 
 - Add `docs/README.md` with a table of what's in `docs/`
+
 
 ---
 
@@ -119,9 +133,12 @@ Doc sprawl is a trust signal. When a contributor opens the repo and finds
 
 - "Which one is current?"
 
+
 - "Has this project been abandoned and restarted multiple times?"
 
+
 - "Can I trust the documentation?"
+
 
 A clean, single-source-of-truth structure answers: *this project is organised,
 intentional, and ready for contributors.*
@@ -132,23 +149,33 @@ intentional, and ready for contributors.*
 
 - `CHANGELOG.md` — unique history
 
+
 - `FEATURE_MATRIX.md` — unique status table
+
 
 - `CURRENT_PROBLEMS_MANIFEST.md` — unique bug tracker
 
+
 - `GOVERNANCE.md` — unique governance policy
+
 
 - `SECURITY_POLICY.md` + `SECURITY.md` — unique security disclosures
 
+
 - `PROFILES.md` — unique profession profiles
+
 
 - All `Profession-*.md` wiki pages — unique per-profession content
 
+
 - All `Shard-*.md` wiki pages — unique shard reference
+
 
 - `LANGUAGE_POLICY.md` — unique ABI guide
 
+
 - `STRATEGIC_VISION.md` — unique high-level vision
+
 
 ---
 

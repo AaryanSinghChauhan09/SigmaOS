@@ -10,6 +10,7 @@ Arguments:
 
 - **options** `MockAgentOptions` (optional) - It extends the `Agent` options.
 
+
 Returns: `MockAgent`
 
 ### Parameter: `MockAgentOptions`
@@ -18,9 +19,12 @@ Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
 - **agent** `Agent` (optional) - Default: `new Agent([options])` - a custom agent encapsulated by the MockAgent.
 
+
 - **ignoreTrailingSlash** `boolean` (optional) - Default: `false` - set the default value for `ignoreTrailingSlash` for interceptors.
 
+
 - **acceptNonStandardSearchParameters** `boolean` (optional) - Default: `false` - set to `true` if the matcher should also accept non standard search parameters such as multi-value items specified with `[]` (e.g. `param[]=1&param[]=2&param[]=3`) and multi-value items which values are comma separated (e.g. `param=1,2,3`).
+
 
 ### Example - Basic MockAgent instantiation
 
@@ -54,8 +58,9 @@ Arguments:
 
 - **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
 
+
 | Matcher type | Condition to pass          |
-|:------------:| -------------------------- |
+| :------------: | -------------------------- |
 | `string`     | Exact match against string |
 | `RegExp`     | Regex must pass            |
 | `Function`   | Function must return true  |
@@ -385,6 +390,7 @@ Arguments:
 
 - **host** `string | RegExp | (value) => boolean` - (optional)
 
+
 Returns: `void`
 
 #### Example - Allow all non-matching urls to be dispatched in a real HTTP request
@@ -475,9 +481,12 @@ This method returns any pending interceptors registered on a mock agent. A pendi
 
 - Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
 
+
 - Is persistent (i.e., registered with `.persist()`) and has not been invoked;
 
+
 - Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
+
 
 Returns: `PendingInterceptor[]` (where `PendingInterceptor` is a `MockDispatch` with an additional `origin: string`)
 
@@ -522,9 +531,12 @@ This method throws if the mock agent has any pending interceptors. A pending int
 
 - Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
 
+
 - Is persistent (i.e., registered with `.persist()`) and has not been invoked;
 
+
 - Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
+
 
 #### Example - Check that there are no pending interceptors
 

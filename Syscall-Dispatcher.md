@@ -6,11 +6,13 @@ The SigmaOS Syscall Dispatcher is a modular, zero-dependency C/C++ implementatio
 
 - `syscalls.h`: Defines sequential syscall identifiers (`SYSCALL_GETPID`, `SYSCALL_WRITE`, etc.) and function prototypes.
 
+
 - `dispatcher.c` / `dispatcher.cpp`: Implements direct table lookup O(1) dispatching, validating syscall numbers and forwarding register arguments directly to kernel handlers.
+
 
 ## Architecture
 
-```
+```text
 User-space Application
    └─ SYSCALL instruction (int 0x80 / syscall)
          └─ Syscall Dispatcher (O(1) table lookup)
@@ -27,7 +29,7 @@ User-space Application
 ## Syscall Table
 
 | Syscall Number | Name | Handler | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 0 | SYSCALL_NOOP | `handle_noop` | No-op for testing |
 | 1 | SYSCALL_READ | `handle_read` | Read from file descriptor |
 | 2 | SYSCALL_WRITE | `handle_write` | Write to file descriptor |
@@ -73,7 +75,7 @@ void init_syscall_dispatcher(void);
 Arguments are passed in registers following the System V AMD64 ABI:
 
 | Register | Argument |
-|---|---|
+| --- | --- |
 | RAX | Syscall number |
 | RDI | arg0 |
 | RSI | arg1 |
@@ -100,6 +102,7 @@ if (!syscall_check_capability(syscall_num, caller_cap)) {
 - **Zero-copy**: Arguments passed in registers, no kernel stack copy
 - **Minimal overhead**: ~50ns per syscall on modern x86_64
 
+
 ## Roadmap
 
 - [x] Basic syscall table and dispatcher
@@ -110,6 +113,7 @@ if (!syscall_check_capability(syscall_num, caller_cap)) {
 - [ ] Formal verification of syscall safety properties
 - [ ] seccomp-style syscall filtering
 - [ ] Syscall statistics and profiling
+
 
 ## Related Modules
 

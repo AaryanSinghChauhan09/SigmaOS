@@ -4,7 +4,7 @@ Sovereign isolation layer for storage operations.
 
 ## Architecture
 
-```
+```text
 Application Layer
    └─ Storage API (POSIX-compatible)
          └─ Storage Manager
@@ -21,7 +21,7 @@ Application Layer
 ## Supported Filesystems
 
 | Filesystem | Status | Features |
-|---|---|---|
+| --- | --- | --- |
 | SovereignFS | ✅ Active | Copy-on-Write, journaling, BLAKE3 integrity, snapshots |
 | Ext4 | ✅ Read-only | Linux compatibility, journaling |
 | FAT32 | ✅ Read/Write | Removable media compatibility |
@@ -64,51 +64,65 @@ void init_storage(void);
 ## SovereignFS Features
 
 ### Copy-on-Write (CoW)
+
 - Every write creates a new extent
 - Old data preserved until explicitly pruned
 - Enables instant snapshots without data duplication
 
+
 ### Journaling
+
 - Write-ahead logging for crash consistency
 - Atomic operations for metadata updates
 - Fast recovery after power failure
 
+
 ### Block Integrity
+
 - Each 4 KB block carries a BLAKE3 checksum
 - Kernel rejects tampered blocks at read time
 - Detects silent data corruption
 
+
 ### Snapshots
+
 - Instant point-in-time filesystem state
 - Minimal space overhead (CoW)
 - Tag-based snapshot management
 - Automatic snapshot retention policy
 
+
 ## Block Device Drivers
 
 ### NVMe Driver
+
 - NVMe 1.4 specification compliance
 - Multiple I/O queues (up to 64K queues)
 - 64KB maximum transfer size per command
 - Namespace management
 - Power management and thermal throttling
 
+
 ### AHCI SATA Driver
+
 - SATA 3.0 (6 Gbps) support
 - NCQ (Native Command Queuing)
 - SMART monitoring
 - Hot-plug support
 
+
 ### USB Storage Driver
+
 - USB Mass Storage Class (MSC) support
 - Bulk-only transport (BOT)
 - UASP (USB Attached SCSI Protocol)
 - Automatic device detection
 
+
 ## Performance Characteristics
 
 | Operation | Latency | Throughput |
-|---|---|---|
+| --- | --- | --- |
 | NVMe 4K random read | ~10µs | ~500MB/s |
 | NVMe 4K random write | ~20µs | ~400MB/s |
 | SATA 4K random read | ~100µs | ~150MB/s |
@@ -122,6 +136,7 @@ void init_storage(void);
 - **Encryption at rest**: Optional AES-256-XTS encryption
 - **Secure erase**: Cryptographically secure data deletion
 - **Audit logging**: All storage operations logged to audit chain
+
 
 ## Roadmap
 
@@ -138,6 +153,7 @@ void init_storage(void);
 - [ ] Storage tiering (SSD cache + HDD archive)
 - [ ] Compression (zstd, lz4)
 - [ ] Deduplication
+
 
 ## Related Modules
 

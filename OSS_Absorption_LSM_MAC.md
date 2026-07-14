@@ -14,11 +14,12 @@ SigmaOS implements a **unified MAC layer** (`sigma-mac`) that draws from all thr
 - **AppArmor** philosophy: Path-based profiles with human-readable syntax — absorbed for desktop application profiles
 - **Landlock** philosophy: Unprivileged, stackable, userspace-composable filesystem restrictions — absorbed as the default mechanism for every sandboxed shard
 
+
 ---
 
 ## 2. sigma-mac Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                     SIGMA MAC FRAMEWORK                          │
 │                                                                  │
@@ -93,8 +94,10 @@ pub fn apply_net_shard_policy() {
 
 SigmaOS defines human-readable per-application MAC profiles in a syntax inspired by AppArmor:
 
-```
+```text
+
 # /etc/sigma/mac/profiles/firefox.sp
+
 # Sigma security profile for Firefox
 
 profile firefox /sigma/store/*-firefox-*/bin/firefox {
@@ -122,7 +125,9 @@ profile firefox /sigma/store/*-firefox-*/bin/firefox {
 ```
 
 ```bash
+
 # Load/unload a profile
+
 $ sigma mac load-profile /etc/sigma/mac/profiles/firefox.sp
 $ sigma mac status firefox
 Σ [MAC] firefox — Profile Status:
@@ -136,16 +141,21 @@ $ sigma mac status firefox
 For server/enterprise deployments, SigmaOS adds SELinux-style type enforcement:
 
 ```bash
+
 # File has type label
+
 $ sigma mac get-label /etc/sigma/sigma.toml
 sigma.toml: system_u:object_r:sigma_config_t:s0
 
 # Process runs with domain label
+
 $ sigma mac get-domain sigma-networking
 sigma-networking[1234]: system_u:system_r:sigma_net_t:s0
 
 # Policy allows: sigma_net_t → can read sigma_config_t files
+
 # Policy denies: user_app_t → cannot read sigma_config_t files
+
 ```
 
 ### 3.4 Unified CLI
@@ -166,7 +176,7 @@ sigma mac landlock show <pid>   # Show Landlock restrictions on process
 ## 4. Default Policy Table
 
 | Shard/App | Landlock | AppArmor Profile | SELinux Domain |
-|:----------|:---------|:-----------------|:---------------|
+| :---------- | :--------- | :----------------- | :--------------- |
 | sigma-networking | /etc/sigma/net, /run/sigma/net | sigma_net | sigma_net_t |
 | sigma-init | / (full — PID 1) | none | kernel_t |
 | firefox | /home/$USER, /Downloads | firefox.sp | user_app_t |

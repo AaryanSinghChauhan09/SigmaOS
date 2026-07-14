@@ -37,11 +37,13 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 - **Docs:** `Bootloader-Design.md`
 
+
 ## 2. Kernel Modules Architecture
 
 **Status:**Modular shard architecture defined.**Plan:** Hot-swappable kernel modules — scheduler, MMU, PQC attestation.
 
 - **Docs:** `Kernel-Architecture.md`
+
 
 ## 3. Memory Management (S-MM)
 
@@ -49,11 +51,13 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 - **Docs:** `Sovereign-Memory-Management.md`
 
+
 ## 4. Process Scheduling (S-SCHED)
 
 **Status:**Round-robin stub present.**Plan:** CFS-like scheduler, multi-core dispatch, thread isolation per shard.
 
 - **Docs:** `Scheduling-Algorithms.md`
+
 
 ## 5. Device Drivers (HAL)
 
@@ -61,11 +65,13 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 - **Docs:** `Driver-Development.md`
 
+
 ## 6. Security Model (S-ARMOR)
 
 **Status:**PQC key types defined; enforcement incomplete.**Plan:** Ring 0/3 separation, MAC namespaces, Kyber/Dilithium syscall signing.
 
 - **Docs:** `Security-Model.md`
+
 
 ## 7. Networking Stack (S-NET)
 
@@ -73,11 +79,13 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 - **Docs:** `Networking.md`
 
+
 ## 8. User-Space Tooling
 
 **Status:**sigma-cli partially implemented.**Plan:** Full shell + package manager + SigmaStore + sigma-doctor CLI.
 
 - **Docs:** `User-Tools.md`
+
 
 ---
 

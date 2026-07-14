@@ -16,9 +16,11 @@ Provides a minimal BPF virtual machine directly in the kernel to filter syscalls
 
 Implemented in `sigma_audit.rs`.
 A secure ring buffer tracking system events like:
+
 - Denied MAC accesses
 - Login failures
 - Suspicious syscalls
+
 Userland tools can poll this ring buffer to stream events to remote log aggregators.
 
 ## Intrusion Detection System (IDS)

@@ -12,6 +12,7 @@ SigmaOS synthesizes the best paradigms from legendary Linux distributions to max
 - **Kali Linux**: Integrated, pre-configured cybersecurity and forensic toolchains available natively out-of-the-box.
 - **Lubuntu**: Extreme lightweight performance and low memory footprint for desktop environments.
 
+
 ## Pre-Packaged Replacements
 
 ### 1. Adobe Creative Cloud Alternative
@@ -22,11 +23,13 @@ SigmaOS synthesizes the best paradigms from legendary Linux distributions to max
 - **After Effects** -> **Natron** / **Blender** (Node-based compositing).
 - **Lightroom** -> **Darktable** / **RawTherapee**.
 
+
 ### 2. Microsoft 365 / Office Suite Alternative
 
 - **Word / Excel / PowerPoint** -> **LibreOffice** (Compiled without Java dependencies, strictly native rendering) / **OnlyOffice**.
 - **Teams** -> **Element** (Matrix protocol for decentralized, encrypted communications).
 - **OneDrive** -> **Nextcloud Sync Client** (End-to-end encrypted).
+
 
 ### 3. Google Workspace Alternative
 
@@ -34,10 +37,12 @@ SigmaOS synthesizes the best paradigms from legendary Linux distributions to max
 - **Gmail** -> **Thunderbird** / **ProtonMail Bridge** (GPG enabled by default).
 - **Google Chrome** -> **Ungoogled Chromium** / **Firefox ESR** (Hardened with strict tracking protection and sandbox).
 
+
 ### 4. Odoo / SAP / ERP Solutions Alternative
 
 - **Odoo Suite** -> **ERPNext** (Frappe framework, pre-packaged for local offline execution with MariaDB/PostgreSQL, fully audited).
 - **Salesforce** -> **SuiteCRM**.
+
 
 ## The SigmaOS Advantage
 

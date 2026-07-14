@@ -8,7 +8,7 @@ hands off to `sigma_kernel_main()`.
 
 ## Boot Flow
 
-```
+```text
 Power on
   │
   ▼
@@ -130,7 +130,7 @@ qemu-system-x86_64 \
 
 For legacy BIOS systems, SigmaOS supports Multiboot2 via GRUB:
 
-```
+```text
 
 # /boot/grub/grub.cfg
 
@@ -151,11 +151,15 @@ Planned: sigma-boot.efi will:
 
 1. Verify kernel ELF signature (Dilithium-5)
 
+
 2. Extend TPM PCR[0..4] with hashes of each boot stage
+
 
 3. Seal disk encryption key against PCR values
 
+
 4. Refuse to boot unsigned kernels
+
 
 ---
 

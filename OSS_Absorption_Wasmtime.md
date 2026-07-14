@@ -19,10 +19,13 @@ SigmaOS absorbs Wasmtime to provide `sigma-wasm`, a subsystem capable of running
 Instead of relying purely on POSIX, SigmaOS supports executing WASI-compliant modules natively. This allows developers to write code once (in Rust, C, Go, etc.) and run it securely on any SigmaOS node, regardless of CPU architecture (x86_64, ARM64, RISC-V).
 
 ```bash
+
 # Compile a rust program to WASI
+
 $ cargo build --target wasm32-wasi
 
 # Run it natively via sigma-wasm
+
 $ sigma run app.wasm
 ```
 

@@ -8,7 +8,7 @@ zero kernel-update breakage.
 Auto-detects and programs the NIC at boot via PCIe endpoint analysis:
 
 | Hardware | PCIe ID | Mode |
-|---|---|---|
+| --- | --- | --- |
 | VirtIO-Net (QEMU) | `1AF4:1000` | DMA ring buffer |
 | RTL8139 (bare-metal) | `10EC:8139` | BMCR register programming |
 

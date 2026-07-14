@@ -18,7 +18,7 @@ SigmaOS absorbs the **append-only commit log storage model** and **partitioned e
 
 All system events, security audit trails, and kernel trace telemetry are stored in partitioned, binary append-only files. This guarantees extremely high write throughput and makes historical log verification linear and tamper-proof.
 
-```
+```text
 /var/log/sigma/
 ├── auth-audit/
 │   ├── partition-0.log  # Append-only stream

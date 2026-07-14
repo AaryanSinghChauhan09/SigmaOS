@@ -11,6 +11,6 @@ This document frames why SigmaOS can feel �behind� established systems (Linu
 | **Primary Goal** | Distributed Cloud Computing | General Purpose / HW Mgmt | Web-App Productivity
 | **Kernel Type** | Modular Shard Lattice / gVisor | Monolithic / Hybrid NT | Linux + Chrome Engine
 | **Portability** | High (Cloud-Native Nodes) | Low (Hardware-Bound) | High (Browser-Based)
-| **Scaling**| Horizontal (Shard Expansion) | Vertical (Hardware Upgrade) | Cloud-Dependent |**Implication:**Tie public messaging to verified capabilities; use the roadmap to move claims from narrative to evidence.**Observation:**Large ecosystems win on contributor onboarding, issue hygiene, and predictable releases.**Implication:**  Good-first-issues, architecture docs, and release notes�even quarterly�help bootstrap contributors.
+| **Scaling** | Horizontal (Shard Expansion) | Vertical (Hardware Upgrade) | Cloud-Dependent | **Implication:**Tie public messaging to verified capabilities; use the roadmap to move claims from narrative to evidence.**Observation:**Large ecosystems win on contributor onboarding, issue hygiene, and predictable releases.**Implication:**  Good-first-issues, architecture docs, and release notes�even quarterly�help bootstrap contributors.
 
 SigmaOS is ambitious; closing the gap with incumbents means foundations first (core OS behavior, security/update integrity, developer ergonomics, measured UX), then advanced features from the 100-item backlog as dependencies allow.

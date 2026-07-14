@@ -15,11 +15,12 @@ This charter defines the governance structure, decision-making processes, and co
 - Community communications (issues, PRs, discussions, forums)
 - Release engineering and roadmap decisions
 
+
 ---
 
 ## 2. Governance Structure
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │            SIGMAOS GOVERNANCE               │
 │                                             │
@@ -45,17 +46,21 @@ This charter defines the governance structure, decision-making processes, and co
 The **Sovereign Council** is the steering committee responsible for the long-term vision, architectural integrity, and community health of SigmaOS.
 
 **Responsibilities**:
+
 - Set the annual roadmap and milestone priorities
 - Break deadlocks in Technical Committee votes
 - Approve or veto changes to this charter
 - Manage release engineering and signing keys
 - Represent SigmaOS in external partnerships
 
+
 **Composition**:
+
 - Minimum 3, maximum 7 members
 - Initial members: Project Founder(s) and early core contributors
 - New members elected by existing Council via simple majority
 - Term: 2 years, renewable
+
 
 **Decision Threshold**: Ordinary resolutions require simple majority (>50%). Charter amendments require supermajority (>66%).
 
@@ -66,7 +71,7 @@ The **Technical Committee** (TC) handles day-to-day engineering decisions.
 **Sub-committees**:
 
 | Committee | Scope | CODEOWNERS Group |
-|---|---|---|
+| --- | --- | --- |
 | Kernel TC | `kernel/`, `kernel/security/` | `@sigma/kernel-maintainers` |
 | Security TC | CVE response, PQC, MAC policies | `@sigma/security-team` |
 | UX/Desktop TC | GUI, accessibility, theming | `@sigma/ux-team` |
@@ -87,29 +92,33 @@ Anyone who submits a merged pull request is considered a **Contributor**. After 
 
 Significant changes MUST follow the RFC process:
 
-```
+```text
+
 1. Author opens an issue with [RFC] prefix
 2. 14-day public comment period
 3. Technical Committee reviews and responds
 4. Author incorporates feedback → final RFC document
 5. TC votes: approve / reject / defer
 6. Approved RFCs merged into wiki/rfcs/
+
 ```
 
 **RFC Template**: See [RFC-0001-template.md](RFC-0001-template.md)
 
 **When RFC is Required**:
+
 - New kernel subsystem or shard category
 - Breaking changes to `sigma-bus` IPC ABI
 - Changes to `sigpkg` package format
 - Security policy changes
 - Governance charter amendments
 
+
 ### 3.2 Ordinary PR Process
 
 Standard contributions follow:
 
-```
+```text
 PR Submitted → CI passes → 1 reviewer approval (committer)
 → 1 maintainer approval → merge to main
 ```
@@ -123,6 +132,7 @@ For security-sensitive files (per `CODEOWNERS`), 2 security-team approvals are r
 3. **Level 3**: Full Sovereign Council vote
 4. **Level 4**: Community vote (binding for charter issues only)
 
+
 ---
 
 ## 4. Release Engineering
@@ -130,7 +140,7 @@ For security-sensitive files (per `CODEOWNERS`), 2 security-team approvals are r
 ### 4.1 Release Cadence
 
 | Channel | Frequency | Stability | Audience |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Nightly | Daily | Unstable | Developers |
 | Beta | Monthly | Testing | Early adopters |
 | Stable | Quarterly | Production | End users |
@@ -139,19 +149,23 @@ For security-sensitive files (per `CODEOWNERS`), 2 security-team approvals are r
 ### 4.2 Release Criteria
 
 A release MUST pass:
+
 - [ ] All CI pipelines green on `x86_64`, `arm64`, `riscv64`
 - [ ] `sigma_quality_check.sh` returns 0 stubs
 - [ ] Security audit by Security TC
 - [ ] `sigpkg` package signing ceremony (Sovereign Council keys)
 - [ ] Release notes approved by Docs TC
 
+
 ### 4.3 Signing Keys
 
 Release artifacts are signed using:
+
 - **Algorithm**: Dilithium5 (post-quantum)
 - **Key ceremony**: Requires 3-of-5 Council members with hardware tokens
 - **Key rotation**: Annual or upon member departure
 - **Public key**: Published at `https://sigmaos.dev/keys/release.pub`
+
 
 ---
 
@@ -164,18 +178,22 @@ Release artifacts are signed using:
 - **Documentation**: CC-BY-SA-4.0
 - **Shard contributions**: Must be GPL-2.0-compatible
 
+
 All contributions require a Developer Certificate of Origin (DCO) sign-off:
-```
+
+```text
 Signed-off-by: Your Name <your@email.com>
 ```
 
 ### 5.2 FOSS Absorption Policy
 
 When absorbing code from other projects:
+
 - License must be GPL-2.0-compatible
 - Attribution maintained in `THIRD_PARTY_LICENSES`
 - Cleanroom reimplementation preferred for proprietary-inspired features
 - Legal review required for any code from non-FOSS sources
+
 
 ---
 
@@ -187,6 +205,7 @@ SigmaOS enforces a strict [Code of Conduct](CODE_OF_CONDUCT.md). We prioritize:
 - **Technical excellence**: Constructive, evidence-based technical discussion
 - **Constructive feedback**: Critique code, not people
 - **Transparency**: Decisions made in the open, reasoning documented
+
 
 **Enforcement**: CoC violations reported to `conduct@sigmaos.dev`. The Sovereign Council acts as final arbiter.
 
@@ -201,15 +220,18 @@ To amend this charter:
 3. Supermajority (>66%) Sovereign Council vote
 4. Amendment takes effect 14 days after ratification
 
+
 ---
 
 ## 8. Dissolution
 
 In the unlikely event of project dissolution:
+
 - All code remains under its stated open-source license
 - Wiki content migrates to a community-maintained archive
 - Signing keys are revoked and publicly announced
 - A 6-month maintenance window is provided for final releases
+
 
 ---
 

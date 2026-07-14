@@ -8,7 +8,7 @@
 ## Current State (v15.0 Baseline)
 
 | Area | Status | Gap |
-|---|---|---|
+| --- | --- | --- |
 | Animation | ✅ Spring + easing engine | No GPU acceleration yet |
 | Renderer | ✅ Software 2D renderer | No Vulkan/GL path |
 | Input | ✅ Keyboard/mouse/touch/gestures | No haptics, no eye tracking |
@@ -31,7 +31,7 @@
 **Problem**: Software renderer is CPU-bound. At 1920×1080, fill_rect takes ~8ms.
 **Solution**: VirtIO-GPU + Mesa path for Vulkan 1.3 compositing.
 
-```
+```text
 kernel/drivers/gpu/sigma_virtio_gpu.zig  ✅ already done
 drivers/gpu/sigma_vulkan.rs              → add VkDevice + VkSwapchain
 userland/desktop/sigma_compositor.rs    → add GPU submit path
@@ -56,7 +56,7 @@ drm.scanout(buf);   // no copy — same physical pages
 **Problem**: File and network I/O blocks the render thread.
 **Solution**: sigma_io_uring ring-buffer async syscalls.
 
-```
+```text
 kernel/core/sigma_io_uring.rs   → new file
 ```
 
@@ -68,7 +68,7 @@ kernel/core/sigma_io_uring.rs   → new file
 **Target timeline** once bootable:
 
 | Milestone | Target |
-|---|---|
+| --- | --- |
 | UEFI → kernel_main | < 500ms |
 | Kernel init (sched+mm+irq) | < 200ms |
 | sigma-init + daemons | < 800ms |
@@ -101,7 +101,7 @@ pub trait FontEngine { fn rasterize(&mut self, c: char, size: u32) -> &[u8]; }
 **Planned** (in priority order):
 
 | Widget | Description | Use in |
-|---|---|---|
+| --- | --- | --- |
 | `Toggle`    | On/off switch with slide anim | Settings, quick toggles |
 | `Slider`    | Range input with drag handle | Volume, brightness |
 | `ListView`  | Scrollable list with virtual rendering | File manager, app list |
@@ -122,9 +122,12 @@ pub trait FontEngine { fn rasterize(&mut self, c: char, size: u32) -> &[u8]; }
 
 - 5×5 Gaussian blur (better visual quality)
 
+
 - Luminance-adaptive border (brighter border on dark bg, dimmer on light)
 
+
 - Vibrancy: average surrounding pixel colour as tint
+
 
 ### 2.4 Responsive Layouts
 
@@ -156,7 +159,7 @@ fn transition_theme(&mut self, from: &dyn Theme, to: &dyn Theme, progress: f32) 
 **Current**: None.
 **Plan**: 5-step first-boot flow:
 
-```
+```text
 Step 1: Welcome + language selection
 Step 2: Privacy choices (all off by default, explicit opt-in)
 Step 3: User account + hostname
@@ -170,7 +173,7 @@ Step 5: Hardware detection summary + driver status
 
 **Plan**: Global search across apps, files, settings, web.
 
-```
+```text
 Score = file_name_score × 3 + content_score × 1 + recent_boost × 2
 Query pipeline: tokenise → search_apps → search_files → search_settings → merge → rank
 ```
@@ -184,17 +187,21 @@ Query pipeline: tokenise → search_apps → search_files → search_settings �
 
 - Grouped notifications (by app)
 
+
 - Swipe-to-dismiss gesture
+
 
 - Action buttons rendered in-notification
 
+
 - History panel (last 48h)
+
 
 ### 3.4 Quick Settings Panel
 
 **Plan**: Swipe-down panel with 12 toggles + sliders:
 
-```
+```text
 [Wi-Fi ▲] [Bluetooth] [Do Not Disturb] [Airplane Mode]
 [Brightness ████░░] [Volume ███░░░]
 [VPN] [Hotspot] [Mirror] [Dark Mode] [Night Light] [Battery Saver]
@@ -219,7 +226,7 @@ pub struct AppSwitcher {
 ### 4.1 Memory Optimisation
 
 | Target | Current | Plan |
-|---|---|---|
+| --- | --- | --- |
 | Idle desktop RAM | Unknown | < 256 MB |
 | sigma-sh startup | Unknown | < 50ms |
 | sigma-pkg install | Unknown | < 1s for typical package |
@@ -229,15 +236,19 @@ pub struct AppSwitcher {
 
 - `#[repr(packed)]` structs to reduce memory layout waste
 
+
 - Arena allocators for short-lived objects
+
 
 - Slab cache reuse for frequent allocations
 
+
 - Lazy shard loading (load on first use)
+
 
 ### 4.2 I/O Stack Optimisation
 
-```
+```text
 Current: syscall → VFS → Tmpfs → copy to user buffer
 Target:  syscall → VFS → io_uring ring → zero-copy to mmap'd user buffer
 ```
@@ -245,7 +256,7 @@ Target:  syscall → VFS → io_uring ring → zero-copy to mmap'd user buffer
 ### 4.3 Network Performance
 
 | Path | Current | Target |
-|---|---|---|
+| --- | --- | --- |
 | sigma-pkg download (1MB) | Unknown | < 100ms on GbE |
 | TLS handshake | Unknown | < 5ms |
 | DNS resolution | Unknown | < 10ms (DoH cached) |
@@ -255,9 +266,12 @@ Target:  syscall → VFS → io_uring ring → zero-copy to mmap'd user buffer
 
 - **Interactive boost**: bump priority +2 for process receiving keyboard input
 
+
 - **Anticipatory I/O**: prefetch next likely read based on access pattern
 
+
 - **CPU affinity**: pin kernel threads to CPU 0, user threads spread across rest
+
 
 ---
 
@@ -274,32 +288,41 @@ pub enum MultiMonArrangement { Mirror, Extend(ExtendDir), Independent }
 
 - 1.25×, 1.5×, 2.0× rendering scale
 
+
 - Logical pixel coordinates throughout UI
 
+
 - Automatic detection from EDID display info
+
 
 ### 5.3 Wayland Protocol Compatibility
 
 - Implement xdg-shell, xdg-output, wlr-layer-shell protocols
 
+
 - Allow Wayland apps to run on Zenith compositor
 
+
 - `navigator.sigmaos.wayland` API for web apps
+
 
 ### 5.4 Mobile UI Adaptation
 
 - Breakpoints: phone (< 600px) / tablet (600-1024px) / desktop (> 1024px)
 
+
 - Touch-first interactions on phone
 
+
 - Bottom navigation bar on phone, side rail on tablet
+
 
 ---
 
 ## Implementation Schedule
 
 | Quarter | UI/UX Focus | Performance Focus |
-|---|---|---|
+| --- | --- | --- |
 | Q3 2026 | Font engine + 5 new widgets | io_uring + GPU compositor path |
 | Q4 2026 | Onboarding wizard + quick settings | Boot time < 2s |
 | Q1 2027 | App switcher + multi-monitor | Memory < 256MB idle |

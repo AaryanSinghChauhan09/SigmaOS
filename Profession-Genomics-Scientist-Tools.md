@@ -10,11 +10,15 @@ The Genomics Scientist Profile is designed for genomics excellence, genetic anal
 
 - **SigmaGenome**: Genome sequencing and analysis platform.
 
+
 - **SigmaBioinformatics**: Bioinformatics tools and databases.
+
 
 - **SigmaVariant**: Variant calling and annotation.
 
+
 - **SigmaPopulation**: Population genetics and analysis.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Genomics Scientist Profile is designed for genomics excellence, genetic anal
 
 - **Theme**: Genomics Purple (Research Standard)
 
+
 - **Layout**: Genomics Dashboard (Genome, Bioinformatics, Variant)
 
+
 - **Personalization**: Custom analysis pipelines and automated workflows.
+
 
 ---
 

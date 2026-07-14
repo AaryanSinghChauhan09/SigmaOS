@@ -10,7 +10,7 @@
 SigmaOS ships from a **single unified codebase** via CMake profile flags. Every format below
 is compiled from the same `main` branch — there are no divergent forks.
 
-```
+```text
 main (unified)
  ├─ PROFILE=standalone    → 🖥️  Full desktop ISO
  ├─ PROFILE=rtos          → ⚙️  Hard real-time ELF
@@ -30,7 +30,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 📦 Application Formats
 
 | Format | Command / Link | Status |
-|--------|----------------|--------|
+| -------- | ---------------- | -------- |
 | Native (Normal) | `make PROFILE=app all` | ✅ Stable |
 | Electron | `npm start` or download installer | ✅ Stable |
 | Java JAR / WAR | `java -jar sigmaos.jar` | 🔄 Preview |
@@ -47,7 +47,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🖥️ Standalone Formats
 
 | Format | Build Flag | Status |
-|--------|-----------|--------|
+| -------- | ----------- | -------- |
 | Native Executable (ISO) | `PROFILE=standalone` | ✅ Stable |
 | AppImage (Linux) | `PROFILE=standalone` | ✅ Stable |
 | Portable EXE (Windows) | `PROFILE=standalone` | 🔄 Preview |
@@ -61,7 +61,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## ⚙️ RTOS Formats
 
 | Format | Build Flag | IRQ Latency | Status |
-|--------|-----------|-------------|--------|
+| -------- | ----------- | ------------- | -------- |
 | Monolithic | `PROFILE=rtos RTOS_TYPE=monolithic` | <10 µs | ✅ Stable |
 | Microkernel | `PROFILE=rtos RTOS_TYPE=microkernel` | <10 µs | ✅ Stable |
 | Layered / Modular | `PROFILE=rtos RTOS_TYPE=layered` | <10 µs | ✅ Stable |
@@ -74,7 +74,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 📱 Mobile Formats
 
 | Format | Platform | Status |
-|--------|----------|--------|
+| -------- | ---------- | -------- |
 | Native APK | Android 12+ | 🔄 Preview |
 | Native IPA | iOS 16+ (TestFlight) | 🔄 Preview |
 | Hybrid (HTML/CSS/JS) | Android + iOS (Capacitor) | ✅ Stable |
@@ -87,7 +87,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🧩 Microkernel Variants
 
 | Variant | Kernel Size | Build Flag | Status |
-|---------|------------|-----------|--------|
+| --------- | ------------ | ----------- | -------- |
 | Pure | <512 KB | `MK_TYPE=pure` | ✅ Stable |
 | Hybrid | <1 MB | `MK_TYPE=hybrid` | ✅ Stable |
 | Modular | <512 KB base | `MK_TYPE=modular` | ✅ Stable |
@@ -99,7 +99,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 💻 Dual Boot Formats
 
 | Format | Risk Level | Status |
-|--------|-----------|--------|
+| -------- | ----------- | -------- |
 | Traditional Partition | Low | 🔄 Preview |
 | Separate Disk | Zero | 🔄 Preview |
 | Nested Boot / Chainloading | Very Low | 🔄 Preview |
@@ -111,7 +111,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🌐 Distributed Formats
 
 | Topology | Consensus | Build Flag | Status |
-|----------|-----------|-----------|--------|
+| ---------- | ----------- | ----------- | -------- |
 | Client–Server | Central | `DIST_TYPE=client-server` | ✅ Stable |
 | Peer-to-Peer | ZeroNet + CRDT | `DIST_TYPE=p2p` | ✅ Stable |
 | Clustered System | RAFT (SovereignConsensus) | `DIST_TYPE=cluster` | ✅ Stable |
@@ -125,7 +125,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## ☁️ Cloud Formats
 
 | Deployment | Image Format | Build Flag | Status |
-|------------|-------------|-----------|--------|
+| ------------ | ------------- | ----------- | -------- |
 | Public Cloud (AWS/GCE/Azure) | QCOW2 / VHD | `CLOUD_TYPE=public` | ✅ Stable |
 | Private Cloud (OpenStack/Proxmox) | QCOW2 / VMDK | `CLOUD_TYPE=private` | ✅ Stable |
 | Hybrid Cloud | WireGuard bundle | `CLOUD_TYPE=hybrid` | ✅ Stable |
@@ -141,7 +141,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🌍 Browser Formats
 
 | Variant | Description | Status |
-|---------|-------------|--------|
+| --------- | ------------- | -------- |
 | Native Desktop | Custom Chromium + `navigator.sigmaos.*` | ✅ Stable |
 | Mobile Browser | Touch-adapted, Android APK / iOS WKWebView | 🔄 Preview |
 | Embedded / WebViews | Electron, Tauri, WebView2 SDK | ✅ Stable |
@@ -154,7 +154,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🖥️ Kernel Formats
 
 | Kernel Model | Size | Scheduler | Build Flag | Status |
-|-------------|------|-----------|-----------|--------|
+| ------------- | ------ | ----------- | ----------- | -------- |
 | Monolithic | ~2 MB | MLFQ+EDF+CFS | `KERNEL_TYPE=monolithic` | ✅ Stable |
 | Microkernel | <512 KB | Round-robin | `KERNEL_TYPE=microkernel` | ✅ Stable |
 | Hybrid | ~1 MB | MLFQ | `KERNEL_TYPE=hybrid` | ✅ Stable |
@@ -217,27 +217,38 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 
 - Windows 10/11 with at least 20GB free space
 
+
 - 8GB USB drive
 
+
 - Stable internet connection
+
 
 **Steps**:
 
 1. Download SigmaOS ISO: `wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/v15.0.0/sigmaos-15.0.0.iso`
 
+
 2. Verify checksum: `sha256sum -c SigmaOS-SHA256SUMS`
+
 
 3. Create bootable USB using Rufus or balenaEtcher
 
+
 4. Boot from USB (press F12/F2 during startup)
+
 
 5. Select "Dual Boot Installation" from menu
 
+
 6. Follow on-screen instructions to partition disk
+
 
 7. Install SigmaOS alongside Windows
 
+
 8. Reboot and select SigmaOS from boot menu
+
 
 **Risk Level**: Low (separate partitions)
 
@@ -247,27 +258,38 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 
 - Existing Linux installation with backup
 
+
 - 8GB USB drive
 
+
 - Stable internet connection
+
 
 **Steps**:
 
 1. Backup important data
 
+
 2. Download SigmaOS ISO: `wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/v15.0.0/sigmaos-15.0.0.iso`
+
 
 3. Verify checksum: `sha256sum -c SigmaOS-SHA256SUMS`
 
+
 4. Create bootable USB: `sudo dd if=sigmaos-15.0.0.iso of=/dev/sdX bs=4M status=progress`
+
 
 5. Boot from USB
 
+
 6. Select "Full Disk Installation" from menu
+
 
 7. Follow on-screen instructions to replace existing Linux
 
+
 8. Reboot into SigmaOS
+
 
 **Risk Level**: Medium (replaces existing Linux)
 
@@ -277,27 +299,38 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 
 - VirtualBox, VMware, or QEMU
 
+
 - At least 4GB RAM allocated
 
+
 - 20GB disk space
+
 
 **Steps**:
 
 1. Download SigmaOS ISO or QCOW2 image
 
+
 2. Verify checksum: `sha256sum -c SigmaOS-SHA256SUMS`
+
 
 3. Create new VM with 4GB+ RAM, 20GB+ disk
 
+
 4. Attach SigmaOS ISO to VM
+
 
 5. Boot VM and select "Installation"
 
+
 6. Follow on-screen instructions
+
 
 7. Install guest tools for better performance
 
+
 **QEMU Quick Start**:
+
 ```bash
 qemu-system-x86_64 -cdrom sigmaos-15.0.0.iso -m 4G -smp 2 -enable-kvm
 ```
@@ -327,9 +360,12 @@ sigma-pkg verify-sig sigmaos-15.0.0.sig sigmaos-15.0.0.iso
 
 - Download SHA256SUMS file from releases
 
+
 - Compare with downloaded file
 
+
 - Use provided verification script: `./verify-checksum.sh sigmaos-15.0.0.iso`
+
 
 ## Troubleshooting
 
@@ -339,31 +375,43 @@ sigma-pkg verify-sig sigmaos-15.0.0.sig sigmaos-15.0.0.iso
 
 - Check BIOS boot order (ensure SigmaOS is first)
 
+
 - Try UEFI mode if using Legacy BIOS
+
 
 - Disable Secure Boot temporarily
 
+
 - Check disk partitioning with GParted
+
 
 **USB not booting**:
 
 - Re-create bootable USB with different tool
 
+
 - Try USB 2.0 port instead of USB 3.0
+
 
 - Verify ISO integrity with checksum
 
+
 - Try different USB drive
+
 
 **Graphics issues**:
 
 - Boot with `nomodeset` parameter
 
+
 - Try VESA driver: `sigmaos video=vesa`
+
 
 - Update graphics drivers post-installation
 
+
 - Check hardware compatibility matrix
+
 
 ### Post-Installation Issues
 
@@ -371,41 +419,57 @@ sigma-pkg verify-sig sigmaos-15.0.0.sig sigmaos-15.0.0.iso
 
 - Check driver compatibility matrix
 
+
 - Install additional drivers: `sigma-pkg install network-drivers`
+
 
 - Try USB tethering for initial setup
 
+
 - Check network configuration: `sigma-net config`
+
 
 **Audio not working**:
 
 - Install audio drivers: `sigma-pkg install audio-drivers`
 
+
 - Check audio settings: `sigma-audio config`
+
 
 - Try different audio backend
 
+
 - Check hardware compatibility matrix
+
 
 **Performance issues**:
 
 - Check system resources: `sigma-top`
 
+
 - Disable unnecessary services: `sigma-service disable <service>`
+
 
 - Update system: `sigma-pkg update`
 
+
 - Check for driver updates
+
 
 ### Getting Help
 
 - **Documentation**: [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 
+
 - **Issues**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+
 
 - **Community**: [Discord/Forum](#)
 
+
 - **Email**: support@sigmaos.org
+
 
 ---
 

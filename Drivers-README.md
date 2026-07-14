@@ -13,9 +13,12 @@ This gives us:
 
 - Hardware support tested against every kernel change.
 
+
 - No unsigned code executing in Ring 0.
 
+
 - Community contributors can improve drivers without vendor permission.
+
 
 Proprietary blobs (NVIDIA closed, Broadcom Wi-Fi firmware) are supported as an **opt-in**
 via `sigma-pkg install sigma-nonfree/<driver>` — isolated, integrity-checked, and audited.
@@ -24,7 +27,7 @@ via `sigma-pkg install sigma-nonfree/<driver>` — isolated, integrity-checked, 
 
 ## Directory Layout
 
-```
+```text
 drivers/
 ├── audio/          # HDA, PipeWire backend (planned v16.0)
 
@@ -75,7 +78,7 @@ drivers/
 ### ✅ Stable Now (v15.0)
 
 | Driver | Hardware | File |
-|--------|----------|------|
+| -------- | ---------- | ------ |
 | sigma-e1000 | Intel Gigabit | `net/sigma_e1000.rs` (via `sovereignnic.rs`) |
 | sigma-nvme | NVMe SSDs | `sovereignnvme.rs` |
 | sigma-xhci | USB 3.x | `sovereignusb.rs` |
@@ -85,7 +88,7 @@ drivers/
 ### 🔄 In Progress (v15.1)
 
 | Driver | Hardware |
-|--------|----------|
+| -------- | ---------- |
 | sigma-r8169 | Realtek Gigabit |
 | sigma-ahci | SATA AHCI |
 | sigma-iwlwifi | Intel Wi-Fi 6/6E |
@@ -96,15 +99,21 @@ drivers/
 
 - `sigma-amdgpu` — AMD Radeon RX 400+ open driver
 
+
 - `sigma-nouveau` — Community NVIDIA open driver
+
 
 - `sigma-xe` — Intel Arc open driver
 
+
 - `sigma-mesa` — Mesa OpenGL 4.6 / Vulkan 1.3
+
 
 - `sigma-bluez` — Bluetooth stack
 
+
 - `sigma-ath9k` / `sigma-ath11k` — Qualcomm Wi-Fi
+
 
 ---
 

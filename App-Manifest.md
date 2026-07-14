@@ -88,7 +88,7 @@ Array of capability strings the app requires. The user is shown a permission pro
 #### Full capability reference
 
 | Capability string | What it grants |
-|---|---|
+| --- | --- |
 | `process:spawn` | Call `navigator.sigmaos.process.spawn()` |
 | `fs:<absolute-path>` | Read and write access to the given path (recursive) |
 | `fs:<absolute-path>:ro` | Read-only access to the given path |
@@ -123,7 +123,9 @@ Optional object for additional system-level permissions:
 
 - **`notifications`**: Allow the app to show notifications via the Notification Center.
 
+
 - **`autostart`**: Start the app automatically when the user logs in.
+
 
 ---
 
@@ -174,7 +176,8 @@ npx sigma-validate manifest.json
 ```
 
 Output on success:
-```
+
+```text
 ✓ manifest.json is valid
   name: WordCounter
   id: dev.example.wordcounter
@@ -182,7 +185,8 @@ Output on success:
 ```
 
 Output on failure:
-```
+
+```text
 ✗ manifest.json has 2 errors
   [id] Required field missing
   [capabilities[1]] "fs:home/user" — path must be absolute (start with /)
@@ -196,9 +200,12 @@ At runtime, the SigmaOS extension checks every `navigator.sigmaos.*` call agains
 
 1. Is this origin an installed SigmaOS app? (verified against the app registry)
 
+
 2. Does the app's manifest include the capability required for this API call?
 
+
 3. Was the capability granted by the user at install time?
+
 
 If any check fails, the call rejects with `PermissionDeniedError` before reaching any daemon.
 

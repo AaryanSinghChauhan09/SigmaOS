@@ -14,11 +14,12 @@ SigmaOS incorporates a local observability stack designed for low-overhead telem
 - **Snapshot Rollback**: Automatic rollback on critical failures
 - **Distributed Tracing**: OpenTelemetry integration for distributed tracing
 
+
 ## Architecture
 
 ### Observability & Self-Healing Flow
 
-```
+```text
  [System/Kernel Metrics] ──► [sigmad-monitor (Prometheus exporter)]
                                        │
                                        ▼
@@ -32,7 +33,7 @@ SigmaOS incorporates a local observability stack designed for low-overhead telem
 
 ### Component Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         Observability Stack             │
 │  ┌──────────┬──────────┬──────────────┐ │
@@ -104,19 +105,28 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+
   - job_name: 'sigmaos'
+
     static_configs:
+
       - targets: ['localhost:9100']
+
   
   - job_name: 'node_exporter'
+
     static_configs:
+
       - targets: ['localhost:9101']
+
 
 alerting:
   alertmanagers:
+
     - static_configs:
         - targets:
           - localhost:9093
+
 ```
 
 ## Technical Implementation
@@ -346,6 +356,7 @@ impl SelfHealingEngine {
 ### Pre-configured Dashboards
 
 **System Overview Dashboard**:
+
 - CPU usage (current, average, peak)
 - Memory usage (current, average, peak)
 - Disk usage (current, average, peak)
@@ -353,19 +364,24 @@ impl SelfHealingEngine {
 - Process count
 - System load average
 
+
 **Self-Healing Dashboard**:
+
 - Anomaly detection events
 - Recovery actions taken
 - Rollback events
 - System health score
 - Alert status
 
+
 **Application Dashboard**:
+
 - Application-specific metrics
 - Request latency
 - Error rates
 - Throughput
 - Resource usage per application
+
 
 ### Dashboard Configuration
 
@@ -441,12 +457,14 @@ where
 3. **Metric Naming**: Follow Prometheus naming conventions
 4. **Sampling**: Use appropriate sampling rates for tracing
 
+
 ### Configuration
 
 1. **Retention Policies**: Set appropriate retention periods
 2. **Thresholds**: Configure appropriate thresholds
 3. **Alerting**: Set up appropriate alert rules
 4. **Dashboards**: Customize dashboards for specific needs
+
 
 ### Security
 
@@ -455,31 +473,40 @@ where
 3. **Authentication**: Use authentication for endpoints
 4. **Audit Logging**: Log access to observability data
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Prometheus metrics exporter daemon
 - CPU/memory utilization metrics
 - Basic Grafana dashboards
 - Alert configuration
 
+
 ### Phase 2 (Months 3-6)
+
 - Integrated Grafana dashboard service
 - Advanced metrics collection
 - Distributed tracing with OpenTelemetry
 - Custom alert rules
 
+
 ### Phase 3 (Months 6-9)
+
 - Self-healing watchdog daemon
 - Service restart on failure
 - Anomaly detection engine
 - Automated recovery actions
 
+
 ### Phase 4 (Months 9-12)
+
 - Automated ZFS/Btrfs snapshot rollback
 - ML-based anomaly detection
 - Predictive failure detection
 - Advanced self-healing strategies
+
 
 ## References
 

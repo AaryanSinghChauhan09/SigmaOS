@@ -23,11 +23,15 @@ Artificial Intelligence within SigmaOS provides freestanding, zero-dependency an
 
 - **Supervised Learning:** Algorithms learn from labeled training data ($X, y$), mapping feature vectors to known ground-truth targets E.g., regression or classification.
 
+
 - **Unsupervised Learning:** Algorithms identify hidden patterns, groupings, or underlying structures within unlabeled data ($X$) E.g., clustering or dimensionality reduction.
+
 
 - **Reinforcement Learning:** Agents learn optimal policy actions within an environment to maximize cumulative rewards through trial-and-error exploration.
 
+
 - **Neural Networks & Deep Learning:** Multi-layered interconnected perceptron networks capable of hierarchical feature representation and non-linear function approximation.
+
 
 ### Knowledge Representation
 
@@ -54,7 +58,7 @@ results = kg.query("SELECT ?device WHERE SigmaOS supports ?device")
 
 ### ML Pipeline in SigmaOS
 
-```
+```text
 SourceData → Feature Extraction → Feature Correlation → Feature Transform
 → Train Model → Ensemble → Evaluate → Deploy
 ```
@@ -254,9 +258,12 @@ for epoch in range(100):
 
 - **TensorFlow & Keras:** Direct execution of SavedModel graphs and Keras sequential/functional models.
 
+
 - **PyTorch:** Native TorchScript JIT compilation and tensor sharding across AVX-512 registers.
 
+
 - **Scikit-learn:** Tabular data modeling and pipeline automation matching exact `fit`/`predict` paradigms.
+
 
 ---
 
@@ -326,21 +333,27 @@ prediction = legal_ai.predict_outcome(case_facts)
 
 - **Issue - Overfitting in Deep Neural Networks:** Model memorizes training data noise, causing high validation loss and poor real-world accuracy.
 
+
 - *Fix Strategy:* Inject `Dropout` layers (rate 0.2 to 0.5), apply $L_2$ weight decay regularization, utilize Early Stopping callbacks, or execute data augmentation.
+
 
 - **Issue - Vanishing & Exploding Gradients:** Gradients shrink to zero or grow exponentially during backpropagation in deep networks.
 
+
 - *Fix Strategy:* Replace Sigmoid/Tanh activations with ReLU or LeakyReLU, initialize weights using He/Glorot normal initializers, and implement Gradient Clipping (`clipnorm=1.0`).
+
 
 - **Issue - Algorithmic Complexity in Attention / Distance Matrices:** Pairwise distance calculations in k-NN or self-attention scale quadratically ($O(n^2)$).
 
+
 - *Fix Strategy:* Utilize approximate nearest neighbor (ANN) search trees (HNSW / k-d trees) to reduce search complexity to $O(n \log n)$.
+
 
 ---
 
 ## SigmaAI Architecture
 
-```
+```text
 SigmaAI Intelligence Layer
 ├── ML Engine (sklearn-compatible API)
 │   ├── Classification: RandomForest, SVM, KNN, LogReg
@@ -370,10 +383,14 @@ SigmaAI Intelligence Layer
 
 - `userland/apps/SigmaAI/sigma_ai_engine.cpp`
 
+
 - `userland/apps/SigmaAI/nn_runtime.cpp`
+
 
 - `userland/apps/SigmaNLP/sigma_nlp.cpp`
 
+
 - `userland/apps/SigmaLegalAI/legal_predictor.cpp`
+
 
 ### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

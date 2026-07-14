@@ -25,6 +25,8 @@ uint64_t hal_get_timestamp_ns(void);
 
 - [ ] AArch64 MMU backend
 
+
 - [ ] RISC-V SBI wrapper
+
 
 - [ ] ACPI/DTB discovery

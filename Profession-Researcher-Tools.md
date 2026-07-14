@@ -10,11 +10,15 @@ The Researcher Profile is designed for research excellence, data management, and
 
 - **SigmaData**: Research data collection and management.
 
+
 - **SigmaAnalysis**: Statistical analysis and visualization tools.
+
 
 - **SigmaPublication**: Publication management and collaboration.
 
+
 - **SigmaCitations**: Citation management and bibliography tools.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Researcher Profile is designed for research excellence, data management, and
 
 - **Theme**: Research Blue (Academic Standard)
 
+
 - **Layout**: Research Dashboard (Data, Analysis, Publication)
 
+
 - **Personalization**: Custom analysis pipelines and automated citations.
+
 
 ---
 

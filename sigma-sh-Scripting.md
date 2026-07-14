@@ -16,6 +16,7 @@ chmod +x script.sigma && ./script.sigma   # executable scripts
 ```
 
 Script shebang line:
+
 ```sh
 #!/usr/bin/env sigma-sh
 ```
@@ -35,7 +36,7 @@ echo "Greeting: ${name:-world}"    # default if unset or empty
 ### Special variables
 
 | Variable | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | `$?` | Exit code of last command |
 | `$$` | PID of the shell process |
 | `$!` | PID of last background process |
@@ -210,7 +211,7 @@ sigma test ; echo "Done"           # always run echo (regardless of exit code)
 ## Built-in Commands
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `cd [dir]` | Change directory (`-` = previous, `~` = home) |
 | `pwd` | Print working directory |
 | `echo [-n] [...]` | Print text (`\n`, `\t` escapes supported) |
@@ -232,7 +233,7 @@ sigma test ; echo "Done"           # always run echo (regardless of exit code)
 ## Test Expressions
 
 | Expression | True when |
-|------------|-----------|
+| ------------ | ----------- |
 | `-e file` | File/dir exists |
 | `-f file` | Regular file exists |
 | `-d path` | Directory exists |
@@ -281,18 +282,25 @@ fi
 
 - Use `set -e` idiom equivalent: `cmd || exit 1` to fail fast
 
+
 - Quote variables: `"$var"` prevents word splitting
+
 
 - Use `$()` instead of backticks `` `cmd` `` — cleaner nesting
 
+
 - Check exit codes: `$?` immediately after the command
 
+
 - Use `sigma-fix scan` before deploying scripts to catch common issues
+
 
 ## See Also
 
 - [CLI Reference](CLI-Reference) — all sigma CLI commands
 
+
 - [sigma-sh Manual](sigma-sh) — interactive shell usage
+
 
 - [Coreutils](Coreutils) — standard utilities available in scripts

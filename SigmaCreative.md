@@ -5,7 +5,9 @@
 ## Features
 
 ### SigmaVector (Vector Graphics)
+
 Scalable vector drawing tools (Illustrator alternative):
+
 - Pen tool with Bézier curves
 - Shape tools (rectangle, ellipse, polygon, star)
 - Path operations (union, intersection, difference, exclusion)
@@ -17,8 +19,11 @@ Scalable vector drawing tools (Illustrator alternative):
 - AI-powered vector tracing
 - Typography tools with OpenType features
 
+
 ### SigmaRaster (Raster Editing)
+
 Photo manipulation and layer-based image editing (Photoshop alternative):
+
 - Layer-based editing with blending modes
 - Selection tools (lasso, magic wand, quick select)
 - Adjustment layers (brightness, contrast, hue/saturation, curves)
@@ -31,8 +36,11 @@ Photo manipulation and layer-based image editing (Photoshop alternative):
 - AI-powered object selection and removal
 - Export to PNG, JPEG, TIFF, WebP, PSD
 
+
 ### SigmaVideo (Video Editing)
+
 Non-linear video editing (Premiere alternative):
+
 - Multi-track timeline editing
 - Video transitions and effects
 - Audio mixing and effects
@@ -44,9 +52,10 @@ Non-linear video editing (Premiere alternative):
 - AI-powered auto-captioning
 - Motion tracking and stabilization
 
+
 ## Architecture
 
-```
+```text
 SigmaCreative Suite
    ├─ SigmaVector (vector graphics engine)
    │   ├─ Path renderer
@@ -68,7 +77,7 @@ SigmaCreative Suite
 ## File Formats
 
 | Application | Native Format | Import Formats | Export Formats |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SigmaVector | .svector | .svg, .ai, .eps, .pdf | .svg, .pdf, .eps, .png |
 | SigmaRaster | .sraster | .psd, .png, .jpg, .tiff, .webp, .raw | .psd, .png, .jpg, .tiff, .webp |
 | SigmaVideo | .svideo | .mp4, .mov, .avi, .mkv | .mp4, .mov, .webm, .prores |
@@ -114,10 +123,11 @@ int sigma_video_export(const video_project_t *proj, const char *path, codec_t co
 - **GPU Acceleration**: Vulkan-based rendering for real-time effects
 - **Zenith Desktop Integration**: Native Zenith UI components with touch/gesture support
 
+
 ## Performance Characteristics
 
 | Application | GPU Acceleration | Max Resolution | Real-time Preview |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SigmaVector | ✅ Vulkan | Unlimited | ✅ Yes |
 | SigmaRaster | ✅ Vulkan | 8K+ | ✅ Yes (with proxy) |
 | SigmaVideo | ✅ Vulkan + NVENC | 8K+ | ✅ Yes (with proxy) |
@@ -134,6 +144,7 @@ int sigma_video_export(const video_project_t *proj, const char *path, codec_t co
 - [ ] Plugin system for third-party filters/effects
 - [ ] Mobile versions (SigmaOS Mobile)
 - [ ] Cloud collaboration (SigmaOS Cloud)
+
 
 ## Related Modules
 

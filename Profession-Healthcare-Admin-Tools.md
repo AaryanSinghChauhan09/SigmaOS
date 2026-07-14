@@ -10,11 +10,15 @@ The Healthcare Administrator Profile is designed for healthcare excellence, faci
 
 - **SigmaFacility**: Facility management and resource allocation.
 
+
 - **SigmaPatient**: Patient administration and care coordination.
+
 
 - **SigmaCompliance**: Healthcare regulatory compliance and reporting.
 
+
 - **SigmaFinance**: Healthcare financial management and billing.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Healthcare Administrator Profile is designed for healthcare excellence, faci
 
 - **Theme**: Medical Blue (Healthcare Standard)
 
+
 - **Layout**: Healthcare Dashboard (Facility, Patients, Compliance)
 
+
 - **Personalization**: Custom compliance workflows and automated reporting.
+
 
 ---
 

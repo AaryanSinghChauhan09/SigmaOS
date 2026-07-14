@@ -19,15 +19,18 @@ npm run dev
 
 1. Boot animation → 2 seconds
 
+
 2. Login screen → click "Enter Desktop"
 
+
 3. Desktop with dock → double-click **Device Manager** to see all 24 drivers
+
 
 ---
 
 ## Architecture
 
-```
+```text
 sigma-web/src/
 ├── App.tsx                       # Root — OsProvider + DriversProvider
 
@@ -60,7 +63,7 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 ### Sensors
 
 | Driver | Web API | What you see |
-|---|---|---|
+| --- | --- | --- |
 | **Battery** | Battery Status API | Live % level, charging state, time remaining |
 | **Network** | Network Information API | Online/offline, connection type, RTT, speed |
 | **Geolocation** | Geolocation API | GPS coordinates with live tracking |
@@ -70,14 +73,14 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 ### Storage
 
 | Driver | Web API | What you can do |
-|---|---|---|
+| --- | --- | --- |
 | **Filesystem** | File System Access API | Browse your real disk, open/save files |
 | **OPFS** | Origin Private File System | Persistent in-browser virtual disk (read/write/delete) |
 
 ### Media
 
 | Driver | Web API | What you see |
-|---|---|---|
+| --- | --- | --- |
 | **Audio** | Web Audio API + getUserMedia | Microphone with live frequency spectrum visualizer |
 | **Camera** | getUserMedia (video) | Live webcam feed with snapshot capture |
 | **Screen Capture** | getDisplayMedia | Screen sharing + WebM recording + download |
@@ -85,7 +88,7 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 ### Input
 
 | Driver | Web API | What you see |
-|---|---|---|
+| --- | --- | --- |
 | **Gamepad** | Gamepad API | Live button states + analog axis bars |
 | **Speech** | SpeechRecognition + Synthesis | Voice input transcript + text-to-speech |
 | **Pointer** | Pointer Events API | Mouse/pen/touch with pressure, tilt, twist |
@@ -93,7 +96,7 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 ### System
 
 | Driver | Web API | What you can do |
-|---|---|---|
+| --- | --- | --- |
 | **Notifications** | Notifications API | Request permission + send system notifications |
 | **Clipboard** | Clipboard API | Write to and read from system clipboard |
 | **Wake Lock** | Screen Wake Lock API | Prevent screen sleep |
@@ -102,7 +105,7 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 ### Hardware Peripherals
 
 | Driver | Web API | What you see |
-|---|---|---|
+| --- | --- | --- |
 | **USB** | WebUSB API | Pair USB devices, vendor/product IDs |
 | **Bluetooth** | Web Bluetooth API | GATT device scan, connect, disconnect |
 | **Serial** | Web Serial API | Arduino/ESP32 — send commands, read output |
@@ -116,7 +119,7 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 ## Browser Support
 
 | Feature | Chrome/Edge | Firefox | Safari |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Battery | ✅ (Chrome-only) | ❌ | ❌ |
 | Geolocation | ✅ | ✅ | ✅ |
 | WebUSB | ✅ | ❌ | ❌ |
@@ -138,14 +141,17 @@ This browser demo serves three purposes:
 
 1. **Proof of concept** — shows SigmaOS architecture working before native hardware boot exists
 
+
 2. **Driver showcase** — demonstrates the 24-driver hardware abstraction layer that will map to native kernel drivers
 
+
 3. **Demo for users** — anyone can try SigmaOS immediately without downloading anything
+
 
 The mapping from browser drivers to native kernel drivers:
 
 | Browser (sigma-web) | Native target (Phase 2) |
-|---|---|
+| --- | --- |
 | Battery Status API | ACPI battery HAL driver |
 | Network Information API | sigma-netd (DHCP/WiFi/Ethernet) |
 | getUserMedia (camera) | V4L2 camera SDF driver |

@@ -10,7 +10,7 @@
 
 | # | Category | Ideas | Highlights |
 
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | 🖥️ OS / Core System | 100 | Kernel architectures, boot, VMs, packages, distributed |
 | 2 | 🔧 Drivers | 75 | GPU (Intel/AMD/NVIDIA), Wi-Fi, storage, IoT, hot-plug |
 | 3 | 🔒 Security | 75 | WASM sandbox, LUKS2, RBAC, network IDS, reproducibility |
@@ -40,7 +40,7 @@
 
 | # | Idea | Why |
 
-|---|---|---|
+| --- | --- | --- |
 | 1 | Bootable ISO (`make iso`) | Unblocks everything |
 | 2 | sigma-sh working REPL | Usability baseline |
 | 3 | sigma-pkg local install | Ecosystem entry point |
@@ -76,9 +76,12 @@
 
 1. Open a [GitHub Discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) with label `idea`
 
+
 2. Or open a PR: add to `docs/IDEAS_1000.md` numbered from 1001
 
+
 3. One line per idea — spec detail in a separate `docs/` file
+
 
 ---
 

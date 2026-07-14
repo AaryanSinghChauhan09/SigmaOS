@@ -15,7 +15,7 @@ sigma_meta_boot_for_profile(2); /* Desktop */
 ## Subsystem map
 
 | Competitor | Module | Feature |
-|------------|--------|---------|
+| ------------ | -------- | --------- |
 | SteamOS | `sigma_game_layer.c` | Gaming + Proton hooks |
 | Clear Linux | `sigma_sched.c` | Performance profiles |
 | NixOS | `sigma_pkg_registry/` | Reproducible `.spkg` recipes |

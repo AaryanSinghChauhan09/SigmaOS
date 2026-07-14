@@ -9,7 +9,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ## Overview
 
 | Stat | Value |
-|---|---|
+| --- | --- |
 | Total utilities | 42 |
 | Critical priority | 9 |
 | Phases | 5 |
@@ -23,7 +23,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ### Build the bedrock utilities that bridge the microkernel to usable user-space.
 
 | Utility | Priority | Category | Key Dependencies |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Process Manager (ps, top, kill) | **Critical** | System | — |
 | File System Navigator (ls, cd, mkdir, rm) | **Critical** | File System | — |
 | Text File Viewer (cat, less, head, tail) | **Critical** | File System | — |
@@ -40,7 +40,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ### Equip developers with the tools needed to build and debug on SigmaOS.
 
 | Utility | Priority | Category | Key Dependencies |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Text Processing (grep, sed, awk, cut, sort) | **Critical** | Text Processing | Text Viewer |
 | File Search & Locate (find, locate, which) | High | File System | FS Navigator |
 | Archive Manager (tar, gzip, zip) | High | File System | FS Navigator |
@@ -58,7 +58,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ### Build interactive end-user applications that make SigmaOS a daily driver.
 
 | Utility | Priority | Category | Key Dependencies |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Package Manager (pkg) | **Critical** | System | Build System |
 | Terminal Multiplexer (tmux-style) | High | Terminal | Shell |
 | File Manager (mc/ranger-style) | High | File System | FS Navigator, Text Viewer |
@@ -75,7 +75,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ### Harden the OS and make it production-ready for multi-user networked environments.
 
 | Utility | Priority | Category | Key Dependencies |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | User & Permission Manager (useradd, chmod) | **Critical** | Security | Shell |
 | Firewall Configuration (iptables-style) | High | Security | Network Diagnostics |
 | SSH Client & Server (openssh) | High | Network | User Manager, Network |
@@ -93,7 +93,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ### Create a thriving ecosystem and lower the barrier to porting existing software.
 
 | Utility | Priority | Category | Key Dependencies |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SDK & API Documentation | **Critical** | Documentation | — |
 | POSIX Compatibility Layer | **Critical** | Compatibility | Package Manager |
 | Graphics Subsystem (Wayland-style) | High | Graphics | User Manager |
@@ -122,7 +122,7 @@ Open the roadmap: `userland/roadmap/index.html` (pure HTML, no build step needed
 ## Key Gaps to Address First
 
 | Gap | Why Critical |
-|---|---|
+| --- | --- |
 | IPC debugging tools (strace-equiv) | SigmaOS needs a way to trace IPC messages between shards |
 | VFS tools (mount, fsck for SigmaFS) | The user-space filesystem needs dedicated inspection tools |
 | Driver shard inspector | Query and configure hardware driver shards (network, storage, display) |
@@ -136,15 +136,21 @@ The file `userland/roadmap/index.html` is a zero-dependency single-page app:
 
 - **Expandable phases** — click to drill into individual utilities
 
+
 - **Live filtering** — search by keyword, filter by category and priority
+
 
 - **Dependency tracking** — each item shows its upstream dependencies
 
+
 - **Priority badges** — Critical / High / Medium / Low with colour coding
+
 
 - **Status indicators** — In Progress / Planned / Completed
 
+
 - **Overview dashboard** — stats cards for totals, criticals, phases, categories
+
 
 No build step needed — open directly in any browser.
 

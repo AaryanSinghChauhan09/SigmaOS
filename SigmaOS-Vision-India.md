@@ -10,11 +10,15 @@ India has 1.4 billion people, 63 million MSMEs, 400,000 CAs, 300,000 doctors, 15
 
 - **Tally** — closed source, aging UI, no mobile, no direct GST filing
 
+
 - **Zoho** — ₹2,800/user/month, data in their servers, requires internet
+
 
 - **SAP** — for the top 500 companies only, ignores 63 million MSMEs
 
+
 - **Windows** — built for the US, bolted onto India as an afterthought
+
 
 SigmaOS is built *from the ground up* for India's professionals, laws, languages, and infrastructure constraints.
 
@@ -24,7 +28,7 @@ SigmaOS is built *from the ground up* for India's professionals, laws, languages
 
 | # | Feature | What it does |
 
-|---|---|---|
+| --- | --- | --- |
 | 1 | **IndiaStack Native** | e-RUPI, ONDC, OCEN, Account Aggregator baked into the OS |
 | 2 | **Bhashini AI** | 22 languages + sign language, fully offline (Whisper.cpp) |
 | 3 | **AR/VR Platform** | OpenXR on a sovereign OS, no Meta/Apple dependency |
@@ -49,7 +53,7 @@ SigmaOS is built *from the ground up* for India's professionals, laws, languages
 SigmaOS ships profession-specific apps pre-installed based on the user's declared profession at setup. Every app integrates with the OS — invoices auto-post to accounts, lab results auto-update EMR, salary auto-feeds EPF.
 
 | App | Profession | Key Capability |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-accounts` | Business owners, CAs | Double-entry, GST, e-Invoice IRN, DID audit trail |
 | `sigma-ca` | Chartered Accountants | Multi-client dashboard, GSTR filing, Form 16 |
 | `sigma-payroll` | HR managers | EPF, ESIC, TDS, Form 16, ECR upload |
@@ -83,7 +87,7 @@ India has 1.2 million villages. Most have no IT support. SigmaOS must work witho
 When something breaks, sigma-heal fixes it:
 
 | Problem | sigma-heal response |
-|---|---|
+| --- | --- |
 | Filesystem corruption | btrfs scrub → repair → restore from mirror if needed |
 | Kernel panic | capture dump → boot recovery kernel → sigma-ai diagnoses → rollback |
 | Package conflict | dependency solver → auto-rollback to last good generation |
@@ -97,7 +101,7 @@ When something breaks, sigma-heal fixes it:
 
 ## sigma-commnet: Village-Owned Internet
 
-```
+```text
          BSNL / Jio / Starlink (₹500/month)
                       │
               sigma-commnet Gateway
@@ -111,19 +115,24 @@ Features:
 
 - QoS fair-share: each household gets equal bandwidth
 
+
 - Offline cache: NCERT, DigiLocker, e-NAM, PM-KISAN always available
+
 
 - DID access control: only enrolled community members can connect
 
+
 - Community billing: shares actual ISP cost equally — no profit, no markup
 
+
 - TRAI compliant: cost-sharing (not reselling) is permitted
+
 
 ---
 
 ## The Technology Stack
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │  USER: PWAs, Zenith Desktop, 23+ India profession apps      │
 ├─────────────────────────────────────────────────────────────┤
@@ -148,13 +157,18 @@ Five things that take competitors 5+ years to replicate:
 
 1. **sigma-bus at OS level** — payroll auto-feeds accounts, legal auto-bills clients. Zoho has this between Zoho apps only. sigma-bus is available to any app.
 
+
 2. **Offline-capable fleet sync** — 10 shops sync peer-to-peer, no cloud. Works in Assam without 4G.
+
 
 3. **DID-verified transactions** — every accounting entry cryptographically signed. `sigma-ca verify 2024-GST-003` proves authenticity to tax officers.
 
+
 4. **Local AI** — sigma-ai (TinyLlama) runs entirely on-device. Your P&L never leaves your office.
 
+
 5. **Indian law at OS level** — BNS 2023 in sigma-legal, updated automatically. Competitors need software releases for every law change.
+
 
 ---
 

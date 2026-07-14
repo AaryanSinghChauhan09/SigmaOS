@@ -17,11 +17,15 @@ Implement a simple 64-task round-robin scheduler. The scheduler must:
 
 - Maintain a circular task queue
 
+
 - Context switch on timer tick (APIC, 10ms quantum)
+
 
 - Pass QEMU test: 2 tasks printing alternately without deadlock
 
+
 - Exit criteria: `make qemu` shows interleaved output from 2 tasks
+
 
 ### [KERNEL] Implement buddy physical allocator — Phase G-02
 
@@ -34,11 +38,15 @@ Implement a buddy allocator for physical page frames:
 
 - Support orders 0–10 (4 KB – 4 MB blocks)
 
+
 - `alloc_pages(order)` and `free_pages(ptr, order)`
+
 
 - No leaks: alloc 100 pages, free all, realloc should succeed
 
+
 - Slab on top: `kmalloc(size)` / `kfree(ptr)` with 10k object test
+
 
 ### [KERNEL] APIC + HPET timer initialisation — Phase G-04
 
@@ -51,9 +59,12 @@ Initialise APIC and HPET for timer interrupts:
 
 - Parse ACPI MADT to locate APIC base
 
+
 - Initialise local APIC timer at 100 Hz
 
+
 - Test: timer IRQ fires in QEMU; `jiffies` counter increments
+
 
 ### [BOOT] Implement sigma-boot.efi UEFI loader — Phase G-07
 
@@ -66,13 +77,18 @@ Implement a minimal UEFI bootloader:
 
 - Load kernel ELF from ESP
 
+
 - Build memory map for physical MM init
+
 
 - Set up identity-mapped page tables (first 4 GB)
 
+
 - Jump to `sigma_kernel_main()`
 
+
 - Test: `qemu-system-x86_64 -cdrom SigmaOS.iso` boots to kernel
+
 
 ---
 
@@ -89,9 +105,12 @@ Implement framebuffer driver using UEFI GOP (Graphics Output Protocol):
 
 - Detect framebuffer base, width, height, pitch from GOP
 
+
 - Provide `sigma_fb_write_pixel(x, y, rgb)` API
 
+
 - Test: coloured rectangle visible in QEMU `-display gtk`
+
 
 ### [DRIVER] Intel iwlwifi Wi-Fi 6 driver — Phase G-09
 
@@ -104,11 +123,15 @@ Implement 802.11ax driver for Intel wireless NICs:
 
 - Probe via PCI (vendor 0x8086, device IDs for AX200/AX201/AX210)
 
+
 - Init firmware loading via sigma-firmwared
+
 
 - Implement `scan`, `connect`, `disconnect` ops
 
+
 - Test: QEMU passthrough or physical Intel NIC associates with AP
+
 
 ---
 
@@ -123,10 +146,12 @@ Implement 802.11ax driver for Intel wireless NICs:
 
 `derive_key()` currently returns 32 zero bytes. All CryptFS-encrypted volumes are trivially decryptable.
 Fix: implement Argon2id key derivation from passphrase + salt:
+
 ```cpp
 sigma_status derive_key(const char* passphrase, const uint8_t* salt,
                          size_t salt_len, uint8_t* key_out, size_t key_len);
 ```
+
 Use `security/SovereignEntropy.cpp` for salt generation.
 Test: encrypted file not readable after password change.
 

@@ -1,4 +1,5 @@
 # SigmaOS Kernel Absorption - Fuchsia
+
 ## Making fuchsia/fuchsia Irrelevant
 
 > **Absorption Target**: https://github.com/fuchsia/fuchsia  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Fuchsia by implementing a native microkernel 
 ## Absorbed Features & Capabilities
 
 ### 1. Component Framework
+
 **Original**: Fuchsia's component framework (CF)  
 **SigmaOS**: SigmaComponent with native integration
 
@@ -29,6 +31,7 @@ pub struct SigmaComponent {
 ```
 
 **Component Features**:
+
 - Native component lifecycle management
 - Component discovery with automatic registration
 - Inter-component communication with native IPC
@@ -36,11 +39,14 @@ pub struct SigmaComponent {
 - Component versioning with automatic updates
 - Component composition with dependency management
 
+
 ### 2. Update System (OTA)
+
 **Original**: Fuchsia's over-the-air update system  
 **SigmaOS**: SigmaUpdate with enhanced features
 
 **Update Features**:
+
 - Atomic updates with automatic rollback
 - Delta updates with minimal bandwidth
 - A/B partitioning with seamless switching
@@ -48,11 +54,14 @@ pub struct SigmaComponent {
 - Update scheduling with user control
 - Update monitoring with telemetry
 
+
 ### 3. Package Management
+
 **Original**: Fuchsia's package system (pkg)  
 **SigmaOS**: SigmaPkg with native integration
 
 **Package Features**:
+
 - Declarative package definitions
 - Content-addressed package storage
 - Package resolution with dependency solving
@@ -60,11 +69,14 @@ pub struct SigmaComponent {
 - Package verification with cryptographic hashes
 - Package sandboxing with capability isolation
 
+
 ### 4. Netstack
+
 **Original**: Fuchsia's network stack  
 **SigmaOS**: SigmaNetStack with modern protocols
 
 **Network Features**:
+
 - Native TCP/IP stack with modern optimizations
 - Zero-copy networking for high performance
 - Native WiFi support with automatic configuration
@@ -72,11 +84,14 @@ pub struct SigmaComponent {
 - Native VPN integration with WireGuard
 - Network monitoring with automatic diagnostics
 
+
 ### 5. FIDL (Interface Definition Language)
+
 **Original**: Fuchsia's FIDL for IPC  
 **SigmaOS**: SigmaIDL with enhanced features
 
 **IDL Features**:
+
 - Native interface definition with type safety
 - Automatic code generation for multiple languages
 - Versioned interfaces with backward compatibility
@@ -84,11 +99,14 @@ pub struct SigmaComponent {
 - Async operations with native await
 - Protocol composition with inheritance
 
+
 ### 6. Security Framework
+
 **Original**: Fuchsia's security model  
 **SigmaOS**: Native security with enhanced features
 
 **Security Features**:
+
 - Capability-based access control
 - Component sandboxing with hardware enforcement
 - Job policy with resource limits
@@ -96,12 +114,13 @@ pub struct SigmaComponent {
 - Secure boot with TPM integration
 - Audit logging with tamper-proof records
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Fuchsia | SigmaOS | Advantage |
-|---------|---------|---------|------------|
+| --------- | --------- | --------- | ------------ |
 | Component System | CF | SigmaComponent | ✅ 2x |
 | Update System | OTA | Enhanced OTA | ✅ 2x |
 | Package Management | pkg | SigmaPkg | ✅ 2x |
@@ -116,6 +135,7 @@ pub struct SigmaComponent {
 ## Implementation Details
 
 ### Native Component Framework
+
 ```rust
 pub mod component {
     use sigma_component::manager::ComponentManager;
@@ -144,6 +164,7 @@ pub mod component {
 ```
 
 ### Native Update System
+
 ```rust
 pub mod update {
     pub struct SigmaUpdate {
@@ -170,26 +191,39 @@ pub mod update {
 ### For Users of Fuchsia
 
 **Before** (using Fuchsia):
+
 ```bash
+
 # Build Fuchsia
+
 # Boot into Fuchsia
+
 # Use Fuchsia component framework
+
 # Package management with pkg
+
 # OTA updates
+
 ```
 
 **After** (using SigmaOS):
+
 ```bash
+
 # Enable Fuchsia-inspired components
+
 sigma-component enable --fuchsia-style
 
 # Create component with native framework
+
 sigma-component create --manifest component.sigma
 
 # Native package management
+
 sigma-pkg install --package my-package
 
 # Atomic OTA updates
+
 sigma-update perform --package update.pkg
 ```
 
@@ -198,7 +232,7 @@ sigma-update perform --package update.pkg
 ## Performance Benchmarks
 
 | Operation | Fuchsia | SigmaOS | Improvement |
-|-----------|---------|---------|-------------|
+| ----------- | --------- | --------- | ------------- |
 | Component Launch | 60ms | 25ms | 2.4x faster |
 | Package Install (100MB) | 30s | 12s | 2.5x faster |
 | Update Apply (1GB) | 5min | 2min | 2.5x faster |

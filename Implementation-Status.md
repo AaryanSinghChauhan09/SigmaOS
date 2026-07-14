@@ -5,7 +5,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Legend
 
 | Symbol | Meaning |
-|---|---|
+| --- | --- |
 | ✅ | Fully implemented and committed |
 | 🔄 | In progress |
 | ⏳ | Planned / roadmapped |
@@ -16,7 +16,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Kernel Subsystems (`modules/core/kernel/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Bootstrap / entry | ✅ | `bootstrap.rs` — IDT, GDT, paging |
 | Interrupt Descriptor Table | ✅ | `idt.rs` |
 | Page Allocator (bitmap) | ✅ | `page_alloc.rs` |
@@ -39,7 +39,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Userland — AI & LLM (`userland/ai/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | AI Task Orchestrator | ✅ | `sigma_llm_backend.rs` — priority queues |
 | Local LLM Context Manager | ✅ | `local_llm.rs` — semantic query routing |
 | Whisper Voice Bridge | ⏳ | Speech → CLI translation |
@@ -50,7 +50,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Userland — Security (`usr/security/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Security Center Daemon | ✅ | `security_center.rs` — audit + IDS |
 | Sandbox CLI | ✅ | Capability-gated sandboxed process launch |
 | Zeek network adapter | ⏳ | Kernel traffic → Zeek rules |
@@ -61,7 +61,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Userland — Desktop & UI (`usr/ui/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Widget OOP Framework | ✅ | `ui_core.rs` — Trait-based, zero-alloc |
 | Zenith Compositor | ✅ | `zenith_desktop.rs` — BSP tiling |
 | Dock / Taskbar | ✅ | `dash.rs` |
@@ -76,7 +76,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Userland — Applications (`usr/apps/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Logic Automation Engine | ✅ | `sigma_logic.rs` — node-based triggers |
 | NoSQL Key-Value DB | ✅ | `sigma_db.rs` — zero-alloc store |
 | Distro Streamer (Linux compat) | ✅ | `sigma_distro_streamer.rs` |
@@ -90,7 +90,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Userland — Education (`usr/education/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Matrix Math Library | ✅ | `sigma_math.rs` — O(N³) mult |
 | Scientific Computing | ✅ | `sigma_scicomp.rs` — Simpson's Rule |
 | Online Academy Server | ⏳ | `sigma_academy.rs` — freeCodeCamp |
@@ -101,7 +101,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Userland — Observability (`usr/observability/`)
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | System Telemetry Monitor | ✅ | `sigma_monitoring.rs` — TSC-based |
 | OpenTelemetry export | ⏳ | Kernel IPC trace spans |
 | Live Zenith Dashboard widget | ⏳ | CPU/RAM bars in Dock |
@@ -111,7 +111,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Package & Boot Infrastructure
 
 | Component | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | sigpkg package manager | 🔄 | `sigma-pkg/` — signing in progress |
 | sigpkg registry server | ⏳ | Mirrors + rollback |
 | UEFI bootloader | ⏳ | `sigma-boot/` |
@@ -124,7 +124,7 @@ This document provides a comprehensive, per-module view of what has been impleme
 ## Professional & Localization
 
 | Module | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Finance calculator (GST/TDS) | ⏳ | `sigma_finance.rs` |
 | Healthcare records | ⏳ | `sigma_healthcare.rs` |
 | Agriculture / QGIS | ⏳ | `sigma_agriculture.rs` |

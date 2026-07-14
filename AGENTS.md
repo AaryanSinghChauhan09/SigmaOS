@@ -12,13 +12,18 @@ The agent ecosystem is modularized into specialized tiers:
 
 1. **Governance Agents**: Enforce security policies and resource quotas.
 
+
 2. **Maintenance Agents**: Perform self-healing, log rotation, and cache purging.
+
 
 3. **Observation Agents**: Monitor silicon health and network entropy.
 
+
 4. **Interface Agents**: Suggest workflows and optimize the Zenith UI.
 
+
 5. **Bridge Agents**: Manage legacy compatibility (e.g., Linux translation).
+
 
 ---
 

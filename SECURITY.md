@@ -14,11 +14,12 @@ SigmaOS implements a Zero-Trust, capability-first security architecture that com
 - **Signed Packages**: GPG-signed packages and repositories
 - **Audit Logging**: Comprehensive security audit trails
 
+
 ## Security Architecture
 
 ### System Call Flow
 
-```
+```text
  [Application Syscall Request]
                │
                ▼
@@ -36,7 +37,7 @@ SigmaOS implements a Zero-Trust, capability-first security architecture that com
 
 ### Security Layers
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         Application Layer               │
 │  ┌──────────┬──────────┬──────────────┐ │
@@ -82,6 +83,7 @@ SigmaOS implements a Zero-Trust, capability-first security architecture that com
 ### Capability Tokens
 
 **Token Structure**:
+
 ```rust
 // kernel/security/capability.rs
 pub const CAP_NET_CONNECT: u64 = 1 << 0;
@@ -165,7 +167,8 @@ impl CapabilityManager {
 ### SELinux Integration
 
 **Policy Structure**:
-```
+
+```text
 /etc/sigma/selinux/policy/
 ├── types/
 │   ├── user_app.te
@@ -180,24 +183,31 @@ impl CapabilityManager {
 ```
 
 **Policy Example**:
+
 ```te
+
 # user_app.te
+
 type user_app_t;
 type user_app_exec_t;
 
 # Allow reading user documents
+
 allow user_app_t user_home_t:file { read getattr };
 
 # Deny network access
+
 neverallow user_app_t port_t:tcp_socket { connect };
 
 # Allow writing to downloads
+
 allow user_app_t downloads_t:file { write create };
 ```
 
 ### Landlock Integration
 
 **Filesystem Sandbox**:
+
 ```rust
 // kernel/security/landlock.rs
 use landlock::{Ruleset, Access, PathBeneath};
@@ -224,8 +234,11 @@ pub struct SandboxRule {
 ### AppArmor Integration
 
 **Profile Example**:
-```
+
+```text
+
 # /etc/apparmor.d/user-app
+
 #include <tunables/global>
 
 profile user-app /usr/bin/user-app {
@@ -330,7 +343,7 @@ revocation_check = true
 
 ### Chain of Trust
 
-```
+```text
 UEFI Firmware
     │
     ▼ (Verify)
@@ -389,17 +402,23 @@ pub fn verify_kernel_signature() -> Result<(), SecurityError> {
 ### GPG Signing
 
 **Repository Signing**:
+
 ```bash
+
 # Generate signing key
+
 gpg --full-generate-key --key-type RSA --key-length 4096
 
 # Export public key
+
 gpg --export --armor > sigmaos-keyring.asc
 
 # Sign repository
+
 sigma-repo sign --key sigmaos-keyring
 
 # Verify repository
+
 sigma-repo verify --key sigmaos-keyring.asc
 ```
 
@@ -487,12 +506,15 @@ protocol = "syslog"
 ### Security Incident Response
 
 **Detection**:
+
 - Anomaly detection in audit logs
 - Unusual capability requests
 - Failed authentication attempts
 - Suspicious file access patterns
 
+
 **Response**:
+
 1. Isolate affected system
 2. Collect forensic evidence
 3. Analyze audit logs
@@ -500,10 +522,13 @@ protocol = "syslog"
 5. Implement remediation
 6. Update security policies
 
+
 **Tools**:
+
 - `sigma-audit`: Audit log analysis
 - `sigma-forensics`: Forensic data collection
 - `sigma-isolate`: System isolation
+
 
 ## Best Practices
 
@@ -514,12 +539,14 @@ protocol = "syslog"
 3. **Defense in Depth**: Multiple security layers
 4. **Audit Everything**: Comprehensive logging
 
+
 ### Configuration
 
 1. **Secure Defaults**: Enable security by default
 2. **Regular Updates**: Keep security patches current
 3. **Policy Review**: Regular policy reviews
 4. **Testing**: Security testing before deployment
+
 
 ### Monitoring
 
@@ -528,31 +555,40 @@ protocol = "syslog"
 3. **Analysis**: Regular log analysis
 4. **Reporting**: Regular security reports
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Implementation of capability-token bitmasks
 - Basic capability validation
 - seccomp filter integration
 - Audit logging infrastructure
 
+
 ### Phase 2 (Months 3-6)
+
 - Integration of Landlock filesystem sandboxing
 - SELinux policy development
 - AppArmor profile support
 - Secure boot implementation
 
+
 ### Phase 3 (Months 6-9)
+
 - Automated profiling tool (sigtrace)
 - Policy generation from system call traces
 - Advanced audit analysis
 - Incident response tools
 
+
 ### Phase 4 (Months 9-12)
+
 - System-wide Zero-Trust verification
 - Cryptographically signed capability tokens
 - IPC security enforcement
 - Advanced threat detection
+
 
 ## References
 

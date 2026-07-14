@@ -12,15 +12,21 @@ Ship a bootable ISO that:
 
 1. Boots on QEMU and real x86_64 hardware via UEFI.
 
+
 2. Presents a `sigma-sh` command prompt.
+
 
 3. Can install packages with `sigma-pkg install <name>`.
 
+
 4. Has a working network connection (DHCP on e1000 / VirtIO-net).
+
 
 5. Fits in under **150 MB** (ISO).
 
+
 6. Runs in **under 256 MB RAM**.
+
 
 This is the "Hello World" of SigmaOS. Everything else follows from this.
 
@@ -30,15 +36,21 @@ This is the "Hello World" of SigmaOS. Everything else follows from this.
 
 - No graphical desktop (Zenith comes in v1.0).
 
+
 - No Wi-Fi (wired/VirtIO only).
+
 
 - No audio.
 
+
 - No GPU acceleration.
+
 
 - No ARM64 (x86_64 only).
 
+
 - No online package registry (local sigpkg repo on ISO only).
+
 
 Keep it small. Keep it honest. Ship it.
 
@@ -48,7 +60,7 @@ Keep it small. Keep it honest. Ship it.
 
 ### Bootloader
 
-```
+```text
 [ ] sigma-boot.efi — UEFI application (C, < 32 KB)
     [ ] UEFI GOP framebuffer init
     [ ] Load kernel ELF from EFI partition
@@ -60,7 +72,7 @@ Keep it small. Keep it honest. Ship it.
 
 ### Kernel (minimum viable)
 
-```
+```text
 [ ] Entry point: arch/x86_64/boot.asm → kernel_main()
 [ ] GDT + IDT setup
 [ ] APIC init (mask PIC, enable APIC timer)
@@ -80,7 +92,7 @@ Keep it small. Keep it honest. Ship it.
 
 ### Drivers
 
-```
+```text
 [ ] VESA/GOP framebuffer (text console, 80x25 minimum)
 [ ] e1000 NIC (QEMU default) — DHCP via sigma-dhcp
 [ ] VirtIO-net (QEMU paravirt) — same sigma-net stack
@@ -93,7 +105,7 @@ Keep it small. Keep it honest. Ship it.
 
 ### Filesystem
 
-```
+```text
 [ ] VFS layer: open / read / write / close / stat / readdir
 [ ] Tmpfs: RAM-backed, used for /tmp and early userland
 [ ] FAT32 read-only: for EFI partition access
@@ -103,7 +115,7 @@ Keep it small. Keep it honest. Ship it.
 
 ### Userland (inside initramfs)
 
-```
+```text
 [ ] sigma-init  (PID 1)
     [ ] Mount /proc, /sys, /dev
     [ ] Run sigma-dhcp on eth0
@@ -136,7 +148,7 @@ Keep it small. Keep it honest. Ship it.
 
 Minimum 10 packages bundled in the ISO:
 
-```
+```text
 sigma-hello      # test package: prints "Hello from SigmaOS"
 
 sigma-neofetch   # system info display
@@ -161,7 +173,7 @@ sigma-nettools   # ip, ping, nslookup
 
 ### ISO Structure
 
-```
+```text
 SigmaOS-0.1-x86_64.iso
 ├── EFI/
 │   └── BOOT/
@@ -216,7 +228,7 @@ qemu-system-x86_64 \
 ## Test Matrix
 
 | Test | Expected Output | Pass? |
-|------|----------------|-------|
+| ------ | ---------------- | ------- |
 | QEMU UEFI boot | `sigma-sh>` prompt | ⬜ |
 | `echo hello` | `hello` | ⬜ |
 | `ls /` | Lists root dirs | ⬜ |
@@ -236,17 +248,24 @@ These can be built **right now** without the bootable kernel:
 
 1. **sigma-pkg local mode** — write and test the package manager against a mock FS.
 
+
 2. **sigma-sh unit tests** — test the REPL logic against vitest / Rust tests in userspace.
+
 
 3. **sigpkg format spec** — define the `.sigpkg` archive format and metadata schema.
 
+
 4. **10-package starter repo** — build and sign the 10 bundled packages.
+
 
 5. **installer.html backend** — wire the existing GUI to the CLI installer logic.
 
+
 6. **Community setup** — GitHub Discussions, Discord, issue templates.
 
+
 7. **Quick-start guide** — `QUICKSTART.md` for contributors and early users.
+
 
 ---
 

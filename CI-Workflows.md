@@ -5,7 +5,7 @@ All automation lives under `.github/workflows/`. Each workflow is scoped to a si
 ## Workflow Summary
 
 | File | Trigger | Purpose |
-|------|---------|---------|
+| ------ | --------- | --------- |
 | `ci.yml` | PR / push to `main` | Cross-arch CMake + kernel build matrix |
 | `pr_quality_gate.yml` | PR to `main` | Format, lint, license, unit-tests, security, size-budget |
 | `pr_labeler.yml` | PR opened/updated | Area labels, size labels, first-contributor welcome |
@@ -16,7 +16,7 @@ All automation lives under `.github/workflows/`. Each workflow is scoped to a si
 
 ## PR Quality Gate Jobs
 
-```
+```text
 commit-lint ──→ (all jobs)
 format-check ──→ build-matrix ──→ unit-tests
 license-check
@@ -28,7 +28,7 @@ size-budget
 
 ## Release Pipeline
 
-```
+```text
 git tag v1.2.3
     └─→ build-images (x86_64, aarch64, riscv64gc)
             └─→ sign & attach SHA-256 + CycloneDX SBOM
@@ -37,7 +37,8 @@ git tag v1.2.3
 ```
 
 Channel promotion (manual `workflow_dispatch`):
-```
+
+```text
 nightly → beta → stable
 (each requires environment approval in GitHub Settings)
 ```
@@ -47,7 +48,7 @@ nightly → beta → stable
 Labels created by `pr_labeler.yml` and `.github/labeler.yml`:
 
 | Label | Trigger |
-|-------|---------|
+| ------- | --------- |
 | `area/kernel` | changes under `kernel/` |
 | `area/drivers` | changes under `drivers/` |
 | `area/tools-cli` | changes under `tools/` |
@@ -65,7 +66,7 @@ Labels created by `pr_labeler.yml` and `.github/labeler.yml`:
 ## Secrets Required
 
 | Secret | Used by |
-|--------|---------|
+| -------- | --------- |
 | `GITHUB_TOKEN` | All workflows (auto-provided) |
 
 No third-party tokens required for the base setup.

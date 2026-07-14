@@ -40,7 +40,7 @@ graph LR
 
 ## Package Format (`.spkg`)
 
-```
+```text
 package-name-1.0.0.spkg
 ├── MANIFEST.toml             # Metadata, version, dependencies, capabilities
 ├── files/                    # Installed file tree
@@ -96,7 +96,9 @@ sigpkg rollback                  # Rollback last transaction
 When `declarative_mode` is enabled in `sigma.toml`, `sigpkg` refuses manual `install`/`update` calls. Only the declarative state parser may install packages:
 
 ```toml
+
 # sigma.toml
+
 [packages]
 declarative_mode = true
 required_shards = [
@@ -110,7 +112,8 @@ required_shards = [
 ```
 
 Running `sigpkg install` manually while in declarative mode returns:
-```
+
+```text
 error: declarative mode is enforced. Edit sigma.toml to add packages.
 ```
 
@@ -125,6 +128,7 @@ Every `sigpkg install` and `sigpkg upgrade` wraps mutations in a transaction:
 3. If any step fails → `sigpkg_transaction_rollback()` restores the snapshot.
 4. If all steps succeed → `sigpkg_transaction_commit()` finalizes.
 
+
 This guarantees that a failed multi-package upgrade never leaves the system in a half-updated state.
 
 ---
@@ -138,6 +142,7 @@ All packages are signed with **Dilithium5** (FIPS 204). The verification flow:
 3. Compute the BLAKE3 hash of the `.spkg`.
 4. Assert hash matches the SFC exactly.
 5. If mismatch → abort and log anomaly.
+
 
 ---
 

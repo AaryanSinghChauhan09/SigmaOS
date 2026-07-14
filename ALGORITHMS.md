@@ -21,11 +21,15 @@ This document outlines the complexity classes and optimization strategies for co
 
 1. **Minimize Context Switches**: Favor shard-local execution over frequent IPC where deterministic response is required.
 
+
 2. **Lock-Free Primitives**: Use atomic operations for high-frequency counters and state flags to prevent race conditions.
+
 
 3. **Memory Pool Isolation**: Each shard should initialize its own memory pool during ASI to prevent global heap fragmentation.
 
+
 4. **Static Allocation**: In Embedded and RTOS profiles, favor static allocation over dynamic heap usage.
+
 
 ## 🧪 Benchmarking Standards
 
@@ -33,9 +37,12 @@ All industrial shards must pass the following benchmarks before merging:
 
 - **Ignition Latency**: < 500μs (on reference x86_64 hardware).
 
+
 - **Throughput (S-NET)**: > 90% of wire speed for large packets.
 
+
 - **Security Overhead**: < 5% CPU impact for PQC-sealed shards.
+
 
 ### Optimization Philosophy
 

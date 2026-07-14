@@ -31,11 +31,15 @@ Normalization eliminates data redundancy and update anomalies by decomposing tab
 
 - **1NF:** Eliminates repeating groups; enforces atomic scalar column values.
 
+
 - **2NF:** Requires 1NF and full functional dependency of non-key attributes on the primary composite key.
+
 
 - **3NF:** Requires 2NF and elimination of transitive functional dependencies.
 
+
 - **BCNF:** Boyce-Codd Normal Form; requires every non-trivial determinant to be a candidate key.
+
 
 Enforced automatically by the SigmaDB schema validator (`normalizer.cpp`).
 
@@ -149,21 +153,27 @@ END;
 
 - **Issue - Incorrect Indexing & Table Scans:** Missing B+ Tree indices cause full table scans ($O(N)$), stalling heavy analytical `JOIN` queries.
 
+
 - *Fix Strategy:* Run `EXPLAIN PLAN FOR` to inspect the query execution tree, identify unindexed nested loops, and create composite covering B+ Tree indices (`CREATE INDEX idx_emp_dept ON employees(dept_id, salary)`).
+
 
 - **Issue - Database Deadlocks:** Concurrent transactions update identical table rows in reverse order, triggering circular lock wait states.
 
+
 - *Fix Strategy:* Enforce strict Two-Phase Locking (2PL), acquire row locks in a globally deterministic order, and utilize `SELECT ... FOR UPDATE NOWAIT` to prevent indefinite blocking.
+
 
 - **Issue - Dirty Reads & Phantom Records:** Unsynchronized transaction isolation levels permit reading uncommitted data or phantom insertions.
 
+
 - *Fix Strategy:* Elevate transaction isolation levels from `READ COMMITTED` to `REPEATABLE READ` or `SERIALIZABLE`, leveraging SigmaDB's MVCC snapshot isolation engine.
+
 
 ---
 
 ## SigmaDB Architecture
 
-```
+```text
 SigmaDB Engine
 ├── SQL Parser + Query Optimizer
 ├── PL/SQL Runtime + Cursor Engine

@@ -22,23 +22,33 @@
 
 1. **Hardware Abstraction (HAL)**: Direct silicon interfaces (NVMe, USB, VGA).
 
+
 2. **Genesis Kernel**: IRQ/IDT handling, memory management, and the SHS scheduler.
+
 
 3. **Sovereign VFS**: A capability-backed filesystem that treats all resources as handles.
 
+
 4. **Security Lattice**: PQC (Kyber/Dilithium) and TPM 2.0 attestation.
+
 
 5. **Package Layer**: Dependency DAG management via `sigma-pkg`.
 
+
 6. **Zenith UI**: Wayland-native compositor with Morphic shaders.
+
 
 7. **AI Orchestrator**: The high-level intent-to-shard dispatch system.
 
+
 8. **Sovereign Claw**: Autonomous AI agent gateway for multi-step goal execution.
+
 
 9. **Ecosystem Abstraction (S99)**: POSIX-compatible translation layer for legacy Linux binaries.
 
+
 10. **Sovereign Nexus**: Integrated Enterprise (ERP/CRM) and Productivity (Office) suite.
+
 
 ---
 1 The Nexus layer (S100) aggregates and enhances the USPs of the world's leading enterprise suites:
@@ -71,13 +81,18 @@ SigmaOS implements a **Fast Startup**mechanism inspired by Windows. At shutdown,
 
 1. **Timer Interrupt (IRQ0)**: Triggers every 1ms (configurable).
 
+
 2. **Context Save**: Current registers are saved via inline ASM.
+
 
 3. **Selection**: The SHS selects the next task based on virtual runtime and AI priority.
 
+
 4. **Quantum Enforcement**: Budget enforcement via RDTSC.
 
+
 5. **Context Restore**: Resumes execution of the selected process.
+
 
 ---
 1 SigmaOS integrates reinforcement learning models directly into the kernel scheduler and memory manager. The **AI Watchdog** (S09) predicts resource contention and preemptively triggers rollbacks or re-sharding.
@@ -100,6 +115,8 @@ Inspired by the Windows Registry but reimagined for sovereignty, the **Sovereign
 
 1. **Security Next**: TPM Attestation + PQC Encryption.
 
+
 2. **Resilience**: Self-Healing Snapshots + AI Watchdog.
+
 
 3. **Differentiation**: Adaptive UI + Sovereign AI Assistant.

@@ -19,7 +19,9 @@ SigmaOS absorbs the **Syscall Proxying** model of gVisor (Google's container san
 When an untrusted binary makes a system call (e.g., `sys_open` or `sys_socket`), the ptrace/KVM trap redirects it to `sigma-sentry`. The sentry is a memory-safe userspace application that emulates the Linux kernel ABI.
 
 ```bash
+
 # Run an untrusted binary through the sentry proxy
+
 $ sigma run --sandbox=sentry ./untrusted_malware
 Σ [SENTRY] Syscall interception active.
   [untrusted_malware] sys_open("/etc/shadow") → SENTRY INTERCEPT
@@ -35,7 +37,9 @@ Because the untrusted code never talks to the real kernel, a kernel privilege es
 For desktop applications that don't need the heavy overhead of syscall proxying but still need strict filesystem isolation, SigmaOS utilizes a profile system inspired by Firejail.
 
 ```bash
+
 # Apply a pre-built isolation profile to a legacy app
+
 $ sigma run --profile=strict-network-only ./download_manager
 ```
 
@@ -43,7 +47,7 @@ $ sigma run --profile=strict-network-only ./download_manager
 
 ## 3. Architecture
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │               SIGMA-SENTRY (gVisor-inspired)                   │
 │                                                                │

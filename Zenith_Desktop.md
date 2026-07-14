@@ -14,11 +14,12 @@ Zenith Desktop is the native, Wayland-first desktop environment for SigmaOS. Bui
 - **Performance**: Optimized for low-latency and smooth animations
 - **Extensible**: Plugin system for custom widgets and extensions
 
+
 ## Architecture
 
 ### Compositor Flow
 
-```
+```text
  [User Input (Wayland Events)]
                │
                ▼
@@ -33,7 +34,7 @@ Zenith Desktop is the native, Wayland-first desktop environment for SigmaOS. Bui
 
 ### Component Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         Zenith Desktop Environment      │
 │  ┌──────────┬──────────┬──────────────┐ │
@@ -325,9 +326,11 @@ impl InputMethodManager {
 - **Punjabi (pa_IN)**: Gurmukhi script
 - **Urdu (ur_IN)**: Perso-Arabic script
 
+
 ### Input Methods
 
 **IBus Integration**:
+
 ```toml
 [input_method]
 engine = "ibus"
@@ -337,6 +340,7 @@ preedit = true
 ```
 
 **Fcitx Integration**:
+
 ```toml
 [input_method]
 engine = "fcitx"
@@ -366,13 +370,16 @@ telugu = "Noto Sans Telugu"
 ### Screen Reader
 
 **Features**:
+
 - Text-to-speech synthesis
 - Window focus announcements
 - Text change notifications
 - Keyboard navigation support
 - Braille display support
 
+
 **Configuration**:
+
 ```toml
 [screen_reader]
 enabled = true
@@ -385,12 +392,15 @@ volume = 1.0
 ### High Contrast Mode
 
 **Features**:
+
 - Increased contrast colors
 - Larger text
 - Focus indicators
 - Customizable color schemes
 
+
 **Configuration**:
+
 ```toml
 [high_contrast]
 enabled = false
@@ -401,29 +411,36 @@ text_scale = 1.2
 ### Keyboard Navigation
 
 **Features**:
+
 - Full keyboard support
 - Keyboard shortcuts
 - Focus indicators
 - Tab navigation
 
+
 **Shortcuts**:
+
 - `Alt+Tab`: Switch windows
 - `Super+D`: Show desktop
 - `Super+L`: Lock screen
 - `Ctrl+Alt+T`: Open terminal
 - `Super+E`: Open file manager
 
+
 ## Performance Optimization
 
 ### GPU Acceleration
 
 **Vulkan Features**:
+
 - Hardware-accelerated rendering
 - Multi-threaded command buffers
 - Descriptor set management
 - Pipeline caching
 
+
 **Configuration**:
+
 ```toml
 [vulkan]
 validation = false
@@ -435,12 +452,15 @@ descriptor_cache = true
 ### Memory Management
 
 **Features**:
+
 - Texture compression
 - Memory pooling
 - Resource recycling
 - Lazy loading
 
+
 **Configuration**:
+
 ```toml
 [memory]
 texture_compression = true
@@ -453,7 +473,8 @@ lazy_loading = true
 ### Theme System
 
 **Structure**:
-```
+
+```text
 /usr/share/zenith/themes/
 ├── zenith-dark/
 │   ├── theme.conf
@@ -470,6 +491,7 @@ lazy_loading = true
 ```
 
 **Theme Configuration**:
+
 ```toml
 [theme]
 name = "Zenith Dark"
@@ -490,12 +512,15 @@ success = "#10b981"
 ### Icon Themes
 
 **Supported Themes**:
+
 - Zenith Icons
 - Adwaita
 - Papirus
 - Numix
 
+
 **Configuration**:
+
 ```toml
 [icons]
 theme = "zenith-icons"
@@ -521,6 +546,7 @@ pub trait Plugin {
 ### Plugin Examples
 
 **System Monitor Plugin**:
+
 ```rust
 pub struct SystemMonitorPlugin {
     cpu_usage: f32,
@@ -550,12 +576,14 @@ impl Plugin for SystemMonitorPlugin {
 3. **Testing**: Comprehensive testing
 4. **Documentation**: Document all public APIs
 
+
 ### Performance
 
 1. **Profiling**: Profile regularly
 2. **Optimization**: Optimize hot paths
 3. **Memory**: Minimize memory usage
 4. **GPU**: Utilize GPU efficiently
+
 
 ### Accessibility
 
@@ -564,31 +592,40 @@ impl Plugin for SystemMonitorPlugin {
 3. **High Contrast**: Support high contrast mode
 4. **Localization**: Full localization support
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Core Wayland compositor protocols
 - Vulkan backend rendering
 - Basic window management
 - Panel and taskbar
 
+
 ### Phase 2 (Months 3-6)
+
 - IBus integration for Indic languages
 - Input method support
 - Layout engines
 - Font configuration
 
+
 ### Phase 3 (Months 6-9)
+
 - Integrated speech synthesizer
 - Screen reading engine
 - Braille display support
 - High contrast mode
 
+
 ### Phase 4 (Months 9-12)
+
 - Gestural accessibility control
 - Multi-display support
 - Color profiles
 - Plugin system
+
 
 ## References
 

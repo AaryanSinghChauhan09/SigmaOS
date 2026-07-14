@@ -15,16 +15,22 @@ In **SigmaOS Zenith**, this paradigm is absorbed via the `SovereignGenera` shard
 ## 2. Strategic Features & USPs
 
 ### 2.1 Single-Address-Space Object Runtime
+
 - **Genera Concept**: No separation between compiler and runtime. All code runs in a shared virtual memory space, represented as interactive Lisp objects.
 - **Sovereign Implementation**: The `SovereignGenera` shard runs an isolated, multi-threaded WebAssembly/Lisp execution chamber that maps symbols to active microkernel memory pages. Users can inspect, trace, and redefine core utilities on-the-fly.
 
+
 ### 2.2 Dynamic Inspection & Object Editing
+
 - **Genera Concept**: Any element on the screen can be right-clicked to inspect its underlying object representation, variables, and methods.
 - **Sovereign Implementation**: Integrated into the Zenith Desktop UI. Pressing `Meta+Click` on any UI widget or terminal element triggers the **Sovereign Inspector**, allowing direct source-code navigation and live parameter editing.
 
+
 ### 2.3 Unified Symbolic Namespace
+
 - **Genera Concept**: Pathnames are not mere strings; they are structured logical objects (e.g., host, device, directory, name, type, version).
 - **Sovereign Implementation**: The file system API parses resource paths into rich symbolic references (`SymbolicPath`). This abstracts local storage, network shares, and temporary memory buffers into a single virtual object tree.
+
 
 ---
 
@@ -32,7 +38,7 @@ In **SigmaOS Zenith**, this paradigm is absorbed via the `SovereignGenera` shard
 
 The `SovereignGenera` shard consists of three core sub-layers:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │               SOVEREIGN GENERA SHARD                    │
 ├─────────────────────────────────────────────────────────┤
@@ -53,6 +59,7 @@ The `SovereignGenera` shard consists of three core sub-layers:
 ## 4. Integration & Usage
 
 ### 4.1 CLI Deployment
+
 You can deploy and initialize the symbolic lattice environment using the `sigma` tool suite:
 
 ```powershell
@@ -69,6 +76,7 @@ $ sigma absorb paradigm genera
 ---
 
 ## 5. References & Standards
+
 - Symbolics Genera 8.0 User Manual
 - "The Lisp Machine Manual" by Richard Stallman et al.
 - Dynamic Object-Oriented Programming (CLOS) specifications

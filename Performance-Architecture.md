@@ -7,7 +7,7 @@ SigmaOS is designed to be measurably faster than Linux distributions through sil
 ## Performance Targets (v16.0 Apex)
 
 | Metric | Target | Current |
-|--------|--------|---------|
+| -------- | -------- | --------- |
 | Boot time (NVMe → desktop) | < 2 s | N/A (no boot yet) |
 | Context switch latency | < 50 ns | N/A |
 | Kyber-1024 ops/sec (AVX-512) | ≥ 5.8 M | N/A |
@@ -24,25 +24,34 @@ SigmaOS is designed to be measurably faster than Linux distributions through sil
 
 - CAS-based atomic operations — no scheduler lock contention
 
+
 - Cache-line aligned task control blocks
 
+
 - Per-CPU runqueues — minimise cross-CPU migration
+
 
 ### NUMA Awareness
 
 - Reads ACPI SRAT table at boot
 
+
 - Prefers local-memory task placement
 
+
 - Migration threshold based on load imbalance
+
 
 ### CFS Clone (vruntime)
 
 - Red-black tree O(log n) insertion/removal
 
+
 - Virtual runtime accounts for priority differences
 
+
 - Bandwidth throttling for cgroup CPU quotas
+
 
 ---
 
@@ -52,25 +61,34 @@ SigmaOS is designed to be measurably faster than Linux distributions through sil
 
 - Power-of-2 page frames, O(log n) alloc/free
 
+
 - Free list per order, per CPU (reduces locking)
 
+
 - Coalescing on free — reduces fragmentation
+
 
 ### Slab Allocator
 
 - Per-type object caches, aligned to cache lines
 
+
 - SLUB-style batching — amortises alloc overhead
 
+
 - Coloring to reduce cache aliasing
+
 
 ### Page Table Walk Optimisation
 
 - TLB shootdowns only on modified mappings
 
+
 - Huge pages (2 MB) for kernel text/data
 
+
 - PCID support — avoids full TLB flush on context switch
+
 
 ---
 
@@ -80,21 +98,28 @@ SigmaOS is designed to be measurably faster than Linux distributions through sil
 
 - Receive: DMA directly into user buffer (VirtIO-net)
 
+
 - Send: scatter-gather DMA, no intermediate copy
+
 
 ### io_uring Equivalent (`kernel/io/sigma_uring.cpp`) — Phase G
 
 - Async I/O submission/completion ring — zero syscall for hot paths
 
+
 - Registered buffers + fixed files — eliminates fd lookup overhead
+
 
 ### TCP Optimisations
 
 - TSO (TCP Segmentation Offload) — NIC does segmentation
 
+
 - GRO (Generic Receive Offload) — coalesce received segments
 
+
 - Nagle algorithm with configurable cork
+
 
 ---
 
@@ -104,15 +129,20 @@ SigmaOS is designed to be measurably faster than Linux distributions through sil
 
 - **Kyber-1024 NTT**: 256-bit polynomial operations vectorised
 
+
 - **Memory operations**: `sigma_memcpy`, `sigma_memset` using 512-bit registers
 
+
 - **Zenith compositor**: matrix transforms, pixel blending (Phase G)
+
 
 ### ARM NEON
 
 - **Kyber NEON NTT**: 128-bit SIMD for ARM Cortex-A72+
 
+
 - **AES-NI equivalent**: ARMv8 crypto extensions for AES-GCM
+
 
 ### Auto-detection at Runtime
 
@@ -152,6 +182,7 @@ PGO improves branch prediction, inlining decisions, and code layout for ~10-15% 
 ## Clear Linux–Inspired Tuning (`cmake/sigma_hardening.cmake`)
 
 Compiler flags applied to production builds:
+
 ```cmake
 -O3 -march=native -mtune=native
 -fprofile-use

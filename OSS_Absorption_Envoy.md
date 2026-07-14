@@ -19,7 +19,9 @@ SigmaOS absorbs Envoy's **xDS dynamic configuration API**, **L7 routing primitiv
 Instead of static config files, `sigma-gateway` accepts runtime configuration updates via a streaming gRPC API modeled after Envoy's xDS (Listener/Route/Cluster/Endpoint Discovery Service).
 
 ```toml
+
 # /etc/sigma/gateway/clusters.toml — static fallback
+
 [[cluster]]
 name = "backend-api"
 endpoints = ["10.0.1.5:8080", "10.0.1.6:8080"]

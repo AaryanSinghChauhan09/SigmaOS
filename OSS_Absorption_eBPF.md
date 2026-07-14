@@ -12,13 +12,14 @@ eBPF (extended Berkeley Packet Filter) is the most significant Linux kernel inno
 - **Enforce** network policy at line rate (replacing iptables — 10x faster)
 - **Profile** CPU flamegraphs, lock contention, memory leaks in production without code changes
 
+
 SigmaOS integrates eBPF as the backbone of `sigma-observe` (observability), `sigma-net-policy` (network firewall), and `sigma-perf` (continuous performance profiling).
 
 ---
 
 ## 2. Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                    SIGMA eBPF LAYER                              │
 │                                                                  │
@@ -49,7 +50,9 @@ SigmaOS integrates eBPF as the backbone of `sigma-observe` (observability), `sig
 ### 3.1 `sigma-observe` — Zero-Overhead Tracing (inspired by bpftrace)
 
 ```bash
+
 # Trace all open() syscalls system-wide
+
 $ sigma observe syscall open
 Σ [OBSERVE] Tracing open() syscalls... (Ctrl+C to stop)
   [firefox:12345]  open("/etc/ssl/certs/ca-bundle.crt", O_RDONLY)   → fd 14
@@ -57,11 +60,13 @@ $ sigma observe syscall open
   [sshd:1001]      open("/etc/ssh/sshd_config", O_RDONLY)           → fd 4
 
 # Trace slow disk I/O (>10ms)
+
 $ sigma observe disk --slower-than 10ms
   [rustc:9999]  read  /home/alice/target/debug/... (45ms, 2.1MB)
   [firefox:12345] read /sigma/store/firefox/.../libxul.so (12ms, 8MB)
 
 # CPU flamegraph (profile all processes for 10s)
+
 $ sigma perf flamegraph --duration 10s --output flamegraph.svg
 Σ [PERF] Profiling all CPUs for 10 seconds...
   Output: flamegraph.svg (open in browser)
@@ -100,7 +105,9 @@ pub fn sigma_packet_filter(ctx: XdpContext) -> XdpAction {
 ```
 
 ```bash
+
 # Declarative firewall rules — compiled to eBPF/XDP at apply time
+
 $ sigma firewall add-rule "deny tcp dport 23"
 $ sigma firewall add-rule "allow tcp dport 22 from 10.0.0.0/8"
 $ sigma firewall add-rule "rate-limit udp 1000pps"
@@ -114,7 +121,9 @@ $ sigma firewall apply
 Inspired by Google's continuous profiling (`parca`), SigmaOS runs a low-overhead eBPF profiler as a background shard:
 
 ```bash
+
 # Show live CPU hotspots
+
 $ sigma perf top
 Σ [PERF] CPU Profile (sampled at 99Hz using eBPF perf events):
 
@@ -126,6 +135,7 @@ $ sigma perf top
   [idle]                                        31.2%  3,120
 
 # Show lock contention
+
 $ sigma perf locks --top 5
 Σ [PERF] Top Lock Contention (last 60s):
   sigma-ipc::MessageQueue::lock    2.3ms avg wait  18,000 contentions
@@ -137,7 +147,9 @@ $ sigma perf locks --top 5
 For the container/Kubernetes profile, SigmaOS integrates Cilium's eBPF-based CNI:
 
 ```yaml
+
 # Container network policy (enforced by eBPF, not iptables)
+
 apiVersion: sigma.io/v1
 kind: NetworkPolicy
 metadata:
@@ -145,12 +157,18 @@ metadata:
 spec:
   selector: app=frontend
   ingress:
+
     - from: app=api-gateway
+
       ports: [8080]
   egress:
+
     - to: app=backend
+
       ports: [5432]
+
     - to: 0.0.0.0/0
+
       ports: [443]   # Allow HTTPS to internet
 ```
 
@@ -159,7 +177,7 @@ spec:
 ## 4. Performance vs Traditional Approaches
 
 | Mechanism | Throughput | Latency per Rule | Overhead |
-|:---------|:-----------|:-----------------|:---------|
+| :--------- | :----------- | :----------------- | :--------- |
 | iptables (traditional) | ~1 Mpps | ~5µs | High (sk_buff copy) |
 | nftables | ~2 Mpps | ~3µs | Medium |
 | eBPF/XDP (sigma) | ~25 Mpps | ~80ns | Near-zero |

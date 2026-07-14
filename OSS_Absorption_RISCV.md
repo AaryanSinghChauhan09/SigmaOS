@@ -29,7 +29,7 @@ graph LR
 ### 2.2 Privilege Mode Mapping
 
 | Mode | RISC-V | SigmaOS Role |
-|:-----|:-------|:------------|
+| :----- | :------- | :------------ |
 | M-mode | Machine | OpenSBI firmware (not SigmaOS) |
 | S-mode | Supervisor | sigma-kernel (kernel shards) |
 | U-mode | User | Application shards |
@@ -38,7 +38,7 @@ graph LR
 ### 2.3 Tested Hardware Targets
 
 | Board | SoC | Status |
-|:------|:----|:-------|
+| :------ | :---- | :------- |
 | SiFive HiFive Unmatched | U740 | ✅ Boots to shell |
 | StarFive VisionFive 2 | JH7110 | 🔧 In progress |
 | Milk-V Mars | JH7110 | 🔧 In progress |

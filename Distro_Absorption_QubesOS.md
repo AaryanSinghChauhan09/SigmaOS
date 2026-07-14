@@ -32,7 +32,7 @@ In the GUI (Zenith Compositor), windows from different domains have colored bord
 
 In a monolithic OS, a malicious USB device can compromise the entire kernel. SigmaOS isolates hardware buses into `sys-usb` and `sys-net` domains.
 
-```
+```text
 ┌────────────────────────────────────────────────────────┐
 │               HARDWARE ISOLATION LAYER                 │
 │                                                        │

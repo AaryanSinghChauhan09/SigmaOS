@@ -12,7 +12,7 @@
 
 ## Architecture
 
-```
+```text
 AgentBus
 ├── ConcreteAgent[0..15]   ← implements Agent trait
 └── IpcMessage routing     ← src → dst via agent_id()
@@ -20,7 +20,7 @@ AgentBus
 
 ## Message Format
 
-```
+```text
 Magic(2) | Kind(1) | SrcId(1) | DstId(1) | Seq(2) | PayloadLen(1)
 Payload[128] | Checksum(2)
 ```
@@ -58,7 +58,7 @@ pub trait Agent {
 
 Fletcher-16 over all bytes except the checksum field itself:
 
-```
+```text
 S1 = Σ bytes[i]  (mod 256)
 S2 = Σ S1[i]    (mod 256)
 checksum = (S2 << 8) | (S1 & 0xFF)

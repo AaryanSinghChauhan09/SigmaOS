@@ -10,11 +10,15 @@ The Logistics Manager Profile is designed for supply chain excellence, inventory
 
 - **SigmaSupply**: Supply chain management and vendor coordination.
 
+
 - **SigmaInventory**: Real-time inventory tracking and optimization.
+
 
 - **SigmaFleet**: Fleet management and route optimization.
 
+
 - **SigmaWarehouse**: Warehouse operations and automation.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Logistics Manager Profile is designed for supply chain excellence, inventory
 
 - **Theme**: Logistics Orange (Supply Chain Standard)
 
+
 - **Layout**: Logistics Dashboard (Supply, Inventory, Fleet)
 
+
 - **Personalization**: Custom routing algorithms and automated alerts.
+
 
 ---
 

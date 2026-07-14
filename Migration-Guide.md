@@ -12,11 +12,15 @@ SigmaOS runs Linux apps through its compatibility layer. You don't need to give 
 
 - 4GB RAM minimum (8GB recommended)
 
+
 - 20GB disk space
+
 
 - x86_64, ARM64, or RISC-V processor
 
+
 - UEFI firmware (Legacy BIOS supported via dual-boot profile)
+
 
 ---
 
@@ -75,7 +79,7 @@ qemu-system-x86_64 \
 ### From Ubuntu/Debian (apt → sigma-pkg)
 
 | Ubuntu command | SigmaOS equivalent |
-|---|---|
+| --- | --- |
 | `apt install <pkg>` | `sigma-pkg install <pkg>` |
 | `apt remove <pkg>` | `sigma-pkg remove <pkg>` |
 | `apt update` | `sigma-pkg update` |
@@ -103,7 +107,7 @@ while read pkg; do sigma-pkg install "$pkg" 2>/dev/null || true; done < my_packa
 ### From Fedora/RHEL (dnf → sigma-pkg)
 
 | Fedora command | SigmaOS equivalent |
-|---|---|
+| --- | --- |
 | `dnf install <pkg>` | `sigma-pkg install <pkg>` |
 | `dnf remove <pkg>` | `sigma-pkg remove <pkg>` |
 | `dnf upgrade` | `sigma-pkg update` |
@@ -112,7 +116,7 @@ while read pkg; do sigma-pkg install "$pkg" 2>/dev/null || true; done < my_packa
 ### From Arch (pacman → sigma-pkg)
 
 | Arch command | SigmaOS equivalent |
-|---|---|
+| --- | --- |
 | `pacman -S <pkg>` | `sigma-pkg install <pkg>` |
 | `pacman -R <pkg>` | `sigma-pkg remove <pkg>` |
 | `pacman -Syu` | `sigma-pkg update` |

@@ -17,7 +17,7 @@ SigmaOS adopts Debian's **three-tier release model** and **freeze-based stabiliz
 ### 2.1 Three-Tier Release Model
 
 | Channel | SigmaOS Name | Stability | Update Frequency |
-|:--------|:-------------|:---------|:----------------|
+| :-------- | :------------- | :--------- | :---------------- |
 | `unstable` | `sigma.next` | Experimental | Daily |
 | `testing` | `sigma.beta` | Mostly stable | Weekly |
 | `stable` | `sigma.stable` | Production | Quarterly LTS |
@@ -36,10 +36,12 @@ $ sigma-pkg channel set sigma.stable
 ### 2.2 Social Contract & DFSG
 
 SigmaOS adopts a formal Social Contract committing to:
+
 1. SigmaOS will always be 100% open source (MIT/Apache-2.0).
 2. We will give back to the communities whose work we absorb.
 3. We will never hide problems — all bugs are public in the issue tracker.
 4. The needs of users come before the needs of the project.
+
 
 ### 2.3 Freeze-Based Stabilization
 

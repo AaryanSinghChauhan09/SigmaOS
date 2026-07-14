@@ -11,6 +11,7 @@ openSUSE offers two paradigms worth absorbing into SigmaOS:
 - **Tumbleweed** (rolling-release with massive QA): Contributes the `openQA` automated testing framework philosophy and the `zypper` transactional update concept.
 - **MicroOS** (immutable OS container host): Contributes the `transactional-update` atomic rootfs update model and `snapper` Btrfs snapshot management.
 
+
 Both projects are published under the GNU GPL and are cleanly re-implementable in Rust for the Sovereign Lattice.
 
 ---
@@ -21,7 +22,7 @@ Both projects are published under the GNU GPL and are cleanly re-implementable i
 
 openSUSE MicroOS makes all system updates transactional: updates are applied to a new Btrfs subvolume snapshot, verified, and only made active on next reboot. The running system is never modified.
 
-```
+```text
 ┌───────────────────────────────────────────────────────────────┐
 │               SIGMA TRANSACTIONAL UPDATE FLOW                 │
 │                                                               │
@@ -88,7 +89,9 @@ impl TransactionalUpdate {
 ### 2.2 Snapper Snapshot Management (`snapper` → `sigma snap`)
 
 ```bash
+
 # List all rootfs snapshots
+
 $ sigma snap list
 Σ [INFO] System snapshots (Btrfs):
 
@@ -100,12 +103,14 @@ $ sigma snap list
   5 ◄ active    2025-11-11 09:00     Current (booted)
 
 # Diff between snapshots
+
 $ sigma snap diff 1 2
 --- /etc/sigma/network.toml  (snapshot 1)
 +++ /etc/sigma/network.toml  (snapshot 2)
 +dns_over_https = true
 
 # Roll back to snapshot 3
+
 $ sigma snap rollback 3
 Σ [WARN] Will roll back /etc/sigma/network.toml and 4 other changed files.
 Proceed? [y/N] y
@@ -117,7 +122,9 @@ Proceed? [y/N] y
 openQA automates full OS installation and regression tests in VMs. SigmaOS adapts this as `sigma-qa`, a QEMU-backed integration test runner for every PR:
 
 ```toml
+
 # .sigma-qa/tests/boot.toml
+
 [test]
 name = "Basic Boot Test"
 timeout_s = 120

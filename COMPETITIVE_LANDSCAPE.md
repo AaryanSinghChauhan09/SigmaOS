@@ -14,11 +14,15 @@ SigmaOS systematically "absorbs" the strengths of established distributions to m
 
 1. **AI-Native Workflows**: Deeply integrated assistants (L-Stream) and automation.
 
+
 2. **Post-Quantum Security**: `SovereignPQC` (Kyber/FIPS-203) at the core.
+
 
 3. **Unified Package Layer**: Pacman + Flatpak + Nix in one seamless system (Orbs).
 
+
 4. **Decentralized Sovereignty**: P2P marketplace and metadata indexing.
+
 
 ---
 

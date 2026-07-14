@@ -10,9 +10,12 @@ SigmaOS uses a **Microkernel-inspired Monolithic** driver model. Drivers run in 
 
 - **Bus Adapters:** PCI, USB, and VirtIO buses enumerate devices and instantiate driver instances.
 
+
 - **Device Lifecycle:** Probe → Initialize → Start → Suspend/Resume → Stop → Remove.
 
+
 - **Safe by Default:** All drivers must be written in Safe Rust. `unsafe` is only permitted for direct MMIO or DMA operations and must be heavily commented.
+
 
 ## 2. The `Driver` Trait
 
@@ -64,13 +67,16 @@ USB drivers interact with the `UsbCore` subsystem via Request Blocks (URBs).
 
 - **Host Controllers (xHCI):** Manage the root hub and port routing.
 
+
 - **Class Drivers (HID, Mass Storage):** Bind to specific interfaces and communicate via `submit_urb()`.
+
 
 ### 3.3 GPU & Display
 
 Currently based on a simple linear Framebuffer.
 
 - Future: Port to `sigma_drm` (Direct Rendering Manager) supporting GEM (Graphics Execution Manager) and KMS (Kernel Mode Setting).
+
 
 ### 3.4 Audio
 
@@ -80,18 +86,25 @@ Audio drivers implement the `AudioStream` trait for PCM playback and capture.
 
 1. **Create the Skeleton:** Place your driver in `kernel/drivers/<subsystem>/`.
 
+
 2. **Implement `SovereignDriver`:** Define your `probe` logic based on PCI Vendor/Device IDs or USB Class Codes.
+
 
 3. **Register:** Call `sigma_driver_registry::register_driver()` in your subsystem initialization.
 
+
 4. **Test:** Add a QEMU test case in `tools/qemu_driver_test.sh`.
+
 
 ## 5. Subsystem Maintainers
 
 - **USB & NVMe:** @DriversLead
 
+
 - **GPU & Display:** @DriversLead
 
+
 - **Audio:** @DriversLead
+
 
 - **Network (NIC/Wi-Fi):** @NetworkLead

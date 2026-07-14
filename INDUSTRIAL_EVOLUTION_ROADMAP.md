@@ -8,7 +8,7 @@ To truly eclipse massive, established distributions like Ubuntu, Fedora, and Arc
 
 ## Strategic Philosophy
 
-```
+```text
 Traditional distros COMPETE for the same space.
 SigmaOS ABSORBS and TRANSCENDS all of them.
 
@@ -27,7 +27,7 @@ Qubes:     "Security-first"     → SigmaOS: Security AND usable
 ### 1.1 Core Absorptions (Q1-Q2)
 
 | Source Distro | Feature Absorbed | SigmaOS Shard | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Ubuntu | APT-compatible package layer | [SovereignAPT.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_Ubuntu.md) | ✅ Done |
 | Arch Linux | AUR-style community recipes | [SigmaRecipes.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_Arch.md) | ✅ Done |
 | NixOS | Atomic reproducible builds | [SovereignAtomicUpdater.shard](file:///c:/Users/Aaryan/.gemini/antigravity-ide/scratch/SigmaOS.wiki/Distro_Absorption_NixOS.md) | ✅ Done |
@@ -42,6 +42,7 @@ The shards responsible for security absorption are already integrated into the `
 - `SovereignSELinux.shard` — absorbs Fedora SELinux policies into SigmaOS RBAC
 - `SovereignSecureBoot.shard` — Dilithium5 + UEFI Secure Boot integration
 - `SovereignSandbox.shard` — Qubes-inspired compartmentalization via Firecracker microVMs
+
 
 ### 1.3 Desktop Absorption
 
@@ -61,7 +62,7 @@ graph LR
 ### 2.1 Enterprise-Grade Absorptions
 
 | Category | Source | SigmaOS Feature |
-|---|---|---|
+| --- | --- | --- |
 | Configuration Management | Ansible/Puppet | `sigma-config` declarative system state |
 | Container Runtime | Docker/Podman | OCI-compatible `sigma-ctr` |
 | Orchestration | Kubernetes | `sigma-orch` lightweight k8s-compatible |
@@ -71,7 +72,7 @@ graph LR
 
 ### 2.2 Industrial Sectors Target
 
-```
+```text
 Manufacturing:  Real-time control (PREEMPT_RT shard)
 Healthcare:     HIPAA-compliant data isolation
 Finance:        Sub-microsecond trading latency
@@ -83,7 +84,7 @@ Telecom:        DPDK-accelerated network stack
 ### 2.3 Certification Roadmap
 
 | Certification | Scope | Target Quarter |
-|---|---|---|
+| --- | --- | --- |
 | Common Criteria EAL4+ | Security kernel | Q3-Y2 |
 | ISO 26262 (ASIL-B) | Automotive RT | Q4-Y2 |
 | DO-178C (DAL-C) | Aerospace boot | Q2-Y3 |
@@ -96,20 +97,22 @@ Telecom:        DPDK-accelerated network stack
 
 ### 3.1 Application Ecosystem
 
-```
+```text
 Goal: Run EVERY Linux application natively without compatibility layers
 ```
 
 **Implementation Strategy**:
+
 1. **Linux ABI Layer** (`sigma-linux-compat`) — kernel-level Linux syscall translation
 2. **glibc Wrapper** — intercept and translate glibc calls to sigma-libc
 3. **Flatpak Native** — SigmaOS-optimized Flatpak runtime
 4. **Wine-Sigma** — Windows application compatibility (D3D → Vulkan translation)
 
+
 ### 3.2 Developer Ecosystem
 
 | Tool | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-sdk` | 🔄 Active | Full SDK with shard scaffolding |
 | `sigma-debug` | 📋 Planned | GDB-compatible kernel debugger |
 | `sigma-trace` | 🔄 Active | eBPF-powered system tracer |
@@ -118,15 +121,17 @@ Goal: Run EVERY Linux application natively without compatibility layers
 
 ### 3.3 Sigma Marketplace
 
-```
+```text
 SigmaOS Marketplace = App Store + Package Manager + Shard Registry
 
 Features:
+
 - PQC-signed shard packages
 - Reputation scoring system  
 - Automated compatibility matrix
 - Revenue sharing for contributors
 - Zero-knowledge proof of functionality
+
 ```
 
 ---
@@ -135,7 +140,7 @@ Features:
 
 ### 4.1 Sovereign Cloud Infrastructure
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │              SIGMA SOVEREIGN CLOUD              │
 │                                                 │
@@ -156,6 +161,7 @@ Features:
 - Zero-knowledge proof of hardware attestation
 - No central authority required
 
+
 ---
 
 ## Phase 5: Universal Singularity (Year 5)
@@ -165,7 +171,7 @@ Features:
 By Year 5, SigmaOS completes the absorption of the entire Linux ecosystem:
 
 | Ecosystem Component | Absorption Method |
-|---|---|
+| --- | --- |
 | Linux kernel subsystems | Direct code + Sovereign reimplementation |
 | POSIX userland | sigma-posix compatibility layer |
 | Desktop ecosystems | Zenith absorbs all paradigms |
@@ -176,7 +182,7 @@ By Year 5, SigmaOS completes the absorption of the entire Linux ecosystem:
 ### 5.2 Hardware Universe
 
 | Hardware Domain | SigmaOS Solution |
-|---|---|
+| --- | --- |
 | x86/x64 servers | Primary target, full optimization |
 | ARM servers (AWS Graviton) | Native ARM64 kernel |
 | RISC-V embedded | RISC-V profile |
@@ -188,7 +194,7 @@ By Year 5, SigmaOS completes the absorption of the entire Linux ecosystem:
 
 ## KPI Dashboard
 
-```
+```text
 Year 1 Targets:
 ├── Package ecosystem: 10,000+ native packages
 ├── Hardware support: 500+ certified devices
@@ -219,6 +225,7 @@ Year 5 Targets (Singularity):
 3. **Sovereignty Preservation**: Every absorbed feature made more secure and efficient
 4. **No Regression**: Absorbed features must exceed original quality
 5. **Attribution**: Original projects credited in `THIRD_PARTY_LICENSES`
+
 
 ---
 

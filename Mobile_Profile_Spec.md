@@ -8,7 +8,7 @@ The SigmaOS mobile profile targets ARM64 smartphones and tablets (starting with 
 
 ## Boot: UEFI EFI Stub on ARM64
 
-```
+```text
 Device power-on → ARM TrustZone ATF (BL1/BL2/BL31) → UEFI (EDK2 ARM64)
   │
   ▼ sigma-boot-arm64.efi (PE32+ EFI application, AArch64)
@@ -122,7 +122,7 @@ suspend_background = true
 
 ## Touch Input: I2C HID Touch Event Pipeline
 
-```
+```text
 Touchscreen IC (e.g., Goodix GT911) → I2C bus
   │  sigma-i2c-driver (kernel shard)
   ▼
@@ -169,6 +169,6 @@ Benchmark target: Kyber-1024 keygen in < 500 µs on Cortex-A72 (BCM2711).
 ## Mobile Profile Image
 
 | Image | Size | Target |
-|---|---|---|
+| --- | --- | --- |
 | sigma-mobile-bcm2711.img | ~300 MB | Raspberry Pi 4 / CM4 |
 | sigma-mobile-snapdragon865.img | ~400 MB | Snapdragon 865 phones |

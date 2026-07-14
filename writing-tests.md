@@ -56,14 +56,20 @@ Skip the guard for tests where a disconnect is expected behavior, such as:
 
 - Signal aborts (`signal.emit('abort')`, `ac.abort()`)
 
+
 - Server-side destruction (`res.destroy()`, `req.socket.destroy()`)
+
 
 - Client-side body destruction mid-stream (`data.body.destroy()`)
 
+
 - Timeout errors (`HeadersTimeoutError`, `BodyTimeoutError`)
+
 
 - Successful upgrades (the socket is detached from the `Client`)
 
+
 - Retry/reconnect tests where the disconnect triggers the retry
+
 
 - HTTP parser errors from malformed responses (`HTTPParserError`)

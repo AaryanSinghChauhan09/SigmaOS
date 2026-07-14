@@ -8,7 +8,7 @@ SigmaOS implements **hardware-enforced security domains** using lightweight Micr
 
 ## Domain Trust Hierarchy
 
-```
+```text
 ┌─────────────────────────────────┐
 │          sigma-vault            │  ← Highest trust, air-gapped
 │   Encrypted secrets, keys      │     No network, no USB
@@ -27,7 +27,7 @@ SigmaOS implements **hardware-enforced security domains** using lightweight Micr
 ## Default Domains
 
 | Domain           | Trust     | Network | USB | Clipboard | RAM    | vCPUs |
-|------------------|-----------|---------|-----|-----------|--------|-------|
+| ------------------ | ----------- | --------- | ----- | ----------- | -------- | ------- |
 | sigma-vault      | Vault     | ❌      | ❌  | ❌        | 512 MB | 1     |
 | sigma-personal   | Trusted   | ✅      | ❌  | ✅        | 2 GB   | 2     |
 | sigma-work       | Standard  | ✅      | ❌  | ✅        | 4 GB   | 4     |
@@ -42,6 +42,7 @@ Data can only flow **downward** (from less trusted to more trusted contexts):
 - **Standard** → Can share with Standard and Trusted
 - **Trusted** → Can share with Trusted only
 
+
 ## Implementation
 
 - **Source**: `security/sigma_microvm_isolation.rs`
@@ -51,10 +52,11 @@ Data can only flow **downward** (from less trusted to more trusted contexts):
   - `is_transfer_allowed(from, to)` — enforce transfer policy
   - `list_active_domains()` — enumerate running domains
 
+
 ## Integration Points
 
 | Component        | Integration                                    |
-|------------------|------------------------------------------------|
+| ------------------ | ------------------------------------------------ |
 | Zenith Desktop   | Color-coded window borders per domain          |
 | File Manager     | Domain-aware file picker with transfer prompts |
 | Clipboard        | Filtered through domain policy engine          |

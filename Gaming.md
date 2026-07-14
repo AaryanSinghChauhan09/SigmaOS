@@ -8,7 +8,7 @@ This specification outlines the sovereign Vulkan-native graphics pipeline, compa
 
 SigmaOS implements a Direct-to-Display Vulkan ICD (Installable Client Driver) that communicates directly with Ring 1 GPU drivers via `sigma-bus` bypass queues, eliminating the overhead of classic Unix display servers.
 
-```
+```text
 ┌────────────────────────────────────────────────────────┐
 │                        Game                            │
 ├───────────────────────────┬────────────────────────────┤
@@ -83,6 +83,7 @@ pub struct GamepadInputEvent {
 ## ⚡ Real-Time Performance Governor
 
 When a game is launched, the system activates the `Gaming` profile in the scheduler and power daemon:
+
 1. **CPU Clocks**: Disables DVFS throttling, pins cores to maximum non-turbo frequency.
 2. **Task Priority**: Promotes game threads to the `EEVDF_REALTIME` scheduling class with a dedicated latency slice of **1.5ms**.
 3. **Memory Lock**: Locks all active game assets into memory (`mlock`) to eliminate page fault stutters during asset streaming.

@@ -58,9 +58,12 @@ Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
 
 1. **cppcheck**  full static analysis on core + HAL + security
 
+
 2. **Atomic module count**  reports how many `atomic_*.cpp/.hpp` files exist
 
+
 3. **Sovereignty check**  scans for forbidden `#include <stdlib.h>` etc. in atomic modules
+
 
 ---
 

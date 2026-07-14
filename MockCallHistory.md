@@ -168,8 +168,10 @@ Parameters :
   - regexp : filter MockCallHistoryLog when the regexp does not match on MockCallHistoryLog.toString() ([see](./MockCallHistoryLog.md#to-string))
   - object : an object with MockCallHistoryLog properties as keys to apply multiple filters. each values are a [filter parameter](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
+
 - options : the second parameter. an object.
   - options.operator : `'AND'` or `'OR'` (default `'OR'`). Used only if criteria is an object. see below
+
 
 ```js
 mockAgent.getCallHistory()?.filterCalls((log) => log.hash === value && log.headers?.['authorization'] !== undefined)
@@ -194,8 +196,11 @@ Can be :
 
 - string. MockCallHistoryLog filtered if `value !== parameterValue`
 
+
 - null. MockCallHistoryLog filtered if `value !== parameterValue`
 
+
 - undefined. MockCallHistoryLog filtered if `value !== parameterValue`
+
 
 - regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`

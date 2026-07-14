@@ -6,11 +6,15 @@ The `SnapshotAgent` provides a powerful way to record and replay HTTP requests f
 
 - **Integration Testing**: Record real API interactions and replay them in tests
 
+
 - **Offline Development**: Work with APIs without network connectivity
+
 
 - **Consistent Test Data**: Ensure tests use the same responses across runs
 
+
 - **API Contract Testing**: Capture and validate API behavior over time
+
 
 ## Constructor
 
@@ -36,6 +40,7 @@ new SnapshotAgent([options])
   - **shouldPlayback** `Function` - Callback to determine if a request should be played back
   - **excludeUrls** `Array` - URL patterns (strings or RegExp) to exclude from recording/playback
   - All other options from `MockAgent` are supported
+
 
 ### Modes
 
@@ -103,6 +108,7 @@ Saves all recorded snapshots to a file.
 #### Parameters
 
 - **filePath** `String` (optional) - Path to save snapshots. Uses constructor `snapshotPath` if not provided.
+
 
 #### Returns
 
@@ -255,6 +261,7 @@ Loads snapshots from a file.
 #### Parameters
 
 - **filePath** `String` (optional) - Path to load snapshots from. Uses constructor `snapshotPath` if not provided.
+
 
 #### Returns
 
@@ -480,15 +487,21 @@ const agent = new SnapshotAgent({
 
 - âœ… Add snapshot files to `.gitignore` if they contain real API data
 
+
 - âœ… Use environment-specific snapshots (dev/staging/prod)
+
 
 - âœ… Regularly review snapshot contents for sensitive information
 
+
 - âœ… Use the `excludeHeaders` option for production snapshots
+
 
 - âŒ Never commit snapshots with real authentication tokens
 
+
 - âŒ Don't share snapshot files containing personal data
+
 
 ```gitignore
 
@@ -624,16 +637,22 @@ SnapshotAgent provides similar functionality to nock but is specifically designe
 
 - âœ… Works with all undici APIs (`request`, `stream`, `pipeline`, etc.)
 
+
 - âœ… Supports undici-specific features (RetryAgent, connection pooling)
+
 
 - âœ… Better TypeScript integration
 
+
 - âœ… More efficient for high-performance scenarios
+
 
 ## See Also
 
 - [MockAgent](./MockAgent.md) - Manual mocking for more control
 
+
 - [MockCallHistory](./MockCallHistory.md) - Inspecting request history
+
 
 - [Testing Best Practices](../best-practices/writing-tests.md) - General testing guidance

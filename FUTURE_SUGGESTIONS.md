@@ -9,9 +9,11 @@ This document outlines structural suggestions, architectural improvements, and a
 To achieve absolute mathematical proof of security and memory safety, we propose expanding formal verification coverage beyond the base IPC layer.
 
 ### Target Objectives
+
 - **Verification of EEVDF Scheduler**: Prove that the scheduler runs without deadlocks and guarantees task deadlines mathematically.
 - **Verification of PMM Page Allocation**: Formally verify the buddy allocator memory map state machine against double-free errors.
 - **Toolchain**: Write Coq specs in `modules/tools/verification/coq/` and run `gnatprove` on Ada kernel modules.
+
 
 ---
 
@@ -34,7 +36,7 @@ Ensure all storage, networking, and system identity structures are safe from qua
 
 Introduce hardware-accelerated AI scheduling queues designed for neuromorphic processors (e.g. Intel Loihi) to handle local on-device neural networking.
 
-```
+```text
        [Sovereign Neuromorphic Scheduler]
                        │
        ┌───────────────┴───────────────┐

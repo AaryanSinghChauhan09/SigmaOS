@@ -10,11 +10,15 @@ The Nurse Profile is designed for nursing excellence, patient care, and efficien
 
 - **SigmaPatient**: Patient monitoring and care management.
 
+
 - **SigmaMedication**: Medication administration and tracking.
+
 
 - **SigmaChart**: Electronic charting and documentation.
 
+
 - **SigmaCommunication**: Care team coordination and communication.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Nurse Profile is designed for nursing excellence, patient care, and efficien
 
 - **Theme**: Care Pink (Healthcare Standard)
 
+
 - **Layout**: Nursing Dashboard (Patient, Medication, Chart)
 
+
 - **Personalization**: Custom care plans and automated reminders.
+
 
 ---
 

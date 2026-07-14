@@ -12,9 +12,11 @@ The SigmaOS Minimal POSIX Capsule is a selective compatibility layer that provid
 4. **Safety**: All implementations use Rust's type system for memory safety
 5. **Performance**: Avoid unnecessary overhead in the compatibility layer
 
+
 ## Scope: What's Included
 
 ### File I/O Primitives
+
 - `open()` - Open/create files with standard flags
 - `read()` - Read from file descriptors
 - `write()` - Write to file descriptors
@@ -25,7 +27,9 @@ The SigmaOS Minimal POSIX Capsule is a selective compatibility layer that provid
 - `rmdir()` - Remove directories
 - `unlink()` - Remove files
 
+
 ### Process & Thread Model
+
 - `spawn()` - Modern process spawning (alternative to fork/exec)
 - `wait()` - Wait for child processes
 - `exit()` - Process termination
@@ -33,13 +37,17 @@ The SigmaOS Minimal POSIX Capsule is a selective compatibility layer that provid
 - `getppid()` - Get parent process ID
 - Thread creation and management primitives
 
+
 ### Signals
+
 - `sigaction()` - Signal handling
 - `kill()` - Send signals to processes
 - `sigprocmask()` - Signal mask manipulation
 - Supported signals: SIGINT, SIGTERM, SIGKILL, SIGCHLD, SIGSTOP, SIGCONT
 
+
 ### IPC (Inter-Process Communication)
+
 - `pipe()` - Create pipe
 - `socket()` - Create socket
 - `bind()` - Bind socket to address
@@ -49,41 +57,52 @@ The SigmaOS Minimal POSIX Capsule is a selective compatibility layer that provid
 - `send()` / `recv()` - Send/receive data
 - `shutdown()` - Shutdown socket
 
+
 ### Networking Sockets
+
 - POSIX-like socket API for TCP/UDP
 - Address family support: AF_INET, AF_INET6
 - Socket types: SOCK_STREAM, SOCK_DGRAM
 - Protocol support: IPPROTO_TCP, IPPROTO_UDP
 
+
 ### Minimal libc Subset
+
 - String functions: `strlen`, `strcpy`, `strncpy`, `strcmp`, `strncmp`, `strchr`, `strstr`
 - Memory functions: `malloc`, `free`, `memcpy`, `memset`, `memcmp`
 - I/O functions: `printf`, `fprintf`, `sprintf`, `puts`, `putchar`
 - Math functions: `atoi`, `atol`, `strtol`, `strtoul`
 - Error handling: `errno`, `strerror`
 
+
 ## Scope: What's Excluded
 
 ### Legacy Shell Utilities
+
 - No reimplementation of grep, awk, sed, etc.
 - SigmaOS will provide AI-native equivalents
 
+
 ### Full POSIX Compliance
+
 - No strict signal semantics
 - No job control (bg, fg, jobs)
 - No terminal control (termios)
 - No obscure POSIX APIs
 
+
 ### Heavy Compatibility Layers
+
 - No full POSIX threads (pthreads) - use SigmaOS native threading
 - No full POSIX IPC (System V IPC) - use SigmaOS native IPC
 - No full POSIX real-time extensions
+
 
 ## Architecture
 
 ### Layer Structure
 
-```
+```text
 ┌─────────────────────────────────────┐
 │   POSIX Application Code            │
 ├─────────────────────────────────────┤
@@ -277,35 +296,47 @@ pub const SO_ERROR: i32 = 4;
 ## Implementation Phases
 
 ### Phase 1: Core Infrastructure
+
 - Error handling (errno)
 - File descriptor management
 - Process management structures
 
+
 ### Phase 2: File I/O
+
 - open, read, write, close
 - lseek, stat, fstat
 - mkdir, rmdir, unlink
 
+
 ### Phase 3: Process Management
+
 - spawn, wait, exit
 - getpid, getppid
 - Basic signal handling
 
+
 ### Phase 4: IPC & Networking
+
 - pipe, socket
 - bind, connect, listen, accept
 - send, recv, shutdown
 
+
 ### Phase 5: Minimal libc
+
 - String functions
 - Memory functions
 - I/O functions
 - Math functions
 
+
 ### Phase 6: Testing
+
 - Port simple utilities (BusyBox)
 - Validate compatibility
 - Performance testing
+
 
 ## Compatibility Notes
 
@@ -317,12 +348,14 @@ pub const SO_ERROR: i32 = 4;
 4. **No terminal control**: No termios, no terminal I/O control
 5. **Limited IPC**: No System V IPC, only pipes and sockets
 
+
 ### Migration Guide for Developers
 
 1. Replace `fork()` + `exec()` with `spawn()`
 2. Use SigmaOS native APIs for advanced features
 3. Avoid relying on obscure POSIX features
 4. Test thoroughly with the compatibility layer
+
 
 ## Future Extensions
 
@@ -333,6 +366,7 @@ The following may be added based on demand:
 - Extended file operations (mmap, etc.)
 - Additional libc functions
 - POSIX threads subset (if needed)
+
 
 ## References
 

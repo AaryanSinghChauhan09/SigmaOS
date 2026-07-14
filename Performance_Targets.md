@@ -8,7 +8,7 @@
 ## Boot Performance
 
 | Milestone | v0.1 Target | v1.0 Target | v2.0 Target | Measurement |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | UEFI → kernel_main | < 500ms | < 300ms | < 200ms | HPET timestamp |
 | Kernel init | < 300ms | < 200ms | < 100ms | jiffies delta |
 | sigma-init + daemons | < 1000ms | < 700ms | < 400ms | PID 1 log |
@@ -21,7 +21,7 @@
 ## Scheduler & Process
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | Context switch latency | < 50ns | sigma-bench context-switch |
 | Task creation (fork) | < 1µs | sigma-bench fork |
 | Syscall dispatch overhead | < 200ns | sigma-bench syscall-noop |
@@ -34,7 +34,7 @@
 ## Memory
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | Idle RAM (sigma-sh only) | < 32 MB | /proc/meminfo |
 | Idle RAM (full desktop) | < 256 MB | /proc/meminfo |
 | Kernel binary (stripped) | < 2 MB | `size kernel.elf` |
@@ -48,7 +48,7 @@
 ## Filesystem
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | SigmaFS sequential read | > 1 GB/s (NVMe) | sigma-bench disk-seq |
 | SigmaFS sequential write | > 800 MB/s (NVMe) | sigma-bench disk-seq |
 | SigmaFS random 4K read | > 100K IOPS | sigma-bench disk-rand |
@@ -61,7 +61,7 @@
 ## Networking
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | TLS 1.3 handshake | < 5ms (LAN) | sigma-bench tls-handshake |
 | DNS resolution (DoH cached) | < 2ms | sigma-bench dns-resolve |
 | UDP ping RTT (LAN) | < 0.5ms | sigma-bench udp-ping |
@@ -75,7 +75,7 @@
 ## Cryptography
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | SHA-256 throughput | > 500 MB/s | sigma-bench sha256 |
 | Kyber-1024 keygen | < 0.5ms | sigma-bench kyber-keygen |
 | Kyber-1024 encaps | < 0.5ms | sigma-bench kyber-enc |
@@ -89,7 +89,7 @@
 ## Desktop / UI
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | Frame time (1080p) | < 16ms (60fps) | sigma-bench compositor |
 | Frame time (4K) | < 8ms (120fps) | sigma-bench compositor-4k |
 | Input → screen latency | < 5ms | High-speed camera test |
@@ -105,7 +105,7 @@
 ## Package Manager
 
 | Metric | Target | Measurement |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-pkg list` | < 50ms | time sigma-pkg list |
 | `sigma-pkg search` (5000 pkgs) | < 100ms | sigma-bench pkg-search |
 | `sigma-pkg install` (local) | < 500ms | sigma-bench pkg-install |

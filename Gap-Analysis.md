@@ -7,7 +7,7 @@ Updated after Rounds 1–32. Compares SigmaOS against Tier 1 (Linux distros), Ti
 ## Status Legend
 
 | Symbol | Meaning |
-|---|---|
+| --- | --- |
 | ✅ | Implemented and committed |
 | 🔧 | Header/stub present — full implementation pending |
 | ☐ | Not yet started |
@@ -24,7 +24,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 
 | # | Gap | Status | Notes |
 
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | Kernel scheduler implementation | ☐ | `kernel/core/sigma_sched.cpp` — MLFQ+MCS bodies missing |
 | 2 | Memory manager implementation | ☐ | `kernel/core/sigma_mm.cpp` — physical/virtual MM missing |
 | 3 | Syscall dispatch implementation | ☐ | `kernel/core/sigma_syscall_dispatch.cpp` missing |
@@ -42,7 +42,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Package Management
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Package repository server | ☐ | No `sigma-repo-server` — nowhere to host packages |
 | Bootstrap package set (50 pkgs) | ☐ | bash, coreutils, curl, git, Python, GCC, Go minimum |
 | `.deb` / `.rpm` / `.apk` compat | ☐ | Format resolver in sigma-pkg not implemented |
@@ -54,7 +54,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Display & Login
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Display manager (`sigma-dm`) | ☐ | DRM/KMS-based — no X11, no Wayland |
 | DID-based login screen | ☐ | Scan QR → DID auth → session. No username/password |
 | sigma-pam replacement | ☐ | PAM for DID-based pluggable auth |
@@ -63,7 +63,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Networking
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | TCP state machine | ☐ | `net/tcp/sigma_tcp.cpp` — full RFC 793 state machine |
 | IPv6 support | ☐ | ICMPv6, SLAAC, DHCPv6 all missing |
 | UDP socket layer | ☐ | UDP needed for DNS, NTP, DHCP, many apps |
@@ -73,7 +73,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### QEMU CI Integration
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Automated QEMU boot test in CI | ☐ | `test_boot_sequence.sh` exists — not wired to GitHub Actions |
 | Hardware CI farm | ☐ | All tests run in software emulation only |
 
@@ -84,7 +84,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Kernel / Architecture
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Rust migration Phase 1 | ☐ | sigma-net, sigma-fs, SDF in Rust — planned, not started |
 | sigma-dna HW profiler implementation | 🔧 | Header exists — CPUID/DMI/PCI reader not written |
 | ARM64 native build | 🔧 | Stubs in `arch/arm64/` — no working cross-compile toolchain |
@@ -96,7 +96,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Security
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | ML-KEM (FIPS 203) full impl | 🔧 | Kyber header present — NIST final standard bindings missing |
 | ML-DSA (FIPS 204) full impl | 🔧 | Dilithium header present — NIST final standard bindings missing |
 | SLH-DSA (FIPS 205) | ☐ | Hash-based signature for code signing — not started |
@@ -107,7 +107,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### India Stack
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | ABDM OAuth2 + FHIR client | ☐ | sigma-health references ABDM — no actual API client |
 | GST IRN generation (IRP API) | ☐ | sigma-accounts has structs — no IRN call to NIC portal |
 | e-Way Bill API client | ☐ | Transport > ₹50,000 mandatory — not implemented |
@@ -119,7 +119,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### AI / ML
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Local LLM backend | ☐ | sigma-heal/sigma-lex reference "sigma-ai analyzes" — no LLM |
 | Indian LLM model integration | ☐ | Sarvam-1, OpenHathi, Krutrim GGUF models |
 | sigma-bhashini offline models | 🔧 | API client exists — offline model files not bundled |
@@ -132,7 +132,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Developer Experience
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Auto-generated API docs | ☐ | Doxygen/Hawkmoth from all .h files |
 | `sigma_error.h` standard | ☐ | Consistent `sigma_err_t` return type across all APIs |
 | Man pages (50 more tools) | ☐ | Round 20 added 2 — need 50+ for all CLI tools |
@@ -145,7 +145,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ### Multilingual & Accessibility
 
 | Gap | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Indian IME (input method) | ☐ | No Inscript/phonetic keyboard for any Indian language |
 | sigma-l10n catalogues | ☐ | `sigma_locale.h` exists — translation strings not written |
 | Braille display support | ☐ | AT-SPI2 screen reader exists — no Braille output |
@@ -156,7 +156,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ## Tier 1 Gap Analysis — vs Linux Distributions
 
 | Feature Area | Ubuntu 24.04 | Fedora 41 | Debian 12 | SigmaOS |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | PQ cryptography | ❌ | ❌ | ❌ | 🔧 (header complete) |
 | Atomic A/B updates | ❌ | ❌ | ❌ | ✅ |
 | DID identity | ❌ | ❌ | ❌ | 🔧 (no login UI yet) |
@@ -178,7 +178,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ## Tier 2 Gap Analysis — vs Microkernels / Research OSes
 
 | Feature | seL4 | MINIX 3 | Genode | Haiku | SigmaOS |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Capability security | ✅ | ❌ | ✅ | ❌ | ✅ |
 | Reincarnation server | ❌ | ✅ | ❌ | ❌ | ✅ |
 | Formal verification | ✅ | ❌ | ❌ | ❌ | ☐ |
@@ -193,7 +193,7 @@ These five gaps mean SigmaOS **cannot run on real hardware today**. All other wo
 ## Tier 3 Gap Analysis — vs Cloud-Native OSes
 
 | Feature | Talos | Bottlerocket | Flatcar | NixOS | SigmaOS |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Immutable root | ✅ | ✅ | ✅ | ❌ | ✅ |
 | Atomic A/B | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Reproducible builds | ❌ | Partial | ❌ | ✅ | ✅ |
@@ -212,7 +212,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 ### 🧩 Core System Gaps (BLOCKING - Phase 1)
 
 | Gap | Priority | Impact |
-|---|---|---|
+| --- | --- | --- |
 | No stable kernel or hardware driver layer | 🔴 CRITICAL | Cannot boot on real hardware |
 | No tested installer and bootloader integration | 🔴 CRITICAL | Cannot install system |
 | No service manager (systemd, OpenRC, etc.) defined | 🔴 CRITICAL | Cannot manage system services |
@@ -222,7 +222,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 ### ⚙️ Package Ecosystem Gaps (BLOCKING - Phase 2)
 
 | Gap | Priority | Impact |
-|---|---|---|
+| --- | --- | --- |
 | sigpkg is proposed but not fully implemented | 🔴 CRITICAL | Cannot install software |
 | No central repo of software packages | 🔴 CRITICAL | No software distribution |
 | Missing package signing, updates, rollback | 🔴 CRITICAL | Cannot trust or manage packages |
@@ -232,7 +232,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 ### 🎨 Desktop & User Experience Gaps (BLOCKING - Phase 2)
 
 | Gap | Priority | Impact |
-|---|---|---|
+| --- | --- | --- |
 | Accessibility tools absent (screen readers, multilingual UI) | 🟠 HIGH | Not accessible to all users |
 | No theme store or customization hub | 🟡 MEDIUM | Poor user experience |
 | No input method integration for Indic scripts | 🟠 HIGH | Cannot type in Indian languages |
@@ -240,7 +240,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 ### 🔒 Security & Privacy Gaps (HIGH PRIORITY - Phase 4)
 
 | Gap | Priority | Impact |
-|---|---|---|
+| --- | --- | --- |
 | No QubesOS-style sandboxing/isolation | 🟠 HIGH | Security vulnerability |
 | No Suricata/Snort integration | 🟠 HIGH | No network threat detection |
 | AI transparency logging not implemented | 🟠 HIGH | Cannot audit AI decisions |
@@ -249,7 +249,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 ### 🧠 AI & Automation Gaps (HIGH PRIORITY - Phase 4)
 
 | Gap | Priority | Impact |
-|---|---|---|
+| --- | --- | --- |
 | SigmaAI Agent still conceptual, not embedded | 🟠 HIGH | No natural language control |
 | No n8n/Airflow-style workflow engine | 🟡 MEDIUM | No automation capabilities |
 | Natural language → CLI translator not functional | 🟠 HIGH | No voice/text control |
@@ -257,7 +257,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 ### 📘 Education & Professional Tools Gaps (MEDIUM PRIORITY - Phase 3)
 
 | Gap | Priority | Impact |
-|---|---|---|
+| --- | --- | --- |
 | CBSE Tools (GeoGebra, Scilab, OpenBoard) not bundled | 🟡 MEDIUM | Not suitable for education |
 | Professional Modules (ERPNext, Koha, QGIS, GNUCash) missing | 🟡 MEDIUM | Not suitable for professional use |
 | Indic language packs not integrated | 🟠 HIGH | Not accessible in Indian languages |
@@ -269,7 +269,7 @@ The following gaps currently prevent SigmaOS from functioning like established L
 The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, the XR/DataSov platform, Linux distro-inspired components, open source project-inspired components, and the new categorized component structure:
 
 | Gap | Discovered While | Priority |
-|---|---|---|
+| --- | --- | --- |
 | No local LLM — sigma-heal AI analysis is a stub | sigma-heal implementation | 🟠 |
 | No ZK-SNARK library — sigma-datasov ZK proofs unimplemented | sigma_datasov.h | 🟡 |
 | No WebXR/OpenXR runtime binary — sigma-xr has no runnable code | sigma_xr.h | 🟡 |
@@ -380,101 +380,142 @@ The following gaps were discovered while implementing self-heal, commnet, contin
 
 1. sigma-snapshot — System snapshot manager (openSUSE Snapper-inspired)
 
+
 2. sigma-aur — Community package repository (Arch AUR-inspired)
+
 
 3. sigma-mint-tools — System management suite (Linux Mint-inspired)
 
+
 4. sigma-musl — Lightweight C library (Alpine-inspired)
 
+
 5. sigma-runit — Lightweight init system (Void Linux-inspired)
+
 
 ### Round 36 — Categorized Components (NEW)
 
 1. sigpkg — Universal package manager (Core System)
 
+
 2. sigma-code — Code editor suite (Development & IT)
+
 
 3. sigma-containers — Containerization (Development & IT)
 
+
 4. sigma-i18n — Multilingual UI (Desktop & UX)
 
+
 5. sigma-a11y — Accessibility tools (Desktop & UX)
+
 
 ### Round 35 — Open Source Project Components (NEW)
 
 1. sigma-paint — Digital painting suite (Krita/GIMP-inspired)
 
+
 2. sigma-office — Office suite (LibreOffice-inspired)
+
 
 3. sigma-mail — Email client (Thunderbird-inspired)
 
+
 4. sigma-cloud — Self-hosted cloud (Nextcloud-inspired)
 
+
 5. sigma-web — Modern web browser (Firefox/Chromium-inspired)
+
 
 ### Round 34 — Linux Distro Components (NEW)
 
 1. sigma-snapper — Snapshot & rollback system (openSUSE Snapper-inspired)
 
+
 2. sigma-obs — Build service infrastructure (openSUSE OBS-inspired)
+
 
 3. sigma-appstreams — Application catalog (RHEL AppStreams-inspired)
 
+
 4. sigma-pamac — GUI package manager (Manjaro PAMAC-inspired)
 
+
 5. sigma-cosmic — Rust-based desktop (Pop!_OS COSMIC-inspired)
+
 
 ### Round 33 — Make It Boot
 
 1. VESA/GOP framebuffer driver (get pixels on screen)
 
+
 2. Minimal scheduler implementation (`sigma_sched.cpp` — round-robin first)
+
 
 3. QEMU boot test in CI (assert boots to shell)
 
+
 4. `make iso` pipeline producing a bootable ISO
+
 
 ### Round 35 — Make It Connect
 
 1. TCP/UDP socket layer implementation
 
+
 2. Basic WiFi SDF driver (iwlwifi or cfg80211 userspace)
+
 
 3. sigma-pkg talking to a real repo server
 
+
 4. sigma-bus IPC running end-to-end
+
 
 ### Round 36 — Make It Secure
 
 1. Real Argon2id CryptFS key derivation (fix Issue #44)
 
+
 2. TPM2 seal/unseal for disk key
+
 
 3. DID login screen replacing username/password
 
+
 4. sigma-trustd Dilithium3 certificate chain end-to-end
+
 
 ### Round 37 — Make It Indian
 
 1. ABDM FHIR client (sigma-health goes live)
 
+
 2. GST IRN API client (sigma-accounts e-invoice goes live)
+
 
 3. IndiaStack UPI autopay working
 
+
 4. Bhashini offline model bundle (22-language ASR/TTS)
 
+
 5. Indian IME (Inscript + phonetic for Devanagari)
+
 
 ### Round 38 — Make It Smart
 
 1. Local LLM integration (sigma-ai with llama.cpp backend)
 
+
 2. sigma-heal AI analysis using local model
+
 
 3. sigma-lex Gazette parser using local NLP
 
+
 4. Federated learning coordinator server
+
 
 ---
 

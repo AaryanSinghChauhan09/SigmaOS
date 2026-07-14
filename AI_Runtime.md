@@ -1,10 +1,12 @@
 # SigmaOS AI Runtime (SigmaAI)
 
 ## Overview
+
 SigmaOS incorporates a localized, offline-first AI runtime (`SigmaAI`) utilizing quantized ONNX and Hugging Face architectures. The engine operates entirely locally, utilizing WebNN, DirectML, and Vulkan compute pipelines, ensuring data security and offline functionality for system queries, code autocompletion, and natural language translations.
 
 ## Architectural Flow
-```
+
+```text
  [User Prompt / System Query]
               │
               ▼
@@ -21,9 +23,11 @@ SigmaOS incorporates a localized, offline-first AI runtime (`SigmaAI`) utilizing
 ```
 
 ## System Properties
+
 Models are stored under `/usr/share/sigma-ai/models/` and managed under the `sigma-ai` daemon.
 
 Example settings (`sigma-ai.conf`):
+
 ```toml
 [runtime]
 engine = "onnxruntime"
@@ -37,6 +41,7 @@ translator = "gemma-2b-it-q4.onnx"
 ```
 
 ## Technical Implementation
+
 The execution pipeline exposes high-speed inference endpoints without loading external Python interpreters.
 
 ```rust
@@ -58,6 +63,7 @@ impl SigmaAIRuntime {
 ```
 
 ## Roadmap & Milestones
+
 - **Phase 1 (Months 0-3)**: Rust binding wrapper for ONNX runtime with INT4 quantization support.
 - **Phase 2 (Months 3-6)**: Vulkan compute shaders for accelerated offline inference on Intel/AMD/NVIDIA cards.
 - **Phase 3 (Months 6-9)**: NL-to-CLI translation engine integrated into the Zenith terminal emulator.

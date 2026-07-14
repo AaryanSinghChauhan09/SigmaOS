@@ -10,7 +10,7 @@ This document outlines the extensive strategic roadmap for automation, customiza
 
 ### 1.1 Theme Engine Overhaul
 
-```
+```text
 Current: Basic GTK theme support
 Target:  Unified sigma-theme engine spanning GTK, Qt, CLI, and Zenith
 
@@ -30,8 +30,11 @@ Architecture:
 ```
 
 **Theme definition format**:
+
 ```toml
+
 # ~/.config/sigma/themes/midnight.sigma-theme
+
 [theme]
 name = "Midnight Sovereign"
 variant = "dark"
@@ -59,7 +62,7 @@ animation_speed = "smooth"  # none, subtle, smooth, dramatic
 ### 1.2 Settings Hub Redesign
 
 | Section | Features | Status |
-|---|---|---|
+| --- | --- | --- |
 | System | CPU, Memory, Storage overview | 🔄 Active |
 | Network | WiFi, VPN, Firewall config | 📋 Planned |
 | Security | Sandbox profiles, MAC policies | 📋 Planned |
@@ -72,14 +75,23 @@ animation_speed = "smooth"  # none, subtle, smooth, dramatic
 ### 1.3 Unified Search (Sigma Search)
 
 ```bash
+
 # Search everything from one place
+
 sigma search "network settings"
+
 # Results:
+
 #   [Settings] Network Configuration → sigma settings network
+
 #   [Shard] NetworkStack → sigma registry inspect NetworkStack
+
 #   [File] /etc/sigma/network.toml → sigma edit /etc/sigma/network.toml
+
 #   [Wiki] Networking-Stack.md → sigma wiki open Networking-Stack
+
 #   [Command] sigma net status → show network interfaces
+
 ```
 
 ---
@@ -89,7 +101,9 @@ sigma search "network settings"
 ### 2.1 Task Scheduler
 
 ```toml
+
 # ~/.config/sigma/automations/daily-backup.toml
+
 [automation]
 name = "Daily Backup"
 schedule = "0 2 * * *"   # 2 AM daily (cron syntax)
@@ -111,15 +125,21 @@ require_disk_gb = 10       # Need 10GB free
 ### 2.2 Macro Recording
 
 ```bash
+
 # Record a series of actions
+
 sigma macro record "setup-dev-env"
+
 # ... user performs actions ...
+
 sigma macro stop
 
 # Replay the macro
+
 sigma macro play "setup-dev-env"
 
 # Share the macro
+
 sigma macro export "setup-dev-env" > setup-dev-env.sigma-macro
 ```
 
@@ -128,7 +148,7 @@ sigma macro export "setup-dev-env" > setup-dev-env.sigma-macro
 The system continuously optimizes based on usage patterns:
 
 | Optimization | Trigger | Action |
-|---|---|---|
+| --- | --- | --- |
 | App preloading | Frequent app detected | Pre-cache in memory |
 | CPU governor | Sustained idle detected | Switch to powersave |
 | Disk defrag | Fragmentation >10% | Background compaction |
@@ -165,7 +185,7 @@ pub trait GpuDriver: SigmaDriver {
 
 ### 3.2 Package Manager UI
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  SIGMA PACKAGE MANAGER                              ─ □ ✕  │
 ├────────────────────────────────────────────────────────────┤
@@ -189,7 +209,7 @@ pub trait GpuDriver: SigmaDriver {
 
 ### 3.3 System Dashboard
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  SIGMA SYSTEM DASHBOARD                                    │
 ├────────────────────────────────────────────────────────────┤
@@ -222,7 +242,7 @@ pub trait GpuDriver: SigmaDriver {
 ## Phase Summary
 
 | Phase | Features | Timeline | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Phase 1 | Theme engine, Settings hub, Unified search | Q1-Q2 | ✅ Done |
 | Phase 2 | Task scheduler, Macros, Auto-optimization | Q3-Q4 | 🔄 Active |
 | Phase 3 | DAL, Package UI, System Dashboard | Year 2 | 📋 Planned |

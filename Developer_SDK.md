@@ -14,9 +14,10 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 - **IDE Integration**: VS Code, IntelliJ plugin support
 - **Documentation**: Comprehensive API documentation and examples
 
+
 ## Development Workflow
 
-```
+```text
  [Build Host (Linux/macOS)] ──► [sig-sdk Cross Toolchain]
                                          │
                                          ▼
@@ -31,55 +32,73 @@ The SigmaOS Developer SDK provides a complete set of systems debugging and perfo
 ### Toolchain
 
 **Cross-Compiler**:
+
 - GCC 12.2.0 with SigmaOS target
 - Clang 16.0 with LLVM backend
 - Binutils 2.40
 - Glibc 2.35
 - Kernel headers 6.1.0
 
+
 **Target Triple**:
+
 - `x86_64-sigmaos-elf`: Bare metal target
 - `x86_64-sigmaos-linux-gnu`: Userspace target
+
 
 ### Debugging Tools
 
 **GDB**:
+
 - GDB server for remote debugging
 - Kernel debugging support
 - Capability-aware debugging
 - Thread debugging
 
+
 **LLDB**:
+
 - LLDB server for remote debugging
 - Rust debugging support
 - Python scripting
 
+
 **perf**:
+
 - CPU profiling
 - Memory profiling
 - Tracepoint support
 
+
 **LTTng**:
+
 - Kernel tracing
 - Userspace tracing
 - Event streaming
 
+
 ### Profiling Tools
 
 **perf**:
+
 - CPU cycle profiling
 - Cache miss profiling
 - Branch prediction profiling
 
+
 **LTTng**:
+
 - System call tracing
 - Function tracing
 - Custom tracepoints
 
+
 **Valgrind**:
+
 - Memory leak detection
 - Thread error detection
 - Cache profiling
+
 
 ## Configuration
 
@@ -114,6 +133,7 @@ enable_kernel_debug = true
 ### Cross-Compilation Setup
 
 **Environment Variables**:
+
 ```bash
 export SIGMA_SDK_ROOT=/opt/sigmaos-sdk
 export PATH=$SIGMA_SDK_ROOT/bin:$PATH
@@ -363,7 +383,9 @@ SigmaTask* sigma_schedule_next(void);
 ### Nim Bindings
 
 ```nim
+
 # sdk/bindings/nim/sigmaos.nim
+
 type
   TaskState = enum
     Running, Ready, Blocked, Terminated
@@ -395,12 +417,15 @@ proc id(task: Task): uint64 =
 ### VS Code Extension
 
 **Features**:
+
 - Syntax highlighting for SigmaOS config files
 - IntelliSense for SigmaOS APIs
 - Debug configuration for GDB
 - Build task integration
 
+
 **Configuration**:
+
 ```json
 {
   "version": "0.2.0",
@@ -422,18 +447,23 @@ proc id(task: Task): uint64 =
 ### IntelliJ Plugin
 
 **Features**:
+
 - Project templates for SigmaOS
 - Run configurations
 - Debugger integration
 - Build system integration
+
 
 ## Build Farm Integration
 
 ### Yocto-Style Build
 
 **Bitbake Recipe**:
+
 ```bitbake
+
 # recipes-kernel/sigmaos-kernel/sigmaos-kernel_6.1.bb
+
 require recipes-kernel/linux/linux-yocto.inc
 
 SRC_URI = "git://github.com/AaryanSinghChauhan09/SigmaOS;branch=main;protocol=https"
@@ -446,17 +476,23 @@ COMPATIBLE_MACHINE = "sigmaos"
 ```
 
 **Build Configuration**:
+
 ```bash
+
 # Initialize build environment
+
 source sigmaos-sdk-init-build-env
 
 # Build kernel
+
 bitbake sigmaos-kernel
 
 # Build SDK
+
 bitbake sigmaos-sdk
 
 # Build image
+
 bitbake sigmaos-image
 ```
 
@@ -469,12 +505,14 @@ bitbake sigmaos-image
 3. **Test on Target**: Test on actual hardware when possible
 4. **Version Control**: Use version control for all code
 
+
 ### Debugging
 
 1. **Use GDB**: Use GDB for interactive debugging
 2. **Enable Tracing**: Use LTTng for system-level tracing
 3. **Profile Performance**: Use perf for performance profiling
 4. **Check Capabilities**: Verify capability permissions
+
 
 ### Building
 
@@ -483,31 +521,40 @@ bitbake sigmaos-image
 3. **Cache Builds**: Use ccache for faster builds
 4. **Clean Builds**: Periodically clean build artifacts
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - GCC/Clang cross-compilers target configuration
 - Basic SDK structure
 - C and Rust bindings
 - GDB integration
 
+
 ### Phase 2 (Months 3-6)
+
 - GDB server porting
 - LLDB integration
 - perf integration
 - Basic profiling support
 
+
 ### Phase 3 (Months 6-9)
+
 - LTTng integration
 - Advanced tracing
 - IDE plugins
 - Build farm integration
 
+
 ### Phase 4 (Months 9-12)
+
 - Yocto-style build farm
 - Automated release artifacts
 - Advanced debugging features
 - Performance optimization tools
+
 
 ## References
 

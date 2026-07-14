@@ -23,7 +23,7 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 ### Core Design Goals
 
 | Goal | Approach |
-|------|----------|
+| ------ | ---------- |
 | **No POSIX dependency** | All package scripts run in a Sovereign WASM sandbox |
 | **Reproducible builds** | Every package carries a content-addressed Merkle hash |
 | **Cryptographic verification** | Ed25519 signatures on all packages and repo manifests |
@@ -32,7 +32,7 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 
 ### Package Format: `.spkg`
 
-```
+```text
 mypackage-1.0.0.spkg
 ├── MANIFEST.toml           # Name, version, deps, checksums
 
@@ -72,12 +72,13 @@ sigpkg list    --installed        # Show installed packages
 ## Update Channels
 
 | Channel | Description | Stability |
-|---------|-------------|-----------|
+| --------- | ------------- | ----------- |
 | `stable` | LTS-quality packages, security patches only | ⭐⭐⭐⭐⭐ |
 | `testing` | Upcoming stable; feature-complete but not yet hardened | ⭐⭐⭐⭐ |
 | `nightly` | Latest main branch builds; may break | ⭐⭐ |
 
 Switch channels:
+
 ```bash
 sigpkg channel set stable   # or testing, nightly
 
@@ -107,9 +108,12 @@ All core SigmaOS packages satisfy:
 
 - **No libc**: Uses `sigma_libc.h` (freestanding).
 
+
 - **No POSIX syscalls**: Routed through the Sovereign Syscall Gate.
 
+
 - **No dynamic linker**: All core packages are statically linked.
+
 
 ---
 
@@ -117,8 +121,11 @@ All core SigmaOS packages satisfy:
 
 - [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
 
+
 - [Phase 4: CI/CD & Testing](Phase-4-CICD-And-Testing)
 
+
 - [Sovereign Packaging Specification](Sovereign-Packaging-Specification)
+
 
 - [Zero Dependency Architecture](Zero-Dependency-Architecture)

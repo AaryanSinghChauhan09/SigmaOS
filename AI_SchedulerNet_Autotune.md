@@ -16,7 +16,7 @@ This approach is inspired by Google's work on kernel ML in production environmen
 
 ### 2.1 System Context
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    KERNEL AUTOTUNER LOOP                        │
 │                                                                 │
@@ -115,7 +115,7 @@ impl AISchedulerTuner {
 ## 3. Training & Model Details
 
 | Attribute | Value |
-|:----------|:------|
+| :---------- | :------ |
 | Architecture | 3-layer fully-connected (FC) network |
 | Input size | 8 normalized features |
 | Hidden layers | 16 → 16 neurons, ReLU activation |
@@ -125,6 +125,7 @@ impl AISchedulerTuner {
 | Inference cost | ~80 µs on low-end CPU (Celeron) |
 
 ### 3.1 Workload Categories
+
 The model is trained to recognize and optimize for five workload archetypes:
 
 - **Interactive** (Desktop): Short time slices, low latency priority
@@ -132,6 +133,7 @@ The model is trained to recognize and optimize for five workload archetypes:
 - **Mixed** (Web server): Balanced slices with network affinity
 - **Realtime** (Audio/Video): Ultra-short slices with CPU pinning
 - **Idle**: Minimal preemptions, power-saving parameters
+
 
 ---
 
@@ -156,6 +158,7 @@ $ sigma scheduler disable-ai
 ---
 
 ## 5. References & Standards
+
 - "EEVDF: Earliest Eligible Virtual Deadline First" — Linus Walleij, LKML
 - "Ghost: Machine Learning for OS Scheduling" — Google Research
 - Linux Kernel CFS and EEVDF scheduler documentation

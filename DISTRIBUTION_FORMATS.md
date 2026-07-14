@@ -28,7 +28,7 @@ Or visit: https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md
 Run SigmaOS tools and apps on any host OS.
 
 | Format | Command | Description |
-|--------|---------|-------------|
+| -------- | --------- | ------------- |
 | **Native (sigpkg)** | `sigma-pkg install <app>` | SigmaOS-native signed package |
 | **AppImage** | `./SigmaApp.AppImage` | Self-contained Linux bundle |
 | **Flatpak** | `flatpak run io.sigmaos.*` | Sandboxed Linux app |
@@ -49,7 +49,7 @@ Run SigmaOS tools and apps on any host OS.
 Full SigmaOS as a standalone operating system.
 
 | Format | Download | Use Case |
-|--------|----------|---------|
+| -------- | ---------- | --------- |
 | **Standalone ISO** | `sigmaos-zenith.iso` | Install to bare metal |
 | **AppImage** | `sigmaos.AppImage` | Run without installing |
 | **Portable EXE** | `sigmaos-compat.exe` | Windows compatibility layer |
@@ -64,7 +64,7 @@ Full SigmaOS as a standalone operating system.
 Hard real-time variants for industrial, embedded, and safety-critical use.
 
 | Variant | IRQ Latency | Description |
-|---------|-------------|-------------|
+| --------- | ------------- | ------------- |
 | **Monolithic RTOS** | < 50 µs | Single binary, all drivers built-in |
 | **Microkernel RTOS** | < 10 µs | Minimal kernel, ring-3 drivers |
 | **Layered RTOS** | < 25 µs | HAL → BSP → RTOS layers |
@@ -86,7 +86,7 @@ make iso PROFILE=rtos SCHED=edf IRQ_LATENCY_TARGET=10
 SigmaOS on smartphones, tablets, and embedded displays.
 
 | Format | Platform | Status |
-|--------|----------|--------|
+| -------- | ---------- | -------- |
 | **Native APK** | Android (ARM64) | Phase D |
 | **Native IPA** | iOS (ARM64) | Phase D |
 | **Hybrid HTML/JS/CSS** | Any WebView | Available |
@@ -101,7 +101,7 @@ SigmaOS on smartphones, tablets, and embedded displays.
 Different microkernel architectures for research and production.
 
 | Variant | Size | IPC | Use Case |
-|---------|------|-----|---------|
+| --------- | ------ | ----- | --------- |
 | **Pure** | < 64 KB | Message-passing only | High-assurance |
 | **Hybrid** | < 256 KB | sigma-bus IPC | Production default |
 | **Modular** | < 512 KB | Loadable modules | Desktop |
@@ -115,7 +115,7 @@ Different microkernel architectures for research and production.
 Run SigmaOS alongside existing OS installations.
 
 | Format | Host | Method |
-|--------|------|--------|
+| -------- | ------ | -------- |
 | **Traditional Partition** | Any | UEFI boot entry, separate partition |
 | **Separate Disk** | Any | Dedicated SSD/NVMe |
 | **Nested/Chainload** | Linux | GRUB chainload sigma-boot.efi |
@@ -129,7 +129,7 @@ Run SigmaOS alongside existing OS installations.
 Multi-node deployment for clusters and distributed computing.
 
 | Format | Protocol | Description |
-|--------|----------|-------------|
+| -------- | ---------- | ------------- |
 | **Client-Server** | gRPC (sigma.proto) | Traditional client-server |
 | **Peer-to-Peer** | ZeroNet mesh | Decentralized nodes |
 | **Clustered** | CRDT sync | Replicated state across nodes |
@@ -145,7 +145,7 @@ Multi-node deployment for clusters and distributed computing.
 Deployment targets for cloud infrastructure.
 
 | Format | Registry | Description |
-|--------|----------|-------------|
+| -------- | ---------- | ------------- |
 | **OCI Container** | ghcr.io/sigmaos | Docker-compatible container |
 | **VM Image (QCOW2)** | GitHub Releases | KVM/QEMU virtual machine |
 | **AWS AMI** | AWS Marketplace | Amazon Machine Image |
@@ -173,7 +173,7 @@ sigma-deploy container --registry ghcr.io/sigmaos
 Run SigmaOS directly in a web browser.
 
 | Format | Technology | Description |
-|--------|------------|-------------|
+| -------- | ------------ | ------------- |
 | **Desktop Demo** | WASM + WebGL | Full Zenith desktop in browser |
 | **Mobile Browser** | PWA | Progressive Web App |
 | **Embedded WebView** | Electron / Tauri | Embedded in another app |
@@ -187,7 +187,7 @@ Run SigmaOS directly in a web browser.
 Different kernel architectures compiled from one codebase.
 
 | Format | Size | Features | Profile Flag |
-|--------|------|---------|-------------|
+| -------- | ------ | --------- | ------------- |
 | **Monolithic** | ~4 MB | All drivers in kernel | `PROFILE=monolithic` |
 | **Microkernel** | < 512 KB | Ring-3 drivers via IPC | `PROFILE=microkernel` |
 | **Hybrid** | ~2 MB | Core in kernel, opt drivers ring-3 | `PROFILE=standalone` |
@@ -225,7 +225,7 @@ make apk PROFILE=mobile
 ## Release Schedule
 
 | Format Group | Current Status | Next Milestone |
-|---|---|---|
+| --- | --- | --- |
 | Standalone ISO | ✅ v15.0.0 | v15.1 — boot + desktop |
 | RTOS | 🔄 v15.0.0 partial | v16.0 — < 10 µs IRQ |
 | Cloud OCI | 🔄 v15.0.0 partial | v15.1 — production image |

@@ -11,7 +11,7 @@
 SigmaOS is **architecturally sound but feature-starved** at Phase 0. When compared to even minimal Linux variants:
 
 | Category | SigmaOS Status | Linux Equivalents | Criticality |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Scheduler** | Round-Robin (stub) | CFS, EDF, deadline | **BLOCKING** |
 | **Memory Allocator** | Slab (TBD) | Buddy + Slab | **BLOCKING** |
 | **Syscalls** | 30 planned | 400+ | **BLOCKING** |
@@ -30,81 +30,114 @@ SigmaOS is **architecturally sound but feature-starved** at Phase 0. When compar
 
 - ✅ **Scheduler** (`sovereign_scheduler.rs`): Placeholder scheduler, not production-ready
 
+
 - ✅ **Memory Management** (`memory/sovereign_allocator.rs`): Slab allocator, needs stress testing
+
 
 - ✅ **Syscall Layer** (`syscall/gate.rs`, `sovereign_syscalls.rs`): ~30 syscalls, non-POSIX ABI
 
+
 - ✅ **IPC** (`syscall/ipc.rs`): Message queue stub
+
 
 - ✅ **HAL** (`hal/`): x86_64 IDT, RISCV stub, MMIO/port I/O in Zig
 
+
 - ✅ **Interrupts** (IRQ handler stubs)
+
 
 - ✅ **Process Management** (`sovereign_process_manager.rs`)
 
+
 - ✅ **Namespace & Isolation** (`sovereign_namespace.rs`)
+
 
 ### Drivers (drivers/)
 
 - ✅ **e1000** (C/C++ compat shim): Ethernet NIC
 
+
 - ✅ **VirtIO-net** (Rust): Paravirtual Ethernet
+
 
 - ✅ **NVMe** (Rust stub): `drivers/sigma/nvme.rs` — not fully implemented
 
+
 - ✅ **WiFi** (Rust stub): `drivers/sigma/wifi.rs` — not fully implemented
+
 
 - ✅ **USB** (Rust stub): `drivers/sigma/usb.rs` — not fully implemented
 
+
 - ✅ **HAL/MMIO** (`drivers/hal/mmio.rs`, `port_io.zig`): Low-level I/O
+
 
 ### Network (kernel/net/)
 
 - ✅ **TCP/UDP Stack** (Rust): `net/net_stack.rs`, `socket.rs`
 
+
 - ✅ **Firewall** (Rust stub): `net/firewall.rs`
+
 
 - ✅ **TLS 1.3** (C++): `net/tls/sigma_tls.cpp` with PQC (Kyber-1024 hybrid)
 
+
 - ✅ **DNS** (C++): `net/dns/sigma_dns.cpp`, DoH support
+
 
 - ✅ **DHCP** (C++): `net/dhcp/sigma_dhcp.cpp` RFC 2131/2132
 
+
 - ✅ **WPA3/SAE** (C++): `net/wifi/sigma_wpa3.cpp` IEEE 802.11-2020
+
 
 ### Storage (kernel/storage/)
 
 - ✅ **VFS layer** (Rust stub): `kernel/storage/mod.rs`, `shard.rs`
 
+
 - ✅ **Block device abstraction**
 
+
 - ⚠️ **No actual filesystems** (ext4-like, btrfs-like planned for Phase 3)
+
 
 ### Virtualization (kernel/virt/) — *If SIGMA_USE_HYPERVISOR=ON*
 
 - ✅ **Hypervisor stub** (`hypervisor.rs`): Container runtime concept
 
+
 - ✅ **vCPU manager** (`vcpu.rs`): Process isolation
 
+
 - ✅ **Container runtime** (`container.rs`): Namespacing placeholder
+
 
 ### Security (security/)
 
 - ✅ **AppArmor-like MAC** (`sovereign_sandbox_mac.rs`): Capability-based
 
+
 - ✅ **PQC Crypto** (Kyber-1024, Dilithium-5): FIPS 203/204 final
 
+
 - ✅ **Secure boot** (TPM2 support planned)
+
 
 ### Userland (userland/)
 
 - ✅ **sigpkg** (Rust): Package manager
 
+
 - ✅ **sigma-sh** (Rust): Shell
+
 
 - ✅ **sigma-agent** (Nim): Workflow automation, plugin system
 
+
 - ✅ **coreutils** (Rust): Basic utilities
+
 
 ---
 
@@ -121,11 +154,15 @@ SigmaOS is **architecturally sound but feature-starved** at Phase 0. When compar
 
 - CFS (Completely Fair Scheduler) with O(log N) complexity
 
+
 - EDF (Earliest Deadline First) for real-time
+
 
 - CPU affinity, load balancing, preemption classes
 
+
 **Reference:** `torvalds/linux` scheduler patterns:
+
 ```c
 // From kernel/sched/core.c
 struct task_struct {
@@ -150,11 +187,15 @@ struct rq {
 
 - [ ] Implement **EDF scheduler** (deadline-first) for hard real-time (Phase 1)
 
+
 - [ ] Add **priority levels** (0-255: kernel, 128-255: user)
+
 
 - [ ] CPU affinity & **NUMA-aware** scheduling
 
+
 - [ ] Preemption counter + IRQ nesting tracking
+
 
 ---
 
@@ -167,11 +208,15 @@ struct rq {
 
 - Buddy allocator: O(log n) page allocation/deallocation
 
+
 - Per-CPU page caches (pcp lists)
+
 
 - Zone-aware allocation (DMA, Normal, HighMem)
 
+
 - Page reclaim (kswapd), compaction
+
 
 ### Key patterns from Linux:
 
@@ -206,13 +251,18 @@ static void __free_one_page(struct page *page, unsigned long pfn,
 
 - [ ] Implement **full Buddy allocator** with split/merge in Rust
 
+
 - [ ] Per-CPU page caches (PCP)
+
 
 - [ ] Zone-aware allocation (at least DMA + Normal)
 
+
 - [ ] Stress test suite: `fuzz_allocator`, `bench_fragmentation`
 
+
 - [ ] Memory pressure detection & kswapd-like reclaim
+
 
 ---
 
@@ -227,29 +277,41 @@ static void __free_one_page(struct page *page, unsigned long pfn,
 
 - File I/O: `open`, `close`, `read`, `write`, `lseek`
 
+
 - Process: `fork`, `exec`, `clone`, `wait`, `exit`
+
 
 - Memory: `mmap`, `munmap`, `brk`
 
+
 - Signals: `signal`, `sigaction`, `kill`
+
 
 - Networking: `socket`, `bind`, `listen`, `accept`, `connect`
 
+
 - IPC: `pipe`, `msgget`, `shmget`
+
 
 - FS: `mount`, `umount`
 
+
 - Device: `ioctl`
+
 
 ### Recommendation:
 
 - [ ] Implement POSIX subset (200 syscalls minimum)
 
+
 - [ ] Reference: `torvalds/linux arch/x86/entry/syscalls/syscall_64.tbl` (440 lines)
+
 
 - [ ] Versioning strategy (v1, v2, v3 for backward compat)
 
+
 - [ ] Trace/audit syscall entry points
+
 
 ---
 
@@ -261,19 +323,26 @@ static void __free_one_page(struct page *page, unsigned long pfn,
 
 - e1000 (legacy, 82543-82576 era)
 
+
 - VirtIO-net (QEMU only)
+
 
 ### Linux Variants Have (Pick 3-5 key ones):
 
 - **Realtek RTL8111** (`r8169` driver): Cheap, ubiquitous
 
+
 - **iwlwifi** (`intel/iwlwifi/`): Intel WiFi, 802.11ac/ax
+
 
 - **MediaTek MT7921** (`mediatek/mt7921e/`): Cheap mobile WiFi
 
+
 - **Mellanox ConnectX** (`mlx4`, `mlx5`): High-performance
 
+
 - **Broadcom BCM43xx** (`b43`, `brcmsmac`): Embedded WiFi
+
 
 ### Reference pattern (RTL8111 from AsahiLinux/linux):
 
@@ -306,13 +375,18 @@ static void rtl_tx(struct net_device *dev, struct sk_buff *skb) {
 
 - [ ] **RTL8111 driver** (Rust): 1500 LOC, covers 80% of cheap laptops
 
+
 - [ ] **WPA3/WiFi association** refinement
+
 
 - [ ] PCI device probing (vendorID/deviceID matching)
 
+
 - [ ] DMA setup for RX/TX rings
 
+
 - [ ] NAPI polling (not interrupt-driven for every packet)
+
 
 ---
 
@@ -324,9 +398,12 @@ static void rtl_tx(struct net_device *dev, struct sk_buff *skb) {
 
 - **NVMe** (`drivers/nvme/host/`): PCIe SSDs (most common now)
 
+
 - **AHCI** (`drivers/ata/libahci.c`): SATA/SSD storage
 
+
 - **mmc/SD** (`drivers/mmc/host/`): eMMC, microSD cards
+
 
 ### Reference (NVMe from torvalds/linux):
 
@@ -352,11 +429,15 @@ static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd)
 
 - [ ] **NVMe driver** (Rust): 2000 LOC, covers 90% of modern machines
 
+
 - [ ] **AHCI/SATA fallback** (Rust): For older hardware
+
 
 - [ ] Interrupt-driven + polling modes
 
+
 - [ ] Error recovery (abort, reset, namespace loss)
+
 
 ---
 
@@ -368,13 +449,18 @@ static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd)
 
 - **DRM/KMS** (Direct Rendering Manager): Unified graphics subsystem
 
+
 - **i915** (Intel): UHD/Iris integrated GPUs
+
 
 - **amdgpu** (AMD): RDNA/VEGA discrete
 
+
 - **virtio-gpu** (QEMU): Paravirtual display
 
+
 - **VFIO** (passthrough): Physical GPU assignment to VMs
+
 
 ### Reference (virtio-gpu driver simplified from torvalds/linux):
 
@@ -406,11 +492,15 @@ static int virtio_gpu_mode_set(struct drm_crtc *crtc,
 
 - [ ] **virtio-gpu driver** (Rust): 1000 LOC, QEMU display passthrough
 
+
 - [ ] **DRM/KMS minimal layer** (Rust): CRTC, encoder, connector abstraction
+
 
 - [ ] **i915 basic support** (Phase 2): Polling mode (no interrupts yet)
 
+
 - [ ] VFIO stubs (Phase 3)
+
 
 ---
 
@@ -422,9 +512,12 @@ static int virtio_gpu_mode_set(struct drm_crtc *crtc,
 
 - **USB core** (`drivers/usb/core/`): Host controller, device enumeration
 
+
 - **USB keyboard/mouse** (`drivers/usb/input/`): HID protocol
 
+
 - **USB mass storage** (`drivers/usb/storage/`): External drives
+
 
 ### Reference (USB keyboard driver, simplified):
 
@@ -454,11 +547,15 @@ static void usb_kbd_irq(struct urb *urb)
 
 - [ ] **USB core** (xHCI controller): 1500 LOC
 
+
 - [ ] **HID keyboard** (500 LOC): Polling mode first
+
 
 - [ ] **HID mouse** (500 LOC): Same
 
+
 - [ ] **Mass storage** (Phase 2)
+
 
 ---
 
@@ -472,17 +569,23 @@ static void usb_kbd_irq(struct urb *urb)
 
 - **Wayland** (weston, GNOME/Wayland): Modern display server
 
+
 - **X11** (xorg): Legacy but ubiquitous
 
+
 - **Compositor** (Weston): Window manager + renderer
+
 
 ### Recommendation:
 
 - [ ] Minimal Wayland compositor (Rust)
 
+
 - [ ] GTK/Qt binding layer (Nim)
 
+
 - [ ] Window manager (sovereign-wm)
+
 
 ---
 
@@ -494,15 +597,20 @@ static void usb_kbd_irq(struct urb *urb)
 
 - **ALSA** (`sound/core/`): Low-level audio
 
+
 - **PulseAudio**: Daemon + server
 
+
 - **JACK**: Professional audio
+
 
 ### Recommendation:
 
 - [ ] Simple audio mixer (Phase 2 placeholder)
 
+
 - [ ] HDA (High Definition Audio) driver (Phase 2)
+
 
 ---
 
@@ -516,13 +624,18 @@ static void usb_kbd_irq(struct urb *urb)
 
 - **ext4**: Journaled, stable, POSIX
 
+
 - **btrfs**: Copy-on-write, snapshots, RAID
+
 
 - **F2FS**: Flash-optimized, wear leveling
 
+
 - **NTFS3** (from Paragon-Software-Group/linux-ntfs3): Windows compat
 
+
 - **Overlay**: Layered FS (container use)
+
 
 ### Reference (ext4 simplified from torvalds/linux):
 
@@ -549,9 +662,12 @@ static struct inode *ext4_iget(struct super_block *sb, unsigned long ino)
 
 - [ ] **Minimal ext4 support** (Phase 3): Read-only first
 
+
 - [ ] **Btrfs stub** (Phase 3): Snapshots for container isolation
 
+
 - [ ] **NTFS3 binding** (Phase 3): For interop
+
 
 ---
 
@@ -563,19 +679,26 @@ static struct inode *ext4_iget(struct super_block *sb, unsigned long ino)
 
 - **KVM** (`arch/x86/kvm/`): Type-2 hypervisor, VMX/SVM
 
+
 - **QEMU** (external): Guest OS runner
+
 
 - **LXC/systemd-nspawn**: Lightweight containers
 
+
 - **cgroup** (`kernel/cgroup/`): Resource isolation
+
 
 ### Recommendation:
 
 - [ ] **Container namespaces** refinement (Phase 3)
 
+
 - [ ] **cgroup v2 support** (Phase 3)
 
+
 - [ ] **KVM stubs** (Phase 4)
+
 
 ---
 
@@ -587,17 +710,24 @@ static struct inode *ext4_iget(struct super_block *sb, unsigned long ino)
 
 - **Landlock** (`security/landlock/`): Unprivileged sandboxing
 
+
 - **SELinux**: Role-based access control
+
 
 - **seccomp**: Syscall filtering
 
+
 - **CFI** (Control Flow Integrity): Indirect call protection
+
 
 - **Shadow stack**: Return address verification
 
+
 - **Stack canaries**: Buffer overflow detection
 
+
 - **FORTIFY_SOURCE**: Compile-time string checks
+
 
 ### Reference (Landlock from landlock-lsm/linux):
 
@@ -615,11 +745,15 @@ SYSCALL_DEFINE3(landlock_add_rule, int, ruleset_fd,
 
 - [ ] **seccomp filters** (Phase 4): Syscall whitelisting
 
+
 - [ ] **Shadow stack** (Phase 4): Return address signing
+
 
 - [ ] **CFI** (Phase 5): Indirect call hardening
 
+
 - [ ] **Landlock-like sandboxing** (Phase 4): For untrusted userland
+
 
 ---
 
@@ -628,7 +762,7 @@ SYSCALL_DEFINE3(landlock_add_rule, int, ruleset_fd,
 ### Priority Ranking (Phase 1–3)
 
 | Driver | Complexity | Impact | Timeline | Reference |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **RTL8111** (NIC) | Medium | HIGH | 4 weeks | `r8169` from torvalds/linux |
 | **NVMe** (SSD) | Medium | HIGH | 4 weeks | `nvme/host/pci.c` from torvalds/linux |
 | **AHCI** (SATA) | Low | MEDIUM | 2 weeks | `ata/libahci.c` from torvalds/linux |
@@ -758,30 +892,39 @@ make PROFILE=cloud qemu-test
    - Add preemption counter
    - CPU affinity tracking
 
+
 2. **Memory allocator stress test** (1 week)
    - Fuzz allocator with random alloc/free patterns
    - Measure fragmentation
    - Add kswapd-like reclaim
 
+
 3. **Syscall table expansion** (3 weeks)
    - Add 50+ POSIX syscalls (open, close, read, write, mmap, etc.)
    - Add versioning layer for backward compat
+
 
 ### Phase 1 (Weeks 4–8)
 
 1. **RTL8111 driver** (4 weeks): Rust + async I/O
 
+
 2. **NVMe driver** (4 weeks): Rust + DMA
 
+
 3. **AHCI/SATA** (2 weeks): Fallback for older hardware
+
 
 ### Phase 2 (Weeks 9–16)
 
 1. **virtio-gpu** (2 weeks): Quick win for QEMU desktop
 
+
 2. **i915 basic** (6 weeks): Intel GPU polling mode
 
+
 3. **USB/xHCI host** (6 weeks): Keyboard + mouse
+
 
 ---
 
@@ -791,33 +934,46 @@ make PROFILE=cloud qemu-test
 
 - **Scheduler**: [torvalds/linux kernel/sched/core.c](https://github.com/torvalds/linux/blob/master/kernel/sched/core.c)
 
+
 - **Memory**: [torvalds/linux mm/page_alloc.c](https://github.com/torvalds/linux/blob/master/mm/page_alloc.c)
+
 
 - **Network Drivers**: [torvalds/linux drivers/net/ethernet/](https://github.com/torvalds/linux/tree/master/drivers/net/ethernet)
 
+
 - **GPU/DRM**: [torvalds/linux drivers/gpu/drm/](https://github.com/torvalds/linux/tree/master/drivers/gpu/drm)
+
 
 ### Specialized Linux Variants
 
 - **Rust Support**: [Rust-for-Linux/linux](https://github.com/Rust-for-Linux/linux)
 
+
 - **Real-Time**: [zen-kernel/zen-kernel](https://github.com/zen-kernel/zen-kernel), [thesofproject/linux](https://github.com/thesofproject/linux)
+
 
 - **Security**: [landlock-lsm/linux](https://github.com/landlock-lsm/linux), [samitolvanen/linux](https://github.com/samitolvanen/linux)
 
+
 - **Apple Silicon**: [AsahiLinux/linux](https://github.com/AsahiLinux/linux) — excellent GPU driver examples
 
+
 - **Mobile**: [msm8916-mainline/linux](https://github.com/msm8916-mainline/linux), [Icenowy/linux](https://github.com/Icenowy/linux)
+
 
 ### Books & Papers
 
 - **Linux Kernel Development** (Robert Love): Chapter 3 (Processes), Chapter 8 (Memory)
 
+
 - **Understanding the Linux Kernel** (Bovet & Cesati): Architecture focus
+
 
 - **Linux Device Drivers** (Rubini et al.): Driver development patterns
 
+
 - **OSDEV.org**: x86-64 memory management, interrupt handling
+
 
 ---
 
@@ -825,11 +981,15 @@ make PROFILE=cloud qemu-test
 
 1. **Pick Phase 0 priority**: Start with scheduler hardening OR memory allocator stress test
 
+
 2. **Create GitHub Issues** for each gap (use labels: `phase-0`, `phase-1`, `driver`, `subsystem`)
+
 
 3. **Assign Linux variant references** to each issue (link to torvalds/linux or variant)
 
+
 4. **Establish spike timeboxes**: 1 week = feasibility study + proof-of-concept
+
 
 ---
 

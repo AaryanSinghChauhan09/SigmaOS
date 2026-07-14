@@ -179,7 +179,7 @@ mockPool.intercept({
 
 in this case opts will be
 
-```
+```text
 {
   method: 'POST',
   headers: { 'X-TOKEN-SECRET': 'SuperSecretToken' },

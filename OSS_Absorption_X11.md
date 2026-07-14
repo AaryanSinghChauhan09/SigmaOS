@@ -1,4 +1,5 @@
 # SigmaOS Display Server Absorption - X11
+
 ## Making freedesktop/xorg-server Irrelevant
 
 > **Absorption Target**: https://github.com/freedesktop/xorg-server  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed X11 by implementing a native X11 compatibilit
 ## Absorbed Features & Capabilities
 
 ### 1. X11 Protocol
+
 **Original**: X11's client-server protocol  
 **SigmaOS**: Native X11 protocol with enhanced features
 
@@ -29,6 +31,7 @@ pub struct ZenithCompositor {
 ```
 
 **Protocol Features**:
+
 - Native X11 protocol implementation with OS-level optimization
 - Protocol translation with automatic conversion
 - X11 caching with intelligent invalidation
@@ -36,11 +39,14 @@ pub struct ZenithCompositor {
 - Protocol validation with automatic checking
 - Protocol monitoring with real-time metrics
 
+
 ### 2. Window Management
+
 **Original**: X11's window management  
 **SigmaOS**: Native window management with enhanced features
 
 **Window Features**:
+
 - Native window management with OS-level optimization
 - Window composition with intelligent layering
 - Window decorations with native theming
@@ -48,11 +54,14 @@ pub struct ZenithCompositor {
 - Window validation with automatic checking
 - Window monitoring with real-time metrics
 
+
 ### 3. Graphics Engine
+
 **Original**: X11's graphics (Xrender, Xext, etc.)  
 **SigmaOS**: Native graphics with enhanced features
 
 **Graphics Features**:
+
 - Native graphics engine with GPU acceleration
 - 2D acceleration with hardware support
 - 3D acceleration with OpenGL/Vulkan
@@ -60,11 +69,14 @@ pub struct ZenithCompositor {
 - Graphics validation with automatic checking
 - Graphics monitoring with real-time metrics
 
+
 ### 4. Input Handling
+
 **Original**: X11's input system  
 **SigmaOS**: Native input with enhanced features
 
 **Input Features**:
+
 - Native input handling with OS-level optimization
 - Direct hardware access with capability-based control
 - Input device management with automatic detection
@@ -72,11 +84,14 @@ pub struct ZenithCompositor {
 - Input validation with automatic checking
 - Input monitoring with real-time metrics
 
+
 ### 5. Extension Support
+
 **Original**: X11's extensions (Composite, DRI, etc.)  
 **SigmaOS**: Native extensions with enhanced features
 
 **Extension Features**:
+
 - Native extension support with OS-level optimization
 - Extension translation with automatic conversion
 - Extension caching with intelligent invalidation
@@ -84,11 +99,14 @@ pub struct ZenithCompositor {
 - Extension validation with automatic checking
 - Extension monitoring with real-time metrics
 
+
 ### 6. Compatibility Layer
+
 **Original**: X11's compatibility with applications  
 **SigmaOS**: Native compatibility with enhanced features
 
 **Compatibility Features**:
+
 - Native compatibility layer with OS-level optimization
 - X11 application translation with automatic conversion
 - Compatibility caching with intelligent optimization
@@ -96,12 +114,13 @@ pub struct ZenithCompositor {
 - Compatibility validation with automatic checking
 - Compatibility monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | X11 | Zenith | Advantage |
-|---------|-----|--------|------------|
+| --------- | ----- | -------- | ------------ |
 | Protocol Performance | X protocol overhead | Native translation | ✅ 5x |
 | Window Performance | X server overhead | Native OS-level | ✅ 5-10x |
 | Graphics Performance | Xrender overhead | Native GPU | ✅ 10-50x |
@@ -116,6 +135,7 @@ pub struct ZenithCompositor {
 ## Implementation Details
 
 ### Native X11 Protocol
+
 ```rust
 pub mod x11 {
     use zenith::x11::X11Protocol;
@@ -140,6 +160,7 @@ pub mod x11 {
 ```
 
 ### Native Compatibility Layer
+
 ```rust
 pub mod compatibility {
     pub struct CompatibilityLayer {
@@ -166,30 +187,43 @@ pub mod compatibility {
 ### For Linux Applications Using X11
 
 **Before** (using X11):
+
 ```bash
+
 # Start X server
+
 startx
 
 # Run X11 application
+
 x11-app
 
 # Use X11 protocol
+
 # libX11
+
 ```
 
 **After** (using Zenith):
+
 ```bash
+
 # Enable compositor shard (native)
+
 sigma-shard enable compositor
 
 # Start Zenith with X11 compatibility
+
 zenith-compositor --x11-compatibility
 
 # Run application
+
 sigma-compositor run --app application --x11
 
 # Native protocol
+
 # libzenith-x11
+
 ```
 
 ---
@@ -197,7 +231,7 @@ sigma-compositor run --app application --x11
 ## Performance Benchmarks
 
 | Operation | X11 | Zenith | Improvement |
-|-----------|-----|--------|-------------|
+| ----------- | ----- | -------- | ------------- |
 | X Server Start | 2s | 200ms | 10x faster |
 | Window Create | 50ms | 10ms | 5x faster |
 | Input Latency | 10ms | 2ms | 5x faster |

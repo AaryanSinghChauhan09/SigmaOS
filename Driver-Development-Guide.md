@@ -13,6 +13,7 @@ SigmaOS uses an Object-Oriented Programming (OOP) approach with Rust traits to d
 - **Encapsulation**: Device-specific implementation details are hidden behind trait abstractions
 - **Extensibility**: New drivers can be added by implementing standard traits
 
+
 ## Driver Categories
 
 ### 1. Network Drivers
@@ -20,9 +21,11 @@ SigmaOS uses an Object-Oriented Programming (OOP) approach with Rust traits to d
 Located in `drivers/net/`
 
 #### Supported Drivers
+
 - **e1000e**: Intel e1000e Ethernet Controller (I219-V, I219-LM, etc.)
 - **r8169**: Realtek r8169/r8168 Ethernet Controller (8169, 8168, 8411, etc.)
 - **sigma_virtio_net**: VirtIO network driver for virtualized environments
+
 
 #### Base Trait: `EthernetDevice`
 
@@ -105,9 +108,11 @@ impl EthernetPhy for MyNetworkController {
 Located in `drivers/storage/`
 
 #### Supported Drivers
+
 - **ahci**: AHCI SATA Controller (Intel, AMD, VIA, NVIDIA, Marvell)
 - **nvme**: NVMe SSD Controller
 - **sigma_virtio_blk**: VirtIO block driver for virtualized environments
+
 
 #### Base Trait: `StorageDevice`
 
@@ -137,10 +142,12 @@ pub trait StorageDevice {
 Located in `drivers/gpu/`
 
 #### Supported Drivers
+
 - **sigma_amdgpu**: AMD Radeon GPU (Vega, Navi, RDNA2)
 - **sigma_i915**: Intel GPU (Gen 6-12, Arc)
 - **sigma_nvidia**: NVIDIA GPU (Kepler, Maxwell, Pascal)
 - **sigma_virtio_gpu**: VirtIO GPU driver for virtualized environments
+
 
 #### Base Trait: `GpuDevice`
 
@@ -162,10 +169,12 @@ pub trait GpuDevice: Device {
 Located in `drivers/usb/`
 
 #### Supported Drivers
+
 - **xhci**: USB 3.0/3.1 xHCI Controller
 - **ehci**: USB 2.0 EHCI Controller
 - **uhci**: USB 1.1 UHCI Controller
 - **ohci**: USB 1.1 OHCI Controller
+
 
 #### Base Trait: `UsbController`
 
@@ -192,11 +201,13 @@ pub trait UsbController {
 Located in `drivers/input/`
 
 #### Supported Drivers
+
 - **hid**: USB HID (Human Interface Device) driver
 - **ps2_keyboard**: PS/2 Keyboard driver
 - **ps2_mouse**: PS/2 Mouse driver
 - **synaptics**: Synaptics Touchpad driver
 - **elan**: ELAN Touchpad driver
+
 
 #### Base Trait: `HidDriver`
 
@@ -375,6 +386,7 @@ pub unsafe extern "C" fn my_driver_shutdown() -> I32 {
 6. **Documentation**: Document register offsets, bit fields, and device-specific quirks
 7. **Testing**: Implement unit tests for driver logic where possible
 
+
 ## Linux Kernel Driver References
 
 When developing SigmaOS drivers, reference the following Linux kernel drivers:
@@ -384,6 +396,7 @@ When developing SigmaOS drivers, reference the following Linux kernel drivers:
 - **GPU**: `drivers/gpu/drm/amd/amdgpu/`, `drivers/gpu/drm/i915/`
 - **USB**: `drivers/usb/host/`
 - **Input**: `drivers/hid/`, `drivers/input/keyboard/`, `drivers/input/mouse/`
+
 
 ## Contributing
 
@@ -396,6 +409,7 @@ When contributing a new driver:
 5. Add error handling for all failure cases
 6. Test on real hardware when possible
 7. Update this guide with device-specific information
+
 
 ## License
 

@@ -23,6 +23,7 @@ This document provides comprehensive migration guides for users transitioning fr
 8. [Data Migration](#data-migration)
 9. [Configuration Migration](#configuration-migration)
 
+
 ---
 
 ## Migrating from Ubuntu
@@ -35,6 +36,7 @@ This document provides comprehensive migration guides for users transitioning fr
 - Export browser bookmarks and passwords
 - Save SSH keys and GPG keys
 
+
 ### Installation
 
 1. Download SigmaOS installer from official repository
@@ -43,6 +45,7 @@ This document provides comprehensive migration guides for users transitioning fr
 4. Select dual-boot option if keeping Ubuntu
 5. Complete installation and reboot
 
+
 ### Post-Installation
 
 #### Package Management
@@ -50,10 +53,13 @@ This document provides comprehensive migration guides for users transitioning fr
 Ubuntu uses `apt`, SigmaOS uses `sigpkg`:
 
 ```bash
+
 # Ubuntu
+
 sudo apt install package
 
 # SigmaOS
+
 sigpkg install package
 ```
 
@@ -64,6 +70,7 @@ SigmaOS uses native implementations:
 - **systemd-coredump** → `sigma_coredump`
 - **systemd-networkd** → Native network drivers
 - **systemd-resolved** → Native DNS resolver
+
 
 #### Desktop Environment
 
@@ -81,6 +88,7 @@ If using GNOME on Ubuntu, SigmaOS includes GNOME with Zenith Desktop integration
 - Export Wayland configurations
 - Note custom COPR repositories
 
+
 ### Installation
 
 1. Download SigmaOS installer
@@ -89,6 +97,7 @@ If using GNOME on Ubuntu, SigmaOS includes GNOME with Zenith Desktop integration
 4. Select dual-boot if keeping Fedora
 5. Complete installation
 
+
 ### Post-Installation
 
 #### Package Management
@@ -96,10 +105,13 @@ If using GNOME on Ubuntu, SigmaOS includes GNOME with Zenith Desktop integration
 Fedora uses `dnf`, SigmaOS uses `sigpkg`:
 
 ```bash
+
 # Fedora
+
 sudo dnf install package
 
 # SigmaOS
+
 sigpkg install package
 ```
 
@@ -123,6 +135,7 @@ SigmaOS supports Wayland natively. Your Wayland configurations should work with 
 - Export APT sources
 - Note custom kernel modules
 
+
 ### Installation
 
 1. Download SigmaOS installer
@@ -131,6 +144,7 @@ SigmaOS supports Wayland natively. Your Wayland configurations should work with 
 4. Select dual-boot if keeping Debian
 5. Complete installation
 
+
 ### Post-Installation
 
 #### Package Management
@@ -138,10 +152,13 @@ SigmaOS supports Wayland natively. Your Wayland configurations should work with 
 Debian uses `apt`, SigmaOS uses `sigpkg`:
 
 ```bash
+
 # Debian
+
 sudo apt install package
 
 # SigmaOS
+
 sigpkg install package
 ```
 
@@ -161,6 +178,7 @@ Like Debian, SigmaOS emphasizes stability. The custom kernel with latest Linux i
 - Export custom PKGBUILD files
 - Note custom kernel parameters
 
+
 ### Installation
 
 1. Download SigmaOS installer
@@ -169,6 +187,7 @@ Like Debian, SigmaOS emphasizes stability. The custom kernel with latest Linux i
 4. Select dual-boot if keeping Arch
 5. Complete installation
 
+
 ### Post-Installation
 
 #### Package Management
@@ -176,10 +195,13 @@ Like Debian, SigmaOS emphasizes stability. The custom kernel with latest Linux i
 Arch uses `pacman`, SigmaOS uses `sigpkg`:
 
 ```bash
+
 # Arch
+
 sudo pacman -S package
 
 # SigmaOS
+
 sigpkg install package
 ```
 
@@ -203,6 +225,7 @@ SigmaOS maintains the flexibility of Arch while providing pre-configured stabili
 - Document Windows-specific settings
 - Backup Windows Registry if needed
 
+
 ### Installation
 
 1. Download SigmaOS installer
@@ -211,6 +234,7 @@ SigmaOS maintains the flexibility of Arch while providing pre-configured stabili
 4. Run Calamares-style installer with dual-boot support
 5. Shrink Windows partition during installation
 6. Complete installation and reboot
+
 
 ### Post-Installation
 
@@ -226,6 +250,7 @@ Windows applications won't run natively. Use SigmaOS native alternatives:
 - **Adobe Photoshop** → GIMP (bundled)
 - **Chrome** → Native browser or Firefox
 - **Steam** → Native Steam with Proton for Windows games
+
 
 #### Drivers
 
@@ -247,6 +272,7 @@ SigmaOS installs GRUB as bootloader, allowing selection between Windows and Sigm
 - Document macOS-specific applications
 - Backup using Migration Assistant
 
+
 ### Installation
 
 1. Download SigmaOS installer
@@ -255,6 +281,7 @@ SigmaOS installs GRUB as bootloader, allowing selection between Windows and Sigm
 4. Run installer
 5. Partition disk for dual-boot
 6. Complete installation
+
 
 ### Post-Installation
 
@@ -271,6 +298,7 @@ macOS applications won't run natively. Use SigmaOS alternatives:
 - **Logic Pro** → Native audio tools
 - **Safari** → Native browser or Firefox
 
+
 #### Hardware
 
 SigmaOS includes native drivers for Mac hardware. Touch Bar support may require additional configuration.
@@ -286,7 +314,7 @@ Use rEFBoot or similar tool to select between macOS and SigmaOS at boot.
 ### Office Suites
 
 | From | To (SigmaOS) |
-|------|--------------|
+| ------ | -------------- |
 | Microsoft Office | LibreOffice |
 | Google Docs | Native office suite |
 | WPS Office | LibreOffice |
@@ -294,7 +322,7 @@ Use rEFBoot or similar tool to select between macOS and SigmaOS at boot.
 ### Development Tools
 
 | From | To (SigmaOS) |
-|------|--------------|
+| ------ | -------------- |
 | VS Code | Native editor with AI suggestions |
 | JetBrains IDEs | Native alternatives |
 | Docker | Native container support |
@@ -303,7 +331,7 @@ Use rEFBoot or similar tool to select between macOS and SigmaOS at boot.
 ### Media Tools
 
 | From | To (SigmaOS) |
-|------|--------------|
+| ------ | -------------- |
 | Adobe Photoshop | GIMP |
 | Adobe Premiere | Native video editor |
 | Blender | Blender (bundled) |
@@ -312,7 +340,7 @@ Use rEFBoot or similar tool to select between macOS and SigmaOS at boot.
 ### Communication
 
 | From | To (SigmaOS) |
-|------|--------------|
+| ------ | -------------- |
 | Slack | Native messaging |
 | Discord | Native client |
 | Zoom | Native video conferencing |
@@ -331,6 +359,7 @@ Use the following methods to migrate user data:
 3. **Cloud Sync**: Upload to cloud, download to SigmaOS
 4. **Dual-Boot Access**: Access Windows/macOS partition from SigmaOS
 
+
 ### Application Data
 
 #### Browser Data
@@ -339,17 +368,20 @@ Use the following methods to migrate user data:
 - **Firefox**: Use Firefox Sync
 - **Edge**: Export bookmarks, import to SigmaOS browser
 
+
 #### Email
 
 - **Outlook**: Export to PST, import to Thunderbird
 - **Gmail**: Use IMAP to sync to native email client
 - **Apple Mail**: Export to mbox format
 
+
 #### Documents
 
 - **Office Documents**: Open directly in LibreOffice
 - **PDFs**: Native PDF viewer
 - **Images**: Native image viewer
+
 
 ---
 
@@ -360,20 +392,27 @@ Use the following methods to migrate user data:
 #### Bash to SigmaOS Shell
 
 ```bash
+
 # Copy bash configurations
+
 cp ~/.bashrc ~/.bash_profile ~/
 
 # SigmaOS uses native shell with AI suggestions
+
 # Most bash configurations will work
+
 ```
 
 #### SSH Keys
 
 ```bash
+
 # Copy SSH directory
+
 cp -r ~/.ssh ~/
 
 # Set correct permissions
+
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/id_rsa
 ```
@@ -381,11 +420,14 @@ chmod 600 ~/.ssh/id_rsa
 #### GPG Keys
 
 ```bash
+
 # Export GPG keys
+
 gpg --export-secret-keys > private.key
 gpg --export > public.key
 
 # Import on SigmaOS
+
 gpg --import private.key
 gpg --import public.key
 ```
@@ -395,7 +437,9 @@ gpg --import public.key
 #### Wi-Fi
 
 ```bash
+
 # Import Wi-Fi configurations from NetworkManager
+
 nmcli connection show
 nmcli connection export <SSID>
 ```
@@ -409,21 +453,27 @@ Configure through native network manager or edit network configuration files.
 #### Hostname
 
 ```bash
+
 # Set hostname
+
 hostnamectl set-hostname new-hostname
 ```
 
 #### Locale
 
 ```bash
+
 # Set locale
+
 localectl set-locale LANG=en_US.UTF-8
 ```
 
 #### Timezone
 
 ```bash
+
 # Set timezone
+
 timedatectl set-timezone America/New_York
 ```
 
@@ -442,6 +492,7 @@ If dual-boot doesn't work:
 3. Update GRUB configuration
 4. Check BIOS/UEFI boot order
 
+
 #### Driver Issues
 
 If hardware doesn't work:
@@ -450,6 +501,7 @@ If hardware doesn't work:
 2. Use `sigpkg install` for additional drivers
 3. Check kernel logs with `dmesg`
 4. Report issues on GitHub
+
 
 #### Application Issues
 
@@ -460,6 +512,7 @@ If applications don't work:
 3. Check application logs
 4. Use AI error explanation layer for help
 
+
 ---
 
 ## Additional Resources
@@ -468,6 +521,7 @@ If applications don't work:
 - [Implementation Progress](Implementation-Progress.md)
 - [Contributor Onboarding](Contributor-Onboarding.md)
 - [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+
 
 ---
 
@@ -479,6 +533,7 @@ For migration assistance:
 2. Search GitHub Issues
 3. Create new issue with detailed information
 4. Join community discussions
+
 
 ---
 

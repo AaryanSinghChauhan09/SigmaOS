@@ -38,7 +38,8 @@ pub enum DeploymentStatus {
 ### Repository Structure
 
 **OSTree Repository Layout:**
-```
+
+```text
 /ostree/repo/
 ├── config
 ├── objects/
@@ -53,6 +54,7 @@ pub enum DeploymentStatus {
 ### Deployment Model
 
 **A/B Update Pattern:**
+
 ```rust
 pub struct ABDeployment {
     pub deployment_a: Deployment,
@@ -62,6 +64,7 @@ pub struct ABDeployment {
 ```
 
 **Update Process:**
+
 1. Pull new commit from repository
 2. Create new deployment in staging
 3. Verify deployment integrity
@@ -69,9 +72,11 @@ pub struct ABDeployment {
 5. Set new deployment as default
 6. Reboot to activate
 
+
 ### Boot Configuration
 
 **Swapped Directory Pattern:**
+
 ```rust
 pub struct BootManager {
     pub boot_version: u32,  // 0 or 1
@@ -92,6 +97,7 @@ pub fn swap_boot() -> Result<()> {
 ### Btrfs Integration
 
 **Snapshot Manager:**
+
 ```rust
 pub struct SnapshotManager {
     pub filesystem: BtrfsFilesystem,
@@ -109,13 +115,18 @@ pub struct Snapshot {
 ```
 
 **Automatic Snapshots:**
+
 ```yaml
+
 # /etc/sigma/snapshot.yaml
+
 snapshots:
   auto_create:
+
     - before_update: true
     - before_package_install: false
     - schedule: daily
+
   
   retention:
     daily: 7
@@ -130,6 +141,7 @@ snapshots:
 ### ZFS Integration
 
 **ZFS Snapshot Manager:**
+
 ```rust
 pub struct ZfsSnapshotManager {
     pub pool: String,
@@ -150,6 +162,7 @@ pub struct ZfsSnapshot {
 ### Health Check Framework
 
 **Implementation:**
+
 ```rust
 pub struct HealthChecker {
     pub checks: Vec<Box<dyn HealthCheck>>,
@@ -165,6 +178,7 @@ pub trait HealthCheck {
 ```
 
 **Built-in Checks:**
+
 ```rust
 pub struct BootCheck;
 pub struct ServiceCheck { pub service: String }
@@ -176,29 +190,40 @@ pub struct KernelModuleCheck { pub module: String }
 ### Health Check Configuration
 
 ```yaml
+
 # /etc/sigma/health-check.yaml
+
 checks:
+
   - name: boot_check
+
     type: boot
     critical: true
     timeout: 30
     
   - name: essential_services
+
     type: service
     services:
+
       - sigma-network
       - sigma-security
+
     critical: true
     
   - name: network_connectivity
+
     type: network
     critical: false
     
   - name: filesystem_integrity
+
     type: filesystem
     paths:
+
       - /
       - /boot
+
     critical: true
 ```
 
@@ -207,6 +232,7 @@ checks:
 ### Instant Rollback
 
 **Implementation:**
+
 ```rust
 pub struct RollbackManager {
     pub deployments: Vec<Deployment>,
@@ -234,6 +260,7 @@ pub fn rollback_to_snapshot(id: &str) -> Result<()> {
 ### Rollback Safety
 
 **Verification Steps:**
+
 1. Check deployment/snapshot exists
 2. Verify deployment/snapshot integrity
 3. Ensure boot configuration is valid
@@ -242,11 +269,13 @@ pub fn rollback_to_snapshot(id: &str) -> Result<()> {
 6. Perform atomic swap
 7. Reboot system
 
+
 ## Delta Updates
 
 ### Binary Delta Implementation
 
 **Delta Generation:**
+
 ```rust
 pub struct DeltaGenerator {
     pub algorithm: DeltaAlgorithm,
@@ -261,6 +290,7 @@ pub enum DeltaAlgorithm {
 ```
 
 **Delta Application:**
+
 ```rust
 pub fn apply_delta(old_package: &Package, delta: &Delta) -> Result<Package> {
     let old_content = read_package(old_package)?;
@@ -276,6 +306,7 @@ pub fn apply_delta(old_package: &Package, delta: &Delta) -> Result<Package> {
 ### UEFI Boot
 
 **Configuration:**
+
 ```rust
 pub struct UefiBootManager {
     pub entries: Vec<BootEntry>,
@@ -295,6 +326,7 @@ pub struct BootEntry {
 ### Secure Boot
 
 **Implementation:**
+
 ```rust
 pub struct SecureBoot {
     pub keys: SecureBootKeys,
@@ -314,7 +346,9 @@ pub struct SecureBootKeys {
 ### Main Configuration
 
 ```yaml
+
 # /etc/sigma/atomic-updates.yaml
+
 updates:
   auto_update: true
   update_schedule: "weekly"
@@ -340,28 +374,37 @@ bootloader:
 ### Command Structure
 
 ```bash
+
 # Check for updates
+
 sigma-update check
 
 # Apply updates
+
 sigma-update apply
 
 # Rollback to previous deployment
+
 sigma-update rollback
 
 # List deployments
+
 sigma-update list-deployments
 
 # Create manual snapshot
+
 sigma-update snapshot create "Pre-upgrade"
 
 # List snapshots
+
 sigma-update snapshot list
 
 # Rollback to snapshot
+
 sigma-update snapshot rollback <id>
 
 # Verify system health
+
 sigma-update health-check
 ```
 
@@ -370,22 +413,27 @@ sigma-update health-check
 ### Deduplication
 
 **Content-Addressed Storage:**
+
 - Automatic deduplication at block level
 - Shared references between deployments
 - Efficient storage utilization
 
+
 ### Compression
 
 **Compression Levels:**
+
 - ZSTD level 3 for package data
 - ZSTD level 15 for metadata
 - LZ4 for boot-time critical data
+
 
 ## Security Features
 
 ### Signature Verification
 
 **Implementation:**
+
 ```rust
 pub struct SignatureVerifier {
     pub trusted_keys: Vec<PublicKey>,
@@ -403,6 +451,7 @@ pub fn verify_commit(commit: &OstreeCommit) -> Result<()> {
 ### Immutable Root
 
 **Implementation:**
+
 ```rust
 pub struct ImmutableRoot {
     pub enabled: bool,
@@ -423,6 +472,7 @@ pub fn enforce_immutability() -> Result<()> {
 3. **Phase 3 (Weeks 45-48):** Health checking system
 4. **Phase 4 (Weeks 49-52):** Delta updates and optimization
 
+
 ## Testing
 
 ### Test Suite
@@ -434,6 +484,7 @@ pub fn enforce_immutability() -> Result<()> {
 - Signature verification tests
 - Performance benchmarks
 
+
 ### Validation Criteria
 
 - 100% rollback success rate
@@ -441,6 +492,7 @@ pub fn enforce_immutability() -> Result<()> {
 - Zero data loss during rollback
 - Boot verification before promotion
 - Secure boot compatibility
+
 
 ## References
 

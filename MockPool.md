@@ -10,7 +10,9 @@ Arguments:
 
 - **origin** `string` - It should only include the **protocol, hostname, and port**.
 
+
 - **options** `MockPoolOptions` - It extends the `Pool` options.
+
 
 Returns: `MockPool`
 
@@ -19,6 +21,7 @@ Returns: `MockPool`
 Extends: `PoolOptions`
 
 - **agent** `Agent` - the agent to associate this MockPool with.
+
 
 ### Example - Basic MockPool instantiation
 
@@ -41,7 +44,7 @@ This method defines the interception rules for matching against requests for a M
 When defining interception rules, all the rules must pass for a request to be intercepted. If a request is not intercepted, a real request will be attempted.
 
 | Matcher type | Condition to pass          |
-|:------------:| -------------------------- |
+| :------------: | -------------------------- |
 | `string`     | Exact match against string |
 | `RegExp`     | Regex must pass            |
 | `Function`   | Function must return true  |
@@ -50,21 +53,28 @@ Arguments:
 
 - **options** `MockPoolInterceptOptions` - Interception options.
 
+
 Returns: `MockInterceptor` corresponding to the input options.
 
 ### Parameter: `MockPoolInterceptOptions`
 
 - **path** `string | RegExp | (path: string) => boolean` - a matcher for the HTTP request path. When a `RegExp` or callback is used, it will match against the request path including all query parameters in alphabetical order. When a `string` is provided, the query parameters can be conveniently specified through the `MockPoolInterceptOptions.query` setting.
 
+
 - **method** `string | RegExp | (method: string) => boolean` - (optional) - a matcher for the HTTP request method. Defaults to `GET`.
+
 
 - **body** `string | RegExp | (body: string) => boolean` - (optional) - a matcher for the HTTP request body.
 
+
 - **headers** `Record<string, string | RegExp | (body: string) => boolean`> - (optional) - a matcher for the HTTP request headers. To be intercepted, a request must match all defined headers. Extra headers not defined here may (or may not) be included in the request and do not affect the interception in any way.
+
 
 - **query** `Record<string, any> | null` - (optional) - a matcher for the HTTP request query string params. Only applies when a `string` was provided for `MockPoolInterceptOptions.path`.
 
+
 - **ignoreTrailingSlash** `boolean` - (optional) - set to `true` if the matcher should also match by ignoring potential trailing slashes in `MockPoolInterceptOptions.path`.
+
 
 ### Return: `MockInterceptor`
 
@@ -72,15 +82,21 @@ We can define the behaviour of an intercepted request with the following options
 
 - **reply** `(statusCode: number, replyData: string | Buffer | object | MockInterceptor.MockResponseDataHandler, responseOptions?: MockResponseOptions) => MockScope` - define a reply for a matching request. You can define the replyData as a callback to read incoming request data. Default for `responseOptions` is `{}`.
 
+
 - **reply** `(callback: MockInterceptor.MockReplyOptionsCallback) => MockScope` - define a reply for a matching request, allowing dynamic mocking of all reply options rather than just the data.
+
 
 - **replyWithError** `(error: Error) => MockScope` - define an error for a matching request to throw.
 
+
 - **defaultReplyHeaders** `(headers: Record<string, string>) => MockInterceptor` - define default headers to be included in subsequent replies. These are in addition to headers on a specific reply.
+
 
 - **defaultReplyTrailers** `(trailers: Record<string, string>) => MockInterceptor` - define default trailers to be included in subsequent replies. These are in addition to trailers on a specific reply.
 
+
 - **replyContentLength** `() => MockInterceptor` - define automatically calculated `content-length` headers to be included in subsequent replies.
+
 
 The reply data of an intercepted request may either be a string, buffer, or JavaScript object. Objects are converted to JSON while strings and buffers are sent as-is.
 
@@ -90,7 +106,9 @@ By default, `reply` and `replyWithError` define the behaviour for the first matc
 
 - **headers** `Record<string, string>` - headers to be included on the mocked reply.
 
+
 - **trailers** `Record<string, string>` - trailers to be included on the mocked reply.
+
 
 ### Return: `MockScope`
 
@@ -98,9 +116,12 @@ A `MockScope` is associated with a single `MockInterceptor`. With this, we can c
 
 - **delay** `(waitInMs: number) => MockScope` - delay the associated reply by a set amount in ms.
 
+
 - **persist** `() => MockScope` - any matching request will always reply with the defined response indefinitely.
 
+
 - **times** `(repeatTimes: number) => MockScope` - any matching request will reply with the defined response a fixed amount of times. This is overridden by **persist**.
+
 
 #### Example - Basic Mocked Request
 

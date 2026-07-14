@@ -7,7 +7,7 @@
 ## Language Assignment
 
 | Domain | Language | Why |
-|---|---|---|
+| --- | --- | --- |
 | Kernel core (scheduler, MM, IPC, syscall) | **Rust** `#![no_std]` | Memory safety, zero-cost, no libc |
 | HAL / boot / ISR / drivers | **Zig** | Direct MMIO, comptime, zero allocations |
 | Formal security (crypto proofs) | **SPARK/Ada** | Proven correctness via `gnatprove` |
@@ -18,7 +18,7 @@
 ## Implemented Files (as of v15.0)
 
 | File | Language | Replaces |
-|---|---|---|
+| --- | --- | --- |
 | `kernel/core/sigma_sched.rs` | Rust | sigma_sched.cpp |
 | `kernel/core/sigma_mm.rs` | Rust | sigma_mm.cpp |
 | `kernel/core/sigma_syscall_dispatch.rs` | Rust | sigma_syscall_dispatch.cpp |
@@ -41,12 +41,17 @@
 
 1. No C or C++ in `kernel/`, `drivers/`, `security/`, `crypto/`
 
+
 2. `#![no_std]` in all kernel crates
+
 
 3. No third-party crates in kernel
 
+
 4. Every `unsafe` block has a justification comment
 
+
 5. OOP via Traits (Rust) / struct methods (Zig) / contracts (SPARK)
+
 
 *See full guide: [docs/Language_Implementation_Policy.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Language_Implementation_Policy.md)*

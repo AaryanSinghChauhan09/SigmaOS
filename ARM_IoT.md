@@ -18,7 +18,7 @@ This document details the hardware abstraction policies, memory layouts, and SoC
 
 Unlike x86_64 MultiBoot2 structures, ARM targets boot via device trees (`DTB`) and direct kernel loading:
 
-```
+```text
 [Broadcom BootROM / GPU Firmware]
              │
              ▼
@@ -40,10 +40,12 @@ Unlike x86_64 MultiBoot2 structures, ARM targets boot via device trees (`DTB`) a
 ### Exception Levels on ARM64
 
 SigmaOS utilizes ARM64 security exception levels as follows:
+
 - **EL3**: Secure Monitor (reserved for firmware/TrustZone secure enclave)
 - **EL2**: Hypervisor (unused, or hosting `SovereignKVM` virtualization)
 - **EL1**: Sovereign Kernel (Scheduler, Memory management, VFS)
 - **EL0**: Userland / Applications (`sigpkg`, `sigma-shell`, `zenith-desktop`)
+
 
 ---
 
@@ -80,7 +82,9 @@ impl Pl011Uart {
 Building for ARM64 targets requires applying the `--target aarch64-unknown-none` configuration.
 
 ```toml
+
 # sigma.toml (ARM profile snippet)
+
 [profile.arm64]
 target = "aarch64-unknown-none"
 toolchain = "nightly"

@@ -1,4 +1,5 @@
 # SigmaOS Advanced Features Roadmap
+
 ## Based on Additional Linux Distribution Research
 
 **Version:** 2.0  
@@ -24,9 +25,12 @@ This roadmap expands the comprehensive implementation roadmap with additional ad
 **Implementation Tasks:**
 
 #### Task 11.1.1: Feature Flag Definition System
+
 - **Location:** `tools/feature_flags/sigma_features.rs`
 - **Description:** Define global and local feature flags
 - **Code Pattern:**
+
+
 ```rust
 #[repr(C)]
 pub struct FeatureFlag {
@@ -43,30 +47,47 @@ static mut FEATURE_FLAGS: [FeatureFlag; MAX_FEATURE_FLAGS] = [FeatureFlag::empty
 ```
 
 #### Task 11.1.2: Feature Flag Configuration
+
 - **Location:** `etc/sigma/features.conf`
 - **Description:** Configuration file for feature flags
 - **Format:**
-```
+
+
+```text
+
 # Global feature flags
+
 global:
+
   - name: "bluetooth"
+
     enabled: false
     description: "Bluetooth support"
+
   - name: "dbus"
+
     enabled: true
     description: "D-Bus IPC system"
 
 # Per-package flags
+
 packages:
+
   - package: "sigma-desktop"
+
     flags:
+
       - name: "wayland"
+
         enabled: true
+
       - name: "x11"
+
         enabled: false
 ```
 
 #### Task 11.1.3: Feature Flag Resolution Engine
+
 - **Location:** `tools/feature_flags/resolver.rs`
 - **Description:** Resolve feature flag dependencies and conflicts
 - **Algorithm:**
@@ -76,10 +97,14 @@ packages:
   4. Apply profile defaults
   5. Apply user overrides
 
+
 #### Task 11.1.4: Feature Flag Integration with Build System
+
 - **Location:** `Cargo.toml` feature definitions
 - **Description:** Map feature flags to Cargo features
 - **Implementation:**
+
+
 ```toml
 [features]
 default = ["std"]
@@ -89,10 +114,12 @@ wayland = ["dep:wayland-client"]
 ```
 
 **Testing Criteria:**
+
 - Feature flag resolution completes without cycles
 - Conflicts are properly detected and reported
 - Profile defaults are correctly applied
 - User overrides take precedence
+
 
 **Estimated Time:** 3 weeks
 
@@ -107,9 +134,12 @@ wayland = ["dep:wayland-client"]
 **Implementation Tasks:**
 
 #### Task 11.2.1: Init System Abstraction Layer
+
 - **Location:** `kernel/init/init_abstraction.rs`
 - **Description:** Define common interface for init systems
 - **Code Pattern:**
+
+
 ```rust
 pub trait InitSystem {
     fn start_service(&self, name: &str) -> Result<(), InitError>;
@@ -131,6 +161,7 @@ pub enum InitSystemType {
 ```
 
 #### Task 11.2.2: Runit Implementation
+
 - **Location:** `kernel/init/runit.rs`
 - **Description:** Implement runit init system
 - **Components:**
@@ -139,7 +170,9 @@ pub enum InitSystemType {
   - Stage 3: Shutdown tasks
   - Service scripts in `/etc/runit/`
 
+
 #### Task 11.2.3: S6 Implementation
+
 - **Location:** `kernel/init/s6.rs`
 - **Description:** Implement s6 init system
 - **Components:**
@@ -147,16 +180,21 @@ pub enum InitSystemType {
   - s6-rc service management
   - s6-notify-on-up service readiness
 
+
 #### Task 11.2.4: Init System Selection
+
 - **Location:** `bootloader/init_config.rs`
 - **Description:** Boot-time init system selection
 - **Configuration:** Kernel parameter `init=`
 
+
 **Testing Criteria:**
+
 - Multiple init systems can be selected at boot
 - Service management works consistently across init systems
 - Init system switching is supported
 - Service status monitoring works
+
 
 **Estimated Time:** 4 weeks
 
@@ -171,6 +209,7 @@ pub enum InitSystemType {
 **Implementation Tasks:**
 
 #### Task 11.3.1: Musl Compatibility Layer
+
 - **Location:** `userland/libc/sigma_musl_compat.rs`
 - **Description:** Compatibility layer for musl-specific APIs
 - **Features:**
@@ -179,7 +218,9 @@ pub enum InitSystemType {
   - Small stack support
   - No dynamic allocation in critical paths
 
+
 #### Task 11.3.2: Static Linking Optimization
+
 - **Location:** `tools/build/static_linker.rs`
 - **Description:** Optimize static linking for minimal binary size
 - **Targets:**
@@ -187,7 +228,9 @@ pub enum InitSystemType {
   - Useful programs under 50kB
   - No external dependencies even for DNS, charset conversion
 
+
 #### Task 11.3.3: Musl Toolchain Integration
+
 - **Location:** `tools/toolchain/musl.rs`
 - **Description:** Build system integration for musl
 - **Components:**
@@ -195,7 +238,9 @@ pub enum InitSystemType {
   - Cross-compilation support
   - Static linking by default
 
+
 #### Task 11.3.4: Dual Libc Support
+
 - **Location:** `userland/libc/dual_libc.rs`
 - **Description:** Support both glibc and musl builds
 - **Implementation:**
@@ -203,11 +248,14 @@ pub enum InitSystemType {
   - Conditional compilation
   - ABI compatibility layer
 
+
 **Testing Criteria:**
+
 - Programs compile with both glibc and musl
 - Static-linked binaries work without external dependencies
 - Binary size targets are met
 - Performance benchmarks show improvement
+
 
 **Estimated Time:** 3 weeks
 
@@ -224,6 +272,7 @@ pub enum InitSystemType {
 **Implementation Tasks:**
 
 #### Task 12.1.1: Critical Path Analysis
+
 - **Location:** `tools/analysis/critical_path.rs`
 - **Description:** Identify and analyze critical paths
 - **Focus Areas:**
@@ -233,10 +282,14 @@ pub enum InitSystemType {
   - Memory allocation
   - I/O operations
 
+
 #### Task 12.1.2: Stack-Based Allocations
+
 - **Location:** `kernel/core/stack_alloc.rs`
 - **Description:** Replace heap allocations with stack allocations where possible
 - **Pattern:**
+
+
 ```rust
 #[inline(always)]
 unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
@@ -245,6 +298,7 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
 ```
 
 #### Task 12.1.3: Object Pooling
+
 - **Location:** `kernel/core/object_pool.rs`
 - **Description:** Pre-allocate object pools for frequently used structures
 - **Components:**
@@ -253,7 +307,9 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Network buffer pool
   - Page table pool
 
+
 #### Task 12.1.4: Memory Pool Elimination
+
 - **Location:** `kernel/mm/pool_elimination.rs`
 - **Description:** Eliminate unnecessary memory pools
 - **Strategy:**
@@ -261,11 +317,14 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Use static allocation for global structures
   - Eliminate dynamic allocation in error paths
 
+
 **Testing Criteria:**
+
 - No dynamic allocations in interrupt context
 - Critical path allocations eliminated
 - Memory usage reduced
 - Performance benchmarks show improvement
+
 
 **Estimated Time:** 4 weeks
 
@@ -280,6 +339,7 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
 **Implementation Tasks:**
 
 #### Task 12.2.1: Unified Dynamic Linker
+
 - **Location:** `userland/ld/sigma_ld.rs`
 - **Description:** Integrate dynamic linker with libc
 - **Benefits:**
@@ -288,7 +348,9 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Faster startup (no separate mapping/relocation)
   - Atomic upgrades possible
 
+
 #### Task 12.2.2: Parallel Initialization
+
 - **Location:** `kernel/init/parallel_init.rs`
 - **Description:** Initialize subsystems in parallel where safe
 - **Strategy:**
@@ -296,10 +358,14 @@ unsafe fn stack_alloc<T, const N: usize>() -> [T; N] {
   - Use thread pool for parallel init
   - Dependency graph for ordering
 
+
 #### Task 12.2.3: Lazy Initialization
+
 - **Location:** `kernel/core/lazy_init.rs`
 - **Description:** Defer initialization until first use
 - **Pattern:**
+
+
 ```rust
 pub struct Lazy<T> {
     cell: core::cell::OnceCell<T>,
@@ -321,6 +387,7 @@ impl<T> Lazy<T> {
 ```
 
 #### Task 12.2.4: Boot Optimization
+
 - **Location:** `bootloader/boot_opt.rs`
 - **Description:** Optimize bootloader and kernel handoff
 - **Optimizations:**
@@ -329,11 +396,14 @@ impl<T> Lazy<T> {
   - Optimized kernel loading
   - Reduced boot messages
 
+
 **Testing Criteria:**
+
 - Boot time reduced by 30%
 - Dynamic linking overhead eliminated
 - Parallel initialization works correctly
 - Lazy initialization doesn't break dependencies
+
 
 **Estimated Time:** 4 weeks
 
@@ -348,9 +418,12 @@ impl<T> Lazy<T> {
 **Implementation Tasks:**
 
 #### Task 13.1.1: Capability Token System
+
 - **Location:** `kernel/security/capability.rs`
 - **Description:** Implement capability token system
 - **Code Pattern:**
+
+
 ```rust
 #[repr(C)]
 pub struct CapabilityToken {
@@ -368,6 +441,7 @@ pub struct CapabilityManager {
 ```
 
 #### Task 13.1.2: Capability Enforcement
+
 - **Location:** `kernel/security/enforcement.rs`
 - **Description:** Enforce capability checks on all privileged operations
 - **Check Points:**
@@ -377,7 +451,9 @@ pub struct CapabilityManager {
   - Device access
   - System calls
 
+
 #### Task 13.1.3: Capability Delegation
+
 - **Location:** `kernel/security/delegation.rs`
 - **Description:** Allow capability delegation with restrictions
 - **Features:**
@@ -386,7 +462,9 @@ pub struct CapabilityManager {
   - Revocable capabilities
   - Audited delegation
 
+
 #### Task 13.1.4: Capability Audit
+
 - **Location:** `kernel/security/audit.rs`
 - **Description:** Audit capability usage
 - **Logging:**
@@ -395,11 +473,14 @@ pub struct CapabilityManager {
   - Capability revocations
   - Capability violations
 
+
 **Testing Criteria:**
+
 - Capability checks prevent unauthorized access
 - All privileged operations require capabilities
 - Delegation works correctly
 - Audit trail is complete
+
 
 **Estimated Time:** 4 weeks
 
@@ -412,6 +493,7 @@ pub struct CapabilityManager {
 **Implementation Tasks:**
 
 #### Task 13.2.1: Secure Boot Verification
+
 - **Location:** `bootloader/secure_boot.rs`
 - **Description:** Verify kernel signature using Secure Boot
 - **Implementation:**
@@ -420,7 +502,9 @@ pub struct CapabilityManager {
   - Check certificate chain
   - Report verification status
 
+
 #### Task 13.2.2: Kernel Signing
+
 - **Location:** `tools/signing/kernel_sign.rs`
 - **Description:** Sign kernel with developer key
 - **Process:**
@@ -429,7 +513,9 @@ pub struct CapabilityManager {
   - Embed signature
   - Verify signature
 
+
 #### Task 13.2.3: Module Signing
+
 - **Location:** `tools/signing/module_sign.rs`
 - **Description:** Sign kernel modules
 - **Requirements:**
@@ -437,7 +523,9 @@ pub struct CapabilityManager {
   - Signature verification on load
   - Reject unsigned modules
 
+
 #### Task 13.2.4: Key Management
+
 - **Location:** `bootloader/keys.rs`
 - **Description:** Manage Secure Boot keys
 - **Features:**
@@ -446,11 +534,14 @@ pub struct CapabilityManager {
   - Key rotation
   - Key backup
 
+
 **Testing Criteria:**
+
 - Secure Boot verification works
 - Signed kernel boots successfully
 - Unsigned kernel is rejected
 - Module signing and verification works
+
 
 **Estimated Time:** 3 weeks
 
@@ -465,6 +556,7 @@ pub struct CapabilityManager {
 **Implementation Tasks:**
 
 #### Task 14.1.1: Parallel Build Optimization
+
 - **Location:** `tools/build/parallel.rs`
 - **Description:** Optimize parallel builds
 - **Strategy:**
@@ -473,7 +565,9 @@ pub struct CapabilityManager {
   - Incremental builds
   - Distributed builds
 
+
 #### Task 14.1.2: Dependency Resolution
+
 - **Location:** `tools/build/deps.rs`
 - **Description:** Advanced dependency resolution
 - **Features:**
@@ -482,7 +576,9 @@ pub struct CapabilityManager {
   - Alternative selection
   - Dependency graph visualization
 
+
 #### Task 14.1.3: Build Artifact Caching
+
 - **Location:** `tools/build/cache.rs`
 - **Description:** Cache build artifacts
 - **Cache:**
@@ -491,7 +587,9 @@ pub struct CapabilityManager {
   - Documentation
   - Test results
 
+
 #### Task 14.1.4: Build Analytics
+
 - **Location:** `tools/build/analytics.rs`
 - **Description:** Track build metrics
 - **Metrics:**
@@ -500,11 +598,14 @@ pub struct CapabilityManager {
   - Test coverage
   - Code quality
 
+
 **Testing Criteria:**
+
 - Parallel builds are faster
 - Dependency resolution is correct
 - Cache hit rate is high
 - Analytics are accurate
+
 
 **Estimated Time:** 4 weeks
 
@@ -517,6 +618,7 @@ pub struct CapabilityManager {
 **Implementation Tasks:**
 
 #### Task 14.2.1: Kernel Debugger
+
 - **Location:** `tools/debug/kdb.rs`
 - **Description:** In-kernel debugger
 - **Features:**
@@ -526,7 +628,9 @@ pub struct CapabilityManager {
   - Memory inspection
   - Register inspection
 
+
 #### Task 14.2.2: Performance Profiler
+
 - **Location:** `tools/prof/profiler.rs`
 - **Description:** Kernel performance profiler
 - **Features:**
@@ -536,7 +640,9 @@ pub struct CapabilityManager {
   - I/O operation tracking
   - Flame graph generation
 
+
 #### Task 14.2.3: Memory Debugger
+
 - **Location:** `tools/debug/mem_debug.rs`
 - **Description:** Memory debugging tools
 - **Features:**
@@ -545,7 +651,9 @@ pub struct CapabilityManager {
   - Buffer overflow detection
   - Memory usage analysis
 
+
 #### Task 14.2.4: System Tracing
+
 - **Location:** `tools/trace/sys_trace.rs`
 - **Description:** System-wide tracing
 - **Features:**
@@ -554,11 +662,14 @@ pub struct CapabilityManager {
   - Network packet tracing
   - File operation tracing
 
+
 **Testing Criteria:**
+
 - Debugger works correctly
 - Profiler provides accurate data
 - Memory debugger finds issues
 - Tracing captures all events
+
 
 **Estimated Time:** 4 weeks
 
@@ -567,63 +678,83 @@ pub struct CapabilityManager {
 ## Implementation Priority
 
 ### High Priority (Next 6 months)
+
 1. Feature Flags System (11.1)
 2. Init System Abstraction (11.2)
 3. Zero-Allocation Optimizations (12.1)
 4. Capability-Based Security (13.1)
 
+
 ### Medium Priority (6-12 months)
+
 5. Musl Support (11.3)
 6. Startup Optimization (12.2)
 7. Secure Boot Integration (13.2)
 8. Build System Enhancements (14.1)
 
+
 ### Low Priority (12-18 months)
+
 9. Debugging Tools (14.2)
+
 
 ---
 
 ## Success Metrics
 
 ### Performance Metrics
+
 - Boot time reduced by 30%
 - Dynamic linking overhead eliminated
 - Memory usage reduced by 20%
 - Binary size reduced by 40% (musl)
 
+
 ### Security Metrics
+
 - All privileged operations require capabilities
 - Secure Boot chain of trust established
 - All modules signed
 - Zero vulnerabilities in critical paths
 
+
 ### Developer Experience Metrics
+
 - Build time reduced by 25%
 - Test coverage increased to 80%
 - Documentation coverage increased to 90%
 - Developer onboarding time reduced by 50%
+
 
 ---
 
 ## References
 
 ### Void Linux
+
 - [musl libc - Design Concepts](https://wiki.musl-libc.org/design-concepts)
 - [musl - Introduction](https://www.musl-libc.org/intro.html)
 - [musl - About](http://musl.libc.org/about.html)
 
+
 ### Artix Linux
+
 - [Wiki | Main / runit](https://wiki.artixlinux.org/Main/Runit)
 - [GitHub - artix-linux/runit-artix](https://github.com/artix-linux/runit-artix)
 
+
 ### Gentoo
+
 - [USE flag - Gentoo wiki](https://wiki.gentoo.org/wiki/USE_flag)
 - [USE flags – Gentoo Development Guide](https://devmanual.gentoo.org/general-concepts/use-flags)
 - [USE flag index – Gentoo Linux](https://www.gentoo.org/support/use-flags/)
 
+
 ### Devuan
+
 - [Init Freedom | Devuan GNU+Linux](https://www.devuan.org/os/init-freedom)
 - [Devuan - Wikipedia](https://en.wikipedia.org/wiki/Devuan)
+
 
 ---
 

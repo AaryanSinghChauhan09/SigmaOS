@@ -9,7 +9,7 @@
 
 `sigma-agent workflow` is SigmaOS's built-in automation engine — inspired by n8n, Claude Code multi-step execution, and azure-cli automation runbooks. Define workflows in YAML (or generate them from plain English), trigger them on schedules, events, or manually, and let sigma-agent execute every step.
 
-```
+```text
 σ ~/code › workflow run dev-workflow --verbose
 
 Σ Workflow: dev-workflow  [manual]
@@ -78,7 +78,9 @@ env:
   KEEP_DAYS: "7"
 
 steps:
+
   - name: step-one
+
     action: "sigma-agent natural language command"
     on_fail: stop        # stop | continue | notify
 
@@ -87,11 +89,13 @@ steps:
     retries: 0           # retry count on failure
 
   - name: step-two
+
     action: "run some shell command"
     condition: "exit_code_of(step-one) == 0"
     on_fail: notify
 
   - name: notify-done
+
     action: "notify 'Done' 'Workflow complete'"
     on_fail: continue
 ```
@@ -99,7 +103,7 @@ steps:
 ### Trigger Formats
 
 | Trigger | Description |
-|---|---|
+| --- | --- |
 | `manual` | Run on demand only (default) |
 | `schedule=daily 06:00` | Every day at 06:00 |
 | `schedule=every friday 22:00` | Every Friday at 22:00 |
@@ -135,7 +139,7 @@ condition: "output_contains(scan, 'critical')"
 ### on_fail Options
 
 | Value | Behaviour |
-|---|---|
+| --- | --- |
 | `stop` | Halt workflow immediately (default) |
 | `continue` | Log error but continue to next step |
 | `notify` | Send critical desktop notification then stop |
@@ -149,6 +153,7 @@ Install with `sigma-agent workflow install <name>` or `sigma-agent workflow inst
 ### `weekly-backup`
 
 Backs up `~/Code` and `~/Documents` every Friday at 22:00.
+
 ```bash
 sigma-agent workflow install weekly-backup
 sigma-agent workflow run weekly-backup --dry-run
@@ -236,13 +241,18 @@ The scheduler:
 
 - Runs schedule-based workflows at their configured time
 
+
 - Fires event-based workflows when conditions are met (CPU/disk/pkg)
+
 
 - Debounces event triggers (minimum 5 minutes between firings)
 
+
 - Logs every run to `~/.cache/sigma/agent/workflow_runs/`
 
+
 - Appends to audit log at `~/.cache/sigma/agent/workflow_audit.log`
+
 
 ---
 
@@ -296,31 +306,37 @@ steps:
   # Security advisor
 
   - name: audit
+
     action: "security scan"
 
   # Multi-agent diagnosis
 
   - name: diagnose
+
     action: "multi --agent sysadmin 'why is system slow'"
 
   # Memory
 
   - name: remember
+
     action: "memory add 'last backup ran successfully' --pattern"
 
   # Notification
 
   - name: alert
+
     action: "notify 'Workflow' 'Step complete' --critical"
 
   # Raw shell
 
   - name: compress
+
     action: "run tar -czf /backup/code.tar.gz /home/user/Code"
 
   # Explain what happened
 
   - name: explain-error
+
     action: "explain --error 'cargo build' 'linker error'"
     condition: "exit_code_of(build) != 0"
 ```
@@ -336,31 +352,38 @@ enabled: true
 trigger: manual
 
 steps:
+
   - name: fetch
+
     action: "run git pull --rebase"
     on_fail: stop
 
   - name: build
+
     action: "run cargo build --release"
     on_fail: stop
     timeout: 300
     retries: 1
 
   - name: test
+
     action: "run cargo test"
     on_fail: notify
     condition: "exit_code_of(build) == 0"
 
   - name: security
+
     action: "security scan --quick"
     on_fail: continue
 
   - name: remember-success
+
     action: "memory add 'last build succeeded on main branch' --pattern"
     on_fail: continue
     condition: "success_of(test)"
 
   - name: done
+
     action: "notify 'Pipeline complete' 'Build, test, security all passed'"
     on_fail: continue
     condition: "success_of(test)"
@@ -371,7 +394,7 @@ steps:
 ## File Locations
 
 | Path | Purpose |
-|---|---|
+| --- | --- |
 | `~/.config/sigma/agent/workflows/*.yaml` | Workflow definitions |
 | `~/.cache/sigma/agent/workflow_runs/*.json` | Run history (JSON) |
 | `~/.cache/sigma/agent/workflow_schedule.json` | Next-run timestamps |
@@ -382,7 +405,7 @@ steps:
 ## Inspiration
 
 | Project | What we took |
-|---|---|
+| --- | --- |
 | [n8n](https://n8n.io) | Node-based pipelines, event triggers, YAML format |
 | [Claude Code](https://github.com/anthropics/claude-code) | Multi-step task execution, step conditions |
 | [azure-cli](https://github.com/Azure/azure-cli) | `az automation runbook`, scheduled jobs |

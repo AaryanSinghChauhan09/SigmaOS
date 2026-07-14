@@ -7,7 +7,7 @@ abstraction that any filesystem implementation can plug into.
 
 ## Architecture
 
-```
+```text
 User process
     │  open("/tmp/file", O_RDWR)
     ▼
@@ -32,6 +32,7 @@ Filesystem ops vtable (FsOps)
 ### Inode
 
 Represents a file, directory, symlink, or device:
+
 ```rust
 pub struct Inode {
     pub ino:    u64,         // Unique inode number
@@ -47,6 +48,7 @@ pub struct Inode {
 ### Dentry (Directory Entry)
 
 Links a filename to an inode:
+
 ```rust
 pub struct Dentry {
     pub name:     [u8; 256],  // Filename
@@ -58,6 +60,7 @@ pub struct Dentry {
 ### File Descriptor
 
 Per-process open file handle:
+
 ```rust
 pub struct FileDesc {
     pub ino:    u64,   // Inode
@@ -109,20 +112,25 @@ sigma_vfs_mount("/proc", 5, proc_root, &PROC_OPS);
 
 1. Start at root inode (`/`)
 
+
 2. Look up dentry `usr` → inode for `/usr`
+
 
 3. Look up dentry `bin` → inode for `/usr/bin`
 
+
 4. Look up dentry `ls` → inode for `/usr/bin/ls`
 
+
 5. Return inode number
+
 
 ---
 
 ## Mounted Filesystems
 
 | Path | Filesystem | Status |
-|------|-----------|--------|
+| ------ | ----------- | -------- |
 | `/tmp` | tmpfs (RAM) | ✅ |
 | `/run` | tmpfs (RAM) | ✅ |
 | `/proc` | procfs (shim) | ✅ |
@@ -135,7 +143,7 @@ sigma_vfs_mount("/proc", 5, proc_root, &PROC_OPS);
 ## Limits
 
 | Limit | Value |
-|-------|-------|
+| ------- | ------- |
 | Max inodes | 4096 |
 | Max dentries | 1024 |
 | Max open FDs | 256 |

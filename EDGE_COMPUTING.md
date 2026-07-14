@@ -481,9 +481,11 @@ impl AdaptiveNetwork {
 
         // Calculate composite score
         let score = (bandwidth / 1000.0) * 0.4
+
                   + (1.0 / latency) * 0.3
                   + reliability * 0.2
                   + (1.0 / cost) * 0.1;
+
 
         Ok(score)
     }

@@ -9,9 +9,11 @@
 Gentoo Linux is the ultimate source-code distribution: every package is compiled from source on the user's machine with fine-grained feature flags called **USE flags**. This enables extreme optimization — binaries tuned for the exact CPU, kernel, and feature set of each machine.
 
 SigmaOS absorbs Gentoo's philosophy into the **Sovereign Build Layer** (`sigma-build`), allowing advanced users to:
+
 - Compile system components with machine-specific CPU optimizations (`-march=native`)
 - Toggle feature flags per-package to minimize binary size and attack surface
 - Build reproducible, verifiable system images from source (mirroring NixOS reproducibility with Gentoo-style flexibility)
+
 
 ---
 
@@ -22,26 +24,33 @@ SigmaOS absorbs Gentoo's philosophy into the **Sovereign Build Layer** (`sigma-b
 Gentoo's USE flags allow per-package feature toggles at compile time. SigmaOS reimplements this as `sigma-features`:
 
 ```toml
+
 # /etc/sigma/features.toml — machine-wide feature flags
+
 [features]
+
 # Hardware features
+
 gpu_vulkan    = true    # Enable Vulkan renderer in all graphics packages
 gpu_opencl    = false   # Disable OpenCL (no GPGPU usage on this machine)
 cpu_avx512    = true    # Enable AVX-512 code paths (detected automatically)
 
 # Security trade-offs
+
 pie           = true    # Position-Independent Executables (all pkgs)
 relro         = true    # Full RELRO hardening
 stack_canary  = true    # Stack protection
 lto           = true    # Link-time optimization (smaller, faster binaries)
 
 # Desktop features
+
 wayland       = true    # Wayland support
 x11           = false   # Disable X11 shim (Wayland-only machine)
 bluetooth     = true    # BT audio/input support
 pulseaudio    = false   # Prefer PipeWire
 
 # Language runtimes
+
 python        = "3.12"  # Python version built into packages that need it
 nodejs        = false   # No Node.js runtime built into system packages
 java          = false   # No Java runtime
@@ -56,7 +65,9 @@ rust          = true    # Rust standard library present
 ### 2.2 Native CPU Optimization (`-march=native` compilation)
 
 ```bash
+
 # Detect and apply optimal compiler flags for this CPU
+
 $ sigma build optimize-flags
 Σ [INFO] Detecting CPU capabilities...
   Vendor: Intel Core i7-12700K
@@ -122,11 +133,14 @@ impl SigmaBuildGraph {
 Not all users want to compile everything. SigmaOS uses a hybrid approach:
 
 ```bash
+
 # Default: install pre-built binary
+
 $ sigma pkg add firefox
 Σ [PKG] Installing firefox 120.0 (pre-built, AVX2 optimized)
 
 # Source mode: compile from scratch with local USE flags
+
 $ sigma pkg add firefox --source
 Σ [BUILD] Building firefox from source with features: [wayland, av1, no-x11]
   Fetching sources...    [██████████] 100%
@@ -140,7 +154,7 @@ $ sigma pkg add firefox --source
 ## 3. Performance Gains from Native Compilation
 
 | Package | Pre-built binary | Native `-march=native` | Speedup |
-|:--------|:----------------|:-----------------------|:--------|
+| :-------- | :---------------- | :----------------------- | :-------- |
 | `zstd` compression | 2,100 MB/s | 3,400 MB/s | +62% |
 | `openssl` AES-GCM | 1.8 GB/s | 4.1 GB/s (AES-NI) | +128% |
 | `ffmpeg` H.264 decode | 280 fps | 380 fps (AVX-512) | +36% |

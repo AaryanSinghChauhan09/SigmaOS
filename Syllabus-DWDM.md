@@ -47,7 +47,7 @@ A Data Warehouse is a centralized, consolidated repository designed for analytic
 
 **Unique Selling Point (USP):** Efficient storage, horizontal scalability, and rapid retrieval for enterprise-grade analytics.
 
-```
+```text
 OLTP (Transactional DB)       →  ETL  →  Data Warehouse  →  Data Marts
 Real-time, normalized, CRUD          Denormalized, historical, read-heavy
 
@@ -62,7 +62,7 @@ Schema design dictates how multi-dimensional analytical data is structured withi
 | :--- | :--- | :--- |
 | **Structure** | Central fact table connected directly to denormalized dimension tables. | Central fact table connected to normalized, branching dimension tables. |
 | **Normalization** | Denormalized (dimensions contain redundant data). | Normalized (dimensions are split into sub-dimensions E.g., City $\rightarrow$ State $\rightarrow$ Country). |
-| **Query Complexity**| Simple, requiring fewer `JOIN` operations; highly optimized for fast read aggregations. | Complex, requiring extensive multi-table `JOIN` operations. |
+| **Query Complexity** | Simple, requiring fewer `JOIN` operations; highly optimized for fast read aggregations. | Complex, requiring extensive multi-table `JOIN` operations. |
 | **Storage Space** | Higher storage footprint due to data redundancy. | Minimal storage footprint due to strict normalization. |
 | **Maintenance** | Prone to update anomalies if dimension attributes change. | Easy to maintain and update due to centralized dimension definitions. |
 
@@ -118,9 +118,12 @@ SigmaWarehouse provides drop-in compatibility and bridging with major enterprise
 
 - **SQL Server & Oracle:** Direct ODBC/JDBC query translation and stored procedure execution.
 
+
 - **Amazon Redshift:** Columnar Parquet/ORC file ingestion and distributed query sharding.
 
+
 - **Snowflake:** Cloud-native virtual warehouse scaling and zero-copy data cloning emulation.
+
 
 ---
 
@@ -202,25 +205,33 @@ sigma.viz.dendrogram(hc)
 
 - **Issue - Incorrect Indexing in Databases:** Missing or fragmented B+ Tree indices cause full table scans, degrading analytical query performance.
 
+
 - *Fix Strategy:* Run `EXPLAIN QUERY PLAN` to identify unindexed scans, create composite covering indices for frequent `WHERE` and `JOIN` clauses, and periodically rebuild fragmented index trees.
+
 
 - **Issue - Database Deadlocks:** Concurrent ETL write transactions lock identical tables in reverse order, causing circular wait states.
 
+
 - *Fix Strategy:* Enforce strict two-phase locking (2PL) protocols, acquire table locks in a globally uniform hierarchical order, and implement automatic deadlock detection with exponential backoff retries.
+
 
 - **Issue - Data Corruption & Missing Values:** Sensor dropouts or network failures inject `NULL` values into OLAP fact tables.
 
+
 - *Fix Strategy:* Use automated ETL data preprocessors to execute k-NN or mean imputation, ensuring analytical hypercubes remain fully populated.
+
 
 - **Issue - Algorithmic Complexity in Mining Scans:** Apriori candidate generation ($C_k$) scales exponentially ($O(2^d)$) with unique item counts.
 
+
 - *Fix Strategy:* Migrate from Apriori to FP-Growth tree traversal, compressing transactional databases into in-memory prefix trees to eliminate candidate generation entirely.
+
 
 ---
 
 ## SigmaWarehouse Architecture
 
-```
+```text
 SigmaWarehouse Stack
 ├── Source Systems: SigmaDB, Log Files, HAL Sensors
 ├── ETL Layer: SigmaETL (Extract-Transform-Load pipelines)
@@ -235,8 +246,11 @@ SigmaWarehouse Stack
 
 - `userland/apps/SigmaWarehouse/sigma_warehouse.cpp`
 
+
 - `userland/apps/SigmaAnalytics/data_mining.cpp`
 
+
 - `userland/apps/SigmaViz/olap_dashboard.cpp`
+
 
 ### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

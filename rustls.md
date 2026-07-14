@@ -9,7 +9,7 @@ SigmaOS uses [rustls](https://github.com/rustls/rustls) (MIT / Apache-2.0) as th
 ## Why rustls over OpenSSL
 
 | Concern | OpenSSL | rustls |
-|---|---|---|
+| --- | --- | --- |
 | Language | C (memory-unsafe) | Pure Rust (memory-safe) |
 | Legacy ciphers | RC4, MD5, SSLv3 — hard to disable | TLS 1.2+ only, no legacy negotiation |
 | License | OpenSSL dual-license (complex) | MIT + Apache-2.0 (clean) |
@@ -22,7 +22,7 @@ SigmaOS uses [rustls](https://github.com/rustls/rustls) (MIT / Apache-2.0) as th
 ## Integration Points
 
 | Component | How rustls is used |
-|---|---|
+| --- | --- |
 | `sigma-curl` | HTTPS client for package downloads and REST APIs |
 | `sigma-ssh` | TLS session wrapping for SSH-over-TLS tunnel mode |
 | `sigma-pkg` | Registry HTTPS: mutual TLS for package uploads |
@@ -116,8 +116,11 @@ pub fn build_tls_config() -> Arc<ClientConfig> {
 
 - `sigma-pkg install sigma-edit` downloads over HTTPS using rustls; cert verification passes.
 
+
 - `sigma-curl https://registry.sigmaos.dev/v1/index` returns HTTP 200.
 
+
 - TLS 1.3 is negotiated; TLS 1.0/1.1 connections are rejected.
+
 
 - Kyber-1024 hybrid KEX is logged in debug output when connecting to a PQC-enabled server.

@@ -31,14 +31,14 @@ Layer 1 shards handle task scheduler structures, virtual filesystem nodes, IPC m
 | `kernel/core/system/SovereignScheduler.cpp` | Scheduler Core | Manages thread queues and executes context swaps |
 | `kernel/core/system/SovereignFairSched.cpp` | EEVDF Engine | Tracks virtual runtimes and calculates deadlines |
 | `kernel/core/fs/SovereignLatticeFS.cpp` | Virtual File System | Extends base VFS with mount nodes and file descriptors |
-| `kernel/core/network/SovereignNetStack.cpp`| Net Core | Buffers network packet segments and routes to interfaces |
+| `kernel/core/network/SovereignNetStack.cpp` | Net Core | Buffers network packet segments and routes to interfaces |
 | `kernel/core/security/SovereignMAC.cpp` | Access Control | Evaluates security capabilities and isolates system handles |
 
 ---
 
 ## 🔄 Core Initialization Sequence
 
-```
+```text
 [bootloader_shard]  ──► Load Kernel ELF into high memory
                             │
                             ▼

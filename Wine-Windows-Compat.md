@@ -8,7 +8,7 @@ SigmaOS runs Windows applications via **Wine** (LGPL-2.1) and **Proton** (BSD/cu
 
 ## Architecture
 
-```
+```text
 Windows EXE / Proton game
         │
         ▼
@@ -28,7 +28,7 @@ Windows EXE / Proton game
 
 ## File Layout
 
-```
+```text
 virtualization/compat/
 └── sigma_wine_launcher.rs
 ```
@@ -146,7 +146,7 @@ sigma-wine-launcher stop <vm-id>
 ## Path Mapping
 
 | SigmaFS path | Wine/Windows path |
-|---|---|
+| --- | --- |
 | `/home/user/Documents/` | `C:\Users\User\Documents\` |
 | `/data/windows/` | `C:\` |
 | `/tmp/` | `Z:\tmp\` |
@@ -173,6 +173,8 @@ sigma-pod run \
 
 - `sigma-wine-launcher run /data/windows/Notepad.exe` opens Notepad inside a Firecracker microVM.
 
+
 - SigmaFS files in `/home/user/` are accessible as `C:\Users\User\` within Wine.
+
 
 - Proton container runs a Windows game binary without crashing on boot.

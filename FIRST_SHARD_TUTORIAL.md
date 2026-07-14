@@ -10,7 +10,7 @@ Welcome to SigmaOS! This guide will teach you how to write, build, and load your
 
 A **Shard** is a self-contained, independently loadable kernel or userland module in SigmaOS. Shards communicate over the **sigma-bus** zero-copy IPC ring-buffer, are signed with Dilithium5 post-quantum signatures, and are managed via the `SHARDS.manifest`.
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │          SOVEREIGN LATTICE              │
 │                                         │
@@ -28,14 +28,21 @@ A **Shard** is a self-contained, independently loadable kernel or userland modul
 ## Step 1: Prerequisites
 
 ```bash
+
 # Ensure the SigmaOS build environment is ready
+
 just check-env
 
 # Expected output:
+
 # ✅ Rust nightly-2025-04-01 (or later)
+
 # ✅ llvm-17 / clang-17
+
 # ✅ just (justfile runner)
+
 # ✅ sigma-bus kernel headers
+
 ```
 
 ---
@@ -43,16 +50,20 @@ just check-env
 ## Step 2: Create the Shard Directory
 
 ```bash
+
 # Navigate to the shards directory
+
 cd kernel/shards/
 
 # Create your shard directory
+
 mkdir hello_world
 cd hello_world
 ```
 
 Your shard directory structure:
-```
+
+```text
 kernel/shards/hello_world/
 ├── Cargo.toml          # Rust manifest
 ├── src/
@@ -76,7 +87,9 @@ priority    = 50               # Boot order (lower = earlier)
 bus_channel = "hello.world"    # sigma-bus channel name
 
 [capabilities]
+
 # Declare what capabilities this shard needs
+
 memory_mb   = 4
 ipc_send    = ["kernel.log"]
 ipc_recv    = ["hello.world"]
@@ -158,7 +171,9 @@ panic     = "abort"   # No unwinding in kernel context
 Open the root `SHARDS.manifest` and add your shard:
 
 ```toml
+
 # Add to the [optional_shards] section for development
+
 [optional_shards.hello_world]
 path     = "kernel/shards/hello_world"
 enabled  = true
@@ -171,16 +186,23 @@ profile  = ["dev", "full"]   # Only loaded in dev/full profiles
 ## Step 7: Build
 
 ```bash
+
 # Build just your shard
+
 just build-shard hello_world
 
 # Expected output:
+
 # Compiling sigma-shard-hello-world v0.1.0
+
 # Linking hello_world.shard
+
 # Signing with Dilithium5...
+
 # ✅ hello_world.shard (12.4 KiB)
 
 # Or build the entire kernel (shards included)
+
 just build
 ```
 
@@ -189,17 +211,25 @@ just build
 ## Step 8: Test Your Shard
 
 ```bash
+
 # Run in QEMU (no real hardware needed)
+
 just run-qemu -- --shard-test hello_world
 
 # Or run the shard unit test suite
+
 just test-shard hello_world
 
 # Expected test output:
+
 # test init ... ok
+
 # test ping_pong ... ok
+
 # test echo ... ok
+
 # test result: 3 passed; 0 failed
+
 ```
 
 Writing a test in `src/lib.rs`:
@@ -233,14 +263,19 @@ mod tests {
 ## Step 9: Verify and Submit
 
 ```bash
+
 # Run the quality gate check (no stubs allowed)
+
 ./scripts/sigma_quality_check.sh
 
 # Check your shard is properly registered
+
 sigma-lattice list-shards | grep hello_world
+
 # hello_world  v0.1.0  [example]  LOADED  ✅
 
 # Submit a PR!
+
 git checkout -b feat/hello-world-shard
 git add kernel/shards/hello_world/ SHARDS.manifest
 git commit -m "feat(shards): add HelloWorld example shard
@@ -259,7 +294,7 @@ git push origin feat/hello-world-shard
 Now that you've built your first shard, explore:
 
 | Resource | Description |
-|---|---|
+| --- | --- |
 | [CORE_SHARDS.md](CORE_SHARDS.md) | How the essential kernel shards work |
 | [ESSENTIAL_SHARDS.md](ESSENTIAL_SHARDS.md) | Critical system shards to study |
 | [sigma-bus spec](IPC.md) | Deep dive into zero-copy IPC |

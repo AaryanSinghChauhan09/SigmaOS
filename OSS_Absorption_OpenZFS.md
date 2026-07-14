@@ -38,6 +38,7 @@ $ sigma fs snapshot datapool/home@before-upgrade
 Σ [FS] Snapshot created: datapool/home@before-upgrade (0 bytes initially)
 
 # If the upgrade breaks something:
+
 $ sigma fs rollback datapool/home@before-upgrade
 Σ [FS] Rolled back to datapool/home@before-upgrade in 0.3s
 ```

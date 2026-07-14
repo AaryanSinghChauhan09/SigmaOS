@@ -8,7 +8,7 @@ SigmaOS is built on a single non-negotiable principle: **every dependency is a l
 
 SigmaOS deliberately uses different languages at different layers of the stack. This is not an accident — it is policy.
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │  LAYER                │  LANGUAGE        │  REASON             │
 ├───────────────────────┼──────────────────┼─────────────────────┤
@@ -25,6 +25,7 @@ SigmaOS deliberately uses different languages at different layers of the stack. 
 └────────────────────────────────────────────────────────────────┘
 
 - Rust introduced incrementally — not yet in kernel core.
+
 ```
 
 > [!IMPORTANT]
@@ -100,7 +101,7 @@ The Zenith SDK (`zenith_desktop/sdk/include/zenith.h`) provides a complete, sove
 
 ### Rendering Path
 
-```
+```text
 App Widget::render()
     └─► sys_ipc_send(COMPOSITOR_IPC, DRAW_RECT, ...)
             └─► sigma_compositor.cpp

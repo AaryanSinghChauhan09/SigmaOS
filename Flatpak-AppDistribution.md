@@ -8,7 +8,7 @@ SigmaOS uses [Flatpak](https://flatpak.org/) (LGPL-2.1) as the **external runtim
 
 ## Architecture
 
-```
+```text
 flatpak run io.sigmaos.SigmaEdit
         │
         ▼
@@ -50,7 +50,7 @@ sigma-pkg publish sigma-edit.flatpak \
 
 ## File Layout
 
-```
+```text
 userland/portal/
 ├── sigma_portal.rs
 └── README.md
@@ -160,18 +160,26 @@ sdk: org.freedesktop.Sdk
 command: sigma-edit
 
 finish-args:
+
   - --share=ipc
   - --socket=wayland
   - --filesystem=home
   - --talk-name=org.freedesktop.portal.Desktop
 
+
 modules:
+
   - name: sigma-edit
+
     buildsystem: simple
     build-commands:
+
       - install -Dm755 sigma-edit /app/bin/sigma-edit
+
     sources:
+
       - type: archive
+
         url: https://registry.sigmaos.dev/src/sigma-edit-1.2.0.tar.zst
         sha256: abc123...
 ```
@@ -182,6 +190,8 @@ modules:
 
 - `flatpak run io.sigmaos.SigmaEdit` launches sigma-edit in a bubblewrap sandbox.
 
+
 - File open dialog uses sigma-portal; selected file is readable by the app.
+
 
 - Camera/microphone requests show sigma-portal confirmation dialog.

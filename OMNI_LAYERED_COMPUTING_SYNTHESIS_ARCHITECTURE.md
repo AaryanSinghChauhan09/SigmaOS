@@ -10,7 +10,7 @@
 
 To establish absolute technological sovereignty, the **SigmaOS Zenith Sovereign Multi-Layer Computing Matrix** achieves complete structural convergence across three definitive layers. By purging standard dependencies, high-level languages, and pre-defined library abstractions, all tiers execute directly on bare-metal silicon through unified, modular C++ structures.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                 TOP LAYER: AI/ML, DATA SCIENCE & WEB                     │
 │  (Gradient Descent ReLU solvers, Confidence Intervals, XSS Sanitization) │
@@ -31,27 +31,36 @@ To establish absolute technological sovereignty, the **SigmaOS Zenith Sovereign 
 
 - **Banker's Deadlock Avoidance Algorithm:** Determines state safeness programmatically by tracking resource allocation matrices, availability vectors, and process requirements to eliminate deadlock paths.
 
+
 - **Watchdog Heartbeat Monitor:** Simulates microkernel watchdogs. Triggers system panics or safe recovery loops when ticks are absent.
 
+
 - **$O(V + E)$ Breadth-First State Tree Search:** Performs vertex explorations across state graph space to trace and optimize execution vectors.
+
 
 ### B. Middle Layer: Data Warehousing, OLAP & Pipelines
 
 - **Logarithmic B-Tree Index Querying:** Implements efficient $O(\log n)$ search indexing over sorted transaction keys to bypass standard $O(N)$ linear scanning overhead.
 
+
 - **PCA Eigen Decomposition:** Solves the dimensional equation $X^T X v = \lambda v$ using iterative power iteration loops to extract dominant eigenvectors without high-level statistical library imports.
 
+
 - **Star & Snowflake Database Layouts:** Employs denormalized facts and dimension arrays to structure analytical query pipelines.
+
 
 ### C. Top Layer: Artificial Intelligence & Web Interface
 
 - **Sigmoidal Logistic Probability Inference:** Computes likelihood outputs matching:
+
   $$P(y = 1 \mid x) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 x)}}$$
   using custom Taylor series exponent expansions to avoid standard floating math library inclusions.
 
 - **Exploding Gradient Clipping:** Evaluates NPU weights during backpropagation and clips excessive gradients to absolute safety boundaries.
 
+
 - **XSS Input Sanitization:** Sanitizes incoming REST API string tags (e.g. converting `<` and `>` to safe HTML entities) to protect the presentation layer from web injection sequences.
+
 
 ---
 
@@ -62,8 +71,8 @@ To establish absolute technological sovereignty, the **SigmaOS Zenith Sovereign 
 | **Banker's Safety** | $\text{Need}[i][j] = \text{Max}[i][j] - \text{Allocation}[i][j]$ | `SovereignOSKernel::IsSafeState` | $O(P \cdot R)$ |
 | **B-Tree Search** | $T(n) = T(n/2) + O(1)$ | `SovereignOLAPEngine::BTreeQueryIndex` | $O(\log N)$ |
 | **PCA Decomposition** | $X^T X v = \lambda v$ | `SovereignDataPipeline::PerformPCADecomposition` | $O(I \cdot D^2)$ |
-| **Logistic Inference** | $P(y = 1 \mid x) = (1 + e^{-z})^{-1}$ | `SovereignAIMLEngine::PredictLogisticProbability`| $O(\text{Taylor Steps})$ |
-| **BFS State Space** | $V + E$ | `SovereignDiscreteMathEngine::ExecuteBFSTraversal`| $O(V + E)$ |
+| **Logistic Inference** | $P(y = 1 \mid x) = (1 + e^{-z})^{-1}$ | `SovereignAIMLEngine::PredictLogisticProbability` | $O(\text{Taylor Steps})$ |
+| **BFS State Space** | $V + E$ | `SovereignDiscreteMathEngine::ExecuteBFSTraversal` | $O(V + E)$ |
 
 ---
 

@@ -8,7 +8,7 @@ The SigmaOS cloud profile is a minimal, headless image designed for virtual mach
 
 ## Boot Sequence
 
-```
+```text
 UEFI (OVMF) → sigma-boot.efi
   │
   ▼ sigma-init (cloud variant)
@@ -29,7 +29,7 @@ UEFI (OVMF) → sigma-boot.efi
 
 The root filesystem is mounted read-only with dm-verity:
 
-```
+```text
 sigma-boot.efi sets up:
   dm-verity device → /dev/dm-0 (verified read-only root)
     ├── root_hash: 64-char hex, embedded in kernel cmdline
@@ -51,7 +51,7 @@ OSTree A/B deployment: see [OSTRee-updates.md](integrations/OSTRee-updates.md).
 `sigma-pod` is the SigmaOS OCI container runtime, implementing the same lifecycle as `containerd` + `runc`:
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-pod create <id> <image>` | Pull image (if needed), create OCI bundle |
 | `sigma-pod start <id>` | Start container process (via sigma-shim) |
 | `sigma-pod stop <id>` | Send SIGTERM → SIGKILL after grace period |
@@ -139,7 +139,7 @@ sigma-otel-collector configure \
 ## Cloud Image Sizes
 
 | Image | Size | Profile |
-|---|---|---|
+| --- | --- | --- |
 | sigma-cloud-minimal.img | ~50 MB | sigma-init + sigma-pod + sigma-net |
 | sigma-cloud-standard.img | ~150 MB | + sigma-otel + sigma-sshd + dev tools |
 | sigma-cloud-gpu.img | ~500 MB | + Mesa + CUDA/ROCm runtime |

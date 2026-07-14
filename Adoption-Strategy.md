@@ -7,7 +7,7 @@
 
 ## The Formula
 
-```
+```text
 Adoption = Technical Excellence × Ecosystem × Community × Trust
 ```
 
@@ -16,7 +16,7 @@ Adoption = Technical Excellence × Ecosystem × Community × Trust
 ## Phase Roadmap
 
 | Phase | Version | Goal | Key Milestone |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | v0.1 | Match baseline | Bootable ISO + shell + 50 packages |
 | 2 | v1.0 | Build ecosystem | App library + SDK + community packages |
 | 3 | v2.0 | Differentiate | PQC everywhere + multi-format marketing |
@@ -27,7 +27,7 @@ Adoption = Technical Excellence × Ecosystem × Community × Trust
 ## Unique Selling Points (Already Built)
 
 | Feature | Others | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | Post-quantum crypto | Add-on or none | ✅ Default in TLS, packages, boot |
 | Multi-format (1 codebase → 50+ outputs) | Not possible | ✅ `make PROFILE=X` |
 | WASM kernel in browser | Not possible | ✅ Live demo today |
@@ -44,25 +44,34 @@ Adoption = Technical Excellence × Ecosystem × Community × Trust
 
 - GitHub Discussions + Good-first-issue labels
 
+
 - CONTRIBUTING.md 5-minute guide
 
+
 - Weekly dev update posts
+
 
 ### Short-term
 
 - Discord (#kernel #drivers #userland #apps #help)
 
+
 - sigma-bounty: $50–500 for critical bugs
 
+
 - Monthly contributor digest
+
 
 ### Long-term
 
 - sigma-conf annual developer conference
 
+
 - University partnerships (CS curriculum)
 
+
 - sigma-foundation non-profit governance
+
 
 ---
 

@@ -66,7 +66,7 @@ struct PtyMaster { fd: i32 }
 **Effort**: 3 days
 **AC**: 5-step wizard completes, writes user config, starts desktop
 
-```
+```text
 Step 1: Welcome screen + language picker
 Step 2: Privacy consent (all off default)
 Step 3: Create user account + set hostname
@@ -185,7 +185,7 @@ proc copy_to_clipboard(path: string)
 **Effort**: 10 days
 **AC**: 60fps at 1080p via VirtIO-GPU in QEMU; software path as fallback
 
-```
+```text
 VirtIO-GPU → DRM/KMS atomic → Mesa Gallium Vulkan ICD → VkSwapchain
 ```
 
@@ -194,15 +194,19 @@ VirtIO-GPU → DRM/KMS atomic → Mesa Gallium Vulkan ICD → VkSwapchain
 **Target**: < 2.5s from UEFI to sigma-sh prompt
 **Effort**: 5 days
 
-```
+```text
 
 1. sigma-boot.zig: parallel DMA for kernel + initramfs load
 
+
 2. kernel: lazy driver init (probe only NVMe + e1000 at boot)
+
 
 3. sigma-init: parallel daemon start with dependency graph
 
+
 4. Zenith: show splash frame within 500ms of kernel start
+
 ```
 
 ### S4.3 sigma-pkg Online Registry
@@ -211,7 +215,7 @@ VirtIO-GPU → DRM/KMS atomic → Mesa Gallium Vulkan ICD → VkSwapchain
 **Effort**: 5 days
 **AC**: `sigma-pkg install sigma-hello` downloads from pkg.sigmaos.app
 
-```
+```text
 Registry API:
   GET /v1/index                 → TOML package index (Dilithium-5 signed)
   GET /v1/pkg/{name}/{ver}/{arch} → .sigpkg download
@@ -227,9 +231,11 @@ Registry API:
 ```yaml
 
 - name: Run benchmarks
+
   run: sigma-bench all --baseline baseline.json --fail-on-regression 0.10
 
 - name: Post results
+
   uses: actions/github-script@v7
   with: script: github.issue.createComment(benchmarkReport)
 ```
@@ -262,20 +268,25 @@ Registry API:
 
 - [ ] Create v0.1.0 GitHub Release tag
 
+
 - [ ] Upload signed ISO to release assets
+
 
 - [ ] Write "Getting Started" blog post
 
+
 - [ ] Post to HackerNews + r/linux
 
+
 - [ ] Open GitHub Discussions for feedback
+
 
 ---
 
 ## Quality Gates per Sprint
 
 | Gate | S1 | S2 | S3 | S4 | S5 |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | All new Rust has trait docs | ✓ | ✓ | ✓ | ✓ | ✓ |
 | No hardcoded colors in widgets | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Text contrast ≥ 4.5:1 | ✓ | ✓ | ✓ | ✓ | ✓ |

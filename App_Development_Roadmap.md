@@ -11,7 +11,7 @@
 ### Tier 1 — Ship with v0.1 (blocking for daily use)
 
 | App | Description | Tech | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **sigma-terminal** | GPU-accelerated terminal emulator | Rust | ⬜ |
 | **sigma-files** | File manager (dual-pane, VFS) | Rust | ⬜ |
 | **sigma-edit** | Text/code editor | Rust | ⬜ |
@@ -21,7 +21,7 @@
 ### Tier 2 — Ship with v1.0 (complete daily driver)
 
 | App | Description | Tech | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **sigma-browser** | Chromium fork + sigma API | Rust + C++ (cleanroom) | ⬜ |
 | **sigma-pdf** | PDF viewer + PQC verify | Rust | ⬜ |
 | **sigma-notes** | Encrypted Markdown notes | Rust | ⬜ |
@@ -34,7 +34,7 @@
 ### Tier 3 — Ship with v1.5 (multimedia + comms)
 
 | App | Description | Tech | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **sigma-play** | Media player (video + audio) | Rust | ⬜ |
 | **sigma-view** | Image viewer (JPEG/PNG/AVIF/HEIC) | Rust | ⬜ |
 | **sigma-mail** | Email client (JMAP/IMAP) | Rust | ⬜ |
@@ -44,7 +44,7 @@
 ### Tier 4 — Ship with v2.0 (creative + pro tools)
 
 | App | Description | Tech |
-|---|---|---|
+| --- | --- | --- |
 | **sigma-office** | Writer + Calc + Impress | Rust |
 | **sigma-draw** | Vector graphics (SVG) | Rust |
 | **sigma-paint** | Raster image editor | Rust |
@@ -55,7 +55,7 @@
 
 ## sigma-terminal Spec
 
-```
+```text
 Architecture:
   VTE (virtual terminal emulator) — grid of cells (char + attrs)
   PTY (pseudo-terminal) — fork/exec sigma-sh
@@ -83,7 +83,7 @@ Features (v1.0):
 
 ## sigma-files Spec
 
-```
+```text
 Architecture:
   VFS browser — uses sigma VFS API
   Dual-pane or single-pane mode
@@ -109,7 +109,7 @@ Performance targets:
 
 ## sigma-edit Spec
 
-```
+```text
 Architecture:
   Piece-tree buffer (O(1) insert/delete anywhere)
   Incremental syntax highlighting (tree-sitter inspired)
@@ -142,19 +142,27 @@ Performance targets:
 
 1. **Build via sigma-sdk**: `sigma-sdk build --target sigpkg`
 
+
 2. **Use sigma_pledge on startup**: declare required capabilities
+
 
 3. **Zero telemetry**: no network calls without user action
 
+
 4. **Respond in < 100ms** to every user interaction (or show progress)
+
 
 5. **Support dark/light/high-contrast** themes via ThemeEngine
 
+
 6. **Respect reduce-motion** system preference
+
 
 7. **Export a PKGBUILD** recipe for reproducible builds
 
+
 8. **Sign with Dilithium-5** via sigma-sdk
+
 
 ### State Management Pattern
 
@@ -174,7 +182,7 @@ pub trait App {
 
 ## App Distribution Pipeline
 
-```
+```text
 Developer                sigpkg registry               User
     │                         │                          │
     ├─ write PKGBUILD         │                          │

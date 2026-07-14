@@ -11,7 +11,7 @@ The sigpkg registry is a content-addressed package registry for SigmaOS. Package
 ### Package Index
 
 | Method | Path | Description |
-|---|---|---|
+| --- | --- | --- |
 | GET | `/v1/index` | Full index (TOML, Merkle root + entries) |
 | GET | `/v1/index/{name}` | Package metadata by name |
 | GET | `/v1/index/{name}/{version}` | Specific version metadata |
@@ -37,13 +37,13 @@ The sigpkg registry is a content-addressed package registry for SigmaOS. Package
 ### Upload
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | POST | `/v1/upload` | Bearer token (Dilithium-5 signed) | Upload a .spkg file |
 | POST | `/v1/sign-token` | Admin key | Issue an upload token |
 
 ### POST /v1/upload Request:
 
-```
+```text
 Content-Type: multipart/form-data
 Authorization: Bearer <dilithium5-signed-token>
 
@@ -56,7 +56,7 @@ Fields:
 ### Binary Cache (Substituter)
 
 | Method | Path | Description |
-|---|---|---|
+| --- | --- | --- |
 | GET | `/nar/{hash}.narinfo` | Fetch narinfo for a store path |
 | GET | `/nar/{hash}.nar.zst` | Fetch the compressed NAR archive |
 | PUT | `/nar/{hash}.nar.zst` | Upload a NAR (authenticated) |
@@ -106,7 +106,7 @@ The Merkle tree is built as a binary tree over all `(name, version, nar_hash)` t
 ## Rate Limiting + Abuse Prevention
 
 | Endpoint | Limit |
-|---|---|
+| --- | --- |
 | GET /v1/search | 100 req/min per IP |
 | GET /nar/*.nar.zst | 50 downloads/hour per IP; 500 MB/hour bandwidth |
 | POST /v1/upload | 10 uploads/hour per token |
@@ -120,7 +120,7 @@ Responses include `X-RateLimit-Remaining` and `Retry-After` headers.
 
 Mirrors poll the primary registry every 15 minutes:
 
-```
+```text
 GET /v1/sync/since?cursor=<last_merkle_root>
 → { "new_packages": [...], "new_merkle_root": "..." }
 ```

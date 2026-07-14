@@ -16,7 +16,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 `sigma_proton_bridge.cpp` has `mapDxvkSurface()` stub.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | GameMode scheduler profile | `kernel/subsystems/sigma_game_layer.c` | `performance-optimized` | Boost game process to SCHED_RR, park bg tasks |
 | DXVK D3D9 → Vulkan bridge | `runtime/compat/win32/d3d/sigma_dxvk_d3d9.cpp` | `release/standalone` | Wire `mapDxvkSurface()` stub into full D3D9 device |
 | DXVK D3D11 → Vulkan bridge | `runtime/compat/win32/d3d/sigma_dxvk_d3d11.cpp` | `release/standalone` | ID3D11Device → VkDevice command buffer |
@@ -31,7 +31,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 ### Gaming performance targets:
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| -------- | -------- | ------------- |
 | DX9 game frame time | < 16.7 ms (60 FPS) | `sigma-zenith fps` |
 | DX11 game frame time | < 8.3 ms (120 FPS) | `sigma-zenith fps` |
 | Input latency (gamepad) | < 5 ms | XInput poll → GPU frame |
@@ -41,7 +41,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 ### GM2 — Media Stack (sigma-media)
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | HEVC/H.265 hardware decode | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | Intel Quick Sync / AMD VCN via V4L2-M2M |
 | AV1 decode | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | AV1 decode via VA-API / DXVA2 equivalent |
 | sigma-video player | `userland/apps/sigma-film/sigma_film.cpp` | `release/standalone` | HEVC/AV1/VP9 playback with hardware decode |
@@ -52,7 +52,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 ### GM3 — Audio Quality
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | HDA codec enumeration | `drivers/audio/sigma_hda.cpp` | `drivers-dev` | All nodes via CORB/RIRB command |
 | PCM output stream | `drivers/audio/sigma_hda.cpp` | `drivers-dev` | BDL ring buffer, DMA, interrupt on complete |
 | sigma-audio mixer daemon | `userland/audio/sigma_audio.cpp` | `release/standalone` | Per-app volume, software mix, route to HDA |
@@ -68,7 +68,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 **Current:** `userland/twin/sigma_twin_iot.cpp` — header only.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | MQTT broker client | `userland/twin/sigma_twin_iot.cpp` | `release/rtos` | Eclipse Paho MQTT port over sigma-net |
 | Modbus RTU/TCP driver | `drivers/serial/sigma_modbus.cpp` | `release/rtos` | Industrial sensors via RS-485 |
 | OPC-UA client | `userland/twin/sigma_twin_opcua.cpp` | `release/rtos` | Factory floor PLC integration |
@@ -79,7 +79,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 ### EI2 — sigma-robotics (ROS 2)
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | ROS 2 DDS port | `runtime/ros2/sigma_ros2_dds.cpp` | `release/rtos` | OMG DDS XRCE over sigma-bus |
 | sigma-bus ↔ ROS 2 bridge | `runtime/ros2/sigma_ros2_bridge.cpp` | `release/rtos` | sigma-bus topics ↔ ROS 2 topics |
 | ROS 2 node lifecycle | `runtime/ros2/sigma_ros2_lifecycle.cpp` | `release/rtos` | Lifecycle state machine per ROS 2 node |
@@ -89,7 +89,7 @@ Continues from [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap).
 ### EI3 — sigma-space (IN-SPACe Tools)
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | ISRO NavIC NMEA parser | `drivers/serial/sigma_navic.cpp` | `release/mobile` | NavIC receiver → lat/lon/altitude |
 | NavIC vs GPS comparison | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/mobile` | sigma-agri uses NavIC field boundary |
 | ISRO Bhuvan API client | `userland/indiastack/sigma_isro_client.cpp` | `release/standalone` | Fetch NDVI, DEM, soil raster tiles |
@@ -129,7 +129,7 @@ sigma-gdb --core /sigma/cores/dump   # analyse core dump
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | GDB RSP (Remote Serial Protocol) server | `userland/devtools/sigma_gdb.cpp` | `tools-dev` | `sigma-gdb --rsp :1234` for IDE integration |
 | DWARF debug info parser | `userland/devtools/sigma_dwarf.cpp` | `tools-dev` | Map RIP → function + line number |
 | Breakpoint via ptrace equivalent | `userland/devtools/sigma_gdb.cpp` | `kernel-exp` | Syscall `SIGMA_SYS_PTRACE` |
@@ -173,7 +173,7 @@ sigma-perf numa show                 # NUMA topology + stats
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Hardware PMU via `rdpmc` | `userland/tools/sigma_perf_cli.cpp` | `performance-optimized` | Cycles, cache misses, branch mispredictions |
 | Sampling via perf interrupt | `kernel/core/sigma_irq.cpp` | `performance-optimized` | NMI-based sampling at 1 kHz |
 | Flamegraph SVG generator | `userland/tools/sigma_perf_cli.cpp` | `performance-optimized` | Call stack → Brendan Gregg flamegraph SVG |
@@ -197,7 +197,7 @@ sigma-strace --json ./myapp > trace.json
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Syscall intercept via ptrace | `userland/devtools/sigma_strace.cpp` | `tools-dev` | Print syscall name + args + return value |
 | PQC operation tracing | `userland/devtools/sigma_strace.cpp` | `tools-dev` | Hook `pqc_sign/verify/encap` via sigma-bus |
 | JSON output mode | `userland/devtools/sigma_strace.cpp` | `tools-dev` | Machine-readable for analysis tooling |
@@ -219,7 +219,7 @@ sigma-memcheck report <pid>          # report for running process
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Shadow memory (Valgrind-style) | `userland/devtools/sigma_memcheck.cpp` | `tools-dev` | Map every heap alloc to shadow bytes |
 | Use-after-free detection | `userland/devtools/sigma_memcheck.cpp` | `tools-dev` | Poison freed memory, catch access |
 | Leak report on exit | `userland/devtools/sigma_memcheck.cpp` | `tools-dev` | Walk live allocations on `exit()` |
@@ -244,7 +244,7 @@ sigma-contrib publish                # build .spkg + sign + push to registry
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma-contrib` scaffold tool | `userland/tools/sigma_contrib_cli.cpp` | `tools-dev` | Generate app skeleton with CMakeLists, header, man page |
 | sigma-sdk C++ headers | `include/sigma_sdk.h` | `tools-dev` | Type-safe wrappers: `sigma::fs::open()`, `sigma::net::connect()` |
 | ABI stability checker | `Makefile` | `tools-dev` | `make check-abi` — nm diff of SIGMA_STABLE symbols |
@@ -276,7 +276,7 @@ sigma-repo-server stats              # download counts, popular packages
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Go HTTPS server | `sigmad/repo/main.go` | `tools-dev` | Serve `.spkg` + `index.sigma` (Dilithium3-signed) |
 | Package index format | `sigmad/repo/index.go` | `tools-dev` | JSON: name, version, sha256, sig, deps, description |
 | ML-DSA-87 index signature | `sigmad/repo/sign.go` | `tools-dev` | Sign whole index with repo private key |
@@ -322,7 +322,7 @@ public_key = "sigma-team.mldsa87.pub"
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Recipe format spec | `sigma_pkg_registry/RECIPE_FORMAT.md` | `tools-dev` | Document TOML schema + validation rules |
 | Recipe linter | `userland/sigma-pkg/sigma_pkg_lint.cpp` | `tools-dev` | Validate recipe: required fields, exact deps, valid SPDX |
 | Recipes for all 55 profession apps | `sigma_pkg_registry/recipes/` | `tools-dev` | One `.recipe` file per app |
@@ -334,7 +334,7 @@ public_key = "sigma-team.mldsa87.pub"
 ### PE3 — Package Security
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Quarantine on failed verify | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Move to `/sigma/quarantine/`, never execute |
 | Package history log | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Log every install/remove to sigma-audit |
 | Rollback to previous version | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Keep one previous version, `sigma-pkg rollback` |
@@ -367,7 +367,7 @@ sigma-update history                 # list past updates with timestamps
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | OTA update daemon | `userland/daemons/sigma_updated.cpp` | all | Background check, download to B-slot |
 | Update manifest format | `sigmad/update/manifest.go` | all | JSON: version, sha256, sig, delta URL |
 | A/B slot manager | `kernel/core/sigma_ab_update.cpp` | `kernel-exp` | Read/write `SigmaBootSlot` EFI variable |
@@ -404,7 +404,7 @@ sigma-recovery shell                 # drop to recovery sigma-sh
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Fix-it menu full implementation | `kernel/core/boot/sigma_boot_recovery_menu.c` | all | Text-mode menu: rollback/fsck/reinstall/shell |
 | sigma-heal + sigma-ai crash diagnosis | `userland/ai/sigma_heal_ai.cpp` | `release/standalone` | Feed panic log → actionable fix suggestion |
 | Recovery network stack | `kernel/resilience/sigma_micro_fallback.cpp` | all | Minimal TCP for fetching updates in recovery |
@@ -415,7 +415,7 @@ sigma-recovery shell                 # drop to recovery sigma-sh
 ### UR3 — Resilience Patterns
 
 | Pattern | Implementation | Branch | Detail |
-|---------|---------------|--------|--------|
+| --------- | --------------- | -------- | -------- |
 | Circuit breaker for India Stack APIs | `userland/indiastack/sigma_circuit_breaker.cpp` | `release/standalone` | On 3 consecutive API failures → switch to offline mode |
 | Retry with exponential backoff | `userland/indiastack/sigma_retry.cpp` | `release/standalone` | API calls: 1 s, 2 s, 4 s, 8 s backoff |
 | Offline-first data sync (CRDT) | `net/sigma_offline_sync.cpp` | `release/distributed` | Last-write-wins for profession app data |
@@ -430,7 +430,7 @@ sigma-recovery shell                 # drop to recovery sigma-sh
 ### MP1 — x86-64 Quality Targets
 
 | Target | Metric | Branch | CI |
-|--------|--------|--------|----|
+| -------- | -------- | -------- | ---- |
 | QEMU boot time | < 2 s | `kernel-exp` | `bench_boot.sh` |
 | Real hardware boot (ThinkPad) | < 5 s | `prepare-sigmaos-launch` | Physical CI runner |
 | RAM idle (Zenith desktop) | < 150 MB | `release/standalone` | `sigma-mem stats` |
@@ -440,7 +440,7 @@ sigma-recovery shell                 # drop to recovery sigma-sh
 ### MP2 — ARM64 Quality Targets
 
 | Target | Device | Metric | Branch |
-|--------|--------|--------|--------|
+| -------- | -------- | -------- | -------- |
 | Raspberry Pi 4 boot | BCM2711 | < 10 s | `release/mobile` |
 | Raspberry Pi 5 boot | BCM2712 | < 8 s | `release/mobile` |
 | Pi Zero 2W idle | sigma-ultra | < 0.4 W | `release/mobile` |
@@ -451,7 +451,7 @@ sigma-recovery shell                 # drop to recovery sigma-sh
 ### MP3 — RISC-V Quality Targets
 
 | Target | Device | Metric | Branch |
-|--------|--------|--------|--------|
+| -------- | -------- | -------- | -------- |
 | VisionFive 2 boot | JH7110 | < 30 s | `release/mobile` |
 | Basic CLI (`sigma-sh`) | RISC-V | Works | `release/mobile` |
 | sigma-agri MSP offline | RISC-V | < 1 s | `release/mobile` |
@@ -467,13 +467,15 @@ strategy:
     arch: [x86_64, aarch64, riscv64]
     profile: [microkernel, standalone, cloud]
     exclude:
+
       - arch: riscv64
+
         profile: standalone   # too slow for RISC-V CI
 
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | ARM64 QEMU CI | `.github/workflows/sigma_qemu.yml` | `release/mobile` | `qemu-system-aarch64 -M virt -cpu cortex-a76` |
 | RISC-V QEMU CI | `.github/workflows/sigma_qemu.yml` | `release/mobile` | `qemu-system-riscv64 -M virt` |
 | Cross-compile ARM64 on x86 | `toolchain-aarch64-elf.cmake` | `release/mobile` | `aarch64-linux-gnu-gcc` cross toolchain |
@@ -490,7 +492,7 @@ strategy:
 
 | # | Task | Owner branch | Done when |
 
-|---|------|-------------|-----------|
+| --- | ------ | ------------- | ----------- |
 | 0.1 | Round-robin scheduler body | `kernel-exp` | 2 tasks interleave in QEMU serial |
 | 0.2 | Buddy allocator connected to VMM | `kernel-exp` | `sigma_malloc(4096)` returns valid pointer |
 | 0.3 | x86-64 page table walker | `kernel-exp` | Map 1 MB region, read back correct bytes |
@@ -506,7 +508,7 @@ strategy:
 
 | # | Task | Owner branch | Done when |
 
-|---|------|-------------|-----------|
+| --- | ------ | ------------- | ----------- |
 | 1.1 | e1000 DMA TX/RX rings | `drivers-dev` | `ping 10.0.2.2` succeeds in QEMU |
 | 1.2 | TCP state machine | `drivers-dev` | `nc` can make TCP connection |
 | 1.3 | UDP socket layer | `drivers-dev` | DNS query works |
@@ -522,7 +524,7 @@ strategy:
 
 | # | Task | Owner branch | Done when |
 
-|---|------|-------------|-----------|
+| --- | ------ | ------------- | ----------- |
 | 2.1 | VirtIO-GPU real DMA | `drivers-dev` | Zenith renders desktop frame |
 | 2.2 | DRM/KMS layer | `drivers-dev` | Native resolution on real display |
 | 2.3 | Compositor `composite_window()` | `release/standalone` | Windows alpha-blend correctly |
@@ -538,7 +540,7 @@ strategy:
 
 | # | Task | Owner branch | Done when |
 
-|---|------|-------------|-----------|
+| --- | ------ | ------------- | ----------- |
 | 3.1 | ABDM FHIR client | `release/standalone` | Create ABHA, push FHIR record |
 | 3.2 | GST IRN + e-Way Bill live | `release/standalone` | CA generates IRN on GSTN |
 | 3.3 | UPI pay + collect | `release/standalone` | `sigma-upi pay` completes transaction |
@@ -554,7 +556,7 @@ strategy:
 
 | # | Task | Owner branch | Done when |
 
-|---|------|-------------|-----------|
+| --- | ------ | ------------- | ----------- |
 | 4.1 | sigma-boot.efi + TPM2 PCR | `kernel-exp` | TPM2 seals CryptFS key to PCR |
 | 4.2 | ML-DSA FIPS 204 final | `performance-optimized` | All packages signed with FIPS 204 |
 | 4.3 | sigma-mac enforced every syscall | `kernel-exp` | Every `open()` checked against policy |
@@ -571,7 +573,7 @@ strategy:
 ## Quick Reference: All Roadmap Documents
 
 | Document | Key sections | Lines |
-|----------|-------------|-------|
+| ---------- | ------------- | ------- |
 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | S1-S4, P1-P6, Q1-Q5, U1-U6, SE1-SE2, A1-A2, D1-D4 | ~1,000 |
 | [Stability-Performance-Extended](Stability-Performance-Extended) | E1-E2, R1-R3, O1-O2, RE1-RE2, NR1-NR2, IQ1-IQ3, TI1-TI3, HC1-HC2, LE1-LE3 | ~900 |
 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | C1-C5, A1-A5, K1-K4, P1-P5 | ~700 |

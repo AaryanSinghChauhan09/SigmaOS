@@ -12,6 +12,7 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
 - **Build Farm**: Use controlled build environments
 - **Transparency**: Make build process auditable and verifiable
 
+
 ## Reproducible Build Requirements
 
 ### Build Environment
@@ -22,17 +23,20 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
    - Kernel headers version pinned
    - Build dependencies version pinned
 
+
 2. **Controlled Environment**:
    - Fixed base image (Docker/OCI)
    - Deterministic filesystem layout
    - Fixed timestamps
    - Controlled locale settings
 
+
 3. **Build Isolation**:
    - Containerized builds
    - Network isolation during build
    - Deterministic random seeds
    - Fixed build order
+
 
 ### Source Code
 
@@ -42,17 +46,19 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
    - Patches applied in deterministic order
    - No embedded build timestamps
 
+
 2. **Build Configuration**:
    - Fixed compiler flags
    - Deterministic optimization level
    - No debug symbols in release builds
    - Strip deterministic metadata
 
+
 ## Build Farm Architecture
 
 ### Build Farm Components
 
-```
+```text
 ┌─────────────────┐
 │  Build Queue    │
 │  (RabbitMQ)     │
@@ -81,15 +87,18 @@ This guide explains how to implement reproducible builds for SigmaOS drivers, en
 ### Build Worker Configuration
 
 **Dockerfile for Build Environment**:
+
 ```dockerfile
 FROM sigmaos/build-base:6.1.0
 
 # Pin toolchain versions
+
 ENV GCC_VERSION=12.2.0
 ENV BINUTILS_VERSION=2.40
 ENV KERNEL_HEADERS=6.1.0
 
 # Install build dependencies
+
 RUN apt-get update && apt-get install -y \
     gcc-${GCC_VERSION} \
     binutils-${BINUTILS_VERSION} \
@@ -99,6 +108,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set deterministic environment
+
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV SOURCE_DATE_EPOCH=1704067200
@@ -110,21 +120,25 @@ ENV SOURCE_DATE_EPOCH=1704067200
 
 ```bash
 #!/bin/bash
+
 # prepare-source.sh
 
 DRIVER_NAME=$1
 VERSION=$2
 
 # Clone repository at specific commit
+
 git clone https://github.com/sigmaos/${DRIVER_NAME}.git
 cd ${DRIVER_NAME}
 git checkout ${COMMIT_HASH}
 
 # Verify checksum
+
 sha256sum ${DRIVER_NAME}-${VERSION}.tar.gz > checksums.sig
 gpg --verify checksums.sig
 
 # Apply patches in deterministic order
+
 for patch in $(ls patches/*.patch | sort); do
     patch -p1 < $patch
 done
@@ -134,15 +148,18 @@ done
 
 ```bash
 #!/bin/bash
+
 # reproducible-build.sh
 
 # Set deterministic environment
+
 export SOURCE_DATE_EPOCH=1704067200
 export TZ=UTC
 export LANG=C
 export LC_ALL=C
 
 # Build with deterministic flags
+
 make \
     CC=gcc-12.2.0 \
     CFLAGS="-O2 -fno-strict-aliasing -fno-common -fno-delete-null-pointer-checks -fno-stack-protector-strong" \
@@ -152,6 +169,7 @@ make \
     KBUILD_BUILD_TIMESTAMP="1704067200"
 
 # Strip deterministic metadata
+
 strip --strip-unneeded --remove-section=.comment \
     --remove-section=.note driver.ko
 ```
@@ -160,18 +178,22 @@ strip --strip-unneeded --remove-section=.comment \
 
 ```bash
 #!/bin/bash
+
 # verify-build.sh
 
 # Calculate checksum
+
 sha256sum driver.ko > driver.ko.sha256
 
 # Compare with expected checksum
+
 if [ "$(cat driver.ko.sha256)" != "$(cat expected.sha256)" ]; then
     echo "Build is not reproducible!"
     exit 1
 fi
 
 # Verify with diffoscope
+
 diffoscope driver.ko reference.ko
 ```
 
@@ -222,6 +244,7 @@ SigmaOS uses SPDX format for SBOMs:
 
 ```bash
 #!/bin/bash
+
 # generate-sbom.sh
 
 sigma-sbom generate \
@@ -232,6 +255,7 @@ sigma-sbom generate \
     --format spdx-json
 
 # Sign SBOM
+
 gpg --detach-sign --armor sbom.json
 ```
 
@@ -245,10 +269,14 @@ name: Reproducible Driver Build
 on:
   push:
     paths:
+
       - 'drivers/nvidia/**'
+
   pull_request:
     paths:
+
       - 'drivers/nvidia/**'
+
 
 jobs:
   reproducible-build:
@@ -256,22 +284,28 @@ jobs:
     container: sigmaos/build-env:6.1.0
     
     steps:
+
       - name: Checkout code
+
         uses: actions/checkout@v3
       
       - name: Build driver
+
         run: |
           ./scripts/reproducible-build.sh nvidia-driver 535.154.05
       
       - name: Verify reproducibility
+
         run: |
           ./scripts/verify-build.sh nvidia-driver.ko
       
       - name: Generate SBOM
+
         run: |
           ./scripts/generate-sbom.sh nvidia-driver
       
       - name: Upload artifacts
+
         uses: actions/upload-artifact@v3
         with:
           name: nvidia-driver
@@ -322,10 +356,13 @@ func (bv *BuildVerifier) VerifyBuild(binaryPath string) (bool, error) {
 ### Diffoscope Integration
 
 ```bash
+
 # Compare builds
+
 diffoscope driver1.ko driver2.ko --html diff.html
 
 # Detailed comparison
+
 diffoscope --max-depth 10 driver1.ko driver2.ko
 ```
 
@@ -334,6 +371,7 @@ diffoscope --max-depth 10 driver1.ko driver2.ko
 ### Non-Reproducible Builds
 
 **Common Causes**:
+
 1. Timestamps embedded in binary
    - Fix: Use `SOURCE_DATE_EPOCH`
 2. Different compiler versions
@@ -343,27 +381,35 @@ diffoscope --max-depth 10 driver1.ko driver2.ko
 4. Filesystem differences
    - Fix: Use containerized builds
 
+
 **Debugging Steps**:
+
 ```bash
+
 # Enable build logging
+
 make V=1 > build.log
 
 # Compare with reference build
+
 diffoscope driver.ko reference.ko
 
 # Check for embedded timestamps
+
 strings driver.ko | grep -i date
 ```
 
 ### SBOM Generation Issues
 
 **Common Issues**:
+
 1. Missing dependency information
    - Fix: Use dependency analysis tools
 2. Incorrect license information
    - Fix: Manually verify licenses
 3. Incomplete file list
    - Fix: Scan all source files
+
 
 ## Best Practices
 
@@ -374,6 +420,7 @@ strings driver.ko | grep -i date
 3. **Build Isolation**: Build in isolated containers
 4. **Verification**: Always verify builds against references
 
+
 ### CI/CD
 
 1. **Automated Verification**: Verify reproducibility in CI
@@ -381,12 +428,14 @@ strings driver.ko | grep -i date
 3. **Artifact Storage**: Store build artifacts with metadata
 4. **Monitoring**: Monitor build reproducibility metrics
 
+
 ### Security
 
 1. **Supply Chain Security**: Verify all dependencies
 2. **Signature Verification**: Sign all build artifacts
 3. **Audit Trail**: Maintain complete build logs
 4. **Transparency**: Make build process public
+
 
 ## References
 

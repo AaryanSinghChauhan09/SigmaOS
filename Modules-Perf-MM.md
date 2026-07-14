@@ -6,7 +6,7 @@ allocator**.
 
 ## Allocator Stack
 
-```
+```text
 sigma_malloc(size)
    └─ Slab Cache (< 512 bytes, O(1) fixed-size slabs)
          └─ Buddy Allocator (≥ 512 bytes, power-of-two zones)
@@ -17,7 +17,7 @@ sigma_malloc(size)
 ## Key Design Points
 
 | Feature | Detail |
-|---|---|
+| --- | --- |
 | **Allocation** | O(1) slab, O(log N) buddy |
 | **NUMA** | Allocates from the NUMA node closest to the requesting CPU |
 | **Fragmentation** | Buddy coalescing keeps external fragmentation < 5% |
@@ -48,7 +48,7 @@ void init_perf_mm(void);
 SigmaOS discovers NUMA node topology from the ACPI SRAT table and maintains a
 per-node free-list:
 
-```
+```text
 Node 0 (CPU 0-7,  RAM 0–64 GB)
 Node 1 (CPU 8-15, RAM 64–128 GB)
 ```
@@ -59,20 +59,28 @@ Allocations prefer the local node; spill to remote only when local is exhausted.
 
 - [ ] Buddy allocator implementation
 
+
 - [ ] Slab cache (fixed-size object pools)
+
 
 - [ ] NUMA-aware page allocator
 
+
 - [ ] Guard page + canary overflow detection
+
 
 - [ ] Memory pressure callbacks (OOM handler)
 
+
 - [ ] Transparent huge pages (THP) support
 
+
 - [ ] Kani formal proofs: no double-free, no use-after-free
+
 
 ## Related Modules
 
 - [`modules/core/kernel/memory`](../../core/kernel/memory/) — Page-table management
+
 
 - [`modules/perf/bench`](../bench/README.md) — Memory allocator benchmarks

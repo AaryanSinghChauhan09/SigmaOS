@@ -12,7 +12,9 @@ NIST finalised the first PQC standards in 2024:
 
 - **FIPS 203** — ML-KEM (Kyber-1024) for key encapsulation
 
+
 - **FIPS 204** — ML-DSA (Dilithium-5) for digital signatures
+
 
 SigmaOS implements both, everywhere classical crypto would appear.
 
@@ -24,7 +26,7 @@ SigmaOS implements both, everywhere classical crypto would appear.
 
 Used for: TLS key exchange, package decryption, CryptFS key wrapping, sigma-bus channel setup.
 
-```
+```text
 Security level: AES-256 equivalent (Category 5)
 Public key:     1568 bytes
 Ciphertext:     1568 bytes
@@ -37,7 +39,7 @@ Shared secret:  32 bytes
 
 Used for: package signing, sigma-boot.efi signing, audit trail chaining, commit signing.
 
-```
+```text
 Security level: AES-256 equivalent (Category 5)
 Public key:     2592 bytes
 Private key:    4864 bytes
@@ -47,7 +49,7 @@ Signature:      4595 bytes
 ### Supporting Primitives
 
 | Primitive | Use |
-|-----------|-----|
+| ----------- | ----- |
 | AES-256-GCM | Symmetric encryption (CryptFS, sigma-vault) |
 | BLAKE3 | Package content hashes |
 | BLAKE2b-256 | Audit trail integrity chains |
@@ -60,7 +62,7 @@ Signature:      4595 bytes
 
 ### TLS 1.3 (`net/tls/`)
 
-```
+```text
 ClientHello:  X25519 keyshare + Kyber-1024 keyshare
 ServerHello:  Kyber-1024 ciphertext + X25519 response
 Session key:  HKDF(kyber_secret || x25519_secret)
@@ -83,9 +85,11 @@ sigma-pkg install myapp.spkg   # auto-verifies Dilithium-5 signature
 ### Audit Trail (`kernel/security/sigma_immutable_audit_trail.cpp`)
 
 Every audit record is BLAKE2b-chained to the previous one:
-```
+
+```text
 record[n].hash = BLAKE2b(record[n].data || record[n-1].hash)
 ```
+
 Tampering with any record invalidates the entire chain.
 
 ### sigma-boot.efi (Phase G)
@@ -100,20 +104,24 @@ The bootloader will be signed with Dilithium-5 and verified against a TPM2-seale
 
 - Kyber NTT (Number Theoretic Transform) vectorised with AVX-512
 
+
 - Target: ≥ 5.8 M Kyber-1024 ops/sec on modern Intel Xeon
+
 
 ### ARM NEON — `crypto/sigma_kyber_neon.cpp`
 
 - Kyber NTT on ARM Cortex-A72+ (Raspberry Pi 4/5)
 
+
 - Target: ≥ 1.2 M Kyber-1024 ops/sec
+
 
 ---
 
 ## Source Files
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `crypto/SovereignKyber.cpp` | Kyber-1024 KEM |
 | `crypto/SovereignDilithium5.cpp` | Dilithium-5 signatures |
 | `crypto/sigma_kyber_avx512.cpp` | AVX-512 accelerated Kyber |
@@ -129,7 +137,7 @@ The bootloader will be signed with Dilithium-5 and verified against a TPM2-seale
 ## Known Issues
 
 | ID | Issue | Severity |
-|----|-------|---------|
+| ---- | ------- | --------- |
 | #1009 | CryptFS `derive_key()` returns 32 zero bytes | Critical — Phase G fix |
 | — | Side-channel resistance not yet audited | Medium — Phase H audit |
 
@@ -138,7 +146,7 @@ The bootloader will be signed with Dilithium-5 and verified against a TPM2-seale
 ## Benchmarks (Target — Phase G)
 
 | Operation | Algorithm | Target |
-|-----------|-----------|--------|
+| ----------- | ----------- | -------- |
 | Key generation | Kyber-1024 | < 0.1 ms |
 | Encapsulation | Kyber-1024 | < 0.2 ms |
 | Decapsulation | Kyber-1024 | < 0.2 ms |

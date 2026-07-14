@@ -8,6 +8,7 @@ Arguments:
 
 - **pool** `Pool` - Pool or BalancedPool from which to return stats.
 
+
 ## Instance Properties
 
 ### `PoolStats.connected`

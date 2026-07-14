@@ -10,11 +10,15 @@ The Artist Profile is designed for creative excellence, digital art creation, an
 
 - **SigmaCanvas**: Digital canvas with layer support and brush customization.
 
+
 - **SigmaColor**: Advanced color management and palette tools.
+
 
 - **SigmaPortfolio**: Portfolio management and exhibition tracking.
 
+
 - **SigmaInspiration**: Mood board and inspiration collection tools.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Artist Profile is designed for creative excellence, digital art creation, an
 
 - **Theme**: Creative Purple (Artistic Standard)
 
+
 - **Layout**: Studio Dashboard (Canvas, Tools, Portfolio)
 
+
 - **Personalization**: Custom brush presets and gesture controls.
+
 
 ---
 

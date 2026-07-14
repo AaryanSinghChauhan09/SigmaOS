@@ -31,8 +31,11 @@ pub trait Scheme {
 ```
 
 ```bash
+
 # Interacting with a scheme
+
 $ cat display:1
+
 # (Outputs current framebuffer metadata)
 
 $ echo "hello" > tcp:192.168.1.1:80

@@ -14,21 +14,27 @@ sigma-vault is the centralised secrets manager for SigmaOS. It stores secrets in
 
 - Master key never stored in cleartext on disk — sealed to TPM2 PCR state
 
+
 - AES-256-GCM with unique 96-bit IV per encryption operation
+
 
 - Audit log: every access (read, write, delete, rotate) recorded with process identity
 
+
 - PKCS#11 interface: drop-in for OpenSSL engines and TLS stacks
+
 
 - Zero in-memory secret retention after use (mlock + explicit_bzero)
 
+
 - Daemon model: vaultd runs at Ring-3 with minimal pledge; clients use IPC
+
 
 ---
 
 ## Architecture
 
-```
+```text
 ┌───────────────────────────────────────────┐
 │  Client process (sigma_pledge includes     │
 │  "vault" capability token)                │
@@ -56,15 +62,21 @@ sigma-vault is the centralised secrets manager for SigmaOS. It stores secrets in
 
 1. At vault init: generate 256-bit master key in TPM2 (`TPM2_Create` under parent key)
 
+
 2. Seal to PCR set: PCR0 (firmware) + PCR7 (Secure Boot state) + PCR11 (OS state)
+
 
 3. Sealed blob stored at `/etc/sigma-vault/master.seal`
 
+
 4. On vaultd startup: `TPM2_Unseal` — fails if PCR values changed (firmware tampered)
+
 
 5. Master key loaded into mlock'd memory region; used to derive per-secret keys via HKDF-SHA3-256
 
+
 6. Master key zeroed from memory immediately after deriving all session keys
+
 
 ---
 
@@ -72,7 +84,7 @@ sigma-vault is the centralised secrets manager for SigmaOS. It stores secrets in
 
 File: `~/.sigma-vault.db` (or `/etc/sigma-vault/system.db` for system secrets)
 
-```
+```text
 Header (64 bytes):
   magic[8]     = "SIGVAULT"
   version[2]   = 0x0001
@@ -94,7 +106,7 @@ Entries appended; compaction on `vault compact` command.
 
 ## CLI
 
-```
+```text
 sigma-vault get    <name>              # print plaintext to stdout
 
 sigma-vault set    <name> [value]      # value from arg or stdin (interactive)
@@ -117,15 +129,21 @@ Library: `libsigma-vault-pkcs11.so` — implements PKCS#11 v3.0 subset:
 
 - `C_Initialize`, `C_Finalize`
 
+
 - `C_OpenSession`, `C_CloseSession`
+
 
 - `C_Login` (PIN = capability token)
 
+
 - `C_Sign`, `C_Verify` (Dilithium-5 + ECDSA P-256)
+
 
 - `C_Encrypt`, `C_Decrypt` (AES-256-GCM)
 
+
 - `C_GenerateKeyPair`, `C_DestroyObject`
+
 
 Used by: sigma-sh TLS, sigma-net TLS 1.3 handshake, sigma-pkg signature verification.
 
@@ -136,6 +154,7 @@ Used by: sigma-sh TLS, sigma-net TLS 1.3 handshake, sigma-pkg signature verifica
 Processes must hold `"vault"` in their sigma_pledge capability set to open IPC connection to vaultd. Privilege escalation rejected with `EPERM` + audit entry.
 
 Audit log entry format (JSON Lines):
+
 ```json
 {"ts":1700000000,"pid":412,"comm":"sigma-sh","op":"get","name":"db_password","result":"ok"}
 ```
@@ -146,32 +165,43 @@ Audit log entry format (JSON Lines):
 
 - [ ] 1. TPM2 seal/unseal wrapper (`security/tpm2_vault.c`)
 
+
 - [ ] 2. AES-256-GCM encrypt/decrypt (`crypto/aes_gcm.c`)
+
 
 - [ ] 3. HKDF-SHA3-256 key derivation (`crypto/hkdf.c`)
 
+
 - [ ] 4. On-disk store reader/writer (`src/store.c`)
+
 
 - [ ] 5. vaultd daemon + IPC socket listener
 
+
 - [ ] 6. sigma_pledge self-restriction for vaultd
+
 
 - [ ] 7. CLI commands: get/set/delete/list/rotate/init
 
+
 - [ ] 8. Audit logger (append-only, fsync after each entry)
+
 
 - [ ] 9. PKCS#11 shared library skeleton
 
+
 - [ ] 10. mlock + explicit_bzero for all in-memory secrets
 
+
 - [ ] 11. Tests: encrypt/decrypt round-trip, TPM2 mock seal, audit log entries
+
 
 ---
 
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | TPM2 seal/unseal | ⬜ Not started |
 | AES-256-GCM store | ⬜ Not started |
 | vaultd daemon | ⬜ Not started |

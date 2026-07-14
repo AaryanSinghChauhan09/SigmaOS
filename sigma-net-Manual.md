@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-net <command> [options]
 sigma-net --version
 sigma-net --help
@@ -21,6 +21,7 @@ sigma-net --help
 ### `status [iface]`
 
 Show all network interfaces or one specific:
+
 ```bash
 sigma-net status            # all interfaces
 
@@ -40,6 +41,7 @@ sigma-net down wlan0
 ### `ip <iface> <addr/prefix>`
 
 Set a static IP address:
+
 ```bash
 sigma-net ip eth0 10.0.0.10/24
 sigma-net ip eth0 192.168.1.100/24
@@ -48,6 +50,7 @@ sigma-net ip eth0 192.168.1.100/24
 ### `dhcp <iface>`
 
 Request a DHCP lease (delegates to `dhclient` or `udhcpc`):
+
 ```bash
 sigma-net dhcp eth0
 sigma-net dhcp wlan0
@@ -56,6 +59,7 @@ sigma-net dhcp wlan0
 ### `mac <iface> [new-mac]`
 
 Show or set MAC address:
+
 ```bash
 sigma-net mac eth0                        # show MAC
 
@@ -66,6 +70,7 @@ sigma-net mac eth0 52:54:00:ab:cd:ef     # set MAC (requires root)
 ### `stats [iface]`
 
 Interface statistics (RX/TX bytes, packets, errors, drops):
+
 ```bash
 sigma-net stats
 sigma-net stats eth0 --json
@@ -98,6 +103,7 @@ sigma-net dns resolve sigmaos.app   # lookup hostname
 ### `ping <host> [-c n]`
 
 ICMP ping (delegates to system ping; simulated when unavailable):
+
 ```bash
 sigma-net ping 8.8.8.8
 sigma-net ping sigmaos.app -c 10
@@ -106,6 +112,7 @@ sigma-net ping sigmaos.app -c 10
 ### `trace <host>`
 
 Traceroute (delegates to `traceroute`):
+
 ```bash
 sigma-net trace 8.8.8.8
 ```
@@ -113,6 +120,7 @@ sigma-net trace 8.8.8.8
 ### `scan <subnet>`
 
 ARP network discovery:
+
 ```bash
 sigma-net scan 10.0.0.0/24      # discover hosts
 
@@ -122,6 +130,7 @@ sigma-net scan 192.168.1.0/24 --json
 ### `capture <iface> [-n count]`
 
 Packet capture (delegates to `tcpdump`; writes `/tmp/sigma-cap.pcap`):
+
 ```bash
 sigma-net capture eth0 -n 32
 ```
@@ -156,7 +165,7 @@ sigma-net fw flush --force              # remove all rules
 ## OPTIONS
 
 | Flag | Description |
-|------|-------------|
+| ------ | ------------- |
 | `-c`, `--count <n>` | Ping packet count (default: 4) |
 | `-n`, `--num <n>` | Capture packet count (default: 16) |
 | `--force` | Override safety prompts (required for `fw flush`) |

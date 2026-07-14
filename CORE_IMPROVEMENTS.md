@@ -13,7 +13,7 @@ SigmaOS already integrates Pacman, Flatpak, and Nix-style builds. To match and e
 ### 1.1 sigpkg Enhancements
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | Content-addressed store | Nix-style `/sigma/store/` with hash-based paths | ✅ Done |
 | Delta updates | Binary diff patches (bsdiff) for package upgrades | 📋 Planned |
 | Parallel downloads | Concurrent package fetches (up to 8 streams) | 🔄 Active |
@@ -25,17 +25,19 @@ SigmaOS already integrates Pacman, Flatpak, and Nix-style builds. To match and e
 
 ### 1.2 Package Ecosystem Growth
 
-```
+```text
 Current:   ~2,000 native packages
 Target Q4: ~10,000 native packages
 Target Y2: ~50,000 (via absorption pipeline + community recipes)
 ```
 
 **Strategy**:
+
 - Automated PKGBUILD → sigpkg recipe translator
 - AUR-compatible `sigma-recipes` community repository
 - Flatpak hub integration for desktop applications
 - AppImage compatibility layer for portable apps
+
 
 ---
 
@@ -55,7 +57,7 @@ pub struct ImprovedEEVDF {
 ```
 
 | Improvement | Benchmark Target | Status |
-|---|---|---|
+| --- | --- | --- |
 | Workload-aware classification | +18% compile throughput | ✅ Done (ANOMALY-0008) |
 | Cache-pressure-aware slicing | -12% L3 miss rate | 🔄 Active |
 | NUMA-aware task migration | +25% NUMA-local memory hits | ✅ Done |
@@ -64,7 +66,7 @@ pub struct ImprovedEEVDF {
 ### 2.2 Memory Management
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | Slab allocator optimization | Per-CPU slab caches, magazine layer | ✅ Done |
 | Transparent huge pages | 2MB/1GB THP support with defrag | 🔄 Active |
 | Memory compaction | Online defragmentation daemon | 📋 Planned |
@@ -74,7 +76,7 @@ pub struct ImprovedEEVDF {
 ### 2.3 I/O Subsystem
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | io_uring support | Async I/O ring for userspace | 🔄 Active |
 | NVMe multipath | Active-active NVMe path management | 📋 Planned |
 | XFS/ext4 parity | Feature-complete filesystem drivers | 🔄 Active |
@@ -87,7 +89,7 @@ pub struct ImprovedEEVDF {
 ### 3.1 Zenith Desktop
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | Wayland-native compositor | No X11 dependency, DRM/KMS direct | 🔄 Active |
 | Fractional scaling | Per-monitor fractional DPI (125%, 150%, 175%) | 📋 Planned |
 | Variable refresh rate | Freesync/G-Sync in compositor | 📋 Planned |
@@ -99,7 +101,7 @@ pub struct ImprovedEEVDF {
 ### 3.2 Shell & Terminal
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | sigma-shell | POSIX-compatible with AI completions | 🔄 Active |
 | Rich prompt | Git status, Python venv, exit code display | ✅ Done |
 | Syntax highlighting | Real-time command syntax coloring | 📋 Planned |
@@ -110,7 +112,7 @@ pub struct ImprovedEEVDF {
 ## 4. Security Improvements
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | MAC policy engine | SELinux/AppArmor-equivalent in native MAC | 🔄 Active |
 | Integrity Measurement | IMA/EVM for runtime file integrity | ✅ Done |
 | Secure boot chain | UEFI → bootloader → kernel → shards | ✅ Done |
@@ -124,7 +126,7 @@ pub struct ImprovedEEVDF {
 ## 5. Networking Improvements
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | TCP BBR congestion | Modern congestion control algorithm | 🔄 Active |
 | WireGuard native | WireGuard VPN as kernel shard | 📋 Planned |
 | eBPF networking | XDP-based packet processing | 🔄 Active |
@@ -137,7 +139,7 @@ pub struct ImprovedEEVDF {
 ## 6. Developer Experience Improvements
 
 | Improvement | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | sigma-sdk | Shard scaffolding, build, test tools | 🔄 Active |
 | GDB kernel debugging | QEMU + GDB integration for kernel dev | ✅ Done |
 | eBPF tracing | `sigma-trace` for system-wide tracing | 🔄 Active |
@@ -148,7 +150,7 @@ pub struct ImprovedEEVDF {
 
 ## Progress Dashboard
 
-```
+```text
 Core Improvements Progress:
 ├── Package Management:  ████████░░  80%
 ├── Kernel Core:         ██████░░░░  60%

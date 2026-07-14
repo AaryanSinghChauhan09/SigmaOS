@@ -10,11 +10,15 @@ The Agricultural Scientist Profile is designed for agricultural research excelle
 
 - **SigmaCrop**: Crop research and breeding management.
 
+
 - **SigmaSoil**: Soil analysis and nutrient management.
+
 
 - **SigmaClimate**: Climate impact analysis and adaptation planning.
 
+
 - **SigmaBiotech**: Agricultural biotechnology and genetic research.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Agricultural Scientist Profile is designed for agricultural research excelle
 
 - **Theme**: Research Green (Agricultural Standard)
 
+
 - **Layout**: Research Dashboard (Crop, Soil, Climate)
 
+
 - **Personalization**: Custom research protocols and automated analysis.
+
 
 ---
 

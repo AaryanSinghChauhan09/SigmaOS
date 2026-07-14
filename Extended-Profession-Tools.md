@@ -11,7 +11,7 @@
 **Regulator:** ICSI / MCA / SEBI LODR / Companies Act 2013
 
 | Feature | Regulation | Implementation |
-|---|---|---|
+| --- | --- | --- |
 | ROC filings (MGT-7, AOC-4, DIR-12, SH-7) | Companies Act 2013 | `sigma_cs_roc_filing_t` + MCA21 API |
 | Secretarial Standards (SS-1, SS-2, SS-4) | ICSI | Board meeting notice + minutes |
 | SEBI LODR compliance calendar | SEBI LODR 2015 | Quarterly deadline tracker |
@@ -37,7 +37,7 @@ SEBI regulates India's ₹400 lakh crore market. Every broker, RIA, and MFD curr
 **Regulator:** SEBI / AMFI / NSDL / CDSL
 
 | Feature | Regulation | Implementation |
-|---|---|---|
+| --- | --- | --- |
 | Peak margin compliance | SEBI Circular SEBI/HO/MRD2 | Daily peak margin tracking |
 | Capital gains calculation (STCG/LTCG) | Finance Act 2024 | 20%/12.5% rates, ₹1.25L exemption |
 | KYC / IPV tracking | SEBI KYC Reg | Annual IPV renewal alert |
@@ -64,7 +64,7 @@ DGCA regulates India's ₹1.5 lakh crore aviation sector with 700+ aircraft and 
 **Regulator:** DGCA / AAI / BCAS / ICAO / STCW
 
 | Feature | What it does |
-|---|---|
+| --- | --- |
 | Pilot logbook | Digital log: PIC/SIC/IFR/night hours, currency check |
 | STCW certificate tracker | Expiry alerts for all 10+ mandatory certs |
 | FRMS (Fatigue Risk Management) | Duty hour limits per DGCA (FDTL rules) |
@@ -92,7 +92,7 @@ India has 7.5 million food businesses. FSSAI's 2024 mandatory allergen labeling 
 **Regulator:** FSSAI / Food Safety and Standards Act 2006
 
 | Feature | Regulation | Implementation |
-|---|---|---|
+| --- | --- | --- |
 | Licence type determination | FSSAI Licensing Regs 2011 | Auto-determine based on turnover/multi-state |
 | Mandatory allergen labeling | FSSAI (Food Products Standards) 2024 | 10-allergen check on every menu item |
 | HACCP CCP monitoring | Codex Alimentarius / FSSAI | IoT sensor integration for CCPs |
@@ -120,7 +120,7 @@ India's ₹2.5 lakh crore mining sector with 1,500+ operational mines. Fatal acc
 **Regulator:** DGMS / IBM / MMDR Act 2015 / PESO
 
 | Feature | Regulation | What it does |
-|---|---|---|
+| --- | --- | --- |
 | Accident report (Form I) | Mines Act 1952 §23 | One-tap filing within 2-hour mandatory window |
 | Blasting register | PESO Explosives Rules | Per-shot log with PPV measurement |
 | HEMM maintenance log | DGMS | Mandatory equipment maintenance records |
@@ -147,7 +147,7 @@ India's ₹15 lakh crore textile sector — 2nd largest employer. Mandatory labe
 **Regulator:** Textile Commissioner / BIS / CITI / AEPC
 
 | Feature | Regulation | What it does |
-|---|---|---|
+| --- | --- | --- |
 | Mandatory label compliance | Textile (Consumer Protection) Rules 2023 | 8-field mandatory label check |
 | Handloom Mark application | Textile Commissioner | Online application + tracking |
 | GI Tag management | GI Act 1999 | Application + renewal for Banarasi, Kanchipuram etc. |
@@ -172,7 +172,7 @@ India has 7,500km of coastline and is the world's largest source of merchant mar
 **Regulator:** DG Shipping / MMD / STCW / IMO
 
 | Feature | What it does |
-|---|---|
+| --- | --- |
 | COC + STCW certificate tracker | Expiry alerts for all 10+ mandatory STCW certs |
 | GMDSS log | Daily DSC watch record (mandatory) |
 | Voyage planning | Distance, fuel, ETA, weather routing |
@@ -199,7 +199,7 @@ India's 700,000 sq km of forest is managed by 80,000 forest officers. M-STrIPES 
 **Regulator:** MoEFCC / NTCA / FSI / WII / CAMPA
 
 | Feature | Regulation | What it does |
-|---|---|---|
+| --- | --- | --- |
 | Forest Rights Claims (FRC) | FRA 2006 | Digital FRC filing + status tracking |
 | M-STrIPES patrol log | NTCA | GPS-tracked patrol + wildlife observation |
 | Forest fire report | Fire Manual | NASA FIRMS integration + incident report |
@@ -224,7 +224,7 @@ India has 3 million+ temples, mosques, churches, and gurudwaras. FCRA compliance
 **Regulator:** Charity Commissioner / FCRA / IT Dept (12A/80G) / Waqf Board
 
 | Feature | Regulation | What it does |
-|---|---|---|
+| --- | --- | --- |
 | FCRA annual return (FC-4) | FCRA 2010 | Annual return due Sept 30 |
 | 80G receipt generation | IT Act §80G | Form 10BE certificate to donor |
 | Form 10BD aggregation | IT Act | Annual donation statement due May 31 |
@@ -247,7 +247,7 @@ sigma-trust 12a renewal check --expiry
 ## Summary — New Profession App Headers (Round 35)
 
 | App | Profession | Regulator | File |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `sigma-cs` | Company Secretary | ICSI/MCA/SEBI | `userland/apps/sigma-cs/sigma_cs.h` |
 | `sigma-sebi` | Stock broker/RIA/MFD | SEBI/AMFI | `userland/apps/sigma-sebi/sigma_sebi.h` |
 | `sigma-aviation` | Pilot/AME/ATC | DGCA/AAI | `userland/apps/sigma-aviation/sigma_aviation.h` |
@@ -262,11 +262,15 @@ Plus from previous round (already committed):
 
 - `sigma-cs` Company Secretary header
 
+
 - `sigma-sebi` SEBI professionals header
+
 
 - `sigma-textile` Textile industry header
 
+
 - `sigma-trust` Religious institutions header
+
 
 ---
 

@@ -19,7 +19,9 @@ flowchart LR
 
 - **AI Telemetry Hooks**: Automatically detects infinite loops or stalled tasks.
 
+
 - **Priority Bands**: IDLE, NORMAL, HIGH, and REALTIME_CRITICAL.
+
 
 ## Task Spawning Example
 

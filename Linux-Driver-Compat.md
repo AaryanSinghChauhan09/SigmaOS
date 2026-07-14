@@ -8,7 +8,7 @@ GPL kernel code (cleanroom implementation).
 
 ## Three-Layer Approach
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │ Layer 3 — AI Porter (sigma-driver-porter)                        │
 │   Study Linux driver structure → generate SigmaOS SDF skeleton   │
@@ -71,7 +71,7 @@ kernel modules expect to find when loaded. Each symbol redirects to the
 SigmaOS HAL equivalent:
 
 | Linux Symbol | SigmaOS Equivalent | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `printk` | `sigma_log` | Kernel logging |
 | `kmalloc` / `kfree` | `sigma_slab_alloc` / `sigma_slab_free` | Slab allocator |
 | `ioremap` / `iounmap` | `sigma_iomap` / `sigma_iounmap` | MMIO mapping |
@@ -150,13 +150,18 @@ The generated `lib.rs` contains:
 
 - Correct SDF lifecycle (`probe/init/shutdown/irq`)
 
+
 - `sigma_pledge` call with inferred capabilities
+
 
 - `sigma_register_driver!` macro registration
 
+
 - TODO comments for register definitions (filled from vendor datasheet)
 
+
 - API mapping comments: `// Replace: ioremap → ddk::iomap`
+
 
 ### AI Translation Mode
 
@@ -179,7 +184,7 @@ sigma-driver-porter port linux_e1000_main.c --ai
 The compat layer handles these common Linux driver patterns:
 
 | Pattern | Linux Style | SigmaOS Style |
-|---------|-------------|---------------|
+| --------- | ------------- | --------------- |
 | PCI probe | `pci_driver.probe()` callback | `fn_probe(bar: u64, irq: u8) -> i32` |
 | MMIO access | `ioremap` + `readl/writel` | `ddk::iomap` + `mmio_read32/write32` |
 | IRQ handling | `request_irq(handler, IRQF_SHARED)` | `ddk::request_irq` + `fn_irq → bool` |
@@ -194,7 +199,7 @@ The compat layer handles these common Linux driver patterns:
 ## Distro Coverage
 
 | Distribution | Kernel | Status | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Ubuntu 22.04/24.04 | 5.15–6.8 | 🔄 Layer 1+2 | `ubuntu_compat.rs` |
 | Debian 12 | 6.1 | 🔄 Layer 1+2 | Same ABI as Ubuntu |
 | Fedora 40 | 6.8 | ⬜ Planned | Slightly different module ABI |

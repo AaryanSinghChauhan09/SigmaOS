@@ -9,7 +9,7 @@ The Workflow Orchestrator enables users to define multi-step automated workflows
 ## Workflow Task Types
 
 | Task Kind       | Description                              | Example                        |
-|-----------------|------------------------------------------|--------------------------------|
+| ----------------- | ------------------------------------------ | -------------------------------- |
 | ShellCommand    | Run a shell command in sandbox           | `sigma-pkg update`             |
 | AiInference     | Query the local AI engine                | "Summarize today's logs"       |
 | FileTransform   | Apply jq/sed/awk transformations         | Parse JSON config files        |
@@ -19,7 +19,7 @@ The Workflow Orchestrator enables users to define multi-step automated workflows
 
 ## DAG Execution
 
-```
+```text
 [Fetch Data] ──→ [AI Analysis] ──→ [Generate Report]
       │                                    ↑
       └──→ [Transform Logs] ──────────────┘
@@ -30,6 +30,7 @@ The Workflow Orchestrator enables users to define multi-step automated workflows
 - Failed tasks trigger **retry logic** (configurable max retries + delay)
 - Skipped tasks propagate when dependencies fail
 
+
 ## Implementation
 
 - **Source**: `ai/sigma_workflow_orchestrator.rs`
@@ -39,11 +40,12 @@ The Workflow Orchestrator enables users to define multi-step automated workflows
   - `execute_workflow(workflow)` — full pipeline execution
   - Task dispatch to shell, AI, file, network, or container executors
 
+
 ## Error Handling
 
 | Error             | Cause                               | Recovery                    |
-|-------------------|-------------------------------------|-----------------------------|
+| ------------------- | ------------------------------------- | ----------------------------- |
 | `DagCycle`        | Circular dependency                 | Fix workflow definition     |
 | `TaskFailed(id)`  | Task exhausted retry budget         | Check task command/config   |
 | `Timeout(id)`     | Task exceeded deadline              | Increase timeout            |
-| `DependencyFailed`| Upstream task failed                | Fix upstream first          |
+| `DependencyFailed` | Upstream task failed                | Fix upstream first          |

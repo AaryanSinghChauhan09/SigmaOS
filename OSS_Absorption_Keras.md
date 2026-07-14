@@ -1,4 +1,5 @@
 # SigmaOS Deep Learning Framework Absorption - Keras
+
 ## Making keras-team/keras Irrelevant
 
 > **Absorption Target**: https://github.com/keras-team/keras  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Keras by implementing a native deep learning 
 ## Absorbed Features & Capabilities
 
 ### 1. Native Deep Learning Framework
+
 **Original**: Python API over TensorFlow backend  
 **SigmaOS**: Native OS-level deep learning with Rust implementation
 
@@ -30,11 +32,13 @@ pub struct SigmaDeep {
 ```
 
 **Core Capabilities**:
+
 - **Model Architecture**
   - Sequential models with automatic layer stacking
   - Functional API for complex architectures
   - Subclassing for custom models
   - Automatic architecture optimization
+
   
 - **Layer Types**
   - Dense layers with various activations
@@ -45,11 +49,14 @@ pub struct SigmaDeep {
   - Pooling layers (Max, Average, Global)
   - Custom layers with automatic optimization
 
+
 ### 2. Automatic Model Optimization
+
 **Original**: Manual architecture design and tuning  
 **SigmaOS**: AI-powered automatic architecture search
 
 **Optimization Features**:
+
 - Neural Architecture Search (NAS) with efficient methods
 - Automatic hyperparameter tuning
 - Model pruning and quantization
@@ -57,11 +64,14 @@ pub struct SigmaDeep {
 - Architecture simplification
 - Automatic layer fusion
 
+
 ### 3. Hardware Acceleration
+
 **Original**: GPU support via TensorFlow  
 **SigmaOS**: Native multi-hardware acceleration
 
 **Acceleration Features**:
+
 - Automatic GPU utilization with optimal memory management
 - Multi-GPU training with data parallelism
 - TPU support with automatic graph optimization
@@ -69,11 +79,14 @@ pub struct SigmaDeep {
 - Edge device optimization (mobile, IoT)
 - Mixed precision training with automatic loss scaling
 
+
 ### 4. Training Pipeline
+
 **Original**: Manual data pipeline with tf.data  
 **SigmaOS**: Native data pipeline with OS optimization
 
 **Pipeline Features**:
+
 - Automatic data loading and preprocessing
 - Native data augmentation with GPU acceleration
 - Distributed data loading across cluster
@@ -81,11 +94,14 @@ pub struct SigmaDeep {
 - Streaming data support
 - Multi-modal data handling
 
+
 ### 5. Model Deployment
+
 **Original**: TensorFlow Serving or external tools  
 **SigmaOS**: Native model deployment with OS integration
 
 **Deployment Features**:
+
 - Native model serving with automatic scaling
 - Model optimization for target platform
 - Edge deployment with model compression
@@ -94,11 +110,14 @@ pub struct SigmaDeep {
 - Model monitoring with drift detection
 - A/B testing with automatic traffic routing
 
+
 ### 6. Transfer Learning
+
 **Original**: Manual fine-tuning with pre-trained models  
 **SigmaOS**: Automatic transfer learning with model zoo
 
 **Transfer Learning Features**:
+
 - Native model zoo with pre-trained models
 - Automatic model selection for task
 - Intelligent layer freezing strategies
@@ -106,11 +125,14 @@ pub struct SigmaDeep {
 - Domain adaptation
 - Few-shot and zero-shot learning
 
+
 ### 7. Explainability
+
 **Original**: Limited explainability tools  
 **SigmaOS**: Native explainability for deep learning
 
 **Explainability Features**:
+
 - Grad-CAM for CNN visualization
 - Attention visualization for transformers
 - Saliency maps with smoothgrad
@@ -119,12 +141,13 @@ pub struct SigmaDeep {
 - Concept activation vectors
 - Automatic insight generation
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Keras | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | Performance | Python overhead | Native Rust | ✅ 5-10x |
 | Hardware Acceleration | Via TensorFlow | Native multi-hardware | ✅ 3-5x |
 | AutoML | External (AutoKeras) | Native NAS | ✅ 10x |
@@ -139,6 +162,7 @@ pub struct SigmaDeep {
 ## Implementation Details
 
 ### Native Deep Learning Framework
+
 ```rust
 pub mod sigma_deep {
     use sigma_core::compute::ComputeEngine;
@@ -174,6 +198,7 @@ pub mod sigma_deep {
 ```
 
 ### Neural Architecture Search
+
 ```rust
 pub mod nas {
     pub struct NASEngine {
@@ -200,11 +225,13 @@ pub mod nas {
 ## API Comparison
 
 ### Keras API
+
 ```python
 from tensorflow import keras
 from tensorflow.keras import layers
 
 # Manual model construction
+
 model = keras.Sequential([
     layers.Dense(64, activation='relu'),
     layers.Dense(32, activation='relu'),
@@ -212,15 +239,18 @@ model = keras.Sequential([
 ])
 
 # Manual compilation
+
 model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
 # Manual training
+
 model.fit(x_train, y_train, epochs=10, batch_size=32)
 ```
 
 ### SigmaDeep API
+
 ```rust
 use sigma_deep::SigmaDeep;
 
@@ -239,36 +269,48 @@ let deployed = model.deploy(target);
 ### For Users of Keras
 
 **Before** (using Keras):
+
 ```python
+
 # Install TensorFlow and Keras
+
 pip install tensorflow
 
 # Import and use
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D
 
 # Manual model construction
+
 model = Sequential([
     Conv2D(32, (3, 3), activation='relu'),
     Dense(10, activation='softmax')
 ])
 
 # Manual training
+
 model.fit(x_train, y_train, epochs=10)
 ```
 
 **After** (using SigmaDeep):
+
 ```bash
+
 # Enable deep learning shard (native, no installation)
+
 sigma-shard enable deep-learning
 
 # AutoML with automatic architecture search
+
 sigma-deep train --auto-arch --data dataset.csv --target label
 
 # Automatic deployment
+
 sigma-deep deploy --model best_model --target edge
 
 # Native explainability
+
 sigma-deep explain --model best_model --data test.csv
 ```
 
@@ -277,7 +319,7 @@ sigma-deep explain --model best_model --data test.csv
 ## Performance Benchmarks
 
 | Operation | Keras/TensorFlow | SigmaDeep | Improvement |
-|-----------|----------------|----------|-------------|
+| ----------- | ---------------- | ---------- | ------------- |
 | CNN Training (ImageNet) | 45min | 12min | 3.8x faster |
 | LSTM Training (Text) | 30min | 9min | 3.3x faster |
 | Inference (ResNet50) | 25ms | 7ms | 3.6x faster |
@@ -289,6 +331,7 @@ sigma-deep explain --model best_model --data test.csv
 ## Advanced Features
 
 ### Distributed Training
+
 ```rust
 pub struct DistributedDeepTrainer {
     cluster: ClusterManager,
@@ -308,6 +351,7 @@ impl DistributedDeepTrainer {
 ```
 
 ### Automatic Model Compression
+
 ```rust
 pub struct ModelCompressor {
     pruner: ModelPruner,

@@ -7,7 +7,7 @@
 ### Pledge Groups
 
 | Group | Allowed operations |
-|---|---|
+| --- | --- |
 | `stdio` | sigma-bus send/recv, read/write to open FDs |
 | `rpath` | sigma_open with O_RDONLY, stat |
 | `wpath` | sigma_open with O_WRONLY, O_CREAT |
@@ -126,7 +126,7 @@ Cache hit rate target: > 99.9% after warm-up (< 100ms into workload).
 
 ## 4. PQC Chain: Kyber-1024 → Dilithium-5 → TPM2 PCR Sealing
 
-```
+```text
 Key Establishment (per sigma-bus session):
   Initiator generates:  Kyber-1024 keypair (pk_i, sk_i)
   Responder generates:  Kyber-1024 keypair (pk_r, sk_r)
@@ -152,7 +152,7 @@ TPM2 PCR Sealing (FDE key):
 
 Every shard receives a [SPIFFE](https://spiffe.io/) Verifiable Identity Document (SVID) at registration:
 
-```
+```text
 SVID URI: spiffe://sigmaos.local/shard/<shard-name>/<instance-id>
 ```
 
@@ -163,7 +163,7 @@ SVIDs are X.509 certificates signed by `sigma-ca` using Dilithium-5. They are ro
 ## 6. Attack Surface Reduction vs Linux
 
 | Attack Vector | Linux | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | Kernel syscall interface | ~400 syscalls exposed to all processes | sigma_pledge: process-specific allowlist |
 | Filesystem access | DAC (rwx bits) | sigma_unveil: explicit per-path allowlist |
 | IPC | Pipes, sockets, signals, shared mem — unrestricted | sigma-bus typed messages + capability token check |

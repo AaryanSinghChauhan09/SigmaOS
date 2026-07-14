@@ -11,9 +11,9 @@ These drivers are loaded only if target devices are detected during the ACPI/PCI
 | Shard Path | Device Class | Core Purpose |
 | :--- | :--- | :--- |
 | `kernel/core/drivers/SovereignUSB3.cpp` | USB Controller | xHCI device loops, transfer rings, bulk/interrupt packets |
-| `kernel/core/drivers/SovereignFireWire.cpp`| IEEE 1394 | Serial bus interface, high-speed media transfers |
-| `kernel/core/drivers/SovereignPCMCIA.cpp`| Laptop Expansion | Legacy expansion bus, card information structure (CIS) |
-| `kernel/core/drivers/SovereignTVTuner.cpp`| Media Tuner | Video capture interfaces, signal demodulation |
+| `kernel/core/drivers/SovereignFireWire.cpp` | IEEE 1394 | Serial bus interface, high-speed media transfers |
+| `kernel/core/drivers/SovereignPCMCIA.cpp` | Laptop Expansion | Legacy expansion bus, card information structure (CIS) |
+| `kernel/core/drivers/SovereignTVTuner.cpp` | Media Tuner | Video capture interfaces, signal demodulation |
 
 ---
 

@@ -9,7 +9,7 @@
 ## Service Types
 
 | Type     | Behavior                                    |
-|----------|---------------------------------------------|
+| ---------- | --------------------------------------------- |
 | Oneshot  | Run once, mark complete                     |
 | Daemon   | Long-running process, supervised            |
 | Forking  | Forks child, parent exits                   |
@@ -19,7 +19,7 @@
 ## Restart Policies
 
 | Policy      | When Restarts                              |
-|-------------|---------------------------------------------|
+| ------------- | --------------------------------------------- |
 | Never       | Service stays in Failed state               |
 | OnFailure   | Only on non-zero exit                       |
 | Always      | Restarts on any exit (normal or error)      |
@@ -27,7 +27,7 @@
 
 ## Default Boot Services
 
-```
+```text
 sigma-logd ──────────────────┐
                              ├──→ sigma-ai-agent
 sigma-dbus ──┬───────────────┘
@@ -36,12 +36,12 @@ sigma-dbus ──┬───────────────┘
 ```
 
 | Service                | Type   | Dependencies              | Restart    |
-|------------------------|--------|---------------------------|------------|
+| ------------------------ | -------- | --------------------------- | ------------ |
 | sigma-dbus             | Daemon | —                         | Always     |
 | sigma-logd             | Daemon | —                         | Always     |
 | sigma-networkd         | Daemon | sigma-dbus                | OnFailure  |
 | sigma-ai-agent         | Daemon | sigma-dbus, sigma-logd    | OnFailure  |
-| sigma-zenith-compositor| Notify | sigma-dbus, sigma-logd    | OnAbnormal |
+| sigma-zenith-compositor | Notify | sigma-dbus, sigma-logd    | OnAbnormal |
 
 ## Implementation
 
@@ -52,6 +52,7 @@ sigma-dbus ──┬───────────────┘
   - `SupervisionTree::start_service(name)` — start with dependency check
   - `SupervisionTree::handle_failure(name)` — restart policy enforcement
   - `create_default_services()` — default SigmaOS boot configuration
+
 
 ## Health Checks
 

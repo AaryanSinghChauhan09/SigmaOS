@@ -2,17 +2,24 @@
 
 - **RFC number**: 0002
 
+
 - **Author(s)**: SigmaOS Project
+
 
 - **Subsystem**: kabi / kernel
 
+
 - **Status**: Accepted
+
 
 - **Date proposed**: 2026-07-01
 
+
 - **Tracking issue**: #kabi
 
+
 - **Implementation PR**: kabi/src/lib.rs
+
 
 ---
 
@@ -36,16 +43,21 @@ cannot know if their driver will work after an OS update.
 
 - A documented list of stable-ABI symbols (functions, structs, constants).
 
+
 - A CI check that detects ABI breakage and fails the build.
 
+
 - Driver DDK exposes **only** stable-ABI symbols so third-party drivers survive
+
   OS minor-version updates.
 
 ### Non-goals
 
 - Matching Linux's KABI (too complex for v1).
 
+
 - Stabilising internal kernel-only interfaces (`sigma_slab_alloc`, etc.).
+
 
 ---
 
@@ -56,7 +68,7 @@ cannot know if their driver will work after an OS update.
 The following categories of symbols are **stable**:
 
 | Category | Examples |
-|----------|---------|
+| ---------- | --------- |
 | Driver DDK traits | `WifiDriver`, `BlockDriver`, `InputDriver` |
 | C-ABI exports used by drivers | `sigma_request_irq`, `sigma_free_irq`, `nic_tx_packet` |
 | kabi structs | `KabiVersion`, `DriverInfo`, `IrqDescriptor` |
@@ -64,7 +76,7 @@ The following categories of symbols are **stable**:
 
 ### kabi/ directory layout
 
-```
+```text
 kabi/
   src/
     lib.rs          # Rust stable-ABI types (repr(C), versioned)
@@ -98,11 +110,15 @@ kabi/
 
 1. Parse current `kabi/src/lib.rs` → current symbol set.
 
+
 2. Load `kabi/snapshots/<base_version>.json` → baseline.
+
 
 3. Diff: any **removed** or **changed** symbol = ABI break → CI fails.
 
+
 4. New symbols = ABI addition → CI passes but appends to snapshot.
+
 
 ---
 
@@ -128,8 +144,11 @@ This RFC itself defines the ABI policy; it has no ABI impact.
 
 1. ✅ Done: `kabi/src/lib.rs` with `KabiVersion` and `DriverInfo` structs.
 
+
 2. ✅ Done: `sigma-drv abi check` CLI command.
 
+
 3. TODO: `kabi/check.py` CI script with snapshot comparison.
+
 
 4. TODO: Snapshot `v15.0.0.json` generated from current headers.

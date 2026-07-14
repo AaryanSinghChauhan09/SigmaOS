@@ -10,11 +10,15 @@ The Sales Executive Profile is designed for sales excellence, customer relations
 
 - **SigmaPipeline**: Sales pipeline management and tracking.
 
+
 - **SigmaCRM**: Customer relationship management and analytics.
+
 
 - **SigmaForecast**: Sales forecasting and reporting.
 
+
 - **SigmaCommission**: Commission tracking and calculation.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Sales Executive Profile is designed for sales excellence, customer relations
 
 - **Theme**: Sales Blue (Business Standard)
 
+
 - **Layout**: Sales Dashboard (Pipeline, CRM, Forecast)
 
+
 - **Personalization**: Custom sales pipelines and automated follow-ups.
+
 
 ---
 

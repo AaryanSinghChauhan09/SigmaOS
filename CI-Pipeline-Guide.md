@@ -7,7 +7,7 @@
 
 ## CI Architecture
 
-```
+```text
 PR opened / push to main
          │
          ├── sigma_dev_workflow.yml ──── commit-lint
@@ -43,7 +43,7 @@ PR opened / push to main
 
 ### ❌ `commit-lint` fails
 
-```
+```text
 ✖ subject may not be empty [subject-empty]
 ✖ type may not be empty [type-empty]
 ```
@@ -64,7 +64,7 @@ git commit --amend
 
 ### ❌ `rustfmt check` fails
 
-```
+```text
 Diff in kernel/core/sigma_pledge.rs at line 42
 ```
 
@@ -89,11 +89,12 @@ git add -u && git commit --amend --no-edit
 
 ### ❌ `clippy` fails
 
-```
+```text
 error: this looks like you are trying to swap `a` and `b`
 ```
 
 **Fix:** Address the warning or suppress with a documented reason:
+
 ```rust
 // clippy is wrong here because X
 #[allow(clippy::manual_swap)]
@@ -103,11 +104,12 @@ error: this looks like you are trying to swap `a` and `b`
 
 ### ❌ `SPDX headers` fails
 
-```
+```text
 MISSING SPDX: kernel/core/my_new_file.rs
 ```
 
 **Fix:** Add to the top of your file:
+
 ```rust
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 SigmaOS Project
@@ -119,11 +121,12 @@ MISSING SPDX: kernel/core/my_new_file.rs
 
 ### ❌ `cargo-audit` fails
 
-```
+```text
 error[RUSTSEC-2024-XXXX]: vulnerability in crate-name
 ```
 
 **Fix:** Update the affected dependency:
+
 ```bash
 cargo update -p crate-name
 
@@ -137,7 +140,7 @@ cargo update -p crate-name
 
 ### ❌ `QEMU smoke boot` fails
 
-```
+```text
 [qemu-smoke] WARN — no recognisable output
 ```
 
@@ -145,9 +148,12 @@ cargo update -p crate-name
 
 1. `arch/boot/sovereign_boot.asm` — does it print to serial?
 
+
 2. `kernel/core/sigma_irq.rs` — is serial console initialized (`serial_puts`)?
 
+
 3. `kernel/src/main.rs` — does it call `print_str("Welcome...")`?
+
 
 The QEMU boot test is currently **non-blocking** (warning only) until the kernel produces a stable boot.
 
@@ -155,7 +161,7 @@ The QEMU boot test is currently **non-blocking** (warning only) until the kernel
 
 ### ❌ `ABI check` fails
 
-```
+```text
 ❌ REMOVED (1 symbols — ABI BREAK): fn sigma_request_irq
 ```
 
@@ -163,17 +169,20 @@ The QEMU boot test is currently **non-blocking** (warning only) until the kernel
 
 - If removal is intentional: bump `kabi/src/version.rs`, run `python kabi/check.py snapshot`
 
+
 - If accidental: restore the symbol or add a compatibility shim
+
 
 ---
 
 ### ❌ `cross-build aarch64` fails
 
-```
+```text
 error[E0554]: #![feature(abi_x86_interrupt)] is not supported on aarch64
 ```
 
 **Fix:** Wrap x86-specific code in `#[cfg(target_arch = "x86_64")]`:
+
 ```rust
 #[cfg(target_arch = "x86_64")]
 pub unsafe fn sigma_pic_init(...) { ... }
@@ -236,9 +245,12 @@ If a fuzz crash is found:
 
 1. Download the crash input from the artifact
 
+
 2. Open an issue with label `bug` `security` `fuzz-found`
 
+
 3. Reference `SECURITY_POLICY.md` if it's a security-sensitive crash
+
 
 ---
 

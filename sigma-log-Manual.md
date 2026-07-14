@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-log <command> [options]
 sigma-log --version
 sigma-log --help
@@ -96,13 +96,13 @@ sigma-log export --format syslog --output syslog.log
 ## OPTIONS
 
 | Flag | Description |
-|------|-------------|
+| ------ | ------------- |
 | `--lines <n>` | Number of lines to show (default: 20) |
 | `--source <name>` | Filter by log source (e.g. `sigma-net`) |
-| `--level <l>` | Minimum log level: `trace\|debug\|info\|warn\|error\|critical` |
+| `--level <l>` | Minimum log level: `trace\ | debug\ | info\ | warn\ | error\ | critical` |
 | `--query <q>` | Search query string |
 | `--threshold <n>` | Anomaly detection sensitivity (default: 3) |
-| `--format <fmt>` | Export format: `json\|csv\|syslog` |
+| `--format <fmt>` | Export format: `json\ | csv\ | syslog` |
 | `--output <file>` | Write output to file |
 | `--no-color` | Disable ANSI colour codes |
 | `--json` | Machine-readable JSON output |
@@ -112,7 +112,7 @@ sigma-log export --format syslog --output syslog.log
 ## LOG LEVELS
 
 | Level | Colour | Description |
-|-------|--------|-------------|
+| ------- | -------- | ------------- |
 | TRACE | dim | Extremely verbose, kernel internals |
 | DEBUG | dim | Debugging information |
 | INFO  | green | Normal operational messages |

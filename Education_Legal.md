@@ -14,11 +14,12 @@ SigmaOS incorporates a complete educational and legal workstation suite. This in
 - **Secure API Workflows**: Encrypted API communications
 - **Compliance Tracking**: Automated compliance monitoring
 
+
 ## Architecture
 
 ### Legal Research Workflow
 
-```
+```text
  [User Search Query] ──► [Local SQLite Cache] ──► Found?
                                 │                  │
                         No ◄────┘                  ├──► Yes ──► Render Document
@@ -35,7 +36,7 @@ SigmaOS incorporates a complete educational and legal workstation suite. This in
 
 ### Component Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │      Education & Legal Suite           │
 │  ┌──────────┬──────────┬──────────────┐ │
@@ -239,12 +240,15 @@ impl LegalCache {
 ### GeoGebra Integration
 
 **Features**:
+
 - Dynamic mathematics software
 - Geometry, algebra, calculus
 - Interactive graphing
 - CAS (Computer Algebra System)
 
+
 **Configuration**:
+
 ```toml
 [geogebra]
 enabled = true
@@ -256,12 +260,15 @@ language = "en_US"
 ### Scilab Integration
 
 **Features**:
+
 - Numerical computation
 - Signal processing
 - Control systems
 - Optimization
 
+
 **Configuration**:
+
 ```toml
 [scilab]
 enabled = true
@@ -272,12 +279,15 @@ toolboxes = ["signal", "control", "optimization"]
 ### Octave Integration
 
 **Features**:
+
 - MATLAB-compatible
 - Numerical analysis
 - Linear algebra
 - Plotting and visualization
 
+
 **Configuration**:
+
 ```toml
 [octave]
 enabled = true
@@ -290,12 +300,15 @@ packages = ["signal", "control", "image"]
 ### Moodle LMS
 
 **Features**:
+
 - Learning management system
 - Course management
 - Student tracking
 - Assessment tools
 
+
 **Configuration**:
+
 ```toml
 [moodle]
 enabled = true
@@ -307,12 +320,15 @@ storage = "/var/lib/moodle"
 ### ERPNext
 
 **Features**:
+
 - Enterprise resource planning
 - Accounting and finance
 - HR management
 - Inventory management
 
+
 **Configuration**:
+
 ```toml
 [erpnext]
 enabled = true
@@ -324,12 +340,15 @@ storage = "/var/lib/erpnext"
 ### Koha Library System
 
 **Features**:
+
 - Integrated library system
 - Catalog management
 - Circulation control
 - Patron management
 
+
 **Configuration**:
+
 ```toml
 [koha]
 enabled = true
@@ -343,28 +362,36 @@ storage = "/var/lib/koha"
 ### Indian Kanoon Integration
 
 **Features**:
+
 - Case law search
 - Judgment retrieval
 - Statute lookup
 - Legal document caching
 
+
 **API Endpoints**:
+
 - `/search/`: Search for cases
 - `/act/{act_name}`: Retrieve statute
 - `/doc/{doc_id}`: Retrieve document
 
+
 ### SCC Online Integration
 
 **Features**:
+
 - Supreme Court cases
 - High Court cases
 - Legal commentary
 - Case analysis
 
+
 **API Endpoints**:
+
 - `/api/search/`: Search cases
 - `/api/document/{id}`: Retrieve document
 - `/api/analysis/{id}`: Case analysis
+
 
 ## Compliance
 
@@ -429,12 +456,14 @@ pub struct AuditEntry {
 3. **Security**: Encrypt all sensitive data
 4. **Caching**: Implement effective caching strategies
 
+
 ### Configuration
 
 1. **API Keys**: Secure API key management
 2. **Rate Limiting**: Respect API rate limits
 3. **Cache Expiry**: Set appropriate cache expiry
 4. **Localization**: Enable proper localization
+
 
 ### Compliance
 
@@ -443,31 +472,40 @@ pub struct AuditEntry {
 3. **Access Control**: Implement proper access controls
 4. **Regular Updates**: Keep legal databases updated
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Base packages compiled (GeoGebra, Scilab, Octave, QGIS)
 - Basic legal engine implementation
 - API integration for Indian Kanoon
 - Local cache setup
 
+
 ### Phase 2 (Months 3-6)
+
 - SQL database cache and schema design
 - Offline statute indices
 - SCC Online integration
 - Advanced search capabilities
 
+
 ### Phase 3 (Months 6-9)
+
 - Case management application
 - Court filing automation
 - Compliance tracking
 - Audit logging system
 
+
 ### Phase 4 (Months 9-12)
+
 - SCC Online enterprise integration
 - Custom SSO gateways
 - Advanced compliance features
 - Legal document analysis
+
 
 ## References
 

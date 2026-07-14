@@ -9,7 +9,7 @@
 ## Current Modularisation State
 
 | Area | State | Gap |
-|------|-------|-----|
+| ------ | ------- | ----- |
 | 600-shard lattice design | ✅ Documented | No runtime shard loader |
 | SDF Ring-3 driver isolation | ✅ Framework | No actual Ring-3 launch mechanism |
 | sigma-bus IPC between modules | ⚠️ Header only | No capability token passing |
@@ -61,7 +61,7 @@ struct SigmaShardManifest {
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma_shard.h` header | `include/sigma_shard.h` | `kernel-exp` | Defines `SigmaShardManifest` struct |
 | `.sigma_shards` ELF section | `linker.ld` | `kernel-exp` | Collect all shard manifests at link time |
 | Shard loader at boot | `kernel/core/sigma_shard_loader.cpp` | `kernel-exp` | Walk `.sigma_shards` section, call `init()` in topo order |
@@ -71,7 +71,7 @@ struct SigmaShardManifest {
 
 ### SL2 — Shard Categories & Hierarchy
 
-```
+```text
 Level 0 — Microkernel core (always present, cannot be unloaded):
   sigma-sched   sigma-mm      sigma-irq    sigma-timer
   sigma-bus     sigma-caps    sigma-audit  sigma-boot
@@ -94,7 +94,7 @@ Level 4 — Optional extensions (user-installed via sigma-pkg):
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Level 0 shard manifests | `kernel/core/shards/` | `kernel-exp` | Declare manifests for all 8 microkernel shards |
 | Level 1 auto-detect via sigma-dna | `hal/sigma_dna.cpp` | `drivers-dev` | CPUID/PCI probe → load correct driver shard |
 | Level 2 by profile | `init/sigma_profile_selector.cpp` | all | Profile manifest lists required Level 2 shards |
@@ -105,7 +105,7 @@ Level 4 — Optional extensions (user-installed via sigma-pkg):
 
 Every shard declares what capabilities it needs. The kernel grants only those.
 
-```
+```text
 Capability token system:
   sigma.cap.net.tx          — transmit packets
   sigma.cap.net.rx          — receive packets
@@ -121,7 +121,7 @@ Capability token system:
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Capability token definitions | `include/sigma_caps.h` | `kernel-exp` | 32-bit bitmask per capability category |
 | Capability grant at shard init | `kernel/security/sigma_caps.cpp` | `kernel-exp` | Kernel grants declared caps, denies others |
 | Capability check on sigma-bus call | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Every IPC: verify caller has required cap |
@@ -165,7 +165,7 @@ option(SIGMA_ENABLE_RUST "Enable Rust components" OFF)
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Profile CMake guards for every subsystem | `CMakeLists.txt` | all | `if(SIGMA_ENABLE_ZENITH)` around all Zenith source |
 | `make check-profile` target | `Makefile` | all | Verify binary only contains expected shards |
 | Profile size budget CI gate | `.github/workflows/sigma_ci.yml` | all | microkernel image < 512 KB enforced |
@@ -207,7 +207,7 @@ if (sigma_feature_available("INDIA_STACK")) {
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma_features.h` compile-time flags | `include/sigma_features.h` | all | Mirror of `sigma_features.json` as `#define` |
 | `sigma_feature_available()` runtime | `kernel/core/sigma_features.cpp` | `kernel-exp` | Read feature bitmask set at boot by profile selector |
 | `sigma-cli features list` command | `userland/tools/sigma_cli.cpp` | `tools-dev` | Show all features, which are enabled |
@@ -238,7 +238,7 @@ sigma-shard unload sigma-gamemode
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `.shard` ELF shared object format | `include/sigma_shard.h` | `kernel-exp` | PIC ELF + `SigmaShardManifest` in `.sigma_shards` section |
 | Shard loader (dlopen equivalent) | `kernel/core/sigma_shard_loader.cpp` | `kernel-exp` | Map shard ELF into kernel address space |
 | Shard unloader (safe) | `kernel/core/sigma_shard_loader.cpp` | `kernel-exp` | Quiesce shard: drain sigma-bus queue, call `shutdown()` |
@@ -262,7 +262,7 @@ sigma-perf kpatch rollback <id>    # revert a patch
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | kpatch function redirect | `kernel/kpatch/sigma_kpatch.cpp` | `performance-optimized` | Write JMP instruction at function entry |
 | kpatch signature verify | `kernel/kpatch/sigma_kpatch.cpp` | `performance-optimized` | ML-DSA-87: reject unsigned patches |
 | kpatch apply CI test | `tests/integration/test_kpatch.sh` | `performance-optimized` | Apply patch → verify function redirected → rollback |
@@ -288,7 +288,7 @@ SIGMA_OPTIONAL_DEP("sigma-ipv6");   // optional IPv6
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `SIGMA_DEPENDS_ON` macro | `include/sigma_module_deps.h` | all | Emit dependency record in `.sigma_deps` ELF section |
 | Dependency validator script | `scripts/check_deps.py` | all | Walk `.sigma_deps`, verify all deps satisfied for profile |
 | Circular dependency detection | `scripts/check_deps.py` | all | Topological sort — fail if cycle detected |
@@ -310,7 +310,7 @@ SIGMA_DEPRECATED sigma_err_t sigma_sys_old_socket(int domain, int type);
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `SIGMA_STABLE` / `SIGMA_EXPERIMENTAL` / `SIGMA_DEPRECATED` macros | `include/sigma_abi.h` | `tools-dev` | Attribute macros + ABI version embedding |
 | `make check-abi` — symbol diff | `Makefile` | `tools-dev` | `nm` diff: fail if SIGMA_STABLE symbol changed signature |
 | ABI stability CI gate | `.github/workflows/sigma_ci.yml` | all | Block merge if ABI broken |
@@ -361,7 +361,7 @@ extern "C" void       sigma_app_destroy(ISigmaApp* app);
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma_app_plugin.h` | `include/sigma_app_plugin.h` | `tools-dev` | Full `ISigmaApp` interface |
 | App loader (dlopen equivalent) | `userland/daemons/sigma_appd.cpp` | `release/standalone` | Load `.spkg` app shared object, call `sigma_app_create()` |
 | App registry daemon | `userland/daemons/sigma_appd.cpp` | `release/standalone` | Maintain list of loaded apps, route CLI/GUI requests |
@@ -392,7 +392,7 @@ sigma_bus_subscribe(
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Capability-gated subscribe | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Reject subscribe if caller lacks required cap |
 | Message schema validation | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Validate payload against topic schema |
 | Topic schema registry | `include/sigma_bus_topics.h` | `tools-dev` | All topic names + payload structs in one header |
@@ -429,7 +429,7 @@ sigma_log_structured(SIGMA_LOG_INFO, "sigma-ca",
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Structured log format | `include/sigma_log.h` | `tools-dev` | JSON lines: `{"ts":1234,"level":"info","comp":"sigma-ca","msg":"..."}` |
 | Log level filtering per component | `kernel/core/sigma_log.cpp` | `tools-dev` | `SIGMA_LOG_LEVEL_sigma-ca=debug` env var |
 | Log routing to sigma-audit | `kernel/core/sigma_log.cpp` | all | ERROR/FATAL → DID-signed audit entry |
@@ -446,7 +446,7 @@ sigma_log_structured(SIGMA_LOG_INFO, "sigma-ca",
 
 Every module must have its own test directory:
 
-```
+```text
 tests/
   kernel/
     test_sched.cpp       # sigma-sched tests
@@ -480,7 +480,7 @@ tests/
 ```
 
 | Gate | CI check | Branch | Target |
-|------|---------|--------|--------|
+| ------ | --------- | -------- | -------- |
 | Every module has test file | `scripts/check_test_coverage.sh` | all | No module directory without matching `test_*.cpp` |
 | Module test run in isolation | `tests/Makefile` | all | Each test links only against its module |
 | Mock injection for dependencies | Test pattern | all | Use `ICryptoProvider` mock in CA tests |
@@ -490,7 +490,7 @@ tests/
 ### MQ2 — Module Size Budget
 
 | Module | Max binary size | Current | Target |
-|--------|----------------|---------|--------|
+| -------- | ---------------- | --------- | -------- |
 | sigma-sched (microkernel) | 32 KB | Unknown | < 32 KB |
 | sigma-mm (microkernel) | 48 KB | Unknown | < 48 KB |
 | sigma-net-tcp | 64 KB | Unknown | < 64 KB |
@@ -541,7 +541,7 @@ $ sigma-pkg install sigma-foo
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Fuzzy package name suggestion | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Levenshtein distance 1–2 from known packages |
 | "Did you mean?" for all CLI | `userland/tools/sigma_cli.cpp` | `tools-dev` | Apply to every "not found" error |
 | Contextual help on error | `userland/tools/sigma_cli.cpp` | `tools-dev` | Every error code → human message + next steps |
@@ -579,7 +579,7 @@ sigma-ca --help --expert  # internal flags too
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Default "simple" mode | All CLI tools | `release/standalone` | Only show 5 most common options by default |
 | `--verbose` unlocks more options | All CLI tools | `release/standalone` | `--help --verbose` shows all flags |
 | Sensible defaults everywhere | All CLI tools | `tools-dev` | Assume current year, current GSTIN from profile |
@@ -593,18 +593,23 @@ sigma-ca --help --expert  # internal flags too
 
 1. Boot SigmaOS → language selection (30 s)
 
+
 2. Scan DID QR → ABHA linked (60 s)
+
 
 3. Profile auto-suggested by profession (30 s)
 
+
 4. sigma-pkg install sigma-ca (60 s)
 
+
 5. sigma-ca dashboard opens (30 s)
+
 Total: < 4 minutes to first profession app running
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Onboarding timer CI | `tests/ui/test_oobe_time.sh` | `prepare-sigmaos-launch` | Assert OOBE completes in < 4 minutes |
 | Profile suggestion accuracy | `userland/installer/sigma_oobe.cpp` | `release/standalone` | 90% correct profession suggestion from DigiLocker |
 | First-run app auto-launch | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `release/standalone` | After OOBE: sigma-ca opens automatically for CA |
@@ -639,7 +644,7 @@ struct SigmaCronJob {
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Cron expression parser | `userland/daemons/sigma_cron.cpp` | `tools-dev` | Parse `* * * * *` + @special tokens |
 | APIC timer wakeup | `userland/daemons/sigma_cron.cpp` | `kernel-exp` | Sleep until `next_run`, wake via sigma-bus timer event |
 | Job execution via sigma-sh | `userland/daemons/sigma_cron.cpp` | `tools-dev` | Fork sigma-sh, exec command, capture stdout/stderr |
@@ -683,7 +688,7 @@ timeout = 10
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Hook config TOML parser | `userland/daemons/sigma_hook.cpp` | `tools-dev` | Parse `sigma-hooks.conf`, register sigma-bus subscriptions |
 | sigma-bus event subscription | `userland/daemons/sigma_hook.cpp` | `kernel-exp` | Subscribe to each event topic |
 | Command execution with timeout | `userland/daemons/sigma_hook.cpp` | `tools-dev` | Fork + exec + kill if exceeds timeout |
@@ -710,7 +715,7 @@ sigma-perf flame ./sigma-ca       # flamegraph
 ### Known hot paths that need optimisation:
 
 | Hot path | Current cost | Target | Optimisation |
-|----------|-------------|--------|-------------|
+| ---------- | ------------- | -------- | ------------- |
 | sigma-bus message dispatch | Unknown | < 100 ns | Lock-free MPSC queue |
 | VFS path lookup | Unknown | < 200 ns | Directory entry cache |
 | `sigma_accounts_post()` | Unknown | < 5 ms / 10K invoices | Batch insert, single transaction |
@@ -741,7 +746,7 @@ struct sigma_task_t {
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `sigma_task_t` hot-fields-first | `kernel/sched/sigma_sched.h` | `performance-optimized` | Pid/state/priority in first cache line |
 | `sigma_account_t` hot path | `userland/apps/sigma-accounts/sigma_accounts.h` | `release/standalone` | Balance/type in first 8 bytes |
 | sigma-bus message hot fields | `kernel/ipc/sigma_bus.h` | `kernel-exp` | Topic hash + payload ptr in first cache line |
@@ -755,7 +760,7 @@ struct sigma_task_t {
 All roadmap documents with their primary dimensions:
 
 | Doc | Primary dimensions | Lines |
-|-----|--------------------|-------|
+| ----- | -------------------- | ------- |
 | Quality-Stability-Performance-Roadmap | Stability, Performance, Quality, UX, Security, Accessibility, DX | ~1,000 |
 | Stability-Performance-Extended | Energy, Reliability, Observability, Release, Network QA, India QA, Hardware | ~900 |
 | Compatibility-Automation-Personalisation-Roadmap | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ~700 |

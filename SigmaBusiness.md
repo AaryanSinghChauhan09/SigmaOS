@@ -5,7 +5,9 @@
 ## Features
 
 ### SigmaCRM (Customer Relationship Management)
+
 Customer relationship management:
+
 - Contact and lead management
 - Sales pipeline tracking
 - Opportunity management
@@ -17,8 +19,11 @@ Customer relationship management:
 - Customer segmentation
 - Mobile CRM app
 
+
 ### SigmaAccounting (Accounting & Finance)
+
 Ledger, invoicing, and expenses:
+
 - Double-entry bookkeeping
 - General ledger and chart of accounts
 - Accounts payable and receivable
@@ -30,8 +35,11 @@ Ledger, invoicing, and expenses:
 - Multi-currency support
 - AI-powered anomaly detection for fraud
 
+
 ### SigmaInventory (Inventory Management)
+
 Comprehensive inventory tracking:
+
 - Product catalog management
 - Stock level monitoring
 - Purchase order management
@@ -43,8 +51,11 @@ Comprehensive inventory tracking:
 - Inventory valuation (FIFO, LIFO, weighted average)
 - AI-powered demand forecasting
 
+
 ### SigmaHR (Human Resources)
+
 Human resources management:
+
 - Employee records and profiles
 - Attendance and time tracking
 - Payroll processing
@@ -56,8 +67,11 @@ Human resources management:
 - Compliance and reporting
 - AI-powered talent matching
 
+
 ### SigmaProjects (Project Management)
+
 Project management and tracking:
+
 - Project planning and scheduling
 - Task management and assignment
 - Gantt charts and timelines
@@ -68,9 +82,10 @@ Project management and tracking:
 - Project reporting and analytics
 - AI-powered risk assessment
 
+
 ## Architecture
 
-```
+```text
 SigmaBusiness Suite
    ├─ SigmaCRM (CRM engine)
    │   ├─ Contact database
@@ -146,6 +161,7 @@ int sigma_projects_generate_report(const char *project_id, project_report_t *rep
 - **SigmaFS Integration**: Document storage with SovereignFS snapshots
 - **Zenith Desktop Integration**: Native Zenith UI with dashboards and reports
 
+
 ## Compliance
 
 - **GST Compliance**: Indian GST filing and reporting (GSTR-1, GSTR-3B)
@@ -154,10 +170,11 @@ int sigma_projects_generate_report(const char *project_id, project_report_t *rep
 - **Labor Laws**: Compliance with local labor regulations
 - **Data Privacy**: GDPR and local data protection law compliance
 
+
 ## Performance Characteristics
 
 | Module | Concurrent Users | Data Size | Real-time Updates |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SigmaCRM | 1000+ | 10GB+ | ✅ Yes |
 | SigmaAccounting | 500+ | 100GB+ | ✅ Yes |
 | SigmaInventory | 1000+ | 50GB+ | ✅ Yes |
@@ -177,6 +194,7 @@ int sigma_projects_generate_report(const char *project_id, project_report_t *rep
 - [ ] Mobile apps (SigmaOS Mobile, iOS, Android)
 - [ ] Web interface (SigmaOS Cloud)
 - [ ] Multi-tenant SaaS version
+
 
 ## Related Modules
 

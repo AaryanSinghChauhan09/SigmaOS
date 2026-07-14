@@ -219,27 +219,33 @@ sigma_admin_system_info_manager() -> *mut SystemInfoManager
 ## CLI Usage
 
 ```bash
+
 # User management
+
 sigma-admin user create --username john --shell /bin/bash
 sigma-admin user delete --username john
 sigma-admin user list
 
 # Network management
+
 sigma-admin network list
 sigma-admin network configure --interface eth0 --ip 192.168.1.100
 sigma-admin network enable --interface eth0
 
 # Storage management
+
 sigma-admin storage list
 sigma-admin storage mount --device /dev/sda1 --mountpoint /mnt/data
 sigma-admin storage format --device /dev/sda1 --filesystem ext4
 
 # Service management
+
 sigma-admin service list
 sigma-admin service start --name nginx
 sigma-admin service enable --name nginx
 
 # System information
+
 sigma-admin system info
 sigma-admin system set-hostname --name sigmaos-desktop
 ```
@@ -258,30 +264,37 @@ The GUI Control Center provides:
 - **Security Panel** - Firewall, MAC policies
 - **Updates Panel** - System updates and package management
 
+
 ### Dashboard
 
 Unified dashboard showing:
+
 - System resource usage
 - Network status
 - Service status
 - Recent logs
 - Security alerts
 
+
 ## Integration
 
 ### Package Manager
 
 SigmaAdmin integrates with the package manager for:
+
 - Software installation/removal
 - System updates
 - Dependency management
 
+
 ### Security System
 
 SigmaAdmin integrates with the MAC policy engine for:
+
 - Security policy management
 - Capability management
 - Audit log viewing
+
 
 ## Future Enhancements
 
@@ -290,6 +303,7 @@ SigmaAdmin integrates with the MAC policy engine for:
 - **Templates** - Pre-configured system profiles
 - **Backup/Restore** - System configuration backup
 - **Cluster Management** - Multi-node administration
+
 
 ## References
 

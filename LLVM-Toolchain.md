@@ -9,7 +9,7 @@ SigmaOS uses **LLVM/Clang** as its primary C/C++ toolchain for components that r
 ## Use Cases
 
 | Optimization | Tool | Benefit |
-|---|---|---|
+| --- | --- | --- |
 | Link-Time Optimization | Clang LTO / ThinLTO | Cross-TU inlining, dead code elimination |
 | Profile-Guided Optimization | Clang PGO (`-fprofile-generate`) | Branch layout from real workloads |
 | BOLT post-link | `llvm-bolt` | Function reordering from perf data |
@@ -145,6 +145,8 @@ llvm-bolt sigma-kernel.elf \
 
 - `make sigma-kernel.elf CFLAGS="-Os -flto=thin"` succeeds; binary is ≥10% smaller than non-LTO build.
 
+
 - `clang --target=aarch64-linux-musl -Os kernel/main.c` cross-compiles without errors.
+
 
 - BOLT-optimized kernel boots in QEMU and shows reduced cold-start time in benchmarks.

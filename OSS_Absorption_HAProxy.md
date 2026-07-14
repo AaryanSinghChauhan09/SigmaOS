@@ -19,7 +19,9 @@ SigmaOS absorbs HAProxy's **non-blocking event loops** and **dynamic weight-base
 Instead of context-switching to userspace to balance requests, SigmaOS utilizes HAProxy-inspired routing loops implemented natively inside the kernel's networking layer via eBPF/XDP.
 
 ```bash
+
 # Register a service load balancer
+
 $ sigma net balancer create web-service --backends 10.0.0.2:80,10.0.0.3:80
 Σ [NET] Load balancer initialized. Alg: Round-Robin.
   Incoming traffic on port 80 balanced across 2 backends.

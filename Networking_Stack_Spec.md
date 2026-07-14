@@ -2,7 +2,7 @@
 
 ## Layer Model
 
-```
+```text
 Application (sigma-curl, sigma-ssh, sigma-pkg)
   │  POSIX-like socket API (sigma_connect, sigma_bind, sigma_send, sigma_recv)
   ▼
@@ -26,15 +26,21 @@ The zero-copy path eliminates intermediate copies for large data transfers:
 
 1. **NIC DMA** fills an RX descriptor ring slot directly into a kernel-mapped physical page.
 
+
 2. **SigmaSmoltcpDevice::receive()** returns the physical page pointer — no copy.
+
 
 3. **smoltcp** processes IP/TCP headers in-place.
 
+
 4. **sigma-net** maps the page into the receiving app's address space using `sigma_map_shared`.
+
 
 5. App reads data directly from the shared page.
 
+
 6. App signals completion; kernel releases the page back to the DMA ring.
+
 
 Memory copies: **zero** between NIC DMA and application read.
 
@@ -42,7 +48,7 @@ Memory copies: **zero** between NIC DMA and application read.
 
 ## TLS 1.3 + Kyber-1024 Hybrid: Handshake
 
-```
+```text
 Client                                 Server
   │                                       │
   │── ClientHello ──────────────────────► │
@@ -69,7 +75,7 @@ Client                                 Server
 
 ## DNS / DoH Pipeline
 
-```
+```text
 App: resolve("registry.sigmaos.dev")
   │
   ▼
@@ -129,7 +135,7 @@ The compiled XDP program is loaded via aya and attached to the NIC's XDP hook, p
 ## Benchmark Targets
 
 | Metric | Target |
-|---|---|
+| --- | --- |
 | TCP throughput (loopback) | > 10 Gbps |
 | TCP latency (loopback, p99) | < 50 µs |
 | TLS 1.3 handshake time | < 5 ms |

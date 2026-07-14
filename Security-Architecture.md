@@ -7,7 +7,7 @@ SigmaOS implements a 6-layer security model with each layer independently provid
 ## The 6 Layers
 
 | Layer | Mechanism | Status | Source |
-|-------|-----------|--------|--------|
+| ------- | ----------- | -------- | -------- |
 | 1 | Ring-3 driver isolation | ✅ | `drivers/ddk/sigma_ddk.rs` |
 | 2 | sigma_pledge + sigma_unveil | ✅ | `kernel/security/sigma_pledge.rs` |
 | 3 | Linux capabilities (41 caps) | ✅ | `kernel/security/sigma_capability.rs` |
@@ -96,7 +96,7 @@ sigma_cgroup_attach(cgroup, container_pid);
 All crypto is quantum-safe by default:
 
 | Purpose | Algorithm | Security Level |
-|---------|-----------|---------------|
+| --------- | ----------- | --------------- |
 | TLS key exchange | ML-KEM-1024 (Kyber) | 256-bit quantum |
 | Package signing | ML-DSA-87 (Dilithium) | 256-bit quantum |
 | Boot verification | ML-DSA-87 | 256-bit quantum |
@@ -109,7 +109,7 @@ NIST FIPS 203 (ML-KEM) and FIPS 204 (ML-DSA) finalized standards.
 ## Attack Surface Comparison
 
 | Attack | Windows | Linux | SigmaOS |
-|--------|---------|-------|---------|
+| -------- | --------- | ------- | --------- |
 | Driver exploit → kernel | ✅ direct | ✅ direct | ❌ ring-3 isolated |
 | Compromised process reads files | ✅ allowed | ✅ allowed | ❌ sigma_unveil blocks |
 | Malicious package | 🔄 antivirus | 🔄 package signing | ❌ Dilithium-5 + verity |

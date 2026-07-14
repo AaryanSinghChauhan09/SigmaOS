@@ -15,11 +15,12 @@ SigmaOS implements a declarative, reproducible package management ecosystem (`si
 - **Signed Repositories**: GPG-signed packages and repositories
 - **SBOM Generation**: Software Bill of Materials for all packages
 
+
 ## Architecture
 
 ### Package Management Flow
 
-```
+```text
  [declarative.sigma configuration]
                  │
                  ▼
@@ -40,7 +41,7 @@ SigmaOS implements a declarative, reproducible package management ecosystem (`si
 
 ### Content-Addressed Store
 
-```
+```text
 /var/lib/sigpkg/store/
 ├── nix/
 │   └── store/
@@ -251,7 +252,7 @@ impl ContentAddressedStore {
 
 ### A/B Partition Layout
 
-```
+```text
 /dev/sda1  EFI System Partition
 /dev/sda2  Boot Partition
 /dev/sda3  System A (Current)
@@ -336,7 +337,7 @@ impl ImmutableUpdater {
 
 ### Repository Structure
 
-```
+```text
 https://pkg.sigmaos.org/stable/
 ├── repo-index.json
 ├── repo-index.json.sig
@@ -376,63 +377,83 @@ https://pkg.sigmaos.org/stable/
 ### Package Operations
 
 ```bash
+
 # Install package
+
 sigpkg install core-utils
 
 # Remove package
+
 sigpkg remove core-utils
 
 # Update package
+
 sigpkg update core-utils
 
 # Update all packages
+
 sigpkg upgrade
 
 # Search packages
+
 sigpkg search python
 
 # Package information
+
 sigpkg info core-utils
 
 # List installed packages
+
 sigpkg list
 ```
 
 ### System Operations
 
 ```bash
+
 # Apply system profile
+
 sigpkg apply /etc/sigpkg/system.sigma
 
 # Rollback to previous generation
+
 sigpkg rollback
 
 # List generations
+
 sigpkg generations
 
 # Show diff between generations
+
 sigpkg diff 1 2
 
 # Garbage collect old generations
+
 sigpkg gc
 ```
 
 ### Repository Operations
 
 ```bash
+
 # Add repository
+
 sigpkg repo add stable https://pkg.sigmaos.org/stable
 
 # Remove repository
+
 sigpkg repo remove stable
 
 # Update repository
+
 sigpkg repo update stable
 
 # List repositories
+
 sigpkg repo list
 
 # Verify repository
+
 sigpkg repo verify stable
 ```
 
@@ -446,6 +467,7 @@ sigpkg repo verify stable
 4. **Documentation**: Provide comprehensive documentation
 5. **Testing**: Include test cases
 
+
 ### System Configuration
 
 1. **Version Control**: Keep system configuration in version control
@@ -453,6 +475,7 @@ sigpkg repo verify stable
 3. **Incremental Changes**: Make incremental changes
 4. **Testing**: Test changes in VM before applying
 5. **Backups**: Keep backups of important data
+
 
 ### Security
 
@@ -462,31 +485,40 @@ sigpkg repo verify stable
 4. **Regular Updates**: Keep packages updated
 5. **Audit Logs**: Review audit logs regularly
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Declarative profile parser
 - Local Content-Addressed symlinking engine
 - Basic package operations
 - CLI implementation
 
+
 ### Phase 2 (Months 3-6)
+
 - Immutable root file system mounting
 - A/B boot partition switching
 - Repository management
 - GPG signature verification
 
+
 ### Phase 3 (Months 6-9)
+
 - Signed repository manifest validation
 - SBOM generation
 - Dependency resolution
 - Transaction rollback
 
+
 ### Phase 4 (Months 9-12)
+
 - Automated rollbacks on health-check failures
 - Build farm integration
 - Automated testing
 - Performance optimization
+
 
 ## References
 

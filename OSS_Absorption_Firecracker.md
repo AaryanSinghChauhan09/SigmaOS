@@ -1,4 +1,5 @@
 # SigmaOS Virtualization Absorption - Firecracker
+
 ## Making firecracker-microvm/firecracker Irrelevant
 
 > **Absorption Target**: https://github.com/firecracker-microvm/firecracker  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Firecracker by implementing a native microVM 
 ## Absorbed Features & Capabilities
 
 ### 1. MicroVM Architecture
+
 **Original**: Firecracker's microVM design  
 **SigmaOS**: Native microVM with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaVM {
 ```
 
 **MicroVM Features**:
+
 - Native microVM with OS-level optimization
 - Minimal overhead with stripped-down kernel
 - Fast boot with sub-second startup
@@ -36,11 +39,14 @@ pub struct SigmaVM {
 - MicroVM validation with automatic checking
 - MicroVM monitoring with real-time metrics
 
+
 ### 2. Jailer System
+
 **Original**: Firecracker's jailer for isolation  
 **SigmaOS**: Native jailer with enhanced features
 
 **Jailer Features**:
+
 - Native jailer with capability-based isolation
 - Resource limiting with hardware enforcement
 - Network namespace isolation with automatic configuration
@@ -48,11 +54,14 @@ pub struct SigmaVM {
 - Jailer validation with automatic checking
 - Jailer monitoring with real-time metrics
 
+
 ### 3. Machine Configuration
+
 **Original**: Firecracker's machine configuration  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
+
 - Native configuration with type safety
 - Firecracker-compatible configuration with automatic conversion
 - Real-time configuration reload
@@ -60,11 +69,14 @@ pub struct SigmaVM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
+
 ### 4. Boot Source
+
 **Original**: Firecracker's boot source management  
 **SigmaOS**: Native boot with enhanced features
 
 **Boot Features**:
+
 - Native boot source management with OS-level optimization
 - Kernel boot with automatic configuration
 - Root filesystem with automatic mounting
@@ -72,11 +84,14 @@ pub struct SigmaVM {
 - Boot validation with automatic checking
 - Boot monitoring with real-time metrics
 
+
 ### 5. Network Interface
+
 **Original**: Firecracker's network interface  
 **SigmaOS**: Native network with enhanced features
 
 **Network Features**:
+
 - Native network interface with OS-level optimization
 - TAP/TUN support with automatic detection
 - Network filtering with hardware acceleration
@@ -84,11 +99,14 @@ pub struct SigmaVM {
 - Network validation with automatic checking
 - Network monitoring with real-time metrics
 
+
 ### 6. vsock Interface
+
 **Original**: Firecracker's vsock interface  
 **SigmaOS**: Native vsock with enhanced features
 
 **vsock Features**:
+
 - Native vsock interface with OS-level optimization
 - Host-guest communication with zero-copy
 - vsock profiles with automatic switching
@@ -96,12 +114,13 @@ pub struct SigmaVM {
 - vsock monitoring with real-time metrics
 - vsock composition with inheritance
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Firecracker | SigmaOS | Advantage |
-|---------|-------------|---------|------------|
+| --------- | ------------- | --------- | ------------ |
 | MicroVM Performance | Rust overhead | Native OS-level | ✅ 2-3x |
 | Boot Performance | Sub-second | Sub-100ms | ✅ 2x |
 | Jailer Performance | cgroup overhead | Native capability | ✅ 3x |
@@ -116,6 +135,7 @@ pub struct SigmaVM {
 ## Implementation Details
 
 ### Native MicroVM Manager
+
 ```rust
 pub mod microvm {
     use sigma_vm::microvm::MicroVMManager;
@@ -139,6 +159,7 @@ pub mod microvm {
 ```
 
 ### Native Jailer
+
 ```rust
 pub mod jailer {
     pub struct Jailer {
@@ -166,26 +187,36 @@ pub mod jailer {
 ### For Users of Firecracker
 
 **Before** (using Firecracker):
+
 ```bash
+
 # Install Firecracker
+
 # Download and install Firecracker
 
 # Create microVM config
+
 # Create firecracker.json
 
 # Run microVM
+
 firecracker --config-file firecracker.json
 ```
 
 **After** (using SigmaVM):
+
 ```bash
+
 # Enable VM shard (native)
+
 sigma-shard enable virtualization
 
 # Use Firecracker-compatible configuration
+
 sigma-vm create --firecracker-compatible --config config.sigma
 
 # Run microVM
+
 sigma-vm run --name mymicrovm
 ```
 
@@ -194,7 +225,7 @@ sigma-vm run --name mymicrovm
 ## Performance Benchmarks
 
 | Operation | Firecracker | SigmaVM | Improvement |
-|-----------|-------------|---------|-------------|
+| ----------- | ------------- | --------- | ------------- |
 | MicroVM Boot | 150ms | 50ms | 3x faster |
 | Memory Overhead | 50MB | 20MB | 2.5x less |
 | CPU Overhead | 5% | 2% | 2.5x less |

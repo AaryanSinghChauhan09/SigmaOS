@@ -10,11 +10,15 @@ The Nanotech Scientist Profile is designed for nanotechnology excellence, nanosc
 
 - **SigmaNano**: Nanomaterial characterization and analysis.
 
+
 - **SigmaFabrication**: Nanofabrication process management.
+
 
 - **SigmaSimulation**: Nanoscale simulation and modeling.
 
+
 - **Safety**: Nanomaterial safety and compliance tracking.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Nanotech Scientist Profile is designed for nanotechnology excellence, nanosc
 
 - **Theme**: Nanotech Purple (Research Standard)
 
+
 - **Layout**: Nanotech Dashboard (Nano, Fabrication, Simulation)
 
+
 - **Personalization**: Custom fabrication protocols and automated safety alerts.
+
 
 ---
 

@@ -13,6 +13,7 @@ Unlike the Linux kernel where maintainers prune legacy drivers, SigmaOS maintain
 3. **Emulation Fallback** - Hardware too old to maintain natively runs via emulation
 4. **Community Maintained** - Contributors can maintain and fork legacy drivers
 
+
 ## Architecture
 
 ### Legacy Driver Metadata
@@ -34,48 +35,64 @@ pub struct LegacyDriverMetadata {
 ### Supported Legacy Drivers
 
 #### Storage
+
 - **Floppy Disk Driver** - 1.44MB, 2.88MB floppy drives
 - **IDE/PATA Driver** - Legacy IDE controllers
 - **SCSI Driver** - Old SCSI controllers
 
+
 #### Input
+
 - **PS/2 Keyboard Driver** - Legacy PS/2 keyboards
 - **PS/2 Mouse Driver** - Legacy PS/2 mice
 - **Serial Mouse Driver** - Serial port mice
 - **Game Port Driver** - Legacy game controllers
 
+
 #### Display
+
 - **VGA Driver** - Standard VGA text mode
 - **EGA Driver** - Enhanced Graphics Adapter
 - **CGA Driver** - Color Graphics Adapter
 - **Legacy GPU Drivers** - VIA, SiS, Matrox, S3
 
+
 #### Audio
+
 - **Sound Blaster 16** - Classic sound card
 - **AdLib Driver** - Early sound card
 - **PC Speaker Driver** - System speaker audio
 
+
 #### Network
+
 - **NE2000 Driver** - Classic Ethernet card
 - **3Com 3C509** - Legacy network card
 - **Token Ring Driver** - IBM Token Ring
 
+
 ## Driver Lifecycle
 
 ### Active Drivers
+
 - Regularly maintained with updates
 - Security patches applied
 - Performance improvements
 
+
 ### Legacy Drivers
+
 - Frozen but still loadable
 - No new features added
 - Critical security fixes only
 
+
 ### Emulated Drivers
+
 - Hardware too rare to maintain natively
 - Runs via QEMU-like emulation
 - Full compatibility through virtualization
+
 
 ## Integration with Modern Kernel
 
@@ -108,7 +125,7 @@ pub fn detect_capabilities(driver: &LegacyDriver) -> DriverCapabilities {
 
 The legacy driver registry organizes drivers by category:
 
-```
+```text
 drivers/legacy/
 ├── storage/
 │   ├── floppy.rs
@@ -184,6 +201,7 @@ Legacy drivers are tested in QEMU/VMs:
 - Test all driver operations
 - Verify compatibility with modern kernel
 
+
 ### Compatibility Scoring
 
 Each driver receives a compatibility score:
@@ -192,6 +210,7 @@ Each driver receives a compatibility score:
 - **80-94%** - Minor limitations
 - **60-79%** - Some features broken
 - **<60%** - Major limitations
+
 
 ### Known Issues
 
@@ -212,17 +231,20 @@ The SigmaOS Foundation ensures no driver is ever dropped:
 - Archive maintenance funded
 - Community incentives for maintenance
 
+
 ### Driver Lifecycle Policy
 
 1. **Active** → Maintained with updates
 2. **Legacy** → Frozen but available
 3. **Emulated** → Supported via virtualization
 
+
 ### Contributor Incentives
 
 - Bounties for maintaining old drivers
 - Hackathons for porting new drivers
 - Recognition for legacy driver work
+
 
 ## Documentation
 
@@ -234,12 +256,14 @@ Each legacy driver includes:
 - Testing procedures
 - Compatibility matrix
 
+
 ## Future Enhancements
 
 - **AI-Assisted Porting** - Use AI to help port legacy drivers
 - **Community Repository** - Allow users to contribute legacy drivers
 - **Automatic Testing** - CI for legacy driver compatibility
 - **Emulation Improvements** - Better performance for emulated drivers
+
 
 ## References
 

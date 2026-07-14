@@ -1,4 +1,5 @@
 # SigmaOS ML Framework Absorption - Scikit-Learn
+
 ## Making scikit-learn/scikit-learn Irrelevant
 
 > **Absorption Target**: https://github.com/scikit-learn/scikit-learn  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed scikit-learn by implementing a native machine
 ## Absorbed Features & Capabilities
 
 ### 1. Native ML Framework
+
 **Original**: Python library with C/C++ extensions  
 **SigmaOS**: Native OS-level ML framework with Rust implementation
 
@@ -30,6 +32,7 @@ pub struct SigmaML {
 ```
 
 **Core Algorithms**:
+
 - Supervised Learning
   - Linear models (Linear, Ridge, Lasso, ElasticNet)
   - Support Vector Machines (SVM)
@@ -38,12 +41,14 @@ pub struct SigmaML {
   - Nearest Neighbors
   - Naive Bayes
   - Neural Networks (native deep learning)
+
   
 - Unsupervised Learning
   - Clustering (K-Means, DBSCAN, Hierarchical)
   - Dimensionality Reduction (PCA, t-SNE, UMAP)
   - Anomaly Detection (Isolation Forest, One-Class SVM)
   - Gaussian Mixture Models
+
   
 - Model Selection
   - Cross-validation with automatic splitting
@@ -51,11 +56,14 @@ pub struct SigmaML {
   - Feature selection with automatic methods
   - Pipeline optimization
 
+
 ### 2. Automatic Preprocessing
+
 **Original**: Manual preprocessing with transformers  
 **SigmaOS**: AI-powered automatic preprocessing
 
 **Preprocessing Features**:
+
 - Automatic data type detection and conversion
 - Missing value imputation with intelligent strategies
 - Feature scaling with automatic method selection
@@ -64,11 +72,14 @@ pub struct SigmaML {
 - Data cleaning with anomaly detection
 - Pipeline optimization with caching
 
+
 ### 3. Hardware Acceleration
+
 **Original**: CPU-based with optional GPU support  
 **SigmaOS**: Native hardware acceleration with automatic optimization
 
 **Acceleration Features**:
+
 - Automatic GPU utilization for supported algorithms
 - SIMD optimization for CPU operations
 - Multi-threading with automatic load balancing
@@ -76,11 +87,14 @@ pub struct SigmaML {
 - Distributed training across cluster nodes
 - Quantization for inference optimization
 
+
 ### 4. Model Explainability
+
 **Original**: Limited explainability tools  
 **SigmaOS**: Native explainability with multiple methods
 
 **Explainability Features**:
+
 - SHAP values with efficient computation
 - Feature importance with permutation importance
 - Partial dependence plots
@@ -89,11 +103,14 @@ pub struct SigmaML {
 - Model-agnostic interpretability
 - Automatic insight generation
 
+
 ### 5. Pipeline Orchestration
+
 **Original**: Manual pipeline construction  
 **SigmaOS**: Automatic pipeline generation and optimization
 
 **Pipeline Features**:
+
 - AutoML with automatic pipeline generation
 - Pipeline optimization with pruning
 - Caching and memoization
@@ -101,11 +118,14 @@ pub struct SigmaML {
 - Automatic hyperparameter tuning
 - Pipeline deployment with serving
 
+
 ### 6. Model Deployment
+
 **Original**: External serving tools (MLflow, etc.)  
 **SigmaOS**: Native model deployment with OS integration
 
 **Deployment Features**:
+
 - Native model serving with automatic scaling
 - Model versioning with A/B testing
 - Real-time inference with sub-millisecond latency
@@ -114,11 +134,14 @@ pub struct SigmaML {
 - Automatic retraining triggers
 - Edge deployment with model compression
 
+
 ### 7. Data Handling
+
 **Original**: NumPy/Pandas integration  
 **SigmaOS**: Native data structures with OS optimization
 
 **Data Features**:
+
 - Native data structures with zero-copy operations
 - Memory-mapped datasets for large data
 - Streaming data processing
@@ -126,12 +149,13 @@ pub struct SigmaML {
 - Compression for storage efficiency
 - Distributed data processing
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | scikit-learn | SigmaOS | Advantage |
-|---------|-------------|---------|------------|
+| --------- | ------------- | --------- | ------------ |
 | Performance | Python overhead | Native Rust | ✅ 5-10x |
 | Hardware Acceleration | Limited | Native GPU/CPU | ✅ 3-5x |
 | AutoML | External (auto-sklearn) | Native | ✅ 10x |
@@ -146,6 +170,7 @@ pub struct SigmaML {
 ## Implementation Details
 
 ### Native ML Framework
+
 ```rust
 pub mod sigma_ml {
     use sigma_core::compute::ComputeEngine;
@@ -181,6 +206,7 @@ pub mod sigma_ml {
 ```
 
 ### AutoML Pipeline
+
 ```rust
 pub mod automl {
     pub struct AutoMLPipeline {
@@ -207,6 +233,7 @@ pub mod automl {
 ## API Comparison
 
 ### scikit-learn API
+
 ```python
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -214,22 +241,27 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 
 # Manual preprocessing
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Manual model selection
+
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y)
 
 # Manual training
+
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
 # Manual evaluation
+
 predictions = model.predict(X_test)
 accuracy = accuracy_score(y_test, predictions)
 ```
 
 ### SigmaML API
+
 ```rust
 use sigma_ml::SigmaML;
 
@@ -250,37 +282,49 @@ let explanation = model.explain(test_data);
 ### For Users of scikit-learn
 
 **Before** (using scikit-learn):
+
 ```python
+
 # Install scikit-learn
+
 pip install scikit-learn
 
 # Import and use
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 
 # Manual preprocessing
+
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Manual hyperparameter tuning
+
 param_grid = {'n_estimators': [100, 200], 'max_depth': [10, 20]}
 grid_search = GridSearchCV(RandomForestClassifier(), param_grid)
 grid_search.fit(X_scaled, y)
 ```
 
 **After** (using SigmaML):
+
 ```bash
+
 # Enable ML shard (native, no installation)
+
 sigma-shard enable ml-framework
 
 # AutoML with automatic preprocessing
+
 sigma-ml train --auto-tune --data dataset.csv --target label
 
 # Automatic deployment
+
 sigma-ml deploy --model best_model --serve
 
 # Native explainability
+
 sigma-ml explain --model best_model --data test.csv
 ```
 
@@ -289,7 +333,7 @@ sigma-ml explain --model best_model --data test.csv
 ## Performance Benchmarks
 
 | Operation | scikit-learn | SigmaML | Improvement |
-|-----------|-------------|---------|-------------|
+| ----------- | ------------- | --------- | ------------- |
 | Random Forest Training (100K samples) | 45s | 12s | 3.8x faster |
 | SVM Training (50K samples) | 120s | 35s | 3.4x faster |
 | PCA (1M samples) | 18s | 5s | 3.6x faster |
@@ -301,6 +345,7 @@ sigma-ml explain --model best_model --data test.csv
 ## Advanced Features
 
 ### Distributed Training
+
 ```rust
 pub struct DistributedTrainer {
     cluster: ClusterManager,
@@ -320,6 +365,7 @@ impl DistributedTrainer {
 ```
 
 ### Automatic Feature Engineering
+
 ```rust
 pub struct AutoFeatureEngineer {
     feature_generator: FeatureGenerator,

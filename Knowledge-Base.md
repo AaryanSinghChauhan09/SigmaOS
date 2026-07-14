@@ -7,40 +7,52 @@
 ## 📋 Table of Contents
 
 ### Getting Started
+
 - [Installation Guide](#installation-guide)
 - [Boot Process](#boot-process)
 - [First Configuration](#first-configuration)
 - [System Update](#system-update)
 
+
 ### Kernel & Core
+
 - [Kernel Architecture](#kernel-architecture)
 - [Scheduler (EEVDF)](#scheduler)
 - [Memory Management](#memory-management)
 - [IPC System](#ipc-system)
 
+
 ### Hardware
+
 - [Driver Framework](#driver-framework)
 - [GPU Drivers](#gpu-drivers)
 - [Networking Hardware](#networking-hardware)
 - [Thermal & Power Management](#thermal--power-management)
 
+
 ### Security
+
 - [Mandatory Access Control](#mandatory-access-control)
 - [Secure Boot & TPM](#secure-boot--tpm)
 - [Cgroup Isolation](#cgroup-isolation)
 - [sigma-shield Firewall](#sigma-shield-firewall)
 - [Post-Quantum Cryptography](#post-quantum-cryptography)
 
+
 ### Package Management
+
 - [sigpkg Overview](#sigpkg-overview)
 - [Creating Packages](#creating-packages)
 - [Package Signing](#package-signing)
 
+
 ### Development
+
 - [Building SigmaOS](#building-sigmaos)
 - [Writing Drivers](#writing-drivers)
 - [Kernel Hacking Guide](#kernel-hacking-guide)
 - [SDK Reference](#sdk-reference)
+
 
 ---
 
@@ -49,7 +61,7 @@
 ### Prerequisites
 
 | Component | Minimum | Recommended |
-|-----------|---------|-------------|
+| ----------- | --------- | ------------- |
 | CPU | x86_64 (Haswell+) | x86_64 or ARM64 |
 | RAM | 512 MB | 4 GB+ |
 | Storage | 4 GB | 32 GB+ NVMe |
@@ -60,10 +72,13 @@
 #### 1. ISO Boot (Recommended)
 
 ```bash
+
 # Burn the ISO to USB
+
 dd if=sigmaos-v0.2-x86_64.iso of=/dev/sdX bs=4M status=progress sync
 
 # Boot from USB, then run the installer
+
 sigma-install --target /dev/sda --profile desktop
 ```
 
@@ -92,7 +107,7 @@ SigmaOS supports dual-boot with Windows and Linux. See [Dual-Boot-Compatibility-
 
 SigmaOS uses a two-stage boot:
 
-```
+```text
 UEFI/BIOS
     │
     ▼
@@ -114,7 +129,7 @@ userland                      ← Shell, desktop, applications
 **Key boot parameters** (passed via GRUB/sigma-boot):
 
 | Parameter | Description |
-|-----------|-------------|
+| ----------- | ------------- |
 | `sigma.profile=desktop` | Load desktop profile |
 | `sigma.loglevel=4` | Kernel verbosity (0-7) |
 | `sigma.nosmp` | Disable SMP (single CPU) |
@@ -131,7 +146,8 @@ SigmaOS uses a **hybrid microkernel** architecture:
 - **Ring 1**: Trusted drivers (GPU, NVMe, network — elevated but isolated)
 - **Ring 3**: Userland (applications, untrusted drivers, POSIX compat layer)
 
-```
+
+```text
 ┌─────────────────────────────────────────────────────┐
 │                    Applications                      │  Ring 3
 │   sigma-shell  │  zenith-desktop  │  sigma-browser  │
@@ -165,10 +181,13 @@ SigmaOS uses the **EEVDF (Earliest Eligible Virtual Deadline First)** scheduler,
 - AI-assisted workload prediction (optional)
 - CPU affinity and NUMA-awareness
 
+
 ### Tuning
 
 ```toml
+
 # sigma.toml — scheduler section
+
 [scheduler]
 eevdf_slice_ns = 3_000_000      # 3 ms time slice (default)
 rt_priority_boost = true         # Boost RT tasks
@@ -189,6 +208,7 @@ SigmaOS uses a **buddy allocator** for physical memory management:
 - Huge page (2 MiB, 1 GiB) support
 - Memory hotplug support
 
+
 ### Virtual Memory (VMM)
 
 - 4-level paging (PML4 on x86_64)
@@ -196,12 +216,15 @@ SigmaOS uses a **buddy allocator** for physical memory management:
 - Memory-mapped files with page cache
 - `mmap`, `mprotect`, `mlock` sovereign equivalents
 
+
 ### OOM Handling
 
 When memory pressure is critical, the **Sovereign OOM Daemon** (`sigma-oom`) selects victims based on:
+
 1. cgroup memory limits
 2. Process OOM score
 3. Process uptime and priority
+
 
 ---
 
@@ -222,7 +245,7 @@ pub trait SigmaDriver {
 ### Driver Rings
 
 | Ring | Type | Examples |
-|------|------|---------|
+| ------ | ------ | --------- |
 | Ring 1 | Trusted | NVMe, GPU, NIC |
 | Ring 3 | Untrusted | USB accessories, printers |
 | Module | Dynamically loadable | Third-party hardware |
@@ -236,7 +259,7 @@ See `kernel/hal/thermal/mod.rs` for the implementation.
 ### Power Profiles
 
 | Profile | Max CPU | TDP Limit | Use Case |
-|---------|---------|-----------|---------|
+| --------- | --------- | ----------- | --------- |
 | `power-saver` | 800 MHz | 15 W | Long battery life |
 | `balanced` | 2.4 GHz | 45 W | Default daily use |
 | `performance` | 5.2 GHz | 125 W | Compute workloads |
@@ -245,7 +268,7 @@ See `kernel/hal/thermal/mod.rs` for the implementation.
 ### Thermal Trip Points (Default — CPU)
 
 | Temperature | Severity | Action |
-|-------------|----------|--------|
+| ------------- | ---------- | -------- |
 | < 70 °C | Normal | No action |
 | 70–85 °C | Warning | Reduce boost clocks |
 | 85–100 °C | Critical | DVFS throttle to 2.4 GHz |
@@ -272,23 +295,30 @@ SigmaOS ships with a **default-drop** egress and ingress policy. Rules must expl
 ### Basic Configuration
 
 ```bash
+
 # Allow HTTPS
+
 sigma-shield add --direction ingress --proto tcp --dst-port 443 --action accept
 
 # Rate-limit SSH
+
 sigma-shield add --direction ingress --proto tcp --dst-port 22 --action rate-limit:10
 
 # View rules
+
 sigma-shield list
 
 # View stats
+
 sigma-shield stats
 ```
 
 ### Rule File Format
 
 ```toml
+
 # /etc/sigma/firewall.toml
+
 [[rule]]
 id = 1
 priority = 100
@@ -316,14 +346,18 @@ See `kernel/security/cgroups/mod.rs`.
 ### Creating a Cgroup
 
 ```bash
+
 # Create a new cgroup for a web server
+
 sigma-cg create webserver /
 
 # Limit to 2 CPU cores and 512 MiB RAM
+
 sigma-cg set webserver cpu.quota=200000 cpu.period=100000
 sigma-cg set webserver memory.limit=536870912
 
 # Start nginx inside the cgroup
+
 sigma-cg run webserver -- nginx -g "daemon off;"
 ```
 
@@ -331,7 +365,7 @@ sigma-cg run webserver -- nginx -g "daemon off;"
 
 SigmaOS exposes cgroup control via `/sigma/cg/`:
 
-```
+```text
 /sigma/cg/
 ├── webserver/
 │   ├── cgroup.procs       # PIDs in this group
@@ -361,7 +395,7 @@ sigpkg verify mpv             # Verify cryptographic signature
 
 ### Package Format (`.spkg`)
 
-```
+```text
 package.spkg/
 ├── MANIFEST.toml         # Metadata, version, deps, signatures
 ├── files/                # Installed files
@@ -377,31 +411,40 @@ package.spkg/
 ### Prerequisites
 
 ```bash
+
 # Install Rust (nightly)
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup install nightly
 rustup component add rust-src llvm-tools-preview
 
 # Install build dependencies
+
 sudo apt install cmake ninja-build nasm grub-common xorriso
 ```
 
 ### Build Commands
 
 ```bash
+
 # Full build (desktop profile)
+
 just build-desktop
 
 # Minimal core build
+
 just build-core
 
 # Build ISO
+
 just iso
 
 # Run in QEMU
+
 just qemu
 
 # Run tests
+
 just test
 ```
 
@@ -412,7 +455,7 @@ just test
 SigmaOS implements NIST-standardized PQC algorithms:
 
 | Algorithm | Use | Standard |
-|-----------|-----|---------|
+| ----------- | ----- | --------- |
 | Kyber-1024 | Key encapsulation | FIPS 203 |
 | Dilithium5 | Digital signatures | FIPS 204 |
 | SPHINCS+-256 | Hash-based signatures | FIPS 205 |
@@ -435,6 +478,7 @@ sigpkg verify --key /etc/sigma/pqc/public.dilithium5 package.spkg
 1. Boot with `sigma.loglevel=7` for verbose output
 2. Check serial console output (COM1 at 115200 baud)
 3. Inspect `/sigma/logs/kernel.log` from recovery shell
+
 
 ### Package Install Fails
 

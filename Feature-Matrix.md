@@ -5,7 +5,7 @@
 ## Status Legend
 
 | Symbol | Meaning |
-|---|---|
+| --- | --- |
 | ✅ | Implemented & tested |
 | 🔧 | Implemented (stub/prototype) |
 | 🚧 | In progress |
@@ -17,7 +17,7 @@
 ## Core Kernel
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | MLFQ→CFS→EDF Scheduler | ✅ | `kernel/sched/sigma_sched.rs` |
 | x86-64 Page Table Walker | ✅ | `kernel/mm/sigma_vmm.rs` |
 | ASLR | ✅ | `kernel/mm/sigma_vmm.rs` |
@@ -38,7 +38,7 @@
 ## Hardware Drivers
 
 | Driver | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | VirtIO GPU | ✅ | `kernel/drivers/gpu/sigma_virtio_gpu.rs` |
 | Intel i915 (Gen9+) | ✅ | `kernel/drivers/gpu/sigma_i915.rs` |
 | AMD GPU | 🔧 | `kernel/drivers/gpu/sigma_amdgpu.rs` |
@@ -57,7 +57,7 @@
 ## Package Ecosystem
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | DPLL SAT Resolver | ✅ | `sigma-pkg/sigma_pkg_core.rs` |
 | Generation Rollback | ✅ | `sigma-pkg/sigma_pkg_core.rs` |
 | Dilithium-5 Verification | 🔧 | `sigma-pkg/sigma_pkg_core.rs` |
@@ -70,7 +70,7 @@
 ## Desktop & UI
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | Theme Store | 🔧 | `zenith_desktop/sigma_theme_store.js` |
 | Screen Reader | 🔧 | `zenith_desktop/accessibility/sigma_screen_reader.js` |
 | Customization Hub | 🔧 | `zenith_desktop/sigma_customization_hub.html` |
@@ -84,7 +84,7 @@
 ## Security
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | IDS (Suricata-compat) | 🔧 | `kernel/security/sigma_ids.rs` |
 | Fail2Ban | 🔧 | `kernel/security/sigma_fail2ban.rs` |
 | Sigma Vault (KVv2 + Transit) | ✅ | `kernel/security/sigma_vault.rs` |
@@ -97,7 +97,7 @@
 ## AI & Automation
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | NL→CLI Translator | ✅ | `agents/sigma_ai_agent.rs` |
 | Log Analyzer | ✅ | `agents/sigma_ai_agent.rs` |
 | Workflow Engine | ✅ | `agents/sigma_workflow_engine.rs` |
@@ -109,7 +109,7 @@
 ## Init System
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | Parallel Service Startup | 🔧 | `init/sigma_init.rs` |
 | .service Parser | 🔧 | `init/sigma_service.rs` |
 | Structured Logging | 🔧 | `init/sigma_journal.rs` |
@@ -119,7 +119,7 @@
 ## CI/CD & Tests
 
 | Feature | Status | File |
-|---|---|---|
+| --- | --- | --- |
 | QEMU Boot CI | ✅ | `.github/workflows/sigma_ci.yml` |
 | Driver CI | ✅ | `.github/workflows/sigma_driver_ci.yml` |
 | Syscall Tests | 🔧 | `tests/kernel/test_syscall_dispatch.rs` |
@@ -132,7 +132,7 @@
 ## Deployment Profile Support
 
 | Profile | Kernel | Desktop | AI | Drivers |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Desktop | ✅ | ✅ | ✅ | ✅ |
 | Server | ✅ | N/A | ✅ | ✅ |
 | Edge | ✅ | N/A | 🔧 | 🔧 |

@@ -13,7 +13,7 @@ Legacy Linux relies heavily on monolithic kernel modules and massive userspace i
 | Linux Tech | Inspiration | SigmaOS Capability |
 | :--- | :--- | :--- |
 | **Systemd** | Service management | Deterministic, dependency-based service tracking without the bloat. |
-| **QubesOS** | VM Compartmentalization| Hardware-backed virtual isolation for critical subsystems. |
+| **QubesOS** | VM Compartmentalization | Hardware-backed virtual isolation for critical subsystems. |
 | **Void Linux / Runit** | Lightweight init | Fast, minimal execution paths for booting the system. |
 
 ---

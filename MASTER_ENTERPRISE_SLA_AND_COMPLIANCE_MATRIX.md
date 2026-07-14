@@ -10,7 +10,7 @@
 
 The **Master Enterprise SLA & Compliance Matrix** enforces strict organizational governance, automated legal compliance E.g., GDPR, HIPAA, SOC2, and cryptographically verified Service Level Agreements (SLAs) directly within the SigmaOS Zenith operating system lattice. By decoupling compliance verification from external audit software and embedding it directly into Ring-3 monitoring daemons, SigmaOS guarantees zero-leakage enterprise sovereignty.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │      ENTERPRISE WORKLOADS (SigmaWarehouse / SigmaDB / SovereignFS)       │
 ├──────────────────────────────────────────────────────────────────────────┤
@@ -127,11 +127,15 @@ public:
 
 - **Issue - False Positive Regulatory Lockouts:** Ambiguous column naming in SigmaDB (`user_id` vs `social_security_number`) triggers aggressive automated GDPR compliance lockouts.
 
+
 - *Fix Strategy:* The compliance engine supports declarative YAML override manifests (`compliance_exceptions.yml`) combined with interactive administrator authorization prompts via `SigmaCLI`.
+
 
 - **Issue - SLA Priority Inversion Starvation:** Dynamically elevating SLA-breaching userland microservices to real-time priority starves foundational kernel VFS daemons.
 
+
 - *Fix Strategy:* The CFS scheduler enforces strict **Bandwidth Capping (Cgroups v2)**, guaranteeing that Ring-0 kernel workers always preserve a minimum 15% guaranteed CPU allocation quantum regardless of userland SLA escalations.
+
 
 ---
 > **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED

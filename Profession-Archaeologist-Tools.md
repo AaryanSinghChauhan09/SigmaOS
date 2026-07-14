@@ -10,11 +10,15 @@ The Archaeologist Profile is designed for archaeological excellence, excavation 
 
 - **SigmaExcavation**: Excavation site management and documentation.
 
+
 - **SigmaArtifact**: Artifact cataloging and preservation.
+
 
 - **SigmaDating**: Dating analysis and chronological tracking.
 
+
 - **SigmaResearch**: Research collaboration and publication.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Archaeologist Profile is designed for archaeological excellence, excavation 
 
 - **Theme**: Heritage Brown (Archaeology Standard)
 
+
 - **Layout**: Archaeology Dashboard (Excavation, Artifacts, Dating)
 
+
 - **Personalization**: Custom site documentation and automated analysis.
+
 
 ---
 

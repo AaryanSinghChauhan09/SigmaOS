@@ -1,4 +1,5 @@
 # SigmaOS Terminal Absorption - Alacritty
+
 ## Making alacritty/alacritty Irrelevant
 
 > **Absorption Target**: https://github.com/alacritty/alacritty  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Alacritty by implementing a native GPU-accele
 ## Absorbed Features & Capabilities
 
 ### 1. GPU Acceleration
+
 **Original**: Alacritty's GPU-accelerated rendering  
 **SigmaOS**: Native GPU acceleration with enhanced features
 
@@ -29,6 +31,7 @@ pub struct SigmaTerm {
 ```
 
 **GPU Features**:
+
 - Native GPU rendering with OpenGL/Vulkan
 - Hardware-accelerated text rendering with sub-pixel precision
 - GPU-accelerated scrolling with smooth animations
@@ -36,11 +39,14 @@ pub struct SigmaTerm {
 - GPU monitoring with real-time metrics
 - GPU profiles with automatic switching
 
+
 ### 2. Font Rendering
+
 **Original**: Alacritty's font rendering  
 **SigmaOS**: Native font rendering with enhanced features
 
 **Font Features**:
+
 - Native font rendering with GPU acceleration
 - Font ligatures with automatic support
 - Font fallback with intelligent selection
@@ -48,11 +54,14 @@ pub struct SigmaTerm {
 - Font profiles with automatic switching
 - Font monitoring with real-time metrics
 
+
 ### 3. Scrollback Buffer
+
 **Original**: Alacritty's scrollback buffer  
 **SigmaOS**: Native scrollback with enhanced features
 
 **Scrollback Features**:
+
 - Native scrollback with intelligent compression
 - Scrollback search with real-time indexing
 - Scrollback persistence with automatic backup
@@ -60,11 +69,14 @@ pub struct SigmaTerm {
 - Scrollback validation with automatic checking
 - Scrollback monitoring with real-time metrics
 
+
 ### 4. Configuration System
+
 **Original**: Alacritty's YAML configuration  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
+
 - Native configuration with type safety
 - Real-time configuration reload
 - Configuration validation with automatic checking
@@ -72,11 +84,14 @@ pub struct SigmaTerm {
 - Configuration inheritance with composition
 - Configuration monitoring with real-time metrics
 
+
 ### 5. Shell Integration
+
 **Original**: Alacritty's shell integration  
 **SigmaOS**: Native shell integration with enhanced features
 
 **Shell Integration Features**:
+
 - Native shell integration with OS-level optimization
 - Shell protocol with automatic detection
 - Shell synchronization with automatic management
@@ -84,11 +99,14 @@ pub struct SigmaTerm {
 - Shell validation with automatic checking
 - Shell monitoring with real-time metrics
 
+
 ### 6. Window Management
+
 **Original**: Alacritty's window management  
 **SigmaOS**: Native window management with enhanced features
 
 **Window Features**:
+
 - Native window management with GPU acceleration
 - Window transparency with hardware support
 - Window decorations with native theming
@@ -96,12 +114,13 @@ pub struct SigmaTerm {
 - Window validation with automatic checking
 - Window monitoring with real-time metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Alacritty | SigmaOS | Advantage |
-|---------|----------|---------|------------|
+| --------- | ---------- | --------- | ------------ |
 | Rendering Performance | GPU-accelerated | Native GPU + optimization | ✅ 2-3x |
 | Font Performance | GPU-accelerated | Native GPU + caching | ✅ 2x |
 | Scrollback Performance | Memory overhead | Intelligent compression | ✅ 3-5x |
@@ -116,6 +135,7 @@ pub struct SigmaTerm {
 ## Implementation Details
 
 ### Native GPU Renderer
+
 ```rust
 pub mod gpu {
     use sigma_term::gpu::GPURenderer;
@@ -139,6 +159,7 @@ pub mod gpu {
 ```
 
 ### Native Scrollback Manager
+
 ```rust
 pub mod scrollback {
     pub struct ScrollbackManager {
@@ -165,26 +186,36 @@ pub mod scrollback {
 ### For Users of Alacritty
 
 **Before** (using Alacritty):
+
 ```bash
+
 # Install Alacritty
+
 # Clone and build Alacritty
 
 # Configure Alacritty
+
 ~/.config/alacritty/alacritty.yml
 
 # Run Alacritty
+
 alacritty
 ```
 
 **After** (using SigmaTerm):
+
 ```bash
+
 # Enable terminal shard (native)
+
 sigma-shard enable terminal
 
 # Use Alacritty-compatible configuration
+
 sigma-term config --alacritty-compatible
 
 # Run native terminal
+
 sigma-term
 ```
 
@@ -193,7 +224,7 @@ sigma-term
 ## Performance Benchmarks
 
 | Operation | Alacritty | SigmaTerm | Improvement |
-|-----------|----------|-----------|-------------|
+| ----------- | ---------- | ----------- | ------------- |
 | Terminal Startup | 100ms | 30ms | 3.3x faster |
 | Render Frame (60fps) | 16ms | 8ms | 2x faster |
 | Font Render | 5ms | 2ms | 2.5x faster |

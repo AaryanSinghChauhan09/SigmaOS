@@ -6,13 +6,18 @@ SigmaFS is SigmaOS's native filesystem. It is designed for correctness, security
 
 - **Copy-on-Write (CoW)** semantics for crash safety and snapshots
 
+
 - **Per-block zstd compression** for transparent space savings
+
 
 - **Per-volume encryption** (dm-crypt equivalent, AES-256-GCM)
 
+
 - **Journaling** for metadata consistency
 
+
 - **VFS integration** via the SigmaOS VFS layer
+
 
 ---
 
@@ -20,7 +25,7 @@ SigmaFS is SigmaOS's native filesystem. It is designed for correctness, security
 
 ### Superblock (Block 0, 4096 bytes)
 
-```
+```text
 Offset  Size  Field
 0       8     Magic: 0x5369676D61465300 ("SigmaFS\0")
 8       4     Version: 1
@@ -42,7 +47,7 @@ Offset  Size  Field
 
 Each inode is 256 bytes:
 
-```
+```text
 Offset  Size  Field
 0       4     Mode (file type + permissions)
 4       4     UID
@@ -70,17 +75,22 @@ When a block is modified:
 
 1. Allocate a new physical block.
 
+
 2. Copy the original content to the new block.
+
 
 3. Apply the modification to the new block.
 
+
 4. Update the inode to point to the new block.
+
 
 5. Release the old block reference count (free if count == 0).
 
+
 This enables **snapshots**: freeze the inode table reference and create a new generation without copying any data.
 
-```
+```text
 Snapshot creation: O(1)
 Snapshot read: O(1) (reads from frozen inode table)
 Snapshot cleanup: O(dirty blocks) (deferred GC)
@@ -113,7 +123,7 @@ Compression ratio target: 2.0× for typical OS text/binary files.
 
 Volume encryption is applied at the block device level, below SigmaFS:
 
-```
+```text
 VFS syscall
   │
   ▼
@@ -135,7 +145,8 @@ Each 4096-byte block uses a unique 12-byte IV derived as `HKDF(master_key, block
 SigmaFS uses **ordered journaling**: metadata is journaled, data is written to its final location before the journal commit.
 
 Journal entry format:
-```
+
+```text
 [JournalEntry]
   type:       u8  (begin | commit | abort | block_write)
   block_num:  u64

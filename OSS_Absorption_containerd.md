@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - containerd
+
 ## Making containerd/containerd Irrelevant
 
 > **Absorption Target**: https://github.com/containerd/containerd  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed containerd by implementing a native container
 ## Absorbed Features & Capabilities
 
 ### 1. Container Runtime
+
 **Original**: containerd's OCI-compliant runtime  
 **SigmaOS**: Native OCI runtime with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaContainer {
 ```
 
 **Runtime Features**:
+
 - Native OCI runtime with OS-level optimization
 - Capability-based sandboxing with hardware enforcement
 - Container lifecycle management with automatic cleanup
@@ -36,11 +39,14 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
+
 ### 2. Snapshot Management
+
 **Original**: containerd's snapshot system  
 **SigmaOS**: Native snapshot system with enhanced features
 
 **Snapshot Features**:
+
 - Native snapshot management with capability-based access
 - Layered snapshots with automatic deduplication
 - Snapshot caching with intelligent invalidation
@@ -48,11 +54,14 @@ pub struct SigmaContainer {
 - Snapshot distribution with content-addressed storage
 - Snapshot profiles with automatic switching
 
+
 ### 3. Content Management
+
 **Original**: containerd's content store  
 **SigmaOS**: Native content system with enhanced features
 
 **Content Features**:
+
 - Native content management with content-addressed storage
 - Content verification with cryptographic signatures
 - Content caching with intelligent invalidation
@@ -60,11 +69,14 @@ pub struct SigmaContainer {
 - Content profiles with automatic switching
 - Content composition with inheritance
 
+
 ### 4. Task Management
+
 **Original**: containerd's task system  
 **SigmaOS**: Native task system with enhanced features
 
 **Task Features**:
+
 - Native task management with capability-based access
 - Task isolation with automatic configuration
 - Task monitoring with real-time metrics
@@ -72,11 +84,14 @@ pub struct SigmaContainer {
 - Task composition with inheritance
 - Task validation with automatic checking
 
+
 ### 5. Distribution
+
 **Original**: containerd's pull/push system  
 **SigmaOS**: Native distribution with enhanced features
 
 **Distribution Features**:
+
 - Native distribution with capability-based access
 - Registry integration with automatic authentication
 - Distribution caching with intelligent invalidation
@@ -84,11 +99,14 @@ pub struct SigmaContainer {
 - Distribution profiles with automatic switching
 - Distribution composition with inheritance
 
+
 ### 6. CRI Plugin
+
 **Original**: containerd's CRI plugin for Kubernetes  
 **SigmaOS**: Native CRI with enhanced features
 
 **CRI Features**:
+
 - Native CRI implementation with type safety
 - CRI validation with automatic checking
 - CRI monitoring with real-time metrics
@@ -96,12 +114,13 @@ pub struct SigmaContainer {
 - CRI composition with inheritance
 - CRI compatibility with Kubernetes
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | containerd | SigmaOS | Advantage |
-|---------|-----------|---------|------------|
+| --------- | ----------- | --------- | ------------ |
 | Runtime Performance | Go overhead | Native Rust | ✅ 5-10x |
 | Snapshot Performance | OverlayFS overhead | Native capability | ✅ 3-5x |
 | Content Performance | Content store overhead | Native capability | ✅ 3-5x |
@@ -116,6 +135,7 @@ pub struct SigmaContainer {
 ## Implementation Details
 
 ### Native OCI Runtime
+
 ```rust
 pub mod oci {
     use sigma_container::runtime::OCIRuntime;
@@ -140,6 +160,7 @@ pub mod oci {
 ```
 
 ### Native Snapshot Manager
+
 ```rust
 pub mod snapshot {
     pub struct SnapshotManager {
@@ -166,26 +187,36 @@ pub mod snapshot {
 ### For Users of containerd
 
 **Before** (using containerd):
+
 ```bash
+
 # Install containerd
+
 sudo apt install containerd
 
 # Configure containerd
+
 /etc/containerd/config.toml
 
 # Use containerd CLI
+
 ctr images pull myimage ctr run myimage mycontainer
 ```
 
 **After** (using SigmaContainer):
+
 ```bash
+
 # Enable container shard (native)
+
 sigma-shard enable container-runtime
 
 # Configure runtime
+
 sigma-container runtime configure --oci
 
 # Use native CLI
+
 sigma-container pull --image myimage
 sigma-container run --image myimage --name mycontainer
 ```
@@ -195,7 +226,7 @@ sigma-container run --image myimage --name mycontainer
 ## Performance Benchmarks
 
 | Operation | containerd | SigmaContainer | Improvement |
-|-----------|-----------|----------------|-------------|
+| ----------- | ----------- | ---------------- | ------------- |
 | Container Create | 350ms | 60ms | 5.8x faster |
 | Snapshot Create | 80ms | 15ms | 5.3x faster |
 | Content Resolve | 50ms | 10ms | 5x faster |

@@ -5,7 +5,9 @@
 ## Features
 
 ### SigmaDrive (Cloud Storage)
+
 Decentralized cloud file storage (Google Drive alternative):
+
 - End-to-end encrypted file storage
 - Decentralized storage via IPFS/Filecoin
 - File versioning with SovereignFS snapshots
@@ -16,8 +18,11 @@ Decentralized cloud file storage (Google Drive alternative):
 - AI-powered file organization and search
 - Cross-device sync (desktop, mobile, web)
 
+
 ### SigmaMail (Email Client)
+
 Secure, encrypted mailing (Gmail alternative):
+
 - End-to-end encrypted email (PGP integration)
 - Spam and phishing protection with AI
 - Rich text composer
@@ -29,8 +34,11 @@ Secure, encrypted mailing (Gmail alternative):
 - Smart replies and compose suggestions
 - Offline mode with sync
 
+
 ### SigmaCalendar (Calendar & Scheduling)
+
 Sync and scheduling tools:
+
 - Event creation and management
 - Recurring events
 - Calendar sharing with permission controls
@@ -41,8 +49,11 @@ Sync and scheduling tools:
 - AI-powered scheduling suggestions
 - Export to iCal format
 
+
 ### SigmaContacts (Contacts Management)
+
 Contact management and synchronization:
+
 - Contact cards with multiple fields
 - Contact groups and labels
 - Import/export vCard format
@@ -51,9 +62,10 @@ Contact management and synchronization:
 - AI-powered contact deduplication
 - Sync with mobile devices
 
+
 ## Architecture
 
-```
+```text
 SigmaCloud Suite
    ├─ SigmaDrive (cloud storage engine)
    │   ├─ IPFS/Filecoin backend
@@ -82,6 +94,7 @@ SigmaCloud Suite
 - **Capability-based sharing**: Fine-grained access control via capability tokens
 - **Post-quantum ready**: Uses Kyber-768 for key exchange
 - **Secure boot integration**: Verified boot chain for cloud clients
+
 
 ## API Interface
 
@@ -124,10 +137,11 @@ int sigma_contacts_export_vcard(const char *contact_id, const char *path);
 - **Zenith Desktop Integration**: Native Zenith UI with notifications
 - **Mobile Sync**: SigmaOS Mobile app for on-the-go access
 
+
 ## Performance Characteristics
 
 | Application | Sync Speed | Encryption | Offline Support |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SigmaDrive | 100MB/s (local), 10MB/s (remote) | ChaCha20-Poly1305 | ✅ Yes |
 | SigmaMail | Instant (IMAP) | PGP + TLS | ✅ Yes |
 | SigmaCalendar | Instant | TLS | ✅ Yes |
@@ -145,6 +159,7 @@ int sigma_contacts_export_vcard(const char *contact_id, const char *path);
 - [ ] Mobile apps (SigmaOS Mobile, iOS, Android)
 - [ ] Web interface (SigmaOS Cloud)
 - [ ] Enterprise features (SSO, admin console, audit logs)
+
 
 ## Related Modules
 

@@ -6,7 +6,7 @@ used to catch performance regressions before they reach `main`.
 ## Benchmark Categories
 
 | Category | Scope | Key Metric |
-|---|---|---|
+| --- | --- | --- |
 | `kernel/syscall` | Syscall dispatcher round-trip | ns/call |
 | `kernel/ipc` | Zero-copy IPC throughput | GB/s |
 | `mm/alloc` | Slab allocator latency | ns/op |
@@ -60,7 +60,9 @@ meaningful in a VM). A regression of > 5% triggers a blocking CI alert.
 
 on:
   schedule:
+
     - cron: '0 2 * * *'   # 02:00 UTC nightly
+
 
 ```
 
@@ -68,22 +70,31 @@ on:
 
 - [ ] Syscall round-trip benchmark
 
+
 - [ ] IPC throughput benchmark
+
 
 - [ ] Memory allocator latency suite
 
+
 - [ ] Filesystem IOPS benchmark
+
 
 - [ ] Network TCP throughput benchmark
 
+
 - [ ] Automated regression detection (± 5% threshold)
+
 
 - [ ] Flamegraph generation pipeline
 
+
 - [ ] Historical results dashboard (GitHub Pages)
+
 
 ## Related Modules
 
 - [`modules/perf/scheduler`](../scheduler/README.md) — Scheduler performance
+
 
 - [`modules/perf/mm`](../mm/README.md) — Memory manager benchmarks

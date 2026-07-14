@@ -13,11 +13,12 @@ This document defines the complete roadmap for native AI integration in SigmaOS 
 3. **Transparent AI**: Every AI decision is explainable. Users can query why the system took any automated action.
 4. **Opt-in Only**: AI features are disabled by default; users explicitly enable them.
 
+
 ---
 
 ## Architecture: The Neural Core
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    SIGMAOS NEURAL CORE                      │
 │                                                             │
@@ -79,41 +80,67 @@ impl SigmaInference {
 ### 1.2 AI Shell Completion (`sigma-shell-ai`)
 
 ```bash
+
 # User types partial command:
+
 $ sigma pkg install nvid<TAB>
 
 # AI suggests:
+
 # > nvidia-driver-570 (v570.144, PQC-signed, 847MB) [GPU DRIVER]
+
 # > nvidia-cuda-12.8 (runtime + dev headers)
+
 # > nvidia-opencl (for non-CUDA workflows)
+
 # Select: nvidia-driver-570
 
 $ sigma install failed after kernel update<ENTER>
+
 # AI diagnoses: "Likely DKMS module rebuild needed. Try: sigma pkg rebuild-dkms"
+
 ```
 
 ### 1.3 Natural Language CLI
 
 ```bash
+
 # Plain English → sigma commands
+
 $ sigma ask "why is my disk 98% full?"
+
 # Analyzing... (local inference, 0.3s)
+
 # 
+
 # Top disk consumers:
+
 #   /var/log/sigma/ (12GB) - kernel debug logs
+
 #   ~/.cache/sigma-pkg/ (8GB) - package cache
+
 #   /home/user/Downloads/ (45GB) - user files
+
 #
+
 # Suggested actions:
+
 #   1. sigma logs clean --older-than 7d   (frees ~10GB)
+
 #   2. sigma pkg cache clean              (frees ~8GB)
+
 #   3. Review /home/user/Downloads/
+
 #
+
 # Auto-clean logs now? [y/N]
 
 $ sigma ask "set up a firewall rule to block port 22 from internet"
+
 # Translates to: sigma shield add-rule --deny --port 22 --src 0.0.0.0/0 --except 10.0.0.0/8
+
 # Apply this rule? [y/N]
+
 ```
 
 ---
@@ -156,16 +183,27 @@ impl AISchedulerTuner {
 
 ```bash
 $ sigma pkg recommend
+
 # Based on your usage patterns (local analysis):
+
 #
+
 # You often run: python3, jupyter, pandas, numpy
+
 # → Recommended: sigma-data-science bundle (all pre-configured)
+
 #
+
 # You compile Rust projects frequently
+
 # → Recommended: sigma-rust-dev-tools (mold linker, cargo-nextest, clippy)
+
 #
+
 # Your GPU is underutilized
+
 # → Recommended: Enable GPU compute profile?
+
 ```
 
 ### 2.3 Anomaly Detection
@@ -202,16 +240,23 @@ impl AnomalyDetector {
 ### 3.1 Voice Control
 
 ```bash
+
 # Wake word: "Hey Sigma"
+
 $ Hey Sigma, take a system snapshot
+
 # → sigma snapshot create auto-voice-$(date +%s)
 
 $ Hey Sigma, what's using all my RAM?
+
 # → sigma top --sort memory --top 5 (formatted for voice)
+
 # "Your top memory users are: Firefox (4GB), Code (2GB), Postgres (1.2GB)..."
 
 $ Hey Sigma, enable focus mode for 2 hours
+
 # → sigma focus --duration 2h
+
 ```
 
 ### 3.2 Predictive App Launch
@@ -247,15 +292,23 @@ impl PredictiveLauncher {
 
 ```bash
 $ sigma find "the tax document from last March"
+
 # Searching semantically... (local embeddings)
+
 # 
+
 # Found: /home/user/Documents/taxes/2024_march_return.pdf
+
 #        /home/user/Downloads/tax_return_draft.docx
+
 # 
+
 # Open first match? [y/N]
 
 $ sigma find "my python script that processes CSV files"
+
 # Found: /home/user/code/data_processor.py (created 2024-11-12)
+
 ```
 
 ---
@@ -266,7 +319,7 @@ $ sigma find "my python script that processes CSV files"
 
 > 📄 Full specification: [AI_Federated_Learning_Mesh.md](AI_Federated_Learning_Mesh)
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │                FEDERATED SIGMA INTELLIGENCE                │
 │                                                            │
@@ -278,17 +331,19 @@ $ sigma find "my python script that processes CSV files"
 ```
 
 **Privacy guarantees**:
+
 - Local training only — raw data never leaves device
 - Gradient clipping + Gaussian noise (ε=0.1 differential privacy)
 - PQC-encrypted gradient uploads
 - Zero-knowledge proof that gradient was computed from real local data
+
 
 ---
 
 ## Model Zoo
 
 | Model | Size | Use Case | Backend |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Gemma-2B-INT4 | 1.2GB | Chat, NL-CLI | CPU/GPU |
 | Whisper-Small | 244MB | Voice commands | CPU |
 | MiniLM-L6 | 22MB | Semantic search | CPU |
@@ -301,7 +356,7 @@ $ sigma find "my python script that processes CSV files"
 ## Hardware Requirements
 
 | AI Feature | Min RAM | Min CPU | GPU Optional |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Shell AI completion | 256MB | Any | No |
 | Anomaly detection | 512MB | Any | No |
 | Voice commands | 1GB | 2 cores | No |

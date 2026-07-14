@@ -9,7 +9,7 @@ This document tracks known issues, limitations, and technical debt across the co
 ## Critical (P0) — Blocks Boot/Functionality
 
 | ID | Component | Description | Workaround |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | BUG-001 | Buddy Allocator | `alloc_pages` / `free_pages` not fully wired to VMM | Use stack-allocated arrays for early-boot code |
 | BUG-002 | Scheduler | Work-stealing uses O(n) scan; may cause latency spikes on >8 CPUs | Limit to single-CPU in current builds |
 | BUG-003 | UEFI Boot | `sigma_efi_entry.c` ELF segment loading is a stub — kernel not actually mapped from ELF | Use flat binary load for testing |
@@ -19,7 +19,7 @@ This document tracks known issues, limitations, and technical debt across the co
 ## High (P1) — Significant Limitations
 
 | ID | Component | Description | Target Release |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | BUG-004 | Btrfs | `create_snapshot` / `rollback` are stubs; actual CoW tree operations not implemented | v15.1 |
 | BUG-005 | sigpkg | Dilithium-5 signature verification is stubbed; packages not cryptographically verified | v15.1 |
 | BUG-006 | AMD GPU | `sigma_amdgpu.rs` probe is stubbed; display not functional on AMD hardware | v15.1 |
@@ -33,7 +33,7 @@ This document tracks known issues, limitations, and technical debt across the co
 ## Medium (P2) — Functional Gaps
 
 | ID | Component | Description | Target Release |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | BUG-011 | IDS | Rule parser not implemented; only packet pass-through | v15.2 |
 | BUG-012 | Fail2Ban | IP blocklist not connected to network filter tables | v15.2 |
 | BUG-013 | UBC | `allocate_page` references `buddy_allocator::alloc_pages` which is not yet wired | v15.1 |
@@ -46,7 +46,7 @@ This document tracks known issues, limitations, and technical debt across the co
 ## Low (P3) — Polish / Optimization
 
 | ID | Component | Description |
-|---|---|---|
+| --- | --- | --- |
 | BUG-017 | CFS Scheduler | Red-black tree not implemented; O(n) sorted array used instead |
 | BUG-018 | EDF Scheduler | Binary heap not implemented; O(n) linear scan used |
 | BUG-019 | VFS | Mount table limited to 16 entries (increase to 256 in next release) |
@@ -59,7 +59,7 @@ This document tracks known issues, limitations, and technical debt across the co
 ## Technical Debt
 
 | Area | Debt Description |
-|---|---|
+| --- | --- |
 | `no_std` violations | Some modules use `alloc::string` which requires a global allocator not yet wired |
 | Static `mut` usage | Many driver singletons use `static mut` without proper spinlock protection |
 | Test coverage | Unit test files are stubs; no actual assertions implemented |
@@ -73,7 +73,8 @@ This document tracks known issues, limitations, and technical debt across the co
 Open an issue at: `https://github.com/sigmaos/kernel/issues`
 
 Use the template:
-```
+
+```text
 **Component**: 
 **Severity**: P0 / P1 / P2 / P3
 **Description**: 

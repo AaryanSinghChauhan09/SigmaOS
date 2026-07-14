@@ -10,7 +10,9 @@ Arguments:
 
 - **url** `URL | string`
 
+
 - **protocol** `string | string[] | WebSocketInit` (optional) - Subprotocol(s) to request the server use, or a [`Dispatcher`](/docs/docs/api/Dispatcher.md).
+
 
 ### WebSocketInit
 
@@ -18,9 +20,12 @@ When passing an object as the second argument, the following options are availab
 
 - **protocols** `string | string[]` (optional) - Subprotocol(s) to request the server use.
 
+
 - **dispatcher** `Dispatcher` (optional) - A custom [`Dispatcher`](/docs/docs/api/Dispatcher.md) to use for the connection.
 
+
 - **headers** `HeadersInit` (optional) - Custom headers to include in the WebSocket handshake request.
+
 
 ### Example:
 
@@ -78,7 +83,9 @@ Arguments:
 
 - **url** `URL | string`
 
+
 - **options** `WebSocketStreamOptions` (optional)
+
 
 ### WebSocketStream Example
 
@@ -117,7 +124,9 @@ Arguments:
 
 - **websocket** `WebSocket` - The WebSocket instance to send the ping frame on
 
+
 - **payload** `Buffer|undefined` (optional) - Optional payload data to include with the ping frame. Must not exceed 125 bytes.
+
 
 Sends a ping frame to the WebSocket server. The server must respond with a pong frame containing the same payload data. This can be used for keepalive purposes or to verify that the connection is still active.
 
@@ -144,6 +153,8 @@ ws.addEventListener('open', () => {
 
 - [MDN - WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 
+
 - [The WebSocket Specification](https://www.rfc-editor.org/rfc/rfc6455)
+
 
 - [The WHATWG WebSocket Specification](https://websockets.spec.whatwg.org/)

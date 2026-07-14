@@ -32,9 +32,11 @@ Instead of duplicating scripts across the main repository for parsing `.deb`, `.
 To maintain a clean Git history, feature branches are actively audited, tested, and merged into `main`. Once merged, the origin branches are deleted to prevent repository clutter.
 
 ### Recent Branch Audits
+
 - `feat/sigma-fs-prototype` → **Merged** into `main`. Branch deleted.
 - `feat/sigma-media-ai` → **Merged** into `main`. Branch deleted.
 - `chore/docs-cleanup` → **Active**. Currently tracking migration of `.md` files to Wiki.
+
 
 *Note: For the definitive list of merged Pull Requests, please see the GitHub repository PR tab. We enforce a linear commit history on `main`.*
 
@@ -43,8 +45,10 @@ To maintain a clean Git history, feature branches are actively audited, tested, 
 ## 4. Security Policy Synchronization
 
 Security documentation is critical and must not diverge. 
+
 - The `SECURITY.md` in the main repository is the **Single Source of Truth** for reporting vulnerabilities. 
 - It contains our PGP public keys and security embargo policies.
 - The Wiki only references `SECURITY.md` to prevent duplication.
+
 
 *If you discover a vulnerability, please consult the `SECURITY.md` file in the root of the SigmaOS GitHub repository.*

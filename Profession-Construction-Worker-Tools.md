@@ -10,11 +10,15 @@ The Construction Worker Profile is designed for construction excellence, site ma
 
 - **SigmaSite**: Site management and safety tracking.
 
+
 - **SigmaTask**: Task assignment and progress tracking.
+
 
 - **SigmaMaterial**: Material inventory and ordering.
 
+
 - **SigmaSafety**: Safety compliance and incident reporting.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Construction Worker Profile is designed for construction excellence, site ma
 
 - **Theme**: Safety Orange (Construction Standard)
 
+
 - **Layout**: Construction Dashboard (Site, Task, Material)
 
+
 - **Personalization: Custom checklists and automated alerts.
+
 
 ---
 

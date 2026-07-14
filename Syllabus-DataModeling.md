@@ -16,7 +16,7 @@ Data modeling defines the mathematical structure, relational dependencies, and d
 
 ### Levels of Data Abstraction
 
-```
+```text
 Physical Level     — How data is stored (S-ZFS blocks, B+ Tree indexes)
 Logical Level      — Tables, columns, relationships (SigmaDB schema)
 View Level         — What users see (SigmaDB Views, SigmaDocs reports)
@@ -25,7 +25,7 @@ Conceptual Level   — ER Diagrams (SigmaModeler)
 
 ### Data Modeling Process
 
-```
+```text
 Requirements → Conceptual Model (ER) → Logical Model (Relational / OO)
 → Physical Model (DDL / Storage) → Implementation (SigmaDB)
 → Versioning (Git-backed) → Migration (SigmaModeler Migration Tool)
@@ -59,7 +59,7 @@ Requirements → Conceptual Model (ER) → Logical Model (Relational / OO)
 
 ### Entity-Relationship Diagram (ERD)
 
-```
+```text
 SigmaDB ERD — System Metrics Schema
 
 ┌─────────────────┐         ┌─────────────────┐
@@ -86,7 +86,7 @@ SigmaDB ERD — System Metrics Schema
 
 ### Dimensional Modeling (Star Schema)
 
-```
+```text
              FACT_METRICS
              ┌──────────────┐
   DIM_TIME──►│ time_id (FK) │◄──DIM_HOST
@@ -131,11 +131,15 @@ results = store.find("processes", {"name": {"$regex": "sigma-*"}})
 
 1. **Clarity** — minimize chartjunk; maximize data-ink ratio.
 
+
 2. **Accuracy** — use proportional scales; avoid truncated axes.
+
 
 3. **Context** — always label axes, titles, and measurement units.
 
+
 4. **Appropriate Encoding** — bars for comparison, lines for continuous trends, scatter plots for correlation.
+
 
 ### SigmaViz Chart Gallery
 
@@ -288,21 +292,27 @@ ml_dash.render('/sigma/ai/reports/model_report.html')
 
 - **Issue - Incorrect Indexing & B+ Tree Fragmentation:** Unindexed foreign keys or highly fragmented B+ Tree indices cause heavy sequential table scans ($O(N)$), degrading OLAP query performance.
 
+
 - *Fix Strategy:* Run `EXPLAIN QUERY PLAN` to identify unindexed joins, create composite covering B+ Tree indices (`CREATE INDEX idx_fk ON child_table(parent_id)`), and execute periodic index defragmentation (`REINDEX`).
+
 
 - **Issue - Normalization Anomalies & Redundancy:** Storing unnormalized data (1NF/2NF) causes severe update, insertion, and deletion anomalies, leading to inconsistent database states.
 
+
 - *Fix Strategy:* Run `SigmaModeler` automated normalizer (`normalizer.cpp`) to decompose monolithic tables into strict 3NF/BCNF schemas, eliminating transitive functional dependencies.
+
 
 - **Issue - Database Deadlocks in Transactional ER Models:** Mutually dependent transactions acquire row locks across parent-child ER tables in conflicting orders, triggering circular wait states.
 
+
 - *Fix Strategy:* Enforce strict two-phase locking (2PL) protocols, acquire table/row locks in a globally uniform hierarchical order, and implement automated deadlock detection with exponential backoff retries.
+
 
 ---
 
 ## SigmaModeler + SigmaViz Architecture
 
-```
+```text
 SigmaModeler
 ├── ER Diagram Editor (visual, drag-drop)
 ├── Schema Validator (NF checker)
@@ -323,10 +333,14 @@ SigmaViz
 
 - `userland/apps/SigmaModeler/erd_engine.cpp`
 
+
 - `userland/apps/SigmaModeler/schema_validator.cpp`
+
 
 - `userland/apps/SigmaViz/chart_engine.cpp`
 
+
 - `userland/apps/SigmaViz/dashboard_renderer.cpp`
+
 
 ### Last updated: 2026-05-19 | SigmaOS Zenith v15.2

@@ -35,7 +35,8 @@ pub enum DependencyResolver {
 ### Native Format (.sigma.tar.zst)
 
 **Structure:**
-```
+
+```text
 .sigma.tar.zst
 ├── .SIGMAINFO          # Package metadata
 ├── .BUILDINFO         # Build information
@@ -47,6 +48,7 @@ pub enum DependencyResolver {
 ```
 
 **SIGMAINFO Format:**
+
 ```ini
 pkgname = sigma-editor
 pkgver = 1.0.0
@@ -66,21 +68,27 @@ conflicts = nano-editor
 ### Repository Configuration
 
 ```yaml
+
 # /etc/sigma/repositories.yaml
+
 repositories:
+
   - name: core
+
     url: https://packages.sigmaos.org/core
     priority: 1
     gpg_key: /etc/sigma/keys/core.gpg
     auto_sync: true
     
   - name: community
+
     url: https://packages.sigmaos.org/community
     priority: 2
     gpg_key: /etc/sigma/keys/community.gpg
     auto_sync: true
     
   - name: extra
+
     url: https://packages.sigmaos.org/extra
     priority: 3
     gpg_key: /etc/sigma/keys/extra.gpg
@@ -90,6 +98,7 @@ repositories:
 ### Repository Metadata
 
 **Repository Index Format:**
+
 ```json
 {
   "version": "1.0",
@@ -114,6 +123,7 @@ repositories:
 ### SAT Solver Integration
 
 **Implementation:**
+
 ```rust
 pub struct SatSolver {
     pub constraints: Vec<Constraint>,
@@ -132,11 +142,13 @@ pub struct Literal {
 ```
 
 **Resolution Process:**
+
 1. Parse package dependencies
 2. Build constraint satisfaction problem
 3. Apply SAT solver to find solution
 4. Handle conflicts with user guidance
 5. Generate transaction plan
+
 
 ## Transaction Management
 
@@ -171,6 +183,7 @@ pub enum TransactionState {
 ### Rollback Mechanism
 
 **Implementation:**
+
 ```rust
 pub struct RollbackData {
     pub previous_state: SystemState,
@@ -186,15 +199,18 @@ pub struct SystemState {
 ```
 
 **Status:** ✅ Implemented
+
 - Location: `tools/sigma_pkg.rs`
 - Features: Snapshot-based rollback system with circular buffer (10 snapshots)
 - C-ABI exports: `sigma_pkg_create_snapshot()`, `sigma_pkg_rollback()`
+
 
 ## Delta Updates
 
 ### Binary Delta Implementation
 
 **Implementation:**
+
 ```rust
 pub struct DeltaUpdate {
     pub old_version: PackageVersion,
@@ -212,23 +228,28 @@ pub enum CompressionAlgorithm {
 ```
 
 **Delta Generation:**
+
 1. Compare old and new package files
 2. Generate binary diff using bsdiff or similar
 3. Compress delta with ZSTD
 4. Sign delta with repository key
 5. Upload to repository
 
+
 **Status:** ✅ Implemented
+
 - Location: `tools/sigma_pkg.rs`
 - Features: Binary patch application with version verification
 - C-ABI export: `sigma_pkg_apply_delta()`
 - Structures: `DeltaPatch`, `PackageVersion`
+
 
 ## Sandboxed Package Installation
 
 ### Sandbox Implementation
 
 **Implementation:**
+
 ```rust
 pub struct SandboxConfig {
     pub network_isolated: bool,
@@ -240,17 +261,21 @@ pub struct SandboxConfig {
 ```
 
 **Sandbox Features:**
+
 - Network namespace isolation
 - Filesystem mount isolation
 - Memory limits via cgroups
 - CPU limits via cgroups
 - Seccomp syscall filtering
 
+
 **Status:** ✅ Implemented
+
 - Location: `tools/sigma_pkg.rs`
 - Features: Network/filesystem isolation with resource limits
 - C-ABI export: `sigma_pkg_install_sandboxed()`
 - Structures: `SandboxConfig`
+
 
 ## Content-Addressed Storage
 
@@ -270,18 +295,23 @@ pub struct StorePath {
 ```
 
 **Benefits:**
+
 - Automatic deduplication
 - Immutable storage
 - Easy garbage collection
 - Reproducible builds
+
 
 ## Build System Integration
 
 ### PKGBUILD-Style Build Scripts
 
 **Example:**
+
 ```bash
+
 # PKGBUILD for sigma-editor
+
 pkgname=sigma-editor
 pkgver=1.0.0
 pkgrel=1
@@ -306,8 +336,11 @@ package() {
 ### Compilation Optimization
 
 **Per-Package Configuration:**
+
 ```ini
+
 # /etc/sigma/package.env
+
 sigma-editor CFLAGS="-O3 -march=native" MAKEOPTS="-j4"
 chromium CFLAGS="-O2" MAKEOPTS="-j2" PORTAGE_TMPDIR=/var/tmp/chromium
 ```
@@ -317,6 +350,7 @@ chromium CFLAGS="-O2" MAKEOPTS="-j2" PORTAGE_TMPDIR=/var/tmp/chromium
 ### Package Signing
 
 **Implementation:**
+
 ```rust
 pub struct PackageSignature {
     pub key_id: String,
@@ -334,39 +368,50 @@ pub enum SignatureAlgorithm {
 ### Signature Verification
 
 **Process:**
+
 1. Download package signature
 2. Verify signature with repository key
 3. Check key revocation status
 4. Verify package checksum
 5. Only install if all checks pass
 
+
 ## CLI Interface
 
 ### Command Structure
 
 ```bash
+
 # Install package
+
 sigma-pkg install sigma-editor
 
 # Remove package
+
 sigma-pkg remove sigma-editor
 
 # Update system
+
 sigma-pkg update
 
 # Search packages
+
 sigma-pkg search editor
 
 # Show package info
+
 sigma-pkg info sigma-editor
 
 # Upgrade package
+
 sigma-pkg upgrade sigma-editor
 
 # Rollback transaction
+
 sigma-pkg rollback <transaction-id>
 
 # Clean cache
+
 sigma-pkg clean
 ```
 
@@ -375,7 +420,9 @@ sigma-pkg clean
 ### Main Configuration File
 
 ```yaml
+
 # /etc/sigma/sigma-pkg.yaml
+
 general:
   color_output: true
   verbose_pkglists: true
@@ -406,6 +453,7 @@ build:
 ### Parallel Downloads
 
 **Implementation:**
+
 ```rust
 pub struct DownloadManager {
     pub max_connections: u32,
@@ -417,9 +465,11 @@ pub struct DownloadManager {
 ### Compression
 
 **Default Compression:**
+
 - ZSTD level 3 for packages
 - ZSTD level 15 for repository metadata
 - Delta updates use ZSTD level 5
+
 
 ## Implementation Priority
 
@@ -427,6 +477,7 @@ pub struct DownloadManager {
 2. **Phase 2 (Weeks 33-36):** Advanced package management (SAT solver)
 3. **Phase 3 (Weeks 45-48):** Delta updates and optimization
 4. **Phase 4 (Weeks 61-64):** Package building tools
+
 
 ## Testing
 
@@ -438,6 +489,7 @@ pub struct DownloadManager {
 - Delta update tests
 - Signature verification tests
 - Performance benchmarks
+
 
 ## References
 

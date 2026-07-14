@@ -19,15 +19,19 @@ SigmaOS absorbs OVS concepts for `sigma-vswitch`, providing the advanced network
 Instead of relying solely on the Linux bridge module, SigmaOS uses an OVS-inspired architecture capable of handling complex VLAN tagging, tunneling (VXLAN/GRE), and flow-based routing required for container and VM networks.
 
 ```bash
+
 # Create a virtual switch for VM networking
+
 $ sigma net switch create br-int
 Σ [NET] Virtual switch 'br-int' created.
 
 # Attach physical interface to switch
+
 $ sigma net switch attach br-int eth0
 Σ [NET] eth0 attached to br-int.
 
 # Create an isolated VLAN for untrusted VMs
+
 $ sigma net vlan create 10 br-int --name untrusted
 ```
 

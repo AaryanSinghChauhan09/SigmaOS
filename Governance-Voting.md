@@ -10,7 +10,7 @@ SigmaOS is a community-governed open-source project. Major technical and strateg
 
 ## Governance Structure
 
-```
+```text
 SigmaOS Foundation
 ├── Core Team       (5 elected members, 2-year terms)
 ├── Security Team   (3 members, security-clearance review)
@@ -25,12 +25,13 @@ SigmaOS Foundation
 - Road-map approval
 - Infrastructure budget
 
+
 ---
 
 ## Decision Categories
 
 | Category | Required Quorum | Voting Period |
-|---|---|---|
+| --- | --- | --- |
 | RFC (major feature) | 60% Core + 30% Community | 14 days |
 | Patch approval | 2 Core team members | 7 days |
 | Security patch | 1 Security team member | 48 hours |
@@ -48,27 +49,35 @@ SigmaOS Foundation
 5. **Decision**: Quorum reached → Accepted/Rejected
 6. **Implementation**: Tracked in `task.md` and assigned milestone
 
+
 ### RFC Template
 
 ```markdown
+
 # RFC-XXXX: Title
 
 ## Summary
+
 One-paragraph description of the change.
 
 ## Motivation
+
 Why is this needed? What problem does it solve?
 
 ## Proposal
+
 Detailed technical design.
 
 ## Drawbacks
+
 Known limitations or risks.
 
 ## Alternatives
+
 What other approaches were considered?
 
 ## Unresolved Questions
+
 Open questions for community input.
 ```
 
@@ -84,6 +93,7 @@ Open questions for community input.
 - Core team votes are weighted 3x
 - Results are announced in the SigmaOS forum and mailing list
 
+
 ---
 
 ## Code of Conduct
@@ -95,6 +105,7 @@ All participants must adhere to the [SigmaOS Code of Conduct](CODE_OF_CONDUCT.md
 - Zero tolerance for harassment, discrimination, or bad-faith participation
 - Violations reported to `conduct@sigmaos.dev`
 
+
 ---
 
 ## Roadmap Submission
@@ -102,7 +113,9 @@ All participants must adhere to the [SigmaOS Code of Conduct](CODE_OF_CONDUCT.md
 Community members can submit roadmap items:
 
 ```bash
+
 # Open a roadmap proposal
+
 sigma-contribute roadmap new --title "Add RISC-V support" --priority medium
 ```
 

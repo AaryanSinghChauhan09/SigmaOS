@@ -6,7 +6,7 @@ SigmaOS uses a four-layer test strategy. The goal: zero bugs escape to a release
 
 ## Test Categories
 
-```
+```text
 tests/
 ├── unit/           C++ unit tests (Google Test, host-mode — no QEMU needed)
 ├── integration/    Shell scripts — boot in QEMU, measure, verify services
@@ -37,7 +37,7 @@ cd build && ctest --output-on-failure
 ```
 
 | Test file | What it covers |
-|---|---|
+| --- | --- |
 | `test_sigma_sched.cpp` | MLFQ scheduler: level demotion, priority boost, anti-starvation |
 | `test_sigma_net.cpp` | TLS 1.3, DNS/DoH, DHCP, WPA3/SAE — 22 tests |
 | `test_sigma_ipc.cpp` | sigma-bus message delivery, capability gating |
@@ -72,7 +72,7 @@ clang++ -fsanitize=fuzzer,address -std=c++17 -Iinclude \
 ```
 
 | Fuzzer | Attack surface |
-|---|---|
+| --- | --- |
 | `fuzz_sigma_tcp.cpp` | TCP packet injection, option parsing, conntrack hash collisions |
 | `fuzz_sigma_pkg.cpp` | Package header parse, manifest JSON, path traversal, signature verify |
 | `fuzz_sigma_fs.cpp` | Malformed filesystem images, SigmaFS metadata |
@@ -104,13 +104,18 @@ Pass criteria for `test_boot_sequence.sh`:
 
 - Kernel boots and PID 1 starts: ✓
 
+
 - `sigma-healthd` ready within 5 seconds of kernel boot: ✓
+
 
 - All critical daemons started (busd, trustd, netd, watchdog): ✓
 
+
 - No FAILED subsystems on first boot: ✓
 
+
 - No unsigned kpatch modules loaded: ✓
+
 
 ---
 
@@ -134,19 +139,27 @@ python -c "from tests.openqa.sigma_scenarios import SCENARIOS; \
 
 - Boot (x86_64, aarch64, RTOS, cloud)
 
+
 - Security: pledge SIGABRT, unveil ENOENT, ASLR, W^X
+
 
 - ZeroTrust: allow, deny, revoke (Round 1 regression)
 
+
 - CryptFS: mount, TPM2 key, wrong PCR (tampered boot)
+
 
 - Packages: install, remove, rollback, dm-verity tamper
 
+
 - Network: DHCP, DoH, TLS 1.3, WPA3/SAE, firewall
+
 
 - Live patch: apply, revert, unsigned rejection
 
+
 - Regression: one test per fixed bug
+
 
 ---
 
@@ -171,17 +184,24 @@ The GitHub Actions workflow (`.github/workflows/sigma_ci.yml`) runs:
 
 1. **Build check** — CMake configure + Ninja build, check-stubs
 
+
 2. **Unit tests** — ctest on host
+
 
 3. **Fuzz tests** — 30-second budget per harness
 
+
 4. **Integration tests** — boot test in QEMU (Ubuntu 24.04 runner with KVM)
+
 
 5. **openQA scenarios** — matrix of critical scenarios
 
+
 6. **POSIX tests** — `tests/posix/run_posix_tests.sh`
 
+
 7. **Memory tests** — `tests/kernel/test_mm.sh`
+
 
 ```yaml
 
@@ -193,7 +213,9 @@ fuzz-tests:
     matrix:
       target: [fuzz_sigma_tcp, fuzz_sigma_pkg]
   steps:
+
     - run: |
+
         clang++ -fsanitize=fuzzer,address -Iinclude \
           tests/fuzz/${{ matrix.target }}.cpp -o ${{ matrix.target }}
         ./${{ matrix.target }} -max_total_time=30
@@ -207,32 +229,42 @@ fuzz-tests:
 
 1. Bug reported / CVE filed
 
+
 2. Reproduce with a minimal test case in `tests/regression/`
+
 
 3. Fix the bug
 
+
 4. Verify test passes
 
+
 5. Test is permanently part of CI — that bug can never silently return
+
 
 Current regression tests cover:
 
 - `regression_pid1_loop` — PID 1 5-iteration bug (Round 1)
 
+
 - `regression_sprintf_overflow` — ZeroTrust buffer overflow (Round 1)
+
 
 - `regression_zt_revocation` — revocation check ordering bug (Round 1)
 
+
 - `regression_cryptfs_zero_key` — CryptFS derive_key() stub (Issue #44)
 
+
 - `regression_kyber_misuse` — Kyber used for signatures (Round 7)
+
 
 ---
 
 ## Tools Reference
 
 | Tool | Purpose | Install |
-|---|---|---|
+| --- | --- | --- |
 | libFuzzer | Coverage-guided fuzzing | `clang -fsanitize=fuzzer` |
 | AddressSanitizer | Detects memory bugs | `-fsanitize=address` |
 | KASAN | Kernel address sanitizer | Build flag `SIGMA_KASAN=1` |

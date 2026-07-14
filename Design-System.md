@@ -9,16 +9,19 @@
 
 1. **Sovereign** — No dark patterns, no ads, no manipulation
 
+
 2. **Fluid** — Physics-based motion, every animation has purpose
 
+
 3. **Legible** — Contrast ≥ 4.5:1 (WCAG AA), always readable
+
 
 ---
 
 ## Colour Palette
 
 | Token | Value | Use |
-|---|---|---|
+| --- | --- | --- |
 | `bg` | `#07080C` | Desktop background |
 | `surface` | `rgba(31,33,42,0.60)` | Glass panels |
 | `border` | `rgba(255,255,255,0.09)` | Panel borders |
@@ -35,7 +38,7 @@
 ## Type Scale (key entries)
 
 | Token | Size | Weight | Use |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `display-lg` | 36px | 800 | Page titles |
 | `heading-2` | 22px | 700 | Card titles |
 | `body` | 14px | 400 | Default UI |
@@ -56,7 +59,7 @@ Corner radius: `6 / 10 / 14 / 18 / 24px / full`
 ## Motion Tokens
 
 | Token | Duration | Easing | Use |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `micro` | 80ms | ease-out-quad | Toggle, hover |
 | `fast` | 150ms | ease-out-quad | Button press |
 | `normal` | 250ms | ease-out-cubic | Panel open/close |

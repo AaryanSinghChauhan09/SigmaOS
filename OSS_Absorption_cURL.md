@@ -19,7 +19,9 @@ SigmaOS absorbs the **universal transfer interface** of cURL and integrates it w
 Instead of applications each bringing their own HTTP/TLS libraries (leading to bloat and security vulnerabilities), SigmaOS provides a system-level transfer API.
 
 ```bash
+
 # Unified command-line transfer tool
+
 $ sigma fetch https://example.com/data.tar.gz --progress
 Σ [FETCH] Establishing HTTP/3 (QUIC) connection...
   TLS 1.3 negotiated (X25519)

@@ -1,4 +1,5 @@
 # SigmaOS Window Manager Absorption - bspwm
+
 ## Making baskerville/bspwm Irrelevant
 
 > **Absorption Target**: https://github.com/baskerville/bspwm  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed bspwm by implementing a native binary space p
 ## Absorbed Features & Capabilities
 
 ### 1. Binary Space Partitioning
+
 **Original**: bspwm's BSP tiling algorithm  
 **SigmaOS**: Native BSP with enhanced algorithms
 
@@ -29,6 +31,7 @@ pub struct SigmaWM {
 ```
 
 **BSP Features**:
+
 - Native binary space partitioning with intelligent algorithms
 - Automatic tree balancing with optimization
 - Preset layouts with automatic selection
@@ -36,11 +39,14 @@ pub struct SigmaWM {
 - Native floating window support
 - Layout presets with automatic application
 
+
 ### 2. Configuration System
+
 **Original**: bspwm's configuration (bspwmrc)  
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
+
 - Native configuration with type safety
 - bspwm-compatible configuration with automatic conversion
 - Real-time configuration reload
@@ -48,11 +54,14 @@ pub struct SigmaWM {
 - Configuration profiles with import/export
 - Configuration inheritance with composition
 
+
 ### 3. Workspace Management
+
 **Original**: bspwm's desktop system  
 **SigmaOS**: Native workspace with enhanced features
 
 **Workspace Features**:
+
 - Native workspace management with automatic organization
 - Workspace persistence with automatic restoration
 - Workspace monitoring with real-time metrics
@@ -60,11 +69,14 @@ pub struct SigmaWM {
 - Workspace profiles with import/export
 - Workspace synchronization across devices
 
+
 ### 4. Keybinding System
+
 **Original**: bspwm's sxhkd integration  
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
+
 - Native keybinding system with type safety
 - Mode-based keybindings with automatic switching
 - Keybinding inheritance with composition
@@ -72,11 +84,14 @@ pub struct SigmaWM {
 - Keybinding conflicts with automatic resolution
 - Keybinding profiles with import/export
 
+
 ### 5. Bar System
+
 **Original**: bspwm's lemonbar integration  
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
+
 - Native bar with hardware acceleration
 - Bar modules with native integration
 - Bar theming with live preview
@@ -84,11 +99,14 @@ pub struct SigmaWM {
 - Bar profiles with automatic switching
 - Bar integration with system notifications
 
+
 ### 6. IPC Interface
+
 **Original**: bspwm's bspc command  
 **SigmaOS**: Native IPC with enhanced features
 
 **IPC Features**:
+
 - Native IPC with zero-copy optimization
 - IPC events with real-time delivery
 - IPC commands with type safety
@@ -96,12 +114,13 @@ pub struct SigmaWM {
 - IPC versioning with backward compatibility
 - IPC monitoring with native metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | bspwm | SigmaOS | Advantage |
-|---------|-------|---------|------------|
+| --------- | ------- | --------- | ------------ |
 | BSP Performance | C overhead | Native Rust | ✅ 3-5x |
 | Configuration Performance | Shell overhead | Native type-safe | ✅ 5x |
 | Keybinding Latency | 5ms | 1ms | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaWM {
 ## Implementation Details
 
 ### Native BSP Engine
+
 ```rust
 pub mod bsp {
     use sigma_wm::bsp::BSPEngine;
@@ -144,6 +164,7 @@ pub mod bsp {
 ```
 
 ### Native IPC Interface
+
 ```rust
 pub mod ipc {
     pub struct IPCInterface {
@@ -168,26 +189,36 @@ pub mod ipc {
 ### For Users of bspwm
 
 **Before** (using bspwm):
+
 ```bash
+
 # Install bspwm
+
 sudo apt install bspwm
 
 # Configure bspwm
+
 ~/.config/bspwm/bspwmrc
 
 # Use bspc command
+
 bspc command
 ```
 
 **After** (using SigmaWM):
+
 ```bash
+
 # Enable window manager shard (native)
+
 sigma-shard enable window-manager
 
 # Use bspwm-compatible configuration
+
 sigma-wm config --bspwm-compatible
 
 # Native commands
+
 sigma-wm command
 ```
 
@@ -196,7 +227,7 @@ sigma-wm command
 ## Performance Benchmarks
 
 | Operation | bspwm | SigmaWM | Improvement |
-|-----------|-------|---------|-------------|
+| ----------- | ------- | --------- | ------------- |
 | BSP Partition | 35ms | 8ms | 4.4x faster |
 | Workspace Switch | 20ms | 4ms | 5x faster |
 | Keybinding Execute | 5ms | 1ms | 5x faster |

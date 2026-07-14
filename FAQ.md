@@ -9,21 +9,27 @@ SigmaOS is a sovereign operating system built with Rust and Nim, designed for se
 ### Why create another operating system?
 
 SigmaOS addresses specific needs:
+
 - **Sovereignty**: Complete control over the OS stack
 - **Security**: Capability-based security model from the ground up
 - **Independence**: No reliance on external third-party dependencies
 - **Indian Context**: Built for India's digital infrastructure (ABDM, GST, UPI)
 - **Performance**: Zero-allocation optimizations and efficient algorithms
 
+
 ### What platforms does SigmaOS support?
 
 Currently:
+
 - x86_64 (primary target)
 - UEFI boot
 
+
 Planned:
+
 - ARM64 (Raspberry Pi)
 - RISC-V
+
 
 ### Is SigmaOS open source?
 
@@ -38,58 +44,71 @@ Yes, SigmaOS is licensed under the MIT License. See the [LICENSE](../LICENSE) fi
 - **Assembly**: Low-level hardware interaction
 - **C**: Legacy compatibility layer
 
+
 ### Why Rust?
 
 Rust provides:
+
 - Memory safety without garbage collection
 - Zero-cost abstractions
 - Strong type system
 - Excellent tooling (cargo, clippy)
 - Growing ecosystem
 
+
 ### Why Nim?
 
 Nim provides:
+
 - Python-like syntax
 - C-level performance
 - Small binary size
 - Easy FFI
 - Metaprogramming capabilities
 
+
 ### Does SigmaOS use the Linux kernel?
 
 No, SigmaOS has its own kernel written from scratch in Rust. This allows for:
+
 - Complete control over kernel design
 - Capability-based security model
 - Zero external dependencies
 - Tailored for SigmaOS requirements
 
+
 ### What filesystems does SigmaOS support?
 
 Currently:
+
 - Basic VFS layer
 - Ext2/Ext3 (planned)
 - FAT32 (planned)
 - CryptFS (Argon2id encrypted, planned)
 
+
 ### What graphics stack does SigmaOS use?
 
 SigmaOS uses:
+
 - VESA/VBE for basic framebuffer
 - UEFI GOP for UEFI systems
 - DRM/KMS for GPU drivers (planned)
 - Zenith compositor (planned)
+
 
 ## Security Questions
 
 ### What is the security model?
 
 SigmaOS uses a capability-based security model:
+
 - Fine-grained capabilities (CAP_CHOWN, CAP_NET_ADMIN, etc.)
 - Sovereign Capability Derivation Forest
 - Mandatory Access Control (MAC) policies
 - Landlock filesystem sandboxing
 - seccomp syscall filtering
+
 
 ### Is there a root user?
 
@@ -102,6 +121,7 @@ No, SigmaOS eliminates the traditional root user in favor of a capability-based 
 - Formal verification planned for critical components
 - Continuous security auditing
 - Automated vulnerability scanning
+
 
 ### Does SigmaOS support Secure Boot?
 
@@ -120,19 +140,23 @@ qemu-system-x86_64 -cdrom sigmaos.iso -m 2G
 ### What applications are available?
 
 SigmaOS includes native implementations of:
+
 - Word processor (sigma-wordprocessor)
 - Spreadsheet (sigma-spreadsheet)
 - Presentation (sigma-presentation)
 - Email client (sigma-email)
 - Database client (sigma-database)
 
+
 Plus core utilities and system tools.
 
 ### Can I run Linux applications on SigmaOS?
 
 Not directly. SigmaOS has its own syscall interface and ABI. However, we plan to implement:
+
 - Linux compatibility layer (optional)
 - Wine-like compatibility for Windows applications (future)
+
 
 ### How do I develop for SigmaOS?
 
@@ -143,55 +167,68 @@ See the [Development Guide](./DEVELOPMENT.md) for detailed instructions. Basic s
 3. Build the project
 4. Follow contribution guidelines
 
+
 ## Performance Questions
 
 ### How does SigmaOS performance compare to Linux?
 
 SigmaOS is optimized for:
+
 - Zero-allocation operations
 - Efficient data structures
 - Minimal overhead
 - Specialized for SigmaOS use cases
+
 
 Benchmarks will be provided as the system matures.
 
 ### What are the system requirements?
 
 Minimum (for development):
+
 - x86_64 CPU
 - 2GB RAM
 - 10GB disk space
 - UEFI firmware
 
+
 Recommended:
+
 - x86_64 CPU with virtualization support
 - 4GB+ RAM
 - 20GB+ disk space
 - UEFI 2.3.1+
+
 
 ## Development Questions
 
 ### How can I contribute?
 
 See the [Contributing Guide](../CONTRIBUTING.md) for details. Key areas:
+
 - Kernel development
 - Driver development
 - Application development
 - Documentation
 - Testing
 
+
 ### What are the most needed contributions?
 
 Currently (Phase 0):
+
 - C++/Rust kernel engineers
 - UEFI/EDK2 bootloader engineers
 - Build system engineers
 
+
 Future phases:
+
 - Network stack engineers
 - GPU/graphics engineers
 - India Stack API integration
 - AI/ML integration
+
 
 ### How do I report bugs?
 
@@ -199,21 +236,25 @@ Report bugs via GitHub Issues:
 https://github.com/AaryanSinghChauhan09/SigmaOS/issues
 
 Include:
+
 - System information
 - Error messages
 - Steps to reproduce
 - Debug logs if available
+
 
 ## Future Questions
 
 ### What's the roadmap?
 
 See the [Roadmap](./ROADMAP.md) for detailed plans. Key milestones:
+
 - M0: First Boot (Month 3)
 - M1: Real Hardware (Month 6)
 - M2: First Desktop (Month 9)
 - M3: India Stack Live (Month 14)
 - M4: Security Audit (Month 18)
+
 
 ### When will SigmaOS be production-ready?
 
@@ -239,22 +280,27 @@ Mobile support is not currently planned but may be considered in future phases.
 - Account Aggregator (AA)
 - NavIC (Indian GPS)
 
+
 ### Will SigmaOS support Indian languages?
 
 Yes, SigmaOS will support:
+
 - Hindi IME (Inscript + phonetic)
 - Other regional languages
 - Offline speech recognition (sigma-bhashini)
 - Text-to-speech
 
+
 ### How will SigmaOS help rural India?
 
 SigmaOS includes:
+
 - sigma-RuralStack for village-level services
 - Offline-first design for low connectivity
 - Low hardware requirements
 - Local language support
 - Digital literacy tools
+
 
 ## Licensing Questions
 
@@ -269,8 +315,10 @@ Yes, the MIT License allows modification and redistribution, provided the licens
 ### Are there any restrictions?
 
 The MIT License has minimal restrictions. You must:
+
 - Include the license and copyright notice
 - State any significant changes made
+
 
 ## Support Questions
 
@@ -280,6 +328,7 @@ The MIT License has minimal restrictions. You must:
 - GitHub Discussions: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
 - Documentation: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 - Email: (to be announced)
+
 
 ### Is commercial支持 available?
 
@@ -310,6 +359,7 @@ Donation options will be announced in the future.
 ## Still Have Questions?
 
 If your question isn't answered here:
+
 1. Check the [Documentation](./)
 2. Search [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 3. Search the [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)

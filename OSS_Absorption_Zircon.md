@@ -1,4 +1,5 @@
 # SigmaOS Kernel Absorption - Zircon
+
 ## Making fuchsia/zircon Irrelevant
 
 > **Absorption Target**: https://github.com/fuchsia/zircon  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed Zircon by implementing a native microkernel w
 ## Absorbed Features & Capabilities
 
 ### 1. Object Capability Model
+
 **Original**: Zircon's capability-based security  
 **SigmaOS**: Native capability system with hardware enforcement
 
@@ -29,6 +31,7 @@ pub struct CapabilitySystem {
 ```
 
 **Capability Features**:
+
 - Fine-grained capability rights with hardware enforcement
 - Object handles with automatic lifecycle management
 - Capability transfer with secure handoff
@@ -36,11 +39,14 @@ pub struct CapabilitySystem {
 - Hierarchical capabilities with inheritance
 - Capability auditing with tamper-proof logs
 
+
 ### 2. Component Framework
+
 **Original**: Fuchsia's component framework  
 **SigmaOS**: SigmaComponent with native integration
 
 **Component Features**:
+
 - Native component lifecycle management
 - Component discovery with automatic registration
 - Inter-component communication with native IPC
@@ -48,11 +54,14 @@ pub struct CapabilitySystem {
 - Component versioning with automatic updates
 - Component composition with dependency management
 
+
 ### 3. Job and Process Management
+
 **Original**: Zircon's job hierarchy  
 **SigmaOS**: Native process management with enhanced features
 
 **Process Features**:
+
 - Hierarchical job management with resource limits
 - Process creation with capability inheritance
 - Thread management with native scheduler
@@ -60,11 +69,14 @@ pub struct CapabilitySystem {
 - Signal handling with native delivery
 - Process monitoring with real-time metrics
 
+
 ### 4. Virtual Memory Management
+
 **Original**: Zircon's VMAR system  
 **SigmaOS**: SigmaVM with advanced features
 
 **VM Features**:
+
 - Virtual memory regions with flexible mapping
 - Memory paging with automatic optimization
 - Memory sharing with capability-based access
@@ -72,11 +84,14 @@ pub struct CapabilitySystem {
 - Memory compression with automatic activation
 - NUMA-aware allocation with automatic optimization
 
+
 ### 5. Kernel Object System
+
 **Original**: Zircon's kernel objects  
 **SigmaOS**: Native object system with enhanced features
 
 **Object Features**:
+
 - Unified object model with type safety
 - Object lifecycle with automatic cleanup
 - Object signaling with event delivery
@@ -84,11 +99,14 @@ pub struct CapabilitySystem {
 - Object sharing with capability transfer
 - Object monitoring with native observability
 
+
 ### 6. Channel Communication
+
 **Original**: Zircon's channel IPC  
 **SigmaOS**: Native IPC with zero-copy optimization
 
 **IPC Features**:
+
 - Zero-copy message passing with shared memory
 - Channel creation with capability-based access
 - Message queuing with automatic backpressure
@@ -96,12 +114,13 @@ pub struct CapabilitySystem {
 - Channel closure with automatic cleanup
 - Channel monitoring with native metrics
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | Zircon | SigmaOS | Advantage |
-|---------|--------|---------|------------|
+| --------- | -------- | --------- | ------------ |
 | Capability Security | Software enforcement | Hardware enforcement | ✅ 10x |
 | IPC Performance | Zero-copy | Zero-copy + optimization | ✅ 2x |
 | Component Isolation | Job-based | Capability-based | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct CapabilitySystem {
 ## Implementation Details
 
 ### Native Capability System
+
 ```rust
 pub mod capability {
     use sigma_core::security::CapabilityManager;
@@ -144,6 +164,7 @@ pub mod capability {
 ```
 
 ### Native Component Framework
+
 ```rust
 pub mod component {
     pub struct SigmaComponent {
@@ -175,26 +196,39 @@ pub mod component {
 ### For Users of Zircon/Fuchsia
 
 **Before** (using Zircon):
+
 ```bash
+
 # Build Fuchsia
+
 # Boot into Fuchsia
+
 # Use Fuchsia component framework
+
 # Capability-based security
+
 # Limited hardware support
+
 ```
 
 **After** (using SigmaOS):
+
 ```bash
+
 # Enable Zircon-inspired capabilities
+
 sigma-kernel capabilities --zircon-style
 
 # Create component with native framework
+
 sigma-component create --manifest component.sigma
 
 # Native IPC with zero-copy
+
 sigma-ipc send --component target --message data
 
 # Hardware-enforced security
+
 sigma-security enforce --hardware
 ```
 
@@ -203,7 +237,7 @@ sigma-security enforce --hardware
 ## Performance Benchmarks
 
 | Operation | Zircon | SigmaOS | Improvement |
-|-----------|--------|---------|-------------|
+| ----------- | -------- | --------- | ------------- |
 | Capability Check | 50ns | 20ns | 2.5x faster |
 | IPC Message (1MB) | 100μs | 40μs | 2.5x faster |
 | Component Launch | 50ms | 15ms | 3.3x faster |

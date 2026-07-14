@@ -8,7 +8,7 @@ This specification outlines the partition backup, live memory capture, and sandb
 
 The system recovery tool (`sigma-recover`) reads direct sector streams from block devices and writes compressed, encrypted backup files (`.simg`) to external or network drives.
 
-```
+```text
                   ┌───────────────────────────────┐
                   │      sigma-recover Engine     │
                   └───────────────┬───────────────┘

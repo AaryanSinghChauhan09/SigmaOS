@@ -10,11 +10,15 @@ The Veterinarian Profile is designed for veterinary excellence, animal care, and
 
 - **SigmaPatient**: Animal patient records and medical history.
 
+
 - **SigmaDiagnosis**: Diagnostic tools and imaging management.
+
 
 - **SigmaTreatment**: Treatment planning and medication tracking.
 
+
 - **SigmaSchedule**: Appointment scheduling and clinic management.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Veterinarian Profile is designed for veterinary excellence, animal care, and
 
 - **Theme**: Veterinary Green (Clinical Standard)
 
+
 - **Layout**: Veterinary Dashboard (Patient, Diagnosis, Treatment)
 
+
 - **Personalization**: Custom treatment plans and automated reminders.
+
 
 ---
 

@@ -8,7 +8,7 @@ The Sovereign Package Manager (`sigma-pkg`) provides reproducible, cryptographic
 
 A `.spkg` archive contains:
 
-```
+```text
 myapp-1.0.0.spkg
 ├── sigma.manifest.json   ← package metadata + dependencies
 ├── content/              ← application files
@@ -108,11 +108,15 @@ Every `.spkg` in the official registry is reproducibly built:
 
 1. Build environment is a hermetic sigma-pod container
 
+
 2. All inputs (source, deps, build tools) are content-addressed
+
 
 3. Build hash recorded in `build.proof`
 
+
 4. Any developer can verify: `sigma-pkg verify --repro firefox`
+
 
 ---
 
@@ -127,7 +131,7 @@ Every `.spkg` in the official registry is reproducibly built:
 Official registry: `https://repo.sigmaos.dev/`
 
 | Channel | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `main` | Stable releases |
 | `updates` | Security + bug fix updates |
 | `backports` | Newer versions backported to stable |
@@ -140,14 +144,16 @@ Official registry: `https://repo.sigmaos.dev/`
 
 Package installs are atomic — either the full install completes or nothing changes:
 
-```
+```text
 sigma-pkg install firefox
+
   1. Download + verify signature
   2. Extract to /sigma/pkg/staging/firefox-120/
   3. Run pre-install hooks
   4. Atomic rename: staging/ → /sigma/pkg/installed/firefox/
   5. Register in /sigma/pkg/db/
   6. Run post-install hooks
+
   → On failure at any step: staging/ is removed, system unchanged
 ```
 
@@ -156,7 +162,7 @@ sigma-pkg install firefox
 ## Source Files
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `pkg/sigma_pkg_core.cpp` | Core package engine |
 | `pkg/sigma_pkg_cli.cpp` | CLI frontend |
 | `pkg/SovereignPkgManager.cpp` | High-level manager |

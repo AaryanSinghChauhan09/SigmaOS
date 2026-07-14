@@ -9,27 +9,33 @@ The SigmaOS Driver Auto-Updater ensures all hardware drivers are cryptographical
 ## Driver Package Format
 
 Each driver package contains:
+
 - **Module binary** (`.ko` kernel module)
 - **Ed25519 signature** (64 bytes)
 - **SHA-256 checksum** (32 bytes)
 - **Signer public key** (32 bytes)
 - **Compatibility metadata** (vendor/device IDs, min kernel version)
 
+
 ## Update Flow
 
-```
+```text
+
 1. Check Registry  ──→  2. Download Package  ──→  3. Verify Signature
+
                                                         │
+
 6. Rollback (if fail) ←── 5. Test Hardware ←── 4. Install Atomically
+
 ```
 
 ## Driver Classes
 
 | Class      | Examples                          |
-|------------|-----------------------------------|
+| ------------ | ----------------------------------- |
 | GPU        | NVIDIA, AMD, Intel integrated     |
 | Network    | Intel e1000e, Realtek, Broadcom   |
-| Storage    | NVMe, SATA AHCI, USB Mass Storage|
+| Storage    | NVMe, SATA AHCI, USB Mass Storage |
 | Audio      | ALSA/PipeWire drivers             |
 | Input      | HID, touchscreen, stylus          |
 | USB        | xHCI, EHCI controllers            |
@@ -46,6 +52,7 @@ Each driver package contains:
   - `check_compatibility(pkg, kernel)` — HCL + kernel version
   - `install_driver(pkg, kernel)` — atomic install with rollback
   - `rollback()` — revert to previous driver
+
 
 ## Security
 

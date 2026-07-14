@@ -9,7 +9,7 @@ source code used.
 
 ## Components
 
-```
+```text
 runtime/compat/win32/
 ├── sigma_pe_loader.rs      PE32+ ELF loader (MZ header → section mapping)
 ├── sigma_ntdll.rs          NT API shim (ntdll.dll replacement)
@@ -36,15 +36,21 @@ println!("Imports:  {} DLLs", image.import_count);
 
 - **PE32+ (x86-64)** — supports both EXE and DLL
 
+
 - **Section mapping** — `.text` (r-x), `.data` (rw-), `.rdata` (r--) mapped with correct permissions
+
 
 - **W^X enforcement** — sections cannot be both writable and executable (SigmaOS security policy)
 
+
 - **Base relocations** — `.reloc` section processed when ASLR loads at non-preferred base
+
 
 - **Import table parsing** — lists all DLL dependencies (resolved by the ntdll shim)
 
+
 - **TLS callbacks** — Thread Local Storage initializers called on load
+
 
 ### Section Permissions (W^X)
 
@@ -64,7 +70,7 @@ Provides the NT functions that Win32 apps call at the bottom of every Windows
 API call chain:
 
 | NT Function | SigmaOS Equivalent |
-|---|---|
+| --- | --- |
 | `NtAllocateVirtualMemory` | `sigma_mmap` with prot flags translation |
 | `NtFreeVirtualMemory` | `sigma_munmap` |
 | `NtCreateThread` | `sigma_thread_create` |
@@ -94,7 +100,7 @@ const EPOCH_DIFF_100NS: u64 = 116_444_736_000_000_000;
 Windows uses opaque integer HANDLEs for all resources. The handle table maps
 Win32 HANDLEs to SigmaOS native IDs:
 
-```
+```text
 Win32 HANDLE value = (table_index << 2)
                      ↕
 sigma_handle_table entry:
@@ -105,7 +111,7 @@ sigma_handle_table entry:
 ### Handle Types
 
 | Kind | Win32 Source | SigmaOS data field |
-|------|-------------|-------------------|
+| ------ | ------------- | ------------------- |
 | `File` | `CreateFile` | SigmaOS file descriptor |
 | `Thread` | `CreateThread` | thread ID |
 | `Process` | `OpenProcess` | PID |
@@ -147,17 +153,24 @@ The launcher (`sigma_wine_loader.rs`):
 
 1. Reads PE32+ header, validates it's 64-bit
 
+
 2. Allocates memory at preferred base (or ASLR random base)
+
 
 3. Maps all sections with `NtAllocateVirtualMemory`
 
+
 4. Processes base relocations if base differs from preferred
+
 
 5. Resolves imports — maps `ntdll.dll` calls to `sigma_ntdll.rs` shim
 
+
 6. Calls TLS callbacks
 
+
 7. Calls entry point with `argc/argv/envp`
+
 
 ---
 
@@ -165,7 +178,7 @@ The launcher (`sigma_wine_loader.rs`):
 
 Win32 compat processes run with:
 
-```
+```text
 sigma_pledge("stdio rpath wpath exec proc inet")
 sigma_unveil("/tmp", "rwc")
 sigma_unveil("~/.wine", "rwc")
@@ -180,21 +193,30 @@ The PE loader enforces W^X — no RWX memory regions.
 
 - ❌ 32-bit PE32 (x86) not supported — only PE32+ (x86-64)
 
+
 - ❌ GUI (USER32/GDI32) not yet wired — console apps only
+
 
 - ❌ COM/OLE not implemented
 
+
 - ❌ Registry (`RegOpenKey` etc.) is a stub
+
 
 - ❌ DirectX — Phase E
 
+
 - ✅ Console I/O via `sigma_ntdll` → sigma-sh
+
 
 - ✅ File I/O (`CreateFile`, `ReadFile`, `WriteFile`)
 
+
 - ✅ Threading (`CreateThread`, `WaitForSingleObject` via event shim)
 
+
 - ✅ Memory management (`VirtualAlloc`, `VirtualFree`)
+
 
 ---
 

@@ -10,7 +10,7 @@ SigmaOS integrates a native WebAssembly (WASM) runtime directly into the kernel,
 
 The SigmaOS WASM runtime is built on a `no_std` compatible interpreter (and eventual JIT compiler) that runs within its own Sovereign Shard (`S07_WASM_Runtime`). 
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    SIGMA WASM RUNTIME                       │
 │                                                             │
@@ -32,15 +32,19 @@ The SigmaOS WASM runtime is built on a `no_std` compatible interpreter (and even
 3. **WASI Compatibility**: The runtime implements a subset of the WebAssembly System Interface (WASI), mapped directly to `sigma-bus` IPC calls, allowing standard WASM modules (compiled from Rust, C/C++, Go) to run unmodified.
 4. **Hot-Swappable Capabilities**: Capabilities (network access, disk access) are injected at runtime via capability handles, adhering to the Sovereign Principles of least-privilege.
 
+
 ## Usage
 
 Running a WASM binary natively from the shell:
 
 ```bash
+
 # Execute a WASM module
+
 sigma wasm run /path/to/module.wasm
 
 # Execute with specific capabilities
+
 sigma wasm run --cap-net --cap-fs-read=/tmp /path/to/module.wasm
 ```
 

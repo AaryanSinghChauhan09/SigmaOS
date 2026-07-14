@@ -7,8 +7,9 @@ This dashboard tracks the implementation of roadmap features, the absorption of 
 ---
 
 ## 1. Ideas & Features Implemented
+
 | Subsystem | Feature | Description | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Security | QubesOS Compartments | Strict Ring-level sandboxing module (`kernel/security/compartments.rs`) | ✅ Implemented |
 | Security | OCI Container Integration | `OciSpec` struct and `Compartment::from_oci_spec` for Docker/Podman native containers | ✅ Implemented |
 | Networking | sigma-shield Firewall | Sovereign packet filter with connection tracking, rate limiting, default-drop policy (`kernel/net/sigma_shield.rs`) | ✅ Implemented |
@@ -22,13 +23,15 @@ This dashboard tracks the implementation of roadmap features, the absorption of 
 | CI/CD | CODEOWNERS Enforcement | GitHub Actions workflow validates ownership on every PR | ✅ Implemented |
 
 ## 2. Documentation Migrations
+
 | Original Location | Destination Wiki Page | Status |
-|---|---|---|
+| --- | --- | --- |
 | `docs/POSIX_COMPAT.md` | `POSIX_COMPAT.md` | ✅ Migrated |
 
 ## 3. Wiki Pages Finalized (from DRAFT → ACTIVE)
+
 | Wiki Page | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | `CORE_SHARDS.md` | Ring 0/1 shard hierarchy, isolation, recovery | ✅ Complete |
 | `ESSENTIAL_SHARDS.md` | Ring 1 security, network, driver shards with Mermaid diagram | ✅ Complete |
 | `Reproducibility.md` | Deterministic builds, Sovereign Finality Certificate | ✅ Complete |
@@ -38,20 +41,26 @@ This dashboard tracks the implementation of roadmap features, the absorption of 
 | `Implementation_Merge_Summary.md` | This dashboard | ✅ Active |
 
 ## 4. Branch Lifecycle & Merges
+
 | Branch Name | Feature | Action Taken | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `feat/qubes-compartments` | Compartmentalized security | Tested, Merged, Deleted | ✅ Absorbed into `main` |
 | `feat/nixos-declarative` | Declarative system state parsing | Tested, Merged, Deleted | ✅ Absorbed into `main` |
 
 ## 5. Key Distro Paradigms Absorbed
+
 1. **QubesOS (Security by Isolation)**: Strict memory-bounded compartments with capability tokens. Extended with OCI container support.
 2. **NixOS (Declarative Reproducibility)**: Declarative state enforcement blocking manual package mutations.
 3. **Arch Wiki (Knowledge Hub)**: Comprehensive `Knowledge-Base.md` covering installation, configuration, troubleshooting, and internals.
 
+
 ## 6. Conflicts Resolved
+
 - None — all merges were fast-forward.
 
+
 ## 7. Next Recommended Steps
+
 - Integrate `compartments.rs` with the EEVDF scheduler for task-level sandboxing.
 - Implement a real TOML parser for `sigma_declarative_parser.rs`.
 - Add io_uring async I/O support to the VFS layer.

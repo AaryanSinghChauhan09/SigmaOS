@@ -18,7 +18,9 @@ graph TD
 
 - **Legacy Support**: `mount()` operations for FAT32 and EXT2 partitions.
 
+
 - **NVMe Awareness**: Direct Memory Access (DMA) hooks for extreme throughput.
+
 
 ## VFS API Example
 

@@ -28,7 +28,9 @@ $ sigma dashboard --panel cpu
 All dashboards in SigmaOS are defined declaratively as TOML files, making them version-controllable and easily shareable.
 
 ```toml
+
 # /etc/sigma/dashboards/network.toml
+
 [dashboard]
 title = "Network Throughput"
 refresh = "1s"

@@ -13,27 +13,32 @@ SigmaOS operates under a decentralized, open-source governance charter. Project 
 - **Inclusive**: Open to all contributors
 - **Secure**: Cryptographic verification of all votes
 
+
 ## Governance Structure
 
 ### Steering Committee
 
 **Composition**:
+
 - 7 elected members
 - 12-month term
 - Staggered elections (3 seats every 4 months)
 - Geographic diversity requirement
 - Technical expertise requirement
 
+
 **Responsibilities**:
+
 - Technical direction decisions
 - RFC approval and rejection
 - Budget allocation
 - Contributor status approval
 - Conflict resolution
 
+
 ### Contributor Voting & Onboarding
 
-```
+```text
  [New Contributor] ──► [Submit Valid PR] ──► PR Merged
                                                │
                                                ▼
@@ -45,7 +50,7 @@ SigmaOS operates under a decentralized, open-source governance charter. Project 
 
 ### Governance Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │      SigmaOS Governance               │
 │  ┌──────────┬──────────┬──────────────┐ │
@@ -253,22 +258,27 @@ impl DIDRegistry {
 ### Contributor Status
 
 **Requirements**:
+
 - 5 merged pull requests
 - 3 months of active contribution
 - Signed CLA
 - Accepted Code of Conduct
 - Valid DID
 
+
 **Benefits**:
+
 - Voting rights on RFCs
 - Eligibility for Steering Committee
 - Access to contributor-only channels
 - Recognition in contributor list
 
+
 ### Contributor License Agreement (CLA)
 
 **CLA Text**:
-```
+
+```text
 Contributor License Agreement for SigmaOS
 
 You hereby grant to the SigmaOS project and its successors a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute your contributions and such derivative works.
@@ -277,11 +287,13 @@ You hereby grant to the SigmaOS project and its successors a perpetual, worldwid
 ### Code of Conduct
 
 **Key Principles**:
+
 - Respectful communication
 - Inclusive environment
 - Constructive feedback
 - Zero tolerance for harassment
 - Conflict resolution process
+
 
 ## RFC Process
 
@@ -294,12 +306,15 @@ You hereby grant to the SigmaOS project and its successors a perpetual, worldwid
 5. **Implementation**: Implementation phase
 6. **Review**: Post-implementation review
 
+
 ### RFC Template
 
 ```markdown
+
 # RFC: [Title]
 
 ## Status
+
 - [ ] Draft
 - [ ] Discussion
 - [ ] Voting
@@ -307,16 +322,21 @@ You hereby grant to the SigmaOS project and its successors a perpetual, worldwid
 - [ ] Rejected
 - [ ] Implemented
 
+
 ## Motivation
+
 Why is this RFC needed?
 
 ## Proposed Solution
+
 Detailed description of the proposed solution.
 
 ## Alternatives
+
 What alternatives were considered?
 
 ## Unresolved Questions
+
 What questions remain unanswered?
 ```
 
@@ -325,23 +345,29 @@ What questions remain unanswered?
 ### Steering Committee Elections
 
 **Eligibility**:
+
 - Contributor status for at least 6 months
 - Minimum 10 merged pull requests
 - No conflicts of interest
 - Geographic diversity consideration
 
+
 **Process**:
+
 1. Nomination period (7 days)
 2. Campaign period (7 days)
 3. Voting period (7 days)
 4. Vote tallying
 5. Results announcement
 
+
 **Voting System**:
+
 - Single transferable vote (STV)
 - Cryptographically signed ballots
 - Public verification
 - Audit trail
+
 
 ## Best Practices
 
@@ -352,12 +378,14 @@ What questions remain unanswered?
 3. **Merit-Based**: Recognition based on contributions
 4. **Security**: Cryptographic verification of all votes
 
+
 ### Contribution
 
 1. **Quality**: Focus on high-quality contributions
 2. **Collaboration**: Work with the community
 3. **Documentation**: Document all changes
 4. **Testing**: Test all contributions thoroughly
+
 
 ### Conflict Resolution
 
@@ -366,31 +394,40 @@ What questions remain unanswered?
 3. **Appeals**: Right to appeal decisions
 4. **Documentation**: Document all conflicts
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Establish open-source code of conduct
 - Contributor license agreements (CLA)
 - Basic governance structure
 - RFC process definition
 
+
 ### Phase 2 (Months 3-6)
+
 - GitHub bot for RFC votes
 - PGP/MOK signature parsing
 - DID registry implementation
 - Vote verification system
 
+
 ### Phase 3 (Months 6-9)
+
 - Steering committee election framework
 - Dashboard interface
 - Contributor management system
 - Conflict resolution process
 
+
 ### Phase 4 (Months 9-12)
+
 - Foundation establishment
 - Intellectual property protection trust
 - Advanced governance features
 - Community outreach programs
+
 
 ## References
 

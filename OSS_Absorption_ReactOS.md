@@ -19,7 +19,9 @@ SigmaOS absorbs the **Win32 API compatibility layers** pioneered by ReactOS (ker
 SigmaOS runs Windows applications natively, translating Win32/DirectX calls to POSIX/Vulkan calls at zero overhead.
 
 ```bash
+
 # Launch a Windows executable seamlessly
+
 $ sigma run legacy-app.exe
 Σ [WIN32] Initializing Win32 Subsystem (Proton-compatible)...
   Mapping C:\ to /home/user/.wine/drive_c/
@@ -55,7 +57,7 @@ pub fn spawn_win32(exe: &Path) -> Result<()> {
 
 ## 3. Architecture
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │               SIGMA-WIN32 COMPATIBILITY LAYER                  │
 │                                                                │

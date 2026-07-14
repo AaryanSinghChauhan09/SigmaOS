@@ -10,7 +10,7 @@ As the first command of the Sovereign Expansion Phase, SigmaOS has deployed `Sov
 
 The Sovereign Lattice dynamically unites heterogeneous silicon into a unified storage fabric:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    SOVEREIGN VFS                                │
 │                                                                 │
@@ -39,7 +39,7 @@ The Sovereign Lattice dynamically unites heterogeneous silicon into a unified st
 
 ### Multi-Node Topology
 
-```
+```text
 ┌──────────────────┐     sigma-mesh      ┌──────────────────┐
 │  Node 1: x86_64  │ ◄═══════════════▶  │  Node 2: ARM64   │
 │  NVMe 2TB        │                     │  eMMC 128GB      │
@@ -55,7 +55,7 @@ The Sovereign Lattice dynamically unites heterogeneous silicon into a unified st
 
 ### Data Striping Strategy
 
-```
+```text
 File: /home/user/project.tar.gz (150MB)
 
 Block Distribution:
@@ -116,23 +116,29 @@ impl SigmaFs {
 ```
 
 **Properties**:
+
 - Atomic writes (no partial state on crash)
 - Content deduplication via hash-based store
 - Instant snapshots (COW, no data copy)
 - BLAKE3 integrity verification on every read
 - Compression: LZ4 for hot data, ZSTD for cold data
 
+
 ### ext4-compat (Legacy)
 
 For compatibility with existing Linux partitions:
+
 - Read-write support for ext4 with journaling
 - Transparent access to ext4 volumes via VFS
 - Migration tool: `sigma fs migrate --from ext4 --to sigma-fs`
 
+
 ### tmpfs-shard (RAM-backed)
 
 ```toml
+
 # /etc/sigma/tmpfs.toml
+
 [tmpfs."/tmp"]
 max_size_mb = 512
 
@@ -148,7 +154,7 @@ max_size_mb = 4096
 ## Performance Benchmarks
 
 | Operation | sigma-fs | ext4 | btrfs | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Sequential read (4K) | 3.2 GB/s | 2.8 GB/s | 2.6 GB/s | NVMe Gen4 |
 | Sequential write (4K) | 2.8 GB/s | 2.5 GB/s | 2.3 GB/s | COW overhead minimal |
 | Random read (4K) | 890K IOPS | 750K IOPS | 680K IOPS | B-tree index |
@@ -162,7 +168,7 @@ max_size_mb = 4096
 ## POSIX Compliance
 
 | POSIX Feature | Status |
-|---|---|
+| --- | --- |
 | open/close/read/write | ✅ |
 | mkdir/rmdir/rename | ✅ |
 | stat/fstat/lstat | ✅ |
@@ -179,26 +185,39 @@ max_size_mb = 4096
 ## CLI Interface
 
 ```bash
+
 # List mounted filesystems
+
 sigma fs list
+
 # MOUNT        TYPE      SIZE     USED    AVAIL   SNAPSHOTS
+
 # /            sigma-fs  500GB    48GB    452GB   3
+
 # /boot        vfat      512MB    25MB    487MB   0
+
 # /home        sigma-fs  1TB      120GB   880GB   7
+
 # /tmp         tmpfs     512MB    12MB    500MB   0
 
 # Create a snapshot
+
 sigma fs snapshot create --name "before-upgrade"
 
 # Rollback to snapshot
+
 sigma fs snapshot rollback "before-upgrade"
 
 # Check filesystem integrity
+
 sigma fs check /
+
 # Verifying BLAKE3 integrity... 100%
+
 # Result: OK (245,891 files verified, 0 corrupted)
 
 # Migrate from ext4
+
 sigma fs migrate /dev/sda2 --from ext4 --to sigma-fs
 ```
 

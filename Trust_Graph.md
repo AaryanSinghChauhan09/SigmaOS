@@ -10,9 +10,12 @@ Unlike mainstream distributions that rely on black-box updates, SigmaOS visualiz
 
 - **PQC Attestation**: Verification that the shard has been signed using Post-Quantum Cryptography (Dilithium/Kyber).
 
+
 - **FIPS-140-3 Compliance**: Real-time auditing of cryptographic module standards.
 
+
 - **Universal Package Graph**: Mathematical proof of software origin via the immutable provenance lattice.
+
 
 ## 🎨 Visualization (Zenith UI)
 

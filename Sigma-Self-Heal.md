@@ -10,7 +10,7 @@ No IT department. No StackOverflow. No re-installation. The OS just fixes itself
 
 ### Filesystem Corruption
 
-```
+```text
 Filesystem corruption:
 ├── Detects: bad sectors, corrupted inodes, orphaned files
 ├── Fixes: btrfs scrub + repair, fsck equivalent per filesystem type
@@ -21,23 +21,30 @@ sigma-heal polls filesystem health every 60 seconds using `btrfs device stats` a
 
 - Bad sectors and read errors
 
+
 - Corrupted inodes and orphaned files
 
+
 - Filesystem tree inconsistencies
+
 
 ### Repair flow:
 
 1. `btrfs scrub start /` → waits for result
 
+
 2. If errors found → `btrfs scrub -r` (repair mode)
+
 
 3. If still unfixable → pulls clean snapshot from `sigma-mirror` (encrypted remote backup)
 
+
 4. Logs event to immutable DID-signed audit trail
+
 
 ### Kernel Panic Recovery
 
-```
+```text
 Kernel panic recovery:
 ├── On crash: capture full memory dump (kdump)
 ├── Boot to recovery kernel (slot-B always available)
@@ -49,19 +56,24 @@ SigmaOS always keeps two kernel slots (A/B). When a panic occurs:
 
 1. kdump captures full memory dump to `/var/sigma-crash/`
 
+
 2. System boots to slot-B (recovery kernel)
+
 
 3. `sigma-ai` analyzes the dump — identifies faulting module, stack trace pattern
 
+
 4. If a known hotfix exists → apply via `sigma-livepatch` (no reboot needed)
 
+
 5. If no hotfix → roll back to last known-good generation
+
 
 Every crash and its resolution is logged with a DID-signed event for audit.
 
 ### Package Conflicts
 
-```
+```text
 Package conflicts:
 ├── Detects: broken dependencies after failed upgrade
 ├── Fixes: dependency solver + rollback broken packages
@@ -72,13 +84,16 @@ After any `sigma-pkg upgrade`, sigma-heal verifies the dependency graph. If a br
 
 1. Dependency resolver identifies the offending package
 
+
 2. Either re-fetches the correct version or rolls back to the previous generation
+
 
 3. System is never left in a partial upgrade state
 
+
 ### Network Self-Heal
 
-```
+```text
 Network self-heal:
 ├── DNS not resolving → try alternate DNS (1.1.1.1, 8.8.8.8, Cloudflare DoT)
 ├── Default route gone → try DHCP renew (sigma-netd --renew)
@@ -89,13 +104,16 @@ sigma-heal subscribes to `sigma-bus` network events from `sigma-netd`. On failur
 
 - DNS probe fails → switch to fallback DNS automatically, restore original when it recovers
 
+
 - Route table empty → trigger DHCP renew on all interfaces
+
 
 - Wi-Fi kernel module crash → unload + reload (`iwlwifi`, `mt7921`, etc.)
 
+
 ### Security Self-Heal
 
-```
+```text
 Security self-heal:
 ├── sigma-ids detects intrusion → auto-isolate compromised process
 ├── Rootkit detected → integrity restore from PQ-signed verified backup
@@ -106,13 +124,16 @@ sigma-heal integrates with `sigma-ids` (intrusion detection) and `sigma-trustd` 
 
 - **Process isolation**: compromised process gets sandboxed with `sigma-jail --isolate <pid>`
 
+
 - **Rootkit**: file integrity baseline (Dilithium3-signed) compared — deviations restored from baseline
+
 
 - **Key compromise**: DID keypair automatically revoked and regenerated; all services notified via `sigma-bus`
 
+
 ### Hardware Self-Heal
 
-```
+```text
 Hardware self-heal:
 ├── GPU driver crash → switch to software rendering (llvmpipe — no black screen)
 ├── Sound card failure → mute gracefully (no kernel panic)
@@ -123,9 +144,12 @@ Because SigmaOS drivers run in userspace (SDF), a driver crash is isolated and h
 
 - GPU driver dies → display server switches to `llvmpipe`/`softpipe` software renderer — user sees degraded performance, not a black screen
 
+
 - Audio driver dies → sigma-audio mutes gracefully, no kernel involvement
 
+
 - USB device pulled during a write → write barrier was already issued; file system state is consistent
+
 
 ---
 
@@ -160,7 +184,7 @@ sigma-heal stats --output /tmp/heal-stats.json
 
 ### Sample `sigma-heal status` output
 
-```
+```text
 sigma-heal status (last 30 days)
 ─────────────────────────────────────────────────────
 Category         Events   Fixed   Mitigated   Failed
@@ -177,7 +201,7 @@ Last event: 3 days ago  (network: DNS fallback activated)
 
 ### Sample `sigma-heal simulate` output
 
-```
+```text
 sigma-heal simulate --component "nvidia.ko"
 
 Scenario: NVIDIA GPU driver crash
@@ -199,13 +223,17 @@ sigma-heald is a Go daemon (`sigmad/heal/main.go`) that:
 
 1. Subscribes to `sigma-bus` for hardware, security, and package events
 
+
 2. Runs a 60-second poll loop for filesystem and service health
+
 
 3. Calls into `sigma_heal.h` C library for actual repair operations
 
+
 4. Writes all events to the DID-signed immutable audit journal
 
-```
+
+```text
 sigma-bus events
     │
     ├── HARDWARE_CRASH → sigma_heal_hw_*()
@@ -224,18 +252,22 @@ Poll loop (60s)
 
 - Does not modify data files (only system files and configurations)
 
+
 - Does not make network connections on your behalf (no phoning home)
+
 
 - Does not hide events — everything is logged to the DID-signed audit trail
 
+
 - Does not replace a human decision for FAILED repairs — admin is notified
+
 
 ---
 
 ## Comparison with Other Systems
 
 | OS | Self-Repair Capability |
-|---|---|
+| --- | --- |
 | Ubuntu | None — manual intervention required |
 | Windows | `sfc /scannow` — filesystem only, manual |
 | macOS | Disk First Aid — manual, filesystem only |

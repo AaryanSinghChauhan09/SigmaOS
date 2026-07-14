@@ -18,7 +18,7 @@ SigmaOS directly learns from Fuchsia's **handle-based capability system**, **com
 
 Like Fuchsia's Zircon handles, every SigmaOS resource (file, port, socket, timer, VMO) is represented as a capability handle that can be explicitly transferred between processes. No ambient authority exists.
 
-```
+```text
 ┌─ Process A ─────────────────────────────┐
 │  handle[3] = VMO("/home/user/data.db")  │ ← can only read/write this file
 │  handle[4] = Port("tcp:8080")           │ ← can only listen on port 8080
@@ -34,7 +34,9 @@ Like Fuchsia's Zircon handles, every SigmaOS resource (file, port, socket, timer
 Like Fuchsia's component framework, SigmaOS components declare their required capabilities in a manifest. The runtime only grants what is declared — no more, no less.
 
 ```toml
+
 # sigma-component.toml for sigma-browser
+
 [component]
 name = "sigma-browser"
 
@@ -45,8 +47,11 @@ capabilities = [
     "storage:~/.sigma/browser",
     "audio:playback",
 ]
+
 # Implicitly: NO filesystem outside ~/.sigma/browser
+
 # Implicitly: NO raw sockets, NO IPC outside declared
+
 ```
 
 ### 2.3 Starnix-Inspired Linux ABI Layer

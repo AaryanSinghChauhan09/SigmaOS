@@ -8,14 +8,16 @@ SigmaOS uses Firecracker as a **secure microVM fallback runtime** for two scenar
 
 1. **OCI container isolation** — running untrusted OCI images inside a microVM instead of a process-level namespace, giving hardware-enforced separation.
 
+
 2. **FaaS cold start** — spinning up short-lived function execution environments with predictable latency.
+
 
 ---
 
 ## Why Firecracker
 
 | Concern | Solution |
-|---|---|
+| --- | --- |
 | OCI namespace escape | microVM boundary — guest kernel cannot see host memory |
 | FaaS cold start latency | Firecracker boots a minimal Linux guest in < 125ms |
 | Device attack surface | Only virtio-net, virtio-blk, vsock — no USB, PCI bus |
@@ -27,7 +29,7 @@ SigmaOS uses Firecracker as a **secure microVM fallback runtime** for two scenar
 
 SigmaOS does **not** link Firecracker as a library. It runs Firecracker as an **external subprocess** and communicates via its Unix socket REST API (`--api-sock`). This keeps the Firecracker process boundary intact and avoids any license entanglement.
 
-```
+```text
 sigma-container run <image>
         │
         ▼
@@ -45,7 +47,7 @@ sigma-container run <image>
 ### virtio Device Glue → Sigma Primitives
 
 | Firecracker virtio device | SigmaOS primitive |
-|---|---|
+| --- | --- |
 | virtio-net (tap device) | sigma-net network namespace |
 | virtio-blk (rootfs image) | SigmaFS sparse image or overlayfs |
 | vsock (CID-based IPC) | sigma-bus vsock transport |
@@ -57,7 +59,9 @@ sigma-container run <image>
 
 - `virtualization/ocirunner/firecracker_launcher.rs` — Rust launcher
 
+
 - `virtualization/ocirunner/README.md` — OCI runner overview
+
 
 ---
 
@@ -163,9 +167,12 @@ jobs:
   firecracker-smoke:
     runs-on: ubuntu-22.04
     steps:
+
       - uses: actions/checkout@v4
 
+
       - name: Install Firecracker
+
         run: |
           curl -fsSL https://github.com/firecracker-microvm/firecracker/releases/\
 download/v1.7.0/firecracker-v1.7.0-x86_64.tgz | tar xz
@@ -173,9 +180,11 @@ download/v1.7.0/firecracker-v1.7.0-x86_64.tgz | tar xz
           sudo chmod +x /usr/bin/firecracker
 
       - name: Build OCI runner
+
         run: cargo build --manifest-path virtualization/ocirunner/Cargo.toml --release
 
       - name: Boot microVM smoke test
+
         run: |
           sudo ./target/release/sigma-oci-smoke --timeout 125ms
         # Exit criteria: guest kernel prints login prompt in < 125ms
@@ -188,9 +197,12 @@ download/v1.7.0/firecracker-v1.7.0-x86_64.tgz | tar xz
 
 - `sigma-container run sigmaos/hello:latest` boots in a Firecracker microVM and prints `Hello`.
 
+
 - Cold start (spawn → guest login prompt) measured at **< 125ms** in QEMU mode.
 
+
 - The equivalent QEMU command `qemu-system-x86_64 -machine microvm` boots a Linux guest and confirms the hardware model matches.
+
 
 ---
 

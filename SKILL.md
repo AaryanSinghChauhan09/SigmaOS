@@ -14,15 +14,21 @@ Use this skill when the user wants to do something they would normally click in 
 
 - Change layout, theme, or workspace
 
+
 - Launch or close apps (settings, files, browser, terminal, dashboard)
+
 
 - Read/write settings (language, accessibility, network)
 
+
 - Semantic file search, tree view, open files
+
 
 - Browser navigation
 
+
 - System dashboard metrics and AI diagnosis
+
 
 ## CLI (preferred)
 
@@ -56,11 +62,11 @@ sigma-agent chat "find architecture documentation"
 ## GUI ↔ CLI mapping
 
 | GUI action | CLI command |
-|------------|-------------|
+| ------------ | ------------- |
 | Applications → Settings | `gui launch settings` |
 | Files semantic search | `gui files search "<query>"` |
 | Panel → workspace N | `gui workspace N` |
-| Settings → Theme | `gui theme obsidian\|cyber\|paper` |
+| Settings → Theme | `gui theme obsidian\ | cyber\ | paper` |
 | WM → Tile layout | `gui layout tile` |
 | Browser URL bar | `gui browser open <url>` |
 | Dashboard AI query | `gui dashboard query "<prompt>"` |

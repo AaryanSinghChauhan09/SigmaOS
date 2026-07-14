@@ -11,7 +11,7 @@ The **SigmaOS Sovereign Sandbox** provides multi-layer isolation for untrusted a
 ### Protected Against
 
 | Threat | Mitigation Layer |
-|---|---|
+| --- | --- |
 | Syscall exploitation | eBPF seccomp filter |
 | Container escape | Firecracker microVM boundary |
 | Memory corruption | ASLR + stack canaries + CFI |
@@ -28,11 +28,12 @@ The **SigmaOS Sovereign Sandbox** provides multi-layer isolation for untrusted a
 - Malicious user with root access to host
 - Quantum-capable adversaries (deferred to PQC layer)
 
+
 ---
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    SOVEREIGN SANDBOX LAYERS                     │
 │                                                                 │
@@ -223,27 +224,41 @@ static const int STRICT_ALLOWLIST[] = {
 ## CLI Interface
 
 ```bash
+
 # Run a community shard in sandbox
+
 sigma sandbox run community-shard.spkg --profile standard
 
 # Run a browser in strict sandbox
+
 sigma sandbox run sigma-browser --profile strict
 
 # List active sandboxes
+
 sigma sandbox list
+
 # ID          PROFILE    MEM_MB  CPU  UPTIME  PID
+
 # sandbox-01  strict     512     2    2h 14m  12345 (sigma-browser)
+
 # sandbox-02  standard   1024    4    45m     13456 (community-plugin)
 
 # Inspect sandbox metrics
+
 sigma sandbox inspect sandbox-01
+
 # Memory: 312/512 MB (61%)
+
 # CPU: 1.2/2 cores (60%)
+
 # Syscalls blocked: 0
+
 # Network rx/tx: 12MB/4MB
+
 # Filesystem writes: 0 (read-only profile)
 
 # Force-kill a misbehaving sandbox
+
 sigma sandbox kill sandbox-02 --reason "excessive cpu usage"
 ```
 
@@ -253,7 +268,7 @@ sigma sandbox kill sandbox-02 --reason "excessive cpu usage"
 
 All sandbox boundary violations are logged to the Sovereign Audit Log:
 
-```
+```text
 2025-07-10T14:23:01Z [SANDBOX-VIOLATION] sandbox-02 attempted forbidden syscall
   syscall:    SYS_ptrace (blocked by seccomp strict-45)
   pid:        13456 (community-plugin)
@@ -266,7 +281,7 @@ All sandbox boundary violations are logged to the Sovereign Audit Log:
 ## Performance
 
 | Metric | MicroVM Profile | Cgroup-Only Profile |
-|---|---|---|
+| --- | --- | --- |
 | Launch time | ~150ms | ~10ms |
 | Memory overhead | ~64MB (VM) | ~2MB (cgroup meta) |
 | CPU overhead | <2% | <0.5% |

@@ -1,4 +1,5 @@
 # SigmaOS Containerization Absorption - runc
+
 ## Making opencontainers/runc Irrelevant
 
 > **Absorption Target**: https://github.com/opencontainers/runc  
@@ -16,6 +17,7 @@ SigmaOS has absorbed and surpassed runc by implementing a native OCI runtime dir
 ## Absorbed Features & Capabilities
 
 ### 1. OCI Runtime
+
 **Original**: runc's OCI-compliant runtime  
 **SigmaOS**: Native OCI runtime with OS integration
 
@@ -29,6 +31,7 @@ pub struct SigmaContainer {
 ```
 
 **Runtime Features**:
+
 - Native OCI runtime with OS-level optimization
 - Capability-based sandboxing with hardware enforcement
 - Container lifecycle management with automatic cleanup
@@ -36,11 +39,14 @@ pub struct SigmaContainer {
 - Container profiles with automatic switching
 - Container composition with inheritance
 
+
 ### 2. Spec Parsing
+
 **Original**: runc's OCI spec parsing  
 **SigmaOS**: Native spec parsing with enhanced features
 
 **Spec Features**:
+
 - Native spec parsing with type safety
 - Spec validation with automatic checking
 - Spec caching with intelligent optimization
@@ -48,11 +54,14 @@ pub struct SigmaContainer {
 - Spec composition with inheritance
 - Spec monitoring with real-time metrics
 
+
 ### 3. Namespace Management
+
 **Original**: runc's namespace creation  
 **SigmaOS**: Native namespace management with enhanced features
 
 **Namespace Features**:
+
 - Native namespace management with capability-based access
 - Namespace isolation with automatic configuration
 - Namespace monitoring with real-time metrics
@@ -60,11 +69,14 @@ pub struct SigmaContainer {
 - Namespace composition with inheritance
 - Namespace validation with automatic checking
 
+
 ### 4. Cgroup Management
+
 **Original**: runc's cgroup configuration  
 **SigmaOS**: Native cgroup management with enhanced features
 
 **Cgroup Features**:
+
 - Native cgroup management with capability-based access
 - Resource limiting with hardware enforcement
 - Cgroup monitoring with real-time metrics
@@ -72,11 +84,14 @@ pub struct SigmaContainer {
 - Cgroup composition with inheritance
 - Cgroup validation with automatic checking
 
+
 ### 5. Process Management
+
 **Original**: runc's process lifecycle  
 **SigmaOS**: Native process management with enhanced features
 
 **Process Features**:
+
 - Native process management with capability-based access
 - Process isolation with automatic configuration
 - Process monitoring with real-time metrics
@@ -84,11 +99,14 @@ pub struct SigmaContainer {
 - Process composition with inheritance
 - Process validation with automatic checking
 
+
 ### 6. Root Filesystem
+
 **Original**: runc's rootfs setup  
 **SigmaOS**: Native rootfs management with enhanced features
 
 **Rootfs Features**:
+
 - Native rootfs management with capability-based access
 - Rootfs isolation with automatic configuration
 - Rootfs monitoring with real-time metrics
@@ -96,12 +114,13 @@ pub struct SigmaContainer {
 - Rootfs composition with inheritance
 - Rootfs validation with automatic checking
 
+
 ---
 
 ## SigmaOS Superiority Matrix
 
 | Feature | runc | SigmaOS | Advantage |
-|---------|-----|---------|------------|
+| --------- | ----- | --------- | ------------ |
 | Runtime Performance | Go overhead | Native Rust | ✅ 5-10x |
 | Spec Parsing Performance | JSON overhead | Native type-safe | ✅ 5x |
 | Namespace Performance | Clone overhead | Native capability | ✅ 5x |
@@ -116,6 +135,7 @@ pub struct SigmaContainer {
 ## Implementation Details
 
 ### Native OCI Runtime
+
 ```rust
 pub mod oci {
     use sigma_container::runtime::OCIRuntime;
@@ -140,6 +160,7 @@ pub mod oci {
 ```
 
 ### Native Spec Parser
+
 ```rust
 pub mod spec {
     pub struct SpecParser {
@@ -167,32 +188,44 @@ pub mod spec {
 ### For Users of runc
 
 **Before** (using runc):
+
 ```bash
+
 # Install runc
+
 sudo apt install runc
 
 # Create container
+
 runc run mycontainer
 
 # Delete container
+
 runc delete mycontainer
 
 # Check status
+
 runc list
 ```
 
 **After** (using SigmaContainer):
+
 ```bash
+
 # Enable container shard (native)
+
 sigma-shard enable container-runtime
 
 # Create container
+
 sigma-container oci run --name mycontainer
 
 # Delete container
+
 sigma-container oci delete --name mycontainer
 
 # Check status
+
 sigma-container oci list
 ```
 
@@ -201,7 +234,7 @@ sigma-container oci list
 ## Performance Benchmarks
 
 | Operation | runc | SigmaContainer | Improvement |
-|-----------|-----|----------------|-------------|
+| ----------- | ----- | ---------------- | ------------- |
 | Container Create | 300ms | 50ms | 6x faster |
 | Spec Parse | 40ms | 8ms | 5x faster |
 | Namespace Setup | 60ms | 12ms | 5x faster |

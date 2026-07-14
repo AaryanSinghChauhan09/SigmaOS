@@ -21,9 +21,11 @@ Instead of opening distinct GUI tools for firewall settings, network parameters,
 ```bash
 $ sigma-control status
 Σ [CONTROL] System Administration Engine:
+
   - Network  : Configured (eth0, DHCP)
   - Security : Active (strict-firewall)
   - Users    : 2 registered
+
 ```
 
 ---

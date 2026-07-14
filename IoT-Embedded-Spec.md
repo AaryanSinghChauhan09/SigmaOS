@@ -13,7 +13,7 @@
 ## Target Hardware
 
 | Category | Examples | RAM | Flash | I/O |
-|----------|---------|-----|-------|-----|
+| ---------- | --------- | ----- | ------- | ----- |
 | Microcontrollers | RP2040, STM32H7 | 64 KB–1 MB | 256 KB–4 MB | GPIO, SPI, I2C, UART |
 | SBCs (Small) | Raspberry Pi Zero 2W | 512 MB | microSD | USB, WiFi, GPIO |
 | Industrial | BeagleBone Black, SAME70 | 512 MB–2 GB | eMMC | CAN, EtherCAT, RS-485 |
@@ -24,7 +24,7 @@
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │              Sigma Atom Application Layer               │
 │  MQTT Client │ OPC-UA │ REST Agent │ Modbus │ Profinet  │
@@ -47,6 +47,7 @@
 ## Build Profiles
 
 ### `sigma-atom-nano` (MCU target)
+
 - RAM: ≥ 64 KB required
 - No MMU (uses MPU instead)
 - No dynamic allocation (static pools only)
@@ -54,7 +55,9 @@
 - RTOS scheduler with 64 priority levels
 - Footprint: ~150 KB flash
 
+
 ### `sigma-atom-micro` (SBC target)
+
 - RAM: ≥ 128 MB
 - MMU enabled
 - Minimal VFS (read-only squashfs root)
@@ -62,12 +65,15 @@
 - Footprint: ~32 MB
 - OTA update support
 
+
 ### `sigma-atom-industrial` (Industrial target)
+
 - RAM: ≥ 512 MB
 - Full kernel with RT patches
 - Deterministic latency: < 50 µs worst-case interrupt response
 - EtherCAT, PROFINET, CAN FD support
 - Functional Safety hooks (IEC 61508 SIL-2 ready)
+
 
 ---
 
@@ -94,9 +100,11 @@ pub struct RtScheduler {
 ```
 
 Deadline analysis:
+
 - Utilization bound check: `Σ(WCET/Period) ≤ n(2^(1/n) - 1)`
 - Response time analysis for each task
 - Assert all deadlines met at compile time (optional `#[sigma_rt_verify]`)
+
 
 ---
 
@@ -139,8 +147,11 @@ pub trait CanBus {
 - **Signature verification**: Dilithium5 signed update manifests
 - **Rollback protection**: Hardware fuse or anti-rollback counter
 
+
 ```toml
+
 # /etc/sigma-atom/ota.toml
+
 [ota]
 update_server = "https://updates.sigmaos.org/atom/"
 check_interval_s = 3600
@@ -155,7 +166,7 @@ rollback_count_max = 3
 ## Industrial Protocols
 
 | Protocol | Standard | Status |
-|---------|---------|--------|
+| --------- | --------- | -------- |
 | CAN 2.0B | ISO 11898 | Planned |
 | CAN FD | ISO 11898-1:2015 | Planned |
 | Modbus RTU/TCP | IEC 61158 | Planned |
@@ -175,6 +186,7 @@ rollback_count_max = 3
 - **Minimal Attack Surface**: Remove all non-required subsystems at compile time
 - **Capability-based I/O**: Each task has explicit I/O permissions
 - **Tamper Detection**: Enclosure tamper detection GPIO monitoring
+
 
 ---
 
@@ -199,7 +211,7 @@ pub trait PowerController {
 Target power budgets:
 
 | Mode | Current Draw | Wake Latency |
-|------|-------------|-------------|
+| ------ | ------------- | ------------- |
 | Active | 50–200 mA | — |
 | Idle | 5–20 mA | < 10 µs |
 | Stop | 100–500 µA | < 100 µs |
@@ -211,7 +223,7 @@ Target power budgets:
 ## Roadmap
 
 | Milestone | Target | Description |
-|-----------|--------|-------------|
+| ----------- | -------- | ------------- |
 | M1 | 2027 Q2 | sigma-atom-micro boots on RPi 5 |
 | M2 | 2027 Q3 | GPIO/SPI/I2C HAL complete |
 | M3 | 2027 Q4 | MQTT + OTA update support |

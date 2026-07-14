@@ -10,11 +10,15 @@ The Scientist Profile is designed for research excellence, data analysis, and la
 
 - **SigmaLab**: Laboratory management system with experiment tracking and inventory.
 
+
 - **SigmaData**: Data analysis platform with statistical tools and visualization.
+
 
 - **SigmaResearch**: Research collaboration and publication management tools.
 
+
 - **SigmaSimulation**: Scientific simulation and modeling environment.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Scientist Profile is designed for research excellence, data analysis, and la
 
 - **Theme**: Research White (Scientific Standard)
 
+
 - **Layout**: Lab Dashboard (Experiments, Data, Publications)
 
+
 - **Personalization: Custom visualization tools and computational workflows.
+
 
 ---
 

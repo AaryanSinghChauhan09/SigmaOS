@@ -9,8 +9,10 @@
 The operating system's security is fundamentally dependent on the firmware that boots it. SigmaOS absorbs the best elements of open-source firmware projects to provide `sigma-boot`, an ultra-fast, cryptographically verifiable boot sequence.
 
 We absorb:
+
 - **Coreboot's** philosophy of extreme hardware initialization speed (booting to OS payload in milliseconds).
 - **Tianocore's (UEFI)** standard interfaces and Secure Boot validation mechanics, ensuring SigmaOS can run securely on modern x86 hardware.
+
 
 ---
 
@@ -57,7 +59,9 @@ pub fn verify_kernel_signature(kernel_image: &[u8], signature: &[u8]) -> Result<
 Replacing GRUB, SigmaOS uses a minimal bootloader written in Rust (inspired by `systemd-boot`), offering a simple, declarative configuration:
 
 ```toml
+
 # /boot/sigma/loader.toml
+
 default = "sigma-zenith-15.0"
 timeout = 3
 

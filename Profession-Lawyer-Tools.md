@@ -10,11 +10,15 @@ The Lawyer Profile prioritizes document integrity, absolute privacy, and ironcla
 
 - **CaseLaw AI**: Local, zero-latency search engine for legal precedents.
 
+
 - **EvidenceFS**: WORM (Write Once, Read Many) storage for evidentiary data.
+
 
 - **LegalTimer**: High-precision billing and task management shard.
 
+
 - **PQC-Seal**: Quantum-resistant document signing and encryption.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Lawyer Profile prioritizes document integrity, absolute privacy, and ironcla
 
 - **Theme**: Ivory Parchment (Clean/Minimal)
 
+
 - **Layout**: Side-by-side Document Review.
 
+
 - **Personalization**: Mandatory biometric verification for encrypted shards.
+
 
 ---
 

@@ -42,11 +42,13 @@ pub struct TestSuite {
 ### Test Runner API
 
 **Initialization:**
+
 ```c
 int test_runner_init(void);
 ```
 
 **Suite Management:**
+
 ```c
 int test_runner_add_suite(const uint8_t *name);
 int test_runner_get_suite_count(void);
@@ -54,12 +56,14 @@ int test_runner_get_suite(uint32_t suite_index, TestSuite *suite);
 ```
 
 **Test Execution:**
+
 ```c
 int run_all(void);
 int run_suite(uint32_t suite_index);
 ```
 
 **Result Recording:**
+
 ```c
 int test_runner_record_result(
     uint32_t suite_index,
@@ -71,6 +75,7 @@ int test_runner_record_result(
 ```
 
 **Summary Retrieval:**
+
 ```c
 int test_runner_get_summary(
     uint32_t *total_tests,
@@ -83,6 +88,7 @@ int test_runner_get_summary(
 ```
 
 **Verification Functions:**
+
 ```c
 int check(void);
 int verify_build(void);
@@ -98,6 +104,7 @@ int verify_hal(void);
 **Implementation:** `tests/kernel/test_scheduler.rs`
 
 **Test Coverage:**
+
 - Thread creation and addition to runqueue
 - Priority-based scheduling
 - Context switch simulation
@@ -105,7 +112,9 @@ int verify_hal(void);
 - CPU time accounting
 - Runqueue overflow protection
 
+
 **Mock Thread Structure:**
+
 ```rust
 pub struct MockThread {
     pub id: u32,
@@ -116,6 +125,7 @@ pub struct MockThread {
 ```
 
 **Test Functions:**
+
 ```rust
 fn test_thread_creation() -> TestResult;
 fn test_priority_scheduling() -> TestResult;
@@ -126,11 +136,15 @@ fn test_runqueue_overflow() -> TestResult;
 ```
 
 **Usage:**
+
 ```bash
+
 # Run scheduler tests
+
 sigma-test --suite=scheduler
 
 # Run specific test
+
 sigma-test --test=test_thread_creation
 ```
 
@@ -139,6 +153,7 @@ sigma-test --test=test_thread_creation
 **Implementation:** `tests/kernel/test_syscall_dispatch.rs`
 
 **Test Coverage:**
+
 - Read syscall dispatch
 - Write syscall dispatch
 - Open syscall dispatch
@@ -148,7 +163,9 @@ sigma-test --test=test_thread_creation
 - Register preservation
 - Error handling
 
+
 **Mock Register Structure:**
+
 ```rust
 pub struct MockRegisters {
     pub rax: u64,
@@ -169,6 +186,7 @@ pub struct MockRegisters {
 ```
 
 **Test Functions:**
+
 ```rust
 fn test_read_syscall() -> TestResult;
 fn test_write_syscall() -> TestResult;
@@ -181,11 +199,15 @@ fn test_error_handling() -> TestResult;
 ```
 
 **Usage:**
+
 ```bash
+
 # Run syscall dispatch tests
+
 sigma-test --suite=syscall
 
 # Run with verbose output
+
 sigma-test --suite=syscall --verbose
 ```
 
@@ -196,6 +218,7 @@ sigma-test --suite=syscall --verbose
 **Implementation:** `tests/fs/test_vfs.rs`
 
 **Test Coverage:**
+
 - Mount TmpFS
 - Open file
 - Write to file
@@ -207,7 +230,9 @@ sigma-test --suite=syscall --verbose
 - File offset tracking
 - Inode allocation
 
+
 **Mock File Structure:**
+
 ```rust
 pub struct MockFile {
     pub fd: i32,
@@ -218,6 +243,7 @@ pub struct MockFile {
 ```
 
 **Mock Inode Structure:**
+
 ```rust
 pub struct MockInode {
     pub inode_num: u64,
@@ -228,6 +254,7 @@ pub struct MockInode {
 ```
 
 **Test Functions:**
+
 ```rust
 fn test_mount_tmpfs() -> TestResult;
 fn test_open_file() -> TestResult;
@@ -242,11 +269,15 @@ fn test_inode_allocation() -> TestResult;
 ```
 
 **Usage:**
+
 ```bash
+
 # Run VFS tests
+
 sigma-test --suite=vfs
 
 # Run with coverage
+
 sigma-test --suite=vfs --coverage
 ```
 
@@ -257,18 +288,24 @@ sigma-test --suite=vfs --coverage
 The driver testing framework provides OOP-based testing for hardware drivers using traits.
 
 **Features:**
+
 - Device trait for driver abstraction
 - Mock hardware simulation
 - Driver lifecycle testing
 - Performance benchmarking
 - Error injection
 
+
 **Usage:**
+
 ```bash
+
 # Run driver tests
+
 sigma-test --suite=drivers
 
 # Test specific driver
+
 sigma-test --driver=nvidia
 ```
 
@@ -279,6 +316,7 @@ sigma-test --driver=nvidia
 **Implementation:** Integration tests for sigma-pkg
 
 **Test Coverage:**
+
 - Dependency resolver
 - Conflict detection
 - Package installation
@@ -286,12 +324,17 @@ sigma-test --driver=nvidia
 - Rollback functionality
 - Signature verification
 
+
 **Usage:**
+
 ```bash
+
 # Run integration tests
+
 sigma-integration-test
 
 # Run specific integration test
+
 sigma-integration-test --test=package_manager
 ```
 
@@ -343,57 +386,82 @@ pub enum Severity {
 ### Static Analysis Rules
 
 **Buffer Overflow Detection:**
+
 - Detects unsafe array access patterns
 - Identifies memcpy without size validation
 - Flags strcpy/strcat usage
 
+
 **Use-After-Free Detection:**
+
 - Tracks freed variables
 - Detects use of freed memory
 
+
 **Double-Free Detection:**
+
 - Tracks free operations
 - Detects duplicate frees
 
+
 **Integer Overflow Detection:**
+
 - Identifies unchecked arithmetic operations
 - Flags potential overflow conditions
 
+
 **Null Pointer Dereference:**
+
 - Detects pointer dereference without null check
 - Identifies unsafe pointer operations
 
+
 **Race Condition Detection:**
+
 - Identifies shared state access without locking
 - Flags unsafe static mutable access
 
+
 **Memory Leak Detection:**
+
 - Tracks allocations and frees
 - Identifies unfreed memory
 
+
 **Information Leak Detection:**
+
 - Detects sensitive information in debug output
 - Flags potential data exposure
 
+
 **Privilege Escalation Detection:**
+
 - Identifies privilege escalation functions
 - Flags unsafe privilege changes
 
+
 **Unsafe Function Usage:**
+
 - Detects usage of unsafe C functions
 - Flags deprecated functions
 
+
 **Hardcoded Credentials:**
+
 - Detects hardcoded passwords/keys
 - Flags insecure credential storage
 
+
 **Cryptographic Weakness:**
+
 - Identifies weak cryptographic algorithms
 - Flags deprecated crypto implementations
+
 
 ### Audit Report
 
 **Report Structure:**
+
 ```rust
 pub struct AuditReport {
     pub findings: Vec<AuditFinding>,
@@ -410,6 +478,7 @@ pub struct AuditReport {
 ```
 
 **Audit Finding:**
+
 ```rust
 pub struct AuditFinding {
     pub id: String,
@@ -428,46 +497,57 @@ pub struct AuditFinding {
 ### Usage
 
 **Initialize Auditor:**
+
 ```rust
 let mut auditor = KernelAuditor::new();
 auditor.init();
 ```
 
 **Scan File:**
+
 ```rust
 let findings = auditor.scan_file("kernel/core/sigma_sched.rs", &content);
 ```
 
 **Enable/Disable Rules:**
+
 ```rust
 auditor.enable_rule("Buffer Overflow Detection");
 auditor.disable_rule("Memory Leak Detection");
 ```
 
 **Get Report:**
+
 ```rust
 let report = auditor.get_report();
 println!("{}", report.get_summary());
 ```
 
 **Export Report:**
+
 ```rust
 let json = auditor.export_report_json();
 let csv = auditor.export_report_csv();
 ```
 
 **Command-Line Usage:**
+
 ```bash
+
 # Run security audit
+
 sigma-audit kernel/
 
 # Generate report
+
 sigma-audit --report security-report.md kernel/
 
 # Check specific vulnerability
+
 sigma-audit --check=buffer-overflow kernel/
 
 # Export to JSON
+
 sigma-audit --format=json --output=audit.json kernel/
 ```
 
@@ -476,6 +556,7 @@ sigma-audit --format=json --output=audit.json kernel/
 ### Benchmarking Tools
 
 **CPU Benchmarks:**
+
 ```bash
 sigma-bench cpu --iterations=1000
 sigma-bench scheduler --tasks=64
@@ -483,6 +564,7 @@ sigma-bench context-switch --iterations=100000
 ```
 
 **Memory Benchmarks:**
+
 ```bash
 sigma-bench memory --bandwidth
 sigma-bench memory --latency
@@ -490,6 +572,7 @@ sigma-bench cache
 ```
 
 **I/O Benchmarks:**
+
 ```bash
 sigma-bench disk --device=/dev/nvme0n1
 sigma-bench network --target=192.168.1.100
@@ -497,6 +580,7 @@ sigma-bench filesystem --path=/mnt/sigmafs
 ```
 
 **System Benchmarks:**
+
 ```bash
 sigma-bench system --all
 sigma-bench boot
@@ -506,14 +590,19 @@ sigma-bench startup
 ## Fuzz Testing
 
 **Usage:**
+
 ```bash
+
 # Fuzz test syscall handler
+
 sigma-fuzz --target=syscall --input=syscalls.txt
 
 # Fuzz test filesystem
+
 sigma-fuzz --target=filesystem --input=operations.txt
 
 # Fuzz test network stack
+
 sigma-fuzz --target=network --input=packets.bin
 ```
 
@@ -524,6 +613,7 @@ sigma-fuzz --target=network --input=packets.bin
 SigmaOS uses GitHub Actions for automated testing on every push and pull request.
 
 **Test Workflow:**
+
 ```yaml
 name: SigmaOS Tests
 
@@ -533,12 +623,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v2
       - name: Run kernel tests
+
         run: sigma-test --suite=kernel
+
       - name: Run security audit
+
         run: sigma-audit kernel/
+
       - name: Run integration tests
+
         run: sigma-integration-test
 ```
 
@@ -577,16 +673,19 @@ export SIGMAOS_AUDIT_SEVERITY=medium
 ### Test Failures
 
 **Check Test Logs:**
+
 ```bash
 sigma-test --suite=scheduler --verbose
 ```
 
 **Debug with GDB:**
+
 ```bash
 gdb --args sigma-test --suite=scheduler
 ```
 
 **Check for Memory Leaks:**
+
 ```bash
 valgrind --leak-check=full sigma-test
 ```
@@ -594,14 +693,20 @@ valgrind --leak-check=full sigma-test
 ### Security Audit Issues
 
 **False Positives:**
+
 ```bash
+
 # Disable specific rule for file
+
 sigma-audit --disable="Buffer Overflow Detection" kernel/core/specific.rs
 ```
 
 **Custom Rules:**
+
 ```bash
+
 # Add custom rule
+
 sigma-audit --add-rule=custom-rule.yaml
 ```
 
@@ -615,6 +720,7 @@ sigma-audit --add-rule=custom-rule.yaml
 4. **Mock External Dependencies:** Use mocks for hardware, network, and filesystem operations
 5. **Test Edge Cases:** Include tests for boundary conditions and error cases
 
+
 ### Security Testing
 
 1. **Regular Audits:** Run security audits regularly, especially before releases
@@ -623,12 +729,14 @@ sigma-audit --add-rule=custom-rule.yaml
 4. **Update Rules:** Keep analysis rules updated with new vulnerability patterns
 5. **Manual Review:** Combine automated analysis with manual code review
 
+
 ## References
 
 - [Kernel Architecture](Kernel-Architecture.md)
 - [Security Documentation](Security.md)
 - [Developer Tools](Developer-Tools.md)
 - [Driver Development Guide](Driver-Development-Guide.md)
+
 
 ## License
 

@@ -6,7 +6,7 @@ experimental galactic-scale mesh routing.
 
 ## Architecture
 
-```
+```text
 Application Layer
    └─ socket.rs          (POSIX-style socket API)
          └─ tcpip.rs     (TCP/IP stack)
@@ -21,7 +21,7 @@ Application Layer
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `socket.rs` | POSIX-compatible socket API (`create`, `bind`, `connect`, `send`, `recv`) |
 | `tcp.rs` | TCP state machine (SYN→ESTABLISHED→FIN) |
 | `tcpip.rs` | IPv4/IPv6 dual-stack with ARP/NDP |
@@ -57,7 +57,7 @@ void init_core_net(void);
 All `sovereign_net.rs` channels use a **hybrid** scheme:
 
 | Layer | Algorithm | Standard |
-|---|---|---|
+| --- | --- | --- |
 | Key Exchange | X25519 + Kyber-768 | NIST ML-KEM |
 | Encryption | ChaCha20-Poly1305 | RFC 8439 |
 | Integrity | BLAKE3 MAC | — |
@@ -66,26 +66,37 @@ All `sovereign_net.rs` channels use a **hybrid** scheme:
 
 - [x] TCP state machine (`tcp.rs`)
 
+
 - [x] Socket API (`socket.rs`)
+
 
 - [x] ICMP (`icmp.rs`)
 
+
 - [x] Post-quantum encryption stub (`pqfs.rs`)
+
 
 - [x] Mesh gossip protocol (`mesh_net.rs`)
 
+
 - [ ] Full IPv6 SLAAC / NDP
+
 
 - [ ] DHCPv4 / DHCPv6 client
 
+
 - [ ] DNSSEC resolver integration
+
 
 - [ ] WireGuard-inspired VPN tunnel
 
+
 - [ ] Formal Kani proofs for TCP state machine
+
 
 ## Related Modules
 
 - [`modules/core/kernel`](../kernel/README.md) — IPC used by net stack
+
 
 - [`modules/security/isolation`](../../security/isolation/README.md) — Network namespace isolation

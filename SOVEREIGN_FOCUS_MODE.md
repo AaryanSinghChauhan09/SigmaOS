@@ -10,7 +10,7 @@ The **SigmaOS Sovereign Focus Mode** is a distraction-free computing environment
 
 Unlike simple "Do Not Disturb" implementations, Sovereign Focus Mode operates at the **kernel level** — it actively re-prioritizes system resources toward the focused application, suppresses all non-critical background activity, and uses AI telemetry to detect and maintain optimal cognitive load states.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │                  FOCUS MODE ARCHITECTURE                     │
 │                                                              │
@@ -41,7 +41,7 @@ Unlike simple "Do Not Disturb" implementations, Sovereign Focus Mode operates at
 ### 1. OS-Level Distraction Elimination
 
 | Suppressed | Allowed |
-|---|---|
+| --- | --- |
 | Social media notifications | Critical system alerts |
 | Email/chat pings | Calendar reminders (optional) |
 | System update popups | Security events |
@@ -54,7 +54,9 @@ Unlike simple "Do Not Disturb" implementations, Sovereign Focus Mode operates at
 During focus mode, the scheduler and memory manager prioritize the focused process group:
 
 ```toml
+
 # /etc/sigma/focus_mode.toml
+
 [focus]
 focused_app_cpu_weight   = 80    # 80% of CPU budget
 background_cpu_weight    = 10    # background gets 10%
@@ -102,27 +104,39 @@ impl FocusAssistant {
 ## CLI Interface
 
 ```bash
+
 # Enter focus mode (auto-detect current focused window)
+
 sigma focus
 
 # Focus on specific app
+
 sigma focus --app "code"
 
 # Focus with timer (Pomodoro: 25min work)
+
 sigma focus --duration 25m
 
 # Focus with allowed list
+
 sigma focus --allow "calendar,terminal"
 
 # Check focus status
+
 sigma focus status
+
 # Focus Mode: ACTIVE (18 minutes)
+
 # Focused App: Visual Studio Code
+
 # Notifications suppressed: 12
+
 # Context switches prevented: 3
+
 # Focus depth score: 0.87 (Deep Flow)
 
 # Exit focus mode
+
 sigma focus off
 ```
 
@@ -132,7 +146,7 @@ sigma focus off
 
 The Zenith desktop shows a subtle focus indicator in the header:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │  🎯 FOCUS  [██████████░░░░]  18/25min  | ← End Focus       │
 └─────────────────────────────────────────────────────────────┘
@@ -147,11 +161,13 @@ The Zenith desktop shows a subtle focus indicator in the header:
 - No behavioral telemetry without explicit opt-in
 - Focus data purged after 30 days (configurable)
 
+
 ---
 
 ## Configuration
 
 ```toml
+
 # ~/.config/sigma/focus.toml
 
 [pomodoro]

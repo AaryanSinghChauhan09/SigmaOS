@@ -14,11 +14,12 @@ SigmaOS incorporates a Natural Language-to-CLI shell agent (`SigmaAI Shell`) bui
 - **Interactive Confirmation**: User approval for sensitive operations
 - **Self-Healing**: Auto-correction of command syntax errors
 
+
 ## Architecture
 
 ### Safety Verification Flow
 
-```
+```text
  [User Prompt (e.g., "compress downloads")]
                      │
                      ▼
@@ -37,7 +38,7 @@ SigmaOS incorporates a Natural Language-to-CLI shell agent (`SigmaAI Shell`) bui
 
 ### Component Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         SigmaAI Shell Agent             │
 │  ┌──────────┬──────────┬──────────────┐ │
@@ -332,6 +333,7 @@ impl CommandSandbox {
 - **Tamil (ta_IN)**: Tamil script support
 - **Telugu (te_IN)**: Telugu script support
 
+
 ### Language Configuration
 
 ```toml
@@ -352,21 +354,29 @@ path = "/usr/share/sigma-ai/models/phi-3-mini-hi-q4.onnx"
 ### Basic Usage
 
 ```bash
+
 # Start SigmaAI Shell
+
 sigma-ai-shell
 
 # Natural language commands
+
 > compress my downloads folder
+
 # Executes: tar -czf downloads.tar.gz ~/Downloads/
 
 > show system memory usage
+
 # Executes: free -h
 
 > list all running processes
+
 # Executes: ps aux
 
 > install git package
+
 # Executes: sigpkg install git
+
 ```
 
 ### Interactive Confirmation
@@ -376,7 +386,9 @@ sigma-ai-shell
 ⚠️  This command will delete files in /tmp
 Proposed command: rm -rf /tmp/*
 Continue? [y/N]: y
+
 # Executes: rm -rf /tmp/*
+
 ```
 
 ### Multi-Step Operations
@@ -405,12 +417,14 @@ Continue? [y/N]: y
 3. **Confirmation**: Require confirmation for destructive operations
 4. **Sandboxing**: Execute commands in isolated sandbox
 
+
 ### Configuration
 
 1. **Model Selection**: Choose appropriate model for use case
 2. **Safety Threshold**: Adjust safety threshold based on user expertise
 3. **Language Support**: Enable appropriate language models
 4. **Capability Limits**: Set appropriate capability limits
+
 
 ### Security
 
@@ -419,31 +433,40 @@ Continue? [y/N]: y
 3. **Audit Logging**: Log all command executions
 4. **User Consent**: Require user consent for sensitive operations
 
+
 ## Roadmap & Milestones
 
 ### Phase 1 (Months 0-3)
+
 - Intent mapping engine
 - Local command translation CLI
 - Basic safety validation
 - ONNX model integration
 
+
 ### Phase 2 (Months 3-6)
+
 - Sandbox execution environment
 - Advanced safety validation
 - Capability-based access control
 - Interactive confirmation system
 
+
 ### Phase 3 (Months 6-9)
+
 - Multi-step script generator
 - Interactive step-by-step debugger
 - Multi-language support
 - Indic language models
 
+
 ### Phase 4 (Months 9-12)
+
 - Self-healing shell integration
 - Auto-correction of syntax errors
 - Advanced context awareness
 - Learning from user behavior
+
 
 ## References
 

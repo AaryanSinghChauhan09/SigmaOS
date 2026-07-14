@@ -13,7 +13,7 @@ India's own language AI platform. No Google Translate, no OpenAI, no foreign API
 ### Capabilities:
 
 | Feature | Details |
-|---|---|
+| --- | --- |
 | Offline ASR | 22 languages + major dialects + Indian Sign Language (ISL) |
 | Neural MT | Any-to-any translation between 22 languages |
 | Domain adaptation | Legal, medical, agricultural terminology models |
@@ -41,7 +41,7 @@ All models run locally. No audio or text leaves the device.
 ### AR (Augmented Reality) — phone or webcam passthrough:
 
 | Profession | AR Use Case |
-|---|---|
+| --- | --- |
 | Architect | Overlay CAD building plan on real construction site (GPS-anchored) |
 | Doctor | Patient vitals and drug interactions visible while examining |
 | Electrician | Thermal camera + AR shows wiring behind walls |
@@ -52,13 +52,18 @@ All models run locally. No audio or text leaves the device.
 
 - 3 virtual screens at 4K resolution (work without a second monitor)
 
+
 - `sigma-meet` meeting rooms in VR
+
 
 - Surgery simulation for medical students
 
+
 - Fire evacuation drill simulation for safety officers
 
+
 - Courtroom advocacy practice for law students
+
 
 ```bash
 sigma-xr devices list
@@ -78,29 +83,40 @@ sigma-xr vr simulation --type fire-drill
 
 - AUTOSAR Classic/Adaptive platform (ECU development environment)
 
+
 - CAN/LIN/FlexRay protocol stack
+
 
 - ISO 26262 functional safety compliance
 
+
 - OTA (Over-the-Air) vehicle software updates
+
 
 ### For EV operators:
 
 - BMS (Battery Management System) integration
 
+
 - OCPP 2.0 EV charging protocol
+
 
 - FAME-II subsidy eligibility checker
 
+
 - Charge station finder (BEE database)
+
 
 ### For vehicle owners / fleet operators:
 
 - Dashcam recording with sigma-ai object detection
 
+
 - VAHAN/SARATHI deep integration (DL renewal, insurance, PUC, challan)
 
+
 - e-Way Bill generation for goods transport
+
 
 ```bash
 sigma-auto vahan rc --vehicle MH12AB1234
@@ -121,23 +137,32 @@ India's drone economy is projected to reach ₹30,000 crore by 2030. DGCA's RPAS
 
 - Digital Sky portal integration (drone registration)
 
+
 - RPAS Pilot Certificate tracker (Category A/B/C)
+
 
 - No-fly zone checker (real-time Digital Sky API)
 
+
 - LAPC (Low Altitude Permission) application workflow
 
+
 - Mandatory flight log format
+
 
 ### AI payloads:
 
 - Agricultural survey: NDVI (Normalized Difference Vegetation Index) crop health
 
+
 - Infrastructure inspection: sigma-ai crack detection on bridges/buildings
+
 
 - Search & rescue: person detection in dense vegetation
 
+
 - Photogrammetry: flight path → 3D point cloud model
+
 
 ```bash
 sigma-drone register --model DJI-M300 --weight 6.2kg --category Small
@@ -159,25 +184,35 @@ India passes 50–100 new regulations every year. Most businesses discover chang
 
 - Gazette of India (daily notifications)
 
+
 - GSTN circulars and rate changes
+
 
 - RBI master directions
 
+
 - SEBI regulations
+
 
 - MCA company law amendments
 
+
 - IRDAI, TRAI, DGCA, NMC notifications
+
 
 ### What it does automatically:
 
 - `sigma-accounts` GST slab tables updated when rates change
 
+
 - `sigma-legal` BNS/BNSS sections updated when amendments pass
+
 
 - `sigma-ca` compliance calendar updated when due dates shift
 
+
 - Finance Act → `sigma-hrms` TDS slabs updated
+
 
 ```bash
 sigma-lex subscribe --profession CA --state MH
@@ -196,7 +231,7 @@ sigma-lex explain --rule "Finance Act 2026 Section 42" --language Hindi
 ### Authentication signals (all passive):
 
 | Signal | Technology | Accuracy |
-|---|---|---|
+| --- | --- | --- |
 | Typing rhythm | Keystroke dynamics | 98% |
 | Mouse patterns | Movement biometrics | 95% |
 | Face | Webcam liveness detection | 99% |
@@ -205,7 +240,7 @@ sigma-lex explain --rule "Finance Act 2026 Section 42" --language Hindi
 
 ### Behaviour based on confidence level:
 
-```
+```text
 All signals match (confidence ≥ 0.90) → Full access, no interruption
 One signal drops (0.75–0.89)          → Minor restrictions: no large transfers
 Multiple drops (0.60–0.74)            → Lock screen in 30 seconds
@@ -216,9 +251,12 @@ Face absent 5+ minutes                → Immediate lock
 
 - Transactions > ₹5,000: requires confidence ≥ 0.95
 
+
 - If below: OTP to registered mobile (seamless, no manual action needed if in range)
 
+
 - Full audit log: every access with confidence score
+
 
 ```bash
 sigma-auth continuous enable
@@ -240,18 +278,23 @@ sigma-auth train --signal typing  # Improve model over 50 sessions
 
 1. Central server broadcasts global model weights
 
+
 2. Your device trains locally on your data
+
 
 3. Only weight **gradients** (not data) are sent — with differential privacy noise added
 
+
 4. Server aggregates gradients via FedAvg → better global model
 
+
 5. You get a better AI; your data stays local
+
 
 ### Active federated networks:
 
 | Network | Trains | Benefit |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-agri-disease` | Crop photos → disease detection | Better AI for all farmers |
 | `sigma-tax-anomaly` | GST patterns → error detection | Better audit for all CAs |
 | `sigma-handwriting-ocr` | Devanagari writing → OCR | Better OCR for all 22 scripts |
@@ -262,9 +305,12 @@ sigma-auth train --signal typing  # Improve model over 50 sessions
 
 - Differential privacy: ε=0.5 (NIST recommended)
 
+
 - Secure aggregation: server never sees individual updates
 
+
 - DPDP Act 2023 compliant: opt-in, full purpose disclosure, revocable
+
 
 ```bash
 sigma-fedlearn list
@@ -286,35 +332,48 @@ sigma-fedlearn opt-out     # Data never left your device either way
 
 - Live machine status, temperature, throughput from IoT sensors
 
+
 - OEE (Overall Equipment Effectiveness) calculated in real-time
+
 
 - Predictive maintenance: "Machine 7 will fail in 14 days" (sigma-ai)
 
+
 - Simulation: "What if Machine 3 fails?" → cascade impact analysis
+
 
 ### Hospital:
 
 - Bed occupancy map, equipment location (RFID tracking)
 
+
 - ER queue length and wait time in real-time
 
+
 - Mass casualty event simulation → optimal patient flow
+
 
 ### Farm:
 
 - NDVI, soil moisture, temperature from sensors + ISRO satellite
 
+
 - Yield prediction by sigma-ai
 
+
 - Simulation: "If monsoon delayed 2 weeks → how much yield loss?"
+
 
 ### Building:
 
 - BIM → live building twin (energy, occupancy, HVAC)
 
+
 - Fire simulation → evacuation route optimisation
 
+
 - Energy optimisation while maintaining comfort constraints
+
 
 ```bash
 sigma-twin create --type factory --sensors 50 --name "Workshop A"
@@ -335,15 +394,19 @@ sigma-twin asset health --asset M003
 
 - JioPhone (KaiOS) — sigma-ultra replaces KaiOS
 
+
 - Basic Android 512 MB RAM — runs in browser mode
+
 
 - Raspberry Pi Zero 256 MB — IoT/rural compute node
 
+
 - Any x86 with 256 MB RAM — 15-year-old computers
+
 
 ### Text-mode UI:
 
-```
+```text
 ┌─────────────────────┐
 │ SIGMA OS ULTRA      │
 │ ─────────────────── │
@@ -361,19 +424,26 @@ sigma-twin asset health --asset M003
 
 - Dial `*999#` → sigma services menu
 
+
 - Check GST balance via USSD
+
 
 - File GSTR-3B basics via USSD
 
+
 - Emergency crop insurance claim via USSD
+
 
 ### Power budget:
 
 - Idle: 50 mW (200 hours on phone battery)
 
+
 - Active text mode: 200 mW
 
+
 - 1W solar panel keeps sigma-ultra running indefinitely
+
 
 ---
 
@@ -387,39 +457,54 @@ sigma-twin asset health --asset M003
 
 - Meeting notice (mandatory 15 days prior per PESA Act)
 
+
 - Biometric attendance with fingerprint device
+
 
 - Resolution drafting and approval with digital signature
 
+
 - Audio/video recording → auto-transcription via sigma-bhashini in local language
+
 
 ### Financial management:
 
 - GP budget in XV Finance Commission format
 
+
 - GPDP (Gram Panchayat Development Plan)
+
 
 - e-GramSwaraj integration (MoPR portal)
 
+
 - MGNREGS attendance and payment (NREGASoft integration)
+
 
 ### Scheme tracking:
 
 - PM Awas Yojana (PMAY-G) beneficiary tracking
 
+
 - Jal Jeevan Mission water connection status
+
 
 - SBM toilet construction records
 
+
 - PM SVANidhi street vendor scheme
+
 
 ### Records:
 
 - Birth/Death registration (CRS portal)
 
+
 - Caste/Income/Domicile certificate issuance
 
+
 - Land records (Bhulekh portal, state-specific)
+
 
 ```bash
 sigma-gram sabha notice --date 2026-07-15 --agenda "Road repair, Water supply"
@@ -437,7 +522,7 @@ sigma-gram scheme status --scheme PMAY-G --village Rampur
 ### Modules:
 
 | Module | Game Concept | Real Skill |
-|---|---|---|
+| --- | --- | --- |
 | Digital Dukaan | Play shopkeeper, make invoices, pay taxes | sigma-accounts, GST basics |
 | Kisan Ka Khel | Farmer: check MSP, PMFBY, eNAM | sigma-agri fully |
 | Shasan Gyaan | Village sarpanch: Gram Sabha, MGNREGS | sigma-gram operations |
@@ -451,9 +536,12 @@ sigma-gram scheme status --scheme PMAY-G --village Rampur
 
 - Complete module → DID-signed certificate (appears on professional DID profile)
 
+
 - Top scorers → featured on `sigmaos.dev` district leaderboard
 
+
 - Schools award marks for completion (UDISE integration)
+
 
 ```bash
 sigma-gamelearn start --module digital-dukaan --language Hindi
@@ -472,13 +560,18 @@ sigma-gamelearn leaderboard --state Maharashtra --district Pune
 
 - Research institutions post data requests: "Need anonymised diabetes data from Tamil Nadu"
 
+
 - You see: who wants it, exactly what they want, how much they pay
+
 
 - You approve or reject per request
 
+
 - Payment in UPI/e-RUPI
 
+
 - Full audit trail: what was shared, to whom, when
+
 
 ### Zero-knowledge proofs — prove facts without revealing data:
 
@@ -509,31 +602,42 @@ DPDP Act 2023 compliant: full purpose disclosure, consent required, right to rev
 
 - Dual-frequency L5 + S band: under 1 metre accuracy (GPS: 3–5 metres)
 
+
 - Drop-in GPS replacement for all sigma-* location features
 
+
 - DGCA-certified for aviation; approved for fishing vessels and land survey
+
 
 ### Bhuvan (ISRO's geo portal):
 
 - CARTOSAT-3: 25 cm resolution imagery (sharper than Google Maps in India)
 
+
 - RESOURCESAT: crop monitoring data
 
+
 - Offline India maps for sigma-ultra
+
 
 ### MOSDAC (Meteorological satellite data):
 
 - Cyclone tracking (Bay of Bengal, Arabian Sea)
 
+
 - Monsoon prediction at district level
 
+
 - Agricultural weather integration with sigma-agri
+
 
 ### IN-SPACe (private space sector):
 
 - Satellite launch licensing workflow
 
+
 - Remote sensing data policy compliance
+
 
 ```bash
 sigma-navic location          # Uses NavIC instead of GPS
@@ -551,11 +655,15 @@ See [section 6](#6-continuous-authentication--never-log-in-again) above. Additio
 
 - **Guideline**: RBI Circular RBI/2021-22/90 on additional factor of authentication
 
+
 - **SigmaOS approach**: If continuous auth confidence ≥ 0.95, no OTP needed (treated as strong second factor)
+
 
 - **Fallback**: OTP to Aadhaar-linked mobile automatically triggered
 
+
 - **Audit**: Every transaction > ₹5,000 logged with auth confidence at time of transaction
+
 
 ---
 

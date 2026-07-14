@@ -21,7 +21,7 @@ This document maps that gap precisely so we can close it systematically.
 ### Alpine Linux
 
 | Dimension | Alpine | SigmaOS v15 | SigmaOS Gap |
-|-----------|--------|-------------|-------------|
+| ----------- | -------- | ------------- | ------------- |
 | Bootable ISO | ✅ | ⬜ | Phase 1 |
 | Kernel | musl + busybox monolithic | Custom freestanding | Our kernel not yet bootable |
 | Shell | ash (busybox) | sigma-sh (planned) | sigma-sh REPL needed |
@@ -41,7 +41,7 @@ This document maps that gap precisely so we can close it systematically.
 ### Tiny Core Linux
 
 | Dimension | Tiny Core | SigmaOS |
-|-----------|-----------|---------|
+| ----------- | ----------- | --------- |
 | ISO size | ~16 MB | Unknown (no ISO yet) |
 | Boot time | <1 min | N/A |
 | RAM usage | ~64 MB | N/A |
@@ -55,7 +55,7 @@ This document maps that gap precisely so we can close it systematically.
 ### Puppy Linux
 
 | Dimension | Puppy | SigmaOS |
-|-----------|-------|---------|
+| ----------- | ------- | --------- |
 | Target audience | Old hardware, beginners | Developers, sovereign users |
 | Live USB | ✅ persistent | Planned v0.1 |
 | GUI on boot | ✅ JWM | Planned (Zenith) |
@@ -70,7 +70,7 @@ This document maps that gap precisely so we can close it systematically.
 ### Arch Linux
 
 | Dimension | Arch | SigmaOS |
-|-----------|------|---------|
+| ----------- | ------ | --------- |
 | Philosophy | KISS, rolling | Sovereign, multi-format |
 | Install | Manual, educational | GUI + CLI wizard planned |
 | Package manager | pacman (10,000+ pkgs) | sigma-pkg (planned registry) |
@@ -86,7 +86,7 @@ This document maps that gap precisely so we can close it systematically.
 ### Ubuntu / Fedora
 
 | Dimension | Ubuntu 24.04 | SigmaOS |
-|-----------|-------------|---------|
+| ----------- | ------------- | --------- |
 | Package repos | 60,000+ | 0 published |
 | LTS support | 5 years | Planned Phase 4 |
 | Hardware support | Excellent | Phase 1-2 |
@@ -148,7 +148,7 @@ A `#community` Discord + active GitHub Discussions costs nothing and matters eno
 These are real advantages we have *today* that no simple distro has:
 
 | Strength | Evidence |
-|----------|---------|
+| ---------- | --------- |
 | Post-quantum cryptography | Kyber-1024 + Dilithium-5 in `crypto/`, TLS stack |
 | Multi-format from one codebase | `download.html` — 50+ formats, one CMake flag |
 | sigma_pledge / sigma_unveil | `security/` — kernel-enforced capability restriction |
@@ -178,7 +178,7 @@ Lead with the category, not the comparison.
 ## Priority Actions to Close the Gap
 
 | Priority | Action | Impact | Effort |
-|----------|--------|--------|--------|
+| ---------- | -------- | -------- | -------- |
 | 🔴 1 | Ship bootable ISO (`make iso`) | Massive | High |
 | 🔴 2 | sigma-sh working REPL | High | Medium |
 | 🔴 3 | sigma-pkg local install | High | Medium |

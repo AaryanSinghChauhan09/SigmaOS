@@ -19,7 +19,9 @@ SigmaOS absorbs NixOS's **whole-system declarative configuration** and **generat
 A single `system.toml` file describes the desired state of the entire system: installed packages, enabled services, user accounts, firewall rules, and kernel parameters.
 
 ```toml
+
 # /etc/sigma/system.toml — Complete system declaration
+
 [system]
 hostname = "sigma-workstation"
 timezone = "Asia/Kolkata"
@@ -45,7 +47,9 @@ allow_in = ["tcp:22", "tcp:443"]
 ```bash
 $ sigma-declare apply
 Σ [DECLARE] Computing delta from current state...
+
   + Install: helix, sigma-forensic (2 new packages)
+
   ~ Change: firewall.allow_in (added tcp:443)
   Applying... done. Generation 14 created.
 ```

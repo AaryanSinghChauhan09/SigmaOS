@@ -10,11 +10,15 @@ The Chef Profile is designed for culinary excellence, recipe management, and eff
 
 - **SigmaKitchen**: Kitchen management system with inventory and scheduling.
 
+
 - **SigmaRecipe**: Recipe database with scaling and nutritional analysis.
+
 
 - **SigmaMenu**: Menu planning and cost management tools.
 
+
 - **SigmaDining**: Reservation and customer management system.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Chef Profile is designed for culinary excellence, recipe management, and eff
 
 - **Theme**: Culinary Orange (Chef Standard)
 
+
 - **Layout**: Kitchen Dashboard (Recipes, Inventory, Menu)
 
+
 - **Personalization**: Voice commands and hands-free operation.
+
 
 ---
 

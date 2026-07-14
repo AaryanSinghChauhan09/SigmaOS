@@ -7,7 +7,7 @@ SigmaOS includes multiple layers of recovery — from kernel-level self-healing 
 ## Recovery Layers
 
 | Layer | Trigger | Action |
-|-------|---------|--------|
+| ------- | --------- | -------- |
 | Kernel self-heal | Kernel panic / NULL deref | Attempt in-place recovery, fallback to rollback |
 | Watchdog | Daemon unresponsive for > 30s | Restart daemon; escalate to kernel WDT |
 | Rollback boot | 3 consecutive failed boots | Boot to previous OSTree A/B snapshot |
@@ -33,11 +33,15 @@ Self-healing actions:
 
 - Restart failed kernel threads
 
+
 - Flush and re-initialise corrupted driver state
+
 
 - Trigger OSTree A/B boot switch on unrecoverable faults
 
+
 - Write forensic log to immutable audit trail
+
 
 ---
 
@@ -45,7 +49,7 @@ Self-healing actions:
 
 On every successful boot, SigmaOS marks the current partition as "good". If 3 consecutive boots fail (watchdog timeout), the bootloader switches to the alternate A/B partition.
 
-```
+```text
 /dev/sda1  (EFI)
 /dev/sda2  (SigmaOS A — current)   ← active
 /dev/sda3  (SigmaOS B — fallback)
@@ -53,6 +57,7 @@ On every successful boot, SigmaOS marks the current partition as "good". If 3 co
 ```
 
 Manual rollback:
+
 ```bash
 sigma rollback list           # show available snapshots
 
@@ -93,7 +98,7 @@ Snapshots are stored as delta-compressed OSTree commits — restoring a snapshot
 
 If the GUI won't start, SigmaOS falls through to an emergency serial shell:
 
-```
+```text
 SigmaOS Recovery Shell v15.0
 Type 'help' for available commands
 
@@ -117,20 +122,25 @@ A bootable recovery image (`sigma-rescue.iso`) will provide:
 
 - Full filesystem repair tools (`sigma-fsck`, `sigma-badblocks`)
 
+
 - Snapshot restore GUI
+
 
 - Forensic imaging (`sigma-dd`, `sigma-forensics`)
 
+
 - Network-accessible SSH recovery session
 
+
 - Factory reset option (wipes `/` but preserves `/data`)
+
 
 ---
 
 ## Recovery Source Files
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `kernel/self_healing/` | In-kernel recovery hooks |
 | `kernel/recovery/` | Rollback orchestration |
 | `recovery/SovereignRecoverySuite.cpp` | High-level recovery API |

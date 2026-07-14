@@ -17,7 +17,7 @@ SigmaOS employs a **layered, capability-based security architecture** rooted in 
 ### 2.1 Attacker Capabilities
 
 | Threat Actor | Capabilities | Mitigations |
-|---|---|---|
+| --- | --- | --- |
 | Remote attacker | Network exploitation, phishing | Zero-trust network, sigma-shield firewall |
 | Malicious package | Supply chain compromise | Ed25519 + SHA-256 verification, reproducible builds |
 | Compromised userland | Privilege escalation | Capability-based sandbox, syscall audit |
@@ -28,13 +28,18 @@ SigmaOS employs a **layered, capability-based security architecture** rooted in 
 
 - Kernel integrity (immutable after boot)
 
+
 - User credentials and secrets (`sigma-crypto-vault`)
+
 
 - Network communications (E2E encrypted)
 
+
 - Package supply chain (cryptographic chain of trust)
 
+
 - Filesystem data (VFS RBAC + optional encryption)
+
 
 ---
 
@@ -44,7 +49,7 @@ SigmaOS employs a **layered, capability-based security architecture** rooted in 
 
 SigmaOS implements a **Capsicum-inspired capability model**. Every process receives a minimal capability token at spawn time. No ambient authority — capabilities must be explicitly delegated.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │              PROCESS CAPABILITY TOKEN                    │
 │                                                          │
@@ -59,7 +64,7 @@ SigmaOS implements a **Capsicum-inspired capability model**. Every process recei
 ### 3.2 Capability Types
 
 | Capability | Description |
-|---|---|
+| --- | --- |
 | `cap_fs` | Filesystem read/write/exec per path |
 | `cap_net` | Network access (protocol, port ranges) |
 | `cap_ipc` | IPC bus access to named services |
@@ -94,7 +99,7 @@ landlock = true
 
 The **sigma-audit** daemon intercepts all syscalls via a kernel-level BPF hook, logs them to a tamper-evident append-only ledger, and can block or alert on policy violations.
 
-```
+```text
 Process → [syscall] → Kernel Interceptor → BPF Filter
                                                │
                               ┌────────────────┴───────────────┐
@@ -109,7 +114,7 @@ Process → [syscall] → Kernel Interceptor → BPF Filter
 
 ### 4.2 Audit Log Format
 
-```
+```text
 [2026-01-01T00:00:00Z] pid=1234 comm=sigma-browser syscall=open
   path=/etc/passwd flags=O_RDONLY
   DECISION=DENY (cap_fs restriction: /etc not in allow list)
@@ -144,7 +149,7 @@ severity = "INFO"
 
 ### 5.1 Boot Chain
 
-```
+```text
 UEFI Firmware (TPM 2.0 PCR measurements)
      │
      ▼
@@ -167,11 +172,15 @@ Userland (profile packages, sandboxed)
 
 - Two kernel slots: **Slot A** (active) and **Slot B** (backup)
 
+
 - On update: write to inactive slot → verify hash → flip active pointer atomically
+
 
 - If boot of new slot fails 3× → automatic rollback to previous slot
 
+
 - TPM extends PCR[9] with slot change events (audit trail)
+
 
 ### 5.3 Sovereign Root Key
 
@@ -179,9 +188,12 @@ The **sovereign root key** is an Ed25519 keypair:
 
 - Private key: HSM-protected, never leaves signing infrastructure
 
+
 - Public key: burned into firmware and distributed with the ISO
 
+
 - Key rotation: requires 3-of-5 multisig from SigmaOS core maintainers
+
 
 ---
 
@@ -191,15 +203,21 @@ The **sovereign root key** is an Ed25519 keypair:
 
 - **Magic cookie validation:** Every allocation tagged with `0xSIGMA5A5A`
 
+
 - **Guard pages:** Unmapped pages before/after each allocation region
+
 
 - **Randomized base:** ASLR + randomized heap layout per boot
 
+
 - **Use-after-free detection:** Poison freed memory with `0xDEADBEEF`
+
 
 - **Double-free detection:** Allocation bitmap tracks state
 
+
 - **Size segregation:** Separate arenas per size class (8, 16, 32, 64, 128, 256 bytes)
+
 
 ### 6.2 sigma_malloc ABI
 
@@ -218,7 +236,7 @@ void *sigma_calloc(size_t n, size_t sz); // Overflow-checked
 All cryptographic operations use **sigma-crypto** — a formally verified Ada/SPARK library:
 
 | Algorithm | Use Case | Standard |
-|---|---|---|
+| --- | --- | --- |
 | Ed25519 | Package signing, boot verification | RFC 8032 |
 | X25519 | Key exchange (WireGuard, TLS) | RFC 7748 |
 | ChaCha20-Poly1305 | Symmetric encryption | RFC 8439 |
@@ -233,7 +251,7 @@ All modules are SPARK-proven: no buffer overflows, no integer overflows, no use-
 
 ## 8. Zero-Trust Network Architecture
 
-```
+```text
 Internet ──────► sigma-shield (BPF firewall)
                       │
                       ▼
@@ -251,9 +269,12 @@ Internet ──────► sigma-shield (BPF firewall)
 
 - GUI apps: **no** direct network access — all requests proxied via `sigma-netd`
 
+
 - DNS: DoH only (no cleartext UDP/53 from userland)
 
+
 - Outbound firewall: default-deny, whitelist per-app
+
 
 ---
 
@@ -263,20 +284,25 @@ Sovereign replacement for KeePass/Bitwarden:
 
 - Master key: Argon2id-derived from passphrase + hardware token (FIDO2/TPM)
 
+
 - Vault file: ChaCha20-Poly1305 encrypted, Ed25519-signed
+
 
 - No cloud sync by default — sovereign storage only
 
+
 - CLI: `sigma-vault get/set/delete/generate`
 
+
 - TOTP support built-in
+
 
 ---
 
 ## 10. Compliance & Formal Verification
 
 | Standard | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | SLSA Level 3 | 🎯 Planned v1.0 | Reproducible ISO builds |
 | SPARK proof coverage | 🔄 In progress | sigma-crypto fully proven |
 | FIPS 140-2 | 🎯 Planned | crypto primitives |

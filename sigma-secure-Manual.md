@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```
+```text
 sigma-secure <command> [options]
 sigma-secure --version
 sigma-secure --help
@@ -26,23 +26,33 @@ Run a full system security audit covering 10 check categories:
 
 - Secure Boot state
 
+
 - Kernel hardening flags (SMEP, SMAP, stack protector)
+
 
 - Unexpected SUID binaries
 
+
 - SSH root login policy
+
 
 - Firewall status
 
+
 - Disk encryption
+
 
 - IMA integrity policy
 
+
 - PQC key presence
+
 
 - CVE database scan
 
+
 - Audit log daemon
+
 
 `--fix` automatically remediates any fixable findings.
 
@@ -51,7 +61,7 @@ Run a full system security audit covering 10 check categories:
 Apply a system hardening profile. Available profiles:
 
 | Profile | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `sovereign` | SigmaOS baseline hardening (default) |
 | `cis` | CIS Benchmark Level 2 |
 | `nist` | NIST SP 800-123 guidelines |
@@ -76,9 +86,12 @@ Verify TPM 2.0 attestation chain:
 
 - Checks TPM chip presence
 
+
 - Verifies PCR[0] (boot) and PCR[7] (Secure Boot)
 
+
 - Validates quote signed by AIK
+
 
 ### `policy <list|set|export>`
 
@@ -100,8 +113,8 @@ Generate a signed security report with all findings. Without `--output`, prints 
 ## OPTIONS
 
 | Flag | Description |
-|------|-------------|
-| `--profile <name>` | Hardening profile (sovereign\|cis\|nist\|stig) |
+| ------ | ------------- |
+| `--profile <name>` | Hardening profile (sovereign\ | cis\ | nist\ | stig) |
 | `--output <file>` | Write report to file |
 | `--fix` | Auto-remediate fixable audit findings |
 | `--json` | Machine-readable JSON output |

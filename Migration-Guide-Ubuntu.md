@@ -5,7 +5,7 @@
 ## Why Migrate?
 
 | Feature | Ubuntu | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | Base language | C (kernel) | Rust (memory-safe) |
 | Package manager | apt/snap | sigpkg (SAT-resolver + AI) |
 | Init system | systemd | Sovereign Init (parallel, lightweight) |
@@ -23,6 +23,7 @@
 - [ ] Export config files: `cp -r ~/.config ~/config_backup`
 - [ ] Note cron jobs: `crontab -l > my_cron.txt`
 - [ ] Note systemd services: `systemctl list-units --type=service --state=running`
+
 
 ---
 
@@ -57,7 +58,7 @@ Boot from USB → Select "Install SigmaOS" → Follow the Calamares-style instal
 ## Post-Migration: Translating Commands
 
 | Ubuntu/apt | SigmaOS/sigpkg |
-|---|---|
+| --- | --- |
 | `sudo apt update` | `sigpkg update` |
 | `sudo apt upgrade` | `sigpkg upgrade` |
 | `sudo apt install pkg` | `sigpkg install pkg` |
@@ -70,7 +71,7 @@ Boot from USB → Select "Install SigmaOS" → Follow the Calamares-style instal
 ## Translating Systemd Services
 
 | systemd | Sovereign Init |
-|---|---|
+| --- | --- |
 | `systemctl start nginx` | `sigma-init start nginx` |
 | `systemctl enable nginx` | `sigma-init enable nginx` |
 | `systemctl status nginx` | `sigma-init status nginx` |
@@ -100,7 +101,7 @@ WantedBy = multi-user.target
 ## Common Package Equivalents
 
 | Ubuntu | SigmaOS |
-|---|---|
+| --- | --- |
 | `vim` | `sigpkg install vim` |
 | `python3` | `sigpkg install python3` |
 | `build-essential` | `sigpkg install sigma-dev-tools` |

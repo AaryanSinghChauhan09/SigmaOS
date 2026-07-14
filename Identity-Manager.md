@@ -5,7 +5,7 @@ identity token at spawn time. No token = no resource access.
 
 ## Architecture
 
-```
+```text
 Kernel (Trust Root)
    └─ Identity Manager
          ├─ Token Issuance (ED25519 signing)
@@ -32,7 +32,8 @@ Kernel (Trust Root)
 ## Token Lifecycle
 
 ### 1. Token Issuance
-```
+
+```text
 Kernel spawns shard
    ├─ Generate ephemeral key pair
    ├─ Create token with capabilities
@@ -41,7 +42,8 @@ Kernel spawns shard
 ```
 
 ### 2. Token Verification
-```
+
+```text
 Shard presents token on IPC/syscall
    ├─ Verify signature (cached Trust Root pubkey)
    ├─ Check expiration timestamp
@@ -50,7 +52,8 @@ Shard presents token on IPC/syscall
 ```
 
 ### 3. Token Revocation
-```
+
+```text
 Admin revokes shard
    ├─ Add shard_id to CRL
    ├─ Broadcast CRL update to all cores
@@ -85,7 +88,7 @@ void init_security_identity(void);
 Tokens contain capability grants that define what the shard can do:
 
 | Capability | Description | Example |
-|---|---|---|
+| --- | --- | --- |
 | `CAP_NET_BIND` | Bind to privileged ports | `NET_BIND:80` |
 | `CAP_FS_READ` | Read from filesystem paths | `FS_READ:/media` |
 | `CAP_FS_WRITE` | Write to filesystem paths | `FS_WRITE:/tmp` |
@@ -99,6 +102,7 @@ Tokens contain capability grants that define what the shard can do:
 - **Minimal overhead**: Token verification adds ~100ns per syscall
 - **Scalable**: Supports millions of concurrent shards
 
+
 ## Security Properties
 
 - **Cryptographic binding**: Tokens are signed by Trust Root
@@ -106,6 +110,7 @@ Tokens contain capability grants that define what the shard can do:
 - **Time-bounded**: Tokens have expiration timestamps
 - **Revocable**: CRL allows immediate token invalidation
 - **Zero-trust**: No token = no access, default-deny policy
+
 
 ## Roadmap
 
@@ -118,6 +123,7 @@ Tokens contain capability grants that define what the shard can do:
 - [ ] Token delegation (shard can delegate subset of capabilities)
 - [ ] Hardware-backed keys (TPM/SGX for Trust Root)
 - [ ] Formal verification of token verification logic
+
 
 ## Related Modules
 

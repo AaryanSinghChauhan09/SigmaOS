@@ -19,16 +19,22 @@ SigmaOS absorbs Ansible's **agentless fleet management model** and **idempotent 
 From a single control node, an operator pushes declarative YAML playbooks to all cluster nodes simultaneously, over WireGuard-encrypted management channels.
 
 ```yaml
+
 # playbooks/deploy_web.yaml
+
 - name: Deploy web frontend
+
   hosts: web_nodes
   tasks:
+
     - name: Install sigma package
+
       sigma.pkg:
         name: frontend-server
         state: present
 
     - name: Ensure service running
+
       sigma.service:
         name: frontend-server
         state: started

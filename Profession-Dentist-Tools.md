@@ -10,11 +10,15 @@ The Dentist Profile is designed for dental excellence, patient care, and efficie
 
 - **SigmaDental**: Dental practice management with patient records.
 
+
 - **SigmaSchedule**: Appointment scheduling and calendar management.
+
 
 - **SigmaImaging**: Dental imaging and X-ray management.
 
+
 - **SigmaBilling**: Dental billing and insurance processing.
+
 
 ---
 
@@ -22,9 +26,12 @@ The Dentist Profile is designed for dental excellence, patient care, and efficie
 
 - **Theme**: Dental White (Dental Standard)
 
+
 - **Layout**: Dental Dashboard (Patients, Schedule, Imaging)
 
+
 - **Personalization**: Custom treatment plans and automated reminders.
+
 
 ---
 

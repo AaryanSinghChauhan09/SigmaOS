@@ -19,7 +19,7 @@ what exists and defines the standard every new piece of code must meet.
 ### Current violations:
 
 | File | Violation | Fix |
-|------|-----------|-----|
+| ------ | ----------- | ----- |
 | `zenith_desktop/compositor/sigma_compositor.cpp` | `Compositor` class: owns window list, renders frames, polls input, handles self-healing, and maintains cursor — 5 responsibilities | Split into `WindowManager`, `Renderer`, `InputPoller`, `SelfHealMonitor`, `CursorLayer` |
 | `kernel/core/sigma_kernel_main.c` | One function does: serial init, VGA, IDT, PIC, slab, PIT, keyboard, scheduler, tasks, interrupts | Each init → its own `sigma_<subsystem>_init()` called from a boot sequence table |
 | `userland/tools/sigma_pod_cli.cpp` | `main()` parses args, creates containers, lists them, destroys them | Split into `PodArgParser`, `PodCreateCommand`, `PodListCommand`, `PodDestroyCommand` |
@@ -33,7 +33,7 @@ what exists and defines the standard every new piece of code must meet.
 New functionality should be added by extension, not modification.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | SDF driver registration macro | `hal/sigma_hal_driver.h` | `drivers-dev` | `SIGMA_SDF_REGISTER_DRIVER(Class, name, vid, pid)` — no changes to HAL core |
 | sigma-bus service registry | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | New services register without touching bus core |
 | Profession app plugin interface | `userland/indiastack/sigma_profession_base.h` | `tools-dev` | `class SigmaProfessionApp : public ISigmaApp` — new apps extend, not modify |
@@ -45,7 +45,7 @@ New functionality should be added by extension, not modification.
 Derived classes must be substitutable for their base class.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `SovereignDriverBase` interface | `hal/sigma_hal_driver.h` | `drivers-dev` | All SDF drivers: `probe()`, `init()`, `shutdown()`, `ioctl()` — NVMe/NIC/GPU all substitutable |
 | `ISigmaApp` profession base | `userland/indiastack/sigma_profession_base.h` | `tools-dev` | `start()`, `stop()`, `status()` — sigma-ca/sigma-health/sigma-agri substitutable |
 | `ISigmaFilesystem` VFS interface | `kernel/vfs/sigma_vfs_interface.h` | `fs-dev` | SigmaFS/ext4/fat32 all implement same `open/read/write/close` |
@@ -56,7 +56,7 @@ Derived classes must be substitutable for their base class.
 No class should be forced to depend on methods it does not use.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Split `sigma_vfs.h` into `IReadable`, `IWritable`, `ISeekable` | `kernel/vfs/` | `fs-dev` | Read-only filesystems implement only `IReadable` |
 | Split driver interface into `INetDriver`, `IBlockDriver`, `IDisplayDriver` | `hal/sigma_hal_driver.h` | `drivers-dev` | NIC doesn't implement display methods |
 | Split `ISigmaApp` into `ICLIApp`, `IGUIApp`, `IBackgroundService` | `userland/indiastack/sigma_profession_base.h` | `tools-dev` | sigma-agri is CLI; sigma-health has GUI; sigma-cron is background |
@@ -67,7 +67,7 @@ No class should be forced to depend on methods it does not use.
 High-level modules must not depend on low-level modules. Both depend on abstractions.
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | sigma-ca depends on `IGSTClient`, not GSTN HTTP client | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | Inject `IGSTClient` — swap sandbox/production without touching CA logic |
 | sigma-health depends on `IABDMClient`, not HTTP | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | Testable: inject mock ABDM client in CI |
 | sigma-compositor depends on `IFramebuffer`, not VirtIO-GPU | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Swap VESA/VirtIO/i915 without touching compositor |
@@ -82,7 +82,7 @@ High-level modules must not depend on low-level modules. Both depend on abstract
 ### Wrong singletons to fix:
 
 | Class | Problem | Fix |
-|-------|---------|-----|
+| ------- | --------- | ----- |
 | `SovereignDilithium::getInstance()` | Forces global state; makes unit testing impossible | Use `ICryptoProvider` DI instead; singleton only as default factory |
 | `Zenith::Compositor::getInstance()` | Cannot test compositor without global state | Constructor injection; singleton only at boot, passed as reference |
 | `LinuxCompatLayer::getInstance()` | Multiple Wine prefixes need multiple instances | Remove singleton; use per-process `LinuxCompatLayer` object |
@@ -110,7 +110,7 @@ class CAInvoiceObserver : public ISignaBusObserver {
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `ISignaBusObserver` base class | `kernel/ipc/sigma_bus_observer.h` | `kernel-exp` | Standard subscribe/notify interface |
 | Profession app observers | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | sigma-ca subscribes to invoice/payroll events |
 | Driver event notifications | `hal/sigma_hal_driver.h` | `drivers-dev` | NIC UP/DOWN events → sigma-netd observer |
@@ -136,7 +136,7 @@ public:
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `SigmaDriverFactory` | `hal/sigma_driver_factory.cpp` | `drivers-dev` | PCI ID → driver instance, no switch-case |
 | `SigmaAppFactory` | `userland/indiastack/sigma_app_factory.cpp` | `tools-dev` | DID profession → app instance |
 | `SigmaFSFactory` | `kernel/vfs/sigma_fs_factory.cpp` | `fs-dev` | Mount type string → filesystem implementation |
@@ -163,7 +163,7 @@ class PkgInstallCommand : public ICommand {
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `ICommand` base class | `userland/tools/sigma_cli_command.h` | `tools-dev` | execute/undo/name/description interface |
 | Command registry | `userland/tools/sigma_cli_registry.cpp` | `tools-dev` | Map `"pkg install"` → `PkgInstallCommand` instance |
 | Undo stack | `userland/tools/sigma_cli_registry.cpp` | `tools-dev` | `sigma-cli undo` reverses last command |
@@ -189,7 +189,7 @@ class CFSStrategy         : public ISchedulerStrategy { ... };
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | `ISchedulerStrategy` | `kernel/sched/sigma_sched_strategy.h` | `kernel-exp` | Plug in RR/MLFQ/EDF/CFS without touching kernel core |
 | `IFilesystemStrategy` | `kernel/vfs/sigma_fs_strategy.h` | `fs-dev` | SigmaFS/ext4/tmpfs as interchangeable strategies |
 | `ICryptoStrategy` | `include/crypto/sigma_crypto_strategy.h` | `performance-optimized` | Kyber-512/768/1024 as strategies; select per security level |
@@ -233,7 +233,7 @@ private:
 ```
 
 | Standard | Enforcement | Branch | Detail |
-|----------|------------|--------|--------|
+| ---------- | ------------ | -------- | -------- |
 | `m_` member prefix, `s_` static prefix | clang-tidy `readability-identifier-naming` | all | `check-identifier-naming` CI job |
 | `const` on all non-mutating methods | clang-tidy `misc-const-correctness` | all | Block merge if const missing |
 | No raw `new`/`delete` in public APIs | clang-tidy `cppcoreguidelines-no-malloc` | all | Use `sigma_unique_ptr` / slab API |
@@ -250,7 +250,7 @@ private:
 
 Every sigma command follows the same grammar:
 
-```
+```text
 sigma-<tool> <noun> <verb> [--flag value] [--bool-flag] [positional]
 
 Examples:
@@ -267,7 +267,7 @@ Examples:
 ### Rules every tool must follow:
 
 | Rule | Implementation | CI gate |
-|------|---------------|---------|
+| ------ | --------------- | --------- |
 | `--help` on every verb | Print usage + examples | `sigma-<tool> <verb> --help` exits 0 |
 | `--json` on every list/status command | Structured JSON to stdout | Parse output with `jq` in CI |
 | `--dry-run` on every mutating command | Show what would happen | No side-effects when flag set |
@@ -298,7 +298,7 @@ sigma-cli --interactive            # TUI picker for all commands
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Completion data JSON | `userland/tools/sigma_cli_completions.json` | `tools-dev` | Machine-readable tree: command → subcommands → flags |
 | sigma-sh completion engine | `userland/shell/sigma_shell.cpp` | `tools-dev` | On TAB: read completions JSON, filter by prefix |
 | Fish-style abbreviations | `userland/shell/sigma_shell.cpp` | `tools-dev` | `sca` expands to `sigma-ca`, `sag` to `sigma-agri` |
@@ -345,7 +345,7 @@ wait %1      # wait for job 1
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Fork + exec external commands | `userland/shell/sigma_shell.cpp` | `tools-dev` | `sigma_sys_fork()` + `sigma_sys_execve()` |
 | Pipe implementation | `userland/shell/sigma_shell.cpp` | `tools-dev` | `sigma_sys_pipe()` + dup2 for stdin/stdout |
 | `>`, `>>`, `<`, `2>` redirect | `userland/shell/sigma_shell.cpp` | `tools-dev` | `sigma_sys_open()` + dup2 |
@@ -396,7 +396,7 @@ sigma-abdm patient search --name Ramesh  # Output: "ABHA: ****-****-1234"
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Indian number formatter | `userland/locales/sigma_l10n.cpp` | `release/standalone` | Lakh/crore format with correct comma placement |
 | ₹ rupee symbol output | `userland/locales/sigma_l10n.cpp` | `release/standalone` | UTF-8 `₹` (U+20B9) in all monetary output |
 | Indian date format | `userland/locales/sigma_l10n.cpp` | `release/standalone` | `dd Month YYYY` by default for Indian locale |
@@ -411,7 +411,7 @@ sigma-abdm patient search --name Ramesh  # Output: "ABHA: ****-****-1234"
 ### OPT1 — Compiler Optimisation
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | LTO (Link-Time Optimisation) | `Makefile` | `performance-optimized` | `-flto=thin` for kernel + userland |
 | PGO (Profile-Guided Optimisation) | `Makefile` | `performance-optimized` | `make PROFILE=pgo iso` → profile run → `make PROFILE=pgo-use iso` |
 | `-O3` for hot paths, `-Os` for cold | `Makefile` | `performance-optimized` | Per-subsystem optimisation level |
@@ -423,7 +423,7 @@ sigma-abdm patient search --name Ramesh  # Output: "ABHA: ****-****-1234"
 ### OPT2 — Runtime Optimisation
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Hot path branch prediction hints | `kernel/core/sigma_syscall_dispatch.cpp` | `kernel-exp` | `__builtin_expect(cond, 1)` on common syscalls |
 | Likely/unlikely macros | `include/sigma_kernel_types.h` | all | `#define SIGMA_LIKELY(x) __builtin_expect(!!(x),1)` |
 | Cache line alignment | `kernel/sched/sigma_runqueue.cpp` | `performance-optimized` | `alignas(64)` on hot data structures |
@@ -435,7 +435,7 @@ sigma-abdm patient search --name Ramesh  # Output: "ABHA: ****-****-1234"
 ### OPT3 — Memory Optimisation
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Small buffer optimisation (SBO) | `klib/sigma_string.cpp` | `tools-dev` | Strings ≤ 15 chars stored inline, no heap |
 | Pool allocator for IPC messages | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Fixed-size message pool, no `sigma_malloc` per message |
 | Zero-copy IPC via shared memory | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Large payloads: share physical page, not copy |
@@ -453,7 +453,7 @@ sigma-abdm patient search --name Ramesh  # Output: "ABHA: ****-****-1234"
 **Current:** Mix of `SigmaOS::`, `sigma::`, no namespace, C-style names.
 
 | Standard | Rule | Files to update |
-|----------|------|----------------|
+| ---------- | ------ | ---------------- |
 | Kernel C code | No namespace (C linkage) | `kernel/core/*.c`, `kernel/vfs/*.c` |
 | Kernel C++ code | `namespace sigma::kernel::` | `kernel/core/*.cpp`, `kernel/sched/*.cpp` |
 | Userland tools | `namespace sigma::tools::` | `userland/tools/*.cpp` |
@@ -493,7 +493,7 @@ typedef int32_t sigma_err_t;
 ```
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | Define `sigma_error_codes.h` | `include/sigma_error_codes.h` | `tools-dev` | All error codes, `sigma_err_to_string()` |
 | `SIGMA_TRY` propagation macro | `include/sigma_error_codes.h` | `tools-dev` | Clean error propagation without exceptions |
 | Migrate kernel to `sigma_err_t` | `kernel/core/`, `kernel/vfs/` | `kernel-exp` | Replace `-1`/`false` return codes |
@@ -504,7 +504,7 @@ typedef int32_t sigma_err_t;
 ### RF3 — Header Hygiene
 
 | Task | File | Branch | Detail |
-|------|------|--------|--------|
+| ------ | ------ | -------- | -------- |
 | SPDX header on every file | All files | all | CI gate already defined — enforce |
 | Include guards → `#pragma once` | All `.h` files | all | `sed -i` migration script |
 | Forward declarations over includes | All headers | all | Reduce compile time: declare instead of include |
@@ -518,7 +518,7 @@ typedef int32_t sigma_err_t;
 ## Summary of New Dimensions Added
 
 | Document | New dimensions | Status |
-|----------|---------------|--------|
+| ---------- | --------------- | -------- |
 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability, Performance, Quality, UX, Security, Accessibility, DX | ✅ Done |
 | [Stability-Performance-Extended](Stability-Performance-Extended) | Energy, Reliability, Observability, Release, Network QA, India QA, Hardware | ✅ Done |
 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ✅ Done |

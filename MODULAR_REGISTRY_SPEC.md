@@ -8,7 +8,7 @@ The **Sovereign Registry** is the central orchestration nexus for the 33-suite l
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    SOVEREIGN REGISTRY                       │
 │                                                             │
@@ -134,7 +134,7 @@ pub enum ShardCategory {
 Each shard declares required capabilities at registration. The registry enforces least-privilege:
 
 | Capability | Bit | Description |
-|---|---|---|
+| --- | --- | --- |
 | `CAP_MEMORY_ALLOC` | 0x0001 | Can allocate kernel memory |
 | `CAP_IPC_SEND` | 0x0002 | Can send sigma-bus messages |
 | `CAP_IPC_RECV` | 0x0004 | Can receive sigma-bus messages |
@@ -178,7 +178,7 @@ pub struct RegistryEntry {
 
 ## Lifecycle Management
 
-```
+```text
 ┌──────────┐    register()    ┌──────────────┐    init()    ┌─────────┐
 │ UNKNOWN  │ ───────────────▶ │ REGISTERED   │ ──────────▶ │ RUNNING │
 └──────────┘                  └──────────────┘              └────┬────┘
@@ -202,7 +202,7 @@ pub struct RegistryEntry {
 
 During kernel boot, the registry processes shards in dependency-topological order:
 
-```
+```text
 Stage 1 (Genesis):   CoreLattice, MemoryManager, SchedulerCore
 Stage 2 (HAL):       HardwareAbstraction, DriverManager, ACPI
 Stage 3 (Registry):  SovereignRegistry self-registers
@@ -236,20 +236,31 @@ pub fn registry_unregister(slot: ShardSlot) -> Result<(), RegistryError>;
 ### CLI
 
 ```bash
+
 # List all registered shards
+
 sigma registry list
+
 # NAME              CATEGORY   STATE      BOOT_ORDER  CAPS
+
 # CoreLattice       core       RUNNING    1           0xFFFF
+
 # SigmaScheduler    core       RUNNING    2           0x0043
+
 # SovereignMAC      security   RUNNING    10          0x00CF
+
 # SigmaShield       security   RUNNING    11          0x002E
+
 # ZenithDesktop     ui         RUNNING    30          0x0006
+
 # HelloWorld        optional   IDLE       99          0x0006
 
 # Inspect a specific shard
+
 sigma registry inspect SigmaShield
 
 # Hot-reload a shard
+
 sigma registry reload SigmaShield
 ```
 

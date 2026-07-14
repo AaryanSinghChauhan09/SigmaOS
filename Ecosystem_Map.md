@@ -7,7 +7,7 @@
 
 ## Layer Diagram
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │  APPLICATIONS (userland/apps/)                                    │
 │  sigma-browser · sigma-edit · sigma-office · sigma-pdf           │
@@ -69,7 +69,7 @@
 ## Component Count
 
 | Layer | Components | Languages |
-|---|---|---|
+| --- | --- | --- |
 | Applications | 8+ (planned v1.0) | Rust/Nim |
 | Desktop | 9 components | Rust |
 | AI & Runtime | 3 | Rust |
@@ -90,7 +90,7 @@
 
 ## Data Flow: App → Kernel → Hardware
 
-```
+```text
 App (Rust/Nim)
   │  navigator.sigmaos.* API or direct syscall
   ▼
@@ -111,7 +111,7 @@ Hardware
 
 ## Package Flow: Developer → User
 
-```
+```text
 Developer writes app
   │
   ▼

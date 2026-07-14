@@ -10,7 +10,7 @@ SigmaOS uses the **Sovereign Init** system as PID 1 — a lightweight, parallel 
 
 ## Architecture
 
-```
+```text
 sigma_init.rs (PID 1)
 ├── sigma_service.rs   — Service definition parser
 ├── sigma_journal.rs   — Structured log aggregator
@@ -25,7 +25,7 @@ sigma_init.rs (PID 1)
 ## Boot Phases
 
 | Phase | Actions |
-|---|---|
+| --- | --- |
 | 0 — Kernel | `sigma_irq`, `sigma_vmm`, `sigma_vfs` initialization |
 | 1 — Early | Mount `/`, `/tmp`, `/proc`, `/sys` |
 | 2 — Basic | Start `sigma-journal`, `sigma-udev` |
@@ -65,7 +65,7 @@ WantedBy = multi-user.target
 ### Service Types
 
 | Type | Behavior |
-|---|---|
+| --- | --- |
 | `simple` | Supervisor tracks ExecStart PID |
 | `forking` | Supervisor tracks secondary PID (from PidFile) |
 | `oneshot` | Runs once, no persistent process |
@@ -76,28 +76,37 @@ WantedBy = multi-user.target
 ## CLI Reference
 
 ```bash
+
 # Start a service
+
 sigma-init start nginx
 
 # Stop a service
+
 sigma-init stop nginx
 
 # Restart a service
+
 sigma-init restart nginx
 
 # Enable on boot
+
 sigma-init enable nginx
 
 # Disable on boot
+
 sigma-init disable nginx
 
 # Check status
+
 sigma-init status nginx
 
 # List all services
+
 sigma-init list
 
 # Show boot timing
+
 sigma-init analyze-boot
 ```
 
@@ -108,23 +117,30 @@ sigma-init analyze-boot
 The `sigma_journal` subsystem collects structured log entries from all services:
 
 ```bash
+
 # View all logs
+
 sigma-journal
 
 # Filter by service
+
 sigma-journal --service nginx
 
 # Filter by log level
+
 sigma-journal --level error
 
 # Follow live
+
 sigma-journal -f
 
 # Export as JSON
+
 sigma-journal --format json > logs.json
 ```
 
 Log entry format:
+
 ```json
 {
   "timestamp": 1720271234567,
@@ -141,7 +157,9 @@ Log entry format:
 Timers are services with a `.timer` file that replaces cron:
 
 ```ini
+
 # /etc/sigma/services/backup.timer
+
 [Timer]
 OnCalendar = daily
 Persistent = true
@@ -155,7 +173,7 @@ WantedBy = timers.target
 ## Differences from systemd
 
 | Feature | systemd | Sovereign Init |
-|---|---|---|
+| --- | --- | --- |
 | Binary format | ELF + dbus | Single Rust binary |
 | D-Bus dependency | Required | None |
 | Cgroup control | systemd manages | Kernel-native cgroups |

@@ -97,7 +97,7 @@ gdb -ex "target remote :1234" build/sigma.elf
 ## Useful Make Targets
 
 | Target | Description |
-|--------|-------------|
+| -------- | ------------- |
 | `make all` | Build kernel + all shards |
 | `make iso` | Generate bootable ISO (Phase G) |
 | `make qemu` | Build + boot in QEMU |
@@ -135,7 +135,7 @@ make qemu-test
 ## Troubleshooting
 
 | Error | Fix |
-|-------|-----|
+| ------- | ----- |
 | `nasm: not found` | `sudo apt install nasm` |
 | `undefined reference to sigma_xxx` | Run `make fix-includes` |
 | Black screen in QEMU | Add `-vga std` flag |

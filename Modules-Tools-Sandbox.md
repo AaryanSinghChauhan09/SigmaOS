@@ -6,7 +6,7 @@ fuzz targets, and integration tests without risking the production kernel state.
 ## Use Cases
 
 | Use Case | Description |
-|---|---|
+| --- | --- |
 | **Fuzz testing** | Execute AFL++/libFuzzer harnesses in an isolated shard |
 | **CI integration tests** | Run full kernel subsystem tests in a QEMU-backed sandbox |
 | **Third-party capsules** | Test unverified plugins before signing |
@@ -14,7 +14,7 @@ fuzz targets, and integration tests without risking the production kernel state.
 
 ## Architecture
 
-```
+```text
 Test Runner
    └─ sandbox_create(config)
          └─ Isolated shard (separate memory domain, IOMMU)
@@ -74,22 +74,31 @@ sigma sandbox run --repro crash-001.bin --target fuzz_net_parser
 
 - [ ] Basic shard isolation (`sandbox_create` / `sandbox_destroy`)
 
+
 - [ ] SovereignFS snapshot-based reset (`sandbox_reset`)
+
 
 - [ ] Syscall trace interceptor (`sandbox_trace_syscalls`)
 
+
 - [ ] AFL++ / libFuzzer integration harness
+
 
 - [ ] QEMU-backed hardware simulation (virtio-blk, virtio-net)
 
+
 - [ ] Coverage-guided fuzzing via KCOV equivalent
 
+
 - [ ] Distributed sandbox pool for CI parallelism
+
 
 ## Related Modules
 
 - [`modules/security/isolation`](../../security/isolation/README.md) — Production isolation
 
+
 - [`modules/tools/diag`](../diag/README.md) — Syscall tracing
+
 
 - [`modules/perf/bench`](../../perf/bench/README.md) — Performance regression testing

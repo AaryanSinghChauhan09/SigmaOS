@@ -11,7 +11,7 @@ only permitted when the lattice partial order is satisfied.
 
 ## Architecture
 
-```
+```text
 Subject (Shard)
    └─ Capability Token (clearance label)
          └─ MAC Policy Engine
@@ -29,7 +29,8 @@ The security lattice is defined as a partial order `(L, ≤)` where:
 - **Objects** have sensitivity labels
 - **Operations** are permitted when `subject_label ≥ object_label`
 
-```
+
+```text
 Top (SYSTEM_ADMIN)
 ├── High (CONFIDENTIAL, HIGH_INTEGRITY)
 ├── Medium (INTERNAL, MEDIUM_INTEGRITY)
@@ -38,17 +39,20 @@ Top (SYSTEM_ADMIN)
 
 ## Policy Language
 
-```
+```text
+
 # Example: allow browser shard to read /media, deny /sys
 
 ALLOW browser_shard READ /media
 DENY  browser_shard ANY  /sys
 
 # Network policies
+
 ALLOW web_shard   CONNECT net:443
 DENY  web_shard   BIND    net:*
 
 # Filesystem policies
+
 ALLOW app_shard   READ  /home
 ALLOW app_shard   WRITE /tmp
 DENY  app_shard   ANY   /etc/shadow
@@ -80,7 +84,7 @@ void init_security_mac(void);
 
 The policy compiler transforms human-readable policy rules into an efficient binary format:
 
-```
+```text
 Policy File (text)
    └─ Policy Compiler
          ├─ Lexical Analysis
@@ -95,7 +99,7 @@ Policy File (text)
 MAC policies are enforced at multiple kernel entry points:
 
 | Enforcement Point | Description |
-|---|---|
+| --- | --- |
 | Syscall Dispatcher | Checks file/network operations |
 | VFS Layer | Validates file access permissions |
 | Network Stack | Enforces socket binding/connecting rules |
@@ -113,6 +117,7 @@ MAC policies are enforced at multiple kernel entry points:
 - [ ] Policy hot-reload (without reboot)
 - [ ] Formal verification of policy correctness
 - [ ] SELinux policy import tool
+
 
 ## Related Modules
 

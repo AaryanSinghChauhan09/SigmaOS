@@ -10,9 +10,12 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 
 1. **Atomic**: Focus on a single shard or functional cluster.
 
+
 2. **Zero-Dependency**: Do not introduce external libraries unless absolutely necessary.
 
+
 3. **PQC-Ready**: Consider security and attestation in every line of code.
+
 
 ---
 
@@ -20,7 +23,9 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 
 1. **Fork the Repository**: Create your own fork and clone it locally.
 
+
 2. **Create a Shard Branch**:
+
 
    ```bash
    git checkout -b shard/your-feature-name
@@ -30,12 +35,15 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
    - Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
    - Update the corresponding `.md` file in the wiki if the architecture changes.
 
+
 2. **Validation**:
    - Run the build system: `make all`.
    - Test in QEMU: `./qemu-boot.sh`.
    - Ensure `sigma-heal` reports no technical debt.
 
+
 3. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
+
 
 ---
 
@@ -44,6 +52,7 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 *Use**OOP-Isolated Singletons** for core engines.
 
 - Follow the `sigma_` naming convention for kernel-level primitives.
+
 
 *Maintain strict**C++11/14** standards for hardware compatibility.
 

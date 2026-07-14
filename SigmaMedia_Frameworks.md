@@ -27,21 +27,29 @@ SigmaMedia treats all streams — audio, video, Webcams, SDRs (Software Defined 
 ### 3.2 AI-Enhanced Codecs
 
 SigmaMedia integrates hardware-accelerated AI models directly into the pipeline graph.
+
 - **Adaptive Compression**: Automatically adjusting bitrate based on network latency and screen content.
 - **On-the-fly Denoising**: Native RNNoise integration removes background noise before it even reaches the application (e.g., Discord or Zoom).
 - **Video Upscaling**: Real-time AI upscaling for legacy video streams.
+
 
 ### 3.3 Declarative Routing
 
 Multimedia routing is no longer hidden in opaque graphical tools. SigmaOS uses declarative configurations to map endpoints:
 
 ```yaml
+
 # /etc/sigma/media_routes.yaml
+
 routes:
+
   - id: "podcasting_setup"
+
     source: "hw:usb_mic_0"
     filters:
+
       - ai_denoise
       - eq_compressor
+
     sink: "app:obs_studio"
 ```

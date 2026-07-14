@@ -5,7 +5,7 @@
 ## Why Migrate?
 
 | Feature | Windows | SigmaOS |
-|---|---|---|
+| --- | --- | --- |
 | License | Proprietary (paid) | Open source (free) |
 | Privacy | Telemetry by default | Zero telemetry |
 | Security | Reactive antivirus | Proactive MAC + Pledge + Vault |
@@ -22,6 +22,7 @@
 - [ ] Note which applications you use daily
 - [ ] Confirm hardware compatibility at `https://hardware.sigmaos.dev`
 
+
 ---
 
 ## Installation
@@ -33,10 +34,12 @@ Download from: `https://releases.sigmaos.dev/v15.0/sigmaos-zenith-amd64.iso`
 ### Step 2: Create Bootable USB (from Windows)
 
 Use **Rufus** (recommended):
+
 1. Download Rufus from `https://rufus.ie`
 2. Select the SigmaOS ISO
 3. Select your USB drive
 4. Click Start (GPT partition for UEFI mode)
+
 
 Or use the SigmaOS USB Writer tool.
 
@@ -47,18 +50,21 @@ Or use the SigmaOS USB Writer tool.
 3. Disable **Secure Boot** (or enroll the SigmaOS MOK key first)
 4. Set USB as first boot device
 
+
 ### Step 4: Install
 
 Boot from USB → "Install SigmaOS" → Choose partition layout:
+
 - **Wipe and install**: Replaces Windows entirely
 - **Dual boot**: Keeps Windows, installs SigmaOS alongside (GRUB manages boot)
+
 
 ---
 
 ## Windows App Equivalents
 
 | Windows | SigmaOS |
-|---|---|
+| --- | --- |
 | Microsoft Office | LibreOffice (`sigpkg install libreoffice`) |
 | Chrome / Edge | Firefox (`sigpkg install firefox`) |
 | Notepad | Mousepad / Kate |
@@ -74,7 +80,7 @@ Boot from USB → "Install SigmaOS" → Choose partition layout:
 ## File System Mapping
 
 | Windows Path | SigmaOS Equivalent |
-|---|---|
+| --- | --- |
 | `C:\Users\Name\Documents` | `/home/name/Documents` |
 | `C:\Program Files` | `/usr/bin` and `/usr/lib` |
 | `C:\Windows\System32` | `/usr/sigma/system` |
@@ -86,7 +92,7 @@ Boot from USB → "Install SigmaOS" → Choose partition layout:
 ## Keyboard Shortcuts
 
 | Windows | SigmaOS (Zenith Desktop) |
-|---|---|
+| --- | --- |
 | `Win + R` | `Super + R` (Run dialog) |
 | `Win + D` | `Super + D` (Show desktop) |
 | `Alt + F4` | `Alt + F4` (Close window) |
@@ -100,13 +106,17 @@ Boot from USB → "Install SigmaOS" → Choose partition layout:
 NTFS partitions from Windows are automatically detected and mountable:
 
 ```bash
+
 # List detected Windows partitions
+
 sigma-disk list
 
 # Mount Windows C: drive
+
 sudo sigma-disk mount /dev/sda2 /mnt/windows
 
 # Access your files
+
 ls /mnt/windows/Users/YourName/Documents
 ```
 

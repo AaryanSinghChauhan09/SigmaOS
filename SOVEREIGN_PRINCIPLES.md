@@ -12,17 +12,19 @@ This document formalizes the architectural and philosophical principles governin
 
 Unlike monolithic procedural kernels, SigmaOS treats every system component as a **Shard Object** — a self-contained, independently loadable, independently testable unit of functionality.
 
-```
+```text
 Monolithic Linux:  [=========== ONE BIG KERNEL ===========]
 SigmaOS:           [Shard][Shard][Shard][Shard][Shard][...]
                    Each shard: own memory, own IPC channel, hot-swappable
 ```
 
 **Implications**:
+
 - No global state leakage between subsystems
 - Fault in one shard cannot corrupt another (isolation)
 - Shards can be updated, restarted, or replaced without reboot
 - Every shard has explicit capability declarations (least-privilege)
+
 
 ---
 
@@ -31,7 +33,7 @@ SigmaOS:           [Shard][Shard][Shard][Shard][Shard][...]
 Security is not an afterthought — it is the **substrate** upon which everything else is built.
 
 | Layer | Mechanism |
-|---|---|
+| --- | --- |
 | Boot | Dilithium5 secure boot chain |
 | Binary | PQC-signed shard packages |
 | Runtime | eBPF seccomp + Firecracker sandbox |
@@ -76,6 +78,7 @@ SigmaOS is not an OS with AI bolted on — it is an OS **designed from the groun
 - Natural language CLI translates human intent to system commands
 - All AI runs **locally** with differential privacy guarantees
 
+
 **Privacy mandate**: No AI telemetry leaves the device without explicit, cryptographically-proven consent.
 
 ---
@@ -83,11 +86,13 @@ SigmaOS is not an OS with AI bolted on — it is an OS **designed from the groun
 ### Principle 5: Sovereign Ownership
 
 The user owns their computing environment completely. SigmaOS never:
+
 - Phones home without consent
 - Installs updates without approval
 - Collects usage data without opt-in
 - Locks the user into vendor ecosystems
 - Hides system behavior behind opaque abstractions
+
 
 **Implementation**: Every system action is logged in the audit ring. Users can query `sigma audit why <event>` to understand any system action.
 
@@ -97,7 +102,7 @@ The user owns their computing environment completely. SigmaOS never:
 
 SigmaOS does not compete with other operating systems — it **absorbs** their best features:
 
-```
+```text
 ├── Ubuntu's ease-of-use    → absorbed into Zenith UX
 ├── Arch's customizability  → absorbed into shard profiles
 ├── NixOS's reproducibility → absorbed into atomic updates
@@ -122,6 +127,7 @@ SigmaOS is never "done." The system is designed for continuous, safe evolution:
 - **AI autotuner** for continuous performance optimization
 - **Federated learning** for cross-device knowledge sharing (opt-in)
 
+
 **Guarantee**: Any SigmaOS installation from any era can be updated to the latest version in a single `sigma upgrade` command.
 
 ---
@@ -132,7 +138,7 @@ SigmaOS is never "done." The system is designed for continuous, safe evolution:
 
 Every PR is checked against these principles:
 
-```
+```text
 [ ] Does this change maintain shard isolation? (P1)
 [ ] Does this change introduce security regressions? (P2)
 [ ] Does this change add unnecessary data copies? (P3)
@@ -149,10 +155,12 @@ Every RFC must reference which principles it upholds and whether any are in tens
 ### In Quality Gate
 
 The `sigma_quality_check.sh` script validates:
+
 - No global mutable state outside designated singletons (P1)
 - No network calls without explicit user consent (P5)
 - No `unsafe` blocks without `// SAFETY:` justification (P2)
 - All new IPC uses sigma-bus, not ad-hoc channels (P3)
+
 
 ---
 

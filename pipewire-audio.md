@@ -8,7 +8,7 @@ SigmaOS runs [PipeWire](https://pipewire.org/) (LGPL-2.1) as a **userland audio 
 
 ## Architecture
 
-```
+```text
 sigma-play / sigma-edit / browser
         │  sigma-audio-api (Rust)
         │  (FFI over libpipewire)
@@ -23,7 +23,7 @@ sigma-play / sigma-edit / browser
 
 ## File Layout
 
-```
+```text
 userland/audio/
 ├── README.md
 ├── sigma_audiod.rs      # PipeWire daemon wrapper shard
@@ -153,7 +153,7 @@ pub enum AudioError {
 
 ## Audio Graph Example
 
-```
+```text
 Microphone (AudioSource, 48kHz, stereo)
         │
         ▼ [noise-reduce effect node]
@@ -189,6 +189,8 @@ sigma-audio list
 
 - `sigma-play /usr/share/sounds/sigma-boot.wav` plays audio through PipeWire on real hardware.
 
+
 - `sigma-audio list` enumerates audio sources and sinks from the PipeWire graph.
+
 
 - sigma-audiod registers as a sigma-bus shard and responds to `capability: audio` queries.

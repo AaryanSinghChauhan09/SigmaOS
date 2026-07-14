@@ -8,7 +8,7 @@ SigmaOS implements **atomic, rollback-safe system updates** inspired by [OSTree]
 
 ## A/B Partition Model
 
-```
+```text
 Disk layout:
   /dev/sda1  EFI System Partition (ESP)
   /dev/sda2  sigma-rootfs-A  (current active)
@@ -23,8 +23,9 @@ Boot flow:
 
 ## sigma-update: Update Lifecycle
 
-```
+```text
 sigma-update apply <update-url>
+
   1. fetch    — download update bundle (.sigupd)
   2. verify   — cosign signature + sha256 manifest
   3. stage    — write to inactive partition (B if A is active)
@@ -32,13 +33,14 @@ sigma-update apply <update-url>
   5. reboot   — reboot into B
   6. activate — on successful boot, mark B as permanent active
   7. rollback — if B fails 3 consecutive boots, revert to A
+
 ```
 
 ---
 
 ## File Layout
 
-```
+```text
 userland/update/
 ├── README.md
 └── sigma_update.rs
@@ -165,6 +167,8 @@ pub fn check_boot_health() {
 
 - `sigma-update apply https://updates.sigmaos.dev/latest` stages update and sets next boot target.
 
+
 - System boots into new partition B after reboot.
+
 
 - Corrupt update triggers rollback to A after 3 failed boots.

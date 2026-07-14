@@ -8,7 +8,7 @@ This specification details how SigmaOS structurally synthesizes and absorbs the 
 
 SigmaOS does not copy external distribution code; instead, it implements cleanroom sovereign versions of their functionality mapping to system layers:
 
-```
+```text
 ┌────────────────────────────────────────────────────────┐
 │                   Zenith Desktop UI                    │
 │   (Absorbs Zorin Appearance & Pantheon Workspaces)    │
@@ -38,6 +38,7 @@ SigmaOS does not copy external distribution code; instead, it implements cleanro
 ## ⚙️ Dynamic Profile Configuration
 
 The system uses profiles to match the desired deployment type:
+
 - **`sigma-core` (Arch-like minimal)**: Minimal runtime footprint, direct hardware console, no GUI.
 - **`sigma-desktop` (Zorin-like UI)**: Active Zenith compositor, audio, standard input/output drivers.
 - **`sigma-cloud` (NixOS-like immutable)**: Containers active, read-only system partitions, declarative GitOps.

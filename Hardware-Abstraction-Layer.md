@@ -7,7 +7,7 @@ HAL backend — nothing else needs to change.
 ## Source Files
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `hal.rs` | Core HAL trait definitions and dispatch table |
 | `hw_detect.rs` | Runtime CPU / ACPI / DTB hardware discovery |
 | `accel_hal.rs` | Hardware accelerator HAL (GPU compute / NPU / DSP) |
@@ -15,7 +15,7 @@ HAL backend — nothing else needs to change.
 ## Supported Targets
 
 | Architecture | Status |
-|---|---|
+| --- | --- |
 | x86_64 | ✅ Active |
 | AArch64 (ARM64) | 🔧 In-progress |
 | RISC-V RV64GC | 📋 Planned |
@@ -47,7 +47,7 @@ sigma_arch_t hal_detect_arch(void);
 `hw_detect.rs` interrogates ACPI RSDP / MADT / SRAT on x86_64 and the
 Flattened Device Tree on ARM/RISC-V to build a unified topology map:
 
-```
+```text
 ACPI RSDP → XSDT → MADT   (interrupt routing)
                   → SRAT   (NUMA node topology)
                   → MCFG   (PCIe ECAM base)
@@ -57,20 +57,28 @@ ACPI RSDP → XSDT → MADT   (interrupt routing)
 
 - [x] x86_64 HAL backend (TSC, LAPIC, IOAPIC)
 
+
 - [x] Hardware discovery (`hw_detect.rs`)
+
 
 - [x] Accelerator HAL stub (`accel_hal.rs`)
 
+
 - [ ] AArch64 GIC-v3 interrupt controller
+
 
 - [ ] RISC-V PLIC / CLINT integration
 
+
 - [ ] ACPI Power Management (S3/S4 sleep states)
 
+
 - [ ] Secure Enclave HAL (SGX / TrustZone)
+
 
 ## Related Modules
 
 - [`modules/core/drivers`](../../core/drivers/README.md) — Drivers that use HAL
+
 
 - [`modules/core/kernel`](../../core/kernel/README.md) — Kernel that drives HAL
