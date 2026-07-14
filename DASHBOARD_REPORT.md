@@ -306,8 +306,26 @@ The following core roadmap and blueprint `.md` files have been finalized, migrat
    - Added `WIKI/OSS_Absorption_udev.md`.
    - Added `WIKI/OSS_Absorption_PipeWire.md`.
 
-## ➡️ Next Recommended Steps (Batch 15)
+## 🛠️ Batch 15 & System Profiling & Documentation Updates Implemented
 
-- **System Profiling & Telemetry Absorptions (`sigma_tracing`)**: Build a native, zero-overhead tracing and profiling daemon to absorb `perf`, `strace`, and `BPF` concepts.
+1. **System Profiling Absorption (`sigma_tracing`)**:
+   - Created `TraceCollector` to capture syscalls (absorbing `strace`).
+   - Created `PerfCounter` to read hardware PMU registers (absorbing `perf`).
+   - Created `ProbeManager` for zero-overhead runtime instrumentation (absorbing eBPF).
+
+2. **Roadmap Progress Sync**:
+   - Updated `.kiro/specs/sigmaos-roadmap/tasks.md` to check off completed core foundational Phase 0 tasks.
+
+3. **Learning Journals Updated**:
+   - Added `sigma_init` DAG topological sorting lessons to `.Jules/bolt.md`.
+   - Added compositor damage tracking lessons to `.Jules/palette.md`.
+   - Added Ed25519 supply-chain signature verification to `.Jules/sentinel.md`.
+
+4. **WIKI Documentation Expansion**:
+   - Migrated fully implemented absorption specs to WIKI: `OSS_Absorption_Flatpak.md`, `OSS_Absorption_Fuchsia.md`, `OSS_Absorption_SerenityOS.md`, `OSS_Absorption_i3.md`, `OSS_Absorption_ext4.md`.
+
+## ➡️ Next Recommended Steps (Batch 16)
+
 - **Service Integration Test**: Write a top-level integration test that actually spins up `sigma_boot`'s initramfs in QEMU and boots `sigma_init`.
 - **Desktop UI Polish**: Absorb ideas from modern Linux DEs (GNOME, KDE Plasma) into the `SigmaDesktop` module (Panel, Dash, Notification Center).
+- **Filesystem Tools (`sigma_fs_tools`)**: Create utilities for formatting and checking the `SigmaFS` volume (similar to `mkfs.ext4` and `fsck`).
