@@ -1,6 +1,0 @@
-{
-  "module": "S25_BrowserLattice",
-  "dependencies": [
-    "S01_Genesis"
-  ]
-}

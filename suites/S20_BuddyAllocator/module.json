@@ -1,6 +1,0 @@
-{
-  "module": "S20_BuddyAllocator",
-  "dependencies": [
-    "S01_Genesis"
-  ]
-}

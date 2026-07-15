@@ -1,5 +1,0 @@
-{
-  "name": "Sovereign Alpine (Minimal)",
-  "shards": ["S01_Genesis", "S04_HAL", "S06_IPC"],
-  "features": ["minimal_footprint", "hardened"]
-}

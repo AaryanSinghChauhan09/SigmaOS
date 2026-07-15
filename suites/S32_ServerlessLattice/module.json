@@ -1,6 +1,0 @@
-{
-  "module": "S32_ServerlessLattice",
-  "dependencies": [
-    "S01_Genesis"
-  ]
-}

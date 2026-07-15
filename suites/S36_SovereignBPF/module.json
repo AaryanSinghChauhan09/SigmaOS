@@ -1,6 +1,0 @@
-{
-  "module": "S36_SovereignBPF",
-  "dependencies": [
-    "S01_Genesis"
-  ]
-}

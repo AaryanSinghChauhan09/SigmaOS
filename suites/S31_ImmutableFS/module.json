@@ -1,6 +1,0 @@
-{
-  "module": "S31_ImmutableFS",
-  "dependencies": [
-    "S01_Genesis"
-  ]
-}

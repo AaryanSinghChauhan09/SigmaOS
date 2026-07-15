@@ -1,6 +1,0 @@
-{
-  "module": "S26_SovereignLibC",
-  "dependencies": [
-    "S01_Genesis"
-  ]
-}
