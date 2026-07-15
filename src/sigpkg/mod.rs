@@ -1,17 +1,17 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod recipe;
 pub mod resolver;
 pub mod store;
-pub mod verifier;
 pub mod transaction;
-pub mod recipe;
+pub mod verifier;
 
+pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
-pub use verifier::CryptoVerifier;
 pub use transaction::Transaction;
-pub use recipe::{PackageRecipe, BuildSystem, RecipeManager, RecipeError};
+pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -23,7 +23,11 @@ pub struct Version {
 
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
@@ -31,14 +35,17 @@ impl Version {
         if parts.len() != 3 {
             return Err(ParseError::InvalidFormat);
         }
-        
-        let major = parts[0].parse::<u64>()
+
+        let major = parts[0]
+            .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1].parse::<u64>()
+        let minor = parts[1]
+            .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2].parse::<u64>()
+        let patch = parts[2]
+            .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        
+
         Ok(Version::new(major, minor, patch))
     }
 }

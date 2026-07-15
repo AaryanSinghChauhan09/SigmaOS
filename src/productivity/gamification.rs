@@ -28,7 +28,12 @@ pub struct Achievement {
 }
 
 impl Achievement {
-    pub fn new(id: String, name: String, achievement_type: AchievementType, target_value: u64) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        achievement_type: AchievementType,
+        target_value: u64,
+    ) -> Self {
         Self {
             id,
             name,
@@ -154,7 +159,7 @@ impl PomodoroTimer {
 
         if let Some(start) = self.start_time {
             self.elapsed = start.elapsed();
-            
+
             if self.elapsed >= self.current_duration {
                 self.complete_pomodoro();
             }
@@ -164,7 +169,7 @@ impl PomodoroTimer {
     fn complete_pomodoro(&mut self) {
         self.running = false;
         self.start_time = None;
-        
+
         match self.state {
             PomodoroState::Work => {
                 self.pomodoros_completed += 1;
@@ -290,7 +295,8 @@ impl ProductivityScore {
         self.focus_score = focus.clamp(0.0, 100.0);
         self.task_completion_score = task_completion.clamp(0.0, 100.0);
         self.consistency_score = consistency.clamp(0.0, 100.0);
-        self.overall_score = (self.focus_score + self.task_completion_score + self.consistency_score) / 3.0;
+        self.overall_score =
+            (self.focus_score + self.task_completion_score + self.consistency_score) / 3.0;
     }
 
     pub fn update_streak(&mut self, current_date: u64) {
@@ -345,7 +351,7 @@ impl GamifiedProductivity {
             "first_pomodoro".to_string(),
             "First Pomodoro".to_string(),
             AchievementType::FocusTime,
-            1
+            1,
         )
         .with_description("Complete your first Pomodoro session".to_string())
         .with_icon("🍅".to_string());
@@ -354,7 +360,7 @@ impl GamifiedProductivity {
             "focus_master".to_string(),
             "Focus Master".to_string(),
             AchievementType::FocusTime,
-            100
+            100,
         )
         .with_description("Complete 100 Pomodoro sessions".to_string())
         .with_icon("🎯".to_string());
@@ -363,7 +369,7 @@ impl GamifiedProductivity {
             "task_achiever".to_string(),
             "Task Achiever".to_string(),
             AchievementType::TasksCompleted,
-            50
+            50,
         )
         .with_description("Complete 50 tasks".to_string())
         .with_icon("✅".to_string());
@@ -372,15 +378,19 @@ impl GamifiedProductivity {
             "goal_getter".to_string(),
             "Goal Getter".to_string(),
             AchievementType::GoalsReached,
-            10
+            10,
         )
         .with_description("Reach 10 goals".to_string())
         .with_icon("🎖️".to_string());
 
-        self.achievements.insert(first_pomodoro.id.clone(), first_pomodoro);
-        self.achievements.insert(focus_master.id.clone(), focus_master);
-        self.achievements.insert(task_achiever.id.clone(), task_achiever);
-        self.achievements.insert(goal_getter.id.clone(), goal_getter);
+        self.achievements
+            .insert(first_pomodoro.id.clone(), first_pomodoro);
+        self.achievements
+            .insert(focus_master.id.clone(), focus_master);
+        self.achievements
+            .insert(task_achiever.id.clone(), task_achiever);
+        self.achievements
+            .insert(goal_getter.id.clone(), goal_getter);
     }
 
     pub fn add_goal(&mut self, goal: Goal) {
@@ -397,14 +407,15 @@ impl GamifiedProductivity {
     }
 
     pub fn add_achievement(&mut self, achievement: Achievement) {
-        self.achievements.insert(achievement.id.clone(), achievement);
+        self.achievements
+            .insert(achievement.id.clone(), achievement);
     }
 
     pub fn update_achievement(&mut self, id: &str, value: u64) {
         if let Some(achievement) = self.achievements.get_mut(id) {
             let was_unlocked = achievement.unlocked;
             achievement.update_progress(value);
-            
+
             if !was_unlocked && achievement.unlocked {
                 self.add_experience(500);
             }
@@ -413,7 +424,7 @@ impl GamifiedProductivity {
 
     pub fn add_experience(&mut self, points: u64) {
         self.experience_points += points;
-        
+
         // Level up every 1000 XP
         while self.experience_points >= self.level as u64 * 1000 {
             self.level += 1;
@@ -425,11 +436,11 @@ impl GamifiedProductivity {
         let next_level_xp = (self.level + 1) as u64 * 1000;
         let progress = self.experience_points - current_level_xp;
         let total_needed = next_level_xp - current_level_xp;
-        
+
         if total_needed == 0 {
             return 100.0;
         }
-        
+
         (progress as f64 / total_needed as f64 * 100.0).min(100.0)
     }
 
@@ -439,10 +450,16 @@ impl GamifiedProductivity {
 
     pub fn update_pomodoro(&mut self) {
         self.pomodoro_timer.update();
-        
+
         if self.pomodoro_timer.pomodoros_completed > 0 {
-            self.update_achievement("first_pomodoro", self.pomodoro_timer.pomodoros_completed as u64);
-            self.update_achievement("focus_master", self.pomodoro_timer.pomodoros_completed as u64);
+            self.update_achievement(
+                "first_pomodoro",
+                self.pomodoro_timer.pomodoros_completed as u64,
+            );
+            self.update_achievement(
+                "focus_master",
+                self.pomodoro_timer.pomodoros_completed as u64,
+            );
         }
     }
 
@@ -482,11 +499,16 @@ mod tests {
 
     #[test]
     fn test_achievement_progress() {
-        let mut achievement = Achievement::new("test".to_string(), "Test".to_string(), AchievementType::FocusTime, 10);
+        let mut achievement = Achievement::new(
+            "test".to_string(),
+            "Test".to_string(),
+            AchievementType::FocusTime,
+            10,
+        );
         achievement.update_progress(5);
         assert_eq!(achievement.get_progress_percentage(), 50.0);
         assert!(!achievement.unlocked);
-        
+
         achievement.update_progress(10);
         assert!(achievement.unlocked);
     }
@@ -511,7 +533,7 @@ mod tests {
         system.add_experience(500);
         assert_eq!(system.experience_points, 500);
         assert_eq!(system.level, 1);
-        
+
         system.add_experience(500);
         assert_eq!(system.level, 2);
     }

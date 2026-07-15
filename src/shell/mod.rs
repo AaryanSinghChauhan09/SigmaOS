@@ -1,4 +1,4 @@
 // SigmaOS Shell Module
 pub mod repl;
 
-pub use repl::{ShellRepl, ShellCommand};
+pub use repl::{ShellCommand, ShellRepl};

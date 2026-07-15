@@ -136,13 +136,13 @@ impl UnifiedDashboard {
 
     pub fn get_system_summary(&self) -> HashMap<String, f64> {
         let mut summary = HashMap::new();
-        
+
         for (id, widget) in &self.widgets {
             if let Some(value) = widget.get_latest_value() {
                 summary.insert(id.clone(), value);
             }
         }
-        
+
         summary
     }
 
@@ -166,24 +166,36 @@ pub struct SystemMonitor {
 impl SystemMonitor {
     pub fn new() -> Self {
         let mut dashboard = UnifiedDashboard::new();
-        
+
         // Add default widgets
-        let cpu_widget = DashboardWidget::new("cpu".to_string(), WidgetType::LineChart, "CPU Usage".to_string())
-            .with_position(0, 0)
-            .with_size(400, 200);
-        
-        let memory_widget = DashboardWidget::new("memory".to_string(), WidgetType::Gauge, "Memory Usage".to_string())
-            .with_position(400, 0)
-            .with_size(200, 200);
-        
-        let disk_widget = DashboardWidget::new("disk".to_string(), WidgetType::Progress, "Disk Usage".to_string())
-            .with_position(0, 200)
-            .with_size(300, 100);
-        
+        let cpu_widget = DashboardWidget::new(
+            "cpu".to_string(),
+            WidgetType::LineChart,
+            "CPU Usage".to_string(),
+        )
+        .with_position(0, 0)
+        .with_size(400, 200);
+
+        let memory_widget = DashboardWidget::new(
+            "memory".to_string(),
+            WidgetType::Gauge,
+            "Memory Usage".to_string(),
+        )
+        .with_position(400, 0)
+        .with_size(200, 200);
+
+        let disk_widget = DashboardWidget::new(
+            "disk".to_string(),
+            WidgetType::Progress,
+            "Disk Usage".to_string(),
+        )
+        .with_position(0, 200)
+        .with_size(300, 100);
+
         dashboard.add_widget(cpu_widget);
         dashboard.add_widget(memory_widget);
         dashboard.add_widget(disk_widget);
-        
+
         Self {
             dashboard,
             running: false,
@@ -202,7 +214,7 @@ impl SystemMonitor {
         if !self.running {
             return;
         }
-        
+
         let pseudo_random = || -> f64 {
             let nanos = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -220,21 +232,21 @@ impl SystemMonitor {
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };
-        
+
         let memory_data = MetricData {
             metric_type: MetricType::Memory,
             value: 60.0 + (pseudo_random() * 15.0),
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };
-        
+
         let disk_data = MetricData {
             metric_type: MetricType::Disk,
             value: 75.0,
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };
-        
+
         self.dashboard.update_widget("cpu", cpu_data);
         self.dashboard.update_widget("memory", memory_data);
         self.dashboard.update_widget("disk", disk_data);
@@ -264,13 +276,21 @@ mod tests {
 
     #[test]
     fn test_widget_creation() {
-        let widget = DashboardWidget::new("test".to_string(), WidgetType::LineChart, "Test".to_string());
+        let widget = DashboardWidget::new(
+            "test".to_string(),
+            WidgetType::LineChart,
+            "Test".to_string(),
+        );
         assert_eq!(widget.title, "Test");
     }
 
     #[test]
     fn test_add_data_point() {
-        let mut widget = DashboardWidget::new("test".to_string(), WidgetType::LineChart, "Test".to_string());
+        let mut widget = DashboardWidget::new(
+            "test".to_string(),
+            WidgetType::LineChart,
+            "Test".to_string(),
+        );
         let data = MetricData {
             metric_type: MetricType::CPU,
             value: 50.0,
@@ -283,7 +303,11 @@ mod tests {
 
     #[test]
     fn test_average_calculation() {
-        let mut widget = DashboardWidget::new("test".to_string(), WidgetType::LineChart, "Test".to_string());
+        let mut widget = DashboardWidget::new(
+            "test".to_string(),
+            WidgetType::LineChart,
+            "Test".to_string(),
+        );
         widget.add_data_point(MetricData {
             metric_type: MetricType::CPU,
             value: 40.0,

@@ -17,21 +17,21 @@ pub enum TargetPlatform {
 /// Binary format
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BinaryFormat {
-    Exe,    // Windows executable
-    Dmg,    // macOS disk image
-    Apk,    // Android package
-    Ipa,    // iOS package
-    Elf,    // Linux executable
-    Bin,    // Generic binary
+    Exe, // Windows executable
+    Dmg, // macOS disk image
+    Apk, // Android package
+    Ipa, // iOS package
+    Elf, // Linux executable
+    Bin, // Generic binary
 }
 
 /// Compatibility mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityMode {
     Native,
-    Translation,  // Binary translation (e.g., Wine, Rosetta)
-    Container,    // Containerization
-    Emulation,    // Full emulation (e.g., QEMU)
+    Translation, // Binary translation (e.g., Wine, Rosetta)
+    Container,   // Containerization
+    Emulation,   // Full emulation (e.g., QEMU)
 }
 
 /// Application binary
@@ -114,8 +114,8 @@ impl TranslationLayer {
     }
 
     pub fn can_translate(&self, binary: &ApplicationBinary) -> bool {
-        self.supported_formats.contains(&binary.format) &&
-        self.supported_targets.contains(&binary.target_platform)
+        self.supported_formats.contains(&binary.format)
+            && self.supported_targets.contains(&binary.target_platform)
     }
 
     pub fn translate(&self, binary: &ApplicationBinary) -> Result<(), CompatibilityError> {
@@ -213,7 +213,8 @@ impl CompatibilityManager {
             .with_overhead(0.15);
 
         self.translation_layers.insert(wine.name.clone(), wine);
-        self.translation_layers.insert(rosetta.name.clone(), rosetta);
+        self.translation_layers
+            .insert(rosetta.name.clone(), rosetta);
         self.translation_layers.insert(box86.name.clone(), box86);
     }
 
@@ -247,7 +248,9 @@ impl CompatibilityManager {
     }
 
     pub fn run_binary(&mut self, name: &str) -> Result<(), CompatibilityError> {
-        let binary = self.registered_binaries.get(name)
+        let binary = self
+            .registered_binaries
+            .get(name)
             .ok_or(CompatibilityError::BinaryNotFound)?;
 
         match binary.compatibility_mode {
@@ -288,7 +291,8 @@ impl CompatibilityManager {
     }
 
     pub fn add_container_runtime(&mut self, runtime: ContainerRuntime) {
-        self.container_runtimes.insert(runtime.name.clone(), runtime);
+        self.container_runtimes
+            .insert(runtime.name.clone(), runtime);
     }
 
     pub fn get_best_compatibility_mode(&self, binary: &ApplicationBinary) -> CompatibilityMode {
@@ -320,15 +324,15 @@ impl CompatibilityManager {
 
     pub fn list_supported_formats(&self) -> Vec<BinaryFormat> {
         let mut formats = Vec::new();
-        
+
         for layer in self.translation_layers.values() {
             formats.extend(layer.supported_formats.iter().copied());
         }
-        
+
         for runtime in self.container_runtimes.values() {
             formats.extend(runtime.supported_formats.iter().copied());
         }
-        
+
         formats.sort();
         formats.dedup();
         formats
@@ -367,7 +371,11 @@ mod tests {
     #[test]
     fn test_binary_registration() {
         let mut manager = CompatibilityManager::new();
-        let binary = ApplicationBinary::new("test".to_string(), BinaryFormat::Exe, TargetPlatform::Windows);
+        let binary = ApplicationBinary::new(
+            "test".to_string(),
+            BinaryFormat::Exe,
+            TargetPlatform::Windows,
+        );
         manager.register_binary(binary);
         assert_eq!(manager.registered_binaries.len(), 1);
     }
@@ -377,24 +385,32 @@ mod tests {
         let layer = TranslationLayer::new("Test".to_string())
             .with_format(BinaryFormat::Exe)
             .with_target(TargetPlatform::Windows);
-        
-        let binary = ApplicationBinary::new("test".to_string(), BinaryFormat::Exe, TargetPlatform::Windows);
+
+        let binary = ApplicationBinary::new(
+            "test".to_string(),
+            BinaryFormat::Exe,
+            TargetPlatform::Windows,
+        );
         assert!(layer.can_translate(&binary));
     }
 
     #[test]
     fn test_container_runtime() {
-        let runtime = ContainerRuntime::new("Docker".to_string())
-            .with_format(BinaryFormat::Elf);
-        
-        let binary = ApplicationBinary::new("test".to_string(), BinaryFormat::Elf, TargetPlatform::Linux);
+        let runtime = ContainerRuntime::new("Docker".to_string()).with_format(BinaryFormat::Elf);
+
+        let binary =
+            ApplicationBinary::new("test".to_string(), BinaryFormat::Elf, TargetPlatform::Linux);
         assert!(runtime.can_containerize(&binary));
     }
 
     #[test]
     fn test_auto_configure() {
         let mut manager = CompatibilityManager::new();
-        let mut binary = ApplicationBinary::new("test".to_string(), BinaryFormat::Exe, TargetPlatform::Windows);
+        let mut binary = ApplicationBinary::new(
+            "test".to_string(),
+            BinaryFormat::Exe,
+            TargetPlatform::Windows,
+        );
         manager.auto_configure_binary(&mut binary);
         assert_eq!(binary.compatibility_mode, CompatibilityMode::Translation);
     }

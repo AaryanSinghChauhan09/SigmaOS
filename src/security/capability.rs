@@ -133,22 +133,19 @@ mod tests {
 
     #[test]
     fn test_network_permission() {
-        let token = CapabilityToken::new()
-            .allow_network("tcp", 80);
+        let token = CapabilityToken::new().allow_network("tcp", 80);
         assert!(token.has_permission(Permission::NetworkTcp));
     }
 
     #[test]
     fn test_file_read_permission() {
-        let token = CapabilityToken::new()
-            .allow_read("/var/www");
+        let token = CapabilityToken::new().allow_read("/var/www");
         assert!(token.has_permission(Permission::FileRead));
     }
 
     #[test]
     fn test_capability_revocation() {
-        let mut token = CapabilityToken::new()
-            .allow_network("tcp", 80);
+        let mut token = CapabilityToken::new().allow_network("tcp", 80);
         token.revoke_all();
         assert_eq!(token.bits(), 0);
     }
@@ -156,8 +153,7 @@ mod tests {
     #[test]
     fn test_capability_gate_validation() {
         let gate = CapabilityGate::new();
-        let token = CapabilityToken::new()
-            .allow_network("tcp", 80);
+        let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
     }
