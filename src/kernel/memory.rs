@@ -25,6 +25,39 @@ impl BuddyAllocator {
         }
     }
 
+    pub fn with_memory(base_addr: usize, size: usize) -> Self {
+        let mut allocator = Self::new();
+        allocator.initialize_memory(base_addr, size);
+        allocator
+    }
+
+    pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
+        let pages = size / PAGE_SIZE;
+        let order = self.calculate_order(pages);
+        
+        if order < 12 {
+            let block = MemoryBlock {
+                addr: NonNull::new(base_addr as *mut u8).unwrap(),
+                size,
+            };
+            self.free_lists[order].push(block);
+        }
+    }
+
+    pub fn get_free_memory(&self) -> usize {
+        self.free_lists.iter()
+            .enumerate()
+            .map(|(order, blocks)| blocks.len() * (1 << order) * PAGE_SIZE)
+            .sum()
+    }
+
+    pub fn get_total_memory(&self) -> usize {
+        self.free_lists.iter()
+            .enumerate()
+            .map(|(order, blocks)| blocks.len() * (1 << order) * PAGE_SIZE)
+            .sum()
+    }
+
     pub fn allocate(&mut self, size: usize) -> Option<MemoryBlock> {
         // Prevent integer overflow in size calculation
         if size == 0 || size > usize::MAX - PAGE_SIZE + 1 {

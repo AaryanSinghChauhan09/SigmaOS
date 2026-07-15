@@ -5,11 +5,13 @@ pub mod resolver;
 pub mod store;
 pub mod verifier;
 pub mod transaction;
+pub mod recipe;
 
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
 pub use verifier::CryptoVerifier;
 pub use transaction::Transaction;
+pub use recipe::{PackageRecipe, BuildSystem, RecipeManager, RecipeError};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
