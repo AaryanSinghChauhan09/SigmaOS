@@ -74,7 +74,7 @@ impl Scheduler {
         }
     }
 
-    pub fn add_process(&mut self, process: Process) {
+    pub fn add_process(&mut self, mut process: Process) {
         process.update_virtual_deadline(self.current_time);
         self.processes.push(process);
     }

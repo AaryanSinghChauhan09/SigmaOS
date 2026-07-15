@@ -1,5 +1,4 @@
 // SigmaOS Kernel Module
-pub mod main;
 pub mod scheduler;
 pub mod memory;
 pub mod ipc;

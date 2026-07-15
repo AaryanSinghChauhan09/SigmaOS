@@ -40,12 +40,13 @@ pub struct SystemSnapshot {
 
 impl SystemSnapshot {
     pub fn new(description: String) -> Self {
+        let timestamp_nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
         Self {
-            id: uuid::Uuid::new_v4().to_string(),
-            timestamp: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            id: format!("snap-{}", timestamp_nanos),
+            timestamp: (timestamp_nanos / 1_000_000_000) as u64,
             system_state: HashMap::new(),
             configuration: HashMap::new(),
             description,

@@ -14,7 +14,7 @@ pub use transaction::Transaction;
 pub use recipe::{PackageRecipe, BuildSystem, RecipeManager, RecipeError};
 
 /// Package version using SemVer
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     major: u64,
     minor: u64,
@@ -43,6 +43,12 @@ impl Version {
     }
 }
 
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseError {
     InvalidFormat,
@@ -67,7 +73,7 @@ pub struct Dependency {
 }
 
 /// Version constraint
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),

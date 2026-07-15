@@ -203,17 +203,27 @@ impl SystemMonitor {
             return;
         }
         
+        let pseudo_random = || -> f64 {
+            let nanos = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(123456789);
+            let state = (nanos ^ 0x5DEECE66D) & ((1 << 48) - 1);
+            let state = (state.wrapping_mul(0x5DEECE66D).wrapping_add(0xB)) & ((1 << 48) - 1);
+            (state as f64) / ((1u64 << 48) as f64)
+        };
+
         // Simulate metric updates
         let cpu_data = MetricData {
             metric_type: MetricType::CPU,
-            value: 45.0 + (rand::random::<f64>() * 20.0),
+            value: 45.0 + (pseudo_random() * 20.0),
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };
         
         let memory_data = MetricData {
             metric_type: MetricType::Memory,
-            value: 60.0 + (rand::random::<f64>() * 15.0),
+            value: 60.0 + (pseudo_random() * 15.0),
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };
