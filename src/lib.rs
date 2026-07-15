@@ -3,6 +3,10 @@
 
 pub mod security;
 pub mod sigpkg;
+pub mod kernel;
+pub mod network;
 
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use sigpkg::{SatSolver, ContentAddressedStore, CryptoVerifier, Transaction};
+pub use kernel::{Scheduler, Process, Priority, ProcessState, BuddyAllocator, MemoryBlock, PAGE_SIZE, IpcManager, Channel, Message, IpcError};
+pub use network::{TcpStack, TcpConnection, TcpSegment, TcpState, TcpError};
