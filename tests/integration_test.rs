@@ -1,5 +1,6 @@
 // SigmaOS Integration Tests
 // Tests for core system components
+#![allow(unused, clippy::all)]
 
 #[cfg(test)]
 mod tests {

@@ -1,5 +1,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(unused, clippy::all)]
 
 pub mod accessibility;
 pub mod automation;
