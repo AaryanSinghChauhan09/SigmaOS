@@ -11,12 +11,28 @@ pub struct PackageEntry {
     pub depends: Vec<String>,
 }
 
+/// Allocation-free case-insensitive substring search helper
+fn contains_case_insensitive(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    haystack.as_bytes()
+        .windows(needle.len())
+        .any(|window| {
+            window.iter()
+                .zip(needle.bytes())
+                .all(|(&h, n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+}
+
 /// Search the sovereign registry by name/keyword
 pub fn search(query: &str) -> Vec<PackageEntry> {
     // In production: query the sovereign registry API / local mirror
-    let query = query.to_lowercase();
     known_packages().into_iter()
-        .filter(|p| p.name.contains(&query) || p.description.to_lowercase().contains(&query))
+        .filter(|p| {
+            contains_case_insensitive(&p.name, query) ||
+            contains_case_insensitive(&p.description, query)
+        })
         .collect()
 }
 
@@ -104,4 +120,28 @@ fn known_packages() -> Vec<PackageEntry> {
             depends: vec!["sigma-libc".to_string()],
         },
     ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_contains_case_insensitive() {
+        assert!(contains_case_insensitive("SigmaOS", "sigma"));
+        assert!(contains_case_insensitive("sigma-libc", "LIBC"));
+        assert!(contains_case_insensitive("Sovereign Shell", "sovereign"));
+        assert!(contains_case_insensitive("NoMatch", ""));
+        assert!(!contains_case_insensitive("NoMatch", "YesMatch"));
+    }
+
+    #[test]
+    fn test_search_case_insensitive() {
+        let results = search("LIBC");
+        assert!(!results.is_empty());
+        assert!(results.iter().any(|p| p.name == "sigma-libc"));
+
+        let results_empty = search("nonexistent-package-query");
+        assert!(results_empty.is_empty());
+    }
 }
