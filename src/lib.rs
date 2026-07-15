@@ -13,6 +13,8 @@ pub mod accessibility;
 pub mod customization;
 pub mod automation;
 pub mod resilience;
+pub mod productivity;
+pub mod orchestration;
 
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use sigpkg::{SatSolver, ContentAddressedStore, CryptoVerifier, Transaction, PackageRecipe, BuildSystem, RecipeManager, RecipeError};
@@ -26,3 +28,5 @@ pub use accessibility::{AccessibilityFramework, AccessibilityProfile, Accessibil
 pub use customization::{CustomizationEngine, Routine, Condition, Action, Theme, TriggerType, CustomizationError};
 pub use automation::{AiOptimizer, OptimizationRecommendation, SystemState, OptimizationCategory, OptimizationError};
 pub use resilience::{SelfHealingModule, RecoveryRule, RecoveryAction, SystemSnapshot, RecoveryEventType, ResilienceError};
+pub use productivity::{GamifiedProductivity, Achievement, Goal, PomodoroTimer, ProductivityScore, AchievementType, PomodoroState};
+pub use orchestration::{CrossDeviceOrchestrator, ConnectedDevice, SmartHomeDevice, AutomationRule, DeviceType, ConnectionStatus, DeviceCapability, AutomationTrigger, CrossDeviceAction, OrchestrationError};
