@@ -1,0 +1,50 @@
+[package]
+name = "sigmaos"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Team"]
+description = "SigmaOS - Sovereign, AI-Native Operating System"
+license = "MIT OR GPL-2.0"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[dependencies]
+# Core dependencies (minimal as per SigmaOS philosophy)
+
+[dev-dependencies]
+# Test dependencies
+
+[features]
+default = []
+desktop = []
+drivers = []
+ai = []
+microkernel = ["core-shards"]
+core-shards = []
+rtos = ["realtime"]
+realtime = []
+cloud = ["cloud-init"]
+cloud-init = []
+wasm = []
+browser = ["wasm"]
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+codegen-units = 1
+
+[[bin]]
+name = "sigma_kernel"
+path = "src/kernel/main.rs"
+
+[[bin]]
+name = "sigma_drivers"
+path = "src/drivers/main.rs"
+
+[[bin]]
+name = "sigma_userspace"
+path = "src/userspace/main.rs"
