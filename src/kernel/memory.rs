@@ -26,6 +26,11 @@ impl BuddyAllocator {
     }
 
     pub fn allocate(&mut self, size: usize) -> Option<MemoryBlock> {
+        // Prevent integer overflow in size calculation
+        if size == 0 || size > usize::MAX - PAGE_SIZE + 1 {
+            return None;
+        }
+        
         let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
         let order = self.calculate_order(pages);
         

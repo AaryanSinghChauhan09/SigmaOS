@@ -156,6 +156,10 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
         
+        // Prevent integer overflow in offset calculation
+        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+            .ok_or(FsError::InvalidFd)?;
+        
         // Simulate read (in production, actual file I/O)
         let bytes_read = buffer.len().min(inode.size as usize);
         file_descriptor.offset += bytes_read as u64;
@@ -171,10 +175,15 @@ impl VirtualFilesystem {
             .ok_or(FsError::NotFound)?;
         
         // Check write permission
-        if !inode.permissions.write {
-            return Err(FsError::PermissionDenied);
-        }
+        if Prevent integer overflow in size calculation
+        let new_size = inode.size.checked_add(buffer.len() as u64)
+            .ok_or(FsError::NoSpace)?;
         
+        // !inode.permissions.write {
+            return Err(FsError::PermissionDenied);
+        }nw_z
+        file_descriptor.offset.checked_add()
+            .ok_or(FsError::NoSpace)?
         // Simulate write (in production, actual file I/O)
         let bytes_written = buffer.len();
         inode.size += bytes_written as u64;
