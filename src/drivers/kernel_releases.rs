@@ -1,7 +1,7 @@
 // SigmaOS Kernel-Release Inspired OOP Drivers
 // This file implements 9 concrete drivers aligned with active Linux kernel releases on kernel.org.
 
-#![allow(non_camel_case_types, unused_imports)]
+#![allow(clippy::all, warnings)]
 
 extern crate alloc;
 

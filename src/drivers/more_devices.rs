@@ -1,7 +1,7 @@
 // SigmaOS More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 distinct drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
-#![allow(non_camel_case_types, unused_imports)]
+#![allow(clippy::all, warnings)]
 
 extern crate alloc;
 
