@@ -86,191 +86,237 @@ The **Zenith Compositor** is SigmaOS's native, unified user-facing desktop frame
 ```
 
 ### 3.1 Architectural Features and Feature Absorption
-* **From GNOME:** Absorb focused, distraction-free spatial layouts, semantic interface accessibility APIs, and clean core configuration standards.
-* **From KDE Plasma:** Absorb rich customization structures, modular dashboard widget APIs, and dynamic configuration adjustments without system restart.
-* **From COSMIC (Sway/i3):** Absorb high-efficiency multi-threaded tiling layout mechanics, safe Rust composition rules, and rapid vector math windows.
-* **From macOS & Windows:** Absorb fluid typographic engines, elegant transition easing curves, and global searchable application overlays.
+* **From GNOME:** Absorb focused, distraction-free spatial layouts, accessible text mappings, and clean core configurations.
+* **From KDE Plasma:** Absorb rich customization structures, modular dashboard widget APIs, and dynamic config updates.
+* **From COSMIC (Sway/i3):** Absorb safe Rust multi-threaded tiling layout mechanics and rapid vector math windows.
+* **From macOS & Windows:** Absorb fluid typographic engines, elegant transition easing, and global searchable overlays.
 
 ### 3.2 Native UI Accessibility Core
-Built directly into the core compositor drawing routines, guaranteeing assistive compliance:
-* **Direct Screen Reader Buffers:** The GUI engine exposes an isolated virtual-tree accessible text structure, routed to the microphone/audio driver without intermediate X11 processing.
-* **Declarative High-Contrast Modes:** Adjusts font weights and background/foreground contrast ratios programmatically using lightweight, JSON-exportable settings overlays.
+Built directly into the core compositor drawing routines:
+* **Direct Screen Reader Buffers:** Accessible virtual text tree mapped directly to audio without intermediate X11 processing.
+* **Declarative High-Contrast Modes:** Adjusts colors and font weights dynamically using JSON-style declarative setups.
 
 ---
 
-## 4. BARE-METAL SUBSYSTEM DESIGN SPECIFICATIONS
+## 4. DEFEATING THE LINUX KERNEL: ARCHITECTURAL SUPERIORITY
 
-This section outlines low-level, zero-dependency, principle-centric code implementations for core operating system subsystems, written exclusively using user-defined primitives, modern low-level systems programming constructs, and object-oriented architectures.
+The Linux kernel version history (from v1.0 released in 1994 to modern v6.x) reveals a steady accumulation of architectural debt, security vulnerabilities, and monolithic bloat. SigmaOS is designed fundamentally to overcome these structural limitations.
 
-### 4.1 Multi-Generation Peripheral Compatibility Core (Rust `#![no_std]`)
-An elegant implementation of polymorphic legacy/modern communication channels and a bytecode sandbox engine for user-defined drivers:
+```
++------------------------------------------------------------------------------------------+
+|                                    ARCHITECTURAL EVOLUTION                               |
++------------------------------------------------------------------------------------------+
+| Linux Kernel (1994 - Present)                   | SigmaOS (Next-Gen)                     |
+| - Unsafe C dependencies, raw pointers           | - Memory-safe, zero-allocation Rust    |
+| - Monolithic, shared mutable global state      | - Capability-isolated shards, no-std   |
+| - Insecure root privilege, vulnerable syscalls | - Zero-trust capability tokens, pledge |
+| - Bloated drivers compiled into kernel context  | - User-Defined bytecode-sandboxed VMs  |
++------------------------------------------------------------------------------------------+
+```
+
+### 4.1 Structural Vulnerabilities in Linux History
+1. **The Monolithic Vulnerability Vector:** In the Linux kernel, device drivers execute in the same privilege ring (Ring 0) as core scheduling and memory management. A single null-pointer dereference or buffer overflow in a legacy floppy disk or Wi-Fi driver compromises the entire system.
+2. **The C Language and Memory Safety Debt:** Written in C, Linux is plagued by raw pointer transmutations, use-after-free conditions, double-frees, and data races. Decades of patches (e.g. KASLR, kernel stack protection) are reactive mitigations, not structural cures.
+3. **The Root Bypass and POSIX Legacy:** Monolithic POSIX systems rely on the root user paradigm. Once an exploit gains Ring 0 execution or administrative setuid capabilities, the entire access-control model collapses.
+4. **IPC Context-Switching Bottlenecks:** Monolithic designs require deep copying of memory buffers across user/kernel boundaries during network, file, and graphics transactions, creating significant CPU cash-miss penalties.
+
+### 4.2 How SigmaOS Overcomes Linux Structural Bottlenecks
+* **Strict Shard Isolation:** The SigmaOS microkernel separates scheduling (`S-SCHED`), memory (`S-MM`), filesystem (`S-FS`), and networking (`S-NET`) into completely isolated, hardware-enforced shards. Shards interact purely through non-blocking capability-gated transactions.
+* **Zero-Allocation Memory Safety:** By leveraging Rust’s compile-time borrow-checker, SigmaOS guarantees mathematical memory safety without a garbage collector or a global memory allocator.
+* **Polymorphic Driver Sandboxing:** Drivers execute in userspace (Ring 3) as polymorphic object instances. Even if a driver crashes, our S6 process supervision shard isolates and restarts it in sub-milliseconds without interrupting kernel runtime.
+* **Zero-Copy Sovereign Transport:** Shared page frames are dynamically mapped across system boundaries using the Sovereign VMM, completely eliminating data copy steps during network socket and storage transactions.
+
+---
+
+## 5. BARE-METAL OOP DRIVER MANAGER ARCHITECTURE
+
+SigmaOS implements a universal, polymorphic **Driver Manager** constructed strictly on Object-Oriented Principles (OOP) and safe systems engineering.
+
+```
+                                +---------------------------+
+                                |     Device (Base Trait)   |
+                                +---------------------------+
+                                              |
+                     +------------------------+------------------------+
+                     |                        |                        |
+                     v                        v                        v
+         +-----------------------+  +-------------------+  +-----------------------+
+         |     StorageDevice     |  |    NetworkDevice  |  |     GraphicsDevice    |
+         +-----------------------+  +-------------------+  +-----------------------+
+                     |                        |                        |
+                     v                        v                        v
+         +-----------------------+  +-------------------+  +-----------------------+
+         |     NVMeController    |  |   E1000Controller |  |     VesaController    |
+         +-----------------------+  +-------------------+  +-----------------------+
+```
+
+### 5.1 The OOP Driver Framework
+We leverage design patterns to decouple physical hardware communications from class-level execution:
+* **The Factory Pattern:** Dynamically instantiates the correct device subclass (e.g., `LegacyKeyboard` or `ModernUsbController`) based on physical hardware IDs scanned on startup.
+* **The Adapter Pattern:** Adapts legacy, ancient port-based register communicators to match modern, memory-mapped I/O (MMIO) traits smoothly under a single unified driver interface.
+* **The Observer Pattern:** Broadcasts thread-safe interrupt event alerts from hardware pins to listening userspace supervisor daemons.
+* **The Singleton Pattern:** Keeps a single centralized `DeviceManager` instance managing the global active driver registry.
+
+### 5.2 Architectural Implementation (Rust `#![no_std]`)
 
 ```rust
-// Zero-dependency representation of hardware communication ports
-#[derive(Debug, Clone, Copy)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy x86 Port I/O (e.g., PIC, standard UART)
-    MemoryMapped(u64), // Modern memory-mapped registers (e.g., PCIe, xHCI)
+// Unified representation of physical communication pathways
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BusChannel {
+    PortIO(u16),       // Legacy x86 Port communication (e.g. PIC, ancient UART)
+    MemoryMapped(u64), // Modern memory-mapped registers (e.g. PCIe, xHCI)
 }
 
-// Unified Peripheral Interface implementing Object-Oriented polymorphism
-pub trait UnifiedPeripheral {
-    fn setup(&mut self) -> Result<(), u32>;
-    fn read_register(&self, offset: u32) -> u8;
-    fn write_register(&mut self, offset: u32, value: u8) -> Result<(), u32>;
-    fn run_udf_control(&mut self, bytecode: &[u8]) -> Result<u64, u32>;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceState {
+    Uninitialized,
+    Initialized,
+    Active,
+    PowerSaving,
+    Shutdown,
 }
 
-// User-Defined Function (UDF) micro-VM sandbox interpreter
-pub struct UdfInterpreter {
-    registers: [u64; 4], // Isolated Virtual Registers: R0 (Accumulator), R1-R3 (GPR)
-    allowed_range: (u64, u64), // Strict sandbox boundaries (MMIO Base, MMIO Size)
+// Base abstract Device trait enforcing OOP encapsulation and polymorphism
+pub trait Device {
+    fn device_id(&self) -> u32;
+    fn class_name(&self) -> &'static str;
+    fn channel(&self) -> BusChannel;
+    fn state(&self) -> DeviceState;
+    fn initialize(&mut self) -> Result<(), u32>;
+    fn set_power_state(&mut self, state: DeviceState) -> Result<(), u32>;
+    fn handle_interrupt(&mut self) -> Result<(), u32>;
 }
 
-impl UdfInterpreter {
-    pub fn new(base: u64, size: u64) -> Self {
+// Concrete subclass: Modern High-Speed NVMe Controller
+pub struct NvmeController {
+    id: u32,
+    base_address: u64,
+    state: DeviceState,
+    block_size: usize,
+}
+
+impl NvmeController {
+    pub fn new(id: u32, base: u64) -> Self {
         Self {
-            registers: [0; 4],
-            allowed_range: (base, base + size),
+            id,
+            base_address: base,
+            state: DeviceState::Uninitialized,
+            block_size: 512,
+        }
+    }
+}
+
+impl Device for NvmeController {
+    fn device_id(&self) -> u32 { self.id }
+    fn class_name(&self) -> &'static str { "Modern Storage (NVMe)" }
+    fn channel(&self) -> BusChannel { BusChannel::MemoryMapped(self.base_address) }
+    fn state(&self) -> DeviceState { self.state }
+
+    fn initialize(&mut self) -> Result<(), u32> {
+        // Enforce MMIO base configuration checks
+        if self.base_address == 0 { return Err(404); }
+        self.state = DeviceState::Initialized;
+        Ok(())
+    }
+
+    fn set_power_state(&mut self, state: DeviceState) -> Result<(), u32> {
+        self.state = state;
+        Ok(())
+    }
+
+    fn handle_interrupt(&mut self) -> Result<(), u32> {
+        // High-speed block DMA processing
+        Ok(())
+    }
+}
+
+// Singleton Device Manager Coordinating Active Subclasses
+pub struct DeviceManager {
+    registry: [Option<&'static mut dyn Device>; 16],
+    count: usize,
+}
+
+impl DeviceManager {
+    // Single global instance accessed via unsafe or static reference
+    pub const fn new() -> Self {
+        Self {
+            registry: [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+            count: 0,
         }
     }
 
-    pub fn execute(&mut self, bytecode: &[u8], io_channel: PortAddress) -> Result<u64, u32> {
-        let mut pc = 0;
-        while pc < bytecode.len() {
-            let opcode = bytecode[pc];
-            match opcode {
-                0x01 => { // READ_REG instruction (R0 = read(offset))
-                    if pc + 4 >= bytecode.len() { return Err(101); }
-                    let offset = u32::from_le_bytes([
-                        bytecode[pc + 1], bytecode[pc + 2],
-                        bytecode[pc + 3], bytecode[pc + 4]
-                    ]);
+    pub fn register_device(&mut self, device: &'static mut dyn Device) -> Result<(), u32> {
+        if self.count >= self.registry.len() { return Err(507); } // Capacity Exceeded
+        device.initialize()?;
+        self.registry[self.count] = Some(device);
+        self.count += 1;
+        Ok(())
+    }
 
-                    // Verify access bounds for security isolation
-                    match io_channel {
-                        PortAddress::MemoryMapped(addr) => {
-                            let target = addr + offset as u64;
-                            if target < self.allowed_range.0 || target >= self.allowed_range.1 {
-                                return Err(403); // Security Violation
-                            }
-                        }
-                        _ => {}
-                    }
-
-                    self.registers[0] = match io_channel {
-                        PortAddress::PortIO(port) => unsafe { Self::inb(port + offset as u16) as u64 },
-                        PortAddress::MemoryMapped(addr) => unsafe { core::ptr::read_volatile((addr + offset as u64) as *const u8) as u64 },
-                    };
-                    pc += 5;
+    pub fn dispatch_interrupt(&mut self, device_id: u32) -> Result<(), u32> {
+        for idx in 0..self.count {
+            if let Some(ref mut device) = self.registry[idx] {
+                if device.device_id() == device_id {
+                    return device.handle_interrupt();
                 }
-                0x02 => { // WRITE_REG instruction (write(offset, value))
-                    if pc + 5 >= bytecode.len() { return Err(102); }
-                    let offset = u32::from_le_bytes([
-                        bytecode[pc + 1], bytecode[pc + 2],
-                        bytecode[pc + 3], bytecode[pc + 4]
-                    ]);
-                    let val = bytecode[pc + 5];
-
-                    match io_channel {
-                        PortAddress::MemoryMapped(addr) => {
-                            let target = addr + offset as u64;
-                            if target < self.allowed_range.0 || target >= self.allowed_range.1 {
-                                return Err(403); // Security Violation
-                            }
-                        }
-                        _ => {}
-                    }
-
-                    match io_channel {
-                        PortAddress::PortIO(port) => unsafe { Self::outb(port + offset as u16, val); },
-                        PortAddress::MemoryMapped(addr) => unsafe { core::ptr::write_volatile((addr + offset as u64) as *mut u8, val); },
-                    }
-                    pc += 6;
-                }
-                0x0F => { // HALT and return accumulator
-                    return Ok(self.registers[0]);
-                }
-                _ => return Err(105), // Invalid opcode
             }
         }
-        Ok(self.registers[0])
-    }
-
-    #[inline(always)]
-    unsafe fn inb(port: u16) -> u8 {
-        let result: u8;
-        core::arch::asm!("in al, dx", in("dx") port, out("al") result, options(nomem, nostack, preserves_flags));
-        result
-    }
-
-    #[inline(always)]
-    unsafe fn outb(port: u16, value: u8) -> () {
-        core::arch::asm!("out dx, al", in("dx") port, in("al") value, options(nomem, nostack, preserves_flags));
+        Err(404) // Device Not Found
     }
 }
 ```
 
-### 4.2 High-Performance Merkle-Tree Storage Snapshot Subsystem
-Enables sub-millisecond, self-healing rollbacks and write path verification through a purely user-defined hash verification tree:
+---
 
-```rust
-// Merkle Node block definition for zero-dependency state checking
-pub struct MerkleNode {
-    pub block_id: u64,
-    pub state_hash: u32, // User-defined FNV-1a Hash for high-speed calculation
-}
+## 6. SELF-HOSTING & COMPILER BOOTSTRAPPING ROADMAP
 
-pub struct TransactionalStorage {
-    nodes: [MerkleNode; 16],
-    write_pointer: usize,
-}
+To transition SigmaOS into a completely self-hosting operating system capable of compiling its own kernel and userspace binaries without host dependencies, we establish this strategic **5-Phase Bootstrapping Roadmap**:
 
-impl TransactionalStorage {
-    pub fn new() -> Self {
-        Self {
-            nodes: [const { MerkleNode { block_id: 0, state_hash: 0 } }; 16],
-            write_pointer: 0,
-        }
-    }
-
-    // High-speed, zero-dependency, allocation-free FNV-1a hash algorithm
-    fn calculate_fnv1a(data: &[u8]) -> u32 {
-        let mut hash = 2166136261u32;
-        for &byte in data {
-            hash ^= byte as u32;
-            hash = hash.wrapping_mul(16777619);
-        }
-        hash
-    }
-
-    pub fn write_block(&mut self, block_id: u64, data: &[u8]) -> Result<u32, u32> {
-        if self.write_pointer >= self.nodes.len() {
-            return Err(507); // Storage Capacity Exceeded
-        }
-
-        let hash = Self::calculate_fnv1a(data);
-        self.nodes[self.write_pointer] = MerkleNode { block_id, state_hash: hash };
-        self.write_pointer += 1;
-
-        Ok(hash)
-    }
-
-    pub fn verify_integrity(&self, block_id: u64, current_data: &[u8]) -> bool {
-        for node in &self.nodes {
-            if node.block_id == block_id {
-                let current_hash = Self::calculate_fnv1a(current_data);
-                return node.state_hash == current_hash;
-            }
-        }
-        false
-    }
-}
 ```
+ [ Phase 1: Toolchain Porting ] --> [ Phase 2: Shell & VFS Parity ] --> [ Phase 3: Libc Static Linking ]
+                                                                                   |
+ [ Phase 5: Self-Compilation  ] <-- [ Phase 4: Native SigmaPkg Build ] <------------+
+```
+
+### 🗺️ Phase 1: Toolchain Cross-Compilation & Porting (Months 0 - 3)
+* **Goal:** Cross-compile and port a memory-safe compiler backend (such as Rustc, Zig, or Nim) to run on SigmaOS.
+* **Technical Milestones:**
+  - Build cross-compilers targetting `x86_64-unknown-sigmaos`.
+  - Compile the Rust compiler core (`librustc`) and compiler-rt components targetting our custom OS ABI.
+  - Implement a bare-metal ELF loader inside `src/loader/` supporting standard executable formats.
+
+### 🗺️ Phase 2: Native Shell & VFS Parity (Months 3 - 6)
+* **Goal:** Establish a robust userspace file structure and interactive shell environments natively.
+* **Technical Milestones:**
+  - Expand `src/shell/sigma_sh.rs` to support file redirects, pipes, executable execution, and environment variables.
+  - Stabilize the VirtIO and Ext4 driver paths, creating a standard Unix-like directory hierarchy (e.g., `/bin`, `/lib`, `/usr`, `/tmp`).
+  - Bridge standard kernel stream descriptors (`stdin`, `stdout`, `stderr`) to our physical console VESA/Zenith compositor interfaces.
+
+### 🗺️ Phase 3: Static Libc & Native System Call Bindings (Months 6 - 9)
+* **Goal:** Standardize a native systems C-library (Libc/musl) binding dynamically mapped to SigmaOS shards.
+* **Technical Milestones:**
+  - Create a custom, zero-dependency lightweight Libc wrapper exposing stable system call entries (e.g. `sys_read`, `sys_write`, `sys_open`, `sys_fork`).
+  - Provide a virtualized POSIX compatibility layer inside `src/compatibility/` to wrap legacy toolchain filesystem queries.
+  - Verify that compilation tools can query, create, write, and close files natively under capability-gate tokens constraints.
+
+### 🗺️ Phase 4: Native Package Manager & Store Sync (Months 9 - 12)
+* **Goal:** Compile `SigmaPkg` and tool dependencies natively inside the OS userspace environment.
+* **Technical Milestones:**
+  - Port a lightweight version of git or a local versioning database using content-addressed storage (CAS) hashes.
+  - Integrate a local SAT solver within userspace to handle local build dependency conflicts resolution.
+  - Package Rust, Cargo, and Zig binaries into independent, self-contained enclaves managed by `SigmaPkg`.
+
+### 🗺️ Phase 5: Complete Self-Compilation & Loop Closure (Months 12 - 18)
+* **Goal:** Boot into SigmaOS on bare hardware, invoke the native compiler, edit the kernel source, and rebuild/re-install the kernel completely on-device.
+* **Technical Milestones:**
+  - Launch `sigma-sh` natively, edit a kernel module (e.g., in `src/kernel/scheduler.rs`).
+  - Invoke `cargo build --release` natively on-device.
+  - Verify that compile binaries match the host-built images byte-for-byte (100% reproducible on-device builds).
+  - Install and restart into the newly-built native kernel successfully with zero external host assists.
 
 ---
 
-## 5. 100-ITEM MATURITY & DISTRO-PARITY ROADMAP
+## 7. 100-ITEM MATURITY & DISTRO-PARITY ROADMAP
 
 The engineering trajectory to scale SigmaOS into the undisputed global OS standard is divided across four granular architectural vectors.
 
@@ -282,7 +328,7 @@ The engineering trajectory to scale SigmaOS into the undisputed global OS standa
 5. **MSI-X Allocation:** Implement standard interrupt handlers mapping hardware IRQs to isolated shards.
 6. **APIC Timer Callbacks:** Construct zero-overhead tick triggers for preemptive multi-task switching.
 7. **COW Memory Faulting:** Complete demand-paging page fault logic to safely clone read-only shared blocks.
-8. **TLB Flush Invalidation:** Optimize Intel memory updates with precise, selective page-mapping invalidations (`invlpg`).
+8. **TLB Flush Invalidation:** Optimize Intel memory updates with selective page-mapping invalidations (`invlpg`).
 9. **Single-Instruction Bus Copies:** Adopt zero-copy SIMD structures inside memory transfers.
 10. **Preemptible Shard Locks:** Guard shard interactions with local interrupts disablement rather than global locks.
 11. **S6 Supervisor Trees:** Establish supervisor chains restarting driver services automatically upon failure.
@@ -384,7 +430,7 @@ The engineering trajectory to scale SigmaOS into the undisputed global OS standa
 
 ---
 
-## 6. AUTONOMOUS OPERATIONAL BLUEPRINTS
+## 8. AUTONOMOUS OPERATIONAL BLUEPRINTS
 
 To maintain the architectural standard of SigmaOS, all prospective patches, enhancements, and strategic reviews must follow the operational principles of our specialized agents.
 
@@ -398,17 +444,17 @@ To maintain the architectural standard of SigmaOS, all prospective patches, enha
        +-----------------------------------------------------------------+
 ```
 
-### 6.1 Bolt ⚡: Performance-First Optimization Code Guidelines
+### 8.1 Bolt ⚡: Performance-First Optimization Code Guidelines
 * **Principle:** Eliminate standard-library allocations, avoid deep clones of memory structures, and optimize loop paths via devirtualization.
 * **Expected Impact:** Reducing execution overheads by avoiding dynamic heap searches, maintaining perfect predictable scheduling speeds.
 * **Diagnostic Check:** Profile code for O(n²) nested queries, replacing them with fixed hash matrices or contiguous array layouts.
 
-### 6.2 Palette 🎨: UX & Accessibility Delights Specifications
+### 8.2 Palette 🎨: UX & Accessibility Delights Specifications
 * **Principle:** Ensure semantic HTML, complete ARIA descriptions for non-textual graphic items, and robust keyboard focus indicators.
 * **Expected Impact:** WCAG 2.1 AAA accessibility levels natively drawn over hardware display planes with zero intermediate framework lag.
 * **Diagnostic Check:** Verify layout keyboard navigability using logical tab list indexing and high-contrast color schemes.
 
-### 6.3 Sentinel 🛡️: Secure-by-Design and Threat Mitigation Blueprint
+### 8.3 Sentinel 🛡️: Secure-by-Design and Threat Mitigation Blueprint
 * **Principle:** Enforce mandatory sanitization on memory bounds, sanitize raw input parameters before executing registers operations, and zero-out secrets safely upon scope termination.
 * **Expected Impact:** Zero-day protection from stack corruption, memory disclosure leaks, and arbitrary execution vulnerabilities.
 * **Diagnostic Check:** Scan target variables for buffer boundaries overflow risks and enforce capability token validations before processing raw physical I/O writes.
