@@ -139,20 +139,65 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
 
 ---
 
-## Part 3: Implementation & Execution Roadmap
+## Part 3: Stepwise Development Roadmap & Branch Structure
 
-### Phase 1: Core Performance Optimization & Telemetry Stability (Months 1-3)
-*   **Focus:** Stabilize the telemetry, scheduling and memory management components using Bolt's performance directives.
-*   **Milestones:** Complete O(1) amortized history and widget buffers in `src/automation/` and `src/dashboard/`.
+To implement the absorption and integration goals systematically, we establish a robust multi-branch development roadmap. This ensures that features are added modularly while maintaining a lean and stable microkernel core.
 
-### Phase 2: Security Isolation & Capability Gating (Months 3-6)
-*   **Focus:** Enforce strict permission tokens in filesystems and drivers using Sentinel's security directives.
-*   **Milestones:** Guard NVMe and network commands behind mandatory capability checks.
+### 🛠️ Subsystem‑Specific Development Phases
 
-### Phase 3: Declarative Distribution & High-Performance I/O (Months 6-9)
-*   **Focus:** Integrate immutable mounts and DPLL SAT solvers into package resolution and file systems.
-*   **Milestones:** Implement Merkle-tree verified system snapshots.
+#### 1. Branch Consolidation & Core Stability
+*   **Task:** Audit existing branch layout. Identify and consolidate experimental prototypes with the main core branch. Set up automated CI/CD configurations to test builds and check formatting/clippy across branches.
+*   **Target Files:** `.github/workflows/ci.yml`, `src/kernel/`, `src/lib.rs`
+*   **Success Criteria:** Formatting remains 100% correct, and all 155 tests pass on every branch merge event.
 
-### Phase 4: Full Compositor Polish & Desktop Integration (Months 9-12)
-*   **Focus:** Add interactive accessibility features and tiling layout compositors.
-*   **Milestones:** Deliver high-contrast states and screen reader vocal buffers on top of the Zenith Desktop.
+#### 2. OOP Driver Ecosystem Expansion
+*   **Task:** Finalize abstract base traits (`DeviceDriver`, `NetworkDriver`, `StorageDriver`, `GpuDriver`). Implement polymorphic runtime loading/unloading. Support porting of Linux drivers via compatibility wrappers, with eventual replacement by Sigma-native drivers.
+*   **Priority Devices:** WiFi chipsets, GPUs, NVMe/SATA storage, USB HID, printers.
+*   **Target Files:** `src/drivers/`, `src/driver/framework.rs`
+*   **Success Criteria:** Peripheral managers load and initialize driver modules dynamically with zero kernel panics.
+
+#### 3. Networking & Filesystem Evolution
+*   **Task:** Implement IPv6 stack support, wireless protocol decoding, and advanced routing tables. Extend Virtual Filesystem (VFS) coverage to Btrfs, ZFS, XFS, and NFS, laying the groundwork for our secure distributed filesystem (SigmaFS).
+*   **Target Files:** `src/network/`, `src/filesystem/vfs.rs`
+*   **Success Criteria:** Network socket creation, packet routing, and multi-fs mounts execute correctly under capability constraints.
+
+#### 4. Virtualization & Containerization
+*   **Task:** Build out integration pathways for KVM/QEMU micro-VMs. Implement Linux-style namespaces, control groups (cgroups), and a lightweight container runtime. Maintain zero-dependency WASM sandboxed application support.
+*   **Target Files:** `src/virtualization/`, `src/container/`
+*   **Success Criteria:** Spawning a micro-VM or container executes in < 5ms with strict hardware resource limits.
+
+#### 5. Security, Sandboxing, & Compliance
+*   **Task:** Connect post-quantum cryptography features with SELinux/AppArmor-compatible MAC policies. Encapsulate userspace drivers with strict privilege separation.
+*   **Target Files:** `src/security/`, `src/syscall/`
+*   **Success Criteria:** Driver or system call violations trigger immediate capability revocation or self-healing fallback actions.
+
+#### 6. Scheduler & Memory Management Tuning
+*   **Task:** Refine our predictive EEVDF+CFS+EDF multi-priority scheduler. Add NUMA-aware physical memory allocation, hugepage mappings, and read-copy-update (RCU) synchronization primitives.
+*   **Target Files:** `src/kernel/scheduler.rs`, `src/kernel/memory.rs`
+*   **Success Criteria:** Scheduling latency benchmarks match or exceed Linux real-time co-kernel metrics.
+
+#### 7. Documentation & Community Engagement
+*   **Task:** Expand the GitHub Wiki with guides for subsystems (drivers, storage, security). Establish clean developer contribution workflows and API references.
+*   **Target Files:** `CONTRIBUTING.md`, `README.md`, `WIKI/`
+*   **Success Criteria:** Subsystem guides cover all core components, enabling rapid onboarding of external contributors.
+
+---
+
+### 📊 Suggested Branch Structure
+To enforce this roadmap across the GitHub repository, we structure our branches as follows:
+*   `main` — Represents the stable, fully verified kernel core and minimal base system.
+*   `drivers` — OOP driver framework, peripheral manager, and Linux compatibility wrapper.
+*   `networking` — IPv6 protocols, wireless stack, routing table logic, and secure tunneling.
+*   `filesystems` — VFS extension layer supporting Btrfs, ZFS, XFS, and SigmaFS.
+*   `virtualization` — MicroVM orchestration, container namespaces, and WASM sandboxing.
+*   `security` — PQC validation, SELinux/AppArmor MAC mapping, and process sandboxing.
+*   `performance` — Scheduler optimization (CFS/EDF) and NUMA memory allocators.
+*   `docs` — GitHub Wiki, subsystem guides, contribution policies, and compliance metrics.
+
+---
+
+### 🚀 Immediate Next Actions
+1.  **Consolidate current workspace branches** into the specified suggested structure.
+2.  **Prioritize OOP Drivers and Wireless Networking** to establish critical usability milestones.
+3.  **Implement Filesystem extensions and MicroVM runtimes** to build out parity with server Linux.
+4.  **Auto-verify code formatting and styling** across all target branches using unified CI/CD checks.
