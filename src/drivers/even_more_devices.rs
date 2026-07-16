@@ -101,7 +101,7 @@ impl PeripheralDevice for AdLibSynthDriver {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::peripheral::{PeripheralManager, DeviceGeneration, PowerState};
+    use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
 
     #[test]
     fn test_adlib_synth_driver() {
@@ -329,18 +329,42 @@ mod tests {
         let mut manager = PeripheralManager::new();
         assert_eq!(manager.device_count(), 0);
 
-        assert!(manager.register_device(Box::new(AdLibSynthDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(PciIdeBridge::new())).is_ok());
-        assert!(manager.register_device(Box::new(Ps2MouseDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(VgaTextModeDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(SerialMouseDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Ne2000NetworkDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Usb4HostController::new())).is_ok());
-        assert!(manager.register_device(Box::new(NvlinkBusDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Bluetooth5_4_Adapter::new())).is_ok());
-        assert!(manager.register_device(Box::new(PcieGen6Bridge::new())).is_ok());
-        assert!(manager.register_device(Box::new(Sata3Controller::new())).is_ok());
-        assert!(manager.register_device(Box::new(Ufs4StorageDriver::new())).is_ok());
+        assert!(manager
+            .register_device(Box::new(AdLibSynthDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(PciIdeBridge::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Ps2MouseDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(VgaTextModeDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(SerialMouseDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Ne2000NetworkDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Usb4HostController::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(NvlinkBusDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Bluetooth5_4_Adapter::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(PcieGen6Bridge::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Sata3Controller::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Ufs4StorageDriver::new()))
+            .is_ok());
 
         assert_eq!(manager.device_count(), 12);
         manager.broadcast_power_state(PowerState::Sleep);
