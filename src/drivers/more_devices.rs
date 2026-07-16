@@ -114,7 +114,7 @@ impl PeripheralDevice for FloppyDiskDriver {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::peripheral::{PeripheralManager, DeviceGeneration, PowerState};
+    use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
 
     #[test]
     fn test_floppy_disk_driver() {
@@ -257,7 +257,7 @@ mod tests {
         let mut config = [0u8; 2];
         assert_eq!(tb4.read(&mut config).unwrap(), 2);
         assert_eq!(config[0], 40); // 40 Gbps
-        assert_eq!(config[1], 2);  // 2 ports
+        assert_eq!(config[1], 2); // 2 ports
 
         assert_eq!(tb4.write(&[3]).unwrap(), 1);
         assert_eq!(tb4.port_count(), 3);
@@ -306,7 +306,10 @@ mod tests {
     #[test]
     fn test_cxl_memory_driver() {
         let mut cxl = CxlMemoryDriver::new();
-        assert_eq!(cxl.name(), "Compute Express Link (CXL) pooled memory controller");
+        assert_eq!(
+            cxl.name(),
+            "Compute Express Link (CXL) pooled memory controller"
+        );
         assert_eq!(cxl.generation(), DeviceGeneration::Modern);
         assert_eq!(cxl.pooled_memory_bytes(), 274_877_906_944);
 
@@ -344,18 +347,42 @@ mod tests {
         let mut manager = PeripheralManager::new();
         assert_eq!(manager.device_count(), 0);
 
-        assert!(manager.register_device(Box::new(FloppyDiskDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(SoundBlaster16Driver::new())).is_ok());
-        assert!(manager.register_device(Box::new(GameportJoystickDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(IdeControllerDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(ParallelPrinterDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(CgaGraphicsDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(PcieGen5NvmeDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Thunderbolt4Controller::new())).is_ok());
-        assert!(manager.register_device(Box::new(Wifi7Adapter::new())).is_ok());
-        assert!(manager.register_device(Box::new(IntelXeGpuDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(CxlMemoryDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(AppleSiliconUnifiedMemoryBus::new())).is_ok());
+        assert!(manager
+            .register_device(Box::new(FloppyDiskDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(SoundBlaster16Driver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(GameportJoystickDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IdeControllerDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(ParallelPrinterDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(CgaGraphicsDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(PcieGen5NvmeDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Thunderbolt4Controller::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Wifi7Adapter::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IntelXeGpuDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(CxlMemoryDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(AppleSiliconUnifiedMemoryBus::new()))
+            .is_ok());
 
         assert_eq!(manager.device_count(), 12);
         manager.broadcast_power_state(PowerState::Sleep);
