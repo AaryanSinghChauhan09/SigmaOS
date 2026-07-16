@@ -201,3 +201,40 @@ To enforce this roadmap across the GitHub repository, we structure our branches 
 2.  **Prioritize OOP Drivers and Wireless Networking** to establish critical usability milestones.
 3.  **Implement Filesystem extensions and MicroVM runtimes** to build out parity with server Linux.
 4.  **Auto-verify code formatting and styling** across all target branches using unified CI/CD checks.
+
+---
+
+## Part 4: Driver Compatibility Matrix & OOP-Based Solutions
+
+Some driver categories are inherently more complex to make fully compatible than others because of proprietary vendor lock-in, extreme hardware complexity, and legacy quirks. Here is how SigmaOS maps out the difficulty tiers, OOP-based mitigation paradigms, and scheduling priority rules.
+
+### 🔧 Compatibility Difficulty Tiers
+
+| Driver Category | Why It Is Hard | Concrete Challenges |
+| :--- | :--- | :--- |
+| **GPU Drivers** (NVIDIA, AMD, Intel) | Proprietary firmware, closed-source APIs, rapid hardware-facing ISA evolution. | Complex reverse-engineering, highly sensitive performance tuning, and backward compatibility. |
+| **WiFi / Wireless Chipsets** | Vendors strictly package binaries as closed-source blobs. | Deep 802.11 protocol parsing, strict licensing, and uncooperative vendor documentation. |
+| **Printers & Scanners** | Rely heavily on proprietary network and USB communication layers. | Zero access to hardware specs, non-standard driver commands, and legacy printer protocols. |
+| **Sound Cards / Audio Interfaces** | DSP micro-architectures require sub-millisecond sync. | Clock-synchronization, strict low-latency requirements, and legacy codec quirks. |
+| **Embedded & IoT Devices** | Vendor-specific hardware configurations are frequently undocumented. | Raw bus reverse-engineering, extreme configuration variance, and lack of standards. |
+| **Legacy Peripherals** (Floppy, Parallel Ports) | Obsolete hardware designed around legacy ISA/DMA paradigms. | Simulating 8-bit/16-bit DMA interfaces, legacy clock dividers, and rare physical test environments. |
+
+---
+
+### ⚡ OOP-Based Mitigation Paradigms
+SigmaOS uses polymorphic OOP abstractions to isolate hardware quirks, guarantee memory safety, and shield the microkernel core from driver-space faults:
+
+1.  **Adapter Design Pattern:** Wrap legacy driver interfaces inside unified, modern APIs. The microkernel core interacts with a clean virtual interface, completely blind to whether the hardware relies on ISA ports or PCIe bars.
+2.  **Strict Polymorphism:** Enforce unified, clean interfaces (`init()`, `read()`, `write()`, `set_power_state()`, and `shutdown()`) for every driver. This completely decouples driver internal registers from kernel control flow.
+3.  **Dynamic Driver Registry:** Implement self-scanning hardware discovery buses. Peripheral managers auto-detect PCI/USB classes and load the corresponding driver module dynamically.
+4.  **Capability-Enforced Sandboxing:** Execute all third-party and unstable legacy drivers inside isolated user-space processes (driver micro-shards). Memory is strictly restricted, ensuring driver crashes do not trigger a kernel panic.
+5.  **Linux Compatibility Layer (Wrappers):** Maintain a temporary, lightweight shim layer to map Linux kernel driver symbols onto SigmaOS microkernel capabilities, accelerating early device support until native, verified drivers are ready.
+
+---
+
+### 📊 Scheduling Priority Rules
+To achieve optimal usability, hardware support is scheduled based on critical system milestones:
+*   **Priority 1: GPU Drivers** — Hardest, but absolutely vital for Zenith desktop compositor fluidity and responsive local LLM acceleration.
+*   **Priority 2: WiFi/Wireless Drivers** — Crucial for modern networked configurations and zero-trust communications.
+*   **Priority 3: Sound & Audio Drivers** — Important for enterprise multimedia stability and audio feedback pipelines.
+*   **Priority 4: Printers/Scanners & Legacy Peripherals** — Addressed systematically via user-space helper nodes and lightweight compatibility wrappers.
