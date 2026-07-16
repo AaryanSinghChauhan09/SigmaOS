@@ -7,6 +7,8 @@ pub mod kernel;
 pub mod network;
 pub mod filesystem;
 pub mod drivers;
+pub mod device;
+pub mod driver;
 pub mod shell;
 pub mod dashboard;
 pub mod accessibility;
