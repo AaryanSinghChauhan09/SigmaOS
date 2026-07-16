@@ -1,5 +1,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(warnings)]
 
 pub mod accessibility;
 pub mod automation;
