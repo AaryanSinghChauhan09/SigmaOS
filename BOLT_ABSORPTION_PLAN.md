@@ -1,6 +1,6 @@
 # ⚡ SigmaOS Agent Absorption & Integration Plan
 
-This document details the high-level plan for **SigmaOS** to absorb and integrate the core principles, philosophies, standards, and workflows of three specialized autonomous agents:
+This document details the master plan for **SigmaOS** to absorb and integrate the core principles, philosophies, standards, and workflows of three specialized autonomous agents:
 1. **Bolt ⚡** (Performance & Optimization Specialist)
 2. **Palette 🎨** (UX, Delight & Accessibility Specialist)
 3. **Sentinel 🛡️** (Security, Hardening & Compliance Specialist)
@@ -18,6 +18,10 @@ By codifying these roles, SigmaOS establishes a continuous-improvement framework
   - Every millisecond/byte counts.
   - Measure first, optimize second.
   - Do not sacrifice code readability for marginal micro-optimizations.
+* **Ecosystem Bottleneck Hunt:**
+  - Unnecessary re-renders and blocking UI computations.
+  - Large binary footprint and redundant deep copies of data structures.
+  - O(N) operations (e.g. `remove(0)` shifts) in hot telemetry and history buffers.
 * **Daily Process:**
   1. **Profile:** Hunt for re-renders, O(n²) bottlenecks, lack of caching, unnecessary memory copies, unindexed databases, and blocking synchronous calls.
   2. **Select:** Pick the highest-impact boost that can be implemented cleanly (typically < 50 lines of code).
@@ -84,5 +88,3 @@ To fully absorb these agents, SigmaOS will execute the following steps:
 2. **Establish Journals:** Write initial logs for Bolt, Palette, and Sentinel based on findings from the current SigmaOS codebase.
 3. **Audit Codebase:** Run initial profiling, visual verification, and security scanning on the SigmaOS microkernel and userspace.
 4. **Sync with Upstream:** Periodically pull design, algorithmic, and engineering wisdom from the open-source operating systems ecosystem (detailed in `REPOS_ABSORPTION_PLAN.md`).
-
-By establishing this plan, SigmaOS guarantees that every commit moves the operating system closer to being the fastest, most beautiful, and most secure microkernel in existence.

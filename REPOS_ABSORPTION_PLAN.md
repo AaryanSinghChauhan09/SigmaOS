@@ -30,10 +30,12 @@ Integrate these into `src/kernel/` and `src/security/capability.rs` to enforce v
 
 ### 2. Operating System Distributions (Mainstream, Immutable, & Specialized)
 **Target Upstream Repositories:**
-* `siderolabs/talos`, `kairos-io/kairos`, `coreos/fedora-coreos`, `flatcar-linux/flatcar` (Immutable & container-focused)
-* `nixos/nixpkgs`, `guix/guix` (Declarative & functional package management)
-* `void-linux/void-packages`, `alpinelinux/aports`, `artix-linux/packages`, `kisslinux/kiss` (Lightweight & systemd-free)
-* `armbian/build`, `puppylinux-woof-CE/woof-CE`, `dietpi/dietpi`, `postmarketOS/pmaports`, `LFS/lfs` (SBC & mobile-focused)
+* **SBC & Mobile:** `armbian/build`, `FydeOS/chromium_os-raspberry_pi`, `puppylinux-woof-CE/woof-CE`, `dietpi/dietpi`, `postmarketOS/pmaports`
+* **Kubernetes-Focused:** `siderolabs/talos`, `kairos-io/kairos`
+* **Independent & Gaming:** `redroselinux/redroselinux`, `jeffreysama/avalos`
+* **Source & Binary Distros:** `void-linux/void-packages`, `clearlinux/distribution`, `nixos/nixpkgs`, `guix/guix`, `bedrocklinux/bedrocklinux-userland`, `alpinelinux/aports`, `openSUSE/obs-build`, `endeavouros-team/PKGBUILDS`, `manjaro/packages-core`, `slackware-contrib/slackbuilds`
+* **Minimalist:** `tinycorelinux/Core`, `LFS/lfs`, `chimera-linux/chimera`, `serpent-os/core`, `hyperbola/hyperbola-packages`, `kisslinux/kiss`, `artix-linux/packages`, `calculate-linux/calculate`, `sabayon/sabayon-distro`, `chakra-linux/chakra`, `peppermintos/peppermintos`, `peppermintos/iso`, `bodhilinux/bodhi`, `zorinos/zorin-os`, `elementary/os`, `deepin-community/deepin`, `mx-linux/mx`
+* **Server & Cloud:** `rocky-linux/rocky`, `almalinux/almalinux`, `oracle/linux`, `cloudlinux/cloudlinux`, `coreos/fedora-coreos`, `flatcar-linux/flatcar`, `rancher/os`, `k3os-io/k3os`, `bottlerocket-os/bottlerocket`, `ubuntu-core/ubuntu-core`
 
 **Key Algorithmic & Design Ideas to Absorb:**
 - **Declarative & Immutable File System States:** From `nixpkgs`, `guix`, and `talos`, absorb functional system declarations. SigmaOS will boot into an immutable filesystem image where user configurations and security pledges (`sigma_pledge` / `sigma_unveil`) define reproducible, read-only system environments.
@@ -51,6 +53,7 @@ Incorporate these into `src/filesystem/vfs.rs` and `src/sigpkg/` to support atom
 * `flatpak/flatpak`, `snapcore/snapd` (Sandbox containment)
 * `spack/spack` (HPC multi-compiler management)
 * `conda/conda` (Language-agnostic package systems)
+* `pkgsrc/pkgsrc`, `nix-community/nix`, `nix-community/home-manager`
 * `openembedded/openembedded-core`, `yoctoproject/poky`, `buildroot/buildroot` (Cross-compilation toolchains)
 
 **Key Algorithmic & Design Ideas to Absorb:**
@@ -68,6 +71,7 @@ Refine `src/sigpkg/` with a unified package manager that transparently adapts mu
 * `openrc/openrc`, `runit/runit`, `s6/s6` (Minimal and fast init systems)
 * `busybox/busybox`, `coreutils/coreutils`, `util-linux/util-linux` (Core POSIX utilities)
 * `procps-ng/procps`, `iputils/iputils`, `net-tools/net-tools` (System & network diagnostics)
+* `e2fsprogs/e2fsprogs`, `btrfs/btrfs-progs`, `zfs/zfs` (Storage utilities)
 
 **Key Algorithmic & Design Ideas to Absorb:**
 - **S6-Style State Supervision:** From `s6`, absorb high-reliability supervision chains. Services are monitored by minimal parent watchdogs that automatically restart failed nodes based on self-healing rules in `src/resilience/self_healing.rs`.
@@ -85,17 +89,18 @@ Integrate into `src/shell/` and `src/resilience/` to manage system services, she
 * `openssh/openssh-portable`, `gnupg/gnupg` (SSH & asymmetric encryption)
 * `selinuxProject/selinux` (Security-Enhanced Linux)
 * `clamav/clamav`, `fail2ban/fail2ban`, `suricata/suricata` (Threat detection & IPS)
+* `bind/bind9`, `dnsmasq/dnsmasq`, `unbound/unbound`, `bird/bird`, `quagga/quagga`, `frrouting/frr`, `openvswitch/ovs`, `strongswan/strongswan`, `ppp/ppp`, `netdata/netdata` (Networking services)
 
 **Key Algorithmic & Design Ideas to Absorb:**
 - **Noise Protocol Handshake:** From `wireguard`, absorb high-speed cryptographic tunneling into SigmaOS's virtual networking driver.
 - **Rate-Limiting & Intrusion Defenses:** From `fail2ban` and `suricata`, implement real-time log-monitoring state machines in `src/security/` to dynamically block malicious sockets.
 
 **SigmaOS Integration Pathway:**
-Enhine `src/security/` with Post-Quantum Cryptography (Kyber-1024 + Dilithium-5) and link it directly to network command validation in `src/drivers/network.rs`.
+Enforce dynamic connection permissions inside `src/security/` and link network command validation directly with the virtual networking drivers under `src/drivers/network.rs`.
 
 ---
 
-### 6. Desktop Environments, Window Compositors, & UI delight
+### 6. Desktop Environments, Window Compositors, & UI Delight
 **Target Upstream Repositories:**
 * `GNOME/gnome-shell`, `KDE/plasma-desktop` (Advanced desktop interfaces)
 * `xfce/xfce4-panel`, `lxde/lxde-common`, `mate-desktop/mate-panel` (Lightweight panel bars)
@@ -103,8 +108,8 @@ Enhine `src/security/` with Post-Quantum Cryptography (Kyber-1024 + Dilithium-5)
 * `openbox/openbox`, `fluxbox/fluxbox` (Lightweight stacking managers)
 
 **Key Algorithmic & Design Ideas to Absorb:**
-- **Tiling Vector Mathematics:** From `i3` and `sway`, absorb hierarchical tree configurations for tiling window lay-outs.
-- **Delightful Transitions & Customization:** From `plasma-desktop`, absorb advanced themes and event-driven automation rules (Samsung Modes & Routines) into `src/customization/`.
+- **Tiling Vector Mathematics:** From `i3` and `sway`, absorb hierarchical tree configurations for tiling window layouts.
+- **Delightful Transitions & Customization:** From `plasma-desktop`, absorb advanced themes and event-driven automation rules into `src/customization/`.
 
 **SigmaOS Integration Pathway:**
 Extend `src/customization/` and `zenith_desktop` with modern rendering loops, screen reader notifications, high-contrast layouts, and responsive font scaling.
@@ -113,13 +118,12 @@ Extend `src/customization/` and `zenith_desktop` with modern rendering loops, sc
 
 ### 7. Filesystems, Distributed Storage, & High-Performance I/O
 **Target Upstream Repositories:**
-* `btrfs/btrfs-progs`, `zfs/zfs` (Copy-on-Write, RAID, and storage pooling)
+* `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `nilfs/nilfs-tools`, `reiserfs/reiserfsprogs`, `bcachefs/bcachefs-tools` (High-performance filesystems)
 * `ceph/ceph`, `gluster/glusterfs`, `lustre/lustre` (Distributed & parallel storage filesystems)
-* `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `bcachefs/bcachefs-tools` (Flash-friendly & high-throughput filesystems)
 * `overlayfs/overlayfs-tools`, `squashfs-tools/squashfs-tools` (Stacked & compressed image filesystems)
 
 **Key Algorithmic & Design Ideas to Absorb:**
-- **Flash-Friendly Wear Leveling:** From `f2fs`, absorb log-structured write optimizations inside our NVMe block drivers.
+- **Flash-Friendly Wear Leveling:** From `f2fs`, absorb log-structured write optimizations inside our block drivers.
 - **Copy-On-Write (CoW) Snapshots:** From `zfs` and `btrfs`, absorb structural Merkle-tree state proofs to enable sub-millisecond, secure rollbacks in `src/resilience/self_healing.rs`.
 
 **SigmaOS Integration Pathway:**
@@ -129,10 +133,17 @@ Enrich `src/filesystem/vfs.rs` and our drivers with advanced cache invalidation,
 
 ### 8. Monitoring, Observers, & Performance Tuning
 **Target Upstream Repositories:**
-* `htop-dev/htop`, `atop/atop`, `glances/glances` (Process viewing & system resource monitoring)
-* `prometheus/prometheus`, `grafana/grafana` (TSDB & visualization metric dash-boards)
-* `vector/vector`, `loki/loki` (Log routing and aggregation pipelines)
-* `perf/perf`, `sysstat/sysstat`, `bcc/bcc`, `bpftrace/bpftrace` (Kernel-level profiling & eBPF tracing)
+* `htop-dev/htop`, `atop/atop`, `glances/glances`, `collectd/collectd`, `sysstat/sysstat`, `iotop/iotop`, `dstat/dstat`, `nmon/nmon`, `sar/sar`, `perf/perf` (System monitors)
+* `curl/curl`, `wget/wget`, `netcat/netcat`, `traceroute/traceroute`, `tcpdump/tcpdump`, `wireshark/wireshark`, `iftop/iftop`, `mtr/mtr`, `ethtool/ethtool`, `bridge-utils/bridge-utils` (Network diagnostics)
+* `bash/bash`, `zsh-users/zsh`, `fish-shell/fish-shell`, `xonsh/xonsh`, `nushell/nushell`, `elvish/elvish`, `powershell/powershell`, `termux/termux-app`, `alacritty/alacritty`, `kitty/kitty` (Terminals and Shells)
+* `yoctoproject/poky`, `openwrt/openwrt`, `buildroot/buildroot`, `android/linux`, `ubiquiti/unifi-linux`, `balena-os/balena-os`, `resin-os/meta-resin`, `tizen/tizen`, `webos/webos`, `sailfishos/sailfishos` (Embedded & IoT OS targets)
+* `qemu/qemu`, `kvm/kvm`, `xen-project/xen`, `virtualbox/virtualbox`, `proxmox/proxmox-ve`, `libvirt/libvirt`, `vagrant/vagrant`, `ganeti/ganeti`, `opennebula/one`, `cloudstack/cloudstack` (Virtualization)
+* `docker/docker-ce`, `moby/moby`, `containerd/containerd`, `opencontainers/runc`, `podman/podman`, `lxc/lxc`, `kubernetes/kubernetes`, `cri-o/cri-o`, `kata-containers/kata-containers`, `firecracker-microvm/firecracker` (Containers)
+* `prometheus/prometheus`, `grafana/grafana`, `elastic/elasticsearch`, `logstash/logstash`, `kibana/kibana`, `graylog/graylog`, `fluent/fluentd`, `vector/vector`, `loki/loki`, `syslog-ng/syslog-ng` (Logging/Telemetry)
+* `cron/cron`, `anacron/anacron`, `systemtap/systemtap`, `bcc/bcc`, `bpftrace/bpftrace`, `strace/strace`, `ltrace/ltrace`, `gdb/gdb`, `valgrind/valgrind` (Instrumentation)
+* `slurm/slurm`, `openmpi/ompi`, `mpich/mpich`, `petsc/petsc`, `hdfgroup/hdf5`, `netcdf/netcdf-c`, `paraview/paraview`, `visit-dav/visit`, `openfoam/openfoam`, `gromacs/gromacs` (HPC & Scientific)
+* `nmap/nmap`, `metasploit/metasploit-framework`, `aircrack-ng/aircrack-ng`, `john/john`, `hashcat/hashcat`, `openvas/openvas`, `ossec/ossec-hids`, `snort/snort` (Auditing & Security testing)
+* `oil-shell/oil`, `dash-shell/dash`, `mksh/mksh`, `busybox/ash`, `ksh93/ksh`, `rc-shell/rc`, `es-shell/es`, `yash-shell/yash`, `osh/osh`, `closh/closh` (Alternative Shells)
 
 **Key Algorithmic & Design Ideas to Absorb:**
 - **eBPF-Inspired System Profiling:** From `bpftrace`, absorb lightweight, safe sandbox metric hooks for syscall monitoring in `src/automation/system_level.rs`.
@@ -140,13 +151,3 @@ Enrich `src/filesystem/vfs.rs` and our drivers with advanced cache invalidation,
 
 **SigmaOS Integration Pathway:**
 Power the monitoring engine in `src/dashboard/` to feed real-time resource usage data directly into our AI-driven system automation optimizer.
-
----
-
-## 🔄 Synchronization & Absorption Protocol
-
-To systematically sync SigmaOS with upstream repositories:
-1. **Abstract:** Isolate upstream breakthroughs into pure-Rust, standard-library-only algorithms (avoiding raw OS-specific syscall bindings).
-2. **Harden:** Pass the abstracted logic through Sentinel's security checker to verify complete type safety and range bounds.
-3. **Optimize:** Adapt the data structures using Bolt's performance directives (e.g. replacing deep cloning with references, using LCG for randoms).
-4. **Delight:** Link the output into Palette's accessibility framework to guarantee a fully compliant, beautiful interface.
