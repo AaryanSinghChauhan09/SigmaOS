@@ -76,7 +76,7 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in &mut self.drivers {
+        for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id { return driver.load(); }
             }
@@ -84,7 +84,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in &mut self.drivers {
+        for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id { return driver.unload(); }
             }
@@ -92,7 +92,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::UnloadFailed)
     }
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
-        for driver_option in &self.drivers {
+        for driver_option in self.drivers.iter() {
             if let Some(ref driver) = *driver_option {
                 if driver.id() == id { return Some(driver.as_ref()); }
             }

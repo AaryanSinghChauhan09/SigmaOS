@@ -145,7 +145,7 @@ impl VirtualFilesystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self.file_descriptors.get(&fd)
+        let file_descriptor = self.file_descriptors.get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
         
         let inode = self.inodes.get(&file_descriptor.inode_id)

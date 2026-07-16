@@ -93,7 +93,7 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn unregister_device(&mut self, id: DeviceID) -> Result<(), DeviceError> {
-        for device_option in &mut self.devices {
+        for device_option in self.devices.iter_mut() {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
                     return Ok(());
@@ -104,7 +104,7 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
-        for device_option in &self.devices {
+        for device_option in self.devices.iter() {
             if let Some(ref device) = *device_option {
                 if device.id() == id { return Some(device.as_ref()); }
             }
@@ -114,7 +114,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn list_devices(&self, device_class: DeviceClass) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in &self.devices {
+        for device_option in self.devices.iter() {
             if let Some(ref device) = *device_option {
                 if device.device_class() == device_class {
                     ids.push(device.id());
@@ -126,7 +126,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn scan_devices(&mut self) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in &self.devices {
+        for device_option in self.devices.iter() {
             if let Some(ref device) = *device_option {
                 ids.push(device.id());
             }
