@@ -27,6 +27,12 @@ pub use kernel::{Scheduler, Process, Priority, ProcessState, BuddyAllocator, Mem
 pub use network::{TcpStack, TcpConnection, TcpSegment, TcpState, TcpError};
 pub use filesystem::{VirtualFilesystem, Inode, FileDescriptor, FileType, FilePermissions, FsError};
 pub use drivers::{GpuDriver, GpuCommand, GpuError, StorageDriver, StorageCommand, StorageType, StorageError, NetworkDriver, NetworkCommand, NetworkType, NetworkError, InputDriver, InputEvent, InputType, UsbHidDriver, HidKeyboardEvent, HidReportType, HidError, VesaDriver, VesaModeInfo, VesaError};
+pub use drivers::{
+    LinuxReleaseDriver, KernelReleaseInfo,
+    MainlineGpuDriver, Longterm6_18_StorageDriver, Longterm6_12_NetworkDriver,
+    Longterm6_6_AudioDriver, Longterm6_1_InputDriver, Longterm5_15_SerialDriver,
+    Longterm5_10_TpmDriver, Stable6_22_SensorDriver, Prepatch6_23_Rc1_AiDriver,
+};
 pub use shell::{ShellRepl, ShellCommand};
 pub use dashboard::{UnifiedDashboard, DashboardWidget, MetricData, MetricType, WidgetType, SystemMonitor};
 pub use accessibility::{AccessibilityFramework, AccessibilityProfile, AccessibilitySetting, AccessibilityCategory, AccessibilityFeature, AccessibilityError};
