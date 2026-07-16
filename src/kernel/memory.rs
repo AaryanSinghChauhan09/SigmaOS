@@ -87,10 +87,9 @@ impl BuddyAllocator {
         let order = self.calculate_order(pages);
         
         // Try to merge with buddy
-        if let Some(merged_block) = self.try_merge(block, order) {
-            self.deallocate(merged_block);
-        } else {
-            self.free_lists[order].push(block);
+        match self.try_merge(block, order) {
+            Ok(merged_block) => self.deallocate(merged_block),
+            Err(original_block) => self.free_lists[order].push(original_block),
         }
     }
 
@@ -133,9 +132,9 @@ impl BuddyAllocator {
         Some(current_block)
     }
 
-    fn try_merge(&mut self, block: MemoryBlock, order: usize) -> Option<MemoryBlock> {
+    fn try_merge(&mut self, block: MemoryBlock, order: usize) -> Result<MemoryBlock, MemoryBlock> {
         if order >= 11 {
-            return None; // Maximum order
+            return Err(block); // Maximum order
         }
         
         let block_addr = block.addr.as_ptr() as usize;
@@ -146,7 +145,7 @@ impl BuddyAllocator {
         if let Some(pos) = self.free_lists[order].iter().position(|b| {
             b.addr.as_ptr() as usize == buddy_addr && b.size == block.size
         }) {
-            let buddy = self.free_lists[order].remove(pos);
+            let _buddy = self.free_lists[order].remove(pos);
             
             // Merge blocks
             let merged_addr = if block_addr < buddy_addr {
@@ -155,13 +154,17 @@ impl BuddyAllocator {
                 buddy_addr
             };
             
-            return Some(MemoryBlock {
-                addr: NonNull::new(merged_addr as *mut u8)?,
-                size: buddy_size,
-            });
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
+                Ok(MemoryBlock {
+                    addr: non_null,
+                    size: buddy_size,
+                })
+            } else {
+                Err(block)
+            }
+        } else {
+            Err(block)
         }
-        
-        None
     }
 }
 

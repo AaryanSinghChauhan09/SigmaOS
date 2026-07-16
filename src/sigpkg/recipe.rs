@@ -147,13 +147,13 @@ impl RecipeManager {
 
     pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
         recipe.validate()?;
-        let key = format!("{}@{}", recipe.name, recipe.version);
+        let key = format!("{}@{:?}", recipe.name, recipe.version);
         self.recipes.insert(key, recipe);
         Ok(())
     }
 
     pub fn get_recipe(&self, name: &str, version: &Version) -> Option<&PackageRecipe> {
-        let key = format!("{}@{}", name, version);
+        let key = format!("{}@{:?}", name, version);
         self.recipes.get(&key)
     }
 
@@ -168,7 +168,7 @@ impl RecipeManager {
     }
 
     pub fn remove_recipe(&mut self, name: &str, version: &Version) {
-        let key = format!("{}@{}", name, version);
+        let key = format!("{}@{:?}", name, version);
         self.recipes.remove(&key);
     }
 }

@@ -89,7 +89,7 @@ impl UsbHidDriver {
     }
 
     pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits & capability) != 0
+        (self.capabilities.bits() & capability) != 0
     }
 
     pub fn clear_buffer(&mut self) {

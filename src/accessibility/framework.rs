@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 /// Accessibility category
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AccessibilityCategory {
     Vision,
     Hearing,
@@ -14,7 +14,7 @@ pub enum AccessibilityCategory {
 }
 
 /// Accessibility feature type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AccessibilityFeature {
     ScreenReader,
     HighContrast,
@@ -127,26 +127,30 @@ impl AccessibilityFramework {
 
     fn add_default_profiles(&mut self) {
         // Vision impaired profile
-        let vision_profile = AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
+        let mut vision_profile = AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::ScreenReader).with_intensity(0.8))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::HighContrast).with_intensity(1.0))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::Magnifier).with_intensity(0.6));
+        vision_profile.enable_all();
         
         // Hearing impaired profile
-        let hearing_profile = AccessibilityProfile::new("Hearing Impaired".to_string(), AccessibilityCategory::Hearing)
+        let mut hearing_profile = AccessibilityProfile::new("Hearing Impaired".to_string(), AccessibilityCategory::Hearing)
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::TextToSpeech).with_intensity(0.9))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::SpeechToText).with_intensity(0.8));
+        hearing_profile.enable_all();
         
         // Mobility impaired profile
-        let mobility_profile = AccessibilityProfile::new("Mobility Impaired".to_string(), AccessibilityCategory::Mobility)
+        let mut mobility_profile = AccessibilityProfile::new("Mobility Impaired".to_string(), AccessibilityCategory::Mobility)
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::KeyboardNavigation).with_intensity(1.0))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::VoiceControl).with_intensity(0.7))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.5));
+        mobility_profile.enable_all();
         
         // Cognitive support profile
-        let cognitive_profile = AccessibilityProfile::new("Cognitive Support".to_string(), AccessibilityCategory::Cognitive)
+        let mut cognitive_profile = AccessibilityProfile::new("Cognitive Support".to_string(), AccessibilityCategory::Cognitive)
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.8))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::DyslexiaFont).with_intensity(0.6));
+        cognitive_profile.enable_all();
         
         self.profiles.insert(vision_profile.name.clone(), vision_profile);
         self.profiles.insert(hearing_profile.name.clone(), hearing_profile);

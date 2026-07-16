@@ -14,7 +14,7 @@ pub use transaction::Transaction;
 pub use recipe::{PackageRecipe, BuildSystem, RecipeManager, RecipeError};
 
 /// Package version using SemVer
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     major: u64,
     minor: u64,
@@ -67,7 +67,7 @@ pub struct Dependency {
 }
 
 /// Version constraint
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),

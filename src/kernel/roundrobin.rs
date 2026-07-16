@@ -152,14 +152,16 @@ mod tests {
     #[test]
     fn test_tick() {
         let mut scheduler = RoundRobinScheduler::new();
-        let process = Process::new(1, "test".to_string(), Priority::Normal);
-        scheduler.add_process(process).unwrap();
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
         
         let initial_index = scheduler.current_index;
-        for _ in 0..20 {
+        for _ in 0..15 {
             scheduler.tick();
         }
-        // After 20 ticks with 10ms time slice, index should change
+        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
         assert_ne!(scheduler.current_index, initial_index);
     }
 

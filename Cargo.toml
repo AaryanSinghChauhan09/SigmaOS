@@ -9,6 +9,8 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
 [dependencies]
 # Core dependencies (minimal as per SigmaOS philosophy)
+uuid = { version = "1.0", features = ["v4"] }
+rand = "0.8"
 
 [dev-dependencies]
 # Test dependencies
@@ -30,12 +32,14 @@ browser = ["wasm"]
 [profile.dev]
 opt-level = 0
 debug = true
+panic = "abort"
 
 [profile.release]
 opt-level = 3
 debug = false
 lto = true
 codegen-units = 1
+panic = "abort"
 
 [[bin]]
 name = "sigma_kernel"
