@@ -1,7 +1,7 @@
 // SigmaOS Round-Robin Scheduler
 // Simple round-robin scheduler for time-sliced execution
 
-use crate::kernel::scheduler::{Process, Priority, ProcessState};
+use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 /// Round-robin scheduler configuration
 pub struct RoundRobinConfig {
@@ -64,9 +64,9 @@ impl RoundRobinScheduler {
             if self.processes[self.current_index].state == ProcessState::Ready {
                 return Some(&self.processes[self.current_index]);
             }
-            
+
             self.current_index = (self.current_index + 1) % self.processes.len();
-            
+
             // If we've looped through all processes
             if self.current_index == start_index {
                 return None;
@@ -76,7 +76,7 @@ impl RoundRobinScheduler {
 
     pub fn tick(&mut self) {
         self.current_time += 1;
-        
+
         // Time slice expired, move to next process
         if self.current_time % self.config.time_slice == 0 {
             self.current_index = (self.current_index + 1) % self.processes.len();
@@ -91,7 +91,7 @@ impl RoundRobinScheduler {
 
     pub fn remove_process(&mut self, pid: u64) {
         self.processes.retain(|p| p.pid != pid);
-        
+
         // Adjust current index if necessary
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
             self.current_index = 0;
@@ -103,7 +103,10 @@ impl RoundRobinScheduler {
     }
 
     pub fn get_ready_process_count(&self) -> usize {
-        self.processes.iter().filter(|p| p.state == ProcessState::Ready).count()
+        self.processes
+            .iter()
+            .filter(|p| p.state == ProcessState::Ready)
+            .count()
     }
 }
 
@@ -144,7 +147,7 @@ mod tests {
         let mut scheduler = RoundRobinScheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process).unwrap();
-        
+
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());
     }
@@ -152,14 +155,16 @@ mod tests {
     #[test]
     fn test_tick() {
         let mut scheduler = RoundRobinScheduler::new();
-        let process = Process::new(1, "test".to_string(), Priority::Normal);
-        scheduler.add_process(process).unwrap();
-        
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
+
         let initial_index = scheduler.current_index;
-        for _ in 0..20 {
+        for _ in 0..10 {
             scheduler.tick();
         }
-        // After 20 ticks with 10ms time slice, index should change
+        // After 10 ticks with 10ms time slice, index should change
         assert_ne!(scheduler.current_index, initial_index);
     }
 
@@ -179,11 +184,11 @@ mod tests {
             max_processes: 2,
         };
         let mut scheduler = RoundRobinScheduler::with_config(config);
-        
+
         let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
         let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
         let process3 = Process::new(3, "test3".to_string(), Priority::Normal);
-        
+
         assert!(scheduler.add_process(process1).is_ok());
         assert!(scheduler.add_process(process2).is_ok());
         assert!(scheduler.add_process(process3).is_err());

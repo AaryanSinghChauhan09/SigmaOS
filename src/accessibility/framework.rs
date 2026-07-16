@@ -14,7 +14,7 @@ pub enum AccessibilityCategory {
 }
 
 /// Accessibility feature type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AccessibilityFeature {
     ScreenReader,
     HighContrast,
@@ -127,31 +127,67 @@ impl AccessibilityFramework {
 
     fn add_default_profiles(&mut self) {
         // Vision impaired profile
-        let vision_profile = AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::ScreenReader).with_intensity(0.8))
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::HighContrast).with_intensity(1.0))
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::Magnifier).with_intensity(0.6));
-        
+        let vision_profile =
+            AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
+                .add_setting(
+                    AccessibilitySetting::new(AccessibilityFeature::ScreenReader)
+                        .with_intensity(0.8),
+                )
+                .add_setting(
+                    AccessibilitySetting::new(AccessibilityFeature::HighContrast)
+                        .with_intensity(1.0),
+                )
+                .add_setting(
+                    AccessibilitySetting::new(AccessibilityFeature::Magnifier).with_intensity(0.6),
+                );
+
         // Hearing impaired profile
-        let hearing_profile = AccessibilityProfile::new("Hearing Impaired".to_string(), AccessibilityCategory::Hearing)
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::TextToSpeech).with_intensity(0.9))
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::SpeechToText).with_intensity(0.8));
-        
+        let hearing_profile = AccessibilityProfile::new(
+            "Hearing Impaired".to_string(),
+            AccessibilityCategory::Hearing,
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::TextToSpeech).with_intensity(0.9),
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::SpeechToText).with_intensity(0.8),
+        );
+
         // Mobility impaired profile
-        let mobility_profile = AccessibilityProfile::new("Mobility Impaired".to_string(), AccessibilityCategory::Mobility)
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::KeyboardNavigation).with_intensity(1.0))
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::VoiceControl).with_intensity(0.7))
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.5));
-        
+        let mobility_profile = AccessibilityProfile::new(
+            "Mobility Impaired".to_string(),
+            AccessibilityCategory::Mobility,
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::KeyboardNavigation).with_intensity(1.0),
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::VoiceControl).with_intensity(0.7),
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.5),
+        );
+
         // Cognitive support profile
-        let cognitive_profile = AccessibilityProfile::new("Cognitive Support".to_string(), AccessibilityCategory::Cognitive)
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.8))
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::DyslexiaFont).with_intensity(0.6));
-        
-        self.profiles.insert(vision_profile.name.clone(), vision_profile);
-        self.profiles.insert(hearing_profile.name.clone(), hearing_profile);
-        self.profiles.insert(mobility_profile.name.clone(), mobility_profile);
-        self.profiles.insert(cognitive_profile.name.clone(), cognitive_profile);
+        let cognitive_profile = AccessibilityProfile::new(
+            "Cognitive Support".to_string(),
+            AccessibilityCategory::Cognitive,
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.8),
+        )
+        .add_setting(
+            AccessibilitySetting::new(AccessibilityFeature::DyslexiaFont).with_intensity(0.6),
+        );
+
+        self.profiles
+            .insert(vision_profile.name.clone(), vision_profile);
+        self.profiles
+            .insert(hearing_profile.name.clone(), hearing_profile);
+        self.profiles
+            .insert(mobility_profile.name.clone(), mobility_profile);
+        self.profiles
+            .insert(cognitive_profile.name.clone(), cognitive_profile);
     }
 
     pub fn add_profile(&mut self, profile: AccessibilityProfile) {
@@ -163,11 +199,16 @@ impl AccessibilityFramework {
             return Err(AccessibilityError::ProfileNotFound);
         }
         self.active_profile = Some(name.to_string());
+        if let Some(profile) = self.profiles.get_mut(name) {
+            profile.enable_all();
+        }
         Ok(())
     }
 
     pub fn get_active_profile(&self) -> Option<&AccessibilityProfile> {
-        self.active_profile.as_ref().and_then(|name| self.profiles.get(name))
+        self.active_profile
+            .as_ref()
+            .and_then(|name| self.profiles.get(name))
     }
 
     pub fn get_profile(&self, name: &str) -> Option<&AccessibilityProfile> {
@@ -182,7 +223,10 @@ impl AccessibilityFramework {
         self.global_settings.insert(setting.feature, setting);
     }
 
-    pub fn get_global_setting(&self, feature: AccessibilityFeature) -> Option<&AccessibilitySetting> {
+    pub fn get_global_setting(
+        &self,
+        feature: AccessibilityFeature,
+    ) -> Option<&AccessibilitySetting> {
         self.global_settings.get(&feature)
     }
 
@@ -193,12 +237,12 @@ impl AccessibilityFramework {
                 return setting.enabled;
             }
         }
-        
+
         // Fall back to global settings
         if let Some(setting) = self.get_global_setting(feature) {
             return setting.enabled;
         }
-        
+
         false
     }
 }
@@ -231,7 +275,10 @@ mod tests {
     fn test_profile_activation() {
         let mut framework = AccessibilityFramework::new();
         assert!(framework.activate_profile("Vision Impaired").is_ok());
-        assert_eq!(framework.active_profile, Some("Vision Impaired".to_string()));
+        assert_eq!(
+            framework.active_profile,
+            Some("Vision Impaired".to_string())
+        );
     }
 
     #[test]
@@ -250,8 +297,11 @@ mod tests {
     #[test]
     fn test_custom_profile() {
         let mut framework = AccessibilityFramework::new();
-        let custom_profile = AccessibilityProfile::new("Custom".to_string(), AccessibilityCategory::Vision)
-            .add_setting(AccessibilitySetting::new(AccessibilityFeature::HighContrast));
+        let custom_profile =
+            AccessibilityProfile::new("Custom".to_string(), AccessibilityCategory::Vision)
+                .add_setting(AccessibilitySetting::new(
+                    AccessibilityFeature::HighContrast,
+                ));
         framework.add_profile(custom_profile);
         assert_eq!(framework.profiles.len(), 5);
     }

@@ -57,9 +57,7 @@ impl NetworkDriver {
                 // Simulate packet reception
                 Ok(vec![])
             }
-            NetworkCommand::GetMACAddress => {
-                Ok(self.mac_address.to_vec())
-            }
+            NetworkCommand::GetMACAddress => Ok(self.mac_address.to_vec()),
             NetworkCommand::SetIP { ip } => {
                 self.ip_address = ip;
                 Ok(vec![])
@@ -84,7 +82,7 @@ impl NetworkDriver {
     }
 
     pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits & capability) != 0
+        (self.capabilities.bits() & capability) != 0
     }
 }
 
@@ -126,7 +124,9 @@ mod tests {
     #[test]
     fn test_set_ip() {
         let mut network = NetworkDriver::new(NetworkType::Ethernet);
-        let command = NetworkCommand::SetIP { ip: "192.168.1.1".to_string() };
+        let command = NetworkCommand::SetIP {
+            ip: "192.168.1.1".to_string(),
+        };
         assert!(network.execute_command(command).is_ok());
         assert_eq!(network.ip_address, "192.168.1.1");
     }
@@ -134,7 +134,9 @@ mod tests {
     #[test]
     fn test_not_connected_error() {
         let mut network = NetworkDriver::new(NetworkType::Ethernet);
-        let command = NetworkCommand::SendPacket { data: vec![1, 2, 3] };
+        let command = NetworkCommand::SendPacket {
+            data: vec![1, 2, 3],
+        };
         assert!(network.execute_command(command).is_err());
     }
 }
