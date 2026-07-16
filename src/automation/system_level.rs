@@ -169,7 +169,7 @@ impl SystemAutomationRule {
         if self.trigger_event != event {
             return false;
         }
-        
+
         // Simple condition evaluation (in production, use proper expression evaluation)
         true
     }
@@ -217,9 +217,12 @@ impl SystemAutomationManager {
             .with_power_mode("power_saver".to_string())
             .with_thermal_limit(70);
 
-        self.performance_profiles.insert(performance.name.clone(), performance);
-        self.performance_profiles.insert(balanced.name.clone(), balanced);
-        self.performance_profiles.insert(power_saver.name.clone(), power_saver);
+        self.performance_profiles
+            .insert(performance.name.clone(), performance);
+        self.performance_profiles
+            .insert(balanced.name.clone(), balanced);
+        self.performance_profiles
+            .insert(power_saver.name.clone(), power_saver);
     }
 
     fn add_default_rules(&mut self) {
@@ -227,7 +230,7 @@ impl SystemAutomationManager {
         let cpu_rule = SystemAutomationRule::new(
             "cpu_high".to_string(),
             "High CPU Usage".to_string(),
-            SystemEventType::CpuHighUsage
+            SystemEventType::CpuHighUsage,
         )
         .with_condition("cpu_usage > 80".to_string())
         .with_action(SystemAction::AdjustCpuFrequency { frequency: 2400 })
@@ -239,7 +242,7 @@ impl SystemAutomationManager {
         let temp_rule = SystemAutomationRule::new(
             "temp_high".to_string(),
             "High Temperature".to_string(),
-            SystemEventType::TemperatureHigh
+            SystemEventType::TemperatureHigh,
         )
         .with_condition("temperature > 85".to_string())
         .with_action(SystemAction::AdjustCooling { level: 100 })
@@ -251,7 +254,7 @@ impl SystemAutomationManager {
         let battery_rule = SystemAutomationRule::new(
             "battery_low".to_string(),
             "Battery Low".to_string(),
-            SystemEventType::BatteryLow
+            SystemEventType::BatteryLow,
         )
         .with_condition("battery < 20".to_string())
         .with_action(SystemAction::EnablePowerSaving { enabled: true })
@@ -268,7 +271,8 @@ impl SystemAutomationManager {
     }
 
     pub fn add_performance_profile(&mut self, profile: PerformanceProfile) {
-        self.performance_profiles.insert(profile.name.clone(), profile);
+        self.performance_profiles
+            .insert(profile.name.clone(), profile);
     }
 
     pub fn set_performance_profile(&mut self, name: &str) -> Result<(), AutomationError> {
@@ -280,10 +284,16 @@ impl SystemAutomationManager {
     }
 
     pub fn get_current_profile(&self) -> Option<&PerformanceProfile> {
-        self.current_profile.as_ref().and_then(|name| self.performance_profiles.get(name))
+        self.current_profile
+            .as_ref()
+            .and_then(|name| self.performance_profiles.get(name))
     }
 
-    pub fn handle_event(&mut self, event: SystemEventType, context: HashMap<String, f64>) -> Vec<SystemAction> {
+    pub fn handle_event(
+        &mut self,
+        event: SystemEventType,
+        context: HashMap<String, f64>,
+    ) -> Vec<SystemAction> {
         let mut triggered_actions = Vec::new();
 
         for rule in &self.rules {
@@ -357,10 +367,16 @@ impl SystemAutomationManager {
         Ok(())
     }
 
-    pub fn generate_prediction(&mut self, model_type: PredictiveModel, context: &HashMap<String, f64>) -> SystemPrediction {
+    pub fn generate_prediction(
+        &mut self,
+        model_type: PredictiveModel,
+        context: &HashMap<String, f64>,
+    ) -> SystemPrediction {
         let predicted_value = match model_type {
             PredictiveModel::UsagePattern => context.get("cpu_usage").unwrap_or(&50.0) * 1.1,
-            PredictiveModel::PerformanceTrend => context.get("memory_usage").unwrap_or(&50.0) * 1.05,
+            PredictiveModel::PerformanceTrend => {
+                context.get("memory_usage").unwrap_or(&50.0) * 1.05
+            }
             PredictiveModel::FailurePrediction => context.get("temperature").unwrap_or(&50.0) * 1.2,
             PredictiveModel::ResourceForecast => context.get("disk_usage").unwrap_or(&50.0) * 1.01,
         };

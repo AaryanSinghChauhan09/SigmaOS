@@ -77,7 +77,7 @@ impl PledgeManager {
         }
         promise.activate()?;
         self.pledge = Some(promise);
-        
+
         // Update capability gate based on pledge
         if let Some(ref pledge) = self.pledge {
             let mut token = CapabilityToken::new();
@@ -93,7 +93,7 @@ impl PledgeManager {
             }
             self.gate.set_capability(token);
         }
-        
+
         Ok(())
     }
 
@@ -125,10 +125,7 @@ pub mod promises {
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {
-        PledgePromise::new(vec![
-            Permission::FileRead,
-            Permission::FileWrite,
-        ])
+        PledgePromise::new(vec![Permission::FileRead, Permission::FileWrite])
     }
 
     /// Network promise - network access
@@ -151,10 +148,7 @@ pub mod promises {
 
     /// IPC promise - inter-process communication
     pub fn ipc() -> PledgePromise {
-        PledgePromise::new(vec![
-            Permission::Ipc,
-            Permission::FileRead,
-        ])
+        PledgePromise::new(vec![Permission::Ipc, Permission::FileRead])
     }
 
     /// Full promise - all permissions
@@ -172,8 +166,8 @@ pub mod promises {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::promises::*;
+    use super::*;
 
     #[test]
     fn test_pledge_creation() {
@@ -209,10 +203,10 @@ mod tests {
     fn test_common_promises() {
         let stdio_promise = stdio();
         assert!(stdio_promise.allows(Permission::FileRead));
-        
+
         let network_promise = network();
         assert!(network_promise.allows(Permission::NetworkTcp));
-        
+
         let full_promise = full();
         assert!(full_promise.allows(Permission::ProcessExec));
     }

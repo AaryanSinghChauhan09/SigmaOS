@@ -1,4 +1,6 @@
 // SigmaOS Dashboard Module
 pub mod monitor;
 
-pub use monitor::{UnifiedDashboard, DashboardWidget, MetricData, MetricType, WidgetType, SystemMonitor};
+pub use monitor::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};

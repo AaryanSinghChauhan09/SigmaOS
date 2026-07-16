@@ -59,7 +59,7 @@ impl VesaDriver {
     pub fn set_mode(&mut self, mode: u16) -> Result<(), VesaError> {
         // Simulate mode setting
         self.current_mode = mode;
-        
+
         // Update mode info based on mode
         match mode {
             0x112 => {
@@ -81,7 +81,7 @@ impl VesaDriver {
                 return Err(VesaError::InvalidMode);
             }
         }
-        
+
         self.mode_info.pitch = self.mode_info.width * (self.mode_info.bpp / 8);
         Ok(())
     }
@@ -94,10 +94,10 @@ impl VesaDriver {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
         }
-        
+
         // Calculate pixel offset
         let offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
-        
+
         // In production, this would write to actual framebuffer
         // For now, just validate the operation
         Ok(())

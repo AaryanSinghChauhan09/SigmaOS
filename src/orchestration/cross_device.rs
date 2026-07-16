@@ -94,11 +94,26 @@ pub enum AutomationTrigger {
 /// Cross-device action
 #[derive(Debug, Clone)]
 pub enum CrossDeviceAction {
-    SendFile { device_id: String, file_path: String },
-    SyncData { device_id: String, data_type: String },
-    SendNotification { device_id: String, message: String },
-    ControlApp { device_id: String, app: String, action: String },
-    ExecuteAutomation { automation_id: String },
+    SendFile {
+        device_id: String,
+        file_path: String,
+    },
+    SyncData {
+        device_id: String,
+        data_type: String,
+    },
+    SendNotification {
+        device_id: String,
+        message: String,
+    },
+    ControlApp {
+        device_id: String,
+        app: String,
+        action: String,
+    },
+    ExecuteAutomation {
+        automation_id: String,
+    },
 }
 
 /// Automation rule
@@ -227,7 +242,11 @@ impl CrossDeviceOrchestrator {
         self.smart_home_devices.insert(id, device);
     }
 
-    pub fn control_smart_home_device(&mut self, id: &str, state: HashMap<String, String>) -> Result<(), OrchestrationError> {
+    pub fn control_smart_home_device(
+        &mut self,
+        id: &str,
+        state: HashMap<String, String>,
+    ) -> Result<(), OrchestrationError> {
         if let Some(device) = self.smart_home_devices.get_mut(id) {
             device.state = state;
             Ok(())
@@ -252,7 +271,11 @@ impl CrossDeviceOrchestrator {
                 continue;
             }
 
-            if rule.triggers.iter().any(|t| self.triggers_match(t, &trigger)) {
+            if rule
+                .triggers
+                .iter()
+                .any(|t| self.triggers_match(t, &trigger))
+            {
                 triggered_actions.extend(rule.actions.clone());
             }
         }
@@ -260,14 +283,28 @@ impl CrossDeviceOrchestrator {
         triggered_actions
     }
 
-    fn triggers_match(&self, rule_trigger: &AutomationTrigger, event_trigger: &AutomationTrigger) -> bool {
+    fn triggers_match(
+        &self,
+        rule_trigger: &AutomationTrigger,
+        event_trigger: &AutomationTrigger,
+    ) -> bool {
         match (rule_trigger, event_trigger) {
-            (AutomationTrigger::DeviceConnected { device_id: rule_id }, 
-             AutomationTrigger::DeviceConnected { device_id: event_id }) => rule_id == event_id,
-            (AutomationTrigger::DeviceDisconnected { device_id: rule_id }, 
-             AutomationTrigger::DeviceDisconnected { device_id: event_id }) => rule_id == event_id,
-            (AutomationTrigger::TimeBased { time: rule_time }, 
-             AutomationTrigger::TimeBased { time: event_time }) => rule_time == event_time,
+            (
+                AutomationTrigger::DeviceConnected { device_id: rule_id },
+                AutomationTrigger::DeviceConnected {
+                    device_id: event_id,
+                },
+            ) => rule_id == event_id,
+            (
+                AutomationTrigger::DeviceDisconnected { device_id: rule_id },
+                AutomationTrigger::DeviceDisconnected {
+                    device_id: event_id,
+                },
+            ) => rule_id == event_id,
+            (
+                AutomationTrigger::TimeBased { time: rule_time },
+                AutomationTrigger::TimeBased { time: event_time },
+            ) => rule_time == event_time,
             (AutomationTrigger::Manual, AutomationTrigger::Manual) => true,
             _ => false,
         }
@@ -275,13 +312,19 @@ impl CrossDeviceOrchestrator {
 
     pub fn execute_action(&mut self, action: CrossDeviceAction) -> Result<(), OrchestrationError> {
         match action {
-            CrossDeviceAction::SendFile { device_id, file_path } => {
+            CrossDeviceAction::SendFile {
+                device_id,
+                file_path,
+            } => {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
                 println!("Sending file {} to device {}", file_path, device_id);
             }
-            CrossDeviceAction::SyncData { device_id, data_type } => {
+            CrossDeviceAction::SyncData {
+                device_id,
+                data_type,
+            } => {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
@@ -293,11 +336,18 @@ impl CrossDeviceOrchestrator {
                 }
                 println!("Sending notification to device {}: {}", device_id, message);
             }
-            CrossDeviceAction::ControlApp { device_id, app, action } => {
+            CrossDeviceAction::ControlApp {
+                device_id,
+                app,
+                action,
+            } => {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
-                println!("Controlling app {} on device {}: {}", app, device_id, action);
+                println!(
+                    "Controlling app {} on device {}: {}",
+                    app, device_id, action
+                );
             }
             CrossDeviceAction::ExecuteAutomation { automation_id } => {
                 println!("Executing automation: {}", automation_id);
@@ -309,12 +359,20 @@ impl CrossDeviceOrchestrator {
     pub fn discover_devices(&mut self) -> Vec<ConnectedDevice> {
         // Simulate device discovery
         let discovered = vec![
-            ConnectedDevice::new("phone_1".to_string(), "iPhone".to_string(), DeviceType::Smartphone)
-                .with_capability(DeviceCapability::NotificationSync)
-                .with_capability(DeviceCapability::AppControl),
-            ConnectedDevice::new("tablet_1".to_string(), "iPad".to_string(), DeviceType::Tablet)
-                .with_capability(DeviceCapability::FileTransfer)
-                .with_capability(DeviceCapability::MediaControl),
+            ConnectedDevice::new(
+                "phone_1".to_string(),
+                "iPhone".to_string(),
+                DeviceType::Smartphone,
+            )
+            .with_capability(DeviceCapability::NotificationSync)
+            .with_capability(DeviceCapability::AppControl),
+            ConnectedDevice::new(
+                "tablet_1".to_string(),
+                "iPad".to_string(),
+                DeviceType::Tablet,
+            )
+            .with_capability(DeviceCapability::FileTransfer)
+            .with_capability(DeviceCapability::MediaControl),
         ];
 
         for device in discovered {
@@ -325,13 +383,12 @@ impl CrossDeviceOrchestrator {
     }
 
     pub fn get_connected_devices(&self) -> Vec<&ConnectedDevice> {
-        self.devices.values()
-            .filter(|d| d.is_connected())
-            .collect()
+        self.devices.values().filter(|d| d.is_connected()).collect()
     }
 
     pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<&ConnectedDevice> {
-        self.devices.values()
+        self.devices
+            .values()
             .filter(|d| d.device_type == device_type)
             .collect()
     }
@@ -382,7 +439,11 @@ mod tests {
     #[test]
     fn test_device_addition() {
         let mut orchestrator = CrossDeviceOrchestrator::new();
-        let device = ConnectedDevice::new("test".to_string(), "Test Device".to_string(), DeviceType::Smartphone);
+        let device = ConnectedDevice::new(
+            "test".to_string(),
+            "Test Device".to_string(),
+            DeviceType::Smartphone,
+        );
         orchestrator.add_device(device);
         assert_eq!(orchestrator.devices.len(), 1);
     }
@@ -390,7 +451,11 @@ mod tests {
     #[test]
     fn test_device_connection() {
         let mut orchestrator = CrossDeviceOrchestrator::new();
-        let device = ConnectedDevice::new("test".to_string(), "Test Device".to_string(), DeviceType::Smartphone);
+        let device = ConnectedDevice::new(
+            "test".to_string(),
+            "Test Device".to_string(),
+            DeviceType::Smartphone,
+        );
         orchestrator.add_device(device);
         assert!(orchestrator.connect_device("test").is_ok());
         assert!(orchestrator.get_device("test").unwrap().is_connected());
@@ -399,7 +464,11 @@ mod tests {
     #[test]
     fn test_smart_home_device() {
         let mut orchestrator = CrossDeviceOrchestrator::new();
-        let device = SmartHomeDevice::new("light_1".to_string(), "Living Room Light".to_string(), "lighting".to_string());
+        let device = SmartHomeDevice::new(
+            "light_1".to_string(),
+            "Living Room Light".to_string(),
+            "lighting".to_string(),
+        );
         orchestrator.add_smart_home_device(device);
         assert_eq!(orchestrator.smart_home_devices.len(), 1);
     }

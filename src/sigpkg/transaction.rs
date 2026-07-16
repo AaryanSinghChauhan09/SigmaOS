@@ -1,7 +1,7 @@
 // Transaction Manager for SigmaPkg
 // Atomic package installation and rollback
 
-use crate::sigpkg::{Package, ContentAddressedStore, SatSolver};
+use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 use std::collections::HashMap;
 
 /// Transaction for package operations
@@ -32,14 +32,16 @@ impl Transaction {
     /// Add install operation
     pub fn install(&mut self, package: Package) -> Result<(), TransactionError> {
         // Resolve dependencies first
-        let resolved = self.resolver.resolve(&package.name, &crate::sigpkg::VersionConstraint::Any)?;
-        
+        let resolved = self
+            .resolver
+            .resolve(&package.name, &crate::sigpkg::VersionConstraint::Any)?;
+
         for dep in resolved {
             if self.store.get(&dep.name).is_none() {
                 self.operations.push(Operation::Install { package: dep });
             }
         }
-        
+
         self.operations.push(Operation::Install { package });
         Ok(())
     }
@@ -49,7 +51,7 @@ impl Transaction {
         if self.store.get(&package_name).is_none() {
             return Err(TransactionError::PackageNotFound(package_name));
         }
-        
+
         self.operations.push(Operation::Remove { package_name });
         Ok(())
     }
@@ -59,7 +61,7 @@ impl Transaction {
         if self.store.get(&old.name).is_none() {
             return Err(TransactionError::PackageNotFound(old.name));
         }
-        
+
         self.operations.push(Operation::Update { old, new });
         Ok(())
     }
@@ -94,11 +96,14 @@ impl Transaction {
 
     /// Preview transaction
     pub fn preview(&self) -> Vec<&str> {
-        self.operations.iter().map(|op| match op {
-            Operation::Install { package } => package.name.as_str(),
-            Operation::Remove { package_name } => package_name.as_str(),
-            Operation::Update { old, .. } => old.name.as_str(),
-        }).collect()
+        self.operations
+            .iter()
+            .map(|op| match op {
+                Operation::Install { package } => package.name.as_str(),
+                Operation::Remove { package_name } => package_name.as_str(),
+                Operation::Update { old, .. } => old.name.as_str(),
+            })
+            .collect()
     }
 }
 
@@ -128,7 +133,7 @@ mod tests {
         let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
-        
+
         let package = Package {
             name: "test".to_string(),
             version: crate::sigpkg::Version::new(1, 0, 0),
@@ -136,7 +141,7 @@ mod tests {
             dependencies: Vec::new(),
             checksum: String::new(),
         };
-        
+
         // This will fail due to dependency resolution, but tests the flow
         let result = transaction.install(package);
         assert!(result.is_err());
@@ -147,7 +152,7 @@ mod tests {
         let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
-        
+
         let result = transaction.remove("nonexistent".to_string());
         assert!(result.is_err());
     }
@@ -157,7 +162,7 @@ mod tests {
         let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
-        
+
         let preview = transaction.preview();
         assert!(preview.is_empty());
     }

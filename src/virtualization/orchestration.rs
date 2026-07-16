@@ -188,8 +188,10 @@ impl KubernetesPod {
     }
 
     pub fn deploy(&self) -> Result<(), VirtualizationError> {
-        println!("Deploying pod {} to namespace {} with {} replicas", 
-                 self.name, self.namespace, self.replicas);
+        println!(
+            "Deploying pod {} to namespace {} with {} replicas",
+            self.name, self.namespace, self.replicas
+        );
         Ok(())
     }
 
@@ -233,12 +235,17 @@ impl ResourcePool {
     }
 
     pub fn can_allocate(&self, cpus: u32, memory_mb: u32, disk_gb: u32) -> bool {
-        self.allocated_cpus + cpus <= self.total_cpus &&
-        self.allocated_memory_mb + memory_mb <= self.total_memory_mb &&
-        self.allocated_disk_gb + disk_gb <= self.total_disk_gb
+        self.allocated_cpus + cpus <= self.total_cpus
+            && self.allocated_memory_mb + memory_mb <= self.total_memory_mb
+            && self.allocated_disk_gb + disk_gb <= self.total_disk_gb
     }
 
-    pub fn allocate(&mut self, cpus: u32, memory_mb: u32, disk_gb: u32) -> Result<(), VirtualizationError> {
+    pub fn allocate(
+        &mut self,
+        cpus: u32,
+        memory_mb: u32,
+        disk_gb: u32,
+    ) -> Result<(), VirtualizationError> {
         if !self.can_allocate(cpus, memory_mb, disk_gb) {
             return Err(VirtualizationError::InsufficientResources);
         }
@@ -295,18 +302,23 @@ impl VirtualizationOrchestrator {
     }
 
     pub fn add_virtual_machine(&mut self, vm: VirtualMachine) -> Result<(), VirtualizationError> {
-        if !self.resource_pool.can_allocate(vm.cpus, vm.memory_mb, vm.disk_gb) {
+        if !self
+            .resource_pool
+            .can_allocate(vm.cpus, vm.memory_mb, vm.disk_gb)
+        {
             return Err(VirtualizationError::InsufficientResources);
         }
 
-        self.resource_pool.allocate(vm.cpus, vm.memory_mb, vm.disk_gb)?;
+        self.resource_pool
+            .allocate(vm.cpus, vm.memory_mb, vm.disk_gb)?;
         self.virtual_machines.insert(vm.id.clone(), vm);
         Ok(())
     }
 
     pub fn remove_virtual_machine(&mut self, id: &str) -> Result<(), VirtualizationError> {
         if let Some(vm) = self.virtual_machines.remove(id) {
-            self.resource_pool.deallocate(vm.cpus, vm.memory_mb, vm.disk_gb);
+            self.resource_pool
+                .deallocate(vm.cpus, vm.memory_mb, vm.disk_gb);
             Ok(())
         } else {
             Err(VirtualizationError::VmNotFound)
@@ -334,16 +346,20 @@ impl VirtualizationOrchestrator {
         let total_cpus: u32 = pod.containers.iter().map(|_| 1).sum();
         let total_memory: u32 = pod.containers.iter().map(|_| 512).sum();
         let total_disk: u32 = pod.containers.iter().map(|_| 1).sum();
-        
+
         let needed_cpus = total_cpus * pod.replicas;
         let needed_memory = total_memory * pod.replicas;
         let needed_disk = total_disk * pod.replicas;
 
-        if !self.resource_pool.can_allocate(needed_cpus, needed_memory, needed_disk) {
+        if !self
+            .resource_pool
+            .can_allocate(needed_cpus, needed_memory, needed_disk)
+        {
             return Err(VirtualizationError::InsufficientResources);
         }
 
-        self.resource_pool.allocate(needed_cpus, needed_memory, needed_disk)?;
+        self.resource_pool
+            .allocate(needed_cpus, needed_memory, needed_disk)?;
         self.kubernetes_pods.insert(pod.name.clone(), pod);
         Ok(())
     }
@@ -353,11 +369,11 @@ impl VirtualizationOrchestrator {
             let total_cpus: u32 = pod.containers.iter().map(|_| 1).sum();
             let total_memory: u32 = pod.containers.iter().map(|_| 512).sum();
             let total_disk: u32 = pod.containers.iter().map(|_| 1).sum();
-            
+
             self.resource_pool.deallocate(
                 total_cpus * pod.replicas,
                 total_memory * pod.replicas,
-                total_disk * pod.replicas
+                total_disk * pod.replicas,
             );
             Ok(())
         } else {
@@ -378,21 +394,28 @@ impl VirtualizationOrchestrator {
     }
 
     pub fn list_running_vms(&self) -> Vec<&VirtualMachine> {
-        self.virtual_machines.values()
+        self.virtual_machines
+            .values()
             .filter(|vm| vm.state == VmState::Running)
             .collect()
     }
 
     pub fn list_running_containers(&self) -> Vec<&Container> {
-        self.containers.values()
+        self.containers
+            .values()
             .filter(|c| c.state == VmState::Running)
             .collect()
     }
 
     pub fn get_resource_usage(&self) -> (f64, f64, f64) {
-        let cpu_usage = self.resource_pool.allocated_cpus as f64 / self.resource_pool.total_cpus as f64 * 100.0;
-        let memory_usage = self.resource_pool.allocated_memory_mb as f64 / self.resource_pool.total_memory_mb as f64 * 100.0;
-        let disk_usage = self.resource_pool.allocated_disk_gb as f64 / self.resource_pool.total_disk_gb as f64 * 100.0;
+        let cpu_usage =
+            self.resource_pool.allocated_cpus as f64 / self.resource_pool.total_cpus as f64 * 100.0;
+        let memory_usage = self.resource_pool.allocated_memory_mb as f64
+            / self.resource_pool.total_memory_mb as f64
+            * 100.0;
+        let disk_usage = self.resource_pool.allocated_disk_gb as f64
+            / self.resource_pool.total_disk_gb as f64
+            * 100.0;
         (cpu_usage, memory_usage, disk_usage)
     }
 
@@ -441,15 +464,23 @@ mod tests {
 
     #[test]
     fn test_vm_creation() {
-        let vm = VirtualMachine::new("test".to_string(), "Test VM".to_string(), VirtualizationTech::KVM)
-            .with_resources(2, 2048, 20);
+        let vm = VirtualMachine::new(
+            "test".to_string(),
+            "Test VM".to_string(),
+            VirtualizationTech::KVM,
+        )
+        .with_resources(2, 2048, 20);
         assert_eq!(vm.cpus, 2);
         assert_eq!(vm.memory_mb, 2048);
     }
 
     #[test]
     fn test_vm_lifecycle() {
-        let mut vm = VirtualMachine::new("test".to_string(), "Test VM".to_string(), VirtualizationTech::KVM);
+        let mut vm = VirtualMachine::new(
+            "test".to_string(),
+            "Test VM".to_string(),
+            VirtualizationTech::KVM,
+        );
         assert!(vm.start().is_ok());
         assert_eq!(vm.state, VmState::Running);
         assert!(vm.stop().is_ok());
@@ -458,14 +489,24 @@ mod tests {
 
     #[test]
     fn test_container_creation() {
-        let container = Container::new("test".to_string(), "Test Container".to_string(), "nginx:latest".to_string(), VirtualizationTech::Docker)
-            .with_port(80, 8080);
+        let container = Container::new(
+            "test".to_string(),
+            "Test Container".to_string(),
+            "nginx:latest".to_string(),
+            VirtualizationTech::Docker,
+        )
+        .with_port(80, 8080);
         assert_eq!(container.ports.len(), 1);
     }
 
     #[test]
     fn test_kubernetes_pod() {
-        let container = Container::new("web".to_string(), "web".to_string(), "nginx:latest".to_string(), VirtualizationTech::Kubernetes);
+        let container = Container::new(
+            "web".to_string(),
+            "web".to_string(),
+            "nginx:latest".to_string(),
+            VirtualizationTech::Kubernetes,
+        );
         let pod = KubernetesPod::new("web-pod".to_string(), "default".to_string())
             .with_container(container)
             .with_replicas(3);
@@ -483,8 +524,12 @@ mod tests {
     #[test]
     fn test_add_vm_to_orchestrator() {
         let mut orchestrator = VirtualizationOrchestrator::new();
-        let vm = VirtualMachine::new("test".to_string(), "Test VM".to_string(), VirtualizationTech::KVM)
-            .with_resources(2, 2048, 20);
+        let vm = VirtualMachine::new(
+            "test".to_string(),
+            "Test VM".to_string(),
+            VirtualizationTech::KVM,
+        )
+        .with_resources(2, 2048, 20);
         assert!(orchestrator.add_virtual_machine(vm).is_ok());
         assert_eq!(orchestrator.virtual_machines.len(), 1);
     }

@@ -135,7 +135,7 @@ mod tests {
         let mut scheduler = Scheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
-        
+
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());
     }

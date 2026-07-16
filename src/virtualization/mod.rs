@@ -1,4 +1,7 @@
 // SigmaOS Virtualization Module
 pub mod orchestration;
 
-pub use orchestration::{VirtualizationOrchestrator, VirtualMachine, Container, KubernetesPod, VirtualizationTech, VmState, ResourcePool, VirtualizationError};
+pub use orchestration::{
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
+};

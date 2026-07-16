@@ -32,15 +32,15 @@ impl ContentAddressedStore {
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
         let package_path = self.base_path.join(&format!("{}-{}", hash, package.name));
-        
+
         let stored = StoredPackage {
             package: package.clone(),
             path: package_path.clone(),
             hash: hash.clone(),
         };
-        
+
         self.packages.insert(package.name.clone(), stored);
-        
+
         Ok(hash)
     }
 
@@ -51,12 +51,16 @@ impl ContentAddressedStore {
 
     /// Get package by hash
     pub fn get_by_hash(&self, hash: &str) -> Option<&Package> {
-        self.packages.values().find(|s| s.hash == hash).map(|s| &s.package)
+        self.packages
+            .values()
+            .find(|s| s.hash == hash)
+            .map(|s| &s.package)
     }
 
     /// Remove package from store
     pub fn remove(&mut self, name: &str) -> Result<(), StoreError> {
-        self.packages.remove(name)
+        self.packages
+            .remove(name)
             .ok_or(StoreError::PackageNotFound(name.to_string()))?;
         Ok(())
     }
@@ -71,7 +75,7 @@ impl ContentAddressedStore {
         // Simplified hash computation - in production use actual SHA3-256
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        
+
         let mut hasher = DefaultHasher::new();
         data.hash(&mut hasher);
         format!("{:x}", hasher.finish())
@@ -111,7 +115,7 @@ mod tests {
             dependencies: Vec::new(),
             checksum: String::new(),
         };
-        
+
         let data = b"test data";
         let hash = store.add(package, data).unwrap();
         assert!(!hash.is_empty());
@@ -127,7 +131,7 @@ mod tests {
             dependencies: Vec::new(),
             checksum: String::new(),
         };
-        
+
         store.add(package.clone(), b"test data").unwrap();
         let retrieved = store.get("test").unwrap();
         assert_eq!(retrieved.name, "test");
@@ -143,7 +147,7 @@ mod tests {
             dependencies: Vec::new(),
             checksum: String::new(),
         };
-        
+
         store.add(package, b"test data").unwrap();
         store.remove("test").unwrap();
         assert!(store.get("test").is_none());

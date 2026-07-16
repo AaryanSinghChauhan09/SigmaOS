@@ -64,7 +64,7 @@ impl UsbHidDriver {
         if !self.connected {
             return Err(HidError::NotConnected);
         }
-        
+
         match report_type {
             HidReportType::Output => {
                 // Send output report (e.g., LED state)
@@ -74,9 +74,7 @@ impl UsbHidDriver {
                 // Send feature report
                 Ok(())
             }
-            HidReportType::Input => {
-                Err(HidError::InvalidReportType)
-            }
+            HidReportType::Input => Err(HidError::InvalidReportType),
         }
     }
 

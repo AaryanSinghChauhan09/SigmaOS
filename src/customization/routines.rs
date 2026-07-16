@@ -41,14 +41,18 @@ impl Condition {
             "equals" => current_value == self.value,
             "contains" => current_value.contains(&self.value),
             "greater_than" => {
-                if let (Ok(curr), Ok(val)) = (current_value.parse::<f64>(), self.value.parse::<f64>()) {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<f64>(), self.value.parse::<f64>())
+                {
                     curr > val
                 } else {
                     false
                 }
             }
             "less_than" => {
-                if let (Ok(curr), Ok(val)) = (current_value.parse::<f64>(), self.value.parse::<f64>()) {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<f64>(), self.value.parse::<f64>())
+                {
                     curr < val
                 } else {
                     false
@@ -213,15 +217,29 @@ impl CustomizationEngine {
 
     fn add_default_routines(&mut self) {
         let work_mode = Routine::new("work_mode".to_string(), "Work Mode".to_string())
-            .with_condition(Condition::new(TriggerType::Time, "09:00".to_string()).with_operator("equals".to_string()))
-            .with_action(Action::SetTheme { theme: "Light".to_string() })
-            .with_action(Action::LaunchApp { app: "email".to_string() })
+            .with_condition(
+                Condition::new(TriggerType::Time, "09:00".to_string())
+                    .with_operator("equals".to_string()),
+            )
+            .with_action(Action::SetTheme {
+                theme: "Light".to_string(),
+            })
+            .with_action(Action::LaunchApp {
+                app: "email".to_string(),
+            })
             .with_priority(10);
 
         let night_mode = Routine::new("night_mode".to_string(), "Night Mode".to_string())
-            .with_condition(Condition::new(TriggerType::Time, "20:00".to_string()).with_operator("equals".to_string()))
-            .with_action(Action::SetTheme { theme: "Dark".to_string() })
-            .with_action(Action::EnableFeature { feature: "blue_light_filter".to_string() })
+            .with_condition(
+                Condition::new(TriggerType::Time, "20:00".to_string())
+                    .with_operator("equals".to_string()),
+            )
+            .with_action(Action::SetTheme {
+                theme: "Dark".to_string(),
+            })
+            .with_action(Action::EnableFeature {
+                feature: "blue_light_filter".to_string(),
+            })
             .with_priority(10);
 
         self.routines.insert(work_mode.id.clone(), work_mode);
@@ -245,7 +263,9 @@ impl CustomizationEngine {
     }
 
     pub fn get_active_theme(&self) -> Option<&Theme> {
-        self.active_theme.as_ref().and_then(|name| self.themes.get(name))
+        self.active_theme
+            .as_ref()
+            .and_then(|name| self.themes.get(name))
     }
 
     pub fn update_context(&mut self, key: String, value: String) {
@@ -350,7 +370,9 @@ mod tests {
     fn test_routine_creation() {
         let routine = Routine::new("test".to_string(), "Test".to_string())
             .with_condition(Condition::new(TriggerType::Time, "09:00".to_string()))
-            .with_action(Action::SetTheme { theme: "Dark".to_string() });
+            .with_action(Action::SetTheme {
+                theme: "Dark".to_string(),
+            });
         assert_eq!(routine.conditions.len(), 1);
         assert_eq!(routine.actions.len(), 1);
     }
