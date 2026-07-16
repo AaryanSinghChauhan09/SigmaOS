@@ -74,7 +74,7 @@ impl Scheduler {
         }
     }
 
-    pub fn add_process(&mut self, process: Process) {
+    pub fn add_process(&mut self, mut process: Process) {
         process.update_virtual_deadline(self.current_time);
         self.processes.push(process);
     }
@@ -135,7 +135,11 @@ mod tests {
         let mut scheduler = Scheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
-        
+
+        for _ in 0..5 {
+            scheduler.tick();
+        }
+
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());
     }

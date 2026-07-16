@@ -1,14 +1,14 @@
 // SigmaOS Drivers Module
 pub mod gpu;
-pub mod storage;
-pub mod network;
 pub mod input;
+pub mod network;
+pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 
-pub use gpu::{GpuDriver, GpuCommand, GpuError};
-pub use storage::{StorageDriver, StorageCommand, StorageType, StorageError};
-pub use network::{NetworkDriver, NetworkCommand, NetworkType, NetworkError};
+pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
-pub use usb_hid::{UsbHidDriver, HidKeyboardEvent, HidReportType, HidError};
-pub use vesa::{VesaDriver, VesaModeInfo, VesaError};
+pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
+pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
+pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
+pub use vesa::{VesaDriver, VesaError, VesaModeInfo};

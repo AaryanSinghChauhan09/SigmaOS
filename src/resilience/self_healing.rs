@@ -40,12 +40,13 @@ pub struct SystemSnapshot {
 
 impl SystemSnapshot {
     pub fn new(description: String) -> Self {
+        let timestamp_nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
         Self {
-            id: uuid::Uuid::new_v4().to_string(),
-            timestamp: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            id: format!("snap-{}", timestamp_nanos),
+            timestamp: (timestamp_nanos / 1_000_000_000) as u64,
             system_state: HashMap::new(),
             configuration: HashMap::new(),
             description,
@@ -94,11 +95,15 @@ impl RecoveryRule {
         self
     }
 
-    pub fn matches(&self, event_type: RecoveryEventType, context: &HashMap<String, String>) -> bool {
+    pub fn matches(
+        &self,
+        event_type: RecoveryEventType,
+        context: &HashMap<String, String>,
+    ) -> bool {
         if self.event_type != event_type {
             return false;
         }
-        
+
         // Simple condition matching (in production, use proper expression evaluation)
         true
     }
@@ -129,30 +134,36 @@ impl SelfHealingModule {
 
     fn add_default_rules(&mut self) {
         // Process crash recovery
-        let process_crash_rule = RecoveryRule::new(
-            RecoveryEventType::ProcessCrash,
-            "process_crash".to_string()
-        )
-        .with_action(RecoveryAction::RestartProcess { pid: 0 })
-        .with_action(RecoveryAction::LogEvent { message: "Process crashed, attempting restart".to_string() })
-        .with_priority(10);
+        let process_crash_rule =
+            RecoveryRule::new(RecoveryEventType::ProcessCrash, "process_crash".to_string())
+                .with_action(RecoveryAction::RestartProcess { pid: 0 })
+                .with_action(RecoveryAction::LogEvent {
+                    message: "Process crashed, attempting restart".to_string(),
+                })
+                .with_priority(10);
 
         // Memory exhaustion recovery
         let memory_exhaustion_rule = RecoveryRule::new(
             RecoveryEventType::MemoryExhaustion,
-            "memory_exhaustion".to_string()
+            "memory_exhaustion".to_string(),
         )
         .with_action(RecoveryAction::ClearCache)
-        .with_action(RecoveryAction::LogEvent { message: "Memory exhausted, clearing cache".to_string() })
+        .with_action(RecoveryAction::LogEvent {
+            message: "Memory exhausted, clearing cache".to_string(),
+        })
         .with_priority(15);
 
         // Service failure recovery
         let service_failure_rule = RecoveryRule::new(
             RecoveryEventType::ServiceFailure,
-            "service_failure".to_string()
+            "service_failure".to_string(),
         )
-        .with_action(RecoveryAction::RestartService { name: String::new() })
-        .with_action(RecoveryAction::LogEvent { message: "Service failed, attempting restart".to_string() })
+        .with_action(RecoveryAction::RestartService {
+            name: String::new(),
+        })
+        .with_action(RecoveryAction::LogEvent {
+            message: "Service failed, attempting restart".to_string(),
+        })
         .with_priority(10);
 
         self.recovery_rules.push(process_crash_rule);
@@ -163,14 +174,14 @@ impl SelfHealingModule {
     pub fn create_snapshot(&mut self, description: String) -> String {
         let snapshot = SystemSnapshot::new(description);
         let id = snapshot.id.clone();
-        
+
         self.snapshots.push(snapshot);
-        
+
         // Keep only max_snapshots
         if self.snapshots.len() > self.max_snapshots {
             self.snapshots.remove(0);
         }
-        
+
         id
     }
 
@@ -185,17 +196,24 @@ impl SelfHealingModule {
 
         let snapshot = self.get_snapshot(id).unwrap();
         println!("Rolling back to snapshot: {}", snapshot.description);
-        
+
         // Simulate rollback
         Ok(())
     }
 
-    pub fn handle_event(&mut self, event_type: RecoveryEventType, context: HashMap<String, String>) -> Vec<RecoveryAction> {
+    pub fn handle_event(
+        &mut self,
+        event_type: RecoveryEventType,
+        context: HashMap<String, String>,
+    ) -> Vec<RecoveryAction> {
         // Log the event
-        self.event_log.push((event_type, SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs()));
+        self.event_log.push((
+            event_type,
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        ));
 
         if !self.auto_recovery_enabled {
             return Vec::new();
@@ -232,7 +250,10 @@ impl SelfHealingModule {
         }
     }
 
-    pub fn execute_recovery_action(&mut self, action: RecoveryAction) -> Result<(), ResilienceError> {
+    pub fn execute_recovery_action(
+        &mut self,
+        action: RecoveryAction,
+    ) -> Result<(), ResilienceError> {
         match action {
             RecoveryAction::RestartProcess { pid } => {
                 println!("Restarting process with PID: {}", pid);

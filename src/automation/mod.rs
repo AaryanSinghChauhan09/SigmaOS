@@ -2,5 +2,10 @@
 pub mod ai_optimizer;
 pub mod system_level;
 
-pub use ai_optimizer::{AiOptimizer, OptimizationRecommendation, SystemState, OptimizationCategory, OptimizationError};
-pub use system_level::{SystemAutomationManager, SystemAutomationRule, SystemAction, SystemEventType, PerformanceProfile, SystemPrediction, PredictiveModel, AutomationError};
+pub use ai_optimizer::{
+    AiOptimizer, OptimizationCategory, OptimizationError, OptimizationRecommendation, SystemState,
+};
+pub use system_level::{
+    AutomationError, PerformanceProfile, PredictiveModel, SystemAction, SystemAutomationManager,
+    SystemAutomationRule, SystemEventType, SystemPrediction,
+};

@@ -1,11 +1,10 @@
 // SigmaOS Kernel Module
-pub mod main;
-pub mod scheduler;
-pub mod memory;
 pub mod ipc;
+pub mod memory;
 pub mod roundrobin;
+pub mod scheduler;
 
-pub use scheduler::{Scheduler, Process, Priority, ProcessState};
+pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use ipc::{IpcManager, Channel, Message, IpcError};
-pub use roundrobin::{RoundRobinScheduler, RoundRobinConfig, SchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};

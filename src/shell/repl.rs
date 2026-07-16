@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
-use std::io::{self, Write, BufRead};
+use std::io::{self, BufRead, Write};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ impl ShellRepl {
 
     fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
-        
+
         if parts.is_empty() {
             return ShellCommand::Unknown(input.to_string());
         }
@@ -120,47 +120,38 @@ impl ShellRepl {
 
     fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
-            ShellCommand::Help => {
-                Ok("Available commands:\n\
+            ShellCommand::Help => Ok("Available commands:\n\
                    help    - Show this help message\n\
                    ps      - List running processes\n\
                    ls      - List files\n\
                    echo    - Print a message\n\
                    set     - Set a variable\n\
                    get     - Get a variable\n\
-                   exit    - Exit the shell".to_string())
-            }
-            ShellCommand::ListProcesses => {
-                Ok("PID  NAME        STATE\n\
+                   exit    - Exit the shell"
+                .to_string()),
+            ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
-                   2    kernel      Running".to_string())
-            }
-            ShellCommand::ListFiles => {
-                Ok("README.md\n\
+                   2    kernel      Running"
+                .to_string()),
+            ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
                    src/\n\
-                   tests/".to_string())
-            }
+                   tests/"
+                .to_string()),
             ShellCommand::Exit => {
                 self.running = false;
                 Ok(String::new())
             }
-            ShellCommand::Echo { message } => {
-                Ok(message)
-            }
+            ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
                 Ok(format!("{} = {}", variable, value))
             }
-            ShellCommand::Get { variable } => {
-                match self.variables.get(&variable) {
-                    Some(value) => Ok(value.clone()),
-                    None => Err(format!("Variable '{}' not found", variable)),
-                }
-            }
-            ShellCommand::Unknown(cmd) => {
-                Err(format!("Unknown command: {}", cmd))
-            }
+            ShellCommand::Get { variable } => match self.variables.get(&variable) {
+                Some(value) => Ok(value.clone()),
+                None => Err(format!("Variable '{}' not found", variable)),
+            },
+            ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
 }
@@ -199,7 +190,9 @@ mod tests {
     #[test]
     fn test_execute_echo() {
         let mut repl = ShellRepl::new();
-        let command = ShellCommand::Echo { message: "test".to_string() };
+        let command = ShellCommand::Echo {
+            message: "test".to_string(),
+        };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
     }

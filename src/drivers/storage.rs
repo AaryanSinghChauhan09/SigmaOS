@@ -38,7 +38,7 @@ impl StorageDriver {
             StorageType::SATA => "SATA HDD".to_string(),
             StorageType::Virtual => "Virtual Disk".to_string(),
         };
-        
+
         Self {
             device_type,
             block_size,
@@ -85,7 +85,7 @@ impl StorageDriver {
     }
 
     pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits & capability) != 0
+        (self.capabilities.bits() & capability) != 0
     }
 }
 
@@ -125,7 +125,10 @@ mod tests {
     #[test]
     fn test_invalid_lba() {
         let mut storage = StorageDriver::new(StorageType::Virtual, 512, 1024);
-        let command = StorageCommand::Read { lba: 9999, sectors: 1 };
+        let command = StorageCommand::Read {
+            lba: 9999,
+            sectors: 1,
+        };
         assert!(storage.execute_command(command).is_err());
     }
 

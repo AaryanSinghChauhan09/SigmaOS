@@ -1,0 +1,13 @@
+# ⚡ Bolt's Journal — SigmaOS Performance Optimizations
+
+This journal contains CRITICAL performance learnings discovered during profiling, compiling, and optimizing SigmaOS.
+
+---
+
+## 2024-07-15 - Unnecessary External Dependencies in Utility Modules
+**Learning:** External crates like `rand` and `uuid` are heavy, introduce substantial compilation times, and are highly inefficient for simple simulation metrics or identifier generations. Replacing them with specialized local, zero-dependency implementations (such as a 48-bit Linear Congruential Generator for pseudo-random numbers and timestamp-nanoseconds for unique snapshot IDs) completely eliminates standard-library binding costs, reduces compiler overhead, and provides sub-nanosecond execution speeds.
+**Action:** Always prefer lightweight, mathematically simple local algorithms over heavy external crate imports for simulation, telemetry, and non-cryptographic utility operations.
+
+## 2024-07-15 - Ownership and Moves in Allocator Merge Trees
+**Learning:** In Buddy Allocator merge operations, taking ownership of memory blocks by-value during a merge search leads to premature values being dropped if buddy merging fails. This forces expensive re-allocation or unnecessary clone overheads. Returning ownership of the original block in a `Result<MemoryBlock, MemoryBlock>` if buddy merging fails avoids all move-borrow complications, preserves zero-allocation guarantees, and maintains perfect linear execution speed.
+**Action:** When designing hardware or memory managers in Rust, use `Result` wrappers to pass ownership back and forth safely without any allocation or cloning of control blocks.

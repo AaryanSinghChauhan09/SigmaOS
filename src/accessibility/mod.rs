@@ -1,4 +1,7 @@
 // SigmaOS Accessibility Module
 pub mod framework;
 
-pub use framework::{AccessibilityFramework, AccessibilityProfile, AccessibilitySetting, AccessibilityCategory, AccessibilityFeature, AccessibilityError};
+pub use framework::{
+    AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
+    AccessibilityProfile, AccessibilitySetting,
+};

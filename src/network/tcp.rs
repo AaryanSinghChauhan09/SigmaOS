@@ -148,7 +148,9 @@ impl TcpStack {
     }
 
     pub fn get_connection_mut(&mut self, local_port: u16) -> Option<&mut TcpConnection> {
-        self.connections.iter_mut().find(|c| c.local_port == local_port)
+        self.connections
+            .iter_mut()
+            .find(|c| c.local_port == local_port)
     }
 
     pub fn close_connection(&mut self, local_port: u16) {
@@ -156,7 +158,8 @@ impl TcpStack {
     }
 
     pub fn process_segment(&mut self, segment: TcpSegment) -> Result<(), TcpError> {
-        let connection = self.get_connection_mut(segment.destination_port)
+        let connection = self
+            .get_connection_mut(segment.destination_port)
             .ok_or(TcpError::ConnectionNotFound)?;
 
         // Process based on current state
