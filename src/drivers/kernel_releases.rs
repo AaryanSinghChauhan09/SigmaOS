@@ -5,11 +5,11 @@
 
 extern crate alloc;
 
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::format;
-use crate::drivers::peripheral::{PeripheralDevice, DeviceGeneration, PowerState};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Shared Release Metadata for Drivers (OOP Composition Principle)
 #[derive(Debug, Clone)]
@@ -114,7 +114,7 @@ impl PeripheralDevice for MainlineGpuDriver {
         let len = data.len().min(self.frame_buffer.len() * 4);
         for i in 0..(len / 4) {
             let mut val_bytes = [0u8; 4];
-            val_bytes.copy_from_slice(&data[i*4..(i+1)*4]);
+            val_bytes.copy_from_slice(&data[i * 4..(i + 1) * 4]);
             self.frame_buffer[i] = u32::from_le_bytes(val_bytes);
         }
         Ok(len)
@@ -160,7 +160,7 @@ impl LinuxReleaseDriver for MainlineGpuDriver {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::peripheral::{PeripheralManager, DeviceGeneration, PowerState};
+    use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
 
     #[test]
     fn test_mainline_gpu_driver() {
@@ -276,8 +276,8 @@ mod tests {
         let mut config = [0u8; 3];
         assert_eq!(audio.read(&mut config).unwrap(), 3);
         assert_eq!(config[0], 70); // Volume
-        assert_eq!(config[1], 0);  // Is NOT muted
-        assert_eq!(config[2], 2);  // Channels
+        assert_eq!(config[1], 0); // Is NOT muted
+        assert_eq!(config[2], 2); // Channels
 
         // Write/update volume level
         let new_vol = [45u8];
@@ -379,7 +379,10 @@ mod tests {
         // Trigger lock
         let lock_command = [0xFFu8];
         assert_eq!(tpm.write(&lock_command).unwrap(), 1);
-        assert!(tpm.run_diagnostics().unwrap().contains("Lockout status: true"));
+        assert!(tpm
+            .run_diagnostics()
+            .unwrap()
+            .contains("Lockout status: true"));
 
         // Read fails on lock
         assert!(tpm.read(&mut pcr).is_err());
@@ -415,7 +418,10 @@ mod tests {
         assert_eq!(cx, 100);
 
         // Diagnostics
-        assert!(sensor.run_diagnostics().unwrap().contains("sample: x=100, y=200, z=0"));
+        assert!(sensor
+            .run_diagnostics()
+            .unwrap()
+            .contains("sample: x=100, y=200, z=0"));
 
         assert!(sensor.shutdown().is_ok());
     }
@@ -455,15 +461,33 @@ mod tests {
         assert_eq!(manager.device_count(), 0);
 
         // Register multiple release drivers polymorphically
-        assert!(manager.register_device(Box::new(MainlineGpuDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Longterm6_18_StorageDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Longterm6_12_NetworkDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Longterm6_6_AudioDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Longterm6_1_InputDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Longterm5_15_SerialDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Longterm5_10_TpmDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Stable6_22_SensorDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Prepatch6_23_Rc1_AiDriver::new())).is_ok());
+        assert!(manager
+            .register_device(Box::new(MainlineGpuDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Longterm6_18_StorageDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Longterm6_12_NetworkDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Longterm6_6_AudioDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Longterm6_1_InputDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Longterm5_15_SerialDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Longterm5_10_TpmDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Stable6_22_SensorDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Prepatch6_23_Rc1_AiDriver::new()))
+            .is_ok());
 
         assert_eq!(manager.device_count(), 9);
 
@@ -590,7 +614,9 @@ impl LinuxReleaseDriver for Longterm6_18_StorageDriver {
         }
         Ok(format!(
             "Diagnostics SUCCESS: Longterm Storage (v{}) verified. Blocks: {}, IOs: {}.",
-            self.info.version, self.blocks.len(), self.io_count
+            self.info.version,
+            self.blocks.len(),
+            self.io_count
         ))
     }
 
@@ -662,7 +688,8 @@ impl PeripheralDevice for Longterm6_12_NetworkDriver {
         let read_len = buffer.len().min(test_packet.len());
         buffer[..read_len].copy_from_slice(&test_packet[..read_len]);
         self.rx_bytes += read_len as u64;
-        self.packet_history.push(String::from("Received test packet"));
+        self.packet_history
+            .push(String::from("Received test packet"));
         Ok(read_len)
     }
 
@@ -699,7 +726,9 @@ impl LinuxReleaseDriver for Longterm6_12_NetworkDriver {
         }
         Ok(format!(
             "Diagnostics SUCCESS: 100GbE link status UP. RX: {} bytes, TX: {} bytes, Logs: {}.",
-            self.rx_bytes, self.tx_bytes, self.packet_history.len()
+            self.rx_bytes,
+            self.tx_bytes,
+            self.packet_history.len()
         ))
     }
 
@@ -1030,7 +1059,8 @@ impl LinuxReleaseDriver for Longterm5_15_SerialDriver {
         }
         Ok(format!(
             "Diagnostics SUCCESS: 16550 UART active. Baud: {} bps, FIFO used: {} bytes.",
-            self.baud_rate, self.fifo_buffer.len()
+            self.baud_rate,
+            self.fifo_buffer.len()
         ))
     }
 
@@ -1088,7 +1118,8 @@ impl PeripheralDevice for Longterm5_10_TpmDriver {
         self.is_locked = false;
         self.pcr_hashes = Vec::new();
         // Setup initial secure registers
-        self.pcr_hashes.push(String::from("e3b0c44298fc1c149afbf4c8996fb924"));
+        self.pcr_hashes
+            .push(String::from("e3b0c44298fc1c149afbf4c8996fb924"));
         Ok(())
     }
 
@@ -1333,7 +1364,11 @@ impl PeripheralDevice for Prepatch6_23_Rc1_AiDriver {
             return Err("AI NPU is not operational");
         }
         // Return active status and load models info
-        let report = format!("NPU_OK:Inferences={}:Models={}", self.inference_count, self.models_loaded.len());
+        let report = format!(
+            "NPU_OK:Inferences={}:Models={}",
+            self.inference_count,
+            self.models_loaded.len()
+        );
         let read_len = buffer.len().min(report.len());
         buffer[..read_len].copy_from_slice(&report.as_bytes()[..read_len]);
         Ok(read_len)
@@ -1372,7 +1407,8 @@ impl LinuxReleaseDriver for Prepatch6_23_Rc1_AiDriver {
         }
         Ok(format!(
             "Diagnostics WARNING: Prepatch experimental NPU driver. Models: {}, Inferences: {}.",
-            self.models_loaded.len(), self.inference_count
+            self.models_loaded.len(),
+            self.inference_count
         ))
     }
 
