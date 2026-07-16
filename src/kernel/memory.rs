@@ -177,6 +177,123 @@ impl Default for BuddyAllocator {
     }
 }
 
+/// Page table entry flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PageFlags(pub u64);
+
+impl PageFlags {
+    pub const PRESENT: u64 = 1 << 0;
+    pub const WRITABLE: u64 = 1 << 1;
+    pub const USER_ACCESSIBLE: u64 = 1 << 2;
+    pub const WRITE_THROUGH: u64 = 1 << 3;
+    pub const CACHE_DISABLE: u64 = 1 << 4;
+    pub const ACCESSED: u64 = 1 << 5;
+    pub const DIRTY: u64 = 1 << 6;
+    pub const HUGE_PAGE: u64 = 1 << 7;
+    pub const GLOBAL: u64 = 1 << 8;
+    pub const NO_EXECUTE: u64 = 1 << 63;
+}
+
+/// A standard 4KB page table entry
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct PageTableEntry(u64);
+
+impl PageTableEntry {
+    pub fn new() -> Self {
+        Self(0)
+    }
+
+    pub fn set_addr(&mut self, addr: u64, flags: PageFlags) {
+        // Clear everything but flags, and mask the address to align with 4KB
+        self.0 = (addr & 0x0000_00FF_FFFF_F000) | flags.0;
+    }
+
+    pub fn get_addr(&self) -> u64 {
+        self.0 & 0x0000_00FF_FFFF_F000
+    }
+
+    pub fn flags(&self) -> PageFlags {
+        PageFlags(self.0 & 0xFFF0_0000_0000_0FFF)
+    }
+
+    pub fn is_present(&self) -> bool {
+        (self.0 & PageFlags::PRESENT) != 0
+    }
+    
+    pub fn clear(&mut self) {
+        self.0 = 0;
+    }
+}
+
+/// A standard Page Table (containing 512 entries on x86_64)
+#[repr(align(4096))]
+pub struct PageTable {
+    pub entries: [PageTableEntry; 512],
+}
+
+impl PageTable {
+    pub fn new() -> Self {
+        Self {
+            entries: [PageTableEntry::new(); 512],
+        }
+    }
+}
+
+/// Virtual Memory Manager (VMM) handling paging
+pub struct VirtualMemoryManager {
+    pub root_directory: NonNull<PageTable>,
+}
+
+impl VirtualMemoryManager {
+    pub fn new(root_directory: NonNull<PageTable>) -> Self {
+        Self { root_directory }
+    }
+
+    /// Translates a virtual address into a physical address
+    pub fn translate(&self, virtual_addr: u64) -> Option<u64> {
+        // Mock translation logic for SigmaOS OOP structure
+        // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_ref() };
+        
+        let entry = &root.entries[pt_index as usize];
+        if entry.is_present() {
+            Some(entry.get_addr() + (virtual_addr & 0xFFF))
+        } else {
+            None
+        }
+    }
+
+    /// Maps a virtual page to a physical frame
+    pub fn map_page(&mut self, virtual_addr: u64, physical_addr: u64, flags: PageFlags) -> Result<(), &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
+        
+        let entry = &mut root.entries[pt_index as usize];
+        if entry.is_present() {
+            return Err("Page already mapped!");
+        }
+        
+        entry.set_addr(physical_addr, flags);
+        Ok(())
+    }
+
+    /// Unmaps a virtual page
+    pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
+        
+        let entry = &mut root.entries[pt_index as usize];
+        if !entry.is_present() {
+            return Err("Page is not mapped!");
+        }
+        
+        entry.clear();
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

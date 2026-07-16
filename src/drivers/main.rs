@@ -1,6 +1,6 @@
 // SigmaOS Drivers Main Entry Point
 #![no_std]
-#![no_main]
+#![cfg_attr(target_os = "none", no_main)]
 
 use core::panic::PanicInfo;
 
