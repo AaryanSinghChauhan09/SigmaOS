@@ -281,7 +281,106 @@ pub trait PackageManager {
 
 ---
 
-## 10. Recommended Next Steps (Sovereign Roadmap)
+## 10. Subsystem Branch Audit & Strategic Next Steps
+
+To accelerate sovereign growth, we audited the active subsystem branches of SigmaOS and defined precise development targets to coordinate unified merges into the `main` branch.
+
+### A. Subsystem Analysis & Next Milestones
+
+#### 1. Kernel Core Subsystem
+*   **Current State:** Implements basic Round-Robin scheduler, PML4 virtual paging, physical buddy allocator, and capability-safe IPC manager.
+*   **Next Milestones (To-Do):**
+    *   Incorporate NUMA-aware memory allocations inside the buddy allocator.
+    *   Implement **hugepage support** (2MB / 1GB pages) and an advanced RCU (Read-Copy Update) lock-free read mechanism.
+    *   Strengthen the predictive scheduler with real-time, AI-based execution workload profiling.
+
+#### 2. Drivers Subsystem
+*   **Current State:** Provides early OOP driver prototypes (e.g. VESA framebuffer, legacy keyboards, storage block commands, USB stacks).
+*   **Next Milestones (To-Do):**
+    *   Build native GPU drivers (NVIDIA / AMD / Intel) with userspace command queues.
+    *   Expand local WiFi chipset drivers.
+    *   Add peripheral printer/scanner drivers with capability-gated compatibility wrappers.
+    *   Deploy a **Driver Registry** to enable Plug-and-Play (PnP) hotplug detection.
+
+#### 3. Networking Subsystem
+*   **Current State:** Implements partial TCP/UDP port allocation and segment validation layers.
+*   **Next Milestones (To-Do):**
+    *   Full IPv6 protocol stack support.
+    *   Deploy wireless networking layers (802.11 modules).
+    *   Integrate secure out-of-the-box VPN client/server gateways.
+    *   Enable container networking (namespaces, cgroup integrations).
+
+#### 4. Filesystems Subsystem
+*   **Current State:** Implements simple Ext4 and FAT32 read/write adapters, and early SigmaFS prototype tables.
+*   **Next Milestones (To-Do):**
+    *   Support high-performance filesystems (XFS, Btrfs, ZFS, NFS, CIFS).
+    *   Mature SigmaFS into a distributed, peer-to-peer sovereign filesystem.
+    *   Build atomic snapshots and rollback recovery controls.
+
+#### 5. Virtualization Subsystem
+*   **Current State:** Experimental WASM browser compilation bundles and basic micro-VM configuration structures.
+*   **Next Milestones (To-Do):**
+    *   Integrate native KVM/QEMU hypervisor routines for full virtual machine (VM) support.
+    *   Establish local container runtime daemons (**SigmaContainers**).
+    *   Explore lightweight micro-VMs to isolate and sandbox third-party drivers.
+
+#### 6. Security Subsystem
+*   **Current State:** Early post-quantum cryptography (Kyber-1024, Dilithium-5) and syscall pledge frameworks.
+*   **Next Milestones (To-Do):**
+    *   Integrate granular SELinux/AppArmor-style security profiles.
+    *   Enforce mandatory cryptographic driver signing.
+    *   Build compliance monitoring dashboards (ISO 27001, GDPR, HIPAA).
+    *   Deploy zero-trust kernel modules.
+
+#### 7. Performance Subsystem
+*   **Current State:** Basic predictive MLFQ scheduling and CPU temperature throttle recommendations.
+*   **Next Milestones (To-Do):**
+    *   Deploy NUMA-aware multi-core scheduling.
+    *   Implement GPU co-scheduling loops for high-performance computing (HPC).
+    *   Establish energy-aware scheduling modules optimized for laptops and mobile devices.
+
+#### 8. Documentation & Onboarding Subsystem
+*   **Current State:** Basic README.md, audit backlog indices, and scattered architecture files.
+*   **Next Milestones (To-Do):**
+    *   Expand GitHub Wiki with comprehensive, interactive subsystem guides.
+    *   Document detailed contributor guidelines, coding styles, and security reporting.
+    *   Publish real-time roadmap dashboard charts mapping phases vs deliverables.
+
+---
+
+### B. Consolidated Subsystem Roadmap
+
+```
+  Short-Term (0-6 months)     -->      Mid-Term (6-18 months)     -->      Long-Term (18-36 months)
+  - Subsystem consolidation            - GPU, WiFi, Printer drivers       - Win/Mac compatibility
+  - Driver hotplug registry            - Virtualization (KVM/QEMU)        - SigmaShell desktop
+  - launch S-PKG with APT/DNF          - SigmaFS rollback snapshots       - Regulatory dashboards
+```
+
+*   **Short-Term [0–6 Months]:**
+    *   Consolidate all developmental branches into a clean subsystem folder structure.
+    *   Stabilize the core microkernel and driver registry.
+    *   Launch `sigmapkg` with universal `.deb`/`.rpm` compatibility adapters.
+*   **Mid-Term [6–18 Months]:**
+    *   Expand core driver coverage (GPUs, wireless chipsets, local peripherals).
+    *   Deploy native virtualization (KVM/QEMU) and container managers.
+    *   Mature Distributed SigmaFS and snapshot-rollback pipelines.
+*   **Long-Term [18–36 Months]:**
+    *   Build native Windows and macOS application compatibility layers.
+    *   Deliver the core **SigmaShell** desktop environment.
+    *   Integrate regulatory compliance monitoring dashboards directly into userspace.
+*   **Future [36+ Months]:**
+    *   Deploy AI-native kernel modules and self-optimizing drivers.
+    *   Integrate post-quantum and IoT hooks.
+    *   Establish a universal publishing hub to export S-PKG structures back to standard Linux distribution targets.
+
+### C. Direct Actionable Next Steps
+To build a solid foundation before tackling UI/UX and enterprise adoption, the immediate concrete priority is:
+> **Merge stable code into a unified main branch, configure warm cache CI/CD pipelines, and prioritize driver and wireless networking expansion.**
+
+---
+
+## 11. Recommended Next Steps (Sovereign Roadmap)
 
 1. **Phase 1 [Immediate]:**
    - Fix the duplicate panic handler error on hosted architectures (Completed: applied conditional standard library compilation bounds).
