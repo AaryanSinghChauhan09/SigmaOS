@@ -82,6 +82,37 @@ pub enum Permission {
     Ipc = 5,
 }
 
+/// OOP SecurityEnforcer trait for policy verification
+pub trait SecurityEnforcer {
+    /// Verify access of a capability token for a specific permission
+    fn verify_access(&self, token: &CapabilityToken, permission: Permission) -> bool;
+}
+
+/// OOP-based ZeroTrustVerifier implementing SecurityEnforcer
+pub struct ZeroTrustVerifier {
+    /// Zero-trust policy strictness level
+    is_strict: bool,
+}
+
+impl ZeroTrustVerifier {
+    /// Create a new ZeroTrustVerifier
+    pub fn new(is_strict: bool) -> Self {
+        Self { is_strict }
+    }
+}
+
+impl SecurityEnforcer for ZeroTrustVerifier {
+    fn verify_access(&self, token: &CapabilityToken, permission: Permission) -> bool {
+        if self.is_strict {
+            // Under strict zero-trust, we only allow access if the capability token explicitly supports it
+            token.has_permission(permission)
+        } else {
+            // Under standard zero-trust, always verify capability has the permission
+            token.has_permission(permission)
+        }
+    }
+}
+
 /// Capability gate for syscall validation
 pub struct CapabilityGate {
     /// Current capability token
@@ -156,5 +187,13 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
+    }
+
+    #[test]
+    fn test_zero_trust_verifier_oop() {
+        let verifier = ZeroTrustVerifier::new(true);
+        let token = CapabilityToken::new().allow_read("/var/www");
+        assert!(verifier.verify_access(&token, Permission::FileRead));
+        assert!(!verifier.verify_access(&token, Permission::NetworkTcp));
     }
 }
