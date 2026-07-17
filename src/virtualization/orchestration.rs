@@ -633,14 +633,14 @@ mod tests {
         // Test Legacy Strategy
         let legacy_strat = VirtualizationStrategyFactory::get_strategy(VirtualizationTech::QEMU);
         assert_eq!(legacy_strat.generation(), "Legacy");
-        assert_eq!(legacy_strat.supports_live_migration(), false);
+        assert!(!legacy_strat.supports_live_migration());
         assert!(legacy_strat.execute_start("win98_guest").is_ok());
 
         // Test Modern Strategy
         let modern_strat =
             VirtualizationStrategyFactory::get_strategy(VirtualizationTech::Kubernetes);
         assert_eq!(modern_strat.generation(), "Modern");
-        assert_eq!(modern_strat.supports_live_migration(), true);
+        assert!(modern_strat.supports_live_migration());
         assert!(modern_strat.execute_start("web-pod-v2").is_ok());
     }
 }

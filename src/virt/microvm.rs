@@ -1,12 +1,8 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
 /// Implements microVM sandboxing using OOP principles with traits and structs
 /// No dependency on external virtualization frameworks
 /// Based on Roadmap Item 19: MicroVM sandboxing foundation
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// MicroVM ID
@@ -98,6 +94,12 @@ pub struct MicroVMCapability {
     pub can_start: bool,
     pub can_stop: bool,
     pub can_pause: bool,
+}
+
+impl Default for MicroVMCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MicroVMCapability {
@@ -288,6 +290,12 @@ pub struct SandboxStats {
     pub by_policy: [usize; 3],
 }
 
+impl Default for SandboxStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SandboxStats {
     pub fn new() -> Self {
         SandboxStats {
@@ -314,6 +322,12 @@ pub struct ManagerCapability {
     pub can_create: bool,
     pub can_destroy: bool,
     pub can_manage: bool,
+}
+
+impl Default for ManagerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ManagerCapability {
@@ -460,19 +474,29 @@ impl SandboxManager for SimpleSandboxManager {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     fn push(&mut self, item: T) {
@@ -640,7 +664,7 @@ mod tests {
             .unwrap();
 
         // 2. Create a Permissive sandbox microVM (e.g. development mode)
-        let microvm_permissive_id = manager
+        let _microvm_permissive_id = manager
             .create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive)
             .unwrap();
 

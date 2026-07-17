@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Hypervisor for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 181
@@ -151,6 +148,12 @@ pub struct SimpleHypervisor {
     pub next_id: AtomicUsize,
 }
 
+impl Default for SimpleHypervisor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleHypervisor {
     pub fn new() -> Self {
         SimpleHypervisor {
@@ -252,8 +255,15 @@ pub trait VMExitHandler {
 }
 
 #[repr(C)]
+#[allow(clippy::type_complexity)]
 pub struct SimpleVMExitHandler {
     pub handlers: Vec<(u64, fn(GuestID, u64))>,
+}
+
+impl Default for SimpleVMExitHandler {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleVMExitHandler {
@@ -280,19 +290,28 @@ impl VMExitHandler for SimpleVMExitHandler {
     }
 }
 
-struct Vec<T> {
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
     fn push(&mut self, item: T) {
         unsafe {
@@ -499,10 +518,7 @@ mod tests {
         }
 
         // Test Hardware-assisted VMExit handler statistics
-        assert_eq!(
-            hypervisor.inject_hardware_exit(guest_modern_id).is_ok(),
-            true
-        );
+        assert!(hypervisor.inject_hardware_exit(guest_modern_id).is_ok());
         for guest_opt in &hypervisor.guests {
             if let Some(ref guest) = *guest_opt {
                 if guest.id() == guest_modern_id {

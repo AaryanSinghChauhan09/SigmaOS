@@ -8,6 +8,12 @@ pub struct LegacyKeyboard {
     power_state: PowerState,
 }
 
+impl Default for LegacyKeyboard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LegacyKeyboard {
     pub fn new() -> Self {
         Self {

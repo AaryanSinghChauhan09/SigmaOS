@@ -156,7 +156,7 @@ impl RoundRobinScheduler {
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
-            yielding || (entry.cpu_time_used % slice == 0)
+            yielding || entry.cpu_time_used.is_multiple_of(slice)
         };
 
         if needs_switch {

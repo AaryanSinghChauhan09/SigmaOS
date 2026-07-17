@@ -91,20 +91,20 @@ impl VesaDriver {
         &self.mode_info
     }
 
-    pub fn write_pixel(&self, x: u32, y: u32, color: u32) -> Result<(), VesaError> {
+    pub fn write_pixel(&self, x: u32, y: u32, _color: u32) -> Result<(), VesaError> {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
         }
 
         // Calculate pixel offset
-        let offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
+        let _offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
 
         // In production, this would write to actual framebuffer
         // For now, just validate the operation
         Ok(())
     }
 
-    pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
+    pub fn clear_screen(&self, _color: u32) -> Result<(), VesaError> {
         // Simulate screen clear
         Ok(())
     }

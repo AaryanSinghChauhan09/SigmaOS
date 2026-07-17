@@ -86,6 +86,12 @@ pub struct DeviceCapability {
     pub can_interrupt: bool,
 }
 
+impl Default for DeviceCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceCapability {
     pub fn new() -> Self {
         DeviceCapability {
@@ -290,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_modern_device_oop() {
-        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(
             modern.query_channel(),
             PortAddress::MemoryMapped(0xFE000000)
@@ -511,6 +517,12 @@ pub struct DeviceManager {
     next_device_id: AtomicUsize,
 }
 
+impl Default for DeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
@@ -613,6 +625,12 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -620,6 +638,10 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     pub fn push(&mut self, item: T) {

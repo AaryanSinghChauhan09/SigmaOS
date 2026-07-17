@@ -1,12 +1,8 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Virtualization Management CLI for SigmaOS
 /// Implements virtualization CLI using OOP principles with traits and structs
 /// No dependency on external CLI frameworks
 /// Based on Roadmap Item 18: Virtualization management CLI
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// VM ID
@@ -140,6 +136,12 @@ impl VMInfo {
 pub struct VMCapability {
     pub can_start: bool,
     pub can_stop: bool,
+}
+
+impl Default for VMCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl VMCapability {
@@ -289,6 +291,12 @@ pub struct CLIStats {
     pub running_vms: usize,
 }
 
+impl Default for CLIStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CLIStats {
     pub fn new() -> Self {
         CLIStats {
@@ -314,6 +322,12 @@ pub struct SimpleVirtualizationCLI {
 pub struct CLICapability {
     pub can_register_commands: bool,
     pub can_manage_vms: bool,
+}
+
+impl Default for CLICapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CLICapability {
@@ -455,20 +469,30 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
     }
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     fn push(&mut self, item: T) {

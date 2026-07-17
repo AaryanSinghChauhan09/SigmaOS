@@ -66,7 +66,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -199,6 +199,12 @@ impl PageFlags {
 #[repr(C)]
 pub struct PageTableEntry(u64);
 
+impl Default for PageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
@@ -230,6 +236,12 @@ impl PageTableEntry {
 #[repr(align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 512],
+}
+
+impl Default for PageTable {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PageTable {
@@ -322,7 +334,7 @@ mod tests {
         let mut allocator = BuddyAllocator::new();
         // This would need actual memory to work properly
         // For now, just test the interface
-        let result = allocator.allocate(4096);
+        let _result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
     }
 }
