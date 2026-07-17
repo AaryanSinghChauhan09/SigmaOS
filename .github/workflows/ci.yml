@@ -74,6 +74,11 @@ jobs:
     - name: Run integration tests
       run: cargo test --test '*'
     
+    - name: Initialize build directory and build binaries
+      run: |
+        mkdir -p build
+        cargo build --bins
+
     - name: Run smoke tests
       run: bash ./scripts/smoke-test.sh
 
