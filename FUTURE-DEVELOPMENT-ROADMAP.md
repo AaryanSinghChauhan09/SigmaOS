@@ -657,29 +657,37 @@ Mainstream Linux distributions suffer from deep, uncorrectable software fragment
 
 SigmaOS renders existing Linux distributions completely obsolete by serving as a secure, self-healing, deterministic **Superset OS**:
 
-### 1. Universal Package System (SigmaPkg)
+### 1. Universal Package System (SigmaPkg++)
 * **Eliminates:** APT, DNF, Pacman, Portage, and APK.
-* **Strategic Mechanism:** Utilizes Content-Addressed Storage (CAS) mapping every library or binary cleanly by its SHA-256 hash. Incorporates translation adapters directly parsing `.deb`, `.rpm`, and `.apk` formats dynamically into safe, sandboxed container environments. An AI-assisted dependency SAT solver mathematically proves resolving dependency conflicts.
+* **Strategic Mechanism:** Utilizes Content-Addressed Storage (CAS) mapping every library or binary cleanly by its SHA-256 hash. Incorporates translation adapters directly parsing `.deb`, `.rpm`, `.apk`, and `.msi` formats dynamically into safe, sandboxed container environments. An AI-assisted dependency SAT solver mathematically proves resolving dependency conflicts. Stores files as cryptographic content hashes, completely avoiding "dependency hell."
+* **SigmaHub App Store:** Universal app store utilizing cryptographically verified, flat-packed applications that completely absorb the safety and speed of Snap, Flatpak, and AUR concepts.
+* **SigmaForge Compiler:** Features AI-assisted source compilation and dynamic, optimized cross-compiling pipelines (completely absorbing and exceeding Gentoo's Portage USP).
 
-### 2. Universal Driver Supremacy
+### 2. Universal Driver Supremacy & Marketplace
 * **Eliminates:** Distro-specific hardware searching and kernel module compiles.
 * **Strategic Mechanism:** Implements a unified polymorphic object-oriented driver registry. All major peripherals are categorized into extensible OOP hierarchies. Provides compatibility wrappers directly executing native Linux and Windows driver modules in a sandboxed, micro-interpreted userspace VM. Drivers can be hot-swapped without system reboots.
+* **Unified Driver Marketplace:** A cryptographically signed, version-controlled repository serving GPU, Wi-Fi, and peripheral drivers, installable dynamically without reboots.
 
 ### 3. Unified Asynchronous Networking & Sovereign Containers
 * **Eliminates:** Heavy userspace systemd network daemons and complex networking bridges.
 * **Strategic Mechanism:** Preloads highly-optimized micro-VM orchestrators and container engines natively compatible with Docker and Kubernetes specifications, managed by dynamic lock-free kernel message channels.
+* **Self-Healing Networking:** Automated, kernel-level recovery mechanisms monitoring and automatically repair routing table gaps, broken VPN tunnels, and firewall misconfigurations dynamically.
 
 ### 4. Zero-Trust Security & Post-Quantum Cryptography
 * **Eliminates:** Fragmented SELinux policies and unverified package executions.
 * **Strategic Mechanism:** A true Zero-Trust microkernel where access is granted strictly through cryptographically signed capability tokens. All binary and driver loads require Dilithium-5 code signatures. Communications use Kyber-1024 Noise handshakes out-of-the-box.
+* **Compliance Dashboards:** Built-in compliance mapping inside the unified dashboard, continuously displaying the system's real-time security postures against ISO 27001, NIST, GDPR, HIPAA, and SOC2 benchmarks.
 
 ### 5. AI-Native Workload Scheduling & Performance
 * **Eliminates:** Generic POSIX schedulers causing thread lock-ups under heavy loads.
 * **Strategic Mechanism:** An intelligent Scheduler analyzing CPU/GPU core temperatures and memory bandwidth using real-time telemetry inputs to dynamically scale workloads. Bypasses POSIX lock contention with lock-free atomic queues.
+* **Predictive Optimization Engine:** Utilizes low-level, zero-allocation runtime profiling to dynamically re-order scheduler prioritizations and predict thread bottlenecks prior to execution lockups.
 
-### 6. Beautiful Zenith visual Core & Deep Accessibility
+### 6. Beautiful Zenith visual Core & Deep Accessibility (SigmaShell)
 * **Eliminates:** Wayland, X11, and heavy userspace accessibility services.
 * **Strategic Mechanism:** The Zenith compositor communicates directly with bare-metal display frames, using SIMD blitting to render responsive interfaces. Incorporates low-level screen readers and adaptive contrast shaders within the core compositor thread.
+* **SigmaWorkspaces:** Unified virtual desktops and productivity overlay panels, absorbing GNOME and KDE Plasma visual flexibility but governed under a single resource footprint.
+* **SigmaPlay Gaming Hub:** Features fully containerized graphics runtimes, low-overhead GPU passthrough layers, and Steam/Proton compatibility.
 
 ---
 
@@ -691,6 +699,20 @@ SigmaOS renders existing Linux distributions completely obsolete by serving as a
 | **Mid-Term** | 6–18 Months | Port high-performance GPU/Wi-Fi drivers; Full container sandboxing in SovereignVMM; Mature SigmaFS Merkle rollbacks. | Delivers standard workspace usability on developer laptops and cloud servers with built-in instant recoverability. |
 | **Long-Term** | 18–36 Months | Windows/macOS ABI binary compatibility layers; Complete Zenith visual shell; Enterprise GDPR/ISO regulatory dashboards. | Displaces standard Linux distros in corporate data centers and financial institutions through zero-trust compliance. |
 | **Future** | 36+ Months | Autonomous self-healing AI-driven kernel schedulers; Edge/IoT quantum handshake adapters; Global hardware partnerships. | Establishes SigmaOS as the dominant next-generation operating system paradigm across all platforms. |
+
+---
+
+## 📅 WHAT'S PLANNED BUT NOT YET IMPLEMENTED
+
+To ensure complete developmental visibility, the following lists maintain tracing of planned but siloed branch integrations:
+* **Core Kernel:** NUMA-aware scheduling, hugepage allocations, and advanced kernel tracing tools.
+* **Device Drivers:** Multi-OS driver compatibility wrappers, native USB printer/scanner support, and live hot-swap updates.
+* **Networking Subsystem:** Complete IPv6 configurations, high-speed VPN protocols, and stateful firewall subsystems.
+* **Filesystem & Storage:** Support for simultaneously mounting XFS, Btrfs, and ZFS, along with distributed network FS mapping.
+* **Virtualization Layer:** KVM/QEMU hypervisor integrations, native SigmaContainers, and lightweight micro-VMs.
+* **Security & Audits:** Integrated SELinux/AppArmor-style policy templates, mandatory cryptographic driver signing, and compliance dashboard metrics.
+* **Performance Optimizations:** GPU co-scheduling pathways, dynamic workload cache profiling, and HPC cluster optimizations.
+* **Ecosystem Growth:** Unified contributor guides, multi-target CI/CD templates, and live repository dashboard sync engines.
 
 ---
 
