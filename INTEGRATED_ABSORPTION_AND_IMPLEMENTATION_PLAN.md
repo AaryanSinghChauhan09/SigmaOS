@@ -534,3 +534,81 @@ To instantly unlock the entire Linux application catalog:
 To transform the Zenith compositor into a consumer-ready desktop:
 1.  **Unified Input Method Framework (IMF):** Build a modular input pipeline supporting complex script rendering (CJK, Arabic) and gestural touchscreen mappings.
 2.  **Zero-Allocation Text-to-Speech Engine:** Integrate a lightweight, low-footprint text-to-speech reader directly into the accessibility system, queuing audio buffers directly through the AC97/Intel-HDA sound driver pipelines without blocking compositor thread frames.
+
+---
+
+## Part 12: Advanced OOP-Based Driver Specifications & Core Class Hierarchies
+
+To solidify our custom operating system capabilities, SigmaOS establishes strict Object-Oriented Programming (OOP) specifications and class design paradigms for expanding hardware compatibility. Below is the architectural design for four supplementary device drivers conforming perfectly to the polymorphic `PeripheralDevice` trait.
+
+### 1. `PS2MouseDriver` (Legacy Generation - Input Family)
+
+*   **OOP Class Classification:** Legacy Hardware Adapter / Interactive Input subclass.
+*   **State Management Fields:**
+    *   `port`: `u16` — Data port register (simulating `0x60`).
+    *   `command_register`: `u16` — Command register (simulating `0x64`).
+    *   `current_x`: `i32` — Monotonically accumulated X cursor position.
+    *   `current_y`: `i32` — Monotonically accumulated Y cursor position.
+    *   `button_states`: `u8` — Packed bitmask for Left/Right/Middle clicks.
+    *   `power_state`: `PowerState` — Current power routing mapping.
+*   **Polymorphic Trait Method Designations:**
+    *   `name(&self)` -> returns `"PS2MouseDriver"`.
+    *   `generation(&self)` -> returns `DeviceGeneration::Legacy`.
+    *   `initialize(&mut self)` -> Resets mouse controller state, transmits PS/2 auto-negotiate sequences, and prepares internal coordinate maps.
+    *   `read(&mut self, buffer)` -> Decodes the 3-byte hardware packet format (Byte 1: button flags, Byte 2: Delta-X delta, Byte 3: Delta-Y delta) and copies coordinates into user buffer.
+    *   `write(&mut self, data)` -> Simulates transmitting command bytes directly to the keyboard auxiliary interface (`0x64`).
+    *   `set_power_state(&mut self, state)` -> Transitions hardware modes; disables PS/2 interrupts during sleep nodes.
+
+### 2. `AmdRadeonGpuDriver` (Modern Generation - Video Family)
+
+*   **OOP Class Classification:** PCIe Bus Master / Graphic Display controller.
+*   **State Management Fields:**
+    *   `bar_address`: `u64` — PCI Memory-Mapped I/O (MMIO) base pointer address.
+    *   `vram_size`: `u64` — Available Video RAM capacity (simulating 8GB VRAM allocation).
+    *   `frame_buffer`: `Vec<u32>` — Simulated double-buffered rendering target.
+    *   `active_pipelines`: `u32` — Number of enabled compute pipelines.
+    *   `tdp_limit`: `u32` — Power thresholds.
+    *   `power_state`: `PowerState` — Operational power mode.
+*   **Polymorphic Trait Method Designations:**
+    *   `name(&self)` -> returns `"AmdRadeonGpuDriver"`.
+    *   `generation(&self)` -> returns `DeviceGeneration::Modern`.
+    *   `initialize(&mut self)` -> Map PCI BAR lanes, initialize DMA ring rings for asynchronous draw calls, and register display channels.
+    *   `read(&mut self, buffer)` -> Retrieves graphic frame-buffer status metrics or performance counters.
+    *   `write(&mut self, data)` -> Executes asynchronous draw commands. Takes standard draw buffers, parses rendering arrays, and translates them into VRAM buffer frames.
+    *   `set_power_state(&mut self, state)` -> Maps low-power ACPI states; dynamically reduces clock frequencies during Sleep configurations.
+
+### 3. `IntelProEthernetDriver` (Modern Generation - Network Family)
+
+*   **OOP Class Classification:** PCIe Bus Master / Packet Transceiver controller.
+*   **State Management Fields:**
+    *   `mac_address`: `[u8; 6]` — Station MAC address (Unique hardware ID).
+    *   `tx_ring_head`: `usize` — Transmit ring-buffer index.
+    *   `rx_ring_head`: `usize` — Receive ring-buffer index.
+    *   `tx_packets`: `Vec<Vec<u8>>` — Transmit packet queuing buffer.
+    *   `rx_packets`: `Vec<Vec<u8>>` — Receive packet queuing buffer.
+    *   `link_speed`: `u32` — Network throughput (simulating 1000Mbps / Gigabit).
+    *   `power_state`: `PowerState` — Current device state.
+*   **Polymorphic Trait Method Designations:**
+    *   `name(&self)` -> returns `"IntelProEthernetDriver"`.
+    *   `generation(&self)` -> returns `DeviceGeneration::Modern`.
+    *   `initialize(&mut self)` -> Configures hardware registers, establishes transmission rings, and initializes target MAC addresses.
+    *   `read(&mut self, buffer)` -> Pops a network frame from the `rx_packets` queue and copies it into the input slice buffer.
+    *   `write(&mut self, data)` -> Encapsulates data payload into a raw Ethernet packet and appends it to the transmission queue buffer.
+    *   `set_power_state(&mut self, state)` -> Toggles Wake-on-LAN (WoL) listening matrices on high-power/sleep transitions.
+
+### 4. `BroadcomBluetoothDriver` (Modern Generation - Wireless Family)
+
+*   **OOP Class Classification:** USB/UART Interface / Short-Range Wireless Transceiver.
+*   **State Management Fields:**
+    *   `chipset_id`: `u32` — Hardware revision number.
+    *   `bonded_devices`: `Vec<[u8; 6]>` — List of stored paired hardware MACs.
+    *   `is_scanning`: `bool` — Active discovery flag.
+    *   `pairing_key`: `u32` — Simulated security pairing code.
+    *   `power_state`: `PowerState` — Device mode state.
+*   **Polymorphic Trait Method Designations:**
+    *   `name(&self)` -> returns `"BroadcomBluetoothDriver"`.
+    *   `generation(&self)` -> returns `DeviceGeneration::Modern`.
+    *   `initialize(&mut self)` -> Bootstraps transceiver clocks, loads Broadcom firmware patch blocks, and starts UART bus communications.
+    *   `read(&mut self, buffer)` -> Receives RFCOMM stream segments or HCI device connection telemetry packets.
+    *   `write(&mut self, data)` -> Submits standard HCI command packets to initiate scanning, pairing, or device discovery.
+    *   `set_power_state(&mut self, state)` -> Disables internal radio transmitters (Airplane mode mapping) during Sleep configurations to conserve battery.
