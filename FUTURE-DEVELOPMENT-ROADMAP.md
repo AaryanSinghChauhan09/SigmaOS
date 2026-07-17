@@ -1,6 +1,6 @@
 # 🗺️ SigmaOS Unified Future Development Roadmap & Universal Device Compatibility Strategy
 
-This document outlines the unified strategic roadmap, branch consolidation plan, multi-distro analysis, and architectural plans to ensure **SigmaOS** remains backwards-compatible with ancient hardware while fully integrating modern and future standards via a highly disciplined, OOP-based driver model and universal software/hardware compatibility layers.
+This document outlines the master technical roadmap, branch consolidation plan, multi-distro analysis, and architectural plans to ensure **SigmaOS** achieves complete feature-parity and benchmark dominance over monolithic Linux distributions.
 
 ---
 
@@ -126,9 +126,62 @@ Instead of creating another isolated packaging standard, SigmaOS's native `Unive
 
 ---
 
-## 🏁 7. Multi-Phase Distro & Compatibility Parity Roadmap
+## 🚀 7. Step-by-Step Feature-Parity Master Plan
 
-The following stepwise milestones establish the concrete implementation roadmap for the SigmaOS kernel, software/hardware compatibility, and driver subsystems.
+To achieve absolute superiority over legacy Linux distributions and build-to-suit compatibility, SigmaOS executes the following step-by-step master plan.
+
+### 📅 Step 1: Core Subsystem Stabilization & NUMA Hardening
+*   **Actions**:
+    - Fully merge the EEVDF task scheduler and the checked Buddy Allocator into the core microkernel branch (`main-dev`).
+    - Implement NUMA-aware multi-core page directory mappings and add hugepage support to minimize TLB context-switching latency.
+    - Conduct continuous thread-stress testing to guarantee zero deadlock or race conditions on the safe IPC bus.
+*   **Deliverables**: A rock-solid, compilable microkernel foundation capable of running asynchronous hardware shards.
+
+### 🔌 Step 2: Dynamic Driver Registry & S-UDA Sandboxing
+*   **Actions**:
+    - Consolidate legacy driver shards into the centralized `SimpleDriverFramework` OOP registry.
+    - Implement an event-driven plug-and-play prober that automatically instantiates correct driver objects when PCI/USB peripherals are connected.
+    - Sandbox legacy driver binaries inside restricted userland Ring 3 pages via our `S-UDA` adapter layer, shielding the core microkernel from driver panics.
+*   **Deliverables**: Dynamic, crash-resistant device driver model that supports third-party binary driver loading safely.
+
+### 🌐 Step 3: Networking Expansion & Custom TCP/UDP
+*   **Actions**:
+    - Stabilize the Ethernet (E1000/RTL8139) adapters and merge our safe custom TCP/UDP network stack (`TcpStack`).
+    - Expand networking protocols with native IPv6 routing and wireless (WiFi) hardware adapters.
+    - Deploy container networking routing tables directly integrated into the security Shard.
+*   **Deliverables**: Secure, high-throughput, and allocation-free network routing layer.
+
+### 💾 Step 4: Filesystem Snapshots & Transaction Rollbacks
+*   **Actions**:
+    - Merge FAT32, Ext4, and our native `SigmaFS` filesystem prototypes under the core `VirtualFilesystem` VFS layer.
+    - Implement zero-copy file buffer read/writes and checked arithmetic overflow checks.
+    - Author the snapshotting module inside the VFS, enabling atomic generation-level directory rollbacks and CAS-backed storage state recovery.
+*   **Deliverables**: A crash-consistent, snapshotting, and transaction-backed storage layer.
+
+### 📦 Step 5: `sigpkg` Packaging Adapters & Package Unification
+*   **Actions**:
+    - Establish `sigpkg` package manager adapters supporting `.deb` and `.rpm` archive format parsing.
+    - Employ mathematically proven `SatSolver` and `CAS` verification models to prevent dependency conflicts during rolling updates.
+    - Mandate secure post-quantum cryptographic signatures (`Kyber-1024` and `Dilithium-5`) on all compiled package recipes.
+*   **Deliverables**: Secure, conflict-free package manager capable of importing legacy Linux packages.
+
+### 🔒 Step 6: Native Software Compatibility & Translation (S-WINE / S-LinuX)
+*   **Actions**:
+    - Construct `S-WINE`'s Portable Executable (PE) loader, mapping binary sections into secure Ring 3 pages and translating Win32 APIs on-the-fly.
+    - Construct `S-LinuX`'s syscall translator, intercepting standard Linux POSIX syscall numbers and mapping them to microkernel capability messages.
+    - Test execution of compiled Linux ELF and Windows EXE binaries natively with minimal performance overhead.
+*   **Deliverables**: Zero-VM application execution compatibility with Windows and Linux.
+
+### 🇮🇳 Step 7: Sovereign India Stack Core Integration
+*   **Actions**:
+    - Implement NPCI UPI secure payment IPC capability gates.
+    - Integrate localized GST and tax calculation daemons directly into system routines.
+    - Support multilingual rendering (22 official Indian languages) and secure post-quantum Aadhaar identity verification gates.
+*   **Deliverables**: Fully localized, Indian sovereign compliance core.
+
+---
+
+## 🏁 8. Step-by-Step Distro & Compatibility Parity Timeline
 
 | Phase | Milestone / Focus | Deliverables & Absorption Target |
 | :--- | :--- | :--- |
@@ -136,12 +189,3 @@ The following stepwise milestones establish the concrete implementation roadmap 
 | **Mid-Term** <br>*(6–18 months)* | **Driver Expansion & Containers** | - Expand GPU (Intel, AMD, NVIDIA stubs) and WiFi driver support.<br>- Deploy the `SigmaContainers` WASM container engine and KVM hypervisor micro-VMs.<br>- Implement VFS snapshotting and atomic transaction-level rollbacks. |
 | **Long-Term** <br>*(18–36 months)* | **Application & OS Compatibility** | - Deploy `S-WINE` PE loading and API translation for native Windows software execution.<br>- Deploy `S-LinuX` syscall translation and POSIX ABI emulation.<br>- Build out the full Zenith desktop shell.<br>- Integrate secure compliance dashboards (GDPR, HIPAA). |
 | **Future** <br>*(36+ months)* | **AI-Native & Sovereign Dominance** | - Deploy AI-driven driver optimization and scheduling (`AiOptimizer`).<br>- Integrate hardware quantum hooks and secure edge IoT adapters.<br>- Establish hardware-vendor partnerships and massive enterprise deployment footprints. |
-
----
-
-## ⚡ Immediate Actionable Next Actions
-
-1.  **Create the `main-dev` Branch**: Establish a unified development branch to merge isolated, stable subsystem commits incrementally.
-2.  **Prioritize GPU & WiFi Drivers**: Harden display compositing (Zenith, direct-drawing) and wireless network layers to ensure daily-driver compatibility.
-3.  **Launch the `sigpkg` Packaging Adapters**: Deploy initial `.deb`/`.rpm` translation adapters to ensure access to established software repositories from day one.
-4.  **Establish Robust CI/CD Pipelines**: Enforce automated cargo testing and static analysis via GitHub Actions to maintain absolute workspace and compilation integrity across all merges.
