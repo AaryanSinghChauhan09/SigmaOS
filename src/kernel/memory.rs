@@ -96,13 +96,14 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        let mut order = 0;
-        let mut size = 1;
-        while size < pages {
-            size *= 2;
-            order += 1;
+        // High-performance branchless bitwise calculation replacing the O(N) loop.
+        // It computes ceil(log2(pages)) using hardware-accelerated leading/trailing zero instructions.
+        if pages <= 1 {
+            0
+        } else {
+            let next_power = pages.next_power_of_two();
+            next_power.trailing_zeros() as usize
         }
-        order
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
@@ -314,10 +315,20 @@ mod tests {
 
     #[test]
     fn test_allocate_deallocate() {
-        let mut allocator = BuddyAllocator::new();
-        // This would need actual memory to work properly
-        // For now, just test the interface
-        let result = allocator.allocate(4096);
-        // Will fail without actual memory, but tests the flow
+        // Initialize the allocator with a valid 4KB page region (1 page)
+        let mut allocator = BuddyAllocator::with_memory(0x1000, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
+
+        // Perform a real allocation
+        let block = allocator.allocate(4096);
+        assert!(block.is_some());
+        let block = block.unwrap();
+        assert_eq!(block.addr.as_ptr() as usize, 0x1000);
+        assert_eq!(block.size, 4096);
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Deallocate and verify state restoration
+        allocator.deallocate(block);
+        assert_eq!(allocator.get_free_memory(), 4096);
     }
 }
