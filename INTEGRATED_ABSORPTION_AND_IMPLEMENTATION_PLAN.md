@@ -122,7 +122,7 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
   - **Unified Security Driver Selection:** From `linux-driver-management`, absorb dynamic vendor/device ID mapping and signed-checksum matching to prevent driver-spoofing vectors.
 * **Pathway in SigmaOS:** Implement in `src/security/`, `src/network/`, and `src/net/`.
 
-### Domain 6: Desktop Environments, Compositors, & Window Managers
+### Domain 6: Desktop Environments, Window Compositors, & UI Delight
 * **Target Repositories:**
   - **Desktop Shells:** `GNOME/gnome-shell`, `KDE/plasma-desktop`
   - **Lightweight Panels:** `xfce/xfce4-panel`, `lxde/lxde-common`, `mate-desktop/mate-panel`
@@ -287,10 +287,68 @@ To future-proof the SigmaOS driver subsystem, we establish a robust framework of
 
 ---
 
-## Part 6: Long-Term Driver Roadmap
+## Part 6: Mainstream Distro Parity & Sovereign Innovations Action Plan
+
+To establish SigmaOS as the premier sovereign choice for enterprise, developers, and desktop professionals, we outline an extensive action plan closing parity gaps with mainstream distributions (Ubuntu, Fedora, Arch) while highlighting sovereign, AI-native, OOP-driven differentiator features.
+
+### 🏗️ 1. Sovereign Kernel & Plug-and-Play Driver Registry
+*   **Polymorphic base driver contracts:** Abstract classes (`DeviceDriver`, `NetworkDriver`, `GPUDriver`) govern hardware interfaces.
+*   **Instant Plug-and-Play auto-instantiation:** Connect a USB, PCIe, or network peripheral to immediately trigger the `PeripheralManager::register_device` event, launching its sandboxed process.
+*   **Legacy Adaptive Driver Wrappers:** Translate foreign Linux and Windows binary blob driver calls into standard SigmaOS capabilities.
+*   **OEM Partnerships:** Standardize device-driver signing keys directly inside FIPS-204 audited security vaults.
+
+### 📦 2. sigmapkg: Unified Sovereign Package Manager
+*   **The .spkg File Format:** Standardized metadata package schema with cryptographically verified manifest hash trees.
+*   **Foreign Format Adapters:** On-the-fly package translation adapters for `.deb`, `.rpm`, `.apk`, and `.msi` inputs, automatically wrapping them in `sigmapkg` sandboxes.
+*   **Self-Healing Rollback Snapshots:** System installations automatically trigger a 1-millisecond Merkle-tree state backup of system config maps. If a package install crashes or breaks dependencies, the system does an atomic rollback.
+*   **AI-Assisted Conversion Pipeline:** Auto-generate completely parsed `.spkg` recipes and sandboxing rules directly from raw makefiles or source URLs.
+
+### 🌐 3. Zero-Trust Networking & Virtualization
+*   **Advanced Container Networking:** Out-of-the-box support for cgroups, network namespaces, and bridge routing tables.
+*   **SigmaContainers:** Lightweight, post-quantum encrypted container sandboxes fully compatible with Docker OCI and Kubernetes Pod specifications.
+*   **SigmaCloud Orchestration:** Distributed clustered memory nodes governed by Capability-based authorization schemes, fully replacing vulnerable POSIX-centric SSH keys.
+
+### 🔒 4. Enterprise Security Compliance & Zero-Trust
+*   **Mandatory Driver Signature Verification:** Only drivers cryptographically signed by authorized sovereign keys can execute MMIO commands.
+*   **Built-in Compliance Dashboards:** Native OS telemetry maps kernel events, system audit trails, and data flows to ISO 27001, GDPR, HIPAA, and SOC2 compliance rule matrices in real-time.
+*   **Zero-Trust Shard Permissions:** No process runs with full access. Subsystems require explicit CapabilityTokens delegated for brief, audited durations.
+
+### ⚡ 5. Stability & High-Performance Optimizations
+*   **Fault-Tolerant Watchdogs:** Failed system processes, filesystem handlers, or device drivers invoke polymorphic self-healing handlers to automatically hot-swap failed threads in < 1ms.
+*   **AI-Driven Predictive Scheduler:** Telemetry loops auto-optimize scheduling ticks (CFS/EDF) based on historical application behaviors.
+*   **NUMA-Aware Memory Mapping:** Support hugepages and lock-free Read-Copy-Update (RCU) arrays inside the buddy memory managers to maximize enterprise scale.
+
+### 🎨 6. Gestural UI/UX & Accessible Desktops
+*   **SigmaShell Desktop Shell:** A modern gestural desktop layout featuring customizable telemetry widgets.
+*   **Accessibility Suite:** Zero-allocation assistive tech screen readers, dyslexia-friendly font face mappings, and gestural touch-first support.
+*   **Unified Productivity Pane:** Consolidated dashboard presenting real-time performance metrics, compliance charts, and gamified productivity targets.
+*   **Internationalization Support:** Native CLI and GUI locale translations covering 22 official languages.
+
+---
+
+## Part 7: 36-Month Development Phases & Long-Term Roadmap
 
 ```text
-  [Short-Term: Months 1-3]   --> OOP Driver Registry, Lazy Loading, & Plug-and-Play Detection
-  [Mid-Term: Months 3-6]     --> Adaptive Linux Wrappers, User-space Sandboxing, & Hot-Swap Support
-  [Long-Term: Months 6-12]   --> Self-Healing Watchdogs, AI Driver Matching, & Quantum IoT Hooks
+       PHASE 1 [0-6 Months]: Stabilize Core Kernel + sigmapkg .deb/.rpm Adapters + CI/CD
+                              |
+                              v
+       PHASE 2 [6-18 Months]: Expand GPU/WiFi Drivers + SigmaContainers + Compliance Dashboards
+                              |
+                              v
+       PHASE 3 [18-36 Months]: Windows/macOS Compat Shims + SigmaCloud + SigmaShell Desktop
+                              |
+                              v
+       PHASE 4 [36+ Months]: AI-Native Kernel Shards + IoT Hooks + Universal Publishing Hub
 ```
+
+### Phase 1: Foundation & Package Parity (Months 0–6)
+*   **Milestones:** Stabilize EEVDF/EDF scheduling and the Buddy Memory manager. Deliver sigmapkg core features with functional adapters for `.deb` and `.rpm` files. Set up robust, auto-formatting CI/CD build verifications.
+
+### Phase 2: Driver Diversity & Container Runtime (Months 6–18)
+*   **Milestones:** Implement high-performance, sandboxed GPU and WiFi drivers. Deliver early versions of `SigmaContainers` and the local developers studio. Connect HIPAA and GDPR regulatory reporting models to the OS audit logs.
+
+### Phase 3: Enterprise Integration & Desktop Composite (Months 18–36)
+*   **Milestones:** Launch the completed gestural touch-first `SigmaShell` desktop environment. Deliver Windows/macOS ABI translation wrappers to execute legacy office/productivity packages.
+
+### Phase 4: AI-Native Sovereign Ecosystem (Months 36+)
+*   **Milestones:** AI telemetry routines auto-tune CPU clock speeds and driver scheduler bounds at runtime. Open the Universal Publishing Hub to easily compile and publish `.spkg` targets onto standard packaging channels.
