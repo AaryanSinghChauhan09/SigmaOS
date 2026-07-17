@@ -26,11 +26,14 @@ Any autonomous AI agent or engineer can use this guide to instantly diagnose, re
    - `src/sigpkg/resolver.rs` (DPLL SAT Solver)
 5. [Virtual Filesystem (VFS)](#5-virtual-filesystem-vfs)
    - `src/filesystem/vfs.rs` (Capability-Gated VFS)
-6. [🔧 Core Subsystems Needing Immediate Improvement](#6-core-subsystems-needing-immediate-improvement)
-7. [🚀 Future Applications for SigmaOS (Superset OS Core)](#7-future-applications-for-sigmaos-superset-os-core)
-8. [🔍 Absorbing Competitors' USP (The Irrelevance Matrix)](#8-absorbing-competitors-usp-the-irrelevance-matrix)
-9. [📊 Subsystem Implementation Backlog](#9-subsystem-implementation-backlog)
-10. [⚡ Immediate Next Actions for AI Agents](#10-immediate-next-actions-for-ai-agents)
+6. [🔍 Branch & Pull Request Analysis](#6-branch--pull-request-analysis)
+7. [🚀 Future Development Roadmap](#7-future-development-roadmap)
+8. [📊 Competitive Benchmarking (Linux/BSD vs SigmaOS)](#8-competitive-benchmarking-linuxbsd-vs-sigmaos)
+9. [🔧 Core Subsystems Needing Immediate Improvement](#9-core-subsystems-needing-immediate-improvement)
+10. [🚀 Future Applications for SigmaOS (Superset OS Core)](#10-future-applications-for-sigmaos-superset-os-core)
+11. [🔍 Absorbing Competitors' USP (The Irrelevance Matrix)](#11-absorbing-competitors-usp-the-irrelevance-matrix)
+12. [📊 Subsystem Implementation Backlog](#12-subsystem-implementation-backlog)
+13. [⚡ Immediate Next Actions for AI Agents](#13-immediate-next-actions-for-ai-agents)
 
 ---
 
@@ -348,7 +351,70 @@ All old and new networking technologies have been fully refactored, modernized, 
 
 ---
 
-## 6. 🔧 Core Subsystems Needing Immediate Improvement
+## 6. 🔍 Branch & Pull Request Analysis
+
+An audit of the SigmaOS repositories and branches shows the following architectural footprint:
+- **Kernel branches:** Working scheduler, memory allocator, and IPC prototypes, waiting for production unification.
+- **Driver branches:** Raw hardware storage, basic USB stack, and initial Ext4/FAT32 driver implementations.
+- **Networking branches:** Passive TCP/UDP state machine tracking.
+- **Filesystem branches:** Conceptual `SigmaFS` log-structured prototype.
+- **Virtualization branches:** Isolated WebAssembly (`WASM`) userspace sandbox runner experiments.
+- **Security branches:** Experimental post-quantum cryptography (Kyber-1024 / Dilithium-5) primitives.
+- **Docs branches:** Scattered design notes, manuals, and standard Readme docs.
+
+**The Integration Gap:** Pull requests show highly functional incremental subsystems but lack consolidation into a single `main-dev` staging branch. Many features are planned but remain unmerged, such as GPU/WiFi drivers, full IPv6 packet processing, transactional FS rollback hooks, and enterprise security compliance dashboards.
+
+---
+
+## 7. 🚀 Future Development Roadmap
+
+### 📦 Phase 1 — Foundation (Next 3–6 months)
+*   **Kernel Core:** Merge experimental scheduler and memory allocator prototypes into a unified `main-dev` branch. Add NUMA‑aware thread scheduling and hugepage virtual memory backing.
+*   **Drivers:** Prioritize multi-architecture GPU and WiFi chipset drivers. Deploy a unified driver registration framework with hot‑swap driver reload.
+*   **Networking:** Fully complete the TCP/UDP state engine; add native IPv6 and capability-based firewall filtering.
+*   **Documentation:** Fully expand the GitHub Wiki with architectural guides, contribution rules, and visual roadmap tables.
+*   **CI/CD Pipeline:** Enforce automatic workspace builds, Clippy warning checks (`-D warnings`), and regression testing suites.
+
+### 📦 Phase 2 — Superset Expansion (6–12 months)
+*   **Filesystem Federation:** Integrate read/write translation layers for ZFS, Btrfs, APFS, and NTFS. Deploy atomic filesystem snapshots and rollbacks.
+*   **Virtualization:** Integrate kernel KVM/QEMU APIs. Launch `SigmaContainers` (OCI-compliant Docker/K8s equivalent) and hyper-secure sandboxing micro‑VMs.
+*   **Security:** Enforce cryptographic mandatory signing on all package formats. Bake AppArmor/SELinux-grade MAC policies into capability tokens.
+*   **Performance:** Enable multi-GPU co-scheduling, energy‑aware task placement, and high-performance computing (HPC) memory pools.
+*   **sigmapkg Manager:** Formally release the universal packaging tool with adapters to natively ingest and extract `.deb`, `.rpm`, `.apk`, and `.msi` payloads.
+
+### 📦 Phase 3 — Differentiation (12–18 months)
+*   **SigmaShell:** Build the modular, accessible GUI desktop workspace featuring interactive widget-based dashboards.
+*   **SigmaWorkspaces:** Create a unified virtual desktop ecosystem with secure multi-tenant productivity overlays.
+*   **SigmaPlay:** Deploy a containerized gaming run-time utilizing hardware GPU passthrough and seamless Steam/Proton compatibility.
+*   **SigmaCloud:** Implement a native microkernel clustering layer for high-availability cloud cluster orchestration.
+*   **SigmaEdge:** Package the lightweight IoT and embedded distribution profile featuring Alpine-grade fast boots.
+*   **SigmaGuardian:** Deploy visual enterprise compliance and audit dashboards tracking ISO, GDPR, HIPAA, and SOC2 policy gates.
+
+### 📦 Phase 4 — Supremacy (18–24 months)
+*   **SigmaBridge Layer:** Deploy a high-speed cross-platform compatibility runtime capable of executing unmodified Linux, BSD, Windows PE, and macOS Mach-O binaries.
+*   **SigmaAI Modules:** Inject native AI-guided kernel modules to perform predictive workload profiling, thermal optimization, and autonomic performance adjustments.
+*   **Self-Healing OS Core:** Link filesystem Merkle proofs directly with VFS write filters to perform instant, self-healing rollbacks on anomalous behavior detection.
+*   **SigmaAnalytics:** Export real-time telemetry, trace logging, and compliance auditing interfaces designed for global enterprises.
+
+---
+
+## 8. 📊 Competitive Benchmarking (Linux/BSD vs SigmaOS)
+
+| Core Dimension | Linux Distributions | BSD Operating Systems | SigmaOS (Planned Specs) |
+| :--- | :--- | :--- | :--- |
+| **Driver Architecture** | Broad hardware support, monolithic and fragmented. | Stable, heavily vetted, but limited hardware support. | **Sovereign Driver Registry:** User-space drivers executing with hardware capabilities and hot-swappable updates. |
+| **Networking Stack** | Highly optimized, container-ready, complex. | Historically famous, robust, but conservative TCP/IP stack. | **SigmaNet:** Native zero-trust, self-healing, post-quantum cryptosystems, and multi-threaded policy engine. |
+| **Filesystems** | Ext4, Btrfs, and third-party ZFS integration. | Native enterprise ZFS and UFS. | **SigmaFS + Federation:** Built-in copy-on-write snapshots, sub-millisecond rollback, and ZFS/APFS translation. |
+| **Virtualization** | KVM, Docker, LXC namespaces. | Jails, bhyve, virtual machines. | **SigmaContainers:** Multi-tenant OCI-compliant namespaces + micro-VM sandboxes + native WASM runtimes. |
+| **Security Defaults** | Optional SELinux/AppArmor, vulnerable root ACLs. | Trusted, secure-by-default, but legacy security templates. | **Enforced Security:** Mandatory package/driver signing + post-quantum crypto keys + native compliance dashboards. |
+| **Performance Tuning** | Heavy manual tuning required for specific workloads. | Consistent and conservative performance curves. | **Autonomic Tuning:** Native local AI modules performing predictive task scheduling and co-scheduling optimizations. |
+| **Package Management** | Divided into APT, DNF, Pacman formats. | Source-based ports tree and binary packages. | **sigmapkg System:** Content-addressed storage (CAS), rollback support, and universal adapters for `.deb`/`.rpm`/`.msi`. |
+| **User Experience (UX)** | High desktop environment fragmentation. | Minimal, command-line focused default environments. | **SigmaShell:** Fully unified, highly accessible, widget-based dashboard desktop workspace. |
+| **Cloud & Edge/IoT** | Managed Kubernetes clusters, Alpine containers. | Conservative network appliances and firewalls. | **SigmaCloud & SigmaEdge:** Native clustering layers, ultra-lightweight embedded profiles with sub-30MB footprints. |
+
+---
+
+## 9. 🔧 Core Subsystems Needing Immediate Improvement
 
 To match industrial standards, the existing prototypes must be enhanced as follows:
 
@@ -387,7 +453,7 @@ To match industrial standards, the existing prototypes must be enhanced as follo
 
 ---
 
-## 7. 🚀 Future Applications for SigmaOS (Superset OS Core)
+## 10. 🚀 Future Applications for SigmaOS (Superset OS Core)
 
 To establish SigmaOS as the dominant global microkernel, the following application suite must be built natively on top of the capability bus:
 
@@ -403,7 +469,7 @@ To establish SigmaOS as the dominant global microkernel, the following applicati
 
 ---
 
-## 8. 🔍 Absorbing Competitors' USP (The Irrelevance Matrix)
+## 11. 🔍 Absorbing Competitors' USP (The Irrelevance Matrix)
 
 | Competitor / OS | Core Unique Selling Proposition (USP) | SigmaOS Domination / Superset Strategy |
 | :--- | :--- | :--- |
@@ -418,7 +484,7 @@ To establish SigmaOS as the dominant global microkernel, the following applicati
 
 ---
 
-## 9. 📊 Subsystem Implementation Backlog
+## 12. 📊 Subsystem Implementation Backlog
 
 To execute the master plan, the following planned subsystems must be incrementally developed:
 
@@ -433,7 +499,7 @@ To execute the master plan, the following planned subsystems must be incremental
 
 ---
 
-## 10. ⚡ Immediate Next Actions for AI Agents
+## 13. ⚡ Immediate Next Actions for AI Agents
 
 1. **Deploy the `main-dev` branch:** Merge and integrate verified subsystems into a unified, stable staging branch.
 2. **Prioritize Core Drivers:** Flesh out the missing GPU framebuffer and network adapters to make the kernel fully bootable with a graphic UI.
