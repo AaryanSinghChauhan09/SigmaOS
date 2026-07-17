@@ -49,90 +49,116 @@ To establish undisputed market leadership, SigmaOS introduces 11 core applicatio
     *   Integrated, AI-native Accessibility Suite (dynamic screen readers, contrast optimizers, voice navigation).
     *   Unified, vector-based design language that dynamically adjusts scale and resolution.
 
-### 2.2 📦 SigmaHub
-*   **Description**: The sovereign universal package and distribution platform.
+### 2.2 🎛️ SigmaOrchestrator
+*   **Description**: A unified automation hub merging traditional scheduling paradigms into one cohesive kernel-level model.
 *   **Key Features**:
-    *   Publishes native `.spkg` packages directly to the decentralized S-FS.
-    *   Automated cross-compilation and exporting pipeline targeting `.deb`, `.rpm`, `.apk`, and `.msi` formats.
-    *   Cryptographically verified peer-to-peer distribution network.
+    *   Combines cron jobs, systemd timers, and Kubernetes-style distributed scheduling into one adaptive system scheduler.
+    *   Dynamic resource allocation in the S-SCHED shard according to workload profiling and network health.
+    *   P2P work stealing among clustered nodes running the SigmaCloud layer.
 
-### 2.3 ☁️ SigmaCloud
-*   **Description**: Local and cluster-level cloud orchestration layer.
+### 2.3 🛡️ SigmaGuardian
+*   **Description**: Real-time compliance and security dashboard.
 *   **Key Features**:
-    *   Absorbs and streamlines the architectural advantages of Kubernetes, Docker Swarm, and OpenStack.
-    *   Native cluster scheduling directly in the S-SCHED shard with zero-overhead resource sharing.
-    *   Self-healing micro-VM replication and dynamic load balancing.
+    *   Real-time security telemetry measuring alignment with global standards (GDPR, HIPAA, ISO 27001, SOC2).
+    *   Automated kernel-level patching, secure sandboxing, and real-time anomaly detection.
+    *   Continuous capability-token auditing and file manipulation logging backed by TPM logs.
 
-### 2.4 🛡️ SigmaSecure
-*   **Description**: Enterprise-grade compliance and security dashboard.
+### 2.4 🔨 SigmaForge
+*   **Description**: Source-based build system (absorbing Gentoo’s Portage USP) optimized via AI.
 *   **Key Features**:
-    *   Real-time telemetry measuring alignment with global standards (GDPR, HIPAA, ISO 27001, SOC2).
-    *   Continuous capability-token auditing and kernel module verification.
-    *   Cryptographic reports backed by hardware-enforced TPM logs.
+    *   Predicts optimal compilation flags for local hardware architectures.
+    *   Automated cross-compilation pipeline utilizing deep compiler telemetry.
+    *   Decentralized dependency resolver communicating over S-FS.
 
-### 2.5 🌉 SigmaBridge
+### 2.5 🔌 SigmaEdge
+*   **Description**: Lightweight, resource-constrained IoT/embedded distribution.
+*   **Key Features**:
+    *   Absorbs and improves upon Alpine Linux's footprint and container-first design.
+    *   Hard real-time scheduling core running within <8MB RAM footprint.
+    *   Secure boot verification and instant hot-swap patches over the air.
+
+### 2.6 🎮 SigmaPlay
+*   **Description**: Native gaming hub with containerized runtimes and Proton integration.
+*   **Key Features**:
+    *   Direct-to-metal Vulkan rendering pipeline with minimal driver overhead and GPU pass-through support.
+    *   Containerized game runtimes that isolate game binaries, absorbing SteamOS game-compatibility.
+    *   Native controller mapping and high-precision physical polling loops.
+
+### 2.7 🌉 SigmaBridge
 *   **Description**: Low-overhead cross-platform execution layer.
 *   **Key Features**:
     *   Direct binary compatibility layer for unmodified Windows and macOS applications.
     *   Bypasses heavy emulation by translating syscalls directly to native capability-based IPC calls.
     *   Strict sandbox containment for running legacy apps securely.
 
-### 2.6 🗄️ SigmaFS Manager
+### 2.8 🗄️ SigmaFS Manager
 *   **Description**: GUI and CLI administration suite for distributed storage.
 *   **Key Features**:
     *   Zero-latency snapshot generation, volume rollbacks, and file migrations.
     *   Real-time multi-disk health telemetry and block-level recovery tools.
     *   Distributed cloud replication control built natively into S-FS.
 
-### 2.7 🛠️ SigmaDev Tools
+### 2.9 💻 SigmaDev Studio
 *   **Description**: Integrated development environment (IDE) and diagnostic suite.
 *   **Key Features**:
     *   Pre-configured compilers and tools for Rust, Zig, C, and Go.
     *   Visual kernel trace analyzers and capability gate inspectors.
     *   Fast micro-container testing environment directly on S-VM.
 
-### 2.8 🧠 SigmaAI
-*   **Description**: Local cognitive operations suite for OS optimization.
+### 2.10 🧠 SigmaAI Kernel Modules
+*   **Description**: AI-native modules built directly into the kernel ring.
 *   **Key Features**:
-    *   Self-healing diagnostic engine that detects and automatically rectifies resource leaks and syntax errors.
+    *   Self-healing diagnostic engine that detects and automatically rectifies resource leaks and runtime errors.
     *   Predictive process-priority management (CFS + MLFQ optimized via local models).
-    *   Context-aware system routines and adaptive desktop workflows.
+    *   Workload profiling and autonomous energy-aware power balancing.
 
-### 2.9 🔌 SigmaEdge
-*   **Description**: Ultra-lightweight, resource-constrained IoT/embedded distribution.
+### 2.11 ☁️ SigmaCloud
+*   **Description**: Local and cluster-level cloud orchestration layer.
 *   **Key Features**:
-    *   Absorbs and improves upon Alpine Linux's footprint and container-first design.
-    *   Hard real-time scheduling core running within <8MB RAM footprint.
-    *   Secure boot verification and instant hot-swap patches over the air.
-
-### 2.10 🎮 SigmaPlay
-*   **Description**: High-performance containerized gaming hub.
-*   **Key Features**:
-    *   Direct-to-metal Vulkan rendering pipeline with minimal driver overhead.
-    *   Containerized game runtimes that isolate game binaries, absorbing SteamOS game-compatibility.
-    *   Sovereign controller support with low-latency physical polling loop.
-
-### 2.11 💼 SigmaWorkspaces
-*   **Description**: Virtual workplace and structured collaboration overlay.
-*   **Key Features**:
-    *   Multi-monitor desktop layouts with frictionless window-tiling, absorbing GNOME, KDE, and Plasma features.
-    *   Encrypted collaboration tools allowing system sharing over the peer-to-peer S-NET shard.
-    *   Integrated document, asset, and spatial indexers for seamless information retrieval.
+    *   Absorbs and streamlines the architectural advantages of Kubernetes, Docker Swarm, and OpenStack.
+    *   Native cluster scheduling directly in the S-SCHED shard with zero-overhead resource sharing.
+    *   Self-healing micro-VM replication and dynamic load balancing.
 
 ---
 
-## 🎨 3. S-MEDIA: The Unified Multimedia & Spatial Rendering Shard
+## ⚡ 3. The Next Big Ideas (Superset Pillars)
+
+SigmaOS achieves absolute market domination by transforming the standard operating system paradigm. Five core pillars define our forward-looking expansion:
+
+### 3.1 🧬 SigmaOS as a Superset OS
+*   We unify the fragments of modern computing: package managers, device drivers, filesystems, and security systems are combined into **one adaptive, zero-dependency environment**.
+*   By absorbing legacy binary formats (.deb, .rpm, .apk, .msi) and hardware specifications, SigmaOS presents a single, universal system API.
+
+### 3.2 🩹 Self-Healing OS
+*   SigmaOS operates on a zero-downtime, self-healing model.
+*   By combining filesystem snapshots, secure capability-restricted sandboxing, and real-time neural anomaly detection, the OS automatically isolates compromised or failing components and triggers instant rollback to a stable system state without user intervention.
+
+### 3.3 🌍 Cross-Platform OS
+*   Cross-platform isolation layers allow SigmaOS users to execute Linux, Windows, and macOS applications with zero configuration.
+*   Systcalls are translated on-the-fly at the capability gate with near-native performance, ending platform lock-in.
+
+### 3.4 🏢 Enterprise-Ready OS
+*   A certified compliant out-of-the-box infrastructure.
+*   Through continuous mandatory signing, decentralized capability tokens, and real-time compliance dashboards (SigmaGuardian), organizations maintain audit-readiness under GDPR, SOC2, HIPAA, and ISO 27001 with zero administrative bloat.
+
+### 3.5 🤖 AI-Native OS
+*   Artificial intelligence is not an add-on application; it is woven into the scheduler itself.
+*   Predictive process scheduling, core dynamic allocation, live workload profiling, and system-wide optimization algorithms operate continuously as low-overhead kernel services.
+
+---
+
+## 🎨 4. S-MEDIA: The Unified Multimedia & Spatial Rendering Shard
 
 The **S-MEDIA** shard natively integrates visual editing, audio synthesis, non-linear video composition, and 3D graphics pipelines, replacing all monolithic userland applications.
 
-### 3.1 Media Players & Visual Editors (VLC, GIMP, Audacity, Krita, Shotcut, Blender, Inkscape)
+### 4.1 Media Players & Visual Editors (VLC, GIMP, Audacity, Krita, Shotcut, Blender, Inkscape)
 *   **VLC Media Player Replacement (Native S-MEDIA Player)**: High-performance video decoding using HW-accelerated pipelines. Direct zero-copy frame rendering onto the Zenith compositor VESA/Vulkan buffer. Completely bypasses userland servers like X11/Wayland.
 *   **GIMP & Krita Replacement (S-MEDIA Paint & Pixel Engine)**: High-bit-depth raster processing engine. Native support for multi-layer non-destructive editing, custom brush pipelines, and vector paths. Uses SIMD vector operations (AVX-512, ARM Neon) directly mapped to graphics memory.
 *   **Audacity Replacement (S-MEDIA Audio Workstation)**: Low-latency audio subsystem directly interfacing with native sound drivers. Supports multi-track editing, spectral analysis, and hardware DSP effects (Vocal/instrument isolation) utilizing local AI-assisted filters.
 *   **Shotcut & Blender Replacement (S-MEDIA Compositor & 3D Studio)**: Integrates non-linear video sequencing and 3D mesh modeling. Utilizes an internal ray-tracing rasterizer written in Rust. Accelerates physics rendering, animation, and keyframing natively through the OS GPU-scheduling capability gates.
 *   **Inkscape Replacement (S-MEDIA Vector Designer)**: Fully GPU-accelerated path rendering module for complex layouts, standard gradients, and SVG/PDF workflows.
 
-### 3.2 Native Media Codecs & File Format Parsers
+### 4.2 Native Media Codecs & File Format Parsers
 S-MEDIA implements direct decoding/encoding kernels for all standard formats, eliminating external dependencies (FFmpeg, LAME, OpenRAW, Ghostscript, libvorbis, etc.):
 *   **Raster Formats**: Native support for OpenRAW, LibRaw, dcraw, `.apng`, `.avif`, `.bpg`, `.exr`, `.fits`, `.flif`, `.gif`, `.iff`/`.lbm`, `.jng`, `.jpg` or `.jpeg`, `.jxl`, `.mng`, `.miff`/`.mi`, `.pam`, `.pbm`, `.pgm`, `.ppm`, `.pnm`, `.pgf`, `.png`, `.qoi`, `.tiff`, `.wbmp`, `.webp`, `.xbm`, `.xcf`, `.xpm`.
 *   **Vector Formats**: Render engines for `.cgm`, `.eps`, `.pdf`, `.pgml`, `.svg`, `.vml`, `.xar`.
@@ -152,11 +178,11 @@ pub trait SMediaDecoder {
 
 ---
 
-## 📄 4. S-OFFICE: The High-Integrity Document & Productivity Shard
+## 📄 5. S-OFFICE: The High-Integrity Document & Productivity Shard
 
 The **S-OFFICE** shard manages structured document processing, layouts, data tabulation, mathematical formulas, and presentation engines, fully replacing Apache OpenOffice and LibreOffice Suites.
 
-### 4.1 Document Synthesizers & Parsers
+### 5.1 Document Synthesizers & Parsers
 *   **Word Processor Engine**: Highly efficient WYSIWYG formatter. Supports native generation of `.odt`, `.rtf`, `.tex`, `.latex`, `.texinfo`, `.adoc`, `.epub`, `.md` (Markdown), `.pdf`, `.html`, and `.css`.
 *   **Tabular Grid Processor**: Native math engine with multi-threaded grid evaluation. Supports parsing and writing `.ods`, `.xlsx`, `.csv`, `.tsv`, `.parquet`, `.orc`, and `.avro`.
 *   **Presentation & Diagramming**: Direct vector presentation engine with hardware-accelerated slide transitions and native mind-mapping via integrated VYM (View Your Mind) and Compendium modeling concepts.
@@ -178,21 +204,21 @@ impl SOfficeDocument {
 
 ---
 
-## 🧠 5. S-AI: The Cognitive Inference, Agency & Modeling Shard
+## 🧠 6. S-AI: The Cognitive Inference, Agency & Modeling Shard
 
 The **S-AI** shard makes machine intelligence a first-class OS primitive. It manages hardware accelerators (NPUs, GPUs) with low-overhead direct kernels, replacing massive software layers like PyTorch, TensorFlow, CrewAI, AutoGPT, LangChain, Ollama, Hugging Face, OpenCV, and individual local model loaders.
 
-### 5.1 Native Deep Learning & Computer Vision Engines
+### 6.1 Native Deep Learning & Computer Vision Engines
 *   **PyTorch, TensorFlow, Keras, JAX & ONNX Replacement**: Eliminates Python-bloat entirely. High-performance tensor execution graph engine built in raw Rust, with optimized kernels for CUDA, Vulkan, OpenCL, OpenVINO, TensorRT, ROCm, and Apple Silicon.
 *   **Computer Vision (OpenCV, AForge.NET, Tesseract, Dlib)**: Native C++ and Rust port of essential CV functions (Sobel, Canny, Hough transform, Kalman filters). Directly integrates OCR via an embedded sovereign Tesseract port, and face-tracking/pose estimation kernels as simple API calls.
 *   **NLP Tools (Apertium, spaCy, NLTK, Word2vec, ChatScript)**: OS-level NLP engine. Direct support for tokenization, Lemmatization, Named Entity Recognition (NER), Word2vec/GloVe embedding indexing, and translation pipelines (Apertium) running in a capability-isolated shard.
 *   **Audio, Speech & Synthesis (Whisper, CMU Sphinx, Julius, WaveNet, Festival)**: Native audio pipeline captures mic input and routes it directly to an embedded Whisper engine for transcription. Native real-time TTS (Text-to-Speech) using high-fidelity local synthesis models.
 
-### 5.2 Local Multi-Agent Frameworks & Automation (CrewAI, Auto-GPT, LangChain)
+### 6.2 Local Multi-Agent Frameworks & Automation (CrewAI, Auto-GPT, LangChain)
 *   **S-AI Agency Shard**: Realizes multi-agent coordination, plan formulation, and automatic execution of complex computing tasks. Implements memory vectors, tool utilization, and planning loops natively in the OS scheduler.
 *   **Autonomous Agent Loop**: Agents can write, compile, and run code within secure sandboxes (`sigma_sandbox`) using local model outputs to solve system-level issues or automate complex pipelines without any third-party framework.
 
-### 5.3 Unified Local LLM Orchestrator & Broad Model Family Support
+### 6.3 Unified Local LLM Orchestrator & Broad Model Family Support
 S-AI contains a unified model execution runtime with native optimization for the world's leading open and sovereign model families, bypassing `llama.cpp` or `vLLM`:
 *   **Supported Model Families**: Fully optimized architectures for Apertus (Swiss AI Initiative), BERT, Cerebras-GPT, DeepSeek (R1, V3, and Lite models), Gemma 4, GLM-4.5+, GPT-1/2/OSS, GPT-J/Neo/NeoX, Granite, Grok-1, Kimi, Mistral (Mixtral/8x7B/Large), OLMo, Phi (Phi-3/4), Qwen (Qwen-2.5-Coder/VL), Sarvam, Step-3.5-Flash, T5, and XLNet.
 *   **Diffusion & Speech Models**: Native support for Stable Diffusion pipelines and WaveNet vocoders.
@@ -212,16 +238,16 @@ impl SAIEngine {
 
 ---
 
-## 🗄️ 6. S-DB & S-SEARCH: High-Performance Storage & Vector Search Shard
+## 🗄️ 7. S-DB & S-SEARCH: High-Performance Storage & Vector Search Shard
 
 The **S-DB** shard serves as a scalable, unified storage layer that supports relational data, document stores, vector indices, spatial queries, and full-text search engines, making third-party databases obsolete.
 
-### 6.1 Native DBMS Paradigms (MySQL, PostgreSQL, MariaDB, PostGIS, Cassandra, CouchDB, SQLite)
+### 7.1 Native DBMS Paradigms (MySQL, PostgreSQL, MariaDB, PostGIS, Cassandra, CouchDB, SQLite)
 *   **Relational Engine**: ACID-compliant transactional relational storage built directly on top of the SigmaOS Distributed Filesystem (S-FS).
 *   **Spatial Extension (PostGIS)**: Native geographic and geometric indexers (R-Tree, Quad-Tree, ELKI indexers) for high-speed spatial querying.
 *   **NoSQL Columnar & Document Stores (Cassandra, CouchDB, SQLite)**: Peer-to-peer schema-less object serialization with automatic background synchronization.
 
-### 6.2 Enterprise Indexing & Search Engine (Lucene, Solr, Nutch, Xapian)
+### 7.2 Enterprise Indexing & Search Engine (Lucene, Solr, Nutch, Xapian)
 *   **Full-Text Search Engine**: Native inverted indexer written in Rust. Features tokenization, stemming, BM25 ranking, and real-time document search built into S-FS file indexing daemon. Bypasses Java-based runtimes like Apache Solr and Lucene.
 
 ```rust
@@ -235,37 +261,37 @@ pub trait SDBQueryEngine {
 
 ---
 
-## 🎛️ 7. S-SIM & S-ROBOT: Scientific Simulation, Mathematical CAD & Robotics Shard
+## 🎛️ 8. S-SIM & S-ROBOT: Scientific Simulation, Mathematical CAD & Robotics Shard
 
 The **S-SIM** & **S-ROBOT** shards provide extensive, native tools for high-fidelity physics, chemistry simulation, mathematical modeling, and hardware-in-the-loop robotics, eliminating complex system setups like ROS, Gazebo, CoppeliaSim, MATLAB, and GROMACS.
 
-### 7.1 Computational Physics & Chemistry (GROMACS, CP2K, LAMMPS, Open Babel, REFPROP, CHEMKIN)
+### 8.1 Computational Physics & Chemistry (GROMACS, CP2K, LAMMPS, Open Babel, REFPROP, CHEMKIN)
 *   **Molecular Dynamics Pipeline**: Optimized GROMACS/LAMMPS solvers running native GPU kernels. Full support for atomic force field simulation, protein folding studies, and crystal structure analysis.
 *   **Quantum Chemistry Engine (CP2K & Open Babel)**: Real-time DFT (Density Functional Theory) calculation framework. Direct import of chemical structures using native Open Babel converters.
 *   **Thermodynamics & Reaction Kinetics (REFPROP, CHEMKIN, COCO)**: Real-time fluid thermodynamic property analysis and chemical reaction simulation.
 
-### 7.2 Engineering & Aerodynamics (XFOIL, OpenVSP, QBlade, Calculix, DWSIM, GMAT)
+### 8.2 Engineering & Aerodynamics (XFOIL, OpenVSP, QBlade, Calculix, DWSIM, GMAT)
 *   **Aerodynamics & Aircraft Design (XFOIL, OpenVSP, QBlade)**: Dynamic lift/drag solver, 3D aircraft geometry designer, and wind turbine blade aerodynamic optimizer.
 *   **Finite Element Analysis (Calculix, ASL)**: Native FEA solver for structural stress, thermal dissipation, and fluid mechanics.
 *   **Mission Analysis (GMAT, JSBSim)**: Aerospace flight mechanics and orbital trajectory calculator based on the NASA General Mission Analysis Tool.
 
-### 7.3 Robotics Operating Core & Simulators (ROS, Gazebo, CoppeliaSim, ArduPilot, TurtleBot)
+### 8.3 Robotics Operating Core & Simulators (ROS, Gazebo, CoppeliaSim, ArduPilot, TurtleBot)
 *   **S-ROBOT Controller Core (Robot Operating System / ROS Replacement)**: Direct IPC-based robotic node orchestration. Low-latency sensor integration, mapping (SLAM), path planning (Python Robotics), and motor controller drivers with hard real-time scheduling.
 *   **Dynamic Simulation Engine (Gazebo & CoppeliaSim)**: Real-time physics engine using ODE (Open Dynamics Engine) and ASL (Advanced Simulation Library) directly mapped to userland rendering interfaces.
 *   **Autopilot System (ArduPilot)**: Native flight controller daemon directly compiled into the real-time core, managing sensors (IMU, Barometer, GPS) with sub-millisecond precision.
 
 ---
 
-## 🔒 8. S-SEC & S-NET: Post-Quantum Cryptography, Anonymous Net & Forensics
+## 🔒 9. S-SEC & S-NET: Post-Quantum Cryptography, Anonymous Net & Forensics
 
 The **S-SEC** and **S-NET** shards provide hardware-enforced, sovereign security, anonymous network transport, and robust forensic analysis, rendering external security software completely obsolete.
 
-### 8.1 Anonymous Network Transport & Encrypted Protocols (Tor, Tails, Signal, Wire, OpenSSL)
+### 9.1 Anonymous Network Transport & Encrypted Protocols (Tor, Tails, Signal, Wire, OpenSSL)
 *   **Tor Onion Routing Native Integration (S-NET Tor Mode)**: Zero-config onion routing protocol built directly into the TCP/UDP networking shard. Optional system-wide isolation (equivalent to Tails OS) with memory-wiping protocols on system shutdown.
 *   **Secure Instant Messaging Engine (Signal / Wire)**: Sovereign Signal-Protocol implementation. Direct native encryption layer for text, voice, and media, integrated with the user's local PQC identity.
 *   **Post-Quantum Cryptography (OpenSSL / GnuPG Replacement)**: Kyber-1024 (FIPS 203) Key Encapsulation and Dilithium-5 (FIPS 204) signatures natively embedded into all socket communication layers. Completely deprecates RSA, ECC, and classic TLS/PGP suites.
 
-### 8.2 Forensic Analysis & Malware Defense (Lynis, Sleuth Kit, ClamAV, Wireshark, BleachBit)
+### 9.2 Forensic Analysis & Malware Defense (Lynis, Sleuth Kit, ClamAV, Wireshark, BleachBit)
 *   **Packet Analyzer (Wireshark Native UI)**: Network capture and deep packet inspection core built into the network stack. Real-time protocol analysis and decryption visualization.
 *   **Forensics Toolchain (The Sleuth Kit, Coroner's Toolkit)**: Native filesystem metadata recovery, deleted partition scanning, and cryptographic registry auditing.
 *   **Malware scanner (ClamAV / ClamWin)**: Real-time capability-based file checking daemon running on S-FS block writes.
@@ -273,7 +299,7 @@ The **S-SEC** and **S-NET** shards provide hardware-enforced, sovereign security
 
 ---
 
-## 🗜️ 9. S-FS Core Extensions: Lossless Compression & Native Archives
+## 🗜️ 10. S-FS Core Extensions: Lossless Compression & Native Archives
 
 The **S-FS** Core natively handles archive file operations, data compression, and package transaction verifications.
 
@@ -295,55 +321,55 @@ impl SFSArchive {
 
 ---
 
-## 🔍 10. Absorbing Competitors' USP to Make Them Irrelevant
+## 🔍 11. Absorbing Competitors' USP to Make Them Irrelevant
 
 To establish SigmaOS as the supreme choice for all target users, our software-shards and system components are engineered to fully absorb and exceed the Unique Selling Propositions (USPs) of leading Linux distributions and ecosystem elements:
 
 | Competitor | Core USP | SigmaOS Superset Absorption Strategy |
 | :--- | :--- | :--- |
 | **Debian / Ubuntu (APT)** | Stability, massive package repository | **sigmapkg Universal Format + S-FS Rollbacks + S-AI Conflict Solver**: Unifies package dependency management with zero-overhead snapshot recovery. |
-| **Red Hat / Fedora (DNF)** | Enterprise security & SELinux compliance | **S-SEC Capability Tokens + Mandatory Signing + SigmaSecure**: Replaces complex, brittle access-control configurations with compiler-guaranteed capabilities and cryptographic compliance logs. |
+| **Red Hat / Fedora (DNF)** | Enterprise security & SELinux compliance | **S-SEC Capability Tokens + Mandatory Signing + SigmaGuardian**: Replaces complex, brittle access-control configurations with compiler-guaranteed capabilities and cryptographic compliance logs. |
 | **Arch (Pacman)** | Rolling release, granular customization | **SigmaShell Modular UX + S-AI Updates**: Upstream rolling-release stability verified locally before applying, preserving user customizations seamlessly. |
 | **Alpine (APK)** | Ultra-lightweight, container-first footprint | **SigmaEdge + S-VM Micro-containers**: Delivers <8MB running memory profiles for embedded/IoT setups without sacrificing microkernel features. |
-| **Gentoo (Portage)** | Source-based compile optimizations | **S-AI Assisted Compilation + S-SCHED Optimization**: Compiles optimized binaries from source using predictive local code optimization tuned directly to local CPU execution patterns. |
-| **openSUSE (Zypper)** | Btrfs-driven snapshot & system rollback | **S-FS Block-Level Snapshots**: Transparent, continuous delta storage mapping that generates automatic recovery checkpoints before any administrative system adjustment. |
-| **Android / Linux Hybrids** | Large touchscreen application ecosystem | **SigmaHub Universal Publisher + SigmaBridge**: Runs legacy native applications and standard mobile bytecode packages directly inside safe capability-restricted sandboxes. |
-| **SteamOS** | Handheld-first containerized gaming focus | **SigmaPlay + S-MEDIA Low-Latency Drivers**: Bypasses heavy gaming-mode layers by utilizing low-overhead containerized runtimes mapped directly to high-priority rendering pipes. |
+| **Gentoo (Portage)** | Source-based compile optimizations | **SigmaForge AI-Assisted Compilation + S-SCHED Optimization**: Compiles optimized binaries from source using predictive local code optimization tuned directly to local CPU execution patterns. |
+| **openSUSE (Zypper)** | Btrfs-driven snapshot & system rollback | **S-FS Block-Level Snapshots (SigmaFS Rollback)**: Transparent, continuous delta storage mapping that generates automatic recovery checkpoints before any administrative system adjustment. |
+| **Android / Linux Hybrids** | Large touchscreen application ecosystem | **SigmaHub Universal App Store + SigmaBridge**: Runs legacy native applications and standard mobile bytecode packages directly inside safe capability-restricted sandboxes. |
+| **SteamOS** | Handheld-first containerized gaming focus | **SigmaPlay Containerized Runtimes + S-MEDIA Low-Latency Drivers**: Bypasses heavy gaming-mode layers by utilizing low-overhead containerized runtimes mapped directly to high-priority rendering pipes. |
 
 ---
 
-## 📊 11. Planned Core Subsystems (From OS Branches)
+## 📊 12. Planned Core Subsystems (From OS Branches)
 
 To support this magnificent ecosystem, the underlying kernel is actively implementing the following core features:
 
-### 11.1 Kernel Core
+### 12.1 Kernel Core
 *   **NUMA-Aware Scheduler**: Core allocation tailored to high-performance clustering.
 *   **Hugepage Memory Support**: Low-overhead TLB caching for multi-gigabyte models.
 *   **AI-Driven Predictive Scheduler**: Learns application usage behaviors to preemptively load code blocks into memory.
 *   **S-Trace Utility**: Integrated system tracing tool capturing IPC messages with sub-nanosecond resolution.
 
-### 11.2 Drivers & Hardware Support
+### 12.2 Drivers & Hardware Support
 *   **Integrated GPU Core Driver**: Native AMD/Intel/Nvidia Vulkan adapters running inside user-space driver shards.
 *   **WiFi Chipset Support**: Raw packet access with integrated post-quantum WPA3 key exchange.
 *   **Printing & Scanning Shard**: Local vector renderers resolving standard document prints natively without massive CUPS layers.
 *   **Hot-Swap Drivers**: Update core peripheral drivers live without dropping system uptime.
 
-### 11.3 High-Speed Networking
+### 12.3 High-Speed Networking
 *   **Full IPv6 & Flow Label Routing**: Advanced routing baked directly into the S-NET shard.
 *   **Integrated WireGuard-style VPN**: Lightweight post-quantum tunnel protocol.
 *   **Dynamic Firewall Subsystem**: Capability-secured firewall auditing block operations in real-time.
 
-### 11.4 Advanced Filesystem Engine
+### 12.4 Advanced Filesystem Engine
 *   **Format Translators**: Built-in support for mounting XFS, Btrfs, ZFS, APFS, NFS, and CIFS.
 *   **P2P Network Filesystem**: Distributed storage synchronization directly over S-NET.
 
-### 11.5 Virtualization & Isolation
+### 12.5 Virtualization & Isolation
 *   **S-VM Hypervisor**: Native micro-VM host enabling instant start-ups (<10ms).
 *   **SigmaContainers**: Isolated namespaces executing untrusted applications with explicit capability token restrictions.
 
 ---
 
-## 📅 12. Immediate Next Actions & Integration Roadmap
+## 📅 13. Immediate Next Actions & Integration Roadmap
 
 ```
 PHASE 1: Core Consolidation   ===> PHASE 2: Cognitive Agency  ===> PHASE 3: Industrial Parity
@@ -352,7 +378,7 @@ PHASE 1: Core Consolidation   ===> PHASE 2: Cognitive Agency  ===> PHASE 3: Indu
 - S-SEC Post-Quantum SSL           - S-DB Relational/Vector Engine  - Sovereign App-Free Desktop
 ```
 
-### 12.1 Immediate Next Steps
+### 13.1 Immediate Next Steps
 1.  **Establish `main-dev` Branch**: Target branch for incremental merging of stable virtual filesystem, scheduling, and driver subsystems.
 2.  **Prioritize GPU & WiFi Drivers**: Critical for immediate, day-to-day usability of the Zenith desktop interface.
 3.  **Launch sigmapkg CLI**: Build initial `.deb` and `.rpm` conversion adapters inside SigmaHub, enabling legacy package installation immediately.
