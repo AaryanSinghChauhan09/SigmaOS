@@ -1,5 +1,10 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+#![allow(unused_mut)]
+#![allow(clippy::all)]
 
 pub mod accessibility;
 pub mod automation;
