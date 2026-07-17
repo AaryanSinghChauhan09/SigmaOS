@@ -380,7 +380,43 @@ To build a solid foundation before tackling UI/UX and enterprise adoption, the i
 
 ---
 
-## 11. Recommended Next Steps (Sovereign Roadmap)
+## 11. Disciplined Integration & Consolidation Workflow (Unifying Silos)
+
+To prevent code drift and minimize regression risks during the consolidation of siloed branches into the production branch, SigmaOS adopts a highly disciplined, multi-stage integration workflow.
+
+### A. The 4-Stage Consolidation Lifecycle
+
+```
+ ┌──────────────────────┐      ┌──────────────────────┐      ┌──────────────────────┐      ┌──────────────────────┐
+ │ 1. Audit & Categorize│ ───> │ 2. main-dev Staging  │ ───> │ 3. Subsystem Merges  │ ───> │ 4. Warm-Cached CI/CD │
+ └──────────────────────┘      └──────────────────────┘      └──────────────────────┘      └──────────────────────┘
+```
+
+1.  **Stage 1: Audit & Categorize:**
+    *   Isolate code changes into modular subsystems: Kernel Core, Drivers, Networking, Filesystems, Virtualization, Security, Performance, and Documentation.
+2.  **Stage 2: Staging via `main-dev` Branch:**
+    *   Establish a shared integration branch `main-dev`. All subsystem merges land on `main-dev` first for isolated verification before final release to `main`.
+3.  **Stage 3: Subsystem-by-Subsystem Incremental Merges:**
+    *   **Merge 1 (Core Kernel):** Stabilize core schedulers and memory paging allocators.
+    *   **Merge 2 (Drivers):** Unify drivers into the OOP plug-and-play Registry.
+    *   **Merge 3 (Networking):** Merge TCP/UDP, IPv6, and local wireless stacks.
+    *   **Merge 4 (Filesystems):** Merge FS drivers with automated rollback snapshots.
+    *   **Merge 5 (Virtualization):** Link microkernel hypervisor wrappers with SigmaContainers.
+    *   **Merge 6 (Security):** Deploy granular SELinux sandboxes and PQC signature verification.
+    *   **Merge 7 (Performance):** Enable NUMA-aware multi-core task scheduling.
+    *   **Merge 8 (Documentation):** Land detailed wikis, roadmap tables, and onboarding guides.
+4.  **Stage 4: Automated Regression Protection:**
+    *   Validate all incremental merges using warm-cached GitHub Actions workflows running unit, integration, and script-based smoke tests.
+
+### B. Immediate Packaging & Driver Priorities
+To secure rapid developer and user adoption, the following priorities are treated as first-class, short-term milestones:
+-   **GPU & Wireless Chipset Drivers:** Implement userspace command queues for Intel, NVIDIA, and AMD graphics processors, along with standard 802.11 network adapters to make SigmaOS instantly usable as a daily desktop OS.
+-   **Universal sigmapkg Launch:** Deploy S-PKG with native adapters (.deb, .rpm) to provide access to hundreds of thousands of pre-existing software packages.
+-   **Workflow-driven Onboarding:** Maintain clear subsystem directories, comprehensive roadmap dashboards, and clean onboarding wikis to lower technical barriers for new community contributors.
+
+---
+
+## 12. Recommended Next Steps (Sovereign Roadmap)
 
 1. **Phase 1 [Immediate]:**
    - Fix the duplicate panic handler error on hosted architectures (Completed: applied conditional standard library compilation bounds).
