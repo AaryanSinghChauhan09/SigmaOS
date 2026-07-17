@@ -8,159 +8,95 @@ This roadmap serves as a strategic comparison matrix and execution path to bridg
 
 ---
 
-## 📊 Comparative Matrix: SigmaOS vs Linux Kernel & Distros
+## 📊 Comparative Dashboard: SigmaOS vs Mainstream Operating Systems
 
-| Subsystem / Feature | SigmaOS (Current State) | Linux Kernel & Distros | Gap / Missing in SigmaOS |
-| :--- | :--- | :--- | :--- |
-| **Drivers** | Prototype / partial support (NVMe, USB xHCI, Ext4/FAT32, basic GPU/USB HID). | Tens of thousands of vendor-backed drivers covering all hardware categories. | Broad hardware driver coverage (WiFi, GPUs, printers, sensors, ARM/RISC-V boards, embedded devices). |
-| **Networking** | Partial TCP/UDP stack, zero-trust network stack. | Mature IPv4/IPv6, advanced routing, VPN, wireless stacks, container networking. | Full networking stack with IPv6, wireless drivers, advanced routing protocols. |
-| **Filesystems** | Ext4, FAT32, SigmaFS prototype. | Dozens of stable filesystems (XFS, Btrfs, ZFS, NTFS, NFS, CIFS, FUSE). | Wider filesystem support, distributed filesystem maturity. |
-| **Virtualization** | Early microkernel + WASM sandbox bundle. | Mature KVM, Xen, Docker/LXC, namespaces, cgroups. | Full virtualization/container ecosystem. |
-| **Security** | Post-quantum cryptography (Kyber-1024, Dilithium-5), pledge/unveil, capability sandboxing. | SELinux, AppArmor, seccomp, LSM framework, decades of CVE response. | Integration with mainstream security frameworks, broader audit tooling. |
-| **Scheduler & Memory** | Predictive multi-priority scheduler (MLFQ+CFS+EDF), Buddy Allocator. | Decades of tuning: NUMA-aware memory, advanced RCU, real-time scheduling, memory hotplug. | NUMA support, advanced RCU, hugepage support. |
-| **Community & Ecosystem** | Small contributor base, sovereign India-first focus. | Global ecosystem, 240k+ stars, 63k+ forks, thousands of corporate contributors. | Large-scale developer adoption, hardware/software vendor partnerships. |
-| **Tooling & Build System** | Rust/Zig/Nim/Ada hybrid, sovereign package manager (`.spkg`). | Mature GCC/Clang toolchains, kernel.org releases, distro packaging (Deb, RPM, Nix). | Wider toolchain support, integration with mainstream distros. |
-| **Documentation** | Roadmap, Wiki, sovereign compliance docs. | Extensive subsystem docs, coding style, APIs, ABI stability. | Broader developer documentation, subsystem-specific guides. |
-
----
-
-## 🔌 Drivers & Hardware Compatibility
-
-### 1. Current State vs. Gaps
-* **Supported Categories:** Basic storage (NVMe, Ext4, FAT32), prototype USB (xHCI host controller, USB HID), and early-stage VESA/GPU framebuffer.
-* **Missing Categories:** Comprehensive Wi-Fi/Bluetooth chipsets, fully accelerated vendor-specific GPUs (Intel, AMD, NVIDIA), printing systems, sensor arrays (I2C, SPI), and specialized boards (ARM SBCs, RISC-V development systems).
-
-### 2. Architecture: Polymorphic Plug-and-Play (PnP) Driver System
-To ensure SigmaOS users never need to manually download legacy drivers, SigmaOS implements an automatic, modular, and future-proof Plug-and-Play (PnP) driver system using OOP principles across seven key structural components:
-
-1. **Base Driver Class:**
-   Define a universal abstract class (e.g., `DeviceDriver` or `Driver`) exposing core virtual interfaces `init()`, `read()`, `write()`, and `shutdown()`. Encapsulation ensures each driver manages its own state and device registers cleanly.
-2. **Subclasses for Device Families:**
-   Use inheritance to create specialized driver categories such as `StorageDriver`, `NetworkDriver`, `GPUDriver`, and `PeripheralDriver`. Each subclass overrides base class virtual methods with device-specific behavioral logic.
-3. **Driver Registry:**
-   Establish a central, unified driver registry tracking the mapping: `Hardware Signature / Device ID` &rarr; `OOP Driver Class`. Through polymorphism, the kernel interacts with drivers via standard, unified interfaces and executes actions without knowing low-level transport details.
-4. **Plug-and-Play (PnP) Detection:**
-   The microkernel transaction bus listens for physical hardware bus-insertion events. On device insertion, the kernel queries the hardware's vendor/device IDs and dynamically instantiates the correct registry-mapped OOP driver object.
-5. **Lazy Loading:**
-   To keep the kernel lean and ensure sub-second boot speeds, drivers are dynamically loaded *only* when physical hardware is actively detected on the bus. This prevents dormant drivers from consuming memory or bloating the operating system runtime.
-6. **Compatibility Wrappers:**
-   Leverage the structural Adapter pattern to wrap legacy Linux drivers within clean, modern SigmaOS OOP interfaces, allowing the kernel to support legacy vendor hardware transparently while native, lightweight drivers are developed.
-7. **Hot-Swap & Self-Healing:**
-   Supports runtime driver hot-swapping and dynamic updating without system reboots. Incorporates a kernel watchdog that monitors driver state; if an isolated user-space driver shard encounters a panic or exception, the watchdog automatically recovers and reloads the driver seamlessly.
+| Subsystem / Feature | SigmaOS (Current State) | Linux Kernel & Distros | Windows OS | macOS | What's Missing in SigmaOS |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Drivers** | Prototype OOP drivers (NVMe, USB HID, Ext4/FAT32). | Huge vendor-backed driver ecosystem. | Broad OEM-certified drivers. | Tight Apple hardware integration. | Wide hardware driver coverage (WiFi, GPUs, printers, legacy devices). |
+| **Package Management** | Planned `.spkg` sovereign manager. | APT, DNF, Pacman, Portage, APK. | `.msi` / `.exe` installers. | `.pkg` + App Store. | Mature package ecosystem, cross-format compatibility. |
+| **Networking** | Partial TCP/UDP stack, zero-trust network stack. | Full IPv4/IPv6, advanced routing, VPN. | Full IPv4/IPv6, enterprise networking. | Full IPv4/IPv6, seamless WiFi/Bluetooth. | IPv6, wireless stack, advanced routing protocols. |
+| **Filesystems** | Ext4, FAT32, SigmaFS prototype. | XFS, Btrfs, ZFS, NTFS, NFS, CIFS. | NTFS, ReFS, FAT32. | APFS, HFS+. | Wider filesystem support, distributed filesystem maturity. |
+| **Virtualization** | Early microkernel + WASM sandbox bundle. | KVM, Xen, Docker/LXC. | Hyper-V, WSL. | Parallels, Apple Hypervisor. | Full virtualization/container ecosystem. |
+| **Security** | Post-quantum cryptography, pledge/unveil, capability sandboxing. | SELinux, AppArmor, seccomp, LSM framework. | BitLocker, Defender, driver signing. | Gatekeeper, SIP, XProtect. | Integration with mainstream security frameworks, broader audit tooling. |
+| **Scheduler & Memory** | Predictive multi-priority scheduler (MLFQ+CFS+EDF), Buddy Allocator. | Decades of tuning: NUMA-aware memory, advanced RCU, real-time scheduling, memory hotplug. | Windows NT scheduler, memory hotplug. | Mach scheduler, memory compression. | NUMA support, advanced RCU, hugepage support. |
+| **UI/UX & Shell** | CLI + experimental WASM apps. | GNOME, KDE, XFCE, etc. | Windows Shell, Fluent UI. | Aqua UI. | Mature desktop environment, GUI ecosystem. |
+| **Community & Ecosystem** | Small contributor base, sovereign India-first focus. | Global ecosystem, 240k+ stars, thousands of contributors. | Massive OEM + enterprise software vendor ecosystem. | Tight Apple developer and device ecosystem. | Large-scale developer adoption, hardware/software vendor partnerships. |
+| **Tooling & Build System** | Rust/Zig/Nim/Ada hybrid build chain. | GCC/Clang toolchains, distro packaging pipelines. | Visual Studio, MSBuild. | Xcode, LLVM/Clang. | Wider toolchain support, IDE integration. |
+| **App Ecosystem** | Early WASM bundle experiments. | Millions of open-source packages. | Huge commercial + enterprise software library. | Rich App Store ecosystem. | Broad application ecosystem, commercial software support. |
 
 ---
 
-## 🌐 Networking
+## 🏢 Core Professional Foundations
 
-### 1. Current State vs. Gaps
-* **Current State:** Partial TCP/UDP implementation with a zero-trust architecture.
-* **Gaps:** Lacks IPv6 support, wireless stack integrations, advanced traffic routing, VPN, and container net-namespaces.
+To make SigmaOS the go-to operating system for every professional job, we establish an enterprise-class core structure:
 
-### 2. Parity Roadmap
-* **Short-Term:** Stabilize the base TCP/UDP loops and secure raw socket capabilities.
-* **Mid-Term:** Build native IPv6 support, integrate wireless/Wi-Fi stack (WPA supplicant/protocol parsing), and establish virtual routing tables.
-* **Long-Term:** Implement container-friendly overlay networks and sandboxed net-namespaces for lightweight microservice isolation.
+### 1. Universal Driver Ecosystem
+*   **OOP-Based Driver Registry:** Hardware signatures are detected dynamically on the bus transaction wires to instantiate correct mapped `DeviceDriver` OOP subclasses.
+*   **Compatibility Wrappers:** Employs structural adapter wrapper classes to dynamically wrap legacy Linux, Windows, and macOS device drivers inside safe SigmaOS OOP APIs.
+*   **Vendor Partnerships:** Establishes sovereign certification programs to license certified, signed, and memory-safe SigmaOS native hardware drivers directly from OEMs.
 
----
+### 2. Enterprise-Grade Security & Audit
+*   **Mandatory Driver Signing & Sandboxing:** All drivers are cryptographically signed and executed within isolated user-space sandboxes, guaranteeing that faulty driver crashes never compromise kernel space.
+*   **PQC & AppArmor Coexistence:** Post-Quantum Cryptographic signatures (Dilithium-5) are tied directly to active security pledges, interpreting Linux AppArmor and SELinux-style profiles natively to authorize system resources.
+*   **Compliance Dashboards:** Integrates automated kernel audit logs mapped to international security standards including ISO 27001, GDPR, HIPAA, and SOC2.
 
-## 📂 Filesystems
-
-### 1. Current State vs. Gaps
-* **Current State:** Read/write capability for Ext4 and FAT32; early prototype of SigmaFS (distributed, sovereign-first FS).
-* **Gaps:** Lack of mature filesystems like XFS, Btrfs, ZFS, and network-shared protocols (NFS, CIFS, FUSE).
-
-### 2. Parity Roadmap
-* **Short-Term:** Harden Ext4/FAT32 implementations against power-loss corruption.
-* **Mid-Term:** Design a FUSE (Filesystem in Userspace) compatibility layer to import existing filesystem engines.
-* **Long-Term:** Add native support for Copy-on-Write (CoW) filesystems (Btrfs, ZFS) and complete the SigmaFS distributed storage model.
+### 3. Professional Package Manager (`sigmapkg`)
+*   **Sovereign `.spkg` Format:** Utilizes content-addressed storage (CAS) verified via cryptographic hashes (SHA-256), eliminating "dependency hell" version conflicts.
+*   **Cross-Format Metadata Adapters:** Translates and unpacks `.deb`, `.rpm`, `.apk`, and `.msi` packages natively through isolation sandboxes into `.spkg` formats.
+*   **Rollback & AI-Assisted Resolution:** S-SEC captures transactional system snapshots to allow under-1ms system rollbacks. S-AI analyzes conflicting dependency trees using DPLL-based constraint solving.
 
 ---
 
-## 🛡️ Virtualization & Containers
+## ⚙️ Productivity & Developer Tools
 
-### 1. Current State vs. Gaps
-* **Current State:** Lightweight sandboxing using WebAssembly (WASM) bundles.
-* **Gaps:** Missing kernel-level hypervisor support (KVM equivalent), hardware virtualization, namespaces, and cgroups.
+SigmaOS is designed natively for creators, engineers, and developers:
 
-### 2. Parity Roadmap
-* **Short-Term:** Refine WASM sandboxing to allow high-speed isolates.
-* **Mid-Term:** Implement namespace separation (PID, Mount, Net, UTS) and resource limits (cgroups equivalent) to bootstrap a native container runtime.
-* **Long-Term:** Integrate virtual machine support using hardware virtual machine extensions (VMX/SVM) and build KVM/QEMU compatibility layers.
+### 1. Unified Office Suite (`SigmaOffice`)
+Natively implements `SigmaOffice` (word processor, spreadsheet, and presentations) built directly on top of the Zenith vector rendering engine, running at native GPU speeds with minimal memory footprints.
 
----
+### 2. Developer Studio & IDE Integration
+Integrates system-level development hooks and zero-dependency compilation servers supporting seamless cross-IDE connections with VS Code, JetBrains, and Eclipse.
 
-## 🔒 Security & Verification
+### 3. Native Containerization (`SigmaContainers`)
+Exposes `SigmaContainers`, a high-throughput lightweight isolation layer utilizing namespaces, capability limits, and S-NET routing. Features complete OCI-compliant execution, allowing standard Docker and Kubernetes pods to run natively.
 
-### 1. Current State vs. Gaps
-* **Current State:** Post-Quantum Cryptography (PQC) as standard primitives, capability-based delegation, and secure pledge/unveil restrictions.
-* **Gaps:** Missing mainstream security module compatibility (SELinux, AppArmor), unified audit logs, and compliance tooling.
-
-### 2. Parity Roadmap
-* **Short-Term:** Enforce mandatory code-signing and verification for all executable binaries and drivers.
-* **Mid-Term:** Establish a lightweight Security Module framework capable of interpreting Linux AppArmor profiles for legacy application compatibility.
-* **Long-Term:** Build automated continuous audit engines monitoring system resource utilization and PQC transaction integrity.
+### 4. Data, Analytics, & Creative Workstations
+*   **Data & Analytics:** Features high-performance built-in SQL/NoSQL databases and data visualization canvases directly rendered to framebuffers.
+*   **Creative Tools:** Bundles S-MEDIA, a hardware-accelerated creative video/audio workstation facilitating real-time vector and timeline editing natively.
 
 ---
 
-## 🧠 Scheduler & Memory Management
+## 🌐 Networking & Virtualization
 
-### 1. Current State vs. Gaps
-* **Current State:** Predictive multi-priority scheduler combining MLFQ, CFS, and EDF; Buddy Allocator for memory block tracking.
-* **Gaps:** Lacks NUMA-awareness, real-time priority tuning (RT-PREEMPT), advanced RCU (Read-Copy Update), and transparent hugepages (THP).
+### 1. Networking Stack Parity
+*   **IPv6 & VPN:** Fully integrates an async IPv6 network stack alongside native WireGuard and OpenVPN tunneling protocols directly in the S-NET shard.
+*   **Advanced Routing:** Features high-speed wait-free packet handlers and stateful routing matrices.
 
-### 2. Parity Roadmap
-* **Short-Term:** Benchmark the MLFQ+CFS+EDF scheduler directly against the Linux CFS under high thread contention.
-* **Mid-Term:** Integrate NUMA-aware allocation strategies into the Buddy Allocator to avoid cross-socket memory latency.
-* **Long-Term:** Implement hugepage allocation mechanisms and lock-free RCU constructs to support database and hyper-scale cloud deployments.
-
----
-
-## 👥 Community, Ecosystem, & Tooling
-
-### 1. Contributor Growth Strategy
-* **Sovereign and Open-Source Synergy:** Align the sovereign India-first approach (GST, UPI, local language support) with a global developer model.
-* **Contests & Academic Partnerships:** Sponsor university hackathons and open-source initiatives to build a steady pipeline of kernel and toolchain contributors.
-* **Vendor Collaborations:** Partner with local and global hardware manufacturers (SBCs, IoT, server boards) to secure reference boards and native driver support.
-
-### 2. Toolchain & Build System Integration
-* **GCC/Clang Compatibility:** Support cross-compilation with standard GCC and Clang toolchains while optimizing the Rust-Zig hybrid build model.
-* **Distro Packaging:** Build compatibility pathways to parse Deb, RPM, or Nix recipes into the native `.spkg` package format, accelerating software catalog growth.
+### 2. High-Density Virtualization
+*   **Hypervisor Integration:** Embeds virtual machine execution structures utilizing hardware virtualization extensions (VMX/SVM) and cgroups equivalents to manage hyper-scale cloud VMs.
+*   **SigmaCloud:** Connects headless server nodes into distributed clusters natively using S-NET.
 
 ---
 
-## 📝 Subsystem-Specific Documentation & Guides
+## 🔒 Stability, Performance, & Hot-Swapping
 
-To empower contributors, SigmaOS will aggressively expand guides and API standards:
-1. **Core Microkernel APIs:** Detailed specifications for IPC, capability creation, and syscall gates.
-2. **Driver Writer’s Guide:** Step-by-step tutorials on subclassing the OOP `DeviceDriver` framework.
-3. **UDF Bytecode Handbook:** Instructions on writing and compiling light bytecode snippets for the custom driver micro-interpreter.
+### 1. Self-Healing Kernel & Hot-Swapping
+*   **Self-Healing:** A dedicated watchdog monitors active shards and automatically patches or reloads faulted drivers based on transactional rollback logs without bringing down the system.
+*   **Hot-Swapping:** Allows developer to reload and upgrade graphic/Wi-Fi drivers live at runtime without system reboots.
+
+### 2. Hardware-Aware Performance
+*   **Predictive AI Scheduler:** S-SCHED uses a local predictive engine to optimize CPU cores and energy domains before workload spikes.
+*   **NUMA-Aware Memory:** S-MM maps memory allocations natively within NUMA nodes, avoiding cross-socket bus latency, and utilizes hugepages and lock-free Read-Copy Update (RCU) operations.
 
 ---
 
-## ⚡ Advanced Stability, Performance, and Speed Optimization Strategies
+## 🎨 UI/UX, Accessibility, & Shell
 
-To surpass the legacy paradigms of the Linux kernel and achieve outstanding levels of performance, speed, and real-time reliability, SigmaOS integrates the following advanced design patterns:
+### 1. `SigmaShell` Desktop
+Exposes a gorgeous, immediate-mode GPU-composited desktop environment (`SigmaShell` / `Zenith`) containing modular widgets, real-time performance telemetry charts, and high-performance layout engines.
 
-### 1. Lock-Free Zero-Copy IPC
-Traditional message-passing IPC suffers from high context-switching and lock contention overhead. SigmaOS utilizes wait-free, ring-buffered communication channels using single-producer single-consumer (SPSC) rings with memory barriers. This guarantees zero-copy buffer handovers and sub-microsecond shard-to-shard transactions without invoking kernel-space synchronization locks.
-
-### 2. Predictive AI-Driven Memory Prefetching
-By embedding a zero-dependency local regression and state-tracking predictive engine within the Memory Shard (S-MM), SigmaOS profiles process-specific page access histories. Instead of waiting for page-fault interrupts to load sequential or pattern-predicted memory, pages are proactively loaded into caches ahead of execution, decreasing memory access latency by up to 40%.
-
-### 3. Hardware-Enforced Capability Caching
-Rather than walking the sparse memory tables for every system-call capability check, SigmaOS implements an ultra-fast capability cache indexed directly inside CPU registers and custom translation structures. Repeated authorization paths are validated at near-zero cycle cost, enabling granular security without performance degradation.
-
-### 4. Link-Time Devirtualization
-To optimize kernel executable footprint and performance, SigmaOS pipelines employ deep devirtualization during Link-Time Optimization (LTO). Dynamic dispatch traits (`Box<dyn Driver>`) are analyzed compiler-wide and automatically converted to monomorphized static dispatch branches. This eliminates the cost of vtable indirection and enables extensive compiler function inlining.
-
-### 5. No-Allocation Real-Time Interrupt Handlers
-To eliminate microkernel jitter and unpredictable latency during hardware interrupts, SigmaOS strictly prohibits dynamic allocations (such as buddy allocator requests) within Interrupt Service Routines (ISRs). Handlers operate exclusively with pre-allocated static thread-safe storage or ring buffers, ensuring hard real-time response guarantees.
-
-### 6. Transactional Crash Rollback & Recovery
-For absolute system availability, the S-SEC shard tracks clean state logs for isolated user-space driver and subsystem shards. If a driver shard encounters a critical panic or memory violation, the kernel cleanly discards the active corrupted transaction and restores the shard's status to its last known validated state checkpoint, maintaining 99.999% operating system uptime.
-
-### 7. Cache-Line Alignment for Shared structures
-To prevent false-sharing bottlenecks on multi-socket NUMA systems, critical shared kernel structs and atomic controls are explicitly aligned to CPU cache-line boundaries (e.g., `#[align(64)]`). This prevents adjacent variables from being fetched or invalidated simultaneously across different core caches, keeping memory bus throughput highly efficient.
+### 2. Accessibility Suite
+Features native screen reader notifications, speech-to-text voice buffers, high-contrast layouts, and vision-motor handicap assistants wired directly into the graphics compositing rendering loop.
 
 ---
 

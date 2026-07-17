@@ -138,7 +138,7 @@ Enrich `src/filesystem/vfs.rs` and our drivers with advanced cache invalidation,
 - **eBPF-Inspired System Profiling:** From `bpftrace`, absorb lightweight, safe sandbox metric hooks for syscall monitoring in `src/automation/system_level.rs`.
 - **Unified Widgets & Dashboards:** From `grafana` and `htop`, absorb clean progress widgets and metric graphs into `src/dashboard/monitor.rs`.
 
-**SigmaOS IntegrationPathway:**
+**SigmaOS Integration Pathway:**
 Power the monitoring engine in `src/dashboard/` to feed real-time resource usage data directly into our AI-driven system automation optimizer.
 
 ---
@@ -221,7 +221,7 @@ SigmaOS aims to completely surpass and render obsolete 20 flagship open-source r
 
 #### [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps)
 *   **Paradigm:** Collection of LLM agent execution templates.
-*   **Sovereign Absorption Mechanism:** S-AI natively integrates these agent templates as built-in declarative schema templates within S-AI execution runtimes, allowing instantaneous agent setup with a single capability pledge.
+*   **Sovereign Absorption Mechanism:** S-AI natively integrates these agent templates as built-ins declarative schema templates within S-AI execution runtimes, allowing instantaneous agent setup with a single capability pledge.
 
 ---
 

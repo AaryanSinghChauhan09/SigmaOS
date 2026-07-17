@@ -8,19 +8,21 @@ This roadmap serves as a strategic comparison matrix and execution path to bridg
 
 ---
 
-## 📊 Comparative Matrix: SigmaOS vs Linux Kernel & Distros
+## 📊 Comparative Dashboard: SigmaOS vs Mainstream Operating Systems
 
-| Subsystem / Feature | SigmaOS (Current State) | Linux Kernel & Distros | Gap / Missing in SigmaOS |
-| :--- | :--- | :--- | :--- |
-| **Drivers** | Prototype / partial support (NVMe, USB xHCI, Ext4/FAT32, basic GPU/USB HID). | Tens of thousands of vendor-backed drivers covering all hardware categories. | Broad hardware driver coverage (WiFi, GPUs, printers, sensors, ARM/RISC-V boards, embedded devices). |
-| **Networking** | Partial TCP/UDP stack, zero-trust network stack. | Mature IPv4/IPv6, advanced routing, VPN, wireless stacks, container networking. | Full networking stack with IPv6, wireless drivers, advanced routing protocols. |
-| **Filesystems** | Ext4, FAT32, SigmaFS prototype. | Dozens of stable filesystems (XFS, Btrfs, ZFS, NTFS, NFS, CIFS, FUSE). | Wider filesystem support, distributed filesystem maturity. |
-| **Virtualization** | Early microkernel + WASM sandbox bundle. | Mature KVM, Xen, Docker/LXC, namespaces, cgroups. | Full virtualization/container ecosystem. |
-| **Security** | Post-quantum cryptography (Kyber-1024, Dilithium-5), pledge/unveil, capability sandboxing. | SELinux, AppArmor, seccomp, LSM framework, decades of CVE response. | Integration with mainstream security frameworks, broader audit tooling. |
-| **Scheduler & Memory** | Predictive multi-priority scheduler (MLFQ+CFS+EDF), Buddy Allocator. | Decades of tuning: NUMA-aware memory, advanced RCU, real-time scheduling, memory hotplug. | NUMA support, advanced RCU, hugepage support. |
-| **Community & Ecosystem** | Small contributor base, sovereign India-first focus. | Global ecosystem, 240k+ stars, 63k+ forks, thousands of corporate contributors. | Large-scale developer adoption, hardware/software vendor partnerships. |
-| **Tooling & Build System** | Rust/Zig/Nim/Ada hybrid, sovereign package manager (`.spkg`). | Mature GCC/Clang toolchains, kernel.org releases, distro packaging (Deb, RPM, Nix). | Wider toolchain support, integration with mainstream distros. |
-| **Documentation** | Roadmap, Wiki, sovereign compliance docs. | Extensive subsystem docs, coding style, APIs, ABI stability. | Broader developer documentation, subsystem-specific guides. |
+| Subsystem / Feature | SigmaOS (Current State) | Linux Kernel & Distros | Windows OS | macOS | What's Missing in SigmaOS |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Drivers** | Prototype OOP drivers (NVMe, USB HID, Ext4/FAT32). | Huge vendor-backed driver ecosystem. | Broad OEM-certified drivers. | Tight Apple hardware integration. | Wide hardware driver coverage (WiFi, GPUs, printers, legacy devices). |
+| **Package Management** | Planned `.spkg` sovereign manager. | APT, DNF, Pacman, Portage, APK. | `.msi` / `.exe` installers. | `.pkg` + App Store. | Mature package ecosystem, cross-format compatibility. |
+| **Networking** | Partial TCP/UDP stack, zero-trust network stack. | Full IPv4/IPv6, advanced routing, VPN. | Full IPv4/IPv6, enterprise networking. | Full IPv4/IPv6, seamless WiFi/Bluetooth. | IPv6, wireless stack, advanced protocols. |
+| **Filesystems** | Ext4, FAT32, SigmaFS prototype. | XFS, Btrfs, ZFS, NTFS, NFS, CIFS. | NTFS, ReFS, FAT32. | APFS, HFS+. | Wider filesystem support, distributed filesystem maturity. |
+| **Virtualization** | Early microkernel + WASM sandbox bundle. | KVM, Xen, Docker/LXC. | Hyper-V, WSL. | Parallels, Apple Hypervisor. | Full virtualization/container ecosystem. |
+| **Security** | Post-quantum cryptography, pledge/unveil, capability sandboxing. | SELinux, AppArmor, seccomp, LSM framework. | BitLocker, Defender, driver signing. | Gatekeeper, SIP, XProtect. | Integration with mainstream security frameworks, broader audit tooling. |
+| **Scheduler & Memory** | Predictive multi-priority scheduler (MLFQ+CFS+EDF), Buddy Allocator. | Decades of tuning: NUMA-aware memory, advanced RCU, real-time scheduling, memory hotplug. | Windows NT scheduler, memory hotplug. | Mach scheduler, memory compression. | NUMA support, advanced RCU, hugepage support. |
+| **UI/UX & Shell** | CLI + experimental WASM apps. | GNOME, KDE, XFCE, etc. | Windows Shell, Fluent UI. | Aqua UI. | Mature desktop environment, GUI ecosystem. |
+| **Community & Ecosystem** | Small contributor base, sovereign India-first focus. | Global ecosystem, 240k+ stars, thousands of contributors. | Massive OEM + enterprise software vendor ecosystem. | Tight Apple developer and device ecosystem. | Large-scale developer adoption, hardware/software vendor partnerships. |
+| **Tooling & Build System** | Rust/Zig/Nim/Ada hybrid build chain. | GCC/Clang toolchains, distro packaging pipelines. | Visual Studio, MSBuild. | Xcode, LLVM/Clang. | Wider toolchain support, IDE integration. |
+| **App Ecosystem** | Early WASM bundle experiments. | Millions of open-source packages. | Huge commercial + enterprise software library. | Rich App Store ecosystem. | Broad application ecosystem, commercial software support. |
 
 ---
 
