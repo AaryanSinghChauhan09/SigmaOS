@@ -38,3 +38,7 @@ pub use orchestration::{CrossDeviceOrchestrator, ConnectedDevice, SmartHomeDevic
 pub use package::{UniversalPackageManager, UnifiedPackage, PackageFormat, PackageSource, PackageAdapter, DependencyResolver, ConflictResolution, PackageError};
 pub use compatibility::{CompatibilityManager, ApplicationBinary, TranslationLayer, ContainerRuntime, TargetPlatform, BinaryFormat, CompatibilityMode, CompatibilityError};
 pub use virtualization::{VirtualizationOrchestrator, VirtualMachine, Container, KubernetesPod, VirtualizationTech, VmState, ResourcePool, VirtualizationError};
+
+pub mod virt;
+pub use virt::hypervisor::{SimpleGuest, SimpleHypervisor, Guest, Hypervisor, GuestState, VirtualizationGeneration, HypervisorError, GuestID};
+pub use virt::microvm::{SimpleMicroVM, SimpleSandboxManager, MicroVM, SandboxManager, MicroVMState, SandboxPolicy};

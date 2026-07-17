@@ -15,7 +15,7 @@ pub type MicroVMID = usize;
 
 /// MicroVM state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MicroVMState {
     Stopped = 0,
     Starting = 1,
@@ -26,7 +26,7 @@ pub enum MicroVMState {
 
 /// Sandbox policy
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxPolicy {
     Strict = 0,
     Moderate = 1,
@@ -157,8 +157,13 @@ impl SimpleMicroVM {
     }
 
     pub fn get_state(&self) -> MicroVMState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        let state_val = self.state.load(Ordering::SeqCst);
+        match state_val {
+            0 => MicroVMState::Stopped,
+            1 => MicroVMState::Starting,
+            2 => MicroVMState::Running,
+            3 => MicroVMState::Stopping,
+            _ => MicroVMState::Paused,
         }
     }
 
@@ -267,6 +272,7 @@ pub trait SandboxManager {
 
 /// Sandbox statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SandboxStats {
     pub total_microvms: usize,
     pub running_microvms: usize,
@@ -474,6 +480,14 @@ impl<T> Vec<T> {
         self.len
     }
 
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter { vec: self, index: 0 }
+    }
+
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -493,8 +507,126 @@ impl<T> Vec<T> {
     }
 }
 
-// External allocator functions
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_microvm_sandbox_policy_oop() {
+        let manager_cap = ManagerCapability::full();
+        let mut manager = SimpleSandboxManager::new(manager_cap);
+
+        // 1. Create a Strict sandbox microVM (e.g. secure, zero network/shared filesystem)
+        let microvm_strict_id = manager.create_microvm(b"strict-secure-vbox", SandboxPolicy::Strict).unwrap();
+
+        // 2. Create a Permissive sandbox microVM (e.g. development mode)
+        let microvm_permissive_id = manager.create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive).unwrap();
+
+        // Verify statistics
+        let stats = manager.stats();
+        assert_eq!(stats.total_microvms, 2);
+        assert_eq!(stats.by_policy[SandboxPolicy::Strict as usize], 1);
+        assert_eq!(stats.by_policy[SandboxPolicy::Permissive as usize], 1);
+
+        // Retrieve and start strict sandbox microVM
+        assert!(manager.start_microvm(microvm_strict_id).is_ok());
+
+        let microvm_strict = manager.get_microvm(microvm_strict_id).unwrap();
+        assert_eq!(microvm_strict.state(), MicroVMState::Running);
+        assert_eq!(microvm_strict.sandbox_policy(), SandboxPolicy::Strict);
+    }
 }
