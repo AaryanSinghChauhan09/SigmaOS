@@ -280,12 +280,18 @@ impl VirtualizationStrategy for ModernVirtualizationStrategy {
     }
 
     fn execute_start(&self, target_name: &str) -> Result<(), VirtualizationError> {
-        println!("Modern sandboxed hypervisor deploying target: {}", target_name);
+        println!(
+            "Modern sandboxed hypervisor deploying target: {}",
+            target_name
+        );
         Ok(())
     }
 
     fn execute_stop(&self, target_name: &str) -> Result<(), VirtualizationError> {
-        println!("Modern sandboxed hypervisor terminating target: {}", target_name);
+        println!(
+            "Modern sandboxed hypervisor terminating target: {}",
+            target_name
+        );
         Ok(())
     }
 }
@@ -631,7 +637,8 @@ mod tests {
         assert!(legacy_strat.execute_start("win98_guest").is_ok());
 
         // Test Modern Strategy
-        let modern_strat = VirtualizationStrategyFactory::get_strategy(VirtualizationTech::Kubernetes);
+        let modern_strat =
+            VirtualizationStrategyFactory::get_strategy(VirtualizationTech::Kubernetes);
         assert_eq!(modern_strat.generation(), "Modern");
         assert_eq!(modern_strat.supports_live_migration(), true);
         assert!(modern_strat.execute_start("web-pod-v2").is_ok());

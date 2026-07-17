@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
 /// Implements microVM sandboxing using OOP principles with traits and structs
 /// No dependency on external virtualization frameworks
 /// Based on Roadmap Item 19: MicroVM sandboxing foundation
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// MicroVM ID
 pub type MicroVMID = usize;
@@ -132,7 +131,12 @@ pub struct SimpleMicroVM {
 }
 
 impl SimpleMicroVM {
-    pub fn new(id: MicroVMID, name: &[u8], sandbox_policy: SandboxPolicy, capability: MicroVMCapability) -> Self {
+    pub fn new(
+        id: MicroVMID,
+        name: &[u8],
+        sandbox_policy: SandboxPolicy,
+        capability: MicroVMCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -255,7 +259,11 @@ impl MicroVM for SimpleMicroVM {
 /// Sandbox manager trait (OOP interface)
 pub trait SandboxManager {
     /// Create microVM
-    fn create_microvm(&mut self, name: &[u8], sandbox_policy: SandboxPolicy) -> Result<MicroVMID, MicroVMError>;
+    fn create_microvm(
+        &mut self,
+        name: &[u8],
+        sandbox_policy: SandboxPolicy,
+    ) -> Result<MicroVMID, MicroVMError>;
     /// Destroy microVM
     fn destroy_microvm(&mut self, id: MicroVMID) -> Result<(), MicroVMError>;
     /// Start microVM
@@ -338,7 +346,11 @@ impl SimpleSandboxManager {
 }
 
 impl SandboxManager for SimpleSandboxManager {
-    fn create_microvm(&mut self, name: &[u8], sandbox_policy: SandboxPolicy) -> Result<MicroVMID, MicroVMError> {
+    fn create_microvm(
+        &mut self,
+        name: &[u8],
+        sandbox_policy: SandboxPolicy,
+    ) -> Result<MicroVMID, MicroVMError> {
         if !self.capability.can_create {
             return Err(MicroVMError::PermissionDenied);
         }
@@ -481,15 +493,27 @@ impl<T> Vec<T> {
     }
 
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+        VecIter {
+            vec: self,
+            index: 0,
+        }
     }
 
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -611,10 +635,14 @@ mod tests {
         let mut manager = SimpleSandboxManager::new(manager_cap);
 
         // 1. Create a Strict sandbox microVM (e.g. secure, zero network/shared filesystem)
-        let microvm_strict_id = manager.create_microvm(b"strict-secure-vbox", SandboxPolicy::Strict).unwrap();
+        let microvm_strict_id = manager
+            .create_microvm(b"strict-secure-vbox", SandboxPolicy::Strict)
+            .unwrap();
 
         // 2. Create a Permissive sandbox microVM (e.g. development mode)
-        let microvm_permissive_id = manager.create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive).unwrap();
+        let microvm_permissive_id = manager
+            .create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive)
+            .unwrap();
 
         // Verify statistics
         let stats = manager.stats();
