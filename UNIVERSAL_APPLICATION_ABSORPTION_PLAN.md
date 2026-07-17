@@ -33,92 +33,86 @@ SigmaOS eliminates this by organizing the OS into dedicated, hot-swappable **Sov
 
 ---
 
-## 🛠️ Core System Improvements
+## 🛠️ Core System Enhancements
 
 SigmaOS refines core system capabilities to deliver absolute architectural superiority over traditional monolithic kernels and fragmented Linux distributions:
 
-### 1. Kernel Intelligence Layer
-*   **Predictive AI Scheduling:** Integrating AI-driven workload profiling directly into the kernel. It dynamically adjusts resource priority queues based on historical thread behavior, predicting CPU burst times and preventing scheduler latency.
-*   **Real-time Anomaly Detection:** Constant monitoring of system call patterns, IPC frequencies, and memory page faults to identify and mitigate privilege escalation or buffer overflow attempts before they can execute.
+### 1. Adaptive Kernel Modules
+*   **Workload-Driven Loading:** SigmaOS implements an adaptive kernel layer that dynamically loads and unloads module shards based on active workload metrics (absorbing and extending FreeBSD’s modularity paradigms) to guarantee minimal memory usage.
+*   **Predictive Resource Allocation:** Wields an AI-driven memory and CPU scheduler that anticipates execution spikes before they occur, automatically pre-allocating pages and balancing core affinities.
 
-### 2. Unified OOP Driver Marketplace & Registry
-*   **Zero-Reboot Hot-Swaps:** A signed, version-controlled repository for GPU, WiFi, and peripheral drivers. Driver instances can be fully loaded, updated, or re-allocated without rebooting the system.
-*   **Versatile OOP Abstraction:** Legacy Port Address I/O and modern Memory-Mapped I/O (MMIO) are unified under the `UnifiedPeripheral` trait, ensuring clean polymorphism.
+### 2. Universal Driver Layer & Registry
+*   **Cross-OS Compatibility Wrappers:** Houses a unified driver registration HAL that maps Windows, macOS, and Linux driver structures natively into SigmaOS userspace capabilities, complete with hot-swap updates and zero-reboot loading.
+*   **Versatile OOP Abstraction:** Decouples physical transport from logical driver calls via `UnifiedPeripheral` traits, bridging Legacy Port address (PIO) and Modern memory-mapped I/O (MMIO).
 
-### 3. Self-Healing Networking (SigmaNet)
-*   **Automatic Route & VPN Repair:** Real-time state machines continuously monitor network connectivity, dynamically rerouting packet streams, re-establishing broken VPN tunnels, and automatically repairing firewall misconfigurations with zero user intervention.
-*   **Built-in Zero-Trust Constraints:** Micro-segmentation is applied at the socket level. Network routes are isolated per capability block.
+### 3. Self-Healing Bootloader
+*   **Automated Panic Recoveries:** In the event of a critical boot kernel panic, the self-healing bootloader detects the crash state and automatically rolls back the active system mount to the last-known-stable transactional snapshot.
 
 ### 4. Filesystem Federation (SigmaFS)
-*   **Universal Multi-FS Mounting:** Natively mounts and manages multiple filesystem types (including Ext4, FAT32, Btrfs, ZFS, APFS, and NTFS) concurrently under a single virtual directory tree.
-*   **Merkle-Tree Rollbacks:** Enables instant, transactional, system-wide snapshot creation and rollbacks directly across federated mounts.
-
-### 5. Adaptive Virtualization Shard (S-VIRT)
-*   **Unified Orchestration:** Merges containerization, type-1 hypervisor VMs, and WebAssembly (WASM) sandboxed runtimes into a single high-efficiency coordination stack (**SigmaContainers** + micro-VMs).
+*   **Concurrent Multi-FS Mounts:** Simultaneously mounts and federates Ext4, ZFS, APFS, and NTFS filesystems under a single Virtual File System directory tree with integrated Merkle-tree rollback snapshots.
 
 ---
 
 ## 📦 Package & Application Layer
 
 ### 1. sigmapkg++
-SigmaOS extends the universal package manager into a highly intelligent software compiler:
-*   **AI-Assisted Dependency Resolution:** Utilizes heuristic DPLL SAT solvers combined with trained weight matrices to determine conflict-free version mappings instantly.
-*   **Delta-Compressed Updates:** Calculates cryptographic delta differences to update binaries with near-zero network overhead, backed by local atomic snapshot recovery points.
-*   **Universal Platform Formats:** Supports packaging and exporting application runtimes natively across SigmaOS, Linux, Windows, and macOS target environments.
+SigmaOS extends its universal package compiler to include:
+*   **AI-Assisted Dependency Resolution:** Resolves complex, multi-version package dependency graphs instantly using DPLL SAT solvers and trained weight heuristic matrices.
+*   **Delta-Compressed Updates:** Transmits only cryptographic delta differences for package upgrades, accompanied by automated atomic rollback checkpoints.
+*   **Cross-Platform Targets:** Builds, formats, and signs packages natively for SigmaOS, Linux, Windows, and macOS target environments.
 
-### 2. SigmaHub
-A universal application portal hosting only cryptographically signed, compliance-checked applications. Bypasses the security fragmentation of Snap, Flatpak, and AUR.
+### 2. SigmaHub Marketplace
+A unified application store that hosts only compliance-checked, signed, and audited software packages, absorbing the best features of Snap, Flatpak, and AUR while eliminating their overhead and security fragmentation.
 
-### 3. SigmaForge
-An AI-assisted, source-compilation compiler framework that optimizes binary compile flags specifically for host CPU instruction sets (absorbing and automating Gentoo's Portage USP).
-
----
-
-## 🔐 Security, Compliance & Cryptography
-
-### 1. Mandatory Cryptographic Signing
-Every package, driver, visual utility, and kernel module must be signed with secure Dilithium-5 digital signatures. Unsigned executables are blocked at the capability validation gate.
-
-### 2. Local Compliance Dashboards
-Real-time security auditing frameworks integrated directly into `SigmaSecure`. Natively generates active compliance mappings for ISO 27001, NIST, GDPR, HIPAA, and SOC2 directly from kernel logs.
-
-### 3. Zero-Trust Default Execution
-Process sandboxing is active by default. Every system thread is instantiated with zero permissions, requiring explicit delegation of a `CapabilityToken` for VFS, network, or socket writes.
-
-### 4. Post-Quantum Cryptography (PQC)
-Kyber-1024 Key Encapsulation Mechanisms (KEM) are woven directly into the VFS encryption boundaries and network socket handshakes, securing system data against post-quantum decrypt-now-play-later attacks.
+### 3. SigmaForge & SigmaSandbox
+*   **SigmaForge:** An AI-assisted source compilation compiler that automates compile-time flag optimization specifically for the host CPU instructions (re-imagining Gentoo's Portage USP).
+*   **SigmaSandbox:** Provides lightweight, secure, and isolated runtime containers for legacy third-party software package packages.
 
 ---
 
-## 🎨 User Experience & Interface
+## 🔐 Security, Compliance & Threat Detection
+
+### 1. Zero-Trust Execution
+Every process thread is sandboxed by default. System call authorization is gated behind mandatory `CapabilityToken` validation, enforcing strict least-privilege policies.
+
+### 2. Mandatory Cryptographic Signing
+All applications, device drivers, and system shards must be signed with NIST-approved Dilithium-5 digital signatures. Unsigned code is intercepted and blocked at the microkernel gate.
+
+### 3. Local Compliance Dashboards
+`SigmaSecure` natively compiles GDPR, HIPAA, ISO 27001, SOC2, and NIST compliance metrics in real-time directly from capability gate transaction logs.
+
+### 4. Post-Quantum Cryptography & Real-Time Threat Detection
+*   **PQC Integration:** Kyber-1024 encryption is embedded natively into network handshakes and VFS storage blocks.
+*   **Real-Time Threat Detection:** Local AI anomaly detection models monitor system call frequencies and network packets to detect and terminate hostile behaviors instantly.
+
+---
+
+## 🎨 User Experience & Accessibility
 
 ### 1. SigmaShell
-A modular desktop compositor implementing responsive visual widgets, low-latency rendering loops, and native WCAG 2.1 AAA compliance controls (including integrated screen readers, high-contrast states, and layout magnification).
+A modular visual compositor featuring interactive widget dashboards, zero-latency graphics pipelines, and WCAG 2.1 compliance (including screen readers, layout magnification, and voice/gesture control).
 
 ### 2. SigmaWorkspaces
-An event-driven, contextual workspace manager that dynamically groups visual windows and automates user routines (such as Samsumg-style Modes and Routines) based on physical environment triggers.
+An event-driven desktop experience that automates layouts and routines (absorbing GNOME, KDE, and macOS features) based on contextual triggers.
 
-### 3. SigmaPlay
-A high-performance gaming hub. Integrates containerized graphics runtimes, direct PCIe GPU passthrough, and native Steam/Proton shims to run heavy titles with near-zero microkernel overhead.
-
-### 4. SigmaFS Manager
-A visual GUI and robust CLI enabling users to manage distributed storage, snapshot timelines, filesystem migration, and encrypted volumes seamlessly.
+### 3. SigmaPlay & SigmaFS Manager
+*   **SigmaPlay:** High-performance gaming hub with containerized runtimes, direct GPU PCIe passthrough, and Steam/Proton integration to absorb SteamOS/Android ecosystems.
+*   **SigmaFS Manager:** Visual GUI + CLI for rollback snapshot management, storage volume migration, and distributed file sharing.
 
 ---
 
-## 🌐 Enterprise & Cloud Infrastructure
+## 🌐 Enterprise, Cloud & Analytics
 
-### 1. SigmaCloud
-A native, zero-dependency cluster orchestration layer that manages container scheduling and distributed networks natively, removing the configuration complexity of Kubernetes or Docker Swarm.
+### 1. SigmaCloud & SigmaEdge
+*   **SigmaCloud:** Native cluster orchestration layer that schedules containers and virtual networks without Docker/Kubernetes configuration complexity.
+*   **SigmaEdge:** High-efficiency, lightweight IoT variant optimizing resources to run in < 30MB of RAM (absorbing Alpine's USP).
 
-### 2. SigmaEdge
-An ultra-lightweight, embedded kernel configuration profile designed for low-power IoT devices, consuming < 30MB of physical RAM (superseding Alpine Linux's footprint optimizations).
+### 2. SigmaGuardian & SigmaOrchestrator
+*   **SigmaGuardian:** Continuous security daemon that automates vulnerability patching and isolates compromised hardware modules.
+*   **SigmaOrchestrator:** Merges cron jobs, systemd timers, and cloud cluster scheduling into a single adaptive, microkernel-level scheduler.
 
-### 3. SigmaGuardian
-An automated, host-intrusion prevention daemon that continuously sweeps system states, patches vulnerabilities on-the-fly, and isolates compromised hardware modules automatically.
-
-### 4. SigmaOrchestrator
-A unified task scheduler that simplifies system management by combining cron jobs, systemd-style timers, and Kubernetes workloads into a single, adaptive, microkernel-level scheduler.
+### 3. SigmaAnalytics
+Built-in, local telemetry pipeline tracking performance, power consumption, compliance vectors, and system resource optimization metrics.
 
 ---
 
