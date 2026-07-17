@@ -47,10 +47,25 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
   - `gregkh/linux` — Stable driver subsystems and backport mechanics.
   - `raspberrypi/linux` — Broadcom SOC support, DMA channels, GPIO routing.
   - `analogdevicesinc/linux` — Advanced industrial bus drivers and ADC controller interfaces.
+  - `AYNTechnologies/linux` (Handheld gaming console hardware adaptations)
+  - `bootlin/linux` (Embedded Linux kernel engineering and boot-time optimizations)
+  - `histb-mainline/linux` (HiSilicon TV Box mainline kernel ports)
+  - `freemyipod/linux` (Legacy Apple iPod hardware adaptations and audio drivers)
+  - `chewitt/linux` (Amlogic SoC media center adaptations and DRM drivers)
+  - `andy-shev/linux` (Intel pin-control, GPIO, and platform driver subsystems)
+  - `esmil/linux` (RISC-V architecture mainline integrations and SoC adaptations)
+  - `AMDESE/linux` (AMD SEV secure encrypted virtualization kernel extensions)
+  - `flipperdevices/flipper-linux-kernel` (Ultra-low footprint embedded firmware kernel)
+  - `CatOS-Home/CatOS` (Polymorphic domestic smart microkernel prototype)
 * **Paradigms & Algorithms to Absorb:**
   - **Virtual File System (VFS) Layer:** Emulate the Linux dentry cache and mount namespace models.
   - **Predictive Multi-Priority Scheduler:** Combine EEVDF and Completely Fair Scheduler (CFS) models.
   - **Low-level Driver Boundaries:** Isolate hardware-facing registers using Rust memory-mapped I/O (MMIO).
+  - **Handheld Gaming & SoC Optimizations:** From `AYNTechnologies/linux` and `chewitt/linux`, absorb raw fan-curve controls, power limit thresholds (TDP), and DRM plane double-buffering structures directly into the `GpuDriver` and scheduler loops.
+  - **Embedded Boot-Time Minimization:** From `bootlin/linux` and `flipperdevices/flipper-linux-kernel`, absorb sub-millisecond driver init techniques, lazy serial polling, and early raw console hooks.
+  - **RISC-V & Pin-Control Abstractions:** From `esmil/linux` and `andy-shev/linux`, absorb platform GPIO descriptor lookups and safe multiplexing patterns.
+  - **Hardware-Enforced Enclave Encryption:** From `AMDESE/linux`, absorb secure memory encryption keys (SME/SEV) and isolate secret keys from standard DMA queries inside our `CapabilityGate`.
+  - **Legacy Audio Codec Wrappers:** From `freemyipod/linux`, absorb double-buffered DMA audio rings and low-level DAC clock synchronizations.
 * **Pathway in SigmaOS:** Integrate into `src/kernel/scheduler.rs`, `src/filesystem/vfs.rs`, and `src/drivers/`.
 
 ### Domain 2: Operating System Distributions (Mainstream, Immutable, & Special Purpose)
@@ -59,11 +74,14 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
   - **Kubernetes-Focused:** `siderolabs/talos`, `kairos-io/kairos`
   - **Independent & Gaming:** `redroselinux/redroselinux`, `jeffreysama/avalos`
   - **Source & Binary Distros:** `void-linux/void-packages`, `clearlinux/distribution`, `nixos/nixpkgs`, `guix/guix`, `bedrocklinux/bedrocklinux-userland`, `alpinelinux/aports`, `openSUSE/obs-build`, `endeavouros-team/PKGBUILDS`, `manjaro/packages-core`, `slackware-contrib/slackbuilds`
-  - **Minimalist:** `tinycorelinux/Core`, `LFS/lfs`, `chimera-linux/chimera`, `serpent-os/core`, `hyperbola/hyperbola-packages`, `kisslinux/kiss`, `artix-linux/packages`, `calculate-linux/calculate`, `sabayon/sabayon-distro`, `chakra-linux/chakra`, `peppermintos/peppermintos`, `peppermintos/iso`, `bodhilinux/bodhi`, `zorinos/zorin-os`, `elementary/os`, `deepin-community/deepin`, `mx-linux/mx`
+  - **Minimalist & Immutable:** `tinycorelinux/Core`, `LFS/lfs`, `chimera-linux/chimera`, `serpent-os/core`, `hyperbola/hyperbola-packages`, `kisslinux/kiss`, `artix-linux/packages`, `calculate-linux/calculate`, `sabayon/sabayon-distro`, `chakra-linux/chakra`, `peppermintos/peppermintos`, `peppermintos/iso`, `bodhilinux/bodhi`, `zorinos/zorin-os`, `elementary/os`, `deepin-community/deepin`, `mx-linux/mx`
   - **Server & Cloud:** `rocky-linux/rocky`, `almalinux/almalinux`, `oracle/linux`, `cloudlinux/cloudlinux`, `coreos/fedora-coreos`, `flatcar-linux/flatcar`, `rancher/os`, `k3os-io/k3os`, `bottlerocket-os/bottlerocket`, `ubuntu-core/ubuntu-core`
+  - `skiffos/SkiffOS` (Immutable, container-centric, multi-architecture target compilation OS)
+  - `FascodeNet/alterlinux` (Highly customized Arch-based user experience distributions)
 * **Paradigms & Algorithms to Absorb:**
-  - **Declarative & Reproducible OS Configuration:** Inspired by NixOS/Guix, SigmaOS boots from read-only system snapshots verified via cryptographic signatures.
-  - **Immutable Storage Layer:** From Talos/Flatcar, support an immutable filesystem state, isolating volatile user writes into capability-unveiled folders.
+  - **Declarative & Immutable File System States:** Inspired by NixOS/Guix and `skiffos/SkiffOS`, SigmaOS boots from read-only system snapshots verified via cryptographic signatures.
+  - **Immutable Storage Layer:** From Talos/Flatcar and SkiffOS, support an immutable filesystem state, isolating volatile user writes into capability-unveiled folders.
+  - **Highly Custom User Layouts:** From `FascodeNet/alterlinux`, absorb advanced, multi-desktop UI layout themes and pre-configured hotkey bindings directly into the Zenith Compositor rendering loops.
   - **Extremely Low Memory Idle State:** From DietPi/TinyCore, maintain an idle memory usage profile of under 30MB for SBC targets.
 * **Pathway in SigmaOS:** Implement in `src/filesystem/mod.rs`, `src/sigpkg/`, and `src/resilience/self_healing.rs`.
 
@@ -71,10 +89,12 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
 * **Target Repositories:**
   - **Package Managers:** `rpm-software-management/rpm`, `dpkg/dpkg`, `pacman/pacman`, `flatpak/flatpak`, `snapcore/snapd`, `homebrew/linuxbrew-core`, `spack/spack`, `conda/conda`, `pkgsrc/pkgsrc`, `nix-community/nix`, `nix-community/home-manager`
   - **Build Systems:** `openembedded/openembedded-core`, `yoctoproject/poky`, `buildroot/buildroot`
+  - `termux/termux-packages` (Android-based Linux terminal package environment and building framework)
 * **Paradigms & Algorithms to Absorb:**
   - **DPLL SAT-Solving Dependency Resolution:** Use advanced constraint satisfaction algorithms to resolve version conflict graphs.
   - **Content-Addressed Storage (CAS):** Store packages using SHA-256 hashes of their contents to achieve complete side-by-side version co-existence and de-duplication.
   - **Sandbox Isolation:** Enforce application sandbox runtime configurations using capability pledges.
+  - **Highly Adaptable Hosted Userspace Packages:** From `termux/termux-packages`, absorb cross-compilation configurations and patch mechanisms that translate raw path prefixes onto target execution folders, making userspace environments completely self-contained.
 * **Pathway in SigmaOS:** Implement in `src/sigpkg/resolver.rs`, `src/sigpkg/store.rs`, and `src/package/`.
 
 ### Domain 4: Init Systems, Process Supervision, & Utilities
@@ -94,10 +114,12 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
   - **Encryption & SSH:** `openssh/openssh-portable`, `gnupg/gnupg`
   - **Hardening & Detection:** `selinuxProject/selinux`, `clamav/clamav`, `fail2ban/fail2ban`, `suricata/suricata`
   - **Networking Protocols:** `bind/bind9`, `dnsmasq/dnsmasq`, `unbound/unbound`, `bird/bird`, `quagga/quagga`, `frrouting/frr`, `openvswitch/ovs`, `strongswan/strongswan`, `ppp/ppp`, `netdata/netdata`
+  - `solus-project/linux-driver-management` (Polymorphic graphics and wireless driver configuration manager)
 * **Paradigms & Algorithms to Absorb:**
   - **Noise Protocol Handshake:** Implement high-speed cryptographic tunnels for zero-trust communications.
   - **Stateful Packet Filtering & Rule Engine:** Process packets inside a capability-isolated network shard without duplicating memory buffers.
   - **Kyber-1024 & Dilithium-5 Security Integration:** NIST-compliant PQC keys to sign network payloads.
+  - **Unified Security Driver Selection:** From `linux-driver-management`, absorb dynamic vendor/device ID mapping and signed-checksum matching to prevent driver-spoofing vectors.
 * **Pathway in SigmaOS:** Implement in `src/security/`, `src/network/`, and `src/net/`.
 
 ### Domain 6: Desktop Environments, Compositors, & Window Managers
@@ -106,9 +128,11 @@ We synchronize SigmaOS's architecture with the open-source software ecosystem ac
   - **Lightweight Panels:** `xfce/xfce4-panel`, `lxde/lxde-common`, `mate-desktop/mate-panel`
   - **Tiling Window Managers:** `swaywm/sway`, `i3/i3`, `awesomeWM/awesome`
   - **Stacking Window Managers:** `openbox/openbox`, `fluxbox/fluxbox`
+  - `JingOS-team/JingOS` (Linux-based, tablet-centric, gestural and multi-touch desktop environment)
 * **Paradigms & Algorithms to Absorb:**
   - **Hierarchical Tree Tiling Mathematics:** Render layouts using safe vector arithmetic for efficient window positioning.
   - **Assistive Screen-Reader Hooks:** Integrate voice buffer queuing directly with layout transitions.
+  - **Gestural & Touch-first UI Loops:** From `JingOS`, absorb natural gesture detection vectors, fluid multi-touch scale/pinch routines, and adaptive icon margins.
 * **Pathway in SigmaOS:** Implement in `src/desktop/zenith.rs`, `src/desktop/compositor.rs`, and `src/accessibility/`.
 
 ### Domain 7: High-Performance Filesystems & Storage
