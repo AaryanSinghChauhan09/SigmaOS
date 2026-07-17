@@ -20,8 +20,32 @@ pub mod orchestration;
 pub mod package;
 pub mod compatibility;
 pub mod virtualization;
+pub mod community;
+pub mod legal;
+pub mod education;
+pub mod ecosystem;
+pub mod governance;
+pub mod support;
 
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use community::{
+    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability, IssueStatus,
+    MentorshipProgram, OnboardingStage, Sponsor,
+};
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+};
+pub use education::{
+    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
+};
+pub use ecosystem::{
+    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
+    EnterprisePartner,
+};
+pub use governance::{
+    FoundationModel, FoundationMember, TransparentRoadmap, RoadmapMilestone, ReleaseType, DemocraticVoting, DemocraticProposal,
+};
+pub use support::{LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier};
 pub use sigpkg::{SatSolver, ContentAddressedStore, CryptoVerifier, Transaction, PackageRecipe, BuildSystem, RecipeManager, RecipeError};
 pub use kernel::{Scheduler, Process, Priority, ProcessState, BuddyAllocator, MemoryBlock, PAGE_SIZE, IpcManager, Channel, Message, IpcError, RoundRobinScheduler, RoundRobinConfig, SchedulerError};
 pub use network::{TcpStack, TcpConnection, TcpSegment, TcpState, TcpError};
