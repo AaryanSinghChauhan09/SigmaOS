@@ -11,3 +11,7 @@ This journal contains CRITICAL performance learnings discovered during profiling
 ## 2024-07-15 - Ownership and Moves in Allocator Merge Trees
 **Learning:** In Buddy Allocator merge operations, taking ownership of memory blocks by-value during a merge search leads to premature values being dropped if buddy merging fails. This forces expensive re-allocation or unnecessary clone overheads. Returning ownership of the original block in a `Result<MemoryBlock, MemoryBlock>` if buddy merging fails avoids all move-borrow complications, preserves zero-allocation guarantees, and maintains perfect linear execution speed.
 **Action:** When designing hardware or memory managers in Rust, use `Result` wrappers to pass ownership back and forth safely without any allocation or cloning of control blocks.
+
+## 2024-07-16 - Heap-Free SemVer Split Parsing
+**Learning:** Collecting split string slices into a heap-allocated `Vec` during SemVer parsing introduces unnecessary allocations and deallocations, causing garbage collection/fragmentation overhead and preventing the package manager from running safely in no_std environments. Replacing `split('.').collect::<Vec<_>>()` with a direct lazy split iterator preserves identical functionality while guaranteeing absolute zero-allocation runtime performance.
+**Action:** Utilize inline iterator-based parsing (like `.next()`) instead of eager collection when decomposing dot-separated version strings.

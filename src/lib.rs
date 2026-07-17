@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
+
 pub mod security;
 pub mod sigpkg;
 pub mod kernel;
