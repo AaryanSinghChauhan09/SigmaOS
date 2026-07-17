@@ -221,7 +221,7 @@ SigmaOS aims to completely surpass and render obsolete 20 flagship open-source r
 
 #### [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps)
 *   **Paradigm:** Collection of LLM agent execution templates.
-*   **Sovereign Absorption Mechanism:** S-AI natively integrates these agent templates as built-ins declarative schema templates within S-AI execution runtimes, allowing instantaneous agent setup with a single capability pledge.
+*   **Sovereign Absorption Mechanism:** S-AI natively integrates these agent templates as built-in declarative schema templates within S-AI execution runtimes, allowing instantaneous agent setup with a single capability pledge.
 
 ---
 
@@ -318,3 +318,37 @@ SigmaOS systematically obsoletes and absorbs specialized Linux kernel forks and 
 *   **[agreenbhm/linux](https://github.com/agreenbhm/linux), [dangowrt/linux](https://github.com/dangowrt/linux), [fifteenhex/linux](https://github.com/fifteenhex/linux), [dandenkijin/linux](https://github.com/dandenkijin/linux), [Eamon2009/linux](https://github.com/Eamon2009/linux), [19atlas/linux-sc](https://github.com/19atlas/linux-sc), [archeYR/linux](https://github.com/archeYR/linux), [BigfootACA/linux](https://github.com/BigfootACA/linux), [austriancoder/linux](https://github.com/austriancoder/linux), [99degree/linux](https://github.com/99degree/linux) (Alternative SoC, Board, and System Support):**
     *   *Parity Paradigm:* Diverse community-driven board support packages, memory map configurations, and platform trees.
     *   *Sovereign Absorption:* Made obsolete because SigmaOS separates all board support details from the microkernel. System memory configurations and SoC buses are mapped declaratively inside S-FS, allowing the same lean microkernel binary to boot across various SBC and SoC configurations with near-zero code modifications.
+
+---
+
+## ⚙️ Consolidated Branch Merger & Release Synchronization Workflow
+
+To transform fragmented prototypes into a professional, cohesive operating system, SigmaOS establishes a systematic branch consolidation workflow and release cycle to achieve parity with enterprise-grade Linux distributions:
+
+### 1. Branch Audit & Subsystem Categorization
+The master integration pipeline classifies active development branches into eight standardized system tiers:
+*   **Kernel Core:** S-SCHED scheduler shard, S-MM Buddy Allocator, and Sovereign IPC Bus.
+*   **Drivers:** User-space PnP Device Driver registry, NVMe, USB xHCI host controller, GPU framebuffer.
+*   **Networking:** Stateful TCP/UDP netstack, IPv6, VPN tunneling, and Wi-Fi drivers.
+*   **Filesystems:** Ext4/FAT32, distributed SigmaFS, and Copy-on-Write (CoW) state handlers.
+*   **Virtualization:** WASM sandboxing, KVM/QEMU layers, and SigmaContainers engine.
+*   **Security:** PQC post-quantum cryptography, sandboxed pledge/unveil, and signed driver modules.
+*   **Performance:** AI-driven MLFQ scheduler, NUMA-aware allocation, and GPU co-scheduling.
+*   **Documentation:** Developer guides, Wiki matrices, and contribution guidelines.
+
+### 2. Incrementally Synced Merge Strategy
+Subsystems are integrated into the main deployment stream (`main-dev` branching pool) sequentially to guarantee stability:
+1.  **Stabilize Kernel Core First:** Standardize MLFQ+CFS+EDF scheduler hooks and Buddy Allocator limits.
+2.  **Integrate Driver Registry:** Deploy polymorphic Plug-and-Play (PnP) dynamic loading.
+3.  **Merge Networking Stack:** Layer in async IPv6 and wireless driver trees.
+4.  **Consolidate Filesystems:** Integrate Merkle-tree CoW snapshots and self-healing rollback.
+5.  **Add Virtualization:** Unify OCI-compliant SigmaContainers and KVM platform extensions.
+6.  **Layer in Security:** Activate mandatory driver cryptographic signatures and syscall pledge sandboxes.
+7.  **Optimize Performance:** Deploy NUMA memory boundaries and lock-free Read-Copy Update (RCU) loops.
+8.  **Merge Documentation:** Update comparative boards, Wiki references, and subsystem tutorials.
+
+### 3. Immediate Priorities & Daily Usability
+*   **GPU & Wi-Fi Support:** Finalize standard framebuffer acceleration and wireless protocol drivers for daily workflow viability.
+*   **`sigmapkg` Package Manager:** Deploy functional `.deb`, `.rpm`, `.apk`, and `.msi` adapters.
+*   **CI/CD Pipeline Automation:** Standardize compile warnings suppression (`-D warnings`) and automate smoke-tests inside GitHub Actions.
+*   **Subsystem Guide Documentation:** Expose clear tutorials for driver subclasses and UDF compiler scripts.
