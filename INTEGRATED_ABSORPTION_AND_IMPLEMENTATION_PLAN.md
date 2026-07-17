@@ -238,3 +238,35 @@ To achieve optimal usability, hardware support is scheduled based on critical sy
 *   **Priority 2: WiFi/Wireless Drivers** — Crucial for modern networked configurations and zero-trust communications.
 *   **Priority 3: Sound & Audio Drivers** — Important for enterprise multimedia stability and audio feedback pipelines.
 *   **Priority 4: Printers/Scanners & Legacy Peripherals** — Addressed systematically via user-space helper nodes and lightweight compatibility wrappers.
+
+---
+
+## Part 5: Driver Stability, Compatibility, & Performance Architectural Design
+
+To future-proof the SigmaOS driver subsystem, we establish a robust framework of advanced architectural designs spanning stability isolation, plug-and-play compatibility layer mappings, and low-latency performance optimizations.
+
+### 🛡️ Driver Stability Architecture
+1.  **Micro-VM & WASM Driver Sandboxing:** To prevent faulty driver panic events from crashing the kernel, each peripheral driver is isolated in a lightweight, user-space WebAssembly (WASM) sandbox or Micro-VM. Drivers communicate with the kernel exclusively via a capability-enforced IPC transaction bus.
+2.  **Polymorphic Self-Healing Watchdogs:** Active watchdog monitors supervise the execution loop of each loaded driver module. If a driver hangs or crashes, the watchdog automatically reloads the driver shard or gracefully falls back to a standardized adapter driver (e.g., reverting to VESA if a GPU driver triggers an exception).
+3.  **Formal Verification & Memory Safety:** Critical core drivers (block storage, PCIe networks) are written in strictly checked Rust, eliminating compile-time buffer overflows and memory leak vectors.
+
+### 🔌 Universal Driver Compatibility
+1.  **Universal Driver Interface (UDI):** Standardizes all low-level communication. Both legacy serial devices and high-speed modern WiFi chipsets plug into the same base UDI API interface.
+2.  **Adaptive Driver Wrappers:** Provide compatibility translation shims. These wrappers capture traditional Linux driver system calls and map them onto SigmaOS's capability-native transaction bus, allowing existing open-source driver portfolios to boot out-of-the-box.
+3.  **Plug‑and‑Play INF-style Registry:** Upon booting, the kernel queries device vendor IDs and dynamically matches them against our global hardware database to hot-load the exact OOP driver module required.
+4.  **Hot‑Swap Support:** Drivers can be dynamically loaded, unloaded, or upgraded at runtime without requiring a system reboot—critical for GPU runtime updates, WiFi configurations, and active NVMe volume mounts.
+
+### ⚡ Low‑Latency Performance Optimizations
+1.  **Lazy Loading Strategy:** To maintain a minimal binary footprint and sub-second boot times, drivers are lazily loaded on-demand only when physical hardware matches the vendor registry lookup.
+2.  **AI‑Assisted Predictive Matching:** An AI model monitors connected bus topologies and historically suggests the optimal driver configuration matching your specific execution profiles, learning and auto-optimizing driver parameters at runtime.
+3.  **NUMA‑Aware Interrupt Scheduling:** Multi-core workloads schedule driver interrupt executions based on NUMA node proximity, significantly reducing cache invalidation overhead for high-performance network packets and massive disk reads.
+
+---
+
+## Part 6: Long-Term Driver Roadmap
+
+```text
+  [Short-Term: Months 1-3]   --> OOP Driver Registry, Lazy Loading, & Plug-and-Play Detection
+  [Mid-Term: Months 3-6]     --> Adaptive Linux Wrappers, User-space Sandboxing, & Hot-Swap Support
+  [Long-Term: Months 6-12]   --> Self-Healing Watchdogs, AI Driver Matching, & Quantum IoT Hooks
+```
