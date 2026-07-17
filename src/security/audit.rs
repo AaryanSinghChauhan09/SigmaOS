@@ -3,10 +3,9 @@
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
-
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -215,7 +214,12 @@ mod tests {
     #[test]
     fn test_simple_audit_logger() {
         let mut logger = SimpleAuditLogger::new();
-        let event = Box::new(SimpleAuditEvent::new(101, EventType::Authentication, 42, b"User logged in"));
+        let event = Box::new(SimpleAuditEvent::new(
+            101,
+            EventType::Authentication,
+            42,
+            b"User logged in",
+        ));
         let id = logger.log_event(event).unwrap();
         assert_eq!(id, 101);
 

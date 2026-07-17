@@ -4,10 +4,9 @@
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
 /// Based on Roadmap Item 66: System integrity monitoring
-
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -114,7 +113,11 @@ impl SimpleFile {
 
         unsafe {
             core::ptr::copy_nonoverlapping(path.as_ptr(), path_array.as_mut_ptr(), path_len);
-            core::ptr::copy_nonoverlapping(checksum.as_ptr(), checksum_array.as_mut_ptr(), checksum_len);
+            core::ptr::copy_nonoverlapping(
+                checksum.as_ptr(),
+                checksum_array.as_mut_ptr(),
+                checksum_len,
+            );
         }
 
         SimpleFile {
@@ -127,9 +130,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {

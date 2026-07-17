@@ -4,10 +4,9 @@
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
-
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -115,7 +114,12 @@ pub struct SimpleSecret {
 }
 
 impl SimpleSecret {
-    pub fn new(id: SecretID, name: &[u8], secret_type: SecretType, capability: SecretCapability) -> Self {
+    pub fn new(
+        id: SecretID,
+        name: &[u8],
+        secret_type: SecretType,
+        capability: SecretCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 

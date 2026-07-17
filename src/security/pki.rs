@@ -3,10 +3,9 @@
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
-
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -50,13 +49,22 @@ pub struct SimpleCertificate {
 }
 
 impl SimpleCertificate {
-    pub fn new(id: CertificateID, cert_type: CertificateType, subject: &[u8], issuer: &[u8]) -> Self {
+    pub fn new(
+        id: CertificateID,
+        cert_type: CertificateType,
+        subject: &[u8],
+        issuer: &[u8],
+    ) -> Self {
         let mut subject_array = [0u8; 256];
         let mut issuer_array = [0u8; 256];
         let subject_len = subject.len().min(255);
         let issuer_len = issuer.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(subject.as_ptr(), subject_array.as_mut_ptr(), subject_len);
+            core::ptr::copy_nonoverlapping(
+                subject.as_ptr(),
+                subject_array.as_mut_ptr(),
+                subject_len,
+            );
             core::ptr::copy_nonoverlapping(issuer.as_ptr(), issuer_array.as_mut_ptr(), issuer_len);
         }
         SimpleCertificate {
@@ -101,7 +109,11 @@ pub trait PKIManager {
     fn issue_certificate(&mut self, cert: Box<dyn Certificate>) -> Result<CertificateID, PKIError>;
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError>;
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate>;
-    fn verify_certificate(&self, id: CertificateID, issuer_id: CertificateID) -> Result<bool, PKIError>;
+    fn verify_certificate(
+        &self,
+        id: CertificateID,
+        issuer_id: CertificateID,
+    ) -> Result<bool, PKIError>;
 }
 
 pub struct SimplePKIManager {
@@ -156,7 +168,11 @@ impl PKIManager for SimplePKIManager {
         None
     }
 
-    fn verify_certificate(&self, id: CertificateID, _issuer_id: CertificateID) -> Result<bool, PKIError> {
+    fn verify_certificate(
+        &self,
+        id: CertificateID,
+        _issuer_id: CertificateID,
+    ) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
             if self.revoked.contains(&id) {
                 return Ok(false);
@@ -217,7 +233,8 @@ mod tests {
 
     #[test]
     fn test_simple_certificate() {
-        let cert = SimpleCertificate::new(101, CertificateType::EndEntity, b"SigmaUser", b"SigmaRoot");
+        let cert =
+            SimpleCertificate::new(101, CertificateType::EndEntity, b"SigmaUser", b"SigmaRoot");
         assert_eq!(cert.id(), 101);
         assert_eq!(cert.certificate_type(), CertificateType::EndEntity);
         assert_eq!(cert.subject(), b"SigmaUser");
@@ -228,7 +245,12 @@ mod tests {
     #[test]
     fn test_simple_pki_manager() {
         let mut manager = SimplePKIManager::new();
-        let cert = Box::new(SimpleCertificate::new(101, CertificateType::EndEntity, b"SigmaUser", b"SigmaRoot"));
+        let cert = Box::new(SimpleCertificate::new(
+            101,
+            CertificateType::EndEntity,
+            b"SigmaUser",
+            b"SigmaRoot",
+        ));
 
         let id = manager.issue_certificate(cert).unwrap();
         assert_eq!(id, 101);

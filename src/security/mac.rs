@@ -4,10 +4,9 @@
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 62: Mandatory access control
-
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -79,7 +78,12 @@ impl Default for ContextCapability {
 }
 
 impl SecurityContext {
-    pub fn new(id: ContextID, level: SecurityLevel, domain: SecurityDomain, capability: ContextCapability) -> Self {
+    pub fn new(
+        id: ContextID,
+        level: SecurityLevel,
+        domain: SecurityDomain,
+        capability: ContextCapability,
+    ) -> Self {
         SecurityContext {
             id,
             level,
@@ -194,11 +198,17 @@ impl MACPolicy for MLSPolicy {
         // MLS: Simple level check - context must meet or exceed policy strictness
         match operation {
             SecurityOperation::Read => context.level >= self.strictness,
-            SecurityOperation::Write => context.level >= self.strictness && context.capability.can_write,
-            SecurityOperation::Execute => context.level >= self.strictness && context.capability.can_execute,
+            SecurityOperation::Write => {
+                context.level >= self.strictness && context.capability.can_write
+            }
+            SecurityOperation::Execute => {
+                context.level >= self.strictness && context.capability.can_execute
+            }
             SecurityOperation::Create => context.level >= self.strictness,
             SecurityOperation::Delete => context.level >= SecurityLevel::High,
-            SecurityOperation::Modify => context.level >= self.strictness && context.capability.can_write,
+            SecurityOperation::Modify => {
+                context.level >= self.strictness && context.capability.can_write
+            }
         }
     }
 
@@ -218,7 +228,12 @@ pub trait MACEngine {
     /// Unregister policy
     fn unregister_policy(&mut self, id: usize) -> Result<(), MACError>;
     /// Create security context
-    fn create_context(&mut self, level: SecurityLevel, domain: SecurityDomain, capability: ContextCapability) -> Result<ContextID, MACError>;
+    fn create_context(
+        &mut self,
+        level: SecurityLevel,
+        domain: SecurityDomain,
+        capability: ContextCapability,
+    ) -> Result<ContextID, MACError>;
     /// Destroy security context
     fn destroy_context(&mut self, id: ContextID) -> Result<(), MACError>;
     /// Check access
@@ -354,7 +369,12 @@ impl MACEngine for SimpleMACEngine {
         }
     }
 
-    fn create_context(&mut self, level: SecurityLevel, domain: SecurityDomain, capability: ContextCapability) -> Result<ContextID, MACError> {
+    fn create_context(
+        &mut self,
+        level: SecurityLevel,
+        domain: SecurityDomain,
+        capability: ContextCapability,
+    ) -> Result<ContextID, MACError> {
         if !self.capability.can_create_contexts {
             return Err(MACError::PermissionDenied);
         }
@@ -435,7 +455,8 @@ mod tests {
     #[test]
     fn test_security_context_and_mls_policy() {
         let capability = ContextCapability::full();
-        let context = SecurityContext::new(1, SecurityLevel::Medium, SecurityDomain::User, capability);
+        let context =
+            SecurityContext::new(1, SecurityLevel::Medium, SecurityDomain::User, capability);
 
         assert_eq!(context.id, 1);
         assert_eq!(context.level, SecurityLevel::Medium);
@@ -455,7 +476,9 @@ mod tests {
         let mut engine = SimpleMACEngine::new(engine_cap);
 
         let context_cap = ContextCapability::full();
-        let context_id = engine.create_context(SecurityLevel::Medium, SecurityDomain::User, context_cap).unwrap();
+        let context_id = engine
+            .create_context(SecurityLevel::Medium, SecurityDomain::User, context_cap)
+            .unwrap();
         assert_eq!(context_id, 1);
 
         let policy_cap = PolicyCapability::full();
