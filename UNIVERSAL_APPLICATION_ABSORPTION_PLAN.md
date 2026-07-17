@@ -1,8 +1,8 @@
 # 🌌 SigmaOS Universal Application Absorption & Sovereign Integration Plan
 
-This document establishes the master architectural blueprint and implementation plan for **SigmaOS** to absorb, integrate, and natively supersede all third-party software, libraries, frameworks, models, data formats, and development suites.
+This document establishes the master architectural blueprint, implementation roadmap, and branch-by-branch superset strategy for **SigmaOS** to absorb, integrate, and natively supersede all third-party software, applications, libraries, frameworks, models, data formats, and development suites.
 
-By building these capabilities as **first-class, zero-dependency, capability-gated OS primitives**, SigmaOS guarantees that users will never need to download, install, or run external applications. Autonomy and digital sovereignty are baked directly into the microkernel and core userland environment.
+By building these capabilities as **first-class, zero-dependency, capability-gated OS primitives**, SigmaOS guarantees that users will never need to download, install, or run external applications. Autonomy, digital sovereignty, and peerless efficiency are baked directly into the microkernel and core userland environment.
 
 ---
 
@@ -14,7 +14,7 @@ SigmaOS eliminates this by organizing the OS into dedicated, hot-swappable **Sov
 
 ```
                +----------------------------------------+
-               |           Zenith User Interface        |
+               |      SigmaShell / Zenith Interface     |
                +----------------------------------------+
                                    |
                                    v (Unified Syscall Gate)
@@ -33,7 +33,86 @@ SigmaOS eliminates this by organizing the OS into dedicated, hot-swappable **Sov
 
 ---
 
-## 📦 Master Domain Absorption Matrix
+## 🔍 Branch-by-Branch Superset Strategy
+
+SigmaOS achieves supremacy by evolving each subsystem into a **superset** of legacy POSIX and modern operating systems.
+
+### 1. Kernel Core
+* **Current State:** Basic scheduler, physical memory allocator (buddy allocator), and IPC prototypes.
+* **Planned Upgrades:** NUMA-aware scheduling, hugepage support, AI-driven predictive scheduler, kernel tracing tools.
+* **➡ Superset Move:** A self-optimizing, AI-driven microkernel that dynamically adjusts scheduling priorities and page sizes in real-time. Unlike Linux kernels that rely on manual sysctl tuning and static schedulers, SigmaOS learns workload characteristics natively.
+
+### 2. Drivers & HAL
+* **Current State:** Port Address PIO/MMIO abstractions, simple block devices, USB, and Ext4/FAT32 prototypes.
+* **Planned Upgrades:** GPU drivers (NVIDIA/AMD/Intel), WiFi chipset support, printer/scanner drivers, hot-swap driver updates.
+* **➡ Superset Move:** A unified Object-Oriented Programming (OOP) driver registry with plug-and-play detection. Third-party drivers run as sandboxed UDF bytecode snippets executing within a high-density, secure bytecode VM, eliminating distro-specific driver compile and compatibility headaches.
+
+### 3. Networking
+* **Current State:** Partial TCP/UDP stack and segment flags.
+* **Planned Upgrades:** Full IPv6, VPN, stateful firewall subsystem, container networking.
+* **➡ Superset Move:** **SigmaNet** → a zero-trust, self-healing networking layer that makes fragmented, insecure networking stacks irrelevant. Post-quantum cryptographic tunneling (Kyber-1024 + Dilithium-5) is integrated directly into every packet transmission.
+
+### 4. Filesystems & VFS
+* **Current State:** Ext4, FAT32, and basic SigmaFS prototype.
+* **Planned Upgrades:** XFS, Btrfs, ZFS, APFS support, Merkle-tree snapshot + rollback system, network filesystems (N NFS, CIFS).
+* **➡ Superset Move:** **SigmaFS** → combines the extreme durability of ZFS with content-addressed storage (CAS) and transactional log-structured writes. Sub-millisecond system-wide rollbacks can be triggered directly from visual GUI sliders.
+
+### 5. Virtualization & Containers
+* **Current State:** WebAssembly (WASM) bundle experiments.
+* **Planned Upgrades:** KVM/QEMU integration, SigmaContainers (native Docker/Kubernetes configuration compatibility), micro-VMs for high-density sandboxing.
+* **➡ Superset Move:** A unified, zero-copy VM and container ecosystem under the same microkernel, utilizing process namespaces and `sigma_pledge` rules to isolate workloads with zero performance overhead.
+
+### 6. Security & Sandboxing
+* **Current State:** Post-quantum cryptographic experiments, capability gates, and `sigma_pledge` / `sigma_unveil`.
+* **Planned Upgrades:** AppArmor/SELinux-style macro-policies baked in, mandatory driver/package cryptosigning, real-time GDPR/HIPAA compliance dashboards.
+* **➡ Superset Move:** Enterprise-grade security enforced by default at the hardware gate, making third-party security frameworks and distro-specific hardened configurations redundant.
+
+### 7. Performance & Optimization
+* **Current State:** Predictive scheduler prototype.
+* **Planned Upgrades:** NUMA scheduling, GPU co-scheduling, energy-aware thermal kernel management, HPC optimizations.
+* **➡ Superset Move:** AI-driven workload profiling that automatically scales cooling levels and CPU frequencies based on historical usage patterns, outperforming any manual kernel tuning.
+
+---
+
+## 📦 Package System Supremacy (`sigmapkg`)
+
+* **Current State:** Conceptual .spkg format, recipe builders, and package store templates.
+* **Planned Upgrades:** Metadata adapters for `.deb`, `.rpm`, `.apk`, and `.msi`; DPLL-based SAT dependency solver; transactional rollback snapshots; universal publishing hub.
+* **➡ Superset Move:** One package manager to rule them all. Bypasses the version conflicts of APT, DNF, Pacman, and Portage. Natively resolves multi-version dependency graphs and shares identical dependencies securely via Content-Addressed Storage (CAS) cryptographic hashes.
+
+---
+
+## 🆕 Suggested New Sovereign Applications for SigmaOS
+
+To guarantee that users never need to download or install external applications, SigmaOS provides a suite of native sovereign applications built directly on core microkernel capabilities:
+
+1. **SigmaShell DE:** A modular, widget-based desktop environment with integrated high-contrast themes, screen readers, and adaptive voice/magnification suites.
+2. **SigmaCloud:** A native cloud orchestration and cluster-management layer that absorbs and excels beyond Kubernetes/Swarm, enabling peer-to-peer cloud scaling with zero configuration.
+3. **SigmaAI:** AI-native kernel optimizer modules for real-time predictive resource allocation, thermal throttling, and system self-healing.
+4. **SigmaSecure:** compliance monitoring dashboards built directly into the kernel scheduler, auditing security boundaries and generating GDPR, HIPAA, and ISO compliance metrics natively.
+5. **SigmaHub:** A universal app publishing store that compiles `.spkg` formats and automatically exports them to `.deb`, `.rpm`, `.apk`, and `.msi` formats.
+6. **SigmaBridge:** A high-speed, zero-copy translation layer allowing seamless execution of Windows (`.exe` via Wine translation) and macOS (`.dmg` via Rosetta translation) apps natively inside the microkernel.
+7. **SigmaFS Manager:** An interactive visual interface and CLI for snapshot management, distributed network storage, and cross-filesystem migration.
+8. **SigmaDev Tools:** An integrated IDE, debugging, and eBPF-style tracing suite optimized for compiler-level diagnostics, container profiling, and kernel-level trace audits.
+
+---
+
+## 📊 Comparative Dashboard
+
+| Subsystem | Legacy Linux Distributions | SigmaOS Sovereign Superset |
+| :--- | :--- | :--- |
+| **Package Manager** | Fragmented (apt, dnf, pacman), dependency hell | Universal `.spkg` + CAS cryptographic deduping + AI solver |
+| **Drivers** | Inconsistent GPU/WiFi binaries, complex kernel compilation | OOP sandboxed registry, hot-swappable, cross-OS wrappers |
+| **Networking** | Fragmented stack, userland VPN configurations | **SigmaNet:** Native zero-trust, PQC encrypted, self-healing |
+| **Filesystems** | Separate Ext4, Btrfs, XFS, ZFS, no native rollback | **SigmaFS:** Snapshot/rollback + native support for all filesystem types |
+| **Virtualization** | Complex KVM setup, docker daemon overhead | Integrated SigmaContainers + micro-VM sandboxes + WASM |
+| **Security** | SELinux/AppArmor optional and difficult to configure | Mandatory PQC cryptosigning + sandboxing + compliance dashboards |
+| **Performance** | Static scheduling, manual thread-pinning required | AI-driven predictive scheduler, NUMA, HPC profile automation |
+| **UI/UX** | Heavy GNOME/KDE fragmentation, basic accessibility | **SigmaShell:** Unified, modular, high-contrast, fully accessible |
+
+---
+
+## 📦 Master Domain Tool & Application Absorption Matrix
 
 ---
 
@@ -206,7 +285,7 @@ SigmaOS eliminates this by organizing the OS into dedicated, hot-swappable **Sov
 
 ---
 
-## 📅 Roadmap & Universal Extension Format Support
+## 📅 Universal Extension Format Support
 
 To guarantee that any legacy file, schema, or image format works flawlessly and natively out of the box, SigmaOS natively registers the following formats inside `src/filesystem/vfs.rs` and routes them to their corresponding Sovereign Shard:
 
@@ -218,6 +297,17 @@ To guarantee that any legacy file, schema, or image format works flawlessly and 
 | **S-GRAPH** | `.apng`, `.avif`, `.bpg`, `.exr`, `.fits`, `.flif`, `.gif`, `.iff`, `.lbm`, `.jng`, `.jpg`, `.jpeg`, `.jxl`, `.mng`, `.miff`, `.mi`, `.pam`, `.pbm`, `.pgm`, `.ppm`, `.pnm`, `.pgf`, `.png`, `.qoi`, `.tiff`, `.wbmp`, `.webp`, `.xbm`, `.xcf`, `.xpm`, `.cgm`, `.eps`, `.pdf`, `.pgml`, `.svg`, `.vml`, `.xar`, `.3mf`, `.amf`, `.blend`, `.dae`, `.dxf`, `.fbx`, `.gltf`, `.glb`, `.hdr`, `.ifc`, `.iges`, `.obj`, `.off`, `.ply`, `.rad`, `.step`, `.stp`, `.stl`, `.usd`, `.vrml`, `.x3d` | - | - |
 | **S-DOC** | - | - | `.adoc`, `.epub`, `.latex`, `.md`, `.odt`, `.rtf`, `.tex`, `.texinfo`, `.css`, `.html`, `.json`, `.mml` |
 | **S-DB** | - | - | `.avro`, `.cml`, `.csv`, `.hdf5`, `.ods`, `.orc`, `.parquet`, `.protobuf`, `.shp`, `.sqlite`, `.tsv`, `.xml` |
+
+---
+
+## ⚡ Immediate Next Actions
+
+To move systematically towards absolute distro-parity and developer autonomy:
+1. **Create a `main-dev` branch:** Merge stable subsystems incrementally to preserve trunk stability.
+2. **Prioritize GPU/WiFi Drivers:** Build out the physical registers table in the OOP HAL mapping layer to enable standard VESA outputs.
+3. **Launch `sigmapkg` with adapters:** Complete the parsing mechanics for `.deb` and `.rpm` archive format adapters.
+4. **Establish Automated CI/CD Pipelines:** Set up robust workflows with formatting verification, clippy enforcement, and cross-platform compilation checks on every commit.
+5. **Expand Canonical Wiki:** Maintain master roadmap tables, contribution instructions, and subsystem architecture maps.
 
 ---
 
