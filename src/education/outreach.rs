@@ -43,7 +43,8 @@ pub struct DocAsset {
 
 impl DocAsset {
     pub fn passes_lint(&self) -> bool {
-        self.has_standard_frontmatter && (self.code_examples_count > 0 || self.format == DocFormat::ManPage)
+        self.has_standard_frontmatter
+            && (self.code_examples_count > 0 || self.format == DocFormat::ManPage)
     }
 }
 
@@ -63,7 +64,13 @@ impl EducationOutreachManager {
         }
     }
 
-    pub fn register_path(&mut self, id: String, title: String, syllabus: Vec<String>, cert: String) {
+    pub fn register_path(
+        &mut self,
+        id: String,
+        title: String,
+        syllabus: Vec<String>,
+        cert: String,
+    ) {
         let path = LearningPath {
             id: id.clone(),
             title,
@@ -95,7 +102,9 @@ impl EducationOutreachManager {
         if self.documentation_pool.is_empty() {
             return 1.0;
         }
-        let passing = self.documentation_pool.iter()
+        let passing = self
+            .documentation_pool
+            .iter()
             .filter(|d| d.passes_lint())
             .count();
         passing as f64 / self.documentation_pool.len() as f64
@@ -118,13 +127,30 @@ mod tests {
         manager.register_path(
             "SCSA-101".to_string(),
             "SigmaOS Certified Systems Administrator".to_string(),
-            vec!["Capabilities".to_string(), "Post-Quantum Cryptography".to_string()],
+            vec![
+                "Capabilities".to_string(),
+                "Post-Quantum Cryptography".to_string(),
+            ],
             "SCSA".to_string(),
         );
 
-        assert_eq!(manager.learning_paths.get("SCSA-101").unwrap().active_students, 0);
+        assert_eq!(
+            manager
+                .learning_paths
+                .get("SCSA-101")
+                .unwrap()
+                .active_students,
+            0
+        );
         assert!(manager.enroll_student("SCSA-101"));
-        assert_eq!(manager.learning_paths.get("SCSA-101").unwrap().active_students, 1);
+        assert_eq!(
+            manager
+                .learning_paths
+                .get("SCSA-101")
+                .unwrap()
+                .active_students,
+            1
+        );
         assert!(!manager.enroll_student("NONEXISTENT"));
     }
 

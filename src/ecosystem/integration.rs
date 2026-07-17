@@ -64,7 +64,13 @@ impl EcosystemManager {
         }
     }
 
-    pub fn register_architecture(&mut self, name: String, platform: EcosystemPlatform, tier: ArchTier, is_bootable: bool) {
+    pub fn register_architecture(
+        &mut self,
+        name: String,
+        platform: EcosystemPlatform,
+        tier: ArchTier,
+        is_bootable: bool,
+    ) {
         let port = ArchitecturePort {
             name: name.clone(),
             platform,
@@ -98,7 +104,8 @@ impl EcosystemManager {
     }
 
     pub fn is_hardware_certified(&self, product_id: &str) -> bool {
-        self.cert_pipeline.get(product_id)
+        self.cert_pipeline
+            .get(product_id)
             .map(|c| c.hardware_compatible && c.certification_status == "Passed")
             .unwrap_or(false)
     }
@@ -130,12 +137,18 @@ mod tests {
             false,
         );
 
-        let arm64 = manager.architecture_matrix.get("ARM64_Mobile_Sovereign").unwrap();
+        let arm64 = manager
+            .architecture_matrix
+            .get("ARM64_Mobile_Sovereign")
+            .unwrap();
         assert_eq!(arm64.platform, EcosystemPlatform::Mobile);
         assert_eq!(arm64.tier, ArchTier::Tier1);
         assert!(arm64.is_bootable);
 
-        let riscv = manager.architecture_matrix.get("RISCV64_IoT_Embedded").unwrap();
+        let riscv = manager
+            .architecture_matrix
+            .get("RISCV64_IoT_Embedded")
+            .unwrap();
         assert_eq!(riscv.tier, ArchTier::Tier2);
         assert!(!riscv.is_bootable);
     }
@@ -149,9 +162,21 @@ mod tests {
             "Strategic".to_string(),
         );
 
-        assert!(!manager.enterprise_partners.get("IBM India").unwrap().verified_and_integrated);
+        assert!(
+            !manager
+                .enterprise_partners
+                .get("IBM India")
+                .unwrap()
+                .verified_and_integrated
+        );
         assert!(manager.verify_partner_integration("IBM India"));
-        assert!(manager.enterprise_partners.get("IBM India").unwrap().verified_and_integrated);
+        assert!(
+            manager
+                .enterprise_partners
+                .get("IBM India")
+                .unwrap()
+                .verified_and_integrated
+        );
         assert!(!manager.verify_partner_integration("SAP Nonexistent"));
     }
 

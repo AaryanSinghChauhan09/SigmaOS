@@ -78,7 +78,9 @@ impl MentorshipProgram {
     pub fn complete_task(&mut self, contributor_name: &str, task: String) -> bool {
         if let Some(profile) = self.contributors.get_mut(contributor_name) {
             profile.completed_tasks.push(task);
-            if profile.completed_tasks.len() >= 3 && profile.stage != OnboardingStage::FullyOnboarded {
+            if profile.completed_tasks.len() >= 3
+                && profile.stage != OnboardingStage::FullyOnboarded
+            {
                 profile.stage = OnboardingStage::FullyOnboarded;
             }
             true
@@ -246,7 +248,10 @@ impl FundingSustainability {
     }
 
     pub fn get_allocated_budget(&self, sector: &str) -> f64 {
-        self.resource_allocations.get(sector).copied().unwrap_or(0.0)
+        self.resource_allocations
+            .get(sector)
+            .copied()
+            .unwrap_or(0.0)
     }
 }
 
@@ -294,11 +299,20 @@ mod tests {
         assert_eq!(issue.status, IssueStatus::Reported);
 
         assert!(tracker.triage_issue(id, BugSeverity::Critical, vec!["kernel".to_string()]));
-        assert_eq!(tracker.issues.get(&id).unwrap().status, IssueStatus::Triaged);
+        assert_eq!(
+            tracker.issues.get(&id).unwrap().status,
+            IssueStatus::Triaged
+        );
 
         assert!(tracker.assign_issue(id, "Ananya".to_string()));
-        assert_eq!(tracker.issues.get(&id).unwrap().status, IssueStatus::Investigating);
-        assert_eq!(tracker.issues.get(&id).unwrap().assigned_to, Some("Ananya".to_string()));
+        assert_eq!(
+            tracker.issues.get(&id).unwrap().status,
+            IssueStatus::Investigating
+        );
+        assert_eq!(
+            tracker.issues.get(&id).unwrap().assigned_to,
+            Some("Ananya".to_string())
+        );
     }
 
     #[test]

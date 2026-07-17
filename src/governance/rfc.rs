@@ -116,14 +116,16 @@ impl RFCRepository for SimpleRFCRepository {
     }
 
     fn list_by_status(&self, status: RFCStatus) -> Vec<RFCID> {
-        self.rfcs.iter()
+        self.rfcs
+            .iter()
             .filter(|r| r.status() == status)
             .map(|r| r.id())
             .collect()
     }
 
     fn list_by_author(&self, author: &str) -> Vec<RFCID> {
-        self.rfcs.iter()
+        self.rfcs
+            .iter()
             .filter(|r| r.author() == author)
             .map(|r| r.id())
             .collect()
@@ -137,7 +139,12 @@ impl Default for SimpleRFCRepository {
 }
 
 pub trait VotingSystem {
-    fn cast_vote(&mut self, rfc_id: RFCID, voter: String, vote: bool) -> Result<(), GovernanceError>;
+    fn cast_vote(
+        &mut self,
+        rfc_id: RFCID,
+        voter: String,
+        vote: bool,
+    ) -> Result<(), GovernanceError>;
     fn get_vote_count(&self, rfc_id: RFCID) -> (usize, usize);
     fn has_voted(&self, rfc_id: RFCID, voter: &str) -> bool;
 }
@@ -153,7 +160,12 @@ impl SimpleVotingSystem {
 }
 
 impl VotingSystem for SimpleVotingSystem {
-    fn cast_vote(&mut self, rfc_id: RFCID, voter: String, vote: bool) -> Result<(), GovernanceError> {
+    fn cast_vote(
+        &mut self,
+        rfc_id: RFCID,
+        voter: String,
+        vote: bool,
+    ) -> Result<(), GovernanceError> {
         if self.has_voted(rfc_id, &voter) {
             return Err(GovernanceError::AccessDenied);
         }
@@ -177,7 +189,9 @@ impl VotingSystem for SimpleVotingSystem {
     }
 
     fn has_voted(&self, rfc_id: RFCID, voter: &str) -> bool {
-        self.votes.iter().any(|&(id, ref v, _)| id == rfc_id && v == voter)
+        self.votes
+            .iter()
+            .any(|&(id, ref v, _)| id == rfc_id && v == voter)
     }
 }
 

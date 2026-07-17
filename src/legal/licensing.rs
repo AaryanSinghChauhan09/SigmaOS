@@ -18,11 +18,17 @@ pub enum LicenseType {
 
 impl LicenseType {
     pub fn is_permissive(&self) -> bool {
-        matches!(self, LicenseType::Mit | LicenseType::Bsd | LicenseType::Apache2)
+        matches!(
+            self,
+            LicenseType::Mit | LicenseType::Bsd | LicenseType::Apache2
+        )
     }
 
     pub fn is_copyleft(&self) -> bool {
-        matches!(self, LicenseType::Gpl2 | LicenseType::Gpl3 | LicenseType::Lgpl)
+        matches!(
+            self,
+            LicenseType::Gpl2 | LicenseType::Gpl3 | LicenseType::Lgpl
+        )
     }
 }
 
@@ -72,7 +78,13 @@ impl LegalComplianceRegistry {
         }
     }
 
-    pub fn register_component(&mut self, name: String, version: String, license: LicenseType, spdx: String) {
+    pub fn register_component(
+        &mut self,
+        name: String,
+        version: String,
+        license: LicenseType,
+        spdx: String,
+    ) {
         let comp = ComponentLicense {
             name: name.clone(),
             version,
@@ -82,7 +94,14 @@ impl LegalComplianceRegistry {
         self.licensed_components.insert(name, comp);
     }
 
-    pub fn register_patent(&mut self, id: String, title: String, country: String, reg_num: String, status: String) {
+    pub fn register_patent(
+        &mut self,
+        id: String,
+        title: String,
+        country: String,
+        reg_num: String,
+        status: String,
+    ) {
         let patent = PatentRecord {
             id: id.clone(),
             title,
@@ -120,7 +139,9 @@ impl LegalComplianceRegistry {
         if self.compliance_certs.is_empty() {
             return 100.0;
         }
-        let certified = self.compliance_certs.values()
+        let certified = self
+            .compliance_certs
+            .values()
             .filter(|c| c.status == "Certified")
             .count();
         (certified as f64 / self.compliance_certs.len() as f64) * 100.0
@@ -177,8 +198,16 @@ mod tests {
         );
         assert_eq!(registry.patent_pool.len(), 1);
 
-        registry.register_cert("Common Criteria EAL6+".to_string(), "ISO-15408".to_string(), "InReview".to_string());
-        registry.register_cert("FIPS 140-3 Level 4".to_string(), "FIPS-140-3".to_string(), "Certified".to_string());
+        registry.register_cert(
+            "Common Criteria EAL6+".to_string(),
+            "ISO-15408".to_string(),
+            "InReview".to_string(),
+        );
+        registry.register_cert(
+            "FIPS 140-3 Level 4".to_string(),
+            "FIPS-140-3".to_string(),
+            "Certified".to_string(),
+        );
 
         assert_eq!(registry.check_overall_compliance_percentage(), 50.0);
     }

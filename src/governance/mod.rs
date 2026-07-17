@@ -3,12 +3,12 @@
 
 pub mod rfc;
 
+pub use rfc::{
+    GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
+    VotingSystem, RFC, RFCID,
+};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
-pub use rfc::{
-    GovernanceError, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem, VotingSystem, RFC, RFCID,
-    RFCRepository, RFCStatus,
-};
 
 /// Foundation committee member profile
 #[derive(Debug, Clone)]
@@ -89,10 +89,18 @@ pub struct TransparentRoadmap {
 
 impl TransparentRoadmap {
     pub fn new() -> Self {
-        Self { milestones: Vec::new() }
+        Self {
+            milestones: Vec::new(),
+        }
     }
 
-    pub fn publish_milestone(&mut self, version: String, r_type: ReleaseType, date: String, desc: String) {
+    pub fn publish_milestone(
+        &mut self,
+        version: String,
+        r_type: ReleaseType,
+        date: String,
+        desc: String,
+    ) {
         let milestone = RoadmapMilestone {
             version,
             release_type: r_type,

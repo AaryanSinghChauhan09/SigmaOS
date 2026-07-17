@@ -73,7 +73,13 @@ impl SupportServicesManager {
         }
     }
 
-    pub fn register_lts_release(&mut self, version: String, release_date: String, supported_until: String, kernel: String) {
+    pub fn register_lts_release(
+        &mut self,
+        version: String,
+        release_date: String,
+        supported_until: String,
+        kernel: String,
+    ) {
         let release = LtsRelease {
             version: version.clone(),
             release_date,
@@ -88,7 +94,9 @@ impl SupportServicesManager {
     }
 
     pub fn get_sla_limit(&self, client: &str) -> Option<u32> {
-        self.active_contracts.get(client).map(|c| c.sla_resolution_hours)
+        self.active_contracts
+            .get(client)
+            .map(|c| c.sla_resolution_hours)
     }
 }
 
@@ -111,7 +119,14 @@ mod tests {
         assert_eq!(manager.get_sla_limit("Nonexistent"), None);
 
         assert!(manager.open_support_ticket("SovereignCloudCorp"));
-        assert_eq!(manager.active_contracts.get("SovereignCloudCorp").unwrap().active_tickets, 1);
+        assert_eq!(
+            manager
+                .active_contracts
+                .get("SovereignCloudCorp")
+                .unwrap()
+                .active_tickets,
+            1
+        );
     }
 
     #[test]
@@ -140,7 +155,10 @@ mod tests {
 
         manager.add_recovery_tool(config);
         assert_eq!(manager.recovery_tools.len(), 1);
-        assert_eq!(manager.recovery_tools[0].rescue_iso_name, "SigmaOS-Rescue-v1.0.iso");
+        assert_eq!(
+            manager.recovery_tools[0].rescue_iso_name,
+            "SigmaOS-Rescue-v1.0.iso"
+        );
         assert!(manager.recovery_tools[0].automount_system_drives);
     }
 }
