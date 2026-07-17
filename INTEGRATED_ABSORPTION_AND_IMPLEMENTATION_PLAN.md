@@ -191,7 +191,7 @@ To implement the absorption and integration goals systematically, we establish a
 *   **Success Criteria:** Spawning a micro-VM or container executes in < 5ms with strict hardware resource limits.
 
 #### 5. Security, Sandboxing, & Compliance
-*   **Task:** Connect post-quantum cryptography features with SELinux/AppArmor-compatible MAC policies. Encapsulate userspace drivers with strict privilege separation.
+*   **Task:** Connect post-quantum cryptography features with SELinux/AppArmor-compatible MAC policies. Enforce driver cryptographic signatures and isolate untrusted executables.
 *   **Target Files:** `src/security/`, `src/syscall/`
 *   **Success Criteria:** Driver or system call violations trigger immediate capability revocation or self-healing fallback actions.
 
@@ -352,3 +352,61 @@ To establish SigmaOS as the premier sovereign choice for enterprise, developers,
 
 ### Phase 4: AI-Native Sovereign Ecosystem (Months 36+)
 *   **Milestones:** AI telemetry routines auto-tune CPU clock speeds and driver scheduler bounds at runtime. Open the Universal Publishing Hub to easily compile and publish `.spkg` targets onto standard packaging channels.
+
+---
+
+## Part 8: Multi-Branch Consolidation Workflow & Release Cycles
+
+Right now, development of different subsystems of SigmaOS occurs across separate functional branches. To systematically close gaps with mainstream Linux distributions, we implement a phased integration plan and unified release cycle to consolidate these subsystems onto `main` via a controlled developer workflow.
+
+### 🔄 Multi-Branch Consolidation Workflow
+
+```text
+               [Feature Branches]
+               (networking, filesystems, virtualization, etc.)
+                               |
+                               | (Incremental merging)
+                               v
+                         [main-dev]  <--- Continuous Integration (Automated verification)
+                               |
+                               | (Hardened, audited release)
+                               v
+                            [main]   <--- Stable release tags
+```
+
+#### Step 1: Audit, Categorization, & Subsystem Alignment
+All current and future development branches are assigned to specific architectural subsystems to ensure clear ownership and isolate test footprints:
+*   **Core Kernel Subsystem** — Governs scheduling algorithms, buddy memory managers, and core IPC mechanisms.
+*   **Driver Subsystem** — Coordinates storage drivers, graphics APIs, networking buses, and the PnP PeripheralManager registry.
+*   **Networking Subsystem** — Focuses on the TCP/UDP stacks, secure wireguard tunneling, wireless networks, and IPv6 tables.
+*   **Filesystems Subsystem** — Encapsulates virtual filesystem abstractions, CoW transactional blocks, and SigmaFS implementations.
+*   **Virtualization Subsystem** — Guides KVM micro-VMs, cgroups container namespaces, and WASM sandbox containers.
+*   **Security Subsystem** — Enforces Dilithium-5/Kyber-1024 signing keys, capability permission bitmasks, and MAC validation.
+*   **Performance Subsystem** — Tunes scheduler heuristic loops, NUMA affinity rules, and GPU co-scheduling.
+*   **Documentation Subsystem** — Manages GitHub Wiki pages, contributing protocols, and API subsystem references.
+
+#### Step 2: Incremental Staged Dev Merging Strategy
+Direct pushes to the stable `main` branch are strictly prohibited. To consolidate subsystems, SigmaOS uses a dedicated development integration branch (`main-dev`):
+1.  **Initialize `main-dev`:** Branch off the stable `main` branch.
+2.  **Kernel Core Consolidation:** First, merge EEVDF schedulers and physical/virtual memory management into `main-dev`. Establish the foundational memory and CPU timing profiles.
+3.  **Driver Registry Integration:** Merge the OOP PeripheralManager registry and hardware-matching buses. Enable basic legacy and modern serial/HID peripherals.
+4.  **Networking Stack Merge:** Layer in TCP/IP segments, UDP packet queues, and wireless routing.
+5.  **Filesystem Integration:** Merge multi-fs mount registries (FAT32/Ext4) and transactional snapshot rollback handlers.
+6.  **Virtualization Layer Merge:** Consolidate hypervisor bindings, micro-VM controllers, and container runtimes.
+7.  **Security Hardening:** Layer in cryptographic token signing, capability validation gates, and sandbox isolation rules.
+8.  **Performance Optimization:** Finally, activate predictive scheduler overrides, NUMA-aware interrupt affinities, and GPU rendering queues.
+
+#### Step 3: Subsystem Verification & CI/CD Automated Gates
+Every subsystem merge into `main-dev` must pass a series of mandatory verification gates enforced by our automated actions:
+*   **Style Gate:** Runs `cargo fmt --check` to guarantee style compliance.
+*   **Lint Gate:** Runs `cargo clippy -- -D warnings` to eliminate dead code, unused imports, or non-optimal Rust patterns crate-wide.
+*   **Correctness Gate:** Runs `cargo test` to execute all 155+ unit and integration test blocks.
+*   **Security Audit Gate:** Automatically runs `cargo audit` to scan dependency trees for known CVEs.
+
+---
+
+### 🚀 Concrete Integration Next Steps
+1.  **Spin up the consolidated `main-dev` integration branch** on the GitHub repository.
+2.  **Prioritize GPU/WiFi drivers and the `sigmapkg` adapter module** in Phase 1 merges to establish immediate hardware/package usability.
+3.  **Deploy the unified CI/CD workflow pipeline** to enforce build and test consistency on every pull request.
+4.  **Publish the comprehensive Subsystem Guides and Contribution Rules** on the master Wiki to empower global developer collaboration.
