@@ -1,6 +1,6 @@
 # 🗺️ SigmaOS Unified Future Development Roadmap & Universal Device Compatibility Strategy
 
-This document outlines the unified strategic roadmap, multi-distro analysis, and architectural plans to ensure **SigmaOS** remains backwards-compatible with ancient hardware while fully integrating modern and future standards via a highly disciplined, OOP-based driver model and universal software/hardware compatibility layers.
+This document outlines the unified strategic roadmap, branch consolidation plan, multi-distro analysis, and architectural plans to ensure **SigmaOS** remains backwards-compatible with ancient hardware while fully integrating modern and future standards via a highly disciplined, OOP-based driver model and universal software/hardware compatibility layers.
 
 ---
 
@@ -88,7 +88,34 @@ To ensure immediate compatibility with any hardware peripheral, printer, or cust
 
 ---
 
-## 📦 5. Package Manager Absorption: Unifying the Ecosystem via `sigpkg`
+## 🛠️ 5. Subsystem & Branch Consolidation Strategy
+
+To bridge fragmented development tracks and compile a cohesive microkernel operating system, SigmaOS establishes a systematic branch consolidation and code-stabilization workflow. This replaces decentralized prototypes with a unified, high-integrity codebase.
+
+### 👥 1. Subsystem Categorization & Audit
+Branches are audited and aggregated into strict structural sub-projects to avoid redundant implementations or duplicate experiments:
+*   **Kernel Core**: Scheduler, memory allocation, virtual memory, thread groups, IPC.
+*   **Drivers**: Bus probing, PCI, USB, framebuffers, input arrays.
+*   **Networking**: TCP/UDP stacks, ethernet cards, routing tables, loopbacks.
+*   **Filesystems**: Virtual Filesystem (VFS), Ext4 wrappers, native SigmaFS formats.
+*   **Virtualization**: Container engines, VM managers, WASM emulators.
+*   **Security**: Capability gates, post-quantum verification blocks, pledge managers.
+*   **Performance**: Telemetry aggregators, CPU/GPU profiling scripts.
+*   **Documentation**: Subsystem guides, roadmap tables, sync rules.
+
+### 🚀 2. Subsystem Stabilization & Integration Flow
+To guarantee stability, code is consolidated into the core branches following a stepwise integration pattern:
+1.  **Stabilize the Kernel Core**: Merge the EEVDF scheduler, Buddy Allocator, and safe IPC bus. Add NUMA-aware physical memory mappings and hugepage mappings. Ensure the predictive scheduler is rock-solid under high thread loads before adding advanced user-space routines.
+2.  **Unify Driver Registries**: Integrate driver prototypes into the central dynamic `SimpleDriverFramework`. Deploy plug-and-play event triggers to instantiate drivers instantly upon peripheral detection. Sandbox legacy C drivers inside userland Ring 3 pages to guarantee system-wide crash-resistance.
+3.  **Asymmetric Networking Expansion**: Consolidate network queues into the core TCP/IP stack. Add robust support for IPv6 routing, WiFi hardware interfaces, and secure container routing layers.
+4.  **Filesystem Integration & Snapshots**: Consolidate local disk wrappers (Ext4/FAT32) and map them alongside the core VFS. Develop secure directory snapshots and transaction-level rollbacks within the VFS block manager.
+5.  **Virtualization Shards (SigmaContainers)**: Merge WASM execution runtimes into a unified `SigmaContainers` manager. Interface KVM/QEMU stubs with the core hypervisor gates to enable full micro-VM sandboxing for untrusted device drivers.
+6.  **Sovereign Post-Quantum Security**: Harden all cryptographic structures with NIST-approved `Kyber-1024` and `Dilithium-5` checks. Integrate mandatory driver and package signing pipelines, and output standard compliance metrics (ISO, GDPR, HIPAA) directly to the system monitoring dashboards.
+7.  **Performance Profiling**: Optimize NUMA scheduling queues and GPU-CPU co-scheduling boundaries, establishing a hyper-tuned environment suitable for high-performance computing (HPC) and low-energy handheld architectures.
+
+---
+
+## 📦 6. Package Manager Absorption: Unifying the Ecosystem via `sigpkg`
 
 Instead of creating another isolated packaging standard, SigmaOS's native `UniversalPackageManager` acts as a hyper-compatible packaging engine:
 
@@ -99,46 +126,22 @@ Instead of creating another isolated packaging standard, SigmaOS's native `Unive
 
 ---
 
-## 🏁 6. Step-by-Step Multi-Distro & Driver-Centric Parity Roadmap
+## 🏁 7. Multi-Phase Distro & Compatibility Parity Roadmap
 
 The following stepwise milestones establish the concrete implementation roadmap for the SigmaOS kernel, software/hardware compatibility, and driver subsystems.
 
-### Phase 1: Foundation Setup
-*   [x] Define OOP base classes for device drivers (`DeviceDriver`, `StorageDriver`, `NetworkDriver`, `GpuDriver`).
-*   [x] Enforce strict state encapsulation so each driver manages its own memory buffer limits.
-*   [x] Establish standard `panic="abort"` with host-compatible test targets.
+| Phase | Milestone / Focus | Deliverables & Absorption Target |
+| :--- | :--- | :--- |
+| **Short-Term** <br>*(0–6 months)* | **Subsystem Consolidation & Networking** | - Merge scheduler, memory allocator, and core IPC into the `main-dev` branch.<br>- Consolidate the dynamic driver registry.<br>- Stabilize the TCP/IP stack with E1000/RTL8139 adapters.<br>- Launch `sigpkg` with basic `.deb`/`.rpm` adapters. |
+| **Mid-Term** <br>*(6–18 months)* | **Driver Expansion & Containers** | - Expand GPU (Intel, AMD, NVIDIA stubs) and WiFi driver support.<br>- Deploy the `SigmaContainers` WASM container engine and KVM hypervisor micro-VMs.<br>- Implement VFS snapshotting and atomic transaction-level rollbacks. |
+| **Long-Term** <br>*(18–36 months)* | **Application & OS Compatibility** | - Deploy `S-WINE` PE loading and API translation for native Windows software execution.<br>- Deploy `S-LinuX` syscall translation and POSIX ABI emulation.<br>- Build out the full Zenith desktop shell.<br>- Integrate secure compliance dashboards (GDPR, HIPAA). |
+| **Future** <br>*(36+ months)* | **AI-Native & Sovereign Dominance** | - Deploy AI-driven driver optimization and scheduling (`AiOptimizer`).<br>- Integrate hardware quantum hooks and secure edge IoT adapters.<br>- Establish hardware-vendor partnerships and massive enterprise deployment footprints. |
 
-### Phase 2: Modular Driver Framework & Dynamic Registry
-*   [x] Implement a centralized driver framework (`SimpleDriverFramework`) for registering, loading, and unloading drivers.
-*   [ ] Implement runtime dynamic loader to load compiled driver modules on-demand upon PCI/USB device discovery.
-*   [ ] Keep kernel core binary size minimal by compiling drivers as separate ELF/WASM shards.
+---
 
-### Phase 3: Linux/Windows Driver Compatibility & Priority Support (S-UDA)
-*   [ ] Develop adapter wrappers to interface legacy/existing Linux and Windows WDM drivers with Sigma-native OOP driver APIs.
-*   [ ] Implement secure Ring 3 sandboxing for compiled third-party drivers to execute safely.
-*   [ ] Optimize high-priority drivers: modern GPUs (NVIDIA/AMD/Intel stubs), high-speed networking (Ethernet, WiFi), storage (NVMe), and standard USB HID peripherals.
+## ⚡ Immediate Actionable Next Actions
 
-### Phase 4: Software Compatibility Layers (S-WINE & S-LinuX)
-*   [ ] Build the native PE loader and Win32 syscall translation maps for S-WINE.
-*   [ ] Develop the POSIX/glibc ABI translation layer for S-LinuX.
-*   [ ] Integrate touch input, graphics compositor, and audio hooks with the translation layers.
-
-### Phase 5: Self-Hosting & Autonomy (Phase G Continuity)
-*   [ ] Build a minimal, fast compilation and bootstrap environment inside SigmaOS for self-hosting compiler toolchains.
-*   [ ] Automate build pipelines and regression testing in CI/CD.
-*   [ ] Implement a kernel-level Recovery Mode that auto-heals or rolls back a failed/corrupted driver load.
-
-### Phase 6: Advanced Security, Benchmarking, & Performance
-*   [ ] Perform comprehensive feature benchmarks of the EEVDF scheduler, zero-copy IPC, and Buddy Allocator against monolithic Linux.
-*   [ ] Implement sandboxed driver execution pages, ensuring third-party drivers run with restricted capability tokens (`CapabilityGate`).
-*   [ ] Enforce post-quantum signed modules to prevent unauthorized module execution in Ring 1/Ring 2.
-
-### Phase 7: India Stack & Localized Integration (Phase H Continuity)
-*   [ ] Implement native, secure NPCI UPI capabilities as a secure IPC interface.
-*   [ ] Integrate localized taxation (GST calculation daemon) and multi-language support (22 official languages rendered within VESA driver).
-*   [ ] Establish verified post-quantum Aadhaar identity verification gates.
-
-### Phase 8: Future-Proofing & AI-Native Orchestration (Phase J Continuity)
-*   [ ] Deploy local LLM model weights as a core system optimization service (`AiOptimizer`).
-*   [ ] Integrate predictive driver loading/unloading based on device usage patterns to minimize power consumption.
-*   [ ] Design native quantum hooks and zero-trust IoT integration layers.
+1.  **Create the `main-dev` Branch**: Establish a unified development branch to merge isolated, stable subsystem commits incrementally.
+2.  **Prioritize GPU & WiFi Drivers**: Harden display compositing (Zenith, direct-drawing) and wireless network layers to ensure daily-driver compatibility.
+3.  **Launch the `sigpkg` Packaging Adapters**: Deploy initial `.deb`/`.rpm` translation adapters to ensure access to established software repositories from day one.
+4.  **Establish Robust CI/CD Pipelines**: Enforce automated cargo testing and static analysis via GitHub Actions to maintain absolute workspace and compilation integrity across all merges.
