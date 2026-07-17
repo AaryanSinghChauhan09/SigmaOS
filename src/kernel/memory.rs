@@ -96,13 +96,7 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        let mut order = 0;
-        let mut size = 1;
-        while size < pages {
-            size *= 2;
-            order += 1;
-        }
-        order
+        pages.next_power_of_two().trailing_zeros() as usize
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
