@@ -75,7 +75,9 @@ jobs:
       run: cargo test --test '*'
     
     - name: Run smoke tests
-      run: ./scripts/smoke-test.sh
+      run: |
+        chmod +x ./scripts/smoke-test.sh
+        ./scripts/smoke-test.sh
 
   security:
     runs-on: ubuntu-latest
