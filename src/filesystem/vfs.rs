@@ -175,15 +175,18 @@ impl VirtualFilesystem {
             .ok_or(FsError::NotFound)?;
         
         // Check write permission
-        if Prevent integer overflow in size calculation
-        let new_size = inode.size.checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
-        
-        // !inode.permissions.write {
+        if !inode.permissions.write {
             return Err(FsError::PermissionDenied);
-        }nw_z
-        file_descriptor.offset.checked_add()
-            .ok_or(FsError::NoSpace)?
+        }
+
+        // Prevent integer overflow in size calculation
+        let _new_size = inode.size.checked_add(buffer.len() as u64)
+            .ok_or(FsError::NoSpace)?;
+
+        // Prevent integer overflow in offset calculation
+        let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+            .ok_or(FsError::NoSpace)?;
+
         // Simulate write (in production, actual file I/O)
         let bytes_written = buffer.len();
         inode.size += bytes_written as u64;
