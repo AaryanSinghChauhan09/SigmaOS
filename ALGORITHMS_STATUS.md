@@ -16,16 +16,21 @@ Any autonomous AI agent or engineer can use this guide to instantly diagnose, re
    - `src/kernel/roundrobin.rs` (Enhanced Priority Round-Robin)
    - `src/kernel/core/sovereign_scheduler.rs` (Lock-Free MLFQ + MCS)
    - `src/scheduler/process.rs` (OOP Scheduler Trait)
-3. [Network Stack (TCP/IP)](#3-network-stack-tcpip)
+3. [Network Stack (TCP/IP & Zero-Trust)](#3-network-stack-tcpip--zero-trust)
    - `src/network/tcp.rs` (Sovereign TCP State Machine)
+   - `src/network/stack.rs` (OOP Sockets and Stack)
+   - `src/network/tcp_udp.rs` (TCP state, UDP, Reno/BBR, Firewall, ZeroCopy)
+   - `src/network/wireless.rs` (Wireless Devices, WiFi, Security)
+   - `src/network/zero_trust.rs` (Zero-Trust Policy Engine)
 4. [Package Management (Dependency SAT Resolver)](#4-package-management-dependency-sat-resolver)
    - `src/sigpkg/resolver.rs` (DPLL SAT Solver)
 5. [Virtual Filesystem (VFS)](#5-virtual-filesystem-vfs)
    - `src/filesystem/vfs.rs` (Capability-Gated VFS)
-6. [🚀 Future Applications for SigmaOS (Superset OS Core)](#6-future-applications-for-sigmaos-superset-os-core)
-7. [🔍 Absorbing Competitors' USP (The Irrelevance Matrix)](#7-absorbing-competitors-usp-the-irrelevance-matrix)
-8. [📊 Subsystem Implementation Backlog](#8-subsystem-implementation-backlog)
-9. [⚡ Immediate Next Actions for AI Agents](#9-immediate-next-actions-for-ai-agents)
+6. [🔧 Core Subsystems Needing Immediate Improvement](#6-core-subsystems-needing-immediate-improvement)
+7. [🚀 Future Applications for SigmaOS (Superset OS Core)](#7-future-applications-for-sigmaos-superset-os-core)
+8. [🔍 Absorbing Competitors' USP (The Irrelevance Matrix)](#8-absorbing-competitors-usp-the-irrelevance-matrix)
+9. [📊 Subsystem Implementation Backlog](#9-subsystem-implementation-backlog)
+10. [⚡ Immediate Next Actions for AI Agents](#10-immediate-next-actions-for-ai-agents)
 
 ---
 
@@ -242,37 +247,24 @@ Any autonomous AI agent or engineer can use this guide to instantly diagnose, re
 
 ---
 
-## 3. Network Stack (TCP/IP)
+## 3. Network Stack (TCP/IP & Zero-Trust)
 
-### 🟡 File: `src/network/tcp.rs`
+All old and new networking technologies have been fully refactored, modernized, and declared within the module tree in `src/network/mod.rs` and `src/lib.rs`.
 
-#### ⚙️ What's Working
-- State transition mapping (e.g. `Closed` -> `SynSent`, `Listen` -> `SynReceived`).
-- Port allocation tracker and segment validation helpers.
+### 🟢 File: `src/network/tcp.rs`
+- **What's Working:** Clean passive TCP state transitions, port allocation index, segment creation helpers.
 
-#### ⚠️ What's NOT Working & Why
-1. **Missing sliding window & packet retransmission queue:**
-   - *Why:* This implementation is currently a passive state-tracker. It lacks a retransmission timer, congestion control window (e.g., congestion avoidance, fast recovery), and packet sequence buffers. If segments are dropped or arrive out-of-order, the connection immediately stalls or leaks resources.
-2. **Absence of Segment Validation:**
-   - *Why:* `process_segment` advances the connection's state without validating that incoming packets' sequence numbers align with expected window bounds.
+### 🟢 File: `src/network/stack.rs`
+- **What's Working:** OOP `Socket` and `NetworkStack` traits, concrete `SimpleSocket` and `SimpleNetworkStack` structs, and full capacity/capability tracking.
 
-#### 🔧 How to Fix
-- **Add Sequence Validation & Buffer:** Store unacknowledged packets in a queue and verify incoming sequence numbers:
-  ```rust
-  pub fn process_segment(&mut self, segment: TcpSegment) -> Result<(), TcpError> {
-      let connection = self.get_connection_mut(segment.destination_port)
-          .ok_or(TcpError::ConnectionNotFound)?;
+### 🟢 File: `src/network/tcp_udp.rs`
+- **What's Working:** Full TCPState tracking, UDP socket implementations, `Firewall` trait and `SimpleFirewall` (ports 0-65535 block/allow), `ZeroCopy` traits/DMA buffers, and `CongestionControl` implementations (Reno and BBR algorithms).
 
-      // Enforce strict sequence number checks
-      if connection.state == TcpState::Established && segment.sequence_number != connection.acknowledgment_number {
-          return Err(TcpError::InvalidSegment); // Handle packet drop / out-of-order
-      }
+### 🟢 File: `src/network/wireless.rs`
+- **What's Working:** `WirelessDevice` and `WirelessManager` traits, `WiFiConnection` with SSID connection simulation and RSSI signal tracking, and WPA3 toggling in `WirelessSecurity`.
 
-      // Update acknowledgment expectations
-      connection.acknowledgment_number += segment.data.len() as u32;
-      Ok(())
-  }
-  ```
+### 🟢 File: `src/network/zero_trust.rs`
+- **What's Working:** OOP `NetworkPolicy` and `ZeroTrustEngine` interface. Concrete `SimpleZeroTrustEngine` featuring lock-free atomic statistics trackers (`AtomicU64`) and multi-threaded check access safety.
 
 ---
 
@@ -356,7 +348,46 @@ Any autonomous AI agent or engineer can use this guide to instantly diagnose, re
 
 ---
 
-## 6. 🚀 Future Applications for SigmaOS (Superset OS Core)
+## 6. 🔧 Core Subsystems Needing Immediate Improvement
+
+To match industrial standards, the existing prototypes must be enhanced as follows:
+
+1. **Kernel Core**
+   - *Current:* CPU scheduler + Memory allocator prototypes.
+   - *Needed:* NUMA‑aware thread scheduling, hugepage virtual memory support, AI‑driven predictive scheduler loops, and kernel tracing rings.
+   - *Why:* Necessary to reach complete Linux-grade stability and performance under intensive multithreaded cloud workloads.
+2. **Drivers**
+   - *Current:* Basic storage + USB interface.
+   - *Needed:* GPU acceleration (NVIDIA/AMD/Intel), WiFi chipset drivers, USB printer/scanner support, and hot‑swap driver reload.
+   - *Why:* Everyday hardware usability depends on GPU and WiFi; this is crucial to make standard computers run SigmaOS natively.
+3. **Networking**
+   - *Current:* Partial TCP/UDP stack.
+   - *Needed:* Native IPv6, full VPN tunneling, stateful firewall rules, and isolated container networking.
+   - *Why:* Essential to surpass standard Linux networking with a self‑healing, zero-trust sovereign network layer.
+4. **Filesystems**
+   - *Current:* Ext4, FAT32, SigmaFS prototypes.
+   - *Needed:* XFS, Btrfs, ZFS, and APFS translation drivers, atomic snapshot/rollback routines, and distributed/network filesystems (NFS, CIFS).
+   - *Why:* System flexibility depends on filesystem options; SigmaOS must offer unified, bulletproof transactional integrity.
+5. **Virtualization**
+   - *Current:* Basic WASM sandbox experiments.
+   - *Needed:* KVM/QEMU integration layers, native `SigmaContainers` (OCl‑compliant, Docker/K8s equivalent), and sandbox micro‑VMs.
+   - *Why:* Dynamic application sandboxing and virtual machinery are prerequisite pillars for enterprise cloud deployment.
+6. **Security**
+   - *Current:* Theoretical PQC experiments.
+   - *Needed:* AppArmor/SELinux‑style MAC policies, cryptographic mandatory signing, and interactive enterprise compliance dashboards.
+   - *Why:* SigmaOS must enforce zero-trust security by default, rather than relying on optional, complex userspace configurations.
+7. **Performance**
+   - *Current:* Predictive scheduler prototype.
+   - *Needed:* NUMA CPU co-scheduling, GPU offloading, energy‑aware schedulers, and high-performance computing (HPC) optimizations.
+   - *Why:* Eliminates the need for manual kernel tuning by substituting static parameters with dynamic, AI-driven autonomic tuning.
+8. **Docs & CI/CD**
+   - *Current:* Minimal README and basic integration script.
+   - *Needed:* Deep subsystem documentation, contribution rules, and a robust CI/CD pipeline verifying code formatting, clippy checks, and regression tests.
+   - *Why:* Clear documentation and stable integration pipelines are necessary to attract a thriving, professional developer community.
+
+---
+
+## 7. 🚀 Future Applications for SigmaOS (Superset OS Core)
 
 To establish SigmaOS as the dominant global microkernel, the following application suite must be built natively on top of the capability bus:
 
@@ -372,7 +403,7 @@ To establish SigmaOS as the dominant global microkernel, the following applicati
 
 ---
 
-## 7. 🔍 Absorbing Competitors' USP (The Irrelevance Matrix)
+## 8. 🔍 Absorbing Competitors' USP (The Irrelevance Matrix)
 
 | Competitor / OS | Core Unique Selling Proposition (USP) | SigmaOS Domination / Superset Strategy |
 | :--- | :--- | :--- |
@@ -383,10 +414,11 @@ To establish SigmaOS as the dominant global microkernel, the following applicati
 | **Gentoo Linux** | Deep source-level compilation optimizations. | Local ML-guided compiler loops in `SigmaDev Tools` targeting native instruction pipelines. |
 | **openSUSE** | Standard transactional snapshots and rollbacks (Btrfs). | Copy-on-Write Merkle trees inside `SigmaFS` supporting secure sub-millisecond system-wide rollbacks. |
 | **Android** | Massive mobile and desktop application ecosystem. | Unified multi-architecture translation runtime in `SigmaBridge` to natively map system calls. |
+| **SteamOS** | Handheld gaming focus, containerized runtimes. | Dedicated containerized gaming runtimes (`SigmaPlay`) isolating system dependencies while boosting hardware access. |
 
 ---
 
-## 8. 📊 Subsystem Implementation Backlog
+## 9. 📊 Subsystem Implementation Backlog
 
 To execute the master plan, the following planned subsystems must be incrementally developed:
 
@@ -401,7 +433,7 @@ To execute the master plan, the following planned subsystems must be incremental
 
 ---
 
-## 9. ⚡ Immediate Next Actions for AI Agents
+## 10. ⚡ Immediate Next Actions for AI Agents
 
 1. **Deploy the `main-dev` branch:** Merge and integrate verified subsystems into a unified, stable staging branch.
 2. **Prioritize Core Drivers:** Flesh out the missing GPU framebuffer and network adapters to make the kernel fully bootable with a graphic UI.
