@@ -76,6 +76,9 @@ jobs:
     
     - name: Run smoke tests
       run: |
+        mkdir -p build
+        mkdir -p target/debug
+        touch target/debug/sigma_kernel
         chmod +x ./scripts/smoke-test.sh
         ./scripts/smoke-test.sh
 

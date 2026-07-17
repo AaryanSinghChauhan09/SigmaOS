@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(warnings, clippy::all)]
+#![rustfmt::skip]
 
 pub mod security;
 pub mod sigpkg;
