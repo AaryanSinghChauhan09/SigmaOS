@@ -30,21 +30,23 @@ This roadmap serves as a strategic comparison matrix and execution path to bridg
 * **Supported Categories:** Basic storage (NVMe, Ext4, FAT32), prototype USB (xHCI host controller, USB HID), and early-stage VESA/GPU framebuffer.
 * **Missing Categories:** Comprehensive Wi-Fi/Bluetooth chipsets, fully accelerated vendor-specific GPUs (Intel, AMD, NVIDIA), printing systems, sensor arrays (I2C, SPI), and specialized boards (ARM SBCs, RISC-V development systems).
 
-### 2. Architecture: OOP Driver Framework
-To eliminate the need for manual driver installation, SigmaOS uses a polymorphic, modular, auto-managed architecture:
+### 2. Architecture: Polymorphic Plug-and-Play (PnP) Driver System
+To ensure SigmaOS users never need to manually download legacy drivers, SigmaOS implements an automatic, modular, and future-proof Plug-and-Play (PnP) driver system using OOP principles across seven key structural components:
 
-1. **Universal Driver Base Class (`DeviceDriver`):**
-   Exposes unified virtual interfaces `init()`, `read()`, `write()`, and `shutdown()`. Subclasses encapsulate specialized device logic while the kernel interacts strictly through polymorphic APIs.
-2. **Driver Registry & Auto-Loader:**
-   Detects hardware signatures dynamically at runtime and instantiates matching OOP drivers. Supports hot-swapping and dynamic loading/unloading.
-3. **Compatibility Wrappers:**
-   Leverages adapter design patterns to wrap legacy Linux drivers into SigmaOS OOP classes. This bridges the immediate driver gap while native, lean alternatives are written.
-4. **Hot-Plugging & Self-Updates:**
-   Allows dynamic reloading of drivers on hardware state changes. Features sandboxed, signed updates verified continuously through CI/CD pipelines.
-5. **Footprint Optimization:**
-   Drivers are separated from the core microkernel and loaded on-demand. Unused driver modules are stored as highly compressed binaries and decompressed directly into memory only when hardware is detected.
-6. **Security & Cryptographic Signatures:**
-   All drivers are cryptographically signed and sandboxed in user-space (OOP microkernel design), preventing faulty or malicious driver code from compromising kernel space.
+1. **Base Driver Class:**
+   Define a universal abstract class (e.g., `DeviceDriver` or `Driver`) exposing core virtual interfaces `init()`, `read()`, `write()`, and `shutdown()`. Encapsulation ensures each driver manages its own state and device registers cleanly.
+2. **Subclasses for Device Families:**
+   Use inheritance to create specialized driver categories such as `StorageDriver`, `NetworkDriver`, `GPUDriver`, and `PeripheralDriver`. Each subclass overrides base class virtual methods with device-specific behavioral logic.
+3. **Driver Registry:**
+   Establish a central, unified driver registry tracking the mapping: `Hardware Signature / Device ID` &rarr; `OOP Driver Class`. Through polymorphism, the kernel interacts with drivers via standard, unified interfaces and executes actions without knowing low-level transport details.
+4. **Plug-and-Play (PnP) Detection:**
+   The microkernel transaction bus listens for physical hardware bus-insertion events. On device insertion, the kernel queries the hardware's vendor/device IDs and dynamically instantiates the correct registry-mapped OOP driver object.
+5. **Lazy Loading:**
+   To keep the kernel lean and ensure sub-second boot speeds, drivers are dynamically loaded *only* when physical hardware is actively detected on the bus. This prevents dormant drivers from consuming memory or bloating the operating system runtime.
+6. **Compatibility Wrappers:**
+   Leverage the structural Adapter pattern to wrap legacy Linux drivers within clean, modern SigmaOS OOP interfaces, allowing the kernel to support legacy vendor hardware transparently while native, lightweight drivers are developed.
+7. **Hot-Swap & Self-Healing:**
+   Supports runtime driver hot-swapping and dynamic updating without system reboots. Incorporates a kernel watchdog that monitors driver state; if an isolated user-space driver shard encounters a panic or exception, the watchdog automatically recovers and reloads the driver seamlessly.
 
 ---
 
