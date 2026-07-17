@@ -31,18 +31,25 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let parts: Vec<&str> = version_str.split('.').collect();
-        if parts.len() != 3 {
+        // Optimized to be entirely allocation-free by using inline parsing with iterators.
+        // This avoids heap-allocated collections like Vec inside utility version parsing.
+        let mut parts = version_str.split('.');
+
+        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+
+        if parts.next().is_some() {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = parts[0]
+        let major = major_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
+        let minor = minor_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
+        let patch = patch_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
