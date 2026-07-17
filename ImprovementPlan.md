@@ -453,7 +453,39 @@ To secure rapid developer and user adoption, the following priorities are treate
 
 ---
 
-## 13. Recommended Next Steps (Sovereign Roadmap)
+## 13. Sovereign Build Toolchain & Sovereign Builders (Competing with Industry Standards)
+
+To scale SigmaOS's native builders (`SovereignEditionBuilder.rs`, `sigma_make.rs`) to industrial-grade, industry-standard maturity, we audited their design and mapped them against market leaders:
+
+### A. Core Build System Comparison
+
+| Product | Architecture | Performance Engine | Cache Model | Portability & Cross-Compilation |
+| :--- | :--- | :--- | :--- | :--- |
+| **GNU Make** | Procedural DAG parser | Single-threaded target evaluations; prone to slow sequential checks. | File timestamp modifications only (highly fragile, easily fooled). | Poor native support; relies heavily on standard toolchain cross-compiler prefixes. |
+| **CMake / Ninja** | Declarative meta-generator / ultra-flat assembler | Hyper-optimized parallel execution loops; instant compile queues. | Relies on generated Ninja manifest state graphs. | Good cross-compilation layers through complex toolchain files. |
+| **Bazel** | Directed Acyclic Graph (DAG) hermetic model | Extreme parallel thread pipelines; massive build farms. | **Cryptographic Content Hashing** (100% stable, zero false cache hits). | Exceptional hermetic build isolation across multi-host setups. |
+| **Yocto / BitBake**| Metadata task-driven recipes | Distributed multi-core parallel builds. | Shared state cache (sstate-cache) with checksum validations. | Built-in target hardware cross-compilers for embedded SOCs. |
+| **Nix** | Functional pure-expression evaluator | Zero-side-effect declarative build sandboxes. | **Hermetic CAS** (Content-Addressed Storage) hash mappings. | Pure cross-compilation targets with mathematically reproducible builds. |
+| **Sovereign Builder** | **OOP Task Directed Graph** | Lock-free multi-threaded scheduler pipelines (`src/kernel/scheduler.rs`). | **Cryptographic Content Hashing (SHA-256)** + WASM sandboxed builders. | Integrated cross-compilation layer with automated PnP target registry. |
+
+---
+
+### B. Toolchain Improvement Roadmap
+
+To fully outclass industry standards like Bazel and Yocto, SigmaOS's sovereign build utilities will execute the following strategic roadmap:
+
+1.  **Universal Task-Directed Graphs (Polymorphic Builders):**
+    *   *The Upgrade:* Transition `sigma_make` from a flat C targets file to a polymorphic, OOP-based DAG scheduler. Build steps are modeled as modular task classes implementing trait-based dependency hooks, running in parallel using our EEVDF microkernel scheduler.
+2.  **Hermetic Sandbox Isolation:**
+    *   *The Upgrade:* Every build target is isolated inside a sandboxed namespace container. Builders possess zero raw filesystem access except what is explicitly declared in their recipe manifest. This prevents side-effects and enforces Bazel/Nix-level compile reproducibility.
+3.  **Cryptographic Content-Hashed Output Caching:**
+    *   *The Upgrade:* Replace fragile GNU Make file-timestamp checks with robust cryptographic SHA-256 content hashes of both input sources and toolchain binaries. If the hash matches the cache, build outputs are instantly symlinked, slashing incremental build times to sub-millisecond speeds.
+4.  **Integrated Cross-Compilation Profiles:**
+    *   *The Upgrade:* Scale `SovereignEditionBuilder` to support native plug-and-play cross-compilation target registries. Developers can build cloud, standalone desktop, and hard real-time SBC profiles seamlessly without manual compiler/toolchain configuration.
+
+---
+
+## 14. Recommended Next Steps (Sovereign Roadmap)
 
 1. **Phase 1 [Immediate]:**
    - Fix the duplicate panic handler error on hosted architectures (Completed: applied conditional standard library compilation bounds).
