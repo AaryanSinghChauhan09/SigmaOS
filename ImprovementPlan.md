@@ -126,7 +126,7 @@ SigmaOS leverages robust Object-Oriented principles designed in Rust structures 
 
 ---
 
-## 7. Master Competitive Absorption Strategy (Rendering Legacy Monolithic Kernels Irrelevant)
+## 7. Master Competitive Absorption Strategy (Part I)
 
 To make legacy, monolithic systems irrelevant, SigmaOS absorbs and transforms the best breakthroughs from major specialized kernel repositories:
 
@@ -154,7 +154,38 @@ To make legacy, monolithic systems irrelevant, SigmaOS absorbs and transforms th
 
 ---
 
-## 8. Recommended Next Steps (Sovereign Roadmap)
+## 8. Master Competitive Absorption Strategy (Part II: Hardening, DSP, & Architecture Dominance)
+
+By absorbing the specialized capabilities of low-level, retro, and embedded Linux ports, SigmaOS establishes full-spectrum sovereignty:
+
+1. **GrapheneOS Hardened Memory & Security (Inspired by `GrapheneOS/kernel_common-6.12`, `Dark-Xploit/linux`, `ethical-buddy/linux`):**
+   - *Legacy Approach:* Monolithic architectures rely on complex runtime allocators (e.g., hardened_malloc) and syscall filters to block zero-day kernel exploits.
+   - *SigmaOS Superiority:* Absorb GrapheneOS's secure allocator segregation and memory sanitization patterns directly into our Sovereign Buddy Allocator (`src/kernel/memory.rs`). By grouping page frames according to process security capability tokens, SigmaOS guarantees total spatial and temporal separation under hardware control.
+2. **KASAN Dynamic Shadow Sanitization (Inspired by `aryabinin/linux`):**
+   - *Legacy Approach:* Software-based KASAN (Kernel Address Sanitizer) shadow bytes compiled into kernel binaries, incurring massive memory overhead.
+   - *SigmaOS Superiority:* We integrate a compile-time safe Rust alternative that maps capability shadow boundaries directly onto our 64-bit hardware page tables (`src/klib/paging.rs`), detecting memory corruption in real-time with zero runtime penalty.
+3. **EtherCAT Industrial Real-Time Command Queuing (Inspired by `Beckhoff/linux`, `elvees/linux`):**
+   - *Legacy Approach:* Monolithic preemption-rt patches trying to enforce hard real-time latency on legacy Ethernet stacks.
+   - *SigmaOS Superiority:* Natively absorb Beckhoff’s EtherCAT frame scheduling logic into our Predictable Scheduler (`src/kernel/scheduler.rs`). Highly deterministic task queues run side-by-side with out-of-band network packet processing using cooperative, zero-jitter multi-priority MLFQ channels.
+4. **Specialized DSP, Mainline SOC & RISC-V Ports (Inspired by `analogdevicesinc/lnxdsp-linux`, `alistair23/linux`, `avpatel/linux`, `apq8064-mainline/linux`, `cixtech/linux-mainline`, `foss-for-synopsys-dwc-arc-processors/linux`, `foss-for-synopsys-dwc-arc-processors/snps-accel-linux`):**
+   - *Legacy Approach:* Porting compilers, BSPs, and drivers to dozens of disparate, non-standard monolithic architectures.
+   - *SigmaOS Superiority:* Standardize low-overhead, modular RISC-V SBI, Synopsys ARC mailbox registers, and Analog Devices lnxdsp DSP bindings inside our hardware abstraction layer (`src/arch/hal.rs`). SigmaOS abstracts hardware heterogeneity into standard, capability-enforced IPC transactions.
+5. **CXL Memory Fabric Shared Volumes (Inspired by `cxl-micron-reskit/famfs-linux`, `heki-linux/lvbs-linux`):**
+   - *Legacy Approach:* Direct-access file allocation mapped across physical PCIe bounds under standard VFS structures.
+   - *SigmaOS Superiority:* Natively integrate famfs (CXL Shared Memory) fabrics and lvbs lightweight virtual storage blocks inside our Virtual Filesystem (`src/filesystem/vfs.rs`), enabling multi-node zero-copy memory clustering.
+6. **Core Input Subsystem Multiplexing (Inspired by `dtor/input`):**
+   - *Legacy Approach:* Heavy kernel-level input driver event queues requiring complex polling loops.
+   - *SigmaOS Superiority:* Absorb standard input event multiplexing and debouncing filters directly into `src/drivers/input.rs`, routing events via capability-safe IPC to the Zenith compositor.
+7. **Retro & E-Ink Hardware Ports (Inspired by `cakehonolulu/linux_ports/tree/sega/32x`, `cakehonolulu/linux_ports/tree/atari/jaguar`, `akemnade/linux`, `bigtreetech/linux`, `bigsaltyfishes/linux-mibooks12.4`, `crashniels/linux`):**
+   - *Legacy Approach:* Writing complex custom display framebuffer drivers for retro Atari, Sega 32X, BigTreeTech boards, and Kobo e-ink screens.
+   - *SigmaOS Superiority:* Absorb their low-level register configuration trees and frame timing loops into a highly generalized VESA driver layer (`src/drivers/vesa.rs`), enabling hotplug and visual rendering without modifying the core microkernel binary.
+8. **Task Diagnostics & Telemetry Routing (Inspired by `avagin/linux-task-diag`, `dsahern/linux`, `AOSC-Tracking/linux`):**
+   - *Legacy Approach:* Verbose virtual files (`/proc/net/*`, `/proc/pid/diag`) exposing kernel internal pointers to userspace.
+   - *SigmaOS Superiority:* Absorb task diagnostic maps and dsahern's routing metrics directly into safe userspace telemetry buffers, populating our Dashboard widget graphs (`src/dashboard/monitor.rs`) via read-only capability gates.
+
+---
+
+## 9. Recommended Next Steps (Sovereign Roadmap)
 
 1. **Phase 1 [Immediate]:**
    - Fix the duplicate panic handler error on hosted architectures (Completed: applied conditional standard library compilation bounds).
