@@ -2,6 +2,7 @@
 // Atomic package installation and rollback
 
 use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
+use std::collections::HashMap;
 
 /// Transaction for package operations
 pub struct Transaction {

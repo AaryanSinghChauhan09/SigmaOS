@@ -66,10 +66,7 @@ impl PeripheralManager {
     }
 
     /// Registers a new peripheral device into the system.
-    pub fn register_device(
-        &mut self,
-        mut device: Box<dyn PeripheralDevice>,
-    ) -> Result<(), &'static str> {
+    pub fn register_device(&mut self, mut device: Box<dyn PeripheralDevice>) -> Result<(), &'static str> {
         device.initialize()?;
         self.devices.push(device);
         Ok(())

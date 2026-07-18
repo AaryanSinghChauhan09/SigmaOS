@@ -24,11 +24,7 @@ pub struct FilePermissions {
 
 impl FilePermissions {
     pub fn new(read: bool, write: bool, execute: bool) -> Self {
-        Self {
-            read,
-            write,
-            execute,
-        }
+        Self { read, write, execute }
     }
 
     pub fn all() -> Self {
@@ -149,14 +145,10 @@ impl VirtualFilesystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let file_descriptor = self.file_descriptors.get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self
-            .inodes
-            .get(&file_descriptor.inode_id)
+        let inode = self.inodes.get(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
 
         // Check read permission
@@ -165,9 +157,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
+        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
 
         // Simulate read (in production, actual file I/O)
@@ -178,14 +168,10 @@ impl VirtualFilesystem {
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let file_descriptor = self.file_descriptors.get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self
-            .inodes
-            .get_mut(&file_descriptor.inode_id)
+        let inode = self.inodes.get_mut(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
 
         // Check write permission
@@ -194,15 +180,11 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in size calculation
-        let _new_size = inode
-            .size
-            .checked_add(buffer.len() as u64)
+        let _new_size = inode.size.checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
+        let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
         // Simulate write (in production, actual file I/O)
@@ -232,7 +214,8 @@ impl VirtualFilesystem {
     }
 
     pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
-        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        let inode = self.inodes.get(&inode_id)
+            .ok_or(FsError::NotFound)?;
 
         if inode.file_type != FileType::Directory {
             return Err(FsError::NotADirectory);

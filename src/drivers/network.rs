@@ -43,7 +43,7 @@ impl NetworkDriver {
 
     pub fn execute_command(&mut self, command: NetworkCommand) -> Result<Vec<u8>, NetworkError> {
         match command {
-            NetworkCommand::SendPacket { data: _ } => {
+            NetworkCommand::SendPacket { data } => {
                 if !self.connected {
                     return Err(NetworkError::NotConnected);
                 }
@@ -62,10 +62,7 @@ impl NetworkDriver {
                 self.ip_address = ip;
                 Ok(vec![])
             }
-            NetworkCommand::Connect {
-                ssid: _,
-                password: _,
-            } => {
+            NetworkCommand::Connect { ssid, password } => {
                 if self.interface_type != NetworkType::WiFi {
                     return Err(NetworkError::InvalidOperation);
                 }

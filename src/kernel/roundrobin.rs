@@ -325,14 +325,8 @@ mod tests {
         };
         let mut scheduler = RoundRobinScheduler::with_config(config);
 
-        assert!(scheduler
-            .add_process(Process::new(1, "test1".to_string(), Priority::Normal))
-            .is_ok());
-        assert!(scheduler
-            .add_process(Process::new(2, "test2".to_string(), Priority::Normal))
-            .is_ok());
-        assert!(scheduler
-            .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
-            .is_err());
+        assert!(scheduler.add_process(Process::new(1, "test1".to_string(), Priority::Normal)).is_ok());
+        assert!(scheduler.add_process(Process::new(2, "test2".to_string(), Priority::Normal)).is_ok());
+        assert!(scheduler.add_process(Process::new(3, "test3".to_string(), Priority::Normal)).is_err());
     }
 }

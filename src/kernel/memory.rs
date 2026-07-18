@@ -266,12 +266,7 @@ impl VirtualMemoryManager {
     }
 
     /// Maps a virtual page to a physical frame
-    pub fn map_page(
-        &mut self,
-        virtual_addr: u64,
-        physical_addr: u64,
-        flags: PageFlags,
-    ) -> Result<(), &'static str> {
+    pub fn map_page(&mut self, virtual_addr: u64, physical_addr: u64, flags: PageFlags) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
 
