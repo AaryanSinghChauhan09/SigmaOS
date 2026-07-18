@@ -62,11 +62,16 @@ impl LiveDebugger {
         self.core_dumps.push(trace);
     }
 
-    pub fn apply_hotpatch(&mut self, patch_id: &str, instructions: &[u8]) -> Result<(), &'static str> {
+    pub fn apply_hotpatch(
+        &mut self,
+        patch_id: &str,
+        instructions: &[u8],
+    ) -> Result<(), &'static str> {
         if instructions.is_empty() {
             return Err("Empty patch instructions");
         }
-        self.active_patches.insert(patch_id.to_string(), instructions.to_vec());
+        self.active_patches
+            .insert(patch_id.to_string(), instructions.to_vec());
         Ok(())
     }
 
@@ -178,7 +183,10 @@ mod tests {
 
         let patch_insts = [0x90, 0x90, 0xC3]; // NOP, NOP, RET
         assert!(dbg.apply_hotpatch("patch-01", &patch_insts).is_ok());
-        assert_eq!(dbg.active_patches.get("patch-01").unwrap(), &patch_insts.to_vec());
+        assert_eq!(
+            dbg.active_patches.get("patch-01").unwrap(),
+            &patch_insts.to_vec()
+        );
 
         assert!(dbg.remove_hotpatch("patch-01"));
     }
@@ -196,7 +204,10 @@ mod tests {
         // V2 has code.rs modified, and new file profile.sh
         let mut files_v2 = HashMap::new();
         files_v2.insert("/etc/hosts".to_string(), "hash1".to_string());
-        files_v2.insert("/home/jules/code.rs".to_string(), "hash2-changed".to_string());
+        files_v2.insert(
+            "/home/jules/code.rs".to_string(),
+            "hash2-changed".to_string(),
+        );
         files_v2.insert("/home/jules/profile.sh".to_string(), "hash3".to_string());
 
         let changes = backup.get_incremental_changes(&files_v2);

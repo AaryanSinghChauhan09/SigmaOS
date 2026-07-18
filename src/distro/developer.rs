@@ -81,7 +81,13 @@ impl PackageBuildService {
         }
     }
 
-    pub fn submit_job(&mut self, job_id: &str, package_name: &str, tarball: &str, arch: TargetArch) {
+    pub fn submit_job(
+        &mut self,
+        job_id: &str,
+        package_name: &str,
+        tarball: &str,
+        arch: TargetArch,
+    ) {
         let job = BuildJob {
             job_id: job_id.to_string(),
             package_name: package_name.to_string(),
@@ -182,8 +188,18 @@ mod tests {
     #[test]
     fn test_build_service_jobs() {
         let mut obs = PackageBuildService::new("SigmaOS Build Service");
-        obs.submit_job("job-1", "nginx-sovereign", "nginx-source.tar.gz", TargetArch::X86_64);
-        obs.submit_job("job-2", "corrupt-pkg", "corrupt-source.tar.gz", TargetArch::Arm64);
+        obs.submit_job(
+            "job-1",
+            "nginx-sovereign",
+            "nginx-source.tar.gz",
+            TargetArch::X86_64,
+        );
+        obs.submit_job(
+            "job-2",
+            "corrupt-pkg",
+            "corrupt-source.tar.gz",
+            TargetArch::Arm64,
+        );
 
         assert_eq!(obs.active_jobs.len(), 2);
         obs.process_jobs();

@@ -63,7 +63,12 @@ impl MpiCommunicator {
     }
 
     /// Simulates sending a packet from current rank to destination rank
-    pub fn send(&self, dest: u32, data: &[u8], communicators: &mut [MpiCommunicator]) -> Result<(), &'static str> {
+    pub fn send(
+        &self,
+        dest: u32,
+        data: &[u8],
+        communicators: &mut [MpiCommunicator],
+    ) -> Result<(), &'static str> {
         if dest >= self.size {
             return Err("Destination rank out of bounds");
         }
@@ -139,7 +144,8 @@ impl EcuController {
             }
             0x500 => {
                 // Emergency Fault
-                self.error_log.push("Emergency fault CAN code received!".to_string());
+                self.error_log
+                    .push("Emergency fault CAN code received!".to_string());
                 self.speed_kmh = 0.0;
                 self.brake_applied = true;
                 Ok("Safety failsafe activated")
@@ -183,10 +189,16 @@ impl EduPlayground {
 
     /// Submits a student's answer code. If correct, awards points and advances levels.
     pub fn submit_solution(&mut self, student_code: &str) -> Result<&'static str, &'static str> {
-        let challenge = self.active_challenge.as_ref().ok_or("No active challenge")?;
+        let challenge = self
+            .active_challenge
+            .as_ref()
+            .ok_or("No active challenge")?;
 
         // Basic static verification of educational coding results
-        if student_code.contains("print") && student_code.contains("hello") && challenge.challenge_id == 1 {
+        if student_code.contains("print")
+            && student_code.contains("hello")
+            && challenge.challenge_id == 1
+        {
             self.current_score += 100;
             if self.current_score >= 200 {
                 self.level += 1;
@@ -223,11 +235,20 @@ mod tests {
         let mut communicators = [node0.clone(), node1.clone(), node2.clone()];
 
         assert!(node0.send(1, b"hello rank 1", &mut communicators).is_ok());
-        assert_eq!(communicators[1].message_buffer.get(&0).unwrap(), b"hello rank 1");
+        assert_eq!(
+            communicators[1].message_buffer.get(&0).unwrap(),
+            b"hello rank 1"
+        );
 
         node0.broadcast(b"sync signal", &mut communicators);
-        assert_eq!(communicators[1].message_buffer.get(&0).unwrap(), b"sync signal");
-        assert_eq!(communicators[2].message_buffer.get(&0).unwrap(), b"sync signal");
+        assert_eq!(
+            communicators[1].message_buffer.get(&0).unwrap(),
+            b"sync signal"
+        );
+        assert_eq!(
+            communicators[2].message_buffer.get(&0).unwrap(),
+            b"sync signal"
+        );
     }
 
     #[test]
@@ -247,7 +268,10 @@ mod tests {
             data: [0; 8],
             dlc: 8,
         };
-        assert_eq!(ecu.process_can_frame(&failsafe_frame), Ok("Safety failsafe activated"));
+        assert_eq!(
+            ecu.process_can_frame(&failsafe_frame),
+            Ok("Safety failsafe activated")
+        );
         assert_eq!(ecu.speed_kmh, 0.0);
         assert!(ecu.brake_applied);
         assert_eq!(ecu.error_log.len(), 1);

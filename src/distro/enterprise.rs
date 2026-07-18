@@ -154,8 +154,16 @@ mod tests {
     #[test]
     fn test_compliance_auditing() {
         let mut auditor = ComplianceAuditor::new("CIS-SigmaOS-L1");
-        auditor.add_rule("sys.password_min_length", "Enforce min 12 character password length", "12");
-        auditor.add_rule("sys.selinux_enforcing", "Enforce SELinux policy", "enforcing");
+        auditor.add_rule(
+            "sys.password_min_length",
+            "Enforce min 12 character password length",
+            "12",
+        );
+        auditor.add_rule(
+            "sys.selinux_enforcing",
+            "Enforce SELinux policy",
+            "enforcing",
+        );
 
         let mut actual_state = HashMap::new();
         actual_state.insert("sys.password_min_length".to_string(), "14".to_string()); // passing but not exact
@@ -165,10 +173,16 @@ mod tests {
         assert_eq!(audit_results.len(), 2);
 
         // First rule checks for EXACT "12" string match in our mock implementation
-        let rule1_res = audit_results.iter().find(|r| r.rule_id == "sys.password_min_length").unwrap();
+        let rule1_res = audit_results
+            .iter()
+            .find(|r| r.rule_id == "sys.password_min_length")
+            .unwrap();
         assert!(!rule1_res.success); // actual "14" != expected "12"
 
-        let rule2_res = audit_results.iter().find(|r| r.rule_id == "sys.selinux_enforcing").unwrap();
+        let rule2_res = audit_results
+            .iter()
+            .find(|r| r.rule_id == "sys.selinux_enforcing")
+            .unwrap();
         assert!(rule2_res.success); // actual "enforcing" == expected "enforcing"
     }
 }

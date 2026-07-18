@@ -143,7 +143,10 @@ impl RegionalSettings {
             int_str = formatted;
         }
 
-        format!("{}{}{}{:02}", self.currency_symbol, int_str, self.decimal_separator, frac_part)
+        format!(
+            "{}{}{}{:02}",
+            self.currency_symbol, int_str, self.decimal_separator, frac_part
+        )
     }
 
     pub fn format_date(&self, day: u32, month: u32, year: u32) -> String {
@@ -185,7 +188,8 @@ impl LocaleManager {
     }
 
     pub fn register_regional_settings(&mut self, settings: RegionalSettings) {
-        self.regional_settings.insert(settings.locale_id.clone(), settings);
+        self.regional_settings
+            .insert(settings.locale_id.clone(), settings);
     }
 
     pub fn set_locale(&mut self, locale: &str) -> Result<(), &'static str> {
@@ -219,18 +223,33 @@ mod tests {
         pack.insert("items_other", "You have {0} items");
 
         assert_eq!(pack.translate("welcome"), Some("Welcome back, {0}!"));
-        assert_eq!(pack.translate_with_args("welcome", &["Alice"]), Some("Welcome back, Alice!".to_string()));
+        assert_eq!(
+            pack.translate_with_args("welcome", &["Alice"]),
+            Some("Welcome back, Alice!".to_string())
+        );
         assert_eq!(pack.translate_plural("items", 1), Some("You have 1 item"));
-        assert_eq!(pack.translate_plural("items", 5), Some("You have {0} items"));
+        assert_eq!(
+            pack.translate_plural("items", 5),
+            Some("You have {0} items")
+        );
     }
 
     #[test]
     fn test_input_method_engine() {
         let mut ime = InputMethodEngine::new("Pinyin");
-        ime.register_conversion("nihao", vec![
-            ImeCandidate { text: "你好".to_string(), description: "hello".to_string() },
-            ImeCandidate { text: "泥好".to_string(), description: "mud good".to_string() }
-        ]);
+        ime.register_conversion(
+            "nihao",
+            vec![
+                ImeCandidate {
+                    text: "你好".to_string(),
+                    description: "hello".to_string(),
+                },
+                ImeCandidate {
+                    text: "泥好".to_string(),
+                    description: "mud good".to_string(),
+                },
+            ],
+        );
 
         let candidates = ime.get_candidates("nihao");
         assert_eq!(candidates.len(), 2);

@@ -26,8 +26,14 @@ impl ManPage {
     }
 
     pub fn format_page(&self) -> String {
-        let mut output = format!("{}({})\n\nNAME\n    {}\n\nSYNOPSIS\n    {}\n\nDESCRIPTION\n    {}\n",
-            self.name.to_uppercase(), self.section, self.name, self.synopsis, self.description);
+        let mut output = format!(
+            "{}({})\n\nNAME\n    {}\n\nSYNOPSIS\n    {}\n\nDESCRIPTION\n    {}\n",
+            self.name.to_uppercase(),
+            self.section,
+            self.name,
+            self.synopsis,
+            self.description
+        );
 
         if !self.options.is_empty() {
             output.push_str("\nOPTIONS\n");
@@ -173,7 +179,12 @@ impl BugBountyProgram {
         });
     }
 
-    pub fn audit_and_reward(&mut self, id: u32, approved: bool, reward: u32) -> Result<(), &'static str> {
+    pub fn audit_and_reward(
+        &mut self,
+        id: u32,
+        approved: bool,
+        reward: u32,
+    ) -> Result<(), &'static str> {
         for report in &mut self.reports {
             if report.report_id == id {
                 if approved {
@@ -266,16 +277,25 @@ impl HelpSystem {
     pub fn search_wiki(&self, keyword: &str) -> Vec<&WikiPage> {
         self.wiki_pages
             .values()
-            .filter(|p| p.title.to_lowercase().contains(&keyword.to_lowercase())
-                || p.content.to_lowercase().contains(&keyword.to_lowercase()))
+            .filter(|p| {
+                p.title.to_lowercase().contains(&keyword.to_lowercase())
+                    || p.content.to_lowercase().contains(&keyword.to_lowercase())
+            })
             .collect()
     }
 
     /// Retrieves a manual localized using translation dictionary (simulation)
-    pub fn translate_man_summary(&self, query: &str, locale_dictionary: &HashMap<String, String>) -> String {
+    pub fn translate_man_summary(
+        &self,
+        query: &str,
+        locale_dictionary: &HashMap<String, String>,
+    ) -> String {
         if let Some(page) = self.man_pages.get(query) {
             let key = format!("man_{}_summary", query);
-            locale_dictionary.get(&key).cloned().unwrap_or(page.synopsis.clone())
+            locale_dictionary
+                .get(&key)
+                .cloned()
+                .unwrap_or(page.synopsis.clone())
         } else {
             "Manual not found".to_string()
         }
@@ -294,7 +314,12 @@ mod tests {
 
     #[test]
     fn test_man_page_formatting() {
-        let mut page = ManPage::new("sigma-exec", 1, "Execute safe command", "Executes an isolated command under active capability gates.");
+        let mut page = ManPage::new(
+            "sigma-exec",
+            1,
+            "Execute safe command",
+            "Executes an isolated command under active capability gates.",
+        );
         page.add_option("-p", "Specify active capability policy");
 
         let formatted = page.format_page();
@@ -325,21 +350,39 @@ mod tests {
 
     #[test]
     fn test_forum_matrix_posts() {
-        let mut channel = ForumChannel::new("#sigmaos-dev", "Discussion about SigmaOS kernel development");
-        channel.post_message("Jules", "Hey team! PQC signatures are working perfectly.", 1718100000);
+        let mut channel = ForumChannel::new(
+            "#sigmaos-dev",
+            "Discussion about SigmaOS kernel development",
+        );
+        channel.post_message(
+            "Jules",
+            "Hey team! PQC signatures are working perfectly.",
+            1718100000,
+        );
 
         assert_eq!(channel.posts.len(), 1);
         assert_eq!(channel.posts[0].author, "Jules");
-        assert_eq!(channel.posts[0].content, "Hey team! PQC signatures are working perfectly.");
+        assert_eq!(
+            channel.posts[0].content,
+            "Hey team! PQC signatures are working perfectly."
+        );
     }
 
     #[test]
     fn test_help_system_search() {
         let mut system = HelpSystem::new();
-        let page = ManPage::new("sigma-sh", 1, "Sovereign Shell", "Interactive userland command interpreter.");
+        let page = ManPage::new(
+            "sigma-sh",
+            1,
+            "Sovereign Shell",
+            "Interactive userland command interpreter.",
+        );
         system.add_man_page(page);
 
-        let wiki = WikiPage::new("PQC Kyber-1024", "Kyber is used for post-quantum key encapsulation.");
+        let wiki = WikiPage::new(
+            "PQC Kyber-1024",
+            "Kyber is used for post-quantum key encapsulation.",
+        );
         system.add_wiki_page(wiki);
 
         assert!(system.search_man("sigma-sh").is_some());
@@ -367,17 +410,28 @@ mod tests {
 
         assert_eq!(conf.schedules.len(), 1);
         assert_eq!(conf.schedules[0].speaker, "Jules");
-        assert_eq!(conf.schedules[0].title, "Unifying Distro Ecosystems with Rust");
+        assert_eq!(
+            conf.schedules[0].title,
+            "Unifying Distro Ecosystems with Rust"
+        );
     }
 
     #[test]
     fn test_help_localized_manuals() {
         let mut system = HelpSystem::new();
-        let page = ManPage::new("sigma-pkg", 1, "Sigma Package Manager", "Registers, resolves, and verifies universal packages.");
+        let page = ManPage::new(
+            "sigma-pkg",
+            1,
+            "Sigma Package Manager",
+            "Registers, resolves, and verifies universal packages.",
+        );
         system.add_man_page(page);
 
         let mut dict = HashMap::new();
-        dict.insert("man_sigma-pkg_summary".to_string(), "Gestionnaire de paquets universels de SigmaOS".to_string());
+        dict.insert(
+            "man_sigma-pkg_summary".to_string(),
+            "Gestionnaire de paquets universels de SigmaOS".to_string(),
+        );
 
         let summary = system.translate_man_summary("sigma-pkg", &dict);
         assert_eq!(summary, "Gestionnaire de paquets universels de SigmaOS");

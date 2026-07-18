@@ -212,7 +212,10 @@ impl HardwareRegressionSuite {
         }
     }
 
-    pub fn run_regression_on(&mut self, profile: HardwareProfile) -> Result<&'static str, &'static str> {
+    pub fn run_regression_on(
+        &mut self,
+        profile: HardwareProfile,
+    ) -> Result<&'static str, &'static str> {
         if profile.memory_gb < 1 {
             return Err("Regression test failed: Out of memory during boot emulator init");
         }
@@ -240,7 +243,10 @@ mod tests {
             ],
         );
 
-        assert_eq!(certificate.overall_status, CertificationStatus::CompatibleWithWarnings);
+        assert_eq!(
+            certificate.overall_status,
+            CertificationStatus::CompatibleWithWarnings
+        );
         assert_eq!(
             certificate.components_status.get(&ComponentType::Cpu),
             Some(&CertificationStatus::Certified)
@@ -271,7 +277,10 @@ mod tests {
         };
 
         assert!(scp.audit_app(&safe_app).is_ok());
-        assert_eq!(scp.audit_app(&toxic_app), Err("Capability model sandbox escape requested"));
+        assert_eq!(
+            scp.audit_app(&toxic_app),
+            Err("Capability model sandbox escape requested")
+        );
     }
 
     #[test]
