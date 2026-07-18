@@ -208,18 +208,63 @@ To systematically close competitive gaps and defeat standard Linux distributions
 
 ---
 
-## 5. BARE-METAL SUBSYSTEM DESIGN SPECIFICATIONS
+## 5. THE SIGMATOOLS SYSTEM SUITE
+
+To achieve institutional adoption parity and match the robustness of the standard Linux distribution ecosystem, SigmaOS specifies the design, construction, and release pipelines for nine custom bare-metal utility systems:
+
+```
++-------------------------------------------------------------------------------------------------+
+|                                        SIGMATOOLS SUITE                                         |
++-------------------------------------------------------------------------------------------------+
+| [SigmaDeploy]    | [SigmaFS]       | [SigmaPatch]   | [SigmaCluster]     | [SigmaIdentity]      |
+| Automated        | Cross-FS Mount  | Zero-Downtime  | Supercomputer      | Enterprise Directory |
+| Provisioning     | Snapshot Manager| Hot Patching   | Grid Orchestrator  | Gated Access & Logs  |
++-------------------------------------------------------------------------------------------------+
+| [SigmaAccess]    | [SigmaDocs]     | [SigmaQA]      | [SigmaCertify]                            |
+| Core Accessibility| Core Man/Help   | Multi-Hardware | Rigorous FIPS                            |
+| Unified Composers| Localized Docs  | Validation     | CC Certification                          |
++-------------------------------------------------------------------------------------------------+
+```
+
+### 5.1 System Specifications
+* **1. SigmaDeploy (Automated Provisioning & Netboot):** A zero-dependency network boot and custom installer engine. Operates natively inside bare metal, utilizing pre-configured TFTP/DHCP sockets mapped directly to E1000 network channels. Executes automated, Kickstart/Preseed-style deployments through declarative JSON-style graphs, permitting zero-touch industrial provisioning.
+* **2. SigmaFS (Unified Storage & Snapshot Manager):** Exposes a clean OOP framework for mounting, writing, and formatting alternative filesystems (including NTFS, exFAT, APFS, EXT4, and ZFS). Coordinates write-cache flushes and maintains transactional integrity during mount states. Supports atomic block snapshots and quick, sub-millisecond rollbacks.
+* **3. SigmaPatch (Zero-Downtime System Updater):** Integrates live microkernel hot-patching. Bypasses standard system reboot cycles by dynamically splicing newly compiled driver or kernel binary instructions directly inside active instruction streams using low-level page-table re-mapping (unmapping old frames, mapping patch frames).
+* **4. SigmaCluster (Grid & Cluster Orchestrator):** Implements lightweight, bare-metal container and cluster grid nodes natively compatible with Kubernetes, Slurm, and OpenStack targets. Manages task delegation, node load balancing, and thread execution over dynamic network rings.
+* **5. SigmaIdentity (Enterprise Directory Integrator):** Integrates standard LDAP, Kerberos, and Active Directory protocols directly at the capability-gated security layer, validating permissions and logging administrative tasks into the immutable ledger.
+* **6. SigmaAccess (Visual & Audio Inclusivity Toolkit):** Houses core visual screen-readers, SIMD hardware color-shifters, magnification overlays, and voice/eye-tracking controllers, completely integrated inside the primary Zenith composition thread.
+* **7. SigmaDocs (Unified Knowledge Engine):** A built-in, local help and manual reader (similar to man pages). Provides localized, multilingual document graphs stored as read-only CAS items in the local package store.
+* **8. SigmaQA (Continuous Multi-Hardware Validator):** An automated regression testing harness that executes hardware testing matrices across various configurations. Validates system stability and identifies threading bottlenecks prior to core branch merges.
+* **9. SigmaCertify (Compliance & Cryptographic Auditor):** A specialized diagnostic engine running continuous automated audits. Checks core operations against FIPS 140-3, Common Criteria, GDPR, and SOC 2 requirements, ensuring enterprise credibility.
+
+### 5.2 Strategic Build and Rollout Sequence
+To ensure optimal deployment stability, the SigmaTools suite is built and rolled out sequentially across five scheduled release milestones:
+
+* **Phase I: Base Storage and Installation (SigmaDeploy + SigmaFS):**
+  Establishes the foundation for target installation, networking discovery, and multi-filesystem partition mapping, providing stable bootable images.
+* **Phase II: Zero-Downtime Resilience (SigmaPatch + SigmaRescue):**
+  Integrates hot-patching capabilities and emergency rollback utilities, shielding nodes against physical media failures.
+* **Phase III: Enterprise Cloud Orchestration (SigmaCluster + SigmaIdentity):**
+  Launches supercomputing grid scheduling and unified corporate directory authentication schemes, qualifying the platform for enterprise clouds.
+* **Phase IV: Inclusive Knowledge Systems (SigmaAccess + SigmaDocs):**
+  Registers core typography help commands and hardware accessibility filters, enabling universal inclusivity.
+* **Phase V: Rigorous Trust and Verification (SigmaQA + SigmaCertify):**
+  Locks down automated regression testing and compliance checkers to satisfy military, financial, and government compliance requirements.
+
+---
+
+## 6. BARE-METAL SUBSYSTEM DESIGN SPECIFICATIONS
 
 The following section defines formal, zero-dependency, pure-OOP architectural and system specifications designed for bare-metal targets, showing how to structure hardware mapping, sandboxing, and transaction rollbacks without standard library references.
 
-### 5.1 Polymorphic Universal Peripheral Blueprint (OOP Paradigm)
+### 6.1 Polymorphic Universal Peripheral Blueprint (OOP Paradigm)
 To achieve complete abstraction across legacy Port I/O (PIO) registers and modern Memory-Mapped I/O (MMIO) ports:
 1. **Unified Device Trait (`UnifiedPeripheral`):** Defines abstract methods for initializing systems, reading/writing registers, handling hardware IRQs, and transitioning power states.
 2. **Legacy Controller Struct:** Represents old-generation devices. Encapsulates base 16-bit Port addresses and executes port access via raw, inline assembly instructions (`inb`/`outb` instructions).
 3. **Modern Controller Struct:** Represents modern devices. Encapsulates 64-bit Memory-Mapped addresses and executes reads and writes via raw, volatile memory pointer dereferencing.
 4. **Unified Peripheral Manager (Singleton):** Coordinates registration of all active devices inside a static registry table. Maps each controller dynamically, allowing the OS to poll, read, and command hardware through a single, consistent vtable-free interface.
 
-### 5.2 Zero-Allocation UDF Bytecode Interpreter Specification
+### 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
 To execute vendor-supplied or custom user-defined driver scripts dynamically inside a secure kernel sandbox:
 1. **Sandboxed VM State (`UdfVm`):** Houses 8 static 64-bit registers (`R0` through `R7`) and a 64-bit program counter. Operates strictly within pre-allocated stack frames with no dynamic heap memory allocations.
 2. **Secure Instruction Set Architecture (ISA):**
@@ -229,13 +274,13 @@ To execute vendor-supplied or custom user-defined driver scripts dynamically ins
    - **OP_HALT (0xF0):** Terminates execution cycle and returns accumulative values.
 3. **VM Safety Guard:** Prior to execution, the interpreter validates instruction bounds to guarantee that no branch, read, or write command can access registers or memory outside the peripheral's sandboxed perimeter.
 
-### 5.3 Declarative Package Resolution SAT Solver Specifications
+### 6.3 Declarative Package Resolution SAT Solver Specifications
 To mathematically resolve multi-version package dependency constraint satisfaction without memory allocations:
 1. **Package Constraint Definition:** Maps package identifiers along with min/max compatible version constraints.
 2. **Package Node Struct:** Encapsulates package IDs, unique version keys, and a fixed-size array of active dependencies.
 3. **Constraint SAT Solver:** Implements a standard backtracking satisfiability solver. Operates strictly over static package arrays, evaluating candidate packages against assigned version states. If a conflict or circular dependency is detected, the solver automatically backtracks, resetting states and attempting alternative candidate packages until a conflict-free resolution state is reached.
 
-### 5.4 JBD2-Style Crash-Resilient Transactional Ledger Specifications
+### 6.4 JBD2-Style Crash-Resilient Transactional Ledger Specifications
 To guarantee transactional crash-consistency over Copy-on-Write Merkle trees:
 1. **Transaction Block Definition:** Encapsulates transaction IDs, target block addresses, and cryptographic CRC32C data hashes.
 2. **Merkle Journal Node:** Maps data blocks alongside calculated Merkle hash proofs.
