@@ -1,6 +1,7 @@
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod certification;
 pub mod community;
+pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
@@ -15,6 +16,10 @@ pub use certification::{
 pub use community::{
     BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
     ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
+};
+pub use compat_layers::{
+    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
+    RegistryValue, Win32Gdi, WindowsRegistry,
 };
 pub use developer::{
     BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
