@@ -5,6 +5,7 @@ pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
+pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 
@@ -29,6 +30,10 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
+pub use nextgen::{
+    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    TimeTravelCheckpoint, TimeTravelEngine,
+};
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
