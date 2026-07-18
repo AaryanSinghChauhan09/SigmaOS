@@ -161,6 +161,7 @@ impl Default for UnifiedDashboard {
 pub struct SystemMonitor {
     pub dashboard: UnifiedDashboard,
     pub running: bool,
+    lcg_state: u64,
 }
 
 impl SystemMonitor {
@@ -187,6 +188,7 @@ impl SystemMonitor {
         Self {
             dashboard,
             running: false,
+            lcg_state: 12345,
         }
     }
 
@@ -203,17 +205,23 @@ impl SystemMonitor {
             return;
         }
         
+        // Custom LCG for random f64 values (pseudo-random, zero-dependency)
+        let mut lcg_next = |state: &mut u64| -> f64 {
+            *state = (state.wrapping_mul(25214903917).wrapping_add(11)) & ((1 << 48) - 1);
+            (*state as f64) / ((1u64 << 48) as f64)
+        };
+
         // Simulate metric updates
         let cpu_data = MetricData {
             metric_type: MetricType::CPU,
-            value: 45.0 + (rand::random::<f64>() * 20.0),
+            value: 45.0 + (lcg_next(&mut self.lcg_state) * 20.0),
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };
         
         let memory_data = MetricData {
             metric_type: MetricType::Memory,
-            value: 60.0 + (rand::random::<f64>() * 15.0),
+            value: 60.0 + (lcg_next(&mut self.lcg_state) * 15.0),
             unit: "%".to_string(),
             timestamp: Instant::now(),
         };

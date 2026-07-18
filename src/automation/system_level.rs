@@ -365,7 +365,14 @@ impl SystemAutomationManager {
             PredictiveModel::ResourceForecast => context.get("disk_usage").unwrap_or(&50.0) * 1.01,
         };
 
-        let confidence = 0.8 + (rand::random::<f64>() * 0.15);
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or(Duration::from_secs(0))
+            .as_nanos();
+        let mut state = (nanos ^ (nanos >> 32)) as u64;
+        state = (state.wrapping_mul(25214903917).wrapping_add(11)) & ((1 << 48) - 1);
+        let rand_val = (state as f64) / ((1u64 << 48) as f64);
+        let confidence = 0.8 + (rand_val * 0.15);
 
         let prediction = SystemPrediction::new(model_type, predicted_value, confidence);
 

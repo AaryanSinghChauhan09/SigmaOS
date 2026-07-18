@@ -4,7 +4,7 @@
 use crate::security::CapabilityToken;
 
 /// GPU command type
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum GpuCommand {
     ClearScreen { r: u8, g: u8, b: u8 },
     DrawRect { x: u32, y: u32, width: u32, height: u32 },
@@ -63,7 +63,7 @@ impl GpuDriver {
     }
 
     pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits & capability) != 0
+        (self.capabilities.bits() & capability) != 0
     }
 }
 

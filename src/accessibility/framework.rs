@@ -14,7 +14,7 @@ pub enum AccessibilityCategory {
 }
 
 /// Accessibility feature type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AccessibilityFeature {
     ScreenReader,
     HighContrast,
@@ -163,6 +163,9 @@ impl AccessibilityFramework {
             return Err(AccessibilityError::ProfileNotFound);
         }
         self.active_profile = Some(name.to_string());
+        if let Some(profile) = self.profiles.get_mut(name) {
+            profile.enable_all();
+        }
         Ok(())
     }
 

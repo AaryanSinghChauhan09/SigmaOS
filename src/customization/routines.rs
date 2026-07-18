@@ -123,7 +123,7 @@ impl Routine {
         }
 
         self.conditions.iter().all(|condition| {
-            let current_value = context.get(&condition.value).unwrap_or(&String::new());
+            let current_value = context.get(&condition.value).map(|s| s.as_str()).unwrap_or("");
             condition.evaluate(current_value)
         })
     }
