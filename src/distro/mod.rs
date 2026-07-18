@@ -152,7 +152,13 @@ impl UnifiedServiceManager {
         }
 
         for svc_name in self.services.keys() {
-            visit(svc_name, &self.services, &mut visited, &mut visiting, &mut order)?;
+            visit(
+                svc_name,
+                &self.services,
+                &mut visited,
+                &mut visiting,
+                &mut order,
+            )?;
         }
 
         Ok(order)
@@ -171,7 +177,10 @@ impl UnifiedServiceManager {
                 if let Some(svc) = self.services.get_mut(name) {
                     svc.running = true;
                     max_group_time = max_group_time.max(svc.startup_time_ms);
-                    self.boot_perf_log.push(format!("[{}] Started service {} in {}ms (parallel)", init_name, name, svc.startup_time_ms));
+                    self.boot_perf_log.push(format!(
+                        "[{}] Started service {} in {}ms (parallel)",
+                        init_name, name, svc.startup_time_ms
+                    ));
                 }
             }
             total_time = max_group_time + 5; // adding small system overhead
@@ -181,7 +190,10 @@ impl UnifiedServiceManager {
                 if let Some(svc) = self.services.get_mut(name) {
                     svc.running = true;
                     total_time += svc.startup_time_ms;
-                    self.boot_perf_log.push(format!("[{}] Started service {} in {}ms (sequential)", init_name, name, svc.startup_time_ms));
+                    self.boot_perf_log.push(format!(
+                        "[{}] Started service {} in {}ms (sequential)",
+                        init_name, name, svc.startup_time_ms
+                    ));
                 }
             }
         }
@@ -224,7 +236,7 @@ pub struct WirelessNetwork {
 pub struct VpnConnection {
     pub vpn_type: String, // "WireGuard", "OpenVPN", "Shadowsocks"
     pub endpoint: String,
-    pub status: String,   // "Connected", "Disconnected"
+    pub status: String, // "Connected", "Disconnected"
 }
 
 #[derive(Debug, Clone)]
@@ -493,7 +505,11 @@ pub struct MultimediaStack {
 }
 
 impl MultimediaStack {
-    pub fn new(display: DisplayServerProtocol, audio: AudioEngine, graphics: GraphicsAcceleration) -> Self {
+    pub fn new(
+        display: DisplayServerProtocol,
+        audio: AudioEngine,
+        graphics: GraphicsAcceleration,
+    ) -> Self {
         Self {
             display,
             audio,
@@ -555,7 +571,10 @@ mod tests {
 
     #[test]
     fn test_installer_profiles() {
-        let mut installer = NetbootInstaller::new(InstallerProfile::Server, "https://netboot.sigmaos.org/base.iso");
+        let mut installer = NetbootInstaller::new(
+            InstallerProfile::Server,
+            "https://netboot.sigmaos.org/base.iso",
+        );
         assert_eq!(installer.installed, false);
         assert!(installer.install_system().is_err());
 
@@ -612,8 +631,14 @@ mod tests {
             action: "DROP".to_string(),
         });
 
-        assert_eq!(suite.check_firewall("10.0.0.5", "192.168.1.100", 22), "DROP");
-        assert_eq!(suite.check_firewall("10.0.0.6", "192.168.1.100", 22), "ACCEPT");
+        assert_eq!(
+            suite.check_firewall("10.0.0.5", "192.168.1.100", 22),
+            "DROP"
+        );
+        assert_eq!(
+            suite.check_firewall("10.0.0.6", "192.168.1.100", 22),
+            "ACCEPT"
+        );
     }
 
     #[test]
