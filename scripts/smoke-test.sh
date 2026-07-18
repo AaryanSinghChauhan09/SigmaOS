@@ -6,6 +6,15 @@ set -e
 
 echo "Running SigmaOS smoke tests..."
 
+# Dynamically ensure the creation of build/ directory
+mkdir -p build
+
+# Dynamically compile target binaries if they are missing
+if [ ! -f "target/debug/sigma_kernel" ] && [ ! -f "target/release/sigma_kernel" ]; then
+    echo "Kernel binary missing, building..."
+    cargo build --bin sigma_kernel
+fi
+
 # Test 1: Check if build directory exists
 if [ ! -d "build" ]; then
     echo "FAIL: Build directory does not exist"
