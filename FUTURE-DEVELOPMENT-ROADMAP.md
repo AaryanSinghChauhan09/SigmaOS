@@ -99,9 +99,9 @@ Text-file system configurations in `/etc/` across Linux distributions create non
 * **Content-Addressed Storage (CAS) Package Manager:** The SigmaPkg package manager stores all system packages and software layers under cryptographically-secured content-addressed paths (e.g., `/store/sha256-...`). Package conflict and dependency hell are physically impossible. Updates are executed atomically, and rolling back to a previous system state is as fast as re-pointing the boot root pointer to a different Merkle root hash.
 
 ### 2.4 OS Security Model & Vulnerability Management
-Linux distributions rely on retrofitted, heavy-weight security policies (SELinux/AppArmor) which add latency and configuration complexity.
+Linux distributions rely on retrofitted, heavyweight security policies (SELinux/AppArmor) which add latency and configuration complexity.
 * **Capability-Ring Paradigm:** SigmaOS uses a formal capability delegation model. Applications possess zero privileges by default. Access to system paths, devices, and networks is authorized exclusively via cryptographically signed capability tokens.
-* **Post-Quantum Cryptography:** All network communications, package signatures, and authorization tokens use hybrid Kyber-1024 and Dilithium-5 algorithms, rendering the system impervious to retro-active decryption by quantum compute threats.
+* **Post-Quantum Cryptography:** All network communications, package signatures, and authorization tokens use hybrid Kyber-1024 and Dilithium-5 algorithms, rendering the system impervious to retroactive decryption by quantum compute threats.
 
 ---
 
@@ -253,18 +253,59 @@ To ensure optimal deployment stability, the SigmaTools suite is built and rolled
 
 ---
 
-## 6. BARE-METAL SUBSYSTEM DESIGN SPECIFICATIONS
+## 6. NATIVE FILE I/O AND TCP NETWORKING MILESTONES
+
+To successfully transition SigmaOS into a bootable, fully functional OS where standard shell environments execute natively, we prioritize the completion of six critical, low-level microkernel filesystems and sockets milestones:
+
+```
++----------------------------------------------------------------------------------------+
+|                      NATIVE FILE I/O & TCP SOCKETS SUBSYSTEM                           |
++----------------------------------------------------------------------------------------+
+| [VFS open/read/write] ---> [tmpfs Interface] ---> [TCP State Machine] ---> [Syscalls] |
+|   - File descriptors      | - Memory Files     | - Syn/Ack Handshakes   | - socket/   |
+|   - Directory walks       | - Temp Buffers     | - Sliding Windows      |   connect   |
++----------------------------------------------------------------------------------------+
+|                            [ext4 Read-Only] ---> [DNS Resolver]                        |
+|                              - Inode walks       | - Host resolving                    |
++----------------------------------------------------------------------------------------+
+```
+
+### 6.1 Subsystem Implementations
+* **1. VFS Open/Read/Write Subsystem (`kernel/fs/vfs.rs`):** [Priority: 🔴 Critical]
+  Establishes the primary Virtual Filesystem (VFS) abstraction. Manages standard file descriptor allocation, directory path resolution loops (directory walks), and coordinates file operations across mounted partition nodes. Supports concurrent access mapping through thread-safe read-write locks.
+* **2. Memory-Resident Filesystem (`kernel/fs/tmpfs.rs`):** [Priority: 🔴 Critical]
+  Implements a lightweight, zero-allocation memory-resident filesystem (`tmpfs`). Automatically allocates transient buffer structures within pre-allocated kernel page pools. Houses `/etc/hostname`, local lockfiles, and socket pipes natively, responding to system I/O syscalls with near-zero latency.
+* **3. Asynchronous TCP State Machine (`kernel/net/tcp.rs`):** [Priority: 🔴 Critical]
+  Houses a stateful, zero-copy TCP protocol machine. Tracks standard transmission states (`LISTEN`, `SYN_SENT`, `SYN_RECEIVED`, `ESTABLISHED`, `FIN_WAIT`) natively inside the network card descriptor ring. Manages sliding windows, packet retransmissions, and out-of-order packet re-assembly buffers natively.
+* **4. Socket & Connection Syscall Dispatcher (`kernel/core/syscall_dispatch.rs`):** [Priority: 🔴 Critical]
+  Exposes standard userspace socket primitives via the central microkernel syscall gate. Connects userspace applications to the underlying TCP stack through capability-gated `socket`, `bind`, `connect`, `send`, `recv`, and `close` system calls.
+* **5. Read-Only Ext4 Subsystem (`fs/ext4/`):** [Priority: 🟠 High]
+  Implements read-only Ext4 capabilities to support booting from standard ext4 storage block partitions. Automatically traverses ext4 directory trees, parses block groups, walks index extents, and translates target inodes to resolve boot files.
+* **6. Minimal DNS Resolver (`kernel/net/dns.rs`):** [Priority: 🟠 High]
+  An integrated bare-metal DNS resolver mapping logical domain names to physical IPv4/IPv6 socket targets. Drives query generation and parses socket response packets directly over UDP, allowing apps to resolve hostnames asynchronously.
+
+### 6.2 Exit Criteria & Verification
+The absolute completeness of this systems implementation is mathematically verified when the following execution boundaries are successfully reached:
+1. **Interactive Shell Execution (`sigma-sh`):**
+   - The shell parses and executes standard terminal commands.
+   - Executing `cat /etc/hostname` successfully reads, loads, and displays the hostname directly from the local `tmpfs` node.
+2. **Native Internet Access:**
+   - Initiating a standard TCP connection to a remote public endpoint successfully drives the SYN/ACK state handshake, resolving names via DNS and reading data streams with zero packet loss.
+
+---
+
+## 7. BARE-METAL SUBSYSTEM DESIGN SPECIFICATIONS
 
 The following section defines formal, zero-dependency, pure-OOP architectural and system specifications designed for bare-metal targets, showing how to structure hardware mapping, sandboxing, and transaction rollbacks without standard library references.
 
-### 6.1 Polymorphic Universal Peripheral Blueprint (OOP Paradigm)
+### 7.1 Polymorphic Universal Peripheral Blueprint (OOP Paradigm)
 To achieve complete abstraction across legacy Port I/O (PIO) registers and modern Memory-Mapped I/O (MMIO) ports:
 1. **Unified Device Trait (`UnifiedPeripheral`):** Defines abstract methods for initializing systems, reading/writing registers, handling hardware IRQs, and transitioning power states.
 2. **Legacy Controller Struct:** Represents old-generation devices. Encapsulates base 16-bit Port addresses and executes port access via raw, inline assembly instructions (`inb`/`outb` instructions).
 3. **Modern Controller Struct:** Represents modern devices. Encapsulates 64-bit Memory-Mapped addresses and executes reads and writes via raw, volatile memory pointer dereferencing.
 4. **Unified Peripheral Manager (Singleton):** Coordinates registration of all active devices inside a static registry table. Maps each controller dynamically, allowing the OS to poll, read, and command hardware through a single, consistent vtable-free interface.
 
-### 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
+### 7.2 Zero-Allocation UDF Bytecode Interpreter Specification
 To execute vendor-supplied or custom user-defined driver scripts dynamically inside a secure kernel sandbox:
 1. **Sandboxed VM State (`UdfVm`):** Houses 8 static 64-bit registers (`R0` through `R7`) and a 64-bit program counter. Operates strictly within pre-allocated stack frames with no dynamic heap memory allocations.
 2. **Secure Instruction Set Architecture (ISA):**
@@ -274,13 +315,13 @@ To execute vendor-supplied or custom user-defined driver scripts dynamically ins
    - **OP_HALT (0xF0):** Terminates execution cycle and returns accumulative values.
 3. **VM Safety Guard:** Prior to execution, the interpreter validates instruction bounds to guarantee that no branch, read, or write command can access registers or memory outside the peripheral's sandboxed perimeter.
 
-### 6.3 Declarative Package Resolution SAT Solver Specifications
+### 7.3 Declarative Package Resolution SAT Solver Specifications
 To mathematically resolve multi-version package dependency constraint satisfaction without memory allocations:
 1. **Package Constraint Definition:** Maps package identifiers along with min/max compatible version constraints.
 2. **Package Node Struct:** Encapsulates package IDs, unique version keys, and a fixed-size array of active dependencies.
 3. **Constraint SAT Solver:** Implements a standard backtracking satisfiability solver. Operates strictly over static package arrays, evaluating candidate packages against assigned version states. If a conflict or circular dependency is detected, the solver automatically backtracks, resetting states and attempting alternative candidate packages until a conflict-free resolution state is reached.
 
-### 6.4 JBD2-Style Crash-Resilient Transactional Ledger Specifications
+### 7.4 JBD2-Style Crash-Resilient Transactional Ledger Specifications
 To guarantee transactional crash-consistency over Copy-on-Write Merkle trees:
 1. **Transaction Block Definition:** Encapsulates transaction IDs, target block addresses, and cryptographic CRC32C data hashes.
 2. **Merkle Journal Node:** Maps data blocks alongside calculated Merkle hash proofs.
