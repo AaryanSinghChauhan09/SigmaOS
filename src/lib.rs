@@ -9,6 +9,7 @@ pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
+pub mod diagnostics;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
@@ -41,6 +42,18 @@ pub use customization::{
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use diagnostics::{
+    crash::{CrashError, CrashPipeline, CrashSeverity, CrashStats, SimpleCrashPipeline},
+    lowlevel::{
+        HealthStatus, SMARTData, SMARTMonitor, SimplePowerTelemetry, SimpleSMARTMonitor,
+        SimpleThermalMonitor, ThermalMonitor,
+    },
+    tools::{
+        CpuCacheProfilerSensor, DiagnosticsError, DiagnosticsManager, DiagnosticsStats,
+        ManagerCapability, MemoryLeakSensor, Sensor, SensorCapability, SensorID, SensorInfo,
+        SensorType, SimpleDiagnosticsManager, SimpleSensor,
+    },
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
