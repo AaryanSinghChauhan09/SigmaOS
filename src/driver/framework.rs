@@ -62,11 +62,11 @@ pub trait DriverFramework {
 
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
-    next_id: AtomicUsize,
+    _next_id: AtomicUsize,
 }
 
 impl SimpleDriverFramework {
-    pub fn new() -> Self { SimpleDriverFramework { drivers: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self { SimpleDriverFramework { drivers: Vec::new(), _next_id: AtomicUsize::new(1) } }
 }
 
 impl DriverFramework for SimpleDriverFramework {
