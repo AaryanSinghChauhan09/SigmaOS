@@ -9,6 +9,9 @@ pub enum StorageType {
     NVMe,
     AHCI,
     SATA,
+    IDE,      // Legacy IDE hard drives
+    Floppy,   // Retro Floppy disk controllers
+    SCSI,     // Legacy SCSI controllers
     Virtual,
 }
 
@@ -36,6 +39,9 @@ impl StorageDriver {
             StorageType::NVMe => "NVMe SSD".to_string(),
             StorageType::AHCI => "AHCI Controller".to_string(),
             StorageType::SATA => "SATA HDD".to_string(),
+            StorageType::IDE => "Legacy IDE HDD".to_string(),
+            StorageType::Floppy => "Legacy Floppy Drive".to_string(),
+            StorageType::SCSI => "Legacy SCSI Disk".to_string(),
             StorageType::Virtual => "Virtual Disk".to_string(),
         };
         
