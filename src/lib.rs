@@ -41,9 +41,10 @@ pub use compatibility::{CompatibilityManager, ApplicationBinary, TranslationLaye
 pub use virtualization::{VirtualizationOrchestrator, VirtualMachine, Container, KubernetesPod, VirtualizationTech, VmState, ResourcePool, VirtualizationError};
 pub use distro::{
     LanguagePack, InputMethodEngine, RegionalSettings, LocaleManager, ImeCandidate,
-    ManPage, HowToGuide, WikiPage, ForumChannel, ForumPost, HelpSystem,
+    ManPage, HowToGuide, WikiPage, ForumChannel, ForumPost, HelpSystem, BugBountyProgram, CommunityConference, BountyStatus, BugBountyReport, ConferenceTalk,
     DeveloperToolkit, PackageBuildService, CrossBuildPipeline, DevTool, BuildJob, BuildStatus, TargetArch,
-    HardwareCertificationProgram, SoftwareCertificationProgram, QAStagedRelease, HardwareCertificate, AppManifest, CertificationStatus, ReleaseStage, ComponentType,
+    HardwareCertificationProgram, SoftwareCertificationProgram, QAStagedRelease, HardwareCertificate, AppManifest, CertificationStatus, ReleaseStage, ComponentType, HardwareRegressionSuite, HardwareProfile,
     RescueISOManager, LiveDebugger, BackupSystem, RescueISO, KernelTrace, BackupSnapshot,
     ConfigHook, DirectoryService, ComplianceAuditor, DirectoryUser, AuditRule, AuditResult,
+    HpcClusterJob, MpiCommunicator, EcuController, EduPlayground, CanFrame, EduChallenge, HpcJobState,
 };

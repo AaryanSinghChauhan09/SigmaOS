@@ -125,6 +125,105 @@ impl ForumChannel {
     }
 }
 
+/// Bug Bounty vulnerability report states
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BountyStatus {
+    Submitted,
+    Auditing,
+    Resolved,
+    Rejected,
+}
+
+/// Represents an individual Bug Bounty vulnerability report
+#[derive(Debug, Clone)]
+pub struct BugBountyReport {
+    pub report_id: u32,
+    pub reporter: String,
+    pub vulnerability_title: String,
+    pub severity: String, // e.g. "Critical", "High", "Medium"
+    pub status: BountyStatus,
+    pub reward_amount_usd: u32,
+}
+
+/// Standardized Bug Bounty Program tracking contributor security incentives
+#[derive(Debug, Clone)]
+pub struct BugBountyProgram {
+    pub program_name: String,
+    pub reports: Vec<BugBountyReport>,
+    pub total_payout_usd: u32,
+}
+
+impl BugBountyProgram {
+    pub fn new(name: &str) -> Self {
+        Self {
+            program_name: name.to_string(),
+            reports: Vec::new(),
+            total_payout_usd: 0,
+        }
+    }
+
+    pub fn submit_report(&mut self, report_id: u32, reporter: &str, title: &str, severity: &str) {
+        self.reports.push(BugBountyReport {
+            report_id,
+            reporter: reporter.to_string(),
+            vulnerability_title: title.to_string(),
+            severity: severity.to_string(),
+            status: BountyStatus::Submitted,
+            reward_amount_usd: 0,
+        });
+    }
+
+    pub fn audit_and_reward(&mut self, id: u32, approved: bool, reward: u32) -> Result<(), &'static str> {
+        for report in &mut self.reports {
+            if report.report_id == id {
+                if approved {
+                    report.status = BountyStatus::Resolved;
+                    report.reward_amount_usd = reward;
+                    self.total_payout_usd += reward;
+                } else {
+                    report.status = BountyStatus::Rejected;
+                }
+                return Ok(());
+            }
+        }
+        Err("Report ID not found")
+    }
+}
+
+/// Represents a talk or presentation at a conference
+#[derive(Debug, Clone)]
+pub struct ConferenceTalk {
+    pub speaker: String,
+    pub title: String,
+    pub duration_mins: u32,
+}
+
+/// Outlines conferences and outreach meetups (e.g. DebConf, FOSDEM style)
+#[derive(Debug, Clone)]
+pub struct CommunityConference {
+    pub name: String,
+    pub location: String,
+    pub schedules: Vec<ConferenceTalk>,
+}
+
+impl CommunityConference {
+    pub fn new(name: &str, location: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            location: location.to_string(),
+            schedules: Vec::new(),
+        }
+    }
+
+    pub fn schedule_talk(&mut self, speaker: &str, title: &str, duration: u32) {
+        self.schedules.push(ConferenceTalk {
+            speaker: speaker.to_string(),
+            title: title.to_string(),
+            duration_mins: duration,
+        });
+    }
+}
+
 /// The overall help and community knowledge manager.
 #[derive(Debug, Clone)]
 pub struct HelpSystem {
@@ -170,6 +269,16 @@ impl HelpSystem {
             .filter(|p| p.title.to_lowercase().contains(&keyword.to_lowercase())
                 || p.content.to_lowercase().contains(&keyword.to_lowercase()))
             .collect()
+    }
+
+    /// Retrieves a manual localized using translation dictionary (simulation)
+    pub fn translate_man_summary(&self, query: &str, locale_dictionary: &HashMap<String, String>) -> String {
+        if let Some(page) = self.man_pages.get(query) {
+            let key = format!("man_{}_summary", query);
+            locale_dictionary.get(&key).cloned().unwrap_or(page.synopsis.clone())
+        } else {
+            "Manual not found".to_string()
+        }
     }
 }
 
@@ -235,5 +344,42 @@ mod tests {
 
         assert!(system.search_man("sigma-sh").is_some());
         assert_eq!(system.search_wiki("Kyber").len(), 1);
+    }
+
+    #[test]
+    fn test_bug_bounty_program() {
+        let mut bounty = BugBountyProgram::new("SigmaOS Hardening Bounty");
+        bounty.submit_report(101, "Alice", "PQC key validation bypass", "Critical");
+
+        assert_eq!(bounty.reports.len(), 1);
+        assert_eq!(bounty.reports[0].status, BountyStatus::Submitted);
+
+        assert!(bounty.audit_and_reward(101, true, 5000).is_ok());
+        assert_eq!(bounty.reports[0].status, BountyStatus::Resolved);
+        assert_eq!(bounty.reports[0].reward_amount_usd, 5000);
+        assert_eq!(bounty.total_payout_usd, 5000);
+    }
+
+    #[test]
+    fn test_community_conferences() {
+        let mut conf = CommunityConference::new("SigmaConf 2024", "New Delhi");
+        conf.schedule_talk("Jules", "Unifying Distro Ecosystems with Rust", 45);
+
+        assert_eq!(conf.schedules.len(), 1);
+        assert_eq!(conf.schedules[0].speaker, "Jules");
+        assert_eq!(conf.schedules[0].title, "Unifying Distro Ecosystems with Rust");
+    }
+
+    #[test]
+    fn test_help_localized_manuals() {
+        let mut system = HelpSystem::new();
+        let page = ManPage::new("sigma-pkg", 1, "Sigma Package Manager", "Registers, resolves, and verifies universal packages.");
+        system.add_man_page(page);
+
+        let mut dict = HashMap::new();
+        dict.insert("man_sigma-pkg_summary".to_string(), "Gestionnaire de paquets universels de SigmaOS".to_string());
+
+        let summary = system.translate_man_summary("sigma-pkg", &dict);
+        assert_eq!(summary, "Gestionnaire de paquets universels de SigmaOS");
     }
 }
