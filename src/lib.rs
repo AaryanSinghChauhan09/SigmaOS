@@ -20,6 +20,7 @@ pub mod orchestration;
 pub mod package;
 pub mod compatibility;
 pub mod virtualization;
+pub mod distro;
 
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use sigpkg::{SatSolver, ContentAddressedStore, CryptoVerifier, Transaction, PackageRecipe, BuildSystem, RecipeManager, RecipeError};
@@ -38,3 +39,11 @@ pub use orchestration::{CrossDeviceOrchestrator, ConnectedDevice, SmartHomeDevic
 pub use package::{UniversalPackageManager, UnifiedPackage, PackageFormat, PackageSource, PackageAdapter, DependencyResolver, ConflictResolution, PackageError};
 pub use compatibility::{CompatibilityManager, ApplicationBinary, TranslationLayer, ContainerRuntime, TargetPlatform, BinaryFormat, CompatibilityMode, CompatibilityError};
 pub use virtualization::{VirtualizationOrchestrator, VirtualMachine, Container, KubernetesPod, VirtualizationTech, VmState, ResourcePool, VirtualizationError};
+pub use distro::{
+    LanguagePack, InputMethodEngine, RegionalSettings, LocaleManager, ImeCandidate,
+    ManPage, HowToGuide, WikiPage, ForumChannel, ForumPost, HelpSystem,
+    DeveloperToolkit, PackageBuildService, CrossBuildPipeline, DevTool, BuildJob, BuildStatus, TargetArch,
+    HardwareCertificationProgram, SoftwareCertificationProgram, QAStagedRelease, HardwareCertificate, AppManifest, CertificationStatus, ReleaseStage, ComponentType,
+    RescueISOManager, LiveDebugger, BackupSystem, RescueISO, KernelTrace, BackupSnapshot,
+    ConfigHook, DirectoryService, ComplianceAuditor, DirectoryUser, AuditRule, AuditResult,
+};
