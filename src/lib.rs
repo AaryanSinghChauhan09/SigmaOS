@@ -52,7 +52,8 @@ pub use distro::{
     IpShield, KernelModule, KernelVariant, LicensingPolicy, LiveMigrationManager,
     LocalizationFramework, MetaPackage, MirrorCdn, MultimediaStack, NetbootInstaller,
     NetworkUtilitySuite, NftablesRule, OemPartnership, QAPipeline, RescueRecoverySystem,
-    UnifiedServiceManager, VirtualPackage, VpnConnection, WirelessNetwork,
+    SigmaAccess, SigmaBuild, SigmaCloud, SigmaGov, SigmaInit, SigmaNet, SigmaPkg, SigmaRescue,
+    SigmaTrace, UnifiedServiceManager, VirtualPackage, VpnConnection, WirelessNetwork,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,

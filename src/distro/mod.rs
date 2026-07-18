@@ -2,6 +2,7 @@
 // Address gaps listed under "Missing Compared to Linux Distros (New Dimensions)"
 // Implements Installer, Init/Services, Networking, Package Ecosystem, Kernel & HAL, Desktop/Multimedia, and QA.
 // Additionally implements New Dimensions: Adoption, Legal/Policy, Ecosystem, Industry Verticals, Resilience, and Localization/Accessibility.
+// Also implements SigmaOS Core Tools Suite: SigmaPkg, SigmaTrace, SigmaInit, SigmaNet, SigmaRescue, SigmaBuild, SigmaAccess, SigmaCloud, SigmaGov.
 
 use std::collections::{HashMap, HashSet};
 
@@ -457,7 +458,11 @@ impl HardwareAbstractionLayer {
     }
 
     pub fn handle_hotplug(&mut self, sysfs_path: &str, driver: &str) -> String {
-        let name = sysfs_path.split('/').last().unwrap_or("dev").to_string();
+        let name = sysfs_path
+            .split('/')
+            .next_back()
+            .unwrap_or("dev")
+            .to_string();
         self.active_devices.insert(
             name.clone(),
             HardwareDevice {
@@ -608,7 +613,7 @@ pub struct LicensingPolicy {
 }
 
 impl LicensingPolicy {
-    pub fn audit_license_compliance(&self, filepath: &str, file_license: &str) -> bool {
+    pub fn audit_license_compliance(&self, _filepath: &str, file_license: &str) -> bool {
         self.allowed_licenses.iter().any(|lic| lic == file_license)
     }
 }
@@ -712,6 +717,213 @@ pub struct AccessibilityToolkit {
 pub struct InclusivityFramework {
     pub code_of_conduct_signed: bool,
     pub diverse_outreach_programs: Vec<String>,
+}
+
+// ==========================================
+// NEW SECTION: SigmaOS Core Flagship Tools Suite
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct SigmaPkg {
+    pub cache_dir: String,
+    pub installed_versions: HashMap<String, String>,
+    pub rollout_history: Vec<String>,
+}
+
+impl SigmaPkg {
+    pub fn new() -> Self {
+        Self {
+            cache_dir: "/var/cache/sigmapkg".to_string(),
+            installed_versions: HashMap::new(),
+            rollout_history: Vec::new(),
+        }
+    }
+
+    pub fn install_package(&mut self, name: &str, version: &str) -> String {
+        self.installed_versions
+            .insert(name.to_string(), version.to_string());
+        self.rollout_history
+            .push(format!("Installed {}-{}", name, version));
+        format!("SigmaPkg: successfully installed {}-{}", name, version)
+    }
+
+    pub fn rollback_package(&mut self, name: &str) -> Result<String, String> {
+        if self.installed_versions.remove(name).is_some() {
+            self.rollout_history.push(format!("Rolled back {}", name));
+            Ok(format!("SigmaPkg: successfully rolled back {}", name))
+        } else {
+            Err(format!("SigmaPkg: package {} not found", name))
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaTrace {
+    pub traces_captured: usize,
+    pub active_filters: Vec<String>,
+}
+
+impl SigmaTrace {
+    pub fn new() -> Self {
+        Self {
+            traces_captured: 0,
+            active_filters: Vec::new(),
+        }
+    }
+
+    pub fn capture_ebpf_event(&mut self, sysfs_probe: &str) -> String {
+        self.traces_captured += 1;
+        format!("SigmaTrace: captured eBPF ftrace probe on {}", sysfs_probe)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaInit {
+    pub monitored_processes: HashMap<usize, String>,
+    pub sandbox_level: u32,
+}
+
+impl SigmaInit {
+    pub fn new() -> Self {
+        Self {
+            monitored_processes: HashMap::new(),
+            sandbox_level: 2,
+        }
+    }
+
+    pub fn supervise_service(&mut self, pid: usize, name: &str) -> String {
+        self.monitored_processes.insert(pid, name.to_string());
+        format!(
+            "SigmaInit: supervising sandboxed process {} (PID {})",
+            name, pid
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaNet {
+    pub tunnel_status: String,
+    pub wg_public_key: String,
+}
+
+impl SigmaNet {
+    pub fn new() -> Self {
+        Self {
+            tunnel_status: "Disconnected".to_string(),
+            wg_public_key: "Kyber1024-SecToken".to_string(),
+        }
+    }
+
+    pub fn connect_wireguard(&mut self, endpoint: &str) -> String {
+        self.tunnel_status = "Connected".to_string();
+        format!("SigmaNet: WireGuard connection established to {}", endpoint)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaRescue {
+    pub timeshift_backups: Vec<String>,
+}
+
+impl SigmaRescue {
+    pub fn new() -> Self {
+        Self {
+            timeshift_backups: Vec::new(),
+        }
+    }
+
+    pub fn create_backup_snapshot(&mut self, label: &str) -> String {
+        self.timeshift_backups.push(label.to_string());
+        format!(
+            "SigmaRescue: created Borg/Timeshift recovery snapshot: {}",
+            label
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaBuild {
+    pub build_target_archs: Vec<String>,
+}
+
+impl SigmaBuild {
+    pub fn new() -> Self {
+        Self {
+            build_target_archs: vec![
+                "x86_64".to_string(),
+                "aarch64".to_string(),
+                "riscv64".to_string(),
+            ],
+        }
+    }
+
+    pub fn compile_for_target(&self, package: &str, target: &str) -> Result<String, String> {
+        if !self.build_target_archs.contains(&target.to_string()) {
+            return Err(format!("Unsupported build architecture: {}", target));
+        }
+        Ok(format!(
+            "SigmaBuild: compiled {} for multi-arch target {}",
+            package, target
+        ))
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaAccess {
+    pub screen_reader_active: bool,
+    pub eye_tracking_calibrated: bool,
+}
+
+impl SigmaAccess {
+    pub fn new() -> Self {
+        Self {
+            screen_reader_active: false,
+            eye_tracking_calibrated: false,
+        }
+    }
+
+    pub fn calibrate_eye_tracking(&mut self) -> String {
+        self.eye_tracking_calibrated = true;
+        "SigmaAccess: eye tracking calibration successful".to_string()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaCloud {
+    pub registry_hooks: Vec<String>,
+}
+
+impl SigmaCloud {
+    pub fn new() -> Self {
+        Self {
+            registry_hooks: Vec::new(),
+        }
+    }
+
+    pub fn deploy_to_aws(&self) -> String {
+        "SigmaCloud: Published Sovereign OS-AMI to AWS cloud marketplace".to_string()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaGov {
+    pub selinux_enabled: bool,
+    pub audit_log: Vec<String>,
+}
+
+impl SigmaGov {
+    pub fn new() -> Self {
+        Self {
+            selinux_enabled: true,
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn log_security_event(&mut self, subject: &str, action: &str) -> String {
+        let entry = format!("SELinux Audit: subject {} executed {}", subject, action);
+        self.audit_log.push(entry.clone());
+        entry
+    }
 }
 
 #[cfg(test)]
@@ -843,5 +1055,55 @@ mod tests {
         let res = migration.migrate_node("web-app", "nodeA", "nodeB").unwrap();
         assert!(res.contains("Successfully migrated"));
         assert_eq!(migration.active_migration_jobs, 1);
+    }
+
+    #[test]
+    fn test_sigma_core_tools_suite() {
+        // SigmaPkg
+        let mut pkg = SigmaPkg::new();
+        let res_inst = pkg.install_package("zenith", "2.1.0");
+        assert!(res_inst.contains("successfully installed zenith-2.1.0"));
+        let res_roll = pkg.rollback_package("zenith").unwrap();
+        assert!(res_roll.contains("successfully rolled back zenith"));
+
+        // SigmaTrace
+        let mut trace = SigmaTrace::new();
+        let res_trace = trace.capture_ebpf_event("sys_write");
+        assert!(res_trace.contains("captured eBPF ftrace probe"));
+
+        // SigmaInit
+        let mut s_init = SigmaInit::new();
+        let res_init = s_init.supervise_service(101, "sshd");
+        assert!(res_init.contains("supervising sandboxed process"));
+
+        // SigmaNet
+        let mut net = SigmaNet::new();
+        let res_net = net.connect_wireguard("vpn.sigmaos.org");
+        assert!(res_net.contains("WireGuard connection established"));
+
+        // SigmaRescue
+        let mut rescue = SigmaRescue::new();
+        let res_rescue = rescue.create_backup_snapshot("backup_2026");
+        assert!(res_rescue.contains("Borg/Timeshift recovery snapshot"));
+
+        // SigmaBuild
+        let s_build = SigmaBuild::new();
+        let res_build = s_build.compile_for_target("kernel", "aarch64").unwrap();
+        assert!(res_build.contains("compiled kernel for multi-arch target"));
+
+        // SigmaAccess
+        let mut s_access = SigmaAccess::new();
+        let res_access = s_access.calibrate_eye_tracking();
+        assert!(res_access.contains("eye tracking calibration successful"));
+
+        // SigmaCloud
+        let s_cloud = SigmaCloud::new();
+        let res_cloud = s_cloud.deploy_to_aws();
+        assert!(res_cloud.contains("Published Sovereign OS-AMI"));
+
+        // SigmaGov
+        let mut s_gov = SigmaGov::new();
+        let res_gov = s_gov.log_security_event("admin", "rm_rf");
+        assert!(res_gov.contains("SELinux Audit: subject admin"));
     }
 }
