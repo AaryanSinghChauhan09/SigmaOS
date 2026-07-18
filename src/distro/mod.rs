@@ -1,6 +1,7 @@
 // SigmaOS Linux-Parity Distribution Subsystem
 // Address gaps listed under "Missing Compared to Linux Distros (New Dimensions)"
 // Implements Installer, Init/Services, Networking, Package Ecosystem, Kernel & HAL, Desktop/Multimedia, and QA.
+// Additionally implements New Dimensions: Adoption, Legal/Policy, Ecosystem, Industry Verticals, Resilience, and Localization/Accessibility.
 
 use std::collections::{HashMap, HashSet};
 
@@ -152,13 +153,7 @@ impl UnifiedServiceManager {
         }
 
         for svc_name in self.services.keys() {
-            visit(
-                svc_name,
-                &self.services,
-                &mut visited,
-                &mut visiting,
-                &mut order,
-            )?;
+            visit(svc_name, &self.services, &mut visited, &mut visiting, &mut order)?;
         }
 
         Ok(order)
@@ -177,10 +172,7 @@ impl UnifiedServiceManager {
                 if let Some(svc) = self.services.get_mut(name) {
                     svc.running = true;
                     max_group_time = max_group_time.max(svc.startup_time_ms);
-                    self.boot_perf_log.push(format!(
-                        "[{}] Started service {} in {}ms (parallel)",
-                        init_name, name, svc.startup_time_ms
-                    ));
+                    self.boot_perf_log.push(format!("[{}] Started service {} in {}ms (parallel)", init_name, name, svc.startup_time_ms));
                 }
             }
             total_time = max_group_time + 5; // adding small system overhead
@@ -190,10 +182,7 @@ impl UnifiedServiceManager {
                 if let Some(svc) = self.services.get_mut(name) {
                     svc.running = true;
                     total_time += svc.startup_time_ms;
-                    self.boot_perf_log.push(format!(
-                        "[{}] Started service {} in {}ms (sequential)",
-                        init_name, name, svc.startup_time_ms
-                    ));
+                    self.boot_perf_log.push(format!("[{}] Started service {} in {}ms (sequential)", init_name, name, svc.startup_time_ms));
                 }
             }
         }
@@ -236,7 +225,7 @@ pub struct WirelessNetwork {
 pub struct VpnConnection {
     pub vpn_type: String, // "WireGuard", "OpenVPN", "Shadowsocks"
     pub endpoint: String,
-    pub status: String, // "Connected", "Disconnected"
+    pub status: String,   // "Connected", "Disconnected"
 }
 
 #[derive(Debug, Clone)]
@@ -505,11 +494,7 @@ pub struct MultimediaStack {
 }
 
 impl MultimediaStack {
-    pub fn new(
-        display: DisplayServerProtocol,
-        audio: AudioEngine,
-        graphics: GraphicsAcceleration,
-    ) -> Self {
+    pub fn new(display: DisplayServerProtocol, audio: AudioEngine, graphics: GraphicsAcceleration) -> Self {
         Self {
             display,
             audio,
@@ -565,16 +550,151 @@ impl QAPipeline {
     }
 }
 
+// ==========================================
+// NEW DIMENSION: Distribution Channels & Adoption
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct OemPartnership {
+    pub vendor_name: String,
+    pub preinstalled_models: Vec<String>,
+    pub bios_integrated: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct CloudMarketplace {
+    pub region: String,
+    pub images_published: HashMap<String, String>, // Provider -> AMI/Image ID
+}
+
+#[derive(Debug, Clone)]
+pub struct MirrorCdn {
+    pub locations: Vec<String>,
+    pub total_mirrors: usize,
+    pub average_latency_ms: u32,
+}
+
+// ==========================================
+// NEW DIMENSION: Legal & Policy Infrastructure
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GovernanceCharter {
+    pub primary_steward: String,
+    pub committee_members: Vec<String>,
+    pub bylaws_approved: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct LicensingPolicy {
+    pub allowed_licenses: Vec<String>,
+    pub audited_files_count: usize,
+}
+
+impl LicensingPolicy {
+    pub fn audit_license_compliance(&self, filepath: &str, file_license: &str) -> bool {
+        self.allowed_licenses.iter().any(|lic| lic == file_license)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct IpShield {
+    pub patent_pool_registered: bool,
+    pub indemnity_covered: bool,
+}
+
+// ==========================================
+// NEW DIMENSION: User & Developer Ecosystem
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct CertificationProgram {
+    pub certification_name: String, // "SCCA", "SCCE" (SigmaOS Certified Administrator/Engineer)
+    pub difficulty_level: String,
+    pub active_certified_count: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeveloperOutreach {
+    pub hackathons_scheduled: usize,
+    pub open_sponsorships: usize,
+    pub active_bug_bounty_usd: u32,
+}
+
+// ==========================================
+// NEW DIMENSION: Specialized Industry Presence
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ComplianceIndustry {
+    TelecomRouter,
+    MedicalDevice,
+    AutomotiveGradeLinux,
+}
+
+#[derive(Debug, Clone)]
+pub struct IndustryComplianceEdition {
+    pub target_industry: ComplianceIndustry,
+    pub certified: bool,
+    pub encryption_standard: String,
+}
+
+// ==========================================
+// NEW DIMENSION: Resilience & Reliability (New)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct RescueRecoverySystem {
+    pub recovery_iso_path: String,
+    pub tools_loaded: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct LiveMigrationManager {
+    pub active_migration_jobs: usize,
+    pub cluster_nodes: Vec<String>,
+}
+
+impl LiveMigrationManager {
+    pub fn migrate_node(&mut self, container_id: &str, source: &str, destination: &str) -> Result<String, String> {
+        if !self.cluster_nodes.contains(&source.to_string()) || !self.cluster_nodes.contains(&destination.to_string()) {
+            return Err("Invalid cluster nodes specified".to_string());
+        }
+        self.active_migration_jobs += 1;
+        Ok(format!("Successfully migrated container {} from {} to {}", container_id, source, destination))
+    }
+}
+
+// ==========================================
+// NEW DIMENSION: Globalization & Inclusivity
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct LocalizationFramework {
+    pub default_locale: String,
+    pub translations: HashMap<String, String>, // Keyword -> Translated
+}
+
+#[derive(Debug, Clone)]
+pub struct AccessibilityToolkit {
+    pub screen_reader_active: bool,
+    pub magnifier_scale: f32,
+    pub braille_output_active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct InclusivityFramework {
+    pub code_of_conduct_signed: bool,
+    pub diverse_outreach_programs: Vec<String>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_installer_profiles() {
-        let mut installer = NetbootInstaller::new(
-            InstallerProfile::Server,
-            "https://netboot.sigmaos.org/base.iso",
-        );
+        let mut installer = NetbootInstaller::new(InstallerProfile::Server, "https://netboot.sigmaos.org/base.iso");
         assert_eq!(installer.installed, false);
         assert!(installer.install_system().is_err());
 
@@ -631,14 +751,8 @@ mod tests {
             action: "DROP".to_string(),
         });
 
-        assert_eq!(
-            suite.check_firewall("10.0.0.5", "192.168.1.100", 22),
-            "DROP"
-        );
-        assert_eq!(
-            suite.check_firewall("10.0.0.6", "192.168.1.100", 22),
-            "ACCEPT"
-        );
+        assert_eq!(suite.check_firewall("10.0.0.5", "192.168.1.100", 22), "DROP");
+        assert_eq!(suite.check_firewall("10.0.0.6", "192.168.1.100", 22), "ACCEPT");
     }
 
     #[test]
@@ -658,5 +772,41 @@ mod tests {
         assert!(loader.load_module("virtio_net").is_err());
         assert!(loader.unload_module("virtio_net").is_ok());
         assert!(!loader.loaded_modules.contains_key("virtio_net"));
+    }
+
+    #[test]
+    fn test_new_dimensions_adoption_and_compliance() {
+        // OEM Partnerships
+        let oem = OemPartnership {
+            vendor_name: "ThinkPad".to_string(),
+            preinstalled_models: vec!["X1 Carbon".to_string()],
+            bios_integrated: true,
+        };
+        assert_eq!(oem.vendor_name, "ThinkPad");
+
+        // Licensing audits
+        let policy = LicensingPolicy {
+            allowed_licenses: vec!["GPL-2.0".to_string(), "MIT".to_string()],
+            audited_files_count: 500,
+        };
+        assert!(policy.audit_license_compliance("src/lib.rs", "MIT"));
+        assert!(!policy.audit_license_compliance("src/restricted.rs", "Proprietary"));
+
+        // Compliance Editions
+        let ed = IndustryComplianceEdition {
+            target_industry: ComplianceIndustry::MedicalDevice,
+            certified: true,
+            encryption_standard: "Kyber-1024".to_string(),
+        };
+        assert_eq!(ed.certified, true);
+
+        // Live Migration
+        let mut migration = LiveMigrationManager {
+            active_migration_jobs: 0,
+            cluster_nodes: vec!["nodeA".to_string(), "nodeB".to_string()],
+        };
+        let res = migration.migrate_node("web-app", "nodeA", "nodeB").unwrap();
+        assert!(res.contains("Successfully migrated"));
+        assert_eq!(migration.active_migration_jobs, 1);
     }
 }

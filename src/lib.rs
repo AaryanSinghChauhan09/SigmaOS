@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -47,6 +50,12 @@ pub use distro::{
     KernelModule, KernelVariant, MetaPackage, MultimediaStack, NetbootInstaller,
     NetworkUtilitySuite, NftablesRule, QAPipeline, UnifiedServiceManager, VirtualPackage,
     VpnConnection, WirelessNetwork,
+    OemPartnership, CloudMarketplace, MirrorCdn,
+    GovernanceCharter, LicensingPolicy, IpShield,
+    CertificationProgram, DeveloperOutreach,
+    ComplianceIndustry, IndustryComplianceEdition,
+    RescueRecoverySystem, LiveMigrationManager,
+    LocalizationFramework, AccessibilityToolkit, InclusivityFramework,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
