@@ -1,3 +1,4 @@
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 // SigmaOS Userspace Main Entry Point
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
