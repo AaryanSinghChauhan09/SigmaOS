@@ -1,4 +1,4 @@
-# 🛠️ SigmaOS Global Repository Implementation & Execution Plan
+# 🛠️ SigmaOS Global Repository Implementation Plan
 
 This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from 500+ open-source repositories into the **SigmaOS** microkernel and userspace.
 
@@ -16,8 +16,8 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 
 ## 🚀 Milestones & Implementation Steps
 
-### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Months 1–3)
-*Focus: Stabilizing the memory manager, multi-priority scheduler, system utilities, and base drivers.*
+### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Short-Term: 1–3 Months)
+*Focus: Stabilizing the memory manager, multi-priority scheduler, and standard command utilities.*
 
 #### 1.1 Buddy Allocator & Real-Time Scheduler Integration
 *   **Task:** Integrate state-restoring error handling into the physical memory manager buddy allocator to support crash recoveries. Integrate Earliest Deadline First (EDF) scheduler tick mechanisms.
@@ -30,19 +30,10 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 *   **Target Directories:** `src/shell/`
 *   **Upstream Inspiration:** `busybox/busybox`, `coreutils/coreutils`
 *   **Success Criteria:** Native commands (ls, cat, ps, clear, help) execute correctly in REPL.
-<<<<<<< HEAD
-=======
-
-#### 1.3 Platform Hardware HAL & Bus Drivers
-*   **Task:** Implement unified GPIO, I2C, SPI, and DMA interfaces.
-*   **Target Directories:** `src/drivers/`, `src/kernel/hal/`
-*   **Upstream Inspiration:** `raspberrypi/linux`, `analogdevicesinc/linux`
-*   **Success Criteria:** Drivers compile cleanly without external dependencies.
->>>>>>> origin/main
 
 ---
 
-### 🟡 Phase 2: Capability Gate & Security Hardening (Months 3–6)
+### 🟡 Phase 2: Capability Gate & Security Hardening (Medium-Term: 3–6 Months)
 *Focus: Enforcing privilege reduction, access control sandboxing, and post-quantum network keys.*
 
 #### 2.1 Capability-Gated Virtual File System & Drivers
@@ -59,7 +50,7 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 
 ---
 
-### 🟢 Phase 3: High-Performance Storage & Networking (Months 6–9)
+### 🟢 Phase 3: High-Performance Storage & Networking (Long-Term: 6–9 Months)
 *Focus: Copy-on-Write snapshots, content-addressed packages, and wire-speed packet handlers.*
 
 #### 3.1 Merkle-Tree CoW File System & Self-Healing Rollbacks
@@ -76,7 +67,7 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 
 ---
 
-### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (Months 9–12)
+### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (9–12 Months)
 *Focus: High-performance dashboard telemetry, AI-powered predictive scaling, and screen accessibility.*
 
 #### 4.1 AI-Powered Adaptive Telemetry & Monitoring
@@ -90,7 +81,6 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 *   **Target Directories:** `src/accessibility/`, `zenith_desktop/`
 *   **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
 *   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
-<<<<<<< HEAD
 
 ---
 
@@ -108,14 +98,12 @@ pub trait DeviceDriver {
 ```
 
 This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, `GpuDriver`, `NetworkDriver`, `BluetoothDriver`) executing within isolated userspace microkernel shards.
-=======
->>>>>>> origin/main
 
 ---
 
 ## 📈 Quality Assurance & Sync Protocol
 
 To maintain 100% architectural integrity during execution:
-1.  **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
-2.  **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
-3.  **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
+1. **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
+2. **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
+3. **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
