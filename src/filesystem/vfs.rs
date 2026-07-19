@@ -193,7 +193,6 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-<<<<<<< HEAD
         // Prevent integer overflow in size calculation
         let _new_size = inode
             .size

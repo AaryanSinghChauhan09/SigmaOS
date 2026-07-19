@@ -127,14 +127,7 @@ impl Routine {
         }
 
         self.conditions.iter().all(|condition| {
-<<<<<<< HEAD
-            let current_value = context
-                .get(&condition.value)
-                .map(|s| s.as_str())
-                .unwrap_or("");
-=======
             let current_value = context.get(&condition.value).map(|s| s.as_str()).unwrap_or("");
->>>>>>> origin/jules-8662134349396449944-dbc9966d
             condition.evaluate(current_value)
         })
     }

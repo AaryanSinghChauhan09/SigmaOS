@@ -115,8 +115,6 @@ impl GpuDriver {
 
     pub fn has_capability(&self, capability: u64) -> bool {
         (self.capabilities.bits() & capability) != 0
-<<<<<<< HEAD
-=======
     }
 
     /// DRM/KMS mode setting API
@@ -141,7 +139,6 @@ impl GpuDriver {
         });
 
         Ok(())
->>>>>>> origin/jules-8662134349396449944-dbc9966d
     }
 }
 

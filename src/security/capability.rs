@@ -200,13 +200,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
-    fn test_zero_trust_verifier_oop() {
-        let verifier = ZeroTrustVerifier::new(true);
-        let token = CapabilityToken::new().allow_read("/var/www");
-        assert!(verifier.verify_access(&token, Permission::FileRead));
-        assert!(!verifier.verify_access(&token, Permission::NetworkTcp));
-=======
     fn test_path_traversal_rejection() {
         // Attempting traversal with /.. or ../ should not grant permission
         let token1 = CapabilityToken::new().allow_read("/var/www/../../etc/passwd");
@@ -229,6 +222,5 @@ mod tests {
         // Extracted port value should be exactly 443, not 507 (overlap of 80 and 443)
         let extracted_port = (token.bits() >> 16) & 0xFFFF;
         assert_eq!(extracted_port, 443);
->>>>>>> origin/jules-3459836125595431986-db79e46f
     }
 }

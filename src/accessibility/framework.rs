@@ -127,69 +127,6 @@ impl AccessibilityFramework {
 
     fn add_default_profiles(&mut self) {
         // Vision impaired profile
-<<<<<<< HEAD
-        let vision_profile =
-            AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
-                .add_setting(
-                    AccessibilitySetting::new(AccessibilityFeature::ScreenReader)
-                        .with_intensity(0.8),
-                )
-                .add_setting(
-                    AccessibilitySetting::new(AccessibilityFeature::HighContrast)
-                        .with_intensity(1.0),
-                )
-                .add_setting(
-                    AccessibilitySetting::new(AccessibilityFeature::Magnifier).with_intensity(0.6),
-                );
-
-        // Hearing impaired profile
-        let hearing_profile = AccessibilityProfile::new(
-            "Hearing Impaired".to_string(),
-            AccessibilityCategory::Hearing,
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::TextToSpeech).with_intensity(0.9),
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::SpeechToText).with_intensity(0.8),
-        );
-
-        // Mobility impaired profile
-        let mobility_profile = AccessibilityProfile::new(
-            "Mobility Impaired".to_string(),
-            AccessibilityCategory::Mobility,
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::KeyboardNavigation).with_intensity(1.0),
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::VoiceControl).with_intensity(0.7),
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.5),
-        );
-
-        // Cognitive support profile
-        let cognitive_profile = AccessibilityProfile::new(
-            "Cognitive Support".to_string(),
-            AccessibilityCategory::Cognitive,
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.8),
-        )
-        .add_setting(
-            AccessibilitySetting::new(AccessibilityFeature::DyslexiaFont).with_intensity(0.6),
-        );
-
-        self.profiles
-            .insert(vision_profile.name.clone(), vision_profile);
-        self.profiles
-            .insert(hearing_profile.name.clone(), hearing_profile);
-        self.profiles
-            .insert(mobility_profile.name.clone(), mobility_profile);
-        self.profiles
-            .insert(cognitive_profile.name.clone(), cognitive_profile);
-=======
         let mut vision_profile = AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::ScreenReader).with_intensity(0.8))
             .add_setting(AccessibilitySetting::new(AccessibilityFeature::HighContrast).with_intensity(1.0))
@@ -219,7 +156,6 @@ impl AccessibilityFramework {
         self.profiles.insert(hearing_profile.name.clone(), hearing_profile);
         self.profiles.insert(mobility_profile.name.clone(), mobility_profile);
         self.profiles.insert(cognitive_profile.name.clone(), cognitive_profile);
->>>>>>> origin/jules-8662134349396449944-dbc9966d
     }
 
     pub fn add_profile(&mut self, profile: AccessibilityProfile) {

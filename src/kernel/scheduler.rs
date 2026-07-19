@@ -170,18 +170,11 @@ mod tests {
         let mut scheduler = Scheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
-<<<<<<< HEAD
-
-        for _ in 0..5 {
-            scheduler.tick();
-        }
-=======
         
         // Advance time so that virtual deadline (current_time + 3) is reached
         scheduler.tick();
         scheduler.tick();
         scheduler.tick();
->>>>>>> origin/jules-8662134349396449944-dbc9966d
 
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());

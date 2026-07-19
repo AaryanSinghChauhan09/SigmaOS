@@ -115,7 +115,6 @@ impl VesaDriver {
 
     pub fn has_capability(&self, capability: u64) -> bool {
         (self.capabilities.bits() & capability) != 0
-<<<<<<< HEAD
     }
 
     /// Write a pixel directly to the framebuffer memory at (x, y) with a 32-bit ARGB color.
@@ -202,8 +201,6 @@ impl PeripheralDevice for VesaDriver {
     fn shutdown(&mut self) -> Result<(), &'static str> {
         self.fill_screen(0x00000000).ok();
         Ok(())
-=======
->>>>>>> origin/jules-8662134349396449944-dbc9966d
     }
 }
 
