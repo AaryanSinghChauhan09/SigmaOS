@@ -243,11 +243,33 @@ impl PageTable {
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
+    pub buddy_allocator: BuddyAllocator,
 }
 
 impl VirtualMemoryManager {
     pub fn new(root_directory: NonNull<PageTable>) -> Self {
-        Self { root_directory }
+        Self {
+            root_directory,
+            buddy_allocator: BuddyAllocator::new(),
+        }
+    }
+
+    pub fn with_allocator(root_directory: NonNull<PageTable>, allocator: BuddyAllocator) -> Self {
+        Self {
+            root_directory,
+            buddy_allocator: allocator,
+        }
+    }
+
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    /// Free pages using buddy allocator (wires free_pages to VMM)
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
     }
 
     /// Translates a virtual address into a physical address
