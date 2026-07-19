@@ -42,10 +42,11 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
+    create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    StorageCommand, StorageDriver, StorageError, StorageType, UdfAncientDevice, UsbHidDriver,
+    VesaDriver, VesaError, VesaModeInfo,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
