@@ -79,7 +79,7 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
             if !self.free_lists[current_order].is_empty() {
-                let block_id = self.free_lists[current_order].remove(0);
+                let block_id = self.free_lists[current_order].pop().unwrap();
                 
                 while current_order > order {
                     let new_order = current_order - 1;
@@ -225,6 +225,11 @@ impl<T> Vec<T> {
         }
     }
     fn is_empty(&self) -> bool { self.len == 0 }
+    fn pop(&mut self) -> Option<T> {
+        if self.len == 0 { return None; }
+        self.len -= 1;
+        unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+    }
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
