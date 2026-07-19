@@ -9,6 +9,7 @@ pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod ecosystem;
@@ -51,6 +52,11 @@ pub use customization::{
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use distro::{
+    BuildTarget, CertificationSuite, CommunityRepository, DevelopmentPipeline, EnterpriseManager,
+    Language, LocalizationEngine, MountMode, RepoSecurityLevel, RescueManager, SpecializedProfile,
+    TestResult, VerticalPreset,
 };
 pub use drivers::{
     AdLibSynthDriver, AppleSiliconUnifiedMemoryBus, Bluetooth5_4_Adapter, CgaGraphicsDriver,
