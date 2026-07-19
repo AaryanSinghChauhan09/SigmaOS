@@ -140,7 +140,8 @@ impl BuddyAllocator {
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        let buddy_addr = block_addr ^ (1 << (order + 12)); // Calculate buddy address
+        // Calculate buddy address by XORing with block size (standard buddy system)
+        let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
         // Find buddy in free list

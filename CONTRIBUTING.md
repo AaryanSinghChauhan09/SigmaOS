@@ -111,10 +111,22 @@ cargo test -- --nocapture
 ```
 SigmaOS/
 ├── src/              # Source code
+│   ├── security/     # Security framework (vault, password manager, VPN, IDS)
+│   ├── productivity/ # Productivity tools (calendar, email, notes, editor, terminal)
+│   ├── virtualization/ # VM and container management
+│   ├── network/      # Networking (sync, torrent, analyzer, TCP)
+│   ├── filesystem/   # Filesystem (manager, archive, disk usage, VFS)
+│   ├── package/      # Package management (manager, updater, universal)
+│   ├── dashboard/    # System dashboard (monitor, process, control center)
+│   ├── customization/ # Theming and customization (theme, routines)
+│   ├── automation/   # AI and automation (orchestrator, ai_optimizer)
+│   ├── kernel/       # Core kernel components
+│   └── lib.rs        # Main library entry point
 ├── tests/            # Integration tests
 ├── docs/             # Documentation
 ├── scripts/          # Utility scripts
 ├── .github/          # GitHub configuration
+├── WIKI/             # GitHub Wiki documentation
 ├── Cargo.toml        # Rust dependencies
 └── README.md         # Project overview
 ```

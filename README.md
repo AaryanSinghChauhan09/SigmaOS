@@ -108,6 +108,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 ### Current Status
 
+**Kernel Core:**
 - ✅ Kernel scheduler (MLFQ+CFS+EDF)
 - ✅ Syscalls (I/O + Process)
 - ✅ Physical MM (buddy allocator)
@@ -115,11 +116,58 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ APIC + timer
 - ✅ sigma_pledge + sigma_unveil
 - ✅ Kyber-1024 KEM + Dilithium-5
+
+**Networking & Storage:**
 - 🔄 TCP/UDP stack - Partial
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
+
+**Desktop & Productivity:**
 - ✅ Zenith Desktop prototype
+- ✅ Screen recorder with GPU acceleration
+- ✅ Screenshot tool with annotation
+- ✅ Calendar + task manager
+- ✅ Email client with IMAP/SMTP
+- ✅ Note-taking app with Markdown
+- ✅ Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- ✅ Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- ✅ Password manager with biometric unlock
+- ✅ Intrusion detection system
+- ✅ Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- ✅ Virtual machine manager (QEMU/KVM)
+- ✅ Container manager (Docker/Podman)
+
+**Package Management:**
 - ✅ sigma-pkg CLI
+- ✅ Universal package manager
+- ✅ Rollback package snapshots
+
+**Networking:**
+- ✅ Cloud sync engine
+- ✅ Built-in torrent client
+- ✅ Network traffic analyzer
+
+**AI & Automation:**
+- ✅ AI orchestrator for system optimization
+
+**Customization:**
+- ✅ Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
 
 
