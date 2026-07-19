@@ -3,6 +3,7 @@ pub mod archive;
 pub mod disk_usage;
 pub mod manager;
 pub mod vfs;
+pub mod support;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -17,3 +18,4 @@ pub use manager::{
     SortOrder, StandardFileOperation, ViewMode,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use support::{FilesystemManager, SimpleFilesystemManager, Filesystem, SimpleFilesystem, FilesystemType, FilesystemError};
