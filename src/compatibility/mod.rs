@@ -3,5 +3,6 @@ pub mod cross_platform;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
+    SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
