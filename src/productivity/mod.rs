@@ -1,4 +1,5 @@
 // SigmaOS Productivity Module
+pub mod clipboard_manager;
 pub mod editor;
 pub mod gamification;
 pub mod notes;
@@ -7,6 +8,10 @@ pub mod screenshot;
 pub mod tasks;
 pub mod terminal;
 
+pub use clipboard_manager::{
+    ClipboardBackend, ClipboardError, ClipboardFilter, ClipboardHistoryConfig, ClipboardItem,
+    ClipboardItemType, ClipboardManager, SystemClipboardBackend,
+};
 pub use editor::{
     CodeEditor, CompletionItem, CompletionKind, CursorPosition, Diagnostic, DiagnosticSeverity,
     Document, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient, RegexHighlighter,
