@@ -44,6 +44,7 @@ pub use automation::{
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use community::{
     BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
@@ -67,6 +68,11 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 >>>>>>> origin/feat/sovereign-app-absorption-plan-7834976665377629483
+=======
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-7275568434630319333
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -74,6 +80,7 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 pub use distro::{
 <<<<<<< HEAD
@@ -131,6 +138,8 @@ pub use education::{
 };
 =======
 >>>>>>> origin/feat/sovereign-app-absorption-plan-7834976665377629483
+=======
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-7275568434630319333
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
@@ -138,15 +147,19 @@ pub use drivers::{
     VesaModeInfo,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> origin/distro-maturity-layer-10191929491159384603
 =======
 >>>>>>> origin/distro-parity-7856909949786957309
 =======
 >>>>>>> origin/feat/sovereign-app-absorption-plan-7834976665377629483
+=======
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-7275568434630319333
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -160,10 +173,13 @@ pub use governance::{
 >>>>>>> origin/distro-parity-7856909949786957309
 =======
 >>>>>>> origin/feat/sovereign-app-absorption-plan-7834976665377629483
+=======
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-7275568434630319333
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -176,6 +192,8 @@ pub use legal::{
 >>>>>>> origin/distro-parity-7856909949786957309
 =======
 >>>>>>> origin/feat/sovereign-app-absorption-plan-7834976665377629483
+=======
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-7275568434630319333
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -203,6 +221,7 @@ pub use sigpkg::{
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
@@ -212,6 +231,8 @@ pub use support::{
 >>>>>>> origin/distro-parity-7856909949786957309
 =======
 >>>>>>> origin/feat/sovereign-app-absorption-plan-7834976665377629483
+=======
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-7275568434630319333
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
