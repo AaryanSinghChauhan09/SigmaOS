@@ -4,14 +4,19 @@
 
 pub mod accessibility;
 pub mod automation;
+pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
+pub mod ecosystem;
+pub mod education;
 pub mod filesystem;
+pub mod governance;
 pub mod kernel;
+pub mod legal;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -20,6 +25,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod support;
 pub mod virtualization;
 
 pub use accessibility::{
@@ -30,6 +36,10 @@ pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+};
+pub use community::{
+    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
+    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -58,12 +68,26 @@ pub use drivers::{
     Ufs4StorageDriver, Usb4HostController, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
     VgaTextModeDriver, Wifi7Adapter,
 };
+pub use ecosystem::{
+    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
+    EnterprisePartner,
+};
+pub use education::{
+    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
+};
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+};
+pub use governance::{
+    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
+    RoadmapMilestone, TransparentRoadmap,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+};
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
@@ -88,6 +112,9 @@ pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
+};
+pub use support::{
+    LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
