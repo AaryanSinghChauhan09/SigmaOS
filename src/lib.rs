@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
@@ -39,6 +42,7 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use community::{
     BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
@@ -52,6 +56,11 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 >>>>>>> origin/distro-maturity-layer-10191929491159384603
+=======
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+>>>>>>> origin/distro-parity-7856909949786957309
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -60,6 +69,7 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use distro::{
+<<<<<<< HEAD
 <<<<<<< HEAD
     BuildTarget, CertificationSuite, CommunityRepository, DevelopmentPipeline, EnterpriseManager,
     Language, LocalizationEngine, MountMode, RepoSecurityLevel, RescueManager, SpecializedProfile,
@@ -100,17 +110,32 @@ pub use education::{
     PqcSelfHealing, QAStagedRelease, RegionalSettings, RegistryType, RegistryValue, ReleaseStage,
     RescueISO, RescueISOManager, SoftwareCertificationProgram, SovereignP2PSync, TargetArch,
     TimeTravelCheckpoint, TimeTravelEngine, WikiPage, Win32Gdi, WindowsRegistry,
+=======
+    AccessibilityToolkit, AudioEngine, BuildSystemTooling, CertificationProgram, CloudMarketplace,
+    ComplianceIndustry, DeveloperOutreach, DisplayServerProtocol, DistroService,
+    DynamicModuleLoader, GovernanceCharter, GraphicsAcceleration, HardwareAbstractionLayer,
+    HardwareDevice, InclusivityFramework, IndustryComplianceEdition, InitFlavor, InstallerProfile,
+    IpShield, KernelModule, KernelVariant, LicensingPolicy, LiveMigrationManager,
+    LocalizationFramework, MetaPackage, MirrorCdn, MultimediaStack, NetbootInstaller,
+    NetworkUtilitySuite, NftablesRule, OemPartnership, QAPipeline, RescueRecoverySystem,
+    SigmaAccess, SigmaBuild, SigmaCloud, SigmaGov, SigmaInit, SigmaNet, SigmaPkg, SigmaRescue,
+    SigmaTrace, UnifiedServiceManager, VirtualPackage, VpnConnection, WirelessNetwork,
+>>>>>>> origin/distro-parity-7856909949786957309
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+<<<<<<< HEAD
 >>>>>>> origin/distro-maturity-layer-10191929491159384603
+=======
+>>>>>>> origin/distro-parity-7856909949786957309
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
@@ -118,16 +143,21 @@ pub use governance::{
 };
 =======
 >>>>>>> origin/distro-maturity-layer-10191929491159384603
+=======
+>>>>>>> origin/distro-parity-7856909949786957309
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 =======
 >>>>>>> origin/distro-maturity-layer-10191929491159384603
+=======
+>>>>>>> origin/distro-parity-7856909949786957309
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -153,11 +183,14 @@ pub use sigpkg::{
     SatSolver, Transaction,
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
 =======
 >>>>>>> origin/distro-maturity-layer-10191929491159384603
+=======
+>>>>>>> origin/distro-parity-7856909949786957309
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
