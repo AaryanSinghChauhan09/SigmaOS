@@ -1,14 +1,234 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(target_os = "none", no_std)]
+#![cfg_attr(target_os = "none", no_main)]
 
+use core::mem;
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Implements crash reporting using OOP principles with traits and structs
 /// No dependency on external crash reporting frameworks
 /// Based on Roadmap Item 14: Crash reporting pipeline
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+#[cfg(not(target_os = "none"))]
+use std::boxed::Box;
+#[cfg(not(target_os = "none"))]
+use std::vec::Vec;
+
+#[cfg(target_os = "none")]
+pub struct Box<T: ?Sized>(*mut T);
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Box<T> {
+    pub fn new(val: T) -> Self
+    where
+        T: Sized,
+    {
+        let ptr = unsafe { alloc(mem::size_of::<T>()) as *mut T };
+        if !ptr.is_null() {
+            unsafe {
+                core::ptr::write(ptr, val);
+            }
+        }
+        Box(ptr)
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::Deref for Box<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*self.0 }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::DerefMut for Box<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { &mut *self.0 }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::convert::AsRef<T> for Box<T> {
+    fn as_ref(&self) -> &T {
+        unsafe { &*self.0 }
+    }
+}
+
+#[cfg(target_os = "none")]
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+#[cfg(target_os = "none")]
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 /// Report ID
 pub type ReportID = usize;
@@ -99,7 +319,12 @@ pub struct SimpleCrashReport {
 }
 
 impl SimpleCrashReport {
-    pub fn new(id: ReportID, application: &[u8], severity: CrashSeverity, capability: ReportCapability) -> Self {
+    pub fn new(
+        id: ReportID,
+        application: &[u8],
+        severity: CrashSeverity,
+        capability: ReportCapability,
+    ) -> Self {
         let mut app_array = [0u8; 64];
         let app_len = application.len().min(63);
 
@@ -153,7 +378,11 @@ impl CrashReport for SimpleCrashReport {
     }
 
     fn stack_trace(&self) -> &[u8] {
-        let len = self.stack_trace.iter().position(|&b| b == 0).unwrap_or(1024);
+        let len = self
+            .stack_trace
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(1024);
         &self.stack_trace[..len]
     }
 
@@ -171,7 +400,11 @@ impl CrashReport for SimpleCrashReport {
 /// Crash pipeline trait (OOP interface)
 pub trait CrashPipeline {
     /// Create report
-    fn create_report(&mut self, application: &[u8], severity: CrashSeverity) -> Result<ReportID, CrashError>;
+    fn create_report(
+        &mut self,
+        application: &[u8],
+        severity: CrashSeverity,
+    ) -> Result<ReportID, CrashError>;
     /// Delete report
     fn delete_report(&mut self, id: ReportID) -> Result<(), CrashError>;
     /// Get report
@@ -193,6 +426,7 @@ pub enum CrashError {
 
 /// Crash statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct CrashStats {
     pub total_reports: usize,
     pub by_severity: [usize; 5],
@@ -251,7 +485,11 @@ impl SimpleCrashPipeline {
 }
 
 impl CrashPipeline for SimpleCrashPipeline {
-    fn create_report(&mut self, application: &[u8], severity: CrashSeverity) -> Result<ReportID, CrashError> {
+    fn create_report(
+        &mut self,
+        application: &[u8],
+        severity: CrashSeverity,
+    ) -> Result<ReportID, CrashError> {
         if !self.capability.can_create {
             return Err(CrashError::PermissionDenied);
         }
@@ -329,62 +567,4 @@ fn get_current_time() -> u64 {
         COUNTER += 1_000_000;
         COUNTER
     }
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

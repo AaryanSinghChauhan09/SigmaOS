@@ -11,3 +11,13 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 ## 2024-07-15 - Uncontrolled Error Propagation in Package Managers
 **Learning:** Allowing low-level package resolution errors (such as `ResolveError`) to bubble up directly to transaction commit layers using automatic question-mark conversions without wrapping or sanitizing can leak system paths and dependency graph configurations. Wrapping resolution failures into a high-level `TransactionError::DependencyConflict` sanitizes error outputs, prevents system layout leakages, and keeps error diagnostics safe.
 **Action:** Proactively sanitize and map internal package/scheduler errors before propagating them to user-space applications to block potential operating system reconnaissance channels.
+
+## 2024-07-16 - Directory Traversal via Unsanitized Sandbox Paths
+**Vulnerability:** Path-gated capability authorizations allowed directory traversal sequences like `..` to bypass root boundaries (e.g. `/var/www/../../etc/passwd`), granting raw system files access.
+**Learning:** Checking path prefixes with `starts_with` alone is insufficient when dot-dot traversal can resolve paths out of scope. Paths must be canonicalized or sanitized to ensure they do not contain relative components like `..`.
+**Prevention:** Reject paths containing directory traversal segments (`../`, `/..`, or starting/ending relative boundaries) before evaluating security rule prefixes.
+
+## 2024-07-16 - Bitmask Overlap Privilege Escalation
+**Vulnerability:** Successive `allow_network` port registrations with logical OR operations corrupted bits 16-31, causing unintended port allocations and privilege escalation (e.g. port 80 and 443 producing unauthorized port 507).
+**Learning:** Bitwise OR operations on non-disjoint bit fields pollute boundaries, leaking permissions across fields.
+**Prevention:** Always mask and clear target bit ranges (e.g. `self.bits &= !(0xFFFF << 16)`) before writing new values to bit-packed integers.

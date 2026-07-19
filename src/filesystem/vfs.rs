@@ -200,7 +200,9 @@ impl VirtualFilesystem {
             .ok_or(FsError::NoSpace)?;
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let _new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
         // Simulate write (in production, actual file I/O)

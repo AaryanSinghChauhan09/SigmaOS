@@ -15,3 +15,7 @@ This journal contains CRITICAL performance learnings discovered during profiling
 ## 2026-07-17 - Zero-Allocation Version Parsing
 **Learning:** Splitting a string and collecting the slices into a heap-allocated collection (such as `version_str.split('.').collect::<Vec<&str>>()`) in frequently called utility methods introduces performance overhead. Replacing this with an iterator-based inline parsing method completely avoids heap allocations and significantly reduces memory usage and execution time.
 **Action:** Always utilize iterators and inline parsing for string manipulation/parsing rather than collecting intermediate elements into heap-allocated collections.
+
+## 2024-07-16 - Heap-Free SemVer Split Parsing
+**Learning:** Collecting split string slices into a heap-allocated `Vec` during SemVer parsing introduces unnecessary allocations and deallocations, causing garbage collection/fragmentation overhead and preventing the package manager from running safely in no_std environments. Replacing `split('.').collect::<Vec<_>>()` with a direct lazy split iterator preserves identical functionality while guaranteeing absolute zero-allocation runtime performance.
+**Action:** Utilize inline iterator-based parsing (like `.next()`) instead of eager collection when decomposing dot-separated version strings.

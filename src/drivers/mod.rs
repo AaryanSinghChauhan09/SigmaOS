@@ -28,6 +28,8 @@ pub use kernel_releases::{
     KernelReleaseInfo, LinuxReleaseDriver, Longterm5_10_TpmDriver, Longterm5_15_SerialDriver,
     Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver, Longterm6_1_InputDriver,
     Longterm6_6_AudioDriver, MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
+    LongtermReleaseDriver, MainlineReleaseDriver, PrepatchRcDriver1, PrepatchRcDriver2, 
+    PrepatchRcDriver3, PrepatchRcDriver4, PrepatchRcDriver5, PrepatchRcDriver6, StableReleaseDriver,
 };
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
