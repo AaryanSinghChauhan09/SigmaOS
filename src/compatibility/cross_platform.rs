@@ -70,17 +70,17 @@ impl SovereignVideoPlayerCapability {
         Self {
             supported_formats: vec![
                 "mp4", "mkv", "avi", "mp3", "aac", "wav", "flac", // VLC core compatibility
-                "av1", "vvc", "opus",                             // Next-gen codecs
+                "av1", "vvc", "opus", // Next-gen codecs
             ],
             advanced_features: vec![
-                "ai_upscale",           // Real-time local neural network video upscaling
-                "frame_interpolation",  // AI-driven 60FPS/120FPS smooth motion generation
-                "pqc_streaming",        // Post-quantum Kyber-1024 encrypted stream rendering
-                "p2p_dist",             // OS-native decentralized streaming distribution
-                "spatial_audio",        // Immersive spatial audio processing and HRTF synthesis
-                "spatial_video",        // 3D holographic stereoscopic depth reprojection
-                "dolby_vision",         // Hardware-accelerated dynamic range tone-mapping
-                "hdr10plus",            // Dynamic metadata HDR processing
+                "ai_upscale",          // Real-time local neural network video upscaling
+                "frame_interpolation", // AI-driven 60FPS/120FPS smooth motion generation
+                "pqc_streaming",       // Post-quantum Kyber-1024 encrypted stream rendering
+                "p2p_dist",            // OS-native decentralized streaming distribution
+                "spatial_audio",       // Immersive spatial audio processing and HRTF synthesis
+                "spatial_video",       // 3D holographic stereoscopic depth reprojection
+                "dolby_vision",        // Hardware-accelerated dynamic range tone-mapping
+                "hdr10plus",           // Dynamic metadata HDR processing
             ],
         }
     }
