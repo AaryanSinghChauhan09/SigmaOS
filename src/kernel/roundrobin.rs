@@ -304,6 +304,7 @@ mod tests {
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
+<<<<<<< HEAD
         let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
         let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
         scheduler.add_process(p1).unwrap();
@@ -314,6 +315,18 @@ mod tests {
         for _ in 0..20 {
             scheduler.tick();
         }
+=======
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
+        
+        let initial_index = scheduler.current_index;
+        for _ in 0..15 {
+            scheduler.tick();
+        }
+        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
+>>>>>>> origin/jules-8662134349396449944-dbc9966d
         assert_ne!(scheduler.current_index, initial_index);
     }
 

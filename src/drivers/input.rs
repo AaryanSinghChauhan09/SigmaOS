@@ -12,13 +12,112 @@ pub enum InputType {
 }
 
 /// Input event
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InputEvent {
-    KeyPress { keycode: u8 },
+    KeyPress { keycode: u8, ascii: Option<char> },
     KeyRelease { keycode: u8 },
-    MouseMove { x: u32, y: u32 },
-    MouseClick { button: u8 },
+    MouseMove { delta_x: i32, delta_y: i32 },
+    MouseClick { left: bool, right: bool, middle: bool },
     Touch { x: u32, y: u32 },
+}
+
+/// PS/2 Scancode to ASCII translator (Set 1)
+pub struct ScancodeTranslator {}
+
+impl ScancodeTranslator {
+    pub fn translate(scancode: u8) -> Option<char> {
+        match scancode {
+            0x1E => Some('a'),
+            0x30 => Some('b'),
+            0x2E => Some('c'),
+            0x20 => Some('d'),
+            0x12 => Some('e'),
+            0x21 => Some('f'),
+            0x22 => Some('g'),
+            0x23 => Some('h'),
+            0x17 => Some('i'),
+            0x24 => Some('j'),
+            0x25 => Some('k'),
+            0x26 => Some('l'),
+            0x32 => Some('m'),
+            0x31 => Some('n'),
+            0x18 => Some('o'),
+            0x19 => Some('p'),
+            0x10 => Some('q'),
+            0x13 => Some('r'),
+            0x1F => Some('s'),
+            0x14 => Some('t'),
+            0x16 => Some('u'),
+            0x2F => Some('v'),
+            0x11 => Some('w'),
+            0x2D => Some('x'),
+            0x15 => Some('y'),
+            0x2C => Some('z'),
+            0x39 => Some(' '), // Space
+            0x1C => Some('\n'), // Enter
+            _ => None,
+        }
+    }
+}
+
+/// PS/2 3-byte Mouse Packet Parser
+pub struct MousePacketParser {
+    state: u8,
+    bytes: [u8; 3],
+}
+
+impl MousePacketParser {
+    pub fn new() -> Self {
+        Self {
+            state: 0,
+            bytes: [0; 3],
+        }
+    }
+
+    /// Push a raw byte from the PS/2 controller and return an event if packet is complete
+    pub fn push_byte(&mut self, byte: u8) -> Option<InputEvent> {
+        // Sync check: bit 3 of first byte must be 1
+        if self.state == 0 && (byte & 0x08) == 0 {
+            return None;
+        }
+
+        self.bytes[self.state as usize] = byte;
+        self.state += 1;
+
+        if self.state == 3 {
+            self.state = 0;
+
+            let flags = self.bytes[0];
+            let raw_x = self.bytes[1];
+            let raw_y = self.bytes[2];
+
+            let left = (flags & 0x01) != 0;
+            let right = (flags & 0x02) != 0;
+            let middle = (flags & 0x04) != 0;
+
+            // X and Y delta sign-extensions
+            let mut delta_x = raw_x as i32;
+            if (flags & 0x10) != 0 {
+                delta_x -= 256;
+            }
+
+            let mut delta_y = raw_y as i32;
+            if (flags & 0x20) != 0 {
+                delta_y -= 256;
+            }
+
+            // Invert Y to match screen coordinate grids (down is positive)
+            delta_y = -delta_y;
+
+            if left || right || middle {
+                return Some(InputEvent::MouseClick { left, right, middle });
+            } else {
+                return Some(InputEvent::MouseMove { delta_x, delta_y });
+            }
+        }
+
+        None
+    }
 }
 
 /// Input driver interface
@@ -26,6 +125,7 @@ pub struct InputDriver {
     pub device_type: InputType,
     pub capabilities: CapabilityToken,
     pub event_buffer: Vec<InputEvent>,
+    pub mouse_parser: MousePacketParser,
 }
 
 impl InputDriver {
@@ -34,6 +134,7 @@ impl InputDriver {
             device_type,
             capabilities: CapabilityToken::new(),
             event_buffer: Vec::new(),
+            mouse_parser: MousePacketParser::new(),
         }
     }
 
@@ -77,7 +178,7 @@ mod tests {
     #[test]
     fn test_event_buffer() {
         let mut input = InputDriver::new(InputType::Keyboard);
-        let event = InputEvent::KeyPress { keycode: 65 };
+        let event = InputEvent::KeyPress { keycode: 65, ascii: None };
         input.push_event(event.clone());
         let polled = input.poll_event();
         assert!(polled.is_some());
@@ -86,8 +187,25 @@ mod tests {
     #[test]
     fn test_clear_buffer() {
         let mut input = InputDriver::new(InputType::Mouse);
-        input.push_event(InputEvent::MouseMove { x: 100, y: 200 });
+        input.push_event(InputEvent::MouseMove { delta_x: 10, delta_y: -5 });
         input.clear_buffer();
         assert!(input.poll_event().is_none());
+    }
+
+    #[test]
+    fn test_scancode_translation() {
+        assert_eq!(ScancodeTranslator::translate(0x1E), Some('a'));
+        assert_eq!(ScancodeTranslator::translate(0x39), Some(' '));
+    }
+
+    #[test]
+    fn test_mouse_parsing() {
+        let mut parser = MousePacketParser::new();
+        // Send a complete mouse packet (0x08 sync flag, delta X = 5, delta Y = 10)
+        assert_eq!(parser.push_byte(0x08), None);
+        assert_eq!(parser.push_byte(0x05), None);
+
+        let event = parser.push_byte(0x0A).unwrap();
+        assert_eq!(event, InputEvent::MouseMove { delta_x: 5, delta_y: -10 });
     }
 }

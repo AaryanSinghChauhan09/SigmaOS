@@ -14,7 +14,7 @@ pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     major: u64,
     minor: u64,
@@ -90,7 +90,11 @@ pub struct Dependency {
 }
 
 /// Version constraint
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+>>>>>>> origin/jules-8662134349396449944-dbc9966d
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),

@@ -188,7 +188,11 @@ pub enum TargetPlatform {
 }
 
 /// Binary format
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+>>>>>>> origin/jules-8662134349396449944-dbc9966d
 pub enum BinaryFormat {
     Exe, // Windows executable
     Dmg, // macOS disk image
