@@ -136,7 +136,6 @@ pub struct Dependency {
 
 /// Version constraint
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),
