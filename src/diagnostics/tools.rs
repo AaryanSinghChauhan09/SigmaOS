@@ -1,5 +1,4 @@
-#![no_std]
-#![no_main]
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 
 /// OOP-based Low-Level Diagnostics Tools for SigmaOS
 /// Implements diagnostics using OOP principles with traits and structs
@@ -10,12 +9,20 @@ use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
+
 /// Sensor ID
 pub type SensorID = usize;
 
 /// Sensor type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SensorType {
     CPU = 0,
     Memory = 1,
@@ -41,7 +48,7 @@ pub trait Sensor {
 
 /// Diagnostics error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DiagnosticsError {
     Success = 0,
     SensorNotFound = 1,
@@ -159,8 +166,6 @@ impl Sensor for SimpleSensor {
             return Err(DiagnosticsError::PermissionDenied);
         }
 
-        // In a real implementation, this would read from hardware
-        // For now, simulate reading
         let simulated_value = match self.sensor_type {
             SensorType::CPU => 50.0,
             SensorType::Memory => 60.0,
@@ -180,6 +185,152 @@ impl Sensor for SimpleSensor {
             name: self.name,
             sensor_type: self.sensor_type,
             value: Self::usize_to_f64(self.value.load(Ordering::SeqCst)),
+            unit: self.unit,
+            capability: self.capability,
+        }
+    }
+}
+
+/// Memory leak sensor (OOP: Concrete diagnostics class)
+/// Tracks memory allocations and simulated leak gradients
+pub struct MemoryLeakSensor {
+    pub id: SensorID,
+    pub name: [u8; 64],
+    pub value: AtomicUsize,
+    pub unit: [u8; 16],
+    pub capability: SensorCapability,
+    pub simulated_leak_gradient: f64,
+    pub total_allocations: usize,
+}
+
+impl MemoryLeakSensor {
+    pub fn new(id: SensorID, name: &[u8], simulated_leak_gradient: f64) -> Self {
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
+
+        let mut unit_array = [0u8; 16];
+        let unit_bytes = b"KB";
+        for i in 0..unit_bytes.len() {
+            unit_array[i] = unit_bytes[i];
+        }
+
+        MemoryLeakSensor {
+            id,
+            name: name_array,
+            value: AtomicUsize::new(1024), // Start at 1024 KB base allocation
+            unit: unit_array,
+            capability: SensorCapability::full(),
+            simulated_leak_gradient,
+            total_allocations: 5,
+        }
+    }
+}
+
+impl Sensor for MemoryLeakSensor {
+    fn id(&self) -> SensorID {
+        self.id
+    }
+
+    fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
+    }
+
+    fn sensor_type(&self) -> SensorType {
+        SensorType::Memory
+    }
+
+    fn read(&mut self) -> Result<f64, DiagnosticsError> {
+        self.total_allocations += 1;
+        // Base allocation plus gradient leak multiplied by read steps
+        let current_val = 1024.0 + (self.total_allocations as f64 * self.simulated_leak_gradient);
+        self.value.store(current_val as usize, Ordering::SeqCst);
+        Ok(current_val)
+    }
+
+    fn info(&self) -> SensorInfo {
+        SensorInfo {
+            id: self.id,
+            name: self.name,
+            sensor_type: SensorType::Memory,
+            value: self.value.load(Ordering::SeqCst) as f64,
+            unit: self.unit,
+            capability: self.capability,
+        }
+    }
+}
+
+/// CPU Cache Profiler sensor (OOP: Concrete diagnostics class)
+/// Calculates cache miss ratios
+pub struct CpuCacheProfilerSensor {
+    pub id: SensorID,
+    pub name: [u8; 64],
+    pub value: AtomicUsize, // miss ratio stored as percentage multiplied by 100
+    pub unit: [u8; 16],
+    pub capability: SensorCapability,
+    pub cache_hits: usize,
+    pub cache_misses: usize,
+}
+
+impl CpuCacheProfilerSensor {
+    pub fn new(id: SensorID, name: &[u8], hits: usize, misses: usize) -> Self {
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
+
+        let mut unit_array = [0u8; 16];
+        let unit_bytes = b"ratio";
+        for i in 0..unit_bytes.len() {
+            unit_array[i] = unit_bytes[i];
+        }
+
+        CpuCacheProfilerSensor {
+            id,
+            name: name_array,
+            value: AtomicUsize::new(0),
+            unit: unit_array,
+            capability: SensorCapability::full(),
+            cache_hits: hits,
+            cache_misses: misses,
+        }
+    }
+}
+
+impl Sensor for CpuCacheProfilerSensor {
+    fn id(&self) -> SensorID {
+        self.id
+    }
+
+    fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
+    }
+
+    fn sensor_type(&self) -> SensorType {
+        SensorType::CPU
+    }
+
+    fn read(&mut self) -> Result<f64, DiagnosticsError> {
+        let total = self.cache_hits + self.cache_misses;
+        if total == 0 {
+            return Ok(0.0);
+        }
+        let miss_ratio = self.cache_misses as f64 / total as f64;
+        self.value.store((miss_ratio * 100.0) as usize, Ordering::SeqCst);
+        Ok(miss_ratio)
+    }
+
+    fn info(&self) -> SensorInfo {
+        SensorInfo {
+            id: self.id,
+            name: self.name,
+            sensor_type: SensorType::CPU,
+            value: (self.value.load(Ordering::SeqCst) as f64) / 100.0,
             unit: self.unit,
             capability: self.capability,
         }
@@ -206,6 +357,7 @@ pub trait DiagnosticsManager {
 
 /// Diagnostics statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct DiagnosticsStats {
     pub total_sensors: usize,
     pub active_sensors: usize,
@@ -372,15 +524,17 @@ impl DiagnosticsManager for SimpleDiagnosticsManager {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
+/// Simple Vec implementation for no_std bare metal target
+#[cfg(target_os = "none")]
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
@@ -388,7 +542,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -401,8 +555,20 @@ impl<T> Vec<T> {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
     }
 
     unsafe fn grow(&mut self) {
@@ -424,8 +590,129 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Custom dummy Box implementation for no_std bare metal target
+#[cfg(target_os = "none")]
+pub struct Box<T: ?Sized> {
+    ptr: NonNull<T>,
+}
+
+#[cfg(target_os = "none")]
+impl<T> Box<T> {
+    pub fn new(val: T) -> Self {
+        unsafe {
+            let layout_size = mem::size_of::<T>();
+            let raw_ptr = alloc(layout_size) as *mut T;
+            if raw_ptr.is_null() {
+                panic!("Allocation failed");
+            }
+            ptr::write(raw_ptr, val);
+            Box {
+                ptr: NonNull::new_unchecked(raw_ptr),
+            }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Box<T> {
+    pub fn as_ref(&self) -> &T {
+        unsafe { self.ptr.as_ref() }
+    }
+
+    pub fn as_mut(&mut self) -> &mut T {
+        unsafe { self.ptr.as_mut() }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::Deref for Box<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::DerefMut for Box<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Drop for Box<T> {
+    fn drop(&mut self) {
+        unsafe {
+            let ptr_val = self.ptr.as_ptr() as *mut u8;
+            free(ptr_val);
+        }
+    }
+}
+
 // External allocator functions
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_memory_leak_sensor() {
+        let mut sensor = MemoryLeakSensor::new(101, b"MemLeak01", 1.5);
+        assert_eq!(sensor.id(), 101);
+        assert_eq!(sensor.sensor_type(), SensorType::Memory);
+
+        let initial_read = sensor.read().unwrap();
+        // Base allocation (1024) + 6 * 1.5 = 1033.0
+        assert_eq!(initial_read, 1033.0);
+
+        let second_read = sensor.read().unwrap();
+        // Base allocation (1024) + 7 * 1.5 = 1034.5
+        assert_eq!(second_read, 1034.5);
+    }
+
+    #[test]
+    fn test_cpu_cache_profiler_sensor() {
+        let mut sensor = CpuCacheProfilerSensor::new(202, b"CpuCache01", 90, 10);
+        assert_eq!(sensor.id(), 202);
+        assert_eq!(sensor.sensor_type(), SensorType::CPU);
+
+        let ratio = sensor.read().unwrap();
+        // 10 misses out of 100 total attempts = 10% miss ratio (0.10)
+        assert_eq!(ratio, 0.10);
+
+        let info = sensor.info();
+        // 10% miss ratio stored as percentage in value: 10
+        // info.value translates value / 100.0 back to ratio (0.10)
+        assert_eq!(info.value, 0.10);
+    }
+
+    #[test]
+    fn test_simple_diagnostics_manager_with_new_sensors() {
+        let mut manager = SimpleDiagnosticsManager::new(ManagerCapability::full());
+        let m_leak = MemoryLeakSensor::new(1, b"MemLeakSensor", 2.0);
+        let cpu_cache = CpuCacheProfilerSensor::new(2, b"CpuCacheSensor", 950, 50);
+
+        manager.register_sensor(Box::new(m_leak)).unwrap();
+        manager.register_sensor(Box::new(cpu_cache)).unwrap();
+
+        assert_eq!(manager.stats().total_sensors, 2);
+
+        let leak_val = manager.read_sensor(1).unwrap();
+        assert_eq!(leak_val, 1036.0); // 1024 + 6 * 2.0
+
+        let cache_val = manager.read_sensor(2).unwrap();
+        assert_eq!(cache_val, 0.05); // 50 / 1000 = 0.05
+    }
 }

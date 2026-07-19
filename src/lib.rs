@@ -8,6 +8,7 @@ pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
+pub mod diagnostics;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
@@ -33,14 +34,17 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
-    SupersetApplicationCapability, TargetPlatform, TranslationLayer,
+    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability, SupersetApplicationCapability,
+    TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use diagnostics::tools::{
+    CpuCacheProfilerSensor, MemoryLeakSensor, SimpleDiagnosticsManager,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,

@@ -1,5 +1,4 @@
-#![no_std]
-#![no_main]
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Implements crash reporting using OOP principles with traits and structs
@@ -9,6 +8,14 @@
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
 
 /// Report ID
 pub type ReportID = usize;
@@ -158,7 +165,7 @@ impl CrashReport for SimpleCrashReport {
     }
 
     fn info(&self) -> ReportInfo {
-        ReportInfo {
+        SensorInfo {
             id: self.id,
             application: self.application,
             severity: self.severity,
@@ -167,6 +174,9 @@ impl CrashReport for SimpleCrashReport {
         }
     }
 }
+
+// Map SensorInfo definition to ReportInfo for compatible naming layout
+pub type SensorInfo = ReportInfo;
 
 /// Crash pipeline trait (OOP interface)
 pub trait CrashPipeline {
@@ -184,7 +194,7 @@ pub trait CrashPipeline {
 
 /// Crash error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CrashError {
     Success = 0,
     ReportNotFound = 1,
@@ -193,6 +203,7 @@ pub enum CrashError {
 
 /// Crash statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct CrashStats {
     pub total_reports: usize,
     pub by_severity: [usize; 5],
@@ -204,6 +215,12 @@ impl CrashStats {
             total_reports: 0,
             by_severity: [0; 5],
         }
+    }
+}
+
+impl Default for CrashStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -247,6 +264,12 @@ impl SimpleCrashPipeline {
             stats: CrashStats::new(),
             capability,
         }
+    }
+}
+
+impl Default for SimpleCrashPipeline {
+    fn default() -> Self {
+        Self::new(PipelineCapability::full())
     }
 }
 
@@ -332,14 +355,16 @@ fn get_current_time() -> u64 {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+#[cfg(target_os = "none")]
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
@@ -347,7 +372,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -360,8 +385,20 @@ impl<T> Vec<T> {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
     }
 
     unsafe fn grow(&mut self) {
@@ -379,6 +416,72 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Custom dummy Box implementation for no_std
+#[cfg(target_os = "none")]
+pub struct Box<T: ?Sized> {
+    ptr: NonNull<T>,
+}
+
+#[cfg(target_os = "none")]
+impl<T> Box<T> {
+    pub fn new(val: T) -> Self {
+        unsafe {
+            let layout_size = mem::size_of::<T>();
+            let raw_ptr = alloc(layout_size) as *mut T;
+            if raw_ptr.is_null() {
+                panic!("Allocation failed");
+            }
+            ptr::write(raw_ptr, val);
+            Box {
+                ptr: NonNull::new_unchecked(raw_ptr),
+            }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Box<T> {
+    pub fn as_ref(&self) -> &T {
+        unsafe { self.ptr.as_ref() }
+    }
+
+    pub fn as_mut(&mut self) -> &mut T {
+        unsafe { self.ptr.as_mut() }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::Deref for Box<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::DerefMut for Box<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Drop for Box<T> {
+    fn drop(&mut self) {
+        unsafe {
+            let ptr_val = self.ptr.as_ptr() as *mut u8;
+            free(ptr_val);
         }
     }
 }

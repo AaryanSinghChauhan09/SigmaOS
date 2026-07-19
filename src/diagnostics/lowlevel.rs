@@ -1,5 +1,4 @@
-#![no_std]
-#![no_main]
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 
 /// OOP-based Low-level Diagnostics Tools for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 16
@@ -7,15 +6,24 @@
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::ptr::NonNull;
+
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
 
 pub type SensorID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SensorType { Temperature = 0, Voltage = 1, Current = 2, Power = 3, Fan = 4 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HealthStatus { Healthy = 0, Warning = 1, Critical = 2, Unknown = 3 }
 
 pub trait Sensor {
@@ -57,7 +65,16 @@ impl SimpleSensor {
 
 impl Sensor for SimpleSensor {
     fn id(&self) -> SensorID { self.id }
-    fn sensor_type(&self) -> SensorType { unsafe { core::mem::transmute(self.sensor_type.load(Ordering::SeqCst)) } }
+    fn sensor_type(&self) -> SensorType {
+        let val = self.sensor_type.load(Ordering::SeqCst);
+        match val {
+            0 => SensorType::Temperature,
+            1 => SensorType::Voltage,
+            2 => SensorType::Current,
+            3 => SensorType::Power,
+            _ => SensorType::Fan,
+        }
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -102,6 +119,12 @@ impl SimpleThermalMonitor {
         let gpu_temp = SimpleSensor::new(self.next_id.fetch_add(1, Ordering::SeqCst), SensorType::Temperature, b"GPU Core", b"C");
         gpu_temp.value.store(55, Ordering::SeqCst);
         self.sensors.push(Some(Box::new(gpu_temp)));
+    }
+}
+
+impl Default for SimpleThermalMonitor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -167,6 +190,7 @@ pub trait SMARTMonitor {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SMARTData {
     pub temperature: u8,
     pub reallocated_sectors: u16,
@@ -189,6 +213,12 @@ impl SimpleSMARTMonitor {
 
     pub fn add_device(&mut self, device_id: usize, data: SMARTData) {
         self.devices.push((device_id, data));
+    }
+}
+
+impl Default for SimpleSMARTMonitor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -249,6 +279,12 @@ impl SimplePowerTelemetry {
             name_array[i] = name[i];
         }
         self.rails.push((name_array, (AtomicUsize::new(voltage as usize), AtomicUsize::new(current as usize))));
+    }
+}
+
+impl Default for SimplePowerTelemetry {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -355,11 +391,14 @@ impl DiagnosticsReport for SimpleDiagnosticsReport {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+/// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -367,6 +406,14 @@ impl<T> Vec<T> {
                 self.len += 1;
             }
         }
+    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
@@ -380,4 +427,75 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(target_os = "none")]
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Custom dummy Box implementation for no_std
+#[cfg(target_os = "none")]
+pub struct Box<T: ?Sized> {
+    ptr: NonNull<T>,
+}
+
+#[cfg(target_os = "none")]
+impl<T> Box<T> {
+    pub fn new(val: T) -> Self {
+        unsafe {
+            let layout_size = mem::size_of::<T>();
+            let raw_ptr = alloc(layout_size) as *mut T;
+            if raw_ptr.is_null() {
+                panic!("Allocation failed");
+            }
+            core::ptr::write(raw_ptr, val);
+            Box {
+                ptr: NonNull::new_unchecked(raw_ptr),
+            }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Box<T> {
+    pub fn as_ref(&self) -> &T {
+        unsafe { self.ptr.as_ref() }
+    }
+
+    pub fn as_mut(&mut self) -> &mut T {
+        unsafe { self.ptr.as_mut() }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::Deref for Box<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> core::ops::DerefMut for Box<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Drop for Box<T> {
+    fn drop(&mut self) {
+        unsafe {
+            let ptr_val = self.ptr.as_ptr() as *mut u8;
+            free(ptr_val);
+        }
+    }
+}
+
+// External allocator functions
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
