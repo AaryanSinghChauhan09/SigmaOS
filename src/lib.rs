@@ -38,6 +38,7 @@ pub use automation::{
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
+<<<<<<< HEAD
 pub use community::{
     BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
@@ -46,6 +47,11 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
+=======
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+>>>>>>> origin/distro-maturity-layer-10191929491159384603
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -54,6 +60,7 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use distro::{
+<<<<<<< HEAD
     BuildTarget, CertificationSuite, CommunityRepository, DevelopmentPipeline, EnterpriseManager,
     Language, LocalizationEngine, MountMode, RepoSecurityLevel, RescueManager, SpecializedProfile,
     TestResult, VerticalPreset,
@@ -80,21 +87,47 @@ pub use ecosystem::{
 };
 pub use education::{
     DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
+=======
+    AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
+    BountyStatus, BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, CanFrame,
+    CertificationStatus, CommunityConference, ComplianceAuditor, ComponentType, ConferenceTalk,
+    ConfigHook, CrossBuildPipeline, DevTool, DeveloperToolkit, DirectoryService, DirectoryUser,
+    DllLoader, DllModule, EcuController, EduChallenge, EduPlayground, ForumChannel, ForumPost,
+    GdiObjectType, HardwareCertificate, HardwareCertificationProgram, HardwareProfile,
+    HardwareRegressionSuite, HelpSystem, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,
+    InputMethodEngine, IntegrityState, KernelTrace, LanguagePack, LinuxSyscall, LiveDebugger,
+    LocaleManager, ManPage, MpiCommunicator, P2pNode, PackageBuildService, PosixTranslation,
+    PqcSelfHealing, QAStagedRelease, RegionalSettings, RegistryType, RegistryValue, ReleaseStage,
+    RescueISO, RescueISOManager, SoftwareCertificationProgram, SovereignP2PSync, TargetArch,
+    TimeTravelCheckpoint, TimeTravelEngine, WikiPage, Win32Gdi, WindowsRegistry,
+};
+pub use drivers::{
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
+    VesaModeInfo,
+>>>>>>> origin/distro-maturity-layer-10191929491159384603
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+<<<<<<< HEAD
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
     RoadmapMilestone, TransparentRoadmap,
 };
+=======
+>>>>>>> origin/distro-maturity-layer-10191929491159384603
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+<<<<<<< HEAD
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
+=======
+>>>>>>> origin/distro-maturity-layer-10191929491159384603
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -119,9 +152,12 @@ pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
 };
+<<<<<<< HEAD
 pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
+=======
+>>>>>>> origin/distro-maturity-layer-10191929491159384603
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
