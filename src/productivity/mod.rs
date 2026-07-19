@@ -1,6 +1,7 @@
 // SigmaOS Productivity Module
 pub mod editor;
 pub mod gamification;
+pub mod notes;
 pub mod tasks;
 pub mod terminal;
 
@@ -12,6 +13,10 @@ pub use editor::{
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+};
+pub use notes::{
+    ContentType, Folder, InMemoryNoteStorage, Notebook, Note, NoteError, NoteSearchResult,
+    NoteStorage, NoteTakingApp,
 };
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
