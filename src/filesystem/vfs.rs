@@ -154,10 +154,8 @@ impl VirtualFilesystem {
             .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self
-            .inodes
-            .get(&file_descriptor.inode_id)
-            .ok_or(FsError::NotFound)?;
+        let inode = self.inodes.get(&file_descriptor.inode_id)
+            .ok_or(FsError::NotFound)?
 
         // Check read permission
         if !inode.permissions.read {
@@ -183,10 +181,8 @@ impl VirtualFilesystem {
             .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self
-            .inodes
-            .get_mut(&file_descriptor.inode_id)
-            .ok_or(FsError::NotFound)?;
+        let inode = self.inodes.get_mut(&file_descriptor.inode_id)
+            .ok_or(FsError::NotFound)?
 
         // Check write permission
         if !inode.permissions.write {
@@ -232,7 +228,8 @@ impl VirtualFilesystem {
     }
 
     pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
-        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        let inode = self.inodes.get(&inode_id)
+            .ok_or(FsError::NotFound)?
 
         if inode.file_type != FileType::Directory {
             return Err(FsError::NotADirectory);

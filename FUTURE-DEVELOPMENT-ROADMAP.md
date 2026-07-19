@@ -425,14 +425,12 @@ graph TD
     - Replaces background systemd and Snap daemons with a lightweight, event-driven context manager.
     - Eliminates application startup latency by leveraging native direct drawing inside `vesa::VesaDriver` and the Zenith compositor.
 
-### 📐 Arch Linux: Eliminating Rolling-Release Fragility & Replicating the AUR Power
-*   **The Flaw**: Pacman is extremely fast but fragile. One faulty package or kernel update can break the bootloader, display server, or storage drivers. In addition, user repository (AUR) packages are unverified, posing severe supply-chain risks.
-*   **The Absorption Strategy**: Absolute speed and simplicity, combined with compile-time safety, dependency validation, and sandboxed package verification.
+### 📐 Arch Linux: Eliminating Rolling-Release Fragility
+*   **The Flaw**: Pacman is extremely fast but fragile. One faulty package or kernel update can break the bootloader, display server, or storage drivers.
+*   **The Absorption Strategy**: Absolute speed and simplicity, combined with compile-time safety and dependency validation.
 *   **The Technical Replacement**:
-    - **Sovereign Rolling-Release Engine (S-RRE)**: Combines the bleeding-edge availability of a rolling release with NixOS-style atomic generations. Every transaction is a cryptographically signed Merkle root transition. If an update fails, the bootloader performs an instant sub-millisecond hardware-enforced rollback to the last verified signed state, eliminating any possible rolling-release fragility.
-    - **The Sovereign Recipe Repository (SRR) & user-recipe build model**: Replicates the Arch User Repository (AUR) without the associated supply-chain vulnerability. Users declare recipes using `.sb` (Sigma-Build) files which are parsed by the zero-allocation SAT Solver. Prior to installation, recipes are evaluated and compiled inside capability-gated micro-VM containers (SovereignVMM), ensuring user-contributed packages can never escape their sandbox or pollute the system.
-    - **Native Pacman Binary Translator Bridge**: To ensure frictionless package compatibility with the massive Arch ecosystem, SigmaOS provides a native binary translation layer. It ingests standard Arch `.pkg.tar.zst` binary archives, validates their dependencies against the local `sigpkg` registry, and executes them natively in zero-trust sandbox compartments without needing to download Arch Linux.
-    - **Zero-Dependency Core Utility Parity**: Delivers complete CLI parity with standard Arch system administration commands (such as a fully allocation-free `sigpkg search` tool, native network managers, and predictive optimization daemons), combining Arch's simplicity with microkernel resilience.
+    - Leverages the native SAT Solver to perform mathematically proven constraint satisfaction before making package updates.
+    - Protects the system from rolling-release panic by storing old packages in a native Content-Addressed Store (`CAS`), allowing instant generation-level rollbacks.
 
 ### 🎩 Fedora: Modernizing Flatpak and Sandboxing
 *   **The Flaw**: Complex, hard-to-maintain SELinux sandboxing configurations that developers routinely disable because they break normal workflows.
@@ -926,3 +924,223 @@ To maintain complete distro-parity and keep SigmaOS entirely synchronized with t
 1.  **Upstream Monitored Sync**: SigmaOS integrates a scheduler inside `src/sigpkg/sync.rs` that regularly pulls updates from upstream specification repos.
 2.  **Zero-Dep Verification**: All sub-modules compiled into the SigmaOS target image are verified via static analysis to contain absolutely no dynamic references or links to foreign `glibc`, `musl`, or external proprietary libraries.
 3.  **Local Self-Containment**: User applications are delivered solely through pre-vetted Content-Addressed Storage recipes (`src/sigpkg/recipe.rs`), enabling safe, sandboxed offline execution with absolute sovereign integrity.
+
+---
+
+# ⚔️ SECTION 10: Fedora Parity, Absorption, and Domination Specification
+## 🚀 Overcoming the Red Hat Flagship and the Standards of Red Hat Enterprise Linux (RHEL)
+
+Fedora is globally recognized as the cutting-edge proving ground for enterprise Linux technologies (such as DNF/RPM package managers, systemd process supervision, Anaconda/Kickstart auto-deployment, SELinux LSM, OSTree-style immutable rollbacks, and PipeWire/Wayland audio-visual multiplexing). Despite its innovative nature, Fedora is burdened by POSIX-legacy bloat, heavy GNU runtime overheads, configuration fragmentation, and unstable release cascades.
+
+SigmaOS systematically absorbs the architectural flagships of Fedora and implements zero-dependency, microkernel-gated, and highly optimized object-oriented equivalents under a strict zero-trust hardware capability model. This eliminates all dependencies on legacy Red Hat architectures while delivering unmatched performance, safety, and reliability.
+
+```
++---------------------------------------------------------------------------------------------------+
+|                                  SOVEREIGN FEDORA-PARITY CORE                                     |
++---------------------------------------------------------------------------------------------------+
+|  [S-DNF DNF/RPM Engine]  [S-INIT Systemd Core]  [S-KICK Anaconda/Kick]  [S-TREE OSTree CoW Shard] |
++---------------------------------------------------------------------------------------------------+
+|               Hardware-Enforced Microkernel-Level CapabilityGate LSM Replacement (S-SEC)          |
++---------------------------------------------------------------------------------------------------+
+|               Zenith Compositor direct framebuffer-render with PipeWire/Wayland S-MED             |
++---------------------------------------------------------------------------------------------------+
+```
+
+---
+
+## 10.1 DNF/RPM Package Engine Absorption (S-DNF)
+*   **The Fedora Model:** Employs RPM (Red Hat Package Manager) format coupled with DNF (Dandified YUM) using complex SQLite-backed repodata and libsolv SAT solving to resolve library constraints.
+*   **The Monolithic Flaw:** RPM and DNF require heavy python/C runtimes, execute complex pre/post-install shell hooks under root authority (ambient privilege risk), and suffer from library state corruption and untracked config drift.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Functional Content-Addressed Storage (CAS):** Packages are treated as read-only, hash-addressed objects stored in `src/sigpkg/store.rs` by their SHA-256 signatures. Duplicate files across package versions are instantly de-duplicated via Merkle trees.
+    - **No-Hook Isolation Shards:** Completely eliminates arbitrary root shell hooks during package installations. System configuration updates are applied solely through declarative JSON schemas processed within isolated Ring 3 package manager shards.
+    - **Zero-Allocation DPLL SAT Solver:** Dependency resolution in `src/sigpkg/resolver.rs` is expanded with an allocation-free Davis-Putnam-Logemann-Loveland (DPLL) constraint solver, resolving complex dependency graphs inside a memory-safe static footprint.
+
+```
+[Package Update requested] -> [S-DNF Shard Solver] -> [Verifies exact SHA-256 and PQC signature]
+                                     |
+                                     v
+                        [Calculates atomic layout] -> [Performs atomic CAS symlink swap]
+```
+
+---
+
+## 10.2 systemd Process Supervision & Control Absorption (S-INIT)
+*   **The Fedora Model:** systemd coordinates unit dependencies, service supervision, socket activation, logging (journald), and login sessions (logind) in a heavy, centralized PID 1 daemon.
+*   **The Monolithic Flaw:** systemd violated the Unix philosophy of doing one thing well, accumulating millions of lines of complex C code executing in Ring 0/ambient root space. This introduces massive attack surfaces and tight architectural coupling.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **S6-Inspired Supervision Chains:** Implements state supervision through a tree of tiny, isolated supervision watchdogs in `src/init/`. Every system service is supervised by a dedicated child process, completely avoiding a single point of failure at PID 1.
+    - **Asynchronous Lock-Free Service Messaging:** Service dependency graphs are traversed and activated asynchronously using lock-free IPC ring buffers. Socket activation is handled by pre-binding device files under capabilities-checked descriptors.
+    - **Zero-Dependency Append-Only logging:** Replaces journald with a lightweight, append-only transaction logger in `src/logging/` that signs log blocks cryptographically using Dilithium-5 keys, preventing tampering or log injection attacks.
+
+---
+
+## 10.3 Anaconda & Kickstart Automated Deployment (S-KICK)
+*   **The Fedora Model:** Uses the Anaconda installer and Kickstart files to automate operating system installations, configuration setups, and partition boundaries on bare-metal and cloud deployments.
+*   **The Monolithic Flaw:** Anaconda is written in Python, requiring a bulky runtime environment during installation. Kickstart configurations are fragile, error-prone shell scripts that cannot guarantee reproducible states.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Pure-Declarative Provisioning Schema:** Replaces interactive installation setups with a single, declarative JSON document containing system parameters, network routing rules, capability allocations, and partition maps.
+    - **Automated UEFI Boot Provisioning:** Uses `SovereignEditionBuilder` to assemble self-bootable, verified, and signed ISO images. The bootloader parses the JSON provisioning manifest, maps partitions using transactional block driver structures, and initializes capabilities dynamically.
+    - **Self-Healing Deployment Rollbacks:** If an installation fails, the microkernel walks back block allocations to the last verified Merkle-root commit, restoring the device instantly with zero loss or configuration skew.
+
+```
++------------------+     [UEFI Bootloader]     +--------------------+
+| Declarative JSON | ------------------------> | Provisioning Shard |
+|  Boot Manifest   |                           +--------------------+
++------------------+                                      |
+                                                          v
+                                               [Partition & Format via VFS]
+                                                          |
+                                                          v
+                                               [Atomic CAS Deployment]
+```
+
+---
+
+## 10.4 SELinux LSM Policy Replacement (S-SEC)
+*   **The Fedora Model:** Employs SELinux (Security-Enhanced Linux) inside the Linux Security Modules (LSM) framework, applying type-enforcement and multi-category security policies to kernel objects.
+*   **The Monolithic Flaw:** SELinux policies are notoriously complex, hard to debug, and operate with ambient root privilege. Additionally, monolithic LSMs check permissions in-line, introducing substantial context-switching overheads in hot I/O paths.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Zero-Trust Capability-Based Security:** Replaces ambient authority entirely. No process runs as "root" or has implicit administrative power. Security is enforced through explicit, immutable `CapabilityToken` tokens mapped to individual hardware registers and file paths.
+    - **Hardware-Enforced Privilege Sandboxing (`sigma_pledge` / `sigma_unveil`):** Restricts the system call vocabulary and visible file hierarchy of any active process at runtime. If a compromised component attempts to execute an un-pledged syscall, the microkernel immediately intercepts the operation and triggers self-healing rollback procedures.
+    - **Out-of-Line Asynchronous Validation:** Permission checks are decoupled from synchronous kernel execution loops, utilizing the lock-free `CapabilityGate` validation pipeline to ensure sub-nanosecond access checks with zero performance degradation.
+
+---
+
+## 10.5 OSTree-Style Immutable Deployments (S-TREE)
+*   **The Fedora Model:** Fedora Silverblue/Kinoite use rpm-ostree to provide immutable, transactional filesystem structures by managing root directory trees via git-like repositories.
+*   **The Monolithic Flaw:** rpm-ostree depends on legacy read-write filesystem layers, relies on complex system reboots to apply updates, and still allows ambient root modifications.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **True Read-Only Copy-on-Write (CoW) Root Shards:** The boot filesystem is inherently read-only and mapped as an immutable cryptographic image. Modifications, customizations, or updates are processed as new, distinct layers utilizing log-structured write paths in the storage driver.
+    - **Zero-Reboot Sub-Millisecond Upgrades:** System updates are applied instantly by modifying the active root Merkle hash in the Virtual Memory Manager. Applications are cleanly transitioned to new memory pages on the fly, eliminating downtime and system reboots.
+    - **Perfect Cryptographic Integrity Proofs:** Every block on the root image is continuously validated against the master Dilithium-5 signed system manifest. Any corrupted sector or tampering immediately triggers a silent, background repair using redundant block sources.
+
+---
+
+## 10.6 PipeWire & Wayland Media Shard Absorption (S-MED)
+*   **The Fedora Model:** Uses PipeWire for real-time audio/video streaming and Wayland (via Mutter/KWin) for low-latency visual compositor layouts.
+*   **The Monolithic Flaw:** PipeWire and Wayland remain dependent on complex POSIX thread scheduling, require heavy IPC serialization across separate userspace boundaries, and suffer from kernel context-switching latency.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Unified Zenith Graphics & Sound Engine:** Audio and video processing are unified into a single, high-performance S-MED Shard executing in Ring 3. This Shard communicates with hardware directly using `vesa::VesaDriver` and sound card drivers, bypassing heavy display and audio servers.
+    - **Zero-Copy Stream Ring Buffers:** Audio buffers and framebuffer blocks are shared across Zenith desktop widgets and drivers using lock-free, zero-allocation circular ring buffers mapped directly into the device DMA descriptor ring.
+    - **Unified Declarative theme overlays:** Interface elements, themes, layout maps, and animation timing states are fully declarative and serializable, allowing highly responsive desktop adjustments and seamless high-contrast accessibility rendering.
+
+```
++---------------------------------------------------------------------------------+
+|                                 S-MED SHARD                                     |
++---------------------------------------------------------------------------------+
+|  [Lock-Free Zero-Allocation Stream Channels]   [Direct Hardware Framebuffer]     |
++---------------------------------------------------------------------------------+
+                                       |
+                                       v
+                     [Hardware DMA Ring Buffer Transfer]
+```
+
+---
+
+## 10.7 Architectural Domination and Comparison Matrix
+
+| Technical Area | Fedora Workstation / Silverblue | SigmaOS Sovereign Architecture |
+| :--- | :--- | :--- |
+| **Package Management** | SQLite metadata, heavy pre/post shell scripts | SHA-256 CAS repository, zero-hook declarative state |
+| **Process Control** | Centrained monolithic systemd daemon (Ring 0) | S6-inspired decoupled child watchdogs (Ring 3) |
+| **Auto-Provisioning** | Python Anaconda installer, Kickstart scripts | Self-booting UEFI image builder, declarative JSON |
+| **Access Enforcement** | SELinux Type-Enforcement policies | Hardware-gated CapabilityToken & PledgeManager |
+| **Root Image State** | rpm-ostree git-like mutable deployments | Immutable Merkle-tree roots, zero-reboot CoW updates |
+| **Media Compositing** | PipeWire audio + Wayland compositor | S-MED lock-free streaming, Zenith direct framebuffer |
+
+By natively embedding these equivalent, zero-dependency, and capability-hardened architectures, SigmaOS delivers a secure, lightning-fast operating platform that makes Fedora and Red Hat legacy distributions completely obsolete.
+
+---
+
+# ⚔️ SECTION 11: Arch Linux Parity, Absorption, and Domination Specification
+## 🚀 Overcoming the Rolling Release Giant and the Standards of Minimalist Distributions
+
+Arch Linux is renowned across the open-source world for its extreme minimalism, adherence to the KISS principle ("Keep It Simple, Stupid"), user-centric control, and the rolling release model. Its primary pillars include the incredibly fast Pacman package manager, the massive user-curated Arch User Repository (AUR), the Arch Build System (ABS) for compiling from source, and a rolling update scheme that completely avoids discrete version upgrades.
+
+Despite its strengths, Arch Linux is severely fragmented. It relies on ambient systemd complexity, lacks isolation for user-submitted packages (exposing users to security risks in the AUR), suffers from broken updates during package state shifts, and demands high cognitive overhead for manual configuration.
+
+SigmaOS systematically absorbs the minimalist and rolling philosophies of Arch Linux and implements zero-dependency, capability-secured, and transaction-backed equivalents. By executing all components inside isolated, Ring 3 Shards governed under a hardware-enforced zero-trust permission model, SigmaOS delivers a rolling platform that is completely stable, secure, and bulletproof.
+
+```
++---------------------------------------------------------------------------------------------------+
+|                                   SOVEREIGN ARCH-PARITY CORE                                      |
++---------------------------------------------------------------------------------------------------+
+|  [S-PAC ALPM Package Engine]  [S-AUR Secure User Shards]  [S-ABS Source Forge]  [S-ROLL Sandbox]  |
++---------------------------------------------------------------------------------------------------+
+|               Hardware-Enforced Microkernel-Level CapabilityGate & PledgeManager Checks            |
++---------------------------------------------------------------------------------------------------+
+|               Unified BSD-Style Sovereign Configuration & Modular Service Chains (S-CONF)          |
++---------------------------------------------------------------------------------------------------+
+```
+
+---
+
+## 11.1 Pacman & ALPM Engine Absorption (S-PAC)
+*   **The Arch Model:** Employs the `pacman` package manager and its backend library `libalpm` (Arch Linux Package Management). It utilizes fast, simple `.pkg.tar.zst` packages with flat sync databases to manage rolling state transitions.
+*   **The Monolithic Flaw:** Pacman lacks transactional rollback boundaries. If an update is interrupted or contains a conflicting shared library (such as a glibc transition), the entire system can enter an unbootable state. Additionally, flat file databases are prone to lock corruption and race conditions.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Transaction-Backed Rolling Updates:** All package operations in `src/sigpkg/transaction.rs` are executed as isolated, atomic transactions. If any segment fails or is aborted, the system instantly rollbacks state to the previous immutable checkpoint in under 1ms.
+    - **Zero-Allocation Sync Databases:** Replaces bloated flat file databases with read-only, content-addressed indexing structures. Package lookups and dependency resolution utilize our zero-allocation `contains_case_insensitive` and SAT solver pipelines.
+    - **Lock-Free Atomic Symlink Swaps:** Files are written to content-addressed hashed directory segments and activated instantly via lock-free symlink switches, eliminating directory conflicts and partial installation corruption.
+
+```
+[Pacman Update triggered] -> [S-PAC CAS Shard] -> [Stages files in SHA-256 directories]
+                                     |
+                                     v
+                        [Performs sub-millisecond atomic symlink swap] -> [Updates active root Merkle hash]
+```
+
+---
+
+## 11.2 Arch User Repository (AUR) Absorption (S-AUR)
+*   **The Arch Model:** The AUR is a community-driven repository where users share build recipes (`PKGBUILD`). Users compile and install packages manually or using helper tools (such as yay or paru).
+*   **The Monolithic Flaw:** AUR recipes execute arbitrary shell commands during compilation and installation with ambient root authority. This exposes users to serious malware, data theft, and supply-chain exploits.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Sandboxed Compilation Shards:** Replaces unsafe compilation loops with isolated Ring 3 build sandboxes governed under the `PledgeManager`. Build processes have absolutely no access to the network, user documents, or kernel registers unless explicitly granted via a transient capability token.
+    - **Cryptographic PQC Validation:** All S-AUR recipes are cryptographically signed using Dilithium-5 keys. The recipe manager `src/sigpkg/recipe.rs` verifies the integrity of the build steps before any instruction is allowed to compile.
+    - **Functional Local Recipe Caching:** Standardizes packages under pure, state-free recipes. Build artifacts are stored in content-addressed storage (CAS), completely avoiding overlap and namespace collision.
+
+---
+
+## 11.3 Arch Build System (ABS) & Source Forge Absorption (S-ABS)
+*   **The Arch Model:** ABS is a ports-like system for compiling packages directly from source, allowing power users to apply custom compilation flags and strip bloated features.
+*   **The Monolithic Flaw:** Compiling from source requires heavy GCC/LLVM toolchains, consumes substantial CPU/RAM resources, and lacks predictable optimization limits.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Zero-Dependency Compilation Shard (S-ABS):** Core build scripts are parsed and processed by our zero-allocation, lightweight compile-time engines, avoiding dependency on heavy external shell toolchains.
+    - **Hardware-Targeted Code Generation:** S-ABS analyzes the host processor's capability bitmask dynamically, automatically compiling source scripts with exact x86_64 or specialized hardware pipeline optimizations (such as AVX-512 or AMX).
+    - **Parallel Lock-Free Builders:** Compilations are split across asynchronous thread pools, passing intermediate build frames through lock-free channels to ensure maximum throughput with zero lock contention.
+
+---
+
+## 11.4 Minimalist BSD-Style Configuration (S-CONF)
+*   **The Arch Model:** Arch relies on minimal, manual configurations (like editing `/etc/fstab`, `/etc/mkinitcpio.conf`, and `/etc/resolv.conf`) managed alongside systemd services.
+*   **The Monolithic Flaw:** Text configurations are chaotic, scattered across the filesystem, and highly prone to syntax errors that can prevent the system from booting.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Unified Declarative JSON Configs:** Completely eliminates configuration fragmentation. The entire system configuration (including hardware profiles, network sockets, active pledges, and user accounts) is defined in a single, declarative, and structured JSON manifest.
+    - **Self-Healing Configuration Rollbacks:** If a manual configuration edit introduces a syntax error, the initialization server `src/init/` immediately detects the failure, rejects the active manifest, and rolls back to the last verified Merkle-root config state.
+    - **Lock-Free Hot-Reloading:** System configurations are hot-reloaded dynamically by updating shared memory segments. Services adapt to updated rules on-the-fly without needing reboots or daemon restarts.
+
+---
+
+## 11.5 Continuous Rolling Updates (S-ROLL)
+*   **The Arch Model:** Arch employs a rolling release model where system packages are continuously updated to the latest upstream versions without discrete operating system upgrade steps.
+*   **The Monolithic Flaw:** Rolling updates frequently introduce breaking library ABI changes (e.g., updating openssl or glibc), breaking downstream dependencies and preventing active processes from executing.
+*   **The SigmaOS Sovereign Object-Oriented Solution:**
+    - **Immutable CoW Pages for Active Processes:** Upgraded libraries are mapped into new virtual memory frames using our virtual memory manager. Active processes continue executing on their existing Copy-on-Write pages, completely avoiding mid-execution crashes.
+    - **Dynamic ABI-Translation Layers:** If a legacy application depends on a deprecated library version, the compatibility manager `src/compatibility/cross_platform.rs` immediately intercepts the calls and translates them to matching API points on-the-fly.
+    - **Sub-Millisecond Image Swapping:** Major system transitions are committed as atomic updates. The bootloader simply redirects its virtual mapping pointers to the new verified Merkle root, executing the upgraded system instantly upon reboot or state transition.
+
+---
+
+## 11.6 Architectural Domination and Comparison Matrix
+
+| Technical Area | Arch Linux Workstation | SigmaOS Sovereign Architecture |
+| :--- | :--- | :--- |
+| **Package Engine** | Fast but fragile flat databases; no rollback boundaries | Transaction-backed CAS updates, atomic symlink swaps |
+| **User Repositories** | Unsafe AUR helper scripts executing under ambient root | Sandboxed Ring 3 compilation, PQC signature validation |
+| **Source Compilations** | Heavy ports-like ABS compilation requiring bulky toolchains | Zero-dependency S-ABS forge, hardware-targeted code gen |
+| **System Init & Config** | Scattered manual text configuration files, systemd-linked | Declarative, pure-functional JSON config, self-healing rollbacks |
+| **Rolling Stability** | High risk of ABI breakage and unbootable states | Immutable Copy-on-Write pages, ABI translation layers |
+
+By absorbing the core rolling release and KISS philosophies of Arch Linux while securing them with capability-based sandboxing and transaction-backed Merkle filesystem states, SigmaOS establishes the ultimate roll-forward operating platform that makes Arch completely obsolete.
