@@ -109,6 +109,73 @@ impl SupersetApplicationCapability for SovereignVideoPlayerCapability {
     }
 }
 
+/// OOP Registry pattern to manage and query boxed SupersetApplicationCapability interfaces
+pub struct SovereignCapabilityRegistry {
+    capabilities: HashMap<String, Box<dyn SupersetApplicationCapability>>,
+}
+
+impl SovereignCapabilityRegistry {
+    pub fn new() -> Self {
+        Self {
+            capabilities: HashMap::new(),
+        }
+    }
+
+    /// Dynamically register a capability
+    pub fn register_capability(&mut self, capability: Box<dyn SupersetApplicationCapability>) {
+        let name = capability.app_name().to_string();
+        self.capabilities.insert(name, capability);
+    }
+
+    /// Query if any registered application possesses the given capability
+    pub fn find_app_by_capability(&self, capability_name: &str) -> Option<&str> {
+        for (name, cap) in &self.capabilities {
+            if cap.has_superset_capability(capability_name) {
+                return Some(name.as_str());
+            }
+        }
+        None
+    }
+}
+
+impl Default for SovereignCapabilityRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OOP Composite pattern combining multiple capabilities under a single interface
+pub struct CompositeApplicationCapability {
+    name: String,
+    components: Vec<Box<dyn SupersetApplicationCapability>>,
+}
+
+impl CompositeApplicationCapability {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            components: Vec::new(),
+        }
+    }
+
+    /// Add a capability component to the composite
+    pub fn add_component(&mut self, component: Box<dyn SupersetApplicationCapability>) {
+        self.components.push(component);
+    }
+}
+
+impl SupersetApplicationCapability for CompositeApplicationCapability {
+    fn app_name(&self) -> &'static str {
+        Box::leak(self.name.clone().into_boxed_str())
+    }
+
+    fn has_superset_capability(&self, capability_name: &str) -> bool {
+        self.components
+            .iter()
+            .any(|comp| comp.has_superset_capability(capability_name))
+    }
+}
+
 /// Target platform
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetPlatform {
@@ -556,5 +623,38 @@ mod tests {
 
         // Verify mathematical proof that Sovereign Video Player is a strict, complete superset of VLC
         assert!(sov_player.is_strict_superset_of_vlc(&vlc));
+    }
+
+    #[test]
+    fn test_sovereign_capability_registry_and_composite() {
+        let mut registry = SovereignCapabilityRegistry::new();
+
+        // Register individual capabilities dynamically (Polymorphism & OOP Factory/Registry)
+        registry.register_capability(Box::new(MediaDecoderCapability::new()));
+        registry.register_capability(Box::new(HtmlRendererCapability::new()));
+
+        // Query the registry polymorphically
+        assert_eq!(
+            registry.find_app_by_capability("mp4"),
+            Some("VLC Media Player")
+        );
+        assert_eq!(
+            registry.find_app_by_capability("javascript"),
+            Some("Chromium Browser")
+        );
+        assert_eq!(registry.find_app_by_capability("vvc"), None);
+
+        // Create a composed multi-purpose application capability (OOP Composite pattern)
+        let mut composite =
+            CompositeApplicationCapability::new("Sovereign Multi-App Workspace".to_string());
+        composite.add_component(Box::new(SovereignVideoPlayerCapability::new()));
+        composite.add_component(Box::new(HtmlRendererCapability::new()));
+
+        // Verify the composite possesses both HTML rendering and Sovereign next-gen video capabilities
+        assert_eq!(composite.app_name(), "Sovereign Multi-App Workspace");
+        assert!(composite.has_superset_capability("vvc"));
+        assert!(composite.has_superset_capability("javascript"));
+        assert!(composite.has_superset_capability("ai_upscale"));
+        assert!(!composite.has_superset_capability("non_existent"));
     }
 }
