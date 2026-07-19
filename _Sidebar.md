@@ -493,8 +493,6 @@
 
 ## Community
 
-## Community
-
 - [Code of Conduct](CODE_OF_CONDUCT)
 
 - [Governance](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/GOVERNANCE.md)
@@ -508,3 +506,42 @@
 - [Component Integration](Component-Integration)
 
 - [RFC Process](Developer-Workflow-And-Governance#rfc-process)
+
+## Implementation Plans & Blueprints
+
+- [Algorithms Status](ALGORITHMS_STATUS)
+
+- [Bolt Absorption Plan](BOLT_ABSORPTION_PLAN)
+
+- [Distro Parity Plan](DISTRO_PARITY_PLAN)
+
+- [Improvement Plan](ImprovementPlan)
+
+- [Integrated Absorption & Implementation Plan](INTEGRATED_ABSORPTION_AND_IMPLEMENTATION_PLAN)
+
+- [Kernel Self-Hosting Roadmap](KERNEL_SELF_HOSTING_ROADMAP)
+
+- [Linux Core Architecture Absorption](LINUX_CORE_ARCHITECTURE_ABSORPTION)
+
+- [Linux Distro Parity Roadmap](LINUX_DISTRO_PARITY_ROADMAP)
+
+- [Linux Distros Absorption Plan](LINUX_DISTROS_ABSORPTION_PLAN)
+
+- [Linux Hardware Absorption Roadmap](LINUX_HARDWARE_ABSORPTION_ROADMAP)
+
+- [Peripheral Compatibility Plan](PERIPHERAL_COMPATIBILITY_PLAN)
+
+- [Repos Absorption Plan](REPOS_ABSORPTION_PLAN)
+
+- [Repos Implementation Plan](REPOS_IMPLEMENTATION_PLAN)
+
+- [Sovereign App Absorption Plan](SOVEREIGN_APP_ABSORPTION_PLAN)
+
+- [Sovereign OS Improvement Specification](SOVEREIGN_OS_IMPROVEMENT_SPECIFICATION)
+
+- [Sub-System Consolidation Roadmap](SUB-SYSTEM_CONSOLIDATION_ROADMAP)
+
+- [Universal Application Absorption Plan](UNIVERSAL_APPLICATION_ABSORPTION_PLAN)
+
+- [Universal Driver Support Plan](UNIVERSAL_DRIVER_SUPPORT_PLAN)
+
