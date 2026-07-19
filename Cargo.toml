@@ -10,7 +10,7 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 [dependencies]
 # Core dependencies (minimal as per SigmaOS philosophy)
 uuid = { version = "1.4", features = ["v4"] }
-rand = "0.8"
+rand = "0.10"
 
 [dev-dependencies]
 # Test dependencies
