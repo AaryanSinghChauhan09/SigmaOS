@@ -3,6 +3,7 @@ pub mod editor;
 pub mod gamification;
 pub mod notes;
 pub mod screen_recorder;
+pub mod screenshot;
 pub mod tasks;
 pub mod terminal;
 
@@ -23,6 +24,10 @@ pub use screen_recorder::{
     AudioQuality, FfmpegBackend, GStreamerBackend, RecorderError, RecordingBackend,
     RecordingConfig, RecordingFormat, RecordingProgress, RecordingRegion, RecordingState,
     ScreenRecorder, VideoQuality,
+};
+pub use screenshot::{
+    CaptureRegion, ImageFormat, MacOsBackend, ScreenshotBackend, ScreenshotConfig, ScreenshotError,
+    ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
