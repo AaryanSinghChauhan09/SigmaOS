@@ -68,6 +68,9 @@ jobs:
         profile: minimal
         toolchain: stable
     
+    - name: Initialize build directory
+      run: mkdir -p build
+
     - name: Run unit tests
       run: cargo test --lib
     
@@ -75,7 +78,7 @@ jobs:
       run: cargo test --test '*'
     
     - name: Run smoke tests
-      run: bash ./scripts/smoke-test.sh
+      run: bash scripts/smoke-test.sh
 
   security:
     runs-on: ubuntu-latest
