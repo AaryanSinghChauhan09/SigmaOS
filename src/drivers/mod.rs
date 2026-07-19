@@ -57,6 +57,10 @@ pub use more_devices::{
     GameportJoystickDriver, IdeControllerDriver, IntelXeGpuDriver, ParallelPrinterDriver,
     PcieGen5NvmeDriver, SoundBlaster16Driver, Thunderbolt4Controller, Wifi7Adapter,
 };
+=======
+pub use legacy_keyboard::LegacyKeyboard;
+pub use modern_usb::ModernUsbController;
+>>>>>>> origin/jules-9194715674943762331-96d1604a
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
