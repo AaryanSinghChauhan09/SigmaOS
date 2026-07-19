@@ -91,12 +91,13 @@ impl Default for RoundRobinConfig {
     }
 }
 
-/// Enhanced priority-aware round-robin scheduler
+/// Enhanced priority-aware round-robin scheduler with O(1) work-stealing
 pub struct RoundRobinScheduler {
     processes: Vec<ScheduledProcess>,
     pub current_index: usize,
     config: RoundRobinConfig,
     current_time: u64,
+    ready_queue_head: Option<usize>, // O(1) tracking of ready processes
 }
 
 impl RoundRobinScheduler {
@@ -106,6 +107,7 @@ impl RoundRobinScheduler {
             current_index: 0,
             config: RoundRobinConfig::default(),
             current_time: 0,
+            ready_queue_head: None,
         }
     }
 
@@ -115,6 +117,7 @@ impl RoundRobinScheduler {
             current_index: 0,
             config,
             current_time: 0,
+            ready_queue_head: None,
         }
     }
 
@@ -122,7 +125,12 @@ impl RoundRobinScheduler {
         if self.processes.len() >= self.config.max_processes {
             return Err(SchedulerError::TooManyProcesses);
         }
+        let idx = self.processes.len();
         self.processes.push(ScheduledProcess::new(process));
+        // Update ready_queue_head if this is the first ready process
+        if self.ready_queue_head.is_none() && self.processes[idx].process.state == ProcessState::Ready {
+            self.ready_queue_head = Some(idx);
+        }
         Ok(())
     }
 
@@ -131,16 +139,25 @@ impl RoundRobinScheduler {
             return None;
         }
 
-        let start_index = self.current_index;
-        loop {
-            if self.processes[self.current_index].process.state == ProcessState::Ready {
-                return Some(&self.processes[self.current_index].process);
-            }
-            self.current_index = (self.current_index + 1) % self.processes.len();
-            if self.current_index == start_index {
-                return None;
+        // O(1) lookup using ready_queue_head
+        if let Some(head) = self.ready_queue_head {
+            if self.processes[head].process.state == ProcessState::Ready {
+                self.current_index = head;
+                return Some(&self.processes[head].process);
             }
         }
+
+        // Fallback: find first ready process and update head
+        for (i, proc) in self.processes.iter().enumerate() {
+            if proc.process.state == ProcessState::Ready {
+                self.ready_queue_head = Some(i);
+                self.current_index = i;
+                return Some(&proc.process);
+            }
+        }
+
+        self.ready_queue_head = None;
+        None
     }
 
     pub fn tick(&mut self) {
@@ -190,13 +207,31 @@ impl RoundRobinScheduler {
     }
 
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
-        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid == pid) {
+        if let Some((idx, entry)) = self.processes.iter_mut().enumerate().find(|(i, e)| e.process.pid == pid) {
             entry.process.state = state;
+            // Update ready_queue_head when state changes
+            if state == ProcessState::Ready && self.ready_queue_head.is_none() {
+                self.ready_queue_head = Some(idx);
+            } else if state != ProcessState::Ready && self.ready_queue_head == Some(idx) {
+                self.ready_queue_head = None;
+            }
         }
     }
 
     pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|e| e.process.pid != pid);
+        if let Some(idx) = self.processes.iter().position(|e| e.process.pid == pid) {
+            self.processes.remove(idx);
+            // Reset ready_queue_head if it pointed to removed process
+            if self.ready_queue_head == Some(idx) {
+                self.ready_queue_head = None;
+            }
+            // Adjust ready_queue_head if it was after removed index
+            if let Some(head) = self.ready_queue_head {
+                if head > idx {
+                    self.ready_queue_head = Some(head - 1);
+                }
+            }
+        }
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
             self.current_index = 0;
         }
