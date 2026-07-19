@@ -32,7 +32,8 @@ impl Transaction {
     /// Add install operation
     pub fn install(&mut self, package: Package) -> Result<(), TransactionError> {
         // Resolve dependencies first
-        let resolved = self.resolver.resolve(&package.name, &crate::sigpkg::VersionConstraint::Any)?;
+        let resolved = self.resolver.resolve(&package.name, &crate::sigpkg::VersionConstraint::Any)
+            .map_err(|e| TransactionError::DependencyConflict(format!("{:?}", e)))?;
         
         for dep in resolved {
             if self.store.get(&dep.name).is_none() {

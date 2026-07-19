@@ -5,12 +5,21 @@ use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Pledge promise representing process permissions
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PledgePromise {
     /// Allowed permissions
     permissions: Vec<Permission>,
     /// Whether pledge is active
     active: AtomicBool,
+}
+
+impl Clone for PledgePromise {
+    fn clone(&self) -> Self {
+        Self {
+            permissions: self.permissions.clone(),
+            active: AtomicBool::new(self.active.load(Ordering::SeqCst)),
+        }
+    }
 }
 
 impl PledgePromise {

@@ -153,9 +153,9 @@ mod tests {
         let v1 = Version::new(1, 0, 0);
         let v2 = Version::new(1, 0, 1);
         
-        assert!(solver.satisfies_constraint(&v2, &VersionConstraint::GreaterThan(v1)));
-        assert!(solver.satisfies_constraint(&v1, &VersionConstraint::LessThan(v2)));
-        assert!(solver.satisfies_constraint(&v1, &VersionConstraint::Exact(v1)));
+        assert!(solver.satisfies_constraint(&v2, &VersionConstraint::GreaterThan(v1.clone())));
+        assert!(solver.satisfies_constraint(&v1, &VersionConstraint::LessThan(v2.clone())));
+        assert!(solver.satisfies_constraint(&v1, &VersionConstraint::Exact(v1.clone())));
     }
 
     #[test]

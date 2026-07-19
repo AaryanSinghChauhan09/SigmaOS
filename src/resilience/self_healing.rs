@@ -2,7 +2,7 @@
 // Event-driven recovery and rollback snapshots
 
 use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH, Duration};
 
 /// Recovery event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,12 +40,14 @@ pub struct SystemSnapshot {
 
 impl SystemSnapshot {
     pub fn new(description: String) -> Self {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or(Duration::from_secs(0));
+        let timestamp = now.as_secs();
+        let id = format!("snapshot-{}-{}", timestamp, now.subsec_nanos());
         Self {
-            id: uuid::Uuid::new_v4().to_string(),
-            timestamp: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            id,
+            timestamp,
             system_state: HashMap::new(),
             configuration: HashMap::new(),
             description,

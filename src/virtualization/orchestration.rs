@@ -73,7 +73,7 @@ impl VirtualMachine {
 
     pub fn start(&mut self) -> Result<(), VirtualizationError> {
         self.state = VmState::Running;
-        println!("Starting VM {} using {}", self.name, self.technology);
+        println!("Starting VM {} using {:?}", self.name, self.technology);
         Ok(())
     }
 
@@ -140,7 +140,7 @@ impl Container {
 
     pub fn start(&mut self) -> Result<(), VirtualizationError> {
         self.state = VmState::Running;
-        println!("Starting container {} using {}", self.name, self.runtime);
+        println!("Starting container {} using {:?}", self.name, self.runtime);
         Ok(())
     }
 
@@ -474,7 +474,7 @@ mod tests {
 
     #[test]
     fn test_resource_pool() {
-        let pool = ResourcePool::new(16, 32768, 1000);
+        let mut pool = ResourcePool::new(16, 32768, 1000);
         assert!(pool.can_allocate(4, 8192, 100));
         assert!(pool.allocate(4, 8192, 100).is_ok());
         assert_eq!(pool.get_available_cpus(), 12);

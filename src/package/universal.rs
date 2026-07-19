@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 /// Package format type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     Deb,      // apt
     Rpm,      // yum
