@@ -17,6 +17,7 @@ pub enum VideoUSBError { Success = 0, NotFound = 1 }
 pub trait USBVideo {
     fn id(&self) -> VideoUSBID;
     fn is_streaming(&self) -> bool;
+    fn set_streaming_state(&self, state: usize);
 }
 
 #[repr(C)]
@@ -37,12 +38,13 @@ impl SimpleUSBVideo {
 impl USBVideo for SimpleUSBVideo {
     fn id(&self) -> VideoUSBID { self.id }
     fn is_streaming(&self) -> bool { self.streaming.load(Ordering::SeqCst) == 1 }
+    fn set_streaming_state(&self, state: usize) { self.streaming.store(state, Ordering::SeqCst); }
 }
 
 pub trait VideoUSBController {
     fn init(&mut self, video_id: VideoUSBID) -> Result<(), VideoUSBError>;
     fn start_stream(&mut self, video_id: VideoUSBID) -> Result<(), VideoUSBError>;
-    def stop_stream(&mut self, video_id: VideoUSBID) -> Result<(), VideoUSBError>;
+    fn stop_stream(&mut self, video_id: VideoUSBID) -> Result<(), VideoUSBError>;
 }
 
 #[repr(C)]
@@ -58,6 +60,17 @@ impl SimpleVideoUSBController {
             next_id: AtomicUsize::new(1),
         }
     }
+
+    pub fn get_video(&self, video_id: VideoUSBID) -> Option<&dyn USBVideo> {
+        for video_option in &self.video_devices {
+            if let Some(ref video) = *video_option {
+                if video.id() == video_id {
+                    return Some(video.as_ref());
+                }
+            }
+        }
+        None
+    }
 }
 
 impl VideoUSBController for SimpleVideoUSBController {
@@ -69,7 +82,7 @@ impl VideoUSBController for SimpleVideoUSBController {
         for video_option in &mut self.video_devices {
             if let Some(ref mut video) = *video_option {
                 if video.id() == video_id {
-                    video.streaming.store(1, Ordering::SeqCst);
+                    video.set_streaming_state(1);
                     return Ok(());
                 }
             }
@@ -81,7 +94,7 @@ impl VideoUSBController for SimpleVideoUSBController {
         for video_option in &mut self.video_devices {
             if let Some(ref mut video) = *video_option {
                 if video.id() == video_id {
-                    video.streaming.store(0, Ordering::SeqCst);
+                    video.set_streaming_state(0);
                     return Ok(());
                 }
             }
@@ -91,8 +104,8 @@ impl VideoUSBController for SimpleVideoUSBController {
 }
 
 pub trait VideoFormat {
-    def set_format(&mut self, video_id: VideoUSBID, width: u16, height: u16, format: u8) -> Result<(), VideoUSBError>;
-    def get_frame(&self, video_id: VideoUSBID, buffer: &mut [u8]) -> Result<usize, VideoUSBError>;
+    fn set_format(&mut self, video_id: VideoUSBID, width: u16, height: u16, format: u8) -> Result<(), VideoUSBError>;
+    fn get_frame(&self, video_id: VideoUSBID, buffer: &mut [u8]) -> Result<usize, VideoUSBError>;
 }
 
 #[repr(C)]
