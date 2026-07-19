@@ -27,9 +27,14 @@ impl CapabilityToken {
         self
     }
 
+    /// Check if path is safe from traversal (contains no relative ".." segments)
+    pub fn is_safe_path(path: &str) -> bool {
+        !path.contains("..")
+    }
+
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
+        if Self::is_safe_path(path) && path.starts_with("/var/www") {
             self.bits |= 1 << 2;
         }
         self
@@ -37,7 +42,7 @@ impl CapabilityToken {
 
     /// Allow file write access
     pub fn allow_write(mut self, path: &str) -> Self {
-        if path.starts_with("/tmp") || path.starts_with("/home") {
+        if Self::is_safe_path(path) && (path.starts_with("/tmp") || path.starts_with("/home")) {
             self.bits |= 1 << 3;
         }
         self
@@ -195,5 +200,16 @@ mod tests {
         let token = CapabilityToken::new().allow_read("/var/www");
         assert!(verifier.verify_access(&token, Permission::FileRead));
         assert!(!verifier.verify_access(&token, Permission::NetworkTcp));
+    }
+
+    #[test]
+    fn test_path_traversal_prevention() {
+        // Safe path should be allowed
+        let safe_token = CapabilityToken::new().allow_read("/var/www/index.html");
+        assert!(safe_token.has_permission(Permission::FileRead));
+
+        // Malicious traversal path should be blocked
+        let dangerous_token = CapabilityToken::new().allow_read("/var/www/../../etc/shadow");
+        assert!(!dangerous_token.has_permission(Permission::FileRead));
     }
 }
