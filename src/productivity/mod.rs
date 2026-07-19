@@ -2,6 +2,7 @@
 pub mod calendar;
 pub mod clipboard_manager;
 pub mod editor;
+pub mod email;
 pub mod gamification;
 pub mod notes;
 pub mod screen_recorder;
@@ -21,6 +22,10 @@ pub use editor::{
     CodeEditor, CompletionItem, CompletionKind, CursorPosition, Diagnostic, DiagnosticSeverity,
     Document, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient, RegexHighlighter,
     SyntaxHighlighter, SyntaxToken, TextRange, TextSelection, TokenType,
+};
+pub use email::{
+    EmailAccountConfig, EmailAddress, EmailAttachment, EmailBackend, EmailClient, EmailError,
+    EmailFilter, EmailFolder, EmailMessage, EmailPriority, ImapSmtpBackend,
 };
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
