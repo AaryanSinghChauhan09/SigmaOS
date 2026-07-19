@@ -6,7 +6,7 @@ set -e
 
 echo "Running SigmaOS smoke tests..."
 
-# Ensure build directory exists
+# Ensure build directory exists prior to executing standard smoke tests
 mkdir -p build
 
 # Test 1: Check if build directory exists

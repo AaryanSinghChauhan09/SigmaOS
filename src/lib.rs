@@ -43,11 +43,20 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UdfAncientDevice, UsbHidDriver,
-    VesaDriver, VesaError, VesaModeInfo,
+    AdLibSynthDriver, AppleSiliconUnifiedMemoryBus, Bluetooth5_4_Adapter, CgaGraphicsDriver,
+    CxlMemoryDriver, create_cga_graphics, create_floppy_disk, create_parallel_printer,
+    create_sound_blaster_16, FloppyDiskDriver, GameportJoystickDriver, GpuCommand, GpuDriver,
+    GpuError, HidError, HidKeyboardEvent, HidReportType, IdeControllerDriver, InputDriver,
+    InputEvent, InputType, IntelXeGpuDriver, KernelReleaseInfo, LinuxReleaseDriver,
+    Longterm5_10_TpmDriver, Longterm5_15_SerialDriver, Longterm6_12_NetworkDriver,
+    Longterm6_18_StorageDriver, Longterm6_1_InputDriver, Longterm6_6_AudioDriver,
+    MainlineGpuDriver, Ne2000NetworkDriver, NetworkCommand, NetworkDriver, NetworkError,
+    NetworkType, NvlinkBusDriver, ParallelPrinterDriver, PciIdeBridge, PcieGen5NvmeDriver,
+    PcieGen6Bridge, Prepatch6_23_Rc1_AiDriver, Ps2MouseDriver, Sata3Controller,
+    SerialMouseDriver, SoundBlaster16Driver, Stable6_22_SensorDriver, StorageCommand,
+    StorageDriver, StorageError, StorageType, Thunderbolt4Controller, UdfAncientDevice,
+    Ufs4StorageDriver, Usb4HostController, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    VgaTextModeDriver, Wifi7Adapter,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
