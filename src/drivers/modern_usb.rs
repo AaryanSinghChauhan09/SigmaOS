@@ -9,6 +9,12 @@ pub struct ModernUsbController {
     buffer: [u8; 64], // Simulated fast DMA buffer
 }
 
+impl Default for ModernUsbController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ModernUsbController {
     pub fn new() -> Self {
         Self {
