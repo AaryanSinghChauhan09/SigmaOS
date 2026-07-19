@@ -130,7 +130,8 @@ impl SupersetApplicationCapability for MediaDecoderCapability {
                 "720p" => 1,
                 _ => 0,
             };
-            get_resolution_score(&self.max_resolution) >= get_resolution_score(&other.max_resolution)
+            get_resolution_score(&self.max_resolution)
+                >= get_resolution_score(&other.max_resolution)
         } else {
             false
         }
@@ -536,19 +537,11 @@ mod tests {
         // Basic player is NOT compatible as a superset of VLC (it lacks vp9/hevc and 4K)
         assert!(!basic_player.is_compatible_with(&vlc));
 
-        let chrome = HtmlRendererCapability::new(
-            "Chrome".to_string(),
-            "Blink".to_string(),
-            true,
-            true,
-        );
+        let chrome =
+            HtmlRendererCapability::new("Chrome".to_string(), "Blink".to_string(), true, true);
 
-        let old_ie = HtmlRendererCapability::new(
-            "IE".to_string(),
-            "Trident".to_string(),
-            false,
-            false,
-        );
+        let old_ie =
+            HtmlRendererCapability::new("IE".to_string(), "Trident".to_string(), false, false);
 
         // Chrome is compatible with old_ie's requirements
         assert!(chrome.is_compatible_with(&old_ie));
