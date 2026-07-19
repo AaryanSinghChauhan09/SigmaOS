@@ -18,7 +18,7 @@ pub struct TrafficPacket {
 }
 
 /// Network protocol
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Protocol {
     Tcp,
     Udp,
@@ -319,8 +319,8 @@ impl NetworkTrafficAnalyzer {
         } else {
             if self.connections.len() >= self.max_connections {
                 // Remove oldest connection
-                if let Some(key) = self.connections.keys().next() {
-                    self.connections.remove(key);
+                if let Some(key) = self.connections.keys().next().cloned() {
+                    self.connections.remove(&key);
                 }
             }
 

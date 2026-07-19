@@ -129,9 +129,8 @@ pub struct RuleBasedOptimizer {
 }
 
 /// Optimization rule
-#[derive(Debug, Clone)]
-struct OptimizationRule {
-    condition: Box<dyn Fn(&SystemState) -> bool>,
+pub struct OptimizationRule {
+    pub(crate) condition: Box<dyn Fn(&SystemState) -> bool>,
     recommendation: OptimizationRecommendation,
 }
 
@@ -172,7 +171,7 @@ impl RuleBasedOptimizer {
                             map
                         },
                         priority: ActionPriority::Medium,
-                        estimated_improvement: 10.0,
+                        estimated_impact: 10.0,
                     },
                 ],
                 expected_improvement_percent: 20.0,
@@ -201,7 +200,7 @@ impl RuleBasedOptimizer {
                             map
                         },
                         priority: ActionPriority::High,
-                        estimated_improvement: 20.0,
+                        estimated_impact: 20.0,
                     },
                 ],
                 expected_improvement_percent: 30.0,

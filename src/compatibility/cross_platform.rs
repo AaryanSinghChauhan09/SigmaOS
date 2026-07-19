@@ -9,11 +9,15 @@ pub trait SupersetApplicationCapability {
     fn app_name(&self) -> &'static str;
     /// Verifies if a specific capability (e.g. "mp4", "javascript", etc.) is fully supported
     fn has_superset_capability(&self, capability_name: &str) -> bool;
+    /// For polymorphic downcasting
+    fn as_any(&self) -> &dyn std::any::Any;
+    /// Verifies compatibility with another capability
+    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool;
 }
 
 /// VLC Media Player superset capability match (OOP Class)
 pub struct MediaDecoderCapability {
-    supported_formats: Vec<&'static str>,
+    pub supported_formats: Vec<&'static str>,
 }
 
 impl MediaDecoderCapability {
@@ -32,11 +36,28 @@ impl SupersetApplicationCapability for MediaDecoderCapability {
     fn has_superset_capability(&self, capability_name: &str) -> bool {
         self.supported_formats.contains(&capability_name)
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
+        if let Some(other) = required.as_any().downcast_ref::<MediaDecoderCapability>() {
+            for format in &other.supported_formats {
+                if !self.has_superset_capability(format) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
 }
 
 /// Chromium Browser superset capability match (OOP Class)
 pub struct HtmlRendererCapability {
-    features: Vec<&'static str>,
+    pub features: Vec<&'static str>,
 }
 
 impl HtmlRendererCapability {
@@ -54,6 +75,23 @@ impl SupersetApplicationCapability for HtmlRendererCapability {
 
     fn has_superset_capability(&self, capability_name: &str) -> bool {
         self.features.contains(&capability_name)
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
+        if let Some(other) = required.as_any().downcast_ref::<HtmlRendererCapability>() {
+            for feature in &other.features {
+                if !self.has_superset_capability(feature) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -106,6 +144,30 @@ impl SupersetApplicationCapability for SovereignVideoPlayerCapability {
     fn has_superset_capability(&self, capability_name: &str) -> bool {
         self.supported_formats.contains(&capability_name)
             || self.advanced_features.contains(&capability_name)
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
+        if let Some(other) = required.as_any().downcast_ref::<MediaDecoderCapability>() {
+            self.is_strict_superset_of_vlc(other)
+        } else if let Some(other) = required.as_any().downcast_ref::<SovereignVideoPlayerCapability>() {
+            for format in &other.supported_formats {
+                if !self.has_superset_capability(format) {
+                    return false;
+                }
+            }
+            for feat in &other.advanced_features {
+                if !self.has_superset_capability(feat) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -173,6 +235,14 @@ impl SupersetApplicationCapability for CompositeApplicationCapability {
         self.components
             .iter()
             .any(|comp| comp.has_superset_capability(capability_name))
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
+        self.components.iter().any(|comp| comp.is_compatible_with(required))
     }
 }
 
@@ -253,108 +323,6 @@ impl ApplicationBinary {
     }
 }
 
-/// Polymorphic trait to verify matching capabilities for equivalent third-party software.
-pub trait SupersetApplicationCapability {
-    fn capability_name(&self) -> &str;
-    fn as_any(&self) -> &dyn std::any::Any;
-    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool;
-}
-
-/// Media decoder capability (e.g. for equivalent third-party software like VLC Media Player)
-#[derive(Debug, Clone)]
-pub struct MediaDecoderCapability {
-    pub name: String,
-    pub supported_codecs: Vec<String>,
-    pub max_resolution: String, // e.g. "1080p", "4K", "8K"
-}
-
-impl MediaDecoderCapability {
-    pub fn new(name: String, codecs: Vec<String>, max_resolution: String) -> Self {
-        Self {
-            name,
-            supported_codecs: codecs,
-            max_resolution,
-        }
-    }
-}
-
-impl SupersetApplicationCapability for MediaDecoderCapability {
-    fn capability_name(&self) -> &str {
-        &self.name
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-
-    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
-        if let Some(other) = required.as_any().downcast_ref::<MediaDecoderCapability>() {
-            // Self is compatible with required if self supports all required codecs
-            for codec in &other.supported_codecs {
-                if !self.supported_codecs.contains(codec) {
-                    return false;
-                }
-            }
-            // Resolution check
-            let get_resolution_score = |res: &str| match res.to_lowercase().as_str() {
-                "8k" => 4,
-                "4k" => 3,
-                "1080p" => 2,
-                "720p" => 1,
-                _ => 0,
-            };
-            get_resolution_score(&self.max_resolution)
-                >= get_resolution_score(&other.max_resolution)
-        } else {
-            false
-        }
-    }
-}
-
-/// HTML Renderer capability (e.g. for equivalent third-party software like Chromium Browser)
-#[derive(Debug, Clone)]
-pub struct HtmlRendererCapability {
-    pub name: String,
-    pub engine: String, // e.g. "Blink", "WebKit", "Gecko"
-    pub supports_html5: bool,
-    pub supports_wasm: bool,
-}
-
-impl HtmlRendererCapability {
-    pub fn new(name: String, engine: String, supports_html5: bool, supports_wasm: bool) -> Self {
-        Self {
-            name,
-            engine,
-            supports_html5,
-            supports_wasm,
-        }
-    }
-}
-
-impl SupersetApplicationCapability for HtmlRendererCapability {
-    fn capability_name(&self) -> &str {
-        &self.name
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-
-    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
-        if let Some(other) = required.as_any().downcast_ref::<HtmlRendererCapability>() {
-            // Engine compatibility or generic check
-            if other.supports_html5 && !self.supports_html5 {
-                return false;
-            }
-            if other.supports_wasm && !self.supports_wasm {
-                return false;
-            }
-            true
-        } else {
-            false
-        }
-    }
-}
 
 /// Translation layer
 pub struct TranslationLayer {

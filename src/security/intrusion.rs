@@ -65,6 +65,8 @@ pub trait DetectionStrategy {
     fn analyze(&self, event: &SecurityEvent) -> Option<DetectionResult>;
     /// Get strategy name
     fn name(&self) -> &str;
+    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
 }
 
 /// Detection result
@@ -121,6 +123,14 @@ impl DetectionStrategy for SignatureDetection {
     fn name(&self) -> &str {
         "SignatureDetection"
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 /// Anomaly-based detection
@@ -168,6 +178,14 @@ impl DetectionStrategy for AnomalyDetection {
 
     fn name(&self) -> &str {
         "AnomalyDetection"
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
     }
 }
 
@@ -295,7 +313,7 @@ impl IntrusionDetectionSystem {
         ];
 
         if let Some(strategy) = self.strategies.iter_mut().find(|s| s.name() == "SignatureDetection") {
-            if let Some(sig_detection) = strategy.as_any().downcast_ref::<mut SignatureDetection>() {
+            if let Some(sig_detection) = strategy.as_any_mut().downcast_mut::<SignatureDetection>() {
                 for rule in default_rules {
                     sig_detection.add_rule(rule);
                 }
@@ -314,12 +332,6 @@ impl Default for IntrusionDetectionSystem {
     }
 }
 
-// Helper for downcasting
-impl dyn DetectionStrategy {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-}
 
 /// IDS errors
 #[derive(Debug, Clone, PartialEq, Eq)]
