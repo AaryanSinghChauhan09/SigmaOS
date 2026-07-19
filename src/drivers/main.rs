@@ -15,8 +15,9 @@ pub extern "C" fn _start() -> ! {
 #[cfg(not(target_os = "none"))]
 fn main() {}
 
-#[cfg(target_os = "none")]
+#[cfg(target_os = "none"])
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
+
