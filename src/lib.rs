@@ -1,6 +1,7 @@
 #![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 
 pub mod accessibility;
 pub mod automation;
@@ -33,8 +34,12 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+<<<<<<< HEAD
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
+=======
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+>>>>>>> origin/jules-11771805144959264946-c8324696
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -43,10 +48,18 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
+<<<<<<< HEAD
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+=======
+    create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UdfAncientDevice, UsbHidDriver,
+    VesaDriver, VesaError, VesaModeInfo,
+>>>>>>> origin/jules-11771805144959264946-c8324696
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
