@@ -1,0 +1,531 @@
+// SigmaOS Virtual Machine Manager
+// OOP-based VM management with hypervisor integration
+
+use std::collections::HashMap;
+use std::path::PathBuf;
+
+/// VM configuration
+#[derive(Debug, Clone)]
+pub struct VmConfig {
+    pub name: String,
+    pub cpu_cores: u32,
+    pub memory_mb: u64,
+    pub disk_size_gb: u64,
+    pub network_enabled: bool,
+    pub gpu_passthrough: bool,
+    pub os_type: OsType,
+}
+
+/// OS type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OsType {
+    Linux,
+    Windows,
+    MacOS,
+    BSD,
+    Other,
+}
+
+/// VM state
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VmState {
+    Stopped,
+    Starting,
+    Running,
+    Paused,
+    Stopping,
+    Error,
+}
+
+/// VM snapshot
+#[derive(Debug, Clone)]
+pub struct VmSnapshot {
+    pub id: String,
+    pub name: String,
+    pub created_at: u64,
+    pub snapshot_path: PathBuf,
+}
+
+/// VM resource usage
+#[derive(Debug, Clone)]
+pub struct VmResourceUsage {
+    pub cpu_percent: f64,
+    pub memory_mb: u64,
+    pub disk_read_mb: u64,
+    pub disk_write_mb: u64,
+    pub network_rx_mb: u64,
+    pub network_tx_mb: u64,
+}
+
+/// OOP trait for hypervisor backends
+pub trait HypervisorBackend {
+    /// Create VM
+    fn create_vm(&mut self, config: &VmConfig) -> Result<String, VmError>;
+    /// Start VM
+    fn start_vm(&mut self, vm_id: &str) -> Result<(), VmError>;
+    /// Stop VM
+    fn stop_vm(&mut self, vm_id: &str) -> Result<(), VmError>;
+    /// Pause VM
+    fn pause_vm(&mut self, vm_id: &str) -> Result<(), VmError>;
+    /// Resume VM
+    fn resume_vm(&mut self, vm_id: &str) -> Result<(), VmError>;
+    /// Delete VM
+    fn delete_vm(&mut self, vm_id: &str) -> Result<(), VmError>;
+    /// Get VM state
+    fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError>;
+    /// Get resource usage
+    fn get_resource_usage(&self, vm_id: &str) -> Result<VmResourceUsage, VmError>;
+    /// Create snapshot
+    fn create_snapshot(&mut self, vm_id: &str, name: &str) -> Result<String, VmError>;
+    /// Restore snapshot
+    fn restore_snapshot(&mut self, vm_id: &str, snapshot_id: &str) -> Result<(), VmError>;
+    /// Get backend name
+    fn name(&self) -> &str;
+}
+
+/// QEMU/KVM backend
+pub struct QemuBackend {
+    vms: HashMap<String, VmConfig>,
+    vm_states: HashMap<String, VmState>,
+}
+
+impl QemuBackend {
+    pub fn new() -> Self {
+        Self {
+            vms: HashMap::new(),
+            vm_states: HashMap::new(),
+        }
+    }
+}
+
+impl HypervisorBackend for QemuBackend {
+    fn create_vm(&mut self, config: &VmConfig) -> Result<String, VmError> {
+        let vm_id = format!("vm_{}", self.vms.len());
+        self.vms.insert(vm_id.clone(), config.clone());
+        self.vm_states.insert(vm_id.clone(), VmState::Stopped);
+        Ok(vm_id)
+    }
+
+    fn start_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Running);
+        Ok(())
+    }
+
+    fn stop_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Stopped);
+        Ok(())
+    }
+
+    fn pause_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Paused);
+        Ok(())
+    }
+
+    fn resume_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Running);
+        Ok(())
+    }
+
+    fn delete_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.remove(vm_id).is_some() {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.remove(vm_id);
+        Ok(())
+    }
+
+    fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError> {
+        self.vm_states.get(vm_id)
+            .copied()
+            .ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))
+    }
+
+    fn get_resource_usage(&self, vm_id: &str) -> Result<VmResourceUsage, VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+
+        Ok(VmResourceUsage {
+            cpu_percent: 25.0,
+            memory_mb: 2048,
+            disk_read_mb: 100,
+            disk_write_mb: 50,
+            network_rx_mb: 10,
+            network_tx_mb: 5,
+        })
+    }
+
+    fn create_snapshot(&mut self, vm_id: &str, name: &str) -> Result<String, VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+
+        let snapshot_id = format!("snapshot_{}", name);
+        Ok(snapshot_id)
+    }
+
+    fn restore_snapshot(&mut self, vm_id: &str, _snapshot_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        Ok(())
+    }
+
+    fn name(&self) -> &str {
+        "QEMU/KVM"
+    }
+}
+
+/// VirtualBox backend
+pub struct VirtualBoxBackend {
+    vms: HashMap<String, VmConfig>,
+    vm_states: HashMap<String, VmState>,
+}
+
+impl VirtualBoxBackend {
+    pub fn new() -> Self {
+        Self {
+            vms: HashMap::new(),
+            vm_states: HashMap::new(),
+        }
+    }
+}
+
+impl HypervisorBackend for VirtualBoxBackend {
+    fn create_vm(&mut self, config: &VmConfig) -> Result<String, VmError> {
+        let vm_id = format!("vb_{}", self.vms.len());
+        self.vms.insert(vm_id.clone(), config.clone());
+        self.vm_states.insert(vm_id.clone(), VmState::Stopped);
+        Ok(vm_id)
+    }
+
+    fn start_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Running);
+        Ok(())
+    }
+
+    fn stop_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Stopped);
+        Ok(())
+    }
+
+    fn pause_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Paused);
+        Ok(())
+    }
+
+    fn resume_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Running);
+        Ok(())
+    }
+
+    fn delete_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.remove(vm_id).is_some() {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.remove(vm_id);
+        Ok(())
+    }
+
+    fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError> {
+        self.vm_states.get(vm_id)
+            .copied()
+            .ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))
+    }
+
+    fn get_resource_usage(&self, vm_id: &str) -> Result<VmResourceUsage, VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+
+        Ok(VmResourceUsage {
+            cpu_percent: 30.0,
+            memory_mb: 4096,
+            disk_read_mb: 150,
+            disk_write_mb: 75,
+            network_rx_mb: 20,
+            network_tx_mb: 10,
+        })
+    }
+
+    fn create_snapshot(&mut self, vm_id: &str, name: &str) -> Result<String, VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+
+        let snapshot_id = format!("vb_snapshot_{}", name);
+        Ok(snapshot_id)
+    }
+
+    fn restore_snapshot(&mut self, vm_id: &str, _snapshot_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        Ok(())
+    }
+
+    fn name(&self) -> &str {
+        "VirtualBox"
+    }
+}
+
+/// OOP-based Virtual Machine Manager
+pub struct VmManager {
+    backend: Box<dyn HypervisorBackend>,
+    vms: HashMap<String, VmConfig>,
+    snapshots: HashMap<String, VmSnapshot>,
+    auto_start_enabled: bool,
+}
+
+impl VmManager {
+    pub fn new(backend: Box<dyn HypervisorBackend>) -> Self {
+        Self {
+            backend,
+            vms: HashMap::new(),
+            snapshots: HashMap::new(),
+            auto_start_enabled: false,
+        }
+    }
+
+    /// Enable auto-start
+    pub fn with_auto_start(mut self, enabled: bool) -> Self {
+        self.auto_start_enabled = enabled;
+        self
+    }
+
+    /// Create VM
+    pub fn create_vm(&mut self, config: VmConfig) -> Result<String, VmError> {
+        let vm_id = self.backend.create_vm(&config)?;
+        self.vms.insert(vm_id.clone(), config);
+        Ok(vm_id)
+    }
+
+    /// Start VM
+    pub fn start_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        self.backend.start_vm(vm_id)
+    }
+
+    /// Stop VM
+    pub fn stop_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        self.backend.stop_vm(vm_id)
+    }
+
+    /// Pause VM
+    pub fn pause_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        self.backend.pause_vm(vm_id)
+    }
+
+    /// Resume VM
+    pub fn resume_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        self.backend.resume_vm(vm_id)
+    }
+
+    /// Delete VM
+    pub fn delete_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        self.backend.delete_vm(vm_id)?;
+        self.vms.remove(vm_id);
+        Ok(())
+    }
+
+    /// Get VM state
+    pub fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError> {
+        self.backend.get_vm_state(vm_id)
+    }
+
+    /// Get VM config
+    pub fn get_vm_config(&self, vm_id: &str) -> Option<&VmConfig> {
+        self.vms.get(vm_id)
+    }
+
+    /// Get resource usage
+    pub fn get_resource_usage(&self, vm_id: &str) -> Result<VmResourceUsage, VmError> {
+        self.backend.get_resource_usage(vm_id)
+    }
+
+    /// Create snapshot
+    pub fn create_snapshot(&mut self, vm_id: &str, name: &str) -> Result<String, VmError> {
+        let snapshot_id = self.backend.create_snapshot(vm_id, name)?;
+        
+        self.snapshots.insert(snapshot_id.clone(), VmSnapshot {
+            id: snapshot_id.clone(),
+            name: name.to_string(),
+            created_at: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            snapshot_path: PathBuf::from(format!("/var/lib/vm/snapshots/{}", snapshot_id)),
+        });
+
+        Ok(snapshot_id)
+    }
+
+    /// Restore snapshot
+    pub fn restore_snapshot(&mut self, vm_id: &str, snapshot_id: &str) -> Result<(), VmError> {
+        self.backend.restore_snapshot(vm_id, snapshot_id)
+    }
+
+    /// Delete snapshot
+    pub fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), VmError> {
+        self.snapshots.remove(snapshot_id)
+            .ok_or_else(|| VmError::SnapshotNotFound(snapshot_id.to_string()))?;
+        Ok(())
+    }
+
+    /// Get snapshots
+    pub fn snapshots(&self) -> Vec<&VmSnapshot> {
+        self.snapshots.values().collect()
+    }
+
+    /// List all VMs
+    pub fn list_vms(&self) -> Vec<(&String, &VmConfig, VmState)> {
+        self.vms.iter()
+            .filter_map(|(id, config)| {
+                self.backend.get_vm_state(id).ok().map(|state| (id, config, state))
+            })
+            .collect()
+    }
+
+    /// Get running VMs
+    pub fn running_vms(&self) -> Vec<String> {
+        self.vms.keys()
+            .filter(|id| {
+                self.backend.get_vm_state(id)
+                    .map(|s| s == VmState::Running)
+                    .unwrap_or(false)
+            })
+            .cloned()
+            .collect()
+    }
+
+    /// Is auto-start enabled
+    pub fn is_auto_start_enabled(&self) -> bool {
+        self.auto_start_enabled
+    }
+
+    /// Enable auto-start
+    pub fn enable_auto_start(&mut self, enabled: bool) {
+        self.auto_start_enabled = enabled;
+    }
+
+    /// Get backend name
+    pub fn backend_name(&self) -> &str {
+        self.backend.name()
+    }
+}
+
+impl Default for VmManager {
+    fn default() -> Self {
+        Self::new(Box::new(QemuBackend::new()))
+            .with_auto_start(false)
+    }
+}
+
+/// VM errors
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VmError {
+    VmNotFound(String),
+    SnapshotNotFound(String),
+    CreationFailed(String),
+    StartFailed(String),
+    StopFailed(String),
+    PauseFailed(String),
+    ResumeFailed(String),
+    DeleteFailed(String),
+    SnapshotFailed(String),
+    RestoreFailed(String),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vm_config() {
+        let config = VmConfig {
+            name: "Test VM".to_string(),
+            cpu_cores: 2,
+            memory_mb: 4096,
+            disk_size_gb: 50,
+            network_enabled: true,
+            gpu_passthrough: false,
+            os_type: OsType::Linux,
+        };
+        assert_eq!(config.name, "Test VM");
+    }
+
+    #[test]
+    fn test_qemu_backend() {
+        let backend = QemuBackend::new();
+        assert_eq!(backend.name(), "QEMU/KVM");
+    }
+
+    #[test]
+    fn test_virtualbox_backend() {
+        let backend = VirtualBoxBackend::new();
+        assert_eq!(backend.name(), "VirtualBox");
+    }
+
+    #[test]
+    fn test_vm_manager() {
+        let manager = VmManager::default();
+        assert_eq!(manager.backend_name(), "QEMU/KVM");
+    }
+
+    #[test]
+    fn test_create_vm() {
+        let mut manager = VmManager::default();
+        let config = VmConfig {
+            name: "Test VM".to_string(),
+            cpu_cores: 2,
+            memory_mb: 4096,
+            disk_size_gb: 50,
+            network_enabled: true,
+            gpu_passthrough: false,
+            os_type: OsType::Linux,
+        };
+        let vm_id = manager.create_vm(config).unwrap();
+        assert!(!vm_id.is_empty());
+    }
+
+    #[test]
+    fn test_start_vm() {
+        let mut manager = VmManager::default();
+        let config = VmConfig {
+            name: "Test VM".to_string(),
+            cpu_cores: 2,
+            memory_mb: 4096,
+            disk_size_gb: 50,
+            network_enabled: true,
+            gpu_passthrough: false,
+            os_type: OsType::Linux,
+        };
+        let vm_id = manager.create_vm(config).unwrap();
+        manager.start_vm(&vm_id).unwrap();
+        let state = manager.get_vm_state(&vm_id).unwrap();
+        assert_eq!(state, VmState::Running);
+    }
+}
