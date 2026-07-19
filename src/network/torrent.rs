@@ -176,7 +176,11 @@ impl TorrentClient {
     }
 
     /// Set speed limits
-    pub fn with_speed_limits(mut self, upload_mbps: Option<u32>, download_mbps: Option<u32>) -> Self {
+    pub fn with_speed_limits(
+        mut self,
+        upload_mbps: Option<u32>,
+        download_mbps: Option<u32>,
+    ) -> Self {
         self.max_upload_speed_mbps = upload_mbps;
         self.max_download_speed_mbps = download_mbps;
         self
@@ -210,7 +214,9 @@ impl TorrentClient {
     /// Add torrent from magnet link
     pub fn add_magnet_link(&mut self, magnet_link: &str) -> Result<String, TorrentError> {
         // Simulated magnet link parsing
-        let info_hash = magnet_link.split("btih:").nth(1)
+        let info_hash = magnet_link
+            .split("btih:")
+            .nth(1)
             .and_then(|s| s.split('&').next())
             .unwrap_or("default_hash")
             .to_string();
@@ -246,7 +252,7 @@ impl TorrentClient {
     pub fn start_torrent(&mut self, torrent_id: &str) -> Result<(), TorrentError> {
         if let Some(handle) = self.torrents.get_mut(torrent_id) {
             handle.state = TorrentState::Downloading;
-            
+
             // Connect to tracker and get peers
             let peers = self.protocol.announce()?;
             handle.peers = peers;
@@ -268,7 +274,11 @@ impl TorrentClient {
     }
 
     /// Remove torrent
-    pub fn remove_torrent(&mut self, torrent_id: &str, delete_files: bool) -> Result<(), TorrentError> {
+    pub fn remove_torrent(
+        &mut self,
+        torrent_id: &str,
+        delete_files: bool,
+    ) -> Result<(), TorrentError> {
         if let Some(handle) = self.torrents.remove(torrent_id) {
             if delete_files {
                 // Simulated file deletion
@@ -298,15 +308,19 @@ impl TorrentClient {
                 handle.stats.uploaded_bytes += 512 * 1024; // 512KB
                 handle.stats.download_speed_mbps = 5.0;
                 handle.stats.upload_speed_mbps = 2.5;
-                
+
                 if handle.info.total_size > 0 {
-                    handle.stats.progress_percent = (handle.stats.downloaded_bytes as f64 / handle.info.total_size as f64) * 100.0;
+                    handle.stats.progress_percent = (handle.stats.downloaded_bytes as f64
+                        / handle.info.total_size as f64)
+                        * 100.0;
                 }
 
                 if handle.stats.download_speed_mbps > 0.0 {
                     let remaining = handle.info.total_size - handle.stats.downloaded_bytes;
-                    let speed_bytes_per_sec = handle.stats.download_speed_mbps * 1024.0 * 1024.0 / 8.0;
-                    handle.stats.eta_seconds = Some((remaining as f64 / speed_bytes_per_sec) as u64);
+                    let speed_bytes_per_sec =
+                        handle.stats.download_speed_mbps * 1024.0 * 1024.0 / 8.0;
+                    handle.stats.eta_seconds =
+                        Some((remaining as f64 / speed_bytes_per_sec) as u64);
                 }
             }
         }
@@ -338,10 +352,7 @@ impl TorrentClient {
 impl Default for TorrentClient {
     fn default() -> Self {
         let protocol = BitTorrentProtocol::new("-SigmaOS-000000000000".to_string());
-        Self::new(
-            Box::new(protocol),
-            PathBuf::from("/home/user/Downloads"),
-        )
+        Self::new(Box::new(protocol), PathBuf::from("/home/user/Downloads"))
     }
 }
 

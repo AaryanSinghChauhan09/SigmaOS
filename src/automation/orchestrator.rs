@@ -115,9 +115,21 @@ impl PredictiveModel {
 
     pub fn predict(&self, state: &SystemState) -> f64 {
         // Simulated prediction
-        let cpu_factor = if state.cpu_usage_percent > 80.0 { 1.2 } else { 1.0 };
-        let memory_factor = if state.memory_usage_mb > 8192 { 1.1 } else { 1.0 };
-        let temp_factor = if state.temperature_celsius > 70.0 { 1.3 } else { 1.0 };
+        let cpu_factor = if state.cpu_usage_percent > 80.0 {
+            1.2
+        } else {
+            1.0
+        };
+        let memory_factor = if state.memory_usage_mb > 8192 {
+            1.1
+        } else {
+            1.0
+        };
+        let temp_factor = if state.temperature_celsius > 70.0 {
+            1.3
+        } else {
+            1.0
+        };
 
         cpu_factor * memory_factor * temp_factor * self.accuracy
     }
@@ -137,9 +149,7 @@ struct OptimizationRule {
 
 impl RuleBasedOptimizer {
     pub fn new() -> Self {
-        Self {
-            rules: Vec::new(),
-        }
+        Self { rules: Vec::new() }
     }
 
     pub fn add_rule(&mut self, rule: OptimizationRule) {
@@ -215,18 +225,16 @@ impl RuleBasedOptimizer {
             recommendation: OptimizationRecommendation {
                 category: OptimizationCategory::ResourceAllocation,
                 description: "High memory usage detected".to_string(),
-                actions: vec![
-                    SystemAction {
-                        action_type: ActionType::AdjustMemoryAllocation,
-                        parameters: {
-                            let mut map = HashMap::new();
-                            map.insert("action".to_string(), "compact".to_string());
-                            map
-                        },
-                        priority: ActionPriority::High,
-                        estimated_impact: 12.0,
+                actions: vec![SystemAction {
+                    action_type: ActionType::AdjustMemoryAllocation,
+                    parameters: {
+                        let mut map = HashMap::new();
+                        map.insert("action".to_string(), "compact".to_string());
+                        map
                     },
-                ],
+                    priority: ActionPriority::High,
+                    estimated_impact: 12.0,
+                }],
                 expected_improvement_percent: 15.0,
                 confidence: 0.85,
             },
@@ -299,15 +307,16 @@ impl AiOptimizationStrategy for MlOptimizer {
         if prediction_score > 1.2 {
             vec![OptimizationRecommendation {
                 category: OptimizationCategory::Performance,
-                description: format!("ML prediction indicates optimization needed (score: {:.2})", prediction_score),
-                actions: vec![
-                    SystemAction {
-                        action_type: ActionType::AdjustCpuFrequency,
-                        parameters: HashMap::new(),
-                        priority: ActionPriority::Medium,
-                        estimated_impact: prediction_score * 10.0,
-                    },
-                ],
+                description: format!(
+                    "ML prediction indicates optimization needed (score: {:.2})",
+                    prediction_score
+                ),
+                actions: vec![SystemAction {
+                    action_type: ActionType::AdjustCpuFrequency,
+                    parameters: HashMap::new(),
+                    priority: ActionPriority::Medium,
+                    estimated_impact: prediction_score * 10.0,
+                }],
                 expected_improvement_percent: prediction_score * 15.0,
                 confidence: self.model.accuracy,
             }]
@@ -378,8 +387,14 @@ impl AiOrchestrator {
 
             // Sort by confidence and expected improvement
             all_recommendations.sort_by(|a, b| {
-                b.confidence.partial_cmp(&a.confidence).unwrap()
-                    .then_with(|| b.expected_improvement_percent.partial_cmp(&a.expected_improvement_percent).unwrap())
+                b.confidence
+                    .partial_cmp(&a.confidence)
+                    .unwrap()
+                    .then_with(|| {
+                        b.expected_improvement_percent
+                            .partial_cmp(&a.expected_improvement_percent)
+                            .unwrap()
+                    })
             });
 
             self.optimization_history = all_recommendations.clone();
@@ -390,7 +405,10 @@ impl AiOrchestrator {
     }
 
     /// Execute optimization
-    pub fn execute_optimization(&mut self, recommendation: &OptimizationRecommendation) -> Result<(), OptimizationError> {
+    pub fn execute_optimization(
+        &mut self,
+        recommendation: &OptimizationRecommendation,
+    ) -> Result<(), OptimizationError> {
         for strategy in &mut self.strategies {
             for action in &recommendation.actions {
                 strategy.execute(action)?;
@@ -441,17 +459,15 @@ impl Default for AiOrchestrator {
         rule_optimizer.create_default_rules();
 
         let mut model = PredictiveModel::new(ModelType::Ensemble);
-        model.train(vec![
-            SystemState {
-                cpu_usage_percent: 75.0,
-                memory_usage_mb: 8192,
-                disk_usage_percent: 50.0,
-                network_throughput_mbps: 100.0,
-                temperature_celsius: 65.0,
-                power_consumption_watts: 45.0,
-                timestamp: Instant::now(),
-            },
-        ]);
+        model.train(vec![SystemState {
+            cpu_usage_percent: 75.0,
+            memory_usage_mb: 8192,
+            disk_usage_percent: 50.0,
+            network_throughput_mbps: 100.0,
+            temperature_celsius: 65.0,
+            power_consumption_watts: 45.0,
+            timestamp: Instant::now(),
+        }]);
 
         Self::new()
             .add_strategy(Box::new(rule_optimizer))

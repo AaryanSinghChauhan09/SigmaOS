@@ -10,7 +10,7 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 [dependencies]
 # Core dependencies (minimal as per SigmaOS philosophy)
 uuid = { version = "1.4", features = ["v4"] }
-rand = "0.8"
+rand = "0.10"
 
 [dev-dependencies]
 # Test dependencies
@@ -44,11 +44,17 @@ panic = "abort"
 [[bin]]
 name = "sigma_kernel"
 path = "src/kernel/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_drivers"
 path = "src/drivers/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_userspace"
 path = "src/userspace/main.rs"
+test = false
+required-features = ["microkernel"]

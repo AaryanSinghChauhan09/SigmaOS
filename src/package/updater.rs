@@ -71,7 +71,11 @@ pub struct RollbackSnapshot {
 /// OOP trait for update sources
 pub trait UpdateSource {
     /// Check for updates
-    fn check_for_updates(&self, current_version: &str, channel: UpdateChannel) -> Result<Vec<UpdatePackage>, UpdateError>;
+    fn check_for_updates(
+        &self,
+        current_version: &str,
+        channel: UpdateChannel,
+    ) -> Result<Vec<UpdatePackage>, UpdateError>;
     /// Download update
     fn download_update(&mut self, update: &UpdatePackage) -> Result<String, UpdateError>;
     /// Get source name
@@ -90,22 +94,24 @@ impl OfficialUpdateSource {
 }
 
 impl UpdateSource for OfficialUpdateSource {
-    fn check_for_updates(&self, current_version: &str, channel: UpdateChannel) -> Result<Vec<UpdatePackage>, UpdateError> {
+    fn check_for_updates(
+        &self,
+        current_version: &str,
+        channel: UpdateChannel,
+    ) -> Result<Vec<UpdatePackage>, UpdateError> {
         // Simulated update check
-        Ok(vec![
-            UpdatePackage {
-                id: "update_001".to_string(),
-                version: "1.1.0".to_string(),
-                update_type: UpdateType::Feature,
-                status: UpdateStatus::Available,
-                size_bytes: 100 * 1024 * 1024, // 100MB
-                description: "New features and improvements".to_string(),
-                release_notes: "Added new UI components".to_string(),
-                checksum: "abc123".to_string(),
-                download_url: format!("{}/update_001.sig", self.base_url),
-                dependencies: Vec::new(),
-            },
-        ])
+        Ok(vec![UpdatePackage {
+            id: "update_001".to_string(),
+            version: "1.1.0".to_string(),
+            update_type: UpdateType::Feature,
+            status: UpdateStatus::Available,
+            size_bytes: 100 * 1024 * 1024, // 100MB
+            description: "New features and improvements".to_string(),
+            release_notes: "Added new UI components".to_string(),
+            checksum: "abc123".to_string(),
+            download_url: format!("{}/update_001.sig", self.base_url),
+            dependencies: Vec::new(),
+        }])
     }
 
     fn download_update(&mut self, update: &UpdatePackage) -> Result<String, UpdateError> {
@@ -161,7 +167,9 @@ impl SoftwareUpdater {
 
     /// Check for updates
     pub fn check_for_updates(&mut self) -> Result<Vec<UpdatePackage>, UpdateError> {
-        let updates = self.update_source.check_for_updates(&self.current_version, self.channel)?;
+        let updates = self
+            .update_source
+            .check_for_updates(&self.current_version, self.channel)?;
         self.available_updates = updates.clone();
         self.last_check = Some(Instant::now());
         Ok(updates)
@@ -184,7 +192,9 @@ impl SoftwareUpdater {
 
     /// Download update
     pub fn download_update(&mut self, update_id: &str) -> Result<UpdateProgress, UpdateError> {
-        let update = self.available_updates.iter()
+        let update = self
+            .available_updates
+            .iter()
             .find(|u| u.id == update_id)
             .ok_or_else(|| UpdateError::UpdateNotFound(update_id.to_string()))?
             .clone();
@@ -210,7 +220,9 @@ impl SoftwareUpdater {
         // Create rollback snapshot before installing
         self.create_rollback_snapshot()?;
 
-        let update = self.available_updates.iter()
+        let update = self
+            .available_updates
+            .iter()
             .find(|u| u.id == update_id)
             .ok_or_else(|| UpdateError::UpdateNotFound(update_id.to_string()))?
             .clone();
@@ -232,7 +244,9 @@ impl SoftwareUpdater {
 
     /// Rollback update
     pub fn rollback_update(&mut self, snapshot_id: &str) -> Result<(), UpdateError> {
-        let snapshot = self.rollback_snapshots.iter()
+        let snapshot = self
+            .rollback_snapshots
+            .iter()
             .find(|s| s.id == snapshot_id)
             .ok_or_else(|| UpdateError::SnapshotNotFound(snapshot_id.to_string()))?;
 
@@ -304,14 +318,16 @@ impl SoftwareUpdater {
 
     /// Get security updates only
     pub fn get_security_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.update_type == UpdateType::Security)
             .collect()
     }
 
     /// Get update by type
     pub fn get_updates_by_type(&self, update_type: UpdateType) -> Vec<&UpdatePackage> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.update_type == update_type)
             .collect()
     }
@@ -321,7 +337,9 @@ impl Default for SoftwareUpdater {
     fn default() -> Self {
         Self::new(
             "1.0.0".to_string(),
-            Box::new(OfficialUpdateSource::new("https://updates.sigmaos.com".to_string())),
+            Box::new(OfficialUpdateSource::new(
+                "https://updates.sigmaos.com".to_string(),
+            )),
         )
         .with_channel(UpdateChannel::Stable)
         .with_auto_update(false, Duration::from_secs(86400))

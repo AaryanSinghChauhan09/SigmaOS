@@ -65,6 +65,10 @@ pub trait DetectionStrategy {
     fn analyze(&self, event: &SecurityEvent) -> Option<DetectionResult>;
     /// Get strategy name
     fn name(&self) -> &str;
+    /// Convert to Any for downcasting
+    fn as_any(&self) -> &dyn std::any::Any;
+    /// Convert to mutable Any for downcasting
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
 }
 
 /// Detection result
@@ -84,9 +88,7 @@ pub struct SignatureDetection {
 
 impl SignatureDetection {
     pub fn new() -> Self {
-        Self {
-            rules: Vec::new(),
-        }
+        Self { rules: Vec::new() }
     }
 
     pub fn add_rule(&mut self, rule: DetectionRule) {
@@ -121,6 +123,14 @@ impl DetectionStrategy for SignatureDetection {
     fn name(&self) -> &str {
         "SignatureDetection"
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 /// Anomaly-based detection
@@ -146,12 +156,12 @@ impl DetectionStrategy for AnomalyDetection {
     fn analyze(&self, event: &SecurityEvent) -> Option<DetectionResult> {
         // Simulated anomaly detection
         // In real implementation, use statistical analysis, ML models, etc.
-        
+
         let metric_key = format!("{:?}", event.event_type);
         if let Some(baseline) = self.baseline.get(&metric_key) {
             // Simulate deviation calculation
             let deviation = (event.timestamp.elapsed().as_secs() as f64 - baseline).abs();
-            
+
             if deviation > self.threshold {
                 return Some(DetectionResult {
                     rule_id: "anomaly".to_string(),
@@ -168,6 +178,14 @@ impl DetectionStrategy for AnomalyDetection {
 
     fn name(&self) -> &str {
         "AnomalyDetection"
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
     }
 }
 
@@ -245,14 +263,16 @@ impl IntrusionDetectionSystem {
 
     /// Get events by type
     pub fn events_by_type(&self, event_type: EventType) -> Vec<&SecurityEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|e| e.event_type == event_type)
             .collect()
     }
 
     /// Get events by severity
     pub fn events_by_severity(&self, severity: Severity) -> Vec<&SecurityEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|e| e.severity == severity)
             .collect()
     }
@@ -294,8 +314,13 @@ impl IntrusionDetectionSystem {
             },
         ];
 
-        if let Some(strategy) = self.strategies.iter_mut().find(|s| s.name() == "SignatureDetection") {
-            if let Some(sig_detection) = strategy.as_any().downcast_ref::<mut SignatureDetection>() {
+        if let Some(strategy) = self
+            .strategies
+            .iter_mut()
+            .find(|s| s.name() == "SignatureDetection")
+        {
+            if let Some(sig_detection) = strategy.as_any_mut().downcast_mut::<SignatureDetection>()
+            {
                 for rule in default_rules {
                     sig_detection.add_rule(rule);
                 }
@@ -311,13 +336,6 @@ impl Default for IntrusionDetectionSystem {
             .add_strategy(Box::new(AnomalyDetection::new(2.0)));
         ids.create_default_rules();
         ids
-    }
-}
-
-// Helper for downcasting
-impl dyn DetectionStrategy {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
     }
 }
 
@@ -359,7 +377,7 @@ mod tests {
             action: RuleAction::Log,
             enabled: true,
         });
-        
+
         let event = SecurityEvent {
             id: "test".to_string(),
             event_type: EventType::PortScan,

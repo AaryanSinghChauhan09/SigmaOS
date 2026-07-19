@@ -704,7 +704,6 @@ mod tests {
         assert!(chromium.has_superset_capability("javascript"));
         assert!(!chromium.has_superset_capability("mkv"));
     }
-
     #[test]
     fn test_sovereign_video_player_is_better_than_vlc() {
         let vlc = MediaDecoderCapability::new();

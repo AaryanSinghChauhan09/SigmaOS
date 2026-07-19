@@ -91,7 +91,11 @@ pub trait EmailBackend {
     /// Send email
     fn send_email(&mut self, message: EmailMessage) -> Result<(), EmailError>;
     /// Fetch emails
-    fn fetch_emails(&mut self, folder: EmailFolder, limit: usize) -> Result<Vec<EmailMessage>, EmailError>;
+    fn fetch_emails(
+        &mut self,
+        folder: EmailFolder,
+        limit: usize,
+    ) -> Result<Vec<EmailMessage>, EmailError>;
     /// Mark as read
     fn mark_as_read(&mut self, email_id: &str) -> Result<(), EmailError>;
     /// Delete email
@@ -126,10 +130,14 @@ impl EmailBackend for ImapSmtpBackend {
         Ok(())
     }
 
-    fn fetch_emails(&mut self, folder: EmailFolder, limit: usize) -> Result<Vec<EmailMessage>, EmailError> {
+    fn fetch_emails(
+        &mut self,
+        folder: EmailFolder,
+        limit: usize,
+    ) -> Result<Vec<EmailMessage>, EmailError> {
         // Simulated fetching
         let mut results = Vec::new();
-        
+
         for (id, email) in &self.emails {
             if email.folder == folder {
                 results.push(email.clone());
@@ -190,7 +198,11 @@ impl EmailClient {
             accounts: Vec::new(),
             current_account: None,
             drafts: Vec::new(),
-            labels: vec!["Important".to_string(), "Work".to_string(), "Personal".to_string()],
+            labels: vec![
+                "Important".to_string(),
+                "Work".to_string(),
+                "Personal".to_string(),
+            ],
         }
     }
 
@@ -217,15 +229,25 @@ impl EmailClient {
     }
 
     /// Compose email
-    pub fn compose_email(&mut self, to: Vec<EmailAddress>, subject: String, body: String) -> EmailMessage {
+    pub fn compose_email(
+        &mut self,
+        to: Vec<EmailAddress>,
+        subject: String,
+        body: String,
+    ) -> EmailMessage {
         EmailMessage {
-            id: format!("email_{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()),
+            id: format!(
+                "email_{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ),
             from: EmailAddress {
                 name: "User".to_string(),
-                address: self.accounts.get(self.current_account.unwrap_or(0))
+                address: self
+                    .accounts
+                    .get(self.current_account.unwrap_or(0))
                     .map(|a| a.email.clone())
                     .unwrap_or_default(),
             },
@@ -259,7 +281,11 @@ impl EmailClient {
     }
 
     /// Fetch emails from folder
-    pub fn fetch_emails(&mut self, folder: EmailFolder, limit: usize) -> Result<Vec<EmailMessage>, EmailError> {
+    pub fn fetch_emails(
+        &mut self,
+        folder: EmailFolder,
+        limit: usize,
+    ) -> Result<Vec<EmailMessage>, EmailError> {
         self.backend.fetch_emails(folder, limit)
     }
 
@@ -274,7 +300,11 @@ impl EmailClient {
     }
 
     /// Move to folder
-    pub fn move_to_folder(&mut self, email_id: &str, folder: EmailFolder) -> Result<(), EmailError> {
+    pub fn move_to_folder(
+        &mut self,
+        email_id: &str,
+        folder: EmailFolder,
+    ) -> Result<(), EmailError> {
         self.backend.move_to_folder(email_id, folder)
     }
 
@@ -311,7 +341,8 @@ impl EmailClient {
         }
 
         // Apply filters
-        let filtered: Vec<EmailMessage> = emails.into_iter()
+        let filtered: Vec<EmailMessage> = emails
+            .into_iter()
             .filter(|email| {
                 if let Some(ref from) = filter.from {
                     if !email.from.address.contains(from) {
@@ -319,7 +350,11 @@ impl EmailClient {
                     }
                 }
                 if let Some(ref subject) = filter.subject_contains {
-                    if !email.subject.to_lowercase().contains(&subject.to_lowercase()) {
+                    if !email
+                        .subject
+                        .to_lowercase()
+                        .contains(&subject.to_lowercase())
+                    {
                         return false;
                     }
                 }

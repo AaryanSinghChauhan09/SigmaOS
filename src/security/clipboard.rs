@@ -76,7 +76,8 @@ impl ClipboardSecurity for XorEncryption {
         for (i, byte) in content.bytes().enumerate() {
             encrypted.push(byte ^ self.key[i % self.key.len()]);
         }
-        Ok(String::from_utf8(encrypted).map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
+        Ok(String::from_utf8(encrypted)
+            .map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
     }
 
     fn unsecure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
@@ -84,7 +85,8 @@ impl ClipboardSecurity for XorEncryption {
         for (i, byte) in content.bytes().enumerate() {
             decrypted.push(byte ^ self.key[i % self.key.len()]);
         }
-        Ok(String::from_utf8(decrypted).map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
+        Ok(String::from_utf8(decrypted)
+            .map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
     }
 
     fn name(&self) -> &str {
@@ -136,9 +138,14 @@ impl SecureClipboardManager {
     }
 
     /// Copy content to clipboard
-    pub fn copy(&mut self, content: String, content_type: ClipboardType) -> Result<(), ClipboardError> {
+    pub fn copy(
+        &mut self,
+        content: String,
+        content_type: ClipboardType,
+    ) -> Result<(), ClipboardError> {
         let secured_content = if self.default_security_level != SecurityLevel::None {
-            self.security.secure(&content, self.default_security_level)?
+            self.security
+                .secure(&content, self.default_security_level)?
         } else {
             content.clone()
         };
@@ -169,12 +176,14 @@ impl SecureClipboardManager {
     pub fn paste(&mut self) -> Result<String, ClipboardError> {
         self.check_auto_clear()?;
 
-        let entry = self.current_entry
+        let entry = self
+            .current_entry
             .as_ref()
             .ok_or_else(|| ClipboardError::ClipboardEmpty)?;
 
         let content = if entry.is_encrypted {
-            self.security.unsecure(&entry.content, self.default_security_level)?
+            self.security
+                .unsecure(&entry.content, self.default_security_level)?
         } else {
             entry.content.clone()
         };
@@ -189,7 +198,10 @@ impl SecureClipboardManager {
 
     /// Check if clipboard is encrypted
     pub fn is_encrypted(&self) -> bool {
-        self.current_entry.as_ref().map(|e| e.is_encrypted).unwrap_or(false)
+        self.current_entry
+            .as_ref()
+            .map(|e| e.is_encrypted)
+            .unwrap_or(false)
     }
 
     /// Clear clipboard
@@ -285,7 +297,9 @@ mod tests {
     #[test]
     fn test_secure_clipboard_manager() {
         let mut manager = SecureClipboardManager::default();
-        manager.copy("test".to_string(), ClipboardType::Text).unwrap();
+        manager
+            .copy("test".to_string(), ClipboardType::Text)
+            .unwrap();
         let pasted = manager.paste().unwrap();
         assert_eq!(pasted, "test");
     }
@@ -293,7 +307,9 @@ mod tests {
     #[test]
     fn test_clipboard_clear() {
         let mut manager = SecureClipboardManager::default();
-        manager.copy("test".to_string(), ClipboardType::Text).unwrap();
+        manager
+            .copy("test".to_string(), ClipboardType::Text)
+            .unwrap();
         manager.clear();
         assert!(manager.paste().is_err());
     }

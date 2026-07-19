@@ -158,7 +158,11 @@ pub enum CompletionKind {
 /// OOP trait for LSP clients
 pub trait LspClient {
     /// Request completion
-    fn request_completion(&self, document: &Document, position: CursorPosition) -> Vec<CompletionItem>;
+    fn request_completion(
+        &self,
+        document: &Document,
+        position: CursorPosition,
+    ) -> Vec<CompletionItem>;
     /// Request diagnostics
     fn request_diagnostics(&self, document: &Document) -> Vec<Diagnostic>;
     /// Get LSP name
@@ -193,7 +197,11 @@ pub struct TextRange {
 pub struct MockLspClient;
 
 impl LspClient for MockLspClient {
-    fn request_completion(&self, document: &Document, _position: CursorPosition) -> Vec<CompletionItem> {
+    fn request_completion(
+        &self,
+        document: &Document,
+        _position: CursorPosition,
+    ) -> Vec<CompletionItem> {
         match document.language {
             Language::Rust => vec![
                 CompletionItem {
@@ -209,14 +217,12 @@ impl LspClient for MockLspClient {
                     documentation: None,
                 },
             ],
-            Language::Python => vec![
-                CompletionItem {
-                    label: "print".to_string(),
-                    kind: CompletionKind::Function,
-                    detail: Some("Print to stdout".to_string()),
-                    documentation: None,
-                },
-            ],
+            Language::Python => vec![CompletionItem {
+                label: "print".to_string(),
+                kind: CompletionKind::Function,
+                detail: Some("Print to stdout".to_string()),
+                documentation: None,
+            }],
             _ => Vec::new(),
         }
     }
@@ -330,7 +336,12 @@ impl CodeEditor {
     }
 
     /// Insert text
-    pub fn insert_text(&mut self, doc_id: &str, text: String, position: CursorPosition) -> Result<(), EditorError> {
+    pub fn insert_text(
+        &mut self,
+        doc_id: &str,
+        text: String,
+        position: CursorPosition,
+    ) -> Result<(), EditorError> {
         if let Some(doc) = self.documents.get_mut(doc_id) {
             // Simple insertion (in real implementation, would handle position properly)
             doc.content.push_str(&text);
@@ -344,7 +355,11 @@ impl CodeEditor {
     }
 
     /// Delete text
-    pub fn delete_text(&mut self, doc_id: &str, selection: TextSelection) -> Result<(), EditorError> {
+    pub fn delete_text(
+        &mut self,
+        doc_id: &str,
+        selection: TextSelection,
+    ) -> Result<(), EditorError> {
         if let Some(doc) = self.documents.get_mut(doc_id) {
             // Simple deletion (in real implementation, would handle selection properly)
             doc.is_modified = true;
@@ -365,7 +380,11 @@ impl CodeEditor {
     }
 
     /// Request completion
-    pub fn request_completion(&self, doc_id: &str, position: CursorPosition) -> Vec<CompletionItem> {
+    pub fn request_completion(
+        &self,
+        doc_id: &str,
+        position: CursorPosition,
+    ) -> Vec<CompletionItem> {
         if let (Some(doc), Some(lsp)) = (self.documents.get(doc_id), self.lsp_client.as_ref()) {
             lsp.request_completion(doc, position)
         } else {
@@ -426,8 +445,7 @@ impl Default for CodeEditor {
             auto_save_interval_seconds: 300,
         };
 
-        Self::new(Box::new(RegexHighlighter), config)
-            .with_lsp_client(Box::new(MockLspClient))
+        Self::new(Box::new(RegexHighlighter), config).with_lsp_client(Box::new(MockLspClient))
     }
 }
 

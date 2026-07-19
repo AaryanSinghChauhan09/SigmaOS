@@ -194,7 +194,8 @@ impl ShellImpl for SigmaShell {
             },
             "security status" => CommandResult {
                 exit_code: 0,
-                stdout: "Security Status: ENABLED\nCapability Gate: ACTIVE\nPledge: ENFORCED".to_string(),
+                stdout: "Security Status: ENABLED\nCapability Gate: ACTIVE\nPledge: ENFORCED"
+                    .to_string(),
                 stderr: String::new(),
                 duration_ms: 10,
             },
@@ -282,7 +283,9 @@ impl IntegratedTerminal {
 
     /// Switch session
     pub fn switch_session(&mut self, session_id: &str) -> Result<(), TerminalError> {
-        let index = self.sessions.iter()
+        let index = self
+            .sessions
+            .iter()
             .position(|s| s.id == session_id)
             .ok_or(TerminalError::SessionNotFound(session_id.to_string()))?;
         self.active_session = Some(index);
@@ -291,7 +294,9 @@ impl IntegratedTerminal {
 
     /// Close session
     pub fn close_session(&mut self, session_id: &str) -> Result<(), TerminalError> {
-        let index = self.sessions.iter()
+        let index = self
+            .sessions
+            .iter()
             .position(|s| s.id == session_id)
             .ok_or(TerminalError::SessionNotFound(session_id.to_string()))?;
 
