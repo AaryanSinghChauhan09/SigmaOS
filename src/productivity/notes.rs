@@ -91,13 +91,15 @@ impl NoteStorage for InMemoryNoteStorage {
     }
 
     fn load_note(&self, note_id: &str) -> Result<Note, NoteError> {
-        self.notes.get(note_id)
+        self.notes
+            .get(note_id)
             .cloned()
             .ok_or_else(|| NoteError::NoteNotFound(note_id.to_string()))
     }
 
     fn delete_note(&mut self, note_id: &str) -> Result<(), NoteError> {
-        self.notes.remove(note_id)
+        self.notes
+            .remove(note_id)
             .ok_or_else(|| NoteError::NoteNotFound(note_id.to_string()))?;
         Ok(())
     }
@@ -132,11 +134,19 @@ impl NoteTakingApp {
     }
 
     /// Create note
-    pub fn create_note(&mut self, title: String, content: String, content_type: ContentType) -> Result<String, NoteError> {
-        let note_id = format!("note_{}", std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos());
+    pub fn create_note(
+        &mut self,
+        title: String,
+        content: String,
+        content_type: ContentType,
+    ) -> Result<String, NoteError> {
+        let note_id = format!(
+            "note_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
 
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -168,7 +178,7 @@ impl NoteTakingApp {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs();
-        
+
         self.storage.save_note(&updated_note)?;
         self.update_search_index(&updated_note);
         Ok(())
@@ -200,11 +210,14 @@ impl NoteTakingApp {
             for note in notes {
                 let title_match = note.title.to_lowercase().contains(&query_lower);
                 let content_match = note.content.to_lowercase().contains(&query_lower);
-                let tag_match = note.tags.iter().any(|t| t.to_lowercase().contains(&query_lower));
+                let tag_match = note
+                    .tags
+                    .iter()
+                    .any(|t| t.to_lowercase().contains(&query_lower));
 
                 if title_match || content_match || tag_match {
                     let relevance_score = if title_match { 1.0 } else { 0.5 };
-                    
+
                     // Create snippet
                     let snippet = if content_match {
                         let pos = note.content.to_lowercase().find(&query_lower).unwrap_or(0);
@@ -232,17 +245,17 @@ impl NoteTakingApp {
     /// Update search index
     fn update_search_index(&mut self, note: &Note) {
         let mut words = Vec::new();
-        
+
         // Add title words
         for word in note.title.split_whitespace() {
             words.push(word.to_lowercase());
         }
-        
+
         // Add content words
         for word in note.content.split_whitespace() {
             words.push(word.to_lowercase());
         }
-        
+
         // Add tags
         for tag in &note.tags {
             words.push(tag.to_lowercase());
@@ -297,7 +310,11 @@ impl NoteTakingApp {
     }
 
     /// Add folder to notebook
-    pub fn add_folder_to_notebook(&mut self, notebook_id: &str, folder_id: &str) -> Result<(), NoteError> {
+    pub fn add_folder_to_notebook(
+        &mut self,
+        notebook_id: &str,
+        folder_id: &str,
+    ) -> Result<(), NoteError> {
         if let Some(notebook) = self.notebooks.get_mut(notebook_id) {
             notebook.folder_ids.push(folder_id.to_string());
             Ok(())
@@ -357,7 +374,10 @@ impl NoteTakingApp {
     /// Get notes by tag
     pub fn get_notes_by_tag(&self, tag: &str) -> Result<Vec<Note>, NoteError> {
         let notes = self.storage.list_notes()?;
-        Ok(notes.into_iter().filter(|n| n.tags.contains(&tag.to_string())).collect())
+        Ok(notes
+            .into_iter()
+            .filter(|n| n.tags.contains(&tag.to_string()))
+            .collect())
     }
 
     /// Get pinned notes
@@ -380,7 +400,8 @@ impl NoteTakingApp {
 
     /// Get active note
     pub fn active_note(&self) -> Option<Note> {
-        self.active_note.as_ref()
+        self.active_note
+            .as_ref()
             .and_then(|id| self.storage.load_note(id).ok())
     }
 
@@ -404,11 +425,12 @@ impl NoteTakingApp {
     /// Import note from markdown
     pub fn import_from_markdown(&mut self, markdown: &str) -> Result<String, NoteError> {
         let lines: Vec<&str> = markdown.lines().collect();
-        let title = lines.first()
+        let title = lines
+            .first()
             .map(|l| l.trim_start_matches('#').trim())
             .unwrap_or("Untitled")
             .to_string();
-        
+
         let content = lines[1..].join("\n");
         self.create_note(title, content, ContentType::Markdown)
     }
@@ -466,14 +488,25 @@ mod tests {
     #[test]
     fn test_create_note() {
         let mut app = NoteTakingApp::default();
-        let note_id = app.create_note("Test".to_string(), "Content".to_string(), ContentType::PlainText).unwrap();
+        let note_id = app
+            .create_note(
+                "Test".to_string(),
+                "Content".to_string(),
+                ContentType::PlainText,
+            )
+            .unwrap();
         assert!(!note_id.is_empty());
     }
 
     #[test]
     fn test_search_notes() {
         let mut app = NoteTakingApp::default();
-        app.create_note("Test Note".to_string(), "This is a test".to_string(), ContentType::PlainText).unwrap();
+        app.create_note(
+            "Test Note".to_string(),
+            "This is a test".to_string(),
+            ContentType::PlainText,
+        )
+        .unwrap();
         let results = app.search_notes("test");
         assert!(!results.is_empty());
     }

@@ -13,7 +13,7 @@ pub use disk_usage::{
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
 pub use manager::{
-    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation, FileType as ManagerFileType,
-    SortOrder, StandardFileOperation, ViewMode,
+    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
+    FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

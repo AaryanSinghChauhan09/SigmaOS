@@ -52,7 +52,13 @@ pub trait VaultEncryption {
     /// Encrypt data
     fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError>;
     /// Decrypt data
-    fn decrypt(&self, encrypted_data: &[u8], key: &[u8], iv: &[u8], tag: &[u8]) -> Result<Vec<u8>, VaultError>;
+    fn decrypt(
+        &self,
+        encrypted_data: &[u8],
+        key: &[u8],
+        iv: &[u8],
+        tag: &[u8],
+    ) -> Result<Vec<u8>, VaultError>;
     /// Get algorithm name
     fn name(&self) -> &str;
 }
@@ -67,7 +73,7 @@ impl VaultEncryption for Aes256GcmEncryption {
         let iv = vec![0u8; 12]; // 96-bit IV
         let tag = vec![0u8; 16]; // 128-bit tag
         let mut encrypted = data.to_vec();
-        
+
         // Simple XOR for simulation (replace with actual AES in production)
         for (i, byte) in encrypted.iter_mut().enumerate() {
             *byte ^= key[i % key.len()];
@@ -76,10 +82,16 @@ impl VaultEncryption for Aes256GcmEncryption {
         Ok((encrypted, iv, tag))
     }
 
-    fn decrypt(&self, encrypted_data: &[u8], key: &[u8], _iv: &[u8], _tag: &[u8]) -> Result<Vec<u8>, VaultError> {
+    fn decrypt(
+        &self,
+        encrypted_data: &[u8],
+        key: &[u8],
+        _iv: &[u8],
+        _tag: &[u8],
+    ) -> Result<Vec<u8>, VaultError> {
         // Simulated decryption
         let mut decrypted = encrypted_data.to_vec();
-        
+
         for (i, byte) in decrypted.iter_mut().enumerate() {
             *byte ^= key[i % key.len()];
         }
@@ -101,7 +113,7 @@ impl VaultEncryption for ChaCha20Poly1305Encryption {
         let iv = vec![0u8; 12];
         let tag = vec![0u8; 16];
         let mut encrypted = data.to_vec();
-        
+
         // Simple XOR for simulation
         for (i, byte) in encrypted.iter_mut().enumerate() {
             *byte ^= key[(i + 1) % key.len()];
@@ -110,9 +122,15 @@ impl VaultEncryption for ChaCha20Poly1305Encryption {
         Ok((encrypted, iv, tag))
     }
 
-    fn decrypt(&self, encrypted_data: &[u8], key: &[u8], _iv: &[u8], _tag: &[u8]) -> Result<Vec<u8>, VaultError> {
+    fn decrypt(
+        &self,
+        encrypted_data: &[u8],
+        key: &[u8],
+        _iv: &[u8],
+        _tag: &[u8],
+    ) -> Result<Vec<u8>, VaultError> {
         let mut decrypted = encrypted_data.to_vec();
-        
+
         for (i, byte) in decrypted.iter_mut().enumerate() {
             *byte ^= key[(i + 1) % key.len()];
         }
@@ -134,7 +152,7 @@ impl VaultEncryption for Kyber1024Encryption {
         let iv = vec![0u8; 32]; // Larger IV for post-quantum
         let tag = vec![0u8; 32]; // Larger tag for post-quantum
         let mut encrypted = data.to_vec();
-        
+
         // Simulated lattice-based encryption
         for (i, byte) in encrypted.iter_mut().enumerate() {
             *byte ^= key[(i * 2) % key.len()];
@@ -143,9 +161,15 @@ impl VaultEncryption for Kyber1024Encryption {
         Ok((encrypted, iv, tag))
     }
 
-    fn decrypt(&self, encrypted_data: &[u8], key: &[u8], _iv: &[u8], _tag: &[u8]) -> Result<Vec<u8>, VaultError> {
+    fn decrypt(
+        &self,
+        encrypted_data: &[u8],
+        key: &[u8],
+        _iv: &[u8],
+        _tag: &[u8],
+    ) -> Result<Vec<u8>, VaultError> {
         let mut decrypted = encrypted_data.to_vec();
-        
+
         for (i, byte) in decrypted.iter_mut().enumerate() {
             *byte ^= key[(i * 2) % key.len()];
         }
@@ -201,14 +225,17 @@ impl EncryptedFileVault {
             return Err(VaultError::FileNotFound(file_path.display().to_string()));
         }
 
-        let data = std::fs::read(file_path)
-            .map_err(|e| VaultError::IoError(e.to_string()))?;
+        let data = std::fs::read(file_path).map_err(|e| VaultError::IoError(e.to_string()))?;
 
         let (encrypted_data, iv, tag) = self.encryption.encrypt(&data, &self.master_key)?;
 
-        let encrypted_filename = format!("{}.enc", file_path.file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("file"));
+        let encrypted_filename = format!(
+            "{}.enc",
+            file_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("file")
+        );
         let encrypted_path = self.vault_path.join(&encrypted_filename);
 
         std::fs::write(&encrypted_path, &encrypted_data)
@@ -237,8 +264,14 @@ impl EncryptedFileVault {
     }
 
     /// Retrieve a file from the vault
-    pub fn retrieve_file(&mut self, file_path: &Path, output_path: &Path) -> Result<VaultResult, VaultError> {
-        let encrypted_file = self.files.get(file_path)
+    pub fn retrieve_file(
+        &mut self,
+        file_path: &Path,
+        output_path: &Path,
+    ) -> Result<VaultResult, VaultError> {
+        let encrypted_file = self
+            .files
+            .get(file_path)
             .ok_or_else(|| VaultError::FileNotFound(file_path.display().to_string()))?;
 
         let encrypted_data = std::fs::read(&encrypted_file.encrypted_path)
@@ -265,7 +298,9 @@ impl EncryptedFileVault {
 
     /// Remove a file from the vault
     pub fn remove_file(&mut self, file_path: &Path) -> Result<VaultResult, VaultError> {
-        let encrypted_file = self.files.remove(file_path)
+        let encrypted_file = self
+            .files
+            .remove(file_path)
             .ok_or_else(|| VaultError::FileNotFound(file_path.display().to_string()))?;
 
         std::fs::remove_file(&encrypted_file.encrypted_path)
@@ -312,7 +347,8 @@ impl EncryptedFileVault {
             )?;
 
             // Encrypt with new key
-            let (new_encrypted_data, new_iv, new_tag) = self.encryption.encrypt(&decrypted_data, &new_key)?;
+            let (new_encrypted_data, new_iv, new_tag) =
+                self.encryption.encrypt(&decrypted_data, &new_key)?;
 
             std::fs::write(&encrypted_file.encrypted_path, &new_encrypted_data)
                 .map_err(|e| VaultError::IoError(e.to_string()))?;

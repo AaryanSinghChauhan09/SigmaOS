@@ -11,8 +11,8 @@ pub mod tasks;
 pub mod terminal;
 
 pub use calendar::{
-    CalendarApp, CalendarError, CalendarEvent, CalendarStorage, CalendarView, DayInfo,
-    EventType, EventStatus, InMemoryCalendarStorage, RecurrencePattern,
+    CalendarApp, CalendarError, CalendarEvent, CalendarStorage, CalendarView, DayInfo, EventStatus,
+    EventType, InMemoryCalendarStorage, RecurrencePattern,
 };
 pub use clipboard_manager::{
     ClipboardBackend, ClipboardError, ClipboardFilter, ClipboardHistoryConfig, ClipboardItem,
@@ -20,8 +20,8 @@ pub use clipboard_manager::{
 };
 pub use editor::{
     CodeEditor, CompletionItem, CompletionKind, CursorPosition, Diagnostic, DiagnosticSeverity,
-    Document, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient, RegexHighlighter,
-    SyntaxHighlighter, SyntaxToken, TextRange, TextSelection, TokenType,
+    Document, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient,
+    RegexHighlighter, SyntaxHighlighter, SyntaxToken, TextRange, TextSelection, TokenType,
 };
 pub use email::{
     EmailAccountConfig, EmailAddress, EmailAttachment, EmailBackend, EmailClient, EmailError,
@@ -32,8 +32,8 @@ pub use gamification::{
     ProductivityScore,
 };
 pub use notes::{
-    ContentType, Folder, InMemoryNoteStorage, Notebook, Note, NoteError, NoteSearchResult,
-    NoteStorage, NoteTakingApp,
+    ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
+    NoteTakingApp, Notebook,
 };
 pub use screen_recorder::{
     AudioQuality, FfmpegBackend, GStreamerBackend, RecorderError, RecordingBackend,
@@ -49,6 +49,6 @@ pub use tasks::{
     TaskError, TaskManager, TaskPriority, TaskStatus, TaskStorage,
 };
 pub use terminal::{
-    BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, SigmaShell, ShellImpl,
-    ShellType, TerminalConfig, TerminalError, TerminalSession, ZshShell,
+    BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
+    SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };

@@ -48,9 +48,19 @@ pub struct ArchiveResult {
 /// OOP trait for archive handlers
 pub trait ArchiveHandler {
     /// Create archive
-    fn create_archive(&mut self, files: &[PathBuf], output: &Path, format: ArchiveFormat, level: CompressionLevel) -> Result<ArchiveResult, ArchiveError>;
+    fn create_archive(
+        &mut self,
+        files: &[PathBuf],
+        output: &Path,
+        format: ArchiveFormat,
+        level: CompressionLevel,
+    ) -> Result<ArchiveResult, ArchiveError>;
     /// Extract archive
-    fn extract_archive(&mut self, archive: &Path, destination: &Path) -> Result<ArchiveResult, ArchiveError>;
+    fn extract_archive(
+        &mut self,
+        archive: &Path,
+        destination: &Path,
+    ) -> Result<ArchiveResult, ArchiveError>;
     /// List archive contents
     fn list_contents(&self, archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError>;
     /// Get handler name
@@ -61,9 +71,16 @@ pub trait ArchiveHandler {
 pub struct ZipArchiveHandler;
 
 impl ArchiveHandler for ZipArchiveHandler {
-    fn create_archive(&mut self, files: &[PathBuf], output: &Path, _format: ArchiveFormat, level: CompressionLevel) -> Result<ArchiveResult, ArchiveError> {
+    fn create_archive(
+        &mut self,
+        files: &[PathBuf],
+        output: &Path,
+        _format: ArchiveFormat,
+        level: CompressionLevel,
+    ) -> Result<ArchiveResult, ArchiveError> {
         let start = std::time::Instant::now();
-        let original_size: u64 = files.iter()
+        let original_size: u64 = files
+            .iter()
             .filter_map(|f| f.metadata().ok())
             .map(|m| m.len())
             .sum();
@@ -88,7 +105,11 @@ impl ArchiveHandler for ZipArchiveHandler {
         })
     }
 
-    fn extract_archive(&mut self, _archive: &Path, _destination: &Path) -> Result<ArchiveResult, ArchiveError> {
+    fn extract_archive(
+        &mut self,
+        _archive: &Path,
+        _destination: &Path,
+    ) -> Result<ArchiveResult, ArchiveError> {
         let start = std::time::Instant::now();
 
         Ok(ArchiveResult {
@@ -129,9 +150,16 @@ impl ArchiveHandler for ZipArchiveHandler {
 pub struct TarArchiveHandler;
 
 impl ArchiveHandler for TarArchiveHandler {
-    fn create_archive(&mut self, files: &[PathBuf], output: &Path, _format: ArchiveFormat, level: CompressionLevel) -> Result<ArchiveResult, ArchiveError> {
+    fn create_archive(
+        &mut self,
+        files: &[PathBuf],
+        output: &Path,
+        _format: ArchiveFormat,
+        level: CompressionLevel,
+    ) -> Result<ArchiveResult, ArchiveError> {
         let start = std::time::Instant::now();
-        let original_size: u64 = files.iter()
+        let original_size: u64 = files
+            .iter()
             .filter_map(|f| f.metadata().ok())
             .map(|m| m.len())
             .sum();
@@ -155,7 +183,11 @@ impl ArchiveHandler for TarArchiveHandler {
         })
     }
 
-    fn extract_archive(&mut self, _archive: &Path, _destination: &Path) -> Result<ArchiveResult, ArchiveError> {
+    fn extract_archive(
+        &mut self,
+        _archive: &Path,
+        _destination: &Path,
+    ) -> Result<ArchiveResult, ArchiveError> {
         let start = std::time::Instant::now();
 
         Ok(ArchiveResult {
@@ -227,25 +259,45 @@ impl ArchiveManager {
     }
 
     /// Create archive
-    pub fn create_archive(&mut self, files: &[PathBuf], output: &Path) -> Result<ArchiveResult, ArchiveError> {
-        let handler = self.handlers.get_mut(&self.default_format)
+    pub fn create_archive(
+        &mut self,
+        files: &[PathBuf],
+        output: &Path,
+    ) -> Result<ArchiveResult, ArchiveError> {
+        let handler = self
+            .handlers
+            .get_mut(&self.default_format)
             .ok_or_else(|| ArchiveError::FormatNotSupported(self.default_format))?;
 
         handler.create_archive(files, output, self.default_format, self.default_compression)
     }
 
     /// Create archive with specific format
-    pub fn create_archive_with_format(&mut self, files: &[PathBuf], output: &Path, format: ArchiveFormat, level: CompressionLevel) -> Result<ArchiveResult, ArchiveError> {
-        let handler = self.handlers.get_mut(&format)
+    pub fn create_archive_with_format(
+        &mut self,
+        files: &[PathBuf],
+        output: &Path,
+        format: ArchiveFormat,
+        level: CompressionLevel,
+    ) -> Result<ArchiveResult, ArchiveError> {
+        let handler = self
+            .handlers
+            .get_mut(&format)
             .ok_or_else(|| ArchiveError::FormatNotSupported(format))?;
 
         handler.create_archive(files, output, format, level)
     }
 
     /// Extract archive
-    pub fn extract_archive(&mut self, archive: &Path, destination: &Path) -> Result<ArchiveResult, ArchiveError> {
+    pub fn extract_archive(
+        &mut self,
+        archive: &Path,
+        destination: &Path,
+    ) -> Result<ArchiveResult, ArchiveError> {
         let format = self.detect_format(archive)?;
-        let handler = self.handlers.get_mut(&format)
+        let handler = self
+            .handlers
+            .get_mut(&format)
             .ok_or_else(|| ArchiveError::FormatNotSupported(format))?;
 
         handler.extract_archive(archive, destination)
@@ -254,7 +306,9 @@ impl ArchiveManager {
     /// List archive contents
     pub fn list_contents(&self, archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
         let format = self.detect_format(archive)?;
-        let handler = self.handlers.get(&format)
+        let handler = self
+            .handlers
+            .get(&format)
             .ok_or_else(|| ArchiveError::FormatNotSupported(format))?;
 
         handler.list_contents(archive)
@@ -262,7 +316,8 @@ impl ArchiveManager {
 
     /// Detect archive format from file extension
     fn detect_format(&self, path: &Path) -> Result<ArchiveFormat, ArchiveError> {
-        let extension = path.extension()
+        let extension = path
+            .extension()
             .and_then(|e| e.to_str())
             .ok_or_else(|| ArchiveError::UnknownFormat)?;
 
@@ -365,15 +420,22 @@ mod tests {
     #[test]
     fn test_create_archive() {
         let mut manager = ArchiveManager::default();
-        let files = vec![PathBuf::from("/test/file1.txt"), PathBuf::from("/test/file2.txt")];
-        let result = manager.create_archive(&files, PathBuf::from("/test/archive.zip")).unwrap();
+        let files = vec![
+            PathBuf::from("/test/file1.txt"),
+            PathBuf::from("/test/file2.txt"),
+        ];
+        let result = manager
+            .create_archive(&files, PathBuf::from("/test/archive.zip"))
+            .unwrap();
         assert!(result.success);
     }
 
     #[test]
     fn test_list_contents() {
         let manager = ArchiveManager::default();
-        let entries = manager.list_contents(PathBuf::from("/test/archive.zip")).unwrap();
+        let entries = manager
+            .list_contents(PathBuf::from("/test/archive.zip"))
+            .unwrap();
         assert!(!entries.is_empty());
     }
 }

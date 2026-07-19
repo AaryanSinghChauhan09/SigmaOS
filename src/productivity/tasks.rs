@@ -125,13 +125,15 @@ impl TaskStorage for InMemoryStorage {
     }
 
     fn load_task(&self, task_id: &str) -> Result<Task, TaskError> {
-        self.tasks.get(task_id)
+        self.tasks
+            .get(task_id)
             .cloned()
             .ok_or_else(|| TaskError::TaskNotFound(task_id.to_string()))
     }
 
     fn delete_task(&mut self, task_id: &str) -> Result<(), TaskError> {
-        self.tasks.remove(task_id)
+        self.tasks
+            .remove(task_id)
             .ok_or_else(|| TaskError::TaskNotFound(task_id.to_string()))?;
         Ok(())
     }
@@ -172,11 +174,19 @@ impl TaskManager {
     }
 
     /// Create task
-    pub fn create_task(&mut self, title: String, description: String, priority: TaskPriority) -> Result<String, TaskError> {
-        let task_id = format!("task_{}", std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos());
+    pub fn create_task(
+        &mut self,
+        title: String,
+        description: String,
+        priority: TaskPriority,
+    ) -> Result<String, TaskError> {
+        let task_id = format!(
+            "task_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
 
         let task = Task {
             id: task_id.clone(),
@@ -227,16 +237,22 @@ impl TaskManager {
     /// Filter tasks by priority
     pub fn filter_by_priority(&self, priority: TaskPriority) -> Result<Vec<Task>, TaskError> {
         let tasks = self.storage.list_tasks()?;
-        Ok(tasks.into_iter().filter(|t| t.priority == priority).collect())
+        Ok(tasks
+            .into_iter()
+            .filter(|t| t.priority == priority)
+            .collect())
     }
 
     /// Search tasks
     pub fn search_tasks(&self, query: &str) -> Result<Vec<Task>, TaskError> {
         let tasks = self.storage.list_tasks()?;
         let query_lower = query.to_lowercase();
-        Ok(tasks.into_iter()
-            .filter(|t| t.title.to_lowercase().contains(&query_lower) || 
-                      t.description.to_lowercase().contains(&query_lower))
+        Ok(tasks
+            .into_iter()
+            .filter(|t| {
+                t.title.to_lowercase().contains(&query_lower)
+                    || t.description.to_lowercase().contains(&query_lower)
+            })
             .collect())
     }
 
@@ -244,10 +260,12 @@ impl TaskManager {
     pub fn complete_task(&mut self, task_id: &str) -> Result<(), TaskError> {
         let mut task = self.storage.load_task(task_id)?;
         task.status = TaskStatus::Done;
-        task.completed_at = Some(std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs());
+        task.completed_at = Some(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        );
         self.storage.save_task(&task)
     }
 
@@ -289,7 +307,11 @@ impl TaskManager {
     }
 
     /// Add task to project
-    pub fn add_task_to_project(&mut self, project_id: &str, task_id: &str) -> Result<(), TaskError> {
+    pub fn add_task_to_project(
+        &mut self,
+        project_id: &str,
+        task_id: &str,
+    ) -> Result<(), TaskError> {
         if let Some(project) = self.projects.get_mut(project_id) {
             project.task_ids.push(task_id.to_string());
             Ok(())
@@ -336,7 +358,12 @@ impl TaskManager {
     }
 
     /// Add task to Kanban column
-    pub fn add_to_kanban(&mut self, board_id: &str, column_id: &str, task_id: &str) -> Result<(), TaskError> {
+    pub fn add_to_kanban(
+        &mut self,
+        board_id: &str,
+        column_id: &str,
+        task_id: &str,
+    ) -> Result<(), TaskError> {
         if let Some(board) = self.boards.get_mut(board_id) {
             if let Some(column) = board.columns.iter_mut().find(|c| c.id == column_id) {
                 column.task_ids.push(task_id.to_string());
@@ -368,7 +395,9 @@ impl TaskManager {
             .unwrap()
             .as_secs();
 
-        let due_reminders: Vec<Reminder> = self.reminders.iter()
+        let due_reminders: Vec<Reminder> = self
+            .reminders
+            .iter()
             .filter(|r| !r.is_dismissed && r.reminder_time <= now)
             .cloned()
             .collect();
@@ -402,7 +431,7 @@ impl TaskManager {
                         .duration_since(std::time::UNIX_EPOCH)
                         .unwrap()
                         .as_secs();
-                    
+
                     // Archive tasks completed more than 30 days ago
                     if now - completed_at > 30 * 24 * 3600 {
                         cleaned += 1;
@@ -424,8 +453,7 @@ impl TaskManager {
 
 impl Default for TaskManager {
     fn default() -> Self {
-        Self::new(Box::new(InMemoryStorage::new()))
-            .with_auto_cleanup(true)
+        Self::new(Box::new(InMemoryStorage::new())).with_auto_cleanup(true)
     }
 }
 
@@ -476,14 +504,26 @@ mod tests {
     #[test]
     fn test_create_task() {
         let mut manager = TaskManager::default();
-        let task_id = manager.create_task("Test".to_string(), "Description".to_string(), TaskPriority::Medium).unwrap();
+        let task_id = manager
+            .create_task(
+                "Test".to_string(),
+                "Description".to_string(),
+                TaskPriority::Medium,
+            )
+            .unwrap();
         assert!(!task_id.is_empty());
     }
 
     #[test]
     fn test_complete_task() {
         let mut manager = TaskManager::default();
-        let task_id = manager.create_task("Test".to_string(), "Description".to_string(), TaskPriority::Medium).unwrap();
+        let task_id = manager
+            .create_task(
+                "Test".to_string(),
+                "Description".to_string(),
+                TaskPriority::Medium,
+            )
+            .unwrap();
         manager.complete_task(&task_id).unwrap();
         let task = manager.get_task(&task_id).unwrap();
         assert_eq!(task.status, TaskStatus::Done);

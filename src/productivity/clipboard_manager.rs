@@ -62,9 +62,7 @@ pub struct SystemClipboardBackend {
 
 impl SystemClipboardBackend {
     pub fn new() -> Self {
-        Self {
-            current_item: None,
-        }
+        Self { current_item: None }
     }
 }
 
@@ -122,7 +120,7 @@ impl ClipboardManager {
     /// Copy to clipboard
     pub fn copy(&mut self, item: ClipboardItem) -> Result<(), ClipboardError> {
         self.backend.copy(item.clone())?;
-        
+
         // Add to history
         self.history.insert(0, item);
         self.last_copy_time = Some(Instant::now());
@@ -134,12 +132,19 @@ impl ClipboardManager {
     }
 
     /// Copy text
-    pub fn copy_text(&mut self, text: String, source_app: Option<String>) -> Result<(), ClipboardError> {
+    pub fn copy_text(
+        &mut self,
+        text: String,
+        source_app: Option<String>,
+    ) -> Result<(), ClipboardError> {
         let item = ClipboardItem {
-            id: format!("item_{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()),
+            id: format!(
+                "item_{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ),
             item_type: ClipboardItemType::Text,
             content: text.into_bytes(),
             metadata: {
@@ -164,8 +169,7 @@ impl ClipboardManager {
         if item.item_type != ClipboardItemType::Text {
             return Err(ClipboardError::TypeMismatch);
         }
-        String::from_utf8(item.content)
-            .map_err(|_| ClipboardError::InvalidContent)
+        String::from_utf8(item.content).map_err(|_| ClipboardError::InvalidContent)
     }
 
     /// Clear clipboard
@@ -185,7 +189,9 @@ impl ClipboardManager {
 
     /// Restore from history
     pub fn restore_from_history(&mut self, index: usize) -> Result<(), ClipboardError> {
-        let item = self.history.get(index)
+        let item = self
+            .history
+            .get(index)
             .ok_or_else(|| ClipboardError::HistoryIndexOutOfRange(index))?
             .clone();
         self.copy(item)
@@ -193,7 +199,8 @@ impl ClipboardManager {
 
     /// Filter history
     pub fn filter_history(&self, filter: &ClipboardFilter) -> Vec<&ClipboardItem> {
-        self.history.iter()
+        self.history
+            .iter()
             .filter(|item| {
                 if let Some(item_type) = filter.item_type {
                     if item.item_type != item_type {
@@ -251,9 +258,8 @@ impl ClipboardManager {
         }
 
         // Trim by max age
-        self.history.retain(|item| {
-            item.timestamp.elapsed() < self.history_config.max_age
-        });
+        self.history
+            .retain(|item| item.timestamp.elapsed() < self.history_config.max_age);
     }
 
     /// Auto-clear if needed

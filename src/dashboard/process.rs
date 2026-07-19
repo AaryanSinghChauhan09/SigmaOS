@@ -77,49 +77,58 @@ pub struct SystemProcessMonitor {
 impl SystemProcessMonitor {
     pub fn new() -> Self {
         let mut processes = HashMap::new();
-        
+
         // Simulated system processes
-        processes.insert(1, ProcessInfo {
-            pid: 1,
-            name: "init".to_string(),
-            command: "/sbin/init".to_string(),
-            user: "root".to_string(),
-            cpu_percent: 0.1,
-            memory_mb: 8,
-            memory_percent: 0.1,
-            state: ProcessState::Running,
-            priority: ProcessPriority::High,
-            threads: 1,
-            created_at: 0,
-        });
+        processes.insert(
+            1,
+            ProcessInfo {
+                pid: 1,
+                name: "init".to_string(),
+                command: "/sbin/init".to_string(),
+                user: "root".to_string(),
+                cpu_percent: 0.1,
+                memory_mb: 8,
+                memory_percent: 0.1,
+                state: ProcessState::Running,
+                priority: ProcessPriority::High,
+                threads: 1,
+                created_at: 0,
+            },
+        );
 
-        processes.insert(100, ProcessInfo {
-            pid: 100,
-            name: "sigma-kernel".to_string(),
-            command: "/boot/sigma-kernel".to_string(),
-            user: "root".to_string(),
-            cpu_percent: 5.0,
-            memory_mb: 256,
-            memory_percent: 2.5,
-            state: ProcessState::Running,
-            priority: ProcessPriority::Realtime,
-            threads: 8,
-            created_at: 1,
-        });
+        processes.insert(
+            100,
+            ProcessInfo {
+                pid: 100,
+                name: "sigma-kernel".to_string(),
+                command: "/boot/sigma-kernel".to_string(),
+                user: "root".to_string(),
+                cpu_percent: 5.0,
+                memory_mb: 256,
+                memory_percent: 2.5,
+                state: ProcessState::Running,
+                priority: ProcessPriority::Realtime,
+                threads: 8,
+                created_at: 1,
+            },
+        );
 
-        processes.insert(500, ProcessInfo {
-            pid: 500,
-            name: "sigma-ui".to_string(),
-            command: "/usr/bin/sigma-ui".to_string(),
-            user: "user".to_string(),
-            cpu_percent: 15.0,
-            memory_mb: 512,
-            memory_percent: 5.0,
-            state: ProcessState::Running,
-            priority: ProcessPriority::Normal,
-            threads: 4,
-            created_at: 10,
-        });
+        processes.insert(
+            500,
+            ProcessInfo {
+                pid: 500,
+                name: "sigma-ui".to_string(),
+                command: "/usr/bin/sigma-ui".to_string(),
+                user: "user".to_string(),
+                cpu_percent: 15.0,
+                memory_mb: 512,
+                memory_percent: 5.0,
+                state: ProcessState::Running,
+                priority: ProcessPriority::Normal,
+                threads: 4,
+                created_at: 10,
+            },
+        );
 
         Self { processes }
     }
@@ -131,7 +140,8 @@ impl ProcessMonitorStrategy for SystemProcessMonitor {
     }
 
     fn get_process(&self, pid: u32) -> Result<ProcessInfo, ProcessError> {
-        self.processes.get(&pid)
+        self.processes
+            .get(&pid)
             .cloned()
             .ok_or_else(|| ProcessError::ProcessNotFound(pid))
     }
@@ -175,10 +185,11 @@ impl ProcessManager {
         }
 
         let processes = self.monitor.get_processes()?;
-        
+
         // Update history
         for process in &processes {
-            self.process_history.entry(process.pid)
+            self.process_history
+                .entry(process.pid)
                 .or_insert_with(Vec::new)
                 .push(process.clone());
         }
@@ -196,10 +207,14 @@ impl ProcessManager {
     }
 
     /// Filter processes
-    pub fn filter_processes(&mut self, filter: &ProcessFilter) -> Result<Vec<ProcessInfo>, ProcessError> {
+    pub fn filter_processes(
+        &mut self,
+        filter: &ProcessFilter,
+    ) -> Result<Vec<ProcessInfo>, ProcessError> {
         let processes = self.get_processes()?;
 
-        Ok(processes.into_iter()
+        Ok(processes
+            .into_iter()
             .filter(|p| {
                 if let Some(ref name) = filter.name_contains {
                     if !p.name.to_lowercase().contains(name) {

@@ -168,9 +168,12 @@ impl ScreenshotTool {
     }
 
     /// Capture screenshot
-    pub fn capture(&mut self, config: ScreenshotConfig) -> Result<ScreenshotResult, ScreenshotError> {
+    pub fn capture(
+        &mut self,
+        config: ScreenshotConfig,
+    ) -> Result<ScreenshotResult, ScreenshotError> {
         let result = self.backend.capture(&config)?;
-        
+
         if result.success {
             self.recent_screenshots.push(result.clone());
             if self.recent_screenshots.len() > self.max_recent {
@@ -182,7 +185,10 @@ impl ScreenshotTool {
     }
 
     /// Quick capture (full screen, PNG)
-    pub fn quick_capture(&mut self, output_path: PathBuf) -> Result<ScreenshotResult, ScreenshotError> {
+    pub fn quick_capture(
+        &mut self,
+        output_path: PathBuf,
+    ) -> Result<ScreenshotResult, ScreenshotError> {
         let config = ScreenshotConfig {
             mode: ScreenshotMode::FullScreen,
             format: ImageFormat::Png,
@@ -196,7 +202,10 @@ impl ScreenshotTool {
     }
 
     /// Capture window
-    pub fn capture_window(&mut self, output_path: PathBuf) -> Result<ScreenshotResult, ScreenshotError> {
+    pub fn capture_window(
+        &mut self,
+        output_path: PathBuf,
+    ) -> Result<ScreenshotResult, ScreenshotError> {
         let config = ScreenshotConfig {
             mode: ScreenshotMode::Window,
             format: ImageFormat::Png,
@@ -210,7 +219,11 @@ impl ScreenshotTool {
     }
 
     /// Capture region
-    pub fn capture_region(&mut self, region: CaptureRegion, output_path: PathBuf) -> Result<ScreenshotResult, ScreenshotError> {
+    pub fn capture_region(
+        &mut self,
+        region: CaptureRegion,
+        output_path: PathBuf,
+    ) -> Result<ScreenshotResult, ScreenshotError> {
         let config = ScreenshotConfig {
             mode: ScreenshotMode::Region,
             format: ImageFormat::Png,
@@ -243,10 +256,10 @@ impl Default for ScreenshotTool {
     fn default() -> Self {
         #[cfg(target_os = "linux")]
         let backend: Box<dyn ScreenshotBackend> = Box::new(X11Backend);
-        
+
         #[cfg(target_os = "macos")]
         let backend: Box<dyn ScreenshotBackend> = Box::new(MacOsBackend);
-        
+
         #[cfg(target_os = "windows")]
         let backend: Box<dyn ScreenshotBackend> = Box::new(WindowsBackend);
 
@@ -317,15 +330,24 @@ mod tests {
     #[test]
     fn test_quick_capture() {
         let mut tool = ScreenshotTool::new(Box::new(X11Backend));
-        let result = tool.quick_capture(PathBuf::from("/test/screenshot.png")).unwrap();
+        let result = tool
+            .quick_capture(PathBuf::from("/test/screenshot.png"))
+            .unwrap();
         assert!(result.success);
     }
 
     #[test]
     fn test_capture_region() {
         let mut tool = ScreenshotTool::new(Box::new(X11Backend));
-        let region = CaptureRegion { x: 0, y: 0, width: 800, height: 600 };
-        let result = tool.capture_region(region, PathBuf::from("/test/screenshot.png")).unwrap();
+        let region = CaptureRegion {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+        let result = tool
+            .capture_region(region, PathBuf::from("/test/screenshot.png"))
+            .unwrap();
         assert!(result.success);
     }
 }

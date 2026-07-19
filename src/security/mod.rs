@@ -30,5 +30,6 @@ pub use vault::{
 };
 pub use vpn::{
     AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics, WireGuardHandler,
+    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    WireGuardHandler,
 };
