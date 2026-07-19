@@ -181,7 +181,11 @@ impl FileManager {
                     .duration_since(std::time::UNIX_EPOCH)
                     .unwrap()
                     .as_secs(),
-                file_type: if is_dir { FileType::Directory } else { FileType::Regular },
+                file_type: if is_dir {
+                    FileType::Directory
+                } else {
+                    FileType::Regular
+                },
             });
         }
 
@@ -198,7 +202,8 @@ impl FileManager {
             SortOrder::Size => items.sort_by(|a, b| a.size_bytes.cmp(&b.size_bytes)),
             SortOrder::Date => items.sort_by(|a, b| a.modified_at.cmp(&b.modified_at)),
             SortOrder::Type => items.sort_by(|a, b| {
-                a.is_directory.cmp(&b.is_directory)
+                a.is_directory
+                    .cmp(&b.is_directory)
                     .then_with(|| a.name.cmp(&b.name))
             }),
         }
@@ -249,7 +254,7 @@ impl FileManager {
     pub fn paste(&mut self) -> Result<(), FileManagerError> {
         for (path, operation) in self.clipboard.drain(..) {
             let destination = self.current_path.join(path.file_name().unwrap());
-            
+
             match operation {
                 ClipboardOperation::Copy => {
                     self.file_operation.copy(&path, &destination)?;
@@ -327,7 +332,7 @@ impl FileManager {
     /// Search files
     pub fn search(&self, query: &str) -> Vec<FileItem> {
         let mut results = Vec::new();
-        
+
         if let Ok(items) = self.list_directory(&self.current_path) {
             let query_lower = query.to_lowercase();
             for item in items {
@@ -344,7 +349,11 @@ impl FileManager {
     pub fn get_file_info(&self, path: &Path) -> Result<FileItem, FileManagerError> {
         // Simulated file info
         Ok(FileItem {
-            name: path.file_name().and_then(|n| n.to_str()).unwrap_or("unknown").to_string(),
+            name: path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("unknown")
+                .to_string(),
             path: path.to_path_buf(),
             size_bytes: 1024,
             is_directory: false,
@@ -395,13 +404,10 @@ impl FileManager {
 
 impl Default for FileManager {
     fn default() -> Self {
-        Self::new(
-            PathBuf::from("/home/user"),
-            Box::new(StandardFileOperation),
-        )
-        .with_view_mode(ViewMode::List)
-        .with_sort_order(SortOrder::Name)
-        .with_show_hidden(false)
+        Self::new(PathBuf::from("/home/user"), Box::new(StandardFileOperation))
+            .with_view_mode(ViewMode::List)
+            .with_sort_order(SortOrder::Name)
+            .with_show_hidden(false)
     }
 }
 
@@ -458,14 +464,22 @@ mod tests {
     #[test]
     fn test_navigate() {
         let mut manager = FileManager::default();
-        manager.navigate(PathBuf::from("/home/user/Documents")).unwrap();
-        assert_eq!(manager.current_path(), PathBuf::from("/home/user/Documents"));
+        manager
+            .navigate(PathBuf::from("/home/user/Documents"))
+            .unwrap();
+        assert_eq!(
+            manager.current_path(),
+            PathBuf::from("/home/user/Documents")
+        );
     }
 
     #[test]
     fn test_add_bookmark() {
         let mut manager = FileManager::default();
-        manager.add_bookmark("Documents".to_string(), PathBuf::from("/home/user/Documents"));
+        manager.add_bookmark(
+            "Documents".to_string(),
+            PathBuf::from("/home/user/Documents"),
+        );
         assert_eq!(manager.bookmarks().len(), 1);
     }
 }

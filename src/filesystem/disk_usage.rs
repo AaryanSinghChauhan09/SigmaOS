@@ -67,13 +67,11 @@ impl AnalysisStrategy for QuickAnalysisStrategy {
             size_bytes: 1024 * 1024 * 1024, // 1GB
             file_count: 100,
             directory_count: 10,
-            largest_files: vec![
-                FileSizeInfo {
-                    path: path.join("large_file.bin"),
-                    size_bytes: 512 * 1024 * 1024, // 512MB
-                    modified_at: 1234567890,
-                },
-            ],
+            largest_files: vec![FileSizeInfo {
+                path: path.join("large_file.bin"),
+                size_bytes: 512 * 1024 * 1024, // 512MB
+                modified_at: 1234567890,
+            }],
         })
     }
 
@@ -166,23 +164,27 @@ impl DiskUsageAnalyzer {
         Ok(DiskUsageInfo {
             path: path.to_path_buf(),
             total_bytes: 500 * 1024 * 1024 * 1024, // 500GB
-            used_bytes: 250 * 1024 * 1024 * 1024, // 250GB
-            free_bytes: 250 * 1024 * 1024 * 1024, // 250GB
+            used_bytes: 250 * 1024 * 1024 * 1024,  // 250GB
+            free_bytes: 250 * 1024 * 1024 * 1024,  // 250GB
             usage_percent: 50.0,
         })
     }
 
     /// Find large files
     pub fn find_large_files(&self, path: &Path, min_size_bytes: u64) -> Vec<FileSizeInfo> {
-        let dir_info = self.strategy.analyze(path).unwrap_or_else(|_| DirectorySizeInfo {
-            path: path.to_path_buf(),
-            size_bytes: 0,
-            file_count: 0,
-            directory_count: 0,
-            largest_files: Vec::new(),
-        });
+        let dir_info = self
+            .strategy
+            .analyze(path)
+            .unwrap_or_else(|_| DirectorySizeInfo {
+                path: path.to_path_buf(),
+                size_bytes: 0,
+                file_count: 0,
+                directory_count: 0,
+                largest_files: Vec::new(),
+            });
 
-        dir_info.largest_files
+        dir_info
+            .largest_files
             .into_iter()
             .filter(|f| f.size_bytes >= min_size_bytes)
             .collect()
@@ -191,20 +193,18 @@ impl DiskUsageAnalyzer {
     /// Find duplicate files (simulated)
     pub fn find_duplicates(&self, path: &Path) -> Vec<Vec<FileSizeInfo>> {
         // Simulated duplicate detection
-        vec![
-            vec![
-                FileSizeInfo {
-                    path: path.join("duplicate1.txt"),
-                    size_bytes: 1024,
-                    modified_at: 1234567890,
-                },
-                FileSizeInfo {
-                    path: path.join("duplicate2.txt"),
-                    size_bytes: 1024,
-                    modified_at: 1234567890,
-                },
-            ],
-        ]
+        vec![vec![
+            FileSizeInfo {
+                path: path.join("duplicate1.txt"),
+                size_bytes: 1024,
+                modified_at: 1234567890,
+            },
+            FileSizeInfo {
+                path: path.join("duplicate2.txt"),
+                size_bytes: 1024,
+                modified_at: 1234567890,
+            },
+        ]]
     }
 
     /// Get size by file type
@@ -229,8 +229,7 @@ impl DiskUsageAnalyzer {
 
 impl Default for DiskUsageAnalyzer {
     fn default() -> Self {
-        Self::new(Box::new(QuickAnalysisStrategy::new(3)))
-            .with_cache(true)
+        Self::new(Box::new(QuickAnalysisStrategy::new(3))).with_cache(true)
     }
 }
 

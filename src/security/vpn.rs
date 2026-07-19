@@ -93,7 +93,12 @@ impl WireGuardHandler {
         }
     }
 
-    pub fn with_keys(mut self, private_key: String, public_key: String, peer_public_key: String) -> Self {
+    pub fn with_keys(
+        mut self,
+        private_key: String,
+        public_key: String,
+        peer_public_key: String,
+    ) -> Self {
         self.private_key = Some(private_key);
         self.public_key = Some(public_key);
         self.peer_public_key = Some(peer_public_key);
@@ -120,10 +125,13 @@ impl VpnProtocolHandler for WireGuardHandler {
 
         Ok(VpnConnectionResult {
             success: true,
-            connection_id: format!("wg_{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs()),
+            connection_id: format!(
+                "wg_{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs()
+            ),
             assigned_ip,
             message: "WireGuard connection established".to_string(),
         })
@@ -226,10 +234,13 @@ impl VpnProtocolHandler for OpenVpnHandler {
 
         Ok(VpnConnectionResult {
             success: true,
-            connection_id: format!("ovpn_{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs()),
+            connection_id: format!(
+                "ovpn_{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs()
+            ),
             assigned_ip,
             message: "OpenVPN connection established".to_string(),
         })

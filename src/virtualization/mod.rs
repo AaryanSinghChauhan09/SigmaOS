@@ -5,8 +5,8 @@ pub mod vm_manager;
 
 pub use container::{
     ContainerConfig, ContainerError, ContainerInfo, ContainerRuntime, ContainerRuntimeManager,
-    ContainerStats, ContainerState, DockerRuntime, NetworkMode, PodmanRuntime, PortMapping,
-    PortProtocol, RestartPolicy, ResourceLimits, VolumeMapping,
+    ContainerState, ContainerStats, DockerRuntime, NetworkMode, PodmanRuntime, PortMapping,
+    PortProtocol, ResourceLimits, RestartPolicy, VolumeMapping,
 };
 pub use orchestration::{
     Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
@@ -14,6 +14,6 @@ pub use orchestration::{
     VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
 };
 pub use vm_manager::{
-    HypervisorBackend, OsType, QemuBackend, VmConfig, VmError, VmManager, VmResourceUsage,
-    VmSnapshot, VmState as ManagerVmState, VirtualBoxBackend,
+    HypervisorBackend, OsType, QemuBackend, VirtualBoxBackend, VmConfig, VmError, VmManager,
+    VmResourceUsage, VmSnapshot, VmState as ManagerVmState,
 };

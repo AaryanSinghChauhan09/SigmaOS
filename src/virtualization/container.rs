@@ -149,7 +149,8 @@ impl ContainerRuntime for DockerRuntime {
     fn create_container(&mut self, config: &ContainerConfig) -> Result<String, ContainerError> {
         let container_id = format!("container_{}", self.containers.len());
         self.containers.insert(container_id.clone(), config.clone());
-        self.container_states.insert(container_id.clone(), ContainerState::Created);
+        self.container_states
+            .insert(container_id.clone(), ContainerState::Created);
         Ok(container_id)
     }
 
@@ -157,7 +158,8 @@ impl ContainerRuntime for DockerRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Running);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
     }
 
@@ -165,7 +167,8 @@ impl ContainerRuntime for DockerRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Exited);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Exited);
         Ok(())
     }
 
@@ -173,7 +176,8 @@ impl ContainerRuntime for DockerRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Paused);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Paused);
         Ok(())
     }
 
@@ -181,7 +185,8 @@ impl ContainerRuntime for DockerRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Running);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
     }
 
@@ -189,9 +194,11 @@ impl ContainerRuntime for DockerRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Restarting);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Restarting);
         std::thread::sleep(std::time::Duration::from_millis(100));
-        self.container_states.insert(container_id.to_string(), ContainerState::Running);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
     }
 
@@ -204,9 +211,13 @@ impl ContainerRuntime for DockerRuntime {
     }
 
     fn get_container_info(&self, container_id: &str) -> Result<ContainerInfo, ContainerError> {
-        let config = self.containers.get(container_id)
+        let config = self
+            .containers
+            .get(container_id)
             .ok_or_else(|| ContainerError::ContainerNotFound(container_id.to_string()))?;
-        let state = self.container_states.get(container_id)
+        let state = self
+            .container_states
+            .get(container_id)
             .copied()
             .unwrap_or(ContainerState::Dead);
 
@@ -220,10 +231,12 @@ impl ContainerRuntime for DockerRuntime {
                 .unwrap()
                 .as_secs(),
             started_at: if state == ContainerState::Running {
-                Some(std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs())
+                Some(
+                    std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                )
             } else {
                 None
             },
@@ -250,7 +263,11 @@ impl ContainerRuntime for DockerRuntime {
     fn list_containers(&self) -> Result<Vec<ContainerInfo>, ContainerError> {
         let mut infos = Vec::new();
         for (id, config) in &self.containers {
-            let state = self.container_states.get(id).copied().unwrap_or(ContainerState::Dead);
+            let state = self
+                .container_states
+                .get(id)
+                .copied()
+                .unwrap_or(ContainerState::Dead);
             infos.push(ContainerInfo {
                 id: id.clone(),
                 name: config.name.clone(),
@@ -295,7 +312,8 @@ impl ContainerRuntime for PodmanRuntime {
     fn create_container(&mut self, config: &ContainerConfig) -> Result<String, ContainerError> {
         let container_id = format!("podman_{}", self.containers.len());
         self.containers.insert(container_id.clone(), config.clone());
-        self.container_states.insert(container_id.clone(), ContainerState::Created);
+        self.container_states
+            .insert(container_id.clone(), ContainerState::Created);
         Ok(container_id)
     }
 
@@ -303,7 +321,8 @@ impl ContainerRuntime for PodmanRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Running);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
     }
 
@@ -311,7 +330,8 @@ impl ContainerRuntime for PodmanRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Exited);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Exited);
         Ok(())
     }
 
@@ -319,7 +339,8 @@ impl ContainerRuntime for PodmanRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Paused);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Paused);
         Ok(())
     }
 
@@ -327,7 +348,8 @@ impl ContainerRuntime for PodmanRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Running);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
     }
 
@@ -335,9 +357,11 @@ impl ContainerRuntime for PodmanRuntime {
         if !self.containers.contains_key(container_id) {
             return Err(ContainerError::ContainerNotFound(container_id.to_string()));
         }
-        self.container_states.insert(container_id.to_string(), ContainerState::Restarting);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Restarting);
         std::thread::sleep(std::time::Duration::from_millis(100));
-        self.container_states.insert(container_id.to_string(), ContainerState::Running);
+        self.container_states
+            .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
     }
 
@@ -350,9 +374,13 @@ impl ContainerRuntime for PodmanRuntime {
     }
 
     fn get_container_info(&self, container_id: &str) -> Result<ContainerInfo, ContainerError> {
-        let config = self.containers.get(container_id)
+        let config = self
+            .containers
+            .get(container_id)
             .ok_or_else(|| ContainerError::ContainerNotFound(container_id.to_string()))?;
-        let state = self.container_states.get(container_id)
+        let state = self
+            .container_states
+            .get(container_id)
             .copied()
             .unwrap_or(ContainerState::Dead);
 
@@ -366,10 +394,12 @@ impl ContainerRuntime for PodmanRuntime {
                 .unwrap()
                 .as_secs(),
             started_at: if state == ContainerState::Running {
-                Some(std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs())
+                Some(
+                    std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                )
             } else {
                 None
             },
@@ -396,7 +426,11 @@ impl ContainerRuntime for PodmanRuntime {
     fn list_containers(&self) -> Result<Vec<ContainerInfo>, ContainerError> {
         let mut infos = Vec::new();
         for (id, config) in &self.containers {
-            let state = self.container_states.get(id).copied().unwrap_or(ContainerState::Dead);
+            let state = self
+                .container_states
+                .get(id)
+                .copied()
+                .unwrap_or(ContainerState::Dead);
             infos.push(ContainerInfo {
                 id: id.clone(),
                 name: config.name.clone(),
@@ -476,7 +510,10 @@ impl ContainerRuntimeManager {
     }
 
     /// Get container stats
-    pub fn get_container_stats(&self, container_id: &str) -> Result<ContainerStats, ContainerError> {
+    pub fn get_container_stats(
+        &self,
+        container_id: &str,
+    ) -> Result<ContainerStats, ContainerError> {
         self.runtime.get_container_stats(container_id)
     }
 
@@ -507,7 +544,10 @@ impl ContainerRuntimeManager {
     /// Get running containers
     pub fn running_containers(&self) -> Result<Vec<ContainerInfo>, ContainerError> {
         let all = self.runtime.list_containers()?;
-        Ok(all.into_iter().filter(|c| c.state == ContainerState::Running).collect())
+        Ok(all
+            .into_iter()
+            .filter(|c| c.state == ContainerState::Running)
+            .collect())
     }
 }
 

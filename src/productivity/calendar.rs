@@ -111,7 +111,8 @@ impl CalendarStorage for InMemoryCalendarStorage {
     }
 
     fn remove_event(&mut self, event_id: &str) -> Result<(), CalendarError> {
-        self.events.remove(event_id)
+        self.events
+            .remove(event_id)
             .ok_or_else(|| CalendarError::EventNotFound(event_id.to_string()))?;
         Ok(())
     }
@@ -133,7 +134,8 @@ impl CalendarStorage for InMemoryCalendarStorage {
     }
 
     fn get_events_in_range(&self, start: u64, end: u64) -> Vec<CalendarEvent> {
-        self.events.values()
+        self.events
+            .values()
             .filter(|e| e.start_time >= start && e.start_time <= end)
             .cloned()
             .collect()
@@ -234,7 +236,9 @@ impl CalendarApp {
             .unwrap()
             .as_secs();
 
-        let mut events: Vec<CalendarEvent> = self.storage.get_all_events()
+        let mut events: Vec<CalendarEvent> = self
+            .storage
+            .get_all_events()
             .into_iter()
             .filter(|e| e.start_time >= now)
             .collect();
@@ -246,18 +250,20 @@ impl CalendarApp {
     /// Search events
     pub fn search_events(&self, query: &str) -> Vec<CalendarEvent> {
         let query_lower = query.to_lowercase();
-        self.storage.get_all_events()
+        self.storage
+            .get_all_events()
             .into_iter()
             .filter(|e| {
-                e.title.to_lowercase().contains(&query_lower) ||
-                e.description.to_lowercase().contains(&query_lower)
+                e.title.to_lowercase().contains(&query_lower)
+                    || e.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
 
     /// Get events by type
     pub fn get_events_by_type(&self, event_type: EventType) -> Vec<CalendarEvent> {
-        self.storage.get_all_events()
+        self.storage
+            .get_all_events()
             .into_iter()
             .filter(|e| e.event_type == event_type)
             .collect()
@@ -316,8 +322,7 @@ impl CalendarApp {
 
 impl Default for CalendarApp {
     fn default() -> Self {
-        Self::new(Box::new(InMemoryCalendarStorage::new()))
-            .with_view(CalendarView::Month)
+        Self::new(Box::new(InMemoryCalendarStorage::new())).with_view(CalendarView::Month)
     }
 }
 

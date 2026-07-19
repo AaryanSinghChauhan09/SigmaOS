@@ -36,7 +36,8 @@ pub use vault::{
 };
 pub use vpn::{
     AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics, WireGuardHandler,
+    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    WireGuardHandler,
 };
 pub use integrity::{IntegrityCheck, IntegrityError, IntegrityVerifier};
 pub use mac::{MacPolicy, MacRule, MacSecurity};

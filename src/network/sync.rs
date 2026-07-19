@@ -246,7 +246,9 @@ impl CloudSyncManager {
 
     /// Authenticate
     pub fn authenticate(&mut self) -> Result<(), SyncError> {
-        let credentials = self.credentials.as_ref()
+        let credentials = self
+            .credentials
+            .as_ref()
             .ok_or_else(|| SyncError::NoCredentials)?;
         self.provider.authenticate(credentials)
     }
@@ -257,22 +259,34 @@ impl CloudSyncManager {
     }
 
     /// Add sync item from path
-    pub fn add_sync_item_from_path(&mut self, local_path: PathBuf, remote_path: String, item_type: SyncItemType) {
+    pub fn add_sync_item_from_path(
+        &mut self,
+        local_path: PathBuf,
+        remote_path: String,
+        item_type: SyncItemType,
+    ) {
         let metadata = std::fs::metadata(&local_path);
-        
+
         let item = SyncItem {
-            id: format!("item_{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()),
+            id: format!(
+                "item_{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ),
             local_path,
             remote_path,
             size_bytes: metadata.map(|m| m.len()).unwrap_or(0),
-            last_modified: metadata.map(|m| m.modified()
-                .ok()
-                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-                .map(|d| d.as_secs())
-                .unwrap_or(0)).unwrap_or(0),
+            last_modified: metadata
+                .map(|m| {
+                    m.modified()
+                        .ok()
+                        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                        .map(|d| d.as_secs())
+                        .unwrap_or(0)
+                })
+                .unwrap_or(0),
             sync_status: SyncStatus::Pending,
             item_type,
         };
@@ -283,7 +297,7 @@ impl CloudSyncManager {
     /// Sync all items
     pub fn sync_all(&mut self) -> Result<SyncResult, SyncError> {
         let start = Instant::now();
-        let mut.items_synced = 0;
+        let mut items_synced = 0;
         let mut bytes_transferred = 0u64;
         let mut errors = Vec::new();
 
@@ -329,7 +343,8 @@ impl CloudSyncManager {
             Ok(item.size_bytes)
         } else if remote_modified > local_modified {
             // Download
-            self.provider.download(&item.remote_path, &item.local_path)?;
+            self.provider
+                .download(&item.remote_path, &item.local_path)?;
             Ok(item.size_bytes)
         } else {
             // Already synced
@@ -343,7 +358,8 @@ impl CloudSyncManager {
         Ok(std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_secs() - 3600) // 1 hour ago
+            .as_secs()
+            - 3600) // 1 hour ago
     }
 
     /// Auto-sync if interval has elapsed
@@ -378,7 +394,11 @@ impl CloudSyncManager {
     }
 
     /// Resolve conflict
-    pub fn resolve_conflict(&mut self, item_id: &str, resolution: ConflictResolution) -> Result<(), SyncError> {
+    pub fn resolve_conflict(
+        &mut self,
+        item_id: &str,
+        resolution: ConflictResolution,
+    ) -> Result<(), SyncError> {
         if let Some(item) = self.sync_items.iter_mut().find(|i| i.id == item_id) {
             match resolution {
                 ConflictResolution::LocalWins => {
@@ -386,7 +406,8 @@ impl CloudSyncManager {
                     item.sync_status = SyncStatus::Synced;
                 }
                 ConflictResolution::RemoteWins => {
-                    self.provider.download(&item.remote_path, &item.local_path)?;
+                    self.provider
+                        .download(&item.remote_path, &item.local_path)?;
                     item.sync_status = SyncStatus::Synced;
                 }
                 ConflictResolution::NewestWins => {

@@ -143,13 +143,11 @@ impl RecordingBackend for FfmpegBackend {
     }
 
     fn get_progress(&self) -> RecordingProgress {
-        let duration = self.start_time
-            .map(|t| t.elapsed().as_secs())
-            .unwrap_or(0);
+        let duration = self.start_time.map(|t| t.elapsed().as_secs()).unwrap_or(0);
 
         RecordingProgress {
             duration_seconds: duration,
-            frames_captured: duration * 30, // Assuming 30 FPS
+            frames_captured: duration * 30,          // Assuming 30 FPS
             file_size_bytes: duration * 1024 * 1024, // 1MB per second
             current_bitrate_mbps: 5.0,
         }
@@ -215,9 +213,7 @@ impl RecordingBackend for GStreamerBackend {
     }
 
     fn get_progress(&self) -> RecordingProgress {
-        let duration = self.start_time
-            .map(|t| t.elapsed().as_secs())
-            .unwrap_or(0);
+        let duration = self.start_time.map(|t| t.elapsed().as_secs()).unwrap_or(0);
 
         RecordingProgress {
             duration_seconds: duration,
@@ -328,7 +324,12 @@ mod tests {
             video_quality: VideoQuality::High,
             audio_quality: AudioQuality::Medium,
             fps: 30,
-            region: RecordingRegion { x: 0, y: 0, width: 1920, height: 1080 },
+            region: RecordingRegion {
+                x: 0,
+                y: 0,
+                width: 1920,
+                height: 1080,
+            },
             record_audio: true,
             record_cursor: true,
             output_path: PathBuf::from("/test/recording.mp4"),
@@ -362,7 +363,12 @@ mod tests {
             video_quality: VideoQuality::High,
             audio_quality: AudioQuality::Medium,
             fps: 30,
-            region: RecordingRegion { x: 0, y: 0, width: 1920, height: 1080 },
+            region: RecordingRegion {
+                x: 0,
+                y: 0,
+                width: 1920,
+                height: 1080,
+            },
             record_audio: true,
             record_cursor: true,
             output_path: PathBuf::from("/test/recording.mp4"),
@@ -379,7 +385,12 @@ mod tests {
             video_quality: VideoQuality::High,
             audio_quality: AudioQuality::Medium,
             fps: 30,
-            region: RecordingRegion { x: 0, y: 0, width: 1920, height: 1080 },
+            region: RecordingRegion {
+                x: 0,
+                y: 0,
+                width: 1920,
+                height: 1080,
+            },
             record_audio: true,
             record_cursor: true,
             output_path: PathBuf::from("/test/recording.mp4"),

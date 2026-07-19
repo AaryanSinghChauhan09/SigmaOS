@@ -130,7 +130,9 @@ impl RoundRobinScheduler {
         let idx = self.processes.len();
         self.processes.push(ScheduledProcess::new(process));
         // Update ready_queue_head if this is the first ready process
-        if self.ready_queue_head.is_none() && self.processes[idx].process.state == ProcessState::Ready {
+        if self.ready_queue_head.is_none()
+            && self.processes[idx].process.state == ProcessState::Ready
+        {
             self.ready_queue_head = Some(idx);
         }
         Ok(())
@@ -230,7 +232,12 @@ impl RoundRobinScheduler {
     }
 
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
-        if let Some((idx, entry)) = self.processes.iter_mut().enumerate().find(|(i, e)| e.process.pid == pid) {
+        if let Some((idx, entry)) = self
+            .processes
+            .iter_mut()
+            .enumerate()
+            .find(|(i, e)| e.process.pid == pid)
+        {
             entry.process.state = state;
             // Update ready_queue_head when state changes
             if state == ProcessState::Ready && self.ready_queue_head.is_none() {

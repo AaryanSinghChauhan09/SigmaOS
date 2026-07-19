@@ -31,12 +31,6 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 *   **Upstream Inspiration:** `busybox/busybox`, `coreutils/coreutils`
 *   **Success Criteria:** Native commands (ls, cat, ps, clear, help) execute correctly in REPL.
 
-#### 1.3 Platform Hardware HAL & Bus Drivers
-*   **Task:** Implement unified GPIO, I2C, SPI, and DMA interfaces.
-*   **Target Directories:** `src/drivers/`, `src/kernel/hal/`
-*   **Upstream Inspiration:** `raspberrypi/linux`, `analogdevicesinc/linux`
-*   **Success Criteria:** Drivers compile cleanly without external dependencies.
-
 ---
 
 ### 🟡 Phase 2: Capability Gate & Security Hardening (Months 3–6)
@@ -87,6 +81,23 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 *   **Target Directories:** `src/accessibility/`, `zenith_desktop/`
 *   **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
 *   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
+
+---
+
+## 🏗️ OOP-Based Plug-and-Play Driver Framework
+
+To ensure flawless driver dynamic-loading, SigmaOS defines abstract base traits and strict device-family hierarchies.
+
+### Polymorphic Device Framework:
+```rust
+pub trait DeviceDriver {
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn shutdown(&mut self) -> Result<(), &'static str>;
+    fn get_status(&self) -> &'static str;
+}
+```
+
+This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, `GpuDriver`, `NetworkDriver`, `BluetoothDriver`) executing within isolated userspace microkernel shards.
 
 ---
 
