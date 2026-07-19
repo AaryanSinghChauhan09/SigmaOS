@@ -181,6 +181,71 @@ impl<'a> OptimizedVersionConstraint<'a> {
 
 ---
 
+## 🐛 Comprehensive Bug & Fix Directory
+
+Below is an exhaustive register of detected codebase bugs, logic vulnerabilities, and unhandled panic paths, paired with ready-to-implement rust-native fixes:
+
+### Bug 1: File Descriptor Offset Checked Addition Bypass (Logic/Security)
+*   **Location:** `src/filesystem/vfs.rs:160` (inside `read_file` method)
+*   **Severity:** **High**
+*   **Root Cause:** The code computes `new_offset` utilizing a safe `.checked_add()` to prevent index overflows:
+    ```rust
+    let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        .ok_or(FsError::InvalidFd)?;
+    ```
+    However, the calculated `new_offset` is **never utilized**. The code proceeds to update the descriptor's offset directly:
+    ```rust
+    file_descriptor.offset += bytes_read as u64;
+```
+    If `file_descriptor.offset` is already close to `u64::MAX`, this addition can overflow and wrap or panic, fully bypassing the safe overflow defense and triggering unhandled panics under hosted targets or undefined memory behavior in production.
+*   **Suggested Fix:** Use the validated `new_offset` computation or explicitly bind the update to a checked add:
+    ```rust
+    let bytes_read = buffer.len().min(inode.size as usize);
+    file_descriptor.offset = file_descriptor.offset.checked_add(bytes_read as u64)
+        .ok_or(FsError::InvalidFd)?;
+    ```
+
+### Bug 2: Potential Null Pointer Dereferences in Page-Walking (Memory Safety/Undefined Behavior)
+*   **Location:** `src/kernel/memory.rs:258, 271, 285`
+*   **Severity:** **Critical** (Microkernel Core)
+*   **Root Cause:** The paging table walkers resolve virtual addresses by dereferencing the raw root directory pointer utilizing unsafe `.as_ref()` and `.as_mut()` blocks:
+    ```rust
+    let root = unsafe { self.root_directory.as_ref() };
+    ```
+    If the microkernel’s memory manager is incorrectly initialized or a page table pointer becomes corrupted (null pointer state), raw `.as_ref()` triggers immediate undefined behavior or bare-metal kernel panics, without any soft recovery or safety guardrails.
+*   **Suggested Fix:** Check pointer validity securely using `as_ref()` patterns or assert non-null state before dereferencing:
+    ```rust
+    let root = unsafe {
+        self.root_directory.as_ref().ok_or("Null Page Table Root!")?
+    };
+    ```
+
+### Bug 3: Direct `unwrap()` on Vector Popping in Memory Management (Panic Risk)
+*   **Location:** `src/kernel/memory.rs:110` (inside `get_block` method)
+*   **Severity:** **Medium**
+*   **Root Cause:** Inside buddy allocator allocation cycles, the method retrieves free blocks directly:
+    ```rust
+    Some(self.free_lists[order].pop().unwrap())
+    ```
+    Although protected by a checked size condition (`!self.free_lists[order].is_empty()`), using `.unwrap()` on raw vector popping creates unsafe panic assumptions. If concurrent interrupts or unmapped core workers manipulate the allocator concurrently, a panic will occur.
+*   **Suggested Fix:** Rely on safe pattern matching or direct option returns:
+    ```rust
+    self.free_lists[order].pop()
+    ```
+
+### Bug 4: Missing Array Index Bounds Checks inside Buddy Allocator `try_merge` (Panic Risk)
+*   **Location:** `src/kernel/memory.rs:146` (inside `try_merge` method)
+*   **Severity:** **Medium**
+*   **Root Cause:** Methods like `try_merge` accept an `order` integer parameter and directly index into the allocator's arrays (`self.free_lists[order]`) without verifying if `order < 12`. If an invalid order bounds calculation is supplied dynamically, the microkernel core will panic out-of-bounds.
+*   **Suggested Fix:** Apply explicit bounds guards before all array indexing:
+    ```rust
+    if order >= 12 {
+        return Err(block);
+    }
+    ```
+
+---
+
 ## 🎯 Recommended Next Steps
 
 1.  **Phase 1: Lint & Diagnostics Clean-up**
