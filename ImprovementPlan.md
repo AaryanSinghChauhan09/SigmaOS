@@ -14,6 +14,7 @@ This document provides a highly comprehensive audit, analysis, next-steps guidel
 7. [User Experience, Accessibility & Visual Delight (🎨 Palette’s Vision)](#7-user-experience-accessibility--visual-delight-🎨-palettes-vision)
 8. [Daily Performance Optimization (⚡ Bolt’s Corner)](#8-daily-performance-optimization-⚡-bolts-corner)
 9. [Subsystem Integration Roadmap & Priority Rankings](#9-subsystem-integration-roadmap--priority-rankings)
+10. [Chromium-Based Sovereign Web Browser (SigmaWeb) Integration](#10-chromium-based-sovereign-web-browser-sigmaweb-integration)
 
 ---
 
@@ -152,4 +153,25 @@ Accessibility and visual appeal are core components of operating system dignity.
 | **GDPR Audit Trails Logging** | Event auditing | ISO 27001 | **Low** | Configure custom sanitizers to wipe personal metadata before logs save. |
 
 ---
-*Document prepared under the guidelines of Bolt ⚡, Sentinel 🛡️, and Palette 🎨.*
+
+## 10. Chromium-Based Sovereign Web Browser (SigmaWeb) Integration
+
+To run modern, high-performance web applications securely, SigmaOS integrates a Chromium-based sovereign web browser application platform (**SigmaWeb**) utilizing custom abstractions and microkernel capabilities.
+
+### A. Non-POSIX Multi-Process Architecture
+*   **Linux/POSIX assumptions**: Chromium relies heavily on Linux `fork`/`exec` and POSIX `shm` namespaces.
+*   **Sovereign Solution**: SigmaOS's AI-native microkernel spawns browser processes natively through the `IpcManager` and encapsulates them using discrete **CapabilityTokens**.
+    *   **Browser Process (Broker)**: Runs with standard filesystem and network permissions.
+    *   **Render Process (Sandbox)**: Runs with zero permissions (`sigma_pledge` restricting all syscalls except `Ipc` write).
+    *   **GPU Process**: Strictly isolated; communicates with `VesaDriver` or `GpuDriver` using shared memory segments natively registered with the physical `BuddyAllocator`.
+
+### B. Zero-Dependency Window Rendering (Zenith Direct)
+*   Instead of loading resource-heavy graphics servers (like X11/Wayland), the SigmaWeb GPU client compiles with a lightweight Aura shell backend that writes direct composite frame buffers to SigmaOS's Zenith Desktop compositor.
+*   Uses **Zero-Dependency Shared Framebuffers** to render HTML5/WebGL surfaces with zero IPC context-switching latency.
+
+### C. Sovereign PQC Network Adapter
+*   Chromium's standard Network Service is re-routed to use **S-NET** (the local, safe TCP stack) instead of POSIX BSD sockets.
+*   Includes built-in post-quantum cryptographic (PQC) certificate verification daemons that intercept SSL handshakes to validate certificates using standard native Kyber-1024/Dilithium-5 keys.
+
+---
+*Prepared with dedication by Bolt ⚡, Sentinel 🛡️, and Palette 🎨.*
