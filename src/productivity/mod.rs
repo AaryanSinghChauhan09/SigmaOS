@@ -1,4 +1,5 @@
 // SigmaOS Productivity Module
+pub mod calendar;
 pub mod clipboard_manager;
 pub mod editor;
 pub mod gamification;
@@ -8,6 +9,10 @@ pub mod screenshot;
 pub mod tasks;
 pub mod terminal;
 
+pub use calendar::{
+    CalendarApp, CalendarError, CalendarEvent, CalendarStorage, CalendarView, DayInfo,
+    EventType, EventStatus, InMemoryCalendarStorage, RecurrencePattern,
+};
 pub use clipboard_manager::{
     ClipboardBackend, ClipboardError, ClipboardFilter, ClipboardHistoryConfig, ClipboardItem,
     ClipboardItemType, ClipboardManager, SystemClipboardBackend,
