@@ -1,11 +1,16 @@
 // SigmaOS Filesystem Module
 pub mod archive;
+pub mod disk_usage;
 pub mod manager;
 pub mod vfs;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
+};
+pub use disk_usage::{
+    AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
+    DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
 pub use manager::{
     ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation, FileType as ManagerFileType,
