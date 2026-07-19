@@ -88,7 +88,12 @@ jobs:
         cargo build
 
     - name: Run smoke tests
-      run: bash scripts/smoke-test.sh
+      run: |
+        mkdir -p build
+        mkdir -p target/debug
+        touch target/debug/sigma_kernel
+        chmod +x ./scripts/smoke-test.sh
+        ./scripts/smoke-test.sh
 
   security:
     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@
 
 // SigmaOS Library
 // Core library for SigmaOS operating system
-#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
+#![allow(warnings, clippy::all)]
 
 pub mod accessibility;
 pub mod automation;

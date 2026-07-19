@@ -82,10 +82,20 @@ impl Scheduler {
     pub fn schedule(&mut self) -> Option<&Process> {
         // Find process with earliest eligible virtual deadline
         let now = self.current_time;
-        self.processes
+        let eligible = self.processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
-            .min_by_key(|p| p.virtual_deadline)
+            .min_by_key(|p| p.virtual_deadline);
+
+        if eligible.is_some() {
+            eligible
+        } else {
+            // Fallback: choose the ready process with the earliest deadline if none are strictly eligible
+            self.processes
+                .iter()
+                .filter(|p| p.state == ProcessState::Ready)
+                .min_by_key(|p| p.virtual_deadline)
+        }
     }
 
     pub fn tick(&mut self) {

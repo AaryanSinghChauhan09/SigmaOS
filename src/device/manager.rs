@@ -110,6 +110,7 @@ impl DeviceManager for SimpleDeviceManager {
         for device_option in self.devices.iter_mut() {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
+                    *device_option = None;
                     return Ok(());
                 }
             }

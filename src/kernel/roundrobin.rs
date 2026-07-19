@@ -426,7 +426,6 @@ mod tests {
         };
         let mut scheduler = RoundRobinScheduler::with_config(config);
 
-<<<<<<< HEAD
         assert!(scheduler
             .add_process(Process::new(1, "test1".to_string(), Priority::Normal))
             .is_ok());
@@ -436,14 +435,5 @@ mod tests {
         assert!(scheduler
             .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
             .is_err());
-=======
-        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        let process3 = Process::new(3, "test3".to_string(), Priority::Normal);
-
-        assert!(scheduler.add_process(process1).is_ok());
-        assert!(scheduler.add_process(process2).is_ok());
-        assert!(scheduler.add_process(process3).is_err());
->>>>>>> origin/jules-9057756713964855410-d59a7b65
     }
 }
