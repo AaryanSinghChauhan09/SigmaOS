@@ -145,13 +145,13 @@ mod tests {
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
-        let package = Package {
-            name: "test".to_string(),
-            version: crate::sigpkg::Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: String::new(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            crate::sigpkg::Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
 
         // This will fail due to dependency resolution, but tests the flow
         let result = transaction.install(package);

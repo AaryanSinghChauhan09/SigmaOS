@@ -9,7 +9,6 @@ pub mod modern_usb;
 pub mod network;
 pub mod peripheral;
 pub mod storage;
-pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
 
