@@ -31,20 +31,29 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let parts: Vec<&str> = version_str.split('.').collect();
-        if parts.len() != 3 {
+        let mut parts = version_str.split('.');
+
+        let major = parts
+            .next()
+            .ok_or(ParseError::InvalidFormat)?
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+
+        let minor = parts
+            .next()
+            .ok_or(ParseError::InvalidFormat)?
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+
+        let patch = parts
+            .next()
+            .ok_or(ParseError::InvalidFormat)?
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+
+        if parts.next().is_some() {
             return Err(ParseError::InvalidFormat);
         }
-
-        let major = parts[0]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
 
         Ok(Version::new(major, minor, patch))
     }
