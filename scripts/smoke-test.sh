@@ -6,6 +6,9 @@ set -e
 
 echo "Running SigmaOS smoke tests..."
 
+# Create build directory if it doesn't exist
+mkdir -p build
+
 # Test 1: Check if build directory exists
 if [ ! -d "build" ]; then
     echo "FAIL: Build directory does not exist"
