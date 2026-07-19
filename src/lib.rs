@@ -51,6 +51,7 @@ pub use automation::{
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use community::{
     BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
@@ -104,6 +105,11 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 >>>>>>> origin/jules-5211497904429441944-cf01c5fc
+=======
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -111,6 +117,7 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -201,10 +208,14 @@ pub use drivers::{
 =======
 pub use drivers::{
 >>>>>>> origin/jules-5211497904429441944-cf01c5fc
+=======
+pub use drivers::{
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -230,10 +241,13 @@ pub use drivers::{
 >>>>>>> origin/jules-3459836125595431986-db79e46f
 =======
 >>>>>>> origin/jules-5211497904429441944-cf01c5fc
+=======
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -265,10 +279,13 @@ pub use governance::{
 >>>>>>> origin/jules-3459836125595431986-db79e46f
 =======
 >>>>>>> origin/jules-5211497904429441944-cf01c5fc
+=======
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -299,6 +316,8 @@ pub use legal::{
 >>>>>>> origin/jules-3459836125595431986-db79e46f
 =======
 >>>>>>> origin/jules-5211497904429441944-cf01c5fc
+=======
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -332,6 +351,7 @@ pub use sigpkg::{
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
@@ -353,6 +373,8 @@ pub use support::{
 >>>>>>> origin/jules-3459836125595431986-db79e46f
 =======
 >>>>>>> origin/jules-5211497904429441944-cf01c5fc
+=======
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,

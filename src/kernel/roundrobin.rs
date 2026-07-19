@@ -75,6 +75,8 @@ impl ScheduledProcess {
         base_slice * multiplier
     }
 }
+=======
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 
 /// Round-robin scheduler configuration
 pub struct RoundRobinConfig {
@@ -139,11 +141,26 @@ impl RoundRobinScheduler {
             return None;
         }
 
+<<<<<<< HEAD
         // O(1) lookup using ready_queue_head
         if let Some(head) = self.ready_queue_head {
             if self.processes[head].process.state == ProcessState::Ready {
                 self.current_index = head;
                 return Some(&self.processes[head].process);
+=======
+        // Find next ready process
+        let start_index = self.current_index;
+        loop {
+            if self.processes[self.current_index].state == ProcessState::Ready {
+                return Some(&self.processes[self.current_index]);
+            }
+
+            self.current_index = (self.current_index + 1) % self.processes.len();
+
+            // If we've looped through all processes
+            if self.current_index == start_index {
+                return None;
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
             }
         }
 
@@ -163,6 +180,7 @@ impl RoundRobinScheduler {
     pub fn tick(&mut self) {
         self.current_time += 1;
 
+<<<<<<< HEAD
         if self.processes.is_empty() {
             return;
         }
@@ -178,6 +196,11 @@ impl RoundRobinScheduler {
 
         if needs_switch {
             self.advance_to_next_ready();
+=======
+        // Time slice expired, move to next process
+        if self.current_time % self.config.time_slice == 0 {
+            self.current_index = (self.current_index + 1) % self.processes.len();
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
         }
     }
 
@@ -219,6 +242,7 @@ impl RoundRobinScheduler {
     }
 
     pub fn remove_process(&mut self, pid: u64) {
+<<<<<<< HEAD
         if let Some(idx) = self.processes.iter().position(|e| e.process.pid == pid) {
             self.processes.remove(idx);
             // Reset ready_queue_head if it pointed to removed process
@@ -232,6 +256,11 @@ impl RoundRobinScheduler {
                 }
             }
         }
+=======
+        self.processes.retain(|p| p.pid != pid);
+
+        // Adjust current index if necessary
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
             self.current_index = 0;
         }
@@ -244,6 +273,7 @@ impl RoundRobinScheduler {
     pub fn get_ready_process_count(&self) -> usize {
         self.processes
             .iter()
+<<<<<<< HEAD
             .filter(|e| e.process.state == ProcessState::Ready)
             .count()
     }
@@ -258,6 +288,10 @@ impl RoundRobinScheduler {
     /// Restore the context of the currently scheduled process
     pub fn restore_context(&self) -> Option<CpuContext> {
         self.processes.get(self.current_index).map(|e| e.context)
+=======
+            .filter(|p| p.state == ProcessState::Ready)
+            .count()
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
     }
 }
 
@@ -298,12 +332,19 @@ mod tests {
         let mut scheduler = RoundRobinScheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process).unwrap();
+<<<<<<< HEAD
         assert!(scheduler.schedule().is_some());
+=======
+
+        let scheduled = scheduler.schedule();
+        assert!(scheduled.is_some());
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
     }
 
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
+<<<<<<< HEAD
 <<<<<<< HEAD
         let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
         let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
@@ -327,6 +368,18 @@ mod tests {
         }
         // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
 >>>>>>> origin/jules-8662134349396449944-dbc9966d
+=======
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
+
+        let initial_index = scheduler.current_index;
+        for _ in 0..10 {
+            scheduler.tick();
+        }
+        // After 10 ticks with 10ms time slice, index should change
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
         assert_ne!(scheduler.current_index, initial_index);
     }
 
@@ -373,6 +426,7 @@ mod tests {
         };
         let mut scheduler = RoundRobinScheduler::with_config(config);
 
+<<<<<<< HEAD
         assert!(scheduler
             .add_process(Process::new(1, "test1".to_string(), Priority::Normal))
             .is_ok());
@@ -382,5 +436,14 @@ mod tests {
         assert!(scheduler
             .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
             .is_err());
+=======
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        let process3 = Process::new(3, "test3".to_string(), Priority::Normal);
+
+        assert!(scheduler.add_process(process1).is_ok());
+        assert!(scheduler.add_process(process2).is_ok());
+        assert!(scheduler.add_process(process3).is_err());
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
     }
 }

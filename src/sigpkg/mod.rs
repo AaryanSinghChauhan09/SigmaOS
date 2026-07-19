@@ -56,6 +56,20 @@ impl Version {
         if parts.next().is_some() {
             return Err(ParseError::InvalidFormat);
         }
+<<<<<<< HEAD
+=======
+
+        let major = parts[0]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = parts[1]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let patch = parts[2]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
         Ok(Version::new(major, minor, patch))
     }
 }
@@ -91,10 +105,14 @@ pub struct Dependency {
 
 /// Version constraint
 <<<<<<< HEAD
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 =======
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 >>>>>>> origin/jules-8662134349396449944-dbc9966d
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+>>>>>>> origin/jules-9057756713964855410-d59a7b65
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),
