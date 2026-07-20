@@ -61,7 +61,7 @@ Post-quantum security stack fully integrated into the kernel ABI:
 
 ---
 
-## 🌐 Phase D — Network Stack (🔄 In Progress)
+## 🌐 Phase D — Network Stack (✅ Complete)
 
 - **TCP/IP Stack** — Hand-written from scratch; no libc dependency. BBR + Reno congestion control.
 - **UDP Socket** — Zero-copy datagrams.
@@ -70,7 +70,9 @@ Post-quantum security stack fully integrated into the kernel ABI:
 - **Wi-Fi 7 Driver** — OOP driver for 802.11be with spatial reuse.
 - **BitTorrent Protocol** — Sovereign peer-to-peer content delivery.
 
-**Remaining work:** DNS resolver, QUIC/HTTP3 transport layer, mDNS for local service discovery.
+- **DNS Resolver** — Hand-written cache-aware DNS resolution client.
+- **mDNS service discovery** — Local multicast DNS lookup for service registry.
+- **QUIC / HTTP3 Protocol** — Custom transport layer protocol for fast parallel connections.
 
 ---
 
@@ -118,7 +120,7 @@ Systematic absorption of every major Linux distro feature:
 
 ---
 
-## 🔧 Phase G — Kernel Boot (🔄 60% Active)
+## 🔧 Phase G — Kernel Boot (✅ 100% Complete)
 
 The critical path to a bootable ISO:
 
@@ -127,11 +129,11 @@ The critical path to a bootable ISO:
 - [x] APIC timer calibration
 - [x] Physical memory map (via GRUB mmap)
 - [x] Virtual memory / paging (4-level page tables)
-- [ ] UEFI GOP framebuffer initialization
-- [ ] ACPI table parsing (DSDT/SSDT)
-- [ ] USB xHCI host controller init (keyboard input pre-login)
-- [ ] ISO 9660 bootable image generation via `xorriso`
-- [ ] GRUB2 configuration and embedding
+- [x] UEFI GOP framebuffer initialization
+- [x] ACPI table parsing (DSDT/SSDT)
+- [x] USB xHCI host controller init (keyboard input pre-login)
+- [x] ISO 9660 bootable image generation via `xorriso`
+- [x] GRUB2 configuration and embedding
 
 **Target:** Bootable QEMU demo by end of Phase G.
 
