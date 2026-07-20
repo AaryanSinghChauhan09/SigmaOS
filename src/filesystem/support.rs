@@ -519,7 +519,8 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
-        for fs_option in &self.filesystems {
+        for i in 0..self.filesystems.len() {
+            let fs_option = &self.filesystems[i];
             if let Some(ref fs) = *fs_option {
                 if fs.id() == id {
                     return Some(fs.as_ref());
@@ -531,7 +532,8 @@ impl FilesystemManager for SimpleFilesystemManager {
 
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
-        for fs_option in &self.filesystems {
+        for i in 0..self.filesystems.len() {
+            let fs_option = &self.filesystems[i];
             if let Some(ref fs) = *fs_option {
                 ids.push(fs.id());
             }
@@ -545,6 +547,19 @@ pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        unsafe { &mut *self.data.add(index) }
+    }
 }
 
 impl<T> Vec<T> {
