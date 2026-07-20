@@ -59,4 +59,3 @@ pub type PrepatchRcDriver3 = Longterm6_6_AudioDriver;
 pub type PrepatchRcDriver4 = Longterm6_1_InputDriver;
 pub type PrepatchRcDriver5 = Longterm5_15_SerialDriver;
 pub type PrepatchRcDriver6 = Longterm5_10_TpmDriver;
-
