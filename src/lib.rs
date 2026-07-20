@@ -134,8 +134,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager, PackageDependencyResolver, Version,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
+    Achievement, AchievementType, Document as ProductivityDocument, DocumentEngine, DocumentFormat,
+    DocumentMetadata, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer, ProductivityScore,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,

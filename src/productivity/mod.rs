@@ -1,6 +1,7 @@
 // SigmaOS Productivity Module
 pub mod calendar;
 pub mod clipboard_manager;
+pub mod document_engine;
 pub mod editor;
 pub mod email;
 pub mod finance;
@@ -19,9 +20,10 @@ pub use clipboard_manager::{
     ClipboardBackend, ClipboardError, ClipboardFilter, ClipboardHistoryConfig, ClipboardItem,
     ClipboardItemType, ClipboardManager, SystemClipboardBackend,
 };
+pub use document_engine::{Document, DocumentEngine, DocumentFormat, DocumentMetadata};
 pub use editor::{
     CodeEditor, CompletionItem, CompletionKind, CursorPosition, Diagnostic, DiagnosticSeverity,
-    Document, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient,
+    Document as EditorDocument, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient,
     RegexHighlighter, SyntaxHighlighter, SyntaxToken, TextRange, TextSelection, TokenType,
 };
 pub use email::{
