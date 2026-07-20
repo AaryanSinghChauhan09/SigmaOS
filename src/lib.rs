@@ -129,6 +129,12 @@ pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 pub use ml::{LLMInterface, ModelStatus, SigmaAid};
+pub use ai::{
+    Agent, AgentRole, AgentState,
+    AgentOrchestrator, Task, TaskStatus, TaskType,
+    Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
+    AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+};
 pub use network::{
     AdblockRule, BrowserCore, BrowserTab, BrowserTabState, DnsError, DnsResolver, MDnsDiscovery,
     QuicConnection, QuicError, SecurityLevel, TabCapabilities, TcpConnection, TcpError,
