@@ -30,6 +30,7 @@ pub mod package;
 pub mod phase_l_plans;
 pub mod productivity;
 pub mod resilience;
+pub mod scheduler;
 pub mod storage;
 pub mod security;
 pub mod shell;
@@ -175,6 +176,12 @@ pub use security::{
     SecurityContext as SelinuxContext, SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use shell::{ShellCommand, ShellRepl, MultiCallShell, SysCommandType};
+pub use scheduler::{
+    ComputeUnit, EevdfScheduler, Service, ServiceState, SInitSupervisor, Task, TaskState,
+    ProcessLifecycleManager, ResourceLimits, Signal, SignalHandler, SignalManager,
+    Scheduler, SchedulerError,
+    Priority, SimpleThread, Thread, ThreadID, ThreadState,
+};
 pub use system::{Generation, GenerationManager};
 pub use tracing::{SigmaTrace, TraceEvent, TraceSpan};
 pub use sigpkg::{
