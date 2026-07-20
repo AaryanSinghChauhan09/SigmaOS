@@ -277,8 +277,9 @@ impl CloudSyncManager {
             ),
             local_path,
             remote_path,
-            size_bytes: metadata.map(|m| m.len()).unwrap_or(0),
+            size_bytes: metadata.as_ref().map(|m| m.len()).unwrap_or(0),
             last_modified: metadata
+                .as_ref()
                 .map(|m| {
                     m.modified()
                         .ok()
@@ -304,7 +305,27 @@ impl CloudSyncManager {
         for item in &mut self.sync_items {
             item.sync_status = SyncStatus::Syncing;
 
-            match self.sync_item(item) {
+            // Determine if upload or download based on modification time
+            let local_modified = item.last_modified;
+            let remote_modified = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs()
+                - 3600; // 1 hour ago
+
+            let res = if local_modified > remote_modified {
+                self.provider
+                    .upload(&item.local_path, &item.remote_path)
+                    .map(|_| item.size_bytes)
+            } else if remote_modified > local_modified {
+                self.provider
+                    .download(&item.remote_path, &item.local_path)
+                    .map(|_| item.size_bytes)
+            } else {
+                Ok(0)
+            };
+
+            match res {
                 Ok(bytes) => {
                     item.sync_status = SyncStatus::Synced;
                     items_synced += 1;
@@ -329,27 +350,6 @@ impl CloudSyncManager {
 
         self.sync_history.push(result.clone());
         Ok(result)
-    }
-
-    /// Sync single item
-    fn sync_item(&mut self, item: &SyncItem) -> Result<u64, SyncError> {
-        // Determine if upload or download based on modification time
-        let local_modified = item.last_modified;
-        let remote_modified = self.get_remote_modified_time(&item.remote_path)?;
-
-        if local_modified > remote_modified {
-            // Upload
-            self.provider.upload(&item.local_path, &item.remote_path)?;
-            Ok(item.size_bytes)
-        } else if remote_modified > local_modified {
-            // Download
-            self.provider
-                .download(&item.remote_path, &item.local_path)?;
-            Ok(item.size_bytes)
-        } else {
-            // Already synced
-            Ok(0)
-        }
     }
 
     /// Get remote modification time (simulated)
@@ -451,6 +451,12 @@ pub enum SyncError {
     QuotaExceeded,
     ItemNotFound(String),
     ConflictError(String),
+}
+
+impl std::fmt::Display for SyncError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[cfg(test)]

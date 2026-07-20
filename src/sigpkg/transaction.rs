@@ -118,10 +118,18 @@ pub enum TransactionError {
 impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
     fn from(err: crate::sigpkg::resolver::ResolveError) -> Self {
         match err {
-            crate::sigpkg::resolver::ResolveError::PackageNotFound(name) => TransactionError::PackageNotFound(name),
-            crate::sigpkg::resolver::ResolveError::NoMatchingVersion(name) => TransactionError::DependencyConflict(name),
-            crate::sigpkg::resolver::ResolveError::CircularDependency(name) => TransactionError::DependencyConflict(name),
-            crate::sigpkg::resolver::ResolveError::Conflict(name) => TransactionError::DependencyConflict(name),
+            crate::sigpkg::resolver::ResolveError::PackageNotFound(name) => {
+                TransactionError::PackageNotFound(name)
+            }
+            crate::sigpkg::resolver::ResolveError::NoMatchingVersion(name) => {
+                TransactionError::DependencyConflict(name)
+            }
+            crate::sigpkg::resolver::ResolveError::CircularDependency(name) => {
+                TransactionError::DependencyConflict(name)
+            }
+            crate::sigpkg::resolver::ResolveError::Conflict(name) => {
+                TransactionError::DependencyConflict(name)
+            }
         }
     }
 }

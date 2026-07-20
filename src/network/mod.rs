@@ -23,7 +23,7 @@ pub use sync::{
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use tcp_udp::{
-    BBRCongestionControl, Protocol, RenoCongestionControl, SimpleFirewall, TCPState, UDPSocket,
+    BBRCongestionControl, RenoCongestionControl, SimpleFirewall, TCPState, UDPSocket,
     ZeroCopyNetwork,
 };
 pub use torrent::{

@@ -62,7 +62,10 @@ impl NetworkDriver {
                 self.ip_address = ip;
                 Ok(vec![])
             }
-            NetworkCommand::Connect { ssid: _, password: _ } => {
+            NetworkCommand::Connect {
+                ssid: _,
+                password: _,
+            } => {
                 if self.interface_type != NetworkType::WiFi {
                     return Err(NetworkError::InvalidOperation);
                 }

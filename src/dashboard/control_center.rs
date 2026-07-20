@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 /// Control panel type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ControlPanel {
     Network,
     Display,
