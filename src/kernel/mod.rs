@@ -2,6 +2,7 @@
 #![allow(dead_code, unused_imports, clippy::all)]
 
 // ── Core kernel primitives ─────────────────────────────────────────────────
+pub mod cpufreq;
 pub mod ipc;
 pub mod memory;
 pub mod numa_allocator;
@@ -49,6 +50,7 @@ pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
 pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
+pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
 pub use proc::{ProcessLifecycleManager, Signal, SignalHandler, SignalManager,

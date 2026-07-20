@@ -110,11 +110,12 @@ pub use iso::builder::{
     SimpleBuildPipeline, SimpleGRUBConfig, SimpleISOPackager,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
-    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
     AllocationPolicy as NumaAllocationPolicy, NumaAllocator, NumaNode, NodeState,
+    Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError,
     SanitizationLevel, SecureFreeDetector, SecureFreeStats,
     SlabAllocator as KernelSlabAllocator, SlabCache, SlabCacheStats, SlabState,
+    CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
