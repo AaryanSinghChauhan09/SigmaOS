@@ -1,12 +1,12 @@
-# 🛡️ SigmaOS Package Trust & Global Distribution Networks Development Roadmap
+# 🛡️ SigmaOS Package Trust, Security, & Global Distribution Networks Development Roadmap
 
-This document establishes the strategic engineering and design roadmap for **SigmaOS's Cryptographic Package Trust & Globally Distributed Mirror Infrastructure**, taking inspiration from Debian secure APT (GPG trust chains) and Fedora mirror managers.
+This document establishes the strategic engineering and design roadmap for **SigmaOS's Cryptographic Package Trust, Dynamic Sandboxing, & Globally Distributed Mirror Infrastructure**, taking inspiration from Debian secure APT (GPG trust chains), Fedora mirror managers, and advanced sandboxing architectures (SELinux, AppArmor, OpenBSD pledge/unveil).
 
 ---
 
 ## 🏗️ 1. Technical Vision & Security Pillars
 
-Monolithic package trust models rely on standard GPG signatures, which are vulnerable to quantum computing attacks. SigmaOS introduces **Post-Quantum Cryptographic (PQC) Signature Verification** and **Decentralized Mirroring** to ensure absolute security and speed.
+Monolithic package trust models rely on standard legacy GPG signatures, which are highly vulnerable to quantum computing attacks (Shor's algorithm). SigmaOS introduces a **Quantum-Resistant Trust Hierarchy** paired with **Zero-Trust sandboxed verification execution layers** to guarantee perfect supply-chain defense.
 
 ```
        +-------------------------------------------------------+
@@ -15,8 +15,8 @@ Monolithic package trust models rely on standard GPG signatures, which are vulne
             |                        |                       |
             v                        v                       v
    +-----------------+      +-----------------+      +-----------------+
-   |   PQC Trust     |      |  Mirror Manager |      |  Nix-Style CAS  |
-   | (Dilithium-5)   |      | (Region-Aware)  |      |  (Conflict-Free)|
+   |   PQC Trust     |      |  Mirror Manager |      |  Pledge/Unveil  |
+   | (Dilithium-5)   |      | (Region-Aware)  |      |  (Least Priv)   |
    +-----------------+      +-----------------+      +-----------------+
 ```
 
@@ -27,7 +27,7 @@ Monolithic package trust models rely on standard GPG signatures, which are vulne
 ### 2.1 Post-Quantum Keys Verification
 - **Inspiration**: Debian GPG trust chains and Nix sandbox builds.
 - **Implementation (Rust)**: Signature validation occurs inside `src/sigpkg/verifier.rs` and `src/package/signing.rs`. Dilithium-5 signatures guarantee tamper-proof package bundles.
-- **Implementation (Zig)**: Assembly-optimized Kyber-1024 KEM (Key Encapsulation Mechanism) routines secure the dynamic package transport sessions over HTTP/TLS, defending against metadata spoofing.
+- **Implementation (Zig)**: Assembly-optimized Kyber-1024 KEM (Key Encapsulation Mechanism) routines secure the dynamic package transport sessions over HTTP/TLS, defending against metadata spoofing and man-in-the-middle eavesdropping.
 
 ---
 
@@ -40,7 +40,18 @@ Monolithic package trust models rely on standard GPG signatures, which are vulne
 
 ---
 
-## 📅 4. Step-by-Step Implementation Roadmap
+## 🔒 4. Sandboxed Package Installation & Least Privilege (Rust)
+
+### 4.1 Sandboxed Execution
+- During installation, untrusted package scripts (e.g., pre/post install recipes) are restricted using a custom kernel-enforced capability block.
+- Any unauthorized file system access outside of `/tmp/` and the target directory invokes standard `FsError::PermissionDenied`.
+
+### 4.2 Dynamic Privilege Reduction
+- Implements `sigma_pledge` and `sigma_unveil` in `src/security/pledge.rs` to strip active installation processes of administrative privileges before executing vendor binaries.
+
+---
+
+## 📅 5. Step-by-Step Implementation Roadmap
 
 - [ ] **Phase 1 (Validation)**: Complete rich metadata fields (licenses, maintainers, mirrors) inside `src/sigpkg/mod.rs` and package specs.
 - [ ] **Phase 2 (Zig Cryptochain)**: Write optimized Dilithium-5 parsing routines in Zig.
