@@ -134,6 +134,8 @@ pub use network::{
     Ipv6Stack,
     RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable,
     CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
+    E1000NetworkDriver, NetworkDriverDevice, NetworkDriverManager, NetworkDriverType,
+    NetworkError as ZenithNetworkError, NetworkPacketFrame, Rtl8139NetworkDriver, ZeroCopyPacketRing,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,

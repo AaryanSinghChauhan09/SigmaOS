@@ -5,6 +5,7 @@ pub mod browser_core;
 pub mod ipv6;
 pub mod routing;
 pub mod tls;
+pub mod zenith;
 
 pub use browser_core::{
     AdblockRule, BrowserCore, BrowserTab, BrowserTabState, SecurityLevel, TabCapabilities,
@@ -16,3 +17,7 @@ pub use ipv6::{
 };
 pub use routing::{RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable};
 pub use tls::{CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion};
+pub use zenith::{
+    E1000NetworkDriver, NetworkDriverDevice, NetworkDriverManager, NetworkDriverType,
+    NetworkError, NetworkPacketFrame, Rtl8139NetworkDriver, ZeroCopyPacketRing,
+};
