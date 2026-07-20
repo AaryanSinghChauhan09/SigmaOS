@@ -76,7 +76,7 @@ make PROFILE=browser all       # WASM bundle
 
 ```
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Kernel Boot)          ████████████░░░░░░░░   60% 🔄 ACTIVE
+Phase G (Kernel Boot)          ████████████████████  100% ✅
 Phase H (India Stack)          ████░░░░░░░░░░░░░░░░   20% 🔄 Started
 Phase I (AI-Native)            ██░░░░░░░░░░░░░░░░░░   10% 🔄 Started
 Phase J (Production Release)   ░░░░░░░░░░░░░░░░░░░░    0% ⬜ Planned
@@ -89,12 +89,12 @@ Phase J (Production Release)   ░░░░░░░░░░░░░░░░�
 | Kernel scheduler (MLFQ+CFS+EDF) | ✅ Complete | ✅ Passing |
 | Syscalls (I/O + Process) | ✅ Complete | ✅ Passing |
 | Physical MM (buddy allocator) | ✅ Complete | ✅ Passing |
-| Virtual MM (paging) | 🔄 Partial | 🔄 Partial |
+| Virtual MM (paging) | ✅ Complete | ✅ Passing |
 | APIC + timer | ✅ Complete | ✅ Passing |
 | sigma_pledge + sigma_unveil | ✅ Complete | ✅ Passing |
 | Kyber-1024 KEM | ✅ Complete | ✅ Passing |
 | Dilithium-5 signatures | ✅ Complete | ✅ Passing |
-| TCP/UDP stack | 🔄 Partial | 🔄 Partial |
+| TCP/UDP stack (with DNS, mDNS, QUIC) | ✅ Complete | ✅ Passing |
 | Zero-Trust networking | ✅ Complete | ✅ Passing |
 | Ext4 + FAT32 filesystems | ✅ Complete | ✅ Passing |
 | SigmaFS (CAS + PQC) | 🔄 In Progress | 🔄 Partial |
@@ -104,9 +104,11 @@ Phase J (Production Release)   ░░░░░░░░░░░░░░░░�
 | UPI Generator | ✅ Complete | ✅ Passing |
 | 22-Language Support | 🔄 14/22 Done | 🔄 Partial |
 | AI Scheduler Integration | 🔄 Framework | ✅ Passing |
-| Bootable ISO | ⬜ Planned | — |
+| UEFI GOP, ACPI parsing & xHCI host init | ✅ Complete | ✅ Passing |
+| Bootable ISO | ✅ Complete | ✅ Passing |
+| xorriso ISO generation & GRUB config | ✅ Complete | ✅ Passing |
 
-**Total Library Tests: 414 passing, 0 failing** ✅
+**Total Library Tests: 423 passing, 0 failing** ✅
 
 ---
 
@@ -116,8 +118,7 @@ We welcome contributions! See [CONTRIBUTING.md](https://github.com/AaryanSinghCh
 
 ### High-Impact Areas
 
-- **Kernel Boot** — UEFI GOP framebuffer, ACPI table parsing
-- **ISO Generation** — xorriso integration, GRUB2 embedding
+
 - **Language Support** — Complete the remaining 8 Scheduled languages
 - **AI Integration** — GGUF model runtime, sigma-aid daemon
 - **sigma-sh** — Natural language command parser

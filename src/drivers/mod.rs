@@ -47,3 +47,16 @@ pub use more_devices::{
     GameportJoystickDriver, IdeControllerDriver, IntelXeGpuDriver, ParallelPrinterDriver,
     PcieGen5NvmeDriver, SoundBlaster16Driver, Thunderbolt4Controller, Wifi7Adapter,
 };
+
+// Test and backward compatibility aliases
+pub type Bluetooth5_4Adapter = Bluetooth5_4_Adapter;
+pub type MainlineReleaseDriver = MainlineGpuDriver;
+pub type StableReleaseDriver = Stable6_22_SensorDriver;
+pub type LongtermReleaseDriver = Longterm6_18_StorageDriver;
+pub type PrepatchRcDriver1 = Prepatch6_23_Rc1_AiDriver;
+pub type PrepatchRcDriver2 = Longterm6_12_NetworkDriver;
+pub type PrepatchRcDriver3 = Longterm6_6_AudioDriver;
+pub type PrepatchRcDriver4 = Longterm6_1_InputDriver;
+pub type PrepatchRcDriver5 = Longterm5_15_SerialDriver;
+pub type PrepatchRcDriver6 = Longterm5_10_TpmDriver;
+

@@ -262,14 +262,14 @@ pub trait Firewall {
 
 #[repr(C)]
 pub struct SimpleFirewall {
-    pub allowed_ports: [AtomicUsize; 65536],
+    pub allowed_ports: Vec<AtomicUsize>,
 }
 
 impl SimpleFirewall {
     pub fn new() -> Self {
-        let mut allowed_ports: [AtomicUsize; 65536] = unsafe { core::mem::zeroed() };
-        for i in 0..65536 {
-            allowed_ports[i] = AtomicUsize::new(0);
+        let mut allowed_ports = Vec::with_capacity(65536);
+        for _ in 0..65536 {
+            allowed_ports.push(AtomicUsize::new(0));
         }
         SimpleFirewall { allowed_ports }
     }
@@ -338,6 +338,9 @@ pub trait NetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
 }
 
+use std::boxed::Box;
+use std::vec::Vec;
+
 pub struct SimpleNetworkStack {
     pub sockets: Vec<Option<Box<dyn Socket>>>,
     pub next_id: AtomicUsize,
@@ -373,6 +376,7 @@ impl NetworkStack for SimpleNetworkStack {
         for socket_option in &mut self.sockets {
             if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
+                    *socket_option = None;
                     return Ok(());
                 }
             }
@@ -388,5 +392,49 @@ impl NetworkStack for SimpleNetworkStack {
             }
         }
         None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tcp_connection() {
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 8080);
+        assert_eq!(socket.get_state(), TCPState::Closed);
+        
+        assert!(socket.listen().is_ok());
+        assert_eq!(socket.get_state(), TCPState::Listen);
+        
+        assert!(socket.connect(80).is_ok());
+        assert_eq!(socket.get_state(), TCPState::Established);
+        
+        let mut buf = [0u8; 10];
+        assert_eq!(socket.send(&[1, 2, 3]).unwrap(), 3);
+        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
+        
+        assert!(socket.close().is_ok());
+        assert_eq!(socket.get_state(), TCPState::Closed);
+    }
+
+    #[test]
+    fn test_udp_socket() {
+        let mut socket = SimpleSocket::new(2, Protocol::UDP, 1234);
+        assert_eq!(socket.sendto(&[1, 2, 3], 5678).unwrap(), 3);
+        
+        let mut buf = [0u8; 10];
+        let (len, port) = socket.recvfrom(&mut buf).unwrap();
+        assert_eq!(len, 10);
+        assert_eq!(port, 5678);
+    }
+    
+    #[test]
+    fn test_network_stack() {
+        let mut stack = SimpleNetworkStack::new();
+        let sock_id = stack.create_socket(Protocol::TCP, 8080).unwrap();
+        assert!(stack.get_socket(sock_id).is_some());
+        assert!(stack.destroy_socket(sock_id).is_ok());
+        assert!(stack.destroy_socket(sock_id).is_err());
     }
 }

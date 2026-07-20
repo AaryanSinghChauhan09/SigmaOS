@@ -2,6 +2,18 @@
 // Tests for core system components
 #![allow(unused, clippy::all)]
 
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
+    std_alloc(layout)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free(ptr: *mut u8) {
+    // No-op deallocation in host test environment.
+}
+
 #[cfg(test)]
 mod tests {
     use sigmaos::drivers::*;

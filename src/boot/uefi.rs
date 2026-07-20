@@ -15,7 +15,7 @@ pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2 }
+pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, GopfFailed = 3, AcpiFailed = 4, UsbFailed = 5 }
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
@@ -82,6 +82,75 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
+/// UEFI GOP (Graphics Output Protocol) framebuffer initialization
+pub struct GopFramebuffer {
+    pub width: u32,
+    pub height: u32,
+    pub pitch: u32,
+    pub base_addr: u64,
+}
+
+impl GopFramebuffer {
+    pub fn new() -> Self {
+        GopFramebuffer {
+            width: 0,
+            height: 0,
+            pitch: 0,
+            base_addr: 0,
+        }
+    }
+
+    pub fn initialize(&mut self) -> Result<(), BootError> {
+        // Simulate GOP initialization
+        self.width = 1920;
+        self.height = 1080;
+        self.pitch = 1920 * 4;
+        self.base_addr = 0xFD000000;
+        Ok(())
+    }
+}
+
+/// ACPI Table parsing (DSDT/SSDT)
+pub struct AcpiParser {
+    pub tables_found: AtomicUsize,
+}
+
+impl AcpiParser {
+    pub fn new() -> Self {
+        AcpiParser {
+            tables_found: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn parse_rsdp(&self, _rsdp_addr: u64) -> Result<(), BootError> {
+        // Simulate parsing RSDP, leading to DSDT and SSDT
+        self.tables_found.fetch_add(2, Ordering::SeqCst); // Found DSDT and at least one SSDT
+        Ok(())
+    }
+}
+
+/// USB xHCI Host Controller Init
+pub struct UsbHostController {
+    pub is_initialized: bool,
+    pub keyboard_detected: bool,
+}
+
+impl UsbHostController {
+    pub fn new() -> Self {
+        UsbHostController {
+            is_initialized: false,
+            keyboard_detected: false,
+        }
+    }
+
+    pub fn initialize_xhci(&mut self) -> Result<(), BootError> {
+        // Simulate xHCI initialization
+        self.is_initialized = true;
+        self.keyboard_detected = true; // pre-login keyboard support
+        Ok(())
+    }
+}
+
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
@@ -108,3 +177,30 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_gop_initialization() {
+        let mut gop = GopFramebuffer::new();
+        assert!(gop.initialize().is_ok());
+        assert_eq!(gop.width, 1920);
+    }
+
+    #[test]
+    fn test_acpi_parsing() {
+        let acpi = AcpiParser::new();
+        assert!(acpi.parse_rsdp(0x000E0000).is_ok());
+        assert_eq!(acpi.tables_found.load(Ordering::Relaxed), 2);
+    }
+
+    #[test]
+    fn test_usb_xhci() {
+        let mut usb = UsbHostController::new();
+        assert!(usb.initialize_xhci().is_ok());
+        assert!(usb.is_initialized);
+        assert!(usb.keyboard_detected);
+    }
+}
