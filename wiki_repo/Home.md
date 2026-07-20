@@ -127,6 +127,9 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ BusyBox-style multi-call shell parser
 - ✅ Image decoder (PNG, JPEG, GIF, BMP, WebP, TIFF)
 - ✅ Audio codec (FLAC, MP3, OGG Vorbis, WAV)
+- ✅ Document engine (Markdown, LaTeX, RTF, ODT, ODS)
+- ✅ Browser core with tab isolation and adblocker
+- ✅ SQL database engine with ACID transactions
 - ⬜ Bootable ISO (Phase G)
 
 ### Driver Ecosystem Status
