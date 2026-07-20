@@ -162,6 +162,8 @@ pub use resilience::{
 pub use storage::{Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState};
 pub use fs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, CompressionType as BtrfsCompressionType, ChecksumType,
+    AhciSataController, BlockStorageDevice, BlockStorageError, JournalBlock, JournalBlockType,
+    MerkleNode, NvmeStorageController, SigmaFs, TransactionalJournal,
     AllocationStrategy as XfsAllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal, XfsState,
 };
 pub use security::{
