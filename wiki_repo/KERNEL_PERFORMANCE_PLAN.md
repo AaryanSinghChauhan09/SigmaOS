@@ -5,7 +5,7 @@ This document specifies the strategies for maintaining zero-allocation hot paths
 ---
 
 ## 1. Hot Path Zero-Allocation Ring Buffer
-To avoid garbage collection or heap latency, communication between shards utilizes static memory buffers.
+To avoid garbage collection or heap latency, communication between shards utilizes static memory buffers. 
 
 ### Rust Implementation (Thread-Safe Packet Queue)
 ```rust
@@ -47,3 +47,9 @@ impl<T: Copy, const N: usize> ZeroAllocRingBuffer<T, N> {
     }
 }
 ```
+
+## 2. Lock-Free Priority Scheduling
+SigmaOS employs the EEVDF algorithm implemented purely in `#![no_std]` Rust to ensure hard real-time latency bounds. It is completely lock-free via static single-linked lists to prevent kernel lock contention.
+
+## 3. High-Throughput Networking
+By bypassing typical kernel buffering logic, ZenithNet operates entirely in userspace using DPDK-style packet descriptor rings. The physical NIC drivers deposit packets directly into the RingBuffer mapping where applications can parse them zero-copy.

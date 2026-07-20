@@ -5,7 +5,7 @@ This document specifies the integration roadmap for Zig FFI bridges, bare-metal 
 ---
 
 ## 1. High-Performance Bare-Metal Allocation
-Zig's explicit memory management allows SigmaOS to perform low-level hardware structures modeling with zero-allocation overhead.
+Zig's explicit memory management allows SigmaOS to perform low-level hardware structures modeling with zero-allocation overhead. We use Zig to construct complex DMA descriptor buffers for hardware abstraction.
 
 ### Zig Implementation (Zero-Dependency Slab Cache)
 ```zig
@@ -46,7 +46,7 @@ pub const ZeroAllocSlab = struct {
 ---
 
 ## 2. FFI Bridge to Rust Kernel
-To interface with Rust's capability manager, Zig modules export clean `extern "C"` functions.
+To interface with Rust's capability manager, Zig modules export clean `extern "C"` functions. 
 
 ### Rust Interface
 ```rust
@@ -55,3 +55,5 @@ extern "C" {
     fn free_slab(ptr: *mut u8);
 }
 ```
+
+The C-ABI guarantees structural compatibility between the microkernel's Rust capability verifier and the lightweight Zig sub-modules.

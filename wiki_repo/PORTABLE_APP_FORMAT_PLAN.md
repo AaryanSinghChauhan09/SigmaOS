@@ -34,3 +34,6 @@ impl AppImageHeader {
     }
 }
 ```
+
+## 2. Decentralized Execution
+Rather than extracting to disk, the SigmaOS kernel simply memory-maps the SAIM payload directly into a SovereignVMM container. The container reads the `security_bits` and automatically revokes ambient privileges matching the bitmask. There is absolutely no external dependency on the host's filesystem format.
