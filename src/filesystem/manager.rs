@@ -211,7 +211,10 @@ impl FileManager {
 
     /// Navigate to path
     pub fn navigate(&mut self, path: &Path) -> Result<(), FileManagerError> {
-        if !path.is_absolute() {
+        // Accept both native absolute paths and Unix-style absolute paths (starts with `/`)
+        // for cross-platform compatibility in this OS-simulation codebase.
+        let is_unix_absolute = path.to_str().map(|s| s.starts_with('/')).unwrap_or(false);
+        if !path.is_absolute() && !is_unix_absolute {
             return Err(FileManagerError::InvalidPath(path.display().to_string()));
         }
 
