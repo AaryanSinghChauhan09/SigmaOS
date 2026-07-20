@@ -125,6 +125,8 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Android-style runtime capability token guard
 - ✅ Kali-style isolated system tracing sandbox
 - ✅ BusyBox-style multi-call shell parser
+- ✅ Image decoder (PNG, JPEG, GIF, BMP, WebP, TIFF)
+- ✅ Audio codec (FLAC, MP3, OGG Vorbis, WAV)
 - ⬜ Bootable ISO (Phase G)
 
 ### Driver Ecosystem Status
