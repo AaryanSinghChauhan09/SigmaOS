@@ -4,8 +4,8 @@
 pub mod audit;
 pub mod capability;
 pub mod clipboard;
-pub mod intrusion;
 pub mod integrity;
+pub mod intrusion;
 pub mod mac;
 pub mod password;
 pub mod pki;
@@ -42,20 +42,18 @@ pub use vpn::{
 };
 // Integrity: export the monitor trait and concrete types that actually exist
 pub use integrity::{
-    IntegrityError, IntegrityMonitor, IntegrityStats, IntegrityStatus,
-    File as IntegrityFile, FileCapability, FileID, FileInfo, SimpleFile,
-    SimpleIntegrityMonitor, MonitorCapability,
+    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
+    IntegrityStats, IntegrityStatus, MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
 };
 // MAC: export what the module actually defines
 pub use mac::{
-    ContextCapability, ContextID, EngineCapability as MacEngineCapability,
-    MACEngine, MACPolicy, MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability,
-    PolicyInfo as MacPolicyInfo, SecurityContext, SecurityDomain,
-    SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
+    MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
+    SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{
-    Certificate, CRL as CrlTrait, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager,
+    Certificate, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
 };
 // Secrets: export actual types
 pub use secrets::{
@@ -64,7 +62,6 @@ pub use secrets::{
 };
 // Vulnerability: export actual types
 pub use vulnerability::{
-    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration,
-    SimpleScanReport, SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability,
-    VulnerabilityScanner,
+    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
+    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };

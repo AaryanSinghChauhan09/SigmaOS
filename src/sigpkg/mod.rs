@@ -29,7 +29,11 @@ impl std::fmt::Display for Version {
 
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {

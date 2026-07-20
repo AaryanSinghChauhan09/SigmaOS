@@ -28,6 +28,12 @@ pub use email::{
     EmailAccountConfig, EmailAddress, EmailAttachment, EmailBackend, EmailClient, EmailError,
     EmailFilter, EmailFolder, EmailMessage, EmailPriority, ImapSmtpBackend,
 };
+pub use finance::{
+    DeducteeType, GstBreakdown, GstCalculator, GstTransactionType, HsnEntry, IncomeTaxCalculator,
+    IncomeTaxResult, IndiaIncomeTaxCalculator, IndiaTdsCalculator, IndianNumberFormatter,
+    IndicLanguage, NpciUpiGateway, StandardGstCalculator, TaxRegime, TdsCalculator, TdsResult,
+    TdsSection, UpiGateway, UpiPaymentRequest, UpiVpa,
+};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -52,10 +58,4 @@ pub use tasks::{
 pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
-};
-pub use finance::{
-    DeducteeType, GstBreakdown, GstCalculator, GstTransactionType, HsnEntry,
-    IndicLanguage, IndiaIncomeTaxCalculator, IndianNumberFormatter, IndiaTdsCalculator,
-    IncomeTaxCalculator, IncomeTaxResult, NpciUpiGateway, StandardGstCalculator,
-    TaxRegime, TdsCalculator, TdsResult, TdsSection, UpiGateway, UpiPaymentRequest, UpiVpa,
 };
