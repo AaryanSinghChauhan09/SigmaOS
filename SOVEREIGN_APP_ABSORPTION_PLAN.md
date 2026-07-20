@@ -667,3 +667,4 @@ To fully satisfy cross-compilation pipeline layouts across diverse programming t
 2. **`WIKI/NIM_INTEGRATION_PLAN.md`:** Garbage-collection free ARC/ORC utility orchestration and modular microkernel shell tools.
 3. **`WIKI/KERNEL_PERFORMANCE_PLAN.md`:** Zero-copy zero-allocation high-throughput network interfaces and MLFQ schedulers.
 4. **`WIKI/PORTABLE_APP_FORMAT_PLAN.md`:** Decentralized, content-addressed standalone packaging specification maps.
+5. **`WIKI/CUSTOM_PERSONALIZATION_SPEC.md`:** Context-aware, Samsung Modes & Routines-style automation and adaptive visual theme triggers.
