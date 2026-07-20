@@ -123,6 +123,10 @@ pub use network::{
     AdblockRule, BrowserCore, BrowserTab, BrowserTabState, DnsError, DnsResolver, MDnsDiscovery,
     QuicConnection, QuicError, SecurityLevel, TabCapabilities, TcpConnection, TcpError,
     TcpSegment, TcpStack, TcpState, TrackingProtection,
+    Ipv6Address, Ipv6AddressType, Ipv6ExtensionHeader, Ipv6Header, Ipv6Interface, Ipv6Route,
+    Ipv6Stack,
+    RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable,
+    CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
 };
 pub use ml::{SigmaAid, LLMInterface, ModelStatus};
 pub use observability::{
