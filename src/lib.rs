@@ -92,6 +92,7 @@ pub use education::{
 pub use audio::{
     AudioChannels, AudioCodec, AudioDriver, AudioDriverError, AudioDriverResult, AudioFormat,
     AudioMetadata, AudioSampleRate, DecodedAudio,
+    AlsaAudioStack, AudioDirection as AlsaDirection, AudioFormat as AlsaFormat, ChannelConfig, MixerControl, PcmStream, SampleRate as AlsaSampleRate,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, SigmaFS, DagNode, HashId,
