@@ -6,6 +6,7 @@ pub mod cpufreq;
 pub mod ipc;
 pub mod memory;
 pub mod numa_allocator;
+pub mod performance;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod secure_free;
@@ -53,6 +54,7 @@ pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
 pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
 pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
 pub use watchdog::{HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState};
+pub use performance::{IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue};
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
 pub use proc::{

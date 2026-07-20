@@ -119,6 +119,7 @@ pub use kernel::{
     SlabAllocator as KernelSlabAllocator, SlabCache, SlabCacheStats, SlabState,
     CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType,
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState,
+    IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
