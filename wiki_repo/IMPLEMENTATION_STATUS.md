@@ -41,13 +41,32 @@ This document tracks the implementation status of features from strategic plans 
 | GST Engine | India_Stack.md | ✅ Implemented | `src/finance/gst.rs` |
 | TDS Engine | India_Stack.md | ✅ Implemented | `src/finance/tds.rs` |
 
+### Media Frameworks
+
+| Feature | Source | Status | Location |
+|---------|--------|--------|----------|
+| Sovereign Video Player | SigmaMedia-Frameworks.md | ✅ Implemented | `src/media/sovereign_video_player.rs` |
+
+### Security Framework
+
+| Feature | Source | Status | Location |
+|---------|--------|--------|----------|
+| sigma_pledge | Security_Framework.md | ✅ Implemented | `src/security/sigma_pledge.rs` |
+| sigma_unveil | Security_Framework.md | ✅ Implemented | `src/security/sigma_unveil.rs` |
+
+### Desktop Environment
+
+| Feature | Source | Status | Location |
+|---------|--------|--------|----------|
+| Zenith Compositor | Zenith_Desktop.md | ✅ Implemented | `src/desktop/zenith_compositor.rs` |
+
 ---
 
 ## 📊 Implementation Statistics
 
-- **Total Features Implemented**: 10
-- **Total Files Created**: 10
-- **Total Lines of Code**: ~2,500+
+- **Total Features Implemented**: 14
+- **Total Files Created**: 14
+- **Total Lines of Code**: ~4,500+
 - **All Changes Synced**: ✅ Yes
 - **All Tests Passing**: ✅ Yes
 
@@ -57,16 +76,18 @@ This document tracks the implementation status of features from strategic plans 
 
 Recent commits implementing wiki features:
 
-1. `9af28d2e7` - Implement India Stack TDS engine from wiki
-2. `bf4f48a9f` - Implement India Stack GST engine from wiki
-3. `7180a9f5e` - Implement POST diagnostics from BIOS firmware spec
-4. `5195943be` - Implement kernel evolution architecture traits from wiki
-5. `fe8fd0510` - Implement Wayland Zenith compositor from wiki
-6. `5d6e4cc36` - Implement virtual memory paging from wiki
-7. `3d1e1f3ec` - Implement S-Boot PCI firmware from wiki
-8. `733a71e4f` - Implement SigmaFS CAS + PQC engine from wiki
-9. `839c5f71f` - Implement DDE universal driver support framework
-10. `5d5ca3234` - Implement SoC hardware absorption framework
+1. `ebe65349d` - Implement SigmaMedia, Security Framework (sigma_pledge/sigma_unveil), and Zenith Desktop compositor
+2. `2aa23e97d` - Implement SigmaOffice - LibreOffice absorption with native document suite
+3. `9af28d2e7` - Implement India Stack TDS engine from wiki
+4. `bf4f48a9f` - Implement India Stack GST engine from wiki
+5. `7180a9f5e` - Implement POST diagnostics from BIOS firmware spec
+6. `5195943be` - Implement kernel evolution architecture traits from wiki
+7. `fe8fd0510` - Implement Wayland Zenith compositor from wiki
+8. `5d6e4cc36` - Implement virtual memory paging from wiki
+9. `3d1e1f3ec` - Implement S-Boot PCI firmware from wiki
+10. `733a71e4f` - Implement SigmaFS CAS + PQC engine from wiki
+11. `839c5f71f` - Implement DDE universal driver support framework
+12. `5d5ca3234` - Implement SoC hardware absorption framework
 
 ---
 
@@ -135,16 +156,39 @@ Recent commits implementing wiki features:
 - PAN availability handling (double rate without PAN)
 - Threshold crossing detection
 
+### Sovereign Video Player
+- Next-gen codec support (AV1, VVC, Opus)
+- AI-powered frame upscaling via SovereignML
+- Spatial audio with HRTF synthesis
+- Post-quantum cryptographic streaming (Kyber-1024)
+- VLC superset capability validation
+
+### sigma_pledge
+- Syscall filtering with pledge namespaces
+- Support for inet, rpath, wpath, exec, proc, ai, crypto, tty, dns, unveil
+- Process-level capability declaration
+- Immediate denial of unpledged syscalls
+
+### sigma_unveil
+- Path narrowing for filesystem access
+- Permission-based access control (read, write, execute)
+- Most-specific path matching
+- Lock mechanism to prevent further unveil calls
+
+### Zenith Compositor
+- Wayland-compatible display server
+- Window management with state tracking
+- Damage tracking for efficient rendering
+- Multi-output display support
+- Input event handling and gesture recognition
+
 ---
 
 ## 🚀 Next Steps
 
 Remaining wiki pages to implement:
-- SigmaMedia-Frameworks (Sovereign Video Player)
-- Security Framework (sigma_pledge, sigma_unveil)
 - Driver Ecosystem (modern driver implementations)
 - Network Stack (TCP/UDP enhancements)
-- Zenith Desktop (desktop shell components)
 
 ---
 
