@@ -147,18 +147,19 @@ impl BuddyAllocator {
         let buddy_size = block.size * 2;
 
         // Find buddy in free list
-        if let Some(pos) = self.free_lists[order].iter().position(|b| {
-            b.addr.as_ptr() as usize == buddy_addr && b.size == block.size
-        }) {
+        if let Some(pos) = self.free_lists[order]
+            .iter()
+            .position(|b| b.addr.as_ptr() as usize == buddy_addr && b.size == block.size)
+        {
             let _buddy = self.free_lists[order].remove(pos);
-            
+
             // Merge blocks
             let merged_addr = if block_addr < buddy_addr {
                 block_addr
             } else {
                 buddy_addr
             };
-            
+
             if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
                     addr: non_null,
@@ -339,6 +340,9 @@ mod tests {
         assert_eq!(allocator.calculate_order(1), 0);
         assert_eq!(allocator.calculate_order(2), 1);
         assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 
     #[test]
@@ -358,5 +362,21 @@ mod tests {
         // Deallocate and verify state restoration
         allocator.deallocate(block);
         assert_eq!(allocator.get_free_memory(), 4096);
+    }
+
+    #[test]
+    fn test_calculate_order_correctness() {
+        let allocator = BuddyAllocator::new();
+        // Test edge cases manually to ensure exact bounds matching
+        assert_eq!(allocator.calculate_order(0), 0);
+        assert_eq!(allocator.calculate_order(1), 0);
+        assert_eq!(allocator.calculate_order(2), 1);
+        assert_eq!(allocator.calculate_order(3), 2);
+        assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(6), 3);
+        assert_eq!(allocator.calculate_order(7), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 }

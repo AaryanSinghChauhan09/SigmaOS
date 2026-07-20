@@ -1,5 +1,6 @@
 // SigmaOS Network Stack Module
 pub mod analyzer;
+pub mod protocols;
 pub mod stack;
 pub mod sync;
 pub mod tcp;
@@ -13,6 +14,7 @@ pub use analyzer::{
     NetworkTrafficAnalyzer, Protocol, SecurityAnalysis, TrafficAlert, TrafficPacket,
     TrafficStatistics,
 };
+pub use protocols::{DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError};
 pub use stack::{
     NetworkStack, SimpleNetworkStack, SimpleSocket, Socket, SocketID, SocketState, SocketType,
 };
@@ -23,8 +25,8 @@ pub use sync::{
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use tcp_udp::{
-    BBRCongestionControl, Protocol, RenoCongestionControl, SimpleFirewall, TCPState, UDPSocket,
-    ZeroCopyNetwork,
+    BBRCongestionControl, Protocol as StackProtocol, RenoCongestionControl, SimpleFirewall,
+    TCPState, UDPSocket, ZeroCopyNetwork,
 };
 pub use torrent::{
     BitTorrentProtocol, ConnectionState as TorrentConnectionState, DownloadStats, PeerInfo,

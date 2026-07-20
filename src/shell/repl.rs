@@ -37,6 +37,9 @@ pub enum ShellCommand {
         subcommand: String,
         package: Option<String>,
     },
+    Ai {
+        query: String,
+    },
     Unknown(String),
 }
 
@@ -222,6 +225,15 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "ai" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Ai {
+                        query: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -241,6 +253,7 @@ impl ShellRepl {
                    echo         - Print a message\n\
                    set          - Set a variable\n\
                    get          - Get a variable\n\
+                   ai <query>   - Natural language command AI\n\
                    exit         - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
@@ -375,6 +388,12 @@ impl ShellRepl {
             ShellCommand::Get { variable } => match self.variables.get(&variable) {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
+            },
+            ShellCommand::Ai { query } => {
+                let mut aid = crate::ml::SigmaAid::new(0);
+                let _ = aid.load_gguf_model("/models/sigma.gguf");
+                let cmd = aid.execute_prompt(&query);
+                Ok(format!("AI suggested command: {}", cmd))
             },
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }

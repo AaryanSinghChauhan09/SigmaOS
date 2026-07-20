@@ -40,7 +40,7 @@ pub struct EmailMessage {
 }
 
 /// Email folder
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EmailFolder {
     Inbox,
     Sent,

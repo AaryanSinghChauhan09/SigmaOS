@@ -278,14 +278,14 @@ mod tests {
     #[test]
     fn test_analyze() {
         let mut analyzer = DiskUsageAnalyzer::default();
-        let result = analyzer.analyze(PathBuf::from("/home/user")).unwrap();
+        let result = analyzer.analyze(&PathBuf::from("/home/user")).unwrap();
         assert_eq!(result.file_count, 100);
     }
 
     #[test]
     fn test_get_disk_usage() {
         let analyzer = DiskUsageAnalyzer::default();
-        let usage = analyzer.get_disk_usage(PathBuf::from("/")).unwrap();
+        let usage = analyzer.get_disk_usage(&PathBuf::from("/")).unwrap();
         assert_eq!(usage.usage_percent, 50.0);
     }
 }

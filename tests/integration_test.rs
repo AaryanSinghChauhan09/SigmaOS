@@ -2,6 +2,19 @@
 // Tests for core system components
 #![allow(unused, clippy::all)]
 
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout =
+        Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
+    std_alloc(layout)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free(ptr: *mut u8) {
+    // No-op deallocation in host test environment.
+}
+
 #[cfg(test)]
 mod tests {
     use sigmaos::drivers::*;
@@ -81,7 +94,7 @@ mod tests {
             .register_device(Box::new(NvlinkBusDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(Bluetooth5_4Adapter::new()))
+            .register_device(Box::new(Bluetooth5_4_Adapter::new()))
             .is_ok());
         assert!(manager
             .register_device(Box::new(PcieGen6Bridge::new()))
@@ -95,31 +108,31 @@ mod tests {
 
         // 3. Register 9 drivers from `kernel_releases.rs`
         assert!(manager
-            .register_device(Box::new(MainlineReleaseDriver::new()))
+            .register_device(Box::new(MainlineGpuDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(StableReleaseDriver::new()))
+            .register_device(Box::new(Stable6_22_SensorDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(LongtermReleaseDriver::new()))
+            .register_device(Box::new(Longterm6_18_StorageDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(PrepatchRcDriver1::new()))
+            .register_device(Box::new(Longterm6_12_NetworkDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(PrepatchRcDriver2::new()))
+            .register_device(Box::new(Longterm6_6_AudioDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(PrepatchRcDriver3::new()))
+            .register_device(Box::new(Longterm6_1_InputDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(PrepatchRcDriver4::new()))
+            .register_device(Box::new(Longterm5_15_SerialDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(PrepatchRcDriver5::new()))
+            .register_device(Box::new(Longterm5_10_TpmDriver::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(PrepatchRcDriver6::new()))
+            .register_device(Box::new(Prepatch6_23_Rc1_AiDriver::new()))
             .is_ok());
 
         // 4. Verify all 33 drivers are registered and initialized

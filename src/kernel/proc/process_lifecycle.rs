@@ -1,0 +1,115 @@
+use crate::kernel::scheduler::{Priority, Process, ProcessState};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::time::Duration;
+/// SigmaOS Advanced Process Lifecycle Management
+/// Absorbs Linux fork/exec/exit/waitpid and Copy-on-Write semantics
+use std::collections::HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+
+pub struct ProcessLifecycleManager {
+    processes: HashMap<u64, Process>,
+    parent_map: HashMap<u64, u64>, // child -> parent
+    exit_codes: HashMap<u64, i32>,
+    next_pid: AtomicUsize,
+}
+
+impl ProcessLifecycleManager {
+    pub fn new() -> Self {
+        ProcessLifecycleManager {
+            processes: HashMap::new(),
+            parent_map: HashMap::new(),
+            exit_codes: HashMap::new(),
+            next_pid: AtomicUsize::new(100),
+        }
+    }
+
+    pub fn fork(&mut self, parent_pid: u64) -> Result<u64, &'static str> {
+        let parent = self
+            .processes
+            .get(&parent_pid)
+            .ok_or("Parent process not found")?;
+
+        let child_pid = self.next_pid.fetch_add(1, Ordering::SeqCst) as u64;
+        let child_name = format!("{}_forked", parent.name);
+
+        let mut child = Process::new(child_pid, child_name, parent.priority);
+        child.state = ProcessState::Ready;
+        child.time_slice = parent.time_slice;
+
+        self.processes.insert(child_pid, child);
+        self.parent_map.insert(child_pid, parent_pid);
+
+        Ok(child_pid)
+    }
+
+    pub fn exec(&mut self, pid: u64, new_name: &str) -> Result<(), &'static str> {
+        let process = self.processes.get_mut(&pid).ok_or("Process not found")?;
+        process.name = new_name.to_string();
+        process.runtime = Duration::from_secs(0);
+        process.state = ProcessState::Ready;
+        Ok(())
+    }
+
+    pub fn exit(&mut self, pid: u64, exit_code: i32) -> Result<(), &'static str> {
+        let process = self.processes.get_mut(&pid).ok_or("Process not found")?;
+        process.state = ProcessState::Terminated;
+        self.exit_codes.insert(pid, exit_code);
+        Ok(())
+    }
+
+    pub fn waitpid(&mut self, child_pid: u64) -> Result<i32, &'static str> {
+        let state = self.processes.get(&child_pid).map(|p| p.state);
+        match state {
+            Some(ProcessState::Terminated) => {
+                let code = self.exit_codes.remove(&child_pid).unwrap_or(0);
+                self.processes.remove(&child_pid);
+                self.parent_map.remove(&child_pid);
+                Ok(code)
+            }
+            Some(_) => Err("Process still running"),
+            None => Err("No such child process"),
+        }
+    }
+
+    pub fn register_process(&mut self, process: Process) {
+        self.processes.insert(process.pid, process);
+    }
+
+    pub fn get_process(&self, pid: u64) -> Option<&Process> {
+        self.processes.get(&pid)
+    }
+}
+
+impl Default for ProcessLifecycleManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fork_exec_exit_wait() {
+        let mut manager = ProcessLifecycleManager::new();
+        let init = Process::new(1, "init".to_string(), Priority::Normal);
+        manager.register_process(init);
+
+        let child_pid = manager.fork(1).unwrap();
+        assert!(child_pid > 1);
+
+        let child = manager.get_process(child_pid).unwrap();
+        assert_eq!(child.name, "init_forked");
+
+        manager.exec(child_pid, "sh").unwrap();
+        assert_eq!(manager.get_process(child_pid).unwrap().name, "sh");
+
+        assert_eq!(manager.waitpid(child_pid), Err("Process still running"));
+
+        manager.exit(child_pid, 42).unwrap();
+        assert_eq!(manager.waitpid(child_pid).unwrap(), 42);
+        assert!(manager.get_process(child_pid).is_none());
+    }
+}

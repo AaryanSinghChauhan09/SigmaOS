@@ -3,22 +3,30 @@
 
 pub mod audit;
 pub mod capability;
+pub mod capability_enforcer;
 pub mod clipboard;
-pub mod intrusion;
 pub mod integrity;
+pub mod intrusion;
 pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
+pub mod selinux;
 pub mod secrets;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
+pub use audit::AuditLogger;
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
+};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
-    SecureClipboardManager, SecurityLevel, XorEncryption,
+    SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
@@ -39,8 +47,28 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use integrity::{IntegrityCheck, IntegrityError, IntegrityVerifier};
-pub use mac::{MacPolicy, MacRule, MacSecurity};
-pub use pki::{Certificate, CertificateAuthority, PkiError, PkiManager};
-pub use secrets::{SecretManager, SecretStorage, SecretType};
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner, VulnerabilitySeverity};
+// Integrity: export the monitor trait and concrete types that actually exist
+pub use integrity::{
+    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
+    IntegrityStats, IntegrityStatus, MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
+};
+// MAC: export what the module actually defines
+pub use mac::{
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
+    MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
+    SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+};
+// PKI: export actual types
+pub use pki::{
+    Certificate, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
+};
+// Secrets: export actual types
+pub use secrets::{
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SecretType,
+    SimpleKeyring, SimpleSecret,
+};
+// Vulnerability: export actual types
+pub use vulnerability::{
+    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
+    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
+};
