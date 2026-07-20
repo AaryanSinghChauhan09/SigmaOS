@@ -84,8 +84,14 @@ pub use governance::{
     RoadmapMilestone, TransparentRoadmap,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
-    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
+    BuddyAllocator, Channel, DeviceDriver, DriverError, DriverMetadata, DriverRegistry,
+    DriverType, FileSystem, FileFlags, FileHandle, FsError, IoOperation, IoResult, IpcError,
+    IpcManager, LinuxAbsorptionEngine, LinuxHeritage, MapFlags, MemoryBlock, MemoryError,
+    MemoryManager, Message, NetworkError, NetworkStack, Priority, Process, ProcessState,
+    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SecureDriverWrapper,
+    SocketDomain, SocketHandle, SocketProtocol, SocketType, PAGE_SIZE,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
