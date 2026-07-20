@@ -141,6 +141,9 @@ pub use kernel::{
     CpuInstructionExtension, SovereignCompilerOptimizer,
     IpcMessage, PageDirectoryController, PageDirectoryEntry, SignalDispatcher, SovereignIpcBus,
     SovereignSignal,
+    DeviceDriver, DriverError, DriverMetadata, FileSystem, FilesystemMetadata, FsError,
+    MemoryManager, MemoryError, MemoryManagerMetadata, NetworkError, NetworkStack, NetworkStackMetadata,
+    Scheduler, SchedulerError, SchedulerMetadata,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,

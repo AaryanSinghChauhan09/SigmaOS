@@ -13,6 +13,7 @@ pub mod roundrobin;
 pub mod scheduler;
 pub mod secure_free;
 pub mod slab_allocator;
+pub mod traits;
 pub mod watchdog;
 
 // ── Phase J: subsystem registry & legacy device drivers ───────────────────
@@ -61,6 +62,11 @@ pub use cpu_features::{CpuInstructionExtension, SovereignCompilerOptimizer};
 pub use gap_filling::{
     IpcMessage, PageDirectoryController, PageDirectoryEntry, SignalDispatcher, SovereignIpcBus,
     SovereignSignal,
+};
+pub use traits::{
+    DeviceDriver, DriverError, DriverMetadata, FileSystem, FilesystemMetadata, FsError,
+    MemoryManager, MemoryError, MemoryManagerMetadata, NetworkError, NetworkStack, NetworkStackMetadata,
+    Scheduler, SchedulerError, SchedulerMetadata,
 };
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
