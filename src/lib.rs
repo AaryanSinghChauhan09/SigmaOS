@@ -7,6 +7,7 @@
 pub mod accessibility;
 pub mod automation;
 pub mod audio;
+pub mod boot;
 pub mod community;
 pub mod compatibility;
 pub mod customization;
@@ -88,6 +89,7 @@ pub use drivers::{
     DeviceError as DdeDeviceError, DeviceId, DriverType, GenericDriver, HardwareBroker, LinuxDdeShim,
     UnifiedPeripheral as DdeUnifiedPeripheral, UdfInterpreter, WasmDriverVm, WindowsNdisWrapper, BusType,
 };
+pub use boot::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use ecosystem::{
     ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
     EnterprisePartner,
