@@ -116,6 +116,7 @@ pub use kernel::{
     SanitizationLevel, SecureFreeDetector, SecureFreeStats,
     SlabAllocator as KernelSlabAllocator, SlabCache, SlabCacheStats, SlabState,
     CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType,
+    HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,

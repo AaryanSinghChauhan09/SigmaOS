@@ -10,6 +10,7 @@ pub mod roundrobin;
 pub mod scheduler;
 pub mod secure_free;
 pub mod slab_allocator;
+pub mod watchdog;
 
 // ── Phase J: subsystem registry & legacy device drivers ───────────────────
 pub mod subsystems;
@@ -51,6 +52,7 @@ pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
 pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
 pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
+pub use watchdog::{HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState};
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
 pub use proc::{ProcessLifecycleManager, Signal, SignalHandler, SignalManager,
