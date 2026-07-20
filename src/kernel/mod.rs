@@ -10,6 +10,7 @@ pub mod linux_absorb;
 pub mod memory;
 pub mod numa_allocator;
 pub mod performance;
+pub mod profiler;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod secure_free;
@@ -61,19 +62,18 @@ pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use numa_allocator::{AllocationPolicy, NumaAllocator, NumaNode, NodeState};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-<<<<<<< HEAD
 pub use subsystem::{
     DeviceDriver, DriverError, DriverMetadata, DriverRegistry, DriverType, FileSystem,
     FileFlags, FileHandle, FsError, IoOperation, IoResult, LinuxHeritage, MapFlags,
     MemoryError, MemoryManager, NetworkError, NetworkStack, Scheduler, SchedulerError,
     SecureDriverWrapper, SocketDomain, SocketHandle, SocketProtocol, SocketType,
 };
-=======
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
 pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
 pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
 pub use watchdog::{HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState};
 pub use performance::{IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue};
+pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
 pub use cpu_features::{CpuInstructionExtension, SovereignCompilerOptimizer};
 pub use gap_filling::{
     IpcMessage, PageDirectoryController, PageDirectoryEntry, SignalDispatcher, SovereignIpcBus,
@@ -117,4 +117,3 @@ pub use net::{
     SockAddrIn, SocketLayer, SocketType, Tbf, TcpConnection, TcpSegment, TcpState,
 };
 pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};
->>>>>>> e4a763ec59eea3021110447db27b0902eaddc9c6
