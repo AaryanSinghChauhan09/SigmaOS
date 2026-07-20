@@ -168,8 +168,10 @@ pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
 pub use virtualization::{
+    Cgroup, CgroupController, CgroupManager, CgroupState, CgroupSubsystem,
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Namespace, NamespaceData, NamespaceManager, NamespaceType,
 };
 
 #[cfg(test)]
