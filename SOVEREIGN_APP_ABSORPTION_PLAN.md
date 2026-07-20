@@ -656,3 +656,14 @@ proc newP2PSocket*(key: array[32, byte]): P2PSocket =
   result.localKey = key
   result.isConnected = false
 ```
+
+---
+
+## 📁 Sovereign Companion Specifications Index
+
+To fully satisfy cross-compilation pipeline layouts across diverse programming targets, the following standalone `.md` companion plans have been generated on-disk under the `WIKI/` directory, serving as exact technical guidelines for implementing the micro-utilities:
+
+1. **`WIKI/ZIG_INTEGRATION_PLAN.md`:** Zero-dependency bare-metal heap management, cross-FFI FFI boundary bindings, and runtime allocation interfaces.
+2. **`WIKI/NIM_INTEGRATION_PLAN.md`:** Garbage-collection free ARC/ORC utility orchestration and modular microkernel shell tools.
+3. **`WIKI/KERNEL_PERFORMANCE_PLAN.md`:** Zero-copy zero-allocation high-throughput network interfaces and MLFQ schedulers.
+4. **`WIKI/PORTABLE_APP_FORMAT_PLAN.md`:** Decentralized, content-addressed standalone packaging specification maps.
