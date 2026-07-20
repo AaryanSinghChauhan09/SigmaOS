@@ -10,6 +10,7 @@ pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
+pub mod desktop;
 pub mod device;
 pub mod driver;
 pub mod drivers;
@@ -23,6 +24,7 @@ pub mod iso;
 pub mod kernel;
 pub mod legal;
 pub mod memory;
+pub mod media;
 pub mod ml;
 pub mod network;
 pub mod observability;
@@ -37,13 +39,10 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod support;
-<<<<<<< HEAD
-=======
 pub mod system;
 pub mod tools;
 pub mod tracing;
 pub mod unimplemented_features;
->>>>>>> e4a763ec59eea3021110447db27b0902eaddc9c6
 pub mod virtualization;
 
 pub use accessibility::{
