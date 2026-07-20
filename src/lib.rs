@@ -105,6 +105,8 @@ pub use graphics::{
     FramebufferCompositor, ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, RenderLayer,
     SigmaCompositor,
     Framebuffer as GpuFramebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat,
+    Animation, AnimationCurve, CompositorError as ZenithError, HighContrastMode, LayoutStyle,
+    Magnifier, Panel, PanelOrientation, ScreenReader, Widget, ZenithCompositor,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,

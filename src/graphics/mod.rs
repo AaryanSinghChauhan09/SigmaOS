@@ -4,6 +4,7 @@
 pub mod compositor;
 pub mod gpu_driver;
 pub mod image_decoder;
+pub mod zenith;
 
 pub use compositor::{
     CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor,
@@ -11,3 +12,7 @@ pub use compositor::{
 };
 pub use image_decoder::{ColorSpace, DecodedImage, ImageDecoder, ImageFormat, ImageMetadata};
 pub use gpu_driver::{Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat};
+pub use zenith::{
+    Animation, AnimationCurve, CompositorError as ZenithError, HighContrastMode, LayoutStyle,
+    Magnifier, Panel, PanelOrientation, ScreenReader, Widget, ZenithCompositor,
+};
