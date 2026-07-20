@@ -154,6 +154,8 @@ pub use storage::{Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Tran
 pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer,
     RuntimeCapabilityToken,
+    AppArmorManager, AppArmorProfile, ObjectType as SelinuxObjectType, Permission as SelinuxPermission,
+    SecurityContext as SelinuxContext, SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use shell::{ShellCommand, ShellRepl, MultiCallShell, SysCommandType};
 pub use system::{Generation, GenerationManager};

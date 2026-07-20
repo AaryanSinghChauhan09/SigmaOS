@@ -11,6 +11,7 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
+pub mod selinux;
 pub mod secrets;
 pub mod vault;
 pub mod vpn;
@@ -19,6 +20,10 @@ pub mod vulnerability;
 pub use audit::AuditLogger;
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
+};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
