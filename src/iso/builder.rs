@@ -1,15 +1,19 @@
+use core::mem;
 /// OOP-based ISO Build System for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements ISO creation, GRUB2 EFI chainloading, kernel packaging
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type BuildStepID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BuildError { Success = 0, FileNotFound = 1, BuildFailed = 2, InvalidConfig = 3 }
+pub enum BuildError {
+    Success = 0,
+    FileNotFound = 1,
+    BuildFailed = 2,
+    InvalidConfig = 3,
+}
 
 pub trait BuildStep {
     fn name(&self) -> &[u8];
@@ -24,16 +28,25 @@ pub struct KernelBuildStep {
 }
 
 impl KernelBuildStep {
-    pub fn new(id: BuildStepID) -> Self { KernelBuildStep { id, complete: AtomicUsize::new(0) } }
+    pub fn new(id: BuildStepID) -> Self {
+        KernelBuildStep {
+            id,
+            complete: AtomicUsize::new(0),
+        }
+    }
 }
 
 impl BuildStep for KernelBuildStep {
-    fn name(&self) -> &[u8] { b"build-kernel" }
+    fn name(&self) -> &[u8] {
+        b"build-kernel"
+    }
     fn execute(&mut self) -> Result<(), BuildError> {
         self.complete.store(1, Ordering::SeqCst);
         Ok(())
     }
-    fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
+    fn is_complete(&self) -> bool {
+        self.complete.load(Ordering::SeqCst) == 1
+    }
 }
 
 #[repr(C)]
@@ -43,16 +56,25 @@ pub struct InitramfsBuildStep {
 }
 
 impl InitramfsBuildStep {
-    pub fn new(id: BuildStepID) -> Self { InitramfsBuildStep { id, complete: AtomicUsize::new(0) } }
+    pub fn new(id: BuildStepID) -> Self {
+        InitramfsBuildStep {
+            id,
+            complete: AtomicUsize::new(0),
+        }
+    }
 }
 
 impl BuildStep for InitramfsBuildStep {
-    fn name(&self) -> &[u8] { b"build-initramfs" }
+    fn name(&self) -> &[u8] {
+        b"build-initramfs"
+    }
     fn execute(&mut self) -> Result<(), BuildError> {
         self.complete.store(1, Ordering::SeqCst);
         Ok(())
     }
-    fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
+    fn is_complete(&self) -> bool {
+        self.complete.load(Ordering::SeqCst) == 1
+    }
 }
 
 #[repr(C)]
@@ -62,16 +84,25 @@ pub struct BootloaderBuildStep {
 }
 
 impl BootloaderBuildStep {
-    pub fn new(id: BuildStepID) -> Self { BootloaderBuildStep { id, complete: AtomicUsize::new(0) } }
+    pub fn new(id: BuildStepID) -> Self {
+        BootloaderBuildStep {
+            id,
+            complete: AtomicUsize::new(0),
+        }
+    }
 }
 
 impl BuildStep for BootloaderBuildStep {
-    fn name(&self) -> &[u8] { b"build-bootloader" }
+    fn name(&self) -> &[u8] {
+        b"build-bootloader"
+    }
     fn execute(&mut self) -> Result<(), BuildError> {
         self.complete.store(1, Ordering::SeqCst);
         Ok(())
     }
-    fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
+    fn is_complete(&self) -> bool {
+        self.complete.load(Ordering::SeqCst) == 1
+    }
 }
 
 #[repr(C)]
@@ -81,16 +112,25 @@ pub struct ISOCreationStep {
 }
 
 impl ISOCreationStep {
-    pub fn new(id: BuildStepID) -> Self { ISOCreationStep { id, complete: AtomicUsize::new(0) } }
+    pub fn new(id: BuildStepID) -> Self {
+        ISOCreationStep {
+            id,
+            complete: AtomicUsize::new(0),
+        }
+    }
 }
 
 impl BuildStep for ISOCreationStep {
-    fn name(&self) -> &[u8] { b"create-iso" }
+    fn name(&self) -> &[u8] {
+        b"create-iso"
+    }
     fn execute(&mut self) -> Result<(), BuildError> {
         self.complete.store(1, Ordering::SeqCst);
         Ok(())
     }
-    fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
+    fn is_complete(&self) -> bool {
+        self.complete.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait BuildPipeline {
@@ -101,7 +141,12 @@ pub trait BuildPipeline {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BuildStatus { Idle = 0, Running = 1, Complete = 2, Failed = 3 }
+pub enum BuildStatus {
+    Idle = 0,
+    Running = 1,
+    Complete = 2,
+    Failed = 3,
+}
 
 pub struct SimpleBuildPipeline {
     pub steps: Vec<Option<Box<dyn BuildStep>>>,
@@ -127,10 +172,11 @@ impl BuildPipeline for SimpleBuildPipeline {
         self.steps.push(Some(step));
         Ok(id)
     }
-    
+
     fn execute(&mut self) -> Result<(), BuildError> {
-        self.status.store(BuildStatus::Running as usize, Ordering::SeqCst);
-        
+        self.status
+            .store(BuildStatus::Running as usize, Ordering::SeqCst);
+
         for i in 0..self.steps.len {
             self.current_step.store(i, Ordering::SeqCst);
             if let Some(ref mut step_opt) = self.steps.get_mut(i) {
@@ -141,11 +187,12 @@ impl BuildPipeline for SimpleBuildPipeline {
                 }
             }
         }
-        
-        self.status.store(BuildStatus::Complete as usize, Ordering::SeqCst);
+
+        self.status
+            .store(BuildStatus::Complete as usize, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn get_status(&self) -> BuildStatus {
         match self.status.load(Ordering::SeqCst) {
             0 => BuildStatus::Idle,
@@ -181,42 +228,58 @@ impl GRUBConfig for SimpleGRUBConfig {
     fn generate_config(&self, kernel_path: &[u8], initramfs_path: &[u8]) -> Vec<u8> {
         let mut config = Vec::new();
         let timeout = self.timeout.load(Ordering::SeqCst);
-        
+
         let header = b"set timeout=";
-        for &byte in header { config.push(byte); }
+        for &byte in header {
+            config.push(byte);
+        }
         let timeout_str = [b'0' + (timeout as u8 % 10)];
         config.push(timeout_str[0]);
         config.push(b'\n');
-        
+
         let default = b"set default=";
-        for &byte in default { config.push(byte); }
+        for &byte in default {
+            config.push(byte);
+        }
         let default_str = [b'0' + (self.default_entry.load(Ordering::SeqCst) as u8 % 10)];
         config.push(default_str[0]);
         config.push(b'\n');
-        
+
         let menu_entry = b"menuentry \"SigmaOS\" {\n";
-        for &byte in menu_entry { config.push(byte); }
-        
+        for &byte in menu_entry {
+            config.push(byte);
+        }
+
         let kernel = b"    multiboot2 /boot/";
-        for &byte in kernel { config.push(byte); }
-        for &byte in kernel_path { config.push(byte); }
+        for &byte in kernel {
+            config.push(byte);
+        }
+        for &byte in kernel_path {
+            config.push(byte);
+        }
         config.push(b'\n');
-        
+
         let initramfs = b"    module2 /boot/";
-        for &byte in initramfs { config.push(byte); }
-        for &byte in initramfs_path { config.push(byte); }
+        for &byte in initramfs {
+            config.push(byte);
+        }
+        for &byte in initramfs_path {
+            config.push(byte);
+        }
         config.push(b'\n');
-        
+
         let boot = b"    boot\n}\n";
-        for &byte in boot { config.push(byte); }
-        
+        for &byte in boot {
+            config.push(byte);
+        }
+
         config
     }
-    
+
     fn set_timeout(&mut self, timeout: usize) {
         self.timeout.store(timeout, Ordering::SeqCst);
     }
-    
+
     fn set_default_entry(&mut self, entry: usize) {
         self.default_entry.store(entry, Ordering::SeqCst);
     }
@@ -248,26 +311,30 @@ impl ISOPackager for SimpleISOPackager {
     fn create_directory(&mut self, _path: &[u8]) -> Result<(), BuildError> {
         Ok(())
     }
-    
+
     fn add_file(&mut self, iso_path: &[u8], host_path: &[u8]) -> Result<(), BuildError> {
         let mut iso_entry = [0u8; 256];
         let mut host_entry = [0u8; 256];
-        
+
         let iso_len = iso_path.len().min(255);
         let host_len = host_path.len().min(255);
-        
-        for i in 0..iso_len { iso_entry[i] = iso_path[i]; }
-        for i in 0..host_len { host_entry[i] = host_path[i]; }
-        
+
+        for i in 0..iso_len {
+            iso_entry[i] = iso_path[i];
+        }
+        for i in 0..host_len {
+            host_entry[i] = host_path[i];
+        }
+
         self.files.push((iso_entry, host_entry));
         self.file_count.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn set_bootable(&mut self) -> Result<(), BuildError> {
         Ok(())
     }
-    
+
     fn generate_iso(&mut self, output_path: &[u8]) -> Result<(), BuildError> {
         #[cfg(not(target_os = "none"))]
         {
@@ -280,14 +347,18 @@ impl ISOPackager for SimpleISOPackager {
                 // Try running xorriso command to generate a real bootable ISO
                 let status = Command::new("xorriso")
                     .args(&[
-                        "-as", "mkisofs",
+                        "-as",
+                        "mkisofs",
                         "-R",
-                        "-b", "boot/grub/grub.cfg",
+                        "-b",
+                        "boot/grub/grub.cfg",
                         "-no-emul-boot",
-                        "-boot-load-size", "4",
+                        "-boot-load-size",
+                        "4",
                         "-boot-info-table",
-                        "-o", path_str,
-                        "iso_root"
+                        "-o",
+                        path_str,
+                        "iso_root",
                     ])
                     .status();
 
@@ -315,11 +386,21 @@ impl ISOPackager for SimpleISOPackager {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
     fn get(&self, index: usize) -> Option<&T> {
         if index < self.len {
             unsafe { Some(&*self.data.add(index)) }
@@ -338,7 +419,9 @@ impl<T> Vec<T> {
 
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -346,18 +429,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {
@@ -367,23 +461,23 @@ mod tests {
     #[test]
     fn test_iso_pipeline_and_packager() {
         let mut pipeline = SimpleBuildPipeline::new();
-        
+
         let step1 = KernelBuildStep::new(1);
         let step2 = InitramfsBuildStep::new(2);
         let step3 = BootloaderBuildStep::new(3);
         let step4 = ISOCreationStep::new(4);
-        
+
         assert_eq!(pipeline.add_step(Box::new(step1)).unwrap(), 1);
         assert_eq!(pipeline.add_step(Box::new(step2)).unwrap(), 2);
         assert_eq!(pipeline.add_step(Box::new(step3)).unwrap(), 3);
         assert_eq!(pipeline.add_step(Box::new(step4)).unwrap(), 4);
-        
+
         assert!(pipeline.execute().is_ok());
-        
+
         // GRUB config generation test
         let grub = SimpleGRUBConfig::new();
         let config_bytes = grub.generate_config(b"sigmaos.bin", b"initramfs.igz");
-        
+
         // Convert custom Vec<u8> to standard Vec<u8> for assertion
         let mut std_bytes = std::vec::Vec::new();
         for i in 0..config_bytes.len {
@@ -394,23 +488,24 @@ mod tests {
         let config_str = std::str::from_utf8(&std_bytes).unwrap();
         assert!(config_str.contains("multiboot2 /boot/sigmaos.bin"));
         assert!(config_str.contains("module2 /boot/initramfs.igz"));
-        
+
         // ISO Packager test with mock fallback check
         let mut packager = SimpleISOPackager::new();
-        assert!(packager.add_file(b"boot/sigmaos.bin", b"target/release/sigmaos.bin").is_ok());
-        
+        assert!(packager
+            .add_file(b"boot/sigmaos.bin", b"target/release/sigmaos.bin")
+            .is_ok());
+
         // Create build directory if not exists
         let _ = std::fs::create_dir_all("build");
         let test_iso_path = b"build/test_sigmaos_build.iso";
         assert!(packager.generate_iso(test_iso_path).is_ok());
-        
+
         // Check if the mock/simulated file exists and has correct identifier CD001 at 32769
         let iso_content = std::fs::read("build/test_sigmaos_build.iso").unwrap();
         assert!(iso_content.len() >= 32768 + 2048);
         assert_eq!(&iso_content[32769..32774], b"CD001");
-        
+
         // Clean up
         let _ = std::fs::remove_file("build/test_sigmaos_build.iso");
     }
 }
-

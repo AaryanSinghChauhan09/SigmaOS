@@ -403,17 +403,17 @@ mod tests {
     fn test_tcp_connection() {
         let mut socket = SimpleSocket::new(1, Protocol::TCP, 8080);
         assert_eq!(socket.get_state(), TCPState::Closed);
-        
+
         assert!(socket.listen().is_ok());
         assert_eq!(socket.get_state(), TCPState::Listen);
-        
+
         assert!(socket.connect(80).is_ok());
         assert_eq!(socket.get_state(), TCPState::Established);
-        
+
         let mut buf = [0u8; 10];
         assert_eq!(socket.send(&[1, 2, 3]).unwrap(), 3);
         assert_eq!(socket.recv(&mut buf).unwrap(), 10);
-        
+
         assert!(socket.close().is_ok());
         assert_eq!(socket.get_state(), TCPState::Closed);
     }
@@ -422,13 +422,13 @@ mod tests {
     fn test_udp_socket() {
         let mut socket = SimpleSocket::new(2, Protocol::UDP, 1234);
         assert_eq!(socket.sendto(&[1, 2, 3], 5678).unwrap(), 3);
-        
+
         let mut buf = [0u8; 10];
         let (len, port) = socket.recvfrom(&mut buf).unwrap();
         assert_eq!(len, 10);
         assert_eq!(port, 5678);
     }
-    
+
     #[test]
     fn test_network_stack() {
         let mut stack = SimpleNetworkStack::new();

@@ -5,7 +5,8 @@
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
+    let layout =
+        Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
     std_alloc(layout)
 }
 

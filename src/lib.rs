@@ -86,6 +86,10 @@ pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
     RoadmapMilestone, TransparentRoadmap,
 };
+pub use iso::builder::{
+    BuildError, BuildPipeline, BuildStatus, BuildStep, GRUBConfig, ISOPackager,
+    SimpleBuildPipeline, SimpleGRUBConfig, SimpleISOPackager,
+};
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
@@ -131,17 +135,13 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use iso::builder::{
-    BuildError, BuildPipeline, BuildStatus, BuildStep, GRUBConfig, ISOPackager,
-    SimpleBuildPipeline, SimpleGRUBConfig, SimpleISOPackager,
-};
-
 
 #[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
+    let layout =
+        Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
     std_alloc(layout)
 }
 
@@ -150,4 +150,3 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
 pub unsafe extern "C" fn free(ptr: *mut u8) {
     // No-op deallocation in host test environment to avoid layout-tracking complexity.
 }
-
