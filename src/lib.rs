@@ -32,6 +32,8 @@ pub mod shell;
 pub mod sigpkg;
 pub mod support;
 pub mod virtualization;
+pub mod unimplemented_features;
+
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
