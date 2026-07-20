@@ -118,6 +118,8 @@ pub use graphics::{
     Framebuffer as GpuFramebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat,
     Animation, AnimationCurve, CompositorError as ZenithError, HighContrastMode, LayoutStyle,
     Magnifier, Panel, PanelOrientation, ScreenReader, Widget, ZenithCompositor,
+    Geometry, WindowNode, WindowState, ZenithCompositor as WaylandZenithCompositor,
+    SCREEN_WIDTH, SCREEN_HEIGHT,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
