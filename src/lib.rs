@@ -36,6 +36,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod support;
 pub mod system;
+pub mod tools;
 pub mod tracing;
 pub mod unimplemented_features;
 pub mod virtualization;
@@ -181,6 +182,10 @@ pub use sigpkg::{
 };
 pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
+};
+pub use tools::{
+    SigmaToolError, SigmaDeploy, SigmaCluster, ClusterNode, NodeState,
+    SigmaIdentity, UserIdentity, SigmaAccess, AccessibilityFeature as SigmaAccessibilityFeature,
 };
 pub use virtualization::{
     Cgroup, CgroupController, CgroupManager, CgroupState, CgroupSubsystem,
