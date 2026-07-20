@@ -759,4 +759,35 @@ mod tests {
         assert!(composite.has_superset_capability("ai_upscale"));
         assert!(!composite.has_superset_capability("non_existent"));
     }
+
+    #[test]
+    fn test_superset_application_capability() {
+        let vlc = MediaDecoderCapability::new(
+            "VLC".to_string(),
+            vec!["h264".to_string(), "hevc".to_string(), "vp9".to_string()],
+            "4K".to_string(),
+        );
+
+        let basic_player = MediaDecoderCapability::new(
+            "Basic".to_string(),
+            vec!["h264".to_string()],
+            "1080p".to_string(),
+        );
+
+        // VLC is a superset capability of basic_player
+        assert!(vlc.is_compatible_with(&basic_player));
+        // Basic player is NOT compatible as a superset of VLC (it lacks vp9/hevc and 4K)
+        assert!(!basic_player.is_compatible_with(&vlc));
+
+        let chrome =
+            HtmlRendererCapability::new("Chrome".to_string(), "Blink".to_string(), true, true);
+
+        let old_ie =
+            HtmlRendererCapability::new("IE".to_string(), "Trident".to_string(), false, false);
+
+        // Chrome is compatible with old_ie's requirements
+        assert!(chrome.is_compatible_with(&old_ie));
+        // old_ie is NOT compatible with chrome's requirements (lacks HTML5 & WASM)
+        assert!(!old_ie.is_compatible_with(&chrome));
+    }
 }

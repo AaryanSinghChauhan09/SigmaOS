@@ -1,9 +1,6 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
-
+#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
-#![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod automation;
@@ -47,8 +44,9 @@ pub use community::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
-    StandardsComplianceManager, TargetPlatform, TranslationLayer,
+    ContainerRuntime, FhsConventionStatus, HtmlRendererCapability, LsbProfile,
+    MediaDecoderCapability, PosixComplianceLevel, StandardsComplianceManager,
+    SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

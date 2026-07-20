@@ -4,9 +4,7 @@ pub mod standards;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
+    ContainerRuntime, FhsConventionStatus, HtmlRendererCapability, LsbProfile,
+    MediaDecoderCapability, PosixComplianceLevel, StandardsComplianceManager,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
-};
-pub use standards::{
-    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };
