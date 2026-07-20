@@ -116,8 +116,9 @@ pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 pub use network::{
-    DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError, TcpConnection, TcpError,
-    TcpSegment, TcpStack, TcpState,
+    AdblockRule, BrowserCore, BrowserTab, BrowserTabState, DnsError, DnsResolver, MDnsDiscovery,
+    QuicConnection, QuicError, SecurityLevel, TabCapabilities, TcpConnection, TcpError,
+    TcpSegment, TcpStack, TcpState, TrackingProtection,
 };
 pub use ml::{SigmaAid, LLMInterface, ModelStatus};
 pub use observability::{
