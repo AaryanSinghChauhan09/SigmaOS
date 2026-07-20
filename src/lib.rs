@@ -55,10 +55,11 @@ pub use community::{
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, FhsConventionStatus, IndianLanguage, LocalizationManager,
     LocalizationProvider, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
     TargetPlatform, TranslationLayer,
+    ApkLoader, BinderCallType, BinaryFormat as ScosmosBinaryFormat, CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
