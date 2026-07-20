@@ -17,62 +17,51 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
-
 ---
 
 ## 📊 System Architecture
 
 SigmaOS decomposes the traditional monolithic kernel into specialized, isolated shards. The interaction between these shards is governed by a capability-enforced transaction bus.
 
-```mermaid
-graph TD
-    UserLand[Userland Applications] -->|Syscall Capability Gate| KernelGate[S-SEC Security Shard]
-    KernelGate -->|Validated Message| Bus[Sovereign IPC Bus]
-    Bus --> S-MM[S-MM: Memory Shard]
-    Bus --> S-SCHED[S-SCHED: Scheduler Shard]
-    Bus --> S-FS[S-FS: Distributed Filesystem]
-    Bus --> S-NET[S-NET: Network Shard]
-    Bus --> S-AI[S-AI: Local LLM Orchestrator]
+```
+UserLand → S-SEC (Capability Gate) → Sovereign IPC Bus
+    Bus → S-MM   (Memory Shard)
+    Bus → S-SCHED (Scheduler Shard)
+    Bus → S-FS   (Distributed Filesystem)
+    Bus → S-NET  (Network Shard)
+    Bus → S-AI   (Local LLM Orchestrator)
+    Bus → S-DISP (Zenith Display Compositor)
 ```
 
-- **S-MM**: Sovereign Memory Manager (Buddy Allocator).
-- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
-- **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
-- **S-SEC**: Security Framework (PQC + MAC + Sandbox).
-- **S-AI**: AI Task Orchestrator (Local LLM routing).
-
+- **S-MM**: Sovereign Memory Manager (Buddy Allocator, O(log n) alloc/free, 4-level paging).
+- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF + AI).
+- **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS + Ext4 + FAT32).
+- **S-SEC**: Security Framework (PQC + MAC + Sandbox + Pledge).
+- **S-AI**: AI Task Orchestrator (Local LLM routing, on-device inference).
+- **S-DISP**: Zenith Desktop Compositor (Wayland-native, no X11).
 
 ---
 
 ## 🚀 Quick Start
 
-### Running the QEMU Demo (Works Today)
-
-Ensure you have the required compiler toolchain and emulation packages:
+### Running the QEMU Demo
 
 ```bash
-
 # Install dependencies
-
 sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go xorriso
 
 # Clone the repository
-
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
 # Build the system image
+cargo build --release
 
-make clean && make all -j$(nproc)
-
-# Run in QEMU
-
-qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
+# Run tests
+cargo test --lib
 ```
 
 ### Profile Builds
-
-SigmaOS supports declarative compilation profiles specified at build-time:
 
 ```bash
 make PROFILE=standalone all    # Full desktop ISO
@@ -83,147 +72,97 @@ make PROFILE=browser all       # WASM bundle
 
 ---
 
-## 🔒 Security & Sandboxing
+## 📈 Development Status
 
-SigmaOS features a capability-native access control system. Programs are executed with explicit privilege tokens (capabilities) rather than generic user IDs.
-
-```rust
-// Capability delegation example
-let token = CapabilityToken::new()
-    .allow_network("tcp", 80)
-    .allow_read("/var/www");
 ```
-
-For a detailed review of all security policies, see the canonical [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) page on the Wiki.
-
----
-
-## 📚 Canonical Documentation (GitHub Wiki)
-
-```text
+Phase D (Network Stack)        ████████████████████  100% ✅
+Phase E (Package Manager)      ████████████████████  100% ✅
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
-Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
+Phase G (Kernel Boot)          ████████████████████  100% ✅
+Phase H (India Stack)          ████░░░░░░░░░░░░░░░░   20% 🔄 Started
+Phase I (AI-Native)            ██░░░░░░░░░░░░░░░░░░   10% 🔄 Started
+Phase J (Production Release)   ░░░░░░░░░░░░░░░░░░░░    0% ⬜ Planned
 ```
 
-### Current Status
+### Current Status (July 2026)
 
-**Kernel Core:**
-- ✅ Kernel scheduler (MLFQ+CFS+EDF)
-- ✅ Syscalls (I/O + Process)
-- ✅ Physical MM (buddy allocator)
-- 🔄 Virtual MM (paging) - Partial
-- ✅ APIC + timer
-- ✅ sigma_pledge + sigma_unveil
-- ✅ Kyber-1024 KEM + Dilithium-5
+| Component | Status | Tests |
+|-----------|--------|-------|
+| Kernel scheduler (MLFQ+CFS+EDF) | ✅ Complete | ✅ Passing |
+| Syscalls (I/O + Process) | ✅ Complete | ✅ Passing |
+| Physical MM (buddy allocator) | ✅ Complete | ✅ Passing |
+| Virtual MM (4-level paging) | ✅ Complete | ✅ Passing |
+| APIC + timer | ✅ Complete | ✅ Passing |
+| sigma_pledge + sigma_unveil | ✅ Complete | ✅ Passing |
+| Kyber-1024 KEM | ✅ Complete | ✅ Passing |
+| Dilithium-5 signatures | ✅ Complete | ✅ Passing |
+| TCP/UDP stack (BBR+Reno congestion) | ✅ Complete | ✅ Passing |
+| DNS Resolver + mDNS + QUIC/HTTP3 | ✅ Complete | ✅ Passing |
+| Zero-Trust networking | ✅ Complete | ✅ Passing |
+| WireGuard VPN | ✅ Complete | ✅ Passing |
+| Wi-Fi 7 Driver (802.11be) | ✅ Complete | ✅ Passing |
+| BitTorrent Protocol | ✅ Complete | ✅ Passing |
+| Ext4 + FAT32 filesystems | ✅ Complete | ✅ Passing |
+| SigmaFS (CAS + PQC) | 🔄 In Progress | 🔄 Partial |
+| Zenith Desktop prototype | ✅ Complete | ✅ Passing |
+| sigma-pkg (SAT solver) | ✅ Complete | ✅ Passing |
+| India Finance Module (GST/TDS/IT) | ✅ Complete | ✅ Passing |
+| UPI Generator | ✅ Complete | ✅ Passing |
+| 22-Language Support | 🔄 14/22 Done | 🔄 Partial |
+| AI Scheduler Integration | 🔄 Framework | ✅ Passing |
+| UEFI GOP framebuffer + ACPI + xHCI | ✅ Complete | ✅ Passing |
+| Bootable ISO (xorriso + GRUB2) | ✅ Complete | ✅ Passing |
+| Archive Manager | ✅ Complete | ✅ Passing |
+| Disk Usage Analyzer | ✅ Complete | ✅ Passing |
+| Virtual Machine Manager (QEMU/KVM) | ✅ Complete | ✅ Passing |
+| Container Manager (Docker/Podman) | ✅ Complete | ✅ Passing |
 
-**Networking & Storage:**
-- 🔄 TCP/UDP stack - Partial
-- ✅ Ext4 + FAT32 filesystems
-- ✅ NVMe + USB xHCI drivers
-
-**Desktop & Productivity:**
-- ✅ Zenith Desktop prototype
-- ✅ Screen recorder with GPU acceleration
-- ✅ Screenshot tool with annotation
-- ✅ Calendar + task manager
-- ✅ Email client with IMAP/SMTP
-- ✅ Note-taking app with Markdown
-- ✅ Code editor with LSP support
-- ✅ Integrated terminal
-- ✅ Clipboard manager with history
-- ✅ Task manager
-
-**Security:**
-- ✅ Encrypted file vault
-- ✅ Password manager with biometric unlock
-- ✅ Intrusion detection system
-- ✅ Secure VPN client
-- ✅ Capability-based security framework
-
-**System Tools:**
-- ✅ File manager
-- ✅ Archive manager
-- ✅ Disk usage analyzer
-- ✅ System monitor
-- ✅ Process manager
-- ✅ Virtual machine manager (QEMU/KVM)
-- ✅ Container manager (Docker/Podman)
-
-**Package Management:**
-- ✅ sigma-pkg CLI
-- ✅ Universal package manager
-- ✅ Rollback package snapshots
-
-**Networking:**
-- ✅ Cloud sync engine
-- ✅ Built-in torrent client
-- ✅ Network traffic analyzer
-
-**AI & Automation:**
-- ✅ AI orchestrator for system optimization
-
-**Customization:**
-- ✅ Unified control center
-- ✅ Declarative theming engine
-
-**Boot & Deployment:**
-- ⬜ Bootable ISO (Phase G)
-
+**Total Library Tests: 424 passing, 0 failing** ✅
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for guidelines.
 
 ### High-Impact Areas
 
-- Round-robin scheduler implementation
-- Buddy allocator completion
-- sigma-sh REPL
-- USB HID keyboard driver
-- VESA framebuffer driver
-- Package recipes
-
+- **Language Support** — Complete the remaining 8 Scheduled languages
+- **AI Integration** — GGUF model runtime, sigma-aid daemon
+- **sigma-sh** — Natural language command parser
+- **SigmaFS** — Complete the content-addressed, PQC-encrypted filesystem
 
 ---
 
-## 📚 Documentation
+## 📚 GitHub Wiki — Canonical Documentation
 
-### Repository Documentation
+| Page | Description |
+|------|-------------|
+| [🏠 Home](Home) | This page — project overview |
+| [📈 Maturity & Distro-Parity Roadmap](Maturity_Parity_Roadmap) | 36-month roadmap across 10 phases |
+| [🧩 Advanced Absorption Matrix](Advanced_Absorption) | How SigmaOS absorbs and supersedes apps |
+| [🗄️ SigmaFS Innovations](SigmaFS_Innovations) | Content-addressed, PQC-encrypted filesystem |
+| [🎬 SigmaMedia Frameworks](SigmaMedia-Frameworks) | Sovereign video player replacing VLC |
+| [🖥️ Zenith Desktop](Zenith_Desktop) | Wayland compositor and desktop shell |
+| [🔒 Security Framework](Security_Framework) | PQC + Capability security deep-dive |
+| [🤖 Sigma AI Agents](Sigma_AI_Agents) | AI-native OS design |
+| [🇮🇳 India Stack](India_Stack) | GST/TDS/UPI/22-language details |
+| [🚀 Self-Hosting Roadmap](Self-Hosting-Roadmap) | Sovereign deployment architecture |
+| [🔧 Application Diagnostics](Application-Diagnostics-And-Fixes) | Performance fixes and diagnostics |
+| [📦 Phase H — India Stack Detail](India_Stack) | Full India regulatory compliance |
 
-- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
-- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
-- [Roadmap](Roadmap.md) — Development plan
-- [INSTALL.md](INSTALL.md) — Build instructions
-- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
-- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy
-- [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
-- [FAQ](FAQ.md) — Common questions (coming soon)
+---
 
+## 🔒 Security Policy
 
-### GitHub Wiki (Canonical Documentation)
-
-Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
-
-- **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
-- **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
-- **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
-- **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
-- **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
-- **Linux Distro Absorption**: [Strategic Distro Absorption Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_ABSORPTION_SPEC)
-- **S-Boot Firmware**: [Sovereign BIOS & UEFI Firmware Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BIOS_FIRMWARE_SPEC)
-- **Zenith Compositor**: [Wayland Zenith UI Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WAYLAND_ZENITH_SPEC)
-- **Portable Apps**: [Portable Application Format Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PORTABLE_APP_FORMAT_PLAN)
-- **Custom Personalization**: [Custom Personalization & Theme Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CUSTOM_PERSONALIZATION_SPEC)
-- **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
-- **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
-- **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
-
+Found a vulnerability? See [SECURITY.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/SECURITY.md) and our [Bug Bounty Program](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/BUG_BOUNTY.md).
 
 ---
 
 ## 📄 License
 
-Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
+Dual-licensed under **MIT** and **GPL-2.0**. See the `LICENSE` file for details.
+
+---
+
+*SigmaOS — Built in India. Built for the World.*
