@@ -380,7 +380,9 @@ No compilable Rust, Zig, or Nim source library modules are implemented within th
 
 ### 9.2 Zero Standard Runtime Dependency
 All proposed code models utilize raw, user-defined primitive values, direct hardware mapping offsets, and zero-allocation logic. This ensures that when features are translated into implementation targets, the final compilations remain lightweight, fast, and completely free from third-party standard libraries or dynamic platforms.
-=======
+
+---
+
 # 🗺️ SigmaOS: The Strategic Unified OS Integration Plan & Future Roadmap
 
 This document outlines the master technical blueprint and multi-phase implementation roadmap to synthesize the absolute best characteristics of **Linux distributions**, **Windows OS versions**, and **Apple iOS/macOS** into **SigmaOS**.
