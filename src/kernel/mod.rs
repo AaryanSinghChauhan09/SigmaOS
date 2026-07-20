@@ -4,6 +4,7 @@
 // ── Core kernel primitives ─────────────────────────────────────────────────
 pub mod cpufreq;
 pub mod cpu_features;
+pub mod gap_filling;
 pub mod ipc;
 pub mod memory;
 pub mod numa_allocator;
@@ -57,6 +58,10 @@ pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
 pub use watchdog::{HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState};
 pub use performance::{IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue};
 pub use cpu_features::{CpuInstructionExtension, SovereignCompilerOptimizer};
+pub use gap_filling::{
+    IpcMessage, PageDirectoryController, PageDirectoryEntry, SignalDispatcher, SovereignIpcBus,
+    SovereignSignal,
+};
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
 pub use proc::{
