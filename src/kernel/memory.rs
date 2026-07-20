@@ -147,18 +147,19 @@ impl BuddyAllocator {
         let buddy_size = block.size * 2;
 
         // Find buddy in free list
-        if let Some(pos) = self.free_lists[order].iter().position(|b| {
-            b.addr.as_ptr() as usize == buddy_addr && b.size == block.size
-        }) {
+        if let Some(pos) = self.free_lists[order]
+            .iter()
+            .position(|b| b.addr.as_ptr() as usize == buddy_addr && b.size == block.size)
+        {
             let _buddy = self.free_lists[order].remove(pos);
-            
+
             // Merge blocks
             let merged_addr = if block_addr < buddy_addr {
                 block_addr
             } else {
                 buddy_addr
             };
-            
+
             if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
                     addr: non_null,
