@@ -153,6 +153,10 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use storage::{Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState};
+pub use fs::{
+    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, CompressionType as BtrfsCompressionType, ChecksumType,
+    AllocationStrategy as XfsAllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal, XfsState,
+};
 pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer,
     RuntimeCapabilityToken,
