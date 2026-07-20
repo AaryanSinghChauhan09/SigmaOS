@@ -5,6 +5,7 @@ pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
+pub mod kernel_io_suite;
 pub mod kernel_releases;
 pub mod legacy_keyboard;
 pub mod more_devices;
@@ -27,6 +28,19 @@ pub use even_more_devices::{
 pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
+pub use kernel_io_suite::{
+    AdLibSynth, AdLibSynthDriver as KernelAdLibSynth, AclPacket, AlsaError, AlsaSoundDriver,
+    AncientDeviceLayer, AncientError, BssInfo, BluetoothError, BluetoothHciDriver, BluetoothMode,
+    CommandBuffer, CommandStatus, Cursor, DisplayMode, EgaCgaAdapter, FlipRequest, GpuAccelerationDriver,
+    GpuCommand as KernelGpuCommand, GpuError, GestureState, GestureType, HidFullError,
+    HidInputReport, HidOutputReport, HidTokenType, IsaBus, IsaDevice,
+    JobStatus, L2capChannel, L2capState, MfmDiskInterface, MultiTouchDriver, Ne2000Ethernet,
+    PixelFormat, PrinterBackend, PrinterCupsDriver, PrinterError, PrinterFormat, PrinterProtocol,
+    PrimitiveType, PrintJob, QosMapping, RingBuffer, SampleFormat, ScanResult, ScoPacket,
+    SecurityType, TouchContact, TouchError, TouchProtocol, UsbHidFullDriver, Uart8250,
+    VesaFramebufferDriver, VesaFramebufferError, VideoMode, WifiError, WifiFullStackDriver,
+    WifiState, WpaToken, WpaTokenType,
+};
 pub use kernel_releases::{
     KernelReleaseInfo, Linux5_15ReleaseDriver, Linux6_12ReleaseDriver, Linux6_1ReleaseDriver,
     Linux6_6ReleaseDriver, LinuxReleaseDriver, LongtermReleaseDriver, MainlineReleaseDriver,
