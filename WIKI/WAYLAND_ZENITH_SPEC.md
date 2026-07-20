@@ -34,7 +34,7 @@ The core compositor manages screen geometry, surface buffers, active input focal
 
 ```rust
 pub const SCREEN_WIDTH: u32 = 1920;
-pub const SCREEN_HEIGHT: u38 = 1080;
+pub const SCREEN_HEIGHT: u32 = 1080;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowState {

@@ -15,9 +15,8 @@ pub struct ZeroAllocRingBuffer<T, const N: usize> {
     tail: usize,
 }
 
-impl<T, const N: usize> ZeroAllocRingBuffer<T, N> {
+impl<T: Copy, const N: usize> ZeroAllocRingBuffer<T, N> {
     pub fn new() -> Self {
-        const NONE_VAL: Option<any> = None;
         // Compile-time safe zero initialization
         unsafe {
             Self {
