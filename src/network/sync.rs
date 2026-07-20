@@ -267,8 +267,8 @@ impl CloudSyncManager {
                 .as_nanos()),
             local_path,
             remote_path,
-            size_bytes: metadata.map(|m| m.len()).unwrap_or(0),
-            last_modified: metadata.map(|m| m.modified()
+            size_bytes: metadata.as_ref().map(|m| m.len()).unwrap_or(0),
+            last_modified: metadata.as_ref().map(|m| m.modified()
                 .ok()
                 .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
                 .map(|d| d.as_secs())
@@ -283,22 +283,24 @@ impl CloudSyncManager {
     /// Sync all items
     pub fn sync_all(&mut self) -> Result<SyncResult, SyncError> {
         let start = Instant::now();
-        let mut.items_synced = 0;
+        let mut items_synced = 0;
         let mut bytes_transferred = 0u64;
         let mut errors = Vec::new();
 
-        for item in &mut self.sync_items {
-            item.sync_status = SyncStatus::Syncing;
+        let len = self.sync_items.len();
+        for i in 0..len {
+            self.sync_items[i].sync_status = SyncStatus::Syncing;
+            let item = self.sync_items[i].clone();
 
-            match self.sync_item(item) {
+            match self.sync_item(&item) {
                 Ok(bytes) => {
-                    item.sync_status = SyncStatus::Synced;
+                    self.sync_items[i].sync_status = SyncStatus::Synced;
                     items_synced += 1;
                     bytes_transferred += bytes;
                 }
                 Err(e) => {
-                    item.sync_status = SyncStatus::Error;
-                    errors.push(format!("{}: {}", item.local_path.display(), e));
+                    self.sync_items[i].sync_status = SyncStatus::Error;
+                    errors.push(format!("{}: {:?}", self.sync_items[i].local_path.display(), e));
                 }
             }
         }

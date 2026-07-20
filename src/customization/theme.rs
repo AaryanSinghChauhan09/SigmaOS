@@ -227,8 +227,9 @@ impl ThemeProvider for BuiltInThemeProvider {
     }
 
     fn set_theme(&mut self, theme: Theme) -> Result<(), ThemeError> {
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
-        self.current_theme = theme.name.to_lowercase();
+        let name_lower = theme.name.to_lowercase();
+        self.themes.insert(name_lower.clone(), theme);
+        self.current_theme = name_lower;
         Ok(())
     }
 
@@ -323,8 +324,9 @@ impl ThemeProvider for CustomThemeProvider {
     }
 
     fn set_theme(&mut self, theme: Theme) -> Result<(), ThemeError> {
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
-        self.current_theme = theme.name.to_lowercase();
+        let name_lower = theme.name.to_lowercase();
+        self.themes.insert(name_lower.clone(), theme);
+        self.current_theme = name_lower;
         Ok(())
     }
 
@@ -371,8 +373,8 @@ impl ThemeEngine {
 
     /// Set theme by name
     pub fn set_theme_by_name(&mut self, name: &str) -> Result<(), ThemeError> {
-        if let Some(theme) = self.provider.get_theme_by_name(name) {
-            self.provider.apply_theme(theme)
+        if let Some(theme) = self.provider.get_theme_by_name(name).cloned() {
+            self.provider.apply_theme(&theme)
         } else {
             Err(ThemeError::ThemeNotFound(name.to_string()))
         }

@@ -3,6 +3,7 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use rand::Rng;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -201,7 +202,7 @@ impl PasswordManager {
             ..entry
         };
 
-        self.passwords.insert(encrypted_entry.id.clone(), encrypted_entry);
+        self.passwords.insert(encrypted_entry.id.clone(), encrypted_entry.clone());
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -246,7 +247,7 @@ impl PasswordManager {
             ..entry
         };
 
-        self.passwords.insert(encrypted_entry.id.clone(), encrypted_entry);
+        self.passwords.insert(encrypted_entry.id.clone(), encrypted_entry.clone());
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
