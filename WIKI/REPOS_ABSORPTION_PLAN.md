@@ -277,7 +277,7 @@ By systematic abstraction, SigmaOS maps, obsoletes, and natively replaces mainst
 *   **Upstream Repositories:**
     *   `openrc/openrc` — Init system used by Gentoo/Alpine.
     *   `runit/runit` — Minimal init system.
-    *    s6/s6` — Supervision suite.
+    *   `s6/s6` — Supervision suite.
     *   `upstart/upstart` — Canonical’s old init system.
     *   `monit/monit` — Service monitoring tool.
     *   `supervisord/supervisor` — Process control system.
