@@ -40,7 +40,7 @@ pub struct EmailMessage {
 }
 
 /// Email folder
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EmailFolder {
     Inbox,
     Sent,
@@ -138,7 +138,7 @@ impl EmailBackend for ImapSmtpBackend {
         // Simulated fetching
         let mut results = Vec::new();
 
-        for (id, email) in &self.emails {
+        for (_, email) in &self.emails {
             if email.folder == folder {
                 results.push(email.clone());
                 if results.len() >= limit {
@@ -309,19 +309,19 @@ impl EmailClient {
     }
 
     /// Star email
-    pub fn star_email(&mut self, email_id: &str, starred: bool) -> Result<(), EmailError> {
+    pub fn star_email(&mut self, _email_id: &str, _starred: bool) -> Result<(), EmailError> {
         // In real implementation, would update via backend
         Ok(())
     }
 
     /// Add label
-    pub fn add_label(&mut self, email_id: &str, label: String) -> Result<(), EmailError> {
+    pub fn add_label(&mut self, _email_id: &str, _label: String) -> Result<(), EmailError> {
         // In real implementation, would update via backend
         Ok(())
     }
 
     /// Remove label
-    pub fn remove_label(&mut self, email_id: &str, label: &str) -> Result<(), EmailError> {
+    pub fn remove_label(&mut self, _email_id: &str, _label: &str) -> Result<(), EmailError> {
         // In real implementation, would update via backend
         Ok(())
     }

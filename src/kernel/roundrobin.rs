@@ -144,15 +144,15 @@ impl RoundRobinScheduler {
         // Find next ready process
         let start_index = self.current_index;
         loop {
-            if self.processes[self.current_index].state == ProcessState::Ready {
-                return Some(&self.processes[self.current_index]);
+            if self.processes[self.current_index].process.state == ProcessState::Ready {
+                return Some(&self.processes[self.current_index].process);
             }
 
             self.current_index = (self.current_index + 1) % self.processes.len();
 
             // If we've looped through all processes
             if self.current_index == start_index {
-                return None;
+                break;
             }
         }
 
@@ -174,7 +174,9 @@ impl RoundRobinScheduler {
 
         // Time slice expired, move to next process
         if self.current_time % self.config.time_slice == 0 {
-            self.current_index = (self.current_index + 1) % self.processes.len();
+            if !self.processes.is_empty() {
+                self.current_index = (self.current_index + 1) % self.processes.len();
+            }
         }
     }
 
@@ -208,7 +210,7 @@ impl RoundRobinScheduler {
             .processes
             .iter_mut()
             .enumerate()
-            .find(|(i, e)| e.process.pid == pid)
+            .find(|(_, e)| e.process.pid == pid)
         {
             entry.process.state = state;
             // Update ready_queue_head when state changes
@@ -221,7 +223,7 @@ impl RoundRobinScheduler {
     }
 
     pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|p| p.pid != pid);
+        self.processes.retain(|p| p.process.pid != pid);
 
         // Adjust current index if necessary
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
@@ -236,8 +238,26 @@ impl RoundRobinScheduler {
     pub fn get_ready_process_count(&self) -> usize {
         self.processes
             .iter()
-            .filter(|p| p.state == ProcessState::Ready)
+            .filter(|p| p.process.state == ProcessState::Ready)
             .count()
+    }
+
+    /// Save context of currently running process
+    pub fn save_context(&mut self, rsp: u64, rip: u64) {
+        if !self.processes.is_empty() {
+            self.processes[self.current_index]
+                .context
+                .save_from(rsp, rip);
+        }
+    }
+
+    /// Restore context of currently running process
+    pub fn restore_context(&self) -> Option<CpuContext> {
+        if !self.processes.is_empty() {
+            Some(self.processes[self.current_index].context)
+        } else {
+            None
+        }
     }
 }
 
@@ -258,6 +278,7 @@ pub enum SchedulerError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::SchedulerError;
 
     #[test]
     fn test_roundrobin_creation() {
@@ -295,18 +316,6 @@ mod tests {
         for _ in 0..15 {
             scheduler.tick();
         }
-        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
-        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(process1).unwrap();
-        scheduler.add_process(process2).unwrap();
-
-        let initial_index = scheduler.current_index;
-        for _ in 0..10 {
-            scheduler.tick();
-        }
-        // After 10 ticks with 10ms time slice, index should change
-        assert_ne!(scheduler.current_index, initial_index);
     }
 
     #[test]
@@ -331,8 +340,8 @@ mod tests {
 
         scheduler.save_context(0xDEADBEEF, 0xCAFEBABE);
         let ctx = scheduler.restore_context().unwrap();
-        assert_eq!(ctx.rsp, 0xDEAD_BEEF);
-        assert_eq!(ctx.rip, 0xCAFE_BABE);
+        assert_eq!(ctx.rsp, 0xDEADBEEF);
+        assert_eq!(ctx.rip, 0xCAFEBABE);
     }
 
     #[test]

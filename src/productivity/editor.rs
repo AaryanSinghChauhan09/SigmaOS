@@ -306,7 +306,7 @@ impl CodeEditor {
             }
         }
 
-        if self.active_document.as_ref() == Some(doc_id) {
+        if self.active_document.as_deref() == Some(doc_id) {
             self.active_document = None;
         }
 
@@ -327,7 +327,9 @@ impl CodeEditor {
 
     /// Get active document
     pub fn active_document(&self) -> Option<&Document> {
-        self.active_document.and_then(|id| self.documents.get(&id))
+        self.active_document
+            .as_ref()
+            .and_then(|id| self.documents.get(id))
     }
 
     /// Get document by ID
@@ -358,7 +360,7 @@ impl CodeEditor {
     pub fn delete_text(
         &mut self,
         doc_id: &str,
-        selection: TextSelection,
+        _selection: TextSelection,
     ) -> Result<(), EditorError> {
         if let Some(doc) = self.documents.get_mut(doc_id) {
             // Simple deletion (in real implementation, would handle selection properly)
@@ -490,7 +492,7 @@ mod tests {
 
     #[test]
     fn test_open_document() {
-        let editor = CodeEditor::default();
+        let mut editor = CodeEditor::default();
         let doc_id = editor.open_document(
             PathBuf::from("/test/main.rs"),
             "fn main() {}".to_string(),

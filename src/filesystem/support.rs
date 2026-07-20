@@ -10,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type FilesystemID = usize;
 
 /// Standard and advanced Filesystem types (Old & New technologies)
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilesystemType {
     Ext4 = 0,
@@ -142,7 +142,7 @@ impl BtrfsFeatures for SimpleBtrfsFS {
 
     fn delete_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
         for i in 0..self.subvolumes.len() {
-            let subvol = &self.subvolumes[i];
+            let subvol = &self.subvolumes.get(i);
             let len = subvol.iter().position(|&b| b == 0).unwrap_or(256);
             if &subvol[..len] == path {
                 self.subvolumes.remove(i);
@@ -209,7 +209,7 @@ impl ZFSFeatures for SimpleZFS {
 
     fn rollback_snapshot(&mut self, snapshot: &[u8]) -> Result<(), FilesystemError> {
         for i in 0..self.snapshots.len() {
-            let snap = &self.snapshots[i];
+            let snap = &self.snapshots.get(i);
             let len = snap.iter().position(|&b| b == 0).unwrap_or(256);
             if &snap[..len] == snapshot {
                 return Ok(());
@@ -255,7 +255,7 @@ impl Fat32Features for SimpleFat32 {
         while current < 0x0FFFFFF8 && current > 0 {
             chain.push(current);
             if (current as usize) < self.cluster_table.len() {
-                current = self.cluster_table.get(current as usize);
+                current = *self.cluster_table.get(current as usize);
             } else {
                 break;
             }
@@ -329,7 +329,7 @@ impl SovereignP2PFeatures for SimpleSovereignP2P {
     ) -> Result<(), FilesystemError> {
         let mut peer_found = false;
         for i in 0..self.peers.len() {
-            if self.peers.get(i) == peer_id {
+            if *self.peers.get(i) == peer_id {
                 peer_found = true;
                 break;
             }
@@ -390,7 +390,7 @@ impl EncryptedFSFeatures for SimpleEncryptedFS {
     fn unlock_path(&mut self, path: &[u8], verification_key: &[u8]) -> Result<(), FilesystemError> {
         let mut index = None;
         for i in 0..self.locked_folders.len() {
-            let folder = &self.locked_folders[i];
+            let folder = &self.locked_folders.get(i);
             let len = folder.iter().position(|&b| b == 0).unwrap_or(128);
             if &folder[..len] == path {
                 index = Some(i);
@@ -399,7 +399,7 @@ impl EncryptedFSFeatures for SimpleEncryptedFS {
         }
 
         if let Some(idx) = index {
-            let key = &self.keys[idx];
+            let key = &self.keys.get(idx);
             let verification_len = verification_key.len().min(32);
             let mut matches = true;
             for i in 0..verification_len {
@@ -519,8 +519,9 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
-        for fs_option in &self.filesystems {
-            if let Some(ref fs) = *fs_option {
+        for i in 0..self.filesystems.len() {
+            let fs_option = self.filesystems.get(i);
+            if let Some(ref fs) = fs_option {
                 if fs.id() == id {
                     return Some(fs.as_ref());
                 }
@@ -531,8 +532,9 @@ impl FilesystemManager for SimpleFilesystemManager {
 
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
-        for fs_option in &self.filesystems {
-            if let Some(ref fs) = *fs_option {
+        for i in 0..self.filesystems.len() {
+            let fs_option = self.filesystems.get(i);
+            if let Some(ref fs) = fs_option {
                 ids.push(fs.id());
             }
         }
@@ -568,8 +570,8 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn get(&self, index: usize) -> T {
-        unsafe { core::ptr::read(self.data.add(index)) }
+    pub fn get(&self, index: usize) -> &T {
+        unsafe { &*self.data.add(index) }
     }
 
     pub fn clone(&self) -> Vec<T> {

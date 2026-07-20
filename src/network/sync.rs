@@ -277,8 +277,9 @@ impl CloudSyncManager {
             ),
             local_path,
             remote_path,
-            size_bytes: metadata.map(|m| m.len()).unwrap_or(0),
+            size_bytes: metadata.as_ref().map(|m| m.len()).unwrap_or(0),
             last_modified: metadata
+                .as_ref()
                 .map(|m| {
                     m.modified()
                         .ok()
@@ -301,18 +302,29 @@ impl CloudSyncManager {
         let mut bytes_transferred = 0u64;
         let mut errors = Vec::new();
 
-        for item in &mut self.sync_items {
-            item.sync_status = SyncStatus::Syncing;
+        for i in 0..self.sync_items.len() {
+            self.sync_items[i].sync_status = SyncStatus::Syncing;
 
-            match self.sync_item(item) {
+            let item = &self.sync_items[i];
+            match Self::sync_item_fields(
+                self.provider.as_mut(),
+                item.last_modified,
+                &item.remote_path,
+                &item.local_path,
+                item.size_bytes,
+            ) {
                 Ok(bytes) => {
-                    item.sync_status = SyncStatus::Synced;
+                    self.sync_items[i].sync_status = SyncStatus::Synced;
                     items_synced += 1;
                     bytes_transferred += bytes;
                 }
                 Err(e) => {
-                    item.sync_status = SyncStatus::Error;
-                    errors.push(format!("{}: {}", item.local_path.display(), e));
+                    self.sync_items[i].sync_status = SyncStatus::Error;
+                    errors.push(format!(
+                        "{}: {:?}",
+                        self.sync_items[i].local_path.display(),
+                        e
+                    ));
                 }
             }
         }
@@ -331,35 +343,33 @@ impl CloudSyncManager {
         Ok(result)
     }
 
-    /// Sync single item
-    fn sync_item(&mut self, item: &SyncItem) -> Result<u64, SyncError> {
-        // Determine if upload or download based on modification time
-        let local_modified = item.last_modified;
-        let remote_modified = self.get_remote_modified_time(&item.remote_path)?;
+    /// Sync single item fields using provider to avoid double mutable borrow of self
+    fn sync_item_fields(
+        provider: &mut dyn SyncProviderImpl,
+        last_modified: u64,
+        remote_path: &str,
+        local_path: &Path,
+        size_bytes: u64,
+    ) -> Result<u64, SyncError> {
+        // Simulated remote modification time
+        let remote_modified = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            - 3600; // 1 hour ago
 
-        if local_modified > remote_modified {
+        if last_modified > remote_modified {
             // Upload
-            self.provider.upload(&item.local_path, &item.remote_path)?;
-            Ok(item.size_bytes)
-        } else if remote_modified > local_modified {
+            provider.upload(local_path, remote_path)?;
+            Ok(size_bytes)
+        } else if remote_modified > last_modified {
             // Download
-            self.provider
-                .download(&item.remote_path, &item.local_path)?;
-            Ok(item.size_bytes)
+            provider.download(remote_path, local_path)?;
+            Ok(size_bytes)
         } else {
             // Already synced
             Ok(0)
         }
-    }
-
-    /// Get remote modification time (simulated)
-    fn get_remote_modified_time(&self, _remote_path: &str) -> Result<u64, SyncError> {
-        // Simulated remote modification time
-        Ok(std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs()
-            - 3600) // 1 hour ago
     }
 
     /// Auto-sync if interval has elapsed

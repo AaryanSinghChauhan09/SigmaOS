@@ -140,8 +140,7 @@ pub struct RuleBasedOptimizer {
     rules: Vec<OptimizationRule>,
 }
 
-/// Optimization rule
-#[derive(Debug, Clone)]
+/// Optimization rule - condition closure holds dynamic check
 struct OptimizationRule {
     condition: Box<dyn Fn(&SystemState) -> bool>,
     recommendation: OptimizationRecommendation,
@@ -182,7 +181,7 @@ impl RuleBasedOptimizer {
                             map
                         },
                         priority: ActionPriority::Medium,
-                        estimated_improvement: 10.0,
+                        estimated_impact: 10.0,
                     },
                 ],
                 expected_improvement_percent: 20.0,
@@ -211,7 +210,7 @@ impl RuleBasedOptimizer {
                             map
                         },
                         priority: ActionPriority::High,
-                        estimated_improvement: 20.0,
+                        estimated_impact: 20.0,
                     },
                 ],
                 expected_improvement_percent: 30.0,
@@ -325,7 +324,7 @@ impl AiOptimizationStrategy for MlOptimizer {
         }
     }
 
-    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError> {
+    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError> {
         // Simulated action execution
         Ok(())
     }

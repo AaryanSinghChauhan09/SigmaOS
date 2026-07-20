@@ -233,8 +233,9 @@ impl ThemeProvider for BuiltInThemeProvider {
     }
 
     fn set_theme(&mut self, theme: Theme) -> Result<(), ThemeError> {
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
-        self.current_theme = theme.name.to_lowercase();
+        let theme_name = theme.name.to_lowercase();
+        self.themes.insert(theme_name.clone(), theme);
+        self.current_theme = theme_name;
         Ok(())
     }
 
@@ -269,9 +270,9 @@ impl CustomThemeProvider {
         }
     }
 
-    pub fn load_theme_from_file(&mut self, path: &str) -> Result<Theme, ThemeError> {
+    pub fn load_theme_from_file(&mut self, _path: &str) -> Result<Theme, ThemeError> {
         // Simulated theme loading from file
-        // In real implementation, would parse JSON/YAML theme file
+        // In real implementation, would parse JSON/YAML theme theme
         Ok(Theme {
             name: "Custom".to_string(),
             mode: ThemeMode::Light,
@@ -329,8 +330,9 @@ impl ThemeProvider for CustomThemeProvider {
     }
 
     fn set_theme(&mut self, theme: Theme) -> Result<(), ThemeError> {
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
-        self.current_theme = theme.name.to_lowercase();
+        let theme_name = theme.name.to_lowercase();
+        self.themes.insert(theme_name.clone(), theme);
+        self.current_theme = theme_name;
         Ok(())
     }
 
@@ -377,8 +379,8 @@ impl ThemeEngine {
 
     /// Set theme by name
     pub fn set_theme_by_name(&mut self, name: &str) -> Result<(), ThemeError> {
-        if let Some(theme) = self.provider.get_theme_by_name(name) {
-            self.provider.apply_theme(theme)
+        if let Some(theme) = self.provider.get_theme_by_name(name).cloned() {
+            self.provider.apply_theme(&theme)
         } else {
             Err(ThemeError::ThemeNotFound(name.to_string()))
         }
@@ -410,7 +412,7 @@ impl ThemeEngine {
     }
 
     /// Import theme from string
-    pub fn import_theme(&mut self, theme_json: &str) -> Result<(), ThemeError> {
+    pub fn import_theme(&mut self, _theme_json: &str) -> Result<(), ThemeError> {
         // Simulated import from JSON
         // In real implementation, would parse JSON and create theme
         Ok(())

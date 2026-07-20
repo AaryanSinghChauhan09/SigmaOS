@@ -204,6 +204,7 @@ impl PasswordManager {
     ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
+        let service = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -218,7 +219,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "add_password".to_string(),
-            message: format!("Password added for service: {}", encrypted_entry.service),
+            message: format!("Password added for service: {}", service),
         })
     }
 
@@ -251,6 +252,7 @@ impl PasswordManager {
             return Err(PasswordError::PasswordNotFound(entry.id.clone()));
         }
 
+        let service = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -269,7 +271,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "update_password".to_string(),
-            message: format!("Password updated for service: {}", encrypted_entry.service),
+            message: format!("Password updated for service: {}", service),
         })
     }
 
@@ -405,7 +407,7 @@ impl PasswordManager {
         Ok(decrypted)
     }
 
-    /// Generate strong password
+    /// Generate strong password using a zero-dependency 48-bit Linear Congruential Generator
     pub fn generate_password(length: usize, include_symbols: bool) -> String {
         const LOWERCASE: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
         const UPPERCASE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -422,10 +424,18 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
-        let mut rng = rand::thread_rng();
+        // Use a 48-bit LCG seeded with standard duration nanoseconds
+        let mut seed = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or(std::time::Duration::from_secs(1))
+            .as_nanos() as u64;
 
         for _ in 0..length {
-            let index = rng.gen_range(0..charset.len());
+            // Standard Knuth LCG parameters
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let index = (seed as usize) % charset.len();
             password.push(charset[index] as char);
         }
 
