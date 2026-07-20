@@ -10,3 +10,5 @@ pub use cross_platform::{
 pub use standards::{
     FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };
+pub mod india_stack_localization;
+pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};

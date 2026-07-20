@@ -1,0 +1,21 @@
+pub mod isa_bus;
+pub mod mfm_rll;
+pub mod ide_ata;
+pub mod uart_8250;
+pub mod ps2_controller;
+pub mod cga_mda;
+pub mod adlib_opl;
+pub mod ne2000;
+pub mod floppy;
+pub mod usb_host;
+
+pub use isa_bus::{IsaBus, IsaDevice, IsaResource, IsaIrq, IsaDmaChannel, LpcBridge};
+pub use mfm_rll::{MfmController, MfmDisk, DiskGeometry, ControllerType};
+pub use ide_ata::{IdeAtaController, AtaDrive, AtaIdentify, AtaDeviceType, TransferMode, AtaCommand};
+pub use uart_8250::{Uart8250Driver, UartPort, UartConfig, UartType, DataBits, StopBits, Parity};
+pub use ps2_controller::{Ps2Controller, MouseState, KeyEvent, KeyCode, KeyEventKind};
+pub use cga_mda::{VgaDriver, Framebuffer, TextConsole, VideoMode, Color, TextCell};
+pub use adlib_opl::{SoundBlasterDriver, OplSynth, OplChannel, OplOperator, OplVersion, SbVariant, PcSpeaker};
+pub use ne2000::{Ne2000Driver, Rtl8139Driver, E1000Driver, NicDriver, NicStats, EthernetFrame, MacAddress};
+pub use floppy::{FloppyController, FloppyDrive, FloppyType};
+pub use usb_host::{XhciController, UsbMassStorage, UsbHidDevice, UsbHostController, UsbDevice, UsbSpeed, HciType};

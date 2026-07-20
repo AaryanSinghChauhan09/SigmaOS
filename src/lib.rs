@@ -20,6 +20,7 @@ pub mod governance;
 pub mod iso;
 pub mod kernel;
 pub mod legal;
+pub mod ml;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -49,6 +50,7 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
     StandardsComplianceManager, TargetPlatform, TranslationLayer,
+    IndianLanguage, LocalizationManager, LocalizationProvider,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -80,7 +82,7 @@ pub use education::{
     DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, SigmaFS, DagNode, HashId,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
@@ -97,6 +99,7 @@ pub use network::{
     DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError, TcpConnection, TcpError,
     TcpSegment, TcpStack, TcpState,
 };
+pub use ml::{SigmaAid, LLMInterface, ModelStatus};
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
