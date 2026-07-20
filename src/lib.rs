@@ -112,7 +112,7 @@ pub use filesystem::{
     DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
     VirtualFilesystem,
 };
-pub use finance::{GstCalculator, GstRate, GstRegime, GstResult, GstState, GoodsType};
+pub use finance::{GstCalculator, GstRate, GstRegime, GstResult, GstState, GoodsType, TdsCalculator, TdsResult, TdsSection};
 pub use graphics::{
     ColorSpace, CompositorError, CompositorResult, CompositorStrategy, DecodedImage,
     FramebufferCompositor, ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, RenderLayer,
