@@ -23,6 +23,7 @@ pub mod governance;
 pub mod iso;
 pub mod kernel;
 pub mod legal;
+pub mod memory;
 pub mod ml;
 pub mod network;
 pub mod observability;
@@ -90,6 +91,10 @@ pub use drivers::{
     UnifiedPeripheral as DdeUnifiedPeripheral, UdfInterpreter, WasmDriverVm, WindowsNdisWrapper, BusType,
 };
 pub use boot::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
+pub use memory::{
+    MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
+    PhysicalAddress, SimpleVMM, VirtualAddress, PAGE_SIZE_BYTES, PAGE_TABLE_ENTRIES,
+};
 pub use ecosystem::{
     ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
     EnterprisePartner,
