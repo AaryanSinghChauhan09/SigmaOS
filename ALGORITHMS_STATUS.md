@@ -198,7 +198,10 @@ The codebase implements `::new()` constructors without implementing the `Default
    if hour >= 9 && hour < 17
    // With:
    if (9..17).contains(&hour)
-=======
+   ```
+
+---
+
 # 📊 SigmaOS — Core Algorithms Status, Analysis & Repair Manual
 
 This document provides a highly detailed analysis of the core algorithms implemented in SigmaOS. It outlines what is currently functional, what is stubbed or failing, the underlying technical reasons ("Why"), and step-by-step engineering blueprints ("How to Fix") so that **any AI agent or human developer can easily diagnose, implement, and resolve these modules.**
