@@ -1,5 +1,6 @@
 // SigmaOS Drivers Module
 pub mod ancient_devices;
+pub mod boot_init;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 pub mod gpu;
@@ -13,9 +14,8 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-pub mod boot_init;
 
-pub use boot_init::{UefiGopDriver, AcpiTableParser, XhciHostController};
+pub use boot_init::{AcpiTableParser, UefiGopDriver, XhciHostController};
 
 pub use ancient_devices::{
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
