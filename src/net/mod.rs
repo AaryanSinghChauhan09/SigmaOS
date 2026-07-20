@@ -4,6 +4,7 @@
 pub mod browser_core;
 pub mod ipv6;
 pub mod routing;
+pub mod sovereign_browser;
 pub mod tls;
 pub mod zenith;
 
@@ -16,6 +17,10 @@ pub use ipv6::{
     Ipv6Stack,
 };
 pub use routing::{RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable};
+pub use sovereign_browser::{
+    AdBlockRule as SovereignAdBlockRule, BraveShield, BrowserTab as SovereignBrowserTab, BrowserError,
+    SecurityProfile, SovereignBrowser, TabContainer, TabState,
+};
 pub use tls::{CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion};
 pub use zenith::{
     E1000NetworkDriver, NetworkDriverDevice, NetworkDriverManager, NetworkDriverType,

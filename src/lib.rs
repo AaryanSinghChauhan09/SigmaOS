@@ -139,6 +139,8 @@ pub use network::{
     CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
     E1000NetworkDriver, NetworkDriverDevice, NetworkDriverManager, NetworkDriverType,
     NetworkError as ZenithNetworkError, NetworkPacketFrame, Rtl8139NetworkDriver, ZeroCopyPacketRing,
+    AdBlockRule as SovereignAdBlockRule, BraveShield, BrowserTab as SovereignBrowserTab, BrowserError,
+    SecurityProfile, SovereignBrowser, TabContainer, TabState,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
