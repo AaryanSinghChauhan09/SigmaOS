@@ -118,7 +118,12 @@ impl GpuDriver {
     }
 
     /// DRM/KMS mode setting API
-    pub fn set_drm_mode(&mut self, connector_id: u32, crtc_id: u32, mode: DrmModeInfo) -> Result<(), GpuError> {
+    pub fn set_drm_mode(
+        &mut self,
+        connector_id: u32,
+        crtc_id: u32,
+        mode: DrmModeInfo,
+    ) -> Result<(), GpuError> {
         self.width = mode.hdisplay as u32;
         self.height = mode.vdisplay as u32;
         self.frame_buffer = vec![0; (self.width * self.height) as usize];
