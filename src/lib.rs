@@ -85,6 +85,8 @@ pub use drivers::{
     Wifi7Adapter, XhciHostController,
     ClockController, ClockError, GenericClock, GenericPin, PinController, PinDirection, PinError,
     PinPull, SocClockController, SocPinController, UnifiedSocController,
+    DeviceError as DdeDeviceError, DeviceId, DriverType, GenericDriver, HardwareBroker, LinuxDdeShim,
+    UnifiedPeripheral as DdeUnifiedPeripheral, UdfInterpreter, WasmDriverVm, WindowsNdisWrapper, BusType,
 };
 pub use ecosystem::{
     ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,

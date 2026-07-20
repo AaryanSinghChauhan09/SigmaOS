@@ -1,6 +1,7 @@
 // SigmaOS Drivers Module
 pub mod ancient_devices;
 pub mod boot_init;
+pub mod dde;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 pub mod gpu;
@@ -37,6 +38,10 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use soc::{
     ClockController, ClockError, GenericClock, GenericPin, PinController, PinDirection, PinError,
     PinPull, SocClockController, SocPinController, UnifiedSocController,
+};
+pub use dde::{
+    DeviceError, DeviceId, DriverType, GenericDriver, HardwareBroker, LinuxDdeShim, UnifiedPeripheral,
+    UdfInterpreter, WasmDriverVm, WindowsNdisWrapper, BusType,
 };
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
