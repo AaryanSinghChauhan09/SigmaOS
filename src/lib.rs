@@ -112,6 +112,9 @@ pub use iso::builder::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    AllocationPolicy as NumaAllocationPolicy, NumaAllocator, NumaNode, NodeState,
+    SanitizationLevel, SecureFreeDetector, SecureFreeStats,
+    SlabAllocator as KernelSlabAllocator, SlabCache, SlabCacheStats, SlabState,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,

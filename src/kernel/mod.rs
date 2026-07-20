@@ -4,8 +4,11 @@
 // ── Core kernel primitives ─────────────────────────────────────────────────
 pub mod ipc;
 pub mod memory;
+pub mod numa_allocator;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod secure_free;
+pub mod slab_allocator;
 
 // ── Phase J: subsystem registry & legacy device drivers ───────────────────
 pub mod subsystems;
@@ -41,8 +44,11 @@ pub mod syscall;
 // ── Core re-exports ────────────────────────────────────────────────────────
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use numa_allocator::{AllocationPolicy, NumaAllocator, NumaNode, NodeState};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
+pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
 pub use proc::{ProcessLifecycleManager, Signal, SignalHandler, SignalManager,
