@@ -17,7 +17,6 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
-
 ---
 
 ## 📊 System Architecture
@@ -35,12 +34,13 @@ graph TD
     Bus --> S-AI[S-AI: Local LLM Orchestrator]
 ```
 
-- **S-MM**: Sovereign Memory Manager (Buddy Allocator).
-- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
+- **S-MM**: Sovereign Memory Manager (Buddy Allocator + Page Directory Controller).
+- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF + EEVDF).
 - **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
 - **S-SEC**: Security Framework (PQC + MAC + Sandbox).
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
-
+- **S-IPC**: Zero-Copy Capability-Gated Message Queue.
+- **S-Signal**: Capability-Gated Signal Dispatcher.
 
 ---
 
@@ -97,6 +97,109 @@ let token = CapabilityToken::new()
 For a detailed review of all security policies, see the canonical [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) page on the Wiki.
 
 ---
+
+## 📋 Implementation Status
+
+### ✅ Completed Features
+
+#### Kernel Performance
+- **Zero-Copy IPC Queue**: Lock-free ring buffer for kernel IPC
+- **UDF Scheduler VM**: User-Defined Function bytecode scheduler
+- **EEVDF Scheduler**: Earliest Eligible Virtual Deadline First scheduling
+- **S-INIT Supervisor**: s6-style hierarchical service supervision
+- **Gap Filling**: S-IPC, S-Signal, S-MM implementations
+
+#### Distro Absorption
+- **CPU Feature Detection**: Gentoo-style compiler optimizations (AVX512, AMX, Neon, SVE)
+- **S-PAC Package Manager**: Arch-style rolling upgrades with DPLL SAT solver
+- **JIT Optimization Selector**: Dynamic CPU extension enumeration
+
+#### Networking
+- **ZenithNet**: Zero-copy networking stack
+- **Polymorphic Network Drivers**: E1000, RTL8139, VirtIO Net
+- **Zero-Copy Packet Ring**: DMA ring buffer interface
+- **SovereignBrowser**: Native browser core with Brave Shield adblocking
+- **Firefox Containers**: Tab isolation and cookie partitioning
+
+#### Filesystem
+- **SigmaFS**: Crash-consistent Merkle tree filesystem
+- **JBD2-Style Journal**: Transactional logging with CRC32C
+- **CoW Architecture**: Copy-on-Write node management
+- **Polymorphic Storage**: NVMe and AHCI SATA controllers
+
+#### System Tools
+- **SigmaDeploy**: Automated provisioning with TFTP/DHCP netboot
+- **SigmaCluster**: Grid orchestrator with node management
+- **SigmaIdentity**: Enterprise directory with LDAP/Kerberos
+- **SigmaAccess**: Visual and audio inclusivity toolkit
+
+#### Compatibility
+- **S-COSMOS**: Cross-platform compatibility shard
+- **S-WINE**: Windows PE binary translator
+- **S-COCOA**: macOS Mach-O application wrapper
+- **S-ANDROID**: Android APK loader with Binder emulation
+
+#### Graphics
+- **Zenith Compositor**: Direct-to-hardware framebuffer splicing
+- **GNOME/KDE/COSMIC**: Feature absorption from major DEs
+- **Accessibility**: Screen reader, high contrast, magnification
+- **Animation System**: Linear, EaseIn, EaseOut, EaseInOut curves
+
+#### AI
+- **S-AI Engine**: Local AI engine and multi-agent automation
+- **SovereignML**: Zero-dependency tensor computation
+- **Agent Orchestrator**: Multi-agent task planner
+- **Compute Backends**: CPU SIMD, Vulkan GPU, NPU support
+
+---
+
+## 🛠️ Development
+
+### Building from Source
+
+```bash
+# Install Rust toolchain
+rustup install nightly
+rustup default nightly
+
+# Build the kernel
+cargo build --release
+
+# Run tests
+cargo test
+```
+
+### Contributing
+
+SigmaOS welcomes contributions! Please see [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for guidelines.
+
+---
+
+## 📚 Documentation
+
+- [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
+- [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security_Framework)
+- [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- [Network Stack](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Network_Stack)
+- [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
+
+---
+
+## 📄 License
+
+SigmaOS is licensed under the [SigmaOS Sovereign License](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE.md).
+
+---
+
+## 🙏 Acknowledgments
+
+SigmaOS draws inspiration from and builds upon concepts from:
+- Linux kernel heritage (v0.01 through 6.x)
+- Gentoo (CPU optimizations)
+- Arch Linux (rolling package management)
+- NixOS (atomic state management)
+- Debian (stability focus)
+- And many other open-source projects
 
 ## 📚 Canonical Documentation (GitHub Wiki)
 
