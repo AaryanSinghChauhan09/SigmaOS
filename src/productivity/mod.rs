@@ -7,6 +7,7 @@ pub mod gamification;
 pub mod notes;
 pub mod screen_recorder;
 pub mod screenshot;
+pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 
@@ -47,6 +48,11 @@ pub use screenshot::{
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
     TaskError, TaskManager, TaskPriority, TaskStatus, TaskStorage,
+};
+pub use sigma_office::{
+    CellValue, ChartType, DocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
+    SigmaDocument, SigmaOffice, ShapeType, SlideElementType, SpreadsheetProcessor, TextProcessor,
+    TypographyRenderer,
 };
 pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
