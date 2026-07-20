@@ -3,6 +3,7 @@ pub mod calendar;
 pub mod clipboard_manager;
 pub mod editor;
 pub mod email;
+pub mod finance;
 pub mod gamification;
 pub mod notes;
 pub mod screen_recorder;
@@ -51,4 +52,10 @@ pub use tasks::{
 pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
+};
+pub use finance::{
+    DeducteeType, GstBreakdown, GstCalculator, GstTransactionType, HsnEntry,
+    IndicLanguage, IndiaIncomeTaxCalculator, IndianNumberFormatter, IndiaTdsCalculator,
+    IncomeTaxCalculator, IncomeTaxResult, NpciUpiGateway, StandardGstCalculator,
+    TaxRegime, TdsCalculator, TdsResult, TdsSection, UpiGateway, UpiPaymentRequest, UpiVpa,
 };

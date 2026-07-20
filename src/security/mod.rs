@@ -15,10 +15,11 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
+pub use audit::AuditLogger;
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
-    SecureClipboardManager, SecurityLevel, XorEncryption,
+    SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
@@ -39,8 +40,31 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use integrity::{IntegrityCheck, IntegrityError, IntegrityVerifier};
-pub use mac::{MacPolicy, MacRule, MacSecurity};
-pub use pki::{Certificate, CertificateAuthority, PkiError, PkiManager};
-pub use secrets::{SecretManager, SecretStorage, SecretType};
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner, VulnerabilitySeverity};
+// Integrity: export the monitor trait and concrete types that actually exist
+pub use integrity::{
+    IntegrityError, IntegrityMonitor, IntegrityStats, IntegrityStatus,
+    File as IntegrityFile, FileCapability, FileID, FileInfo, SimpleFile,
+    SimpleIntegrityMonitor, MonitorCapability,
+};
+// MAC: export what the module actually defines
+pub use mac::{
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability,
+    MACEngine, MACPolicy, MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability,
+    PolicyInfo as MacPolicyInfo, SecurityContext, SecurityDomain,
+    SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+};
+// PKI: export actual types
+pub use pki::{
+    Certificate, CRL as CrlTrait, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager,
+};
+// Secrets: export actual types
+pub use secrets::{
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SecretType,
+    SimpleKeyring, SimpleSecret,
+};
+// Vulnerability: export actual types
+pub use vulnerability::{
+    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration,
+    SimpleScanReport, SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability,
+    VulnerabilityScanner,
+};

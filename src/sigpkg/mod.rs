@@ -16,9 +16,9 @@ pub use verifier::CryptoVerifier;
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 impl std::fmt::Display for Version {
@@ -29,17 +29,11 @@ impl std::fmt::Display for Version {
 
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
+        Self { major, minor, patch }
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        // Optimized to be entirely allocation-free by using inline parsing with iterators.
-        // This avoids heap-allocated collections like Vec inside utility version parsing.
-        let mut parts = version_str.split('.');
+        let mut parts = version_str.splitn(4, '.');
 
         let major = parts
             .next()
@@ -63,23 +57,7 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = parts[0]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
         Ok(Version::new(major, minor, patch))
-    }
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
@@ -136,7 +114,6 @@ pub struct Dependency {
 
 /// Version constraint
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),
@@ -172,6 +149,12 @@ mod tests {
     }
 
     #[test]
+    fn test_version_parse_invalid() {
+        assert!(Version::parse("bad").is_err());
+        assert!(Version::parse("1.2.3.4").is_err());
+    }
+
+    #[test]
     fn test_package_rich_metadata_and_pqc_trust() {
         let mut pkg = Package::new(
             "linux-rt-kernel".to_string(),
@@ -181,7 +164,6 @@ mod tests {
             "sha256:d83d102e3b74".to_string(),
         );
 
-        // Populate rich metadata standard fields
         pkg.licenses.push("GPL-2.0-only".to_string());
         pkg.maintainers
             .push("Sovereign Maintainers <maintainers@sigmaos.dev>".to_string());
