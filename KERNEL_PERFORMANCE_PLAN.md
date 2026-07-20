@@ -70,15 +70,8 @@ pub struct ZeroCopyQueue<T, const N: usize> {
 
 impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
-        // Safe initialization of array with None elements
-        const NONE_VAL: Option<Option<()>> = None;
-        let mut buffer: [Option<T>; N] = unsafe { std::mem::zeroed() };
-        for elem in &mut buffer {
-            unsafe { std::ptr::write(elem, None); }
-        }
-
         Self {
-            buffer,
+            buffer: std::array::from_fn(|_| None),
             head: AtomicUsize::new(0),
             tail: AtomicUsize::new(0),
         }
