@@ -1,90 +1,197 @@
-# SigmaOS Maturity & Distro-Parity Roadmap
+# 📈 SigmaOS Maturity & Distro-Parity Roadmap
 
-> **Status**: 🔄 Active | **Scope**: `Strategic Planning & Maturity Milestones`
-
----
-
-## 1. Core Priorities and Success Metrics
-
-To reach and surpass mature Linux distributions, SigmaOS adheres to a set of strict core engineering priorities and success metrics.
-
-### Primary Goals:
-
-- **Stability**: Implementation of fully reproducible builds, comprehensive test suite coverage, and automated integration regression testing.
-- **Hardware Support**: Broad driver availability for standard consumer devices (x86_64, ARM64, and RISC-V platforms).
-- **Package Ecosystem**: A robust, decentralized, and sandboxed package manager (`SigmaPkg`) featuring transaction-based rollbacks and support adapters.
-- **Security**: Syscall capability-token boundaries, secure boot validation, and immutable write-ahead logging (WAL).
-- **Polished UX**: The Zenith Desktop environment behaving as a production-ready, low-latency display manager.
-
-### Success Metrics:
-
-1. Bootable installation ISO with GUI installer deployed within 6 months.
-2. 90% test coverage passing in CI on all core modules.
-3. GPU, Wi-Fi, and standard desktop peripherals supported on 80% of tested consumer hardware configurations.
-4. `SigmaPkg` running 90% of imported core packages in sandboxes within 12 months.
+> **Goal:** Achieve full parity with mainstream Linux distributions within 36 months, then surpass them across all critical dimensions: security, performance, AI-native capabilities, and Indian regulatory compliance.
 
 ---
 
-## 2. Technical Workstreams and Concrete Actions
+## 🗺️ Phase Overview
 
-```mermaid
-graph TD
-    A["Kernel & Runtime"] --> B["Drivers & Shim"]
-    B --> C["SigmaPkg Package Manager"]
-    C --> D["Zenith Desktop UX"]
-    D --> E["SigmaFS Storage"]
-    E --> F["AI Orchestrator & Agents"]
+| Phase | Name | Target | Status |
+|-------|------|--------|--------|
+| A | Foundation | Core kernel primitives | ✅ Complete |
+| B | Security Core | PQC + Capability model | ✅ Complete |
+| C | Storage & FS | VFS + SigmaFS + Ext4 | ✅ Complete |
+| D | Network Stack | TCP/UDP + Zero-Trust | 🔄 In Progress |
+| E | Package Manager | sigma-pkg + sigpkg SAT solver | ✅ Complete |
+| F | Competitor Crusher | Driver + app absorption | ✅ Complete |
+| G | Kernel Boot | Bootable ISO + bare metal | 🔄 60% Active |
+| H | India Stack | GST/UPI/22-lang + compliance | ⬜ Blocked on G |
+| I | AI-Native | Local LLM OS primitive | ⬜ Planned |
+| J | Production Release | Stable, shippable distro | ⬜ Planned |
+
+---
+
+## 🏗️ Phase A — Foundation (✅ Done)
+
+Core kernel primitives required for any OS:
+
+- **Buddy Allocator** — Physical memory management with O(log n) alloc/free. Binary power-of-two block coalescing ensures zero fragmentation.
+- **Round-Robin + MLFQ Scheduler** — Multi-Level Feedback Queue with preemptive timeslicing. Extended with Completely Fair Scheduling (CFS) and Earliest Deadline First (EDF) for real-time workloads.
+- **IPC Message Bus** — Zero-copy capability-validated inter-process channels.
+- **Process Model** — Lightweight processes with isolated capability namespaces.
+
+```rust
+// Example: Buddy allocator in action
+let allocator = BuddyAllocator::new(HEAP_START, HEAP_SIZE);
+let block = allocator.allocate(4096).expect("OOM");
+allocator.deallocate(block);
 ```
 
-### 2.1 Kernel & Runtime
+---
 
-- **Action**: Implement syscall capability token boundaries. Each thread is spawned with specific tokens mapping resource permissions, rejecting unauthorized kernel interactions.
-- **Deliverables**: Syscall capability gate logic, local access policies.
+## 🔒 Phase B — Security Core (✅ Done)
 
-### 2.2 Drivers & Hardware Shim
+Post-quantum security stack fully integrated into the kernel ABI:
 
-- **Action**: Build a dual driver strategy consisting of native drivers for common hardware and a compatibility driver shim to load standard Linux kernel module interfaces when native ones are absent.
-- **Deliverables**: Linux driver shim prototype layer, whitelisted PCI/USB ID driver database.
-
-### 2.3 Package Management (`SigmaPkg`)
-
-- **Action**: Build a sandboxed, declarative package management system with adapters to read and translate packages from legacy ecosystems (`apt`, `pacman`, `dnf`, `nix`).
-- **Deliverables**: `SigmaPkg` specifications, translation adapter modules, transaction rollback tool.
-
-### 2.4 Filesystem & Storage (`SigmaFS`)
-
-- **Action**: Build `SigmaFS` using Copy-on-Write (CoW), checksummed data validation, and transactional volume snapshots.
-- **Deliverables**: `SigmaFS` driver prototype, snapshot API hooks.
-
-### 2.5 AI Orchestration & Automation
-
-- **Action**: Deploy a local LLM runtime (run on NPU/GPU via Wasmtime) for local desktop automation, predictive diagnostics, and compliance analysis.
-- **Deliverables**: `sigma-ai-daemon`, local inference API, compliance logging.
+- **Kyber-1024 KEM** — NIST FIPS 203 key encapsulation for all network handshakes.
+- **Dilithium-5** — NIST FIPS 204 digital signatures for all package verification.
+- **sigma_pledge / sigma_unveil** — OpenBSD-inspired syscall filtering. Processes declare their capabilities upfront; all others are denied.
+- **MAC Engine** — Mandatory Access Control with Bell-LaPadula MLS policy.
+- **Audit Logger** — Structured security event logging with tamper-evident chains.
 
 ---
 
-## 3. CI/CD, Branching, & Release Policy
+## 💾 Phase C — Storage & Filesystem (✅ Done)
 
-### Pipeline Execution:
-
-1. **Lint Phase**: Syntax validation and static code analysis.
-2. **Unit Phase**: Isolated module testing.
-3. **Integration Phase**: Testing component interactions using QEMU virtual drivers.
-4. **Hardware Verification**: Running smoke tests on standard bare-metal hardware testing rigs.
-5. **ISO Build**: Assembling reproducible installation media.
-
-### Branching Policy:
-
-- Master branch (`main`) is protected. All modifications require passing CI pipelines and signed commits.
-- Release tags represent tested milestones. Rolling updates are shipped weekly via the `canary` update channel.
+- **VFS Layer** — Virtual Filesystem abstraction supporting pluggable backends.
+- **Ext4 Read/Write** — Full journal + extent-tree support.
+- **FAT32** — Legacy compatibility for removable media and EFI partitions.
+- **SigmaFS** — Custom sovereign filesystem with built-in PQC encryption and content-addressed storage blocks.
+- **Archive Subsystem** — Native tar, zip, zstd, lz4 decompression without external tools.
 
 ---
 
-## 4. Phased Timeline
+## 🌐 Phase D — Network Stack (🔄 In Progress)
 
-| Phase | Duration | Core Outcomes |
-| :--- | :--- | :--- |
-| **Immediate** | 0-3 Months | Repo audit & docs consolidation, package manager spec, driver priority whitelists, baseline CI. |
-| **Short** | 3-9 Months | `SigmaPkg` prototype, capability token layer v1, Zenith compositor alpha, `SigmaFS` prototype, bootable installer ISO. |
-| **Mid** | 9-18 Months | Linux driver shim layer, package adapters for `apt`/`pacman`, TPM secure boot, rolling channel launch. |
-| **Long** | 18-36 Months | Native LLM runtime integration, hardware-certification programs, LTS release target, global contributor scale. |
+- **TCP/IP Stack** — Hand-written from scratch; no libc dependency. BBR + Reno congestion control.
+- **UDP Socket** — Zero-copy datagrams.
+- **Zero-Trust Networking** — All connections require explicit capability tokens. No implicit trust from source IP.
+- **WireGuard VPN** — Kernel-native VPN using Curve25519 / ChaCha20-Poly1305.
+- **Wi-Fi 7 Driver** — OOP driver for 802.11be with spatial reuse.
+- **BitTorrent Protocol** — Sovereign peer-to-peer content delivery.
+
+**Remaining work:** DNS resolver, QUIC/HTTP3 transport layer, mDNS for local service discovery.
+
+---
+
+## 📦 Phase E — Package Manager (✅ Done)
+
+sigma-pkg is SigmaOS's fully sovereign package management system:
+
+- **SAT Solver** — Conflict-free dependency resolution with version constraints.
+- **Content-Addressed Store** — Immutable package store (hash-verified, Nix-inspired).
+- **Transactional Install** — Atomic installs with rollback on failure.
+- **Crypto Verifier** — Dilithium-5 signature verification on every package.
+- **Recipe System** — Declarative build system for compiling packages from source.
+
+```rust
+let solver = SatSolver::new();
+solver.add_package("gtk4", VersionConstraint::GreaterOrEqual(Version::new(4, 6, 0)));
+let plan = solver.resolve().expect("No solution");
+```
+
+---
+
+## 🚀 Phase F — Competitor Crusher (✅ Done)
+
+Systematic absorption of every major Linux distro feature:
+
+### Ubuntu / Debian Parity
+- APT-compatible package metadata format
+- Snap/Flatpak compatibility layer
+- systemd-compatible service supervision (translated to SigmaInit)
+
+### Arch Linux Parity
+- Rolling-release update model
+- AUR-equivalent community recipe registry (SigmaRecipes)
+- pacman-compatible package format import
+
+### Fedora / RHEL Parity
+- RPM package translation layer
+- SELinux policy import → MAC policy conversion
+- Subscription management compatibility
+
+### NixOS Parity
+- Declarative system configuration (sigma-config.toml)
+- Reproducible builds via content-addressed store
+- Rollback to any previous generation
+
+---
+
+## 🔧 Phase G — Kernel Boot (🔄 60% Active)
+
+The critical path to a bootable ISO:
+
+- [x] Multiboot2 header in bare-metal entry point
+- [x] GDT + IDT initialization
+- [x] APIC timer calibration
+- [x] Physical memory map (via GRUB mmap)
+- [x] Virtual memory / paging (4-level page tables)
+- [ ] UEFI GOP framebuffer initialization
+- [ ] ACPI table parsing (DSDT/SSDT)
+- [ ] USB xHCI host controller init (keyboard input pre-login)
+- [ ] ISO 9660 bootable image generation via `xorriso`
+- [ ] GRUB2 configuration and embedding
+
+**Target:** Bootable QEMU demo by end of Phase G.
+
+---
+
+## 🇮🇳 Phase H — India Stack (⬜ Planned)
+
+Native compliance with Indian regulatory and financial infrastructure:
+
+- **GST Module** — Automated IGST/CGST/SGST calculation. Intra-state, inter-state, and export regimes.
+- **TDS Engine** — All 194 sections with threshold tracking and quarter-end reconciliation.
+- **Income Tax Calculator** — FY 2024-25, Old and New regimes. Section 87A rebate, surcharge slabs.
+- **UPI Deep-Link Generator** — NPCI-compliant `upi://` request URIs for payment flows.
+- **Language Support** — 22 scheduled languages: Hindi, Tamil, Telugu, Kannada, Malayalam, Bengali, Marathi, Gujarati, Punjabi, Odia, Assamese, Urdu, and more.
+- **Aadhaar Compliance** — Privacy-preserving identity verification APIs.
+- **DigiLocker Integration** — Sovereign document storage aligned with MeitY specifications.
+
+---
+
+## 🤖 Phase I — AI-Native (⬜ Planned)
+
+SigmaOS treats local AI inference as a kernel primitive, not an afterthought:
+
+- **SovereignML Runtime** — On-device LLM inference without cloud dependency.
+- **Sigma AI Daemon (sigma-aid)** — Background service exposing LLM capabilities via capability-gated IPC.
+- **Predictive Scheduler** — AI-enhanced process priority prediction from historical usage patterns.
+- **Natural Language Shell** — sigma-sh understands natural language commands translated to syscalls.
+- **Intelligent Package Search** — Semantic search across the recipe registry.
+
+---
+
+## 🏆 Phase J — Production Release (⬜ Planned)
+
+- Live ISO with graphical installer (Zenith Desktop)
+- Hardware Compatibility List (HCL) covering 500+ laptop/desktop platforms
+- Long-term support (LTS) channel: 5-year security patch guarantee
+- OEM partnership program for pre-installed devices
+- India Cloud Sovereignty Certification
+
+---
+
+## 📊 Distro Comparison Matrix
+
+| Feature | SigmaOS | Ubuntu | Arch | NixOS | Fedora |
+|---------|---------|--------|------|-------|--------|
+| PQC Cryptography | ✅ Native | ❌ | ❌ | ❌ | ❌ |
+| Capability Security | ✅ Hardware | Partial | Partial | Partial | Partial |
+| No-Std Kernel | ✅ | ❌ | ❌ | ❌ | ❌ |
+| AI-Native | ✅ Planned | ❌ | ❌ | ❌ | ❌ |
+| India Stack | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Reproducible Builds | ✅ | Partial | ❌ | ✅ | Partial |
+| Atomic Updates | ✅ | ❌ | ❌ | ✅ | Partial |
+| SAT Dependency Solver | ✅ | Partial | Partial | ✅ | Partial |
+
+---
+
+## 🔗 Related Pages
+
+- [Advanced Absorption Matrix](Advanced_Absorption) — How Linux distro features are absorbed
+- [Security Framework](Security_Framework) — PQC + Capability security deep-dive  
+- [SigmaFS Innovations](SigmaFS_Innovations) — Filesystem design
+- [India Stack](India_Stack) — GST/TDS/UPI/language details
+- [Sigma AI Agents](Sigma_AI_Agents) — AI-native OS design

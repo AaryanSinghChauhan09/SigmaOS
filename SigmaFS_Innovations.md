@@ -1,55 +1,170 @@
-# SigmaOS File System Innovations
+# 🗄️ SigmaFS — Sovereign Filesystem Innovations
 
-> **Status**: 🔄 Active | **Subsystem**: `SigmaFS`
-
-## 1. Executive Summary
-
-To leap ahead of legacy Linux file systems (ext4, XFS) and modern CoW solutions (Btrfs, ZFS), SigmaOS introduces **SigmaFS** — a next-generation Copy-on-Write (CoW) file system. SigmaFS brings the scalability of XFS, the stability of ext4, and the advanced snapshotting of Btrfs/ZFS, while introducing unprecedented cryptographic auditing and declarative integration.
+> SigmaOS introduces **SigmaFS**, a next-generation sovereign filesystem designed from first principles. It discards the decades-old inode model in favor of an object-capability storage architecture with built-in post-quantum encryption and content-addressed deduplication.
 
 ---
 
-## 2. Absorbed Distro Capabilities
+## 🏗️ Architecture Overview
 
-| Linux FS | Inspiration | SigmaFS Capability |
-| :--- | :--- | :--- |
-| **Btrfs/ZFS** (Fedora, Ubuntu) | Snapshotting, checksums | Forensic-grade cryptographic snapshots with instant rollback. |
-| **ext4** (Debian, Ubuntu) | Stability & wide support | Rock-solid core extent-mapping engine for legacy workload compat. |
-| **XFS** (RHEL) | High scalability | Massively parallel metadata operations for NVMe storage arrays. |
-| **NixOS** (FS Mounts) | Declarative configuration | Declarative mounts driven by `sigma.toml` configuration. |
+```
+┌──────────────────────────────────────────────────────┐
+│                   Application Layer                   │
+│         (POSIX VFS interface — full compat)           │
+├──────────────────────────────────────────────────────┤
+│                  VFS Abstraction Layer                 │
+│         (Pluggable backend registry)                  │
+├─────────────┬─────────────┬──────────────────────────┤
+│  SigmaFS    │  Ext4       │   FAT32 / exFAT           │
+│  (Native)   │  (Compat)   │   (Removable / EFI)       │
+├─────────────┴─────────────┴──────────────────────────┤
+│              Storage Abstraction Layer                 │
+│    (NVMe / SATA / USB / virtio-blk backends)          │
+├──────────────────────────────────────────────────────┤
+│            S-SEC Capability Gate                       │
+│   (All storage I/O validated through cap tokens)       │
+└──────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 3. SigmaOS Innovations
+## ✨ SigmaFS Key Innovations
 
-### 3.1 SigmaFS: Forensic Snapshots & Rollback
+### 1. Content-Addressed Storage (CAS)
 
-SigmaFS isn't just CoW; it’s *forensic*. Every snapshot includes a cryptographic Merkle root of the file system state, signed by the kernel.
+Every file block is stored by its cryptographic hash (SHA3-512), not its name or location. This provides:
 
-```bash
-$ sigma fs snapshot create --forensic "Pre-update state"
-Σ [FS] Snapshot generated: snap_2026_07_13_A
-  Hash (SHA-256): 9a7b...8f4c
-  Signature valid.
+- **Zero-redundancy**: Identical blocks stored once regardless of how many files reference them.
+- **Instant cloning**: Cloning a file or directory costs O(1) — just create a new reference.
+- **Integrity by design**: Any bit corruption is immediately detected.
+- **Deduplication across users**: System libraries shared at the block level.
+
+```rust
+// Content-addressed store insert
+let store = ContentAddressedStore::new();
+let hash = store.insert(file_data)?;
+// Same data referenced twice → same hash, stored once
+let hash2 = store.insert(file_data)?;
+assert_eq!(hash, hash2);
 ```
 
-If an update breaks the system, the kernel automatically rolls back to the last verified snapshot instantly during early boot.
+### 2. Post-Quantum Transparent Encryption
 
-### 3.2 Self-Healing Storage
+Every file is encrypted at rest using a hybrid scheme:
+- **AES-256-GCM** for bulk data encryption (hardware-accelerated via AES-NI)
+- **Kyber-1024** for key encapsulation (NIST FIPS 203)
+- **Dilithium-5** for file metadata signatures (NIST FIPS 204)
 
-Using redundant arrays (RAID-Sigma), SigmaFS continuously scans block checksums in the background. If a corrupted block is detected (e.g., due to cosmic rays or failing flash memory), it automatically reconstructs the data from the parity blocks without user intervention.
+Key derivation uses the per-file capability token as additional authenticated data (AAD), making file decryption impossible without the correct capability token.
 
-### 3.3 Declarative Mounts
+### 3. Capability-Gated File Access
 
-Instead of editing `/etc/fstab`, file systems in SigmaOS are managed declaratively:
+Traditional filesystems use user IDs and permission bits. SigmaFS uses **object capabilities**:
 
-```toml
+```rust
+// Capability token determines what you can do with a file
+let file_cap = CapabilityToken::new()
+    .allow_read("/home/user/documents")
+    .allow_append("/home/user/logs")
+    .deny_execute_anywhere();
 
-# /etc/sigma/storage.toml
-
-[[volume]]
-label = "user_data"
-path = "/home"
-fs_type = "sigmafs"
-encryption = "aes-256-xts"
-snapshot_policy = "hourly"
+// The filesystem enforces this at the block driver level
+let fd = sigmfs.open("/home/user/documents/report.pdf", file_cap)?;
 ```
+
+### 4. Copy-on-Write Snapshots
+
+Full filesystem snapshots are O(1) using CoW semantics:
+- All writes go to new blocks; old blocks remain until snapshot is dropped.
+- System snapshots taken automatically before every package install.
+- Manual snapshot: `sigma-fs snapshot create "pre-update"`
+- Rollback: `sigma-fs snapshot restore "pre-update"`
+
+### 5. Integrated Journaling
+
+SigmaFS uses a write-ahead log (WAL) with three durability levels:
+- **Writeback**: Maximum performance; metadata journaled only.
+- **Ordered** (default): Data written before metadata commits.
+- **Data**: Full journaling of all data; maximum durability.
+
+---
+
+## 📊 SigmaFS vs. Competitor Filesystems
+
+| Feature | SigmaFS | Ext4 | Btrfs | ZFS | APFS |
+|---------|---------|------|-------|-----|------|
+| CAS Deduplication | ✅ Native | ❌ | Partial | ✅ | Partial |
+| PQC Encryption | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Capability Access | ✅ | ❌ | ❌ | ❌ | Partial |
+| CoW Snapshots | ✅ | ❌ | ✅ | ✅ | ✅ |
+| O(1) Clone | ✅ | ❌ | ✅ | ✅ | ✅ |
+| RAID built-in | ✅ | ❌ | ✅ | ✅ | ❌ |
+| Kernel-native | ✅ | ✅ | ✅ | External | macOS only |
+| Max file size | 2^128 bytes | 16TB | 16EB | 16EB | 8EB |
+| Journaling | ✅ WAL | ✅ | ✅ | ✅ | ✅ |
+
+---
+
+## 🔧 Disk Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Block 0: Superblock                                  │
+│  (magic, version, CAS root hash, journal offset)      │
+├─────────────────────────────────────────────────────┤
+│  Block 1-N: Journal WAL                               │
+│  (transaction log, replay-on-crash)                   │
+├─────────────────────────────────────────────────────┤
+│  Block N+1 onwards: CAS Object Store                  │
+│  (content-addressed blocks, Merkle tree indexed)      │
+├─────────────────────────────────────────────────────┤
+│  Inline Encryption Metadata (per-block IV/tag)        │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🗂️ Virtual Filesystem Layer
+
+The VFS provides a POSIX-compatible interface over multiple backends:
+
+```rust
+pub trait Filesystem {
+    fn mount(&mut self, device: &str) -> Result<(), FsError>;
+    fn read(&self, path: &str, buf: &mut [u8]) -> Result<usize, FsError>;
+    fn write(&mut self, path: &str, data: &[u8]) -> Result<usize, FsError>;
+    fn stat(&self, path: &str) -> Result<Inode, FsError>;
+    fn mkdir(&mut self, path: &str) -> Result<(), FsError>;
+    fn unlink(&mut self, path: &str) -> Result<(), FsError>;
+}
+```
+
+Registered backends include:
+- `SigmaFSBackend` — native sovereign filesystem
+- `Ext4Backend` — Linux ext4 read/write
+- `Fat32Backend` — FAT32 for EFI and removable media
+- `ArchiveBackend` — Mounting archives as virtual filesystems (tar, zip, zstd)
+- `NetworkBackend` — Mounting remote SigmaFS volumes over PQC-encrypted channels
+
+---
+
+## 📦 Archive Subsystem
+
+The archive module handles compressed archive formats without external tools:
+
+| Format | Compress | Decompress | Status |
+|--------|----------|------------|--------|
+| tar | ✅ | ✅ | Complete |
+| zip | ✅ | ✅ | Complete |
+| zstd | ✅ | ✅ | Complete |
+| lz4 | ✅ | ✅ | Complete |
+| xz | ✅ | ✅ | Complete |
+| bz2 | ✅ | ✅ | Complete |
+| 7z | ⬜ | ✅ | Decompress only |
+
+---
+
+## 🔗 Related Pages
+
+- [Advanced Absorption Matrix](Advanced_Absorption) — App replacement strategy
+- [Security Framework](Security_Framework) — PQC + Capability security
+- [Maturity & Distro-Parity Roadmap](Maturity_Parity_Roadmap) — Phase plan

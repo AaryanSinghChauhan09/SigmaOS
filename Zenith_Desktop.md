@@ -1,620 +1,239 @@
-# SigmaOS Zenith Desktop Specification
+# 🖥️ Zenith Desktop — SigmaOS UI Compositor
 
-## Overview
+> **Zenith** is SigmaOS's sovereign Wayland-compatible display compositor, designed to deliver a next-generation desktop experience without any X11 attack surface, legacy display server overhead, or proprietary GPU blobs.
 
-Zenith Desktop is the native, Wayland-first desktop environment for SigmaOS. Built with performance and modern aesthetics in mind, Zenith features a hardware-accelerated compositor, native screen reading APIs, and deep localization with out-of-the-box support for major Indic languages.
+---
 
-### Key Features
+## 🏗️ Architecture
 
-- **Wayland-First**: Native Wayland compositor with no X11 dependencies
-- **Hardware Acceleration**: Vulkan-based rendering for maximum performance
-- **Accessibility**: Built-in screen reader and accessibility APIs
-- **Indic Languages**: Full support for Indian languages and input methods
-- **Modern Design**: Clean, modern UI with consistent design language
-- **Performance**: Optimized for low-latency and smooth animations
-- **Extensible**: Plugin system for custom widgets and extensions
-
-## Architecture
-
-### Compositor Flow
-
-```text
- [User Input (Wayland Events)]
-               │
-               ▼
-   [Zenith Wayland Compositor] ◄──► [Accessibility screen reader daemon]
-               │
-               ▼
-   [Indic Language Input IM] (IBus/Fcitx API)
-               │
-               ▼
-   [Vulkan Desktop Layout Renderer]
+```
+┌─────────────────────────────────────────────────────────┐
+│              Zenith Desktop Shell                        │
+│   (App launcher, taskbar, notifications, workspaces)     │
+├─────────────────────────────────────────────────────────┤
+│             ZenithCompositor (Wayland Server)            │
+│   (Window management, damage tracking, surface tree)     │
+├────────────────────┬────────────────────────────────────┤
+│   GPU Backend      │   Software Renderer                 │
+│   (Vulkan/DRM/KMS) │   (VESA / framebuffer fallback)    │
+├────────────────────┴────────────────────────────────────┤
+│              S-SEC Capability Gate                        │
+│   (GPU access, display server, input events)             │
+├─────────────────────────────────────────────────────────┤
+│   Hardware: GPU (NVLink/PCIe 5) + Display (HDMI/DP 2.1) │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Component Architecture
+---
 
-```text
-┌─────────────────────────────────────────┐
-│         Zenith Desktop Environment      │
-│  ┌──────────┬──────────┬──────────────┐ │
-│  │ Compositor│ Shell    │ Panel        │ │
-│  └──────────┴──────────┴──────────────┘ │
-│  ┌──────────┬──────────┬──────────────┐ │
-│  │ Window   │ Input    │ Accessibility │ │
-│  │ Manager  │ Method   │ Services     │ │
-│  └──────────┴──────────┴──────────────┘ │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│         Wayland Protocol Layer          │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│         Vulkan Rendering Engine          │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│              GPU Hardware               │
-└─────────────────────────────────────────┘
+## ✨ Core Features
+
+### Wayland Protocol Compatibility
+
+ZenithCompositor implements the core Wayland protocol plus key extensions:
+
+| Protocol | Status | Description |
+|----------|--------|-------------|
+| `wl_compositor` | ✅ | Core surface management |
+| `wl_shm` | ✅ | Shared memory buffers |
+| `xdg_shell` | ✅ | Desktop window model |
+| `wl_seat` | ✅ | Pointer + keyboard input |
+| `wp_presentation` | ✅ | Frame timing |
+| `xwayland` | 🔄 | X11 app compatibility |
+| `wp_fractional_scale` | ✅ | HiDPI support |
+| `zwp_linux_dmabuf` | ✅ | Zero-copy GPU buffers |
+| `ext_session_lock` | ✅ | Screen locker protocol |
+
+### Rendering Pipeline
+
+```
+Application renders → wl_buffer (DMA-BUF or SHM) 
+    → ZenithCompositor (damage tracking) 
+    → Scene graph (sorted by z-order) 
+    → GPU backend (Vulkan render pass) 
+    → KMS/DRM (vsync atomic commit) 
+    → Display
 ```
 
-## Configuration
+### Window Decorations
 
-### Compositor Configuration
+ZenithCompositor uses **server-side decorations (SSD)** with a clean sovereign aesthetic:
 
-**File**: `/etc/zenith/compositor.conf`
+- Flat, minimal chrome — no window border gradients
+- Accent color follows capability token color (per-app visual differentiation)
+- Smooth 60/120/240Hz adaptive refresh
+- Variable blur radius on glassmorphism panels
 
-```toml
-[compositor]
-renderer = "vulkan"
-vsync = true
-scaling = "hidpi"
-max_fps = 144
-tearing = false
+---
 
-[display]
-scale = 1.0
-refresh_rate = 144
-color_profile = "srgb"
-hdr = false
+## 🎨 Zenith Desktop Shell
 
-[accessibility]
-screen_reader = true
-default_locale = "hi_IN" # Hindi (India)
-input_method = "ibus-m17n"
-high_contrast = false
-large_text = false
+### Sigma Taskbar
 
-[performance]
-gpu_acceleration = true
-memory_limit = "2GB"
-thread_count = 4
+- **Sigma Dock** — macOS-style app dock with magnetic hover animations
+- **Smart Workspace** — AI-suggested workspace grouping (related apps grouped together)
+- **Quick Settings** — One-click access to Wi-Fi, Bluetooth, Volume, Brightness
+- **Notification Center** — Grouped, actionable notifications with rich media previews
+
+### App Launcher
+
+Natural language + fuzzy search:
+```
+> "open my tax calculation spreadsheet from last month"
+→ [AI]: Found: /home/user/Documents/TaxCalc_March2025.xlsx
+         Opening with SigmaOffice Calc...
 ```
 
-### Shell Configuration
+### Workspaces
 
-**File**: `/etc/zenith/shell.conf`
+- **Dynamic workspaces** — Auto-created on demand, auto-removed when empty
+- **Overview mode** — Pinch gesture or Super key shows all workspaces
+- **Cross-workspace drag** — Drag windows between workspace tiles
+- **Named workspaces** — AI suggests names based on open apps
 
-```toml
-[shell]
-theme = "zenith-dark"
-icon_theme = "zenith-icons"
-font = "Inter 11"
-panel_position = "bottom"
-panel_height = 48
+---
 
-[desktop]
-wallpaper = "/usr/share/zenith/wallpapers/default.jpg"
-show_icons = true
-grid_size = 64
-sort_method = "name"
+## 🖱️ Input Handling
 
-[windows]
-border_width = 2
-shadow = true
-blur = true
-animations = true
-```
+### Pointer (libinput replacement)
 
-## Technical Implementation
-
-### Compositor Core
+SigmaOS implements its own input event pipeline:
 
 ```rust
-// userland/apps/zenith-compositor/src/compositor.rs
-use ash::vk;
-use ash::Device;
-use ash::extensions::khr::Swapchain;
-
-pub struct ZenithCompositor {
-    pub vk_device: Device,
-    pub swapchain: Swapchain,
-    pub screen_reader_active: bool,
-    pub accessibility_service: AccessibilityService,
-    pub input_method: InputMethodManager,
-}
-
-impl ZenithCompositor {
-    pub fn new() -> Result<Self, CompositorError> {
-        let vk_device = Self::init_vulkan()?;
-        let swapchain = Self::create_swapchain(&vk_device)?;
-        let accessibility_service = AccessibilityService::new()?;
-        let input_method = InputMethodManager::new("ibus-m17n")?;
-
-        Ok(Self {
-            vk_device,
-            swapchain,
-            screen_reader_active: false,
-            accessibility_service,
-            input_method,
-        })
-    }
-
-    pub fn draw_desktop_elements(&self) -> Result<(), CompositorError> {
-        // GPU accelerated composite rendering of panels, taskbars and windows
-        self.render_panels()?;
-        self.render_windows()?;
-        self.render_overlays()?;
-
-        if self.screen_reader_active {
-            self.announce_accessibility_focus()?;
-        }
-
-        Ok(())
-    }
-
-    pub fn handle_wayland_event(&mut self, event: WaylandEvent) -> Result<(), CompositorError> {
-        match event {
-            WaylandEvent::Keyboard(input) => {
-                self.input_method.handle_input(input)?;
-            }
-            WaylandEvent::Pointer(motion) => {
-                self.handle_pointer_motion(motion)?;
-            }
-            WaylandEvent::Touch(touch) => {
-                self.handle_touch(touch)?;
-            }
-        }
-        Ok(())
-    }
-
-    pub fn toggle_screen_reader(&mut self) -> Result<(), CompositorError> {
-        self.screen_reader_active = !self.screen_reader_active;
-        if self.screen_reader_active {
-            self.accessibility_service.enable()?;
-        } else {
-            self.accessibility_service.disable()?;
-        }
-        Ok(())
-    }
+pub trait InputDriver {
+    fn poll_events(&mut self) -> Vec<InputEvent>;
+    fn set_acceleration(&mut self, accel: f64);
+    fn set_scroll_factor(&mut self, factor: f64);
 }
 ```
 
-### Window Manager
+Supported input devices:
+- USB HID keyboards and mice
+- PS/2 legacy keyboard (via compatibility driver)
+- Multi-touch touchpads (precision gestures: 2/3/4 finger)
+- Stylus/pen input (Wacom + generic HID)
+- Gamepad input (for gamepad-aware Wayland apps)
+- Touchscreen (multi-point capacitive)
 
-```rust
-// userland/apps/zenith-shell/src/window_manager.rs
-pub struct WindowManager {
-    windows: Vec<Window>,
-    focused_window: Option<usize>,
-    layout_manager: LayoutManager,
-}
+### Gesture Recognition
 
-impl WindowManager {
-    pub fn new() -> Self {
-        WindowManager {
-            windows: Vec::new(),
-            focused_window: None,
-            layout_manager: LayoutManager::new(),
-        }
-    }
+| Gesture | Action |
+|---------|--------|
+| 3-finger swipe left/right | Switch workspace |
+| 3-finger swipe up | Show overview |
+| 4-finger pinch | Mission Control |
+| 2-finger scroll | Natural scrolling |
+| Touchscreen long-press | Context menu |
 
-    pub fn add_window(&mut self, window: Window) {
-        self.windows.push(window);
-        self.layout_manager.relayout(&mut self.windows);
-    }
+---
 
-    pub fn focus_window(&mut self, window_id: usize) {
-        self.focused_window = Some(window_id);
-        self.windows[window_id].set_focused(true);
+## 🎨 Theming System
 
-        // Announce to screen reader
-        if let Some(ref mut sr) = self.screen_reader {
-            sr.announce_window_focus(&self.windows[window_id]);
-        }
-    }
+### SigmaTheme Engine
 
-    pub fn close_window(&mut self, window_id: usize) {
-        self.windows.remove(window_id);
-        self.layout_manager.relayout(&mut self.windows);
-    }
-}
-```
-
-### Accessibility Service
-
-```rust
-// userland/apps/zenith-compositor/src/accessibility.rs
-pub struct AccessibilityService {
-    screen_reader: ScreenReader,
-    braille_display: Option<BrailleDisplay>,
-    high_contrast_mode: bool,
-}
-
-impl AccessibilityService {
-    pub fn new() -> Result<Self, AccessibilityError> {
-        let screen_reader = ScreenReader::new()?;
-        let braille_display = BrailleDisplay::detect()?;
-
-        Ok(Self {
-            screen_reader,
-            braille_display,
-            high_contrast_mode: false,
-        })
-    }
-
-    pub fn enable(&mut self) -> Result<(), AccessibilityError> {
-        self.screen_reader.enable()?;
-        if let Some(ref mut bd) = self.braille_display {
-            bd.enable()?;
-        }
-        Ok(())
-    }
-
-    pub fn announce_window_focus(&self, window: &Window) {
-        let text = format!("Window focused: {}", window.title());
-        self.screen_reader.speak(&text);
-    }
-
-    pub fn announce_text_change(&self, text: &str) {
-        self.screen_reader.speak(text);
-    }
-}
-```
-
-### Input Method Integration
-
-```rust
-// userland/apps/zenith-compositor/src/input_method.rs
-pub struct InputMethodManager {
-    backend: InputMethodBackend,
-    current_locale: String,
-}
-
-impl InputMethodManager {
-    pub fn new(backend: &str) -> Result<Self, InputMethodError> {
-        let backend = match backend {
-            "ibus" => InputMethodBackend::IBus,
-            "fcitx" => InputMethodBackend::Fcitx,
-            _ => return Err(InputMethodError::InvalidBackend),
-        };
-
-        Ok(Self {
-            backend,
-            current_locale: "en_US".to_string(),
-        })
-    }
-
-    pub fn set_locale(&mut self, locale: &str) -> Result<(), InputMethodError> {
-        self.current_locale = locale.to_string();
-        self.backend.set_locale(locale)?;
-        Ok(())
-    }
-
-    pub fn handle_input(&self, input: InputEvent) -> Result<String, InputMethodError> {
-        match self.backend {
-            InputMethodBackend::IBus => self.handle_ibus_input(input),
-            InputMethodBackend::Fcitx => self.handle_fcitx_input(input),
-        }
-    }
-}
-```
-
-## Indic Language Support
-
-### Supported Languages
-
-- **Hindi (hi_IN)**: Devanagari script
-- **Bengali (bn_IN)**: Bengali script
-- **Tamil (ta_IN)**: Tamil script
-- **Telugu (te_IN)**: Telugu script
-- **Marathi (mr_IN)**: Devanagari script
-- **Gujarati (gu_IN)**: Gujarati script
-- **Kannada (kn_IN)**: Kannada script
-- **Malayalam (ml_IN)**: Malayalam script
-- **Punjabi (pa_IN)**: Gurmukhi script
-- **Urdu (ur_IN)**: Perso-Arabic script
-
-### Input Methods
-
-**IBus Integration**:
+The theming engine uses a declarative theme specification:
 
 ```toml
-[input_method]
-engine = "ibus"
-layouts = ["hi", "bn", "ta", "te"]
-candidates = 10
-preedit = true
-```
-
-**Fcitx Integration**:
-
-```toml
-[input_method]
-engine = "fcitx"
-layouts = ["hi", "bn", "ta", "te"]
-candidates = 10
-preedit = true
-```
-
-### Font Configuration
-
-```toml
-[fonts]
-default = "Noto Sans"
-size = 11
-hinting = "full"
-antialiasing = true
-
-[indic_fonts]
-hindi = "Noto Sans Devanagari"
-bengali = "Noto Sans Bengali"
-tamil = "Noto Sans Tamil"
-telugu = "Noto Sans Telugu"
-```
-
-## Accessibility Features
-
-### Screen Reader
-
-**Features**:
-
-- Text-to-speech synthesis
-- Window focus announcements
-- Text change notifications
-- Keyboard navigation support
-- Braille display support
-
-**Configuration**:
-
-```toml
-[screen_reader]
-enabled = true
-voice = "en-US"
-rate = 1.0
-pitch = 1.0
-volume = 1.0
-```
-
-### High Contrast Mode
-
-**Features**:
-
-- Increased contrast colors
-- Larger text
-- Focus indicators
-- Customizable color schemes
-
-**Configuration**:
-
-```toml
-[high_contrast]
-enabled = false
-theme = "high-contrast"
-text_scale = 1.2
-```
-
-### Keyboard Navigation
-
-**Features**:
-
-- Full keyboard support
-- Keyboard shortcuts
-- Focus indicators
-- Tab navigation
-
-**Shortcuts**:
-
-- `Alt+Tab`: Switch windows
-- `Super+D`: Show desktop
-- `Super+L`: Lock screen
-- `Ctrl+Alt+T`: Open terminal
-- `Super+E`: Open file manager
-
-## Performance Optimization
-
-### GPU Acceleration
-
-**Vulkan Features**:
-
-- Hardware-accelerated rendering
-- Multi-threaded command buffers
-- Descriptor set management
-- Pipeline caching
-
-**Configuration**:
-
-```toml
-[vulkan]
-validation = false
-synchronization = true
-pipeline_cache = true
-descriptor_cache = true
-```
-
-### Memory Management
-
-**Features**:
-
-- Texture compression
-- Memory pooling
-- Resource recycling
-- Lazy loading
-
-**Configuration**:
-
-```toml
-[memory]
-texture_compression = true
-pool_size = "512MB"
-lazy_loading = true
-```
-
-## Theming
-
-### Theme System
-
-**Structure**:
-
-```text
-/usr/share/zenith/themes/
-├── zenith-dark/
-│   ├── theme.conf
-│   ├── colors.conf
-│   └── widgets/
-├── zenith-light/
-│   ├── theme.conf
-│   ├── colors.conf
-│   └── widgets/
-└── custom/
-    ├── theme.conf
-    ├── colors.conf
-    └── widgets/
-```
-
-**Theme Configuration**:
-
-```toml
-[theme]
-name = "Zenith Dark"
-version = "1.0"
-author = "SigmaOS Team"
-
+# ~/.config/zenith/theme.toml
 [colors]
-background = "#1e1e1e"
-foreground = "#ffffff"
-primary = "#3b82f6"
-secondary = "#10b981"
-accent = "#f59e0b"
-error = "#ef4444"
-warning = "#f59e0b"
-success = "#10b981"
+accent = "#6C63FF"        # Sovereign purple
+background = "#0D1117"    # Deep navy
+surface = "#161B22"       # Card surface
+text_primary = "#E6EDF3"  # Primary text
+text_secondary = "#8B949E"
+
+[blur]
+enabled = true
+radius = 20
+saturation = 1.4
+
+[animations]
+duration_ms = 200
+easing = "ease-out-cubic"
 ```
 
-### Icon Themes
+### Preset Themes
 
-**Supported Themes**:
+| Theme | Style |
+|-------|-------|
+| Sovereign Dark | Default — deep navy + sovereign purple |
+| Banaras Gold | India-inspired warm gold on deep maroon |
+| Kashmir Blue | Cool blue-grey inspired by Dal Lake |
+| Midnight Teal | Cyberpunk-inspired teal on near-black |
+| Paper White | Light mode — off-white with ink accents |
 
-- Zenith Icons
-- Adwaita
-- Papirus
-- Numix
+### Dynamic Theming
 
-**Configuration**:
+- **Time-based** — Auto-switch to light/dark at sunrise/sunset
+- **Location-aware** — Sunrise/sunset calculated from device location
+- **App-specific** — Different accent colors per application
 
-```toml
-[icons]
-theme = "zenith-icons"
-size = 24
-symbolic = true
+---
+
+## 🌐 Display Management
+
+### Multi-Monitor Support
+
+```bash
+# List displays
+sigma-display list
+
+# Configure displays
+sigma-display set --primary DP-1 --secondary HDMI-1 --arrange right
+
+# HiDPI scaling
+sigma-display scale --output DP-1 --factor 2.0
 ```
 
-## Plugin System
+### HDR Support
 
-### Plugin Architecture
+ZenithCompositor supports HDR10 and HLG on compatible displays:
+- Tone mapping for non-HDR app content on HDR displays
+- Per-window HDR mode
+- EDR (Extended Dynamic Range) in software for HiDPI displays
+
+### Refresh Rates
+
+- **Variable Refresh Rate (VRR)** — AMD FreeSync / NVIDIA G-Sync Compatible
+- **Adaptive Sync** — Reduces screen tearing without fixed vsync latency
+- **High Refresh** — Up to 360Hz on supported displays
+
+---
+
+## 📺 Screen Recording & Screenshotting
+
+Built-in screen capture without external tools:
 
 ```rust
-// userland/apps/zenith-shell/src/plugin.rs
-pub trait Plugin {
-    fn name(&self) -> &str;
-    fn version(&self) -> &str;
-    fn init(&mut self) -> Result<(), PluginError>;
-    fn shutdown(&mut self) -> Result<(), PluginError>;
-    fn handle_event(&mut self, event: &Event) -> Result<(), PluginError>;
-}
+// Screen capture API (capability-gated)
+let recorder = ScreenRecorder::new(cap_token)?;
+recorder.start_recording(RecordingConfig {
+    output_path: "/home/user/Videos/recording.mp4",
+    codec: VideoCodec::AV1,
+    quality: Quality::High,
+    include_audio: true,
+    region: CaptureRegion::FullScreen,
+})?;
 ```
 
-### Plugin Examples
+---
 
-**System Monitor Plugin**:
+## 🔒 Security Properties
 
-```rust
-pub struct SystemMonitorPlugin {
-    cpu_usage: f32,
-    memory_usage: f32,
-}
+ZenithCompositor enforces:
 
-impl Plugin for SystemMonitorPlugin {
-    fn name(&self) -> &str {
-        "System Monitor"
-    }
+1. **No ambient authority** — Apps cannot read other apps' window content
+2. **Capability-gated screen capture** — Screenshots require explicit capability
+3. **Secure lock screen** — Separate process with minimal capabilities
+4. **Clipboard isolation** — Apps cannot read clipboard unless granted `clipboard_read` capability
+5. **Input isolation** — Global keyboard hooks require `input_monitor` capability (must be user-approved)
+6. **No X11 by default** — Eliminating the entire X11 attack surface
 
-    fn handle_event(&mut self, event: &Event) -> Result<(), PluginError> {
-        match event {
-            Event::Timer => self.update_stats(),
-            _ => Ok(()),
-        }
-    }
-}
-```
+---
 
-## Best Practices
+## 🔗 Related Pages
 
-### Development
-
-1. **Modular Design**: Keep components independent
-2. **Clear APIs**: Define clear interfaces
-3. **Testing**: Comprehensive testing
-4. **Documentation**: Document all public APIs
-
-### Performance
-
-1. **Profiling**: Profile regularly
-2. **Optimization**: Optimize hot paths
-3. **Memory**: Minimize memory usage
-4. **GPU**: Utilize GPU efficiently
-
-### Accessibility
-
-1. **Screen Reader**: Ensure screen reader compatibility
-2. **Keyboard**: Full keyboard support
-3. **High Contrast**: Support high contrast mode
-4. **Localization**: Full localization support
-
-## Roadmap & Milestones
-
-### Phase 1 (Months 0-3)
-
-- Core Wayland compositor protocols
-- Vulkan backend rendering
-- Basic window management
-- Panel and taskbar
-
-### Phase 2 (Months 3-6)
-
-- IBus integration for Indic languages
-- Input method support
-- Layout engines
-- Font configuration
-
-### Phase 3 (Months 6-9)
-
-- Integrated speech synthesizer
-- Screen reading engine
-- Braille display support
-- High contrast mode
-
-### Phase 4 (Months 9-12)
-
-- Gestural accessibility control
-- Multi-display support
-- Color profiles
-- Plugin system
-
-## References
-
-- [Wayland Protocol](https://wayland.freedesktop.org/)
-- [Vulkan Specification](https://www.khronos.org/vulkan/)
-- [IBus Documentation](https://ibus.github.io/docs/)
-- [Accessibility Guidelines](https://www.w3.org/WAI/)
-- [GNOME HIG](https://developer.gnome.org/hig/)
+- [Security Framework](Security_Framework) — Capability-gated display APIs
+- [SigmaMedia Frameworks](SigmaMedia-Frameworks) — Built-in media playback in Zenith
+- [Advanced Absorption Matrix](Advanced_Absorption) — How Zenith replaces legacy DEs
+- [Maturity & Distro-Parity Roadmap](Maturity_Parity_Roadmap) — Desktop milestone status
