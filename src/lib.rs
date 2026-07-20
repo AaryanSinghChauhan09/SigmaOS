@@ -6,6 +6,7 @@
 
 pub mod accessibility;
 pub mod automation;
+pub mod audio;
 pub mod community;
 pub mod compatibility;
 pub mod customization;
@@ -16,6 +17,7 @@ pub mod drivers;
 pub mod ecosystem;
 pub mod education;
 pub mod filesystem;
+pub mod graphics;
 pub mod governance;
 pub mod iso;
 pub mod kernel;
@@ -86,8 +88,17 @@ pub use ecosystem::{
 pub use education::{
     DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
 };
+pub use audio::{
+    AudioChannels, AudioCodec, AudioDriver, AudioDriverError, AudioDriverResult, AudioFormat,
+    AudioMetadata, AudioSampleRate, DecodedAudio,
+};
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, SigmaFS, DagNode, HashId,
+};
+pub use graphics::{
+    ColorSpace, CompositorError, CompositorResult, CompositorStrategy, DecodedImage,
+    FramebufferCompositor, ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, RenderLayer,
+    SigmaCompositor,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
