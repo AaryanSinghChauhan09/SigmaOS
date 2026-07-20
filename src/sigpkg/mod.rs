@@ -35,19 +35,19 @@ impl Version {
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
         let mut parts = version_str.splitn(4, '.');
 
-        let major = parts
+        let major_parsed = parts
             .next()
             .ok_or(ParseError::InvalidFormat)?
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
-        let minor = parts
+        let minor_parsed = parts
             .next()
             .ok_or(ParseError::InvalidFormat)?
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
-        let patch = parts
+        let patch_parsed = parts
             .next()
             .ok_or(ParseError::InvalidFormat)?
             .parse::<u64>()
@@ -57,7 +57,7 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        Ok(Version::new(major, minor, patch))
+        Ok(Version::new(major_parsed, minor_parsed, patch_parsed))
     }
 }
 
