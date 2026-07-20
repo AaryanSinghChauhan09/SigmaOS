@@ -2,18 +2,30 @@
 pub mod legacy;
 
 pub use legacy::{
+    E1000Driver,
+    FloppyController,
+    Framebuffer,
+    IdeAtaController,
     // ISA bus
     IsaBus,
     // Storage
-    MfmController, IdeAtaController, FloppyController,
-    // Input
-    Ps2Controller, UartPort,
-    // Display
-    VgaDriver, TextConsole, Framebuffer, VideoMode,
-    // Audio
-    SoundBlasterDriver, OplSynth, PcSpeaker,
+    MfmController,
     // Network
-    Ne2000Driver, Rtl8139Driver, E1000Driver,
+    Ne2000Driver,
+    OplSynth,
+    PcSpeaker,
+    // Input
+    Ps2Controller,
+    Rtl8139Driver,
+    // Audio
+    SoundBlasterDriver,
+    TextConsole,
+    UartPort,
+    UsbHidDevice,
+    UsbMassStorage,
+    // Display
+    VgaDriver,
+    VideoMode,
     // USB
-    XhciController, UsbMassStorage, UsbHidDevice,
+    XhciController,
 };

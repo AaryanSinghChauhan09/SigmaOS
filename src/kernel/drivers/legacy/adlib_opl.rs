@@ -1,46 +1,50 @@
+use crate::kernel::subsystems::registry::{
+    InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
+};
 /// SigmaOS Legacy Driver — AdLib/OPL2/OPL3 FM Synthesis + Sound Blaster ISA
 /// Absorbs Linux ALSA snd-opl3 + snd-sb* driver families
 /// AdLib OPL2 (YM3812), OPL3 (YMF262), SB 1.0/2.0/Pro/16/AWE32
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
-use crate::kernel::subsystems::registry::{KernelSubsystem, InitOrder, SubsystemError, SubsystemPriority};
 
 /// OPL register space
-pub const OPL_BASE_ADDR: u16   = 0x388;
+pub const OPL_BASE_ADDR: u16 = 0x388;
 pub const OPL2_NUM_OPERATORS: usize = 18;
 pub const OPL3_NUM_OPERATORS: usize = 36;
 
 /// OPL chip version
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OplVersion { Opl2, Opl3 }
+pub enum OplVersion {
+    Opl2,
+    Opl3,
+}
 
 /// OPL operator (slot) register state
 #[derive(Debug, Clone, Default)]
 pub struct OplOperator {
-    pub am: bool,         // Amplitude modulation
-    pub vib: bool,        // Vibrato
-    pub eg_type: bool,    // Envelope generator type
-    pub ksr: bool,        // Key scale rate
-    pub mult: u8,         // Frequency multiplier (0-15)
-    pub ksl: u8,          // Key scale level (0-3)
-    pub total_level: u8,  // Total level / attenuation (0-63)
-    pub attack: u8,       // Attack rate (0-15)
-    pub decay: u8,        // Decay rate (0-15)
-    pub sustain: u8,      // Sustain level (0-15)
-    pub release: u8,      // Release rate (0-15)
-    pub wave_select: u8,  // Waveform select (0-7 for OPL3)
+    pub am: bool,        // Amplitude modulation
+    pub vib: bool,       // Vibrato
+    pub eg_type: bool,   // Envelope generator type
+    pub ksr: bool,       // Key scale rate
+    pub mult: u8,        // Frequency multiplier (0-15)
+    pub ksl: u8,         // Key scale level (0-3)
+    pub total_level: u8, // Total level / attenuation (0-63)
+    pub attack: u8,      // Attack rate (0-15)
+    pub decay: u8,       // Decay rate (0-15)
+    pub sustain: u8,     // Sustain level (0-15)
+    pub release: u8,     // Release rate (0-15)
+    pub wave_select: u8, // Waveform select (0-7 for OPL3)
 }
 
 /// OPL channel
 #[derive(Debug, Clone)]
 pub struct OplChannel {
     pub num: u8,
-    pub frequency: u16,     // F-Num (0-1023)
-    pub octave: u8,         // Block (0-7)
+    pub frequency: u16, // F-Num (0-1023)
+    pub octave: u8,     // Block (0-7)
     pub key_on: bool,
-    pub feedback: u8,       // Feedback modulation (0-7)
-    pub connection: u8,     // 0=FM, 1=Additive
+    pub feedback: u8,   // Feedback modulation (0-7)
+    pub connection: u8, // 0=FM, 1=Additive
     pub operators: [OplOperator; 2],
 }
 
@@ -64,7 +68,9 @@ impl OplChannel {
         self.key_on = true;
     }
 
-    pub fn note_off(&mut self) { self.key_on = false; }
+    pub fn note_off(&mut self) {
+        self.key_on = false;
+    }
 }
 
 /// OPL FM Synthesizer
@@ -77,11 +83,18 @@ pub struct OplSynth {
 }
 
 impl OplSynth {
-    pub fn opl2() -> Self { Self::new(OplVersion::Opl2) }
-    pub fn opl3() -> Self { Self::new(OplVersion::Opl3) }
+    pub fn opl2() -> Self {
+        Self::new(OplVersion::Opl2)
+    }
+    pub fn opl3() -> Self {
+        Self::new(OplVersion::Opl3)
+    }
 
     pub fn new(version: OplVersion) -> Self {
-        let ch_count = match version { OplVersion::Opl2 => 9, OplVersion::Opl3 => 18 };
+        let ch_count = match version {
+            OplVersion::Opl2 => 9,
+            OplVersion::Opl3 => 18,
+        };
         OplSynth {
             version,
             channels: (0..ch_count).map(OplChannel::new).collect(),
@@ -92,20 +105,30 @@ impl OplSynth {
     }
 
     pub fn note_on(&mut self, channel: u8, fnum: u16, octave: u8) -> Result<(), &'static str> {
-        let ch = self.channels.get_mut(channel as usize).ok_or("OPL: invalid channel")?;
+        let ch = self
+            .channels
+            .get_mut(channel as usize)
+            .ok_or("OPL: invalid channel")?;
         ch.note_on(fnum, octave);
         self.note_count.fetch_add(1, Ordering::Relaxed);
         Ok(())
     }
 
     pub fn note_off(&mut self, channel: u8) -> Result<(), &'static str> {
-        let ch = self.channels.get_mut(channel as usize).ok_or("OPL: invalid channel")?;
+        let ch = self
+            .channels
+            .get_mut(channel as usize)
+            .ok_or("OPL: invalid channel")?;
         ch.note_off();
         Ok(())
     }
 
-    pub fn note_count(&self) -> usize { self.note_count.load(Ordering::Relaxed) }
-    pub fn channel_count(&self) -> usize { self.channels.len() }
+    pub fn note_count(&self) -> usize {
+        self.note_count.load(Ordering::Relaxed)
+    }
+    pub fn channel_count(&self) -> usize {
+        self.channels.len()
+    }
 }
 
 // ── Sound Blaster ISA driver ──────────────────────────────────────────────
@@ -113,24 +136,28 @@ impl OplSynth {
 /// Sound Blaster variant
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SbVariant {
-    Sb10, Sb20, SbPro, Sb16, SbAwE32,
+    Sb10,
+    Sb20,
+    SbPro,
+    Sb16,
+    SbAwE32,
 }
 
 impl SbVariant {
     pub fn dsp_version(&self) -> (u8, u8) {
         match self {
-            SbVariant::Sb10   => (1, 5),
-            SbVariant::Sb20   => (2, 1),
-            SbVariant::SbPro  => (3, 1),
-            SbVariant::Sb16   => (4, 5),
-            SbVariant::SbAwE32=> (4, 11),
+            SbVariant::Sb10 => (1, 5),
+            SbVariant::Sb20 => (2, 1),
+            SbVariant::SbPro => (3, 1),
+            SbVariant::Sb16 => (4, 5),
+            SbVariant::SbAwE32 => (4, 11),
         }
     }
 
     pub fn max_sample_rate(&self) -> u32 {
         match self {
-            SbVariant::Sb10  | SbVariant::Sb20  => 22050,
-            SbVariant::SbPro  => 44100,
+            SbVariant::Sb10 | SbVariant::Sb20 => 22050,
+            SbVariant::SbPro => 44100,
             SbVariant::Sb16 | SbVariant::SbAwE32 => 48000,
         }
     }
@@ -158,7 +185,11 @@ pub struct SoundBlasterDriver {
 impl SoundBlasterDriver {
     /// Typical ISA factory defaults
     pub fn new(variant: SbVariant) -> Self {
-        let dma16 = if variant.supports_16bit() { Some(5) } else { None };
+        let dma16 = if variant.supports_16bit() {
+            Some(5)
+        } else {
+            None
+        };
         SoundBlasterDriver {
             variant,
             base_io: 0x220,
@@ -168,7 +199,14 @@ impl SoundBlasterDriver {
             opl: OplSynth::opl2(),
             sample_rate: 44100,
             bits: if variant.supports_16bit() { 16 } else { 8 },
-            channels: if variant == SbVariant::SbPro || variant == SbVariant::Sb16 || variant == SbVariant::SbAwE32 { 2 } else { 1 },
+            channels: if variant == SbVariant::SbPro
+                || variant == SbVariant::Sb16
+                || variant == SbVariant::SbAwE32
+            {
+                2
+            } else {
+                1
+            },
             samples_played: AtomicUsize::new(0),
             initialized: false,
         }
@@ -179,21 +217,35 @@ impl SoundBlasterDriver {
         buf.len()
     }
 
-    pub fn samples_played(&self) -> usize { self.samples_played.load(Ordering::Relaxed) }
+    pub fn samples_played(&self) -> usize {
+        self.samples_played.load(Ordering::Relaxed)
+    }
 }
 
 impl KernelSubsystem for SoundBlasterDriver {
-    fn name(&self) -> &str { "soundblaster" }
-    fn version(&self) -> &str { "1.0.0" }
-    fn init_order(&self) -> InitOrder { InitOrder::Device }
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::Optional }
-    fn dependencies(&self) -> Vec<&'static str> { vec!["isa_bus"] }
+    fn name(&self) -> &str {
+        "soundblaster"
+    }
+    fn version(&self) -> &str {
+        "1.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::Device
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::Optional
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["isa_bus"]
+    }
 
     fn initialize(&mut self) -> Result<(), SubsystemError> {
         self.initialized = true;
         Ok(())
     }
-    fn shutdown(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn shutdown(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 }
 
 /// PC Speaker driver (PIT channel 2, 8254 timer)
@@ -206,7 +258,12 @@ pub struct PcSpeaker {
 
 impl PcSpeaker {
     pub fn new() -> Self {
-        PcSpeaker { pit_base: 0x40, enabled: false, frequency: 0, beep_count: AtomicUsize::new(0) }
+        PcSpeaker {
+            pit_base: 0x40,
+            enabled: false,
+            frequency: 0,
+            beep_count: AtomicUsize::new(0),
+        }
     }
 
     pub fn beep(&mut self, freq_hz: u32, duration_ms: u32) {
@@ -217,10 +274,16 @@ impl PcSpeaker {
         self.enabled = false;
     }
 
-    pub fn beep_count(&self) -> usize { self.beep_count.load(Ordering::Relaxed) }
+    pub fn beep_count(&self) -> usize {
+        self.beep_count.load(Ordering::Relaxed)
+    }
 }
 
-impl Default for PcSpeaker { fn default() -> Self { Self::new() } }
+impl Default for PcSpeaker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod tests {

@@ -1,15 +1,16 @@
+use crate::kernel::subsystems::registry::{
+    InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
+};
 /// SigmaOS Legacy Driver — MFM/RLL Hard Disk Controller (ST-506 interface)
 /// Absorbs Linux 0.01 hard disk driver — the very first block device Linux ever supported
 /// Supports ST-412 / ST-506 controllers, MFM and RLL encoding, CHS geometry
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
-use crate::kernel::subsystems::registry::{KernelSubsystem, InitOrder, SubsystemError, SubsystemPriority};
 
 /// Maximum CHS (Cylinder-Head-Sector) values for ancient controllers
 pub const MFM_MAX_CYLINDERS: u16 = 1024;
-pub const MFM_MAX_HEADS: u8      = 16;
-pub const MFM_MAX_SECTORS: u8    = 63;
+pub const MFM_MAX_HEADS: u8 = 16;
+pub const MFM_MAX_SECTORS: u8 = 63;
 pub const MFM_SECTOR_SIZE: usize = 512;
 
 /// MFM/RLL disk geometry (CHS)
@@ -32,10 +33,10 @@ impl DiskGeometry {
     /// Convert LBA to CHS
     pub fn lba_to_chs(&self, lba: u32) -> (u16, u8, u8) {
         let spt = self.sectors_per_track as u32;
-        let h   = self.heads as u32;
-        let c   = (lba / (spt * h)) as u16;
+        let h = self.heads as u32;
+        let c = (lba / (spt * h)) as u16;
         let tmp = lba % (spt * h);
-        let hd  = (tmp / spt) as u8;
+        let hd = (tmp / spt) as u8;
         let sec = (tmp % spt + 1) as u8;
         (c, hd, sec)
     }
@@ -43,7 +44,13 @@ impl DiskGeometry {
 
 /// ST-506 controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ControllerType { ST506, WD1003, WD1007, Mfm, Rll }
+pub enum ControllerType {
+    ST506,
+    WD1003,
+    WD1007,
+    Mfm,
+    Rll,
+}
 
 /// MFM/RLL disk descriptor
 #[derive(Debug)]
@@ -77,7 +84,11 @@ impl MfmDisk {
         }
     }
 
-    pub fn read_sector(&self, lba: u32, buf: &mut [u8; MFM_SECTOR_SIZE]) -> Result<(), &'static str> {
+    pub fn read_sector(
+        &self,
+        lba: u32,
+        buf: &mut [u8; MFM_SECTOR_SIZE],
+    ) -> Result<(), &'static str> {
         let idx = lba as usize;
         if idx >= self.sectors.len() {
             return Err("MFM: sector out of range");
@@ -87,7 +98,11 @@ impl MfmDisk {
         Ok(())
     }
 
-    pub fn write_sector(&mut self, lba: u32, buf: &[u8; MFM_SECTOR_SIZE]) -> Result<(), &'static str> {
+    pub fn write_sector(
+        &mut self,
+        lba: u32,
+        buf: &[u8; MFM_SECTOR_SIZE],
+    ) -> Result<(), &'static str> {
         let idx = lba as usize;
         if idx >= self.sectors.len() {
             return Err("MFM: sector out of range");
@@ -97,7 +112,9 @@ impl MfmDisk {
         Ok(())
     }
 
-    pub fn io_count(&self) -> usize { self.io_count.load(Ordering::Relaxed) }
+    pub fn io_count(&self) -> usize {
+        self.io_count.load(Ordering::Relaxed)
+    }
 }
 
 /// MFM controller driver — manages up to 2 drives (primary/secondary)
@@ -111,11 +128,18 @@ pub struct MfmController {
 impl MfmController {
     /// Default ST-506 I/O base and IRQ
     pub fn new() -> Self {
-        MfmController { drives: [None, None], base_io: 0x01F0, irq: 14, initialized: false }
+        MfmController {
+            drives: [None, None],
+            base_io: 0x01F0,
+            irq: 14,
+            initialized: false,
+        }
     }
 
     pub fn attach_drive(&mut self, slot: usize, disk: MfmDisk) -> Result<(), &'static str> {
-        if slot > 1 { return Err("MFM: only 2 drives supported"); }
+        if slot > 1 {
+            return Err("MFM: only 2 drives supported");
+        }
         self.drives[slot] = Some(disk);
         Ok(())
     }
@@ -130,21 +154,35 @@ impl MfmController {
 }
 
 impl KernelSubsystem for MfmController {
-    fn name(&self) -> &str { "mfm_rll" }
-    fn version(&self) -> &str { "1.0.0" }
-    fn init_order(&self) -> InitOrder { InitOrder::Device }
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::Low }
-    fn dependencies(&self) -> Vec<&'static str> { vec!["isa_bus"] }
+    fn name(&self) -> &str {
+        "mfm_rll"
+    }
+    fn version(&self) -> &str {
+        "1.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::Device
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::Low
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["isa_bus"]
+    }
 
     fn initialize(&mut self) -> Result<(), SubsystemError> {
         self.initialized = true;
         Ok(())
     }
-    fn shutdown(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn shutdown(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 }
 
 impl Default for MfmController {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -153,20 +191,32 @@ mod tests {
 
     #[test]
     fn test_disk_geometry() {
-        let geo = DiskGeometry { cylinders: 615, heads: 4, sectors_per_track: 17 };
+        let geo = DiskGeometry {
+            cylinders: 615,
+            heads: 4,
+            sectors_per_track: 17,
+        };
         assert_eq!(geo.total_sectors(), 615 * 4 * 17);
     }
 
     #[test]
     fn test_lba_to_chs() {
-        let geo = DiskGeometry { cylinders: 615, heads: 4, sectors_per_track: 17 };
+        let geo = DiskGeometry {
+            cylinders: 615,
+            heads: 4,
+            sectors_per_track: 17,
+        };
         let (c, h, s) = geo.lba_to_chs(0);
         assert_eq!((c, h, s), (0, 0, 1));
     }
 
     #[test]
     fn test_mfm_read_write() {
-        let geo = DiskGeometry { cylinders: 10, heads: 4, sectors_per_track: 17 };
+        let geo = DiskGeometry {
+            cylinders: 10,
+            heads: 4,
+            sectors_per_track: 17,
+        };
         let mut disk = MfmDisk::new(0, geo, ControllerType::Mfm);
         let mut write_buf = [0xABu8; MFM_SECTOR_SIZE];
         disk.write_sector(0, &write_buf).unwrap();
@@ -179,8 +229,13 @@ mod tests {
     #[test]
     fn test_mfm_controller_attach() {
         let mut ctrl = MfmController::new();
-        let geo = DiskGeometry { cylinders: 615, heads: 4, sectors_per_track: 17 };
-        ctrl.attach_drive(0, MfmDisk::new(0, geo, ControllerType::Mfm)).unwrap();
+        let geo = DiskGeometry {
+            cylinders: 615,
+            heads: 4,
+            sectors_per_track: 17,
+        };
+        ctrl.attach_drive(0, MfmDisk::new(0, geo, ControllerType::Mfm))
+            .unwrap();
         assert!(ctrl.drive(0).is_some());
         assert!(ctrl.drive(1).is_none());
     }

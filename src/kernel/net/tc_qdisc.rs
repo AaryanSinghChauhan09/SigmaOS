@@ -1,15 +1,14 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-
 use std::collections::VecDeque;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A network packet in the qdisc layer (simplified)
 #[derive(Debug, Clone)]
 pub struct QPacket {
-    pub priority: u8,    // 0 = lowest, 7 = highest (TC_PRIO_MAX)
+    pub priority: u8, // 0 = lowest, 7 = highest (TC_PRIO_MAX)
     pub size: usize,
     pub data: Vec<u8>,
 }
@@ -17,7 +16,11 @@ pub struct QPacket {
 impl QPacket {
     pub fn new(priority: u8, data: Vec<u8>) -> Self {
         let size = data.len();
-        QPacket { priority, size, data }
+        QPacket {
+            priority,
+            size,
+            data,
+        }
     }
 }
 
@@ -27,7 +30,9 @@ pub trait QDisc: Send + Sync {
     fn enqueue(&mut self, pkt: QPacket) -> Result<(), QPacket>;
     fn dequeue(&mut self) -> Option<QPacket>;
     fn len(&self) -> usize;
-    fn is_empty(&self) -> bool { self.len() == 0 }
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
     fn stats(&self) -> QDiscStats;
 }
 
@@ -47,11 +52,19 @@ pub struct Pfifo {
 }
 
 impl Pfifo {
-    pub fn new(limit: usize) -> Self { Pfifo { queue: VecDeque::new(), limit, stats: QDiscStats::default() } }
+    pub fn new(limit: usize) -> Self {
+        Pfifo {
+            queue: VecDeque::new(),
+            limit,
+            stats: QDiscStats::default(),
+        }
+    }
 }
 
 impl QDisc for Pfifo {
-    fn name(&self) -> &str { "pfifo" }
+    fn name(&self) -> &str {
+        "pfifo"
+    }
     fn enqueue(&mut self, pkt: QPacket) -> Result<(), QPacket> {
         if self.queue.len() >= self.limit {
             self.stats.dropped += 1;
@@ -63,11 +76,17 @@ impl QDisc for Pfifo {
     }
     fn dequeue(&mut self) -> Option<QPacket> {
         let p = self.queue.pop_front();
-        if p.is_some() { self.stats.dequeued += 1; }
+        if p.is_some() {
+            self.stats.dequeued += 1;
+        }
         p
     }
-    fn len(&self) -> usize { self.queue.len() }
-    fn stats(&self) -> QDiscStats { self.stats.clone() }
+    fn len(&self) -> usize {
+        self.queue.len()
+    }
+    fn stats(&self) -> QDiscStats {
+        self.stats.clone()
+    }
 }
 
 // ── pfifo_fast — Linux default: 3 priority bands ──────────────────────────
@@ -81,22 +100,32 @@ pub struct PfifoFast {
 
 impl PfifoFast {
     pub fn new(limit: usize) -> Self {
-        PfifoFast { bands: [VecDeque::new(), VecDeque::new(), VecDeque::new()], limit, total: 0, stats: QDiscStats::default() }
+        PfifoFast {
+            bands: [VecDeque::new(), VecDeque::new(), VecDeque::new()],
+            limit,
+            total: 0,
+            stats: QDiscStats::default(),
+        }
     }
 
     fn band(priority: u8) -> usize {
         match priority {
             6..=7 => 0, // Interactive
             3..=5 => 1, // Normal
-            _     => 2, // Bulk
+            _ => 2,     // Bulk
         }
     }
 }
 
 impl QDisc for PfifoFast {
-    fn name(&self) -> &str { "pfifo_fast" }
+    fn name(&self) -> &str {
+        "pfifo_fast"
+    }
     fn enqueue(&mut self, pkt: QPacket) -> Result<(), QPacket> {
-        if self.total >= self.limit { self.stats.dropped += 1; return Err(pkt); }
+        if self.total >= self.limit {
+            self.stats.dropped += 1;
+            return Err(pkt);
+        }
         let band = Self::band(pkt.priority);
         self.bands[band].push_back(pkt);
         self.total += 1;
@@ -113,8 +142,12 @@ impl QDisc for PfifoFast {
         }
         None
     }
-    fn len(&self) -> usize { self.total }
-    fn stats(&self) -> QDiscStats { self.stats.clone() }
+    fn len(&self) -> usize {
+        self.total
+    }
+    fn stats(&self) -> QDiscStats {
+        self.stats.clone()
+    }
 }
 
 // ── SFQ — Stochastic Fair Queueing ────────────────────────────────────────
@@ -142,7 +175,9 @@ impl Sfq {
 }
 
 impl QDisc for Sfq {
-    fn name(&self) -> &str { "sfq" }
+    fn name(&self) -> &str {
+        "sfq"
+    }
     fn enqueue(&mut self, pkt: QPacket) -> Result<(), QPacket> {
         // Hash bucket by priority (simplified - real SFQ uses 5-tuple hash)
         let bucket = pkt.priority as usize % self.num_buckets;
@@ -167,8 +202,12 @@ impl QDisc for Sfq {
         }
         None
     }
-    fn len(&self) -> usize { self.total }
-    fn stats(&self) -> QDiscStats { self.stats.clone() }
+    fn len(&self) -> usize {
+        self.total
+    }
+    fn stats(&self) -> QDiscStats {
+        self.stats.clone()
+    }
 }
 
 // ── Token Bucket Filter (TBF) — rate limiting ─────────────────────────────
@@ -183,7 +222,13 @@ pub struct Tbf {
 
 impl Tbf {
     pub fn new(inner: Box<dyn QDisc>, rate_bytes_per_tick: usize, burst_bytes: usize) -> Self {
-        Tbf { inner, rate_bytes_per_tick, bucket_tokens: burst_bytes, bucket_max: burst_bytes, stats: QDiscStats::default() }
+        Tbf {
+            inner,
+            rate_bytes_per_tick,
+            bucket_tokens: burst_bytes,
+            bucket_max: burst_bytes,
+            stats: QDiscStats::default(),
+        }
     }
 
     pub fn tick(&mut self) {
@@ -192,8 +237,12 @@ impl Tbf {
 }
 
 impl QDisc for Tbf {
-    fn name(&self) -> &str { "tbf" }
-    fn enqueue(&mut self, pkt: QPacket) -> Result<(), QPacket> { self.inner.enqueue(pkt) }
+    fn name(&self) -> &str {
+        "tbf"
+    }
+    fn enqueue(&mut self, pkt: QPacket) -> Result<(), QPacket> {
+        self.inner.enqueue(pkt)
+    }
     fn dequeue(&mut self) -> Option<QPacket> {
         if let Some(p) = self.inner.dequeue() {
             if self.bucket_tokens >= p.size {
@@ -208,15 +257,21 @@ impl QDisc for Tbf {
         }
         None
     }
-    fn len(&self) -> usize { self.inner.len() }
-    fn stats(&self) -> QDiscStats { self.stats.clone() }
+    fn len(&self) -> usize {
+        self.inner.len()
+    }
+    fn stats(&self) -> QDiscStats {
+        self.stats.clone()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn pkt(prio: u8) -> QPacket { QPacket::new(prio, vec![0u8; 100]) }
+    fn pkt(prio: u8) -> QPacket {
+        QPacket::new(prio, vec![0u8; 100])
+    }
 
     #[test]
     fn test_pfifo_basic() {
@@ -258,12 +313,12 @@ mod tests {
         let inner = Box::new(Pfifo::new(64));
         let mut tbf = Tbf::new(inner, 500, 1000); // 500 B/tick, 1KB burst
         tbf.enqueue(QPacket::new(0, vec![0u8; 800])).unwrap(); // 800B packet
-        // Has 1000 tokens → dequeues fine
+                                                               // Has 1000 tokens → dequeues fine
         assert!(tbf.dequeue().is_some());
         // Now 200 tokens left; enqueue 400B → not enough to dequeue
         tbf.enqueue(QPacket::new(0, vec![0u8; 400])).unwrap();
         assert!(tbf.dequeue().is_none()); // blocked by TBF
-        // Tick → add 500 tokens (200+500=700 ≥ 400)
+                                          // Tick → add 500 tokens (200+500=700 ≥ 400)
         tbf.tick();
         assert!(tbf.dequeue().is_some());
     }

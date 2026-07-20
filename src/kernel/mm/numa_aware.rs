@@ -1,6 +1,5 @@
 /// SigmaOS NUMA (Non-Uniform Memory Access) Topology manager
 /// Tracks NUMA nodes and handles node-local memory allocation preferences
-
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -89,7 +88,7 @@ mod tests {
         });
 
         assert_eq!(ntm.get_node_for_cpu(2), Some(1));
-        
+
         let alloc_node = ntm.allocate_node_local(2, 512).unwrap();
         assert_eq!(alloc_node, 1);
     }

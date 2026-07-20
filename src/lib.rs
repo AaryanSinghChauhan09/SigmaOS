@@ -25,16 +25,15 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod phase_l_plans;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod support;
-pub mod virtualization;
 pub mod unimplemented_features;
-pub mod phase_l_plans;
-
+pub mod virtualization;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -51,9 +50,9 @@ pub use community::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
-    StandardsComplianceManager, TargetPlatform, TranslationLayer,
-    IndianLanguage, LocalizationManager, LocalizationProvider,
+    ContainerRuntime, FhsConventionStatus, IndianLanguage, LocalizationManager,
+    LocalizationProvider, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+    TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -85,7 +84,8 @@ pub use education::{
     DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, SigmaFS, DagNode, HashId,
+    DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
+    VirtualFilesystem,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
@@ -102,11 +102,11 @@ pub use kernel::{
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
+pub use ml::{LLMInterface, ModelStatus, SigmaAid};
 pub use network::{
     DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError, TcpConnection, TcpError,
     TcpSegment, TcpStack, TcpState,
 };
-pub use ml::{SigmaAid, LLMInterface, ModelStatus};
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,

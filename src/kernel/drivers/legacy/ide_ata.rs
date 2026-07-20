@@ -1,49 +1,66 @@
+use crate::kernel::subsystems::registry::{
+    InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
+};
 /// SigmaOS Legacy Driver — IDE/ATA Controller (Linux 1.x–2.6 era)
 /// Absorbs full ATA-1 through ATA-7 specification support
 /// PIO modes 0-4, MWDMA, UDMA/133, LBA28/LBA48, master/slave topology
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
 use std::string::{String, ToString};
-use crate::kernel::subsystems::registry::{KernelSubsystem, InitOrder, SubsystemError, SubsystemPriority};
+use std::vec::Vec;
 
 pub const ATA_SECTOR_SIZE: usize = 512;
-pub const ATA_PRIMARY_BASE: u16   = 0x01F0;
+pub const ATA_PRIMARY_BASE: u16 = 0x01F0;
 pub const ATA_SECONDARY_BASE: u16 = 0x0170;
-pub const ATA_PRIMARY_IRQ: u8     = 14;
-pub const ATA_SECONDARY_IRQ: u8   = 15;
+pub const ATA_PRIMARY_IRQ: u8 = 14;
+pub const ATA_SECONDARY_IRQ: u8 = 15;
 
 /// ATA commands (from ATA-7 spec)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum AtaCommand {
-    ReadSectors         = 0x20,
-    ReadSectorsExt      = 0x24, // LBA48
-    WriteSectors        = 0x30,
-    WriteSectorsExt     = 0x34, // LBA48
-    Identify            = 0xEC,
-    IdentifyPacket      = 0xA1, // ATAPI
-    SetFeatures         = 0xEF,
-    ReadDmaExt          = 0x25,
-    WriteDmaExt         = 0x35,
-    FlushCache          = 0xE7,
-    FlushCacheExt       = 0xEA,
-    StandbyImmediate    = 0xE0,
-    CheckPowerMode      = 0xE5,
-    Nop                 = 0x00,
+    ReadSectors = 0x20,
+    ReadSectorsExt = 0x24, // LBA48
+    WriteSectors = 0x30,
+    WriteSectorsExt = 0x34, // LBA48
+    Identify = 0xEC,
+    IdentifyPacket = 0xA1, // ATAPI
+    SetFeatures = 0xEF,
+    ReadDmaExt = 0x25,
+    WriteDmaExt = 0x35,
+    FlushCache = 0xE7,
+    FlushCacheExt = 0xEA,
+    StandbyImmediate = 0xE0,
+    CheckPowerMode = 0xE5,
+    Nop = 0x00,
 }
 
 /// ATA transfer mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TransferMode {
-    Pio0, Pio1, Pio2, Pio3, Pio4,
-    Mwdma0, Mwdma1, Mwdma2,
-    Udma0, Udma1, Udma2, Udma3, Udma4, Udma5, Udma6, // UDMA/133
+    Pio0,
+    Pio1,
+    Pio2,
+    Pio3,
+    Pio4,
+    Mwdma0,
+    Mwdma1,
+    Mwdma2,
+    Udma0,
+    Udma1,
+    Udma2,
+    Udma3,
+    Udma4,
+    Udma5,
+    Udma6, // UDMA/133
 }
 
 /// ATA device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AtaDeviceType { Ata, Atapi, Unknown }
+pub enum AtaDeviceType {
+    Ata,
+    Atapi,
+    Unknown,
+}
 
 /// IDENTIFY DEVICE response (512 bytes / 256 words)
 #[derive(Debug, Clone)]
@@ -81,8 +98,8 @@ impl AtaIdentify {
 
 /// ATA drive (master or slave)
 pub struct AtaDrive {
-    pub channel: u8,     // 0 = primary, 1 = secondary
-    pub position: u8,    // 0 = master, 1 = slave
+    pub channel: u8,  // 0 = primary, 1 = secondary
+    pub position: u8, // 0 = master, 1 = slave
     pub identify: AtaIdentify,
     pub device_type: AtaDeviceType,
     pub present: bool,
@@ -113,10 +130,17 @@ impl AtaDrive {
         }
     }
 
-    pub fn read_sectors(&self, lba: u64, count: usize, buf: &mut Vec<u8>) -> Result<(), &'static str> {
+    pub fn read_sectors(
+        &self,
+        lba: u64,
+        count: usize,
+        buf: &mut Vec<u8>,
+    ) -> Result<(), &'static str> {
         for i in 0..count {
             let idx = (lba as usize) + i;
-            if idx >= self.data.len() { return Err("ATA: LBA out of range"); }
+            if idx >= self.data.len() {
+                return Err("ATA: LBA out of range");
+            }
             buf.extend_from_slice(&self.data[idx]);
             self.io_ops.fetch_add(1, Ordering::Relaxed);
         }
@@ -127,15 +151,21 @@ impl AtaDrive {
         let count = buf.len() / ATA_SECTOR_SIZE;
         for i in 0..count {
             let idx = (lba as usize) + i;
-            if idx >= self.data.len() { return Err("ATA: LBA out of range"); }
+            if idx >= self.data.len() {
+                return Err("ATA: LBA out of range");
+            }
             self.data[idx].copy_from_slice(&buf[i * ATA_SECTOR_SIZE..(i + 1) * ATA_SECTOR_SIZE]);
             self.io_ops.fetch_add(1, Ordering::Relaxed);
         }
         Ok(())
     }
 
-    pub fn io_count(&self) -> usize { self.io_ops.load(Ordering::Relaxed) }
-    pub fn is_lba48(&self) -> bool { self.identify.supports_lba48 }
+    pub fn io_count(&self) -> usize {
+        self.io_ops.load(Ordering::Relaxed)
+    }
+    pub fn is_lba48(&self) -> bool {
+        self.identify.supports_lba48
+    }
 }
 
 /// IDE channel (primary or secondary) — holds master + slave
@@ -148,14 +178,26 @@ pub struct IdeChannel {
 
 impl IdeChannel {
     pub fn primary() -> Self {
-        IdeChannel { base_io: ATA_PRIMARY_BASE, ctrl_io: 0x03F6, irq: ATA_PRIMARY_IRQ, drives: [None, None] }
+        IdeChannel {
+            base_io: ATA_PRIMARY_BASE,
+            ctrl_io: 0x03F6,
+            irq: ATA_PRIMARY_IRQ,
+            drives: [None, None],
+        }
     }
     pub fn secondary() -> Self {
-        IdeChannel { base_io: ATA_SECONDARY_BASE, ctrl_io: 0x0376, irq: ATA_SECONDARY_IRQ, drives: [None, None] }
+        IdeChannel {
+            base_io: ATA_SECONDARY_BASE,
+            ctrl_io: 0x0376,
+            irq: ATA_SECONDARY_IRQ,
+            drives: [None, None],
+        }
     }
 
     pub fn attach(&mut self, pos: usize, drive: AtaDrive) {
-        if pos < 2 { self.drives[pos] = Some(drive); }
+        if pos < 2 {
+            self.drives[pos] = Some(drive);
+        }
     }
 }
 
@@ -183,7 +225,9 @@ impl IdeAtaController {
         let mut count = 0usize;
         for ch in &self.channels {
             for drive in &ch.drives {
-                if drive.is_some() { count += 1; }
+                if drive.is_some() {
+                    count += 1;
+                }
             }
         }
         count
@@ -191,22 +235,36 @@ impl IdeAtaController {
 }
 
 impl KernelSubsystem for IdeAtaController {
-    fn name(&self) -> &str { "ide_ata" }
-    fn version(&self) -> &str { "2.0.0" }
-    fn init_order(&self) -> InitOrder { InitOrder::Device }
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::High }
-    fn dependencies(&self) -> Vec<&'static str> { vec!["isa_bus"] }
+    fn name(&self) -> &str {
+        "ide_ata"
+    }
+    fn version(&self) -> &str {
+        "2.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::Device
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::High
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["isa_bus"]
+    }
 
     fn initialize(&mut self) -> Result<(), SubsystemError> {
         self.initialized = true;
         self.reset();
         Ok(())
     }
-    fn shutdown(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn shutdown(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 }
 
 impl Default for IdeAtaController {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

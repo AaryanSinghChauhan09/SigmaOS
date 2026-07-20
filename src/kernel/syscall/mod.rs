@@ -4,6 +4,5 @@ pub mod table;
 // pub mod dispatch; // kept separate to avoid no_std conflict
 
 pub use table::{
-    SyscallTable, SyscallArgs, SyscallResult, SyscallError, SyscallNr,
-    SyscallHandler,
+    SyscallArgs, SyscallError, SyscallHandler, SyscallNr, SyscallResult, SyscallTable,
 };

@@ -1,8 +1,7 @@
+use core::sync::atomic::{AtomicU32, Ordering};
 /// SigmaOS Softirq and tasklets deferred execution engine
 /// Handles lower-priority interrupt bottom-half processing
-
 use std::collections::VecDeque;
-use core::sync::atomic::{AtomicU32, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SoftirqType {
@@ -94,11 +93,11 @@ mod tests {
     fn test_softirq_engine() {
         let mut engine = SoftirqEngine::new();
         engine.register_action(SoftirqType::Timer, mock_action);
-        
+
         engine.raise_softirq(SoftirqType::Timer);
         assert_eq!(engine.execute_pending(), 1);
         assert_eq!(CALLED_COUNT.load(Ordering::SeqCst), 1);
-        
+
         engine.queue_tasklet(mock_action);
         assert_eq!(engine.execute_pending(), 1);
         assert_eq!(CALLED_COUNT.load(Ordering::SeqCst), 2);

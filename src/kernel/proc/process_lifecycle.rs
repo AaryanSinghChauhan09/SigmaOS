@@ -1,12 +1,11 @@
+use crate::kernel::scheduler::{Priority, Process, ProcessState};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::time::Duration;
 /// SigmaOS Advanced Process Lifecycle Management
 /// Absorbs Linux fork/exec/exit/waitpid and Copy-on-Write semantics
-
 use std::collections::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::kernel::scheduler::{Process, ProcessState, Priority};
-use core::time::Duration;
 
 pub struct ProcessLifecycleManager {
     processes: HashMap<u64, Process>,
@@ -26,18 +25,21 @@ impl ProcessLifecycleManager {
     }
 
     pub fn fork(&mut self, parent_pid: u64) -> Result<u64, &'static str> {
-        let parent = self.processes.get(&parent_pid).ok_or("Parent process not found")?;
-        
+        let parent = self
+            .processes
+            .get(&parent_pid)
+            .ok_or("Parent process not found")?;
+
         let child_pid = self.next_pid.fetch_add(1, Ordering::SeqCst) as u64;
         let child_name = format!("{}_forked", parent.name);
-        
+
         let mut child = Process::new(child_pid, child_name, parent.priority);
         child.state = ProcessState::Ready;
         child.time_slice = parent.time_slice;
-        
+
         self.processes.insert(child_pid, child);
         self.parent_map.insert(child_pid, parent_pid);
-        
+
         Ok(child_pid)
     }
 
@@ -97,7 +99,7 @@ mod tests {
 
         let child_pid = manager.fork(1).unwrap();
         assert!(child_pid > 1);
-        
+
         let child = manager.get_process(child_pid).unwrap();
         assert_eq!(child.name, "init_forked");
 

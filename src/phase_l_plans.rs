@@ -55,7 +55,11 @@ pub mod zenithnet {
 
     impl NetworkPacketFrame {
         pub const fn empty() -> Self {
-            Self { data: [0u8; MTU], len: 0, checksum_ok: true }
+            Self {
+                data: [0u8; MTU],
+                len: 0,
+                checksum_ok: true,
+            }
         }
     }
 
@@ -116,7 +120,9 @@ pub mod zenithnet {
             Ok(())
         }
 
-        fn link_speed_mbps(&self) -> u32 { 1000 }
+        fn link_speed_mbps(&self) -> u32 {
+            1000
+        }
     }
 
     // ------------------------------------------------------------------
@@ -131,7 +137,11 @@ pub mod zenithnet {
 
     impl Rtl8139NetworkDriver {
         pub const fn new(io_port: u16) -> Self {
-            Self { io_port, rx_buf: [0u8; 8192], rx_cursor: 0 }
+            Self {
+                io_port,
+                rx_buf: [0u8; 8192],
+                rx_cursor: 0,
+            }
         }
     }
 
@@ -145,13 +155,17 @@ pub mod zenithnet {
             Ok(())
         }
 
-        fn poll_receive_ring(&mut self) -> Option<NetworkPacketFrame> { None }
+        fn poll_receive_ring(&mut self) -> Option<NetworkPacketFrame> {
+            None
+        }
 
         fn configure_dma_ring(&mut self, _rx: u64, _tx: u64) -> Result<(), NetworkError> {
             Ok(())
         }
 
-        fn link_speed_mbps(&self) -> u32 { 100 }
+        fn link_speed_mbps(&self) -> u32 {
+            100
+        }
     }
 
     // ------------------------------------------------------------------
@@ -160,8 +174,16 @@ pub mod zenithnet {
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TcpState {
-        Closed, Listen, SynSent, SynReceived, Established,
-        FinWait1, FinWait2, CloseWait, LastAck, TimeWait,
+        Closed,
+        Listen,
+        SynSent,
+        SynReceived,
+        Established,
+        FinWait1,
+        FinWait2,
+        CloseWait,
+        LastAck,
+        TimeWait,
     }
 
     #[derive(Debug, Clone, Copy)]
@@ -214,7 +236,10 @@ pub mod zenithnet {
 
     impl TcpStack {
         pub const fn new() -> Self {
-            Self { connections: [None; MAX_CONNECTIONS], count: 0 }
+            Self {
+                connections: [None; MAX_CONNECTIONS],
+                count: 0,
+            }
         }
 
         pub fn open(&mut self, local: u16, ip: u32, remote: u16) -> Result<usize, NetworkError> {
@@ -243,13 +268,16 @@ pub mod zenithnet {
 
     /// Kyber-1024 KEM ciphertext placeholder.
     pub struct SovereignGuardTun {
-        pub kyber_ct: [u8; 1568],   // Kyber-1024 ciphertext size
+        pub kyber_ct: [u8; 1568], // Kyber-1024 ciphertext size
         pub active: bool,
     }
 
     impl SovereignGuardTun {
         pub const fn new() -> Self {
-            Self { kyber_ct: [0u8; 1568], active: false }
+            Self {
+                kyber_ct: [0u8; 1568],
+                active: false,
+            }
         }
 
         pub fn establish(&mut self, preshared: &[u8; 32]) -> Result<(), NetworkError> {
@@ -259,7 +287,9 @@ pub mod zenithnet {
             Ok(())
         }
 
-        pub fn is_active(&self) -> bool { self.active }
+        pub fn is_active(&self) -> bool {
+            self.active
+        }
     }
 
     // ------------------------------------------------------------------
@@ -349,11 +379,11 @@ pub mod sovereign_vmm {
     pub struct CapToken(pub u64);
 
     impl CapToken {
-        pub const STDIO:   CapToken = CapToken(0b0000_0001);
+        pub const STDIO: CapToken = CapToken(0b0000_0001);
         pub const NETWORK: CapToken = CapToken(0b0000_0010);
         pub const STORAGE: CapToken = CapToken(0b0000_0100);
-        pub const EXEC:    CapToken = CapToken(0b0000_1000);
-        pub const ALL:     CapToken = CapToken(0b1111_1111);
+        pub const EXEC: CapToken = CapToken(0b0000_1000);
+        pub const ALL: CapToken = CapToken(0b1111_1111);
 
         pub fn has(&self, other: CapToken) -> bool {
             self.0 & other.0 == other.0
@@ -369,10 +399,18 @@ pub mod sovereign_vmm {
     // ------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum HypervisorBackend { IntelVtx, AmdV }
+    pub enum HypervisorBackend {
+        IntelVtx,
+        AmdV,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum VmState { Halted, Running, Paused, Error }
+    pub enum VmState {
+        Halted,
+        Running,
+        Paused,
+        Error,
+    }
 
     #[derive(Debug, Clone, Copy)]
     pub struct MicroVm {
@@ -385,7 +423,12 @@ pub mod sovereign_vmm {
     }
 
     impl MicroVm {
-        pub const fn new(id: u32, phys_base: u64, mem_size: usize, backend: HypervisorBackend) -> Self {
+        pub const fn new(
+            id: u32,
+            phys_base: u64,
+            mem_size: usize,
+            backend: HypervisorBackend,
+        ) -> Self {
             Self {
                 id,
                 guest_phys_base: phys_base,
@@ -433,14 +476,21 @@ pub mod sovereign_vmm {
     impl NestedPageTable {
         pub const fn new() -> Self {
             // SAFETY: Option<NestedPageEntry> is None by value-init
-            Self { entries: [const { None }; MAX_NESTED_PAGES], count: 0 }
+            Self {
+                entries: [const { None }; MAX_NESTED_PAGES],
+                count: 0,
+            }
         }
 
         pub fn map(&mut self, guest: u64, host: u64, flags: u8) -> Result<(), &'static str> {
             if self.count >= MAX_NESTED_PAGES {
                 return Err("NPT full");
             }
-            self.entries[self.count] = Some(NestedPageEntry { guest_phys: guest, host_phys: host, flags });
+            self.entries[self.count] = Some(NestedPageEntry {
+                guest_phys: guest,
+                host_phys: host,
+                flags,
+            });
             self.count += 1;
             Ok(())
         }
@@ -468,7 +518,10 @@ pub mod sovereign_vmm {
 
     impl PledgeManager {
         pub const fn new() -> Self {
-            Self { tokens: [CapToken::ALL; MAX_CONTAINERS], count: 0 }
+            Self {
+                tokens: [CapToken::ALL; MAX_CONTAINERS],
+                count: 0,
+            }
         }
 
         pub fn pledge(&mut self, allowed: CapToken) -> usize {
@@ -481,7 +534,9 @@ pub mod sovereign_vmm {
         }
 
         pub fn check(&self, id: usize, required: CapToken) -> bool {
-            if id >= self.count { return false; }
+            if id >= self.count {
+                return false;
+            }
             self.tokens[id].has(required)
         }
 
@@ -533,7 +588,11 @@ pub mod sovereign_vmm {
 
         pub fn get_vm(&self, id: u32) -> Option<&MicroVm> {
             let idx = id as usize;
-            if idx < self.vm_count { self.vms[idx].as_ref() } else { None }
+            if idx < self.vm_count {
+                self.vms[idx].as_ref()
+            } else {
+                None
+            }
         }
     }
 
@@ -563,7 +622,12 @@ pub mod sovereign_vmm {
 
         #[test]
         fn test_micro_vm_lifecycle() {
-            let mut vm = MicroVm::new(0, 0x1000_0000, 64 * 1024 * 1024, HypervisorBackend::IntelVtx);
+            let mut vm = MicroVm::new(
+                0,
+                0x1000_0000,
+                64 * 1024 * 1024,
+                HypervisorBackend::IntelVtx,
+            );
             assert_eq!(vm.state, VmState::Halted);
             vm.start().unwrap();
             assert_eq!(vm.state, VmState::Running);
@@ -596,7 +660,9 @@ pub mod sovereign_vmm {
         #[test]
         fn test_sovereign_vmm_core() {
             let mut vmm = SovereignVmmCore::new();
-            let id = vmm.launch_vm(0x2000_0000, 128 * 1024 * 1024, HypervisorBackend::AmdV).unwrap();
+            let id = vmm
+                .launch_vm(0x2000_0000, 128 * 1024 * 1024, HypervisorBackend::AmdV)
+                .unwrap();
             let vm = vmm.get_vm(id).unwrap();
             assert_eq!(vm.state, VmState::Running);
             assert_eq!(vm.backend, HypervisorBackend::AmdV);
@@ -647,7 +713,10 @@ pub mod sovereign_browser {
         fn load_url(&mut self, url: &[u8]) -> Result<(), BrowserError>;
         fn render_to_framebuffer(&mut self) -> Result<(), BrowserError>;
         fn inject_booster(&mut self, script_udf: &[u8]) -> Result<(), BrowserError>;
-        fn transition_security_profile(&mut self, profile: SecurityProfile) -> Result<(), BrowserError>;
+        fn transition_security_profile(
+            &mut self,
+            profile: SecurityProfile,
+        ) -> Result<(), BrowserError>;
     }
 
     // ------------------------------------------------------------------
@@ -689,7 +758,9 @@ pub mod sovereign_browser {
         }
 
         fn render_to_framebuffer(&mut self) -> Result<(), BrowserError> {
-            if !self.active { return Err(BrowserError::RenderFailed); }
+            if !self.active {
+                return Err(BrowserError::RenderFailed);
+            }
             // Simulated: blit into VESA framebuffer
             Ok(())
         }
@@ -702,7 +773,10 @@ pub mod sovereign_browser {
             Ok(())
         }
 
-        fn transition_security_profile(&mut self, profile: SecurityProfile) -> Result<(), BrowserError> {
+        fn transition_security_profile(
+            &mut self,
+            profile: SecurityProfile,
+        ) -> Result<(), BrowserError> {
             self.profile = profile;
             if profile == SecurityProfile::Incognito || profile == SecurityProfile::TorRouted {
                 // Wipe session data
@@ -728,11 +802,17 @@ pub mod sovereign_browser {
 
     impl AdBlockEngine {
         pub const fn new() -> Self {
-            Self { rules: [[0u8; 64]; MAX_BLOCK_RULES], rule_lens: [0usize; MAX_BLOCK_RULES], count: 0 }
+            Self {
+                rules: [[0u8; 64]; MAX_BLOCK_RULES],
+                rule_lens: [0usize; MAX_BLOCK_RULES],
+                count: 0,
+            }
         }
 
         pub fn add_rule(&mut self, pattern: &[u8]) -> bool {
-            if self.count >= MAX_BLOCK_RULES || pattern.len() > 64 { return false; }
+            if self.count >= MAX_BLOCK_RULES || pattern.len() > 64 {
+                return false;
+            }
             self.rules[self.count][..pattern.len()].copy_from_slice(pattern);
             self.rule_lens[self.count] = pattern.len();
             self.count += 1;
@@ -770,7 +850,9 @@ pub mod sovereign_browser {
         }
 
         pub fn open_tab(&mut self) -> Result<usize, BrowserError> {
-            if self.tab_count >= MAX_TABS { return Err(BrowserError::TabFull); }
+            if self.tab_count >= MAX_TABS {
+                return Err(BrowserError::TabFull);
+            }
             let id = self.tab_count as u32;
             self.tabs[self.tab_count] = Some(BrowserTab::new(id));
             self.tab_count += 1;
@@ -816,7 +898,8 @@ pub mod sovereign_browser {
         fn test_incognito_clears_state() {
             let mut tab = BrowserTab::new(2);
             tab.load_url(b"https://sigma.os").unwrap();
-            tab.transition_security_profile(SecurityProfile::Incognito).unwrap();
+            tab.transition_security_profile(SecurityProfile::Incognito)
+                .unwrap();
             assert_eq!(tab.url_len, 0);
             assert_eq!(tab.profile, SecurityProfile::Incognito);
         }
@@ -858,7 +941,10 @@ pub mod sovereign_browser {
             let small_udf = [0u8; 512];
             tab.inject_booster(&small_udf).unwrap();
             let huge_udf = [0u8; 4096];
-            assert_eq!(tab.inject_booster(&huge_udf), Err(BrowserError::UdfTooLarge));
+            assert_eq!(
+                tab.inject_booster(&huge_udf),
+                Err(BrowserError::UdfTooLarge)
+            );
         }
     }
 }
@@ -876,17 +962,27 @@ pub mod sovereign_sched {
     // ------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-    pub enum CoreType { Performance, Efficiency, Gpu, Npu }
+    pub enum CoreType {
+        Performance,
+        Efficiency,
+        Gpu,
+        Npu,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum ThreadState { Runnable, Sleeping, Blocked, Zombie }
+    pub enum ThreadState {
+        Runnable,
+        Sleeping,
+        Blocked,
+        Zombie,
+    }
 
     #[derive(Debug, Clone, Copy)]
     pub struct Thread {
         pub tid: u32,
-        pub priority: u8,          // 0 = highest
-        pub deadline: u64,         // EEVDF virtual deadline
-        pub vruntime: u64,         // CFS virtual runtime
+        pub priority: u8,  // 0 = highest
+        pub deadline: u64, // EEVDF virtual deadline
+        pub vruntime: u64, // CFS virtual runtime
         pub core_affinity: CoreType,
         pub state: ThreadState,
         pub cpu_usage_ns: u64,
@@ -923,11 +1019,17 @@ pub mod sovereign_sched {
 
     impl EevdfScheduler {
         pub const fn new() -> Self {
-            Self { threads: [const { None }; MAX_THREADS], count: 0, current_tick: 0 }
+            Self {
+                threads: [const { None }; MAX_THREADS],
+                count: 0,
+                current_tick: 0,
+            }
         }
 
         pub fn add_thread(&mut self, thread: Thread) -> Result<(), &'static str> {
-            if self.count >= MAX_THREADS { return Err("Thread table full"); }
+            if self.count >= MAX_THREADS {
+                return Err("Thread table full");
+            }
             self.threads[self.count] = Some(thread);
             self.count += 1;
             Ok(())
@@ -962,7 +1064,10 @@ pub mod sovereign_sched {
         pub fn set_state(&mut self, tid: u32, state: ThreadState) {
             for i in 0..self.count {
                 if let Some(ref mut t) = self.threads[i] {
-                    if t.tid == tid { t.state = state; return; }
+                    if t.tid == tid {
+                        t.state = state;
+                        return;
+                    }
                 }
             }
         }
@@ -973,7 +1078,13 @@ pub mod sovereign_sched {
     // ------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum ServiceState { Down, Starting, Up, Crashed, Restarting }
+    pub enum ServiceState {
+        Down,
+        Starting,
+        Up,
+        Crashed,
+        Restarting,
+    }
 
     #[derive(Debug, Clone, Copy)]
     pub struct ServiceDescriptor {
@@ -986,10 +1097,18 @@ pub mod sovereign_sched {
 
     impl ServiceDescriptor {
         pub const fn new(id: u32, name: [u8; 32], max_restarts: u32) -> Self {
-            Self { id, name, state: ServiceState::Down, restart_count: 0, max_restarts }
+            Self {
+                id,
+                name,
+                state: ServiceState::Down,
+                restart_count: 0,
+                max_restarts,
+            }
         }
 
-        pub fn start(&mut self) { self.state = ServiceState::Up; }
+        pub fn start(&mut self) {
+            self.state = ServiceState::Up;
+        }
 
         pub fn crash(&mut self) -> bool {
             self.state = ServiceState::Crashed;
@@ -1010,11 +1129,21 @@ pub mod sovereign_sched {
 
     impl SInitSupervisor {
         pub const fn new() -> Self {
-            Self { services: [const { None }; MAX_SERVICES], count: 0 }
+            Self {
+                services: [const { None }; MAX_SERVICES],
+                count: 0,
+            }
         }
 
-        pub fn register(&mut self, id: u32, name: &[u8], max_restarts: u32) -> Result<(), &'static str> {
-            if self.count >= MAX_SERVICES { return Err("Supervisor table full"); }
+        pub fn register(
+            &mut self,
+            id: u32,
+            name: &[u8],
+            max_restarts: u32,
+        ) -> Result<(), &'static str> {
+            if self.count >= MAX_SERVICES {
+                return Err("Supervisor table full");
+            }
             let mut n = [0u8; 32];
             let len = name.len().min(32);
             n[..len].copy_from_slice(&name[..len]);
@@ -1037,7 +1166,10 @@ pub mod sovereign_sched {
         pub fn start_service(&mut self, id: u32) {
             for i in 0..self.count {
                 if let Some(ref mut svc) = self.services[i] {
-                    if svc.id == id { svc.start(); return; }
+                    if svc.id == id {
+                        svc.start();
+                        return;
+                    }
                 }
             }
         }
@@ -1131,7 +1263,11 @@ pub mod sigmafs_extended {
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum StorageError {
-        DeviceFull, InvalidBlock, ChecksumMismatch, JournalFull, IoError,
+        DeviceFull,
+        InvalidBlock,
+        ChecksumMismatch,
+        JournalFull,
+        IoError,
     }
 
     pub trait BlockStorageDevice {
@@ -1153,25 +1289,37 @@ pub mod sigmafs_extended {
 
     impl NvmeStorageController {
         pub const fn new(base: u64, capacity: u64) -> Self {
-            Self { base_addr: base, capacity_sectors: capacity, blocks: [[0u8; BLOCK_SIZE]; 16] }
+            Self {
+                base_addr: base,
+                capacity_sectors: capacity,
+                blocks: [[0u8; BLOCK_SIZE]; 16],
+            }
         }
     }
 
     impl BlockStorageDevice for NvmeStorageController {
         fn read_sector(&self, lba: u64, buf: &mut [u8; BLOCK_SIZE]) -> Result<(), StorageError> {
-            if lba >= 16 { return Err(StorageError::InvalidBlock); }
+            if lba >= 16 {
+                return Err(StorageError::InvalidBlock);
+            }
             *buf = self.blocks[lba as usize];
             Ok(())
         }
 
         fn write_sector(&mut self, lba: u64, data: &[u8; BLOCK_SIZE]) -> Result<(), StorageError> {
-            if lba >= 16 { return Err(StorageError::InvalidBlock); }
+            if lba >= 16 {
+                return Err(StorageError::InvalidBlock);
+            }
             self.blocks[lba as usize] = *data;
             Ok(())
         }
 
-        fn sector_count(&self) -> u64 { self.capacity_sectors }
-        fn device_name(&self) -> &'static str { "NVMe-M.2" }
+        fn sector_count(&self) -> u64 {
+            self.capacity_sectors
+        }
+        fn device_name(&self) -> &'static str {
+            "NVMe-M.2"
+        }
     }
 
     // ------------------------------------------------------------------
@@ -1208,10 +1356,18 @@ pub mod sigmafs_extended {
 
     impl MerkleNode {
         pub const fn leaf(lba: u64, hash: [u8; 32]) -> Self {
-            Self { hash, lba, child_left: None, child_right: None, is_dirty: false }
+            Self {
+                hash,
+                lba,
+                child_left: None,
+                child_right: None,
+                is_dirty: false,
+            }
         }
 
-        pub fn mark_dirty(&mut self) { self.is_dirty = true; }
+        pub fn mark_dirty(&mut self) {
+            self.is_dirty = true;
+        }
 
         pub fn update_hash(&mut self, data: &[u8; BLOCK_SIZE]) {
             let crc = crc32c_block(data);
@@ -1225,7 +1381,11 @@ pub mod sigmafs_extended {
     // ------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum JournalBlockType { Descriptor, Commit, Revoke }
+    pub enum JournalBlockType {
+        Descriptor,
+        Commit,
+        Revoke,
+    }
 
     #[derive(Debug, Clone, Copy)]
     pub struct JournalEntry {
@@ -1242,11 +1402,21 @@ pub mod sigmafs_extended {
 
     impl TransactionJournal {
         pub const fn new() -> Self {
-            Self { entries: [const { None }; JOURNAL_CAPACITY], head: 0, committed: 0 }
+            Self {
+                entries: [const { None }; JOURNAL_CAPACITY],
+                head: 0,
+                committed: 0,
+            }
         }
 
-        pub fn begin_write(&mut self, lba: u64, data: &[u8; BLOCK_SIZE]) -> Result<(), StorageError> {
-            if self.head >= JOURNAL_CAPACITY { return Err(StorageError::JournalFull); }
+        pub fn begin_write(
+            &mut self,
+            lba: u64,
+            data: &[u8; BLOCK_SIZE],
+        ) -> Result<(), StorageError> {
+            if self.head >= JOURNAL_CAPACITY {
+                return Err(StorageError::JournalFull);
+            }
             let crc = crc32c_block(data);
             self.entries[self.head] = Some(JournalEntry {
                 block_type: JournalBlockType::Descriptor,
@@ -1258,7 +1428,9 @@ pub mod sigmafs_extended {
         }
 
         pub fn commit(&mut self) -> Result<(), StorageError> {
-            if self.head >= JOURNAL_CAPACITY { return Err(StorageError::JournalFull); }
+            if self.head >= JOURNAL_CAPACITY {
+                return Err(StorageError::JournalFull);
+            }
             self.entries[self.head] = Some(JournalEntry {
                 block_type: JournalBlockType::Commit,
                 lba: 0,
@@ -1270,10 +1442,15 @@ pub mod sigmafs_extended {
         }
 
         pub fn verify_last_commit(&self) -> bool {
-            if self.committed == 0 { return false; }
+            if self.committed == 0 {
+                return false;
+            }
             matches!(
                 self.entries[self.committed - 1],
-                Some(JournalEntry { block_type: JournalBlockType::Commit, .. })
+                Some(JournalEntry {
+                    block_type: JournalBlockType::Commit,
+                    ..
+                })
             )
         }
 
@@ -1295,7 +1472,8 @@ pub mod sigmafs_extended {
         fn test_nvme_read_write() {
             let mut nvme = NvmeStorageController::new(0xFEED_0000, 1024);
             let mut write_buf = [0u8; BLOCK_SIZE];
-            write_buf[0] = 0xDE; write_buf[1] = 0xAD;
+            write_buf[0] = 0xDE;
+            write_buf[1] = 0xAD;
             nvme.write_sector(0, &write_buf).unwrap();
             let mut read_buf = [0u8; BLOCK_SIZE];
             nvme.read_sector(0, &mut read_buf).unwrap();
@@ -1307,7 +1485,10 @@ pub mod sigmafs_extended {
         fn test_nvme_invalid_lba() {
             let nvme = NvmeStorageController::new(0, 512);
             let mut buf = [0u8; BLOCK_SIZE];
-            assert_eq!(nvme.read_sector(999, &mut buf), Err(StorageError::InvalidBlock));
+            assert_eq!(
+                nvme.read_sector(999, &mut buf),
+                Err(StorageError::InvalidBlock)
+            );
         }
 
         #[test]
@@ -1353,7 +1534,10 @@ pub mod sigmafs_extended {
             for _ in 0..JOURNAL_CAPACITY {
                 let _ = journal.begin_write(0, &block);
             }
-            assert_eq!(journal.begin_write(0, &block), Err(StorageError::JournalFull));
+            assert_eq!(
+                journal.begin_write(0, &block),
+                Err(StorageError::JournalFull)
+            );
         }
     }
 }
@@ -1378,13 +1562,17 @@ pub mod s_ai_engine {
 
     impl<const R: usize, const C: usize> Matrix<R, C> {
         pub const fn zeros() -> Self {
-            Self { data: [[0.0f32; C]; R] }
+            Self {
+                data: [[0.0f32; C]; R],
+            }
         }
 
         pub fn relu(&mut self) {
             for row in self.data.iter_mut() {
                 for v in row.iter_mut() {
-                    if *v < 0.0 { *v = 0.0; }
+                    if *v < 0.0 {
+                        *v = 0.0;
+                    }
                 }
             }
         }
@@ -1430,7 +1618,12 @@ pub mod s_ai_engine {
 
     impl KvSlot {
         pub const fn empty() -> Self {
-            Self { key: [0.0f32; TENSOR_DIM], value: [0.0f32; TENSOR_DIM], valid: false, token_id: 0 }
+            Self {
+                key: [0.0f32; TENSOR_DIM],
+                value: [0.0f32; TENSOR_DIM],
+                valid: false,
+                token_id: 0,
+            }
         }
     }
 
@@ -1441,17 +1634,27 @@ pub mod s_ai_engine {
 
     impl KvCache {
         pub const fn new() -> Self {
-            Self { slots: [KvSlot::empty(); KV_CACHE_SLOTS], cursor: 0 }
+            Self {
+                slots: [KvSlot::empty(); KV_CACHE_SLOTS],
+                cursor: 0,
+            }
         }
 
         pub fn insert(&mut self, token_id: u32, key: [f32; TENSOR_DIM], value: [f32; TENSOR_DIM]) {
             let idx = self.cursor % KV_CACHE_SLOTS;
-            self.slots[idx] = KvSlot { key, value, valid: true, token_id };
+            self.slots[idx] = KvSlot {
+                key,
+                value,
+                valid: true,
+                token_id,
+            };
             self.cursor += 1;
         }
 
         pub fn lookup(&self, token_id: u32) -> Option<&KvSlot> {
-            self.slots.iter().find(|s| s.valid && s.token_id == token_id)
+            self.slots
+                .iter()
+                .find(|s| s.valid && s.token_id == token_id)
         }
 
         pub fn evict_oldest(&mut self) {
@@ -1465,23 +1668,40 @@ pub mod s_ai_engine {
     // ------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum AgentTaskType { Research, Coding, Automation, Summarization, Search }
+    pub enum AgentTaskType {
+        Research,
+        Coding,
+        Automation,
+        Summarization,
+        Search,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum AgentStatus { Idle, Running, Completed, Failed }
+    pub enum AgentStatus {
+        Idle,
+        Running,
+        Completed,
+        Failed,
+    }
 
     #[derive(Debug, Clone, Copy)]
     pub struct AgentTask {
         pub id: u32,
         pub task_type: AgentTaskType,
         pub status: AgentStatus,
-        pub model_size_b: u32,   // billions of parameters
+        pub model_size_b: u32, // billions of parameters
         pub tokens_processed: u64,
     }
 
     impl AgentTask {
         pub const fn new(id: u32, task_type: AgentTaskType, model_size_b: u32) -> Self {
-            Self { id, task_type, status: AgentStatus::Idle, model_size_b, tokens_processed: 0 }
+            Self {
+                id,
+                task_type,
+                status: AgentStatus::Idle,
+                model_size_b,
+                tokens_processed: 0,
+            }
         }
 
         pub fn run(&mut self, tokens: u64) {
@@ -1507,7 +1727,9 @@ pub mod s_ai_engine {
         }
 
         pub fn spawn(&mut self, task: AgentTask) -> Result<usize, &'static str> {
-            if self.count >= MAX_AGENTS { return Err("Agent pool full"); }
+            if self.count >= MAX_AGENTS {
+                return Err("Agent pool full");
+            }
             self.agents[self.count] = Some(task);
             self.count += 1;
             Ok(self.count - 1)
@@ -1522,7 +1744,15 @@ pub mod s_ai_engine {
         pub fn completed_count(&self) -> usize {
             self.agents[..self.count]
                 .iter()
-                .filter(|a| matches!(a, Some(AgentTask { status: AgentStatus::Completed, .. })))
+                .filter(|a| {
+                    matches!(
+                        a,
+                        Some(AgentTask {
+                            status: AgentStatus::Completed,
+                            ..
+                        })
+                    )
+                })
                 .count()
         }
     }
@@ -1538,8 +1768,10 @@ pub mod s_ai_engine {
         #[test]
         fn test_matrix_relu() {
             let mut m = Matrix::<2, 2>::zeros();
-            m.data[0][0] = -1.0; m.data[0][1] = 2.0;
-            m.data[1][0] = -3.0; m.data[1][1] = 4.0;
+            m.data[0][0] = -1.0;
+            m.data[0][1] = 2.0;
+            m.data[1][0] = -3.0;
+            m.data[1][1] = 4.0;
             m.relu();
             assert_eq!(m.data[0][0], 0.0);
             assert_eq!(m.data[0][1], 2.0);
@@ -1549,7 +1781,8 @@ pub mod s_ai_engine {
         #[test]
         fn test_matrix_scale() {
             let mut m = Matrix::<2, 2>::zeros();
-            m.data[0][0] = 2.0; m.data[1][1] = 3.0;
+            m.data[0][0] = 2.0;
+            m.data[1][1] = 3.0;
             m.scale(2.0);
             assert!((m.data[0][0] - 4.0).abs() < 1e-6);
             assert!((m.data[1][1] - 6.0).abs() < 1e-6);
@@ -1558,9 +1791,11 @@ pub mod s_ai_engine {
         #[test]
         fn test_matmul_identity() {
             let mut a = Matrix::<2, 2>::zeros();
-            a.data[0][0] = 1.0; a.data[1][1] = 1.0;
+            a.data[0][0] = 1.0;
+            a.data[1][1] = 1.0;
             let mut b = Matrix::<2, 2>::zeros();
-            b.data[0][0] = 5.0; b.data[1][1] = 7.0;
+            b.data[0][0] = 5.0;
+            b.data[1][1] = 7.0;
             let c = matmul(&a, &b);
             assert!((c.data[0][0] - 5.0).abs() < 1e-6);
             assert!((c.data[1][1] - 7.0).abs() < 1e-6);
@@ -1597,8 +1832,10 @@ pub mod s_ai_engine {
         #[test]
         fn test_multi_agent_orchestration() {
             let mut orch = AgentOrchestrator::new();
-            orch.spawn(AgentTask::new(1, AgentTaskType::Research, 70)).unwrap();
-            orch.spawn(AgentTask::new(2, AgentTaskType::Summarization, 8)).unwrap();
+            orch.spawn(AgentTask::new(1, AgentTaskType::Research, 70))
+                .unwrap();
+            orch.spawn(AgentTask::new(2, AgentTaskType::Summarization, 8))
+                .unwrap();
             orch.route_and_run(0, 2048);
             orch.route_and_run(1, 512);
             assert_eq!(orch.completed_count(), 2);
@@ -1608,7 +1845,8 @@ pub mod s_ai_engine {
         fn test_agent_pool_full() {
             let mut orch = AgentOrchestrator::new();
             for i in 0..MAX_AGENTS {
-                orch.spawn(AgentTask::new(i as u32, AgentTaskType::Search, 1)).unwrap();
+                orch.spawn(AgentTask::new(i as u32, AgentTaskType::Search, 1))
+                    .unwrap();
             }
             let result = orch.spawn(AgentTask::new(999, AgentTaskType::Search, 1));
             assert!(result.is_err());
@@ -1631,7 +1869,11 @@ pub mod s_cosmos {
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum LoaderError {
-        InvalidMagic, TooManySegments, SegmentTooLarge, ApiUnresolved, UnsupportedFormat,
+        InvalidMagic,
+        TooManySegments,
+        SegmentTooLarge,
+        ApiUnresolved,
+        UnsupportedFormat,
     }
 
     #[derive(Debug, Clone, Copy)]
@@ -1639,7 +1881,7 @@ pub mod s_cosmos {
         pub virtual_addr: u64,
         pub file_offset: u32,
         pub size: u32,
-        pub flags: u8,   // 0b001=executable, 0b010=readable, 0b100=writable
+        pub flags: u8, // 0b001=executable, 0b010=readable, 0b100=writable
     }
 
     pub struct PeBinaryLoader {
@@ -1660,7 +1902,9 @@ pub mod s_cosmos {
         }
 
         pub fn parse_header(&mut self, data: &[u8]) -> Result<(), LoaderError> {
-            if data.len() < 4 { return Err(LoaderError::InvalidMagic); }
+            if data.len() < 4 {
+                return Err(LoaderError::InvalidMagic);
+            }
             // PE magic: 0x4D 0x5A ("MZ")
             if data[0] != 0x4D || data[1] != 0x5A {
                 return Err(LoaderError::InvalidMagic);
@@ -1674,7 +1918,9 @@ pub mod s_cosmos {
         }
 
         pub fn map_segment(&mut self, seg: PeSegment) -> Result<(), LoaderError> {
-            if self.seg_count >= MAX_SEGMENTS { return Err(LoaderError::TooManySegments); }
+            if self.seg_count >= MAX_SEGMENTS {
+                return Err(LoaderError::TooManySegments);
+            }
             self.segments[self.seg_count] = Some(seg);
             self.seg_count += 1;
             Ok(())
@@ -1687,8 +1933,8 @@ pub mod s_cosmos {
 
     #[derive(Debug, Clone, Copy)]
     pub struct ApiTranslation {
-        pub win32_hash: u64,      // FNV-1a hash of Win32 API name
-        pub sigma_syscall: u32,   // Corresponding SigmaOS syscall number
+        pub win32_hash: u64,    // FNV-1a hash of Win32 API name
+        pub sigma_syscall: u32, // Corresponding SigmaOS syscall number
     }
 
     pub struct Win32TranslationTable {
@@ -1698,7 +1944,10 @@ pub mod s_cosmos {
 
     impl Win32TranslationTable {
         pub const fn new() -> Self {
-            Self { entries: [const { None }; MAX_API_MAPS], count: 0 }
+            Self {
+                entries: [const { None }; MAX_API_MAPS],
+                count: 0,
+            }
         }
 
         fn fnv1a(s: &[u8]) -> u64 {
@@ -1710,10 +1959,19 @@ pub mod s_cosmos {
             hash
         }
 
-        pub fn register(&mut self, win32_name: &[u8], sigma_syscall: u32) -> Result<(), &'static str> {
-            if self.count >= MAX_API_MAPS { return Err("Translation table full"); }
+        pub fn register(
+            &mut self,
+            win32_name: &[u8],
+            sigma_syscall: u32,
+        ) -> Result<(), &'static str> {
+            if self.count >= MAX_API_MAPS {
+                return Err("Translation table full");
+            }
             let hash = Self::fnv1a(win32_name);
-            self.entries[self.count] = Some(ApiTranslation { win32_hash: hash, sigma_syscall });
+            self.entries[self.count] = Some(ApiTranslation {
+                win32_hash: hash,
+                sigma_syscall,
+            });
             self.count += 1;
             Ok(())
         }
@@ -1751,11 +2009,17 @@ pub mod s_cosmos {
 
     impl MachoLoader {
         pub const fn new() -> Self {
-            Self { segments: [const { None }; MAX_SEGMENTS], seg_count: 0, entry_point: 0 }
+            Self {
+                segments: [const { None }; MAX_SEGMENTS],
+                seg_count: 0,
+                entry_point: 0,
+            }
         }
 
         pub fn parse_header(&mut self, data: &[u8]) -> Result<(), LoaderError> {
-            if data.len() < 4 { return Err(LoaderError::InvalidMagic); }
+            if data.len() < 4 {
+                return Err(LoaderError::InvalidMagic);
+            }
             // Mach-O magic: 0xCF 0xFA 0xED 0xFE (64-bit little-endian)
             if data[0] != 0xCF || data[1] != 0xFA || data[2] != 0xED || data[3] != 0xFE {
                 return Err(LoaderError::InvalidMagic);
@@ -1764,7 +2028,9 @@ pub mod s_cosmos {
         }
 
         pub fn add_segment(&mut self, seg: MachoSegment) -> Result<(), LoaderError> {
-            if self.seg_count >= MAX_SEGMENTS { return Err(LoaderError::TooManySegments); }
+            if self.seg_count >= MAX_SEGMENTS {
+                return Err(LoaderError::TooManySegments);
+            }
             self.segments[self.seg_count] = Some(seg);
             self.seg_count += 1;
             Ok(())
@@ -1779,7 +2045,7 @@ pub mod s_cosmos {
     pub struct ApkManifest {
         pub min_sdk: u32,
         pub target_sdk: u32,
-        pub permissions: u64,   // Bitmask: 0b1=INTERNET, 0b10=STORAGE, 0b100=CAMERA
+        pub permissions: u64, // Bitmask: 0b1=INTERNET, 0b10=STORAGE, 0b100=CAMERA
     }
 
     pub struct ApkLoader {
@@ -1790,11 +2056,19 @@ pub mod s_cosmos {
 
     impl ApkLoader {
         pub const fn new() -> Self {
-            Self { manifest: None, dex_base: 0, dex_size: 0 }
+            Self {
+                manifest: None,
+                dex_base: 0,
+                dex_size: 0,
+            }
         }
 
         pub fn parse_manifest(&mut self, min_sdk: u32, target_sdk: u32, perms: u64) {
-            self.manifest = Some(ApkManifest { min_sdk, target_sdk, permissions: perms });
+            self.manifest = Some(ApkManifest {
+                min_sdk,
+                target_sdk,
+                permissions: perms,
+            });
         }
 
         pub fn load_dex(&mut self, base: u64, size: u32) -> Result<(), LoaderError> {
@@ -1820,8 +2094,10 @@ pub mod s_cosmos {
         fn test_pe_valid_magic() {
             let mut loader = PeBinaryLoader::new();
             let mut hdr = [0u8; 48];
-            hdr[0] = 0x4D; hdr[1] = 0x5A; // MZ
-            hdr[40] = 0x00; hdr[41] = 0x10; // entry offset = 0x1000
+            hdr[0] = 0x4D;
+            hdr[1] = 0x5A; // MZ
+            hdr[40] = 0x00;
+            hdr[41] = 0x10; // entry offset = 0x1000
             loader.parse_header(&hdr).unwrap();
             assert_eq!(loader.entry_point, 0x0040_0000 + 0x1000);
         }
@@ -1836,7 +2112,14 @@ pub mod s_cosmos {
         #[test]
         fn test_pe_segment_mapping() {
             let mut loader = PeBinaryLoader::new();
-            loader.map_segment(PeSegment { virtual_addr: 0x1000, file_offset: 512, size: 4096, flags: 0b011 }).unwrap();
+            loader
+                .map_segment(PeSegment {
+                    virtual_addr: 0x1000,
+                    file_offset: 512,
+                    size: 4096,
+                    flags: 0b011,
+                })
+                .unwrap();
             assert_eq!(loader.seg_count, 1);
         }
 
@@ -1868,8 +2151,8 @@ pub mod s_cosmos {
         fn test_apk_loader_permissions() {
             let mut apk = ApkLoader::new();
             apk.parse_manifest(21, 34, 0b0000_0111); // INTERNET|STORAGE|CAMERA
-            assert!(apk.has_permission(0b001));  // INTERNET
-            assert!(apk.has_permission(0b100));  // CAMERA
+            assert!(apk.has_permission(0b001)); // INTERNET
+            assert!(apk.has_permission(0b100)); // CAMERA
             assert!(!apk.has_permission(0b1000)); // Not granted
             apk.load_dex(0x1000_0000, 65536).unwrap();
             assert_eq!(apk.dex_size, 65536);

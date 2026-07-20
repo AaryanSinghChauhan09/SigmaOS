@@ -1,10 +1,9 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
+use std::collections::BTreeMap;
 /// OOP-based Localization Manager for SigmaOS India Stack
 /// Implements 22 scheduled languages of India and regional formatting
 /// Based on Roadmap Item: India-first architecture
-
 use std::string::{String, ToString};
-use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum IndianLanguage {
@@ -46,16 +45,30 @@ pub struct LocalizationManager {
 impl LocalizationManager {
     pub fn new() -> Self {
         let mut dictionaries = BTreeMap::new();
-        
+
         // Initialize dictionaries for all 22 languages
         let languages = [
-            IndianLanguage::Assamese, IndianLanguage::Bengali, IndianLanguage::Gujarati,
-            IndianLanguage::Hindi, IndianLanguage::Kannada, IndianLanguage::Kashmiri,
-            IndianLanguage::Konkani, IndianLanguage::Malayalam, IndianLanguage::Manipuri,
-            IndianLanguage::Marathi, IndianLanguage::Nepali, IndianLanguage::Oriya,
-            IndianLanguage::Punjabi, IndianLanguage::Sanskrit, IndianLanguage::Sindhi,
-            IndianLanguage::Tamil, IndianLanguage::Telugu, IndianLanguage::Urdu,
-            IndianLanguage::Bodo, IndianLanguage::Santhali, IndianLanguage::Maithili,
+            IndianLanguage::Assamese,
+            IndianLanguage::Bengali,
+            IndianLanguage::Gujarati,
+            IndianLanguage::Hindi,
+            IndianLanguage::Kannada,
+            IndianLanguage::Kashmiri,
+            IndianLanguage::Konkani,
+            IndianLanguage::Malayalam,
+            IndianLanguage::Manipuri,
+            IndianLanguage::Marathi,
+            IndianLanguage::Nepali,
+            IndianLanguage::Oriya,
+            IndianLanguage::Punjabi,
+            IndianLanguage::Sanskrit,
+            IndianLanguage::Sindhi,
+            IndianLanguage::Tamil,
+            IndianLanguage::Telugu,
+            IndianLanguage::Urdu,
+            IndianLanguage::Bodo,
+            IndianLanguage::Santhali,
+            IndianLanguage::Maithili,
             IndianLanguage::Dogri,
         ];
 
@@ -110,7 +123,9 @@ impl LocalizationManager {
 
     pub fn get_string(&self, key: &str) -> Option<String> {
         let lang = self.get_language();
-        self.dictionaries.get(&lang).and_then(|dict| dict.get(key).cloned())
+        self.dictionaries
+            .get(&lang)
+            .and_then(|dict| dict.get(key).cloned())
     }
 
     pub fn format_inr(&self, amount: f64) -> String {
@@ -149,10 +164,10 @@ mod tests {
     fn test_language_switching() {
         let mut manager = LocalizationManager::new();
         assert_eq!(manager.get_language(), IndianLanguage::Hindi);
-        
+
         manager.set_language(IndianLanguage::Tamil);
         assert_eq!(manager.get_language(), IndianLanguage::Tamil);
-        
+
         manager.set_language(IndianLanguage::Bodo);
         assert_eq!(manager.get_language(), IndianLanguage::Bodo);
     }
@@ -162,10 +177,10 @@ mod tests {
         let mut manager = LocalizationManager::new();
         manager.add_string(IndianLanguage::Hindi, "hello", "नमस्ते");
         manager.add_string(IndianLanguage::Tamil, "hello", "வணக்கம்");
-        
+
         manager.set_language(IndianLanguage::Hindi);
         assert_eq!(manager.get_string("hello").unwrap(), "नमस्ते");
-        
+
         manager.set_language(IndianLanguage::Tamil);
         assert_eq!(manager.get_string("hello").unwrap(), "வணக்கம்");
     }

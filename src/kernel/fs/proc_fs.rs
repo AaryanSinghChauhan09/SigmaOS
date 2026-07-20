@@ -1,6 +1,5 @@
 /// SigmaOS proc filesystem (/proc) implementation
 /// Provides dynamic system statistics and process information in-memory
-
 use std::collections::HashMap;
 use std::string::{String, ToString};
 
@@ -30,18 +29,22 @@ impl ProcFileSystem {
         });
 
         fs.register_file("version", || {
-            "SigmaOS version 1.0.0 (antigravity@sovereign) (rustc 1.80.0) #1 SMP Mon Jul 20 2026\n".to_string()
+            "SigmaOS version 1.0.0 (antigravity@sovereign) (rustc 1.80.0) #1 SMP Mon Jul 20 2026\n"
+                .to_string()
         });
 
         fs
     }
 
     pub fn register_file(&mut self, path: &str, generator: fn() -> String) {
-        self.entries.insert(path.to_string(), ProcEntry {
-            name: path.to_string(),
-            is_dir: false,
-            content_generator: generator,
-        });
+        self.entries.insert(
+            path.to_string(),
+            ProcEntry {
+                name: path.to_string(),
+                is_dir: false,
+                content_generator: generator,
+            },
+        );
     }
 
     pub fn read_file(&self, path: &str) -> Result<String, &'static str> {

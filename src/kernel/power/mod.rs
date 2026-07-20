@@ -1,6 +1,5 @@
 /// SigmaOS Power Management Subsystem
 /// CPUfreq governors, thermal throttling, suspend/resume lifecycle
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -42,8 +41,8 @@ impl CpufreqPolicy {
     pub fn update_freq(&mut self, load_percent: u8) {
         let load = load_percent.min(100) as u32;
         self.cur_freq_khz = match self.governor {
-            CpufreqGovernor::Performance  => self.max_freq_khz,
-            CpufreqGovernor::Powersave    => self.min_freq_khz,
+            CpufreqGovernor::Performance => self.max_freq_khz,
+            CpufreqGovernor::Powersave => self.min_freq_khz,
             CpufreqGovernor::OnDemand | CpufreqGovernor::Schedutil => {
                 let range = self.max_freq_khz - self.min_freq_khz;
                 self.min_freq_khz + range * load / 100
@@ -51,9 +50,15 @@ impl CpufreqPolicy {
             CpufreqGovernor::Conservative => {
                 // Step 10% at a time
                 let step = (self.max_freq_khz - self.min_freq_khz) / 10;
-                if load > 70 { (self.cur_freq_khz + step).min(self.max_freq_khz) }
-                else if load < 30 { self.cur_freq_khz.saturating_sub(step).max(self.min_freq_khz) }
-                else { self.cur_freq_khz }
+                if load > 70 {
+                    (self.cur_freq_khz + step).min(self.max_freq_khz)
+                } else if load < 30 {
+                    self.cur_freq_khz
+                        .saturating_sub(step)
+                        .max(self.min_freq_khz)
+                } else {
+                    self.cur_freq_khz
+                }
             }
         };
     }
@@ -73,12 +78,16 @@ impl CpufreqManager {
     }
 
     pub fn set_governor_all(&mut self, gov: CpufreqGovernor) {
-        for p in &mut self.policies { p.governor = gov; }
+        for p in &mut self.policies {
+            p.governor = gov;
+        }
     }
 
     pub fn update_all(&mut self, loads: &[u8]) {
         for (i, p) in self.policies.iter_mut().enumerate() {
-            if let Some(&load) = loads.get(i) { p.update_freq(load); }
+            if let Some(&load) = loads.get(i) {
+                p.update_freq(load);
+            }
         }
     }
 }
@@ -86,7 +95,13 @@ impl CpufreqManager {
 // ── Thermal Management ─────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ThermalZoneType { Cpu, Gpu, Battery, Ambient, Pch }
+pub enum ThermalZoneType {
+    Cpu,
+    Gpu,
+    Battery,
+    Ambient,
+    Pch,
+}
 
 #[derive(Debug, Clone)]
 pub struct ThermalZone {
@@ -103,19 +118,27 @@ impl ThermalZone {
         ThermalZone {
             name: name.to_string(),
             zone_type: ThermalZoneType::Cpu,
-            current_temp_mdegc: 45_000,  // 45°C idle
-            trip_critical: 105_000,       // 105°C → shutdown
-            trip_hot: 95_000,             // 95°C → throttle
-            trip_warm: 80_000,            // 80°C → light throttle
+            current_temp_mdegc: 45_000, // 45°C idle
+            trip_critical: 105_000,     // 105°C → shutdown
+            trip_hot: 95_000,           // 95°C → throttle
+            trip_warm: 80_000,          // 80°C → light throttle
         }
     }
 
-    pub fn is_throttled(&self) -> bool { self.current_temp_mdegc >= self.trip_warm }
-    pub fn is_emergency(&self) -> bool { self.current_temp_mdegc >= self.trip_critical }
+    pub fn is_throttled(&self) -> bool {
+        self.current_temp_mdegc >= self.trip_warm
+    }
+    pub fn is_emergency(&self) -> bool {
+        self.current_temp_mdegc >= self.trip_critical
+    }
 
     pub fn throttle_percent(&self) -> u8 {
-        if self.current_temp_mdegc < self.trip_warm { return 100; }
-        if self.current_temp_mdegc >= self.trip_critical { return 0; }
+        if self.current_temp_mdegc < self.trip_warm {
+            return 100;
+        }
+        if self.current_temp_mdegc >= self.trip_critical {
+            return 0;
+        }
         let hot_range = self.trip_critical - self.trip_warm;
         let excess = self.current_temp_mdegc - self.trip_warm;
         (100 - (excess * 100 / hot_range)) as u8
@@ -137,29 +160,52 @@ impl ThermalManager {
         }
     }
 
-    pub fn register_zone(&mut self, zone: ThermalZone) { self.zones.push(zone); }
+    pub fn register_zone(&mut self, zone: ThermalZone) {
+        self.zones.push(zone);
+    }
 
     pub fn update_temp(&mut self, zone_idx: usize, temp_mdegc: i32) {
         if let Some(zone) = self.zones.get_mut(zone_idx) {
             zone.current_temp_mdegc = temp_mdegc;
-            if zone.is_emergency() { self.emergency_events.fetch_add(1, Ordering::Relaxed); }
-            else if zone.is_throttled() { self.throttle_events.fetch_add(1, Ordering::Relaxed); }
+            if zone.is_emergency() {
+                self.emergency_events.fetch_add(1, Ordering::Relaxed);
+            } else if zone.is_throttled() {
+                self.throttle_events.fetch_add(1, Ordering::Relaxed);
+            }
         }
     }
 
-    pub fn any_emergency(&self) -> bool { self.zones.iter().any(|z| z.is_emergency()) }
-    pub fn min_throttle_percent(&self) -> u8 { self.zones.iter().map(|z| z.throttle_percent()).min().unwrap_or(100) }
-    pub fn throttle_events(&self) -> usize { self.throttle_events.load(Ordering::Relaxed) }
+    pub fn any_emergency(&self) -> bool {
+        self.zones.iter().any(|z| z.is_emergency())
+    }
+    pub fn min_throttle_percent(&self) -> u8 {
+        self.zones
+            .iter()
+            .map(|z| z.throttle_percent())
+            .min()
+            .unwrap_or(100)
+    }
+    pub fn throttle_events(&self) -> usize {
+        self.throttle_events.load(Ordering::Relaxed)
+    }
 }
 
 impl Default for ThermalManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ── Suspend / Resume ───────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SleepState { S0, S1, S3Suspend, S4Hibernate, S5SoftOff }
+pub enum SleepState {
+    S0,
+    S1,
+    S3Suspend,
+    S4Hibernate,
+    S5SoftOff,
+}
 
 pub struct PowerStateManager {
     pub current_state: SleepState,
@@ -183,25 +229,35 @@ impl PowerStateManager {
     }
 
     pub fn enter_sleep(&mut self, state: SleepState) -> Result<(), &'static str> {
-        if state == SleepState::S0 { return Err("Already in S0"); }
+        if state == SleepState::S0 {
+            return Err("Already in S0");
+        }
         self.current_state = state;
         self.suspend_count.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
     pub fn resume(&mut self) -> Result<(), &'static str> {
-        if self.current_state == SleepState::S0 { return Err("Already running (S0)"); }
+        if self.current_state == SleepState::S0 {
+            return Err("Already running (S0)");
+        }
         self.current_state = SleepState::S0;
         self.resume_count.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
-    pub fn suspend_count(&self) -> usize { self.suspend_count.load(Ordering::Relaxed) }
-    pub fn resume_count(&self) -> usize  { self.resume_count.load(Ordering::Relaxed) }
+    pub fn suspend_count(&self) -> usize {
+        self.suspend_count.load(Ordering::Relaxed)
+    }
+    pub fn resume_count(&self) -> usize {
+        self.resume_count.load(Ordering::Relaxed)
+    }
 }
 
 impl Default for PowerStateManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -212,10 +268,12 @@ mod tests {
     fn test_cpufreq_governors() {
         let mut pol = CpufreqPolicy::new(0, 800_000, 3_600_000);
         pol.governor = CpufreqGovernor::Performance;
-        pol.update_freq(0); assert_eq!(pol.cur_freq_khz, 3_600_000);
+        pol.update_freq(0);
+        assert_eq!(pol.cur_freq_khz, 3_600_000);
 
         pol.governor = CpufreqGovernor::Powersave;
-        pol.update_freq(100); assert_eq!(pol.cur_freq_khz, 800_000);
+        pol.update_freq(100);
+        assert_eq!(pol.cur_freq_khz, 800_000);
 
         pol.governor = CpufreqGovernor::OnDemand;
         pol.update_freq(50);
