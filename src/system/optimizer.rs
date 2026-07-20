@@ -52,7 +52,7 @@ impl MemoryOptimization {
 impl OptimizationStrategy for MemoryOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
         let start_memory = self.get_memory_usage_mb();
-        
+
         // Simulate memory optimization
         let freed = if self.aggressive {
             self.clear_caches();
@@ -127,7 +127,7 @@ impl CpuOptimization {
 impl OptimizationStrategy for CpuOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
         let start_cpu = self.get_cpu_usage_percent();
-        
+
         // Simulate CPU optimization
         let saved = if self.reduce_background_processes {
             self.throttle_background_processes();
@@ -274,7 +274,7 @@ impl NetworkOptimization {
         // Simulate enabling TCP Fast Open
     }
 
-    fn optimize_mtu_size(&self) -> {
+    fn optimize_mtu_size(&self) {
         // Simulate MTU optimization
     }
 }

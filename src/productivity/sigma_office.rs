@@ -1,12 +1,12 @@
 //! # SigmaOffice - Sovereign Office Suite
-//! 
+//!
 //! This module implements SigmaOffice, a zero-overhead document suite that replaces
 //! LibreOffice and Apache OpenOffice. Documents (text, spreadsheets, slides) are compiled
 //! as semantic local-first trees, utilizing native typography rendering within the Zenith
 //! window compositor.
-//! 
+//!
 //! ## Architecture
-//! 
+//!
 //! - **Document Tree**: Semantic AST-based document representation
 //! - **Native Rendering**: Direct GPU-accelerated typography via Zenith compositor
 //! - **Local-First**: All documents stored in SigmaFS with capability-gated access
@@ -42,10 +42,7 @@ pub enum DocumentNode {
     /// Paragraph break
     Paragraph,
     /// Heading with level
-    Heading {
-        level: u32,
-        content: String,
-    },
+    Heading { level: u32, content: String },
     /// Table structure
     Table {
         rows: Vec<Vec<DocumentNode>>,
@@ -151,7 +148,7 @@ impl SigmaDocument {
     /// Create a new document
     pub fn new(doc_type: DocumentType, title: String, capability: CapabilityToken) -> Self {
         let timestamp = Self::current_timestamp();
-        
+
         SigmaDocument {
             doc_type,
             title,
@@ -261,7 +258,7 @@ impl SpreadsheetProcessor {
     /// Set cell value
     pub fn set_cell(&mut self, row: u32, col: u32, value: CellValue) -> Result<()> {
         self.cells.insert((row, col), value.clone());
-        
+
         let node = DocumentNode::Cell {
             row,
             col,
@@ -274,8 +271,12 @@ impl SpreadsheetProcessor {
     /// Set cell formula
     pub fn set_formula(&mut self, row: u32, col: u32, formula: &str) -> Result<()> {
         self.formulas.insert((row, col), formula.to_string());
-        
-        let value = self.cells.get(&(row, col)).cloned().unwrap_or(CellValue::Empty);
+
+        let value = self
+            .cells
+            .get(&(row, col))
+            .cloned()
+            .unwrap_or(CellValue::Empty);
         let node = DocumentNode::Cell {
             row,
             col,
@@ -321,7 +322,12 @@ impl PresentationProcessor {
     }
 
     /// Add text box to current slide
-    pub fn add_text_box(&mut self, content: &str, font_size: u32, position: (f32, f32)) -> Result<()> {
+    pub fn add_text_box(
+        &mut self,
+        content: &str,
+        font_size: u32,
+        position: (f32, f32),
+    ) -> Result<()> {
         let node = DocumentNode::SlideElement {
             element_type: SlideElementType::TextBox {
                 content: content.to_string(),
@@ -348,7 +354,12 @@ impl PresentationProcessor {
     }
 
     /// Add shape to current slide
-    pub fn add_shape(&mut self, shape_type: ShapeType, fill_color: [u8; 4], position: (f32, f32)) -> Result<()> {
+    pub fn add_shape(
+        &mut self,
+        shape_type: ShapeType,
+        fill_color: [u8; 4],
+        position: (f32, f32),
+    ) -> Result<()> {
         let node = DocumentNode::SlideElement {
             element_type: SlideElementType::Shape {
                 shape_type,
@@ -430,7 +441,7 @@ impl SigmaOffice {
         let doc = SigmaDocument::new(DocumentType::Text, title, self.capability.clone());
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
-        
+
         Ok(TextProcessor::new(title, self.capability.clone()))
     }
 
@@ -439,7 +450,7 @@ impl SigmaOffice {
         let doc = SigmaDocument::new(DocumentType::Spreadsheet, title, self.capability.clone());
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
-        
+
         Ok(SpreadsheetProcessor::new(title, self.capability.clone()))
     }
 
@@ -448,7 +459,7 @@ impl SigmaOffice {
         let doc = SigmaDocument::new(DocumentType::Presentation, title, self.capability.clone());
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
-        
+
         Ok(PresentationProcessor::new(title, self.capability.clone()))
     }
 
@@ -481,9 +492,9 @@ impl SigmaOffice {
 // Placeholder types for compilation
 mod sigma_types {
     use std::io;
-    
+
     pub type Result<T> = std::result::Result<T, io::Error>;
-    
+
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {
         pub id: u64,
@@ -498,10 +509,12 @@ mod tests {
     fn test_text_document_creation() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut processor = TextProcessor::new("Test Document".to_string(), capability);
-        
+
         processor.add_heading(1, "Introduction").unwrap();
-        processor.add_text("This is a test document.", false, false).unwrap();
-        
+        processor
+            .add_text("This is a test document.", false, false)
+            .unwrap();
+
         assert_eq!(processor.document().title(), "Test Document");
         assert_eq!(processor.document().document_type(), DocumentType::Text);
     }
@@ -510,11 +523,16 @@ mod tests {
     fn test_spreadsheet_creation() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut processor = SpreadsheetProcessor::new("Budget".to_string(), capability);
-        
-        processor.set_cell(0, 0, CellValue::Text("Item".to_string())).unwrap();
+
+        processor
+            .set_cell(0, 0, CellValue::Text("Item".to_string()))
+            .unwrap();
         processor.set_cell(0, 1, CellValue::Number(100.0)).unwrap();
-        
-        assert_eq!(processor.get_cell(0, 0), Some(&CellValue::Text("Item".to_string())));
+
+        assert_eq!(
+            processor.get_cell(0, 0),
+            Some(&CellValue::Text("Item".to_string()))
+        );
         assert_eq!(processor.get_cell(0, 1), Some(&CellValue::Number(100.0)));
     }
 
@@ -522,10 +540,10 @@ mod tests {
     fn test_presentation_creation() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut processor = PresentationProcessor::new("Slides".to_string(), capability);
-        
+
         processor.add_text_box("Title", 24, (50.0, 50.0)).unwrap();
         processor.add_slide().unwrap();
-        
+
         assert_eq!(processor.total_slides(), 2);
     }
 }

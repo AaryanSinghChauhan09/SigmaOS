@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverError {
@@ -94,7 +94,12 @@ pub trait NetworkStack {
     fn init(&mut self) -> Result<(), NetworkError>;
     fn receive_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError>;
     fn send_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError>;
-    fn create_socket(&mut self, domain: u32, socket_type: u32, protocol: u32) -> Result<u32, NetworkError>;
+    fn create_socket(
+        &mut self,
+        domain: u32,
+        socket_type: u32,
+        protocol: u32,
+    ) -> Result<u32, NetworkError>;
     fn close_socket(&mut self, handle: u32) -> Result<(), NetworkError>;
     fn metadata(&self) -> &NetworkStackMetadata;
 }
@@ -118,7 +123,13 @@ pub trait MemoryManager {
     fn free_physical(&mut self, address: u64, size: usize) -> Result<(), MemoryError>;
     fn allocate_virtual(&mut self, size: usize) -> Result<u64, MemoryError>;
     fn free_virtual(&mut self, address: u64, size: usize) -> Result<(), MemoryError>;
-    fn map_memory(&mut self, virtual_addr: u64, physical_addr: u64, size: usize, flags: u32) -> Result<(), MemoryError>;
+    fn map_memory(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        size: usize,
+        flags: u32,
+    ) -> Result<(), MemoryError>;
     fn unmap_memory(&mut self, virtual_addr: u64, size: usize) -> Result<(), MemoryError>;
     fn metadata(&self) -> &MemoryManagerMetadata;
 }

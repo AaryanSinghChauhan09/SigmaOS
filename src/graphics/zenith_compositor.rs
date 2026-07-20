@@ -37,7 +37,12 @@ impl WindowNode {
         Self {
             id,
             title,
-            geometry: Geometry { x, y, width: w, height: h },
+            geometry: Geometry {
+                x,
+                y,
+                width: w,
+                height: h,
+            },
             state: WindowState::Inactive,
         }
     }
@@ -57,8 +62,10 @@ impl WindowNode {
     }
 
     pub fn contains_point(&self, x: i32, y: i32) -> bool {
-        x >= self.geometry.x && x < self.geometry.x + self.geometry.width as i32 &&
-        y >= self.geometry.y && y < self.geometry.y + self.geometry.height as i32
+        x >= self.geometry.x
+            && x < self.geometry.x + self.geometry.width as i32
+            && y >= self.geometry.y
+            && y < self.geometry.y + self.geometry.height as i32
     }
 }
 
@@ -86,7 +93,7 @@ impl ZenithCompositor {
     pub fn activate_window(&mut self, window_id: u32) -> Result<(), &'static str> {
         let window = self.get_window_mut(window_id).ok_or("Window not found")?;
         window.set_state(WindowState::Active);
-        
+
         // Deactivate other windows
         for win_opt in self.windows.iter_mut() {
             if let Some(win) = win_opt {
@@ -95,7 +102,7 @@ impl ZenithCompositor {
                 }
             }
         }
-        
+
         self.active_window_id = Some(window_id);
         Ok(())
     }
@@ -103,7 +110,7 @@ impl ZenithCompositor {
     pub fn minimize_window(&mut self, window_id: u32) -> Result<(), &'static str> {
         let window = self.get_window_mut(window_id).ok_or("Window not found")?;
         window.set_state(WindowState::Minimized);
-        
+
         if self.active_window_id == Some(window_id) {
             self.active_window_id = None;
         }
@@ -218,7 +225,7 @@ mod tests {
     fn test_compositor_register() {
         let mut compositor = ZenithCompositor::new();
         let window = WindowNode::new(1, "Test".to_string(), 0, 0, 800, 600);
-        
+
         compositor.register_window(window).unwrap();
         assert_eq!(compositor.window_count(), 1);
     }
@@ -228,26 +235,32 @@ mod tests {
         let mut compositor = ZenithCompositor::new();
         let window1 = WindowNode::new(1, "Test1".to_string(), 0, 0, 800, 600);
         let window2 = WindowNode::new(2, "Test2".to_string(), 100, 100, 800, 600);
-        
+
         compositor.register_window(window1).unwrap();
         compositor.register_window(window2).unwrap();
-        
+
         compositor.activate_window(1).unwrap();
         assert_eq!(compositor.active_window_id, Some(1));
         assert_eq!(compositor.get_window(1).unwrap().state, WindowState::Active);
-        assert_eq!(compositor.get_window(2).unwrap().state, WindowState::Inactive);
+        assert_eq!(
+            compositor.get_window(2).unwrap().state,
+            WindowState::Inactive
+        );
     }
 
     #[test]
     fn test_compositor_minimize() {
         let mut compositor = ZenithCompositor::new();
         let window = WindowNode::new(1, "Test".to_string(), 0, 0, 800, 600);
-        
+
         compositor.register_window(window).unwrap();
         compositor.activate_window(1).unwrap();
         compositor.minimize_window(1).unwrap();
-        
-        assert_eq!(compositor.get_window(1).unwrap().state, WindowState::Minimized);
+
+        assert_eq!(
+            compositor.get_window(1).unwrap().state,
+            WindowState::Minimized
+        );
         assert_eq!(compositor.active_window_id, None);
     }
 
@@ -255,11 +268,11 @@ mod tests {
     fn test_compositor_remove() {
         let mut compositor = ZenithCompositor::new();
         let window = WindowNode::new(1, "Test".to_string(), 0, 0, 800, 600);
-        
+
         compositor.register_window(window).unwrap();
         compositor.activate_window(1).unwrap();
         compositor.remove_window(1).unwrap();
-        
+
         assert_eq!(compositor.window_count(), 0);
         assert_eq!(compositor.active_window_id, None);
     }
@@ -269,10 +282,10 @@ mod tests {
         let mut compositor = ZenithCompositor::new();
         let window1 = WindowNode::new(1, "Test1".to_string(), 0, 0, 800, 600);
         let window2 = WindowNode::new(2, "Test2".to_string(), 400, 300, 800, 600);
-        
+
         compositor.register_window(window1).unwrap();
         compositor.register_window(window2).unwrap();
-        
+
         // Window2 is on top (added later)
         let hit = compositor.get_window_at_point(500, 400);
         assert_eq!(hit.unwrap().id, 2);
@@ -281,12 +294,12 @@ mod tests {
     #[test]
     fn test_window_limit() {
         let mut compositor = ZenithCompositor::new();
-        
+
         for i in 0..32 {
             let window = WindowNode::new(i, format!("Window {}", i), 0, 0, 800, 600);
             compositor.register_window(window).unwrap();
         }
-        
+
         let window = WindowNode::new(32, "Extra".to_string(), 0, 0, 800, 600);
         assert!(compositor.register_window(window).is_err());
     }

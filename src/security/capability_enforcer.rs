@@ -188,9 +188,7 @@ mod tests {
     fn test_custom_port_allowed() {
         let mut enforcer = SecurityEnforcer::new();
 
-        let token = CapabilityToken::new(101)
-            .allow_network()
-            .add_port(8080);
+        let token = CapabilityToken::new(101).allow_network().add_port(8080);
 
         enforcer.assign_token(token).unwrap();
 

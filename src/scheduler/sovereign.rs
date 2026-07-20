@@ -1,22 +1,31 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Sovereign Scheduler for SigmaOS
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
 /// Implements MLFQ (Multi-Level Feedback Queue) and MCS (Machine-to-Core Scheduling)
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ThreadID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ThreadState { Ready = 0, Running = 1, Blocked = 2, Sleeping = 3 }
+pub enum ThreadState {
+    Ready = 0,
+    Running = 1,
+    Blocked = 2,
+    Sleeping = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Priority { High = 0, Normal = 1, Low = 2, Idle = 3 }
+pub enum Priority {
+    High = 0,
+    Normal = 1,
+    Low = 2,
+    Idle = 3,
+}
 
 pub trait Thread {
     fn id(&self) -> ThreadID;
@@ -45,9 +54,15 @@ impl SimpleThread {
 }
 
 impl Thread for SimpleThread {
-    fn id(&self) -> ThreadID { self.id }
-    fn state(&self) -> ThreadState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    fn priority(&self) -> Priority { self.priority }
+    fn id(&self) -> ThreadID {
+        self.id
+    }
+    fn state(&self) -> ThreadState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn priority(&self) -> Priority {
+        self.priority
+    }
     fn set_state(&mut self, state: ThreadState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -62,7 +77,11 @@ pub trait Scheduler {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SchedulerError { Success = 0, ThreadNotFound = 1, QueueFull = 2 }
+pub enum SchedulerError {
+    Success = 0,
+    ThreadNotFound = 1,
+    QueueFull = 2,
+}
 
 pub struct MLFQScheduler {
     pub queues: [Vec<Option<Box<dyn Thread>>>; 4],
@@ -138,7 +157,8 @@ impl Scheduler for MLFQScheduler {
 }
 
 pub trait MCSScheduler {
-    fn assign_to_core(&mut self, thread_id: ThreadID, core_id: usize) -> Result<(), SchedulerError>;
+    fn assign_to_core(&mut self, thread_id: ThreadID, core_id: usize)
+        -> Result<(), SchedulerError>;
     fn get_core_load(&self, core_id: usize) -> usize;
 }
 
@@ -164,7 +184,11 @@ impl SimpleMCSScheduler {
 }
 
 impl MCSScheduler for SimpleMCSScheduler {
-    fn assign_to_core(&mut self, thread_id: ThreadID, core_id: usize) -> Result<(), SchedulerError> {
+    fn assign_to_core(
+        &mut self,
+        thread_id: ThreadID,
+        core_id: usize,
+    ) -> Result<(), SchedulerError> {
         if core_id >= self.core_assignments.len() {
             return Err(SchedulerError::ThreadNotFound);
         }
@@ -173,13 +197,19 @@ impl MCSScheduler for SimpleMCSScheduler {
         Ok(())
     }
     fn get_core_load(&self, core_id: usize) -> usize {
-        if core_id >= 64 { return 0; }
+        if core_id >= 64 {
+            return 0;
+        }
         self.core_loads[core_id].load(Ordering::SeqCst)
     }
 }
 
 pub trait RealTimeScheduler {
-    fn add_rt_thread(&mut self, thread: Box<dyn Thread>, deadline: usize) -> Result<ThreadID, SchedulerError>;
+    fn add_rt_thread(
+        &mut self,
+        thread: Box<dyn Thread>,
+        deadline: usize,
+    ) -> Result<ThreadID, SchedulerError>;
     fn get_next_deadline(&self) -> Option<usize>;
 }
 
@@ -198,13 +228,19 @@ impl SimpleRealTimeScheduler {
 }
 
 impl RealTimeScheduler for SimpleRealTimeScheduler {
-    fn add_rt_thread(&mut self, thread: Box<dyn Thread>, deadline: usize) -> Result<ThreadID, SchedulerError> {
+    fn add_rt_thread(
+        &mut self,
+        thread: Box<dyn Thread>,
+        deadline: usize,
+    ) -> Result<ThreadID, SchedulerError> {
         let id = thread.id();
         self.rt_queue.push((id, deadline));
         Ok(id)
     }
     fn get_next_deadline(&self) -> Option<usize> {
-        if self.rt_queue.is_empty() { return None; }
+        if self.rt_queue.is_empty() {
+            return None;
+        }
         let mut min_deadline = self.rt_queue[0].1;
         for &(_, deadline) in &self.rt_queue {
             if deadline < min_deadline {
@@ -215,22 +251,38 @@ impl RealTimeScheduler for SimpleRealTimeScheduler {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn is_empty(&self) -> bool { self.len == 0 }
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     fn remove(&mut self, index: usize) -> Option<T> {
-        if index >= self.len { return None; }
+        if index >= self.len {
+            return None;
+        }
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -241,19 +293,32 @@ impl<T> Vec<T> {
         }
     }
     fn get(&self, index: usize) -> Option<&T> {
-        if index >= self.len { return None; }
+        if index >= self.len {
+            return None;
+        }
         unsafe { Some(&*self.data.add(index)) }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

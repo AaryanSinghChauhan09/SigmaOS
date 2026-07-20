@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioFormat {
@@ -101,7 +101,7 @@ impl AudioCodec {
     /// Decode audio from raw data
     pub fn decode(&self, data: &[u8]) -> Result<DecodedAudio, &'static str> {
         let format = Self::detect_format(data);
-        
+
         match format {
             AudioFormat::Flac => self.decode_flac(data),
             AudioFormat::Mp3 => self.decode_mp3(data),
@@ -124,16 +124,13 @@ impl AudioCodec {
 
         let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
         let mut samples = Vec::with_capacity(sample_count);
-        
+
         // Placeholder decoding
         for _ in 0..sample_count {
             samples.push(0);
         }
 
-        Ok(DecodedAudio {
-            metadata,
-            samples,
-        })
+        Ok(DecodedAudio { metadata, samples })
     }
 
     /// Decode MP3 audio (simplified implementation)
@@ -149,15 +146,12 @@ impl AudioCodec {
 
         let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
         let mut samples = Vec::with_capacity(sample_count);
-        
+
         for _ in 0..sample_count {
             samples.push(0);
         }
 
-        Ok(DecodedAudio {
-            metadata,
-            samples,
-        })
+        Ok(DecodedAudio { metadata, samples })
     }
 
     /// Decode WAV audio (simplified implementation)
@@ -173,15 +167,12 @@ impl AudioCodec {
 
         let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
         let mut samples = Vec::with_capacity(sample_count);
-        
+
         for _ in 0..sample_count {
             samples.push(0);
         }
 
-        Ok(DecodedAudio {
-            metadata,
-            samples,
-        })
+        Ok(DecodedAudio { metadata, samples })
     }
 
     /// Decode OGG Vorbis audio (simplified implementation)
@@ -197,15 +188,12 @@ impl AudioCodec {
 
         let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
         let mut samples = Vec::with_capacity(sample_count);
-        
+
         for _ in 0..sample_count {
             samples.push(0);
         }
 
-        Ok(DecodedAudio {
-            metadata,
-            samples,
-        })
+        Ok(DecodedAudio { metadata, samples })
     }
 
     /// Convert sample rate (simplified resampling)
@@ -258,7 +246,10 @@ mod tests {
     #[test]
     fn test_flac_format_detection() {
         let flac_signature = [0x66, 0x4C, 0x61, 0x43];
-        assert_eq!(AudioCodec::detect_format(&flac_signature), AudioFormat::Flac);
+        assert_eq!(
+            AudioCodec::detect_format(&flac_signature),
+            AudioFormat::Flac
+        );
     }
 
     #[test]
@@ -269,24 +260,29 @@ mod tests {
 
     #[test]
     fn test_wav_format_detection() {
-        let wav_signature = [0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45];
+        let wav_signature = [
+            0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
+        ];
         assert_eq!(AudioCodec::detect_format(&wav_signature), AudioFormat::Wav);
     }
 
     #[test]
     fn test_ogg_format_detection() {
         let ogg_signature = [0x4F, 0x67, 0x67, 0x53];
-        assert_eq!(AudioCodec::detect_format(&ogg_signature), AudioFormat::OggVorbis);
+        assert_eq!(
+            AudioCodec::detect_format(&ogg_signature),
+            AudioFormat::OggVorbis
+        );
     }
 
     #[test]
     fn test_audio_decode() {
         let codec = AudioCodec::new();
         let flac_data = [0x66, 0x4C, 0x61, 0x43];
-        
+
         let result = codec.decode(&flac_data);
         assert!(result.is_ok());
-        
+
         let audio = result.unwrap();
         assert_eq!(audio.metadata.format, AudioFormat::Flac);
     }
@@ -295,10 +291,10 @@ mod tests {
     fn test_audio_resample() {
         let codec = AudioCodec::new();
         let flac_data = [0x66, 0x4C, 0x61, 0x43];
-        
+
         let audio = codec.decode(&flac_data).unwrap();
         let resampled = AudioCodec::resample(&audio, AudioSampleRate::Hz48000);
-        
+
         assert_eq!(resampled.metadata.sample_rate, AudioSampleRate::Hz48000);
     }
 }

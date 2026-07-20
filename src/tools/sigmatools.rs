@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaToolError {
@@ -109,7 +109,8 @@ impl SigmaCluster {
     }
 
     pub fn remove_node(&mut self, id: &str) -> Result<(), SigmaToolError> {
-        self.nodes.remove(id)
+        self.nodes
+            .remove(id)
             .ok_or(SigmaToolError::ResourceUnavailable)?;
         Ok(())
     }
@@ -123,7 +124,8 @@ impl SigmaCluster {
     }
 
     pub fn get_idle_nodes(&self) -> Vec<&ClusterNode> {
-        self.nodes.values()
+        self.nodes
+            .values()
             .filter(|node| node.state == NodeState::Idle)
             .collect()
     }

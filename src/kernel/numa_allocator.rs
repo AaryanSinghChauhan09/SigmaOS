@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NodeState {
@@ -19,17 +19,17 @@ pub struct NumaNode {
     pub node_id: u32,
     pub state: NodeState,
     pub distance: Vec<u32>, // Distance to other nodes
-    pub memory_size: u64,    // Total memory in bytes
-    pub free_memory: u64,    // Free memory in bytes
-    pub cpus: Vec<u32>,      // CPUs attached to this node
+    pub memory_size: u64,   // Total memory in bytes
+    pub free_memory: u64,   // Free memory in bytes
+    pub cpus: Vec<u32>,     // CPUs attached to this node
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AllocationPolicy {
-    Local,      // Allocate from local node
-    Interleave, // Interleave across nodes
+    Local,          // Allocate from local node
+    Interleave,     // Interleave across nodes
     Preferred(u32), // Preferred node
-    Bind(u32),  // Bind to specific node
+    Bind(u32),      // Bind to specific node
 }
 
 pub struct NumaAllocator {
@@ -98,7 +98,8 @@ impl NumaAllocator {
                     }
                 }
                 // Fallback to any online node with free memory
-                self.nodes.iter()
+                self.nodes
+                    .iter()
                     .find(|(_, n)| n.free_memory > 0 && n.state == NodeState::Online)
                     .map(|(id, _)| *id)
             }
@@ -132,12 +133,10 @@ impl NumaAllocator {
 
     /// Allocate memory from a specific node
     pub fn allocate(&mut self, size: u64, node_id: Option<u32>) -> Result<*mut u8, &'static str> {
-        let target_node = node_id.unwrap_or_else(|| {
-            self.select_node(None).unwrap_or(self.current_node)
-        });
+        let target_node =
+            node_id.unwrap_or_else(|| self.select_node(None).unwrap_or(self.current_node));
 
-        let node = self.nodes.get_mut(&target_node)
-            .ok_or("Node not found")?;
+        let node = self.nodes.get_mut(&target_node).ok_or("Node not found")?;
 
         if node.free_memory < size {
             return Err("Insufficient memory on node");
@@ -156,8 +155,7 @@ impl NumaAllocator {
 
     /// Free memory to a specific node
     pub fn free(&mut self, size: u64, node_id: u32) -> Result<(), &'static str> {
-        let node = self.nodes.get_mut(&node_id)
-            .ok_or("Node not found")?;
+        let node = self.nodes.get_mut(&node_id).ok_or("Node not found")?;
 
         node.free_memory += size;
         Ok(())
@@ -192,7 +190,7 @@ mod tests {
     #[test]
     fn test_add_node() {
         let mut allocator = NumaAllocator::new();
-        
+
         let node = NumaNode {
             node_id: 0,
             state: NodeState::Online,
@@ -209,7 +207,7 @@ mod tests {
     #[test]
     fn test_local_policy() {
         let mut allocator = NumaAllocator::new();
-        
+
         let node = NumaNode {
             node_id: 0,
             state: NodeState::Online,
@@ -229,7 +227,7 @@ mod tests {
     #[test]
     fn test_allocate() {
         let mut allocator = NumaAllocator::new();
-        
+
         let node = NumaNode {
             node_id: 0,
             state: NodeState::Online,
@@ -240,10 +238,10 @@ mod tests {
         };
 
         allocator.add_node(node).unwrap();
-        
+
         let result = allocator.allocate(256, Some(0));
         assert!(result.is_ok());
-        
+
         let node = allocator.get_node(0).unwrap();
         assert_eq!(node.free_memory, 256);
     }
@@ -251,7 +249,7 @@ mod tests {
     #[test]
     fn test_free() {
         let mut allocator = NumaAllocator::new();
-        
+
         let node = NumaNode {
             node_id: 0,
             state: NodeState::Online,
@@ -262,9 +260,9 @@ mod tests {
         };
 
         allocator.add_node(node).unwrap();
-        
+
         allocator.free(256, 0).unwrap();
-        
+
         let node = allocator.get_node(0).unwrap();
         assert_eq!(node.free_memory, 512);
     }
@@ -272,7 +270,7 @@ mod tests {
     #[test]
     fn test_total_memory() {
         let mut allocator = NumaAllocator::new();
-        
+
         let node1 = NumaNode {
             node_id: 0,
             state: NodeState::Online,

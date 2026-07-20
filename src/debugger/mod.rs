@@ -1,13 +1,13 @@
 //! SigmaOS Debugger Module
-//! 
+//!
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
 
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 pub mod breakpoint;
 
@@ -127,7 +127,11 @@ impl Debugger {
     }
 
     /// Add a breakpoint
-    pub fn add_breakpoint(&mut self, address: u64, breakpoint_type: BreakpointType) -> Result<(), String> {
+    pub fn add_breakpoint(
+        &mut self,
+        address: u64,
+        breakpoint_type: BreakpointType,
+    ) -> Result<(), String> {
         // Check if breakpoint already exists
         if self.breakpoints.iter().any(|bp| bp.address == address) {
             return Err("Breakpoint already exists at this address".to_string());
@@ -142,37 +146,42 @@ impl Debugger {
     pub fn remove_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let original_len = self.breakpoints.len();
         self.breakpoints.retain(|bp| bp.address != address);
-        
+
         if self.breakpoints.len() == original_len {
             return Err("Breakpoint not found at this address".to_string());
         }
-        
+
         Ok(())
     }
 
     /// Enable a breakpoint
     pub fn enable_breakpoint(&mut self, address: u64) -> Result<(), String> {
-        let breakpoint = self.breakpoints.iter_mut()
+        let breakpoint = self
+            .breakpoints
+            .iter_mut()
             .find(|bp| bp.address == address)
             .ok_or("Breakpoint not found")?;
-        
+
         breakpoint.enable();
         Ok(())
     }
 
     /// Disable a breakpoint
     pub fn disable_breakpoint(&mut self, address: u64) -> Result<(), String> {
-        let breakpoint = self.breakpoints.iter_mut()
+        let breakpoint = self
+            .breakpoints
+            .iter_mut()
             .find(|bp| bp.address == address)
             .ok_or("Breakpoint not found")?;
-        
+
         breakpoint.disable();
         Ok(())
     }
 
     /// Check if a breakpoint is hit
     pub fn check_breakpoint(&mut self, address: u64) -> Option<&Breakpoint> {
-        self.breakpoints.iter()
+        self.breakpoints
+            .iter()
             .find(|bp| bp.address == address && bp.enabled)
     }
 
@@ -213,7 +222,8 @@ impl Debugger {
 
     /// Find memory region containing an address
     pub fn find_memory_region(&self, address: u64) -> Option<&MemoryRegion> {
-        self.memory_regions.iter()
+        self.memory_regions
+            .iter()
             .find(|region| region.contains(address))
     }
 
@@ -224,7 +234,8 @@ impl Debugger {
 
     /// Read memory from a specific address
     pub fn read_memory(&self, address: u64, size: usize) -> Result<Vec<u8>, String> {
-        let region = self.find_memory_region(address)
+        let region = self
+            .find_memory_region(address)
             .ok_or("Address not in any known memory region")?;
 
         if !region.is_readable() {
@@ -238,7 +249,8 @@ impl Debugger {
 
     /// Write memory to a specific address
     pub fn write_memory(&self, address: u64, data: &[u8]) -> Result<(), String> {
-        let region = self.find_memory_region(address)
+        let region = self
+            .find_memory_region(address)
             .ok_or("Address not in any known memory region")?;
 
         if !region.is_writable() {
@@ -310,10 +322,10 @@ mod tests {
     fn test_debugger_attach_detach() {
         let mut debugger = Debugger::new();
         assert_eq!(debugger.get_state(), DebuggerState::Detached);
-        
+
         debugger.attach();
         assert_eq!(debugger.get_state(), DebuggerState::Attached);
-        
+
         debugger.detach();
         assert_eq!(debugger.get_state(), DebuggerState::Detached);
     }
@@ -322,18 +334,22 @@ mod tests {
     fn test_debugger_breakpoint_management() {
         let mut debugger = Debugger::new();
         debugger.attach();
-        
+
         // Add breakpoint
-        assert!(debugger.add_breakpoint(0x1000, BreakpointType::Software).is_ok());
+        assert!(debugger
+            .add_breakpoint(0x1000, BreakpointType::Software)
+            .is_ok());
         assert_eq!(debugger.get_breakpoints().len(), 1);
-        
+
         // Try to add duplicate
-        assert!(debugger.add_breakpoint(0x1000, BreakpointType::Software).is_err());
-        
+        assert!(debugger
+            .add_breakpoint(0x1000, BreakpointType::Software)
+            .is_err());
+
         // Remove breakpoint
         assert!(debugger.remove_breakpoint(0x1000).is_ok());
         assert_eq!(debugger.get_breakpoints().len(), 0);
-        
+
         // Try to remove non-existent
         assert!(debugger.remove_breakpoint(0x1000).is_err());
     }
@@ -361,15 +377,15 @@ mod tests {
     fn test_call_stack() {
         let mut debugger = Debugger::new();
         debugger.attach();
-        
+
         let frame1 = StackFrame::new(0x1000);
         let frame2 = StackFrame::new(0x2000);
-        
+
         debugger.push_frame(frame1);
         debugger.push_frame(frame2);
-        
+
         assert_eq!(debugger.get_call_stack().len(), 2);
-        
+
         let popped = debugger.pop_frame();
         assert!(popped.is_some());
         assert_eq!(popped.unwrap().address, 0x2000);

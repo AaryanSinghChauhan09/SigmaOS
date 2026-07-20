@@ -27,7 +27,11 @@ impl GenerationManager {
     }
 
     /// Registers a new immutable configuration snapshot node
-    pub fn create_generation(&mut self, root_inode: u64, timestamp: u64) -> Result<u32, &'static str> {
+    pub fn create_generation(
+        &mut self,
+        root_inode: u64,
+        timestamp: u64,
+    ) -> Result<u32, &'static str> {
         let next_id = (self.generations.len() + 1) as u32;
         let gen = Generation {
             id: next_id,
@@ -107,17 +111,19 @@ mod tests {
     #[test]
     fn test_generation_cleanup() {
         let mut manager = GenerationManager::new();
-        
+
         // Create 5 generations
         for i in 1..=5 {
-            manager.create_generation(i * 0x1000, 1718900000 + i).unwrap();
+            manager
+                .create_generation(i * 0x1000, 1718900000 + i)
+                .unwrap();
         }
-        
+
         assert_eq!(manager.generation_count(), 5);
-        
+
         // Keep only 3 generations
         manager.cleanup_old_generations(3);
-        
+
         assert_eq!(manager.generation_count(), 3);
     }
 
@@ -125,7 +131,7 @@ mod tests {
     fn test_invalid_generation_swap() {
         let mut manager = GenerationManager::new();
         manager.create_generation(0x1000, 1718900000).unwrap();
-        
+
         // Try to swap to non-existent generation
         let result = manager.swap_active_generation(999);
         assert!(result.is_err());

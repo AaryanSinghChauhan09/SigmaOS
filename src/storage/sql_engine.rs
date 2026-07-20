@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SqlType {
@@ -99,8 +99,10 @@ impl SqlEngine {
     /// Commit the current transaction
     pub fn commit(&mut self) -> Result<(), &'static str> {
         let transaction_id = self.current_transaction.ok_or("No active transaction")?;
-        
-        let transaction = self.transactions.iter_mut()
+
+        let transaction = self
+            .transactions
+            .iter_mut()
             .find(|t| t.id == transaction_id)
             .ok_or("Transaction not found")?;
 
@@ -113,8 +115,10 @@ impl SqlEngine {
     /// Rollback the current transaction
     pub fn rollback(&mut self) -> Result<(), &'static str> {
         let transaction_id = self.current_transaction.ok_or("No active transaction")?;
-        
-        let transaction = self.transactions.iter_mut()
+
+        let transaction = self
+            .transactions
+            .iter_mut()
             .find(|t| t.id == transaction_id)
             .ok_or("Transaction not found")?;
 
@@ -153,7 +157,11 @@ impl SqlEngine {
     }
 
     /// Insert a row into a table
-    pub fn insert(&mut self, table_name: &str, values: Vec<SqlValue>) -> Result<QueryResult, &'static str> {
+    pub fn insert(
+        &mut self,
+        table_name: &str,
+        values: Vec<SqlValue>,
+    ) -> Result<QueryResult, &'static str> {
         let table = self.tables.get_mut(table_name).ok_or("Table not found")?;
 
         if values.len() != table.columns.len() {
@@ -177,14 +185,21 @@ impl SqlEngine {
     }
 
     /// Select rows from a table
-    pub fn select(&self, table_name: &str, columns: Option<Vec<String>>) -> Result<QueryResult, &'static str> {
+    pub fn select(
+        &self,
+        table_name: &str,
+        columns: Option<Vec<String>>,
+    ) -> Result<QueryResult, &'static str> {
         let table = self.tables.get(table_name).ok_or("Table not found")?;
 
         let column_indices = if let Some(cols) = columns {
             // Select specific columns
             let mut indices = Vec::new();
             for col_name in &cols {
-                let idx = table.columns.iter().position(|c| &c.name == col_name)
+                let idx = table
+                    .columns
+                    .iter()
+                    .position(|c| &c.name == col_name)
                     .ok_or("Column not found")?;
                 indices.push(idx);
             }
@@ -214,10 +229,18 @@ impl SqlEngine {
     }
 
     /// Update rows in a table
-    pub fn update(&mut self, table_name: &str, column: &str, value: SqlValue) -> Result<QueryResult, &'static str> {
+    pub fn update(
+        &mut self,
+        table_name: &str,
+        column: &str,
+        value: SqlValue,
+    ) -> Result<QueryResult, &'static str> {
         let table = self.tables.get_mut(table_name).ok_or("Table not found")?;
 
-        let col_idx = table.columns.iter().position(|c| &c.name == column)
+        let col_idx = table
+            .columns
+            .iter()
+            .position(|c| &c.name == column)
             .ok_or("Column not found")?;
 
         let affected_rows = table.rows.len();
@@ -270,7 +293,7 @@ mod tests {
     #[test]
     fn test_create_table() {
         let mut engine = SqlEngine::new();
-        
+
         let columns = vec![
             Column {
                 name: "id".to_string(),
@@ -293,7 +316,7 @@ mod tests {
     #[test]
     fn test_insert_and_select() {
         let mut engine = SqlEngine::new();
-        
+
         let columns = vec![
             Column {
                 name: "id".to_string(),
@@ -310,12 +333,9 @@ mod tests {
         ];
 
         engine.create_table("users".to_string(), columns).unwrap();
-        
-        let values = vec![
-            SqlValue::Integer(1),
-            SqlValue::Text("Alice".to_string()),
-        ];
-        
+
+        let values = vec![SqlValue::Integer(1), SqlValue::Text("Alice".to_string())];
+
         engine.insert("users", values).unwrap();
 
         let result = engine.select("users", None).unwrap();
@@ -326,15 +346,15 @@ mod tests {
     #[test]
     fn test_transaction() {
         let mut engine = SqlEngine::new();
-        
+
         let tx_id = engine.begin_transaction();
         assert_eq!(tx_id, 1);
-        
+
         engine.commit().unwrap();
-        
+
         let result = engine.begin_transaction();
         assert_eq!(result, 2);
-        
+
         engine.rollback().unwrap();
         assert_eq!(engine.transaction_count(), 2);
     }
@@ -342,7 +362,7 @@ mod tests {
     #[test]
     fn test_update() {
         let mut engine = SqlEngine::new();
-        
+
         let columns = vec![
             Column {
                 name: "id".to_string(),
@@ -359,24 +379,25 @@ mod tests {
         ];
 
         engine.create_table("users".to_string(), columns).unwrap();
-        
-        let values = vec![
-            SqlValue::Integer(1),
-            SqlValue::Text("Alice".to_string()),
-        ];
-        
+
+        let values = vec![SqlValue::Integer(1), SqlValue::Text("Alice".to_string())];
+
         engine.insert("users", values).unwrap();
-        
-        engine.update("users", "name", SqlValue::Text("Bob".to_string())).unwrap();
-        
-        let result = engine.select("users", Some(vec!["name".to_string()])).unwrap();
+
+        engine
+            .update("users", "name", SqlValue::Text("Bob".to_string()))
+            .unwrap();
+
+        let result = engine
+            .select("users", Some(vec!["name".to_string()]))
+            .unwrap();
         assert_eq!(result.rows[0][0], SqlValue::Text("Bob".to_string()));
     }
 
     #[test]
     fn test_delete() {
         let mut engine = SqlEngine::new();
-        
+
         let columns = vec![
             Column {
                 name: "id".to_string(),
@@ -393,17 +414,14 @@ mod tests {
         ];
 
         engine.create_table("users".to_string(), columns).unwrap();
-        
-        let values = vec![
-            SqlValue::Integer(1),
-            SqlValue::Text("Alice".to_string()),
-        ];
-        
+
+        let values = vec![SqlValue::Integer(1), SqlValue::Text("Alice".to_string())];
+
         engine.insert("users", values).unwrap();
-        
+
         let result = engine.delete("users").unwrap();
         assert_eq!(result.affected_rows, 1);
-        
+
         let result = engine.select("users", None).unwrap();
         assert_eq!(result.rows.len(), 0);
     }
@@ -411,19 +429,17 @@ mod tests {
     #[test]
     fn test_drop_table() {
         let mut engine = SqlEngine::new();
-        
-        let columns = vec![
-            Column {
-                name: "id".to_string(),
-                sql_type: SqlType::Integer,
-                primary_key: true,
-                not_null: true,
-            },
-        ];
+
+        let columns = vec![Column {
+            name: "id".to_string(),
+            sql_type: SqlType::Integer,
+            primary_key: true,
+            not_null: true,
+        }];
 
         engine.create_table("users".to_string(), columns).unwrap();
         engine.drop_table("users").unwrap();
-        
+
         assert_eq!(engine.table_count(), 0);
     }
 }

@@ -24,8 +24,9 @@ pub use clipboard_manager::{
 pub use document_engine::{Document, DocumentEngine, DocumentFormat, DocumentMetadata};
 pub use editor::{
     CodeEditor, CompletionItem, CompletionKind, CursorPosition, Diagnostic, DiagnosticSeverity,
-    Document as EditorDocument, EditorConfig, EditorError, Language, LspClient, LspFeature, MockLspClient,
-    RegexHighlighter, SyntaxHighlighter, SyntaxToken, TextRange, TextSelection, TokenType,
+    Document as EditorDocument, EditorConfig, EditorError, Language, LspClient, LspFeature,
+    MockLspClient, RegexHighlighter, SyntaxHighlighter, SyntaxToken, TextRange, TextSelection,
+    TokenType,
 };
 pub use email::{
     EmailAccountConfig, EmailAddress, EmailAttachment, EmailBackend, EmailClient, EmailError,
@@ -54,14 +55,14 @@ pub use screenshot::{
     CaptureRegion, ImageFormat, MacOsBackend, ScreenshotBackend, ScreenshotConfig, ScreenshotError,
     ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
+pub use sigma_office::{
+    CellValue, ChartType, DocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
+    ShapeType, SigmaDocument, SigmaOffice, SlideElementType, SpreadsheetProcessor, TextProcessor,
+    TypographyRenderer,
+};
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
     TaskError, TaskManager, TaskPriority, TaskStatus, TaskStorage,
-};
-pub use sigma_office::{
-    CellValue, ChartType, DocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
-    SigmaDocument, SigmaOffice, ShapeType, SlideElementType, SpreadsheetProcessor, TextProcessor,
-    TypographyRenderer,
 };
 pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,

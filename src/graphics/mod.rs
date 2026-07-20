@@ -8,16 +8,16 @@ pub mod zenith;
 pub mod zenith_compositor;
 
 pub use compositor::{
-    CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor,
-    LayerBlendMode, RenderLayer, SigmaCompositor,
+    CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
+    RenderLayer, SigmaCompositor,
 };
-pub use image_decoder::{ColorSpace, DecodedImage, ImageDecoder, ImageFormat, ImageMetadata};
 pub use gpu_driver::{Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat};
+pub use image_decoder::{ColorSpace, DecodedImage, ImageDecoder, ImageFormat, ImageMetadata};
 pub use zenith::{
     Animation, AnimationCurve, CompositorError as ZenithError, HighContrastMode, LayoutStyle,
     Magnifier, Panel, PanelOrientation, ScreenReader, Widget, ZenithCompositor,
 };
 pub use zenith_compositor::{
-    Geometry, WindowNode, WindowState, ZenithCompositor as WaylandZenithCompositor,
-    SCREEN_WIDTH, SCREEN_HEIGHT,
+    Geometry, WindowNode, WindowState, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
+    SCREEN_WIDTH,
 };

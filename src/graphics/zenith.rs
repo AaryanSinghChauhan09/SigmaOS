@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompositorError {
@@ -18,9 +18,9 @@ pub enum CompositorError {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LayoutStyle {
-    Grid,       // GNOME-style grid layout
-    Tiling,     // COSMIC-style tiling
-    Floating,   // Traditional floating windows
+    Grid,     // GNOME-style grid layout
+    Tiling,   // COSMIC-style tiling
+    Floating, // Traditional floating windows
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -166,7 +166,7 @@ impl Animation {
 /// Screen reader integration
 pub struct ScreenReader {
     pub enabled: bool,
-    pub voice_rate: u8, // 0-100
+    pub voice_rate: u8,  // 0-100
     pub voice_pitch: u8, // 0-100
 }
 

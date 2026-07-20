@@ -4,6 +4,6 @@
 pub mod sigmatools;
 
 pub use sigmatools::{
-    SigmaToolError, SigmaDeploy, SigmaCluster, ClusterNode, NodeState,
-    SigmaIdentity, UserIdentity, SigmaAccess, AccessibilityFeature,
+    AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
+    SigmaIdentity, SigmaToolError, UserIdentity,
 };

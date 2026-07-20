@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityError {
@@ -18,10 +18,10 @@ pub enum CompatibilityError {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryFormat {
-    Pe,      // Windows PE (Portable Executable)
-    MachO,   // macOS Mach-O
-    Elf,     // Linux/Android ELF
-    Apk,     // Android APK
+    Pe,    // Windows PE (Portable Executable)
+    MachO, // macOS Mach-O
+    Elf,   // Linux/Android ELF
+    Apk,   // Android APK
 }
 
 /// S-WINE: Windows Binary Translator
@@ -53,7 +53,10 @@ impl PeBinaryLoader {
 
         // Parse PE header offset
         let pe_offset = u32::from_le_bytes([
-            binary_data[0x3C], binary_data[0x3D], binary_data[0x3E], binary_data[0x3F]
+            binary_data[0x3C],
+            binary_data[0x3D],
+            binary_data[0x3E],
+            binary_data[0x3F],
         ]) as usize;
 
         if pe_offset + 4 > binary_data.len() {
@@ -61,8 +64,11 @@ impl PeBinaryLoader {
         }
 
         // Check PE signature
-        if binary_data[pe_offset] != 0x50 || binary_data[pe_offset + 1] != 0x45 ||
-           binary_data[pe_offset + 2] != 0x00 || binary_data[pe_offset + 3] != 0x00 {
+        if binary_data[pe_offset] != 0x50
+            || binary_data[pe_offset + 1] != 0x45
+            || binary_data[pe_offset + 2] != 0x00
+            || binary_data[pe_offset + 3] != 0x00
+        {
             return Err(CompatibilityError::InvalidBinary);
         }
 
@@ -124,7 +130,10 @@ impl MachoLoader {
 
         // Check for Mach-O magic number (0xFEEDFACE or 0xFEEDFACF for 64-bit)
         let magic = u32::from_be_bytes([
-            binary_data[0], binary_data[1], binary_data[2], binary_data[3]
+            binary_data[0],
+            binary_data[1],
+            binary_data[2],
+            binary_data[3],
         ]);
 
         if magic != 0xFEEDFACE && magic != 0xFEEDFACF {
@@ -139,7 +148,10 @@ impl MachoLoader {
     }
 
     /// Translate macOS Mach IPC to SigmaOS IPC
-    pub fn translate_mach_ipc(&self, message_type: &str) -> Result<&'static str, CompatibilityError> {
+    pub fn translate_mach_ipc(
+        &self,
+        message_type: &str,
+    ) -> Result<&'static str, CompatibilityError> {
         if !self.loaded {
             return Err(CompatibilityError::TranslationFailed);
         }
@@ -194,8 +206,8 @@ impl ApkLoader {
         }
 
         // Check for ZIP signature (APK is a ZIP file)
-        if apk_data[0] != 0x50 || apk_data[1] != 0x4B ||
-           apk_data[2] != 0x03 || apk_data[3] != 0x04 {
+        if apk_data[0] != 0x50 || apk_data[1] != 0x4B || apk_data[2] != 0x03 || apk_data[3] != 0x04
+        {
             return Err(CompatibilityError::InvalidBinary);
         }
 
@@ -207,7 +219,10 @@ impl ApkLoader {
     }
 
     /// Translate Android Binder call to SigmaOS capability
-    pub fn translate_binder_call(&self, call_type: BinderCallType) -> Result<&'static str, CompatibilityError> {
+    pub fn translate_binder_call(
+        &self,
+        call_type: BinderCallType,
+    ) -> Result<&'static str, CompatibilityError> {
         if !self.loaded || !self.binder_enabled {
             return Err(CompatibilityError::TranslationFailed);
         }
@@ -259,7 +274,7 @@ impl ScosmosManager {
         if self.pe_loader.parse_pe(binary_data).is_ok() {
             self.active_format = Some(BinaryFormat::Pe);
             return Ok(BinaryFormat::Pe);
-       }
+        }
 
         // Try Mach-O format
         if self.macho_loader.parse_macho(binary_data).is_ok() {
@@ -315,7 +330,7 @@ mod tests {
     #[test]
     fn test_pe_loader() {
         let mut loader = PeBinaryLoader::new();
-        
+
         // Create minimal PE header
         let mut pe_data = vec![0u8; 256];
         pe_data[0] = 0x4D; // 'M'
@@ -354,7 +369,7 @@ mod tests {
     #[test]
     fn test_macho_loader() {
         let mut loader = MachoLoader::new();
-        
+
         // Create Mach-O magic (32-bit)
         let mut macho_data = vec![0u8; 256];
         macho_data[0] = 0xFE;
@@ -376,14 +391,16 @@ mod tests {
         macho_data[3] = 0xCE;
         loader.parse_macho(&macho_data).unwrap();
 
-        let result = loader.translate_mach_ipc("MACH_MSG_TYPE_MOVE_SEND").unwrap();
+        let result = loader
+            .translate_mach_ipc("MACH_MSG_TYPE_MOVE_SEND")
+            .unwrap();
         assert_eq!(result, "sigma_ipc_send");
     }
 
     #[test]
     fn test_apk_loader() {
         let mut loader = ApkLoader::new();
-        
+
         // Create ZIP signature
         let mut apk_data = vec![0u8; 256];
         apk_data[0] = 0x50; // 'P'
@@ -406,14 +423,16 @@ mod tests {
         apk_data[3] = 0x04;
         loader.parse_apk(&apk_data).unwrap();
 
-        let result = loader.translate_binder_call(BinderCallType::Transaction).unwrap();
+        let result = loader
+            .translate_binder_call(BinderCallType::Transaction)
+            .unwrap();
         assert_eq!(result, "sigma_ipc_transaction");
     }
 
     #[test]
     fn test_scosmos_manager() {
         let mut manager = ScosmosManager::new();
-        
+
         let mut pe_data = vec![0u8; 256];
         pe_data[0] = 0x4D;
         pe_data[1] = 0x5A;
@@ -432,7 +451,7 @@ mod tests {
     fn test_invalid_binary() {
         let mut manager = ScosmosManager::new();
         let invalid_data = vec![0xFF; 10];
-        
+
         let result = manager.load_binary(&invalid_data);
         assert!(result.is_err());
     }
