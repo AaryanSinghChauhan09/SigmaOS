@@ -120,6 +120,7 @@ pub use kernel::{
     CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType,
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState,
     IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue,
+    CpuInstructionExtension, SovereignCompilerOptimizer,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
@@ -146,6 +147,7 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager, PackageDependencyResolver, Version,
+    PackageState, SpacPackageManager, SovereignPackage,
 };
 pub use productivity::{
     Achievement, AchievementType, Document as ProductivityDocument, DocumentEngine, DocumentFormat,
