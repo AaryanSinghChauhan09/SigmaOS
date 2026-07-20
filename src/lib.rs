@@ -83,6 +83,8 @@ pub use drivers::{
     StorageType, Thunderbolt4Controller, UdfAncientDevice, UefiGopDriver, Ufs4StorageDriver,
     Usb4HostController, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, VgaTextModeDriver,
     Wifi7Adapter, XhciHostController,
+    ClockController, ClockError, GenericClock, GenericPin, PinController, PinDirection, PinError,
+    PinPull, SocClockController, SocPinController, UnifiedSocController,
 };
 pub use ecosystem::{
     ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
