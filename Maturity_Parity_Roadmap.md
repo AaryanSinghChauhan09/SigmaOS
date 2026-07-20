@@ -11,11 +11,11 @@
 | A | Foundation | Core kernel primitives | ✅ Complete |
 | B | Security Core | PQC + Capability model | ✅ Complete |
 | C | Storage & FS | VFS + SigmaFS + Ext4 | ✅ Complete |
-| D | Network Stack | TCP/UDP + Zero-Trust | 🔄 In Progress |
+| D | Network Stack | TCP/UDP + Zero-Trust | ✅ Complete |
 | E | Package Manager | sigma-pkg + sigpkg SAT solver | ✅ Complete |
 | F | Competitor Crusher | Driver + app absorption | ✅ Complete |
-| G | Kernel Boot | Bootable ISO + bare metal | 🔄 60% Active |
-| H | India Stack | GST/UPI/22-lang + compliance | ⬜ Blocked on G |
+| G | Kernel Boot | Bootable ISO + bare metal | ✅ Complete |
+| H | India Stack | GST/UPI/22-lang + compliance | 🔄 Started |
 | I | AI-Native | Local LLM OS primitive | ⬜ Planned |
 | J | Production Release | Stable, shippable distro | ⬜ Planned |
 
