@@ -120,6 +120,11 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype
 - ✅ sigma-pkg CLI
+- ✅ NixOS-style atomic generation manager
+- ✅ Arch-style SAT solver and package parser
+- ✅ Android-style runtime capability token guard
+- ✅ Kali-style isolated system tracing sandbox
+- ✅ BusyBox-style multi-call shell parser
 - ⬜ Bootable ISO (Phase G)
 
 ### Driver Ecosystem Status
