@@ -668,3 +668,4 @@ To fully satisfy cross-compilation pipeline layouts across diverse programming t
 3. **`WIKI/KERNEL_PERFORMANCE_PLAN.md`:** Zero-copy zero-allocation high-throughput network interfaces and MLFQ schedulers.
 4. **`WIKI/PORTABLE_APP_FORMAT_PLAN.md`:** Decentralized, content-addressed standalone packaging specification maps.
 5. **`WIKI/CUSTOM_PERSONALIZATION_SPEC.md`:** Context-aware, Samsung Modes & Routines-style automation and adaptive visual theme triggers.
+6. **`WIKI/BIOS_FIRMWARE_SPEC.md`:** SEC/PEI/DXE early boot phases, memory controller activation, and PCI bus scan boot firmware.
