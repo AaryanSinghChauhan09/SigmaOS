@@ -69,6 +69,7 @@ pub use drivers::{
     SoundBlaster16Driver, Stable6_22_SensorDriver, StorageCommand, StorageDriver, StorageError,
     StorageType, Thunderbolt4Controller, UdfAncientDevice, Ufs4StorageDriver, Usb4HostController,
     UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, VgaTextModeDriver, Wifi7Adapter,
+    UefiGopDriver, AcpiTableParser, XhciHostController,
 };
 pub use ecosystem::{
     ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
@@ -91,7 +92,10 @@ pub use kernel::{
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use network::{
+    DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError, TcpConnection, TcpError,
+    TcpSegment, TcpStack, TcpState,
+};
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,

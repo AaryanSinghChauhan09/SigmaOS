@@ -7,6 +7,7 @@ pub mod tcp_udp;
 pub mod torrent;
 pub mod wireless;
 pub mod zero_trust;
+pub mod protocols;
 
 pub use analyzer::{
     AlertSeverity, AlertType, AnalysisStrategy, BandwidthAnalysis, ConnectionInfo, ConnectionState,
@@ -37,4 +38,7 @@ pub use wireless::{
 };
 pub use zero_trust::{
     NetworkAction, NetworkPolicy, SimpleNetworkPolicy, SimpleZeroTrustEngine, ZeroTrustEngine,
+};
+pub use protocols::{
+    DnsResolver, DnsError, MDnsDiscovery, QuicConnection, QuicError,
 };
