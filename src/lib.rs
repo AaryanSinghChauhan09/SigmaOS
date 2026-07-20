@@ -183,6 +183,7 @@ pub use fs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, CompressionType as BtrfsCompressionType, ChecksumType,
     AhciSataController, BlockStorageDevice, BlockStorageError, JournalBlock, JournalBlockType,
     MerkleNode, NvmeStorageController, SigmaFs, TransactionalJournal,
+    CasBlock, SigmaFsCasEngine, SHA256_HASH_SIZE, DILITHIUM5_SIGNATURE_SIZE,
     AllocationStrategy as XfsAllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal, XfsState,
 };
 pub use security::{
