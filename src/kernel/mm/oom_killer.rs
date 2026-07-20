@@ -1,8 +1,7 @@
+use crate::kernel::scheduler::Process;
 /// SigmaOS OOM (Out Of Memory) Killer implementation
 /// Calculates badness score of processes and kills the worst culprit
-
 use std::collections::HashMap;
-use crate::kernel::scheduler::Process;
 
 pub struct OomKiller {
     oom_scores_adj: HashMap<u64, i32>,
@@ -25,16 +24,20 @@ impl OomKiller {
         self.oom_scores_adj.get(&pid).copied().unwrap_or(0)
     }
 
-    pub fn select_victim(&self, processes: &[Process], memory_usages: &HashMap<u64, u64>) -> Option<u64> {
+    pub fn select_victim(
+        &self,
+        processes: &[Process],
+        memory_usages: &HashMap<u64, u64>,
+    ) -> Option<u64> {
         let mut worst_pid = None;
         let mut worst_points = -99999i64;
 
         for p in processes {
             let usage = memory_usages.get(&p.pid).copied().unwrap_or(0);
-            
+
             // Base score is memory usage in kilobytes
             let mut points = (usage / 1024) as i64;
-            
+
             // Adjust based on Priority
             points -= match p.priority {
                 crate::kernel::scheduler::Priority::Idle => 0,
@@ -76,10 +79,10 @@ mod tests {
     #[test]
     fn test_oom_killer_selection() {
         let mut oom = OomKiller::new();
-        
+
         let p1 = Process::new(101, "browser".to_string(), Priority::Normal);
         let p2 = Process::new(102, "db".to_string(), Priority::High);
-        
+
         let mut usages = HashMap::new();
         usages.insert(101, 1024 * 1024 * 50); // 50MB
         usages.insert(102, 1024 * 1024 * 100); // 100MB

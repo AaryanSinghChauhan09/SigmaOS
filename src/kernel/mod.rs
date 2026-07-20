@@ -13,8 +13,8 @@ pub mod slab_allocator;
 pub mod watchdog;
 
 // ── Phase J: subsystem registry & legacy device drivers ───────────────────
-pub mod subsystems;
 pub mod drivers;
+pub mod subsystems;
 
 // ── Phase J: process management (fork/exec/signals/namespaces/cgroups) ────
 pub mod proc;
@@ -55,26 +55,34 @@ pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
 pub use watchdog::{HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState};
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
-pub use proc::{ProcessLifecycleManager, Signal, SignalHandler, SignalManager,
-               Namespace, NamespaceType, NamespaceManager,
-               ResourceLimits, CgroupManager};
+pub use proc::{
+    CgroupManager, Namespace, NamespaceManager, NamespaceType, ProcessLifecycleManager,
+    ResourceLimits, Signal, SignalHandler, SignalManager,
+};
 // mm: single export covering both Phase J and Phase K additions
-pub use mm::{SlabAllocator, VmallocManager, HugePageManager, HugePageSize,
-             OomKiller, NumaTopologyManager, NumaNode,
-             PageCache, CachedPage, PageStatus};
-pub use fs::{ProcFileSystem, SysfsTree, DevTmpFs, DeviceClass};
-pub use irq::{IRQController, IRQHandler, ControllerType, IrqDomain,
-              SoftirqEngine, SoftirqType, Workqueue, Work};
-pub use power::{CpufreqPolicy, CpufreqGovernor, CpufreqManager,
-                ThermalZone, ThermalManager, PowerStateManager, SleepState};
+pub use fs::{DevTmpFs, DeviceClass, ProcFileSystem, SysfsTree};
+pub use irq::{
+    ControllerType, IRQController, IRQHandler, IrqDomain, SoftirqEngine, SoftirqType, Work,
+    Workqueue,
+};
+pub use mm::{
+    CachedPage, HugePageManager, HugePageSize, NumaNode, NumaTopologyManager, OomKiller, PageCache,
+    PageStatus, SlabAllocator, VmallocManager,
+};
+pub use power::{
+    CpufreqGovernor, CpufreqManager, CpufreqPolicy, PowerStateManager, SleepState, ThermalManager,
+    ThermalZone,
+};
 // net: single export covering Phase J (socket/netfilter/tc) + Phase K (IPv4/TCP)
-pub use net::{SocketLayer, SockAddrIn, AddressFamily, SocketType, Protocol,
-              NetfilterTable, NfRule, NfVerdict, NfHookpoint,
-              Pfifo, PfifoFast, Sfq, Tbf, QPacket,
-              Ipv4Stack, Ipv4Header, ArpTable, RoutingTable, Route,
-              TcpConnection, TcpSegment, TcpState, CongestionAlgorithm};
-pub use block_dev::{BlockDeviceManager, RamDisk, Bio, BioOp, DeadlineScheduler,
-                    SECTOR_SIZE, BLOCK_SIZE};
-pub use crypto::{sha256, hmac_sha256, pbkdf2_hmac_sha256, Aes128,
-                 SigmaCsprng, CryptoEngine, CryptoAlgorithm};
-pub use syscall::{SyscallTable, SyscallArgs, SyscallResult, SyscallError, SyscallNr};
+pub use block_dev::{
+    Bio, BioOp, BlockDeviceManager, DeadlineScheduler, RamDisk, BLOCK_SIZE, SECTOR_SIZE,
+};
+pub use crypto::{
+    hmac_sha256, pbkdf2_hmac_sha256, sha256, Aes128, CryptoAlgorithm, CryptoEngine, SigmaCsprng,
+};
+pub use net::{
+    AddressFamily, ArpTable, CongestionAlgorithm, Ipv4Header, Ipv4Stack, NetfilterTable,
+    NfHookpoint, NfRule, NfVerdict, Pfifo, PfifoFast, Protocol, QPacket, Route, RoutingTable, Sfq,
+    SockAddrIn, SocketLayer, SocketType, Tbf, TcpConnection, TcpSegment, TcpState,
+};
+pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};

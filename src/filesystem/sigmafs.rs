@@ -1,10 +1,9 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaFS: Content-Addressed, Post-Quantum Cryptography (PQC) Encrypted Filesystem
 /// Implements a full Merkle-tree DAG structure for content addressing.
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::security::EncryptionAlgorithm;
 
@@ -108,28 +107,28 @@ mod tests {
     #[test]
     fn test_merkle_dag_storage() {
         let mut fs = SigmaFS::new();
-        
+
         // Write two identical blocks
         let data1 = b"Block 1 data".to_vec();
         let data2 = b"Block 1 data".to_vec();
-        
+
         let hash1 = fs.store_node(DagNode::DataBlock(data1));
         let hash2 = fs.store_node(DagNode::DataBlock(data2));
-        
+
         // Due to CAS, they should have the same HashId (deduplication)
         assert_eq!(hash1, hash2);
-        
+
         // Create a file pointing to this block
         let file_node = DagNode::File(vec![hash1]);
         let file_hash = fs.store_node(file_node);
-        
+
         // Create a root directory pointing to this file
         let mut root_dir = BTreeMap::new();
         root_dir.insert("my_file.txt".to_string(), file_hash);
         let root_hash = fs.store_node(DagNode::Directory(root_dir));
-        
+
         fs.root_hash = root_hash;
-        
+
         assert_eq!(fs.cas.len(), 4); // Root init + 1 datablock + 1 file + 1 new root
     }
 
@@ -137,7 +136,7 @@ mod tests {
     fn test_vfs_integration() {
         let mut fs = SigmaFS::new();
         assert!(fs.initialize().is_ok());
-        
+
         let file_hash = fs.write_file(b"SigmaOS is sovereign").unwrap();
         assert!(fs.get_node(&file_hash).is_some());
     }

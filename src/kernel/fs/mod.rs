@@ -1,7 +1,7 @@
+pub mod devtmpfs;
 pub mod proc_fs;
 pub mod sysfs_like;
-pub mod devtmpfs;
 
-pub use proc_fs::{ProcFileSystem, ProcEntry};
-pub use sysfs_like::{SysfsTree, SysfsDeviceNode, SysfsAttribute};
-pub use devtmpfs::{DevTmpFs, DeviceNode, DeviceClass};
+pub use devtmpfs::{DevTmpFs, DeviceClass, DeviceNode};
+pub use proc_fs::{ProcEntry, ProcFileSystem};
+pub use sysfs_like::{SysfsAttribute, SysfsDeviceNode, SysfsTree};

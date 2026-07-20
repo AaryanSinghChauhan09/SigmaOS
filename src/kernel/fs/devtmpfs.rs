@@ -1,6 +1,5 @@
 /// SigmaOS devtmpfs (/dev) pseudo-filesystem
 /// Automatically registers and creates device files when drivers boot
-
 use std::collections::HashMap;
 use std::string::{String, ToString};
 
@@ -28,7 +27,13 @@ impl DevTmpFs {
         }
     }
 
-    pub fn register_device(&mut self, name: &str, class: DeviceClass, major: u32, minor: u32) -> Result<(), &'static str> {
+    pub fn register_device(
+        &mut self,
+        name: &str,
+        class: DeviceClass,
+        major: u32,
+        minor: u32,
+    ) -> Result<(), &'static str> {
         if self.devices.contains_key(name) {
             return Err("Device already registered in /dev");
         }
@@ -68,8 +73,10 @@ mod tests {
     #[test]
     fn test_devtmpfs() {
         let mut dev = DevTmpFs::new();
-        dev.register_device("null", DeviceClass::Char, 1, 3).unwrap();
-        dev.register_device("sda", DeviceClass::Block, 8, 0).unwrap();
+        dev.register_device("null", DeviceClass::Char, 1, 3)
+            .unwrap();
+        dev.register_device("sda", DeviceClass::Block, 8, 0)
+            .unwrap();
 
         assert_eq!(dev.get_device("null").unwrap().major, 1);
         assert_eq!(dev.get_device("sda").unwrap().class, DeviceClass::Block);

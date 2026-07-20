@@ -1,22 +1,38 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
-
 use std::collections::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum AddressFamily { Unspec, Unix, Inet, Inet6, Netlink, Packet }
+pub enum AddressFamily {
+    Unspec,
+    Unix,
+    Inet,
+    Inet6,
+    Netlink,
+    Packet,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SocketType { Stream, Dgram, Raw, SeqPacket }
+pub enum SocketType {
+    Stream,
+    Dgram,
+    Raw,
+    SeqPacket,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Protocol { Tcp = 6, Udp = 17, Icmp = 1, Raw = 0 }
+pub enum Protocol {
+    Tcp = 6,
+    Udp = 17,
+    Icmp = 1,
+    Raw = 0,
+}
 
 /// IPv4 socket address
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -26,17 +42,31 @@ pub struct SockAddrIn {
 }
 
 impl SockAddrIn {
-    pub fn new(addr: [u8; 4], port: u16) -> Self { SockAddrIn { port, addr } }
-    pub fn loopback(port: u16) -> Self { SockAddrIn::new([127, 0, 0, 1], port) }
-    pub fn any(port: u16) -> Self { SockAddrIn::new([0, 0, 0, 0], port) }
+    pub fn new(addr: [u8; 4], port: u16) -> Self {
+        SockAddrIn { port, addr }
+    }
+    pub fn loopback(port: u16) -> Self {
+        SockAddrIn::new([127, 0, 0, 1], port)
+    }
+    pub fn any(port: u16) -> Self {
+        SockAddrIn::new([0, 0, 0, 0], port)
+    }
 }
 
 // ── Socket State Machine ───────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketState {
-    Unbound, Bound, Listening, Connected, Accepted,
-    CloseWait, FinWait1, FinWait2, TimeWait, Closed,
+    Unbound,
+    Bound,
+    Listening,
+    Connected,
+    Accepted,
+    CloseWait,
+    FinWait1,
+    FinWait2,
+    TimeWait,
+    Closed,
 }
 
 /// File descriptor flags
@@ -51,7 +81,13 @@ pub struct SocketFlags {
 
 impl Default for SocketFlags {
     fn default() -> Self {
-        SocketFlags { non_blocking: false, reuse_addr: false, reuse_port: false, keep_alive: false, no_delay: false }
+        SocketFlags {
+            non_blocking: false,
+            reuse_addr: false,
+            reuse_port: false,
+            keep_alive: false,
+            no_delay: false,
+        }
     }
 }
 
@@ -62,7 +98,12 @@ pub struct SocketBuffer {
 }
 
 impl SocketBuffer {
-    pub fn new(capacity: usize) -> Self { SocketBuffer { data: Vec::new(), capacity } }
+    pub fn new(capacity: usize) -> Self {
+        SocketBuffer {
+            data: Vec::new(),
+            capacity,
+        }
+    }
     pub fn push(&mut self, buf: &[u8]) -> usize {
         let avail = self.capacity.saturating_sub(self.data.len());
         let n = buf.len().min(avail);
@@ -73,8 +114,12 @@ impl SocketBuffer {
         let n = n.min(self.data.len());
         self.data.drain(..n).collect()
     }
-    pub fn len(&self) -> usize { self.data.len() }
-    pub fn is_empty(&self) -> bool { self.data.is_empty() }
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
 }
 
 /// A kernel socket
@@ -98,9 +143,13 @@ pub struct Socket {
 impl Socket {
     pub fn new(fd: u32, family: AddressFamily, sock_type: SocketType, proto: Protocol) -> Self {
         Socket {
-            fd, family, sock_type, protocol: proto,
+            fd,
+            family,
+            sock_type,
+            protocol: proto,
             state: SocketState::Unbound,
-            local_addr: None, remote_addr: None,
+            local_addr: None,
+            remote_addr: None,
             flags: SocketFlags::default(),
             recv_buf: SocketBuffer::new(131072), // 128KB default
             send_buf: SocketBuffer::new(131072),
@@ -112,29 +161,39 @@ impl Socket {
     }
 
     pub fn bind(&mut self, addr: SockAddrIn) -> Result<(), &'static str> {
-        if self.state != SocketState::Unbound { return Err("Socket already bound"); }
+        if self.state != SocketState::Unbound {
+            return Err("Socket already bound");
+        }
         self.local_addr = Some(addr);
         self.state = SocketState::Bound;
         Ok(())
     }
 
     pub fn listen(&mut self, backlog: usize) -> Result<(), &'static str> {
-        if self.sock_type != SocketType::Stream { return Err("Only SOCK_STREAM can listen"); }
-        if self.state != SocketState::Bound { return Err("Socket must be bound first"); }
+        if self.sock_type != SocketType::Stream {
+            return Err("Only SOCK_STREAM can listen");
+        }
+        if self.state != SocketState::Bound {
+            return Err("Socket must be bound first");
+        }
         self.backlog = backlog;
         self.state = SocketState::Listening;
         Ok(())
     }
 
     pub fn connect(&mut self, remote: SockAddrIn) -> Result<(), &'static str> {
-        if self.state == SocketState::Connected { return Err("Already connected"); }
+        if self.state == SocketState::Connected {
+            return Err("Already connected");
+        }
         self.remote_addr = Some(remote);
         self.state = SocketState::Connected;
         Ok(())
     }
 
     pub fn send(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        if self.state != SocketState::Connected { return Err("Not connected"); }
+        if self.state != SocketState::Connected {
+            return Err("Not connected");
+        }
         let n = self.send_buf.push(data);
         self.bytes_sent.fetch_add(n, Ordering::Relaxed);
         Ok(n)
@@ -149,9 +208,15 @@ impl Socket {
         Ok(data)
     }
 
-    pub fn inject_data(&mut self, data: &[u8]) { self.recv_buf.push(data); }
-    pub fn bytes_sent(&self) -> usize { self.bytes_sent.load(Ordering::Relaxed) }
-    pub fn bytes_recv(&self) -> usize { self.bytes_recv.load(Ordering::Relaxed) }
+    pub fn inject_data(&mut self, data: &[u8]) {
+        self.recv_buf.push(data);
+    }
+    pub fn bytes_sent(&self) -> usize {
+        self.bytes_sent.load(Ordering::Relaxed)
+    }
+    pub fn bytes_recv(&self) -> usize {
+        self.bytes_recv.load(Ordering::Relaxed)
+    }
 }
 
 // ── Socket Manager (kernel socket table) ──────────────────────────────────
@@ -164,7 +229,11 @@ pub struct SocketLayer {
 
 impl SocketLayer {
     pub fn new() -> Self {
-        SocketLayer { sockets: HashMap::new(), next_fd: AtomicUsize::new(4), bound_ports: HashMap::new() }
+        SocketLayer {
+            sockets: HashMap::new(),
+            next_fd: AtomicUsize::new(4),
+            bound_ports: HashMap::new(),
+        }
     }
 
     pub fn socket(&mut self, family: AddressFamily, typ: SocketType, proto: Protocol) -> u32 {
@@ -174,7 +243,9 @@ impl SocketLayer {
     }
 
     pub fn bind(&mut self, fd: u32, addr: SockAddrIn) -> Result<(), &'static str> {
-        if self.bound_ports.contains_key(&addr.port) { return Err("EADDRINUSE: port already bound"); }
+        if self.bound_ports.contains_key(&addr.port) {
+            return Err("EADDRINUSE: port already bound");
+        }
         self.bound_ports.insert(addr.port, fd);
         let sock = self.sockets.get_mut(&fd).ok_or("EBADF: invalid fd")?;
         sock.bind(addr)
@@ -201,21 +272,31 @@ impl SocketLayer {
     }
 
     pub fn inject_data(&mut self, fd: u32, data: &[u8]) {
-        if let Some(sock) = self.sockets.get_mut(&fd) { sock.inject_data(data); }
+        if let Some(sock) = self.sockets.get_mut(&fd) {
+            sock.inject_data(data);
+        }
     }
 
     pub fn close(&mut self, fd: u32) -> Result<(), &'static str> {
         let sock = self.sockets.remove(&fd).ok_or("EBADF")?;
-        if let Some(addr) = sock.local_addr { self.bound_ports.remove(&addr.port); }
+        if let Some(addr) = sock.local_addr {
+            self.bound_ports.remove(&addr.port);
+        }
         Ok(())
     }
 
-    pub fn get_socket(&self, fd: u32) -> Option<&Socket> { self.sockets.get(&fd) }
-    pub fn socket_count(&self) -> usize { self.sockets.len() }
+    pub fn get_socket(&self, fd: u32) -> Option<&Socket> {
+        self.sockets.get(&fd)
+    }
+    pub fn socket_count(&self) -> usize {
+        self.sockets.len()
+    }
 }
 
 impl Default for SocketLayer {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -230,12 +311,18 @@ mod tests {
         let server_fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
         sl.bind(server_fd, SockAddrIn::any(8080)).unwrap();
         sl.listen(server_fd, 10).unwrap();
-        assert_eq!(sl.get_socket(server_fd).unwrap().state, SocketState::Listening);
+        assert_eq!(
+            sl.get_socket(server_fd).unwrap().state,
+            SocketState::Listening
+        );
 
         // Client
         let client_fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
         sl.connect(client_fd, SockAddrIn::loopback(8080)).unwrap();
-        assert_eq!(sl.get_socket(client_fd).unwrap().state, SocketState::Connected);
+        assert_eq!(
+            sl.get_socket(client_fd).unwrap().state,
+            SocketState::Connected
+        );
 
         // Data transfer
         let n = sl.send(client_fd, b"Hello SigmaOS!").unwrap();

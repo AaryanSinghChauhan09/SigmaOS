@@ -1,6 +1,5 @@
 /// SigmaOS cgroups v2 resource controller implementation
 /// Controls CPU limits, Memory limits, and PID limits
-
 use std::collections::HashMap;
 use std::string::{String, ToString};
 
@@ -63,7 +62,7 @@ impl CgroupManager {
         for g in self.groups.values_mut() {
             g.pids.retain(|&x| x != pid);
         }
-        
+
         let group = self.groups.get_mut(name).ok_or("Cgroup not found")?;
         if group.pids.len() >= group.limits.max_pids as usize {
             return Err("PID limit exceeded for this cgroup");
@@ -105,7 +104,10 @@ mod tests {
 
         cgm.attach_process("database", 201).unwrap();
         cgm.attach_process("database", 202).unwrap();
-        assert_eq!(cgm.attach_process("database", 203), Err("PID limit exceeded for this cgroup"));
+        assert_eq!(
+            cgm.attach_process("database", 203),
+            Err("PID limit exceeded for this cgroup")
+        );
 
         let group = cgm.get_group_of_pid(201).unwrap();
         assert_eq!(group.name, "database");

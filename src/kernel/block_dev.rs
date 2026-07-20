@@ -1,78 +1,124 @@
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
-
 use std::collections::{BTreeMap, VecDeque};
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
 
 pub const SECTOR_SIZE: usize = 512;
-pub const BLOCK_SIZE:  usize = 4096; // 4K blocks
+pub const BLOCK_SIZE: usize = 4096; // 4K blocks
 pub const SECTORS_PER_BLOCK: usize = BLOCK_SIZE / SECTOR_SIZE;
 
 // ── Block I/O request types ───────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BioOp { Read, Write, Flush, Discard }
+pub enum BioOp {
+    Read,
+    Write,
+    Flush,
+    Discard,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ReqPriority { Idle, Normal, High, Sync }
+pub enum ReqPriority {
+    Idle,
+    Normal,
+    High,
+    Sync,
+}
 
 /// A block I/O request (bio)
 #[derive(Debug, Clone)]
 pub struct Bio {
-    pub id:       u64,
-    pub sector:   u64,      // Starting sector (LBA)
-    pub count:    u32,      // Number of sectors
-    pub op:       BioOp,
+    pub id: u64,
+    pub sector: u64, // Starting sector (LBA)
+    pub count: u32,  // Number of sectors
+    pub op: BioOp,
     pub priority: ReqPriority,
-    pub data:     Vec<u8>,
+    pub data: Vec<u8>,
 }
 
 impl Bio {
     pub fn read(id: u64, sector: u64, count: u32) -> Self {
-        Bio { id, sector, count, op: BioOp::Read, priority: ReqPriority::Normal, data: vec![0u8; count as usize * SECTOR_SIZE] }
+        Bio {
+            id,
+            sector,
+            count,
+            op: BioOp::Read,
+            priority: ReqPriority::Normal,
+            data: vec![0u8; count as usize * SECTOR_SIZE],
+        }
     }
     pub fn write(id: u64, sector: u64, data: Vec<u8>) -> Self {
         let count = (data.len() / SECTOR_SIZE) as u32;
-        Bio { id, sector, count, op: BioOp::Write, priority: ReqPriority::Normal, data }
+        Bio {
+            id,
+            sector,
+            count,
+            op: BioOp::Write,
+            priority: ReqPriority::Normal,
+            data,
+        }
     }
-    pub fn end_sector(&self) -> u64 { self.sector + self.count as u64 }
-    pub fn byte_len(&self) -> usize { self.count as usize * SECTOR_SIZE }
+    pub fn end_sector(&self) -> u64 {
+        self.sector + self.count as u64
+    }
+    pub fn byte_len(&self) -> usize {
+        self.count as usize * SECTOR_SIZE
+    }
 }
 
 // ── I/O Scheduler (elevator) ──────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ElevatorAlgorithm { Noop, Deadline, CScan, Bfq }
+pub enum ElevatorAlgorithm {
+    Noop,
+    Deadline,
+    CScan,
+    Bfq,
+}
 
 /// Deadline scheduler: read deadline 500ms, write deadline 5000ms
 pub struct DeadlineScheduler {
-    read_queue:  BTreeMap<u64, Bio>,  // sector → Bio
+    read_queue: BTreeMap<u64, Bio>, // sector → Bio
     write_queue: BTreeMap<u64, Bio>,
-    dispatch:    VecDeque<Bio>,
-    head_pos:    u64,                 // Current disk head position
+    dispatch: VecDeque<Bio>,
+    head_pos: u64, // Current disk head position
     total_merged: AtomicUsize,
 }
 
 impl DeadlineScheduler {
     pub fn new() -> Self {
-        DeadlineScheduler { read_queue: BTreeMap::new(), write_queue: BTreeMap::new(), dispatch: VecDeque::new(), head_pos: 0, total_merged: AtomicUsize::new(0) }
+        DeadlineScheduler {
+            read_queue: BTreeMap::new(),
+            write_queue: BTreeMap::new(),
+            dispatch: VecDeque::new(),
+            head_pos: 0,
+            total_merged: AtomicUsize::new(0),
+        }
     }
 
     pub fn submit(&mut self, bio: Bio) {
         // Try to merge adjacent requests
         match bio.op {
-            BioOp::Read  => { self.read_queue.insert(bio.sector, bio); }
-            BioOp::Write => { self.write_queue.insert(bio.sector, bio); }
-            _ => { self.dispatch.push_back(bio); }
+            BioOp::Read => {
+                self.read_queue.insert(bio.sector, bio);
+            }
+            BioOp::Write => {
+                self.write_queue.insert(bio.sector, bio);
+            }
+            _ => {
+                self.dispatch.push_back(bio);
+            }
         }
     }
 
     /// Dispatch next request using C-SCAN (elevator) over sectors
     pub fn dispatch_next(&mut self) -> Option<Bio> {
-        if let Some(bio) = self.dispatch.pop_front() { return Some(bio); }
+        if let Some(bio) = self.dispatch.pop_front() {
+            return Some(bio);
+        }
 
         // Serve reads preferentially; find next sector >= head
         if let Some((&sector, _)) = self.read_queue.range(self.head_pos..).next() {
@@ -100,10 +146,16 @@ impl DeadlineScheduler {
         None
     }
 
-    pub fn pending(&self) -> usize { self.read_queue.len() + self.write_queue.len() + self.dispatch.len() }
+    pub fn pending(&self) -> usize {
+        self.read_queue.len() + self.write_queue.len() + self.dispatch.len()
+    }
 }
 
-impl Default for DeadlineScheduler { fn default() -> Self { Self::new() } }
+impl Default for DeadlineScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 // ── Block device abstraction ──────────────────────────────────────────────
 
@@ -112,7 +164,9 @@ pub trait BlockDevice: Send + Sync {
     fn sector_count(&self) -> u64;
     fn read_sectors(&mut self, lba: u64, buf: &mut [u8]) -> Result<usize, &'static str>;
     fn write_sectors(&mut self, lba: u64, data: &[u8]) -> Result<usize, &'static str>;
-    fn flush(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn flush(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
 }
 
 /// RAM-backed block device (for testing / ramdisk)
@@ -120,36 +174,54 @@ pub struct RamDisk {
     name: String,
     data: Vec<u8>,
     sector_count: u64,
-    reads:  AtomicU64,
+    reads: AtomicU64,
     writes: AtomicU64,
 }
 
 impl RamDisk {
     pub fn new(name: &str, size_bytes: usize) -> Self {
         let sectors = (size_bytes / SECTOR_SIZE) as u64;
-        RamDisk { name: name.to_string(), data: vec![0u8; size_bytes], sector_count: sectors, reads: AtomicU64::new(0), writes: AtomicU64::new(0) }
+        RamDisk {
+            name: name.to_string(),
+            data: vec![0u8; size_bytes],
+            sector_count: sectors,
+            reads: AtomicU64::new(0),
+            writes: AtomicU64::new(0),
+        }
     }
-    pub fn reads(&self)  -> u64 { self.reads.load(Ordering::Relaxed) }
-    pub fn writes(&self) -> u64 { self.writes.load(Ordering::Relaxed) }
+    pub fn reads(&self) -> u64 {
+        self.reads.load(Ordering::Relaxed)
+    }
+    pub fn writes(&self) -> u64 {
+        self.writes.load(Ordering::Relaxed)
+    }
 }
 
 impl BlockDevice for RamDisk {
-    fn name(&self) -> &str { &self.name }
-    fn sector_count(&self) -> u64 { self.sector_count }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn sector_count(&self) -> u64 {
+        self.sector_count
+    }
 
     fn read_sectors(&mut self, lba: u64, buf: &mut [u8]) -> Result<usize, &'static str> {
         let offset = lba as usize * SECTOR_SIZE;
         let len = buf.len();
-        if offset + len > self.data.len() { return Err("RamDisk: read out of bounds"); }
-        buf.copy_from_slice(&self.data[offset..offset+len]);
+        if offset + len > self.data.len() {
+            return Err("RamDisk: read out of bounds");
+        }
+        buf.copy_from_slice(&self.data[offset..offset + len]);
         self.reads.fetch_add(1, Ordering::Relaxed);
         Ok(len)
     }
 
     fn write_sectors(&mut self, lba: u64, data: &[u8]) -> Result<usize, &'static str> {
         let offset = lba as usize * SECTOR_SIZE;
-        if offset + data.len() > self.data.len() { return Err("RamDisk: write out of bounds"); }
-        self.data[offset..offset+data.len()].copy_from_slice(data);
+        if offset + data.len() > self.data.len() {
+            return Err("RamDisk: write out of bounds");
+        }
+        self.data[offset..offset + data.len()].copy_from_slice(data);
         self.writes.fetch_add(1, Ordering::Relaxed);
         Ok(data.len())
     }
@@ -165,7 +237,11 @@ pub struct BlockDeviceManager {
 
 impl BlockDeviceManager {
     pub fn new() -> Self {
-        BlockDeviceManager { devices: std::collections::HashMap::new(), scheduler: DeadlineScheduler::new(), bio_counter: AtomicU64::new(0) }
+        BlockDeviceManager {
+            devices: std::collections::HashMap::new(),
+            scheduler: DeadlineScheduler::new(),
+            bio_counter: AtomicU64::new(0),
+        }
     }
 
     pub fn register(&mut self, dev: Box<dyn BlockDevice>) {
@@ -173,7 +249,9 @@ impl BlockDeviceManager {
         self.devices.insert(name, dev);
     }
 
-    pub fn submit_bio(&mut self, bio: Bio) { self.scheduler.submit(bio); }
+    pub fn submit_bio(&mut self, bio: Bio) {
+        self.scheduler.submit(bio);
+    }
 
     pub fn process_pending(&mut self) -> usize {
         let mut processed = 0;
@@ -184,7 +262,9 @@ impl BlockDeviceManager {
                         let mut buf = vec![0u8; bio.byte_len()];
                         let _ = dev.read_sectors(bio.sector, &mut buf);
                     }
-                    BioOp::Write => { let _ = dev.write_sectors(bio.sector, &bio.data); }
+                    BioOp::Write => {
+                        let _ = dev.write_sectors(bio.sector, &bio.data);
+                    }
                     _ => {}
                 }
             }
@@ -193,11 +273,19 @@ impl BlockDeviceManager {
         processed
     }
 
-    pub fn next_bio_id(&self) -> u64 { self.bio_counter.fetch_add(1, Ordering::SeqCst) }
-    pub fn device_count(&self) -> usize { self.devices.len() }
+    pub fn next_bio_id(&self) -> u64 {
+        self.bio_counter.fetch_add(1, Ordering::SeqCst)
+    }
+    pub fn device_count(&self) -> usize {
+        self.devices.len()
+    }
 }
 
-impl Default for BlockDeviceManager { fn default() -> Self { Self::new() } }
+impl Default for BlockDeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod tests {

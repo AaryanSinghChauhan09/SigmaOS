@@ -108,6 +108,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 ### Current Status
 
+**Kernel Core:**
 - ✅ Kernel scheduler (MLFQ+CFS+EDF)
 - ✅ Syscalls (I/O + Process)
 - ✅ Physical MM (buddy allocator)
@@ -122,18 +123,26 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ sigma-pkg CLI
 - ⬜ Bootable ISO (Phase G)
 
-### Driver Ecosystem Status
-
-**Phase 4: Driver Ecosystem — 100% Complete** ✅
-
-- ✅ 8 Modern Drivers (Bluetooth, Printer, GPU, Audio, WiFi, Touch, Framebuffer, USB HID)
-- ✅ 6 Ancient Device Drivers (UART, ISA Bus, NE2000, MFM Disk, AdLib, EGA/CGA)
-- ✅ 35 Unit Tests with Full Coverage
-- ✅ Linux Kernel Heritage Patterns Absorbed (v0.01 through 6.x)
-- ✅ #![no_std] Compatible Architecture
-- ✅ Complete Documentation (Driver_Ecosystem.md)
-
-**Driver Coverage**: 90% of common hardware supported
+**Linux Kernel Absorption:**
+- ✅ NixOS-style atomic generation manager
+- ✅ Arch-style SAT solver and package parser
+- ✅ Android-style runtime capability token guard
+- ✅ Kali-style isolated system tracing sandbox
+- ✅ BusyBox-style multi-call shell parser
+- ✅ Image decoder (PNG, JPEG, GIF, BMP, WebP, TIFF)
+- ✅ Audio codec (FLAC, MP3, OGG Vorbis, WAV)
+- ✅ Document engine (Markdown, LaTeX, RTF, ODT, ODS)
+- ✅ Browser core with tab isolation and adblocker
+- ✅ SQL database engine with ACID transactions
+- ✅ Advanced memory management (NUMA allocator, slab allocator, secure free detection)
+- ✅ Complete TCP/IP networking stack (IPv6, routing, TLS)
+- ✅ Security frameworks (SELinux/AppArmor equivalent)
+- ✅ Virtualization support (namespaces, cgroups)
+- ✅ Power management (CPUFreq scaling)
+- ✅ Hardware monitoring and watchdog support
+- ✅ Journaling filesystems (Btrfs, XFS)
+- ✅ GPU drivers (basic GPU acceleration)
+- ✅ Audio stack (ALSA equivalent)
 
 
 ---
@@ -158,6 +167,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -176,6 +186,14 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
 - **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+- **Linux Distro Absorption**: [Strategic Distro Absorption Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_ABSORPTION_SPEC)
+- **S-Boot Firmware**: [Sovereign BIOS & UEFI Firmware Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BIOS_FIRMWARE_SPEC)
+- **Zenith Compositor**: [Wayland Zenith UI Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WAYLAND_ZENITH_SPEC)
+- **Portable Apps**: [Portable Application Format Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PORTABLE_APP_FORMAT_PLAN)
+- **Custom Personalization**: [Custom Personalization & Theme Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CUSTOM_PERSONALIZATION_SPEC)
+- **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
+- **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
+- **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
 
 
 ---

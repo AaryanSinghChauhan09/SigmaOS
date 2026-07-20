@@ -1,23 +1,30 @@
+use crate::kernel::subsystems::registry::{
+    InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
+};
 /// SigmaOS Legacy Driver — USB Host Controller + HID + Mass Storage
 /// Absorbs Linux USB stack (linux/drivers/usb/): OHCI, UHCI, EHCI, xHCI
 /// USB HID (keyboards, mice, gamepads), USB Mass Storage (BBB protocol)
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
 use std::string::{String, ToString};
-use crate::kernel::subsystems::registry::{KernelSubsystem, InitOrder, SubsystemError, SubsystemPriority};
+use std::vec::Vec;
 
 /// USB speed
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UsbSpeed { Low, Full, High, Super, SuperPlus }
+pub enum UsbSpeed {
+    Low,
+    Full,
+    High,
+    Super,
+    SuperPlus,
+}
 
 impl UsbSpeed {
     pub fn mbps(&self) -> u32 {
         match self {
-            UsbSpeed::Low       => 1,
-            UsbSpeed::Full      => 12,
-            UsbSpeed::High      => 480,
-            UsbSpeed::Super     => 5_000,
+            UsbSpeed::Low => 1,
+            UsbSpeed::Full => 12,
+            UsbSpeed::High => 480,
+            UsbSpeed::Super => 5_000,
             UsbSpeed::SuperPlus => 10_000,
         }
     }
@@ -25,7 +32,12 @@ impl UsbSpeed {
 
 /// USB host controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HciType { Ohci, Uhci, Ehci, Xhci }
+pub enum HciType {
+    Ohci,
+    Uhci,
+    Ehci,
+    Xhci,
+}
 
 /// USB device descriptor (simplified)
 #[derive(Debug, Clone)]
@@ -41,13 +53,26 @@ pub struct UsbDescriptor {
 
 impl UsbDescriptor {
     pub fn new(vid: u16, pid: u16, class: u8, product: &str) -> Self {
-        UsbDescriptor { vid, pid, class, subclass: 0, protocol: 0, product: product.to_string(), manufacturer: "Unknown".to_string() }
+        UsbDescriptor {
+            vid,
+            pid,
+            class,
+            subclass: 0,
+            protocol: 0,
+            product: product.to_string(),
+            manufacturer: "Unknown".to_string(),
+        }
     }
 }
 
 /// USB endpoint
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EndpointType { Control, Bulk, Interrupt, Isochronous }
+pub enum EndpointType {
+    Control,
+    Bulk,
+    Interrupt,
+    Isochronous,
+}
 
 #[derive(Debug, Clone)]
 pub struct UsbEndpoint {
@@ -68,7 +93,13 @@ pub struct UsbDevice {
 
 impl UsbDevice {
     pub fn new(addr: u8, speed: UsbSpeed, desc: UsbDescriptor) -> Self {
-        UsbDevice { addr, speed, descriptor: desc, endpoints: Vec::new(), enabled: true }
+        UsbDevice {
+            addr,
+            speed,
+            descriptor: desc,
+            endpoints: Vec::new(),
+            enabled: true,
+        }
     }
 }
 
@@ -78,7 +109,11 @@ pub trait UsbHostController: Send + Sync {
     fn speed(&self) -> UsbSpeed;
     fn enumerate(&mut self) -> Vec<UsbDevice>;
     fn submit_bulk(&mut self, dev_addr: u8, ep: u8, data: &[u8]) -> Result<usize, &'static str>;
-    fn submit_control(&mut self, dev_addr: u8, request: UsbControlRequest) -> Result<Vec<u8>, &'static str>;
+    fn submit_control(
+        &mut self,
+        dev_addr: u8,
+        request: UsbControlRequest,
+    ) -> Result<Vec<u8>, &'static str>;
     fn port_count(&self) -> u8;
 }
 
@@ -103,14 +138,27 @@ pub struct XhciController {
 
 impl XhciController {
     pub fn new(base_mmio: u64, ports: u8) -> Self {
-        XhciController { base_mmio, port_count: ports, max_slots: 64, devices: Vec::new(), transfer_count: AtomicUsize::new(0), initialized: false }
+        XhciController {
+            base_mmio,
+            port_count: ports,
+            max_slots: 64,
+            devices: Vec::new(),
+            transfer_count: AtomicUsize::new(0),
+            initialized: false,
+        }
     }
 }
 
 impl UsbHostController for XhciController {
-    fn hci_type(&self) -> HciType { HciType::Xhci }
-    fn speed(&self) -> UsbSpeed { UsbSpeed::SuperPlus }
-    fn port_count(&self) -> u8 { self.port_count }
+    fn hci_type(&self) -> HciType {
+        HciType::Xhci
+    }
+    fn speed(&self) -> UsbSpeed {
+        UsbSpeed::SuperPlus
+    }
+    fn port_count(&self) -> u8 {
+        self.port_count
+    }
 
     fn enumerate(&mut self) -> Vec<UsbDevice> {
         // Mock: return registered devices
@@ -122,31 +170,59 @@ impl UsbHostController for XhciController {
         Ok(data.len())
     }
 
-    fn submit_control(&mut self, _dev: u8, _req: UsbControlRequest) -> Result<Vec<u8>, &'static str> {
+    fn submit_control(
+        &mut self,
+        _dev: u8,
+        _req: UsbControlRequest,
+    ) -> Result<Vec<u8>, &'static str> {
         self.transfer_count.fetch_add(1, Ordering::Relaxed);
         Ok(vec![0u8; 18]) // Mock descriptor response
     }
 }
 
 impl KernelSubsystem for XhciController {
-    fn name(&self) -> &str { "xhci" }
-    fn version(&self) -> &str { "4.0.0" }
-    fn init_order(&self) -> InitOrder { InitOrder::Device }
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::High }
-    fn dependencies(&self) -> Vec<&'static str> { vec![] }
-    fn initialize(&mut self) -> Result<(), SubsystemError> { self.initialized = true; Ok(()) }
-    fn shutdown(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn name(&self) -> &str {
+        "xhci"
+    }
+    fn version(&self) -> &str {
+        "4.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::Device
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::High
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec![]
+    }
+    fn initialize(&mut self) -> Result<(), SubsystemError> {
+        self.initialized = true;
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 }
 
 // ── USB HID (Human Interface Device) ──────────────────────────────────────
 
 /// HID usage page
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HidUsagePage { GenericDesktop = 0x01, Keyboard = 0x07, Leds = 0x08, Button = 0x09 }
+pub enum HidUsagePage {
+    GenericDesktop = 0x01,
+    Keyboard = 0x07,
+    Leds = 0x08,
+    Button = 0x09,
+}
 
 /// HID report type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HidReportKind { Input, Output, Feature }
+pub enum HidReportKind {
+    Input,
+    Output,
+    Feature,
+}
 
 pub struct UsbHidDevice {
     pub descriptor: UsbDescriptor,
@@ -180,16 +256,29 @@ impl UsbHidDevice {
     }
 
     pub fn poll_event(&mut self) -> Option<Vec<u8>> {
-        if self.events.is_empty() { None } else { Some(self.events.remove(0)) }
+        if self.events.is_empty() {
+            None
+        } else {
+            Some(self.events.remove(0))
+        }
     }
 
-    pub fn report_count(&self) -> usize { self.report_count.load(Ordering::Relaxed) }
+    pub fn report_count(&self) -> usize {
+        self.report_count.load(Ordering::Relaxed)
+    }
 }
 
 // ── USB Mass Storage (BBB — Bulk-Only Transport) ───────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScsiCommand { TestUnitReady = 0x00, RequestSense = 0x03, Read10 = 0x28, Write10 = 0x2A, Inquiry = 0x12, ReadCapacity10 = 0x25 }
+pub enum ScsiCommand {
+    TestUnitReady = 0x00,
+    RequestSense = 0x03,
+    Read10 = 0x28,
+    Write10 = 0x2A,
+    Inquiry = 0x12,
+    ReadCapacity10 = 0x25,
+}
 
 pub struct UsbMassStorage {
     pub descriptor: UsbDescriptor,
@@ -204,7 +293,9 @@ impl UsbMassStorage {
         UsbMassStorage {
             descriptor: UsbDescriptor::new(0x0781, 0x5583, 0x08, "USB Flash Drive"),
             max_lun: 0,
-            data: (0..core::cmp::min(capacity_sectors, 8192)).map(|_| [0u8; 512]).collect(),
+            data: (0..core::cmp::min(capacity_sectors, 8192))
+                .map(|_| [0u8; 512])
+                .collect(),
             scsi_count: AtomicUsize::new(0),
             initialized: false,
         }
@@ -213,7 +304,9 @@ impl UsbMassStorage {
     pub fn scsi_read(&self, lba: u32, sectors: u32, buf: &mut Vec<u8>) -> Result<(), &'static str> {
         for i in 0..sectors as usize {
             let idx = lba as usize + i;
-            if idx >= self.data.len() { return Err("USB MSC: LBA out of range"); }
+            if idx >= self.data.len() {
+                return Err("USB MSC: LBA out of range");
+            }
             buf.extend_from_slice(&self.data[idx]);
             self.scsi_count.fetch_add(1, Ordering::Relaxed);
         }
@@ -224,25 +317,46 @@ impl UsbMassStorage {
         let count = buf.len() / 512;
         for i in 0..count {
             let idx = lba as usize + i;
-            if idx >= self.data.len() { return Err("USB MSC: LBA out of range"); }
-            self.data[idx].copy_from_slice(&buf[i*512..(i+1)*512]);
+            if idx >= self.data.len() {
+                return Err("USB MSC: LBA out of range");
+            }
+            self.data[idx].copy_from_slice(&buf[i * 512..(i + 1) * 512]);
             self.scsi_count.fetch_add(1, Ordering::Relaxed);
         }
         Ok(())
     }
 
-    pub fn capacity_sectors(&self) -> u32 { self.data.len() as u32 }
-    pub fn scsi_count(&self) -> usize { self.scsi_count.load(Ordering::Relaxed) }
+    pub fn capacity_sectors(&self) -> u32 {
+        self.data.len() as u32
+    }
+    pub fn scsi_count(&self) -> usize {
+        self.scsi_count.load(Ordering::Relaxed)
+    }
 }
 
 impl KernelSubsystem for UsbMassStorage {
-    fn name(&self) -> &str { "usb_storage" }
-    fn version(&self) -> &str { "2.0.0" }
-    fn init_order(&self) -> InitOrder { InitOrder::Late }
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::Optional }
-    fn dependencies(&self) -> Vec<&'static str> { vec!["xhci"] }
-    fn initialize(&mut self) -> Result<(), SubsystemError> { self.initialized = true; Ok(()) }
-    fn shutdown(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn name(&self) -> &str {
+        "usb_storage"
+    }
+    fn version(&self) -> &str {
+        "2.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::Late
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::Optional
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["xhci"]
+    }
+    fn initialize(&mut self) -> Result<(), SubsystemError> {
+        self.initialized = true;
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 }
 
 #[cfg(test)]

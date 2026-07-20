@@ -1,6 +1,5 @@
 /// SigmaOS vmalloc interface for virtual contiguous memory allocation
 /// Maps non-contiguous physical pages into contiguous virtual space
-
 use std::collections::HashMap;
 use std::vec::Vec;
 
@@ -34,7 +33,7 @@ impl VmallocManager {
         let aligned_size = num_pages * page_size;
 
         let start_addr = self.next_virtual_addr;
-        
+
         // Mock physical page allocation (e.g. 0x10000, 0x11000, etc.)
         let mut pages = Vec::with_capacity(num_pages);
         for i in 0..num_pages {
@@ -81,7 +80,7 @@ mod tests {
         let mut vmm = VmallocManager::new();
         let addr = vmm.vmalloc(10000).unwrap(); // Will align to 3 pages (12288 bytes)
         assert_eq!(addr, 0xD000_0000);
-        
+
         let pages = vmm.get_pages(addr).unwrap();
         assert_eq!(pages.len(), 3);
 

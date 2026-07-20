@@ -1,6 +1,5 @@
 /// SigmaOS Huge Pages and hugetlbfs memory support
 /// Standard huge pages: 2MB or 1GB configurations to reduce TLB misses
-
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -27,7 +26,7 @@ impl HugePageManager {
     pub fn new() -> Self {
         let mut free_pages = HashMap::new();
         free_pages.insert(HugePageSize::Size2Mb, 512); // Pre-reserve 1GB worth of 2MB pages
-        free_pages.insert(HugePageSize::Size1Gb, 4);   // Pre-reserve 4GB worth of 1GB pages
+        free_pages.insert(HugePageSize::Size1Gb, 4); // Pre-reserve 4GB worth of 1GB pages
 
         HugePageManager {
             allocated_pages: HashMap::new(),
@@ -36,13 +35,16 @@ impl HugePageManager {
     }
 
     pub fn allocate_huge_page(&mut self, size: HugePageSize) -> Result<usize, &'static str> {
-        let available = self.free_pages.get_mut(&size).ok_or("Invalid huge page size")?;
+        let available = self
+            .free_pages
+            .get_mut(&size)
+            .ok_or("Invalid huge page size")?;
         if *available == 0 {
             return Err("No huge pages available");
         }
 
         *available -= 1;
-        
+
         // Mock virtual address assignment
         let base_addr = match size {
             HugePageSize::Size2Mb => 0xE000_0000 + (*available * 2 * 1024 * 1024),
@@ -54,7 +56,10 @@ impl HugePageManager {
     }
 
     pub fn release_huge_page(&mut self, base_addr: usize) -> Result<(), &'static str> {
-        let size = self.allocated_pages.remove(&base_addr).ok_or("Invalid huge page base address")?;
+        let size = self
+            .allocated_pages
+            .remove(&base_addr)
+            .ok_or("Invalid huge page base address")?;
         let available = self.free_pages.get_mut(&size).ok_or("Invalid state")?;
         *available += 1;
         Ok(())

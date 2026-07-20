@@ -1,18 +1,23 @@
+use crate::kernel::subsystems::registry::{
+    InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
+};
 /// SigmaOS Legacy Driver — NS8250/16550A UART Serial Port Driver
 /// Absorbs Linux serial.c (the most-ported driver in Linux history)
 /// Supports: 8250, 8250A, 16450, 16550, 16550A, 16750, 16950 UARTs
 /// COM1–COM4, baud rates 50–4,000,000, 5–8 data bits, 1–2 stop bits, parity
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
 use std::collections::VecDeque;
-use crate::kernel::subsystems::registry::{KernelSubsystem, InitOrder, SubsystemError, SubsystemPriority};
+use std::vec::Vec;
 
 /// Standard COM port I/O bases and IRQs
-pub const COM1_BASE: u16 = 0x3F8; pub const COM1_IRQ: u8 = 4;
-pub const COM2_BASE: u16 = 0x2F8; pub const COM2_IRQ: u8 = 3;
-pub const COM3_BASE: u16 = 0x3E8; pub const COM3_IRQ: u8 = 4;
-pub const COM4_BASE: u16 = 0x2E8; pub const COM4_IRQ: u8 = 3;
+pub const COM1_BASE: u16 = 0x3F8;
+pub const COM1_IRQ: u8 = 4;
+pub const COM2_BASE: u16 = 0x2F8;
+pub const COM2_IRQ: u8 = 3;
+pub const COM3_BASE: u16 = 0x3E8;
+pub const COM3_IRQ: u8 = 4;
+pub const COM4_BASE: u16 = 0x2E8;
+pub const COM4_IRQ: u8 = 3;
 
 /// UART register offsets from base I/O address
 pub mod regs {
@@ -33,36 +38,57 @@ pub mod regs {
 /// Baud rate divisor table (16550A, 1.8432 MHz crystal)
 pub fn baud_divisor(baud: u32) -> u16 {
     match baud {
-        50      => 2304,
-        75      => 1536,
-        110     => 1047,
-        150     => 768,
-        300     => 384,
-        600     => 192,
-        1200    => 96,
-        1800    => 64,
-        2400    => 48,
-        4800    => 24,
-        9600    => 12,
-        19200   => 6,
-        38400   => 3,
-        57600   => 2,
-        115200  => 1,
-        _       => 12, // default 9600
+        50 => 2304,
+        75 => 1536,
+        110 => 1047,
+        150 => 768,
+        300 => 384,
+        600 => 192,
+        1200 => 96,
+        1800 => 64,
+        2400 => 48,
+        4800 => 24,
+        9600 => 12,
+        19200 => 6,
+        38400 => 3,
+        57600 => 2,
+        115200 => 1,
+        _ => 12, // default 9600
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DataBits { Five = 5, Six = 6, Seven = 7, Eight = 8 }
+pub enum DataBits {
+    Five = 5,
+    Six = 6,
+    Seven = 7,
+    Eight = 8,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StopBits { One, Two }
+pub enum StopBits {
+    One,
+    Two,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Parity { None, Odd, Even, Mark, Space }
+pub enum Parity {
+    None,
+    Odd,
+    Even,
+    Mark,
+    Space,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UartType { U8250, U16450, U16550, U16550A, U16750, U16950 }
+pub enum UartType {
+    U8250,
+    U16450,
+    U16550,
+    U16550A,
+    U16750,
+    U16950,
+}
 
 /// UART port configuration
 #[derive(Debug, Clone)]
@@ -88,7 +114,7 @@ impl Default for UartConfig {
 
 /// UART port — represents one physical COM port
 pub struct UartPort {
-    pub port_num: u8,       // 1–4
+    pub port_num: u8, // 1–4
     pub base_io: u16,
     pub irq: u8,
     pub uart_type: UartType,
@@ -101,10 +127,18 @@ pub struct UartPort {
 }
 
 impl UartPort {
-    pub fn com1() -> Self { Self::new(1, COM1_BASE, COM1_IRQ) }
-    pub fn com2() -> Self { Self::new(2, COM2_BASE, COM2_IRQ) }
-    pub fn com3() -> Self { Self::new(3, COM3_BASE, COM3_IRQ) }
-    pub fn com4() -> Self { Self::new(4, COM4_BASE, COM4_IRQ) }
+    pub fn com1() -> Self {
+        Self::new(1, COM1_BASE, COM1_IRQ)
+    }
+    pub fn com2() -> Self {
+        Self::new(2, COM2_BASE, COM2_IRQ)
+    }
+    pub fn com3() -> Self {
+        Self::new(3, COM3_BASE, COM3_IRQ)
+    }
+    pub fn com4() -> Self {
+        Self::new(4, COM4_BASE, COM4_IRQ)
+    }
 
     pub fn new(port_num: u8, base_io: u16, irq: u8) -> Self {
         UartPort {
@@ -121,9 +155,13 @@ impl UartPort {
         }
     }
 
-    pub fn configure(&mut self, config: UartConfig) { self.config = config; }
+    pub fn configure(&mut self, config: UartConfig) {
+        self.config = config;
+    }
 
-    pub fn enable(&mut self) { self.enabled = true; }
+    pub fn enable(&mut self) {
+        self.enabled = true;
+    }
 
     pub fn write_byte(&mut self, b: u8) {
         self.tx_buf.push_back(b);
@@ -131,7 +169,9 @@ impl UartPort {
     }
 
     pub fn write_str(&mut self, s: &str) {
-        for b in s.bytes() { self.write_byte(b); }
+        for b in s.bytes() {
+            self.write_byte(b);
+        }
     }
 
     pub fn inject_rx(&mut self, data: &[u8]) {
@@ -141,15 +181,23 @@ impl UartPort {
         }
     }
 
-    pub fn read_byte(&mut self) -> Option<u8> { self.rx_buf.pop_front() }
+    pub fn read_byte(&mut self) -> Option<u8> {
+        self.rx_buf.pop_front()
+    }
 
     pub fn flush_tx(&mut self) -> Vec<u8> {
         self.tx_buf.drain(..).collect()
     }
 
-    pub fn rx_count(&self) -> usize { self.rx_bytes.load(Ordering::Relaxed) }
-    pub fn tx_count(&self) -> usize { self.tx_bytes.load(Ordering::Relaxed) }
-    pub fn divisor(&self) -> u16 { baud_divisor(self.config.baud_rate) }
+    pub fn rx_count(&self) -> usize {
+        self.rx_bytes.load(Ordering::Relaxed)
+    }
+    pub fn tx_count(&self) -> usize {
+        self.tx_bytes.load(Ordering::Relaxed)
+    }
+    pub fn divisor(&self) -> u16 {
+        baud_divisor(self.config.baud_rate)
+    }
 }
 
 /// UART driver managing all 4 COM ports
@@ -181,11 +229,21 @@ impl Uart8250Driver {
 }
 
 impl KernelSubsystem for Uart8250Driver {
-    fn name(&self) -> &str { "uart_8250" }
-    fn version(&self) -> &str { "3.0.0" }
-    fn init_order(&self) -> InitOrder { InitOrder::EarlyBoot }
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::High }
-    fn dependencies(&self) -> Vec<&'static str> { vec!["isa_bus"] }
+    fn name(&self) -> &str {
+        "uart_8250"
+    }
+    fn version(&self) -> &str {
+        "3.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::EarlyBoot
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::High
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["isa_bus"]
+    }
 
     fn initialize(&mut self) -> Result<(), SubsystemError> {
         for port in self.ports.iter_mut().flatten() {
@@ -203,7 +261,9 @@ impl KernelSubsystem for Uart8250Driver {
 }
 
 impl Default for Uart8250Driver {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

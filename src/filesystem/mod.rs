@@ -2,9 +2,9 @@
 pub mod archive;
 pub mod disk_usage;
 pub mod manager;
+pub mod sigmafs;
 pub mod support;
 pub mod vfs;
-pub mod sigmafs;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -18,9 +18,9 @@ pub use manager::{
     ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
+pub use sigmafs::{DagNode, HashId, SigmaFS};
 pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use sigmafs::{SigmaFS, DagNode, HashId};

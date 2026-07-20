@@ -1,6 +1,5 @@
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
-
 use std::collections::HashMap;
 use std::vec::Vec;
 
@@ -53,19 +52,23 @@ impl SignalManager {
                 return;
             }
         }
-        
+
         // Handle SIGKILL and SIGTERM instantly if default
-        let handler = self.signal_actions
+        let handler = self
+            .signal_actions
             .get(&target_pid)
             .and_then(|m| m.get(&sig).copied())
             .unwrap_or(SignalHandler::Default);
-            
+
         if sig == Signal::SIGKILL && handler == SignalHandler::Default {
             // Terminate instantly (simulated)
             return;
         }
 
-        self.pending_signals.entry(target_pid).or_default().push(sig);
+        self.pending_signals
+            .entry(target_pid)
+            .or_default()
+            .push(sig);
     }
 
     pub fn set_handler(&mut self, pid: u64, sig: Signal, handler: SignalHandler) {
@@ -73,7 +76,10 @@ impl SignalManager {
             // SIGKILL cannot be caught or ignored
             return;
         }
-        self.signal_actions.entry(pid).or_default().insert(sig, handler);
+        self.signal_actions
+            .entry(pid)
+            .or_default()
+            .insert(sig, handler);
     }
 
     pub fn get_pending_signals(&self, pid: u64) -> Option<&Vec<Signal>> {
@@ -108,7 +114,7 @@ mod tests {
     fn test_signal_sending() {
         let mut sm = SignalManager::new();
         sm.send_signal(101, Signal::SIGINT);
-        
+
         let pending = sm.get_pending_signals(101).unwrap();
         assert_eq!(pending[0], Signal::SIGINT);
 
@@ -129,7 +135,7 @@ mod tests {
         let mut sm = SignalManager::new();
         sm.set_handler(101, Signal::SIGUSR1, SignalHandler::Custom(mock_handler));
         sm.set_handler(101, Signal::SIGKILL, SignalHandler::Ignore); // should fail/be ignored
-        
+
         // Check that SIGKILL still acts default
         sm.send_signal(101, Signal::SIGKILL);
         // Custom handler works

@@ -1,23 +1,22 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Kernel Subsystem Registry
 /// Inspired by Linux initcall mechanism — provides ordered, dependency-aware subsystem boot
 /// OOP-based: every kernel module implements the KernelSubsystem trait
-
 use std::collections::HashMap;
-use std::vec::Vec;
 use std::string::{String, ToString};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 /// Initialization priority — mirrors Linux initcall levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InitOrder {
-    EarlyBoot = 0,     // early_initcall — memory, IRQ
-    CoreKernel = 1,    // core_initcall  — core subsystems
-    PostCore = 2,      // postcore_initcall — devices
-    Arch = 3,          // arch_initcall — arch-specific
-    Subsystem = 4,     // subsys_initcall — filesystem, net
-    Filesystem = 5,    // fs_initcall — vfs, proc
-    Device = 6,        // device_initcall — drivers
-    Late = 7,          // late_initcall — optional/user-mode
+    EarlyBoot = 0,  // early_initcall — memory, IRQ
+    CoreKernel = 1, // core_initcall  — core subsystems
+    PostCore = 2,   // postcore_initcall — devices
+    Arch = 3,       // arch_initcall — arch-specific
+    Subsystem = 4,  // subsys_initcall — filesystem, net
+    Filesystem = 5, // fs_initcall — vfs, proc
+    Device = 6,     // device_initcall — drivers
+    Late = 7,       // late_initcall — optional/user-mode
 }
 
 /// Subsystem lifecycle state
@@ -64,10 +63,14 @@ pub trait KernelSubsystem: Send + Sync {
     fn init_order(&self) -> InitOrder;
 
     /// Priority for conflict resolution
-    fn priority(&self) -> SubsystemPriority { SubsystemPriority::Normal }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::Normal
+    }
 
     /// List of subsystem names this depends on (must be initialized first)
-    fn dependencies(&self) -> Vec<&'static str> { Vec::new() }
+    fn dependencies(&self) -> Vec<&'static str> {
+        Vec::new()
+    }
 
     /// Initialize the subsystem — called once during boot
     fn initialize(&mut self) -> Result<(), SubsystemError>;
@@ -76,13 +79,19 @@ pub trait KernelSubsystem: Send + Sync {
     fn shutdown(&mut self) -> Result<(), SubsystemError>;
 
     /// Called on system suspend (ACPI S3)
-    fn suspend(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn suspend(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 
     /// Called on system resume
-    fn resume(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+    fn resume(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
 
     /// Health check — returns true if subsystem is healthy
-    fn health_check(&self) -> bool { true }
+    fn health_check(&self) -> bool {
+        true
+    }
 
     /// Human-readable status string
     fn status(&self) -> String {
@@ -122,21 +131,32 @@ impl SubsystemRegistry {
     pub fn boot_all(&mut self) -> Result<usize, SubsystemError> {
         // Sort by init_order then priority
         self.subsystems.sort_by(|a, b| {
-            a.init_order().cmp(&b.init_order())
+            a.init_order()
+                .cmp(&b.init_order())
                 .then(a.priority().cmp(&b.priority()))
         });
 
         let mut count = 0usize;
-        let names: Vec<String> = self.subsystems.iter().map(|s| s.name().to_string()).collect();
+        let names: Vec<String> = self
+            .subsystems
+            .iter()
+            .map(|s| s.name().to_string())
+            .collect();
 
         for i in 0..self.subsystems.len() {
             // Verify dependencies
             for dep in self.subsystems[i].dependencies() {
-                let dep_state = self.states.get(dep).copied().unwrap_or(SubsystemState::Unregistered);
-                if dep_state != SubsystemState::Initialized && dep_state != SubsystemState::Running {
-                    return Err(SubsystemError::DependencyMissing(
-                        format!("{} requires {}", names[i], dep)
-                    ));
+                let dep_state = self
+                    .states
+                    .get(dep)
+                    .copied()
+                    .unwrap_or(SubsystemState::Unregistered);
+                if dep_state != SubsystemState::Initialized && dep_state != SubsystemState::Running
+                {
+                    return Err(SubsystemError::DependencyMissing(format!(
+                        "{} requires {}",
+                        names[i], dep
+                    )));
                 }
             }
 
@@ -175,7 +195,10 @@ impl SubsystemRegistry {
     }
 
     pub fn get_state(&self, name: &str) -> SubsystemState {
-        self.states.get(name).copied().unwrap_or(SubsystemState::Unregistered)
+        self.states
+            .get(name)
+            .copied()
+            .unwrap_or(SubsystemState::Unregistered)
     }
 
     pub fn count(&self) -> usize {
@@ -188,7 +211,9 @@ impl SubsystemRegistry {
 }
 
 impl Default for SubsystemRegistry {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -201,14 +226,22 @@ mod tests {
     }
 
     impl KernelSubsystem for MockSubsystem {
-        fn name(&self) -> &str { self.name }
-        fn version(&self) -> &str { "1.0.0" }
-        fn init_order(&self) -> InitOrder { InitOrder::Device }
+        fn name(&self) -> &str {
+            self.name
+        }
+        fn version(&self) -> &str {
+            "1.0.0"
+        }
+        fn init_order(&self) -> InitOrder {
+            InitOrder::Device
+        }
         fn initialize(&mut self) -> Result<(), SubsystemError> {
             self.initialized = true;
             Ok(())
         }
-        fn shutdown(&mut self) -> Result<(), SubsystemError> { Ok(()) }
+        fn shutdown(&mut self) -> Result<(), SubsystemError> {
+            Ok(())
+        }
     }
 
     #[test]
@@ -220,8 +253,16 @@ mod tests {
     #[test]
     fn test_register_and_boot() {
         let mut reg = SubsystemRegistry::new();
-        reg.register(Box::new(MockSubsystem { name: "uart_8250", initialized: false })).unwrap();
-        reg.register(Box::new(MockSubsystem { name: "ne2000", initialized: false })).unwrap();
+        reg.register(Box::new(MockSubsystem {
+            name: "uart_8250",
+            initialized: false,
+        }))
+        .unwrap();
+        reg.register(Box::new(MockSubsystem {
+            name: "ne2000",
+            initialized: false,
+        }))
+        .unwrap();
         let booted = reg.boot_all().unwrap();
         assert_eq!(booted, 2);
         assert_eq!(reg.get_state("uart_8250"), SubsystemState::Running);
@@ -230,15 +271,26 @@ mod tests {
     #[test]
     fn test_duplicate_registration() {
         let mut reg = SubsystemRegistry::new();
-        reg.register(Box::new(MockSubsystem { name: "uart_8250", initialized: false })).unwrap();
-        let res = reg.register(Box::new(MockSubsystem { name: "uart_8250", initialized: false }));
+        reg.register(Box::new(MockSubsystem {
+            name: "uart_8250",
+            initialized: false,
+        }))
+        .unwrap();
+        let res = reg.register(Box::new(MockSubsystem {
+            name: "uart_8250",
+            initialized: false,
+        }));
         assert!(matches!(res, Err(SubsystemError::AlreadyRegistered(_))));
     }
 
     #[test]
     fn test_shutdown_all() {
         let mut reg = SubsystemRegistry::new();
-        reg.register(Box::new(MockSubsystem { name: "test_sub", initialized: false })).unwrap();
+        reg.register(Box::new(MockSubsystem {
+            name: "test_sub",
+            initialized: false,
+        }))
+        .unwrap();
         reg.boot_all().unwrap();
         let shut = reg.shutdown_all();
         assert_eq!(shut, 1);

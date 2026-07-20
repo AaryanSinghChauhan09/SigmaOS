@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
@@ -107,7 +107,11 @@ impl GenerationManager {
         }
     }
 
-    pub fn create_generation(&mut self, root_inode: u64, timestamp: u64) -> Result<u32, &'static str> {
+    pub fn create_generation(
+        &mut self,
+        root_inode: u64,
+        timestamp: u64,
+    ) -> Result<u32, &'static str> {
         let next_id = (self.generations.len() + 1) as u32;
         let gen = Generation {
             id: next_id,
@@ -297,7 +301,11 @@ impl PagingController {
         }
     }
 
-    pub fn map_page(&mut self, virtual_page_idx: usize, is_writable: bool) -> Result<usize, &'static str> {
+    pub fn map_page(
+        &mut self,
+        virtual_page_idx: usize,
+        is_writable: bool,
+    ) -> Result<usize, &'static str> {
         if virtual_page_idx >= 256 {
             return Err("Virtual address range is out of bounds");
         }
@@ -388,7 +396,12 @@ impl PackageDependencyResolver {
         self.check_cycles(name, &mut visited, &mut visit_idx)
     }
 
-    fn check_cycles(&self, name: &'static str, visited: &mut [&'static str; 16], idx: &mut usize) -> bool {
+    fn check_cycles(
+        &self,
+        name: &'static str,
+        visited: &mut [&'static str; 16],
+        idx: &mut usize,
+    ) -> bool {
         for i in 0..*idx {
             if visited[i] == name {
                 return false;
@@ -444,9 +457,7 @@ pub struct SecurityEnforcer {
 
 impl SecurityEnforcer {
     pub fn new() -> Self {
-        Self {
-            tokens: [None; 32],
-        }
+        Self { tokens: [None; 32] }
     }
 
     pub fn assign_token(&mut self, token: CapabilityToken) -> Result<(), &'static str> {
@@ -770,7 +781,11 @@ impl SigmaFsCasEngine {
         Err("Content-Addressed Storage (CAS) pool is full")
     }
 
-    pub fn read_block(&self, hash: &[u8; SHA256_HASH_SIZE], buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn read_block(
+        &self,
+        hash: &[u8; SHA256_HASH_SIZE],
+        buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
         for (idx, block_opt) in self.storage_pool.iter().enumerate() {
             if let Some(ref block) = block_opt {
                 if block.hash == *hash {
@@ -786,7 +801,11 @@ impl SigmaFsCasEngine {
         Err("Target content-addressed block not found")
     }
 
-    fn verify_pqc_signature(&self, data: &[u8], signature: &[u8; DILITHIUM5_SIGNATURE_SIZE]) -> bool {
+    fn verify_pqc_signature(
+        &self,
+        data: &[u8],
+        signature: &[u8; DILITHIUM5_SIGNATURE_SIZE],
+    ) -> bool {
         if data.is_empty() {
             return false;
         }
@@ -892,7 +911,10 @@ impl AutoResourceOptimizer {
                 if thread.is_idle && thread.priority == ThreadPriority::High {
                     thread.priority = ThreadPriority::Normal;
                     optimized_count += 1;
-                } else if !thread.is_idle && thread.cpu_workload_percentage > 90 && thread.priority == ThreadPriority::Normal {
+                } else if !thread.is_idle
+                    && thread.cpu_workload_percentage > 90
+                    && thread.priority == ThreadPriority::Normal
+                {
                     thread.priority = ThreadPriority::High;
                     optimized_count += 1;
                 }
@@ -929,72 +951,144 @@ pub struct RpmPackage {
     pub name: &'static str,
 }
 impl Package for RpmPackage {
-    fn name(&self) -> &'static str { self.name }
-    fn package_type(&self) -> PackageType { PackageType::Rpm }
-    fn install(&self) -> Result<(), &'static str> { Ok(()) }
-    fn remove(&self) -> Result<(), &'static str> { Ok(()) }
-    fn update(&self) -> Result<(), &'static str> { Ok(()) }
-    fn is_sandboxed(&self) -> bool { false }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn package_type(&self) -> PackageType {
+        PackageType::Rpm
+    }
+    fn install(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn remove(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn update(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn is_sandboxed(&self) -> bool {
+        false
+    }
 }
 
 pub struct DebPackage {
     pub name: &'static str,
 }
 impl Package for DebPackage {
-    fn name(&self) -> &'static str { self.name }
-    fn package_type(&self) -> PackageType { PackageType::Deb }
-    fn install(&self) -> Result<(), &'static str> { Ok(()) }
-    fn remove(&self) -> Result<(), &'static str> { Ok(()) }
-    fn update(&self) -> Result<(), &'static str> { Ok(()) }
-    fn is_sandboxed(&self) -> bool { false }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn package_type(&self) -> PackageType {
+        PackageType::Deb
+    }
+    fn install(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn remove(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn update(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn is_sandboxed(&self) -> bool {
+        false
+    }
 }
 
 pub struct SnapPackage {
     pub name: &'static str,
 }
 impl Package for SnapPackage {
-    fn name(&self) -> &'static str { self.name }
-    fn package_type(&self) -> PackageType { PackageType::Snap }
-    fn install(&self) -> Result<(), &'static str> { Ok(()) }
-    fn remove(&self) -> Result<(), &'static str> { Ok(()) }
-    fn update(&self) -> Result<(), &'static str> { Ok(()) }
-    fn is_sandboxed(&self) -> bool { true }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn package_type(&self) -> PackageType {
+        PackageType::Snap
+    }
+    fn install(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn remove(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn update(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn is_sandboxed(&self) -> bool {
+        true
+    }
 }
 
 pub struct FlatpakPackage {
     pub name: &'static str,
 }
 impl Package for FlatpakPackage {
-    fn name(&self) -> &'static str { self.name }
-    fn package_type(&self) -> PackageType { PackageType::Flatpak }
-    fn install(&self) -> Result<(), &'static str> { Ok(()) }
-    fn remove(&self) -> Result<(), &'static str> { Ok(()) }
-    fn update(&self) -> Result<(), &'static str> { Ok(()) }
-    fn is_sandboxed(&self) -> bool { true }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn package_type(&self) -> PackageType {
+        PackageType::Flatpak
+    }
+    fn install(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn remove(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn update(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn is_sandboxed(&self) -> bool {
+        true
+    }
 }
 
 pub struct AppImagePackage {
     pub name: &'static str,
 }
 impl Package for AppImagePackage {
-    fn name(&self) -> &'static str { self.name }
-    fn package_type(&self) -> PackageType { PackageType::AppImage }
-    fn install(&self) -> Result<(), &'static str> { Ok(()) }
-    fn remove(&self) -> Result<(), &'static str> { Ok(()) }
-    fn update(&self) -> Result<(), &'static str> { Ok(()) }
-    fn is_sandboxed(&self) -> bool { false }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn package_type(&self) -> PackageType {
+        PackageType::AppImage
+    }
+    fn install(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn remove(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn update(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn is_sandboxed(&self) -> bool {
+        false
+    }
 }
 
 pub struct SigmaPackage {
     pub name: &'static str,
 }
 impl Package for SigmaPackage {
-    fn name(&self) -> &'static str { self.name }
-    fn package_type(&self) -> PackageType { PackageType::Sigma }
-    fn install(&self) -> Result<(), &'static str> { Ok(()) }
-    fn remove(&self) -> Result<(), &'static str> { Ok(()) }
-    fn update(&self) -> Result<(), &'static str> { Ok(()) }
-    fn is_sandboxed(&self) -> bool { true }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn package_type(&self) -> PackageType {
+        PackageType::Sigma
+    }
+    fn install(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn remove(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn update(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn is_sandboxed(&self) -> bool {
+        true
+    }
 }
 
 pub struct UnifiedPackageManager {
@@ -1003,7 +1097,9 @@ pub struct UnifiedPackageManager {
 
 impl UnifiedPackageManager {
     pub fn new() -> Self {
-        Self { registry: Vec::new() }
+        Self {
+            registry: Vec::new(),
+        }
     }
 
     pub fn register_and_install(&mut self, pkg: Box<dyn Package>) -> Result<(), &'static str> {
@@ -1102,10 +1198,22 @@ mod tests {
 
     #[test]
     fn test_busybox_style_multicall() {
-        assert_eq!(MultiCallShell::parse_multicall_invocation("echo"), SysCommandType::Echo);
-        assert_eq!(MultiCallShell::parse_multicall_invocation("sigma-whoami"), SysCommandType::WhoAmI);
-        assert_eq!(MultiCallShell::parse_multicall_invocation("pwd"), SysCommandType::Pwd);
-        assert_eq!(MultiCallShell::parse_multicall_invocation("ls"), SysCommandType::Unsupported);
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("echo"),
+            SysCommandType::Echo
+        );
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("sigma-whoami"),
+            SysCommandType::WhoAmI
+        );
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("pwd"),
+            SysCommandType::Pwd
+        );
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("ls"),
+            SysCommandType::Unsupported
+        );
     }
 
     #[test]
@@ -1155,7 +1263,10 @@ mod tests {
 
         let duplicates = engine.find_duplicate_files();
         assert_eq!(duplicates.len(), 1);
-        assert_eq!(duplicates[0], ("/home/user/document.txt", "/home/user/document_copy.txt"));
+        assert_eq!(
+            duplicates[0],
+            ("/home/user/document.txt", "/home/user/document_copy.txt")
+        );
 
         let freed_bytes = engine.sweep_temporary_nodes();
         assert_eq!(freed_bytes, 500);
@@ -1166,19 +1277,23 @@ mod tests {
     fn test_auto_resource_performance_enhancer() {
         let mut optimizer = AutoResourceOptimizer::new();
 
-        assert!(optimizer.register_thread(ActiveProcessThread {
-            process_id: 501,
-            priority: ThreadPriority::Normal,
-            cpu_workload_percentage: 95,
-            is_idle: false,
-        }).is_ok());
+        assert!(optimizer
+            .register_thread(ActiveProcessThread {
+                process_id: 501,
+                priority: ThreadPriority::Normal,
+                cpu_workload_percentage: 95,
+                is_idle: false,
+            })
+            .is_ok());
 
-        assert!(optimizer.register_thread(ActiveProcessThread {
-            process_id: 502,
-            priority: ThreadPriority::High,
-            cpu_workload_percentage: 0,
-            is_idle: true,
-        }).is_ok());
+        assert!(optimizer
+            .register_thread(ActiveProcessThread {
+                process_id: 502,
+                priority: ThreadPriority::High,
+                cpu_workload_percentage: 0,
+                is_idle: true,
+            })
+            .is_ok());
 
         let optimized_threads_count = optimizer.run_optimization_sweep();
         assert_eq!(optimized_threads_count, 2);
@@ -1194,12 +1309,36 @@ mod tests {
     fn test_unified_package_manager_polymorphism() {
         let mut manager = UnifiedPackageManager::new();
 
-        assert!(manager.register_and_install(Box::new(RpmPackage { name: "fedora-kernel" })).is_ok());
-        assert!(manager.register_and_install(Box::new(DebPackage { name: "ubuntu-libc" })).is_ok());
-        assert!(manager.register_and_install(Box::new(SnapPackage { name: "spotify-snap" })).is_ok());
-        assert!(manager.register_and_install(Box::new(FlatpakPackage { name: "gimp-flatpak" })).is_ok());
-        assert!(manager.register_and_install(Box::new(AppImagePackage { name: "audacity-appimage" })).is_ok());
-        assert!(manager.register_and_install(Box::new(SigmaPackage { name: "zenith-desktop" })).is_ok());
+        assert!(manager
+            .register_and_install(Box::new(RpmPackage {
+                name: "fedora-kernel"
+            }))
+            .is_ok());
+        assert!(manager
+            .register_and_install(Box::new(DebPackage {
+                name: "ubuntu-libc"
+            }))
+            .is_ok());
+        assert!(manager
+            .register_and_install(Box::new(SnapPackage {
+                name: "spotify-snap"
+            }))
+            .is_ok());
+        assert!(manager
+            .register_and_install(Box::new(FlatpakPackage {
+                name: "gimp-flatpak"
+            }))
+            .is_ok());
+        assert!(manager
+            .register_and_install(Box::new(AppImagePackage {
+                name: "audacity-appimage"
+            }))
+            .is_ok());
+        assert!(manager
+            .register_and_install(Box::new(SigmaPackage {
+                name: "zenith-desktop"
+            }))
+            .is_ok());
 
         assert_eq!(manager.get_package_count(), 6);
         assert_eq!(manager.registry[0].package_type(), PackageType::Rpm);
@@ -1209,8 +1348,13 @@ mod tests {
     #[test]
     fn test_consolidated_dxe_scan() {
         let mut scanner = PciBusScanner::new();
-        assert!(scanner.scan_and_register(0, 1, 0x8086, 0x1234, 0x01).is_ok());
-        assert_eq!(scanner.registered_devices[0].as_ref().unwrap().class, PciClass::Storage);
+        assert!(scanner
+            .scan_and_register(0, 1, 0x8086, 0x1234, 0x01)
+            .is_ok());
+        assert_eq!(
+            scanner.registered_devices[0].as_ref().unwrap().class,
+            PciClass::Storage
+        );
     }
 
     #[test]
@@ -1225,7 +1369,9 @@ mod tests {
     #[test]
     fn test_consolidated_signals() {
         let mut disp = SignalDispatcher::new();
-        assert!(disp.raise_signal(5, SovereignSignal::Terminate, true).is_ok());
+        assert!(disp
+            .raise_signal(5, SovereignSignal::Terminate, true)
+            .is_ok());
         assert_eq!(disp.poll_signal(5).unwrap(), SovereignSignal::Terminate);
     }
 

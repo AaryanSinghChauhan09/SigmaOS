@@ -27,6 +27,7 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod phase_l_plans;
 pub mod productivity;
 pub mod resilience;
 pub mod storage;
@@ -36,10 +37,8 @@ pub mod sigpkg;
 pub mod support;
 pub mod system;
 pub mod tracing;
-pub mod virtualization;
 pub mod unimplemented_features;
-pub mod phase_l_plans;
-
+pub mod virtualization;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -56,9 +55,9 @@ pub use community::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
-    StandardsComplianceManager, TargetPlatform, TranslationLayer,
-    IndianLanguage, LocalizationManager, LocalizationProvider,
+    ContainerRuntime, FhsConventionStatus, IndianLanguage, LocalizationManager,
+    LocalizationProvider, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+    TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -95,7 +94,8 @@ pub use audio::{
     AlsaAudioStack, AudioDirection as AlsaDirection, AudioFormat as AlsaFormat, ChannelConfig, MixerControl, PcmStream, SampleRate as AlsaSampleRate,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, SigmaFS, DagNode, HashId,
+    DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
+    VirtualFilesystem,
 };
 pub use graphics::{
     ColorSpace, CompositorError, CompositorResult, CompositorStrategy, DecodedImage,
@@ -123,6 +123,7 @@ pub use kernel::{
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
+pub use ml::{LLMInterface, ModelStatus, SigmaAid};
 pub use network::{
     AdblockRule, BrowserCore, BrowserTab, BrowserTabState, DnsError, DnsResolver, MDnsDiscovery,
     QuicConnection, QuicError, SecurityLevel, TabCapabilities, TcpConnection, TcpError,
@@ -132,7 +133,6 @@ pub use network::{
     RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable,
     CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
 };
-pub use ml::{SigmaAid, LLMInterface, ModelStatus};
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,

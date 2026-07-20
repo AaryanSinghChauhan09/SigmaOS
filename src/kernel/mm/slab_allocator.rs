@@ -1,7 +1,6 @@
 /// SigmaOS SLAB/SLUB memory allocator
 /// Inspired by Bonwick's 1994 paper and the Linux kernel SLUB allocator.
 /// Exposes caches for fixed-size allocations to prevent fragmentation.
-
 use std::collections::HashMap;
 use std::vec::Vec;
 
@@ -15,7 +14,11 @@ impl Slab {
     pub fn new(object_size: usize, num_objects: usize) -> Self {
         let free_list = (0..num_objects).collect();
         let data = vec![0u8; object_size * num_objects];
-        Slab { object_size, free_list, data }
+        Slab {
+            object_size,
+            free_list,
+            data,
+        }
     }
 
     pub fn allocate(&mut self) -> Option<usize> {
@@ -51,7 +54,7 @@ impl SlabCache {
                 return Some(i * 1000 + slot); // Simple ID scheme
             }
         }
-        
+
         // Add a new slab
         let mut new_slab = Slab::new(self.object_size, 64);
         let slot = new_slab.allocate()?;
@@ -124,7 +127,7 @@ mod tests {
     #[test]
     fn test_slab_cache_allocations() {
         let mut allocator = SlabAllocator::new();
-        
+
         let (id1, size1) = allocator.allocate(24).unwrap();
         assert_eq!(size1, 32); // should fit in 32-byte slab
 

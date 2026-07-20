@@ -1,3 +1,3 @@
 pub mod sigma_aid;
 
-pub use sigma_aid::{SigmaAid, LLMInterface, ModelStatus};
+pub use sigma_aid::{LLMInterface, ModelStatus, SigmaAid};
