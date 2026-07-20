@@ -100,6 +100,7 @@ pub use graphics::{
     ColorSpace, CompositorError, CompositorResult, CompositorStrategy, DecodedImage,
     FramebufferCompositor, ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, RenderLayer,
     SigmaCompositor,
+    Framebuffer as GpuFramebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
