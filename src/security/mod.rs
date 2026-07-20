@@ -3,6 +3,7 @@
 
 pub mod audit;
 pub mod capability;
+pub mod capability_enforcer;
 pub mod clipboard;
 pub mod integrity;
 pub mod intrusion;
@@ -17,6 +18,7 @@ pub mod vulnerability;
 
 pub use audit::AuditLogger;
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,

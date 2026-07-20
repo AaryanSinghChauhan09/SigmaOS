@@ -31,6 +31,8 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod support;
+pub mod system;
+pub mod tracing;
 pub mod virtualization;
 pub mod unimplemented_features;
 pub mod phase_l_plans;
@@ -118,7 +120,7 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager, PackageDependencyResolver, Version,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -128,8 +130,13 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
-pub use shell::{ShellCommand, ShellRepl};
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer,
+    RuntimeCapabilityToken,
+};
+pub use shell::{ShellCommand, ShellRepl, MultiCallShell, SysCommandType};
+pub use system::{Generation, GenerationManager};
+pub use tracing::{SigmaTrace, TraceEvent, TraceSpan};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,

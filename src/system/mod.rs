@@ -4,6 +4,7 @@
 pub mod cleanup;
 pub mod defrag;
 pub mod duplicate;
+pub mod generation_manager;
 pub mod memory;
 pub mod optimizer;
 pub mod power;
@@ -24,6 +25,7 @@ pub use duplicate::{
     DuplicateError, DuplicateFinder, DuplicateGroup, FileMetadata, HashAlgorithm,
     ScanStats, Sha256Algorithm,
 };
+pub use generation_manager::{Generation, GenerationManager};
 pub use memory::{
     AllocationRecord, AllocationType, LeakLocation, LeakReport, LeakDetectionStrategy,
     MemoryLeakDetector, ReferenceCountingDetector, TimeBasedDetector,
