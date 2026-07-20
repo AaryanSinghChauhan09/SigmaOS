@@ -18,6 +18,7 @@ pub mod drivers;
 pub mod ecosystem;
 pub mod education;
 pub mod filesystem;
+pub mod finance;
 pub mod graphics;
 pub mod governance;
 pub mod iso;
@@ -111,6 +112,7 @@ pub use filesystem::{
     DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
     VirtualFilesystem,
 };
+pub use finance::{GstCalculator, GstRate, GstRegime, GstResult, GstState, GoodsType};
 pub use graphics::{
     ColorSpace, CompositorError, CompositorResult, CompositorStrategy, DecodedImage,
     FramebufferCompositor, ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, RenderLayer,
