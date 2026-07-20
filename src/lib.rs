@@ -29,6 +29,7 @@ pub mod orchestration;
 pub mod package;
 pub mod productivity;
 pub mod resilience;
+pub mod storage;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -142,6 +143,7 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
+pub use storage::{Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState};
 pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer,
     RuntimeCapabilityToken,
