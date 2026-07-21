@@ -1,5 +1,5 @@
 //! Kernel Profiling Tools
-//! 
+//!
 //! This module provides kernel profiling capabilities for performance analysis,
 //! including function call tracing, timing statistics, and hot path identification.
 
@@ -7,8 +7,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Profiling entry for a function
 #[derive(Debug, Clone)]
@@ -84,7 +84,10 @@ impl KernelProfiler {
             return;
         }
         if let Some(name) = self.stack.pop() {
-            let entry = self.entries.entry(name.clone()).or_insert_with(|| ProfileEntry::new(name));
+            let entry = self
+                .entries
+                .entry(name.clone())
+                .or_insert_with(|| ProfileEntry::new(name));
             entry.record_call(duration_ns);
         }
     }
@@ -98,7 +101,8 @@ impl KernelProfiler {
     }
 
     pub fn get_hot_paths(&self, threshold_ns: u64) -> Vec<&ProfileEntry> {
-        self.entries.values()
+        self.entries
+            .values()
             .filter(|e| e.avg_time_ns > threshold_ns)
             .collect()
     }
@@ -117,7 +121,11 @@ impl KernelProfiler {
     pub fn get_statistics(&self) -> ProfilerStatistics {
         let total_calls: u64 = self.entries.values().map(|e| e.call_count).sum();
         let total_time: u64 = self.entries.values().map(|e| e.total_time_ns).sum();
-        let avg_call_time = if total_calls > 0 { total_time / total_calls } else { 0 };
+        let avg_call_time = if total_calls > 0 {
+            total_time / total_calls
+        } else {
+            0
+        };
 
         ProfilerStatistics {
             total_functions: self.entries.len(),
@@ -207,10 +215,10 @@ mod tests {
     fn test_profiler_enable_disable() {
         let mut profiler = KernelProfiler::new();
         assert!(!profiler.is_enabled());
-        
+
         profiler.enable();
         assert!(profiler.is_enabled());
-        
+
         profiler.disable();
         assert!(!profiler.is_enabled());
     }
@@ -218,12 +226,12 @@ mod tests {
     #[test]
     fn test_profiler_entry() {
         let mut entry = ProfileEntry::new("test_function".to_string());
-        
+
         entry.record_call(100);
         assert_eq!(entry.call_count, 1);
         assert_eq!(entry.total_time_ns, 100);
         assert_eq!(entry.avg_time_ns, 100);
-        
+
         entry.record_call(200);
         assert_eq!(entry.call_count, 2);
         assert_eq!(entry.total_time_ns, 300);
@@ -234,15 +242,15 @@ mod tests {
     fn test_profiler_tracking() {
         let mut profiler = KernelProfiler::new();
         profiler.enable();
-        
+
         profiler.enter_function("func_a".to_string());
         profiler.exit_function(100);
-        
+
         profiler.enter_function("func_b".to_string());
         profiler.exit_function(200);
-        
+
         assert_eq!(profiler.get_all_entries().len(), 2);
-        
+
         let entry_a = profiler.get_entry("func_a").unwrap();
         assert_eq!(entry_a.call_count, 1);
         assert_eq!(entry_a.total_time_ns, 100);
@@ -252,13 +260,13 @@ mod tests {
     fn test_profiler_hot_paths() {
         let mut profiler = KernelProfiler::new();
         profiler.enable();
-        
+
         profiler.enter_function("hot_func".to_string());
         profiler.exit_function(1000);
-        
+
         profiler.enter_function("cold_func".to_string());
         profiler.exit_function(10);
-        
+
         let hot_paths = profiler.get_hot_paths(500);
         assert_eq!(hot_paths.len(), 1);
         assert_eq!(hot_paths[0].name, "hot_func");
@@ -268,13 +276,13 @@ mod tests {
     fn test_profiler_statistics() {
         let mut profiler = KernelProfiler::new();
         profiler.enable();
-        
+
         profiler.enter_function("func_a".to_string());
         profiler.exit_function(100);
-        
+
         profiler.enter_function("func_b".to_string());
         profiler.exit_function(200);
-        
+
         let stats = profiler.get_statistics();
         assert_eq!(stats.total_functions, 2);
         assert_eq!(stats.total_calls, 2);
@@ -286,12 +294,12 @@ mod tests {
     fn test_profiler_reset() {
         let mut profiler = KernelProfiler::new();
         profiler.enable();
-        
+
         profiler.enter_function("func_a".to_string());
         profiler.exit_function(100);
-        
+
         assert_eq!(profiler.get_all_entries().len(), 1);
-        
+
         profiler.reset();
         assert_eq!(profiler.get_all_entries().len(), 0);
     }

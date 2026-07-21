@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Process Scheduler for SigmaOS
 /// Implements process scheduling using OOP principles with traits and structs
 /// No dependency on external scheduling frameworks
 /// Based on Roadmap Item 5: Process scheduler
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Process ID
 pub type ProcessID = usize;
@@ -105,14 +104,19 @@ impl ProcessCapability {
 pub struct SimpleProcess {
     pub id: ProcessID,
     pub name: [u8; 64],
-    pub state: AtomicUsize, // ProcessState as usize
+    pub state: AtomicUsize,    // ProcessState as usize
     pub priority: AtomicUsize, // ProcessPriority as usize
     pub cpu_time: AtomicUsize,
     pub capability: ProcessCapability,
 }
 
 impl SimpleProcess {
-    pub fn new(id: ProcessID, name: &[u8], priority: ProcessPriority, capability: ProcessCapability) -> Self {
+    pub fn new(
+        id: ProcessID,
+        name: &[u8],
+        priority: ProcessPriority,
+        capability: ProcessCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -131,9 +135,7 @@ impl SimpleProcess {
     }
 
     pub fn get_state(&self) -> ProcessState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state_atomic(&self, state: ProcessState) {
@@ -141,9 +143,7 @@ impl SimpleProcess {
     }
 
     pub fn get_priority(&self) -> ProcessPriority {
-        unsafe {
-            core::mem::transmute(self.priority.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.priority.load(Ordering::SeqCst)) }
     }
 
     pub fn set_priority_atomic(&self, priority: ProcessPriority) {
@@ -198,7 +198,11 @@ impl Process for SimpleProcess {
 /// Process scheduler trait (OOP interface)
 pub trait ProcessScheduler {
     /// Create process
-    fn create_process(&mut self, name: &[u8], priority: ProcessPriority) -> Result<ProcessID, SchedulerError>;
+    fn create_process(
+        &mut self,
+        name: &[u8],
+        priority: ProcessPriority,
+    ) -> Result<ProcessID, SchedulerError>;
     /// Destroy process
     fn destroy_process(&mut self, id: ProcessID) -> Result<(), SchedulerError>;
     /// Schedule next process
@@ -287,7 +291,11 @@ impl SimpleProcessScheduler {
 }
 
 impl ProcessScheduler for SimpleProcessScheduler {
-    fn create_process(&mut self, name: &[u8], priority: ProcessPriority) -> Result<ProcessID, SchedulerError> {
+    fn create_process(
+        &mut self,
+        name: &[u8],
+        priority: ProcessPriority,
+    ) -> Result<ProcessID, SchedulerError> {
         if !self.capability.can_create {
             return Err(SchedulerError::PermissionDenied);
         }
@@ -431,7 +439,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

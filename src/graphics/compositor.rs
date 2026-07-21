@@ -1,13 +1,12 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Graphics Compositor for SigmaOS
 /// Implements graphics composition using OOP principles with traits and structs
 /// No dependency on external graphics frameworks
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Position
 #[repr(C)]
@@ -57,17 +56,17 @@ impl Rectangle {
     }
 
     pub fn contains(&self, point: Position) -> bool {
-        point.x >= self.position.x &&
-        point.x < self.position.x + self.size.width as i32 &&
-        point.y >= self.position.y &&
-        point.y < self.position.y + self.size.height as i32
+        point.x >= self.position.x
+            && point.x < self.position.x + self.size.width as i32
+            && point.y >= self.position.y
+            && point.y < self.position.y + self.size.height as i32
     }
 
     pub fn intersects(&self, other: &Rectangle) -> bool {
-        self.position.x < other.position.x + other.size.width as i32 &&
-        self.position.x + self.size.width as i32 > other.position.x &&
-        self.position.y < other.position.y + other.size.height as i32 &&
-        self.position.y + self.size.height as i32 > other.position.y
+        self.position.x < other.position.x + other.size.width as i32
+            && self.position.x + self.size.width as i32 > other.position.x
+            && self.position.y < other.position.y + other.size.height as i32
+            && self.position.y + self.size.height as i32 > other.position.y
     }
 }
 
@@ -91,10 +90,7 @@ impl Color {
     }
 
     pub fn to_u32(&self) -> u32 {
-        ((self.a as u32) << 24) |
-        ((self.r as u32) << 16) |
-        ((self.g as u32) << 8) |
-        (self.b as u32)
+        ((self.a as u32) << 24) | ((self.r as u32) << 16) | ((self.g as u32) << 8) | (self.b as u32)
     }
 }
 
@@ -263,8 +259,12 @@ impl Surface for BitmapSurface {
         let data = self.data_mut();
         let stride = self.stride as usize / 4;
 
-        for y in rect.position.y.max(0) as usize..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize {
-            for x in rect.position.x.max(0) as usize..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize {
+        for y in rect.position.y.max(0) as usize
+            ..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize
+        {
+            for x in rect.position.x.max(0) as usize
+                ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
+            {
                 let index = y * stride + x;
                 if index < data.len() {
                     data[index] = color_value;
@@ -382,7 +382,12 @@ pub struct SimpleWindow {
 
 impl SimpleWindow {
     pub fn new(id: usize, rect: Rectangle, capability: WindowCapability) -> Self {
-        let surface = BitmapSurface::new(id, rect.size.width, rect.size.height, SurfaceCapability::full());
+        let surface = BitmapSurface::new(
+            id,
+            rect.size.width,
+            rect.size.height,
+            SurfaceCapability::full(),
+        );
 
         SimpleWindow {
             id,
@@ -635,7 +640,7 @@ impl Compositor for SimpleCompositor {
                     let window_rect = window.rect();
                     let output_data = output.data_mut();
                     let window_data = surface.data();
-                    
+
                     let output_stride = output.info().stride as usize / 4;
                     let window_stride = surface.info().stride as usize / 4;
 
@@ -644,11 +649,12 @@ impl Compositor for SimpleCompositor {
                         for x in 0..window_rect.size.width as usize {
                             let output_x = (window_rect.position.x + x as i32) as usize;
                             let output_y = (window_rect.position.y + y as i32) as usize;
-                            
+
                             let output_index = output_y * output_stride + output_x;
                             let window_index = y * window_stride + x;
 
-                            if output_index < output_data.len() && window_index < window_data.len() {
+                            if output_index < output_data.len() && window_index < window_data.len()
+                            {
                                 output_data[output_index] = window_data[window_index];
                             }
                         }
@@ -708,7 +714,11 @@ impl<T> Vec<T> {
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
             self.len -= 1;
             item
         }
@@ -741,7 +751,11 @@ impl<T> Vec<T> {
             }
 
             if index < self.len {
-                core::ptr::copy(self.data.add(index), self.data.add(index + 1), self.len - index);
+                core::ptr::copy(
+                    self.data.add(index),
+                    self.data.add(index + 1),
+                    self.len - index,
+                );
             }
 
             core::ptr::write(self.data.add(index), item);
@@ -785,7 +799,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

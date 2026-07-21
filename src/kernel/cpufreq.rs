@@ -4,14 +4,14 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GovernorType {
     Performance,  // Always max frequency
-    Powersave,     // Always min frequency
+    Powersave,    // Always min frequency
     Ondemand,     // Dynamic based on load
     Conservative, // Similar to ondemand but more gradual
     Schedutil,    // Scheduler-driven frequency scaling
@@ -21,9 +21,9 @@ pub enum GovernorType {
 #[derive(Debug, Clone)]
 pub struct CpufreqPolicy {
     pub cpu: u32,
-    pub min_freq: u32,    // kHz
-    pub max_freq: u32,    // kHz
-    pub cur_freq: u32,    // kHz
+    pub min_freq: u32, // kHz
+    pub max_freq: u32, // kHz
+    pub cur_freq: u32, // kHz
     pub governor: GovernorType,
     pub transition_latency: u32, // microseconds
 }
@@ -84,8 +84,7 @@ impl CpufreqManager {
 
     /// Set the governor for a CPU
     pub fn set_governor(&mut self, cpu: u32, governor: GovernorType) -> Result<(), &'static str> {
-        let policy = self.policies.get_mut(&cpu)
-            .ok_or("CPU not found")?;
+        let policy = self.policies.get_mut(&cpu).ok_or("CPU not found")?;
 
         policy.governor = governor;
 
@@ -107,9 +106,13 @@ impl CpufreqManager {
     }
 
     /// Set frequency range for a CPU
-    pub fn set_frequency_range(&mut self, cpu: u32, min_freq: u32, max_freq: u32) -> Result<(), &'static str> {
-        let policy = self.policies.get_mut(&cpu)
-            .ok_or("CPU not found")?;
+    pub fn set_frequency_range(
+        &mut self,
+        cpu: u32,
+        min_freq: u32,
+        max_freq: u32,
+    ) -> Result<(), &'static str> {
+        let policy = self.policies.get_mut(&cpu).ok_or("CPU not found")?;
 
         if min_freq < *self.available_frequencies.first().unwrap_or(&800000) {
             return Err("Minimum frequency too low");
@@ -138,8 +141,7 @@ impl CpufreqManager {
 
     /// Set specific frequency for a CPU
     pub fn set_frequency(&mut self, cpu: u32, freq: u32) -> Result<(), &'static str> {
-        let policy = self.policies.get_mut(&cpu)
-            .ok_or("CPU not found")?;
+        let policy = self.policies.get_mut(&cpu).ok_or("CPU not found")?;
 
         if freq < policy.min_freq || freq > policy.max_freq {
             return Err("Frequency out of allowed range");
@@ -161,28 +163,28 @@ impl CpufreqManager {
 
     /// Get current frequency for a CPU
     pub fn get_frequency(&self, cpu: u32) -> Result<u32, &'static str> {
-        let policy = self.policies.get(&cpu)
-            .ok_or("CPU not found")?;
+        let policy = self.policies.get(&cpu).ok_or("CPU not found")?;
 
         Ok(policy.cur_freq)
     }
 
     /// Get policy for a CPU
     pub fn get_policy(&self, cpu: u32) -> Result<&CpufreqPolicy, &'static str> {
-        self.policies.get(&cpu)
-            .ok_or("CPU not found")
+        self.policies.get(&cpu).ok_or("CPU not found")
     }
 
     /// Get statistics for a CPU
     pub fn get_stats(&self, cpu: u32) -> Result<&CpufreqStats, &'static str> {
-        self.stats.get(&cpu)
-            .ok_or("CPU not found")
+        self.stats.get(&cpu).ok_or("CPU not found")
     }
 
     /// Simulate load-based frequency scaling
-    pub fn update_frequency_based_on_load(&mut self, cpu: u32, load: f64) -> Result<(), &'static str> {
-        let policy = self.policies.get_mut(&cpu)
-            .ok_or("CPU not found")?;
+    pub fn update_frequency_based_on_load(
+        &mut self,
+        cpu: u32,
+        load: f64,
+    ) -> Result<(), &'static str> {
+        let policy = self.policies.get_mut(&cpu).ok_or("CPU not found")?;
 
         match policy.governor {
             GovernorType::Ondemand => {
@@ -228,7 +230,12 @@ impl CpufreqManager {
 
 impl Default for CpufreqManager {
     fn default() -> Self {
-        Self::new(4, vec![800000, 1200000, 1600000, 2000000, 2400000, 2800000, 3200000, 3600000, 4000000])
+        Self::new(
+            4,
+            vec![
+                800000, 1200000, 1600000, 2000000, 2400000, 2800000, 3200000, 3600000, 4000000,
+            ],
+        )
     }
 }
 
@@ -245,20 +252,20 @@ mod tests {
     #[test]
     fn test_set_governor() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         manager.set_governor(0, GovernorType::Powersave).unwrap();
         let freq = manager.get_frequency(0).unwrap();
-        
+
         assert_eq!(freq, 800000); // Min frequency
     }
 
     #[test]
     fn test_set_frequency_range() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         manager.set_frequency_range(0, 1600000, 3200000).unwrap();
         let policy = manager.get_policy(0).unwrap();
-        
+
         assert_eq!(policy.min_freq, 1600000);
         assert_eq!(policy.max_freq, 3200000);
     }
@@ -266,20 +273,20 @@ mod tests {
     #[test]
     fn test_set_frequency() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         manager.set_frequency(0, 2400000).unwrap();
         let freq = manager.get_frequency(0).unwrap();
-        
+
         assert_eq!(freq, 2400000);
     }
 
     #[test]
     fn test_load_based_scaling() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         manager.set_governor(0, GovernorType::Ondemand).unwrap();
         manager.update_frequency_based_on_load(0, 0.8).unwrap();
-        
+
         let freq = manager.get_frequency(0).unwrap();
         assert!(freq > 2400000); // Should be high with 80% load
     }
@@ -287,27 +294,27 @@ mod tests {
     #[test]
     fn test_stats() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         manager.set_frequency(0, 2400000).unwrap();
         let stats = manager.get_stats(0).unwrap();
-        
+
         assert_eq!(stats.total_transitions, 1);
     }
 
     #[test]
     fn test_performance_governor() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         manager.set_governor(0, GovernorType::Performance).unwrap();
         let freq = manager.get_frequency(0).unwrap();
-        
+
         assert_eq!(freq, 4000000); // Max frequency
     }
 
     #[test]
     fn test_invalid_frequency() {
         let mut manager = CpufreqManager::new(2, vec![800000, 1600000, 2400000, 3200000, 4000000]);
-        
+
         let result = manager.set_frequency(0, 5000000);
         assert!(result.is_err());
     }

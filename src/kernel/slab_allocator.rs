@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SlabState {
@@ -46,7 +46,12 @@ impl SlabAllocator {
     }
 
     /// Create a new slab cache
-    pub fn create_cache(&mut self, name: String, object_size: usize, align: usize) -> Result<(), &'static str> {
+    pub fn create_cache(
+        &mut self,
+        name: String,
+        object_size: usize,
+        align: usize,
+    ) -> Result<(), &'static str> {
         if self.caches.contains_key(&name) {
             return Err("Cache already exists");
         }
@@ -70,8 +75,7 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-        let cache = self.caches.get_mut(cache_name)
-            .ok_or("Cache not found")?;
+        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
 
         // Try to find a free object in existing slabs
         for slab in &mut cache.slabs {
@@ -81,7 +85,7 @@ impl SlabAllocator {
                         *obj = Some(self.allocate_memory(cache.object_size));
                         slab.inuse += 1;
                         cache.free_objects -= 1;
-                        
+
                         // Update slab state
                         slab.state = if slab.inuse == cache.objects_per_slab {
                             SlabState::Full
@@ -108,8 +112,7 @@ impl SlabAllocator {
 
     /// Free an object back to its cache
     pub fn free(&mut self, cache_name: &str, obj: *mut u8) -> Result<(), &'static str> {
-        let cache = self.caches.get_mut(cache_name)
-            .ok_or("Cache not found")?;
+        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
 
         for slab in &mut cache.slabs {
             for slab_obj in &mut slab.objects {
@@ -138,7 +141,7 @@ impl SlabAllocator {
     /// Create a new slab for a cache
     fn create_slab(&self, cache: &SlabCache) -> Result<Slab, &'static str> {
         let mut objects = Vec::with_capacity(cache.objects_per_slab);
-        
+
         for _ in 0..cache.objects_per_slab {
             objects.push(Some(self.allocate_memory(cache.object_size)));
         }
@@ -160,7 +163,7 @@ impl SlabAllocator {
     /// Get cache statistics
     pub fn get_cache_stats(&self, cache_name: &str) -> Option<SlabCacheStats> {
         let cache = self.caches.get(cache_name)?;
-        
+
         Some(SlabCacheStats {
             name: cache.name.clone(),
             object_size: cache.object_size,
@@ -173,8 +176,7 @@ impl SlabAllocator {
 
     /// Shrink a cache by removing empty slabs
     pub fn shrink_cache(&mut self, cache_name: &str) -> Result<usize, &'static str> {
-        let cache = self.caches.get_mut(cache_name)
-            .ok_or("Cache not found")?;
+        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
 
         let initial_count = cache.slabs.len();
         cache.slabs.retain(|slab| slab.state != SlabState::Empty);
@@ -185,8 +187,7 @@ impl SlabAllocator {
 
     /// Destroy a cache
     pub fn destroy_cache(&mut self, cache_name: &str) -> Result<(), &'static str> {
-        self.caches.remove(cache_name)
-            .ok_or("Cache not found")?;
+        self.caches.remove(cache_name).ok_or("Cache not found")?;
         Ok(())
     }
 
@@ -219,17 +220,21 @@ mod tests {
     #[test]
     fn test_create_cache() {
         let mut allocator = SlabAllocator::new();
-        
-        allocator.create_cache("task_struct".to_string(), 512, 8).unwrap();
+
+        allocator
+            .create_cache("task_struct".to_string(), 512, 8)
+            .unwrap();
         assert_eq!(allocator.cache_count(), 1);
     }
 
     #[test]
     fn test_allocate() {
         let mut allocator = SlabAllocator::new();
-        
-        allocator.create_cache("task_struct".to_string(), 512, 8).unwrap();
-        
+
+        allocator
+            .create_cache("task_struct".to_string(), 512, 8)
+            .unwrap();
+
         let obj = allocator.allocate("task_struct").unwrap();
         assert!(!obj.is_null());
     }
@@ -237,9 +242,11 @@ mod tests {
     #[test]
     fn test_free() {
         let mut allocator = SlabAllocator::new();
-        
-        allocator.create_cache("task_struct".to_string(), 512, 8).unwrap();
-        
+
+        allocator
+            .create_cache("task_struct".to_string(), 512, 8)
+            .unwrap();
+
         let obj = allocator.allocate("task_struct").unwrap();
         allocator.free("task_struct", obj).unwrap();
     }
@@ -247,12 +254,14 @@ mod tests {
     #[test]
     fn test_cache_stats() {
         let mut allocator = SlabAllocator::new();
-        
-        allocator.create_cache("task_struct".to_string(), 512, 8).unwrap();
-        
+
+        allocator
+            .create_cache("task_struct".to_string(), 512, 8)
+            .unwrap();
+
         allocator.allocate("task_struct").unwrap();
         allocator.allocate("task_struct").unwrap();
-        
+
         let stats = allocator.get_cache_stats("task_struct").unwrap();
         assert_eq!(stats.used_objects, 2);
     }
@@ -260,15 +269,17 @@ mod tests {
     #[test]
     fn test_shrink_cache() {
         let mut allocator = SlabAllocator::new();
-        
-        allocator.create_cache("task_struct".to_string(), 512, 8).unwrap();
-        
+
+        allocator
+            .create_cache("task_struct".to_string(), 512, 8)
+            .unwrap();
+
         let obj1 = allocator.allocate("task_struct").unwrap();
         let obj2 = allocator.allocate("task_struct").unwrap();
-        
+
         allocator.free("task_struct", obj1).unwrap();
         allocator.free("task_struct", obj2).unwrap();
-        
+
         let removed = allocator.shrink_cache("task_struct").unwrap();
         assert!(removed > 0);
     }
@@ -276,10 +287,12 @@ mod tests {
     #[test]
     fn test_destroy_cache() {
         let mut allocator = SlabAllocator::new();
-        
-        allocator.create_cache("task_struct".to_string(), 512, 8).unwrap();
+
+        allocator
+            .create_cache("task_struct".to_string(), 512, 8)
+            .unwrap();
         allocator.destroy_cache("task_struct").unwrap();
-        
+
         assert_eq!(allocator.cache_count(), 0);
     }
 }

@@ -33,7 +33,7 @@ pub struct StartupOptimizationResult {
     pub time_saved_ms: u64,
     pub services_delayed: Vec<String>,
     pub services_parallelized: Vec<String>,
-   pub message: String,
+    pub message: String,
 }
 
 /// OOP trait for startup optimization strategies
@@ -86,26 +86,34 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
     fn analyze(&self, services: &[StartupService]) -> StartupAnalysis {
         let total_services = services.len();
         let enabled_services = services.iter().filter(|s| s.enabled).count();
-        let total_estimated_time_ms: u64 = services.iter()
+        let total_estimated_time_ms: u64 = services
+            .iter()
             .filter(|s| s.enabled)
             .map(|s| s.estimated_startup_time_ms)
             .sum();
 
         // Find critical path (services with Critical priority)
-        let critical_path_time_ms: u64 = services.iter()
+        let critical_path_time_ms: u64 = services
+            .iter()
             .filter(|s| s.enabled && s.priority == ServicePriority::Critical)
             .map(|s| s.estimated_startup_time_ms)
             .sum();
 
         // Find parallelizable services (no dependencies)
-        let parallelizable_services: Vec<String> = services.iter()
+        let parallelizable_services: Vec<String> = services
+            .iter()
             .filter(|s| s.enabled && s.dependencies.is_empty())
             .map(|s| s.name.clone())
             .collect();
 
         // Find delayable services (Low priority, non-critical)
-        let delayable_services: Vec<String> = services.iter()
-            .filter(|s| s.enabled && s.priority == ServicePriority::Low && s.estimated_startup_time_ms > self.delay_threshold_ms)
+        let delayable_services: Vec<String> = services
+            .iter()
+            .filter(|s| {
+                s.enabled
+                    && s.priority == ServicePriority::Low
+                    && s.estimated_startup_time_ms > self.delay_threshold_ms
+            })
             .map(|s| s.name.clone())
             .collect();
 
@@ -188,7 +196,8 @@ impl StartupOptimizationStrategy for ProfileBasedOptimizer {
     fn analyze(&self, services: &[StartupService]) -> StartupAnalysis {
         let total_services = services.len();
         let enabled_services = services.iter().filter(|s| s.enabled).count();
-        let total_estimated_time_ms: u64 = services.iter()
+        let total_estimated_time_ms: u64 = services
+            .iter()
             .filter(|s| s.enabled)
             .map(|s| s.estimated_startup_time_ms)
             .sum();
@@ -199,12 +208,14 @@ impl StartupOptimizationStrategy for ProfileBasedOptimizer {
             StartupProfile::Reliable => total_estimated_time_ms,
         };
 
-        let parallelizable_services: Vec<String> = services.iter()
+        let parallelizable_services: Vec<String> = services
+            .iter()
             .filter(|s| s.enabled)
             .map(|s| s.name.clone())
             .collect();
 
-        let delayable_services: Vec<String> = services.iter()
+        let delayable_services: Vec<String> = services
+            .iter()
             .filter(|s| s.enabled && s.priority == ServicePriority::Low)
             .map(|s| s.name.clone())
             .collect();

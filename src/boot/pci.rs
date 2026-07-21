@@ -72,7 +72,7 @@ impl PciBusScanner {
         }
 
         let pci_device = PciDevice::new(bus, slot, vendor, device, class_code);
-        
+
         if !pci_device.is_present() {
             return Err("Device not present");
         }
@@ -129,26 +129,36 @@ mod tests {
     #[test]
     fn test_pci_scanner() {
         let mut scanner = PciBusScanner::new();
-        
-        scanner.scan_and_register(0, 1, 0x8086, 0x100E, 0x02).unwrap();
+
+        scanner
+            .scan_and_register(0, 1, 0x8086, 0x100E, 0x02)
+            .unwrap();
         assert_eq!(scanner.device_count(), 1);
     }
 
     #[test]
     fn test_pci_scan_absent() {
         let mut scanner = PciBusScanner::new();
-        
-        scanner.scan_and_register(0, 1, 0xFFFF, 0x100E, 0x02).unwrap();
+
+        scanner
+            .scan_and_register(0, 1, 0xFFFF, 0x100E, 0x02)
+            .unwrap();
         assert_eq!(scanner.device_count(), 0);
     }
 
     #[test]
     fn test_get_devices_by_class() {
         let mut scanner = PciBusScanner::new();
-        
-        scanner.scan_and_register(0, 1, 0x8086, 0x100E, 0x02).unwrap(); // Network
-        scanner.scan_and_register(0, 2, 0x8086, 0x100F, 0x01).unwrap(); // Storage
-        scanner.scan_and_register(0, 3, 0x8086, 0x1010, 0x02).unwrap(); // Network
+
+        scanner
+            .scan_and_register(0, 1, 0x8086, 0x100E, 0x02)
+            .unwrap(); // Network
+        scanner
+            .scan_and_register(0, 2, 0x8086, 0x100F, 0x01)
+            .unwrap(); // Storage
+        scanner
+            .scan_and_register(0, 3, 0x8086, 0x1010, 0x02)
+            .unwrap(); // Network
 
         let network_devices = scanner.get_devices_by_class(PciClass::Network);
         assert_eq!(network_devices.len(), 2);
@@ -159,21 +169,37 @@ mod tests {
 
     #[test]
     fn test_pci_class_mapping() {
-        assert_eq!(PciDevice::new(0, 0, 0x8086, 0x100E, 0x02).class, PciClass::Network);
-        assert_eq!(PciDevice::new(0, 0, 0x8086, 0x100E, 0x01).class, PciClass::Storage);
-        assert_eq!(PciDevice::new(0, 0, 0x8086, 0x100E, 0x03).class, PciClass::Display);
-        assert_eq!(PciDevice::new(0, 0, 0x8086, 0x100E, 0xFF).class, PciClass::Unknown);
+        assert_eq!(
+            PciDevice::new(0, 0, 0x8086, 0x100E, 0x02).class,
+            PciClass::Network
+        );
+        assert_eq!(
+            PciDevice::new(0, 0, 0x8086, 0x100E, 0x01).class,
+            PciClass::Storage
+        );
+        assert_eq!(
+            PciDevice::new(0, 0, 0x8086, 0x100E, 0x03).class,
+            PciClass::Display
+        );
+        assert_eq!(
+            PciDevice::new(0, 0, 0x8086, 0x100E, 0xFF).class,
+            PciClass::Unknown
+        );
     }
 
     #[test]
     fn test_scanner_clear() {
         let mut scanner = PciBusScanner::new();
-        
-        scanner.scan_and_register(0, 1, 0x8086, 0x100E, 0x02).unwrap();
-        scanner.scan_and_register(0, 2, 0x8086, 0x100F, 0x01).unwrap();
-        
+
+        scanner
+            .scan_and_register(0, 1, 0x8086, 0x100E, 0x02)
+            .unwrap();
+        scanner
+            .scan_and_register(0, 2, 0x8086, 0x100F, 0x01)
+            .unwrap();
+
         assert_eq!(scanner.device_count(), 2);
-        
+
         scanner.clear();
         assert_eq!(scanner.device_count(), 0);
     }

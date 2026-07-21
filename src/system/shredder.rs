@@ -2,7 +2,7 @@
 // OOP-based secure file deletion with multiple overwrite passes
 
 use std::fs::{self, File, OpenOptions};
-use std::io::{self, Write, Seek, SeekFrom};
+use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;
 
 /// Shredding algorithm
@@ -46,8 +46,7 @@ pub struct ZeroPassShredder;
 
 impl ShreddingStrategy for ZeroPassShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
-        let metadata = fs::metadata(path)
-            .map_err(|e| ShredderError::IoError(e.to_string()))?;
+        let metadata = fs::metadata(path).map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         let file_size = metadata.len();
         let mut file = OpenOptions::new()
@@ -93,8 +92,7 @@ pub struct RandomPassShredder;
 
 impl ShreddingStrategy for RandomPassShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
-        let metadata = fs::metadata(path)
-            .map_err(|e| ShredderError::IoError(e.to_string()))?;
+        let metadata = fs::metadata(path).map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         let file_size = metadata.len();
         let mut file = OpenOptions::new()
@@ -141,8 +139,7 @@ pub struct Dod5220Shredder;
 
 impl ShreddingStrategy for Dod5220Shredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
-        let metadata = fs::metadata(path)
-            .map_err(|e| ShredderError::IoError(e.to_string()))?;
+        let metadata = fs::metadata(path).map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         let file_size = metadata.len();
         let mut file = OpenOptions::new()
@@ -197,7 +194,12 @@ impl ShreddingStrategy for Dod5220Shredder {
 }
 
 impl Dod5220Shredder {
-    fn write_pattern(&self, file: &mut File, file_size: u64, pattern: u8) -> Result<u64, ShredderError> {
+    fn write_pattern(
+        &self,
+        file: &mut File,
+        file_size: u64,
+        pattern: u8,
+    ) -> Result<u64, ShredderError> {
         let buffer = vec![pattern; 8192];
         let mut bytes_written = 0u64;
 
@@ -217,8 +219,7 @@ pub struct GutmannShredder;
 
 impl ShreddingStrategy for GutmannShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
-        let metadata = fs::metadata(path)
-            .map_err(|e| ShredderError::IoError(e.to_string()))?;
+        let metadata = fs::metadata(path).map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         let file_size = metadata.len();
         let mut file = OpenOptions::new()
@@ -258,7 +259,12 @@ impl ShreddingStrategy for GutmannShredder {
 }
 
 impl GutmannShredder {
-    fn write_pattern(&self, file: &mut File, file_size: u64, pattern: u8) -> Result<u64, ShredderError> {
+    fn write_pattern(
+        &self,
+        file: &mut File,
+        file_size: u64,
+        pattern: u8,
+    ) -> Result<u64, ShredderError> {
         let buffer = vec![pattern; 8192];
         let mut bytes_written = 0u64;
 
@@ -303,15 +309,17 @@ impl FileShredder {
 
         // Delete file after shredding if enabled
         if self.delete_after_shred && result.success {
-            fs::remove_file(path)
-                .map_err(|e| ShredderError::IoError(e.to_string()))?;
+            fs::remove_file(path).map_err(|e| ShredderError::IoError(e.to_string()))?;
         }
 
         Ok(result)
     }
 
     /// Shred multiple files
-    pub fn shred_multiple(&mut self, paths: &[&Path]) -> Vec<Result<ShreddingResult, ShredderError>> {
+    pub fn shred_multiple(
+        &mut self,
+        paths: &[&Path],
+    ) -> Vec<Result<ShreddingResult, ShredderError>> {
         paths.iter().map(|path| self.shred(path)).collect()
     }
 

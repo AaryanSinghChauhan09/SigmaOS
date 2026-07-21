@@ -94,12 +94,14 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
 
         for record in self.allocations.values() {
             let stack_key = record.stack_trace.join(" | ");
-            let entry = leak_locations.entry(stack_key).or_insert_with(|| LeakLocation {
-                stack_trace: record.stack_trace.clone(),
-                leak_count: 0,
-                total_bytes: 0,
-                average_size: 0,
-            });
+            let entry = leak_locations
+                .entry(stack_key)
+                .or_insert_with(|| LeakLocation {
+                    stack_trace: record.stack_trace.clone(),
+                    leak_count: 0,
+                    total_bytes: 0,
+                    average_size: 0,
+                });
             entry.leak_count += 1;
             entry.total_bytes += record.size as u64;
         }
@@ -159,7 +161,8 @@ impl LeakDetectionStrategy for TimeBasedDetector {
         let start = Instant::now();
         let now = Instant::now();
 
-        let leaked_allocations: Vec<_> = self.allocations
+        let leaked_allocations: Vec<_> = self
+            .allocations
             .values()
             .filter(|r| now.duration_since(r.timestamp) > self.leak_threshold)
             .collect();
@@ -171,12 +174,14 @@ impl LeakDetectionStrategy for TimeBasedDetector {
 
         for record in leaked_allocations {
             let stack_key = record.stack_trace.join(" | ");
-            let entry = leak_locations.entry(stack_key).or_insert_with(|| LeakLocation {
-                stack_trace: record.stack_trace.clone(),
-                leak_count: 0,
-                total_bytes: 0,
-                average_size: 0,
-            });
+            let entry = leak_locations
+                .entry(stack_key)
+                .or_insert_with(|| LeakLocation {
+                    stack_trace: record.stack_trace.clone(),
+                    leak_count: 0,
+                    total_bytes: 0,
+                    average_size: 0,
+                });
             entry.leak_count += 1;
             entry.total_bytes += record.size as u64;
         }

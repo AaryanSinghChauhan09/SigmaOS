@@ -14,7 +14,7 @@ pub mod snapshot;
 pub mod startup;
 
 pub use cleanup::{
-    CleanupError, CleanupStats, CleanupStrategy, CacheStrategy, LogFileStrategy,
+    CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
     SystemCleanupManager, TempFileStrategy,
 };
 pub use defrag::{
@@ -22,39 +22,37 @@ pub use defrag::{
     FragmentationReport, SigmaFsDefragStrategy,
 };
 pub use duplicate::{
-    DuplicateError, DuplicateFinder, DuplicateGroup, FileMetadata, HashAlgorithm,
-    ScanStats, Sha256Algorithm,
+    DuplicateError, DuplicateFinder, DuplicateGroup, FileMetadata, HashAlgorithm, ScanStats,
+    Sha256Algorithm,
 };
 pub use generation_manager::{Generation, GenerationManager};
 pub use memory::{
-    AllocationRecord, AllocationType, LeakLocation, LeakReport, LeakDetectionStrategy,
+    AllocationRecord, AllocationType, LeakDetectionStrategy, LeakLocation, LeakReport,
     MemoryLeakDetector, ReferenceCountingDetector, TimeBasedDetector,
 };
 pub use optimizer::{
-    CpuOptimization, IoOptimization, MemoryOptimization, NetworkOptimization,
-    OptimizationError, OptimizationResult, OptimizationStrategy, PerformanceEnhancer,
-    PerformanceProfile,
+    CpuOptimization, IoOptimization, MemoryOptimization, NetworkOptimization, OptimizationError,
+    OptimizationResult, OptimizationStrategy, PerformanceEnhancer, PerformanceProfile,
 };
 pub use power::{
     BatterySaverManager, BatteryStatus, CpuPowerStrategy, DisplayPowerStrategy,
     NetworkPowerStrategy, PowerError, PowerMode, PowerResult, PowerStrategy,
 };
 pub use sandbox::{
-    CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ResourceLimits,
-    ResourceUsage, SandboxEnforcement, SandboxError, SandboxOperation, SandboxProfile,
-    SandboxProcess, SandboxResult, ProcessSandboxManager,
+    CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ProcessSandboxManager,
+    ResourceLimits, ResourceUsage, SandboxEnforcement, SandboxError, SandboxOperation,
+    SandboxProcess, SandboxProfile, SandboxResult,
 };
 pub use shredder::{
     Dod5220Shredder, FileShredder, GutmannShredder, RandomPassShredder, ShredderError,
     ShreddingAlgorithm, ShreddingResult, ShreddingStrategy, ZeroPassShredder,
 };
 pub use snapshot::{
-    FileSnapshotStorage, MerkleSnapshotStorage, RestoreResult, SnapshotConfig,
-    SnapshotError, SnapshotMetadata, SnapshotResult, SnapshotStorage,
-    SystemSnapshotManager,
+    FileSnapshotStorage, MerkleSnapshotStorage, RestoreResult, SnapshotConfig, SnapshotError,
+    SnapshotMetadata, SnapshotResult, SnapshotStorage, SystemSnapshotManager,
 };
 pub use startup::{
     DependencyBasedOptimizer, ProfileBasedOptimizer, ServicePriority, StartupAnalysis,
-    StartupOptimizationResult, StartupOptimizationStrategy, StartupOptimizer,
-    StartupProfile, StartupService,
+    StartupOptimizationResult, StartupOptimizationStrategy, StartupOptimizer, StartupProfile,
+    StartupService,
 };

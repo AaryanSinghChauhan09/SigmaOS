@@ -61,7 +61,11 @@ pub struct RestoreResult {
 /// OOP trait for snapshot storage strategies
 pub trait SnapshotStorage {
     /// Create a snapshot
-    fn create_snapshot(&mut self, metadata: SnapshotMetadata, data: &[u8]) -> Result<SnapshotResult, SnapshotError>;
+    fn create_snapshot(
+        &mut self,
+        metadata: SnapshotMetadata,
+        data: &[u8],
+    ) -> Result<SnapshotResult, SnapshotError>;
     /// Restore from snapshot
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError>;
     /// List snapshots
@@ -90,7 +94,11 @@ impl FileSnapshotStorage {
 }
 
 impl SnapshotStorage for FileSnapshotStorage {
-    fn create_snapshot(&mut self, metadata: SnapshotMetadata, data: &[u8]) -> Result<SnapshotResult, SnapshotError> {
+    fn create_snapshot(
+        &mut self,
+        metadata: SnapshotMetadata,
+        data: &[u8],
+    ) -> Result<SnapshotResult, SnapshotError> {
         let start = std::time::Instant::now();
 
         // Check max snapshots limit
@@ -114,8 +122,7 @@ impl SnapshotStorage for FileSnapshotStorage {
 
         // Write snapshot data
         let data_path = snapshot_path.join("snapshot.bin");
-        std::fs::write(&data_path, data)
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        std::fs::write(&data_path, data).map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         self.snapshots.insert(metadata.id.clone(), metadata.clone());
 
@@ -131,7 +138,9 @@ impl SnapshotStorage for FileSnapshotStorage {
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
         let start = std::time::Instant::now();
 
-        let metadata = self.snapshots.get(snapshot_id)
+        let metadata = self
+            .snapshots
+            .get(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -142,8 +151,7 @@ impl SnapshotStorage for FileSnapshotStorage {
         }
 
         // Simulate restore process
-        let data = std::fs::read(&data_path)
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let data = std::fs::read(&data_path).map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // In real implementation, this would restore files to their original locations
         let files_restored = (data.len() / 4096).max(1); // Estimate based on 4KB blocks
@@ -164,7 +172,8 @@ impl SnapshotStorage for FileSnapshotStorage {
     }
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
-        self.snapshots.remove(snapshot_id)
+        self.snapshots
+            .remove(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -206,7 +215,11 @@ impl MerkleSnapshotStorage {
 }
 
 impl SnapshotStorage for MerkleSnapshotStorage {
-    fn create_snapshot(&mut self, metadata: SnapshotMetadata, data: &[u8]) -> Result<SnapshotResult, SnapshotError> {
+    fn create_snapshot(
+        &mut self,
+        metadata: SnapshotMetadata,
+        data: &[u8],
+    ) -> Result<SnapshotResult, SnapshotError> {
         let start = std::time::Instant::now();
 
         if self.snapshots.len() >= self.config.max_snapshots {
@@ -231,8 +244,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
 
         // Write snapshot data with Merkle tree
         let data_path = snapshot_path.join("snapshot.bin");
-        std::fs::write(&data_path, data)
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        std::fs::write(&data_path, data).map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write Merkle root
         let merkle_path = snapshot_path.join("merkle_root.txt");
@@ -246,14 +258,19 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             snapshot_id: Some(metadata.id.clone()),
             bytes_written: data.len() as u64,
             duration_seconds: start.elapsed().as_secs(),
-            message: format!("Merkle snapshot created: {} (root: {})", metadata.name, merkle_root),
+            message: format!(
+                "Merkle snapshot created: {} (root: {})",
+                metadata.name, merkle_root
+            ),
         })
     }
 
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
         let start = std::time::Instant::now();
 
-        let metadata = self.snapshots.get(snapshot_id)
+        let metadata = self
+            .snapshots
+            .get(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -265,14 +282,15 @@ impl SnapshotStorage for MerkleSnapshotStorage {
         }
 
         // Verify Merkle root
-        let data = std::fs::read(&data_path)
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let data = std::fs::read(&data_path).map_err(|e| SnapshotError::IoError(e.to_string()))?;
         let computed_root = self.compute_merkle_root(&data);
         let stored_root = std::fs::read_to_string(&merkle_path)
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         if computed_root != stored_root.trim() {
-            return Err(SnapshotError::IntegrityError("Merkle root mismatch".to_string()));
+            return Err(SnapshotError::IntegrityError(
+                "Merkle root mismatch".to_string(),
+            ));
         }
 
         let files_restored = (data.len() / 4096).max(1);
@@ -282,7 +300,10 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             snapshot_id: snapshot_id.to_string(),
             files_restored,
             duration_seconds: start.elapsed().as_secs(),
-            message: format!("Restored from Merkle snapshot: {} (verified)", metadata.name),
+            message: format!(
+                "Restored from Merkle snapshot: {} (verified)",
+                metadata.name
+            ),
         })
     }
 
@@ -293,7 +314,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
     }
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
-        self.snapshots.remove(snapshot_id)
+        self.snapshots
+            .remove(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -338,7 +360,11 @@ impl SystemSnapshotManager {
     }
 
     /// Create a system snapshot
-    pub fn create_snapshot(&mut self, name: String, description: String) -> Result<SnapshotResult, SnapshotError> {
+    pub fn create_snapshot(
+        &mut self,
+        name: String,
+        description: String,
+    ) -> Result<SnapshotResult, SnapshotError> {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()

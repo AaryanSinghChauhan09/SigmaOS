@@ -1,22 +1,22 @@
 //! # Zenith Compositor - SigmaOS Wayland Display Server
-//! 
+//!
 //! Zenith is SigmaOS's sovereign Wayland-compatible display compositor,
 //! designed to deliver a next-generation desktop experience without any X11
 //! attack surface, legacy display server overhead, or proprietary GPU blobs.
-//! 
+//!
 //! ## Architecture
-//! 
+//!
 //! ```
-//! Application renders → wl_buffer (DMA-BUF or SHM) 
-//!     → ZenithCompositor (damage tracking) 
-//!     → Scene graph (sorted by z-order) 
-//!     → GPU backend (Vulkan render pass) 
-//!     → KMS/DRM (vsync atomic commit) 
+//! Application renders → wl_buffer (DMA-BUF or SHM)
+//!     → ZenithCompositor (damage tracking)
+//!     → Scene graph (sorted by z-order)
+//!     → GPU backend (Vulkan render pass)
+//!     → KMS/DRM (vsync atomic commit)
 //!     → Display
 //! ```
 
-use std::collections::HashMap;
 use sigma_types::{CapabilityToken, Result};
+use std::collections::HashMap;
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,12 +44,19 @@ pub struct WindowGeometry {
 
 impl WindowGeometry {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        WindowGeometry { x, y, width, height }
+        WindowGeometry {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     pub fn contains_point(&self, px: i32, py: i32) -> bool {
-        px >= self.x && px < self.x + self.width as i32
-            && py >= self.y && py < self.y + self.height as i32
+        px >= self.x
+            && px < self.x + self.width as i32
+            && py >= self.y
+            && py < self.y + self.height as i32
     }
 }
 
@@ -91,7 +98,7 @@ impl Surface {
     pub fn new(surface_type: SurfaceType, width: u32, height: u32) -> Self {
         let stride = width * 4; // RGBA
         let buffer = vec![0; (stride * height) as usize];
-        
+
         Surface {
             surface_type,
             buffer,
@@ -114,7 +121,12 @@ pub struct DamageRegion {
 
 impl DamageRegion {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        DamageRegion { x, y, width, height }
+        DamageRegion {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -248,34 +260,42 @@ impl ZenithCompositor {
 
     /// Destroy a window
     pub fn destroy_window(&mut self, window_id: u64) -> Result<()> {
-        self.windows.remove(&window_id)
+        self.windows
+            .remove(&window_id)
             .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found"))?;
         self.surfaces.remove(&window_id);
-        
+
         if self.active_window == Some(window_id) {
             self.active_window = self.windows.keys().next().copied();
         }
-        
+
         Ok(())
     }
 
     /// Set window state
     pub fn set_window_state(&mut self, window_id: u64, state: WindowState) -> Result<()> {
-        let window = self.windows.get_mut(&window_id)
+        let window = self
+            .windows
+            .get_mut(&window_id)
             .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found"))?;
-        
+
         window.state = state;
         Ok(())
     }
 
     /// Set window geometry
     pub fn set_window_geometry(&mut self, window_id: u64, geometry: WindowGeometry) -> Result<()> {
-        let window = self.windows.get_mut(&window_id)
+        let window = self
+            .windows
+            .get_mut(&window_id)
             .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found"))?;
-        
+
         window.geometry = geometry;
         self.damage_regions.push(DamageRegion::new(
-            geometry.x, geometry.y, geometry.width, geometry.height
+            geometry.x,
+            geometry.y,
+            geometry.width,
+            geometry.height,
         ));
         Ok(())
     }
@@ -283,7 +303,9 @@ impl ZenithCompositor {
     /// Activate a window (bring to front)
     pub fn activate_window(&mut self, window_id: u64) -> Result<()> {
         if !self.windows.contains_key(&window_id) {
-            return Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found").into());
+            return Err(
+                std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found").into(),
+            );
         }
         self.active_window = Some(window_id);
         Ok(())
@@ -375,7 +397,7 @@ impl ZenithCompositor {
         // 2. Build scene graph sorted by z-order
         // 3. Render to GPU backend
         // 4. Submit to KMS/DRM for display
-        
+
         self.clear_damage();
         Ok(())
     }
@@ -395,15 +417,17 @@ mod tests {
     fn test_window_creation() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
-        
+
         let geometry = WindowGeometry::new(100, 100, 800, 600);
-        let window_id = compositor.create_window(
-            "Test Window".to_string(),
-            "test.app".to_string(),
-            geometry,
-            sigma_types::CapabilityToken { id: 2 },
-        ).unwrap();
-        
+        let window_id = compositor
+            .create_window(
+                "Test Window".to_string(),
+                "test.app".to_string(),
+                geometry,
+                sigma_types::CapabilityToken { id: 2 },
+            )
+            .unwrap();
+
         assert!(compositor.get_window(window_id).is_some());
         assert_eq!(compositor.active_window(), Some(window_id));
     }
@@ -411,7 +435,7 @@ mod tests {
     #[test]
     fn test_window_geometry() {
         let geometry = WindowGeometry::new(100, 100, 800, 600);
-        
+
         assert!(geometry.contains_point(150, 150));
         assert!(geometry.contains_point(100, 100));
         assert!(!geometry.contains_point(50, 50));
@@ -422,17 +446,21 @@ mod tests {
     fn test_window_state() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
-        
+
         let geometry = WindowGeometry::new(0, 0, 800, 600);
-        let window_id = compositor.create_window(
-            "Test".to_string(),
-            "test.app".to_string(),
-            geometry,
-            sigma_types::CapabilityToken { id: 2 },
-        ).unwrap();
-        
-        compositor.set_window_state(window_id, WindowState::Maximized).unwrap();
-        
+        let window_id = compositor
+            .create_window(
+                "Test".to_string(),
+                "test.app".to_string(),
+                geometry,
+                sigma_types::CapabilityToken { id: 2 },
+            )
+            .unwrap();
+
+        compositor
+            .set_window_state(window_id, WindowState::Maximized)
+            .unwrap();
+
         let window = compositor.get_window(window_id).unwrap();
         assert_eq!(window.state, WindowState::Maximized);
     }
@@ -441,24 +469,28 @@ mod tests {
     fn test_find_window_at_point() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
-        
+
         let geometry1 = WindowGeometry::new(0, 0, 400, 400);
         let geometry2 = WindowGeometry::new(400, 0, 400, 400);
-        
-        compositor.create_window(
-            "Window 1".to_string(),
-            "app1".to_string(),
-            geometry1,
-            sigma_types::CapabilityToken { id: 2 },
-        ).unwrap();
-        
-        compositor.create_window(
-            "Window 2".to_string(),
-            "app2".to_string(),
-            geometry2,
-            sigma_types::CapabilityToken { id: 3 },
-        ).unwrap();
-        
+
+        compositor
+            .create_window(
+                "Window 1".to_string(),
+                "app1".to_string(),
+                geometry1,
+                sigma_types::CapabilityToken { id: 2 },
+            )
+            .unwrap();
+
+        compositor
+            .create_window(
+                "Window 2".to_string(),
+                "app2".to_string(),
+                geometry2,
+                sigma_types::CapabilityToken { id: 3 },
+            )
+            .unwrap();
+
         assert!(compositor.find_window_at_point(200, 200).is_some());
         assert!(compositor.find_window_at_point(600, 200).is_some());
         assert!(compositor.find_window_at_point(800, 800).is_none());
@@ -468,9 +500,9 @@ mod tests {
 // Placeholder types for compilation
 mod sigma_types {
     use std::io;
-    
+
     pub type Result<T> = std::result::Result<T, io::Error>;
-    
+
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {
         pub id: u64,

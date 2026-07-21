@@ -70,10 +70,10 @@ impl PostDiagnostics {
 
     pub fn run_cpu_test(&mut self) -> Result<(), &'static str> {
         let mut test = PostTest::new(TestType::Cpu, "CPU Registers Test".to_string());
-        
+
         // Simulated CPU test
         let cpu_ok = true; // In real implementation, would test CPU
-        
+
         if cpu_ok {
             self.add_test(test);
             Ok(())
@@ -86,10 +86,10 @@ impl PostDiagnostics {
 
     pub fn run_memory_test(&mut self) -> Result<(), &'static str> {
         let mut test = PostTest::new(TestType::Memory, "Memory Integrity Test".to_string());
-        
+
         // Simulated memory test
         let memory_ok = true; // In real implementation, would test memory
-        
+
         if memory_ok {
             self.add_test(test);
             Ok(())
@@ -102,10 +102,10 @@ impl PostDiagnostics {
 
     pub fn run_storage_test(&mut self) -> Result<(), &'static str> {
         let mut test = PostTest::new(TestType::Storage, "Storage Controller Test".to_string());
-        
+
         // Simulated storage test
         let storage_ok = true; // In real implementation, would test storage
-        
+
         if storage_ok {
             self.add_test(test);
             Ok(())
@@ -120,16 +120,22 @@ impl PostDiagnostics {
         self.run_cpu_test().ok();
         self.run_memory_test().ok();
         self.run_storage_test().ok();
-        
+
         self.overall_status
     }
 
     pub fn get_failed_tests(&self) -> Vec<&PostTest> {
-        self.tests.iter().filter(|t| t.status == PostStatus::Failed).collect()
+        self.tests
+            .iter()
+            .filter(|t| t.status == PostStatus::Failed)
+            .collect()
     }
 
     pub fn get_warning_tests(&self) -> Vec<&PostTest> {
-        self.tests.iter().filter(|t| t.status == PostStatus::Warning).collect()
+        self.tests
+            .iter()
+            .filter(|t| t.status == PostStatus::Warning)
+            .collect()
     }
 
     fn update_overall_status(&mut self) {
@@ -168,7 +174,7 @@ mod tests {
     fn test_post_test_fail() {
         let mut test = PostTest::new(TestType::Memory, "Test".to_string());
         test.fail(0x1234);
-        
+
         assert_eq!(test.status, PostStatus::Failed);
         assert_eq!(test.error_code, Some(0x1234));
     }
@@ -177,7 +183,7 @@ mod tests {
     fn test_post_test_warn() {
         let mut test = PostTest::new(TestType::Storage, "Test".to_string());
         test.warn();
-        
+
         assert_eq!(test.status, PostStatus::Warning);
     }
 
@@ -185,7 +191,7 @@ mod tests {
     fn test_post_diagnostics() {
         let mut post = PostDiagnostics::new();
         let test = PostTest::new(TestType::Cpu, "Test".to_string());
-        
+
         post.add_test(test);
         assert_eq!(post.test_count(), 1);
         assert_eq!(post.overall_status, PostStatus::Passed);
@@ -196,7 +202,7 @@ mod tests {
         let mut post = PostDiagnostics::new();
         let mut test = PostTest::new(TestType::Cpu, "Test".to_string());
         test.fail(0xC001);
-        
+
         post.add_test(test);
         assert_eq!(post.overall_status, PostStatus::Failed);
     }
@@ -206,7 +212,7 @@ mod tests {
         let mut post = PostDiagnostics::new();
         let mut test = PostTest::new(TestType::Cpu, "Test".to_string());
         test.warn();
-        
+
         post.add_test(test);
         assert_eq!(post.overall_status, PostStatus::Warning);
     }
@@ -214,14 +220,14 @@ mod tests {
     #[test]
     fn test_get_failed_tests() {
         let mut post = PostDiagnostics::new();
-        
+
         let mut test1 = PostTest::new(TestType::Cpu, "Test1".to_string());
         test1.fail(0xC001);
         post.add_test(test1);
-        
+
         let test2 = PostTest::new(TestType::Memory, "Test2".to_string());
         post.add_test(test2);
-        
+
         let failed = post.get_failed_tests();
         assert_eq!(failed.len(), 1);
     }
@@ -230,7 +236,7 @@ mod tests {
     fn test_run_all_tests() {
         let mut post = PostDiagnostics::new();
         let status = post.run_all_tests();
-        
+
         assert_eq!(post.test_count(), 3);
         assert_eq!(status, PostStatus::Passed);
     }

@@ -197,7 +197,11 @@ impl PageDirectoryController {
         user_accessible: bool,
     ) -> Result<(), &'static str> {
         // Check for existing mapping
-        if self.entries.iter().any(|e| e.virtual_address == virtual_addr) {
+        if self
+            .entries
+            .iter()
+            .any(|e| e.virtual_address == virtual_addr)
+        {
             return Err("Virtual address already mapped");
         }
 
@@ -324,9 +328,7 @@ mod tests {
     fn test_page_directory_controller() {
         let mut controller = PageDirectoryController::new();
 
-        controller
-            .map_page(0x1000, 0x2000, true, false)
-            .unwrap();
+        controller.map_page(0x1000, 0x2000, true, false).unwrap();
 
         assert_eq!(controller.translate(0x1000), Some(0x2000));
     }
@@ -335,9 +337,7 @@ mod tests {
     fn test_page_unmap() {
         let mut controller = PageDirectoryController::new();
 
-        controller
-            .map_page(0x1000, 0x2000, true, false)
-            .unwrap();
+        controller.map_page(0x1000, 0x2000, true, false).unwrap();
 
         controller.unmap_page(0x1000).unwrap();
 
@@ -348,13 +348,9 @@ mod tests {
     fn test_duplicate_mapping() {
         let mut controller = PageDirectoryController::new();
 
-        controller
-            .map_page(0x1000, 0x2000, true, false)
-            .unwrap();
+        controller.map_page(0x1000, 0x2000, true, false).unwrap();
 
-        assert!(controller
-            .map_page(0x1000, 0x3000, true, false)
-            .is_err());
+        assert!(controller.map_page(0x1000, 0x3000, true, false).is_err());
     }
 
     #[test]

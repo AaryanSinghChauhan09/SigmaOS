@@ -4,5 +4,5 @@
 pub mod gst;
 pub mod tds;
 
-pub use gst::{GstCalculator, GstRate, GstRegime, GstResult, GstState, GoodsType};
+pub use gst::{GoodsType, GstCalculator, GstRate, GstRegime, GstResult, GstState};
 pub use tds::{TdsCalculator, TdsResult, TdsSection};

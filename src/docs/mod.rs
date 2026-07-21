@@ -1,14 +1,14 @@
 //! SigmaOS Documentation Generation System
-//! 
+//!
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
 
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -114,7 +114,7 @@ impl DocGenerator {
     /// Generate HTML documentation
     fn generate_html(&self) -> Result<String, String> {
         let mut output = String::new();
-        
+
         output.push_str("<!DOCTYPE html>\n");
         output.push_str("<html>\n<head>\n");
         output.push_str("<title>SigmaOS Documentation</title>\n");
@@ -123,7 +123,9 @@ impl DocGenerator {
         output.push_str("h1 { color: #333; }\n");
         output.push_str("h2 { color: #666; border-bottom: 1px solid #eee; }\n");
         output.push_str("code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }\n");
-        output.push_str("pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }\n");
+        output.push_str(
+            "pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }\n",
+        );
         output.push_str("</style>\n");
         output.push_str("</head>\n<body>\n");
 
@@ -202,40 +204,25 @@ impl ApiDocBuilder {
         let mut generator = DocGenerator::new();
         generator.add_metadata("title".to_string(), "SigmaOS API Documentation".to_string());
         generator.add_metadata("version".to_string(), "1.0.0".to_string());
-        
+
         Self { generator }
     }
 
     /// Add API overview
     pub fn add_overview(&mut self, content: String) {
-        let entry = DocEntry::new(
-            "Overview".to_string(),
-            content,
-            SectionType::Overview,
-            1,
-        );
+        let entry = DocEntry::new("Overview".to_string(), content, SectionType::Overview, 1);
         self.generator.add_entry(entry);
     }
 
     /// Add API reference
     pub fn add_api_reference(&mut self, content: String) {
-        let entry = DocEntry::new(
-            "API Reference".to_string(),
-            content,
-            SectionType::API,
-            2,
-        );
+        let entry = DocEntry::new("API Reference".to_string(), content, SectionType::API, 2);
         self.generator.add_entry(entry);
     }
 
     /// Add examples
     pub fn add_examples(&mut self, content: String) {
-        let entry = DocEntry::new(
-            "Examples".to_string(),
-            content,
-            SectionType::Examples,
-            3,
-        );
+        let entry = DocEntry::new("Examples".to_string(), content, SectionType::Examples, 3);
         self.generator.add_entry(entry);
     }
 
@@ -292,7 +279,7 @@ mod tests {
     fn test_markdown_generation() {
         let mut generator = DocGenerator::new();
         generator.add_metadata("title".to_string(), "Test".to_string());
-        
+
         let entry = DocEntry::new(
             "Test Section".to_string(),
             "Test content".to_string(),
@@ -311,7 +298,7 @@ mod tests {
     #[test]
     fn test_html_generation() {
         let mut generator = DocGenerator::new();
-        
+
         let entry = DocEntry::new(
             "Test Section".to_string(),
             "Test content".to_string(),
@@ -346,7 +333,7 @@ mod tests {
     fn test_doc_generator_clear() {
         let mut generator = DocGenerator::new();
         generator.add_metadata("key".to_string(), "value".to_string());
-        
+
         let entry = DocEntry::new(
             "Test".to_string(),
             "Content".to_string(),

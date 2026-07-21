@@ -45,9 +45,16 @@ pub enum GstState {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GstRegime {
-    IntraState { state: GstState },
-    InterState { from_state: GstState, to_state: GstState },
-    Export { destination_country: &'static str },
+    IntraState {
+        state: GstState,
+    },
+    InterState {
+        from_state: GstState,
+        to_state: GstState,
+    },
+    Export {
+        destination_country: &'static str,
+    },
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -63,11 +70,7 @@ pub struct GstResult {
 pub struct GstCalculator;
 
 impl GstCalculator {
-    pub fn calculate_gst(
-        base_amount_paise: u64,
-        rate: GstRate,
-        regime: GstRegime,
-    ) -> GstResult {
+    pub fn calculate_gst(base_amount_paise: u64, rate: GstRate, regime: GstRegime) -> GstResult {
         let (rate_percent, cess_percent) = match rate {
             GstRate::Rate0 => (0.0, 0.0),
             GstRate::Rate5 => (5.0, 0.0),
@@ -96,26 +99,22 @@ impl GstCalculator {
                     lut_required: false,
                 }
             }
-            GstRegime::InterState { .. } => {
-                GstResult {
-                    cgst_paise: 0,
-                    sgst_paise: 0,
-                    igst_paise: gst_amount,
-                    cess_paise: cess_amount,
-                    total_paise: base_amount_paise + gst_amount + cess_amount,
-                    lut_required: false,
-                }
-            }
-            GstRegime::Export { .. } => {
-                GstResult {
-                    cgst_paise: 0,
-                    sgst_paise: 0,
-                    igst_paise: 0,
-                    cess_paise: 0,
-                    total_paise: base_amount_paise,
-                    lut_required: true,
-                }
-            }
+            GstRegime::InterState { .. } => GstResult {
+                cgst_paise: 0,
+                sgst_paise: 0,
+                igst_paise: gst_amount,
+                cess_paise: cess_amount,
+                total_paise: base_amount_paise + gst_amount + cess_amount,
+                lut_required: false,
+            },
+            GstRegime::Export { .. } => GstResult {
+                cgst_paise: 0,
+                sgst_paise: 0,
+                igst_paise: 0,
+                cess_paise: 0,
+                total_paise: base_amount_paise,
+                lut_required: true,
+            },
         }
     }
 
@@ -150,9 +149,11 @@ mod tests {
         let result = GstCalculator::calculate_gst(
             100_000,
             GstRate::Rate18,
-            GstRegime::IntraState { state: GstState::Maharashtra },
+            GstRegime::IntraState {
+                state: GstState::Maharashtra,
+            },
         );
-        
+
         assert_eq!(result.cgst_paise, 9_000);
         assert_eq!(result.sgst_paise, 9_000);
         assert_eq!(result.igst_paise, 0);
@@ -169,7 +170,7 @@ mod tests {
                 to_state: GstState::Gujarat,
             },
         );
-        
+
         assert_eq!(result.cgst_paise, 0);
         assert_eq!(result.sgst_paise, 0);
         assert_eq!(result.igst_paise, 12_000);
@@ -181,9 +182,11 @@ mod tests {
         let result = GstCalculator::calculate_gst(
             500_000,
             GstRate::Rate18,
-            GstRegime::Export { destination_country: "USA" },
+            GstRegime::Export {
+                destination_country: "USA",
+            },
         );
-        
+
         assert_eq!(result.cgst_paise, 0);
         assert_eq!(result.sgst_paise, 0);
         assert_eq!(result.igst_paise, 0);
@@ -196,19 +199,36 @@ mod tests {
         let result = GstCalculator::calculate_gst(
             100_000,
             GstRate::Rate28WithCess,
-            GstRegime::IntraState { state: GstState::Maharashtra },
+            GstRegime::IntraState {
+                state: GstState::Maharashtra,
+            },
         );
-        
+
         assert!(result.cess_paise > 0);
         assert_eq!(result.total_paise, 100_000 + 28_000 + 15_000);
     }
 
     #[test]
     fn test_goods_type_mapping() {
-        assert_eq!(GstCalculator::get_rate_for_goods(GoodsType::EssentialFood), GstRate::Rate0);
-        assert_eq!(GstCalculator::get_rate_for_goods(GoodsType::BasicCommodities), GstRate::Rate5);
-        assert_eq!(GstCalculator::get_rate_for_goods(GoodsType::ProcessedFood), GstRate::Rate12);
-        assert_eq!(GstCalculator::get_rate_for_goods(GoodsType::StandardGoods), GstRate::Rate18);
-        assert_eq!(GstCalculator::get_rate_for_goods(GoodsType::LuxuryGoods), GstRate::Rate28);
+        assert_eq!(
+            GstCalculator::get_rate_for_goods(GoodsType::EssentialFood),
+            GstRate::Rate0
+        );
+        assert_eq!(
+            GstCalculator::get_rate_for_goods(GoodsType::BasicCommodities),
+            GstRate::Rate5
+        );
+        assert_eq!(
+            GstCalculator::get_rate_for_goods(GoodsType::ProcessedFood),
+            GstRate::Rate12
+        );
+        assert_eq!(
+            GstCalculator::get_rate_for_goods(GoodsType::StandardGoods),
+            GstRate::Rate18
+        );
+        assert_eq!(
+            GstCalculator::get_rate_for_goods(GoodsType::LuxuryGoods),
+            GstRate::Rate28
+        );
     }
 }

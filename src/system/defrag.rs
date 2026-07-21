@@ -9,7 +9,7 @@ pub trait DefragStrategy {
     /// Analyze fragmentation
     fn analyze(&self, path: &Path) -> Result<FragmentationReport, DefragError>;
     /// Defragment
-    defragment(&mut self, path: &Path) -> Result<DefragResult, DefragError>;
+    fn defragment(&mut self, path: &Path) -> Result<DefragResult, DefragError>;
     /// Get strategy name
     fn name(&self) -> &str;
 }
@@ -137,7 +137,7 @@ impl DefragStrategy for SigmaFsDefragStrategy {
 
     fn defragment(&mut self, path: &Path) -> Result<DefragResult, DefragError> {
         let start_time = std::time::Instant::now();
-        
+
         let report = self.analyze(path)?;
         let fragmentation_before = report.fragmentation_percent;
 
@@ -166,7 +166,7 @@ impl DefragStrategy for SigmaFsDefragStrategy {
         }
 
         let time_taken = start_time.elapsed().as_secs();
-        
+
         // Re-analyze after defragmentation
         let report_after = self.analyze(path)?;
         let fragmentation_after = report_after.fragmentation_percent;
@@ -199,8 +199,7 @@ impl SigmaFsDefragStrategy {
         total_size: &mut u64,
         fragmented_size: &mut u64,
     ) -> Result<(), DefragError> {
-        let entries = std::fs::read_dir(path)
-            .map_err(|e| DefragError::IoError(e.to_string()))?;
+        let entries = std::fs::read_dir(path).map_err(|e| DefragError::IoError(e.to_string()))?;
 
         for entry in entries {
             let entry = entry.map_err(|e| DefragError::IoError(e.to_string()))?;
@@ -213,8 +212,9 @@ impl SigmaFsDefragStrategy {
                     .map_err(|e| DefragError::IoError(e.to_string()))?;
 
                 let size = metadata.len();
-                let block_count = (size / self.block_size) as usize + if size % self.block_size > 0 { 1 } else { 0 };
-                
+                let block_count = (size / self.block_size) as usize
+                    + if size % self.block_size > 0 { 1 } else { 0 };
+
                 // Simulate contiguous blocks (in real implementation, this would check actual block layout)
                 let contiguous_blocks = if self.aggressive {
                     (block_count as f64 * 0.6) as usize // More fragmentation in aggressive mode
@@ -222,8 +222,9 @@ impl SigmaFsDefragStrategy {
                     (block_count as f64 * 0.8) as usize
                 };
 
-                let file_info = FileBlockInfo::new(entry_path, size, block_count, contiguous_blocks);
-                
+                let file_info =
+                    FileBlockInfo::new(entry_path, size, block_count, contiguous_blocks);
+
                 *total_size += size;
                 if file_info.is_fragmented {
                     *fragmented_size += size;
@@ -352,8 +353,8 @@ mod tests {
 
     #[test]
     fn test_disk_defragmenter_creation() {
-        let defragger = DiskDefragmenter::new(Box::new(SigmaFsDefragStrategy::new()))
-            .with_dry_run(true);
+        let defragger =
+            DiskDefragmenter::new(Box::new(SigmaFsDefragStrategy::new())).with_dry_run(true);
         assert!(defragger.dry_run);
     }
 

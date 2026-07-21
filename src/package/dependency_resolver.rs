@@ -18,7 +18,8 @@ impl Version {
     }
 
     pub fn satisfies(&self, required: Version) -> bool {
-        self.major >= required.major && (self.major > required.major || self.minor >= required.minor)
+        self.major >= required.major
+            && (self.major > required.major || self.minor >= required.minor)
     }
 }
 
@@ -58,7 +59,12 @@ impl PackageDependencyResolver {
         self.check_cycles(name, &mut visited, &mut visit_idx)
     }
 
-    fn check_cycles(&self, name: &'static str, visited: &mut [&'static str; MAX_REGISTRY_SIZE], idx: &mut usize) -> bool {
+    fn check_cycles(
+        &self,
+        name: &'static str,
+        visited: &mut [&'static str; MAX_REGISTRY_SIZE],
+        idx: &mut usize,
+    ) -> bool {
         // Cycle detected
         for i in 0..*idx {
             if visited[i] == name {
@@ -98,15 +104,18 @@ impl PackageDependencyResolver {
     }
 
     /// Resolve all dependencies for a package
-    pub fn resolve_dependencies(&self, name: &'static str) -> Result<Vec<&'static str>, &'static str> {
+    pub fn resolve_dependencies(
+        &self,
+        name: &'static str,
+    ) -> Result<Vec<&'static str>, &'static str> {
         let mut resolved: Vec<&'static str> = Vec::new();
         let mut visited: [&str; MAX_REGISTRY_SIZE] = [""; MAX_REGISTRY_SIZE];
         let mut visit_idx = 0;
-        
+
         if !self.resolve_recursive(name, &mut resolved, &mut visited, &mut visit_idx) {
             return Err("Circular dependency detected");
         }
-        
+
         Ok(resolved)
     }
 

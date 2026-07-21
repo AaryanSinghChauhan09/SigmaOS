@@ -43,12 +43,12 @@ impl SigmaTrace {
             event,
             payload,
         };
-        
+
         // Check if we're overwriting data
         if self.buffer[self.write_pointer].is_some() {
             self.overflow_count += 1;
         }
-        
+
         self.buffer[self.write_pointer] = Some(span);
         self.write_pointer = (self.write_pointer + 1) % TRACE_BUFFER_SIZE;
     }
@@ -68,14 +68,14 @@ impl SigmaTrace {
     pub fn get_all_spans(&self) -> Vec<TraceSpan> {
         let mut spans = Vec::new();
         let mut idx = self.write_pointer;
-        
+
         for _ in 0..TRACE_BUFFER_SIZE {
             if let Some(span) = self.buffer[idx] {
                 spans.push(span);
             }
             idx = (idx + 1) % TRACE_BUFFER_SIZE;
         }
-        
+
         spans
     }
 
@@ -131,10 +131,10 @@ mod tests {
     #[test]
     fn test_trace_clear() {
         let mut tracer = SigmaTrace::new();
-        
+
         tracer.record_span(1000, TraceEvent::Syscall(1), 0x1000);
         assert_eq!(tracer.get_recorded_count(), 1);
-        
+
         tracer.clear();
         assert_eq!(tracer.get_recorded_count(), 0);
         assert_eq!(tracer.get_overflow_count(), 0);
@@ -143,12 +143,12 @@ mod tests {
     #[test]
     fn test_memory_access_tracing() {
         let mut tracer = SigmaTrace::new();
-        
+
         tracer.record_span(1000, TraceEvent::MemoryAccess(0x1000, 0x2000), 0x100);
-        
+
         let spans = tracer.get_all_spans();
         assert_eq!(spans.len(), 1);
-        
+
         if let TraceEvent::MemoryAccess(addr, size) = spans[0].event {
             assert_eq!(addr, 0x1000);
             assert_eq!(size, 0x2000);

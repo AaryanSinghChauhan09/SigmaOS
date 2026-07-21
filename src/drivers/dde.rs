@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceError {
@@ -237,7 +237,7 @@ impl UdfInterpreter {
 
     pub fn execute_instruction(&mut self, opcode: u8, operands: &[u64]) -> Result<(), DeviceError> {
         match opcode {
-            0x01 => self.registers[0] = operands[0], // MOV
+            0x01 => self.registers[0] = operands[0],  // MOV
             0x02 => self.registers[0] += operands[0], // ADD
             0x03 => self.registers[0] -= operands[0], // SUB
             _ => return Err(DeviceError::InvalidOperation),
@@ -384,9 +384,10 @@ mod tests {
     }
 
     #[test]
- fn test_unified_peripheral_trait() {
+    fn test_unified_peripheral_trait() {
         let device_id = DeviceId::new(0x1234, 0x5678, 0x01, 0x02);
-        let driver: Box<dyn UnifiedPeripheral> = Box::new(GenericDriver::new(device_id, DriverType::Native, 0x1000));
+        let driver: Box<dyn UnifiedPeripheral> =
+            Box::new(GenericDriver::new(device_id, DriverType::Native, 0x1000));
 
         let id = driver.get_device_id();
         assert_eq!(id.vendor_id, 0x1234);

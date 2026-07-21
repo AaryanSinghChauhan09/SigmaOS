@@ -84,12 +84,12 @@ impl<T: Clone, const N: usize> Default for ZeroCopyQueue<T, N> {
 /// UDF Scheduler Instruction set
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedOpcode {
-    LoadPriority = 0x01,  // Load process priority: LoadPriority(reg_idx)
-    LoadRuntime = 0x02,   // Load process runtime: LoadRuntime(reg_idx)
-    MulConst = 0x03,      // Multiply register by constant: MulConst(reg_idx, constant)
-    AddConst = 0x04,      // Add constant to register: AddConst(reg_idx, constant)
-    StoreResult = 0x05,   // Store final decision: StoreResult(reg_idx)
-    Halt = 0x0F,          // Halt VM
+    LoadPriority = 0x01, // Load process priority: LoadPriority(reg_idx)
+    LoadRuntime = 0x02,  // Load process runtime: LoadRuntime(reg_idx)
+    MulConst = 0x03,     // Multiply register by constant: MulConst(reg_idx, constant)
+    AddConst = 0x04,     // Add constant to register: AddConst(reg_idx, constant)
+    StoreResult = 0x05,  // Store final decision: StoreResult(reg_idx)
+    Halt = 0x0F,         // Halt VM
 }
 
 pub struct SchedInstruction {
@@ -201,29 +201,29 @@ mod tests {
     #[test]
     fn test_zero_copy_queue() {
         let mut queue: ZeroCopyQueue<u32, 4> = ZeroCopyQueue::new();
-        
+
         assert!(queue.is_empty());
         assert!(!queue.is_full());
-        
+
         queue.enqueue(1).unwrap();
         queue.enqueue(2).unwrap();
         queue.enqueue(3).unwrap();
-        
+
         assert_eq!(queue.len(), 3);
-        
+
         assert_eq!(queue.dequeue().unwrap(), 1);
         assert_eq!(queue.dequeue().unwrap(), 2);
-        
+
         assert_eq!(queue.len(), 1);
     }
 
     #[test]
     fn test_queue_full() {
         let mut queue: ZeroCopyQueue<u32, 2> = ZeroCopyQueue::new();
-        
+
         queue.enqueue(1).unwrap();
         queue.enqueue(2).unwrap();
-        
+
         assert!(queue.is_full());
         assert!(queue.enqueue(3).is_err());
     }
@@ -231,22 +231,41 @@ mod tests {
     #[test]
     fn test_queue_empty() {
         let mut queue: ZeroCopyQueue<u32, 2> = ZeroCopyQueue::new();
-        
+
         assert!(queue.dequeue().is_err());
     }
 
     #[test]
     fn test_udf_sched_vm() {
         let program = vec![
-            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::AddConst, arg1: 0, arg2: 5 },
-            SchedInstruction { opcode: SchedOpcode::StoreResult, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::Halt, arg1: 0, arg2: 0 },
+            SchedInstruction {
+                opcode: SchedOpcode::LoadPriority,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::AddConst,
+                arg1: 0,
+                arg2: 5,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::StoreResult,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::Halt,
+                arg1: 0,
+                arg2: 0,
+            },
         ];
-        
+
         let mut vm = UdfSchedVm::new(program);
-        let process = ProcessProfile { priority_level: 3, runtime_ms: 100 };
-        
+        let process = ProcessProfile {
+            priority_level: 3,
+            runtime_ms: 100,
+        };
+
         let result = vm.evaluate_priority(&process).unwrap();
         assert_eq!(result, 8); // 3 + 5 = 8
     }
@@ -254,15 +273,34 @@ mod tests {
     #[test]
     fn test_udf_sched_vm_multiply() {
         let program = vec![
-            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::MulConst, arg1: 0, arg2: 2 },
-            SchedInstruction { opcode: SchedOpcode::StoreResult, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::Halt, arg1: 0, arg2: 0 },
+            SchedInstruction {
+                opcode: SchedOpcode::LoadPriority,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::MulConst,
+                arg1: 0,
+                arg2: 2,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::StoreResult,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::Halt,
+                arg1: 0,
+                arg2: 0,
+            },
         ];
-        
+
         let mut vm = UdfSchedVm::new(program);
-        let process = ProcessProfile { priority_level: 5, runtime_ms: 100 };
-        
+        let process = ProcessProfile {
+            priority_level: 5,
+            runtime_ms: 100,
+        };
+
         let result = vm.evaluate_priority(&process).unwrap();
         assert_eq!(result, 10); // 5 * 2 = 10
     }
@@ -270,17 +308,44 @@ mod tests {
     #[test]
     fn test_udf_sched_vm_combined() {
         let program = vec![
-            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::LoadRuntime, arg1: 1, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::AddConst, arg1: 0, arg2: 10 },
-            SchedInstruction { opcode: SchedOpcode::MulConst, arg1: 1, arg2: 2 },
-            SchedInstruction { opcode: SchedOpcode::StoreResult, arg1: 1, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::Halt, arg1: 0, arg2: 0 },
+            SchedInstruction {
+                opcode: SchedOpcode::LoadPriority,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::LoadRuntime,
+                arg1: 1,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::AddConst,
+                arg1: 0,
+                arg2: 10,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::MulConst,
+                arg1: 1,
+                arg2: 2,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::StoreResult,
+                arg1: 1,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::Halt,
+                arg1: 0,
+                arg2: 0,
+            },
         ];
-        
+
         let mut vm = UdfSchedVm::new(program);
-        let process = ProcessProfile { priority_level: 3, runtime_ms: 50 };
-        
+        let process = ProcessProfile {
+            priority_level: 3,
+            runtime_ms: 50,
+        };
+
         let result = vm.evaluate_priority(&process).unwrap();
         assert_eq!(result, 100); // (50 * 2) = 100
     }
@@ -288,13 +353,24 @@ mod tests {
     #[test]
     fn test_register_bounds() {
         let program = vec![
-            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 5, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::Halt, arg1: 0, arg2: 0 },
+            SchedInstruction {
+                opcode: SchedOpcode::LoadPriority,
+                arg1: 5,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::Halt,
+                arg1: 0,
+                arg2: 0,
+            },
         ];
-        
+
         let mut vm = UdfSchedVm::new(program);
-        let process = ProcessProfile { priority_level: 3, runtime_ms: 100 };
-        
+        let process = ProcessProfile {
+            priority_level: 3,
+            runtime_ms: 100,
+        };
+
         assert!(vm.evaluate_priority(&process).is_err());
     }
 }

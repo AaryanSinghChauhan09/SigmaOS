@@ -1,13 +1,12 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using OOP principles with traits and structs
 /// No dependency on external scheduler frameworks
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -89,9 +88,7 @@ impl Schedulable for Task {
     }
 
     fn state(&self) -> TaskState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     fn set_state(&mut self, state: TaskState) {
@@ -332,13 +329,7 @@ pub struct PriorityScheduler {
 impl PriorityScheduler {
     pub fn new() -> Self {
         PriorityScheduler {
-            priority_queues: [
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-            ],
+            priority_queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new()],
             current_task: AtomicUsize::new(0),
             context_switches: AtomicU64::new(0),
         }
@@ -494,7 +485,11 @@ impl<T> Vec<T> {
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
             self.len -= 1;
             item
         }
@@ -509,7 +504,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

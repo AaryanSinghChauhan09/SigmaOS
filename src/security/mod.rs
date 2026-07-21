@@ -11,8 +11,8 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod selinux;
 pub mod secrets;
+pub mod selinux;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
@@ -20,10 +20,6 @@ pub mod vulnerability;
 pub use audit::AuditLogger;
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
-};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
@@ -37,6 +33,10 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
+};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use vault::{
@@ -72,7 +72,5 @@ pub use secrets::{
 // Vulnerability: export actual types
 pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
-    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
-};
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
