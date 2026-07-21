@@ -7,6 +7,13 @@ pub mod routing;
 pub mod sovereign_browser;
 pub mod tls;
 pub mod zenith;
+pub mod signal_client;
+pub mod tor_client;
+pub mod torrent;
+
+pub use signal_client::DoubleRatchetState;
+pub use tor_client::{TorCircuit, TorRelay};
+pub use torrent::{TorrentClient, TorrentMetadata};
 
 pub use browser_core::{
     AdblockRule, BrowserCore, BrowserTab, BrowserTabState, SecurityLevel, TabCapabilities,

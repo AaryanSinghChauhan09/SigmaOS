@@ -295,8 +295,7 @@ mod tests {
 
     #[test]
     fn test_replace_text() {
-        let engine = DocumentEngine::new();
-        let mut doc = engine.create_document(
+        let mut doc = DocumentEngine::create_document(
             "Test".to_string(),
             "Author".to_string(),
             "Hello World".to_string(),
