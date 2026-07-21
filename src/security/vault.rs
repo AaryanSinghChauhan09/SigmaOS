@@ -3,6 +3,26 @@
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+/// Helper function to generate random bytes
+fn generate_random_bytes(len: usize) -> Vec<u8> {
+    let mut bytes = vec![0u8; len];
+    let seed = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos() as u64;
+    
+    // Simple XOR-based PRNG for demonstration
+    // In production, use cryptographically secure RNG
+    let mut state = seed;
+    for byte in bytes.iter_mut() {
+        state = state.wrapping_mul(1103515245).wrapping_add(12345);
+        *byte = (state >> 32) as u8;
+    }
+    
+    bytes
+}
 
 /// Encryption algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,8 +90,8 @@ impl VaultEncryption for Aes256GcmEncryption {
     fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         // Simulated AES-256-GCM encryption
         // In real implementation, use actual AES-256-GCM
-        let iv = vec![0u8; 12]; // 96-bit IV
-        let tag = vec![0u8; 16]; // 128-bit tag
+        let iv = generate_random_bytes(12); // 96-bit IV
+        let tag = generate_random_bytes(16); // 128-bit tag
         let mut encrypted = data.to_vec();
 
         // Simple XOR for simulation (replace with actual AES in production)

@@ -28,6 +28,10 @@ impl SimpleKeyDerivation {
     pub fn new() -> Self {
         SimpleKeyDerivation { rounds: AtomicUsize::new(1000) }
     }
+    
+    pub fn with_rounds(rounds: usize) -> Self {
+        SimpleKeyDerivation { rounds: AtomicUsize::new(rounds) }
+    }
 }
 
 impl KeyDerivation for SimpleKeyDerivation {
