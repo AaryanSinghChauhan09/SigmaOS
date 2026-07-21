@@ -6,7 +6,7 @@ set -e
 
 echo "Running SigmaOS smoke tests..."
 
-# Ensure build directory exists prior to executing standard smoke tests
+# Dynamically ensure creation of build/ directory to prevent failures in CI
 mkdir -p build
 
 # Test 1: Check if build directory exists
@@ -15,6 +15,12 @@ if [ ! -d "build" ]; then
     exit 1
 fi
 echo "PASS: Build directory exists"
+
+# Ensure target binaries are compiled if missing
+if [ ! -f "target/debug/sigma_kernel" ] && [ ! -f "target/release/sigma_kernel" ]; then
+    echo "Compiling sigma_kernel binary..."
+    cargo build --bin sigma_kernel
+fi
 
 # Test 2: Check if kernel binary exists
 if [ ! -f "target/debug/sigma_kernel" ] && [ ! -f "target/release/sigma_kernel" ]; then

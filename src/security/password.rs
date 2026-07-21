@@ -51,7 +51,8 @@ pub struct BiometricResult {
 /// OOP trait for biometric authentication strategies
 pub trait BiometricAuth {
     /// Authenticate with biometric
-    fn authenticate(&self, biometric_type: BiometricType) -> Result<BiometricResult, PasswordError>;
+    fn authenticate(&self, biometric_type: BiometricType)
+        -> Result<BiometricResult, PasswordError>;
     /// Enroll biometric
     fn enroll(&mut self, biometric_type: BiometricType) -> Result<(), PasswordError>;
     /// Get strategy name
@@ -70,7 +71,10 @@ impl FingerprintAuth {
 }
 
 impl BiometricAuth for FingerprintAuth {
-    fn authenticate(&self, biometric_type: BiometricType) -> Result<BiometricResult, PasswordError> {
+    fn authenticate(
+        &self,
+        biometric_type: BiometricType,
+    ) -> Result<BiometricResult, PasswordError> {
         if biometric_type != BiometricType::Fingerprint {
             return Err(PasswordError::BiometricNotSupported);
         }
@@ -114,7 +118,10 @@ impl FaceIdAuth {
 }
 
 impl BiometricAuth for FaceIdAuth {
-    fn authenticate(&self, biometric_type: BiometricType) -> Result<BiometricResult, PasswordError> {
+    fn authenticate(
+        &self,
+        biometric_type: BiometricType,
+    ) -> Result<BiometricResult, PasswordError> {
         if biometric_type != BiometricType::FaceID {
             return Err(PasswordError::BiometricNotSupported);
         }
@@ -191,7 +198,10 @@ impl PasswordManager {
     }
 
     /// Add a password entry
-    pub fn add_password(&mut self, entry: PasswordEntry) -> Result<PasswordManagerResult, PasswordError> {
+    pub fn add_password(
+        &mut self,
+        entry: PasswordEntry,
+    ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
@@ -201,7 +211,8 @@ impl PasswordManager {
             ..entry
         };
 
-        self.passwords.insert(encrypted_entry.id.clone(), encrypted_entry);
+        self.passwords
+            .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -215,7 +226,9 @@ impl PasswordManager {
     pub fn get_password(&mut self, id: &str) -> Result<PasswordEntry, PasswordError> {
         self.check_auto_lock()?;
 
-        let entry = self.passwords.get(id)
+        let entry = self
+            .passwords
+            .get(id)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
         let decrypted_password = self.decrypt_password(&entry.encrypted_password)?;
@@ -228,7 +241,10 @@ impl PasswordManager {
     }
 
     /// Update a password entry
-    pub fn update_password(&mut self, entry: PasswordEntry) -> Result<PasswordManagerResult, PasswordError> {
+    pub fn update_password(
+        &mut self,
+        entry: PasswordEntry,
+    ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
         if !self.passwords.contains_key(&entry.id) {
@@ -246,7 +262,8 @@ impl PasswordManager {
             ..entry
         };
 
-        self.passwords.insert(encrypted_entry.id.clone(), encrypted_entry);
+        self.passwords
+            .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -260,7 +277,8 @@ impl PasswordManager {
     pub fn delete_password(&mut self, id: &str) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
-        self.passwords.remove(id)
+        self.passwords
+            .remove(id)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
         self.last_access = Some(std::time::Instant::now());
@@ -276,7 +294,9 @@ impl PasswordManager {
     pub fn list_passwords(&mut self) -> Result<Vec<PasswordEntry>, PasswordError> {
         self.check_auto_lock()?;
 
-        let entries: Vec<PasswordEntry> = self.passwords.values()
+        let entries: Vec<PasswordEntry> = self
+            .passwords
+            .values()
             .map(|e| PasswordEntry {
                 encrypted_password: vec![], // Don't return actual passwords
                 ..e.clone()
@@ -291,7 +311,9 @@ impl PasswordManager {
     pub fn search_passwords(&mut self, query: &str) -> Result<Vec<PasswordEntry>, PasswordError> {
         self.check_auto_lock()?;
 
-        let results: Vec<PasswordEntry> = self.passwords.values()
+        let results: Vec<PasswordEntry> = self
+            .passwords
+            .values()
             .filter(|e| e.service.to_lowercase().contains(&query.to_lowercase()))
             .map(|e| PasswordEntry {
                 encrypted_password: vec![],
@@ -304,16 +326,21 @@ impl PasswordManager {
     }
 
     /// Authenticate with biometric
-    pub fn authenticate_biometric(&mut self, biometric_type: BiometricType) -> Result<BiometricResult, PasswordError> {
+    pub fn authenticate_biometric(
+        &mut self,
+        biometric_type: BiometricType,
+    ) -> Result<BiometricResult, PasswordError> {
         if !self.biometric_enabled {
             return Err(PasswordError::BiometricNotEnabled);
         }
 
-        let auth = self.biometric_auth.as_ref()
+        let auth = self
+            .biometric_auth
+            .as_ref()
             .ok_or_else(|| PasswordError::BiometricNotEnabled)?;
 
         let result = auth.authenticate(biometric_type)?;
-        
+
         if result.success {
             self.last_access = Some(std::time::Instant::now());
         }
@@ -389,14 +416,14 @@ impl PasswordManager {
         charset.extend_from_slice(LOWERCASE);
         charset.extend_from_slice(UPPERCASE);
         charset.extend_from_slice(DIGITS);
-        
+
         if include_symbols {
             charset.extend_from_slice(SYMBOLS);
         }
 
         let mut password = String::new();
         let mut rng = rand::thread_rng();
-        
+
         for _ in 0..length {
             let index = rng.gen_range(0..charset.len());
             password.push(charset[index] as char);
@@ -408,7 +435,10 @@ impl PasswordManager {
 
 impl Default for PasswordManager {
     fn default() -> Self {
-        Self::new(PathBuf::from("/home/user/.sigmaos/passwords"), vec![0u8; 32])
+        Self::new(
+            PathBuf::from("/home/user/.sigmaos/passwords"),
+            vec![0u8; 32],
+        )
     }
 }
 

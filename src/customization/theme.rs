@@ -111,104 +111,110 @@ impl BuiltInThemeProvider {
         let mut themes = HashMap::new();
 
         // Light theme
-        themes.insert("light".to_string(), Theme {
-            name: "Light".to_string(),
-            mode: ThemeMode::Light,
-            colors: ColorPalette {
-                primary: "#007AFF".to_string(),
-                secondary: "#5856D6".to_string(),
-                accent: "#FF9500".to_string(),
-                background: "#FFFFFF".to_string(),
-                foreground: "#000000".to_string(),
-                success: "#34C759".to_string(),
-                warning: "#FFCC00".to_string(),
-                error: "#FF3B30".to_string(),
+        themes.insert(
+            "light".to_string(),
+            Theme {
+                name: "Light".to_string(),
+                mode: ThemeMode::Light,
+                colors: ColorPalette {
+                    primary: "#007AFF".to_string(),
+                    secondary: "#5856D6".to_string(),
+                    accent: "#FF9500".to_string(),
+                    background: "#FFFFFF".to_string(),
+                    foreground: "#000000".to_string(),
+                    success: "#34C759".to_string(),
+                    warning: "#FFCC00".to_string(),
+                    error: "#FF3B30".to_string(),
+                },
+                typography: TypographySettings {
+                    font_family: "System UI".to_string(),
+                    font_size: 16,
+                    font_weight: 400,
+                    line_height: 1.5,
+                    letter_spacing: 0.0,
+                },
+                spacing: SpacingSettings {
+                    unit: 8,
+                    padding_small: 8,
+                    padding_medium: 16,
+                    padding_large: 24,
+                    margin_small: 8,
+                    margin_medium: 16,
+                    margin_large: 24,
+                },
+                border_radius: BorderRadiusSettings {
+                    small: 4,
+                    medium: 8,
+                    large: 16,
+                    full: false,
+                },
+                shadows: ShadowSettings {
+                    enabled: true,
+                    blur: 10,
+                    spread: 0,
+                    color: "#000000".to_string(),
+                    opacity: 0.1,
+                },
+                animations: AnimationSettings {
+                    enabled: true,
+                    duration_ms: 300,
+                    easing: "ease-in-out".to_string(),
+                },
             },
-            typography: TypographySettings {
-                font_family: "System UI".to_string(),
-                font_size: 16,
-                font_weight: 400,
-                line_height: 1.5,
-                letter_spacing: 0.0,
-            },
-            spacing: SpacingSettings {
-                unit: 8,
-                padding_small: 8,
-                padding_medium: 16,
-                padding_large: 24,
-                margin_small: 8,
-                margin_medium: 16,
-                margin_large: 24,
-            },
-            border_radius: BorderRadiusSettings {
-                small: 4,
-                medium: 8,
-                large: 16,
-                full: false,
-            },
-            shadows: ShadowSettings {
-                enabled: true,
-                blur: 10,
-                spread: 0,
-                color: "#000000".to_string(),
-                opacity: 0.1,
-            },
-            animations: AnimationSettings {
-                enabled: true,
-                duration_ms: 300,
-                easing: "ease-in-out".to_string(),
-            },
-        });
+        );
 
         // Dark theme
-        themes.insert("dark".to_string(), Theme {
-            name: "Dark".to_string(),
-            mode: ThemeMode::Dark,
-            colors: ColorPalette {
-                primary: "#0A84FF".to_string(),
-                secondary: "#5E5CE6".to_string(),
-                accent: "#FFD60A".to_string(),
-                background: "#000000".to_string(),
-                foreground: "#FFFFFF".to_string(),
-                success: "#30D158".to_string(),
-                warning: "#FFD60A".to_string(),
-                error: "#FF453A".to_string(),
+        themes.insert(
+            "dark".to_string(),
+            Theme {
+                name: "Dark".to_string(),
+                mode: ThemeMode::Dark,
+                colors: ColorPalette {
+                    primary: "#0A84FF".to_string(),
+                    secondary: "#5E5CE6".to_string(),
+                    accent: "#FFD60A".to_string(),
+                    background: "#000000".to_string(),
+                    foreground: "#FFFFFF".to_string(),
+                    success: "#30D158".to_string(),
+                    warning: "#FFD60A".to_string(),
+                    error: "#FF453A".to_string(),
+                },
+                typography: TypographySettings {
+                    font_family: "System UI".to_string(),
+                    font_size: 16,
+                    font_weight: 400,
+                    line_height: 1.5,
+                    letter_spacing: 0.0,
+                },
+                spacing: SpacingSettings {
+                    unit: 8,
+                    padding_small: 8,
+                    padding_medium: 16,
+                    padding_large: 24,
+                    margin_small: 8,
+                    margin_medium: 16,
+                    margin_large: 24,
+                },
+                border_radius: BorderRadiusSettings {
+                    small: 4,
+                    medium: 8,
+                    large: 16,
+                    full: false,
+                },
+                shadows: ShadowSettings {
+                    enabled: true,
+                    blur: 10,
+                    spread: 0,
+                    color: "#FFFFFF".to_string(),
+                    opacity: 0.1,
+                },
+                animations: AnimationSettings {
+                    enabled: true,
+                    duration_ms: 300,
+                    easing: "ease-in-out".to_string(),
+                },
             },
-            typography: TypographySettings {
-                font_family: "System UI".to_string(),
-                font_size: 16,
-                font_weight: 400,
-                line_height: 1.5,
-                letter_spacing: 0.0,
-            },
-            spacing: SpacingSettings {
-                unit: 8,
-                padding_small: 8,
-                padding_medium: 16,
-                padding_large: 24,
-                margin_small: 8,
-                margin_medium: 16,
-                margin_large: 24,
-            },
-            border_radius: BorderRadiusSettings {
-                small: 4,
-                medium: 8,
-                large: 16,
-                full: false,
-            },
-            shadows: ShadowSettings {
-                enabled: true,
-                blur: 10,
-                spread: 0,
-                color: "#FFFFFF".to_string(),
-                opacity: 0.1,
-            },
-            animations: AnimationSettings {
-                enabled: true,
-                duration_ms: 300,
-                easing: "ease-in-out".to_string(),
-            },
-        });
+        );
 
         Self {
             themes,
@@ -386,14 +392,21 @@ impl ThemeEngine {
     /// Get available themes
     pub fn available_themes(&self) -> Vec<String> {
         // In real implementation, would return list of available theme names
-        vec!["light".to_string(), "dark".to_string(), "custom".to_string()]
+        vec![
+            "light".to_string(),
+            "dark".to_string(),
+            "custom".to_string(),
+        ]
     }
 
     /// Export current theme
     pub fn export_theme(&self) -> String {
         let theme = self.current_theme();
         // Simulated export to JSON
-        format!("{{\"name\": \"{}\", \"mode\": {:?}}}", theme.name, theme.mode)
+        format!(
+            "{{\"name\": \"{}\", \"mode\": {:?}}}",
+            theme.name, theme.mode
+        )
     }
 
     /// Import theme from string
@@ -427,8 +440,7 @@ impl ThemeEngine {
 
 impl Default for ThemeEngine {
     fn default() -> Self {
-        Self::new(Box::new(BuiltInThemeProvider::new()))
-            .with_auto_switch(false)
+        Self::new(Box::new(BuiltInThemeProvider::new())).with_auto_switch(false)
     }
 }
 

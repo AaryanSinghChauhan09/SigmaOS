@@ -124,7 +124,7 @@ impl BandwidthAnalysis {
 impl AnalysisStrategy for BandwidthAnalysis {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
         self.window_packets.push(packet.clone());
-        
+
         if self.window_packets.len() > self.window_size {
             self.window_packets.remove(0);
         }
@@ -132,21 +132,28 @@ impl AnalysisStrategy for BandwidthAnalysis {
         // Calculate bandwidth over window
         let total_bytes: u64 = self.window_packets.iter().map(|p| p.size_bytes).sum();
         let window_duration = if self.window_packets.len() > 1 {
-            self.window_packets.last().unwrap().timestamp
+            self.window_packets
+                .last()
+                .unwrap()
+                .timestamp
                 .duration_since(self.window_packets.first().unwrap().timestamp)
         } else {
             Duration::from_secs(1)
         };
 
         if window_duration.as_secs() > 0 {
-            self.current_bandwidth_mbps = (total_bytes as f64 * 8.0) / (window_duration.as_secs() as f64 * 1_000_000.0);
+            self.current_bandwidth_mbps =
+                (total_bytes as f64 * 8.0) / (window_duration.as_secs() as f64 * 1_000_000.0);
         }
 
         if self.current_bandwidth_mbps > self.threshold_mbps {
             Some(TrafficAlert {
                 alert_type: AlertType::HighBandwidthUsage,
                 severity: AlertSeverity::Medium,
-                message: format!("High bandwidth usage detected: {:.2} Mbps", self.current_bandwidth_mbps),
+                message: format!(
+                    "High bandwidth usage detected: {:.2} Mbps",
+                    self.current_bandwidth_mbps
+                ),
                 timestamp: Instant::now(),
                 related_ips: vec![packet.source_ip],
             })
@@ -180,12 +187,18 @@ impl SecurityAnalysis {
 impl AnalysisStrategy for SecurityAnalysis {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
         // Track connection attempts
-        *self.connection_attempts.entry(packet.source_ip).or_insert(0) += 1;
+        *self
+            .connection_attempts
+            .entry(packet.source_ip)
+            .or_insert(0) += 1;
 
         // Check for port scan
         if self.suspicious_ports.contains(&packet.destination_port) {
-            let attempts = *self.connection_attempts.get(&packet.source_ip).unwrap_or(&0);
-            
+            let attempts = *self
+                .connection_attempts
+                .get(&packet.source_ip)
+                .unwrap_or(&0);
+
             if attempts > self.max_attempts {
                 return Some(TrafficAlert {
                     alert_type: AlertType::PortScan,
@@ -264,7 +277,11 @@ impl NetworkTrafficAnalyzer {
         self.statistics.total_bytes += packet.size_bytes;
 
         // Update protocol statistics
-        *self.statistics.protocols.entry(packet.protocol).or_insert(0) += packet.size_bytes;
+        *self
+            .statistics
+            .protocols
+            .entry(packet.protocol)
+            .or_insert(0) += packet.size_bytes;
 
         // Update upload/download
         // Assume local IPs are in 192.168.x.x or 10.x.x.x ranges
@@ -309,9 +326,10 @@ impl NetworkTrafficAnalyzer {
 
     /// Track connection
     fn track_connection(&mut self, packet: &TrafficPacket) {
-        let connection_key = format!("{}:{}-{}:{}",
-            packet.source_ip, packet.source_port,
-            packet.destination_ip, packet.destination_port);
+        let connection_key = format!(
+            "{}:{}-{}:{}",
+            packet.source_ip, packet.source_port, packet.destination_ip, packet.destination_port
+        );
 
         if let Some(conn) = self.connections.get_mut(&connection_key) {
             conn.bytes_sent += packet.size_bytes;
@@ -324,17 +342,20 @@ impl NetworkTrafficAnalyzer {
                 }
             }
 
-            self.connections.insert(connection_key, ConnectionInfo {
-                source_ip: packet.source_ip,
-                destination_ip: packet.destination_ip,
-                source_port: packet.source_port,
-                destination_port: packet.destination_port,
-                protocol: packet.protocol,
-                state: ConnectionState::Established,
-                bytes_sent: packet.size_bytes,
-                bytes_received: 0,
-                duration: Duration::from_secs(0),
-            });
+            self.connections.insert(
+                connection_key,
+                ConnectionInfo {
+                    source_ip: packet.source_ip,
+                    destination_ip: packet.destination_ip,
+                    source_port: packet.source_port,
+                    destination_port: packet.destination_port,
+                    protocol: packet.protocol,
+                    state: ConnectionState::Established,
+                    bytes_sent: packet.size_bytes,
+                    bytes_received: 0,
+                    duration: Duration::from_secs(0),
+                },
+            );
         }
     }
 
@@ -370,14 +391,16 @@ impl NetworkTrafficAnalyzer {
 
     /// Get connections by IP
     pub fn connections_by_ip(&self, ip: IpAddr) -> Vec<&ConnectionInfo> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.source_ip == ip || c.destination_ip == ip)
             .collect()
     }
 
     /// Get connections by protocol
     pub fn connections_by_protocol(&self, protocol: Protocol) -> Vec<&ConnectionInfo> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.protocol == protocol)
             .collect()
     }

@@ -285,7 +285,12 @@ impl UnifiedControlCenter {
     }
 
     /// Update panel setting
-    pub fn update_panel_setting(&mut self, panel: ControlPanel, key: String, value: String) -> Result<(), ControlCenterError> {
+    pub fn update_panel_setting(
+        &mut self,
+        panel: ControlPanel,
+        key: String,
+        value: String,
+    ) -> Result<(), ControlCenterError> {
         if let Some(panel_impl) = self.panels.get_mut(&panel) {
             panel_impl.update_setting(key, value)
         } else {
@@ -335,7 +340,8 @@ impl UnifiedControlCenter {
         self.search_query = query.clone();
         let query_lower = query.to_lowercase();
 
-        self.panels.keys()
+        self.panels
+            .keys()
             .filter(|panel| {
                 let panel_name = format!("{:?}", panel).to_lowercase();
                 panel_name.contains(&query_lower)
@@ -491,7 +497,11 @@ mod tests {
     fn test_toggle_quick_setting() {
         let mut center = UnifiedControlCenter::default();
         center.toggle_quick_setting("wifi").unwrap();
-        let setting = center.quick_settings.iter().find(|s| s.id == "wifi").unwrap();
+        let setting = center
+            .quick_settings
+            .iter()
+            .find(|s| s.id == "wifi")
+            .unwrap();
         assert!(!setting.is_enabled);
     }
 }

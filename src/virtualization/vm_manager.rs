@@ -147,7 +147,8 @@ impl HypervisorBackend for QemuBackend {
     }
 
     fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError> {
-        self.vm_states.get(vm_id)
+        self.vm_states
+            .get(vm_id)
             .copied()
             .ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))
     }
@@ -252,7 +253,8 @@ impl HypervisorBackend for VirtualBoxBackend {
     }
 
     fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError> {
-        self.vm_states.get(vm_id)
+        self.vm_states
+            .get(vm_id)
             .copied()
             .ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))
     }
@@ -369,16 +371,19 @@ impl VmManager {
     /// Create snapshot
     pub fn create_snapshot(&mut self, vm_id: &str, name: &str) -> Result<String, VmError> {
         let snapshot_id = self.backend.create_snapshot(vm_id, name)?;
-        
-        self.snapshots.insert(snapshot_id.clone(), VmSnapshot {
-            id: snapshot_id.clone(),
-            name: name.to_string(),
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            snapshot_path: PathBuf::from(format!("/var/lib/vm/snapshots/{}", snapshot_id)),
-        });
+
+        self.snapshots.insert(
+            snapshot_id.clone(),
+            VmSnapshot {
+                id: snapshot_id.clone(),
+                name: name.to_string(),
+                created_at: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+                snapshot_path: PathBuf::from(format!("/var/lib/vm/snapshots/{}", snapshot_id)),
+            },
+        );
 
         Ok(snapshot_id)
     }
@@ -390,7 +395,8 @@ impl VmManager {
 
     /// Delete snapshot
     pub fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), VmError> {
-        self.snapshots.remove(snapshot_id)
+        self.snapshots
+            .remove(snapshot_id)
             .ok_or_else(|| VmError::SnapshotNotFound(snapshot_id.to_string()))?;
         Ok(())
     }
@@ -402,18 +408,24 @@ impl VmManager {
 
     /// List all VMs
     pub fn list_vms(&self) -> Vec<(&String, &VmConfig, VmState)> {
-        self.vms.iter()
+        self.vms
+            .iter()
             .filter_map(|(id, config)| {
-                self.backend.get_vm_state(id).ok().map(|state| (id, config, state))
+                self.backend
+                    .get_vm_state(id)
+                    .ok()
+                    .map(|state| (id, config, state))
             })
             .collect()
     }
 
     /// Get running VMs
     pub fn running_vms(&self) -> Vec<String> {
-        self.vms.keys()
+        self.vms
+            .keys()
             .filter(|id| {
-                self.backend.get_vm_state(id)
+                self.backend
+                    .get_vm_state(id)
                     .map(|s| s == VmState::Running)
                     .unwrap_or(false)
             })
@@ -439,8 +451,7 @@ impl VmManager {
 
 impl Default for VmManager {
     fn default() -> Self {
-        Self::new(Box::new(QemuBackend::new()))
-            .with_auto_start(false)
+        Self::new(Box::new(QemuBackend::new())).with_auto_start(false)
     }
 }
 

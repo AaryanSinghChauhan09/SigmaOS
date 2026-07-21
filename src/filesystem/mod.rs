@@ -2,6 +2,7 @@
 pub mod archive;
 pub mod disk_usage;
 pub mod manager;
+pub mod support;
 pub mod vfs;
 
 pub use archive::{
@@ -13,7 +14,11 @@ pub use disk_usage::{
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
 pub use manager::{
-    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation, FileType as ManagerFileType,
-    SortOrder, StandardFileOperation, ViewMode,
+    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
+    FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
+};
+pub use support::{
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
+    SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
