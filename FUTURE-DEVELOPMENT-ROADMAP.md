@@ -118,6 +118,8 @@ The driver framework registers concrete implementations optimized for the physic
 * **VgaTextModeDriver:** Manages historical VGA screen grids and character attributes natively.
 * **SerialMouseDriver:** Decodes RS-232 serial byte packets natively over COM1/COM2.
 * **Ne2000NetworkDriver:** Supports legendary ISA network controllers via Ring 3 PIO frame pools.
+* **AdcTempSensorDriver:** Integrates legacy analog-to-digital converter registers, converting polled raw thermistor registers to Celsius floating-point variables via PIO fallbacks.
+* **SpiFlashRomDriver:** Maps Serial Peripheral Interface Flash ROM blocks, enabling reading and sector-erasing operations over low-level SPI controller FIFO ports.
 
 #### B. Modern Silicon and Next-Generation Platforms
 * **PcieGen5NvmeDriver & PcieGen6Bridge:** Utilizes high-density Memory-Mapped I/O (MMIO), 64-bit hardware descriptor rings, and MSI-X interrupt lines, compliant with the NVMe v1.4, v2.0, and PCIe Gen6 architectural specifications.
@@ -127,6 +129,9 @@ The driver framework registers concrete implementations optimized for the physic
 * **CxlMemoryDriver:** Interfaces with Compute Express Link (CXL) host caches, abstracting coherent memory expansions as unified virtual memory ranges.
 * **AppleSiliconUnifiedMemoryBus:** Maps unified storage registers under strict physical address layouts.
 * **Sata3Controller / Ufs4Storage:** Provides hardware-accelerated block pipelines for modern mobile and solid-state devices.
+* **VirtioConsoleDriver:** Provides virtualized I/O console channels communicating with hypervisor-side console rings using lock-free DMA ring buffers and virtqueue routing.
+* **CanBusController:** Processes industrial and vehicular CAN-Bus controller telemetry, supporting dynamic packet priorities and interrupt queues natively.
+* **OptaneNvdimmDriver:** Maps persistent non-volatile DIMM storage bytes directly as coherent physical RAM ranges under SovereignVMM cache protection.
 
 ### 2.3 Auto-Negotiation Broker (`PeripheralBroker`)
 When the system polls a physical bus slot during scanning:
