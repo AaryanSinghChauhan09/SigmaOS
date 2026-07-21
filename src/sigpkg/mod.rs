@@ -41,19 +41,19 @@ impl Version {
         // This avoids heap-allocated collections like Vec inside utility version parsing.
         let mut parts = version_str.split('.');
 
-        let major = parts
+        let major_parsed = parts
             .next()
             .ok_or(ParseError::InvalidFormat)?
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
-        let minor = parts
+        let minor_parsed = parts
             .next()
             .ok_or(ParseError::InvalidFormat)?
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
-        let patch = parts
+        let patch_parsed = parts
             .next()
             .ok_or(ParseError::InvalidFormat)?
             .parse::<u64>()
@@ -63,23 +63,7 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = parts[0]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        Ok(Version::new(major, minor, patch))
-    }
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+        Ok(Version::new(major_parsed, minor_parsed, patch_parsed))
     }
 }
 
@@ -136,7 +120,6 @@ pub struct Dependency {
 
 /// Version constraint
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),

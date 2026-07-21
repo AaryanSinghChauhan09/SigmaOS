@@ -339,6 +339,9 @@ mod tests {
         assert_eq!(allocator.calculate_order(1), 0);
         assert_eq!(allocator.calculate_order(2), 1);
         assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 
     #[test]
@@ -358,5 +361,21 @@ mod tests {
         // Deallocate and verify state restoration
         allocator.deallocate(block);
         assert_eq!(allocator.get_free_memory(), 4096);
+    }
+
+    #[test]
+    fn test_calculate_order_correctness() {
+        let allocator = BuddyAllocator::new();
+        // Test edge cases manually to ensure exact bounds matching
+        assert_eq!(allocator.calculate_order(0), 0);
+        assert_eq!(allocator.calculate_order(1), 0);
+        assert_eq!(allocator.calculate_order(2), 1);
+        assert_eq!(allocator.calculate_order(3), 2);
+        assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(6), 3);
+        assert_eq!(allocator.calculate_order(7), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 }
