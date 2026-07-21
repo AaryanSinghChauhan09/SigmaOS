@@ -59,8 +59,16 @@ mod tests {
         let mut timeline = VideoTimeline::new(60);
         let track = VideoTrack {
             clips: alloc::vec![
-                VideoClip { id: 1, start_time_ms: 0, duration_ms: 5000 },
-                VideoClip { id: 2, start_time_ms: 4000, duration_ms: 3000 },
+                VideoClip {
+                    id: 1,
+                    start_time_ms: 0,
+                    duration_ms: 5000
+                },
+                VideoClip {
+                    id: 2,
+                    start_time_ms: 4000,
+                    duration_ms: 3000
+                },
             ],
             z_index: 0,
         };
