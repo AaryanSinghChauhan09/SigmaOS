@@ -120,7 +120,7 @@ The driver framework registers concrete implementations optimized for the physic
 * **Ne2000NetworkDriver:** Supports legendary ISA network controllers via Ring 3 PIO frame pools.
 
 #### B. Modern Silicon and Next-Generation Platforms
-* **PcieGen5NvmeDriver:** Utilizes high-density Memory-Mapped I/O (MMIO), 64-bit hardware descriptor rings, and MSI-X interrupt lines, compliant with the NVMe v1.4 and v2.0 specifications.
+* **PcieGen5NvmeDriver & PcieGen6Bridge:** Utilizes high-density Memory-Mapped I/O (MMIO), 64-bit hardware descriptor rings, and MSI-X interrupt lines, compliant with the NVMe v1.4, v2.0, and PCIe Gen6 architectural specifications.
 * **Thunderbolt4Controller / USB4Host:** Coordinates massive serial buses. Handles high-speed dynamic bus mapping and DMA ring allocations.
 * **Wifi7Adapter / Bluetooth5_4:** Processes multi-gigabit wireless packets natively inside the asynchronous `ZenithNet` driver channels.
 * **IntelXeGpuDriver / NvlinkBus:** Implements high-throughput unified memory mapping (UMA) interfaces. Maps graphics commands directly onto execution queues of parallel hardware accelerators.
@@ -245,6 +245,18 @@ SigmaOS is designed to systematically replace, absorb, and dominate traditional 
 #### D. Performance Diagnostics (Intel Lab LKP: `intel-lab-lkp/linux`)
 * **The Linux Fork Goal:** Heavy user-space profiling scripts to detect memory leaks and scheduling latency regressions.
 * **The SigmaOS Absorption:** Embedded directly in the microkernel core. Telemetry on memory allocation boundaries and context-switch overheads is monitored continuously by the built-in `AiOptimizer` to scale priorities dynamically.
+
+#### E. Embedded Single-Board Clusters ( `linux-99pi` )
+* **The Linux Fork Goal:** Porting and maintaining Raspberry Pi board configurations on custom Linux configurations.
+* **The SigmaOS Absorption:** Replaces duplicate board files with a declarative hardware description system where SPI, I2C, and custom GPIO routing tables map natively to physical addresses.
+
+#### F. Storage Log Schedulers ( `dubeyko/linux` [SSDFS] )
+* **The Linux Fork Goal:** Managing specialized garbage-collection and block storage maps on flash memory arrays.
+* **The SigmaOS Absorption:** Implements log-structured wear-leveling algorithms directly within our polymorphic storage enclaves, completely bypassing OS heap allocations during block compaction loops.
+
+#### G. Secure Cryptographic Hypervisors ( `AMDESE/linux-kvm` )
+* **The Linux Fork Goal:** Sandboxing hypervisors through KVM integrations.
+* **The SigmaOS Absorption:** Fully isolated within standard userspace shards, leveraging AMD-V/Intel-VT directly at the microkernel level using dynamic capability-gated security boundaries.
 
 ---
 
@@ -509,12 +521,50 @@ To maintain absolute architectural safety, all implementations across core syste
 
 ---
 
-## 12. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
+## 12. AUTOMATED UPSTREAM INTELLIGENCE & DAILY UPDATES SCANNING
+
+To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine.
+
+```
+                      +---------------------------------------+
+                      |         Upstream Github Monitor       |
+                      +---------------------------------------+
+                       /                                     \
+                      v                                       v
+         +--------------------------+           +--------------------------+
+         |      Sigma Updater       |           |  Sigma Distros Crusher   |
+         | (Daily upstream patches) |           | (Feature & Parity audit) |
+         +--------------------------+           +--------------------------+
+                      \                                       /
+                       v                                     v
+                      +---------------------------------------+
+                      |       Sovereign Microkernel Shard     |
+                      |   (Incremental Clean Upstream Sync)   |
+                      +---------------------------------------+
+```
+
+### 12.1 The "Sigma Updater" Engine
+* **Mission:** Continuously monitors the repository trees of the Linux Kernel (mainline, stable, and LTS branches), LLVM, GCC, and musl/glibc projects.
+* **Functions:**
+  1. Identifies and parses upstream security advisories, vulnerability disclosures, and critical hardware driver fixes.
+  2. Maps security CVE solutions directly to capability rings in SigmaOS.
+  3. Prepares daily diagnostic and recommendation matrices for incremental microkernel upgrades.
+
+### 12.2 The "Sigma Linux Distros Crusher" Engine
+* **Mission:** Performs systematic code audits against the major packaging, init, and container systems of Ubuntu (apt), Arch (pacman), Fedora (dnf), and NixOS (nix).
+* **Functions:**
+  1. Compiles daily capability parity tables highlighting legacy performance and modular constraints.
+  2. Translates system-level optimizations (such as eBPF-style network parsing, EEVDF real-time scheduling adjustments, and flash wear-leveling log structures) into safe, OOP-compliant, zero-dependency SigmaOS primitives.
+  3. Reports architectural vulnerabilities in mainstream distributions directly to our secure ledger and local knowledge bases.
+
+---
+
+## 13. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
 
 In accordance with strict low-level system design principles, all strategic specifications, component models, and driver frameworks detailed inside this document represent declarative, architectural planning blueprints.
 
-### 12.1 Pure Design Blueprints
+### 13.1 Pure Design Blueprints
 No compilable Rust, Zig, or Nim source library modules are implemented within this specification file. Systems are mapped exclusively through detailed visual UML flowcharts, ASCII architectural layouts, and declarative state definitions.
 
-### 12.2 Zero Standard Runtime Dependency
+### 13.2 Zero Standard Runtime Dependency
 All proposed code models utilize raw, user-defined primitive values, direct hardware mapping offsets, and zero-allocation logic. This ensures that when features are translated into implementation targets, the final compiles remain lightweight, fast, and completely free from third-party standard libraries or dynamic platforms.
