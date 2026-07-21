@@ -87,7 +87,8 @@ impl SlabAllocator {
             if slab.state != SlabState::Full {
                 for obj in &mut slab.objects {
                     if obj.is_none() {
-                        let ptr = self.allocate_memory(object_size);
+                        let next_id = self.next_slab_id;
+                        let ptr = Self::allocate_memory(next_id, object_size);
                         *obj = Some(ptr);
                         slab.inuse += 1;
                         cache.free_objects -= 1;
@@ -108,7 +109,8 @@ impl SlabAllocator {
         }
 
         // No free objects, create a new slab
-        let new_slab = self.create_slab(objects_per_slab, object_size)?;
+        let next_id = self.next_slab_id;
+        let new_slab = self.create_slab(next_id, objects_per_slab, object_size)?;
         let obj = new_slab.objects[0].unwrap();
         let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
         cache.slabs.push(new_slab);
@@ -146,11 +148,11 @@ impl SlabAllocator {
     }
 
     /// Create a new slab for a cache
-    fn create_slab(&self, objects_per_slab: usize, object_size: usize) -> Result<Slab, &'static str> {
+    fn create_slab(&self, next_id: u64, objects_per_slab: usize, object_size: usize) -> Result<Slab, &'static str> {
         let mut objects = Vec::with_capacity(objects_per_slab);
 
         for _ in 0..objects_per_slab {
-            objects.push(Some(self.allocate_memory(object_size)));
+            objects.push(Some(Self::allocate_memory(next_id, object_size)));
         }
 
         Ok(Slab {
@@ -161,10 +163,10 @@ impl SlabAllocator {
     }
 
     /// Allocate memory (simplified - would use actual allocator)
-    fn allocate_memory(&self, size: usize) -> *mut u8 {
+    fn allocate_memory(next_slab_id: u64, _size: usize) -> *mut u8 {
         // In a real implementation, this would use the underlying page allocator
         // For now, return a dummy pointer
-        (0x2000 + self.next_slab_id as usize) as *mut u8
+        (0x2000 + next_slab_id as usize) as *mut u8
     }
 
     /// Get cache statistics

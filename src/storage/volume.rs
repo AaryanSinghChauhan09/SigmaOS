@@ -28,6 +28,7 @@ pub trait Volume {
     fn volume_type(&self) -> VolumeType;
     fn size(&self) -> u64;
     fn is_mounted(&self) -> bool;
+    fn set_mounted(&self, mounted: bool);
 }
 
 #[repr(C)]
@@ -73,6 +74,9 @@ impl Volume for SimpleVolume {
     }
     fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
     fn is_mounted(&self) -> bool { self.mounted.load(Ordering::SeqCst) == 1 }
+    fn set_mounted(&self, mounted: bool) {
+        self.mounted.store(if mounted { 1 } else { 0 }, Ordering::SeqCst);
+    }
 }
 
 pub trait VolumeManager {
@@ -130,7 +134,7 @@ impl VolumeManager for SimpleVolumeManager {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
                 if volume.id() == id {
-                    volume.mounted.store(1, Ordering::SeqCst);
+                    volume.set_mounted(true);
                     return Ok(());
                 }
             }
@@ -142,7 +146,7 @@ impl VolumeManager for SimpleVolumeManager {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
                 if volume.id() == id {
-                    volume.mounted.store(0, Ordering::SeqCst);
+                    volume.set_mounted(false);
                     return Ok(());
                 }
             }
