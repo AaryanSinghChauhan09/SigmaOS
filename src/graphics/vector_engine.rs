@@ -50,7 +50,7 @@ impl VectorPath {
             end: Point2D { x: ex, y: ey },
         });
     }
-    
+
     pub fn close(&mut self) {
         self.commands.push(PathCommand::ClosePath);
     }
@@ -67,7 +67,7 @@ mod tests {
         path.line_to(10.0, 0.0);
         path.cubic_bezier(10.0, 10.0, 0.0, 10.0, 0.0, 0.0);
         path.close();
-        
+
         assert_eq!(path.commands.len(), 4);
         if let PathCommand::MoveTo(p) = &path.commands[0] {
             assert_eq!(p.x, 0.0);

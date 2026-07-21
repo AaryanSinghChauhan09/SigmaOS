@@ -71,16 +71,18 @@ mod tests {
     fn test_ffmpeg_demuxing() {
         let mut ctx = FormatContext::new();
         let vid_idx = ctx.add_stream(StreamType::Video);
-        
+
         ctx.demux_packet(MediaPacket {
             stream_index: vid_idx,
             timestamp_pts: 100,
             payload: alloc::vec![1, 2, 3],
         });
-        
+
         assert_eq!(ctx.packets.len(), 1);
-        
-        let tx = Transcoder { hardware_accel_enabled: true };
+
+        let tx = Transcoder {
+            hardware_accel_enabled: true,
+        };
         let out = tx.transcode_packet(&ctx.packets[0]);
         assert_ne!(out.payload, alloc::vec![1, 2, 3]); // Verify simulated transcode applied
     }
