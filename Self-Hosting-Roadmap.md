@@ -6,7 +6,7 @@ This specification details the self-hosting strategy, enterprise orchestration, 
 
 ## 🏛️ Deployment Architecture
 
-To achieve complete isolation and independence from public cloud vendor lock-in, SigmaOS uses a self-hosted micro-VM cluster structure. 
+To achieve complete isolation and independence from public cloud vendor lock-in, SigmaOS uses a self-hosted micro-VM cluster structure.
 
 ```
        [Public Request / Live Media Streams]
@@ -38,12 +38,8 @@ To achieve complete isolation and independence from public cloud vendor lock-in,
 
 ### Phase 2: Distributed Storage and Object Registry
 - Initialize peer-to-peer decentralized storage distribution engines.
-- Launch `SigmaFS` local volume controllers with automated sector healing. All file blocks are strictly governed by Merkle Tree Copy-on-Write logs.
+- Launch `SigmaFS` local volume controllers with automated sector healing.
 
 ### Phase 3: Sovereign Media Deployment
 - Instantiate the native, built-in `SovereignVideoPlayer` to stream media without standard external container runtimes.
-- Leverage custom DSP hardware decoding layers to optimize network-bound raw video streams via GPU execution boundaries.
-
-### Phase 4: Full Multi-Agent Cluster Autonomy
-- Delegate physical node failure-recovery directly to `SovereignML` orchestration agents.
-- When an OS panic occurs on `Self-Host Node Alpha`, the agent on `Node Beta` dynamically re-partitions the network topology and isolates the failing component using capability-revocation before rebooting the kernel instance.
+- Leverage custom DSP hardware decoding layers to optimize network-bound raw video streams.
