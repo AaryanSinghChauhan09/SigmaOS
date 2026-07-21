@@ -33,6 +33,7 @@ pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub mod phase_l_plans;
+pub mod pillars;
 pub mod productivity;
 pub mod resilience;
 pub mod scheduler;

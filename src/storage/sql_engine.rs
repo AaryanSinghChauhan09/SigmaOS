@@ -221,10 +221,12 @@ impl SqlEngine {
             result_rows.push(result_row);
         }
 
+        let num_rows = result_rows.len();
+
         Ok(QueryResult {
             columns: result_columns,
             rows: result_rows,
-            affected_rows: result_rows.len(),
+            affected_rows: num_rows,
         })
     }
 

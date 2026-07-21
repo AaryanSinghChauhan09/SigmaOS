@@ -283,16 +283,19 @@ impl DiskDefragmenter {
     pub fn defragment(&mut self, path: &Path) -> Result<&DefragResult, DefragError> {
         if self.dry_run {
             let report = self.analyze(path)?;
-            return Ok(&DefragResult {
-                strategy_name: self.strategy.name().to_string(),
+            let frag_pct = report.fragmentation_percent;
+            let strategy_name = self.strategy.name().to_string();
+            self.result = Some(DefragResult {
+                strategy_name,
                 success: true,
                 files_processed: 0,
                 bytes_moved: 0,
                 time_taken_seconds: 0,
-                fragmentation_before: report.fragmentation_percent,
-                fragmentation_after: report.fragmentation_percent,
+                fragmentation_before: frag_pct,
+                fragmentation_after: frag_pct,
                 message: "Dry run - no files were defragmented".to_string(),
             });
+            return Ok(self.result.as_ref().unwrap());
         }
 
         let result = self.strategy.defragment(path)?;
