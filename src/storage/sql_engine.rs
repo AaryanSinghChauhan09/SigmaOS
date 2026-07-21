@@ -17,7 +17,7 @@ pub enum SqlType {
     Null,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SqlValue {
     Integer(i64),
     Text(String),
