@@ -49,7 +49,16 @@ impl USBDevice for SimpleUSBDevice {
     fn id(&self) -> USBDeviceID { self.id }
     fn vendor_id(&self) -> u16 { self.vendor_id.load(Ordering::SeqCst) as u16 }
     fn product_id(&self) -> u16 { self.product_id.load(Ordering::SeqCst) as u16 }
-    fn device_type(&self) -> USBDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn device_type(&self) -> USBDeviceType { {
+        let raw = self.device_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => USBDeviceType::MassStorage,
+            2 => USBDeviceType::Network,
+            3 => USBDeviceType::Audio,
+            4 => USBDeviceType::Unknown,
+            _ => USBDeviceType::HID,
+        }
+    } }
 
     fn initialize(&mut self) -> Result<(), USBError> {
         Ok(())

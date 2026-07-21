@@ -44,7 +44,14 @@ impl SimpleDevice {
 impl Device for SimpleDevice {
     fn id(&self) -> DeviceID { self.id }
     fn device_type(&self) -> DeviceType { self.device_type }
-    fn state(&self) -> DeviceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> DeviceState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DeviceState::Initialized,
+            2 => DeviceState::Active,
+            _ => DeviceState::Uninitialized,
+        }
+    } }
     fn initialize(&mut self) -> Result<(), HALError> {
         self.state.store(DeviceState::Initialized as usize, Ordering::SeqCst);
         Ok(())

@@ -118,9 +118,15 @@ impl SimpleKernelTask {
     }
 
     pub fn get_state(&self) -> TaskState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TaskState::Running,
+            2 => TaskState::Blocked,
+            3 => TaskState::Terminated,
+            _ => TaskState::Ready,
         }
+    }
     }
 
     pub fn set_state(&self, state: TaskState) {

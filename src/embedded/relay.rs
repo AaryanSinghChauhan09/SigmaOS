@@ -40,7 +40,13 @@ impl SimpleRelay {
 
 impl Relay for SimpleRelay {
     fn id(&self) -> RelayID { self.id }
-    fn state(&self) -> RelayState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> RelayState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => RelayState::Closed,
+            _ => RelayState::Open,
+        }
+    } }
 }
 
 pub trait RelayController {

@@ -74,7 +74,14 @@ impl SimpleOptimizer {
 }
 
 impl Optimizer for SimpleOptimizer {
-    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst)) } }
+    fn optimizer_type(&self) -> OptimizerType { {
+        let raw = self.optimizer_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => OptimizerType::Adam,
+            2 => OptimizerType::RMSProp,
+            _ => OptimizerType::SGD,
+        }
+    } }
     fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
 
     fn set_learning_rate(&mut self, rate: f32) {

@@ -53,7 +53,15 @@ impl Workspace for SimpleWorkspace {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn layout(&self) -> WorkspaceLayout { unsafe { core::mem::transmute(self.layout.load(Ordering::SeqCst)) } }
+    fn layout(&self) -> WorkspaceLayout { {
+        let raw = self.layout.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => WorkspaceLayout::Stacking,
+            2 => WorkspaceLayout::Tabbed,
+            3 => WorkspaceLayout::Floating,
+            _ => WorkspaceLayout::Tiling,
+        }
+    } }
     
     fn set_layout(&mut self, layout: WorkspaceLayout) {
         self.layout.store(layout as usize, Ordering::SeqCst);

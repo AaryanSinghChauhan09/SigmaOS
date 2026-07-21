@@ -60,7 +60,15 @@ impl DiscoveredDevice for SimpleDiscoveredDevice {
         let len = self.address.iter().position(|&b| b == 0).unwrap_or(64);
         &self.address[..len]
     }
-    fn protocol(&self) -> DiscoveryProtocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
+    fn protocol(&self) -> DiscoveryProtocol { {
+        let raw = self.protocol.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DiscoveryProtocol::UPnP,
+            2 => DiscoveryProtocol::SSDP,
+            3 => DiscoveryProtocol::BLE,
+            _ => DiscoveryProtocol::mDNS,
+        }
+    } }
 }
 
 pub trait DeviceDiscovery {

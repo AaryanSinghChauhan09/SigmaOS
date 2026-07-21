@@ -58,7 +58,14 @@ impl FileEntry for SimpleFileEntry {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
     }
-    fn file_type(&self) -> FileType { unsafe { core::mem::transmute(self.file_type.load(Ordering::SeqCst)) } }
+    fn file_type(&self) -> FileType { {
+        let raw = self.file_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => FileType::File,
+            2 => FileType::Symlink,
+            _ => FileType::Directory,
+        }
+    } }
     fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
     fn is_hidden(&self) -> bool { self.hidden.load(Ordering::SeqCst) == 1 }
 }

@@ -43,7 +43,15 @@ impl SimpleGasSensor {
 
 impl GasSensor for SimpleGasSensor {
     fn id(&self) -> SensorID { self.id }
-    fn gas_type(&self) -> GasType { unsafe { core::mem::transmute(self.gas_type.load(Ordering::SeqCst)) } }
+    fn gas_type(&self) -> GasType { {
+        let raw = self.gas_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => GasType::CO,
+            2 => GasType::CH4,
+            3 => GasType::NO2,
+            _ => GasType::CO2,
+        }
+    } }
     fn read_ppm(&self) -> u32 { self.ppm.load(Ordering::SeqCst) as u32 }
 }
 

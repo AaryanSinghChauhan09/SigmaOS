@@ -43,7 +43,15 @@ impl SimpleADCChannel {
 
 impl ADCChannel for SimpleADCChannel {
     fn id(&self) -> ChannelID { self.id }
-    fn resolution(&self) -> ADCResolution { unsafe { core::mem::transmute(self.resolution.load(Ordering::SeqCst)) } }
+    fn resolution(&self) -> ADCResolution { {
+        let raw = self.resolution.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ADCResolution::Bits10,
+            2 => ADCResolution::Bits12,
+            3 => ADCResolution::Bits16,
+            _ => ADCResolution::Bits8,
+        }
+    } }
     
     fn read(&self) -> u16 {
         self.value.load(Ordering::SeqCst) as u16

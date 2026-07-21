@@ -48,7 +48,15 @@ impl SimpleQuota {
 
 impl Quota for SimpleQuota {
     fn id(&self) -> QuotaID { self.id }
-    fn resource_type(&self) -> ResourceType { unsafe { core::mem::transmute(self.resource_type.load(Ordering::SeqCst)) } }
+    fn resource_type(&self) -> ResourceType { {
+        let raw = self.resource_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ResourceType::Memory,
+            2 => ResourceType::Disk,
+            3 => ResourceType::Network,
+            _ => ResourceType::CPU,
+        }
+    } }
     fn limit(&self) -> u64 { self.limit.load(Ordering::SeqCst) as u64 }
     fn usage(&self) -> u64 { self.usage.load(Ordering::SeqCst) as u64 }
 

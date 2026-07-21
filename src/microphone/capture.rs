@@ -60,7 +60,14 @@ impl Microphone for SimpleMicrophone {
     }
     fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
     fn channels(&self) -> u32 { self.channels.load(Ordering::SeqCst) as u32 }
-    fn format(&self) -> AudioFormat { unsafe { core::mem::transmute(self.format.load(Ordering::SeqCst)) } }
+    fn format(&self) -> AudioFormat { {
+        let raw = self.format.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => AudioFormat::PCM32,
+            2 => AudioFormat::Float32,
+            _ => AudioFormat::PCM16,
+        }
+    } }
 }
 
 pub trait AudioCapture {

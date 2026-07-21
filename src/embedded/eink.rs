@@ -48,7 +48,14 @@ impl EInkDisplay for SimpleEInkDisplay {
     fn id(&self) -> DisplayID { self.id }
     fn width(&self) -> u16 { self.width.load(Ordering::SeqCst) as u16 }
     fn height(&self) -> u16 { self.height.load(Ordering::SeqCst) as u16 }
-    fn color_mode(&self) -> ColorMode { unsafe { core::mem::transmute(self.color_mode.load(Ordering::SeqCst)) } }
+    fn color_mode(&self) -> ColorMode { {
+        let raw = self.color_mode.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ColorMode::Grayscale,
+            2 => ColorMode::Color,
+            _ => ColorMode::BlackWhite,
+        }
+    } }
 }
 
 pub trait EInkController {

@@ -63,7 +63,15 @@ impl ClusterNode for SimpleClusterNode {
         let len = self.ip_address.iter().position(|&b| b == 0).unwrap_or(16);
         &self.ip_address[..len]
     }
-    fn state(&self) -> NodeState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> NodeState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => NodeState::Online,
+            2 => NodeState::Degraded,
+            3 => NodeState::Maintenance,
+            _ => NodeState::Offline,
+        }
+    } }
 
     fn set_state(&mut self, state: NodeState) {
         self.state.store(state as usize, Ordering::SeqCst);

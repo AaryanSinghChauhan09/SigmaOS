@@ -62,7 +62,15 @@ impl ConfigValue for SimpleConfigValue {
         let len = self.key.iter().position(|&b| b == 0).unwrap_or(128);
         &self.key[..len]
     }
-    fn config_type(&self) -> ConfigType { unsafe { core::mem::transmute(self.config_type.load(Ordering::SeqCst)) } }
+    fn config_type(&self) -> ConfigType { {
+        let raw = self.config_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ConfigType::Integer,
+            2 => ConfigType::Boolean,
+            3 => ConfigType::Float,
+            _ => ConfigType::String,
+        }
+    } }
     fn as_string(&self) -> &[u8] {
         let len = self.string_value.iter().position(|&b| b == 0).unwrap_or(256);
         &self.string_value[..len]

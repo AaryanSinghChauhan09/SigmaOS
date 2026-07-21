@@ -40,7 +40,14 @@ impl SimpleGPS {
 
 impl GPS for SimpleGPS {
     fn id(&self) -> GPSID { self.id }
-    fn fix(&self) -> GPSFix { unsafe { core::mem::transmute(self.fix.load(Ordering::SeqCst)) } }
+    fn fix(&self) -> GPSFix { {
+        let raw = self.fix.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => GPSFix::Fix2D,
+            2 => GPSFix::Fix3D,
+            _ => GPSFix::NoFix,
+        }
+    } }
 }
 
 pub trait GPSController {

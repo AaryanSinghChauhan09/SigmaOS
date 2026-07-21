@@ -71,7 +71,16 @@ impl Window for SimpleWindow {
     fn y(&self) -> i32 { self.y.load(Ordering::SeqCst) as i32 }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> WindowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> WindowState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => WindowState::Minimized,
+            2 => WindowState::Maximized,
+            3 => WindowState::Fullscreen,
+            4 => WindowState::Hidden,
+            _ => WindowState::Normal,
+        }
+    } }
 
     fn set_state(&mut self, state: WindowState) {
         self.state.store(state as usize, Ordering::SeqCst);

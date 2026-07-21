@@ -57,7 +57,16 @@ impl Metric for SimpleMetric {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn metric_type(&self) -> MetricType { unsafe { core::mem::transmute(self.metric_type.load(Ordering::SeqCst)) } }
+    fn metric_type(&self) -> MetricType { {
+        let raw = self.metric_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => MetricType::Gauge,
+            2 => MetricType::Histogram,
+            3 => MetricType::Summary,
+            4 => MetricType::Trend,
+            _ => MetricType::Counter,
+        }
+    } }
     fn value(&self) -> f64 { (self.value.load(Ordering::SeqCst) as f64) / 10000.0 }
 
     fn set_value(&mut self, value: f64) {

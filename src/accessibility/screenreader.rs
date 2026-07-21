@@ -56,7 +56,14 @@ impl Voice for SimpleVoice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn gender(&self) -> VoiceGender { unsafe { core::mem::transmute(self.gender.load(Ordering::SeqCst)) } }
+    fn gender(&self) -> VoiceGender { {
+        let raw = self.gender.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => VoiceGender::Female,
+            2 => VoiceGender::Neutral,
+            _ => VoiceGender::Male,
+        }
+    } }
     fn rate(&self) -> f32 { (self.rate.load(Ordering::SeqCst) as f32) / 100.0 }
     
     fn set_rate(&mut self, rate: f32) {

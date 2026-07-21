@@ -48,7 +48,14 @@ impl TFTDisplay for SimpleTFTDisplay {
     fn id(&self) -> DisplayID { self.id }
     fn width(&self) -> u16 { self.width.load(Ordering::SeqCst) as u16 }
     fn height(&self) -> u16 { self.height.load(Ordering::SeqCst) as u16 }
-    fn color_depth(&self) -> ColorDepth { unsafe { core::mem::transmute(self.color_depth.load(Ordering::SeqCst)) } }
+    fn color_depth(&self) -> ColorDepth { {
+        let raw = self.color_depth.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ColorDepth::RGB18,
+            2 => ColorDepth::RGB24,
+            _ => ColorDepth::RGB16,
+        }
+    } }
 }
 
 pub trait TFTController {

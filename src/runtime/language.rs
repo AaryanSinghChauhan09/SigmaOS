@@ -53,7 +53,16 @@ impl SimpleLanguageRuntime {
 
 impl LanguageRuntime for SimpleLanguageRuntime {
     fn id(&self) -> RuntimeID { self.id }
-    fn language_type(&self) -> LanguageType { unsafe { core::mem::transmute(self.language_type.load(Ordering::SeqCst)) } }
+    fn language_type(&self) -> LanguageType { {
+        let raw = self.language_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => LanguageType::Node,
+            2 => LanguageType::Java,
+            3 => LanguageType::Go,
+            4 => LanguageType::Rust,
+            _ => LanguageType::Python,
+        }
+    } }
     fn version(&self) -> &[u8] {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
         &self.version[..len]

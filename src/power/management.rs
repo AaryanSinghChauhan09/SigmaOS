@@ -66,8 +66,25 @@ impl PowerProfile for SimplePowerProfile {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
-    fn profile_type(&self) -> PowerProfile { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
-    fn cpu_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.cpu_governor.load(Ordering::SeqCst)) } }
+    fn profile_type(&self) -> PowerProfile { {
+        let raw = self.profile_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PowerProfile::Balanced,
+            2 => PowerProfile::PowerSaver,
+            3 => PowerProfile::Custom,
+            _ => PowerProfile::Performance,
+        }
+    } }
+    fn cpu_governor(&self) -> CPUGovernor { {
+        let raw = self.cpu_governor.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => CPUGovernor::Ondemand,
+            2 => CPUGovernor::Conservative,
+            3 => CPUGovernor::Powersave,
+            4 => CPUGovernor::Userspace,
+            _ => CPUGovernor::Performance,
+        }
+    } }
     fn max_cpu_freq(&self) -> usize { self.max_cpu_freq.load(Ordering::SeqCst) }
     fn min_cpu_freq(&self) -> usize { self.min_cpu_freq.load(Ordering::SeqCst) }
 }
@@ -110,7 +127,16 @@ impl CPUGovernor for SimpleCPUGovernor {
         Ok(())
     }
 
-    fn get_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.current_governor.load(Ordering::SeqCst)) } }
+    fn get_governor(&self) -> CPUGovernor { {
+        let raw = self.current_governor.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => CPUGovernor::Ondemand,
+            2 => CPUGovernor::Conservative,
+            3 => CPUGovernor::Powersave,
+            4 => CPUGovernor::Userspace,
+            _ => CPUGovernor::Performance,
+        }
+    } }
 
     fn set_frequency(&mut self, freq_khz: usize) -> Result<(), PowerError> {
         let max = self.max_freq.load(Ordering::SeqCst);
@@ -271,7 +297,15 @@ impl SimpleBatteryManager {
 impl BatteryManager for SimpleBatteryManager {
     fn get_capacity(&self) -> i32 { self.capacity.load(Ordering::SeqCst) as i32 }
 
-    fn get_status(&self) -> BatteryStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
+    fn get_status(&self) -> BatteryStatus { {
+        let raw = self.status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BatteryStatus::Charging,
+            2 => BatteryStatus::Discharging,
+            3 => BatteryStatus::Full,
+            _ => BatteryStatus::Unknown,
+        }
+    } }
 
     fn is_charging(&self) -> bool { self.is_charging_flag.load(Ordering::SeqCst) == 1 }
 

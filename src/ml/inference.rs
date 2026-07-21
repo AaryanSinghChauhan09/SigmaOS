@@ -53,7 +53,15 @@ impl SimpleMLModel {
 
 impl MLModel for SimpleMLModel {
     fn id(&self) -> ModelID { self.id }
-    fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) } }
+    fn model_type(&self) -> ModelType { {
+        let raw = self.model_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ModelType::DecisionTree,
+            2 => ModelType::SVM,
+            3 => ModelType::Transformer,
+            _ => ModelType::NeuralNetwork,
+        }
+    } }
     fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
     fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
 

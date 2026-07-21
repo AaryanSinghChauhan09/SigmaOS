@@ -44,7 +44,14 @@ impl SimpleEthernetMAC {
 impl EthernetMAC for SimpleEthernetMAC {
     fn id(&self) -> MACID { self.id }
     fn mac_address(&self) -> [u8; 6] { self.mac_address }
-    fn link_state(&self) -> LinkState { unsafe { core::mem::transmute(self.link_state.load(Ordering::SeqCst)) } }
+    fn link_state(&self) -> LinkState { {
+        let raw = self.link_state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => LinkState::Up,
+            2 => LinkState::AutoNegotiating,
+            _ => LinkState::Down,
+        }
+    } }
 }
 
 pub trait EthernetController {

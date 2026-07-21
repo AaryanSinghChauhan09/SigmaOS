@@ -58,7 +58,16 @@ impl Container for SimpleContainer {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ContainerState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ContainerState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            4 => ContainerState::Deleting,
+            _ => ContainerState::Created,
+        }
+    } }
 
     fn start(&mut self) -> Result<(), ContainerError> {
         self.state.store(ContainerState::Running as usize, Ordering::SeqCst);

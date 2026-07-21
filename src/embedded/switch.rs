@@ -40,7 +40,13 @@ impl SimpleSwitch {
 
 impl Switch for SimpleSwitch {
     fn id(&self) -> SwitchID { self.id }
-    fn state(&self) -> SwitchState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> SwitchState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SwitchState::On,
+            _ => SwitchState::Off,
+        }
+    } }
 }
 
 pub trait SwitchController {

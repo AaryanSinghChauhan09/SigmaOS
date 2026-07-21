@@ -134,9 +134,16 @@ impl SimpleTask {
     }
 
     pub fn get_state(&self) -> TaskState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TaskState::Running,
+            2 => TaskState::Completed,
+            3 => TaskState::Failed,
+            4 => TaskState::Cancelled,
+            _ => TaskState::Pending,
         }
+    }
     }
 
     pub fn set_state(&self, state: TaskState) {

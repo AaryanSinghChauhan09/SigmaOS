@@ -43,7 +43,15 @@ impl SimpleUSBEndpoint {
 
 impl USBEndpoint for SimpleUSBEndpoint {
     fn id(&self) -> EndpointID { self.id }
-    fn endpoint_type(&self) -> EndpointType { unsafe { core::mem::transmute(self.endpoint_type.load(Ordering::SeqCst)) } }
+    fn endpoint_type(&self) -> EndpointType { {
+        let raw = self.endpoint_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => EndpointType::Isochronous,
+            2 => EndpointType::Bulk,
+            3 => EndpointType::Interrupt,
+            _ => EndpointType::Control,
+        }
+    } }
     fn max_packet_size(&self) -> u16 { self.max_packet_size.load(Ordering::SeqCst) as u16 }
 }
 

@@ -68,7 +68,14 @@ impl Notification for SimpleNotification {
         let len = self.body.iter().position(|&b| b == 0).unwrap_or(512);
         &self.body[..len]
     }
-    fn urgency(&self) -> NotificationUrgency { unsafe { core::mem::transmute(self.urgency.load(Ordering::SeqCst)) } }
+    fn urgency(&self) -> NotificationUrgency { {
+        let raw = self.urgency.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => NotificationUrgency::Normal,
+            2 => NotificationUrgency::Critical,
+            _ => NotificationUrgency::Low,
+        }
+    } }
     fn app_name(&self) -> &[u8] {
         let len = self.app_name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.app_name[..len]

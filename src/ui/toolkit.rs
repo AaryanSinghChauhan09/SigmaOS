@@ -171,9 +171,16 @@ impl SimpleWidget {
     }
 
     pub fn get_state(&self) -> WidgetState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => WidgetState::Hovered,
+            2 => WidgetState::Pressed,
+            3 => WidgetState::Disabled,
+            4 => WidgetState::Hidden,
+            _ => WidgetState::Normal,
         }
+    }
     }
 }
 

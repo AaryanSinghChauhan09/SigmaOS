@@ -47,7 +47,16 @@ impl SimpleTransaction {
 
 impl Transaction for SimpleTransaction {
     fn id(&self) -> TransactionID { self.id }
-    fn state(&self) -> TransactionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> TransactionState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TransactionState::InProgress,
+            2 => TransactionState::Committed,
+            3 => TransactionState::RolledBack,
+            4 => TransactionState::Failed,
+            _ => TransactionState::Pending,
+        }
+    } }
 
     fn begin(&mut self) -> Result<(), UpdateError> {
         self.state.store(TransactionState::InProgress as usize, Ordering::SeqCst);

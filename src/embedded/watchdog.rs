@@ -44,7 +44,14 @@ impl SimpleWatchdog {
 impl Watchdog for SimpleWatchdog {
     fn id(&self) -> WatchdogID { self.id }
     fn timeout(&self) -> u32 { self.timeout.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> WatchdogState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> WatchdogState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => WatchdogState::Enabled,
+            2 => WatchdogState::Triggered,
+            _ => WatchdogState::Disabled,
+        }
+    } }
 }
 
 pub trait WatchdogManager {

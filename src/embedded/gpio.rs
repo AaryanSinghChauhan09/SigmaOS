@@ -47,7 +47,15 @@ impl SimpleGPIOPin {
 
 impl GPIOPin for SimpleGPIOPin {
     fn id(&self) -> PinID { self.id }
-    fn mode(&self) -> PinMode { unsafe { core::mem::transmute(self.mode.load(Ordering::SeqCst)) } }
+    fn mode(&self) -> PinMode { {
+        let raw = self.mode.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PinMode::Output,
+            2 => PinMode::Alternate,
+            3 => PinMode::Analog,
+            _ => PinMode::Input,
+        }
+    } }
     
     fn set_mode(&mut self, mode: PinMode) {
         self.mode.store(mode as usize, Ordering::SeqCst);

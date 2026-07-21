@@ -168,9 +168,16 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            4 => ContainerState::Failed,
+            _ => ContainerState::Created,
         }
+    }
     }
 
     pub fn set_state(&self, state: ContainerState) {

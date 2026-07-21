@@ -49,7 +49,14 @@ impl SimpleSnapshot {
 
 impl Snapshot for SimpleSnapshot {
     fn id(&self) -> SnapshotID { self.id }
-    fn snapshot_type(&self) -> SnapshotType { unsafe { core::mem::transmute(self.snapshot_type.load(Ordering::SeqCst)) } }
+    fn snapshot_type(&self) -> SnapshotType { {
+        let raw = self.snapshot_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SnapshotType::Incremental,
+            2 => SnapshotType::Differential,
+            _ => SnapshotType::Full,
+        }
+    } }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn is_valid(&self) -> bool { self.valid.load(Ordering::SeqCst) == 1 }

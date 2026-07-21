@@ -43,7 +43,15 @@ impl SimpleCryptoEngine {
 
 impl CryptoEngine for SimpleCryptoEngine {
     fn id(&self) -> CryptoID { self.id }
-    fn algorithm(&self) -> CryptoAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
+    fn algorithm(&self) -> CryptoAlgorithm { {
+        let raw = self.algorithm.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => CryptoAlgorithm::SHA256,
+            2 => CryptoAlgorithm::RSA,
+            3 => CryptoAlgorithm::ECDSA,
+            _ => CryptoAlgorithm::AES,
+        }
+    } }
     fn is_busy(&self) -> bool { self.busy.load(Ordering::SeqCst) == 1 }
 }
 

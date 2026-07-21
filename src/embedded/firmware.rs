@@ -109,7 +109,16 @@ impl FirmwareUpdater for SimpleFirmwareUpdater {
     fn get_state(&self, id: FirmwareID) -> FirmwareState {
         for &(fw_id, ref state) in &self.states {
             if fw_id == id {
-                return unsafe { core::mem::transmute(state.load(Ordering::SeqCst)) };
+                return {
+        let raw = state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => FirmwareState::Downloading,
+            2 => FirmwareState::Installing,
+            3 => FirmwareState::Completed,
+            4 => FirmwareState::Error,
+            _ => FirmwareState::Idle,
+        }
+    };
             }
         }
         FirmwareState::Idle

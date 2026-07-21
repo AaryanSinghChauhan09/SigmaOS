@@ -51,7 +51,14 @@ impl SimpleDebugLog {
 
 impl DebugLog for SimpleDebugLog {
     fn id(&self) -> LogID { self.id }
-    fn level(&self) -> LogLevel { unsafe { core::mem::transmute(self.level.load(Ordering::SeqCst)) } }
+    fn level(&self) -> LogLevel { {
+        let raw = self.level.load(Ordering::SeqCst) as u32;
+        match raw {
+            2 => LogLevel::Warning,
+            3 => LogLevel::Error,
+            _ => LogLevel::Info,
+        }
+    } }
     fn message(&self) -> &[u8] {
         let len = self.message.iter().position(|&b| b == 0).unwrap_or(256);
         &self.message[..len]

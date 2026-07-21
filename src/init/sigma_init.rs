@@ -60,7 +60,16 @@ impl Service for SimpleService {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ServiceState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ServiceState::Starting,
+            2 => ServiceState::Running,
+            3 => ServiceState::Stopping,
+            4 => ServiceState::Failed,
+            _ => ServiceState::Stopped,
+        }
+    } }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
 
     fn start(&mut self) -> Result<(), InitError> {

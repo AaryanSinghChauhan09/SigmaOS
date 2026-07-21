@@ -152,9 +152,16 @@ impl SimpleSandbox {
     }
 
     pub fn get_state(&self) -> SandboxState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SandboxState::Running,
+            2 => SandboxState::Paused,
+            3 => SandboxState::Stopped,
+            4 => SandboxState::Failed,
+            _ => SandboxState::Creating,
         }
+    }
     }
 
     pub fn set_state(&self, state: SandboxState) {

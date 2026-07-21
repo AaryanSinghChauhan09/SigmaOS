@@ -130,9 +130,15 @@ impl SimplePermission {
     }
 
     pub fn get_state(&self) -> PermissionState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PermissionState::Denied,
+            2 => PermissionState::Prompt,
+            3 => PermissionState::Revoked,
+            _ => PermissionState::Granted,
         }
+    }
     }
 
     pub fn set_state(&self, state: PermissionState) {

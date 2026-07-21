@@ -62,7 +62,15 @@ impl SyncItem for SimpleSyncItem {
         let len = self.remote_path.iter().position(|&b| b == 0).unwrap_or(256);
         &self.remote_path[..len]
     }
-    fn status(&self) -> SyncStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
+    fn status(&self) -> SyncStatus { {
+        let raw = self.status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SyncStatus::Syncing,
+            2 => SyncStatus::Completed,
+            3 => SyncStatus::Error,
+            _ => SyncStatus::Idle,
+        }
+    } }
 }
 
 pub trait CloudSync {

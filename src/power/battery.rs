@@ -56,7 +56,16 @@ impl Battery for SimpleBattery {
     fn capacity(&self) -> u32 { self.capacity.load(Ordering::SeqCst) as u32 }
     fn current_charge(&self) -> u32 { self.current_charge.load(Ordering::SeqCst) as u32 }
     fn voltage(&self) -> u32 { self.voltage.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> BatteryState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> BatteryState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BatteryState::Discharging,
+            2 => BatteryState::Full,
+            3 => BatteryState::NotPresent,
+            4 => BatteryState::Critical,
+            _ => BatteryState::Charging,
+        }
+    } }
     fn health(&self) -> u32 { self.health.load(Ordering::SeqCst) as u32 }
 }
 

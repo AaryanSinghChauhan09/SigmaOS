@@ -61,7 +61,16 @@ impl DNSRecord for SimpleDNSRecord {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
     }
-    fn record_type(&self) -> RecordType { unsafe { core::mem::transmute(self.record_type.load(Ordering::SeqCst)) } }
+    fn record_type(&self) -> RecordType { {
+        let raw = self.record_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            28 => RecordType::AAAA,
+            5 => RecordType::CNAME,
+            15 => RecordType::MX,
+            16 => RecordType::TXT,
+            _ => RecordType::A,
+        }
+    } }
     fn ttl(&self) -> u32 { self.ttl.load(Ordering::SeqCst) as u32 }
     fn data(&self) -> &[u8] {
         let len = self.data.iter().position(|&b| b == 0).unwrap_or(128);

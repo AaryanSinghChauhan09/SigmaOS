@@ -55,7 +55,16 @@ impl SimpleBootStage {
 
 impl BootStage for SimpleBootStage {
     fn id(&self) -> BootStageID { self.id }
-    fn stage_type(&self) -> BootStage { unsafe { core::mem::transmute(self.stage_type.load(Ordering::SeqCst)) } }
+    fn stage_type(&self) -> BootStage { {
+        let raw = self.stage_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BootStage::Bootloader,
+            2 => BootStage::Kernel,
+            3 => BootStage::Initramfs,
+            4 => BootStage::Userspace,
+            _ => BootStage::Firmware,
+        }
+    } }
     fn hash(&self) -> &Self::hash { &self.hash }
     fn signature(&self) -> &Self::signature { &self.signature }
 

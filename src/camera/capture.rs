@@ -60,7 +60,15 @@ impl Camera for SimpleCamera {
     }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn format(&self) -> CameraFormat { unsafe { core::mem::transmute(self.format.load(Ordering::SeqCst)) } }
+    fn format(&self) -> CameraFormat { {
+        let raw = self.format.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => CameraFormat::YUYV,
+            2 => CameraFormat::MJPEG,
+            3 => CameraFormat::H264,
+            _ => CameraFormat::RGB24,
+        }
+    } }
 }
 
 pub trait CameraManager {

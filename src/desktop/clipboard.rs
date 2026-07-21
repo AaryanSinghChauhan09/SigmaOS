@@ -50,7 +50,15 @@ impl SimpleClipboardItem {
 
 impl ClipboardItem for SimpleClipboardItem {
     fn id(&self) -> ClipboardID { self.id }
-    fn format(&self) -> ClipboardFormat { unsafe { core::mem::transmute(self.format.load(Ordering::SeqCst)) } }
+    fn format(&self) -> ClipboardFormat { {
+        let raw = self.format.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ClipboardFormat::Image,
+            2 => ClipboardFormat::HTML,
+            3 => ClipboardFormat::Files,
+            _ => ClipboardFormat::Text,
+        }
+    } }
     fn data(&self) -> &[u8] { &self.data }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
 }

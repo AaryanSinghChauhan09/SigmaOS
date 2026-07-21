@@ -57,7 +57,15 @@ impl Package for SimplePackage {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
         &self.version[..len]
     }
-    fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> PackageState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PackageState::Available,
+            2 => PackageState::Updating,
+            3 => PackageState::Corrupted,
+            _ => PackageState::Installed,
+        }
+    } }
 }
 
 pub trait PackageManager {

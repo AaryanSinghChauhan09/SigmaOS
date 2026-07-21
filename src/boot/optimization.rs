@@ -144,9 +144,15 @@ impl SimpleBootService {
     }
 
     pub fn get_status(&self) -> ServiceStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst))
+        {
+        let raw = self.status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ServiceStatus::Initializing,
+            2 => ServiceStatus::Ready,
+            3 => ServiceStatus::Failed,
+            _ => ServiceStatus::Pending,
         }
+    }
     }
 
     pub fn set_status(&self, status: ServiceStatus) {

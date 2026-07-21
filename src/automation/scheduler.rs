@@ -65,7 +65,15 @@ impl ScheduledTask for SimpleScheduledTask {
         let len = self.schedule.iter().position(|&b| b == 0).unwrap_or(64);
         &self.schedule[..len]
     }
-    fn status(&self) -> TaskStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
+    fn status(&self) -> TaskStatus { {
+        let raw = self.status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TaskStatus::Running,
+            2 => TaskStatus::Completed,
+            3 => TaskStatus::Failed,
+            _ => TaskStatus::Pending,
+        }
+    } }
     fn last_run(&self) -> u64 { self.last_run.load(Ordering::SeqCst) as u64 }
 }
 

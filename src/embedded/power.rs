@@ -55,7 +55,16 @@ impl PowerState for SimplePowerState {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
-    fn mode(&self) -> PowerMode { unsafe { core::mem::transmute(self.mode.load(Ordering::SeqCst)) } }
+    fn mode(&self) -> PowerMode { {
+        let raw = self.mode.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PowerMode::Idle,
+            2 => PowerMode::Sleep,
+            3 => PowerMode::DeepSleep,
+            4 => PowerMode::Off,
+            _ => PowerMode::Active,
+        }
+    } }
     fn voltage(&self) -> f32 { (self.voltage.load(Ordering::SeqCst) as f32) / 1000.0 }
 }
 
@@ -87,7 +96,16 @@ impl PowerManager for SimplePowerManager {
     }
     
     fn get_mode(&self) -> PowerMode {
-        unsafe { core::mem::transmute(self.current_mode.load(Ordering::SeqCst)) }
+        {
+        let raw = self.current_mode.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PowerMode::Idle,
+            2 => PowerMode::Sleep,
+            3 => PowerMode::DeepSleep,
+            4 => PowerMode::Off,
+            _ => PowerMode::Active,
+        }
+    }
     }
     
     fn get_voltage(&self) -> f32 {

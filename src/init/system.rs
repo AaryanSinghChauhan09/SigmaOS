@@ -145,9 +145,16 @@ impl SimpleService {
     }
 
     pub fn get_state(&self) -> ServiceState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ServiceState::Starting,
+            2 => ServiceState::Running,
+            3 => ServiceState::Stopping,
+            4 => ServiceState::Failed,
+            _ => ServiceState::Stopped,
         }
+    }
     }
 
     pub fn set_state(&self, state: ServiceState) {

@@ -51,7 +51,14 @@ impl TouchPoint for SimpleTouchPoint {
     fn id(&self) -> TouchID { self.id }
     fn x(&self) -> u32 { self.x.load(Ordering::SeqCst) as u32 }
     fn y(&self) -> u32 { self.y.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> TouchState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> TouchState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TouchState::Down,
+            2 => TouchState::Move,
+            _ => TouchState::Up,
+        }
+    } }
     fn pressure(&self) -> u32 { self.pressure.load(Ordering::SeqCst) as u32 }
 }
 
