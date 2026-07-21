@@ -17,6 +17,7 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
+
 ---
 
 ## 📊 System Architecture
@@ -34,13 +35,12 @@ graph TD
     Bus --> S-AI[S-AI: Local LLM Orchestrator]
 ```
 
-- **S-MM**: Sovereign Memory Manager (Buddy Allocator + Page Directory Controller).
-- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF + EEVDF).
+- **S-MM**: Sovereign Memory Manager (Buddy Allocator).
+- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
 - **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
 - **S-SEC**: Security Framework (PQC + MAC + Sandbox).
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
-- **S-IPC**: Zero-Copy Capability-Gated Message Queue.
-- **S-Signal**: Capability-Gated Signal Dispatcher.
+
 
 ---
 
@@ -98,109 +98,6 @@ For a detailed review of all security policies, see the canonical [Security Fram
 
 ---
 
-## 📋 Implementation Status
-
-### ✅ Completed Features
-
-#### Kernel Performance
-- **Zero-Copy IPC Queue**: Lock-free ring buffer for kernel IPC
-- **UDF Scheduler VM**: User-Defined Function bytecode scheduler
-- **EEVDF Scheduler**: Earliest Eligible Virtual Deadline First scheduling
-- **S-INIT Supervisor**: s6-style hierarchical service supervision
-- **Gap Filling**: S-IPC, S-Signal, S-MM implementations
-
-#### Distro Absorption
-- **CPU Feature Detection**: Gentoo-style compiler optimizations (AVX512, AMX, Neon, SVE)
-- **S-PAC Package Manager**: Arch-style rolling upgrades with DPLL SAT solver
-- **JIT Optimization Selector**: Dynamic CPU extension enumeration
-
-#### Networking
-- **ZenithNet**: Zero-copy networking stack
-- **Polymorphic Network Drivers**: E1000, RTL8139, VirtIO Net
-- **Zero-Copy Packet Ring**: DMA ring buffer interface
-- **SovereignBrowser**: Native browser core with Brave Shield adblocking
-- **Firefox Containers**: Tab isolation and cookie partitioning
-
-#### Filesystem
-- **SigmaFS**: Crash-consistent Merkle tree filesystem
-- **JBD2-Style Journal**: Transactional logging with CRC32C
-- **CoW Architecture**: Copy-on-Write node management
-- **Polymorphic Storage**: NVMe and AHCI SATA controllers
-
-#### System Tools
-- **SigmaDeploy**: Automated provisioning with TFTP/DHCP netboot
-- **SigmaCluster**: Grid orchestrator with node management
-- **SigmaIdentity**: Enterprise directory with LDAP/Kerberos
-- **SigmaAccess**: Visual and audio inclusivity toolkit
-
-#### Compatibility
-- **S-COSMOS**: Cross-platform compatibility shard
-- **S-WINE**: Windows PE binary translator
-- **S-COCOA**: macOS Mach-O application wrapper
-- **S-ANDROID**: Android APK loader with Binder emulation
-
-#### Graphics
-- **Zenith Compositor**: Direct-to-hardware framebuffer splicing
-- **GNOME/KDE/COSMIC**: Feature absorption from major DEs
-- **Accessibility**: Screen reader, high contrast, magnification
-- **Animation System**: Linear, EaseIn, EaseOut, EaseInOut curves
-
-#### AI
-- **S-AI Engine**: Local AI engine and multi-agent automation
-- **SovereignML**: Zero-dependency tensor computation
-- **Agent Orchestrator**: Multi-agent task planner
-- **Compute Backends**: CPU SIMD, Vulkan GPU, NPU support
-
----
-
-## 🛠️ Development
-
-### Building from Source
-
-```bash
-# Install Rust toolchain
-rustup install nightly
-rustup default nightly
-
-# Build the kernel
-cargo build --release
-
-# Run tests
-cargo test
-```
-
-### Contributing
-
-SigmaOS welcomes contributions! Please see [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for guidelines.
-
----
-
-## 📚 Documentation
-
-- [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-- [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security_Framework)
-- [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
-- [Network Stack](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Network_Stack)
-- [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
-
----
-
-## 📄 License
-
-SigmaOS is licensed under the [SigmaOS Sovereign License](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE.md).
-
----
-
-## 🙏 Acknowledgments
-
-SigmaOS draws inspiration from and builds upon concepts from:
-- Linux kernel heritage (v0.01 through 6.x)
-- Gentoo (CPU optimizations)
-- Arch Linux (rolling package management)
-- NixOS (atomic state management)
-- Debian (stability focus)
-- And many other open-source projects
-
 ## 📚 Canonical Documentation (GitHub Wiki)
 
 ```text
@@ -219,65 +116,62 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ APIC + timer
 - ✅ sigma_pledge + sigma_unveil
 - ✅ Kyber-1024 KEM + Dilithium-5
+- ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
+- ✅ Linux Driver Absorption Engine
+- ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+
+**Networking & Storage:**
 - 🔄 TCP/UDP stack - Partial
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
+
+**Desktop & Productivity:**
 - ✅ Zenith Desktop prototype
+- ✅ Screen recorder with GPU acceleration
+- ✅ Screenshot tool with annotation
+- ✅ Calendar + task manager
+- ✅ Email client with IMAP/SMTP
+- ✅ Note-taking app with Markdown
+- ✅ Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- ✅ Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- ✅ Password manager with biometric unlock
+- ✅ Intrusion detection system
+- ✅ Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- ✅ Virtual machine manager (QEMU/KVM)
+- ✅ Container manager (Docker/Podman)
+
+**Package Management:**
 - ✅ sigma-pkg CLI
-- ✅ NixOS-style atomic generation manager
-- ✅ Arch-style SAT solver and package parser
-- ✅ Android-style runtime capability token guard
-- ✅ Kali-style isolated system tracing sandbox
-- ✅ BusyBox-style multi-call shell parser
-- ✅ Image decoder (PNG, JPEG, GIF, BMP, WebP, TIFF)
-- ✅ Audio codec (FLAC, MP3, OGG Vorbis, WAV)
-- ✅ Document engine (Markdown, LaTeX, RTF, ODT, ODS)
-- ✅ Browser core with tab isolation and adblocker
-- ✅ SQL database engine with ACID transactions
-- ✅ Advanced memory management (NUMA allocator, slab allocator, secure free detection)
-- ✅ Complete TCP/IP networking stack (IPv6, routing, TLS)
-- ✅ Security frameworks (SELinux/AppArmor equivalent, audit trails)
-- ✅ Virtualization support (namespaces, cgroups)
-- ✅ Power management (CPUFreq scaling)
-- ✅ Hardware monitoring and watchdog support
-- ✅ Journaling filesystems (Btrfs, XFS)
-- ✅ GPU drivers (basic GPU acceleration)
-- ✅ Audio stack (ALSA equivalent)
+- ✅ Universal package manager
+- ✅ Rollback package snapshots
+
+**Networking:**
+- ✅ Cloud sync engine
+- ✅ Built-in torrent client
+- ✅ Network traffic analyzer
+
+**AI & Automation:**
+- ✅ AI orchestrator for system optimization
+
+**Customization:**
+- ✅ Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
-
-### Driver Ecosystem Status
-
-**Phase 4: Driver Ecosystem — 100% Complete** ✅
-
-- ✅ 8 Modern Drivers (Bluetooth, Printer, GPU, Audio, WiFi, Touch, Framebuffer, USB HID)
-- ✅ 6 Ancient Device Drivers (UART, ISA Bus, NE2000, MFM Disk, AdLib, EGA/CGA)
-- ✅ 35 Unit Tests with Full Coverage
-- ✅ Linux Kernel Heritage Patterns Absorbed (v0.01 through 6.x)
-- ✅ #![no_std] Compatible Architecture
-- ✅ Complete Documentation (Driver_Ecosystem.md)
-
-**Driver Coverage**: 90% of common hardware supported
-
-**Linux Kernel Absorption:**
-- ✅ NixOS-style atomic generation manager
-- ✅ Arch-style SAT solver and package parser
-- ✅ Android-style runtime capability token guard
-- ✅ Kali-style isolated system tracing sandbox
-- ✅ BusyBox-style multi-call shell parser
-- ✅ Image decoder (PNG, JPEG, GIF, BMP, WebP, TIFF)
-- ✅ Audio codec (FLAC, MP3, OGG Vorbis, WAV)
-- ✅ Document engine (Markdown, LaTeX, RTF, ODT, ODS)
-- ✅ Browser core with tab isolation and adblocker
-- ✅ SQL database engine with ACID transactions
-- ✅ Advanced memory management (NUMA allocator, slab allocator, secure free detection)
-- ✅ Complete TCP/IP networking stack (IPv6, routing, TLS)
-- ✅ Security frameworks (SELinux/AppArmor equivalent)
-- ✅ Virtualization support (namespaces, cgroups)
-- ✅ Power management (CPUFreq scaling)
-- ✅ Hardware monitoring and watchdog support
-- ✅ Journaling filesystems (Btrfs, XFS)
-- ✅ GPU drivers (basic GPU acceleration)
-- ✅ Audio stack (ALSA equivalent)
 
 
 ---
@@ -317,6 +211,9 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
+- **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
+- **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
