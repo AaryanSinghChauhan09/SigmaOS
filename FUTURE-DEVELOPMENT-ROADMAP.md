@@ -559,12 +559,70 @@ To guarantee continuous parity and eventual domination over mainstream Linux dis
 
 ---
 
-## 13. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
+## 13. SOVEREIGNCLI COMMAND-LINE SYNTHESIS ENGINE (S-CLI)
+
+SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
+
+```
++-----------------------------------------------------------------------------------------+
+|                                SOVEREIGNCLI COMMAND DISPATCHER                          |
++-----------------------------------------------------------------------------------------+
+| [zenith window]  | [zenith capture] | [sigpkg compile] | [vault access] | [net inspect] |
+| - Align/Scale    | - GPU-Record     | - DPLL Linker    | - PQC Cipher   | - DPI Buffer  |
++-----------------------------------------------------------------------------------------+
+|                      S-CLI Command Trait (CommandPattern / Singleton)                   |
++-----------------------------------------------------------------------------------------+
+```
+
+### 13.1 Unified command Architecture
+All CLI commands implement a shared systems abstraction layer where parse routing, validation, and execution require explicit `CapabilityToken` checks before running:
+
+* **Command Registry Singleton (`CliCommandRegistry`):** Tracks and exposes all active commands available to userspace. Maps textual command paths (e.g., `zenith window tile`) to distinct `CliCommand` object instances.
+* **Polymorphic Action Execution:**
+  ```
+  Base Abstract Class: CliCommand
+    +-- execute(&mut self, arguments: &[&str], token: CapabilityToken) -> Result<String, CliError>
+    +-- name(&self) -> &str
+    +-- help_graph(&self) -> String
+  ```
+
+### 13.2 Graphic-to-Command Mappings & Specifications
+
+#### A. Window & Workspace Management (`zenith window`)
+* **GUI Action:** Dragging, tiling, scaling, and closing application workspaces on Zenith.
+* **CLI Command:** `zenith window <command_args>`
+  - `zenith window tile --layout=split-horizontal`: Triggers the EEVDF-aligned, multi-priority visual tiling manager, partitioning Zenith viewports on active framebuffers.
+  - `zenith window scale --id=<window_id> --width=800 --height=600`: Directly resizes a specified `ZenithWindow` surface via thread-safe compositor command pipes.
+
+#### B. Direct Screen Capturing & Recording (`zenith capture`)
+* **GUI Action:** Recording screen areas or taking annotations.
+* **CLI Command:** `zenith capture <command_args>`
+  - `zenith capture take --region=0,0,800,600 --out=/store/snap.png`: Executes a zero-copy blit from display memory to our CAS storage blocks.
+  - `zenith capture record --fps=60 --gpu-accel=true --out=/store/session.webm`: Directs ZenithNet and GPU scheduler pipelines to stream composited framebuffer pages natively.
+
+#### C. Content-Addressed Software Linker (`sigpkg compile`)
+* **GUI Action:** Selecting application components and installing package files.
+* **CLI Command:** `sigpkg compile <command_args>`
+  - `sigpkg compile --src=/src/my_app --out=/store/sha256-output.sigma`: Instantiates our JIT compiler-rt layers and evaluates package build trees without legacy compiler-chain bloat.
+
+#### D. Quantum Vault Security Gateway (`vault access`)
+* **GUI Action:** Biometric unlock, credential management, and secure directory encryption.
+* **CLI Command:** `vault access <command_args>`
+  - `vault access decrypt --target=/store/private_vault --key-token=<dilithium_sig>`: Invokes Dilithium-5 decryption routes natively over isolated process boundaries.
+
+#### E. Deep Network Intrusion Inspection (`net inspect`)
+* **GUI Action:** Opening dynamic bandwidth graphs and monitoring threat alerts.
+* **CLI Command:** `net inspect <command_args>`
+  - `net inspect dma --interface=e1000 --pattern="UNION SELECT"`: Intercepts raw packet descriptors over lock-free ring-buffer pipelines, matching incoming payloads against threat signatures.
+
+---
+
+## 14. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
 
 In accordance with strict low-level system design principles, all strategic specifications, component models, and driver frameworks detailed inside this document represent declarative, architectural planning blueprints.
 
-### 13.1 Pure Design Blueprints
+### 14.1 Pure Design Blueprints
 No compilable Rust, Zig, or Nim source library modules are implemented within this specification file. Systems are mapped exclusively through detailed visual UML flowcharts, ASCII architectural layouts, and declarative state definitions.
 
-### 13.2 Zero Standard Runtime Dependency
+### 14.2 Zero Standard Runtime Dependency
 All proposed code models utilize raw, user-defined primitive values, direct hardware mapping offsets, and zero-allocation logic. This ensures that when features are translated into implementation targets, the final compiles remain lightweight, fast, and completely free from third-party standard libraries or dynamic platforms.
