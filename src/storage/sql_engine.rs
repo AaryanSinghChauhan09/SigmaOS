@@ -192,10 +192,10 @@ impl SqlEngine {
     ) -> Result<QueryResult, &'static str> {
         let table = self.tables.get(table_name).ok_or("Table not found")?;
 
-        let column_indices = if let Some(cols) = columns {
+        let column_indices = if let Some(ref cols) = columns {
             // Select specific columns
             let mut indices = Vec::new();
-            for col_name in &cols {
+            for col_name in cols {
                 let idx = table
                     .columns
                     .iter()
