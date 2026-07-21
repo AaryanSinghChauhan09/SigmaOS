@@ -325,7 +325,7 @@ impl BatterySaverManager {
                             success: false,
                             power_saved_percent: 0.0,
                             battery_life_extended_minutes: 0,
-                            message: format!("Failed: {}", e),
+                            message: format!("Failed: {:?}", e),
                         });
                     }
                 }
