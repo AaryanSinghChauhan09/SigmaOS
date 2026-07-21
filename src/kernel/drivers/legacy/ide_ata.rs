@@ -282,11 +282,20 @@ mod tests {
     fn test_ata_drive_read_write() {
         let id = AtaIdentify::mock("TestDrive", 1024);
         let mut drive = AtaDrive::new(0, 0, id);
-        let write_data = vec![0xDEu8; 512];
+        let write_data: Vec<u8> = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect();
         drive.write_sectors(0, &write_data).unwrap();
         let mut read_buf = Vec::new();
         drive.read_sectors(0, 1, &mut read_buf).unwrap();
-        assert_eq!(read_buf[0], 0xDE);
+        assert_eq!(read_buf[0], write_data[0]);
         assert_eq!(drive.io_count(), 2);
     }
 

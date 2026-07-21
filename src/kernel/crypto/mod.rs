@@ -341,7 +341,11 @@ mod tests {
 
     #[test]
     fn test_csprng() {
-        let seed = [0xABu8; 32];
+        let seed: [u8; 32] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes();
         let rng = SigmaCsprng::new(&seed);
         let r1 = rng.generate(16);
         let r2 = rng.generate(16);

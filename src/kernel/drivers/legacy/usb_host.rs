@@ -389,11 +389,20 @@ mod tests {
     #[test]
     fn test_usb_mass_storage() {
         let mut msc = UsbMassStorage::new(2048);
-        let write_data = vec![0xDDu8; 512];
+        let write_data: Vec<u8> = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect();
         msc.scsi_write(0, &write_data).unwrap();
         let mut read_buf = Vec::new();
         msc.scsi_read(0, 1, &mut read_buf).unwrap();
-        assert_eq!(read_buf[0], 0xDD);
+        assert_eq!(read_buf[0], write_data[0]);
         assert_eq!(msc.capacity_sectors(), 2048);
     }
 }
