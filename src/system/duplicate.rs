@@ -162,13 +162,14 @@ impl DuplicateFinder {
                 let mut group = DuplicateGroup::new(hash.clone());
                 let mut total_size = 0u64;
 
+                let files_count = files.len();
                 for file in files {
                     total_size += file.size;
                     group.add_file(file);
                 }
 
                 group.total_size = total_size;
-                self.scan_stats.duplicates_found += files.len() - 1;
+                self.scan_stats.duplicates_found += files_count - 1;
                 self.scan_stats.total_duplicate_size += total_size;
                 self.scan_stats.potential_savings += group.space_savings();
                 self.duplicate_groups.push(group);

@@ -270,14 +270,14 @@ impl MemoryLeakDetector {
 
     /// Check if there are leaks
     pub fn has_leaks(&self) -> bool {
-        self.current_report
+        self.current_report.as_ref()
             .map(|r| r.leaked_allocations > 0)
             .unwrap_or(false)
     }
 
     /// Get total leaked bytes
     pub fn total_leaked_bytes(&self) -> u64 {
-        self.current_report
+        self.current_report.as_ref()
             .map(|r| r.total_leaked_bytes)
             .unwrap_or(0)
     }

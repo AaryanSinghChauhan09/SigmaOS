@@ -46,7 +46,7 @@ impl SimpleThread {
 
 impl Thread for SimpleThread {
     fn id(&self) -> ThreadID { self.id }
-    fn state(&self) -> ThreadState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ThreadState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
     fn priority(&self) -> Priority { self.priority }
     fn set_state(&mut self, state: ThreadState) {
         self.state.store(state as usize, Ordering::SeqCst);

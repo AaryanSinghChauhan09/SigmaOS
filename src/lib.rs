@@ -61,18 +61,13 @@ pub use community::{
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
 };
 pub use compatibility::{
-<<<<<<< HEAD
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, FhsConventionStatus, HtmlRendererCapability, LsbProfile,
     MediaDecoderCapability, PosixComplianceLevel, StandardsComplianceManager,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
-=======
-    ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FhsConventionStatus, IndianLanguage, LocalizationManager,
-    LocalizationProvider, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
-    TargetPlatform, TranslationLayer,
+    BinaryFormat as CrossPlatformBinaryFormat, CompatibilityError as CrossPlatformError,
+    IndianLanguage, LocalizationManager, LocalizationProvider,
     ApkLoader, BinderCallType, BinaryFormat as ScosmosBinaryFormat, CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
->>>>>>> e4a763ec59eea3021110447db27b0902eaddc9c6
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -111,14 +106,11 @@ pub use ecosystem::{
 };
 pub use education::{
     DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
-<<<<<<< HEAD
-=======
 };
 pub use audio::{
     AudioChannels, AudioCodec, AudioDriver, AudioDriverError, AudioDriverResult, AudioFormat,
     AudioMetadata, AudioSampleRate, DecodedAudio,
     AlsaAudioStack, AudioDirection as AlsaDirection, AudioFormat as AlsaFormat, ChannelConfig, MixerControl, PcmStream, SampleRate as AlsaSampleRate,
->>>>>>> e4a763ec59eea3021110447db27b0902eaddc9c6
 };
 pub use filesystem::{
     DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
@@ -139,25 +131,20 @@ pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
     RoadmapMilestone, TransparentRoadmap,
 };
-<<<<<<< HEAD
-pub use kernel::{
-    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
-    BuddyAllocator, Channel, DeviceDriver, DriverError, DriverMetadata, DriverRegistry,
-    DriverType, FileSystem, FileFlags, FileHandle, FsError, IoOperation, IoResult, IpcError,
-    IpcManager, LinuxAbsorptionEngine, LinuxHeritage, MapFlags, MemoryBlock, MemoryError,
-    MemoryManager, Message, NetworkError, NetworkStack, Priority, Process, ProcessState,
-    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SecureDriverWrapper,
-    SocketDomain, SocketHandle, SocketProtocol, SocketType, PAGE_SIZE,
-=======
 pub use iso::builder::{
     BuildError, BuildPipeline, BuildStatus, BuildStep, GRUBConfig, ISOPackager,
     SimpleBuildPipeline, SimpleGRUBConfig, SimpleISOPackager,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
+    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
+    BuddyAllocator, Channel, DeviceDriver, DriverError, DriverMetadata, DriverRegistry,
+    DriverType, FileSystem, FileFlags, FileHandle, FsError, IoOperation, IoResult,
+    IpcManager, LinuxAbsorptionEngine, LinuxHeritage, MapFlags, MemoryBlock,
+    Message, Priority, Process, ProcessState,
+    RoundRobinConfig, RoundRobinScheduler, SecureDriverWrapper,
+    SocketDomain, SocketHandle, SocketProtocol, SocketType, PAGE_SIZE,
     AllocationPolicy as NumaAllocationPolicy, NumaAllocator, NumaNode, NodeState,
-    Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError,
     SanitizationLevel, SecureFreeDetector, SecureFreeStats,
     SlabAllocator as KernelSlabAllocator, SlabCache, SlabCacheStats, SlabState,
     CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType,
@@ -165,11 +152,9 @@ pub use kernel::{
     IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue,
     CpuInstructionExtension, SovereignCompilerOptimizer,
     IpcMessage, PageDirectoryController, PageDirectoryEntry, SignalDispatcher, SovereignIpcBus,
-    SovereignSignal,
-    DeviceDriver, DriverError, DriverMetadata, FileSystem, FilesystemMetadata, FsError,
+    SovereignSignal, FilesystemMetadata,
     MemoryManager, MemoryError, MemoryManagerMetadata, NetworkError, NetworkStack, NetworkStackMetadata,
-    Scheduler, SchedulerError, SchedulerMetadata,
->>>>>>> e4a763ec59eea3021110447db27b0902eaddc9c6
+    Scheduler, SchedulerError, SchedulerMetadata, IpcError, FsError,
 };
 pub use legal::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
@@ -246,13 +231,10 @@ pub use sigpkg::{
 pub use support::{
     LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
-<<<<<<< HEAD
-=======
 pub use tools::{
     SigmaToolError, SigmaDeploy, SigmaCluster, ClusterNode, NodeState,
     SigmaIdentity, UserIdentity, SigmaAccess, AccessibilityFeature as SigmaAccessibilityFeature,
 };
->>>>>>> e4a763ec59eea3021110447db27b0902eaddc9c6
 pub use virtualization::{
     Cgroup, CgroupController, CgroupManager, CgroupState, CgroupSubsystem,
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

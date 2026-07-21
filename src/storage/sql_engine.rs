@@ -180,7 +180,7 @@ impl SqlEngine {
     pub fn select(&self, table_name: &str, columns: Option<Vec<String>>) -> Result<QueryResult, &'static str> {
         let table = self.tables.get(table_name).ok_or("Table not found")?;
 
-        let column_indices = if let Some(cols) = columns {
+        let column_indices = if let Some(ref cols) = columns {
             // Select specific columns
             let mut indices = Vec::new();
             for col_name in &cols {
@@ -194,8 +194,8 @@ impl SqlEngine {
             (0..table.columns.len()).collect()
         };
 
-        let result_columns = if let Some(cols) = columns {
-            cols
+        let result_columns = if let Some(ref cols) = columns {
+            cols.clone()
         } else {
             table.columns.iter().map(|c| c.name.clone()).collect()
         };
@@ -208,8 +208,8 @@ impl SqlEngine {
 
         Ok(QueryResult {
             columns: result_columns,
-            rows: result_rows,
             affected_rows: result_rows.len(),
+            rows: result_rows,
         })
     }
 

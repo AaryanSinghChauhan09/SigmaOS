@@ -132,7 +132,7 @@ impl SimpleProcess {
 
     pub fn get_state(&self) -> ProcessState {
         unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+            core::mem::transmute(self.state.load(Ordering::SeqCst) as u32)
         }
     }
 
@@ -142,7 +142,7 @@ impl SimpleProcess {
 
     pub fn get_priority(&self) -> ProcessPriority {
         unsafe {
-            core::mem::transmute(self.priority.load(Ordering::SeqCst))
+            core::mem::transmute(self.priority.load(Ordering::SeqCst) as u32)
         }
     }
 
@@ -222,6 +222,7 @@ pub enum SchedulerError {
 
 /// Scheduler statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SchedulerStats {
     pub total_processes: usize,
     pub ready_processes: usize,
