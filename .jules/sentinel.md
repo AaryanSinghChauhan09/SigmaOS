@@ -21,3 +21,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Vulnerability:** Successive `allow_network` port registrations with logical OR operations corrupted bits 16-31, causing unintended port allocations and privilege escalation (e.g. port 80 and 443 producing unauthorized port 507).
 **Learning:** Bitwise OR operations on non-disjoint bit fields pollute boundaries, leaking permissions across fields.
 **Prevention:** Always mask and clear target bit ranges (e.g. `self.bits &= !(0xFFFF << 16)`) before writing new values to bit-packed integers.
+
+## 2026-07-20 - Unclosed Import Delimiters and Committed Merge Conflicts
+**Vulnerability:** Having merge conflict markers committed directly to repository branches leads to immediate parser/compiler termination, acting as an unintentional Denial-of-Service (DoS) on CI pipelines and developer builds.
+**Learning:** Delimiter validation checks must be enforced strictly prior to commit stages to prevent broken master/main trunks.
+**Prevention:** Integrate pre-commit or pre-push gates that search for conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) to ensure only fully resolved files enter upstream integration.
