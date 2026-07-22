@@ -42,6 +42,7 @@ impl Size {
 
 /// Rectangle
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
     pub position: Position,
     pub size: Size,
@@ -256,14 +257,16 @@ impl Surface for BitmapSurface {
 
     fn fill_rect(&mut self, rect: Rectangle, color: Color) {
         let color_value = color.to_u32();
-        let data = self.data_mut();
         let stride = self.stride as usize / 4;
+        let height = self.size.height as i32;
+        let width = self.size.width as i32;
+        let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize
-            ..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize
+            ..(rect.position.y + rect.size.height as i32).min(height) as usize
         {
             for x in rect.position.x.max(0) as usize
-                ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
+                ..(rect.position.x + rect.size.width as i32).min(width) as usize
             {
                 let index = y * stride + x;
                 if index < data.len() {

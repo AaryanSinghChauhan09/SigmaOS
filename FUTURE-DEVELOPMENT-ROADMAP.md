@@ -118,15 +118,20 @@ The driver framework registers concrete implementations optimized for the physic
 * **VgaTextModeDriver:** Manages historical VGA screen grids and character attributes natively.
 * **SerialMouseDriver:** Decodes RS-232 serial byte packets natively over COM1/COM2.
 * **Ne2000NetworkDriver:** Supports legendary ISA network controllers via Ring 3 PIO frame pools.
+* **AdcTempSensorDriver:** Integrates legacy analog-to-digital converter registers, converting polled raw thermistor registers to Celsius floating-point variables via PIO fallbacks.
+* **SpiFlashRomDriver:** Maps Serial Peripheral Interface Flash ROM blocks, enabling reading and sector-erasing operations over low-level SPI controller FIFO ports.
 
 #### B. Modern Silicon and Next-Generation Platforms
-* **PcieGen5NvmeDriver:** Utilizes high-density Memory-Mapped I/O (MMIO), 64-bit hardware descriptor rings, and MSI-X interrupt lines, compliant with the NVMe v1.4 and v2.0 specifications.
+* **PcieGen5NvmeDriver & PcieGen6Bridge:** Utilizes high-density Memory-Mapped I/O (MMIO), 64-bit hardware descriptor rings, and MSI-X interrupt lines, compliant with the NVMe v1.4, v2.0, and PCIe Gen6 architectural specifications.
 * **Thunderbolt4Controller / USB4Host:** Coordinates massive serial buses. Handles high-speed dynamic bus mapping and DMA ring allocations.
 * **Wifi7Adapter / Bluetooth5_4:** Processes multi-gigabit wireless packets natively inside the asynchronous `ZenithNet` driver channels.
 * **IntelXeGpuDriver / NvlinkBus:** Implements high-throughput unified memory mapping (UMA) interfaces. Maps graphics commands directly onto execution queues of parallel hardware accelerators.
 * **CxlMemoryDriver:** Interfaces with Compute Express Link (CXL) host caches, abstracting coherent memory expansions as unified virtual memory ranges.
 * **AppleSiliconUnifiedMemoryBus:** Maps unified storage registers under strict physical address layouts.
 * **Sata3Controller / Ufs4Storage:** Provides hardware-accelerated block pipelines for modern mobile and solid-state devices.
+* **VirtioConsoleDriver:** Provides virtualized I/O console channels communicating with hypervisor-side console rings using lock-free DMA ring buffers and virtqueue routing.
+* **CanBusController:** Processes industrial and vehicular CAN-Bus controller telemetry, supporting dynamic packet priorities and interrupt queues natively.
+* **OptaneNvdimmDriver:** Maps persistent non-volatile DIMM storage bytes directly as coherent physical RAM ranges under SovereignVMM cache protection.
 
 ### 2.3 Auto-Negotiation Broker (`PeripheralBroker`)
 When the system polls a physical bus slot during scanning:
@@ -134,6 +139,23 @@ When the system polls a physical bus slot during scanning:
 2. If the slot registers standard PCIe or MMIO capabilities, the system instantiates the corresponding `ModernSiliconDriver`.
 3. If legacy CMOS or ISA flags are triggered, the system instantiates a matching `LegacyAncientDriver` wrapper with PIO fallback.
 4. The Broker registers the instantiated driver under the `PeripheralManager` singleton. Applications access the hardware through a single, consistent `UnifiedPeripheral` interface, hiding generation differences entirely.
+
+### 2.4 Universal Adapter-Based Driver Compatibility Shards
+To achieve absolute hardware coverage and render legacy operating systems obsolete, SigmaOS implements polymorphic driver adapters. These adapters extend the base `PeripheralDevice` abstract trait, allowing third-party drivers compiled for alternative operating systems to execute inside capability-gated enclaves without recompilation:
+
+```
++-------------------------------------------------------------------------------+
+|                            Unified Polymorphic Device Bus                     |
++-------------------------------------------------------------------------------+
+|   [LinuxDriverAdapter]    |  [WindowsNdisAdapter]   |   [WasmDriverAdapter]   |
+|   - Wraps SKB & PCI Dev   |  - Miniport Emulations  |   - WebAssembly VM      |
+|   - Zero-Copy Translaton  |  - Gated Ring 3 Shards  |   - Guest-to-Host Gate  |
++-------------------------------------------------------------------------------+
+```
+
+* **1. LinuxDriverAdapter (The Linux Kernel Bridge):** Dynamically wraps standard Linux PCI and USB network/storage drivers. It exposes legacy Linux subsystem exports natively on the microkernel (such as translating `sk_buff` packet descriptors to ZenithNet ring-buffer pages, and converting standard `net_device_ops` into capability-checked `PeripheralDevice` actions) with zero performance degradation.
+* **2. WindowsNdisAdapter (The Windows Miniport Emulation Shard):** Houses an NDIS-compliant runtime layer capable of loading pre-compiled Windows Network Miniport binary drivers (.sys files). By emulating core kernel exports (such as `NdisMRegisterMiniportDriver` and `NdisAllocateNetBuffer`), it executes Windows-native drivers inside Ring 3 userspace enclaves, completely protecting the microkernel against blue screens or driver-level heap corruption.
+* **3. WasmDriverAdapter (The WebAssembly Virtual Driver Engine):** Orchestrates sandboxed, portable, hardware-independent WebAssembly drivers inside an isolated userspace VM. This engine maps physical device registers directly onto a virtual, bound-checked linear memory region, providing near-native execution speeds while guaranteeing that an unstable or corrupted WebAssembly driver can be rebooted instantly by the `SelfHealingModule` without disrupting system uptime.
 
 ---
 
@@ -201,6 +223,11 @@ SigmaOS is designed to systematically replace, absorb, and dominate traditional 
 * **The SigmaOS Domination:**
   - **S-DNF Package Engine:** Bypasses risky installation scripts by treating system packages as read-only Content-Addressed Storage (CAS) objects.
   - **Clean filesystem Hierarchy (FHS):** Removes Unix legacy directories, organizing resources into `/shards` (isolated drivers), `/system` (core kernel), and `/userland` (sandboxed applications).
+  - **sigma_community_mesh:** Connects developers and contributors over a decentralized peer-to-peer grid, enabling seamless, zero-dependency software and driver publication.
+  - **sigma_ai_silicon_tuner:** Coordinates direct, zero-overhead instruction pathways to next-gen NPU/TPU silicon registers, unlocking maximum computational efficiency for AI/ML workloads.
+  - **sigma_omni_compat_layer:** Implements an omni-ABI translation matrix that parses and executes legacy Linux ELF binaries natively with capability-checked gates, completely avoiding standard glibc library bloating.
+  - **sigma_sovereign_defense_grid:** Enforces military-grade Mandatory Access Control (MAC), cryptographically verified boot chains, and air-gapped userspace enclaves natively inside the security shard.
+  - **sigma_polished_ux_daemon:** Runs premium glassmorphism desktop windows and widgets over Zenith display pipelines, paired with an AI-guided assistant for declarative systems control.
 
 #### B. Arch Linux Parity (Unifying Rolling Releases and ABS)
 * **The Linux Flaw:** Broken library state transitions during rolling updates, and unsafe package building (AUR recipes) executing commands under ambient administrative privileges.
@@ -213,6 +240,18 @@ SigmaOS is designed to systematically replace, absorb, and dominate traditional 
 * **The SigmaOS Domination:**
   - **Hardware-Gated CapabilityToken & PledgeManager:** Replaces SELinux. Processes declare exact system access boundaries (e.g., `network`, `stdio`, `fs`) validated at the hardware microkernel gate.
   - **S-TREE Immutable Deployments:** Managing boot images as immutable, read-only Merkle-tree root nodes, permitting sub-millisecond, zero-reboot system updates.
+
+#### D. Tails & Whonix Parity (S-AMNESIA Volatile Sandbox)
+* **The Linux Flaw:** Persistent storage leaks and forensic tracking vulnerabilities resulting from unencrypted, lazy disk writes and ambient core dumps during execution.
+* **The SigmaOS Domination:**
+  - **S-AMNESIA Volatile Sandboxes:** Executes session-gated workspaces entirely inside dynamic physical RAM page frames.
+  - **Secure Cryptographic Memory Erasure:** On session closing, the microkernel security module sweeps and forcefully overwrites all allocated container frames with custom bit patterns prior to freeing, preventing any forensic cold-boot attacks.
+
+#### E. Void Linux Parity (S-VOID Micro-Init Supervisor)
+* **The Linux Flaw:** Heavy systemd service dependency trees and slow POSIX shell init pipelines delaying system startup.
+* **The SigmaOS Domination:**
+  - **S-VOID Micro-Init Supervisor:** Manages active system daemons as independent, lightweight stateful actors.
+  - **Dynamic Dependency Parsing:** Services declare explicit initialization requirements. S-VOID parses these edges dynamically to execute and monitor daemons in parallel, booting the system with zero redundant context switches.
 
 ### 4.2 Proprietary Operating System Giants
 
@@ -245,6 +284,18 @@ SigmaOS is designed to systematically replace, absorb, and dominate traditional 
 #### D. Performance Diagnostics (Intel Lab LKP: `intel-lab-lkp/linux`)
 * **The Linux Fork Goal:** Heavy user-space profiling scripts to detect memory leaks and scheduling latency regressions.
 * **The SigmaOS Absorption:** Embedded directly in the microkernel core. Telemetry on memory allocation boundaries and context-switch overheads is monitored continuously by the built-in `AiOptimizer` to scale priorities dynamically.
+
+#### E. Embedded Single-Board Clusters ( `linux-99pi` )
+* **The Linux Fork Goal:** Porting and maintaining Raspberry Pi board configurations on custom Linux configurations.
+* **The SigmaOS Absorption:** Replaces duplicate board files with a declarative hardware description system where SPI, I2C, and custom GPIO routing tables map natively to physical addresses.
+
+#### F. Storage Log Schedulers ( `dubeyko/linux` [SSDFS] )
+* **The Linux Fork Goal:** Managing specialized garbage-collection and block storage maps on flash memory arrays.
+* **The SigmaOS Absorption:** Implements log-structured wear-leveling algorithms directly within our polymorphic storage enclaves, completely bypassing OS heap allocations during block compaction loops.
+
+#### G. Secure Cryptographic Hypervisors ( `AMDESE/linux-kvm` )
+* **The Linux Fork Goal:** Sandboxing hypervisors through KVM integrations.
+* **The SigmaOS Absorption:** Fully isolated within standard userspace shards, leveraging AMD-V/Intel-VT directly at the microkernel level using dynamic capability-gated security boundaries.
 
 ---
 
@@ -280,7 +331,7 @@ The Zenith compositor runs directly on the bare-metal hardware display buffers w
 
 ## 6. THE SIGMAPKG CLOUD-NATIVE DEPOSITORIES
 
-SigmaOS establishes a functional, cloud-native package distribution model that guarantees perfect reproducibility, absolute separation of dependencies, and secure installation pipelines.
+SigmaOS establishes a functional, cloud-native package distribution model that guarantees perfect reproducibility, absolute separation of dependencies, and secure installation pipelines, completely absorbing and unifying the strengths of Debian's APT, Red Hat's DNF, Arch's Pacman, openSUSE's Zypper, Gentoo's Portage, and Alpine's APK.
 
 ```
 +-----------------------------------------------------------------------+
@@ -297,13 +348,25 @@ SigmaOS establishes a functional, cloud-native package distribution model that g
 ```
 
 ### 6.1 Content-Addressed Storage (CAS) Package Format
-All system software packages, libraries, and resources are cataloged under cryptographically-secured content-addressed directories (e.g. `/store/sha256-...`). Package version mismatch and dependency overlaps are physically impossible, and duplicate assets across packages are instantly de-duplicated at the sector level.
+All system software packages, libraries, configuration settings, manuals, and metadata are cataloged under cryptographically-secured content-addressed directories (e.g. `/store/sha256-...`). Package version mismatch and dependency overlaps are physically impossible, and duplicate assets across packages are instantly de-duplicated at the sector level, mirroring Alpine's tiny footprint efficiency while retaining absolute integrity.
 
 ### 6.2 DPLL SAT Solver Constraint Engine
-The package dependency resolver utilizes an allocation-free Davis-Putnam-Logemann-Loveland (DPLL) SAT constraint solver. When an installation or update is requested, the solver evaluates the complete system dependency graph. Overlaps, version conflicts, or circular dependency chains are detected prior to file writing, rejecting unsafe transactions automatically.
+The package dependency resolver utilizes an allocation-free Davis-Putnam-Logemann-Loveland (DPLL) SAT constraint solver. When an installation or update is requested, the solver evaluates the complete system dependency graph. Overlaps, version conflicts, or circular dependency chains are detected prior to file writing, rejecting unsafe transactions automatically and eliminating "dependency hell" completely.
 
 ### 6.3 Sovereign Portable App Format (SigmaAppImage)
-A self-contained, read-only application package. It encapsulates software binaries, assets, and mandatory security capabilities into a single signed, compressed image. When executed, the package is mapped directly into memory via `SovereignVMM` without extraction, achieving near-zero launch latency.
+A self-contained, read-only application package. It encapsulates software binaries, assets, and mandatory security capabilities into a single signed, compressed image. When executed, the package is mapped directly into memory via `SovereignVMM` without extraction, achieving near-zero launch latency and completely eliminating cross-distro fragmentation issues.
+
+### 6.4 Post-Quantum Signed Repositories & Trusted Registries
+To replace vulnerable legacy GPG security keys, all official and community repositories are signed utilizing NIST FIPS 203/204 post-quantum Dilithium-5 digital signatures. Repositories are distributed over decentralized Matrix-hosted registries, protecting against single-point of failure hacks and shielding software distribution pipelines against future quantum state adversaries.
+
+### 6.5 Transactional Self-Healing & Sub-Millisecond Rollback (openSUSE Style)
+System updates are executed as pure, atomic transactions. By using log-structured Merkle-tree state re-pointing, the package manager can roll back the entire operating system to any previous generation state in a single instruction cycle. If any file or library corruption is detected during boot-time integrity walks, the microkernel performs atomic self-healing rollbacks with zero system reboot cycles.
+
+### 6.6 Universal Distro Translation Shards (.deb, .rpm, .apk Parsing)
+To enable immediate compatibility with all third-party software in the open-source landscape, SigmaOS embeds isolated translation shards within the S-DNF package core. These shards parse, extract, and translate standard Debian `.deb`, Red Hat `.rpm`, and Alpine `.apk` archives on-the-fly, transforming legacy procedural installation hooks into capability-gated, sandboxed userspace containers running natively on Zenith.
+
+### 6.7 CPUID-Guided JIT Target Customization (Gentoo Portage Style)
+To match Gentoo's extreme customizability and compile-time optimization without the drawback of slow serial compilations, the package manager utilizes our built-in JIT Optimization Selector. By reading CPUID capabilities at install time, the package system dynamically recompiles critical software loops (e.g., matching AVX-512 or AMX registers), delivering maximum hardware pipeline performance on a container-friendly, lightweight footprint.
 
 ---
 
@@ -335,6 +398,8 @@ To achieve institutional adoption parity and match the robustness of the standar
 * **7. SigmaDocs (Unified Knowledge Engine):** A built-in, local help and manual reader (similar to man pages). Provides localized, multilingual document graphs stored as read-only CAS items in the local package store.
 * **8. SigmaQA (Continuous Multi-Hardware Validator):** An automated regression testing harness that executes hardware testing matrices across various configurations. Validates system stability and identifies threading bottlenecks prior to core branch merges.
 * **9. SigmaCertify (Compliance & Cryptographic Auditor):** A specialized diagnostic engine running continuous automated audits. Checks core operations against FIPS 140-3, Common Criteria, GDPR, and SOC 2 requirements, ensuring enterprise credibility.
+* **10. SigmaRescue (Cold-Boot System Diagnostics & Recovery Shell):** An emergency, zero-dependency diagnostics environment. Operates on pre-compiled minimal static structures, giving developers direct read/write access to raw block storage partitions to walk back, audit, and re-point broken Merkle root filesystem hashes dynamically.
+* **11. SigmaMonitor (SIMD-Accelerated Live Performance Telemetry):** A real-time system performance and thermal analyzer. Runs directly inside the Zenith composition layer, displaying dynamic CPU scheduling queues, memory leak gradients, L1/L2 cache hit ratios, and core-temperatures without standard OS heap allocation footprints.
 
 ### 7.2 Strategic Build and Rollout Sequence
 To ensure optimal deployment stability, the SigmaTools suite is built and rolled out sequentially across five scheduled release milestones:
@@ -509,12 +574,108 @@ To maintain absolute architectural safety, all implementations across core syste
 
 ---
 
-## 12. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
+## 12. AUTOMATED UPSTREAM INTELLIGENCE & DAILY UPDATES SCANNING
+
+To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine.
+
+```
+                      +---------------------------------------+
+                      |         Upstream Github Monitor       |
+                      +---------------------------------------+
+                       /                                     \
+                      v                                       v
+         +--------------------------+           +--------------------------+
+         |      Sigma Updater       |           |  Sigma Distros Crusher   |
+         | (Daily upstream patches) |           | (Feature & Parity audit) |
+         +--------------------------+           +--------------------------+
+                      \                                       /
+                       v                                     v
+                      +---------------------------------------+
+                      |       Sovereign Microkernel Shard     |
+                      |   (Incremental Clean Upstream Sync)   |
+                      +---------------------------------------+
+```
+
+### 12.1 The "Sigma Updater" Engine
+* **Mission:** Continuously monitors the repository trees of the Linux Kernel (mainline, stable, and LTS branches), LLVM, GCC, and musl/glibc projects.
+* **Functions:**
+  1. Identifies and parses upstream security advisories, vulnerability disclosures, and critical hardware driver fixes.
+  2. Maps security CVE solutions directly to capability rings in SigmaOS.
+  3. Prepares daily diagnostic and recommendation matrices for incremental microkernel upgrades.
+
+### 12.2 The "Sigma Linux Distros Crusher" Engine
+* **Mission:** Performs systematic code audits against the major packaging, init, and container systems of Ubuntu (apt), Arch (pacman), Fedora (dnf), and NixOS (nix).
+* **Functions:**
+  1. Compiles daily capability parity tables highlighting legacy performance and modular constraints.
+  2. Translates system-level optimizations (such as eBPF-style network parsing, EEVDF real-time scheduling adjustments, and flash wear-leveling log structures) into safe, OOP-compliant, zero-dependency SigmaOS primitives.
+  3. Reports architectural vulnerabilities in mainstream distributions directly to our secure ledger and local knowledge bases.
+
+---
+
+## 13. SOVEREIGNCLI COMMAND-LINE SYNTHESIS ENGINE (S-CLI)
+
+SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
+
+```
++-----------------------------------------------------------------------------------------+
+|                                SOVEREIGNCLI COMMAND DISPATCHER                          |
++-----------------------------------------------------------------------------------------+
+| [zenith window]  | [zenith capture] | [sigpkg compile] | [vault access] | [net inspect] |
+| - Align/Scale    | - GPU-Record     | - DPLL Linker    | - PQC Cipher   | - DPI Buffer  |
++-----------------------------------------------------------------------------------------+
+|                      S-CLI Command Trait (CommandPattern / Singleton)                   |
++-----------------------------------------------------------------------------------------+
+```
+
+### 13.1 Unified command Architecture
+All CLI commands implement a shared systems abstraction layer where parse routing, validation, and execution require explicit `CapabilityToken` checks before running:
+
+* **Command Registry Singleton (`CliCommandRegistry`):** Tracks and exposes all active commands available to userspace. Maps textual command paths (e.g., `zenith window tile`) to distinct `CliCommand` object instances.
+* **Polymorphic Action Execution:**
+  ```
+  Base Abstract Class: CliCommand
+    +-- execute(&mut self, arguments: &[&str], token: CapabilityToken) -> Result<String, CliError>
+    +-- name(&self) -> &str
+    +-- help_graph(&self) -> String
+  ```
+
+### 13.2 Graphic-to-Command Mappings & Specifications
+
+#### A. Window & Workspace Management (`zenith window`)
+* **GUI Action:** Dragging, tiling, scaling, and closing application workspaces on Zenith.
+* **CLI Command:** `zenith window <command_args>`
+  - `zenith window tile --layout=split-horizontal`: Triggers the EEVDF-aligned, multi-priority visual tiling manager, partitioning Zenith viewports on active framebuffers.
+  - `zenith window scale --id=<window_id> --width=800 --height=600`: Directly resizes a specified `ZenithWindow` surface via thread-safe compositor command pipes.
+
+#### B. Direct Screen Capturing & Recording (`zenith capture`)
+* **GUI Action:** Recording screen areas or taking annotations.
+* **CLI Command:** `zenith capture <command_args>`
+  - `zenith capture take --region=0,0,800,600 --out=/store/snap.png`: Executes a zero-copy blit from display memory to our CAS storage blocks.
+  - `zenith capture record --fps=60 --gpu-accel=true --out=/store/session.webm`: Directs ZenithNet and GPU scheduler pipelines to stream composited framebuffer pages natively.
+
+#### C. Content-Addressed Software Linker (`sigpkg compile`)
+* **GUI Action:** Selecting application components and installing package files.
+* **CLI Command:** `sigpkg compile <command_args>`
+  - `sigpkg compile --src=/src/my_app --out=/store/sha256-output.sigma`: Instantiates our JIT compiler-rt layers and evaluates package build trees without legacy compiler-chain bloat.
+
+#### D. Quantum Vault Security Gateway (`vault access`)
+* **GUI Action:** Biometric unlock, credential management, and secure directory encryption.
+* **CLI Command:** `vault access <command_args>`
+  - `vault access decrypt --target=/store/private_vault --key-token=<dilithium_sig>`: Invokes Dilithium-5 decryption routes natively over isolated process boundaries.
+
+#### E. Deep Network Intrusion Inspection (`net inspect`)
+* **GUI Action:** Opening dynamic bandwidth graphs and monitoring threat alerts.
+* **CLI Command:** `net inspect <command_args>`
+  - `net inspect dma --interface=e1000 --pattern="UNION SELECT"`: Intercepts raw packet descriptors over lock-free ring-buffer pipelines, matching incoming payloads against threat signatures.
+
+---
+
+## 14. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
 
 In accordance with strict low-level system design principles, all strategic specifications, component models, and driver frameworks detailed inside this document represent declarative, architectural planning blueprints.
 
-### 12.1 Pure Design Blueprints
+### 14.1 Pure Design Blueprints
 No compilable Rust, Zig, or Nim source library modules are implemented within this specification file. Systems are mapped exclusively through detailed visual UML flowcharts, ASCII architectural layouts, and declarative state definitions.
 
-### 12.2 Zero Standard Runtime Dependency
+### 14.2 Zero Standard Runtime Dependency
 All proposed code models utilize raw, user-defined primitive values, direct hardware mapping offsets, and zero-allocation logic. This ensures that when features are translated into implementation targets, the final compiles remain lightweight, fast, and completely free from third-party standard libraries or dynamic platforms.

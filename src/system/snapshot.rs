@@ -115,8 +115,10 @@ impl SnapshotStorage for FileSnapshotStorage {
 
         // Write metadata
         let metadata_path = snapshot_path.join("metadata.json");
-        let metadata_json = serde_json::to_string(&metadata)
-            .map_err(|e| SnapshotError::SerializationError(e.to_string()))?;
+        let metadata_json = format!(
+            "{{\"id\":\"{}\",\"name\":\"{}\",\"timestamp\":{},\"description\":\"{}\",\"size_bytes\":{},\"is_bootable\":{}}}",
+            metadata.id, metadata.name, metadata.timestamp, metadata.description, metadata.size_bytes, metadata.is_bootable
+        );
         std::fs::write(&metadata_path, metadata_json)
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
@@ -234,8 +236,10 @@ impl SnapshotStorage for MerkleSnapshotStorage {
 
         // Write metadata
         let metadata_path = snapshot_path.join("metadata.json");
-        let metadata_json = serde_json::to_string(&metadata)
-            .map_err(|e| SnapshotError::SerializationError(e.to_string()))?;
+        let metadata_json = format!(
+            "{{\"id\":\"{}\",\"name\":\"{}\",\"timestamp\":{},\"description\":\"{}\",\"size_bytes\":{},\"is_bootable\":{}}}",
+            metadata.id, metadata.name, metadata.timestamp, metadata.description, metadata.size_bytes, metadata.is_bootable
+        );
         std::fs::write(&metadata_path, metadata_json)
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 

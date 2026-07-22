@@ -51,7 +51,7 @@ impl MemoryOptimization {
 
 impl OptimizationStrategy for MemoryOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
-        let start_memory = self.get_memory_usage_mb();
+        let start_memory = Self::get_memory_usage_mb();
 
         // Simulate memory optimization
         let freed = if self.aggressive {
@@ -77,8 +77,8 @@ impl OptimizationStrategy for MemoryOptimization {
     }
 
     fn is_applicable(&self) -> bool {
-        let current_usage = self.get_memory_usage_mb();
-        let total_memory = self.get_total_memory_mb();
+        let current_usage = Self::get_memory_usage_mb();
+        let total_memory = Self::get_total_memory_mb();
         let used_percent = (current_usage as f64 / total_memory as f64) * 100.0;
         used_percent > (100.0 - self.target_free_percent)
     }
@@ -126,7 +126,7 @@ impl CpuOptimization {
 
 impl OptimizationStrategy for CpuOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
-        let start_cpu = self.get_cpu_usage_percent();
+        let start_cpu = Self::get_cpu_usage_percent();
 
         // Simulate CPU optimization
         let saved = if self.reduce_background_processes {
@@ -152,7 +152,7 @@ impl OptimizationStrategy for CpuOptimization {
     }
 
     fn is_applicable(&self) -> bool {
-        let current_usage = self.get_cpu_usage_percent();
+        let current_usage = Self::get_cpu_usage_percent();
         let idle_percent = 100.0 - current_usage;
         idle_percent < self.target_idle_percent
     }
@@ -343,7 +343,7 @@ impl PerformanceEnhancer {
                             success: false,
                             memory_freed_mb: 0,
                             cpu_saved_percent: 0.0,
-                            message: format!("Failed: {}", e),
+                            message: format!("Failed: {:?}", e),
                         });
                     }
                 }
