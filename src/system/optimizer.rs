@@ -430,7 +430,7 @@ mod tests {
     #[test]
     fn test_optimization() {
         let mut enhancer = PerformanceEnhancer::new()
-            .add_strategy(Box::new(MemoryOptimization::new().aggressive()));
+            .add_strategy(Box::new(MemoryOptimization::new().aggressive().with_target(90.0)));
         let results = enhancer.optimize().unwrap();
         assert!(!results.is_empty());
     }

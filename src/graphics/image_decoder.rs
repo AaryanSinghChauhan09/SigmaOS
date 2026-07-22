@@ -52,7 +52,7 @@ impl ImageDecoder {
 
     /// Detect image format from file signature (magic bytes)
     pub fn detect_format(data: &[u8]) -> ImageFormat {
-        if data.len() < 8 {
+        if data.len() < 2 {
             return ImageFormat::Unknown;
         }
 

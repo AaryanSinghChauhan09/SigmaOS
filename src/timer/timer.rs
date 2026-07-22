@@ -6,7 +6,7 @@
 /// No dependency on external timer frameworks
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use core::mem;
 
 /// Timer ID

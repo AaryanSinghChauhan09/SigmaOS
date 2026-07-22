@@ -126,8 +126,9 @@ impl SlabAllocator {
         for slab in &mut cache.slabs {
             for slab_obj in &mut slab.objects {
                 if slab_obj == &Some(obj) {
-                    *slab_obj = None;
-                    slab.inuse -= 1;
+                    if slab.inuse > 0 {
+                        slab.inuse -= 1;
+                    }
                     cache.free_objects += 1;
 
                     // Update slab state

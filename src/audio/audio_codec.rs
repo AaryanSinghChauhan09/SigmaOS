@@ -64,7 +64,7 @@ impl AudioCodec {
 
     /// Detect audio format from file signature
     pub fn detect_format(data: &[u8]) -> AudioFormat {
-        if data.len() < 4 {
+        if data.len() < 3 {
             return AudioFormat::Unknown;
         }
 

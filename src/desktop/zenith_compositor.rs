@@ -319,8 +319,8 @@ impl ZenithCompositor {
 
     /// Find window at point
     pub fn find_window_at_point(&self, x: i32, y: i32) -> Option<u64> {
-        // Iterate in reverse order (top to bottom)
-        for window_id in self.windows.keys().rev() {
+        let window_ids: Vec<_> = self.windows.keys().copied().collect();
+        for window_id in window_ids.iter().rev() {
             if let Some(window) = self.windows.get(window_id) {
                 if window.state == WindowState::Normal || window.state == WindowState::Tiled {
                     if window.geometry.contains_point(x, y) {

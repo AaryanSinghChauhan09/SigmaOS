@@ -24,6 +24,11 @@ impl CapabilityToken {
         Self { bits: 0 }
     }
 
+    /// Check if the token contains the specified capability bitmask
+    pub fn contains(&self, capability: u64) -> bool {
+        (self.bits & capability) == capability
+    }
+
     /// Allow network access
     pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
         match protocol {
@@ -73,6 +78,11 @@ impl CapabilityToken {
     /// Revoke all permissions
     pub fn revoke_all(&mut self) {
         self.bits = 0;
+    }
+
+    /// Allow specific capability bitmask
+    pub fn allow_capability(&mut self, cap: u64) {
+        self.bits |= cap;
     }
 
     /// Get raw capability bits

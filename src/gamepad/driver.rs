@@ -138,8 +138,8 @@ impl GamepadManager for SimpleGamepadManager {
 }
 
 pub trait InputMapping {
-    fn map_button(&mut self, physical: u8, virtual: u8);
-    fn map_axis(&mut self, physical: u8, virtual: u8);
+    fn map_button(&mut self, physical: u8, r#virtual: u8);
+    fn map_axis(&mut self, physical: u8, r#virtual: u8);
     fn get_mapped_button(&self, physical: u8) -> u8;
     fn get_mapped_axis(&self, physical: u8) -> u8;
 }
@@ -160,15 +160,15 @@ impl SimpleInputMapping {
 }
 
 impl InputMapping for SimpleInputMapping {
-    fn map_button(&mut self, physical: u8, virtual: u8) {
+    fn map_button(&mut self, physical: u8, r#virtual: u8) {
         if physical < 16 {
-            self.button_map[physical as usize] = virtual;
+            self.button_map[physical as usize] = r#virtual;
         }
     }
 
-    fn map_axis(&mut self, physical: u8, virtual: u8) {
+    fn map_axis(&mut self, physical: u8, r#virtual: u8) {
         if physical < 4 {
-            self.axis_map[physical as usize] = virtual;
+            self.axis_map[physical as usize] = r#virtual;
         }
     }
 

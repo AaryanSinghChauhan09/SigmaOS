@@ -186,7 +186,7 @@ impl Plugin for SimplePlugin {
         &self.name[..len]
     }
 
-    fn version(&self) -> (u32, u32,-u32) {
+    fn version(&self) -> (u32, u32, u32) {
         self.version
     }
 

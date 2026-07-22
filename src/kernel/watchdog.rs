@@ -41,7 +41,7 @@ pub struct HardwareMonitor {
     pub uptime: u64,          // seconds
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MonitorThreshold {
     CpuTempCritical,
     CpuTempWarning,
@@ -263,7 +263,11 @@ impl WatchdogManager {
 
     /// Get timestamp (simplified)
     fn get_timestamp(&self) -> u64 {
-        self.monitor.uptime
+        if self.monitor.uptime == 0 {
+            1
+        } else {
+            self.monitor.uptime
+        }
     }
 }
 

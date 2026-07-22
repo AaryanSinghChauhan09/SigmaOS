@@ -65,14 +65,11 @@ impl GenerationManager {
 
     /// Remove old generations to reclaim space (keeps last N generations)
     pub fn cleanup_old_generations(&mut self, keep_count: usize) {
-        if self.generations.len() > keep_count {
-            let remove_count = self.generations.len() - keep_count;
-            for _ in 0..remove_count {
-                if let Some(idx) = self.active_generation_idx {
-                    if idx > 0 {
-                        self.generations.remove(0);
-                        self.active_generation_idx = Some(idx - 1);
-                    }
+        while self.generations.len() > keep_count {
+            self.generations.remove(0);
+            if let Some(idx) = self.active_generation_idx {
+                if idx > 0 {
+                    self.active_generation_idx = Some(idx - 1);
                 }
             }
         }

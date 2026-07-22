@@ -77,7 +77,7 @@ pub trait PluginManager {
     fn load_plugin(&mut self, path: &[u8]) -> Result<PluginID, PluginError>;
     fn unload_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
     fn get_plugin(&self, id: PluginID) -> Option<&dyn Plugin>;
-    def enable_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
+    fn enable_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
 }
 
 #[repr(C)]
@@ -145,7 +145,7 @@ impl PluginManager for SimplePluginManager {
 
 pub trait PluginAPI {
     fn register_extension(&mut self, plugin_id: PluginID, extension: &[u8]);
-    def get_extension(&self, plugin_id: PluginID, extension: &[u8]) -> Option<&[u8]>;
+    fn get_extension(&self, plugin_id: PluginID, extension: &[u8]) -> Option<&[u8]>;
 }
 
 #[repr(C)]

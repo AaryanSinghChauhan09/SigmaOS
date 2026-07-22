@@ -96,7 +96,7 @@ impl CgroupManager {
             subsystems: BTreeMap::new(),
         };
 
-        self.cgroups.insert(path, cgroup);
+        self.cgroups.insert(path.clone(), cgroup);
 
         // Set as root if no parent
         if parent.is_none() && self.root_cgroup.is_none() {
@@ -166,8 +166,10 @@ impl CgroupManager {
 
     /// Delete a cgroup
     pub fn delete_cgroup(&mut self, path: &str) -> Result<(), &'static str> {
-        if self.root_cgroup.as_ref() == Some(&path.to_string()) {
-            return Err("Cannot delete root cgroup");
+        if let Some(cgroup) = self.cgroups.get(path) {
+            if Some(&cgroup.name) == self.root_cgroup.as_ref() {
+                return Err("Cannot delete root cgroup");
+            }
         }
 
         self.cgroups.remove(path).ok_or("Cgroup not found")?;

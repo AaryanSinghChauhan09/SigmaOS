@@ -257,7 +257,7 @@ impl SimpleInputHandler {
 
 impl InputHandler for SimpleInputHandler {
     fn handle_event(&mut self, event: &dyn InputEvent) -> InputResult {
-        if !self.capability.can handle {
+        if !self.capability.can_handle {
             return InputResult::Ignored;
         }
 

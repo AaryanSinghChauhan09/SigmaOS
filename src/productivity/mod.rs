@@ -56,7 +56,7 @@ pub use screenshot::{
     ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
 pub use sigma_office::{
-    CellValue, ChartType, DocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
+    CellValue, ChartType, DocumentMetadata as OfficeDocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
     ShapeType, SigmaDocument, SigmaOffice, SlideElementType, SpreadsheetProcessor, TextProcessor,
     TypographyRenderer,
 };

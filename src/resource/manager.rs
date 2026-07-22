@@ -6,7 +6,7 @@
 /// No dependency on external resource frameworks
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use core::mem;
 
 /// Resource ID

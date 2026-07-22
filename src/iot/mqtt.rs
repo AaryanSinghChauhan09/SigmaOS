@@ -114,7 +114,7 @@ impl MQTTClient for SimpleMQTTClient {
 }
 
 pub trait MessageHandler {
-    def on_message(&self, topic: &[u8], payload: &[u8]);
+    fn on_message(&self, topic: &[u8], payload: &[u8]);
 }
 
 #[repr(C)]

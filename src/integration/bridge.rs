@@ -66,7 +66,7 @@ pub trait BridgeManager {
     fn create_bridge(&mut self, bridge_type: BridgeType, target: &[u8]) -> Result<BridgeID, BridgeError>;
     fn destroy_bridge(&mut self, id: BridgeID) -> Result<(), BridgeError>;
     fn get_bridge(&self, id: BridgeID) -> Option<&dyn Bridge>;
-    def send_data(&self, bridge_id: BridgeID, data: &[u8]) -> Result<(), BridgeError>;
+    fn send_data(&self, bridge_id: BridgeID, data: &[u8]) -> Result<(), BridgeError>;
 }
 
 #[repr(C)]

@@ -253,7 +253,7 @@ impl AIAgent for SimpleAIAgent {
             response.push(*byte);
         }
 
-        Ok(response
+        Ok(response)
     }
 
     fn learn(&mut self, input: &[u8], feedback: bool) {

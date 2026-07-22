@@ -6,7 +6,7 @@
 /// No dependency on external IPC frameworks
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use core::mem;
 
 /// IPC endpoint trait (OOP interface)

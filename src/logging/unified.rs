@@ -126,7 +126,7 @@ impl TargetCapability {
         TargetCapability {
             can_write: false,
             can_flush: false,
-            pub can_rotate: false,
+            can_rotate: false,
         }
     }
 

@@ -6,7 +6,11 @@ use core::mem;
 /// Implements process/thread scheduling using OOP principles with traits and structs
 /// No dependency on external scheduler frameworks
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -28,6 +32,10 @@ pub trait Schedulable {
     fn set_last_run_time(&mut self, time: u64);
     /// Get task ID
     fn task_id(&self) -> usize;
+    /// Can yield
+    fn can_yield(&self) -> bool { true }
+    /// Can block
+    fn can_block(&self) -> bool { true }
 }
 
 /// Priority levels
@@ -43,7 +51,7 @@ pub enum Priority {
 
 /// Task state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskState {
     Ready = 0,
     Running = 1,
@@ -122,6 +130,14 @@ impl Schedulable for Task {
 
     fn task_id(&self) -> usize {
         self.id
+    }
+
+    fn can_yield(&self) -> bool {
+        self.capability.can_yield
+    }
+
+    fn can_block(&self) -> bool {
+        self.capability.can_block
     }
 }
 
@@ -270,7 +286,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability.can_yield {
+                    if !task.can_yield() {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Ready);
@@ -285,7 +301,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability.can_block {
+                    if !task.can_block() {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Blocked);
@@ -397,7 +413,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability.can_yield {
+                        if !task.can_yield() {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Ready);
@@ -414,7 +430,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability.can_block {
+                        if !task.can_block() {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Blocked);
@@ -462,81 +478,4 @@ impl Scheduler for PriorityScheduler {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
-            self.len -= 1;
-            item
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}

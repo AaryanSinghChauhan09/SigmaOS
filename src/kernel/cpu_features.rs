@@ -39,16 +39,8 @@ impl SovereignCompilerOptimizer {
     pub fn execute_vector_multiply(&self, lhs: &[f32], rhs: &[f32], out: &mut [f32]) {
         match self.active_extension {
             CpuInstructionExtension::Avx512 => {
-                // Vectorized AVX-512 FMA execution path
-                for i in (0..lhs.len()).step_by(16) {
-                    if i + 15 < lhs.len() {
-                        // In real production, execute native AVX-512 assembly blocks here
-                        for j in 0..16 {
-                            if i + j < out.len() {
-                                out[i + j] = lhs[i + j] * rhs[i + j];
-                            }
-                        }
-                    }
+                for i in 0..lhs.len() {
+                    out[i] = lhs[i] * rhs[i];
                 }
             }
             _ => {

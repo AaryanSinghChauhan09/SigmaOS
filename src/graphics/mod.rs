@@ -15,8 +15,8 @@ pub use vector_engine::{PathCommand, Point2D, VectorPath};
 pub use video_timeline::{VideoClip, VideoTimeline, VideoTrack};
 
 pub use compositor::{
-    CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
-    RenderLayer, SigmaCompositor,
+    BitmapSurface, Color, Position as GraphicsPosition, Rectangle, Size as GraphicsSize, Surface,
+    SurfaceCapability, SurfaceInfo,
 };
 pub use gpu_driver::{Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat};
 pub use image_decoder::{ColorSpace, DecodedImage, ImageDecoder, ImageFormat, ImageMetadata};

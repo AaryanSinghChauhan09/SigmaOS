@@ -431,20 +431,19 @@ impl FileSystem for AbsorbedExt4Driver {
     }
 
     fn metadata(&self) -> &crate::kernel::subsystem::FilesystemMetadata {
-        static METADATA: crate::kernel::subsystem::FilesystemMetadata =
-            crate::kernel::subsystem::FilesystemMetadata {
-                name: String::from("AbsorbedExt4"),
-                version: String::from("1.0.0"),
-                fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
-                linux_heritage: None,
-                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
-                max_filename_length: 255,
-                features: vec![
-                    crate::kernel::subsystem::FilesystemFeature::Journaling,
-                    crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
-                ],
-            };
-        &METADATA
+        static METADATA: std::sync::OnceLock<crate::kernel::subsystem::FilesystemMetadata> = std::sync::OnceLock::new();
+        METADATA.get_or_init(|| crate::kernel::subsystem::FilesystemMetadata {
+            name: String::from("AbsorbedExt4"),
+            version: String::from("1.0.0"),
+            fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
+            linux_heritage: None,
+            max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
+            max_filename_length: 255,
+            features: vec![
+                crate::kernel::subsystem::FilesystemFeature::Journaling,
+                crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
+            ],
+        })
     }
 
     fn as_any(&self) -> &dyn Any {

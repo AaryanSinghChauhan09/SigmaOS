@@ -71,7 +71,7 @@ pub trait IoTHub {
     fn add_device(&mut self, device: Box<dyn IoTDevice>) -> Result<DeviceID, IoTError>;
     fn remove_device(&mut self, id: DeviceID) -> Result<(), IoTError>;
     fn get_device(&self, id: DeviceID) -> Option<&dyn IoTDevice>;
-    def send_command(&self, id: DeviceID, command: &[u8]) -> Result<(), IoTError>;
+    fn send_command(&self, id: DeviceID, command: &[u8]) -> Result<(), IoTError>;
 }
 
 #[repr(C)]
@@ -127,7 +127,7 @@ impl IoTHub for SimpleIoTHub {
 
 pub trait AutomationRule {
     fn add_rule(&mut self, trigger: &[u8], action: &[u8]);
-    def execute_rules(&self, event: &[u8]) -> Vec<&[u8]>;
+    fn execute_rules(&self, event: &[u8]) -> Vec<&[u8]>;
 }
 
 #[repr(C)]
