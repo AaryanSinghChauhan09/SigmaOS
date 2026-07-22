@@ -223,11 +223,6 @@ SigmaOS is designed to systematically replace, absorb, and dominate traditional 
 * **The SigmaOS Domination:**
   - **S-DNF Package Engine:** Bypasses risky installation scripts by treating system packages as read-only Content-Addressed Storage (CAS) objects.
   - **Clean filesystem Hierarchy (FHS):** Removes Unix legacy directories, organizing resources into `/shards` (isolated drivers), `/system` (core kernel), and `/userland` (sandboxed applications).
-  - **sigma_community_mesh:** Connects developers and contributors over a decentralized peer-to-peer grid, enabling seamless, zero-dependency software and driver publication.
-  - **sigma_ai_silicon_tuner:** Coordinates direct, zero-overhead instruction pathways to next-gen NPU/TPU silicon registers, unlocking maximum computational efficiency for AI/ML workloads.
-  - **sigma_omni_compat_layer:** Implements an omni-ABI translation matrix that parses and executes legacy Linux ELF binaries natively with capability-checked gates, completely avoiding standard glibc library bloating.
-  - **sigma_sovereign_defense_grid:** Enforces military-grade Mandatory Access Control (MAC), cryptographically verified boot chains, and air-gapped userspace enclaves natively inside the security shard.
-  - **sigma_polished_ux_daemon:** Runs premium glassmorphism desktop windows and widgets over Zenith display pipelines, paired with an AI-guided assistant for declarative systems control.
 
 #### B. Arch Linux Parity (Unifying Rolling Releases and ABS)
 * **The Linux Flaw:** Broken library state transitions during rolling updates, and unsafe package building (AUR recipes) executing commands under ambient administrative privileges.
