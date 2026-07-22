@@ -1166,6 +1166,5 @@ mod tests {
         let check_res = repl.execute_command(check_cmd).unwrap();
         assert!(check_res.contains("System Safety Sanity Scan"));
         assert!(check_res.contains("W^X strictly enforced"));
->>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
     }
 }
