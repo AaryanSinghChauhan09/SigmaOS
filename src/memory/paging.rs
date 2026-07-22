@@ -42,6 +42,7 @@ impl PageTableEntry {
     }
 }
 
+#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -72,6 +73,7 @@ impl Default for PageTable {
     }
 }
 
+#[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
 }
@@ -94,6 +96,10 @@ impl PageDirectory {
     pub fn get_table(&self, idx: usize) -> Option<&PageTable> {
         self.entries.get(idx).and_then(|e| e.as_ref())
     }
+
+    pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
+        self.entries.get_mut(idx).and_then(|e| e.as_mut())
+    }
 }
 
 impl Default for PageDirectory {
@@ -102,6 +108,7 @@ impl Default for PageDirectory {
     }
 }
 
+#[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
 }
@@ -123,6 +130,10 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory(&self, idx: usize) -> Option<&PageDirectory> {
         self.entries.get(idx).and_then(|e| e.as_ref())
+    }
+
+    pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
+        self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
 }
 
@@ -148,10 +159,10 @@ impl SimpleVMM {
         virt: VirtualAddress,
         phys: PhysicalAddress,
     ) -> Result<(), MemoryError> {
-        let pml4_idx = (virt.0 >> 39) & 0x1FF;
-        let pdpt_idx = (virt.0 >> 30) & 0x1FF;
-        let pd_idx = (virt.0 >> 21) & 0x1FF;
-        let pt_idx = (virt.0 >> 12) & 0x1FF;
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
         // Ensure PML4 entry exists
         if self.pml4_table[pml4_idx].is_none() {
@@ -165,14 +176,14 @@ impl SimpleVMM {
             pml4.set_directory(pdpt_idx, PageDirectory::new())?;
         }
 
-        let pdpt = pml4.get_directory(pdpt_idx).unwrap();
+        let pdpt = pml4.get_directory_mut(pdpt_idx).unwrap();
 
         // Ensure PD entry exists
         if pdpt.get_table(pd_idx).is_none() {
             pdpt.set_table(pd_idx, PageTable::new())?;
         }
 
-        let pd = pdpt.get_table(pd_idx).unwrap();
+        let pd = pdpt.get_table_mut(pd_idx).unwrap();
 
         // Set the page table entry
         let pte = PageTableEntry::new(phys);
@@ -185,10 +196,10 @@ impl SimpleVMM {
         &self,
         virt: VirtualAddress,
     ) -> Result<PhysicalAddress, MemoryError> {
-        let pml4_idx = (virt.0 >> 39) & 0x1FF;
-        let pdpt_idx = (virt.0 >> 30) & 0x1FF;
-        let pd_idx = (virt.0 >> 21) & 0x1FF;
-        let pt_idx = (virt.0 >> 12) & 0x1FF;
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
         let pml4 = self.pml4_table[pml4_idx]
             .as_ref()
@@ -203,18 +214,18 @@ impl SimpleVMM {
     }
 
     pub fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), MemoryError> {
-        let pml4_idx = (virt.0 >> 39) & 0x1FF;
-        let pdpt_idx = (virt.0 >> 30) & 0x1FF;
-        let pd_idx = (virt.0 >> 21) & 0x1FF;
-        let pt_idx = (virt.0 >> 12) & 0x1FF;
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
         let pml4 = self.pml4_table[pml4_idx]
             .as_mut()
             .ok_or(MemoryError::PageNotPresent)?;
         let pdpt = pml4
-            .get_directory(pdpt_idx)
+            .get_directory_mut(pdpt_idx)
             .ok_or(MemoryError::PageNotPresent)?;
-        let pd = pdpt.get_table(pd_idx).ok_or(MemoryError::PageNotPresent)?;
+        let pd = pdpt.get_table_mut(pd_idx).ok_or(MemoryError::PageNotPresent)?;
 
         pd.entries[pt_idx] = None;
         Ok(())
