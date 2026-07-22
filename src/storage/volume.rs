@@ -6,7 +6,6 @@ use core::mem;
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
 use core::sync::atomic::{AtomicUsize, Ordering};
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -180,7 +179,11 @@ impl VolumeManager for SimpleVolumeManager {
 pub trait SnapshotManager {
     fn create_snapshot(&mut self, volume_id: VolumeID) -> Result<VolumeID, VolumeError>;
     fn delete_snapshot(&mut self, snapshot_id: VolumeID) -> Result<(), VolumeError>;
-    fn restore_snapshot(&mut self, volume_id: VolumeID, snapshot_id: VolumeID) -> Result<(), VolumeError>;
+    fn restore_snapshot(
+        &mut self,
+        volume_id: VolumeID,
+        snapshot_id: VolumeID,
+    ) -> Result<(), VolumeError>;
 }
 
 #[repr(C)]

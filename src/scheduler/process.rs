@@ -138,6 +138,7 @@ impl SimpleProcess {
         }
     }
 
+    pub fn get_state(&self) -> ProcessState {
         let raw = self.state.load(Ordering::SeqCst) as u32;
         match raw {
             1 => ProcessState::Running,
