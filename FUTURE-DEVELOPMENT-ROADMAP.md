@@ -521,6 +521,7 @@ To maintain absolute architectural safety, all implementations across core syste
 
 ---
 
+<<<<<<< HEAD
 ## 12. AUTOMATED UPSTREAM INTELLIGENCE & DAILY UPDATES SCANNING
 
 To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine.
@@ -750,4 +751,15 @@ To measure our progress toward full parity with legacy Linux distributions, the 
 | **Apps** | Bundled applications| Minimal shell utils | Text editor + terminal| Media players + IDE | Office suite + CAD |
 | **Cloud** | Container runtime | Mock virtualization | Sandboxed containers| OCI‑compliant engine| Kubernetes scale orchestration|
 | **Hardware** | Supported architectures| x86_64 only | x86_64 bare-metal | ARM64 Support | RISC‑V bare-metal |
->>>>>>> origin/jules-109675230653822082-3f4e6804
+
+---
+
+## 12. STRICT "ONLY PLAN & NO CODE" COMPLIANCE DECLARATION
+
+In accordance with strict low-level system design principles, all strategic specifications, component models, and driver frameworks detailed inside this document represent declarative, architectural planning blueprints.
+
+### 12.1 Pure Design Blueprints
+No compilable Rust, Zig, or Nim source library modules are implemented within this specification file. Systems are mapped exclusively through detailed visual UML flowcharts, ASCII architectural layouts, and declarative state definitions.
+
+### 12.2 Zero Standard Runtime Dependency
+All proposed code models utilize raw, user-defined primitive values, direct hardware mapping offsets, and zero-allocation logic. This ensures that when features are translated into implementation targets, the final compiles remain lightweight, fast, and completely free from third-party standard libraries or dynamic platforms.

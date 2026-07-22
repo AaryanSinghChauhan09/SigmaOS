@@ -116,9 +116,12 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ APIC + timer
 - ✅ sigma_pledge + sigma_unveil
 - ✅ Kyber-1024 KEM + Dilithium-5
+<<<<<<< HEAD
 - ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
 - ✅ Linux Driver Absorption Engine
 - ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+=======
+>>>>>>> origin/feature/sigmaos-strategic-roadmap-2789445252773258079
 
 **Networking & Storage:**
 - 🔄 TCP/UDP stack - Partial
