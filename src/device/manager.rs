@@ -64,18 +64,16 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {
-<<<<<<< HEAD
-        let raw = self.device_class.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => DeviceClass::Character,
-            2 => DeviceClass::Network,
-            3 => DeviceClass::Input,
-            4 => DeviceClass::Output,
-            _ => DeviceClass::Block,
+        {
+            let raw = self.device_class.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => DeviceClass::Character,
+                2 => DeviceClass::Network,
+                3 => DeviceClass::Input,
+                4 => DeviceClass::Output,
+                _ => DeviceClass::Block,
+            }
         }
-=======
-        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) }
->>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
