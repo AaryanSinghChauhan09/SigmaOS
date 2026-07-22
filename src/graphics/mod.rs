@@ -4,11 +4,11 @@
 pub mod compositor;
 pub mod gpu_driver;
 pub mod image_decoder;
-pub mod zenith;
-pub mod zenith_compositor;
 pub mod raytracer;
 pub mod vector_engine;
 pub mod video_timeline;
+pub mod zenith;
+pub mod zenith_compositor;
 
 pub use raytracer::{Ray, Sphere, Vec3};
 pub use vector_engine::{PathCommand, Point2D, VectorPath};

@@ -1,7 +1,7 @@
 // ============================================================================
 // SigmaOS — Disruptive Pillars Suite
 // ============================================================================
-// 
+//
 // 1. Adaptive AI-Driven Installer & Gamified Onboarding
 // 2. SigmaHub Unified Marketplace & Security Engine
 // 3. Universal Convergence Shell & WCAG Accessibility Stack
@@ -16,8 +16,8 @@
 #![allow(dead_code)]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 // ============================================================================
 // 1. ADAPTIVE AI-DRIVEN INSTALLER & GAMIFIED ONBOARDING
@@ -116,7 +116,11 @@ impl AdaptiveInstaller {
             hardware: hw,
             persona,
             root_encrypted: true,
-            swap_size_mb: if self.detected_ram_mb < 8192 { 4096 } else { 2048 },
+            swap_size_mb: if self.detected_ram_mb < 8192 {
+                4096
+            } else {
+                2048
+            },
             default_desktop_theme: "SovereignDarkGlass",
             preinstalled_bundles: bundles,
         }
@@ -202,7 +206,11 @@ impl SigmaHubMarketplace {
     }
 
     pub fn scan_and_install(&mut self, app_id: &'static str) -> Result<(), &'static str> {
-        let app = self.catalog.iter().find(|a| a.app_id == app_id).ok_or("App not found in catalog")?;
+        let app = self
+            .catalog
+            .iter()
+            .find(|a| a.app_id == app_id)
+            .ok_or("App not found in catalog")?;
         if app.security_rating == SecurityScanResult::MalwareDetected {
             return Err("Installation blocked: Malware detected");
         }
@@ -320,7 +328,10 @@ impl SelfHealingUpdateEngine {
         }
     }
 
-    pub fn apply_predictive_update(&mut self, target_ver: &'static str) -> Result<(), &'static str> {
+    pub fn apply_predictive_update(
+        &mut self,
+        target_ver: &'static str,
+    ) -> Result<(), &'static str> {
         self.state = UpdateState::StagingTransaction;
         // Simulate A/B slot staging
         self.backup_kernel_version = self.active_kernel_version;
@@ -462,8 +473,17 @@ impl SigmaDaoGovernance {
         id
     }
 
-    pub fn cast_vote(&mut self, proposal_id: u32, vote_for: bool, weight: u64) -> Result<(), &'static str> {
-        let prop = self.proposals.iter_mut().find(|p| p.proposal_id == proposal_id).ok_or("Proposal not found")?;
+    pub fn cast_vote(
+        &mut self,
+        proposal_id: u32,
+        vote_for: bool,
+        weight: u64,
+    ) -> Result<(), &'static str> {
+        let prop = self
+            .proposals
+            .iter_mut()
+            .find(|p| p.proposal_id == proposal_id)
+            .ok_or("Proposal not found")?;
         if vote_for {
             prop.votes_for += weight;
         } else {

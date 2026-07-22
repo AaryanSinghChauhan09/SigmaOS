@@ -1,12 +1,11 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -16,11 +15,20 @@ pub type VolumeID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum VolumeType { Linear = 0, Stripe = 1, Mirror = 2, RAID5 = 3 }
+pub enum VolumeType {
+    Linear = 0,
+    Stripe = 1,
+    Mirror = 2,
+    RAID5 = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum VolumeError { Success = 0, NotFound = 1, CreationFailed = 2 }
+pub enum VolumeError {
+    Success = 0,
+    NotFound = 1,
+    CreationFailed = 2,
+}
 
 pub trait Volume {
     fn id(&self) -> VolumeID;
@@ -58,7 +66,9 @@ impl SimpleVolume {
 }
 
 impl Volume for SimpleVolume {
-    fn id(&self) -> VolumeID { self.id }
+    fn id(&self) -> VolumeID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -80,7 +90,12 @@ impl Volume for SimpleVolume {
 }
 
 pub trait VolumeManager {
-    fn create_volume(&mut self, name: &[u8], volume_type: VolumeType, size: u64) -> Result<VolumeID, VolumeError>;
+    fn create_volume(
+        &mut self,
+        name: &[u8],
+        volume_type: VolumeType,
+        size: u64,
+    ) -> Result<VolumeID, VolumeError>;
     fn delete_volume(&mut self, id: VolumeID) -> Result<(), VolumeError>;
     fn get_volume(&self, id: VolumeID) -> Option<&dyn Volume>;
     fn mount_volume(&mut self, id: VolumeID) -> Result<(), VolumeError>;
@@ -103,7 +118,12 @@ impl SimpleVolumeManager {
 }
 
 impl VolumeManager for SimpleVolumeManager {
-    fn create_volume(&mut self, name: &[u8], volume_type: VolumeType, size: u64) -> Result<VolumeID, VolumeError> {
+    fn create_volume(
+        &mut self,
+        name: &[u8],
+        volume_type: VolumeType,
+        size: u64,
+    ) -> Result<VolumeID, VolumeError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let volume = SimpleVolume::new(id, name, volume_type, size);
         self.volumes.push(Some(Box::new(volume)));
@@ -124,7 +144,9 @@ impl VolumeManager for SimpleVolumeManager {
     fn get_volume(&self, id: VolumeID) -> Option<&dyn Volume> {
         for volume_option in &self.volumes {
             if let Some(ref volume) = *volume_option {
-                if volume.id() == id { return Some(volume.as_ref()); }
+                if volume.id() == id {
+                    return Some(volume.as_ref());
+                }
             }
         }
         None
@@ -191,7 +213,12 @@ impl SnapshotManager for SimpleSnapshotManager {
         Err(VolumeError::NotFound)
     }
 
-    fn restore_snapshot(&mut self, _volume_id: VolumeID, _snapshot_id: VolumeID) -> Result<(), VolumeError> {
+    fn restore_snapshot(
+        &mut self,
+        _volume_id: VolumeID,
+        _snapshot_id: VolumeID,
+    ) -> Result<(), VolumeError> {
         Ok(())
     }
 }
+
