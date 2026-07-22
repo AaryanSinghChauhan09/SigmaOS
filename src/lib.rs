@@ -52,17 +52,6 @@ pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
 };
-pub use ai::{
-    Agent, Agent as SaiAgent, AgentOrchestrator, AgentOrchestrator as SaiOrchestrator, AgentRole,
-    AgentState, AgentTask, AgentTask as SaiTask, AiError, ComputeBackend, LocalModel, ModelSize,
-    SaiEngine, Task, TaskStatus, TaskType, Tensor, TensorCore,
-};
-pub use audio::{
-    AlsaAudioStack, AudioChannels, AudioCodec, AudioDirection as AlsaDirection, AudioDriver,
-    AudioDriverError, AudioDriverResult, AudioFormat, AudioFormat as AlsaFormat, AudioMetadata,
-    AudioSampleRate, ChannelConfig, DecodedAudio, MixerControl, PcmStream,
-    SampleRate as AlsaSampleRate,
-};
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,

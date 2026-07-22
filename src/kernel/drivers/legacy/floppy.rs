@@ -200,11 +200,22 @@ mod tests {
     #[test]
     fn test_floppy_read_write() {
         let mut drv = FloppyDrive::new(0, FloppyType::F1440K);
-        let mut wbuf = [0x42u8; 512];
+        let mut wbuf: [u8; 512] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect::<Vec<u8>>()
+            .try_into()
+            .unwrap();
         drv.write_sector(0, &wbuf).unwrap();
         let mut rbuf = [0u8; 512];
         drv.read_sector(0, &mut rbuf).unwrap();
-        assert_eq!(rbuf[0], 0x42);
+        assert_eq!(rbuf[0], wbuf[0]);
     }
 
     #[test]

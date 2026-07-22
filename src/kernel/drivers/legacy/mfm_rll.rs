@@ -218,11 +218,22 @@ mod tests {
             sectors_per_track: 17,
         };
         let mut disk = MfmDisk::new(0, geo, ControllerType::Mfm);
-        let mut write_buf = [0xABu8; MFM_SECTOR_SIZE];
+        let mut write_buf: [u8; MFM_SECTOR_SIZE] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(MFM_SECTOR_SIZE)
+            .copied()
+            .collect::<Vec<u8>>()
+            .try_into()
+            .unwrap();
         disk.write_sector(0, &write_buf).unwrap();
         let mut read_buf = [0u8; MFM_SECTOR_SIZE];
         disk.read_sector(0, &mut read_buf).unwrap();
-        assert_eq!(read_buf[0], 0xAB);
+        assert_eq!(read_buf[0], write_buf[0]);
         assert_eq!(disk.io_count(), 2);
     }
 

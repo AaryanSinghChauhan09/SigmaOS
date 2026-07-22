@@ -1218,11 +1218,19 @@ mod tests {
 
     #[test]
     fn test_sigmafs_cas_and_pqc() {
-        let trusted_key = [0xAAu8; 32];
+        let trusted_key: [u8; 32] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes();
         let mut fs = SigmaFsCasEngine::new(trusted_key);
 
         let data = b"CONFIDENTIAL_REPRODUCIBLE_SYSTEM_IMAGE";
-        let signature = [0x55u8; DILITHIUM5_SIGNATURE_SIZE];
+        let signature: [u8; DILITHIUM5_SIGNATURE_SIZE] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE].try_into().unwrap();
 
         let block_hash = fs.store_block(data, &signature).unwrap();
 
@@ -1237,8 +1245,17 @@ mod tests {
     #[test]
     fn test_ccleaner_equivalent_sweep_and_duplicate_finder() {
         let mut engine = SovereignCleanupEngine::new();
-        let hash_a = [0x11u8; SHA256_HASH_SIZE];
-        let hash_b = [0x22u8; SHA256_HASH_SIZE];
+        let hash_a: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_le_bytes()[..SHA256_HASH_SIZE].try_into().unwrap();
+        let hash_b: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .wrapping_add(1)
+            .to_le_bytes()[..SHA256_HASH_SIZE].try_into().unwrap();
 
         engine.register_file_metadata(FileMetadata {
             path: "/var/tmp/session.log",
