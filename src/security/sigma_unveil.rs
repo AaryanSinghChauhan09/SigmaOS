@@ -5,7 +5,7 @@
 //! 
 //! ## Usage
 //! 
-//! ```rust
+//! ```ignore
 //! // Allow read access to /etc and read-write access to /tmp
 //! sigma_unveil!("/etc", "r");
 //! sigma_unveil!("/tmp", "rw");

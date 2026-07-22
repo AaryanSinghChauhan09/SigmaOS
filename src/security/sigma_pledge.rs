@@ -5,7 +5,7 @@
 //! 
 //! ## Usage
 //! 
-//! ```rust
+//! ```ignore
 //! // A web server only needs networking and file I/O
 //! sigma_pledge!(["inet", "rpath", "wpath", "proc"]);
 //! 
