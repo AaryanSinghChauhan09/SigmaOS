@@ -67,8 +67,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
+    Achievement, AchievementType, FlintChartEngine, FlintChartSpec, FlintEncoding, FlintMark,
+    FlintValue, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer, ProductivityScore,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
