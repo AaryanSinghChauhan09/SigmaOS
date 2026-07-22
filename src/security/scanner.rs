@@ -33,19 +33,23 @@ impl YaraScanner {
     /// Scans a binary payload for all registered signatures
     pub fn scan(&self, payload: &[u8]) -> Vec<String> {
         let mut matches = Vec::new();
-        
+
         for rule in &self.rules {
             if self.find_subsequence(payload, &rule.signature).is_some() {
                 matches.push(rule.name.clone());
             }
         }
-        
+
         matches
     }
 
     fn find_subsequence(&self, haystack: &[u8], needle: &[u8]) -> Option<usize> {
-        if needle.is_empty() { return Some(0); }
-        haystack.windows(needle.len()).position(|window| window == needle)
+        if needle.is_empty() {
+            return Some(0);
+        }
+        haystack
+            .windows(needle.len())
+            .position(|window| window == needle)
     }
 }
 
@@ -58,10 +62,10 @@ mod tests {
         let mut scanner = YaraScanner::new();
         scanner.add_rule("MalwareA", b"\xDE\xAD\xBE\xEF");
         scanner.add_rule("BackdoorB", b"secret_backdoor");
-        
+
         let safe_file = b"This is a safe file.";
         assert!(scanner.scan(safe_file).is_empty());
-        
+
         let infected_file = b"Some data... \xDE\xAD\xBE\xEF ...more data";
         let matches = scanner.scan(infected_file);
         assert_eq!(matches.len(), 1);

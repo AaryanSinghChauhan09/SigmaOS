@@ -34,7 +34,10 @@ impl NoSqlEngine {
     }
 
     pub fn insert_document(&mut self, collection: &str, key: &str, document: DocumentValue) {
-        let coll = self.collections.entry(String::from(collection)).or_insert_with(BTreeMap::new);
+        let coll = self
+            .collections
+            .entry(String::from(collection))
+            .or_insert_with(BTreeMap::new);
         coll.insert(String::from(key), document);
     }
 
@@ -56,16 +59,22 @@ mod tests {
     #[test]
     fn test_nosql_document_store() {
         let mut db = NoSqlEngine::new("node_a");
-        
+
         let mut user_doc = BTreeMap::new();
-        user_doc.insert(String::from("name"), DocumentValue::Text(String::from("Alice")));
+        user_doc.insert(
+            String::from("name"),
+            DocumentValue::Text(String::from("Alice")),
+        );
         user_doc.insert(String::from("age"), DocumentValue::Integer(30));
 
         db.insert_document("users", "user:1", DocumentValue::Map(user_doc));
 
         let retrieved = db.get_document("users", "user:1").unwrap();
         if let DocumentValue::Map(map) = retrieved {
-            assert_eq!(map.get("name").unwrap(), &DocumentValue::Text(String::from("Alice")));
+            assert_eq!(
+                map.get("name").unwrap(),
+                &DocumentValue::Text(String::from("Alice"))
+            );
             assert_eq!(map.get("age").unwrap(), &DocumentValue::Integer(30));
         } else {
             panic!("Expected Map");
