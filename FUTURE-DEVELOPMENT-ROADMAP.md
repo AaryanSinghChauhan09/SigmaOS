@@ -393,6 +393,8 @@ To achieve institutional adoption parity and match the robustness of the standar
 * **7. SigmaDocs (Unified Knowledge Engine):** A built-in, local help and manual reader (similar to man pages). Provides localized, multilingual document graphs stored as read-only CAS items in the local package store.
 * **8. SigmaQA (Continuous Multi-Hardware Validator):** An automated regression testing harness that executes hardware testing matrices across various configurations. Validates system stability and identifies threading bottlenecks prior to core branch merges.
 * **9. SigmaCertify (Compliance & Cryptographic Auditor):** A specialized diagnostic engine running continuous automated audits. Checks core operations against FIPS 140-3, Common Criteria, GDPR, and SOC 2 requirements, ensuring enterprise credibility.
+* **10. SigmaRescue (Cold-Boot System Diagnostics & Recovery Shell):** An emergency, zero-dependency diagnostics environment. Operates on pre-compiled minimal static structures, giving developers direct read/write access to raw block storage partitions to walk back, audit, and re-point broken Merkle root filesystem hashes dynamically.
+* **11. SigmaMonitor (SIMD-Accelerated Live Performance Telemetry):** A real-time system performance and thermal analyzer. Runs directly inside the Zenith composition layer, displaying dynamic CPU scheduling queues, memory leak gradients, L1/L2 cache hit ratios, and core-temperatures without standard OS heap allocation footprints.
 
 ### 7.2 Strategic Build and Rollout Sequence
 To ensure optimal deployment stability, the SigmaTools suite is built and rolled out sequentially across five scheduled release milestones:
