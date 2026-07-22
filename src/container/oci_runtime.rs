@@ -58,7 +58,15 @@ impl Container for SimpleContainer {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ContainerState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ContainerState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            _ => ContainerState::Deleting,
+        }
+    }
 
     fn start(&mut self) -> Result<(), ContainerError> {
         self.state.store(ContainerState::Running as usize, Ordering::SeqCst);
@@ -262,8 +270,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut self.oci_spec.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.oci_spec.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return container.start();
                 }
@@ -273,8 +281,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut self.oci_spec.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.oci_spec.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return container.stop();
                 }
@@ -298,8 +306,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &self.oci_spec.containers {
-            if let Some(ref container) = *container_option {
+        for container_option in &*self.oci_spec.containers {
+            if let Some(ref container) = container_option {
                 ids.push(container.id());
             }
         }
@@ -308,6 +316,27 @@ impl ContainerRuntime for SimpleContainerRuntime {
 }
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -352,4 +381,21 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
