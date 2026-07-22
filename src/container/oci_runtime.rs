@@ -11,11 +11,11 @@ use core::mem;
 pub type ContainerID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState { Created = 0, Running = 1, Paused = 2, Stopped = 3, Deleting = 4 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError { Success = 0, InvalidConfig = 1, StartFailed = 2, StopFailed = 3, ResourceLimit = 4 }
 
 pub trait Container {
