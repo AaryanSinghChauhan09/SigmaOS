@@ -1,23 +1,33 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Block Storage for SigmaOS
 /// Based on 100-Improvement-Ideas.md storage management concepts
 /// Implements comprehensive block device abstraction, partition management,
 /// and caching for high-performance storage operations
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type BlockDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BlockDeviceType { HDD = 0, SSD = 1, NVMe = 2, Virtual = 3, RAMDisk = 4 }
+pub enum BlockDeviceType {
+    HDD = 0,
+    SSD = 1,
+    NVMe = 2,
+    Virtual = 3,
+    RAMDisk = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BlockError { Success = 0, NotFound = 1, ReadFailed = 2, WriteFailed = 3 }
+pub enum BlockError {
+    Success = 0,
+    NotFound = 1,
+    ReadFailed = 2,
+    WriteFailed = 3,
+}
 
 pub trait BlockDevice {
     fn id(&self) -> BlockDeviceID;
@@ -37,7 +47,12 @@ pub struct SimpleBlockDevice {
 }
 
 impl SimpleBlockDevice {
-    pub fn new(id: BlockDeviceID, device_type: BlockDeviceType, block_size: usize, total_blocks: usize) -> Self {
+    pub fn new(
+        id: BlockDeviceID,
+        device_type: BlockDeviceType,
+        block_size: usize,
+        total_blocks: usize,
+    ) -> Self {
         SimpleBlockDevice {
             id,
             device_type: AtomicUsize::new(device_type as usize),
@@ -48,7 +63,9 @@ impl SimpleBlockDevice {
 }
 
 impl BlockDevice for SimpleBlockDevice {
-    fn id(&self) -> BlockDeviceID { self.id }
+    fn id(&self) -> BlockDeviceID {
+        self.id
+    }
     fn device_type(&self) -> BlockDeviceType {
         match self.device_type.load(Ordering::SeqCst) as u32 {
             1 => BlockDeviceType::SSD,
@@ -58,8 +75,12 @@ impl BlockDevice for SimpleBlockDevice {
             _ => BlockDeviceType::HDD,
         }
     }
-    fn block_size(&self) -> usize { self.block_size.load(Ordering::SeqCst) }
-    fn total_blocks(&self) -> usize { self.total_blocks.load(Ordering::SeqCst) }
+    fn block_size(&self) -> usize {
+        self.block_size.load(Ordering::SeqCst)
+    }
+    fn total_blocks(&self) -> usize {
+        self.total_blocks.load(Ordering::SeqCst)
+    }
 
     fn read_block(&self, _block_num: usize, _buffer: &mut [u8]) -> Result<(), BlockError> {
         Ok(())
@@ -71,7 +92,10 @@ impl BlockDevice for SimpleBlockDevice {
 }
 
 pub trait BlockManager {
-    fn register_device(&mut self, device: Box<dyn BlockDevice>) -> Result<BlockDeviceID, BlockError>;
+    fn register_device(
+        &mut self,
+        device: Box<dyn BlockDevice>,
+    ) -> Result<BlockDeviceID, BlockError>;
     fn unregister_device(&mut self, id: BlockDeviceID) -> Result<(), BlockError>;
     fn get_device(&self, id: BlockDeviceID) -> Option<&dyn BlockDevice>;
     fn list_devices(&self) -> Vec<BlockDeviceID>;
@@ -93,7 +117,10 @@ impl SimpleBlockManager {
 }
 
 impl BlockManager for SimpleBlockManager {
-    fn register_device(&mut self, device: Box<dyn BlockDevice>) -> Result<BlockDeviceID, BlockError> {
+    fn register_device(
+        &mut self,
+        device: Box<dyn BlockDevice>,
+    ) -> Result<BlockDeviceID, BlockError> {
         let id = device.id();
         self.devices.push(Some(device));
         Ok(id)
@@ -113,7 +140,9 @@ impl BlockManager for SimpleBlockManager {
     fn get_device(&self, id: BlockDeviceID) -> Option<&dyn BlockDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.id() == id { return Some(device.as_ref()); }
+                if device.id() == id {
+                    return Some(device.as_ref());
+                }
             }
         }
         None
@@ -131,7 +160,12 @@ impl BlockManager for SimpleBlockManager {
 }
 
 pub trait PartitionTable {
-    fn create_partition(&mut self, device_id: BlockDeviceID, start_block: usize, size_blocks: usize) -> Result<usize, BlockError>;
+    fn create_partition(
+        &mut self,
+        device_id: BlockDeviceID,
+        start_block: usize,
+        size_blocks: usize,
+    ) -> Result<usize, BlockError>;
     fn delete_partition(&mut self, partition_id: usize) -> Result<(), BlockError>;
     fn list_partitions(&self, device_id: BlockDeviceID) -> Vec<(usize, usize, usize)>;
 }
@@ -152,9 +186,15 @@ impl SimplePartitionTable {
 }
 
 impl PartitionTable for SimplePartitionTable {
-    fn create_partition(&mut self, device_id: BlockDeviceID, start_block: usize, size_blocks: usize) -> Result<usize, BlockError> {
+    fn create_partition(
+        &mut self,
+        device_id: BlockDeviceID,
+        start_block: usize,
+        size_blocks: usize,
+    ) -> Result<usize, BlockError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        self.partitions.push((device_id, id, start_block, size_blocks));
+        self.partitions
+            .push((device_id, id, start_block, size_blocks));
         Ok(id)
     }
 
@@ -235,13 +275,25 @@ impl BlockCache for SimpleBlockCache {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -259,15 +311,26 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

@@ -61,7 +61,9 @@ impl Sphere {
 
 /// Simple sqrt substitute for #![no_std] (Newton's method)
 fn sqrt(x: f64) -> f64 {
-    if x <= 0.0 { return 0.0; }
+    if x <= 0.0 {
+        return 0.0;
+    }
     let mut z = x;
     for _ in 0..10 {
         z = z - (z * z - x) / (2.0 * z);
@@ -76,14 +78,26 @@ mod tests {
     #[test]
     fn test_ray_sphere_intersection() {
         let sphere = Sphere {
-            center: Vec3 { x: 0.0, y: 0.0, z: -5.0 },
+            center: Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: -5.0,
+            },
             radius: 1.0,
         };
         let ray = Ray {
-            origin: Vec3 { x: 0.0, y: 0.0, z: 0.0 },
-            direction: Vec3 { x: 0.0, y: 0.0, z: -1.0 },
+            origin: Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            direction: Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: -1.0,
+            },
         };
-        
+
         let t = sphere.intersect(&ray).unwrap();
         // The ray is at z=0 pointing -z, sphere is at z=-5, r=1.
         // Surface is at z=-4.

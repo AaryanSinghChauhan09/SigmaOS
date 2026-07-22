@@ -68,13 +68,13 @@ impl AudioDevice for SimpleAudioDevice {
     }
     fn audio_type(&self) -> AudioType {
         {
-        let raw = self.audio_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => AudioType::Capture,
-            2 => AudioType::Duplex,
-            _ => AudioType::Playback,
+            let raw = self.audio_type.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => AudioType::Capture,
+                2 => AudioType::Duplex,
+                _ => AudioType::Playback,
+            }
         }
-    }
     }
     fn sample_rate(&self) -> u32 {
         self.sample_rate.load(Ordering::SeqCst) as u32
