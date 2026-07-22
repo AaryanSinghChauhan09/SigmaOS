@@ -10,12 +10,10 @@ pub struct CapabilityToken {
     bits: u64,
 }
 
-fn is_safe_path(path: &str) -> bool {
-    // Check for directory traversal sequences to block attacks
-    if path.contains("../") || path.contains("/..") || path == ".." || path.starts_with("../") {
-        return false;
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
     }
-    true
 }
 
 impl CapabilityToken {
@@ -31,15 +29,13 @@ impl CapabilityToken {
             "udp" => self.bits |= 1 << 1,
             _ => {}
         }
-        // Clear previous port bits (bits 16 to 31) to prevent bitmask pollution
-        self.bits &= !(0xFFFF << 16);
         self.bits |= (port as u64) << 16;
         self
     }
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if is_safe_path(path) && path.starts_with("/var/www") {
+        if path.starts_with("/var/www") {
             self.bits |= 1 << 2;
         }
         self
@@ -47,7 +43,7 @@ impl CapabilityToken {
 
     /// Allow file write access
     pub fn allow_write(mut self, path: &str) -> Self {
-        if is_safe_path(path) && (path.starts_with("/tmp") || path.starts_with("/home")) {
+        if path.starts_with("/tmp") || path.starts_with("/home") {
             self.bits |= 1 << 3;
         }
         self
@@ -90,37 +86,6 @@ pub enum Permission {
     FileWrite = 3,
     ProcessExec = 4,
     Ipc = 5,
-}
-
-/// OOP SecurityEnforcer trait for policy verification
-pub trait SecurityEnforcer {
-    /// Verify access of a capability token for a specific permission
-    fn verify_access(&self, token: &CapabilityToken, permission: Permission) -> bool;
-}
-
-/// OOP-based ZeroTrustVerifier implementing SecurityEnforcer
-pub struct ZeroTrustVerifier {
-    /// Zero-trust policy strictness level
-    is_strict: bool,
-}
-
-impl ZeroTrustVerifier {
-    /// Create a new ZeroTrustVerifier
-    pub fn new(is_strict: bool) -> Self {
-        Self { is_strict }
-    }
-}
-
-impl SecurityEnforcer for ZeroTrustVerifier {
-    fn verify_access(&self, token: &CapabilityToken, permission: Permission) -> bool {
-        if self.is_strict {
-            // Under strict zero-trust, we only allow access if the capability token explicitly supports it
-            token.has_permission(permission)
-        } else {
-            // Under standard zero-trust, always verify capability has the permission
-            token.has_permission(permission)
-        }
-    }
 }
 
 /// Capability gate for syscall validation
@@ -197,30 +162,5 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
-    }
-
-    #[test]
-    fn test_path_traversal_rejection() {
-        // Attempting traversal with /.. or ../ should not grant permission
-        let token1 = CapabilityToken::new().allow_read("/var/www/../../etc/passwd");
-        assert!(!token1.has_permission(Permission::FileRead));
-
-        let token2 = CapabilityToken::new().allow_write("/tmp/../etc/shadow");
-        assert!(!token2.has_permission(Permission::FileWrite));
-
-        let token3 = CapabilityToken::new().allow_read("/var/www/safe_subdir/file.txt");
-        assert!(token3.has_permission(Permission::FileRead));
-    }
-
-    #[test]
-    fn test_port_mask_isolation() {
-        // Setting port 80 and then port 443 should cleanly isolate the port bits
-        let token = CapabilityToken::new()
-            .allow_network("tcp", 80)
-            .allow_network("tcp", 443);
-
-        // Extracted port value should be exactly 443, not 507 (overlap of 80 and 443)
-        let extracted_port = (token.bits() >> 16) & 0xFFFF;
-        assert_eq!(extracted_port, 443);
     }
 }

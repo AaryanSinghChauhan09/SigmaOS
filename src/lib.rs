@@ -6,14 +6,13 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
+pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod network;
-pub mod container;
-pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub mod productivity;
@@ -34,8 +33,7 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
-    StandardsComplianceManager, TargetPlatform, TranslationLayer,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -57,10 +55,6 @@ pub use kernel::{
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use observability::{
-    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
-    SimpleObservabilityStack,
-};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -78,14 +72,8 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use container::{
-    SimpleContainerRuntime, ContainerRuntime as CoreContainerRuntime, RuntimeStats, RuntimeCapability,
-    ContainerID, ContainerState, ContainerError, ContainerInfo, ContainerCapability, SimpleContainer
-};
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
-pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
-};
+pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
@@ -93,4 +81,13 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+
+pub mod virt;
+pub use virt::hypervisor::{
+    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
+    VirtualizationGeneration,
+};
+pub use virt::microvm::{
+    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };
