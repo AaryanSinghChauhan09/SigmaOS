@@ -1,6 +1,7 @@
 #![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod audio;
@@ -80,7 +81,6 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-<<<<<<< HEAD
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
     AcpiTableParser, AdLibSynthDriver, AppleSiliconUnifiedMemoryBus, Bluetooth5_4_Adapter, BusType,
     CgaGraphicsDriver, ClockController, ClockError, CxlMemoryDriver, DeviceError as DdeDeviceError,

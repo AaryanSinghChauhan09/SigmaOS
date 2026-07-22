@@ -36,6 +36,7 @@ pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use kernel_io_suite::{
     AclPacket, AdLibSynth, AdLibSynthDriver as KernelAdLibSynth, AlsaError, AlsaSoundDriver,
     AncientDeviceLayer, AncientError, BluetoothError, BluetoothHciDriver, BluetoothMode, BssInfo,
@@ -70,17 +71,6 @@ pub use soc::{
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-
-pub use kernel_releases::{
-    KernelReleaseInfo, LinuxReleaseDriver, Longterm5_10_TpmDriver, Longterm5_15_SerialDriver,
-    Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver, Longterm6_1_InputDriver,
-    Longterm6_6_AudioDriver, MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
-};
-pub use more_devices::{
-    AppleSiliconUnifiedMemoryBus, CgaGraphicsDriver, CxlMemoryDriver, FloppyDiskDriver,
-    GameportJoystickDriver, IdeControllerDriver, IntelXeGpuDriver, ParallelPrinterDriver,
-    PcieGen5NvmeDriver, SoundBlaster16Driver, Thunderbolt4Controller, Wifi7Adapter,
-};
 
 // Test and backward compatibility aliases
 pub type Bluetooth5_4Adapter = Bluetooth5_4_Adapter;

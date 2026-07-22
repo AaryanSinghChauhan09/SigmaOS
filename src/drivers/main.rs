@@ -14,12 +14,6 @@ pub extern "C" fn _start() -> ! {
     loop {}
 }
 
-<<<<<<< HEAD
-=======
-#[cfg(not(target_os = "none"))]
-fn main() {}
-
->>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
 #[cfg(target_os = "none")]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
