@@ -12,7 +12,7 @@ fn generate_random_bytes(len: usize) -> Vec<u8> {
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_nanos() as u64;
-    
+
     // Simple XOR-based PRNG for demonstration
     // In production, use cryptographically secure RNG
     let mut state = seed;
@@ -20,7 +20,7 @@ fn generate_random_bytes(len: usize) -> Vec<u8> {
         state = state.wrapping_mul(1103515245).wrapping_add(12345);
         *byte = (state >> 32) as u8;
     }
-    
+
     bytes
 }
 
