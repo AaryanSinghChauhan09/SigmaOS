@@ -261,7 +261,10 @@ mod tests {
         let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
             .with_pkgrel(3)
             .with_arch("aarch64".to_string())
-            .with_source("https://github.com/dylanaraps/neofetch".to_string(), "hash_neofetch".to_string())
+            .with_source(
+                "https://github.com/dylanaraps/neofetch".to_string(),
+                "hash_neofetch".to_string(),
+            )
             .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
             .with_build_command("make build".to_string())
             .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
@@ -269,6 +272,9 @@ mod tests {
         assert_eq!(recipe.pkgrel, 3);
         assert_eq!(recipe.arch, "aarch64");
         assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
-        assert_eq!(recipe.package_commands[0], "make DESTDIR=\"$pkgdir\" install");
+        assert_eq!(
+            recipe.package_commands[0],
+            "make DESTDIR=\"$pkgdir\" install"
+        );
     }
 }
