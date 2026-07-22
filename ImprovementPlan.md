@@ -167,7 +167,16 @@ SigmaOS natively absorbs and improves the core productivity tools and orchestrat
 
 ---
 
-## 🛠️ 9. Expanded Systems Engineering Roles
+## 🤖 9. AI-Native Automation Core & Agent
+
+SigmaOS integrates a zero-dependency, local AI agent (`SimpleAIAgent`) executing directly on standard memory ranges:
+1.  **Natural Language Command Translator (`translate_natural_command`):** Translates natural language requests into direct, executable system actions. Supports major Indian languages (Hindi, Tamil, Bengali) along with standard English commands (e.g. converting *"libreoffice install karo"* or *"லிப்ரேஆபிஸ் நிறுவவும்"* dynamically to `sigpkg install libreoffice`).
+2.  **Context-Aware Safety Checker (`perform_safety_check`):** Reviews CLI command patterns before execution, blocking dangerous actions (such as `rm -rf /` or accidental deletion of `sigma-accounts`) and returning interactive safety alerts.
+3.  **Command Explanation Engine (`explain_command`):** Translates cryptic systems execution parameters (e.g. `tar -xvf archive.tar.gz`) into clear, plain-language diagnostic descriptions.
+
+---
+
+## 🛠️ 10. Expanded Systems Engineering Roles
 
 To successfully satisfy the 100-item parity roadmap and achieve full boot integration, SigmaOS establishes eight specialized, non-overlapping systems engineering roles within the developer community:
 *   **Compiler & Language Toolchain Engineer:** Focuses on the LLVM backend, ELF loaders, and bootstrapping compilers natively. Maintains low-level compiler-rt libraries.
@@ -181,9 +190,9 @@ To successfully satisfy the 100-item parity roadmap and achieve full boot integr
 
 ---
 
-## 📟 10. SovereignCLI Command-Line Synthesis Engine (S-CLI)
+## 📟 11. SovereignCLI Command-Line Synthesis Engine (S-CLI)
 
-SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
+SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
 *   **CliCommandRegistry Singleton:** Tracks and exposes all active commands available to userspace. Maps textual command paths (e.g., `zenith window tile`) to distinct `CliCommand` object instances.
 *   **Polymorphic Actions:** Command execution requires explicit `CapabilityToken` checks.
 *   **Available Syntheses:**
@@ -195,7 +204,7 @@ SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates th
 
 ---
 
-## 📡 11. Automated Upstream Intelligence & Daily Updates Scanning
+## 📡 12. Automated Upstream Intelligence & Daily Updates Scanning
 
 To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine:
 1.  **The "Sigma Updater" Engine:** Continuously monitors the repository trees of the Linux Kernel (mainline, stable, and LTS branches), LLVM, GCC, and musl/glibc projects. Identifies, parses, and maps upstream security fixes directly to capability rings in SigmaOS.
@@ -203,7 +212,7 @@ To guarantee continuous parity and eventual domination over mainstream Linux dis
 
 ---
 
-## 💎 12. Core Systems OOP Implementation Specifications
+## 💎 13. Core Systems OOP Implementation Specifications
 
 To maintain absolute architectural safety, all implementations across core systems must strictly adhere to the following Object-Oriented systems principles:
 *   **Networking & Connectivity:** Dynamic network sockets are modeled as polymorphically isolated `Connection` objects. Each socket represents a concrete implementation of the base abstract `SocketChannel` class, enforcing encapsulating bounds on physical ring-buffer frames.
@@ -216,14 +225,14 @@ To maintain absolute architectural safety, all implementations across core syste
 
 ---
 
-## ⚡ 13. Bolt's Daily Performance Optimization
+## ⚡ 14. Bolt's Daily Performance Optimization
 
 Today's Bolt performance improvement focuses on **Allocation-Free Version Parsing and Zero-Copy top-level interfaces**.
 By replacing intermediate heap allocations with lazy slice iterators, we completely eliminate memory churn in package installation and dynamic dependency resolution, making the `sigpkg` engine fast and lightweight under intensive workspace loads.
 
 ---
 
-## 🚀 14. Prioritized Next Steps & Action Plan
+## 🚀 15. Prioritized Next Steps & Action Plan
 
 | Task | Description | Priority | Target Subsystem |
 | :--- | :--- | :---: | :---: |
