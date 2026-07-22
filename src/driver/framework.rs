@@ -62,12 +62,16 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
+<<<<<<< HEAD
         let raw = self.state.load(Ordering::SeqCst) as u32;
         match raw {
             1 => DriverState::Loaded,
             2 => DriverState::Active,
             _ => DriverState::Unloaded,
         }
+=======
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state

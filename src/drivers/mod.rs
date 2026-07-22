@@ -35,6 +35,7 @@ pub use even_more_devices::{
 pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
+<<<<<<< HEAD
 pub use kernel_io_suite::{
     AclPacket, AdLibSynth, AdLibSynthDriver as KernelAdLibSynth, AlsaError, AlsaSoundDriver,
     AncientDeviceLayer, AncientError, BluetoothError, BluetoothHciDriver, BluetoothMode, BssInfo,

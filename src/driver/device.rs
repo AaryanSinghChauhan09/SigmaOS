@@ -143,6 +143,7 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
+<<<<<<< HEAD
         let raw = self.state.load(Ordering::SeqCst) as u32;
         match raw {
             1 => DeviceState::Initializing,
@@ -152,6 +153,9 @@ impl DeviceDescriptor {
             5 => DeviceState::Shutdown,
             _ => DeviceState::Uninitialized,
         }
+=======
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
     }
 
     pub fn set_state(&self, state: DeviceState) {
