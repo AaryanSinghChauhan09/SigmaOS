@@ -38,7 +38,15 @@ impl SimpleThread {
 
 impl Thread for SimpleThread {
     fn id(&self) -> ThreadID { self.id }
-    fn state(&self) -> ThreadState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ThreadState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ThreadState::Running,
+            2 => ThreadState::Blocked,
+            3 => ThreadState::Terminated,
+            _ => ThreadState::Ready,
+        }
+    } }
     fn start(&mut self) -> Result<(), ThreadError> {
         self.state.store(ThreadState::Running as usize, Ordering::SeqCst);
         Ok(())

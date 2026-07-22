@@ -55,7 +55,14 @@ impl VirtualKey for SimpleVirtualKey {
         let len = self.label.iter().position(|&b| b == 0).unwrap_or(8);
         &self.label[..len]
     }
-    fn key_type(&self) -> KeyType { unsafe { core::mem::transmute(self.key_type.load(Ordering::SeqCst)) } }
+    fn key_type(&self) -> KeyType { {
+        let raw = self.key_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => KeyType::Modifier,
+            2 => KeyType::Function,
+            _ => KeyType::Character,
+        }
+    } }
     fn is_pressed(&self) -> bool { self.pressed.load(Ordering::SeqCst) == 1 }
 }
 

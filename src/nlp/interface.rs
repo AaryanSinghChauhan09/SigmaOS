@@ -47,7 +47,16 @@ impl SimpleIntent {
 
 impl Intent for SimpleIntent {
     fn id(&self) -> IntentID { self.id }
-    fn intent_type(&self) -> IntentType { unsafe { core::mem::transmute(self.intent_type.load(Ordering::SeqCst)) } }
+    fn intent_type(&self) -> IntentType { {
+        let raw = self.intent_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => IntentType::QuerySystem,
+            2 => IntentType::Configure,
+            3 => IntentType::Help,
+            4 => IntentType::Unknown,
+            _ => IntentType::ExecuteCommand,
+        }
+    } }
     fn confidence(&self) -> f32 { (self.confidence.load(Ordering::SeqCst) as f32) / 100.0 }
     fn parameters(&self) -> &[[u8; 64]] { &self.parameters }
 }

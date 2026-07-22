@@ -145,7 +145,14 @@ impl ABPartitioning for SimpleABPartitioning {
     }
     
     fn get_active_partition(&self) -> BootState {
-        unsafe { core::mem::transmute(self.active_state.load(Ordering::SeqCst)) }
+        {
+        let raw = self.active_state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BootState::B,
+            2 => BootState::Recovery,
+            _ => BootState::A,
+        }
+    }
     }
 }
 

@@ -16,8 +16,11 @@ pub mod selinux;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod scanner;
+pub mod forensics;
+pub mod cleaner;
 
-pub use audit::AuditLogger;
+pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use clipboard::{

@@ -43,7 +43,14 @@ impl SimpleLED {
 
 impl LED for SimpleLED {
     fn id(&self) -> LEDID { self.id }
-    fn state(&self) -> LEDState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> LEDState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => LEDState::On,
+            2 => LEDState::Blink,
+            _ => LEDState::Off,
+        }
+    } }
     fn brightness(&self) -> u8 { self.brightness.load(Ordering::SeqCst) as u8 }
 }
 

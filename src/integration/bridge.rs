@@ -48,7 +48,14 @@ impl SimpleBridge {
 
 impl Bridge for SimpleBridge {
     fn id(&self) -> BridgeID { self.id }
-    fn bridge_type(&self) -> BridgeType { unsafe { core::mem::transmute(self.bridge_type.load(Ordering::SeqCst)) } }
+    fn bridge_type(&self) -> BridgeType { {
+        let raw = self.bridge_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BridgeType::Foreign,
+            2 => BridgeType::Hybrid,
+            _ => BridgeType::Native,
+        }
+    } }
     fn target_system(&self) -> &[u8] {
         let len = self.target_system.iter().position(|&b| b == 0).unwrap_or(64);
         &self.target_system[..len]

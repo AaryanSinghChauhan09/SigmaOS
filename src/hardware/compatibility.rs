@@ -57,14 +57,32 @@ impl SimpleDevice {
 
 impl Device for SimpleDevice {
     fn id(&self) -> DeviceID { self.id }
-    fn device_type(&self) -> DeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn device_type(&self) -> DeviceType { {
+        let raw = self.device_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DeviceType::WiFi,
+            2 => DeviceType::Printer,
+            3 => DeviceType::Chipset,
+            4 => DeviceType::Audio,
+            5 => DeviceType::Storage,
+            _ => DeviceType::GPU,
+        }
+    } }
     fn vendor_id(&self) -> u16 { self.vendor_id.load(Ordering::SeqCst) as u16 }
     fn device_id(&self) -> u16 { self.device_id.load(Ordering::SeqCst) as u16 }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(128);
         &self.name[..len]
     }
-    fn support_status(&self) -> SupportStatus { unsafe { core::mem::transmute(self.support_status.load(Ordering::SeqCst)) } }
+    fn support_status(&self) -> SupportStatus { {
+        let raw = self.support_status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SupportStatus::Partial,
+            2 => SupportStatus::Unsupported,
+            3 => SupportStatus::Unknown,
+            _ => SupportStatus::Supported,
+        }
+    } }
 }
 
 pub trait CompatibilityMatrix {

@@ -65,8 +65,24 @@ impl SimpleFirewallRule {
 
 impl FirewallRule for SimpleFirewallRule {
     fn id(&self) -> RuleID { self.id }
-    fn action(&self) -> RuleAction { unsafe { core::mem::transmute(self.action.load(Ordering::SeqCst)) } }
-    fn protocol(&self) -> Protocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
+    fn action(&self) -> RuleAction { {
+        let raw = self.action.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => RuleAction::Drop,
+            2 => RuleAction::Reject,
+            3 => RuleAction::Log,
+            _ => RuleAction::Accept,
+        }
+    } }
+    fn protocol(&self) -> Protocol { {
+        let raw = self.protocol.load(Ordering::SeqCst) as u32;
+        match raw {
+            17 => Protocol::UDP,
+            1 => Protocol::ICMP,
+            255 => Protocol::Any,
+            _ => Protocol::TCP,
+        }
+    } }
     fn source_ip(&self) -> &[u8] { &self.source_ip }
     fn destination_ip(&self) -> &[u8] { &self.destination_ip }
     fn source_port(&self) -> u16 { self.source_port.load(Ordering::SeqCst) as u16 }

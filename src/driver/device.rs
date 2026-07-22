@@ -143,7 +143,17 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DeviceState::Initializing,
+            2 => DeviceState::Ready,
+            3 => DeviceState::Busy,
+            4 => DeviceState::Error,
+            5 => DeviceState::Shutdown,
+            _ => DeviceState::Uninitialized,
+        }
+    }
     }
 
     pub fn set_state(&self, state: DeviceState) {

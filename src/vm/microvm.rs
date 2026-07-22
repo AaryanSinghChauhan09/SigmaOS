@@ -56,7 +56,17 @@ impl SimpleMicroVM {
 
 impl MicroVM for SimpleMicroVM {
     fn id(&self) -> VMID { self.id }
-    fn state(&self) -> VMState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> VMState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => VMState::Starting,
+            2 => VMState::Running,
+            3 => VMState::Paused,
+            4 => VMState::Stopping,
+            5 => VMState::Failed,
+            _ => VMState::Stopped,
+        }
+    } }
 
     fn start(&mut self) -> Result<(), VMError> {
         self.state.store(VMState::Starting as usize, Ordering::SeqCst);

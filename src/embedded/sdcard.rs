@@ -46,7 +46,14 @@ impl SimpleSDCard {
 
 impl SDCard for SimpleSDCard {
     fn id(&self) -> CardID { self.id }
-    fn card_type(&self) -> CardType { unsafe { core::mem::transmute(self.card_type.load(Ordering::SeqCst)) } }
+    fn card_type(&self) -> CardType { {
+        let raw = self.card_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => CardType::SDHC,
+            2 => CardType::SDXC,
+            _ => CardType::SDSC,
+        }
+    } }
     fn capacity(&self) -> u64 { self.capacity.load(Ordering::SeqCst) as u64 }
     fn is_initialized(&self) -> bool { self.initialized.load(Ordering::SeqCst) == 1 }
 }

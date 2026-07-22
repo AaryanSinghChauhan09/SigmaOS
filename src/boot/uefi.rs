@@ -39,7 +39,15 @@ impl SimpleUEFIBootloader {
 }
 
 impl UEFIBootloader for SimpleUEFIBootloader {
-    fn phase(&self) -> BootPhase { unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst)) } }
+    fn phase(&self) -> BootPhase { {
+        let raw = self.phase.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BootPhase::LoadKernel,
+            2 => BootPhase::Handoff,
+            3 => BootPhase::Complete,
+            _ => BootPhase::Init,
+        }
+    } }
     fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
         self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);

@@ -53,7 +53,13 @@ impl SimpleChannel {
 impl Channel for SimpleChannel {
     fn id(&self) -> ChannelID { self.id }
     fn channel_type(&self) -> ChannelType { self.channel_type }
-    fn state(&self) -> ChannelState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ChannelState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ChannelState::Open,
+            _ => ChannelState::Closed,
+        }
+    } }
     fn send(&mut self, data: &[u8]) -> Result<(), IPCError> {
         let bytes = data.len().min(4096);
         unsafe { core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.as_mut_ptr(), bytes); }

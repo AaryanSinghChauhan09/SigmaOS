@@ -58,7 +58,15 @@ impl Thread for SimpleThread {
         self.id
     }
     fn state(&self) -> ThreadState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ThreadState::Running,
+            2 => ThreadState::Blocked,
+            3 => ThreadState::Sleeping,
+            _ => ThreadState::Ready,
+        }
+    }
     }
     fn priority(&self) -> Priority {
         self.priority

@@ -291,7 +291,16 @@ impl Sensor for SimpleSensor {
         self.id
     }
     fn sensor_type(&self) -> SensorType {
-        unsafe { core::mem::transmute(self.sensor_type.load(Ordering::SeqCst)) }
+        {
+        let raw = self.sensor_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SensorType::Voltage,
+            2 => SensorType::Current,
+            3 => SensorType::Power,
+            4 => SensorType::Fan,
+            _ => SensorType::Temperature,
+        }
+    }
     }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);

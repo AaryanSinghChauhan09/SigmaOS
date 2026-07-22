@@ -52,7 +52,15 @@ impl RemoteSession for SimpleRemoteSession {
         let len = self.host.iter().position(|&b| b == 0).unwrap_or(128);
         &self.host[..len]
     }
-    fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> SessionState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SessionState::Connecting,
+            2 => SessionState::Connected,
+            3 => SessionState::Error,
+            _ => SessionState::Disconnected,
+        }
+    } }
 }
 
 pub trait RemoteDesktop {

@@ -49,7 +49,15 @@ impl SimpleBlockDevice {
 
 impl BlockDevice for SimpleBlockDevice {
     fn id(&self) -> BlockDeviceID { self.id }
-    fn device_type(&self) -> BlockDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn device_type(&self) -> BlockDeviceType {
+        match self.device_type.load(Ordering::SeqCst) as u32 {
+            1 => BlockDeviceType::SSD,
+            2 => BlockDeviceType::NVMe,
+            3 => BlockDeviceType::Virtual,
+            4 => BlockDeviceType::RAMDisk,
+            _ => BlockDeviceType::HDD,
+        }
+    }
     fn block_size(&self) -> usize { self.block_size.load(Ordering::SeqCst) }
     fn total_blocks(&self) -> usize { self.total_blocks.load(Ordering::SeqCst) }
 

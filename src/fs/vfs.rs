@@ -47,7 +47,15 @@ impl SimpleInode {
 
 impl Inode for SimpleInode {
     fn id(&self) -> InodeID { self.id }
-    fn file_type(&self) -> FileType { unsafe { core::mem::transmute(self.file_type.load(Ordering::SeqCst)) } }
+    fn file_type(&self) -> FileType { {
+        let raw = self.file_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => FileType::Directory,
+            2 => FileType::Symlink,
+            3 => FileType::Device,
+            _ => FileType::Regular,
+        }
+    } }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn permissions(&self) -> u16 { self.permissions.load(Ordering::SeqCst) as u16 }
 }

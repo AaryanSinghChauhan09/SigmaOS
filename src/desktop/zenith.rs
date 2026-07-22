@@ -157,9 +157,16 @@ impl SimpleWindow {
     }
 
     pub fn get_state(&self) -> WindowState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => WindowState::Normal,
+            2 => WindowState::Maximized,
+            3 => WindowState::Fullscreen,
+            4 => WindowState::Hidden,
+            _ => WindowState::Minimized,
         }
+    }
     }
 
     pub fn set_state(&self, state: WindowState) {

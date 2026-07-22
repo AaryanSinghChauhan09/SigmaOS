@@ -58,7 +58,15 @@ impl Volume for SimpleVolume {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn volume_type(&self) -> VolumeType { unsafe { core::mem::transmute(self.volume_type.load(Ordering::SeqCst)) } }
+    fn volume_type(&self) -> VolumeType {
+        let raw = self.volume_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => VolumeType::Stripe,
+            2 => VolumeType::Mirror,
+            3 => VolumeType::RAID5,
+            _ => VolumeType::Linear,
+        }
+    }
     fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
     fn is_mounted(&self) -> bool { self.mounted.load(Ordering::SeqCst) == 1 }
 }

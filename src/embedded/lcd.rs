@@ -48,7 +48,14 @@ impl LCDDisplay for SimpleLCDDisplay {
     fn id(&self) -> DisplayID { self.id }
     fn width(&self) -> u16 { self.width.load(Ordering::SeqCst) as u16 }
     fn height(&self) -> u16 { self.height.load(Ordering::SeqCst) as u16 }
-    fn color_format(&self) -> ColorFormat { unsafe { core::mem::transmute(self.color_format.load(Ordering::SeqCst)) } }
+    fn color_format(&self) -> ColorFormat { {
+        let raw = self.color_format.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ColorFormat::RGB888,
+            2 => ColorFormat::ARGB8888,
+            _ => ColorFormat::RGB565,
+        }
+    } }
 }
 
 pub trait LCDController {

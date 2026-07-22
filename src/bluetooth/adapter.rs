@@ -60,7 +60,15 @@ impl BluetoothAdapter for SimpleBluetoothAdapter {
         &self.name[..len]
     }
     fn address(&self) -> &[u8] { &self.address }
-    fn state(&self) -> BluetoothState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> BluetoothState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BluetoothState::On,
+            2 => BluetoothState::Scanning,
+            3 => BluetoothState::Pairing,
+            _ => BluetoothState::Off,
+        }
+    } }
 
     fn set_state(&mut self, state: BluetoothState) {
         self.state.store(state as usize, Ordering::SeqCst);

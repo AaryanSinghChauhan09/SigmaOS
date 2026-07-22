@@ -309,7 +309,16 @@ impl UnifiedLogger for SimpleUnifiedLogger {
             return;
         }
 
-        let current_level = unsafe { core::mem::transmute(self.level.load(Ordering::SeqCst)) };
+        let current_level = {
+        let raw = self.level.load(Ordering::SeqCst) as u32;
+        match raw {
+            2 => LogLevel::Info,
+            3 => LogLevel::Warning,
+            4 => LogLevel::Error,
+            5 => LogLevel::Fatal,
+            _ => LogLevel::Trace,
+        }
+    };
         if level < current_level {
             return;
         }
@@ -339,9 +348,16 @@ impl UnifiedLogger for SimpleUnifiedLogger {
     }
 
     fn level(&self) -> LogLevel {
-        unsafe {
-            core::mem::transmute(self.level.load(Ordering::SeqCst))
+        {
+        let raw = self.level.load(Ordering::SeqCst) as u32;
+        match raw {
+            2 => LogLevel::Info,
+            3 => LogLevel::Warning,
+            4 => LogLevel::Error,
+            5 => LogLevel::Fatal,
+            _ => LogLevel::Trace,
         }
+    }
     }
 
     fn add_target(&mut self, target: Box<dyn LogTarget>) -> Result<(), LogError> {

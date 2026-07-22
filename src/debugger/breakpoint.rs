@@ -9,7 +9,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BreakpointID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum BreakpointType {
     Software = 0,
@@ -61,7 +61,14 @@ impl Breakpoint for SimpleBreakpoint {
         self.address.load(Ordering::SeqCst)
     }
     fn breakpoint_type(&self) -> BreakpointType {
-        unsafe { core::mem::transmute(self.breakpoint_type.load(Ordering::SeqCst)) }
+        {
+        let raw = self.breakpoint_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BreakpointType::Hardware,
+            2 => BreakpointType::Watchpoint,
+            _ => BreakpointType::Software,
+        }
+    }
     }
     fn is_enabled(&self) -> bool {
         self.enabled.load(Ordering::SeqCst) == 1

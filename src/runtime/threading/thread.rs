@@ -174,9 +174,16 @@ impl Thread {
     }
 
     pub fn get_state(&self) -> ThreadState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ThreadState::Ready,
+            2 => ThreadState::Running,
+            3 => ThreadState::Blocked,
+            4 => ThreadState::Terminated,
+            _ => ThreadState::Uninitialized,
         }
+    }
     }
 
     pub fn set_state(&self, state: ThreadState) {

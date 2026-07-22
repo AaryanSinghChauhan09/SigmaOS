@@ -43,7 +43,16 @@ impl SimpleInputEvent {
 
 impl InputEvent for SimpleInputEvent {
     fn id(&self) -> EventID { self.id }
-    fn event_type(&self) -> InputEventType { unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) } }
+    fn event_type(&self) -> InputEventType { {
+        let raw = self.event_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => InputEventType::KeyRelease,
+            2 => InputEventType::MouseMove,
+            3 => InputEventType::MouseClick,
+            4 => InputEventType::MouseScroll,
+            _ => InputEventType::KeyPress,
+        }
+    } }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
 }
 

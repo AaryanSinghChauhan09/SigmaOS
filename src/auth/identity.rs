@@ -59,7 +59,15 @@ impl DigitalIdentity for SimpleDigitalIdentity {
         let len = self.did.iter().position(|&b| b == 0).unwrap_or(128);
         &self.did[..len]
     }
-    fn identity_type(&self) -> IdentityType { unsafe { core::mem::transmute(self.identity_type.load(Ordering::SeqCst)) } }
+    fn identity_type(&self) -> IdentityType { {
+        let raw = self.identity_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => IdentityType::Service,
+            2 => IdentityType::Device,
+            3 => IdentityType::Organization,
+            _ => IdentityType::User,
+        }
+    } }
 
     fn verify(&self, _challenge: &[u8]) -> Result<bool, IdentityError> {
         Ok(true)

@@ -52,7 +52,15 @@ impl APIEndpoint for SimpleAPIEndpoint {
         let len = self.path.iter().position(|&b| b == 0).unwrap_or(128);
         &self.path[..len]
     }
-    fn method(&self) -> HTTPMethod { unsafe { core::mem::transmute(self.method.load(Ordering::SeqCst)) } }
+    fn method(&self) -> HTTPMethod { {
+        let raw = self.method.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => HTTPMethod::POST,
+            2 => HTTPMethod::PUT,
+            3 => HTTPMethod::DELETE,
+            _ => HTTPMethod::GET,
+        }
+    } }
 }
 
 pub trait APIGateway {

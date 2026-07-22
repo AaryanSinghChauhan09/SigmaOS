@@ -48,7 +48,15 @@ impl SimpleProtocolHandler {
 
 impl ProtocolHandler for SimpleProtocolHandler {
     fn id(&self) -> ProtocolID { self.id }
-    fn protocol_type(&self) -> ProtocolType { unsafe { core::mem::transmute(self.protocol_type.load(Ordering::SeqCst)) } }
+    fn protocol_type(&self) -> ProtocolType { {
+        let raw = self.protocol_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ProtocolType::FTP,
+            2 => ProtocolType::SSH,
+            3 => ProtocolType::SMB,
+            _ => ProtocolType::HTTP,
+        }
+    } }
     fn scheme(&self) -> &[u8] {
         let len = self.scheme.iter().position(|&b| b == 0).unwrap_or(16);
         &self.scheme[..len]

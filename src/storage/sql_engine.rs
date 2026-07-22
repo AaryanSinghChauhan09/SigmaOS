@@ -17,7 +17,7 @@ pub enum SqlType {
     Null,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SqlValue {
     Integer(i64),
     Text(String),
@@ -192,10 +192,10 @@ impl SqlEngine {
     ) -> Result<QueryResult, &'static str> {
         let table = self.tables.get(table_name).ok_or("Table not found")?;
 
-        let column_indices = if let Some(cols) = columns {
+        let column_indices = if let Some(ref cols) = columns {
             // Select specific columns
             let mut indices = Vec::new();
-            for col_name in &cols {
+            for col_name in cols {
                 let idx = table
                     .columns
                     .iter()
@@ -221,10 +221,12 @@ impl SqlEngine {
             result_rows.push(result_row);
         }
 
+        let num_rows = result_rows.len();
+
         Ok(QueryResult {
             columns: result_columns,
             rows: result_rows,
-            affected_rows: result_rows.len(),
+            affected_rows: num_rows,
         })
     }
 

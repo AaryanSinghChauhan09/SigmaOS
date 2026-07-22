@@ -152,9 +152,15 @@ impl SimpleComponent {
     }
 
     pub fn get_status(&self) -> ValidationStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst))
+        {
+        let raw = self.status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ValidationStatus::Invalid,
+            2 => ValidationStatus::Pending,
+            3 => ValidationStatus::Failed,
+            _ => ValidationStatus::Valid,
         }
+    }
     }
 
     pub fn set_status(&self, status: ValidationStatus) {

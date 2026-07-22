@@ -106,9 +106,14 @@ impl SimpleMemoryBlock {
     }
 
     pub fn get_state(&self) -> BlockState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BlockState::Allocated,
+            2 => BlockState::Reserved,
+            _ => BlockState::Free,
         }
+    }
     }
 
     pub fn set_state_atomic(&self, state: BlockState) {

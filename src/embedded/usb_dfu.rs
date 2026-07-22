@@ -40,7 +40,14 @@ impl SimpleUSBDFU {
 
 impl USBDFU for SimpleUSBDFU {
     fn id(&self) -> DFUID { self.id }
-    fn state(&self) -> DFUState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> DFUState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DFUState::Busy,
+            2 => DFUState::Error,
+            _ => DFUState::Idle,
+        }
+    } }
 }
 
 pub trait DFUController {

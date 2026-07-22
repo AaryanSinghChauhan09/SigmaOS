@@ -141,9 +141,16 @@ impl SimpleDevice {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DeviceState::Provisioning,
+            2 => DeviceState::Provisioned,
+            3 => DeviceState::Active,
+            4 => DeviceState::Deactivated,
+            _ => DeviceState::Unprovisioned,
         }
+    }
     }
 
     pub fn set_state(&self, state: DeviceState) {

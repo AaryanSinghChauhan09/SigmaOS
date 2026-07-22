@@ -64,7 +64,16 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {
-        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) }
+        {
+        let raw = self.device_class.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DeviceClass::Character,
+            2 => DeviceClass::Network,
+            3 => DeviceClass::Input,
+            4 => DeviceClass::Output,
+            _ => DeviceClass::Block,
+        }
+    }
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {

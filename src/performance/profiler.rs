@@ -48,7 +48,15 @@ impl SimpleProfile {
 
 impl Profile for SimpleProfile {
     fn id(&self) -> ProfileID { self.id }
-    fn profile_type(&self) -> ProfileType { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
+    fn profile_type(&self) -> ProfileType { {
+        let raw = self.profile_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ProfileType::Memory,
+            2 => ProfileType::IO,
+            3 => ProfileType::Network,
+            _ => ProfileType::CPU,
+        }
+    } }
     fn start_time(&self) -> u64 { self.start_time.load(Ordering::SeqCst) as u64 }
     fn end_time(&self) -> u64 { self.end_time.load(Ordering::SeqCst) as u64 }
     fn duration(&self) -> u64 {

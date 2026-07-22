@@ -59,7 +59,15 @@ impl Setting for SimpleSetting {
         let len = self.key.iter().position(|&b| b == 0).unwrap_or(128);
         &self.key[..len]
     }
-    fn setting_type(&self) -> SettingType { unsafe { core::mem::transmute(self.setting_type.load(Ordering::SeqCst)) } }
+    fn setting_type(&self) -> SettingType { {
+        let raw = self.setting_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SettingType::Integer,
+            2 => SettingType::Boolean,
+            3 => SettingType::Color,
+            _ => SettingType::String,
+        }
+    } }
     fn value(&self) -> &[u8] {
         let len = self.value.iter().position(|&b| b == 0).unwrap_or(256);
         &self.value[..len]

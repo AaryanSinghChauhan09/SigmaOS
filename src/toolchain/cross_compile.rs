@@ -55,7 +55,15 @@ impl SimpleToolchain {
 
 impl Toolchain for SimpleToolchain {
     fn id(&self) -> ToolchainID { self.id }
-    fn target_arch(&self) -> Architecture { unsafe { core::mem::transmute(self.target_arch.load(Ordering::SeqCst)) } }
+    fn target_arch(&self) -> Architecture { {
+        let raw = self.target_arch.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => Architecture::ARM64,
+            2 => Architecture::RISCV64,
+            3 => Architecture::PPC64,
+            _ => Architecture::X86_64,
+        }
+    } }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]

@@ -48,7 +48,14 @@ impl FlashBlock for SimpleFlashBlock {
     fn id(&self) -> BlockID { self.id }
     fn address(&self) -> u32 { self.address.load(Ordering::SeqCst) as u32 }
     fn size(&self) -> u32 { self.size.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> FlashState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> FlashState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => FlashState::Written,
+            2 => FlashState::Locked,
+            _ => FlashState::Erased,
+        }
+    } }
 }
 
 pub trait FlashManager {

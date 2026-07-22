@@ -49,7 +49,15 @@ impl SimpleWindow {
 
 impl Window for SimpleWindow {
     fn id(&self) -> WindowID { self.id }
-    fn state(&self) -> WindowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> WindowState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => WindowState::Visible,
+            2 => WindowState::Minimized,
+            3 => WindowState::Maximized,
+            _ => WindowState::Hidden,
+        }
+    } }
     fn show(&mut self) -> Result<(), DesktopError> {
         self.state.store(WindowState::Visible as usize, Ordering::SeqCst);
         Ok(())

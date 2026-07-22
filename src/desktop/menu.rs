@@ -58,7 +58,15 @@ impl MenuItem for SimpleMenuItem {
         let len = self.label.iter().position(|&b| b == 0).unwrap_or(128);
         &self.label[..len]
     }
-    fn item_type(&self) -> MenuItemType { unsafe { core::mem::transmute(self.item_type.load(Ordering::SeqCst)) } }
+    fn item_type(&self) -> MenuItemType { {
+        let raw = self.item_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => MenuItemType::Action,
+            2 => MenuItemType::Submenu,
+            3 => MenuItemType::Checkbox,
+            _ => MenuItemType::Separator,
+        }
+    } }
     fn is_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
     fn is_checked(&self) -> bool { self.checked.load(Ordering::SeqCst) == 1 }
 }

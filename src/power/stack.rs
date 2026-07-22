@@ -118,13 +118,26 @@ impl SimplePowerManager {
     }
 
     pub fn get_profile(&self) -> PowerProfile {
-        unsafe {
-            core::mem::transmute(self.profile.load(Ordering::SeqCst))
+        {
+        let raw = self.profile.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PowerProfile::Balanced,
+            2 => PowerProfile::PowerSaver,
+            3 => PowerProfile::Custom,
+            _ => PowerProfile::Performance,
         }
     }
+    }
 
-    pub fn set_profile_atomic(&self, profile: PowerProfile) {
-        self.profile.store(profile as usize, Ordering::SeqCst);
+    pub fn set_{
+        let raw = self.cpu_governor.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => CPUGovernor::Ondemand,
+            2 => CPUGovernor::Conservative,
+            3 => CPUGovernor::Powersave,
+            _ => CPUGovernor::Performance,
+        }
+    }rdering::SeqCst);
     }
 
     pub fn get_cpu_governor(&self) -> CPUGovernor {

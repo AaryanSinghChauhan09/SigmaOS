@@ -51,8 +51,24 @@ impl SimpleBuilder {
 
 impl Builder for SimpleBuilder {
     fn id(&self) -> BuilderID { self.id }
-    fn architecture(&self) -> Architecture { unsafe { core::mem::transmute(self.architecture.load(Ordering::SeqCst)) } }
-    fn state(&self) -> BuilderState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn architecture(&self) -> Architecture { {
+        let raw = self.architecture.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => Architecture::ARM64,
+            2 => Architecture::RISCV64,
+            3 => Architecture::PPC64,
+            _ => Architecture::X86_64,
+        }
+    } }
+    fn state(&self) -> BuilderState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => BuilderState::Building,
+            2 => BuilderState::Failed,
+            3 => BuilderState::Success,
+            _ => BuilderState::Idle,
+        }
+    } }
 
     fn start_build(&mut self, target: &[u8]) -> Result<(), BuildError> {
         if self.state.load(Ordering::SeqCst) != BuilderState::Idle as usize {

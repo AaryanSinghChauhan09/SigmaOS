@@ -55,7 +55,15 @@ impl IoTDevice for SimpleIoTDevice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn device_type(&self) -> DeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn device_type(&self) -> DeviceType { {
+        let raw = self.device_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => DeviceType::Actuator,
+            2 => DeviceType::Controller,
+            3 => DeviceType::Gateway,
+            _ => DeviceType::Sensor,
+        }
+    } }
     fn is_online(&self) -> bool { self.online.load(Ordering::SeqCst) == 1 }
 }
 

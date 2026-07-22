@@ -63,7 +63,13 @@ impl Gamepad for SimpleGamepad {
     fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
     fn get_button(&self, button: u8) -> ButtonState {
         if button < 16 {
-            unsafe { core::mem::transmute(self.buttons[button as usize].load(Ordering::SeqCst)) }
+            {
+        let raw = self.buttons[button as usize].load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ButtonState::Pressed,
+            _ => ButtonState::Released,
+        }
+    }
         } else {
             ButtonState::Released
         }

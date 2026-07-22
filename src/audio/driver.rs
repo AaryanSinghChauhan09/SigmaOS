@@ -9,7 +9,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AudioDeviceID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum AudioType {
     Playback = 0,
@@ -67,7 +67,14 @@ impl AudioDevice for SimpleAudioDevice {
         &self.name[..len]
     }
     fn audio_type(&self) -> AudioType {
-        unsafe { core::mem::transmute(self.audio_type.load(Ordering::SeqCst)) }
+        {
+        let raw = self.audio_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => AudioType::Capture,
+            2 => AudioType::Duplex,
+            _ => AudioType::Playback,
+        }
+    }
     }
     fn sample_rate(&self) -> u32 {
         self.sample_rate.load(Ordering::SeqCst) as u32

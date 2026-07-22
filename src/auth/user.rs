@@ -57,7 +57,14 @@ impl User for SimpleUser {
         let len = self.username.iter().position(|&b| b == 0).unwrap_or(32);
         &self.username[..len]
     }
-    fn state(&self) -> UserState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> UserState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => UserState::Inactive,
+            2 => UserState::Locked,
+            _ => UserState::Active,
+        }
+    } }
     fn authenticate(&mut self, _password: &[u8]) -> Result<bool, AuthError> {
         if self.state() == UserState::Locked { return Err(AuthError::AccountLocked); }
         Ok(true)

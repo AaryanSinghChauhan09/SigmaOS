@@ -54,7 +54,16 @@ impl AIAgent for SimpleAIAgent {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> AgentState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> AgentState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => AgentState::Active,
+            2 => AgentState::Busy,
+            3 => AgentState::Error,
+            4 => AgentState::Learning,
+            _ => AgentState::Idle,
+        }
+    } }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
         self.state.store(AgentState::Busy as usize, Ordering::SeqCst);

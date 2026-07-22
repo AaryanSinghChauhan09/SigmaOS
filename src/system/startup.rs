@@ -153,6 +153,8 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
         }
 
         let services_optimized = services_delayed.len() + services_parallelized.len();
+        let delayed_count = services_delayed.len();
+        let parallelized_count = services_parallelized.len();
 
         StartupOptimizationResult {
             services_optimized,
@@ -162,8 +164,8 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
             message: format!(
                 "Optimized {} services: {} delayed, {} marked for parallel execution",
                 services_optimized,
-                services_delayed.len(),
-                services_parallelized.len()
+                delayed_count,
+                parallelized_count
             ),
         }
     }

@@ -54,7 +54,15 @@ impl Printer for SimplePrinter {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> PrinterState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> PrinterState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PrinterState::Printing,
+            2 => PrinterState::Error,
+            3 => PrinterState::Offline,
+            _ => PrinterState::Idle,
+        }
+    } }
 
     fn set_state(&mut self, state: PrinterState) {
         self.state.store(state as usize, Ordering::SeqCst);

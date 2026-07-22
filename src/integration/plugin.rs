@@ -62,7 +62,15 @@ impl Plugin for SimplePlugin {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(16);
         &self.version[..len]
     }
-    fn state(&self) -> PluginState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> PluginState { {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PluginState::Loaded,
+            2 => PluginState::Active,
+            3 => PluginState::Error,
+            _ => PluginState::Unloaded,
+        }
+    } }
 }
 
 pub trait PluginManager {

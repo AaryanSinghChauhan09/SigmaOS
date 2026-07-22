@@ -52,7 +52,14 @@ impl MQTTTopic for SimpleMQTTTopic {
         let len = self.topic.iter().position(|&b| b == 0).unwrap_or(128);
         &self.topic[..len]
     }
-    fn qos(&self) -> QoS { unsafe { core::mem::transmute(self.qos.load(Ordering::SeqCst)) } }
+    fn qos(&self) -> QoS { {
+        let raw = self.qos.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => QoS::AtLeastOnce,
+            2 => QoS::ExactlyOnce,
+            _ => QoS::AtMostOnce,
+        }
+    } }
 }
 
 pub trait MQTTClient {

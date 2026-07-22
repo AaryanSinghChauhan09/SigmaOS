@@ -49,7 +49,15 @@ impl SimplePanel {
 
 impl Panel for SimplePanel {
     fn id(&self) -> PanelID { self.id }
-    fn position(&self) -> PanelPosition { unsafe { core::mem::transmute(self.position.load(Ordering::SeqCst)) } }
+    fn position(&self) -> PanelPosition { {
+        let raw = self.position.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => PanelPosition::Bottom,
+            2 => PanelPosition::Left,
+            3 => PanelPosition::Right,
+            _ => PanelPosition::Top,
+        }
+    } }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn is_autohide(&self) -> bool { self.autohide.load(Ordering::SeqCst) == 1 }
