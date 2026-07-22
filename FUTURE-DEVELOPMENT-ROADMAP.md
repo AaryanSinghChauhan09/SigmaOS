@@ -236,6 +236,18 @@ SigmaOS is designed to systematically replace, absorb, and dominate traditional 
   - **Hardware-Gated CapabilityToken & PledgeManager:** Replaces SELinux. Processes declare exact system access boundaries (e.g., `network`, `stdio`, `fs`) validated at the hardware microkernel gate.
   - **S-TREE Immutable Deployments:** Managing boot images as immutable, read-only Merkle-tree root nodes, permitting sub-millisecond, zero-reboot system updates.
 
+#### D. Tails & Whonix Parity (S-AMNESIA Volatile Sandbox)
+* **The Linux Flaw:** Persistent storage leaks and forensic tracking vulnerabilities resulting from unencrypted, lazy disk writes and ambient core dumps during execution.
+* **The SigmaOS Domination:**
+  - **S-AMNESIA Volatile Sandboxes:** Executes session-gated workspaces entirely inside dynamic physical RAM page frames.
+  - **Secure Cryptographic Memory Erasure:** On session closing, the microkernel security module sweeps and forcefully overwrites all allocated container frames with custom bit patterns prior to freeing, preventing any forensic cold-boot attacks.
+
+#### E. Void Linux Parity (S-VOID Micro-Init Supervisor)
+* **The Linux Flaw:** Heavy systemd service dependency trees and slow POSIX shell init pipelines delaying system startup.
+* **The SigmaOS Domination:**
+  - **S-VOID Micro-Init Supervisor:** Manages active system daemons as independent, lightweight stateful actors.
+  - **Dynamic Dependency Parsing:** Services declare explicit initialization requirements. S-VOID parses these edges dynamically to execute and monitor daemons in parallel, booting the system with zero redundant context switches.
+
 ### 4.2 Proprietary Operating System Giants
 
 #### A. Windows (Windows 10/11 & Windows Server)
