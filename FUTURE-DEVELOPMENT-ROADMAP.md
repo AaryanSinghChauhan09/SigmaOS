@@ -140,6 +140,23 @@ When the system polls a physical bus slot during scanning:
 3. If legacy CMOS or ISA flags are triggered, the system instantiates a matching `LegacyAncientDriver` wrapper with PIO fallback.
 4. The Broker registers the instantiated driver under the `PeripheralManager` singleton. Applications access the hardware through a single, consistent `UnifiedPeripheral` interface, hiding generation differences entirely.
 
+### 2.4 Universal Adapter-Based Driver Compatibility Shards
+To achieve absolute hardware coverage and render legacy operating systems obsolete, SigmaOS implements polymorphic driver adapters. These adapters extend the base `PeripheralDevice` abstract trait, allowing third-party drivers compiled for alternative operating systems to execute inside capability-gated enclaves without recompilation:
+
+```
++-------------------------------------------------------------------------------+
+|                            Unified Polymorphic Device Bus                     |
++-------------------------------------------------------------------------------+
+|   [LinuxDriverAdapter]    |  [WindowsNdisAdapter]   |   [WasmDriverAdapter]   |
+|   - Wraps SKB & PCI Dev   |  - Miniport Emulations  |   - WebAssembly VM      |
+|   - Zero-Copy Translaton  |  - Gated Ring 3 Shards  |   - Guest-to-Host Gate  |
++-------------------------------------------------------------------------------+
+```
+
+* **1. LinuxDriverAdapter (The Linux Kernel Bridge):** Dynamically wraps standard Linux PCI and USB network/storage drivers. It exposes legacy Linux subsystem exports natively on the microkernel (such as translating `sk_buff` packet descriptors to ZenithNet ring-buffer pages, and converting standard `net_device_ops` into capability-checked `PeripheralDevice` actions) with zero performance degradation.
+* **2. WindowsNdisAdapter (The Windows Miniport Emulation Shard):** Houses an NDIS-compliant runtime layer capable of loading pre-compiled Windows Network Miniport binary drivers (.sys files). By emulating core kernel exports (such as `NdisMRegisterMiniportDriver` and `NdisAllocateNetBuffer`), it executes Windows-native drivers inside Ring 3 userspace enclaves, completely protecting the microkernel against blue screens or driver-level heap corruption.
+* **3. WasmDriverAdapter (The WebAssembly Virtual Driver Engine):** Orchestrates sandboxed, portable, hardware-independent WebAssembly drivers inside an isolated userspace VM. This engine maps physical device registers directly onto a virtual, bound-checked linear memory region, providing near-native execution speeds while guaranteeing that an unstable or corrupted WebAssembly driver can be rebooted instantly by the `SelfHealingModule` without disrupting system uptime.
+
 ---
 
 ## 3. SANDBOXED UDF BYTECODE INTERPRETER SPECIFICATION
