@@ -138,15 +138,12 @@ impl SimpleProcess {
         }
     }
 
-    pub fn get_state(&self) -> ProcessState {
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => ProcessState::Running,
-                2 => ProcessState::Blocked,
-                3 => ProcessState::Terminated,
-                _ => ProcessState::Ready,
-            }
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ProcessState::Running,
+            2 => ProcessState::Blocked,
+            3 => ProcessState::Terminated,
+            _ => ProcessState::Ready,
         }
     }
 
@@ -155,15 +152,13 @@ impl SimpleProcess {
     }
 
     pub fn get_priority(&self) -> ProcessPriority {
-        {
-            let raw = self.priority.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => ProcessPriority::Low,
-                2 => ProcessPriority::Normal,
-                3 => ProcessPriority::High,
-                4 => ProcessPriority::Critical,
-                _ => ProcessPriority::Idle,
-            }
+        let raw = self.priority.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ProcessPriority::Low,
+            2 => ProcessPriority::Normal,
+            3 => ProcessPriority::High,
+            4 => ProcessPriority::Critical,
+            _ => ProcessPriority::Idle,
         }
     }
 

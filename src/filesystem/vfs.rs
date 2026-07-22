@@ -149,6 +149,11 @@ impl VirtualFilesystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
+        // Performance optimization: early return for zero-sized read requests to bypass hash lookups
+        if buffer.is_empty() {
+            return Ok(0);
+        }
+
         let file_descriptor = self
             .file_descriptors
             .get_mut(&fd)
@@ -178,6 +183,11 @@ impl VirtualFilesystem {
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
+        // Performance optimization: early return for zero-sized write requests to bypass hash lookups
+        if buffer.is_empty() {
+            return Ok(0);
+        }
+
         let file_descriptor = self
             .file_descriptors
             .get_mut(&fd)

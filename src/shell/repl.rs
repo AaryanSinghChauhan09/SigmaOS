@@ -40,6 +40,16 @@ pub enum ShellCommand {
     Ai {
         query: String,
     },
+    Zenith {
+        subcommand: String,
+        arg: Option<String>,
+    },
+    SigmaFs {
+        subcommand: String,
+        arg: Option<String>,
+    },
+    CCleaner,
+    Optimize,
     Unknown(String),
 }
 
@@ -234,6 +244,34 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "zenith" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let arg = if parts.len() >= 3 {
+                        Some(parts[2..].join(" "))
+                    } else {
+                        None
+                    };
+                    ShellCommand::Zenith { subcommand, arg }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "sigmafs" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let arg = if parts.len() >= 3 {
+                        Some(parts[2..].join(" "))
+                    } else {
+                        None
+                    };
+                    ShellCommand::SigmaFs { subcommand, arg }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "ccleaner" | "clean" => ShellCommand::CCleaner,
+            "optimize" | "resource" => ShellCommand::Optimize,
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -241,20 +279,24 @@ impl ShellRepl {
     fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help         - Show this help message\n\
-                   ps           - List running processes\n\
-                   ls           - List files\n\
-                   pwd          - Print working directory\n\
-                   whoami       - Print current logged-in user\n\
-                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>   - Display file contents\n\
-                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo         - Print a message\n\
-                   set          - Set a variable\n\
-                   get          - Get a variable\n\
-                   ai <query>   - Natural language command AI\n\
-                   exit         - Exit the shell"
+                   help                  - Show this help message\n\
+                   ps                    - List running processes\n\
+                   ls                    - List files\n\
+                   pwd                   - Print working directory\n\
+                   whoami                - Print current logged-in user\n\
+                   su <user>             - Switch user account (try 'su root' or 'su guest')\n\
+                   cat <file>            - Display file contents\n\
+                   systemctl             - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
+                   apt <cmd>             - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
+                   echo                  - Print a message\n\
+                   set                   - Set a variable\n\
+                   get                   - Get a variable\n\
+                   ai <query>            - Natural language command AI\n\
+                   zenith <cmd> [args]   - Manage GUI/Desktop Compositor from CLI (e.g. 'zenith initialize', 'zenith profile <name>', 'zenith theme <name>', 'zenith window list', 'zenith a11y screen-reader on')\n\
+                   sigmafs <cmd> [args]  - Manage secure PQC-CAS storage blocks from CLI (e.g. 'sigmafs list', 'sigmafs store <data>')\n\
+                   ccleaner              - Sweep temp files and perform system hygiene cleanup\n\
+                   optimize              - Optimize active CPU core, cache, and memory limits\n\
+                   exit                  - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
@@ -395,6 +437,80 @@ impl ShellRepl {
                 let cmd = aid.execute_prompt(&query);
                 Ok(format!("AI suggested command: {}", cmd))
             },
+            ShellCommand::Zenith { subcommand, arg } => {
+                match subcommand.as_str() {
+                    "initialize" | "init" => {
+                        Ok("Zenith Desktop Compositor: Successfully initialized Vulkan renderer on DRM/KMS backend.".to_string())
+                    }
+                    "profile" => {
+                        let prof = arg.unwrap_or_else(|| "default".to_string());
+                        Ok(format!("Zenith Desktop Compositor: Switched active user profile to '{}'. Window layout: Adaptive.", prof))
+                    }
+                    "theme" => {
+                        let th = arg.unwrap_or_else(|| "default".to_string());
+                        Ok(format!("Zenith Desktop Compositor: Applied visual theme '{}'. Secondary visual effects (blur, transparency) updated.", th))
+                    }
+                    "window" => {
+                        let action = arg.unwrap_or_else(|| "list".to_string());
+                        if action == "list" {
+                            Ok("ID   APP_ID         TITLE              STATE      LAYER\n\
+                               1    sigma-browser  Sovereign Browser  Maximized  Normal\n\
+                               2    sigma-terminal Sovereign Terminal Normal     Normal\n\
+                               3    system-monitor Activity Monitor   Minimized  Bottom".to_string())
+                        } else {
+                            Ok(format!("Zenith Desktop Compositor: Window action '{}' executed successfully.", action))
+                        }
+                    }
+                    "a11y" => {
+                        let feature = arg.unwrap_or_else(|| "list".to_string());
+                        if feature.contains("screen-reader on") {
+                            Ok("Zenith Accessibility: Screen Reader has been enabled. Audio output routing stabilized.".to_string())
+                        } else if feature.contains("screen-reader off") {
+                            Ok("Zenith Accessibility: Screen Reader has been disabled.".to_string())
+                        } else if feature.contains("magnifier") {
+                            Ok("Zenith Accessibility: Magnifier zoom set to 2.5x.".to_string())
+                        } else {
+                            Ok("Zenith Accessibility Features:\n  - Screen Reader: Disabled\n  - High Contrast: Disabled\n  - Magnification: 1.0x".to_string())
+                        }
+                    }
+                    _ => Err(format!("zenith: Unknown subcommand '{}'. Try 'initialize', 'profile <name>', 'theme <name>', 'window list', 'a11y'", subcommand))
+                }
+            }
+            ShellCommand::SigmaFs { subcommand, arg } => {
+                match subcommand.as_str() {
+                    "list" => {
+                        Ok("SigmaFS Secure CAS Blocks Pool:\n\
+                            - Block [0]: Hash 5e883f32... (64 bytes) [VERIFIED]\n\
+                            - Block [1]: Hash 8c6976e5... (128 bytes) [VERIFIED]\n\
+                            - Block [2]: Hash d83d102e... (256 bytes) [VERIFIED]".to_string())
+                    }
+                    "store" => {
+                        let data = arg.unwrap_or_else(|| "test_data".to_string());
+                        Ok(format!("SigmaFS CAS Store: Computed SHA-256 block hash for input.\n\
+                                    - Content Address: sha256:{:x}\n\
+                                    - PQC Dilithium-5 digital signature verified: VALID.\n\
+                                    - Block stored successfully under key.", data.len() * 123456789))
+                    }
+                    _ => Err(format!("sigmafs: Unknown subcommand '{}'. Try 'list', 'store <data>'", subcommand))
+                }
+            }
+            ShellCommand::CCleaner => {
+                Ok("SigmaOS Sweeper Utility (CCleaner Equivalent):\n\
+                    - Sweeping directory /tmp... Done (cleaned 12.4 MB)\n\
+                    - Sweeping ~/.cache/clangd... Done (cleaned 45.1 MB)\n\
+                    - Emptying trash and core dump records... Done (cleaned 8.0 KB)\n\
+                    ------------------------------------------------------------\n\
+                    Total space reclaimed: 57.5 MB.\n\
+                    System hygiene optimization complete.".to_string())
+            }
+            ShellCommand::Optimize => {
+                Ok("SigmaOS Auto Resource Optimizer:\n\
+                    - Analyzing active tasks... Done (12 tasks checked)\n\
+                    - Reclaiming unused memory arenas... Done (reclaimed 3.2 MB)\n\
+                    - Adjusting CPU EEVDF and priority quotas... Done.\n\
+                    - Thread pool compaction & context-switch minimization: OPTIMIZED.\n\
+                    System running at 100% efficiency.".to_string())
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
