@@ -37,6 +37,7 @@ pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub use kernel_io_suite::{
     AclPacket, AdLibSynth, AdLibSynthDriver as KernelAdLibSynth, AlsaError, AlsaSoundDriver,
     AncientDeviceLayer, AncientError, BluetoothError, BluetoothHciDriver, BluetoothMode, BssInfo,
@@ -83,3 +84,12 @@ pub type PrepatchRcDriver3 = Longterm6_6_AudioDriver;
 pub type PrepatchRcDriver4 = Longterm6_1_InputDriver;
 pub type PrepatchRcDriver5 = Longterm5_15_SerialDriver;
 pub type PrepatchRcDriver6 = Longterm5_10_TpmDriver;
+=======
+pub use legacy_keyboard::LegacyKeyboard;
+pub use modern_usb::ModernUsbController;
+pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
+pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
+pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
+pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
+pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
