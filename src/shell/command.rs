@@ -163,6 +163,24 @@ impl SimpleCommandRegistry {
 
         let pwd = SimpleShellCommand::new(b"pwd", b"Print working directory");
         self.commands.push(Some(Box::new(pwd)));
+
+        let sigpkg =
+            SimpleShellCommand::new(b"sigpkg", b"Manage packages (install, update, remove)");
+        self.commands.push(Some(Box::new(sigpkg)));
+
+        let sigtrace = SimpleShellCommand::new(b"sigtrace", b"System tracing control");
+        self.commands.push(Some(Box::new(sigtrace)));
+
+        let sigmetrics =
+            SimpleShellCommand::new(b"sigmetrics", b"System metrics telemetry exporter");
+        self.commands.push(Some(Box::new(sigmetrics)));
+
+        let sigstandards =
+            SimpleShellCommand::new(b"sigstandards", b"Verify POSIX and FHS compliance");
+        self.commands.push(Some(Box::new(sigstandards)));
+
+        let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
+        self.commands.push(Some(Box::new(sigsched)));
     }
 }
 
@@ -185,9 +203,11 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
-        for command_option in &self.commands {
-            if let Some(ref command) = *command_option {
-                if command.name() == name {
+        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let trimmed_name = &name[..name_len];
+        for command_option in &*self.commands {
+            if let Some(ref command) = command_option {
+                if command.name() == trimmed_name {
                     return Some(command.as_ref());
                 }
             }
@@ -197,8 +217,8 @@ impl CommandRegistry for SimpleCommandRegistry {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut names = Vec::new();
-        for command_option in &self.commands {
-            if let Some(ref command) = *command_option {
+        for command_option in &*self.commands {
+            if let Some(ref command) = command_option {
                 names.push(command.name());
             }
         }
@@ -258,7 +278,7 @@ impl ShellSession for SimpleShellSession {
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &self.environment {
+        for &(ref k, ref v) in &*self.environment {
             let len = k.iter().position(|&b| b == 0).unwrap_or(64);
             if &k[..len] == key {
                 let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
@@ -331,7 +351,7 @@ impl CommandHistory for SimpleCommandHistory {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut commands = Vec::new();
-        for cmd in &self.history {
+        for cmd in &*self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
         }
@@ -343,6 +363,27 @@ struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> Vec<T> {
@@ -384,7 +425,54 @@ impl<T> Vec<T> {
     }
 }
 
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_builtins_registration() {
+        let registry = SimpleCommandRegistry::new();
+        let mut session = SimpleShellSession::new();
+
+        // Verify all 5 new built-ins are registered successfully
+        assert!(session.registry.get(b"sigpkg").is_some());
+        assert!(session.registry.get(b"sigtrace").is_some());
+        assert!(session.registry.get(b"sigmetrics").is_some());
+        assert!(session.registry.get(b"sigstandards").is_some());
+        assert!(session.registry.get(b"sigsched").is_some());
+    }
+
+    #[test]
+    fn test_execute_sigpkg() {
+        let mut session = SimpleShellSession::new();
+        let result = session.execute_line(b"sigpkg").unwrap();
+        assert_eq!(&result[..6], b"sigpkg");
+    }
+
+    #[test]
+    fn test_command_history_add_and_list() {
+        let mut history = SimpleCommandHistory::new();
+        history.add(b"sigtrace trace task 256");
+        assert_eq!(history.list().len(), 1);
+        assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
+    }
 }
