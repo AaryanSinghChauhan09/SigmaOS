@@ -1,8 +1,6 @@
 // SigmaOS Network Stack - TCP Implementation
 // Sovereign TCP/IP stack with capability-based access control
 
-use core::time::Duration;
-
 /// TCP state machine states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TcpState {
