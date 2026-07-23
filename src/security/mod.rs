@@ -1,7 +1,6 @@
 // SigmaOS Security Module
 // Capability-based security, pledge, and access control
 
-pub mod audit;
 pub mod capability;
 pub mod clipboard;
 pub mod integrity;

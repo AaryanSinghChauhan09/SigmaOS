@@ -25,42 +25,12 @@ pub enum GpuCommand {
     Present,
 }
 
-/// DRM/KMS CRTC configuration
-#[derive(Debug, Clone, Copy)]
-pub struct DrmCrtc {
-    pub id: u32,
-    pub x: u32,
-    pub y: u32,
-    pub width: u32,
-    pub height: u32,
-    pub active: bool,
-}
-
-/// DRM/KMS Mode Info
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct DrmModeInfo {
-    pub clock: u32,
-    pub hdisplay: u16,
-    pub vdisplay: u16,
-    pub vrefresh: u32,
-}
-
-/// DRM/KMS Connector configuration
-#[derive(Debug, Clone)]
-pub struct DrmConnector {
-    pub id: u32,
-    pub connected: bool,
-    pub modes: Vec<DrmModeInfo>,
-}
-
 /// GPU driver interface
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
     pub capabilities: CapabilityToken,
     pub frame_buffer: Vec<u32>,
-    pub crtc: Option<DrmCrtc>,
-    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -71,8 +41,6 @@ impl GpuDriver {
             height,
             capabilities: CapabilityToken::new(),
             frame_buffer: vec![0; size],
-            crtc: None,
-            connector: None,
         }
     }
 

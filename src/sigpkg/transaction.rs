@@ -80,7 +80,7 @@ impl Transaction {
                     // Actual removal logic
                 }
                 Operation::Update { old, new } => {
-                    println!("Updating: {} -> {:?}", old.name, new.version);
+                    println!("Updating: {} -> {}", old.name, new.version);
                     // Actual update logic
                 }
             }
@@ -113,25 +113,6 @@ pub enum TransactionError {
     PackageNotFound(String),
     DependencyConflict(String),
     RollbackFailed,
-}
-
-impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
-    fn from(err: crate::sigpkg::resolver::ResolveError) -> Self {
-        match err {
-            crate::sigpkg::resolver::ResolveError::PackageNotFound(name) => {
-                TransactionError::PackageNotFound(name)
-            }
-            crate::sigpkg::resolver::ResolveError::NoMatchingVersion(name) => {
-                TransactionError::DependencyConflict(name)
-            }
-            crate::sigpkg::resolver::ResolveError::CircularDependency(name) => {
-                TransactionError::DependencyConflict(name)
-            }
-            crate::sigpkg::resolver::ResolveError::Conflict(name) => {
-                TransactionError::DependencyConflict(name)
-            }
-        }
-    }
 }
 
 #[cfg(test)]

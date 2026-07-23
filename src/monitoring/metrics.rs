@@ -215,8 +215,8 @@ fn format_simple(value: f64) -> Vec<u8> {
             digits.push((n % 10) as u8 + b'0');
             n /= 10;
         }
-        while !digits.is_empty() {
-            result.push(digits.pop().unwrap());
+        while let Some(d) = digits.pop() {
+            result.push(d);
         }
     }
 
@@ -231,8 +231,8 @@ fn format_simple(value: f64) -> Vec<u8> {
             digits.push((n % 10) as u8 + b'0');
             n /= 10;
         }
-        while !digits.is_empty() {
-            result.push(digits.pop().unwrap());
+        while let Some(d) = digits.pop() {
+            result.push(d);
         }
     }
 

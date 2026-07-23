@@ -1,7 +1,5 @@
 // SigmaOS Dashboard Module
-pub mod control_center;
 pub mod monitor;
-pub mod process;
 
 pub use control_center::{
     ControlCenterError, ControlPanel, ControlPanelImpl, DashboardWidget as ControlWidget,

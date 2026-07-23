@@ -11,6 +11,13 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Text,
+    Json,
+    Binary,
+}
+
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
@@ -196,6 +203,13 @@ impl AuditPolicy for SimpleAuditPolicy {
             Err(AuditError::InvalidEvent)
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Text,
+    Json,
+    Binary,
 }
 
 #[cfg(test)]

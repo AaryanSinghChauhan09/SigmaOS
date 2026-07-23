@@ -108,7 +108,7 @@ pub enum ChartType {
 }
 
 /// Cell value types for spreadsheets
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CellValue {
     Text(String),
     Number(f64),
@@ -476,7 +476,9 @@ impl SigmaOffice {
     /// Save document to SigmaFS
     pub fn save_document(&self, doc_idx: usize, path: &str) -> Result<()> {
         // In real implementation, this would save to SigmaFS with capability checks
-        let _doc = self.documents.get(doc_idx).ok_or("Document not found")?;
+        let _doc = self.documents.get(doc_idx).ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
+        })?;
         // Save logic here
         Ok(())
     }

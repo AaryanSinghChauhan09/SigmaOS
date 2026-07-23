@@ -13,7 +13,7 @@ use alloc::vec::Vec;
 
 pub type BreakpointID = usize;
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum BreakpointType {
     Software = 0,
@@ -117,14 +117,7 @@ impl Breakpoint for SimpleBreakpoint {
         self.address.load(Ordering::SeqCst)
     }
     fn breakpoint_type(&self) -> BreakpointType {
-        {
-            let raw = self.breakpoint_type.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => BreakpointType::Hardware,
-                2 => BreakpointType::Watchpoint,
-                _ => BreakpointType::Software,
-            }
-        }
+        unsafe { core::mem::transmute(self.breakpoint_type.load(Ordering::SeqCst)) }
     }
     fn is_enabled(&self) -> bool {
         self.enabled.load(Ordering::SeqCst) == 1

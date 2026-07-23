@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 /// Accessibility category
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AccessibilityCategory {
     Vision,
     Hearing,
