@@ -11,3 +11,6 @@ pub use cross_platform::{
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
 pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
+pub use scosmos::{
+    ApkLoader, BinderCallType, BinaryFormat as ScosmosBinaryFormat, CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
+};
