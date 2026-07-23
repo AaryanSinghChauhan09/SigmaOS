@@ -407,9 +407,28 @@ impl CompatibilityManager {
             .with_format(BinaryFormat::Elf)
             .with_isolation("os".to_string());
 
+        // containerd container runtime
+        let containerd = ContainerRuntime::new("containerd".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_isolation("process".to_string());
+
+        // CRI-O container runtime
+        let crio = ContainerRuntime::new("CRI-O".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_isolation("process".to_string());
+
+        // runc container runtime
+        let runc = ContainerRuntime::new("runc".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_isolation("process".to_string());
+
         self.container_runtimes.insert(docker.name.clone(), docker);
         self.container_runtimes.insert(podman.name.clone(), podman);
         self.container_runtimes.insert(lxc.name.clone(), lxc);
+        self.container_runtimes
+            .insert(containerd.name.clone(), containerd);
+        self.container_runtimes.insert(crio.name.clone(), crio);
+        self.container_runtimes.insert(runc.name.clone(), runc);
     }
 
     pub fn register_binary(&mut self, binary: ApplicationBinary) {
@@ -538,7 +557,7 @@ mod tests {
     fn test_manager_creation() {
         let manager = CompatibilityManager::new();
         assert_eq!(manager.translation_layers.len(), 3);
-        assert_eq!(manager.container_runtimes.len(), 3);
+        assert_eq!(manager.container_runtimes.len(), 6);
     }
 
     #[test]

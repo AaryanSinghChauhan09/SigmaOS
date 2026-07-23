@@ -40,16 +40,19 @@ jobs:
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
     
     - name: Format check
-      run: cargo fmt -- --check || true
+      run: cargo fmt -- --check
     
     - name: Clippy
-      run: cargo clippy -- -D warnings || true
+      run: cargo clippy -- -D warnings
+      continue-on-error: true
     
     - name: Build
-      run: cargo build --verbose || true
+      run: cargo build --verbose
+      continue-on-error: true
     
     - name: Run tests
-      run: cargo test --verbose || true
+      run: cargo test --verbose
+      continue-on-error: true
     
     - name: Security audit
       uses: rustsec/audit-check@v1
@@ -73,20 +76,24 @@ jobs:
       run: mkdir -p build
 
     - name: Run unit tests
-      run: cargo test --lib || true
+      run: cargo test --lib
+      continue-on-error: true
     
     - name: Run integration tests
-      run: cargo test --test '*' || true
+      run: cargo test --test '*'
+      continue-on-error: true
 
     - name: Initialize build and compile workspace
       run: |
         mkdir -p build
-        cargo build || true
+        cargo build
+      continue-on-error: true
     
     - name: Build binaries and initialize build dir for smoke test
       run: |
         mkdir -p build
-        cargo build || true
+        cargo build
+      continue-on-error: true
 
     - name: Run smoke tests
       run: |
@@ -94,7 +101,7 @@ jobs:
         mkdir -p target/debug
         touch target/debug/sigma_kernel
         chmod +x ./scripts/smoke-test.sh
-        ./scripts/smoke-test.sh || true
+        ./scripts/smoke-test.sh
 
   security:
     runs-on: ubuntu-latest
@@ -104,11 +111,10 @@ jobs:
     
     - name: Run security checks
       run: |
-        cargo install cargo-audit || true
-        cargo audit || true
+        cargo install cargo-audit
+        cargo audit
     
     - name: Check for vulnerabilities
       uses: rustsec/audit-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true

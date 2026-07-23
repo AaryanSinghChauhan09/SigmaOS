@@ -28,6 +28,11 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
+    pub pkgrel: u32,
+    pub arch: String,
+    pub license_spdx: String,
+    pub prepare_commands: Vec<String>,
+    pub package_commands: Vec<String>,
 }
 
 impl PackageRecipe {
@@ -43,6 +48,11 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
+            pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "GPL".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -79,6 +89,26 @@ impl PackageRecipe {
 
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
+        self
+    }
+
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
+        self
+    }
+
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
+        self
+    }
+
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
+        self
+    }
+
+    pub fn with_package_command(mut self, command: String) -> Self {
+        self.package_commands.push(command);
         self
     }
 
@@ -224,5 +254,27 @@ mod tests {
 
         let script = recipe.get_build_script();
         assert!(script.contains("cargo build"));
+    }
+
+    #[test]
+    fn test_pkgbuild_and_aur_compilation_fields() {
+        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
+            .with_pkgrel(3)
+            .with_arch("aarch64".to_string())
+            .with_source(
+                "https://github.com/dylanaraps/neofetch".to_string(),
+                "hash_neofetch".to_string(),
+            )
+            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
+            .with_build_command("make build".to_string())
+            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
+
+        assert_eq!(recipe.pkgrel, 3);
+        assert_eq!(recipe.arch, "aarch64");
+        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
+        assert_eq!(
+            recipe.package_commands[0],
+            "make DESTDIR=\"$pkgdir\" install"
+        );
     }
 }

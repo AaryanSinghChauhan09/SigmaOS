@@ -20,10 +20,10 @@ This journal contains CRITICAL performance learnings discovered during profiling
 **Learning:** Collecting split string slices into a heap-allocated `Vec` during SemVer parsing introduces unnecessary allocations and deallocations, causing garbage collection/fragmentation overhead and preventing the package manager from running safely in no_std environments. Replacing `split('.').collect::<Vec<_>>()` with a direct lazy split iterator preserves identical functionality while guaranteeing absolute zero-allocation runtime performance.
 **Action:** Utilize inline iterator-based parsing (like `.next()`) instead of eager collection when decomposing dot-separated version strings.
 
-## 2024-07-18 - Borrow Checker Constraint Elimination of Defensive Clones
-**Learning:** Strict compiler borrow checking on fields inside a parent struct (such as the allocations Map in `SecureFreeDetector` or caches in `SlabAllocator`) often tempts developers to call `.clone()` defensively on nested values or structures to satisfy the borrow checker. This causes hidden allocation bottlenecks inside real-time microkernel modules. Refactoring the lifetimes by releasing the parent borrow early (e.g., using scoped blocks or extracting scalar fields first) completely eliminates the compile-time conflict, avoiding defensive heap copying and maintaining zero-copy execution pipelines.
-**Action:** Before cloning to satisfy the borrow checker, analyze field access scopes and use local variable extraction or scoped blocks to isolate mutable borrowings.
-
 ## 2026-07-20 - Custom Zero-Dependency LCG Utility Helpers vs. External Crate Footprint
 **Learning:** Incorporating external crates (like `rand` or `uuid`) for basic non-cryptographic telemetry IDs or random polling intervals adds immense build-time overhead, bloating the microkernel and triggering standard-library linker dependencies on host-hosted setups. Implementing a lightweight local 48-bit Linear Congruential Generator (LCG) with UNIX timestamp nanoseconds provides compile-time independence, sub-nanosecond execution speeds, and guarantees zero compilation dependencies on external environments.
 **Action:** Minimize external crate dependencies in modular kernels; prefer local mathematical utility implementations for basic simulation algorithms.
+
+## 2026-07-22 - Replacing Vector Collection with Lazy Iterators in SemVer
+**Learning:** Using heap-allocated `Vec` buffers via `split('.').collect()` for checking format and parsing minor/major/patch parts of a package version string is a classic performance bottleneck in dependency solvers. Transitioning to direct, lazy iterators on the `.split()` object completely avoids the heap allocator.
+**Action:** Never eagerly collect string slices into a dynamic array unless the elements are reused multiple times in unrelated scopes.

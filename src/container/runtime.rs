@@ -15,7 +15,7 @@ pub type ContainerID = usize;
 
 /// Container state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -46,7 +46,7 @@ pub trait Container {
 
 /// Container error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
     Success = 0,
     AlreadyStarted = 1,
@@ -115,6 +115,37 @@ impl ContainerCapability {
     }
 }
 
+/// Container network configuration type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerNetworkType {
+    None,
+    Bridge,
+    Overlay,
+}
+
+/// Container volume configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerVolume {
+    pub is_bind_mount: bool,
+    pub is_tmpfs: bool,
+    pub read_only: bool,
+}
+
+/// Container user namespaces mapping
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerNamespace {
+    pub uid_mapping: u32,
+    pub gid_mapping: u32,
+    pub rootless: bool,
+}
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
 /// Simple container (OOP: Concrete container class)
 #[repr(C)]
 pub struct SimpleContainer {
@@ -127,6 +158,10 @@ pub struct SimpleContainer {
     pub cpu_limit: u32,
     pub capability: ContainerCapability,
     pub environment: [u8; 512],
+    pub network_type: ContainerNetworkType,
+    pub volume: ContainerVolume,
+    pub namespace: ContainerNamespace,
+    pub seccomp: SeccompProfile,
 }
 
 impl SimpleContainer {
@@ -152,6 +187,10 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
+            network_type: ContainerNetworkType::None,
+            volume: ContainerVolume { is_bind_mount: false, is_tmpfs: false, read_only: false },
+            namespace: ContainerNamespace { uid_mapping: 0, gid_mapping: 0, rootless: false },
+            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
         }
     }
 
@@ -168,16 +207,13 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
             1 => ContainerState::Running,
             2 => ContainerState::Paused,
             3 => ContainerState::Stopped,
-            4 => ContainerState::Failed,
-            _ => ContainerState::Created,
+            _ => ContainerState::Failed,
         }
-    }
     }
 
     pub fn set_state(&self, state: ContainerState) {
@@ -296,6 +332,7 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -381,7 +418,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
         let mut index = None;
         for (i, container_option) in self.containers.iter().enumerate() {
-            if let Some(ref container) = *container_option {
+            if let Some(ref container) = container_option {
                 if container.id() == id {
                     index = Some(i);
                     break;
@@ -479,8 +516,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn get_container(&self, id: ContainerID) -> Option<&dyn Container> {
-        for container_option in &self.containers {
-            if let Some(ref container) = *container_option {
+        for container_option in &*self.containers {
+            if let Some(ref container) = container_option {
                 if container.id() == id {
                     return Some(container.as_ref());
                 }
@@ -491,8 +528,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &self.containers {
-            if let Some(ref container) = *container_option {
+        for container_option in &*self.containers {
+            if let Some(ref container) = container_option {
                 ids.push(container.id());
             }
         }
@@ -506,8 +543,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
 impl SimpleContainerRuntime {
     fn get_container_mut(&mut self, id: ContainerID) -> Option<&mut Box<dyn Container>> {
-        for container_option in &mut self.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return Some(container);
                 }
@@ -522,6 +559,27 @@ struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> Vec<T> {
@@ -569,8 +627,63 @@ impl<T> Vec<T> {
     }
 }
 
-// External allocator functions
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_container_creation() {
+        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let id = runtime.create_container(b"sovereign_container", b"ubuntu-pqc", ContainerCapability::full()).unwrap();
+        assert_eq!(id, 1);
+    }
+
+    #[test]
+    fn test_container_oci_networking_and_volumes() {
+        let mut container = SimpleContainer::new(1, b"web_app", b"nginx-dilithium", ContainerCapability::full());
+
+        // Assert network parity bridge setting
+        assert_eq!(container.network_type, ContainerNetworkType::None);
+        container.network_type = ContainerNetworkType::Bridge;
+        assert_eq!(container.network_type, ContainerNetworkType::Bridge);
+
+        // Assert volume mounts setting
+        assert!(!container.volume.is_bind_mount);
+        container.volume.is_bind_mount = true;
+        assert!(container.volume.is_bind_mount);
+    }
+
+    #[test]
+    fn test_container_namespaces_and_seccomp() {
+        let mut container = SimpleContainer::new(1, b"secure_sandbox", b"alpine-kyber", ContainerCapability::full());
+
+        // Assert namespace uid mappings
+        assert_eq!(container.namespace.uid_mapping, 0);
+        container.namespace.uid_mapping = 1000;
+        assert_eq!(container.namespace.uid_mapping, 1000);
+
+        // Assert seccomp profile hardening
+        assert!(!container.seccomp.hardened);
+        container.seccomp.hardened = true;
+        assert!(container.seccomp.hardened);
+    }
 }
