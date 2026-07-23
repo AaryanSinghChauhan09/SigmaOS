@@ -30,19 +30,25 @@ impl Version {
         }
     }
 
+    /// Parses version input safely with a zero-allocation, stateless next() token iterator over '.' separators
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let parts: Vec<&str> = version_str.split('.').collect();
-        if parts.len() != 3 {
+        let mut parts = version_str.split('.');
+
+        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+
+        if parts.next().is_some() {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = parts[0]
+        let major = major_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
+        let minor = minor_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
+        let patch = patch_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 

@@ -89,6 +89,7 @@ impl PackageDependencyResolver {
                 }
             }
         }
+        *idx -= 1;
         true
     }
 
@@ -156,6 +157,7 @@ impl PackageDependencyResolver {
                 }
             }
         }
+        *idx -= 1;
         true
     }
 
