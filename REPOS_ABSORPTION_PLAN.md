@@ -504,6 +504,26 @@ By systematic abstraction, SigmaOS maps, obsoletes, and natively replaces mainst
 
 ---
 
+## 💾 35. The Legacy Linux Hardware Preservation Initiative
+
+Modern Linux distributions and kernel versions (such as the standard mainline tree) routinely deprecate and drop support for early computing hardware architectures, ISA devices, and vintage drivers to simplify their monolithic procedural codebase. SigmaOS rejects this planned obsolescence.
+
+By employing a decoupled userspace driver architecture and standard Object-Oriented base traits (`DeviceDriver`, `PeripheralDevice`), SigmaOS implements a zero-allocation, secure, and perpetual preservation framework for legacy hardware devices. This allows hardware to operate securely and efficiently at native speeds, even under modern post-quantum microkernel workloads.
+
+### Key Preserved Legacy Drivers inside `src/kernel/drivers/legacy/`:
+- **`adlib_opl` (OPL FM Synthesizer / SoundBlaster 16):** Fully emulates retro sound cards and synthesis chips at I/O ports `0x220` and `0x388`, executing sound buffers under safe thread synchronization.
+- **`cga_mda` (CGA/MDA Text Console / Vesa Text Mode):** Accesses historical monochrome and color video memory blocks directly at frame segment `0xB8000` to draw retro screen matrices.
+- **`floppy` (Floppy Disk Controller):** Coordinates low-level disk sector lookups over vintage ISA DMA channels and PIO command blocks.
+- **`ide_ata` (IDE/ATA Drive Controller):** Preserves retro ATA command blocks (e.g., IDENTIFY, READ/WRITE DMA), supporting early parallel hard disks.
+- **`isa_bus` (ISA, EISA, & LPC Bridge):** Abstracts historical bus infrastructures, resolving legacy IRQs, system port ranges, and 8259 PIC controllers.
+- **`mfm_rll` (MFM/RLL Hard Disk Controller):** Emulates early ST-506/ST-412 disk geometries, sector mappings, and stepper-motor track calculations.
+- **`ne2000` (NE2000 Network Card / RTL8139):** Preserves ISA-based Ethernet frame ring-buffers executing within sandboxed userspace shards.
+- **`uart_8250` (8250 UART Serial Mouse / Serial Ports):** Transcribes COM1/COM2 serial scancodes and mouse inputs natively.
+
+By preservation of these vintage interfaces, SigmaOS maintains digital sovereignty, technical heritage, and backward compatibility for industrial, academic, and retro-computing deployments worldwide.
+
+---
+
 ## 🛡️ Capability-Gated Security Alignments
 
 To keep SigmaOS 100% secure, all components absorbed from the 34 domains are wrapped in a Capability-Based Sandbox:
