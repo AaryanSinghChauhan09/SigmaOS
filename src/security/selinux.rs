@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityContext {
@@ -94,10 +94,11 @@ impl SecurityPolicy {
                 continue;
             }
 
-            if self.labels_match(&rule.source, source) 
+            if self.labels_match(&rule.source, source)
                 && self.labels_match(&rule.target, target)
                 && rule.object_type == object_type
-                && rule.permissions.contains(&permission) {
+                && rule.permissions.contains(&permission)
+            {
                 return true;
             }
         }
@@ -223,8 +224,7 @@ impl AppArmorManager {
 
     /// Delete a profile
     pub fn delete_profile(&mut self, name: &str) -> Result<(), &'static str> {
-        self.profiles.remove(name)
-            .ok_or("Profile not found")?;
+        self.profiles.remove(name).ok_or("Profile not found")?;
         Ok(())
     }
 
@@ -247,7 +247,7 @@ mod tests {
     #[test]
     fn test_security_policy() {
         let mut policy = SecurityPolicy::new();
-        
+
         let source = SecurityLabel {
             user: "system_u".to_string(),
             role: "system_r".to_string(),
@@ -280,10 +280,10 @@ mod tests {
     #[test]
     fn test_enforcing_mode() {
         let mut policy = SecurityPolicy::new();
-        
+
         policy.set_enforcing(false);
         assert!(!policy.is_enforcing());
-        
+
         policy.set_enforcing(true);
         assert!(policy.is_enforcing());
     }
@@ -291,7 +291,7 @@ mod tests {
     #[test]
     fn test_wildcard_matching() {
         let mut policy = SecurityPolicy::new();
-        
+
         let source = SecurityLabel {
             user: "".to_string(), // Wildcard
             role: "".to_string(),
@@ -323,14 +323,15 @@ mod tests {
             level: "s0".to_string(),
         };
 
-        let allowed = policy.check_permission(&check_source, &target, ObjectType::File, Permission::Read);
+        let allowed =
+            policy.check_permission(&check_source, &target, ObjectType::File, Permission::Read);
         assert!(allowed);
     }
 
     #[test]
     fn test_apparmor_manager() {
         let mut manager = AppArmorManager::new();
-        
+
         let profile = AppArmorProfile {
             name: "test_profile".to_string(),
             path: "/etc/".to_string(),
@@ -348,10 +349,10 @@ mod tests {
     #[test]
     fn test_apparmor_enforcing() {
         let mut manager = AppArmorManager::new();
-        
+
         manager.set_enforcing(false);
         assert!(!manager.is_enforcing());
-        
+
         manager.set_enforcing(true);
         assert!(manager.is_enforcing());
     }
@@ -359,7 +360,7 @@ mod tests {
     #[test]
     fn test_delete_rule() {
         let mut policy = SecurityPolicy::new();
-        
+
         let source = SecurityLabel {
             user: "system_u".to_string(),
             role: "system_r".to_string(),
@@ -384,7 +385,7 @@ mod tests {
 
         policy.add_rule(rule).unwrap();
         policy.delete_rule(0).unwrap();
-        
+
         assert_eq!(policy.rule_count(), 0);
     }
 }

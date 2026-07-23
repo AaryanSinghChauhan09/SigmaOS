@@ -65,7 +65,11 @@ pub struct ResourceUsage {
 /// OOP trait for sandbox enforcement strategies
 pub trait SandboxEnforcement {
     /// Apply sandbox to process
-    fn apply_sandbox(&mut self, pid: u64, profile: &SandboxProfile) -> Result<SandboxResult, SandboxError>;
+    fn apply_sandbox(
+        &mut self,
+        pid: u64,
+        profile: &SandboxProfile,
+    ) -> Result<SandboxResult, SandboxError>;
     /// Check if operation is allowed
     fn check_operation(&self, pid: u64, operation: SandboxOperation) -> bool;
     /// Get strategy name
@@ -104,7 +108,11 @@ impl CapabilitySandboxEnforcer {
 }
 
 impl SandboxEnforcement for CapabilitySandboxEnforcer {
-    fn apply_sandbox(&mut self, pid: u64, profile: &SandboxProfile) -> Result<SandboxResult, SandboxError> {
+    fn apply_sandbox(
+        &mut self,
+        pid: u64,
+        profile: &SandboxProfile,
+    ) -> Result<SandboxResult, SandboxError> {
         self.active_sandboxes.insert(pid, profile.clone());
 
         // Simulate applying sandbox restrictions
@@ -140,14 +148,15 @@ impl SandboxEnforcement for CapabilitySandboxEnforcer {
                     false
                 }
                 SandboxOperation::NetworkAccess(_) => {
-                    matches!(profile.network_access, NetworkPolicy::FullAccess | NetworkPolicy::OutboundOnly)
+                    matches!(
+                        profile.network_access,
+                        NetworkPolicy::FullAccess | NetworkPolicy::OutboundOnly
+                    )
                 }
-                SandboxOperation::ProcessCreation => {
-                    profile.capabilities.contains(&"process_creation".to_string())
-                }
-                SandboxOperation::SystemCall(syscall) => {
-                    profile.capabilities.contains(&syscall)
-                }
+                SandboxOperation::ProcessCreation => profile
+                    .capabilities
+                    .contains(&"process_creation".to_string()),
+                SandboxOperation::SystemCall(syscall) => profile.capabilities.contains(&syscall),
             }
         } else {
             true // No sandbox applied, allow all
@@ -187,7 +196,11 @@ impl NamespaceSandboxEnforcer {
 }
 
 impl SandboxEnforcement for NamespaceSandboxEnforcer {
-    fn apply_sandbox(&mut self, pid: u64, profile: &SandboxProfile) -> Result<SandboxResult, SandboxError> {
+    fn apply_sandbox(
+        &mut self,
+        pid: u64,
+        profile: &SandboxProfile,
+    ) -> Result<SandboxResult, SandboxError> {
         self.active_sandboxes.insert(pid, profile.clone());
 
         // Simulate creating namespaces
@@ -207,7 +220,9 @@ impl SandboxEnforcement for NamespaceSandboxEnforcer {
         if let Some(profile) = self.active_sandboxes.get(&pid) {
             match operation {
                 SandboxOperation::FileAccess(_) => true,
-                SandboxOperation::NetworkAccess(_) => matches!(profile.network_access, NetworkPolicy::FullAccess),
+                SandboxOperation::NetworkAccess(_) => {
+                    matches!(profile.network_access, NetworkPolicy::FullAccess)
+                }
                 SandboxOperation::ProcessCreation => false,
                 SandboxOperation::SystemCall(_) => true,
             }
@@ -257,8 +272,13 @@ impl ProcessSandboxManager {
     }
 
     /// Sandbox a process with a profile
-    pub fn sandbox_process(&mut self, pid: u64, profile_name: &str) -> Result<SandboxResult, SandboxError> {
-        let profile = self.profiles
+    pub fn sandbox_process(
+        &mut self,
+        pid: u64,
+        profile_name: &str,
+    ) -> Result<SandboxResult, SandboxError> {
+        let profile = self
+            .profiles
             .get(profile_name)
             .ok_or_else(|| SandboxError::ProfileNotFound(profile_name.to_string()))?;
 

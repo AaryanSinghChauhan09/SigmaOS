@@ -79,7 +79,10 @@ impl PowerStrategy for CpuPowerStrategy {
             success: true,
             power_saved_percent: power_saved,
             battery_life_extended_minutes: (power_saved * 6.0) as u64, // Approximate
-            message: format!("CPU frequency limited to {}%", self.max_cpu_frequency_percent),
+            message: format!(
+                "CPU frequency limited to {}%",
+                self.max_cpu_frequency_percent
+            ),
         })
     }
 
@@ -150,7 +153,10 @@ impl PowerStrategy for DisplayPowerStrategy {
             success: true,
             power_saved_percent: power_saved,
             battery_life_extended_minutes: (power_saved * 4.0) as u64,
-            message: format!("Brightness set to {}%, timeout: {}s", self.brightness_percent, self.timeout_seconds),
+            message: format!(
+                "Brightness set to {}%, timeout: {}s",
+                self.brightness_percent, self.timeout_seconds
+            ),
         })
     }
 
@@ -379,7 +385,10 @@ impl BatterySaverManager {
 
     /// Get total battery life extended
     pub fn total_battery_extended(&self) -> u64 {
-        self.results.iter().map(|r| r.battery_life_extended_minutes).sum()
+        self.results
+            .iter()
+            .map(|r| r.battery_life_extended_minutes)
+            .sum()
     }
 }
 
@@ -426,8 +435,7 @@ mod tests {
 
     #[test]
     fn test_auto_switch() {
-        let mut manager = BatterySaverManager::new()
-            .with_auto_switch(true, 20);
+        let mut manager = BatterySaverManager::new().with_auto_switch(true, 20);
         manager.update_battery_status(BatteryStatus {
             level_percent: 15,
             is_charging: false,

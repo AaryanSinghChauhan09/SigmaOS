@@ -79,7 +79,9 @@ impl MultiCallShell {
 
     /// List all supported commands
     pub fn list_supported_commands() -> &'static [&'static str] {
-        &["echo", "whoami", "pwd", "cat", "ls", "mkdir", "rm", "cp", "mv", "date", "uname"]
+        &[
+            "echo", "whoami", "pwd", "cat", "ls", "mkdir", "rm", "cp", "mv", "date", "uname",
+        ]
     }
 }
 
@@ -90,10 +92,22 @@ mod tests {
     #[test]
     fn test_busybox_style_multicall() {
         // Simulates invoking utilities via system symlinks
-        assert_eq!(MultiCallShell::parse_multicall_invocation("echo"), SysCommandType::Echo);
-        assert_eq!(MultiCallShell::parse_multicall_invocation("sigma-whoami"), SysCommandType::WhoAmI);
-        assert_eq!(MultiCallShell::parse_multicall_invocation("pwd"), SysCommandType::Pwd);
-        assert_eq!(MultiCallShell::parse_multicall_invocation("ls"), SysCommandType::Unsupported);
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("echo"),
+            SysCommandType::Echo
+        );
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("sigma-whoami"),
+            SysCommandType::WhoAmI
+        );
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("pwd"),
+            SysCommandType::Pwd
+        );
+        assert_eq!(
+            MultiCallShell::parse_multicall_invocation("ls"),
+            SysCommandType::Unsupported
+        );
     }
 
     #[test]

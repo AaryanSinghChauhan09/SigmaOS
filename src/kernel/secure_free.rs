@@ -4,15 +4,15 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SanitizationLevel {
-    None,       // No sanitization
-    Partial,    // Zero only sensitive data
-    Full,       // Zero entire allocation
-    Pattern,    // Fill with detectable pattern
+    None,    // No sanitization
+    Partial, // Zero only sensitive data
+    Full,    // Zero entire allocation
+    Pattern, // Fill with detectable pattern
 }
 
 #[derive(Debug, Clone)]
@@ -53,7 +53,9 @@ impl SecureFreeDetector {
 
     /// Securely free memory
     pub fn secure_free(&mut self, address: usize, ptr: *mut u8) -> Result<(), &'static str> {
-        let record = self.allocations.get_mut(&address)
+        let record = self
+            .allocations
+            .get_mut(&address)
             .ok_or("Allocation not found")?;
 
         if record.freed {
@@ -110,7 +112,8 @@ impl SecureFreeDetector {
 
     /// Detect information disclosure (unfreed sensitive data)
     pub fn detect_information_disclosure(&self) -> Vec<usize> {
-        self.allocations.iter()
+        self.allocations
+            .iter()
             .filter(|(_, record)| record.is_sensitive && !record.freed)
             .map(|(addr, _)| *addr)
             .collect()
@@ -193,7 +196,7 @@ mod tests {
     #[test]
     fn test_register_allocation() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.register_allocation(0x1000, 512, true);
         assert_eq!(detector.allocation_count(), 1);
     }
@@ -201,12 +204,12 @@ mod tests {
     #[test]
     fn test_secure_free() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.register_allocation(0x1000, 512, true);
-        
+
         let mut buffer = [0u8; 512];
         let result = detector.secure_free(0x1000, buffer.as_mut_ptr());
-        
+
         assert!(result.is_ok());
         assert_eq!(detector.freed_count(), 1);
     }
@@ -214,12 +217,12 @@ mod tests {
     #[test]
     fn test_double_free_detection() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.register_allocation(0x1000, 512, true);
-        
+
         let mut buffer = [0u8; 512];
         detector.secure_free(0x1000, buffer.as_mut_ptr()).unwrap();
-        
+
         let result = detector.secure_free(0x1000, buffer.as_mut_ptr());
         assert!(result.is_err());
     }
@@ -227,22 +230,22 @@ mod tests {
     #[test]
     fn test_use_after_free_detection() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.register_allocation(0x1000, 512, true);
-        
+
         let mut buffer = [0u8; 512];
         detector.secure_free(0x1000, buffer.as_mut_ptr()).unwrap();
-        
+
         assert!(detector.check_use_after_free(0x1000));
     }
 
     #[test]
     fn test_information_disclosure_detection() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.register_allocation(0x1000, 512, true);
         detector.register_allocation(0x2000, 512, false);
-        
+
         let disclosures = detector.detect_information_disclosure();
         assert_eq!(disclosures.len(), 1);
         assert_eq!(disclosures[0], 0x1000);
@@ -251,10 +254,10 @@ mod tests {
     #[test]
     fn test_sanitization_levels() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.set_sanitization_level(SanitizationLevel::None);
         assert_eq!(detector.sanitization_level(), SanitizationLevel::None);
-        
+
         detector.set_sanitization_level(SanitizationLevel::Full);
         assert_eq!(detector.sanitization_level(), SanitizationLevel::Full);
     }
@@ -262,15 +265,15 @@ mod tests {
     #[test]
     fn test_pattern_sanitization() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.set_sanitization_level(SanitizationLevel::Pattern);
         detector.set_pattern(0xAB);
-        
+
         detector.register_allocation(0x1000, 512, true);
-        
+
         let mut buffer = [0u8; 512];
         detector.secure_free(0x1000, buffer.as_mut_ptr()).unwrap();
-        
+
         // Check that buffer is filled with pattern
         assert_eq!(buffer[0], 0xAB);
     }
@@ -278,13 +281,13 @@ mod tests {
     #[test]
     fn test_statistics() {
         let mut detector = SecureFreeDetector::new();
-        
+
         detector.register_allocation(0x1000, 512, true);
         detector.register_allocation(0x2000, 512, false);
-        
+
         let mut buffer1 = [0u8; 512];
         detector.secure_free(0x1000, buffer1.as_mut_ptr()).unwrap();
-        
+
         let stats = detector.get_statistics();
         assert_eq!(stats.total_allocations, 2);
         assert_eq!(stats.freed_allocations, 1);

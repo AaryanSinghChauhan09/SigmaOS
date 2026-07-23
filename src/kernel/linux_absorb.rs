@@ -165,13 +165,13 @@ impl LinuxAbsorptionEngine {
         source_code: &str,
     ) -> Result<AbsorbedDriverInfo, AbsorptionError> {
         let sigma_driver_name = Self::generate_sigma_name(linux_module);
-        
+
         // Apply conversion rules
         let converted_code = self.apply_conversion_rules(source_code)?;
-        
+
         // Apply security hardening
         let hardened_code = self.apply_security_hardening(&converted_code)?;
-        
+
         let info = AbsorbedDriverInfo {
             linux_module: String::from(linux_module),
             linux_version: String::from(linux_version),
@@ -316,11 +316,9 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
                 let data = vec![0u8; size];
                 Ok(IoResult::ReadComplete { data })
             }
-            IoOperation::Write { offset, data } => {
-                Ok(IoResult::WriteComplete {
-                    bytes_written: data.len(),
-                })
-            }
+            IoOperation::Write { offset, data } => Ok(IoResult::WriteComplete {
+                bytes_written: data.len(),
+            }),
             _ => Err(DriverError::NotSupported),
         }
     }
@@ -433,18 +431,19 @@ impl FileSystem for AbsorbedExt4Driver {
     }
 
     fn metadata(&self) -> &crate::kernel::subsystem::FilesystemMetadata {
-        static METADATA: crate::kernel::subsystem::FilesystemMetadata = crate::kernel::subsystem::FilesystemMetadata {
-            name: String::from("AbsorbedExt4"),
-            version: String::from("1.0.0"),
-            fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
-            linux_heritage: None,
-            max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
-            max_filename_length: 255,
-            features: vec![
-                crate::kernel::subsystem::FilesystemFeature::Journaling,
-                crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
-            ],
-        };
+        static METADATA: crate::kernel::subsystem::FilesystemMetadata =
+            crate::kernel::subsystem::FilesystemMetadata {
+                name: String::from("AbsorbedExt4"),
+                version: String::from("1.0.0"),
+                fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
+                linux_heritage: None,
+                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
+                max_filename_length: 255,
+                features: vec![
+                    crate::kernel::subsystem::FilesystemFeature::Journaling,
+                    crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
+                ],
+            };
         &METADATA
     }
 
@@ -516,7 +515,10 @@ impl NetworkStack for AbsorbedTcpStack {
         Ok(handle)
     }
 
-    fn close_socket(&mut self, handle: crate::kernel::subsystem::SocketHandle) -> Result<(), NetworkError> {
+    fn close_socket(
+        &mut self,
+        handle: crate::kernel::subsystem::SocketHandle,
+    ) -> Result<(), NetworkError> {
         if let Some(pos) = self.connections.iter().position(|&h| h == handle) {
             self.connections.remove(pos);
         }
@@ -580,7 +582,11 @@ impl MemoryManager for AbsorbedBuddyAllocator {
     }
 
     fn free_physical(&mut self, address: u64, size: usize) -> Result<(), MemoryError> {
-        if let Some(pos) = self.allocated_blocks.iter().position(|&(addr, sz)| addr == address && sz == size) {
+        if let Some(pos) = self
+            .allocated_blocks
+            .iter()
+            .position(|&(addr, sz)| addr == address && sz == size)
+        {
             self.allocated_blocks.remove(pos);
         }
         Ok(())
@@ -657,7 +663,10 @@ impl Scheduler for AbsorbedCfsScheduler {
         Ok(())
     }
 
-    fn add_process(&mut self, process: crate::kernel::subsystem::ProcessInfo) -> Result<(), SchedulerError> {
+    fn add_process(
+        &mut self,
+        process: crate::kernel::subsystem::ProcessInfo,
+    ) -> Result<(), SchedulerError> {
         self.processes.push(process);
         Ok(())
     }
@@ -673,7 +682,11 @@ impl Scheduler for AbsorbedCfsScheduler {
         self.processes.first().cloned()
     }
 
-    fn update_process(&mut self, pid: u64, state: crate::kernel::subsystem::ProcessState) -> Result<(), SchedulerError> {
+    fn update_process(
+        &mut self,
+        pid: u64,
+        state: crate::kernel::subsystem::ProcessState,
+    ) -> Result<(), SchedulerError> {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
         }
@@ -705,10 +718,10 @@ mod tests {
     fn test_absorption_engine() {
         let mut engine = LinuxAbsorptionEngine::new();
         let source_code = "void init() { kmalloc(1024); }";
-        
+
         let result = engine.absorb_driver("test_module", "6.6", source_code);
         assert!(result.is_ok());
-        
+
         let info = result.unwrap();
         assert_eq!(info.linux_module, "test_module");
         assert_eq!(info.absorption_status, AbsorptionStatus::Completed);
@@ -718,7 +731,7 @@ mod tests {
     fn test_absorbed_usb_hid_driver() {
         let mut driver = AbsorbedUsbHidDriver::new(0x1234, 0x5678);
         assert!(driver.init().is_ok());
-        
+
         let operation = IoOperation::Read { offset: 0, size: 8 };
         let result = driver.handle_io(operation);
         assert!(result.is_ok());
@@ -736,7 +749,7 @@ mod tests {
     fn test_absorbed_tcp_stack() {
         let mut stack = AbsorbedTcpStack::new();
         assert!(stack.init().is_ok());
-        
+
         let handle = stack.create_socket(
             crate::kernel::subsystem::SocketDomain::IPv4,
             crate::kernel::subsystem::SocketType::Stream,
@@ -749,7 +762,7 @@ mod tests {
     fn test_absorbed_buddy_allocator() {
         let mut allocator = AbsorbedBuddyAllocator::new();
         assert!(allocator.init().is_ok());
-        
+
         let address = allocator.allocate_physical(4096);
         assert!(address.is_ok());
     }
@@ -758,7 +771,7 @@ mod tests {
     fn test_absorbed_cfs_scheduler() {
         let mut scheduler = AbsorbedCfsScheduler::new();
         assert!(scheduler.init().is_ok());
-        
+
         let process = crate::kernel::subsystem::ProcessInfo {
             pid: 1,
             name: String::from("test"),

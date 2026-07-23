@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageState {
@@ -58,7 +58,7 @@ impl SpacPackageManager {
     /// Stage a package for installation
     pub fn stage_package(&mut self, package: SovereignPackage) -> Result<(), &'static str> {
         let name = package.name.clone();
-        
+
         if self.packages.contains_key(&name) {
             return Err("Package already exists");
         }
@@ -71,7 +71,7 @@ impl SpacPackageManager {
     /// Activate all staged packages transactionally
     pub fn activate_staged(&mut self) -> Result<usize, &'static str> {
         let count = self.staged_packages.len();
-        
+
         for name in self.staged_packages.drain(..) {
             if let Some(pkg) = self.packages.get_mut(&name) {
                 pkg.activate();
@@ -83,8 +83,7 @@ impl SpacPackageManager {
 
     /// Rollback a package to previous state
     pub fn rollback_package(&mut self, name: &str) -> Result<(), &'static str> {
-        let pkg = self.packages.get_mut(name)
-            .ok_or("Package not found")?;
+        let pkg = self.packages.get_mut(name).ok_or("Package not found")?;
 
         pkg.rollback();
         Ok(())
@@ -107,8 +106,7 @@ impl SpacPackageManager {
 
     /// Remove a package
     pub fn remove_package(&mut self, name: &str) -> Result<(), &'static str> {
-        self.packages.remove(name)
-            .ok_or("Package not found")?;
+        self.packages.remove(name).ok_or("Package not found")?;
         Ok(())
     }
 
@@ -136,13 +134,13 @@ mod tests {
     #[test]
     fn test_stage_package() {
         let mut manager = SpacPackageManager::new();
-        
+
         let pkg = SovereignPackage::new(
             "test".to_string(),
             "1.0.0".to_string(),
             vec!["/bin/test".to_string()],
         );
-        
+
         manager.stage_package(pkg).unwrap();
         assert_eq!(manager.staged_count(), 1);
     }
@@ -150,16 +148,16 @@ mod tests {
     #[test]
     fn test_activate_staged() {
         let mut manager = SpacPackageManager::new();
-        
+
         let pkg = SovereignPackage::new(
             "test".to_string(),
             "1.0.0".to_string(),
             vec!["/bin/test".to_string()],
         );
-        
+
         manager.stage_package(pkg).unwrap();
         manager.activate_staged().unwrap();
-        
+
         let pkg = manager.get_package("test").unwrap();
         assert_eq!(pkg.status, PackageState::Activated);
     }
@@ -167,17 +165,17 @@ mod tests {
     #[test]
     fn test_rollback_package() {
         let mut manager = SpacPackageManager::new();
-        
+
         let pkg = SovereignPackage::new(
             "test".to_string(),
             "1.0.0".to_string(),
             vec!["/bin/test".to_string()],
         );
-        
+
         manager.stage_package(pkg).unwrap();
         manager.activate_staged().unwrap();
         manager.rollback_package("test").unwrap();
-        
+
         let pkg = manager.get_package("test").unwrap();
         assert_eq!(pkg.status, PackageState::RolledBack);
     }
@@ -185,35 +183,35 @@ mod tests {
     #[test]
     fn test_remove_package() {
         let mut manager = SpacPackageManager::new();
-        
+
         let pkg = SovereignPackage::new(
             "test".to_string(),
             "1.0.0".to_string(),
             vec!["/bin/test".to_string()],
         );
-        
+
         manager.stage_package(pkg).unwrap();
         manager.remove_package("test").unwrap();
-        
+
         assert_eq!(manager.package_count(), 0);
     }
 
     #[test]
     fn test_duplicate_package() {
         let mut manager = SpacPackageManager::new();
-        
+
         let pkg1 = SovereignPackage::new(
             "test".to_string(),
             "1.0.0".to_string(),
             vec!["/bin/test".to_string()],
         );
-        
+
         let pkg2 = SovereignPackage::new(
             "test".to_string(),
             "2.0.0".to_string(),
             vec!["/bin/test".to_string()],
         );
-        
+
         manager.stage_package(pkg1).unwrap();
         assert!(manager.stage_package(pkg2).is_err());
     }

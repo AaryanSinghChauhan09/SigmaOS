@@ -49,9 +49,7 @@ impl TempFileStrategy {
 
 impl CleanupStrategy for TempFileStrategy {
     fn should_clean(&self, path: &Path) -> bool {
-        let filename = path.file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("");
+        let filename = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
         for pattern in &self.patterns {
             if self.matches_pattern(filename, pattern) {
@@ -205,8 +203,7 @@ impl SystemCleanupManager {
 
     /// Recursively scan directory
     fn scan_directory(&mut self, path: &Path) -> Result<(), CleanupError> {
-        let entries = std::fs::read_dir(path)
-            .map_err(|e| CleanupError::IoError(e.to_string()))?;
+        let entries = std::fs::read_dir(path).map_err(|e| CleanupError::IoError(e.to_string()))?;
 
         for entry in entries {
             let entry = entry.map_err(|e| CleanupError::IoError(e.to_string()))?;
@@ -228,16 +225,15 @@ impl SystemCleanupManager {
     fn check_and_clean_file(&mut self, path: &Path) -> Result<(), CleanupError> {
         for strategy in &self.strategies {
             if strategy.should_clean(path) {
-                let metadata = std::fs::metadata(path)
-                    .map_err(|e| CleanupError::IoError(e.to_string()))?;
+                let metadata =
+                    std::fs::metadata(path).map_err(|e| CleanupError::IoError(e.to_string()))?;
 
                 let size = metadata.len();
 
                 if self.dry_run {
                     println!("Would clean: {} ({} bytes)", path.display(), size);
                 } else {
-                    std::fs::remove_file(path)
-                        .map_err(|e| CleanupError::IoError(e.to_string()))?;
+                    std::fs::remove_file(path).map_err(|e| CleanupError::IoError(e.to_string()))?;
                     println!("Cleaned: {} ({} bytes)", path.display(), size);
                 }
 

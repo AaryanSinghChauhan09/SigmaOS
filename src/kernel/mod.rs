@@ -2,8 +2,8 @@
 #![allow(dead_code, unused_imports, clippy::all)]
 
 // ── Core kernel primitives ─────────────────────────────────────────────────
-pub mod cpufreq;
 pub mod cpu_features;
+pub mod cpufreq;
 pub mod gap_filling;
 pub mod ipc;
 pub mod linux_absorb;
@@ -51,38 +51,44 @@ pub mod crypto;
 pub mod syscall;
 
 // ── Core re-exports ────────────────────────────────────────────────────────
-pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use linux_absorb::{
-    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
-    AbsorptionEngine as LinuxAbsorptionEngine, ConversionRule, ConversionRuleType,
-    LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
-};
-pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use numa_allocator::{AllocationPolicy, NumaAllocator, NumaNode, NodeState};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use subsystem::{
-    DeviceDriver, DriverError, DriverMetadata, DriverRegistry, DriverType, FileSystem,
-    FileFlags, FileHandle, FsError, IoOperation, IoResult, LinuxHeritage, MapFlags,
-    MemoryError, MemoryManager, NetworkError, NetworkStack, Scheduler, SchedulerError,
-    SecureDriverWrapper, SocketDomain, SocketHandle, SocketProtocol, SocketType,
-};
-pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
-pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
-pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
-pub use watchdog::{HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager, WatchdogState};
-pub use performance::{IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm, ZeroCopyQueue};
-pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
 pub use cpu_features::{CpuInstructionExtension, SovereignCompilerOptimizer};
+pub use cpufreq::{CpufreqManager, CpufreqPolicy, CpufreqStats, GovernorType};
 pub use gap_filling::{
     IpcMessage, PageDirectoryController, PageDirectoryEntry, SignalDispatcher, SovereignIpcBus,
     SovereignSignal,
 };
+pub use ipc::{Channel, IpcError, IpcManager, Message};
+pub use linux_absorb::{
+    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionEngine as LinuxAbsorptionEngine,
+    AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType, LinuxAbsorptionEngine,
+    SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
+};
+pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use numa_allocator::{AllocationPolicy, NodeState, NumaAllocator, NumaNode};
+pub use performance::{
+    IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm,
+    ZeroCopyQueue,
+};
+pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
+pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
+pub use subsystem::{
+    DeviceDriver, DriverError, DriverMetadata, DriverRegistry, DriverType, FileFlags, FileHandle,
+    FileSystem, FsError, IoOperation, IoResult, LinuxHeritage, MapFlags, MemoryError,
+    MemoryManager, NetworkError, NetworkStack, Scheduler, SchedulerError, SecureDriverWrapper,
+    SocketDomain, SocketHandle, SocketProtocol, SocketType,
+};
 pub use traits::{
     DeviceDriver, DriverError, DriverMetadata, FileSystem, FilesystemMetadata, FsError,
-    MemoryManager, MemoryError, MemoryManagerMetadata, NetworkError, NetworkStack, NetworkStackMetadata,
-    Scheduler, SchedulerError, SchedulerMetadata,
+    MemoryError, MemoryManager, MemoryManagerMetadata, NetworkError, NetworkStack,
+    NetworkStackMetadata, Scheduler, SchedulerError, SchedulerMetadata,
+};
+pub use watchdog::{
+    HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,
+    WatchdogState,
 };
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────

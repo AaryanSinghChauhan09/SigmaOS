@@ -22,14 +22,14 @@ impl HashAlgorithm for Sha256Algorithm {
         use std::hash::{Hash, Hasher};
         use std::io::Read;
 
-        let mut file = File::open(path)
-            .map_err(|e| DuplicateError::IoError(e.to_string()))?;
+        let mut file = File::open(path).map_err(|e| DuplicateError::IoError(e.to_string()))?;
 
         let mut hasher = DefaultHasher::new();
         let mut buffer = [0u8; 8192];
 
         loop {
-            let bytes_read = file.read(&mut buffer)
+            let bytes_read = file
+                .read(&mut buffer)
                 .map_err(|e| DuplicateError::IoError(e.to_string()))?;
             if bytes_read == 0 {
                 break;
@@ -150,7 +150,10 @@ impl DuplicateFinder {
                 for mut file in files {
                     if let Ok(hash) = self.algorithm.compute_hash(&file.path) {
                         file.hash = Some(hash.clone());
-                        files_by_hash.entry(hash).or_insert_with(Vec::new).push(file);
+                        files_by_hash
+                            .entry(hash)
+                            .or_insert_with(Vec::new)
+                            .push(file);
                     }
                 }
             }
@@ -184,8 +187,8 @@ impl DuplicateFinder {
         path: &Path,
         files_by_size: &mut HashMap<u64, Vec<FileMetadata>>,
     ) -> Result<(), DuplicateError> {
-        let entries = std::fs::read_dir(path)
-            .map_err(|e| DuplicateError::IoError(e.to_string()))?;
+        let entries =
+            std::fs::read_dir(path).map_err(|e| DuplicateError::IoError(e.to_string()))?;
 
         for entry in entries {
             let entry = entry.map_err(|e| DuplicateError::IoError(e.to_string()))?;
@@ -270,8 +273,7 @@ mod tests {
 
     #[test]
     fn test_duplicate_finder_creation() {
-        let finder = DuplicateFinder::new(Box::new(Sha256Algorithm))
-            .with_min_size(2048);
+        let finder = DuplicateFinder::new(Box::new(Sha256Algorithm)).with_min_size(2048);
         assert_eq!(finder.min_file_size, 2048);
     }
 

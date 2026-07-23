@@ -143,7 +143,11 @@ impl SimpleVMM {
         }
     }
 
-    pub fn map_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress) -> Result<(), MemoryError> {
+    pub fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+    ) -> Result<(), MemoryError> {
         let pml4_idx = (virt.0 >> 39) & 0x1FF;
         let pdpt_idx = (virt.0 >> 30) & 0x1FF;
         let pd_idx = (virt.0 >> 21) & 0x1FF;
@@ -177,14 +181,21 @@ impl SimpleVMM {
         Ok(())
     }
 
-    pub fn get_physical_address(&self, virt: VirtualAddress) -> Result<PhysicalAddress, MemoryError> {
+    pub fn get_physical_address(
+        &self,
+        virt: VirtualAddress,
+    ) -> Result<PhysicalAddress, MemoryError> {
         let pml4_idx = (virt.0 >> 39) & 0x1FF;
         let pdpt_idx = (virt.0 >> 30) & 0x1FF;
         let pd_idx = (virt.0 >> 21) & 0x1FF;
         let pt_idx = (virt.0 >> 12) & 0x1FF;
 
-        let pml4 = self.pml4_table[pml4_idx].as_ref().ok_or(MemoryError::PageNotPresent)?;
-        let pdpt = pml4.get_directory(pdpt_idx).ok_or(MemoryError::PageNotPresent)?;
+        let pml4 = self.pml4_table[pml4_idx]
+            .as_ref()
+            .ok_or(MemoryError::PageNotPresent)?;
+        let pdpt = pml4
+            .get_directory(pdpt_idx)
+            .ok_or(MemoryError::PageNotPresent)?;
         let pd = pdpt.get_table(pd_idx).ok_or(MemoryError::PageNotPresent)?;
         let pte = pd.get_entry(pt_idx).ok_or(MemoryError::PageNotPresent)?;
 
@@ -197,8 +208,12 @@ impl SimpleVMM {
         let pd_idx = (virt.0 >> 21) & 0x1FF;
         let pt_idx = (virt.0 >> 12) & 0x1FF;
 
-        let pml4 = self.pml4_table[pml4_idx].as_mut().ok_or(MemoryError::PageNotPresent)?;
-        let pdpt = pml4.get_directory(pdpt_idx).ok_or(MemoryError::PageNotPresent)?;
+        let pml4 = self.pml4_table[pml4_idx]
+            .as_mut()
+            .ok_or(MemoryError::PageNotPresent)?;
+        let pdpt = pml4
+            .get_directory(pdpt_idx)
+            .ok_or(MemoryError::PageNotPresent)?;
         let pd = pdpt.get_table(pd_idx).ok_or(MemoryError::PageNotPresent)?;
 
         pd.entries[pt_idx] = None;
@@ -220,7 +235,7 @@ mod tests {
     fn test_page_table_entry() {
         let phys = PhysicalAddress(0x1000);
         let entry = PageTableEntry::new(phys);
-        
+
         assert!(entry.present);
         assert!(entry.writable);
         assert_eq!(entry.physical_address.0, 0x1000);
@@ -230,7 +245,7 @@ mod tests {
     fn test_page_table() {
         let mut pt = PageTable::new();
         let entry = PageTableEntry::new(PhysicalAddress(0x1000));
-        
+
         pt.set_entry(0, entry).unwrap();
         assert!(pt.get_entry(0).is_some());
     }
@@ -239,7 +254,7 @@ mod tests {
     fn test_page_directory() {
         let mut pd = PageDirectory::new();
         let pt = PageTable::new();
-        
+
         pd.set_table(0, pt).unwrap();
         assert!(pd.get_table(0).is_some());
     }
@@ -249,10 +264,10 @@ mod tests {
         let mut vmm = SimpleVMM::new();
         let virt = VirtualAddress(0x1000);
         let phys = PhysicalAddress(0x2000);
-        
+
         vmm.map_page(virt, phys).unwrap();
         let resolved = vmm.get_physical_address(virt).unwrap();
-        
+
         assert_eq!(resolved.0, 0x2000);
     }
 
@@ -261,22 +276,22 @@ mod tests {
         let mut vmm = SimpleVMM::new();
         let virt = VirtualAddress(0x1000);
         let phys = PhysicalAddress(0x2000);
-        
+
         vmm.map_page(virt, phys).unwrap();
         vmm.unmap_page(virt).unwrap();
-        
+
         assert!(vmm.get_physical_address(virt).is_err());
     }
 
     #[test]
     fn test_virtual_address_indices() {
         let virt = VirtualAddress(0x123456789ABC);
-        
+
         let pml4_idx = (virt.0 >> 39) & 0x1FF;
         let pdpt_idx = (virt.0 >> 30) & 0x1FF;
         let pd_idx = (virt.0 >> 21) & 0x1FF;
         let pt_idx = (virt.0 >> 12) & 0x1FF;
-        
+
         assert!(pml4_idx < 512);
         assert!(pdpt_idx < 512);
         assert!(pd_idx < 512);
@@ -287,7 +302,7 @@ mod tests {
     fn test_invalid_index() {
         let mut pt = PageTable::new();
         let entry = PageTableEntry::new(PhysicalAddress(0x1000));
-        
+
         assert!(pt.set_entry(512, entry).is_err());
     }
 }

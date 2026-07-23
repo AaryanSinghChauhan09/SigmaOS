@@ -1,18 +1,18 @@
 //! # Sovereign Video Player - SigmaMedia Frameworks
-//! 
+//!
 //! This module implements the Sovereign Video Player, a built-in media engine
 //! that eliminates the need for third-party players like VLC Media Player.
-//! 
+//!
 //! ## Features
-//! 
+//!
 //! - **Unified Format & Next-Gen Codec Deck**: Support for AV1, VVC (H.266), Opus
 //! - **Live Neural AI Video Upscaling**: Real-time resolution enhancement via SovereignML
 //! - **Immersive Spatial Audio**: HRTF synthesis and holographic stereoscopic projection
 //! - **Post-Quantum Cryptographic Security**: Kyber-1024 KEM + Dilithium-5 signatures
 //! - **Structural Zero-Trust Integration**: Capability-gated memory access
 
-use std::collections::HashMap;
 use sigma_types::{CapabilityToken, Result};
+use std::collections::HashMap;
 
 /// Video codec enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -114,7 +114,7 @@ pub struct SovereignVideoPlayer {
     /// Current video codec
     video_codec: Option<VideoCodec>,
     /// Current audio codec
-    Option<AudioCodec>,
+    audio_codec: Option<AudioCodec>,
     /// Container format
     container_format: Option<ContainerFormat>,
     /// Upscaling quality
@@ -183,10 +183,9 @@ impl SovereignVideoPlayer {
     /// Play media
     pub fn play(&mut self) -> Result<()> {
         if self.video_codec.is_none() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                "No media loaded",
-            ).into());
+            return Err(
+                std::io::Error::new(std::io::ErrorKind::InvalidInput, "No media loaded").into(),
+            );
         }
         self.is_playing = true;
         Ok(())
@@ -211,7 +210,8 @@ impl SovereignVideoPlayer {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "Seek position exceeds duration",
-            ).into());
+            )
+            .into());
         }
         self.current_position = position_ns;
         Ok(())
@@ -472,7 +472,7 @@ mod tests {
     fn test_superset_capability_validation() {
         let sov_player = SovereignVideoPlayerCapability::new();
         let vlc_player = MediaDecoderCapability::new();
-        
+
         assert!(sov_player.is_strict_superset_of_vlc(vlc_player.supported_formats()));
         assert!(sov_player.has_capability("av1"));
         assert!(sov_player.has_capability("ai_upscale"));
@@ -482,14 +482,14 @@ mod tests {
     fn test_playback_controls() {
         let capability = sigma_types::CapabilityToken { id: 1 };
         let mut player = SovereignVideoPlayer::new(capability);
-        
+
         // Test play/pause
         player.play().unwrap();
         assert!(player.is_playing());
-        
+
         player.pause().unwrap();
         assert!(!player.is_playing());
-        
+
         // Test stop
         player.play().unwrap();
         player.seek(1_000_000_000).unwrap();
@@ -502,9 +502,9 @@ mod tests {
 // Placeholder types for compilation
 mod sigma_types {
     use std::io;
-    
+
     pub type Result<T> = std::result::Result<T, io::Error>;
-    
+
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {
         pub id: u64,

@@ -23,7 +23,9 @@ pub struct SovereignCompilerOptimizer {
 impl SovereignCompilerOptimizer {
     pub fn new() -> Self {
         let extension = Self::detect_processor_extensions();
-        Self { active_extension: extension }
+        Self {
+            active_extension: extension,
+        }
     }
 
     /// Reads raw CPUID instruction sets without standard library references
@@ -82,7 +84,10 @@ mod tests {
     #[test]
     fn test_cpu_optimizer_creation() {
         let optimizer = SovereignCompilerOptimizer::new();
-        assert_eq!(optimizer.active_extension(), CpuInstructionExtension::Default);
+        assert_eq!(
+            optimizer.active_extension(),
+            CpuInstructionExtension::Default
+        );
     }
 
     #[test]
@@ -91,9 +96,9 @@ mod tests {
         let lhs = vec![1.0, 2.0, 3.0, 4.0];
         let rhs = vec![2.0, 2.0, 2.0, 2.0];
         let mut out = vec![0.0; 4];
-        
+
         optimizer.execute_vector_multiply(&lhs, &rhs, &mut out);
-        
+
         assert_eq!(out, vec![2.0, 4.0, 6.0, 8.0]);
     }
 
@@ -101,13 +106,13 @@ mod tests {
     fn test_vector_multiply_avx512() {
         let mut optimizer = SovereignCompilerOptimizer::new();
         optimizer.set_extension(CpuInstructionExtension::Avx512);
-        
+
         let lhs = vec![1.0f32; 20];
         let rhs = vec![3.0f32; 20];
         let mut out = vec![0.0f32; 20];
-        
+
         optimizer.execute_vector_multiply(&lhs, &rhs, &mut out);
-        
+
         for val in out.iter() {
             assert_eq!(*val, 3.0);
         }
@@ -117,7 +122,7 @@ mod tests {
     fn test_set_extension() {
         let mut optimizer = SovereignCompilerOptimizer::new();
         optimizer.set_extension(CpuInstructionExtension::Neon);
-        
+
         assert_eq!(optimizer.active_extension(), CpuInstructionExtension::Neon);
     }
 }

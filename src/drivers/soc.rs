@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PinDirection {
@@ -219,7 +219,9 @@ impl SocClockController {
 
 impl ClockController for SocClockController {
     fn set_frequency(&mut self, clock_id: u32, freq_hz: u32) -> Result<(), ClockError> {
-        let clock = self.clocks.get_mut(&clock_id)
+        let clock = self
+            .clocks
+            .get_mut(&clock_id)
             .ok_or(ClockError::NoSuchClockLine)?;
 
         if clock.locked {
@@ -239,7 +241,9 @@ impl ClockController for SocClockController {
     }
 
     fn enable(&mut self, clock_id: u32) -> Result<(), ClockError> {
-        let clock = self.clocks.get_mut(&clock_id)
+        let clock = self
+            .clocks
+            .get_mut(&clock_id)
             .ok_or(ClockError::NoSuchClockLine)?;
 
         if clock.locked {
@@ -251,7 +255,9 @@ impl ClockController for SocClockController {
     }
 
     fn disable(&mut self, clock_id: u32) -> Result<(), ClockError> {
-        let clock = self.clocks.get_mut(&clock_id)
+        let clock = self
+            .clocks
+            .get_mut(&clock_id)
             .ok_or(ClockError::NoSuchClockLine)?;
 
         if clock.locked {
@@ -263,7 +269,10 @@ impl ClockController for SocClockController {
     }
 
     fn is_enabled(&self, clock_id: u32) -> bool {
-        self.clocks.get(&clock_id).map(|c| c.enabled).unwrap_or(false)
+        self.clocks
+            .get(&clock_id)
+            .map(|c| c.enabled)
+            .unwrap_or(false)
     }
 }
 
@@ -380,7 +389,7 @@ mod tests {
     #[test]
     fn test_clock_frequency() {
         let mut controller = SocClockController::new();
-        controller.add_clock(GenericClock::new( 1, 1000, 100000));
+        controller.add_clock(GenericClock::new(1, 1000, 100000));
 
         controller.set_frequency(1, 50000).unwrap();
         assert_eq!(controller.get_frequency(1), Some(50000));

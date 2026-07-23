@@ -4,19 +4,19 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NamespaceType {
-    Mount,    // Filesystem mount points
-    Uts,      // Hostname and domain name
-    Ipc,      // Inter-process communication
-    Network,  // Network interfaces and routing
-    Pid,      // Process IDs
-    User,     // User and group IDs
-    Cgroup,   // Cgroup root directory
+    Mount,   // Filesystem mount points
+    Uts,     // Hostname and domain name
+    Ipc,     // Inter-process communication
+    Network, // Network interfaces and routing
+    Pid,     // Process IDs
+    User,    // User and group IDs
+    Cgroup,  // Cgroup root directory
 }
 
 #[derive(Debug, Clone)]
@@ -75,7 +75,11 @@ impl NamespaceManager {
     }
 
     /// Create a new namespace
-    pub fn create_namespace(&mut self, ns_type: NamespaceType, parent_id: Option<u64>) -> Result<u64, &'static str> {
+    pub fn create_namespace(
+        &mut self,
+        ns_type: NamespaceType,
+        parent_id: Option<u64>,
+    ) -> Result<u64, &'static str> {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -139,8 +143,7 @@ impl NamespaceManager {
 
     /// Clone a namespace
     pub fn clone_namespace(&mut self, id: u64) -> Result<u64, &'static str> {
-        let source = self.namespaces.get(&id)
-            .ok_or("Namespace not found")?;
+        let source = self.namespaces.get(&id).ok_or("Namespace not found")?;
 
         let new_id = self.next_id;
         self.next_id += 1;
@@ -162,8 +165,7 @@ impl NamespaceManager {
             return Err("Cannot delete init namespace");
         }
 
-        self.namespaces.remove(&id)
-            .ok_or("Namespace not found")?;
+        self.namespaces.remove(&id).ok_or("Namespace not found")?;
 
         Ok(())
     }
@@ -192,8 +194,10 @@ mod tests {
     #[test]
     fn test_create_namespace() {
         let mut manager = NamespaceManager::new();
-        
-        let id = manager.create_namespace(NamespaceType::Mount, None).unwrap();
+
+        let id = manager
+            .create_namespace(NamespaceType::Mount, None)
+            .unwrap();
         assert_eq!(manager.namespace_count(), 1);
         assert_eq!(manager.init_namespace(), Some(id));
     }
@@ -201,12 +205,12 @@ mod tests {
     #[test]
     fn test_clone_namespace() {
         let mut manager = NamespaceManager::new();
-        
+
         let parent_id = manager.create_namespace(NamespaceType::Uts, None).unwrap();
         let child_id = manager.clone_namespace(parent_id).unwrap();
-        
+
         assert_eq!(manager.namespace_count(), 2);
-        
+
         let parent = manager.get_namespace(parent_id).unwrap();
         let child = manager.get_namespace(child_id).unwrap();
         assert_eq!(child.parent_id, Some(parent_id));
@@ -215,30 +219,32 @@ mod tests {
     #[test]
     fn test_delete_namespace() {
         let mut manager = NamespaceManager::new();
-        
-        let id = manager.create_namespace(NamespaceType::Network, None).unwrap();
+
+        let id = manager
+            .create_namespace(NamespaceType::Network, None)
+            .unwrap();
         manager.delete_namespace(id).unwrap();
-        
+
         assert_eq!(manager.namespace_count(), 0);
     }
 
     #[test]
     fn test_delete_init_namespace() {
         let mut manager = NamespaceManager::new();
-        
+
         let id = manager.create_namespace(NamespaceType::Pid, None).unwrap();
         let result = manager.delete_namespace(id);
-        
+
         assert!(result.is_err());
     }
 
     #[test]
     fn test_namespace_data() {
         let mut manager = NamespaceManager::new();
-        
+
         let id = manager.create_namespace(NamespaceType::Uts, None).unwrap();
         let ns = manager.get_namespace(id).unwrap();
-        
+
         if let NamespaceData::Uts { hostname, .. } = &ns.data {
             assert_eq!(hostname, "sigmaos");
         } else {
@@ -249,11 +255,15 @@ mod tests {
     #[test]
     fn test_multiple_namespace_types() {
         let mut manager = NamespaceManager::new();
-        
-        manager.create_namespace(NamespaceType::Mount, None).unwrap();
-        manager.create_namespace(NamespaceType::Network, None).unwrap();
+
+        manager
+            .create_namespace(NamespaceType::Mount, None)
+            .unwrap();
+        manager
+            .create_namespace(NamespaceType::Network, None)
+            .unwrap();
         manager.create_namespace(NamespaceType::Pid, None).unwrap();
-        
+
         assert_eq!(manager.namespace_count(), 3);
     }
 }

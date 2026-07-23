@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComputeUnit {
@@ -85,13 +85,15 @@ impl EevdfScheduler {
     /// Schedule the next eligible task
     pub fn schedule(&mut self) -> Option<u64> {
         // Find earliest eligible task
-        let eligible_idx = self.ready_queue.iter()
+        let eligible_idx = self
+            .ready_queue
+            .iter()
             .position(|t| t.is_eligible(self.current_time));
 
         if let Some(idx) = eligible_idx {
             let mut task = self.ready_queue.remove(idx);
             task.state = TaskState::Running;
-            
+
             // Assign to available compute unit
             if let Some(unit) = self.get_available_unit() {
                 task.assign_compute_unit(unit);
@@ -107,11 +109,13 @@ impl EevdfScheduler {
 
     /// Complete a task
     pub fn complete_task(&mut self, task_id: u64) -> Result<(), &'static str> {
-        let mut task = self.running_tasks.remove(&task_id)
+        let mut task = self
+            .running_tasks
+            .remove(&task_id)
             .ok_or("Task not found")?;
-        
+
         task.state = TaskState::Completed;
-        
+
         // Release compute unit
         if let Some(unit) = task.compute_unit {
             self.release_unit(unit);
@@ -123,7 +127,9 @@ impl EevdfScheduler {
     /// Get available compute unit
     fn get_available_unit(&self) -> Option<ComputeUnit> {
         // Check which units are not in use by running tasks
-        let used_units: Vec<ComputeUnit> = self.running_tasks.values()
+        let used_units: Vec<ComputeUnit> = self
+            .running_tasks
+            .values()
             .filter_map(|t| t.compute_unit)
             .collect();
 
@@ -252,22 +258,19 @@ impl SInitSupervisor {
 
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let service = self.services.get_mut(name)
-            .ok_or("Service not found")?;
+        let service = self.services.get_mut(name).ok_or("Service not found")?;
         service.start()
     }
 
     /// Stop a service
     pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let service = self.services.get_mut(name)
-            .ok_or("Service not found")?;
+        let service = self.services.get_mut(name).ok_or("Service not found")?;
         service.stop()
     }
 
     /// Restart a crashed service
     pub fn restart_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let service = self.services.get_mut(name)
-            .ok_or("Service not found")?;
+        let service = self.services.get_mut(name).ok_or("Service not found")?;
         service.restart()
     }
 
@@ -353,10 +356,10 @@ mod tests {
     #[test]
     fn test_service_start_stop() {
         let mut service = Service::new("test".to_string());
-        
+
         service.start().unwrap();
         assert_eq!(service.state, ServiceState::Running);
-        
+
         service.stop().unwrap();
         assert_eq!(service.state, ServiceState::Stopped);
     }
@@ -364,11 +367,11 @@ mod tests {
     #[test]
     fn test_service_restart() {
         let mut service = Service::new("test".to_string());
-        
+
         service.start().unwrap();
         service.crash();
         assert_eq!(service.state, ServiceState::Crashed);
-        
+
         service.restart().unwrap();
         assert_eq!(service.state, ServiceState::Running);
         assert_eq!(service.restart_count, 1);
@@ -377,33 +380,39 @@ mod tests {
     #[test]
     fn test_sinit_supervisor() {
         let mut supervisor = SInitSupervisor::new();
-        
+
         let service = Service::new("web".to_string());
         supervisor.add_service(service);
-        
+
         supervisor.start_service("web").unwrap();
-        assert_eq!(supervisor.get_service_state("web"), Some(ServiceState::Running));
+        assert_eq!(
+            supervisor.get_service_state("web"),
+            Some(ServiceState::Running)
+        );
     }
 
     #[test]
     fn test_supervision_restart() {
         let mut supervisor = SInitSupervisor::new();
-        
+
         let mut service = Service::new("database".to_string());
         service.start().unwrap();
         service.crash();
         supervisor.add_service(service);
-        
+
         let restarted = supervisor.supervise();
         assert_eq!(restarted.len(), 1);
-        assert_eq!(supervisor.get_service_state("database"), Some(ServiceState::Running));
+        assert_eq!(
+            supervisor.get_service_state("database"),
+            Some(ServiceState::Running)
+        );
     }
 
     #[test]
     fn test_time_advancement() {
         let mut scheduler = EevdfScheduler::new();
         assert_eq!(scheduler.current_time(), 0);
-        
+
         scheduler.advance_time(100);
         assert_eq!(scheduler.current_time(), 100);
     }

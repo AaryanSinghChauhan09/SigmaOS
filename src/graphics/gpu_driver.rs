@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuState {
@@ -71,7 +71,12 @@ impl GpuDriver {
     }
 
     /// Register a GPU device
-    pub fn register_device(&mut self, vendor: GpuVendor, device_id: u32, vram_size: u64) -> Result<u32, &'static str> {
+    pub fn register_device(
+        &mut self,
+        vendor: GpuVendor,
+        device_id: u32,
+        vram_size: u64,
+    ) -> Result<u32, &'static str> {
         let id = self.next_device_id;
         self.next_device_id += 1;
 
@@ -96,9 +101,14 @@ impl GpuDriver {
     }
 
     /// Initialize a GPU device
-    pub fn initialize_device(&mut self, id: u32, width: u32, height: u32, format: PixelFormat) -> Result<(), &'static str> {
-        let device = self.devices.get_mut(&id)
-            .ok_or("Device not found")?;
+    pub fn initialize_device(
+        &mut self,
+        id: u32,
+        width: u32,
+        height: u32,
+        format: PixelFormat,
+    ) -> Result<(), &'static str> {
+        let device = self.devices.get_mut(&id).ok_or("Device not found")?;
 
         let bpp = match format {
             PixelFormat::Rgb24 | PixelFormat::Bgr24 => 24,
@@ -149,8 +159,7 @@ impl GpuDriver {
 
     /// Set device state
     pub fn set_device_state(&mut self, id: u32, state: GpuState) -> Result<(), &'static str> {
-        let device = self.devices.get_mut(&id)
-            .ok_or("Device not found")?;
+        let device = self.devices.get_mut(&id).ok_or("Device not found")?;
 
         device.state = state;
         Ok(())
@@ -163,9 +172,16 @@ impl GpuDriver {
     }
 
     /// Fill rectangle (2D acceleration)
-    pub fn fill_rect(&self, id: u32, x: u32, y: u32, width: u32, height: u32, color: u32) -> Result<(), &'static str> {
-        let device = self.devices.get(&id)
-            .ok_or("Device not found")?;
+    pub fn fill_rect(
+        &self,
+        id: u32,
+        x: u32,
+        y: u32,
+        width: u32,
+        height: u32,
+        color: u32,
+    ) -> Result<(), &'static str> {
+        let device = self.devices.get(&id).ok_or("Device not found")?;
 
         if device.state != GpuState::HardwareAccelerated {
             return Err("Device not in accelerated state");
@@ -180,9 +196,17 @@ impl GpuDriver {
     }
 
     /// Copy rectangle (2D acceleration)
-    pub fn copy_rect(&self, id: u32, src_x: u32, src_y: u32, dst_x: u32, dst_y: u32, width: u32, height: u32) -> Result<(), &'static str> {
-        let device = self.devices.get(&id)
-            .ok_or("Device not found")?;
+    pub fn copy_rect(
+        &self,
+        id: u32,
+        src_x: u32,
+        src_y: u32,
+        dst_x: u32,
+        dst_y: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<(), &'static str> {
+        let device = self.devices.get(&id).ok_or("Device not found")?;
 
         if device.state != GpuState::HardwareAccelerated {
             return Err("Device not in accelerated state");
@@ -220,10 +244,12 @@ mod tests {
     #[test]
     fn test_register_device() {
         let mut driver = GpuDriver::new();
-        
-        let id = driver.register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024).unwrap();
+
+        let id = driver
+            .register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024)
+            .unwrap();
         assert_eq!(driver.device_count(), 1);
-        
+
         let device = driver.get_device(id).unwrap();
         assert_eq!(device.vendor, GpuVendor::Intel);
     }
@@ -231,10 +257,14 @@ mod tests {
     #[test]
     fn test_initialize_device() {
         let mut driver = GpuDriver::new();
-        
-        let id = driver.register_device(GpuVendor::Amd, 0x5678, 512 * 1024 * 1024).unwrap();
-        driver.initialize_device(id, 1920, 1080, PixelFormat::Rgba32).unwrap();
-        
+
+        let id = driver
+            .register_device(GpuVendor::Amd, 0x5678, 512 * 1024 * 1024)
+            .unwrap();
+        driver
+            .initialize_device(id, 1920, 1080, PixelFormat::Rgba32)
+            .unwrap();
+
         let device = driver.get_device(id).unwrap();
         assert_eq!(device.state, GpuState::HardwareAccelerated);
         assert!(device.framebuffer.is_some());
@@ -243,23 +273,35 @@ mod tests {
     #[test]
     fn test_primary_device() {
         let mut driver = GpuDriver::new();
-        
-        let id1 = driver.register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024).unwrap();
-        let id2 = driver.register_device(GpuVendor::Nvidia, 0x5678, 2048 * 1024 * 1024).unwrap();
-        
-        assert_eq!(driver.primary_device(), Some(driver.get_device(id1).unwrap()));
-        
+
+        let id1 = driver
+            .register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024)
+            .unwrap();
+        let id2 = driver
+            .register_device(GpuVendor::Nvidia, 0x5678, 2048 * 1024 * 1024)
+            .unwrap();
+
+        assert_eq!(
+            driver.primary_device(),
+            Some(driver.get_device(id1).unwrap())
+        );
+
         driver.set_primary_device(id2).unwrap();
-        assert_eq!(driver.primary_device(), Some(driver.get_device(id2).unwrap()));
+        assert_eq!(
+            driver.primary_device(),
+            Some(driver.get_device(id2).unwrap())
+        );
     }
 
     #[test]
     fn test_set_device_state() {
         let mut driver = GpuDriver::new();
-        
-        let id = driver.register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024).unwrap();
+
+        let id = driver
+            .register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024)
+            .unwrap();
         driver.set_device_state(id, GpuState::VgaFallback).unwrap();
-        
+
         let device = driver.get_device(id).unwrap();
         assert_eq!(device.state, GpuState::VgaFallback);
     }
@@ -267,10 +309,14 @@ mod tests {
     #[test]
     fn test_get_framebuffer() {
         let mut driver = GpuDriver::new();
-        
-        let id = driver.register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024).unwrap();
-        driver.initialize_device(id, 1920, 1080, PixelFormat::Rgb24).unwrap();
-        
+
+        let id = driver
+            .register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024)
+            .unwrap();
+        driver
+            .initialize_device(id, 1920, 1080, PixelFormat::Rgb24)
+            .unwrap();
+
         let fb = driver.get_framebuffer(id).unwrap();
         assert_eq!(fb.width, 1920);
         assert_eq!(fb.height, 1080);
@@ -279,10 +325,14 @@ mod tests {
     #[test]
     fn test_fill_rect() {
         let mut driver = GpuDriver::new();
-        
-        let id = driver.register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024).unwrap();
-        driver.initialize_device(id, 1920, 1080, PixelFormat::Rgba32).unwrap();
-        
+
+        let id = driver
+            .register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024)
+            .unwrap();
+        driver
+            .initialize_device(id, 1920, 1080, PixelFormat::Rgba32)
+            .unwrap();
+
         let result = driver.fill_rect(id, 0, 0, 100, 100, 0xFF0000);
         assert!(result.is_ok());
     }
@@ -290,10 +340,14 @@ mod tests {
     #[test]
     fn test_copy_rect() {
         let mut driver = GpuDriver::new();
-        
-        let id = driver.register_device(GpuVendor::Amd, 0x5678, 512 * 1024 * 1024).unwrap();
-        driver.initialize_device(id, 1920, 1080, PixelFormat::Rgba32).unwrap();
-        
+
+        let id = driver
+            .register_device(GpuVendor::Amd, 0x5678, 512 * 1024 * 1024)
+            .unwrap();
+        driver
+            .initialize_device(id, 1920, 1080, PixelFormat::Rgba32)
+            .unwrap();
+
         let result = driver.copy_rect(id, 0, 0, 100, 100, 50, 50);
         assert!(result.is_ok());
     }
@@ -301,10 +355,14 @@ mod tests {
     #[test]
     fn test_list_devices() {
         let mut driver = GpuDriver::new();
-        
-        driver.register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024).unwrap();
-        driver.register_device(GpuVendor::Amd, 0x5678, 512 * 1024 * 1024).unwrap();
-        
+
+        driver
+            .register_device(GpuVendor::Intel, 0x1234, 1024 * 1024 * 1024)
+            .unwrap();
+        driver
+            .register_device(GpuVendor::Amd, 0x5678, 512 * 1024 * 1024)
+            .unwrap();
+
         let devices = driver.list_devices();
         assert_eq!(devices.len(), 2);
     }

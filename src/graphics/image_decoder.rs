@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFormat {
@@ -94,7 +94,7 @@ impl ImageDecoder {
     /// Decode image from raw data
     pub fn decode(&self, data: &[u8]) -> Result<DecodedImage, &'static str> {
         let format = Self::detect_format(data);
-        
+
         match format {
             ImageFormat::Png => self.decode_png(data),
             ImageFormat::Jpeg => self.decode_jpeg(data),
@@ -118,7 +118,7 @@ impl ImageDecoder {
 
         let pixel_count = (metadata.width * metadata.height) as usize;
         let mut decoded_data = Vec::with_capacity(pixel_count * 4);
-        
+
         // Placeholder decoding - would implement actual PNG decompression
         for _ in 0..pixel_count {
             decoded_data.push(255); // R
@@ -147,7 +147,7 @@ impl ImageDecoder {
 
         let pixel_count = (metadata.width * metadata.height) as usize;
         let mut decoded_data = Vec::with_capacity(pixel_count * 3);
-        
+
         // Placeholder decoding - would implement actual JPEG decompression
         for _ in 0..pixel_count {
             decoded_data.push(128); // R
@@ -174,7 +174,7 @@ impl ImageDecoder {
 
         let pixel_count = (metadata.width * metadata.height) as usize;
         let mut decoded_data = Vec::with_capacity(pixel_count * 4);
-        
+
         for _ in 0..pixel_count {
             decoded_data.push(255);
             decoded_data.push(255);
@@ -201,7 +201,7 @@ impl ImageDecoder {
 
         let pixel_count = (metadata.width * metadata.height) as usize;
         let mut decoded_data = Vec::with_capacity(pixel_count * 3);
-        
+
         for _ in 0..pixel_count {
             decoded_data.push(128);
             decoded_data.push(128);
@@ -217,7 +217,7 @@ impl ImageDecoder {
     /// Resize image (nearest-neighbor scaling)
     pub fn resize(image: &DecodedImage, new_width: u32, new_height: u32) -> DecodedImage {
         let mut resized_data = Vec::with_capacity((new_width * new_height) as usize * 4);
-        
+
         let x_ratio = image.metadata.width as f32 / new_width as f32;
         let y_ratio = image.metadata.height as f32 / new_height as f32;
         let bytes_per_pixel = (image.metadata.bits_per_pixel / 8) as usize;
@@ -226,8 +226,9 @@ impl ImageDecoder {
             for x in 0..new_width {
                 let src_x = (x as f32 * x_ratio) as u32;
                 let src_y = (y as f32 * y_ratio) as u32;
-                let src_offset = ((src_y * image.metadata.width + src_x) * bytes_per_pixel as u32) as usize;
-                
+                let src_offset =
+                    ((src_y * image.metadata.width + src_x) * bytes_per_pixel as u32) as usize;
+
                 for byte in 0..bytes_per_pixel {
                     if src_offset + byte < image.data.len() {
                         resized_data.push(image.data[src_offset + byte]);
@@ -262,41 +263,56 @@ mod tests {
     #[test]
     fn test_png_format_detection() {
         let png_signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-        assert_eq!(ImageDecoder::detect_format(&png_signature), ImageFormat::Png);
+        assert_eq!(
+            ImageDecoder::detect_format(&png_signature),
+            ImageFormat::Png
+        );
     }
 
     #[test]
     fn test_jpeg_format_detection() {
         let jpeg_signature = [0xFF, 0xD8, 0xFF];
-        assert_eq!(ImageDecoder::detect_format(&jpeg_signature), ImageFormat::Jpeg);
+        assert_eq!(
+            ImageDecoder::detect_format(&jpeg_signature),
+            ImageFormat::Jpeg
+        );
     }
 
     #[test]
     fn test_gif_format_detection() {
         let gif_signature = [0x47, 0x49, 0x46, 0x38, 0x37, 0x61];
-        assert_eq!(ImageDecoder::detect_format(&gif_signature), ImageFormat::Gif);
+        assert_eq!(
+            ImageDecoder::detect_format(&gif_signature),
+            ImageFormat::Gif
+        );
     }
 
     #[test]
     fn test_bmp_format_detection() {
         let bmp_signature = [0x42, 0x4D];
-        assert_eq!(ImageDecoder::detect_format(&bmp_signature), ImageFormat::Bmp);
+        assert_eq!(
+            ImageDecoder::detect_format(&bmp_signature),
+            ImageFormat::Bmp
+        );
     }
 
     #[test]
     fn test_unknown_format_detection() {
         let unknown_data = [0x00, 0x00, 0x00];
-        assert_eq!(ImageDecoder::detect_format(&unknown_data), ImageFormat::Unknown);
+        assert_eq!(
+            ImageDecoder::detect_format(&unknown_data),
+            ImageFormat::Unknown
+        );
     }
 
     #[test]
     fn test_image_decode() {
         let decoder = ImageDecoder::new();
         let png_data = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-        
+
         let result = decoder.decode(&png_data);
         assert!(result.is_ok());
-        
+
         let image = result.unwrap();
         assert_eq!(image.metadata.format, ImageFormat::Png);
         assert_eq!(image.metadata.width, 100);
@@ -307,10 +323,10 @@ mod tests {
     fn test_image_resize() {
         let decoder = ImageDecoder::new();
         let png_data = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-        
+
         let image = decoder.decode(&png_data).unwrap();
         let resized = ImageDecoder::resize(&image, 50, 50);
-        
+
         assert_eq!(resized.metadata.width, 50);
         assert_eq!(resized.metadata.height, 50);
     }

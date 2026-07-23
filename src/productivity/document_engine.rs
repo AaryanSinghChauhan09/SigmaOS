@@ -102,10 +102,7 @@ impl DocumentEngine {
             character_count,
         };
 
-        Document {
-            metadata,
-            content,
-        }
+        Document { metadata, content }
     }
 
     /// Load document from string
@@ -115,11 +112,7 @@ impl DocumentEngine {
         let character_count = content.chars().count();
         let timestamp = 0;
 
-        let title = filename
-            .split('.')
-            .next()
-            .unwrap_or("Untitled")
-            .to_string();
+        let title = filename.split('.').next().unwrap_or("Untitled").to_string();
 
         let metadata = DocumentMetadata {
             format,
@@ -131,14 +124,14 @@ impl DocumentEngine {
             character_count,
         };
 
-        Document {
-            metadata,
-            content,
-        }
+        Document { metadata, content }
     }
 
     /// Convert document to different format
-    pub fn convert_format(document: &Document, target_format: DocumentFormat) -> Result<String, &'static str> {
+    pub fn convert_format(
+        document: &Document,
+        target_format: DocumentFormat,
+    ) -> Result<String, &'static str> {
         match target_format {
             DocumentFormat::Markdown => Self::to_markdown(document),
             DocumentFormat::PlainText => Ok(document.content.clone()),
@@ -150,7 +143,7 @@ impl DocumentEngine {
     /// Convert to Markdown
     fn to_markdown(document: &Document) -> Result<String, &'static str> {
         let mut markdown = String::new();
-        
+
         // Add title as H1
         if !document.metadata.title.is_empty() {
             markdown.push_str(&format!("# {}\n\n", document.metadata.title));
@@ -165,10 +158,10 @@ impl DocumentEngine {
     /// Convert to LaTeX
     fn to_latex(document: &Document) -> Result<String, &'static str> {
         let mut latex = String::new();
-        
+
         latex.push_str("\\documentclass{article}\n");
         latex.push_str("\\begin{document}\n");
-        
+
         if !document.metadata.title.is_empty() {
             latex.push_str(&format!("\\title{{{}}}\n", document.metadata.title));
             latex.push_str("\\maketitle\n\n");
@@ -204,11 +197,11 @@ impl DocumentEngine {
         let mut count = 0;
         document.content = document.content.replace(search, replace);
         count = document.content.matches(replace).count();
-        
+
         // Update metadata
         document.metadata.character_count = document.content.chars().count();
         document.metadata.word_count = document.content.split_whitespace().count();
-        
+
         count
     }
 }
