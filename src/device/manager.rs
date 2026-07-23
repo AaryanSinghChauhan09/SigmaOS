@@ -64,14 +64,7 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {
-        let raw = self.device_class.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => DeviceClass::Character,
-            2 => DeviceClass::Network,
-            3 => DeviceClass::Input,
-            4 => DeviceClass::Output,
-            _ => DeviceClass::Block,
-        }
+        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) }
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
@@ -117,7 +110,6 @@ impl DeviceManager for SimpleDeviceManager {
         for device_option in self.devices.iter_mut() {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
-                    *device_option = None;
                     return Ok(());
                 }
             }

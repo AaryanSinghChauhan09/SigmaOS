@@ -1,7 +1,24 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
-// Interactive shell for SigmaOS
+// Interactive shell with full desktop GUI-parity commands
 
+use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
+
+use crate::accessibility::{
+    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
+    AccessibilitySetting,
+};
+use crate::compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
+};
+use crate::customization::{CustomizationEngine, Theme};
+use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
+use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
+use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
+use crate::virtualization::{
+    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
+    VmState,
+};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -20,91 +37,105 @@ pub enum ShellCommand {
     Get {
         variable: String,
     },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
+
+    // Customization & GUI theme commands
+    ThemeSet {
+        theme: String,
     },
-    Cat {
-        filename: String,
+    ThemeList,
+    RoutineEnable {
+        routine_id: String,
     },
-    Systemctl {
-        action: String,
-        service: String,
+
+    // Accessibility commands
+    A11ySet {
+        setting: String,
+        enabled: bool,
     },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
+    A11yProfile {
+        profile: String,
     },
-    Ai {
-        query: String,
+
+    // Telemetry and monitoring commands
+    MonitorShow,
+
+    // Package management commands
+    PkgInstall {
+        name: String,
     },
-    Zenith {
-        subcommand: String,
-        arg: Option<String>,
+    PkgRemove {
+        name: String,
     },
-    SigmaFs {
-        subcommand: String,
-        arg: Option<String>,
+    PkgList,
+
+    // Virtualization and container commands
+    VmCreate {
+        name: String,
+        tech: String,
     },
-    CCleaner,
-    Optimize,
+    VmStart {
+        id: String,
+    },
+    VmList,
+    ContainerRun {
+        name: String,
+        image: String,
+    },
+
+    // Cross-platform compatibility commands
+    PlatformRun {
+        name: String,
+        platform: String,
+        format: String,
+    },
+
+    // Resilience and backup commands
+    SnapshotCreate,
+    SnapshotRestore {
+        id: String,
+    },
+
     Unknown(String),
 }
 
 /// Shell REPL
 pub struct ShellRepl {
     running: bool,
-    variables: std::collections::HashMap<String, String>,
+    variables: HashMap<String, String>,
     prompt: String,
-    current_user: String,
-    current_dir: String,
-    services: std::collections::HashMap<String, String>,
-    installed_packages: std::collections::HashSet<String>,
+
+    // Keep internal instances of engines for persistent state during shell interaction
+    pub customization: CustomizationEngine,
+    pub accessibility: AccessibilityFramework,
+    pub package_manager: UniversalPackageManager,
+    pub virt_orchestrator: VirtualizationOrchestrator,
+    pub compatibility: CompatibilityManager,
+    pub self_healing: SelfHealingModule,
 }
 
 impl ShellRepl {
     pub fn new() -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Stopped".to_string());
-        services.insert("udev".to_string(), "Running".to_string());
-
-        let mut installed_packages = std::collections::HashSet::new();
-        installed_packages.insert("sigma-sh".to_string());
-        installed_packages.insert("sigma-core".to_string());
-
         Self {
             running: true,
-            variables: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
-            current_user: "ubuntu".to_string(),
-            current_dir: "/home/ubuntu".to_string(),
-            services,
-            installed_packages,
+            variables: HashMap::new(),
+            prompt: "sigma-sh> ".to_string(),
+            customization: CustomizationEngine::new(),
+            accessibility: AccessibilityFramework::new(),
+            package_manager: UniversalPackageManager::new(),
+            virt_orchestrator: VirtualizationOrchestrator::new(),
+            compatibility: CompatibilityManager::new(),
+            self_healing: SelfHealingModule::new(),
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            prompt,
-            current_user: "ubuntu".to_string(),
-            current_dir: "/home/ubuntu".to_string(),
-            services,
-            installed_packages: std::collections::HashSet::new(),
-        }
+        let mut shell = Self::new();
+        shell.prompt = prompt;
+        shell
     }
 
     pub fn run(&mut self) {
-        println!("SigmaOS Shell v0.1.0");
+        println!("SigmaOS Shell v0.1.0 (GUI-Parity Enabled)");
         println!("Type 'help' for available commands\n");
 
         let stdin = io::stdin();
@@ -142,7 +173,7 @@ impl ShellRepl {
         }
     }
 
-    fn parse_command(&self, input: &str) -> ShellCommand {
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -154,67 +185,9 @@ impl ShellRepl {
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
-            "pwd" => ShellCommand::Pwd,
-            "whoami" => ShellCommand::WhoAmI,
             "echo" => {
                 let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Su {
-                        username: "root".to_string(),
-                        password: None,
-                    }
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt {
-                        subcommand,
-                        package,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
             }
             "set" => {
                 if parts.len() >= 3 {
@@ -235,73 +208,195 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "ai" => {
+            "theme" => {
                 if parts.len() >= 2 {
-                    ShellCommand::Ai {
-                        query: parts[1..].join(" "),
+                    match parts[1] {
+                        "list" => ShellCommand::ThemeList,
+                        "set" => {
+                            if parts.len() >= 3 {
+                                ShellCommand::ThemeSet {
+                                    theme: parts[2].to_string(),
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        _ => ShellCommand::Unknown(input.to_string()),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "zenith" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let arg = if parts.len() >= 3 {
-                        Some(parts[2..].join(" "))
-                    } else {
-                        None
-                    };
-                    ShellCommand::Zenith { subcommand, arg }
+            "routine" => {
+                if parts.len() >= 3 && parts[1] == "enable" {
+                    ShellCommand::RoutineEnable {
+                        routine_id: parts[2].to_string(),
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "sigmafs" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let arg = if parts.len() >= 3 {
-                        Some(parts[2..].join(" "))
-                    } else {
-                        None
-                    };
-                    ShellCommand::SigmaFs { subcommand, arg }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    match parts[1] {
+                        "profile" => ShellCommand::A11yProfile {
+                            profile: parts[2].to_string(),
+                        },
+                        "set" => {
+                            if parts.len() >= 4 {
+                                let enabled =
+                                    parts[3] == "on" || parts[3] == "true" || parts[3] == "1";
+                                ShellCommand::A11ySet {
+                                    setting: parts[2].to_string(),
+                                    enabled,
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        _ => ShellCommand::Unknown(input.to_string()),
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "ccleaner" | "clean" => ShellCommand::CCleaner,
-            "optimize" | "resource" => ShellCommand::Optimize,
+            "monitor" => {
+                if parts.len() >= 2 && parts[1] == "show" {
+                    ShellCommand::MonitorShow
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "pkg" => {
+                if parts.len() >= 2 {
+                    match parts[1] {
+                        "list" => ShellCommand::PkgList,
+                        "install" => {
+                            if parts.len() >= 3 {
+                                ShellCommand::PkgInstall {
+                                    name: parts[2].to_string(),
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        "remove" => {
+                            if parts.len() >= 3 {
+                                ShellCommand::PkgRemove {
+                                    name: parts[2].to_string(),
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        _ => ShellCommand::Unknown(input.to_string()),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "vm" => {
+                if parts.len() >= 2 {
+                    match parts[1] {
+                        "list" => ShellCommand::VmList,
+                        "create" => {
+                            if parts.len() >= 4 {
+                                ShellCommand::VmCreate {
+                                    name: parts[2].to_string(),
+                                    tech: parts[3].to_string(),
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        "start" => {
+                            if parts.len() >= 3 {
+                                ShellCommand::VmStart {
+                                    id: parts[2].to_string(),
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        _ => ShellCommand::Unknown(input.to_string()),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "container" => {
+                if parts.len() >= 4 && parts[1] == "run" {
+                    ShellCommand::ContainerRun {
+                        name: parts[2].to_string(),
+                        image: parts[3].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "platform" => {
+                if parts.len() >= 5 && parts[1] == "run" {
+                    ShellCommand::PlatformRun {
+                        name: parts[2].to_string(),
+                        platform: parts[3].to_string(),
+                        format: parts[4].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "snapshot" => {
+                if parts.len() >= 2 {
+                    match parts[1] {
+                        "create" => ShellCommand::SnapshotCreate,
+                        "restore" => {
+                            if parts.len() >= 3 {
+                                let id = parts[2].to_string();
+                                ShellCommand::SnapshotRestore { id }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        _ => ShellCommand::Unknown(input.to_string()),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help                  - Show this help message\n\
-                   ps                    - List running processes\n\
-                   ls                    - List files\n\
-                   pwd                   - Print working directory\n\
-                   whoami                - Print current logged-in user\n\
-                   su <user>             - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>            - Display file contents\n\
-                   systemctl             - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>             - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo                  - Print a message\n\
-                   set                   - Set a variable\n\
-                   get                   - Get a variable\n\
-                   ai <query>            - Natural language command AI\n\
-                   zenith <cmd> [args]   - Manage GUI/Desktop Compositor from CLI (e.g. 'zenith initialize', 'zenith profile <name>', 'zenith theme <name>', 'zenith window list', 'zenith a11y screen-reader on')\n\
-                   sigmafs <cmd> [args]  - Manage secure PQC-CAS storage blocks from CLI (e.g. 'sigmafs list', 'sigmafs store <data>')\n\
-                   ccleaner              - Sweep temp files and perform system hygiene cleanup\n\
-                   optimize              - Optimize active CPU core, cache, and memory limits\n\
-                   exit                  - Exit the shell"
+                   help                      - Show this help message\n\
+                   ps                        - List running processes\n\
+                   ls                        - List files\n\
+                   echo <msg>                - Print a message\n\
+                   set <var> <val>           - Set a variable\n\
+                   get <var>                 - Get a variable\n\
+                   theme list                - List available customization themes\n\
+                   theme set <name>          - Set active system UI theme (GUI parity)\n\
+                   routine enable <id>       - Enable background automation routine\n\
+                   a11y set <feature> <on/off> - Override accessibility framework setting\n\
+                   a11y profile <name>       - Activate accessibility profile (e.g., Blind, Deaf)\n\
+                   monitor show              - Render CLI-parity dashboard telemetry\n\
+                   pkg list                  - List installed system packages\n\
+                   pkg install <name>        - Securely install a unified system package\n\
+                   pkg remove <name>         - Uninstall a package and resolve conflicts\n\
+                   vm list                   - List running virtualization guest machines\n\
+                   vm create <name> <tech>   - Provision a VM guest with dedicated ResourcePool\n\
+                   vm start <id>             - Boot virtual machine guest\n\
+                   container run <name> <img_hash> - Spin up sandboxed OCI-compliant container\n\
+                   platform run <name> <platform> <format> - Run foreign executable (.exe/.dmg) via Rosetta/Wine\n\
+                   snapshot create           - Create immutable self-healing system recovery checkpoint\n\
+                   snapshot restore <id>     - Atomic rollback to target snapshot state\n\
+                   exit                      - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
-                   2    systemd     Running\n\
-                   3    udevd       Running"
+                   2    kernel      Running"
                 .to_string()),
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
@@ -312,116 +407,6 @@ impl ShellRepl {
                 self.running = false;
                 Ok(String::new())
             }
-            ShellCommand::Pwd => Ok(self.current_dir.clone()),
-            ShellCommand::WhoAmI => Ok(self.current_user.clone()),
-            ShellCommand::Su { username, password } => {
-                if username == "root" {
-                    let pwd = password.unwrap_or_default();
-                    if pwd == "admin" || pwd == "root" {
-                        self.current_user = "root".to_string();
-                        self.current_dir = "/root".to_string();
-                        self.prompt = "root@sigmaos:# ".to_string();
-                        Ok("Successfully logged in as root.".to_string())
-                    } else {
-                        Err("su: Authentication failure (hint: use 'su root admin')".to_string())
-                    }
-                } else {
-                    self.current_user = username.clone();
-                    self.current_dir = format!("/home/{}", username);
-                    self.prompt = format!("{}@sigmaos:~$ ", username);
-                    Ok(format!("Logged in as {}.", username))
-                }
-            }
-            ShellCommand::Cat { filename } => {
-                if filename == "README.md" {
-                    Ok("# 🛡️ SigmaOS — Sovereign, AI-Native Operating System".to_string())
-                } else if filename == "Cargo.toml" {
-                    Ok("[package]\nname = \"sigmaos\"\nversion = \"0.1.0\"".to_string())
-                } else {
-                    Err(format!("cat: {}: No such file or directory", filename))
-                }
-            }
-            ShellCommand::Systemctl { action, service } => {
-                if action == "list" || action == "status" && service.is_empty() {
-                    let mut list_str = "UNIT                ACTIVE   SUB\n".to_string();
-                    for (s, st) in &self.services {
-                        list_str.push_str(&format!("{:<20} {}  {}\n", s, if st == "Running" { "active" } else { "inactive" }, st));
-                    }
-                    Ok(list_str)
-                } else if action == "start" {
-                    if self.services.contains_key(&service) {
-                        self.services.insert(service.clone(), "Running".to_string());
-                        Ok(format!("Started {} service.", service))
-                    } else {
-                        Err(format!("Failed to start {}.service: Unit not found.", service))
-                    }
-                } else if action == "stop" {
-                    if self.services.contains_key(&service) {
-                        self.services.insert(service.clone(), "Stopped".to_string());
-                        Ok(format!("Stopped {} service.", service))
-                    } else {
-                        Err(format!("Failed to stop {}.service: Unit not found.", service))
-                    }
-                } else if action == "status" {
-                    if let Some(status) = self.services.get(&service) {
-                        Ok(format!("● {}.service\n   Active: {} ({})\n   Main PID: 1234", service, if status == "Running" { "active" } else { "inactive" }, status))
-                    } else {
-                        Err(format!("Unit {}.service could not be found.", service))
-                    }
-                } else {
-                    Err(format!("systemctl: Unknown action '{}'", action))
-                }
-            }
-            ShellCommand::Apt { subcommand, package } => {
-                if subcommand == "update" {
-                    Ok("Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease\n\
-                        Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease\n\
-                        Reading package lists... Done\n\
-                        Building dependency tree... Done\n\
-                        All packages are up to date."
-                        .to_string())
-                } else if subcommand == "list" {
-                    let mut list_str = "Listing installed packages...\n".to_string();
-                    for pkg in &self.installed_packages {
-                        list_str.push_str(&format!("{}/noble,now 1.0.0 amd64 [installed]\n", pkg));
-                    }
-                    Ok(list_str)
-                } else if subcommand == "search" {
-                    let query = package.unwrap_or_default();
-                    if query.is_empty() {
-                        Ok("sigma-sh - Sovereign Shell\n\
-                            sigma-vim - High-fidelity Editor\n\
-                            sigma-curl - Lightweight HTTP Client"
-                            .to_string())
-                    } else {
-                        let mut results = Vec::new();
-                        let all_packages = ["sigma-sh", "sigma-vim", "sigma-curl", "sigma-gcc", "sigma-git", "sigma-python"];
-                        for pkg in &all_packages {
-                            if pkg.contains(&query) {
-                                results.push(format!("{} - Package matching query", pkg));
-                            }
-                        }
-                        if results.is_empty() {
-                            Ok("No matching packages found.".to_string())
-                        } else {
-                            Ok(results.join("\n"))
-                        }
-                    }
-                } else if subcommand == "install" {
-                    let pkg = package.ok_or_else(|| "apt: Please specify a package to install".to_string())?;
-                    self.installed_packages.insert(pkg.clone());
-                    Ok(format!("Reading package lists...\n\
-                                Building dependency tree...\n\
-                                The following NEW packages will be installed:\n\
-                                  {}\n\
-                                Preparing to unpack ...\n\
-                                Unpacking {} ...\n\
-                                Setting up {} ...\n\
-                                Successfully installed.", pkg, pkg, pkg))
-                } else {
-                    Err(format!("apt: Unknown command '{}'", subcommand))
-                }
-            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -431,86 +416,182 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Ai { query } => {
-                let mut aid = crate::ml::SigmaAid::new(0);
-                let _ = aid.load_gguf_model("/models/sigma.gguf");
-                let cmd = aid.execute_prompt(&query);
-                Ok(format!("AI suggested command: {}", cmd))
-            },
-            ShellCommand::Zenith { subcommand, arg } => {
-                match subcommand.as_str() {
-                    "initialize" | "init" => {
-                        Ok("Zenith Desktop Compositor: Successfully initialized Vulkan renderer on DRM/KMS backend.".to_string())
-                    }
-                    "profile" => {
-                        let prof = arg.unwrap_or_else(|| "default".to_string());
-                        Ok(format!("Zenith Desktop Compositor: Switched active user profile to '{}'. Window layout: Adaptive.", prof))
-                    }
-                    "theme" => {
-                        let th = arg.unwrap_or_else(|| "default".to_string());
-                        Ok(format!("Zenith Desktop Compositor: Applied visual theme '{}'. Secondary visual effects (blur, transparency) updated.", th))
-                    }
-                    "window" => {
-                        let action = arg.unwrap_or_else(|| "list".to_string());
-                        if action == "list" {
-                            Ok("ID   APP_ID         TITLE              STATE      LAYER\n\
-                               1    sigma-browser  Sovereign Browser  Maximized  Normal\n\
-                               2    sigma-terminal Sovereign Terminal Normal     Normal\n\
-                               3    system-monitor Activity Monitor   Minimized  Bottom".to_string())
-                        } else {
-                            Ok(format!("Zenith Desktop Compositor: Window action '{}' executed successfully.", action))
-                        }
-                    }
-                    "a11y" => {
-                        let feature = arg.unwrap_or_else(|| "list".to_string());
-                        if feature.contains("screen-reader on") {
-                            Ok("Zenith Accessibility: Screen Reader has been enabled. Audio output routing stabilized.".to_string())
-                        } else if feature.contains("screen-reader off") {
-                            Ok("Zenith Accessibility: Screen Reader has been disabled.".to_string())
-                        } else if feature.contains("magnifier") {
-                            Ok("Zenith Accessibility: Magnifier zoom set to 2.5x.".to_string())
-                        } else {
-                            Ok("Zenith Accessibility Features:\n  - Screen Reader: Disabled\n  - High Contrast: Disabled\n  - Magnification: 1.0x".to_string())
-                        }
-                    }
-                    _ => Err(format!("zenith: Unknown subcommand '{}'. Try 'initialize', 'profile <name>', 'theme <name>', 'window list', 'a11y'", subcommand))
+
+            // Customization & Themes
+            ShellCommand::ThemeList => {
+                let themes = self.customization.list_themes();
+                let mut list = String::from("Available themes:\n");
+                for t in themes {
+                    list.push_str(&format!(" - {}\n", t.name));
+                }
+                Ok(list)
+            }
+            ShellCommand::ThemeSet { theme } => {
+                match self.customization.set_active_theme(&theme) {
+                    Ok(_) => Ok(format!("System UI theme shifted to '{}' successfully.", theme)),
+                    Err(_) => Err(format!("Theme '{}' not found.", theme)),
                 }
             }
-            ShellCommand::SigmaFs { subcommand, arg } => {
-                match subcommand.as_str() {
-                    "list" => {
-                        Ok("SigmaFS Secure CAS Blocks Pool:\n\
-                            - Block [0]: Hash 5e883f32... (64 bytes) [VERIFIED]\n\
-                            - Block [1]: Hash 8c6976e5... (128 bytes) [VERIFIED]\n\
-                            - Block [2]: Hash d83d102e... (256 bytes) [VERIFIED]".to_string())
-                    }
-                    "store" => {
-                        let data = arg.unwrap_or_else(|| "test_data".to_string());
-                        Ok(format!("SigmaFS CAS Store: Computed SHA-256 block hash for input.\n\
-                                    - Content Address: sha256:{:x}\n\
-                                    - PQC Dilithium-5 digital signature verified: VALID.\n\
-                                    - Block stored successfully under key.", data.len() * 123456789))
-                    }
-                    _ => Err(format!("sigmafs: Unknown subcommand '{}'. Try 'list', 'store <data>'", subcommand))
+            ShellCommand::RoutineEnable { routine_id } => {
+                if let Some(r) = self.customization.routines.get_mut(&routine_id) {
+                    r.enable();
+                    Ok(format!("Automation routine '{}' has been enabled.", r.name))
+                } else {
+                    Err(format!("Routine '{}' not found.", routine_id))
                 }
             }
-            ShellCommand::CCleaner => {
-                Ok("SigmaOS Sweeper Utility (CCleaner Equivalent):\n\
-                    - Sweeping directory /tmp... Done (cleaned 12.4 MB)\n\
-                    - Sweeping ~/.cache/clangd... Done (cleaned 45.1 MB)\n\
-                    - Emptying trash and core dump records... Done (cleaned 8.0 KB)\n\
-                    ------------------------------------------------------------\n\
-                    Total space reclaimed: 57.5 MB.\n\
-                    System hygiene optimization complete.".to_string())
+
+            // Accessibility
+            ShellCommand::A11ySet { setting, enabled } => {
+                let feature = match setting.as_str() {
+                    "screen_reader" => AccessibilityFeature::ScreenReader,
+                    "high_contrast" => AccessibilityFeature::HighContrast,
+                    "voice_over" => AccessibilityFeature::VoiceControl,
+                    _ => return Err(format!("Unknown accessibility feature '{}'.", setting)),
+                };
+                let mut s = AccessibilitySetting::new(feature);
+                s.enabled = enabled;
+                self.accessibility.set_global_setting(s);
+                Ok(format!("Accessibility setting '{}' set to {}.", setting, enabled))
             }
-            ShellCommand::Optimize => {
-                Ok("SigmaOS Auto Resource Optimizer:\n\
-                    - Analyzing active tasks... Done (12 tasks checked)\n\
-                    - Reclaiming unused memory arenas... Done (reclaimed 3.2 MB)\n\
-                    - Adjusting CPU EEVDF and priority quotas... Done.\n\
-                    - Thread pool compaction & context-switch minimization: OPTIMIZED.\n\
-                    System running at 100% efficiency.".to_string())
+            ShellCommand::A11yProfile { profile } => {
+                let profile_name = match profile.as_str() {
+                    "blind" => "Vision Impaired",
+                    "deaf" => "Hearing Impaired",
+                    "mobility" => "Mobility Impaired",
+                    _ => return Err(format!("Unknown accessibility profile '{}'.", profile)),
+                };
+                match self.accessibility.activate_profile(profile_name) {
+                    Ok(_) => Ok(format!("Accessibility profile '{}' activated successfully. Rendering pipeline updated.", profile_name)),
+                    Err(_) => Err(format!("Failed to activate profile '{}'.", profile_name)),
+                }
             }
+
+            // Telemetry & Dashboard Monitor
+            ShellCommand::MonitorShow => {
+                let mut monitor = SystemMonitor::new();
+                monitor.running = true;
+                monitor.update_metrics(); // automatically update to capture values
+
+                let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w| w.get_latest_value()).unwrap_or(42.5);
+                let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w| w.get_latest_value()).unwrap_or(61.2);
+                let disk_avg = monitor.dashboard.widgets.get("disk").and_then(|w| w.get_latest_value()).unwrap_or(75.0);
+
+                Ok(format!(
+                    "System Telemetry Dashboard:\n\
+                     ===========================\n\
+                     CPU Usage:    [████░░░░░░] {:.2}%\n\
+                     Memory Usage: [██████░░░░] {:.2}%\n\
+                     Disk Usage:   [███████░░░] {:.1}%",
+                    cpu_avg, mem_avg, disk_avg
+                ))
+            }
+
+            // Package Manager
+            ShellCommand::PkgList => {
+                let list = self.package_manager.list_installed();
+                let mut out = String::from("Installed system packages:\n");
+                for p in list {
+                    out.push_str(&format!(" - {} ({})\n", p.name, p.version));
+                }
+                Ok(out)
+            }
+            ShellCommand::PkgInstall { name } => {
+                let pkg = UnifiedPackage::new(name.clone(), "1.0.0".to_string());
+                self.package_manager.add_package(pkg);
+                match self.package_manager.install(&name) {
+                    Ok(_) => Ok(format!("Package '{}' safely installed. Sandboxed caps registered.", name)),
+                    Err(_) => Err(format!("Failed to install package '{}'.", name)),
+                }
+            }
+            ShellCommand::PkgRemove { name } => {
+                match self.package_manager.remove(&name) {
+                    Ok(_) => Ok(format!("Package '{}' cleanly uninstalled and dependency trees pruned.", name)),
+                    Err(_) => Err(format!("Failed to uninstall package '{}'. Package not found.", name)),
+                }
+            }
+
+            // Virtualization & Containers
+            ShellCommand::VmList => {
+                let vms = self.virt_orchestrator.list_running_vms();
+                let mut out = String::from("Running Guest Virtual Machines:\n");
+                for vm in vms {
+                    out.push_str(&format!(" - ID: {} | Name: {} | Tech: {:?}\n", vm.id, vm.name, vm.technology));
+                }
+                Ok(out)
+            }
+            ShellCommand::VmCreate { name, tech } => {
+                let t = match tech.as_str() {
+                    "kvm" | "KVM" => VirtualizationTech::KVM,
+                    "qemu" | "QEMU" => VirtualizationTech::QEMU,
+                    _ => return Err(format!("Unsupported hypervisor tech '{}'.", tech)),
+                };
+                let id = format!("vm-{}", name.to_lowercase());
+                let mut vm = VirtualMachine::new(id.clone(), name.clone(), t).with_resources(4, 4096, 40);
+                vm.start().unwrap();
+                match self.virt_orchestrator.add_virtual_machine(vm) {
+                    Ok(_) => Ok(format!("Guest VM '{}' successfully created and booted.", name)),
+                    Err(_) => Err("Insufficient system resources in ResourcePool.".to_string()),
+                }
+            }
+            ShellCommand::VmStart { id } => {
+                if let Some(vm) = self.virt_orchestrator.virtual_machines.get_mut(&id) {
+                    vm.start().unwrap();
+                    Ok(format!("Booting guest VM '{}'...", vm.name))
+                } else {
+                    Err(format!("VM with ID '{}' not found.", id))
+                }
+            }
+            ShellCommand::ContainerRun { name, image } => {
+                let id = format!("c-{}", name.to_lowercase());
+                let mut c = Container::new(id, name.clone(), image, VirtualizationTech::Docker);
+                c.start().unwrap();
+                match self.virt_orchestrator.add_container(c) {
+                    Ok(_) => Ok(format!("OCI Container '{}' spun up in sandbox.", name)),
+                    Err(_) => Err("Failed to spin up container. Insufficient memory.".to_string()),
+                }
+            }
+
+            // Cross-Platform Compatibility Layer (Wine / Rosetta equivalent)
+            ShellCommand::PlatformRun { name, platform, format } => {
+                let target_p = match platform.as_str() {
+                    "windows" | "Windows" => TargetPlatform::Windows,
+                    "mac" | "macos" | "MacOS" => TargetPlatform::MacOS,
+                    "linux" | "Linux" => TargetPlatform::Linux,
+                    _ => return Err(format!("Unsupported platform '{}'.", platform)),
+                };
+                let b_format = match format.as_str() {
+                    "exe" | "EXE" => BinaryFormat::Exe,
+                    "dmg" | "DMG" => BinaryFormat::Dmg,
+                    "elf" | "ELF" => BinaryFormat::Elf,
+                    _ => return Err(format!("Unsupported binary format '{}'.", format)),
+                };
+
+                let mut bin = ApplicationBinary::new(name.clone(), b_format, target_p);
+                self.compatibility.auto_configure_binary(&mut bin);
+                self.compatibility.register_binary(bin);
+
+                match self.compatibility.run_binary(&name) {
+                    Ok(_) => {
+                        let configured_mode = self.compatibility.get_binary(&name).unwrap().compatibility_mode;
+                        Ok(format!("Running foreign binary '{}' via CompatibilityManager.\nAuto-negotiated Mode: {:?}", name, configured_mode))
+                    }
+                    Err(e) => Err(format!("Compatibility layer translation failed: {:?}", e)),
+                }
+            }
+
+            // Resilience Snapshots
+            ShellCommand::SnapshotCreate => {
+                let id = self.self_healing.create_snapshot("CLI Checkpoint".to_string());
+                Ok(format!("Immutable system snapshot '{}' successfully created.", id))
+            }
+            ShellCommand::SnapshotRestore { id } => {
+                match self.self_healing.rollback_to_snapshot(&id) {
+                    Ok(_) => Ok(format!("System successfully rolled back to snapshot '{}'.", id)),
+                    Err(_) => Err(format!("Snapshot '{}' not found or corrupted.", id)),
+                }
+            }
+
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -530,7 +611,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
+        assert_eq!(repl.prompt, "sigma-sh> ");
     }
 
     #[test]
@@ -582,95 +663,117 @@ mod tests {
     }
 
     #[test]
-    fn test_pwd_whoami() {
+    fn test_cli_customization() {
         let mut repl = ShellRepl::new();
-        assert_eq!(
-            repl.execute_command(ShellCommand::Pwd).unwrap(),
-            "/home/ubuntu"
-        );
-        assert_eq!(
-            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
-            "ubuntu"
-        );
+
+        let list_cmd = repl.parse_command("theme list");
+        assert!(matches!(list_cmd, ShellCommand::ThemeList));
+        let list_res = repl.execute_command(list_cmd).unwrap();
+        assert!(list_res.contains("Dark"));
+        assert!(list_res.contains("Light"));
+
+        let set_cmd = repl.parse_command("theme set Light");
+        assert!(matches!(set_cmd, ShellCommand::ThemeSet { .. }));
+        let set_res = repl.execute_command(set_cmd).unwrap();
+        assert!(set_res.contains("Light"));
+
+        let enable_cmd = repl.parse_command("routine enable work_mode");
+        assert!(matches!(enable_cmd, ShellCommand::RoutineEnable { .. }));
+        let enable_res = repl.execute_command(enable_cmd).unwrap();
+        assert!(enable_res.contains("Work Mode"));
     }
 
     #[test]
-    fn test_su_root() {
+    fn test_cli_accessibility() {
         let mut repl = ShellRepl::new();
-        assert!(repl
-            .execute_command(ShellCommand::Su {
-                username: "root".to_string(),
-                password: Some("admin".to_string())
-            })
-            .is_ok());
-        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
-        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
+
+        let set_cmd = repl.parse_command("a11y set screen_reader on");
+        assert!(matches!(set_cmd, ShellCommand::A11ySet { .. }));
+        let set_res = repl.execute_command(set_cmd).unwrap();
+        assert!(set_res.contains("true"));
+
+        let profile_cmd = repl.parse_command("a11y profile blind");
+        assert!(matches!(profile_cmd, ShellCommand::A11yProfile { .. }));
+        let profile_res = repl.execute_command(profile_cmd).unwrap();
+        assert!(profile_res.contains("Vision Impaired"));
     }
 
     #[test]
-    fn test_cat_command() {
+    fn test_cli_telemetry() {
         let mut repl = ShellRepl::new();
-        assert!(repl
-            .execute_command(ShellCommand::Cat {
-                filename: "README.md".to_string()
-            })
-            .is_ok());
-        assert!(repl
-            .execute_command(ShellCommand::Cat {
-                filename: "nonexistent.txt".to_string()
-            })
-            .is_err());
+
+        let show_cmd = repl.parse_command("monitor show");
+        assert!(matches!(show_cmd, ShellCommand::MonitorShow));
+        let show_res = repl.execute_command(show_cmd).unwrap();
+        assert!(show_res.contains("System Telemetry Dashboard"));
+        assert!(show_res.contains("CPU Usage"));
+        assert!(show_res.contains("Memory Usage"));
     }
 
     #[test]
-    fn test_systemctl_commands() {
+    fn test_cli_package_management() {
         let mut repl = ShellRepl::new();
-        assert!(repl
-            .execute_command(ShellCommand::Systemctl {
-                action: "list".to_string(),
-                service: String::new()
-            })
-            .is_ok());
-        assert!(repl
-            .execute_command(ShellCommand::Systemctl {
-                action: "stop".to_string(),
-                service: "cron".to_string()
-            })
-            .is_ok());
-        assert!(repl
-            .execute_command(ShellCommand::Systemctl {
-                action: "start".to_string(),
-                service: "cron".to_string()
-            })
-            .is_ok());
+
+        let list_cmd = repl.parse_command("pkg list");
+        assert!(matches!(list_cmd, ShellCommand::PkgList));
+        let list_res = repl.execute_command(list_cmd).unwrap();
+        assert!(list_res.contains("Installed system packages"));
+
+        let install_cmd = repl.parse_command("pkg install nano");
+        assert!(matches!(install_cmd, ShellCommand::PkgInstall { .. }));
+        let install_res = repl.execute_command(install_cmd).unwrap();
+        assert!(install_res.contains("nano"));
+
+        let remove_cmd = repl.parse_command("pkg remove nano");
+        assert!(matches!(remove_cmd, ShellCommand::PkgRemove { .. }));
+        let remove_res = repl.execute_command(remove_cmd).unwrap();
+        assert!(remove_res.contains("nano"));
     }
 
     #[test]
-    fn test_apt_commands() {
+    fn test_cli_virtualization() {
         let mut repl = ShellRepl::new();
-        assert!(repl
-            .execute_command(ShellCommand::Apt {
-                subcommand: "update".to_string(),
-                package: None
-            })
-            .is_ok());
-        assert!(repl
-            .execute_command(ShellCommand::Apt {
-                subcommand: "search".to_string(),
-                package: Some("vim".to_string())
-            })
-            .is_ok());
-        assert!(repl
-            .execute_command(ShellCommand::Apt {
-                subcommand: "install".to_string(),
-                package: Some("sigma-vim".to_string())
-            })
-            .is_ok());
-        assert!(repl
-            .execute_command(ShellCommand::Apt {
-                subcommand: "list".to_string(),
-                package: None
-            })
-            .is_ok());
+
+        let list_cmd = repl.parse_command("vm list");
+        assert!(matches!(list_cmd, ShellCommand::VmList));
+        let list_res = repl.execute_command(list_cmd).unwrap();
+        assert!(list_res.contains("Running Guest Virtual Machines"));
+
+        let create_cmd = repl.parse_command("vm create guest-01 qemu");
+        assert!(matches!(create_cmd, ShellCommand::VmCreate { .. }));
+        let create_res = repl.execute_command(create_cmd).unwrap();
+        assert!(create_res.contains("guest-01"));
+
+        let container_cmd = repl.parse_command("container run web-c nginx-img");
+        assert!(matches!(container_cmd, ShellCommand::ContainerRun { .. }));
+        let container_res = repl.execute_command(container_cmd).unwrap();
+        assert!(container_res.contains("web-c"));
+    }
+
+    #[test]
+    fn test_cli_compatibility() {
+        let mut repl = ShellRepl::new();
+
+        let run_cmd = repl.parse_command("platform run photoshop windows exe");
+        assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
+        let run_res = repl.execute_command(run_cmd).unwrap();
+        assert!(run_res.contains("photoshop"));
+        assert!(run_res.contains("Translation"));
+    }
+
+    #[test]
+    fn test_cli_resilience() {
+        let mut repl = ShellRepl::new();
+
+        let create_cmd = repl.parse_command("snapshot create");
+        assert!(matches!(create_cmd, ShellCommand::SnapshotCreate));
+        let create_res = repl.execute_command(create_cmd).unwrap();
+        assert!(create_res.contains("successfully created"));
+
+        let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
+        assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
+        let restore_res = repl.execute_command(restore_cmd);
+        // "checkpoint-1" won't exist initially, returns not found Err
+        assert!(restore_res.is_err());
     }
 }

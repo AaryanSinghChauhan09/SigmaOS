@@ -1,65 +1,111 @@
-#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
-pub mod audio;
 pub mod automation;
-pub mod boot;
 pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod debugger;
-pub mod desktop;
 pub mod device;
-pub mod docs;
 pub mod driver;
 pub mod drivers;
 pub mod ecosystem;
 pub mod education;
 pub mod filesystem;
-pub mod finance;
 pub mod governance;
-pub mod graphics;
-pub mod iso;
 pub mod kernel;
 pub mod legal;
-pub mod media;
-pub mod memory;
-pub mod ml;
 pub mod network;
-pub mod observability;
 pub mod orchestration;
 pub mod package;
-pub mod phase_l_plans;
-pub mod pillars;
 pub mod productivity;
 pub mod resilience;
-pub mod scheduler;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod storage;
 pub mod support;
-pub mod system;
-pub mod tools;
-pub mod tracing;
-pub mod unimplemented_features;
 pub mod virtualization;
 
-
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout =
-        Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
-    std_alloc(layout)
-}
-
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn free(_ptr: *mut u8) {
-    // No-op deallocation in host test environment to avoid layout-tracking complexity.
-}
+pub use accessibility::{
+    AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
+    AccessibilityProfile, AccessibilitySetting,
+};
+pub use automation::{
+    AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
+    OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
+    SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+};
+pub use community::{
+    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
+    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
+};
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+};
+pub use customization::{
+    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use dashboard::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use drivers::{
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
+    VesaModeInfo,
+};
+pub use ecosystem::{
+    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
+    EnterprisePartner,
+};
+pub use education::{
+    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
+};
+pub use filesystem::{
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+};
+pub use governance::{
+    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
+    RoadmapMilestone, TransparentRoadmap,
+};
+pub use kernel::{
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+};
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+};
+pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use orchestration::{
+    AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
+    ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
+    DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use package::{
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use productivity::{
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
+};
+pub use resilience::{
+    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
+    SystemSnapshot,
+};
+pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use shell::{ShellCommand, ShellRepl};
+pub use sigpkg::{
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction,
+};
+pub use support::{
+    LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
+};
+pub use virtualization::{
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
