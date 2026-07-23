@@ -104,6 +104,7 @@ impl SlabAllocator {
 
         // No free objects, create a new slab
         let new_slab = Self::create_slab(next_slab_id, cache)?;
+        self.next_slab_id += 1;
         let obj = new_slab.objects[0].unwrap();
         cache.slabs.push(new_slab);
         cache.free_objects = cache.objects_per_slab - 1;
@@ -143,8 +144,9 @@ impl SlabAllocator {
     fn create_slab(next_slab_id: u64, cache: &SlabCache) -> Result<Slab, &'static str> {
         let mut objects = Vec::with_capacity(cache.objects_per_slab);
 
-        for _ in 0..cache.objects_per_slab {
-            objects.push(Some(Self::allocate_memory(next_slab_id, cache.object_size)));
+        objects.push(Some(Self::allocate_memory(next_slab_id, cache.object_size)));
+        for _ in 1..cache.objects_per_slab {
+            objects.push(None);
         }
 
         Ok(Slab {

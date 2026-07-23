@@ -344,10 +344,10 @@ mod tests {
         let nanos = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_nanos();
+            .as_nanos()
+            .to_le_bytes();
         let mut seed = [0u8; 32];
-        seed[..16].copy_from_slice(&nanos.to_le_bytes());
-        seed[16..].copy_from_slice(&nanos.to_be_bytes());
+        seed[..16].copy_from_slice(&nanos);
         let rng = SigmaCsprng::new(&seed);
         let r1 = rng.generate(16);
         let r2 = rng.generate(16);

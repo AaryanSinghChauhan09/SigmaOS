@@ -263,7 +263,7 @@ impl WatchdogManager {
 
     /// Get timestamp (simplified)
     fn get_timestamp(&self) -> u64 {
-        self.monitor.uptime
+        self.monitor.uptime.max(1)
     }
 }
 

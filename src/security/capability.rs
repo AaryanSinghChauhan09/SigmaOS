@@ -66,6 +66,16 @@ impl CapabilityToken {
         (self.bits & (1 << permission as u64)) != 0
     }
 
+    /// Allow specific capability bitmask
+    pub fn allow_capability(&mut self, capability: u64) {
+        self.bits |= capability;
+    }
+
+    /// Check if capability token contains the required capability
+    pub fn contains(&self, capability: u64) -> bool {
+        (self.bits & capability) == capability
+    }
+
     /// Revoke all permissions
     pub fn revoke_all(&mut self) {
         self.bits = 0;

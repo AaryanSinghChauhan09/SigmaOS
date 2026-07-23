@@ -1297,6 +1297,7 @@ impl Uart8250 {
     pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
             // THRE set, can write
+            self.line_status |= 0x01; // Set Data Ready bit
             Ok(())
         } else {
             Err(AncientError::DeviceBusy)
@@ -1625,7 +1626,7 @@ mod tests {
 
         let contact = TouchContact {
             id: 0,
-            x: 100,
+            x: 110,
             y: 200,
             pressure: 50,
             active: true,
