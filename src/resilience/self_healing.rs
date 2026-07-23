@@ -42,8 +42,8 @@ impl SystemSnapshot {
     pub fn new(description: String) -> Self {
         let timestamp_nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_nanos())
-            .unwrap_or(0);
+            .unwrap()
+            .as_nanos();
         Self {
             id: format!("snap-{}", timestamp_nanos),
             timestamp: (timestamp_nanos / 1_000_000_000) as u64,
@@ -98,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        _context: &HashMap<String, String>,
+        context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -190,7 +190,11 @@ impl SelfHealingModule {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: &str) -> Result<(), ResilienceError> {
-        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
+        if !self.snapshots.iter().any(|s| s.id == id) {
+            return Err(ResilienceError::SnapshotNotFound);
+        }
+
+        let snapshot = self.get_snapshot(id).unwrap();
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback
@@ -207,8 +211,8 @@ impl SelfHealingModule {
             event_type,
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
-                .map(|d| d.as_secs())
-                .unwrap_or(0),
+                .unwrap()
+                .as_secs(),
         ));
 
         if !self.auto_recovery_enabled {
