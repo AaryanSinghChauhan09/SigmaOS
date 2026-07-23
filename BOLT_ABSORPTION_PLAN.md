@@ -57,7 +57,11 @@ By codifying these roles, SigmaOS establishes a continuous-improvement framework
 
 ## 2. Absorption Framework & Standards
 
-SigmaOS absorbs these roles by establishing standard directories and checklist files that must be evaluated during every development cycle:
+### Philosophy
+- Users notice and appreciate the small details.
+- Accessibility (a11y) is not optional; it is a fundamental requirement.
+- Every interactive transition and state change should feel smooth and seamless.
+- Good UX is invisible—it simply works without friction.
 
 ### A. Persistent Journals (`.jules/`)
 To retain learnings across agent execution, SigmaOS maintains a persistent directory `.jules/` containing:

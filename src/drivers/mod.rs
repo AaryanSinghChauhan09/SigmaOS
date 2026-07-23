@@ -1,4 +1,5 @@
 // SigmaOS Drivers Module
+pub mod even_more_devices;
 pub mod gpu;
 pub mod input;
 pub mod legacy_keyboard;
@@ -9,6 +10,10 @@ pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 
+pub use even_more_devices::{
+    AmdRadeonGpuDriver, BroadcomBluetoothDriver, BtState, GpuState, IntelProEthernetDriver,
+    MouseState, NetState, PS2MouseDriver,
+};
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;
