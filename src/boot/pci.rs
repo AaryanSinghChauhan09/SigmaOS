@@ -6,7 +6,7 @@
 extern crate alloc;
 use alloc::vec::Vec;
 
-pub const PCI_MAX_BUS: u8 = 256;
+pub const PCI_MAX_BUS: u16 = 256;
 pub const PCI_MAX_DEVICE: u8 = 32;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

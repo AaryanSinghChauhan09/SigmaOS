@@ -236,7 +236,7 @@ impl Ipv6Stack {
             .ok_or("No route to destination")?;
 
         let header = Ipv6Header::new(
-            route.gateway.unwrap_or_else(|| route.destination.clone()),
+            route.gateway.clone().unwrap_or_else(|| route.destination.clone()),
             destination,
             payload.len() as u16,
             next_header,

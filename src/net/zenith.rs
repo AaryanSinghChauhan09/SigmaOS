@@ -16,7 +16,7 @@ pub enum NetworkError {
     TransmissionFailed,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NetworkDriverType {
     E1000,
     Rtl8139,
