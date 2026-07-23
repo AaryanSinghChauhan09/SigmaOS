@@ -241,8 +241,9 @@ impl ZenithCompositor {
             capability,
         };
 
+        let surface_clone = window.surface.clone();
         self.windows.insert(window_id, window);
-        self.surfaces.insert(window_id, window.surface.clone());
+        self.surfaces.insert(window_id, surface_clone);
         self.active_window = Some(window_id);
 
         Ok(window_id)
