@@ -255,6 +255,6 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(test)]
 #[no_mangle]
-pub unsafe extern "C" fn free(ptr: *mut u8) {
+pub unsafe extern "C" fn free(_ptr: *mut u8) {
     // No-op deallocation in host test environment to avoid layout-tracking complexity.
 }
