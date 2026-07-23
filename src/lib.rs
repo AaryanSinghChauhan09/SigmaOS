@@ -43,11 +43,10 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    AmdRadeonGpuDriver, BroadcomBluetoothDriver, BtState, GpuCommand, GpuDriver, GpuError,
-    GpuState, HidError, HidKeyboardEvent, HidReportType, InputDriver, InputEvent, InputType,
-    IntelProEthernetDriver, MouseState, NetState, NetworkCommand, NetworkDriver, NetworkError,
-    NetworkType, PS2MouseDriver, StorageCommand, StorageDriver, StorageError, StorageType,
-    UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
+    VesaModeInfo,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -67,8 +66,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, FlintChartEngine, FlintChartSpec, FlintEncoding, FlintMark,
-    FlintValue, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer, ProductivityScore,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
