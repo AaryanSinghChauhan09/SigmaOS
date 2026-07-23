@@ -9,8 +9,9 @@ pub use container::{
     PortProtocol, ResourceLimits, RestartPolicy, VolumeMapping,
 };
 pub use orchestration::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
+    ResourcePool, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
+    VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
 };
 pub use vm_manager::{
     HypervisorBackend, OsType, QemuBackend, VirtualBoxBackend, VmConfig, VmError, VmManager,

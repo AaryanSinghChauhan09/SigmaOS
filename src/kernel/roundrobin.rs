@@ -91,13 +91,12 @@ impl Default for RoundRobinConfig {
     }
 }
 
-/// Enhanced priority-aware round-robin scheduler with O(1) work-stealing
+/// Enhanced priority-aware round-robin scheduler
 pub struct RoundRobinScheduler {
     processes: Vec<ScheduledProcess>,
     pub current_index: usize,
     config: RoundRobinConfig,
     current_time: u64,
-    ready_queue_head: Option<usize>, // O(1) tracking of ready processes
 }
 
 impl RoundRobinScheduler {
@@ -107,7 +106,6 @@ impl RoundRobinScheduler {
             current_index: 0,
             config: RoundRobinConfig::default(),
             current_time: 0,
-            ready_queue_head: None,
         }
     }
 
@@ -117,7 +115,6 @@ impl RoundRobinScheduler {
             current_index: 0,
             config,
             current_time: 0,
-            ready_queue_head: None,
         }
     }
 
@@ -125,14 +122,7 @@ impl RoundRobinScheduler {
         if self.processes.len() >= self.config.max_processes {
             return Err(SchedulerError::TooManyProcesses);
         }
-        let idx = self.processes.len();
         self.processes.push(ScheduledProcess::new(process));
-        // Update ready_queue_head if this is the first ready process
-        if self.ready_queue_head.is_none()
-            && self.processes[idx].process.state == ProcessState::Ready
-        {
-            self.ready_queue_head = Some(idx);
-        }
         Ok(())
     }
 
@@ -141,54 +131,36 @@ impl RoundRobinScheduler {
             return None;
         }
 
-        // Find next ready process
         let start_index = self.current_index;
         loop {
             if self.processes[self.current_index].process.state == ProcessState::Ready {
                 return Some(&self.processes[self.current_index].process);
             }
-
             self.current_index = (self.current_index + 1) % self.processes.len();
-
-            // If we've looped through all processes
             if self.current_index == start_index {
                 return None;
             }
         }
-
-        // Fallback: find first ready process and update head
-        for (i, proc) in self.processes.iter().enumerate() {
-            if proc.process.state == ProcessState::Ready {
-                self.ready_queue_head = Some(i);
-                self.current_index = i;
-                return Some(&proc.process);
-            }
-        }
-
-        self.ready_queue_head = None;
-        None
     }
 
     pub fn tick(&mut self) {
         self.current_time += 1;
 
-        let yielded = if !self.processes.is_empty() {
-            let current = &mut self.processes[self.current_index];
-            if current.yield_requested {
-                current.yield_requested = false;
-                true
-            } else {
-                false
-            }
-        } else {
-            false
+        if self.processes.is_empty() {
+            return;
+        }
+
+        let needs_switch = {
+            let entry = &mut self.processes[self.current_index];
+            entry.cpu_time_used += 1;
+            let slice = entry.time_slice_ticks(self.config.time_slice);
+            let yielding = entry.yield_requested;
+            entry.yield_requested = false;
+            yielding || entry.cpu_time_used.is_multiple_of(slice)
         };
 
-        // Time slice expired or yield requested, move to next process
-        if yielded || self.current_time % self.config.time_slice == 0 {
-            if !self.processes.is_empty() {
-                self.current_index = (self.current_index + 1) % self.processes.len();
-            }
+        if needs_switch {
+            self.advance_to_next_ready();
         }
     }
 
@@ -218,44 +190,15 @@ impl RoundRobinScheduler {
     }
 
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
-        if let Some((idx, entry)) = self
-            .processes
-            .iter_mut()
-            .enumerate()
-            .find(|(i, e)| e.process.pid == pid)
-        {
+        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid == pid) {
             entry.process.state = state;
-            // Update ready_queue_head when state changes
-            if state == ProcessState::Ready && self.ready_queue_head.is_none() {
-                self.ready_queue_head = Some(idx);
-            } else if state != ProcessState::Ready && self.ready_queue_head == Some(idx) {
-                self.ready_queue_head = None;
-            }
         }
     }
 
     pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|p| p.process.pid != pid);
-
-        // Adjust current index if necessary
+        self.processes.retain(|e| e.process.pid != pid);
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
             self.current_index = 0;
-        }
-    }
-
-    pub fn save_context(&mut self, rsp: u64, rip: u64) {
-        if !self.processes.is_empty() {
-            self.processes[self.current_index]
-                .context
-                .save_from(rsp, rip);
-        }
-    }
-
-    pub fn restore_context(&self) -> Option<CpuContext> {
-        if self.processes.is_empty() {
-            None
-        } else {
-            Some(self.processes[self.current_index].context)
         }
     }
 
@@ -266,8 +209,20 @@ impl RoundRobinScheduler {
     pub fn get_ready_process_count(&self) -> usize {
         self.processes
             .iter()
-            .filter(|p| p.process.state == ProcessState::Ready)
+            .filter(|e| e.process.state == ProcessState::Ready)
             .count()
+    }
+
+    /// Save the context of the currently running process
+    pub fn save_context(&mut self, rsp: u64, rip: u64) {
+        if let Some(entry) = self.processes.get_mut(self.current_index) {
+            entry.context.save_from(rsp, rip);
+        }
+    }
+
+    /// Restore the context of the currently scheduled process
+    pub fn restore_context(&self) -> Option<CpuContext> {
+        self.processes.get(self.current_index).map(|e| e.context)
     }
 }
 
@@ -308,34 +263,22 @@ mod tests {
         let mut scheduler = RoundRobinScheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process).unwrap();
-
-        let scheduled = scheduler.schedule();
-        assert!(scheduled.is_some());
+        assert!(scheduler.schedule().is_some());
     }
 
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
-        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(process1).unwrap();
-        scheduler.add_process(process2).unwrap();
+        let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(p1).unwrap();
+        scheduler.add_process(p2).unwrap();
 
         let initial_index = scheduler.current_index;
-        for _ in 0..15 {
+        // Normal priority multiplier is 2x base 10 = 20 ticks per slice
+        for _ in 0..20 {
             scheduler.tick();
         }
-        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
-        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(process1).unwrap();
-        scheduler.add_process(process2).unwrap();
-
-        let initial_index = scheduler.current_index;
-        for _ in 0..10 {
-            scheduler.tick();
-        }
-        // After 10 ticks with 10ms time slice, index should change
         assert_ne!(scheduler.current_index, initial_index);
     }
 

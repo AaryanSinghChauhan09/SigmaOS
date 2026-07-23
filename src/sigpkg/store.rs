@@ -31,7 +31,7 @@ impl ContentAddressedStore {
     /// Add package to store
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
-        let package_path = self.base_path.join(&format!("{}-{}", hash, package.name));
+        let package_path = self.base_path.join(format!("{}-{}", hash, package.name));
 
         let stored = StoredPackage {
             package: package.clone(),

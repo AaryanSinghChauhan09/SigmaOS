@@ -1,7 +1,7 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::sigpkg::{Dependency, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Version};
 use std::collections::HashMap;
 
 /// Build system type
@@ -130,24 +130,16 @@ impl PackageRecipe {
 
     pub fn get_build_script(&self) -> String {
         match self.build_system {
-            BuildSystem::Cargo => {
-                format!("cargo build --release\ncargo install --path .")
-            }
-            BuildSystem::Make => {
-                format!("make -j$(nproc)\nmake install")
-            }
+            BuildSystem::Cargo => "cargo build --release\ncargo install --path .".to_string(),
+            BuildSystem::Make => "make -j$(nproc)\nmake install".to_string(),
             BuildSystem::CMake => {
-                format!("mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install")
+                "mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install".to_string()
             }
-            BuildSystem::Autotools => {
-                format!("./configure\nmake -j$(nproc)\nmake install")
-            }
+            BuildSystem::Autotools => "./configure\nmake -j$(nproc)\nmake install".to_string(),
             BuildSystem::Meson => {
-                format!("meson setup build\nmeson compile -C build\nmeson install -C build")
+                "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
-            BuildSystem::Ninja => {
-                format!("ninja\nninja install")
-            }
+            BuildSystem::Ninja => "ninja\nninja install".to_string(),
         }
     }
 }
