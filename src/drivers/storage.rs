@@ -9,9 +9,9 @@ pub enum StorageType {
     NVMe,
     AHCI,
     SATA,
-    IDE,      // Legacy IDE hard drives
-    Floppy,   // Retro Floppy disk controllers
-    SCSI,     // Legacy SCSI controllers
+    IDE,    // Legacy IDE hard drives
+    Floppy, // Retro Floppy disk controllers
+    SCSI,   // Legacy SCSI controllers
     Virtual,
 }
 
