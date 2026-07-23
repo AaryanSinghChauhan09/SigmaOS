@@ -135,15 +135,7 @@ impl SimpleProcess {
     }
 
     pub fn get_state(&self) -> ProcessState {
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => ProcessState::Running,
-                2 => ProcessState::Blocked,
-                3 => ProcessState::Terminated,
-                _ => ProcessState::Ready,
-            }
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state_atomic(&self, state: ProcessState) {
@@ -151,16 +143,7 @@ impl SimpleProcess {
     }
 
     pub fn get_priority(&self) -> ProcessPriority {
-        {
-            let raw = self.priority.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => ProcessPriority::Low,
-                2 => ProcessPriority::Normal,
-                3 => ProcessPriority::High,
-                4 => ProcessPriority::Critical,
-                _ => ProcessPriority::Idle,
-            }
-        }
+        unsafe { core::mem::transmute(self.priority.load(Ordering::SeqCst)) }
     }
 
     pub fn set_priority_atomic(&self, priority: ProcessPriority) {
@@ -243,7 +226,6 @@ pub enum SchedulerError {
 
 /// Scheduler statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct SchedulerStats {
     pub total_processes: usize,
     pub ready_processes: usize,

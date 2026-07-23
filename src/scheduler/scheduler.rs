@@ -88,16 +88,7 @@ impl Schedulable for Task {
     }
 
     fn state(&self) -> TaskState {
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => TaskState::Running,
-                2 => TaskState::Blocked,
-                3 => TaskState::Sleeping,
-                4 => TaskState::Terminated,
-                _ => TaskState::Ready,
-            }
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     fn set_state(&mut self, state: TaskState) {
