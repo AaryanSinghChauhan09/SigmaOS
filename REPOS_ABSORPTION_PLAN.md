@@ -129,6 +129,10 @@ By systematic abstraction, SigmaOS maps, obsoletes, and natively replaces mainst
     *   `KDE/plasma-desktop` — KDE Plasma desktop.
     *   `xfce/xfce4-panel` — XFCE panel.
     *   `lxde/lxde-common` — LXDE desktop.
+    *   `lubuntu-project/lubuntu-default-settings` — Lubuntu custom configurations and lightweight settings.
+    *   `lxqt/lxqt-panel` — LXQt lightweight desktop panel.
+    *   `lxqt/pcmanfm-qt` — LXQt ultra-lightweight desktop file manager.
+    *   `lxqt/qterminal` — LXQt lightweight tabbed terminal.
     *   `mate-desktop/mate-panel` — MATE desktop.
     *   `swaywm/sway` — Wayland tiling WM.
     *   `i3/i3` — Tiling window manager.
