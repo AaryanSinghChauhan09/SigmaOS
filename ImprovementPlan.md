@@ -167,14 +167,72 @@ SigmaOS natively absorbs and improves the core productivity tools and orchestrat
 
 ---
 
-## ⚡ 9. Bolt's Daily Performance Optimization
+## 🤖 9. AI-Native Automation Core & Agent
+
+SigmaOS integrates a zero-dependency, local AI agent (`SimpleAIAgent`) executing directly on standard memory ranges:
+1.  **Natural Language Command Translator (`translate_natural_command`):** Translates natural language requests into direct, executable system actions. Supports major Indian languages (Hindi, Tamil, Bengali) along with standard English commands (e.g. converting *"libreoffice install karo"* or *"லிப்ரேஆபிஸ் நிறுவவும்"* dynamically to `sigpkg install libreoffice`).
+2.  **Context-Aware Safety Checker (`perform_safety_check`):** Reviews CLI command patterns before execution, blocking dangerous actions (such as `rm -rf /` or accidental deletion of `sigma-accounts`) and returning interactive safety alerts.
+3.  **Command Explanation Engine (`explain_command`):** Translates cryptic systems execution parameters (e.g. `tar -xvf archive.tar.gz`) into clear, plain-language diagnostic descriptions.
+
+---
+
+## 🛠️ 10. Expanded Systems Engineering Roles
+
+To successfully satisfy the 100-item parity roadmap and achieve full boot integration, SigmaOS establishes eight specialized, non-overlapping systems engineering roles within the developer community:
+*   **Compiler & Language Toolchain Engineer:** Focuses on the LLVM backend, ELF loaders, and bootstrapping compilers natively. Maintains low-level compiler-rt libraries.
+*   **Database & Storage Engineer:** Focuses on SigmaFS Merkle trees, flash SSD write-cache algorithms, wear-leveling log blocks, and high-density columnar databases.
+*   **Networking Engineer:** Maintains ZenithNet, ensuring zero-copy socket structures, IPv6 capability routing, and Noise Protocol PQ secure channels.
+*   **Testing & QA Engineer:** Orchestrates continuous fuzzing pipelines, multi-hardware verification matrices, and stress tests to maintain kernel stability.
+*   **Documentation & Developer Relations Specialist:** Coordinates manual pages, help systems, and synchronizes code blueprints to the GitHub Wiki.
+*   **Performance & Optimization Specialist:** Focuses on maximizing cache hits, profiling scheduling latencies, and implementing SIMD and AVX-512 visual acceleration pipelines.
+*   **Accessibility & Internationalization Specialist:** Implements screen reader synthesizers, hardware high-contrast graphics translation layers, and native localization engines for official languages.
+*   **Governance & Community Manager:** Facilitates Matrix communication networks, democratic voting tokens, and secure ledger bug bounty payouts.
+
+---
+
+## 📟 11. SovereignCLI Command-Line Synthesis Engine (S-CLI)
+
+SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
+*   **CliCommandRegistry Singleton:** Tracks and exposes all active commands available to userspace. Maps textual command paths (e.g., `zenith window tile`) to distinct `CliCommand` object instances.
+*   **Polymorphic Actions:** Command execution requires explicit `CapabilityToken` checks.
+*   **Available Syntheses:**
+    -   *`zenith window` (Window & Workspace Management):* Resizes, moves, or tiles active display partitions.
+    -   *`zenith capture` (Screen Capture & Recording):* Directs zero-copy display memory blits to Content-Addressed storage nodes.
+    -   *`sigpkg compile` (Content-Addressed Compilation):* Instantiates compiler-rt and SAT resolvers to package dependencies.
+    -   *`vault access` (Quantum Cryptographic Access):* Decrypts folders securely via biometric authentication and Dilithium verification.
+    -   *`net inspect` (Deep Packet Register Inspection):* Scans active DMA packet rings for malicious traffic signatures.
+
+---
+
+## 📡 12. Automated Upstream Intelligence & Daily Updates Scanning
+
+To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine:
+1.  **The "Sigma Updater" Engine:** Continuously monitors the repository trees of the Linux Kernel (mainline, stable, and LTS branches), LLVM, GCC, and musl/glibc projects. Identifies, parses, and maps upstream security fixes directly to capability rings in SigmaOS.
+2.  **The "Sigma Linux Distros Crusher" Engine:** Performs systematic code audits against the major packaging, init, and container systems of Ubuntu (`apt`), Arch (`pacman`), Fedora (`dnf`), and NixOS (`nix`). Translates system-level optimizations (such as eBPF-style network parsing, EEVDF scheduling adjustments, and flash wear-leveling log structures) into safe, OOP-compliant, zero-dependency SigmaOS primitives.
+
+---
+
+## 💎 13. Core Systems OOP Implementation Specifications
+
+To maintain absolute architectural safety, all implementations across core systems must strictly adhere to the following Object-Oriented systems principles:
+*   **Networking & Connectivity:** Dynamic network sockets are modeled as polymorphically isolated `Connection` objects. Each socket represents a concrete implementation of the base abstract `SocketChannel` class, enforcing encapsulating bounds on physical ring-buffer frames.
+*   **File Systems & Storage:** Block storage units are governed by the abstract class `StorageVolume`. Individual driver implementations (such as `NvmeDriver` or `SataDriver`) inherit from this interface, normalizing reads/writes under standard sector blocks.
+*   **Process & Resource Management:** Every scheduled unit is represented as a `RealTimeTask` object. Tasks contain encapsulated metadata (such as deadlines, capability rings, execution budgets) and support polymorphic scheduling behaviors.
+*   **Update & Maintenance System:** System updates are represented as atomic `UpdateTransaction` classes.
+*   **Cross-Platform & Compatibility:** External binary loaders (e.g. `ElfLoader` or `PeLoader`) extend the `ExecutableLoader` abstract class.
+*   **Virtualization & Containerization:** Virtual machines are instantiated by the `HypervisorFactory` based on hardware attributes.
+*   **AI & Automation Layer:** Neural tasks are evaluated by the `AiOptimizer` singleton running continuously in userspace.
+
+---
+
+## ⚡ 14. Bolt's Daily Performance Optimization
 
 Today's Bolt performance improvement focuses on **Allocation-Free Version Parsing and Zero-Copy top-level interfaces**.
 By replacing intermediate heap allocations with lazy slice iterators, we completely eliminate memory churn in package installation and dynamic dependency resolution, making the `sigpkg` engine fast and lightweight under intensive workspace loads.
 
 ---
 
-## 🚀 10. Prioritized Next Steps & Action Plan
+## 🚀 15. Prioritized Next Steps & Action Plan
 
 | Task | Description | Priority | Target Subsystem |
 | :--- | :--- | :---: | :---: |
