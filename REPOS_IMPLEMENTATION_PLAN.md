@@ -1,12 +1,10 @@
-# 🛠️ SigmaOS Comprehensive Repository Implementation & Execution Plan
+# 🛠️ SigmaOS Global Repository Implementation Plan
 
-This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from **500+ open-source repositories** across 34 core domains into the **SigmaOS** microkernel and userspace.
+This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from 500+ open-source repositories into the **SigmaOS** microkernel and userspace.
 
 ---
 
 ## 📅 Roadmap Overview
-
-The implementation is structured across **four sequential stabilization phases** to transition from experimental prototype layers into a rock-solid, production-grade operating system distribution.
 
 ```text
   Phase 1: Stabilization & Foundation  [Q1-Q2]  -->  Phase 2: Capability & Hardening [Q2-Q3]
@@ -18,8 +16,8 @@ The implementation is structured across **four sequential stabilization phases**
 
 ## 🚀 Milestones & Implementation Steps
 
-### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Months 1–3)
-*Focus: Stabilizing the memory manager, multi-priority scheduler, system utilities, and base drivers.*
+### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Short-Term: 1–3 Months)
+*Focus: Stabilizing the memory manager, multi-priority scheduler, and standard command utilities.*
 
 #### 1.1 Buddy Allocator & Real-Time Scheduler Integration
 *   **Task:** Integrate state-restoring error handling into the physical memory manager buddy allocator to support crash recoveries. Integrate Earliest Deadline First (EDF) scheduler tick mechanisms.
@@ -35,7 +33,7 @@ The implementation is structured across **four sequential stabilization phases**
 
 ---
 
-### 🟡 Phase 2: Capability Gate & Security Hardening (Months 3–6)
+### 🟡 Phase 2: Capability Gate & Security Hardening (Medium-Term: 3–6 Months)
 *Focus: Enforcing privilege reduction, access control sandboxing, and post-quantum network keys.*
 
 #### 2.1 Capability-Gated Virtual File System & Drivers
@@ -52,7 +50,7 @@ The implementation is structured across **four sequential stabilization phases**
 
 ---
 
-### 🟢 Phase 3: High-Performance Storage & Networking (Months 6–9)
+### 🟢 Phase 3: High-Performance Storage & Networking (Long-Term: 6–9 Months)
 *Focus: Copy-on-Write snapshots, content-addressed packages, and wire-speed packet handlers.*
 
 #### 3.1 Merkle-Tree CoW File System & Self-Healing Rollbacks
@@ -69,7 +67,7 @@ The implementation is structured across **four sequential stabilization phases**
 
 ---
 
-### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (Months 9–12)
+### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (9–12 Months)
 *Focus: High-performance dashboard telemetry, AI-powered predictive scaling, and screen accessibility.*
 
 #### 4.1 AI-Powered Adaptive Telemetry & Monitoring
@@ -106,6 +104,6 @@ This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, 
 ## 📈 Quality Assurance & Sync Protocol
 
 To maintain 100% architectural integrity during execution:
-1.  **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
-2.  **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
-3.  **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
+1. **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
+2. **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
+3. **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.

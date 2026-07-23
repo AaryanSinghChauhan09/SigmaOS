@@ -2,527 +2,177 @@
 
 Thank you for your interest in contributing to SigmaOS! This document provides guidelines and instructions for contributing to the project.
 
----
-
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Coding Standards](#coding-standards)
-- [Testing Requirements](#testing-requirements)
-- [Documentation](#documentation)
-- [Pull Request Process](#pull-request-process)
-- [Community Guidelines](#community-guidelines)
-
-
----
-
 ## Code of Conduct
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
-
----
+- Be respectful and inclusive
+- Focus on what is best for the community
+- Show empathy towards other community members
 
 ## Getting Started
 
 ### Prerequisites
 
-- Follow the [INSTALL.md](INSTALL.md) guide to set up your development environment
-- Have a GitHub account
-- Understand the basic concepts of operating systems and kernel development
-- Familiarity with Rust, Nim, or Zig (depending on contribution area)
-
-### Development Environment Setup
-
-**Required Tools**:
-- Rust toolchain (stable, for kernel development)
-- Nim compiler (for userland tools)
-- Zig compiler (for low-level components)
+- Rust (latest stable version)
+- Cargo (comes with Rust)
+- Git
 - QEMU (for testing)
-- Git (for version control)
+- Make
 
-**Optional Tools**:
-- GDB (for debugging)
-- Valgrind (for memory analysis)
-- Clippy (Rust linter)
-- Nimpretty (Nim formatter)
+### Setting Up Development Environment
 
-### First Steps
+```bash
+# Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally:
+# Build the project
+cargo build
 
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/SigmaOS.git
-   cd SigmaOS
-   ```
+# Run tests
+cargo test
 
-3. **Add the upstream remote**:
-
-   ```bash
-   git remote add upstream https://github.com/AaryanSinghChauhan09/SigmaOS.git
-   ```
-
-4. **Create a branch** for your work:
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-5. **Set up development environment**:
-
-   ```bash
-   # Install Rust toolchain
-   rustup install stable
-   rustup component add clippy rustfmt
-
-   # Install Nim (if needed)
-   # See https://nim-lang.org/install.html
-
-   # Install Zig (if needed)
-   # See https://ziglang.org/download/
-
-   # Build SigmaOS
-   make build
-   ```
-
----
+# Run the project
+cargo run
+```
 
 ## Development Workflow
 
-### Branch Naming Convention
+### Branching Strategy
 
-Use descriptive branch names following these patterns:
+- `main` - The main development branch
+- All changes should be made through pull requests
+- Feature branches should be named `feature/description`
+- Bugfix branches should be named `fix/description`
 
-- `feature/<area>/<description>` - New features
-- `fix/<area>/<description>` - Bug fixes
-- `docs/<area>/<description>` - Documentation changes
-- `refactor/<area>/<description>` - Code refactoring
-- `test/<area>/<description>` - Test additions
+### Commit Guidelines
 
+- Use clear, descriptive commit messages
+- Follow conventional commit format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
-Examples:
+### Code Style
 
-- `feature/network/tcp-stack`
-- `fix/memory/allocator-leak`
-- `docs/kernel/scheduler`
-- `refactor/drivers/usb-interface`
+- Follow Rust standard formatting: `cargo fmt`
+- Use clippy for linting: `cargo clippy`
+- Write tests for new functionality
+- Document public APIs with rustdoc
 
-
-### Commit Message Convention
-
-Follow conventional commit format:
-
-```text
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-
-**Examples**:
-
-```text
-feat(kernel): implement EEVDF scheduler
-
-Add Earliest Eligible Virtual Deadline First scheduler
-with support for real-time tasks and CPU affinity.
-
-Closes #123
-```
-
-```text
-fix(drivers): resolve USB xHCI interrupt handling
-
-Fix race condition in interrupt handler that caused
-device detection failures on certain chipsets.
-
-Fixes #456
-```
-
-### Development Process
-
-1. **Create an issue** (or comment on an existing one) to discuss your planned changes
-2. **Create a branch** from `main` or `develop`
-3. **Make your changes** following the coding standards
-4. **Write tests** for your changes
-5. **Update documentation** as needed
-6. **Run tests** locally to ensure everything passes
-7. **Commit your changes** with clear messages
-8. **Push to your fork**
-9. **Open a pull request**
-
-
----
-
-## Coding Standards
-
-### Language Policy
-
-SigmaOS uses multiple languages for different purposes:
-
-- **Rust**: System components, kernel shards, security-critical code
-- **Zig**: Low-level runtime, driver stubs, memory management
-- **Nim**: Tooling, automation utilities, build scripts
-- **C**: Legacy compatibility, hardware-specific code (minimal)
-- **Ada/SPARK**: Formal verification, safety-critical components
-
-, inheritance, polymorphism
-See [LANGUAGE_POLICY.md](LANGUAGE_POLICY.md) for detailed language usage guidelines.
-
-### Rust Guidelinesnd small**
-- **Minimize predefined function dependencies**
-- **Prefer user-defieabstraction over library functions**
-- **Docuent  custom implementations
-
-- Use `cargo fmt` for formatting
-- Use `cargo clippy` for linting
-- Prefer `unwrap()` over `expect()` only in tests
-- Document all public APIs with `///`
-- Use `#[derive(Debug)]` for public structs
-
-
-### Zig Guidelines
-
-- Follow Zig style guide
-- Use explicit error handling
-- Document all public functions
-- Prefer comptime for constants
-
-
-### Nim Guidelines
-
-- Follow Nim style guide
-- Use `nimpretty` for formatting
-- Document all exported procedures
-- Prefer explicit types over inference
-
-
-### General Guidelines
-
-- **No external dependencies** unless absolutely necessary
-- **Implement from first principles** where possible
-- **Use OOP principles**: encapsulation, abstraction, composition
-- **Write clear, self-documenting code**
-- **Add comments for complex logic**
-- **Keep functions focused and small**
-
-
----
-
-## Testing Requirements
-
-### Unit Tests
-
-Every feature must include unit tests:
-
-```rust
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_feature() {
-        assert_eq!(result, expected);
-    }
-}
-```
-
-### Integration Tests
-
-Add integration tests in `tests/` directory:
-
-```rust
-// tests/integration_test.rs
-use sigmaos::kernel;
-
-#[test]
-fn test_integration() {
-    // Integration test code
-}
-```
-
-### Smoke Tests
-
-Add smoke tests in `scripts/smoke-test-*.sh`:
-
-```bash
-#!/bin/bash
-
-# Smoke test for your feature
-
-```
-
-### Test Coverage
-
-- Aim for >80% code coverage
-- All critical paths must be tested
-- Security-related code requires 100% coverage
-
+## Testing
 
 ### Running Tests
 
 ```bash
-
 # Run all tests
+cargo test
 
-make test
+# Run specific test
+cargo test test_name
 
-# Run unit tests only
-
-make test-unit
-
-# Run integration tests
-
-make test-integration
-
-# Run smoke tests
-
-./scripts/smoke-test.sh
+# Run tests with output
+cargo test -- --nocapture
 ```
 
----
+### Test Coverage
+
+- Aim for high test coverage
+- Write unit tests for individual functions
+- Write integration tests for component interactions
+- Use property-based testing where appropriate
 
 ## Documentation
 
 ### Code Documentation
 
-- Document all public APIs
-- Use doc tests for examples
-- Include usage examples in documentation
+- Document all public functions and structs
+- Use `///` for item documentation
+- Use `//!` for module documentation
+- Include examples where helpful
 
+### Wiki Documentation
 
-### README Updates
-
-Update relevant README files in subsystem directories:
-
-```markdown
-
-## Feature Name
-
-Brief description of the feature.
-
-### Usage
-
-```rust
-
-let result = feature_function();
-
-```
-
-### Configuration
-
-Configuration options and examples.
-
-```text
-
-### Architecture Documentation
-
-For significant changes, update [ARCHITECTURE.md](ARCHITECTURE.md):
-
-```mermaid
-graph TD
-    A[Component] --> B[Component]
-```
-
-### API Documentation
-
-For public APIs, add documentation to the appropriate spec file.
-
----
+- Update the wiki for major features
+- Add tutorials and guides
+- Keep architecture diagrams up to date
+- Document API changes
 
 ## Pull Request Process
 
-### Before Opening a PR
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Update documentation
+6. Submit a pull request
+7. Address review feedback
+8. Get approval and merge
 
-1. **Ensure your branch is up to date**:
+## Project Structure
 
-   ```bash
-   git fetch upstream
-   git rebase upstream/main
-   ```
+```
+SigmaOS/
+├── src/              # Source code
+│   ├── security/     # Security framework (vault, password manager, VPN, IDS)
+│   ├── productivity/ # Productivity tools (calendar, email, notes, editor, terminal)
+│   ├── virtualization/ # VM and container management
+│   ├── network/      # Networking (sync, torrent, analyzer, TCP)
+│   ├── filesystem/   # Filesystem (manager, archive, disk usage, VFS)
+│   ├── package/      # Package management (manager, updater, universal)
+│   ├── dashboard/    # System dashboard (monitor, process, control center)
+│   ├── customization/ # Theming and customization (theme, routines)
+│   ├── automation/   # AI and automation (orchestrator, ai_optimizer)
+│   ├── kernel/       # Core kernel components
+│   └── lib.rs        # Main library entry point
+├── tests/            # Integration tests
+├── docs/             # Documentation
+├── scripts/          # Utility scripts
+├── .github/          # GitHub configuration
+├── WIKI/             # GitHub Wiki documentation
+├── Cargo.toml        # Rust dependencies
+└── README.md         # Project overview
+```
 
-2. **Run all tests**:
+## Module Guidelines
 
-   ```bash
-   make test
-   ./scripts/smoke-test.sh
-   ```
+### Security Module
 
-3. **Run linters**:
+- Capability-based security model
+- No unsafe code without justification
+- Audit all security-sensitive operations
 
-   ```bash
-   cargo fmt
-   cargo clippy
-   ```
+### Kernel Module
 
-4. **Update documentation** as needed
+- No_std compatible where possible
+- Minimal dependencies
+- Clear error handling
 
+### Package Manager
 
-### Opening a PR
+- Zero-dependency where possible
+- Cryptographic verification
+- Atomic transactions
 
-1. Use the [PR template](docs/pr_template.md)
-2. Fill in all required sections
-3. Link to related issues
-4. Request review from maintainers
+## Issue Reporting
 
+- Use GitHub Issues for bug reports
+- Provide reproduction steps
+- Include environment details
+- Tag relevant maintainers
 
-### PR Checklist
+## Feature Requests
 
-- [ ] Code follows project style guidelines
-- [ ] Tests added/updated and passing
-- [ ] Documentation updated
-- [ ] Commit messages follow convention
-- [ ] PR description filled completely
-- [ ] CI checks passing
-- [ ] No merge conflicts
-
-
-### Review Process
-
-1. **Automated checks** must pass (CI, linting, tests)
-2. **At least one maintainer** must approve
-3. **Address all review comments**
-4. **Update PR** based on feedback
-5. **Squash commits** if requested
-6. **Merge** using `--no-ff` to preserve history
-
-
----
-
-## Community Guidelines
-
-### Communication Channels
-
-- **GitHub Issues**: Bug reports, feature requests
-- **GitHub Discussions**: General questions, ideas
-- **Discord**: Real-time chat (invite in README)
-- **Mailing List**: Announcements, discussions
-
-
-### Getting Help
-
-- Search existing issues and discussions first
-- Provide clear, reproducible bug reports
-- Include system information and error logs
-- Be patient and respectful
-
-
-### Reporting Security Issues
-
-See [SECURITY_POLICY.md](SECURITY_POLICY.md) for reporting security vulnerabilities.
-
----
-
-## High-Impact Contribution Areas
-
-Looking for something to work on? Check these high-impact areas:
-
-### Kernel Components
-
-- **Scheduler**: Round-robin implementation, CPU affinity
-- **Memory Management**: Buddy allocator completion, paging
-- **IPC**: Zero-latency inter-process communication
-- **Syscalls**: POSIX compatibility layer
-
-
-### Drivers
-
-- **GPU**: NVIDIA, AMD, Intel drivers
-- **Network**: Ethernet NIC drivers, Wi-Fi
-- **Storage**: NVMe, AHCI improvements
-- **Input**: HID devices, touchscreens
-
-
-### Userland
-
-- **Shell**: sigma-sh REPL implementation
-- **Package Manager**: sigma-pkg dependency resolver
-- **Desktop**: Zenith compositor improvements
-- **Applications**: Core utilities
-
-
-### Documentation
-
-- **Architecture**: System design documents
-- **API**: Internal API documentation
-- **Guides**: Tutorial and how-to guides
-- **Translations**: Multi-language support
-
-
-See [TODO.md](TODO.md) and [Roadmap.md](Roadmap.md) for more details.
-
----
-
-## Recognition
-
-Contributors are recognized in:
-
-- **CONTRIBUTORS.md** - List of all contributors
-- **Release notes** - Credits for each release
-- **GitHub** - Contribution graph
-- **Community** - Shoutouts in discussions
-
-
----
+- Use GitHub Issues for feature requests
+- Describe the use case
+- Propose a solution
+- Consider implementation complexity
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the project's license (MIT + GPL-2.0 dual license).
-
----
+By contributing to SigmaOS, you agree that your contributions will be licensed under the same license as the project.
 
 ## Questions?
 
-- Check [FAQ.md](FAQ.md) for common questions
-- Ask in [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
-- Contact maintainers via [SECURITY_POLICY.md](SECURITY_POLICY.md) for security issues
+- Open an issue for questions
+- Contact maintainers via GitHub
+- Check existing documentation
 
-
----
-
-## Contributor Onboarding
-
-### First Contribution Path
-
-New contributors should follow this path for their first contribution:
-
-1. **Choose a "good first issue"** from the issue tracker
-2. **Comment on the issue** to claim it (avoid duplicate work)
-3. **Set up development environment** (see above)
-4. **Make your changes** following coding standards
-5. **Write tests** for your changes
-6. **Submit a pull request** with the PR template
-7. **Address review feedback** promptly
-8. **Celebrate your first contribution!**
-
-### Mentorship Program
-
-SigmaOS offers mentorship for new contributors:
-
-- **Request a mentor** by commenting on your issue with `@sigmaos-mentors`
-- **Pair programming** sessions available via Discord
-- **Code review guidance** from experienced contributors
-- **Architecture discussions** for complex changes
-
-### Getting Help
-
-- **GitHub Discussions**: Ask questions in the appropriate category
-- **Discord**: Real-time help in #help channel
-- **Documentation**: Check existing docs before asking
-- **Search**: Search issues and discussions first
-
-### Development Resources
-
-- **Architecture Guide**: See [ARCHITECTURE.md](ARCHITECTURE.md)
-- **API Documentation**: See `docs/api/` directory
-- **Examples**: See `examples/` directory
-- **Tests**: See existing tests for patterns
-
----
-
-*Last Updated: 2026-07-14*
+Thank you for contributing to SigmaOS!

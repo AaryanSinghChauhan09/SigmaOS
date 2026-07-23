@@ -1,458 +1,270 @@
-# SigmaOS Installation Guide
+# 🔧 SigmaOS Installation Guide
 
-> **Build Status**: ![CI](https://github.com/AaryanSinghChauhan09/SigmaOS/workflows/SigmaOS%20Build%20and%20Test%20Pipeline/badge.svg)
-
-This guide covers building and installing SigmaOS from source for various deployment targets.
+> **Note:** SigmaOS is currently in active development. The steps below describe building from source and running under QEMU emulation. Bare-metal installation on physical hardware requires Phase G completion (bootable ISO).
 
 ---
 
-## Table of Contents
+## 📋 Prerequisites
 
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Build Profiles](#build-profiles)
-- [Platform-Specific Instructions](#platform-specific-instructions)
-- [Troubleshooting](#troubleshooting)
-- [Advanced Configuration](#advanced-configuration)
+### Required Tools
 
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Rust | 1.80+ (nightly) | Primary build language |
+| cargo | bundled with Rust | Build system |
+| QEMU | 8.0+ | Emulation for testing |
+| nasm | 2.15+ | Bare-metal assembly |
+| xorriso | 1.5+ | ISO generation (Phase G) |
+| Git | 2.40+ | Source control |
 
----
-
-## Prerequisites
-
-### Common Requirements
-
-All builds require:
-
-- **Git**: For cloning the repository
-- **Make**: For build orchestration
-- **CMake**: >= 3.15 for cross-platform builds
-- **Python 3**: >= 3.8 for build scripts
-
-
-### Linux (Ubuntu/Debian)
+### Installing Prerequisites on Ubuntu/Debian
 
 ```bash
-sudo apt-get update
-sudo apt-get install -y \
+# System packages
+sudo apt update
+sudo apt install -y \
     build-essential \
     nasm \
     cmake \
     qemu-system-x86 \
-    golang-go \
+    qemu-utils \
     xorriso \
-    grub-pc-bin \
-    grub-efi-amd64-bin \
+    mtools \
     git \
-    python3 \
-    python3-pip
+    curl
+
+# Install Rust (nightly)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+rustup toolchain install nightly
+rustup default nightly
+rustup target add x86_64-unknown-none
 ```
 
-### macOS
+### Installing Prerequisites on Fedora/RHEL
 
 ```bash
-brew install \
-    nasm \
-    cmake \
-    qemu \
-    go \
-    xorriso \
-    coreutils
-```
-
-### Windows (WSL2)
-
-```bash
-
-# Install WSL2 with Ubuntu
-
-wsl --install
-
-# Inside WSL2 Ubuntu:
-
-sudo apt-get update
-sudo apt-get install -y \
-    build-essential \
-    nasm \
-    cmake \
+sudo dnf install -y \
+    gcc gcc-c++ make \
+    nasm cmake \
     qemu-system-x86 \
-    golang-go \
     xorriso \
-    grub-pc-bin \
-    grub-efi-amd64-bin
+    mtools \
+    git curl
+
+# Rust installation same as above
+```
+
+### Installing Prerequisites on Arch Linux
+
+```bash
+sudo pacman -S --needed \
+    base-devel nasm cmake \
+    qemu-system-x86 \
+    xorriso mtools \
+    git curl
+
+# Rust installation same as above
 ```
 
 ---
 
-## Quick Start
-
-### Clone Repository
+## 📥 Getting the Source
 
 ```bash
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 ```
 
-### Build for QEMU (x86_64)
+---
+
+## 🏗️ Building
+
+### Run Library Tests (Recommended First Step)
+
+This validates your toolchain is working correctly:
 
 ```bash
-make clean
-make all ARCH=x86_64
+cargo test --lib
+# Expected output: test result: ok. 414 passed; 0 failed
 ```
 
-### Run in QEMU
+### Build the Library
 
 ```bash
+cargo build --release
+```
+
+### Build for Bare-Metal Target
+
+```bash
+# Build the kernel entry point
+cargo build --target x86_64-unknown-none --release -p sigmaos-kernel
+
+# Build the driver binary
+cargo build --target x86_64-unknown-none --release -p sigmaos-drivers
+```
+
+### Development Build (with debug info)
+
+```bash
+cargo build
+```
+
+---
+
+## 🖥️ Running Under QEMU
+
+### Library Function Testing
+
+The standard `cargo test` runs all tests natively on the host OS:
+
+```bash
+cargo test --lib -- --test-threads=4
+```
+
+### Bare-Metal Emulation (Phase G — In Progress)
+
+```bash
+# Once the bootable ISO is generated (Phase G complete):
 qemu-system-x86_64 \
     -cdrom build/sigmaos.iso \
     -m 2G \
+    -cpu host \
+    -enable-kvm \
     -serial stdio \
-    -no-reboot
-```
-
-### Build ISO for Bare Metal
-
-```bash
-make PROFILE=standalone all
-```
-
-The ISO will be available at `build/sigmaos.iso`.
-
----
-
-## Build Profiles
-
-SigmaOS supports multiple build profiles for different deployment targets:
-
-### Standalone (Full Desktop)
-
-```bash
-make PROFILE=standalone all
-```
-
-**Includes**: Full desktop environment, all drivers, Zenith compositor, AI tools
-
-**Target**: Desktop/laptop hardware
-
-**Output**: `build/sigmaos-standalone.iso` (~2GB)
-
-### Microkernel
-
-```bash
-make PROFILE=microkernel all
-```
-
-**Includes**: Minimal kernel, core shards only
-
-**Target**: Embedded systems, containers
-
-**Output**: `build/sigmaos-microkernel.bin` (<512KB)
-
-### RTOS (Real-Time)
-
-```bash
-make PROFILE=rtos all
-```
-
-**Includes**: Hard real-time scheduler, deterministic timing
-
-**Target**: Industrial control, medical devices
-
-**Output**: `build/sigmaos-rtos.elf`
-
-### Cloud
-
-```bash
-make PROFILE=cloud all
-```
-
-**Includes**: Headless image, cloud-init support
-
-**Target**: AWS, GCP, Azure deployments
-
-**Output**: `build/sigmaos-cloud.img.qcow2`
-
-### Mobile
-
-```bash
-make PROFILE=mobile all
-```
-
-**Includes**: Touch-optimized UI, mobile drivers
-
-**Target**: ARM64 Android/iOS devices
-
-**Output**: `build/sigmaos-mobile.apk` or `.ipa`
-
-### Browser
-
-```bash
-make PROFILE=browser all
-```
-
-**Includes**: WASM-compiled kernel, web UI
-
-**Target**: Web browsers via WebAssembly
-
-**Output**: `build/sigmaos-browser.wasm`
-
----
-
-## Platform-Specific Instructions
-
-### x86_64 (Intel/AMD)
-
-```bash
-make clean
-make all ARCH=x86_64
-```
-
-**Supported**: QEMU, bare metal, virtualization platforms
-
-### ARM64 (aarch64)
-
-```bash
-make clean
-make all ARCH=aarch64 CROSS_COMPILE=aarch64-linux-gnu-
-```
-
-**Supported**: Raspberry Pi 4/5, ARM servers, Apple Silicon
-
-**Requirements**: aarch64-linux-gnu toolchain
-
-### RISC-V
-
-```bash
-make clean
-make all ARCH=riscv64 CROSS_COMPILE=riscv64-linux-gnu-
-```
-
-**Supported**: RISC-V development boards, SiFive hardware
-
-**Requirements**: riscv64-linux-gnu toolchain
-
----
-
-## Development Build
-
-### Debug Build
-
-```bash
-make DEBUG=1 all
-```
-
-Enables debug symbols, disables optimizations.
-
-### Release Build
-
-```bash
-make RELEASE=1 all
-```
-
-Enables optimizations, strips debug symbols.
-
-### Verbose Build
-
-```bash
-make V=1 all
-```
-
-Shows all compiler commands.
-
-### Parallel Build
-
-```bash
-make -j$(nproc) all
-```
-
-Uses all available CPU cores.
-
----
-
-## Testing
-
-### Run Smoke Tests
-
-```bash
-./scripts/smoke-test.sh
-```
-
-### Run Unit Tests
-
-```bash
-make test
-```
-
-### Run Integration Tests
-
-```bash
-make test-integration
-```
-
-### Run QEMU Boot Test
-
-```bash
-make test-qemu
+    -vga std
 ```
 
 ---
 
-## Troubleshooting
+## ⚙️ Configuration
 
-### Build Fails with "command not found"
+### Cargo.toml Workspace Structure
 
-Install missing prerequisites from the [Prerequisites](#prerequisites) section.
+SigmaOS uses a Cargo workspace:
 
-### QEMU Boot Fails
-
-Ensure QEMU is installed and the ISO was built successfully:
-
-```bash
-ls -lh build/sigmaos.iso
-qemu-system-x86_64 --version
+```
+SigmaOS/
+├── src/lib.rs              # Main library
+├── src/kernel/             # Kernel subsystems
+├── src/drivers/            # Hardware drivers
+├── src/security/           # Security subsystems
+├── src/network/            # Network stack
+├── src/filesystem/         # Filesystem subsystems
+├── src/productivity/       # User productivity tools (incl. India Stack)
+├── src/sigpkg/             # Package manager
+├── src/virtualization/     # Container / VM support
+└── ...
 ```
 
-### Cross-Compilation Errors
+### Build Profiles
 
-Verify the cross-compiler toolchain is in your PATH:
-
-```bash
-aarch64-linux-gnu-gcc --version
-riscv64-linux-gnu-gcc --version
-```
-
-### Out of Memory During Build
-
-Reduce parallel jobs:
-
-```bash
-make -j2 all
-```
-
-### Permission Denied on Scripts
-
-Make scripts executable:
-
-```bash
-chmod +x scripts/*.sh
-```
-
----
-
-## Advanced Configuration
-
-### Custom Kernel Configuration
-
-Edit `Config.sigma` to customize kernel parameters:
+Edit `Cargo.toml` to select a build profile:
 
 ```toml
-[kernel]
-memory = "2048M"
-cores = 4
-debug = true
-
-[shards]
-enable = ["s-mm", "s-sched", "s-net", "s-fs"]
-```
-
-### Build with Custom Toolchain
-
-```bash
-make CC=/path/to/gcc CXX=/path/to/g++ all
-```
-
-### Build Specific Components
-
-```bash
-make kernel
-make drivers
-make userspace
-```
-
-### Clean Build Artifacts
-
-```bash
-make clean          # Remove build artifacts
-make distclean      # Remove all generated files
-make mrproper       # Remove everything including config
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"  # Required for no_std kernel
 ```
 
 ---
 
-## Installation to Disk
+## 🛡️ Verifying Your Build
 
-### Create Bootable USB (Linux)
-
-```bash
-
-# Insert USB drive (replace /dev/sdX with your device)
-
-sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress
-sudo sync
-```
-
-### Create Bootable USB (macOS)
+### Check Compilation
 
 ```bash
-
-# Insert USB drive (replace disk2 with your device)
-
-diskutil list
-sudo diskutil unmountDisk /dev/disk2
-sudo dd if=build/sigmaos.iso of=/dev/disk2 bs=4m
-sudo sync
+cargo check --lib
+# Should complete with no errors
 ```
 
-### Create Bootable USB (Windows)
+### Run Full Test Suite
 
-Use [Rufus](https://rufus.ie/) or [Etcher](https://www.balena.io/etcher/):
+```bash
+cargo test --lib 2>&1 | tail -5
+# Expected: test result: ok. 414 passed; 0 failed; 0 ignored
+```
 
-1. Download Rufus from https://rufus.ie/
-2. Select `build/sigmaos.iso`
-3. Select your USB drive
-4. Click "Start"
+### Verify Specific Modules
 
+```bash
+# Security tests
+cargo test --lib security::
+
+# India Stack tests (Finance module)
+cargo test --lib productivity::finance::
+
+# Package manager tests
+cargo test --lib sigpkg::
+
+# Kernel tests
+cargo test --lib kernel::
+```
 
 ---
 
-## Verification
+## 🐛 Troubleshooting
 
-### Verify ISO Integrity
-
-```bash
-sha256sum build/sigmaos.iso
-```
-
-Compare with the checksum in the release notes.
-
-### Verify Build
+### "error: no such target `x86_64-unknown-none`"
 
 ```bash
-./scripts/smoke-test.sh
+rustup target add x86_64-unknown-none
 ```
 
-All tests should pass.
+### "linker `cc` not found"
+
+```bash
+sudo apt install gcc  # or equivalent for your distro
+```
+
+### "Could not compile `sigmaos`"
+
+Check the Rust version:
+```bash
+rustc --version
+# Ensure nightly-2024 or later
+```
+
+### Tests failing on Windows
+
+Most tests are designed to run on Linux. On Windows, use WSL2:
+```powershell
+wsl --install
+wsl --set-default-version 2
+# Then run all build commands inside WSL2
+```
 
 ---
 
-## Next Steps
+## 📦 Package Installation (sigma-pkg)
 
-- Read [ARCHITECTURE.md](ARCHITECTURE.md) for system design
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) to contribute
-- Join the community at [COMMUNITY.md](COMMUNITY.md)
-- Report issues at [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+Once SigmaOS is running:
 
+```bash
+# Update package registry
+sigma-pkg update
+
+# Search for a package
+sigma-pkg search firefox
+
+# Install a package
+sigma-pkg install kdenlive
+
+# Remove a package
+sigma-pkg remove kdenlive
+
+# Show package info
+sigma-pkg info kdenlive
+```
 
 ---
 
-## Getting Help
+## 🔗 Related Links
 
-- **Documentation**: [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-- **Issues**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
-- **Support**: [SUPPORT.md](SUPPORT.md)
-
-
----
-
-*Last Updated: 2026-07-13*
+- [Contributing Guide](CONTRIBUTING.md) — How to submit changes
+- [Security Policy](SECURITY.md) — Reporting vulnerabilities
+- [Roadmap](Roadmap.md) — Development phases
+- [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) — Full documentation
