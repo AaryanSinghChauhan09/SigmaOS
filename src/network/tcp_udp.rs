@@ -588,6 +588,11 @@ impl SimpleNetworkStack {
 
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
+        // Zero-trust check: restrict privileged ports (< 1024) unless authorized by the firewall
+        if port < 1024 && !self.firewall.is_allowed(port) {
+            return Err(NetworkError::InvalidParameter);
+        }
+
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let socket = SimpleSocket::new(id, protocol, port);
         self.sockets.push(Some(Box::new(socket)));
@@ -873,5 +878,22 @@ mod tests {
         let triggered = epoll.wait(&mut events_out).unwrap();
         assert_eq!(triggered, 1);
         assert_eq!(events_out[0].data, 999);
+    }
+
+    #[test]
+    fn test_zero_trust_port_binding() {
+        let mut stack = SimpleNetworkStack::new();
+
+        // Bind to a regular port above 1024 - should succeed
+        assert!(stack.create_socket(Protocol::TCP, 8080).is_ok());
+
+        // Bind to a privileged port < 1024 without firewall authorization - should fail
+        assert!(stack.create_socket(Protocol::TCP, 80).is_err());
+
+        // Allow port 80 in firewall
+        stack.firewall.allow_port(80);
+
+        // Now bind to privileged port 80 - should succeed
+        assert!(stack.create_socket(Protocol::TCP, 80).is_ok());
     }
 }
