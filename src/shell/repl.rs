@@ -37,6 +37,17 @@ pub enum ShellCommand {
         subcommand: String,
         package: Option<String>,
     },
+    Uname,
+    Clear,
+    Touch {
+        filename: String,
+    },
+    Mkdir {
+        dirname: String,
+    },
+    Rm {
+        filename: String,
+    },
     Unknown(String),
 }
 
@@ -143,6 +154,35 @@ impl ShellRepl {
             "exit" | "quit" => ShellCommand::Exit,
             "pwd" => ShellCommand::Pwd,
             "whoami" => ShellCommand::WhoAmI,
+            "uname" => ShellCommand::Uname,
+            "clear" => ShellCommand::Clear,
+            "touch" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Touch {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "mkdir" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Mkdir {
+                        dirname: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "echo" => {
                 let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
@@ -259,6 +299,11 @@ impl ShellRepl {
             }
             ShellCommand::Pwd => Ok(self.current_dir.clone()),
             ShellCommand::WhoAmI => Ok(self.current_user.clone()),
+            ShellCommand::Uname => Ok("Linux sigmaos 6.24.0-mainline #1 SMP PREEMPT_RT Sun Jul 19 2026 x86_64 x86_64 x86_64 GNU/Linux".to_string()),
+            ShellCommand::Clear => Ok("\x1B[2J\x1B[H".to_string()),
+            ShellCommand::Touch { filename } => Ok(format!("Created empty file: {}", filename)),
+            ShellCommand::Mkdir { dirname } => Ok(format!("Created directory: {}", dirname)),
+            ShellCommand::Rm { filename } => Ok(format!("Removed file: {}", filename)),
             ShellCommand::Su { username, password } => {
                 if username == "root" {
                     let pwd = password.unwrap_or_default();
@@ -537,5 +582,50 @@ mod tests {
                 package: None
             })
             .is_ok());
+    }
+
+    #[test]
+    fn test_uname_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("uname");
+        assert!(matches!(cmd, ShellCommand::Uname));
+        let out = repl.execute_command(cmd).unwrap();
+        assert!(out.contains("sigmaos"));
+    }
+
+    #[test]
+    fn test_clear_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("clear");
+        assert!(matches!(cmd, ShellCommand::Clear));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "\x1B[2J\x1B[H");
+    }
+
+    #[test]
+    fn test_touch_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("touch testfile.txt");
+        assert!(matches!(cmd, ShellCommand::Touch { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Created empty file: testfile.txt");
+    }
+
+    #[test]
+    fn test_mkdir_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("mkdir testdir");
+        assert!(matches!(cmd, ShellCommand::Mkdir { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Created directory: testdir");
+    }
+
+    #[test]
+    fn test_rm_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("rm testfile.txt");
+        assert!(matches!(cmd, ShellCommand::Rm { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Removed file: testfile.txt");
     }
 }
