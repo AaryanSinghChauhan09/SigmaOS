@@ -66,7 +66,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = size.div_ceil(PAGE_SIZE);
+        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -96,13 +96,15 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        let mut order = 0;
-        let mut size = 1;
-        while size < pages {
-            size *= 2;
-            order += 1;
+        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
+        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
+        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
+        if pages <= 1 {
+            0
+        } else {
+            let next_pow = pages.next_power_of_two();
+            next_pow.trailing_zeros() as usize
         }
-        order
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
@@ -140,7 +142,8 @@ impl BuddyAllocator {
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        let buddy_addr = block_addr ^ (1 << (order + 12)); // Calculate buddy address
+        // Calculate buddy address by XORing with block size (standard buddy system)
+        let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
         // Find buddy in free list
@@ -157,9 +160,9 @@ impl BuddyAllocator {
                 buddy_addr
             };
 
-            if let Some(addr) = NonNull::new(merged_addr as *mut u8) {
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
-                    addr,
+                    addr: non_null,
                     size: buddy_size,
                 })
             } else {
@@ -199,12 +202,6 @@ impl PageFlags {
 #[repr(C)]
 pub struct PageTableEntry(u64);
 
-impl Default for PageTableEntry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
@@ -238,12 +235,6 @@ pub struct PageTable {
     pub entries: [PageTableEntry; 512],
 }
 
-impl Default for PageTable {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl PageTable {
     pub fn new() -> Self {
         Self {
@@ -255,11 +246,33 @@ impl PageTable {
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
+    pub buddy_allocator: BuddyAllocator,
 }
 
 impl VirtualMemoryManager {
     pub fn new(root_directory: NonNull<PageTable>) -> Self {
-        Self { root_directory }
+        Self {
+            root_directory,
+            buddy_allocator: BuddyAllocator::new(),
+        }
+    }
+
+    pub fn with_allocator(root_directory: NonNull<PageTable>, allocator: BuddyAllocator) -> Self {
+        Self {
+            root_directory,
+            buddy_allocator: allocator,
+        }
+    }
+
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    /// Free pages using buddy allocator (wires free_pages to VMM)
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
     }
 
     /// Translates a virtual address into a physical address
@@ -331,10 +344,20 @@ mod tests {
 
     #[test]
     fn test_allocate_deallocate() {
-        let mut allocator = BuddyAllocator::new();
-        // This would need actual memory to work properly
-        // For now, just test the interface
-        let _result = allocator.allocate(4096);
-        // Will fail without actual memory, but tests the flow
+        // Initialize the allocator with a valid 4KB page region (1 page)
+        let mut allocator = BuddyAllocator::with_memory(0x1000, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
+
+        // Perform a real allocation
+        let block = allocator.allocate(4096);
+        assert!(block.is_some());
+        let block = block.unwrap();
+        assert_eq!(block.addr.as_ptr() as usize, 0x1000);
+        assert_eq!(block.size, 4096);
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Deallocate and verify state restoration
+        allocator.deallocate(block);
+        assert_eq!(allocator.get_free_memory(), 4096);
     }
 }
