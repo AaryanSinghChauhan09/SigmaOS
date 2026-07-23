@@ -19,6 +19,8 @@ pub mod vulnerability;
 pub mod scanner;
 pub mod forensics;
 pub mod cleaner;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -57,11 +59,11 @@ pub use integrity::{
     File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
     IntegrityStats, IntegrityStatus, MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
 };
-// MAC: export what the module actually defines
+// MAC: export what the module defines
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{

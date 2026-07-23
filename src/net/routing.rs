@@ -35,7 +35,7 @@ pub enum RouteProtocol {
     Dhcp,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RouteKey {
     pub destination: String,
     pub prefix_length: u8,
@@ -95,14 +95,20 @@ impl RoutingTable {
     /// Lookup a route for a destination
     pub fn lookup_route(&mut self, destination: &str) -> Option<&RouteEntry> {
         // Check cache first
-        for cached_route in &self.route_cache {
-            if self.matches_destination(destination, &cached_route.key.destination, cached_route.key.prefix_length) {
-                return Some(cached_route);
+        let mut found_idx = None;
+        for i in 0..self.route_cache.len() {
+            if self.matches_destination(destination, &self.route_cache[i].key.destination, self.route_cache[i].key.prefix_length) {
+                found_idx = Some(i);
+                break;
             }
         }
 
+        if let Some(idx) = found_idx {
+            return Some(&self.route_cache[idx]);
+        }
+
         // Full lookup
-        let mut best_route = None;
+        let mut best_route_key = None;
         let mut best_metric = u32::MAX;
         let mut best_prefix = 0u8;
 
@@ -113,21 +119,27 @@ impl RoutingTable {
                    (route.key.prefix_length == best_prefix && route.metric < best_metric) {
                     best_prefix = route.key.prefix_length;
                     best_metric = route.metric;
-                    best_route = Some(route);
+                    best_route_key = Some(route.key.clone());
                 }
             }
         }
 
         // Cache the result
-        if let Some(route) = best_route {
-            self.route_cache.push(route.clone());
-            // Limit cache size
-            if self.route_cache.len() > 128 {
-                self.route_cache.remove(0);
+        if let Some(ref key) = best_route_key {
+            if let Some(route) = self.routes.get(key) {
+                self.route_cache.push(route.clone());
+                // Limit cache size
+                if self.route_cache.len() > 128 {
+                    self.route_cache.remove(0);
+                }
             }
         }
 
-        best_route
+        if let Some(ref key) = best_route_key {
+            self.routes.get(key)
+        } else {
+            None
+        }
     }
 
     /// Check if destination matches a route prefix
