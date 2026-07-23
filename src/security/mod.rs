@@ -24,12 +24,12 @@ pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
-pub use mac::{MACPolicy, MACEngine, SimpleMACEngine};
+pub use mac::{MACEngine, MACPolicy, SimpleMACEngine};
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pki::{Certificate, PKIManager, SimplePKIManager, PKIError};
+pub use pki::{Certificate, PKIError, PKIManager, SimplePKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use secrets::SecretType;
 pub use vault::{

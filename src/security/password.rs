@@ -430,7 +430,9 @@ impl PasswordManager {
 
         let mut password = String::new();
         for _ in 0..length {
-            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             let index = (seed as usize) % charset.len();
             password.push(charset[index] as char);
         }

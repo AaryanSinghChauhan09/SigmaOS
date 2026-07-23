@@ -1,10 +1,10 @@
 //! Capability Tokens: Privilege Isolation (Android/AOSP Absorption)
-//! 
+//!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -141,7 +141,7 @@ impl SecurityEnforcer {
             active_tokens: Vec::new(),
         }
     }
-    
+
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
     }

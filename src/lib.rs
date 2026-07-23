@@ -8,12 +8,12 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -76,10 +76,7 @@ pub use resilience::{
 };
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use shell::{ShellCommand, ShellRepl};
-pub use sigpkg::{
-    ContentAddressedStore, CryptoVerifier, PackageRecipe,
-    SatSolver, Transaction,
-};
+pub use sigpkg::{ContentAddressedStore, CryptoVerifier, PackageRecipe, SatSolver, Transaction};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
