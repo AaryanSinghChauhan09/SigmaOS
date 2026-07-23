@@ -6,7 +6,7 @@
 //!
 //! ## Architecture
 //!
-//! ```text
+//! ```
 //! Application renders → wl_buffer (DMA-BUF or SHM)
 //!     → ZenithCompositor (damage tracking)
 //!     → Scene graph (sorted by z-order)
@@ -319,12 +319,14 @@ impl ZenithCompositor {
 
     /// Find window at point
     pub fn find_window_at_point(&self, x: i32, y: i32) -> Option<u64> {
-        let window_ids: Vec<_> = self.windows.keys().copied().collect();
-        for window_id in window_ids.iter().rev() {
-            if let Some(window) = self.windows.get(window_id) {
+        // Iterate in reverse order (top to bottom)
+        let mut keys: Vec<&u64> = self.windows.keys().collect();
+        keys.reverse();
+        for &window_id in keys {
+            if let Some(window) = self.windows.get(&window_id) {
                 if window.state == WindowState::Normal || window.state == WindowState::Tiled {
                     if window.geometry.contains_point(x, y) {
-                        return Some(*window_id);
+                        return Some(window_id);
                     }
                 }
             }

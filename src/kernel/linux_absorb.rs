@@ -344,6 +344,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
 /// Absorbed Linux Ext4 filesystem driver converted to SigmaOS
 pub struct AbsorbedExt4Driver {
     metadata: DriverMetadata,
+    fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
     mounted: bool,
     mount_point: String,
 }
@@ -369,6 +370,18 @@ impl AbsorbedExt4Driver {
                 }),
                 capabilities: vec![0x4000, 0x4001],
                 required_capabilities: vec![0x1000],
+            },
+            fs_metadata: crate::kernel::subsystem::FilesystemMetadata {
+                name: String::from("AbsorbedExt4"),
+                version: String::from("1.0.0"),
+                fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
+                linux_heritage: None,
+                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
+                max_filename_length: 255,
+                features: vec![
+                    crate::kernel::subsystem::FilesystemFeature::Journaling,
+                    crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
+                ],
             },
             mounted: false,
             mount_point: String::new(),
@@ -431,19 +444,7 @@ impl FileSystem for AbsorbedExt4Driver {
     }
 
     fn metadata(&self) -> &crate::kernel::subsystem::FilesystemMetadata {
-        static METADATA: std::sync::OnceLock<crate::kernel::subsystem::FilesystemMetadata> = std::sync::OnceLock::new();
-        METADATA.get_or_init(|| crate::kernel::subsystem::FilesystemMetadata {
-            name: String::from("AbsorbedExt4"),
-            version: String::from("1.0.0"),
-            fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
-            linux_heritage: None,
-            max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
-            max_filename_length: 255,
-            features: vec![
-                crate::kernel::subsystem::FilesystemFeature::Journaling,
-                crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
-            ],
-        })
+        &self.fs_metadata
     }
 
     fn as_any(&self) -> &dyn Any {

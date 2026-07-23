@@ -107,11 +107,11 @@ impl WatchdogManager {
 
     /// Start a watchdog
     pub fn start_watchdog(&mut self, name: &str) -> Result<(), &'static str> {
-        let ts = self.get_timestamp();
+        let timestamp = self.get_timestamp();
         let watchdog = self.watchdogs.get_mut(name).ok_or("Watchdog not found")?;
 
         watchdog.state = WatchdogState::Running;
-        watchdog.last_keepalive = ts;
+        watchdog.last_keepalive = timestamp;
 
         if self.active_watchdog.is_none() {
             self.active_watchdog = Some(name.to_string());
@@ -135,14 +135,14 @@ impl WatchdogManager {
 
     /// Send keepalive to a watchdog
     pub fn keepalive(&mut self, name: &str) -> Result<(), &'static str> {
-        let ts = self.get_timestamp();
+        let timestamp = self.get_timestamp();
         let watchdog = self.watchdogs.get_mut(name).ok_or("Watchdog not found")?;
 
         if watchdog.state != WatchdogState::Running {
             return Err("Watchdog not running");
         }
 
-        watchdog.last_keepalive = ts;
+        watchdog.last_keepalive = timestamp;
         Ok(())
     }
 
@@ -263,11 +263,7 @@ impl WatchdogManager {
 
     /// Get timestamp (simplified)
     fn get_timestamp(&self) -> u64 {
-        if self.monitor.uptime == 0 {
-            1
-        } else {
-            self.monitor.uptime
-        }
+        self.monitor.uptime
     }
 }
 

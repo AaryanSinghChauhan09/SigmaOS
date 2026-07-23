@@ -23,7 +23,7 @@ pub struct ZeroCopyQueue<T, const N: usize> {
 impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
-            buffer: core::array::from_fn(|_| None),
+            buffer: [const { None }; N],
             head: 0,
             tail: 0,
         }

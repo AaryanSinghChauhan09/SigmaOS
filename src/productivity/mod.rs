@@ -5,7 +5,6 @@ pub mod document_engine;
 pub mod editor;
 pub mod email;
 pub mod finance;
-pub mod flint_chart;
 pub mod gamification;
 pub mod notes;
 pub mod screen_recorder;
@@ -39,7 +38,6 @@ pub use finance::{
     IndicLanguage, NpciUpiGateway, StandardGstCalculator, TaxRegime, TdsCalculator, TdsResult,
     TdsSection, UpiGateway, UpiPaymentRequest, UpiVpa,
 };
-pub use flint_chart::{FlintChartEngine, FlintChartSpec, FlintEncoding, FlintMark, FlintValue};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -58,7 +56,7 @@ pub use screenshot::{
     ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
 pub use sigma_office::{
-    CellValue, ChartType, DocumentMetadata as OfficeDocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
+    CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
     ShapeType, SigmaDocument, SigmaOffice, SlideElementType, SpreadsheetProcessor, TextProcessor,
     TypographyRenderer,
 };

@@ -75,26 +75,20 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-        // Get object size and capacity beforehand
-        let (object_size, objects_per_slab) = {
-            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
-            (cache.object_size, cache.objects_per_slab)
-        };
+        let next_slab_id = self.next_slab_id;
+        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
 
         // Try to find a free object in existing slabs
-        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
         for slab in &mut cache.slabs {
             if slab.state != SlabState::Full {
                 for obj in &mut slab.objects {
                     if obj.is_none() {
-                        let next_id = self.next_slab_id;
-                        let ptr = Self::allocate_memory(next_id, object_size);
-                        *obj = Some(ptr);
+                        *obj = Some(Self::allocate_memory(next_slab_id, cache.object_size));
                         slab.inuse += 1;
                         cache.free_objects -= 1;
 
                         // Update slab state
-                        slab.state = if slab.inuse == objects_per_slab {
+                        slab.state = if slab.inuse == cache.objects_per_slab {
                             SlabState::Full
                         } else if slab.inuse > 0 {
                             SlabState::Partial
@@ -102,19 +96,17 @@ impl SlabAllocator {
                             SlabState::Empty
                         };
 
-                        return Ok(ptr);
+                        return Ok(obj.unwrap());
                     }
                 }
             }
         }
 
         // No free objects, create a new slab
-        let next_id = self.next_slab_id;
-        let new_slab = self.create_slab(next_id, objects_per_slab, object_size)?;
+        let new_slab = Self::create_slab(next_slab_id, cache)?;
         let obj = new_slab.objects[0].unwrap();
-        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
         cache.slabs.push(new_slab);
-        cache.free_objects = objects_per_slab - 1;
+        cache.free_objects = cache.objects_per_slab - 1;
 
         Ok(obj)
     }
@@ -126,9 +118,8 @@ impl SlabAllocator {
         for slab in &mut cache.slabs {
             for slab_obj in &mut slab.objects {
                 if slab_obj == &Some(obj) {
-                    if slab.inuse > 0 {
-                        slab.inuse -= 1;
-                    }
+                    *slab_obj = None;
+                    slab.inuse -= 1;
                     cache.free_objects += 1;
 
                     // Update slab state
@@ -149,11 +140,11 @@ impl SlabAllocator {
     }
 
     /// Create a new slab for a cache
-    fn create_slab(&self, next_id: u64, objects_per_slab: usize, object_size: usize) -> Result<Slab, &'static str> {
-        let mut objects = Vec::with_capacity(objects_per_slab);
+    fn create_slab(next_slab_id: u64, cache: &SlabCache) -> Result<Slab, &'static str> {
+        let mut objects = Vec::with_capacity(cache.objects_per_slab);
 
-        for _ in 0..objects_per_slab {
-            objects.push(Some(Self::allocate_memory(next_id, object_size)));
+        for _ in 0..cache.objects_per_slab {
+            objects.push(Some(Self::allocate_memory(next_slab_id, cache.object_size)));
         }
 
         Ok(Slab {

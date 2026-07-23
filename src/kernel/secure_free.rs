@@ -53,12 +53,15 @@ impl SecureFreeDetector {
 
     /// Securely free memory
     pub fn secure_free(&mut self, address: usize, ptr: *mut u8) -> Result<(), &'static str> {
-        let (size, freed, is_sensitive) = {
-            let record = self.allocations.get(&address).ok_or("Allocation not found")?;
-            (record.size, record.freed, record.is_sensitive)
+        let (size, is_sensitive, already_freed) = {
+            let record = self
+                .allocations
+                .get(&address)
+                .ok_or("Allocation not found")?;
+            (record.size, record.is_sensitive, record.freed)
         };
 
-        if freed {
+        if already_freed {
             return Err("Double free detected");
         }
 

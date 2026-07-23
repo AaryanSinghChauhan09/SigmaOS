@@ -44,7 +44,7 @@ pub struct Framebuffer {
     pub format: PixelFormat,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GpuDevice {
     pub vendor: GpuVendor,
     pub device_id: u32,

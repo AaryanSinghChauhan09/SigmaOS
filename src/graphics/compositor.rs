@@ -8,9 +8,30 @@ use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+pub type CompositorError = GraphicsError;
+pub type CompositorResult<T> = Result<T, CompositorError>;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CompositorStrategy {
+    Direct,
+    DoubleBuffered,
+}
+
+pub struct FramebufferCompositor {
+    pub id: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LayerBlendMode {
+    Normal,
+    Alpha,
+}
+
+pub struct RenderLayer {
+    pub z_order: u32,
+}
+
+pub type SigmaCompositor = SimpleCompositor;
 
 /// Position
 #[repr(C)]
@@ -187,18 +208,13 @@ pub struct BitmapSurface {
 
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
-        let size = (width * height) as usize;
         let data = unsafe {
-            let layout = core::alloc::Layout::array::<u32>(size).ok();
-            if let Some(layout) = layout {
-                let ptr = alloc::alloc::alloc(layout) as *mut u32;
-                if ptr.is_null() {
-                    None
-                } else {
-                    Some(NonNull::new_unchecked(ptr))
-                }
-            } else {
+            let size = (width * height) as usize;
+            let ptr = alloc(size * mem::size_of::<u32>()) as *mut u32;
+            if ptr.is_null() {
                 None
+            } else {
+                Some(NonNull::new_unchecked(ptr))
             }
         };
 
@@ -300,10 +316,7 @@ impl Drop for BitmapSurface {
     fn drop(&mut self) {
         unsafe {
             if let Some(data) = self.data {
-                let size = (self.size.width * self.size.height) as usize;
-                if let Ok(layout) = core::alloc::Layout::array::<u32>(size) {
-                    alloc::alloc::dealloc(data.as_ptr() as *mut u8, layout);
-                }
+                free(data.as_ptr() as *mut u8);
             }
         }
     }
@@ -520,6 +533,58 @@ impl CompositorStats {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T: 'a> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T: 'a> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 /// Simple compositor (OOP: Concrete compositor class)
 pub struct SimpleCompositor {
     windows: Vec<Option<Box<dyn Window>>>,
@@ -649,15 +714,17 @@ impl Compositor for SimpleCompositor {
         // Clear output
         output.clear(Color::rgb(0, 0, 0));
 
+        let output_info = output.info();
+        let output_stride = output_info.stride as usize / 4;
+        let output_data = output.data_mut();
+
         // Compose windows in order (back to front)
         for &window_id in &self.window_order {
             if let Some(ref mut window) = self.windows[window_id] {
                 let window_rect = window.rect();
-                let output_stride = output.info().stride as usize / 4;
                 if let Some(surface) = window.surface() {
-                    let window_stride = surface.info().stride as usize / 4;
                     let window_data = surface.data();
-                    let output_data = output.data_mut();
+                    let window_stride = surface.info().stride as usize / 4;
 
                     // Copy window surface to output
                     for y in 0..window_rect.size.height as usize {
@@ -697,4 +764,141 @@ impl Compositor for SimpleCompositor {
     }
 }
 
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
+            self.len -= 1;
+            item
+        }
+    }
+
+    fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut write = 0;
+        for read in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(read);
+                if f(item) {
+                    if write != read {
+                        let item_copy = core::ptr::read(self.data.add(read));
+                        core::ptr::write(self.data.add(write), item_copy);
+                    }
+                    write += 1;
+                }
+            }
+        }
+        self.len = write;
+    }
+
+    fn insert(&mut self, index: usize, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if index < self.len {
+                core::ptr::copy(
+                    self.data.add(index),
+                    self.data.add(index + 1),
+                    self.len - index,
+                );
+            }
+
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
+    fn iter(&self) -> core::slice::Iter<'_, T> {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+
+    fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+
+    fn position<F>(&self, mut f: F) -> Option<usize>
+    where
+        F: FnMut(&T) -> bool,
+    {
+        for i in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(i);
+                if f(item) {
+                    return Some(i);
+                }
+            }
+        }
+        None
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
