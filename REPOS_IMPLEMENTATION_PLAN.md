@@ -10,6 +10,9 @@ This document maps out the systematic, step-by-step implementation roadmap to in
   Phase 1: Stabilization & Foundation  [Q1-Q2]  -->  Phase 2: Capability & Hardening [Q2-Q3]
                                                                         |
   Phase 4: Sovereign Integration & Delight [Q4] <--  Phase 3: High-Perf Storage & Net [Q3-Q4]
+                                        |
+                                        v
+                    [Phases L to Q: Sovereign Scale & AI-Native Layer]
 ```
 
 ---
@@ -81,6 +84,36 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 *   **Target Directories:** `src/accessibility/`, `zenith_desktop/`
 *   **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
 *   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
+
+---
+
+## 🚀 Next-Phase Strategic Initiatives (Phases L to Q)
+
+To evolve from a core microkernel prototype into an industrial-grade, national-scale sovereign OS, the following next-generation phases are planned and implemented:
+
+### ⚙️ Phase L: Kernel Refinement & Microkernel Modularization
+*   **Focus:** Core microkernel modularization, standardizing syscall interfaces, and implementing POSIX compliance layers to ease Linux absorption.
+*   **Deliverables:** Completing demand paging, Copy-on-Write (CoW), and syscall table standardization in `src/kernel/`.
+
+### 🌐 Phase M: Networking & Distributed Systems (Mesh & SigmaNet)
+*   **Focus:** Implementing peer-to-peer mesh networking for sovereign communication. Developing SigmaNet, a PQC-secured alternative to TCP/IP.
+*   **Deliverables:** Custom TCP/UDP stack congestion control, mesh network routing tables, and QUIC latency benchmarks.
+
+### 📂 Phase N: Filesystem Evolution (SigmaFS Replication)
+*   **Focus:** Evolving SigmaFS with transactional journaling, cryptographic signatures, and distributed replication with NIC/MeitY data centers.
+*   **Deliverables:** Merkle-CoW journaling blocks and sovereign cloud integration interfaces.
+
+### 🖥️ Phase O: Desktop & Multilingual Support (Zenith GUI)
+*   **Focus:** Scaling the Zenith compositor to support GPU acceleration and full multilingual UI across 22 scheduled languages of India.
+*   **Deliverables:** Native screen magnification, high-contrast states, and a sovereign app store.
+
+### 🤖 Phase P: AI-Native Sovereign Layer (Agent Absorption)
+*   **Focus:** Sandboxed local inference engines (Rust-based GGML, candle) running predictive scheduling and self-healing diagnostics.
+*   **Deliverables:** AI kernel task scheduler and PQC-secured IPC agent communication tunnels.
+
+### 🛡️ Phase Q: Security & Sovereignty (Zero-Trust & Aadhaar Integration)
+*   **Focus:** Post-quantum cryptography integration across all networking, storage, and IPC layers. Identity-based access and Aadhaar-compliant verification.
+*   **Deliverables:** Zero-trust capability tokens and biometric-assisted secure boot sequences.
 
 ---
 
