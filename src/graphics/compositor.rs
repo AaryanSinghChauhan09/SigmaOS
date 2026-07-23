@@ -6,11 +6,36 @@ use core::mem;
 /// Implements graphics composition using OOP principles with traits and structs
 /// No dependency on external graphics frameworks
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+
+pub type CompositorError = GraphicsError;
+pub type CompositorResult<T> = Result<T, CompositorError>;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CompositorStrategy {
+    Direct,
+    DoubleBuffered,
+}
+
+pub struct FramebufferCompositor {
+    pub id: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LayerBlendMode {
+    Normal,
+    Alpha,
+}
+
+pub struct RenderLayer {
+    pub z_order: u32,
+}
+
+pub type SigmaCompositor = SimpleCompositor;
 
 /// Position
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
@@ -24,7 +49,7 @@ impl Position {
 
 /// Size
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Size {
     pub width: u32,
     pub height: u32,
@@ -486,6 +511,7 @@ pub enum GraphicsError {
 
 /// Compositor statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct CompositorStats {
     pub total_windows: usize,
     pub visible_windows: usize,
@@ -501,6 +527,58 @@ impl CompositorStats {
             frame_count: 0,
             composition_time_ms: 0,
         }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T: 'a> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T: 'a> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -633,15 +711,16 @@ impl Compositor for SimpleCompositor {
         // Clear output
         output.clear(Color::rgb(0, 0, 0));
 
+        let output_info = output.info();
+        let output_stride = output_info.stride as usize / 4;
+        let output_data = output.data_mut();
+
         // Compose windows in order (back to front)
         for &window_id in &self.window_order {
             if let Some(ref mut window) = self.windows[window_id] {
+                let window_rect = window.rect();
                 if let Some(surface) = window.surface() {
-                    let window_rect = window.rect();
-                    let output_data = output.data_mut();
                     let window_data = surface.data();
-
-                    let output_stride = output.info().stride as usize / 4;
                     let window_stride = surface.info().stride as usize / 4;
 
                     // Copy window surface to output
@@ -763,20 +842,14 @@ impl<T> Vec<T> {
         }
     }
 
-    fn iter(&self) -> Iter<T> {
-        Iter {
-            data: self.data,
-            len: self.len,
-            index: 0,
-        }
+    fn iter(&self) -> core::slice::Iter<'_, T> {
+        use core::ops::Deref;
+        self.deref().iter()
     }
 
-    fn iter_mut(&mut self) -> IterMut<T> {
-        IterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-        }
+    fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 
     fn position<F>(&self, mut f: F) -> Option<usize>
@@ -817,48 +890,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-struct Iter<T> {
-    data: *const T,
-    len: usize,
-    index: usize,
-}
-
-impl<'a, T> Iterator for Iter<T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &*self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-
-struct IterMut<T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-}
-
-impl<'a, T> Iterator for IterMut<T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &mut *self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
         }
     }
 }
