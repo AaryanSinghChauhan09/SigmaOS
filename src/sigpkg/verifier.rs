@@ -114,13 +114,13 @@ mod tests {
         let mut verifier = CryptoVerifier::new();
         verifier.add_trusted_key("test_key".to_string());
 
-        let package = Package {
-            name: "test".to_string(),
-            version: crate::sigpkg::Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: "test_checksum".to_string(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            crate::sigpkg::Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            "test_checksum".to_string(),
+        );
 
         let data = b"test data";
         let signature = b"test signature";
