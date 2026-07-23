@@ -2,11 +2,6 @@
 pub mod routines;
 
 pub use routines::{
-    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme as RoutineTheme,
+    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme,
     TriggerType,
-};
-pub use theme::{
-    AnimationSettings, BorderRadiusSettings, BuiltInThemeProvider, ColorPalette,
-    CustomThemeProvider, ShadowSettings, SpacingSettings, Theme, ThemeEngine, ThemeError,
-    ThemeMode, ThemeProvider, TypographySettings,
 };

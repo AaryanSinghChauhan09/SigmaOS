@@ -75,7 +75,7 @@ pub use resilience::{
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    ContentAddressedStore, CryptoVerifier, PackageRecipe,
     SatSolver, Transaction,
 };
 pub use virtualization::{
