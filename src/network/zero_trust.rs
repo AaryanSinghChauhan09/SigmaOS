@@ -387,8 +387,8 @@ impl NetworkPolicyExt for SimpleNetworkPolicy {
 impl NetworkPolicyExt for dyn NetworkPolicy {
     fn is_active_mut(&self) -> &AtomicBool {
         unsafe {
-            // Safe fallback downcast helper
-            let ptr = self as *const dyn NetworkPolicy as *const SimpleNetworkPolicy;
+            // Safe fallback downcast helper: cast fat pointer to thin pointer to discard the vtable, then downcast to SimpleNetworkPolicy.
+            let ptr = self as *const dyn NetworkPolicy as *const () as *const SimpleNetworkPolicy;
             &(*ptr).is_active
         }
     }

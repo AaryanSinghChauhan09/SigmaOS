@@ -41,27 +41,23 @@ impl Version {
         // This avoids heap-allocated collections like Vec inside utility version parsing.
         let mut parts = version_str.split('.');
 
-        let major = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        let minor = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        let patch = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
+        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
 
         if parts.next().is_some() {
             return Err(ParseError::InvalidFormat);
         }
+
+        let major = major_str
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = minor_str
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let patch = patch_str
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
 
         Ok(Version::new(major, minor, patch))
     }
