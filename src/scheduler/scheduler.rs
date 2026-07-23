@@ -6,7 +6,7 @@ use core::mem;
 /// Implements process/thread scheduling using OOP principles with traits and structs
 /// No dependency on external scheduler frameworks
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -28,6 +28,8 @@ pub trait Schedulable {
     fn set_last_run_time(&mut self, time: u64);
     /// Get task ID
     fn task_id(&self) -> usize;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
 }
 
 /// Priority levels
@@ -43,7 +45,7 @@ pub enum Priority {
 
 /// Task state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskState {
     Ready = 0,
     Running = 1,
@@ -75,6 +77,58 @@ impl Task {
             quantum,
             capability,
         }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -122,6 +176,10 @@ impl Schedulable for Task {
 
     fn task_id(&self) -> usize {
         self.id
+    }
+
+    fn capability(&self) -> TaskCapability {
+        self.capability
     }
 }
 
@@ -270,7 +328,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability.can_yield {
+                    if !task.capability().can_yield {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Ready);
@@ -285,7 +343,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability.can_block {
+                    if !task.capability().can_block {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Blocked);
@@ -397,7 +455,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability.can_yield {
+                        if !task.capability().can_yield {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Ready);
@@ -414,7 +472,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability.can_block {
+                        if !task.capability().can_block {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Blocked);

@@ -8,13 +8,16 @@ pub mod sai;
 pub mod system;
 pub mod voice;
 
-pub use agent::{Agent, AgentRole, AgentState};
+pub use agent::{AIAgent, SimpleAIAgent};
 pub use llm::{
     LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
     QuantizationType, InferenceBackend, BatchingStrategy,
     StreamingLlmEngine, StreamingInference,
 };
-pub use orchestrator::{AgentOrchestrator, Task, TaskStatus, TaskType};
+pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
+pub use sai::{
+    Agent, AgentRole, AgentTask as Task, TaskStatus,
+};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
