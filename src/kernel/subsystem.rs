@@ -654,7 +654,9 @@ impl DriverRegistry {
     
     /// Shutdown all registered drivers
     pub fn shutdown_all(&mut self) -> Result<(), RegistryError> {
-        self.drivers.iter_mut().for_each(|d| { let _ = d.shutdown(); });
+        self.drivers.iter_mut().for_each(|d| {
+            let _ = d.shutdown();
+        });
         Ok(())
     }
 }
