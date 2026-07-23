@@ -70,7 +70,8 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        match self.fs_type.load(Ordering::SeqCst) {
+        let val = self.fs_type.load(Ordering::SeqCst);
+        match val {
             0 => FilesystemType::Ext4,
             1 => FilesystemType::Btrfs,
             2 => FilesystemType::ZFS,
@@ -529,8 +530,8 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
-        for i in 0..self.filesystems.len() {
-            if let Some(ref fs) = *self.filesystems.get_ref(i) {
+        for fs_option in &self.filesystems {
+            if let Some(ref fs) = *fs_option {
                 if fs.id() == id {
                     return Some(fs.as_ref());
                 }
@@ -579,6 +580,9 @@ impl<T> Vec<T> {
     }
 
     pub fn get(&self, index: usize) -> T {
+        if self.data.is_null() || index >= self.len {
+            panic!("Access of invalid pointer");
+        }
         unsafe { core::ptr::read(self.data.add(index)) }
     }
 

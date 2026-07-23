@@ -127,7 +127,7 @@ impl AccessibilityFramework {
 
     fn add_default_profiles(&mut self) {
         // Vision impaired profile
-        let vision_profile =
+        let mut vision_profile =
             AccessibilityProfile::new("Vision Impaired".to_string(), AccessibilityCategory::Vision)
                 .add_setting(
                     AccessibilitySetting::new(AccessibilityFeature::ScreenReader)
@@ -140,9 +140,10 @@ impl AccessibilityFramework {
                 .add_setting(
                     AccessibilitySetting::new(AccessibilityFeature::Magnifier).with_intensity(0.6),
                 );
+        vision_profile.enable_all();
 
         // Hearing impaired profile
-        let hearing_profile = AccessibilityProfile::new(
+        let mut hearing_profile = AccessibilityProfile::new(
             "Hearing Impaired".to_string(),
             AccessibilityCategory::Hearing,
         )
@@ -152,9 +153,10 @@ impl AccessibilityFramework {
         .add_setting(
             AccessibilitySetting::new(AccessibilityFeature::SpeechToText).with_intensity(0.8),
         );
+        hearing_profile.enable_all();
 
         // Mobility impaired profile
-        let mobility_profile = AccessibilityProfile::new(
+        let mut mobility_profile = AccessibilityProfile::new(
             "Mobility Impaired".to_string(),
             AccessibilityCategory::Mobility,
         )
@@ -167,9 +169,10 @@ impl AccessibilityFramework {
         .add_setting(
             AccessibilitySetting::new(AccessibilityFeature::ReducedMotion).with_intensity(0.5),
         );
+        mobility_profile.enable_all();
 
         // Cognitive support profile
-        let cognitive_profile = AccessibilityProfile::new(
+        let mut cognitive_profile = AccessibilityProfile::new(
             "Cognitive Support".to_string(),
             AccessibilityCategory::Cognitive,
         )
@@ -179,6 +182,7 @@ impl AccessibilityFramework {
         .add_setting(
             AccessibilitySetting::new(AccessibilityFeature::DyslexiaFont).with_intensity(0.6),
         );
+        cognitive_profile.enable_all();
 
         self.profiles
             .insert(vision_profile.name.clone(), vision_profile);
