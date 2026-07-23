@@ -8,7 +8,7 @@ use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CgroupSubsystem {
     Cpu,     // CPU scheduling and accounting
     Memory,  // Memory usage and limits

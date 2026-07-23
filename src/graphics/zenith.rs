@@ -423,7 +423,7 @@ mod tests {
 
     #[test]
     fn test_widget_creation() {
-        let compositor = ZenithCompositor::new(1920, 1080);
+        let mut compositor = ZenithCompositor::new(1920, 1080);
         let widget_id = compositor.create_widget("button".to_string());
 
         assert_eq!(compositor.widget_count(), 1);
@@ -445,7 +445,7 @@ mod tests {
 
     #[test]
     fn test_panel_creation() {
-        let compositor = ZenithCompositor::new(1920, 1080);
+        let mut compositor = ZenithCompositor::new(1920, 1080);
         let panel_id = compositor.create_panel(PanelOrientation::Horizontal);
 
         assert_eq!(compositor.panel_count(), 1);
@@ -466,7 +466,7 @@ mod tests {
 
     #[test]
     fn test_animation_creation() {
-        let compositor = ZenithCompositor::new(1920, 1080);
+        let mut compositor = ZenithCompositor::new(1920, 1080);
         let animation_id = compositor.create_animation(1000, AnimationCurve::EaseInOut);
 
         assert_eq!(compositor.animation_count(), 1);
@@ -487,7 +487,7 @@ mod tests {
 
     #[test]
     fn test_animation_curve() {
-        let compositor = ZenithCompositor::new(1920, 1080);
+        let mut compositor = ZenithCompositor::new(1920, 1080);
         let animation_id = compositor.create_animation(1000, AnimationCurve::EaseIn);
 
         let animation = compositor.animations.get_mut(&animation_id).unwrap();
