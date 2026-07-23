@@ -22,7 +22,7 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
-pub use audit::{AuditLogger, AuditPolicy};
+pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use clipboard::{
@@ -39,8 +39,8 @@ pub use password::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission,
+    SecurityContext as SelinuxSecurityContext, SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -63,7 +63,8 @@ pub use integrity::{
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
+    SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{

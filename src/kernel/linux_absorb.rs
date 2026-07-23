@@ -347,6 +347,7 @@ pub struct AbsorbedExt4Driver {
     fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
     mounted: bool,
     mount_point: String,
+    fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
 }
 
 impl AbsorbedExt4Driver {
@@ -385,6 +386,18 @@ impl AbsorbedExt4Driver {
             },
             mounted: false,
             mount_point: String::new(),
+            fs_metadata: crate::kernel::subsystem::FilesystemMetadata {
+                name: String::from("AbsorbedExt4"),
+                version: String::from("1.0.0"),
+                fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
+                linux_heritage: None,
+                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
+                max_filename_length: 255,
+                features: vec![
+                    crate::kernel::subsystem::FilesystemFeature::Journaling,
+                    crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
+                ],
+            },
         }
     }
 }

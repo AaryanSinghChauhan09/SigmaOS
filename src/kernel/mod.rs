@@ -79,11 +79,6 @@ pub use subsystem::{
     DriverRegistry, DriverType, FileFlags, FileHandle, IoOperation, IoResult, LinuxHeritage,
     MapFlags, SecureDriverWrapper, SocketDomain, SocketHandle, SocketProtocol,
 };
-pub use traits::{
-    DeviceDriver, DriverError, DriverMetadata, FileSystem, FilesystemMetadata, FsError,
-    MemoryError, MemoryManager, MemoryManagerMetadata, NetworkError, NetworkStack,
-    NetworkStackMetadata, SchedulerMetadata,
-};
 pub use watchdog::{
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,
     WatchdogState,

@@ -334,7 +334,7 @@ impl PresentationProcessor {
                 font_size,
             },
             position,
-            size: (200.0, 50.0),
+            size: (100.0, 50.0),
         };
         self.slides[self.current_slide].push(node.clone());
         self.document.add_node(node)
@@ -366,7 +366,7 @@ impl PresentationProcessor {
                 fill_color,
             },
             position,
-            size: (100.0, 100.0),
+            size: (100.0, 50.0),
         };
         self.slides[self.current_slide].push(node.clone());
         self.document.add_node(node)

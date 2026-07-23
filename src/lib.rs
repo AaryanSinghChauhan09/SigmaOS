@@ -13,6 +13,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
