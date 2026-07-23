@@ -89,6 +89,7 @@ impl PackageDependencyResolver {
                 }
             }
         }
+        *idx -= 1;
         true
     }
 
@@ -126,6 +127,10 @@ impl PackageDependencyResolver {
         visited: &mut [&'static str; MAX_REGISTRY_SIZE],
         idx: &mut usize,
     ) -> bool {
+        if resolved.contains(&name) {
+            return true;
+        }
+
         // Check for cycles
         for i in 0..*idx {
             if visited[i] == name {
@@ -143,11 +148,6 @@ impl PackageDependencyResolver {
 
         // Find package
         if let Some(recipe) = self.find_recipe(name) {
-            // Add package to resolved list
-            if !resolved.contains(&name) {
-                resolved.push(name);
-            }
-
             // Recursively resolve dependencies
             for dep_idx in 0..recipe.dep_count {
                 let dep_name = recipe.dependencies[dep_idx];
@@ -155,7 +155,13 @@ impl PackageDependencyResolver {
                     return false;
                 }
             }
+
+            // Add package to resolved list
+            if !resolved.contains(&name) {
+                resolved.push(name);
+            }
         }
+        *idx -= 1;
         true
     }
 

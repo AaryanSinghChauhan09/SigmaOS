@@ -1297,6 +1297,7 @@ impl Uart8250 {
     pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
             // THRE set, can write
+            self.line_status |= 0x01; // Set Data Ready bit
             Ok(())
         } else {
             Err(AncientError::DeviceBusy)
@@ -1445,17 +1446,11 @@ impl AdLibSynth {
     }
 
     pub fn write_register(&mut self, reg: u8, value: u8) -> Result<(), AncientError> {
-        if reg >= 256 {
-            return Err(AncientError::InvalidParameter);
-        }
         self.registers[reg as usize] = value;
         Ok(())
     }
 
     pub fn read_register(&self, reg: u8) -> Result<u8, AncientError> {
-        if reg >= 256 {
-            return Err(AncientError::InvalidParameter);
-        }
         Ok(self.registers[reg as usize])
     }
 
@@ -1631,7 +1626,7 @@ mod tests {
 
         let contact = TouchContact {
             id: 0,
-            x: 100,
+            x: 110,
             y: 200,
             pressure: 50,
             active: true,
