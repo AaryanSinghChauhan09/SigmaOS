@@ -3,179 +3,6 @@
 
 use std::collections::HashMap;
 
-/// OOP-based Superset Application Capability matching
-pub trait SupersetApplicationCapability {
-    /// Name of the superset-compatible software equivalent
-    fn app_name(&self) -> &'static str;
-    /// Verifies if a specific capability (e.g. "mp4", "javascript", etc.) is fully supported
-    fn has_superset_capability(&self, capability_name: &str) -> bool;
-}
-
-/// VLC Media Player superset capability match (OOP Class)
-pub struct MediaDecoderCapability {
-    supported_formats: Vec<&'static str>,
-}
-
-impl MediaDecoderCapability {
-    pub fn new() -> Self {
-        Self {
-            supported_formats: vec!["mp4", "mkv", "avi", "mp3", "aac", "wav", "flac"],
-        }
-    }
-}
-
-impl SupersetApplicationCapability for MediaDecoderCapability {
-    fn app_name(&self) -> &'static str {
-        "VLC Media Player"
-    }
-
-    fn has_superset_capability(&self, capability_name: &str) -> bool {
-        self.supported_formats.contains(&capability_name)
-    }
-}
-
-/// Chromium Browser superset capability match (OOP Class)
-pub struct HtmlRendererCapability {
-    features: Vec<&'static str>,
-}
-
-impl HtmlRendererCapability {
-    pub fn new() -> Self {
-        Self {
-            features: vec!["html5", "css3", "javascript", "webgl", "wasm", "v8"],
-        }
-    }
-}
-
-impl SupersetApplicationCapability for HtmlRendererCapability {
-    fn app_name(&self) -> &'static str {
-        "Chromium Browser"
-    }
-
-    fn has_superset_capability(&self, capability_name: &str) -> bool {
-        self.features.contains(&capability_name)
-    }
-}
-
-/// Sovereign Video Player superset capability match (OOP Class)
-/// Features absolute parity with and improvements over VLC,
-/// meaning the built-in system is better than VLC Media Player.
-pub struct SovereignVideoPlayerCapability {
-    supported_formats: Vec<&'static str>,
-    advanced_features: Vec<&'static str>,
-}
-
-impl SovereignVideoPlayerCapability {
-    pub fn new() -> Self {
-        Self {
-            supported_formats: vec![
-                "mp4", "mkv", "avi", "mp3", "aac", "wav", "flac", // VLC core compatibility
-                "av1", "vvc", "opus", // Next-gen codecs
-            ],
-            advanced_features: vec![
-                "ai_upscale",          // Real-time local neural network video upscaling
-                "frame_interpolation", // AI-driven 60FPS/120FPS smooth motion generation
-                "pqc_streaming",       // Post-quantum Kyber-1024 encrypted stream rendering
-                "p2p_dist",            // OS-native decentralized streaming distribution
-                "spatial_audio",       // Immersive spatial audio processing and HRTF synthesis
-                "spatial_video",       // 3D holographic stereoscopic depth reprojection
-                "dolby_vision",        // Hardware-accelerated dynamic range tone-mapping
-                "hdr10plus",           // Dynamic metadata HDR processing
-            ],
-        }
-    }
-
-    /// Verifies programmatically that the Sovereign Video Player is a strict,
-    /// complete superset of VLC Media Player capabilities.
-    pub fn is_strict_superset_of_vlc(&self, vlc: &MediaDecoderCapability) -> bool {
-        for format in &vlc.supported_formats {
-            if !self.has_superset_capability(format) {
-                return false;
-            }
-        }
-        // It must also have additional advanced features
-        !self.advanced_features.is_empty()
-    }
-}
-
-impl SupersetApplicationCapability for SovereignVideoPlayerCapability {
-    fn app_name(&self) -> &'static str {
-        "Sovereign Video Player"
-    }
-
-    fn has_superset_capability(&self, capability_name: &str) -> bool {
-        self.supported_formats.contains(&capability_name)
-            || self.advanced_features.contains(&capability_name)
-    }
-}
-
-/// OOP Registry pattern to manage and query boxed SupersetApplicationCapability interfaces
-pub struct SovereignCapabilityRegistry {
-    capabilities: HashMap<String, Box<dyn SupersetApplicationCapability>>,
-}
-
-impl SovereignCapabilityRegistry {
-    pub fn new() -> Self {
-        Self {
-            capabilities: HashMap::new(),
-        }
-    }
-
-    /// Dynamically register a capability
-    pub fn register_capability(&mut self, capability: Box<dyn SupersetApplicationCapability>) {
-        let name = capability.app_name().to_string();
-        self.capabilities.insert(name, capability);
-    }
-
-    /// Query if any registered application possesses the given capability
-    pub fn find_app_by_capability(&self, capability_name: &str) -> Option<&str> {
-        for (name, cap) in &self.capabilities {
-            if cap.has_superset_capability(capability_name) {
-                return Some(name.as_str());
-            }
-        }
-        None
-    }
-}
-
-impl Default for SovereignCapabilityRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// OOP Composite pattern combining multiple capabilities under a single interface
-pub struct CompositeApplicationCapability {
-    name: String,
-    components: Vec<Box<dyn SupersetApplicationCapability>>,
-}
-
-impl CompositeApplicationCapability {
-    pub fn new(name: String) -> Self {
-        Self {
-            name,
-            components: Vec::new(),
-        }
-    }
-
-    /// Add a capability component to the composite
-    pub fn add_component(&mut self, component: Box<dyn SupersetApplicationCapability>) {
-        self.components.push(component);
-    }
-}
-
-impl SupersetApplicationCapability for CompositeApplicationCapability {
-    fn app_name(&self) -> &'static str {
-        Box::leak(self.name.clone().into_boxed_str())
-    }
-
-    fn has_superset_capability(&self, capability_name: &str) -> bool {
-        self.components
-            .iter()
-            .any(|comp| comp.has_superset_capability(capability_name))
-    }
-}
-
 /// Target platform
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetPlatform {
@@ -188,7 +15,7 @@ pub enum TargetPlatform {
 }
 
 /// Binary format
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BinaryFormat {
     Exe, // Windows executable
     Dmg, // macOS disk image
@@ -373,11 +200,23 @@ impl CompatibilityManager {
             .with_target(TargetPlatform::Windows)
             .with_overhead(0.2);
 
+        // Proton (Valve's advanced fork of Wine for high-performance Windows gaming)
+        let proton = TranslationLayer::new("Proton".to_string())
+            .with_format(BinaryFormat::Exe)
+            .with_target(TargetPlatform::Windows)
+            .with_overhead(0.05);
+
         // Rosetta-like translation for macOS binaries
         let rosetta = TranslationLayer::new("Rosetta".to_string())
             .with_format(BinaryFormat::Dmg)
             .with_target(TargetPlatform::MacOS)
             .with_overhead(0.1);
+
+        // Darling for Darwin/macOS application translation
+        let darling = TranslationLayer::new("Darling".to_string())
+            .with_format(BinaryFormat::Dmg)
+            .with_target(TargetPlatform::MacOS)
+            .with_overhead(0.25);
 
         // Box86/Box64 for x86/x64 binaries on ARM
         let box86 = TranslationLayer::new("Box86".to_string())
@@ -385,10 +224,21 @@ impl CompatibilityManager {
             .with_target(TargetPlatform::Linux)
             .with_overhead(0.15);
 
+        // Waydroid for Android application containerized translation
+        let waydroid = TranslationLayer::new("Waydroid".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_target(TargetPlatform::Linux)
+            .with_overhead(0.08);
+
         self.translation_layers.insert(wine.name.clone(), wine);
+        self.translation_layers.insert(proton.name.clone(), proton);
         self.translation_layers
             .insert(rosetta.name.clone(), rosetta);
+        self.translation_layers
+            .insert(darling.name.clone(), darling);
         self.translation_layers.insert(box86.name.clone(), box86);
+        self.translation_layers
+            .insert(waydroid.name.clone(), waydroid);
     }
 
     fn add_default_runtimes(&mut self) {
@@ -556,7 +406,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = CompatibilityManager::new();
-        assert_eq!(manager.translation_layers.len(), 3);
+        assert_eq!(manager.translation_layers.len(), 6);
         assert_eq!(manager.container_runtimes.len(), 6);
     }
 
@@ -605,74 +455,5 @@ mod tests {
         );
         manager.auto_configure_binary(&mut binary);
         assert_eq!(binary.compatibility_mode, CompatibilityMode::Translation);
-    }
-
-    #[test]
-    fn test_superset_media_and_html_capabilities() {
-        let vlc = MediaDecoderCapability::new();
-        let chromium = HtmlRendererCapability::new();
-
-        assert_eq!(vlc.app_name(), "VLC Media Player");
-        assert!(vlc.has_superset_capability("mp4"));
-        assert!(!vlc.has_superset_capability("javascript"));
-
-        assert_eq!(chromium.app_name(), "Chromium Browser");
-        assert!(chromium.has_superset_capability("javascript"));
-        assert!(!chromium.has_superset_capability("mkv"));
-    }
-    #[test]
-    fn test_sovereign_video_player_is_better_than_vlc() {
-        let vlc = MediaDecoderCapability::new();
-        let sov_player = SovereignVideoPlayerCapability::new();
-
-        assert_eq!(sov_player.app_name(), "Sovereign Video Player");
-
-        // Verify standard VLC compatibility
-        assert!(sov_player.has_superset_capability("mp4"));
-        assert!(sov_player.has_superset_capability("mkv"));
-        assert!(sov_player.has_superset_capability("flac"));
-
-        // Verify next-generation improvements over VLC
-        assert!(sov_player.has_superset_capability("av1"));
-        assert!(sov_player.has_superset_capability("ai_upscale"));
-        assert!(sov_player.has_superset_capability("pqc_streaming"));
-        assert!(sov_player.has_superset_capability("dolby_vision"));
-        assert!(sov_player.has_superset_capability("frame_interpolation"));
-
-        // Verify mathematical proof that Sovereign Video Player is a strict, complete superset of VLC
-        assert!(sov_player.is_strict_superset_of_vlc(&vlc));
-    }
-
-    #[test]
-    fn test_sovereign_capability_registry_and_composite() {
-        let mut registry = SovereignCapabilityRegistry::new();
-
-        // Register individual capabilities dynamically (Polymorphism & OOP Factory/Registry)
-        registry.register_capability(Box::new(MediaDecoderCapability::new()));
-        registry.register_capability(Box::new(HtmlRendererCapability::new()));
-
-        // Query the registry polymorphically
-        assert_eq!(
-            registry.find_app_by_capability("mp4"),
-            Some("VLC Media Player")
-        );
-        assert_eq!(
-            registry.find_app_by_capability("javascript"),
-            Some("Chromium Browser")
-        );
-        assert_eq!(registry.find_app_by_capability("vvc"), None);
-
-        // Create a composed multi-purpose application capability (OOP Composite pattern)
-        let mut composite =
-            CompositeApplicationCapability::new("Sovereign Multi-App Workspace".to_string());
-        composite.add_component(Box::new(SovereignVideoPlayerCapability::new()));
-        composite.add_component(Box::new(HtmlRendererCapability::new()));
-
-        // Verify the composite possesses both HTML rendering and Sovereign next-gen video capabilities
-        assert_eq!(composite.app_name(), "Sovereign Multi-App Workspace");
-        assert!(composite.has_superset_capability("vvc"));
-        assert!(composite.has_superset_capability("javascript"));
-        assert!(composite.has_superset_capability("ai_upscale"));
-        assert!(!composite.has_superset_capability("non_existent"));
     }
 }
