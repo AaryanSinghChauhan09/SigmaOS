@@ -11,7 +11,7 @@ use core::mem;
 pub type BlockID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AllocError { Success = 0, OutOfMemory = 1, InvalidBlock = 2, Fragmentation = 3 }
 
 pub trait BuddyAllocator {
@@ -47,7 +47,7 @@ pub struct SimpleBuddyAllocator {
 }
 
 impl SimpleBuddyAllocator {
-    pub fn new(max_order: usize, total_frames: usize) -> Self {
+    pub fn new(max_order: usize, _total_frames: usize) -> Self {
         let mut free_lists: [Vec<BlockID>; 12] = [
             Vec::new(), Vec::new(), Vec::new(), Vec::new(),
             Vec::new(), Vec::new(), Vec::new(), Vec::new(),
@@ -59,6 +59,7 @@ impl SimpleBuddyAllocator {
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);
+        blocks.push(None); // Index 0 unused
         blocks.push(Some(initial_block));
         free_lists[initial_order].push(initial_block_id);
         
@@ -81,15 +82,19 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].pop().unwrap();
                 
-                while current_order > order {
-                    let new_order = current_order - 1;
+                let mut current_block_id = block_id;
+                let mut active_order = current_order;
+
+                // Recursively split the block until we reach the target allocation order
+                while active_order > order {
+                    active_order -= 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     
-                    let mut left_block = Block::new(new_order);
-                    let mut right_block = Block::new(new_order);
+                    let mut left_block = Block::new(active_order);
+                    let mut right_block = Block::new(active_order);
                     
-                    if let Some(ref mut parent) = self.blocks[block_id] {
+                    if let Some(ref mut parent) = self.blocks[current_block_id] {
                         parent.left.store(left_id, Ordering::SeqCst);
                         parent.right.store(right_id, Ordering::SeqCst);
                         parent.free.store(0, Ordering::SeqCst);
@@ -101,16 +106,18 @@ impl BuddyAllocator for SimpleBuddyAllocator {
                     self.blocks[left_id] = Some(left_block);
                     self.blocks[right_id] = Some(right_block);
                     
-                    self.free_lists[new_order].push(right_id);
+                    // The right block goes into the free list of the split order
+                    self.free_lists[active_order].push(right_id);
                     
-                    return Ok(left_id);
+                    // We continue splitting the left block
+                    current_block_id = left_id;
                 }
                 
-                if let Some(ref mut block) = self.blocks[block_id] {
+                if let Some(ref mut block) = self.blocks[current_block_id] {
                     block.free.store(0, Ordering::SeqCst);
                 }
                 
-                return Ok(block_id);
+                return Ok(current_block_id);
             }
         }
         
@@ -255,6 +262,9 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+    fn len(&self) -> usize {
+        self.len
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -268,3 +278,28 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+// =========================================================================
+// 🔄 UNIT TESTING
+// =========================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_buddy_allocator_split() {
+        let mut allocator = SimpleBuddyAllocator::new(4, 16);
+        assert_eq!(allocator.get_free_count(4), 1);
+
+        // Allocating order 1 should split order 4 down to order 1 recursively
+        let block_id = allocator.allocate(1).unwrap();
+        assert!(block_id > 0);
+
+        // We should have split buddies left in free lists of order 1, 2, and 3
+        assert_eq!(allocator.get_free_count(1), 1);
+        assert_eq!(allocator.get_free_count(2), 1);
+        assert_eq!(allocator.get_free_count(3), 1);
+        assert_eq!(allocator.get_free_count(4), 0);
+    }
+}

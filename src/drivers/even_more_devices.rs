@@ -79,7 +79,9 @@ impl PeripheralDevice for AdLibSynthDriver {
         while idx + 1 < data.len() {
             let reg = data[idx] as usize;
             let val = data[idx + 1];
-            self.registers[reg] = val;
+            if reg < self.registers.len() {
+                self.registers[reg] = val;
+            }
             idx += 2;
         }
         Ok(idx)

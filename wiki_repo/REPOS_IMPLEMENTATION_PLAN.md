@@ -1,6 +1,6 @@
 # 🛠️ SigmaOS Comprehensive Repository Implementation & Execution Plan
 
-This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from **500+ open-source repositories** into the **SigmaOS** microkernel and userspace.
+This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from **500+ open-source repositories** across 34 core domains into the **SigmaOS** microkernel and userspace.
 
 ---
 
@@ -109,3 +109,115 @@ To maintain 100% architectural integrity during execution:
 1.  **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
 2.  **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
 3.  **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
+
+---
+
+## 📅 4. 90-Day Execution Milestones, Metrics, and Resource Strategy
+
+To achieve commercial and technical maturity, the rollout of SigmaOS is structured around concrete 90-day sprints, metrics, risk mitigation policies, and communication plans.
+
+### 4.1 Master Rollout Milestones
+* **Milestone 1: CI Foundation (Day 30)**
+  - CI pipeline running on all host/target architectures.
+  - Reproducible builds fully verified with strict output hashes.
+  - Build provenance and software bill of materials (SBOM) automatically published.
+* **Milestone 2: Kernel Boot (Day 60)**
+  - Kernel boots deterministically on all target architectures (x86_64, AArch64, RISC-V).
+  - Critical polymorphic drivers (storage, NICs, basic GPU framebuffers) fully functional.
+  - Bootable desktop demo executing in QEMU environments.
+* **Milestone 3: Package Ecosystem (Day 90)**
+  - `sigpkg` package manager MVP complete with SAT resolver and FHS adapters.
+  - 50 curated core packages fully tested and available in depositories.
+  - Bootable desktop ISO complete with graphical/interactive installer.
+
+### 4.2 Success Metrics
+
+#### Technical Metrics
+- **CI Success Rate:** >95% success across all architecture builds.
+- **Build Reproducibility:** 100% determinism of official release artifacts.
+- **Boot Time:** <5 seconds to responsive desktop shell in QEMU.
+- **Package Count:** 50 curated, verified software packages.
+- **Driver Coverage:** Top 5 NIC adapters, top 3 GPU families supported.
+
+#### Quality Metrics
+- **Test Coverage:** >70% code coverage for core kernel components.
+- **Security Vulnerabilities:** 0 critical or high CVEs.
+- **Documentation Coverage:** >80% public APIs documented with flowcharts and manuals.
+
+#### Adoption Metrics
+- **Contributors:** 5+ active core systems contributors.
+- **Stars:** 500+ GitHub community stars.
+- **Issues:** <20 open issues, with <5 classified as critical severity.
+
+### 4.3 Risk Management & Mitigation
+
+#### High-Risk Items
+* **Risk: Kernel Phase 0 delays**
+  - *Mitigation:* Prioritize critical path items, deferring non-essential helper features.
+  - *Contingency:* Extend Sprint 2 by 1 week if block splitting or page tables require stabilization.
+* **Risk: Driver development complexity**
+  - *Mitigation:* Focus on VirtIO drivers first (easier to test and isolate in QEMU).
+  - *Contingency:* Utilize established open-source driver specifications as functional reference.
+* **Risk: sigpkg complexity**
+  - *Mitigation:* Start with a minimal viable package manager layout, bypassing complex GUI layers.
+  - *Contingency:* Defer web UI to a later sprint if SAT-solver resolution takes precedence.
+
+#### Medium-Risk Items
+* **Risk: Multi-arch CI infrastructure**
+  - *Mitigation:* Start with x86_64 and AArch64 targets, adding RISC-V incrementally.
+  - *Contingency:* Rely on GitHub Actions hosted runners initially prior to deploying local servers.
+* **Risk: Reproducible build challenges**
+  - *Mitigation:* Use Docker containers for a consistent, hermetic compiling environment.
+  - *Contingency:* Accept partial reproducibility initially on non-critical userland packages.
+
+### 4.4 Resource & Time Allocation
+
+#### Team Composition
+- **Kernel Team:** 2 Systems Engineers (core paging, EEVDF scheduler, IPC).
+- **Drivers Team:** 2 Device Engineers (PCI, NVMe, USB, VESA, GPU).
+- **Build & CI Team:** 1 DevOps Engineer (reproducibility, Actions pipelines, SBOM).
+- **Packaging Team:** 2 Package Engineers (SAT solver, FHS redirects, translators).
+- **UX Team:** 1 Frontend Engineer (Zenith Lite desktop, input events).
+- **Security Team:** 1 Security Auditor (MAC profiles, capability token gates, PQC).
+- **Documentation:** 1 Technical Writer (part-time, wiki sync, user manuals).
+
+#### Time Allocation
+- **Sprint 1:** 100% CI, build environments, and reproducible toolchains.
+- **Sprint 2:** 70% Kernel & Drivers, 30% Security/Capability auditing.
+- **Sprint 3:** 60% Packaging, 40% UX, desktop Polish, and installer.
+
+### 4.5 Dependencies & Communication
+
+#### Dependencies
+- *External:* QEMU (hardware testing), Docker (hermetic builds), GitHub Actions (CI pipeline), Rust toolchain.
+- *Internal:* Kernel Phase 0 → Drivers → Desktop Demo → sigpkg → Package Ecosystem.
+
+#### Communication Plan
+- **Weekly Standups:**
+  - *Monday:* Sprint planning and ticket allocation.
+  - *Wednesday:* Progress checks and block resolution.
+  - *Friday:* Interactive demo and sprint retrospective.
+- **Milestone Reviews:**
+  - *Day 30:* CI Foundation review and SBOM audit.
+  - *Day 60:* Bootable Kernel and device driver audit.
+  - *Day 90:* Package ecosystem, ISO installer, and WCAG accessibility review.
+- **Stakeholder Updates:**
+  - Bi-weekly technical status reports.
+  - Monthly public demos to the open-source community.
+  - Quarterly master roadmap reviews.
+
+---
+
+## 🔮 5. Next Steps Beyond 90 Days
+
+### Immediate Next Quarter (Days 91-180)
+- Complete full file system implementations (SigmaFS, in-memory tmpfs, partition adapters).
+- Expand hardware driver coverage (native Wi-Fi 7, multi-GPU Vulkan queues).
+- Implement WebAssembly (WASM) userland runtime for portable execution.
+- Add POSIX-compatibility translation layer to support standard utilities natively.
+
+### Medium-Term (Days 181-365)
+- Reach 1,000+ curated and verified packages in public repositories.
+- Complete the local AI-assisted scheduler and GPU power-scaling engine.
+- Implement the secure, atomic S-TREE update and hot-patching mechanism.
+- Add enterprise features (fleet orchestration) and remote diagnostics.
