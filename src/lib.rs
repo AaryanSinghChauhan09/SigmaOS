@@ -1,16 +1,26 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
-#![allow(unused, clippy::all)]
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod automation;
+pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
+pub mod device;
+pub mod driver;
 pub mod drivers;
+pub mod ecosystem;
+pub mod education;
 pub mod filesystem;
+pub mod governance;
 pub mod kernel;
+pub mod legal;
 pub mod network;
+pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub mod productivity;
@@ -18,6 +28,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod support;
 pub mod virtualization;
 
 pub use accessibility::{
@@ -29,9 +40,14 @@ pub use automation::{
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
+pub use community::{
+    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
+    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
+};
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
+    StandardsComplianceManager, TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -40,19 +56,46 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
+    AdLibSynthDriver, AppleSiliconUnifiedMemoryBus, Bluetooth5_4_Adapter, CgaGraphicsDriver,
+    CxlMemoryDriver, FloppyDiskDriver, GameportJoystickDriver, GpuCommand, GpuDriver, GpuError,
+    HidError, HidKeyboardEvent, HidReportType, IdeControllerDriver, InputDriver, InputEvent,
+    InputType, IntelXeGpuDriver, KernelReleaseInfo, LinuxReleaseDriver, Longterm5_10_TpmDriver,
+    Longterm5_15_SerialDriver, Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver,
+    Longterm6_1_InputDriver, Longterm6_6_AudioDriver, MainlineGpuDriver, Ne2000NetworkDriver,
+    NetworkCommand, NetworkDriver, NetworkError, NetworkType, NvlinkBusDriver,
+    ParallelPrinterDriver, PciIdeBridge, PcieGen5NvmeDriver, PcieGen6Bridge,
+    Prepatch6_23_Rc1_AiDriver, Ps2MouseDriver, Sata3Controller, SerialMouseDriver,
+    SoundBlaster16Driver, Stable6_22_SensorDriver, StorageCommand, StorageDriver, StorageError,
+    StorageType, Thunderbolt4Controller, UdfAncientDevice, Ufs4StorageDriver, Usb4HostController,
+    UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, VgaTextModeDriver, Wifi7Adapter,
+};
+pub use ecosystem::{
+    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
+    EnterprisePartner,
+};
+pub use education::{
+    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+};
+pub use governance::{
+    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
+    RoadmapMilestone, TransparentRoadmap,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+};
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use observability::{
+    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
+    SimpleObservabilityStack,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -75,6 +118,9 @@ pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
+};
+pub use support::{
+    LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
