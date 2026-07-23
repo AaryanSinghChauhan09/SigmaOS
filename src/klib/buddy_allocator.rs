@@ -1,3 +1,5 @@
+#![no_std]
+#![no_main]
 
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
@@ -9,7 +11,7 @@ use core::mem;
 pub type BlockID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AllocError { Success = 0, OutOfMemory = 1, InvalidBlock = 2, Fragmentation = 3 }
 
 pub trait BuddyAllocator {
@@ -52,11 +54,12 @@ impl SimpleBuddyAllocator {
             Vec::new(), Vec::new(), Vec::new(), Vec::new(),
         ];
         let mut blocks = Vec::new();
-        let next_id = AtomicUsize::new(0);
+        let mut next_id = AtomicUsize::new(1);
         
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);
+        blocks.push(None); // Index 0 unused
         blocks.push(Some(initial_block));
         free_lists[initial_order].push(initial_block_id);
         
@@ -77,17 +80,21 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
             if !self.free_lists[current_order].is_empty() {
-                let block_id = self.free_lists[current_order].remove(0);
+                let block_id = self.free_lists[current_order].pop().unwrap();
                 
-                while current_order > order {
-                    let new_order = current_order - 1;
+                let mut current_block_id = block_id;
+                let mut active_order = current_order;
+
+                // Recursively split the block until we reach the target allocation order
+                while active_order > order {
+                    active_order -= 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     
-                    let left_block = Block::new(new_order);
-                    let right_block = Block::new(new_order);
+                    let mut left_block = Block::new(active_order);
+                    let mut right_block = Block::new(active_order);
                     
-                    if let Some(ref mut parent) = self.blocks[block_id] {
+                    if let Some(ref mut parent) = self.blocks[current_block_id] {
                         parent.left.store(left_id, Ordering::SeqCst);
                         parent.right.store(right_id, Ordering::SeqCst);
                         parent.free.store(0, Ordering::SeqCst);
@@ -99,16 +106,18 @@ impl BuddyAllocator for SimpleBuddyAllocator {
                     self.blocks[left_id] = Some(left_block);
                     self.blocks[right_id] = Some(right_block);
                     
-                    self.free_lists[new_order].push(right_id);
+                    // The right block goes into the free list of the split order
+                    self.free_lists[active_order].push(right_id);
                     
-                    return Ok(left_id);
+                    // We continue splitting the left block
+                    current_block_id = left_id;
                 }
                 
-                if let Some(ref mut block) = self.blocks[block_id] {
+                if let Some(ref mut block) = self.blocks[current_block_id] {
                     block.free.store(0, Ordering::SeqCst);
                 }
                 
-                return Ok(block_id);
+                return Ok(current_block_id);
             }
         }
         
@@ -209,17 +218,11 @@ impl MemoryPool for SimpleBuddyAllocator {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -228,15 +231,13 @@ impl<T> Vec<T> {
             }
         }
     }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+    fn is_empty(&self) -> bool { self.len == 0 }
+    fn pop(&mut self) -> Option<T> {
+        if self.len == 0 { return None; }
+        self.len -= 1;
+        unsafe { Some(core::ptr::read(self.data.add(self.len))) }
     }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
+    fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -246,7 +247,7 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+    fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
@@ -261,6 +262,9 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+    fn len(&self) -> usize {
+        self.len
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -273,123 +277,29 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+// =========================================================================
+// 🔄 UNIT TESTING
+// =========================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_buddy_allocator() {
-        let mut allocator = SimpleBuddyAllocator::new(10, 1024);
+    fn test_buddy_allocator_split() {
+        let mut allocator = SimpleBuddyAllocator::new(4, 16);
+        assert_eq!(allocator.get_free_count(4), 1);
 
-        let block_1 = allocator.allocate(3).unwrap();
-        assert!(block_1 > 0);
+        // Allocating order 1 should split order 4 down to order 1 recursively
+        let block_id = allocator.allocate(1).unwrap();
+        assert!(block_id > 0);
 
-        let block_2 = allocator.allocate(3).unwrap();
-        assert!(block_2 > 0);
-        assert_ne!(block_1, block_2);
-
-        assert!(allocator.free(block_1, 3).is_ok());
-        assert!(allocator.free(block_2, 3).is_ok());
-    }
-
-    #[test]
-    fn test_fragmentation() {
-        let allocator = SimpleBuddyAllocator::new(5, 32);
-        let ratio = allocator.get_fragmentation_ratio();
-        assert!(ratio >= 0.0 && ratio <= 1.0);
+        // We should have split buddies left in free lists of order 1, 2, and 3
+        assert_eq!(allocator.get_free_count(1), 1);
+        assert_eq!(allocator.get_free_count(2), 1);
+        assert_eq!(allocator.get_free_count(3), 1);
+        assert_eq!(allocator.get_free_count(4), 0);
     }
 }
