@@ -50,7 +50,76 @@ SigmaOS utilizes a unified **EEVDF (Earliest Eligible Virtual Deadline First) Sc
 
 ---
 
-## 📅 5. Step-by-Step Implementation Roadmap
+## 🧠 5. CPU ALU, CU, & Processor Registers Context-Saving (Rust / Assembly)
+
+To achieve zero preemption overhead during context switching under RT profiles, SigmaOS optimizes low-level processor state handling:
+*   **Arithmetic Logic Unit (ALU) & Control Unit (CU)**: Low-level interrupt controllers lock pipeline execution during critical sections to prevent instruction decoding bubble states.
+*   **Vector/FPU Register Spill Optimization**: Rather than saving all 512-bit AVX/SIMD vector registers on every switch, SigmaOS utilizes a **lazy register allocation** trap. FPU and vector registers are only saved/restored if the newly scheduled thread actually executes an ALU vector instruction.
+
+```rust
+// Unified low-level CPU register context state representing a thread switch context
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct CpuRegisterContext {
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rbp: u64,
+    pub rsp: u64,
+    pub rip: u64,
+    pub rflags: u64,
+    pub fpu_saved: bool, // Lazy saving flag for SIMD/FPU ALU registers
+}
+
+impl CpuRegisterContext {
+    pub fn new() -> Self {
+        Self {
+            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0,
+            rbp: 0, rsp: 0, rip: 0, rflags: 0x200, fpu_saved: false,
+        }
+    }
+}
+```
+
+---
+
+## 📋 6. Core Automation, Macro Recording, and Auto-Optimization Subsystems (Rust)
+
+To match the automation power of modern environments, SigmaOS implements:
+*   **Task Scheduler**: A lock-free, chronological job execution list that parses crontab syntax.
+*   **Macro Recorder & Auto-Optimizer**: Records system-wide user shell inputs into `.sigma-macro` scripts, and invokes adaptive cache/performance governor tuning dynamically.
+
+```rust
+// Represents a scheduled automation task trigger
+#[derive(Debug, Clone, Copy)]
+pub struct AutomationTask {
+    pub id: usize,
+    pub cron_hour: u8,
+    pub cron_minute: u8,
+    pub require_ac_power: bool,
+}
+
+pub struct AutomationEngine {
+    pub is_recording_macro: bool,
+    pub is_idle_optimization_enabled: bool,
+}
+
+impl AutomationEngine {
+    pub fn new() -> Self {
+        Self {
+            is_recording_macro: false,
+            is_idle_optimization_enabled: true,
+        }
+    }
+}
+```
+
+---
+
+## 📅 7. Step-by-Step Implementation Roadmap
 
 - [ ] **Phase 1 (Verification)**: Complete EEVDF real-time priority schedules and HPC bypass hooks in `src/kernel/scheduler.rs`.
 - [ ] **Phase 2 (Zig HPC Shard)**: Develop low-latency clustering communication and direct DMA bypass drivers in Zig.

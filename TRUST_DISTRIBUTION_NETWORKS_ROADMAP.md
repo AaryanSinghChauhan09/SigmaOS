@@ -51,7 +51,48 @@ Monolithic package trust models rely on standard legacy GPG signatures, which ar
 
 ---
 
-## 📅 5. Step-by-Step Implementation Roadmap
+## 🛠️ 5. Compiler, Linker, Assembler, and Database Recipes Specifications (Rust)
+
+To compile and package foundational system utilities and development tools (Compilers, Linkers, Assemblers, and Database engines) in a fully reproducible and secure environment, SigmaOS defines custom secure packages:
+
+```rust
+// Representing a system developer package recipe mapping
+#[derive(Debug, Clone)]
+pub struct DevToolRecipe {
+    pub package_name: &'static str,
+    pub compiler_args: &'static str,
+    pub is_statically_linked: bool,
+    pub optimization_level: u32,
+}
+
+pub fn get_core_devtool_recipe(name: &str) -> Option<DevToolRecipe> {
+    match name {
+        "sovereign-rustc" => Some(DevToolRecipe {
+            package_name: "sovereign-rustc",
+            compiler_args: "-C target-feature=+crt-static -C opt-level=3",
+            is_statically_linked: true,
+            optimization_level: 3,
+        }),
+        "sovereign-ld" => Some(DevToolRecipe {
+            package_name: "sovereign-ld",
+            compiler_args: "--gc-sections --strip-all",
+            is_statically_linked: true,
+            optimization_level: 2,
+        }),
+        "sovereign-dbms" => Some(DevToolRecipe {
+            package_name: "sovereign-dbms",
+            compiler_args: "-C opt-level=3 -C codegen-units=1",
+            is_statically_linked: true,
+            optimization_level: 3,
+        }),
+        _ => None,
+    }
+}
+```
+
+---
+
+## 📅 6. Step-by-Step Implementation Roadmap
 
 - [ ] **Phase 1 (Validation)**: Complete rich metadata fields (licenses, maintainers, mirrors) inside `src/sigpkg/mod.rs` and package specs.
 - [ ] **Phase 2 (Zig Cryptochain)**: Write optimized Dilithium-5 parsing routines in Zig.
