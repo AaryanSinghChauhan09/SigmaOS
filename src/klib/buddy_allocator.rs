@@ -2,7 +2,6 @@
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -79,7 +78,7 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].remove(0);
                 
-                while current_order > order {
+                if current_order > order {
                     let new_order = current_order - 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -390,6 +389,6 @@ mod tests {
     fn test_fragmentation() {
         let allocator = SimpleBuddyAllocator::new(5, 32);
         let ratio = allocator.get_fragmentation_ratio();
-        assert!(ratio >= 0.0 && ratio <= 1.0);
+        assert!((0.0..=1.0).contains(&ratio));
     }
 }

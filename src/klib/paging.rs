@@ -1,7 +1,6 @@
 /// OOP-based Paging + Virtual Memory for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 7-8
 /// Implements 4-level page tables, PML4, userspace isolation, page fault handling
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -39,6 +38,12 @@ pub struct SimplePageTableEntry {
     pub physical_addr: AtomicUsize,
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
+}
+
+impl Default for SimplePageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimplePageTableEntry {
@@ -101,12 +106,13 @@ impl SimplePageTable {
 }
 
 impl PageTable for SimplePageTable {
+    #[allow(clippy::deref_addrof)]
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry {
         if index < 512 {
             &mut self.entries[index]
         } else {
             static mut DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            unsafe { &mut *(&raw mut DUMMY as *mut SimplePageTableEntry) }
+            unsafe { &mut *(&raw mut DUMMY) }
         }
     }
     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry {
@@ -140,6 +146,12 @@ pub struct SimpleVMM {
     pub pd_tables: Vec<Option<SimplePageTable>>,
     pub pt_tables: Vec<Option<SimplePageTable>>,
     pub next_table_addr: AtomicUsize,
+}
+
+impl Default for SimpleVMM {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleVMM {
@@ -346,6 +358,12 @@ pub struct SimpleProcessMemory {
     pub next_id: AtomicUsize,
 }
 
+impl Default for SimpleProcessMemory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleProcessMemory {
     pub fn new() -> Self {
         SimpleProcessMemory {
@@ -379,7 +397,7 @@ impl ProcessMemory for SimpleProcessMemory {
             return Err(PageFaultError::InvalidAddress);
         }
         if let Some(ref mut vmm) = self.address_spaces[space_id] {
-            let page_count = (size + 4095) / 4096;
+            let page_count = size.div_ceil(4096);
             for i in 0..page_count {
                 let virt = base + i * 4096;
                 let phys = 0x1000000 + i * 4096;
