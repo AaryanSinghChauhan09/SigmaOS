@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Container ID
 pub type ContainerID = usize;
@@ -165,7 +164,12 @@ pub struct SimpleContainer {
 }
 
 impl SimpleContainer {
-    pub fn new(id: ContainerID, name: &[u8], image: &[u8], capability: ContainerCapability) -> Self {
+    pub fn new(
+        id: ContainerID,
+        name: &[u8],
+        image: &[u8],
+        capability: ContainerCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let mut image_array = [0u8; 128];
 
@@ -188,9 +192,20 @@ impl SimpleContainer {
             capability,
             environment: [0; 512],
             network_type: ContainerNetworkType::None,
-            volume: ContainerVolume { is_bind_mount: false, is_tmpfs: false, read_only: false },
-            namespace: ContainerNamespace { uid_mapping: 0, gid_mapping: 0, rootless: false },
-            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
+            volume: ContainerVolume {
+                is_bind_mount: false,
+                is_tmpfs: false,
+                read_only: false,
+            },
+            namespace: ContainerNamespace {
+                uid_mapping: 0,
+                gid_mapping: 0,
+                rootless: false,
+            },
+            seccomp: SeccompProfile {
+                hardened: false,
+                blocked_syscalls_mask: 0,
+            },
         }
     }
 
@@ -311,7 +326,12 @@ impl Container for SimpleContainer {
 /// Container runtime trait (OOP interface)
 pub trait ContainerRuntime {
     /// Create container
-    fn create_container(&mut self, name: &[u8], image: &[u8], capability: ContainerCapability) -> Result<ContainerID, ContainerError>;
+    fn create_container(
+        &mut self,
+        name: &[u8],
+        image: &[u8],
+        capability: ContainerCapability,
+    ) -> Result<ContainerID, ContainerError>;
     /// Remove container
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
     /// Start container
@@ -398,7 +418,12 @@ impl SimpleContainerRuntime {
 }
 
 impl ContainerRuntime for SimpleContainerRuntime {
-    fn create_container(&mut self, name: &[u8], image: &[u8], capability: ContainerCapability) -> Result<ContainerID, ContainerError> {
+    fn create_container(
+        &mut self,
+        name: &[u8],
+        image: &[u8],
+        capability: ContainerCapability,
+    ) -> Result<ContainerID, ContainerError> {
         if !self.capability.can_create {
             return Err(ContainerError::PermissionDenied);
         }
@@ -609,7 +634,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -653,13 +682,24 @@ mod tests {
     #[test]
     fn test_container_creation() {
         let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime.create_container(b"sovereign_container", b"ubuntu-pqc", ContainerCapability::full()).unwrap();
+        let id = runtime
+            .create_container(
+                b"sovereign_container",
+                b"ubuntu-pqc",
+                ContainerCapability::full(),
+            )
+            .unwrap();
         assert_eq!(id, 1);
     }
 
     #[test]
     fn test_container_oci_networking_and_volumes() {
-        let mut container = SimpleContainer::new(1, b"web_app", b"nginx-dilithium", ContainerCapability::full());
+        let mut container = SimpleContainer::new(
+            1,
+            b"web_app",
+            b"nginx-dilithium",
+            ContainerCapability::full(),
+        );
 
         // Assert network parity bridge setting
         assert_eq!(container.network_type, ContainerNetworkType::None);
@@ -674,7 +714,12 @@ mod tests {
 
     #[test]
     fn test_container_namespaces_and_seccomp() {
-        let mut container = SimpleContainer::new(1, b"secure_sandbox", b"alpine-kyber", ContainerCapability::full());
+        let mut container = SimpleContainer::new(
+            1,
+            b"secure_sandbox",
+            b"alpine-kyber",
+            ContainerCapability::full(),
+        );
 
         // Assert namespace uid mappings
         assert_eq!(container.namespace.uid_mapping, 0);

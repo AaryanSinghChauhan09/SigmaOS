@@ -107,21 +107,10 @@ impl Scheduler {
             }
         }
 
-        let eligible = self
-            .processes
+        self.processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
-            .min_by_key(|p| p.virtual_deadline);
-
-        if eligible.is_some() {
-            eligible
-        } else {
-            // Fallback: choose the ready process with the earliest deadline if none are strictly eligible
-            self.processes
-                .iter()
-                .filter(|p| p.state == ProcessState::Ready)
-                .min_by_key(|p| p.virtual_deadline)
-        }
+            .min_by_key(|p| p.virtual_deadline)
     }
 
     pub fn tick(&mut self) {
@@ -172,10 +161,9 @@ mod tests {
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
 
-        // Advance time so that virtual deadline (current_time + 3) is reached
-        scheduler.tick();
-        scheduler.tick();
-        scheduler.tick();
+        for _ in 0..5 {
+            scheduler.tick();
+        }
 
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());

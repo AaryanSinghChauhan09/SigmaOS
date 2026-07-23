@@ -1,244 +1,65 @@
-# 🗺️ SigmaOS Future Development Roadmap
-## Based on Modern Linux Distribution Best Practices
-### Version: 1.0 Date: July 2026 Target: Next-Generation Operating System Excellence
+# 🚀 SigmaOS Future Development & Leapfrog Roadmap
+
+This document establishes the strategic, long-term engineering plan for the future expansion and leapfrogging capabilities of **SigmaOS's core subsystems**, focusing on package distribution, system observability, compatibility standards, and high-performance real-time scheduling.
 
 ---
 
-## 🏛️ Executive Summary
+## 🏗️ 1. Technical Vision: Outclassing Mainstream OS Ecosystems
 
-This roadmap outlines strategic improvements for **SigmaOS** by leveraging proven techniques from leading Linux distributions (Arch Linux, Fedora/Red Hat, Debian/Ubuntu, openSUSE, Alpine, Gentoo, Solus, and Clear Linux). The focus areas include performance optimization, security hardening, package management innovation, atomic updates, and enhanced user experience.
+Traditional monolithic kernels and release distributions introduce architectural bottlenecks. SigmaOS utilizes **Zero-Dependency, Multi-Language Hybrid Shards** and **Capability-Based Sandboxing** to achieve superior security, determinism, and developer agility.
 
-### Key Objectives:
-- Achieve 30-40% performance improvement through kernel and I/O optimization.
-- Implement atomic update mechanism with instant rollback capability.
-- Enhance security posture with zero-trust architecture.
-- Develop modern package management with dependency resolution.
-- Improve user experience with declarative configuration and automation.
-
----
-
-## 📊 Performance Optimization Roadmap
-
-### Phase 1: Kernel-Level Optimizations (Priority: HIGH)
-
-#### 1.1 Dynamic Kernel Tuning Profiles
-*Inspired by: Ubuntu 24.04 low-latency tunables, Clear Linux patches*
-
-Develop a profile-based kernel parameter system with three modes:
-- **Low-Latency Profile:** For gaming, multimedia, real-time applications.
-- **Throughput Profile:** For servers, HPC, batch processing.
-- **Power-Efficiency Profile:** For laptops, mobile devices.
-
-```rust
-pub struct KernelProfile {
-    pub preemption_mode: PreemptionMode,  // VOLUNTARY, FULL, NONE
-    pub tickless_cpus: Vec<CpuId>,        // nohz_full
-    pub rcu_lazy: bool,                   // rcutree.enable_rcu_lazy
-    pub cpu_governor: CpuGovernor,        // performance, powersave, schedutil
-}
-
-pub enum PreemptionMode {
-    Voluntary,    // Balanced throughput
-    Full,         // Low latency (gaming/multimedia)
-    None,         // Maximum throughput (servers)
-}
 ```
-
-*Expected Impact:* 15-25% latency reduction for interactive workloads.
-
-#### 1.2 Advanced Memory Management
-*Inspired by: Linux 6.1+ MGLRU, modern kernel tuning guides*
-
-- Implement Multi-Gen LRU (MGLRU) for better memory management.
-- Add transparent huge pages (THP) with smart defrag policies.
-- Develop adaptive swappiness based on workload patterns.
-
-```rust
-pub struct MemoryConfig {
-    pub swappiness: u8,              // 1-100, adaptive based on workload
-    pub thp_enabled: bool,
-    pub thp_defrag: ThpDefragMode,
-    pub dirty_ratio: u8,            // Percentage of memory for dirty pages
-    pub dirty_background_ratio: u8,
-    pub vfs_cache_pressure: u8,
-}
-```
-
-*Expected Impact:* 20-30% reduction in memory pressure for memory-intensive workloads.
-
-#### 1.3 I/O Subsystem Optimization
-*Inspired by: Modern Linux I/O scheduler tuning, io_uring*
-
-- Implement adaptive I/O scheduler selection:
-  - `deadline` for HDDs
-  - `none`/`noop` for SSDs/NVMe
-  - `bfq` for desktop responsiveness
-- Integrate `io_uring` for async I/O operations.
-- Develop intelligent read-ahead based on access patterns.
-
-*Expected Impact:* 30-40% improvement in I/O throughput.
-
-#### 1.4 Network Stack Optimization
-*Inspired by: BBR congestion control, modern TCP tuning*
-
-- Default to BBR congestion control (vs cubic).
-- Implement TCP buffer auto-tuning.
-- Add zero-copy networking for high-throughput scenarios.
-
-```rust
-pub struct NetworkConfig {
-    pub congestion_control: CongestionControl,  // BBR, cubic, bbr2
-    pub tcp_rmem: [usize; 3],                   // Min, default, max
-    pub tcp_wmem: [usize; 3],
-    pub tcp_slow_start_after_idle: bool,
-    pub tcp_fastopen: bool,
-}
-```
-
-*Expected Impact:* 25-35% improvement in network throughput.
-
----
-
-### Phase 2: Scheduler and CPU Optimization (Priority: HIGH)
-
-#### 2.1 EEVDF Scheduler Integration
-*Inspired by: Linux 6.6+ EEVDF scheduler*
-
-- Migrate from CFS to EEVDF (Earliest Eligible Virtual Deadline First).
-- Implement `latency-nice` for latency-sensitive tasks.
-- Add NUMA-aware scheduling for multi-socket systems.
-
-*Expected Impact:* 10-15% improvement in task scheduling fairness.
-
-#### 2.2 CPU Frequency Scaling
-*Inspired by: Modern CPU governor implementations*
-
-- Implement intelligent CPU governor selection:
-  - `performance` for consistent high performance.
-  - `schedutil` for responsive desktop.
-  - `powersave` for battery life.
-- Add per-CPU frequency control for heterogeneous CPUs (big.LITTLE).
-
-*Expected Impact:* 15-20% power efficiency improvement for mobile devices.
-
----
-
-## 📦 Package Management & Dependency Handling
-
-### Phase 1: Modern Package Manager Architecture (Priority: HIGH)
-
-#### 1.1 Sigma Package Manager (SPM) Design
-*Inspired by: Pacman (speed), DNF5 (features), Nix (reproducibility)*
-
-```rust
-pub struct SigmaPackageManager {
-    pub backend: PackageBackend,
-    pub resolver: DependencyResolver,
-    pub repository: Repository,
-    pub cache: PackageCache,
-}
-
-pub enum PackageBackend {
-    Native,      // Custom SigmaOS format (.sigma)
-    Ostree,      // For atomic updates
-    Container,   // OCI-compatible containers
-}
-
-pub enum DependencyResolver {
-    Topological,    // Fast, simple (like Pacman)
-    SatSolver,      // Advanced (like DNF/Zypper)
-    Functional,     // Reproducible (like Nix)
-}
-```
-
-- **Fast installation:** ZSTD compression, parallel downloads.
-- **SAT solver:** Advanced dependency resolution with conflict handling.
-- **Delta updates:** Binary diffs for efficient updates.
-- **Transaction history:** Rollback capability for package operations.
-- **Content-addressed storage:** Deduplication like Nix/OSTree.
-
----
-
-## 🛡️ Security Hardening & Isolation
-
-### Phase 1: Kernel-Level Security (Priority: HIGH)
-
-#### 1.1 Mandatory Access Control (MAC)
-*Inspired by: SELinux, AppArmor, capability tokens*
-
-- Extend existing capability tokens with MAC policies.
-- Implement profile-based confinement like AppArmor.
-- Add per-process security contexts.
-
-```rust
-pub struct SecurityContext {
-    pub capability_tokens: u64,           // Existing
-    pub mac_profile: Option<String>,      // New: MAC profile
-    pub namespace: NamespaceConfig,        // Enhanced
-    pub seccomp_filter: SeccompFilter,     // New
-}
-
-pub struct SeccompFilter {
-    pub allowed_syscalls: HashSet<Syscall>,
-    pub denied_syscalls: HashSet<Syscall>,
-    pub default_action: SeccompAction,
-}
+       +-------------------------------------------------------+
+       |                  Sovereign Core Shards                |
+       +-------------------------------------------------------+
+            |                        |                       |
+            v                        v                       v
+   +-----------------+      +-----------------+      +-----------------+
+   |   PQC Spec v2   |      |  SigmaTrace VM  |      |   POSIX Tiers   |
+   | (Kyber/Dilithium|      | (Low-Overhead)  |      | (Modular Subs)  |
+   +-----------------+      +-----------------+      +-----------------+
 ```
 
 ---
 
-## 🏛️ Atomic Updates & Rollback Mechanisms
+## 📦 2. Domain 1: Package Distribution & Quantum-Safe Trust (Rust)
 
-### Phase 1: OSTree Integration (Priority: HIGH)
-
-```rust
-pub struct AtomicUpdateSystem {
-    pub ostree_repo: OstreeRepo,
-    pub deployments: Vec<Deployment>,
-    pub bootloader: BootloaderManager,
-}
-
-pub struct Deployment {
-    pub id: String,
-    pub checksum: String,
-    pub timestamp: DateTime,
-    pub kernel: KernelVersion,
-    pub status: DeploymentStatus,
-}
-
-pub enum DeploymentStatus {
-    Booted,
-    Pending,
-    RolledBack,
-}
-```
+### 2.1 Next-Gen Package Recipes & Trust Chains
+- **Inspiration**: Secure Debian APT, Nix, and Gentoo Portage.
+- **Future Architecture**: Package recipes will be extended with complete post-quantum cryptography (PQC) validation keys (using Kyber-1024 and Dilithium-5) to completely replace standard legacy GPG signing, defending against future quantum computing attacks.
+- **Reproducible Build Pipeline**: Integrate standard build environment variables (such as `SOURCE_DATE_EPOCH` in compilation Makefile pipelines) to achieve 100% bit-for-bit deterministic, reproducible binary artifacts.
 
 ---
 
-## 🎨 User Experience & Declarative Configuration
+## 🔍 3. Domain 2: Low-Overhead Kernel & System Observability (Rust / Zig)
 
-### Phase 1: Declarative Configuration (Priority: HIGH)
+### 3.1 Sandboxed eBPF-like Dynamic Tracing
+- **Inspiration**: Linux `eBPF`/`perf` and BSD `DTrace`.
+- **Future Architecture**: Extend the observability stack (`src/observability/stack.rs`) with custom `SigmaTrace` sandboxed dynamic probing VMs, allowing developers to safely hook system calls and schedulers events with near-zero trace overhead.
+- **Prometheus-ready Telemetry**: Automate the collection of memory allocators fragmentation and page-fault metrics to expose through high-speed, lock-free `SigmaMetrics` endpoints.
 
-```yaml
-# /etc/sigma/system.yaml
-system:
-  hostname: "sigmaos-workstation"
-  timezone: "UTC"
-  locale: "en_US.UTF-8"
+---
 
-kernel:
-  profile: "low-latency"
-  parameters:
-    - "quiet"
-    - "splash"
+## ⚖️ 4. Domain 3: Interoperability, FHS, & POSIX Tiers (Rust / Zig)
 
-packages:
-  - name: "sigma-editor"
-  - name: "sigma-terminal"
-  - name: "development-tools"
+### 4.1 Modular Compatibility Layers
+- **Inspiration**: LSB (Linux Standard Base), Wine, and macOS Rosetta.
+- **Future Architecture**: Implement modular POSIX compatibility tiers inside `src/compatibility/` where POSIX syscall assumptions are translated to capability-gated IPC transactions in user-space, avoiding kernel bloat.
+- **FHS Overlay Symlinks**: Mount standard compliance paths (e.g. `/bin`, `/etc`, `/usr/lib`, `/var`) dynamically using capability-gated overlays over our distributed, immutable sovereign file system.
 
-security:
-  mac_policy: "enforcing"
-  firewall: "enabled"
-  automatic_updates: true
-```
+---
+
+## ⚡ 5. Domain 4: Real-Time EEVDF & HPC Cluster Scheduling (Rust)
+
+### 5.1 Hard Preemption RT and Slurm-style Clustering
+- **Inspiration**: Linux `PREEMPT_RT` and HPC `Slurm`/`MPI`.
+- **Future Architecture**: Tune the EEVDF scheduler in `src/kernel/scheduler.rs` with hard preemption paths for RT priorities, guaranteeing bounded interrupt handling latencies.
+- **Clustered Memory-Bypass Routing**: Support memory mapped DMA bypass for MPI-based supercomputing clusters, ensuring microsecond message-passing latency.
+
+---
+
+## 📅 6. Step-by-Step Implementation Roadmap
+
+- [ ] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
+- [ ] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
+- [ ] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
