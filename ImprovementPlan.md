@@ -88,7 +88,34 @@ SigmaOS integrates four core strategic features that differentiate it from mains
 
 ---
 
-## 🔍 6. Comprehensive Multi-Dimensional Audit
+## 🧩 6. Core Components & Suggested Improvements
+
+| Linux Component | Role in Distros | Improvements for SigmaOS |
+| :--- | :--- | :--- |
+| **Kernel** | Links software to hardware, manages resources | - Maintain microkernel design for strict modularity<br>- Add AI-driven scheduling (predictive, energy-aware EAS)<br>- Integrate post-quantum cryptography primitives |
+| **GNU Tools** | Shell, compiler, boot loader, utilities | - Modernize Bash shell with AI-assisted S-CLI<br>- Add self-healing utilities to auto-recover configurations<br>- Provide safe Rust-based replacements for legacy utilities |
+| **Boot Loader (GRUB)** | Loads kernel and OS components | - Develop a secure, minimal boot loader with quantum-safe signatures<br>- Add rollback and forensic recovery features like NixOS |
+| **Shell (Bash/Zsh)** | Command-line interface | - AI-enhanced shell supporting natural language commands<br>- Context-aware autocomplete, error correction, and plain language explanations |
+| **Display Server (X/Wayland)** | Renders GUI | - Replace legacy X/Wayland with Zenith secure, lightweight compositor<br>- Add GPU-aware scheduling directly for AI and rendering workloads |
+| **Display Manager (GDM/LightDM)** | Login and session management | - Unified identity system with biometric / AI authentication<br>- Support multi-tenant secure virtual sessions |
+| **Daemons (systemd)** | Background services | - Capability-based process and daemon isolation<br>- AI-driven service orchestration<br>- Replace monolithic systemd with modular S-VOID shards |
+| **Package Manager (APT/DNF/Pacman)** | Installs and manages software | - AI-native package manager featuring predictive cache sizing<br>- Universal package format (SigmaAppImage) to avoid cross-distro fragmentation<br>- Built-in sandboxing and Merkle signature validation |
+| **Desktop Environment (GNOME/KDE)** | GUI, libraries, user apps | - Sovereign, lightweight desktop with AI-native widgets<br>- Integrate voice/gesture control and unified access layers<br>- Modular UI toolkit for embedded devices |
+| **User Applications** | Everyday software | - Sovereign alternatives (privacy-first browser, AI-native office suite)<br>- Built-in ML model deployment tools<br>- Quantum-safe communication applications |
+
+---
+
+## 🌟 7. Key Areas Where SigmaOS Can Leap Ahead
+
+1.  **AI-Native Kernel Scheduling:** Predict workloads, optimize energy profiles dynamically, and guarantee absolute Quality of Service (QoS) across parallel tasks.
+2.  **Post-Quantum Security:** Bake quantum-safe cryptography (Kyber-1024, Dilithium-5) natively into every communication, compilation, and storage layer.
+3.  **Self-Healing Utilities:** Auto-detect and fix misconfigurations or system crashes using active watchdogs and sub-millisecond rollback points.
+4.  **Universal Packaging:** One signed, read-only container format (SigmaAppImage) executing seamlessly across all environments with hardware-gated capabilities.
+5.  **Sovereign Desktop:** Lightweight, modular, and privacy-first visual core rendering directly on standard hardware framebuffers.
+
+---
+
+## 🔍 8. Comprehensive Multi-Dimensional Audit
 
 ### Area 1: Code Quality & Testing
 *   **Merge Conflict Resolution:** Successfully resolved git merge conflict markers and delimiter issues in `src/lib.rs` and `src/compatibility/mod.rs` (checking out files from the stable `047f70e` commit).
@@ -147,7 +174,7 @@ SigmaOS integrates four core strategic features that differentiate it from mains
 
 ---
 
-## ⚖️ 7. Legal Professionals Tools Enhancement
+## ⚖️ 9. Legal Professionals Tools Enhancement
 
 SigmaOS provides a robust, professional suite of tools designed to automate licensing compliance and legal analysis:
 1.  **Contract Audit & Risk Assessment (`audit_contract_text`):** Automates risk scanning of legal agreements (NDAs, Terms of Service, SLAs). Detects critical risks such as unilateral modifications, lack of liability caps, broad intellectual property transfer, and over-permissive indemnification. Returns risk level ratings and tailored mitigation recommendations.
@@ -156,7 +183,7 @@ SigmaOS provides a robust, professional suite of tools designed to automate lice
 
 ---
 
-## 🌀 8. Ubuntu Linux Distros Ecosystem Parity Tools
+## 🌀 10. Ubuntu Linux Distros Ecosystem Parity Tools
 
 SigmaOS natively absorbs and improves the core productivity tools and orchestration architectures from several prominent Ubuntu Linux distributions:
 1.  **Ubuntu Desktop (`UbuntuAptEngine`):** Emulates advanced package installation (`apt-get install`), repository list syncs, and Launchpad Personal Package Archives (PPAs). Resolves dynamic package topologies efficiently.
@@ -167,7 +194,7 @@ SigmaOS natively absorbs and improves the core productivity tools and orchestrat
 
 ---
 
-## 🤖 9. AI-Native Automation Core & Agent
+## 🤖 11. AI-Native Automation Core & Agent
 
 SigmaOS integrates a zero-dependency, local AI agent (`SimpleAIAgent`) executing directly on standard memory ranges:
 1.  **Natural Language Command Translator (`translate_natural_command`):** Translates natural language requests into direct, executable system actions. Supports major Indian languages (Hindi, Tamil, Bengali) along with standard English commands (e.g. converting *"libreoffice install karo"* or *"லிப்ரேஆபிஸ் நிறுவவும்"* dynamically to `sigpkg install libreoffice`).
@@ -176,7 +203,20 @@ SigmaOS integrates a zero-dependency, local AI agent (`SimpleAIAgent`) executing
 
 ---
 
-## 🛠️ 10. Expanded Systems Engineering Roles
+## 🧰 12. Core SigmaTools Suite & System Utilities
+
+SigmaOS includes a robust, pre-installed suite of diagnostic and recovery toolsets running natively under strict `#![no_std]` constraints:
+1.  **SigmaDeploy:** Operates automated netboot TFTP/DHCP provisioning using pre-configured kickstart/preseed configuration graphs.
+2.  **SigmaCluster:** Integrates task grids and cluster node states natively, managing queuing latency and task structures.
+3.  **SigmaIdentity:** Integrates enterprise directory authentications (LDAP and Kerberos) directly inside secure capability domains.
+4.  **SigmaAccess:** Houses voice synthesis screen-readers, magnification lenses, and SIMD contrast controllers directly in the Zenith composition loop.
+5.  **SigmaPatch (`SigmaPatch`):** Integrates live zero-downtime microkernel hot-patching. Slices newly compiled instruction streams directly inside memory registers by remapping physical page frames on-the-fly.
+6.  **SigmaRescue (`SigmaRescue`):** An emergency cold-boot shell providing direct partition walks to inspect and re-point filesystems back to previous secure Merkle roots.
+7.  **SigmaMonitor (`SigmaMonitor`):** A zero-allocation performance telemetry monitor tracking CPU core temperatures, context-switching latency loops, and memory leak gradients continuously.
+
+---
+
+## 🛠️ 13. Expanded Systems Engineering Roles
 
 To successfully satisfy the 100-item parity roadmap and achieve full boot integration, SigmaOS establishes eight specialized, non-overlapping systems engineering roles within the developer community:
 *   **Compiler & Language Toolchain Engineer:** Focuses on the LLVM backend, ELF loaders, and bootstrapping compilers natively. Maintains low-level compiler-rt libraries.
@@ -190,7 +230,7 @@ To successfully satisfy the 100-item parity roadmap and achieve full boot integr
 
 ---
 
-## 📟 11. SovereignCLI Command-Line Synthesis Engine (S-CLI)
+## 📟 14. SovereignCLI Command-Line Synthesis Engine (S-CLI)
 
 SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
 *   **CliCommandRegistry Singleton:** Tracks and exposes all active commands available to userspace. Maps textual command paths (e.g., `zenith window tile`) to distinct `CliCommand` object instances.
@@ -204,7 +244,7 @@ SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates th
 
 ---
 
-## 📡 12. Automated Upstream Intelligence & Daily Updates Scanning
+## 📡 15. Automated Upstream Intelligence & Daily Updates Scanning
 
 To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine:
 1.  **The "Sigma Updater" Engine:** Continuously monitors the repository trees of the Linux Kernel (mainline, stable, and LTS branches), LLVM, GCC, and musl/glibc projects. Identifies, parses, and maps upstream security fixes directly to capability rings in SigmaOS.
@@ -212,7 +252,7 @@ To guarantee continuous parity and eventual domination over mainstream Linux dis
 
 ---
 
-## 💎 13. Core Systems OOP Implementation Specifications
+## 💎 16. Core Systems OOP Implementation Specifications
 
 To maintain absolute architectural safety, all implementations across core systems must strictly adhere to the following Object-Oriented systems principles:
 *   **Networking & Connectivity:** Dynamic network sockets are modeled as polymorphically isolated `Connection` objects. Each socket represents a concrete implementation of the base abstract `SocketChannel` class, enforcing encapsulating bounds on physical ring-buffer frames.
@@ -225,14 +265,14 @@ To maintain absolute architectural safety, all implementations across core syste
 
 ---
 
-## ⚡ 14. Bolt's Daily Performance Optimization
+## ⚡ 17. Bolt's Daily Performance Optimization
 
 Today's Bolt performance improvement focuses on **Allocation-Free Version Parsing and Zero-Copy top-level interfaces**.
 By replacing intermediate heap allocations with lazy slice iterators, we completely eliminate memory churn in package installation and dynamic dependency resolution, making the `sigpkg` engine fast and lightweight under intensive workspace loads.
 
 ---
 
-## 🚀 15. Prioritized Next Steps & Action Plan
+## 🚀 18. Prioritized Next Steps & Action Plan
 
 | Task | Description | Priority | Target Subsystem |
 | :--- | :--- | :---: | :---: |
