@@ -367,6 +367,310 @@ pub mod zenithnet {
 }
 
 // ============================================================================
+// 8. ROADMAP_INNOVATIONS — Multi-Distro Architectural Solutions
+// ============================================================================
+
+pub mod roadmap_innovations {
+    use alloc::vec::Vec;
+    use alloc::string::String;
+    use alloc::string::ToString;
+    use alloc::collections::BTreeSet;
+
+    // 8.1 Kernel Profiles
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PreemptionMode {
+        Voluntary,
+        Full,
+        None,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum CpuGovernor {
+        Performance,
+        Powersave,
+        Schedutil,
+    }
+
+    pub struct KernelProfile {
+        pub preemption_mode: PreemptionMode,
+        pub tickless_cpus: Vec<u32>,
+        pub rcu_lazy: bool,
+        pub cpu_governor: CpuGovernor,
+    }
+
+    // 8.2 Memory Configuration
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum ThpDefragMode {
+        Always,
+        Defer,
+        Never,
+    }
+
+    pub struct MemoryConfig {
+        pub swappiness: u8,
+        pub thp_enabled: bool,
+        pub thp_defrag: ThpDefragMode,
+        pub dirty_ratio: u8,
+        pub dirty_background_ratio: u8,
+        pub vfs_cache_pressure: u8,
+    }
+
+    // 8.3 Network Configuration
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum CongestionControl {
+        Bbr,
+        Cubic,
+        Bbr2,
+    }
+
+    pub struct NetworkConfig {
+        pub congestion_control: CongestionControl,
+        pub tcp_rmem: [usize; 3],
+        pub tcp_wmem: [usize; 3],
+        pub tcp_slow_start_after_idle: bool,
+        pub tcp_fastopen: bool,
+    }
+
+    // 8.4 Advanced Package Manager & Layering
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PackageBackend {
+        Native,
+        Ostree,
+        Container,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DependencyResolver {
+        Topological,
+        SatSolver,
+        Functional,
+    }
+
+    pub struct PackageMetadata {
+        pub name: String,
+        pub version: String,
+        pub dependencies: Vec<String>,
+    }
+
+    pub struct SigmaPackageManager {
+        pub backend: PackageBackend,
+        pub resolver: DependencyResolver,
+        pub installed: Vec<PackageMetadata>,
+    }
+
+    impl SigmaPackageManager {
+        pub fn new(backend: PackageBackend, resolver: DependencyResolver) -> Self {
+            Self {
+                backend,
+                resolver,
+                installed: Vec::new(),
+            }
+        }
+
+        pub fn install_package(&mut self, pkg: PackageMetadata) -> Result<(), &'static str> {
+            self.installed.push(pkg);
+            Ok(())
+        }
+    }
+
+    // 8.5 Enhanced Sandbox
+    pub struct ResourceLimit {
+        pub value: u64,
+        pub soft: bool,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum NetworkIsolation {
+        None,
+        HostOnly,
+        IsolatedNamespace,
+    }
+
+    pub struct EnhancedSandbox {
+        pub cpu_limit: Option<ResourceLimit>,
+        pub memory_limit: Option<ResourceLimit>,
+        pub network_isolation: NetworkIsolation,
+        pub seccomp_allowed: BTreeSet<u32>,
+    }
+
+    // 8.6 GreenBoot-Style Health Checker
+    pub struct HealthChecker {
+        pub checks: Vec<String>,
+        pub rollback_on_failure: bool,
+    }
+
+    impl HealthChecker {
+        pub fn run_diagnostics(&self) -> bool {
+            !self.checks.is_empty()
+        }
+    }
+
+    // 8.7 Solus-Inspired Desktop Configurations
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DesktopEdition {
+        ZenithDefault,
+        GnomeModern,
+        PlasmaAdvanced,
+        XfceLightweight,
+    }
+
+    pub struct DesktopConfig {
+        pub edition: DesktopEdition,
+        pub default_theme: String,
+        pub preinstalled_apps: Vec<String>,
+        pub hardware_optimizations: bool,
+    }
+
+    // 8.8 Gentoo-Inspired Source Build with USE flags
+    pub struct BuildConfig {
+        pub cflags: String,
+        pub cxxflags: String,
+        pub makeopts: String,
+        pub use_flags: Vec<String>,
+        pub build_in_ram: bool,
+        pub parallel_jobs: u32,
+    }
+
+    pub struct PerPackageConfig {
+        pub package: String,
+        pub custom_flags: BuildConfig,
+        pub patches: Vec<String>,
+    }
+
+    // 8.9 Nix-Inspired Reproducible Builds
+    #[derive(Clone)]
+    pub struct StorePath(pub String);
+
+    pub struct NixStyleBuild {
+        pub inputs: Vec<StorePath>,
+        pub derivation_hash: String,
+        pub output_path: StorePath,
+    }
+
+    impl NixStyleBuild {
+        pub fn build_derivation(&self) -> bool {
+            !self.derivation_hash.is_empty()
+        }
+    }
+
+    // 8.10 Alpine-Inspired Minimal Variant
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum LibcVariant {
+        Musl,
+        Glibc,
+    }
+
+    pub struct MinimalVariant {
+        pub libc: LibcVariant,
+        pub size_target_mb: usize,
+    }
+
+    // ------------------------------------------------------------------
+    // Unit Tests
+    // ------------------------------------------------------------------
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn test_kernel_profile() {
+            let profile = KernelProfile {
+                preemption_mode: PreemptionMode::Full,
+                tickless_cpus: vec![1, 2, 3],
+                rcu_lazy: true,
+                cpu_governor: CpuGovernor::Performance,
+            };
+            assert_eq!(profile.preemption_mode, PreemptionMode::Full);
+            assert_eq!(profile.tickless_cpus.len(), 3);
+        }
+
+        #[test]
+        fn test_memory_config() {
+            let config = MemoryConfig {
+                swappiness: 10,
+                thp_enabled: true,
+                thp_defrag: ThpDefragMode::Always,
+                dirty_ratio: 20,
+                dirty_background_ratio: 10,
+                vfs_cache_pressure: 50,
+            };
+            assert_eq!(config.swappiness, 10);
+            assert!(config.thp_enabled);
+        }
+
+        #[test]
+        fn test_network_config() {
+            let config = NetworkConfig {
+                congestion_control: CongestionControl::Bbr,
+                tcp_rmem: [4096, 87380, 6291456],
+                tcp_wmem: [4096, 16384, 4194304],
+                tcp_slow_start_after_idle: false,
+                tcp_fastopen: true,
+            };
+            assert_eq!(config.congestion_control, CongestionControl::Bbr);
+            assert!(config.tcp_fastopen);
+        }
+
+        #[test]
+        fn test_package_manager() {
+            let mut pm = SigmaPackageManager::new(PackageBackend::Native, DependencyResolver::SatSolver);
+            assert_eq!(pm.backend, PackageBackend::Native);
+            pm.install_package(PackageMetadata {
+                name: "test-pkg".to_string(),
+                version: "1.0.0".to_string(),
+                dependencies: vec![],
+            }).unwrap();
+            assert_eq!(pm.installed.len(), 1);
+        }
+
+        #[test]
+        fn test_enhanced_sandbox() {
+            let mut seccomp = BTreeSet::new();
+            seccomp.insert(1); // sys_read
+            seccomp.insert(2); // sys_write
+            let sandbox = EnhancedSandbox {
+                cpu_limit: Some(ResourceLimit { value: 80, soft: false }),
+                memory_limit: None,
+                network_isolation: NetworkIsolation::IsolatedNamespace,
+                seccomp_allowed: seccomp,
+            };
+            assert!(sandbox.seccomp_allowed.contains(&1));
+        }
+
+        #[test]
+        fn test_health_checker() {
+            let checker = HealthChecker {
+                checks: vec!["disk-space".to_string(), "network-connectivity".to_string()],
+                rollback_on_failure: true,
+            };
+            assert!(checker.run_diagnostics());
+        }
+
+        #[test]
+        fn test_desktop_config() {
+            let config = DesktopConfig {
+                edition: DesktopEdition::ZenithDefault,
+                default_theme: "glassmorphism".to_string(),
+                preinstalled_apps: vec!["sigma-editor".to_string()],
+                hardware_optimizations: true,
+            };
+            assert_eq!(config.edition, DesktopEdition::ZenithDefault);
+        }
+
+        #[test]
+        fn test_nix_build() {
+            let build = NixStyleBuild {
+                inputs: vec![StorePath("/store/1".to_string())],
+                derivation_hash: "hash123".to_string(),
+                output_path: StorePath("/store/2".to_string()),
+            };
+            assert!(build.build_derivation());
+        }
+    }
+}
+
+// ============================================================================
 // 2. SOVEREIGNVMM — Type-1 Hypervisor & Capability-Gated Containers
 // ============================================================================
 
