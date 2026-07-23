@@ -1,7 +1,7 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
-use crate::sigpkg::{Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use std::collections::{HashMap, HashSet};
 
 /// SAT Solver for dependency resolution
@@ -21,7 +21,7 @@ impl SatSolver {
     pub fn add_package(&mut self, package: Package) {
         self.packages
             .entry(package.name.clone())
-            .or_default()
+            .or_insert_with(Vec::new)
             .push(package);
     }
 
@@ -138,7 +138,6 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sigpkg::Dependency;
 
     #[test]
     fn test_sat_solver_creation() {
@@ -149,13 +148,13 @@ mod tests {
     #[test]
     fn test_add_package() {
         let mut solver = SatSolver::new();
-        let package = Package::new(
-            "test".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            Vec::new(),
-            String::new(),
-        );
+        let package = Package {
+            name: "test".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: Vec::new(),
+            checksum: String::new(),
+        };
         solver.add_package(package);
         assert!(solver.packages.contains_key("test"));
     }
@@ -176,27 +175,27 @@ mod tests {
         let mut solver = SatSolver::new();
 
         // Create circular dependency: A -> B -> A
-        let pkg_a = Package::new(
-            "A".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            vec![Dependency {
+        let pkg_a = Package {
+            name: "A".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: vec![Dependency {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            String::new(),
-        );
+            checksum: String::new(),
+        };
 
-        let pkg_b = Package::new(
-            "B".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            vec![Dependency {
+        let pkg_b = Package {
+            name: "B".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: vec![Dependency {
                 name: "A".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            String::new(),
-        );
+            checksum: String::new(),
+        };
 
         solver.add_package(pkg_a);
         solver.add_package(pkg_b);

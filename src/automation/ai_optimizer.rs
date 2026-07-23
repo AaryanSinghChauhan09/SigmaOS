@@ -1,6 +1,8 @@
 // SigmaOS AI-Driven Optimization System
 // Copilot-style assistants for system tuning and automation
 
+use std::collections::HashMap;
+
 /// Optimization category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizationCategory {
@@ -129,13 +131,9 @@ impl AiOptimizer {
     pub fn record_state(&mut self, state: SystemState) {
         self.system_history.push(state);
 
-        // BOLT PERFORMANCE OPTIMIZATION: Amortized O(1) history maintenance
-        // Standard Vec::remove(0) triggers a full O(N) memory copy to shift elements.
-        // Instead, we allow the history buffer to grow up to 1200 states, and then
-        // bulk-drain the oldest 200 states in a single O(N) operation.
-        // This reduces memory movement overhead from O(N) per insertion to O(N)/200 amortized (up to 200x speedup).
-        if self.system_history.len() > 1200 {
-            self.system_history.drain(0..200);
+        // Keep only last 1000 states
+        if self.system_history.len() > 1000 {
+            self.system_history.remove(0);
         }
     }
 

@@ -62,10 +62,8 @@ impl Process {
 
 /// EEVDF Scheduler
 pub struct Scheduler {
-    pub processes: Vec<Process>,
-    pub current_time: u64,
-    pub is_realtime_profile: bool,
-    pub is_hpc_profile: bool,
+    processes: Vec<Process>,
+    current_time: u64,
 }
 
 impl Scheduler {
@@ -73,17 +71,7 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
-            is_realtime_profile: false,
-            is_hpc_profile: false,
         }
-    }
-
-    pub fn enable_realtime_profile(&mut self, enabled: bool) {
-        self.is_realtime_profile = enabled;
-    }
-
-    pub fn enable_hpc_profile(&mut self, enabled: bool) {
-        self.is_hpc_profile = enabled;
     }
 
     pub fn add_process(&mut self, mut process: Process) {
@@ -94,33 +82,10 @@ impl Scheduler {
     pub fn schedule(&mut self) -> Option<&Process> {
         // Find process with earliest eligible virtual deadline
         let now = self.current_time;
-
-        if self.is_realtime_profile {
-            // Prioritize Realtime priority tasks immediately under realtime profile
-            let rt_proc = self
-                .processes
-                .iter()
-                .filter(|p| p.state == ProcessState::Ready && p.priority == Priority::Realtime)
-                .min_by_key(|p| p.virtual_deadline);
-            if rt_proc.is_some() {
-                return rt_proc;
-            }
-        }
-
         self.processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
-            .min_by_key(|p| p.virtual_deadline);
-
-        if eligible.is_some() {
-            eligible
-        } else {
-            // Fallback: choose the ready process with the earliest deadline if none are strictly eligible
-            self.processes
-                .iter()
-                .filter(|p| p.state == ProcessState::Ready)
-                .min_by_key(|p| p.virtual_deadline)
-        }
+            .min_by_key(|p| p.virtual_deadline)
     }
 
     pub fn tick(&mut self) {
@@ -171,10 +136,9 @@ mod tests {
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
 
-        // Advance time so that virtual deadline (current_time + 3) is reached
-        scheduler.tick();
-        scheduler.tick();
-        scheduler.tick();
+        for _ in 0..5 {
+            scheduler.tick();
+        }
 
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());

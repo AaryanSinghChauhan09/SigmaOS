@@ -1,5 +1,2 @@
-/target/
-**/target/
-**/*.rs.bk
+target/
 *.log
-*.tmp
