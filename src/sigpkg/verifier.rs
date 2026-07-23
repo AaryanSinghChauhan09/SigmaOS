@@ -22,22 +22,27 @@ impl CryptoVerifier {
     }
 
     /// Verify package signature
-    pub fn verify(&self, package: &Package, signature: &[u8], data: &[u8]) -> Result<bool, VerifyError> {
+    pub fn verify(
+        &self,
+        package: &Package,
+        signature: &[u8],
+        data: &[u8],
+    ) -> Result<bool, VerifyError> {
         // Simplified verification - in production use actual Dilithium-5
         let computed_hash = self.compute_hash(data);
         let expected_hash = &package.checksum;
-        
+
         if computed_hash != *expected_hash {
             return Err(VerifyError::HashMismatch);
         }
-        
+
         // Verify signature against trusted keys
         for key in &self.trusted_keys {
             if self.verify_signature(key, signature, data) {
                 return Ok(true);
             }
         }
-        
+
         Err(VerifyError::InvalidSignature)
     }
 
@@ -46,7 +51,7 @@ impl CryptoVerifier {
         // Simplified hash computation - in production use actual SHA3-256
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        
+
         let mut hasher = DefaultHasher::new();
         data.hash(&mut hasher);
         format!("{:x}", hasher.finish())
@@ -108,7 +113,7 @@ mod tests {
     fn test_package_verification() {
         let mut verifier = CryptoVerifier::new();
         verifier.add_trusted_key("test_key".to_string());
-        
+
         let package = Package {
             name: "test".to_string(),
             version: crate::sigpkg::Version::new(1, 0, 0),
@@ -116,10 +121,10 @@ mod tests {
             dependencies: Vec::new(),
             checksum: "test_checksum".to_string(),
         };
-        
+
         let data = b"test data";
         let signature = b"test signature";
-        
+
         // This will fail due to hash mismatch, but tests the flow
         let result = verifier.verify(&package, signature, data);
         assert!(result.is_err());

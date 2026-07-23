@@ -5,4 +5,4 @@ pub mod capability;
 pub mod pledge;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use pledge::{PledgeManager, PledgePromise, PledgeError, promises};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
