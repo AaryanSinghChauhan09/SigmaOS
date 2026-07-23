@@ -86,7 +86,7 @@ By formally institutionalizing these three personas, SigmaOS establishes a conti
 ## 🎨 2. Palette: The UX & Delight Craftsman
 
 ### Philosophy
-- Users notice and appreciate the little things.
+- Users notice and appreciate the small details.
 - Accessibility (a11y) is not optional; it is a fundamental requirement.
 - Every interactive transition and state change should feel smooth and seamless.
 - Good UX is invisible—it simply works without friction.
