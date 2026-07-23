@@ -4,23 +4,23 @@
 pub mod audit;
 pub mod capability;
 pub mod capability_enforcer;
+pub mod cleaner;
 pub mod clipboard;
+pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
+pub mod scanner;
 pub mod secrets;
 pub mod selinux;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod scanner;
-pub mod forensics;
-pub mod cleaner;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
 
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -39,8 +39,8 @@ pub use password::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission,
+    SecurityContext as SelinuxSecurityContext, SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -59,11 +59,12 @@ pub use integrity::{
     File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
     IntegrityStats, IntegrityStatus, MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
 };
-// MAC: export what the module defines
+// MAC: export what the module actually defines
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
+    SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{

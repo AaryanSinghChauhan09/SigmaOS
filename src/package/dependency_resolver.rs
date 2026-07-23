@@ -89,6 +89,7 @@ impl PackageDependencyResolver {
                 }
             }
         }
+        *idx -= 1;
         true
     }
 
@@ -142,7 +143,6 @@ impl PackageDependencyResolver {
         }
 
         // Find package
-        let mut success = true;
         if let Some(recipe) = self.find_recipe(name) {
             // Add package to resolved list
             if !resolved.contains(&name) {
@@ -153,13 +153,12 @@ impl PackageDependencyResolver {
             for dep_idx in 0..recipe.dep_count {
                 let dep_name = recipe.dependencies[dep_idx];
                 if !self.resolve_recursive(dep_name, resolved, visited, idx) {
-                    success = false;
-                    break;
+                    return false;
                 }
             }
         }
         *idx -= 1;
-        success
+        true
     }
 
     /// Get the total number of registered packages

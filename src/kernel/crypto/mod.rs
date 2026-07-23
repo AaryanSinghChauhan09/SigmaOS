@@ -341,13 +341,13 @@ mod tests {
 
     #[test]
     fn test_csprng() {
-        let nanos = std::time::SystemTime::now()
+        let mut seed = [0u8; 32];
+        let nanos_bytes = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_nanos();
-        let mut seed = [0u8; 32];
-        seed[..16].copy_from_slice(&nanos.to_le_bytes());
-        seed[16..].copy_from_slice(&nanos.to_be_bytes());
+            .as_nanos()
+            .to_le_bytes();
+        seed[..16].copy_from_slice(&nanos_bytes);
         let rng = SigmaCsprng::new(&seed);
         let r1 = rng.generate(16);
         let r2 = rng.generate(16);

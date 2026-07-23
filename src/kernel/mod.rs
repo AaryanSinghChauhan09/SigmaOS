@@ -60,9 +60,9 @@ pub use gap_filling::{
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver,
-    AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType, LinuxAbsorptionEngine,
-    SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
+    ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
+    SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use numa_allocator::{AllocationPolicy, NodeState, NumaAllocator, NumaNode};
@@ -71,25 +71,13 @@ pub use performance::{
     ZeroCopyQueue,
 };
 pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler as SovereignScheduler};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
 pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
 pub use subsystem::{
-    DeviceDriver, DriverError, DriverMetadata, DriverRegistry, DriverType, FileFlags, FileHandle,
-    FileSystem, FsError, IoOperation, IoResult, LinuxHeritage, MapFlags, MemoryError,
-    MemoryManager, NetworkError, NetworkStack, Scheduler, SchedulerError, SecureDriverWrapper,
-    SocketDomain, SocketHandle, SocketProtocol, SocketType,
-};
-pub use traits::{
-    DeviceDriver as TraitsDeviceDriver, DriverError as TraitsDriverError,
-    DriverMetadata as TraitsDriverMetadata, FileSystem as TraitsFileSystem,
-    FilesystemMetadata as TraitsFilesystemMetadata, FsError as TraitsFsError,
-    MemoryError as TraitsMemoryError, MemoryManager as TraitsMemoryManager,
-    MemoryManagerMetadata as TraitsMemoryManagerMetadata, NetworkError as TraitsNetworkError,
-    NetworkStack as TraitsNetworkStack, NetworkStackMetadata as TraitsNetworkStackMetadata,
-    Scheduler as TraitsScheduler, SchedulerError as TraitsSchedulerError,
-    SchedulerMetadata as TraitsSchedulerMetadata,
+    DriverRegistry, DriverType, FileFlags, FileHandle, IoOperation, IoResult, LinuxHeritage,
+    MapFlags, SecureDriverWrapper, SocketDomain, SocketHandle, SocketProtocol,
 };
 pub use watchdog::{
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,
@@ -108,13 +96,10 @@ pub use irq::{
     Workqueue,
 };
 pub use mm::{
-    CachedPage, HugePageManager, HugePageSize, NumaNode as MmNumaNode, NumaTopologyManager, OomKiller, PageCache,
-    PageStatus, SlabAllocator as MmSlabAllocator, VmallocManager,
+    CachedPage, HugePageManager, HugePageSize, NumaTopologyManager, OomKiller, PageCache,
+    PageStatus, VmallocManager,
 };
-pub use power::{
-    CpufreqGovernor, CpufreqManager as PowerCpufreqManager, CpufreqPolicy as PowerCpufreqPolicy, PowerStateManager, SleepState, ThermalManager,
-    ThermalZone,
-};
+pub use power::{CpufreqGovernor, PowerStateManager, SleepState, ThermalManager, ThermalZone};
 // net: single export covering Phase J (socket/netfilter/tc) + Phase K (IPv4/TCP)
 pub use block_dev::{
     Bio, BioOp, BlockDeviceManager, DeadlineScheduler, RamDisk, BLOCK_SIZE, SECTOR_SIZE,
@@ -125,6 +110,6 @@ pub use crypto::{
 pub use net::{
     AddressFamily, ArpTable, CongestionAlgorithm, Ipv4Header, Ipv4Stack, NetfilterTable,
     NfHookpoint, NfRule, NfVerdict, Pfifo, PfifoFast, Protocol, QPacket, Route, RoutingTable, Sfq,
-    SockAddrIn, SocketLayer, SocketType as NetSocketType, Tbf, TcpConnection, TcpSegment, TcpState,
+    SockAddrIn, SocketLayer, SocketType, Tbf, TcpConnection, TcpSegment, TcpState,
 };
 pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};
