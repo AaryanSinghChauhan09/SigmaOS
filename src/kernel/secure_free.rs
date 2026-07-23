@@ -53,14 +53,17 @@ impl SecureFreeDetector {
 
     /// Securely free memory
     pub fn secure_free(&mut self, address: usize, ptr: *mut u8) -> Result<(), &'static str> {
-        let record = self
-            .allocations
-            .get_mut(&address)
-            .ok_or("Allocation not found")?;
+        let (is_sensitive, size) = {
+            let record = self
+                .allocations
+                .get_mut(&address)
+                .ok_or("Allocation not found")?;
 
-        if record.freed {
-            return Err("Double free detected");
-        }
+            if record.freed {
+                return Err("Double free detected");
+            }
+            (record.is_sensitive, record.size)
+        };
 
         // Sanitize based on level
         match self.sanitization_level {
@@ -68,18 +71,22 @@ impl SecureFreeDetector {
                 // No sanitization
             }
             SanitizationLevel::Partial => {
-                if record.is_sensitive {
-                    self.sanitize_memory(ptr, record.size, 0);
+                if is_sensitive {
+                    self.sanitize_memory(ptr, size, 0);
                 }
             }
             SanitizationLevel::Full => {
-                self.sanitize_memory(ptr, record.size, 0);
+                self.sanitize_memory(ptr, size, 0);
             }
             SanitizationLevel::Pattern => {
-                self.fill_pattern(ptr, record.size);
+                self.fill_pattern(ptr, size);
             }
         }
 
+        let record = self
+            .allocations
+            .get_mut(&address)
+            .ok_or("Allocation not found")?;
         record.freed = true;
         Ok(())
     }

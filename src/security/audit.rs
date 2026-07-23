@@ -206,6 +206,13 @@ impl AuditPolicy for SimpleAuditPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Text,
+    Json,
+    Binary,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
