@@ -1,194 +1,181 @@
-# 🛡️ SigmaOS: Future Development Roadmap & Strategic Parity Matrix
+# 🚀 SigmaOS Future Development & Distro-Parity Roadmap
 
-This document establishes the master architectural strategy, long-term development plans, and strategic parity matrices to position **SigmaOS** as the world's premier sovereign, AI-native, and post-quantum resilient operating system.
-
-By comparing ourselves directly with mature operating systems (Windows, macOS, and Linux), SigmaOS identifies critical growth sectors and codifies them behind a unified capability-gated security paradigm.
-
----
-
-## 🏗️ 1. Master Strategic Parity Matrix
-
-SigmaOS bridges legacy desktop deficiencies by implementing distinct, safe, and highly performant sovereign alternatives.
-
-| Subsystem Component | Linux Equivalent | Windows / macOS Equivalent | SigmaOS Differentiator | Implementation Status |
-| :--- | :--- | :--- | :--- | :--- |
-| **Scheduler Core** | CFS / Realtime Preempt | NT Scheduler / Grand Central | MLFQ + CFS + APIC Predictor | **Active / Tested** (90%+) |
-| **Security Sandbox** | SElinux / AppArmor | UAC / App Sandbox | `sigma_pledge` + `sigma_unveil` | **Active / Tested** (100%) |
-| **PQC Cryptography** | WireGuard / TLS 1.3 | BitLocker / FileVault | Kyber-1024 + Dilithium-5 | **Active / Tested** (100%) |
-| **Desktop REPL Shell** | Bash / Zsh | Command Prompt / PowerShell | Parity CLI-to-GUI Multi-call | **Active / Tested** (100%) |
-| **Hardware Drivers** | DRM / ALSA / usbcore | Windows Driver Kit (WDK) | Polymorphic OOP UnifiedPeripheral | **Active / Tested** (100%) |
-| **Package Store** | Pacman / Apt / Flatpak | Microsoft Store / App Store | Content-Addressed `.spkg` | **Active / Tested** (100%) |
-| **Onboarding Pipeline** | Linux Contributor Mentors | MSDN / Apple Developer | MentorshipProgram Onboarding | **Active / Tested** (100%) |
-| **Vulnerability Tracker** | Bugzilla / Launchpad | Windows Error Reporting (WER) | BugTracker Triaging Shards | **Active / Tested** (100%) |
-| **Funding & Sustainability**| Linux Foundation | Corporate Parent Backers | FundingSustainability sector | **Active / Tested** (100%) |
-| **Licensing Compliance** | GPL-2.0 / MIT | Proprietary EULA | LegalComplianceRegistry | **Active / Tested** (100%) |
-| **Certification Audit** | Common Criteria / FIPS | FIPS 140-3 Level 4 | ComplianceCert ISO monitor | **Active / Tested** (100%) |
-| **University Outreach** | Academic Research Labs | Apple University Developer | UniversityPartnership CSE | **Active / Tested** (100%) |
-| **Documentation Standards**| ManPages / HOWTO Wikis | MSDN Docs Library | DocAsset Linting Auditor | **Active / Tested** (100%) |
-| **Multi-Arch Silicon** | ARM / RISC-V ports | Apple Silicon Rosetta | ArchitecturePort Tiered Grid | **Active / Tested** (100%) |
-| **Enterprise Agreements** | Red Hat / SAP / IBM | Microsoft Enterprise Partner | EnterprisePartner verified | **Active / Tested** (100%) |
-| **Democratic Voting** | Debian Leader Elections | Corporate Board Direction | DemocraticProposal Quorums | **Active / Tested** (100%) |
-| **Support Contracts** | Canonical Advantage | MS Premier Support | SupportServicesManager SLAs | **Active / Tested** (100%) |
-| **LTS Releases** | LTS Kernels (e.g. 6.1) | Windows LTSC Releases | LtsRelease supported_until | **Active / Tested** (100%) |
-| **Disaster Recovery** | System Rescue CD | macOS Recovery Console | RecoveryConfig ISO mapping | **Active / Tested** (100%) |
-| **Image processing** | GIMP / GEGL | Adobe Photoshop / Core Image | 'SigmaPaint' Raster Layer UDFs | **Active / Tested** (100%) |
-| **Video Composition** | Kdenlive / MLT | DaVinci Resolve Magic Mask | 'SigmaCut' YUV compositing | **Active / Tested** (100%) |
-| **Win32 Compatibility** | Wine Subsystem | Windows on ARM Emulation | 'SigmaWin' W^X PE32+ Loader | **Active / Tested** (100%) |
+> **"Autonomy is not built in isolation, but scaled through ecosystem depth."**
+> This master document outlines the strategic vision, architectural alignment, and phased milestones to elevate SigmaOS from an elite industrial microkernel into a globally dominant, community-driven sovereign operating system.
 
 ---
 
-## 🚀 2. Master Six-Sector Strategic Enhancements
+## 🎯 Executive Summary
 
-To sustain our edge and expand SigmaOS adoption, we focus on the six non-technical and organizational pillars of mature Linux distributions:
+While SigmaOS is technically superior to legacy monolithic kernels—featuring a capability-based Rust microkernel, post-quantum cryptographic security, and a modular shard architecture—it currently lacks the non-technical but critical pillars that make Linux distributions dominant: **scale of community, governance discipline, visual accessibility, application depth, cloud orchestrations, and hardware breadth.**
 
-### 2.1 Community Infrastructure & Onboarding
-- **Objective**: Establish structured mentorship pipelines, robust bug-tracking, and community sustainability/sponsorship tier allocations.
-- **Onboarding Pipeline**: Modelled after Linux mentorship foundations to guide external system developers into kernel module compilation.
-- **Bug Management**: Triages active reports from triage down to investigation, assigning shards automatically based on subsystem scope.
-- **Sustainability Models**: Promotes diversified community sponsorship with robust tier-based allocations.
+This roadmap formally codifies these gaps and establishes a rigorous execution strategy to achieve full parity with enterprise-grade Linux distributions.
 
-### 2.2 Legal & Licensing Framework
-- **Objective**: Ensure complete licensing policy clarity, patent risk shields, and formal compliance certifications (such as ISO-15408 Common Criteria or FIPS-140 standard enforcement).
-- **Licensing Compliance**: Automated linter scanning to check third-party licenses for copyleft vs. permissive bounds.
-- **Patent Shields**: Maintained database registry tracking intellectual property risk buffers.
-- **Compliance Certifications**: Automated monitoring for structural compliance across FIPS and ISO standard modules.
-
-### 2.3 Education & Outreach
-- **Objective**: Foster academic integrations, structure structured learning paths, and enforce high quality-of-documentation standards.
-- **Learning Paths**: Structured progression tracks with gamified enrollment/progress indicators for systems developers.
-- **University Partnerships**: Built-in tracking of CSE syllabus alignment and academic lab collaborative initiatives.
-- **Document Standards**: Automated linters checking all wiki, markdown, and code documentation assets for style consistency.
-
-### 2.4 Ecosystem Integration
-- **Objective**: Facilitate multi-architecture ports, enterprise partner mappings, and hardware/software verification certifications.
-- **Silicon/Multi-Arch Ports**: Matrix for tracking support tiers across target architectures (including ARM64, RISC-V, and x86_64).
-- **Enterprise Partnerships**: Trackers for strategic, enterprise-grade alliances (e.g. SAP, IBM, Red Hat integrations).
-- **Compatibility Certifications**: Automated workflows auditing and certifying hardware/software configurations.
-
-### 2.5 Governance & Transparency
-- **Objective**: Define a clear foundation model, democratic voting proposal structures, and open, transparent release cycles.
-- **Foundation Model**: Structured governance boards managing board roles, treasuries, and committee structures.
-- **Transparent Roadmaps**: Publicly visible milestone mapping detailing release stability timelines and lifecycle parameters.
-- **Democratic Proposals**: Built-in secure voting system requiring quorum checks and automatic proposal execution triggers.
-
-### 2.6 Support & Services
-- **Objective**: Provide professional support contracts, guarantee Long-Term Support (LTS) release lifecycles, and deliver robust disaster recovery ISO tools.
-- **Enterprise Support**: Comprehensive SLA timers and professional ticket incident managers.
-- **LTS Releases**: Guaranteed maintenance life cycles, tracking exact support expiration periods across core kernel editions.
-- **Disaster Recovery**: Pre-configured rescue environments mapping boot-critical ISO targets to automatic storage restoration tools.
-
----
-
-## 💻 3. Executable Reference Implementation
-
-The following standard-conforming Rust implementation provides the complete, valid, and fully-compiling source code for a high-level strategic telemetry state monitor, a capability compliance checker, and a post-quantum key validator. It compiles under a standard Rust environment and is integrated into our unified test suite.
-
-```rust
-// Fictionalized #![no_std] compliant implementation illustrating complete Strategic Parity Engine
-
-/// Strategic telemetry error states
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TelemetryError {
-    Success = 0,
-    TelemetryBufferFull = 1,
-    AuditViolationDetected = 2,
-    NotSupported = 3,
-}
-
-/// Parity components
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ParityComponent {
-    Scheduler,
-    PqcSecurity,
-    OopDrivers,
-    Win32Compatibility,
-    A11yCompositor,
-}
-
-/// Telemetry status metrics
-pub struct ParityMetric {
-    pub component: ParityComponent,
-    pub compliance_percentage: f64,
-    pub is_active_sovereign: bool,
-}
-
-/// Base OOP interface representing any strategic system-wide telemetry tracker
-pub trait ParityTracker {
-    fn name(&self) -> &str;
-    fn audit_compliance(&self) -> Result<f64, TelemetryError>;
-}
-
-// ==========================================
-// 1. Concrete Telemetry Monitor Implementation
-// ==========================================
-
-pub struct StrategicTelemetryMonitor {
-    pub metrics: Vec<ParityMetric>,
-}
-
-impl StrategicTelemetryMonitor {
-    pub fn new() -> Self {
-        let mut monitor = StrategicTelemetryMonitor { metrics: Vec::new() };
-        monitor.register_metric(ParityComponent::Scheduler, 100.0, true);
-        monitor.register_metric(ParityComponent::PqcSecurity, 100.0, true);
-        monitor.register_metric(ParityComponent::OopDrivers, 100.0, true);
-        monitor
-    }
-
-    pub fn register_metric(&mut self, component: ParityComponent, compliance: f64, sovereign: bool) {
-        let metric = ParityMetric {
-            component,
-            compliance_percentage: compliance,
-            is_active_sovereign: sovereign,
-        };
-        self.metrics.push(metric);
-    }
-
-    pub fn compute_average_parity_compliance(&self) -> f64 {
-        if self.metrics.is_empty() {
-            return 100.0;
-        }
-        let sum: f64 = self.metrics.iter().map(|m| m.compliance_percentage).sum();
-        sum / self.metrics.len() as f64
-    }
-}
-
-// ==========================================
-// 2. Concrete PQC Key Integrity Validator
-// ==========================================
-
-pub struct PqcValidator {
-    pub key_bytes_mask: [u8; 32],
-}
-
-impl PqcValidator {
-    pub fn new() -> Self {
-        PqcValidator { key_bytes_mask: [0xAA; 32] }
-    }
-}
-
-impl ParityTracker for PqcValidator {
-    fn name(&self) -> &str {
-        "Post-Quantum Cryptography Key Integrity Auditor"
-    }
-
-    fn audit_compliance(&self) -> Result<f64, TelemetryError> {
-        // Scan the Dilithium-5 key mask to verify no zeroing-out has occurred (integrity audit)
-        if self.key_bytes_mask.iter().all(|&b| b == 0) {
-            return Err(TelemetryError::AuditViolationDetected);
-        }
-        Ok(100.0)
-    }
-}
+```
++-----------------------------------------------------------------------------------------+
+|                                SIGMAOS STRATEGIC MATURITY                               |
++-----------------------------------------------------------------------------------------+
+| [Community] -> Launch Wiki & Forums | Contributor Mentorship & Pair-Programming         |
+| [Governance] -> Reproducible Signed ISOs | LTS/Rolling Releases | CI/CD at Scale         |
+| [Accessibility] -> Screen Readers | High-Contrast | Universal Localization (22 Languages)|
+| [Apps] -> Office (LibreOffice Core) | Creative Suites | SigmaHub Decentralized Market   |
+| [Cloud] -> Container Runtime (SovereignVMM) | Multi-Cloud SDK Integration (AWS/Azure/GCP)|
+| [Hardware] -> Porting to ARM64 / RISC-V | Dynamic Wear-Leveling | Energy-Aware Sched    |
++-----------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 🔬 4. Validation and Verification Strategy
+## 🔍 Gaps: Missing Compared to Linux Distros
 
-To guarantee absolute synchronicity and correctness of the strategic roadmap:
-1. **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
-2. **Deterministic Logging Verification**: Under APIC ticks, the `StrategicTelemetryMonitor` computes metrics under O(1) constant bounds, preventing telemetry thread latency spikes.
-3. **PQC Sandbox Attestation**: All telemetry registers are protected using capability tokens, completely eliminating unauthorized execution or side-channel leakage risks.
+### 1. Community & Ecosystem
+* **The Linux Standard:** Linux thrives on thousands of developers worldwide contributing to specialized subsystems, testing configurations, and supporting newcomers.
+* **The SigmaOS Gap:** SigmaOS is still solo/early-stage with a highly concentrated contributor base.
+* **Documentation Culture:**
+  * **The Linux Standard:** The Arch Wiki, Debian Administrator's Handbooks, and Fedora Docs are industry-leading gold standards for system configuration and troubleshooting.
+  * **The SigmaOS Gap:** SigmaOS lacks a centralized, community-driven knowledge base. While we have internal development plans, we lack high-level, interactive onboarding guides for end-users and developers.
+* **Package Ecosystem Maturity:**
+  * **The Linux Standard:** Linux distributions offer millions of libraries and binary packages through mature repositories like APT, DNF, and Pacman.
+  * **The SigmaOS Gap:** SigmaOS has an early packaging engine (`sigpkg`), but needs developer adoption and porting recipes to host mainstream application binaries.
 
-By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized strategic developmental pipeline that completely surpasses legacy desktop toolkits.
+### 2. Governance & Release Engineering
+* **Stable Release Channels:**
+  * **The Linux Standard:** Major distros provide predictable LTS (Long-Term Support), rolling releases, and bleeding-edge experimental channels.
+  * **The SigmaOS Gap:** SigmaOS lacks formal versioning discipline, signed release builds, and fully reproducible bootable ISO compilation pipelines across multi-host environments.
+* **Regression Testing Frameworks:**
+  * **The Linux Standard:** The Linux Kernel Performance project and openQA test thousands of hardware configurations, compiler combinations, and software workloads in parallel on massive bare-metal build farms.
+  * **The SigmaOS Gap:** SigmaOS currently runs basic unit tests and local script-based QEMU smoke tests, but lacks a large-scale, automated hardware-in-the-loop (HITL) CI/CD regression testing pipeline.
+* **Distribution Governance:**
+  * **The Linux Standard:** Established foundations (such as the Linux Foundation, SPI/Debian, and Software in the Public Interest) manage licensing, trademarks, technical RFC decisions, and roadmaps.
+  * **The SigmaOS Gap:** SigmaOS governance remains undefined, limiting institutional adoption and enterprise trust.
+
+### 3. Accessibility & Inclusivity
+* **Assistive Technologies:**
+  * **The Linux Standard:** Linux ships robust accessibility stacks, including Orca (Screen Reader), high-contrast accessibility themes, desktop magnifier utilities, and braille display drivers (BRLTTY) out of the box.
+  * **The SigmaOS Gap:** SigmaOS's UI layer (Zenith) does not yet ship fully integrated, native text-to-speech visual wrappers or physical braille peripheral handlers.
+* **Localization & Translation Layers:**
+  * **The Linux Standard:** Linux supports hundreds of languages, input methods (e.g., IBus, Fcitx), and internationalization frameworks (i18n/gettext) to remain globally accessible.
+  * **The SigmaOS Gap:** SigmaOS currently lacks structured translation catalogs and keyboard layout maps for languages beyond standard US English.
+* **Inclusive Defaults:**
+  * **The Linux Standard:** Linux distros prioritize compliance with digital usability standards like WCAG 2.1 AA and ISO 9241.
+  * **The SigmaOS Gap:** SigmaOS has not yet embedded WCAG compliance checks or cognitive visual layouts into its core default themes.
+
+### 4. Application Ecosystem
+* **Office & Productivity Suites:**
+  * **The Linux Standard:** Linux bundles rich office suites (LibreOffice, OnlyOffice), image editors (GIMP, Inkscape), and developer IDEs.
+  * **The SigmaOS Gap:** SigmaOS has zero bundled office suites, developer-facing text editors, or creative application suites out of the box.
+* **Creative & Media Tools:**
+  * **The Linux Standard:** Linux supports professional-grade audio/video editing suites, digital audio workstations (DAWs), streaming tools (OBS Studio), and complex hardware acceleration pipelines (Mesa/VA-API).
+  * **The SigmaOS Gap:** SigmaOS lacks a robust multimedia subsystem for professional audio routing and low-latency hardware video decoding.
+* **Enterprise Applications:**
+  * **The Linux Standard:** Linux excels in hosting database servers, enterprise resource planning (ERP), customer relationship management (CRM), and regulatory compliance monitoring systems.
+  * **The SigmaOS Gap:** SigmaOS does not yet provide standard SQL engine ports or transactional business tool integration models.
+
+### 5. Networking & Cloud Integration
+* **Container Runtime Ecosystem:**
+  * **The Linux Standard:** Linux is the foundation of modern cloud native scaling, powering Docker, containeric, and Kubernetes via kernel primitives (Namespaces, Cgroups).
+  * **The SigmaOS Gap:** SigmaOS has early microkernel isolation patterns, but lacks a native, production-ready container engine compatible with OCI (Open Container Initiative) standards.
+* **Cloud-Native Tooling:**
+  * **The Linux Standard:** Linux integrates deeply with AWS, Azure, and Google Cloud Platform (GCP) through native metadata daemons, cloud-init, and optimized virtual machine drivers.
+  * **The SigmaOS Gap:** SigmaOS lacks built-in cloud SDKs and automated configuration engines for rapid deployment in virtualized hyper-scaler environments.
+* **Networking Appliances & Firewalls:**
+  * **The Linux Standard:** BSD firewalls and Linux `iptables`/`nftables` process millions of packets at wire-speed, serving as the backbone of global enterprise routers.
+  * **The SigmaOS Gap:** SigmaOS's virtual TCP/IP network stack is still basic and lacks high-throughput stateful firewalls or advanced traffic-shaping filters.
+
+### 6. Hardware & Platform Support
+* **ARM & RISC-V Portability:**
+  * **The Linux Standard:** Linux runs seamlessly on everything from multi-socket x86 servers and ARM-based laptops/phones to low-cost RISC-V IoT controllers.
+  * **The SigmaOS Gap:** SigmaOS is primarily designed for x86_64 virtualization platforms and has not yet expanded to ARM64 or RISC-V physical system images.
+* **Peripheral Compatibility Ecosystem:**
+  * **The Linux Standard:** Linux supports a vast matrix of printers, scanners, USB devices, smartcard readers, and custom industrial controllers using generic class drivers.
+  * **The SigmaOS Gap:** SigmaOS lacks generic peripheral class drivers and a hot-swappable hardware manager.
+* **Energy Optimization & Laptop Scaling:**
+  * **The Linux Standard:** Linux features advanced energy-aware schedulers (EAS), laptop mode-tools, and dynamic ACPI performance scaling.
+  * **The SigmaOS Gap:** SigmaOS lacks battery-aware adaptive scheduling and multi-level sleep state management.
+
+---
+
+## 🚀 How to Improve: Strategic Action Plan
+
+To systematically close these gaps, SigmaOS is executing the following 6-step improvement roadmap, spanning from immediate code integrations to long-term governance structures.
+
+```
+       [Phase I: Short-Term]             [Phase II: Medium-Term]             [Phase III: Long-Term]
+  - Launch Wiki & Forums             - Continuous signed builds        - Establish SigmaOS Foundation
+  - Embed Screen Reader & a11y       - universal sigmapkg adapters     - Port to ARM64 and RISC-V
+  - Port core developer CLI tools    - SovereignVMM OCI containers     - Multi-cloud orchestration
+```
+
+---
+
+### Phase I: Short-Term Foundations (0–6 Months)
+
+#### 1. Community Building & Documentation Culture
+* **Deliverable: Launch of the SigmaOS Sovereign Wiki**
+  * Establish a Git-backed, community-driven Wiki documenting system architecture, capability-based security, package definitions, and driver guidelines.
+  * Create developer onboarding programs, matching low-level Rust kernel developers with frontend visual contributors to accelerate UI development.
+* **Deliverable: Contributor Support Portal**
+  * Publish modular code style guides, security disclosure pipelines, and issue templates to standardize community contributions.
+
+#### 2. Embedded Accessibility Stack (🎨 Palette Integration)
+* **Deliverable: Screen Reader & Contrast Layers**
+  * Integrate the screen reader engine (`src/accessibility/screenreader.rs`) directly into the Zenith Desktop compositor.
+  * Implement dynamic high-contrast UI theme toggling and responsive font scaling without triggering temporary heap allocations, guaranteeing a seamless 120 FPS experience.
+* **Deliverable: Gettext-Style i18n Localization Layer**
+  * Implement standard language catalogs and keyboard layouts supporting 22 languages out-of-the-box, ensuring global accessibility.
+
+#### 3. Core Developer Tooling & App Bundles
+* **Deliverable: Minimal Developer Workstation Environment**
+  * Bundle a core suite of productive utilities into the default standalone desktop ISO: a lightweight text editor (`sigma-edit`), a capability-gated file manager, and system-level monitoring dashboards.
+
+---
+
+### Phase II: Medium-Term Expansion (6–18 Months)
+
+#### 4. Enterprise Governance & Release Engineering
+* **Deliverable: Continuous Integration & Signed Builds**
+  * Build a dedicated hardware-in-the-loop (HITL) test farm to continuously run regression test suites across varied x86 and peripheral configurations.
+  * Deploy cryptographic release-signing using Dilithium-5 signatures, and enforce binary reproducibility for all official bootable ISO releases.
+* **Deliverable: Long-Term Support (LTS) Release Cycle**
+  * Establish clear release channels: rolling development releases for developers, and stable LTS branches with backported security updates for enterprise systems.
+
+#### 5. Universal Package Management & Decoupled Stores (`sigmapkg`)
+* **Deliverable: Content-Addressed Storage (CAS) Registry**
+  * Expand `sigmapkg` to support a distributed, peer-to-peer package registry (SigmaHub) utilizing cryptographic content-addressed storage (CAS) to eliminate dependency version conflicts.
+  * Implement compatibility metadata adapters to easily repackage standard Linux `.deb` and `.rpm` binaries into secure, sandboxed SigmaPkg formats.
+
+#### 6. Cloud Orchestration & Container Engines (`SovereignVMM`)
+* **Deliverable: OCI-Compatible Container Runtime**
+  * Refine the virtualization manager (`virtualization/orchestration.rs`) into a native, OCI-compliant container engine capable of executing sandboxed workloads directly on the microkernel.
+  * Integrate native cloud-init configuration daemons and multi-cloud SDK adapters to enable automated, rapid provisioning on AWS, GCP, and Azure.
+
+---
+
+### Phase III: Long-Term Sovereignty (18–36+ Months)
+
+#### 7. Architecture Porting & Hardware Expansion
+* **Deliverable: Porting to ARM64 and RISC-V SBCs**
+  * Adapt page-table structures and low-level interrupt routines to support ARM64 (e.g., Raspberry Pi) and RISC-V physical hardware targets.
+  * Implement generic USB, PCIe, and storage class drivers inside the `UnifiedPeripheral` OOP abstraction to support legacy and modern devices out of the box.
+* **Deliverable: Energy-Aware Adaptive Scheduling**
+  * Connect system-level power telemetry inputs directly into our predictive MLFQ scheduler, dynamically scaling processor power-states and throttling thermal workloads on mobile/laptop architectures.
+
+#### 8. Formal Open-Source Governance
+* **Deliverable: Establish the SigmaOS Foundation**
+  * Incorporate a non-profit foundation with members from the open-source community, government institutions, and enterprise partners to govern the project.
+  * Establish a clear, transparent RFC (Request for Comments) decision-making process for system changes, security disclosures, and release planning.
+
+---
+
+## 📈 Metric Goals for Distro-Parity
+
+To measure our progress toward full parity with legacy Linux distributions, the SigmaOS project tracks the following core milestones:
+
+| Target Area | Metric | Current Status | Phase I Target | Phase II Target | Phase III Target |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Community** | Active contributors | Solo / Early-stage | 50+ | 500+ | 5000+ |
+| **Governance**| Signed builds & ISOs | Unsigned / Manual | Verified build farm | Fully signed LTS | Reproducible images |
+| **a11y** | WCAG Compliance | Basic | AA Compliant | AAA Compliant | Fully compliant defaults|
+| **Apps** | Bundled applications| Minimal shell utils | Text editor + terminal| Media players + IDE | Office suite + CAD |
+| **Cloud** | Container runtime | Mock virtualization | Sandboxed containers| OCI‑compliant engine| Kubernetes scale orchestration|
+| **Hardware** | Supported architectures| x86_64 only | x86_64 bare-metal | ARM64 Support | RISC‑V bare-metal |
