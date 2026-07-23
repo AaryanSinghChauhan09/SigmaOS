@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 /// Package format type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     Deb,      // apt
     Rpm,      // yum
@@ -79,8 +79,8 @@ impl UnifiedPackage {
     }
 
     pub fn has_conflict_with(&self, other: &UnifiedPackage) -> bool {
-        self.conflicts.iter().any(|c| c == &other.name) ||
-        other.conflicts.iter().any(|c| c == &self.name)
+        self.conflicts.iter().any(|c| c == &other.name)
+            || other.conflicts.iter().any(|c| c == &self.name)
     }
 }
 
@@ -105,19 +105,28 @@ impl PackageAdapter {
     }
 
     pub fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Installing {} using {} adapter", package.name, self.adapter_name);
+        println!(
+            "Installing {} using {} adapter",
+            package.name, self.adapter_name
+        );
         // Simulate installation
         Ok(())
     }
 
     pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Removing {} using {} adapter", package.name, self.adapter_name);
+        println!(
+            "Removing {} using {} adapter",
+            package.name, self.adapter_name
+        );
         // Simulate removal
         Ok(())
     }
 
     pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Updating {} using {} adapter", package.name, self.adapter_name);
+        println!(
+            "Updating {} using {} adapter",
+            package.name, self.adapter_name
+        );
         // Simulate update
         Ok(())
     }
@@ -178,7 +187,9 @@ impl DependencyResolver {
 
         for (i, pkg1_name) in packages.iter().enumerate() {
             for pkg2_name in packages.iter().skip(i + 1) {
-                if let (Some(pkg1), Some(pkg2)) = (self.packages.get(pkg1_name), self.packages.get(pkg2_name)) {
+                if let (Some(pkg1), Some(pkg2)) =
+                    (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
+                {
                     if pkg1.has_conflict_with(pkg2) {
                         conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
                     }
@@ -196,7 +207,8 @@ impl DependencyResolver {
             ConflictResolution::PreferNewest => {
                 // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2)) {
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
                         if p1.version > p2.version {
                             resolution.push(pkg1.clone());
                         } else {
@@ -208,7 +220,8 @@ impl DependencyResolver {
             ConflictResolution::PreferOldest => {
                 // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2)) {
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
                         if p1.version < p2.version {
                             resolution.push(pkg1.clone());
                         } else {
@@ -220,7 +233,8 @@ impl DependencyResolver {
             ConflictResolution::PreferNative => {
                 // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2)) {
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
                         if p1.formats.contains(&PackageFormat::SigmaPkg) {
                             resolution.push(pkg1.clone());
                         } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
@@ -283,8 +297,10 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
         self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
         self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters.insert(PackageFormat::Flatpak, flatpak_adapter);
-        self.adapters.insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+        self.adapters
+            .insert(PackageFormat::Flatpak, flatpak_adapter);
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -295,10 +311,10 @@ impl UniversalPackageManager {
     pub fn install(&mut self, package_name: &str) -> Result<(), PackageError> {
         // Resolve dependencies
         let dependencies = self.resolver.resolve_dependencies(package_name)?;
-        
+
         // Detect conflicts
         let conflicts = self.resolver.detect_conflicts(&dependencies);
-        
+
         if !conflicts.is_empty() {
             let resolution = self.resolver.resolve_conflicts(&conflicts);
             println!("Conflicts detected: {:?}", conflicts);
@@ -315,7 +331,7 @@ impl UniversalPackageManager {
                         break;
                     }
                 }
-                
+
                 let mut installed = package.clone();
                 installed.installed = true;
                 self.installed_packages.insert(dep_name.clone(), installed);
@@ -351,7 +367,8 @@ impl UniversalPackageManager {
     }
 
     pub fn search(&self, query: &str) -> Vec<&UnifiedPackage> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|p| p.name.contains(query) || p.version.contains(query))
             .collect()
     }
@@ -406,10 +423,10 @@ mod tests {
         let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
             .with_dependency("pkg2".to_string());
         let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string());
-        
+
         resolver.add_package(pkg1);
         resolver.add_package(pkg2);
-        
+
         let deps = resolver.resolve_dependencies("pkg1").unwrap();
         assert_eq!(deps.len(), 2);
     }
@@ -420,10 +437,10 @@ mod tests {
         let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
             .with_conflict("pkg2".to_string());
         let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string());
-        
+
         resolver.add_package(pkg1);
         resolver.add_package(pkg2);
-        
+
         let conflicts = resolver.detect_conflicts(&["pkg1".to_string(), "pkg2".to_string()]);
         assert_eq!(conflicts.len(), 1);
     }
@@ -433,7 +450,7 @@ mod tests {
         let mut manager = UniversalPackageManager::new();
         let package = UnifiedPackage::new("test".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
-        
+
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);

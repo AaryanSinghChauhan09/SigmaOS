@@ -19,7 +19,7 @@ pub enum OptimizationCategory {
 pub struct OptimizationRecommendation {
     pub category: OptimizationCategory,
     pub description: String,
-    pub impact: f64, // 0.0 to 1.0
+    pub impact: f64,     // 0.0 to 1.0
     pub confidence: f64, // 0.0 to 1.0
     pub action: String,
     pub estimated_benefit: String,
@@ -130,92 +130,112 @@ impl AiOptimizer {
 
     pub fn record_state(&mut self, state: SystemState) {
         self.system_history.push(state);
-        
+
         // Keep only last 1000 states
         if self.system_history.len() > 1000 {
             self.system_history.remove(0);
         }
     }
 
-    pub fn analyze_current_state(&self, current_state: &SystemState) -> Vec<OptimizationRecommendation> {
+    pub fn analyze_current_state(
+        &self,
+        current_state: &SystemState,
+    ) -> Vec<OptimizationRecommendation> {
         let mut recommendations = Vec::new();
 
         // CPU optimization
         if current_state.cpu_usage > 80.0 {
-            recommendations.push(OptimizationRecommendation::new(
-                OptimizationCategory::Performance,
-                "High CPU usage detected".to_string()
-            )
-            .with_impact(0.8)
-            .with_confidence(0.9)
-            .with_action("Reduce background processes".to_string())
-            .with_benefit("Expected 15-20% CPU reduction".to_string()));
+            recommendations.push(
+                OptimizationRecommendation::new(
+                    OptimizationCategory::Performance,
+                    "High CPU usage detected".to_string(),
+                )
+                .with_impact(0.8)
+                .with_confidence(0.9)
+                .with_action("Reduce background processes".to_string())
+                .with_benefit("Expected 15-20% CPU reduction".to_string()),
+            );
         }
 
         // Memory optimization
         if current_state.memory_usage > 85.0 {
-            recommendations.push(OptimizationRecommendation::new(
-                OptimizationCategory::Performance,
-                "High memory usage detected".to_string()
-            )
-            .with_impact(0.7)
-            .with_confidence(0.85)
-            .with_action("Clear cache and inactive applications".to_string())
-            .with_benefit("Expected 10-15% memory reduction".to_string()));
+            recommendations.push(
+                OptimizationRecommendation::new(
+                    OptimizationCategory::Performance,
+                    "High memory usage detected".to_string(),
+                )
+                .with_impact(0.7)
+                .with_confidence(0.85)
+                .with_action("Clear cache and inactive applications".to_string())
+                .with_benefit("Expected 10-15% memory reduction".to_string()),
+            );
         }
 
         // Thermal optimization
         if current_state.temperature > 75.0 {
-            recommendations.push(OptimizationRecommendation::new(
-                OptimizationCategory::Thermal,
-                "High temperature detected".to_string()
-            )
-            .with_impact(0.9)
-            .with_confidence(0.95)
-            .with_action("Reduce CPU frequency and enable cooling".to_string())
-            .with_benefit("Expected 5-10°C temperature reduction".to_string()));
+            recommendations.push(
+                OptimizationRecommendation::new(
+                    OptimizationCategory::Thermal,
+                    "High temperature detected".to_string(),
+                )
+                .with_impact(0.9)
+                .with_confidence(0.95)
+                .with_action("Reduce CPU frequency and enable cooling".to_string())
+                .with_benefit("Expected 5-10°C temperature reduction".to_string()),
+            );
         }
 
         // Power optimization
         if current_state.power_consumption > 50.0 && !self.system_history.is_empty() {
-            let avg_power: f64 = self.system_history.iter()
+            let avg_power: f64 = self
+                .system_history
+                .iter()
                 .map(|s| s.power_consumption)
-                .sum::<f64>() / self.system_history.len() as f64;
-            
+                .sum::<f64>()
+                / self.system_history.len() as f64;
+
             if current_state.power_consumption > avg_power * 1.5 {
-                recommendations.push(OptimizationRecommendation::new(
-                    OptimizationCategory::Power,
-                    "Unusual power consumption detected".to_string()
-                )
-            .with_impact(0.6)
-            .with_confidence(0.7)
-            .with_action("Enable power saving mode".to_string())
-            .with_benefit("Expected 20-30% power reduction".to_string()));
+                recommendations.push(
+                    OptimizationRecommendation::new(
+                        OptimizationCategory::Power,
+                        "Unusual power consumption detected".to_string(),
+                    )
+                    .with_impact(0.6)
+                    .with_confidence(0.7)
+                    .with_action("Enable power saving mode".to_string())
+                    .with_benefit("Expected 20-30% power reduction".to_string()),
+                );
             }
         }
 
         // Filter by threshold
         recommendations.retain(|r| r.confidence >= self.optimization_threshold);
-        
+
         // Sort by impact
         recommendations.sort_by(|a, b| b.impact.partial_cmp(&a.impact).unwrap());
 
         recommendations
     }
 
-    pub fn generate_recommendations(&mut self, current_state: &SystemState) -> Vec<OptimizationRecommendation> {
+    pub fn generate_recommendations(
+        &mut self,
+        current_state: &SystemState,
+    ) -> Vec<OptimizationRecommendation> {
         let new_recommendations = self.analyze_current_state(current_state);
         self.recommendations = new_recommendations.clone();
         new_recommendations
     }
 
-    pub fn apply_recommendation(&mut self, recommendation: &OptimizationRecommendation) -> Result<(), OptimizationError> {
+    pub fn apply_recommendation(
+        &mut self,
+        recommendation: &OptimizationRecommendation,
+    ) -> Result<(), OptimizationError> {
         if !self.learning_enabled {
             return Err(OptimizationError::LearningDisabled);
         }
 
         println!("Applying recommendation: {}", recommendation.action);
-        
+
         // Simulate applying the recommendation
         Ok(())
     }
@@ -276,11 +296,14 @@ mod tests {
         let state = SystemState::new().with_cpu(90.0);
         let recommendations = optimizer.generate_recommendations(&state);
         assert!(!recommendations.is_empty());
-        assert_eq!(recommendations[0].category, OptimizationCategory::Performance);
+        assert_eq!(
+            recommendations[0].category,
+            OptimizationCategory::Performance
+        );
     }
 
     #[test]
- fn test_high_temperature_recommendation() {
+    fn test_high_temperature_recommendation() {
         let mut optimizer = AiOptimizer::new();
         let state = SystemState::new().with_temperature(80.0);
         let recommendations = optimizer.generate_recommendations(&state);

@@ -1,4 +1,6 @@
 // SigmaOS Customization Module
 pub mod routines;
 
-pub use routines::{CustomizationEngine, Routine, Condition, Action, Theme, TriggerType, CustomizationError};
+pub use routines::{
+    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};

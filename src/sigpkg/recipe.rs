@@ -1,7 +1,7 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::sigpkg::{Version, Dependency, VersionConstraint};
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
 
 /// Build system type
@@ -162,9 +162,7 @@ impl RecipeManager {
     }
 
     pub fn find_by_name(&self, name: &str) -> Vec<&PackageRecipe> {
-        self.recipes.values()
-            .filter(|r| r.name == name)
-            .collect()
+        self.recipes.values().filter(|r| r.name == name).collect()
     }
 
     pub fn remove_recipe(&mut self, name: &str, version: &Version) {
@@ -196,7 +194,7 @@ mod tests {
             .with_build_system(BuildSystem::Cargo)
             .with_source("https://example.com".to_string(), "abc123".to_string())
             .with_build_command("cargo build".to_string());
-        
+
         assert_eq!(recipe.description, "Test package");
         assert_eq!(recipe.build_system, BuildSystem::Cargo);
     }
@@ -206,7 +204,7 @@ mod tests {
         let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
             .with_source("https://example.com".to_string(), "abc123".to_string())
             .with_build_command("cargo build".to_string());
-        
+
         assert!(recipe.validate().is_ok());
     }
 
@@ -222,7 +220,7 @@ mod tests {
         let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
             .with_source("https://example.com".to_string(), "abc123".to_string())
             .with_build_command("cargo build".to_string());
-        
+
         assert!(manager.add_recipe(recipe).is_ok());
         assert_eq!(manager.list_recipes().len(), 1);
     }
@@ -231,7 +229,7 @@ mod tests {
     fn test_build_script_generation() {
         let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
             .with_build_system(BuildSystem::Cargo);
-        
+
         let script = recipe.get_build_script();
         assert!(script.contains("cargo build"));
     }

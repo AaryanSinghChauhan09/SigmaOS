@@ -71,34 +71,38 @@ impl IpcManager {
     pub fn create_channel(&mut self, sender: u64, receiver: u64) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
-        
+
         let channel = Channel::new(id, sender, receiver);
         self.channels.push(channel);
-        
+
         id
     }
 
     pub fn send(&mut self, channel_id: u64, message: Message, sender: u64) -> Result<(), IpcError> {
-        let channel = self.channels.iter_mut()
+        let channel = self
+            .channels
+            .iter_mut()
             .find(|c| c.id == channel_id)
             .ok_or(IpcError::ChannelNotFound)?;
-        
+
         if channel.sender != sender {
             return Err(IpcError::PermissionDenied);
         }
-        
+
         channel.send(message)
     }
 
     pub fn receive(&mut self, channel_id: u64, receiver: u64) -> Result<Option<Message>, IpcError> {
-        let channel = self.channels.iter_mut()
+        let channel = self
+            .channels
+            .iter_mut()
             .find(|c| c.id == channel_id)
             .ok_or(IpcError::ChannelNotFound)?;
-        
+
         if channel.receiver != receiver {
             return Err(IpcError::PermissionDenied);
         }
-        
+
         Ok(channel.receive())
     }
 
@@ -138,10 +142,10 @@ mod tests {
     fn test_send_receive() {
         let mut channel = Channel::new(1, 100, 200);
         let message = Message::Data(vec![1, 2, 3]);
-        
+
         assert!(channel.send(message.clone()).is_ok());
         assert_eq!(channel.len(), 1);
-        
+
         let received = channel.receive();
         assert!(received.is_some());
     }
@@ -150,10 +154,10 @@ mod tests {
     fn test_ipc_manager() {
         let mut manager = IpcManager::new();
         let channel_id = manager.create_channel(100, 200);
-        
+
         let message = Message::Data(vec![1, 2, 3]);
         assert!(manager.send(channel_id, message, 100).is_ok());
-        
+
         let received = manager.receive(channel_id, 200);
         assert!(received.is_ok());
     }

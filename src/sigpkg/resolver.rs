@@ -1,7 +1,7 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
-use crate::sigpkg::{Package, Dependency, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use std::collections::{HashMap, HashSet};
 
 /// SAT Solver for dependency resolution
@@ -26,12 +26,16 @@ impl SatSolver {
     }
 
     /// Resolve dependencies for target package
-    pub fn resolve(&self, package_name: &str, version_constraint: &VersionConstraint) -> Result<Vec<Package>, ResolveError> {
+    pub fn resolve(
+        &self,
+        package_name: &str,
+        version_constraint: &VersionConstraint,
+    ) -> Result<Vec<Package>, ResolveError> {
         let mut result = Vec::new();
         let mut visited = HashSet::new();
-        
+
         self.resolve_recursive(package_name, version_constraint, &mut result, &mut visited)?;
-        
+
         Ok(result)
     }
 
@@ -49,10 +53,13 @@ impl SatSolver {
         visited.insert(package_name.to_string());
 
         // Find matching package
-        let packages = self.packages.get(package_name)
+        let packages = self
+            .packages
+            .get(package_name)
             .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
 
-        let matching_package = packages.iter()
+        let matching_package = packages
+            .iter()
             .find(|p| self.satisfies_constraint(&p.version, version_constraint))
             .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))?;
 
@@ -85,7 +92,12 @@ impl SatSolver {
         self.has_cycle(package_name, &mut visited, &mut recursion_stack)
     }
 
-    fn has_cycle(&self, package_name: &str, visited: &mut HashSet<String>, recursion_stack: &mut HashSet<String>) -> bool {
+    fn has_cycle(
+        &self,
+        package_name: &str,
+        visited: &mut HashSet<String>,
+        recursion_stack: &mut HashSet<String>,
+    ) -> bool {
         visited.insert(package_name.to_string());
         recursion_stack.insert(package_name.to_string());
 
@@ -152,7 +164,7 @@ mod tests {
         let solver = SatSolver::new();
         let v1 = Version::new(1, 0, 0);
         let v2 = Version::new(1, 0, 1);
-        
+
         assert!(solver.satisfies_constraint(&v2, &VersionConstraint::GreaterThan(v1)));
         assert!(solver.satisfies_constraint(&v1, &VersionConstraint::LessThan(v2)));
         assert!(solver.satisfies_constraint(&v1, &VersionConstraint::Exact(v1)));
@@ -161,7 +173,7 @@ mod tests {
     #[test]
     fn test_circular_dependency_detection() {
         let mut solver = SatSolver::new();
-        
+
         // Create circular dependency: A -> B -> A
         let pkg_a = Package {
             name: "A".to_string(),
@@ -173,7 +185,7 @@ mod tests {
             }],
             checksum: String::new(),
         };
-        
+
         let pkg_b = Package {
             name: "B".to_string(),
             version: Version::new(1, 0, 0),
@@ -184,10 +196,10 @@ mod tests {
             }],
             checksum: String::new(),
         };
-        
+
         solver.add_package(pkg_a);
         solver.add_package(pkg_b);
-        
+
         assert!(solver.detect_circular("A"));
     }
 }

@@ -4,11 +4,24 @@
 use crate::security::CapabilityToken;
 
 /// GPU command type
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum GpuCommand {
-    ClearScreen { r: u8, g: u8, b: u8 },
-    DrawRect { x: u32, y: u32, width: u32, height: u32 },
-    DrawText { x: u32, y: u32, text: String },
+    ClearScreen {
+        r: u8,
+        g: u8,
+        b: u8,
+    },
+    DrawRect {
+        x: u32,
+        y: u32,
+        width: u32,
+        height: u32,
+    },
+    DrawText {
+        x: u32,
+        y: u32,
+        text: String,
+    },
     Present,
 }
 
@@ -37,7 +50,12 @@ impl GpuDriver {
                 let color = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
                 self.frame_buffer.fill(color);
             }
-            GpuCommand::DrawRect { x, y, width, height, .. } => {
+            GpuCommand::DrawRect {
+                x,
+                y,
+                width,
+                height,
+            } => {
                 let color = 0xFFFFFF; // White
                 for row in y..(y + height).min(self.height) {
                     for col in x..(x + width).min(self.width) {
@@ -63,7 +81,7 @@ impl GpuDriver {
     }
 
     pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits & capability) != 0
+        (self.capabilities.bits() & capability) != 0
     }
 }
 
@@ -102,7 +120,12 @@ mod tests {
     #[test]
     fn test_draw_rect() {
         let mut gpu = GpuDriver::new(100, 100);
-        let command = GpuCommand::DrawRect { x: 10, y: 10, width: 20, height: 20 };
+        let command = GpuCommand::DrawRect {
+            x: 10,
+            y: 10,
+            width: 20,
+            height: 20,
+        };
         assert!(gpu.execute_command(command).is_ok());
     }
 }
