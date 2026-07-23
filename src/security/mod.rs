@@ -4,8 +4,8 @@
 pub mod audit;
 pub mod capability;
 pub mod clipboard;
-pub mod intrusion;
 pub mod integrity;
+pub mod intrusion;
 pub mod mac;
 pub mod password;
 pub mod pki;
@@ -20,15 +20,32 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel, XorEncryption,
 };
+pub use integrity::{
+    File, FileCapability, FileInfo, IntegrityError, IntegrityMonitor, IntegrityStatus,
+    MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
+};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
+};
+pub use mac::{
+    ContextCapability, ContextID, EngineCapability, MACEngine, MACError, MACPolicy, MACStats,
+    MLSPolicy, PolicyCapability, PolicyInfo, PolicyType, SecurityContext, SecurityDomain,
+    SecurityLevel as MacSecurityLevel, SecurityOperation, SimpleMACEngine,
 };
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
+pub use pki::{
+    Certificate, CertificateType, PKIError, PKIManager, SimpleCRL, SimpleCertificate,
+    SimplePKIManager, CRL,
+};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use secrets::{
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretError, SecretInfo,
+    SecretType, SimpleKeyring, SimpleSecret,
+};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
@@ -39,8 +56,8 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use integrity::{IntegrityCheck, IntegrityError, IntegrityVerifier};
-pub use mac::{MacPolicy, MacRule, MacSecurity};
-pub use pki::{Certificate, CertificateAuthority, PkiError, PkiManager};
-pub use secrets::{SecretManager, SecretStorage, SecretType};
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner, VulnerabilitySeverity};
+pub use vulnerability::{
+    CIPipelineIntegration, ScanError, ScanReport, Severity as VulnerabilitySeverity,
+    SimpleCIPipelineIntegration, SimpleScanReport, SimpleVulnerability, SimpleVulnerabilityScanner,
+    Vulnerability, VulnerabilityID, VulnerabilityScanner,
+};

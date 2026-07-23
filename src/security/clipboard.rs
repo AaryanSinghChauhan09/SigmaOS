@@ -174,7 +174,7 @@ impl SecureClipboardManager {
 
     /// Paste content from clipboard
     pub fn paste(&mut self) -> Result<String, ClipboardError> {
-        self.check_auto_clear()?;
+        self.check_auto_clear();
 
         let entry = self
             .current_entry

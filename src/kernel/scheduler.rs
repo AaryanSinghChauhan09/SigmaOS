@@ -107,7 +107,8 @@ impl Scheduler {
             }
         }
 
-        self.processes
+        let eligible = self
+            .processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
             .min_by_key(|p| p.virtual_deadline);
@@ -170,7 +171,7 @@ mod tests {
         let mut scheduler = Scheduler::new();
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
-        
+
         // Advance time so that virtual deadline (current_time + 3) is reached
         scheduler.tick();
         scheduler.tick();

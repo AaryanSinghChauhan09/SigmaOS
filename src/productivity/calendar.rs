@@ -226,7 +226,7 @@ impl CalendarApp {
         for m in 1..month {
             total_days += days_per_month[(m - 1) as usize];
         }
-        total_days * 86400
+        u64::from(total_days) * 86400
     }
 
     /// Get upcoming events

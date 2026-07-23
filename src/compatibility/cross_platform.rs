@@ -254,21 +254,21 @@ impl ApplicationBinary {
 }
 
 /// Polymorphic trait to verify matching capabilities for equivalent third-party software.
-pub trait SupersetApplicationCapability {
+pub trait SovereignAppCapability {
     fn capability_name(&self) -> &str;
     fn as_any(&self) -> &dyn std::any::Any;
-    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool;
+    fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool;
 }
 
 /// Media decoder capability (e.g. for equivalent third-party software like VLC Media Player)
 #[derive(Debug, Clone)]
-pub struct MediaDecoderCapability {
+pub struct StandardMediaCapability {
     pub name: String,
     pub supported_codecs: Vec<String>,
     pub max_resolution: String, // e.g. "1080p", "4K", "8K"
 }
 
-impl MediaDecoderCapability {
+impl StandardMediaCapability {
     pub fn new(name: String, codecs: Vec<String>, max_resolution: String) -> Self {
         Self {
             name,
@@ -278,7 +278,7 @@ impl MediaDecoderCapability {
     }
 }
 
-impl SupersetApplicationCapability for MediaDecoderCapability {
+impl SovereignAppCapability for StandardMediaCapability {
     fn capability_name(&self) -> &str {
         &self.name
     }
@@ -287,8 +287,8 @@ impl SupersetApplicationCapability for MediaDecoderCapability {
         self
     }
 
-    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
-        if let Some(other) = required.as_any().downcast_ref::<MediaDecoderCapability>() {
+    fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool {
+        if let Some(other) = required.as_any().downcast_ref::<StandardMediaCapability>() {
             // Self is compatible with required if self supports all required codecs
             for codec in &other.supported_codecs {
                 if !self.supported_codecs.contains(codec) {
@@ -313,14 +313,14 @@ impl SupersetApplicationCapability for MediaDecoderCapability {
 
 /// HTML Renderer capability (e.g. for equivalent third-party software like Chromium Browser)
 #[derive(Debug, Clone)]
-pub struct HtmlRendererCapability {
+pub struct StandardHtmlCapability {
     pub name: String,
     pub engine: String, // e.g. "Blink", "WebKit", "Gecko"
     pub supports_html5: bool,
     pub supports_wasm: bool,
 }
 
-impl HtmlRendererCapability {
+impl StandardHtmlCapability {
     pub fn new(name: String, engine: String, supports_html5: bool, supports_wasm: bool) -> Self {
         Self {
             name,
@@ -331,7 +331,7 @@ impl HtmlRendererCapability {
     }
 }
 
-impl SupersetApplicationCapability for HtmlRendererCapability {
+impl SovereignAppCapability for StandardHtmlCapability {
     fn capability_name(&self) -> &str {
         &self.name
     }
@@ -340,8 +340,8 @@ impl SupersetApplicationCapability for HtmlRendererCapability {
         self
     }
 
-    fn is_compatible_with(&self, required: &dyn SupersetApplicationCapability) -> bool {
-        if let Some(other) = required.as_any().downcast_ref::<HtmlRendererCapability>() {
+    fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool {
+        if let Some(other) = required.as_any().downcast_ref::<StandardHtmlCapability>() {
             // Engine compatibility or generic check
             if other.supports_html5 && !self.supports_html5 {
                 return false;

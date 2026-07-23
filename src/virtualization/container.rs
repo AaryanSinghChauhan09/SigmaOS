@@ -42,7 +42,7 @@ pub struct VolumeMapping {
 }
 
 /// Network mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NetworkMode {
     Bridge,
     Host,

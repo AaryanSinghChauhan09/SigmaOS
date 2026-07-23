@@ -14,11 +14,26 @@ pub enum InputType {
 /// Input event
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InputEvent {
-    KeyPress { keycode: u8, ascii: Option<char> },
-    KeyRelease { keycode: u8 },
-    MouseMove { delta_x: i32, delta_y: i32 },
-    MouseClick { left: bool, right: bool, middle: bool },
-    Touch { x: u32, y: u32 },
+    KeyPress {
+        keycode: u8,
+        ascii: Option<char>,
+    },
+    KeyRelease {
+        keycode: u8,
+    },
+    MouseMove {
+        delta_x: i32,
+        delta_y: i32,
+    },
+    MouseClick {
+        left: bool,
+        right: bool,
+        middle: bool,
+    },
+    Touch {
+        x: u32,
+        y: u32,
+    },
 }
 
 /// PS/2 Scancode to ASCII translator (Set 1)
@@ -53,7 +68,7 @@ impl ScancodeTranslator {
             0x2D => Some('x'),
             0x15 => Some('y'),
             0x2C => Some('z'),
-            0x39 => Some(' '), // Space
+            0x39 => Some(' '),  // Space
             0x1C => Some('\n'), // Enter
             _ => None,
         }
@@ -110,7 +125,11 @@ impl MousePacketParser {
             delta_y = -delta_y;
 
             if left || right || middle {
-                return Some(InputEvent::MouseClick { left, right, middle });
+                return Some(InputEvent::MouseClick {
+                    left,
+                    right,
+                    middle,
+                });
             } else {
                 return Some(InputEvent::MouseMove { delta_x, delta_y });
             }
@@ -178,7 +197,10 @@ mod tests {
     #[test]
     fn test_event_buffer() {
         let mut input = InputDriver::new(InputType::Keyboard);
-        let event = InputEvent::KeyPress { keycode: 65, ascii: None };
+        let event = InputEvent::KeyPress {
+            keycode: 65,
+            ascii: None,
+        };
         input.push_event(event.clone());
         let polled = input.poll_event();
         assert!(polled.is_some());
@@ -187,7 +209,10 @@ mod tests {
     #[test]
     fn test_clear_buffer() {
         let mut input = InputDriver::new(InputType::Mouse);
-        input.push_event(InputEvent::MouseMove { delta_x: 10, delta_y: -5 });
+        input.push_event(InputEvent::MouseMove {
+            delta_x: 10,
+            delta_y: -5,
+        });
         input.clear_buffer();
         assert!(input.poll_event().is_none());
     }
@@ -206,6 +231,12 @@ mod tests {
         assert_eq!(parser.push_byte(0x05), None);
 
         let event = parser.push_byte(0x0A).unwrap();
-        assert_eq!(event, InputEvent::MouseMove { delta_x: 5, delta_y: -10 });
+        assert_eq!(
+            event,
+            InputEvent::MouseMove {
+                delta_x: 5,
+                delta_y: -10
+            }
+        );
     }
 }

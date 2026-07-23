@@ -144,8 +144,8 @@ impl RoundRobinScheduler {
         // Find next ready process
         let start_index = self.current_index;
         loop {
-            if self.processes[self.current_index].state == ProcessState::Ready {
-                return Some(&self.processes[self.current_index]);
+            if self.processes[self.current_index].process.state == ProcessState::Ready {
+                return Some(&self.processes[self.current_index].process);
             }
 
             self.current_index = (self.current_index + 1) % self.processes.len();
@@ -172,9 +172,23 @@ impl RoundRobinScheduler {
     pub fn tick(&mut self) {
         self.current_time += 1;
 
-        // Time slice expired, move to next process
-        if self.current_time % self.config.time_slice == 0 {
-            self.current_index = (self.current_index + 1) % self.processes.len();
+        let yielded = if !self.processes.is_empty() {
+            let current = &mut self.processes[self.current_index];
+            if current.yield_requested {
+                current.yield_requested = false;
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+
+        // Time slice expired or yield requested, move to next process
+        if yielded || self.current_time % self.config.time_slice == 0 {
+            if !self.processes.is_empty() {
+                self.current_index = (self.current_index + 1) % self.processes.len();
+            }
         }
     }
 
@@ -221,11 +235,27 @@ impl RoundRobinScheduler {
     }
 
     pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|p| p.pid != pid);
+        self.processes.retain(|p| p.process.pid != pid);
 
         // Adjust current index if necessary
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
             self.current_index = 0;
+        }
+    }
+
+    pub fn save_context(&mut self, rsp: u64, rip: u64) {
+        if !self.processes.is_empty() {
+            self.processes[self.current_index]
+                .context
+                .save_from(rsp, rip);
+        }
+    }
+
+    pub fn restore_context(&self) -> Option<CpuContext> {
+        if self.processes.is_empty() {
+            None
+        } else {
+            Some(self.processes[self.current_index].context)
         }
     }
 
@@ -236,7 +266,7 @@ impl RoundRobinScheduler {
     pub fn get_ready_process_count(&self) -> usize {
         self.processes
             .iter()
-            .filter(|p| p.state == ProcessState::Ready)
+            .filter(|p| p.process.state == ProcessState::Ready)
             .count()
     }
 }
@@ -290,7 +320,7 @@ mod tests {
         let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
         scheduler.add_process(process1).unwrap();
         scheduler.add_process(process2).unwrap();
-        
+
         let initial_index = scheduler.current_index;
         for _ in 0..15 {
             scheduler.tick();
