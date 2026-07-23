@@ -35,7 +35,8 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, TargetPlatform,
+    TranslationLayer, User32MessageQueue, Win32Error, Win32Message, WinSockAdapter,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
