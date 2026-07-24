@@ -51,7 +51,8 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        core::ops::Deref::deref(self).iter()
+        use core::ops::Deref;
+        self.deref().iter()
     }
 }
 
@@ -59,7 +60,29 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        core::ops::DerefMut::deref_mut(self).iter_mut()
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
     }
 }
 
@@ -192,24 +215,6 @@ impl SimpleCommandRegistry {
 
         let pwd = SimpleShellCommand::new(b"pwd", b"Print working directory");
         self.commands.push(Some(Box::new(pwd)));
-
-        let sigpkg =
-            SimpleShellCommand::new(b"sigpkg", b"Manage packages (install, update, remove)");
-        self.commands.push(Some(Box::new(sigpkg)));
-
-        let sigtrace = SimpleShellCommand::new(b"sigtrace", b"System tracing control");
-        self.commands.push(Some(Box::new(sigtrace)));
-
-        let sigmetrics =
-            SimpleShellCommand::new(b"sigmetrics", b"System metrics telemetry exporter");
-        self.commands.push(Some(Box::new(sigmetrics)));
-
-        let sigstandards =
-            SimpleShellCommand::new(b"sigstandards", b"Verify POSIX and FHS compliance");
-        self.commands.push(Some(Box::new(sigstandards)));
-
-        let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
-        self.commands.push(Some(Box::new(sigsched)));
     }
 }
 
@@ -232,11 +237,9 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
-        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
-        let trimmed_name = &name[..name_len];
-        for command_option in &*self.commands {
-            if let Some(ref command) = command_option {
-                if command.name() == trimmed_name {
+        for command_option in &self.commands {
+            if let Some(ref command) = *command_option {
+                if command.name() == name {
                     return Some(command.as_ref());
                 }
             }
@@ -246,8 +249,8 @@ impl CommandRegistry for SimpleCommandRegistry {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut names = Vec::new();
-        for command_option in &*self.commands {
-            if let Some(ref command) = command_option {
+        for command_option in &self.commands {
+            if let Some(ref command) = *command_option {
                 names.push(command.name());
             }
         }
@@ -307,7 +310,7 @@ impl ShellSession for SimpleShellSession {
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &*self.environment {
+        for &(ref k, ref v) in &self.environment {
             let len = k.iter().position(|&b| b == 0).unwrap_or(64);
             if &k[..len] == key {
                 let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
@@ -380,7 +383,7 @@ impl CommandHistory for SimpleCommandHistory {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut commands = Vec::new();
-        for cmd in &*self.history {
+        for cmd in &self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
         }
@@ -392,27 +395,6 @@ struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
 }
 
 impl<T> Vec<T> {
@@ -454,17 +436,7 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
