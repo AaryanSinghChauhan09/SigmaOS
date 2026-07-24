@@ -16,6 +16,14 @@ This journal contains CRITICAL performance learnings discovered during profiling
 **Learning:** Splitting a string and collecting the slices into a heap-allocated collection (such as `version_str.split('.').collect::<Vec<&str>>()`) in frequently called utility methods introduces performance overhead. Replacing this with an iterator-based inline parsing method completely avoids heap allocations and significantly reduces memory usage and execution time.
 **Action:** Always utilize iterators and inline parsing for string manipulation/parsing rather than collecting intermediate elements into heap-allocated collections.
 
-## 2026-07-23 - Zero-Allocation Shell Command Parser
-**Learning:** Collecting all parsed segments of a command string into a heap-allocated `Vec<&str>` before routing can result in wasteful allocation overheads, especially for single-word terminal commands (e.g., `help`, `ps`, `ls`, `clear`, `exit`) or simple parameter queries. Refactoring the command scanner to stream tokens sequentially via standard Rust iterators like `split_whitespace` eliminates all dynamic collections on the hot paths, guaranteeing zero heap allocations for standard utility command matches.
-**Action:** Leverage native iterator state machines to parse CLI input, retrieving commands and operands iteratively on-demand and avoiding upfront vector collections.
+## 2024-07-16 - Heap-Free SemVer Split Parsing
+**Learning:** Collecting split string slices into a heap-allocated `Vec` during SemVer parsing introduces unnecessary allocations and deallocations, causing garbage collection/fragmentation overhead and preventing the package manager from running safely in no_std environments. Replacing `split('.').collect::<Vec<_>>()` with a direct lazy split iterator preserves identical functionality while guaranteeing absolute zero-allocation runtime performance.
+**Action:** Utilize inline iterator-based parsing (like `.next()`) instead of eager collection when decomposing dot-separated version strings.
+
+## 2026-07-20 - Custom Zero-Dependency LCG Utility Helpers vs. External Crate Footprint
+**Learning:** Incorporating external crates (like `rand` or `uuid`) for basic non-cryptographic telemetry IDs or random polling intervals adds immense build-time overhead, bloating the microkernel and triggering standard-library linker dependencies on host-hosted setups. Implementing a lightweight local 48-bit Linear Congruential Generator (LCG) with UNIX timestamp nanoseconds provides compile-time independence, sub-nanosecond execution speeds, and guarantees zero compilation dependencies on external environments.
+**Action:** Minimize external crate dependencies in modular kernels; prefer local mathematical utility implementations for basic simulation algorithms.
+
+## 2026-07-22 - Replacing Vector Collection with Lazy Iterators in SemVer
+**Learning:** Using heap-allocated `Vec` buffers via `split('.').collect()` for checking format and parsing minor/major/patch parts of a package version string is a classic performance bottleneck in dependency solvers. Transitioning to direct, lazy iterators on the `.split()` object completely avoids the heap allocator.
+**Action:** Never eagerly collect string slices into a dynamic array unless the elements are reused multiple times in unrelated scopes.

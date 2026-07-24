@@ -8,8 +8,6 @@ By systematic abstraction, SigmaOS maps, obsoletes, and natively replaces mainst
 
 ## 🗺️ Master Absorption Matrix (34 Core Domains)
 
----
-
 ### 1. 🔹 Core Linux Kernel & Variants
 *   **Upstream Repositories:**
     *   `torvalds/linux` — Official Linux kernel source tree.
@@ -324,181 +322,181 @@ By systematic abstraction, SigmaOS maps, obsoletes, and natively replaces mainst
 
 ### 23. 🔹 Additional Linux Distros (Set 2)
 *   **Upstream Repositories:**
-    *   `calculate-linux/calculate` — Gentoo binary profile variant.
-    *   `sabayon/sabayon-distro` — Rolling release Gentoo optimization.
-    *   `chakra-linux/chakra` — Semi-rolling KDE package models.
-    *   `peppermintos/peppermintos` — Cloud-focused lightweight service integration.
-    *   `bodhilinux/bodhi` — Minimalist enlightenment-based distribution.
-    *   `zorinos/zorin-os` — Windows integration emulation layers.
-    *   `elementary/os` — Flat visual layouts and custom panel widgets.
-    *   `deepin-community/deepin` — Custom modular system layouts.
-    *   `mx-linux/mx` — Hardware-probe and configuration assistants.
-    *   `peppermintos/iso` — ISO generation configurations.
+    *   `peppermintos/peppermintos` — Cloud-centric lightweight distro.
+    *   `bodhilinux/bodhi` — Enlightenment-based distro.
+    *   `zorinos/zorin-os` — User-friendly Ubuntu-based distro.
+    *   `elementary/os` — Design-focused Ubuntu-based distro.
+    *   `deepin-community/deepin` — Desktop-focused distro from China.
+    *   `mx-linux/mx` — Debian-based lightweight distro.
+    *   `calculate-linux/calculate` — Gentoo-based distro with binaries.
+    *   `chakra-linux/chakra` — KDE-focused distro.
+    *   `sabayon/sabayon-distro` — Gentoo-based rolling release.
+    *   `peppermintos/iso` — ISO build system.
 *   **Engineering Breakthroughs to Absorb:** Semi-rolling package trees, minimalist visual panel engines, hardware configuration helpers.
 *   **SigmaOS Alignment:** Dynamic settings UI dashboards mapped inside `src/ui/window.rs`.
 
 ### 24. 🔹 Package Managers & Build Systems (Set 2)
 *   **Upstream Repositories:**
-    *   `pkgsrc/pkgsrc` — NetBSD portable package tree structure.
-    *   `conda/conda` — Binary package isolation environments.
-    *   `guix/guix` — GNU functional package configurations.
-    *   `nix-community/nix` — Core Nix expression compiler.
-    *   `spack/spack` — HPC and parameter-varying builds.
-    *   `flatpak/flatpak` — Sandbox bubblewrap runtimes.
-    *   `snapcore/snapd` — SquashFS loopback compression.
-    *   `homebrew/linuxbrew-core` — Multi-user prefix isolation.
-    *   `openembedded/openembedded-core` — Layer-based cross compilation definitions.
-    *   `rpm-software-management/rpm` — C-based package state engine.
+    *   `pkgsrc/pkgsrc` — NetBSD package system.
+    *   `conda/conda` — Cross-platform package manager.
+    *   `guix/guix` — Functional package manager.
+    *   `nix-community/nix` — Nix package manager.
+    *   `spack/spack` — HPC package manager.
+    *   `flatpak/flatpak` — Universal Linux app sandboxing.
+    *   `snapcore/snapd` — Canonical’s Snap system.
+    *   `homebrew/linuxbrew-core` — Homebrew for Linux.
+    *   `openembedded/openembedded-core` — Embedded Linux build system.
+    *   `rpm-software-management/rpm` — RPM package manager.
 *   **Engineering Breakthroughs to Absorb:** Functional isolation of namespaces, parameter-varying dependency resolution, content hashes.
 *   **SigmaOS Alignment:** Native SAT-solver engine and sandboxed execution blocks inside `src/sigpkg/resolver.rs`.
 
 ### 25. 🔹 Desktop Environments (Set 2)
 *   **Upstream Repositories:**
-    *   `GNOME/gnome-shell` — Shell state tracker & layouts.
-    *   `KDE/plasma-desktop` — Modular plasma widgets & IPC.
-    *   `xfce/xfce4-panel` — Taskbar panel integrations.
-    *   `lxde/lxde-common` — Low-memory environment profiles.
-    *   `mate-desktop/mate-panel` — Traditional window panel configurations.
-    *   `swaywm/sway` — Wayland tiling managers.
-    *   `i3/i3` — Tree-based coordinate tile rendering.
-    *   `awesomeWM/awesome` — Lua-driven layout control.
-    *   `openbox/openbox` — Minimal XML layout configurations.
-    *   `fluxbox/fluxbox` — Slot and tab-window structures.
+    *   `GNOME/gnome-shell` — GNOME desktop shell.
+    *   `KDE/plasma-desktop` — KDE Plasma desktop.
+    *   `xfce/xfce4-panel` — XFCE panel.
+    *   `lxde/lxde-common` — LXDE desktop.
+    *   `mate-desktop/mate-panel` — MATE desktop.
+    *   `swaywm/sway` — Wayland tiling WM.
+    *   `i3/i3` — Tiling window manager.
+    *   `awesomeWM/awesome` — Lua-based WM.
+    *   `openbox/openbox` — Lightweight WM.
+    *   `fluxbox/fluxbox` — Minimal WM.
 *   **Engineering Breakthroughs to Absorb:** Tree-based coordinates for window management, Lua/scriptable compositor extensions, lightweight tab groupings.
 *   **SigmaOS Alignment:** Wayland-inspired compositor layouts inside `src/graphics/zenith.rs`.
 
 ### 26. 🔹 HPC & Scientific Tools
 *   **Upstream Repositories:**
-    *   `slurm/slurm` — Workload queues & cluster allocation.
-    *   `openmpi/ompi` — Message-passing interface routing.
-    *   `mpich/mpich` — Shared memory packet transport layers.
-    *   `petsc/petsc` — Parallel linear solvers.
-    *   `hdfgroup/hdf5` — Scientific hierarchy file formats.
-    *   `netcdf/netcdf-c` — Multi-dimensional coordinate files.
-    *   `paraview/paraview` — Distributed parallel mesh decoders.
-    *   `visit-dav/visit` — Interactive mesh geometry renderers.
-    *   `openfoam/openfoam` — Parallel numerical mesh engines.
-    *   `gromacs/gromacs` — Molecular trajectory calculation.
+    *   `slurm/slurm` — HPC workload manager.
+    *   `openmpi/ompi` — MPI implementation.
+    *   `mpich/mpich` — MPI library.
+    *   `petsc/petsc` — Scientific computing toolkit.
+    *   `hdfgroup/hdf5` — HDF5 data format.
+    *   `netcdf/netcdf-c` — NetCDF scientific data format.
+    *   `paraview/paraview` — Visualization toolkit.
+    *   `visit-dav/visit` — Visualization software.
+    *   `openfoam/openfoam` — CFD simulation toolkit.
+    *   `gromacs/gromacs` — Molecular dynamics software.
 *   **Engineering Breakthroughs to Absorb:** Queue scheduling state machines, direct MPI cluster passing, hierarchical data files.
 *   **SigmaOS Alignment:** Sovereign cluster dispatcher layers in `src/orchestration/`.
 
 ### 27. 🔹 Security Tools (Set 2)
 *   **Upstream Repositories:**
-    *   `nmap/nmap` — Port scanner engine.
-    *   `metasploit/metasploit-framework` — Exploit payloads & orchestration.
-    *   `aircrack-ng/aircrack-ng` — Wireless packet interception.
-    *   `john/john` — Password dictionary mutation algorithms.
-    *   `hashcat/hashcat` — GPU password hashing benchmarks.
-    *   `openvas/openvas` — Vulnerability scan schedules.
-    *   `ossec/ossec-hids` — Host event audit trails.
-    *   `snort/snort` — In-line network packet scanner.
-    *   `suricata/suricata` — Multi-thread rule matching engine.
-    *   `clamav/clamav` — Hex/hash virus matching database.
+    *   `nmap/nmap` — Network scanner.
+    *   `metasploit/metasploit-framework` — Penetration testing framework.
+    *   `aircrack-ng/aircrack-ng` — Wi-Fi security tools.
+    *   `john/john` — Password cracker.
+    *   `hashcat/hashcat` — Password recovery.
+    *   `openvas/openvas` — Vulnerability scanner.
+    *   `ossec/ossec-hids` — Host intrusion detection.
+    *   `snort/snort` — IDS/IPS system.
+    *   `suricata/suricata` — IDS/IPS system.
+    *   `clamav/clamav` — Antivirus engine.
 *   **Engineering Breakthroughs to Absorb:** Real-time stream rule match, audit trails, active packet interception.
 *   **SigmaOS Alignment:** Intrusion detection systems and network rules inside `src/security/intrusion.rs`.
 
 ### 28. 🔹 Miscellaneous Utilities (Set 2)
 *   **Upstream Repositories:**
-    *   `screen/screen` — Multiplexer session handlers.
-    *   `tmux/tmux` — Multiplex grid terminals.
-    *   `mc/midnight-commander` — Dual-pane directory tree navigators.
-    *   `nano/nano` — Quick buffer keyboard-bound editors.
-    *   `vim/vim` — Modal motion navigation.
-    *   `emacs/emacs` — Lisp-extensible text environments.
-    *   `joe-editor/joe` — Standard WordStar editing modes.
-    *   `micro-editor/micro` — Mouse-interactive terminal configurations.
-    *   `neovim/neovim` — Lua API text buffers.
-    *   `helix-editor/helix` — Tree-sitter modal configurations.
+    *   `screen/screen` — Terminal multiplexer.
+    *   `tmux/tmux` — Terminal multiplexer.
+    *   `mc/midnight-commander` — File manager.
+    *   `nano/nano` — Text editor.
+    *   `vim/vim` — Text editor.
+    *   `emacs/emacs` — GNU Emacs editor.
+    *   `joe-editor/joe` — Joe’s Own Editor.
+    *   `micro-editor/micro` — Modern terminal editor.
+    *   `neovim/neovim` — Refactored Vim.
+    *   `helix-editor/helix` — Modal text editor.
 *   **Engineering Breakthroughs to Absorb:** Modal navigation states, dual-pane layout trees, terminal multiplex configurations.
 *   **SigmaOS Alignment:** Micro-editor and terminal widget suites in `src/productivity/terminal.rs`.
 
 ### 29. 🔹 Alternative Shells & Terminals
 *   **Upstream Repositories:**
-    *   `oil-shell/oil` — Safe stream parsers and POSIX mappings.
-    *   `dash-shell/dash` — Minimalist POSIX execution script shells.
-    *   `mksh/mksh` — Korn-shell parameter expansion routines.
-    *   `busybox/ash` — Embedded Almquist shell structures.
-    *   `ksh93/ksh` — Advanced standard parameter evaluation.
-    *   `rc-shell/rc` — Plan 9 token-passing pipelines.
-    *   `es-shell/es` — Lambda-calculus function execution.
-    *   `yash-shell/yash` — POSIX-strict command parsing.
-    *   `osh/osh` — Oil-shell variable validators.
-    *   `closh/closh` — Clojure pipeline interpreters.
+    *   `oil-shell/oil` — Bash-compatible modern shell.
+    *   `dash-shell/dash` — Lightweight POSIX shell.
+    *   `mksh/mksh` — MirBSD Korn Shell.
+    *   `busybox/ash` — Almquist shell in BusyBox.
+    *   `ksh93/ksh` — KornShell 93.
+    *   `rc-shell/rc` — Plan 9 shell.
+    *   `es-shell/es` — Functional programming shell.
+    *   `yash-shell/yash` — Yet another shell.
+    *   `osh/osh` — Oil shell variant.
+    *   `closh/closh` — Clojure shell.
 *   **Engineering Breakthroughs to Absorb:** Lambda commands, POSIX compliance parsers, Plan 9-style environment scopes.
 *   **SigmaOS Alignment:** Command parser core inside `src/shell/command.rs`.
 
 ### 30. 🔹 Virtualization & Hypervisors
 *   **Upstream Repositories:**
-    *   `qemu/qemu` — Device emulation & virtual translation.
-    *   `kvm/kvm` — Hardware acceleration register states.
-    *   `xen-project/xen` — Type-1 hypervisor scheduler.
-    *   `virtualbox/virtualbox` — Ring-3 driver interaction layers.
-    *   `proxmox/proxmox-ve` — Virtual environment control networks.
-    *   `libvirt/libvirt` — XML virtualization API.
-    *   `vagrant/vagrant` — Declarative machine environments.
-    *   `ganeti/ganeti` — Multi-node cluster VM placement.
-    *   `opennebula/one` — Orchestration templates.
-    *   `cloudstack/cloudstack` — Distributed storage configurations.
+    *   `qemu/qemu` — Machine emulator & virtualizer.
+    *   `kvm/kvm` — Kernel-based VM.
+    *   `xen-project/xen` — Xen hypervisor.
+    *   `virtualbox/virtualbox` — Oracle VirtualBox.
+    *   `proxmox/proxmox-ve` — Proxmox Virtual Environment.
+    *   `libvirt/libvirt` — Virtualization API.
+    *   `vagrant/vagrant` — VM automation tool.
+    *   `ganeti/ganeti` — Cluster virtualization manager.
+    *   `opennebula/one` — Cloud & virtualization platform.
+    *   `cloudstack/cloudstack` — Apache CloudStack.
 *   **Engineering Breakthroughs to Absorb:** Guest address spaces translation, hypercall schedulers, hardware state register maps.
 *   **SigmaOS Alignment:** Micro-hypervisor integrations in `src/virt/hypervisor.rs`.
 
 ### 31. 🔹 Monitoring & Logging (Set 2)
 *   **Upstream Repositories:**
-    *   `prometheus/prometheus` — Time-series metric database.
-    *   `grafana/grafana` — Real-time telemetry dashboard.
-    *   `elastic/elasticsearch` — Distributed search & indexing.
-    *   `logstash/logstash` — Event ingestion filters.
-    *   `kibana/kibana` — High-speed log analysis UI.
-    *   `graylog/graylog` — Structured log aggregators.
-    *   `fluent/fluentd` — Portable JSON logging layers.
-    *   `vector/vector` — High-performance log pipeline router.
-    *   `loki/loki` — Label-indexed log storage.
-    *   `syslog-ng/syslog-ng` — Secure multi-destination syslog routing.
+    *   `prometheus/prometheus` — Monitoring system.
+    *   `grafana/grafana` — Visualization & dashboards.
+    *   `elastic/elasticsearch` — Search & analytics engine.
+    *   `logstash/logstash` — Log processing pipeline.
+    *   `kibana/kibana` — Data visualization for logs.
+    *   `graylog/graylog` — Log management.
+    *   `fluent/fluentd` — Data collector.
+    *   `vector/vector` — High-performance observability pipeline.
+    *   `loki/loki` — Log aggregation system.
+    *   `syslog-ng/syslog-ng` — Syslog daemon.
 *   **Engineering Breakthroughs to Absorb:** Time-series query states, label-indexed log matching, vector pipelines.
 *   **SigmaOS Alignment:** Event logging pipelines inside `src/logging/unified.rs`.
 
 ### 32. 🔹 Networking & Internet Tools (Set 2)
 *   **Upstream Repositories:**
-    *   `bind/bind9` — DNS transaction engines & zones.
-    *   `dnsmasq/dnsmasq` — Combined DNS/DHCP caches.
-    *   `unbound/unbound` — DNS recursive resolvers.
-    *   `bird/bird` — Dynamic route propagation algorithms.
-    *   `quagga/quagga` — OSPF/BGP routing layers.
-    *   `frrouting/frr` — Open-source routing protocols.
-    *   `openvswitch/ovs` — Virtual layer-2 packet switches.
-    *   `strongswan/strongswan` — IPsec key exchanges.
-    *   `ppp/ppp` — Point-to-Point protocol states.
-    *   `netdata/netdata` — Zero-overhead telemetry visualization.
+    *   `bind/bind9` — DNS server.
+    *   `dnsmasq/dnsmasq` — Lightweight DNS/DHCP server.
+    *   `unbound/unbound` — DNS resolver.
+    *   `bird/bird` — Internet routing daemon.
+    *   `quagga/quagga` — Routing software suite.
+    *   `frrouting/frr` — Routing protocols.
+    *   `openvswitch/ovs` — Virtual switch.
+    *   `strongswan/strongswan` — IPsec VPN.
+    *   `ppp/ppp` — Point-to-Point Protocol.
+    *   `netdata/netdata` — Real-time monitoring.
 *   **Engineering Breakthroughs to Absorb:** Zone cache databases, BGP protocol routing states, virtual Layer-2 packets.
 *   **SigmaOS Alignment:** DNS and routing tables in `src/net/routing.rs` and `src/net/dns.rs`.
 
 ### 33. 🔹 File Systems & Storage (Set 2)
 *   **Upstream Repositories:**
-    *   `aufs/aufs` — Multi-layered union directory lookups.
-    *   `ocfs2/ocfs2-tools` — Cluster shared filesystem metadata.
-    *   `gfs2/gfs2-utils` — Global cluster lock managers.
-    *   `vfat/vfat-tools` — FAT sector layouts.
-    *   `exfat/exfat-utils` — exFAT cluster allocation tables.
-    *   `ntfs-3g/ntfs-3g` — NTFS volume parsing.
-    *   `zfs/zfs` — Storage pools & RAID-Z arrays.
-    *   `btrfs/btrfs-progs` — Extent allocations & subvolumes.
-    *   `e2fsprogs/e2fsprogs` — Ext superblock & block group builders.
-    *   `squashfs-tools/squashfs-tools` — Inode compressed loops.
+    *   `aufs/aufs` — Union filesystem.
+    *   `ocfs2/ocfs2-tools` — Oracle Cluster FS.
+    *   `gfs2/gfs2-utils` — Cluster filesystem.
+    *   `vfat/vfat-tools` — FAT filesystem tools.
+    *   `exfat/exfat-utils` — exFAT filesystem tools.
+    *   `ntfs-3g/ntfs-3g` — NTFS driver.
+    *   `zfs/zfs` — OpenZFS filesystem.
+    *   `btrfs/btrfs-progs` — Btrfs tools.
+    *   `e2fsprogs/e2fsprogs` — Ext filesystem utilities.
+    *   `squashfs-tools/squashfs-tools` — Compressed FS tools.
 *   **Engineering Breakthroughs to Absorb:** Extent mappings, cluster allocation tables, compressed SquashFS loopback, subvolume trees.
 *   **SigmaOS Alignment:** Ext4 and FAT32 native drivers inside `src/filesystem/mod.rs`.
 
 ### 34. 🔹 Miscellaneous Utilities (Set 3)
 *   **Upstream Repositories:**
-    *   `cron/cron` — Daemon task scheduler.
-    *   `anacron/anacron` — Delayed startup jobs.
-    *   `systemtap/systemtap` — Kernel trace compilation.
-    *   `bcc/bcc` — BPF compile helpers.
-    *   `bpftrace/bpftrace` — Interactive trace expressions.
-    *   `strace/strace` — System call interception register maps.
-    *   `ltrace/ltrace` — Library dynamic symbol mappings.
-    *   `gdb/gdb` — Dwarf symbol maps & register tracing.
-    *   `valgrind/valgrind` — Virtual execution memory checkers.
-    *   `perf/perf` — CPU performance counter maps.
+    *   `cron/cron` — Job scheduler.
+    *   `anacron/anacron` — Scheduled jobs for laptops.
+    *   `systemtap/systemtap` — Kernel instrumentation.
+    *   `bcc/bcc` — BPF Compiler Collection.
+    *   `bpftrace/bpftrace` — Tracing tool.
+    *   `strace/strace` — System call tracer.
+    *   `ltrace/ltrace` — Library call tracer.
+    *   `gdb/gdb` — GNU debugger.
+    *   `valgrind/valgrind` — Memory debugging tool.
+    *   `perf/perf` — Kernel performance analysis.
 *   **Engineering Breakthroughs to Absorb:** Dynamic trace probes, system call register mapping, DWARF symbol tables.
 *   **SigmaOS Alignment:** Kernel-wide metric collection and tracing inside `src/tracing/sigma_trace.rs`.
 

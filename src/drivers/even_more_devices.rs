@@ -71,17 +71,11 @@ impl PeripheralDevice for PS2MouseDriver {
         if data.is_empty() {
             return Err("No data to write");
         }
-        // Write to FM Synthesizer register pairs [reg, value]
-        let mut idx = 0;
-        while idx + 1 < data.len() {
-            let reg = data[idx] as usize;
-            let val = data[idx + 1];
-            if reg < self.registers.len() {
-                self.registers[reg] = val;
-            }
-            idx += 2;
-        }
-        Ok(idx)
+        // Store written bytes to buffer for simulated mouse feedback
+        let write_len = data.len().min(self.buffer.len());
+        self.buffer[..write_len].copy_from_slice(&data[..write_len]);
+        self.len = write_len;
+        Ok(write_len)
     }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
