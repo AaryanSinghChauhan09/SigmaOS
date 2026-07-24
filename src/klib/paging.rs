@@ -1,23 +1,36 @@
+use core::mem;
 /// OOP-based Paging + Virtual Memory for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 7-8
 /// Implements 4-level page tables, PML4, userspace isolation, page fault handling
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PageTableLevel { PML4 = 0, PDPT = 1, PD = 2, PT = 3 }
+pub enum PageTableLevel {
+    PML4 = 0,
+    PDPT = 1,
+    PD = 2,
+    PT = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PageFaultError { Success = 0, NotPresent = 1, PermissionDenied = 2, InvalidAddress = 3 }
+pub enum PageFaultError {
+    Success = 0,
+    NotPresent = 1,
+    PermissionDenied = 2,
+    InvalidAddress = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PrivilegeLevel { Kernel = 0, User = 3 }
+pub enum PrivilegeLevel {
+    Kernel = 0,
+    User = 3,
+}
 
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
@@ -70,23 +83,33 @@ impl SimplePageTableEntry {
 }
 
 impl PageTableEntry for SimplePageTableEntry {
-    fn is_present(&self) -> bool { self.present.load(Ordering::SeqCst) == 1 }
-    fn is_writable(&self) -> bool { self.writable.load(Ordering::SeqCst) == 1 }
-    fn is_user_accessible(&self) -> bool { self.user_accessible.load(Ordering::SeqCst) == 1 }
+    fn is_present(&self) -> bool {
+        self.present.load(Ordering::SeqCst) == 1
+    }
+    fn is_writable(&self) -> bool {
+        self.writable.load(Ordering::SeqCst) == 1
+    }
+    fn is_user_accessible(&self) -> bool {
+        self.user_accessible.load(Ordering::SeqCst) == 1
+    }
     fn get_physical_address(&self) -> PhysicalAddress {
         self.physical_addr.load(Ordering::SeqCst) & 0x000FFFFFFFFFF000
     }
     fn set_present(&mut self, present: bool) {
-        self.present.store(if present { 1 } else { 0 }, Ordering::SeqCst);
+        self.present
+            .store(if present { 1 } else { 0 }, Ordering::SeqCst);
     }
     fn set_writable(&mut self, writable: bool) {
-        self.writable.store(if writable { 1 } else { 0 }, Ordering::SeqCst);
+        self.writable
+            .store(if writable { 1 } else { 0 }, Ordering::SeqCst);
     }
     fn set_user_accessible(&mut self, user: bool) {
-        self.user_accessible.store(if user { 1 } else { 0 }, Ordering::SeqCst);
+        self.user_accessible
+            .store(if user { 1 } else { 0 }, Ordering::SeqCst);
     }
     fn set_physical_address(&mut self, addr: PhysicalAddress) {
-        self.physical_addr.store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
+        self.physical_addr
+            .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
     }
     fn get_page_size(&self) -> usize {
         self.page_size_flag.load(Ordering::SeqCst)
@@ -150,13 +173,20 @@ impl PageTable for SimplePageTable {
 }
 
 pub trait VirtualMemoryManager {
-    fn map_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
-        self.map_page_with_size(virt, phys, user, writable, 4096)
-    }
-    fn map_page_with_size(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool, page_size: usize) -> Result<(), PageFaultError>;
+    fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError>;
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress>;
-    fn handle_page_fault(&mut self, virt: VirtualAddress, error_code: usize) -> Result<(), PageFaultError>;
+    fn handle_page_fault(
+        &mut self,
+        virt: VirtualAddress,
+        error_code: usize,
+    ) -> Result<(), PageFaultError>;
 }
 
 pub struct SimpleVMM {
@@ -184,41 +214,39 @@ impl SimpleVMM {
             next_table_addr: AtomicUsize::new(0x2000),
         }
     }
-    
+
     fn get_pml4_index(&self, virt: VirtualAddress) -> usize {
         (virt >> 39) & 0x1FF
     }
-    
+
     fn get_pdpt_index(&self, virt: VirtualAddress) -> usize {
         (virt >> 30) & 0x1FF
     }
-    
+
     fn get_pd_index(&self, virt: VirtualAddress) -> usize {
         (virt >> 21) & 0x1FF
     }
-    
+
     fn get_pt_index(&self, virt: VirtualAddress) -> usize {
         (virt >> 12) & 0x1FF
     }
 }
 
 impl VirtualMemoryManager for SimpleVMM {
-    fn map_page_with_size(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool, page_size: usize) -> Result<(), PageFaultError> {
-        // Enforce strict address alignment verification (must be page-aligned to its size)
-        if page_size != 4096 && page_size != 2097152 && page_size != 1073741824 {
-            return Err(PageFaultError::InvalidAddress);
-        }
-        if virt % page_size != 0 || phys % page_size != 0 {
-            return Err(PageFaultError::InvalidAddress);
-        }
-
+    fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
-        
+
         let pml4_present = self.pml4.get_entry(pml4_idx).is_present();
-        
+
         if !pml4_present {
             let pdpt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pdpt_entry = SimplePageTableEntry::new();
@@ -226,7 +254,7 @@ impl VirtualMemoryManager for SimpleVMM {
             pdpt_entry.set_writable(true);
             pdpt_entry.set_user_accessible(false);
             pdpt_entry.set_physical_address(pdpt_phys);
-            
+
             let pdpt_table = SimplePageTable::new(pdpt_phys);
             while self.pdpt_tables.len() <= pml4_idx {
                 self.pdpt_tables.push(None);
@@ -234,14 +262,14 @@ impl VirtualMemoryManager for SimpleVMM {
             self.pdpt_tables[pml4_idx] = Some(pdpt_table);
             self.pml4.set_entry(pml4_idx, pdpt_entry);
         }
-        
+
         let pdpt_idx_in_vec = pml4_idx;
         let pdpt_present = if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
             pdpt.get_entry(pdpt_idx).is_present()
         } else {
             false
         };
-        
+
         if !pdpt_present {
             if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
                 let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
@@ -250,7 +278,7 @@ impl VirtualMemoryManager for SimpleVMM {
                 pd_entry.set_writable(true);
                 pd_entry.set_user_accessible(false);
                 pd_entry.set_physical_address(pd_phys);
-                
+
                 let pd_table = SimplePageTable::new(pd_phys);
                 while self.pd_tables.len() <= pdpt_idx {
                     self.pd_tables.push(None);
@@ -275,7 +303,7 @@ impl VirtualMemoryManager for SimpleVMM {
                 pt_entry.set_writable(true);
                 pt_entry.set_user_accessible(false);
                 pt_entry.set_physical_address(pt_phys);
-                
+
                 let pt_table = SimplePageTable::new(pt_phys);
                 while self.pt_tables.len() <= pd_idx {
                     self.pt_tables.push(None);
@@ -284,7 +312,7 @@ impl VirtualMemoryManager for SimpleVMM {
                 pd.set_entry(pd_idx, pt_entry);
             }
         }
-        
+
         let pt_idx_in_vec = pd_idx;
         if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
             let mut pt_entry = SimplePageTableEntry::new();
@@ -297,30 +325,30 @@ impl VirtualMemoryManager for SimpleVMM {
 
         Ok(())
     }
-    
+
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
-        
+
         let pml4_present = self.pml4.get_entry(pml4_idx).is_present();
         if !pml4_present {
             return Err(PageFaultError::NotPresent);
         }
-        
+
         if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
             let pdpt_present = pdpt.get_entry(pdpt_idx).is_present();
             if !pdpt_present {
                 return Err(PageFaultError::NotPresent);
             }
-            
+
             if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
                 let pd_present = pd.get_entry(pd_idx).is_present();
                 if !pd_present {
                     return Err(PageFaultError::NotPresent);
                 }
-                
+
                 if let Some(ref mut pt) = self.pt_tables[pd_idx] {
                     let mut pt_entry = SimplePageTableEntry::new();
                     pt_entry.set_present(false);
@@ -328,43 +356,31 @@ impl VirtualMemoryManager for SimpleVMM {
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress> {
         let pml4_idx = self.get_pml4_index(virt);
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
-        
+
         let pml4_entry = self.pml4.get_entry_ref(pml4_idx);
         if !pml4_entry.is_present() {
             return None;
         }
-        
+
         if let Some(ref pdpt) = self.pdpt_tables[pml4_idx] {
             let pdpt_entry = pdpt.get_entry_ref(pdpt_idx);
             if !pdpt_entry.is_present() {
                 return None;
-            }
-            
-            // If 1GB Giant page is mapped at PDPT level
-            if pdpt_entry.get_page_size() == 1073741824 {
-                let page_offset = virt & 0x3FFFFFFF;
-                return Some(pdpt_entry.get_physical_address() | page_offset);
             }
 
             if let Some(ref pd) = self.pd_tables[pdpt_idx] {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
-                }
-                
-                // If 2MB Huge page is mapped at PD level
-                if pd_entry.get_page_size() == 2097152 {
-                    let page_offset = virt & 0x1FFFFF;
-                    return Some(pd_entry.get_physical_address() | page_offset);
                 }
 
                 if let Some(ref pt) = self.pt_tables[pd_idx] {
@@ -376,11 +392,15 @@ impl VirtualMemoryManager for SimpleVMM {
                 }
             }
         }
-        
+
         None
     }
-    
-    fn handle_page_fault(&mut self, virt: VirtualAddress, _error_code: usize) -> Result<(), PageFaultError> {
+
+    fn handle_page_fault(
+        &mut self,
+        virt: VirtualAddress,
+        _error_code: usize,
+    ) -> Result<(), PageFaultError> {
         let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
         self.map_page(virt, phys, true, true)
     }
@@ -389,7 +409,14 @@ impl VirtualMemoryManager for SimpleVMM {
 pub trait ProcessMemory {
     fn create_address_space(&mut self) -> Result<usize, PageFaultError>;
     fn destroy_address_space(&mut self, space_id: usize) -> Result<(), PageFaultError>;
-    fn map_region(&mut self, space_id: usize, base: VirtualAddress, size: usize, user: bool, writable: bool) -> Result<(), PageFaultError>;
+    fn map_region(
+        &mut self,
+        space_id: usize,
+        base: VirtualAddress,
+        size: usize,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError>;
 }
 
 pub struct SimpleProcessMemory {
@@ -422,7 +449,7 @@ impl ProcessMemory for SimpleProcessMemory {
         self.address_spaces[id] = Some(vmm);
         Ok(id)
     }
-    
+
     fn destroy_address_space(&mut self, space_id: usize) -> Result<(), PageFaultError> {
         if space_id >= self.address_spaces.len() {
             return Err(PageFaultError::InvalidAddress);
@@ -430,8 +457,15 @@ impl ProcessMemory for SimpleProcessMemory {
         self.address_spaces[space_id] = None;
         Ok(())
     }
-    
-    fn map_region(&mut self, space_id: usize, base: VirtualAddress, size: usize, user: bool, writable: bool) -> Result<(), PageFaultError> {
+
+    fn map_region(
+        &mut self,
+        space_id: usize,
+        base: VirtualAddress,
+        size: usize,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError> {
         if space_id >= self.address_spaces.len() {
             return Err(PageFaultError::InvalidAddress);
         }
@@ -455,33 +489,65 @@ impl<T> Default for Vec<T> {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+        VecIter {
+            vec: self,
+            index: 0,
+        }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -611,7 +677,9 @@ mod tests {
         let mut pm = SimpleProcessMemory::new();
         let space_id = pm.create_address_space().unwrap();
 
-        assert!(pm.map_region(space_id, 0x4000_0000, 8192, true, true).is_ok());
+        assert!(pm
+            .map_region(space_id, 0x4000_0000, 8192, true, true)
+            .is_ok());
 
         assert!(pm.destroy_address_space(space_id).is_ok());
     }

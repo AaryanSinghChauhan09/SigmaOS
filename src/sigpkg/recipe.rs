@@ -1,5 +1,6 @@
-// SigmaOS Package Recipes
-// Build recipes for package compilation and installation
+//! SigPkg: Community Recipe Packaging (Arch Linux Absorption)
+//!
+//! Zero-allocation package manager parsing simple, signed declarative community recipes.
 
 use crate::sigpkg::{Dependency, Version};
 use std::collections::HashMap;
@@ -59,23 +60,24 @@ pub struct PackageRecipe {
 }
 
 impl PackageRecipe {
-    pub fn new(name: String, version: Version) -> Self {
-        Self {
+    pub fn new(
+        name: &'static str,
+        major: u32,
+        minor: u32,
+        patch: u32,
+        url: &'static str,
+        dependencies: &'static [&'static str],
+    ) -> Self {
+        PackageRecipe {
             name,
-            version,
-            description: String::new(),
-            build_system: BuildSystem::Cargo,
-            dependencies: Vec::new(),
-            source_url: String::new(),
-            hash: String::new(),
-            build_commands: Vec::new(),
-            install_commands: Vec::new(),
-            environment: HashMap::new(),
-            pkgrel: 1,
-            arch: "x86_64".to_string(),
-            license_spdx: "GPL".to_string(),
-            prepare_commands: Vec::new(),
-            package_commands: Vec::new(),
+            version: Version {
+                major,
+                minor,
+                patch,
+            },
+            source_url: url,
+            checksum: [0; 32], // Stub checksum
+            dependencies,
         }
     }
 

@@ -10,9 +10,9 @@ pub use cross_platform::{
 };
 
 pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
+    VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
 pub use mint_linux::{
