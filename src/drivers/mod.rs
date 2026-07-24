@@ -1,11 +1,19 @@
 // SigmaOS Drivers Module
 pub mod ancient_devices;
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
+pub mod kernel_io_suite;
+pub mod kernel_releases;
 pub mod legacy_keyboard;
 pub mod modern_usb;
+pub mod more_devices;
 pub mod network;
 pub mod peripheral;
+pub mod soc;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
@@ -48,8 +56,17 @@ pub use kernel_releases::{
 };
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
+pub use more_devices::{
+    AppleSiliconUnifiedMemoryBus, CgaGraphicsDriver, CxlMemoryDriver, FloppyDiskDriver,
+    GameportJoystickDriver, IdeControllerDriver, IntelXeGpuDriver, ParallelPrinterDriver,
+    PcieGen5NvmeDriver, SoundBlaster16Driver, Thunderbolt4Controller, Wifi7Adapter,
+};
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
+pub use soc::{
+    ClockController, ClockError, GenericClock, GenericPin, PinController, PinDirection, PinError,
+    PinPull, SocClockController, SocPinController, UnifiedSocController,
+};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};

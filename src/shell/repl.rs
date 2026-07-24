@@ -1,24 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
-// Interactive shell with full desktop GUI-parity and defensive auditing commands
+// Interactive shell for SigmaOS
 
-use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
-
-use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
-    AccessibilitySetting,
-};
-use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
-};
-use crate::customization::{CustomizationEngine, Theme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
-use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
-};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -37,31 +20,25 @@ pub enum ShellCommand {
     Get {
         variable: String,
     },
-
-    // Customization & GUI theme commands
-    ThemeSet {
-        theme: String,
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
     },
-    ThemeList,
-    RoutineEnable {
-        routine_id: String,
+    Cat {
+        filename: String,
     },
-
-    // Accessibility commands
-    A11ySet {
-        setting: String,
-        enabled: bool,
+    Systemctl {
+        action: String,
+        service: String,
     },
-    A11yProfile {
-        profile: String,
+    Apt {
+        subcommand: String,
+        package: Option<String>,
     },
-
-    // Telemetry and monitoring commands
-    MonitorShow,
-
-    // Package management commands
-    PkgInstall {
-        name: String,
+    Ai {
+        query: String,
     },
     Display {
         subcommand: String,
@@ -101,7 +78,7 @@ pub enum ShellCommand {
 /// Shell REPL
 pub struct ShellRepl {
     running: bool,
-    variables: HashMap<String, String>,
+    variables: std::collections::HashMap<String, String>,
     prompt: String,
     current_user: String,
     current_dir: String,
@@ -127,16 +104,40 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Stopped".to_string());
+        services.insert("udev".to_string(), "Running".to_string());
+
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+        installed_packages.insert("sigma-core".to_string());
+
+        let mut displays = Vec::new();
+        displays.push("DP-1: primary 2560x1440@144Hz scale=1.0 hdr=false".to_string());
+        displays.push("HDMI-1: secondary 1920x1080@60Hz scale=1.0 hdr=false".to_string());
+
+        let mut windows = Vec::new();
+        windows.push("ID=1 Title='SigmaTerminal' App='sigma.terminal' Geom=0,0,800,600 State=Normal Focused=true".to_string());
+        windows.push("ID=2 Title='SigmaOffice' App='sigma.office' Geom=100,100,1024,768 State=Normal Focused=false".to_string());
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            prompt: "sigma-sh> ".to_string(),
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages: std::collections::HashSet::new(),
+            installed_packages,
+            active_theme: "Sovereign Dark".to_string(),
+            active_profile: "standard".to_string(),
+            active_layout: "Adaptive".to_string(),
+            clipboard_content: "Initial clipboard context (0x5001)".to_string(),
+            screen_reader_enabled: false,
+            high_contrast_enabled: false,
+            magnifier_zoom: 1.0,
+            color_blind_mode: "none".to_string(),
+            recording_active: false,
+            displays,
+            windows,
         }
     }
 
@@ -144,7 +145,6 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
@@ -169,7 +169,7 @@ impl ShellRepl {
     }
 
     pub fn run(&mut self) {
-        println!("SigmaOS Shell v0.1.0 (GUI-Parity & Security Auditing Enabled)");
+        println!("SigmaOS Shell v0.1.0");
         println!("Type 'help' for available commands\n");
 
         let stdin = io::stdin();
@@ -208,240 +208,102 @@ impl ShellRepl {
     }
 
     fn parse_command(&self, input: &str) -> ShellCommand {
-        // Optimized to minimize/avoid heap allocations by using iterators.
-        // Single-word commands are completely allocation-free.
-        let mut parts = input.split_whitespace();
-        let cmd = match parts.next() {
-            Some(c) => c,
-            None => return ShellCommand::Unknown(input.to_string()),
-        };
+        let parts: Vec<&str> = input.split_whitespace().collect();
 
-        match cmd {
+        if parts.is_empty() {
+            return ShellCommand::Unknown(input.to_string());
+        }
+
+        match parts[0] {
             "help" => ShellCommand::Help,
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
             "pwd" => ShellCommand::Pwd,
             "whoami" => ShellCommand::WhoAmI,
-            "uname" => ShellCommand::Uname,
-            "clear" => ShellCommand::Clear,
-            "touch" => {
-                if let Some(filename) = parts.next() {
-                    ShellCommand::Touch {
-                        filename: filename.to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "mkdir" => {
-                if let Some(dirname) = parts.next() {
-                    ShellCommand::Mkdir {
-                        dirname: dirname.to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "rm" => {
-                if let Some(filename) = parts.next() {
-                    ShellCommand::Rm {
-                        filename: filename.to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "echo" => {
-                let message = parts.collect::<Vec<&str>>().join(" ");
+                let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
             }
-            "set" => {
-                if let Some(variable) = parts.next() {
-                    let value = parts.collect::<Vec<&str>>().join(" ");
-                    if !value.is_empty() {
-                        ShellCommand::Set {
-                            variable: variable.to_string(),
-                            value,
-                        }
+            "su" => {
+                if parts.len() >= 2 {
+                    let password = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
                     } else {
-                        ShellCommand::Unknown(input.to_string())
+                        None
+                    };
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password,
+                    }
+                } else {
+                    ShellCommand::Su {
+                        username: "root".to_string(),
+                        password: None,
+                    }
+                }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "systemctl" => {
+                if parts.len() >= 2 {
+                    let action = parts[1].to_string();
+                    let service = if parts.len() >= 3 {
+                        parts[2].to_string()
+                    } else {
+                        String::new()
+                    };
+                    ShellCommand::Systemctl { action, service }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "apt" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let package = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Apt {
+                        subcommand,
+                        package,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "set" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Set {
+                        variable: parts[1].to_string(),
+                        value: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "get" => {
-                if let Some(variable) = parts.next() {
+                if parts.len() >= 2 {
                     ShellCommand::Get {
-                        variable: variable.to_string(),
+                        variable: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "theme" => {
+            "ai" => {
                 if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::ThemeList,
-                        "set" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::ThemeSet {
-                                    theme: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "routine" => {
-                if parts.len() >= 3 && parts[1] == "enable" {
-                    ShellCommand::RoutineEnable {
-                        routine_id: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    match parts[1] {
-                        "profile" => ShellCommand::A11yProfile {
-                            profile: parts[2].to_string(),
-                        },
-                        "set" => {
-                            if parts.len() >= 4 {
-                                let enabled =
-                                    parts[3] == "on" || parts[3] == "true" || parts[3] == "1";
-                                ShellCommand::A11ySet {
-                                    setting: parts[2].to_string(),
-                                    enabled,
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "monitor" => {
-                if parts.len() >= 2 && parts[1] == "show" {
-                    ShellCommand::MonitorShow
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "pkg" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::PkgList,
-                        "install" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::PkgInstall {
-                                    name: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "remove" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::PkgRemove {
-                                    name: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "vm" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::VmList,
-                        "create" => {
-                            if parts.len() >= 4 {
-                                ShellCommand::VmCreate {
-                                    name: parts[2].to_string(),
-                                    tech: parts[3].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "start" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::VmStart {
-                                    id: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "container" => {
-                if parts.len() >= 4 && parts[1] == "run" {
-                    ShellCommand::ContainerRun {
-                        name: parts[2].to_string(),
-                        image: parts[3].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "platform" => {
-                if parts.len() >= 5 && parts[1] == "run" {
-                    ShellCommand::PlatformRun {
-                        name: parts[2].to_string(),
-                        platform: parts[3].to_string(),
-                        format: parts[4].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "snapshot" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "create" => ShellCommand::SnapshotCreate,
-                        "restore" => {
-                            if parts.len() >= 3 {
-                                let id = parts[2].to_string();
-                                ShellCommand::SnapshotRestore { id }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "audit" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "status" => ShellCommand::AuditStatus,
-                        "log" => ShellCommand::AuditLog,
-                        "check" => ShellCommand::AuditCheck,
-                        _ => ShellCommand::Unknown(input.to_string()),
+                    ShellCommand::Ai {
+                        query: parts[1..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -491,7 +353,7 @@ impl ShellRepl {
         }
     }
 
-    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
                    help         - Show this help message\n\
@@ -533,11 +395,6 @@ impl ShellRepl {
             }
             ShellCommand::Pwd => Ok(self.current_dir.clone()),
             ShellCommand::WhoAmI => Ok(self.current_user.clone()),
-            ShellCommand::Uname => Ok("Linux sigmaos 6.24.0-mainline #1 SMP PREEMPT_RT Sun Jul 19 2026 x86_64 x86_64 x86_64 GNU/Linux".to_string()),
-            ShellCommand::Clear => Ok("\x1B[2J\x1B[H".to_string()),
-            ShellCommand::Touch { filename } => Ok(format!("Created empty file: {}", filename)),
-            ShellCommand::Mkdir { dirname } => Ok(format!("Created directory: {}", dirname)),
-            ShellCommand::Rm { filename } => Ok(format!("Removed file: {}", filename)),
             ShellCommand::Su { username, password } => {
                 if username == "root" {
                     let pwd = password.unwrap_or_default();
@@ -861,31 +718,6 @@ mod tests {
     }
 
     #[test]
-    fn test_theme_and_profile_commands() {
-        let mut repl = ShellRepl::new();
-
-        let theme_cmd = repl.parse_command("theme dark");
-        let res = repl.execute_command(theme_cmd).unwrap();
-        assert_eq!(repl.current_theme, "dark");
-        assert!(res.contains("dark"));
-
-        let profile_cmd = repl.parse_command("profile developer");
-        let res = repl.execute_command(profile_cmd).unwrap();
-        assert_eq!(repl.current_profile, "developer");
-        assert!(res.contains("developer"));
-    }
-
-    #[test]
-    fn test_a11y_commands() {
-        let mut repl = ShellRepl::new();
-
-        let a11y_cmd = repl.parse_command("a11y high_contrast on");
-        let res = repl.execute_command(a11y_cmd).unwrap();
-        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
-        assert!(res.contains("on"));
-    }
-
-    #[test]
     fn test_exit() {
         let mut repl = ShellRepl::new();
         let command = ShellCommand::Exit;
@@ -894,141 +726,96 @@ mod tests {
     }
 
     #[test]
-    fn test_cli_customization() {
+    fn test_pwd_whoami() {
         let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("theme list");
-        assert!(matches!(list_cmd, ShellCommand::ThemeList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Dark"));
-        assert!(list_res.contains("Light"));
-
-        let set_cmd = repl.parse_command("theme set Light");
-        assert!(matches!(set_cmd, ShellCommand::ThemeSet { .. }));
-        let set_res = repl.execute_command(set_cmd).unwrap();
-        assert!(set_res.contains("Light"));
-
-        let enable_cmd = repl.parse_command("routine enable work_mode");
-        assert!(matches!(enable_cmd, ShellCommand::RoutineEnable { .. }));
-        let enable_res = repl.execute_command(enable_cmd).unwrap();
-        assert!(enable_res.contains("Work Mode"));
+        assert_eq!(
+            repl.execute_command(ShellCommand::Pwd).unwrap(),
+            "/home/ubuntu"
+        );
+        assert_eq!(
+            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
+            "ubuntu"
+        );
     }
 
     #[test]
-    fn test_cli_accessibility() {
+    fn test_su_root() {
         let mut repl = ShellRepl::new();
-
-        let set_cmd = repl.parse_command("a11y set screen_reader on");
-        assert!(matches!(set_cmd, ShellCommand::A11ySet { .. }));
-        let set_res = repl.execute_command(set_cmd).unwrap();
-        assert!(set_res.contains("true"));
-
-        let profile_cmd = repl.parse_command("a11y profile blind");
-        assert!(matches!(profile_cmd, ShellCommand::A11yProfile { .. }));
-        let profile_res = repl.execute_command(profile_cmd).unwrap();
-        assert!(profile_res.contains("Vision Impaired"));
+        assert!(repl
+            .execute_command(ShellCommand::Su {
+                username: "root".to_string(),
+                password: Some("admin".to_string())
+            })
+            .is_ok());
+        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
+        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
     }
 
     #[test]
-    fn test_cli_telemetry() {
+    fn test_cat_command() {
         let mut repl = ShellRepl::new();
-
-        let show_cmd = repl.parse_command("monitor show");
-        assert!(matches!(show_cmd, ShellCommand::MonitorShow));
-        let show_res = repl.execute_command(show_cmd).unwrap();
-        assert!(show_res.contains("System Telemetry Dashboard"));
-        assert!(show_res.contains("CPU Usage"));
-        assert!(show_res.contains("Memory Usage"));
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "README.md".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "nonexistent.txt".to_string()
+            })
+            .is_err());
     }
 
     #[test]
-    fn test_cli_package_management() {
+    fn test_systemctl_commands() {
         let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("pkg list");
-        assert!(matches!(list_cmd, ShellCommand::PkgList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Installed system packages"));
-
-        let install_cmd = repl.parse_command("pkg install nano");
-        assert!(matches!(install_cmd, ShellCommand::PkgInstall { .. }));
-        let install_res = repl.execute_command(install_cmd).unwrap();
-        assert!(install_res.contains("nano"));
-
-        let remove_cmd = repl.parse_command("pkg remove nano");
-        assert!(matches!(remove_cmd, ShellCommand::PkgRemove { .. }));
-        let remove_res = repl.execute_command(remove_cmd).unwrap();
-        assert!(remove_res.contains("nano"));
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "list".to_string(),
+                service: String::new()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "stop".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "start".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
     }
 
     #[test]
-    fn test_cli_virtualization() {
+    fn test_apt_commands() {
         let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("vm list");
-        assert!(matches!(list_cmd, ShellCommand::VmList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Running Guest Virtual Machines"));
-
-        let create_cmd = repl.parse_command("vm create guest-01 qemu");
-        assert!(matches!(create_cmd, ShellCommand::VmCreate { .. }));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("guest-01"));
-
-        let container_cmd = repl.parse_command("container run web-c nginx-img");
-        assert!(matches!(container_cmd, ShellCommand::ContainerRun { .. }));
-        let container_res = repl.execute_command(container_cmd).unwrap();
-        assert!(container_res.contains("web-c"));
-    }
-
-    #[test]
-    fn test_cli_compatibility() {
-        let mut repl = ShellRepl::new();
-
-        let run_cmd = repl.parse_command("platform run photoshop windows exe");
-        assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
-        let run_res = repl.execute_command(run_cmd).unwrap();
-        assert!(run_res.contains("photoshop"));
-        assert!(run_res.contains("Translation"));
-    }
-
-    #[test]
-    fn test_cli_resilience() {
-        let mut repl = ShellRepl::new();
-
-        let create_cmd = repl.parse_command("snapshot create");
-        assert!(matches!(create_cmd, ShellCommand::SnapshotCreate));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("successfully created"));
-
-        let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
-        assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
-        let restore_res = repl.execute_command(restore_cmd);
-        // "checkpoint-1" won't exist initially, returns not found Err
-        assert!(restore_res.is_err());
-    }
-
-    #[test]
-    fn test_cli_defensive_auditing() {
-        let mut repl = ShellRepl::new();
-
-        let status_cmd = repl.parse_command("audit status");
-        assert!(matches!(status_cmd, ShellCommand::AuditStatus));
-        let status_res = repl.execute_command(status_cmd).unwrap();
-        assert!(status_res.contains("Defensive Audit Summary"));
-        assert!(status_res.contains("Enforced"));
-
-        let log_cmd = repl.parse_command("audit log");
-        assert!(matches!(log_cmd, ShellCommand::AuditLog));
-        let log_res = repl.execute_command(log_cmd).unwrap();
-        assert!(log_res.contains("Latest Defensive Access Logs"));
-        assert!(log_res.contains("CAP_CHECK"));
-
-        let check_cmd = repl.parse_command("audit check");
-        assert!(matches!(check_cmd, ShellCommand::AuditCheck));
-        let check_res = repl.execute_command(check_cmd).unwrap();
-        assert!(check_res.contains("System Safety Sanity Scan"));
-        assert!(check_res.contains("W^X strictly enforced"));
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "update".to_string(),
+                package: None
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "search".to_string(),
+                package: Some("vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "install".to_string(),
+                package: Some("sigma-vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "list".to_string(),
+                package: None
+            })
+            .is_ok());
     }
 
     #[test]

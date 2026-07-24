@@ -1,6 +1,7 @@
 // Arch-Style: Zero-Allocation SAT Solver and Package Parser
 // Handles multiple version constraints without dynamic memory overhead
-// Enhanced with SigmaRecipes (PKGBUILD parser) and NIST Dilithium-5 Post-Quantum cryptography verification.
+// Enhanced with SigmaRecipes (PKGBUILD parser), NIST Dilithium-5 Post-Quantum cryptography verification,
+// Reproducible Build Env Hash Validators, and ABS Sandbox Hook Processors.
 
 #![no_std]
 
@@ -313,6 +314,86 @@ impl PostQuantumVerifier {
     }
 }
 
+// --- J. REPRODUCIBLE BUILD ENVIRONMENT HASH VALIDATOR ---
+pub struct ReproducibleBuildVerifier;
+
+impl ReproducibleBuildVerifier {
+    /// Computes a deterministic environment fingerprint (seed) based on compiler options and target configs
+    pub fn compute_environment_fingerprint(
+        rustc_version: &str,
+        target_arch: &str,
+        opt_level: u8,
+        timestamp: u64,
+    ) -> u64 {
+        let mut hash = 5381u64;
+        // Jenkins/DJB2-style hash over environment parameters
+        for &b in rustc_version.as_bytes() {
+            hash = hash.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        for &b in target_arch.as_bytes() {
+            hash = hash.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        hash = hash.wrapping_mul(33).wrapping_add(opt_level as u64);
+        // Include source epoch timestamp if deterministic
+        hash = hash.wrapping_mul(33).wrapping_add(timestamp);
+        hash
+    }
+
+    /// Verifies if a newly compiled package binary deterministic checksum matches expectation
+    pub fn verify_binary_determinism(
+        binary_a: &[u8],
+        binary_b: &[u8],
+    ) -> bool {
+        binary_a == binary_b
+    }
+}
+
+// --- K. ABS SANDBOX HOOK PROCESSOR (makepkg-equivalent) ---
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AbsHook {
+    Prepare,
+    Build,
+    Check,
+    Package,
+}
+
+pub struct AbsSandboxHookProcessor {
+    pub capability_mask: u32,
+    pub executed_hooks: Vec<AbsHook>,
+}
+
+impl AbsSandboxHookProcessor {
+    pub fn new(cap_mask: u32) -> Self {
+        Self {
+            capability_mask: cap_mask,
+            executed_hooks: Vec::new(),
+        }
+    }
+
+    /// Runs a specific build-lifecycle hook (e.g. build() or package()) in a capability-gated sandbox environment
+    pub fn execute_hook(&mut self, hook: AbsHook, hook_script: &str) -> Result<&'static str, &'static str> {
+        // Enforce security capability validation to protect building hosts
+        let required_cap = match hook {
+            AbsHook::Prepare => 0x1,
+            AbsHook::Build   => 0x2,
+            AbsHook::Check   => 0x4,
+            AbsHook::Package => 0x8,
+        };
+
+        if (self.capability_mask & required_cap) != required_cap {
+            return Err("Sandbox error: Insufficient capabilities to run makepkg stage!");
+        }
+
+        // Simulates unprivileged sandboxed shell script execution validation
+        if hook_script.contains("rm -rf /") {
+            return Err("Sandbox security alert: Blocked destructive execution command!");
+        }
+
+        self.executed_hooks.push(hook);
+        Ok("Makepkg hook stage executed successfully within isolated sandbox context")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -449,5 +530,35 @@ mod tests {
         let signature = Dilithium5Signature::new(sig_val);
 
         assert!(PostQuantumVerifier::verify_signature(name, binary, pub_key, signature));
+    }
+
+    // --- REPRODUCIBLE & SANDBOX UNIT TESTS ---
+
+    #[test]
+    fn test_reproducible_env_and_binary_checksums() {
+        let hash1 = ReproducibleBuildVerifier::compute_environment_fingerprint("1.80.0", "x86_64", 3, 1718900000);
+        let hash2 = ReproducibleBuildVerifier::compute_environment_fingerprint("1.80.0", "x86_64", 3, 1718900000);
+        // Fingerprints must match deterministically
+        assert_eq!(hash1, hash2);
+
+        let binary_a = b"SIGMAOS_INIT_BINARY_COMPILATION_A";
+        let binary_b = b"SIGMAOS_INIT_BINARY_COMPILATION_A";
+        assert!(ReproducibleBuildVerifier::verify_binary_determinism(binary_a, binary_b));
+    }
+
+    #[test]
+    fn test_abs_sandbox_hook_executions() {
+        let mut sandbox = AbsSandboxHookProcessor::new(0b1111); // fully privileged build host
+        assert!(sandbox.execute_hook(AbsHook::Prepare, "git apply patches").is_ok());
+        assert!(sandbox.execute_hook(AbsHook::Build, "cargo build --release").is_ok());
+
+        // Malicious script test must be blocked
+        let malicious_res = sandbox.execute_hook(AbsHook::Check, "rm -rf /");
+        assert!(malicious_res.is_err());
+
+        // Test with restrictive capability mask
+        let mut restricted_sandbox = AbsSandboxHookProcessor::new(0b0011); // Only Prepare and Build caps
+        let pack_res = restricted_sandbox.execute_hook(AbsHook::Package, "tar czf pkg.tar.gz");
+        assert!(pack_res.is_err()); // blocked due to lack of 0x8 capability
     }
 }
