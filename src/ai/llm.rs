@@ -255,7 +255,7 @@ impl LocalLlmEngine {
     /// Estimate memory usage
     pub fn estimate_memory_usage(&self) -> usize {
         // Rough estimation based on model size and quantization
-        let base_size = 7_000_000_000; // 7GB for a 7B model in fp32
+        let base_size: u64 = 7_000_000_000; // 7GB for a 7B model in fp32
         
         let multiplier = match self.config.quantization {
             QuantizationType::Fp32 => 1.0,
@@ -452,7 +452,7 @@ mod tests {
     fn test_memory_estimation() {
         let mut config = LlmConfig::default();
         config.quantization = QuantizationType::Fp32;
-        let engine = LocalLlmEngine::new(config);
+        let engine = LocalLlmEngine::new(config.clone());
         
         let fp32_size = engine.estimate_memory_usage();
         

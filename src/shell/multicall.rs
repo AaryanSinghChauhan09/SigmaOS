@@ -105,7 +105,7 @@ mod tests {
             SysCommandType::Pwd
         );
         assert_eq!(
-            MultiCallShell::parse_multicall_invocation("ls"),
+            MultiCallShell::parse_multicall_invocation("grep"),
             SysCommandType::Unsupported
         );
     }
