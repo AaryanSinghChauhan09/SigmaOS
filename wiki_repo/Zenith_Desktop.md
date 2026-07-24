@@ -47,11 +47,11 @@ ZenithCompositor implements the core Wayland protocol plus key extensions:
 ### Rendering Pipeline
 
 ```
-Application renders → wl_buffer (DMA-BUF or SHM) 
-    → ZenithCompositor (damage tracking) 
-    → Scene graph (sorted by z-order) 
-    → GPU backend (Vulkan render pass) 
-    → KMS/DRM (vsync atomic commit) 
+Application renders → wl_buffer (DMA-BUF or SHM)
+    → ZenithCompositor (damage tracking)
+    → Scene graph (sorted by z-order)
+    → GPU backend (Vulkan render pass)
+    → KMS/DRM (vsync atomic commit)
     → Display
 ```
 

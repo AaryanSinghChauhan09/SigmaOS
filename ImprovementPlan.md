@@ -290,3 +290,100 @@ By replacing intermediate heap allocations with lazy slice iterators, we complet
 | **Pure-Rust HTML Render** | Complete the zero-dependency HTML5 parser inside `src/net/browser_core/`. | **Medium** | Sovereign Browser |
 | **AVX Vector Optimization** | Enable AVX-512 hardware acceleration for local DeepSeek MoE inference routines. | **Medium** | AI Engine |
 | **Hardware Clock Gating** | Fully implement automatic power state gating within SOC controllers. | **Low** | Thermal & Power |
+
+---
+
+## 🧩 20. Dual-Layer Linux Compatibility Strategy
+
+To rival and surpass monolithic Linux distributions—guaranteeing robust operations across all kernel versions listed on `kernel.org`—SigmaOS adopts a robust **dual-layer architecture**. This framework pairs modern, clean Object-Oriented modular structures with version-adapted legacy compatibility interfaces.
+
+### A. Kernel Core Systems
+*   **Abstract Kernel Base Class (`Kernel`):** Encapsulates core system lifecycles. Mediates standard kernel lifecycle loops: `boot()`, `schedule()`, and `shutdown()`.
+*   **Polymorphic Scheduler Hierarchy:** Implements the base `Scheduler` class with dynamic, polymorphic swappability between `RealtimeScheduler`, `PredictiveScheduler`, and `FairScheduler` active targets.
+*   **Encapsulated Memory Manager:** Governs virtual memory pagings, buddy-slab allocations, and proactive unused heap garbage collection.
+*   **`LegacyKernelAdapter`:** Wraps, translates, and exposes historical system call interfaces from ancient Linux kernel versions (ranging from `2.x` through modern `6.x` kernels). This allows legacy software compiled against traditional Linux syscalls to execute natively within the zero-trust capability sandbox.
+*   **Versioned API Interfaces:** Exposes modern capabilities and pledge constraints for contemporary applications, while maintaining backward-compatible, versioned layouts for ancient binaries.
+
+### B. Polymorphic Driver Management
+*   **Abstract Base Driver Class (`DeviceDriver`):** Outlines standardized hardware lifecycle interfaces: `init()`, `probe()`, `load()`, and `unload()`.
+*   **Inheritance Hierarchy:** Specializes standard base driver models to form `StorageDriver`, `NetworkDriver`, `GraphicsDriver`, and `InputDriver` classes.
+*   **Polymorphic Bus Classes:** Normalizes diverse physical and virtual peripheral buses including abstract PCI, USB, NVMe, I²C, and SPI classes.
+*   **`LegacyDriverAdapter`:** Incorporates legacy compatibility interfaces to support older, specialized, or discontinued hardware standards such as ISA, early PCI, USB 1.1, floppy drives, and parallel communication ports.
+*   **Polymorphic Hardware Probing:** Normalizes bus probing using unified hardware detection interfaces that detect both legacy configurations and modern self-reporting buses.
+*   **Self-Healing Resilience:** Watches driver states through active watchdog supervision, performing sub-millisecond restarts of failed driver modules automatically.
+
+### C. Package Management & Transactions
+*   **Abstract Package Class (`Package`):** Encapsulates dependency graphs, package hashes, digital verification signatures, and regulatory compliance flags.
+*   **Dynamic Dependency Solver:** Executes abstract constraint-resolution strategies, delegating solving logic to polymorphic resolver classes (e.g. DPLL SAT solver or heuristic resolvers).
+*   **Atomic Transaction Manager:** Executes safe package transitions, guaranteeing atomic transaction installs or complete rollbacks toPreviousKnownValid filesystem snapshots via Copy-on-Write (CoW).
+*   **`LegacyPackageAdapter`:** Translates foreign packaging metadata, converting and shim-extracting `.deb`, `.rpm`, `.tgz`, and legacy source archives into native sigpkg formats on-the-fly.
+*   **Cross-Version Core Shims:** Provides backward-compatible shims that intercept calls to old system libraries, enabling legacy binaries to execute against contemporary kernel layers.
+
+### D. Filesystems & Storage Modularity
+*   **Abstract Filesystem Interface (`FileSystem`):** Defines standard polymorphic storage endpoints: `mount()`, `read()`, `write()`, and `rollback()`.
+*   **Polymorphic Implementation Hierarchy:** Declares specialized inheritance models including `SigmaFS` (native Merkle-tree storage), `Ext4Adapter`, `BtrfsAdapter`, and `LegacyFSAdapter` (offering full support for FAT32, Minix, and ReiserFS).
+*   **Decorator Pattern Integration:** Enriches storage targets at runtime by dynamically wrapping filesystems with additional transaction validation, post-quantum cryptographic encryption, or append-only logging layers.
+*   **Encapsulation of Internal Storage Services:** Encapsulates transaction journaling, write deduplication, and snapshot state rollbacks inside private storage drivers, completely hiding block allocations from user space.
+
+### E. Modular Networking Stack
+*   **Unified Network Stack Class (`NetworkStack`):** Encapsulates and manages virtual and physical network configurations, supporting dynamic socket multiplexing.
+*   **Polymorphic Protocol Drivers:** Models protocols as distinct inheritance classes (such as `TCPProtocol`, `UDPProtocol`, `QUICProtocol`, and `WireGuardProtocol`).
+*   **`LegacyProtocolAdapter`:** Bridges communication layers to support legacy and ancient network stacks, enabling fallback support for SLIP, PPP, and IPv4-only communication frames.
+*   **Dynamic Security Layer:** Protects network loops with post-quantum cryptography (Kyber/Dilithium) and enforces strict capability sandbox routing.
+
+### F. Enterprise Security & Compliance
+*   **Security Manager singleton (`SecurityManager`):** Enforces capability-based privilege isolation, validating access tokens before permitting process executions.
+*   **Tamper-Proof Audit Logger:** Generates merkle-tree-signed system audits to monitor driver initialization, package installations, and system modifications.
+*   **Interactive Compliance Checker:** Reviews system states against standard regulatory policies (such as GDPR privacy lists, HIPAA metrics, and the Indian Social Security Code).
+*   **`LegacySecurityAdapter`:** Emulates historical UNIX access control configurations, wrapping basic Discretionary Access Control (DAC) permissions and early SELinux contexts.
+*   **Dual-Mode Privilege Enforcement:** Runs ancient, untrusted binaries within legacy permission envelopes while modern microkernel tasks are validated against strict zero-trust sandboxes.
+
+### G. Adaptive Desktop UX
+*   **Unified Desktop Class (`ZenithDesktop`):** Controls window tiling layouts and triggers visual adjustments based on active system profiles (`DeveloperProfile`, `GamerProfile`, `MinimalistProfile`).
+*   **Accessibility Assistant:** Incorporates gesture controls, voice inputs, and SIMD-accelerated high-contrast screen reader layouts.
+*   **Observer-Pattern Layout Adaptation:** Triggers instant window tiling, wallpaper theme updates, or process scheduler priority shifts dynamically in response to active user configurations.
+*   **`LegacyUIAdapter`:** Embeds translation frames to allow historical X11, Motif, and older GTK/Qt applications to render fluidly within Zenith's modern Wayland-style compositor.
+
+---
+
+## 📊 21. SigmaOS Dual-Layer OOP Architecture vs. Monolithic Linux
+
+| Feature | Legacy Linux Distributions | SigmaOS Strategic Blueprint (OOP + Adapters) |
+| :--- | :--- | :--- |
+| **Kernel Model** | Monolithic, procedural structures. Complicated syscall mappings. | Abstract `Kernel` base class + `LegacyKernelAdapter`. Completely modular. |
+| **Driver Model** | Procedural, kernel-space modules. Prone to system-wide crashes. | OOP Driver hierarchy + `LegacyDriverAdapter`. Hot-swap support with watchdog-driven self-healing. |
+| **Package Mgmt** | Segmented package formats (Apt/Pacman/Nix) with complex manual rollbacks. | Polymorphic `Package` classes + `LegacyPackageAdapter` (.deb / .rpm translation) with atomic rollback. |
+| **Filesystem** | Scattered procedural mounts (Ext4, Btrfs, ZFS). | Abstract `FileSystem` class + `LegacyFSAdapter` (native support for FAT32, Minix, ReiserFS). |
+| **Networking** | Hardcoded monolithic network stack. | Polymorphic protocol classes + `LegacyProtocolAdapter` (supporting SLIP/PPP/IPv4-only fallback). |
+| **Security** | Monolithic policy modules (SELinux/AppArmor). | Abstract `SecurityManager` + `LegacySecurityAdapter` (supporting basic DAC / MAC fallbacks). |
+| **Desktop UX** | Rigid procedural window management (GNOME/KDE). | AI-adaptive `ZenithDesktop` profiles + `LegacyUIAdapter` (X11 / Motif translation layers). |
+
+---
+
+## 🚀 22. Priority Roadmap for Modularity and Backward Compatibility
+
+1.  **Commit Abstract Base Classes:** Establish base abstract structures for `Kernel`, `DeviceDriver`, `Package`, `FileSystem`, and `NetworkStack` interfaces.
+2.  **Formulate Legacy API Adapters:** Wrap historical Linux kernel system interfaces (versions 2.x to 6.x) to support backward binary compatibility.
+3.  **Deploy Lifecycle Managers:** Establish clean drivers dynamically loading/unloading, package transaction states, and scheduler priority transitions.
+4.  **Integrate Hardware/Software CI Matrix:** Run continuous automated verification of package resolver and driver architectures against both modern virtualization targets and legacy system mocks.
+5.  **Expose Legacy Support Wikis:** Document complete OOP design interfaces and legacy hardware adaptions in local wiki plan repositories.
+
+---
+
+## 🎨 23. Image & Visual Processing Core Blueprint (Defeating Open Source Competitors)
+
+To capture absolute domination over legacy graphics layers (such as Linux's X11/Wayland rendering pipelines) and obsolete existing creative work suites, SigmaOS implements a zero-dependency, **SIMD-accelerated, GPU-virtualized Image & Visual Processing Core**.
+
+This system integrates high-performance coordinate mathematics directly within bare-metal physical memory blocks to eliminate standard pipeline buffering delay.
+
+### A. Core Graphics Rendering & Design Elements
+*   **SIMD-Accelerated Vector Engine (`SigmaVector`):** Employs bare-metal AVX-512 and ARM Neon instructions to execute matrix vector transformations, geometric clipping, and bezier coordinate rasterization in sub-nanosecond iterations.
+*   **Zero-Copy Framebuffer Compositor (`ZenithCompositor`):** Remaps GPU video RAM pages directly into userspace buffers using capability-gated page tables, completely bypassing intermediary window manager sockets and socket protocol overheads.
+*   **Merkle Visual State Proofs:** Associates every screen rendering layout with an incremental Merkle tree cryptographic proof. This enables instant visual verification, secure remote framebuffer transmission, and tamper-proof canvas recording.
+*   **Hardware-Accelerated Color Calibration Engine:** Integrates high-bitdepth display profile adapters (supporting native HDR10, sRGB, and custom ICC profiling) directly within the graphics driver's frame processing loop to prevent visual color shifts across target devices.
+
+### B. Intelligent AI-Native Themes & Adaptive Layouts
+*   **Dynamic Visual Synthesis Engine:** Deploys local, non-allocating lightweight theme synthesis logic that adjusts contrast ratios, font scaling coefficients, and workspace tiling borders in response to active user lighting, time profiles, and scheduling loads.
+*   **Polymorphic SVG and Image Decoders:** Integrates custom, completely memory-safe image parsers (supporting RAW, PNG, JPEG, SVG, and high-density vector files) guarded by strict boundary limits to eliminate standard security threat vectors (such as heap overflow attacks in standard C-based decoders).
+*   **High-Contrast Screen Lens Magnifier:** Runs hardware-level scaling engines directly within GPU processing units, allowing high-speed magnification lenses and screen-reading vector outlines to draw without blocking thread scheduling loops.
+*   **Modular Vector Prime Templates:** Standardizes custom visual components and icon primitives into modular, capability-checked template files that adapt seamlessly across low-end LXQt-style displays and ultra-high-density retina displays.

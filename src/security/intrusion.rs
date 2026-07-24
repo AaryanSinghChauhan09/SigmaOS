@@ -3,7 +3,7 @@
 
 use std::collections::HashMap;
 use std::net::IpAddr;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 /// Security event
 #[derive(Debug, Clone)]
