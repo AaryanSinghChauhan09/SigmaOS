@@ -280,7 +280,7 @@ impl IntrusionDetectionSystem {
     /// Block source
     fn block_source(&self, event: &SecurityEvent) {
         // Simulated blocking
-        if let Some(ip) = event.source_ip {
+        if let Some(_ip) = event.source_ip {
             // In real implementation, add to firewall rules
         }
     }

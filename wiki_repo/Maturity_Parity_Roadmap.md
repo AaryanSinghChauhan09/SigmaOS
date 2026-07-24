@@ -197,7 +197,7 @@ SigmaOS treats local AI inference as a kernel primitive, not an afterthought:
 ## 🔗 Related Pages
 
 - [Advanced Absorption Matrix](Advanced_Absorption) — How Linux distro features are absorbed
-- [Security Framework](Security_Framework) — PQC + Capability security deep-dive  
+- [Security Framework](Security_Framework) — PQC + Capability security deep-dive
 - [SigmaFS Innovations](SigmaFS_Innovations) — Filesystem design
 - [India Stack](India_Stack) — GST/TDS/UPI/language details
 - [Sigma AI Agents](Sigma_AI_Agents) — AI-native OS design
