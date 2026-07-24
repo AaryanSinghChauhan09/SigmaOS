@@ -36,7 +36,7 @@ pub enum BusType {
     Spi,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DeviceId {
     pub vendor_id: u16,
     pub product_id: u16,

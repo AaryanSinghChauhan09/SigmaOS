@@ -13,7 +13,7 @@ use alloc::vec::Vec;
 
 pub type BreakpointID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum BreakpointType {
     Software = 0,
