@@ -10,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type FilesystemID = usize;
 
 /// Standard and advanced Filesystem types (Old & New technologies)
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilesystemType {
     Ext4 = 0,

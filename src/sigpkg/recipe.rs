@@ -11,6 +11,30 @@ pub struct Version {
     pub patch: u32,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildSystem {
+    Cargo,
+    Make,
+    CMake,
+    Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeError {
+    InvalidFormat,
+    MissingField,
+    SignatureMismatch,
+    DependencyConflict,
+}
+
+pub struct RecipeManager;
+
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
 /// Declarative package recipes.
 pub struct PackageRecipe {
     pub name: &'static str,

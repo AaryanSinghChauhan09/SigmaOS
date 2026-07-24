@@ -20,7 +20,7 @@ pub enum CommandError {
 
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
-    fn execute(&mut self, args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError>;
+    fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError>;
     fn help(&self) -> &[u8];
 }
 
@@ -47,7 +47,7 @@ impl SimpleShellCommand {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a ShellVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
@@ -56,7 +56,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut ShellVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
@@ -65,7 +65,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for ShellVec<T> {
     type Target = [T];
     fn deref(&self) -> &[T] {
         if self.data.is_null() {
@@ -76,7 +76,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for ShellVec<T> {
     fn deref_mut(&mut self) -> &mut [T] {
         if self.data.is_null() {
             &mut []
@@ -86,7 +86,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
+impl<T> Drop for ShellVec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {
             unsafe {
@@ -105,8 +105,8 @@ impl ShellCommand for SimpleShellCommand {
         &self.name[..len]
     }
 
-    fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
-        let mut output = Vec::new();
+    fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
         let name = self.name();
         for &byte in name {
             output.push(byte);
@@ -126,7 +126,7 @@ impl ShellCommand for SimpleShellCommand {
 }
 
 pub trait CommandParser {
-    fn parse(&self, input: &[u8]) -> Result<([u8; 32], Vec<[u8; 64]>), CommandError>;
+    fn parse(&self, input: &[u8]) -> Result<([u8; 32], ShellVec<[u8; 64]>), CommandError>;
     fn validate(&self, command: &[u8], args: &[[u8; 64]]) -> Result<(), CommandError>;
 }
 
@@ -140,9 +140,9 @@ impl SimpleCommandParser {
 }
 
 impl CommandParser for SimpleCommandParser {
-    fn parse(&self, input: &[u8]) -> Result<([u8; 32], Vec<[u8; 64]>), CommandError> {
+    fn parse(&self, input: &[u8]) -> Result<([u8; 32], ShellVec<[u8; 64]>), CommandError> {
         let mut command = [0u8; 32];
-        let mut args = Vec::new();
+        let mut args = ShellVec::new();
         let mut current_arg = [0u8; 64];
         let mut arg_index = 0;
         let mut in_command = true;
@@ -188,18 +188,18 @@ pub trait CommandRegistry {
     fn register(&mut self, command: Box<dyn ShellCommand>) -> Result<(), CommandError>;
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError>;
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand>;
-    fn list(&self) -> Vec<&[u8]>;
+    fn list(&self) -> ShellVec<&[u8]>;
 }
 
 #[repr(C)]
 pub struct SimpleCommandRegistry {
-    pub commands: Vec<Option<Box<dyn ShellCommand>>>,
+    pub commands: ShellVec<Option<Box<dyn ShellCommand>>>,
 }
 
 impl SimpleCommandRegistry {
     pub fn new() -> Self {
         SimpleCommandRegistry {
-            commands: Vec::new(),
+            commands: ShellVec::new(),
         }
     }
 
@@ -267,8 +267,8 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut names = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut names = ShellVec::new();
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
                 names.push(command.name());
@@ -279,7 +279,7 @@ impl CommandRegistry for SimpleCommandRegistry {
 }
 
 pub trait ShellSession {
-    fn execute_line(&mut self, input: &[u8]) -> Result<Vec<u8>, CommandError>;
+    fn execute_line(&mut self, input: &[u8]) -> Result<ShellVec<u8>, CommandError>;
     fn set_environment(&mut self, key: &[u8], value: &[u8]);
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]>;
 }
@@ -288,7 +288,7 @@ pub trait ShellSession {
 pub struct SimpleShellSession {
     pub registry: SimpleCommandRegistry,
     pub parser: SimpleCommandParser,
-    pub environment: Vec<([u8; 64], [u8; 128])>,
+    pub environment: ShellVec<([u8; 64], [u8; 128])>,
 }
 
 impl SimpleShellSession {
@@ -298,13 +298,13 @@ impl SimpleShellSession {
         SimpleShellSession {
             registry,
             parser: SimpleCommandParser::new(),
-            environment: Vec::new(),
+            environment: ShellVec::new(),
         }
     }
 }
 
 impl ShellSession for SimpleShellSession {
-    fn execute_line(&mut self, input: &[u8]) -> Result<Vec<u8>, CommandError> {
+    fn execute_line(&mut self, input: &[u8]) -> Result<ShellVec<u8>, CommandError> {
         let (command_name, args) = self.parser.parse(input)?;
 
         if let Some(command) = self.registry.get(&command_name) {
@@ -345,19 +345,19 @@ pub trait CommandHistory {
     fn add(&mut self, command: &[u8]);
     fn get_previous(&self) -> Option<&[u8]>;
     fn get_next(&self) -> Option<&[u8]>;
-    fn list(&self) -> Vec<&[u8]>;
+    fn list(&self) -> ShellVec<&[u8]>;
 }
 
 #[repr(C)]
 pub struct SimpleCommandHistory {
-    pub history: Vec<[u8; 256]>,
+    pub history: ShellVec<[u8; 256]>,
     pub current_index: AtomicUsize,
 }
 
 impl SimpleCommandHistory {
     pub fn new() -> Self {
         SimpleCommandHistory {
-            history: Vec::new(),
+            history: ShellVec::new(),
             current_index: AtomicUsize::new(0),
         }
     }
@@ -401,8 +401,8 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut commands = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut commands = ShellVec::new();
         for cmd in &*self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
@@ -411,36 +411,15 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-struct Vec<T> {
+struct ShellVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Vec<T> {
+impl<T> ShellVec<T> {
     fn new() -> Self {
-        Vec {
+        ShellVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
