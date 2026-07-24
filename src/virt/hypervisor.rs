@@ -361,17 +361,184 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hypervisor_and_guest_generations_oop() {
+        let mut hypervisor = SimpleHypervisor::new();
+
+        // 1. Create a legacy software guest VM (e.g. simulating QEMU translation)
+        let guest_legacy_id = hypervisor
+            .create_guest(
+                b"qemu-legacy-winxp",
+                1,
+                512,
+                VirtualizationGeneration::LegacySoftware,
+            )
+            .unwrap();
+
+        // 2. Create a modern hardware-assisted guest VM (e.g. simulating VT-x / EPT nested guest)
+        let guest_modern_id = hypervisor
+            .create_guest(
+                b"kvm-modern-linux",
+                4,
+                4096,
+                VirtualizationGeneration::ModernHardwareAssisted,
+            )
+            .unwrap();
+
+        // Verify ID assignment and retrieve guests
+        assert_eq!(guest_legacy_id, 1);
+        assert_eq!(guest_modern_id, 2);
+
+        // Mutably configure guest parameters via OOP traits
+        for guest_opt in &mut hypervisor.guests {
+            if let Some(ref mut guest) = *guest_opt {
+                if guest.id() == guest_legacy_id {
+                    assert_eq!(guest.generation(), VirtualizationGeneration::LegacySoftware);
+                    assert_eq!(guest.state(), GuestState::Stopped);
+                    // Legacy software guests should fail on nested virtualization configuration
+                    assert!(guest.configure_nested_virtualization(true).is_err());
+                } else if guest.id() == guest_modern_id {
+                    assert_eq!(
+                        guest.generation(),
+                        VirtualizationGeneration::ModernHardwareAssisted
+                    );
+                    assert_eq!(guest.state(), GuestState::Stopped);
+                    // Modern nested virtualization configuration should succeed
+                    assert!(guest.configure_nested_virtualization(true).is_ok());
+                }
+            }
+        }
+
+        // Test start/stop guest lifecycles
+        assert!(hypervisor.start_guest(guest_modern_id).is_ok());
+        for guest_opt in &hypervisor.guests {
+            if let Some(ref guest) = *guest_opt {
+                if guest.id() == guest_modern_id {
+                    assert_eq!(guest.state(), GuestState::Running);
+                }
+            }
+        }
+
+        // Test Hardware-assisted VMExit handler statistics
+        assert!(hypervisor.inject_hardware_exit(guest_modern_id).is_ok());
+        for guest_opt in &hypervisor.guests {
+            if let Some(ref guest) = *guest_opt {
+                if guest.id() == guest_modern_id {
+                    assert_eq!(guest.hardware_exit_count(), 1);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_vmexit_handler() {
+        let mut exit_handler = SimpleVMExitHandler::new();
+
+        // Register sample handler for exit reason 0x80 (e.g. CPUID vmexit instruction)
+        fn handle_cpuid(_guest_id: GuestID, _reason: u64) {
+            println!("VMEXIT handle CPUID");
+        }
+        exit_handler.register_handler(0x80, handle_cpuid);
+
+        assert!(exit_handler.handle_exit(1, 0x80).is_ok());
+        assert!(exit_handler.handle_exit(1, 0x99).is_err()); // Unregistered exit reason
+    }
+}

@@ -23,6 +23,12 @@ pub struct CapabilityToken {
     pub is_revoked: bool,
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
