@@ -18,7 +18,13 @@ This journal contains CRITICAL performance learnings discovered during profiling
 **Learning:** Splitting a string and collecting the slices into a heap-allocated collection (such as `version_str.split('.').collect::<Vec<&str>>()`) in frequently called utility methods introduces performance overhead. Replacing this with an iterator-based inline parsing method completely avoids heap allocations and significantly reduces memory usage and execution time.
 **Action:** Always utilize iterators and inline parsing for string manipulation/parsing rather than collecting intermediate elements into heap-allocated collections.
 
+<<<<<<< HEAD
 ## 2026-07-23 - Zero-Allocation Shell Command Parser
 **Learning:** Collecting all parsed segments of a command string into a heap-allocated `Vec<&str>` before routing can result in wasteful allocation overheads, especially for single-word terminal commands (e.g., `help`, `ps`, `ls`, `clear`, `exit`) or simple parameter queries. Refactoring the command scanner to stream tokens sequentially via standard Rust iterators like `split_whitespace` eliminates all dynamic collections on the hot paths, guaranteeing zero heap allocations for standard utility command matches.
 **Action:** Leverage native iterator state machines to parse CLI input, retrieving commands and operands iteratively on-demand and avoiding upfront vector collections.
+>>>>>>> temp-resolve-branch
+=======
+## 2026-07-23 - DPLL SAT Solver Recursion Caching
+**Learning:** Evaluating SAT solver dependency graphs recursively on massive, nested package manifests poses a threat of stack overflow and incurs $O(N^2)$ traversal costs. Introducing a memoization cache maps package names directly to previously evaluated resolution lists, bypassing redundant sub-graph lookups and achieving optimal $O(N)$ execution bounds.
+**Action:** Cache the outputs of recursive traversal sub-routines using state-passing or standard caches when analyzing multi-branch dependency matrices.
 >>>>>>> temp-resolve-branch
