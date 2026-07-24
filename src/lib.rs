@@ -53,6 +53,19 @@ pub use filesystem::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    KObject, KRef, KernelObject, Device, DeviceType, DeviceManager, DeviceBinding, DriverError, DriverMetadata,
+    Driver, DriverRegistration, DriverRegistry, Bus, PciBus, UsableBus,
+    VfsMount, Statfs, Filesystem, SuperBlock, Inode, InodeAttr, InodeType, Dentry,
+    FileOperations, InodeOperations, FsError, Mount, FilesystemMetadata,
+    Task, Cred, SchedPolicy, ProcessState as SchedProcessState, RunQueue, SchedClass,
+    ZonedPageAllocator, Page, Zone, VmArea, VmSpace,
+    Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl,
+    Netfilter, NetfilterRule, SocketAddr, SocketState, OperState, Qdisc, PfifoFast, QdiscManager,
+    Container, ContainerState, Runtime, ContainerManager, NamespaceConfig, NamespaceSet, OciSpec,
+    ResourceConfig, SigmaPackageManager, Generation, PackageMetadata, SystemConfig, SystemProfile,
+    CapabilitySet, Label, SecurityTask, AvcCache, AuditLog,
+    FirmwareInterface, BootLoader, BootParams, SetupHeader, Initramfs, KernelCommandLine,
+    FirmwareInfo, AcpiTable, SmpInfo, BootError,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{

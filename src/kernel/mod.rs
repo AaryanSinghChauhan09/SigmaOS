@@ -1,10 +1,30 @@
 // SigmaOS Kernel Module
-pub mod ipc;
+pub mod device;
+pub mod driver;
+pub mod bus;
+pub mod object;
+pub mod vfs;
+pub mod sched;
 pub mod memory;
+pub mod net;
+pub mod container;
+pub mod package;
+pub mod security;
+pub mod boot;
+pub mod ipc;
 pub mod roundrobin;
-pub mod scheduler;
 
+pub use device::{Device, DeviceType, DeviceManager, DeviceBinding, DriverError, DriverMetadata};
+pub use driver::{Driver, DriverRegistration, DriverRegistry};
+pub use bus::{Bus, PciBus, UsableBus};
+pub use object::{KObject, KRef, KernelObject};
+pub use vfs::*;
+pub use sched::task::{Task, Cred, ProcessState, SchedPolicy};
+pub use sched::scheduler::{Scheduler, RunQueue, SchedClass};
+pub use memory::{Page, Zone, ZonedPageAllocator, VmArea, VmSpace};
+pub use net::stack::{Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl, Netfilter, NetfilterRule, Qdisc, PfifoFast, QdiscManager};
+pub use container::runtime::{Container, ContainerState, Runtime, ContainerManager, NamespaceConfig, NamespaceSet, OciSpec, ResourceConfig};
+pub use package::manager::{SigmaPackageManager, Generation, PackageMetadata, SystemConfig, SystemProfile};
+pub use security::lsm::{MacPolicy, LsmHook, CapabilitySet, Label, SecurityTask, AvcCache, AuditLog};
+pub use boot::firmware::{FirmwareInterface, BootLoader, BootParams, SetupHeader, Initramfs, KernelCommandLine};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
