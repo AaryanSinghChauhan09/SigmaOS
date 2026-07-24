@@ -788,4 +788,161 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tcp_state_machine() {
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+        assert_eq!(socket.get_state(), TCPState::Closed);
+
+        socket.listen().unwrap();
+        assert_eq!(socket.get_state(), TCPState::Listen);
+
+        socket.connect(443).unwrap();
+        assert_eq!(socket.get_state(), TCPState::Established);
+    }
+
+    #[test]
+    fn test_firewall() {
+        let mut fw = SimpleFirewall::new();
+        assert!(!fw.is_allowed(80));
+
+        fw.allow_port(80);
+        assert!(fw.is_allowed(80));
+
+        fw.block_port(80);
+        assert!(!fw.is_allowed(80));
+    }
+
+    #[test]
+    fn test_congestion_control() {
+        let mut reno = RenoCongestionControl::new();
+        let initial_cwnd = reno.get_cwnd();
+        reno.update_cwnd(2);
+        assert!(reno.get_cwnd() > initial_cwnd);
+
+        reno.on_loss();
+        assert_eq!(reno.get_cwnd(), 1);
+    }
+
+    #[test]
+    fn test_bsd_socket_options() {
+        let socket = SimpleSocket::new(100, Protocol::TCP, 80);
+        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 0);
+
+        socket.set_opt(SocketOption::ReuseAddr, 1).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 1);
+
+        socket.set_opt(SocketOption::RcvBuf, 131072).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 131072);
+    }
+
+    #[test]
+    fn test_netfilter_iptables() {
+        let mut fw = NetfilterFirewall::new();
+        let rule = NetfilterRule {
+            chain: NetfilterChain::Input,
+            source_ip: [192, 168, 1, 100],
+            dest_ip: [0, 0, 0, 0],
+            protocol: Protocol::TCP,
+            port: 22,
+            action: NetfilterAction::Drop,
+        };
+        fw.add_rule(rule);
+
+        // Packet matches rule: should be dropped
+        let action = fw.match_packet(
+            NetfilterChain::Input,
+            [192, 168, 1, 100],
+            [10, 0, 0, 1],
+            Protocol::TCP,
+            22,
+        );
+        assert_eq!(action, NetfilterAction::Drop);
+
+        // Different IP: should be accepted (by default policy)
+        let action_other = fw.match_packet(
+            NetfilterChain::Input,
+            [192, 168, 1, 101],
+            [10, 0, 0, 1],
+            Protocol::TCP,
+            22,
+        );
+        assert_eq!(action_other, NetfilterAction::Accept);
+    }
+
+    #[test]
+    fn test_ip_routing_cidr() {
+        let mut routing = RoutingTable::new();
+        let entry = RoutingEntry {
+            dest_network: [192, 168, 1, 0],
+            subnet_mask: [255, 255, 255, 0],
+            gateway: [192, 168, 1, 1],
+            interface_name: [b'e', b't', b'h', b'0', 0, 0, 0, 0],
+        };
+        routing.add_route(entry);
+
+        // Route matches subnet
+        let route = routing.lookup([192, 168, 1, 50]).unwrap();
+        assert_eq!(route.gateway, [192, 168, 1, 1]);
+
+        // Route does not match
+        assert!(routing.lookup([10, 0, 0, 5]).is_none());
+    }
+
+    #[test]
+    fn test_epoll_event_loop() {
+        let mut epoll = EpollInstance::new(1);
+        let event = EpollEvent {
+            events: 1,
+            data: 999,
+        };
+        epoll.ctl(EpollOp::Add, 10, event).unwrap();
+
+        let mut events_out = [EpollEvent { events: 0, data: 0 }; 4];
+        let triggered = epoll.wait(&mut events_out).unwrap();
+        assert_eq!(triggered, 1);
+        assert_eq!(events_out[0].data, 999);
+    }
+}

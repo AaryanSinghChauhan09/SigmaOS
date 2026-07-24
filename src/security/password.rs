@@ -204,6 +204,7 @@ impl PasswordManager {
     ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
+        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -252,6 +253,7 @@ impl PasswordManager {
             return Err(PasswordError::PasswordNotFound(entry.id.clone()));
         }
 
+        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -423,17 +425,13 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
-        let mut seed = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as u64;
+        let mut password = String::new();
+        use rand::RngExt;
+        let mut rng = rand::rng();
 
         let mut password = String::new();
         for _ in 0..length {
-            seed = seed
-                .wrapping_mul(6364136223846793005)
-                .wrapping_add(1442695040888963407);
-            let index = (seed as usize) % charset.len();
+            let index = rng.random_range(0..charset.len());
             password.push(charset[index] as char);
         }
 

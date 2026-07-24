@@ -62,18 +62,20 @@ impl ShellRepl {
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            customization: CustomizationEngine::new(),
-            accessibility: AccessibilityFramework::new(),
-            package_manager: UniversalPackageManager::new(),
-            virt_orchestrator: VirtualizationOrchestrator::new(),
-            compatibility: CompatibilityManager::new(),
-            self_healing: SelfHealingModule::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),

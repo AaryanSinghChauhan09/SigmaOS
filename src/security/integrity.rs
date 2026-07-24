@@ -373,6 +373,23 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct IntegrityCheck {
+    pub file_path: alloc::string::String,
+    pub expected_hash: alloc::string::String,
+}
+
+#[derive(Debug, Clone)]
+pub struct IntegrityVerifier {
+    pub enabled: bool,
+}
+
+impl IntegrityVerifier {
+    pub fn new() -> Self {
+        Self { enabled: true }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
