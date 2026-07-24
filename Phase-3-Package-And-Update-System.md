@@ -16,6 +16,7 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 > - `drivers/multimedia/` — All 2 multimedia driver files
 > - `drivers/*.cpp`, `drivers/*.c` — 14 top-level driver files
 
+
 ---
 
 ## `sigpkg` — Sovereign Package Manager
@@ -23,7 +24,7 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 ### Core Design Goals
 
 | Goal | Approach |
-| ------ | ---------- |
+|------|----------|
 | **No POSIX dependency** | All package scripts run in a Sovereign WASM sandbox |
 | **Reproducible builds** | Every package carries a content-addressed Merkle hash |
 | **Cryptographic verification** | Ed25519 signatures on all packages and repo manifests |
@@ -32,39 +33,28 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 
 ### Package Format: `.spkg`
 
-```text
+```
 mypackage-1.0.0.spkg
 ├── MANIFEST.toml           # Name, version, deps, checksums
-
 ├── payload/                # Binary + data files (zstd-compressed)
-
 │   ├── bin/
 │   ├── lib/
 │   └── share/
 └── scripts/
     ├── pre-install.wasm    # Pre-install hook (WASM sandbox)
-
     └── post-install.wasm   # Post-install hook (WASM sandbox)
-
 ```
 
 ### `sigpkg` CLI
 
 ```bash
 sigpkg install <package>          # Install from sovereign repo
-
 sigpkg remove  <package>          # Uninstall, prune orphans
-
 sigpkg update                     # Fetch latest manifests & upgrade
-
 sigpkg rollback                   # Revert to previous generation
-
 sigpkg search  <query>            # Search sovereign package index
-
 sigpkg verify  <package.spkg>     # Verify Ed25519 signature
-
 sigpkg list    --installed        # Show installed packages
-
 ```
 
 ---
@@ -72,16 +62,14 @@ sigpkg list    --installed        # Show installed packages
 ## Update Channels
 
 | Channel | Description | Stability |
-| --------- | ------------- | ----------- |
+|---------|-------------|-----------|
 | `stable` | LTS-quality packages, security patches only | ⭐⭐⭐⭐⭐ |
 | `testing` | Upcoming stable; feature-complete but not yet hardened | ⭐⭐⭐⭐ |
 | `nightly` | Latest main branch builds; may break | ⭐⭐ |
 
 Switch channels:
-
 ```bash
 sigpkg channel set stable   # or testing, nightly
-
 ```
 
 ---
@@ -92,9 +80,7 @@ When building with `TARGET_OS=ubuntu`, SigmaOS enables an optional APT bridge �
 
 ```bash
 sigma install --apt firefox      # Resolves via APT bridge
-
 sigma install --snap vlc         # Resolves via Snap bridge
-
 ```
 
 > [!WARNING]
@@ -105,11 +91,8 @@ sigma install --snap vlc         # Resolves via Snap bridge
 ## Dependency Independence
 
 All core SigmaOS packages satisfy:
-
 - **No libc**: Uses `sigma_libc.h` (freestanding).
-
 - **No POSIX syscalls**: Routed through the Sovereign Syscall Gate.
-
 - **No dynamic linker**: All core packages are statically linked.
 
 ---
@@ -117,9 +100,6 @@ All core SigmaOS packages satisfy:
 ## 🔗 Related Pages
 
 - [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
-
 - [Phase 4: CI/CD & Testing](Phase-4-CICD-And-Testing)
-
 - [Sovereign Packaging Specification](Sovereign-Packaging-Specification)
-
 - [Zero Dependency Architecture](Zero-Dependency-Architecture)

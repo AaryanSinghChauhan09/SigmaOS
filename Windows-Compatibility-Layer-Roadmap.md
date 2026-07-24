@@ -13,12 +13,9 @@ the **18 billion lines of installed Win32 application code** that users depend o
 Wine took 30 years. Proton took 6. SigmaOS will build on their lessons with a
 cleaner architecture.
 
-### What already exists in the repo:
-
+**What already exists in the repo:**
 - `runtime/containers/sigma_linux_compat.cpp` — ELF64 loader + Linux syscall translator (15 syscalls mapped)
-
 - `userland/compat/POSIXShim.cpp` — POSIX open/read/write/close/fork/execve shim
-
 - `userland/compat/sigma_proton_bridge.cpp` — Proton-style syscall trap + `mapDxvkSurface()` stub
 
 **What needs to be built:** everything Win32.
@@ -27,7 +24,7 @@ cleaner architecture.
 
 ## Architecture Overview
 
-```text
+```
 Windows .exe / .dll (PE32+)
         │
         ▼
@@ -58,7 +55,7 @@ SigmaOS hardware (SDF drivers)
 
 ## Dependency Chain (What Blocks What)
 
-```text
+```
 SigmaOS kernel boots (Phase 0)
     └── sigma-syscall ABI stable (30 calls)
         └── sigma-vmm address space management
@@ -82,7 +79,7 @@ blocked until Phase 0 completes (`sigma_sched`, `sigma_mm`, `sigma_syscall_dispa
 These are not compat-layer tasks — they are kernel tasks that unblock everything.
 
 | Task | File | Status |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Kernel scheduler (MLFQ) | `kernel/core/sigma_sched.cpp` | `[ ]` |
 | Memory manager (buddy+slab+VMM) | `kernel/core/sigma_mm.cpp` | `[ ]` |
 | Syscall dispatch (30 calls) | `kernel/core/sigma_syscall_dispatch.cpp` | `[ ]` |
@@ -97,20 +94,17 @@ These are not compat-layer tasks — they are kernel tasks that unblock everythi
 ## Stage 1 — PE Loader (`sigma-pe`)
 
 ### What it does
-
 Parses and loads Windows PE32+ executable images into a SigmaOS address space,
 the same way `sigma_linux_compat.cpp` handles ELF64.
 
 ### Files to create
-
-```text
+```
 runtime/compat/win32/sigma_pe_loader.cpp     ← PE32+ parser + segment mapper
 runtime/compat/win32/sigma_pe_loader.h
 include/compat/sigma_pe_types.h              ← IMAGE_DOS_HEADER, IMAGE_NT_HEADERS, etc.
 ```
 
 ### Key structures to implement
-
 ```cpp
 // IMAGE_DOS_HEADER — 64 bytes
 // IMAGE_NT_HEADERS64 — signature + FileHeader + OptionalHeader
@@ -123,30 +117,19 @@ include/compat/sigma_pe_types.h              ← IMAGE_DOS_HEADER, IMAGE_NT_HEAD
 ```
 
 ### Loader steps
-
-```text
-
+```
 1. Validate MZ magic (0x4D5A) + PE signature (0x50450000)
-
 2. Parse IMAGE_FILE_HEADER → machine type, section count, characteristics
-
 3. Parse IMAGE_OPTIONAL_HEADER64 → ImageBase, AddressOfEntryPoint, SizeOfImage
-
 4. Map PE sections via sigma_vmm_map_region():
-
    .text  → R-X
    .rdata → R--
    .data  → RW-
    .bss   → RW- (zero-fill)
-
-1. Apply base relocations (IMAGE_BASE_RELOCATION) if loaded != preferred base
-
-2. Resolve imports (IMAGE_IMPORT_DESCRIPTOR) → fill IAT with sigma-ntdll stubs
-
-3. Handle TLS callbacks (IMAGE_TLS_DIRECTORY) before entry point
-
-4. Call entry point: DllMain(hmod, DLL_PROCESS_ATTACH, NULL) or WinMain
-
+5. Apply base relocations (IMAGE_BASE_RELOCATION) if loaded != preferred base
+6. Resolve imports (IMAGE_IMPORT_DESCRIPTOR) → fill IAT with sigma-ntdll stubs
+7. Handle TLS callbacks (IMAGE_TLS_DIRECTORY) before entry point
+8. Call entry point: DllMain(hmod, DLL_PROCESS_ATTACH, NULL) or WinMain
 ```
 
 ### Status: `[ ]` Not started
@@ -156,14 +139,12 @@ include/compat/sigma_pe_types.h              ← IMAGE_DOS_HEADER, IMAGE_NT_HEAD
 ## Stage 2 — NT Syscall Translator (`sigma-ntdll`)
 
 ### What it does
-
 The NT native API (`NtXxx` / `ZwXxx` functions in `ntdll.dll`) is the actual
 syscall boundary of Windows — Win32 API sits on top of it. Translating NT calls
 to sigma-syscall is the highest-leverage work in the entire compat stack.
 
 ### Files to create
-
-```text
+```
 runtime/compat/win32/sigma_ntdll.cpp         ← NT native API implementation
 runtime/compat/win32/sigma_nt_syscall_table.cpp ← NT→sigma syscall number map
 include/compat/sigma_nt_types.h              ← NTSTATUS, UNICODE_STRING, OBJECT_ATTRIBUTES, etc.
@@ -173,7 +154,7 @@ include/compat/sigma_nt_syscalls.h           ← NtXxx function declarations
 ### NT→SigmaOS syscall mapping (priority order)
 
 | NT syscall | Maps to | Notes |
-| ------------ | --------- | ------- |
+|------------|---------|-------|
 | `NtReadFile` | `sigma_sys_read` | Handle → fd translation |
 | `NtWriteFile` | `sigma_sys_write` | Handle → fd |
 | `NtCreateFile` | `sigma_sys_open` | ObjectAttributes path extraction |
@@ -207,7 +188,6 @@ include/compat/sigma_nt_syscalls.h           ← NtXxx function declarations
 | `RtlFreeHeap` | sigma_slab_free | |
 
 ### Handle table
-
 Windows uses kernel handles (integers) for all objects — files, threads, events,
 sections, keys. A **sigma-handle-table** must map NT handles to sigma objects:
 
@@ -229,7 +209,6 @@ struct SigmaHandle {
 ```
 
 ### PEB / TEB stubs
-
 Win32 apps expect `fs:[0x18]` (TEB) and `gs:[0x60]` (PEB on x86-64) to be valid:
 
 ```cpp
@@ -256,7 +235,7 @@ struct SigmaPEB {
 The most-imported DLL in Windows. Wraps NT calls with friendlier semantics.
 Implemented as a native SigmaOS shared library that exports the `kernel32.dll` symbol table.
 
-```text
+```
 runtime/compat/win32/kernel32/sigma_kernel32.cpp
 runtime/compat/win32/kernel32/sigma_kernel32_file.cpp      ← CreateFile, ReadFile, WriteFile
 runtime/compat/win32/kernel32/sigma_kernel32_process.cpp   ← CreateProcess, ExitProcess
@@ -269,10 +248,10 @@ runtime/compat/win32/kernel32/sigma_kernel32_module.cpp    ← LoadLibrary, GetP
 runtime/compat/win32/kernel32/sigma_kernel32_error.cpp     ← GetLastError, SetLastError
 ```
 
-### Priority functions (cover 90% of CLI apps):
+**Priority functions (cover 90% of CLI apps):**
 
 | Function | sigma-ntdll call | Notes |
-| ---------- | ----------------- | ------- |
+|----------|-----------------|-------|
 | `CreateFileA/W` | `NtCreateFile` | Path → ObjectAttributes conversion |
 | `ReadFile` | `NtReadFile` | Overlapped → sync wrapper |
 | `WriteFile` | `NtWriteFile` | |
@@ -301,7 +280,7 @@ runtime/compat/win32/kernel32/sigma_kernel32_error.cpp     ← GetLastError, Set
 
 Handles window management, message pumps, and input. Backed by Zenith compositor.
 
-```text
+```
 runtime/compat/win32/user32/sigma_user32.cpp
 runtime/compat/win32/user32/sigma_user32_window.cpp   ← CreateWindow, ShowWindow, SetWindowPos
 runtime/compat/win32/user32/sigma_user32_msg.cpp      ← GetMessage, DispatchMessage, PostMessage
@@ -311,9 +290,8 @@ runtime/compat/win32/user32/sigma_user32_dialog.cpp   ← MessageBox, DialogBox,
 runtime/compat/win32/user32/sigma_user32_dc.cpp       ← GetDC, ReleaseDC (HDC → Vulkan surface)
 ```
 
-### Win32 HWND → Zenith surface mapping:
-
-```text
+**Win32 HWND → Zenith surface mapping:**
+```
 CreateWindow(...)
     → sigma_user32 allocates HWND slot in window table
         → sigma_compositor_create_surface(width, height)
@@ -321,9 +299,8 @@ CreateWindow(...)
                 → Returns Vulkan surface handle stored in HWND record
 ```
 
-### Message pump → sigma-display event loop:
-
-```text
+**Message pump → sigma-display event loop:**
+```
 GetMessage(MSG*)
     → sigma_display_poll_event()
         → maps sigma_key_event → WM_KEYDOWN/WM_KEYUP
@@ -343,7 +320,7 @@ GDI is the legacy 2D drawing API. Many Win32 apps use it for basic rendering.
 Rather than implementing GDI in software, sigma-gdi32 routes all drawing calls
 through Vulkan compute shaders via the Zenith compositor.
 
-```text
+```
 runtime/compat/win32/gdi32/sigma_gdi32.cpp
 runtime/compat/win32/gdi32/sigma_gdi32_draw.cpp    ← TextOut, Rectangle, Ellipse, BitBlt
 runtime/compat/win32/gdi32/sigma_gdi32_font.cpp    ← CreateFont, SelectObject (→ HarfBuzz)
@@ -351,9 +328,8 @@ runtime/compat/win32/gdi32/sigma_gdi32_bitmap.cpp  ← CreateBitmap, StretchBlt,
 runtime/compat/win32/gdi32/sigma_gdi32_dc.cpp      ← CreateDC, DeleteDC, HDC→Vulkan
 ```
 
-### HDC → Vulkan command buffer mapping:
-
-```text
+**HDC → Vulkan command buffer mapping:**
+```
 GDI HDC (Device Context)
     → sigma_gdi32 maintains HDC → Vulkan command buffer table
         → TextOut(hdc, x, y, text) → HarfBuzz shape → FreeType2 render → upload glyph atlas → Vulkan draw
@@ -365,7 +341,7 @@ GDI HDC (Device Context)
 
 Required for apps that use Explorer shell integration.
 
-```text
+```
 runtime/compat/win32/shell32/sigma_shell32.cpp
     ← ShellExecute (→ sigma-cli exec), SHGetFolderPath, SHFileOperation
     ← Common file dialogs (GetOpenFileName → Zenith file picker)
@@ -390,16 +366,15 @@ settings, COM registration, and file associations.
 **Architecture:** sigma-reg maps the registry to a flat SQLite database at
 `/sigma/data/registry.db`, queried via sigma-ntdll `NtXxx` key calls.
 
-```text
+```
 runtime/compat/win32/registry/sigma_reg.cpp
 runtime/compat/win32/registry/sigma_reg_hive.cpp    ← HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER
 runtime/compat/win32/registry/sigma_reg_persist.cpp ← SQLite backend
 include/compat/sigma_reg.h
 ```
 
-### Key hives:
-
-```text
+**Key hives:**
+```
 HKLM\SOFTWARE          → /sigma/data/reg/HKLM/SOFTWARE/
 HKCU\Software          → /sigma/data/reg/HKCU/<did>/Software/
 HKLM\SYSTEM\CurrentControlSet → hardware config stubs
@@ -414,15 +389,14 @@ giving SigmaOS a forensic capability Windows lacks by default.
 Component Object Model is the backbone of Win32 interop — used by Office, IE,
 WMI, DirectX, and thousands of enterprise apps.
 
-```text
+```
 runtime/compat/win32/com/sigma_com.cpp           ← CoInitialize, CoCreateInstance, CoUninitialize
 runtime/compat/win32/com/sigma_com_server.cpp    ← IClassFactory, DLL registration
 runtime/compat/win32/com/sigma_com_marshal.cpp   ← IStream, IMarshal stubs
 runtime/compat/win32/com/sigma_com_automation.cpp ← IDispatch (VBA/scripting)
 ```
 
-### COM→sigma-bus mapping:
-
+**COM→sigma-bus mapping:**
 COM `CoCreateInstance(CLSID)` → sigma-bus `sigma_bus_spawn_service(uuid)`.
 COM interfaces become sigma-bus capability tokens. This makes COM objects
 first-class SigmaOS services with PQC-attested identity.
@@ -438,7 +412,7 @@ first-class SigmaOS services with PQC-attested identity.
 Leverages the work already done in `sigma_proton_bridge.cpp` → `mapDxvkSurface()`.
 The full DXVK bridge translates Direct3D 9/10/11/12 draw calls to Vulkan.
 
-```text
+```
 runtime/compat/win32/d3d/sigma_dxvk_bridge.cpp    ← D3D device creation → Vulkan device
 runtime/compat/win32/d3d/sigma_dxvk_d3d9.cpp      ← IDirect3DDevice9 → VkCommandBuffer
 runtime/compat/win32/d3d/sigma_dxvk_d3d11.cpp     ← ID3D11Device → VkDevice
@@ -446,8 +420,7 @@ runtime/compat/win32/d3d/sigma_dxvk_d3d12.cpp     ← D3D12 → Vulkan 1.3 (vkd3
 runtime/compat/win32/d3d/sigma_dxgi.cpp            ← IDXGISwapChain → Zenith swapchain
 ```
 
-### The existing stub to expand:
-
+**The existing stub to expand:**
 ```cpp
 // Already in sigma_proton_bridge.cpp:
 sigma_status mapDxvkSurface(sigma_u32 hwnd, sigma_u32* vulkan_surface) {
@@ -460,7 +433,7 @@ sigma_status mapDxvkSurface(sigma_u32 hwnd, sigma_u32* vulkan_surface) {
 Apps compiled with MSVC link against `msvcrt.dll` / `vcruntime140.dll`.
 SigmaOS provides a sovereign reimplementation backed by `klib/sigma_nanolib.h`.
 
-```text
+```
 runtime/compat/win32/crt/sigma_msvcrt.cpp         ← malloc/free/printf/scanf/etc.
 runtime/compat/win32/crt/sigma_msvcrt_math.cpp    ← sin/cos/sqrt (→ libm or AVX-512 inline)
 runtime/compat/win32/crt/sigma_msvcrt_string.cpp  ← strcpy/strlen/memcpy (→ sigma_nanolib)
@@ -472,7 +445,7 @@ runtime/compat/win32/crt/sigma_msvcrt_threads.cpp ← _beginthread (→ sigma_th
 
 Network apps use Winsock. Translate to sigma-socket ABI:
 
-```text
+```
 runtime/compat/win32/winsock/sigma_winsock2.cpp
     ← WSAStartup, socket(), connect(), send(), recv(), closesocket()
     → sigma_socket_open(), sigma_socket_connect(), sigma_socket_send/recv()
@@ -487,7 +460,7 @@ runtime/compat/win32/winsock/sigma_winsock2.cpp
 All the above components are assembled into `sigma-wine` — the unified Windows
 compatibility environment.
 
-```text
+```
 runtime/compat/win32/sigma_wine.cpp           ← top-level orchestrator
 runtime/compat/win32/sigma_wine_loader.cpp    ← detect PE, invoke sigma-pe, wire DLL stubs
 runtime/compat/win32/sigma_wine_server.cpp    ← wineserver equivalent: handles kernel objects
@@ -496,37 +469,29 @@ include/compat/sigma_wine.h
 ```
 
 **sigma-wine-server** (equivalent to Wine's `wineserver`):
-
 - Manages cross-process kernel objects (events, mutexes, named pipes, shared memory)
-
 - Runs as a sigma-pod container alongside the Windows app
-
 - Uses sigma-bus for all IPC — no Unix domain sockets required
 
-### CLI interface:
-
+**CLI interface:**
 ```bash
 sigma-wine notepad.exe
 sigma-wine setup.exe /silent
 sigma-wine --d3d11 game.exe        # force D3D11→Vulkan
-
 sigma-wine --debug --trace explorer.exe
 sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
-
 ```
 
 ### Status: `[ ]` Not started
 
 ---
-
 ## Phased Timeline
 
 ### Phase W0 — Foundation (Months 0–3, parallel to Phase 0 kernel)
-
-### Do this while waiting for kernel boot to stabilize.
+*Do this while waiting for kernel boot to stabilize.*
 
 | Task | File | Exit Gate |
-| ------ | ------ | ----------- |
+|------|------|-----------|
 | PE type definitions header | `include/compat/sigma_pe_types.h` | Compiles cleanly |
 | NT type definitions header | `include/compat/sigma_nt_types.h` | NTSTATUS, UNICODE_STRING, PEB, TEB defined |
 | Handle table skeleton | `runtime/compat/win32/sigma_handle_table.cpp` | alloc/free/lookup working |
@@ -535,11 +500,10 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 | sigma-wine CLI stub | `runtime/compat/win32/sigma_wine.cpp` | `sigma-wine --info hello.exe` prints PE headers |
 
 ### Phase W1 — Hello World (Months 3–6)
-
-### Target: run a static Win32 CLI binary that prints to stdout.
+*Target: run a static Win32 CLI binary that prints to stdout.*
 
 | Task | File | Exit Gate |
-| ------ | ------ | ----------- |
+|------|------|-----------|
 | NT syscall table (I/O + memory) | `runtime/compat/win32/sigma_ntdll.cpp` | NtReadFile, NtWriteFile, NtAllocateVirtualMemory mapped |
 | PEB/TEB setup | `runtime/compat/win32/sigma_ntdll.cpp` | gs:[0x60] valid, BeingDebugged=0 |
 | sigma-kernel32 console I/O | `runtime/compat/win32/kernel32/sigma_kernel32_console.cpp` | WriteConsoleA writes to stdout |
@@ -550,11 +514,10 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 **Milestone:** `sigma-wine hello.exe` prints `Hello, SigmaOS!` in QEMU.
 
 ### Phase W2 — CLI App Compatibility (Months 6–12)
-
-### Target: run cmd.exe, Python for Windows, Git for Windows CLI.
+*Target: run cmd.exe, Python for Windows, Git for Windows CLI.*
 
 | Task | File | Exit Gate |
-| ------ | ------ | ----------- |
+|------|------|-----------|
 | Full kernel32 file I/O | `sigma_kernel32_file.cpp` | CreateFile/ReadFile/WriteFile on sigma-vfs |
 | Process creation | `sigma_kernel32_process.cpp` | CreateProcess spawns a child |
 | NT synchronization | `sigma_ntdll.cpp` | Mutex, Event, WaitForSingleObject |
@@ -567,11 +530,10 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 **Milestone:** `sigma-wine python.exe -c "print('hello')"` works.
 
 ### Phase W3 — GUI App Compatibility (Months 12–24)
-
-### Target: run Notepad, simple Win32 GUI apps.
+*Target: run Notepad, simple Win32 GUI apps.*
 
 | Task | File | Exit Gate |
-| ------ | ------ | ----------- |
+|------|------|-----------|
 | sigma-user32 window + WM_PAINT | `sigma_user32_window.cpp` | CreateWindow/ShowWindow/GetMessage loop |
 | HWND → Zenith surface mapping | `sigma_user32_dc.cpp` | Window appears on Zenith desktop |
 | Message pump | `sigma_user32_msg.cpp` | WM_KEYDOWN/WM_MOUSEMOVE delivered |
@@ -584,11 +546,10 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 **Milestone:** `sigma-wine notepad.exe` opens, renders text, saves a file.
 
 ### Phase W4 — Office / Enterprise Apps (Months 24–36)
-
-### Target: run Office 2019 / LibreOffice Windows build, VSCode, Electron apps.
+*Target: run Office 2019 / LibreOffice Windows build, VSCode, Electron apps.*
 
 | Task | File | Exit Gate |
-| ------ | ------ | ----------- |
+|------|------|-----------|
 | COM/OLE core | `sigma_com.cpp` | CoCreateInstance works for registered CLSIDs |
 | IDispatch (VBA/scripting) | `sigma_com_automation.cpp` | VBA macros execute |
 | sigma-gdi32 BitBlt/DIBits | `sigma_gdi32_bitmap.cpp` | Image rendering works |
@@ -601,11 +562,10 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 **Milestone:** Microsoft Word 2019 opens and renders a document.
 
 ### Phase W5 — Gaming (Months 24–48, parallel to W4)
-
-### Target: run Steam + Proton games natively on SigmaOS.
+*Target: run Steam + Proton games natively on SigmaOS.*
 
 | Task | File | Exit Gate |
-| ------ | ------ | ----------- |
+|------|------|-----------|
 | DXVK D3D9/D3D11 complete | `sigma_dxvk_d3d9.cpp`, `sigma_dxvk_d3d11.cpp` | Games render frames |
 | vkd3d-proton D3D12 | `sigma_dxvk_d3d12.cpp` | DX12 titles run |
 | XInput (gamepad) | `runtime/compat/win32/sigma_xinput.cpp` | Controller input works |
@@ -619,7 +579,7 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 
 ## Complete File Tree
 
-```text
+```
 runtime/compat/win32/
 ├── sigma_wine.cpp                     Stage 7 — top-level orchestrator
 ├── sigma_wine_loader.cpp              Stage 7 — PE detection + DLL wiring
@@ -696,10 +656,11 @@ include/compat/
 └── sigma_wine.h                       sigma-wine public API
 ```
 
+
 ## Compatibility Targets by Phase
 
 | Application | Category | Phase | Key blockers |
-| ------------- | ---------- | ------- | -------------- |
+|-------------|----------|-------|--------------|
 | `hello.exe` (static Win32 CLI) | CLI | W1 | PE loader + kernel32 console I/O |
 | Python 3.x for Windows | CLI | W2 | CRT + kernel32 + process creation |
 | Git for Windows | CLI | W2 | CRT + file I/O + winsock |
@@ -724,7 +685,7 @@ include/compat/
 The compat layer runs **entirely in userspace** — no NT kernel code runs in SigmaOS Ring-0.
 This is a fundamental security advantage over running Windows inside a VM.
 
-```text
+```
 Windows app (Ring-3)
     │  NT syscall (SYSCALL instruction)
     ▼
@@ -758,7 +719,7 @@ on real Windows without expensive third-party tooling.
 ## SigmaOS Advantages Over Running Windows in a VM
 
 | Dimension | Windows in VM (Hyper-V/KVM) | sigma-wine (native compat) |
-| ----------- | ---------------------------- | --------------------------- |
+|-----------|----------------------------|---------------------------|
 | RAM overhead | +2–4 GB for Windows guest OS | Zero — no guest OS |
 | Boot time | 30–60 seconds for VM | Instant — just process launch |
 | GPU passthrough | Complex, limited support | Native Vulkan via DXVK |
@@ -774,8 +735,7 @@ on real Windows without expensive third-party tooling.
 ## Test Plan
 
 ### Unit tests (per stage)
-
-```text
+```
 tests/compat/win32/
 ├── test_pe_loader.cpp         ← parse known PE files, verify section map
 ├── test_nt_syscall_table.cpp  ← every mapped NT call returns expected value
@@ -789,8 +749,7 @@ tests/compat/win32/
 ```
 
 ### Integration tests (per milestone)
-
-```text
+```
 tests/compat/win32/integration/
 ├── run_hello_exe.sh           ← W1: sigma-wine static hello.exe → "Hello, SigmaOS!"
 ├── run_python_cli.sh          ← W2: sigma-wine python.exe -c "print('ok')"
@@ -801,25 +760,18 @@ tests/compat/win32/integration/
 ```
 
 ### CI gating
-
 ```yaml
-
 # .github/workflows/sigma_wine_ci.yml
-
 name: sigma-wine compatibility CI
 on: [push, pull_request]
 jobs:
   wine-unit:
     runs-on: ubuntu-latest
     steps:
-
       - run: make test-compat-win32
-
   wine-pe-loader:
     steps:
-
       - run: ./tests/compat/win32/run_hello_exe.sh
-
 ```
 
 ---
@@ -827,7 +779,7 @@ jobs:
 ## Master Status Checklist
 
 | Stage | Component | Status | Phase |
-| ------- | ----------- | -------- | ------- |
+|-------|-----------|--------|-------|
 | W0 | `include/compat/sigma_pe_types.h` | `[ ]` | Now |
 | W0 | `include/compat/sigma_nt_types.h` | `[ ]` | Now |
 | W0 | `include/compat/sigma_win32_types.h` | `[ ]` | Now |

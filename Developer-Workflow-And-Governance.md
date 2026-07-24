@@ -11,15 +11,11 @@
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 ./scripts/setup_hooks.sh    # installs hooks, checks toolchain, configures git
-
 ```
 
 This installs three git hooks:
-
 - **commit-msg**: enforces Conventional Commits format
-
 - **pre-commit**: runs rustfmt on staged `.rs` files
-
 - **prepare-commit-msg**: auto-appends `Signed-off-by:`
 
 ---
@@ -28,7 +24,7 @@ This installs three git hooks:
 
 SigmaOS uses [Conventional Commits](https://www.conventionalcommits.org/), extended with OS-specific types:
 
-```text
+```
 type(scope): short description (max 100 chars)
 
 Optional longer body explaining WHY, not what.
@@ -39,7 +35,7 @@ Signed-off-by: Your Name <your@email.com>
 ### Valid types
 
 | Type | Use for |
-| ------ | --------- |
+|------|---------|
 | `feat` | New feature |
 | `fix` | Bug fix |
 | `impl` | Implements a roadmap/ideas item |
@@ -60,7 +56,7 @@ Signed-off-by: Your Name <your@email.com>
 
 ### Examples
 
-```text
+```
 kernel(sched): add MLFQ priority boost to prevent starvation
 
 Without periodic boosting, low-priority tasks can starve indefinitely
@@ -90,23 +86,21 @@ and you have the right to submit it.
 ### Before opening a PR
 
 1. Run locally:
-
    ```bash
    cargo fmt --check
    cargo clippy -- -D warnings
    cargo test
    ./kabi/check.py check         # verify no ABI breakage
-
    ```
 
-1. Fill in the PR template (`.github/PULL_REQUEST_TEMPLATE.md`) — every section matters.
+2. Fill in the PR template (`.github/PULL_REQUEST_TEMPLATE.md`) — every section matters.
 
-2. Reference the Ideas-999-Structured.md idea number if applicable.
+3. Reference the Ideas-999-Structured.md idea number if applicable.
 
 ### Review requirements
 
 | Change type | Required approvals |
-| ------------- | ------------------- |
+|-------------|-------------------|
 | Docs / wiki | 1 maintainer |
 | Userland tools | 1 maintainer + CI green |
 | Kernel subsystem | 2 maintainers + CI green + CODEOWNERS |
@@ -116,13 +110,9 @@ and you have the right to submit it.
 ### AI PR Summarizer
 
 The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a comment with:
-
 - Changed subsystems and file list
-
 - Suggested review checklist
-
 - Auto-detected test gaps
-
 - Affected CODEOWNERS
 
 ---
@@ -132,7 +122,7 @@ The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a c
 ### Workflows that run on every PR
 
 | Workflow | What it checks |
-| ---------- | ---------------- |
+|----------|----------------|
 | `sigma_dev_workflow.yml` | Commit lint, rustfmt, clippy, Nim check, SPDX headers, unsafe audit, cargo-audit CVE scan, SBOM, AI PR summary |
 | `sigma_multiarch_ci.yml` | Cross-build x86_64/arm64/riscv64, QEMU smoke boot, OCI compat, reproducible builds |
 | `pr_quality_gate.yml` | Commit lint, format, license, build matrix |
@@ -140,7 +130,7 @@ The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a c
 ### Nightly-only jobs
 
 | Job | Schedule |
-| ----- | ---------- |
+|-----|----------|
 | Syscall fuzz (cargo-fuzz) | `0 2 * * *` |
 | cargo-audit security scan | `0 2 * * *` |
 | ABI regression check | `0 2 * * *` |
@@ -148,9 +138,7 @@ The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a c
 ### Running CI locally (act)
 
 ```bash
-
 # Install: https://github.com/nektos/act
-
 act pull_request -W .github/workflows/sigma_dev_workflow.yml
 ```
 
@@ -161,17 +149,13 @@ act pull_request -W .github/workflows/sigma_dev_workflow.yml
 SigmaOS maintains a stable ABI for the **Driver DDK** and **C-ABI exports**:
 
 ```bash
-
 # Check for ABI breakage before pushing
-
 python kabi/check.py check
 
 # Generate a new snapshot after an intentional ABI addition
-
 python kabi/check.py snapshot --version v15.1.0
 
 # View the full stable symbol list
-
 python kabi/check.py report
 ```
 
@@ -184,25 +168,16 @@ See [RFC-0002: Kernel Stable ABI Policy](https://github.com/AaryanSinghChauhan09
 Significant changes require an RFC before implementation:
 
 1. Copy `docs/rfcs/RFC-0001-template.md` → `docs/rfcs/RFC-NNNN-<topic>.md`
-
 2. Open a GitHub Issue titled `RFC: <topic>` with label `rfc`
-
 3. Discussion period: minimum 7 days
-
 4. Maintainer signs off → RFC status becomes **Accepted**
-
 5. Implementation PR links back to the RFC
 
-### RFCs are required for:
-
+**RFCs are required for:**
 - New syscalls
-
 - ABI-breaking changes
-
 - New kernel subsystems
-
 - Changes to `sigma_pledge` promise bits
-
 - Changes to the sigpkg format
 
 ---
@@ -215,7 +190,7 @@ file for the complete subsystem → maintainer mapping (Linux kernel style).
 ### Key areas
 
 | Subsystem | Maintainer file path |
-| ----------- | --------------------- |
+|-----------|---------------------|
 | Kernel core (sched/mm/syscalls) | `MAINTAINERS: KERNEL CORE` |
 | Security (pledge/seccomp/PQC) | `MAINTAINERS: SECURITY SUBSYSTEM` |
 | Wi-Fi drivers | `MAINTAINERS: NETWORK STACK — WI-FI` |
@@ -227,21 +202,16 @@ file for the complete subsystem → maintainer mapping (Linux kernel style).
 ## Performance & Tracing
 
 ```bash
-
 # Run the microbenchmark suite
-
 sigma-perf bench --save
 
 # Live kernel trace (requires kernel trace socket)
-
 sigma-trace live
 
 # Generate a flamegraph
-
 sigma-trace flamegraph | inferno-flamegraph > sigma-flame.svg
 
 # Hardware counter summary
-
 sigma-perf stat
 ```
 
@@ -256,9 +226,7 @@ Every build on `main` generates a [CycloneDX](https://cyclonedx.org/) SBOM artif
 downloadable from the GitHub Actions run. This lets you verify every dependency.
 
 ```bash
-
 # Generate SBOM locally
-
 cargo install cargo-cyclonedx
 cargo cyclonedx --format json --output-file sbom/sigmaos.cdx.json
 ```
@@ -268,7 +236,7 @@ cargo cyclonedx --format json --output-file sbom/sigmaos.cdx.json
 ## Branching Model
 
 | Branch | Purpose | Protection |
-| -------- | --------- | ------------ |
+|--------|---------|------------|
 | `main` | Single unified branch | PR required, CI must pass, CODEOWNERS enforced |
 | `release/vX.Y.Z` | Release maintenance | Backports only, no force-push |
 | `kernel-exp` | Experimental kernel | No protection (caveat emptor) |

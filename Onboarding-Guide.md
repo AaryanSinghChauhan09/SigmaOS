@@ -11,7 +11,6 @@ SigmaOS is designed for silicon-direct, high-security operations. You must stric
 ### A. Zero Monolithic Dependencies
 
 - Do not include any standard library headers (`<vector>`, `<string>`, `<iostream>`, etc.) as they assume host operating system runtimes.
-
 - Use fixed-width primitive types defined in [sigma_kernel_types.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_kernel_types.h) (`sigma_u32`, `sigma_u64`, etc.).
 
 ### B. Stable C++ Meyer Singletons
@@ -33,7 +32,7 @@ public:
         static MyComponent instance;
         return instance;
     }
-
+    
     void run() {
         sigma_log_info("[SUB] Active.");
     }
@@ -50,7 +49,6 @@ private:
 ### C. Zero-Loss Fixed-Point Calculations
 
 - Never use standard CPU float/double math in financial or statutory calculators.
-
 - Calculate monetary values exclusively as integers in **paise** (1 Rupee = 100 paise) to prevent precision loss.
 
 ---
@@ -65,13 +63,13 @@ Verify compilation and boot stage behavior locally using the QEMU target suite:
    make clean
    ```
 
-1. **Build Bootable ISO**:
+2. **Build Bootable ISO**:
 
    ```bash
    make iso
    ```
 
-1. **Ignite the Emulation Target**:
+3. **Ignite the Emulation Target**:
 
    ```bash
    make qemu

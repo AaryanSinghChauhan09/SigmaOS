@@ -6,7 +6,7 @@
 
 ## Overall Progress
 
-```text
+```
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
 Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE (was 0%)
 Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
@@ -17,7 +17,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 ## Subsystem Status
 
 | Subsystem | Component | Status |
-| ----------- | ----------- | -------- |
+|-----------|-----------|--------|
 | **Kernel** | Scheduler (MLFQ+CFS+EDF) | ✅ Done |
 | | Syscalls — I/O (read/write/open/close/lseek/dup/stat/fcntl/ioctl) | ✅ Done |
 | | Syscalls — Process (fork/execve/wait4/exit/kill/pipe/mkdir) | ✅ Done |
@@ -94,7 +94,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 ## Open Issue Count by Phase
 
 | Phase | Open | Resolved |
-| ------- | ------ | --------- |
+|-------|------|---------|
 | Phase A-F | 4 (low priority) | 28 |
 | Phase G (kernel) | 16 | 0 |
 | Phase H (India) | 8 | 0 |
@@ -104,7 +104,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 ## CI Status
 
 | Check | Status |
-| ------- | -------- |
+|-------|--------|
 | Build (x86_64) | ✅ Passing |
 | Static analysis | ✅ Passing |
 | PQC fuzz | ✅ Passing |

@@ -10,7 +10,7 @@ from — cleanroom reimplementation only, no GPL code copied.
 ## Key References by Subsystem
 
 | Subsystem | Study | What |
-| --- | --- | --- |
+|---|---|---|
 | Capability security | seL4, Fuchsia/Zircon | Capability model, IPC fastpath |
 | Package manager | Nix/Guix | Content-addressed store, reproducible builds |
 | Compositor | Smithay (Rust, MIT) | Wayland-inspired compositor framework |

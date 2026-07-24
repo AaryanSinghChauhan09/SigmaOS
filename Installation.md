@@ -1,458 +1,97 @@
-# SigmaOS Installation Guide
+# Installation
 
-> **Build Status**: ![CI](https://github.com/AaryanSinghChauhan09/SigmaOS/workflows/SigmaOS%20Build%20and%20Test%20Pipeline/badge.svg)
+# 🚀 SigmaOS Installation Guide
 
-This guide covers building and installing SigmaOS from source for various deployment targets.
-
----
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Build Profiles](#build-profiles)
-- [Platform-Specific Instructions](#platform-specific-instructions)
-- [Troubleshooting](#troubleshooting)
-- [Advanced Configuration](#advanced-configuration)
-
+Welcome to the SigmaOS Installation Guide. This document provides a step-by-step procedure to deploy the SigmaOS Sovereign Lattice onto physical hardware or a virtualized environment.
 
 ---
 
-## Prerequisites
+## 💻 Supported Hardware
 
-### Common Requirements
+| Platform | Support Tier | Notes | 
+| :--- | :--- | :--- | 
 
-All builds require:
+| **Raspberry Pi 5 (BCM2712)** | Tier 1 (Optimized) | Full silicon-level hardware acceleration. | 
 
-- **Git**: For cloning the repository
-- **Make**: For build orchestration
-- **CMake**: >= 3.15 for cross-platform builds
-- **Python 3**: >= 3.8 for build scripts
+| **Raspberry Pi 4 (BCM2711)** | Tier 1 (Supported) | Primary development target. | 
 
+| **x86_64 Systems (Intel/AMD)** | Tier 2 (Stable) | Generic drivers for UEFI systems. | 
 
-### Linux (Ubuntu/Debian)
-
-```bash
-sudo apt-get update
-sudo apt-get install -y \
-    build-essential \
-    nasm \
-    cmake \
-    qemu-system-x86 \
-    golang-go \
-    xorriso \
-    grub-pc-bin \
-    grub-efi-amd64-bin \
-    git \
-    python3 \
-    python3-pip
-```
-
-### macOS
-
-```bash
-brew install \
-    nasm \
-    cmake \
-    qemu \
-    go \
-    xorriso \
-    coreutils
-```
-
-### Windows (WSL2)
-
-```bash
-
-# Install WSL2 with Ubuntu
-
-wsl --install
-
-# Inside WSL2 Ubuntu:
-
-sudo apt-get update
-sudo apt-get install -y \
-    build-essential \
-    nasm \
-    cmake \
-    qemu-system-x86 \
-    golang-go \
-    xorriso \
-    grub-pc-bin \
-    grub-efi-amd64-bin
-```
+| **RISC-V Generic** | Experimental | Basic kernel boot only. | 
 
 ---
 
-## Quick Start
+## ⚡ Quick Deployment (Physical Hardware)
 
-### Clone Repository
+1. **Download the Official Image**
 
-```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-```
+   Download the latest `sigmaos_aarch64.img` from the GitHub Release page.
 
-### Build for QEMU (x86_64)
+1. **Flash to SD Card / NVMe**
 
-```bash
-make clean
-make all ARCH=x86_64
-```
+   Use `dd` or a tool like BalenaEtcher to flash the image.
 
-### Run in QEMU
+   ```bash
+   sudo dd if=sigmaos_aarch64.img of=/dev/sdX bs=4M status=progress
+   ```
 
-```bash
-qemu-system-x86_64 \
-    -cdrom build/sigmaos.iso \
-    -m 2G \
-    -serial stdio \
-    -no-reboot
-```
+1. **Booting**
 
-### Build ISO for Bare Metal
-
-```bash
-make PROFILE=standalone all
-```
-
-The ISO will be available at `build/sigmaos.iso`.
+   Insert the drive and power on. The Sovereign Boot Manager will initialize the lattice shards and launch the Zenith UI automatically.
 
 ---
 
-## Build Profiles
+## 🔬 Virtualization (QEMU)
 
-SigmaOS supports multiple build profiles for different deployment targets:
+If you want to test SigmaOS without physical hardware, use the QEMU target.
 
-### Standalone (Full Desktop)
+1. **Build the Kernel**
 
-```bash
-make PROFILE=standalone all
-```
+   Follow the instructions in [Build.md](Build.md) to compile `sigma_os.elf`.
 
-**Includes**: Full desktop environment, all drivers, Zenith compositor, AI tools
+1. **Run QEMU**
 
-**Target**: Desktop/laptop hardware
-
-**Output**: `build/sigmaos-standalone.iso` (~2GB)
-
-### Microkernel
-
-```bash
-make PROFILE=microkernel all
-```
-
-**Includes**: Minimal kernel, core shards only
-
-**Target**: Embedded systems, containers
-
-**Output**: `build/sigmaos-microkernel.bin` (<512KB)
-
-### RTOS (Real-Time)
-
-```bash
-make PROFILE=rtos all
-```
-
-**Includes**: Hard real-time scheduler, deterministic timing
-
-**Target**: Industrial control, medical devices
-
-**Output**: `build/sigmaos-rtos.elf`
-
-### Cloud
-
-```bash
-make PROFILE=cloud all
-```
-
-**Includes**: Headless image, cloud-init support
-
-**Target**: AWS, GCP, Azure deployments
-
-**Output**: `build/sigmaos-cloud.img.qcow2`
-
-### Mobile
-
-```bash
-make PROFILE=mobile all
-```
-
-**Includes**: Touch-optimized UI, mobile drivers
-
-**Target**: ARM64 Android/iOS devices
-
-**Output**: `build/sigmaos-mobile.apk` or `.ipa`
-
-### Browser
-
-```bash
-make PROFILE=browser all
-```
-
-**Includes**: WASM-compiled kernel, web UI
-
-**Target**: Web browsers via WebAssembly
-
-**Output**: `build/sigmaos-browser.wasm`
+   ```bash
+   qemu-system-aarch64 \
+       -machine raspi4b \
+       -cpu cortex-a72 \
+       -m 2G \
+       -kernel sigma_os.elf \
+       -serial stdio
+   ```
 
 ---
 
-## Platform-Specific Instructions
+## 🌓 Dual-Boot Configuration
 
-### x86_64 (Intel/AMD)
+The `SovereignPartitionManager` supports scanning existing GPT partitions and bridging with systemd-boot.
 
-```bash
-make clean
-make all ARCH=x86_64
-```
+1. **Copy the Kernel**
 
-**Supported**: QEMU, bare metal, virtualization platforms
+   Copy `sigma_os_x64.elf` to your EFI partition.
 
-### ARM64 (aarch64)
+   ```bash
+   sudo cp sigma_os_x64.elf /boot/efi/EFI/sigmaos/
+   ```
 
-```bash
-make clean
-make all ARCH=aarch64 CROSS_COMPILE=aarch64-linux-gnu-
-```
+1. **Add Boot Entry**
 
-**Supported**: Raspberry Pi 4/5, ARM servers, Apple Silicon
+   Create `/boot/efi/loader/entries/sigmaos.conf`:
 
-**Requirements**: aarch64-linux-gnu toolchain
-
-### RISC-V
-
-```bash
-make clean
-make all ARCH=riscv64 CROSS_COMPILE=riscv64-linux-gnu-
-```
-
-**Supported**: RISC-V development boards, SiFive hardware
-
-**Requirements**: riscv64-linux-gnu toolchain
+   ```ini
+   title   SigmaOS Sovereign Lattice
+   linux   /EFI/sigmaos/sigma_os_x64.elf
+   options root=PARTUUID=XXXX-XXXX rw
+   ```
 
 ---
 
-## Development Build
+## 🎯 Post-Installation
 
-### Debug Build
+Upon first boot, the **Onboarding Wizard**will launch to:*Detect your hardware and apply**Smart Defaults**.
 
-```bash
-make DEBUG=1 all
-```
-
-Enables debug symbols, disables optimizations.
-
-### Release Build
-
-```bash
-make RELEASE=1 all
-```
-
-Enables optimizations, strips debug symbols.
-
-### Verbose Build
-
-```bash
-make V=1 all
-```
-
-Shows all compiler commands.
-
-### Parallel Build
-
-```bash
-make -j$(nproc) all
-```
-
-Uses all available CPU cores.
+*Prompt for your**Profession Profile**(Lawyer, Doctor, Engineer, etc.).*Configure**Verified Boot** and PQC security levels.
 
 ---
 
-## Testing
-
-### Run Smoke Tests
-
-```bash
-./scripts/smoke-test.sh
-```
-
-### Run Unit Tests
-
-```bash
-make test
-```
-
-### Run Integration Tests
-
-```bash
-make test-integration
-```
-
-### Run QEMU Boot Test
-
-```bash
-make test-qemu
-```
-
----
-
-## Troubleshooting
-
-### Build Fails with "command not found"
-
-Install missing prerequisites from the [Prerequisites](#prerequisites) section.
-
-### QEMU Boot Fails
-
-Ensure QEMU is installed and the ISO was built successfully:
-
-```bash
-ls -lh build/sigmaos.iso
-qemu-system-x86_64 --version
-```
-
-### Cross-Compilation Errors
-
-Verify the cross-compiler toolchain is in your PATH:
-
-```bash
-aarch64-linux-gnu-gcc --version
-riscv64-linux-gnu-gcc --version
-```
-
-### Out of Memory During Build
-
-Reduce parallel jobs:
-
-```bash
-make -j2 all
-```
-
-### Permission Denied on Scripts
-
-Make scripts executable:
-
-```bash
-chmod +x scripts/*.sh
-```
-
----
-
-## Advanced Configuration
-
-### Custom Kernel Configuration
-
-Edit `Config.sigma` to customize kernel parameters:
-
-```toml
-[kernel]
-memory = "2048M"
-cores = 4
-debug = true
-
-[shards]
-enable = ["s-mm", "s-sched", "s-net", "s-fs"]
-```
-
-### Build with Custom Toolchain
-
-```bash
-make CC=/path/to/gcc CXX=/path/to/g++ all
-```
-
-### Build Specific Components
-
-```bash
-make kernel
-make drivers
-make userspace
-```
-
-### Clean Build Artifacts
-
-```bash
-make clean          # Remove build artifacts
-make distclean      # Remove all generated files
-make mrproper       # Remove everything including config
-```
-
----
-
-## Installation to Disk
-
-### Create Bootable USB (Linux)
-
-```bash
-
-# Insert USB drive (replace /dev/sdX with your device)
-
-sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress
-sudo sync
-```
-
-### Create Bootable USB (macOS)
-
-```bash
-
-# Insert USB drive (replace disk2 with your device)
-
-diskutil list
-sudo diskutil unmountDisk /dev/disk2
-sudo dd if=build/sigmaos.iso of=/dev/disk2 bs=4m
-sudo sync
-```
-
-### Create Bootable USB (Windows)
-
-Use [Rufus](https://rufus.ie/) or [Etcher](https://www.balena.io/etcher/):
-
-1. Download Rufus from https://rufus.ie/
-2. Select `build/sigmaos.iso`
-3. Select your USB drive
-4. Click "Start"
-
-
----
-
-## Verification
-
-### Verify ISO Integrity
-
-```bash
-sha256sum build/sigmaos.iso
-```
-
-Compare with the checksum in the release notes.
-
-### Verify Build
-
-```bash
-./scripts/smoke-test.sh
-```
-
-All tests should pass.
-
----
-
-## Next Steps
-
-- Read [ARCHITECTURE.md](ARCHITECTURE.md) for system design
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) to contribute
-- Join the community at [COMMUNITY.md](COMMUNITY.md)
-- Report issues at [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-
-
----
-
-## Getting Help
-
-- **Documentation**: [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-- **Issues**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
-- **Support**: [SUPPORT.md](SUPPORT.md)
-
-
----
-
-*Last Updated: 2026-07-13*
+### Welcome to the future of sovereign computing

@@ -9,7 +9,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ## Language Assignment
 
 | Language | Role in SigmaOS | OOP Mechanism |
-| ---------- | ---------------- | --------------- |
+|----------|----------------|---------------|
 | **Rust** | Kernel core, IPC, AI scheduler, PQC stubs, agent orchestration, containers | Structs + Traits (`impl`) |
 | **Zig** | Bootloader, x86_64 HAL, paging, PS/2 input, framebuffer, audio drivers | Structs + methods, `comptime`, tagged unions |
 | **Nim** | Config engine, generation manager, CLI, package manager | Objects + methods + generics |
@@ -22,7 +22,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Rust (`no_std`, `no_builtins`)
 
 | File | Replaces |
-| ------ | ---------- |
+|------|----------|
 | `klib/ai_scheduler.rs` | `core/ai_scheduler/ai_sched.cpp` |
 | `klib/pqc.rs` | `crypto/SovereignKyber.cpp`, `SovereignDilithium5.cpp` |
 | `init/watchdog.rs` | Self-healing watchdog |
@@ -44,7 +44,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Zig (bare-metal, no stdlib)
 
 | File | Replaces |
-| ------ | ---------- |
+|------|----------|
 | `arch/x86_64/paging.zig` | `arch/x86_64/paging.c` |
 | `hal/x86/hal_io.zig` | `hal/x86/` C HAL files |
 | `drivers/input/ps2.zig` | `sigma_keyboard.cpp`, `sigma_mouse.cpp`, `sigma_ps2.cpp` |
@@ -56,10 +56,11 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/unified/driver_api.zig` | `drivers/unified/driver_api.h` |
 | **`fs/sovereign_vfs.zig`** | `fs/sigmafs/sigmafs.h`, `fs/sovereign_fs/sovereign_fs.h`, `fs/SovereignDiskZenith.h`, all `include/fs/*.h` |
 
+
 ### Nim (compiles to native, no stdlib/libc)
 
 | File | Replaces |
-| ------ | ---------- |
+|------|----------|
 | `config/core/declarative_engine.nim` | `config/core/DeclarativeEngine.cpp` |
 | `config/core/generation_manager.nim` | `config/core/GenerationManager.cpp` |
 | `config/cli_main.nim` | `config/cli_main.cpp` |
@@ -72,7 +73,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Ada/SPARK (formally verified, no runtime exceptions)
 
 | File | Replaces |
-| ------ | ---------- |
+|------|----------|
 | `crypto/kyber.ads` + `kyber.adb` | `crypto/SovereignKyber.cpp` |
 | `crypto/dilithium.ads` + `dilithium.adb` | `crypto/SovereignDilithium5.cpp` |
 | `drivers/block/ahci.ads` + `ahci.adb` | `drivers/block/ahci_shard.cpp` |
@@ -86,7 +87,6 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ## OOP Principles Per Language
 
 ### Rust
-
 ```rust
 // Struct as class, Trait as interface
 pub trait SigmaObject { fn initialize(&mut self) -> i32; }
@@ -95,7 +95,6 @@ impl AgentOrchestrator { pub fn register(&mut self, id: usize, priority: u8) -> 
 ```
 
 ### Zig
-
 ```zig
 // Struct with methods as OOP class
 pub const Framebuffer = struct {
@@ -105,18 +104,14 @@ pub const Framebuffer = struct {
 ```
 
 ### Nim
-
 ```nim
-
 # Object type with procedures = OOP class
-
 type GenerationManager* = object
   generations*: seq[GenerationInfo]
 proc createGeneration*(mgr: var GenerationManager; label: string): int = ...
 ```
 
 ### Ada/SPARK
-
 ```ada
 -- Tagged Record = OOP class, SPARK aspects = contracts
 type AHCI_Port is tagged record
@@ -132,15 +127,10 @@ procedure Read_Sector (Port: in out AHCI_Port; ...) with Pre => Port.State = Idl
 The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 
 ```yaml
-
 - Rust:     cargo build --target x86_64-unknown-none
-
 - Zig:      zig build-lib --target x86_64-freestanding-none
-
 - Nim:      nim c --noMain --noLinking --cpu:amd64
-
 - Ada/SPARK: gprbuild -P sigmaos.gpr
-
 ```
 
 ---
@@ -148,9 +138,6 @@ The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 ## 🔗 Related Pages
 
 - [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
-
 - [Phase 6: Long-Term Vision](Phase-6-Long-Term-Vision)
-
 - [Zero-Dependency Architecture](Zero-Dependency-Architecture)
-
 - [Roadmap](Roadmap)

@@ -7,7 +7,7 @@
 
 ## Layer Overview
 
-```text
+```
 Applications     → sigma-browser · sigma-edit · sigma-office · sigma-play
 Desktop          → compositor · wm · panel · settings · launcher · notifications
 AI & Runtime     → sigma-ai (TinyLlama) · WASM runtime · sigma-pod OCI
@@ -32,7 +32,7 @@ Boot             → sigma-boot.zig (UEFI stub)
 ## Component Count: 100+
 
 | Layer | Count |
-| --- | --- |
+|---|---|
 | Desktop UI | 9 |
 | Userland Tools | 13 |
 | Network Tools | 5 |
@@ -49,7 +49,7 @@ Boot             → sigma-boot.zig (UEFI stub)
 ## New in Batch 6
 
 | Component | File | Purpose |
-| --- | --- | --- |
+|---|---|---|
 | Panel / Dynamic Island | `userland/desktop/sigma_panel.rs` | Top status bar with modular items |
 | Settings Hub | `userland/desktop/sigma_settings.rs` | Unified settings (appearance/network/privacy) |
 | Accessibility | `userland/desktop/sigma_accessibility.rs` | High contrast, screen reader, colour blind, sticky keys |

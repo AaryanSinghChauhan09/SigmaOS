@@ -14,13 +14,9 @@ Linus Torvalds explicitly refuses to stabilize the Linux kernel ABI:
 > kernel version X, it may or may not work with kernel version X+1."
 
 This means:
-
 - NVIDIA must recompile their driver for every kernel update
-
 - Out-of-tree drivers break regularly
-
 - Vendors don't ship drivers because maintenance cost is too high
-
 - Users get "kernel update broke my Wi-Fi" experiences
 
 ## Windows Does It Right (for stability)
@@ -48,13 +44,9 @@ pub struct KabiHeader {
 ```
 
 Rules that will **never be violated**:
-
 1. `KABI_VERSION_MAJOR` only increments for breaking changes (extremely rare)
-
 2. New fields are added **only at the end** of stable structs
-
 3. The `struct_size` field lets the loader detect and zero-fill unknown trailing fields
-
 4. Stable symbol names are frozen — internal implementation can change, exported names cannot
 
 ---
@@ -132,7 +124,7 @@ can only request the capabilities appropriate for their isolation level.
 ## Versioning Policy
 
 | Scenario | Action |
-| ---------- | -------- |
+|----------|--------|
 | Bug fix in kernel, no ABI change | Patch bump — all drivers continue working |
 | New optional field added to struct | Minor bump — old drivers get zero for new field |
 | Field removed or reordered | Major bump — old drivers rejected with clear error |
@@ -143,7 +135,7 @@ can only request the capabilities appropriate for their isolation level.
 ## Comparison
 
 | OS | kABI Stability | Driver Compatibility |
-| ---- | ---------------- | ---------------------- |
+|----|----------------|----------------------|
 | Linux | ❌ No stable kABI | Breaks every kernel update |
 | Windows | 🔄 Stable per OS version | Breaks across major releases |
 | SigmaOS | ✅ Stable forever (v1.0) | DDK v1.0 drivers work on all versions |

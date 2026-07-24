@@ -1,6 +1,6 @@
 # Phase K — IPv4 Stack, TCP, Block I/O, Page Cache, Crypto, Syscall Table
 
-> **Status:** ✅ COMPLETE — 542 tests pass (+35 over Phase J), 10 files / 1659 lines  
+> **Status:** ✅ COMPLETE — 542 tests pass (+35 over Phase J), 10 files / 1659 lines
 > **Commit:** `87272521d5` · `feat(kernel): Phase K`
 
 ---

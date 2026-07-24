@@ -2,14 +2,14 @@
 
 SigmaOS ships a purpose-built app for every licensed and registered profession in India. Each app integrates with the OS at the kernel level via sigma-bus — invoices auto-post to accounts, lab results auto-update EMR, payroll auto-feeds EPF.
 
-### Total: 50+ profession apps covering every sector regulated by Indian law.
+**Total: 50+ profession apps covering every sector regulated by Indian law.**
 
 ---
 
 ## Financial & Accounting
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-accounts` | Business owner, trader | GSTN | Double-entry, e-Invoice IRN, eWay Bill, DID audit trail |
 | `sigma-ca` | Chartered Accountant | ICAI | Multi-client dashboard, GSTR filing, Form 16 |
 | `sigma-cma` | Cost & Management Accountant | ICMAI | Cost audit (§148), CMA data for bank loans, DSCR |
@@ -23,7 +23,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Legal & Governance
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-legal` | Advocate, solicitor | State Bar Council | BNS 2023, eCourts API, DID-signed briefs |
 | `sigma-police` | Police officer | BNS/BNSS/CCTNS | FIR drafting, IPC→BNS mapper, e-Challan |
 | `sigma-forest` | Forest officer, wildlife officer | Forest Act, WPA 1972 | FRC claims, fire alerts, M-STrIPES patrol |
@@ -35,7 +35,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Health & Medical
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-health` | Doctor (MBBS/specialist) | NMC/ABDM | ABDM EMR, PMJAY claims, prescription |
 | `sigma-dental` | Dentist | DCI | FDI tooth charting, CGHS rates, autoclave log |
 | `sigma-veterinary` | Veterinarian, livestock officer | VCI/PCA | Cattle UID, drug dosage, INAPH sync |
@@ -49,7 +49,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Engineering & Technical
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-electrical` | Electrical engineer, contractor | CEA/IE Rules 1956 | Load calc, cable sizing (IS 3961), net meter |
 | `sigma-mining` | Mine manager, safety officer | DGMS/Mines Act 1952 | Accident report (2-hr), mineral challan, HEMM log |
 | `sigma-marine` | Ship officer, port operator | DG Shipping/STCW | COC tracking, stability calc, bunker calc |
@@ -65,7 +65,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Business, Trade & Services
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-pos` | Retailer, shopkeeper | GSTN | UPI QR, WhatsApp billing, GST auto, offline |
 | `sigma-hrms` | HR manager | EPFO/ESIC | EPF, ESIC, TDS, Form 16, ECR upload |
 | `sigma-hospitality` | Hotel, travel agent | MOT/HRACC/IATA | Form C (foreign guests), GST slab by room rent |
@@ -79,7 +79,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Agriculture & Environment
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-agri` | Farmer, agri consultant | PM-KISAN/PMFBY | Mandi prices (eNAM), soil test, PM-KISAN status |
 | `sigma-fisheries` | Fisherman, aquaculture | PMMSY/MPEDA | Fishing ban check, catch log, PMMSY subsidy |
 | `sigma-waste` | Waste management officer | SWM/E-Waste/BMW Rules | BMW colour-coded log, EPR targets, plastic ban |
@@ -89,7 +89,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Food & Wellness
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-fssai` | Restaurant, food manufacturer | FSSAI/Food Safety Act | License type by turnover, HACCP temp log, allergen |
 | `sigma-wellness` | Yoga teacher, Ayurveda, gym | CCIM/QCI/AYUSH | Prakriti assessment, PMJAY AYUSH billing, gym membership |
 
@@ -98,7 +98,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Creative, Media & Digital
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-film` | Director, producer, musician | CBFC/IPRS/IT Rules | CBFC application, OTT IT Rules 2021, copyright reg |
 | `sigma-creator` | Influencer, YouTuber | ASCI/SEBI | Disclosure check, 44ADA tax, brand deal invoice |
 | `sigma-gaming` | Online game developer | IT Online Games Rules 2023 | GST 28%, TDS 194BA, cultural compliance |
@@ -108,7 +108,7 @@ SigmaOS ships a purpose-built app for every licensed and registered profession i
 ## Education & Social
 
 | App | Profession | Regulator | Key Feature |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `sigma-edu` | Teacher, school admin | NEP 2020/RTE | Attendance, marks, e-Shram for contract teachers |
 | `sigma-coaching` | Coaching institute | UGC/Rajasthan Coaching Act | Admission disclosure, GST 18%, student stress monitoring |
 | `sigma-trust` | Temple/NGO/charity manager | FCRA 2010/80G | FCRA FC-4 return, 80G certificate, hundi count |
@@ -127,13 +127,11 @@ sigma-sec did professional-credential add \
   --verification-url https://icai.org/check?id=123456
 
 # Client scans QR → sees verified credential
-
 # Government portals accept sigma-DID login (no username/password)
-
 ```
 
 | Body | Example credential |
-| --- | --- |
+|---|---|
 | ICAI | CA membership + DID → verified CA QR |
 | NMC | Doctor NMC reg + DID → verified doctor QR |
 | Bar Council | Advocate enrollment + DID → court-verified QR |

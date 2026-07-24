@@ -7,7 +7,7 @@
 ## Current Status Summary
 
 | Subsystem | Status | Files |
-| --- | --- | --- |
+|---|---|---|
 | Sovereign Kernel (`no_std` CFS Scheduler) | ✅ Implemented | `kernel/core/sched_cfs.rs` |
 | Multi-tier VMM (Buddy & Slab Allocator) | ✅ Implemented | `kernel/mm/buddy_slab_vmm.rs` |
 | Zero-Alloc IPC Ring Buffer | ✅ Implemented | `kernel/ipc/ring_channel.rs` |
@@ -15,8 +15,6 @@
 | TCP/IP stack (zero-dependency) | ✅ Implemented | `kernel/net/tcp_stack.rs` |
 | Native Cryptography (ChaCha20) | ✅ Implemented | `kernel/crypto/chacha20.rs` |
 | sigpkg Security (ED25519 + SBOM Verification) | ✅ Core Implemented | `sigma-pkg/` |
-| ACPI Hardware Discovery | ✅ Implemented | `kernel/drivers/acpi.rs` |
-| NVMe Disk Driver | ✅ Implemented | `kernel/drivers/nvme.rs` |
 | Sovereign App Suites (Writer, Sheet, Vector) | 🔄 Stubs Implemented | `office/`, `design/` |
 | CI/CD Pipeline & Automatic SBOMs | ✅ Implemented | `.github/workflows/` |
 | Bootloader / UEFI | ⏳ Planned | `sigma-boot/` |
@@ -31,28 +29,22 @@
 ### Deliverables
 
 #### Kernel
-
 - [ ] UEFI boot and verified boot integration (`sigma-boot`)
 - [ ] Multi-arch CI images: `x86_64`, `aarch64`, `riscv64`
-- [x] ACPI hardware discovery implemented (RSDP/RSDT/XSDT/MADT) (`kernel/drivers/acpi.rs`)
 - [ ] ACPI power management and suspend/resume
 - [ ] SMP scheduling with per-CPU runqueues
 
 #### Storage & Filesystem
-
 - [ ] OpenZFS / Btrfs CoW extent mapping → `sigmafs.rs`
 - [ ] `ext4` read-only compatibility mount
 - [ ] dm-verity root partition integrity checks
 
 #### Drivers
-
 - [ ] VirtIO-net, VirtIO-blk, VirtIO-gpu
-- [x] NVMe driver implemented (`kernel/drivers/nvme.rs`)
-- [ ] e1000 network, USB xHCI
+- [ ] NVMe, e1000 network, USB xHCI
 - [ ] Basic Intel / AMD GPU KMS support
 
 #### Security
-
 - [ ] Intel SGX secure enclave initialization
 - [ ] Firecracker microVM VMM integration
 
@@ -67,14 +59,12 @@
 ### Deliverables
 
 #### Package Ecosystem
-
 - [ ] `sigpkg` signed package registry with rollback and mirrors
 - [ ] Flatpak XDG portal integration (sandboxed app delivery)
 - [ ] WASM / WASI runtime with capability-limited execution
 - [ ] Unified absorption of `.deb`, `.rpm`, Flatpak, Snap formats
 
 #### Desktop & Compositor
-
 - [ ] i3 / AwesomeWM-style dynamic tiling layout engine in Zenith
 - [ ] picom-style Kawase blur, window shadows, and inactive opacity
 - [ ] rofi-inspired semantic AI launcher (integrating `local_llm.rs`)
@@ -82,7 +72,6 @@
 - [ ] Multi-monitor support and dynamic workspace tiling
 
 #### Accessibility
-
 - [ ] Screen reader integration
 - [ ] High-contrast and magnification themes
 - [ ] Voice command input (Whisper model bridge)
@@ -98,7 +87,6 @@
 ### Deliverables
 
 #### Cybersecurity
-
 - [ ] Zeek network traffic profiling → Security Center integration
 - [ ] GnuPG signature enforcement in `sigpkg` pipeline
 - [ ] fail2ban-equivalent auto-IP-blocklist from IPC anomaly logs
@@ -106,13 +94,11 @@
 - [ ] QubesOS-style per-app hardware-capability compartmentalization
 
 #### Cryptography & Identity
-
 - [ ] WireGuard-native VPN tunnel via `sigma_networkmanager.rs`
 - [ ] TPM2 measured boot attestation
 - [ ] `sigma-vault` (HashiCorp Vault-inspired secrets store)
 
 #### Observability
-
 - [ ] OpenTelemetry trace export from kernel IPC spans
 - [ ] Live CPU/Memory dashboard widget in Zenith Dock
 - [ ] Crash dump analysis via systemd-coredump equivalent
@@ -128,21 +114,18 @@
 ### Deliverables
 
 #### AI Runtime
-
 - [ ] Quantized `llama.cpp` / `whisper.cpp` local inference via `local_llm.rs`
 - [ ] Natural language → CLI translation (SigmaAI Agent shell)
 - [ ] OpenCog AtomSpace semantic network integration
 - [ ] mlpack C++ linear algebra acceleration bridging `sigma_math.rs`
 
 #### Data Science
-
 - [ ] DVC-backed automatic telemetry snapshot via SovereignFS CoW
 - [ ] MLflow experiment tagging bound to sigpkg artifact deployments
 - [ ] Apache Spark-style distributed aggregation using shard IPC
 - [ ] Jupyter kernel stub for interactive sigma-notebook sessions
 
 #### Automation
-
 - [ ] `sigma_logic.rs` node expansion: HTTP trigger, file-watch, webhook
 - [ ] n8n-style visual workflow editor in Zenith apps
 - [ ] AI-powered bug explainer: translate kernel panics to plain language
@@ -158,21 +141,18 @@
 ### Deliverables
 
 #### Indian Localization
-
 - [ ] indic-transliteration engine in `sigma_i18n.rs` (Devanagari, Tamil, Bengali, Telugu, Gujarati)
 - [ ] Bharat-FOSS community module packaging
 - [ ] OpenForge e-Gov SDK pre-installed
 - [ ] BOSS Linux regional language UI profiles import
 
 #### Education
-
 - [ ] GeoGebra math visualization wrapper → Zenith Apps
 - [ ] Scilab / GNU Octave scientific computing CLI
 - [ ] OpenBoard digital whiteboard app
 - [ ] Offline freeCodeCamp + Exercism curriculum server (`sigma_academy.rs`)
 
 #### Professional Suites
-
 - [ ] QGIS agriculture yield prediction → `sigma_agriculture.rs`
 - [ ] OpenMRS healthcare record system → `sigma_healthcare.rs`
 - [ ] GST / TDS calculator embedded in `sigma_finance.rs`
@@ -195,7 +175,7 @@
 ## Cross-Reference Links
 
 | Document | Topic |
-| --- | --- |
+|---|---|
 | [Performance_Enhancements.md](Performance_Enhancements.md) | Linux kernel, systemd, LLVM |
 | [Advanced_Performance.md](Advanced_Performance.md) | SGX, ZFS, Firecracker |
 | [UI_UX_Improvements.md](UI_UX_Improvements.md) | GNOME, KDE, elementary |

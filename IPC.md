@@ -8,7 +8,7 @@ the network stack, and between processes.
 
 ## Architecture
 
-```text
+```
 Process / Driver           sigma-bus               Kernel / Other process
        │                      │                           │
        │── send(ch, data) ───►│                           │
@@ -23,7 +23,7 @@ Process / Driver           sigma-bus               Kernel / Other process
 32 pre-defined channels, each with a 256-slot lock-free SPSC ring:
 
 | Channel | Name | Direction | Users |
-| --------- | ------ | ----------- | ------- |
+|---------|------|-----------|-------|
 | 0x00 | `IPC_CH_KERNEL` | kernel→user | Kernel notifications |
 | 0x01 | `IPC_CH_DRIVERS` | driver→kernel | Driver events |
 | 0x10 | `IPC_CH_HOTPLUG` | kernel→user | USB/PCIe attach/detach |
@@ -97,7 +97,7 @@ send_message_zero_copy(
 ## Performance
 
 | Operation | Latency | Notes |
-| ----------- | --------- | ------- |
+|-----------|---------|-------|
 | `send_message_zero_copy` | < 100 ns | SPSC ring, no lock |
 | `recv_message` | < 50 ns | SPSC ring pop |
 | Ring-3 driver → kernel | < 5 µs | IPC crossing |

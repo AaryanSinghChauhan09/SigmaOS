@@ -8,7 +8,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Status Legend
 
 | Symbol | Meaning |
-| -------- | --------- |
+|--------|---------|
 | ✅ | Fully implemented |
 | 🔄 | Partial (stub with basic logic) |
 | ⬜ | Planned (returns ENOSYS) |
@@ -18,7 +18,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Process Control
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 39 | `getpid` | ✅ | Returns current process ID |
 | 110 | `getppid` | ✅ | Returns 1 (init) as default |
 | 102 | `getuid` | ✅ | Returns 0 (root) |
@@ -36,7 +36,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Memory Management
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 9 | `mmap` | 🔄 | Maps via slab allocator |
 | 11 | `munmap` | 🔄 | Frees slab allocation |
 | 12 | `brk` | 🔄 | Returns next heap address |
@@ -48,7 +48,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## File I/O
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 0 | `read` | ⬜ | Needs VFS |
 | 1 | `write` | ⬜ | Needs VFS |
 | 2 | `open` | ⬜ | Needs VFS |
@@ -67,7 +67,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Filesystem
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 4 | `stat` | ⬜ | File metadata |
 | 5 | `fstat` | ⬜ | fd metadata |
 | 6 | `lstat` | ⬜ | Symlink metadata |
@@ -85,7 +85,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## IPC & Signals
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 202 | `futex` | 🔄 | FUTEX_WAIT + FUTEX_WAKE |
 | 22 | `pipe` | ⬜ | Create pipe |
 | 293 | `pipe2` | ⬜ | Pipe with flags |
@@ -97,7 +97,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Networking
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 41 | `socket` | ⬜ | Create socket |
 | 42 | `connect` | ⬜ | Connect socket |
 | 43 | `accept` | ⬜ | Accept connection |
@@ -115,7 +115,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Time
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 35 | `nanosleep` | ✅ | Converts to sigma_sleep_ms |
 | 228 | `clock_gettime` | ✅ | Returns sigma_clock_ns() |
 | 63 | `uname` | ✅ | Returns SigmaOS utsname |
@@ -125,7 +125,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## Randomness & Misc
 
 | Nr | Name | Status | Notes |
-| ---- | ------ | -------- | ------- |
+|----|------|--------|-------|
 | 318 | `getrandom` | ✅ | PRNG from clock |
 | 218 | `set_tid_address` | ✅ | Returns sigma_gettid() |
 | 319 | `memfd_create` | ⬜ | In-memory file |
@@ -136,7 +136,7 @@ All syscalls go through `sigma_syscall_dispatch()` in `kernel/core/syscall_dispa
 ## SigmaOS Custom Syscalls (>= 400)
 
 | Nr | Name | Status | Description |
-| ---- | ------ | -------- | ------------- |
+|----|------|--------|-------------|
 | 400 | `sigma_pledge` | ✅ | Restrict process capabilities |
 | 401 | `sigma_unveil` | ✅ | Restrict filesystem access |
 | 402 | `sigma_attest` | 🔄 | PQC attestation request |

@@ -9,7 +9,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 **Goal:** Every PR is gated by build + QEMU smoke.
 
 | Task | File | Status |
-| ------ | ------ | -------- |
+|------|------|--------|
 | QEMU boot smoke CI | `.github/workflows/qemu-boot.yml` | ✅ Done |
 | Reproducible build CI | `.github/workflows/reproducible_build.yml` | ✅ Done |
 | Compatibility matrix CI | `.github/workflows/compat-matrix.yml` | ✅ Done |
@@ -24,7 +24,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 **Goal:** Run top-20 OCI images in CI microVM; have profiler data.
 
 | Task | File | Status |
-| ------ | ------ | -------- |
+|------|------|--------|
 | microVM OCI runner | `virtualization/ocirunner/ocirunner.rs` | ✅ Done |
 | microVM shell script | `virtualization/ocirunner/run_in_microvm.sh` | ✅ Done |
 | Syscall profiler tool | `tools/syscall_profiler/profiler.py` | ✅ Done |
@@ -39,7 +39,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 **Goal:** Static Linux ELF binaries load and run basic I/O.
 
 | Task | File | Status |
-| ------ | ------ | -------- |
+|------|------|--------|
 | ELF64 loader | `kernel/linux_compat/elf_loader.rs` | ✅ Done |
 | vDSO shim | `kernel/linux_compat/vdso_shim.rs` | ✅ Done |
 | /proc shim | `kernel/linux_compat/proc_shim.rs` | ✅ Done |
@@ -57,7 +57,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 **Goal:** Vendor-ready driver SDK; transactional updates work in QEMU.
 
 | Task | File | Status |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Driver SDK trait + MMIO | `sdk/driver/src/lib.rs` | ✅ Done |
 | virtio-blk example driver | `sdk/driver/examples/virtio_blk.rs` | ✅ Done |
 | A/B transactional updater | `sigmad/updater/main.rs` | ✅ Done |
@@ -76,7 +76,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 **Goal:** Basic file I/O and TCP sockets work natively.
 
 | Task | File | Priority |
-| ------ | ------ | ---------- |
+|------|------|----------|
 | VFS open/read/write | `kernel/fs/vfs.rs` | 🔴 Critical |
 | tmpfs | `kernel/fs/tmpfs.rs` | 🔴 Critical |
 | TCP state machine | `kernel/net/tcp.rs` | 🔴 Critical |
@@ -93,7 +93,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 **Goal:** Zenith desktop boots with GPU acceleration in QEMU.
 
 | Task | File | Priority |
-| ------ | ------ | ---------- |
+|------|------|----------|
 | DRM/KMS mode setting | `drivers/gpu/` | 🔴 |
 | virtio-gpu driver | `drivers/gpu/sigma_virtio_gpu.zig` | 🔴 |
 | Wayland compositor | `desktop/compositor/` | 🟠 |
@@ -106,7 +106,7 @@ Active development plan for SigmaOS, mapped to the repo structure.
 ## KPIs to Track Weekly
 
 | Metric | Current | Target (Week 12) |
-| -------- | --------- | ----------------- |
+|--------|---------|-----------------|
 | CI boot pass rate | 90% | 100% |
 | Syscalls implemented | 15 | 50 |
 | OCI images passing | 0 | 20 |

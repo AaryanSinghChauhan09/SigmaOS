@@ -7,7 +7,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ## Status Legend
 
 | Symbol | Meaning |
-| -------- | --------- |
+|--------|---------|
 | ✅ | Implemented (functional) |
 | 🔄 | Partial (stub/headers exist) |
 | 🆕 | Just implemented (this sprint) |
@@ -20,7 +20,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ### 1.1 Bootloader & Kernel Startup
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | UEFI Bootloader | GRUB2, systemd-boot | 🔄 | `sigma-boot/sigma_boot.zig` |
 | Kernel Entry (x86-64) | `arch/x86_64/boot/head.S` | 🆕 | `arch/x86_64/head64.asm` |
 | GDT + TSS | `arch/x86_64/kernel/cpu.c` | 🆕 | `arch/x86_64/gdt.asm` |
@@ -32,7 +32,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ### 1.2 Scheduler
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | Round-robin (base) | `SCHED_OTHER` | 🆕 | `kernel/core/sigma_sched.rs` |
 | MLFQ (4 levels) | Enhanced CFS | 🆕 | `kernel/core/sigma_sched.rs` |
 | CFS (vruntime) | `kernel/sched/fair.c` | 🆕 | `kernel/core/sigma_sched.rs` |
@@ -45,7 +45,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ### 1.3 Memory Manager
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | Buddy allocator | `mm/page_alloc.c` | 🆕 | `kernel/core/sigma_mm.rs` |
 | Slab allocator | `mm/slub.c` | 🆕 | `kernel/core/sigma_mm.rs` |
 | 4-level paging | `arch/x86_64/mm/` | 🔄 | `arch/x86_64/paging.zig` |
@@ -57,7 +57,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ### 1.4 Interrupt Controller
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | 8259 PIC init/remap | `arch/x86_64/kernel/i8259.c` | 🆕 | `kernel/core/sigma_irq.rs` |
 | IDT dispatch | `arch/x86_64/entry_64.S` | 🆕 | `arch/x86_64/idt.asm` |
 | PIT timer (1kHz) | `drivers/clocksource/i8253.c` | 🆕 | `kernel/core/sigma_irq.rs` |
@@ -69,7 +69,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ### 1.5 Syscall Dispatch
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | Syscall gate (int 0x80) | `arch/x86_64/entry_64.S` | 🆕 | `arch/x86_64/idt.asm` |
 | SYSCALL instruction | `MSR_LSTAR` setup | ⬜ | Phase B |
 | 50+ syscall handlers | `kernel/sys.c` | 🔄 | `kernel/core/syscall_dispatch.rs` |
@@ -83,7 +83,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ## Tier 2 — Filesystem & I/O
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | VFS core | `fs/inode.c` | 🆕 | `kernel/vfs/sigma_vfs.rs` |
 | Tmpfs | `fs/tmpfs/` | 🆕 | `kernel/vfs/sigma_tmpfs.rs` |
 | Ext4 | `fs/ext4/` | 🔄 | `kernel/fs/ext4/` |
@@ -99,7 +99,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ## Tier 3 — Networking
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | IPv4/IPv6 | `net/ipv4/`, `net/ipv6/` | 🔄 | `kernel/net/` |
 | TCP state machine | `net/ipv4/tcp.c` | ⬜ | Phase B |
 | UDP | `net/ipv4/udp.c` | ⬜ | Phase B |
@@ -117,7 +117,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ## Tier 4 — Storage
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | NVMe | `drivers/nvme/host/` | ✅ | `drivers/sovereignnvme.rs` |
 | AHCI/SATA | `drivers/ata/libahci.c` | 🔄 | `drivers/storage/sigma_ahci.rs` |
 | VirtIO-blk | `drivers/block/virtio_blk.c` | ✅ | `sdk/driver/examples/virtio_blk.rs` |
@@ -128,7 +128,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ## Tier 5 — Desktop & GPU
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | Framebuffer (VESA) | `drivers/video/vesa.c` | 🔄 | `drivers/display/sigma_vesa.zig` |
 | VirtIO-GPU | `drivers/gpu/drm/virtio/` | 🔄 | `drivers/gpu/sigma_virtio_gpu.zig` |
 | KMS/DRM core | `drivers/gpu/drm/drm_*.c` | 🔄 | `drivers/graphics/kms.zig` |
@@ -143,7 +143,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 ## Tier 6 — Package & Ecosystem
 
 | Component | Linux Equivalent | Status | File |
-| ----------- | ----------------- | -------- | ------ |
+|-----------|-----------------|--------|------|
 | Package format | `.deb`, `.rpm` | 🔄 | `docs/SIGPKG_SPEC.md` |
 | Package manager | `apt`, `dnf`, `pacman` | 🔄 | `sigma-pkg/` |
 | A/B updates | rpm-ostree, Talos | 🆕 | `sigmad/updater/main.rs` |
@@ -157,7 +157,7 @@ Complete mapping of missing Linux-equivalent components to SigmaOS implementatio
 
 ## Implementation Progress
 
-```text
+```
 Tier 1 Bootability:   ████████░░  ~75% (GDT+IDT+IRQ+Sched+MM done; fork/exec pending)
 Tier 2 Filesystem:    ██████░░░░  ~55% (VFS+Tmpfs done; ext4 write + console pending)
 Tier 3 Networking:    █████░░░░░  ~45% (DNS+DHCP+TLS+e1000 done; TCP state machine pending)
@@ -171,7 +171,7 @@ Tier 6 Ecosystem:     █████░░░░░  ~45% (DDK+sigpkg+updater d
 ## Comparison to Linux Distros
 
 | Metric | Alpine 3.19 | Debian 12 | SigmaOS v15 | Target |
-| -------- | ------------ | ----------- | ------------- | -------- |
+|--------|------------|-----------|-------------|--------|
 | Boot time | 1s | 15s | N/A (not bootable yet) | <5s |
 | ISO size | 5 MB | 350 MB | N/A | <50 MB standalone |
 | Syscalls | 300+ | 300+ | 50 (stubs) | 100+ by v15.1 |

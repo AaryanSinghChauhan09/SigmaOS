@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```text
+```
 sigma-pkg <command> [options] [packages...]
 sigma-pkg --version
 sigma-pkg --help
@@ -17,13 +17,9 @@ sigma-pkg --help
 `sigma-pkg` is the native package manager for SigmaOS. Packages are cryptographically attested `.spkg` bundles signed with Dilithium-5 (NIST PQC). The implementation is in `pkg/sigma_pkg_cli.nim` (Nim, stdlib only).
 
 All packages in the Sigma Store registry have:
-
 - Ed25519 or Dilithium-5 signatures
-
 - Declared capability requirements
-
 - A dependency graph
-
 - Atomic install/rollback via A/B staging
 
 ## COMMANDS
@@ -36,7 +32,6 @@ Install one or more packages:
 sigma-pkg install zenith-desktop
 sigma-pkg install sigma-browser sigma-notes sigma-agent
 sigma-pkg install sigma-ml --dry-run    # preview without installing
-
 ```
 
 Options: `--dry-run`, `--force`, `--version <x.y.z>`
@@ -48,7 +43,6 @@ Remove installed packages:
 ```bash
 sigma-pkg remove sigma-browser
 sigma-pkg remove sigma-notes --purge    # also remove config files
-
 ```
 
 ### `search <query>`
@@ -79,11 +73,8 @@ Check for updates. Without arguments, checks all installed packages:
 
 ```bash
 sigma-pkg update                # check all
-
 sigma-pkg update sigma-core    # check one package
-
 sigma-pkg update --dry-run      # preview what would update
-
 ```
 
 ### `audit`
@@ -120,9 +111,7 @@ Prevent a package from being auto-updated:
 
 ```bash
 sigma-pkg pin sigma-core      # protect core shard
-
 sigma-pkg pin sigma-gpu-hal   # protect tested driver version
-
 ```
 
 ### `unpin <pkg>`
@@ -139,9 +128,7 @@ Export the list of installed packages:
 
 ```bash
 sigma-pkg export                          # print to stdout
-
 sigma-pkg export --output packages.txt   # save to file
-
 ```
 
 The export format is `name==version` per line — compatible with `sigma-pkg install` as input.
@@ -149,7 +136,7 @@ The export format is `name==version` per line — compatible with `sigma-pkg ins
 ## OPTIONS
 
 | Flag | Description |
-| ------ | ------------- |
+|------|-------------|
 | `--dry-run` | Show what would happen without making changes |
 | `--force` | Override safety checks |
 | `--purge` | Remove package and all associated config/data |
@@ -164,7 +151,7 @@ The export format is `name==version` per line — compatible with `sigma-pkg ins
 Core packages that ship with every SigmaOS installation:
 
 | Package | Version | Description |
-| --------- | --------- | ------------- |
+|---------|---------|-------------|
 | `sigma-core` | 15.0.0 | Kernel core shards |
 | `sigma-sh` | 0.3.0 | Sovereign interactive shell |
 | `sigma-net` | 2.1.0 | Networking stack shard |
@@ -178,15 +165,11 @@ Core packages that ship with every SigmaOS installation:
 Every package in the Sigma Store is:
 
 1. Built reproducibly — bit-for-bit identical on all hardware
-
 2. Signed with Dilithium-5 (NIST FIPS 204) by the publisher
-
 3. Counter-signed by the Sigma Store registry CA
-
 4. Verified against the TPM PCR chain on install
 
 To manually verify a package signature:
-
 ```bash
 sigma-secure pqc verify sigma-core
 sigma-pkg info sigma-core --json | jq '.signature'
@@ -195,31 +178,24 @@ sigma-pkg info sigma-core --json | jq '.signature'
 ## EXAMPLES
 
 ```bash
-
 # Install the full desktop environment
-
 sigma-pkg install zenith-desktop sigma-browser sigma-notes
 
 # Check for and apply updates
-
 sigma-pkg update
 sigma-pkg update --dry-run   # preview first
 
 # Search and install a specific package
-
 sigma-pkg search vr
 sigma-pkg install sigma-vr-studio
 
 # Audit for vulnerabilities
-
 sigma-pkg audit
 
 # Export package list for reproducible deployments
-
 sigma-pkg export --output /etc/sigma/packages.txt
 
 # Re-install from an exported list
-
 cat /etc/sigma/packages.txt | xargs sigma-pkg install
 ```
 

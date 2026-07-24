@@ -10,7 +10,7 @@ neither OS offers: Ring-3 crash isolation and AI-assisted porting.
 ## Why SDF Exists
 
 | Problem | Windows | Linux | SigmaOS SDF |
-| --------- | --------- | ------- | ------------- |
+|---------|---------|-------|-------------|
 | Stable ABI | ✅ per-version | ❌ breaks every update | ✅ frozen forever (DDK v1.0) |
 | Open source | ❌ vendor blobs | ✅ kernel-integrated | ✅ open encouraged + closed allowed |
 | Driver crash isolation | ❌ ring-0 crash = BSOD | ❌ ring-0 crash = kernel panic | ✅ Ring-3 isolation option |
@@ -21,7 +21,7 @@ neither OS offers: Ring-3 crash isolation and AI-assisted porting.
 
 ## Architecture
 
-```text
+```
 ┌─────────────────────────────────────────────────────────┐
 │  HARDWARE  (CPU · NVMe · GPU · NIC · USB · TPM2)        │
 ├─────────────────────────────────────────────────────────┤
@@ -115,7 +115,7 @@ older drivers and zero-fill the new fields.
 By setting `ring: 3` in the descriptor, a driver runs as an isolated userspace
 process communicating with the kernel through sigma-bus IPC:
 
-```text
+```
 Kernel ring-0          sigma-bus              Driver ring-3
      │                    │                        │
      │──── IRQ event ────►│                        │
@@ -126,13 +126,9 @@ Kernel ring-0          sigma-bus              Driver ring-3
 ```
 
 Benefits:
-
 - Driver crash → kernel keeps running, driver process restarted
-
 - Driver bug → contained in sandbox, no kernel memory corruption
-
 - `sigma_pledge` per driver limits syscall access
-
 - Easier debugging (driver is a normal process)
 
 Cost: ~1–5µs per operation for IPC crossing.
@@ -161,7 +157,7 @@ access — one exploit = full system compromise.
 ## Driver Flags
 
 | Flag | Meaning |
-| ------ | --------- |
+|------|---------|
 | `SIGMA_DRV_FLAG_OPEN_SOURCE` | Source available — community can audit and fix |
 | `SIGMA_DRV_FLAG_CERTIFIED` | Vendor-signed, tested by SigmaOS team |
 | `SIGMA_DRV_FLAG_RING3` | Runs in ring-3 isolated process |
@@ -174,7 +170,7 @@ access — one exploit = full system compromise.
 ## Hardware Support Status
 
 | Hardware | Driver | Status |
-| ---------- | -------- | -------- |
+|----------|--------|--------|
 | Intel e1000/e1000e NIC | `kernel/linux_compat/e1000_main.rs` | ✅ Working |
 | NVMe SSD | `drivers/sovereignnvme.rs` | ✅ Working |
 | USB HID | `drivers/sovereignusb.rs` | 🔄 Partial |
@@ -191,27 +187,21 @@ access — one exploit = full system compromise.
 ## Building a Driver
 
 ```bash
-
 # Generate skeleton from Linux driver (cleanroom study)
-
 sigma-driver-porter analyse /path/to/linux_rtl8169.c
 sigma-driver-porter port    /path/to/linux_rtl8169.c
 
 # Or with AI translation
-
 sigma-driver-porter port /path/to/linux_rtl8169.c --ai
 
 # Build
-
 cd sigma_drivers/rtl8169
 cargo build --release --target x86_64-sigmaos.json
 
 # Validate
-
 sigma-ddk validate target/x86_64-sigmaos/release/librtl8169.a
 
 # View vendor registry
-
 sigma-ddk-vendors list
 sigma-ddk-vendors score
 ```

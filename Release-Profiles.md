@@ -6,7 +6,7 @@ Each activates different kernel features via CMake feature flags.
 ## Profile Comparison
 
 | Profile | Branch | Best For | GUI | RT | Min RAM |
-| --------- | -------- | --------- | ----- | ---- | --------- |
+|---------|--------|---------|-----|----|---------|
 | **Standalone** | `release/standalone` | Developer laptops | ✅ Zenith | — | 512 MB |
 | **Browser** | `release/browser` | Consumer / thin clients | ✅ Chromium | — | 256 MB |
 | **Microkernel** | `release/microkernel` | Servers, research | ❌ | — | 8 MB |
@@ -22,22 +22,15 @@ Each activates different kernel features via CMake feature flags.
 
 **Target:** Developer workstations, power users.
 
-### Key features:
-
+**Key features:**
 - Full Zenith desktop environment (C++ compositor)
-
 - All profession tools pre-installed
-
 - sigma-ai local LLM daemon
-
 - Indian IME (Inscript + phonetic)
-
 - sigma-pkg GUI package manager
-
 - Auto-tiling window manager
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=standalone iso
 ```
@@ -48,18 +41,13 @@ make PROFILE=standalone iso
 
 **Target:** Consumer devices, thin clients, Chromebooks.
 
-### Key features:
-
+**Key features:**
 - `navigator.sigmaos.*` API for PWAs
-
 - Zero-install packages (stream from repo)
-
 - Boots to Chromium in < 3 seconds
-
 - No traditional desktop stack
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=browser iso
 ```
@@ -70,22 +58,15 @@ make PROFILE=browser iso
 
 **Target:** Servers, hypervisors, research, security-critical nodes.
 
-### Key features:
-
+**Key features:**
 - < 512 KB kernel image
-
 - < 8 MB RAM footprint
-
 - sigma-bus IPC
-
 - Capability token passing
-
 - No userland except sigma-sh
-
 - Formal verification target (Coq/Frama-C)
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=microkernel iso
 ```
@@ -96,22 +77,15 @@ make PROFILE=microkernel iso
 
 **Target:** Raspberry Pi 4/5, JioBook, ARM64 tablets.
 
-### Key features:
-
+**Key features:**
 - ARM64 GIC interrupt controller
-
 - P/C-state aware scheduler
-
 - Touch-optimised Zenith UI
-
 - NEON-accelerated Kyber
-
 - sigma-ultra USSD text mode (Pi Zero)
-
 - RISC-V support (planned)
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=mobile ARCH=arm64 iso
 ```
@@ -122,22 +96,15 @@ make PROFILE=mobile ARCH=arm64 iso
 
 **Target:** Industrial control, robotics, CNC machines.
 
-### Key features:
-
+**Key features:**
 - EDF (earliest-deadline-first) scheduler
-
 - Priority inheritance protocol
-
 - Bounded IRQ latency < 10 µs
-
 - ROS 2 DDS middleware port
-
 - sigma-twin real IoT sensor path
-
 - PREEMPT_RT-style full preemption
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=rtos iso
 ```
@@ -148,20 +115,14 @@ make PROFILE=rtos iso
 
 **Target:** Users who want to keep Windows or Linux.
 
-### Key features:
-
+**Key features:**
 - EFI boot entry registration
-
 - Partition layout auto-detector
-
 - Windows NTFS read-only mount
-
 - GRUB chainload fallback
-
 - Non-destructive installer
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=dualboot iso
 ```
@@ -172,22 +133,15 @@ make PROFILE=dualboot iso
 
 **Target:** AWS, Azure, GCP, BharatCloud government VMs.
 
-### Key features:
-
+**Key features:**
 - Immutable root filesystem
-
 - A/B partition atomic updates
-
 - Container-first, no GUI overhead
-
 - sigma-pod (cgroup + namespace)
-
 - sigma-fleet MDM agent
-
 - OpenTelemetry export
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=cloud iso
 ```
@@ -198,22 +152,15 @@ make PROFILE=cloud iso
 
 **Target:** Multi-node sovereign computing clusters.
 
-### Key features:
-
+**Key features:**
 - ZeroNet mesh networking
-
 - CRDT offline-first sync
-
 - SovereignCloudFS
-
 - sigma-mesh-compute scheduler
-
 - Container orchestration
-
 - DLT blockchain-lite
 
-### Build:
-
+**Build:**
 ```bash
 make PROFILE=distributed iso
 ```

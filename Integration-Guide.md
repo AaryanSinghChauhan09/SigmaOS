@@ -7,7 +7,7 @@
 ## Priority Matrix
 
 | Priority | Integration | Timeline | License |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | 🔴 Immediate | [sigstore/cosign](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/sigstore-cosign.md) | Weeks | Apache-2.0 |
 | 🔴 Immediate | [rustls TLS](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/rustls.md) | Weeks | MIT/Apache |
 | 🔴 Immediate | [QEMU CI](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/QEMU-CI-Integration.md) | Weeks | GPL (run externally) |

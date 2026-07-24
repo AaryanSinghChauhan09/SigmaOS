@@ -1,96 +1,48 @@
-# Contributing to the SigmaOS Wiki
+# WIKI-Contributing
 
-This guide explains how to contribute to the SigmaOS GitHub Wiki.
+1
 
-The wiki is the primary knowledge base for SigmaOS — covering architecture, features, roadmaps, and user documentation.
-
----
-
-## Wiki Repository
-
-The wiki is managed as a separate Git repository:
-
-```text
-https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git
-```
-
-It is mirrored locally at `wiki_repo/` inside the main SigmaOS repository.
+> Join the evolution of digital sovereignty.
 
 ---
 
-## Quick Start
+1
 
-### 1. Clone the wiki
+SigmaOS is an industrial-grade project. All contributions must adhere to:
 
-```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git
-cd SigmaOS.wiki
-```
+1
 
-### 2. Edit or add a page
+1
 
-Wiki pages are Markdown files at the root of the wiki repository. The filename becomes the URL slug:
+1
 
-- `Architecture-Overview.md` → `https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview`
+We follow a staged release cadence:
 
-### 3. Commit and push
+1
 
-```bash
-git add MyPage.md
-git commit -m "wiki: add explanation of MyPage"
-git push origin master
-```
+1
 
----
+1
 
-## Wiki Page Types
+Every Pull Request triggers the following automated suite:
 
-| Type | Naming | Example |
-| ---- | ------ | ------- |
-| Architecture | `Title-Case-Hyphenated.md` | `Kernel-Architecture.md` |
-| Roadmaps | `Title-Roadmap.md` | `Development-Roadmap.md` |
-| Absorption docs | `OSS_Absorption_Project.md` | `OSS_Absorption_Docker.md` |
-| How-to guides | `Action-Verb-Topic.md` | `Building-from-Source.md` |
+1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
 
----
+2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
 
-## Markdown Style
+3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
 
-- Use a single `# H1` heading as the page title
-- Headings must be surrounded by blank lines (MD022)
-- Fenced code blocks must include the language identifier (MD040)
-- Use `<!-- slide -->` comments only in carousel blocks
-- No HTML-only markup; use Markdown equivalents
+4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
+
+1
+
+1. **Fork** the repository and create an `alpha` branch.
+
+2. **Develop** your shard in the appropriate `suites/` directory.
+
+3. **Sync** documentation in `WIKI/`.
+
+4. **Submit** a PR to `beta` for review.
 
 ---
-
-## Syncing from `wiki_repo/`
-
-Pages in `wiki_repo/` inside the main repository are kept in sync with the live wiki:
-
-```powershell
-
-# Push wiki_repo changes to GitHub Wiki
-
-git -C wiki_repo add .
-git -C wiki_repo commit -m "wiki: update pages"
-git -C wiki_repo push origin master
-```
-
----
-
-## What to Contribute
-
-- Fix errors, outdated information, or broken links
-- Add new architecture explanations or implementation notes
-- Write how-to guides for common tasks
-- Add distro absorption analysis pages for new projects
-- Improve roadmap pages with concrete timelines
-
----
-
-## Related
-
-- [README.md](README.md) — Wiki home
-- [CONTRIBUTING.md](../../CONTRIBUTING.md) — Main repo contributing guide
-- [docs/CONTRIBUTING.md](../../docs/CONTRIBUTING.md) — Engineering docs guide
+"Sovereignty is a collective intent."

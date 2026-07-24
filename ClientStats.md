@@ -1,4 +1,4 @@
-﻿# Class: ClientStats
+# Class: ClientStats
 
 Stats for a [Client](/docs/docs/api/Client.md).
 

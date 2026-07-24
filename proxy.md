@@ -1,4 +1,4 @@
-﻿# Connecting through a proxy
+# Connecting through a proxy
 
 Connecting through a proxy is possible by:
 
@@ -37,6 +37,7 @@ const client = new Client(proxyUrl)
 const response = await client.request({
   method: 'GET',
   path: serverUrl + '/hello?foo=bar'
+
 })
 
 response.body.setEncoding('utf8')
@@ -64,6 +65,7 @@ function buildProxy () {
     server.listen(0, () => resolve(server))
   })
 }
+
 ```
 
 ### Connect with authentication
@@ -124,4 +126,5 @@ function buildProxy () {
     server.listen(0, () => resolve(server))
   })
 }
+
 ```

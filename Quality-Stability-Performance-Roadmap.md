@@ -8,7 +8,7 @@ trustworthy, fast, and pleasant. Grounded in the June 2026 codebase audit.
 ## Current State (Honest Assessment)
 
 | Dimension | Current grade | Biggest blocker |
-| ----------- | -------------- | ----------------- |
+|-----------|--------------|-----------------|
 | **Stability** | D — cannot boot on real hardware | Kernel scheduler/MM/syscall stubs |
 | **Performance** | C — good design, no real measurements | No bootable ISO to benchmark |
 | **Quality / Testing** | C — CI defined, some tests real | QEMU tests are `echo` stubs |
@@ -27,7 +27,7 @@ trustworthy, fast, and pleasant. Grounded in the June 2026 codebase audit.
 The single largest stability gap: stubs that silently return 0 instead of failing gracefully.
 
 | Task | File | Branch | Fix |
-| ------ | ------ | -------- | ----- |
+|------|------|--------|-----|
 | Replace all `return 0` syscall stubs with `ENOSYS` | `kernel/syscalls/sigma_syscalls.cpp` | `kernel-exp` | Return `-ENOSYS` (38), log unimplemented call |
 | Panic handler with full register dump | `kernel/core/sigma_panic.cpp` | `kernel-exp` | Print RIP/RSP/CR3/backtrace to serial before halt |
 | Stack overflow detection (guard pages) | `kernel/mm/sigma_vmm.cpp` | `kernel-exp` | Map guard page below each kernel stack |
@@ -40,13 +40,13 @@ The single largest stability gap: stubs that silently return 0 instead of failin
 
 ### S2 — Driver Crash Isolation (SDF robustness)
 
-```text
+```
 Current: SDF drivers crash → silence (no recovery)
 Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 | Task | File | Branch | Fix |
-| ------ | ------ | -------- | ----- |
+|------|------|--------|-----|
 | sigma-heal driver restart hook | `kernel/diagnostics/sigma_crash_reporter.cpp` | `drivers-dev` | On Ring-3 driver segfault → send SIGKILL + restart |
 | Driver health heartbeat | `hal/sigma_hal_watchdog.cpp` | `drivers-dev` | Each SDF driver must ping watchdog every 1 s |
 | Driver state snapshot on crash | `hal/sigma_hal_watchdog.cpp` | `drivers-dev` | Save TX/RX ring state before kill for restore |
@@ -56,7 +56,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### S3 — Filesystem Consistency
 
 | Task | File | Branch | Fix |
-| ------ | ------ | -------- | ----- |
+|------|------|--------|-----|
 | Journal replay on unclean unmount | `fs/sigmafs/sigma_journal.cpp` | `fs-dev` | Replay log on next mount if dirty flag set |
 | Atomic rename (rename-then-link) | `kernel/vfs/sigma_vfs.cpp` | `fs-dev` | Use journal: write new inode, update dir atomically |
 | Fsck integration test | `tests/integration/test_fsck.sh` | `fs-dev` | Corrupt partition → sigma-fsck recovers |
@@ -66,7 +66,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### S4 — Boot Reliability
 
 | Task | File | Branch | Fix |
-| ------ | ------ | -------- | ----- |
+|------|------|--------|-----|
 | A/B boot slot with rollback | `kernel/resilience/sigma_rollback.cpp` | all | Already exists — wire to UEFI EFI variable |
 | Safe-mode profile (SIGMA_MINIMAL_MODE) | `kernel/core/sigma_kernel_main.c` | all | Already wired — verify fires after 3 failed boots |
 | "Fix it" recovery menu at boot | `kernel/core/boot/sigma_boot_recovery_menu.c` | all | Text-mode menu: rollback/repair/reinstall |
@@ -80,11 +80,11 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### P1 — Boot Time (target < 2 s on NVMe SSD)
 
 | Current | Ubuntu 24.04 | Fedora 41 | SteamOS | SigmaOS target |
-| --------- | ------------- | ----------- | --------- | ---------------- |
+|---------|-------------|-----------|---------|----------------|
 | Unknown (doesn't boot) | 43 s | 9 s | 8 s | **< 2 s** |
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Parallel shard ignition (ASI) | `kernel/core/boot/sigma_boot.c` | `kernel-exp` | Boot independent shards concurrently |
 | sigma-init parallel service launch | `init/sigma_init.cpp` | `kernel-exp` | Dependency-ordered parallel start |
 | Lazy driver init (probe only on use) | `hal/SovereignHAL.cpp` | `drivers-dev` | Defer driver init until first I/O request |
@@ -95,11 +95,11 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### P2 — Context Switch Latency (target < 50 ns)
 
 | Current | Linux generic | PREEMPT_RT | SigmaOS target |
-| --------- | -------------- | ----------- | ---------------- |
+|---------|--------------|-----------|----------------|
 | Unknown | ~1,000 ns | ~200 ns | **< 50 ns** |
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Hand-tuned SYSCALL/SYSRET entry | `arch/x86_64/sigma_syscall_entry.asm` | `kernel-exp` | Minimal register save: RSP/RBP/RDI/RSI/RDX/RCX/R11 only |
 | Avoid `mfence`/`lfence` on hot path | `arch/x86_64/sigma_syscall_entry.asm` | `kernel-exp` | Use `LFENCE` only where strictly needed |
 | Per-CPU runqueue (no cross-CPU lock) | `kernel/sched/sigma_runqueue.cpp` | `performance-optimized` | Lock-free CAS queue per core |
@@ -109,7 +109,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### P3 — Memory Performance (target: 0 unnecessary copies)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Zero-copy DMA: NIC → userspace | `kernel/net/sigma_net.c` | `drivers-dev` | Map DMA buffer into user VA, no `memcpy` |
 | Zero-copy DMA: NVMe → userspace | `drivers/storage/sigma_nvme.cpp` | `drivers-dev` | io_uring-style DMA-direct read |
 | UBC: map page into user VA (no copy) | `kernel/fs/sigma_ubc.cpp` | `fs-dev` | Share physical page via VMM |
@@ -121,7 +121,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### P4 — Network Throughput (target: wire-speed on 1 GbE)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | ZCLN (zero-copy LAN) implementation | `net/sigma_tcp_ip.cpp` | `drivers-dev` | `ZclnPacketDescriptor` queue already exists — wire it |
 | TCP segmentation offload (TSO) | `kernel/net/sigma_net.c` | `drivers-dev` | Offload TCP checksum + segmentation to NIC |
 | Receive-side scaling (RSS) | `kernel/core/drivers/SovereignE1000.cpp` | `drivers-dev` | Distribute RX descriptors across CPU queues |
@@ -131,12 +131,12 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### P5 — Cryptographic Performance (target: PQC with zero overhead penalty)
 
 | Current | Target |
-| --------- | -------- |
+|---------|--------|
 | Kyber: PRNG placeholder (~∞ ms) | Kyber AVX-512: ≥ 5.8 M ops/sec |
 | Dilithium: PRNG placeholder | Dilithium AVX-512: ≥ 1.5 M sign/sec |
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Real Kyber NTT (liboqs backend) | `crypto/SovereignKyber.cpp` | `performance-optimized` | Replace PRNG with liboqs pqcrystals-kyber |
 | AVX-512 polynomial multiply | `crypto/sigma_kyber_avx512.cpp` | `performance-optimized` | 13× faster than reference C |
 | ARM NEON NTT | `crypto/sigma_kyber_neon.cpp` | `release/mobile` | 5.7× faster on Cortex-A76 |
@@ -147,7 +147,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### P6 — GPU / Rendering Performance (target: 1 frame @ 120 Hz, 8.3 ms)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Vulkan triple-buffer pre-record | `zenith_desktop/compositor/sigma_vk_frame.cpp` | `release/standalone` | Pre-record command buffers, submit on vblank |
 | SIMD matrix scaling (AVX-512) | `zenith_desktop/sigma_simd_scale.cpp` | `performance-optimized` | Replace scalar loops in transform path |
 | Font atlas pre-built at start | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Upload glyph atlas once, no per-frame uploads |
@@ -163,12 +163,12 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Biggest quality debt:** QEMU tests use `echo "Simulating..."` instead of real QEMU.
 
 | Task | File | Branch | Fix |
-| ------ | ------ | -------- | ----- |
+|------|------|--------|-----|
 | Replace echo stubs with real QEMU | `.github/workflows/sigma_qemu.yml` | all | `qemu-system-x86_64 -cdrom SigmaOS.iso -serial stdio` |
 | Assert boot reaches shell prompt | `.github/workflows/sigma_ci.yml` | all | `grep -q "sigma-login" output.log` within 30 s |
 | QEMU test on 3 profiles | `.github/workflows/sigma_ci.yml` | all | standalone, microkernel, cloud |
-| Remove ` || true` from blocking tests | `.github/workflows/sigma_ci.yml` | all | Let CI actually fail on test failures |
-| SPDX header enforcement (fail, not warn) | `.github/workflows/sigma_ci.yml` | all | Change ` || true` to real exit code |
+| Remove `|| true` from blocking tests | `.github/workflows/sigma_ci.yml` | all | Let CI actually fail on test failures |
+| SPDX header enforcement (fail, not warn) | `.github/workflows/sigma_ci.yml` | all | Change `|| true` to real exit code |
 | ABI stability gate | `Makefile` | `tools-dev` | `make check-abi` fails if `SIGMA_STABLE` symbol changes |
 
 ### Q2 — Unit Test Coverage (target: 80% critical paths)
@@ -176,7 +176,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Current:** Tests exist in `tests/unit/`, `tests/kernel/`, `tests/fuzz/` but coverage unknown.
 
 | Task | File | Branch | Target |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Buddy allocator exhaustive test | `tests/kernel/test_allocator.cpp` | `kernel-exp` | Alloc every order, verify no leak, test OOM path |
 | MCS scheduler budget test | `tests/kernel/test_sched.cpp` | `kernel-exp` | Verify budget exhaustion + replenish |
 | VMM page table test | `tests/kernel/test_vmm.cpp` | `kernel-exp` | Map/unmap 1000 pages, verify CoW copy |
@@ -193,7 +193,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Current:** `tests/fuzz/fuzz_sigma_tcp.cpp` and `tests/fuzz/fuzz_sigma_pkg.cpp` exist.
 
 | Task | File | Branch | Target |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Fuzz syscall dispatcher | `tests/fuzz/fuzz_syscalls.cpp` | `kernel-exp` | Random syscall numbers + args |
 | Fuzz PE loader | `tests/fuzz/fuzz_pe_loader.cpp` | `tools-dev` | Random bytes as PE input |
 | Fuzz sigma-ca GST input | `tests/fuzz/fuzz_sigma_ca.cpp` | `release/standalone` | Random GSTIN + voucher JSON |
@@ -207,7 +207,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Current:** `sigma_quality.yml` runs clang-tidy + cppcheck. Needs expansion.
 
 | Task | File | Branch | Fix |
-| ------ | ------ | -------- | ----- |
+|------|------|--------|-----|
 | clang-tidy: add `-warnings-as-errors` | `.github/workflows/sigma_quality.yml` | all | All warnings become CI failures |
 | AddressSanitizer build variant | `.github/workflows/sigma_ci.yml` | `kernel-exp` | `-fsanitize=address` build, run unit tests |
 | UBSan build variant | `.github/workflows/sigma_ci.yml` | `kernel-exp` | `-fsanitize=undefined` build |
@@ -222,7 +222,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Current:** `scripts/regression_check.sh` exists. `tests/regression/` directory exists.
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Performance regression gate | `.github/workflows/sigma_ci.yml` | `performance-optimized` | If boot time regresses > 10%, CI fails |
 | Context switch regression test | `tests/perf/bench_sched.cpp` | `performance-optimized` | Assert < 100 ns (2× budget) |
 | Memory usage regression gate | `.github/workflows/sigma_ci.yml` | all | If idle RAM > 200 MB, warn |
@@ -237,7 +237,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### U1 — First-Boot Experience (target: Indian user productive in < 5 minutes)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | OOBE (Out-of-Box Experience) wizard | `userland/installer/sigma_oobe.cpp` | `release/standalone` | Language → timezone → DID login → profile → done |
 | Language selection screen (22 Indian langs) | `userland/installer/sigma_oobe.cpp` | `release/standalone` | Sorted by speaker count; default = system locale |
 | DID onboarding flow | `userland/installer/sigma_oobe.cpp` | `release/standalone` | QR scan → ABHA link → profession credential |
@@ -251,7 +251,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Current:** Parser and builtins are real, but no TTY read.
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Connect TTY via `sigma_sys_read(0,…)` | `userland/shell/sigma_shell.cpp` | `tools-dev` | Remove `line[0]='\0'` placeholder |
 | Fish-style auto-suggestion (ghost text) | `userland/shell/sigma_shell.cpp` | `tools-dev` | `history_suggest(prefix)` already implemented — render ghost |
 | Real tab completion (VFS readdir) | `userland/shell/sigma_shell.cpp` | `tools-dev` | TAB → `vfs_readdir(PWD)` for file/cmd completion |
@@ -265,7 +265,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### U3 — Zenith Desktop Usability
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | App launcher (Rofi-style) | `zenith_desktop/launcher/sigma_launcher.cpp` | `release/standalone` | Super key → fuzzy search installed apps |
 | Taskbar with workspace switcher | `zenith_desktop/taskbar/sigma_taskbar.cpp` | `release/standalone` | Show workspace 1–10, active app titles |
 | System tray (clock, network, volume) | `zenith_desktop/taskbar/sigma_systray.cpp` | `release/standalone` | NTP clock, WiFi signal, audio level |
@@ -275,13 +275,13 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 | Clipboard manager | `zenith_desktop/clipboard/sigma_clipboard.cpp` | `release/standalone` | History of last 20 clipboard entries |
 | Font rendering with HarfBuzz | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Complex script shaping for Devanagari/Tamil |
 | HiDPI scaling (1×/1.5×/2×) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Auto-detect DPI, scale UI accordingly |
-| Dark/light theme toggle | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Respect `~/.sigma_profile theme=dark | light` |
+| Dark/light theme toggle | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Respect `~/.sigma_profile theme=dark|light` |
 | Keyboard shortcut legend overlay | `zenith_desktop/launcher/sigma_launcher.cpp` | `release/standalone` | `?` key shows all shortcuts |
 
 ### U4 — sigma-cli Discoverability
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | `--help` on every subcommand | `userland/tools/sigma_cli.cpp` | `tools-dev` | Every verb shows usage + examples |
 | `--json` output flag | `userland/tools/sigma_cli.cpp` | `tools-dev` | Machine-readable JSON for scripting |
 | `--dry-run` preview | `userland/tools/sigma_cli.cpp` | `tools-dev` | Show what would happen without executing |
@@ -293,7 +293,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### U5 — Package Manager UX
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Progress bar on install | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Live download progress + hash verify |
 | Dependency conflict resolution | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Explain conflict, suggest fix, not just fail |
 | Rollback on failed install | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Atomic staging swap — bad install never leaves system broken |
@@ -305,7 +305,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### U6 — Error Messages & Recovery
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Human-readable kernel panic | `kernel/core/sigma_panic.cpp` | `kernel-exp` | "Kernel panic: null pointer in sigma-net driver. Rebooting in 10 s." |
 | Actionable sigma-heal suggestions | `userland/ai/sigma_heal_ai.cpp` | `release/standalone` | "Crash caused by iwlwifi driver. Try: sigma-drv reload iwlwifi" |
 | sigma-sh error context | `userland/shell/sigma_shell.cpp` | `tools-dev` | "Command not found: sigam-cli. Did you mean: sigma-cli?" |
@@ -320,7 +320,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### SE1 — Fix Known Critical Security Stubs
 
 | Issue | File | Branch | Fix |
-| ------- | ------ | -------- | ----- |
+|-------|------|--------|-----|
 | CryptFS `derive_key()` returns 32 zero bytes (Issue #44) | `crypto/SovereignCryptFS.cpp` | `kernel-exp` | Real Argon2id (time=3, mem=65536, threads=4) |
 | Kyber/Dilithium use PRNG not NTT | `crypto/SovereignKyber.cpp` | `performance-optimized` | Integrate liboqs real lattice arithmetic |
 | `sigma_attestation_verify()` always returns `true` | `security/SovereignAttestation.cpp` | `kernel-exp` | Real TPM2 PCR measurement check |
@@ -331,7 +331,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### SE2 — Security CI Gates
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | CodeQL on every PR | `.github/workflows/codeql-analysis.yml` | all | Already defined — verify it passes |
 | Secrets scan (fail on hardcoded creds) | `.github/workflows/sigma_ci.yml` | all | Already in security-scan job — make it fail |
 | SPDX license headers enforced | `.github/workflows/sigma_ci.yml` | all | Fail CI if any `.cpp`/`.h` missing `SPDX-License-Identifier` |
@@ -347,7 +347,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Current:** AT-SPI2 header present; no implementation. sigma-bhashini offline TTS exists as a header.
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | AT-SPI2 accessibility tree walker | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | Walk Zenith window tree, enumerate widgets |
 | Screen reader TTS via sigma-bhashini | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | Widget name + role → sigma-bhashini TTS → HDA audio |
 | Keyboard navigation (no mouse required) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Tab through widgets, Enter to activate |
@@ -360,7 +360,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### A2 — Indian Language Accessibility
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | 22-language UI strings | `userland/locales/sigma_l10n.cpp` | `release/standalone` | All system messages translated |
 | Devanagari font rendering | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | HarfBuzz complex script shaping |
 | Tamil / Telugu / Bengali font | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Full Unicode block coverage |
@@ -374,7 +374,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### D1 — Debugging Tools
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | sigma-gdb (source-level debugger) | `userland/devtools/sigma_gdb.cpp` | `tools-dev` | GDB-compatible protocol, DWARF debug info |
 | sigma-strace (syscall tracer) | `userland/devtools/sigma_strace.cpp` | `tools-dev` | Print syscall name + args on every call |
 | sigma-perf (hardware PMU profiler) | `userland/tools/sigma_perf_cli.cpp` | `performance-optimized` | RDPMC for cycles/cache-misses/branch-mispred |
@@ -386,7 +386,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### D2 — Build System Quality
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | `make help` target | `Makefile` | all | Print all available targets + descriptions |
 | `make check` target | `Makefile` | all | Build + unit tests + static analysis in one command |
 | `make iso` produce real bootable image | `Makefile` | `kernel-exp` | Currently broken — fix after Phase 0 kernel |
@@ -401,7 +401,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### D3 — API Documentation
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Doxygen configured for all subsystems | `Doxyfile` | `docs-update` | `INPUT = kernel/ userland/ include/ crypto/` |
 | `docs/api/html/` published to gh-pages | `.github/workflows/sigma_ci.yml` | `gh-pages` | Auto-publish on merge to `main` |
 | `sigma_error.h` standard error codes | `include/sigma_error_codes.h` | `tools-dev` | Consistent `sigma_err_t` return type everywhere |
@@ -413,7 +413,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### D4 — sigma-sdk Quality
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | ABI stability CI (`make check-abi`) | `Makefile` | `tools-dev` | `SIGMA_STABLE` symbols never change |
 | C++ wrapper for all syscalls | `include/sigma_sdk.h` | `tools-dev` | `sigma::fs::open()` wraps raw syscall |
 | Error handling guide | `docs/CONTRIBUTING.md` | `docs-update` | Every API returns `sigma_err_t`, no exceptions |
@@ -426,8 +426,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ## Per-Branch Quality Targets
 
 ### `kernel-exp` quality gates
-
-```text
+```
 [ ] Kernel boots in QEMU with no errors on serial
 [ ] Buddy allocator passes 10,000-iteration stress test
 [ ] VMM maps/unmaps 1,000 pages without leak
@@ -438,8 +437,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `drivers-dev` quality gates
-
-```text
+```
 [ ] NIC TX/RX: ping 10.0.2.2 in QEMU, no packet loss
 [ ] NVMe: read 1 GB file, SHA256 matches original
 [ ] GPU: VirtIO-GPU renders Zenith frame at ≥ 60 FPS
@@ -448,8 +446,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `fs-dev` quality gates
-
-```text
+```
 [ ] VFS write → fsync → read roundtrip, bytes match
 [ ] Journal replay after abrupt poweroff: no data loss
 [ ] fuzz_vfs: 10-minute AFL++ run, no crashes
@@ -458,8 +455,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `performance-optimized` quality gates
-
-```text
+```
 [ ] Context switch p99 < 100 ns (2× budget)
 [ ] Kyber-1024 AVX-512: ≥ 5.8 M ops/sec
 [ ] Dilithium-5 sign: ≥ 1.5 M sig/sec
@@ -469,8 +465,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/standalone` quality gates
-
-```text
+```
 [ ] OOBE complete in < 3 minutes
 [ ] All 55 profession apps installable via sigma-pkg
 [ ] sigma-ca computes GSTR-1 for 1,000 invoices < 1 s
@@ -482,8 +477,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/cloud` quality gates
-
-```text
+```
 [ ] sigma-pod OOM-kills at exactly --mem limit
 [ ] sigma-pod CPU throttled at --cpu limit
 [ ] dm-verity detects corrupted .spkg image
@@ -492,8 +486,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/mobile` quality gates
-
-```text
+```
 [ ] Boots on Raspberry Pi 4 in < 10 s
 [ ] sigma-ultra boots on Pi Zero in < 5 s
 [ ] USSD menu responds in < 2 s over 2G
@@ -502,8 +495,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/rtos` quality gates
-
-```text
+```
 [ ] IRQ latency p99 < 10 µs
 [ ] EDF: zero missed deadlines in 60-second stress
 [ ] sigma-mining alert: DGMS report within 2 hours
@@ -515,7 +507,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ## Cumulative Benchmark Targets vs. Competitors
 
 | Metric | Ubuntu 24.04 | Windows 11 | SteamOS | **SigmaOS Target** |
-| -------- | ------------- | ------------ | --------- | --------------------- |
+|--------|-------------|------------|---------|---------------------|
 | Boot time (NVMe SSD) | 43 s | 35 s | 8 s | **< 2 s** |
 | Idle RAM (desktop) | 847 MB | 2,100 MB | 600 MB | **< 150 MB** |
 | Context switch p99 | ~1,000 ns | ~1,200 ns | ~300 ns | **< 50 ns** |
@@ -532,8 +524,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ## Master Checklist — Quality, Stability, Performance, UX
 
 ### Phase Q0 — Must have before any public release
-
-```text
+```
 [S1] [ ] Kernel: no silent return-0 stubs in syscall handler
 [S1] [ ] Kernel: panic handler prints register dump
 [S1] [ ] Kernel: watchdog fires on 10-second hang
@@ -547,8 +538,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### Phase Q1 — Before v16.0 Apex
-
-```text
+```
 [P1] [ ] Boot time < 2 s on NVMe SSD (CI timer)
 [P2] [ ] Context switch < 100 ns (2× budget)
 [P3] [ ] Zero-copy DMA for NIC and NVMe
@@ -562,8 +552,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### Phase Q2 — Before v17.0 Sovereign
-
-```text
+```
 [P6] [ ] Vulkan compositor: 1-frame latency @ 120 Hz
 [Q4] [ ] All warnings-as-errors in clang-tidy
 [Q5] [ ] No performance regression gate on CI
@@ -575,8 +564,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### Phase Q3 — v18.0 Singularity
-
-```text
+```
 [P1] [ ] Boot time < 1 s (parallel ASI fully tuned)
 [Q5] [ ] Formal verification: IPC + scheduler (IIT/IISc)
 [A1] [ ] WCAG 2.2 AA certified on every Zenith release
@@ -597,7 +585,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 **Target:** sigma-ultra < 0.4 W idle; laptop < 2.5 W idle (screen off).
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | ACPI P-state governor | `kernel/power/sigma_perf_governor.cpp` | `performance-optimized` | Write `IA32_PERF_CTL` MSR; ondemand/powersave/performance modes |
 | ACPI C-state idle | `kernel/power/sigma_power_manager.cpp` | `performance-optimized` | `HLT` in idle loop; C3/C6/C8 for deeper sleep |
 | Wakeup source accounting | `kernel/power/sigma_wakeup.cpp` | `performance-optimized` | Every wakeup attributed to a driver/process |
@@ -612,7 +600,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### E2 — sigma-ultra Power Optimisation (ARM)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | ARM WFI idle | `arch/arm64/sigma_idle.asm` | `release/mobile` | `WFI` instruction in idle loop |
 | big.LITTLE core parking | `kernel/sched/sigma_numa.cpp` | `release/mobile` | Park LITTLE cores when load < 20 % |
 | Display off after 30 s idle | `arch/arm64/sigma_bcm2711.cpp` | `release/mobile` | HDMI blanking for Pi 4 |
@@ -625,7 +613,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ### R1 — Mean Time Between Failures (MTBF) Targets
 
 | Component | Current | Target | Method |
-| ----------- | --------- | -------- | -------- |
+|-----------|---------|--------|--------|
 | Kernel panic rate | Unknown | 0 panics / 1,000 boot-hours | Watchdog + crash stats |
 | SDF driver crash rate | Unknown | < 1 crash / 10,000 hours | Driver heartbeat monitoring |
 | Filesystem corruption | Unknown | 0 silent corruptions | dm-verity on every read |
@@ -637,7 +625,7 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 Deliberately break components to verify recovery paths work.
 
 | Test | File | Branch | What it checks |
-| ------ | ------ | -------- | ---------------- |
+|------|------|--------|----------------|
 | Kill NIC driver mid-transfer | `tests/chaos/test_nic_crash.sh` | `drivers-dev` | sigma-heal restarts driver, connection resumes |
 | Corrupt 1 block of SigmaFS | `tests/chaos/test_fs_corrupt.sh` | `fs-dev` | dm-verity detects, sigma-fsck repairs |
 | OOM during package install | `tests/chaos/test_oom_install.sh` | `tools-dev` | Install rolls back cleanly, no partial state |
@@ -649,7 +637,7 @@ Deliberately break components to verify recovery paths work.
 ### R3 — Longevity Testing
 
 | Test | Duration | Branch | Pass criteria |
-| ------ | ---------- | -------- | --------------- |
+|------|----------|--------|---------------|
 | QEMU continuous boot | 72 hours | all | No kernel panic or hang |
 | File I/O stress (bonnie++) | 8 hours | `fs-dev` | No data corruption, no journal errors |
 | Network throughput soak | 24 hours | `drivers-dev` | No packet loss, throughput ≥ 800 Mbps |
@@ -665,33 +653,22 @@ Deliberately break components to verify recovery paths work.
 
 **New file:** `userland/tools/sigma_observatory.cpp`
 
-```text
+```
 sigma-observatory             # launch full TUI dashboard
-
 sigma-observatory --json      # machine-readable JSON stream
-
 sigma-observatory cpu         # per-core utilization + frequency
-
 sigma-observatory mem         # RAM usage, slab sizes, page cache
-
 sigma-observatory net         # per-interface TX/RX bytes/packets
-
 sigma-observatory io          # per-device IOPS, latency histogram
-
 sigma-observatory proc        # process list sorted by CPU/mem
-
 sigma-observatory temp        # CPU + GPU temperature
-
 sigma-observatory pqc         # PQC ops/sec live counter
-
 sigma-observatory scheduler   # runqueue depth per CPU
-
 sigma-observatory power       # RAPL energy counters, battery %
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | `/proc/sigma/` virtual filesystem | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Expose kernel stats as readable files |
 | Per-CPU stats in procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | `/proc/sigma/cpu/N/stat` |
 | Memory stats in procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | `/proc/sigma/meminfo` — buddy orders, slab |
@@ -702,23 +679,17 @@ sigma-observatory power       # RAPL energy counters, battery %
 
 ### O2 — sigma-audit (tamper-evident logging)
 
-```text
+```
 sigma-audit log                    # recent audit entries
-
 sigma-audit log --follow           # real-time stream
-
 sigma-audit log --filter kernel    # filter by subsystem
-
 sigma-audit verify                 # verify Dilithium3 chain
-
 sigma-audit export audit.json      # export for CERT-In
-
 sigma-audit push                   # push to sigma-fleet
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | WORM audit register | `kernel/security/sigma_immutable_audit_trail.cpp` | all | Write-once hardware registers for forensic profile |
 | Dilithium3 on every log entry | `kernel/security/sigma_immutable_audit_trail.cpp` | all | ML-DSA-87 sign each event |
 | Log rotation with integrity | `userland/tools/sigma_audit_cli.cpp` | `tools-dev` | Rotate on size limit; keep chain of custody |
@@ -733,25 +704,17 @@ sigma-audit push                   # push to sigma-fleet
 **Current:** `scripts/release.sh`, `scripts/sign_release.sh`, `.github/workflows/sigma_release.yml` exist but are not fully wired.
 
 ```bash
-
 # Full release pipeline:
-
 sigma-release check          # all quality gates pass
-
 sigma-release iso            # reproducible build
-
 sigma-release sign           # ML-DSA-87 sign ISO + packages
-
 sigma-release publish        # upload to GitHub Releases
-
 sigma-release notes v16.0    # auto-generate release notes
-
 sigma-release verify v16.0-rc1.iso  # verify signature
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Reproducible build gate | `.github/workflows/sigma_ci.yml` | all | Two builds → identical SHA256 (SOURCE_DATE_EPOCH fixed) |
 | ML-DSA-87 sign ISO | `scripts/sign_release.sh` | `prepare-sigmaos-launch` | `pqc_sign(iso_hash, sk)` → `.sig` file |
 | SBOM generation (CycloneDX) | `scripts/gen_sbom.sh` | `prepare-sigmaos-launch` | Auto-generate Software Bill of Materials |
@@ -763,7 +726,7 @@ sigma-release verify v16.0-rc1.iso  # verify signature
 ### RE2 — Branch Management Quality
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Branch parity CI (existing) | `scripts/ci_branch_check.sh` | all | Already works — run on every PR |
 | Protected branches policy | `.github/` settings | all | `main` + `release/*` require CI pass + review |
 | PR template enforces checklist | `.github/PULL_REQUEST_TEMPLATE.md` | all | Tests / docs / CURRENT_PROBLEMS_MANIFEST updated |
@@ -778,7 +741,7 @@ sigma-release verify v16.0-rc1.iso  # verify signature
 ### C1 — Contribution Pipeline
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | CONTRIBUTING.md completeness | `CONTRIBUTING.md` | `docs-update` | Setup → build → test → PR → review cycle |
 | Code review checklist | `.github/PULL_REQUEST_TEMPLATE.md` | all | Security / performance / docs / test evidence |
 | Good first issues labelled | GitHub issues | all | Tag 20+ `good-first-issue` items from Phase G list |
@@ -789,21 +752,16 @@ sigma-release verify v16.0-rc1.iso  # verify signature
 ### C2 — Developer Onboarding
 
 ```bash
-
 # 5-command new contributor setup:
-
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 ./scripts/setup.sh          # install deps (Ubuntu 22.04+)
-
 make PROFILE=microkernel    # build smallest profile
-
 make test                   # run unit tests
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | `setup.sh` installs all deps | `scripts/setup.sh` | all | `apt install build-essential nasm cmake clang` + cross-toolchain |
 | Dev container (`.devcontainer/`) | `.devcontainer/devcontainer.json` | all | Already exists — verify it builds cleanly |
 | `make test` single command | `Makefile` | all | Runs all unit tests, prints pass/fail |
@@ -816,7 +774,7 @@ make test                   # run unit tests
 ## Per-Branch Summary Table (All Dimensions)
 
 | Branch | Stability | Performance | Quality | Ease of Use | Energy | Observability |
-| -------- | ----------- | ------------- | --------- | ------------- | -------- | --------------- |
+|--------|-----------|-------------|---------|-------------|--------|---------------|
 | `kernel-exp` | 🔴 Panic handler, no-return-0 stubs, guard pages | 🔴 Context switch < 50 ns, KASLR, ASID | 🔴 Real QEMU CI, ASan/UBSan | 🟡 Human-readable panic | 🟡 ACPI C-state idle | 🟠 `/proc/sigma/` procfs |
 | `drivers-dev` | 🔴 SDF crash → restart < 500 ms | 🔴 Zero-copy DMA NIC/NVMe | 🟠 NIC/NVMe fuzz tests | 🟡 Driver hot-reload CLI | 🟠 USB autosuspend, DPMS | 🟡 Driver stats in procfs |
 | `fs-dev` | 🔴 Journal replay, dm-verity | 🟠 UBC zero-copy, read-ahead | 🟠 VFS fuzz, journal crash test | 🟡 sigma-fsck guided repair | 🟡 Flush on poweroff | 🟡 Cache hit/miss stats |
@@ -842,20 +800,14 @@ make test                   # run unit tests
 Every quality, stability, performance, or UX regression must be tracked here:
 
 ```bash
-
 # Add a problem:
-
 echo "## Phase Q (Quality) — New Issues" >> CURRENT_PROBLEMS_MANIFEST.md
-
 echo "- [#XXXX] Area: description — file.cpp" >> CURRENT_PROBLEMS_MANIFEST.md
 
 # Required before any PR merges to main:
-
 ./scripts/ci_branch_check.sh
 ./scripts/sigma_automation.sh recovery-check
-
 # CURRENT_PROBLEMS_MANIFEST.md must reflect new status
-
 ```
 
 **Release gate:** `CURRENT_PROBLEMS_MANIFEST.md` must have zero open 🔴 items before any `release/*` tag is created.
@@ -865,49 +817,32 @@ echo "- [#XXXX] Area: description — file.cpp" >> CURRENT_PROBLEMS_MANIFEST.md
 ## Quick Reference — All Quality Commands
 
 ```bash
-
 # Build + test (all in one)
-
 make check                         # build + unit tests + static analysis
 
 # Stability
-
 make check-stubs                   # count remaining stubs
-
 ./tests/chaos/test_rollback.sh     # 3 failed boots → rollback
 
 # Performance
-
 sigma-perf bench pqc               # Kyber/Dilithium ops/sec
-
 sigma-perf bench sched             # context switch latency
-
 sigma-observatory                  # live dashboard
 
 # Quality
-
 ./scripts/run_static_analysis.sh   # clang-tidy + cppcheck
-
 ./scripts/regression_check.sh      # regression suite
 
 # Security
-
 sigma-sec status                   # security posture
-
 sigma-audit verify                 # verify log chain of custody
-
 sigma-pqc status                   # PQC algorithms + FIPS level
 
 # Release
-
 ./scripts/sigma_automation.sh wiki-sync    # mirror docs
-
 ./scripts/sigma_automation.sh backup      # source backup
-
 ./scripts/ci_branch_check.sh              # branch parity
-
 sigma-release check                # all gates before tagging
-
 ```
 
 ---

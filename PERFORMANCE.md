@@ -1,68 +1,47 @@
-# Performance Optimization Specification (Clear Linux Parity)
+# Σ SIGMAOS: Performance & Benchmarking Roadmap
 
-This specification details the compilation flags, kernel runtime autotuning, vectorization strategies, and advanced memory page management that deliver low-overhead execution.
+SigmaOS Zenith (v15.0) prioritizes deterministic performance and high throughput. This document outlines the profiling and benchmarking infrastructure.
 
----
+## 📊 Benchmarking Tiers
 
-## ⚡ Compiler Vectorization & Architecture Targets
+### 1. Micro-Benchmarks (Unit Level)
 
-SigmaOS is built targeting x86-64-v3/v4 and ARMv8.2-A+ natively. Crucial loops utilize compiler auto-vectorization (AVX-512, NEON, SVE) with specialized assembly modules for hot codepaths.
+- **S-MM Latency**: Measures slab allocation and deallocation speed.
 
-### 1. Vectorized Memory Copy (`memcpy`)
+- **IPC Throughput**: Measures the bandwidth of the Sovereign Shard Bridge.
 
-```rust
-// klib/src/arch/x86_64/memcpy.rs
-#[no_mangle]
-#[naked]
-pub unsafe extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
-    // Highly-optimized AVX-512/AVX2 unrolled block copy
-    core::arch::asm!(
-        "cmp rdx, 64",
-        "jb .L_copy_small",
-        // Align destination...
-        // Main loop copying 64-byte AVX chunks
-        "vmovdqu64 zmm0, [rsi]",
-        "vmovdqu64 [rdi], zmm0",
-        "ret",
-        options(noreturn)
-    )
-}
-```
+- **Crypto-Ops**: Benchmarks Dilithium-5 and Kyber-1024 performance.
 
----
+### 2. Macro-Benchmarks (System Level)
 
-## ⚙️ Kernel Autotuner (`sigma_kernel_autotuner.rs`)
+- **ASI Ignition Time**: Total time from bootloader handoff to shell readiness.
 
-The kernel autotuner runs as an asynchronous worker. It queries the `/sigma/metrics` telemetry node and adjusts scheduler parameters dynamically.
+- **VFS Stress Test**: Concurrent read/write operations across multiple filesystems.
 
-```rust
-// kernel/src/tuning/autotuner.rs
-pub struct KernelAutotuner {
-    last_context_switches: u64,
-    cache_miss_ratio: f32,
-}
+- **Network Stack Latency**: Round-trip time for PQC-sealed packets.
 
-impl KernelAutotuner {
-    pub fn tune_scheduler_slice(&mut self, current_slice_ns: u64) -> u64 {
-        // If context switches are high and cache misses exceed 15%,
-        // expand the EEVDF scheduler time slice to restore cache locality.
-        if self.cache_miss_ratio > 0.15 {
-            current_slice_ns * 120 / 100
-        } else {
-            current_slice_ns
-        }
-    }
-}
-```
+### 3. Regression Testing
 
----
+- Every PR is automatically benchmarked against the `performance-optimized` branch.
 
-## 💾 Memory Optimization
+- Performance degradation > 2% triggers an automatic audit.
 
-### 1. Transparent Buddy Page Merging
+## 🛠 Tooling Integration
 
-The physical memory manager (`SovereignPMM`) scans physical page tables for identical read-only memory blocks (e.g. shared dynamic library memory, immutable app assets) and merges them into a single physical page frame with Copy-on-Write enabled, saving up to **35%** memory on dense container nodes.
+- **Static Analysis**: `make lint` uses Clang-Tidy to detect algorithmic inefficiencies.
 
-### 2. Page Caching & Direct I/O
+- **Dynamic Profiling**: `scripts/profile.sh` integrates with `perf` and `valgrind` (simulation mode).
 
-The zero-copy virtual filesystem bypasses the OS buffer cache for NVMe storage devices, utilizing Direct DMA transfers from drive controller memory directly into the application space buffer.
+- **Automated CI**: Benchmarks are executed across x86, ARM, and RISC-V targets.
+
+## 🚀 Performance-Optimized Branch
+
+The `performance/optimization` branch is dedicated to experimental algorithmic improvements, including:
+
+- Lock-free shard orchestration.
+
+- Zero-copy networking paths.
+
+- SIMD-accelerated cryptographic kernels.
+
+*"A sovereign system must be as fast as it is free."*

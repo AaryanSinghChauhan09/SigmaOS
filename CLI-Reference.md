@@ -7,95 +7,30 @@ All commands emit clean, coloured output by default and can switch to machine-re
 
 ## sigma — OS Development CLI
 
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| **`sigma-office`** | **Produce** | **Sovereign Productivity Suite (Docs, Sheets, Slides).** |
+The unified developer CLI, compiled from `tools/sigma-cli.rs` (Rust, zero dependencies).
 
-| **`sigma-nexus`** | **Manage** | **Sovereign Enterprise ERP/CRM/Cloud management.** |
+### Installation
 
-| **`sigma-linux`** | **Compatibility** | **Run legacy Linux/POSIX binaries via S99 translation.** |
+```bash
+cargo build --release --manifest-path tools/Cargo.toml
+sudo cp tools/target/release/sigma /usr/local/bin/sigma
+```
 
-| **`sigma-reg`** | **Configure** | **Query/Edit the Sovereign Registry (Git-backed).** |
+### Global flags
 
-| `sigma-driver` | Manage | Load, list, and auto-detect modular kernel drivers. |
+| Flag | Description |
+|------|-------------|
+| `--json` | Machine-readable JSON on stdout |
+| `--verbose` / `-v` | Extra diagnostic output |
+| `--version` / `-V` | Print version and exit |
+| `--help` / `-h` | Show help and exit |
 
 Any subcommand also accepts `--help` for detailed per-command usage:
 
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| **`sigma-claw`** | **Automate** | **Sovereign Claw AI Automation (Multi-step intents).** |
-
-| **`sigma-shell`** | **Interact** | **Enter the Sovereign Intent Shell (NL-to-CLI).** |
-
-| `sigma-ai status` | Monitor | Check the health of the local AI assistant. |
-| `sigma-ai query` | Interact | Send a natural language command to the OS. |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `sigma-init` | Initialize | Manage and list system services (AI-enhanced). |
-| **`sigma-reg`** | **Configure** | **Query/Edit the Sovereign Registry (Git-backed).** |
-
-| `sigma-boot-fast` | Boot | Execute Apex Fast Startup (Hybrid Hibernation). |
-| `sigma-irq` | Inspect | View the hardware IDT and active interrupt handlers. |
-| `sigma-sched` | Tune | Configure SHS v2 Hybrid Scheduling policies. |
-| `sigma-bench` | Test | Run performance and security benchmarks across the lattice. |
-| `sigma-dev`   | Toolkit | Debugging, profiling, and tracing utilities for shards. |
-| `sigma-recover` | Rollback | Boot into the last known good Apex checkpoint. |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `sigma-top` | Monitor | Real-time system monitor (CPU, Mem, GPU, AI metrics). |
-| `sigma-log` | View | Unified logging tool for all sovereign lattice events. |
-| `sigma-net` | Diagnose | Network diagnostics with PQC and sovereignty checks. |
-| `sigma-update` | Update | Unified updater with automatic snapshot rollback protection. |
-| `sigma-health` | Audit | Comprehensive system health check (Kernel, UI, Sec, AI). |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `sigma-pkg install` | Install | Install a shard (automatically creates a pre-install snapshot). |
-| `sigma-pkg remove` | Remove | Purge a shard from the lattice (creates a safety snapshot). |
-| `sigma-pkg list` | List | View all installed sovereign shards and their versions. |
-| `sigma-pkg graph` | Visualize | Generate a dependency DAG of the current system. |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `zenith-start` | Launch | Start the Wayland-native Zenith compositor. |
-| `zenith-layout` | Switch | Change the UI layout (Mosaic, Tile, Stack). |
-| `zenith-theme` | Style | Apply a new visual theme (Dark, Cyber, Paper). |
-| `zenith-status` | Health | Monitor surface health and GPU fallback status. |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `sigma-sec attest` | Handshake | Perform TPM 2.0 hardware attestation. |
-| `sigma-sec audit` | Verify | Run PQC compliance audit on all active shards. |
-| `sigma-sec enforce` | Policy | Apply strict security policies to the kernel lattice. |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `sigma-ai status` | Monitor | Check the health of the local AI assistant. |
-| `sigma-ai query` | Interact | Send a natural language command to the OS orchestrator. |
-| `sigma-ai adapt` | Optimize | Enable AI-driven UI and resource optimization. |
-
-1
-
-| Command | Action | Description |
-| --------- | -------- | ------------- |
-| `sigma-snap create` | Capture | Manually create a silicon-direct system snapshot. |
-| `sigma-snap list` | View | List all available restore points in the `S41` registry. |
-| `sigma-snap rollback` | Restore | Revert the system to a specific snapshot ID. |
-| `sigma-snap monitor` | Watchdog | Start the daemon that triggers auto-rollback on failure. |
+```bash
+sigma build --help
+sigma update --help
+```
 
 ---
 
@@ -340,9 +275,7 @@ sigma help pkg
 Any binary named `sigma-<name>` on `PATH` is auto-discovered as a subcommand (cargo-style):
 
 ```bash
-
 # Install a custom profiler plugin:
-
 cp sigma-profiler /usr/local/bin/
 sigma profiler start          # delegates to sigma-profiler start
 ```
@@ -373,31 +306,24 @@ The app-lifecycle CLI for SigmaOS userland development, compiled from `tools/sig
 ### Examples
 
 ```bash
-
 # Create and run a new app
-
 sigma init my-app
 sigma run my-app
 
 # Sign and verify before distribution
-
 sigma sign my-app
 sigma verify my-app
 
 # Inspect declared capabilities
-
 sigma caps my-app
 
 # System health check
-
 sigma health
 
 # Tweak a kernel parameter
-
 sigma sysctl kernel.sched.latency_ns=50000
 
 # Package management
-
 sigma pkg add sigma-vr-compositor
 sigma pkg search neuro
 sigma pkg audit
@@ -440,20 +366,17 @@ The home directory is shortened to `~`.
 ### Built-in Commands
 
 #### Navigation
-
 | Command | Description |
 |---------|-------------|
 | `cd [dir\|-\|~]` | Change directory (`-` = OLDPWD, `~` = HOME) |
 | `pwd` | Print working directory |
 
 #### Output
-
 | Command | Description |
 |---------|-------------|
 | `echo [-n] [...]` | Print text (supports `\n`, `\t` escapes) |
 
 #### Variables & Environment
-
 | Command | Description |
 |---------|-------------|
 | `export [K=V]` | Set/export environment variables |
@@ -462,7 +385,6 @@ The home directory is shortened to `~`.
 | `read <VAR>` | Read a line from stdin into a variable |
 
 #### Aliases & Discovery
-
 | Command | Description |
 |---------|-------------|
 | `alias [K='V']` | Define or list aliases |
@@ -471,13 +393,11 @@ The home directory is shortened to `~`.
 | `which <name>` | Locate an executable on PATH |
 
 #### Process Control
-
 | Command | Description |
 |---------|-------------|
 | `kill [-SIGNAL] <pid>` | Send a signal to a process |
 
 #### History & Session
-
 | Command | Description |
 |---------|-------------|
 | `history` | Show numbered command history (consecutive duplicates suppressed) |
@@ -486,7 +406,6 @@ The home directory is shortened to `~`.
 | `help` | Show categorised built-in help |
 
 #### Test/Conditions
-
 | Command | Description |
 |---------|-------------|
 | `test <expr>` / `[ <expr> ]` | Evaluate conditions (built-in: `-e`, `-f`, `-d`, `-z`, `-n`, `=`, `!=`, `-eq`, `-ne`, `-lt`, `-gt`, `-le`, `-ge`) |
@@ -494,38 +413,30 @@ The home directory is shortened to `~`.
 ### Shell Syntax
 
 ```bash
-
 # Pipes
-
 ls -la | grep .sigma | wc -l
 
 # Redirections
-
 cmd > out.txt     # stdout overwrite
 cmd >> out.txt    # stdout append
 cmd < in.txt      # stdin
 cmd 2> err.txt    # stderr
 
 # Background
-
 long_running_task &
 
 # Sequences
-
 compile; test; deploy
 
 # Conditionals
-
 make && echo "success" || echo "failed"
 
 # Variables
-
 name="sigma"
 echo "Hello, ${name:-world}"
 echo "Last exit: $?"
 
 # Control flow (scripts)
-
 if [ -f sigma.toml ]; then
     echo "config found"
 else
@@ -537,7 +448,6 @@ for arch in x86_64 aarch64 riscv64gc; do
 done
 
 # Functions
-
 greet() {
     echo "Hello from sigma-sh"
 }
@@ -550,7 +460,6 @@ Script files use the `.sigma` extension:
 
 ```bash
 #!/usr/bin/env sigma-sh
-
 # build-all.sigma
 
 for target in x86_64 aarch64; do
@@ -865,24 +774,19 @@ sigma-debug <command> [--pid <n>] [--addr <hex>] [--len <n>] [--json]
 | `repl` | Interactive debug REPL session |
 
 ```bash
-
 # Inspect a shard and dump memory
-
 sigma-debug shard list
 sigma-debug mem dump --addr 0xffff000000001000 --len 128
 
 # Symbol resolution
-
 sigma-debug sym resolve 0xffff000000001234
 sigma-debug sym search sigma_syscall
 
 # Set breakpoint and backtrace
-
 sigma-debug bp set --addr 0xffff000000001234
 sigma-debug bt --pid 1 --json
 
 # Interactive session
-
 sigma-debug repl
 ```
 
@@ -943,29 +847,23 @@ sigma-fix <scan|suggest|apply|rollback|explain|list> [options]
 Severity levels: `CRITICAL` `HIGH` `MEDIUM` `LOW`
 
 ```bash
-
 # Scan and see what's fixable
-
 sigma-fix scan
 sigma-fix list
 
 # Inspect a fix before applying
-
 sigma-fix suggest --id FIX-0001
 sigma-fix explain --id FIX-0001
 
 # Apply fixes
-
 sigma-fix apply --id FIX-0001 --dry-run
 sigma-fix apply --id FIX-0001 --auto
 sigma-fix apply --id FIX-0007
 
 # Undo if needed
-
 sigma-fix rollback --id FIX-0001
 
 # JSON output for CI pipelines
-
 sigma-fix scan --json | jq '.scan.fixes[] | select(.severity=="CRITICAL")'
 ```
 
@@ -1179,39 +1077,32 @@ sigma-net <command> [options]
 | `fw flush --force` | Remove all rules |
 
 ```bash
-
 # Interface management
-
 sigma-net status
 sigma-net up eth0
 sigma-net ip eth0 10.0.0.10/24
 sigma-net dhcp wlan0
 
 # Routing
-
 sigma-net route list
 sigma-net route add 192.168.1.0/24 via 10.0.0.1
 
 # Diagnostics
-
 sigma-net ping 8.8.8.8 -c 10
 sigma-net trace sigmaos.app
 sigma-net scan 10.0.0.0/24
 
 # WiFi
-
 sigma-net wifi scan
 sigma-net wifi connect "MyNetwork" "passphrase"
 sigma-net wifi status
 
 # Firewall
-
 sigma-net fw list
 sigma-net fw allow "tcp dport 8080"
 sigma-net fw deny "tcp dport 23"
 
 # JSON output for scripts
-
 sigma-net status --json | jq '.[].addr'
 sigma-net route list --json | jq '.[0].gateway'
 ```
@@ -1275,30 +1166,23 @@ gst-calc <command> [options]
 | `gstr1 [--period MMYYYY]` | GSTR-1 filing summary |
 
 ```bash
-
 # Standard GST on professional services
-
 gst-calc tax --amount 50000 --rate 18
 
 # Inter-state (IGST)
-
 gst-calc tax --amount 100000 --rate 18 --inter
 
 # Extract GST from GST-inclusive price
-
 gst-calc reverse --amount 59000 --rate 18
 
 # HSN lookup
-
 gst-calc hsn computer
 gst-calc hsn 8471
 
 # TDS on contractor payment
-
 gst-calc tds --amount 500000 --section 194C
 
 # Invoice line for JSON export
-
 gst-calc invoice --amount 25000 --rate 18 --desc "Software Development" --json
 ```
 
@@ -1324,37 +1208,28 @@ struct-load <command> [options]
 | `section --profile <name>` | Steel section properties (IS 808) |
 
 ```bash
-
 # Simply-supported beam: 6m span, 12 kN/m UDL, 20 kN point load
-
 struct-load beam --span 6 --udl 12 --pl 20
 
 # Cantilever beam
-
 struct-load beam --span 3 --udl 8 --cantilever
 
 # Column capacity check
-
 struct-load column --width 0.4 --depth 0.4 --height 3.5 --axial 800
 
 # Two-way slab design moments
-
 struct-load slab --span 4 --ly 6 --dl 3.5 --ll 2.0
 
 # Isolated footing adequacy
-
 struct-load foundation --width 1.5 --depth 0.45 --axial 600 --sbc 150
 
 # IS 1893 seismic base shear, Zone III
-
 struct-load seismic --seismic-weight 5000 --zone III --sa 2.5 --r 5 --i 1
 
 # Load combinations governing
-
 struct-load combo --dl 5 --ll 3 --wind 1.5
 
 # Steel section lookup
-
 struct-load section --profile "ISMB 300"
 struct-load section --profile "ISMB"    # list all ISMB sections
 ```

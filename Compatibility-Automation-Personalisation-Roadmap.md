@@ -9,7 +9,7 @@ pipelines, system customisation, and per-user personalisation.
 ## Current State
 
 | Dimension | State | Key gap |
-| ----------- | ------- | --------- |
+|-----------|-------|---------|
 | **App compatibility** | Linux ELF compat exists (`sigma_linux_compat.cpp`), Win32 loader skeleton | No live execution — VMM not wired |
 | **Platform compatibility** | x86-64 QEMU only | No real hardware, no ARM64, no RISC-V |
 | **Automation** | `sigma_automation.sh` real (backup/update/wiki-sync) | No scheduled tasks, no event-triggered automation |
@@ -28,7 +28,7 @@ pipelines, system customisation, and per-user personalisation.
 #### Stage L1 — Static Linux binaries (no libc dependency)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Wire VMM to ELF segment map | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Call `sigma_vmm_map_region(va, size, perms)` per PT_LOAD |
 | ELF base relocation | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Apply `.rela.dyn` if load address ≠ preferred |
 | Expand syscall table to 50 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Add: `stat`, `fstat`, `lseek`, `pipe`, `dup2`, `clone`, `wait4`, `execve`, `mprotect`, `getcwd`, `chdir`, `mkdir`, `rmdir`, `unlink`, `rename`, `readdir`, `socket`, `connect`, `send`, `recv`, `nanosleep`, `futex`, `set_robust_list`, `get_tid_address` |
@@ -42,7 +42,7 @@ pipelines, system customisation, and per-user personalisation.
 #### Stage L2 — Dynamic Linux binaries (glibc/musl)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | sigma-ldso (ELF dynamic linker) | `userland/ldso/sigma_ldso.cpp` | `tools-dev` | Load `ld-linux.so.2` or sigma-provided musl-libc |
 | PLT/GOT relocation | `userland/ldso/sigma_ldso.cpp` | `tools-dev` | Resolve `R_X86_64_JUMP_SLOT`, `R_X86_64_GLOB_DAT` |
 | musl-libc static bundle | `userland/ldso/sigma_musl.cpp` | `tools-dev` | Ship musl as sigma-pkg — covers 95% of CLI apps |
@@ -55,7 +55,7 @@ pipelines, system customisation, and per-user personalisation.
 #### Stage L3 — Container isolation (sigma-pod + Linux compat)
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Linux ELF inside sigma-pod namespace | `userland/tools/sigma_pod_cli.cpp` | `release/cloud` | `sigma-pod run-native --compat-linux /usr/bin/nginx` |
 | Linux filesystem layout inside pod | `kernel/core/process/sigma_namespace.cpp` | `release/cloud` | Mount `/proc`, `/dev`, `/tmp` in pod mount namespace |
 | Seccomp-BPF filter for Linux compat | `kernel/security/sigma_seccomp.cpp` | `release/cloud` | Restrict to mapped syscalls only |
@@ -67,7 +67,7 @@ pipelines, system customisation, and per-user personalisation.
 VMM integration pending.
 
 | Stage | Target app | Blocker | Branch |
-| ------- | ----------- | --------- | -------- |
+|-------|-----------|---------|--------|
 | W1 | `hello.exe` (static Win32) | VMM section mapping | `tools-dev` |
 | W2 | Python 3 CLI for Windows | sigma-msvcrt printf/malloc | `tools-dev` |
 | W2 | Git for Windows CLI | Winsock2 TCP | `tools-dev` |
@@ -75,10 +75,9 @@ VMM integration pending.
 | W4 | VSCode (Electron) | D3D11→Vulkan DXVK | `release/standalone` |
 | W5 | DX11 Steam game | vkd3d-proton D3D12 | `release/standalone` |
 
-### Next W1 tasks:
-
+**Next W1 tasks:**
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | VMM region alloc for PE sections | `runtime/compat/win32/sigma_pe_loader.cpp` | `tools-dev` | `sigma_vmm_map_region(va, memsz, perms)` per section |
 | Base relocation walk | `runtime/compat/win32/sigma_pe_loader.cpp` | `tools-dev` | `IMAGE_BASE_RELOCATION` chain → patch absolute addresses |
 | IAT stub patching | `runtime/compat/win32/sigma_pe_loader.cpp` | `tools-dev` | Fill IAT entries with sigma-ntdll function pointers |
@@ -91,7 +90,7 @@ VMM integration pending.
 **Current:** `userland/compat/POSIXShim.cpp` — open/read/write/close/fork/execve stubs.
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | POSIX open() → VFS full path | `userland/compat/POSIXShim.cpp` | `tools-dev` | Normalise path, call `sigma_sys_open` |
 | POSIX fork() + execve() | `userland/compat/POSIXShim.cpp` | `tools-dev` | `sigma_sys_fork` + `sigma_sys_execve` |
 | POSIX signal handling | `userland/compat/POSIXShim.cpp` | `tools-dev` | `SIGINT/SIGTERM/SIGSEGV` → sigma signal primitives |
@@ -102,7 +101,7 @@ VMM integration pending.
 ### C4 — File Format Compatibility
 
 | Format | App | Task | Branch |
-| -------- | ----- | ------ | -------- |
+|--------|-----|------|--------|
 | Tally XML import/export | sigma-accounts | `sigma_accounts_import_tally()` body | `release/standalone` |
 | Excel .xlsx read | sigma-accounts | libxlsxwriter port | `release/standalone` |
 | PDF generation | sigma-ca, sigma-health | Cairo/Poppler port or sovereign PDF writer | `release/standalone` |
@@ -115,12 +114,13 @@ VMM integration pending.
 ### C5 — Package Format Compatibility
 
 | Format | Task | Branch | Detail |
-| -------- | ------ | -------- | -------- |
+|--------|------|--------|--------|
 | `.deb` install via sigma-compat | `userland/sigma-pkg/sigma_pkg_deb.cpp` | `tools-dev` | Extract `.deb` into sigma-posix-compat prefix |
 | `.rpm` install via sigma-compat | `userland/sigma-pkg/sigma_pkg_rpm.cpp` | `tools-dev` | RPM cpio extraction |
 | Flatpak run via sigma-pod | `userland/sigma-pkg/sigma_pkg_flatpak.cpp` | `release/cloud` | sigma-pod + Linux compat → run Flatpak |
 | AppImage via sigma-compat | `userland/sigma-pkg/sigma_pkg_appimage.cpp` | `tools-dev` | Mount squashfs, run ELF inside sigma-compat |
 | `.spkg` as primary format | `sigma_pkg_registry/` | all | Native sigma format — always preferred |
+
 
 ---
 
@@ -134,29 +134,19 @@ VMM integration pending.
 
 ```bash
 sigma_automation.sh release          # tag + sign + publish release ISO
-
 sigma_automation.sh qemu-test        # boot ISO in QEMU, assert prompt
-
 sigma_automation.sh perf-bench       # run all benchmarks, store results
-
 sigma_automation.sh sign-release     # ML-DSA-87 sign ISO + packages
-
 sigma_automation.sh lint             # clang-tidy + markdownlint
-
 sigma_automation.sh gen-changelog    # git log → CHANGELOG.md
-
 sigma_automation.sh sbom             # generate CycloneDX SBOM
-
 sigma_automation.sh india-sync       # sync MSP/HSN/ICD-10 offline data
-
 sigma_automation.sh fleet-sync       # push policy to all sigma-fleet devices
-
 sigma_automation.sh clean            # remove build artefacts + tmp files
-
 ```
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | `cmd_qemu_test()` | `scripts/sigma_automation.sh` | Boot ISO, assert "sigma-login" in output within 30 s |
 | `cmd_perf_bench()` | `scripts/sigma_automation.sh` | Run bench_sched + bench_pqc, write JSON to `.sigma/bench/` |
 | `cmd_sign_release()` | `scripts/sigma_automation.sh` | Call `pqc_sign(iso_sha256, dilithium_sk)` via sigma-pqc CLI |
@@ -169,25 +159,17 @@ sigma_automation.sh clean            # remove build artefacts + tmp files
 **New file:** `userland/daemons/sigma_cron.cpp`
 
 ```bash
-
 # /sigma/etc/sigma-cron.conf syntax (similar to crontab):
-
 @daily    sigma_automation.sh india-sync          # refresh offline India data
-
 @weekly   sigma_automation.sh perf-bench          # benchmark trend
-
 @monthly  sigma_automation.sh gen-changelog        # update CHANGELOG
-
 0 2 * * * sigma_automation.sh backup              # nightly source backup
-
 0 6 * * * sigma-pkg update                        # check for package updates
-
 @reboot   sigma_automation.sh quality-check        # quality gate on every boot
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | sigma-cron daemon | `userland/daemons/sigma_cron.cpp` | `tools-dev` | Parse crontab, fire at wall-clock time via APIC timer |
 | sigma-cron CLI | `userland/tools/sigma_cron_cli.cpp` | `tools-dev` | `sigma-cron list/add/remove/run <job>` |
 | sigma-cron sigma-bus integration | `userland/daemons/sigma_cron.cpp` | `tools-dev` | Jobs published to sigma-bus as events |
@@ -199,9 +181,7 @@ sigma_automation.sh clean            # remove build artefacts + tmp files
 **New file:** `userland/daemons/sigma_hook.cpp`
 
 ```bash
-
 # Event hooks — fire on system events:
-
 sigma-hook add --on "package.installed" --run "sigma-sec verify --pkg %PKG"
 sigma-hook add --on "network.connected" --run "sigma_automation.sh india-sync"
 sigma-hook add --on "boot.success"      --run "sigma_automation.sh quality-check"
@@ -211,7 +191,7 @@ sigma-hook add --on "sensor.temperature.high" --run "sigma-rt jitter show"
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | sigma-hook daemon | `userland/daemons/sigma_hook.cpp` | `tools-dev` | Subscribe to sigma-bus topics, execute command on match |
 | Hook definition format | `/sigma/etc/sigma-hooks.conf` | `tools-dev` | TOML: `[[hook]] event = "..." command = "..."` |
 | sigma-hook CLI | `userland/tools/sigma_hook_cli.cpp` | `tools-dev` | `sigma-hook list/add/remove/test <event>` |
@@ -223,7 +203,7 @@ sigma-hook add --on "sensor.temperature.high" --run "sigma-rt jitter show"
 **Current:** `.github/workflows/` has 16 workflow files. Several tests are `echo` stubs.
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Replace QEMU echo stubs | `.github/workflows/sigma_qemu.yml` | all | Real `qemu-system-x86_64 -cdrom SigmaOS.iso -serial stdio` |
 | Nightly benchmark CI | `.github/workflows/sigma_ci.yml` | `performance-optimized` | Scheduled `@daily` benchmark run + trend diff |
 | India Stack sandbox CI | `.github/workflows/sigma_ci.yml` | `release/standalone` | Weekly GSTN/ABDM sandbox integration tests |
@@ -239,25 +219,20 @@ sigma-hook add --on "sensor.temperature.high" --run "sigma-rt jitter show"
 
 ```bash
 sigma_git_sync.sh                  # current: commit + push
-
 sigma_git_sync.sh --dry-run        # preview without push
-
 sigma_git_sync.sh --wiki-only      # only update wiki_repo/
-
 sigma_git_sync.sh --verify-sig     # verify last commit's Dilithium sig
-
 sigma_git_sync.sh --sync-all-branches  # push all local branches
-
 sigma_git_sync.sh --release v16.0  # tag + sign + push release
-
 ```
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | `--verify-sig` flag | `scripts/sigma_git_sync.sh` | Run `sigma-pqc verify` on HEAD commit signature |
 | `--sync-all-branches` flag | `scripts/sigma_git_sync.sh` | Push all local branches that are ahead of origin |
 | `--release <version>` flag | `scripts/sigma_git_sync.sh` | `git tag -s v$VERSION && git push --tags` |
 | Signed commits by default | `scripts/sigma_git_sync.sh` | `git commit -S` using Dilithium3 key if available |
+
 
 ---
 
@@ -271,9 +246,7 @@ VFS read not yet wired.
 #### Config.sigma format (TOML + Dilithium attestation)
 
 ```toml
-
 # /sigma/etc/Config.sigma
-
 [system]
 hostname    = "sigma-node-01"
 timezone    = "Asia/Kolkata"
@@ -281,7 +254,6 @@ locale      = "hi_IN.UTF-8"
 
 [boot]
 profile     = "desktop"          # desktop | minimal | cloud | forensic | gaming
-
 safe_mode   = false
 ab_slot     = "A"
 
@@ -306,14 +278,12 @@ pqc_level   = "ml-kem-1024"     # ml-kem-512 | ml-kem-768 | ml-kem-1024
 
 [india]
 gst_profile = "regular"         # regular | composition | unregistered
-
 state_code  = "27"              # 27 = Maharashtra
-
 preferred_language = "hi"
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | VFS read Config.sigma at boot | `userland/ignite/sigma_ignite.cpp` | `kernel-exp` | `vfs_open("/sigma/etc/Config.sigma")` after VFS init |
 | TOML parser (zero-dependency) | `userland/ignite/sigma_toml.cpp` | `tools-dev` | Lightweight TOML parser, no external deps |
 | Dilithium3 signature verification | `userland/ignite/sigma_ignite.cpp` | `tools-dev` | Verify `Config.sigma.sig` before applying |
@@ -331,7 +301,7 @@ preferred_language = "hi"
 
 #### Profile definitions
 
-```text
+```
 developer   — debug symbols, relaxed MAC, verbose logging, sigma-gdb
 desktop     — Zenith GUI, full profession apps, sigma-ai
 minimal     — no GUI, 8 core commands, 64 MB RAM
@@ -343,7 +313,7 @@ rtos        — EDF scheduler, no non-RT services
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Profile selector boot param | `init/sigma_profile_selector.cpp` | all | `sigma.profile=cloud` on kernel cmdline |
 | Per-profile service set | `init/sigma_profile_selector.cpp` | all | Only start services listed in profile manifest |
 | Per-profile cgroup limits | `init/sigma_profile_selector.cpp` | `release/cloud` | Cloud profile: enforce container cgroup limits |
@@ -357,22 +327,16 @@ rtos        — EDF scheduler, no non-RT services
 
 ```bash
 sigma-zenith theme list                    # installed themes
-
 sigma-zenith theme set zenith-dark         # apply built-in theme
-
 sigma-zenith theme set /path/to/mytheme.sigma
 sigma-zenith theme create mytheme          # skeleton from current settings
-
 sigma-zenith theme edit mytheme            # open in text editor
-
 sigma-zenith theme export mytheme.sigma    # export as signed bundle
-
 sigma-zenith theme import theme.sigma      # install from file/URL
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Theme file format (TOML) | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Colors, fonts, gaps, border radius, animations |
 | Built-in themes | `zenith_desktop/themes/` | `release/standalone` | zenith-dark, zenith-light, zenith-india, zenith-high-contrast, zenith-mono |
 | Live theme apply (no restart) | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | IPC message → compositor reloads theme in < 200 ms |
@@ -384,7 +348,7 @@ sigma-zenith theme import theme.sigma      # install from file/URL
 ### K4 — Kernel & Syscall Customisation
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | sigma-sysctl (runtime kernel params) | `userland/tools/sigma_sysctl_cli.cpp` | `kernel-exp` | `sigma-sysctl net.tcp.congestion=cubic` |
 | `/sigma/proc/sys/` virtual fs | `kernel/vfs/sigma_sysctl.cpp` | `kernel-exp` | Read/write kernel parameters via VFS |
 | Kernel module load/unload | `userland/tools/sigma_drv_cli.cpp` | `drivers-dev` | `sigma-drv load my_driver.sdf` at runtime |
@@ -404,9 +368,7 @@ sigma-zenith theme import theme.sigma      # install from file/URL
 #### ~/.sigma_profile format
 
 ```toml
-
 # ~/.sigma_profile
-
 [identity]
 did             = "did:sigma:abc123..."
 name            = "Aaryan Singh Chauhan"
@@ -437,23 +399,19 @@ gst = "sigma-gst gstr3b"    # profession shortcut
 
 [apps]
 startup         = ["sigma-ca", "sigma-health"]   # launch on login
-
 default_browser = "sigma-browser"
 default_editor  = "micro"
 default_term    = "sigma-term"
 
 [notifications]
 gst_reminder    = true   # remind 7 days before GSTR filing due
-
 pmfby_deadline  = true   # insurance enrollment reminder
-
 court_hearing   = true   # sigma-legal hearing reminders
-
 mgnregs_attend  = false
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | VFS read `~/.sigma_profile` at login | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `kernel-exp` | `vfs_open("/home/<uid>/.sigma_profile")` |
 | TOML parser for profile | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `tools-dev` | Reuse `sigma_toml.cpp` from Config.sigma |
 | Apply desktop keys to Zenith | `zenith_desktop/zenith_unified_init.cpp` | `release/standalone` | theme/layout/gaps/font from profile |
@@ -471,27 +429,19 @@ Every user's identity is a cryptographically-verifiable DID document.
 The OS reads profession + preferences from the DID and configures itself.
 
 ```bash
-
 # First boot: scan QR on sigma-ultra phone
-
 sigma-dm login --did-scan   # camera → QR → DID auth → desktop opens
 
 # DID document carries:
-
 #   profession = "ca"        → loads sigma-ca on startup
-
 #   state      = "MH"        → sets GST state = Maharashtra
-
 #   language   = "hi"        → UI + screen reader in Hindi
-
 #   theme      = "zenith-dark"
-
 #   bar_council_number = "MH/12345" → verified advocate badge
-
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | DID document profession field | `security/SovereignDID.cpp` | `release/standalone` | Read `profession`, `state`, `preferred_lang` |
 | Auto-configure from DID on login | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `release/standalone` | Merge DID preferences into `~/.sigma_profile` |
 | Professional credential badge | `zenith_desktop/taskbar/sigma_systray.cpp` | `release/standalone` | Show "CA ✓" / "Dr ✓" badge in taskbar |
@@ -501,7 +451,7 @@ sigma-dm login --did-scan   # camera → QR → DID auth → desktop opens
 ### P3 — App-Level Personalisation
 
 | App | Personalisation feature | Task | Branch |
-| ----- | ------------------------ | ------ | -------- |
+|-----|------------------------|------|--------|
 | sigma-ca | Multi-client dashboard order | Save client sort preference to `~/.sigma_profile` | `release/standalone` |
 | sigma-agri | Crop favourites + MSP alerts | `crops.favourites` in profile | `release/standalone` |
 | sigma-health | Patient list filters | Save view preferences per doctor | `release/standalone` |
@@ -514,7 +464,7 @@ sigma-dm login --did-scan   # camera → QR → DID auth → desktop opens
 ### P4 — Personalisation for Rural & Low-Resource Users
 
 | Feature | Target | Task | Branch |
-| --------- | -------- | ------ | -------- |
+|---------|--------|------|--------|
 | Default language from SIM card | sigma-ultra | Detect SIM PLMN → select language | `release/mobile` |
 | Offline preference sync (CRDT) | sigma-ultra | Merge preferences without internet | `release/distributed` |
 | Feature phone simplified profile | sigma-ultra | Only 5 settings: language/UPI/crops/health/scheme | `release/mobile` |
@@ -526,30 +476,23 @@ sigma-dm login --did-scan   # camera → QR → DID auth → desktop opens
 ```bash
 sigma-zenith wallpaper set ~/Pictures/sunrise.jpg
 sigma-zenith wallpaper set --slide ~/Pictures/   # slideshow
-
 sigma-zenith font set "Noto Sans Devanagari" 13
 sigma-zenith cursor set sigma-arrow-large         # HiDPI cursor
-
 sigma-zenith animation speed fast|normal|off      # reduce motion
-
 sigma-zenith workspace rename 1 "Work" 2 "Media" 3 "Terminal"
 sigma-zenith bar position top|bottom
 sigma-zenith bar clock format "%-I:%M %p"         # 12-hour IST format
-
 sigma-zenith bar date format "%d %B %Y"           # "28 June 2026"
-
 sigma-zenith bar language show|hide               # current IME
-
 sigma-zenith bar network show|hide
 sigma-zenith startup app add sigma-ca             # launch on login
-
 sigma-zenith startup app remove sigma-ca
 sigma-zenith keybinding set "Super+G" "sigma-agri msp"
 sigma-zenith keybinding list
 ```
 
 | Task | File | Branch | Detail |
-| ------ | ------ | -------- | -------- |
+|------|------|--------|--------|
 | Wallpaper setter + slideshow | `zenith_desktop/personalization/sigma_wallpaper.cpp` | `release/standalone` | Load PNG/JPEG → upload to compositor as background layer |
 | Font picker | `zenith_desktop/personalization/sigma_font_picker.cpp` | `release/standalone` | List installed Noto fonts, set globally |
 | Animation speed preference | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Scale animation duration by preference |
@@ -563,7 +506,7 @@ sigma-zenith keybinding list
 ## Per-Branch Compatibility × Automation × Customisation Summary
 
 | Branch | Compat priority | Automation priority | Customisation priority |
-| -------- | ---------------- | -------------------- | ----------------------- |
+|--------|----------------|--------------------|-----------------------|
 | `kernel-exp` | POSIX shim VFS | Config.sigma VFS read | sigma-sysctl procfs |
 | `drivers-dev` | `.deb`/AppImage compat | Hardware CI automation | sigma-drv hot-reload |
 | `fs-dev` | File format (Tally/PDF) | sigma-cron persistent storage | SigmaFS per-user partition |
@@ -588,7 +531,7 @@ sigma-zenith keybinding list
 ## Master Compatibility Status Table
 
 | Feature | File | Status |
-| --------- | ------ | -------- |
+|---------|------|--------|
 | Linux ELF64 parser | `sigma_linux_compat.cpp` | ✅ Real |
 | Linux syscall translator (15 calls) | `sigma_linux_compat.cpp` | ⚠️ Partial |
 | Linux VMM section mapping | `sigma_linux_compat.cpp` | ❌ TODO |

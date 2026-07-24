@@ -8,17 +8,11 @@
 ## Overview
 
 The SigmaOS SDK lets you build applications that integrate natively with:
-
 - sigma-agent (AI CLI assistant)
-
 - sigma-bus (typed IPC)
-
 - sigma_pledge / sigma_unveil (security)
-
 - sigma-pkg (package distribution)
-
 - Zenith Desktop compositor
-
 - sigma-ai daemon (local LLM inference)
 
 **Languages:** Rust (primary), Nim (CLI tools), Zig (HAL/drivers), Ada/SPARK (security-critical)
@@ -28,30 +22,23 @@ The SigmaOS SDK lets you build applications that integrate natively with:
 ## Quick Start
 
 ```bash
-
 # Install SDK
-
 sigma-pkg install sigma-sdk
 
 # Scaffold a new app
-
 sigma-sdk new my-app --lang rust
 cd my-app
 
 # Build
-
 cargo build --release
 
 # Package
-
 sigma-sdk package --name my-app --version 0.1.0
 
 # Test locally
-
 sigma-pkg install my-app-0.1.0.sigpkg
 
 # Publish
-
 sigma-pkg publish my-app-0.1.0.sigpkg
 ```
 
@@ -71,13 +58,9 @@ license     = "MIT"
 arch        = ["x86_64", "aarch64"]
 
 [security]
-
 # sigma_pledge capabilities (required — be minimal)
-
 pledge      = ["stdio", "rpath", "wpath", "inet"]
-
 # sigma_unveil paths (required — be minimal)
-
 unveil      = [
   { path = "/home", perms = "r" },
   { path = "/tmp",  perms = "rw" },
@@ -88,14 +71,11 @@ sigma-libc  = ">=1.0"
 sigma-tls   = ">=2.0"
 
 [integration]
-
 # Optional: register with sigma-agent as a tool
-
 agent_tool  = true
 agent_cmds  = ["my-app do-thing", "my-app show"]
 
 # Optional: sigma-bus IPC channels
-
 bus_channels = ["BUS_MYAPP"]
 ```
 
@@ -129,14 +109,11 @@ pub extern "C" fn sigma_tool_execute(
 ```
 
 Then declare in manifest:
-
 ```toml
 [integration]
 agent_tool = true
 agent_cmds = ["my-app do-thing"]
-
 # User can then say: sigma-agent "my-app do-thing <input>"
-
 ```
 
 ---
@@ -172,7 +149,6 @@ fn ask_sigma_ai(prompt: &str) -> Result<String, Box<dyn std::error::Error>> {
 ```
 
 Or via HTTP (when daemon is running):
-
 ```bash
 curl -X POST http://localhost:11430/v1/chat \
      -d '{"message":"explain this error: segfault in my-app"}'
@@ -232,19 +208,15 @@ fn restrict_capabilities() {
 ## Packaging Your App
 
 ```bash
-
 # Build release binary
-
 cargo build --release
 
 # Create package structure
-
 mkdir -p dist/usr/bin dist/usr/share/my-app
 cp target/release/my-app dist/usr/bin/
 cp -r assets/ dist/usr/share/my-app/
 
 # Create package
-
 sigma-sdk package \
   --name my-app \
   --version 0.1.0 \
@@ -253,11 +225,9 @@ sigma-sdk package \
   --output my-app-0.1.0.sigpkg
 
 # Sign the package (Dilithium-5)
-
 sigma-pkg sign my-app-0.1.0.sigpkg --key ~/.config/sigma/signing.key
 
 # Verify
-
 sigma-pkg verify my-app-0.1.0.sigpkg
 ```
 
@@ -266,21 +236,15 @@ sigma-pkg verify my-app-0.1.0.sigpkg
 ## Publishing to sigma_pkg_registry
 
 ```bash
-
 # Create a recipe file
-
 sigma-sdk recipe create my-app
-
 # Edit sigma_pkg_registry/recipes/my-app.toml
 
 # Submit via PR to github.com/AaryanSinghChauhan09/SigmaOS
-
 # File: sigma_pkg_registry/recipes/my-app.toml
-
 ```
 
 Recipe format:
-
 ```toml
 [package]
 name     = "my-app"
@@ -299,9 +263,7 @@ license  = "MIT"
 Tools and daemons are written in Nim:
 
 ```nim
-
 # my-tool.nim
-
 import std/[os, osproc, strformat]
 
 proc main() =
@@ -315,13 +277,10 @@ main()
 ```
 
 ```bash
-
 # Build
-
 nim c -d:release --opt:speed -o:my-tool my-tool.nim
 
 # Package
-
 sigma-sdk package --name my-tool --binary my-tool
 ```
 
@@ -338,19 +297,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
-
         with: {toolchain: stable}
-
       - run: cargo build --release
       - run: cargo test
-
       # Package for SigmaOS
-
       - run: |
-
           sigma-pkg install sigma-sdk || true
           sigma-sdk package --name my-app --version 0.1.0 || true
 ```
@@ -360,7 +313,7 @@ jobs:
 ## Examples
 
 | Example | Description | Location |
-| --- | --- | --- |
+|---|---|---|
 | `sigma-edit` | Text editor | `sdk/examples/sigma-edit/` |
 | `sigma-calc` | Calculator | `sdk/examples/sigma-calc/` |
 | `sigma-files` | File manager | `sdk/examples/sigma-files/` |

@@ -30,7 +30,7 @@ pub struct Task {
 
 ## Task States
 
-```text
+```
           fork()
  UNUSED ──────────► EMBRYO ──── ready ──► RUNNABLE
                                                │
@@ -72,15 +72,13 @@ sigma_sleep_ms(100);
 
 Context switching is handled by `arch/x86_64/context_switch.asm`:
 
-```text
+```
 sigma_context_switch(from*, to*)
-
   1. Save RSP, R12-R15, RBP, RBX, RIP, CR3, RFLAGS to *from
   2. Load above from *to
   3. If CR3 differs → flush TLB (load new page table)
   4. Restore RFLAGS
   5. Jump to saved RIP (ret with pushed return address)
-
 ```
 
 Per-task kernel stack (64 KB) ensures each task has its own call stack during
@@ -93,7 +91,7 @@ interrupt handling and kernel operations.
 At boot, two tasks are created:
 
 | PID | Name | Policy | Description |
-| ----- | ------ | -------- | ------------- |
+|-----|------|--------|-------------|
 | 0 | `idle` | MLFQ Q3 | Runs `hlt` when nothing else is runnable |
 | 1 | `init` | MLFQ Q0 | First userspace process, parent of all others |
 
@@ -102,7 +100,7 @@ At boot, two tasks are created:
 ## Maximum Limits
 
 | Limit | Value |
-| ------- | ------- |
+|-------|-------|
 | Max concurrent tasks | 256 |
 | Open FDs per process | 256 |
 | Kernel stack size | 64 KB |

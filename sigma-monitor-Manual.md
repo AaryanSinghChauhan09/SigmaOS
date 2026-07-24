@@ -6,7 +6,7 @@
 
 ## SYNOPSIS
 
-```text
+```
 sigma-monitor [mode] [--interval <sec>] [--count <n>] [--json]
 sigma-monitor --version
 sigma-monitor --help
@@ -21,7 +21,7 @@ Output supports both human-readable terminal display and `--json` for CI/monitor
 ## MODES
 
 | Mode | Description |
-| ------ | ------------- |
+|------|-------------|
 | `cpu` | CPU usage per core with bar chart, colour-coded by threshold |
 | `mem` | RAM + swap usage, used/total/percentage |
 | `net` | Network I/O (rx/tx bytes) per interface |
@@ -33,7 +33,7 @@ Output supports both human-readable terminal display and `--json` for CI/monitor
 ## OPTIONS
 
 | Flag | Description |
-| ------ | ------------- |
+|------|-------------|
 | `--interval <sec>` | Refresh interval for watch mode (default: 2) |
 | `--count <n>` | Stop after N samples (default: infinite in watch, 1 otherwise) |
 | `--json` | Emit JSON lines instead of ANSI terminal output |
@@ -45,7 +45,7 @@ Output supports both human-readable terminal display and `--json` for CI/monitor
 CPU usage bar changes colour based on load:
 
 | Threshold | Colour |
-| ----------- | -------- |
+|-----------|--------|
 | < 50% | Green |
 | 50–80% | Yellow |
 | > 80% | Red |
@@ -53,21 +53,16 @@ CPU usage bar changes colour based on load:
 ## EXAMPLES
 
 ```bash
-
 # Single snapshot, all metrics
-
 sigma-monitor
 
 # Watch CPU only, refresh every second
-
 sigma-monitor cpu --interval 1
 
 # Collect 10 samples of memory stats in JSON
-
 sigma-monitor mem --count 10 --json
 
 # Run continuously and pipe to a log
-
 sigma-monitor all --json >> /var/log/sigma-metrics.jsonl
 ```
 

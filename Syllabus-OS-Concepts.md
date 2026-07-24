@@ -43,7 +43,7 @@ An Operating System is foundational system software that manages hardware resour
 
 ### Process States
 
-```text
+```
 NEW → READY → RUNNING → TERMINATED
                 ↓ ↑
              WAITING/BLOCKED
@@ -161,7 +161,7 @@ sigma_signal(PROC_42, SIGKILL);  // Force termination
 
 ### Memory Hierarchy
 
-```text
+```
 Registers (< 1ns) → L1 Cache (1ns) → L2 Cache (3ns) → L3 Cache (10ns)
 → RAM (50ns) → NVMe SSD (100μs) → HDD (10ms) → Cloud (RTT)
 ```
@@ -248,7 +248,7 @@ class SovereignIOScheduler {
 
 ### File System — S-ZFS
 
-```text
+```
 SigmaOS Virtual File System (VFS)
 ├── /sigma/          — OS root
 │   ├── kernel/      — Kernel modules
@@ -285,22 +285,15 @@ sigma_closedir(dir);
 
 ### Common Issues & Fix Strategies
 
-- **Issue - Kernel Memory Leaks:** Unreleased slab allocations or orphaned page frames exhaust physical RAM over time.
-
-- *Fix Strategy:* Implement strict RAII smart pointer wrappers (`SigmaUniquePtr`), execute automated kernel slab leak tracking, and run Valgrind/KASAN profiling tools during boot validation.
-
-- **Issue - Concurrency Deadlocks:** Threads acquire multiple mutex locks in conflicting orders, stalling kernel execution indefinitely.
-
-- *Fix Strategy:* Enforce a strict lock acquisition hierarchy across all kernel subsystems, utilize `try_lock` with exponential backoff, and integrate priority inheritance protocols to prevent priority inversion.
-
-- **Issue - File System Corruption & Incorrect Indexing:** Sudden power loss leaves VFS B+ Tree directory indices fragmented or corrupted.
-
-- *Fix Strategy:* Utilize S-ZFS Copy-on-Write (CoW) transactional semantics, ensuring directory structures are updated atomically via merkle tree root updates without requiring fsck disk scrubbing.
-
-- **Issue - Unhandled Interrupt Storms:** Faulty peripheral hardware floods the APIC with unhandled IRQs, starving userland CPU execution.
-
-- *Fix Strategy:* Implement interrupt throttling and switch from pure interrupt-driven I/O to polling mode (NAPI equivalent) under high packet/event loads.
+* **Issue - Kernel Memory Leaks:** Unreleased slab allocations or orphaned page frames exhaust physical RAM over time.
+  * *Fix Strategy:* Implement strict RAII smart pointer wrappers (`SigmaUniquePtr`), execute automated kernel slab leak tracking, and run Valgrind/KASAN profiling tools during boot validation.
+* **Issue - Concurrency Deadlocks:** Threads acquire multiple mutex locks in conflicting orders, stalling kernel execution indefinitely.
+  * *Fix Strategy:* Enforce a strict lock acquisition hierarchy across all kernel subsystems, utilize `try_lock` with exponential backoff, and integrate priority inheritance protocols to prevent priority inversion.
+* **Issue - File System Corruption & Incorrect Indexing:** Sudden power loss leaves VFS B+ Tree directory indices fragmented or corrupted.
+  * *Fix Strategy:* Utilize S-ZFS Copy-on-Write (CoW) transactional semantics, ensuring directory structures are updated atomically via merkle tree root updates without requiring fsck disk scrubbing.
+* **Issue - Unhandled Interrupt Storms:** Faulty peripheral hardware floods the APIC with unhandled IRQs, starving userland CPU execution.
+  * *Fix Strategy:* Implement interrupt throttling and switch from pure interrupt-driven I/O to polling mode (NAPI equivalent) under high packet/event loads.
 
 ---
 
-### Last updated: 2026-05-19 | SigmaOS Zenith v15.2
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

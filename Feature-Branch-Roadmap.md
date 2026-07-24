@@ -10,7 +10,7 @@ Every task maps to a real file with a known current state.
 ## Actual Implementation State (Ground Truth)
 
 | Component | File | State |
-| ----------- | ------ | ------- |
+|-----------|------|-------|
 | Kernel boot entry | `kernel/core/sigma_kernel_main.c` | ✅ Real |
 | Buddy allocator | `kernel/memory/sigma_allocator.cpp` | ✅ Real |
 | MCS scheduler | `kernel/sched/sigma_mcs.cpp` | ✅ Real |
@@ -34,12 +34,11 @@ Every task maps to a real file with a known current state.
 ## `kernel-exp` — Feature Roadmap
 
 ### Feature 1: Syscall Dispatch (BLOCKS EVERYTHING)
-
 **Current:** `sigma_syscalls.cpp` — all handlers are `return 0` stubs. 8 syscall numbers defined.
 **Need:** Full dispatch table wired to real subsystems.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Wire `SIGMA_SYS_DEBUG_PRINT` to serial + VGA | `kernel/syscalls/sigma_syscalls.cpp` | Route to `serial_puts()` / `vga_putc()` |
 | Wire `SIGMA_SYS_ALLOC_MEM` to buddy allocator | `kernel/syscalls/sigma_syscalls.cpp` | Call `sigma_malloc(arg1)`, return ptr |
 | Wire `SIGMA_SYS_FREE_MEM` to buddy allocator | `kernel/syscalls/sigma_syscalls.cpp` | Call `sigma_free((void*)arg1)` |
@@ -53,12 +52,11 @@ Every task maps to a real file with a known current state.
 **Exit test:** `write(1, "hello\n", 6)` from a static userland binary prints to serial.
 
 ### Feature 2: VMM — Page Table Walker (BLOCKS COMPAT LAYER, USERLAND)
-
 **Current:** `sigma_vmm.cpp` — `sigma_vmm_map` is empty. `sigma_mmap` treats virtual = physical.
 **Need:** Real 4-level page table walk with PML4→PDPT→PD→PT.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | x86-64 PML4 init at boot | `kernel/memory/sigma_vmm.cpp` | Allocate PML4 from buddy, write CR3 |
 | `sigma_vmm_map(ctx, vaddr, paddr, flags)` — full 4-level walk | `kernel/memory/sigma_vmm.cpp` | Allocate PDPT/PD/PT as needed via `sigma_malloc` |
 | `sigma_vmm_unmap(ctx, vaddr)` — clear PTE + TLB flush | `kernel/memory/sigma_vmm.cpp` | `invlpg` instruction |
@@ -70,11 +68,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** Userland process at VA 0x400000 reads/writes a mapped page; CoW copies on write.
 
 ### Feature 3: MLFQ Scheduler (upgrade from round-robin)
-
 **Current:** `sigma_kernel_main.c` calls `sigma_sched_init()` + `sigma_sched_add_task()` for two dummy tasks. MCS budget accounting exists (`sigma_mcs.cpp`). MLFQ likely exists in `kernel/scheduler/`.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Verify MLFQ body exists and compiles | `kernel/scheduler/sigma_mlfq.cpp` (or `.h`) | Run `make PROFILE=microkernel` |
 | Wire MLFQ with MCS budget accounting | `kernel/sched/sigma_mcs.cpp` | Call `sigma_mcs_check_budget` in scheduler tick |
 | Priority inheritance for mutex waiters | `kernel/sched/sigma_pi.cpp` | Elevate waiter to holder's priority |
@@ -86,11 +83,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** 8 tasks at mixed priorities run for 10 seconds — high-priority tasks get more CPU cycles measurably.
 
 ### Feature 4: IRQ / Interrupt Controller
-
 **Current:** `idt_init()` and `sigma_pic_init()` called at boot. Timer at 1000 Hz. Keyboard IRQ handler present.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | APIC init (replace PIC for SMP) | `kernel/core/sigma_irq.cpp` | Write to APIC MMIO base; disable PIC |
 | Local APIC timer (replace PIT) | `kernel/core/sigma_timer.cpp` | Calibrate against PIT, then switch |
 | I/O APIC for PCI MSI-X | `hal/sigma_pci.cpp` | Read IOAPIC redirection table, enable MSI |
@@ -101,11 +97,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** Timer fires 1000× per second on APIC; TLB shootdown IPI works across 2 virtual CPUs.
 
 ### Feature 5: UEFI Bootloader (`sigma-boot.efi`)
-
 **Current:** Doesn't exist. Kernel is loaded by GRUB/QEMU multiboot.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | UEFI PE binary skeleton | `sigma-boot/sigma_boot.c` | EDK2 application entry `efi_main()` |
 | Load kernel ELF from ESP partition | `sigma-boot/sigma_elf_loader.c` | `EFI_FILE_PROTOCOL->Read()` |
 | UEFI GOP framebuffer setup | `sigma-boot/sigma_gop.c` | `EFI_GRAPHICS_OUTPUT_PROTOCOL` |
@@ -121,11 +116,10 @@ Every task maps to a real file with a known current state.
 ## `drivers-dev` — Feature Roadmap
 
 ### Feature 6: Real GPU / DRM / KMS Pipeline
-
 **Current:** `SovereignGPU.cpp` — framebuffer base address is a hardcoded constant (`0xE0000000`), swap and shader functions log to serial. No real register writes.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | VirtIO-GPU device detect + init | `drivers/display/sigma_virtio_gpu.cpp` | Scan PCI for vendor 0x1AF4 device 0x1050 |
 | VirtIO-GPU resource create (2D) | `drivers/display/sigma_virtio_gpu.cpp` | `VIRTIO_GPU_CMD_RESOURCE_CREATE_2D` |
 | VirtIO-GPU set scanout + flush | `drivers/display/sigma_virtio_gpu.cpp` | Attach resource to scanout, flush rect |
@@ -140,11 +134,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** Zenith compositor renders a 1920×1080 desktop frame via VirtIO-GPU in QEMU at ≥60 FPS.
 
 ### Feature 7: Wi-Fi Drivers
-
 **Current:** `drivers/SovereignWiFi.cpp` exists (not read). `sigma_iwlwifi.h` stub.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | cfg80211 nl80211 userspace framework | `drivers/net/sigma_cfg80211.cpp` | Netlink socket, `NL80211_CMD_CONNECT` |
 | Intel iwlwifi firmware loader | `drivers/net/sigma_iwlwifi.cpp` | Load `.ucode` firmware blob via sigma-vfs |
 | iwlwifi MVM driver (7265/8265/AX200) | `drivers/net/sigma_iwlwifi.cpp` | MMIO init, Tx/Rx queues |
@@ -156,11 +149,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** `sigma-net connect --ssid HomeNetwork --psk password` associates and gets DHCP IP.
 
 ### Feature 8: NVMe + Storage Real DMA
-
 **Current:** `SovereignNVMe.cpp` — DMA is `status = 0; // Assume success`. Queue depth tracked but no real submission queue.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | NVMe admin queue setup (SQ+CQ) | `drivers/storage/sigma_nvme.cpp` | Write `ASQ`, `ACQ`, `AQA` BAR registers |
 | NVMe identify controller | `drivers/storage/sigma_nvme.cpp` | Submit admin cmd 0x06, read `MDTS` |
 | NVMe I/O queue creation | `drivers/storage/sigma_nvme.cpp` | Create/Delete I/O Submission + Completion queues |
@@ -172,11 +164,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** `sigma-fsck /dev/nvme0n1` reads actual sectors from QEMU NVMe device.
 
 ### Feature 9: Real NIC — e1000 / VirtIO-net DMA Ring
-
 **Current:** `SovereignNIC.cpp` — `transmit()` logs a string, `receive()` returns 0. No DMA ring.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | e1000 Tx descriptor ring setup | `kernel/core/drivers/SovereignE1000.cpp` | Write `TDBAL/TDBAH/TDLEN/TDH/TDT` MMIO |
 | e1000 Rx descriptor ring setup | `kernel/core/drivers/SovereignE1000.cpp` | Write `RDBAL/RDBAH/RDLEN/RDH/RDT` MMIO |
 | e1000 transmit: fill descriptor + kick TDT | `kernel/core/drivers/SovereignE1000.cpp` | Set buffer address, length, CMD byte |
@@ -188,11 +179,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** `ping 10.0.2.2` from QEMU guest reaches QEMU host gateway and gets ICMP reply.
 
 ### Feature 10: Audio — HDA Controller
-
 **Current:** No audio driver exists.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | HDA controller detect (PCI class 0x0403) | `drivers/audio/sigma_hda.cpp` | Map MMIO BAR0 |
 | HDA CORB/RIRB setup | `drivers/audio/sigma_hda.cpp` | Codec command/response ring buffers |
 | HDA codec node enumeration | `drivers/audio/sigma_hda.cpp` | `GET_PARAMETER(AFG)` → pin widgets |
@@ -207,11 +197,10 @@ Every task maps to a real file with a known current state.
 ## `fs-dev` — Feature Roadmap
 
 ### Feature 11: VFS — Real File Operations
-
 **Current:** VFS header exists. `vfs_open/read/write/close` likely partial. `POSIXShim.cpp` calls `vfs_open/read/write/close` but VMM not connected.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | `vfs_open(pid, path, flags)` — path lookup | `kernel/vfs/sigma_vfs.cpp` | Walk directory tree from root inode |
 | `vfs_read(pid, fd, buf, count)` — block read | `kernel/vfs/sigma_vfs.cpp` | Translate fd → inode → block device read |
 | `vfs_write(pid, fd, buf, count)` | `kernel/vfs/sigma_vfs.cpp` | Dirty page marking + write-back |
@@ -224,11 +213,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** Shell can `echo hello > /tmp/test.txt && cat /tmp/test.txt` via tmpfs.
 
 ### Feature 12: SigmaFS Native Filesystem
-
 **Current:** `sigmafs.c` present. State unknown.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | On-disk layout: superblock + inode bitmap + block bitmap | `fs/sigmafs/sigma_mkfs.cpp` | Write superblock at LBA 0 |
 | `sigma_mkfs /dev/nvme0n1p1` tool | `fs/sigmafs/sigma_mkfs.cpp` | Format partition with SigmaFS |
 | Inode read/write | `fs/sigmafs/sigma_inode.cpp` | Inode table, direct + indirect blocks |
@@ -240,11 +228,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** `sigma-pkg install vim` installs to SigmaFS partition, survives reboot.
 
 ### Feature 13: Unified Buffer Cache (UBC)
-
 **Current:** `kernel/fs/sigma_ubc.h` — header only, no implementation.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Page cache hash table | `kernel/fs/sigma_ubc.cpp` | `(dev, block) → struct page*` radix tree |
 | Dirty page list + writeback thread | `kernel/fs/sigma_ubc.cpp` | kthread flushes dirty pages every 5 s |
 | Zero-copy read: map page into user VA | `kernel/fs/sigma_ubc.cpp` | Share physical page via VMM instead of copy |
@@ -259,11 +246,10 @@ Every task maps to a real file with a known current state.
 ## `performance-optimized` — Feature Roadmap
 
 ### Feature 14: Real PQC Cryptographic Primitives
-
 **Current:** Both Kyber and Dilithium use `splitmix64` PRNG and XOR — not cryptographically secure.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Integrate liboqs Kyber-1024 NTT | `crypto/SovereignKyber.cpp` | Swap `kyber_gen_matrix` with liboqs backend |
 | AVX-512 NTT for Kyber poly-mul | `crypto/sigma_kyber_avx512.cpp` | Hand-vectorized butterfly operations |
 | ARM NEON NTT for Kyber poly-mul | `crypto/sigma_kyber_neon.cpp` | NEON intrinsics for poly_mul_acc |
@@ -277,11 +263,10 @@ Every task maps to a real file with a known current state.
 **Benchmark target:** Kyber-1024 KEM: ≥5.8 M ops/sec on AVX-512, ≥2.1 M on NEON.
 
 ### Feature 15: Silicon-Aware Scheduler + PGO
-
 **Current:** MLFQ exists. MCS budget accounting wired. No NUMA, no CFS, no PGO.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | NUMA topology reader | `kernel/sched/sigma_numa.cpp` | Parse ACPI SRAT table at boot |
 | Per-NUMA-node runqueue | `kernel/sched/sigma_numa.cpp` | Prefer tasks on their home node |
 | Load balancer (steal from distant node) | `kernel/sched/sigma_lb.cpp` | `sigma_lb_tick()` every 100 ms |
@@ -295,11 +280,10 @@ Every task maps to a real file with a known current state.
 **Benchmark target:** Context switch < 50 ns; boot time < 2 s on NVMe.
 
 ### Feature 16: Vulkan Compositor Acceleration
-
 **Current:** `SovereignGPU.cpp` — `swapBuffers()` just resets a watchdog counter. Compositor uses a mock framebuffer (static C array).
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Vulkan instance + physical device init | `zenith_desktop/compositor/sigma_vk_init.cpp` | `vkCreateInstance`, `vkEnumeratePhysicalDevices` |
 | Vulkan swapchain for DRM output | `zenith_desktop/compositor/sigma_vk_swapchain.cpp` | `vkCreateSwapchainKHR` with KMS DRM fd |
 | Vulkan command buffer per frame | `zenith_desktop/compositor/sigma_vk_frame.cpp` | Triple-buffer, pre-record draw calls |
@@ -315,11 +299,10 @@ Every task maps to a real file with a known current state.
 ## `tools-dev` — Feature Roadmap
 
 ### Feature 17: Shell — Connect TTY to Real I/O
-
 **Current:** `sigma_shell.cpp` — full parser + builtins. REPL loop reads from `line[0] = '\0'` placeholder. Tokenizer, history, aliases, env vars all real. **The shell does nothing at runtime without a TTY fd.**
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | TTY fd read via `sigma_sys_read(0, ...)` | `userland/shell/sigma_shell.cpp` | Replace placeholder with real syscall |
 | Echo mode + raw mode toggle | `userland/shell/sigma_shell.cpp` | `ECHO`/`ICANON` terminal flags |
 | Fork + exec for external commands | `userland/shell/sigma_shell.cpp` | `sigma_sys_fork()` + `sigma_sys_execve()` |
@@ -332,11 +315,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** `ls | grep sigma | wc -l` works end-to-end in QEMU terminal.
 
 ### Feature 18: sigma-wine — Win32 Compat (Stage W1–W2)
-
 **Current:** PE loader parses headers but `s.mem = NULL`. ntdll has 20 NT functions. kernel32 console I/O exists. wine_loader orchestrates but VMM integration is TODO.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | sigma-vmm region allocation for PE sections | `runtime/compat/win32/sigma_pe_loader.cpp` | Call `sigma_vmm_map_region(va, size, perms)` |
 | Base relocation application | `runtime/compat/win32/sigma_pe_loader.cpp` | Walk `IMAGE_BASE_RELOCATION` chain, patch addresses |
 | IAT patching with sigma-ntdll stubs | `runtime/compat/win32/sigma_pe_loader.cpp` | Resolve each import by name → sigma DLL |
@@ -352,11 +334,10 @@ Every task maps to a real file with a known current state.
 **Exit test:** `sigma-wine hello.exe` prints `Hello, SigmaOS!` on serial console in QEMU.
 
 ### Feature 19: sigma-cli Completions + Profile Engine
-
 **Current:** `sigma_cli.cpp` — modular CLI with profiles/aliases. VFS profile load is `[~]` partial.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | VFS read `~/.sigma_profile` on shell start | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `vfs_open("/home/user/.sigma_profile")` |
 | Apply profile → WM layout + theme | `zenith_desktop/zenith_unified_init.cpp` | Call `sigma_wm_layout(mode)` from profile key |
 | `sigma-cli pkg install/remove/list` | `userland/tools/sigma_cli.cpp` | Route to sigma-pkg via IPC |
@@ -367,11 +348,10 @@ Every task maps to a real file with a known current state.
 | sigma-observatory stub TUI | `userland/tools/sigma_observatory.cpp` | ncurses-style live stats for CPU/mem/net |
 
 ### Feature 20: sigma-pkg — Package Manager
-
 **Current:** `sigma_pkg_registry/` exists. Deb/rpm/apk compat resolver not implemented. No live repo server.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | sigma-repo-server (Go HTTPS) | `sigmad/repo/main.go` | Serve `.spkg` files with Dilithium3-signed index |
 | `sigma-pkg install <name>` end-to-end | `userland/sigma-pkg/sigma_pkg.cpp` | Fetch + Dilithium3-verify + extract to VFS |
 | dm-verity on package install | `userland/sigma-pkg/sigma_pkg.cpp` | Hash tree check before extraction |
@@ -385,11 +365,10 @@ Every task maps to a real file with a known current state.
 ## `release/standalone` — Feature Roadmap
 
 ### Feature 21: Zenith Desktop — Full Pipeline
-
 **Current:** Tiling WM is real. Compositor has render loop + mock framebuffer. `composite_window()` is empty. Input polling via IPC stub.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Connect compositor to real DRM framebuffer | `zenith_desktop/compositor/sigma_compositor.cpp` | Replace mock 1920×1080 array with real GPU FB |
 | Implement `composite_window()` alpha blend | `zenith_desktop/compositor/sigma_compositor.cpp` | Porter-Duff over operator, SIMD accelerated |
 | Real input event loop (keyboard + pointer) | `zenith_desktop/compositor/sigma_compositor.cpp` | Read from `/dev/input/event0` via sigma-vfs |
@@ -400,11 +379,10 @@ Every task maps to a real file with a known current state.
 | Theme hot-reload without restart | `zenith_desktop/theme/sigma_theme_engine.cpp` | Watch `~/.sigma_profile` for inotify-equiv |
 
 ### Feature 22: DID-Based Login
-
 **Current:** `SovereignDID.cpp` exists in security/. No display manager. No QR code generator.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | `sigma-dm` display manager | `userland/display/sigma_dm.cpp` | Show QR code on Zenith framebuffer |
 | QR code generator | `userland/display/sigma_qr.cpp` | Encode DID URL as QR matrix |
 | sigma-ultra companion app scan | `userland/sigma_ultra.cpp` | USSD or BLE scan → DID proof |
@@ -413,11 +391,10 @@ Every task maps to a real file with a known current state.
 | Fallback PIN entry | `userland/display/sigma_dm.cpp` | TOTP / static PIN for no-camera devices |
 
 ### Feature 23: sigma-ai Local LLM
-
 **Current:** `userland/ai/` directory exists. sigma-heal/sigma-lex reference sigma-ai but no LLM backend.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | llama.cpp integration | `userland/ai/sigma_ai_llama.cpp` | Fork llama.cpp, call `llama_eval()` |
 | sigma-ai daemon with IPC API | `userland/ai/sigma_ai_daemon.cpp` | sigma-bus: `sigma_ai_ask(prompt, &response)` |
 | Sarvam-1 model bundle (.gguf) | `sigma_pkg_registry/recipes/sarvam1.recipe` | Download + verify 4.1 GB model |
@@ -427,11 +404,10 @@ Every task maps to a real file with a known current state.
 | Indian language routing | `userland/ai/sigma_ai_lang.cpp` | Auto-detect Devanagari/Tamil/Telugu input |
 
 ### Feature 24: Indian IME
-
 **Current:** Nothing. `sigma_locale.h` exists but no translation strings, no input method.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Inscript keyboard layout engine | `userland/ime/sigma_inscript.cpp` | Map scan codes to Unicode code points |
 | Phonetic (transliteration) input | `userland/ime/sigma_phonetic.cpp` | "namaste" → "नमस्ते" via rule table |
 | 22-language Unicode support | `userland/ime/sigma_unicode.cpp` | All scheduled Indian languages |
@@ -444,11 +420,10 @@ Every task maps to a real file with a known current state.
 ## `release/microkernel` — Feature Roadmap
 
 ### Feature 25: Minimal Kernel Profile
-
 **Current:** `sigma_kernel_main.c` supports `SIGMA_MINIMAL_MODE` but it just skips tasks.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Strip kernel to 15 essential syscalls | `kernel/core/sigma_syscall_dispatch.cpp` | `#ifdef SIGMA_MICROKERNEL_PROFILE` |
 | sigma-bus IPC end-to-end | `kernel/ipc/sigma_bus.cpp` | Capability token passing over IPC channel |
 | Capability-based access control | `kernel/security/sigma_caps.cpp` | Deny syscalls without capability token |
@@ -463,11 +438,10 @@ Every task maps to a real file with a known current state.
 ## `release/cloud` — Feature Roadmap
 
 ### Feature 26: Container Enforcement — Kernel Path
-
 **Current:** `sigma-pod run-native` sends namespace/cgroup spec as IPC. Kernel orchestrator `[~]` partial. Cgroup enforcement `[~]` partial.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | `sigma_cgroup.c` CPU quota enforcement | `kernel/core/process/sigma_cgroup.c` | Throttle task when `cpu.quota` exceeded |
 | `sigma_cgroup.c` memory limit | `kernel/core/process/sigma_cgroup.c` | OOM kill when `memory.limit` exceeded |
 | `sigma_cgroup.c` I/O bandwidth limit | `kernel/core/process/sigma_cgroup.c` | Token bucket on block I/O submissions |
@@ -484,11 +458,10 @@ Every task maps to a real file with a known current state.
 ## `release/distributed` — Feature Roadmap
 
 ### Feature 27: SovereignCloudFS + Mesh Compute
-
 **Current:** `net/sigma_cloudfs.cpp` and `net/sigma_mesh.cpp` exist (state unknown).
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | SovereignCloudFS: Raft consensus | `net/sigma_cloudfs.cpp` | 3-node Raft leader election + log replication |
 | SovereignCloudFS: block sync | `net/sigma_cloudfs.cpp` | Encrypted multi-node block replication |
 | CRDT offline sync | `net/sigma_offline_sync.cpp` | LWW-element set for key-value store |
@@ -501,11 +474,10 @@ Every task maps to a real file with a known current state.
 ## `release/rtos` — Feature Roadmap
 
 ### Feature 28: Hard Real-Time Guarantees
-
 **Current:** EDF exists in scheduler roadmap. MCS budget accounting is real. No priority inheritance.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | PREEMPT_RT-style full kernel preemption | `kernel/core/sigma_sched.cpp` | All spinlocks → mutex, preemptible IRQ handlers |
 | EDF scheduler (earliest-deadline-first) | `kernel/sched/sigma_edf.cpp` | `struct edf_task { deadline_ns; }` + priority queue |
 | Priority inheritance for mutexes | `kernel/sched/sigma_pi.cpp` | Elevate holder to waiter's priority temporarily |
@@ -519,11 +491,10 @@ Every task maps to a real file with a known current state.
 ## `release/mobile` — Feature Roadmap
 
 ### Feature 29: ARM64 Full BSP
-
 **Current:** Stubs in `arch/arm64/`. No working cross-compile toolchain confirmed.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | ARM64 GIC-400 interrupt controller | `arch/arm64/sigma_gic.cpp` | GICD/GICC MMIO init, IRQ routing |
 | ARM64 MMU (4-level TTBR0/TTBR1) | `arch/arm64/sigma_mmu.cpp` | `TCR_EL1` setup, TTBR0 for user, TTBR1 for kernel |
 | BCM2711 BSP (RPi 4) | `arch/arm64/sigma_bcm2711.cpp` | UART, GENET eth, PCIe, VidCore VI |
@@ -538,11 +509,10 @@ Every task maps to a real file with a known current state.
 ## `release/dual-boot` — Feature Roadmap
 
 ### Feature 30: Dual-Boot Install
-
 **Current:** No installer exists. No EFI entry registration. No NTFS driver.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Partition detector | `userland/installer/sigma_part_detect.cpp` | Read GPT/MBR, list existing OS partitions |
 | EFI boot entry registration | `sigma-boot/sigma_efi_entry.c` | `EFI_BOOT_MANAGER_PROTOCOL->AddBootEntry()` |
 | Shrink existing NTFS partition | `userland/installer/sigma_part_resize.cpp` | libparted-style online resize |
@@ -556,23 +526,21 @@ Every task maps to a real file with a known current state.
 ## `gh-pages` / `prepare-sigmaos-launch` — Feature Roadmap
 
 ### Feature 31: CI Pipeline — Real Tests
-
 **Current:** QEMU tests in `sigma_qemu.yml` are `echo "Simulating..."`. Many test steps use `|| true`.
 
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Wire QEMU boot test to real ISO | `.github/workflows/sigma_qemu.yml` | Remove `echo`, use `qemu-system-x86_64 -cdrom SigmaOS.iso` |
 | Assert boot reaches shell in < 30 s | `.github/workflows/sigma_ci.yml` | `timeout 30 bash -c "..."` with exit code check |
 | `make check-abi` gate on `SIGMA_STABLE` symbols | `Makefile` | `nm` diff between PRs |
 | Wine compat CI | `.github/workflows/sigma_wine_ci.yml` | Run `sigma-wine hello.exe` in QEMU |
 | Memory sanitizer build | `.github/workflows/sigma_ci.yml` | `-fsanitize=address,undefined` build variant |
-| SPDX header enforcement (fail, not warn) | `.github/workflows/sigma_ci.yml` | Change ` || true` to real exit code check |
+| SPDX header enforcement (fail, not warn) | `.github/workflows/sigma_ci.yml` | Change `|| true` to real exit code check |
 | Doxygen → wiki auto-publish | `.github/workflows/sigma_ci.yml` | Run `doxygen Doxyfile` + commit to wiki_repo |
 
 ### Feature 32: Website + App Store
-
 | Task | File | Detail |
-| ------ | ------ | -------- |
+|------|------|--------|
 | Branch status dashboard | `site.js` | Poll GitHub API, show per-branch CI badge |
 | Interactive roadmap gantt | `roadmap.html` | D3.js Gantt based on this roadmap file |
 | QEMU-in-browser demo | `browser/sigma_qemu_web.js` | `qemu.js` WebAssembly port |
@@ -584,8 +552,7 @@ Every task maps to a real file with a known current state.
 ## Master Feature Checklist (all branches)
 
 | # | Feature | Branch | Priority | Status |
-
-| --- | --------- | --------- | ---------- | -------- |
+|---|---------|---------|----------|--------|
 | 1 | Syscall dispatch (real bodies) | `kernel-exp` | 🔴 | ❌ |
 | 2 | VMM page table walker | `kernel-exp` | 🔴 | ⚠️ |
 | 3 | UEFI bootloader (`sigma-boot.efi`) | `kernel-exp` | 🔴 | ❌ |

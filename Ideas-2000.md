@@ -9,8 +9,7 @@
 ## New Categories (ideas 1001–2000)
 
 | # | Category | Ideas | Highlights |
-
-| --- | --- | --- | --- |
+|---|---|---|---|
 | 1 | 🧬 Science & Bioinformatics | 1001–1025 | HPC, BLAST, DICOM-RT, FHIR R4, FASTQ parser |
 | 2 | 🚀 Space & Aerospace | 1026–1055 | SpaceWire, MIL-STD-1553, DO-178C, CubeSat OS, SEU mitigation |
 | 3 | 🏎️ Automotive | 1056–1095 | AUTOSAR, CAN FD, FlexRay, SOME/IP, OBD-II, V2X, ADAS |
@@ -44,7 +43,6 @@
 ## Combined backlog: 2000 ideas
 
 - [IDEAS_1000.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/IDEAS_1000.md) — ideas 1–1000
-
 - [IDEAS_2000.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/IDEAS_2000.md) — ideas 1001–2000
 
 **Contribute idea #2001+** via [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) → label `idea`
