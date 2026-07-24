@@ -296,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_modern_device_oop() {
-        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(
             modern.query_channel(),
             PortAddress::MemoryMapped(0xFE000000)

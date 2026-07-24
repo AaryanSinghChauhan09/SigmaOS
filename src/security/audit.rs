@@ -11,13 +11,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat {
-    Text,
-    Json,
-    Binary,
-}
-
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
@@ -205,3 +198,49 @@ impl AuditPolicy for SimpleAuditPolicy {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_audit_event() {
+        let event = SimpleAuditEvent::new(101, EventType::Authentication, 42, b"User logged in");
+        assert_eq!(event.id(), 101);
+        assert_eq!(event.event_type(), EventType::Authentication);
+        assert_eq!(event.user_id(), 42);
+        assert_eq!(event.description(), b"User logged in");
+    }
+
+    #[test]
+    fn test_simple_audit_logger() {
+        let mut logger = SimpleAuditLogger::new();
+        let event = Box::new(SimpleAuditEvent::new(
+            101,
+            EventType::Authentication,
+            42,
+            b"User logged in",
+        ));
+        let id = logger.log_event(event).unwrap();
+        assert_eq!(id, 101);
+
+        let retrieved = logger.get_event(101).unwrap();
+        assert_eq!(retrieved.id(), 101);
+
+        let queried = logger.query_events(EventType::Authentication, 42);
+        assert_eq!(queried.len(), 1);
+        assert_eq!(queried[0], 101);
+
+        logger.clear_events(2000000).unwrap();
+        assert!(logger.get_event(101).is_none());
+    }
+
+    #[test]
+    fn test_simple_audit_policy() {
+        let policy = SimpleAuditPolicy::new();
+        let auth_event = SimpleAuditEvent::new(1, EventType::Authentication, 42, b"Login");
+        let sys_event = SimpleAuditEvent::new(2, EventType::SystemChange, 42, b"Change");
+
+        assert!(policy.check_compliance(&auth_event));
+        assert!(!policy.check_compliance(&sys_event));
+    }
+}

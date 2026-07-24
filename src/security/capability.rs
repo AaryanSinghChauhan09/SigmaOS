@@ -52,14 +52,10 @@ impl CapabilityToken {
         }
     }
 
-    /// Constructor with parameters for compatibility
-    pub fn with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
-        CapabilityToken {
-            id,
-            allowed_paths,
-            allowed_ports: ports.to_vec(),
-            is_revoked: false,
-            bits: !0,
+    /// Allow file read access
+    pub fn allow_read(mut self, path: &str) -> Self {
+        if path.starts_with("/var/www") || path == "/" {
+            self.bits |= 1 << 2;
         }
     }
 

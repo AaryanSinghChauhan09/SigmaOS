@@ -190,12 +190,6 @@ pub trait CRL {
     fn get_crl(&self) -> Vec<(CertificateID, u32)>;
 }
 
-
-#[derive(Debug, Clone)]
-pub struct CertificateAuthority {
-    pub name: alloc::string::String,
-}
-
 pub struct SimpleCRL {
     pub revoked: Vec<(CertificateID, u32)>,
 }
@@ -213,10 +207,6 @@ impl Default for SimpleCRL {
         Self::new()
     }
 }
-
-pub type CertificateAuthority = SimplePKIManager;
-pub type PkiError = PKIError;
-pub type PkiManager = SimplePKIManager;
 
 impl CRL for SimpleCRL {
     fn add_to_crl(&mut self, cert_id: CertificateID, reason: u32) {
@@ -284,6 +274,3 @@ mod tests {
         assert_eq!(current_crl[0], (101, 1));
     }
 }
-
-pub type PkiError = PKIError;
-pub type PkiManager = dyn PKIManager;

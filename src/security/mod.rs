@@ -1,14 +1,13 @@
 pub mod lsm;
 
+pub mod audit;
 pub mod capability;
-pub mod clipboard;
 pub mod integrity;
-pub mod intrusion;
 pub mod mac;
-pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod secrets;
+pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{

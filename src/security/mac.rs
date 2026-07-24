@@ -77,10 +77,6 @@ impl Default for ContextCapability {
     }
 }
 
-pub type MacPolicy = dyn MACPolicy;
-pub type MacRule = PolicyInfo;
-pub type MacSecurity = SimpleMACEngine;
-
 impl SecurityContext {
     pub fn new(
         id: ContextID,
@@ -452,24 +448,6 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-
-#[derive(Debug, Clone)]
-pub struct MacRule {
-    pub name: alloc::string::String,
-    pub allowed: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct MacSecurity {
-    pub enabled: bool,
-}
-
-impl MacSecurity {
-    pub fn new() -> Self {
-        Self { enabled: true }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -516,5 +494,3 @@ mod tests {
         assert_eq!(stats.access_denied, 1);
     }
 }
-
-pub type MacPolicy = dyn MACPolicy;
