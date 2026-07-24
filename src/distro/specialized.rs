@@ -210,6 +210,90 @@ impl EduPlayground {
     }
 }
 
+/// Sigma Hardware Detector (MHWD parity absorbing Manjaro Linux)
+/// Automatically identifies PCI/USB hardware ID mappings and deploys optimal drivers.
+pub struct SigmaHardwareDetector {
+    pub hardware_db: HashMap<(u16, u16), &'static str>, // maps (vendor_id, device_id) to driver name
+    pub loaded_drivers: Vec<&'static str>,
+}
+
+impl SigmaHardwareDetector {
+    pub fn new() -> Self {
+        let mut db = HashMap::new();
+        // Register default hardware-to-driver mappings (e.g. GPUs, network adapters, storage controllers)
+        db.insert((0x10DE, 0x2204), "nvidia-pcie-gen6"); // NVIDIA RTX 3090 / 4090
+        db.insert((0x8086, 0x1533), "e1000e-ethernet");  // Intel E1000
+        db.insert((0x10EC, 0x8168), "rtl8169-realtek");   // Realtek Ethernet
+        db.insert((0x144D, 0xA808), "samsung-nvme-v4");   // Samsung Pro NVMe
+
+        Self {
+            hardware_db: db,
+            loaded_drivers: Vec::new(),
+        }
+    }
+
+    /// Simulates scanning a PCI/USB bus and auto-configuring appropriate drivers
+    pub fn scan_and_load_drivers(&mut self, devices: &[(u16, u16)]) -> usize {
+        let mut count = 0;
+        for &dev in devices {
+            if let Some(&driver) = self.hardware_db.get(&dev) {
+                if !self.loaded_drivers.contains(&driver) {
+                    self.loaded_drivers.push(driver);
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+}
+
+impl Default for SigmaHardwareDetector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Sigma Settings Manager (MSM parity absorbing Manjaro Linux)
+/// Central controller to configure kernels, multi-locale language packages, and system timezones.
+pub struct SigmaSettingsManager {
+    pub available_kernels: Vec<&'static str>,
+    pub active_kernel: &'static str,
+    pub locale_packages: Vec<String>,
+    pub active_timezone: String,
+}
+
+impl SigmaSettingsManager {
+    pub fn new() -> Self {
+        Self {
+            available_kernels: vec!["Sovereign-LTS-6.1", "Sovereign-RT-6.6", "Sovereign-Mainline-6.12"],
+            active_kernel: "Sovereign-LTS-6.1",
+            locale_packages: vec!["en_US.UTF-8".to_string(), "hi_IN.UTF-8".to_string()], // default supports India Stack locales
+            active_timezone: "UTC".to_string(),
+        }
+    }
+
+    /// Switches the running system kernel dynamically
+    pub fn switch_kernel(&mut self, target_kernel: &'static str) -> Result<(), &'static str> {
+        if self.available_kernels.contains(&target_kernel) {
+            self.active_kernel = target_kernel;
+            Ok(())
+        } else {
+            Err("Target kernel is not available in system repos")
+        }
+    }
+
+    /// Updates the active system timezone configuration
+    pub fn update_timezone(&mut self, tz: &str) {
+        self.active_timezone = tz.to_string();
+    }
+}
+
+impl Default for SigmaSettingsManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -297,5 +381,38 @@ mod tests {
         let pass_res = play.submit_solution("fn main() { print!(\"hello\"); }");
         assert!(pass_res.is_ok());
         assert_eq!(play.current_score, 100);
+    }
+
+    #[test]
+    fn test_sigma_hardware_detection_mhwd() {
+        let mut detector = SigmaHardwareDetector::new();
+        // Scan a list of detected PCI peripheral devices
+        let bus_scan = vec![
+            (0x10DE, 0x2204), // NVIDIA RTX 4090 GPU
+            (0x8086, 0x1533), // Intel E1000 NIC
+            (0x9999, 0x9999), // Unsupported/unknown device
+        ];
+
+        let loaded_count = detector.scan_and_load_drivers(&bus_scan);
+        assert_eq!(loaded_count, 2);
+        assert!(detector.loaded_drivers.contains(&"nvidia-pcie-gen6"));
+        assert!(detector.loaded_drivers.contains(&"e1000e-ethernet"));
+    }
+
+    #[test]
+    fn test_sigma_settings_manager_msm() {
+        let mut manager = SigmaSettingsManager::new();
+        assert_eq!(manager.active_kernel, "Sovereign-LTS-6.1");
+
+        // Switch kernel dynamically
+        assert!(manager.switch_kernel("Sovereign-RT-6.6").is_ok());
+        assert_eq!(manager.active_kernel, "Sovereign-RT-6.6");
+
+        // Switching to unsupported fails
+        assert!(manager.switch_kernel("Linux-Legacy").is_err());
+
+        // Update timezone settings
+        manager.update_timezone("Asia/Kolkata");
+        assert_eq!(manager.active_timezone, "Asia/Kolkata");
     }
 }

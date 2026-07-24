@@ -1445,17 +1445,11 @@ impl AdLibSynth {
     }
 
     pub fn write_register(&mut self, reg: u8, value: u8) -> Result<(), AncientError> {
-        if reg >= 256 {
-            return Err(AncientError::InvalidParameter);
-        }
         self.registers[reg as usize] = value;
         Ok(())
     }
 
     pub fn read_register(&self, reg: u8) -> Result<u8, AncientError> {
-        if reg >= 256 {
-            return Err(AncientError::InvalidParameter);
-        }
         Ok(self.registers[reg as usize])
     }
 
