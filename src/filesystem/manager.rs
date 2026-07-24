@@ -306,8 +306,8 @@ impl FileManager {
 
     /// Navigate to bookmark
     pub fn navigate_to_bookmark(&mut self, name: &str) -> Result<(), FileManagerError> {
-        if let Some(path) = self.bookmarks.get(name) {
-            self.navigate(path)
+        if let Some(path) = self.bookmarks.get(name).cloned() {
+            self.navigate(&path)
         } else {
             Err(FileManagerError::BookmarkNotFound(name.to_string()))
         }
@@ -457,15 +457,17 @@ mod tests {
     #[test]
     fn test_list_directory() {
         let manager = FileManager::default();
-        let items = manager.list_directory(PathBuf::from("/home/user")).unwrap();
+        let path = PathBuf::from("/home/user");
+        let items = manager.list_directory(&path).unwrap();
         assert!(!items.is_empty());
     }
 
     #[test]
     fn test_navigate() {
         let mut manager = FileManager::default();
+        let path = PathBuf::from("/home/user/Documents");
         manager
-            .navigate(PathBuf::from("/home/user/Documents"))
+            .navigate(&path)
             .unwrap();
         assert_eq!(
             manager.current_path(),
