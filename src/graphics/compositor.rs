@@ -701,7 +701,6 @@ impl Compositor for SimpleCompositor {
 #[cfg(test)]
 mod tests {
     use super::*;
-}
 
 impl<T> Vec<T> {
     fn new() -> Self {
@@ -833,4 +832,5 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
 }
