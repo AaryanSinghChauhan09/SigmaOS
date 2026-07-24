@@ -34,11 +34,20 @@ impl Default for CapabilityToken {
 
 impl CapabilityToken {
     pub fn new() -> Self {
-        CapabilityToken {
-            id: 0,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
-            is_revoked: false,
+        Self { bits: 0 }
+    }
+
+    /// Create capability token from raw bits
+    pub fn from_bits(bits: u64) -> Self {
+        Self { bits }
+    }
+
+    /// Allow network access
+    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
+        match protocol {
+            "tcp" => self.bits |= 1 << 0,
+            "udp" => self.bits |= 1 << 1,
+            _ => {}
         }
     }
 

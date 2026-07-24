@@ -4,15 +4,16 @@
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod network;
+pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub mod productivity;
@@ -33,7 +34,13 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, FhsConventionStatus, LsbProfile, PosixComplianceLevel,
+    StandardsComplianceManager, TargetPlatform, TranslationLayer,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -53,21 +60,12 @@ pub use filesystem::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
-    KObject, KRef, KernelObject, Device, DeviceType, DeviceManager, DeviceBinding, DriverError, DriverMetadata,
-    Driver, DriverRegistration, DriverRegistry, Bus, PciBus, UsableBus,
-    VfsMount, Statfs, Filesystem, SuperBlock, Inode, InodeAttr, InodeType, Dentry,
-    FileOperations, InodeOperations, FsError, Mount, FilesystemMetadata,
-    Task, Cred, SchedPolicy, ProcessState as SchedProcessState, RunQueue, SchedClass,
-    ZonedPageAllocator, Page, Zone, VmArea, VmSpace,
-    Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl,
-    Netfilter, NetfilterRule, SocketAddr, SocketState, OperState, Qdisc, PfifoFast, QdiscManager,
-    Container, ContainerState, Runtime, ContainerManager, NamespaceConfig, NamespaceSet, OciSpec,
-    ResourceConfig, SigmaPackageManager, Generation, PackageMetadata, SystemConfig, SystemProfile,
-    CapabilitySet, Label, SecurityTask, AvcCache, AuditLog,
-    FirmwareInterface, BootLoader, BootParams, SetupHeader, Initramfs, KernelCommandLine,
-    FirmwareInfo, AcpiTable, SmpInfo, BootError,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use observability::{
+    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
+    SimpleObservabilityStack,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -85,8 +83,13 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
-pub use shell::{ShellCommand, ShellRepl};
+pub use security::{
+    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    IsolationError, Permission, PledgeManager, PledgePromise,
+};
+pub use shell::{
+    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
+};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
@@ -94,20 +97,4 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
-
-pub mod virt;
-pub use virt::hypervisor::{
-    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
-    VirtualizationGeneration,
-};
-pub use virt::microvm::{
-    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };

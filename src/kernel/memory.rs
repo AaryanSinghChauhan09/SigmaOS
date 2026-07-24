@@ -189,20 +189,100 @@ pub struct VmSpace {
 
 impl VmSpace {
     pub fn new() -> Self {
-        VmSpace {
-            pgd: 0,
-            vmas: Vec::new(),
-            total_vm: 0,
-            locked_vm: 0,
-            pinned_vm: 0,
+        Self(0)
+    }
+
+    pub fn set_addr(&mut self, addr: u64, flags: PageFlags) {
+        // Clear everything but flags, and mask the address to align with 4KB
+        self.0 = (addr & 0x0000_00FF_FFFF_F000) | flags.0;
+    }
+
+    pub fn get_addr(&self) -> u64 {
+        self.0 & 0x0000_00FF_FFFF_F000
+    }
+
+    pub fn flags(&self) -> PageFlags {
+        PageFlags(self.0 & 0xFFF0_0000_0000_0FFF)
+    }
+
+    pub fn is_present(&self) -> bool {
+        (self.0 & PageFlags::PRESENT) != 0
+    }
+
+    pub fn clear(&mut self) {
+        self.0 = 0;
+    }
+}
+
+/// A standard Page Table (containing 512 entries on x86_64)
+#[repr(align(4096))]
+pub struct PageTable {
+    pub entries: [PageTableEntry; 512],
+}
+
+impl PageTable {
+    pub fn new() -> Self {
+        Self {
+            entries: [PageTableEntry::new(); 512],
+        }
+    }
+}
+
+/// Virtual Memory Manager (VMM) handling paging
+pub struct VirtualMemoryManager {
+    pub root_directory: NonNull<PageTable>,
+}
+
+impl VirtualMemoryManager {
+    pub fn new(root_directory: NonNull<PageTable>) -> Self {
+        Self { root_directory }
+    }
+
+    /// Translates a virtual address into a physical address
+    pub fn translate(&self, virtual_addr: u64) -> Option<u64> {
+        // Mock translation logic for SigmaOS OOP structure
+        // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_ref() };
+
+        let entry = &root.entries[pt_index as usize];
+        if entry.is_present() {
+            Some(entry.get_addr() + (virtual_addr & 0xFFF))
+        } else {
+            None
         }
     }
 
-    pub fn find_vma(&self, addr: u64) -> Option<&VmArea> {
-        self.vmas.iter().find(|vma| addr >= vma.vm_start && addr < vma.vm_end)
+    /// Maps a virtual page to a physical frame
+    pub fn map_page(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        flags: PageFlags,
+    ) -> Result<(), &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
+
+        let entry = &mut root.entries[pt_index as usize];
+        if entry.is_present() {
+            return Err("Page already mapped!");
+        }
+
+        entry.set_addr(physical_addr, flags);
+        Ok(())
     }
 
-    pub fn find_vma_mut(&mut self, addr: u64) -> Option<&mut VmArea> {
-        self.vmas.iter_mut().find(|vma| addr >= vma.vm_start && addr < vma.vm_end)
+    /// Unmaps a virtual page
+    pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
+
+        let entry = &mut root.entries[pt_index as usize];
+        if !entry.is_present() {
+            return Err("Page is not mapped!");
+        }
+
+        entry.clear();
+        Ok(())
     }
 }
