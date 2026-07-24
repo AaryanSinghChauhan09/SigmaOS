@@ -157,7 +157,7 @@ impl BuddyAllocator {
                 buddy_addr
             };
 
-            if let Some(addr) = NonNull::new(merged_addr as *mut u8) {
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
                     addr,
                     size: buddy_size,

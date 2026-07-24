@@ -70,7 +70,8 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        match self.fs_type.load(Ordering::SeqCst) {
+        let val = self.fs_type.load(Ordering::SeqCst);
+        match val {
             0 => FilesystemType::Ext4,
             1 => FilesystemType::Btrfs,
             2 => FilesystemType::ZFS,
@@ -559,19 +560,6 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -594,6 +582,9 @@ impl<T> Vec<T> {
     }
 
     pub fn get(&self, index: usize) -> T {
+        if self.data.is_null() || index >= self.len {
+            panic!("Access of invalid pointer");
+        }
         unsafe { core::ptr::read(self.data.add(index)) }
     }
 

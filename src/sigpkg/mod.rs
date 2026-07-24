@@ -49,16 +49,6 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = major_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = minor_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = patch_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
         Ok(Version::new(major, minor, patch))
     }
 }
