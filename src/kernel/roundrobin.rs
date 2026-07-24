@@ -290,7 +290,7 @@ mod tests {
         let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
         scheduler.add_process(process1).unwrap();
         scheduler.add_process(process2).unwrap();
-        
+
         let initial_index = scheduler.current_index;
         for _ in 0..15 {
             scheduler.tick();
