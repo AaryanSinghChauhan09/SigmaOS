@@ -1,5 +1,5 @@
 //! Capability Tokens: Privilege Isolation (Android/AOSP Absorption)
-//! 
+//!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
 use alloc::vec::Vec;
@@ -53,7 +53,7 @@ impl SecurityEnforcer {
             active_tokens: Vec::new(),
         }
     }
-    
+
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
     }
