@@ -67,21 +67,16 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Stopped".to_string());
-        services.insert("udev".to_string(), "Running".to_string());
-
-        let mut installed_packages = std::collections::HashSet::new();
-        installed_packages.insert("sigma-sh".to_string());
-        installed_packages.insert("sigma-core".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
@@ -89,6 +84,7 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
@@ -186,62 +182,6 @@ impl ShellRepl {
             "echo" => {
                 let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Su {
-                        username: "root".to_string(),
-                        password: None,
-                    }
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt {
-                        subcommand,
-                        package,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
             }
             "set" => {
                 if parts.len() >= 3 {
@@ -440,7 +380,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
+        assert_eq!(repl.prompt, "sigma-sh> ");
     }
 
     #[test]

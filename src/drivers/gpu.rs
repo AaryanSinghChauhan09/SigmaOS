@@ -25,8 +25,13 @@ pub enum GpuCommand {
     Present,
 }
 
-/// DRM/KMS CRTC configuration
 #[derive(Debug, Clone, Copy)]
+pub struct DrmModeInfo {
+    pub hdisplay: u16,
+    pub vdisplay: u16,
+}
+
+#[derive(Debug, Clone)]
 pub struct DrmCrtc {
     pub id: u32,
     pub x: u32,
@@ -36,16 +41,6 @@ pub struct DrmCrtc {
     pub active: bool,
 }
 
-/// DRM/KMS Mode Info
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct DrmModeInfo {
-    pub clock: u32,
-    pub hdisplay: u16,
-    pub vdisplay: u16,
-    pub vrefresh: u32,
-}
-
-/// DRM/KMS Connector configuration
 #[derive(Debug, Clone)]
 pub struct DrmConnector {
     pub id: u32,

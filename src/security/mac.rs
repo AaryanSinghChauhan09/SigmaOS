@@ -448,6 +448,25 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
+pub type MacPolicy = dyn MACPolicy;
+
+#[derive(Debug, Clone)]
+pub struct MacRule {
+    pub name: alloc::string::String,
+    pub allowed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct MacSecurity {
+    pub enabled: bool,
+}
+
+impl MacSecurity {
+    pub fn new() -> Self {
+        Self { enabled: true }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
