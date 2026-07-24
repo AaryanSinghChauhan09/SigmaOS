@@ -1,70 +1,55 @@
-#![no_std]
+// SigmaOS Kernel Memory Management
+// Implements buddy allocator and paging
 
-extern crate alloc;
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, AtomicU32, Ordering};
+use core::ptr::NonNull;
 
+/// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
-pub const PAGE_SIZE_2M: usize = 2 * 1024 * 1024;
-pub const PAGE_SIZE_1G: usize = 1024 * 1024 * 1024;
-pub const PFN_SHIFT: usize = 12;
-pub const PAGE_OFFSET: usize = 0xFFFF800000000000;
 
-pub struct PhysicalAddress(pub u64);
-pub struct VirtualAddress(pub u64);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageFaultError {
-    NotPresent,
-    PermissionDenied,
-    InvalidAddress,
-    AlreadyMapped,
+/// Memory block
+#[derive(Debug)]
+pub struct MemoryBlock {
+    pub addr: NonNull<u8>,
+    pub size: usize,
 }
 
-pub struct Page {
-    pub flags: AtomicUsize,
-    pub count: AtomicUsize,
-    pub mapping: Option<usize>,
-    pub index: u64,
-    pub private: Option<usize>,
-    pub zone: Option<*const Zone>,
+/// Buddy allocator for memory management
+pub struct BuddyAllocator {
+    free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
 }
 
-impl Page {
+impl BuddyAllocator {
     pub fn new() -> Self {
-        Page {
-            flags: AtomicUsize::new(0),
-            count: AtomicUsize::new(1),
-            mapping: None,
-            index: 0,
-            private: None,
-            zone: None,
+        Self {
+            free_lists: Default::default(),
         }
     }
 
-    pub fn inc_ref(&self) {
-        self.count.fetch_add(1, Ordering::SeqCst);
+    pub fn with_memory(base_addr: usize, size: usize) -> Self {
+        let mut allocator = Self::new();
+        allocator.initialize_memory(base_addr, size);
+        allocator
     }
 
-    pub fn dec_ref(&self) -> bool {
-        self.count.fetch_sub(1, Ordering::SeqCst) == 1
-    }
+    pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
+        let pages = size / PAGE_SIZE;
+        let order = self.calculate_order(pages);
 
         if order < 12 {
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
-                self.free_lists[order].push(block);
-            }
+            let block = MemoryBlock {
+                addr: NonNull::new(base_addr as *mut u8).unwrap(),
+                size,
+            };
+            self.free_lists[order].push(block);
         }
     }
 
-    pub fn add_zone(&mut self, zone: Zone) {
-        self.free_pages += zone.present_pages as usize;
-        self.total_pages += zone.present_pages as usize;
-        self.zones.push(zone);
+    pub fn get_free_memory(&self) -> usize {
+        self.free_lists
+            .iter()
+            .enumerate()
+            .map(|(order, blocks)| blocks.len() * (1 << order) * PAGE_SIZE)
+            .sum()
     }
 
     pub fn get_total_memory(&self) -> usize {
@@ -81,7 +66,7 @@ impl Page {
             return None;
         }
 
-        let pages = size.div_ceil(PAGE_SIZE);
+        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -95,6 +80,7 @@ impl Page {
                 return Some(block);
             }
         }
+
         None
     }
 
@@ -122,8 +108,8 @@ impl Page {
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
-        if order < 12 {
-            self.free_lists[order].pop()
+        if order < 12 && !self.free_lists[order].is_empty() {
+            Some(self.free_lists[order].pop().unwrap())
         } else {
             None
         }
@@ -182,48 +168,16 @@ impl Page {
             } else {
                 Err(block)
             }
-        }
-    }
-
-    pub fn total_free(&self) -> usize {
-        self.free_pages
-    }
-
-    pub fn total_allocated(&self) -> usize {
-        self.total_pages - self.free_pages
-    }
-}
-
-pub struct VmArea {
-    pub vm_start: u64,
-    pub vm_end: u64,
-    pub vm_flags: u32,
-    pub vm_page_prot: u32,
-    pub vm_pgoff: u64,
-    pub vm_file: Option<usize>,
-    pub vm_private_data: Option<usize>,
-}
-
-impl VmArea {
-    pub fn new(start: u64, end: u64, flags: u32) -> Self {
-        VmArea {
-            vm_start: start,
-            vm_end: end,
-            vm_flags: flags,
-            vm_page_prot: 0,
-            vm_pgoff: 0,
-            vm_file: None,
-            vm_private_data: None,
+        } else {
+            Err(block)
         }
     }
 }
 
-pub struct VmSpace {
-    pub pgd: usize,
-    pub vmas: Vec<VmArea>,
-    pub total_vm: u64,
-    pub locked_vm: u64,
-    pub pinned_vm: u64,
+impl Default for BuddyAllocator {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Page table entry flags
@@ -247,12 +201,6 @@ impl PageFlags {
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct PageTableEntry(u64);
-
-impl Default for PageTableEntry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 impl PageTableEntry {
     pub fn new() -> Self {
@@ -287,12 +235,6 @@ pub struct PageTable {
     pub entries: [PageTableEntry; 512],
 }
 
-impl Default for PageTable {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl PageTable {
     pub fn new() -> Self {
         Self {
@@ -304,11 +246,33 @@ impl PageTable {
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
+    pub buddy_allocator: BuddyAllocator,
 }
 
 impl VirtualMemoryManager {
     pub fn new(root_directory: NonNull<PageTable>) -> Self {
-        Self { root_directory }
+        Self {
+            root_directory,
+            buddy_allocator: BuddyAllocator::new(),
+        }
+    }
+
+    pub fn with_allocator(root_directory: NonNull<PageTable>, allocator: BuddyAllocator) -> Self {
+        Self {
+            root_directory,
+            buddy_allocator: allocator,
+        }
+    }
+
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    /// Free pages using buddy allocator (wires free_pages to VMM)
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
     }
 
     /// Translates a virtual address into a physical address
@@ -376,14 +340,43 @@ mod tests {
         assert_eq!(allocator.calculate_order(1), 0);
         assert_eq!(allocator.calculate_order(2), 1);
         assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 
     #[test]
     fn test_allocate_deallocate() {
-        let mut allocator = BuddyAllocator::new();
-        // This would need actual memory to work properly
-        // For now, just test the interface
-        let _result = allocator.allocate(4096);
-        // Will fail without actual memory, but tests the flow
+        // Initialize the allocator with a valid 4KB page region (1 page)
+        let mut allocator = BuddyAllocator::with_memory(0x1000, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
+
+        // Perform a real allocation
+        let block = allocator.allocate(4096);
+        assert!(block.is_some());
+        let block = block.unwrap();
+        assert_eq!(block.addr.as_ptr() as usize, 0x1000);
+        assert_eq!(block.size, 4096);
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Deallocate and verify state restoration
+        allocator.deallocate(block);
+        assert_eq!(allocator.get_free_memory(), 4096);
+    }
+
+    #[test]
+    fn test_calculate_order_correctness() {
+        let allocator = BuddyAllocator::new();
+        // Test edge cases manually to ensure exact bounds matching
+        assert_eq!(allocator.calculate_order(0), 0);
+        assert_eq!(allocator.calculate_order(1), 0);
+        assert_eq!(allocator.calculate_order(2), 1);
+        assert_eq!(allocator.calculate_order(3), 2);
+        assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(6), 3);
+        assert_eq!(allocator.calculate_order(7), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 }

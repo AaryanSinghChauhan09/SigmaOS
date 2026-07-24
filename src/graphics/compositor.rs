@@ -701,6 +701,7 @@ impl Compositor for SimpleCompositor {
 #[cfg(test)]
 mod tests {
     use super::*;
+}
 
 impl<T> Vec<T> {
     fn new() -> Self {
