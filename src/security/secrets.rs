@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -256,13 +258,6 @@ impl Default for KeyringStats {
 }
 
 /// Simple keyring (OOP: Concrete keyring class)
-pub type SecretManager = dyn Keyring;
-
-#[derive(Debug, Clone)]
-pub struct SecretStorage {
-    pub name: alloc::string::String,
-}
-
 pub struct SimpleKeyring {
     pub secrets: Vec<Option<Box<dyn Secret>>>,
     pub next_id: AtomicUsize,
@@ -445,8 +440,3 @@ mod tests {
         assert_eq!(keyring.stats().total_secrets, 0);
     }
 }
-
-pub type SecretManager = dyn Keyring;
-
-#[derive(Debug, Clone)]
-pub struct SecretStorage;
