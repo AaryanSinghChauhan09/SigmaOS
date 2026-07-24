@@ -25,12 +25,42 @@ pub enum GpuCommand {
     Present,
 }
 
+/// DRM/KMS CRTC configuration
+#[derive(Debug, Clone, Copy)]
+pub struct DrmCrtc {
+    pub id: u32,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+    pub active: bool,
+}
+
+/// DRM/KMS Mode Info
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DrmModeInfo {
+    pub clock: u32,
+    pub hdisplay: u16,
+    pub vdisplay: u16,
+    pub vrefresh: u32,
+}
+
+/// DRM/KMS Connector configuration
+#[derive(Debug, Clone)]
+pub struct DrmConnector {
+    pub id: u32,
+    pub connected: bool,
+    pub modes: Vec<DrmModeInfo>,
+}
+
 /// GPU driver interface
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
     pub capabilities: CapabilityToken,
     pub frame_buffer: Vec<u32>,
+    pub crtc: Option<DrmCrtc>,
+    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -41,6 +71,8 @@ impl GpuDriver {
             height,
             capabilities: CapabilityToken::new(),
             frame_buffer: vec![0; size],
+            crtc: None,
+            connector: None,
         }
     }
 
@@ -55,6 +87,7 @@ impl GpuDriver {
                 y,
                 width,
                 height,
+                ..
             } => {
                 let color = 0xFFFFFF; // White
                 for row in y..(y + height).min(self.height) {
@@ -82,6 +115,35 @@ impl GpuDriver {
 
     pub fn has_capability(&self, capability: u64) -> bool {
         (self.capabilities.bits() & capability) != 0
+    }
+
+    /// DRM/KMS mode setting API
+    pub fn set_drm_mode(
+        &mut self,
+        connector_id: u32,
+        crtc_id: u32,
+        mode: DrmModeInfo,
+    ) -> Result<(), GpuError> {
+        self.width = mode.hdisplay as u32;
+        self.height = mode.vdisplay as u32;
+        self.frame_buffer = vec![0; (self.width * self.height) as usize];
+
+        self.crtc = Some(DrmCrtc {
+            id: crtc_id,
+            x: 0,
+            y: 0,
+            width: self.width,
+            height: self.height,
+            active: true,
+        });
+
+        self.connector = Some(DrmConnector {
+            id: connector_id,
+            connected: true,
+            modes: vec![mode],
+        });
+
+        Ok(())
     }
 }
 

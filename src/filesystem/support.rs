@@ -70,8 +70,17 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        let val = self.fs_type.load(Ordering::SeqCst) as u32;
-        unsafe { core::mem::transmute(val) }
+        match self.fs_type.load(Ordering::SeqCst) {
+            0 => FilesystemType::Ext4,
+            1 => FilesystemType::Btrfs,
+            2 => FilesystemType::ZFS,
+            3 => FilesystemType::Fat32,
+            4 => FilesystemType::APFS,
+            5 => FilesystemType::SovereignP2P,
+            6 => FilesystemType::EncryptedFS,
+            7 => FilesystemType::CompressedFS,
+            _ => FilesystemType::Ext4,
+        }
     }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
@@ -143,7 +152,7 @@ impl BtrfsFeatures for SimpleBtrfsFS {
 
     fn delete_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
         for i in 0..self.subvolumes.len() {
-            let subvol = &self.subvolumes[i];
+            let subvol = self.subvolumes.get(i);
             let len = subvol.iter().position(|&b| b == 0).unwrap_or(256);
             if &subvol[..len] == path {
                 self.subvolumes.remove(i);
@@ -210,7 +219,7 @@ impl ZFSFeatures for SimpleZFS {
 
     fn rollback_snapshot(&mut self, snapshot: &[u8]) -> Result<(), FilesystemError> {
         for i in 0..self.snapshots.len() {
-            let snap = &self.snapshots[i];
+            let snap = self.snapshots.get(i);
             let len = snap.iter().position(|&b| b == 0).unwrap_or(256);
             if &snap[..len] == snapshot {
                 return Ok(());
@@ -391,7 +400,7 @@ impl EncryptedFSFeatures for SimpleEncryptedFS {
     fn unlock_path(&mut self, path: &[u8], verification_key: &[u8]) -> Result<(), FilesystemError> {
         let mut index = None;
         for i in 0..self.locked_folders.len() {
-            let folder = &self.locked_folders[i];
+            let folder = self.locked_folders.get(i);
             let len = folder.iter().position(|&b| b == 0).unwrap_or(128);
             if &folder[..len] == path {
                 index = Some(i);
@@ -400,7 +409,7 @@ impl EncryptedFSFeatures for SimpleEncryptedFS {
         }
 
         if let Some(idx) = index {
-            let key = &self.keys[idx];
+            let key = self.keys.get(idx);
             let verification_len = verification_key.len().min(32);
             let mut matches = true;
             for i in 0..verification_len {
@@ -521,8 +530,7 @@ impl FilesystemManager for SimpleFilesystemManager {
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
         for i in 0..self.filesystems.len() {
-            let fs_option = &self.filesystems[i];
-            if let Some(ref fs) = *fs_option {
+            if let Some(ref fs) = *self.filesystems.get_ref(i) {
                 if fs.id() == id {
                     return Some(fs.as_ref());
                 }
@@ -534,8 +542,7 @@ impl FilesystemManager for SimpleFilesystemManager {
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
         for i in 0..self.filesystems.len() {
-            let fs_option = &self.filesystems[i];
-            if let Some(ref fs) = *fs_option {
+            if let Some(ref fs) = *self.filesystems.get_ref(i) {
                 ids.push(fs.id());
             }
         }
@@ -548,19 +555,6 @@ pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        unsafe { &mut *self.data.add(index) }
-    }
 }
 
 impl<T> Vec<T> {
@@ -586,6 +580,14 @@ impl<T> Vec<T> {
 
     pub fn get(&self, index: usize) -> T {
         unsafe { core::ptr::read(self.data.add(index)) }
+    }
+
+    pub fn get_ref(&self, index: usize) -> &T {
+        unsafe { &*self.data.add(index) }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> &mut T {
+        unsafe { &mut *self.data.add(index) }
     }
 
     pub fn clone(&self) -> Vec<T> {
