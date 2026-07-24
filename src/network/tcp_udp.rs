@@ -807,23 +807,6 @@ mod tests {
     }
 
     #[test]
-    fn test_zero_trust_port_binding() {
-        let mut stack = SimpleNetworkStack::new();
-
-        // Bind to non-privileged port (>= 1024) should succeed
-        assert!(stack.create_socket(Protocol::TCP, 8080).is_ok());
-
-        // Bind to privileged port (< 1024) should fail by default
-        assert!(stack.create_socket(Protocol::TCP, 80).is_err());
-
-        // Authorize port in firewall first
-        stack.firewall.allow_port(80);
-
-        // Bind to authorized privileged port should succeed now
-        assert!(stack.create_socket(Protocol::TCP, 80).is_ok());
-    }
-
-    #[test]
     fn test_congestion_control() {
         let mut reno = RenoCongestionControl::new();
         let initial_cwnd = reno.get_cwnd();

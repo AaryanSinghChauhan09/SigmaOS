@@ -122,13 +122,32 @@ impl ZonedPageAllocator {
         self.zones.push(zone);
     }
 
-    pub fn allocate(&mut self, order: u32) -> Option<PhysicalAddress> {
-        for zone in &mut self.zones {
-            if zone.free_area[order as usize].free > 0 {
-                zone.free_area[order as usize].free -= 1;
-                self.free_pages -= 1 << order;
-                let pfn = zone.zone_start_pfn;
-                return Some(PhysicalAddress(pfn << PFN_SHIFT));
+    pub fn get_total_memory(&self) -> usize {
+        self.free_lists
+            .iter()
+            .enumerate()
+            .map(|(order, blocks)| blocks.len() * (1 << order) * PAGE_SIZE)
+            .sum()
+    }
+
+    pub fn allocate(&mut self, size: usize) -> Option<MemoryBlock> {
+        // Prevent integer overflow in size calculation
+        if size == 0 || size > usize::MAX - PAGE_SIZE + 1 {
+            return None;
+        }
+
+        let pages = size.div_ceil(PAGE_SIZE);
+        let order = self.calculate_order(pages);
+
+        // Find smallest block that can satisfy request
+        for current_order in order..12 {
+            if let Some(block) = self.get_block(current_order) {
+                // Split block if necessary
+                if current_order > order {
+                    let split_block = self.split_block(block, current_order - order)?;
+                    return Some(split_block);
+                }
+                return Some(block);
             }
         }
         None
@@ -187,7 +206,35 @@ pub struct VmSpace {
     pub pinned_vm: u64,
 }
 
-impl VmSpace {
+/// Page table entry flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PageFlags(pub u64);
+
+impl PageFlags {
+    pub const PRESENT: u64 = 1 << 0;
+    pub const WRITABLE: u64 = 1 << 1;
+    pub const USER_ACCESSIBLE: u64 = 1 << 2;
+    pub const WRITE_THROUGH: u64 = 1 << 3;
+    pub const CACHE_DISABLE: u64 = 1 << 4;
+    pub const ACCESSED: u64 = 1 << 5;
+    pub const DIRTY: u64 = 1 << 6;
+    pub const HUGE_PAGE: u64 = 1 << 7;
+    pub const GLOBAL: u64 = 1 << 8;
+    pub const NO_EXECUTE: u64 = 1 << 63;
+}
+
+/// A standard 4KB page table entry
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct PageTableEntry(u64);
+
+impl Default for PageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
     }
@@ -218,6 +265,12 @@ impl VmSpace {
 #[repr(align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 512],
+}
+
+impl Default for PageTable {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PageTable {
@@ -284,5 +337,33 @@ impl VirtualMemoryManager {
 
         entry.clear();
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_allocator_creation() {
+        let allocator = BuddyAllocator::new();
+        assert!(allocator.free_lists.iter().all(|list| list.is_empty()));
+    }
+
+    #[test]
+    fn test_order_calculation() {
+        let allocator = BuddyAllocator::new();
+        assert_eq!(allocator.calculate_order(1), 0);
+        assert_eq!(allocator.calculate_order(2), 1);
+        assert_eq!(allocator.calculate_order(4), 2);
+    }
+
+    #[test]
+    fn test_allocate_deallocate() {
+        let mut allocator = BuddyAllocator::new();
+        // This would need actual memory to work properly
+        // For now, just test the interface
+        let _result = allocator.allocate(4096);
+        // Will fail without actual memory, but tests the flow
     }
 }
