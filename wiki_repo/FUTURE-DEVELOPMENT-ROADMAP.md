@@ -620,6 +620,42 @@ All CLI commands implement a shared systems abstraction layer where parse routin
 * **CLI Command:** `net inspect <command_args>`
   - `net inspect dma --interface=e1000 --pattern="UNION SELECT"`: Intercepts raw packet descriptors over lock-free ring-buffer pipelines, matching incoming payloads against threat signatures.
 
+#### F. Process Supervision & Service Control (`sys control`) [Absorbing systemctl/service/init]
+* **GUI Action:** Monitoring task bars, background processes, system services, and shutdown buttons.
+* **CLI Command:** `sys control <command_args>`
+  - `sys control start --service=zenith-compositor --priority=high`: Activates and binds Zenith service threads inside our multi-priority scheduler queues, eliminating systemd daemonization overhead.
+  - `sys control status --all`: Polls state-machine buffers from our thread-safe `SovereignSched` registry.
+  - `sys control stop --service=ne2000-net`: Sends a zero-copy capability termination signal to userspace drivers.
+
+#### G. Cryptographically-Signed Event Auditing (`sys logs`) [Absorbing journalctl/dmesg]
+* **GUI Action:** Reading system-log dashboards and compliance metrics.
+* **CLI Command:** `sys logs <command_args>`
+  - `sys logs query --since="1h" --level=error --signed=true`: Walks back the microkernel's append-only cryptographic ledger of signed audit events, guaranteeing verifiable logs that standard dmesg/journalctl configurations cannot match.
+  - `sys logs stream --output=ansi-compositor`: Establishes an active IPC observer line to stream real-time kernel-ring logs to the local Zenith screen buffer.
+
+#### H. Interface & Link Routing Manager (`net link`) [Absorbing ip/ifconfig/route]
+* **GUI Action:** Selecting Wi-Fi/Ethernet networks and checking network status icons.
+* **CLI Command:** `net link <command_args>`
+  - `net link set --device=e1000 --addr=10.0.2.15 --netmask=255.255.255.0`: Mapped direct to DMA packet ring registers, configuring E1000 hardware state in userspace.
+  - `net link route add --destination=::/0 --gateway=fe80::1`: Binds an IPv6 route path on the ZenithNet routing table with zero-allocation O(1) hashing.
+
+#### I. Storage Partition & Cache Synchronization (`storage sync`) [Absorbing mount/sync/fstrim]
+* **GUI Action:** Ejecting USB flash drives, safe-removal overlays, and partition managers.
+* **CLI Command:** `storage sync <command_args>`
+  - `storage sync flash --volume=/dev/nvme0n1p1`: Forces a complete write-cache flush and sector alignment compaction across the EXT4/JBD2 journaling logs.
+  - `storage sync mount --src=/dev/floppy0 --target=/mnt/floppy`: Instantiates a polymorphic `LegacyAncientDriver` mapper, binding file tables inside the secure VFS abstraction.
+
+#### J. Container Sandboxing & Resource Isolation (`sandbox restrict`) [Absorbing docker/podman/chroot]
+* **GUI Action:** Double-clicking restricted application shortcuts and setting parental filters.
+* **CLI Command:** `sandbox restrict <command_args>`
+  - `sandbox restrict run --binary=/userland/browser --caps="stdio,network,fs"`: Instantiates a virtual container enclave bounded by exact, hardware-enforced capability tokens, blocking relative path traversal attacks at the gate.
+
+#### K. Dependency Solver & CAS Package Installer (`sigpkg query/install`) [Absorbing apt-cache/pacman/dnf]
+* **GUI Action:** Opening the App Store interface and executing updates.
+* **CLI Command:** `sigpkg <command_args>`
+  - `sigpkg query --search="terminal-ide" --resolver=dpll`: Invokes our zero-allocation SAT DPLL constraint solver to search the local and remote CAS indices.
+  - `sigpkg install --name=terminal-ide --cas-hash=sha256-abc123...`: Directly maps read-only, content-addressed block shards into SovereignVMM storage layers, bypassing standard unsafe installer shell hooks.
+
 ---
 
 ## 15. SOVEREIGN FUTURE DEVELOPMENT & DISTRO-PARITY ROADMAP
