@@ -1,5 +1,3 @@
-#![no_std]
-
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
