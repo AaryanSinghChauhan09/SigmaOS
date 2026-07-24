@@ -424,9 +424,8 @@ mod tests {
             PathBuf::from("/test/file1.txt"),
             PathBuf::from("/test/file2.txt"),
         ];
-        let path = PathBuf::from("/test/archive.zip");
         let result = manager
-            .create_archive(&files, &path)
+            .create_archive(&files, &PathBuf::from("/test/archive.zip"))
             .unwrap();
         assert!(result.success);
     }
@@ -434,9 +433,8 @@ mod tests {
     #[test]
     fn test_list_contents() {
         let manager = ArchiveManager::default();
-        let path = PathBuf::from("/test/archive.zip");
         let entries = manager
-            .list_contents(&path)
+            .list_contents(&PathBuf::from("/test/archive.zip"))
             .unwrap();
         assert!(!entries.is_empty());
     }

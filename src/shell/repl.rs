@@ -37,40 +37,16 @@ pub enum ShellCommand {
         subcommand: String,
         package: Option<String>,
     },
-    Ai {
-        query: String,
+    Uname,
+    Clear,
+    Touch {
+        filename: String,
     },
-    Display {
-        subcommand: String,
-        args: Vec<String>,
+    Mkdir {
+        dirname: String,
     },
-    Theme {
-        subcommand: String,
-        args: Vec<String>,
-    },
-    Profile {
-        subcommand: String,
-        args: Vec<String>,
-    },
-    Window {
-        subcommand: String,
-        args: Vec<String>,
-    },
-    Accessibility {
-        subcommand: String,
-        args: Vec<String>,
-    },
-    Screenshot {
-        subcommand: String,
-        args: Vec<String>,
-    },
-    Record {
-        subcommand: String,
-        args: Vec<String>,
-    },
-    Clipboard {
-        subcommand: String,
-        args: Vec<String>,
+    Rm {
+        filename: String,
     },
     Unknown(String),
 }
@@ -84,19 +60,6 @@ pub struct ShellRepl {
     current_dir: String,
     services: std::collections::HashMap<String, String>,
     installed_packages: std::collections::HashSet<String>,
-
-    // Persistent state matching GUI Capabilities (Zenith Desktop)
-    active_theme: String,
-    active_profile: String,
-    active_layout: String,
-    clipboard_content: String,
-    screen_reader_enabled: bool,
-    high_contrast_enabled: bool,
-    magnifier_zoom: f32,
-    color_blind_mode: String,
-    recording_active: bool,
-    displays: Vec<String>,
-    windows: Vec<String>,
 }
 
 impl ShellRepl {
@@ -104,40 +67,16 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Stopped".to_string());
-        services.insert("udev".to_string(), "Running".to_string());
-
-        let mut installed_packages = std::collections::HashSet::new();
-        installed_packages.insert("sigma-sh".to_string());
-        installed_packages.insert("sigma-core".to_string());
-
-        let mut displays = Vec::new();
-        displays.push("DP-1: primary 2560x1440@144Hz scale=1.0 hdr=false".to_string());
-        displays.push("HDMI-1: secondary 1920x1080@60Hz scale=1.0 hdr=false".to_string());
-
-        let mut windows = Vec::new();
-        windows.push("ID=1 Title='SigmaTerminal' App='sigma.terminal' Geom=0,0,800,600 State=Normal Focused=true".to_string());
-        windows.push("ID=2 Title='SigmaOffice' App='sigma.office' Geom=100,100,1024,768 State=Normal Focused=false".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages,
-            active_theme: "Sovereign Dark".to_string(),
-            active_profile: "standard".to_string(),
-            active_layout: "Adaptive".to_string(),
-            clipboard_content: "Initial clipboard context (0x5001)".to_string(),
-            screen_reader_enabled: false,
-            high_contrast_enabled: false,
-            magnifier_zoom: 1.0,
-            color_blind_mode: "none".to_string(),
-            recording_active: false,
-            displays,
-            windows,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
@@ -145,6 +84,7 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
@@ -154,17 +94,6 @@ impl ShellRepl {
             current_dir: "/home/ubuntu".to_string(),
             services,
             installed_packages: std::collections::HashSet::new(),
-            active_theme: "Sovereign Dark".to_string(),
-            active_profile: "standard".to_string(),
-            active_layout: "Adaptive".to_string(),
-            clipboard_content: String::new(),
-            screen_reader_enabled: false,
-            high_contrast_enabled: false,
-            magnifier_zoom: 1.0,
-            color_blind_mode: "none".to_string(),
-            recording_active: false,
-            displays: Vec::new(),
-            windows: Vec::new(),
         }
     }
 
@@ -221,65 +150,38 @@ impl ShellRepl {
             "exit" | "quit" => ShellCommand::Exit,
             "pwd" => ShellCommand::Pwd,
             "whoami" => ShellCommand::WhoAmI,
-            "echo" => {
-                let message = parts[1..].join(" ");
-                ShellCommand::Echo { message }
-            }
-            "su" => {
+            "uname" => ShellCommand::Uname,
+            "clear" => ShellCommand::Clear,
+            "touch" => {
                 if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Su {
-                        username: "root".to_string(),
-                        password: None,
-                    }
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
+                    ShellCommand::Touch {
                         filename: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "systemctl" => {
+            "mkdir" => {
                 if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt {
-                        subcommand,
-                        package,
+                    ShellCommand::Mkdir {
+                        dirname: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "echo" => {
+                let message = parts[1..].join(" ");
+                ShellCommand::Echo { message }
             }
             "set" => {
                 if parts.len() >= 3 {
@@ -300,55 +202,6 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "ai" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Ai {
-                        query: parts[1..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "display" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "list".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Display { subcommand, args }
-            }
-            "theme" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "list".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Theme { subcommand, args }
-            }
-            "profile" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "list".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Profile { subcommand, args }
-            }
-            "window" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "list".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Window { subcommand, args }
-            }
-            "accessibility" | "acc" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "status".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Accessibility { subcommand, args }
-            }
-            "screenshot" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "capture".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Screenshot { subcommand, args }
-            }
-            "record" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "start".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Record { subcommand, args }
-            }
-            "clipboard" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "get".to_string() };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Clipboard { subcommand, args }
-            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -368,15 +221,6 @@ impl ShellRepl {
                    echo         - Print a message\n\
                    set          - Set a variable\n\
                    get          - Get a variable\n\
-                   ai <query>   - Natural language command AI\n\
-                   display      - Manage displays (try 'display list', 'display scale', or 'display rate')\n\
-                   theme        - Manage themes (try 'theme list', 'theme set <theme>', or 'theme auto')\n\
-                   profile      - Manage UX profiles (try 'profile list', 'profile switch <profile>', or 'profile layout')\n\
-                   window       - Manage windows (try 'window list', 'window create', 'window state', or 'window close')\n\
-                   accessibility / acc - Manage accessibility (try 'acc status', 'acc screen-reader', or 'acc magnifier')\n\
-                   screenshot   - Capture desktop screenshot\n\
-                   record       - Manage video recording (try 'record start' or 'record stop')\n\
-                   clipboard    - Manage clipboard (try 'clipboard get' or 'clipboard set <text>')\n\
                    exit         - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
@@ -395,6 +239,11 @@ impl ShellRepl {
             }
             ShellCommand::Pwd => Ok(self.current_dir.clone()),
             ShellCommand::WhoAmI => Ok(self.current_user.clone()),
+            ShellCommand::Uname => Ok("Linux sigmaos 6.24.0-mainline #1 SMP PREEMPT_RT Sun Jul 19 2026 x86_64 x86_64 x86_64 GNU/Linux".to_string()),
+            ShellCommand::Clear => Ok("\x1B[2J\x1B[H".to_string()),
+            ShellCommand::Touch { filename } => Ok(format!("Created empty file: {}", filename)),
+            ShellCommand::Mkdir { dirname } => Ok(format!("Created directory: {}", dirname)),
+            ShellCommand::Rm { filename } => Ok(format!("Removed file: {}", filename)),
             ShellCommand::Su { username, password } => {
                 if username == "root" {
                     let pwd = password.unwrap_or_default();
@@ -512,149 +361,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Ai { query } => {
-                let mut aid = crate::ml::SigmaAid::new(0);
-                let _ = aid.load_gguf_model("/models/sigma.gguf");
-                let cmd = aid.execute_prompt(&query);
-                Ok(format!("AI suggested command: {}", cmd))
-            },
-            ShellCommand::Display { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok(self.displays.join("\n"))
-                } else if subcommand == "set" {
-                    Ok("Set layout: primary DP-1, secondary HDMI-1, arrange right".to_string())
-                } else if subcommand == "scale" {
-                    let output = args.get(0).cloned().unwrap_or_else(|| "DP-1".to_string());
-                    let factor = args.get(1).cloned().unwrap_or_else(|| "2.0".to_string());
-                    Ok(format!("Adjusted scaling factor for {} to {}.", output, factor))
-                } else if subcommand == "rate" {
-                    let output = args.get(0).cloned().unwrap_or_else(|| "DP-1".to_string());
-                    let rate = args.get(1).cloned().unwrap_or_else(|| "144".to_string());
-                    Ok(format!("Adjusted refresh rate for {} to {}Hz.", output, rate))
-                } else if subcommand == "hdr" {
-                    let output = args.get(0).cloned().unwrap_or_else(|| "DP-1".to_string());
-                    let enable = args.get(1).cloned().unwrap_or_else(|| "true".to_string());
-                    Ok(format!("HDR support on {} set to {}.", output, enable))
-                } else {
-                    Err("Unknown display command".to_string())
-                }
-            }
-            ShellCommand::Theme { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok("Sovereign Dark, Banaras Gold, Kashmir Blue, Midnight Teal, Paper White".to_string())
-                } else if subcommand == "set" {
-                    let theme = args.get(0).cloned().unwrap_or_else(|| "Banaras Gold".to_string());
-                    self.active_theme = theme.clone();
-                    Ok(format!("Theme changed to {}.", theme))
-                } else if subcommand == "configure" {
-                    Ok("Configured theme: accent=#6C63FF, blur=true, radius=20px.".to_string())
-                } else if subcommand == "auto" {
-                    Ok("Configured dynamic theming: enabled=true, mode=time.".to_string())
-                } else {
-                    Err("Unknown theme command".to_string())
-                }
-            }
-            ShellCommand::Profile { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok("standard, developer, gamer, guest".to_string())
-                } else if subcommand == "switch" {
-                    let profile = args.get(0).cloned().unwrap_or_else(|| "developer".to_string());
-                    self.active_profile = profile.clone();
-                    Ok(format!("UX profile changed to {}.", profile))
-                } else if subcommand == "layout" {
-                    let layout = args.get(0).cloned().unwrap_or_else(|| "tiling".to_string());
-                    self.active_layout = layout.clone();
-                    Ok(format!("Compositor layout set to {}.", layout))
-                } else {
-                    Err("Unknown profile command".to_string())
-                }
-            }
-            ShellCommand::Window { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok(self.windows.join("\n"))
-                } else if subcommand == "create" {
-                    let id = self.windows.len() + 1;
-                    let title = args.get(0).cloned().unwrap_or_else(|| "SigmaApp".to_string());
-                    let app = args.get(1).cloned().unwrap_or_else(|| "sigma.app".to_string());
-                    let geom = args.get(2).cloned().unwrap_or_else(|| "100,100,500,400".to_string());
-                    let w_str = format!("ID={} Title='{}' App='{}' Geom={} State=Normal Focused=true", id, title, app, geom);
-                    self.windows.push(w_str);
-                    Ok(format!("Created window ID {}: '{}' ({}) at geom {}", id, title, app, geom))
-                } else if subcommand == "state" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "1".to_string());
-                    let state = args.get(1).cloned().unwrap_or_else(|| "Maximized".to_string());
-                    Ok(format!("Window {} state changed to {}", id, state))
-                } else if subcommand == "move" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "1".to_string());
-                    Ok(format!("Window {} moved/resized successfully.", id))
-                } else if subcommand == "focus" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "1".to_string());
-                    Ok(format!("Window {} is now focused.", id))
-                } else if subcommand == "close" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "2".to_string());
-                    Ok(format!("Window {} closed/destroyed.", id))
-                } else {
-                    Err("Unknown window command".to_string())
-                }
-            }
-            ShellCommand::Accessibility { subcommand, args } => {
-                if subcommand == "status" {
-                    Ok(format!("Screen Reader: {}\nHigh Contrast: {}\nMagnifier: {}x\nColorblind: {}",
-                        if self.screen_reader_enabled { "Enabled" } else { "Disabled" },
-                        if self.high_contrast_enabled { "Enabled" } else { "Disabled" },
-                        self.magnifier_zoom,
-                        self.color_blind_mode
-                    ))
-                } else if subcommand == "screen-reader" {
-                    let enable = args.get(0).cloned().unwrap_or_else(|| "true".to_string()) == "true";
-                    self.screen_reader_enabled = enable;
-                    Ok(format!("Screen reader enabled={}.", enable))
-                } else if subcommand == "contrast" {
-                    let enable = args.get(0).cloned().unwrap_or_else(|| "true".to_string()) == "true";
-                    self.high_contrast_enabled = enable;
-                    Ok(format!("High-contrast mode set to {}.", enable))
-                } else if subcommand == "magnifier" {
-                    let zoom = args.get(0).cloned().unwrap_or_else(|| "2.0".to_string()).parse::<f32>().unwrap_or(1.0);
-                    self.magnifier_zoom = zoom;
-                    Ok(format!("Magnification scale set to {}x.", zoom))
-                } else if subcommand == "colorblind" {
-                    let mode = args.get(0).cloned().unwrap_or_else(|| "protanopia".to_string());
-                    self.color_blind_mode = mode.clone();
-                    Ok(format!("Color blind correction mode set to {}.", mode))
-                } else {
-                    Err("Unknown accessibility command".to_string())
-                }
-            }
-            ShellCommand::Screenshot { subcommand, args } => {
-                let output = args.get(0).cloned().unwrap_or_else(|| "/home/ubuntu/screenshot.png".to_string());
-                let region = args.get(1).cloned().unwrap_or_else(|| "full".to_string());
-                Ok(format!("Screenshot captured successfully! Saved to {} ({}).", output, region))
-            }
-            ShellCommand::Record { subcommand, args } => {
-                if subcommand == "start" {
-                    self.recording_active = true;
-                    let output = args.get(0).cloned().unwrap_or_else(|| "/home/ubuntu/recording.mp4".to_string());
-                    let codec = args.get(1).cloned().unwrap_or_else(|| "av1".to_string());
-                    let quality = args.get(2).cloned().unwrap_or_else(|| "high".to_string());
-                    Ok(format!("Screen recording initiated. Output saved to {} using {} codec ({} quality).", output, codec, quality))
-                } else if subcommand == "stop" {
-                    self.recording_active = false;
-                    Ok("Screen recording stopped and finalized.".to_string())
-                } else {
-                    Err("Unknown record command".to_string())
-                }
-            }
-            ShellCommand::Clipboard { subcommand, args } => {
-                if subcommand == "get" {
-                    Ok(format!("Clipboard content: {} (capability token 0x5001 verified)", self.clipboard_content))
-                } else if subcommand == "set" {
-                    let text = args.join(" ");
-                    self.clipboard_content = text.clone();
-                    Ok(format!("Copied to clipboard: {}", text))
-                } else {
-                    Err("Unknown clipboard command".to_string())
-                }
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -674,7 +380,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
+        assert_eq!(repl.prompt, "sigma-sh> ");
     }
 
     #[test]
@@ -819,50 +525,47 @@ mod tests {
     }
 
     #[test]
-    fn test_display_commands() {
+    fn test_uname_command() {
         let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Display { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Display { subcommand: "set".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Display { subcommand: "scale".to_string(), args: vec!["DP-1".to_string(), "2.0".to_string()] }).is_ok());
+        let cmd = repl.parse_command("uname");
+        assert!(matches!(cmd, ShellCommand::Uname));
+        let out = repl.execute_command(cmd).unwrap();
+        assert!(out.contains("sigmaos"));
     }
 
     #[test]
-    fn test_theme_commands() {
+    fn test_clear_command() {
         let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Theme { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert_eq!(repl.execute_command(ShellCommand::Theme { subcommand: "set".to_string(), args: vec!["Banaras Gold".to_string()] }).unwrap(), "Theme changed to Banaras Gold.");
-        assert_eq!(repl.active_theme, "Banaras Gold");
+        let cmd = repl.parse_command("clear");
+        assert!(matches!(cmd, ShellCommand::Clear));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "\x1B[2J\x1B[H");
     }
 
     #[test]
-    fn test_profile_commands() {
+    fn test_touch_command() {
         let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Profile { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Profile { subcommand: "switch".to_string(), args: vec!["developer".to_string()] }).is_ok());
-        assert_eq!(repl.active_profile, "developer");
+        let cmd = repl.parse_command("touch testfile.txt");
+        assert!(matches!(cmd, ShellCommand::Touch { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Created empty file: testfile.txt");
     }
 
     #[test]
-    fn test_window_commands() {
+    fn test_mkdir_command() {
         let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Window { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Window { subcommand: "create".to_string(), args: vec!["SigmaBrowser".to_string(), "sigma.browser".to_string(), "10,10,600,400".to_string()] }).is_ok());
-        assert_eq!(repl.windows.len(), 3);
+        let cmd = repl.parse_command("mkdir testdir");
+        assert!(matches!(cmd, ShellCommand::Mkdir { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Created directory: testdir");
     }
 
     #[test]
-    fn test_accessibility_commands() {
+    fn test_rm_command() {
         let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Accessibility { subcommand: "status".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Accessibility { subcommand: "screen-reader".to_string(), args: vec!["true".to_string()] }).is_ok());
-        assert!(repl.screen_reader_enabled);
-    }
-
-    #[test]
-    fn test_clipboard_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Clipboard { subcommand: "get".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Clipboard { subcommand: "set".to_string(), args: vec!["CopiedText".to_string()] }).is_ok());
-        assert_eq!(repl.clipboard_content, "CopiedText");
+        let cmd = repl.parse_command("rm testfile.txt");
+        assert!(matches!(cmd, ShellCommand::Rm { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Removed file: testfile.txt");
     }
 }

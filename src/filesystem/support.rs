@@ -70,18 +70,8 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        let val = self.fs_type.load(Ordering::SeqCst);
-        match val {
-            0 => FilesystemType::Ext4,
-            1 => FilesystemType::Btrfs,
-            2 => FilesystemType::ZFS,
-            3 => FilesystemType::Fat32,
-            4 => FilesystemType::APFS,
-            5 => FilesystemType::SovereignP2P,
-            6 => FilesystemType::EncryptedFS,
-            7 => FilesystemType::CompressedFS,
-            _ => FilesystemType::Ext4,
-        }
+        let val = self.fs_type.load(Ordering::SeqCst) as u32;
+        unsafe { core::mem::transmute(val) }
     }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
@@ -560,6 +550,19 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -582,9 +585,6 @@ impl<T> Vec<T> {
     }
 
     pub fn get(&self, index: usize) -> T {
-        if self.data.is_null() || index >= self.len {
-            panic!("Access of invalid pointer");
-        }
         unsafe { core::ptr::read(self.data.add(index)) }
     }
 
@@ -638,17 +638,7 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
