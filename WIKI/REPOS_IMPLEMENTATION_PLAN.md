@@ -1,28 +1,23 @@
-# 🛠️ SigmaOS Comprehensive Repository Implementation & Execution Plan
+# 🛠️ SigmaOS Global Repository Implementation Plan
 
-This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from **500+ open-source repositories** across 34 core domains into the **SigmaOS** microkernel and userspace.
+This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from 500+ open-source repositories into the **SigmaOS** microkernel and userspace.
 
 ---
 
 ## 📅 Roadmap Overview
 
-The implementation is structured across **four sequential stabilization phases** to transition from experimental prototype layers into a rock-solid, production-grade operating system distribution, followed by **six next-phase strategic initiatives** for national-scale sovereign resilience.
-
 ```text
   Phase 1: Stabilization & Foundation  [Q1-Q2]  -->  Phase 2: Capability & Hardening [Q2-Q3]
                                                                         |
   Phase 4: Sovereign Integration & Delight [Q4] <--  Phase 3: High-Perf Storage & Net [Q3-Q4]
-                                        |
-                                        v
-                    [Phases L to Q: Sovereign Scale & AI-Native Layer]
 ```
 
 ---
 
 ## 🚀 Milestones & Implementation Steps
 
-### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Months 1–3)
-*Focus: Stabilizing the memory manager, multi-priority scheduler, system utilities, and base drivers.*
+### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Short-Term: 1–3 Months)
+*Focus: Stabilizing the memory manager, multi-priority scheduler, and standard command utilities.*
 
 #### 1.1 Buddy Allocator & Real-Time Scheduler Integration
 *   **Task:** Integrate state-restoring error handling into the physical memory manager buddy allocator to support crash recoveries. Integrate Earliest Deadline First (EDF) scheduler tick mechanisms.
@@ -38,7 +33,7 @@ The implementation is structured across **four sequential stabilization phases**
 
 ---
 
-### 🟡 Phase 2: Capability Gate & Security Hardening (Months 3–6)
+### 🟡 Phase 2: Capability Gate & Security Hardening (Medium-Term: 3–6 Months)
 *Focus: Enforcing privilege reduction, access control sandboxing, and post-quantum network keys.*
 
 #### 2.1 Capability-Gated Virtual File System & Drivers
@@ -55,7 +50,7 @@ The implementation is structured across **four sequential stabilization phases**
 
 ---
 
-### 🟢 Phase 3: High-Performance Storage & Networking (Months 6–9)
+### 🟢 Phase 3: High-Performance Storage & Networking (Long-Term: 6–9 Months)
 *Focus: Copy-on-Write snapshots, content-addressed packages, and wire-speed packet handlers.*
 
 #### 3.1 Merkle-Tree CoW File System & Self-Healing Rollbacks
@@ -72,7 +67,7 @@ The implementation is structured across **four sequential stabilization phases**
 
 ---
 
-### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (Months 9–12)
+### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (9–12 Months)
 *Focus: High-performance dashboard telemetry, AI-powered predictive scaling, and screen accessibility.*
 
 #### 4.1 AI-Powered Adaptive Telemetry & Monitoring
@@ -86,36 +81,6 @@ The implementation is structured across **four sequential stabilization phases**
 *   **Target Directories:** `src/accessibility/`, `zenith_desktop/`
 *   **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
 *   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
-
----
-
-## 🚀 Next-Phase Strategic Initiatives (Phases L to Q)
-
-To evolve from a core microkernel prototype into an industrial-grade, national-scale sovereign OS, the following next-generation phases are planned and implemented:
-
-### ⚙️ Phase L: Kernel Refinement & Microkernel Modularization
-*   **Focus:** Core microkernel modularization, standardizing syscall interfaces, and implementing POSIX compliance layers to ease Linux absorption.
-*   **Deliverables:** Completing demand paging, Copy-on-Write (CoW), and syscall table standardization in `src/kernel/`.
-
-### 🌐 Phase M: Networking & Distributed Systems (Mesh & SigmaNet)
-*   **Focus:** Implementing peer-to-peer mesh networking for sovereign communication. Developing SigmaNet, a PQC-secured alternative to TCP/IP.
-*   **Deliverables:** Custom TCP/UDP stack congestion control, mesh network routing tables, and QUIC latency benchmarks.
-
-### 📂 Phase N: Filesystem Evolution (SigmaFS Replication)
-*   **Focus:** Evolving SigmaFS with transactional journaling, cryptographic signatures, and distributed replication with NIC/MeitY data centers.
-*   **Deliverables:** Merkle-CoW journaling blocks and sovereign cloud integration interfaces.
-
-### 🖥️ Phase O: Desktop & Multilingual Support (Zenith GUI)
-*   **Focus:** Scaling the Zenith compositor to support GPU acceleration and full multilingual UI across 22 scheduled languages of India.
-*   **Deliverables:** Native screen magnification, high-contrast states, and a sovereign app store.
-
-### 🤖 Phase P: AI-Native Sovereign Layer (Agent Absorption)
-*   **Focus:** Sandboxed local inference engines (Rust-based GGML, candle) running predictive scheduling and self-healing diagnostics.
-*   **Deliverables:** AI kernel task scheduler and PQC-secured IPC agent communication tunnels.
-
-### 🛡️ Phase Q: Security & Sovereignty (Zero-Trust & Aadhaar Integration)
-*   **Focus:** Post-quantum cryptography integration across all networking, storage, and IPC layers. Identity-based access and Aadhaar-compliant verification.
-*   **Deliverables:** Zero-trust capability tokens and biometric-assisted secure boot sequences.
 
 ---
 
@@ -139,6 +104,6 @@ This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, 
 ## 📈 Quality Assurance & Sync Protocol
 
 To maintain 100% architectural integrity during execution:
-1.  **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
-2.  **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
-3.  **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
+1. **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
+2. **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
+3. **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.

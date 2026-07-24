@@ -7,6 +7,148 @@ use alloc::vec::Vec;
 /// Digital Forensics Engine (Sleuth Kit Parity)
 /// Raw disk image analysis engine for forensic recovery.
 
+// ==========================================
+// 6. Kali Linux-Style Sovereign Cybersecurity Tools
+// ==========================================
+
+/// Parse network frames to automatically detect plain-text credential leaks or protocol anomalies
+#[derive(Debug, Clone)]
+pub struct KaliSnifferAudit {
+    pub flagged_leak_count: usize,
+}
+
+impl KaliSnifferAudit {
+    pub fn new() -> Self {
+        Self {
+            flagged_leak_count: 0,
+        }
+    }
+
+    /// Sniffs a raw byte frame. If it contains "USER" or "PASS" in plain-text, raises a forensic warning.
+    pub fn audit_network_frame(&mut self, frame: &[u8]) -> bool {
+        let frame_str = String::from_utf8_lossy(frame);
+        if frame_str.contains("USER")
+            || frame_str.contains("PASS")
+            || frame_str.contains("password=")
+        {
+            self.flagged_leak_count += 1;
+            true // Plain-text credential leak detected!
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for KaliSnifferAudit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dynamic Decoy Honeypot generator to trap potential intruders and identify port scans
+#[derive(Debug, Clone)]
+pub struct DecoyHoneyPot {
+    pub decoy_ports: Vec<u16>,
+    pub trip_wires_triggered: usize,
+}
+
+impl DecoyHoneyPot {
+    pub fn new() -> Self {
+        Self {
+            decoy_ports: alloc::vec![21, 22, 23, 80],
+            trip_wires_triggered: 0,
+        }
+    }
+
+    /// Triggers when an unauthorized scan/connection attempts to bind or probe a decoy port
+    pub fn probe_port(&mut self, port: u16) -> bool {
+        if self.decoy_ports.contains(&port) {
+            self.trip_wires_triggered += 1;
+            true // Trap sprung!
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for DecoyHoneyPot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Defensive Port Auditor to identify unhardened listening sockets
+#[derive(Debug, Clone)]
+pub struct SigmaPortScanner {
+    pub target_ports: Vec<u16>,
+}
+
+impl SigmaPortScanner {
+    pub fn new() -> Self {
+        Self {
+            target_ports: alloc::vec![80, 443, 8080],
+        }
+    }
+
+    /// Performs an audit check on a given port to verify if it is classified as safe or vulnerable
+    pub fn audit_port(&self, port: u16) -> &'static str {
+        match port {
+            80 | 23 | 21 => "Vulnerable: plain-text protocol active",
+            443 => "Safe: HTTPS / SSL active",
+            22 => "Safe: SSH cryptographically active",
+            _ => "Unknown service",
+        }
+    }
+}
+
+impl Default for SigmaPortScanner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Evaluates credential complexity, dictionary matches, and security entropy
+#[derive(Debug, Clone)]
+pub struct PassComplexityAuditor {
+    pub common_dictionary: Vec<String>,
+}
+
+impl PassComplexityAuditor {
+    pub fn new() -> Self {
+        Self {
+            common_dictionary: alloc::vec![
+                String::from("123456"),
+                String::from("password"),
+                String::from("admin"),
+                String::from("root"),
+            ],
+        }
+    }
+
+    /// Audits the entropy and dictionary safety of a password
+    pub fn audit_password_strength(&self, password: &str) -> &'static str {
+        if self.common_dictionary.contains(&String::from(password)) {
+            return "Critical: Common dictionary password!";
+        }
+        if password.len() < 8 {
+            return "Weak: Length is below 8 characters";
+        }
+        let has_uppercase = password.chars().any(|c| c.is_uppercase());
+        let has_digit = password.chars().any(|c| c.is_digit(10));
+        if has_uppercase && has_digit {
+            "Strong: High entropy password"
+        } else {
+            "Moderate: missing uppercase or numeric digit"
+        }
+    }
+}
+
+impl Default for PassComplexityAuditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct ForensicAnalyzer;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -101,5 +243,52 @@ mod tests {
         let meta = analyzer.extract_metadata(&mem);
         assert_eq!(meta.len(), 2);
         assert_eq!(meta[0].key, "CameraMake");
+    }
+
+    #[test]
+    fn test_kali_sniffer_and_credential_audit() {
+        let mut sniffer = KaliSnifferAudit::new();
+        assert!(!sniffer.audit_network_frame(b"GET /index.html HTTP/1.1\r\n\r\n"));
+
+        assert!(sniffer
+            .audit_network_frame(b"POST /login HTTP/1.1\r\nContent: user=admin&password=root\r\n"));
+        assert_eq!(sniffer.flagged_leak_count, 1);
+    }
+
+    #[test]
+    fn test_decoy_honeypot_traps() {
+        let mut decoy = DecoyHoneyPot::new();
+        assert!(!decoy.probe_port(443)); // Safe port, not a decoy
+
+        assert!(decoy.probe_port(21)); // FTP decoy port probed!
+        assert_eq!(decoy.trip_wires_triggered, 1);
+    }
+
+    #[test]
+    fn test_port_scanner_and_password_auditor() {
+        let scanner = SigmaPortScanner::new();
+        assert_eq!(
+            scanner.audit_port(80),
+            "Vulnerable: plain-text protocol active"
+        );
+        assert_eq!(scanner.audit_port(443), "Safe: HTTPS / SSL active");
+
+        let auditor = PassComplexityAuditor::new();
+        assert_eq!(
+            auditor.audit_password_strength("password"),
+            "Critical: Common dictionary password!"
+        );
+        assert_eq!(
+            auditor.audit_password_strength("123456"),
+            "Critical: Common dictionary password!"
+        );
+        assert_eq!(
+            auditor.audit_password_strength("weak"),
+            "Weak: Length is below 8 characters"
+        );
+        assert_eq!(
+            auditor.audit_password_strength("StrongPass123"),
+            "Strong: High entropy password"
+        );
     }
 }
