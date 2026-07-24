@@ -1,9 +1,8 @@
 // SigmaOS Drivers Main Entry Point
-#![cfg_attr(target_os = "none", no_std)]
+#![no_std]
 #![cfg_attr(target_os = "none", no_main)]
-#![allow(unused, clippy::all)]
+#![allow(clippy::all, unused)]
 
-#[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
 #[cfg(target_os = "none")]
@@ -13,11 +12,10 @@ pub extern "C" fn _start() -> ! {
     loop {}
 }
 
-#[cfg(target_os = "none")]
+#[cfg(not(target_os = "none"))]
+fn main() {}
+
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
-
-#[cfg(not(target_os = "none"))]
-fn main() {}
