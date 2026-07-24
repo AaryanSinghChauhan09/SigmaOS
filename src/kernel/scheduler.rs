@@ -64,8 +64,6 @@ impl Process {
 pub struct Scheduler {
     processes: Vec<Process>,
     current_time: u64,
-    pub is_realtime_profile: bool,
-    pub is_hpc_profile: bool,
 }
 
 impl Scheduler {
@@ -73,17 +71,7 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
-            is_realtime_profile: false,
-            is_hpc_profile: false,
         }
-    }
-
-    pub fn enable_realtime_profile(&mut self, enabled: bool) {
-        self.is_realtime_profile = enabled;
-    }
-
-    pub fn enable_hpc_profile(&mut self, enabled: bool) {
-        self.is_hpc_profile = enabled;
     }
 
     pub fn add_process(&mut self, mut process: Process) {
@@ -148,10 +136,9 @@ mod tests {
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
 
-        // Advance time so that virtual deadline (current_time + 3) is reached
-        scheduler.tick();
-        scheduler.tick();
-        scheduler.tick();
+        for _ in 0..5 {
+            scheduler.tick();
+        }
 
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());

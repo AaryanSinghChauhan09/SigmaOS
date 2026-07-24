@@ -2,6 +2,7 @@
 // Atomic package installation and rollback
 
 use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
+use std::collections::HashMap;
 
 /// Transaction for package operations
 pub struct Transaction {
@@ -115,25 +116,6 @@ pub enum TransactionError {
     RollbackFailed,
 }
 
-impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
-    fn from(err: crate::sigpkg::resolver::ResolveError) -> Self {
-        match err {
-            crate::sigpkg::resolver::ResolveError::PackageNotFound(name) => {
-                TransactionError::PackageNotFound(name)
-            }
-            crate::sigpkg::resolver::ResolveError::NoMatchingVersion(name) => {
-                TransactionError::DependencyConflict(name)
-            }
-            crate::sigpkg::resolver::ResolveError::CircularDependency(name) => {
-                TransactionError::DependencyConflict(name)
-            }
-            crate::sigpkg::resolver::ResolveError::Conflict(name) => {
-                TransactionError::DependencyConflict(name)
-            }
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -153,13 +135,13 @@ mod tests {
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
-        let package = Package::new(
-            "test".to_string(),
-            crate::sigpkg::Version::new(1, 0, 0),
-            String::new(),
-            Vec::new(),
-            String::new(),
-        );
+        let package = Package {
+            name: "test".to_string(),
+            version: crate::sigpkg::Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: Vec::new(),
+            checksum: String::new(),
+        };
 
         // This will fail due to dependency resolution, but tests the flow
         let result = transaction.install(package);

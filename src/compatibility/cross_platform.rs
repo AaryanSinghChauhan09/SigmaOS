@@ -15,7 +15,7 @@ pub enum TargetPlatform {
 }
 
 /// Binary format
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BinaryFormat {
     Exe, // Windows executable
     Dmg, // macOS disk image
@@ -77,109 +77,6 @@ impl ApplicationBinary {
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self
-    }
-}
-
-/// Polymorphic trait to verify matching capabilities for equivalent third-party software.
-pub trait SovereignAppCapability {
-    fn capability_name(&self) -> &str;
-    fn as_any(&self) -> &dyn std::any::Any;
-    fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool;
-}
-
-/// Media decoder capability (e.g. for equivalent third-party software like VLC Media Player)
-#[derive(Debug, Clone)]
-pub struct StandardMediaCapability {
-    pub name: String,
-    pub supported_codecs: Vec<String>,
-    pub max_resolution: String, // e.g. "1080p", "4K", "8K"
-}
-
-impl StandardMediaCapability {
-    pub fn new(name: String, codecs: Vec<String>, max_resolution: String) -> Self {
-        Self {
-            name,
-            supported_codecs: codecs,
-            max_resolution,
-        }
-    }
-}
-
-impl SovereignAppCapability for StandardMediaCapability {
-    fn capability_name(&self) -> &str {
-        &self.name
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-
-    fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool {
-        if let Some(other) = required.as_any().downcast_ref::<StandardMediaCapability>() {
-            // Self is compatible with required if self supports all required codecs
-            for codec in &other.supported_codecs {
-                if !self.supported_codecs.contains(codec) {
-                    return false;
-                }
-            }
-            // Resolution check
-            let get_resolution_score = |res: &str| match res.to_lowercase().as_str() {
-                "8k" => 4,
-                "4k" => 3,
-                "1080p" => 2,
-                "720p" => 1,
-                _ => 0,
-            };
-            get_resolution_score(&self.max_resolution)
-                >= get_resolution_score(&other.max_resolution)
-        } else {
-            false
-        }
-    }
-}
-
-/// HTML Renderer capability (e.g. for equivalent third-party software like Chromium Browser)
-#[derive(Debug, Clone)]
-pub struct StandardHtmlCapability {
-    pub name: String,
-    pub engine: String, // e.g. "Blink", "WebKit", "Gecko"
-    pub supports_html5: bool,
-    pub supports_wasm: bool,
-}
-
-impl StandardHtmlCapability {
-    pub fn new(name: String, engine: String, supports_html5: bool, supports_wasm: bool) -> Self {
-        Self {
-            name,
-            engine,
-            supports_html5,
-            supports_wasm,
-        }
-    }
-}
-
-impl SovereignAppCapability for StandardHtmlCapability {
-    fn capability_name(&self) -> &str {
-        &self.name
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-
-    fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool {
-        if let Some(other) = required.as_any().downcast_ref::<StandardHtmlCapability>() {
-            // Engine compatibility or generic check
-            if other.supports_html5 && !self.supports_html5 {
-                return false;
-            }
-            if other.supports_wasm && !self.supports_wasm {
-                return false;
-            }
-            true
-        } else {
-            false
-        }
     }
 }
 
@@ -303,23 +200,11 @@ impl CompatibilityManager {
             .with_target(TargetPlatform::Windows)
             .with_overhead(0.2);
 
-        // Proton (Valve's advanced fork of Wine for high-performance Windows gaming)
-        let proton = TranslationLayer::new("Proton".to_string())
-            .with_format(BinaryFormat::Exe)
-            .with_target(TargetPlatform::Windows)
-            .with_overhead(0.05);
-
         // Rosetta-like translation for macOS binaries
         let rosetta = TranslationLayer::new("Rosetta".to_string())
             .with_format(BinaryFormat::Dmg)
             .with_target(TargetPlatform::MacOS)
             .with_overhead(0.1);
-
-        // Darling for Darwin/macOS application translation
-        let darling = TranslationLayer::new("Darling".to_string())
-            .with_format(BinaryFormat::Dmg)
-            .with_target(TargetPlatform::MacOS)
-            .with_overhead(0.25);
 
         // Box86/Box64 for x86/x64 binaries on ARM
         let box86 = TranslationLayer::new("Box86".to_string())
@@ -327,21 +212,10 @@ impl CompatibilityManager {
             .with_target(TargetPlatform::Linux)
             .with_overhead(0.15);
 
-        // Waydroid for Android application containerized translation
-        let waydroid = TranslationLayer::new("Waydroid".to_string())
-            .with_format(BinaryFormat::Elf)
-            .with_target(TargetPlatform::Linux)
-            .with_overhead(0.08);
-
         self.translation_layers.insert(wine.name.clone(), wine);
-        self.translation_layers.insert(proton.name.clone(), proton);
         self.translation_layers
             .insert(rosetta.name.clone(), rosetta);
-        self.translation_layers
-            .insert(darling.name.clone(), darling);
         self.translation_layers.insert(box86.name.clone(), box86);
-        self.translation_layers
-            .insert(waydroid.name.clone(), waydroid);
     }
 
     fn add_default_runtimes(&mut self) {
@@ -360,28 +234,9 @@ impl CompatibilityManager {
             .with_format(BinaryFormat::Elf)
             .with_isolation("os".to_string());
 
-        // containerd container runtime
-        let containerd = ContainerRuntime::new("containerd".to_string())
-            .with_format(BinaryFormat::Elf)
-            .with_isolation("process".to_string());
-
-        // CRI-O container runtime
-        let crio = ContainerRuntime::new("CRI-O".to_string())
-            .with_format(BinaryFormat::Elf)
-            .with_isolation("process".to_string());
-
-        // runc container runtime
-        let runc = ContainerRuntime::new("runc".to_string())
-            .with_format(BinaryFormat::Elf)
-            .with_isolation("process".to_string());
-
         self.container_runtimes.insert(docker.name.clone(), docker);
         self.container_runtimes.insert(podman.name.clone(), podman);
         self.container_runtimes.insert(lxc.name.clone(), lxc);
-        self.container_runtimes
-            .insert(containerd.name.clone(), containerd);
-        self.container_runtimes.insert(crio.name.clone(), crio);
-        self.container_runtimes.insert(runc.name.clone(), runc);
     }
 
     pub fn register_binary(&mut self, binary: ApplicationBinary) {
@@ -509,8 +364,8 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = CompatibilityManager::new();
-        assert_eq!(manager.translation_layers.len(), 6);
-        assert_eq!(manager.container_runtimes.len(), 6);
+        assert_eq!(manager.translation_layers.len(), 3);
+        assert_eq!(manager.container_runtimes.len(), 3);
     }
 
     #[test]
