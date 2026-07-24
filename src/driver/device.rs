@@ -2152,45 +2152,6 @@ impl DeviceManager {
         }
     }
 
-    /// Register a legacy, potentially unsupported device.
-    /// If there is an early-boot configuration override (from Linux historical overrides),
-    /// we apply the custom base port and load the associated UDF interpreter bytecode to make it functional.
-    pub fn register_legacy_device_with_override(
-        &mut self,
-        device_name: &[u8],
-        default_port: u16,
-    ) -> Result<usize, DeviceError> {
-        let mut final_port = default_port;
-
-        // Lookup in the Linux Early Boot Override Table
-        if let Some(override_entry) = self.linux_override_table.lookup(device_name) {
-            final_port = override_entry.port_io_override;
-        }
-
-        // Create the Legacy Device using OOP principles to minimize footprint
-        let legacy_device = LegacyDevice::new(
-            self.next_device_id.load(Ordering::SeqCst),
-            device_name,
-            final_port,
-        );
-
-        // Register standard character device capabilities
-        let capability = DeviceCapability {
-            can_read: true,
-            can_write: true,
-            can_mmap: false,
-            can_dma: false,
-            can_interrupt: false,
-        };
-
-        self.register_device(
-            Box::new(legacy_device),
-            device_name,
-            DeviceType::Character,
-            capability,
-        )
-    }
-
     pub fn register_device(
         &mut self,
         device: Box<dyn Device>,
