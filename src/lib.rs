@@ -3,7 +3,6 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
-pub mod ai;
 pub mod audio;
 pub mod automation;
 pub mod boot;
@@ -19,8 +18,6 @@ pub mod driver;
 pub mod drivers;
 pub mod ecosystem;
 pub mod education;
-pub mod fs;
-pub mod net;
 pub mod filesystem;
 pub mod finance;
 pub mod governance;
@@ -36,7 +33,6 @@ pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub mod phase_l_plans;
-pub mod pillars;
 pub mod productivity;
 pub mod resilience;
 pub mod scheduler;
@@ -58,7 +54,7 @@ pub use accessibility::{
 pub use ai::{
     Agent, Agent as SaiAgent, AgentOrchestrator, AgentOrchestrator as SaiOrchestrator, AgentRole,
     AgentState, AgentTask, AgentTask as SaiTask, AiError, ComputeBackend, LocalModel, ModelSize,
-    SaiEngine, Task as AiTask, TaskStatus, Tensor, TensorCore,
+    SaiEngine, Task, TaskStatus, TaskType, Tensor, TensorCore,
 };
 pub use audio::{
     AlsaAudioStack, AudioChannels, AudioCodec, AudioDirection as AlsaDirection, AudioDriver,
@@ -143,7 +139,7 @@ pub use governance::{
 pub use graphics::{
     Animation, AnimationCurve, ColorSpace, CompositorError, CompositorError as ZenithError,
     CompositorResult, CompositorStrategy, DecodedImage, Framebuffer as GpuFramebuffer,
-    FramebufferCompositor, Geometry, GpuDevice, HighContrastMode,
+    FramebufferCompositor, Geometry, GpuDevice, GpuDriver, GpuState, GpuVendor, HighContrastMode,
     ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, LayoutStyle, Magnifier, Panel,
     PanelOrientation, PixelFormat, RenderLayer, ScreenReader, SigmaCompositor, Widget, WindowNode,
     WindowState, ZenithCompositor, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
@@ -158,14 +154,14 @@ pub use kernel::{
     AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
     AllocationPolicy as NumaAllocationPolicy, BuddyAllocator, Channel, CpuInstructionExtension,
     CpufreqManager, CpufreqPolicy, CpufreqStats, DeviceDriver, DriverError, DriverMetadata,
-    DriverRegistry, DriverType as KernelDriverType, FileFlags, FileHandle, FileSystem, FsError as KernelFsError,
+    DriverRegistry, DriverType, FileFlags, FileHandle, FileSystem, FilesystemMetadata, FsError,
     GovernorType, HardwareMonitor, IoOperation, IoResult, IpcError, IpcError as PerfIpcError,
     IpcManager, IpcMessage, LinuxAbsorptionEngine, LinuxHeritage, MapFlags, MemoryBlock,
-    MemoryError as KernelMemoryError, MemoryManager, TraitsMemoryManagerMetadata as MemoryManagerMetadata, Message, MonitorThreshold, NetworkError as KernelNetworkError,
-    NetworkStack, TraitsNetworkStackMetadata as NetworkStackMetadata, NodeState, NumaAllocator, NumaNode,
+    MemoryError, MemoryManager, MemoryManagerMetadata, Message, MonitorThreshold, NetworkError,
+    NetworkStack, NetworkStackMetadata, NodeState, NumaAllocator, NumaNode,
     PageDirectoryController, PageDirectoryEntry, Priority, Process, ProcessProfile, ProcessState,
     RoundRobinConfig, RoundRobinScheduler, SanitizationLevel, SchedInstruction, SchedOpcode,
-    Scheduler, SchedulerError, TraitsSchedulerMetadata as SchedulerMetadata, TraitsFilesystemMetadata as FilesystemMetadata, SecureDriverWrapper, SecureFreeDetector,
+    Scheduler, SchedulerError, SchedulerMetadata, SecureDriverWrapper, SecureFreeDetector,
     SecureFreeStats, SignalDispatcher, SlabAllocator as KernelSlabAllocator, SlabCache,
     SlabCacheStats, SlabState, SocketDomain, SocketHandle, SocketProtocol, SocketType,
     SovereignCompilerOptimizer, SovereignIpcBus, SovereignSignal, UdfSchedVm, WatchdogAction,
@@ -179,20 +175,16 @@ pub use memory::{
     PhysicalAddress, SimpleVMM, VirtualAddress, PAGE_SIZE_BYTES, PAGE_TABLE_ENTRIES,
 };
 pub use ml::{LLMInterface, ModelStatus, SigmaAid};
-pub use net::{
-    SovereignAdBlockRule, AdblockRule, BraveShield, BrowserCore, BrowserError,
-    BrowserTab, BrowserTab as SovereignBrowserTab, BrowserTabState, CipherSuite,
-    E1000NetworkDriver, Ipv6Address, Ipv6AddressType, Ipv6ExtensionHeader, Ipv6Header,
-    Ipv6Interface, Ipv6Route, Ipv6Stack, NetworkDriverDevice, NetworkDriverManager,
-    NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame,
-    RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver,
-    SecurityLevel, SecurityProfile, SovereignBrowser, TabCapabilities, TabContainer, TabState,
-    TlsConfig, TlsEngine, TlsSession,
-    TlsState, TlsVersion, TrackingProtection, ZeroCopyPacketRing,
-};
 pub use network::{
-    DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError,
-    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    AdBlockRule as SovereignAdBlockRule, AdblockRule, BraveShield, BrowserCore, BrowserError,
+    BrowserTab, BrowserTab as SovereignBrowserTab, BrowserTabState, CipherSuite, DnsError,
+    DnsResolver, E1000NetworkDriver, Ipv6Address, Ipv6AddressType, Ipv6ExtensionHeader, Ipv6Header,
+    Ipv6Interface, Ipv6Route, Ipv6Stack, MDnsDiscovery, NetworkDriverDevice, NetworkDriverManager,
+    NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame, QuicConnection,
+    QuicError, RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver,
+    SecurityLevel, SecurityProfile, SovereignBrowser, TabCapabilities, TabContainer, TabState,
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, TlsConfig, TlsEngine, TlsSession,
+    TlsState, TlsVersion, TrackingProtection, ZeroCopyPacketRing,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
@@ -263,6 +255,6 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(test)]
 #[no_mangle]
-pub unsafe extern "C" fn free(ptr: *mut u8) {
+pub unsafe extern "C" fn free(_ptr: *mut u8) {
     // No-op deallocation in host test environment to avoid layout-tracking complexity.
 }
