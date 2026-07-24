@@ -1,5 +1,4 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
+#![allow(clippy::all, warnings)]
 
 // SigmaOS Library
 // Core library for SigmaOS operating system
@@ -14,6 +13,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;

@@ -111,12 +111,6 @@ impl PageTableEntry for SimplePageTableEntry {
         self.physical_addr
             .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
     }
-    fn get_page_size(&self) -> usize {
-        self.page_size_flag.load(Ordering::SeqCst)
-    }
-    fn set_page_size(&mut self, size: usize) {
-        self.page_size_flag.store(size, Ordering::SeqCst);
-    }
 }
 
 pub trait PageTable {

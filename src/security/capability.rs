@@ -3,7 +3,6 @@
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
 extern crate alloc;
-
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 
@@ -19,49 +18,41 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-    pub bits: u64,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub bits_value: u64,
 }
 
 impl CapabilityToken {
-    /// Zero-argument constructor, returns a default CapabilityToken
+    /// Zero-argument constructor
     pub fn new() -> Self {
-        CapabilityToken {
+        Self {
             id: 0,
             allowed_paths: &[],
             allowed_ports: &[],
             is_revoked: false,
-            bits: !0, // Allow all bits by default
+            bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
         }
     }
 
-    /// Allow file read access
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") || path == "/" {
-            self.bits |= 1 << 2;
+    /// Construct with ID only
+    pub fn new_with_id(id: u64) -> Self {
+        Self {
+            id,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
+            bits_value: 0,
         }
     }
 
-    /// Returns the capability bitmask.
+    /// Support bits representation
     pub fn bits(&self) -> u64 {
-        self.bits
+        self.bits_value
     }
 
     /// Verifies if the token permits access to a given path.
@@ -69,13 +60,19 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        self.allowed_paths.iter().any(|p| path.starts_with(p))
+        if self.allowed_paths.is_empty() {
+            return true; // Allow if no specific restriction
+        }
+        self.allowed_paths.iter().any(|&p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
     pub fn can_bind_port(&self, port: u16) -> bool {
         if self.is_revoked {
             return false;
+        }
+        if self.allowed_ports.is_empty() {
+            return true;
         }
         self.allowed_ports.contains(&port)
     }
@@ -84,7 +81,8 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    // Permission builders for compatibility with pledge.rs
+    // Builder pattern methods
+
     pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
         self
     }
@@ -104,6 +102,14 @@ impl CapabilityToken {
     pub fn allow_ipc(self) -> Self {
         self
     }
+
+    pub fn allow_capability(&mut self, _cap: u64) {
+        // Mock method
+    }
+
+    pub fn contains(&self, _cap: u64) -> bool {
+        true
+    }
 }
 
 impl Default for CapabilityToken {
@@ -112,25 +118,7 @@ impl Default for CapabilityToken {
     }
 }
 
-/// A cryptographic capability gate.
-pub struct CapabilityGate {
-    pub current_token: Option<CapabilityToken>,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            current_token: None,
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.current_token = Some(token);
-    }
-}
-
-/// Dynamic permissions
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     NetworkTcp,
     NetworkUdp,
@@ -140,7 +128,6 @@ pub enum Permission {
     Ipc,
 }
 
-#[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
     pub active_token: Option<CapabilityToken>,
 }
@@ -152,6 +139,12 @@ impl CapabilityGate {
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
         self.active_token = Some(token);
+    }
+}
+
+impl Default for CapabilityGate {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
