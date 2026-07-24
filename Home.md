@@ -24,6 +24,10 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 
 SigmaOS decomposes the traditional monolithic kernel into specialized, isolated shards. The interaction between these shards is governed by a capability-enforced transaction bus.
 
+### OOP Architecture Plan
+
+SigmaOS is undergoing a 9-pillar OOP-based architecture redesign grounded in Linux kernel subsystems and Linux distro best practices. See the [OOP Development Plan](OOP_Development_Plan.md) for the full implementation roadmap.
+
 ```mermaid
 graph TD
     UserLand[Userland Applications] -->|Syscall Capability Gate| KernelGate[S-SEC Security Shard]
