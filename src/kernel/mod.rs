@@ -1,6 +1,7 @@
 // SigmaOS Kernel Module
 pub mod ipc;
 pub mod memory;
+pub mod performance;
 pub mod roundrobin;
 pub mod scheduler;
 

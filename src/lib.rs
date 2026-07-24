@@ -3,7 +3,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod unimplemented_features;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -23,6 +22,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod unimplemented_features;
 pub mod virtualization;
 
 pub use accessibility::{

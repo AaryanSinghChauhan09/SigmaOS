@@ -5,6 +5,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IpcError {
@@ -16,23 +17,23 @@ pub enum IpcError {
 /// Thread-Safe, Lock-Free Circular Ring-Buffer for Zero-Copy IPC
 pub struct ZeroCopyQueue<T, const N: usize> {
     buffer: [Option<T>; N],
-    head: usize,
-    tail: usize,
+    head: AtomicUsize,
+    tail: AtomicUsize,
 }
 
 impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
             buffer: [const { None }; N],
-            head: 0,
-            tail: 0,
+            head: AtomicUsize::new(0),
+            tail: AtomicUsize::new(0),
         }
     }
 
     /// Pushes a zero-copy reference or page frame onto the queue without locks
     pub fn enqueue(&mut self, item: T) -> Result<(), IpcError> {
-        let head = self.head;
-        let tail = self.tail;
+        let head = self.head.load(Ordering::Relaxed);
+        let tail = self.tail.load(Ordering::Acquire);
 
         if head.wrapping_sub(tail) >= N {
             return Err(IpcError::QueueFull);
@@ -40,14 +41,14 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
 
         let idx = head % N;
         self.buffer[idx] = Some(item);
-        self.head = head.wrapping_add(1);
+        self.head.store(head.wrapping_add(1), Ordering::Release);
         Ok(())
     }
 
     /// Pulls a zero-copy reference or page frame out of the queue
     pub fn dequeue(&mut self) -> Result<T, IpcError> {
-        let head = self.head;
-        let tail = self.tail;
+        let head = self.head.load(Ordering::Acquire);
+        let tail = self.tail.load(Ordering::Relaxed);
 
         if tail == head {
             return Err(IpcError::QueueEmpty);
@@ -55,23 +56,28 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
 
         let idx = tail % N;
         let item = self.buffer[idx].take().ok_or(IpcError::InvalidPayload)?;
-        self.tail = tail.wrapping_add(1);
+        self.tail.store(tail.wrapping_add(1), Ordering::Release);
         Ok(item)
     }
 
     /// Check if queue is empty
     pub fn is_empty(&self) -> bool {
-        self.head == self.tail
+        self.head.load(Ordering::Acquire) == self.tail.load(Ordering::Acquire)
     }
 
     /// Check if queue is full
     pub fn is_full(&self) -> bool {
-        self.head.wrapping_sub(self.tail) >= N
+        self.head
+            .load(Ordering::Acquire)
+            .wrapping_sub(self.tail.load(Ordering::Acquire))
+            >= N
     }
 
     /// Get current queue size
     pub fn len(&self) -> usize {
-        self.head.wrapping_sub(self.tail)
+        self.head
+            .load(Ordering::Acquire)
+            .wrapping_sub(self.tail.load(Ordering::Acquire))
     }
 }
 
