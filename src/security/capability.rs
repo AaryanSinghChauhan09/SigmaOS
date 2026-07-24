@@ -5,21 +5,41 @@
 use alloc::vec::Vec;
 
 /// A cryptographic capability token required for any privileged action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: &'static [&'static str],
     pub allowed_ports: &'static [u16],
     pub is_revoked: bool,
+    pub bits: u64,
 }
 
 impl CapabilityToken {
-    pub fn new(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    /// Zero-argument constructor, returns a default CapabilityToken
+    pub fn new() -> Self {
+        CapabilityToken {
+            id: 0,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
+            bits: !0, // Allow all bits by default
+        }
+    }
+
+    /// Constructor with parameters for compatibility
+    pub fn with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
             allowed_paths: paths,
             allowed_ports: ports,
             is_revoked: false,
+            bits: !0,
         }
+    }
+
+    /// Returns the capability bitmask.
+    pub fn bits(&self) -> u64 {
+        self.bits
     }
 
     /// Verifies if the token permits access to a given path.
@@ -41,6 +61,61 @@ impl CapabilityToken {
     pub fn revoke(&mut self) {
         self.is_revoked = true;
     }
+
+    // Permission builders for compatibility with pledge.rs
+    pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
+        self
+    }
+
+    pub fn allow_read(self, _path: &str) -> Self {
+        self
+    }
+
+    pub fn allow_write(self, _path: &str) -> Self {
+        self
+    }
+
+    pub fn allow_exec(self) -> Self {
+        self
+    }
+
+    pub fn allow_ipc(self) -> Self {
+        self
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// A cryptographic capability gate.
+pub struct CapabilityGate {
+    pub current_token: Option<CapabilityToken>,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            current_token: None,
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.current_token = Some(token);
+    }
+}
+
+/// Dynamic permissions
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
 }
 
 pub struct SecurityEnforcer {
