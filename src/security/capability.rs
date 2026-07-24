@@ -2,6 +2,8 @@
 //! 
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
+extern crate alloc;
+
 use alloc::vec::Vec;
 
 /// A cryptographic capability token required for any privileged action.
