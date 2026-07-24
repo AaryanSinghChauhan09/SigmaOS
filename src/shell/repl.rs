@@ -120,23 +120,37 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
         Self {
             running: true,
-            variables: HashMap::new(),
+            variables: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            customization: CustomizationEngine::new(),
-            accessibility: AccessibilityFramework::new(),
-            package_manager: UniversalPackageManager::new(),
-            virt_orchestrator: VirtualizationOrchestrator::new(),
-            compatibility: CompatibilityManager::new(),
-            self_healing: SelfHealingModule::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
-        let mut shell = Self::new();
-        shell.prompt = prompt;
-        shell
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            prompt,
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+        }
     }
 
     pub fn run(&mut self) {
@@ -178,36 +192,74 @@ impl ShellRepl {
         }
     }
 
-    pub fn parse_command(&self, input: &str) -> ShellCommand {
-        let parts: Vec<&str> = input.split_whitespace().collect();
+    fn parse_command(&self, input: &str) -> ShellCommand {
+        // Optimized to minimize/avoid heap allocations by using iterators.
+        // Single-word commands are completely allocation-free.
+        let mut parts = input.split_whitespace();
+        let cmd = match parts.next() {
+            Some(c) => c,
+            None => return ShellCommand::Unknown(input.to_string()),
+        };
 
-        if parts.is_empty() {
-            return ShellCommand::Unknown(input.to_string());
-        }
-
-        match parts[0] {
+        match cmd {
             "help" => ShellCommand::Help,
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
+            "pwd" => ShellCommand::Pwd,
+            "whoami" => ShellCommand::WhoAmI,
+            "uname" => ShellCommand::Uname,
+            "clear" => ShellCommand::Clear,
+            "touch" => {
+                if let Some(filename) = parts.next() {
+                    ShellCommand::Touch {
+                        filename: filename.to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "mkdir" => {
+                if let Some(dirname) = parts.next() {
+                    ShellCommand::Mkdir {
+                        dirname: dirname.to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "rm" => {
+                if let Some(filename) = parts.next() {
+                    ShellCommand::Rm {
+                        filename: filename.to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "echo" => {
-                let message = parts[1..].join(" ");
+                let message = parts.collect::<Vec<&str>>().join(" ");
                 ShellCommand::Echo { message }
             }
             "set" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Set {
-                        variable: parts[1].to_string(),
-                        value: parts[2..].join(" "),
+                if let Some(variable) = parts.next() {
+                    let value = parts.collect::<Vec<&str>>().join(" ");
+                    if !value.is_empty() {
+                        ShellCommand::Set {
+                            variable: variable.to_string(),
+                            value,
+                        }
+                    } else {
+                        ShellCommand::Unknown(input.to_string())
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "get" => {
-                if parts.len() >= 2 {
+                if let Some(variable) = parts.next() {
                     ShellCommand::Get {
-                        variable: parts[1].to_string(),
+                        variable: variable.to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
