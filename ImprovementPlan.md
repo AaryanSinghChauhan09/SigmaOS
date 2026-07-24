@@ -212,7 +212,16 @@ SigmaOS natively absorbs and improves the core productivity tools and orchestrat
 
 ---
 
-## 🤖 13. AI-Native Automation Core & Agent
+## 🎨 13. Deep Desktop Customization Utilities
+
+SigmaOS includes built-in dynamic desktop customizers running on top-level configurations:
+1.  **Dynamic Backdrop Filters (`ZenithBackdropFilter`):** Exposes modular controls to adjust window background blurs, rounded design corners, and transparency percentages.
+2.  **Interactive System Soundscapes (`SigmaSoundscape`):** Maps core events (such as user login, shutdown, and warning alerts) dynamically to custom sound files.
+3.  **DPI-Aware Icon Theme Scaling (`IconThemeEngine`):** Automatically rescales visual icons and typography size based on hardware screen DPI thresholds to guarantee pixel-perfect resolution.
+
+---
+
+## 🤖 14. AI-Native Automation Core & Agent
 
 SigmaOS integrates a zero-dependency, local AI agent (`SimpleAIAgent`) executing directly on standard memory ranges:
 1.  **Natural Language Command Translator (`translate_natural_command`):** Translates natural language requests into direct, executable system actions. Supports major Indian languages (Hindi, Tamil, Bengali) along with standard English commands (e.g. converting *"libreoffice install karo"* or *"லிப்ரேஆபிஸ் நிறுவவும்"* dynamically to `sigpkg install libreoffice`).
@@ -221,7 +230,7 @@ SigmaOS integrates a zero-dependency, local AI agent (`SimpleAIAgent`) executing
 
 ---
 
-## 🧰 14. Core SigmaTools Suite & System Utilities
+## 🧰 15. Core SigmaTools Suite & System Utilities
 
 SigmaOS includes a robust, pre-installed suite of diagnostic and recovery toolsets running natively under strict `#![no_std]` constraints:
 1.  **SigmaDeploy:** Operates automated netboot TFTP/DHCP provisioning using pre-configured kickstart/preseed configuration graphs.
@@ -234,7 +243,7 @@ SigmaOS includes a robust, pre-installed suite of diagnostic and recovery toolse
 
 ---
 
-## 🏢 15. SovereignData & Productivity Workspace
+## 🏢 16. SovereignData & Productivity Workspace
 
 SigmaOS natively absorbs, improves, and isolates core functions from prominent productivity, office, and CAD repositories (such as LibreOffice, VS Code, and FreeCAD):
 1.  **SovereignOffice (`SpreadsheetProcessor`):** Incorporates high-performance cell-range compilers capable of parsing and evaluating financial formulas (including `SUM` and `AVERAGE` ranges) directly in standard sheets.
@@ -243,7 +252,7 @@ SigmaOS natively absorbs, improves, and isolates core functions from prominent p
 
 ---
 
-## ⚡ 16. Cachy Linux Dynamic Optimizations
+## ⚡ 17. Cachy Linux Dynamic Optimizations
 
 To deliver outstanding responsive fluidity and desktop performance, SigmaOS absorbs and builds upon the leading custom kernel designs of Cachy Linux:
 1.  **Sovereign BORE Scheduler (`CachyBoreScheduler`):** Emulates Cachy Linux's Burst-Oriented Response Enhancer (BORE). Continuously monitors and logs runtime CPU burst duration scores of active system threads, allocating dynamically wider execution timeslices to highly interactive, low-burst tasks.
@@ -251,7 +260,7 @@ To deliver outstanding responsive fluidity and desktop performance, SigmaOS abso
 
 ---
 
-## 🛠️ 17. Expanded Systems Engineering Roles
+## 🛠️ 18. Expanded Systems Engineering Roles
 
 To successfully satisfy the 100-item parity roadmap and achieve full boot integration, SigmaOS establishes eight specialized, non-overlapping systems engineering roles within the developer community:
 *   **Compiler & Language Toolchain Engineer:** Focuses on the LLVM backend, ELF loaders, and bootstrapping compilers natively. Maintains low-level compiler-rt libraries.
@@ -265,7 +274,7 @@ To successfully satisfy the 100-item parity roadmap and achieve full boot integr
 
 ---
 
-## 📟 18. SovereignCLI Command-Line Synthesis Engine (S-CLI)
+## 📟 19. SovereignCLI Command-Line Synthesis Engine (S-CLI)
 
 SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates the legacy divide between graphical and text-based control. Under our Zero-Zero-Trust Capability framework, every single operation exposed within our Zenith graphical workspaces is mapped directly to a strongly-typed, object-oriented CLI system command.
 *   **CliCommandRegistry Singleton:** Tracks and exposes all active commands available to userspace. Maps textual command paths (e.g., `zenith window tile`) to distinct `CliCommand` object instances.
@@ -279,7 +288,7 @@ SigmaOS implements a unified Command-Line Interface (`S-CLI`) that eliminates th
 
 ---
 
-## 📡 19. Automated Upstream Intelligence & Daily Updates Scanning
+## 📡 20. Automated Upstream Intelligence & Daily Updates Scanning
 
 To guarantee continuous parity and eventual domination over mainstream Linux distributions, SigmaOS executes two specialized daily automation processes managed by the AI engine:
 1.  **The "Sigma Updater" Engine:** Continuously monitors the repository trees of the Linux Kernel (mainline, stable, and LTS branches), LLVM, GCC, and musl/glibc projects. Identifies, parses, and maps upstream security fixes directly to capability rings in SigmaOS.
@@ -287,7 +296,7 @@ To guarantee continuous parity and eventual domination over mainstream Linux dis
 
 ---
 
-## 💎 20. Core Systems OOP Implementation Specifications
+## 💎 21. Core Systems OOP Implementation Specifications
 
 To maintain absolute architectural safety, all implementations across core systems must strictly adhere to the following Object-Oriented systems principles:
 *   **Networking & Connectivity:** Dynamic network sockets are modeled as polymorphically isolated `Connection` objects. Each socket represents a concrete implementation of the base abstract `SocketChannel` class, enforcing encapsulating bounds on physical ring-buffer frames.
@@ -300,14 +309,14 @@ To maintain absolute architectural safety, all implementations across core syste
 
 ---
 
-## ⚡ 21. Bolt's Daily Performance Optimization
+## ⚡ 22. Bolt's Daily Performance Optimization
 
 Today's Bolt performance improvement focuses on **Allocation-Free Version Parsing and Zero-Copy top-level interfaces**.
 By replacing intermediate heap allocations with lazy slice iterators, we completely eliminate memory churn in package installation and dynamic dependency resolution, making the `sigpkg` engine fast and lightweight under intensive workspace loads.
 
 ---
 
-## 🚀 22. Prioritized Next Steps & Action Plan
+## 🚀 23. Prioritized Next Steps & Action Plan
 
 | Task | Description | Priority | Target Subsystem |
 | :--- | :--- | :---: | :---: |
