@@ -1,7 +1,11 @@
 // SigmaOS Kernel Scheduler
 // Implements EEVDF (Earliest Eligible Virtual Deadline First) scheduler
+// Enhanced with CachyOS-style BORE (Burst-Oriented Response Enhancer) responsiveness tuning
 
 use core::time::Duration;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Process priority levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -32,6 +36,7 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_deadline: u64,
     pub time_slice: Duration,
+    pub sleep_count: u64, // BORE tracking for interactive sleep cycles
 }
 
 impl Process {
@@ -44,19 +49,27 @@ impl Process {
             runtime: Duration::from_secs(0),
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
+            sleep_count: 0,
         }
     }
 
     pub fn update_virtual_deadline(&mut self, current_time: u64) {
         // EEVDF virtual deadline calculation
-        let weight = match self.priority {
+        let weight: u64 = match self.priority {
             Priority::Idle => 1024,
             Priority::Low => 512,
             Priority::Normal => 256,
             Priority::High => 128,
             Priority::Realtime => 64,
         };
-        self.virtual_deadline = current_time + (1000 / weight);
+
+        // BORE-style burstiness responsive deadline bonus
+        // Bursty tasks (high sleep count) get a scheduling bonus (up to 50% deadline reduction)
+        let bore_bonus = (self.sleep_count * 5).min(50);
+        let base_delay = 1000 / weight;
+        let adjusted_delay = base_delay.saturating_sub(bore_bonus);
+
+        self.virtual_deadline = current_time + adjusted_delay;
     }
 }
 
@@ -64,6 +77,8 @@ impl Process {
 pub struct Scheduler {
     processes: Vec<Process>,
     current_time: u64,
+    pub is_realtime_profile: bool,
+    pub is_hpc_profile: bool,
 }
 
 impl Scheduler {
@@ -71,6 +86,8 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
+            is_realtime_profile: false,
+            is_hpc_profile: false,
         }
     }
 
@@ -103,6 +120,10 @@ impl Scheduler {
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
+            if state == ProcessState::Blocked {
+                // Task yielded or blocked (interactive behavior) -> increment sleep_count for BORE bonus
+                process.sleep_count = process.sleep_count.saturating_add(1);
+            }
             if state == ProcessState::Ready {
                 process.update_virtual_deadline(self.current_time);
             }
@@ -157,5 +178,26 @@ mod tests {
         let p1 = Priority::Low;
         let p2 = Priority::High;
         assert!(p2 > p1);
+    }
+
+    #[test]
+    fn test_bore_responsiveness_bonus() {
+        let mut scheduler = Scheduler::new();
+
+        // 1. Create a CPU-bound process (never sleeps, sleep_count = 0)
+        let cpu_process = Process::new(1, "cpu_worker".to_string(), Priority::Normal);
+        scheduler.add_process(cpu_process);
+
+        // 2. Create an interactive process (sleeps frequently)
+        let mut interactive_process = Process::new(2, "compositor".to_string(), Priority::Normal);
+        // Simulate multiple sleep/yield events
+        interactive_process.sleep_count = 10;
+        scheduler.add_process(interactive_process);
+
+        // Interactive process should have a closer/earlier virtual deadline due to BORE bonus
+        let p_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        let p_inter = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
+
+        assert!(p_inter.virtual_deadline < p_cpu.virtual_deadline);
     }
 }
