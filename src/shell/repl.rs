@@ -192,14 +192,16 @@ impl ShellRepl {
         }
     }
 
-    pub fn parse_command(&self, input: &str) -> ShellCommand {
-        let parts: Vec<&str> = input.split_whitespace().collect();
+    fn parse_command(&self, input: &str) -> ShellCommand {
+        // Optimized to minimize/avoid heap allocations by using iterators.
+        // Single-word commands are completely allocation-free.
+        let mut parts = input.split_whitespace();
+        let cmd = match parts.next() {
+            Some(c) => c,
+            None => return ShellCommand::Unknown(input.to_string()),
+        };
 
-        if parts.is_empty() {
-            return ShellCommand::Unknown(input.to_string());
-        }
-
-        match parts[0] {
+        match cmd {
             "help" => ShellCommand::Help,
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
@@ -209,50 +211,55 @@ impl ShellRepl {
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
             "touch" => {
-                if parts.len() >= 2 {
+                if let Some(filename) = parts.next() {
                     ShellCommand::Touch {
-                        filename: parts[1].to_string(),
+                        filename: filename.to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "mkdir" => {
-                if parts.len() >= 2 {
+                if let Some(dirname) = parts.next() {
                     ShellCommand::Mkdir {
-                        dirname: parts[1].to_string(),
+                        dirname: dirname.to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "rm" => {
-                if parts.len() >= 2 {
+                if let Some(filename) = parts.next() {
                     ShellCommand::Rm {
-                        filename: parts[1].to_string(),
+                        filename: filename.to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "echo" => {
-                let message = parts[1..].join(" ");
+                let message = parts.collect::<Vec<&str>>().join(" ");
                 ShellCommand::Echo { message }
             }
             "set" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Set {
-                        variable: parts[1].to_string(),
-                        value: parts[2..].join(" "),
+                if let Some(variable) = parts.next() {
+                    let value = parts.collect::<Vec<&str>>().join(" ");
+                    if !value.is_empty() {
+                        ShellCommand::Set {
+                            variable: variable.to_string(),
+                            value,
+                        }
+                    } else {
+                        ShellCommand::Unknown(input.to_string())
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "get" => {
-                if parts.len() >= 2 {
+                if let Some(variable) = parts.next() {
                     ShellCommand::Get {
-                        variable: parts[1].to_string(),
+                        variable: variable.to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
