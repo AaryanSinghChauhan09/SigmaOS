@@ -1,143 +1,235 @@
-# SigmaOS Wiki
+# 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
-> **v15.0.0 Zenith — Stable** · One branch (`main`) · PQC-signed · Multi-format
-
----
-
-## What is SigmaOS?
-
-SigmaOS is a sovereign, multi-format operating system built from a single unified codebase.
-It ships in **50+ distribution formats** — from a bare-metal RTOS to a browser-tab WASM app —
-all signed with post-quantum cryptography (Kyber-1024 + Dilithium-5).
-
-> *The only OS that boots on bare metal, runs in a browser, deploys as a cloud container,
-> and installs as a mobile APK — all from one codebase.*
+> **"Sovereignty is the ultimate efficiency."**
+> The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
 
 ---
 
-## 🚀 Start Here
+## 🎯 Overview
 
-| I want to… | Go to |
-|---|---|
-| **Download SigmaOS** | [DOWNLOAD.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md) |
-| **Run it in QEMU right now** | [Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/QUICKSTART.md) |
-| **Understand the architecture** | [Architecture Overview](Architecture-Overview) |
-| **Use the AI CLI agent** | [sigma-agent](sigma-agent) |
-| **Automate workflows** | [sigma-agent-workflow](sigma-agent-workflow) |
-| **Migrate from Linux** | [Migration Guide](Migration-Guide) |
-| **Build an app** | [SDK Guide](SDK-Guide) · [Your First App](Your-First-App) |
-| **Add a driver** | [Driver Development](Driver-Development) |
-| **Contribute code** | [Community Governance](Community-Governance) · [Developer Guide](Developer_Guide) |
-| **Compare to other distros** | [SigmaOS vs Linux](SigmaOS-vs-Linux) |
-| **Understand the roadmap** | [ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md) |
+SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
+
+### Core Pillars
+
+- **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
+- **Capability-Based Security**: 64-bit hardware-enforced permission model replacing legacy ACLs.
+- **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
+- **AI-Native Design**: Local LLM inference as a first-class OS primitive.
+- **India-First**: Native GST, Income Tax, UPI, and 22-language support.
+
 
 ---
 
-## 🤖 AI Agent (sigma-agent)
+## 📊 System Architecture
 
-sigma-agent is SigmaOS's built-in AI CLI assistant — 36 modules, 22 subcommands.
+SigmaOS decomposes the traditional monolithic kernel into specialized, isolated shards. The interaction between these shards is governed by a capability-enforced transaction bus.
+
+```mermaid
+graph TD
+    UserLand[Userland Applications] -->|Syscall Capability Gate| KernelGate[S-SEC Security Shard]
+    KernelGate -->|Validated Message| Bus[Sovereign IPC Bus]
+    Bus --> S-MM[S-MM: Memory Shard]
+    Bus --> S-SCHED[S-SCHED: Scheduler Shard]
+    Bus --> S-FS[S-FS: Distributed Filesystem]
+    Bus --> S-NET[S-NET: Network Shard]
+    Bus --> S-AI[S-AI: Local LLM Orchestrator]
+```
+
+- **S-MM**: Sovereign Memory Manager (Buddy Allocator).
+- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
+- **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
+- **S-SEC**: Security Framework (PQC + MAC + Sandbox).
+- **S-AI**: AI Task Orchestrator (Local LLM routing).
+
+
+---
+
+## 🚀 Quick Start
+
+### Running the QEMU Demo (Works Today)
+
+Ensure you have the required compiler toolchain and emulation packages:
 
 ```bash
-sigma-agent                          # interactive REPL
-sigma-agent "install sigma-edit"     # one-shot NL command
-sigma-agent "set dark mode"          # any GUI action via NL
-sigma-agent doctor                   # health check
-sigma-agent daemon start             # background AI service
-sigma-agent workflow install --all   # install automation templates
-sigma-agent security scan            # security audit
+
+# Install dependencies
+
+sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go xorriso
+
+# Clone the repository
+
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+
+# Build the system image
+
+make clean && make all -j$(nproc)
+
+# Run in QEMU
+
+qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 ```
 
-Every GUI action has a CLI equivalent. Full docs: [sigma-agent](sigma-agent) · [Workflow Automation](sigma-agent-workflow)
+### Profile Builds
 
----
+SigmaOS supports declarative compilation profiles specified at build-time:
 
-## 📦 Download Formats
-
-| Category | Formats |
-|---|---|
-| App | Native, Electron, Java, .NET, Python, AppImage/Snap/Flatpak, WASM, Mobile, ELF, sigpkg |
-| Standalone | Native ISO, AppImage, Portable EXE, WASM Bundle |
-| RTOS | Monolithic, Microkernel, Layered, Exokernel, POSIX Layer, Bare-Metal |
-| Mobile | APK, IPA, Hybrid, Cross-Platform, PWA |
-| Microkernel | Pure, Hybrid, Modular, Exokernel, POSIX Layer |
-| Dual Boot | Partition, Separate Disk, Chainload, Virtualized, Live USB |
-| Distributed | Client-Server, P2P, Cluster, Grid, SOA, Ledger, Actor |
-| Cloud | Public, Private, Hybrid, Multi, Community, IaaS, PaaS, SaaS, FaaS |
-| Browser | Desktop, Mobile, WebViews, Headless, Lite, Specialised |
-| Kernel | Monolithic, Microkernel, Hybrid, Exokernel, Nanokernel, Modular, Mono+Modular |
-
----
-
-## 🗺️ Roadmap at a Glance
-
-| Phase | Version | Goal | Status |
-|---|---|---|---|
-| 1 | **v0.1** | Bootable ISO + sigma-sh + sigma-pkg | 🔴 Building |
-| 2 | v1.0 | Desktop + AppImage + 50 packages + SDK | ⬜ Planned Q2 2027 |
-| 3 | v2.0 | Mobile + WASM + Cloud images | ⬜ Planned Q4 2027 |
-| 4 | v3.0 | RTOS + Distributed + Formal verification | ⬜ Planned Q2 2028 |
-
----
-
-## 🏗️ System Architecture
-
-```
-User Space     → PWAs · Zenith Desktop · sigma-ai · profession apps
-Browser Shell  → Custom Chromium + navigator.sigmaos.* API
-System Daemons → sigmad-health · sigmad-pkg · sigmad-netd · sigmad-vault
-Syscall Layer  → sigma_pledge + sigma_unveil + seccomp-BPF + AVC
-Kernel (Ring 0)→ MLFQ+EDF+CFS Scheduler · Buddy+Slab MM · PQC Security
-                 TCP/IP+TLS1.3+Kyber · VFS+SigmaFS+Ext4 · IPC · eBPF
-HAL            → x86_64 · ARM64 · RISC-V RV64GC
-Hardware       → CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI
+```bash
+make PROFILE=standalone all    # Full desktop ISO
+make PROFILE=rtos all          # Hard real-time ELF
+make PROFILE=cloud all         # Headless cloud image
+make PROFILE=browser all       # WASM bundle
 ```
 
 ---
 
-## 🧩 Ecosystem
+## 🔒 Security & Sandboxing
 
-- **600+ shards** — atomic, independently testable capability modules
-- **sigma-pkg** — PQC-signed package manager with reproducible builds
-- **sigma-sdk** — multi-language SDK (Rust, JS/TS, Python, Java, .NET)
-- **Zenith Desktop** — glassmorphic DE with `navigator.sigmaos.*` web API
-- **sigma-vault** — TPM2-backed secrets store
-- **sigma-pod** — OCI-compatible container runtime
-- **sigma-ai** — on-device TinyLlama inference daemon
+SigmaOS features a capability-native access control system. Programs are executed with explicit privilege tokens (capabilities) rather than generic user IDs.
 
----
+```rust
+// Capability delegation example
+let token = CapabilityToken::new()
+    .allow_network("tcp", 80)
+    .allow_read("/var/www");
+```
 
-## 🔒 Security Pillars
-
-1. **Post-Quantum Cryptography** — Kyber-1024 KEM + Dilithium-5 signatures
-2. **sigma_pledge / sigma_unveil** — kernel-enforced capability restriction
-3. **Zero-Trust** — SPIFFE workload identities, per-syscall attestation
-4. **TPM2** — sealed key derivation, remote attestation
-5. **W^X** — no page simultaneously writable and executable
-6. **Reproducible Builds** — cryptographically verifiable binaries
+For a detailed review of all security policies, see the canonical [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) page on the Wiki.
 
 ---
 
-## 📚 Key Documents
+## 📚 Canonical Documentation (GitHub Wiki)
 
-| Document | Description |
-|---|---|
-| [Architecture Overview](Architecture-Overview) | System layers, subsystems, deployment profiles |
-| [sigma-agent](sigma-agent) | AI CLI agent — 36 modules, 22 subcommands |
-| [sigma-agent-workflow](sigma-agent-workflow) | n8n-style workflow automation |
-| [Migration Guide](Migration-Guide) | Moving from Ubuntu/Fedora/Arch to SigmaOS |
-| [SigmaOS vs Linux](SigmaOS-vs-Linux) | Feature-by-feature comparison |
-| [Linux Absorption Architecture](Linux-Absorption-Architecture) | Running Linux apps on SigmaOS |
-| [SDK Guide](SDK-Guide) | Build native SigmaOS apps |
-| [Community Governance](Community-Governance) | Contributor roles, RFC process, voting |
-| [Security Model](Security-Model) | PQC, pledge/unveil, zero-trust |
-| [Professional Tools & Apps](Professional-Tools-And-Apps) | Full app and tool ecosystem |
-| [sigpkg Specification](sigpkg-Spec) | Package format and registry |
-| [OSS Reference Map](OSS-Reference-Map) | Inspirational open-source projects |
-| [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas backlog |
-| [999 Structured Ideas (6 Pillars)](Ideas-999-Structured) | Kernel, Packages, AI, Security, UX, Community — 999 actionable tasks |
-| [Profession Profiles](PROFILES) | 1000+ role-specific shard bundles |
+```text
+Phase F (Competitor Crusher)   ████████████████████  100% ✅
+Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
+Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
+```
+
+### Current Status
+
+**Kernel Core:**
+- ✅ Kernel scheduler (MLFQ+CFS+EDF)
+- ✅ Syscalls (I/O + Process)
+- ✅ Physical MM (buddy allocator)
+- 🔄 Virtual MM (paging) - Partial
+- ✅ APIC + timer
+- ✅ sigma_pledge + sigma_unveil
+- ✅ Kyber-1024 KEM + Dilithium-5
+- ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
+- ✅ Linux Driver Absorption Engine
+- ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+
+**Networking & Storage:**
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
+
+**Desktop & Productivity:**
+- ✅ Zenith Desktop prototype
+- ✅ Screen recorder with GPU acceleration
+- ✅ Screenshot tool with annotation
+- ✅ Calendar + task manager
+- ✅ Email client with IMAP/SMTP
+- ✅ Note-taking app with Markdown
+- ✅ Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- ✅ Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- ✅ Password manager with biometric unlock
+- ✅ Intrusion detection system
+- ✅ Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- ✅ Virtual machine manager (QEMU/KVM)
+- ✅ Container manager (Docker/Podman)
+
+**Package Management:**
+- ✅ sigma-pkg CLI
+- ✅ Universal package manager
+- ✅ Rollback package snapshots
+
+**Networking:**
+- ✅ Cloud sync engine
+- ✅ Built-in torrent client
+- ✅ Network traffic analyzer
+
+**AI & Automation:**
+- ✅ AI orchestrator for system optimization
+
+**Customization:**
+- ✅ Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
+- ⬜ Bootable ISO (Phase G)
+
 
 ---
 
-*SigmaOS — Sovereign by Design. One codebase. Every format.*
-*GitHub: [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)*
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### High-Impact Areas
+
+- Round-robin scheduler implementation
+- Buddy allocator completion
+- sigma-sh REPL
+- USB HID keyboard driver
+- VESA framebuffer driver
+- Package recipes
+
+
+---
+
+## 📚 Documentation
+
+### Repository Documentation
+
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
+- [Roadmap](Roadmap.md) — Development plan
+- [INSTALL.md](INSTALL.md) — Build instructions
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
+- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy
+- [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
+- [FAQ](FAQ.md) — Common questions (coming soon)
+
+
+### GitHub Wiki (Canonical Documentation)
+
+Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
+
+- **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
+- **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
+- **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
+- **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
+- **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
+- **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
+- **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+- **Linux Distro Absorption**: [Strategic Distro Absorption Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_ABSORPTION_SPEC)
+- **S-Boot Firmware**: [Sovereign BIOS & UEFI Firmware Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BIOS_FIRMWARE_SPEC)
+- **Zenith Compositor**: [Wayland Zenith UI Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WAYLAND_ZENITH_SPEC)
+- **Portable Apps**: [Portable Application Format Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PORTABLE_APP_FORMAT_PLAN)
+- **Custom Personalization**: [Custom Personalization & Theme Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CUSTOM_PERSONALIZATION_SPEC)
+- **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
+- **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
+- **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
+
+
+---
+
+## 📄 License
+
+Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
