@@ -1,8 +1,8 @@
+use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::driver::device::DdeDeviceWrapper;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {
@@ -47,8 +47,8 @@ impl HistoricSyscallEmulator for Era0_11SyscallEmulator {
         // Early Linux used EAX for syscall number, EBX, ECX, EDX for arguments
         match state.eax {
             0 => Err(HistoricError::SyscallNotImplemented), // sys_setup
-            1 => Ok(42), // sys_exit (dummy code)
-            2 => Ok(101), // sys_fork (simulated pid)
+            1 => Ok(42),                                    // sys_exit (dummy code)
+            2 => Ok(101),                                   // sys_fork (simulated pid)
             3 => {
                 // sys_read(fd, buf, count)
                 let count = state.edx;
@@ -269,10 +269,10 @@ mod tests {
     fn test_era_emulation_read() {
         let emu = Era0_11SyscallEmulator;
         let mut state = HistoricalCpuState {
-            eax: 3, // sys_read
-            ebx: 0, // stdin
+            eax: 3,      // sys_read
+            ebx: 0,      // stdin
             ecx: 0x1000, // buffer
-            edx: 12, // count
+            edx: 12,     // count
             ..Default::default()
         };
         let bytes_read = emu.emulate_syscall(&mut state).unwrap();
@@ -284,7 +284,7 @@ mod tests {
         let emu = Era1_0SyscallEmulator::new();
         let mut state = HistoricalCpuState {
             eax: 102, // sys_socketcall
-            ebx: 1, // socket()
+            ebx: 1,   // socket()
             ..Default::default()
         };
         let fd = emu.emulate_syscall(&mut state).unwrap();

@@ -1,10 +1,21 @@
 //! Capability Tokens: Privilege Isolation (Android/AOSP Absorption)
-//! 
+//!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-use alloc::vec::Vec;
+use std::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
+}
 
 /// A cryptographic capability token required for any privileged action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: &'static [&'static str],
@@ -13,13 +24,51 @@ pub struct CapabilityToken {
 }
 
 impl CapabilityToken {
-    pub fn new(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    pub fn new() -> Self {
+        CapabilityToken {
+            id: 0,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
+        }
+    }
+
+    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
             allowed_paths: paths,
             allowed_ports: ports,
             is_revoked: false,
         }
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.id
+    }
+
+    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
+        self.id |= 1;
+        self
+    }
+
+    pub fn allow_read(mut self, _path: &str) -> Self {
+        self.id |= 2;
+        self
+    }
+
+    pub fn allow_write(mut self, _path: &str) -> Self {
+        self.id |= 4;
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.id |= 8;
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.id |= 16;
+        self
     }
 
     /// Verifies if the token permits access to a given path.
@@ -43,6 +92,29 @@ impl CapabilityToken {
     }
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub token: CapabilityToken,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            token: CapabilityToken::new(),
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
+    }
+}
+
 pub struct SecurityEnforcer {
     active_tokens: Vec<CapabilityToken>,
 }
@@ -53,7 +125,7 @@ impl SecurityEnforcer {
             active_tokens: Vec::new(),
         }
     }
-    
+
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
     }

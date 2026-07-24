@@ -204,6 +204,7 @@ impl PasswordManager {
     ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
+        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -218,7 +219,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "add_password".to_string(),
-            message: format!("Password added for service: {}", encrypted_entry.service),
+            message: format!("Password added for service: {}", service_name),
         })
     }
 
@@ -251,6 +252,7 @@ impl PasswordManager {
             return Err(PasswordError::PasswordNotFound(entry.id.clone()));
         }
 
+        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -269,7 +271,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "update_password".to_string(),
-            message: format!("Password updated for service: {}", encrypted_entry.service),
+            message: format!("Password updated for service: {}", service_name),
         })
     }
 
@@ -422,10 +424,11 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
-        let mut rng = rand::thread_rng();
+        use rand::RngExt;
+        let mut rng = rand::rng();
 
         for _ in 0..length {
-            let index = rng.gen_range(0..charset.len());
+            let index = rng.random_range(0..charset.len());
             password.push(charset[index] as char);
         }
 
