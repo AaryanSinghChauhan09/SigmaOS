@@ -2,11 +2,8 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
 
-/// Permission enum representing privilege actions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     NetworkTcp,
@@ -28,31 +25,52 @@ pub struct CapabilityToken {
 }
 
 impl CapabilityToken {
-    /// Zero-argument constructor
     pub fn new() -> Self {
-        Self {
+        CapabilityToken {
             id: 0,
             allowed_paths: &[],
             allowed_ports: &[],
+            is_revoked: false,
+        }
+    }
+
+    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+        CapabilityToken {
+            id,
+            allowed_paths: paths,
+            allowed_ports: ports,
             is_revoked: false,
             bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
         }
     }
 
-    /// Construct with ID only
-    pub fn new_with_id(id: u64) -> Self {
-        Self {
-            id,
-            allowed_paths: &[],
-            allowed_ports: &[],
-            is_revoked: false,
-            bits_value: 0,
-        }
+    pub fn bits(&self) -> u64 {
+        self.id
     }
 
-    /// Support bits representation
-    pub fn bits(&self) -> u64 {
-        self.bits_value
+    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
+        self.id |= 1;
+        self
+    }
+
+    pub fn allow_read(mut self, _path: &str) -> Self {
+        self.id |= 2;
+        self
+    }
+
+    pub fn allow_write(mut self, _path: &str) -> Self {
+        self.id |= 4;
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.id |= 8;
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.id |= 16;
+        self
     }
 
     /// Verifies if the token permits access to a given path.
@@ -145,6 +163,29 @@ impl CapabilityGate {
 impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub token: CapabilityToken,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            token: CapabilityToken::new(),
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
     }
 }
 

@@ -137,7 +137,7 @@ impl ClipboardManager {
         text: String,
         source_app: Option<String>,
     ) -> Result<(), ClipboardError> {
-        let length = text.len();
+        let text_length = text.len().to_string();
         let item = ClipboardItem {
             id: format!(
                 "item_{}",
@@ -150,7 +150,7 @@ impl ClipboardManager {
             content: text.into_bytes(),
             metadata: {
                 let mut meta = HashMap::new();
-                meta.insert("text_length".to_string(), length.to_string());
+                meta.insert("text_length".to_string(), text_length);
                 meta
             },
             timestamp: Instant::now(),
