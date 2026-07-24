@@ -20,6 +20,7 @@ pub mod drivers;
 pub mod ecosystem;
 pub mod education;
 pub mod fs;
+pub mod init;
 pub mod net;
 pub mod filesystem;
 pub mod finance;
@@ -193,6 +194,10 @@ pub use net::{
 pub use network::{
     DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError,
     TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+};
+pub use init::{
+    InitSystem, Service as InitService, ServiceID, ServiceState as InitServiceState, SigmaInit, SimpleService,
+    DependencyResolver as InitDependencyResolver, SimpleDependencyResolver, ServiceMonitor as InitServiceMonitor, SimpleServiceMonitor,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
