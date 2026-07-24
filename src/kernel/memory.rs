@@ -50,69 +50,14 @@ impl Page {
         self.count.fetch_sub(1, Ordering::SeqCst) == 1
     }
 
-    pub fn get_count(&self) -> usize {
-        self.count.load(Ordering::SeqCst)
-    }
-}
-
-pub enum PageFlag {
-    Locked = 1 << 0,
-    Error = 1 << 1,
-    Referenced = 1 << 2,
-    Uptodate = 1 << 3,
-    Dirty = 1 << 4,
-    Mappedtods = 1 << 5,
-    Anonymous = 1 << 6,
-    Swapped = 1 << 7,
-    Reclaimed = 1 << 8,
-    Kernel = 1 << 9,
-}
-
-pub struct Zone {
-    pub zone_start_pfn: u64,
-    pub spanned_pages: u64,
-    pub present_pages: u64,
-    pub free_area: [FreeArea; 11],
-    pub watermark: [usize; 3],
-    pub nr_reclaimed: u64,
-    pub nr_slabs: u64,
-    pub cached_objects: u64,
-    pub total_objects: u64,
-}
-
-pub struct FreeArea {
-    pub free: usize,
-    pub order: u32,
-}
-
-impl Zone {
-    pub fn new(start_pfn: u64, size_pages: u64) -> Self {
-        Zone {
-            zone_start_pfn: start_pfn,
-            spanned_pages: size_pages,
-            present_pages: size_pages,
-            free_area: [FreeArea { free: 0, order: 0 }; 11],
-            watermark: [0; 3],
-            nr_reclaimed: 0,
-            nr_slabs: 0,
-            cached_objects: 0,
-            total_objects: 0,
-        }
-    }
-}
-
-pub struct ZonedPageAllocator {
-    zones: Vec<Zone>,
-    total_pages: usize,
-    free_pages: usize,
-}
-
-impl ZonedPageAllocator {
-    pub fn new() -> Self {
-        ZonedPageAllocator {
-            zones: Vec::new(),
-            total_pages: 0,
-            free_pages: 0,
+        if order < 12 {
+            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
+                let block = MemoryBlock {
+                    addr,
+                    size,
+                };
+                self.free_lists[order].push(block);
+            }
         }
     }
 
@@ -177,8 +122,8 @@ impl ZonedPageAllocator {
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
-        if order < 12 && !self.free_lists[order].is_empty() {
-            Some(self.free_lists[order].pop().unwrap())
+        if order < 12 {
+            self.free_lists[order].pop()
         } else {
             None
         }

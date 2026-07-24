@@ -1,3 +1,11 @@
-pub mod manager;
+// SigmaOS Package Module
+pub mod universal;
+pub mod store;
 
-pub use manager::{SigmaPackageManager, Generation, PackageMetadata, SystemConfig, SystemProfile, DependencyResolver, PackageBackend};
+pub use universal::{
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use store::{
+    StoreError, StoreApp, SigmaSoftwareStore,
+};
