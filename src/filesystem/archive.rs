@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Archive format
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ArchiveFormat {
     Zip,
     Tar,
@@ -425,7 +425,7 @@ mod tests {
             PathBuf::from("/test/file2.txt"),
         ];
         let result = manager
-            .create_archive(&files, PathBuf::from("/test/archive.zip"))
+            .create_archive(&files, &PathBuf::from("/test/archive.zip"))
             .unwrap();
         assert!(result.success);
     }
@@ -434,7 +434,7 @@ mod tests {
     fn test_list_contents() {
         let manager = ArchiveManager::default();
         let entries = manager
-            .list_contents(PathBuf::from("/test/archive.zip"))
+            .list_contents(&PathBuf::from("/test/archive.zip"))
             .unwrap();
         assert!(!entries.is_empty());
     }
