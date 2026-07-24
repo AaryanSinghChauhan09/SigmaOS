@@ -1113,6 +1113,95 @@ impl UnifiedPackageManager {
     }
 }
 
+// =========================================================================
+// CACHY LINUX INSPIRED BORE SCHEDULER & MICROARCHITECTURE PARSER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct BoreTask {
+    pub pid: u32,
+    pub burst_score: u32, // high burst = CPU hog, low burst = interactive
+    pub priority: u32,
+}
+
+pub struct CachyBoreScheduler {
+    pub tasks: Vec<BoreTask>,
+    pub base_timeslice_ms: u32,
+}
+
+impl CachyBoreScheduler {
+    pub fn new() -> Self {
+        Self {
+            tasks: Vec::new(),
+            base_timeslice_ms: 10,
+        }
+    }
+
+    pub fn register_task(&mut self, pid: u32, priority: u32) {
+        self.tasks.push(BoreTask {
+            pid,
+            burst_score: 0,
+            priority,
+        });
+    }
+
+    /// Logs runtime cpu burst periods, updating the dynamic interactive multiplier
+    pub fn log_cpu_burst(&mut self, pid: u32, burst_ms: u32) {
+        for t in &mut self.tasks {
+            if t.pid == pid {
+                t.burst_score = (t.burst_score + burst_ms).min(100);
+            }
+        }
+    }
+
+    /// Evaluates dynamic scheduler timeslices, allocating wider windows to highly responsive/interactive tasks (BORE-style)
+    pub fn get_allocated_timeslice(&self, pid: u32) -> u32 {
+        for t in &self.tasks {
+            if t.pid == pid {
+                // Low burst tasks (interactive) get a latency multiplier/bonus
+                let interactive_bonus = 100 - t.burst_score;
+                return self.base_timeslice_ms + (interactive_bonus / 10);
+            }
+        }
+        self.base_timeslice_ms
+    }
+}
+
+impl Default for CachyBoreScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicroarchitectureLevel {
+    V1, // Basic x86_64
+    V2, // SSE4.2, SSSE3, popcnt
+    V3, // AVX, AVX2, BMI2, FMA
+    V4, // AVX-512
+}
+
+pub struct CpuMicroarchitectureSelector {
+    pub supported_level: MicroarchitectureLevel,
+}
+
+impl CpuMicroarchitectureSelector {
+    pub fn new(level: MicroarchitectureLevel) -> Self {
+        Self {
+            supported_level: level,
+        }
+    }
+
+    /// Checks if a dynamic compilation path can use AVX-512 or AVX2 optimized loops (Cachy Linux style)
+    pub fn can_use_avx512(&self) -> bool {
+        self.supported_level == MicroarchitectureLevel::V4
+    }
+
+    pub fn can_use_avx2(&self) -> bool {
+        self.supported_level == MicroarchitectureLevel::V3 || self.supported_level == MicroarchitectureLevel::V4
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1411,5 +1500,31 @@ mod tests {
         assert_eq!(entry.base_low, 0x5678);
         assert_eq!(entry.base_middle, 0x34);
         assert_eq!(entry.base_high, 0x12);
+    }
+
+    #[test]
+    fn test_cachy_bore_scheduler() {
+        let mut scheduler = CachyBoreScheduler::new();
+        scheduler.register_task(101, 5);
+        scheduler.register_task(102, 10);
+
+        // Intitially both tasks have 0 burst, getting the max interactive bonus timeslice
+        assert_eq!(scheduler.get_allocated_timeslice(101), 20);
+
+        // Process 101 logs some CPU-burst hogging activity
+        scheduler.log_cpu_burst(101, 50);
+        // Interactive bonus is reduced, timeslice is narrower
+        assert_eq!(scheduler.get_allocated_timeslice(101), 15);
+    }
+
+    #[test]
+    fn test_cpu_microarchitecture_levels() {
+        let v3_cpu = CpuMicroarchitectureSelector::new(MicroarchitectureLevel::V3);
+        assert!(v3_cpu.can_use_avx2());
+        assert!(!v3_cpu.can_use_avx512());
+
+        let v4_cpu = CpuMicroarchitectureSelector::new(MicroarchitectureLevel::V4);
+        assert!(v4_cpu.can_use_avx2());
+        assert!(v4_cpu.can_use_avx512());
     }
 }

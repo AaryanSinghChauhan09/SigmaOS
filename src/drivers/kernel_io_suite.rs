@@ -197,11 +197,7 @@ impl PrinterCupsDriver {
         }
     }
 
-    pub fn submit_job(
-        &mut self,
-        document: Vec<u8>,
-        format: PrintFormat,
-    ) -> Result<u32, PrinterError> {
+    pub fn submit_job(&mut self, document: Vec<u8>, format: PrintFormat) -> Result<u32, PrinterError> {
         if self.power_state != PowerState::On {
             return Err(PrinterError::NotPowered);
         }
@@ -231,10 +227,7 @@ impl PrinterCupsDriver {
     }
 
     pub fn get_job_status(&self, job_id: u32) -> Option<JobStatus> {
-        self.job_queue
-            .iter()
-            .find(|j| j.job_id == job_id)
-            .map(|j| j.status)
+        self.job_queue.iter().find(|j| j.job_id == job_id).map(|j| j.status)
     }
 }
 
@@ -311,20 +304,10 @@ pub struct CommandBuffer {
 
 #[derive(Debug, Clone)]
 pub enum GpuCommand {
-    Draw {
-        vertices: u32,
-        primitive: PrimitiveType,
-    },
-    Clear {
-        color: [f32; 4],
-    },
-    Blit {
-        src: u32,
-        dst: u32,
-    },
-    Compute {
-        work_groups: [u32; 3],
-    },
+    Draw { vertices: u32, primitive: PrimitiveType },
+    Clear { color: [f32; 4] },
+    Blit { src: u32, dst: u32 },
+    Compute { work_groups: [u32; 3] },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -588,9 +571,7 @@ impl PeripheralDevice for AlsaSoundDriver {
         // Convert u8 buffer to i16 for PCM reading
         let sample_count = buffer.len() / 2;
         let mut samples = vec![0i16; sample_count];
-        let count = self
-            .read_pcm(&mut samples)
-            .map_err(|_| "ALSA: Read failed")?;
+        let count = self.read_pcm(&mut samples).map_err(|_| "ALSA: Read failed")?;
         let byte_count = count * 2;
         for i in 0..byte_count {
             if i < buffer.len() {
@@ -872,7 +853,7 @@ impl MultiTouchDriver {
 
     pub fn recognize_gesture(&mut self) -> Option<GestureType> {
         let active_contacts: Vec<_> = self.contacts.iter().filter(|c| c.active).collect();
-
+        
         match active_contacts.len() {
             1 => {
                 let contact = active_contacts[0];
@@ -911,8 +892,7 @@ impl PeripheralDevice for MultiTouchDriver {
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
-        self.initialize()
-            .map_err(|_| "Touch: Initialization failed")
+        self.initialize().map_err(|_| "Touch: Initialization failed")
     }
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
@@ -1036,10 +1016,7 @@ impl VesaFramebufferDriver {
         self.cursor.visible = visible;
     }
 
-    pub fn convert_pixel_format(
-        &mut self,
-        format: PixelFormat,
-    ) -> Result<(), VesaFramebufferError> {
+    pub fn convert_pixel_format(&mut self, format: PixelFormat) -> Result<(), VesaFramebufferError> {
         self.pixel_format = format;
         // In production, this would convert the entire buffer
         Ok(())
@@ -1167,11 +1144,11 @@ impl UsbHidFullDriver {
         if self.power_state != PowerState::On {
             return Err(HidFullError::NotPowered);
         }
+        self.output_reports.push(report);
         // LED handling
         if let Some(led_byte) = report.data.first() {
             self.led_state = *led_byte;
         }
-        self.output_reports.push(report);
         Ok(())
     }
 
@@ -1275,7 +1252,7 @@ impl Uart8250 {
     pub fn new(base_port: u16) -> Self {
         Self {
             base_port,
-            divisor: 12,       // 9600 baud
+            divisor: 12, // 9600 baud
             line_status: 0x60, // THRE + TEMT
         }
     }
@@ -1294,9 +1271,9 @@ impl Uart8250 {
         }
     }
 
-    pub fn write_byte(&mut self, _byte: u8) -> Result<(), AncientError> {
+    pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
-            self.line_status |= 0x01;
+            // THRE set, can write
             Ok(())
         } else {
             Err(AncientError::DeviceBusy)
@@ -1407,23 +1384,12 @@ impl MfmDiskInterface {
         Ok(())
     }
 
-    pub fn read_sector(
-        &self,
-        _cylinder: u16,
-        _head: u8,
-        _sector: u16,
-    ) -> Result<Vec<u8>, AncientError> {
+    pub fn read_sector(&self, _cylinder: u16, _head: u8, _sector: u16) -> Result<Vec<u8>, AncientError> {
         // Simulate sector read (512 bytes)
         Ok(vec![0u8; 512])
     }
 
-    pub fn write_sector(
-        &mut self,
-        _cylinder: u16,
-        _head: u8,
-        _sector: u16,
-        _data: &[u8],
-    ) -> Result<(), AncientError> {
+    pub fn write_sector(&mut self, _cylinder: u16, _head: u8, _sector: u16, _data: &[u8]) -> Result<(), AncientError> {
         Ok(())
     }
 }
@@ -1445,11 +1411,17 @@ impl AdLibSynth {
     }
 
     pub fn write_register(&mut self, reg: u8, value: u8) -> Result<(), AncientError> {
+        if reg >= 256 {
+            return Err(AncientError::InvalidParameter);
+        }
         self.registers[reg as usize] = value;
         Ok(())
     }
 
     pub fn read_register(&self, reg: u8) -> Result<u8, AncientError> {
+        if reg >= 256 {
+            return Err(AncientError::InvalidParameter);
+        }
         Ok(self.registers[reg as usize])
     }
 
@@ -1546,14 +1518,14 @@ mod tests {
     fn test_bluetooth_hci_driver() {
         let mut driver = BluetoothHciDriver::new();
         assert!(driver.initialize().is_ok());
-
+        
         let packet = AclPacket {
             handle: 0x0001,
             flags: 0x02,
             data: vec![0x01, 0x02, 0x03],
         };
         assert!(driver.send_acl(packet).is_ok());
-
+        
         let cid = driver.create_l2cap_channel(0x0001).unwrap();
         assert!(cid >= 0x40);
     }
@@ -1562,12 +1534,10 @@ mod tests {
     fn test_printer_cups_driver() {
         let mut driver = PrinterCupsDriver::new("TestPrinter", PrinterProtocol::UsbIpp);
         assert!(driver.initialize().is_ok());
-
-        let job_id = driver
-            .submit_job(vec![0x1B, 0x40], PrintFormat::Pcl)
-            .unwrap();
+        
+        let job_id = driver.submit_job(vec![0x1B, 0x40], PrintFormat::Pcl).unwrap();
         assert!(job_id > 0);
-
+        
         assert!(driver.process_jobs().is_ok());
         assert_eq!(driver.get_job_status(job_id), Some(JobStatus::Completed));
     }
@@ -1576,13 +1546,11 @@ mod tests {
     fn test_gpu_acceleration_driver() {
         let mut driver = GpuAccelerationDriver::new(0xE0000000);
         assert!(driver.initialize().is_ok());
-
-        let commands = vec![GpuCommand::Clear {
-            color: [0.0, 0.0, 0.0, 1.0],
-        }];
+        
+        let commands = vec![GpuCommand::Clear { color: [0.0, 0.0, 0.0, 1.0] }];
         let buffer_id = driver.submit_command_buffer(commands).unwrap();
         assert!(buffer_id == 0);
-
+        
         assert!(driver.process_commands().is_ok());
         assert!(driver.queue_flip(1, true).is_ok());
     }
@@ -1591,11 +1559,11 @@ mod tests {
     fn test_alsa_sound_driver() {
         let mut driver = AlsaSoundDriver::new(48000, 2);
         assert!(driver.initialize().is_ok());
-
+        
         let samples = vec![100i16, 200, 300, 400];
         let written = driver.write_pcm(&samples).unwrap();
         assert!(written > 0);
-
+        
         let mut read_buffer = [0i16; 4];
         let _ = driver.read_pcm(&mut read_buffer);
     }
@@ -1604,10 +1572,10 @@ mod tests {
     fn test_wifi_full_stack_driver() {
         let mut driver = WifiFullStackDriver::new();
         assert!(driver.initialize().is_ok());
-
+        
         assert!(driver.start_scan().is_ok());
         assert!(!driver.scan_results.is_empty());
-
+        
         let bss = BssInfo {
             ssid: String::from("TestNetwork"),
             bssid: [0x00, 0x11, 0x22, 0x33, 0x44, 0x55],
@@ -1622,16 +1590,16 @@ mod tests {
     fn test_multi_touch_driver() {
         let mut driver = MultiTouchDriver::new(TouchProtocol::TypeB, 10);
         assert!(driver.initialize().is_ok());
-
+        
         let contact = TouchContact {
             id: 0,
-            x: 150,
+            x: 100,
             y: 200,
             pressure: 50,
             active: true,
         };
         assert!(driver.update_contact(contact).is_ok());
-
+        
         driver.gesture_state.start_x = 50;
         driver.gesture_state.start_y = 200;
         let gesture = driver.recognize_gesture();
@@ -1642,11 +1610,11 @@ mod tests {
     fn test_vesa_framebuffer_driver() {
         let mut driver = VesaFramebufferDriver::new(1024, 768, 32);
         assert!(driver.initialize().is_ok());
-
+        
         assert!(driver.write_pixel(100, 100, 0xFF0000).is_ok());
         assert!(driver.flip().is_ok());
         assert!(driver.clear(0x000000).is_ok());
-
+        
         driver.set_cursor(50, 50, true);
         assert_eq!(driver.cursor.x, 50);
     }
@@ -1655,13 +1623,13 @@ mod tests {
     fn test_usb_hid_full_driver() {
         let mut driver = UsbHidFullDriver::new();
         assert!(driver.initialize().is_ok());
-
+        
         let descriptor = vec![0x05, 0x01, 0x09, 0x06];
         assert!(driver.parse_report_descriptor(&descriptor).is_ok());
-
+        
         driver.set_boot_protocol(true);
         assert!(driver.boot_protocol);
-
+        
         let output_report = HidOutputReport {
             report_id: 0,
             data: vec![0x01],
@@ -1673,22 +1641,22 @@ mod tests {
     #[test]
     fn test_ancient_device_layer() {
         let mut layer = AncientDeviceLayer::new();
-
+        
         assert!(layer.initialize_uart(0x3F8).is_ok());
         assert!(layer.uart_8250.is_some());
-
+        
         assert!(layer.scan_isa_bus().is_ok());
         assert!(layer.isa_bus.is_some());
-
+        
         assert!(layer.initialize_ne2000(0x300, 10).is_ok());
         assert!(layer.ne2000.is_some());
-
+        
         assert!(layer.initialize_mfm_disk(0x1F0).is_ok());
         assert!(layer.mfm_disk.is_some());
-
+        
         assert!(layer.initialize_adlib(0x388).is_ok());
         assert!(layer.adlib.is_some());
-
+        
         assert!(layer.initialize_ega_cga(0x3D4).is_ok());
         assert!(layer.ega_cga.is_some());
     }
