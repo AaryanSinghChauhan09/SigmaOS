@@ -277,6 +277,6 @@ All major wiki pages have been implemented. Remaining work:
 
 ## 📅 Last Updated
 
-**Date**: July 20, 2026  
-**Repository**: https://github.com/AaryanSinghChauhan09/SigmaOS  
+**Date**: July 20, 2026
+**Repository**: https://github.com/AaryanSinghChauhan09/SigmaOS
 **Branch**: main
