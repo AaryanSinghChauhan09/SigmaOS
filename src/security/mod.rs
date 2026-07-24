@@ -74,5 +74,3 @@ pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
-    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
-};
