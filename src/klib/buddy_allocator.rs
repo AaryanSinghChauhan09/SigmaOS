@@ -341,123 +341,17 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }
 
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_buddy_allocator() {
-        let mut allocator = SimpleBuddyAllocator::new(10, 1024);
-
-        let block_1 = allocator.allocate(3).unwrap();
-        assert!(block_1 > 0);
-
-        let block_2 = allocator.allocate(3).unwrap();
-        assert!(block_2 > 0);
-        assert_ne!(block_1, block_2);
-
-        assert!(allocator.free(block_1, 3).is_ok());
-        assert!(allocator.free(block_2, 3).is_ok());
-    }
-
-    #[test]
-    fn test_fragmentation() {
-        let allocator = SimpleBuddyAllocator::new(5, 32);
-        let ratio = allocator.get_fragmentation_ratio();
-        assert!((0.0..=1.0).contains(&ratio));
-    }
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

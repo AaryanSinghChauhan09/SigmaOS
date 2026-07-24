@@ -677,3 +677,64 @@ mod tests {
         assert_eq!(comp.stats().total_windows, 1);
     }
 }
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+struct Iter<T> {
+    data: *const T,
+    len: usize,
+    index: usize,
+}
+
+impl<'a, T> Iterator for Iter<T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            unsafe {
+                let item = &*self.data.add(self.index);
+                self.index += 1;
+                Some(item)
+            }
+        } else {
+            None
+        }
+    }
+}
+
+struct IterMut<T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+}
+
+impl<'a, T> Iterator for IterMut<T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            unsafe {
+                let item = &mut *self.data.add(self.index);
+                self.index += 1;
+                Some(item)
+            }
+        } else {
+            None
+        }
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

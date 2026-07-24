@@ -1,9 +1,12 @@
-#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
-// SigmaOS Kernel Main Entry Point
+#![allow(warnings)]
+#![allow(clippy::all)]
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 #![allow(clippy::all, unused)]
 
+// SigmaOS Kernel Main Entry Point
+
+#[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
 #[cfg(target_os = "none")]
@@ -16,7 +19,7 @@ pub extern "C" fn _start() -> ! {
 #[cfg(not(target_os = "none"))]
 fn main() {}
 
-#[cfg(all(not(test), target_os = "none"))]
+#[cfg(target_os = "none")]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}

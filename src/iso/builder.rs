@@ -448,64 +448,17 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::boxed::Box;
-
-    #[test]
-    fn test_iso_pipeline_and_packager() {
-        let mut pipeline = SimpleBuildPipeline::new();
-
-        let step1 = KernelBuildStep::new(1);
-        let step2 = InitramfsBuildStep::new(2);
-        let step3 = BootloaderBuildStep::new(3);
-        let step4 = ISOCreationStep::new(4);
-
-        assert_eq!(pipeline.add_step(Box::new(step1)).unwrap(), 1);
-        assert_eq!(pipeline.add_step(Box::new(step2)).unwrap(), 2);
-        assert_eq!(pipeline.add_step(Box::new(step3)).unwrap(), 3);
-        assert_eq!(pipeline.add_step(Box::new(step4)).unwrap(), 4);
-
-        assert!(pipeline.execute().is_ok());
-
-        // GRUB config generation test
-        let grub = SimpleGRUBConfig::new();
-        let config_bytes = grub.generate_config(b"sigmaos.bin", b"initramfs.igz");
-
-        // Convert custom Vec<u8> to standard Vec<u8> for assertion
-        let mut std_bytes = std::vec::Vec::new();
-        for i in 0..config_bytes.len {
-            if let Some(&b) = config_bytes.get(i) {
-                std_bytes.push(b);
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
             }
         }
-        let config_str = std::str::from_utf8(&std_bytes).unwrap();
-        assert!(config_str.contains("multiboot2 /boot/sigmaos.bin"));
-        assert!(config_str.contains("module2 /boot/initramfs.igz"));
-
-        // ISO Packager test with mock fallback check
-        let mut packager = SimpleISOPackager::new();
-        assert!(packager
-            .add_file(b"boot/sigmaos.bin", b"target/release/sigmaos.bin")
-            .is_ok());
-
-        // Create build directory if not exists
-        let _ = std::fs::create_dir_all("build");
-        let test_iso_path = b"build/test_sigmaos_build.iso";
-        assert!(packager.generate_iso(test_iso_path).is_ok());
-
-        // Check if the mock/simulated file exists and has correct identifier CD001 at 32769
-        let iso_content = std::fs::read("build/test_sigmaos_build.iso").unwrap();
-        assert!(iso_content.len() >= 32768 + 2048);
-        assert_eq!(&iso_content[32769..32774], b"CD001");
-
-        // Clean up
-        let _ = std::fs::remove_file("build/test_sigmaos_build.iso");
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

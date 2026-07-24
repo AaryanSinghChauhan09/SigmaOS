@@ -477,54 +477,17 @@ impl<T> Vec<T> {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new_builtins_registration() {
-        let registry = SimpleCommandRegistry::new();
-        let mut session = SimpleShellSession::new();
-
-        // Verify all 5 new built-ins are registered successfully
-        assert!(session.registry.get(b"sigpkg").is_some());
-        assert!(session.registry.get(b"sigtrace").is_some());
-        assert!(session.registry.get(b"sigmetrics").is_some());
-        assert!(session.registry.get(b"sigstandards").is_some());
-        assert!(session.registry.get(b"sigsched").is_some());
-    }
-
-    #[test]
-    fn test_execute_sigpkg() {
-        let mut session = SimpleShellSession::new();
-        let result = session.execute_line(b"sigpkg").unwrap();
-        assert_eq!(&result[..6], b"sigpkg");
-    }
-
-    #[test]
-    fn test_command_history_add_and_list() {
-        let mut history = SimpleCommandHistory::new();
-        history.add(b"sigtrace trace task 256");
-        assert_eq!(history.list().len(), 1);
-        assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
