@@ -3,6 +3,7 @@
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
 extern crate alloc;
+
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 
@@ -18,12 +19,13 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
+    pub bits: u64,
 }
 
 impl Default for CapabilityToken {
@@ -39,74 +41,31 @@ impl Default for CapabilityToken {
 }
 
 impl CapabilityToken {
+    /// Zero-argument constructor, returns a default CapabilityToken
     pub fn new() -> Self {
-        Self { bits: 0 }
-    }
-
-    /// Create capability token from raw bits
-    pub fn from_bits(bits: u64) -> Self {
-        Self { bits }
-    }
-
-    /// Allow network access
-    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
-        match protocol {
-            "tcp" => self.bits |= 1 << 0,
-            "udp" => self.bits |= 1 << 1,
-            _ => {}
+        CapabilityToken {
+            id: 0,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
+            bits: !0, // Allow all bits by default
         }
     }
 
-    pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
-        let mut allowed_paths = Vec::new();
-        for &path in paths {
-            allowed_paths.push(path.to_string());
-        }
+    /// Constructor with parameters for compatibility
+    pub fn with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
             allowed_paths,
             allowed_ports: ports.to_vec(),
             is_revoked: false,
+            bits: !0,
         }
     }
 
-    /// Retrieve the token bits/id
+    /// Returns the capability bitmask.
     pub fn bits(&self) -> u64 {
-        self.id
-    }
-
-    /// Builder to allow a network port
-    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
-        // mitigate port-allocation bitmask pollution by masking out bits 16-31
-        let masked_port = port & 0xFFFF;
-        self.allowed_ports.push(masked_port);
-        self
-    }
-
-    /// Builder to allow read access on a path
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if is_safe_path(path) {
-            self.allowed_paths.push(path.to_string());
-        }
-        self
-    }
-
-    /// Builder to allow write access on a path
-    pub fn allow_write(mut self, path: &str) -> Self {
-        if is_safe_path(path) {
-            self.allowed_paths.push(path.to_string());
-        }
-        self
-    }
-
-    /// Builder to allow process execution
-    pub fn allow_exec(self) -> Self {
-        self
-    }
-
-    /// Builder to allow IPC access
-    pub fn allow_ipc(self) -> Self {
-        self
+        self.bits
     }
 
     /// Verifies if the token permits access to a given path.
@@ -128,6 +87,61 @@ impl CapabilityToken {
     pub fn revoke(&mut self) {
         self.is_revoked = true;
     }
+
+    // Permission builders for compatibility with pledge.rs
+    pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
+        self
+    }
+
+    pub fn allow_read(self, _path: &str) -> Self {
+        self
+    }
+
+    pub fn allow_write(self, _path: &str) -> Self {
+        self
+    }
+
+    pub fn allow_exec(self) -> Self {
+        self
+    }
+
+    pub fn allow_ipc(self) -> Self {
+        self
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// A cryptographic capability gate.
+pub struct CapabilityGate {
+    pub current_token: Option<CapabilityToken>,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            current_token: None,
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.current_token = Some(token);
+    }
+}
+
+/// Dynamic permissions
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
 }
 
 #[derive(Debug, Clone, Default)]

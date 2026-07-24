@@ -62,8 +62,8 @@ impl Process {
 
 /// EEVDF Scheduler
 pub struct Scheduler {
-    pub processes: Vec<Process>,
-    pub current_time: u64,
+    processes: Vec<Process>,
+    current_time: u64,
     pub is_realtime_profile: bool,
     pub is_hpc_profile: bool,
 }
