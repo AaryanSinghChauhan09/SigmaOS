@@ -1,8 +1,8 @@
-use core::mem;
-/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
-/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
-/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
+//! OOP-based Networking Stack (TCP/UDP) for SigmaOS
+//! Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
+//! Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
+//! Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;

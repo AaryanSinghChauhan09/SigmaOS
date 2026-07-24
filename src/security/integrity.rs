@@ -427,8 +427,3 @@ mod tests {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct IntegrityCheck;
-
-#[derive(Debug, Clone)]
-pub struct IntegrityVerifier;

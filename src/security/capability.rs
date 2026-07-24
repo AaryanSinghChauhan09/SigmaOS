@@ -130,16 +130,7 @@ impl CapabilityToken {
     }
 }
 
-/// Checks if a path is safe to prevent directory traversals and sandbox escapes
-pub fn is_safe_path(path: &str) -> bool {
-    if path.contains("..") {
-        return false;
-    }
-    true
-}
-
-/// Capability gate for process-level capability verification
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
     pub active_token: Option<CapabilityToken>,
 }
