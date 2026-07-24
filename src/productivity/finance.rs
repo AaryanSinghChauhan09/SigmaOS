@@ -746,6 +746,155 @@ impl Default for IndianNumberFormatter {
     }
 }
 
+// ─── Indic Professional Tools ─────────────────────────────────────────────────
+
+/// Indian agricultural tool for Farmers (Krishi)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CropType {
+    Wheat,
+    Paddy,
+    Sugarcane,
+    Cotton,
+}
+
+pub struct KrishiHelper;
+
+impl KrishiHelper {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Estimate fertilizer (NPK) required in kilograms based on crop type and land in Bighas.
+    /// Standard recommendation per hectare (1 Hectare = 4 Bighas):
+    /// - Wheat: N:120, P:60, K:40 kg
+    /// - Paddy: N:100, P:50, K:50 kg
+    pub fn estimate_fertilizer(&self, crop: CropType, bighas: f64) -> (f64, f64, f64) {
+        let hectares = bighas / 4.0;
+        match crop {
+            CropType::Wheat => (120.0 * hectares, 60.0 * hectares, 40.0 * hectares),
+            CropType::Paddy => (100.0 * hectares, 50.0 * hectares, 50.0 * hectares),
+            CropType::Sugarcane => (150.0 * hectares, 80.0 * hectares, 60.0 * hectares),
+            CropType::Cotton => (80.0 * hectares, 40.0 * hectares, 40.0 * hectares),
+        }
+    }
+
+    /// Estimate Minimum Support Price (MSP) in INR based on quintals of harvest (1 Quintal = 100 kg)
+    /// Using official MSP rates for FY 2024-25
+    pub fn estimate_msp_value(&self, crop: CropType, quintals: f64) -> f64 {
+        let rate_per_quintal = match crop {
+            CropType::Wheat => 2275.0,     // Wheat MSP
+            CropType::Paddy => 2183.0,     // Paddy Common MSP
+            CropType::Sugarcane => 315.0,  // Fair and Remunerative Price (FRP)
+            CropType::Cotton => 6620.0,    // Cotton Medium Staple MSP
+        };
+        quintals * rate_per_quintal
+    }
+}
+
+impl Default for KrishiHelper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Indian legal and judicial compliance tool for Advocates (Vakil)
+pub struct VakilHelper;
+
+impl VakilHelper {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Calculate Court Fee in INR based on claim value as per the Court Fees Act
+    /// Slab-based calculation:
+    /// - Up to 50,000 INR: 2.5%
+    /// - 50,001 to 2,00,000 INR: 1,250 + 5% on excess of 50,000
+    /// - Above 2,00,000 INR: 8,750 + 7.5% on excess of 2,00,000 (capped at 1,50,000 INR)
+    pub fn calculate_court_fee(&self, claim_value: f64) -> f64 {
+        let fee = if claim_value <= 50000.0 {
+            claim_value * 0.025
+        } else if claim_value <= 200000.0 {
+            1250.0 + (claim_value - 50000.0) * 0.05
+        } else {
+            8750.0 + (claim_value - 200000.0) * 0.075
+        };
+        fee.min(150000.0)
+    }
+
+    /// Look up corresponding BNS (Bharatiya Nyaya Sanhita 2023) section from old IPC (Indian Penal Code) section
+    pub fn ipc_to_bns(&self, ipc_section: u32) -> Option<&'static str> {
+        match ipc_section {
+            302 => Some("Section 101 (Murder)"),
+            307 => Some("Section 109 (Attempt to murder)"),
+            378 | 379 => Some("Section 303 (Theft)"),
+            420 => Some("Section 318 (Cheating)"),
+            124 => Some("Section 152 (Acts endangering sovereignty)"),
+            498 => Some("Section 85 (Cruelty by husband or relatives)"),
+            _ => None,
+        }
+    }
+}
+
+impl Default for VakilHelper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Indian retail and merchant billing tool for Traders (Vyapar)
+pub struct VyaparHelper;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct InvoiceResult {
+    pub taxable_value: f64,
+    pub cgst_amount: f64,
+    pub sgst_amount: f64,
+    pub total_amount: f64,
+}
+
+impl VyaparHelper {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Calculate margin & markup percentages based on cost and selling price
+    pub fn margin_markup(&self, cost: f64, selling_price: f64) -> (f64, f64) {
+        if cost <= 0.0 || selling_price <= 0.0 || selling_price < cost {
+            return (0.0, 0.0);
+        }
+        let margin = ((selling_price - cost) / selling_price) * 100.0;
+        let markup = ((selling_price - cost) / cost) * 100.0;
+        (margin, markup)
+    }
+
+    /// Calculate CGST and SGST split from gross selling price (GST-inclusive billing)
+    pub fn calculate_inclusive_gst(&self, inclusive_price: f64, gst_rate_pct: f64) -> InvoiceResult {
+        if inclusive_price <= 0.0 || gst_rate_pct < 0.0 {
+            return InvoiceResult {
+                taxable_value: 0.0,
+                cgst_amount: 0.0,
+                sgst_amount: 0.0,
+                total_amount: 0.0,
+            };
+        }
+        let divisor = 1.0 + (gst_rate_pct / 100.0);
+        let taxable_value = inclusive_price / divisor;
+        let total_gst = inclusive_price - taxable_value;
+        InvoiceResult {
+            taxable_value,
+            cgst_amount: total_gst / 2.0,
+            sgst_amount: total_gst / 2.0,
+            total_amount: inclusive_price,
+        }
+    }
+}
+
+impl Default for VyaparHelper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -905,5 +1054,40 @@ mod tests {
         assert_eq!(IndicLanguage::Hindi.bcp47_code(), "hi-IN");
         assert_eq!(IndicLanguage::Tamil.bcp47_code(), "ta-IN");
         assert_eq!(IndicLanguage::English.bcp47_code(), "en-IN");
+    }
+
+    #[test]
+    fn test_krishi_helper() {
+        let krishi = KrishiHelper::new();
+        // 4 bighas = 1 hectare
+        let npk = krishi.estimate_fertilizer(CropType::Wheat, 4.0);
+        assert_eq!(npk, (120.0, 60.0, 40.0));
+
+        let msp_val = krishi.estimate_msp_value(CropType::Wheat, 10.0);
+        assert_eq!(msp_val, 22750.0);
+    }
+
+    #[test]
+    fn test_vakil_helper() {
+        let vakil = VakilHelper::new();
+        // 40,000 claim value court fee -> 40,000 * 2.5% = 1,000
+        let fee = vakil.calculate_court_fee(40000.0);
+        assert_eq!(fee, 1000.0);
+
+        let lookup = vakil.ipc_to_bns(302).unwrap();
+        assert!(lookup.contains("Section 101"));
+    }
+
+    #[test]
+    fn test_vyapar_helper() {
+        let vyapar = VyaparHelper::new();
+        let (margin, markup) = vyapar.margin_markup(100.0, 125.0);
+        assert_eq!(margin, 20.0);
+        assert_eq!(markup, 25.0);
+
+        // Inclusive of 18% GST on 118 INR should result in 100 taxable value
+        let res = vyapar.calculate_inclusive_gst(118.0, 18.0);
+        assert!((res.taxable_value - 100.0).abs() < 1e-5);
+        assert!((res.cgst_amount - 9.0).abs() < 1e-5);
     }
 }
