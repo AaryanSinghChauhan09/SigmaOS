@@ -87,38 +87,58 @@ To render legacy Linux distributions (such as Ubuntu, Kali, Kubuntu, Lubuntu, En
 
 ---
 
-## ⚡ 4. Strategic Battleplan against Legacy Linux
+## 🛠️ 4. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
+
+SigmaOS rejects heavy, vulnerable external dependencies and bloated package runtimes. Instead of porting legacy Linux tools, SigmaOS integrates a comprehensive suite of native, zero-dependency, and capability-gated built-in tools that are strictly superior to their legacy open-source equivalents:
+
+### 4.1 Development & Database Tools
+* **VS Code / JetBrains → `SigmaCode` Shard:** Integrates a built-in Language Server Protocol (LSP) broker, syntax-highlighter, and a lightweight, zero-copy local AI autocomplete daemon, completely bypassing Electron memory leaks.
+* **Postman → `SigmaAPI` Utility:** A built-in, non-allocating HTTP/REST, GraphQL, and WebSockets sandbox utility capable of capturing and simulating socket sequences directly behind `CapabilityToken` gates.
+* **Git → `SigmaCommit` Engine:** A post-quantum secure distributed version control system. Replaces SHA-1 with Blake3 hashing, signs every transaction with native Dilithium-5 keys, and implements direct, zero-copy delta serialization.
+* **SQLite / PostgreSQL → `SigmaDB` Shard:** A native, transactional relational and NoSQL storage engine with page-level encryption, running fully in-memory with sub-nanosecond lookups and zero third-party database daemon overhead.
+
+### 4.2 Security & Forensic Tools
+* **Wireshark / tcpdump → `SigmaSniff` Monitor:** A built-in, SIMD-accelerated network packet and traffic analyzer, offering real-time zero-copy deep packet inspection (DPI) with visual timeline rendering directly in the Zenith desktop.
+* **Nmap → `SigmaScan` Network Utility:** A highly parallelized, lock-free network scanner that probes subnets, resolves topologies, and audits listening ports, guarded natively by S-NET capabilities.
+* **OpenSSL / GnuPG → `SigmaCrypt` Engine:** A modern, standard cryptographic toolbox implementing Kyber-1024 (key exchange), Dilithium-5 (signatures), and ChaCha20-Poly1305 (data encryption) with zero legacy OpenSSL code vulnerabilities.
+* **Ansible / Puppet → `SigmaDeploy` Provisioner:** A declarative, local and remote state-reconciliation system that parses simple YAML/TOML playbooks to verify machine generation states natively in under 5ms.
+
+### 4.3 Network & System Utilities
+* **curl / wget → `SigmaFetch` client:** A lightweight client engine containing built-in post-quantum TLS handshakes, capable of downloading files to strict Sandboxed storage locations.
+* **Docker / Podman → `SigmaContainer` Engine:** A zero-dependency cgroups/namespaces container runtime designed specifically for capability-based microkernel virtualization without heavy SUID root daemons.
+* **Systemd / init → `SigmaInit` Shard:** An event-triggered, S6-aligned microkernel service supervisor that monitors shard states and initiates state rollbacks on driver failures.
+* **apt / dnf / pacman → `SigmaPkg` Parser:** A high-speed, allocation-free package manager utilizing custom SAT solvers and Content-Addressed Stores (CAS) for reproducible builds.
+
+---
+
+## ⚡ 5. Strategic Battleplan against Legacy Linux
 
 ### ⚡ A. Lubuntu Parity Strategy (The Lightweight Challenger)
-Lubuntu wins legacy systems software market-share by being lightweight. SigmaOS defeats Lubuntu by being lightweight **and** secure, adaptive, and multimedia-ready out-of-the-box:
 * **SigmaFS Lite:** An ultra-lightweight, transactional Copy-on-Write (CoW) filesystem featuring optimized Merkle-tree lookups, designed specifically to maximize I/O throughput on flash and legacy storage media with minimal RAM overhead.
 * **Adaptive Resource Scheduler:** An AI-driven CPU/memory allocation algorithm that automatically detects old/legacy processors and scales down background thread pools dynamically to guarantee fluid 120 FPS desktop performance on edge systems.
 * **Universal .spkg Package Manager:** Houses sandboxed, lightweight apps with built-in sector-level deduplication and sub-millisecond atomic rollback snapshots, offering a cleaner runtime profile than heavy Snap or Flatpak loopback mounts.
 * **Self-Healing Kernel:** Employs watchdog process state supervision to automatically detect, isolate, and recover from sub-system or driver crashes in under 1ms without user reboot or shell interruption.
 
 ### 🎨 B. Kubuntu Parity Strategy (The Customization & Aesthetics Giant)
-Kubuntu thrives on highly customizable KDE Plasma layouts. SigmaOS surpasses Kubuntu by replacing manual desktop customizations with AI-driven, adaptive personalization, zero-trust security, and deep cross-device continuity:
-* **Zenith Adaptive Desktop:** Goes beyond standard custom themes. Features instantly switchable visual profiles tailored for Developers, Gamers, Minimalists, or Accessibility requirements.
+* **Zenith Adaptive Desktop:** Features instantly switchable visual profiles tailored for Developers, Gamers, Minimalists, or Accessibility requirements.
 * **AI-Driven Personalization:** Monitors usage telemetry locally to automatically rearrange tile layouts, suggesting productivity shortcuts and adapting the active desktop workspace to user work habits.
 * **Cross-Device Continuity:** Synchronizes file state, active application windows, and clipboard buffers natively across SigmaOS desktop, mobile, and IoT setups without third-party cloud intermediaries.
 
 ### 🛡️ C. Fedora Parity Strategy (The Cutting-Edge Immutable Standard)
-Fedora is recognized for its cutting-edge pacakging pipelines, Flatpak integration, and OSTree-based Silverblue immutable system models. SigmaOS renders Fedora completely obsolete by replacing monolithic, legacy abstractions with elegant microkernel-native primitives:
-* **NixOS-Style Generation Swapping:** Fedora Silverblue requires heavy overlayfs layers and OSTree branch tracking. SigmaOS achieves instant, zero-copy, and fragmentation-free updates/rollbacks by swapping directory inode pointers at block level in under 1ms.
-* **SELinux Replacement via S-SEC CapabilityTokens:** Monolithic SELinux policy checks incur massive runtime overheads and are highly complex to configure. SigmaOS replaces SELinux with hardware-enforced `CapabilityTokens` checked directly in the microkernel's lock-free transaction bus, executing security validations in sub-nanosecond bounds.
+* **NixOS-Style Generation Swapping:** SigmaOS achieves instant, zero-copy, and fragmentation-free updates/rollbacks by swapping directory inode pointers at block level in under 1ms.
+* **SELinux Replacement via S-SEC CapabilityTokens:** Replaces SELinux with hardware-enforced `CapabilityTokens` checked directly in the microkernel's lock-free transaction bus, executing security validations in sub-nanosecond bounds.
 * **Universal .spkg Package Manager with SAT Solver:** Bypasses heavy runtimes (such as flatpakd, ostree, and dnf caches) to parse community recipes and resolve constraints cleanly on-device with zero-allocation SAT solvers, cutting RAM and footprint by over 90%.
 * **Zenith Adaptive Compositor:** Bypasses heavy, monolithic X11/Wayland architectures to render fluid, hardware-accelerated tiling workspaces with built-in keyboard accessibility and native screen reader pipelines.
 
 ### 🎨 D. Zorin OS Parity Strategy (The Smooth Aesthetic Innovator)
-Zorin OS is highly praised for its premium Zorin Appearance interface, seamless desktop layouts mimicking Windows/macOS/Ubuntu, smooth touch gestures, and the Zorin Connect mobile synchronization daemon. SigmaOS natively absorbs and defeats Zorin OS by upgrading these visual features into high-performance, native microkernel services:
 * **Zenith Layout Engine (Zorin Appearance Superset):** Bypasses heavy GNOME Shell JavaScript extensions. Incorporates an entirely native, zero-copy layout switcher (`ZenithAppearance`) capable of rendering Windows 11, macOS, GNOME, or Classic Windows structures in under 5ms, utilizing hardware-accelerated tile buffers directly in the GPU.
 * **SigmaConnect (Zorin Connect / GSConnect Native Replacement):** Replaces Java/Python based GSConnect services with an ultra-lightweight, peer-to-peer daemon utilizing post-quantum encrypted (Kyber-1024) local socket pools. Seamlessly mirrors mobile SMS, clipboard shares, system notifications, and touch controls directly to local window stacks.
-* **Native Windows App Installer Guard:** Instead of running heavy, insecure Wine installer alerts procedurally, double-clicking `.exe` or `.msi` triggers an automatic containerized verification. SigmaOS prompts the user to either construct an isolated sandboxed Windows Translation Layer container or suggest a native package recipe dynamically from `sigpkg`.
+* **Native Windows App Installer Guard:** Double-clicking `.exe` or `.msi` triggers an automatic containerized verification. SigmaOS prompts the user to either construct an isolated sandboxed Windows Translation Layer container or suggest a native package recipe dynamically from `sigpkg`.
 * **Dynamic Time-of-Day Theming Core:** Incorporates a microkernel clock-gated background scheduler that smoothly transitions desktop wallpapers, ambient glow elements, and font sizes across smooth, haptic gradients based on native geographic daylight timelines.
 
 ---
 
-## ⚡ 5. Bolt's Daily Performance Optimization
+## ⚡ 6. Bolt's Daily Performance Optimization
 
 ### 💡 What: Dependency Solver Iteration & Memoized State Cache
 The SAT solver in `src/sigpkg/resolver.rs` is responsible for resolving dependency trees. Currently, it uses a naive recursive approach in `resolve_recursive()` that visits nodes recursively and performs lookup operations on package names.
@@ -139,7 +159,7 @@ To verify this improvement:
 
 ---
 
-## 🎚️ 6. Prioritized Next Steps & Action Plan
+## 🎚️ 7. Prioritized Next Steps & Action Plan
 
 We rank the remaining improvements into a strict priority hierarchy:
 
@@ -159,7 +179,7 @@ We rank the remaining improvements into a strict priority hierarchy:
 
 ---
 
-## 🛡️ 7. Self-Healing & System Resilience
+## 🛡️ 8. Self-Healing & System Resilience
 
 SigmaOS uses active supervision watchdogs to implement a highly resilient self-healing state machine:
 * **State Watchdogs:** S6-style processes monitor the wellness of critical userland and kernel tasks.
