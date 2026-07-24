@@ -134,6 +134,16 @@ impl Default for CapabilityToken {
     fn default() -> Self {
         Self::new()
     }
+
+    /// Check if capability contains a specific u64 bit
+    pub fn contains(&self, bit: u64) -> bool {
+        (self.bits & bit) != 0
+    }
+
+    /// Allow a specific capability bit
+    pub fn allow_capability(&mut self, bit: u64) {
+        self.bits |= bit;
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

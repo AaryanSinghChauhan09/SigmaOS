@@ -15,7 +15,7 @@ pub type ServiceID = usize;
 
 /// Service state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
     Stopped = 0,
     Starting = 1,
@@ -261,6 +261,7 @@ pub trait InitSystem {
 
 /// Init statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InitStats {
     pub total_services: usize,
     pub running_services: usize,
@@ -513,9 +514,30 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
-        if self.capacity > 0 {
+        if !self.data.is_null() {
             unsafe {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
@@ -523,6 +545,22 @@ impl<T> Drop for Vec<T> {
                 free(self.data as *mut u8);
             }
         }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 
