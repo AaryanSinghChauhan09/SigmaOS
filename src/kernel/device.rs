@@ -5,7 +5,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::object::{KernelObject, KRef};
+use crate::kernel::object::{KRef, KernelObject};
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -141,11 +141,17 @@ impl DeviceManager {
     }
 
     pub fn find_device(&self, name: &str) -> Option<&dyn Device> {
-        self.devices.iter().find(|d| d.name() == name).map(|d| d.as_ref())
+        self.devices
+            .iter()
+            .find(|d| d.name() == name)
+            .map(|d| d.as_ref())
     }
 
     pub fn find_device_mut(&mut self, name: &str) -> Option<&mut dyn Device> {
-        self.devices.iter_mut().find(|d| d.name() == name).map(|d| d.as_mut())
+        self.devices
+            .iter_mut()
+            .find(|d| d.name() == name)
+            .map(|d| d.as_mut())
     }
 
     pub fn bind_driver(&mut self, device_name: &str, driver_name: &str) -> Result<(), DriverError> {

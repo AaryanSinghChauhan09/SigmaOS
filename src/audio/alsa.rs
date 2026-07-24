@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioDirection {
@@ -48,8 +48,8 @@ pub enum SampleRate {
 pub enum ChannelConfig {
     Mono,
     Stereo,
-    Surround51,  // 5.1 surround
-    Surround71,  // 7.1 surround
+    Surround51, // 5.1 surround
+    Surround71, // 7.1 surround
 }
 
 #[derive(Debug, Clone)]
@@ -126,7 +126,9 @@ impl AlsaAudioStack {
 
     /// Open a PCM stream
     pub fn open_pcm_stream(&mut self, id: u32) -> Result<(), &'static str> {
-        let stream = self.pcm_streams.get_mut(&id)
+        let stream = self
+            .pcm_streams
+            .get_mut(&id)
             .ok_or("PCM stream not found")?;
 
         stream.opened = true;
@@ -135,7 +137,9 @@ impl AlsaAudioStack {
 
     /// Close a PCM stream
     pub fn close_pcm_stream(&mut self, id: u32) -> Result<(), &'static str> {
-        let stream = self.pcm_streams.get_mut(&id)
+        let stream = self
+            .pcm_streams
+            .get_mut(&id)
             .ok_or("PCM stream not found")?;
 
         stream.opened = false;
@@ -145,7 +149,9 @@ impl AlsaAudioStack {
 
     /// Start a PCM stream
     pub fn start_pcm_stream(&mut self, id: u32) -> Result<(), &'static str> {
-        let stream = self.pcm_streams.get_mut(&id)
+        let stream = self
+            .pcm_streams
+            .get_mut(&id)
             .ok_or("PCM stream not found")?;
 
         if !stream.opened {
@@ -158,7 +164,9 @@ impl AlsaAudioStack {
 
     /// Stop a PCM stream
     pub fn stop_pcm_stream(&mut self, id: u32) -> Result<(), &'static str> {
-        let stream = self.pcm_streams.get_mut(&id)
+        let stream = self
+            .pcm_streams
+            .get_mut(&id)
             .ok_or("PCM stream not found")?;
 
         stream.running = false;
@@ -167,7 +175,9 @@ impl AlsaAudioStack {
 
     /// Write audio data to a playback stream
     pub fn write_pcm(&mut self, id: u32, data: &[u8]) -> Result<usize, &'static str> {
-        let stream = self.pcm_streams.get_mut(&id)
+        let stream = self
+            .pcm_streams
+            .get_mut(&id)
             .ok_or("PCM stream not found")?;
 
         if !stream.opened {
@@ -178,7 +188,8 @@ impl AlsaAudioStack {
             return Err("PCM stream not running");
         }
 
-        if stream.direction != AudioDirection::Playback && stream.direction != AudioDirection::Both {
+        if stream.direction != AudioDirection::Playback && stream.direction != AudioDirection::Both
+        {
             return Err("Stream is not a playback stream");
         }
 
@@ -188,7 +199,9 @@ impl AlsaAudioStack {
 
     /// Read audio data from a capture stream
     pub fn read_pcm(&mut self, id: u32, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        let stream = self.pcm_streams.get_mut(&id)
+        let stream = self
+            .pcm_streams
+            .get_mut(&id)
             .ok_or("PCM stream not found")?;
 
         if !stream.opened {
@@ -208,7 +221,13 @@ impl AlsaAudioStack {
     }
 
     /// Create a mixer control
-    pub fn create_mixer_control(&mut self, name: String, min_value: i32, max_value: i32, default_value: i32) -> Result<u32, &'static str> {
+    pub fn create_mixer_control(
+        &mut self,
+        name: String,
+        min_value: i32,
+        max_value: i32,
+        default_value: i32,
+    ) -> Result<u32, &'static str> {
         let id = self.next_mixer_id;
         self.next_mixer_id += 1;
 
@@ -227,7 +246,9 @@ impl AlsaAudioStack {
 
     /// Set mixer control value
     pub fn set_mixer_value(&mut self, id: u32, value: i32) -> Result<(), &'static str> {
-        let control = self.mixer_controls.get_mut(&id)
+        let control = self
+            .mixer_controls
+            .get_mut(&id)
             .ok_or("Mixer control not found")?;
 
         if value < control.min_value || value > control.max_value {
@@ -240,7 +261,9 @@ impl AlsaAudioStack {
 
     /// Get mixer control value
     pub fn get_mixer_value(&self, id: u32) -> Result<i32, &'static str> {
-        let control = self.mixer_controls.get(&id)
+        let control = self
+            .mixer_controls
+            .get(&id)
             .ok_or("Mixer control not found")?;
 
         Ok(control.current_value)
@@ -248,7 +271,9 @@ impl AlsaAudioStack {
 
     /// Mute/unmute mixer control
     pub fn set_mute(&mut self, id: u32, muted: bool) -> Result<(), &'static str> {
-        let control = self.mixer_controls.get_mut(&id)
+        let control = self
+            .mixer_controls
+            .get_mut(&id)
             .ok_or("Mixer control not found")?;
 
         control.is_muted = muted;
@@ -299,19 +324,21 @@ mod tests {
     #[test]
     fn test_create_pcm_stream() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_pcm_stream(
-            "default".to_string(),
-            AudioDirection::Playback,
-            AudioFormat::S16Le,
-            SampleRate::Rate48000,
-            ChannelConfig::Stereo,
-            4096,
-            1024,
-        ).unwrap();
-        
+
+        let id = stack
+            .create_pcm_stream(
+                "default".to_string(),
+                AudioDirection::Playback,
+                AudioFormat::S16Le,
+                SampleRate::Rate48000,
+                ChannelConfig::Stereo,
+                4096,
+                1024,
+            )
+            .unwrap();
+
         assert_eq!(stack.pcm_stream_count(), 1);
-        
+
         let stream = stack.get_pcm_stream(id).unwrap();
         assert_eq!(stream.name, "default");
     }
@@ -319,19 +346,21 @@ mod tests {
     #[test]
     fn test_open_pcm_stream() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_pcm_stream(
-            "test".to_string(),
-            AudioDirection::Playback,
-            AudioFormat::S16Le,
-            SampleRate::Rate44100,
-            ChannelConfig::Mono,
-            4096,
-            1024,
-        ).unwrap();
-        
+
+        let id = stack
+            .create_pcm_stream(
+                "test".to_string(),
+                AudioDirection::Playback,
+                AudioFormat::S16Le,
+                SampleRate::Rate44100,
+                ChannelConfig::Mono,
+                4096,
+                1024,
+            )
+            .unwrap();
+
         stack.open_pcm_stream(id).unwrap();
-        
+
         let stream = stack.get_pcm_stream(id).unwrap();
         assert!(stream.opened);
     }
@@ -339,25 +368,27 @@ mod tests {
     #[test]
     fn test_start_stop_pcm_stream() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_pcm_stream(
-            "test".to_string(),
-            AudioDirection::Playback,
-            AudioFormat::S16Le,
-            SampleRate::Rate48000,
-            ChannelConfig::Stereo,
-            4096,
-            1024,
-        ).unwrap();
-        
+
+        let id = stack
+            .create_pcm_stream(
+                "test".to_string(),
+                AudioDirection::Playback,
+                AudioFormat::S16Le,
+                SampleRate::Rate48000,
+                ChannelConfig::Stereo,
+                4096,
+                1024,
+            )
+            .unwrap();
+
         stack.open_pcm_stream(id).unwrap();
         stack.start_pcm_stream(id).unwrap();
-        
+
         let stream = stack.get_pcm_stream(id).unwrap();
         assert!(stream.running);
-        
+
         stack.stop_pcm_stream(id).unwrap();
-        
+
         let stream = stack.get_pcm_stream(id).unwrap();
         assert!(!stream.running);
     }
@@ -365,33 +396,37 @@ mod tests {
     #[test]
     fn test_write_pcm() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_pcm_stream(
-            "playback".to_string(),
-            AudioDirection::Playback,
-            AudioFormat::S16Le,
-            SampleRate::Rate48000,
-            ChannelConfig::Stereo,
-            4096,
-            1024,
-        ).unwrap();
-        
+
+        let id = stack
+            .create_pcm_stream(
+                "playback".to_string(),
+                AudioDirection::Playback,
+                AudioFormat::S16Le,
+                SampleRate::Rate48000,
+                ChannelConfig::Stereo,
+                4096,
+                1024,
+            )
+            .unwrap();
+
         stack.open_pcm_stream(id).unwrap();
         stack.start_pcm_stream(id).unwrap();
-        
+
         let data = vec![0u8; 512];
         let written = stack.write_pcm(id, &data).unwrap();
-        
+
         assert_eq!(written, 512);
     }
 
     #[test]
     fn test_create_mixer_control() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_mixer_control("Master".to_string(), 0, 100, 50).unwrap();
+
+        let id = stack
+            .create_mixer_control("Master".to_string(), 0, 100, 50)
+            .unwrap();
         assert_eq!(stack.mixer_control_count(), 1);
-        
+
         let control = stack.get_mixer_control(id).unwrap();
         assert_eq!(control.name, "Master");
         assert_eq!(control.current_value, 50);
@@ -400,10 +435,12 @@ mod tests {
     #[test]
     fn test_set_mixer_value() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_mixer_control("Volume".to_string(), 0, 100, 50).unwrap();
+
+        let id = stack
+            .create_mixer_control("Volume".to_string(), 0, 100, 50)
+            .unwrap();
         stack.set_mixer_value(id, 75).unwrap();
-        
+
         let value = stack.get_mixer_value(id).unwrap();
         assert_eq!(value, 75);
     }
@@ -411,10 +448,12 @@ mod tests {
     #[test]
     fn test_set_mute() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_mixer_control("Master".to_string(), 0, 100, 50).unwrap();
+
+        let id = stack
+            .create_mixer_control("Master".to_string(), 0, 100, 50)
+            .unwrap();
         stack.set_mute(id, true).unwrap();
-        
+
         let control = stack.get_mixer_control(id).unwrap();
         assert!(control.is_muted);
     }
@@ -422,10 +461,30 @@ mod tests {
     #[test]
     fn test_list_streams() {
         let mut stack = AlsaAudioStack::new();
-        
-        stack.create_pcm_stream("stream1".to_string(), AudioDirection::Playback, AudioFormat::S16Le, SampleRate::Rate48000, ChannelConfig::Stereo, 4096, 1024).unwrap();
-        stack.create_pcm_stream("stream2".to_string(), AudioDirection::Capture, AudioFormat::S16Le, SampleRate::Rate44100, ChannelConfig::Mono, 4096, 1024).unwrap();
-        
+
+        stack
+            .create_pcm_stream(
+                "stream1".to_string(),
+                AudioDirection::Playback,
+                AudioFormat::S16Le,
+                SampleRate::Rate48000,
+                ChannelConfig::Stereo,
+                4096,
+                1024,
+            )
+            .unwrap();
+        stack
+            .create_pcm_stream(
+                "stream2".to_string(),
+                AudioDirection::Capture,
+                AudioFormat::S16Le,
+                SampleRate::Rate44100,
+                ChannelConfig::Mono,
+                4096,
+                1024,
+            )
+            .unwrap();
+
         let streams = stack.list_pcm_streams();
         assert_eq!(streams.len(), 2);
     }
@@ -433,10 +492,12 @@ mod tests {
     #[test]
     fn test_invalid_mixer_value() {
         let mut stack = AlsaAudioStack::new();
-        
-        let id = stack.create_mixer_control("Volume".to_string(), 0, 100, 50).unwrap();
+
+        let id = stack
+            .create_mixer_control("Volume".to_string(), 0, 100, 50)
+            .unwrap();
         let result = stack.set_mixer_value(id, 150);
-        
+
         assert!(result.is_err());
     }
 }

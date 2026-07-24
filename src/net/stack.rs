@@ -149,20 +149,20 @@ pub enum OperState {
     Up,
 }
 
-pub protocol TcpSk {
-    snd_una: u32,
-    snd_nxt: u32,
-    rcv_nxt: u32,
-    snd_wl1: u32,
-    snd_wl2: u32,
-    snd_wnd: u32,
-    rcv_wnd: u32,
-    cwnd: u32,
-    ssthresh: u32,
-    retransmits: u32,
-    out_of_order: u32,
-    rcv_tstamp: bool,
-    snd_tstamp: bool,
+pub struct TcpSk {
+    pub snd_una: u32,
+    pub snd_nxt: u32,
+    pub rcv_nxt: u32,
+    pub snd_wl1: u32,
+    pub snd_wl2: u32,
+    pub snd_wnd: u32,
+    pub rcv_wnd: u32,
+    pub cwnd: u32,
+    pub ssthresh: u32,
+    pub retransmits: u32,
+    pub out_of_order: u32,
+    pub rcv_tstamp: bool,
+    pub snd_tstamp: bool,
 }
 
 pub trait CongestionControl: Send + Sync {
@@ -319,10 +319,16 @@ impl Qdisc for PfifoFast {
     fn peek(&self) -> Option<&SkBuff> {
         None
     }
-    fn drop(&mut self) -> usize { 0 }
+    fn drop(&mut self) -> usize {
+        0
+    }
     fn reset(&mut self) {}
-    fn qlen(&self) -> usize { self.queues.iter().map(|q| q.len()).sum() }
-    fn name(&self) -> &str { "pfifo_fast" }
+    fn qlen(&self) -> usize {
+        self.queues.iter().map(|q| q.len()).sum()
+    }
+    fn name(&self) -> &str {
+        "pfifo_fast"
+    }
 }
 
 pub struct QdiscManager {

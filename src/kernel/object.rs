@@ -101,9 +101,11 @@ impl KernelObject for KObject {
     }
 
     fn remove_child(&mut self, child_name: &str) -> Option<Box<dyn KernelObject>> {
-        if let Some(idx) = self.children.iter().position(|c| {
-            unsafe { c.as_ref() }.map_or(false, |child| child.name() == child_name)
-        }) {
+        if let Some(idx) = self
+            .children
+            .iter()
+            .position(|c| unsafe { c.as_ref() }.map_or(false, |child| child.name() == child_name))
+        {
             let child_ptr = self.children.remove(idx);
             unsafe { Some(Box::from_raw(child_ptr as *mut dyn KernelObject)) }
         } else {

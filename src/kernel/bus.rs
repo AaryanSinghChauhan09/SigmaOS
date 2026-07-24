@@ -5,7 +5,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::object::{KernelObject, KRef};
+use crate::kernel::object::{KRef, KernelObject};
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,11 @@ pub trait Bus: KernelObject + Send + Sync {
     fn remove(&self, device: &mut dyn DeviceDriver) -> Result<(), BusError>;
     fn devices(&self) -> Vec<&dyn DeviceDriver>;
     fn drivers(&self) -> Vec<&dyn DeviceDriver>;
-    fn bind_driver(&mut self, device: &mut dyn DeviceDriver, driver: &mut dyn DeviceDriver) -> Result<(), BusError>;
+    fn bind_driver(
+        &mut self,
+        device: &mut dyn DeviceDriver,
+        driver: &mut dyn DeviceDriver,
+    ) -> Result<(), BusError>;
 }
 
 pub struct PciBus {
@@ -125,7 +129,11 @@ impl KernelObject for PciBus {
         }
     }
 
-    fn sysfs_store(&mut self, _attr: &str, _value: &str) -> Result<(), crate::kernel::object::ObjectError> {
+    fn sysfs_store(
+        &mut self,
+        _attr: &str,
+        _value: &str,
+    ) -> Result<(), crate::kernel::object::ObjectError> {
         Err(crate::kernel::object::ObjectError::CapabilityDenied)
     }
 }
@@ -155,7 +163,11 @@ impl Bus for PciBus {
         Vec::new()
     }
 
-    fn bind_driver(&mut self, _device: &mut dyn DeviceDriver, _driver: &mut dyn DeviceDriver) -> Result<(), BusError> {
+    fn bind_driver(
+        &mut self,
+        _device: &mut dyn DeviceDriver,
+        _driver: &mut dyn DeviceDriver,
+    ) -> Result<(), BusError> {
         Ok(())
     }
 }

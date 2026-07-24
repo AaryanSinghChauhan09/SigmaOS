@@ -1,14 +1,14 @@
 //! SigmaOS Voice Recognition and Synthesis Module
-//! 
+//!
 //! This module provides voice recognition (speech-to-text) and synthesis (text-to-speech)
 //! capabilities for the SigmaOS AI ecosystem, including local inference and AI integration.
 
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Voice recognition model type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -68,7 +68,12 @@ pub struct SynthesisResult {
 }
 
 impl SynthesisResult {
-    pub fn new(audio_data: Vec<u8>, format: AudioFormat, sample_rate: u32, duration_ms: u32) -> Self {
+    pub fn new(
+        audio_data: Vec<u8>,
+        format: AudioFormat,
+        sample_rate: u32,
+        duration_ms: u32,
+    ) -> Self {
         Self {
             audio_data,
             format,
@@ -95,7 +100,11 @@ impl VoiceRecognizer {
     }
 
     /// Recognize speech from audio data
-    pub fn recognize(&self, audio_data: &[u8], format: AudioFormat) -> Result<RecognitionResult, String> {
+    pub fn recognize(
+        &self,
+        audio_data: &[u8],
+        format: AudioFormat,
+    ) -> Result<RecognitionResult, String> {
         // Validate audio format
         if format != AudioFormat::Pcm16 && format != AudioFormat::Pcm32 {
             return Err("Unsupported audio format for recognition".to_string());
@@ -226,7 +235,11 @@ impl VoiceAssistant {
     }
 
     /// Process voice input and generate response
-    pub fn process(&mut self, audio_input: &[u8], format: AudioFormat) -> Result<SynthesisResult, String> {
+    pub fn process(
+        &mut self,
+        audio_input: &[u8],
+        format: AudioFormat,
+    ) -> Result<SynthesisResult, String> {
         // Recognize speech
         let recognition = self.recognizer.recognize(audio_input, format)?;
 
@@ -319,7 +332,8 @@ mod tests {
 
     #[test]
     fn test_voice_synthesizer_creation() {
-        let synthesizer = VoiceSynthesizer::new(SynthesisModel::ESpeak, "default".to_string(), 22050);
+        let synthesizer =
+            VoiceSynthesizer::new(SynthesisModel::ESpeak, "default".to_string(), 22050);
         assert_eq!(synthesizer.get_model(), SynthesisModel::ESpeak);
         assert_eq!(synthesizer.get_voice(), "default");
     }
