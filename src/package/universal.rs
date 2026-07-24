@@ -481,15 +481,25 @@ mod tests {
         let duration_resolve = start.elapsed();
 
         assert_eq!(deps.len(), 100);
-        println!("Resolved 100 deep package dependencies in: {:?}", duration_resolve);
+        println!(
+            "Resolved 100 deep package dependencies in: {:?}",
+            duration_resolve
+        );
 
         let start = std::time::Instant::now();
         let conflicts = resolver.detect_conflicts(&deps);
         let duration_conflicts = start.elapsed();
 
-        println!("Detected conflicts on 100 packages in: {:?}", duration_conflicts);
+        println!(
+            "Detected conflicts on 100 packages in: {:?}",
+            duration_conflicts
+        );
         assert_eq!(conflicts.len(), 9);
         // Under our O(N) optimized pre-resolution, this is extremely fast (< 1ms)
-        assert!(duration_conflicts.as_millis() < 50, "Conflict detection was too slow: {:?}", duration_conflicts);
+        assert!(
+            duration_conflicts.as_millis() < 50,
+            "Conflict detection was too slow: {:?}",
+            duration_conflicts
+        );
     }
 }
