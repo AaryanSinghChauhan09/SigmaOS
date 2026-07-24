@@ -83,7 +83,10 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    IsolationError, Permission, PledgeManager, PledgePromise,
+};
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
