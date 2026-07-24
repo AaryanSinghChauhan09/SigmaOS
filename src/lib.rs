@@ -1,7 +1,9 @@
-#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod unimplemented_features;
 pub mod accessibility;
 pub mod audio;
 pub mod automation;
@@ -10,8 +12,6 @@ pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod debugger;
-pub mod desktop;
 pub mod device;
 pub mod docs;
 pub mod driver;
@@ -24,10 +24,7 @@ pub mod governance;
 pub mod graphics;
 pub mod iso;
 pub mod kernel;
-pub mod legal;
-pub mod media;
-pub mod memory;
-pub mod ml;
+pub mod klib;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
