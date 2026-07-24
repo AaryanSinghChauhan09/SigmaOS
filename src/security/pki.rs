@@ -216,6 +216,10 @@ impl Default for SimpleCRL {
     }
 }
 
+pub type CertificateAuthority = SimplePKIManager;
+pub type PkiError = PKIError;
+pub type PkiManager = SimplePKIManager;
+
 impl CRL for SimpleCRL {
     fn add_to_crl(&mut self, cert_id: CertificateID, reason: u32) {
         self.revoked.push((cert_id, reason));

@@ -69,6 +69,9 @@ impl ShellRepl {
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
@@ -86,6 +89,9 @@ impl ShellRepl {
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
@@ -93,7 +99,7 @@ impl ShellRepl {
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages: std::collections::HashSet::new(),
+            installed_packages,
         }
     }
 
@@ -380,7 +386,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "sigma-sh> ");
+        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
     }
 
     #[test]

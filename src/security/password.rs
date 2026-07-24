@@ -3,6 +3,7 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use rand::Rng;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -212,6 +213,7 @@ impl PasswordManager {
             ..entry
         };
 
+        let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
@@ -264,6 +266,7 @@ impl PasswordManager {
             ..entry
         };
 
+        let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
@@ -424,11 +427,15 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
-        use rand::RngExt;
-        let mut rng = rand::rng();
+        // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
+        let mut seed = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos() as u64;
 
         for _ in 0..length {
-            let index = rng.random_range(0..charset.len());
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            let index = (seed as usize) % charset.len();
             password.push(charset[index] as char);
         }
 
