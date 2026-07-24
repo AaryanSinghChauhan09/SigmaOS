@@ -269,10 +269,20 @@ mod tests {
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
-        let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(p1).unwrap();
-        scheduler.add_process(p2).unwrap();
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
+
+        let initial_index = scheduler.current_index;
+        for _ in 0..15 {
+            scheduler.tick();
+        }
+        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
 
         let initial_index = scheduler.current_index;
         // Normal priority multiplier is 2x base 10 = 20 ticks per slice

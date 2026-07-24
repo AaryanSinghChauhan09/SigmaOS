@@ -153,14 +153,89 @@ impl ZonedPageAllocator {
         None
     }
 
-    pub fn free(&mut self, addr: PhysicalAddress, order: u32) {
-        let pfn = addr.0 >> PFN_SHIFT;
-        for zone in &mut self.zones {
-            if pfn >= zone.zone_start_pfn && pfn < zone.zone_start_pfn + zone.spanned_pages {
-                zone.free_area[order as usize].free += 1;
-                zone.present_pages += 1 << order;
-                self.free_pages += 1 << order;
-                break;
+    pub fn deallocate(&mut self, block: MemoryBlock) {
+        let pages = block.size / PAGE_SIZE;
+        let order = self.calculate_order(pages);
+
+        // Try to merge with buddy
+        match self.try_merge(block, order) {
+            Ok(merged_block) => self.deallocate(merged_block),
+            Err(original_block) => self.free_lists[order].push(original_block),
+        }
+    }
+
+    fn calculate_order(&self, pages: usize) -> usize {
+        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
+        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
+        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
+        if pages <= 1 {
+            0
+        } else {
+            let next_pow = pages.next_power_of_two();
+            next_pow.trailing_zeros() as usize
+        }
+    }
+
+    fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
+        if order < 12 && !self.free_lists[order].is_empty() {
+            Some(self.free_lists[order].pop().unwrap())
+        } else {
+            None
+        }
+    }
+
+    fn split_block(&mut self, block: MemoryBlock, target_order: usize) -> Option<MemoryBlock> {
+        let mut current_block = block;
+        let mut current_order = self.calculate_order(current_block.size / PAGE_SIZE);
+
+        while current_order > target_order {
+            current_order -= 1;
+            let half_size = current_block.size / 2;
+            let addr = current_block.addr.as_ptr() as usize + half_size;
+
+            let buddy = MemoryBlock {
+                addr: NonNull::new(addr as *mut u8)?,
+                size: half_size,
+            };
+
+            current_block.size = half_size;
+            self.free_lists[current_order].push(buddy);
+        }
+
+        Some(current_block)
+    }
+
+    fn try_merge(&mut self, block: MemoryBlock, order: usize) -> Result<MemoryBlock, MemoryBlock> {
+        if order >= 11 {
+            return Err(block); // Maximum order
+        }
+
+        let block_addr = block.addr.as_ptr() as usize;
+        // Calculate buddy address by XORing with block size (standard buddy system)
+        let buddy_addr = block_addr ^ block.size;
+        let buddy_size = block.size * 2;
+
+        // Find buddy in free list
+        if let Some(pos) = self.free_lists[order]
+            .iter()
+            .position(|b| b.addr.as_ptr() as usize == buddy_addr && b.size == block.size)
+        {
+            let _buddy = self.free_lists[order].remove(pos);
+
+            // Merge blocks
+            let merged_addr = if block_addr < buddy_addr {
+                block_addr
+            } else {
+                buddy_addr
+            };
+
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
+                Ok(MemoryBlock {
+                    addr: non_null,
+                    size: buddy_size,
+                })
+            } else {
+                Err(block)
             }
         }
     }
