@@ -6,12 +6,7 @@ pub mod object;
 pub mod vfs;
 pub mod sched;
 pub mod memory;
-pub mod net;
-pub mod container;
-pub mod package;
-pub mod security;
-pub mod boot;
-pub mod ipc;
+pub mod performance;
 pub mod roundrobin;
 
 pub use device::{Device, DeviceType, DeviceManager, DeviceBinding, DriverError, DriverMetadata};

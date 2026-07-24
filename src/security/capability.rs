@@ -222,6 +222,29 @@ impl CapabilityGate {
     }
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub token: CapabilityToken,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            token: CapabilityToken::new(),
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
+    }
+}
+
 pub struct SecurityEnforcer {
     active_tokens: Vec<CapabilityToken>,
 }
