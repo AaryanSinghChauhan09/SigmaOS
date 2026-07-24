@@ -1,19 +1,18 @@
-use core::mem;
+#![no_std]
+#![no_main]
+
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type BlockID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum AllocError {
-    Success = 0,
-    OutOfMemory = 1,
-    InvalidBlock = 2,
-    Fragmentation = 3,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AllocError { Success = 0, OutOfMemory = 1, InvalidBlock = 2, Fragmentation = 3 }
 
 pub trait BuddyAllocator {
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError>;
@@ -50,28 +49,20 @@ pub struct SimpleBuddyAllocator {
 impl SimpleBuddyAllocator {
     pub fn new(max_order: usize, _total_frames: usize) -> Self {
         let mut free_lists: [Vec<BlockID>; 12] = [
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
+            Vec::new(), Vec::new(), Vec::new(), Vec::new(),
+            Vec::new(), Vec::new(), Vec::new(), Vec::new(),
+            Vec::new(), Vec::new(), Vec::new(), Vec::new(),
         ];
         let mut blocks = Vec::new();
-        let next_id = AtomicUsize::new(0);
-
+        let mut next_id = AtomicUsize::new(1);
+        
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);
+        blocks.push(None); // Index 0 unused
         blocks.push(Some(initial_block));
         free_lists[initial_order].push(initial_block_id);
-
+        
         SimpleBuddyAllocator {
             max_order: AtomicUsize::new(max_order),
             free_lists,
@@ -86,108 +77,103 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         if order > self.max_order.load(Ordering::SeqCst) {
             return Err(AllocError::OutOfMemory);
         }
-
+        
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
             if !self.free_lists[current_order].is_empty() {
-                let block_id = self.free_lists[current_order].remove(0);
+                let block_id = self.free_lists[current_order].pop().unwrap();
+                
+                let mut current_block_id = block_id;
+                let mut active_order = current_order;
 
-                if current_order > order {
-                    let new_order = current_order - 1;
+                // Recursively split the block until we reach the target allocation order
+                while active_order > order {
+                    active_order -= 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-
-                    let left_block = Block::new(new_order);
-                    let right_block = Block::new(new_order);
-
-                    if let Some(ref mut parent) = self.blocks[block_id] {
+                    
+                    let mut left_block = Block::new(active_order);
+                    let mut right_block = Block::new(active_order);
+                    
+                    if let Some(ref mut parent) = self.blocks[current_block_id] {
                         parent.left.store(left_id, Ordering::SeqCst);
                         parent.right.store(right_id, Ordering::SeqCst);
                         parent.free.store(0, Ordering::SeqCst);
                     }
-
-                    while left_id >= self.blocks.len() {
-                        self.blocks.push(None);
-                    }
-                    while right_id >= self.blocks.len() {
-                        self.blocks.push(None);
-                    }
-
+                    
+                    while left_id >= self.blocks.len() { self.blocks.push(None); }
+                    while right_id >= self.blocks.len() { self.blocks.push(None); }
+                    
                     self.blocks[left_id] = Some(left_block);
                     self.blocks[right_id] = Some(right_block);
-
-                    self.free_lists[new_order].push(right_id);
-
-                    return Ok(left_id);
+                    
+                    // The right block goes into the free list of the split order
+                    self.free_lists[active_order].push(right_id);
+                    
+                    // We continue splitting the left block
+                    current_block_id = left_id;
                 }
-
-                if let Some(ref mut block) = self.blocks[block_id] {
+                
+                if let Some(ref mut block) = self.blocks[current_block_id] {
                     block.free.store(0, Ordering::SeqCst);
                 }
-
-                return Ok(block_id);
+                
+                return Ok(current_block_id);
             }
         }
-
+        
         Err(AllocError::OutOfMemory)
     }
-
+    
     fn free(&mut self, block_id: BlockID, order: usize) -> Result<(), AllocError> {
         if block_id >= self.blocks.len() {
             return Err(AllocError::InvalidBlock);
         }
-
+        
         let mut current_id = block_id;
         let mut current_order = order;
-
+        
         loop {
             if let Some(ref mut block) = self.blocks[current_id] {
                 block.free.store(1, Ordering::SeqCst);
                 block.order.store(current_order, Ordering::SeqCst);
             }
-
+            
             let buddy_id = current_id ^ (1 << current_order);
-
+            
             if buddy_id >= self.blocks.len() {
                 self.free_lists[current_order].push(current_id);
                 return Ok(());
             }
-
+            
             let buddy_free = if let Some(ref buddy) = self.blocks[buddy_id] {
-                buddy.free.load(Ordering::SeqCst) == 1
-                    && buddy.order.load(Ordering::SeqCst) == current_order
+                buddy.free.load(Ordering::SeqCst) == 1 && buddy.order.load(Ordering::SeqCst) == current_order
             } else {
                 false
             };
-
+            
             if !buddy_free || current_order >= self.max_order.load(Ordering::SeqCst) {
                 self.free_lists[current_order].push(current_id);
                 return Ok(());
             }
-
-            let parent_id = if current_id < buddy_id {
-                current_id
-            } else {
-                buddy_id
-            };
-
+            
+            let parent_id = if current_id < buddy_id { current_id } else { buddy_id };
+            
             if let Some(ref mut buddy) = self.blocks[buddy_id] {
                 buddy.free.store(0, Ordering::SeqCst);
             }
             if let Some(ref mut block) = self.blocks[current_id] {
                 block.free.store(0, Ordering::SeqCst);
             }
-
+            
             self.free_lists[current_order].retain(|&id| id != buddy_id && id != current_id);
-
+            
             current_id = parent_id;
             current_order += 1;
         }
     }
-
+    
     fn get_free_count(&self, order: usize) -> usize {
-        if order >= 12 {
-            return 0;
-        }
+        if order >= 12 { return 0; }
         self.free_lists[order].len()
     }
 }
@@ -202,7 +188,7 @@ impl MemoryPool for SimpleBuddyAllocator {
     fn get_total_frames(&self) -> usize {
         self.blocks.len()
     }
-
+    
     fn get_used_frames(&self) -> usize {
         let mut used = 0;
         for block_option in &self.blocks {
@@ -214,82 +200,44 @@ impl MemoryPool for SimpleBuddyAllocator {
         }
         used
     }
-
+    
     fn get_fragmentation_ratio(&self) -> f64 {
         let total = self.get_total_frames();
-        if total == 0 {
-            return 0.0;
-        }
+        if total == 0 { return 0.0; }
         let used = self.get_used_frames();
         let free = total - used;
-        if free == 0 {
-            return 0.0;
-        }
-
+        if free == 0 { return 0.0; }
+        
         let mut free_blocks = 0;
         for i in 0..12 {
             free_blocks += self.free_lists[i].len();
         }
-
-        if free_blocks == 0 {
-            return 0.0;
-        }
+        
+        if free_blocks == 0 { return 0.0; }
         (free_blocks as f64) / (free as f64)
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
+    fn is_empty(&self) -> bool { self.len == 0 }
+    fn pop(&mut self) -> Option<T> {
+        if self.len == 0 { return None; }
+        self.len -= 1;
+        unsafe { Some(core::ptr::read(self.data.add(self.len))) }
     }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
+    fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -299,21 +247,14 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
+    fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
                     if write_idx != i {
-                        core::ptr::copy_nonoverlapping(
-                            self.data.add(i),
-                            self.data.add(write_idx),
-                            1,
-                        );
+                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
                     }
                     write_idx += 1;
                 }
@@ -321,37 +262,44 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+    fn len(&self) -> usize {
+        self.len
+    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+// =========================================================================
+// 🔄 UNIT TESTING
+// =========================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_buddy_allocator_split() {
+        let mut allocator = SimpleBuddyAllocator::new(4, 16);
+        assert_eq!(allocator.get_free_count(4), 1);
+
+        // Allocating order 1 should split order 4 down to order 1 recursively
+        let block_id = allocator.allocate(1).unwrap();
+        assert!(block_id > 0);
+
+        // We should have split buddies left in free lists of order 1, 2, and 3
+        assert_eq!(allocator.get_free_count(1), 1);
+        assert_eq!(allocator.get_free_count(2), 1);
+        assert_eq!(allocator.get_free_count(3), 1);
+        assert_eq!(allocator.get_free_count(4), 0);
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
