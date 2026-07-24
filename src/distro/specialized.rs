@@ -155,129 +155,6 @@ impl EcuController {
     }
 }
 
-// ==========================================
-// 6. EndeavourOS-Style Sovereign Utilities
-// ==========================================
-
-/// EndeavourOS-Style Welcome Engine to configure initial system states
-#[derive(Debug, Clone)]
-pub struct EosWelcomeEngine {
-    pub first_boot: bool,
-    pub mirrors_configured: bool,
-    pub drivers_installed: bool,
-}
-
-impl EosWelcomeEngine {
-    pub fn new() -> Self {
-        Self {
-            first_boot: true,
-            mirrors_configured: false,
-            drivers_installed: false,
-        }
-    }
-
-    pub fn update_mirrors(&mut self) -> Result<&'static str, &'static str> {
-        self.mirrors_configured = true;
-        Ok("Sovereign package mirrors configured successfully")
-    }
-
-    pub fn install_recommended_drivers(&mut self) -> Result<&'static str, &'static str> {
-        self.drivers_installed = true;
-        Ok("Modern Vulkan/GPU and HID drivers installed")
-    }
-}
-
-impl Default for EosWelcomeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// EndeavourOS-Style Mirror Speed Ranker
-#[derive(Debug, Clone)]
-pub struct MirrorRanker {
-    pub default_timeout_ms: u64,
-}
-
-impl MirrorRanker {
-    pub fn new(timeout: u64) -> Self {
-        Self {
-            default_timeout_ms: timeout,
-        }
-    }
-
-    /// Ranks list of regional mirrors based on simulated round-trip-time (RTT) latency
-    pub fn rank_mirrors(&self, mirrors: &[&str]) -> Vec<(String, u64)> {
-        let mut ranked = Vec::new();
-        for (i, &mirror) in mirrors.iter().enumerate() {
-            // Simulated RTT: base RTT modulated by index to make ranking deterministic
-            let rtt = 10 + (i as u64 * 15);
-            ranked.push((mirror.to_string(), rtt));
-        }
-        ranked.sort_by_key(|(_, rtt)| *rtt);
-        ranked
-    }
-}
-
-/// Background periodic checking service for new packages
-#[derive(Debug, Clone)]
-pub struct EosUpdateNotifier {
-    pub pending_updates_count: u32,
-}
-
-impl EosUpdateNotifier {
-    pub fn new() -> Self {
-        Self {
-            pending_updates_count: 0,
-        }
-    }
-
-    pub fn check_for_updates(&mut self) -> bool {
-        // Simulated background query
-        self.pending_updates_count = 5;
-        true
-    }
-}
-
-impl Default for EosUpdateNotifier {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Unified diagnostic collector for kernel and package manager logs
-#[derive(Debug, Clone)]
-pub struct DiagnosticLogTool {
-    pub collected_lines: Vec<String>,
-}
-
-impl DiagnosticLogTool {
-    pub fn new() -> Self {
-        Self {
-            collected_lines: Vec::new(),
-        }
-    }
-
-    pub fn record_log_entry(&mut self, source: &str, msg: &str) {
-        self.collected_lines.push(format!("[{}] {}", source, msg));
-    }
-
-    pub fn generate_troubleshooting_report(&self) -> String {
-        let mut report = String::from("--- SigmaOS Troubleshooting Report ---\n");
-        for line in &self.collected_lines {
-            report.push_str(line);
-            report.push('\n');
-        }
-        report
-    }
-}
-
-impl Default for DiagnosticLogTool {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Educational Sandbox Coding Challenge
 #[derive(Debug, Clone)]
 pub struct EduChallenge {
@@ -330,6 +207,90 @@ impl EduPlayground {
         } else {
             Err("Code analysis failed: expected standard output or matching signature")
         }
+    }
+}
+
+/// Sigma Hardware Detector (MHWD parity absorbing Manjaro Linux)
+/// Automatically identifies PCI/USB hardware ID mappings and deploys optimal drivers.
+pub struct SigmaHardwareDetector {
+    pub hardware_db: HashMap<(u16, u16), &'static str>, // maps (vendor_id, device_id) to driver name
+    pub loaded_drivers: Vec<&'static str>,
+}
+
+impl SigmaHardwareDetector {
+    pub fn new() -> Self {
+        let mut db = HashMap::new();
+        // Register default hardware-to-driver mappings (e.g. GPUs, network adapters, storage controllers)
+        db.insert((0x10DE, 0x2204), "nvidia-pcie-gen6"); // NVIDIA RTX 3090 / 4090
+        db.insert((0x8086, 0x1533), "e1000e-ethernet");  // Intel E1000
+        db.insert((0x10EC, 0x8168), "rtl8169-realtek");   // Realtek Ethernet
+        db.insert((0x144D, 0xA808), "samsung-nvme-v4");   // Samsung Pro NVMe
+
+        Self {
+            hardware_db: db,
+            loaded_drivers: Vec::new(),
+        }
+    }
+
+    /// Simulates scanning a PCI/USB bus and auto-configuring appropriate drivers
+    pub fn scan_and_load_drivers(&mut self, devices: &[(u16, u16)]) -> usize {
+        let mut count = 0;
+        for &dev in devices {
+            if let Some(&driver) = self.hardware_db.get(&dev) {
+                if !self.loaded_drivers.contains(&driver) {
+                    self.loaded_drivers.push(driver);
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+}
+
+impl Default for SigmaHardwareDetector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Sigma Settings Manager (MSM parity absorbing Manjaro Linux)
+/// Central controller to configure kernels, multi-locale language packages, and system timezones.
+pub struct SigmaSettingsManager {
+    pub available_kernels: Vec<&'static str>,
+    pub active_kernel: &'static str,
+    pub locale_packages: Vec<String>,
+    pub active_timezone: String,
+}
+
+impl SigmaSettingsManager {
+    pub fn new() -> Self {
+        Self {
+            available_kernels: vec!["Sovereign-LTS-6.1", "Sovereign-RT-6.6", "Sovereign-Mainline-6.12"],
+            active_kernel: "Sovereign-LTS-6.1",
+            locale_packages: vec!["en_US.UTF-8".to_string(), "hi_IN.UTF-8".to_string()], // default supports India Stack locales
+            active_timezone: "UTC".to_string(),
+        }
+    }
+
+    /// Switches the running system kernel dynamically
+    pub fn switch_kernel(&mut self, target_kernel: &'static str) -> Result<(), &'static str> {
+        if self.available_kernels.contains(&target_kernel) {
+            self.active_kernel = target_kernel;
+            Ok(())
+        } else {
+            Err("Target kernel is not available in system repos")
+        }
+    }
+
+    /// Updates the active system timezone configuration
+    pub fn update_timezone(&mut self, tz: &str) {
+        self.active_timezone = tz.to_string();
+    }
+}
+
+impl Default for SigmaSettingsManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -423,51 +384,35 @@ mod tests {
     }
 
     #[test]
-    fn test_endeavour_welcome_engine() {
-        let mut welcome = EosWelcomeEngine::new();
-        assert!(welcome.first_boot);
-        assert_eq!(
-            welcome.update_mirrors().unwrap(),
-            "Sovereign package mirrors configured successfully"
-        );
-        assert!(welcome.mirrors_configured);
-
-        assert_eq!(
-            welcome.install_recommended_drivers().unwrap(),
-            "Modern Vulkan/GPU and HID drivers installed"
-        );
-        assert!(welcome.drivers_installed);
-    }
-
-    #[test]
-    fn test_mirror_ranker() {
-        let ranker = MirrorRanker::new(500);
-        let mirrors = vec![
-            "mirror.us.sigmaos.org",
-            "mirror.in.sigmaos.org",
-            "mirror.de.sigmaos.org",
+    fn test_sigma_hardware_detection_mhwd() {
+        let mut detector = SigmaHardwareDetector::new();
+        // Scan a list of detected PCI peripheral devices
+        let bus_scan = vec![
+            (0x10DE, 0x2204), // NVIDIA RTX 4090 GPU
+            (0x8086, 0x1533), // Intel E1000 NIC
+            (0x9999, 0x9999), // Unsupported/unknown device
         ];
-        let ranked = ranker.rank_mirrors(&mirrors);
-        assert_eq!(ranked.len(), 3);
-        assert_eq!(ranked[0].0, "mirror.us.sigmaos.org");
-        assert_eq!(ranked[0].1, 10);
+
+        let loaded_count = detector.scan_and_load_drivers(&bus_scan);
+        assert_eq!(loaded_count, 2);
+        assert!(detector.loaded_drivers.contains(&"nvidia-pcie-gen6"));
+        assert!(detector.loaded_drivers.contains(&"e1000e-ethernet"));
     }
 
     #[test]
-    fn test_update_notifier_and_log_tool() {
-        let mut notifier = EosUpdateNotifier::new();
-        assert!(notifier.check_for_updates());
-        assert_eq!(notifier.pending_updates_count, 5);
+    fn test_sigma_settings_manager_msm() {
+        let mut manager = SigmaSettingsManager::new();
+        assert_eq!(manager.active_kernel, "Sovereign-LTS-6.1");
 
-        let mut log_tool = DiagnosticLogTool::new();
-        log_tool.record_log_entry("Kernel", "Vulkan context bound successfully");
-        log_tool.record_log_entry(
-            "PackageManager",
-            "Transaction completed: installed sigma-vim",
-        );
+        // Switch kernel dynamically
+        assert!(manager.switch_kernel("Sovereign-RT-6.6").is_ok());
+        assert_eq!(manager.active_kernel, "Sovereign-RT-6.6");
 
-        let report = log_tool.generate_troubleshooting_report();
-        assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
-        assert!(report.contains("[Kernel] Vulkan context bound successfully"));
+        // Switching to unsupported fails
+        assert!(manager.switch_kernel("Linux-Legacy").is_err());
+
+        // Update timezone settings
+        manager.update_timezone("Asia/Kolkata");
+        assert_eq!(manager.active_timezone, "Asia/Kolkata");
     }
 }

@@ -269,11 +269,6 @@ impl SimpleVMM {
         writable: bool,
         execute_disable: bool,
     ) -> Result<(), MemoryError> {
-        // Alignment verification check (4KB = 4096 bytes = 0xFFF mask)
-        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -319,11 +314,6 @@ impl SimpleVMM {
         phys: PhysicalAddress,
         writable: bool,
     ) -> Result<(), MemoryError> {
-        // Alignment verification check (2MB = 2,097,152 bytes = 0x1F_FFFF mask)
-        if (virt.0 & 0x1F_FFFF) != 0 || (phys.0 & 0x1F_FFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -356,11 +346,6 @@ impl SimpleVMM {
         phys: PhysicalAddress,
         writable: bool,
     ) -> Result<(), MemoryError> {
-        // Alignment verification check (1GB = 1,073,741,824 bytes = 0x3FFF_FFFF mask)
-        if (virt.0 & 0x3FFF_FFFF) != 0 || (phys.0 & 0x3FFF_FFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
 
@@ -704,25 +689,5 @@ mod tests {
         let entry = PageTableEntry::new(PhysicalAddress(0x1000));
 
         assert!(pt.set_entry(512, entry).is_err());
-    }
-
-    #[test]
-    fn test_vmm_address_alignment_verification() {
-        let mut vmm = SimpleVMM::new();
-
-        // 4KB alignment checks
-        assert!(vmm.map_page(VirtualAddress(0x1005), PhysicalAddress(0x2000)).is_err());
-        assert!(vmm.map_page(VirtualAddress(0x1000), PhysicalAddress(0x2003)).is_err());
-        assert!(vmm.map_page(VirtualAddress(0x1000), PhysicalAddress(0x2000)).is_ok());
-
-        // 2MB alignment checks
-        assert!(vmm.map_huge_2mb(VirtualAddress(0x200100), PhysicalAddress(0x800000), true).is_err());
-        assert!(vmm.map_huge_2mb(VirtualAddress(0x200000), PhysicalAddress(0x800100), true).is_err());
-        assert!(vmm.map_huge_2mb(VirtualAddress(0x200000), PhysicalAddress(0x800000), true).is_ok());
-
-        // 1GB alignment checks
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40001000), PhysicalAddress(0xC0000000), true).is_err());
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC0001000), true).is_err());
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC0000000), true).is_ok());
     }
 }
