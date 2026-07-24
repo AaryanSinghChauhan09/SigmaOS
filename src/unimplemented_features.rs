@@ -1230,7 +1230,9 @@ mod tests {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
-            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE].try_into().unwrap();
+            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE]
+            .try_into()
+            .unwrap();
 
         let block_hash = fs.store_block(data, &signature).unwrap();
 
@@ -1249,13 +1251,17 @@ mod tests {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
-            .to_le_bytes()[..SHA256_HASH_SIZE].try_into().unwrap();
+            .to_le_bytes()[..SHA256_HASH_SIZE]
+            .try_into()
+            .unwrap();
         let hash_b: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
             .wrapping_add(1)
-            .to_le_bytes()[..SHA256_HASH_SIZE].try_into().unwrap();
+            .to_le_bytes()[..SHA256_HASH_SIZE]
+            .try_into()
+            .unwrap();
 
         engine.register_file_metadata(FileMetadata {
             path: "/var/tmp/session.log",

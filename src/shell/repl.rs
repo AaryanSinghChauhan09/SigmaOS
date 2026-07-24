@@ -891,7 +891,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
     fn test_pwd_whoami() {
         let mut repl = ShellRepl::new();
         assert_eq!(
@@ -982,7 +981,9 @@ mod tests {
                 package: None
             })
             .is_ok());
-=======
+    }
+
+    #[test]
     fn test_cli_customization() {
         let mut repl = ShellRepl::new();
 
@@ -1095,6 +1096,5 @@ mod tests {
         let restore_res = repl.execute_command(restore_cmd);
         // "checkpoint-1" won't exist initially, returns not found Err
         assert!(restore_res.is_err());
->>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
     }
 }
