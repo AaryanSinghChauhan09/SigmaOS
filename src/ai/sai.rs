@@ -305,7 +305,7 @@ impl AgentOrchestrator {
         task.set_status(TaskStatus::Completed);
 
         if let Some(agent_id) = task.assigned_agent {
-            if let Some(agent) self.agents.get_mut(&agent_id) {
+            if let Some(agent) = self.agents.get_mut(&agent_id) {
                 agent.complete_task();
                 agent.deactivate();
             }

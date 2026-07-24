@@ -34,7 +34,7 @@ pub enum PixelFormat {
     Rgb565,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Framebuffer {
     pub address: usize,
     pub width: u32,
@@ -44,7 +44,7 @@ pub struct Framebuffer {
     pub format: PixelFormat,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GpuDevice {
     pub vendor: GpuVendor,
     pub device_id: u32,

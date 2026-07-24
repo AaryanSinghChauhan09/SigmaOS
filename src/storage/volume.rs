@@ -24,6 +24,8 @@ pub trait Volume {
     fn volume_type(&self) -> VolumeType;
     fn size(&self) -> u64;
     fn is_mounted(&self) -> bool;
+    fn mount(&self);
+    fn unmount(&self);
 }
 
 #[repr(C)]
@@ -52,6 +54,24 @@ impl SimpleVolume {
     }
 }
 
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 impl Volume for SimpleVolume {
     fn id(&self) -> VolumeID { self.id }
     fn name(&self) -> &[u8] {
@@ -69,6 +89,8 @@ impl Volume for SimpleVolume {
     }
     fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
     fn is_mounted(&self) -> bool { self.mounted.load(Ordering::SeqCst) == 1 }
+    fn mount(&self) { self.mounted.store(1, Ordering::SeqCst); }
+    fn unmount(&self) { self.mounted.store(0, Ordering::SeqCst); }
 }
 
 pub trait VolumeManager {
@@ -126,7 +148,7 @@ impl VolumeManager for SimpleVolumeManager {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
                 if volume.id() == id {
-                    volume.mounted.store(1, Ordering::SeqCst);
+                    volume.mount();
                     return Ok(());
                 }
             }
@@ -138,7 +160,7 @@ impl VolumeManager for SimpleVolumeManager {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
                 if volume.id() == id {
-                    volume.mounted.store(0, Ordering::SeqCst);
+                    volume.unmount();
                     return Ok(());
                 }
             }
@@ -150,7 +172,7 @@ impl VolumeManager for SimpleVolumeManager {
 pub trait SnapshotManager {
     fn create_snapshot(&mut self, volume_id: VolumeID) -> Result<VolumeID, VolumeError>;
     fn delete_snapshot(&mut self, snapshot_id: VolumeID) -> Result<(), VolumeError>;
-    def restore_snapshot(&mut self, volume_id: VolumeID, snapshot_id: VolumeID) -> Result<(), VolumeError>;
+    fn restore_snapshot(&mut self, volume_id: VolumeID, snapshot_id: VolumeID) -> Result<(), VolumeError>;
 }
 
 #[repr(C)]
@@ -162,6 +184,40 @@ impl SimpleSnapshotManager {
     pub fn new() -> Self {
         SimpleSnapshotManager {
             snapshots: Vec::new(),
+        }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }
