@@ -504,9 +504,18 @@ pub struct SigmaSoundscape {
 impl SigmaSoundscape {
     pub fn new() -> Self {
         let mut mapped = HashMap::new();
-        mapped.insert("login".to_string(), "file:///system/audio/chime.wav".to_string());
-        mapped.insert("shutdown".to_string(), "file:///system/audio/logout.wav".to_string());
-        mapped.insert("error".to_string(), "file:///system/audio/warning.wav".to_string());
+        mapped.insert(
+            "login".to_string(),
+            "file:///system/audio/chime.wav".to_string(),
+        );
+        mapped.insert(
+            "shutdown".to_string(),
+            "file:///system/audio/logout.wav".to_string(),
+        );
+        mapped.insert(
+            "error".to_string(),
+            "file:///system/audio/warning.wav".to_string(),
+        );
 
         Self {
             mapped_sounds: mapped,
@@ -515,7 +524,8 @@ impl SigmaSoundscape {
     }
 
     pub fn map_sound_event(&mut self, event_name: &str, file_uri: &str) {
-        self.mapped_sounds.insert(event_name.to_string(), file_uri.to_string());
+        self.mapped_sounds
+            .insert(event_name.to_string(), file_uri.to_string());
     }
 
     pub fn trigger_sound_event(&self, event_name: &str) -> Option<&str> {
@@ -620,10 +630,16 @@ mod tests {
     #[test]
     fn test_sigma_soundscape_mapping() {
         let mut scape = SigmaSoundscape::new();
-        assert_eq!(scape.trigger_sound_event("login"), Some("file:///system/audio/chime.wav"));
+        assert_eq!(
+            scape.trigger_sound_event("login"),
+            Some("file:///system/audio/chime.wav")
+        );
 
         scape.map_sound_event("notification", "file:///system/audio/beep.wav");
-        assert_eq!(scape.trigger_sound_event("notification"), Some("file:///system/audio/beep.wav"));
+        assert_eq!(
+            scape.trigger_sound_event("notification"),
+            Some("file:///system/audio/beep.wav")
+        );
     }
 
     #[test]

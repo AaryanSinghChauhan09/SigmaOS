@@ -319,10 +319,16 @@ impl Qdisc for PfifoFast {
     fn peek(&self) -> Option<&SkBuff> {
         None
     }
-    fn drop(&mut self) -> usize { 0 }
+    fn drop(&mut self) -> usize {
+        0
+    }
     fn reset(&mut self) {}
-    fn qlen(&self) -> usize { self.queues.iter().map(|q| q.len()).sum() }
-    fn name(&self) -> &str { "pfifo_fast" }
+    fn qlen(&self) -> usize {
+        self.queues.iter().map(|q| q.len()).sum()
+    }
+    fn name(&self) -> &str {
+        "pfifo_fast"
+    }
 }
 
 pub struct QdiscManager {

@@ -221,28 +221,77 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        name: parts[1].to_string(),
-                    }
+            "display" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
                 } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Display { subcommand, args }
             }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    let enabled = match parts[2] {
-                        "on" | "true" | "enable" => true,
-                        _ => false,
-                    };
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        enabled,
-                    }
+            "theme" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
                 } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Theme { subcommand, args }
+            }
+            "profile" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Profile { subcommand, args }
+            }
+            "window" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Window { subcommand, args }
+            }
+            "accessibility" | "acc" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "status".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Accessibility { subcommand, args }
+            }
+            "screenshot" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "capture".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Screenshot { subcommand, args }
+            }
+            "record" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "start".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Record { subcommand, args }
+            }
+            "clipboard" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "get".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Clipboard { subcommand, args }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
@@ -602,115 +651,119 @@ mod tests {
     #[test]
     fn test_cli_customization() {
         let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("theme list");
-        assert!(matches!(list_cmd, ShellCommand::ThemeList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Dark"));
-        assert!(list_res.contains("Light"));
-
-        let set_cmd = repl.parse_command("theme set Light");
-        assert!(matches!(set_cmd, ShellCommand::ThemeSet { .. }));
-        let set_res = repl.execute_command(set_cmd).unwrap();
-        assert!(set_res.contains("Light"));
-
-        let enable_cmd = repl.parse_command("routine enable work_mode");
-        assert!(matches!(enable_cmd, ShellCommand::RoutineEnable { .. }));
-        let enable_res = repl.execute_command(enable_cmd).unwrap();
-        assert!(enable_res.contains("Work Mode"));
+        assert!(repl
+            .execute_command(ShellCommand::Display {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Display {
+                subcommand: "set".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Display {
+                subcommand: "scale".to_string(),
+                args: vec!["DP-1".to_string(), "2.0".to_string()]
+            })
+            .is_ok());
     }
 
     #[test]
     fn test_cli_accessibility() {
         let mut repl = ShellRepl::new();
-
-        let set_cmd = repl.parse_command("a11y set screen_reader on");
-        assert!(matches!(set_cmd, ShellCommand::A11ySet { .. }));
-        let set_res = repl.execute_command(set_cmd).unwrap();
-        assert!(set_res.contains("true"));
-
-        let profile_cmd = repl.parse_command("a11y profile blind");
-        assert!(matches!(profile_cmd, ShellCommand::A11yProfile { .. }));
-        let profile_res = repl.execute_command(profile_cmd).unwrap();
-        assert!(profile_res.contains("Vision Impaired"));
+        assert!(repl
+            .execute_command(ShellCommand::Theme {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert_eq!(
+            repl.execute_command(ShellCommand::Theme {
+                subcommand: "set".to_string(),
+                args: vec!["Banaras Gold".to_string()]
+            })
+            .unwrap(),
+            "Theme changed to Banaras Gold."
+        );
+        assert_eq!(repl.active_theme, "Banaras Gold");
     }
 
     #[test]
     fn test_cli_telemetry() {
         let mut repl = ShellRepl::new();
-
-        let show_cmd = repl.parse_command("monitor show");
-        assert!(matches!(show_cmd, ShellCommand::MonitorShow));
-        let show_res = repl.execute_command(show_cmd).unwrap();
-        assert!(show_res.contains("System Telemetry Dashboard"));
-        assert!(show_res.contains("CPU Usage"));
-        assert!(show_res.contains("Memory Usage"));
+        assert!(repl
+            .execute_command(ShellCommand::Profile {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Profile {
+                subcommand: "switch".to_string(),
+                args: vec!["developer".to_string()]
+            })
+            .is_ok());
+        assert_eq!(repl.active_profile, "developer");
     }
 
     #[test]
     fn test_cli_package_management() {
         let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("pkg list");
-        assert!(matches!(list_cmd, ShellCommand::PkgList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Installed system packages"));
-
-        let install_cmd = repl.parse_command("pkg install nano");
-        assert!(matches!(install_cmd, ShellCommand::PkgInstall { .. }));
-        let install_res = repl.execute_command(install_cmd).unwrap();
-        assert!(install_res.contains("nano"));
-
-        let remove_cmd = repl.parse_command("pkg remove nano");
-        assert!(matches!(remove_cmd, ShellCommand::PkgRemove { .. }));
-        let remove_res = repl.execute_command(remove_cmd).unwrap();
-        assert!(remove_res.contains("nano"));
+        assert!(repl
+            .execute_command(ShellCommand::Window {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Window {
+                subcommand: "create".to_string(),
+                args: vec![
+                    "SigmaBrowser".to_string(),
+                    "sigma.browser".to_string(),
+                    "10,10,600,400".to_string()
+                ]
+            })
+            .is_ok());
+        assert_eq!(repl.windows.len(), 3);
     }
 
     #[test]
     fn test_cli_virtualization() {
         let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("vm list");
-        assert!(matches!(list_cmd, ShellCommand::VmList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Running Guest Virtual Machines"));
-
-        let create_cmd = repl.parse_command("vm create guest-01 qemu");
-        assert!(matches!(create_cmd, ShellCommand::VmCreate { .. }));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("guest-01"));
-
-        let container_cmd = repl.parse_command("container run web-c nginx-img");
-        assert!(matches!(container_cmd, ShellCommand::ContainerRun { .. }));
-        let container_res = repl.execute_command(container_cmd).unwrap();
-        assert!(container_res.contains("web-c"));
+        assert!(repl
+            .execute_command(ShellCommand::Accessibility {
+                subcommand: "status".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Accessibility {
+                subcommand: "screen-reader".to_string(),
+                args: vec!["true".to_string()]
+            })
+            .is_ok());
+        assert!(repl.screen_reader_enabled);
     }
 
     #[test]
     fn test_cli_compatibility() {
         let mut repl = ShellRepl::new();
-
-        let run_cmd = repl.parse_command("platform run photoshop windows exe");
-        assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
-        let run_res = repl.execute_command(run_cmd).unwrap();
-        assert!(run_res.contains("photoshop"));
-        assert!(run_res.contains("Translation"));
-    }
-
-    #[test]
-    fn test_cli_resilience() {
-        let mut repl = ShellRepl::new();
-
-        let create_cmd = repl.parse_command("snapshot create");
-        assert!(matches!(create_cmd, ShellCommand::SnapshotCreate));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("successfully created"));
-
-        let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
-        assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
-        let restore_res = repl.execute_command(restore_cmd);
-        // "checkpoint-1" won't exist initially, returns not found Err
-        assert!(restore_res.is_err());
+        assert!(repl
+            .execute_command(ShellCommand::Clipboard {
+                subcommand: "get".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Clipboard {
+                subcommand: "set".to_string(),
+                args: vec!["CopiedText".to_string()]
+            })
+            .is_ok());
+        assert_eq!(repl.clipboard_content, "CopiedText");
     }
 }

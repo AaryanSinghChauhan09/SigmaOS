@@ -1,4 +1,7 @@
-pub mod stack;
 pub mod socket;
+pub mod stack;
 
-pub use stack::{Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl, Netfilter, NetfilterRule, NFAction, Qdisc, PfifoFast, QdiscManager};
+pub use stack::{
+    BbrCongestionControl, CongestionControl, NFAction, NetDevice, Netfilter, NetfilterRule,
+    PfifoFast, Qdisc, QdiscManager, RenoCongestionControl, SkBuff, Socket,
+};
