@@ -14,9 +14,10 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod graphics;
-pub mod init;
+pub mod finance;
 pub mod kernel;
+pub mod klib;
+pub mod legal;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -84,11 +85,18 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+pub use finance::{
+    GoodsType, GstCalculator, GstRate, GstRegime, GstResult, GstState, TdsCalculator, TdsResult,
+    TdsSection,
+};
 pub use kernel::{
     ABIManager, BuddyAllocator, Channel, IpcError, IpcManager, KernelGraph, KernelPersona,
     KernelPlugin, KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver,
     NetPod, PAGE_SIZE, Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler,
     Scheduler, SchedulerError,
+};
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
