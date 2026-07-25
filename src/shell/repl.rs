@@ -64,6 +64,10 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("cron".to_string(), "Running".to_string());
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
@@ -71,7 +75,7 @@ impl ShellRepl {
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
@@ -374,7 +378,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "sigma-sh> ");
+        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
     }
 
     #[test]

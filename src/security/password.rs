@@ -212,7 +212,7 @@ impl PasswordManager {
         };
 
         self.passwords
-            .insert(encrypted_entry.id.clone(), encrypted_entry);
+            .insert(encrypted_entry.id.clone(), encrypted_entry.clone());
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -263,7 +263,7 @@ impl PasswordManager {
         };
 
         self.passwords
-            .insert(encrypted_entry.id.clone(), encrypted_entry);
+            .insert(encrypted_entry.id.clone(), encrypted_entry.clone());
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -422,10 +422,9 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
-        let mut rng = rand::thread_rng();
-
         for _ in 0..length {
-            let index = rng.gen_range(0..charset.len());
+            let rand_val: u64 = rand::random();
+            let index = (rand_val as usize) % charset.len();
             password.push(charset[index] as char);
         }
 
