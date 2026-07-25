@@ -79,37 +79,6 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    // Builder pattern methods
-
-    pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
-        self
-    }
-
-    pub fn allow_read(self, _path: &str) -> Self {
-        self
-    }
-
-    pub fn allow_write(self, _path: &str) -> Self {
-        self
-    }
-
-    pub fn allow_exec(self) -> Self {
-        self
-    }
-
-    pub fn allow_ipc(self) -> Self {
-        self
-    }
-
-    pub fn allow_capability(&mut self, _cap: u64) {
-        // Mock method
-    }
-
-    pub fn contains(&self, _cap: u64) -> bool {
-        true
-    }
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
     pub active_token: Option<CapabilityToken>,

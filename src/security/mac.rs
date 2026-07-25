@@ -512,5 +512,3 @@ mod tests {
         assert_eq!(stats.access_denied, 1);
     }
 }
-
-pub type MacPolicy = dyn MACPolicy;

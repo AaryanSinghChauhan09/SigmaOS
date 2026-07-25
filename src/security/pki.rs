@@ -280,6 +280,3 @@ mod tests {
         assert_eq!(current_crl[0], (101, 1));
     }
 }
-
-pub type PkiError = PKIError;
-pub type PkiManager = dyn PKIManager;
