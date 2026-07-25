@@ -1,5 +1,5 @@
-//! Copy-on-Write (COW) Transactional Snapshot and Active Mount Engine
-//! Provides transactional filesystem rollback metadata to defeat Fedora's Btrfs.
+/// Copy-on-Write (COW) Transactional Snapshot and Active Mount Engine
+/// Provides transactional filesystem rollback metadata to defeat Fedora's Btrfs.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -70,16 +70,7 @@ impl CowSnapshotManager {
         }
     }
 
-    pub fn record_transaction(
-        &mut self,
-        snapshot_id: usize,
-        inode: InodeID,
-        prev_size: usize,
-        prev_checksum: u32,
-        new_size: usize,
-        new_checksum: u32,
-        timestamp: u64,
-    ) -> Result<(), &'static str> {
+    pub fn record_transaction(&mut self, snapshot_id: usize, inode: InodeID, prev_size: usize, prev_checksum: u32, new_size: usize, new_checksum: u32, timestamp: u64) -> Result<(), &'static str> {
         let mut found_idx = None;
         for (i, snap) in self.snapshots.iter().enumerate() {
             if snap.id == snapshot_id {
@@ -144,11 +135,7 @@ impl CowSnapshotManager {
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
@@ -175,71 +162,38 @@ impl<T> Default for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
+        VecIter { vec: self, index: 0 }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
     }
-    pub fn contains(&self, item: &T) -> bool
-    where
-        T: PartialEq,
-    {
+    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {
-                if &*self.data.add(i) == item {
-                    return true;
-                }
+                if &*self.data.add(i) == item { return true; }
             }
         }
         false
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -351,9 +305,7 @@ mod tests {
         manager.snapshots.push(snap);
 
         // Record a transaction making changes to inode 42
-        manager
-            .record_transaction(1, 42, 1024, 0xABC, 2048, 0xDEF, 1700000100)
-            .unwrap();
+        manager.record_transaction(1, 42, 1024, 0xABC, 2048, 0xDEF, 1700000100).unwrap();
 
         assert_eq!(manager.snapshots[0].transactions.len(), 1);
 
