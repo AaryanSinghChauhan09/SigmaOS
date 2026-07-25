@@ -1145,8 +1145,7 @@ impl UsbHidFullDriver {
             return Err(HidFullError::NotPowered);
         }
         self.output_reports.push(report);
-        Ok(())
-LED handling
+        // LED handling
         if let Some(led_byte) = report.data.first() {
             self.led_state = *led_byte;
         }
