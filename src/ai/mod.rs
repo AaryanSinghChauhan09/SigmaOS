@@ -2,6 +2,7 @@
 // S-AI engine, agents, orchestrator, and local inference
 
 pub mod agent;
+pub mod autogen;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
@@ -9,6 +10,10 @@ pub mod system;
 pub mod voice;
 
 pub use agent::{AIAgent, SimpleAIAgent};
+pub use autogen::{
+    AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
+    GroupChat, SandboxCodeExecutor,
+};
 pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
