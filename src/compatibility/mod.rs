@@ -2,6 +2,7 @@
 pub mod cross_platform;
 pub mod federation;
 pub mod historic_linux;
+pub mod lattice_grid;
 pub mod mesh_hub;
 
 pub use cross_platform::{
@@ -14,6 +15,15 @@ pub use federation::{
     FederatedNode, FileSyscallVM, FloppySim, KernelFederation, LegacyCPod, LegacyCppPod,
     LegacyDACSandbox, NetworkSyscallVM, PeripheralSimulator, PersonaType, ProcessSyscallVM,
     SecuritySandbox, SyscallContext, SyscallVM, TapeDriveSim, UEFIBoot, ZeroTrustSandbox,
+};
+
+pub use lattice_grid::{
+    BIOSNexusGrid, BuildChronicleMesh, CodexSyscall, CorebootNexusGrid, DACArchiveGrid,
+    DriverArchiveDock, FileCodexGrid, FirmwareNexusGrid, FloppyNexus, GraphicsDock, KernelLattice,
+    LatticeNode, LatticePersona, LegacyCChronicleMesh, LegacyCppChronicleMesh, NetworkCodexGrid,
+    NetworkDock, NexusType, PeripheralNexus, ProcessCodexGrid, SELinuxArchiveGrid,
+    SecurityArchiveGrid, StorageDock, SyscallCodexGrid, TapeNexus, UEFINexusGrid,
+    ZeroTrustArchiveGrid,
 };
 
 pub use mesh_hub::{
