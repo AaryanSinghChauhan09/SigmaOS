@@ -1,6 +1,6 @@
-//! Systemd-Grade Init and Target State Engine for SigmaOS
-//! Provides robust target dependency graphs, wants/requires properties,
-//! and target states to defeat Fedora's Systemd initialization.
+/// Systemd-Grade Init and Target State Engine for SigmaOS
+/// Provides robust target dependency graphs, wants/requires properties,
+/// and target states to defeat Fedora's Systemd initialization.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

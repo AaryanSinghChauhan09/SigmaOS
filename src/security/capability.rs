@@ -26,6 +26,12 @@ pub struct CapabilityToken {
     pub bits: u64,
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {

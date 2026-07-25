@@ -1,6 +1,6 @@
-//! RedHat/Fedora SPEC & RPM Compatibility Translation Engine
-//! Translates .spec dependencies, validates GPG package provenance,
-//! and converts RPM archives to natively installable sigpkgs.
+/// RedHat/Fedora SPEC & RPM Compatibility Translation Engine
+/// Translates .spec dependencies, validates GPG package provenance,
+/// and converts RPM archives to natively installable sigpkgs.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -71,12 +71,7 @@ impl RpmPackageTranslator {
         }
 
         let mut output_pkg = [0u8; 64];
-        let name_len = self
-            .spec_meta
-            .name
-            .iter()
-            .position(|&b| b == 0)
-            .unwrap_or(32);
+        let name_len = self.spec_meta.name.iter().position(|&b| b == 0).unwrap_or(32);
         output_pkg[..name_len].copy_from_slice(&self.spec_meta.name[..name_len]);
 
         let compat_suffix = b"-converted-sigpkg";
@@ -88,14 +83,14 @@ impl RpmPackageTranslator {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_rpm_spec_translation() {
-        let mut translator =
-            RpmPackageTranslator::new(b"kernel-core", b"6.5.6", PackageSourceFormat::Rpm);
+        let mut translator = RpmPackageTranslator::new(b"kernel-core", b"6.5.6", PackageSourceFormat::Rpm);
 
         // Assert unsigned fails translation
         assert!(translator.translate_to_sigpkg().is_err());

@@ -1,10 +1,17 @@
 // SigmaOS Network Stack Module
 pub mod stack;
 pub mod tcp;
-pub mod ring_buffer_stack;
+pub mod tcp_udp;
+pub mod wireless;
+pub mod zero_trust;
 
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use ring_buffer_stack::{
-    IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket, TcpState as RingTcpState,
-    compute_checksum, ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
+pub use wireless::{
+    WirelessDeviceID, WirelessType, WirelessError, WirelessDevice, SimpleWirelessDevice,
+    WirelessAuditor, WiFiConnection, SimpleWiFiConnection, WirelessManager, SimpleWirelessManager,
+    WirelessSecurity, SimpleWirelessSecurity,
+};
+pub use zero_trust::{
+    PolicyID, NetworkAction, NetworkPolicy, PolicyInfo, PolicyCapability, SimpleNetworkPolicy,
+    ZeroTrustEngine, ZeroTrustError, ZeroTrustStats, SimpleZeroTrustEngine, EngineCapability,
 };

@@ -163,7 +163,6 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "make".to_string(),
         }
     }
 }

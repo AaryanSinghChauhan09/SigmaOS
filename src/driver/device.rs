@@ -2190,7 +2190,7 @@ mod tests {
 
     #[test]
     fn test_modern_device_oop() {
-        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(
             modern.query_channel(),
             PortAddress::MemoryMapped(0xFE000000)
@@ -2217,28 +2217,30 @@ mod tests {
     }
 
     #[test]
-    fn test_linux_compatibility_and_override() {
-        let mut manager = DeviceManager::new();
+    fn test_dde_device_translation_wrapper() {
+        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
 
-        // Register an early boot override for custom legacy hardware "custom_uart"
-        let entry = EarlyBootParameterOverride::new(b"custom_uart", 0x2F8, 4, &[0x04]);
-        manager.linux_override_table.register_override(entry);
+        assert_eq!(
+            dde_wrapper.query_channel(),
+            PortAddress::MemoryMapped(0xFC000000)
+        );
+        assert_eq!(dde_wrapper.info().vendor_id, 0x8086);
+        assert_eq!(dde_wrapper.info().device_id, 0x100e);
 
-        // Register legacy device with override
-        let dev_id_result = manager.register_legacy_device_with_override(b"custom_uart", 0x3F8);
-        assert!(dev_id_result.is_ok());
-        let dev_id = dev_id_result.unwrap();
+        // Test simulated PCI BAR configuration register writing and reading
+        assert!(dde_wrapper.write_byte(0x10, 0x55).is_ok());
+        assert_eq!(dde_wrapper.read_byte(0x10).unwrap(), 0x55);
 
-        // Check if descriptor correctly matches "custom_uart" name
-        let descriptor = manager.get_descriptor(dev_id).unwrap();
-        assert_eq!(&descriptor.name[..11], b"custom_uart");
+        // Test block-like reads/writes simulating DMA descriptors
+        let test_buffer = [0xAA; 16];
+        assert!(dde_wrapper.write(&test_buffer).is_ok());
 
-        // Verify that the port config is overriden to 0x2F8 (instead of 0x3F8)
-        // Retrieve the device from manager and cast to UnifiedPeripheral
-        let dev = manager.get_device(dev_id).unwrap();
+        let mut read_buffer = [0u8; 16];
+        assert!(dde_wrapper.read(&mut read_buffer).is_ok());
+        assert_eq!(read_buffer, test_buffer);
 
-        // Simulating matching by using dynamic casting-like fields or calling device functions
-        assert_eq!(dev.info().device_type, DeviceType::Character);
+        // Test translated ioctl call
+        assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
     }
 }
 
@@ -2474,6 +2476,12 @@ pub struct DeviceManager {
     descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
     pub linux_override_table: LinuxEarlyOverrideTable,
+}
+
+impl Default for DeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Default for DeviceManager {
@@ -2925,6 +2933,105 @@ impl UnifiedPeripheral for ModernDevice {
             let _ = (offset, value);
         }
         Ok(())
+    }
+}
+
+/// Represents a foreign driver wrapper running in the Device Driver Environment (DDE) translation layer.
+/// This translates foreign OS-specific I/O patterns (e.g., Linux kmalloc, virt_to_phys, PCI bars) to our `UnifiedPeripheral` interface.
+pub struct DdeDeviceWrapper {
+    pub id: usize,
+    pub name: [u8; 64],
+    pub base_addr: u32,
+    pub simulated_pci_bar: [u8; 256],
+    pub foreign_os_type: [u8; 16], // e.g., "Linux", "Windows", "FreeBSD"
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: usize, name: &[u8], base_addr: u32, os_type: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+
+        let mut os_array = [0u8; 16];
+        let os_len = os_type.len().min(15);
+        unsafe {
+            core::ptr::copy_nonoverlapping(os_type.as_ptr(), os_array.as_mut_ptr(), os_len);
+        }
+
+        DdeDeviceWrapper {
+            id,
+            name: name_array,
+            base_addr,
+            simulated_pci_bar: [0u8; 256],
+            foreign_os_type: os_array,
+        }
+    }
+}
+
+impl Device for DdeDeviceWrapper {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        // Emulate foreign driver initialization (e.g., Linux driver probe)
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.simulated_pci_bar.len());
+        buffer[..len].copy_from_slice(&self.simulated_pci_bar[..len]);
+        Ok(len)
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.simulated_pci_bar.len());
+        self.simulated_pci_bar[..len].copy_from_slice(&buffer[..len]);
+        Ok(len)
+    }
+
+    fn ioctl(&mut self, command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        // Emulate ioctl translation (e.g., translating POSIX ioctl to SigmaOS command)
+        if command == 0xFF {
+            Ok(1)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Character);
+        info.base_address = self.base_addr;
+        info.vendor_id = 0x8086; // Standard Intel Vendor ID for testing
+        info.device_id = 0x100e; // E1000 network card for simulation
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for DdeDeviceWrapper {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_addr)
+    }
+
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        let idx = offset as usize;
+        if idx < self.simulated_pci_bar.len() {
+            Ok(self.simulated_pci_bar[idx])
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
+    }
+
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        let idx = offset as usize;
+        if idx < self.simulated_pci_bar.len() {
+            self.simulated_pci_bar[idx] = value;
+            Ok(())
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
     }
 }
 

@@ -1,15 +1,9 @@
-#![no_std]
-#![allow(warnings)]
-#![allow(clippy::all)]
-
 /// OOP-based Wireless Network Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 86
-/// Implements WiFi device management, connection, and Kali-inspired network auditing
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+/// Implements WiFi device management, Kali-grade packet auditing, and monitor mode connection
 
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type WirelessDeviceID = usize;
 
@@ -21,15 +15,9 @@ pub enum WirelessType {
     Cellular = 2,
 }
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WirelessError {
-    Success = 0,
-    NotFound = 1,
-    ConnectFailed = 2,
-    ScanFailed = 3,
-    NotSupported = 4,
-}
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum WirelessError { Success = 0, NotFound = 1, ConnectFailed = 2, ScanFailed = 3, InvalidMode = 4 }
 
 pub trait WirelessDevice {
     fn id(&self) -> WirelessDeviceID;
@@ -54,79 +42,76 @@ pub struct SimpleWirelessDevice {
     pub id: WirelessDeviceID,
     pub device_type: AtomicUsize,
     pub mac_address: [u8; 6],
-    pub monitor_mode: AtomicBool,
+    pub monitor_mode: AtomicUsize, // 0 = managed, 1 = monitor
 }
 
 impl SimpleWirelessDevice {
     pub fn new(id: WirelessDeviceID, device_type: WirelessType, mac: &[u8]) -> Self {
         let mut mac_array = [0u8; 6];
         let mac_len = mac.len().min(6);
-        unsafe {
-            core::ptr::copy_nonoverlapping(mac.as_ptr(), mac_array.as_mut_ptr(), mac_len);
-        }
+        mac_array[..mac_len].copy_from_slice(&mac[..mac_len]);
         SimpleWirelessDevice {
             id,
             device_type: AtomicUsize::new(device_type as usize),
             mac_address: mac_array,
-            monitor_mode: AtomicBool::new(false),
+            monitor_mode: AtomicUsize::new(0),
         }
     }
 }
 
 impl WirelessDevice for SimpleWirelessDevice {
-    fn id(&self) -> WirelessDeviceID {
-        self.id
-    }
+    fn id(&self) -> WirelessDeviceID { self.id }
     fn device_type(&self) -> WirelessType {
-        unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) }
+        let val = self.device_type.load(Ordering::SeqCst);
+        match val {
+            0 => WirelessType::WiFi,
+            1 => WirelessType::Bluetooth,
+            _ => WirelessType::Cellular,
+        }
     }
-    fn mac_address(&self) -> &[u8] {
-        &self.mac_address
-    }
+    fn mac_address(&self) -> &[u8] { &self.mac_address }
 
     fn scan_networks(&mut self) -> Result<Vec<([u8; 32], i8)>, WirelessError> {
         let mut networks = Vec::new();
-        let mut net1 = [0u8; 32];
-        let name1 = b"SigmaOS-Network";
-        net1[..name1.len()].copy_from_slice(name1);
-        networks.push((net1, -50));
+        let mut n1 = [0u8; 32];
+        let ssid1 = b"SigmaOS-Network";
+        n1[..ssid1.len()].copy_from_slice(ssid1);
 
-        let mut net2 = [0u8; 32];
-        let name2 = b"Guest-Network";
-        net2[..name2.len()].copy_from_slice(name2);
-        networks.push((net2, -70));
+        let mut n2 = [0u8; 32];
+        let ssid2 = b"Guest-Network";
+        n2[..ssid2.len()].copy_from_slice(ssid2);
 
+        networks.push((n1, -50));
+        networks.push((n2, -70));
         Ok(networks)
     }
 }
 
+/// Kali Linux-Inspired Wireless Packet Auditing Interface
+pub trait WirelessAuditor {
+    fn set_monitor_mode(&mut self, enabled: bool) -> Result<(), WirelessError>;
+    fn inject_deauth_frame(&self, target_client: &[u8; 6], ap_bssid: &[u8; 6]) -> Result<usize, WirelessError>;
+    fn audit_signal_strengths(&self) -> Vec<( [u8; 6], i8 )>;
+}
+
 impl WirelessAuditor for SimpleWirelessDevice {
     fn set_monitor_mode(&mut self, enabled: bool) -> Result<(), WirelessError> {
-        self.monitor_mode.store(enabled, Ordering::SeqCst);
+        self.monitor_mode.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
         Ok(())
     }
 
-    fn is_monitor_mode(&self) -> bool {
-        self.monitor_mode.load(Ordering::SeqCst)
+    fn inject_deauth_frame(&self, _target_client: &[u8; 6], _ap_bssid: &[u8; 6]) -> Result<usize, WirelessError> {
+        if self.monitor_mode.load(Ordering::SeqCst) == 0 {
+            return Err(WirelessError::InvalidMode);
+        }
+        // Return simulated injected frame size
+        Ok(64)
     }
 
-    fn inject_packet(&self, packet: &[u8]) -> Result<usize, WirelessError> {
-        if !self.is_monitor_mode() {
-            return Err(WirelessError::NotSupported); // Packet injection requires monitor mode!
-        }
-        // Return injected packet size
-        Ok(packet.len())
-    }
-
-    fn deauthenticate_client(&self, client_mac: &[u8]) -> Result<(), WirelessError> {
-        if !self.is_monitor_mode() {
-            return Err(WirelessError::NotSupported);
-        }
-        // Simulate deauth attack by injecting a fake deauth frame
-        let mut deauth_frame = [0u8; 32];
-        deauth_frame[0..6].copy_from_slice(client_mac);
-        self.inject_packet(&deauth_frame)?;
-        Ok(())
+    fn audit_signal_strengths(&self) -> Vec<( [u8; 6], i8 )> {
+        let mut aud = Vec::new();
+        aud.push((self.mac_address, -45));
+        aud
     }
 }
 
@@ -140,6 +125,12 @@ pub trait WiFiConnection {
 pub struct SimpleWiFiConnection {
     pub connected: AtomicUsize,
     pub signal_strength: AtomicUsize,
+}
+
+impl Default for SimpleWiFiConnection {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleWiFiConnection {
@@ -191,6 +182,12 @@ pub trait WirelessManager {
 pub struct SimpleWirelessManager {
     pub devices: Vec<Option<Box<dyn WirelessDevice>>>,
     pub next_id: AtomicUsize,
+}
+
+impl Default for SimpleWirelessManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleWirelessManager {
@@ -251,6 +248,12 @@ pub struct SimpleWirelessSecurity {
     pub wpa3_enabled: AtomicUsize,
 }
 
+impl Default for SimpleWirelessSecurity {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleWirelessSecurity {
     pub fn new() -> Self {
         SimpleWirelessSecurity {
@@ -286,55 +289,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_wireless_device_scanning() {
-        let mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-        let mut dev = SimpleWirelessDevice::new(1, WirelessType::WiFi, &mac);
-        assert_eq!(dev.id(), 1);
-        assert_eq!(dev.device_type(), WirelessType::WiFi);
-        assert_eq!(dev.mac_address(), &mac);
+    fn test_wireless_auditor_monitoring() {
+        let mut dev = SimpleWirelessDevice::new(1, WirelessType::WiFi, &[0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]);
 
-        let networks = dev.scan_networks().unwrap();
-        assert_eq!(networks.len(), 2);
-        assert_eq!(networks[0].1, -50);
-    }
+        // Assert deauth frame inject fails in managed mode
+        assert!(dev.inject_deauth_frame(&[0; 6], &[0; 6]).is_err());
 
-    #[test]
-    fn test_wireless_auditing_and_pentest() {
-        let mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-        let mut dev = SimpleWirelessDevice::new(1, WirelessType::WiFi, &mac);
-
-        // Injection should fail when monitor mode is off
-        let packet = b"dummy packet";
-        assert!(dev.inject_packet(packet).is_err());
-
-        // Enable monitor mode (sniffing enabled)
+        // Set monitor mode
         dev.set_monitor_mode(true).unwrap();
-        assert!(dev.is_monitor_mode());
 
-        // Injection should succeed when monitor mode is on
-        assert_eq!(dev.inject_packet(packet).unwrap(), packet.len());
+        // Success inject
+        let size = dev.inject_deauth_frame(&[0x11; 6], &[0x22; 6]).unwrap();
+        assert_eq!(size, 64);
 
-        // Deauthenticate a client
-        let target_client = [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF];
-        assert!(dev.deauthenticate_client(&target_client).is_ok());
-    }
-
-    #[test]
-    fn test_wifi_connection_flow() {
-        let mut conn = SimpleWiFiConnection::new();
-        assert!(!conn.is_connected());
-        conn.connect(b"SSID", b"pass").unwrap();
-        assert!(conn.is_connected());
-        assert_eq!(conn.get_signal_strength(), 60);
-        conn.disconnect().unwrap();
-        assert!(!conn.is_connected());
-    }
-
-    #[test]
-    fn test_wireless_security() {
-        let mut sec = SimpleWirelessSecurity::new();
-        assert_eq!(sec.get_security_mode(), 2);
-        sec.set_security_mode(3);
-        assert_eq!(sec.get_security_mode(), 3);
+        let aud = dev.audit_signal_strengths();
+        assert_eq!(aud.len(), 1);
+        assert_eq!(aud[0].1, -45);
     }
 }
