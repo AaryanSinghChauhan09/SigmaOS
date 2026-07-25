@@ -72,7 +72,7 @@ This roadmap formally codifies these gaps and establishes a rigorous execution s
   * **The SigmaOS Gap:** SigmaOS does not yet provide standard SQL engine ports or transactional business tool integration models.
 
 ### 5. Networking & Cloud Integration
-* **Container Runtime Ecosystem:**
+* **Container Ecosystem:**
   * **The Linux Standard:** Linux is the foundation of modern cloud native scaling, powering Docker, containeric, and Kubernetes via kernel primitives (Namespaces, Cgroups).
   * **The SigmaOS Gap:** SigmaOS has early microkernel isolation patterns, but lacks a native, production-ready container engine compatible with OCI (Open Container Initiative) standards.
 * **Cloud-Native Tooling:**
