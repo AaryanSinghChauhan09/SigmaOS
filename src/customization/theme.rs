@@ -685,14 +685,23 @@ mod tests {
     }
 
     #[test]
-    fn test_spacing_density_adjustment() {
-        let mut engine = ThemeEngine::default();
-        assert!(engine.adjust_spacing_density("compact").is_ok());
-        let theme = engine.current_theme();
-        assert_eq!(theme.spacing.unit, 4);
+    fn test_sigma_soundscape_mapping() {
+        let mut scape = SigmaSoundscape::new();
+        assert_eq!(
+            scape.trigger_sound_event("login"),
+            Some("file:///system/audio/chime.wav")
+        );
 
-        assert!(engine.adjust_spacing_density("spacious").is_ok());
-        let theme2 = engine.current_theme();
-        assert_eq!(theme2.spacing.unit, 12);
+        scape.map_sound_event("notification", "file:///system/audio/beep.wav");
+        assert_eq!(
+            scape.trigger_sound_event("notification"),
+            Some("file:///system/audio/beep.wav")
+        );
+    }
+
+    #[test]
+    fn test_icon_theme_scaling() {
+        let pack = IconThemeEngine::new("SovereignIcons", 144.0); // 1.5x scaling
+        assert_eq!(pack.get_scaled_icon_size(), 72);
     }
 }

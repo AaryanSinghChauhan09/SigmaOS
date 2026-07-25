@@ -7,10 +7,7 @@ use core::mem;
 /// Implements init system using OOP principles with traits and structs
 /// No dependency on external init frameworks
 /// Based on Roadmap Item 5: Lightweight init system
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Service ID
@@ -154,7 +151,16 @@ impl SimpleService {
     }
 
     pub fn get_state(&self) -> ServiceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        {
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => ServiceState::Starting,
+                2 => ServiceState::Running,
+                3 => ServiceState::Stopping,
+                4 => ServiceState::Failed,
+                _ => ServiceState::Stopped,
+            }
+        }
     }
 
     pub fn set_state(&self, state: ServiceState) {
@@ -504,4 +510,116 @@ mod tests {
 
         init.unregister_service(101).unwrap();
     }
+}
+
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

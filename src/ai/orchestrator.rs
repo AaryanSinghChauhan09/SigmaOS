@@ -12,7 +12,13 @@ pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

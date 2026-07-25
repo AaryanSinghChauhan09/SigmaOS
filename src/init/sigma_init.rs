@@ -15,9 +15,9 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::boxed::Box;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ServiceID = usize;

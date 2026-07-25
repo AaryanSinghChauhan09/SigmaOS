@@ -8,10 +8,8 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
-pub mod rpm_compat;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use recipe::PackageRecipe;
+pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;

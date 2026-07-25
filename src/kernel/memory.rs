@@ -27,6 +27,18 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
+use core::ptr::NonNull;
+
+pub struct Zone {
+    pub present_pages: u64,
+}
+
+#[derive(Debug)]
+pub struct MemoryBlock {
+    pub addr: NonNull<u8>,
+    pub size: usize,
+}
+
 pub struct Page {
     pub flags: AtomicUsize,
     pub count: AtomicUsize,
@@ -77,10 +89,7 @@ impl BuddyAllocator {
 
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
+                let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
         }

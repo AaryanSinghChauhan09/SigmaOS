@@ -3,6 +3,7 @@ pub mod bus;
 pub mod device;
 pub mod driver;
 pub mod memory;
+pub mod object;
 pub mod performance;
 pub mod roundrobin;
 pub mod sched;
@@ -21,9 +22,9 @@ pub use driver::{Driver, DriverRegistration, DriverRegistry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver,
-    AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType, LinuxAbsorptionEngine,
-    SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
+    ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
+    SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use memory::{Page, VmArea, VmSpace, Zone, ZonedPageAllocator};
@@ -41,7 +42,11 @@ pub use performance::{
     ZeroCopyQueue,
 };
 pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+};
+pub use sched::scheduler::{RunQueue, SchedClass, Scheduler};
+pub use sched::task::{Cred, ProcessState, SchedPolicy, Task};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler as SovereignScheduler};
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
 pub use security::lsm::{
@@ -82,12 +87,12 @@ pub use irq::{
     Workqueue,
 };
 pub use mm::{
-    CachedPage, HugePageManager, HugePageSize, NumaNode as MmNumaNode, NumaTopologyManager, OomKiller, PageCache,
-    PageStatus, SlabAllocator as MmSlabAllocator, VmallocManager,
+    CachedPage, HugePageManager, HugePageSize, NumaNode as MmNumaNode, NumaTopologyManager,
+    OomKiller, PageCache, PageStatus, SlabAllocator as MmSlabAllocator, VmallocManager,
 };
 pub use power::{
-    CpufreqGovernor, CpufreqManager as PowerCpufreqManager, CpufreqPolicy as PowerCpufreqPolicy, PowerStateManager, SleepState, ThermalManager,
-    ThermalZone,
+    CpufreqGovernor, CpufreqManager as PowerCpufreqManager, CpufreqPolicy as PowerCpufreqPolicy,
+    PowerStateManager, SleepState, ThermalManager, ThermalZone,
 };
 // net: single export covering Phase J (socket/netfilter/tc) + Phase K (IPv4/TCP)
 pub use block_dev::{

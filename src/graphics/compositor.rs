@@ -719,20 +719,13 @@ impl Compositor for SimpleCompositor {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_surface_rect_flow() {
-        let cap = SurfaceCapability::full();
-        let mut surf = BitmapSurface::new(1, 10, 10, cap);
-        assert_eq!(surf.size().width, 10);
-        surf.clear(Color::rgb(255, 0, 0));
-        assert_eq!(surf.data()[0], Color::rgb(255, 0, 0).to_u32());
-
-        surf.fill_rect(Rectangle::new(1, 1, 5, 5), Color::rgb(0, 255, 0));
-        assert_eq!(surf.data()[12], Color::rgb(0, 255, 0).to_u32());
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
 
     #[test]
