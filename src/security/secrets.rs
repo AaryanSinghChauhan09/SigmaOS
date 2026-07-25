@@ -255,6 +255,14 @@ impl Default for KeyringStats {
     }
 }
 
+/// Simple keyring (OOP: Concrete keyring class)
+pub type SecretManager = dyn Keyring;
+
+#[derive(Debug, Clone)]
+pub struct SecretStorage {
+    pub name: alloc::string::String,
+}
+
 pub struct SimpleKeyring {
     pub secrets: Vec<Option<Box<dyn Secret>>>,
     pub next_id: AtomicUsize,

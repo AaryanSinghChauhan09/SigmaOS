@@ -166,3 +166,24 @@ impl RecipeManager {
         Self
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildSystem {
+    Cargo,
+    Make,
+    CMake,
+    Ninja,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeError {
+    InvalidRecipe,
+    MissingField,
+}
+
+pub struct RecipeManager;
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self
+    }
+}

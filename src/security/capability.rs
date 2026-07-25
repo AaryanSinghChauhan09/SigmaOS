@@ -2,9 +2,17 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -17,7 +25,7 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
@@ -30,14 +38,13 @@ impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
             id: 0,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
+            allowed_paths: &[],
+            allowed_ports: &[],
             is_revoked: false,
-            bits: 0,
         }
     }
 
-    pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
             allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
@@ -53,16 +60,6 @@ impl CapabilityToken {
             allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
             allowed_ports: ports.to_vec(),
             is_revoked: false,
-        }
-    }
-
-    pub fn from_bits(bits: u64) -> Self {
-        CapabilityToken {
-            id: bits,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
-            is_revoked: false,
-            bits_value: bits,
         }
     }
 
@@ -179,6 +176,29 @@ impl CapabilityGate {
 impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub token: CapabilityToken,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            token: CapabilityToken::new(),
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
     }
 }
 
