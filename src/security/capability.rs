@@ -98,12 +98,6 @@ impl CapabilityToken {
     }
 }
 
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
     pub token: CapabilityToken,

@@ -1,8 +1,7 @@
 // SigmaOS Secure VPN Client
 // OOP-based VPN with WireGuard and OpenVPN support
 
-use std::collections::HashMap;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::{IpAddr, Ipv4Addr};
 use std::path::PathBuf;
 
 /// VPN protocol

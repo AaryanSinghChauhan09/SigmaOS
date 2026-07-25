@@ -133,7 +133,7 @@ Late:         usb_storage, proc_fs, sysfs, devtmpfs
 507 tests total — 0 failed — 0.60s
 
 kernel::drivers::legacy::*     — 30+ tests
-kernel::proc::*                — 10+ tests  
+kernel::proc::*                — 10+ tests
 kernel::mm::*                  — 15+ tests
 kernel::fs::*                  — 6+ tests
 kernel::irq::*                 — 5+ tests
