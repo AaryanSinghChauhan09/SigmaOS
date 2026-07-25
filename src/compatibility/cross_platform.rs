@@ -476,11 +476,23 @@ impl CompatibilityManager {
             .with_target(TargetPlatform::Windows)
             .with_overhead(0.2);
 
+        // Proton (Valve's advanced fork of Wine for high-performance Windows gaming)
+        let proton = TranslationLayer::new("Proton".to_string())
+            .with_format(BinaryFormat::Exe)
+            .with_target(TargetPlatform::Windows)
+            .with_overhead(0.05);
+
         // Rosetta-like translation for macOS binaries
         let rosetta = TranslationLayer::new("Rosetta".to_string())
             .with_format(BinaryFormat::Dmg)
             .with_target(TargetPlatform::MacOS)
             .with_overhead(0.1);
+
+        // Darling for Darwin/macOS application translation
+        let darling = TranslationLayer::new("Darling".to_string())
+            .with_format(BinaryFormat::Dmg)
+            .with_target(TargetPlatform::MacOS)
+            .with_overhead(0.25);
 
         // Box86/Box64 for x86/x64 binaries on ARM
         let box86 = TranslationLayer::new("Box86".to_string())
@@ -488,10 +500,21 @@ impl CompatibilityManager {
             .with_target(TargetPlatform::Linux)
             .with_overhead(0.15);
 
+        // Waydroid for Android application containerized translation
+        let waydroid = TranslationLayer::new("Waydroid".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_target(TargetPlatform::Linux)
+            .with_overhead(0.08);
+
         self.translation_layers.insert(wine.name.clone(), wine);
+        self.translation_layers.insert(proton.name.clone(), proton);
         self.translation_layers
             .insert(rosetta.name.clone(), rosetta);
+        self.translation_layers
+            .insert(darling.name.clone(), darling);
         self.translation_layers.insert(box86.name.clone(), box86);
+        self.translation_layers
+            .insert(waydroid.name.clone(), waydroid);
     }
 
     fn add_default_runtimes(&mut self) {
@@ -510,9 +533,28 @@ impl CompatibilityManager {
             .with_format(BinaryFormat::Elf)
             .with_isolation("os".to_string());
 
+        // containerd container runtime
+        let containerd = ContainerRuntime::new("containerd".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_isolation("process".to_string());
+
+        // CRI-O container runtime
+        let crio = ContainerRuntime::new("CRI-O".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_isolation("process".to_string());
+
+        // runc container runtime
+        let runc = ContainerRuntime::new("runc".to_string())
+            .with_format(BinaryFormat::Elf)
+            .with_isolation("process".to_string());
+
         self.container_runtimes.insert(docker.name.clone(), docker);
         self.container_runtimes.insert(podman.name.clone(), podman);
         self.container_runtimes.insert(lxc.name.clone(), lxc);
+        self.container_runtimes
+            .insert(containerd.name.clone(), containerd);
+        self.container_runtimes.insert(crio.name.clone(), crio);
+        self.container_runtimes.insert(runc.name.clone(), runc);
     }
 
     pub fn register_binary(&mut self, binary: ApplicationBinary) {
@@ -640,8 +682,8 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = CompatibilityManager::new();
-        assert_eq!(manager.translation_layers.len(), 3);
-        assert_eq!(manager.container_runtimes.len(), 3);
+        assert_eq!(manager.translation_layers.len(), 6);
+        assert_eq!(manager.container_runtimes.len(), 6);
     }
 
     #[test]

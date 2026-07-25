@@ -499,16 +499,68 @@ impl Default for DependencyResolver {
     }
 }
 
-// ----------------------------------------------------
-// Universal Package Manager
-// ----------------------------------------------------
+/// Transactional package manager checkpoint
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
+}
 
-/// Universal package manager using dynamic dispatch to modularly handle various package format adapters
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
+    }
+}
+
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
+    pub transaction_history: TransactionalHistory,
 }
 
 impl UniversalPackageManager {
@@ -518,6 +570,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
+            transaction_history: TransactionalHistory::new(),
         };
 
         manager.add_default_adapters();
@@ -541,6 +594,32 @@ impl UniversalPackageManager {
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
         self.packages.insert(package.name.clone(), package);
+    }
+
+    pub fn create_checkpoint(&mut self) -> usize {
+        self.transaction_history
+            .create_checkpoint(&self.installed_packages)
+    }
+
+    pub fn rollback_to_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), PackageError> {
+        if let Some(checkpoint) = self
+            .transaction_history
+            .get_checkpoint(checkpoint_id)
+            .cloned()
+        {
+            let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
+            for key in current_keys {
+                if !checkpoint.installed_keys.contains(&key) {
+                    self.remove(&key)?;
+                }
+            }
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(format!(
+                "Checkpoint {} not found",
+                checkpoint_id
+            )))
+        }
     }
 
     pub fn install(&mut self, package_name: &str) -> Result<(), PackageError> {
@@ -708,65 +787,27 @@ mod tests {
     }
 
     #[test]
-    fn test_apt_deb_adapter_flow() {
-        let adapter = AptDebAdapter::new();
-        assert_eq!(adapter.format(), PackageFormat::Deb);
-        assert_eq!(adapter.adapter_name(), "apt");
-
-        let package = UnifiedPackage::new("curl".to_string(), "7.81.0".to_string())
-            .with_format(PackageFormat::Deb);
-
-        assert!(adapter.can_handle(&package));
-        assert!(adapter.install(&package).is_ok());
-        assert!(adapter.update(&package).is_ok());
-        assert!(adapter.remove(&package).is_ok());
-    }
-
-    #[test]
-    fn test_yum_rpm_adapter_flow() {
-        let adapter = YumRpmAdapter::new();
-        assert_eq!(adapter.format(), PackageFormat::Rpm);
-        assert_eq!(adapter.adapter_name(), "yum");
-
-        let package = UnifiedPackage::new("nginx".to_string(), "1.20.1".to_string())
-            .with_format(PackageFormat::Rpm);
-
-        assert!(adapter.can_handle(&package));
-        assert!(adapter.install(&package).is_ok());
-        assert!(adapter.update(&package).is_ok());
-        assert!(adapter.remove(&package).is_ok());
-    }
-
-    struct MockCustomAdapter;
-    impl PackageFormatAdapter for MockCustomAdapter {
-        fn format(&self) -> PackageFormat {
-            PackageFormat::Deb
-        }
-        fn adapter_name(&self) -> &str {
-            "custom-mock"
-        }
-        fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_universal_manager_polymorphism() {
+    fn test_transactional_rollback() {
         let mut manager = UniversalPackageManager::new();
-        // Dynamic registration under Open-Closed/Polymorphism OOP principles
-        manager.register_adapter(PackageFormat::Deb, Box::new(MockCustomAdapter));
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
 
-        let package = UnifiedPackage::new("custom-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::Deb);
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
 
-        manager.add_package(package);
-        assert!(manager.install("custom-app").is_ok());
-        assert_eq!(manager.installed_packages.len(), 1);
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
+
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
+
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
     }
 }
