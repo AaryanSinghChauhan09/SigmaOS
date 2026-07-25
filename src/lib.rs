@@ -59,8 +59,10 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
-    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    ABIManager, BuddyAllocator, Channel, IpcError, IpcManager, KernelGraph, KernelPersona,
+    KernelPlugin, KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver,
+    NetPod, PAGE_SIZE, Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler,
+    Scheduler, SchedulerError,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use observability::{
