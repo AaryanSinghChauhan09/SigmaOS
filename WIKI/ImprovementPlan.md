@@ -387,3 +387,44 @@ This system integrates high-performance coordinate mathematics directly within b
 *   **Polymorphic SVG and Image Decoders:** Integrates custom, completely memory-safe image parsers (supporting RAW, PNG, JPEG, SVG, and high-density vector files) guarded by strict boundary limits to eliminate standard security threat vectors (such as heap overflow attacks in standard C-based decoders).
 *   **High-Contrast Screen Lens Magnifier:** Runs hardware-level scaling engines directly within GPU processing units, allowing high-speed magnification lenses and screen-reading vector outlines to draw without blocking thread scheduling loops.
 *   **Modular Vector Prime Templates:** Standardizes custom visual components and icon primitives into modular, capability-checked template files that adapt seamlessly across low-end LXQt-style displays and ultra-high-density retina displays.
+
+---
+
+## 🔀 24. Router-Based Architectural Blueprint for Multi-Generation Compatibility
+
+To guarantee complete seamless operation across decades of hardware and software evolutions, SigmaOS implements a robust **Router-Based Architecture**. By routing operations at a per-process and per-module granularity rather than toggling kernel configurations globally, the operating system can run modern zero-trust processes side-by-side with ancient, unmodified legacy binaries.
+
+### A. The Seven Compatibility Routers
+1.  **Kernel Personality Router (`KernelRouter`):** Directs system calls dynamically on a per-process basis. Routes requests to specialized kernel personality layers (supporting versioned behaviors corresponding to Linux `2.6`, `3.x`, `4.x`, `5.x`, and `6.x` kernel branches). This enables mixed workloads where containerized legacy services and contemporary microkernel tasks execute in adjacent slots.
+2.  **Syscall Archive Engine (`SyscallArchive`):** Maintains a complete, indexed archive of historic system call definitions mapping directly to ancient binary layouts. Organizes call templates into specialized subclasses: `FileArchive`, `NetworkArchive`, and `ProcessArchive`. Translates deprecated parameters into secure capabilities.
+3.  **Driver Personality Router (`DriverRouter`):** Forwards I/O commands to legacy or modern processing stacks dynamically. Models specialized routing lanes: `StorageRouter`, `NetworkRouter`, and `GraphicsRouter` to proxy legacy driver requests through modern abstract APIs, minimizing hardware emulation overhead.
+4.  **Firmware Evolution Router (`FirmwareRouter`):** Normalizes boot environments, providing a single polymorphic interface matching standard firmware standards. Delegates boot operations to concrete router layers: `BIOSRouter`, `UEFIRouter`, and `CorebootRouter`.
+5.  **Ancient Build Environment Router (`BuildRouter`):** Encapsulates and configures ancient compiler toolchains (such as GCC 2.x and libc5) dynamically at runtime. Employs translation profiles: `LegacyCRouter`, `LegacyCppRouter`, and `LegacyAsmRouter` to compile ancient C/C++ and Assembly code natively without requiring source code patches.
+6.  **Security Personality Router (`SecurityRouter`):** Manages conflicting security profiles, routing processes to their expected access models. Employs targeted subclasses: `DACRouter` (for standard user/group permissions), `SELinuxRouter` (for early security contexts), and `ZeroTrustRouter` (for fine-grained capability isolation).
+7.  **Peripheral Router Pods (`PeripheralRouter`):** Simulates ancient, obsolete, or unavailable hardware peripherals inside secure sandbox channels. Implements virtual peripheral models: `FloppyRouter`, `TapeRouter`, `CRTRouter`, and `DotMatrixRouter` to satisfy legacy software expectations without physical hardware requirements.
+
+---
+
+## 📊 25. Router-Based Architectural Parity vs. Legacy Linux
+
+| Subsystem Dimension | Traditional Linux Distributions | SigmaOS Router-Based Architecture (OOP) | Competitive Edge / Differentiator |
+| :--- | :--- | :--- | :--- |
+| **Kernel Personas** | Single kernel version per booted system. Switching requires system-wide reboots or chroots. | `KernelRouter` routing per-process calls to corresponding versioned personalities. | Per-process, on-the-fly system call routing without reboots. |
+| **Syscall Archives** | Native compiler syscall entries only. Older system calls are gradually dropped or broken. | `SyscallArchive` maintaining a comprehensive archive of historical syscall definitions (2.x to 6.x). | Complete backward binary translation and reproducible debugger analysis. |
+| **Driver Handlers** | Discontinued and legacy drivers are systematically purged from upstream trees. | `DriverRouter` proxying legacy hardware requests cleanly through contemporary abstract APIs. | Continued hardware support with microsecond-level proxy layers. |
+| **Firmware Support** | Legacy BIOS and early Coreboot support are actively deprecated in modern boot loaders. | `FirmwareRouter` exposing a unified interface for BIOS, UEFI, and Coreboot. | Seamless, unified boot sequences across three generations of system firmware. |
+| **Build Environments** | Modern compilation libraries only. Compiling old tools requires complex container stacks. | `BuildRouter` encapsulating legacy compilers (GCC 2.x / libc5) within runtime wrappers. | Native, zero-downtime compiling of historical code bases without refactoring. |
+| **Security Controls** | Monolithic SELinux or AppArmor enforcement applied globally to all active tasks. | `SecurityRouter` providing dual-mode privilege routing (Zero-Trust vs. DAC). | Ancient apps execute in safe DAC sandboxes while modern apps utilize strict zero-trust. |
+| **Peripheral Devices** | OBSOLETE hardware support is completely purged from standard block driver trees. | `PeripheralRouter` pods simulating Floppy, Magnetic Tape, CRT, and Dot-Matrix hardware. | Legacy process requirements are satisfied virtualized without physical hardware dependencies. |
+
+---
+
+## 🚀 26. Next Steps for Router Implementation Roadmap
+
+1.  **Implement KernelRouter:** Build process context trackers to dynamically select kernel system call routing matrices based on active binary personalities.
+2.  **Develop SyscallArchive:** Compile the master database of Linux kernel.org system call definitions to map deprecated functions into safe capability calls.
+3.  **Formulate DriverRouter Subclasses:** Establish standard virtual routes for `StorageRouter`, `NetworkRouter`, and `GraphicsRouter` proxy drivers.
+4.  **Integrate FirmwareRouter Abstractions:** Normalise UEFI and BIOS boot protocols under a unified system initialization wrapper.
+5.  **Build BuildRouter Toolchains:** Establish containerised build environments managing GCC 2.x and ancient glibc configurations.
+6.  **Verify SecurityRouter Sandboxing:** Conduct fuzzing audits of legacy permission paths to ensure absolute containment.
+7.  **Launch PeripheralRouter Virtualization:** Test virtual floppy disk and magnetic tape mock structures using standard read/write loops.
