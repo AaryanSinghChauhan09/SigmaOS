@@ -66,6 +66,12 @@ pub use automation::{
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
+    KernelPersonality, KernelProxy, SyscallLedgerEntry, LedgerManager, LegacyDriver,
+    StorageProxy, NetworkProxy, GraphicsProxy, DriverProxy, FirmwareInterface,
+    BIOSProxy, UEFIProxy, CorebootProxy, FirmwareProxy, CompilerBackend, LegacyCProxy,
+    LegacyCppProxy, LegacyAsmProxy, BuildProxy, SecurityModel, DACProxy, SELinuxProxy,
+    ZeroTrustProxy, SecurityProxy, ObsoleteDevice, FloppyProxy, TapeProxy, CRTProxy,
+    DotMatrixProxy, PeripheralProxy,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

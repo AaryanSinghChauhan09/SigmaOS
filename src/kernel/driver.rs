@@ -5,7 +5,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError};
+use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
 use crate::kernel::object::{KRef, KernelObject};
 use crate::security::CapabilityToken;
 

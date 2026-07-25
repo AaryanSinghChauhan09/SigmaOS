@@ -86,7 +86,9 @@ impl KernelObject for KObject {
     }
 
     fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
-        self.parent = parent.map(|p| p as *const dyn KernelObject);
+        self.parent = parent.map(|p| unsafe {
+            core::mem::transmute::<&dyn KernelObject, &'static dyn KernelObject>(p) as *const dyn KernelObject
+        });
     }
 
     fn children(&self) -> Vec<&dyn KernelObject> {
@@ -97,7 +99,9 @@ impl KernelObject for KObject {
     }
 
     fn add_child(&mut self, child: &dyn KernelObject) {
-        self.children.push(child as *const dyn KernelObject);
+        self.children.push(unsafe {
+            core::mem::transmute::<&dyn KernelObject, &'static dyn KernelObject>(child) as *const dyn KernelObject
+        });
     }
 
     fn remove_child(&mut self, child_name: &str) -> Option<Box<dyn KernelObject>> {

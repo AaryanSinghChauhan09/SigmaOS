@@ -29,7 +29,7 @@ pub struct SkBuff {
     pub network_header: usize,
     pub transport_header: usize,
     pub protocol: u16,
-    pub dev: Option<*const NetDevice>,
+    pub dev: Option<*const dyn NetDevice>,
     pub priority: u32,
     pub mark: u32,
     pub pkt_type: PktType,
