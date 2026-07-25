@@ -14,6 +14,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
+pub mod init;
 pub mod kernel;
 pub mod klib;
 pub mod network;
