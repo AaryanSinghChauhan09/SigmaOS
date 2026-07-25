@@ -246,6 +246,14 @@ impl VintagePackageConverter {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HistoricError {
+    SyscallNotImplemented,
+    MemoryAccessViolation,
+    InvalidIoPortAccess,
+    UnsupportedPackageFormat,
+}
+
 // =========================================================================
 // 1. KERNEL PERSONALITY OVERLAY (S-OVERLAY)
 // =========================================================================
@@ -521,12 +529,471 @@ impl PeripheralCapsule for DotMatrixCapsule {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HistoricError {
-    SyscallNotImplemented,
-    MemoryAccessViolation,
-    InvalidIoPortAccess,
-    UnsupportedPackageFormat,
+// =========================================================================
+// 8. KERNEL PERSONALITY FABRIC
+// =========================================================================
+
+pub struct KernelFabric {
+    pub active_overlay: KernelOverlay,
+    pub thread_count: usize,
+}
+
+impl KernelFabric {
+    pub fn new(era: LinuxEra) -> Self {
+        Self {
+            active_overlay: KernelOverlay::new(era),
+            thread_count: 1,
+        }
+    }
+
+    pub fn weave_behaviors(&self, base_addr: usize) -> usize {
+        self.active_overlay.overlay_memory_model(base_addr)
+    }
+}
+
+// =========================================================================
+// 9. SYSCALL EVOLUTION REGISTRY
+// =========================================================================
+
+pub trait SyscallRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize>;
+}
+
+pub struct FileRegistry {
+    pub era: LinuxEra,
+}
+impl SyscallRegistry for FileRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize> {
+        match name {
+            "read" | "sys_read" => Some(3),
+            "write" | "sys_write" => Some(4),
+            _ => None,
+        }
+    }
+}
+
+pub struct NetworkRegistry {
+    pub era: LinuxEra,
+}
+impl SyscallRegistry for NetworkRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize> {
+        match name {
+            "socketcall" => Some(102),
+            _ => None,
+        }
+    }
+}
+
+pub struct ProcessRegistry {
+    pub era: LinuxEra,
+}
+impl SyscallRegistry for ProcessRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize> {
+        match name {
+            "fork" => Some(2),
+            "clone" => Some(120),
+            _ => None,
+        }
+    }
+}
+
+// =========================================================================
+// 10. DRIVER PERSONALITY VAULT
+// =========================================================================
+
+pub trait DriverVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str>;
+}
+
+pub struct StorageVault;
+impl DriverVault for StorageVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str> {
+        if version <= 2 {
+            Ok("LegacyIDE")
+        } else {
+            Ok("SATA")
+        }
+    }
+}
+
+pub struct NetworkVault;
+impl DriverVault for NetworkVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str> {
+        if version <= 2 {
+            Ok("NE2000")
+        } else {
+            Ok("Intel1000")
+        }
+    }
+}
+
+pub struct GraphicsVault;
+impl DriverVault for GraphicsVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str> {
+        if version <= 2 {
+            Ok("VGA")
+        } else {
+            Ok("Vesa")
+        }
+    }
+}
+
+// =========================================================================
+// 11. FIRMWARE EVOLUTION DOCK
+// =========================================================================
+
+pub trait FirmwareDock {
+    fn dock_interface(&self) -> &'static str;
+}
+
+pub struct BIOSDock;
+impl FirmwareDock for BIOSDock {
+    fn dock_interface(&self) -> &'static str {
+        "BIOS_INT13"
+    }
+}
+
+pub struct UEFIDock;
+impl FirmwareDock for UEFIDock {
+    fn dock_interface(&self) -> &'static str {
+        "UEFI_RUNTIME_SERVICES"
+    }
+}
+
+pub struct CorebootDock;
+impl FirmwareDock for CorebootDock {
+    fn dock_interface(&self) -> &'static str {
+        "COREBOOT_CB_TABLES"
+    }
+}
+
+// =========================================================================
+// 12. ANCIENT BUILD CAPSULES 2.0
+// =========================================================================
+
+pub trait BuildCapsuleV2 {
+    fn replay_build(&self) -> bool;
+    fn capture_snapshot(&self) -> [u8; 16];
+}
+
+pub struct LegacyCSnapshot {
+    pub snapshot_id: [u8; 16],
+}
+impl BuildCapsuleV2 for LegacyCSnapshot {
+    fn replay_build(&self) -> bool {
+        true
+    }
+    fn capture_snapshot(&self) -> [u8; 16] {
+        self.snapshot_id
+    }
+}
+
+pub struct LegacyCppSnapshot {
+    pub snapshot_id: [u8; 16],
+}
+impl BuildCapsuleV2 for LegacyCppSnapshot {
+    fn replay_build(&self) -> bool {
+        true
+    }
+    fn capture_snapshot(&self) -> [u8; 16] {
+        self.snapshot_id
+    }
+}
+
+pub struct LegacyAsmSnapshot {
+    pub snapshot_id: [u8; 16],
+}
+impl BuildCapsuleV2 for LegacyAsmSnapshot {
+    fn replay_build(&self) -> bool {
+        true
+    }
+    fn capture_snapshot(&self) -> [u8; 16] {
+        self.snapshot_id
+    }
+}
+
+// =========================================================================
+// 13. SECURITY PERSONALITY VAULT
+// =========================================================================
+
+pub trait SecurityVault {
+    fn retrieve_policy(&self, version: u32) -> &'static str;
+}
+
+pub struct DACVault;
+impl SecurityVault for DACVault {
+    fn retrieve_policy(&self, _version: u32) -> &'static str {
+        "User/Group Ownership"
+    }
+}
+
+pub struct SELinuxVault;
+impl SecurityVault for SELinuxVault {
+    fn retrieve_policy(&self, _version: u32) -> &'static str {
+        "SELinux Type Enforcement"
+    }
+}
+
+pub struct ZeroTrustVault;
+impl SecurityVault for ZeroTrustVault {
+    fn retrieve_policy(&self, _version: u32) -> &'static str {
+        "Strict Capabilities Isolation"
+    }
+}
+
+// =========================================================================
+// 14. PERIPHERAL EVOLUTION DOCK
+// =========================================================================
+
+pub trait PeripheralDock {
+    fn dock_peripheral(&self) -> &'static str;
+}
+
+pub struct FloppyDock;
+impl PeripheralDock for FloppyDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Floppy Disk Controller"
+    }
+}
+
+pub struct TapeDock;
+impl PeripheralDock for TapeDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Magnetic Tape Drive"
+    }
+}
+
+pub struct CRTGraphicsDock;
+impl PeripheralDock for CRTGraphicsDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Cathode Ray Tube Console"
+    }
+}
+
+pub struct DotMatrixDock;
+impl PeripheralDock for DotMatrixDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Dot Matrix Parallel Printer"
+    }
+}
+
+// =========================================================================
+// 15. KERNEL PERSONALITY MESH NETWORK
+// =========================================================================
+
+pub struct KernelMeshNetwork {
+    pub nodes: Vec<LinuxEra>,
+}
+
+impl KernelMeshNetwork {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn join_node(&mut self, era: LinuxEra) {
+        self.nodes.push(era);
+    }
+
+    pub fn supports_era(&self, era: LinuxEra) -> bool {
+        self.nodes.contains(&era)
+    }
+}
+
+impl Default for KernelMeshNetwork {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. SYSCALL EVOLUTION LEDGER 3.0
+// =========================================================================
+
+pub trait SyscallLedgerV3 {
+    fn get_performance_metric_us(&self, syscall_num: usize) -> u32;
+    fn get_deprecation_timeline_year(&self, syscall_num: usize) -> u32;
+}
+
+pub struct FileLedgerV3;
+impl SyscallLedgerV3 for FileLedgerV3 {
+    fn get_performance_metric_us(&self, _syscall_num: usize) -> u32 {
+        10
+    }
+    fn get_deprecation_timeline_year(&self, _syscall_num: usize) -> u32 {
+        2030
+    }
+}
+
+pub struct NetworkLedgerV3;
+impl SyscallLedgerV3 for NetworkLedgerV3 {
+    fn get_performance_metric_us(&self, _syscall_num: usize) -> u32 {
+        25
+    }
+    fn get_deprecation_timeline_year(&self, _syscall_num: usize) -> u32 {
+        2035
+    }
+}
+
+pub struct ProcessLedgerV3;
+impl SyscallLedgerV3 for ProcessLedgerV3 {
+    fn get_performance_metric_us(&self, _syscall_num: usize) -> u32 {
+        45
+    }
+    fn get_deprecation_timeline_year(&self, _syscall_num: usize) -> u32 {
+        2028
+    }
+}
+
+// =========================================================================
+// 17. DRIVER PERSONALITY ARCHIVE
+// =========================================================================
+
+pub trait DriverArchive {
+    fn query_supported_bus(&self) -> &'static str;
+}
+
+pub struct StorageArchive;
+impl DriverArchive for StorageArchive {
+    fn query_supported_bus(&self) -> &'static str {
+        "ISA/PCI/IDE"
+    }
+}
+
+pub struct NetworkArchive;
+impl DriverArchive for NetworkArchive {
+    fn query_supported_bus(&self) -> &'static str {
+        "PCI/AGP"
+    }
+}
+
+pub struct GraphicsArchive;
+impl DriverArchive for GraphicsArchive {
+    fn query_supported_bus(&self) -> &'static str {
+        "ISA/AGP/PCI"
+    }
+}
+
+// =========================================================================
+// 18. FIRMWARE EVOLUTION GATEWAY
+// =========================================================================
+
+pub trait FirmwareGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool;
+}
+
+pub struct BIOSGateway;
+impl FirmwareGateway for BIOSGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool {
+        boot_sig == 0xAA55
+    }
+}
+
+pub struct UEFIGateway;
+impl FirmwareGateway for UEFIGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool {
+        boot_sig == 0xEF10
+    }
+}
+
+pub struct CorebootGateway;
+impl FirmwareGateway for CorebootGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool {
+        boot_sig == 0xC00B
+    }
+}
+
+// =========================================================================
+// 19. ANCIENT BUILD REPLAY GRID
+// =========================================================================
+
+pub trait BuildGrid {
+    fn get_node_reproducibility_score(&self) -> u32;
+}
+
+pub struct LegacyCGrid;
+impl BuildGrid for LegacyCGrid {
+    fn get_node_reproducibility_score(&self) -> u32 {
+        100
+    }
+}
+
+pub struct LegacyCppGrid;
+impl BuildGrid for LegacyCppGrid {
+    fn get_node_reproducibility_score(&self) -> u32 {
+        98
+    }
+}
+
+pub struct LegacyAsmGrid;
+impl BuildGrid for LegacyAsmGrid {
+    fn get_node_reproducibility_score(&self) -> u32 {
+        100
+    }
+}
+
+// =========================================================================
+// 20. SECURITY PERSONALITY GATEWAY
+// =========================================================================
+
+pub trait SecurityGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool;
+}
+
+pub struct DACGateway;
+impl SecurityGateway for DACGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool {
+        key == b"ROOT_UID"
+    }
+}
+
+pub struct SELinuxGateway;
+impl SecurityGateway for SELinuxGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool {
+        key == b"SELINUX_SECCTX"
+    }
+}
+
+pub struct ZeroTrustGateway;
+impl SecurityGateway for ZeroTrustGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool {
+        key == b"CAP_TOKEN"
+    }
+}
+
+// =========================================================================
+// 21. PERIPHERAL EVOLUTION ARCHIVE
+// =========================================================================
+
+pub trait PeripheralArchive {
+    fn archive_simulation(&self) -> &'static str;
+}
+
+pub struct FloppyArchive;
+impl PeripheralArchive for FloppyArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "FLOPPY_ARCHIVE_MAPPED"
+    }
+}
+
+pub struct TapeArchive;
+impl PeripheralArchive for TapeArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "TAPE_ARCHIVE_MAPPED"
+    }
+}
+
+pub struct CRTArchive;
+impl PeripheralArchive for CRTArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "CRT_ARCHIVE_MAPPED"
+    }
+}
+
+pub struct DotMatrixArchive;
+impl PeripheralArchive for DotMatrixArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "DOTMATRIX_ARCHIVE_MAPPED"
+    }
 }
 
 #[cfg(test)]
@@ -688,5 +1155,117 @@ mod tests {
 
         let mut printer: Box<dyn PeripheralCapsule> = Box::new(DotMatrixCapsule);
         assert_eq!(printer.get_device_signature(), 0x378);
+    }
+
+    #[test]
+    fn test_kernel_fabric() {
+        let fabric = KernelFabric::new(LinuxEra::Era0_11);
+        assert_eq!(fabric.thread_count, 1);
+        assert_eq!(fabric.weave_behaviors(0x12345678), 0x345678);
+    }
+
+    #[test]
+    fn test_syscall_registry() {
+        let file_reg: Box<dyn SyscallRegistry> = Box::new(FileRegistry {
+            era: LinuxEra::Era1_0,
+        });
+        assert_eq!(file_reg.lookup_syscall("read").unwrap(), 3);
+
+        let net_reg: Box<dyn SyscallRegistry> = Box::new(NetworkRegistry {
+            era: LinuxEra::Era1_0,
+        });
+        assert_eq!(net_reg.lookup_syscall("socketcall").unwrap(), 102);
+
+        let proc_reg: Box<dyn SyscallRegistry> = Box::new(ProcessRegistry {
+            era: LinuxEra::Era2_4,
+        });
+        assert_eq!(proc_reg.lookup_syscall("clone").unwrap(), 120);
+    }
+
+    #[test]
+    fn test_driver_vault() {
+        let stor_vault: Box<dyn DriverVault> = Box::new(StorageVault);
+        assert_eq!(stor_vault.fetch_driver_api(1).unwrap(), "LegacyIDE");
+        assert_eq!(stor_vault.fetch_driver_api(4).unwrap(), "SATA");
+    }
+
+    #[test]
+    fn test_firmware_dock() {
+        let bios: Box<dyn FirmwareDock> = Box::new(BIOSDock);
+        assert_eq!(bios.dock_interface(), "BIOS_INT13");
+
+        let uefi: Box<dyn FirmwareDock> = Box::new(UEFIDock);
+        assert_eq!(uefi.dock_interface(), "UEFI_RUNTIME_SERVICES");
+    }
+
+    #[test]
+    fn test_build_capsule_v2() {
+        let mut uuid = [0u8; 16];
+        uuid[0] = 0xAA;
+        let c_snap: Box<dyn BuildCapsuleV2> = Box::new(LegacyCSnapshot { snapshot_id: uuid });
+        assert!(c_snap.replay_build());
+        assert_eq!(c_snap.capture_snapshot()[0], 0xAA);
+    }
+
+    #[test]
+    fn test_security_vault() {
+        let dac: Box<dyn SecurityVault> = Box::new(DACVault);
+        assert_eq!(dac.retrieve_policy(1), "User/Group Ownership");
+
+        let sel: Box<dyn SecurityVault> = Box::new(SELinuxVault);
+        assert_eq!(sel.retrieve_policy(1), "SELinux Type Enforcement");
+    }
+
+    #[test]
+    fn test_peripheral_dock() {
+        let floppy: Box<dyn PeripheralDock> = Box::new(FloppyDock);
+        assert_eq!(floppy.dock_peripheral(), "Floppy Disk Controller");
+    }
+
+    #[test]
+    fn test_kernel_mesh_network() {
+        let mut mesh = KernelMeshNetwork::new();
+        mesh.join_node(LinuxEra::Era2_4);
+        assert!(mesh.supports_era(LinuxEra::Era2_4));
+        assert!(!mesh.supports_era(LinuxEra::Era0_11));
+    }
+
+    #[test]
+    fn test_syscall_ledger_v3() {
+        let file_led3: Box<dyn SyscallLedgerV3> = Box::new(FileLedgerV3);
+        assert_eq!(file_led3.get_performance_metric_us(3), 10);
+        assert_eq!(file_led3.get_deprecation_timeline_year(3), 2030);
+    }
+
+    #[test]
+    fn test_driver_archive() {
+        let stor_arch: Box<dyn DriverArchive> = Box::new(StorageArchive);
+        assert_eq!(stor_arch.query_supported_bus(), "ISA/PCI/IDE");
+    }
+
+    #[test]
+    fn test_firmware_gateway() {
+        let bios: Box<dyn FirmwareGateway> = Box::new(BIOSGateway);
+        assert!(bios.resolve_firmware_compatibility(0xAA55));
+        assert!(!bios.resolve_firmware_compatibility(0xEF10));
+    }
+
+    #[test]
+    fn test_build_grid() {
+        let c_grid: Box<dyn BuildGrid> = Box::new(LegacyCGrid);
+        assert_eq!(c_grid.get_node_reproducibility_score(), 100);
+    }
+
+    #[test]
+    fn test_security_gateway() {
+        let dac: Box<dyn SecurityGateway> = Box::new(DACGateway);
+        assert!(dac.federate_identity(b"ROOT_UID"));
+        assert!(!dac.federate_identity(b"GUEST_UID"));
+    }
+
+    #[test]
+    fn test_peripheral_archive() {
+        let floppy: Box<dyn PeripheralArchive> = Box::new(FloppyArchive);
+        assert_eq!(floppy.archive_simulation(), "FLOPPY_ARCHIVE_MAPPED");
     }
 }
