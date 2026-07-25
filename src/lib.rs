@@ -51,14 +51,19 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
-    KernelPersonality, KernelProxy, SyscallLedgerEntry, LedgerManager, LegacyDriver,
-    StorageProxy, NetworkProxy, GraphicsProxy, DriverProxy, FirmwareInterface,
-    BIOSProxy, UEFIProxy, CorebootProxy, FirmwareProxy, CompilerBackend, LegacyCProxy,
-    LegacyCppProxy, LegacyAsmProxy, BuildProxy, SecurityModel, DACProxy, SELinuxProxy,
-    ZeroTrustProxy, SecurityProxy, ObsoleteDevice, FloppyProxy, TapeProxy, CRTProxy,
-    DotMatrixProxy, PeripheralProxy,
+    AiTaskOrchestrator, ApplicationBinary, ArchiveProfile, BinaryFormat, BootInterface,
+    BuildArchive, BuildCapsule, BuildLedgerSystem, BuildProfile, CapsuleVersion, ChronicleType,
+    CompatibilityError, CompatibilityManager, CompatibilityMode, ConstellationNode,
+    ConstellationSecurityModel, ContainerRuntime, D3dToVulkanTranslator, DriverClass,
+    DriverEmulator, DriverMuseum, DriverRepositoryManager, EmulatedPeripheral, EmulatorProfile,
+    ExhibitType, FirmwareBridgeManager, FirmwarePavilion, FirmwarePersona, FirmwareType,
+    GapSandboxPolicy, HardwareDriver, HidGraphicsDriver, JobClass, KernelConstellation,
+    KernelModule, KernelModuleManager, KernelShard, LedgerSnapshot, MemoryProtection, ModuleState,
+    NetworkStackGateway, ObsoleteDevice, ObsoletePeripheral, PavilionType, PeFormat, PeLoader,
+    PeripheralEmulationLibrary, PeripheralMuseum, PeripheralPod, RegistryManager, SecurityGrid,
+    SecurityModel, SecurityPavilion, SecurityPolicyManager, ShardType, SyscallCapsule,
+    SyscallChronicle, SyscallCompatibilityRegistry, TargetPlatform, TranslationLayer,
+    User32MessageQueue, VirtualMemoryManager, Win32Error, Win32Message, WinSockAdapter,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
