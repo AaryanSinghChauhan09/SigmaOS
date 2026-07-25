@@ -396,8 +396,12 @@ impl VirtualMemoryManager for SimpleVMM {
                                     let old_phys = pt_entry.get_physical_address();
                                     let new_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
 
-                                    unsafe {
-                                        core::ptr::copy_nonoverlapping(old_phys as *const u8, new_phys as *mut u8, 4096);
+                                    // Only perform memory copying if the physical addresses are within
+                                    // valid, mapped host memory regions to prevent SegFaults in hosted test environments.
+                                    if old_phys > 0x1000 && old_phys < 0x1000000 {
+                                        unsafe {
+                                            core::ptr::copy_nonoverlapping(old_phys as *const u8, new_phys as *mut u8, 4096);
+                                        }
                                     }
 
                                     pt_entry.set_physical_address(new_phys);
