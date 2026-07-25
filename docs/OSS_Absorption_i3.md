@@ -2,8 +2,8 @@
 
 ## Making i3/i3 Irrelevant
 
-> **Absorption Target**: https://github.com/i3/i3  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/i3/i3
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaWM - Native Window Manager with i3 Compatibility
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed i3 by implementing a native tiling window man
 
 ### 1. Tiling Window Manager
 
-**Original**: i3's tiling window management  
+**Original**: i3's tiling window management
 **SigmaOS**: Native tiling with enhanced algorithms
 
 ```rust
@@ -42,7 +42,7 @@ pub struct SigmaWM {
 
 ### 2. Configuration System
 
-**Original**: i3's configuration file (i3.config)  
+**Original**: i3's configuration file (i3.config)
 **SigmaOS**: Native configuration with enhanced features
 
 **Configuration Features**:
@@ -57,7 +57,7 @@ pub struct SigmaWM {
 
 ### 3. Workspace Management
 
-**Original**: i3's workspace system  
+**Original**: i3's workspace system
 **SigmaOS**: Native workspace with enhanced features
 
 **Workspace Features**:
@@ -72,7 +72,7 @@ pub struct SigmaWM {
 
 ### 4. Keybinding System
 
-**Original**: i3's keybinding configuration  
+**Original**: i3's keybinding configuration
 **SigmaOS**: Native keybinding with enhanced features
 
 **Keybinding Features**:
@@ -87,7 +87,7 @@ pub struct SigmaWM {
 
 ### 5. Bar System
 
-**Original**: i3's bar (i3bar)  
+**Original**: i3's bar (i3bar)
 **SigmaOS**: Native bar with enhanced features
 
 **Bar Features**:
@@ -102,7 +102,7 @@ pub struct SigmaWM {
 
 ### 6. IPC Interface
 
-**Original**: i3's IPC interface (i3-msg)  
+**Original**: i3's IPC interface (i3-msg)
 **SigmaOS**: Native IPC with enhanced features
 
 **IPC Features**:
@@ -140,13 +140,13 @@ pub struct SigmaWM {
 pub mod tiling {
     use sigma_wm::tiling::TilingEngine;
     use sigma_wm::layout::LayoutManager;
-    
+
     pub struct SigmaWM {
         tiling_engine: TilingEngine,
         layout_manager: LayoutManager,
         workspace_manager: WorkspaceManager,
     }
-    
+
     impl SigmaWM {
         pub fn tile_windows(&self, windows: Vec<Window>) -> TiledLayout {
             // Native tiling with intelligent algorithms
@@ -154,7 +154,7 @@ pub mod tiling {
             let optimized = self.layout_manager.optimize(layout);
             TiledLayout::i3_compatible(optimized)
         }
-        
+
         pub fn manage_workspaces(&self) {
             // Native workspace management
             self.workspace_manager.start();
@@ -172,7 +172,7 @@ pub mod ipc {
         command_handler: CommandHandler,
         event_dispatcher: EventDispatcher,
     }
-    
+
     impl IPCInterface {
         pub fn handle_command(&self, command: Command) -> CommandResult {
             // Native command handling

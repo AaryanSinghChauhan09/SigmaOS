@@ -14,31 +14,10 @@ pub enum BuildSystem {
     Autotools,
     Meson,
     Ninja,
-    Custom,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidFormat,
-    MissingField,
-    SignatureMismatch,
-    DependencyConflict,
-    InvalidName,
-    InvalidSource,
-    InvalidHash,
-    NoBuildCommands,
-    InvalidRecipe,
-}
-
-pub struct RecipeManager;
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-/// Declarative package recipes.
+/// Package recipe
+#[derive(Debug, Clone)]
 pub struct PackageRecipe {
     pub name: String,
     pub version: Version,
@@ -173,7 +152,27 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "make".to_string(),
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildSystem {
+    Cargo,
+    Make,
+    CMake,
+    Ninja,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeError {
+    InvalidRecipe,
+    MissingField,
+}
+
+pub struct RecipeManager;
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self
     }
 }

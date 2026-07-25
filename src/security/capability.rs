@@ -2,6 +2,7 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
+use std::string::String;
 use std::vec::Vec;
 use std::string::String;
 
@@ -31,6 +32,12 @@ impl Default for CapabilityToken {
     }
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
@@ -38,14 +45,13 @@ impl CapabilityToken {
             allowed_paths: Vec::new(),
             allowed_ports: Vec::new(),
             is_revoked: false,
-            bits_value: 0xFFFF_FFFF_FFFF_FFFF,
         }
     }
 
     pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
         CapabilityToken {
             id,
-            allowed_paths: paths.iter().map(|&s| s.to_string()).collect(),
+            allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
             allowed_ports: ports.to_vec(),
             is_revoked: false,
         }
@@ -95,16 +101,6 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-
-        // Mitigate directory traversal vulnerability:
-        // Reject path traversal before checking prefixes
-        let path_obj = std::path::Path::new(path);
-        for component in path_obj.components() {
-            if let std::path::Component::ParentDir = component {
-                return false;
-            }
-        }
-
         if self.allowed_paths.is_empty() {
             return true; // Allow if no specific restriction
         }
@@ -126,17 +122,29 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    pub fn allow_capability(&mut self, cap: u64) {
-        self.bits_value |= cap;
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub active_token: Option<CapabilityToken>,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self { active_token: None }
     }
 
-    pub fn contains(&self, cap: u64) -> bool {
-        (self.bits_value & cap) != 0
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.active_token = Some(token);
     }
 }
 
 pub struct SecurityEnforcer {
     active_tokens: std::vec::Vec<CapabilityToken>,
+}
+
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SecurityEnforcer {

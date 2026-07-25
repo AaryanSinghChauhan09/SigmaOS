@@ -1,6 +1,6 @@
 # Building SigmaOS from Source
 
-> **Philosophy**: "Sovereignty is the ultimate efficiency."  
+> **Philosophy**: "Sovereignty is the ultimate efficiency."
 > SigmaOS is built entirely from first principles in **Rust**, **Zig**, and **Nim** — with minimal external dependencies.
 
 ---

@@ -8,7 +8,7 @@ This document integrates the comprehensive SigmaOS roadmap specifications from .
 The roadmap transforms SigmaOS from a prototype into a production-grade, bootable, secure operating system with:
 
 - **Phase 0**: Kernel Stability (Hardware Foundation)
-- **Phase 1**: Shell Polish (User Experience)  
+- **Phase 1**: Shell Polish (User Experience)
 - **Phase 2**: App Completions (Feature Parity)
 - **Phase 3**: Platform Features (Advanced Capabilities)
 - **Phase 4**: Ecosystem (Developer & Community)
