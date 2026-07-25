@@ -539,3 +539,44 @@ To completely absorb and deliver all outstanding, unimplemented research initiat
 2.  **Harden Rolling Transaction Upgrades:** Couple the rolling transaction solver with the `sigpkg` transactional rollback layer inside `src/sigpkg/resolver.rs`.
 3.  **Deploy Memory-Safety Fuzzers:** Build automated range fuzzing checks within our continuous integration test suite to run boundary stress testing.
 4.  **Unify Multi-Call REPL commands:** Merge REPL shell command handlers under the unified S-CLI multi-call binary inside `src/shell/command.rs`.
+
+---
+
+## 🔮 35. Next-Gen Architectural Proposal & Differentiator Specifications
+
+To stand completely apart from legacy operating systems (Linux, BSD, Windows, macOS)—not merely by matching their feature parity but by out-innovating them—SigmaOS implements an advanced **Next-Gen Architectural Framework**. This specification introduces AI-native microkernel abstractions, universal translation engines, and cryptographic storage.
+
+### A. Core Next-Gen Subsystems
+1.  **AI-Native Microkernel (`AdaptiveKernelPersonas`):** reconfigures kernel task priorities, memory allocations, and visual loops dynamically depending on active workload profiles (ML, Gaming, or Server). Integrates predictive system call translation, pre-fetching required storage and network frames before they are formally requested.
+2.  **Self-Healing State Engine (`SelfHealingKernel`):** Maintains whole-OS Git-like rollback snapshots using cryptographic Merkle trees. Performs continuous integrity scans of active memory frames and implements on-the-fly, AI-generated hot patching of identified vulnerability vectors.
+3.  **Universal ABI Translator (`UniversalAbiTranslator`):** Translates foreign POSIX and non-POSIX binary instructions into native capability-based system calls. Runs unmodified Linux, BSD, Windows, and macOS binaries natively without the heavy virtualization overhead of hypervisors or standard Wine translation layers.
+4.  **Distributed Secure Storage (`SigmaFSPlusPlus`):** Establishes a distributed, versioned filesystem incorporating a blockchain-style, tamper-proof cryptographic audit trail. Supports native content-addressed deduplication, dynamic compression, and AI-driven semantic file parsing.
+5.  **Privacy-First Call Validation (`PrivacyFirstKernel`):** Implements post-quantum cryptographic primitives (Dilithium-5/Kyber-1024) natively inside standard system call boundaries. Enforces absolute zero-trust sandboxing and isolates sensitive operations within encrypted hardware memory enclaves.
+6.  **AI-Driven Accessibility UX (`ZenithAiUX`):** Generates real-time, SIMD-accelerated subtitles, media transcriptions, and smart accessibility overlays (e.g. real-time captions and gesture mappings) directly inside Zenith's composition loop.
+7.  **Energy-Aware Scheduler (`EnergyAwareScheduler`):** Estimates thread execution energy costs dynamically. Balances scheduler priority slices between performance objectives and battery/thermal parameters to enable green, sustainable computing.
+8.  **Native Multi-Model AI Runtime (`ModelOrchestrator`):** Manages local model inference routines (LLMs, computer vision, and speech encoders) as first-class kernel tasks, assigning scheduling queues, CPU/GPU slices, and memory enclaves dynamically.
+
+---
+
+## 📊 36. Comparative Snapshot: SigmaOS Next-Gen Innovations vs. Legacy OSes
+
+| Subsystem | Legacy OS Parity Gaps | SigmaOS Next-Gen Innovation (Strategic Edge) | Differentiator Impact |
+| :--- | :--- | :--- | :--- |
+| **Kernel Core** | Virtual memory, schedulers, cgroups. | `AdaptiveKernelPersonas` + Predictive Syscalls. | Kernel reconfigures its code paths dynamically for active workload types. |
+| **Networking** | Full TCP/IP, IPv4/IPv6, VPNs, routing. | Stateful PQC tunnels + Predictive pre-fetching. | High-speed, quantum-safe data streams with zero copy. |
+| **Filesystem** | Snaps, transaction journaling, RAID. | `SigmaFS++` with Blockchain audit trails. | Distributed, versioned storage featuring native semantic search. |
+| **Security** | MAC layers (SELinux), namespaces. | Zero-Trust Sandboxing by default. | Every process executes in a capability-gated, quantum-signed enclave. |
+| **Userland** | Interactive shells, core utils, GUI toolkits. | AI-Driven accessibility overlays. | Desktop adapts layouts and captures screen reader paths contextually. |
+| **Services** | Init system, logging, PipeWire audio. | Self-healing whole-OS rollback snapshots. | System recovers from failures instantly without data loss. |
+| **Ecosystem** | POSIX, virtualization, runtimes. | Universal ABI Translator. | Standard foreign binaries run without virtualization overhead. |
+| **Advanced** | Minimal legacy compatibility. | Native multi-model AI runtime. | LLMs and neural tasks are treated as first-class, scheduled OS processes. |
+
+---
+
+## 🚀 37. Strategic Next-Gen Implementation Roadmap
+
+1.  **Draft Adaptive Personas:** Build kernel personality modules dynamically modifying thread slices based on active process classification.
+2.  **Model Syscall Pre-fetching:** Code predictive pre-fetching matrices inside our microkernel syscall handlers to pre-allocate memory buffers.
+3.  **Formulate Whole-OS Snapshots:** Pair `GenerationManager` inode swaps with block storage CoW trees to enable instant rolling snapshots.
+4.  **Prototype Universal ABI Mapping:** Establish system call translation maps translating standard ELF and PE binary syscalls into capability rings.
+5.  **Assemble Local Model Slices:** Connect local neural network runtime tasks directly to microkernel task scheduling queues.

@@ -202,22 +202,18 @@ impl CapabilityToken {
 
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
-    pub active_token: Option<CapabilityToken>,
+    pub token: CapabilityToken,
 }
 
 impl CapabilityGate {
     pub fn new() -> Self {
-        Self { active_token: None }
+        Self {
+            token: CapabilityToken::new(),
+        }
     }
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.active_token = Some(token);
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
+        self.token = token;
     }
 }
 
