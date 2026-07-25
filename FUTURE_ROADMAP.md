@@ -1,75 +1,75 @@
-# SigmaOS: Comprehensive Future Development Roadmap
+# SigmaOS — Future Development Roadmap
+> Phases I–Z | Updated July 2026 | [Full detail: FUTURE_ROADMAP.md in repo](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FUTURE_ROADMAP.md)
 
-This document outlines the unified, 5-phase strategic engineering plan to evolve SigmaOS into a premier, AI-native, hyper-secure, sovereign desktop and server operating system.
+## Phase I — Q3 2026 (Bootability)
+- UEFI bootloader (`sigma-boot.efi`) — no GRUB dependency
+- Bootable ISO pipeline (`make iso`)
+- NVMe interrupt-driven async driver
+- SATA AHCI driver
+- virtio-GPU for QEMU/KVM
+- Multi-monitor KMS
 
-```mermaid
-gantt
-    title SigmaOS Release Timeline
-    dateFormat  YYYY-MM
-    section Core & Drivers
-    Phase 1 :active, 2026-07, 2026-11
-    section Package & UI
-    Phase 2 : 2026-11, 2027-03
-    section Security & Audit
-    Phase 3 : 2027-03, 2027-07
-    section AI & Automation
-    Phase 4 : 2027-07, 2027-11
-    section Education & Loc
-    Phase 5 : 2027-11, 2028-03
-```
+## Phase J — Q4 2026 (Architecture)
+- ARM64 port (Raspberry Pi 5, Apple M-series stub)
+- RISC-V 64 port (SBI/PLIC)
+- eBPF JIT compiler (x86-64)
+- Formal verification (Coq proofs)
+- Linux binary compatibility (`binfmt_misc`)
+- Wayland protocol (client-side)
 
----
+## Phase K — Q1 2027 (Security)
+- Quantum-safe TLS 1.3 (ML-KEM-768 + ML-DSA-65)
+- TPM 2.0 measured boot + remote attestation
+- FIDO2/WebAuthn
+- Full MAC (AppArmor-inspired)
+- KASLR, SMEP/SMAP, CET
 
-## Phase 1: Core System, Virtualization & Drivers (Month 0–4)
+## Phase L — Q2 2027 (Ecosystem)
+- sigma-sdk CLI v2 (scaffold, debug, profile)
+- sigma-pkg repository server (content-addressed)
+- Zenith desktop v2 (tiling WM, virtual desktops, HiDPI)
+- 10 bundled apps complete
+- 500+ packages in registry
 
-### Focus: Hardware compatibility, filesystem recovery, and secure execution layers.
+## Phase M — Q3 2027 (AI-Native)
+- sigma-ai v2: Phi-3, Gemma-2B, DeepSeek-Coder on-device
+- AI shell completion (NL → command)
+- ML-guided adaptive scheduler
+- Differential privacy telemetry
+- ONNX model import
 
-- **Secure Enclaves (Intel SGX):** Integrate hardware enclave startup routines into the scheduler to isolate kernel namespaces.
+## Phase N — Q4 2027 (Cloud + Enterprise)
+- sigma-pod v2: rootless, < 100ms startup, CRI for K8s
+- Cloud images: AWS/GCP/Azure/DO
+- sigma-deploy CLI
+- FIPS 140-3 + PCI-DSS + SOC2 compliance
 
-- **Advanced CoW Storage:** Adapt OpenZFS and Btrfs filesystem structures (such as snapshot trees and pooled allocators) into the SovereignFS (`sigmafs.rs`) layer.
+## Phase O–Z (2028+)
+- India Stack: ABDM, UPI, GST, DigiLocker, ONDC
+- Defence profile: MLS, air-gap, tamper-evident logs
+- IoT: < 100MB, GPIO/I2C/SPI/CAN, 500ms boot
+- Quantum: QPU driver, hybrid classical-quantum scheduler
+- v2.0.0 Sovereign Release: production OS, 10K packages
 
-- **Micro-Virtualization:** Integrate Firecracker-inspired KVM abstractions to enable lightweight, sandboxed micro-VM launches.
+## Driver Roadmap
+| Driver | Phase | Priority |
+|--------|-------|----------|
+| SATA AHCI | I | 🔴 Critical |
+| virtio-GPU | I | 🔴 Critical |
+| RTL8125B 2.5GbE | I | 🟠 High |
+| AMD GPU | J | 🟠 High |
+| Intel GPU (xe) | J | 🟠 High |
+| Broadcom Wi-Fi | K | 🟡 Medium |
+| DisplayLink USB | L | 🟡 Medium |
+| NVIDIA nouveau 2.0 | L | 🟡 Medium |
 
-- **Driver Parity:** Port stable Linux network drivers (e e1000, VirtIO-net) and basic GPU layouts (VirtIO-gpu) to the HAL.
+## Performance Targets
+| Metric | Current | v1.0 | v2.0 |
+|--------|---------|------|------|
+| Boot time | ~8s | 2s | <1s |
+| Syscall latency | 800ns | 300ns | <200ns |
+| TCP throughput | 2 Gbps | 8 Gbps | 10 Gbps |
+| NVMe IOPS | 200K | 800K | 1M |
+| LLM tokens/sec | 0 | 15 | 20+ |
 
-## Phase 2: Unified Package Manager & UI Customization (Month 4–8)
-
-### Focus: Application delivery formats, tiling interfaces, and composition effects.
-
-- **Universal sigpkg manager:** Integrate flatpak-inspired XDG portals and container boundaries to support sandboxed application sandboxes.
-
-- **AwesomeWM/i3 tiling layouts:** Build dynamic tiling capabilities using a tree model inside the Zenith window manager.
-
-- **Compositor visual polish (picom):** Add blurred transparency, Kawase shaders, and shadow overlays directly into the GPU pipeline.
-
-## Phase 3: Cybersecurity audits & Network hardening (Month 8–12)
-
-### Focus: Active defense, network analysis, and cryptographic signatures.
-
-- **Zeek network profiling:** Route kernel stack traffic logs directly to an active Zeek anomaly scanner interface.
-
-- **GnuPG update verification:** Enforce GPG signatures in the package manager registry to prevent side-loading.
-
-- **Intrusion Prevention (fail2ban/Lynis):** Embed automated auditing scripts to verify that execution capabilities match running sandboxes.
-
-## Phase 4: AI Agent, Automation & Data Science (Month 12–16)
-
-### Focus: AI-native operations, local models, and telemetry workflows.
-
-- **Whisper voice command logic:** Quantize Whisper speech-to-text models to run within the local context manager.
-
-- **DVC/MLflow versioning:** Automate telemetry checkpoints using CoW storage snapshots.
-
-- **mlpack/OpenCog engines:** Build cognitive and mathematical execution modules directly on our zero-allocation libraries.
-
-## Phase 5: Regional Indian Localization & Gov-SDKs (Month 16–20)
-
-### Focus: Regional language translation, compliance registries, and agricultural modules.
-
-- **Indic transliteration engines:** Deploy automatic script conversions directly in the text rendering stack.
-
-- **Bharat-FOSS & OpenForge tools:** Bundle e-Gov development toolkits and GST calculation suites natively.
-
-- **QGIS agriculture wrappers:** Connect geographic mappings to localized telemetry analyzers to predict crop yields.
-
-### Last Updated: July 2026
+See full details in the [repo FUTURE_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FUTURE_ROADMAP.md).

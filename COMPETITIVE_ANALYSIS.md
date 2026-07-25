@@ -117,13 +117,10 @@ sigma-sh needs to provide this. It doesn't need to be bash — it needs to be *r
 ### 3. Package Installation Takes One Command
 
 ```sh
-
 # Alpine
-
 apk add git
 
 # SigmaOS (target)
-
 sigma-pkg install git
 ```
 
