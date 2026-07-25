@@ -89,65 +89,108 @@ To render legacy Linux distributions (such as Ubuntu, Kali, Kubuntu, Lubuntu, En
 
 ---
 
-## 🛠️ 4. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
+## 🧩 4. New Development & Improvement Plan: Orbit-and-Library & Switchboard-and-Repository Specification
+
+To support ancient software and legacy hardware architectures natively alongside highly optimized modern workloads, SigmaOS is evolving into a unified **Orbit-and-Library** & **Switchboard-and-Repository** polymorphic architecture. This modular OOP abstraction ensures complete compatibility back to historic OS eras while keeping the core microkernel clean and non-allocating.
+
+### 4.1 Orbit-and-Library Architecture
+1. **Kernel Personality Orbit (`KernelOrbit` Class)**
+   - **Concept:** Models historic kernel personas as modular orbiting subsystems around the microkernel core.
+   - **Benefit:** Legacy workloads can dynamically "dock" into matching orbits based on binary headers.
+   - **Use Case:** A legacy database expecting Linux 2.4 MLFQ scheduling APIs docks into the 2.4 Orbit, while modern standard S-AI daemons orbit the 6.x Persona.
+2. **Syscall Evolution Almanac (`SyscallAlmanac` Class)**
+   - **Concept:** Encapsulates a versioned dictionary of system call semantics, parameters, and notes from historic kernel.org releases.
+   - **Inheritance Structure:** Derived subclasses `FileAlmanac`, `NetworkAlmanac`, and `ProcessAlmanac` handle respective subsets.
+   - **Benefit:** Offers historical system call replay and predictive execution translation for ancient executable formats.
+3. **Driver Personality Library (`DriverLibrary` Class)**
+   - **Concept:** Archives and catalogues legacy or legacy-hardware drivers as "books" within a virtual storage module.
+   - **Inheritance Structure:** Subclasses `StorageVolume`, `NetworkVolume`, and `GraphicsVolume` group old dynamic objects.
+   - **Benefit:** Outmoded device drivers (ISA, AGP, early USB controllers) can be loaded on demand on legacy bare-metal configurations without inflating the running kernel image size.
+4. **Firmware Evolution Dockyard (`FirmwareDockyard` Class)**
+   - **Concept:** Serves as a polymorphic boot gateway providing unified hardware diagnostics and environment structures.
+   - **Inheritance Structure:** Subclasses `BIOSDockyard`, `UEFIDockyard`, and `CorebootDockyard` abstract early platform initialization.
+   - **Benefit:** Guarantees fluid SigmaOS boot loops across diverse machines, from ancient BIOS-only hardware to advanced virtual micro-VMs.
+5. **Ancient Build Replay Ledger (`BuildLedger` Class)**
+   - **Concept:** Packages and manages old toolchains and compiler runs with a deterministic history tracking engine.
+   - **Profiles:** `LegacyCLedger`, `LegacyCppLedger`, and `LegacyAsmLedger`.
+   - **Benefit:** Legacy projects compile cleanly with cryptographic ledgers generated automatically for debugging, rollback, and historical preservation.
+6. **Security Personality Archive (`SecurityArchive` Class)**
+   - **Concept:** Maintains archival databases of standard security paradigms (DAC, AppArmor, SELinux).
+   - **Inheritance Structure:** Subclasses `DACArchive`, `SELinuxArchive`, and `ZeroTrustArchive`.
+   - **Benefit:** Ancient applications execute under their expected historical access privileges, whilst modern sandboxed components remain fully protected under strict modern zero-trust constraints.
+7. **Peripheral Evolution Library (`PeripheralLibrary` Class)**
+   - **Concept:** Encapsulates software-level emulation layers for outdated external storage and output nodes.
+   - **Inheritance Structure:** Subclasses `FloppyVolume`, `TapeVolume`, `CRTVolume`, and `DotMatrixVolume`.
+   - **Benefit:** Historic binaries expecting hardware devices can run with 100% fidelity without physical hardware dependencies.
+
+---
+
+### 4.2 Switchboard-and-Repository Architecture
+1. **Kernel Personality Matrix Switchboard (`KernelSwitchboard` Class)**
+   - **Concept:** Serves as a dynamic routing multiplexer, mapping active processes directly to specific kernel environments (from Linux 2.6 up to 6.x specs) at runtime.
+   - **Benefit:** Instant routing of system calls based on target headers without triggering context restarts, VM isolation delays, or hardware reboots.
+2. **Syscall Evolution Codex (`SyscallCodex` Class)**
+   - **Concept:** Functions as an on-the-fly reference translation index that decodes historical arguments, flags, and semantics.
+   - **Inheritance Structure:** Subclasses `FileCodex`, `NetworkCodex`, and `ProcessCodex`.
+   - **Benefit:** Translates old kernel instructions to safe modern equivalent APIs instantly, preventing application crashes.
+3. **Driver Personality Repository (`DriverRepository` Class)**
+   - **Concept:** Maintains version-tagged and dependency-indexed legacy device driver components.
+   - **Inheritance Structure:** Subclasses `StorageRepo`, `NetworkRepo`, and `GraphicsRepo`.
+   - **Benefit:** Low-level controllers can be downloaded, decrypted, and linked dynamically at boot, dropping microkernel memory footfall to <10MB.
+4. **Firmware Evolution Terminal (`FirmwareTerminal` Class)**
+   - **Concept:** Provides a dynamic, hardware-level interface layer mapping platform boot commands.
+   - **Inheritance Structure:** Subclasses `BIOSTerminal`, `UEFITerminal`, and `CorebootTerminal`.
+   - **Benefit:** Unifies firmware setup screens and diagnostic logs into a consolidated terminal shell regardless of the hardware brand.
+5. **Ancient Build Replay Ledger 2.0 (`BuildLedgerV2` Class)**
+   - **Concept:** Packages compiler variables and dependencies with incremental snapshots.
+   - **Profiles:** `LegacyCLedgerV2`, `LegacyCppLedgerV2`, and `LegacyAsmLedgerV2`.
+   - **Benefit:** Facilitates fully reproducible ancient build compilation and immutable state tracking.
+6. **Security Personality Repository (`SecurityRepository` Class)**
+   - **Concept:** Manages historical discretionary and mandatory access lists within an append-only registry.
+   - **Inheritance Structure:** Subclasses `DACRepo`, `SELinuxRepo`, and `ZeroTrustRepo`.
+   - **Benefit:** Provides secure environment simulation for legacy user databases without leaking system-level privileges.
+7. **Peripheral Evolution Terminal (`PeripheralTerminal` Class)**
+   - **Concept:** Models legacy physical endpoints as interactive virtual terminal blocks.
+   - **Inheritance Structure:** Subclasses `FloppyTerminal`, `TapeTerminal`, `CRTTerminal`, and `DotMatrixTerminal`.
+   - **Benefit:** Renders ancient peripheral access requests into standard virtual filesystem signals.
+
+---
+
+## 📊 5. Multi-OS Comparative Matrix (Unified Feature Audit)
+
+SigmaOS completely bypasses legacy Linux distribution design limitations with our new orbit-and-library switchboards:
+
+| Strategic Dimension | 🐧 Monolithic Linux | 🛡️ SigmaOS (Orbit/Library & Switchboard Plan) | Key Architectural Edge |
+| :--- | :--- | :--- | :--- |
+| **Kernel Personas** | Locked to a single running version | **KernelOrbit** & **KernelSwitchboard** | Runtime persona routing and docking |
+| **Syscalls** | Native architectures only | **SyscallAlmanac** & **SyscallCodex** | Predictive & historical translation codices |
+| **Drivers** | Monolithic (legacy often dropped) | **DriverLibrary** & **DriverRepository** | Demand-fetched and indexed legacy driver volumes |
+| **Firmware Boot** | Ancient BIOS support dropping | **FirmwareDockyard** & **FirmwareTerminal** | Unified BIOS + UEFI + Coreboot initialization |
+| **Build Pipelines** | Modern compiler toolchains only | **BuildLedger** & **BuildLedgerV2** | snapshot-based legacy compilations |
+| **Security Scope** | Static system-wide LSM rules | **SecurityArchive** & **SecurityRepository** | Co-existence of old security lists with Zero Trust |
+| **Obsolete Devices**| Unsupported or unmaintained | **PeripheralLibrary** & **PeripheralTerminal** | Floppy, tape, CRT, and Dot-Matrix software emulation |
+
+---
+
+## 🛠️ 6. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
 
 SigmaOS rejects heavy, vulnerable external dependencies and bloated package runtimes. Instead of porting legacy Linux tools, SigmaOS integrates a comprehensive suite of native, zero-dependency, and capability-gated built-in tools that are strictly superior to their legacy open-source equivalents:
 
-### 4.1 Development & Database Tools
+### 6.1 Development & Database Tools
 * **VS Code / JetBrains → `SigmaCode` Shard:** Integrates a built-in Language Server Protocol (LSP) broker, syntax-highlighter, and a lightweight, zero-copy local AI autocomplete daemon, completely bypassing Electron memory leaks.
 * **Postman → `SigmaAPI` Utility:** A built-in, non-allocating HTTP/REST, GraphQL, and WebSockets sandbox utility capable of capturing and simulating socket sequences directly behind `CapabilityToken` gates.
 * **Git → `SigmaCommit` Engine:** A post-quantum secure distributed version control system. Replaces SHA-1 with Blake3 hashing, signs every transaction with native Dilithium-5 keys, and implements direct, zero-copy delta serialization.
 * **SQLite / PostgreSQL → `SigmaDB` Shard:** A native, transactional relational and NoSQL storage engine with page-level encryption, running fully in-memory with sub-nanosecond lookups and zero third-party database daemon overhead.
 
-### 4.2 Security & Forensic Tools
+### 6.2 Security & Forensic Tools
 * **Wireshark / tcpdump → `SigmaSniff` Monitor:** A built-in, SIMD-accelerated network packet and traffic analyzer, offering real-time zero-copy deep packet inspection (DPI) with visual timeline rendering directly in the Zenith desktop.
 * **Nmap → `SigmaScan` Network Utility:** A highly parallelized, lock-free network scanner that probes subnets, resolves topologies, and audits listening ports, guarded natively by S-NET capabilities.
 * **OpenSSL / GnuPG → `SigmaCrypt` Engine:** A modern, standard cryptographic toolbox implementing Kyber-1024 (key exchange), Dilithium-5 (signatures), and ChaCha20-Poly1305 (data encryption) with zero legacy OpenSSL code vulnerabilities.
 * **Ansible / Puppet → `SigmaDeploy` Provisioner:** A declarative, local and remote state-reconciliation system that parses simple YAML/TOML playbooks to verify machine generation states natively in under 5ms.
 
-### 4.3 Network & System Utilities
-* **curl / wget → `SigmaFetch` client:** A lightweight client engine containing built-in post-quantum TLS handshakes, capable of downloading files to strict Sandboxed storage locations.
-* **Docker / Podman → `SigmaContainer` Engine:** A zero-dependency cgroups/namespaces container runtime designed specifically for capability-based microkernel virtualization without heavy SUID root daemons.
-* **Systemd / init → `SigmaInit` Shard:** An event-triggered, S6-aligned microkernel service supervisor that monitors shard states and initiates state rollbacks on driver failures.
-* **apt / dnf / pacman → `SigmaPkg` Parser:** A high-speed, allocation-free package manager utilizing custom SAT solvers and Content-Addressed Stores (CAS) for reproducible builds.
-
 ---
 
-## ⚡ 5. Strategic Battleplan against Legacy Linux
-
-### ⚡ A. Lubuntu Parity Strategy (The Lightweight Challenger)
-* **SigmaFS Lite:** An ultra-lightweight, transactional Copy-on-Write (CoW) filesystem featuring optimized Merkle-tree lookups, designed specifically to maximize I/O throughput on flash and legacy storage media with minimal RAM overhead.
-* **Adaptive Resource Scheduler:** An AI-driven CPU/memory allocation algorithm that automatically detects old/legacy processors and scales down background thread pools dynamically to guarantee fluid 120 FPS desktop performance on edge systems.
-* **Universal .spkg Package Manager:** Houses sandboxed, lightweight apps with built-in sector-level deduplication and sub-millisecond atomic rollback snapshots, offering a cleaner runtime profile than heavy Snap or Flatpak loopback mounts.
-* **Self-Healing Kernel:** Employs watchdog process state supervision to automatically detect, isolate, and recover from sub-system or driver crashes in under 1ms without user reboot or shell interruption.
-
-### 🎨 B. Kubuntu Parity Strategy (The Customization & Aesthetics Giant)
-* **Zenith Adaptive Desktop:** Features instantly switchable visual profiles tailored for Developers, Gamers, Minimalists, or Accessibility requirements.
-* **AI-Driven Personalization:** Monitors usage telemetry locally to automatically rearrange tile layouts, suggesting productivity shortcuts and adapting the active desktop workspace to user work habits.
-* **Cross-Device Continuity:** Synchronizes file state, active application windows, and clipboard buffers natively across SigmaOS desktop, mobile, and IoT setups without third-party cloud intermediaries.
-
-### 🛡️ C. Fedora Parity Strategy (The Cutting-Edge Immutable Standard)
-* **NixOS-Style Generation Swapping:** SigmaOS achieves instant, zero-copy, and fragmentation-free updates/rollbacks by swapping directory inode pointers at block level in under 1ms.
-* **SELinux Replacement via S-SEC CapabilityTokens:** Replaces SELinux with hardware-enforced `CapabilityTokens` checked directly in the microkernel's lock-free transaction bus, executing security validations in sub-nanosecond bounds.
-* **Universal .spkg Package Manager with SAT Solver:** Bypasses heavy runtimes (such as flatpakd, ostree, and dnf caches) to parse community recipes and resolve constraints cleanly on-device with zero-allocation SAT solvers, cutting RAM and footprint by over 90%.
-* **Zenith Adaptive Compositor:** Bypasses heavy, monolithic X11/Wayland architectures to render fluid, hardware-accelerated tiling workspaces with built-in keyboard accessibility and native screen reader pipelines.
-
-### 🎨 D. Zorin OS Parity Strategy (The Smooth Aesthetic Innovator)
-* **Zenith Layout Engine (Zorin Appearance Superset):** Bypasses heavy GNOME Shell JavaScript extensions. Incorporates an entirely native, zero-copy layout switcher (`ZenithAppearance`) capable of rendering Windows 11, macOS, GNOME, or Classic Windows structures in under 5ms, utilizing hardware-accelerated tile buffers directly in the GPU.
-* **SigmaConnect (Zorin Connect / GSConnect Native Replacement):** Replaces Java/Python based GSConnect services with an ultra-lightweight, peer-to-peer daemon utilizing post-quantum encrypted (Kyber-1024) local socket pools. Seamlessly mirrors mobile SMS, clipboard shares, system notifications, and touch controls directly to local window stacks.
-* **Native Windows App Installer Guard:** Double-clicking `.exe` or `.msi` triggers an automatic containerized verification. SigmaOS prompts the user to either construct an isolated sandboxed Windows Translation Layer container or suggest a native package recipe dynamically from `sigpkg`.
-* **Dynamic Time-of-Day Theming Core:** Incorporates a microkernel clock-gated background scheduler that smoothly transitions desktop wallpapers, ambient glow elements, and font sizes across smooth, haptic gradients based on native geographic daylight timelines.
-
-### 🌿 E. Linux Mint Parity Strategy (The Elegant Windows-Migrator Haven)
-Linux Mint dominates standard desktop market shares by offering a highly polished, intuitive, and extremely stable desktop environment (Cinnamon) alongside excellent GUI tools like MintUpdate, MintInstall, and MintBackup. SigmaOS completely absorbs and renders Linux Mint obsolete by providing microkernel-native, fast, and secure counterparts:
-* **Zenith Cinnamon Layout:** Offers an out-of-the-box, lightweight desktop configuration (`ZenithCinnamon`) matching Cinnamon's classic panel and menu workflow. Written entirely in zero-dependency Rust, it achieves sub-millisecond response latency and consumes less than 15MB of RAM compared to Cinnamon's 180MB footprint.
-* **SigmaPkg GUI ("MintInstall" Replacement):** A lightning-fast package center application that interacts directly with our DPLL SAT solver. It integrates flatpak/recipe mirrors transparently and uses sandbox-gated capability indicators to alert users of package access scopes before installation.
-* **SigmaUpdate ("MintUpdate" Replacement):** Replaces classic package-level incremental updates with NixOS-style atomic system configuration generational swaps. If any newly installed update fails to boot or encounters issues, holding down the spacebar during boot swaps root filesystem inode pointers back to the previous stable state instantly.
-* **Zero-Configuration Hardware Driver Wizard ("MintDrivers" Replacement):** Incorporates a microkernel Plug-and-Play auto-discovery database. It detects PCIe, USB, and memory controllers on boot, fetches signed driver bytecode over peer-to-peer S-NET, and links them dynamically as sandboxed driver shards without kernel reboot.
-
----
-
-## ⚡ 6. Bolt's Daily Performance Optimization
+## ⚡ 7. Bolt's Daily Performance Optimization
 
 ### 💡 What: Dependency Solver Iteration & Memoized State Cache
 The SAT solver in `src/sigpkg/resolver.rs` is responsible for resolving dependency trees. Currently, it uses a naive recursive approach in `resolve_recursive()` that visits nodes recursively and performs lookup operations on package names.
@@ -168,7 +211,7 @@ To verify this improvement:
 
 ---
 
-## 🎚️ 7. Prioritized Next Steps & Action Plan
+## 🎚️ 8. Prioritized Next Steps & Action Plan
 
 We rank the remaining improvements into a strict priority hierarchy:
 
@@ -177,19 +220,20 @@ We rank the remaining improvements into a strict priority hierarchy:
 2. **Correct Borrow Checker Gaps:** Refactor `src/filesystem/manager.rs` to retrieve bookmark paths before executing mutable self navigations, decoupling the immutable borrow from the mutable borrow. (Fully implemented & resolved!)
 3. **Fix Move/Borrow Errors:** Standardize cloning for `String` and `PasswordEntry` in `src/productivity/clipboard_manager.rs` and `src/security/password.rs` to stop borrow-after-move errors.
 4. **Resolve Microkernel Compiling Bugs:** Correct non-standard `protocol` declarations in `src/net/stack.rs`, Python-like `def` syntax inside traits in `src/net/socket.rs`, and address the brace collisions in `src/kernel/memory.rs` to enable workspace-wide library compiling.
+5. **Implement KernelOrbit & Switchboard Prototypes:** Develop dynamic personality switchboards and orbits to enable process routing across multiple Linux kernel standards.
 
 ### 🟡 Medium Priority
 1. **Expand Unit Tests:** Refactor `tests/integration_test.rs` to implement real end-to-end integration tests for the MLFQ scheduler and SAT solver package resolver.
-2. **Modularize the Unimplemented Monolith:** Shift helper stubs out of `src/unimplemented_features.rs` and move them into domain-specific modules.
-3. **Establish Argon2id Stretching:** Enhance GDPR/HIPAA compliance by upgrading the password hashing pipeline from mock algorithms to native Argon2id stretching.
+2. **Develop SyscallAlmanac & Codex Mapping:** Populate versioned syscall dictionaries and translate old file/process descriptors automatically inside the microkernel bus.
+3. **Establish Argon2id Hashing:** Enhance GDPR/HIPAA compliance by upgrading the password hashing pipeline from mock algorithms to native Argon2id stretching.
 
 ### 🟢 Low Priority
-1. **Zenith WCAG High-Contrast Polish:** Introduce high-contrast keyboard focus indicators inside `zenith_desktop.css` and emit standard accessibility attributes from visual layers.
-2. **Refactor Drivers into Factory Pattern:** Implement a dynamic `DriverFactory` to instate a polymorphic Plug-and-Play driver load sequence rather than procedural registrations.
+1. **Add Legacy Device Terminals:** Implement simulation library volumes for Floppy, Tape, and CRT peripherals.
+2. **Zenith WCAG High-Contrast Polish:** Introduce high-contrast keyboard focus indicators inside `zenith_desktop.css` and emit standard accessibility attributes from visual layers.
 
 ---
 
-## 🛡️ 8. Self-Healing & System Resilience
+## 🛡️ 9. Self-Healing & System Resilience
 
 SigmaOS uses active supervision watchdogs to implement a highly resilient self-healing state machine:
 * **State Watchdogs:** S6-style processes monitor the wellness of critical userland and kernel tasks.
