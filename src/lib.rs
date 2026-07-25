@@ -42,6 +42,12 @@ pub mod power {
 pub mod observability {
     pub mod profiler;
 }
+pub mod boot {
+    pub mod firmware_bridge;
+}
+pub mod toolchain {
+    pub mod adapter;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -152,4 +158,22 @@ pub use power::governor::{
 };
 pub use observability::profiler::{
     TracepointType, PerformanceMetric, SigmaProfiler,
+};
+pub use boot::firmware_bridge::{
+    FirmwareType, FirmwareBridge,
+};
+pub use toolchain::adapter::{
+    ToolchainProfile, ToolchainAdapter,
+};
+pub use compatibility::persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+};
+pub use compatibility::abi_translator::{
+    CpuArchitecture, ABITranslator,
+};
+pub use network::revival::{
+    RevivalProtocol, NetRevival,
+};
+pub use driver::simulation::{
+    SimType, PeripheralSim,
 };
