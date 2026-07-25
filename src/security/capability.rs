@@ -4,7 +4,6 @@
 
 use std::string::String;
 use std::vec::Vec;
-use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -24,12 +23,6 @@ pub struct CapabilityToken {
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
     pub bits_value: u64,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl Default for CapabilityToken {
@@ -121,6 +114,7 @@ impl CapabilityToken {
     pub fn revoke(&mut self) {
         self.is_revoked = true;
     }
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
@@ -156,12 +150,6 @@ impl SecurityEnforcer {
 
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
-    }
-}
-
-impl Default for SecurityEnforcer {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
