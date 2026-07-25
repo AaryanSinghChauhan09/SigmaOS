@@ -70,7 +70,8 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        match self.fs_type.load(Ordering::SeqCst) {
+        let val = self.fs_type.load(Ordering::SeqCst);
+        match val {
             0 => FilesystemType::Ext4,
             1 => FilesystemType::Btrfs,
             2 => FilesystemType::ZFS,
