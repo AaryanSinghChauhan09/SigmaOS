@@ -429,5 +429,3 @@ To support high-velocity, sovereign system development, resources are allocated 
 - ALSA Project: https://www.alsa-project.org/
 - VESA Specifications: https://www.vesa.org/
 - USB Specifications: https://www.usb.org/
-
-
