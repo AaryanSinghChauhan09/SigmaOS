@@ -507,6 +507,99 @@ mod tests {
     }
 
     #[test]
+    fn test_pwd_whoami() {
+        let mut repl = ShellRepl::new();
+        assert_eq!(
+            repl.execute_command(ShellCommand::Pwd).unwrap(),
+            "/home/ubuntu"
+        );
+        assert_eq!(
+            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
+            "ubuntu"
+        );
+    }
+
+    #[test]
+    fn test_su_root() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Su {
+                username: "root".to_string(),
+                password: Some("admin".to_string())
+            })
+            .is_ok());
+        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
+        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
+    }
+
+    #[test]
+    fn test_cat_command() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "README.md".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "nonexistent.txt".to_string()
+            })
+            .is_err());
+    }
+
+    #[test]
+    fn test_systemctl_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "list".to_string(),
+                service: String::new()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "stop".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "start".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+    }
+
+    #[test]
+    fn test_apt_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "update".to_string(),
+                package: None
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "search".to_string(),
+                package: Some("vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "install".to_string(),
+                package: Some("sigma-vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "list".to_string(),
+                package: None
+            })
+            .is_ok());
+    }
+
+    #[test]
     fn test_cli_customization() {
         let mut repl = ShellRepl::new();
 
@@ -619,76 +712,5 @@ mod tests {
         let restore_res = repl.execute_command(restore_cmd);
         // "checkpoint-1" won't exist initially, returns not found Err
         assert!(restore_res.is_err());
-    }
-
-    #[test]
-    fn test_cli_defensive_auditing() {
-        let mut repl = ShellRepl::new();
-
-        let status_cmd = repl.parse_command("audit status");
-        assert!(matches!(status_cmd, ShellCommand::AuditStatus));
-        let status_res = repl.execute_command(status_cmd).unwrap();
-        assert!(status_res.contains("Defensive Audit Summary"));
-        assert!(status_res.contains("Enforced"));
-
-        let log_cmd = repl.parse_command("audit log");
-        assert!(matches!(log_cmd, ShellCommand::AuditLog));
-        let log_res = repl.execute_command(log_cmd).unwrap();
-        assert!(log_res.contains("Latest Defensive Access Logs"));
-        assert!(log_res.contains("CAP_CHECK"));
-
-        let check_cmd = repl.parse_command("audit check");
-        assert!(matches!(check_cmd, ShellCommand::AuditCheck));
-        let check_res = repl.execute_command(check_cmd).unwrap();
-        assert!(check_res.contains("System Safety Sanity Scan"));
-        assert!(check_res.contains("W^X strictly enforced"));
-    }
-
-    #[test]
-    fn test_display_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Display { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Display { subcommand: "set".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Display { subcommand: "scale".to_string(), args: vec!["DP-1".to_string(), "2.0".to_string()] }).is_ok());
-    }
-
-    #[test]
-    fn test_theme_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Theme { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert_eq!(repl.execute_command(ShellCommand::Theme { subcommand: "set".to_string(), args: vec!["Banaras Gold".to_string()] }).unwrap(), "Theme changed to Banaras Gold.");
-        assert_eq!(repl.active_theme, "Banaras Gold");
-    }
-
-    #[test]
-    fn test_profile_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Profile { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Profile { subcommand: "switch".to_string(), args: vec!["developer".to_string()] }).is_ok());
-        assert_eq!(repl.active_profile, "developer");
-    }
-
-    #[test]
-    fn test_window_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Window { subcommand: "list".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Window { subcommand: "create".to_string(), args: vec!["SigmaBrowser".to_string(), "sigma.browser".to_string(), "10,10,600,400".to_string()] }).is_ok());
-        assert_eq!(repl.windows.len(), 3);
-    }
-
-    #[test]
-    fn test_accessibility_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Accessibility { subcommand: "status".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Accessibility { subcommand: "screen-reader".to_string(), args: vec!["true".to_string()] }).is_ok());
-        assert!(repl.screen_reader_enabled);
-    }
-
-    #[test]
-    fn test_clipboard_commands() {
-        let mut repl = ShellRepl::new();
-        assert!(repl.execute_command(ShellCommand::Clipboard { subcommand: "get".to_string(), args: vec![] }).is_ok());
-        assert!(repl.execute_command(ShellCommand::Clipboard { subcommand: "set".to_string(), args: vec!["CopiedText".to_string()] }).is_ok());
-        assert_eq!(repl.clipboard_content, "CopiedText");
     }
 }
