@@ -1,9 +1,18 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
+pub mod gap_closure;
 pub mod historic_linux;
 pub mod personality;
 pub mod sigmawin;
+
+pub use gap_closure::{
+    AiTaskOrchestrator, BootInterface, BuildLedgerSystem, DriverClass, DriverRepositoryManager,
+    EmulatedPeripheral, FirmwareBridgeManager, GapSandboxPolicy, HardwareDriver, HidGraphicsDriver,
+    JobClass, KernelModule, KernelModuleManager, LedgerSnapshot, MemoryProtection, ModuleState,
+    NetworkStackGateway, PeripheralEmulationLibrary, SecurityPolicyManager,
+    SyscallCompatibilityRegistry, VirtualMemoryManager,
+};
 
 pub use constellation::{
     ArchiveProfile, BuildArchive, ChronicleType, ConstellationNode, DriverMuseum, ExhibitType,

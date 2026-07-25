@@ -35,14 +35,19 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, ArchiveProfile, BinaryFormat, BuildArchive, BuildCapsule, BuildProfile,
-    CapsuleVersion, ChronicleType, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ConstellationNode, ConstellationSecurityModel, ContainerRuntime, D3dToVulkanTranslator,
-    DriverEmulator, DriverMuseum, EmulatorProfile, ExhibitType, FirmwarePavilion, FirmwarePersona,
-    FirmwareType, KernelConstellation, KernelShard, ObsoleteDevice, ObsoletePeripheral,
-    PavilionType, PeFormat, PeLoader, PeripheralMuseum, PeripheralPod, RegistryManager,
-    SecurityGrid, SecurityModel, SecurityPavilion, ShardType, SyscallCapsule, SyscallChronicle,
-    TargetPlatform, TranslationLayer, User32MessageQueue, Win32Error, Win32Message, WinSockAdapter,
+    AiTaskOrchestrator, ApplicationBinary, ArchiveProfile, BinaryFormat, BootInterface,
+    BuildArchive, BuildCapsule, BuildLedgerSystem, BuildProfile, CapsuleVersion, ChronicleType,
+    CompatibilityError, CompatibilityManager, CompatibilityMode, ConstellationNode,
+    ConstellationSecurityModel, ContainerRuntime, D3dToVulkanTranslator, DriverClass,
+    DriverEmulator, DriverMuseum, DriverRepositoryManager, EmulatedPeripheral, EmulatorProfile,
+    ExhibitType, FirmwareBridgeManager, FirmwarePavilion, FirmwarePersona, FirmwareType,
+    GapSandboxPolicy, HardwareDriver, HidGraphicsDriver, JobClass, KernelConstellation,
+    KernelModule, KernelModuleManager, KernelShard, LedgerSnapshot, MemoryProtection, ModuleState,
+    NetworkStackGateway, ObsoleteDevice, ObsoletePeripheral, PavilionType, PeFormat, PeLoader,
+    PeripheralEmulationLibrary, PeripheralMuseum, PeripheralPod, RegistryManager, SecurityGrid,
+    SecurityModel, SecurityPavilion, SecurityPolicyManager, ShardType, SyscallCapsule,
+    SyscallChronicle, SyscallCompatibilityRegistry, TargetPlatform, TranslationLayer,
+    User32MessageQueue, VirtualMemoryManager, Win32Error, Win32Message, WinSockAdapter,
 };
 pub use customization::{
     Action, AutoThemeScheduler, Condition, CustomizationEngine, CustomizationError, Routine,
