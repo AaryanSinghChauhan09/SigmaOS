@@ -41,7 +41,7 @@ pub struct HardwareMonitor {
     pub uptime: u64,          // seconds
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MonitorThreshold {
     CpuTempCritical,
     CpuTempWarning,
@@ -107,10 +107,11 @@ impl WatchdogManager {
 
     /// Start a watchdog
     pub fn start_watchdog(&mut self, name: &str) -> Result<(), &'static str> {
+        let timestamp = self.get_timestamp();
         let watchdog = self.watchdogs.get_mut(name).ok_or("Watchdog not found")?;
 
         watchdog.state = WatchdogState::Running;
-        watchdog.last_keepalive = self.get_timestamp();
+        watchdog.last_keepalive = timestamp;
 
         if self.active_watchdog.is_none() {
             self.active_watchdog = Some(name.to_string());
@@ -134,13 +135,14 @@ impl WatchdogManager {
 
     /// Send keepalive to a watchdog
     pub fn keepalive(&mut self, name: &str) -> Result<(), &'static str> {
+        let timestamp = self.get_timestamp();
         let watchdog = self.watchdogs.get_mut(name).ok_or("Watchdog not found")?;
 
         if watchdog.state != WatchdogState::Running {
             return Err("Watchdog not running");
         }
 
-        watchdog.last_keepalive = self.get_timestamp();
+        watchdog.last_keepalive = timestamp;
         Ok(())
     }
 
