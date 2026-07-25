@@ -60,19 +60,13 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    AiTaskOrchestrator, ApplicationBinary, ArchiveProfile, BinaryFormat, BootInterface,
-    BuildArchive, BuildCapsule, BuildLedgerSystem, BuildProfile, CapsuleVersion, ChronicleType,
-    CompatibilityError, CompatibilityManager, CompatibilityMode, ConstellationNode,
-    ConstellationSecurityModel, ContainerRuntime, D3dToVulkanTranslator, DriverClass,
-    DriverEmulator, DriverMuseum, DriverRepositoryManager, EmulatedPeripheral, EmulatorProfile,
-    ExhibitType, FirmwareBridgeManager, FirmwarePavilion, FirmwarePersona, FirmwareType,
-    GapSandboxPolicy, HardwareDriver, HidGraphicsDriver, JobClass, KernelConstellation,
-    KernelModule, KernelModuleManager, KernelShard, LedgerSnapshot, MemoryProtection, ModuleState,
-    NetworkStackGateway, ObsoleteDevice, ObsoletePeripheral, PavilionType, PeFormat, PeLoader,
-    PeripheralEmulationLibrary, PeripheralMuseum, PeripheralPod, RegistryManager, SecurityGrid,
-    SecurityModel, SecurityPavilion, SecurityPolicyManager, ShardType, SyscallCapsule,
-    SyscallChronicle, SyscallCompatibilityRegistry, TargetPlatform, TranslationLayer,
-    User32MessageQueue, VirtualMemoryManager, Win32Error, Win32Message, WinSockAdapter,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
+    LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge, SyscallAbi,
+    WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

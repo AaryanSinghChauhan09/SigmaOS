@@ -1,11 +1,7 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
-pub mod linux_adapter;
-pub mod persona;
-pub mod abi_translator;
-pub mod lattice;
-pub mod prism;
+pub mod legacy_adapters;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -47,4 +43,12 @@ pub use lattice::{
 };
 pub use prism::{
     PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
+    LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge, SyscallAbi,
+    WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
