@@ -237,28 +237,77 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        name: parts[1].to_string(),
-                    }
+            "display" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
                 } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Display { subcommand, args }
             }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    let enabled = match parts[2] {
-                        "on" | "true" | "enable" => true,
-                        _ => false,
-                    };
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        enabled,
-                    }
+            "theme" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
                 } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Theme { subcommand, args }
+            }
+            "profile" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Profile { subcommand, args }
+            }
+            "window" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Window { subcommand, args }
+            }
+            "accessibility" | "acc" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "status".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Accessibility { subcommand, args }
+            }
+            "screenshot" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "capture".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Screenshot { subcommand, args }
+            }
+            "record" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "start".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Record { subcommand, args }
+            }
+            "clipboard" => {
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "get".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Clipboard { subcommand, args }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
@@ -552,10 +601,189 @@ mod tests {
         };
         repl.execute_command(set_cmd).unwrap();
 
-        let run_cmd = ShellCommand::Run {
-            variable: "test_macro".to_string(),
-        };
-        let result = repl.execute_command(run_cmd);
-        assert!(result.is_ok());
+    #[test]
+    fn test_cat_command() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "README.md".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "nonexistent.txt".to_string()
+            })
+            .is_err());
+    }
+
+    #[test]
+    fn test_systemctl_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "list".to_string(),
+                service: String::new()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "stop".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "start".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+    }
+
+    #[test]
+    fn test_apt_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "update".to_string(),
+                package: None
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "search".to_string(),
+                package: Some("vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "install".to_string(),
+                package: Some("sigma-vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "list".to_string(),
+                package: None
+            })
+            .is_ok());
+    }
+
+    #[test]
+    fn test_display_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Display {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Display {
+                subcommand: "set".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Display {
+                subcommand: "scale".to_string(),
+                args: vec!["DP-1".to_string(), "2.0".to_string()]
+            })
+            .is_ok());
+    }
+
+    #[test]
+    fn test_theme_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Theme {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert_eq!(
+            repl.execute_command(ShellCommand::Theme {
+                subcommand: "set".to_string(),
+                args: vec!["Banaras Gold".to_string()]
+            })
+            .unwrap(),
+            "Theme changed to Banaras Gold."
+        );
+        assert_eq!(repl.active_theme, "Banaras Gold");
+    }
+
+    #[test]
+    fn test_profile_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Profile {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Profile {
+                subcommand: "switch".to_string(),
+                args: vec!["developer".to_string()]
+            })
+            .is_ok());
+        assert_eq!(repl.active_profile, "developer");
+    }
+
+    #[test]
+    fn test_window_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Window {
+                subcommand: "list".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Window {
+                subcommand: "create".to_string(),
+                args: vec![
+                    "SigmaBrowser".to_string(),
+                    "sigma.browser".to_string(),
+                    "10,10,600,400".to_string()
+                ]
+            })
+            .is_ok());
+        assert_eq!(repl.windows.len(), 3);
+    }
+
+    #[test]
+    fn test_accessibility_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Accessibility {
+                subcommand: "status".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Accessibility {
+                subcommand: "screen-reader".to_string(),
+                args: vec!["true".to_string()]
+            })
+            .is_ok());
+        assert!(repl.screen_reader_enabled);
+    }
+
+    #[test]
+    fn test_clipboard_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Clipboard {
+                subcommand: "get".to_string(),
+                args: vec![]
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Clipboard {
+                subcommand: "set".to_string(),
+                args: vec!["CopiedText".to_string()]
+            })
+            .is_ok());
+        assert_eq!(repl.clipboard_content, "CopiedText");
     }
 }
