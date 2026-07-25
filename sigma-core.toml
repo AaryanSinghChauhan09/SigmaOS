@@ -1,0 +1,84 @@
+# SigmaOS Minimal Base Profile (sigma-core)
+# Inspired by Alpine Linux minimalism and security-first approach
+# This profile provides the minimal base system for SigmaOS
+
+[profile]
+name = "sigma-core"
+description = "Minimal base system with essential components only"
+version = "0.1.0"
+
+[features]
+# Minimal feature set for base system
+desktop = false
+ai_tools = false
+networking = true
+graphics = false
+audio = false
+
+[shards]
+# Only essential core shards
+core_shards = ["s-mm", "s-sched", "s-net", "s-fs", "s-ipc", "s-sec", "s-sys"]
+
+# Minimal essential shards
+essential_shards = ["network", "storage"]
+
+# No optional shards
+optional_shards = []
+
+[boot]
+# Minimal kernel parameters
+kernel_params = [
+  "kernel.smm.enable=true",
+  "kernel.sched.eevdf=true",
+  "kernel.net.firewall=deny",
+  "quiet",
+  "loglevel=3"
+]
+
+[init]
+# Minimal init system
+systemd_compatible = false
+services = ["network", "sshd"]
+
+[package]
+# Minimal package configuration
+repository = "https://packages.sigmaos.org/core"
+cache_dir = "/sigma/store"
+auto_update = false
+
+# Core packages only
+core_packages = \[
+  "sigma-coreutils",
+  "sigma-shell",
+  "sigma-network",
+  "sigma-storage",
+  "sigma-security"
+\]
+
+[security]
+# Security-first configuration
+secure_boot = true
+tpm_enabled = true
+disk_encryption = true
+selinux = true
+auditd = true
+
+[network]
+# Minimal network configuration
+dhcp = true
+firewall = "deny"
+dns_servers = ["8.8.8.8", "8.8.4.4"]
+
+# SSH only for remote access
+ssh_enabled = true
+ssh_port = 22
+
+[storage]
+# Minimal storage configuration
+filesystem = "ext4"
+encryption = "luks2"
+
+[logging]
+# Minimal logging
+log_level = "warn"
+log_file = "/var/log/sigmaos.log"

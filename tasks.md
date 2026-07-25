@@ -395,7 +395,7 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
 
 ## Task Dependency Graph
 
-```
+```text
 1 -> 2
 2 -> 3, 6, 9, 12, 15
 3 -> 4

@@ -655,7 +655,7 @@ This roadmap focuses on absorbing server-oriented open-source projects to create
 ### Server Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Boot to services | 5s | 3s | 2s | 1s | <1s |
 | Idle memory | 200MB | 150MB | 100MB | 64MB | <64MB |
 | Service startup | 500ms | 300ms | 200ms | 100ms | <100ms |
@@ -665,7 +665,7 @@ This roadmap focuses on absorbing server-oriented open-source projects to create
 ### Database Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Query latency | 20ms | 15ms | 10ms | 5ms | <5ms |
 | Connection pool | 100 | 500 | 1000 | 5000 | 5000+ |
 | Throughput | 10K qps | 50K qps | 100K qps | 500K qps | 500K+ qps |
@@ -673,7 +673,7 @@ This roadmap focuses on absorbing server-oriented open-source projects to create
 ### Container Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Container startup | N/A | 2s | 1s | 500ms | <500ms |
 | MicroVM startup | N/A | 2s | 1s | 500ms | <500ms |
 | Container density | N/A | 50 | 100 | 200 | 200+ |

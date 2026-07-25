@@ -48,7 +48,7 @@ When you launch a GUI application on Zenith:
 
 4. The **Native Compositor** (`sigma_compositor.cpp`) maps the app's backing framebuffers to this exact `container_id`, preventing any unauthorized cross-app window read/writes.
 
-```
+```text
 +-------------------------------------------------------------+
 |                     Zenith Compositor                       |
 +------------------------------+------------------------------+

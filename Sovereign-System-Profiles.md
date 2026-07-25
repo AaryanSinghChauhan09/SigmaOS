@@ -32,15 +32,17 @@ fn main() {
 
 SigmaOS formalizes dynamic security and resource enforcement models using central profile structures.
 
-```
+```text
 +-----------------------------------------------------------------------------------+
 |                            Sovereign Profile Switcher                             |
 +---------------------+-------------------+-------------------+---------------------+
                       |                   |                   |
                       v                   v                   v
               [CAINE Forensic]          [IoT]            [Enterprise]
+
               - Read-Only blocks   - 16MB Sandboxes     - Strict VFS ACLs
               - Whonix Firewall    - Curated Channel    - Deterministic logs
+
 ```
 
 The unified control center (`sigma_control_center.cpp`) dynamically manages system properties per active profile:

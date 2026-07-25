@@ -136,7 +136,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Studio - Developer Profile    [Profile] [Settings] │
 ├─────────────────────────────────────────────────────────┤
@@ -220,7 +220,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Studio - Designer Profile     [Profile] [Settings] │
 ├─────────────────────────────────────────────────────────┤
@@ -304,7 +304,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Studio - Data Scientist Profile [Profile] [Settings]│
 ├─────────────────────────────────────────────────────────┤
@@ -388,7 +388,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Studio - SysAdmin Profile     [Profile] [Settings] │
 ├─────────────────────────────────────────────────────────┤
@@ -474,7 +474,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Studio - Cybersecurity Profile [Profile] [Settings]│
 ├─────────────────────────────────────────────────────────┤
@@ -558,7 +558,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Studio - Content Creator Profile [Profile][Settings]│
 ├─────────────────────────────────────────────────────────┤
@@ -921,7 +921,7 @@ Sigma Studio is the unified "operating system cockpit" that provides role-based 
 
 ### Developer to Designer:
 
-```
+```text
 User: Switches from Developer to Designer profile
 SigmaOS:
 
@@ -936,13 +936,14 @@ SigmaOS:
 5. Adjusts UI layout
 
 6. Restores designer work state
+
 ```
 
 ### AI-Assisted Workflow
 
 ### Developer Workflow:
 
-```
+```text
 User: "Create a new web project"
 AI:
 
@@ -957,13 +958,14 @@ AI:
 5. Sets up Git
 
 6. Creates initial commit
+
 ```
 
 ### Cross-Profile Integration
 
 ### Developer and SysAdmin:
 
-```
+```text
 User: Developer profile with server access
 SigmaOS:
 
@@ -974,6 +976,7 @@ SigmaOS:
 3. Adds server management capabilities
 
 4. Integrates with development workflow
+
 ```
 
 ## Challenges and Mitigation

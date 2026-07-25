@@ -306,7 +306,7 @@ Implement GNU coreutils equivalents in Rust.
 
 ## GitHub Milestone Structure
 
-```
+```text
 Milestone: v15.1 (Sprint 0-2, 3 months)
   #1001 UEFI Bootloader
   #1002 GDT+IDT wiring

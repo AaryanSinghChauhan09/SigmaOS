@@ -24,7 +24,7 @@ Sigma Control Center is the unified system management application for SigmaOS, p
 
 ### Component Structure
 
-```
+```text
 Sigma Control Center
 ├── Dashboard (Overview)
 ├── Hardware Monitor
@@ -101,7 +101,7 @@ Sigma Control Center
 
 ### UI Layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Sigma Control Center                    [User] [Settings] │
 ├─────────────────────────────────────────────────────────┤
@@ -223,7 +223,7 @@ Sigma Control Center
 
 ### UI Flow:
 
-```
+```text
 Device List → Driver Selection → Installation/Update → Verification
 ```
 
@@ -793,16 +793,18 @@ Device List → Driver Selection → Installation/Update → Verification
 
 ### Example Interactions:
 
-```
+```text
 User: "Why is my laptop hot?"
 AI: Analyzing thermal data... CPU temperature is 85°C due to high load.
     Suggestion: Enable power saving mode or close resource-intensive applications.
 
 User: "Optimize my PC"
 AI: Analyzing system... Found 3 optimization opportunities:
+
     1. Disable unnecessary startup services
     2. Enable SSD TRIM
     3. Optimize swap usage
+
     Apply optimizations? [Yes] [No]
 
 User: "Install CUDA"

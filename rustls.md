@@ -9,7 +9,7 @@ SigmaOS uses [rustls](https://github.com/rustls/rustls) (MIT / Apache-2.0) as th
 ## Why rustls over OpenSSL
 
 | Concern | OpenSSL | rustls |
-|---|---|---|
+| --- | --- | --- |
 | Language | C (memory-unsafe) | Pure Rust (memory-safe) |
 | Legacy ciphers | RC4, MD5, SSLv3 — hard to disable | TLS 1.2+ only, no legacy negotiation |
 | License | OpenSSL dual-license (complex) | MIT + Apache-2.0 (clean) |
@@ -22,7 +22,7 @@ SigmaOS uses [rustls](https://github.com/rustls/rustls) (MIT / Apache-2.0) as th
 ## Integration Points
 
 | Component | How rustls is used |
-|---|---|
+| --- | --- |
 | `sigma-curl` | HTTPS client for package downloads and REST APIs |
 | `sigma-ssh` | TLS session wrapping for SSH-over-TLS tunnel mode |
 | `sigma-pkg` | Registry HTTPS: mutual TLS for package uploads |

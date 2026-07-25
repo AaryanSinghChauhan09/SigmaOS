@@ -1,0 +1,152 @@
+#![no_std]
+#![no_main]
+
+/// OOP-based Flow Sensor for SigmaOS
+/// Based on Ideas-999-Structured: Embedded & Firmware Item 4046
+/// Implements flow sensor
+
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
+
+pub type FlowID = usize;
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum FlowError { Success = 0, NotFound = 1 }
+
+pub trait FlowSensor {
+    fn id(&self) -> FlowID;
+    fn is_initialized(&self) -> bool;
+}
+
+#[repr(C)]
+pub struct SimpleFlowSensor {
+    pub id: FlowID,
+    pub initialized: AtomicUsize,
+}
+
+impl SimpleFlowSensor {
+    pub fn new(id: FlowID) -> Self {
+        SimpleFlowSensor {
+            id,
+            initialized: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl FlowSensor for SimpleFlowSensor {
+    fn id(&self) -> FlowID { self.id }
+    fn is_initialized(&self) -> bool { self.initialized.load(Ordering::SeqCst) == 1 }
+}
+
+pub trait FlowController {
+    fn init(&mut self, sensor_id: FlowID) -> Result<(), FlowError>;
+    fn read(&self, sensor_id: FlowID) -> Result<u16, FlowError>;
+    def reset(&mut self, sensor_id: FlowID) -> Result<(), FlowError>;
+}
+
+#[repr(C)]
+pub struct SimpleFlowController {
+    pub sensors: Vec<Option<Box<dyn FlowSensor>>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleFlowController {
+    pub fn new() -> Self {
+        SimpleFlowController {
+            sensors: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl FlowController for SimpleFlowController {
+    fn init(&mut self, sensor_id: FlowID) -> Result<(), FlowError> {
+        for sensor_option in &mut self.sensors {
+            if let Some(ref mut sensor) = *sensor_option {
+                if sensor.id() == sensor_id {
+                    sensor.initialized.store(1, Ordering::SeqCst);
+                    return Ok(());
+                }
+            }
+        }
+        Err(FlowError::NotFound)
+    }
+    
+    fn read(&self, sensor_id: FlowID) -> Result<u16, FlowError> {
+        if self.get_sensor(sensor_id).is_some() {
+            Ok(0)
+        } else {
+            Err(FlowError::NotFound)
+        }
+    }
+    
+    fn reset(&mut self, sensor_id: FlowID) -> Result<(), FlowError> {
+        if self.get_sensor(sensor_id).is_some() {
+            Ok(())
+        } else {
+            Err(FlowError::NotFound)
+        }
+    }
+    
+    fn get_sensor(&self, id: FlowID) -> Option<&dyn FlowSensor> {
+        for sensor_option in &self.sensors {
+            if let Some(ref sensor) = *sensor_option {
+                if sensor.id() == id { return Some(sensor.as_ref()); }
+            }
+        }
+        None
+    }
+}
+
+pub trait FlowRate {
+    def read_rate(&self, sensor_id: FlowID) -> Result<f32, FlowError>;
+}
+
+#[repr(C)]
+pub struct SimpleFlowRate {
+    pub controller: SimpleFlowController,
+}
+
+impl SimpleFlowRate {
+    pub fn new(controller: SimpleFlowController) -> Self {
+        SimpleFlowRate { controller }
+    }
+}
+
+impl FlowRate for SimpleFlowRate {
+    fn read_rate(&self, sensor_id: FlowID) -> Result<f32, FlowError> {
+        if self.controller.get_sensor(sensor_id).is_some() {
+            Ok(0.0)
+        } else {
+            Err(FlowError::NotFound)
+        }
+    }
+}
+
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

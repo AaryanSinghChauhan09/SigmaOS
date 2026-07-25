@@ -23,7 +23,7 @@ SigmaOS implements a comprehensive security architecture focused on defense-in-d
 ### Threat Model
 
 | Threat Category | Description | Mitigation |
-|-----------------|-------------|------------|
+| ----------------- | ------------- | ------------ |
 | Supply Chain Attacks | Malicious code in dependencies | Reproducible builds, signed artifacts |
 | Runtime Exploits | Memory corruption, ROP | Capability system, WASM sandboxing |
 | Privilege Escalation | Unauthorized access to resources | Capability-based access control |
@@ -69,7 +69,7 @@ impl PQCKeyPair {
 ### Algorithm Selection
 
 | Operation | Algorithm | Security Level | Performance |
-|-----------|-----------|----------------|-------------|
+| ----------- | ----------- | ---------------- | ------------- |
 | Key Exchange | ML-KEM-768 | NIST Level 1 | Fast |
 | Signatures | ML-DSA-65 | NIST Level 3 | Medium |
 | Hashing | SHA3-256 | NIST Level 2 | Very Fast |
@@ -198,7 +198,7 @@ impl ProcessUnveil {
 
 ### Secure Boot Chain
 
-```
+```text
 UEFI Firmware → Sigma Bootloader → Sigma Kernel → Sigma Init
     ↓              ↓                  ↓              ↓
   Signed         Signed             Signed         Verified
@@ -718,7 +718,7 @@ SigmaOS aims to comply with:
 ### Certification Roadmap
 
 | Milestone | Target Date | Certification |
-|-----------|-------------|----------------|
+| ----------- | ------------- | ---------------- |
 | FIPS 140-3 | Q4 2027 | Cryptographic module |
 | Common Criteria EAL4 | Q2 2028 | Security target |
 | FedRAMP | Q4 2028 | Cloud deployment |

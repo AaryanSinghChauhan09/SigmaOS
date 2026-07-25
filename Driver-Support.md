@@ -5,7 +5,7 @@ This document outlines the current state of hardware support in SigmaOS, mapping
 ## 📊 Hardware Compatibility Matrix
 
 | Hardware Category | Current Status | Supported Hardware | Missing / Planned |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Networking (Wired)** | 🟡 Partial | Intel e1000 | Realtek (RTL8169), VirtIO-net |
 | **Networking (Wi-Fi)** | 🔴 None | N/A | Intel Wi-Fi (iwlwifi), Broadcom |
 | **Storage (Block)** | 🟡 Partial | IDE/ATA, AHCI (SATA) | **NVMe** (Priority), VirtIO-blk |

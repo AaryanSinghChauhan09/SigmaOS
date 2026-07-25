@@ -128,15 +128,10 @@ Background Daemon (localhost:11430 + /run/sigma/agent.sock):
 
 ```bash
 sigma-agent                          # interactive REPL
-
 sigma-agent "install sigma-edit"     # one-shot
-
 sigma-agent doctor                   # health check
-
 sigma-agent daemon start             # start background service
-
 sigma-agent install --shell-integration  # set up shell hooks
-
 ```
 
 ---
@@ -147,9 +142,7 @@ sigma-agent install --shell-integration  # set up shell hooks
 
 ```bash
 sigma-agent doctor           # check all components + backends
-
 sigma-agent doctor --verbose # show fix commands for every failure
-
 ```
 
 Checks: binaries, LLM backends, shell integration, daemon, training data, plugins, voice backend, configuration, SigmaOS tools. Returns exit code 0/1/2.
@@ -158,13 +151,9 @@ Checks: binaries, LLM backends, shell integration, daemon, training data, plugin
 
 ```bash
 sigma-agent update           # check + install from GitHub releases
-
 sigma-agent update --check   # check only
-
 sigma-agent update --dry-run # preview
-
 sigma-agent update rollback  # revert to previous version
-
 ```
 
 ### `daemon` — Background AI service
@@ -192,19 +181,12 @@ sigma-agent memory add "my code is in ~/code/myapp"
 sigma-agent memory add "I prefer dark mode" --pref
 sigma-agent memory add "always run sigma-agent doctor after install" --pattern
 sigma-agent memory list                     # see everything the agent knows
-
 sigma-agent memory list "dark mode"         # search
-
 sigma-agent memory forget "dark mode"       # remove
-
 sigma-agent memory pin "my code is in"      # protect from forget
-
 sigma-agent memory project init             # create .sigma_memory file
-
 sigma-agent memory project show             # display project memory
-
 sigma-agent memory context                  # preview what's injected into prompts
-
 ```
 
 Project memory (`.sigma_memory` in any directory) works like CLAUDE.md — the agent reads it automatically for project context. Edit it freely.
@@ -220,7 +202,6 @@ sigma-agent script-gen "harden system security" --dry-run
 sigma-agent script-gen --template dev-setup -o ~/setup.sa
 sigma-agent script-gen --run "install sigma-edit and configure dark mode"
 sigma-agent script-gen --list          # 12 built-in templates
-
 ```
 
 Built-in templates: `dev-setup`, `security-harden`, `backup`, `update-system`, `network-setup`, `workspace-init`, `install-tools`, `accessibility-setup`, `dark-mode`, `privacy-mode`, `kiosk-mode`, `ai-setup`.
@@ -231,17 +212,13 @@ Inspired by copilot-cli `??`, Claude Code explain, Aider `/ask`:
 
 ```bash
 sigma-agent explain                             # interactive explain mode
-
 sigma-agent explain "sigma-pkg install <name>"  # explain a command
-
 sigma-agent explain --concept "how paging works"
 sigma-agent explain --concept "sigma_pledge"
 sigma-agent explain --error "cargo build" "permission denied"
 sigma-agent explain --code src/main.rs
 sigma-agent explain --list                      # 45 built-in topics
-
 sigma-agent "??" "what does sigma_pledge do"    # shorthand
-
 ```
 
 45 built-in topics (no LLM needed): sigma_pledge, sigma_unveil, sigma-pkg, sigma-sh, paging, shard, buddy allocator, sigma-bus, MLFQ, sigma-agent, post-quantum cryptography, and more.
@@ -251,24 +228,19 @@ sigma-agent "??" "what does sigma_pledge do"    # shorthand
 Inspired by n8n, Claude Code multi-step, azure-cli automation runbooks.
 
 ```bash
-
 # Install all 8 built-in templates
-
 sigma-agent workflow install --all
 
 # Run a workflow
-
 sigma-agent workflow run weekly-backup
 sigma-agent workflow run weekly-backup --dry-run
 sigma-agent workflow run dev-workflow --verbose
 
 # Generate from natural language
-
 sigma-agent workflow create "backup home folder every Friday"
 sigma-agent workflow create "run security audit nightly" -o nightly.yaml
 
 # Manage
-
 sigma-agent workflow list
 sigma-agent workflow enable weekly-backup
 sigma-agent workflow disable cpu-alert
@@ -276,7 +248,6 @@ sigma-agent workflow history
 sigma-agent workflow audit
 
 # Background scheduler (checks triggers every 60s)
-
 sigma-agent workflow scheduler
 ```
 
@@ -286,7 +257,6 @@ YAML format:
 ```yaml
 name: my-workflow
 trigger: schedule=daily 06:00   # or: manual, cpu>90, disk<10, pkg_update, boot
-
 steps:
   - name: step-one
     action: "sigma-agent natural language command"
@@ -302,9 +272,7 @@ Full documentation: [sigma-agent-workflow](sigma-agent-workflow)
 
 ```bash
 sigma-agent context          # pretty-print
-
 sigma-agent context --json   # JSON for scripting
-
 ```
 
 ### `security` — Security advisor
@@ -327,9 +295,7 @@ sigma-agent learn stats
 
 ```bash
 sigma-agent multi "why is CPU high"              # → sigma-sysadmin
-
 sigma-agent multi --agent security "audit logs"  # force agent
-
 sigma-agent multi diagnose "slow + network drops"
 sigma-agent multi --list
 ```
@@ -357,9 +323,7 @@ sigma-agent plugin list|install|create|example|training|remove
 
 ```bash
 sigma-agent complete "install sig"         # instant static
-
 sigma-agent complete --dynamic "why is my" # LLM-powered
-
 sigma-agent complete --shell > /etc/bash_completion.d/sigma-agent
 sigma-agent complete --top
 ```
@@ -414,7 +378,6 @@ sigma-agent install --shell-integration [--shell fish|zsh|bash]
 ## Tools (21 built-in)
 
 | # | Tool | Description |
-
 |---|---|---|
 | 1 | `read_file` | Read file content |
 | 2 | `write_file` | Write/append to file |
@@ -444,11 +407,8 @@ sigma-agent install --shell-integration [--shell fish|zsh|bash]
 
 ```bash
 sigma-pkg install sigma-ai          # sovereign daemon (recommended)
-
 ollama pull tinyllama               # via Ollama
-
 sigma-pkg install sigma-model-tinyllama  # GGUF (~700MB)
-
 ```
 
 ---
@@ -457,15 +417,10 @@ sigma-pkg install sigma-model-tinyllama  # GGUF (~700MB)
 
 ```bash
 sigma-agent train seed              # 10 + 55 built-in samples (v1 + v2)
-
 sigma-agent train sync              # pull GitHub wiki → training samples
-
 sigma-agent learn rate good         # rate interactions as they happen
-
 sigma-agent learn correct "..."     # provide corrections → DPO pairs
-
 sigma-agent learn build sigma-v1    # ChatML + Alpaca + DPO JSONL
-
 sigma-agent learn finetune tinyllama-1.1b sigma-agent-v1
 sigma-agent config set model sigma-agent-v1
 ```
@@ -514,7 +469,6 @@ userland/agent/
 ---
 
 ## Build
-
 ```bash
 nim c -d:release --opt:speed -o:sigma-agent userland/agent/sigma_agent_main.nim
 cargo build --release -p sigma-agent-core
@@ -543,7 +497,6 @@ cp sigma-agent /usr/bin/ && cp target/release/sigma-agent-core /usr/bin/
 
 ---
 
-### Sovereign AI — local inference, no telemetry, privacy-first.
+*Sovereign AI — local inference, no telemetry, privacy-first.*
 
 *See also: [Architecture Overview](Architecture-Overview) · [Zenith Desktop](Zenith-Desktop) · [Security Model](Security-Model)*
-```

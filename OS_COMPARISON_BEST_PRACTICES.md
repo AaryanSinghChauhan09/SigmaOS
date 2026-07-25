@@ -47,7 +47,7 @@ An operating system is considered "better" than others when it balances these cr
 ### Performance Comparison
 
 | OS | Boot Time | CPU Efficiency | Memory Efficiency | I/O Performance | Network Performance |
-|----|-----------|----------------|------------------|-----------------|---------------------|
+| ---- | ----------- | ---------------- | ------------------ | ----------------- | --------------------- |
 | **Linux** | 5-10s | 95%+ | 85% | Excellent | Excellent |
 | **Windows** | 10-30s | 80% | 70% | Good | Good |
 | **macOS** | 15-25s | 85% | 75% | Good | Good |
@@ -66,7 +66,7 @@ An operating system is considered "better" than others when it balances these cr
 ### Security Comparison
 
 | OS | Access Control | Isolation | Encryption | Security Updates | Vulnerability Response |
-|----|---------------|-----------|------------|-----------------|----------------------|
+| ---- | --------------- | ----------- | ------------ | ----------------- | ---------------------- |
 | **Linux** | Excellent (SELinux/AppArmor) | Excellent (Containers/Namespaces) | Excellent (LUKS/eCryptfs) | Excellent | <24 hours |
 | **Windows** | Good (UAC/Windows Defender) | Good (Sandbox/AppContainer) | Good (BitLocker) | Good | 24-48 hours |
 | **macOS** | Excellent (Sandbox/Gatekeeper) | Excellent (Sandbox/XPC) | Excellent (FileVault) | Excellent | <24 hours |
@@ -85,7 +85,7 @@ An operating system is considered "better" than others when it balances these cr
 ### Stability Comparison
 
 | OS | Crash Recovery | Fault Tolerance | Uptime | Error Handling | File System Integrity |
-|----|---------------|-----------------|--------|---------------|----------------------|
+| ---- | --------------- | ----------------- | -------- | --------------- | ---------------------- |
 | **Linux** | Excellent | Excellent | 99.9%+ | Excellent | Excellent (ext4/btrfs) |
 | **Windows** | Good | Good | 95-99% | Good | Good (NTFS) |
 | **macOS** | Excellent | Good | 98-99% | Excellent | Excellent (APFS) |
@@ -104,7 +104,7 @@ An operating system is considered "better" than others when it balances these cr
 ### Compatibility Comparison
 
 | OS | Binary Compatibility | API Compatibility | Hardware Support | Package Ecosystem | Cross-Platform |
-|----|---------------------|-------------------|-----------------|------------------|----------------|
+| ---- | --------------------- | ------------------- | ----------------- | ------------------ | ---------------- |
 | **Linux** | Excellent (ELF) | Excellent (POSIX) | Excellent | Excellent (Multiple) | Excellent |
 | **Windows** | Excellent (PE) | Excellent (Win32) | Excellent | Good (Store/MSI) | Limited |
 | **macOS** | Good (Mach-O) | Good (Cocoa) | Limited (Apple) | Good (Homebrew) | Limited |
@@ -123,7 +123,7 @@ An operating system is considered "better" than others when it balances these cr
 ### Scalability Comparison
 
 | OS | Multi-Core Support | Distributed Systems | IoT Support | HPC Support | Cloud Native |
-|----|-------------------|---------------------|------------|------------|-------------|
+| ---- | ------------------- | --------------------- | ------------ | ------------ | ------------- |
 | **Linux** | Excellent | Excellent | Excellent | Excellent | Excellent |
 | **Windows** | Good | Good | Limited | Limited | Good |
 | **macOS** | Good | Limited | Limited | Limited | Limited |
@@ -142,7 +142,7 @@ An operating system is considered "better" than others when it balances these cr
 ### User Experience Comparison
 
 | OS | Ease of Use | Customization | Accessibility | Learning Curve | User Satisfaction |
-|----|------------|---------------|---------------|----------------|------------------|
+| ---- | ------------ | --------------- | --------------- | ---------------- | ------------------ |
 | **Linux** | Medium | Excellent | Excellent | Medium | 4.0/5 |
 | **Windows** | Excellent | Medium | Excellent | Low | 4.2/5 |
 | **macOS** | Excellent | Medium | Excellent | Low | 4.5/5 |

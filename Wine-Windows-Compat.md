@@ -8,7 +8,7 @@ SigmaOS runs Windows applications via **Wine** (LGPL-2.1) and **Proton** (BSD/cu
 
 ## Architecture
 
-```
+```text
 Windows EXE / Proton game
         │
         ▼
@@ -28,7 +28,7 @@ Windows EXE / Proton game
 
 ## File Layout
 
-```
+```text
 virtualization/compat/
 └── sigma_wine_launcher.rs
 ```
@@ -84,10 +84,19 @@ impl WineLauncher {
         Ok(())
     }
 
-    fn exec_in_guest(&self, windows_path: &str) -> Result<(), WineError> {
         // Send command via vsock CID to the guest Wine executor agent
         println!("Executing in guest: wine '{}'", windows_path);
-        // TODO: vsock connect → send JSON command → receive PID
+
+        let cid = self.vm.get_vsock_cid()?;
+        let port = 8080; // Default guest agent port
+
+        let mut stream = std::os::unix::net::UnixStream::connect(format!("/var/run/firecracker/vsock_{}_{}", cid, port))
+            .map_err(|_| WineError::ExecFailed)?;
+
+        let payload = format!(r#"{{"cmd": "wine", "args": ["{}"]}}"#, windows_path);
+        std::io::Write::write_all(&mut stream, payload.as_bytes())
+            .map_err(|_| WineError::ExecFailed)?;
+
         Ok(())
     }
 }
@@ -137,7 +146,7 @@ sigma-wine-launcher stop <vm-id>
 ## Path Mapping
 
 | SigmaFS path | Wine/Windows path |
-|---|---|
+| --- | --- |
 | `/home/user/Documents/` | `C:\Users\User\Documents\` |
 | `/data/windows/` | `C:\` |
 | `/tmp/` | `Z:\tmp\` |

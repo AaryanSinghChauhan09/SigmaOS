@@ -28,7 +28,7 @@ sigma-vault is the centralised secrets manager for SigmaOS. It stores secrets in
 
 ## Architecture
 
-```
+```text
 ┌───────────────────────────────────────────┐
 │  Client process (sigma_pledge includes     │
 │  "vault" capability token)                │
@@ -72,7 +72,7 @@ sigma-vault is the centralised secrets manager for SigmaOS. It stores secrets in
 
 File: `~/.sigma-vault.db` (or `/etc/sigma-vault/system.db` for system secrets)
 
-```
+```text
 Header (64 bytes):
   magic[8]     = "SIGVAULT"
   version[2]   = 0x0001
@@ -94,7 +94,7 @@ Entries appended; compaction on `vault compact` command.
 
 ## CLI
 
-```
+```text
 sigma-vault get    <name>              # print plaintext to stdout
 
 sigma-vault set    <name> [value]      # value from arg or stdin (interactive)
@@ -136,6 +136,7 @@ Used by: sigma-sh TLS, sigma-net TLS 1.3 handshake, sigma-pkg signature verifica
 Processes must hold `"vault"` in their sigma_pledge capability set to open IPC connection to vaultd. Privilege escalation rejected with `EPERM` + audit entry.
 
 Audit log entry format (JSON Lines):
+
 ```json
 {"ts":1700000000,"pid":412,"comm":"sigma-sh","op":"get","name":"db_password","result":"ok"}
 ```
@@ -171,7 +172,7 @@ Audit log entry format (JSON Lines):
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | TPM2 seal/unseal | ⬜ Not started |
 | AES-256-GCM store | ⬜ Not started |
 | vaultd daemon | ⬜ Not started |

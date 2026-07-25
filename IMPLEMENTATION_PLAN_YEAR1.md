@@ -21,7 +21,7 @@ This document outlines the detailed implementation plan for Year 1 of SigmaOS de
 ### Implementation Priority Matrix
 
 | Component | Priority | Complexity | Dependencies | Timeline |
-|-----------|----------|------------|--------------|----------|
+| ----------- | ---------- | ------------ | -------------- | ---------- |
 | Sigma Control Center | CRITICAL | HIGH | Kernel, UI framework | Q1-Q2 |
 | AI Integration Foundation | CRITICAL | VERY HIGH | ML frameworks, hardware | Q1-Q2 |
 | Unified Design System | HIGH | MEDIUM | UI framework | Q1 |
@@ -35,7 +35,8 @@ This document outlines the detailed implementation plan for Year 1 of SigmaOS de
 **Objective**: Create unified system management application
 
 **Architecture**:
-```
+
+```text
 sigma-control-center/
 ├── core/
 │   ├── system_monitor.rs       # Hardware monitoring
@@ -126,7 +127,8 @@ sigma-control-center/
 **Objective**: Implement basic AI capabilities at OS level
 
 **Architecture**:
-```
+
+```text
 sigma-ai/
 ├── core/
 │   ├── local_llm.rs            # Local LLM integration
@@ -211,7 +213,8 @@ sigma-ai/
 **Objective**: Establish consistent design language across all applications
 
 **Architecture**:
-```
+
+```text
 sigma-design-system/
 ├── core/
 │   ├── color_palette.rs       # Color system
@@ -352,7 +355,8 @@ sigma-design-system/
 **Objective**: Create unified development environment
 
 **Architecture**:
-```
+
+```text
 sigma-dev-studio/
 ├── core/
 │   ├── git_manager.rs         # Git GUI and management

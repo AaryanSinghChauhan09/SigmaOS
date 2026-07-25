@@ -54,7 +54,7 @@ make qemu PROFILE=standalone
 ## 3. Repository Layout
 
 | Directory | Language | Purpose |
-|-----------|----------|---------|
+| ----------- | ---------- | --------- |
 | `kernel/core/` | Rust `#![no_std]` | Scheduler, MM, IPC, syscalls |
 | `kernel/security/` | Rust | pledge/unveil, zero-trust |
 | `kernel/net/` | Rust | TCP/UDP/TLS network stack |

@@ -8,7 +8,7 @@ SigmaOS runs the [OpenTelemetry Collector](https://github.com/open-telemetry/ope
 
 ## Architecture
 
-```
+```text
 sigma-bus IPC calls
         │  OTLP/gRPC spans (opentelemetry-rust SDK)
         ▼
@@ -132,7 +132,9 @@ impl SigmaMetrics {
 
 apiVersion: 1
 providers:
+
   - name: SigmaOS
+
     orgId: 1
     type: file
     options:
@@ -141,19 +143,27 @@ providers:
 # Dashboard panels (abbreviated):
 
 panels:
+
   - title: "IPC Calls/sec"
+
     type: graph
     datasource: Prometheus
     targets:
+
       - expr: rate(sigma_bus_ipc_calls_total[1m])
   - title: "IPC Latency p99 (ms)"
+
     type: graph
     targets:
+
       - expr: histogram_quantile(0.99, sigma_bus_ipc_latency_ms_bucket)
   - title: "Active Shards"
+
     type: stat
     targets:
+
       - expr: sigma_shards_active
+
 ```
 
 ---

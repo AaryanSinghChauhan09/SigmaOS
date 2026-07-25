@@ -8,7 +8,7 @@ SigmaOS implements a **Linux syscall compatibility layer** (`kernel/linux_compat
 
 ## Architecture
 
-```
+```text
 Linux ELF binary (statically linked)
         │  execve()
         ▼
@@ -25,7 +25,7 @@ The compatibility layer uses a **syscall translation table** that maps Linux x86
 
 ## File Layout
 
-```
+```text
 kernel/linux_compat/
 ├── README.md
 ├── sigma_linuxcompat.rs   # main compat layer

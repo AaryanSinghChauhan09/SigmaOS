@@ -8,11 +8,8 @@
 
 ```bash
 sigma-sh script.sigma              # execute a script
-
 sigma-sh script.sigma arg1 arg2   # with positional arguments
-
 chmod +x script.sigma && ./script.sigma   # executable scripts
-
 ```
 
 Script shebang line:
@@ -29,7 +26,6 @@ name="sigma"
 version=15
 echo "Hello, $name v${version}"
 echo "Greeting: ${name:-world}"    # default if unset or empty
-
 ```
 
 ### Special variables
@@ -52,21 +48,13 @@ echo "Greeting: ${name:-world}"    # default if unset or empty
 
 ```sh
 ${VAR}              # safe expansion
-
 ${VAR:-default}     # use default if VAR is unset or empty
-
 ${VAR:=default}     # assign and use default if VAR is unset
-
 ${#VAR}             # length of VAR
-
 ${VAR##pattern}     # strip longest prefix matching pattern
-
 ${VAR#pattern}      # strip shortest prefix
-
 ${VAR%%pattern}     # strip longest suffix
-
 ${VAR%pattern}      # strip shortest suffix
-
 ```
 
 ## Arithmetic
@@ -76,15 +64,10 @@ Use `$((expr))` for integer arithmetic:
 ```sh
 x=10
 y=$((x * 3 + 5))       # 35
-
 echo $((y / 7))         # 5
-
 echo $((2 ** 8))        # 256 (exponentiation)
-
 echo $((RANDOM % 100))  # random 0-99
-
 i=$((i + 1))            # increment
-
 ```
 
 Supported operators: `+`, `-`, `*`, `/`, `%`, `(`, `)`
@@ -118,13 +101,11 @@ else
 fi
 
 # String comparison
-
 if [ "$arch" = "x86_64" ]; then
     echo "Intel/AMD system"
 fi
 
 # Numeric comparison
-
 if [ $count -gt 10 ]; then
     echo "Count exceeded threshold"
 fi
@@ -138,7 +119,6 @@ for arch in x86_64 aarch64 riscv64gc; do
 done
 
 # Iterate over files
-
 for f in /etc/sigma/*.toml; do
     echo "Processing $f"
 done
@@ -163,7 +143,6 @@ greet() {
 greet sigma
 
 # Function with return value (via exit code)
-
 is_up() {
     sigma-net ping "$1" -c 1 > /dev/null 2>&1
 }
@@ -175,23 +154,16 @@ fi
 ## Pipelines and Redirections
 
 ```sh
-
 # Pipes
-
 sigma-log tail --lines 100 | grep ERROR | wc -l
 
 # Redirections
-
 sigma-monitor cpu > /tmp/cpu.txt        # stdout to file
-
 sigma-monitor cpu >> /tmp/cpu.txt       # append stdout
-
 sigma-diagnostics 2>/dev/null           # discard stderr
-
 sigma-diagnostics > out.txt 2>&1        # both to file
 
 # Background
-
 sigma-monitor watch &
 echo "Monitor PID: $!"
 ```
@@ -200,11 +172,8 @@ echo "Monitor PID: $!"
 
 ```sh
 sigma build && sigma run          # run only if build succeeded
-
 sigma build || echo "Build failed"  # run only if build failed
-
 sigma test ; echo "Done"           # always run echo (regardless of exit code)
-
 ```
 
 ## Built-in Commands
@@ -252,7 +221,6 @@ sigma test ; echo "Done"           # always run echo (regardless of exit code)
 
 ```sh
 #!/usr/bin/env sigma-sh
-
 # build-and-test.sigma — build all targets, run tests, report
 
 TARGETS="x86_64 aarch64"
@@ -280,19 +248,13 @@ fi
 ## Scripting Tips
 
 - Use `set -e` idiom equivalent: `cmd || exit 1` to fail fast
-
 - Quote variables: `"$var"` prevents word splitting
-
 - Use `$()` instead of backticks `` `cmd` `` — cleaner nesting
-
 - Check exit codes: `$?` immediately after the command
-
 - Use `sigma-fix scan` before deploying scripts to catch common issues
 
 ## See Also
 
 - [CLI Reference](CLI-Reference) — all sigma CLI commands
-
 - [sigma-sh Manual](sigma-sh) — interactive shell usage
-
 - [Coreutils](Coreutils) — standard utilities available in scripts

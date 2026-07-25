@@ -3,8 +3,9 @@
 This document serves as the master catalog of all 247 roadmaps developed for SigmaOS.
 
 ## 🧠 AI & Cognitive (AI-01 to AI-55)
+
 | # | Document | Topic |
-|---|---|---|
+| --- | --- | --- |
 | 1 | [Roadmap-AI-01-Local-LLM-Inference](Roadmap-AI-01-Local-LLM-Inference.md) | Embedded GGUF model loader |
 | 2 | [Roadmap-AI-02-Whisper-Voice-Commands](Roadmap-AI-02-Whisper-Voice-Commands.md) | Offline voice command shell |
 | 3 | [Roadmap-AI-03-Natural-Language-CLI](Roadmap-AI-03-Natural-Language-CLI.md) | NL → shell command translation |
@@ -62,8 +63,9 @@ This document serves as the master catalog of all 247 roadmaps developed for Sig
 | 55 | [Roadmap-AI-55-Differential-Privacy-Telemetry](Roadmap-AI-55-Differential-Privacy-Telemetry.md) | Local Differential Privacy for Analytics |
 
 ## 🤖 ML Algorithms (ML-01 to ML-35)
+
 | # | Document | Topic |
-|---|---|---|
+| --- | --- | --- |
 | 56 | [Roadmap-ML-01-Kernel-SVM](Roadmap-ML-01-Kernel-SVM.md) | Support Vector Machine (SMO solver) |
 | 57 | [Roadmap-ML-02-Random-Forest](Roadmap-ML-02-Random-Forest.md) | Ensemble tree classifier |
 | 58 | [Roadmap-ML-03-Neural-Network-Inference](Roadmap-ML-03-Neural-Network-Inference.md) | MLP inference (INT8 quantised) |
@@ -101,8 +103,9 @@ This document serves as the master catalog of all 247 roadmaps developed for Sig
 | 90 | [Roadmap-ML-35-Active-Kernel-Tuning](Roadmap-ML-35-Active-Kernel-Tuning.md) | Active Learning for Kernel Parameter Tuning |
 
 ## 🧩 Foundation Model Integrations (Model-01 to Model-35)
+
 | # | Document | Topic |
-|---|---|---|
+| --- | --- | --- |
 | 91 | [Roadmap-Model-01-Phi-3](Roadmap-Model-01-Phi-3-Integration.md) | Microsoft Phi-3-mini (3.8B) |
 | 92 | [Roadmap-Model-02-Gemma](Roadmap-Model-02-Gemma-Integration.md) | Google Gemma-2B |
 | 93 | [Roadmap-Model-03-Llama3](Roadmap-Model-03-Llama3-Integration.md) | Meta LLaMA 3 8B |
@@ -112,21 +115,21 @@ This document serves as the master catalog of all 247 roadmaps developed for Sig
 | 97 | [Roadmap-Model-07-Whisper-Large](Roadmap-Model-07-Whisper-Large.md) | Whisper Large-v3 transcription |
 | 98 | [Roadmap-Model-08-BERT-Embeddings](Roadmap-Model-08-BERT-Embeddings.md) | MiniLM embeddings for RAG |
 | 99 | [Roadmap-Model-09-Qwen](Roadmap-Model-09-Qwen-Integration.md) | Qwen2.5 1.5B multilingual |
-| 100| [Roadmap-Model-10-DeepSeek-Coder](Roadmap-Model-10-DeepSeek-Coder.md) | DeepSeek-Coder 1.3B |
-| 101| [Roadmap-Model-21-Falcon-Lite](Roadmap-Model-21-Falcon-Lite.md) | Falcon Lite 1B Optimizer |
-| 102| [Roadmap-Model-22-Yi-LongContext](Roadmap-Model-22-Yi-LongContext.md) | Yi 6B Long-Context Engine |
-| 103| [Roadmap-Model-23-Mamba-SSM](Roadmap-Model-23-Mamba-SSM.md) | Mamba SSM Execution Runtime |
-| 104| [Roadmap-Model-24-MoE-Routing-Daemon](Roadmap-Model-24-MoE-Routing-Daemon.md) | Mixture-of-Experts routing Daemon |
-| 105| [Roadmap-Model-25-Diffusion-Theme](Roadmap-Model-25-Diffusion-Theme.md) | Diffusion Theme Generator |
-| 106| [Roadmap-Model-26-Graph-Neural-Net-VFS](Roadmap-Model-26-Graph-Neural-Net-VFS.md) | GNN VFS Access Predictor |
-| 107| [Roadmap-Model-27-Audio-Text-Fusion](Roadmap-Model-27-Audio-Text-Fusion.md) | Audio-Text Fusion Model |
-| 108| [Roadmap-Model-28-Video-Summarizer](Roadmap-Model-28-Video-Summarizer.md) | Local Video Summarization Engine |
-| 109| [Roadmap-Model-29-Symbolic-Math](Roadmap-Model-29-Symbolic-Math.md) | Symbolic Math LLM Solver |
-| 110| [Roadmap-Model-30-Genomic-Embeddings](Roadmap-Model-30-Genomic-Embeddings.md) | Genomic Embedding Engine |
-| 111| [Roadmap-Model-31-Mistral-SWA](Roadmap-Model-31-Mistral-SWA.md) | Mistral Sliding Window Attention Optimization |
-| 112| [Roadmap-Model-32-Quantized-Embedding-Models](Roadmap-Model-32-Quantized-Embedding-Models.md) | Binary and Ternary Embedding Models |
-| 113| [Roadmap-Model-33-Graph-Neural-Networks](Roadmap-Model-33-Graph-Neural-Networks.md) | Deep GNNs for Process Analysis |
-| 114| [Roadmap-Model-34-Mamba-SSM-Inference](Roadmap-Model-34-Mamba-SSM-Inference.md) | State-Space Model Hardware Accelerators |
-| 115| [Roadmap-Model-35-MoE-Sparse-Execution](Roadmap-Model-35-MoE-Sparse-Execution.md) | Mixture-of-Experts Sparse Weight Loader |
+| 100 | [Roadmap-Model-10-DeepSeek-Coder](Roadmap-Model-10-DeepSeek-Coder.md) | DeepSeek-Coder 1.3B |
+| 101 | [Roadmap-Model-21-Falcon-Lite](Roadmap-Model-21-Falcon-Lite.md) | Falcon Lite 1B Optimizer |
+| 102 | [Roadmap-Model-22-Yi-LongContext](Roadmap-Model-22-Yi-LongContext.md) | Yi 6B Long-Context Engine |
+| 103 | [Roadmap-Model-23-Mamba-SSM](Roadmap-Model-23-Mamba-SSM.md) | Mamba SSM Execution Runtime |
+| 104 | [Roadmap-Model-24-MoE-Routing-Daemon](Roadmap-Model-24-MoE-Routing-Daemon.md) | Mixture-of-Experts routing Daemon |
+| 105 | [Roadmap-Model-25-Diffusion-Theme](Roadmap-Model-25-Diffusion-Theme.md) | Diffusion Theme Generator |
+| 106 | [Roadmap-Model-26-Graph-Neural-Net-VFS](Roadmap-Model-26-Graph-Neural-Net-VFS.md) | GNN VFS Access Predictor |
+| 107 | [Roadmap-Model-27-Audio-Text-Fusion](Roadmap-Model-27-Audio-Text-Fusion.md) | Audio-Text Fusion Model |
+| 108 | [Roadmap-Model-28-Video-Summarizer](Roadmap-Model-28-Video-Summarizer.md) | Local Video Summarization Engine |
+| 109 | [Roadmap-Model-29-Symbolic-Math](Roadmap-Model-29-Symbolic-Math.md) | Symbolic Math LLM Solver |
+| 110 | [Roadmap-Model-30-Genomic-Embeddings](Roadmap-Model-30-Genomic-Embeddings.md) | Genomic Embedding Engine |
+| 111 | [Roadmap-Model-31-Mistral-SWA](Roadmap-Model-31-Mistral-SWA.md) | Mistral Sliding Window Attention Optimization |
+| 112 | [Roadmap-Model-32-Quantized-Embedding-Models](Roadmap-Model-32-Quantized-Embedding-Models.md) | Binary and Ternary Embedding Models |
+| 113 | [Roadmap-Model-33-Graph-Neural-Networks](Roadmap-Model-33-Graph-Neural-Networks.md) | Deep GNNs for Process Analysis |
+| 114 | [Roadmap-Model-34-Mamba-SSM-Inference](Roadmap-Model-34-Mamba-SSM-Inference.md) | State-Space Model Hardware Accelerators |
+| 115 | [Roadmap-Model-35-MoE-Sparse-Execution](Roadmap-Model-35-MoE-Sparse-Execution.md) | Mixture-of-Experts Sparse Weight Loader |
 
 *(Refer to [All-Roadmaps-Index](All-Roadmaps-Index.md) for full categories 116-247 including OS, Security, Storage, Networking, UI, Compilers, SciComp, India, and Robotics)*

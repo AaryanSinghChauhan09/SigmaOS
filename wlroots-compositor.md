@@ -10,7 +10,7 @@ The wlroots project (MIT, C) was studied for interface design only. No wlroots c
 
 ## Architecture
 
-```
+```text
 Wayland clients (weston-terminal, sigma-edit, etc.)
         │  Wayland socket: /run/user/1000/wayland-0
         ▼
@@ -28,7 +28,7 @@ Wayland clients (weston-terminal, sigma-edit, etc.)
 
 ## File Layout
 
-```
+```text
 desktop/compositor/
 ├── Cargo.toml
 ├── README.md

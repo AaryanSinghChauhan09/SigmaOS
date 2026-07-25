@@ -123,10 +123,12 @@ Implement 802.11ax driver for Intel wireless NICs:
 
 `derive_key()` currently returns 32 zero bytes. All CryptFS-encrypted volumes are trivially decryptable.
 Fix: implement Argon2id key derivation from passphrase + salt:
+
 ```cpp
 sigma_status derive_key(const char* passphrase, const uint8_t* salt,
                          size_t salt_len, uint8_t* key_out, size_t key_len);
 ```
+
 Use `security/SovereignEntropy.cpp` for salt generation.
 Test: encrypted file not readable after password change.
 

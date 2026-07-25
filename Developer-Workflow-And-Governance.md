@@ -11,15 +11,11 @@
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 ./scripts/setup_hooks.sh    # installs hooks, checks toolchain, configures git
-
 ```
 
 This installs three git hooks:
-
 - **commit-msg**: enforces Conventional Commits format
-
 - **pre-commit**: runs rustfmt on staged `.rs` files
-
 - **prepare-commit-msg**: auto-appends `Signed-off-by:`
 
 ---
@@ -95,12 +91,11 @@ and you have the right to submit it.
    cargo clippy -- -D warnings
    cargo test
    ./kabi/check.py check         # verify no ABI breakage
-
    ```
 
-1. Fill in the PR template (`.github/PULL_REQUEST_TEMPLATE.md`) — every section matters.
+2. Fill in the PR template (`.github/PULL_REQUEST_TEMPLATE.md`) — every section matters.
 
-2. Reference the Ideas-999-Structured.md idea number if applicable.
+3. Reference the Ideas-999-Structured.md idea number if applicable.
 
 ### Review requirements
 
@@ -115,13 +110,9 @@ and you have the right to submit it.
 ### AI PR Summarizer
 
 The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a comment with:
-
 - Changed subsystems and file list
-
 - Suggested review checklist
-
 - Auto-detected test gaps
-
 - Affected CODEOWNERS
 
 ---
@@ -147,9 +138,7 @@ The `sigma_dev_workflow.yml` CI job runs automatically on every PR and posts a c
 ### Running CI locally (act)
 
 ```bash
-
 # Install: https://github.com/nektos/act
-
 act pull_request -W .github/workflows/sigma_dev_workflow.yml
 ```
 
@@ -160,17 +149,13 @@ act pull_request -W .github/workflows/sigma_dev_workflow.yml
 SigmaOS maintains a stable ABI for the **Driver DDK** and **C-ABI exports**:
 
 ```bash
-
 # Check for ABI breakage before pushing
-
 python kabi/check.py check
 
 # Generate a new snapshot after an intentional ABI addition
-
 python kabi/check.py snapshot --version v15.1.0
 
 # View the full stable symbol list
-
 python kabi/check.py report
 ```
 
@@ -183,25 +168,16 @@ See [RFC-0002: Kernel Stable ABI Policy](https://github.com/AaryanSinghChauhan09
 Significant changes require an RFC before implementation:
 
 1. Copy `docs/rfcs/RFC-0001-template.md` → `docs/rfcs/RFC-NNNN-<topic>.md`
-
 2. Open a GitHub Issue titled `RFC: <topic>` with label `rfc`
-
 3. Discussion period: minimum 7 days
-
 4. Maintainer signs off → RFC status becomes **Accepted**
-
 5. Implementation PR links back to the RFC
 
-### RFCs are required for:
-
+**RFCs are required for:**
 - New syscalls
-
 - ABI-breaking changes
-
 - New kernel subsystems
-
 - Changes to `sigma_pledge` promise bits
-
 - Changes to the sigpkg format
 
 ---
@@ -226,21 +202,16 @@ file for the complete subsystem → maintainer mapping (Linux kernel style).
 ## Performance & Tracing
 
 ```bash
-
 # Run the microbenchmark suite
-
 sigma-perf bench --save
 
 # Live kernel trace (requires kernel trace socket)
-
 sigma-trace live
 
 # Generate a flamegraph
-
 sigma-trace flamegraph | inferno-flamegraph > sigma-flame.svg
 
 # Hardware counter summary
-
 sigma-perf stat
 ```
 
@@ -255,9 +226,7 @@ Every build on `main` generates a [CycloneDX](https://cyclonedx.org/) SBOM artif
 downloadable from the GitHub Actions run. This lets you verify every dependency.
 
 ```bash
-
 # Generate SBOM locally
-
 cargo install cargo-cyclonedx
 cargo cyclonedx --format json --output-file sbom/sigmaos.cdx.json
 ```

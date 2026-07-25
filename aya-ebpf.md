@@ -9,7 +9,7 @@ SigmaOS uses [aya](https://github.com/aya-rs/aya) (Apache-2.0 / MIT) for safe, p
 ## Use Cases
 
 | Tool | eBPF Use |
-|---|---|
+| --- | --- |
 | `sigma-trace` | Syscall tracing: audit per-process syscall usage |
 | `sigma-net-monitor` | Network monitoring: per-flow byte counters |
 | `sigma-ids` | Intrusion detection: block known-malicious packet patterns via XDP |
@@ -19,7 +19,7 @@ SigmaOS uses [aya](https://github.com/aya-rs/aya) (Apache-2.0 / MIT) for safe, p
 
 ## File Layout
 
-```
+```text
 tools/tracing/
 ├── Cargo.toml
 ├── README.md

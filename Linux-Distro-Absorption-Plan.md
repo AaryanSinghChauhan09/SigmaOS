@@ -71,7 +71,7 @@ See [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.
 ### Performance-Focused Distros
 
 | Distro | Key Features to Research | Priority |
-|--------|-------------------------|----------|
+| -------- | ------------------------- | ---------- |
 | Alpine Linux | musl libc, apk package manager, minimal footprint, security hardening | HIGH |
 | Gentoo | Portage package manager, compile-time optimization, USE flags | MEDIUM |
 | Void Linux | runit init system, XBPS package manager, rolling release | MEDIUM |
@@ -81,7 +81,7 @@ See [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.
 ### User Experience-Focused Distros
 
 | Distro | Key Features to Research | Priority |
-|--------|-------------------------|----------|
+| -------- | ------------------------- | ---------- |
 | Pop!_OS | COSMIC desktop, Pop Shop, tiling window manager, recovery partition | HIGH |
 | elementary OS | Pantheon desktop, AppCenter, curated applications | MEDIUM |
 | Linux Mint | Update Manager, Mint Tools, Cinnamon desktop, multimedia codecs | HIGH |
@@ -91,7 +91,7 @@ See [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.
 ### Stability-Focused Distros
 
 | Distro | Key Features to Research | Priority |
-|--------|-------------------------|----------|
+| -------- | ------------------------- | ---------- |
 | Debian | Debconf, APT, stable release cycle, backports | HIGH |
 | RHEL/CentOS | SELinux, yum/dnf, subscription management, long support | HIGH |
 | openSUSE | YaST, snapper, OBS, zypper, Btrfs filesystem | HIGH |
@@ -100,7 +100,7 @@ See [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.
 ### Specialized Distros
 
 | Distro | Key Features to Research | Priority |
-|--------|-------------------------|----------|
+| -------- | ------------------------- | ---------- |
 | Solus | Budgie desktop, eopkg package manager, curated rolling | MEDIUM |
 | Manjaro | Pamac, AUR integration, kernel selection, office suite | HIGH |
 | MX Linux | MX Tools, snapshot system, live USB persistence | MEDIUM |
@@ -258,7 +258,7 @@ See [Ethical Feature Absorption Framework](Ethical-Feature-Absorption-Framework.
 ## 📊 Feature Absorption Matrix
 
 | Feature | Source Distro | Category | Priority | Complexity | India Context |
-|---------|---------------|----------|----------|------------|---------------|
+| --------- | --------------- | ---------- | ---------- | ------------ | --------------- |
 | musl libc integration | Alpine | Core | HIGH | HIGH | Low-end hardware optimization |
 | Declarative config | NixOS | Core | HIGH | HIGH | Government deployments |
 | Snapshot system | openSUSE | Core | HIGH | MEDIUM | System rollback |

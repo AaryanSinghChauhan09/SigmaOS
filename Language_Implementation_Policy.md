@@ -8,7 +8,7 @@
 ## Language Assignment by Domain
 
 | Domain | Language | Rationale |
-|--------|----------|-----------|
+| -------- | ---------- | ----------- |
 | Kernel core (scheduler, MM, IPC, syscall) | **Rust** (`#![no_std]`) | Memory safety, zero-cost abstractions, `no_std` |
 | HAL / boot / ISR stubs | **Zig** | Comptime, direct hardware access, no hidden allocations |
 | Formal-critical security (MACs, crypto proofs) | **SPARK/Ada** | Formal verification via `gnatprove`, proof-carrying code |
@@ -42,7 +42,7 @@
 ## Migration Status (C/C++ → Modern Languages)
 
 | File/Subsystem | Old Language | New Language | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `kernel/core/sigma_sched.cpp` | C++ | Rust | ⬜ Planned |
 | `kernel/core/sigma_mm.cpp` | C++ | Rust | ⬜ Planned |
 | `kernel/core/sigma_irq.cpp` | C++ | Zig | ⬜ Planned |

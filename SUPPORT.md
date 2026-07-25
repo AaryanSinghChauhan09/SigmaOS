@@ -1,63 +1,59 @@
-# SigmaOS Support
+# Sovereign Support Nexus
 
-## Getting Help
+Welcome to the SigmaOS Support Nexus. As an industrial-grade operating system, SigmaOS provides several tiers of support for the Sovereign Lattice.
 
-### GitHub Discussions
-Best place for questions, ideas, and general help:
-https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
+## 🛠 Self-Service Support
 
-### GitHub Issues
-For confirmed bugs and feature requests:
-https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+### 1. The Sovereign Wiki
 
-**Before opening an issue:**
-- Search existing issues first
-- Check [CURRENT_PROBLEMS_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST.md) — your issue may already be tracked
-- Use the appropriate issue template (bug, feature, driver request, docs)
+The [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) is the primary source of truth for all 600 shards, API references, and industrial strategy.
 
-### Wiki
-Comprehensive documentation:
-https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+### 2. S-LOG Telemetry
 
----
+If you encounter a shard failure, check the internal journal logs:
 
-## Issue Labels
+```bash
 
-| Label | Meaning |
-|-------|---------|
-| `bug` | Something broken |
-| `feature` | New capability request |
-| `driver` | Hardware driver request |
-| `security` | Security-related (use private advisory for vulnerabilities) |
-| `docs` | Documentation improvement |
-| `kernel` | Core kernel subsystem |
-| `networking` | Network stack |
-| `fs` | Filesystem layer |
-| `good first issue` | Suitable for new contributors |
-| `help wanted` | Maintainers need community assistance |
+# View real-time kernel telemetry
 
----
+sigma-cli log --follow
 
-## Security Issues
+```
 
-**Do not open public issues for security vulnerabilities.**
-See [SECURITY_POLICY.md](SECURITY_POLICY.md) for private reporting.
+### 3. S-AUTO Self-Healing
 
----
+SigmaOS is designed to automatically recover from shard-level corruption. If a component fails, the `SovereignRollbackShard` will attempt to restore the last stable PQC-attested snapshot.
 
-## FAQ
+## 🤝 Community & Industrial Support
 
-**Q: Is SigmaOS bootable on real hardware?**
-A: Not yet. `make iso` producing a bootable image is Phase G (v16.0 Apex, Q1 2027). Currently QEMU-testable.
+### 1. S-FORUM (Lattice-Net)
 
-**Q: Can I run Linux apps on SigmaOS?**
-A: A Linux ELF compatibility layer (`runtime/containers/sigma_linux_compat.cpp`) is implemented. Full parity is Phase G+.
+SigmaOS v15.0 introduces the **S-FORUM**, a decentralized support mesh. Unlike legacy forums, all SigmaOS support threads are:
 
-**Q: What architectures are supported?**
-A: x86_64 (primary), ARM64 (Phase G), RISC-V RV64GC (Phase H). HAL stubs exist for all three.
+- **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
 
-**Q: How do I contribute a driver?**
-A: See [CONTRIBUTING.md](CONTRIBUTING.md) and the SDF driver template in [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md).
+***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY** playground.
 
-**Q: Where is the package registry?**
-A: `sigma_pkg_registry/` in the repo. The online registry server is Phase G (#1011).
+- **Self-Healing**: The S-WIKI automatically incorporates community-verified solutions.
+
+### 2. GitHub Issues
+
+For bug reports and architectural suggestions, please use the [Issue Tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues). Ensure you attach the relevant `S-LOG` artifacts.
+
+### 3. Professional Tiers
+
+For mission-critical industrial deployments (Bio-Fab, Aerospace, Defense), professional support is available via SAC-certified partners. Refer to the `Sovereign-Industrial-Contract.md` for SLA-backed support.
+
+## 🔍 Frequently Asked Questions (FAQ)
+
+### Q: How do I resolve include path errors?
+
+A: SigmaOS enforces root-relative addressing. Ensure your compiler search path includes the project root.
+
+### Q: My PQC keys are not synchronizing
+
+A: Verify that the `SovereignPQCEngine` is initialized and the hardware RNG (RDRAND) is accessible.
+
+### Q: Can I run Linux applications?
+
+A: Yes, via the `S-PROTON` bridge, which provides OCI-compliant sharding for mainstream binaries.

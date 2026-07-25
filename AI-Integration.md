@@ -44,7 +44,7 @@ impl SigmaAI {
 ### Model Specifications
 
 | Component | Model | Size | Purpose |
-|-----------|-------|------|---------|
+| ----------- | ------- | ------ | --------- |
 | System Optimizer | Llama-2-7B-Quantized | ~4GB | System optimization recommendations |
 | Workload Predictor | Custom Transformer | ~500MB | Resource prediction |
 | Anomaly Detector | Isolation Forest | ~100MB | Security/performance anomalies |

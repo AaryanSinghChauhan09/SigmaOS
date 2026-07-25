@@ -597,7 +597,7 @@ This roadmap focuses on absorbing embedded-oriented open-source projects to crea
 ### Embedded Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Boot to app | 2s | 1.5s | 1s | 500ms | <500ms |
 | RAM usage | 64MB | 48MB | 32MB | 32MB | <32MB |
 | Storage | 128MB | 96MB | 64MB | 64MB | <64MB |
@@ -608,7 +608,7 @@ This roadmap focuses on absorbing embedded-oriented open-source projects to crea
 ### Real-Time Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Worst-case interrupt | 10ms | 5ms | 3ms | 1ms | <1ms |
 | Scheduling jitter | 5ms | 3ms | 2ms | 1ms | <1ms |
 | Task switch time | 100µs | 50µs | 25µs | 10µs | <10µs |

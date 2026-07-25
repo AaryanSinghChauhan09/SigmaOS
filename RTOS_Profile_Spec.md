@@ -24,7 +24,7 @@ Each real-time task is defined by:
 
 For `n` tasks, the system is schedulable under EDF if:
 
-```
+```text
 Σ (C_i / T_i) ≤ 1.0
 ```
 
@@ -128,7 +128,7 @@ All real-time task stacks, message queues, and buffers are allocated at init tim
 
 ## Boot Sequence (RTOS Profile)
 
-```
+```text
 sigma-boot-rtos.efi
   │  Skip PCI enumeration (not needed for most RTOS targets)
   │  Load kernel ELF to fixed physical address (no KASLR in RTOS profile)
@@ -153,7 +153,7 @@ EDF scheduler runs
 Target compliance:
 
 | POSIX.1b Feature | Status |
-|---|---|
+| --- | --- |
 | `SCHED_FIFO` / `SCHED_RR` | ✅ Mapped to EDF task with WCET == period |
 | `clock_gettime(CLOCK_REALTIME)` | ✅ |
 | `clock_nanosleep` | ✅ |

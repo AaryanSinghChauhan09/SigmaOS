@@ -22,7 +22,7 @@ SigmaOS adopts **content-addressed, reproducible builds** inspired by Nix (LGPL)
 
 ## sigma-pkg build: Hash Path Layout
 
-```
+```text
 /sigma/store/
   sha256:abc123def456-sigma-edit-1.2.0/
     bin/sigma-edit
@@ -90,7 +90,7 @@ When `sigma-pkg install <pkg>` is invoked:
 
 4. If not found: build locally, upload to cache
 
-```
+```text
 narinfo format:
   StorePath: /sigma/store/sha256:abc123-sigma-edit-1.2.0
   URL: nar/sha256:abc123.nar.zst

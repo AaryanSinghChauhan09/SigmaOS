@@ -271,6 +271,7 @@ For each inspired feature, maintain:
 - [Any additional attribution requirements]
 
 - [License compliance notes]
+
 ```
 
 ### Example: sigma-snapshot
@@ -326,6 +327,7 @@ For each inspired feature, maintain:
 - No code copied from Snapper project
 
 - GPL-2.0 license reviewed for compatibility
+
 ```
 
 ---

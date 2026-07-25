@@ -10,6 +10,7 @@
 - Add Secure Boot signing (PQC/Dilithium-5 certificates)
 
 - Ship with multi-arch loaders: x86_64, ARM64, RISC-V
+
 **Reference**: Rust-for-Linux, AsahiLinux
 **Priority**: ⚠️ BLOCKING
 
@@ -25,6 +26,7 @@
 - RT queue for hard real-time
 
 - Tickless/adaptive HZ
+
 **Benchmark Target**: Match Linux CFS throughput, lower latency variance
 
 ## 3. Physical + Virtual Memory Manager with Formal Verification

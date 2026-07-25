@@ -28,7 +28,7 @@ The goal is **zero-friction migration** for Linux workloads while keeping the Si
 
 ## Three-Layer Architecture
 
-```
+```text
 Layer 3: AI Porter      — study Linux driver structure, generate SDF native
 Layer 2: Distro Shim    — export Linux kernel symbols, redirect to SigmaOS HAL
 Layer 1: MicroVM/OCI    — run unmodified Linux containers in isolated VM
@@ -84,7 +84,7 @@ ELF loader + syscall translation table. Linux binary loads and runs on SigmaOS k
 Ordered by frequency across top-100 server workloads (profiler data):
 
 | Priority | Syscall | Status | Complexity |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | `read` / `write` | ⬜ stub | Low |
 | 2 | `open` / `close` | ⬜ stub | Low |
 | 3 | `mmap` / `munmap` | ✅ partial | Medium |
@@ -152,7 +152,8 @@ The vDSO exposes:
 Many Linux programs read `/proc/self/maps`, `/proc/cpuinfo`, `/sys/class/net/`, etc.
 
 Minimum viable shim:
-```
+
+```text
 /proc/self/maps     → VMA list from current process VmSpace
 /proc/cpuinfo       → static content describing the CPU
 /proc/meminfo       → sigma_mm_free_pages() converted to Linux format
@@ -165,7 +166,8 @@ Minimum viable shim:
 ## Security Constraints
 
 Linux-compat processes run under:
-```
+
+```text
 sigma_pledge("stdio rpath wpath exec proc inet")
 ```
 

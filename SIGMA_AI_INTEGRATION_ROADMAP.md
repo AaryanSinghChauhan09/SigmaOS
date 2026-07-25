@@ -96,7 +96,7 @@ SigmaOS will be the first operating system designed from the ground up with AI a
 
 ### Examples:
 
-```
+```text
 User: "Why is my laptop hot?"
 AI: Analyzes thermal data, identifies thermal throttling, suggests solutions
 
@@ -147,7 +147,7 @@ AI: Searches filesystem, finds deleted file, restores from backup if available
 
 ### Examples:
 
-```
+```text
 User: "How do I find large files?"
 AI: Suggests: find / -type f -size +100M 2>/dev/null
 
@@ -178,7 +178,7 @@ AI: Explains error and suggests solutions
 
 ### Examples:
 
-```
+```text
 User: "Find my vacation photos from last year"
 AI: Searches images by date, location, and content
 
@@ -209,7 +209,7 @@ AI: Searches documents by semantic content
 
 ### Examples:
 
-```
+```text
 User: "My internet is slow"
 AI: Analyzes network, identifies bottleneck, suggests solutions
 
@@ -242,7 +242,7 @@ AI: Analyzes performance, identifies bottlenecks, optimizes
 
 ### Examples:
 
-```
+```text
 User: "Optimize this function"
 AI: Analyzes code, suggests optimizations, applies changes
 
@@ -273,7 +273,7 @@ AI: Analyzes code, generates unit tests, integration tests
 
 ### Examples:
 
-```
+```text
 User: "Create Python project"
 AI: Creates project structure, initializes Git, creates venv, installs deps, opens IDE
 
@@ -793,7 +793,7 @@ AI: Creates monitoring script, sets up alerts, tests monitoring
 
 ### Code Assistance:
 
-```
+```text
 User: "Optimize this function"
 AI: Analyzes code, suggests optimizations, applies changes
 
@@ -806,7 +806,7 @@ AI: Analyzes code, generates unit tests, integration tests
 
 ### Environment Setup:
 
-```
+```text
 User: "Setup Python development environment"
 AI: Installs Python, pip, venv, IDE, configures environment
 
@@ -818,7 +818,7 @@ AI: Installs Docker, kubectl, configures cluster, provides dashboard
 
 ### Troubleshooting:
 
-```
+```text
 User: "Why is my system slow?"
 AI: Analyzes performance, identifies bottlenecks, suggests fixes
 
@@ -828,7 +828,7 @@ AI: Diagnoses network problem, applies fix, verifies resolution
 
 ### Automation:
 
-```
+```text
 User: "Backup system every day at 3am"
 AI: Creates backup script, sets up cron job, tests backup
 
@@ -840,7 +840,7 @@ AI: Creates monitoring script, sets up alerts, tests monitoring
 
 ### Content Creation:
 
-```
+```text
 User: "Generate image of sunset"
 AI: Generates image using AI image generation
 
@@ -850,7 +850,7 @@ AI: Applies AI video enhancement, improves quality
 
 ### Productivity:
 
-```
+```text
 User: "Summarize this document"
 AI: Analyzes document, generates summary
 

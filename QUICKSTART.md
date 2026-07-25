@@ -62,7 +62,7 @@ telemetry HUD — all running as a web app.
 
 All 50+ distribution formats are documented at:
 
-```
+```text
 download.html   ← open this in your browser
 ```
 
@@ -99,7 +99,7 @@ make PROFILE=browser       all -j$(nproc)   # WASM bundle
 The highest-impact tasks right now are:
 
 | Task | Skill | File |
-|------|-------|------|
+| ------ | ------- | ------ |
 | Round-robin scheduler | C++ / Rust (no_std) | `kernel/core/sigma_sched.cpp` |
 | Buddy allocator | C++ / Rust (no_std) | `kernel/core/sigma_mm.cpp` |
 | sigma-sh REPL | Rust | `userland/shell/sigma_shell.cpp` |
@@ -116,7 +116,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for technical mandates (Rust, no_std, no
 ## Key Docs
 
 | Document | What it covers |
-|----------|---------------|
+| ---------- | --------------- |
 | [README.md](README.md) | Project overview + download links |
 | [ROADMAP.md](ROADMAP.md) | Phase 1→4 execution plan |
 | [DOWNLOAD.md](DOWNLOAD.md) | All 50+ format tables + build flags |

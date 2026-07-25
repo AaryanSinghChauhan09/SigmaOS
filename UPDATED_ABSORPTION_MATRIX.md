@@ -9,7 +9,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Boot/Firmware (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | rcore/os | 4 | 5 | 4 | 13 | 2 | **Integrate directly** |
 | xous-core | 5 | 4 | 3 | 12 | 3 | **Integrate directly** |
 | osv/osv | 5 | 4 | 4 | 13 | 2 | **Integrate directly** |
@@ -19,7 +19,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Kernel/Microkernel (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | rust-osdev/x86_64 | 4 | 5 | 4 | 13 | 1 | **Integrate directly** |
 | Redox OS crates | 5 | 5 | 4 | 14 | 2 | **Integrate directly** |
 | unikraft/unikraft | 5 | 4 | 4 | 13 | 3 | **Integrate directly** |
@@ -29,7 +29,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Desktop UI (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | smithay/smithay | 5 | 5 | 5 | 15 | 3 | **Integrate directly** |
 | alacritty/alacritty | 3 | 5 | 4 | 12 | 2 | **Integrate directly** |
 | waybar/waybar | 5 | 4 | 4 | 13 | 2 | **Integrate directly** |
@@ -39,7 +39,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Security/Crypto (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | tpm2-software/tpm2-tools | 5 | 4 | 5 | 14 | 2 | **Integrate directly** |
 | theupdateframework/tuf | 5 | 4 | 5 | 14 | 2 | **Integrate directly** |
 | age-encryption/age | 5 | 5 | 4 | 14 | 1 | **Integrate directly** |
@@ -49,7 +49,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Observability (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | grafana/agent | 3 | 5 | 4 | 12 | 1 | **Integrate directly** |
 | prometheus/prometheus | 3 | 5 | 4 | 12 | 1 | **Integrate directly** |
 | open-telemetry/spec | 3 | 4 | 4 | 11 | 2 | **Use as reference** |
@@ -60,7 +60,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Networking (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | rust-lang/async-io | 4 | 5 | 4 | 13 | 1 | **Integrate directly** |
 | libpnet/libpnet | 4 | 4 | 4 | 12 | 2 | **Integrate directly** |
 | Cloudflare/quiche | 5 | 4 | 4 | 13 | 2 | **Integrate directly** |
@@ -70,7 +70,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Storage (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | fusepy/libfuse | 5 | 4 | 3 | 12 | 2 | **Integrate directly** |
 | filippo/iofs | 5 | 4 | 3 | 12 | 1 | **Integrate directly** |
 | borgbackup/borg | 5 | 4 | 3 | 12 | 3 | **Integrate directly** |
@@ -80,7 +80,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Web UI (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | vitejs/vite | 5 | 4 | 3 | 12 | 1 | **Use as reference** |
 | caddyserver/caddy | 3 | 5 | 4 | 12 | 1 | **Integrate directly** |
 | playwright/playwright | 3 | 4 | 3 | 10 | 2 | **Integrate directly** |
@@ -90,7 +90,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Drivers (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | intel/tiano | 5 | 3 | 3 | 11 | 3 | **Integrate directly** |
 | stmicroelectronics/stm32cube | 5 | 3 | 3 | 11 | 3 | **Integrate directly** |
 | libusb/libusb | 2 | 4 | 4 | 10 | 2 | **Integrate directly** |
@@ -100,7 +100,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### Package Management (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | coreos/rkt | 3 | 4 | 4 | 11 | 3 | **Integrate directly** |
 | conda/conda | 5 | 3 | 3 | 11 | 3 | **Use as reference** |
 | scoopinstaller/scoop | 5 | 3 | 3 | 11 | 2 | **Use as reference** |
@@ -112,7 +112,7 @@ This matrix combines the original 112 projects with the 120 additional projects,
 ### GPL Projects (New Additions)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | u-root/u-root | 5 | 2 | 2 | 9 | 4 | **Use as reference** |
 | systemd/systemd-boot | 2 | 2 | 2 | 6 | 4 | **Use as reference** |
 | pflash/flashrom | 1 | 2 | 2 | 5 | 6 | **Use as reference** |

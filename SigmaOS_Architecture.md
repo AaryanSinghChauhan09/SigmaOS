@@ -27,5 +27,4 @@ The `sigma_sh` provides an industrial interface to the lattice, including:
 - **PQC-Attested Pkgs**: Secure software distribution via S-PKG.
 
 ---
-
-### Sovereignty achieved through mathematical finality.
+*Sovereignty achieved through mathematical finality.*

@@ -20,7 +20,7 @@ Key properties:
 
 ## Shard Lifecycle
 
-```
+```text
 sigma-init
   │  spawn + register
   ▼
@@ -47,7 +47,7 @@ DEAD      →  kernel reclaims address space, revokes CapToken
 
 ### Directory Structure
 
-```
+```text
 shards/hello-shard/
 ├── Cargo.toml
 └── src/

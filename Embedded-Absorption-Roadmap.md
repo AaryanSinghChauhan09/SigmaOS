@@ -71,7 +71,7 @@ This roadmap focuses on absorbing embedded-oriented open-source projects to crea
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Boot to app | 2s | 1.5s | 1s | 500ms | <500ms |
 | RAM usage | 64MB | 48MB | 32MB | 32MB | <32MB |
 | Storage | 128MB | 96MB | 64MB | 64MB | <64MB |

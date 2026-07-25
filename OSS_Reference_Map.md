@@ -12,7 +12,7 @@
 ## Kernel & Core
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | Capability ring security | **seL4** (GPLv2 + proofs) | Capability-based access control model, formal verification approach, IPC fastpath design |
 | Capability rings | **Fuchsia/Zircon** (BSD/MIT) | Handle table design, capability token passing, process birth/death semantics |
 | Syscall gate | **OpenBSD pledge/unveil** (ISC) | Minimal allowlist philosophy, irreversible restriction semantics |
@@ -29,7 +29,7 @@
 ## Package Manager & Build
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | Content-addressed store | **Nix** (LGPL) | `/nix/store/<hash>-name-version` path layout, closure computation |
 | Reproducible builds | **Guix** (GPLv3) | Bootstrap chain, grafts for security updates without rebuild |
 | Binary cache | **Nix binary cache** | Substituter protocol, narinfo format, signing |
@@ -46,7 +46,7 @@
 ## Graphics & Display
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | Compositor protocol | **wlroots** (MIT) | Scene-graph API, output layout, input routing — mirror the abstraction, not the code |
 | Compositor | **Smithay** (MIT, Rust!) | Direct port candidate — Rust Wayland compositor framework |
 | KMS/DRM | **Linux DRM atomic** (GPLv2) | Atomic modesetting state machine, CRTC/plane/connector objects |
@@ -61,7 +61,7 @@
 ## Networking
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | TCP/IP stack | **lwIP** (BSD) | Zero-copy pbuf chain, netif abstraction — good for embedded profile |
 | TCP/IP stack | **smoltcp** (MIT, Rust!) | Direct inspiration candidate — pure Rust, `no_std` TCP/IP |
 | DNS/DoH | **Unbound** (BSD) | DNSSEC validation chain, DoH/DoT client model |
@@ -76,7 +76,7 @@
 ## Filesystem
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | CoW filesystem | **btrfs** (GPLv2) | B-tree on-disk format concept, snapshot/subvolume model |
 | CoW filesystem | **ZFS / OpenZFS** (CDDL/CDDL) | Dataset model, send/receive incremental snapshots |
 | Atomic updates | **OSTree** (LGPLv2) | Composing OS images as immutable git-like objects |
@@ -90,7 +90,7 @@
 ## Security
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | PQC cryptography | **liboqs** (MIT) | Reference vectors + test suites for Kyber-1024 / Dilithium-5 — use for correctness auditing only |
 | Secure boot | **systemd-boot** (LGPLv2) | EFI stub loader design, UEFI secure boot chain |
 | SELinux-style MAC | **SELinux** (GPLv2) | AVC object class / permission model — cleanroom policy engine |
@@ -106,7 +106,7 @@
 ## Linux ELF Compatibility Layer
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | Syscall translation | **FreeBSD Linuxulator** (BSD) | Syscall number remapping table design, `linux_syscall_set` |
 | Syscall translation | **Darling** (GPL — study only) | macOS ↔ Linux syscall translation patterns |
 | ELF loader | **musl libc** (MIT) | ELF dynamic linker internals, TLS model, `dl_iterate_phdr` |
@@ -117,7 +117,7 @@
 ## AI / ML
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | On-device inference | **llama.cpp** (MIT) | GGUF quantised model format, GGML tensor operations |
 | On-device inference | **ONNX Runtime** (MIT) | Execution provider abstraction (CPU/GPU/NPU) |
 | NPU HAL | **Linux accel subsystem** (GPLv2) | `DRM_ACCEL_*` IOCTL interface — mirror for sigma NPU class |
@@ -130,7 +130,7 @@
 ## Containers & Cloud
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | MicroVM | **Firecracker** (Apache 2) | Jailer + VMM architecture, REST API, minimal device model |
 | Syscall sandbox | **gVisor** (Apache 2) | Sentry (Go kernel), Gofer (filesystem proxy), syscall interception |
 | Container runtime | **kata-containers** (Apache 2) | Hypervisor-based container model, agent protocol |
@@ -143,7 +143,7 @@
 ## Installer & Recovery
 
 | SigmaOS Subsystem | OSS Reference | What to Study |
-|---|---|---|
+| --- | --- | --- |
 | Text/GUI installer | **Alpine setup-alpine** (MIT) | Minimal question-answer installer pattern |
 | Declarative install | **NixOS installer** (MIT) | Configuration.nix → system activation |
 | Partitioning | **libparted** (GPLv3 — study only) | Partition table models (GPT, MBR), geometry abstraction |

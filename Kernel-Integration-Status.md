@@ -9,7 +9,7 @@ This page tracks the integration status of Phase G kernel components into the ma
 ### ✅ Completed Integration
 
 | Component | Status | Module File | Description |
-|-----------|--------|-------------|-------------|
+| ----------- | -------- | ------------- | ------------- |
 | Round-Robin Scheduler | ✅ Integrated | `kernel/scheduler.rs` | Scheduler module exports and integration |
 | Buddy Allocator | ✅ Integrated | `kernel/mm.rs` | Memory management module exports |
 | Slab Allocator | ✅ Integrated | `kernel/mm.rs` | Memory management module exports |
@@ -52,6 +52,7 @@ This page tracks the integration status of Phase G kernel components into the ma
 9. Initialize framebuffer driver
 
 **Boot Info Structure**:
+
 ```rust
 pub struct BootInfo {
     pub magic: u64,
@@ -130,6 +131,7 @@ pub struct BootInfo {
 - Configurable minimum log level
 
 **API**:
+
 ```rust
 log::init()
 log::set_min_level(LogLevel::Info)
@@ -139,6 +141,7 @@ log::error("module", "message")
 ```
 
 **Macros**:
+
 ```rust
 kinfo!("message {}", arg)
 kdebug!("message {}", arg)
@@ -161,11 +164,13 @@ kerror!("message {}", arg)
 - System halt on panic
 
 **API**:
+
 ```rust
 panic::panic_handler(info: &PanicInfo)
 ```
 
 **Macros**:
+
 ```rust
 kassert!(condition)
 kassert!(condition, "message")
@@ -177,7 +182,7 @@ kunreachable!("message")
 
 The kernel displays the following initialization sequence:
 
-```
+```text
 SigmaOS v15.0.0 Zenith - Phase G Kernel
 ========================================
 Initializing kernel subsystems...

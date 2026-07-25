@@ -7,7 +7,7 @@
 ## Current CI Coverage (v15.0)
 
 | Test Type | Target | Tool | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Kernel build (x86_64) | `x86_64-unknown-none` | `make all` | ✅ |
 | Kernel build (arm64) | `aarch64-unknown-none` | `make ARCH=arm64 all` | 🔄 |
 | Kernel build (riscv64) | `riscv64gc-unknown-none-elf` | `make ARCH=riscv64 all` | ⬜ |
@@ -34,25 +34,32 @@ Each test must pass before the v0.1 ISO tag is created:
 strategy:
   matrix:
     include:
+
       - arch: x86_64
+
         machine: q35
         cpu: host        # KVM on Linux runners
 
         memory: 256M
         boot: uefi
+
       - arch: x86_64
+
         machine: q35
         cpu: qemu64      # no KVM (GitHub Actions)
 
         memory: 256M
         boot: uefi
+
       - arch: aarch64
+
         machine: virt
         cpu: cortex-a57
         memory: 256M
         boot: uefi       # EDK2 UEFI for ARM
 
       - arch: riscv64
+
         machine: virt
         cpu: rv64         # RISC-V CLINT + PLIC
 
@@ -82,7 +89,7 @@ Each QEMU test:
 Once the kernel is bootable, add physical hardware runners:
 
 | Hardware | Form Factor | CPU | RAM | Storage | Priority |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Generic x86_64 laptop | Laptop | Intel Core i5-8th gen | 8 GB | NVMe 256 GB | 🔴 High |
 | Raspberry Pi 4 (4 GB) | SBC | BCM2711 ARM64 | 4 GB | SD Card | 🔴 High |
 | Raspberry Pi 5 (8 GB) | SBC | BCM2712 ARM64 | 8 GB | SD Card | 🟠 Medium |
@@ -111,7 +118,7 @@ Once the kernel is bootable, add physical hardware runners:
 When a driver lands, add a QEMU smoke test:
 
 | Driver | QEMU Device Flag | Smoke Test |
-|---|---|---|
+| --- | --- | --- |
 | e1000 NIC | `-net nic,model=e1000 -net user` | `ping 10.0.2.2` |
 | VirtIO-net | `-net nic,model=virtio -net user` | `ping 10.0.2.2` |
 | NVMe | `-drive file=test.img,if=none,id=nvm -device nvme,drive=nvm` | `sigma-disks list` shows device |
@@ -127,7 +134,7 @@ When a driver lands, add a QEMU smoke test:
 Run on every `main` push, track regressions:
 
 | Benchmark | Tool | Target | Regression Threshold |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Context switch latency | `sigma-perf context-switch` | <50 ns | +20% = fail |
 | Kyber-1024 throughput (AVX-512) | `sigma-perf kyber` | ≥5.8M ops/s | -15% = fail |
 | Kernel build time | `make all` elapsed | <120s | +30% = fail |

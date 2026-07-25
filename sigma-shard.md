@@ -26,7 +26,7 @@ SigmaOS organises its codebase into 600+ independently-loadable shards. Each sha
 
 ## Shard Lifecycle
 
-```
+```text
 UNREGISTERED
      │ sigma-bus discovers .sigpkg or compiled-in shard
      ▼
@@ -149,7 +149,7 @@ sigma-bus verifies that the requesting process holds the declared tokens (via si
 
 ## Crash Recovery
 
-```
+```text
 shard crashes (SIGSEGV / SIGABRT / exit non-zero)
    → supervisor receives SIGCHLD / process exit event
    → wait(2) to collect exit status
@@ -184,7 +184,7 @@ capabilities_required = ["net_socket"]
 
 ## sigpkg Packaging for Shards
 
-```
+```text
 S034-AI-1.0.0-x86_64.sigpkg
 ├── META/manifest.toml
 │     type = "shard"
@@ -226,7 +226,7 @@ S034-AI-1.0.0-x86_64.sigpkg
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | Shard lifecycle | ⬜ Not started |
 | sigma-bus IPC | ⬜ Not started |
 | Capability tokens | ⬜ Not started |

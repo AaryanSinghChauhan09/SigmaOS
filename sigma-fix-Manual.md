@@ -47,11 +47,8 @@ Apply a suggested fix:
 
 ```bash
 sigma-fix apply --id FIX-0001              # interactive confirmation
-
 sigma-fix apply --id FIX-0001 --auto       # apply without prompt
-
 sigma-fix apply --id FIX-0003 --dry-run    # show what would change
-
 ```
 
 `--dry-run` shows the target file and change without modifying anything.
@@ -70,11 +67,8 @@ Detailed root-cause analysis for an issue and the rationale behind the fix:
 
 ```bash
 sigma-fix explain --id FIX-0001   # SSH root login
-
 sigma-fix explain --id FIX-0003   # PQC key generation
-
 sigma-fix explain --id FIX-0007   # kptr_restrict
-
 ```
 
 ### `list`
@@ -113,18 +107,14 @@ sigma-fix list --json
 ## CI INTEGRATION
 
 ```bash
-
 # Fail CI if any CRITICAL issues are unfixed
-
 sigma-fix scan --json | jq -e '.scan.fixes[] | select(.severity=="CRITICAL")' && exit 1
 
 # Auto-apply all LOW severity fixes
-
 sigma-fix scan --json | jq -r '.scan.fixes[] | select(.severity=="LOW") | .id' | \
   xargs -I{} sigma-fix apply --id {} --auto
 
 # Full auto-repair in CI
-
 sigma-fix scan --json | \
   jq -r '.scan.fixes[].id' | \
   xargs -I{} sigma-fix apply --id {} --auto
@@ -133,28 +123,22 @@ sigma-fix scan --json | \
 ## EXAMPLES
 
 ```bash
-
 # Find and review issues
-
 sigma-fix scan
 sigma-fix list
 
 # Review before applying
-
 sigma-fix suggest --id FIX-0001
 sigma-fix explain --id FIX-0001
 
 # Preview without writing
-
 sigma-fix apply --id FIX-0001 --dry-run
 
 # Apply and verify
-
 sigma-fix apply --id FIX-0001 --auto
 sigma-fix list   # FIX-0001 should now show APPLIED
 
 # Undo if needed
-
 sigma-fix rollback --id FIX-0001
 ```
 

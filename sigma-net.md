@@ -26,7 +26,7 @@ sigma-net is the networking stack for SigmaOS, inspired by smoltcp's embedded-fi
 
 ## Architecture
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │  Socket API (POSIX: socket/bind/connect/send/recv) │
 ├────────────────────────────────────────────────────┤
@@ -158,7 +158,8 @@ States: `INIT → SELECTING → REQUESTING → BOUND → RENEWING → REBINDING 
 Three hook points (inspired by netfilter): `PREROUTING`, `FORWARD`, `POSTROUTING`
 
 Each hook processes a chain of rules:
-```
+
+```text
 rule: {src_ip, dst_ip, src_port, dst_port, proto, iface} → {ACCEPT, DROP, REJECT, DNAT, SNAT}
 ```
 
@@ -215,7 +216,7 @@ Stateful conntrack table: tracks TCP state, UDP "connection" by 5-tuple, ICMP by
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | IPv4/IPv6 | ⬜ Not started |
 | TCP | ⬜ Not started |
 | UDP | ⬜ Not started |

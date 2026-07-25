@@ -1,4 +1,4 @@
-﻿# Class: MockAgent
+# Class: MockAgent
 
 Extends: `undici.Dispatcher`
 
@@ -30,6 +30,7 @@ This will instantiate the MockAgent. It will not do anything until registered as
 import { MockAgent } from 'undici'
 
 const mockAgent = new MockAgent()
+
 ```
 
 ### Example - Basic MockAgent instantiation with custom agent
@@ -40,6 +41,7 @@ import { Agent, MockAgent } from 'undici'
 const agent = new Agent()
 
 const mockAgent = new MockAgent({ agent })
+
 ```
 
 ## Instance Methods
@@ -54,18 +56,20 @@ Arguments:
 
 - **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
 
-| Matcher type | Condition to pass          |
-|:------------:| -------------------------- |
-| `string`     | Exact match against string |
-| `RegExp`     | Regex must pass            |
-| `Function`   | Function must return true  |
+| Matcher type | Condition to pass          | 
+| :------------: | -------------------------- | 
+
+| `string`     | Exact match against string | 
+| `RegExp`     | Regex must pass            | 
+| `Function`   | Function must return true  | 
 
 Returns: `MockClient | MockPool`.
 
-| `MockAgentOptions`   | Mock instance returned |
-| -------------------- | ---------------------- |
-| `connections === 1`  | `MockClient`           |
-| `connections` > `1`  | `MockPool`             |
+| `MockAgentOptions`   | Mock instance returned | 
+| -------------------- | ---------------------- | 
+
+| `connections === 1`  | `MockClient`           | 
+| `connections` > `1`  | `MockPool`             | 
 
 #### Example - Basic Mocked Request
 
@@ -85,6 +89,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked Request with local mock agent dispatcher
@@ -107,6 +112,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked Request with local mock pool dispatcher
@@ -129,6 +135,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked Request with local mock client dispatcher
@@ -151,6 +158,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked requests with multiple intercepts
@@ -180,6 +188,7 @@ console.log('response received', result2.statusCode) // response received 200
 for await (const data of result2.body) {
   console.log('data', data.toString('utf8')) // data hello
 }
+
 ```
 
 #### Example - Mock different requests within the same file
@@ -199,6 +208,7 @@ describe('Test', () => {
     // your test
   });
 });
+
 ```
 
 #### Example - Mocked request with query body, headers and trailers
@@ -238,6 +248,7 @@ for await (const data of body) {
 }
 
 console.log('trailers', trailers) // { 'content-md5': 'test' }
+
 ```
 
 #### Example - Mocked request with origin regex
@@ -261,6 +272,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Mocked request with origin function
@@ -284,6 +296,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 ### `MockAgent.close()`
@@ -301,6 +314,7 @@ const mockAgent = new MockAgent()
 setGlobalDispatcher(mockAgent)
 
 await mockAgent.close()
+
 ```
 
 ### `MockAgent.dispatch(options, handlers)`
@@ -335,6 +349,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 ### `MockAgent.deactivate()`
@@ -352,6 +367,7 @@ const mockAgent = new MockAgent()
 setGlobalDispatcher(mockAgent)
 
 mockAgent.deactivate()
+
 ```
 
 ### `MockAgent.activate()`
@@ -373,6 +389,7 @@ mockAgent.deactivate()
 
 // Later
 mockAgent.activate()
+
 ```
 
 ### `MockAgent.enableNetConnect([host])`
@@ -399,6 +416,7 @@ mockAgent.enableNetConnect()
 
 await request('http://example.com')
 // A real request is made
+
 ```
 
 #### Example - Allow requests matching a host string to make real requests
@@ -420,6 +438,7 @@ await request('http://example-2.com:8080')
 
 await request('http://example-3.com')
 // Will throw
+
 ```
 
 #### Example - Allow requests matching a host regex to make real requests
@@ -434,6 +453,7 @@ mockAgent.enableNetConnect(new RegExp('example.com'))
 
 await request('http://example.com')
 // A real request is made
+
 ```
 
 #### Example - Allow requests matching a host function to make real requests
@@ -448,6 +468,7 @@ mockAgent.enableNetConnect((value) => value === 'example.com')
 
 await request('http://example.com')
 // A real request is made
+
 ```
 
 ### `MockAgent.disableNetConnect()`
@@ -467,6 +488,7 @@ mockAgent.disableNetConnect()
 
 await request('http://example.com')
 // Will throw
+
 ```
 
 ### `MockAgent.pendingInterceptors()`
@@ -514,6 +536,7 @@ const pendingInterceptors = agent.pendingInterceptors()
 //     origin: 'https://example.com'
 //   }
 // ]
+
 ```
 
 ### `MockAgent.assertNoPendingInterceptors([options])`
@@ -542,11 +565,12 @@ agent.assertNoPendingInterceptors()
 //
 // 1 interceptor is pending:
 //
-// â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-// â”‚ (index) â”‚ Method â”‚        Origin         â”‚ Path â”‚ Status code â”‚ Persistent â”‚ Invocations â”‚ Remaining â”‚
-// â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-// â”‚    0    â”‚ 'GET'  â”‚ 'https://example.com' â”‚ '/'  â”‚     200     â”‚    'âŒ'    â”‚      0      â”‚     1     â”‚
-// â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+// ┌─────────┬────────┬───────────────────────┬──────┬─────────────┬────────────┬─────────────┬───────────┐
+// │ (index) │ Method │        Origin         │ Path │ Status code │ Persistent │ Invocations │ Remaining │
+// ├─────────┼────────┼───────────────────────┼──────┼─────────────┼────────────┼─────────────┼───────────┤
+// │    0    │ 'GET'  │ 'https://example.com' │ '/'  │     200     │    '❌'    │      0      │     1     │
+// └─────────┴────────┴───────────────────────┴──────┴─────────────┴────────────┴─────────────┴───────────┘
+
 ```
 
 #### Example - access call history on MockAgent
@@ -577,6 +601,7 @@ mockAgent.getCallHistory()?.firstCall()
 //   host: 'example.com',
 //   port: ''
 // }
+
 ```
 
 #### Example - clear call history
@@ -585,6 +610,7 @@ mockAgent.getCallHistory()?.firstCall()
 const mockAgent = new MockAgent()
 
 mockAgent.clearAllCallHistory()
+
 ```
 
 #### Example - call history instance class method
@@ -604,4 +630,5 @@ mockAgentHistory?.filterCalls(/"data": "{}"/) // returns an Array of MockCallHis
 mockAgentHistory?.filterCalls('application/json') // returns an Array of MockCallHistoryLogs where any value === 'application/json'
 mockAgentHistory?.filterCalls((log) => log.path === '/endpoint') // returns an Array of MockCallHistoryLogs when given function returns true
 mockAgentHistory?.clear() // clear the history
+
 ```

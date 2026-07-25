@@ -26,7 +26,7 @@ sigma-pkg is the sovereign package manager for SigmaOS. v0.1 ships a fully local
 
 ## CLI Commands
 
-```
+```text
 sigma-pkg install   <pkg>[@<ver>] [--arch <arch>] [--root <dir>]
 sigma-pkg remove    <pkg> [--purge]
 sigma-pkg update    [<pkg>]           # fetch latest metadata + upgrade
@@ -52,7 +52,7 @@ sigma-pkg clean     [--cache]         # remove downloaded archives from cache
 
 A `.sigpkg` file is a `zstd`-compressed tar archive with the following structure:
 
-```
+```text
 <name>-<version>-<arch>.sigpkg
 ├── META/
 │   ├── manifest.toml      # name, version, arch, deps[], license, description
@@ -88,7 +88,7 @@ install_sh  = "META/install.sh"  # optional post-install hook
 Base URL: `https://registry.sigmaos.dev/v1/`
 
 | Endpoint | Method | Response |
-|----------|--------|----------|
+| ---------- | -------- | ---------- |
 | `/v1/index` | GET | `index.zst` — full package list (TOML array) |
 | `/v1/pkg/{name}/{version}/{arch}` | GET | `.sigpkg` binary stream |
 | `/v1/search?q=<query>` | GET | JSON array of matching manifest.toml objects |
@@ -116,7 +116,7 @@ Algorithm: topological sort (Kahn's algorithm) on the dependency DAG.
 
 ## Atomic Transaction Model
 
-```
+```text
 install flow:
   download → verify sig → verify checksums → extract to /var/sigma-pkg/staging/<name>-<ver>/
   → build overlay: for each file: rename staging → final path (atomic)
@@ -180,7 +180,7 @@ On failure at any step: staging directory left for inspection; no partial state 
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | Local install (v0.1) | ⬜ Not started |
 | Dep resolver | ⬜ Not started |
 | Atomic transactions | ⬜ Not started |

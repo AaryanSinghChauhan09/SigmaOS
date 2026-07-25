@@ -73,7 +73,7 @@ The answer should always be "Yes."
 
 ### Unified Application Framework
 
-```
+```text
 Sigma Application Layer
 ├── Sigma Store (Unified Interface)
 ├── Sigma Package Manager (Unified Backend)
@@ -737,7 +737,7 @@ Supported Ecosystems
 
 ### Environment Setup:
 
-```
+```text
 User: "Setup Python development environment"
 SigmaOS: Installs Python, pip, venv, IDE, configures environment
 
@@ -747,7 +747,7 @@ SigmaOS: Installs VS Code, Python extensions, configures settings
 
 ### Application Installation:
 
-```
+```text
 User: "Install Blender"
 SigmaOS: Detects best format (Flatpak), installs, configures GPU acceleration
 
@@ -759,7 +759,7 @@ SigmaOS: Installs Steam, configures Proton, sets up gaming
 
 ### Creative Applications:
 
-```
+```text
 User: "Install GIMP"
 SigmaOS: Installs GIMP, configures GPU acceleration, sets up plugins
 
@@ -771,7 +771,7 @@ SigmaOS: Installs Krita, configures tablet support, sets up brushes
 
 ### System Tools:
 
-```
+```text
 User: "Install Wireshark"
 SigmaOS: Installs Wireshark, configures permissions, sets up capture
 

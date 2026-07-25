@@ -5,7 +5,7 @@ This document explains every active branch, its purpose, and how to work with it
 ## Branch Overview
 
 | Branch | Target Archetype | Scheduler | Key Feature Flag |
-|--------|-----------------|-----------|-----------------|
+| -------- | ----------------- | ----------- | ----------------- |
 | `main` | Stable baseline | MLFQ balanced | all default |
 | `kernel-exp` | Kernel lab | in-progress | `SIGMA_KERNEL_EXP=1` |
 | `drivers-dev` | Driver dev | standard | `SIGMA_SDF_DRIVERS=1` |

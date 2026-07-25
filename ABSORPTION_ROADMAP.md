@@ -297,7 +297,7 @@ This roadmap outlines a systematic approach to absorbing 232 open-source project
 ### Boot Performance Targets
 
 | Metric | Current | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | --------- | -------- |
 | Cold boot (NVMe) | Unknown | 5s | 3s | 2.5s | 2s | <2s |
 | Resume from suspend | Unknown | 2s | 1s | 750ms | 500ms | <500ms |
 | Service startup | Unknown | 500ms | 300ms | 200ms | 100ms | <100ms |
@@ -305,7 +305,7 @@ This roadmap outlines a systematic approach to absorbing 232 open-source project
 ### Memory Efficiency Targets
 
 | Metric | Current | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | --------- | -------- |
 | Idle memory (desktop) | Unknown | 300MB | 250MB | 200MB | 150MB | <150MB |
 | Idle memory (server) | Unknown | 150MB | 120MB | 100MB | 64MB | <64MB |
 | Per-process overhead | Unknown | 5MB | 4MB | 3MB | 2MB | <2MB |
@@ -313,7 +313,7 @@ This roadmap outlines a systematic approach to absorbing 232 open-source project
 ### CPU Performance Targets
 
 | Metric | Current | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | --------- | -------- |
 | Context switch latency | Unknown | 2µs | 1.5µs | 1µs | 500ns | <500ns |
 | Scheduler latency | Unknown | 30µs | 20µs | 15µs | 10µs | <10µs |
 | Interrupt latency | Unknown | 15µs | 10µs | 7µs | 5µs | <5µs |
@@ -321,7 +321,7 @@ This roadmap outlines a systematic approach to absorbing 232 open-source project
 ### I/O Performance Targets
 
 | Metric | Current | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | --------- | -------- |
 | NVMe sequential read | Unknown | 2GB/s | 2.5GB/s | 2.8GB/s | 3GB/s | >3GB/s |
 | NVMe random 4K read | Unknown | 300K IOPS | 400K IOPS | 450K IOPS | 500K IOPS | >500K IOPS |
 | Network throughput | Unknown | 5GbE | 7GbE | 9GbE | 10GbE | 10GbE |

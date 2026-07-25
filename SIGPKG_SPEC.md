@@ -9,7 +9,7 @@
 
 A `.sigpkg` file is a zstd-compressed tar archive:
 
-```
+```text
 my-app-1.0.0.sigpkg
 ├── sigma.toml          # Manifest
 
@@ -77,7 +77,7 @@ config       = ["etc/my-app.conf"]
 
 ## Repository Layout
 
-```
+```text
 sigma-repo/
 ├── index.json          # Signed package index
 
@@ -138,7 +138,7 @@ sigma-pkg publish             # publish to registry
 
 sigpkg uses atomic A/B partitions for safe updates:
 
-```
+```text
 Slot A (active):  /sigma/system-a/  ← running
 Slot B (inactive): /sigma/system-b/  ← update target
 
@@ -151,6 +151,7 @@ Slot B (inactive): /sigma/system-b/  ← update target
 4. Reboot
 
 5. If boot fails → automatic rollback to slot A
+
 ```
 
 ---
@@ -168,7 +169,8 @@ Every package must:
 4. For "Certified" status: pass SigmaOS team security review
 
 Verification at install time:
-```
+
+```text
 sigma-pkg verify nginx-1.24.0-x86_64.sigpkg
   ✓ sha256 checksum
   ✓ Dilithium-5 signature (author key)

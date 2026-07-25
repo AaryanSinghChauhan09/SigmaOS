@@ -479,7 +479,7 @@ This roadmap focuses on absorbing desktop-oriented open-source projects to creat
 ### Desktop Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Boot to desktop | 5s | 3s | 2.5s | 2s | <2s |
 | Window render | 100ms | 70ms | 50ms | 30ms | <30ms |
 | App launch | 2s | 1s | 750ms | 500ms | <500ms |
@@ -489,7 +489,7 @@ This roadmap focuses on absorbing desktop-oriented open-source projects to creat
 ### User Experience Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Input latency | 50ms | 30ms | 20ms | 10ms | <10ms |
 | Notification delay | 500ms | 300ms | 200ms | 100ms | <100ms |
 | Launcher response | 500ms | 300ms | 200ms | 100ms | <100ms |

@@ -8,7 +8,7 @@
 ## Current State (v15.0 Baseline)
 
 | Area | Status | Gap |
-|---|---|---|
+| --- | --- | --- |
 | Animation | ✅ Spring + easing engine | No GPU acceleration yet |
 | Renderer | ✅ Software 2D renderer | No Vulkan/GL path |
 | Input | ✅ Keyboard/mouse/touch/gestures | No haptics, no eye tracking |
@@ -31,7 +31,7 @@
 **Problem**: Software renderer is CPU-bound. At 1920×1080, fill_rect takes ~8ms.
 **Solution**: VirtIO-GPU + Mesa path for Vulkan 1.3 compositing.
 
-```
+```text
 kernel/drivers/gpu/sigma_virtio_gpu.zig  ✅ already done
 drivers/gpu/sigma_vulkan.rs              → add VkDevice + VkSwapchain
 userland/desktop/sigma_compositor.rs    → add GPU submit path
@@ -56,7 +56,7 @@ drm.scanout(buf);   // no copy — same physical pages
 **Problem**: File and network I/O blocks the render thread.
 **Solution**: sigma_io_uring ring-buffer async syscalls.
 
-```
+```text
 kernel/core/sigma_io_uring.rs   → new file
 ```
 
@@ -68,7 +68,7 @@ kernel/core/sigma_io_uring.rs   → new file
 **Target timeline** once bootable:
 
 | Milestone | Target |
-|---|---|
+| --- | --- |
 | UEFI → kernel_main | < 500ms |
 | Kernel init (sched+mm+irq) | < 200ms |
 | sigma-init + daemons | < 800ms |
@@ -101,7 +101,7 @@ pub trait FontEngine { fn rasterize(&mut self, c: char, size: u32) -> &[u8]; }
 **Planned** (in priority order):
 
 | Widget | Description | Use in |
-|---|---|---|
+| --- | --- | --- |
 | `Toggle`    | On/off switch with slide anim | Settings, quick toggles |
 | `Slider`    | Range input with drag handle | Volume, brightness |
 | `ListView`  | Scrollable list with virtual rendering | File manager, app list |
@@ -156,7 +156,7 @@ fn transition_theme(&mut self, from: &dyn Theme, to: &dyn Theme, progress: f32) 
 **Current**: None.
 **Plan**: 5-step first-boot flow:
 
-```
+```text
 Step 1: Welcome + language selection
 Step 2: Privacy choices (all off by default, explicit opt-in)
 Step 3: User account + hostname
@@ -170,7 +170,7 @@ Step 5: Hardware detection summary + driver status
 
 **Plan**: Global search across apps, files, settings, web.
 
-```
+```text
 Score = file_name_score × 3 + content_score × 1 + recent_boost × 2
 Query pipeline: tokenise → search_apps → search_files → search_settings → merge → rank
 ```
@@ -194,7 +194,7 @@ Query pipeline: tokenise → search_apps → search_files → search_settings �
 
 **Plan**: Swipe-down panel with 12 toggles + sliders:
 
-```
+```text
 [Wi-Fi ▲] [Bluetooth] [Do Not Disturb] [Airplane Mode]
 [Brightness ████░░] [Volume ███░░░]
 [VPN] [Hotspot] [Mirror] [Dark Mode] [Night Light] [Battery Saver]
@@ -219,7 +219,7 @@ pub struct AppSwitcher {
 ### 4.1 Memory Optimisation
 
 | Target | Current | Plan |
-|---|---|---|
+| --- | --- | --- |
 | Idle desktop RAM | Unknown | < 256 MB |
 | sigma-sh startup | Unknown | < 50ms |
 | sigma-pkg install | Unknown | < 1s for typical package |
@@ -237,7 +237,7 @@ pub struct AppSwitcher {
 
 ### 4.2 I/O Stack Optimisation
 
-```
+```text
 Current: syscall → VFS → Tmpfs → copy to user buffer
 Target:  syscall → VFS → io_uring ring → zero-copy to mmap'd user buffer
 ```
@@ -245,7 +245,7 @@ Target:  syscall → VFS → io_uring ring → zero-copy to mmap'd user buffer
 ### 4.3 Network Performance
 
 | Path | Current | Target |
-|---|---|---|
+| --- | --- | --- |
 | sigma-pkg download (1MB) | Unknown | < 100ms on GbE |
 | TLS handshake | Unknown | < 5ms |
 | DNS resolution | Unknown | < 10ms (DoH cached) |
@@ -299,7 +299,7 @@ pub enum MultiMonArrangement { Mirror, Extend(ExtendDir), Independent }
 ## Implementation Schedule
 
 | Quarter | UI/UX Focus | Performance Focus |
-|---|---|---|
+| --- | --- | --- |
 | Q3 2026 | Font engine + 5 new widgets | io_uring + GPU compositor path |
 | Q4 2026 | Onboarding wizard + quick settings | Boot time < 2s |
 | Q1 2027 | App switcher + multi-monitor | Memory < 256MB idle |

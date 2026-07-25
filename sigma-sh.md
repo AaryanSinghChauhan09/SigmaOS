@@ -28,7 +28,7 @@ sigma-sh is the default interactive shell and script interpreter for SigmaOS. It
 
 ### REPL Loop
 
-```
+```text
 read_line() → tokenize() → expand() → parse_ast() → execute() → print_result()
         ↑______________________________________________↓  (loop)
 ```
@@ -54,7 +54,7 @@ read_line() → tokenize() → expand() → parse_ast() → execute() → print_
 ### Builtins
 
 | Builtin | Behaviour |
-|---------|-----------|
+| --------- | ----------- |
 | `cd [dir]` | chdir; updates `$OLDPWD`, `$PWD`; no-arg → `$HOME` |
 | `exit [n]` | flush history, close IPC sockets, _exit(n) |
 | `export VAR=val` | add/update process environment |
@@ -81,7 +81,7 @@ read_line() → tokenize() → expand() → parse_ast() → execute() → print_
 ## Signal Handling
 
 | Signal | Action |
-|--------|--------|
+| -------- | -------- |
 | `SIGINT` (Ctrl+C) | cancel current foreground job; redisplay prompt |
 | `SIGQUIT` (Ctrl+\) | ignored in interactive mode |
 | `SIGEOF` (Ctrl+D) | if line empty: exit; else: ignore |
@@ -159,7 +159,7 @@ Engine: `libedit`-compatible callback API.
 ## Status
 
 | Milestone | State |
-|-----------|-------|
+| ----------- | ------- |
 | Tokenizer | ⬜ Not started |
 | Parser | ⬜ Not started |
 | Builtins | ⬜ Not started |

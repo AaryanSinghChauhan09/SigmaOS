@@ -5,7 +5,7 @@
 SigmaOS uses the standard x86_64 hardware privilege ring model with a strict separation policy:
 
 | Ring | Who runs here | What they can do |
-|---|---|---|
+| --- | --- | --- |
 | Ring 0 (kernel) | sigma-kernel | Full hardware access, manage page tables, handle IRQs, load/unload shards |
 | Ring 1 | (unused) | Reserved |
 | Ring 2 | (unused) | Reserved |
@@ -35,7 +35,7 @@ A **shard** is SigmaOS's atomic capability unit — equivalent to a process in a
 
 ### Shard Communication via sigma-bus
 
-```
+```text
 Shard A                  sigma-bus kernel channel             Shard B
   │                              │                               │
   │── send(BusMsg {              │                               │
@@ -55,7 +55,7 @@ The kernel validates the capability token and pledge on **every message**. There
 
 ## 3. Memory Layout
 
-```
+```text
 Virtual Address Space (x86_64, 48-bit canonical):
 
   0x0000_0000_0000_0000  Null guard page (unmapped)
@@ -81,7 +81,7 @@ Each shard sees only its own virtual space plus the kernel text (read-only). sig
 ## 4. IPC Performance: sigma-bus Benchmark Targets
 
 | Metric | Target | Mechanism |
-|---|---|---|
+| --- | --- | --- |
 | Round-trip latency (local) | < 500 ns | Shared memory ring + futex wait |
 | Round-trip latency (cross-CPU) | < 2 µs | IPI + ring buffer |
 | Throughput (small messages, 64B) | > 10M msg/s | Lock-free MPSC ring |
@@ -94,7 +94,7 @@ Benchmark tool: `sigma-bench-ipc` in `tools/bench/`.
 
 ## 5. Security Model: Pledge → Unveil → AVC → PQC Chain
 
-```
+```text
 Process birth
   │
   ▼ sigma_pledge("stdio rpath inet")

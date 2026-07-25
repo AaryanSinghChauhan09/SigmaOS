@@ -68,7 +68,7 @@ SigmaOS boots through five distinct stages, from UEFI firmware to the `sigma-sh`
 
 **Actions in order**:
 
-```
+```text
 kernel_main(boot_info)
   │
   ├─ 1. Setup GDT (kernel CS/SS, user CS/SS, TSS)
@@ -170,7 +170,7 @@ kernel_main(boot_info)
 ## Full Boot Timeline (Target: < 2s to sigma-sh prompt)
 
 | Stage | Duration target | Milestone |
-|---|---|---|
+| --- | --- | --- |
 | Stage 0 (UEFI) | ~200ms | UEFI POST |
 | Stage 1 (EFI stub) | ~50ms | Kernel loaded |
 | Stage 2 (kernel init) | ~100ms | Scheduler running |

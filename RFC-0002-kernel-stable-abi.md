@@ -39,6 +39,7 @@ cannot know if their driver will work after an OS update.
 - A CI check that detects ABI breakage and fails the build.
 
 - Driver DDK exposes **only** stable-ABI symbols so third-party drivers survive
+
   OS minor-version updates.
 
 ### Non-goals
@@ -56,7 +57,7 @@ cannot know if their driver will work after an OS update.
 The following categories of symbols are **stable**:
 
 | Category | Examples |
-|----------|---------|
+| ---------- | --------- |
 | Driver DDK traits | `WifiDriver`, `BlockDriver`, `InputDriver` |
 | C-ABI exports used by drivers | `sigma_request_irq`, `sigma_free_irq`, `nic_tx_packet` |
 | kabi structs | `KabiVersion`, `DriverInfo`, `IrqDescriptor` |
@@ -64,7 +65,7 @@ The following categories of symbols are **stable**:
 
 ### kabi/ directory layout
 
-```
+```text
 kabi/
   src/
     lib.rs          # Rust stable-ABI types (repr(C), versioned)

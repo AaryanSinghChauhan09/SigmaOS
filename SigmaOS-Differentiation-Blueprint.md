@@ -58,4 +58,3 @@ This page defines how SigmaOS surpasses SteamOS, Clear Linux, NixOS, Fedora Core
 - Desktop smoke tests pass on all release profiles.
 
 - Every release ships with matched docs + tests + rollback evidence.
-

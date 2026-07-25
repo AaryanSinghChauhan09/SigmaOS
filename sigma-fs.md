@@ -76,7 +76,7 @@ struct file_ops {
 
 ## SigmaFS On-Disk Format (Native CoW B-tree)
 
-```
+```text
 Block 0:    Superblock (4 KB)
 Block 1–N:  B-tree node pool (variable)
 Block N+1+: Data extent pool
@@ -84,7 +84,7 @@ Block N+1+: Data extent pool
 
 ### Superblock (4 KB)
 
-```
+```text
 magic[8]        = "SIGMAFS\0"
 version[4]      = 0x00000001
 block_size[4]   = 4096
@@ -179,7 +179,7 @@ checksum[32]        // SHA-3-256 of all above fields
 
 ## OSTree A/B Layout
 
-```
+```text
 /ostree/
   deploy/
     sigmaos/
@@ -225,7 +225,7 @@ Bind-mounts overlay `/usr`, `/lib`, `/bin` from active deployment. `/etc`, `/var
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | VFS layer | ⬜ Not started |
 | Tmpfs | ⬜ Not started |
 | FAT32 | ⬜ Not started |

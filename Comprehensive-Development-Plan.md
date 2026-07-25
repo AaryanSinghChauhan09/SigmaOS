@@ -45,6 +45,7 @@ Generalize driver support across x86-64, ARM64, and RISC-V.
 #### Action Items:
 
 - Create unified driver interface abstraction:
+
   ```rust
   trait SovereignDriver {
       fn probe(&self) -> Result<()>;
@@ -402,7 +403,7 @@ Only OS that's truly "made in India"
 ## 📊 COMPETITIVE ADVANTAGE MATRIX
 
 | Criterion | SigmaOS | Linux | macOS | Windows |
-|-----------|---------|-------|-------|---------|
+| ----------- | --------- | ------- | ------- | --------- |
 | Syscall latency | <100ns | 200ns | 1µs | 5µs |
 | Context switch | <50ns | 500ns | 3µs | 10µs |
 | Boot time | <2s | 4s | 8s | 15s |
@@ -420,7 +421,7 @@ Only OS that's truly "made in India"
 ## 🎯 KEY SUCCESS METRICS (18-Month Targets)
 
 | Metric | Target | How to Measure |
-|--------|--------|----------------|
+| -------- | -------- | ---------------- |
 | Bootability | Bootable ISO + 10,000 downloads | `make iso` → GitHub releases |
 | Performance | #1 OS for syscall latency | LMBench + sysbench benchmarks |
 | Security | 0 privilege escalation CVEs | Fuzzing + formal verification |

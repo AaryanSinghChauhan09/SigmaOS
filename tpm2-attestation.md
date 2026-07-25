@@ -9,7 +9,7 @@ SigmaOS integrates TPM2 for **measured boot** and **remote attestation**. During
 ## PCR Measurement Chain
 
 | PCR | Content Measured |
-|---|---|
+| --- | --- |
 | PCR 0 | UEFI firmware (CRTM) |
 | PCR 1 | UEFI configuration |
 | PCR 4 | Boot loader code (sigma-boot.efi) |
@@ -25,7 +25,7 @@ SigmaOS seals the FDE key to **PCRs 0, 4, 7, 8** using `tpm2_unseal` — any mod
 
 ## File Layout
 
-```
+```text
 security/
 ├── README.md
 ├── sigma_trustd.rs     # remote attestation daemon

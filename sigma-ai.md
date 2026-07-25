@@ -28,7 +28,7 @@ sigma-ai is the on-device AI inference daemon for SigmaOS. It loads quantised GG
 
 ## Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────┐
 │  Clients                                         │
 │  sigma-copilot  │  REST (127.0.0.1:7734)         │
@@ -73,7 +73,7 @@ sigma-ai is the on-device AI inference daemon for SigmaOS. It loads quantised GG
 
 ### REST (HTTP/1.1 on 127.0.0.1:7734)
 
-```
+```text
 POST /v1/infer
 Content-Type: application/json
 {
@@ -90,7 +90,7 @@ data: {"token": " world", "done": false}
 data: {"token": "", "done": true, "total_tokens": 12}
 ```
 
-```
+```text
 GET  /v1/models          → JSON array of loaded model metadata
 POST /v1/embed           → return embedding vector (float32 array)
 GET  /v1/health          → {"status":"ok","model_count":2}
@@ -105,7 +105,7 @@ GET  /v1/health          → {"status":"ok","model_count":2}
 ## Compute Backends
 
 | Backend | Condition | Ops/s target |
-|---------|-----------|-------------|
+| --------- | ----------- | ------------- |
 | AVX-512 | x86_64 + AVX-512 flag | 25 tok/s (7B Q4) |
 | AVX2 | x86_64 fallback | 12 tok/s |
 | NEON | ARM64 | 18 tok/s (NEON + dotprod) |
@@ -137,6 +137,7 @@ Callers need `"ai"` in sigma_pledge. vaultd provides capability tokens. If capab
 ## Audit Log
 
 Format (JSON Lines, append-only, fsync each entry):
+
 ```json
 {"ts":1700000000,"pid":512,"comm":"sigma-copilot","model":"sigma-7b-q4",
  "prompt_tokens":128,"completion_tokens":64,"latency_ms":312,"result":"ok"}
@@ -158,7 +159,7 @@ sigma-copilot is a thin shard (`suites/S034-AI/copilot/`) that wraps sigma-aid:
 
 ## Model sigpkg Format
 
-```
+```text
 sigma-7b-q4-0.1.0-any.sigpkg
 ├── META/manifest.toml     (type="model", requires_capability="ai")
 ├── META/checksums.b3
@@ -206,7 +207,7 @@ sigma-7b-q4-0.1.0-any.sigpkg
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | GGUF loader | ⬜ Not started |
 | Scalar inference | ⬜ Not started |
 | AVX-512 backend | ⬜ Not started |

@@ -430,7 +430,7 @@ This roadmap outlines SigmaOS's strategy to become the fastest and most enjoyabl
 
 ### Examples:
 
-```
+```text
 User: "Create a REST API with Python"
 AI: Creates project structure, installs Flask, configures routes, adds tests
 
@@ -868,7 +868,7 @@ AI: Analyzes code, identifies bug, suggests fix, applies change
 
 ### Python Web Project:
 
-```
+```text
 User: "Create Python web project"
 SigmaOS:
 
@@ -885,11 +885,12 @@ SigmaOS:
 6. Creates initial commit
 
 7. Sets up development server
+
 ```
 
 ### Rust CLI Project:
 
-```
+```text
 User: "Create Rust CLI project"
 SigmaOS:
 
@@ -906,13 +907,14 @@ SigmaOS:
 6. Creates initial commit
 
 7. Sets up build system
+
 ```
 
 ### Environment Switching
 
 ### Language Switching:
 
-```
+```text
 User: "Switch to Go development"
 SigmaOS:
 
@@ -925,13 +927,14 @@ SigmaOS:
 4. Opens Go-specific tools
 
 5. Updates IDE settings
+
 ```
 
 ### AI-Assisted Development
 
 ### Code Generation:
 
-```
+```text
 User: "Create a REST API endpoint"
 AI: Generates code, adds error handling, adds tests, documents code
 

@@ -162,12 +162,14 @@ gantt
 To run a local development workspace, compile the system components, and launch:
 
 1. **Clone the Sovereign Workspace**:
+
    ```bash
    git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
    cd SigmaOS
    ```
 
 1. **Build and Preview the Desktop Environment (Web/Vite UI)**:
+
    ```bash
    npm install
    npm run build
@@ -175,6 +177,7 @@ To run a local development workspace, compile the system components, and launch:
    ```
 
 1. **Compile the x86_64 Bare-Metal Iso (requires cross-compiler toolchain or Ubuntu container)**:
+
    ```bash
    make all
    ```
@@ -184,11 +187,13 @@ To run a local development workspace, compile the system components, and launch:
 SigmaOS implements a rigorous multi-tier testing pipeline to prevent regressions across all branches:
 
 - **Unit and Integration Tests**: Standard JS/TS and C++ behavior assertions are run in the web-app layer via Vitest:
+
   ```bash
   npm run test
   ```
 
 - **QEMU Emulation Verification**: Boot and scheduler states are validated directly inside hardware emulators using QEMU:
+
   ```bash
   # Test x86_64 Singularity Boot
 

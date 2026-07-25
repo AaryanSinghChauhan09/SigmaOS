@@ -35,7 +35,8 @@ This roadmap outlines the development of a unified package ecosystem for SigmaOS
 ### sigpkg Specification
 
 **Structure**:
-```
+
+```text
 sigpkg/
 ├── META.json          # Package metadata
 
@@ -62,6 +63,7 @@ sigpkg/
 ```
 
 **META.json Format**:
+
 ```json
 {
   "name": "package-name",
@@ -147,6 +149,7 @@ sigma-pkg convert package.rpm
 - Sign package
 
 **Usage**:
+
 ```bash
 
 # Convert single package
@@ -189,6 +192,7 @@ deb2sigpkg --maintainer "name" --repo "url" package.deb
 - Sign package
 
 **Usage**:
+
 ```bash
 
 # Convert single package
@@ -231,6 +235,7 @@ rpm2sigpkg --maintainer "name" --repo "url" package.rpm
 - Sign package
 
 **Usage**:
+
 ```bash
 
 # Convert Flatpak bundle
@@ -275,6 +280,7 @@ flatpak2sigpkg --maintainer "name" package.flatpak
 - Sign package
 
 **Usage**:
+
 ```bash
 
 # Convert Snap package
@@ -306,7 +312,7 @@ snap2sigpkg --maintainer "name" package.snap
 
 ### Repository Structure
 
-```
+```text
 sigmaos-repo/
 ├── pool/
 │   ├── main/
@@ -327,6 +333,7 @@ sigmaos-repo/
 ### Repository Management
 
 **Commands**:
+
 ```bash
 
 # Initialize repository

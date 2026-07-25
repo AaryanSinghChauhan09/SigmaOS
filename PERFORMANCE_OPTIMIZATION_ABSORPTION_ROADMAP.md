@@ -513,7 +513,7 @@ This roadmap focuses on absorbing performance-oriented open-source projects to c
 ### Boot Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Cold boot to services | 2s | 1.5s | 1s | 500ms | <500ms |
 | Boot visualization | N/A | Working | Optimized | Polished | Complete |
 | Boot analysis | N/A | Working | Optimized | Automated | Complete |
@@ -521,7 +521,7 @@ This roadmap focuses on absorbing performance-oriented open-source projects to c
 ### CPU Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | CPU utilization | 80% | 85% | 90% | 95% | 95%+ |
 | Context switch latency | 2µs | 1.5µs | 1µs | 500ns | <500ns |
 | Scheduler latency | 20µs | 15µs | 10µs | 5µs | <5µs |
@@ -530,7 +530,7 @@ This roadmap focuses on absorbing performance-oriented open-source projects to c
 ### Memory Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Memory efficiency | Baseline | +10% | +20% | +30% | +30% |
 | Swap performance | Baseline | +20% | +40% | +60% | +60% |
 | Cache hit rate | 80% | 85% | 90% | 95% | 95%+ |
@@ -539,7 +539,7 @@ This roadmap focuses on absorbing performance-oriented open-source projects to c
 ### I/O Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | I/O throughput | Baseline | +10% | +20% | +30% | +30% |
 | I/O latency | Baseline | -10% | -20% | -30% | -30% |
 | I/O priority | N/A | Working | Optimized | Automated | Complete |
@@ -548,7 +548,7 @@ This roadmap focuses on absorbing performance-oriented open-source projects to c
 ### Network Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Network throughput | Baseline | +10% | +20% | +30% | +30% |
 | Packet processing latency | Baseline | -10% | -20% | -30% | -30% |
 | Network QoS | N/A | N/A | Working | Optimized | Complete |

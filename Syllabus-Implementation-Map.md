@@ -7,7 +7,6 @@
 ## 📚 Subjects Covered
 
 | # | Subject | SigmaOS Layer | Wiki Page |
-
 | --- | --------- | --------------- | ----------- |
 | 1 | Fundamentals of Computer & IT | Kernel + HAL + CLI | [FCIT-Map](Syllabus-FCIT) |
 | 2 | Discrete Mathematics | Logic & Math Engine | [DiscreteMath-Map](Syllabus-DiscreteMath) |
@@ -137,5 +136,5 @@
 
 ---
 
-### Last updated: 2026-05-19 | SigmaOS Zenith v15.2
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
 

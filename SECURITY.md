@@ -1,20 +1,26 @@
-# Security Policy
+# SigmaOS Security Model
 
-## Supported Versions
+SigmaOS adopts a zero-trust, natively isolated approach to security, fundamentally differing from monolithic designs like Linux or Windows.
 
-Currently, only the `main` branch (EXTINCTION-1 APEX) receives active security patches.
+## Capability-Based Access Control
 
-## Zero-Trust Architecture Guidelines
+Every resource (IPC channels, file descriptors, PCI config space, memory maps) is gated by 64-bit unforgeable **capability tokens**.
+- **No Global root:** There is no concept of a "root" user possessing omnipotent access.
+- **VFS Enforcement:** `kernel/fs/vfs.rs` enforces capability checks at the descriptor open/truncate layer.
+- **IPC Enforcement:** `kernel/ipc/ring_channel.rs` strictly drops messages that do not provide the correct capability token for the target channel.
 
-SigmaOS employs a "Zero-Trust shard namespacing" model. When contributing or modifying suites:
+## Cryptography
 
-1. **No Implicit Trust:** No S-suite (S01-S33) inherently trusts another. All inter-suite communication MUST use the Sovereign Event Bus.
+The kernel ships with native, zero-dependency implementations of essential cryptography for disk encryption and network protocols.
+- **ChaCha20 (`kernel/crypto/chacha20.rs`)**: A highly optimized, constant-time stream cipher used natively by the kernel. No dynamic memory allocations are used.
 
-2. **WASM Isolation:** Untrusted or foreign logic MUST be executed inside the Native WASM JIT Engine within `S11_Virtualization`, adhering to WASI capability-based permissions.
+## Package Security (`sigpkg`)
 
-3. **Memory Safety:** Avoid raw pointers outside of the `S05_Memory` suite. Use the native `sigma_sdk_malloc` and bounds-checked wrappers.
+Supply chain security is a first-class citizen:
+- **SBOM Verification (`sigma-pkg/sbom.rs`)**: Software Bill of Materials (SBOM) manifests are verified against incoming packages to ensure zero drift from signed source.
+- **ED25519 Signatures (`sigma-pkg/ed25519_verify.rs`)**: Package manifests must be signed using ED25519 public key infrastructure. Untrusted binaries cannot execute on the host.
 
-## Reporting a Vulnerability
+## Memory Safety
 
-Do not report security vulnerabilities via public GitHub issues.
-Please email `security@sigmaos.dev` with a detailed description, PoC (if available), and potential mitigation. We aim to acknowledge reports within 48 hours.
+- **100% Rust No-Std**: Memory safety vulnerabilities (buffer overflows, use-after-free) are structurally prevented by Rust's ownership model in the kernel core.
+- **Custom Memory Manager (`kernel/mm/buddy_slab_vmm.rs`)**: Avoids fragmentation and isolates kernel objects using dedicated SLAB caches.

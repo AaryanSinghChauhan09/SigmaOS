@@ -1,0 +1,81 @@
+# SigmaOS Configuration File (sigma.toml)
+# This is the main configuration file for SigmaOS
+# Location: /etc/sigma/sigma.toml or ~/.config/sigma/sigma.toml
+
+[system]
+# System profile selection
+profile = "standalone"  # Options: standalone, microkernel, rtos, cloud, mobile, browser
+
+# System hostname
+hostname = "sigmaos"
+
+# Locale settings
+locale = "en_US.UTF-8"
+timezone = "UTC"
+
+[features]
+# Feature flags for system components
+desktop = true
+ai_tools = true
+networking = true
+graphics = true
+audio = true
+
+[shards]
+# Core shards to load
+core_shards = ["s-mm", "s-sched", "s-net", "s-fs", "s-ipc", "s-sec", "s-sys"]
+
+# Essential shards to load
+essential_shards = ["gpu", "network", "storage", "input", "audio"]
+
+# Optional shards to load
+optional_shards = ["zenith", "desktop", "llm", "pkg"]
+
+[boot]
+# Kernel boot parameters
+kernel_params = [
+  "kernel.smm.enable=true",
+  "kernel.sched.eevdf=true",
+  "kernel.net.firewall=deny"
+]
+
+[init]
+# Init system configuration
+systemd_compatible = true
+services = ["network", "ssh", "desktop"]
+
+[package]
+# Package manager configuration
+repository = "https://packages.sigmaos.org"
+cache_dir = "/sigma/store"
+auto_update = false
+update_frequency = "weekly"
+
+[security]
+# Security settings
+secure_boot = true
+tpm_enabled = true
+disk_encryption = true
+
+[network]
+# Network configuration
+dhcp = true
+firewall = "deny"
+dns_servers = ["8.8.8.8", "8.8.4.4"]
+
+[ui]
+# Desktop UI settings
+compositor = "zenith"
+theme = "default"
+scaling = "auto"
+
+[ai]
+# AI configuration
+llm_enabled = true
+llm_model = "local"
+privacy_mode = "strict"
+
+[logging]
+# Logging configuration
+log_level = "info"
+log_file = "/var/log/sigmaos.log"

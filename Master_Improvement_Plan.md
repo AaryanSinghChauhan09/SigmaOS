@@ -8,7 +8,7 @@
 ## Executive Summary
 
 | Area | Current State | Target (v1.0) | Target (v2.0) |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Design System | ✅ Defined | Implemented in all widgets | Live theming |
 | Applications | 0 installable | 8 Tier-1 apps | 20+ apps |
 | UI/UX | ✅ Core engine | Full widget set + animation | Wayland compat |
@@ -126,7 +126,7 @@ pub trait Themed {
 
 #### sigma-terminal
 
-```
+```text
 File:   userland/apps/sigma_terminal.rs
 Lang:   Rust
 Engine: VTE grid + PTY + sigma-renderer
@@ -147,7 +147,7 @@ Key implementation tasks:
 
 #### sigma-files
 
-```
+```text
 File:   userland/apps/sigma_files.rs
 Lang:   Rust
 Engine: sigma VFS API + sigma-renderer
@@ -168,7 +168,7 @@ Key tasks:
 
 #### sigma-edit
 
-```
+```text
 File:   userland/apps/sigma_edit.rs
 Lang:   Rust
 Engine: Piece-tree buffer + incremental highlight
@@ -189,11 +189,12 @@ Key tasks:
 
 ### 2.2 App Framework (shared infrastructure)
 
-```
+```text
 File: userland/apps/sigma_app_framework.rs
 ```
 
 Every app uses:
+
 ```rust
 pub trait SigmaApp: Send {
     type Model: Clone + Default;
@@ -220,7 +221,7 @@ pub trait SigmaApp: Send {
 ### 3.1 Missing Widgets (priority order)
 
 | Widget | File | ETA |
-|---|---|---|
+| --- | --- | --- |
 | `Toggle` | sigma_widgets.rs | v0.1 |
 | `Slider` | sigma_widgets.rs | v0.1 |
 | `ListView` | sigma_widgets.rs | v0.1 |
@@ -237,7 +238,7 @@ pub trait SigmaApp: Send {
 ### 3.2 UX Flows to Implement
 
 | Flow | File | Priority |
-|---|---|---|
+| --- | --- | --- |
 | First-boot onboarding wizard | `userland/installer/sigma_onboarding.rs` | 🔴 |
 | App permissions prompt | `userland/desktop/sigma_permission_dialog.rs` | 🔴 |
 | Quick Settings panel (swipe down) | `userland/desktop/sigma_quick_settings.rs` | 🟠 |
@@ -250,7 +251,7 @@ pub trait SigmaApp: Send {
 ### 3.3 Accessibility Gaps
 
 | Gap | Action | File |
-|---|---|---|
+| --- | --- | --- |
 | TTS audio output | Integrate espeak-ng-style synthesizer | `userland/accessibility/sigma_tts.rs` |
 | Keyboard-only navigation | Focus order + ARIA roles on all widgets | sigma_widgets.rs |
 | Screen magnifier | Pixel-doubled overlay compositing | `userland/desktop/sigma_magnifier.rs` |
@@ -259,7 +260,7 @@ pub trait SigmaApp: Send {
 
 ### 3.4 Mobile/Adaptive UI
 
-```
+```text
 Breakpoints:
   < 480px  → phone layout (bottom nav, full-screen apps)
   480-1024px → tablet layout (split-view, floating panels)
@@ -272,6 +273,7 @@ Required:
 - SplitView container
 
 - AdaptiveLayout wrapper that switches based on screen size
+
 ```
 
 ---
@@ -280,13 +282,15 @@ Required:
 
 ### 4.1 Frame Rate Optimisation
 
-```
+```text
 Current bottleneck: Software fill_rect = O(W×H) pixels per frame
 Solution path:
+
   1. Damage tracking (only repaint changed regions)       ← IMPLEMENT NOW
   2. Layer caching (cache static layers as bitmaps)       ← v0.1
   3. GPU compositing via VirtIO-GPU + Mesa Vulkan          ← v1.0
   4. Hardware KMS direct scanout (no compositor copy)      ← v1.5
+
 ```
 
 **Immediate action — damage tracking**:
@@ -311,7 +315,7 @@ impl DamageTracker {
 
 ### 4.2 Memory Optimisation Plan
 
-```
+```text
 Target: < 256MB idle desktop RAM
 
 Actions:
@@ -325,11 +329,12 @@ Actions:
 4. String interning for frequently repeated strings (paths, app names)
 
 5. Shared read-only pages between processes (same code pages)
+
 ```
 
 ### 4.3 Boot Time Optimisation
 
-```
+```text
 Phase 1 (sigma-boot.zig):
   ├─ Read kernel + initramfs in parallel DMA transfers
   └─ Set GOP framebuffer before jumping to kernel (splash screen)
@@ -434,7 +439,7 @@ impl<S: Clone, A> Store<S, A> {
 ### 6.1 Near-term Capabilities
 
 | Capability | Status | Action |
-|---|---|---|
+| --- | --- | --- |
 | Bootable ISO | ⬜ | kernel scheduler + MM + VFS + shell |
 | sigma-pkg online | ⬜ | Set up pkg.sigmaos.app registry |
 | Wi-Fi connection UI | ⬜ | sigma-netctl GUI in settings |
@@ -444,7 +449,7 @@ impl<S: Clone, A> Store<S, A> {
 ### 6.2 Platform Capabilities Matrix
 
 | Feature | Desktop | Mobile | Cloud | RTOS | Browser |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Zenith DE | ✅ | Adaptive | ⬜ | — | ✅ WASM |
 | sigma-pkg | ✅ | ✅ | ✅ | Minimal | ✅ |
 | TLS 1.3+Kyber | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -523,7 +528,7 @@ sigma-loc-count  # lines of code by language
 ### Quality gates (no PR merges without passing)
 
 | Gate | Threshold |
-|---|---|
+| --- | --- |
 | Test coverage | ≥ 80% for kernel subsystems |
 | OOP trait documentation | 100% of public traits |
 | Performance regression | < 10% vs baseline |

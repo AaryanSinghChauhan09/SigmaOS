@@ -10,7 +10,7 @@ Phase G converts SigmaOS from a design scaffold to a bootable operating system. 
 
 | # | Blocker | Status | File | Description |
 
-|---|---------|--------|------|-------------|
+| --- | --------- | -------- | ------ | ------------- |
 | 1 | Round-robin scheduler | ✅ Complete | `kernel/scheduler/round_robin_scheduler.rs` | Full round-robin task scheduler with TCB management |
 | 2 | Buddy physical allocator | ✅ Complete | `kernel/mm/buddy_allocator.rs` | Buddy system for physical memory allocation |
 | 3 | Slab allocator (kmalloc) | ✅ Complete | `kernel/mm/slab_allocator.rs` | Slab allocator for dynamic memory allocation |

@@ -1,7 +1,7 @@
 # SigmaOS Competitor Comparison
 
 | Distro | Strengths | Where SigmaOS is weak | SigmaOS strategy to surpass |
-|--------|-----------|------------------------|-----------------------------|
+| -------- | ----------- | ------------------------ | ----------------------------- |
 | Raspberry Pi OS | Huge hardware ecosystem, optimized drivers, easy setup | Limited driver matrix (PS/2, VGA, e1000) | Expand HAL + sovereign drivers; ARM profile |
 | SteamOS | Gaming integration, Proton, polished UX | No mature GPU/gaming layer | Sovereign graphics + Zenith WM + native SDK |
 | Clear Linux | Intel-tuned performance | Basic scheduler tuning | Silicon-aware scheduler + PGO builds |

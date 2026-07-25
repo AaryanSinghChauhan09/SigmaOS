@@ -11,7 +11,7 @@
 SigmaOS is **architecturally sound but feature-starved** at Phase 0. When compared to even minimal Linux variants:
 
 | Category | SigmaOS Status | Linux Equivalents | Criticality |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Scheduler** | Round-Robin (stub) | CFS, EDF, deadline | **BLOCKING** |
 | **Memory Allocator** | Slab (TBD) | Buddy + Slab | **BLOCKING** |
 | **Syscalls** | 30 planned | 400+ | **BLOCKING** |
@@ -126,6 +126,7 @@ SigmaOS is **architecturally sound but feature-starved** at Phase 0. When compar
 - CPU affinity, load balancing, preemption classes
 
 **Reference:** `torvalds/linux` scheduler patterns:
+
 ```c
 // From kernel/sched/core.c
 struct task_struct {
@@ -628,7 +629,7 @@ SYSCALL_DEFINE3(landlock_add_rule, int, ruleset_fd,
 ### Priority Ranking (Phase 1–3)
 
 | Driver | Complexity | Impact | Timeline | Reference |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **RTL8111** (NIC) | Medium | HIGH | 4 weeks | `r8169` from torvalds/linux |
 | **NVMe** (SSD) | Medium | HIGH | 4 weeks | `nvme/host/pci.c` from torvalds/linux |
 | **AHCI** (SATA) | Low | MEDIUM | 2 weeks | `ata/libahci.c` from torvalds/linux |

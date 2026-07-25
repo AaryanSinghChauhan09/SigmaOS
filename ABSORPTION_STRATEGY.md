@@ -295,6 +295,7 @@ SigmaOS will absorb open-source projects through a three-tiered strategy: direct
 ### Dependency Management
 
 **Cargo.toml Integration**:
+
 ```toml
 [dependencies]
 
@@ -316,7 +317,8 @@ crypto = ["libsodium-sys"]
 ### Attribution Documentation
 
 **NOTICE File Template**:
-```
+
+```text
 SigmaOS
 Copyright (c) 2026 SigmaOS Contributors
 
@@ -338,6 +340,7 @@ Source: https://github.com/smoltcp-rs/smoltcp
 ### Code Structure
 
 **Integration Pattern**:
+
 ```rust
 // Direct integration with wrapper
 pub mod external {

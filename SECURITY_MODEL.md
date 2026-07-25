@@ -8,7 +8,7 @@ modern zero-trust architecture.
 
 ## Layers
 
-```
+```text
 ┌───────────────────────────────────────────────────────────────────┐
 │  Layer 6: Post-Quantum Cryptography (Kyber-1024 + Dilithium-5)   │
 │  All TLS, package signing, and attestation are quantum-safe       │
@@ -110,7 +110,8 @@ Supported namespace types: PID, NET, MNT, IPC, UTS, USER.
 ## Layer 5: Zero-Trust + TPM2
 
 Every workload has a SPIFFE identity:
-```
+
+```text
 spiffe://sigmaos.local/workload/nginx
 spiffe://sigmaos.local/kernel/driver/e1000
 ```
@@ -134,7 +135,7 @@ If any boot stage is tampered with → TPM refuses to unseal → disk stays encr
 All cryptographic operations use PQC algorithms:
 
 | Operation | Algorithm | File |
-|-----------|-----------|------|
+| ----------- | ----------- | ------ |
 | Key exchange (TLS) | Kyber-1024 | `crypto/sigma_kyber.rs` |
 | Signatures (packages) | Dilithium-5 | `crypto/sigma_dilithium.rs` |
 | Hash (integrity) | SHA-3-256 | `crypto/` |
@@ -148,7 +149,7 @@ Standard algorithm names (FIPS 203/204): ML-KEM-1024, ML-DSA-87.
 
 Every syscall goes through three checks before execution:
 
-```
+```text
 syscall_dispatch(nr, args)
   │
   ├─ 1. sigma_pledge check: is this syscall in allowed set?
@@ -184,7 +185,7 @@ Logs are immutable (append-only) and signed with Dilithium-5.
 ## Comparison
 
 | Feature | Windows | Linux | SigmaOS |
-|---------|---------|-------|---------|
+| --------- | --------- | ------- | --------- |
 | Driver isolation | ❌ ring-0 | ❌ ring-0 | ✅ ring-3 option |
 | Syscall allowlist | ❌ | ✅ seccomp | ✅ sigma_pledge |
 | Path restriction | ❌ | ❌ | ✅ sigma_unveil |

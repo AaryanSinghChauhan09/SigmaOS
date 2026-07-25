@@ -9,7 +9,7 @@
 ## Crates Used
 
 | Crate | Version | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `vm-memory` | 0.14.1 | Guest physical memory abstractions (`GuestMemoryMmap`) |
 | `vmm-sys-util` | 0.12.1 | Linux KVM/eventfd/epoll wrappers |
 | `virtio-bindings` | 0.2.2 | Low-level virtio C struct bindings |
@@ -23,7 +23,7 @@
 
 All crates are vendored into `virtualization/rust-vmm-crates/` using `cargo vendor`:
 
-```
+```text
 cargo vendor --manifest-path virtualization/Cargo.toml virtualization/rust-vmm-crates
 ```
 

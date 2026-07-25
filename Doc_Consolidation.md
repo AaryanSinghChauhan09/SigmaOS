@@ -10,7 +10,7 @@
 
 The repo accumulated overlapping docs through rapid iteration:
 
-```
+```text
 Architecture duplicates:
   ARCHITECTURE.md          ← canonical ✅
   Architecture.md          ← duplicate (same content, different case)
@@ -53,7 +53,7 @@ CI Pipeline duplicates:
 ## Canonical Files (Single Source of Truth)
 
 | Topic | Canonical File | Supersedes |
-|---|---|---|
+| --- | --- | --- |
 | Architecture | `ARCHITECTURE.md` | `Architecture.md` (case dup) |
 | Growth Roadmap | `ROADMAP.md` | `roadmap.md`, `DEVELOPMENT_ROADMAP.md`, `PHASE_*` |
 | Competitive Analysis | `docs/Competitive_Analysis.md` | All wiki_repo/Competitive_* |
@@ -89,12 +89,15 @@ CI Pipeline duplicates:
 The wiki has 500+ pages — many are valuable reference. The ones to consolidate:
 
 - Remove or merge the ~15 overlapping Competitive_* pages into one
+
   `Competitive-Analysis.md` that points to `docs/Competitive_Analysis.md`
 
 - Remove or merge the ~8 overlapping Architecture_* pages into one
+
   `Architecture-Overview.md` that points to `ARCHITECTURE.md`
 
 - Archive `APEX_INFINITY_ROADMAP.md`, `EXPANSION_ROADMAP.md`,
+
   `ROADMAP_SEQUENCE.md` — redirect to `ROADMAP.md`
 
 - Keep all profession-specific pages (they're not duplicates)
@@ -106,6 +109,7 @@ The wiki has 500+ pages — many are valuable reference. The ones to consolidate
 ### Phase C — Contributor guidelines
 
 - Add to `CONTRIBUTING.md`: "Before creating a new doc, check this list
+
   of canonical files. New docs go in `docs/`. Wiki pages go in `wiki_repo/`."
 
 - Add `docs/README.md` with a table of what's in `docs/`

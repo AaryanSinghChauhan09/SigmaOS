@@ -89,7 +89,7 @@ This roadmap focuses on absorbing cloud-oriented open-source projects to create 
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Container startup | 2s | 1s | 750ms | 500ms | <500ms |
 | MicroVM startup | 2s | 1s | 750ms | 500ms | <500ms |
 | Serverless cold start | 2s | 1s | 500ms | 100ms | <100ms |

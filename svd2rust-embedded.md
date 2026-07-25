@@ -9,7 +9,7 @@ SigmaOS uses [svd2rust](https://github.com/rust-embedded/svd2rust) (MIT / Apache
 ## Supported BSPs
 
 | BSP | SVD Source | Generated crate |
-|---|---|---|
+| --- | --- | --- |
 | RP2040 | `arch/arm64/bsp/rp2040/rp2040.svd` | `arch/arm64/bsp/rp2040/src/lib.rs` |
 | STM32F411 | `arch/arm64/bsp/stm32f411/stm32f411.svd` | `arch/arm64/bsp/stm32f411/src/lib.rs` |
 | nRF52840 | `arch/arm64/bsp/nrf52840/nrf52840.svd` | `arch/arm64/bsp/nrf52840/src/lib.rs` |
@@ -132,12 +132,14 @@ fn init_uart(p: &Peripherals) {
 # In .github/workflows/bsp-generate.yml:
 
 - name: Regenerate BSP bindings
+
   run: |
     cargo install svd2rust --version 0.33.0 --locked
     cargo install form --version 0.10.0 --locked
     make bsp-rp2040 bsp-stm32 bsp-nrf52840
 
 - name: Check no diff in generated files
+
   run: git diff --exit-code arch/arm64/bsp/
 ```
 

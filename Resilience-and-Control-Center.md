@@ -23,6 +23,7 @@ Sovereign error codes partition across subsystems:
 ### Structured NixOS-inspired Logging (`zenith_logger.cpp`)
 
 All exceptions dump deterministic JSON strings to `zenithd.log`:
+
 ```json
 {"timestamp_mock": 1774857600, "error_code": 502, "component": "Compositor", "description": "Hardware FB failed, safe VGA recovery triggered", "container_id": 0}
 ```

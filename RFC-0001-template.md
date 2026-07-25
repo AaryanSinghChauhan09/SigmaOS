@@ -68,7 +68,7 @@ flowchart TD
 ### Interactions with existing subsystems
 
 | Subsystem | Impact | Notes |
-|-----------|--------|-------|
+| ----------- | -------- | ------- |
 | scheduler | none / minor / major | |
 | VFS       | none / minor / major | |
 | security  | none / minor / major | |
@@ -160,5 +160,5 @@ flowchart TD
 ## Revision History
 
 | Date | Author | Change |
-|------|--------|--------|
+| ------ | -------- | -------- |
 | YYYY-MM-DD | @author | Initial draft |

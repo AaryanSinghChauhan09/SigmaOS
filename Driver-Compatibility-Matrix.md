@@ -17,7 +17,7 @@
 ### Wi-Fi Adapters
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | Intel | AX200/AX201 | ✅ Supported | Works out-of-the-box |
 | Intel | AX210 | ✅ Supported | Works out-of-the-box |
 | Realtek | RTL8822CE | 🔄 Partial | Works with limitations |
@@ -26,7 +26,7 @@
 ### Ethernet Adapters
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | Intel | I219-V | ✅ Supported | Works out-of-the-box |
 | Realtek | RTL8111 | ✅ Supported | Works out-of-the-box |
 
@@ -35,21 +35,21 @@
 ### Integrated Graphics
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | Intel | UHD Graphics 620 | ✅ Supported | Works out-of-the-box |
 | AMD | Radeon Vega 8 | ✅ Supported | Works out-of-the-box |
 
 ### Discrete Graphics
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | NVIDIA | GTX 1050 | 🔄 Partial | Basic support only |
 | AMD | RX 580 | ✅ Supported | Works out-of-the-box |
 
 ## Audio Devices
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | Realtek | ALC892 | ✅ Supported | Works out-of-the-box |
 | Intel | HD Audio | ✅ Supported | Works out-of-the-box |
 
@@ -58,7 +58,7 @@
 ### NVMe Controllers
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | Samsung | 970 EVO | ✅ Supported | Works out-of-the-box |
 | Western Digital | SN750 | ✅ Supported | Works out-of-the-box |
 
@@ -67,7 +67,7 @@
 ### Inkjet Printers
 
 | Manufacturer | Model | Status | Notes |
-|-------------|-------|--------|-------|
+| ------------- | ------- | -------- | ------- |
 | HP | DeskJet 2700 | ✅ Supported | Works out-of-the-box |
 | Canon | PIXMA G2010 | ✅ Supported | Works out-of-the-box |
 

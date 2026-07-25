@@ -1,9 +1,6 @@
 # SigmaOS — Sovereignty & User-Defined Roadmap
-
 ## Reduce Foreign Dependency · User-Defined Extensions
-
 ## Sovereign Alternatives · Zero-Trust Supply Chain
-
 ## Per-User OS Configuration · User-Defined Apps & Scripts
 
 ---
@@ -14,8 +11,7 @@ SigmaOS has two sovereignty goals:
 
 1. **Technical sovereignty** — no critical dependency on foreign software,
    foreign cloud, or foreign standards that could be denied or compromised.
-
-1. **User sovereignty** — every user can define, extend, and own their OS
+2. **User sovereignty** — every user can define, extend, and own their OS
    behaviour without asking permission from any vendor.
 
 ---
@@ -162,9 +158,7 @@ net/tls/
 that understands shard manifests natively.
 
 ```python
-
 # sigma-build (Python DSL, long-term):
-
 shard("sigma-net-tcp",
     version = "1.0.0",
     sources = ["net/tcp/sigma_tcp.cpp"],
@@ -180,6 +174,7 @@ shard("sigma-net-tcp",
 | Proof-of-concept build | `sigma-build/sigma_build.py` | Phase 9 | Build microkernel profile from DSL |
 | Keep CMake for v16.0–v17.0 | `CMakeLists.txt` | all | CMake acceptable until Phase 9 |
 
+
 ---
 
 ## Part 2 — User-Defined System Extensions
@@ -190,54 +185,35 @@ Any user can create a custom profession tool that integrates fully with
 SigmaOS — no C++ required, no rebuild required.
 
 ```bash
-
 # Create a custom profession app in 5 steps:
 
 # 1. Scaffold
-
 sigma-contrib new-app my-custom-tool
 
 # 2. Generated structure:
-
 # userland/apps/my-custom-tool/
-
 #   sigma_my_custom_tool.h         # auto-generated ISigmaApp header
-
 #   sigma_my_custom_tool.cpp       # implement your logic here
-
 #   manifest.sigma                 # app metadata + capabilities
-
 #   sigma-my-custom-tool.1         # man page template
-
 #   tests/test_my_custom_tool.cpp  # test template
-
 #   CMakeLists.txt                 # auto-generated build
 
 # 3. Implement (C++ or sigma-script):
-
 # sigma-script (YAML + Bash-like, no C++ needed for simple tools):
-
 # my-custom-tool.sigma-script:
-
 #   name: land-records-checker
-
 #   description: Check land records for my village
-
 #   commands:
-
 #     check:
-
 #       run: sigma-gov dilrmp lookup --khatauni $1
-
 #       help: Check land records by khatauni number
 
 # 4. Build and install
-
 sigma-contrib build my-custom-tool
 sigma-contrib install my-custom-tool    # installs to /sigma/apps/
 
 # 5. Use immediately
-
 sigma-my-custom-tool check 1234
 ```
 
@@ -254,28 +230,21 @@ sigma-my-custom-tool check 1234
 ### UD2 — User-Defined CLI Commands
 
 ```bash
-
 # Any user can add custom commands to sigma-sh:
 
 # ~/.sigma/commands/gst-check.sh:
-
 #!/sigma/bin/sigma-sh
-
 # Usage: gst-check <gstin>
-
 # Description: Quick GST compliance check
-
 GSTIN="${1:?Usage: gst-check <GSTIN>}"
 sigma-ca gst compute --gstin "$GSTIN" --period "$(date +%Y-%m)"
 echo "---"
 sigma-digilocker fetch --gstin "$GSTIN" --doc gst-certificate
 
 # Register as command:
-
 sigma-cli command register gst-check ~/.sigma/commands/gst-check.sh
 
 # Now available everywhere:
-
 gst-check 27ABCDE1234F1Z5
 ```
 
@@ -293,7 +262,6 @@ gst-check 27ABCDE1234F1Z5
 **Current:** `sigma-cli alias add` works. VFS profile load partial.
 
 ```toml
-
 # ~/.sigma_profile — user can define everything:
 
 [identity]
@@ -339,27 +307,19 @@ pmkisan_credit    = false
 ### UD4 — User-Defined Zenith Layout Plugins
 
 ```bash
-
 # Users can define custom tiling layout algorithms:
 
 # ~/.sigma/layouts/my-layout.sigma-layout:
-
 # name: "India Stack Focus"
-
 # description: "Large terminal + sigma-ca sidebar + sigma-health panel"
-
 # script:
-
 #   window 0: x=0 y=0 w=60% h=100%    # terminal (left)
-
 #   window 1: x=60% y=0 w=40% h=50%   # sigma-ca (top right)
-
 #   window 2: x=60% y=50% w=40% h=50% # sigma-health (bottom right)
 
 sigma-zenith layout install ~/.sigma/layouts/my-layout.sigma-layout
 sigma-zenith layout use "India Stack Focus"
 sigma-zenith layout list       # shows built-in + user-defined
-
 ```
 
 | Task | File | Branch | Detail |
@@ -373,24 +333,16 @@ sigma-zenith layout list       # shows built-in + user-defined
 ### UD5 — User-Defined Themes and Widgets
 
 ```bash
-
 # Full theme customisation:
-
 sigma-zenith theme create my-india-theme
-
 # Opens ~/.sigma/themes/my-india-theme.sigma-theme in editor
 
 # ~/.sigma/themes/my-india-theme.sigma-theme:
-
 [palette]
 base       = "#FF9933"   # Saffron (India flag)
-
 surface    = "#FFFFFF"   # White
-
 accent     = "#138808"   # India green
-
 text       = "#000080"   # Navy blue
-
 warning    = "#FFC107"
 error      = "#F44336"
 
@@ -408,10 +360,8 @@ border_width  = 2
 
 [effects]
 blur_radius    = 10    # glassmorphism
-
 shadow_offset  = 4
 animation_ms   = 200   # 0 to disable for accessibility
-
 ```
 
 | Task | File | Branch | Detail |
@@ -426,9 +376,7 @@ animation_ms   = 200   # 0 to disable for accessibility
 ### UD6 — User-Defined Automation Scripts (sigma-script)
 
 ```yaml
-
 # ~/sigma-scripts/morning-check.sigma-script
-
 name: Morning GST & Legal Check
 description: Run every weekday morning
 
@@ -450,7 +398,6 @@ steps:
     on_fail: sigma-cli health check
 
 schedule: "0 9 * * 1-5"   # weekdays 9 AM
-
 ```
 
 | Task | File | Branch | Detail |
@@ -462,6 +409,7 @@ schedule: "0 9 * * 1-5"   # weekdays 9 AM
 | Schedule integration with sigma-cron | `userland/daemons/sigma_cron.cpp` | `tools-dev` | `schedule:` field → sigma-cron job |
 | Script marketplace | `sigma_pkg_registry/scripts/` | `tools-dev` | Community-contributed scripts via sigma-pkg |
 | `sigma-script run/list/validate` CLI | `userland/tools/sigma_script_cli.cpp` | `tools-dev` | Full management CLI |
+
 
 ---
 
@@ -496,28 +444,21 @@ Data residency policy:
 ### SP2 — Sovereign Identity (no Google/Microsoft/Apple login)
 
 ```bash
-
 # Every user has a self-sovereign DID — no foreign IdP needed:
 
 # Create DID (first boot):
-
 sigma-trust did create --name "Arjun Sharma" --profession ca
 
 # DID is stored locally on device:
-
 # /sigma/var/trust/arjun_did.json
 
 # Login to any India government portal:
-
 sigma-gov login --portal gstn.gov.in    # Uses DID, not Google OAuth
-
 sigma-gov login --portal abdm.gov.in
 sigma-gov login --portal mca21.gov.in
 
 # No username/password. No Google account. No Microsoft account.
-
 # The DID IS the identity.
-
 ```
 
 | Task | File | Branch | Detail |

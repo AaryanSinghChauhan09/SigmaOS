@@ -6,7 +6,7 @@ SigmaOS guarantees that every official artifact is **bit-for-bit reproducible** 
 
 ## What "Reproducible" Means
 
-```
+```text
 Source commit X + Toolchain Y → Binary Z (always the same bytes)
 ```
 
@@ -65,7 +65,7 @@ All timestamps in binaries, archive headers, and filesystem metadata are set to 
 
 ### 4. Locked Dependencies
 
-```
+```text
 Cargo.lock  — exact crate versions (committed to repo)
 ```
 
@@ -154,22 +154,36 @@ jobs:
   reproducible:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
       - name: Pin toolchain
+
         run: rustup show
+
       - name: Set SOURCE_DATE_EPOCH
+
         run: echo "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)" >> $GITHUB_ENV
+
       - name: Build ISO
+
         run: make iso PROFILE=standalone
+
       - name: Build again (verify reproducibility)
+
         run: make iso PROFILE=standalone
         env:
           BUILD_DIR: build2
+
       - name: Compare
+
         run: diff build/sigmaos.iso build2/sigmaos.iso
+
       - name: Generate provenance
+
         run: ./build/provenance.sh > provenance.json
+
       - name: Upload artifacts
+
         uses: actions/upload-artifact@v4
         with:
           name: sigmaos-iso
@@ -184,7 +198,7 @@ jobs:
 
 For hardware deployments, SigmaOS extends the reproducible build with measured boot:
 
-```
+```text
 UEFI → sigma-boot.efi → TPM PCR[0] = hash(sigma-boot.efi)
                       → TPM PCR[1] = hash(kernel)
                       → TPM PCR[2] = hash(initramfs)

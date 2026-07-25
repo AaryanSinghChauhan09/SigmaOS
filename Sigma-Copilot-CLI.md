@@ -34,7 +34,7 @@ sigma-agent skill run zenith-gui '{"command":"theme cyber"}'
 ## Architecture
 
 | Layer | Component |
-|-------|-----------|
+| ------- | ----------- |
 | CLI | `userland/agent/sigma_agent_cli.cpp` |
 | Agent runtime | `kernel/core/ai/SovereignCopilot.cpp` |
 | GUI bridge | `kernel/core/ai/SovereignZenithCLI.cpp` |

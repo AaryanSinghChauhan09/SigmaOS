@@ -80,7 +80,7 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 ### Core Components
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    SigmaAI Agent System                       │
 ├─────────────────────────────────────────────────────────────┤
@@ -119,6 +119,7 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 - Context understanding
 
 **Implementation**:
+
 ```rust
 pub struct NLParser {
     model: LLMModel,
@@ -162,6 +163,7 @@ impl NLParser {
 - Alternative command suggestions
 
 **Implementation**:
+
 ```rust
 pub struct CommandGenerator {
     templates: CommandTemplateRegistry,
@@ -203,6 +205,7 @@ impl CommandGenerator {
 - Risk assessment
 
 **Implementation**:
+
 ```rust
 pub struct CommandValidator {
     permission_checker: PermissionChecker,
@@ -248,6 +251,7 @@ impl CommandValidator {
 - File system awareness
 
 **Implementation**:
+
 ```rust
 pub struct ContextManager {
     system_state: SystemState,
@@ -283,6 +287,7 @@ impl ContextManager {
 - Application-specific knowledge
 
 **Implementation**:
+
 ```rust
 pub struct KnowledgeBase {
     command_history: CommandHistory,
@@ -323,6 +328,7 @@ impl KnowledgeBase {
 - Application control
 
 **Implementation**:
+
 ```rust
 pub struct GUIBridge {
     element_finder: GUIElementFinder,
@@ -364,6 +370,7 @@ impl GUIBridge {
 - Context understanding
 
 **Implementation**:
+
 ```rust
 pub struct LLMCore {
     model: LanguageModel,
@@ -399,6 +406,7 @@ impl LLMCore {
 - Timeout management
 
 **Implementation**:
+
 ```rust
 pub struct Executor {
     sandbox: Sandbox,
@@ -439,6 +447,7 @@ impl Executor {
 - Process isolation
 
 **Implementation**:
+
 ```rust
 pub struct Sandbox {
     resource_limits: ResourceLimits,
@@ -470,7 +479,7 @@ impl Sandbox {
 
 ### Bridge Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                  CLI-to-GUI Bridge System                       │
 ├─────────────────────────────────────────────────────────────┤
@@ -492,7 +501,7 @@ impl Sandbox {
 **CLI to GUI Command Mapping Table**:
 
 | CLI Command | GUI Operation | Application | Parameters |
-|-------------|---------------|-------------|------------|
+| ------------- | --------------- | ------------- | ------------ |
 | `sigma-open file.txt` | Open file | File Manager | file path |
 | `sigma-browser open https://example.com` | Open URL | Browser | URL |
 | `sigma-terminal run command` | Execute command | Terminal | command |
@@ -565,6 +574,7 @@ pub enum GUIEvent {
 ### Application-Specific Bridges
 
 **Desktop Environment Bridge**:
+
 ```rust
 pub struct DesktopBridge {
     compositor: CompositorBridge,
@@ -586,6 +596,7 @@ impl DesktopBridge {
 ```
 
 **File Manager Bridge**:
+
 ```rust
 pub struct FileManagerBridge {
     file_tree: FileTreeBridge,
@@ -610,6 +621,7 @@ impl FileManagerBridge {
 ```
 
 **Browser Bridge**:
+
 ```rust
 pub struct BrowserBridge {
     address_bar: AddressBarBridge,

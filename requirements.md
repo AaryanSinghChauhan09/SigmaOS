@@ -623,7 +623,7 @@ The 15 component areas below are prioritized to bring SigmaOS to parity with a m
 The following requirements are designated as 90-day priority targets. Progress on these items SHALL be tracked in the project milestone tracker and reported in each sprint review.
 
 | Priority | Requirement | Deliverable |
-|----------|-------------|-------------|
+| ---------- | ------------- | ------------- |
 | P0 | Requirement 1 | sigpkg format specification v1.0 finalized and documented |
 | P0 | Requirement 2 | sigma_pkg_registry API v1 endpoint live in staging |
 | P0 | Requirement 3 | Minimal Pkg_Client supporting install and verify commands |
@@ -634,4 +634,3 @@ The following requirements are designated as 90-day priority targets. Progress o
 | P1 | Requirement 9 | mkfs.sigmafs and fsck.sigmafs tools functional |
 | P2 | Requirement 10 | initramfs unlock and pivot-root functional |
 | P2 | Requirement 11 | Device_Manager creates /dev nodes for enumerated hardware |
-

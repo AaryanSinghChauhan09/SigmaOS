@@ -120,7 +120,7 @@ This roadmap synthesizes insights from leading Linux distributions (Ubuntu, Arch
   - Package signing verification
 - **Timeline**: 4 weeks
 - **Priority**: 🔴 CRITICAL
-- **Status**: ✅ Started - Basic package handling implemented
+- **Status**: ✅ Implemented - Core sigpkg handles ED25519 signature checks, package manifests, and SBOM CycloneDX schema validation.
 
 #### 1.4 Security Framework (Gap Analysis Priority 1)
 **Inspiration**: SELinux, AppArmor
@@ -231,6 +231,7 @@ This roadmap synthesizes insights from leading Linux distributions (Ubuntu, Arch
 - **sigma-dm-verity**: Block-level integrity verification (Linux dm-verity-inspired)
 - **Timeline**: 10 weeks
 - **Priority**: 🔴 CRITICAL
+- **Status**: ✅ Core VFS Implemented - Capability-gated directory hierarchy and file operations are active in no_std.
 
 #### 3.2 Advanced Storage Features
 **Inspiration**: Btrfs, ZFS
@@ -287,6 +288,7 @@ This roadmap synthesizes insights from leading Linux distributions (Ubuntu, Arch
 - **sigma-ai-scheduler**: AI-assisted predictive scheduling (SigmaOS unique)
 - **Timeline**: 12 weeks
 - **Priority**: 🔴 CRITICAL
+- **Status**: ✅ Implemented - Intrusive RB-tree CFS scheduler active in kernel/core/sched_cfs.rs.
 
 #### 5.2 Memory Management
 **Inspiration**: Linux memory management, zswap
@@ -298,6 +300,7 @@ This roadmap synthesizes insights from leading Linux distributions (Ubuntu, Arch
 - **sigma-tickless**: Adaptive tickless operation (Linux NOHZ-inspired)
 - **Timeline**: 8 weeks
 - **Priority**: 🟠 HIGH
+- **Status**: ✅ Core Implemented - Buddy Page Allocator, object SLAB Cache, and 4-level x86-64 VMM initialized in kernel/mm/buddy_slab_vmm.rs.
 
 #### 5.3 I/O Performance
 **Inspiration**: Linux io_uring, DPDK

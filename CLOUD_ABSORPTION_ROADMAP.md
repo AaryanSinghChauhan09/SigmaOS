@@ -831,7 +831,7 @@ This roadmap focuses on absorbing cloud-oriented open-source projects to create 
 ### Cloud Performance
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Container startup | 2s | 1s | 750ms | 500ms | <500ms |
 | MicroVM startup | 2s | 1s | 750ms | 500ms | <500ms |
 | Serverless cold start | 2s | 1s | 500ms | 100ms | <100ms |
@@ -841,7 +841,7 @@ This roadmap focuses on absorbing cloud-oriented open-source projects to create 
 ### Cloud Efficiency
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Container density | 50 | 100 | 200 | 500 | 500+ |
 | MicroVM density | 20 | 50 | 100 | 200 | 200+ |
 | Serverless density | 100 | 500 | 1000 | 5000 | 5000+ |

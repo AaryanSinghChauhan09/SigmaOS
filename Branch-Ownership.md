@@ -7,10 +7,10 @@ SigmaOS uses a federated branch management model inspired by large-scale Linux d
 ## 🗂️ Branch Mapping
 
 | Branch | Primary Owner | Key Deliverable | Priority | CI Gate |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `main` | **Release Manager** | Stable LTS builds and ABI | High | Reproducible build pass |
 | `drivers-dev` | **Drivers Lead** | USB, NVMe, GPU drivers | High | Driver unit + QEMU tests |
-| `drivers-experimental`| **Drivers Lead** | Bleeding edge drivers | Medium | Integration smoke tests |
+| `drivers-experimental` | **Drivers Lead** | Bleeding edge drivers | Medium | Integration smoke tests |
 | `fs-dev` | **FS Lead** | Journaling encrypted FS | High | FS integrity tests |
 | `kernel-exp` | **Research Lead** | Microkernel/WASM experiments | Low | Research CI only |
 | `sigpkg` | **Packaging Lead** | Package manager MVP | Medium | Reproducible package build |

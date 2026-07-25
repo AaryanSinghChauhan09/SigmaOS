@@ -25,7 +25,7 @@ sigma-monitor is a real-time system monitor for SigmaOS, providing CPU, memory, 
 ## Data Sources
 
 | Metric | Source |
-|--------|--------|
+| -------- | -------- |
 | Per-process CPU | `/proc/<pid>/stat` (or procfs-equivalent SigmaOS VFS) |
 | Per-process memory | `/proc/<pid>/status` (VmRSS, VmSwap) |
 | System-wide CPU | `/proc/stat` cumulative jiffies |
@@ -40,7 +40,7 @@ sigma-monitor is a real-time system monitor for SigmaOS, providing CPU, memory, 
 
 ## Display Layout (TUI)
 
-```
+```text
 ┌─ sigma-monitor ─ uptime: 3d 12h ── SigmaOS v0.2 ────────────────┐
 │ CPU  ████████████░░░░░░░  62 %   Cores: 8   Freq: 3.6 GHz        │
 │ MEM  ████████░░░░░░░░░░░  41 %   3.3 GB / 8.0 GB  Swap: 0 MB     │
@@ -102,7 +102,7 @@ sigma-monitor is a real-time system monitor for SigmaOS, providing CPU, memory, 
 ## Color Coding
 
 | Level | CPU% | Color |
-|-------|------|-------|
+| ------- | ------ | ------- |
 | Normal | 0–40 | Green |
 | Warning | 40–80 | Yellow |
 | Critical | 80–100 | Red |
@@ -146,7 +146,7 @@ Memory and disk I/O bars follow same scale. Zombie processes shown in magenta. S
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | procfs reader | ⬜ Not started |
 | TUI renderer | ⬜ Not started |
 | Shard health | ⬜ Not started |

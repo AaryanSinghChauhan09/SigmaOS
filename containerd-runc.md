@@ -9,7 +9,7 @@ SigmaOS uses **containerd** (Apache-2.0) as the OCI image manager and pull/unpac
 ## Component Roles
 
 | Component | Role | License |
-|---|---|---|
+| --- | --- | --- |
 | containerd | Image pull, layer unpacking, snapshot management | Apache-2.0 |
 | runc | OCI runtime: `create`, `start`, `kill`, `delete` | Apache-2.0 |
 | sigma-shim | containerd shim v2 — maps OCI to sigma sandbox | MIT (new) |
@@ -19,7 +19,7 @@ SigmaOS uses **containerd** (Apache-2.0) as the OCI image manager and pull/unpac
 
 ## Architecture
 
-```
+```text
 sigma-container run <image>
        │
        ▼
@@ -39,7 +39,7 @@ sigma-container run <image>
 ## Sigma Shim: OCI Lifecycle Mapping
 
 | OCI Lifecycle Hook | Sigma Action |
-|---|---|
+| --- | --- |
 | `create` | `sigma_pledge("stdio rpath wpath cpath inet")` — per image policy |
 | `start` | `sigma_unveil("/", "rx")` then restrict to OCI rootfs |
 | `prestart hook` | Set up sigma-net namespace, inject SVID identity |

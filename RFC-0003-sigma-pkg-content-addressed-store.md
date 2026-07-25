@@ -29,7 +29,7 @@ packages share a single on-disk copy via hardlinks (deduplication).
 
 ### Store path format
 
-```
+```text
 /sigma/store/<derivation-hash>-<name>-<version>/
 ```
 
@@ -47,7 +47,7 @@ This mirrors [GNU Guix's store path scheme](https://guix.gnu.org/manual/en/html_
 
 Files with identical SHA-256 hashes are stored once and hardlinked:
 
-```
+```text
 /sigma/store/cas/<sha256-first-2-chars>/<sha256-rest>  → actual file
 /sigma/store/<hash>-pkg-1.0/bin/tool → hardlink to cas entry
 /sigma/store/<hash>-pkg-2.0/bin/tool → same hardlink (if content identical)
@@ -55,7 +55,7 @@ Files with identical SHA-256 hashes are stored once and hardlinked:
 
 ### Signature verification chain
 
-```
+```text
 package.spkg
   └── manifest.json  (package metadata + file list + per-file hashes)
   └── manifest.json.dilithium5.sig  (Dilithium-5 signature by maintainer key)
@@ -73,6 +73,7 @@ Verification steps:
 ### Database schema
 
 `/sigma/var/pkg/installed.json` — JSON object, keyed by package name:
+
 ```json
 {
   "sigma-core": {

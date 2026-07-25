@@ -34,7 +34,7 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 ### Core Components
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    SigmaAI Agent System                       │
 ├─────────────────────────────────────────────────────────────┤
@@ -134,7 +134,7 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 
 ### Bridge Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                  CLI-to-GUI Bridge System                       │
 ├─────────────────────────────────────────────────────────────┤
@@ -154,7 +154,7 @@ This document outlines the architecture and implementation roadmap for SigmaAI, 
 ### Command Mapping Examples
 
 | CLI Command | GUI Operation | Application |
-|-------------|---------------|-------------|
+| ------------- | --------------- | ------------- |
 | `sigma-open file.txt` | Open file | File Manager |
 | `sigma-browser open https://example.com` | Open URL | Browser |
 | `sigma-terminal run command` | Execute command | Terminal |

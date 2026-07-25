@@ -65,7 +65,7 @@ This roadmap focuses on absorbing UI/UX-oriented open-source projects to create 
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Frame Rate | 30fps | 45fps | 60fps | 60fps | 60fps |
 | Frame Time | 50ms | 30ms | 20ms | 16ms | <16ms |
 | Input Latency | 50ms | 30ms | 20ms | 10ms | <10ms |

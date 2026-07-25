@@ -63,7 +63,7 @@ This roadmap focuses on absorbing networking-oriented open-source projects to cr
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Throughput | Baseline | +10% | +20% | +30% | Line-rate |
 | Latency | Baseline | -10% | -20% | -30% | <10µs |
 | Connection Time | Baseline | -20% | -40% | -60% | <100ms |

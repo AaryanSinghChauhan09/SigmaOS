@@ -1,4 +1,4 @@
-﻿# Connector
+# Connector
 
 Undici creates the underlying socket via the connector builder.
 Normally, this happens automatically and you don't need to care about this,
@@ -51,7 +51,7 @@ const client = new Client('https://localhost:3000', {
     connector(opts, (err, socket) => {
       if (err) {
         cb(err)
-      } else if (/* assertion */) {
+      } else if (/*assertion*/) {
         socket.destroy()
         cb(new Error('kaboom'))
       } else {
@@ -60,6 +60,7 @@ const client = new Client('https://localhost:3000', {
     })
   }
 })
+
 ```
 
 ### Example: validate the CA fingerprint
@@ -121,4 +122,5 @@ function getIssuerCertificate (socket) {
   }
   return certificate
 }
+
 ```

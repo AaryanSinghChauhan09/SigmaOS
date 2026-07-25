@@ -6,7 +6,7 @@
 
 ## The Adoption Equation
 
-```
+```text
 Adoption = Technical Excellence × Ecosystem × Community × Trust
 ```
 
@@ -51,7 +51,7 @@ Students exploring OS internals, developers wanting a clean privacy-first deskto
 ### App Library (via sigpkg)
 
 | App | Category | Priority |
-|---|---|---|
+| --- | --- | --- |
 | sigma-browser (Chromium fork) | Web | 🔴 |
 | sigma-edit (text/code editor) | Dev | 🔴 |
 | sigma-terminal | System | 🔴 |
@@ -90,7 +90,7 @@ A developer can install SigmaOS, open sigma-edit, write code, compile, test — 
 ### Unique Differentiators (already implemented — need marketing)
 
 | Feature | Why It Matters | Status |
-|---|---|---|
+| --- | --- | --- |
 | PQC by default (Kyber-1024 + Dilithium-5) | Harvest-now-decrypt-later risk — other distros don't have this | ✅ |
 | sigma_pledge / sigma_unveil | Per-process capability restriction — stronger than SELinux in practice | ✅ |
 | WASM kernel in browser | Run SigmaOS in a browser tab — zero install | ✅ |
@@ -204,7 +204,7 @@ A developer can install SigmaOS, open sigma-edit, write code, compile, test — 
 ### Security Maturity Milestones
 
 | Version | Security Milestone |
-|---|---|
+| --- | --- |
 | v0.1 | sigma_pledge on all userland processes |
 | v1.0 | TPM2 measured boot + remote attestation |
 | v1.5 | Third-party security audit (Cure53 or similar) |
@@ -221,7 +221,7 @@ Published build logs at builds.sigmaos.app (planned v1.0).
 ## Success Metrics
 
 | Metric | v0.1 | v1.0 | v2.0 | v3.0 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | GitHub stars | 1,000 | 10,000 | 50,000 | 200,000 |
 | Monthly downloads | 500 | 10,000 | 100,000 | 1,000,000 |
 | sigpkg packages | 10 | 500 | 5,000 | 50,000 |

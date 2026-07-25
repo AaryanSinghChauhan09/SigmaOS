@@ -589,7 +589,7 @@ This document catalogs principles, patterns, and features from open source proje
 ## 📊 Feature Inspiration Matrix
 
 | Feature | Source Project | License | Principles | SigmaOS Component | Priority |
-|---------|---------------|---------|------------|-------------------|----------|
+| --------- | --------------- | --------- | ------------ | ------------------- | ---------- |
 | Timeline video editing | Kdenlive | GPL-3.0 | Non-linear editing, proxy files | sigma-video | MEDIUM |
 | Vector path editing | Inkscape | GPL-3.0 | SVG-based, node editing | sigma-vector | MEDIUM |
 | Distributed processing | Apache Spark | Apache-2.0 | RDD abstraction, in-memory | sigma-spark | HIGH |

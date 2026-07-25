@@ -53,7 +53,7 @@ This roadmap focuses on absorbing desktop-oriented open-source projects to creat
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Boot to desktop | 5s | 3s | 2.5s | 2s | <2s |
 | Window render | 100ms | 70ms | 50ms | 30ms | <30ms |
 | App launch | 2s | 1s | 750ms | 500ms | <500ms |

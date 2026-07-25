@@ -63,7 +63,7 @@ This roadmap focuses on absorbing server-oriented open-source projects to create
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Boot to services | 5s | 3s | 2s | 1s | <1s |
 | Idle memory | 200MB | 150MB | 100MB | 64MB | <64MB |
 | Service startup | 500ms | 300ms | 200ms | 100ms | <100ms |

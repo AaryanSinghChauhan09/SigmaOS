@@ -9,7 +9,7 @@
 ## Navigation
 
 | Pillar | Range | Count |
-|--------|-------|-------|
+| -------- | ------- | ------- |
 | [🖥️ Kernel & Hardware](#-pillar-1-kernel--hardware) | 1–167 | 167 |
 | [📦 Package & Ecosystem](#-pillar-2-package--ecosystem) | 168–334 | 167 |
 | [🤖 AI & Automation](#-pillar-3-ai--automation) | 335–501 | 167 |

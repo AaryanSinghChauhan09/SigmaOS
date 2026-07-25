@@ -10,7 +10,7 @@
 SigmaOS ships from a **single unified codebase** via CMake profile flags. Every format below
 is compiled from the same `main` branch — there are no divergent forks.
 
-```
+```text
 main (unified)
  ├─ PROFILE=standalone    → 🖥️  Full desktop ISO
  ├─ PROFILE=rtos          → ⚙️  Hard real-time ELF
@@ -30,7 +30,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 📦 Application Formats
 
 | Format | Command / Link | Status |
-|--------|----------------|--------|
+| -------- | ---------------- | -------- |
 | Native (Normal) | `make PROFILE=app all` | ✅ Stable |
 | Electron | `npm start` or download installer | ✅ Stable |
 | Java JAR / WAR | `java -jar sigmaos.jar` | 🔄 Preview |
@@ -47,7 +47,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🖥️ Standalone Formats
 
 | Format | Build Flag | Status |
-|--------|-----------|--------|
+| -------- | ----------- | -------- |
 | Native Executable (ISO) | `PROFILE=standalone` | ✅ Stable |
 | AppImage (Linux) | `PROFILE=standalone` | ✅ Stable |
 | Portable EXE (Windows) | `PROFILE=standalone` | 🔄 Preview |
@@ -61,7 +61,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## ⚙️ RTOS Formats
 
 | Format | Build Flag | IRQ Latency | Status |
-|--------|-----------|-------------|--------|
+| -------- | ----------- | ------------- | -------- |
 | Monolithic | `PROFILE=rtos RTOS_TYPE=monolithic` | <10 µs | ✅ Stable |
 | Microkernel | `PROFILE=rtos RTOS_TYPE=microkernel` | <10 µs | ✅ Stable |
 | Layered / Modular | `PROFILE=rtos RTOS_TYPE=layered` | <10 µs | ✅ Stable |
@@ -74,7 +74,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 📱 Mobile Formats
 
 | Format | Platform | Status |
-|--------|----------|--------|
+| -------- | ---------- | -------- |
 | Native APK | Android 12+ | 🔄 Preview |
 | Native IPA | iOS 16+ (TestFlight) | 🔄 Preview |
 | Hybrid (HTML/CSS/JS) | Android + iOS (Capacitor) | ✅ Stable |
@@ -87,7 +87,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🧩 Microkernel Variants
 
 | Variant | Kernel Size | Build Flag | Status |
-|---------|------------|-----------|--------|
+| --------- | ------------ | ----------- | -------- |
 | Pure | <512 KB | `MK_TYPE=pure` | ✅ Stable |
 | Hybrid | <1 MB | `MK_TYPE=hybrid` | ✅ Stable |
 | Modular | <512 KB base | `MK_TYPE=modular` | ✅ Stable |
@@ -99,7 +99,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 💻 Dual Boot Formats
 
 | Format | Risk Level | Status |
-|--------|-----------|--------|
+| -------- | ----------- | -------- |
 | Traditional Partition | Low | 🔄 Preview |
 | Separate Disk | Zero | 🔄 Preview |
 | Nested Boot / Chainloading | Very Low | 🔄 Preview |
@@ -111,7 +111,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🌐 Distributed Formats
 
 | Topology | Consensus | Build Flag | Status |
-|----------|-----------|-----------|--------|
+| ---------- | ----------- | ----------- | -------- |
 | Client–Server | Central | `DIST_TYPE=client-server` | ✅ Stable |
 | Peer-to-Peer | ZeroNet + CRDT | `DIST_TYPE=p2p` | ✅ Stable |
 | Clustered System | RAFT (SovereignConsensus) | `DIST_TYPE=cluster` | ✅ Stable |
@@ -125,7 +125,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## ☁️ Cloud Formats
 
 | Deployment | Image Format | Build Flag | Status |
-|------------|-------------|-----------|--------|
+| ------------ | ------------- | ----------- | -------- |
 | Public Cloud (AWS/GCE/Azure) | QCOW2 / VHD | `CLOUD_TYPE=public` | ✅ Stable |
 | Private Cloud (OpenStack/Proxmox) | QCOW2 / VMDK | `CLOUD_TYPE=private` | ✅ Stable |
 | Hybrid Cloud | WireGuard bundle | `CLOUD_TYPE=hybrid` | ✅ Stable |
@@ -141,7 +141,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🌍 Browser Formats
 
 | Variant | Description | Status |
-|---------|-------------|--------|
+| --------- | ------------- | -------- |
 | Native Desktop | Custom Chromium + `navigator.sigmaos.*` | ✅ Stable |
 | Mobile Browser | Touch-adapted, Android APK / iOS WKWebView | 🔄 Preview |
 | Embedded / WebViews | Electron, Tauri, WebView2 SDK | ✅ Stable |
@@ -154,7 +154,7 @@ All artefacts are signed with **Dilithium-5** and keys exchanged via **Kyber-102
 ## 🖥️ Kernel Formats
 
 | Kernel Model | Size | Scheduler | Build Flag | Status |
-|-------------|------|-----------|-----------|--------|
+| ------------- | ------ | ----------- | ----------- | -------- |
 | Monolithic | ~2 MB | MLFQ+EDF+CFS | `KERNEL_TYPE=monolithic` | ✅ Stable |
 | Microkernel | <512 KB | Round-robin | `KERNEL_TYPE=microkernel` | ✅ Stable |
 | Hybrid | ~1 MB | MLFQ | `KERNEL_TYPE=hybrid` | ✅ Stable |
@@ -298,6 +298,7 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 7. Install guest tools for better performance
 
 **QEMU Quick Start**:
+
 ```bash
 qemu-system-x86_64 -cdrom sigmaos-15.0.0.iso -m 4G -smp 2 -enable-kvm
 ```

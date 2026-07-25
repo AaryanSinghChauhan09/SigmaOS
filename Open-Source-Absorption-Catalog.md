@@ -33,7 +33,7 @@ This catalog catalogs 110+ open-source projects that SigmaOS can absorb, adapt, 
 ## Priority 1: Immediate Priority (Score 12-15)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | Wasmtime | 4 | 5 | 5 | 14 | 2 | **Integrate directly** |
 | Wasmer | 5 | 5 | 5 | 15 | 2 | **Integrate directly** |
 | smoltcp | 5 | 5 | 5 | 15 | 1 | **Integrate directly** |

@@ -7,7 +7,6 @@
 ## Kernel (Rust `#![no_std]` + Zig + SPARK/Ada)
 
 ### Core
-
 | Subsystem | File | Lang |
 |---|---|---|
 | Scheduler (MLFQ+EDF+CFS) | `kernel/core/sigma_sched.rs` | Rust |
@@ -21,7 +20,6 @@
 | EDF scheduler | `kernel/scheduling/sigma_edf.rs` | Rust |
 
 ### IPC
-
 | Subsystem | File | Lang |
 |---|---|---|
 | sigma-bus typed IPC | `kernel/ipc/sigma_bus.rs` | Rust |
@@ -29,7 +27,6 @@
 | Shared memory | `kernel/ipc/sigma_shm.rs` | Rust |
 
 ### Memory
-
 | Subsystem | File | Lang |
 |---|---|---|
 | x86-64 4-level paging | `kernel/memory/sigma_vmm.zig` | Zig |
@@ -37,7 +34,6 @@
 | Huge pages (2MB/1GB) | `kernel/memory/sigma_hugepages.ads/.adb` | SPARK |
 
 ### Security
-
 | Subsystem | File | Lang |
 |---|---|---|
 | sigma_pledge + sigma_unveil | `kernel/security/sigma_pledge.rs` | Rust |
@@ -50,7 +46,6 @@
 | AVC O(1) cache | `security/sigma_avc.rs` | Rust |
 
 ### Crypto
-
 | Subsystem | File | Lang |
 |---|---|---|
 | SHA-256 + HMAC | `kernel/crypto/sigma_sha256.rs` | Rust |
@@ -58,7 +53,6 @@
 | Dilithium-5 | `crypto/sigma_dilithium.ads/.adb` | SPARK |
 
 ### Networking
-
 | Subsystem | File | Lang |
 |---|---|---|
 | Ethernet + IPv4 + ARP + UDP | `kernel/net/sigma_net.rs` | Rust |
@@ -74,7 +68,6 @@
 | WireGuard VPN | `kernel/net/sigma_wireguard.rs` | Rust |
 
 ### Filesystems
-
 | Subsystem | File | Lang |
 |---|---|---|
 | VFS + Tmpfs | `kernel/fs/sigma_vfs.rs` | Rust |
@@ -85,7 +78,6 @@
 | SigmaFS CoW native | `kernel/fs/sigma_sigmafs.rs` | Rust |
 
 ### Power
-
 | Subsystem | File | Lang |
 |---|---|---|
 | ACPI P/C-states | `kernel/power/sigma_power.zig` | Zig |
@@ -122,26 +114,22 @@
 ## Userland (Nim + Rust)
 
 ### Shell & Scripting
-
 | Tool | File | Lang |
 |---|---|---|
 | sigma-sh REPL | `userland/shell/sigma_shell.nim` | Nim |
 | Script runner | `userland/shell/sigma_scripting.nim` | Nim |
 
 ### Package Management
-
 | Tool | File | Lang |
 |---|---|---|
 | sigma-pkg | `userland/pkg/sigma_pkg.nim` | Nim |
 
 ### Core Utilities
-
 | Tool | File | Lang |
 |---|---|---|
 | sigma-coreutils (15 tools) | `userland/coreutils/sigma_coreutils.nim` | Nim |
 
 ### System Tools
-
 | Tool | File | Lang |
 |---|---|---|
 | sigma-monitor | `userland/tools/sigma_monitor.rs` | Rust |
@@ -152,7 +140,6 @@
 | sigma-update daemon | `userland/tools/sigma_update_daemon.rs` | Rust |
 
 ### Network Tools
-
 | Tool | File | Lang |
 |---|---|---|
 | sigma-ssh | `userland/net/sigma_ssh.nim` | Nim |
@@ -161,7 +148,6 @@
 | sigma-netctl | `userland/net/sigma_netctl.nim` | Nim |
 
 ### Desktop
-
 | Component | File | Lang |
 |---|---|---|
 | Zenith compositor | `userland/desktop/sigma_compositor.rs` | Rust |
@@ -172,7 +158,6 @@
 | App launcher (fuzzy) | `userland/desktop/sigma_launcher.rs` | Rust |
 
 ### Daemons
-
 | Daemon | File | Lang |
 |---|---|---|
 | sigmad-health | `userland/daemon/sigmad_health.rs` | Rust |
@@ -180,14 +165,12 @@
 | sigmad-vault | `userland/daemon/sigmad_vault.rs` | Rust |
 
 ### Init & Update
-
 | Component | File | Lang |
 |---|---|---|
 | sigma-init (PID 1) | `userland/init/sigma_init.rs` | Rust |
 | sigma-update (A/B) | `userland/update/sigma_update.rs` | Rust |
 
 ### AI & Runtime
-
 | Component | File | Lang |
 |---|---|---|
 | sigma-ai (TinyLlama) | `userland/ai/sigma_ai.rs` | Rust |
@@ -207,4 +190,4 @@
 | **SPARK/Ada** | 5% | Formal crypto, huge pages |
 | **C/C++** | 0% | None — all converted |
 
-### Total subsystems implemented: 90+
+**Total subsystems implemented: 90+**

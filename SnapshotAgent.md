@@ -1,4 +1,4 @@
-﻿# SnapshotAgent
+# SnapshotAgent
 
 The `SnapshotAgent` provides a powerful way to record and replay HTTP requests for testing purposes. It extends `MockAgent` to enable automatic snapshot testing, eliminating the need to manually define mock responses.
 
@@ -16,6 +16,7 @@ The `SnapshotAgent` provides a powerful way to record and replay HTTP requests f
 
 ```javascript
 new SnapshotAgent([options])
+
 ```
 
 ### Parameters
@@ -58,6 +59,7 @@ const users = await response.json()
 
 // Save recorded snapshots
 await agent.saveSnapshots()
+
 ```
 
 #### Playback Mode (`'playback'`)
@@ -75,6 +77,7 @@ setGlobalDispatcher(agent)
 
 // Uses recorded response instead of real request
 const response = await fetch('https://api.example.com/users')
+
 ```
 
 #### Update Mode (`'update'`)
@@ -92,6 +95,7 @@ setGlobalDispatcher(agent)
 
 // Uses snapshot if exists, otherwise makes real request and records it
 const response = await fetch('https://api.example.com/new-endpoint')
+
 ```
 
 ## Instance Methods
@@ -110,6 +114,7 @@ Saves all recorded snapshots to a file.
 
 ```javascript
 await agent.saveSnapshots('./custom-snapshots.json')
+
 ```
 
 ## Advanced Configuration
@@ -132,6 +137,7 @@ const agent = new SnapshotAgent({
   // Exclude sensitive headers from snapshots entirely
   excludeHeaders: ['authorization', 'x-api-key', 'cookie']
 })
+
 ```
 
 ### Custom Request/Response Filtering
@@ -155,6 +161,7 @@ const agent = new SnapshotAgent({
     return !url.pathname.includes('/auth/')
   }
 })
+
 ```
 
 ### URL Pattern Exclusion
@@ -172,6 +179,7 @@ const agent = new SnapshotAgent({
     'telemetry'                      // Substring match
   ]
 })
+
 ```
 
 ### Memory Management
@@ -190,6 +198,7 @@ const agent = new SnapshotAgent({
   autoFlush: true,
   flushInterval: 30000
 })
+
 ```
 
 ### Sequential Response Handling
@@ -219,6 +228,7 @@ const second = await fetch('https://api.example.com/random')
 
 // Third call repeats the last response (B)
 const third = await fetch('https://api.example.com/random')
+
 ```
 
 ## Managing Snapshots
@@ -246,6 +256,7 @@ agent.replaceSnapshots(filteredSnapshots.map((snapshot, index) => ({
 
 // Save updated snapshots
 await agent.saveSnapshots('./updated-snapshots.json')
+
 ```
 
 ### `agent.loadSnapshots([filePath])`
@@ -262,6 +273,7 @@ Loads snapshots from a file.
 
 ```javascript
 await agent.loadSnapshots('./existing-snapshots.json')
+
 ```
 
 ### `agent.getRecorder()`
@@ -275,6 +287,7 @@ Gets the underlying `SnapshotRecorder` instance.
 ```javascript
 const recorder = agent.getRecorder()
 console.log(`Recorded ${recorder.size()} interactions`)
+
 ```
 
 ### `agent.getMode()`
@@ -291,6 +304,7 @@ Clears all recorded snapshots from memory.
 
 ```javascript
 agent.clearSnapshots()
+
 ```
 
 ## Working with Different Request Types
@@ -306,6 +320,7 @@ const response = await fetch('https://jsonplaceholder.typicode.com/posts/1')
 const post = await response.json()
 
 await agent.saveSnapshots()
+
 ```
 
 ### POST Requests with Body
@@ -322,6 +337,7 @@ const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
 })
 
 await agent.saveSnapshots()
+
 ```
 
 ### Using with `undici.request`
@@ -338,6 +354,7 @@ const { statusCode, headers, body } = await request('https://api.example.com/dat
 const data = await body.json()
 
 await agent.saveSnapshots()
+
 ```
 
 ## Test Integration
@@ -366,12 +383,13 @@ test('API integration test', async (t) => {
   assert(Array.isArray(users))
   assert(users.length > 0)
 })
+
 ```
 
 ### Environment-Based Mode Selection
 
 ```javascript
-const mode = process.env.SNAPSHOT_MODE || 'playback'
+const mode = process.env.SNAPSHOT_MODE | | 'playback'
 
 const agent = new SnapshotAgent({
   mode,
@@ -380,6 +398,7 @@ const agent = new SnapshotAgent({
 
 // Run with: SNAPSHOT_MODE=record npm test (to record)
 // Run with: npm test (to playback)
+
 ```
 
 ### Test Helper Function
@@ -398,6 +417,7 @@ test('user API test', async (t) => {
 
   // Test implementation...
 })
+
 ```
 
 ## Snapshot File Format
@@ -429,6 +449,7 @@ Snapshots are stored as JSON with the following structure:
     }
   }
 ]
+
 ```
 
 ## Security Considerations
@@ -457,14 +478,14 @@ const agent = new SnapshotAgent({
     const url = new URL(requestOpts.path, requestOpts.origin)
 
     // Don't record authentication endpoints
-    if (url.pathname.includes('/auth/') || url.pathname.includes('/login')) {
+    if (url.pathname.includes('/auth/') | | url.pathname.includes('/login')) {
       return false
     }
 
     // Don't record if request contains sensitive body data
     if (requestOpts.body && typeof requestOpts.body === 'string') {
       const body = requestOpts.body.toLowerCase()
-      if (body.includes('password') || body.includes('secret')) {
+      if (body.includes('password') | | body.includes('secret')) {
         return false
       }
     }
@@ -472,23 +493,24 @@ const agent = new SnapshotAgent({
     return true
   }
 })
+
 ```
 
 ### Snapshot File Security
 
 **Important**: Snapshot files may contain sensitive data. Handle them securely:
 
-- âœ… Add snapshot files to `.gitignore` if they contain real API data
+- ✅ Add snapshot files to `.gitignore` if they contain real API data
 
-- âœ… Use environment-specific snapshots (dev/staging/prod)
+- ✅ Use environment-specific snapshots (dev/staging/prod)
 
-- âœ… Regularly review snapshot contents for sensitive information
+- ✅ Regularly review snapshot contents for sensitive information
 
-- âœ… Use the `excludeHeaders` option for production snapshots
+- ✅ Use the `excludeHeaders` option for production snapshots
 
-- âŒ Never commit snapshots with real authentication tokens
+- ❌ Never commit snapshots with real authentication tokens
 
-- âŒ Don't share snapshot files containing personal data
+- ❌ Don't share snapshot files containing personal data
 
 ```gitignore
 
@@ -500,6 +522,7 @@ const agent = new SnapshotAgent({
 # Include sanitized test snapshots
 
 !/test/snapshots/mock-*.json
+
 ```
 
 ## Error Handling
@@ -515,6 +538,7 @@ try {
     console.log('Snapshot not found for this request')
   }
 }
+
 ```
 
 ### Handling Network Errors in Record Mode
@@ -528,6 +552,7 @@ try {
   // Network errors are not recorded as snapshots
   console.log('Network error:', error.message)
 }
+
 ```
 
 ## Best Practices
@@ -540,6 +565,7 @@ const agent = new SnapshotAgent({
   mode: 'playback',
   snapshotPath: `./test/snapshots/${testSuiteName}-${testName}.json`
 })
+
 ```
 
 ### 2. Version Control Snapshots
@@ -551,6 +577,7 @@ Add snapshot files to version control to ensure consistent test behavior across 
 # Include snapshots in version control
 
 !/test/snapshots/*.json
+
 ```
 
 ### 3. Clean Up Test Data
@@ -567,6 +594,7 @@ test('API test', async (t) => {
     agent.clearSnapshots()
   })
 })
+
 ```
 
 ### 4. Snapshot Validation
@@ -585,13 +613,14 @@ test('validate snapshot contents', async (t) => {
   assert(snapshots.length > 0, 'Should have recorded snapshots')
   assert(snapshots[0].request.url.startsWith('https://'), 'Should use HTTPS')
 })
+
 ```
 
 ## Comparison with Other Tools
 
 ### vs Manual MockAgent Setup
 
-### Manual MockAgent:
+### Manual MockAgent
 
 ```javascript
 const mockAgent = new MockAgent()
@@ -604,9 +633,10 @@ mockPool.intercept({
   { id: 1, name: 'User 1' },
   { id: 2, name: 'User 2' }
 ])
+
 ```
 
-### SnapshotAgent:
+### SnapshotAgent
 
 ```javascript
 // Record once
@@ -616,19 +646,20 @@ const agent = new SnapshotAgent({ mode: 'record', snapshotPath: './snapshots.jso
 // Use in tests
 const agent = new SnapshotAgent({ mode: 'playback', snapshotPath: './snapshots.json' })
 // Automatically replays recorded response
+
 ```
 
 ### vs nock
 
 SnapshotAgent provides similar functionality to nock but is specifically designed for undici:
 
-- âœ… Works with all undici APIs (`request`, `stream`, `pipeline`, etc.)
+- ✅ Works with all undici APIs (`request`, `stream`, `pipeline`, etc.)
 
-- âœ… Supports undici-specific features (RetryAgent, connection pooling)
+- ✅ Supports undici-specific features (RetryAgent, connection pooling)
 
-- âœ… Better TypeScript integration
+- ✅ Better TypeScript integration
 
-- âœ… More efficient for high-performance scenarios
+- ✅ More efficient for high-performance scenarios
 
 ## See Also
 

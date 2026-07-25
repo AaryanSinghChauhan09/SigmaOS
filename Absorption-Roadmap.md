@@ -125,7 +125,7 @@ This roadmap outlines a systematic approach to absorbing 232 open-source project
 ### Boot Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Cold boot (NVMe) | 5s | 3s | 2.5s | 2s | <2s |
 | Resume from suspend | 2s | 1s | 750ms | 500ms | <500ms |
 | Service startup | 500ms | 300ms | 200ms | 100ms | <100ms |
@@ -133,7 +133,7 @@ This roadmap outlines a systematic approach to absorbing 232 open-source project
 ### Memory Efficiency Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Idle memory (desktop) | 300MB | 250MB | 200MB | 150MB | <150MB |
 | Idle memory (server) | 150MB | 120MB | 100MB | 64MB | <64MB |
 | Per-process overhead | 5MB | 4MB | 3MB | 2MB | <2MB |

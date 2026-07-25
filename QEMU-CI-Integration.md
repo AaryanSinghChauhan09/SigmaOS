@@ -9,7 +9,7 @@ SigmaOS uses QEMU as the primary CI device model for testing drivers, boot seque
 ## Machine Types
 
 | Architecture | QEMU machine | Firmware |
-|---|---|---|
+| --- | --- | --- |
 | x86_64 | `q35` | OVMF UEFI or SeaBIOS |
 | ARM64 | `virt` | EDK2 UEFI (qemu-efi-aarch64) |
 | RISC-V 64 | `virt` | OpenSBI + U-Boot |
@@ -21,7 +21,7 @@ SigmaOS uses QEMU as the primary CI device model for testing drivers, boot seque
 GitHub Actions does not have native KVM on all runners, so we use 6 jobs:
 
 | Job | Arch | Firmware | Accel |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | x86_64-uefi-kvm | x86_64 | OVMF | KVM (self-hosted) |
 | x86_64-uefi-tcg | x86_64 | OVMF | TCG (hosted) |
 | x86_64-bios-tcg | x86_64 | SeaBIOS | TCG |
@@ -50,37 +50,49 @@ jobs:
       fail-fast: false
       matrix:
         include:
+
           - arch: x86_64
+
             firmware: uefi
             accel: kvm
             runner: self-hosted-kvm
             qemu_machine: q35,accel=kvm
             bios_args: "-bios /usr/share/OVMF/OVMF_CODE.fd"
+
           - arch: x86_64
+
             firmware: uefi
             accel: tcg
             runner: ubuntu-22.04
             qemu_machine: q35,accel=tcg
             bios_args: "-bios /usr/share/OVMF/OVMF_CODE.fd"
+
           - arch: x86_64
+
             firmware: bios
             accel: tcg
             runner: ubuntu-22.04
             qemu_machine: q35,accel=tcg
             bios_args: ""
+
           - arch: arm64
+
             firmware: uefi
             accel: tcg
             runner: ubuntu-22.04
             qemu_machine: virt,accel=tcg
             bios_args: "-bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
+
           - arch: riscv64
+
             firmware: uboot
             accel: tcg
             runner: ubuntu-22.04
             qemu_machine: virt,accel=tcg
             bios_args: "-bios /usr/lib/riscv64-linux-gnu/opensbi/generic/fw_jump.bin"
+
           - arch: arm64
+
             firmware: uefi
             accel: kvm
             runner: self-hosted-arm64-kvm
@@ -88,9 +100,11 @@ jobs:
             bios_args: "-bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
 
     steps:
+
       - uses: actions/checkout@v4
 
       - name: Install QEMU
+
         run: |
           sudo apt-get update -q
           sudo apt-get install -y \
@@ -98,10 +112,12 @@ jobs:
             ovmf qemu-efi-aarch64
 
       - name: Build kernel (${{ matrix.arch }})
+
         run: |
           make ARCH=${{ matrix.arch }} sigma-kernel.elf
 
       - name: Boot smoke test
+
         run: |
           timeout 120 qemu-system-${{ matrix.arch }} \
             -machine ${{ matrix.qemu_machine }} \
@@ -119,17 +135,20 @@ jobs:
           | tee /tmp/boot-${{ matrix.arch }}.log
 
       - name: Assert boot success
+
         run: |
           grep -q "sigma-init: boot complete" /tmp/boot-${{ matrix.arch }}.log
           echo "Boot smoke test passed for ${{ matrix.arch }}-${{ matrix.firmware }}-${{ matrix.accel }}"
 
       - name: Driver smoke tests (virtio)
+
         run: |
           grep -q "virtio-net: initialized" /tmp/boot-${{ matrix.arch }}.log
           grep -q "virtio-blk: initialized" /tmp/boot-${{ matrix.arch }}.log
           echo "virtio driver tests passed"
 
       - name: Upload boot log
+
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -144,7 +163,7 @@ jobs:
 The CI kernel boot appends `sigma.test=smoke` which triggers built-in driver smoke tests:
 
 | Device | Test |
-|---|---|
+| --- | --- |
 | virtio-net | Sends a single ICMP echo to 10.0.2.2 (QEMU gateway) |
 | virtio-blk | Reads first 512 bytes of disk0, checks MBR magic |
 | virtio-rng | Reads 32 bytes, verifies entropy > 0 |

@@ -9,7 +9,7 @@ SigmaOS uses **LLVM/Clang** as its primary C/C++ toolchain for components that r
 ## Use Cases
 
 | Optimization | Tool | Benefit |
-|---|---|---|
+| --- | --- | --- |
 | Link-Time Optimization | Clang LTO / ThinLTO | Cross-TU inlining, dead code elimination |
 | Profile-Guided Optimization | Clang PGO (`-fprofile-generate`) | Branch layout from real workloads |
 | BOLT post-link | `llvm-bolt` | Function reordering from perf data |

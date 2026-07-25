@@ -30,13 +30,9 @@ void sigma_panic_handler(const char* msg) {
 ```
 
 Self-healing actions:
-
 - Restart failed kernel threads
-
 - Flush and re-initialise corrupted driver state
-
 - Trigger OSTree A/B boot switch on unrecoverable faults
-
 - Write forensic log to immutable audit trail
 
 ---
@@ -55,11 +51,8 @@ On every successful boot, SigmaOS marks the current partition as "good". If 3 co
 Manual rollback:
 ```bash
 sigma rollback list           # show available snapshots
-
 sigma rollback to v15.0.0    # restore specific version
-
 sigma rollback cancel         # stay on current
-
 ```
 
 ---
@@ -67,21 +60,16 @@ sigma rollback cancel         # stay on current
 ## Snapshot Management
 
 ```bash
-
 # Create snapshot before risky operation
-
 sigma snapshot create pre-update
 
 # List snapshots
-
 sigma snapshot list
 
 # Diff two snapshots
-
 sigma snapshot diff pre-update HEAD
 
 # Restore
-
 sigma snapshot restore pre-update
 ```
 
@@ -98,15 +86,10 @@ SigmaOS Recovery Shell v15.0
 Type 'help' for available commands
 
 sigma-sh# fsck /dev/sda2        # check filesystem
-
 sigma-sh# sigma-mount /dev/sda2 /mnt  # mount root
-
 sigma-sh# sigma-pkg repair      # reinstall broken packages
-
 sigma-sh# sigma-log tail 100    # read last 100 kernel log lines
-
 sigma-sh# reboot                # restart
-
 ```
 
 ---
@@ -114,15 +97,10 @@ sigma-sh# reboot                # restart
 ## Recovery ISO (Planned — Phase G)
 
 A bootable recovery image (`sigma-rescue.iso`) will provide:
-
 - Full filesystem repair tools (`sigma-fsck`, `sigma-badblocks`)
-
 - Snapshot restore GUI
-
 - Forensic imaging (`sigma-dd`, `sigma-forensics`)
-
 - Network-accessible SSH recovery session
-
 - Factory reset option (wipes `/` but preserves `/data`)
 
 ---
@@ -141,4 +119,4 @@ A bootable recovery image (`sigma-rescue.iso`) will provide:
 
 ---
 
-### See also: [System-Daemons](System-Daemons) · [Kernel](Kernel) · [Storage](Storage)
+*See also: [System-Daemons](System-Daemons) · [Kernel](Kernel) · [Storage](Storage)*

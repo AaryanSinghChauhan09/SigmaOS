@@ -426,7 +426,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ## Per-Branch Quality Targets
 
 ### `kernel-exp` quality gates
-
 ```
 [ ] Kernel boots in QEMU with no errors on serial
 [ ] Buddy allocator passes 10,000-iteration stress test
@@ -438,7 +437,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `drivers-dev` quality gates
-
 ```
 [ ] NIC TX/RX: ping 10.0.2.2 in QEMU, no packet loss
 [ ] NVMe: read 1 GB file, SHA256 matches original
@@ -448,7 +446,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `fs-dev` quality gates
-
 ```
 [ ] VFS write → fsync → read roundtrip, bytes match
 [ ] Journal replay after abrupt poweroff: no data loss
@@ -458,7 +455,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `performance-optimized` quality gates
-
 ```
 [ ] Context switch p99 < 100 ns (2× budget)
 [ ] Kyber-1024 AVX-512: ≥ 5.8 M ops/sec
@@ -469,7 +465,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/standalone` quality gates
-
 ```
 [ ] OOBE complete in < 3 minutes
 [ ] All 55 profession apps installable via sigma-pkg
@@ -482,7 +477,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/cloud` quality gates
-
 ```
 [ ] sigma-pod OOM-kills at exactly --mem limit
 [ ] sigma-pod CPU throttled at --cpu limit
@@ -492,7 +486,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/mobile` quality gates
-
 ```
 [ ] Boots on Raspberry Pi 4 in < 10 s
 [ ] sigma-ultra boots on Pi Zero in < 5 s
@@ -502,7 +495,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### `release/rtos` quality gates
-
 ```
 [ ] IRQ latency p99 < 10 µs
 [ ] EDF: zero missed deadlines in 60-second stress
@@ -532,7 +524,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ## Master Checklist — Quality, Stability, Performance, UX
 
 ### Phase Q0 — Must have before any public release
-
 ```
 [S1] [ ] Kernel: no silent return-0 stubs in syscall handler
 [S1] [ ] Kernel: panic handler prints register dump
@@ -547,7 +538,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### Phase Q1 — Before v16.0 Apex
-
 ```
 [P1] [ ] Boot time < 2 s on NVMe SSD (CI timer)
 [P2] [ ] Context switch < 100 ns (2× budget)
@@ -562,7 +552,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### Phase Q2 — Before v17.0 Sovereign
-
 ```
 [P6] [ ] Vulkan compositor: 1-frame latency @ 120 Hz
 [Q4] [ ] All warnings-as-errors in clang-tidy
@@ -575,7 +564,6 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ```
 
 ### Phase Q3 — v18.0 Singularity
-
 ```
 [P1] [ ] Boot time < 1 s (parallel ASI fully tuned)
 [Q5] [ ] Formal verification: IPC + scheduler (IIT/IISc)
@@ -667,27 +655,16 @@ Deliberately break components to verify recovery paths work.
 
 ```
 sigma-observatory             # launch full TUI dashboard
-
 sigma-observatory --json      # machine-readable JSON stream
-
 sigma-observatory cpu         # per-core utilization + frequency
-
 sigma-observatory mem         # RAM usage, slab sizes, page cache
-
 sigma-observatory net         # per-interface TX/RX bytes/packets
-
 sigma-observatory io          # per-device IOPS, latency histogram
-
 sigma-observatory proc        # process list sorted by CPU/mem
-
 sigma-observatory temp        # CPU + GPU temperature
-
 sigma-observatory pqc         # PQC ops/sec live counter
-
 sigma-observatory scheduler   # runqueue depth per CPU
-
 sigma-observatory power       # RAPL energy counters, battery %
-
 ```
 
 | Task | File | Branch | Detail |
@@ -704,17 +681,11 @@ sigma-observatory power       # RAPL energy counters, battery %
 
 ```
 sigma-audit log                    # recent audit entries
-
 sigma-audit log --follow           # real-time stream
-
 sigma-audit log --filter kernel    # filter by subsystem
-
 sigma-audit verify                 # verify Dilithium3 chain
-
 sigma-audit export audit.json      # export for CERT-In
-
 sigma-audit push                   # push to sigma-fleet
-
 ```
 
 | Task | File | Branch | Detail |
@@ -733,21 +704,13 @@ sigma-audit push                   # push to sigma-fleet
 **Current:** `scripts/release.sh`, `scripts/sign_release.sh`, `.github/workflows/sigma_release.yml` exist but are not fully wired.
 
 ```bash
-
 # Full release pipeline:
-
 sigma-release check          # all quality gates pass
-
 sigma-release iso            # reproducible build
-
 sigma-release sign           # ML-DSA-87 sign ISO + packages
-
 sigma-release publish        # upload to GitHub Releases
-
 sigma-release notes v16.0    # auto-generate release notes
-
 sigma-release verify v16.0-rc1.iso  # verify signature
-
 ```
 
 | Task | File | Branch | Detail |
@@ -789,17 +752,12 @@ sigma-release verify v16.0-rc1.iso  # verify signature
 ### C2 — Developer Onboarding
 
 ```bash
-
 # 5-command new contributor setup:
-
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 ./scripts/setup.sh          # install deps (Ubuntu 22.04+)
-
 make PROFILE=microkernel    # build smallest profile
-
 make test                   # run unit tests
-
 ```
 
 | Task | File | Branch | Detail |
@@ -842,20 +800,14 @@ make test                   # run unit tests
 Every quality, stability, performance, or UX regression must be tracked here:
 
 ```bash
-
 # Add a problem:
-
 echo "## Phase Q (Quality) — New Issues" >> CURRENT_PROBLEMS_MANIFEST.md
-
 echo "- [#XXXX] Area: description — file.cpp" >> CURRENT_PROBLEMS_MANIFEST.md
 
 # Required before any PR merges to main:
-
 ./scripts/ci_branch_check.sh
 ./scripts/sigma_automation.sh recovery-check
-
 # CURRENT_PROBLEMS_MANIFEST.md must reflect new status
-
 ```
 
 **Release gate:** `CURRENT_PROBLEMS_MANIFEST.md` must have zero open 🔴 items before any `release/*` tag is created.
@@ -865,49 +817,32 @@ echo "- [#XXXX] Area: description — file.cpp" >> CURRENT_PROBLEMS_MANIFEST.md
 ## Quick Reference — All Quality Commands
 
 ```bash
-
 # Build + test (all in one)
-
 make check                         # build + unit tests + static analysis
 
 # Stability
-
 make check-stubs                   # count remaining stubs
-
 ./tests/chaos/test_rollback.sh     # 3 failed boots → rollback
 
 # Performance
-
 sigma-perf bench pqc               # Kyber/Dilithium ops/sec
-
 sigma-perf bench sched             # context switch latency
-
 sigma-observatory                  # live dashboard
 
 # Quality
-
 ./scripts/run_static_analysis.sh   # clang-tidy + cppcheck
-
 ./scripts/regression_check.sh      # regression suite
 
 # Security
-
 sigma-sec status                   # security posture
-
 sigma-audit verify                 # verify log chain of custody
-
 sigma-pqc status                   # PQC algorithms + FIPS level
 
 # Release
-
 ./scripts/sigma_automation.sh wiki-sync    # mirror docs
-
 ./scripts/sigma_automation.sh backup      # source backup
-
 ./scripts/ci_branch_check.sh              # branch parity
-
 sigma-release check                # all gates before tagging
-
 ```
 
 ---

@@ -162,7 +162,7 @@ If sigma-boot.efi returns non-zero EFI status (load failure, sig verify fail), E
 ## Status
 
 | Feature | State |
-|---------|-------|
+| --------- | ------- |
 | GOP framebuffer | ⬜ Not started |
 | ELF loader | ⬜ Not started |
 | Sig verification | ⬜ Not started |

@@ -8,7 +8,7 @@
 ## Quick Reference
 
 | Directory / File | License | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `kernel/` | MIT | Freestanding, no glibc, original implementation |
 | `arch/` | MIT | Architecture-specific boot + paging code |
 | `drivers/` | MIT | SDF drivers; firmware blobs excluded (see below) |

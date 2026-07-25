@@ -9,7 +9,7 @@
 ## Why smoltcp
 
 | Property | Value |
-|---|---|
+| --- | --- |
 | Language | Pure Rust, zero unsafe networking code |
 | `no_std` | Yes — usable in bare-metal RTOS profile |
 | License | MIT — compatible with SigmaOS MIT stack |
@@ -126,7 +126,7 @@ pub fn init_networking(nic: impl NicDevice) -> Interface {
 ## Profiles That Use smoltcp
 
 | Profile | Use case |
-|---|---|
+| --- | --- |
 | Microkernel | Primary TCP/IP — all kernel net traffic |
 | RTOS | UDP + ICMP only (minimal profile) |
 | Embedded | `no_std` bare-metal networking |

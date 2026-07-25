@@ -61,7 +61,7 @@ This roadmap focuses on absorbing performance-oriented open-source projects to c
 ## Performance Targets
 
 | Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Target |
-|--------|---------|---------|---------|---------|--------|
+| -------- | --------- | --------- | --------- | --------- | -------- |
 | Cold boot to services | 2s | 1.5s | 1s | 500ms | <500ms |
 | CPU utilization | 80% | 85% | 90% | 95% | 95%+ |
 | Memory efficiency | Baseline | +10% | +20% | +30% | +30% |

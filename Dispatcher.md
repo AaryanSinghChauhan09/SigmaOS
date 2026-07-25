@@ -1,4 +1,4 @@
-﻿# Dispatcher
+# Dispatcher
 
 Extends: `events.EventEmitter`
 
@@ -21,6 +21,7 @@ Returns: `void | Promise<null>` - Only returns a `Promise` if no `callback` argu
 ```js
 dispatcher.close() // -> Promise
 dispatcher.close(() => {}) // -> void
+
 ```
 
 #### Example - Request resolves before Client closes
@@ -51,6 +52,7 @@ await client.close()
 
 console.log('Client closed')
 server.close()
+
 ```
 
 ### `Dispatcher.connect(options[, callback])`
@@ -128,6 +130,7 @@ try {
   socket.write(wanted)
   socket.end()
 } catch (error) { }
+
 ```
 
 ### `Dispatcher.destroy([error, callback]): Promise`
@@ -149,6 +152,7 @@ dispatcher.destroy() // -> Promise
 dispatcher.destroy(new Error()) // -> Promise
 dispatcher.destroy(() => {}) // -> void
 dispatcher.destroy(new Error(), () => {}) // -> void
+
 ```
 
 #### Example - Request is aborted when Client is destroyed
@@ -180,6 +184,7 @@ try {
 } catch (error) {
   console.error(error)
 }
+
 ```
 
 ### `Dispatcher.dispatch(options, handler)`
@@ -283,6 +288,7 @@ client.dispatch({
     server.close()
   }
 })
+
 ```
 
 #### Example 2 - Dispatch Upgrade Request
@@ -333,6 +339,7 @@ client.dispatch({
     socket.end()
   }
 })
+
 ```
 
 #### Example 3 - Dispatch POST request
@@ -386,6 +393,7 @@ client.dispatch({
     server.close()
   }
 })
+
 ```
 
 ### `Dispatcher.pipeline(options, handler)`
@@ -472,6 +480,7 @@ pipeline(
     server.close()
   }
 )
+
 ```
 
 ### `Dispatcher.request(options[, callback])`
@@ -519,6 +528,7 @@ The `RequestOptions.method` property should not be value `'CONNECT'`.
 - **body** `stream.Readable` which also implements [the body mixin from the Fetch Standard](https://fetch.spec.whatwg.org/#body-mixin).
 
 - **trailers** `Record<string, string>` - This object starts out
+
   as empty and will be mutated to contain trailers after `body` has emitted `'end'`.
 
 - **opaque** `unknown`
@@ -583,6 +593,7 @@ try {
 } catch (error) {
   console.error(error)
 }
+
 ```
 
 #### Example 2 - Aborting a request
@@ -616,6 +627,7 @@ try {
 }
 
 abortController.abort()
+
 ```
 
 Alternatively, any `EventEmitter` that emits an `'abort'` event may be used as an abort controller:
@@ -647,6 +659,7 @@ try {
 }
 
 ee.emit('abort')
+
 ```
 
 Destroying the request or response body will have the same effect.
@@ -675,6 +688,7 @@ try {
   client.close()
   server.close()
 }
+
 ```
 
 #### Example 3 - Conditionally reading the body
@@ -694,6 +708,7 @@ if (statusCode === 200) {
 await body.dump()
 
 return null
+
 ```
 
 ### `Dispatcher.stream(options, factory[, callback])`
@@ -771,6 +786,7 @@ try {
 } catch (error) {
   console.error(error)
 }
+
 ```
 
 #### Example 2 - Stream to Fastify Response
@@ -828,6 +844,7 @@ try {
   fastifyServer.close()
   nodeServer.close()
 } catch (error) { }
+
 ```
 
 ### `Dispatcher.upgrade(options[, callback])`
@@ -895,6 +912,7 @@ try {
   client.close()
   server.close()
 }
+
 ```
 
 ### `Dispatcher.compose(interceptors[, interceptor])`
@@ -902,25 +920,30 @@ try {
 Compose a new dispatcher from the current dispatcher and the given interceptors.
 
 > _Notes_:
+>
 > - The order of the interceptors matters. The last interceptor will be the first to be called.
+
 > - It is important to note that the `interceptor` function should return a function that follows the `Dispatcher.dispatch` signature.
+
 > - Any fork of the chain of `interceptors` can lead to unexpected results.
+
 >
 > **Interceptor Stack Visualization:**
+>
 > ```
 > compose([interceptor1, interceptor2, interceptor3])
 >
 > Request Flow:
-> â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-> â”‚   Request   â”‚â”€â”€â”€â–¶â”‚interceptor3 â”‚â”€â”€â”€â–¶â”‚interceptor2 â”‚â”€â”€â”€â–¶â”‚interceptor1 â”‚â”€â”€â”€â–¶â”‚  dispatcher â”‚
-> â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚   .dispatch â”‚
->                           â–²                   â–²                   â–²         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
->                           â”‚                   â”‚                   â”‚                â–²
->                    (called first)      (called second)     (called last)           â”‚
->                                                                                    â”‚
-> â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”‚
-> â”‚  Response   â”‚â—€â”€â”€â”€â”‚interceptor3 â”‚â—€â”€â”€â”€â”‚interceptor2 â”‚â—€â”€â”€â”€â”‚interceptor1 â”‚â—€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-> â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+> ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+> │   Request   │───▶│interceptor3 │───▶│interceptor2 │───▶│interceptor1 │───▶│  dispatcher │
+> └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    │   .dispatch │
+>                           ▲                   ▲                   ▲         └─────────────┘
+>                           │                   │                   │                ▲
+>                    (called first)      (called second)     (called last)           │
+>                                                                                    │
+> ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐          │
+> │  Response   │◀───│interceptor3 │◀───│interceptor2 │◀───│interceptor1 │◀─────────┘
+> └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 >
 > The interceptors are composed in reverse order due to function composition.
 > ```
@@ -963,6 +986,7 @@ const client = new Client('http://localhost:3000')
   .compose(redirectInterceptor)
 
 await client.request({ path: '/', method: 'GET' })
+
 ```
 
 #### Example 2 - Chained Compose
@@ -1006,6 +1030,7 @@ const client = new Client('http://localhost:3000')
   .compose(retryInterceptor)
 
 await client.request({ path: '/', method: 'GET' })
+
 ```
 
 #### Pre-built interceptors
@@ -1026,6 +1051,7 @@ const client = new Client("http://service.example").compose(
   redirect({ maxRedirections: 3, throwOnMaxRedirect: true })
 );
 client.request({ path: "/" })
+
 ```
 
 ##### `retry`
@@ -1049,6 +1075,7 @@ const client = new Client("http://service.example").compose(
     retryAfter: true,
   })
 );
+
 ```
 
 ##### `dump`
@@ -1082,6 +1109,7 @@ client.dispatch(
   },
   handler
 );
+
 ```
 
 ##### `dns`
@@ -1160,6 +1188,7 @@ const response = await client.request({
   origin: `http://localhost:3030`,
   ...requestOpts
 })
+
 ```
 
 ### Example - DNS Interceptor and LRU cache as a storage
@@ -1199,6 +1228,7 @@ const response = await client.request({
   origin: `http://localhost:3030`,
   ...requestOpts
 })
+
 ```
 
 ##### `responseError`
@@ -1220,11 +1250,12 @@ await client.request({
   method: "GET",
   path: "/"
 });
+
 ```
 
 ##### `decompress`
 
-âš ï¸ The decompress interceptor is experimental and subject to change.
+⚠️ The decompress interceptor is experimental and subject to change.
 
 The `decompress` interceptor automatically decompresses response bodies that are compressed with gzip, deflate, brotli, or zstd compression. It removes the `content-encoding` and `content-length` headers from decompressed responses and supports RFC-9110 compliant multiple encodings.
 
@@ -1249,6 +1280,7 @@ const response = await client.request({
   method: "GET",
   path: "/"
 });
+
 ```
 
 ### Example - Custom Options
@@ -1263,6 +1295,7 @@ const client = new Client("http://service.example").compose(
     skipStatusCodes: [204, 304, 201] // Skip these status codes
   })
 );
+
 ```
 
 ### Supported Encodings
@@ -1313,9 +1346,9 @@ const { Agent, cacheStores, interceptors, setGlobalDispatcher } = require('undic
 
 const client = new Agent().compose(interceptors.cache({
   store: new cacheStores.MemoryCacheStore({
-    maxSize: 100 * 1024 * 1024, // 100MB
+    maxSize: 100 *1024* 1024, // 100MB
     maxCount: 1000,
-    maxEntrySize: 5 * 1024 * 1024 // 5MB
+    maxEntrySize: 5 *1024* 1024 // 5MB
   })
 }))
 
@@ -1326,6 +1359,7 @@ const first = await fetch('https://example.com/data')
 
 // Second request can be served from cache according to RFC9111 rules.
 const second = await fetch('https://example.com/data')
+
 ```
 
 ##### `Deduplicate Interceptor`
@@ -1340,7 +1374,7 @@ The `deduplicate` interceptor deduplicates concurrent identical requests. When m
 
 - `excludeHeaderNames` - Header names to exclude from the deduplication key. Requests with different values for these headers will still be deduplicated together. Useful for headers like `x-request-id` that vary per request but shouldn't affect deduplication. Header name matching is case-insensitive. Default `[]`.
 
-- `maxBufferSize` - Maximum bytes buffered per paused waiting deduplicated handler. If a waiting handler remains paused and exceeds this threshold, it is failed with an abort error to prevent unbounded memory growth. Default `5 * 1024 * 1024`.
+*`maxBufferSize` - Maximum bytes buffered per paused waiting deduplicated handler. If a waiting handler remains paused and exceeds this threshold, it is failed with an abort error to prevent unbounded memory growth. Default `5*1024* 1024`.
 
 ### Usage
 
@@ -1358,6 +1392,7 @@ const clientWithCache = new Client("http://service.example").compose(
   deduplicate(),
   cache()
 );
+
 ```
 
 Requests are considered identical if they have the same:
@@ -1432,6 +1467,7 @@ Header arguments such as `options.headers` in [`Client.dispatch`](/docs/docs/api
 - As an array of strings. An array representation of a header list must have an even length, or an `InvalidArgumentError` will be thrown.
 
 - As an iterable that can encompass `Headers`, `Map`, or a custom iterator returning key-value pairs.
+
 Keys are lowercase and values are not modified.
 
 Undici validates header syntax at the protocol level (for example, invalid header names and invalid control characters in string values), but it does not sanitize untrusted application input. Validate and sanitize any user-provided header names and values before passing them to Undici to prevent header/body injection vulnerabilities.
@@ -1450,6 +1486,7 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   host: 'mysite.com',
   accept: '*/*'
 }
+
 ```
 
 ### Example 2 - Array
@@ -1462,6 +1499,7 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   'host', 'mysite.com',
   'accept', '*/*'
 ]
+
 ```
 
 ### Example 3 - Iterable
@@ -1474,8 +1512,11 @@ new Headers({
   host: 'mysite.com',
   accept: '*/*'
 })
+
 ```
+
 or
+
 ```js
 new Map([
   ['content-length', '123'],
@@ -1484,8 +1525,11 @@ new Map([
   ['host', 'mysite.com'],
   ['accept', '*/*']
 ])
+
 ```
+
 or
+
 ```js
 {
   *[Symbol.iterator] () {
@@ -1496,4 +1540,5 @@ or
     yield ['accept', '*/*']
   }
 }
+
 ```

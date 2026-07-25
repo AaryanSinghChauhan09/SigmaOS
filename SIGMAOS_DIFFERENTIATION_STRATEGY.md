@@ -82,7 +82,7 @@ This document outlines SigmaOS's strategic differentiation from existing operati
 
 ### Example Use Cases:
 
-```
+```text
 User: "Why is my laptop hot?"
 SigmaOS: Analyzes system metrics, identifies thermal throttling, suggests solutions
 
@@ -702,7 +702,7 @@ Instead of forking everything, contribute upstream to:
 
 ### Example:
 
-```
+```text
 User: "Create Python project"
 SigmaOS:
 
@@ -721,6 +721,7 @@ SigmaOS:
 7. Sets up pre-commit hooks
 
 8. Configures CI/CD pipeline
+
 ```
 
 ## Sigma Studio: The Killer Feature

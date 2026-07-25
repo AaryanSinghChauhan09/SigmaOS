@@ -74,4 +74,3 @@ To boot with fewer moving parts, the kernel supports:
 - `SIGMA_MINIMAL_MODE=1`
 
 In minimal mode, `kernel/core/sigma_kernel_main.c` skips scheduler/task bring-up and marks the boot successful after basic HAL init.
-

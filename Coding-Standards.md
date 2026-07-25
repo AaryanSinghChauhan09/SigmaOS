@@ -1,271 +1,333 @@
 # SigmaOS Coding Standards
 
-**Version:** 1.0 | Applies to: all SigmaOS source code
+> **Core Principle**: "Sovereignty is the ultimate efficiency."  
+> All code in SigmaOS must be self-contained, first-principles, and demonstrably correct.
 
 ---
 
-## 1. Languages & Domains
+## Table of Contents
 
-| Domain | Primary Language | Secondary |
-|---|---|---|
-| Kernel (`kernel/`) | Rust (`#![no_std]`) | Assembly (arch-specific) |
-| Userland tools | Rust (std) | Zig |
-| Security-critical crypto | Ada/SPARK | — |
-| Shell (sigma-sh) | Rust (std) | — |
-| Package manager (sigpkg) | Rust (std) | — |
-| Drivers | Rust + C FFI stubs | C (legacy compat) |
-| Build scripts | Zig build + justfile | — |
-| Config files | TOML | — |
-| Documentation | Markdown | — |
+1. [Language Policy](#language-policy)
+2. [No-Stdlib / No-External-Libs Constraint](#no-stdlib-constraint)
+3. [OOP Principles](#oop-principles)
+4. [Rust Standards](#rust-standards)
+5. [Zig Standards](#zig-standards)
+6. [Nim Standards](#nim-standards)
+7. [Naming Conventions](#naming-conventions)
+8. [Error Handling](#error-handling)
+9. [Testing Requirements](#testing-requirements)
+10. [Documentation Standards](#documentation-standards)
 
-See [LANGUAGE_POLICY.md](../LANGUAGE_POLICY.md) for the full FFI rules.
 
 ---
 
-## 2. Rust Style Rules
+## Language Policy
 
-### 2.1 General
+| Layer | Preferred Language | Rationale |
+| :--- | :--- | :--- |
+| Kernel core | **Rust** | Memory safety, `#![no_std]`, zero-cost abstractions |
+| Driver framework | **Zig** | Comptime generics, direct hardware access, C interop |
+| Userland daemons | **Nim** | Expressive OOP, lightweight, compile-time dispatch |
+| AI/inference | **Rust** | Quantized math, deterministic behaviour |
+| Desktop GUI | **Nim** | Widget hierarchy via method dispatch |
+| Package manager | **Rust** | Correctness, trait-based extensibility |
 
-```rust
-// ✅ Good: descriptive, snake_case names
-fn allocate_kernel_page(size: usize) -> Result<*mut u8, KernelError> { ... }
-
-// ❌ Bad: abbreviations, camelCase
-fn allocKPg(sz: usize) -> *mut u8 { ... }
-```
-
-### 2.2 Error Handling
-
-- **Never** use `.unwrap()` in kernel code — always propagate with `?` or explicit match
-
-- Use `Result<T, E>` for all fallible operations
-
-- Define domain-specific error enums (no `Box<dyn Error>` in `no_std`)
-
-```rust
-// ✅ Good
-pub enum MemoryError {
-    OutOfMemory,
-    InvalidAlignment,
-    AddressNotMapped(usize),
-}
-
-// ❌ Bad
-fn alloc(size: usize) -> *mut u8 {
-    some_fn().unwrap() // BANNED in kernel code
-}
-```
-
-### 2.3 Unsafe
-
-- `unsafe` blocks require a `// SAFETY: <justification>` comment immediately above
-
-- Every `unsafe` block must be reviewed by 2 maintainers in PR
-
-- Minimize `unsafe` surface — wrap in safe abstractions immediately
-
-```rust
-// ✅ Good
-// SAFETY: ptr is guaranteed non-null and aligned by the allocator contract
-let val = unsafe { ptr.read() };
-
-// ❌ Bad
-let val = unsafe { ptr.read() }; // no safety comment
-```
-
-### 2.4 Naming
-
-| Item | Convention | Example |
-|---|---|---|
-| Types, traits, enums | `UpperCamelCase` | `MemoryRegion`, `KernelError` |
-| Functions, variables | `snake_case` | `init_memory()`, `page_size` |
-| Constants | `SCREAMING_SNAKE_CASE` | `PAGE_SIZE`, `MAX_PROCS` |
-| Modules | `snake_case` | `mod memory_manager;` |
-| Files | `snake_case.rs` | `memory_manager.rs` |
-
-### 2.5 Documentation
-
-- All `pub` items **must** have `///` doc comments
-
-- Include `# Examples` sections for public API functions
-
-- Use `#[doc(hidden)]` only for true implementation details
-
-```rust
-/// Allocate `size` bytes from the kernel heap.
-///
-/// # Errors
-
-/// Returns `MemoryError::OutOfMemory` if the heap is exhausted.
-///
-/// # Examples
-
-/// ```
-/// let ptr = sigma_malloc(1024)?;
-/// ```
-pub fn sigma_malloc(size: usize) -> Result<*mut u8, MemoryError> { ... }
-```
+**Prohibited**: Python, JavaScript, Go, Java, C++ in the kernel or drivers.  
+C is permitted *only* as FFI glue with explicit `unsafe` documentation.
 
 ---
 
-## 3. Zig Style Rules (Userland)
+## No-Stdlib Constraint
 
-- Use `comptime` for all generic code — no runtime dispatch where possible
+### Rust (`#![no_std]`)
 
-- Error unions: `!T` for all fallible functions
+```rust
+// MANDATORY for all kernel crates
+#![no_std]
+#![no_main]
 
-- No heap allocation in hot paths without explicit `Allocator` parameter
+// MANDATORY if heap is used (only with sigma's own allocator)
+extern crate alloc;
+```
 
-- All public functions documented with `/// ...` comments
+- **No `std::` imports** anywhere in `kernel/` or `userland/agent/`.
+- **No external crates** without explicit approval in `LICENSES.md`.
+- Every `[dependencies]` entry must have a `# JUSTIFICATION:` comment.
+- Implement all data structures from scratch (ring buffer, hash map, etc.).
 
-- Build: always go through `build.zig`, no raw `zig build-exe`
+
+### Zig (freestanding)
 
 ```zig
-// ✅ Good
-pub fn readFile(allocator: std.mem.Allocator, path: []const u8) ![]u8 {
-    // ...
+// Target flag required for ALL kernel drivers:
+// zig build-exe -target x86_64-freestanding-none
+
+// FORBIDDEN:
+const std = @import("std");   // ❌ Never in kernel/drivers/
+
+// ALLOWED (comptime only):
+const builtin = @import("builtin");  // ✅ Target/arch detection only
+```
+
+### Nim (`--mm:none`)
+
+```nim
+
+# REQUIRED compiler flags for all daemons:
+
+# nim compile --mm:none --verbosity:0
+
+# FORBIDDEN:
+
+import os        # ❌ No OS-level imports
+import strutils  # ❌ No standard library imports
+
+# REQUIRED:
+
+{.push raises: [].}  # ✅ Force explicit error types
+```
+
+---
+
+## OOP Principles
+
+SigmaOS mandates the four core OOP pillars across all languages:
+
+### 1. Encapsulation
+
+- All internal state is `private` or `pub(crate)`.
+- Public API is defined via **trait** (Rust), **vtable struct** (Zig), or **method** (Nim).
+
+
+```rust
+// ✅ CORRECT: encapsulated internal state
+pub struct SigmaAllocator {
+    heap_start: usize,  // private — internal implementation detail
+    allocated:  usize,
 }
-
-// ❌ Bad
-pub fn readFile(path: []const u8) []u8 {
-    // panics on error, no allocator control
+impl SigmaAllocator {
+    pub fn alloc(&mut self, size: usize) -> *mut u8 { /* ... */ }
 }
 ```
 
----
+### 2. Abstraction
 
-## 4. Ada/SPARK Rules (Security-Critical Code)
+- Abstract interfaces must be defined before concrete types.
+- Rust: use `trait`, Zig: use vtable `struct`, Nim: use `ref object of RootObj`.
 
-- Every package spec (`.ads`) must have SPARK mode enabled: `pragma SPARK_Mode (On);`
 
-- All subprograms must have `Pre` and `Post` contracts
+```zig
+// ✅ CORRECT: abstract vtable defined before concrete impl
+pub const DriverVtable = struct {
+    initFn:  *const fn(ctx: *anyopaque) void,
+    readFn:  *const fn(ctx: *anyopaque, buf: []u8) usize,
+};
+```
 
-- Run `gnatprove` in CI — no merge without 0 violations
+### 3. Inheritance / Composition
 
-- No dynamic allocation in SPARK-proved subprograms
+- **Prefer composition over inheritance** (except for Nim `ref object` hierarchies).
+- Rust: embed structs as fields; Zig: embed pointers to sub-systems.
 
-```ada
--- ✅ Good
-procedure Encrypt
-  (Key  : in  Key_Type;
-   Data : in  Byte_Array;
-   Out  : out Byte_Array)
-  with
-    Pre  => Key'Length = 32 and Data'Length > 0,
-    Post => Out'Length = Data'Length;
+
+### 4. Polymorphism
+
+- Rust: `dyn Trait` for runtime dispatch; generics for compile-time.
+- Zig: function pointer vtables for runtime dispatch; `comptime` for static.
+- Nim: `method` + `procCall` for virtual dispatch.
+
+
+```nim
+
+# ✅ CORRECT: Nim polymorphic method dispatch
+
+type
+  BaseWidget* = ref object of RootObj
+    id*: uint32
+
+method paint*(self: BaseWidget) {.base.} = discard
+
+type
+  ButtonWidget* = ref object of BaseWidget
+    label*: array[32, char]
+
+method paint*(self: ButtonWidget) =
+  procCall self.BaseWidget.paint()
+  # draw button pixels
 ```
 
 ---
 
-## 5. Git Commit Style
+## Rust Standards
 
-Format: `type(scope): short description`
+### File header (mandatory)
 
-| Type | When to use |
-|---|---|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `refactor` | Code change without behavior change |
-| `docs` | Documentation only |
-| `test` | Adding/fixing tests |
-| `chore` | Build/CI/tooling changes |
-| `security` | Security-related changes |
-| `perf` | Performance improvements |
-
+```rust
+// <filename>.rs — <Short description>
+// Language: Rust (#![no_std], no external crates)
+// OOP: <TraitName> (abstract), <ConcreteType> (impl), <Compositor> (composition)
+// Specification: <wiki or docs link>
+#![no_std]
 ```
-feat(sigma-sh): add if/else scripting support
-fix(sigpkg): correct SemVer comparison for pre-release versions
-security(sigma-crypto): replace placeholder SHA-256 with ring crate
-docs(wiki): add Absorption Matrix page
+
+### Safety
+
+- Mark all `unsafe` blocks with a `// SAFETY:` comment explaining why it's safe.
+- Never use `mem::transmute` without explicit justification.
+- Prefer `*const` over `*mut` wherever possible.
+
+
+### Memory
+
+- Use `BumpAllocator` for kernel heap (from `kernel/src/custom_allocators.rs`).
+- Never call `Box::new`, `Vec::new`, or other `alloc` APIs without registering the global allocator.
+
+
+---
+
+## Zig Standards
+
+### File header (mandatory)
+
+```zig
+// <filename>.zig — <Short description>
+// Language: Zig (no stdlib, freestanding)
+// OOP: <abstract vtable> → <ConcreteType>
+// Specification: <wiki or docs link>
+```
+
+### Const generics
+
+- Use `comptime` constants and generic functions instead of runtime dispatch where performance is critical.
+- Mark compile-time-only values with `comptime` keyword.
+
+
+### Error handling
+
+- Use `error{}` union types for all fallible operations.
+- Never use `unreachable` in production paths without a `// PROOF:` comment.
+
+
+---
+
+## Nim Standards
+
+### File header (mandatory)
+
+```nim
+
+## <filename>.nim — <Short description>
+
+## Language: Nim (freestanding — no stdlib, no third-party packages)
+
+## OOP: <BaseType> (abstract), <DerivedType> (derived)
+
+## Specification: <wiki or docs link>
+
+{.push raises: [].}
+```
+
+### Type system
+
+- All primitive types must be defined explicitly (e.g., `type SigmaU8* = uint8`).
+- Never use Nim's `string`, `seq`, or `Table` types in kernel-facing code.
+- Use fixed-size `array` types only.
+
+
+### Method dispatch
+
+- Use `method` for virtual dispatch; `proc` for non-virtual.
+- Always call `procCall self.BaseType.method()` in overriding methods.
+
+
+---
+
+## Naming Conventions
+
+| Element | Rust | Zig | Nim |
+| :--- | :--- | :--- | :--- |
+| Types | `PascalCase` | `PascalCase` | `PascalCase` |
+| Functions | `snake_case` | `camelCase` | `camelCase` |
+| Constants | `SCREAMING_SNAKE` | `SCREAMING_SNAKE` | `SCREAMING_SNAKE` |
+| Traits/interfaces | `PascalCase` | `PascalCaseVtable` | `PascalCase` |
+| Files | `snake_case.rs` | `snake_case.zig` | `snake_case.nim` |
+| Modules | `snake_case` | `snake_case` | `snake_case` |
+
+---
+
+## Error Handling
+
+- **Never panic** in kernel code. Use `Result<T, E>` (Rust), `!ErrorType` (Zig), or explicit error enums (Nim).
+- **Never use `unwrap()`** in production paths. Always match or propagate.
+- Map errors from lower layers to higher-level domain errors at subsystem boundaries.
+
+
+```rust
+// ❌ FORBIDDEN in kernel paths:
+let v = result.unwrap();
+
+// ✅ REQUIRED:
+let v = result.map_err(|e| KernelError::from(e))?;
 ```
 
 ---
 
-## 6. PR Requirements
+## Testing Requirements
 
-- [ ] All CI checks pass (build, test, clippy, fmt)
+Every module **must** include unit tests:
 
-- [ ] `unsafe` code has `// SAFETY:` comments
+| Language | Test location | Command |
+| :--- | :--- | :--- |
+| Rust | `#[cfg(test)]` mod at bottom of file | `cargo test` |
+| Zig | `test "..."` blocks at bottom of file | `zig test <file>` |
+| Nim | `proc test*()` returning `bool` at bottom | `nim compile --run` |
 
-- [ ] New public APIs have `///` doc comments
+Minimum coverage requirements:
 
-- [ ] Tests added for new functionality
+- Happy path: **required**.
+- At least one error path: **required**.
+- Boundary conditions (e.g., buffer full, empty input): **strongly recommended**.
 
-- [ ] No `unwrap()` in kernel code
-
-- [ ] No hardcoded paths or magic numbers (use named constants)
-
-- [ ] SPARK proofs pass for any `security/` changes
-
-- [ ] PR description references GitHub issue
-
----
-
-## 7. Testing Standards
-
-### Kernel Tests
-
-- Unit tests in `#[cfg(test)]` modules within each file
-
-- Integration tests in `kernel/tests/`
-
-- QEMU smoke tests run in CI via `sigma_qemu.yml`
-
-### Userland Tests
-
-- `cargo test` for all crates
-
-- Property-based tests with `proptest` for parser/crypto code
-
-- `cargo bench` for performance-critical paths
-
-### Minimum Coverage
-
-| Component | Required Coverage |
-|---|---|
-| `sigma-crypto` | 95% (SPARK proofs supplement) |
-| `sigma-sh` parser | 90% |
-| `sigpkg` resolver | 85% |
-| Kernel memory | 80% |
 
 ---
 
-## 8. Directory Conventions
+## Documentation Standards
 
+Every public function/type must have:
+
+```rust
+/// Short one-line summary.
+///
+/// # Arguments
+/// - `param`: Description.
+///
+/// # Returns
+/// What the return value means.
+///
+/// # Safety
+/// (If `unsafe`) Why this is sound.
+pub fn my_function(param: u32) -> Result<u32, KernelError> { ... }
 ```
-kernel/src/
-  ├── arch/         # Arch-specific: x86_64, riscv64, aarch64
 
-  ├── memory/       # PMM, VMM, allocator
+For Zig:
 
-  ├── sched/        # Scheduler (EEVDF)
+```zig
+/// Short summary.
+/// Returns the number of bytes written, or FsError on failure.
+pub fn write(self: *SigmaExt4, inode: Inode, ...) FsError!Usize { ... }
+```
 
-  ├── drivers/      # Driver registry + device drivers
+For Nim:
 
-  ├── fs/           # VFS + filesystem implementations
+```nim
 
-  ├── syscall/      # Syscall dispatch table
+## Short summary.
 
-  └── security/     # Capability engine, audit hook
+## Returns true if operation succeeded.
 
-userland/
-  ├── shell/        # sigma-sh (Nim stubs → Rust migration in progress)
-
-  ├── sigpkg/       # sigpkg package manager (Rust)
-
-  ├── coreutils/    # sigma-core-utils (Rust)
-
-  └── apps/         # Desktop apps (Zig)
-
-security/           # Ada/SPARK security modules
-
-docs/
-  ├── wiki/         # GitHub Wiki source (synced via CI)
-
-  └── *.md          # Project-level docs
-
+proc doThing*(self: BaseWidget): bool = ...
 ```
 
 ---
 
-*Maintained by SigmaOS core team. For questions, open a [discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions).*
+*For the full engineering philosophy, see [Engineering-Principles](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Engineering-Principles-Roadmap) on the Wiki.*

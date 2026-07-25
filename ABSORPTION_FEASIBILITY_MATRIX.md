@@ -57,7 +57,7 @@ This matrix provides a comprehensive analysis of license compatibility and techn
 ### Tier 1: Immediate Priority (Score 12-15)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | Wasmtime | 4 | 5 | 5 | 14 | 2 | **Integrate directly** |
 | Wasmer | 5 | 5 | 5 | 15 | 2 | **Integrate directly** |
 | smoltcp | 5 | 5 | 5 | 15 | 1 | **Integrate directly** |
@@ -82,7 +82,7 @@ This matrix provides a comprehensive analysis of license compatibility and techn
 ### Tier 2: High Priority (Score 9-11)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | Postgres | 5 | 5 | 3 | 13 | 2 | **Integrate directly** |
 | Traefik | 5 | 4 | 3 | 12 | 2 | **Integrate directly** |
 | rust-analyzer | 4 | 4 | 4 | 12 | 2 | **Integrate directly** |
@@ -107,7 +107,7 @@ This matrix provides a comprehensive analysis of license compatibility and techn
 ### Tier 3: Medium Priority (Score 6-8)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | crosvm | 3 | 3 | 4 | 10 | 4 | **Integrate directly** |
 | Mesa KMS | 5 | 3 | 3 | 11 | 3 | **Integrate directly** |
 | Wayland libs | 5 | 4 | 3 | 12 | 2 | **Integrate directly** |
@@ -132,7 +132,7 @@ This matrix provides a comprehensive analysis of license compatibility and techn
 ### Tier 4: Reference Only (Score 0-5)
 
 | Project | License | Technical | Strategic | Total | Effort | Recommendation |
-|---------|---------|-----------|-----------|-------|--------|----------------|
+| --------- | --------- | ----------- | ----------- | ------- | -------- | ---------------- |
 | Tianocore/edk2 | 5 | 2 | 3 | 10 | 6 | **Use as reference** |
 | refind | 1 | 2 | 2 | 5 | 6 | **Use as reference** |
 | GRUB | 1 | 2 | 2 | 5 | 6 | **Use as reference** |

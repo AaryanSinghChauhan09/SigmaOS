@@ -7,7 +7,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ## Feature Comparison Matrix
 
 | Feature | Debian/Ubuntu | Fedora | Arch Linux | SigmaOS | Advantage |
-|---------|---------------|--------|-----------|---------|-----------|
+| --------- | --------------- | -------- | ----------- | --------- | ----------- |
 | **Supply Chain Security** | | | | | |
 | Cryptographically signed supply chain | Partial | Partial | None | ✅ Full | SigmaOS |
 | Reproducible builds by default | Optional | Optional | Manual | ✅ Mandatory | SigmaOS |
@@ -123,7 +123,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Boot Performance
 
 | Metric | Ubuntu 22.04 | Fedora 38 | Arch Linux | SigmaOS Target |
-|--------|--------------|-----------|-----------|----------------|
+| -------- | -------------- | ----------- | ----------- | ---------------- |
 | Cold boot to desktop | ~10s | ~8s | ~7s | **<2s** |
 | Resume from suspend | ~2s | ~1.5s | ~1.5s | **<500ms** |
 | Service startup | ~500ms | ~400ms | ~350ms | **<100ms** |
@@ -131,7 +131,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Memory Efficiency
 
 | Metric | Ubuntu 22.04 | Fedora 38 | Arch Linux | SigmaOS Target |
-|--------|--------------|-----------|-----------|----------------|
+| -------- | -------------- | ----------- | ----------- | ---------------- |
 | Idle memory (desktop) | ~400MB | ~350MB | ~300MB | **<150MB** |
 | Idle memory (server) | ~200MB | ~180MB | ~150MB | **<64MB** |
 | Per-process overhead | ~5MB | ~4MB | ~3MB | **<2MB** |
@@ -139,7 +139,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### CPU Performance
 
 | Metric | Ubuntu 22.04 | Fedora 38 | Arch Linux | SigmaOS Target |
-|--------|--------------|-----------|-----------|----------------|
+| -------- | -------------- | ----------- | ----------- | ---------------- |
 | Context switch latency | ~1.5µs | ~1.2µs | ~1µs | **<500ns** |
 | Scheduler latency | ~20µs | ~15µs | ~12µs | **<10µs** |
 | Interrupt latency | ~10µs | ~8µs | ~6µs | **<5µs** |
@@ -147,7 +147,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### I/O Performance
 
 | Metric | Ubuntu 22.04 | Fedora 38 | Arch Linux | SigmaOS Target |
-|--------|--------------|-----------|-----------|----------------|
+| -------- | -------------- | ----------- | ----------- | ---------------- |
 | NVMe sequential read | ~2.5 GB/s | ~2.5 GB/s | ~2.5 GB/s | **>3 GB/s** |
 | NVMe random 4K read | ~400K IOPS | ~400K IOPS | ~400K IOPS | **>500K IOPS** |
 | Network throughput | Line-rate | Line-rate | Line-rate | **Line-rate** |
@@ -157,7 +157,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Supply Chain Security
 
 | Aspect | Ubuntu | Fedora | Arch | SigmaOS |
-|--------|--------|--------|------|---------|
+| -------- | -------- | -------- | ------ | --------- |
 | Package signing | GPG (optional) | GPG (optional) | None | **Dilithium-5 (mandatory)** |
 | Reproducible builds | Optional | Optional | Manual | **Mandatory** |
 | Build provenance | ❌ No | ❌ No | ❌ No | **Yes** |
@@ -167,7 +167,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Runtime Security
 
 | Aspect | Ubuntu | Fedora | Arch | SigmaOS |
-|--------|--------|--------|------|---------|
+| -------- | -------- | -------- | ------ | --------- |
 | Capability system | SELinux (optional) | SELinux (optional) | None | **pledge/unveil (native)** |
 | WASM sandboxing | Optional | Optional | Manual | **First-class** |
 | Hardware keys | Optional | Optional | Manual | **TPM/TEE native** |
@@ -178,7 +178,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Tooling
 
 | Aspect | Ubuntu | Fedora | Arch | SigmaOS |
-|--------|--------|--------|------|---------|
+| -------- | -------- | -------- | ------ | --------- |
 | Reproducible SDK | ❌ No | ❌ No | ❌ No | **Yes** |
 | Cross-compile | Manual | Manual | Manual | **One-command** |
 | Debug adapters | Manual | Manual | Manual | **Integrated** |
@@ -187,7 +187,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Documentation
 
 | Aspect | Ubuntu | Fedora | Arch | SigmaOS |
-|--------|--------|--------|------|---------|
+| -------- | -------- | -------- | ------ | --------- |
 | API documentation | Good | Good | Good | **Enhanced** |
 | Performance guide | Basic | Basic | Basic | **Comprehensive** |
 | Security guide | Good | Good | Basic | **Comprehensive** |
@@ -198,7 +198,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Deployment
 
 | Aspect | Ubuntu | Fedora | Arch | SigmaOS |
-|--------|--------|--------|------|---------|
+| -------- | -------- | -------- | ------ | --------- |
 | LTS releases | Yes | Yes | No | **Yes** |
 | Atomic updates | ❌ No | ❌ No | ❌ No | **Yes** |
 | Rollback | ❌ No | ❌ No | ❌ No | **Yes** |
@@ -208,7 +208,7 @@ SigmaOS wins by being measurably better where Linux distros struggle: smaller tr
 ### Monitoring
 
 | Aspect | Ubuntu | Fedora | Arch | SigmaOS |
-|--------|--------|--------|------|---------|
+| -------- | -------- | -------- | ------ | --------- |
 | Telemetry | External | External | External | **Built-in** |
 | Observability | External | External | External | **Native** |
 | Performance monitoring | External | External | External | **Integrated** |

@@ -2,7 +2,7 @@
 
 ## Layer Model
 
-```
+```text
 Application (sigma-curl, sigma-ssh, sigma-pkg)
   │  POSIX-like socket API (sigma_connect, sigma_bind, sigma_send, sigma_recv)
   ▼
@@ -42,7 +42,7 @@ Memory copies: **zero** between NIC DMA and application read.
 
 ## TLS 1.3 + Kyber-1024 Hybrid: Handshake
 
-```
+```text
 Client                                 Server
   │                                       │
   │── ClientHello ──────────────────────► │
@@ -69,7 +69,7 @@ Client                                 Server
 
 ## DNS / DoH Pipeline
 
-```
+```text
 App: resolve("registry.sigmaos.dev")
   │
   ▼
@@ -129,7 +129,7 @@ The compiled XDP program is loaded via aya and attached to the NIC's XDP hook, p
 ## Benchmark Targets
 
 | Metric | Target |
-|---|---|
+| --- | --- |
 | TCP throughput (loopback) | > 10 Gbps |
 | TCP latency (loopback, p99) | < 50 µs |
 | TLS 1.3 handshake time | < 5 ms |

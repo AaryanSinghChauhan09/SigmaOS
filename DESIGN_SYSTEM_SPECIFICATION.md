@@ -373,7 +373,7 @@ impl ComponentGenerator {
 
 ### File Structure
 
-```
+```text
 sigma-design-system/
 ├── tokens/
 │   ├── colors.rs

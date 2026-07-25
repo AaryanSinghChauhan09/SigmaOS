@@ -912,7 +912,7 @@ High-impact, high-complexity components that provide significant differentiation
 
 ## 🔗 Dependency Graph
 
-```
+```text
 sigma-cli-core (Foundation)
 ├── sigma-cli-help
 ├── sigma-color-output
