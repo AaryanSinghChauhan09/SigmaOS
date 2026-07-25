@@ -28,12 +28,20 @@ pub struct CapabilityToken {
 impl CapabilityToken {
     /// Zero-argument constructor
     pub fn new() -> Self {
-        Self {
-            id: 0,
-            allowed_paths: &[],
-            allowed_ports: &[],
-            is_revoked: false,
-            bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
+        Self { bits: 0 }
+    }
+
+    /// Create capability token from raw bits
+    pub fn from_bits(bits: u64) -> Self {
+        Self { bits }
+    }
+
+    /// Allow network access
+    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
+        match protocol {
+            "tcp" => self.bits |= 1 << 0,
+            "udp" => self.bits |= 1 << 1,
+            _ => {}
         }
     }
 

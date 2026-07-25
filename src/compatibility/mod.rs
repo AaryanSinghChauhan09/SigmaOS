@@ -1,8 +1,8 @@
 // SigmaOS Compatibility Module
 pub mod chimera_linux;
 pub mod cross_platform;
-pub mod historic_linux;
 pub mod standards;
+pub mod legacy_adapters;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -17,4 +17,11 @@ pub use scosmos::{
 };
 pub use standards::{
     FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
+pub use legacy_adapters::{
+    LegacyKernelAdapter, LegacyDriverAdapter, LegacyPackageAdapter, LegacyFSAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
