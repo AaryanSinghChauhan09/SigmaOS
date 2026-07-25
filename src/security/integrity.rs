@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
@@ -373,23 +375,6 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct IntegrityCheck {
-    pub file_path: alloc::string::String,
-    pub expected_hash: alloc::string::String,
-}
-
-#[derive(Debug, Clone)]
-pub struct IntegrityVerifier {
-    pub enabled: bool,
-}
-
-impl IntegrityVerifier {
-    pub fn new() -> Self {
-        Self { enabled: true }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -421,9 +406,3 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct IntegrityCheck;
-
-#[derive(Debug, Clone)]
-pub struct IntegrityVerifier;

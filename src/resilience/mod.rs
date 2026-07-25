@@ -1,4 +1,5 @@
 // SigmaOS Resilience Module
+pub mod automated_fixer;
 pub mod self_healing;
 pub mod backup;
 

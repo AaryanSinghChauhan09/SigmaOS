@@ -2,19 +2,12 @@ pub mod lsm;
 
 pub mod audit;
 pub mod capability;
-pub mod clipboard;
 pub mod integrity;
-pub mod intrusion;
 pub mod mac;
 pub mod pki;
 pub mod pledge;
 pub mod secrets;
 pub mod vulnerability;
-pub mod scanner;
-pub mod forensics;
-pub mod cleaner;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{

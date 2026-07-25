@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -448,8 +450,3 @@ mod tests {
         assert_eq!(keyring.stats().total_secrets, 0);
     }
 }
-
-pub type SecretManager = dyn Keyring;
-
-#[derive(Debug, Clone)]
-pub struct SecretStorage;
