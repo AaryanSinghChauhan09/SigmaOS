@@ -5,6 +5,80 @@
 use std::string::String;
 use std::vec::Vec;
 
+/// Capability token representing access rights
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    /// 64-bit capability bitmask
+    bits: u64,
+}
+
+impl CapabilityToken {
+    /// Create a new capability token with no permissions
+    pub fn new() -> Self {
+        Self { bits: 0 }
+    }
+
+    /// Create capability token from raw bits
+    pub fn from_bits(bits: u64) -> Self {
+        Self { bits }
+    }
+
+    /// Allow network access
+    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
+        match protocol {
+            "tcp" => self.bits |= 1 << 0,
+            "udp" => self.bits |= 1 << 1,
+            _ => {}
+        }
+        self.bits |= (port as u64) << 16;
+        self
+    }
+
+    /// Allow file read access
+    pub fn allow_read(mut self, path: &str) -> Self {
+        if path.starts_with("/var/www") {
+            self.bits |= 1 << 2;
+        }
+        self
+    }
+
+    /// Allow file write access
+    pub fn allow_write(mut self, path: &str) -> Self {
+        if path.starts_with("/tmp") || path.starts_with("/home") {
+            self.bits |= 1 << 3;
+        }
+        self
+    }
+
+    /// Allow process execution
+    pub fn allow_exec(mut self) -> Self {
+        self.bits |= 1 << 4;
+        self
+    }
+
+    /// Allow IPC communication
+    pub fn allow_ipc(mut self) -> Self {
+        self.bits |= 1 << 5;
+        self
+    }
+
+    /// Check if capability has specific permission
+    pub fn has_permission(&self, permission: Permission) -> bool {
+        (self.bits & (1 << permission as u64)) != 0
+    }
+
+    /// Revoke all permissions
+    pub fn revoke_all(&mut self) {
+        self.bits = 0;
+    }
+
+    /// Get raw capability bits
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
+}
+
+/// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     NetworkTcp,
