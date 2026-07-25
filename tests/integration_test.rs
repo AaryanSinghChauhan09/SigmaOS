@@ -4,10 +4,9 @@
 
 use sigmaos::compatibility::{
     APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
-    LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge, SyscallAbi,
-    WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 
 #[cfg(test)]
@@ -42,8 +41,14 @@ mod tests {
 
     #[test]
     fn test_legacy_driver_bridge_revival() {
-        let storage = StorageBridge { driver_name: "floppy-drive-controller", bus: LegacyBus::Isa };
-        let graphics = GraphicsBridge { driver_name: "crt-terminal-controller", bus: LegacyBus::Agp };
+        let storage = StorageBridge {
+            driver_name: "floppy-drive-controller",
+            bus: LegacyBus::Isa,
+        };
+        let graphics = GraphicsBridge {
+            driver_name: "crt-terminal-controller",
+            bus: LegacyBus::Agp,
+        };
 
         assert_eq!(storage.bus_type(), LegacyBus::Isa);
         assert_eq!(graphics.bus_type(), LegacyBus::Agp);
@@ -54,10 +59,16 @@ mod tests {
     #[test]
     fn test_legacy_workload_optimizer_tuning() {
         let optimizer = WorkloadOptimizer::new();
-        assert_eq!(optimizer.active_profile.get(), WorkloadProfile::LowMemoryProfile);
+        assert_eq!(
+            optimizer.active_profile.get(),
+            WorkloadProfile::LowMemoryProfile
+        );
 
         // Apply Single Core scheduling locks for early thread assumptions
         optimizer.apply_workload_tuning(WorkloadProfile::SingleCoreProfile);
-        assert_eq!(optimizer.active_profile.get(), WorkloadProfile::SingleCoreProfile);
+        assert_eq!(
+            optimizer.active_profile.get(),
+            WorkloadProfile::SingleCoreProfile
+        );
     }
 }

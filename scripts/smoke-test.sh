@@ -6,8 +6,11 @@ set -e
 
 echo "Running SigmaOS smoke tests..."
 
-# Ensure build directory exists
+# Create build directory if missing
 mkdir -p build
+
+# Compile target binaries
+cargo build
 
 # Test 1: Check if build directory exists
 if [ ! -d "build" ]; then

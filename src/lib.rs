@@ -1,24 +1,19 @@
-#![allow(warnings, clippy::all)]
-
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod automation;
-pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
-pub mod ecosystem;
-pub mod education;
 pub mod filesystem;
-pub mod governance;
 pub mod kernel;
-pub mod legal;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -27,7 +22,6 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod support;
 pub mod virtualization;
 pub mod graphics {
     pub mod paint;
@@ -70,14 +64,13 @@ pub use automation::{
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
-pub use community::{
-    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
-    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
-};
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
-    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+    APITimelineManager, ApplicationBinary, BinaryCompatMatrix, BinaryFormat, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime, DiscontinuedFS, DriverBridge,
+    FSRevival, GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
+    LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform,
+    TranslationLayer, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -91,32 +84,14 @@ pub use drivers::{
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
 };
-pub use ecosystem::{
-    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
-    EnterprisePartner,
-};
-pub use education::{
-    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
-};
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
-    LegacyFsType, LegacyFSAdapter,
-};
-pub use governance::{
-    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
-    RoadmapMilestone, TransparentRoadmap,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
-pub use legal::{
-    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
-};
-pub use network::{
-    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    LegacyProtocol, LegacyProtocolAdapter,
-};
+pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -125,17 +100,14 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-    StoreError, StoreApp, SigmaSoftwareStore,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
-    MediaFormat, PlaybackState, AudioTrack, SigmaMediaEngine,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
-    BackupError, BackupSnapshot, SigmaTimeshift,
 };
 pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use shell::{ShellCommand, ShellRepl};
@@ -143,94 +115,7 @@ pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
 };
-pub use support::{
-    LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
-};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-pub use graphics::paint::{
-    ColorRgba, BlendMode, PhotoError, ImageFilter, CanvasLayer, RasterLayer, GaussianBlurFilter, GrayscaleConversionFilter,
-};
-pub use graphics::video::{
-    VideoError, PixelRgba, VideoFrame, VideoEffect, TimelineClip, YuvToRgbEffect, SubtitleOverlayEffect, VideoClip,
-};
-pub use graphics::compositor::{
-    Position, Size, Rectangle, Color, Surface, SurfaceInfo, PixelFormat, SurfaceCapability, BitmapSurface, Window, WindowInfo, WindowCapability, SimpleWindow, Compositor, GraphicsError, CompositorStats, CompositorCapability, SimpleCompositor,
-};
-pub use hardware::win32::{
-    Win32Error, Win32Handle, PeFormat, PeLoader, RegistryManager, Win32Message, User32MessageQueue,
-};
-pub use hardware::compatibility::{
-    HardwareCompatibilityManager, CompatibilityReport, CompatibilityResult, HardwareDevice, CompatibilityCheck,
-};
-pub use power::governor::{
-    GovernorMode, CPUState, SigmaGovernor,
-};
-pub use observability::profiler::{
-    TracepointType, PerformanceMetric, SigmaProfiler,
-};
-pub use boot::firmware_bridge::{
-    FirmwareType, FirmwareBridge,
-};
-pub use boot::bridge_grid::{
-    BIOSBridgeGrid, UEFIBridgeGrid, CorebootBridgeGrid, FirmwareBridgeGrid,
-};
-pub use toolchain::adapter::{
-    ToolchainProfile, ToolchainAdapter,
-};
-pub use toolchain::capsule::{
-    CapsuleProfile, BuildCapsule,
-};
-pub use toolchain::codex::{
-    CodexCategory, CodexEntry, BuildCodex,
-};
-pub use toolchain::bootstrap::{
-    BootstrapStage, PortPackage, LfsBootstrapEngine,
-};
-pub use compatibility::persona::{
-    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
-};
-pub use compatibility::abi_translator::{
-    CpuArchitecture, ABITranslator,
-};
-pub use compatibility::lattice::{
-    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
-};
-pub use compatibility::prism::{
-    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
-};
-pub use compatibility::canonical::{
-    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
-};
-pub use scheduler::numa_scheduler::{
-    NumaNode, NumaScheduler, Node as LFNode, MichaelScottQueue, TreiberStack,
-};
-pub use crypto::vectorized_pqc::{
-    VectorizedPqcEngine,
-};
-pub use network::revival::{
-    RevivalProtocol, NetRevival,
-};
-pub use driver::simulation::{
-    SimType, PeripheralSim,
-};
-pub use driver::mapper::{
-    MapperCategory, DriverMapper,
-};
-pub use driver::pods::{
-    PodType, PeripheralPod,
-};
-pub use driver::vault::{
-    VaultEntry, DriverArchiveVault,
-};
-pub use driver::grid::{
-    GridSlotType, PeripheralArchiveGrid,
-};
-pub use security::bridge::{
-    LegacySecurityType, SecurityBridge,
-};
-pub use security::prism::{
-    SecurityFacet, SecurityPrism,
 };

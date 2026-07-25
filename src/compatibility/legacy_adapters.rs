@@ -33,7 +33,10 @@ impl KernelPersonaVM {
     /// Hot-swaps the kernel persona at runtime without requiring a system reboot
     pub fn hot_swap_persona(&self, new_persona: KernelPersona) {
         self.current_persona.set(new_persona);
-        println!("PersonaVM: Swapped active kernel personality to: {:?}", new_persona);
+        println!(
+            "PersonaVM: Swapped active kernel personality to: {:?}",
+            new_persona
+        );
     }
 }
 
@@ -102,10 +105,17 @@ pub struct StorageBridge {
 }
 
 impl LegacyDriver for StorageBridge {
-    fn name(&self) -> &'static str { self.driver_name }
-    fn bus_type(&self) -> LegacyBus { self.bus }
+    fn name(&self) -> &'static str {
+        self.driver_name
+    }
+    fn bus_type(&self) -> LegacyBus {
+        self.bus
+    }
     fn init_legacy(&self) -> bool {
-        println!("DriverBridge: Initializing Legacy Storage Driver '{}' on bus {:?}", self.driver_name, self.bus);
+        println!(
+            "DriverBridge: Initializing Legacy Storage Driver '{}' on bus {:?}",
+            self.driver_name, self.bus
+        );
         true
     }
 }
@@ -116,10 +126,17 @@ pub struct NetworkBridge {
 }
 
 impl LegacyDriver for NetworkBridge {
-    fn name(&self) -> &'static str { self.driver_name }
-    fn bus_type(&self) -> LegacyBus { self.bus }
+    fn name(&self) -> &'static str {
+        self.driver_name
+    }
+    fn bus_type(&self) -> LegacyBus {
+        self.bus
+    }
     fn init_legacy(&self) -> bool {
-        println!("DriverBridge: Initializing Legacy Network Driver '{}' on bus {:?}", self.driver_name, self.bus);
+        println!(
+            "DriverBridge: Initializing Legacy Network Driver '{}' on bus {:?}",
+            self.driver_name, self.bus
+        );
         true
     }
 }
@@ -130,10 +147,17 @@ pub struct GraphicsBridge {
 }
 
 impl LegacyDriver for GraphicsBridge {
-    fn name(&self) -> &'static str { self.driver_name }
-    fn bus_type(&self) -> LegacyBus { self.bus }
+    fn name(&self) -> &'static str {
+        self.driver_name
+    }
+    fn bus_type(&self) -> LegacyBus {
+        self.bus
+    }
     fn init_legacy(&self) -> bool {
-        println!("DriverBridge: Initializing Legacy Graphics Driver '{}' on bus {:?}", self.driver_name, self.bus);
+        println!(
+            "DriverBridge: Initializing Legacy Graphics Driver '{}' on bus {:?}",
+            self.driver_name, self.bus
+        );
         true
     }
 }
@@ -177,7 +201,10 @@ impl FSRevival {
 
     /// Mounts discontinued filesystems natively with decorated safe storage adapters
     pub fn mount_legacy_partition(&self, partition_id: u32) -> bool {
-        println!("FSRevival: Mount request for legacy partition ID {} of type {:?} granted.", partition_id, self.fs_type);
+        println!(
+            "FSRevival: Mount request for legacy partition ID {} of type {:?} granted.",
+            partition_id, self.fs_type
+        );
         if self.has_journaling_decorator {
             println!("  -> Intercepting block writes with active metadata journaling decorators.");
         }
@@ -195,7 +222,9 @@ pub struct APITimelineManager {
 
 impl APITimelineManager {
     pub const fn new(version: KernelPersona) -> Self {
-        Self { target_kernel_version: version }
+        Self {
+            target_kernel_version: version,
+        }
     }
 
     /// Dynamically translates legacy syscall parameters to match expected timelines
@@ -272,8 +301,14 @@ impl LegacyPluginManager {
     pub const fn new() -> Self {
         Self {
             registered_plugins: [
-                CompatibilityPlugin { plugin_id: 101, target_compat_layer: "reiserfs-mount-hook" },
-                CompatibilityPlugin { plugin_id: 102, target_compat_layer: "isa-driver-interrupt-hook" },
+                CompatibilityPlugin {
+                    plugin_id: 101,
+                    target_compat_layer: "reiserfs-mount-hook",
+                },
+                CompatibilityPlugin {
+                    plugin_id: 102,
+                    target_compat_layer: "isa-driver-interrupt-hook",
+                },
             ],
             plugins_count: Cell::new(2),
         }
@@ -317,9 +352,18 @@ mod tests {
 
     #[test]
     fn test_driver_bridge_subclasses() {
-        let storage = StorageBridge { driver_name: "ide-drive", bus: LegacyBus::Isa };
-        let network = NetworkBridge { driver_name: "ne2k-nic", bus: LegacyBus::EarlyPci };
-        let graphics = GraphicsBridge { driver_name: "voodoo-agp", bus: LegacyBus::Agp };
+        let storage = StorageBridge {
+            driver_name: "ide-drive",
+            bus: LegacyBus::Isa,
+        };
+        let network = NetworkBridge {
+            driver_name: "ne2k-nic",
+            bus: LegacyBus::EarlyPci,
+        };
+        let graphics = GraphicsBridge {
+            driver_name: "voodoo-agp",
+            bus: LegacyBus::Agp,
+        };
 
         assert_eq!(storage.bus_type(), LegacyBus::Isa);
         assert_eq!(network.bus_type(), LegacyBus::EarlyPci);
@@ -345,9 +389,15 @@ mod tests {
     #[test]
     fn test_workload_optimizer() {
         let optimizer = WorkloadOptimizer::new();
-        assert_eq!(optimizer.active_profile.get(), WorkloadProfile::LowMemoryProfile);
+        assert_eq!(
+            optimizer.active_profile.get(),
+            WorkloadProfile::LowMemoryProfile
+        );
         optimizer.apply_workload_tuning(WorkloadProfile::SingleCoreProfile);
-        assert_eq!(optimizer.active_profile.get(), WorkloadProfile::SingleCoreProfile);
+        assert_eq!(
+            optimizer.active_profile.get(),
+            WorkloadProfile::SingleCoreProfile
+        );
     }
 
     #[test]
