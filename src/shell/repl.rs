@@ -49,27 +49,27 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
-        let mut a11y = std::collections::HashMap::new();
-        a11y.insert("screen_reader".to_string(), false);
-        a11y.insert("high_contrast".to_string(), false);
-        a11y.insert("magnification".to_string(), false);
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: a11y,
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
-        let mut a11y = std::collections::HashMap::new();
-        a11y.insert("screen_reader".to_string(), false);
-        a11y.insert("high_contrast".to_string(), false);
-        a11y.insert("magnification".to_string(), false);
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,

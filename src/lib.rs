@@ -1,5 +1,4 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
+#![allow(clippy::all, warnings)]
 
 // SigmaOS Library
 // Core library for SigmaOS operating system
@@ -18,14 +17,9 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod finance;
-pub mod governance;
-pub mod graphics;
-pub mod iso;
 pub mod kernel;
+pub mod klib;
 pub mod legal;
-pub mod media;
-pub mod memory;
-pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -117,6 +111,11 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use device::{
+    DeviceClass, DeviceDriver as PublicDeviceDriver, DeviceError, DeviceHotplug,
+    DeviceManager as PublicDeviceManager, SimpleDevice, SimpleDeviceDriver, SimpleDeviceHotplug,
+    SimpleDeviceManager,
+};
 pub use drivers::{
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
     AcpiTableParser, AdLibSynthDriver, AppleSiliconUnifiedMemoryBus, Bluetooth5_4_Adapter, BusType,
@@ -177,6 +176,10 @@ pub use iso::builder::{
     BuildError, BuildPipeline, BuildStatus, BuildStep, GRUBConfig, ISOPackager,
     SimpleBuildPipeline, SimpleGRUBConfig, SimpleISOPackager,
 };
+pub use finance::{
+    GoodsType, GstCalculator, GstRate, GstRegime, GstResult, GstState, TdsCalculator, TdsResult,
+    TdsSection,
+};
 pub use kernel::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
     AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
@@ -217,6 +220,9 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
+};
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{

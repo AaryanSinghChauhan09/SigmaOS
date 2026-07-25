@@ -1,5 +1,7 @@
 // SigmaOS Virtualization Module
-pub mod oci_pod;
+pub mod cgroups;
+pub mod container;
+pub mod namespaces;
 pub mod orchestration;
 
 pub use cgroups::{

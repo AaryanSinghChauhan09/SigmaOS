@@ -3,10 +3,6 @@ use crate::driver::device::DdeDeviceWrapper;
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {
