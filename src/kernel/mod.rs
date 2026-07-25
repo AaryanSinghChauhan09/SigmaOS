@@ -1,44 +1,57 @@
 // SigmaOS Kernel Module
+pub mod bus;
 pub mod device;
 pub mod driver;
-pub mod bus;
-pub mod object;
-pub mod vfs;
-pub mod sched;
 pub mod memory;
+pub mod object;
 pub mod performance;
 pub mod roundrobin;
+pub mod sched;
+pub mod vfs;
 
-pub use device::{Device, DeviceType, DeviceManager, DeviceBinding, DriverError, DriverMetadata};
-pub use driver::{Driver, DriverRegistration, DriverRegistry};
+pub use boot::firmware::{
+    BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
+};
 pub use bus::{Bus, PciBus, UsableBus};
-pub use object::{KObject, KRef, KernelObject};
-pub use vfs::*;
-pub use sched::task::{Task, Cred, ProcessState, SchedPolicy};
-pub use sched::scheduler::{Scheduler, RunQueue, SchedClass};
-pub use memory::{Page, Zone, ZonedPageAllocator, VmArea, VmSpace};
-pub use net::stack::{Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl, Netfilter, NetfilterRule, Qdisc, PfifoFast, QdiscManager};
-pub use container::runtime::{Container, ContainerState, Runtime, ContainerManager, NamespaceConfig, NamespaceSet, OciSpec, ResourceConfig};
-pub use package::manager::{SigmaPackageManager, Generation, PackageMetadata, SystemConfig, SystemProfile};
-pub use security::lsm::{MacPolicy, LsmHook, CapabilitySet, Label, SecurityTask, AvcCache, AuditLog};
-pub use boot::firmware::{FirmwareInterface, BootLoader, BootParams, SetupHeader, Initramfs, KernelCommandLine};
+pub use container::runtime::{
+    Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
+    ResourceConfig, Runtime,
+};
+pub use device::{Device, DeviceBinding, DeviceManager, DeviceType, DriverError, DriverMetadata};
+pub use driver::{Driver, DriverRegistration, DriverRegistry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver,
-    AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType, LinuxAbsorptionEngine,
-    SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
+    ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
+    SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use memory::{Page, VmArea, VmSpace, Zone, ZonedPageAllocator};
+pub use net::stack::{
+    BbrCongestionControl, CongestionControl, NetDevice, Netfilter, NetfilterRule, PfifoFast, Qdisc,
+    QdiscManager, RenoCongestionControl, SkBuff, Socket,
+};
 pub use numa_allocator::{AllocationPolicy, NodeState, NumaAllocator, NumaNode};
+pub use object::{KObject, KRef, KernelObject};
+pub use package::manager::{
+    Generation, PackageMetadata, SigmaPackageManager, SystemConfig, SystemProfile,
+};
 pub use performance::{
     IpcError as PerfIpcError, ProcessProfile, SchedInstruction, SchedOpcode, UdfSchedVm,
     ZeroCopyQueue,
 };
 pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+};
+pub use sched::scheduler::{RunQueue, SchedClass, Scheduler};
+pub use sched::task::{Cred, ProcessState, SchedPolicy, Task};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler as SovereignScheduler};
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
+pub use security::lsm::{
+    AuditLog, AvcCache, CapabilitySet, Label, LsmHook, MacPolicy, SecurityTask,
+};
 pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
 pub use subsystem::{
     DeviceDriver, DriverError, DriverMetadata, DriverRegistry, DriverType, FileFlags, FileHandle,
@@ -56,6 +69,7 @@ pub use traits::{
     Scheduler as TraitsScheduler, SchedulerError as TraitsSchedulerError,
     SchedulerMetadata as TraitsSchedulerMetadata,
 };
+pub use vfs::*;
 pub use watchdog::{
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,
     WatchdogState,
@@ -73,12 +87,12 @@ pub use irq::{
     Workqueue,
 };
 pub use mm::{
-    CachedPage, HugePageManager, HugePageSize, NumaNode as MmNumaNode, NumaTopologyManager, OomKiller, PageCache,
-    PageStatus, SlabAllocator as MmSlabAllocator, VmallocManager,
+    CachedPage, HugePageManager, HugePageSize, NumaNode as MmNumaNode, NumaTopologyManager,
+    OomKiller, PageCache, PageStatus, SlabAllocator as MmSlabAllocator, VmallocManager,
 };
 pub use power::{
-    CpufreqGovernor, CpufreqManager as PowerCpufreqManager, CpufreqPolicy as PowerCpufreqPolicy, PowerStateManager, SleepState, ThermalManager,
-    ThermalZone,
+    CpufreqGovernor, CpufreqManager as PowerCpufreqManager, CpufreqPolicy as PowerCpufreqPolicy,
+    PowerStateManager, SleepState, ThermalManager, ThermalZone,
 };
 // net: single export covering Phase J (socket/netfilter/tc) + Phase K (IPv4/TCP)
 pub use block_dev::{
