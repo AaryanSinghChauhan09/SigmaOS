@@ -187,3 +187,20 @@ impl RecipeManager {
         Self
     }
 }
+
+#[derive(Debug, Clone)]
+pub enum BuildSystem {
+    Cargo,
+    CMake,
+    Make,
+    None,
+}
+
+#[derive(Debug, Clone)]
+pub enum RecipeError {
+    InvalidRecipe,
+    SignatureMismatch,
+}
+
+#[derive(Debug, Clone)]
+pub struct RecipeManager;

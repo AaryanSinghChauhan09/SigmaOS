@@ -123,33 +123,14 @@ impl ShellRepl {
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
-        let mut displays = Vec::new();
-        displays.push("DP-1: primary 2560x1440@144Hz scale=1.0 hdr=false".to_string());
-        displays.push("HDMI-1: secondary 1920x1080@60Hz scale=1.0 hdr=false".to_string());
-
-        let mut windows = Vec::new();
-        windows.push("ID=1 Title='SigmaTerminal' App='sigma.terminal' Geom=0,0,800,600 State=Normal Focused=true".to_string());
-        windows.push("ID=2 Title='SigmaOffice' App='sigma.office' Geom=100,100,1024,768 State=Normal Focused=false".to_string());
-
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages,
-            active_theme: "Sovereign Dark".to_string(),
-            active_profile: "standard".to_string(),
-            active_layout: "Adaptive".to_string(),
-            clipboard_content: "Initial clipboard context (0x5001)".to_string(),
-            screen_reader_enabled: false,
-            high_contrast_enabled: false,
-            magnifier_zoom: 1.0,
-            color_blind_mode: "none".to_string(),
-            recording_active: false,
-            displays,
-            windows,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
@@ -157,6 +138,7 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
