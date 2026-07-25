@@ -392,6 +392,9 @@ impl PasswordManager {
 
     /// Encrypt password
     fn encrypt_password(&self, password: &[u8]) -> Result<Vec<u8>, PasswordError> {
+        if self.master_key.is_empty() {
+            return Err(PasswordError::EncryptionError("Master key cannot be empty".to_string()));
+        }
         // Simulated encryption
         let mut encrypted = password.to_vec();
         for (i, byte) in encrypted.iter_mut().enumerate() {
@@ -402,6 +405,9 @@ impl PasswordManager {
 
     /// Decrypt password
     fn decrypt_password(&self, encrypted: &[u8]) -> Result<Vec<u8>, PasswordError> {
+        if self.master_key.is_empty() {
+            return Err(PasswordError::DecryptionError("Master key cannot be empty".to_string()));
+        }
         // Simulated decryption
         let mut decrypted = encrypted.to_vec();
         for (i, byte) in decrypted.iter_mut().enumerate() {
