@@ -451,15 +451,6 @@ impl SimpleCommandRegistry {
 
         let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
         self.commands.push(Some(Box::new(sigsched)));
-
-        let sigmagrep = SigmaGrepCommand;
-        self.commands.push(Some(Box::new(sigmagrep)));
-
-        let sigmafind = SigmaFindCommand;
-        self.commands.push(Some(Box::new(sigmafind)));
-
-        let sigmadiff = SigmaDiffCommand;
-        self.commands.push(Some(Box::new(sigmadiff)));
     }
 }
 
@@ -494,8 +485,8 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn list(&self) -> ShellVec<&[u8]> {
-        let mut names = ShellVec::new();
+    fn list(&self) -> Vec<&[u8]> {
+        let mut names = Vec::new();
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
                 names.push(command.name());
@@ -628,8 +619,8 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> ShellVec<&[u8]> {
-        let mut commands = ShellVec::new();
+    fn list(&self) -> Vec<&[u8]> {
+        let mut commands = Vec::new();
         for cmd in &*self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
@@ -638,15 +629,36 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-struct ShellVec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> ShellVec<T> {
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Vec<T> {
     fn new() -> Self {
-        ShellVec {
+        Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -732,67 +744,5 @@ mod tests {
         history.add(b"sigtrace trace task 256");
         assert_eq!(history.list().len(), 1);
         assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
-    }
-
-    #[test]
-    fn test_sigmagrep_execution() {
-        let mut cmd = SigmaGrepCommand;
-        assert_eq!(cmd.name(), b"sigmagrep");
-
-        let mut arg1 = [0u8; 64];
-        let mut arg2 = [0u8; 64];
-        let mut arg3 = [0u8; 64];
-        arg1[..14].copy_from_slice(b"my-search-term");
-        arg2[..2].copy_from_slice(b"-i");
-        arg3[..2].copy_from_slice(b"-n");
-
-        let args = vec![arg1, arg2, arg3];
-        let output = cmd.execute(&args).unwrap();
-        let output_str = std::str::from_utf8(&output).unwrap();
-
-        assert!(output_str.contains("my-search-term"));
-        assert!(output_str.contains("case-insensitive"));
-        assert!(output_str.contains("line-numbers"));
-    }
-
-    #[test]
-    fn test_sigmafind_execution() {
-        let mut cmd = SigmaFindCommand;
-        assert_eq!(cmd.name(), b"sigmafind");
-
-        let mut arg1 = [0u8; 64];
-        let mut arg2 = [0u8; 64];
-        let mut arg3 = [0u8; 64];
-        let mut arg4 = [0u8; 64];
-        arg1[..2].copy_from_slice(b"-e");
-        arg2[..2].copy_from_slice(b"-d");
-        arg3[..1].copy_from_slice(b"5");
-        arg4[..9].copy_from_slice(b"test-file");
-
-        let args = vec![arg1, arg2, arg3, arg4];
-        let output = cmd.execute(&args).unwrap();
-        let output_str = std::str::from_utf8(&output).unwrap();
-
-        assert!(output_str.contains("test-file"));
-        assert!(output_str.contains("regex-mode"));
-        assert!(output_str.contains("max-depth: 5"));
-    }
-
-    #[test]
-    fn test_sigmadiff_execution() {
-        let mut cmd = SigmaDiffCommand;
-        assert_eq!(cmd.name(), b"sigmadiff");
-
-        let mut arg1 = [0u8; 64];
-        let mut arg2 = [0u8; 64];
-        arg1[..2].copy_from_slice(b"-w");
-        arg2[..2].copy_from_slice(b"-y");
-
-        let args = vec![arg1, arg2];
-        let output = cmd.execute(&args).unwrap();
-        let output_str = std::str::from_utf8(&output).unwrap();
-
-        assert!(output_str.contains("ignoring whitespace"));
-        assert!(output_str.contains("side-by-side"));
     }
 }
