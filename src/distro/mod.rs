@@ -38,6 +38,6 @@ pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator,
+    CanFrame, DiagnosticLogTool, EcuController, EduChallenge, EduPlayground, EosUpdateNotifier,
+    EosWelcomeEngine, HpcClusterJob, HpcJobState, MirrorRanker, MpiCommunicator,
 };

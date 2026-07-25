@@ -310,6 +310,9 @@ impl SimpleKeyring {
     }
 }
 
+pub type SecretManager = SimpleKeyring;
+pub type SecretStorage = SimpleSecret;
+
 impl Keyring for SimpleKeyring {
     fn add_secret(&mut self, secret: Box<dyn Secret>) -> Result<SecretID, SecretError> {
         if !self.capability.can_add {

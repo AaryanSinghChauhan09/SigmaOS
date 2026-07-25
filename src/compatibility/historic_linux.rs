@@ -1288,6 +1288,113 @@ impl PeripheralArchiveDock for DotMatrixArchiveDock {
     }
 }
 
+// =========================================================================
+// 29. FRESH HIGH-LEVEL KERNEL PERSONALITY SWITCHES & FUNCTIONS (S-FUNCTIONS)
+// =========================================================================
+
+pub struct DynamicKernelPersonalityManager {
+    pub current_persona: LinuxEra,
+    pub is_time_travel_debugging_active: bool,
+}
+
+impl DynamicKernelPersonalityManager {
+    pub fn new() -> Self {
+        Self {
+            current_persona: LinuxEra::Era2_4,
+            is_time_travel_debugging_active: false,
+        }
+    }
+
+    /// switchPersona(processID, personaType) -> Dynamic Kernel Persona Switching
+    pub fn switch_persona(&mut self, _process_id: u32, persona_type: LinuxEra) -> bool {
+        self.current_persona = persona_type;
+        true
+    }
+
+    /// translateSyscall(syscallID, targetVersion) -> Syscall Translation Layer
+    pub fn translate_syscall(&self, syscall_id: usize, target_version: LinuxEra) -> usize {
+        match target_version {
+            LinuxEra::Era0_11 => {
+                if syscall_id == 120 {
+                    2 // fallback clone to fork
+                } else {
+                    syscall_id
+                }
+            }
+            _ => syscall_id,
+        }
+    }
+
+    /// loadDriver(driverID, compatibilityMode) -> Driver Evolution Loader
+    pub fn load_driver(&self, driver_id: u32, compatibility_mode: bool) -> &'static str {
+        if compatibility_mode {
+            if driver_id == 1 {
+                "LegacyIDE"
+            } else {
+                "NE2000"
+            }
+        } else if driver_id == 1 {
+            "SATA"
+        } else {
+            "Intel1000"
+        }
+    }
+
+    /// bootFirmware(modeType) -> Firmware Bridge Function
+    pub fn boot_firmware(&self, mode_type: &str) -> &'static str {
+        match mode_type {
+            "BIOS" => "Legacy BIOS boot initialized",
+            "UEFI" => "Secure UEFI boot initialized",
+            _ => "Coreboot payload initialized",
+        }
+    }
+
+    /// executeCapsule(capsuleID) -> Build Capsule Executor
+    pub fn execute_capsule(&self, capsule_id: u32) -> bool {
+        capsule_id > 0
+    }
+
+    /// applySecurityPolicy(processID, policyType) -> Security Policy Selector
+    pub fn apply_security_policy(&self, _process_id: u32, policy_type: &str) -> &'static str {
+        match policy_type {
+            "DAC" => "Discretionary Access Control applied",
+            "SELinux" => "SELinux type enforcement applied",
+            _ => "Zero-Trust default-deny enforcer applied",
+        }
+    }
+
+    /// emulatePeripheral(deviceType, mode) -> Peripheral Emulator Function
+    pub fn emulate_peripheral(&self, device_type: &str, _mode: u32) -> &'static str {
+        match device_type {
+            "floppy" => "Simulating Floppy Controller",
+            "tape" => "Simulating Tape Drive",
+            _ => "Simulating CRT Graphics Monitor",
+        }
+    }
+
+    /// debugKernelVersion(processID, targetVersion) -> Kernel Time-Travel Debugger
+    pub fn debug_kernel_version(&mut self, _process_id: u32, _target_version: LinuxEra) -> bool {
+        self.is_time_travel_debugging_active = true;
+        true
+    }
+
+    /// federateResources(resourceID, versionScope) -> Resource Federation Manager
+    pub fn federate_resources(&self, resource_id: u32, _version_scope: LinuxEra) -> bool {
+        resource_id > 0
+    }
+
+    /// replayAPI(apiID, legacyMode) -> Ancient API Replay
+    pub fn replay_api(&self, api_id: u32, _legacy_mode: bool) -> bool {
+        api_id > 0
+    }
+}
+
+impl Default for DynamicKernelPersonalityManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1609,5 +1716,20 @@ mod tests {
         let floppy: Box<dyn PeripheralArchiveDock> = Box::new(FloppyArchiveDock);
         assert_eq!(floppy.query_dock_module_signature(), 0x3F0);
         assert_eq!(floppy.execute_dock_simulation(), "Floppy simulation active");
+    }
+
+    #[test]
+    fn test_dynamic_kernel_personality_manager() {
+        let mut mgr = DynamicKernelPersonalityManager::new();
+        assert!(mgr.switch_persona(12, LinuxEra::Era1_0));
+        assert_eq!(mgr.translate_syscall(120, LinuxEra::Era0_11), 2);
+        assert_eq!(mgr.load_driver(1, true), "LegacyIDE");
+        assert_eq!(mgr.boot_firmware("UEFI"), "Secure UEFI boot initialized");
+        assert!(mgr.execute_capsule(5));
+        assert_eq!(mgr.apply_security_policy(1, "SELinux"), "SELinux type enforcement applied");
+        assert_eq!(mgr.emulate_peripheral("floppy", 1), "Simulating Floppy Controller");
+        assert!(mgr.debug_kernel_version(1, LinuxEra::Era1_0));
+        assert!(mgr.federate_resources(1, LinuxEra::Era1_0));
+        assert!(mgr.replay_api(1, true));
     }
 }

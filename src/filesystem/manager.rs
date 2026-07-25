@@ -466,6 +466,7 @@ mod tests {
     #[test]
     fn test_navigate() {
         let mut manager = FileManager::default();
+        let path = PathBuf::from("/home/user/Documents");
         manager
             .navigate(&PathBuf::from("/home/user/Documents"))
             .unwrap();

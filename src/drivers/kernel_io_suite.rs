@@ -1172,6 +1172,7 @@ impl UsbHidFullDriver {
         if let Some(led_byte) = report.data.first() {
             self.led_state = *led_byte;
         }
+        self.output_reports.push(report);
         Ok(())
     }
 

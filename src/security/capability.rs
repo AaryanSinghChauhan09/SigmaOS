@@ -2,6 +2,7 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
+use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -15,29 +16,44 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
-    pub allowed_paths: &'static [&'static str],
-    pub allowed_ports: &'static [u16],
+    pub allowed_paths: Vec<String>,
+    pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
             id: 0,
-            allowed_paths: &[],
-            allowed_ports: &[],
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
         }
     }
 
-    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
         CapabilityToken {
             id,
-            allowed_paths: paths,
-            allowed_ports: ports,
+            allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
+            allowed_ports: ports.to_vec(),
+            is_revoked: false,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: bits,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
         }
     }
@@ -76,13 +92,19 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        self.allowed_paths.iter().any(|&p| path.starts_with(p))
+        if self.allowed_paths.is_empty() {
+            return true; // Allow if no specific restriction
+        }
+        self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
     pub fn can_bind_port(&self, port: u16) -> bool {
         if self.is_revoked {
             return false;
+        }
+        if self.allowed_ports.is_empty() {
+            return true;
         }
         self.allowed_ports.contains(&port)
     }
@@ -92,31 +114,29 @@ impl CapabilityToken {
     }
 }
 
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
-    pub token: CapabilityToken,
+    pub active_token: Option<CapabilityToken>,
 }
 
 impl CapabilityGate {
     pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
+        Self { active_token: None }
     }
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
+        self.active_token = Some(token);
     }
 }
 
 pub struct SecurityEnforcer {
     active_tokens: Vec<CapabilityToken>,
+}
+
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SecurityEnforcer {

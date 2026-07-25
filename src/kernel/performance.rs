@@ -21,7 +21,7 @@ pub struct ZeroCopyQueue<T, const N: usize> {
     tail: AtomicUsize,
 }
 
-impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
+impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
             buffer: [const { None }; N],
@@ -81,7 +81,7 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     }
 }
 
-impl<T: Clone + Copy, const N: usize> Default for ZeroCopyQueue<T, N> {
+impl<T: Clone, const N: usize> Default for ZeroCopyQueue<T, N> {
     fn default() -> Self {
         Self::new()
     }

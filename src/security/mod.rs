@@ -1,18 +1,14 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
+pub mod lsm;
 
+pub mod audit;
 pub mod capability;
-pub mod clipboard;
+pub mod cleaner;
+pub mod forensics;
 pub mod integrity;
-pub mod intrusion;
 pub mod mac;
-pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod secrets;
-pub mod vault;
-pub mod vpn;
-pub mod vulnerability;
+pub mod qubes_isolation;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{
@@ -31,15 +27,4 @@ pub use password::{
 };
 pub use pki::{Certificate, CertificateAuthority, PkiError, PkiManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use secrets::{SecretManager, SecretStorage, SecretType};
-pub use vault::{
-    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
-    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
-    VaultResult,
-};
-pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
-};
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner, VulnerabilitySeverity};
+pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};

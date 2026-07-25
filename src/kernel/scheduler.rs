@@ -107,6 +107,19 @@ impl Scheduler {
     pub fn schedule(&mut self) -> Option<&Process> {
         // Find process with earliest eligible virtual deadline
         let now = self.current_time;
+
+        if self.is_realtime_profile {
+            // Prioritize Realtime priority tasks immediately under realtime profile
+            let rt_proc = self
+                .processes
+                .iter()
+                .filter(|p| p.state == ProcessState::Ready && p.priority == Priority::Realtime)
+                .min_by_key(|p| p.virtual_deadline);
+            if rt_proc.is_some() {
+                return rt_proc;
+            }
+        }
+
         self.processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
@@ -165,9 +178,10 @@ mod tests {
         let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
 
-        for _ in 0..5 {
-            scheduler.tick();
-        }
+        // Advance time so that virtual deadline (current_time + 3) is reached
+        scheduler.tick();
+        scheduler.tick();
+        scheduler.tick();
 
         let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());

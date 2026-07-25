@@ -2,18 +2,19 @@
 #![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
+pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
-pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -22,8 +23,22 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod unimplemented_features;
 pub mod virtualization;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -84,6 +99,13 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{
+    SystemdEngine, SystemdUnit, UnitState, UnitType,
 };
 
 pub mod virt;

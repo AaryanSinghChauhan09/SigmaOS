@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompressionType {
@@ -74,7 +74,11 @@ impl BtrfsFilesystem {
     }
 
     /// Create a new subvolume
-    pub fn create_subvolume(&mut self, name: String, parent_id: Option<u64>) -> Result<u64, &'static str> {
+    pub fn create_subvolume(
+        &mut self,
+        name: String,
+        parent_id: Option<u64>,
+    ) -> Result<u64, &'static str> {
         let id = self.next_subvol_id;
         self.next_subvol_id += 1;
 
@@ -94,7 +98,12 @@ impl BtrfsFilesystem {
     }
 
     /// Create a snapshot of a subvolume
-    pub fn create_snapshot(&mut self, source_id: u64, name: String, readonly: bool) -> Result<u64, &'static str> {
+    pub fn create_snapshot(
+        &mut self,
+        source_id: u64,
+        name: String,
+        readonly: bool,
+    ) -> Result<u64, &'static str> {
         if !self.subvolumes.contains_key(&source_id) {
             return Err("Source subvolume not found");
         }
@@ -127,25 +136,26 @@ impl BtrfsFilesystem {
             }
         }
 
-        self.subvolumes.remove(&id)
-            .ok_or("Subvolume not found")?;
+        self.subvolumes.remove(&id).ok_or("Subvolume not found")?;
 
         Ok(())
     }
 
     /// Set subvolume as readonly
     pub fn set_readonly(&mut self, id: u64, readonly: bool) -> Result<(), &'static str> {
-        let subvol = self.subvolumes.get_mut(&id)
-            .ok_or("Subvolume not found")?;
+        let subvol = self.subvolumes.get_mut(&id).ok_or("Subvolume not found")?;
 
         subvol.readonly = readonly;
         Ok(())
     }
 
     /// Set compression for a subvolume
-    pub fn set_compression(&mut self, id: u64, compression: CompressionType) -> Result<(), &'static str> {
-        let subvol = self.subvolumes.get_mut(&id)
-            .ok_or("Subvolume not found")?;
+    pub fn set_compression(
+        &mut self,
+        id: u64,
+        compression: CompressionType,
+    ) -> Result<(), &'static str> {
+        let subvol = self.subvolumes.get_mut(&id).ok_or("Subvolume not found")?;
 
         subvol.compression = compression;
         Ok(())
@@ -183,8 +193,10 @@ impl BtrfsFilesystem {
 
     /// Generate UUID (simplified)
     fn generate_uuid(&self) -> [u8; 16] {
-        [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-         0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]
+        [
+            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
+            0x0F, 0x10,
+        ]
     }
 
     /// Get subvolume count
@@ -211,10 +223,10 @@ mod tests {
     #[test]
     fn test_create_subvolume() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         let id = fs.create_subvolume("test".to_string(), None).unwrap();
         assert_eq!(fs.subvolume_count(), 1);
-        
+
         let subvol = fs.get_subvolume(id).unwrap();
         assert_eq!(subvol.name, "test");
     }
@@ -222,12 +234,14 @@ mod tests {
     #[test]
     fn test_create_snapshot() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         let subvol_id = fs.create_subvolume("test".to_string(), None).unwrap();
-        let snapshot_id = fs.create_snapshot(subvol_id, "test_snapshot".to_string(), true).unwrap();
-        
+        let snapshot_id = fs
+            .create_snapshot(subvol_id, "test_snapshot".to_string(), true)
+            .unwrap();
+
         assert_eq!(fs.snapshot_count(), 1);
-        
+
         let snapshot = fs.get_snapshot(snapshot_id).unwrap();
         assert_eq!(snapshot.source_subvol_id, subvol_id);
     }
@@ -235,20 +249,21 @@ mod tests {
     #[test]
     fn test_delete_subvolume() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         let id = fs.create_subvolume("test".to_string(), None).unwrap();
         fs.delete_subvolume(id).unwrap();
-        
+
         assert_eq!(fs.subvolume_count(), 0);
     }
 
     #[test]
     fn test_delete_with_snapshots() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         let subvol_id = fs.create_subvolume("test".to_string(), None).unwrap();
-        fs.create_snapshot(subvol_id, "snapshot".to_string(), true).unwrap();
-        
+        fs.create_snapshot(subvol_id, "snapshot".to_string(), true)
+            .unwrap();
+
         let result = fs.delete_subvolume(subvol_id);
         assert!(result.is_err());
     }
@@ -256,10 +271,10 @@ mod tests {
     #[test]
     fn test_set_readonly() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         let id = fs.create_subvolume("test".to_string(), None).unwrap();
         fs.set_readonly(id, true).unwrap();
-        
+
         let subvol = fs.get_subvolume(id).unwrap();
         assert!(subvol.readonly);
     }
@@ -267,10 +282,10 @@ mod tests {
     #[test]
     fn test_set_compression() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         let id = fs.create_subvolume("test".to_string(), None).unwrap();
         fs.set_compression(id, CompressionType::Lzo).unwrap();
-        
+
         let subvol = fs.get_subvolume(id).unwrap();
         assert_eq!(subvol.compression, CompressionType::Lzo);
     }
@@ -278,10 +293,10 @@ mod tests {
     #[test]
     fn test_list_subvolumes() {
         let mut fs = BtrfsFilesystem::new();
-        
+
         fs.create_subvolume("test1".to_string(), None).unwrap();
         fs.create_subvolume("test2".to_string(), None).unwrap();
-        
+
         let subvols = fs.list_subvolumes();
         assert_eq!(subvols.len(), 2);
     }

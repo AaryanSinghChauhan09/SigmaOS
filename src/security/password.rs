@@ -3,6 +3,7 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use rand::Rng;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -212,6 +213,7 @@ impl PasswordManager {
             ..entry
         };
 
+        let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
@@ -264,6 +266,7 @@ impl PasswordManager {
             ..entry
         };
 
+        let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
@@ -427,6 +430,7 @@ impl PasswordManager {
         use rand::RngExt;
         let mut rng = rand::rng();
 
+        let mut password = String::new();
         for _ in 0..length {
             let index = rng.random_range(0..charset.len());
             password.push(charset[index] as char);

@@ -1,14 +1,22 @@
+#![no_std]
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 /// OOP-based Network Zero-Trust for SigmaOS
 /// Implements zero-trust networking using OOP principles with traits and structs
 /// No dependency on external networking frameworks
 /// Based on Roadmap Item 64: Network zero-trust defaults
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Policy ID
 pub type PolicyID = usize;
 
 /// Network action
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkAction {
     Allow = 0,
@@ -27,10 +35,13 @@ pub trait NetworkPolicy {
     fn check(&self, source: &[u8], destination: &[u8], port: u16) -> NetworkAction;
     /// Get policy info
     fn info(&self) -> PolicyInfo;
+    /// Custom upcast helper
+    fn as_any_mut(&mut self) -> &mut dyn core::any::Any;
 }
 
 /// Policy info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PolicyInfo {
     pub id: PolicyID,
     pub name: [u8; 64],
@@ -76,8 +87,13 @@ impl PolicyCapability {
     }
 }
 
+impl Default for PolicyCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple network policy (OOP: Concrete policy class)
-#[repr(C)]
 pub struct SimpleNetworkPolicy {
     pub id: PolicyID,
     pub name: [u8; 64],
@@ -173,6 +189,10 @@ impl NetworkPolicy for SimpleNetworkPolicy {
             capability: self.capability,
         }
     }
+
+    fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
+        self
+    }
 }
 
 /// Zero-trust engine trait (OOP interface)
@@ -193,7 +213,7 @@ pub trait ZeroTrustEngine {
 }
 
 /// Network error types
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     Success = 0,
@@ -203,6 +223,8 @@ pub enum NetworkError {
 }
 
 /// Zero-trust statistics
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ZeroTrustStats {
     pub total_policies: usize,
     pub active_policies: usize,
@@ -223,14 +245,16 @@ impl ZeroTrustStats {
     }
 }
 
+impl Default for ZeroTrustStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple zero-trust engine (OOP: Concrete engine class)
 pub struct SimpleZeroTrustEngine {
     pub policies: Vec<Option<Box<dyn NetworkPolicy>>>,
-    pub total_policies: usize,
-    pub active_policies: usize,
-    pub access_checks: AtomicU64,
-    pub allowed_access: AtomicU64,
-    pub denied_access: AtomicU64,
+    pub stats: core::cell::RefCell<ZeroTrustStats>,
     pub capability: EngineCapability,
 }
 
@@ -261,15 +285,17 @@ impl EngineCapability {
     }
 }
 
+impl Default for EngineCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleZeroTrustEngine {
     pub fn new(capability: EngineCapability) -> Self {
         SimpleZeroTrustEngine {
             policies: Vec::new(),
-            total_policies: 0,
-            active_policies: 0,
-            access_checks: AtomicU64::new(0),
-            allowed_access: AtomicU64::new(0),
-            denied_access: AtomicU64::new(0),
+            stats: core::cell::RefCell::new(ZeroTrustStats::new()),
             capability,
         }
     }
@@ -286,7 +312,9 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
 
         let id = policy.id();
         self.policies.push(Some(policy));
-        self.total_policies += 1;
+        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+            stats.total_policies += 1;
+        }
         Ok(id)
     }
 
@@ -307,7 +335,9 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
 
         if let Some(i) = index {
             self.policies[i] = None;
-            self.total_policies -= 1;
+            if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                stats.total_policies -= 1;
+            }
             Ok(())
         } else {
             Err(NetworkError::PolicyNotFound)
@@ -318,9 +348,15 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
         for policy_option in &mut self.policies {
             if let Some(ref mut policy) = *policy_option {
                 if policy.id() == id {
-                    policy.is_active_mut().store(true, Ordering::SeqCst);
-                    self.active_policies += 1;
-                    return Ok(());
+                    if let Some(simple_policy) =
+                        policy.as_any_mut().downcast_mut::<SimpleNetworkPolicy>()
+                    {
+                        simple_policy.is_active.store(true, Ordering::SeqCst);
+                        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                            stats.active_policies += 1;
+                        }
+                        return Ok(());
+                    }
                 }
             }
         }
@@ -331,9 +367,15 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
         for policy_option in &mut self.policies {
             if let Some(ref mut policy) = *policy_option {
                 if policy.id() == id {
-                    policy.is_active_mut().store(false, Ordering::SeqCst);
-                    self.active_policies -= 1;
-                    return Ok(());
+                    if let Some(simple_policy) =
+                        policy.as_any_mut().downcast_mut::<SimpleNetworkPolicy>()
+                    {
+                        simple_policy.is_active.store(false, Ordering::SeqCst);
+                        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                            stats.active_policies -= 1;
+                        }
+                        return Ok(());
+                    }
                 }
             }
         }
@@ -341,55 +383,79 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
     }
 
     fn check_access(&self, source: &[u8], destination: &[u8], port: u16) -> NetworkAction {
-        self.access_checks.fetch_add(1, Ordering::SeqCst);
-
         if !self.capability.can_enforce {
-            self.allowed_access.fetch_add(1, Ordering::SeqCst);
+            if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                stats.access_checks += 1;
+                stats.allowed_access += 1;
+            }
             return NetworkAction::Allow;
+        }
+
+        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+            stats.access_checks += 1;
         }
 
         for policy_option in &self.policies {
             if let Some(ref policy) = *policy_option {
                 let action = policy.check(source, destination, port);
                 if action == NetworkAction::Deny {
-                    self.denied_access.fetch_add(1, Ordering::SeqCst);
+                    if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                        stats.denied_access += 1;
+                    }
                     return action;
                 }
             }
         }
 
-        self.allowed_access.fetch_add(1, Ordering::SeqCst);
+        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+            stats.allowed_access += 1;
+        }
         NetworkAction::Allow
     }
 
     fn stats(&self) -> ZeroTrustStats {
-        ZeroTrustStats {
-            total_policies: self.total_policies,
-            active_policies: self.active_policies,
-            access_checks: self.access_checks.load(Ordering::SeqCst),
-            allowed_access: self.allowed_access.load(Ordering::SeqCst),
-            denied_access: self.denied_access.load(Ordering::SeqCst),
-        }
+        *self.stats.borrow()
     }
 }
 
-// Extensible method on NetworkPolicy to mutably access is_active
-pub trait NetworkPolicyExt: NetworkPolicy {
-    fn is_active_mut(&self) -> &AtomicBool;
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl NetworkPolicyExt for SimpleNetworkPolicy {
-    fn is_active_mut(&self) -> &AtomicBool {
-        &self.is_active
-    }
-}
+    #[test]
+    fn test_zero_trust_policy_and_engine() {
+        let policy_cap = PolicyCapability::full();
+        let mut policy = SimpleNetworkPolicy::new(1, b"allow_dns", policy_cap);
+        policy.add_allowed_port(53);
 
-impl NetworkPolicyExt for dyn NetworkPolicy {
-    fn is_active_mut(&self) -> &AtomicBool {
-        unsafe {
-            // Safe fallback downcast helper: cast fat pointer to thin pointer to discard the vtable, then downcast to SimpleNetworkPolicy.
-            let ptr = self as *const dyn NetworkPolicy as *const () as *const SimpleNetworkPolicy;
-            &(*ptr).is_active
-        }
+        let engine_cap = EngineCapability::full();
+        let mut engine = SimpleZeroTrustEngine::new(engine_cap);
+        engine.register_policy(Box::new(policy)).unwrap();
+
+        // Default allow since policy is not active
+        assert_eq!(
+            engine.check_access(b"10.0.0.1", b"8.8.8.8", 80),
+            NetworkAction::Allow
+        );
+
+        // Activate policy
+        engine.enable_policy(1).unwrap();
+
+        // Port 53 should be allowed, port 80 should be denied
+        assert_eq!(
+            engine.check_access(b"10.0.0.1", b"8.8.8.8", 53),
+            NetworkAction::Allow
+        );
+        assert_eq!(
+            engine.check_access(b"10.0.0.1", b"8.8.8.8", 80),
+            NetworkAction::Deny
+        );
+
+        let stats = engine.stats();
+        assert_eq!(stats.total_policies, 1);
+        assert_eq!(stats.active_policies, 1);
+        assert_eq!(stats.access_checks, 3);
+        assert_eq!(stats.allowed_access, 2);
+        assert_eq!(stats.denied_access, 1);
     }
 }

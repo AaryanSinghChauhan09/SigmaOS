@@ -514,6 +514,114 @@ pub enum ThemeError {
     LoadError(String),
 }
 
+// ==========================================
+// ADDITIONAL REQUIRED CUSTOMIZATION TOOLS
+// ==========================================
+
+/// ZenithBackdropFilter - Custom window blur, transparency, and design corner rendering
+pub struct ZenithBackdropFilter {
+    pub blur_radius: f32,
+    pub opacity_percent: u8,
+    pub border_radius_pixels: u16,
+}
+
+impl ZenithBackdropFilter {
+    pub fn new() -> Self {
+        Self {
+            blur_radius: 12.5,
+            opacity_percent: 85,
+            border_radius_pixels: 8,
+        }
+    }
+
+    pub fn adjust_blur(&mut self, radius: f32) {
+        self.blur_radius = radius.max(0.0).min(100.0);
+    }
+
+    pub fn set_opacity(&mut self, opacity: u8) {
+        self.opacity_percent = opacity.min(100);
+    }
+
+    pub fn get_rendering_parameters(&self) -> (f32, f32, u16) {
+        let opacity_alpha = self.opacity_percent as f32 / 100.0;
+        (self.blur_radius, opacity_alpha, self.border_radius_pixels)
+    }
+}
+
+impl Default for ZenithBackdropFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SigmaSoundscape - Auditory Theme & Sound Event Mapper
+pub struct SigmaSoundscape {
+    pub mapped_sounds: HashMap<String, String>, // maps EventName -> AudioFileURI
+    pub master_volume_percent: u8,
+}
+
+impl SigmaSoundscape {
+    pub fn new() -> Self {
+        let mut mapped = HashMap::new();
+        mapped.insert(
+            "login".to_string(),
+            "file:///system/audio/chime.wav".to_string(),
+        );
+        mapped.insert(
+            "shutdown".to_string(),
+            "file:///system/audio/logout.wav".to_string(),
+        );
+        mapped.insert(
+            "error".to_string(),
+            "file:///system/audio/warning.wav".to_string(),
+        );
+
+        Self {
+            mapped_sounds: mapped,
+            master_volume_percent: 75,
+        }
+    }
+
+    pub fn map_sound_event(&mut self, event_name: &str, file_uri: &str) {
+        self.mapped_sounds
+            .insert(event_name.to_string(), file_uri.to_string());
+    }
+
+    pub fn trigger_sound_event(&self, event_name: &str) -> Option<&str> {
+        self.mapped_sounds.get(event_name).map(|s| s.as_str())
+    }
+}
+
+impl Default for SigmaSoundscape {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// IconThemeEngine - Hardware-Aware dynamic DPI icon scaler
+pub struct IconThemeEngine {
+    pub active_icon_pack: String,
+    pub base_icon_size: u16,
+    pub screen_dpi: f32,
+}
+
+impl IconThemeEngine {
+    pub fn new(pack: &str, dpi: f32) -> Self {
+        Self {
+            active_icon_pack: pack.to_string(),
+            base_icon_size: 48,
+            screen_dpi: dpi,
+        }
+    }
+
+    /// Evaluates dynamic scaled sizes to ensure pixel-perfect resolution on high density screens
+    pub fn get_scaled_icon_size(&self) -> u16 {
+        let scale_factor = self.screen_dpi / 96.0; // 96 is standard baseline DPI
+        let raw_scaled = self.base_icon_size as f32 * scale_factor;
+        raw_scaled as u16
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

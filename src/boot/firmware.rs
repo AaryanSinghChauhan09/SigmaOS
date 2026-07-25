@@ -1,0 +1,173 @@
+#![no_std]
+
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+
+#[derive(Debug, Clone)]
+pub struct FirmwareMemoryMapEntry {
+    pub addr: u64,
+    pub size: u64,
+    pub ty: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FirmwareInfo {
+    pub vendor: String,
+    pub version: String,
+    pub oem_id: u16,
+    pub oem_table_id: u16,
+    pub oem_revision: u32,
+    pub compiler_id: String,
+    pub compile_date: String,
+}
+
+pub trait FirmwareInterface: Send + Sync {
+    fn get_memory_map(&self) -> Result<Vec<FirmwareMemoryMapEntry>, BootError>;
+    fn get_boot_device(&self) -> Result<String, BootError>;
+    fn get_rtc_time(&self) -> Result<u64, BootError>;
+    fn get_acpi_tables(&self) -> Result<Vec<AcpiTable>, BootError>;
+    fn get_efi_system_table(&self) -> Result<Option<*mut u8>, BootError>;
+    fn get_smp_info(&self) -> Result<SmpInfo, BootError>;
+    fn set_wakeup_vector(&self, vec: usize) -> Result<(), BootError>;
+    fn get_firmware_fingerprint(&self) -> Option<FirmwareancyInfo>;
+}
+
+#[derive(Debug, Clone)]
+pub struct AcpiTable {
+    pub signature: String,
+    pub address: u64,
+    pub length: u32,
+    pub revision: u8,
+}
+
+#[derive(Debug, Clone)]
+pub struct SmpInfo {
+    pub cpu_count: u32,
+    pub apic_id: Vec<u32>,
+    pub flags: u32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootError {
+    FirmwareUnavailable,
+    MemoryMapFailed,
+    BootDeviceNotFound,
+    InvalidConfiguration,
+}
+
+pub trait BootLoader: Send + Sync {
+    fn enter_kernel(&self, kernel_entry: usize, params: *const BootParams) -> Result<(), BootError>;
+    fn load_kernel(&self, source: &str, dest: usize, size: usize) -> Result<usize, BootError>;
+    fn load_initrd(&self, source: &str, dest: usize, size: usize) -> Result<usize, BootError>;
+    fn parse_cmdline(&self, cmdline: &str) -> Result<BootParams, BootError>;
+    fn setup_memory(&self, params: &mut BootParams) -> Result<(), BootError>;
+    fn setup_arch(&self) -> Result<(), BootError>;
+}
+
+pub struct BootParams {
+    pub hdr: SetupHeader,
+    pub cmdline: String,
+    pub memory_size: u64,
+    pub initrd_addr: u64,
+    pub initrd_size: u64,
+}
+
+pub struct SetupHeader {
+    pub boot_flag: u16,
+    pub header: u8,
+    pub load_flags: u32,
+    pub hdr_len: u32,
+    pub code32_start: u32,
+    pub ramdisk_image: u32,
+    pub ramdisk_size: u32,
+    pub boot_loader_name: [u8; 32],
+    pub setup_data: usize,
+}
+
+impl BootParams {
+    pub fn new() -> Self {
+        BootParams {
+            hdr: SetupHeader {
+                boot_flag: 0xAA55,
+                header: 0,
+                load_flags: 0,
+                hdr_len: 0,
+                code32_start: 0,
+                ramdisk_image: 0,
+                ramdisk_size: 0,
+                boot_loader_name: [0; 32],
+                setup_data: 0,
+            },
+            cmdline: String::new(),
+            memory_size: 0,
+            initrd_addr: 0,
+            initrd_size: 0,
+        }
+    }
+}
+
+pub struct Initramfs {
+    pub data: Vec<u8>,
+    pub size: usize,
+}
+
+impl Initramfs {
+    pub fn new() -> Self {
+        Initramfs {
+            data: Vec::new(),
+            size: 0,
+        }
+    }
+
+    pub fn load(&mut self, source: &[u8]) -> Result<(), BootError> {
+        self.data = source.to_vec();
+        self.size = source.len();
+        Ok(())
+    }
+
+    pub fn extract(&self) -> Result<Vec<u8>, BootError> {
+        Ok(self.data.clone())
+    }
+
+    pub fn mount_root(&self, mount_point: &str) -> Result<(), BootError> {
+        Ok(())
+    }
+}
+
+pub struct KernelCommandLine {
+    params: Vec<(String, Option<String>)>,
+}
+
+impl KernelCommandLine {
+    pub fn new(cmdline: &str) -> Self {
+        let mut params = Vec::new();
+        for part in cmdline.split_whitespace() {
+            if let Some(eq) = part.find('=') {
+                let key = part[..eq].to_string();
+                let value = part[eq + 1..].to_string();
+                params.push((key, Some(value)));
+            } else {
+                params.push((part.to_string(), None));
+            }
+        }
+        KernelCommandLine { params }
+    }
+
+    pub fn get(&self, key: &str) -> Option<&str> {
+        for (k, v) in &self.params {
+            if k == key {
+                return v.as_deref();
+            }
+        }
+        None
+    }
+
+    pub fn get_bool(&self, key: &str) -> bool {
+        self.get(key).is_some() || self.params.iter().any(|(k, _)| k == key)
+    }
+
+    pub fn get_usize(&self, key: &str) -> Option<usize> {
+        self.get(key).and_then(|v| v.parse().ok())
+    }
+}

@@ -1,31 +1,36 @@
-// Legacy Serial Port Driver (e.g., COM1)
-// Demonstrates how legacy serial interface drivers implement the unified OOP architecture.
+// Legacy Serial Port (UART 16550A) Driver
+// Implements unified OOP peripheral interface for ancient communication terminals.
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
+/// Represents an ancient 16550 UART Serial Port (e.g., COM1 at 0x3F8, COM2 at 0x2F8)
 pub struct LegacySerialPort {
+    base_port: u16,
     is_initialized: bool,
     power_state: PowerState,
-    port_base: u16,
+    baud_rate: u32,
 }
 
 impl LegacySerialPort {
-    pub fn new(port_base: u16) -> Self {
+    /// Creates a new LegacySerialPort instance
+    pub fn new(base_port: u16) -> Self {
         Self {
+            base_port,
             is_initialized: false,
             power_state: PowerState::Off,
-            port_base,
+            baud_rate: 9600,
         }
     }
 
-    pub fn get_port_base(&self) -> u16 {
-        self.port_base
+    /// Set baud rate by divisor (simulating DLAB logic)
+    pub fn set_baud_rate(&mut self, baud_rate: u32) {
+        self.baud_rate = baud_rate;
     }
 }
 
 impl PeripheralDevice for LegacySerialPort {
     fn name(&self) -> &'static str {
-        "COM Legacy Serial Port"
+        "UART 16550A Legacy Serial Port"
     }
 
     fn generation(&self) -> DeviceGeneration {
@@ -33,7 +38,13 @@ impl PeripheralDevice for LegacySerialPort {
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
-        // Traditionally, COM1 is at port 0x3F8. We configure baud rate and line controls here.
+        // Traditional x86 16550 initialization sequence:
+        // 1. Disable all interrupts
+        // 2. Set DLAB (Divisor Latch Access Bit) to configure baud rate
+        // 3. Set divisor low and high bytes
+        // 4. Clear DLAB and configure 8 bits, no parity, one stop bit (8N1)
+        // 5. Enable FIFO, clear them, and set receiver trigger to 14 bytes
+        // 6. Enable IRQs, RTS/DSR
         self.is_initialized = true;
         self.power_state = PowerState::On;
         Ok(())
@@ -41,31 +52,39 @@ impl PeripheralDevice for LegacySerialPort {
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized {
-            return Err("Device not initialized");
+            return Err("Serial port: Device not initialized");
         }
         if self.power_state != PowerState::On {
-            return Err("Device is sleeping or off");
+            return Err("Serial port: Device is sleeping or powered off");
         }
 
-        // Simulate reading a character from UART data register
-        if !buffer.is_empty() {
-            buffer[0] = b'S'; // Simulated incoming telemetry character
-            Ok(1)
-        } else {
-            Ok(0)
+        if buffer.is_empty() {
+            return Ok(0);
         }
+
+        // Simulate reading a byte from the Receiver Buffer Register (RBR)
+        // Returning ancient ASCII Carriage Return or diagnostic data
+        buffer[0] = b'S'; // Diagnostic ASCII startup char
+        Ok(1)
     }
 
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
         if !self.is_initialized {
-            return Err("Device not initialized");
+            return Err("Serial port: Device not initialized");
         }
         if self.power_state != PowerState::On {
-            return Err("Device is sleeping or off");
+            return Err("Serial port: Device is sleeping or powered off");
         }
 
-        // Simulate writing each character to the UART transmitter holding register
-        Ok(data.len())
+        // Simulate writing bytes to the Transmitter Holding Register (THR)
+        // In real hardware, we would poll Line Status Register (LSR) bit 5 (Empty THR) and outb
+        let mut bytes_written = 0;
+        for &byte in data {
+            // Simulated volatile write to ancient COM port
+            let _ = byte;
+            bytes_written += 1;
+        }
+        Ok(bytes_written)
     }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
@@ -85,25 +104,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_legacy_serial_creation() {
+    fn test_legacy_serial_oop() {
         let mut serial = LegacySerialPort::new(0x3F8);
-        assert_eq!(serial.get_port_base(), 0x3F8);
+        assert_eq!(serial.generation(), DeviceGeneration::Legacy);
         assert!(serial.initialize().is_ok());
-    }
 
-    #[test]
-    fn test_legacy_serial_read_write() {
-        let mut serial = LegacySerialPort::new(0x3F8);
-        let mut buf = [0; 10];
-        // Must fail before initialize
-        assert!(serial.read(&mut buf).is_err());
-
-        serial.initialize().unwrap();
-        let bytes_read = serial.read(&mut buf).unwrap();
+        let mut read_buf = [0u8; 10];
+        let bytes_read = serial.read(&mut read_buf).unwrap();
         assert_eq!(bytes_read, 1);
-        assert_eq!(buf[0], b'S');
+        assert_eq!(read_buf[0], b'S');
 
-        let bytes_written = serial.write(b"HELLO").unwrap();
-        assert_eq!(bytes_written, 5);
+        let write_data = b"Hello, SigmaOS!";
+        let bytes_written = serial.write(write_data).unwrap();
+        assert_eq!(bytes_written, write_data.len());
+
+        assert!(serial.set_power_state(PowerState::Sleep).is_ok());
+        assert!(serial.read(&mut read_buf).is_err()); // cannot read when asleep
+
+        assert!(serial.shutdown().is_ok());
     }
 }

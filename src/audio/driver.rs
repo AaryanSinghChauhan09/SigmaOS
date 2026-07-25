@@ -121,7 +121,6 @@ impl AudioDevice for SimpleAudioDevice {
     fn audio_type(&self) -> AudioType {
         unsafe { core::mem::transmute(self.audio_type.load(Ordering::SeqCst)) }
     }
-    }
     fn sample_rate(&self) -> u32 {
         self.sample_rate.load(Ordering::SeqCst) as u32
     }

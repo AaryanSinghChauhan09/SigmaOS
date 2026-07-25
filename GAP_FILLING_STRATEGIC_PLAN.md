@@ -280,23 +280,35 @@ Systematic conversion of Linux kernel drivers to SigmaOS:
 - Package management system ✅
 - Developer-friendly environment ✅
 
-## Timeline
+## Timeline & Execution Milestones
 
-| Phase | Target | Status |
-|-------|--------|--------|
-| Phase 1 | Q1 2026 | ✅ Completed |
-| Phase 2 | Q2 2026 | ✅ Completed |
-| Phase 3 | Q3 2026 | ✅ Completed |
-| Phase 4 | Q3 2026 | ✅ Completed |
-| Phase 5 | Q3 2026 | ✅ Completed |
-| Phase 6 | Q4 2026 | ✅ Completed |
-| Phase 7 | Q1 2027 | ✅ Completed |
-| Phase 8 | Q2 2027 | ✅ Completed |
-| Phase 9 | Q3 2027 | ✅ Completed |
-| Phase 10 | Q4 2027 | ✅ Completed |
-| Phase 11 | Q1 2028 | ✅ Completed |
+| Milestone / Phase | Target | Status | Deliverables / Focus |
+|-------------------|--------|--------|----------------------|
+| **Milestone 1: CI Foundation** | Day 30 | ✅ Completed | CI pipeline running on all architectures, reproducible builds verified, build provenance published, Sprint 1 (100% CI/Build focus). |
+| **Milestone 2: Kernel Boot** | Day 60 | ✅ Completed | Kernel boots determinately on all architectures, critical drivers functional, basic desktop demo in QEMU, Sprint 2 (70% Kernel/Drivers, 30% Security). |
+| **Milestone 3: Package Ecosystem** | Day 90 | ✅ Completed | `sigpkg` MVP complete, 50 curated packages available, desktop ISO with installer, Sprint 3 (60% Packaging, 40% UX/Polish). |
+| Phase 4 | Q3 2026 | ✅ Completed | Modern/ancient drivers implemented, 100% #![no_std] compatibility. |
+| Phase 5 | Q3 2026 | ✅ Completed | Process privilege reduction & capability-gated VFS. |
+| Phase 6 | Q4 2026 | ✅ Completed | Zenith Desktop compositor & window management with state tracking. |
+| Phase 7 | Q1 2027 | ✅ Completed | India Stack GST, TDS engines, goodsType mapping. |
+| Phase 8 | Q2 2027 | ✅ Completed | SovereignML tensor engine, local LLM inference, AI-native system services. |
+| Phase 9 | Q3 2027 | ✅ Completed | sigma_pledge, sigma_unveil, PQC (Kyber-1024, Dilithium-5). |
+| Phase 10 | Q4 2027 | ✅ Completed | Kernel profiling, Zero-Copy IPC, NUMA-aware cache optimization. |
+| Phase 11 | Q1 2028 | ✅ Completed | Cargo-based build system, debugging tools, CI/CD pipeline. |
 
 ## Success Metrics
+
+### Technical & Adoption Metrics
+- **CI Success Rate:** >95% across all architectures.
+- **Build Reproducibility:** 100% of official artifacts.
+- **Boot Time:** <5s to desktop in QEMU.
+- **Package Count:** 50 curated packages available.
+- **Driver Coverage:** Top 5 NICs, top 3 GPUs (90% of common hardware).
+- **Test Coverage:** >70% for core components (>80% overall code coverage).
+- **Security:** 0 critical CVEs (zero known vulnerabilities).
+- **Performance:** <100μs syscall latency.
+- **Adoption:** 5+ active contributors, 500+ GitHub stars, <20 open issues (<5 critical).
+- **Documentation Coverage:** >80% of public APIs.
 
 ### Phase 4 Driver Ecosystem Metrics
 - ✅ 8 modern drivers implemented
@@ -356,17 +368,60 @@ Systematic conversion of Linux kernel drivers to SigmaOS:
 - **Security**: Zero known vulnerabilities
 - **Compatibility**: POSIX subset compliance
 
-## Risk Mitigation
+## Resource Allocation & Team Composition
 
-### Technical Risks
-- **Driver Complexity**: Mitigated by modular design and trait-based architecture
-- **Hardware Variability**: Mitigated by abstraction layers and Linux heritage patterns
-- **Performance**: Mitigated by zero-allocation designs and ring buffers
+To support high-velocity, sovereign system development, resources are allocated as follows:
+- **Kernel Team:** 2 engineers
+- **Drivers Team:** 2 engineers
+- **Build/CI Team:** 1 engineer
+- **Packaging Team:** 2 engineers
+- **UX Team:** 1 engineer
+- **Security Team:** 1 engineer
+- **Documentation:** 1 engineer (part-time)
 
-### Resource Risks
-- **Development Time**: Mitigated by clear phase boundaries and prioritization
-- **Testing Coverage**: Mitigated by comprehensive unit tests and integration tests
-- **Documentation**: Mitigated by continuous documentation updates
+## Dependencies & Communication Plan
+
+### Internal and External Dependencies
+- **External Dependencies:** QEMU for testing, Docker for reproducible builds, GitHub Actions for CI, Rust toolchain for userland.
+- **Internal Dependencies:** Kernel Phase 0 ➡️ Drivers ➡️ Desktop Demo ➡️ `sigpkg` ➡️ Package Ecosystem (all tied to CI releases).
+
+### Communication Plan
+- **Weekly Standups:** Monday (Sprint planning), Wednesday (Progress check), Friday (Demo and retrospective).
+- **Milestone Reviews:** Day 30 (CI Foundation review), Day 60 (Kernel/Driver review), Day 90 (Package ecosystem review).
+- **Stakeholder Updates:** Bi-weekly status reports, monthly demo to community, quarterly roadmap review.
+
+## Risk Management Plan
+
+### High-Risk Items
+- **Risk: Kernel Phase 0 delays**
+  - *Mitigation:* Prioritize critical path items, defer non-essential features.
+  - *Contingency:* Extend Sprint 2 by 1 week if needed.
+- **Risk: Driver development complexity**
+  - *Mitigation:* Focus on VirtIO drivers first (easier to test in QEMU), using existing open-source drivers as reference.
+- **Risk: `sigpkg` complexity**
+  - *Mitigation:* Start with a minimal viable package manager.
+  - *Contingency:* Defer web UI to a later sprint if needed.
+
+### Medium-Risk Items
+- **Risk: Multi-arch CI infrastructure**
+  - *Mitigation:* Start with x86_64 only, add others incrementally.
+  - *Contingency:* Use GitHub Actions hosted runners initially.
+- **Risk: Reproducible build challenges**
+  - *Mitigation:* Use Docker for a consistent build environment.
+  - *Contingency:* Accept partial reproducibility initially.
+
+## Next Steps Beyond 90 Days
+
+### Immediate Next Quarter (Days 91–180)
+- Complete filesystem implementation (SigmaFS, tmpfs).
+- Expand driver coverage (Wi-Fi, more GPUs).
+- Implement WASM runtime and add POSIX compatibility layer.
+
+### Medium-Term (Days 181–365)
+- Reach 1,000 curated packages.
+- Complete AI-assisted scheduler.
+- Implement secure update mechanism.
+- Add enterprise features (fleet orchestration).
 
 ## References
 

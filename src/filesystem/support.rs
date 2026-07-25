@@ -10,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type FilesystemID = usize;
 
 /// Standard and advanced Filesystem types (Old & New technologies)
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilesystemType {
     Ext4 = 0,
@@ -560,19 +560,6 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -595,6 +582,9 @@ impl<T> Vec<T> {
     }
 
     pub fn get(&self, index: usize) -> T {
+        if self.data.is_null() || index >= self.len {
+            panic!("Access of invalid pointer");
+        }
         unsafe { core::ptr::read(self.data.add(index)) }
     }
 
