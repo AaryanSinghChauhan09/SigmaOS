@@ -2,47 +2,28 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-use std::string::String;
-use std::vec::Vec;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
+extern crate alloc;
+use alloc::vec::Vec;
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-    pub bits: u64,
+    pub bits_value: u64,
 }
 
 impl CapabilityToken {
+    /// Zero-argument constructor
     pub fn new() -> Self {
-        CapabilityToken {
+        Self {
             id: 0,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
+            allowed_paths: &[],
+            allowed_ports: &[],
             is_revoked: false,
-            bits: 0,
-        }
-    }
-
-    pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
-        CapabilityToken {
-            id,
-            allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
-            allowed_ports: ports.to_vec(),
-            is_revoked: false,
-            bits: 0,
+            bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
         }
     }
 
@@ -67,7 +48,10 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        self.allowed_paths.iter().any(|p| path.starts_with(p))
+        if self.allowed_paths.is_empty() {
+            return true; // Allow if no specific restriction
+        }
+        self.allowed_paths.iter().any(|&p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
@@ -91,11 +75,7 @@ impl CapabilityToken {
         self
     }
 
-    /// Allow file read access
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") || path == "/" {
-            self.bits |= 1 << 2;
-        }
+    pub fn allow_read(self, _path: &str) -> Self {
         self
     }
 
@@ -126,84 +106,33 @@ impl Default for CapabilityToken {
     }
 }
 
-impl CapabilityToken {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
+}
+
+pub struct CapabilityGate {
+    pub active_token: Option<CapabilityToken>,
+}
+
+impl CapabilityGate {
     pub fn new() -> Self {
-        CapabilityToken {
-            id: 0,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
-            is_revoked: false,
-        }
+        Self { active_token: None }
     }
 
-    pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
-        CapabilityToken {
-            id,
-            allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
-            allowed_ports: ports.to_vec(),
-            is_revoked: false,
-        }
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.active_token = Some(token);
     }
+}
 
-    pub fn from_bits(bits: u64) -> Self {
-        CapabilityToken {
-            id: bits,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
-            is_revoked: false,
-        }
-    }
-
-    pub fn bits(&self) -> u64 {
-        self.id
-    }
-
-    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
-        self.id |= 1;
-        self
-    }
-
-    pub fn allow_read(mut self, _path: &str) -> Self {
-        self.id |= 2;
-        self
-    }
-
-    pub fn allow_write(mut self, _path: &str) -> Self {
-        self.id |= 4;
-        self
-    }
-
-    pub fn allow_exec(mut self) -> Self {
-        self.id |= 8;
-        self
-    }
-
-    pub fn allow_ipc(mut self) -> Self {
-        self.id |= 16;
-        self
-    }
-
-    /// Verifies if the token permits access to a given path.
-    pub fn can_access_path(&self, path: &str) -> bool {
-        if self.is_revoked {
-            return false;
-        }
-        if self.allowed_paths.is_empty() {
-            return true; // Allow if no specific restriction
-        }
-        self.allowed_paths.iter().any(|p| path.starts_with(p))
-    }
-
-    /// Verifies if the token permits binding to a network port.
-    pub fn can_bind_port(&self, port: u16) -> bool {
-        if self.is_revoked {
-            return false;
-        }
-        self.allowed_ports.contains(&port)
-    }
-
-    pub fn revoke(&mut self) {
-        self.is_revoked = true;
+impl Default for CapabilityGate {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

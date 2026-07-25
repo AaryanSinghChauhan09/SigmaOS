@@ -8,6 +8,8 @@ pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use store::{
-    StoreError, StoreApp, SigmaSoftwareStore,
+
+pub use dependency_resolver::{
+    PackageDependencyResolver, PackageRecipe as DeclarativePackageRecipe,
+    Version as DependencyVersion,
 };
