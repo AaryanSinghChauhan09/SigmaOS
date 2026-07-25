@@ -309,7 +309,7 @@ To guarantee extreme packet processing speeds, SigmaOS operates a bare-metal TCP
 
 ---
 
-### 4.3 Memory Management & Scheduler (SovereignVMM)
+### 4.3 Memory Management & Scheduler (SovereiorVMM)
 SovereignVMM manages resources using dynamic, low-overhead scheduling and allocation algorithms.
 
 - **Dynamic Scheduling:** Predictive Multi-Level Feedback Queue (MLFQ) scheduler optimized with earliest-eligible deadline (CFS/EDF) adjustments.
@@ -345,7 +345,7 @@ To systematically challenge and replace the traditional monolithic kernel archit
 
 ```
 +---------------------------------------------------------------------------------+
-|                       LINUX vs. SIGMAOS ARCHITECTURAL COMPARISON                 |
+|                       LINUX vs. SIGMAOS ARCHURAL COMPARISON                     |
 +---------------------------------------------------------------------------------+
 | Metric / Design      | Monolithic Linux (kernel.org)   | SigmaOS (Sovereign Core)|
 +----------------------+---------------------------------+------------------------+
@@ -1003,5 +1003,102 @@ pub trait SelfHealingManager {
 
     // Audits and logs anomalies without executing dynamic heap allocations
     fn audit_subsystem_health(&self, id: usize) -> SubsystemStats;
+}
+```
+
+---
+
+## 7. MULTI-KERNEL PERSONALITY & TIME-TRAVEL COMPATIBILITY LAYERS
+
+To challenge and defeat standard Linux distributions globally, SigmaOS incorporates an OOP-based **Multi-Kernel Personality Framework** and an adaptive **Time-Travel API Translation Layer**. These paradigms enable legacy and modern hardware/software to execute natively with maximum performance and complete encapsulation.
+
+```
+       [Ancient Binary (expects Linux 2.6 syscalls)]
+                            |
+                            v
+               [Time-Travel APITimeline]
+        (Dynamic Translation -> Maps old API to Modern)
+                            |
+                            v
+               [KernelPersonaManager]
+        (Configures active Linux 2.6 personality context)
+                            |
+                            v
+           [Bare-Metal SigmaOS Microkernel Core]
+```
+
+### 7.1 Multi-Kernel Personality Framework
+The microkernel isolates standard kernel APIs across different eras inside pluggable **Kernel Personalities**. Rather than running legacy binaries inside sluggish emulators or hypervisors, SigmaOS dynamically loads the required personality state machine:
+- **KernelPersonaManager:** Detects the binary's target ABI signature (e.g. Linux 2.6, 3.x, 4.x, 5.x, or 6.x) upon execution and dynamically activates corresponding system-call translation matrices.
+- **Amnesic Context Isolation:** Each personality runs inside a capability-gated Ring 3 namespace. Legacy systems see a virtualized, backward-compatible procfs, sysfs, and socket interface while remaining completely isolated from modern bare-metal system segments.
+
+---
+
+### 7.2 Time-Travel API Layer (APITimeline)
+System calls evolve continuously across decades of operating system development. SigmaOS bridges this gap natively without source code modification:
+- **APITimeline:** Encapsulates API changes chronologically across kernel.org releases. When an ancient compiled binary invokes a deprecated system-call (such as ancient network socket options or obsolete file-locking flags), the `APITimeline` maps it transparently to modern, zero-trust equivalents.
+- **OOP Timeline Specialization:** Implements modular sub-timelines:
+  - `FileTimeline`: Translates obsolete synchronous filesystem primitives.
+  - `NetworkTimeline`: Translates deprecated routing and protocol structures.
+  - `ProcessTimeline`: Maps legacy threading and task-parent models to modern SovereignVMM threads.
+
+---
+
+### 7.3 Legacy Hardware Pods 2.0 (HardwarePodManager)
+Obsolete hardware driver modules are wrapped inside pluggable virtual pods, maintaining universal backward compatibility without kernel-level pollution:
+- **HardwarePodManager:** A singleton supervisor that manages legacy-emulating pods. When an ancient device (such as a legacy floppy controller, ISA SoundBlaster, parallel printer port, or AGP graphics card) is probed, the manager auto-detects its interface class.
+- **Polymorphic Emulation vs. Native Virtualization:** Based on target CPU flags and system memory budgets, the pod auto-negotiates whether to map physical port addresses directly (Legacy ISA/LPT native path) or virtualize the hardware register ranges inside safe Wasm-isolated containers.
+
+---
+
+### 7.4 Cross-Kernel Regression Harness 2.0
+To guarantee that rolling system updates never break retro-compatibility, SigmaOS integrates an automated regression testing engine:
+- **RegressionHarness:** Executes continuous regression tests validating hundreds of retro software suites (e.g., retro libc5 applications, ancient X11R6 display layers, and legacy database systems).
+- **Target Release Profiles:** Maintains automated, structured expected-behavior profiles mapped to historical kernel.org releases, certifying perfect backward compatibility before a rolling patch is deployed.
+
+---
+
+### 7.5 Adaptive Resource Scaling for Legacy Workloads
+Retro software is often designed with hardware assumptions that break on high-core, multi-socket modern processors (e.g., expecting single-thread scheduling or extremely low physical memory boundaries).
+- **ResourceScaler:** Dynamically detects application context requirements. For retro workloads, it automatically scales down scheduler parameters:
+  - `LowMemoryProfile`: Restricts heap access to <64MB physical RAM segments to prevent internal pointer overflows.
+  - `SingleCoreProfile`: Pins multi-threaded execution to a single hyper-thread core, ensuring no race conditions can occur in legacy un-synchronized thread loops.
+
+---
+
+### 7.6 Compatibility Knowledge Base & AI-Driven Profiling
+- **CompatKnowledgeBase 2.0:** A decentralized, pluggable database mapping legacy APIs, devices, and driver overrides. Developers and users can submit new mappings as lightweight, signed plugins to extend retro-compatibility libraries.
+- **CompatibilityPredictor (AI-Driven Profiling):** An embedded, offline machine learning model that analyzes binary system-call footprints at launch. It dynamically predicts which legacy APIs and deprecated device interfaces the binary will invoke, and automatically pre-generates lightweight OOP shims and wrappers to guarantee immediate execution success.
+
+---
+
+### 7.7 Architectural OOP Blueprint (Pseudocode)
+```rust
+pub enum KernelEra {
+    Linux_2_6,
+    Linux_3_X,
+    Linux_4_X,
+    Linux_5_X,
+    Linux_6_X,
+    SovereignNative,
+}
+
+pub struct SyscallFrame {
+    pub syscall_number: usize,
+    pub args: [u64; 6],
+}
+
+pub trait TargetPersonality {
+    // Retuns the era enum identifier
+    fn era(&self) -> KernelEra;
+
+    // Directs and translates syscall inputs to sovereign equivalents
+    fn translate_syscall(&self, frame: &mut SyscallFrame) -> Result<u64, u32>;
+}
+
+pub struct KernelPersonaManager {
+    // Singleton controller swaps target personality contexts dynamically
+    pub active_era: KernelEra,
+    pub active_personality: Box<dyn TargetPersonality>,
 }
 ```
