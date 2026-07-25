@@ -258,7 +258,6 @@ impl Default for KeyringStats {
 }
 
 /// Simple keyring (OOP: Concrete keyring class)
-pub type SecretManager = dyn Keyring;
 
 #[derive(Debug, Clone)]
 pub struct SecretStorage {
@@ -452,6 +451,3 @@ mod tests {
 }
 
 pub type SecretManager = dyn Keyring;
-
-#[derive(Debug, Clone)]
-pub struct SecretStorage;

@@ -110,22 +110,7 @@ impl CapabilityToken {
     }
 }
 
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
-
+#[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
     pub active_token: Option<CapabilityToken>,
 }
