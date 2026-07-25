@@ -996,6 +996,298 @@ impl PeripheralArchive for DotMatrixArchive {
     }
 }
 
+// =========================================================================
+// 22. KERNEL PERSONALITY MOSAIC
+// =========================================================================
+
+pub struct KernelMosaic {
+    pub tiles: Vec<LinuxEra>,
+}
+
+impl KernelMosaic {
+    pub fn new() -> Self {
+        Self { tiles: Vec::new() }
+    }
+
+    pub fn place_tile(&mut self, era: LinuxEra) {
+        self.tiles.push(era);
+    }
+
+    pub fn supports_tile(&self, era: LinuxEra) -> bool {
+        self.tiles.contains(&era)
+    }
+}
+
+impl Default for KernelMosaic {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23. SYSCALL EVOLUTION CHRONICLE MAP
+// =========================================================================
+
+pub trait SyscallChronicleMap {
+    fn get_fallback_syscall_num(&self, original_num: usize) -> Option<usize>;
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str;
+}
+
+pub struct FileChronicleMap;
+impl SyscallChronicleMap for FileChronicleMap {
+    fn get_fallback_syscall_num(&self, original_num: usize) -> Option<usize> {
+        match original_num {
+            5 => Some(3), // sys_open fallback to sys_read (dummy emulation)
+            _ => None,
+        }
+    }
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str {
+        match original_num {
+            3 => "FileReadOperation",
+            4 => "FileWriteOperation",
+            5 => "FileOpenOperation",
+            _ => "UnknownFileOperation",
+        }
+    }
+}
+
+pub struct NetworkChronicleMap;
+impl SyscallChronicleMap for NetworkChronicleMap {
+    fn get_fallback_syscall_num(&self, _original_num: usize) -> Option<usize> {
+        None
+    }
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str {
+        match original_num {
+            102 => "NetworkSocketCallOperation",
+            _ => "UnknownNetworkOperation",
+        }
+    }
+}
+
+pub struct ProcessChronicleMap;
+impl SyscallChronicleMap for ProcessChronicleMap {
+    fn get_fallback_syscall_num(&self, original_num: usize) -> Option<usize> {
+        match original_num {
+            120 => Some(2), // sys_clone fallback to sys_fork
+            _ => None,
+        }
+    }
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str {
+        match original_num {
+            1 => "ProcessExitOperation",
+            2 => "ProcessForkOperation",
+            120 => "ProcessCloneOperation",
+            _ => "UnknownProcessOperation",
+        }
+    }
+}
+
+// =========================================================================
+// 24. DRIVER PERSONALITY REPOSITORY VAULT
+// =========================================================================
+
+pub trait DriverRepoVault {
+    fn query_lineage_metadata(&self, driver_id: u32) -> &'static str;
+    fn get_dependency_chain(&self, driver_id: u32) -> &'static [&'static str];
+}
+
+pub struct StorageRepoVault;
+impl DriverRepoVault for StorageRepoVault {
+    fn query_lineage_metadata(&self, _driver_id: u32) -> &'static str {
+        "IDE -> SATA -> NVMe"
+    }
+    fn get_dependency_chain(&self, _driver_id: u32) -> &'static [&'static str] {
+        &["PciBus", "DmaController"]
+    }
+}
+
+pub struct NetworkRepoVault;
+impl DriverRepoVault for NetworkRepoVault {
+    fn query_lineage_metadata(&self, _driver_id: u32) -> &'static str {
+        "NE2000 -> Intel100 -> Intel1000"
+    }
+    fn get_dependency_chain(&self, _driver_id: u32) -> &'static [&'static str] {
+        &["PciBus", "NetFilter"]
+    }
+}
+
+pub struct GraphicsRepoVault;
+impl DriverRepoVault for GraphicsRepoVault {
+    fn query_lineage_metadata(&self, _driver_id: u32) -> &'static str {
+        "MDA -> VGA -> VESA -> DRM/KMS"
+    }
+    fn get_dependency_chain(&self, _driver_id: u32) -> &'static [&'static str] {
+        &["PciBus", "Framebuffer"]
+    }
+}
+
+// =========================================================================
+// 25. FIRMWARE EVOLUTION DOCK GRID
+// =========================================================================
+
+pub trait FirmwareDockGrid {
+    fn get_dock_status(&self) -> &'static str;
+    fn execute_handshake(&self, code: u16) -> bool;
+}
+
+pub struct BIOSDockGrid;
+impl FirmwareDockGrid for BIOSDockGrid {
+    fn get_dock_status(&self) -> &'static str {
+        "BIOS_LEGACY_DOCK_ONLINE"
+    }
+    fn execute_handshake(&self, code: u16) -> bool {
+        code == 0xAA55
+    }
+}
+
+pub struct UEFIDockGrid;
+impl FirmwareDockGrid for UEFIDockGrid {
+    fn get_dock_status(&self) -> &'static str {
+        "UEFI_MODERN_DOCK_ONLINE"
+    }
+    fn execute_handshake(&self, code: u16) -> bool {
+        code == 0xEF10
+    }
+}
+
+pub struct CorebootDockGrid;
+impl FirmwareDockGrid for CorebootDockGrid {
+    fn get_dock_status(&self) -> &'static str {
+        "COREBOOT_OPEN_DOCK_ONLINE"
+    }
+    fn execute_handshake(&self, code: u16) -> bool {
+        code == 0xC00B
+    }
+}
+
+// =========================================================================
+// 26. ANCIENT BUILD REPLAY LEDGER ARCHIVE
+// =========================================================================
+
+pub trait BuildLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32;
+    fn verify_build_preservation(&self, crc: u32) -> bool;
+}
+
+pub struct LegacyCLedgerArchive {
+    pub entry_id: u32,
+}
+impl BuildLedgerArchive for LegacyCLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32 {
+        self.entry_id
+    }
+    fn verify_build_preservation(&self, crc: u32) -> bool {
+        crc == 0x12345678
+    }
+}
+
+pub struct LegacyCppLedgerArchive {
+    pub entry_id: u32,
+}
+impl BuildLedgerArchive for LegacyCppLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32 {
+        self.entry_id
+    }
+    fn verify_build_preservation(&self, crc: u32) -> bool {
+        crc == 0x87654321
+    }
+}
+
+pub struct LegacyAsmLedgerArchive {
+    pub entry_id: u32,
+}
+impl BuildLedgerArchive for LegacyAsmLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32 {
+        self.entry_id
+    }
+    fn verify_build_preservation(&self, crc: u32) -> bool {
+        crc == 0xabcdef00
+    }
+}
+
+// =========================================================================
+// 27. SECURITY PERSONALITY MOSAIC
+// =========================================================================
+
+pub trait SecurityMosaic {
+    fn authorize_mosaic_tile(&self, uid: u32, privilege_bit: u8) -> bool;
+}
+
+pub struct DACMosaic;
+impl SecurityMosaic for DACMosaic {
+    fn authorize_mosaic_tile(&self, uid: u32, _privilege_bit: u8) -> bool {
+        uid == 0
+    }
+}
+
+pub struct SELinuxMosaic {
+    pub enforce: bool,
+}
+impl SecurityMosaic for SELinuxMosaic {
+    fn authorize_mosaic_tile(&self, _uid: u32, privilege_bit: u8) -> bool {
+        if !self.enforce {
+            return true;
+        }
+        privilege_bit < 8
+    }
+}
+
+pub struct ZeroTrustMosaic;
+impl SecurityMosaic for ZeroTrustMosaic {
+    fn authorize_mosaic_tile(&self, _uid: u32, _privilege_bit: u8) -> bool {
+        false
+    }
+}
+
+// =========================================================================
+// 28. PERIPHERAL EVOLUTION ARCHIVE DOCK
+// =========================================================================
+
+pub trait PeripheralArchiveDock {
+    fn query_dock_module_signature(&self) -> u16;
+    fn execute_dock_simulation(&self) -> &'static str;
+}
+
+pub struct FloppyArchiveDock;
+impl PeripheralArchiveDock for FloppyArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x3F0
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "Floppy simulation active"
+    }
+}
+
+pub struct TapeArchiveDock;
+impl PeripheralArchiveDock for TapeArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x280
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "Magnetic tape simulation active"
+    }
+}
+
+pub struct CRTArchiveDock;
+impl PeripheralArchiveDock for CRTArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x3D4
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "CRT display simulation active"
+    }
+}
+
+pub struct DotMatrixArchiveDock;
+impl PeripheralArchiveDock for DotMatrixArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x378
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "Dot matrix printer simulation active"
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1267,5 +1559,55 @@ mod tests {
     fn test_peripheral_archive() {
         let floppy: Box<dyn PeripheralArchive> = Box::new(FloppyArchive);
         assert_eq!(floppy.archive_simulation(), "FLOPPY_ARCHIVE_MAPPED");
+    }
+
+    #[test]
+    fn test_kernel_mosaic() {
+        let mut mosaic = KernelMosaic::new();
+        mosaic.place_tile(LinuxEra::Era2_0);
+        assert!(mosaic.supports_tile(LinuxEra::Era2_0));
+        assert!(!mosaic.supports_tile(LinuxEra::Era0_11));
+    }
+
+    #[test]
+    fn test_syscall_chronicle_map() {
+        let file_chron: Box<dyn SyscallChronicleMap> = Box::new(FileChronicleMap);
+        assert_eq!(file_chron.get_fallback_syscall_num(5).unwrap(), 3);
+        assert_eq!(file_chron.get_semantic_annotation(3), "FileReadOperation");
+    }
+
+    #[test]
+    fn test_driver_repo_vault() {
+        let stor_repo: Box<dyn DriverRepoVault> = Box::new(StorageRepoVault);
+        assert_eq!(stor_repo.query_lineage_metadata(1), "IDE -> SATA -> NVMe");
+        assert_eq!(stor_repo.get_dependency_chain(1)[0], "PciBus");
+    }
+
+    #[test]
+    fn test_firmware_dock_grid() {
+        let bios: Box<dyn FirmwareDockGrid> = Box::new(BIOSDockGrid);
+        assert_eq!(bios.get_dock_status(), "BIOS_LEGACY_DOCK_ONLINE");
+        assert!(bios.execute_handshake(0xAA55));
+    }
+
+    #[test]
+    fn test_build_ledger_archive() {
+        let c_led: Box<dyn BuildLedgerArchive> = Box::new(LegacyCLedgerArchive { entry_id: 101 });
+        assert_eq!(c_led.get_reproducible_entry_id(), 101);
+        assert!(c_led.verify_build_preservation(0x12345678));
+    }
+
+    #[test]
+    fn test_security_mosaic() {
+        let dac: Box<dyn SecurityMosaic> = Box::new(DACMosaic);
+        assert!(dac.authorize_mosaic_tile(0, 1));
+        assert!(!dac.authorize_mosaic_tile(1000, 1));
+    }
+
+    #[test]
+    fn test_peripheral_archive_dock() {
+        let floppy: Box<dyn PeripheralArchiveDock> = Box::new(FloppyArchiveDock);
+        assert_eq!(floppy.query_dock_module_signature(), 0x3F0);
+        assert_eq!(floppy.execute_dock_simulation(), "Floppy simulation active");
     }
 }
