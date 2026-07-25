@@ -1,8 +1,15 @@
 // SigmaOS Compatibility Module
+pub mod constellation;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod personality;
 pub mod sigmawin;
+
+pub use constellation::{
+    ArchiveProfile, BuildArchive, ChronicleType, ConstellationNode, DriverMuseum, ExhibitType,
+    FirmwarePavilion, KernelConstellation, ObsoletePeripheral, PavilionType, PeripheralMuseum,
+    SecurityModel as ConstellationSecurityModel, SecurityPavilion, SyscallChronicle,
+};
 
 pub use personality::{
     BuildCapsule, BuildProfile, CapsuleVersion, DriverEmulator, EmulatorProfile, FirmwarePersona,
