@@ -9,6 +9,12 @@ pub struct ModernUsbController {
     buffer: [u8; 64], // Simulated fast DMA buffer
 }
 
+impl Default for ModernUsbController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ModernUsbController {
     pub fn new() -> Self {
         Self {
@@ -42,7 +48,7 @@ impl PeripheralDevice for ModernUsbController {
         if self.power_state != PowerState::On {
             return Err("Device is sleeping or off");
         }
-        
+
         // High-speed block read simulation
         let len = core::cmp::min(buffer.len(), self.buffer.len());
         buffer[..len].copy_from_slice(&self.buffer[..len]);
@@ -56,7 +62,7 @@ impl PeripheralDevice for ModernUsbController {
         if self.power_state != PowerState::On {
             return Err("Device is sleeping or off");
         }
-        
+
         let len = core::cmp::min(data.len(), self.buffer.len());
         self.buffer[..len].copy_from_slice(&data[..len]);
         Ok(len)
