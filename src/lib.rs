@@ -47,6 +47,7 @@ pub mod boot {
 }
 pub mod toolchain {
     pub mod adapter;
+    pub mod capsule;
 }
 
 pub use accessibility::{
@@ -165,15 +166,30 @@ pub use boot::firmware_bridge::{
 pub use toolchain::adapter::{
     ToolchainProfile, ToolchainAdapter,
 };
+pub use toolchain::capsule::{
+    CapsuleProfile, BuildCapsule,
+};
 pub use compatibility::persona::{
     PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
 };
 pub use compatibility::abi_translator::{
     CpuArchitecture, ABITranslator,
 };
+pub use compatibility::lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
 pub use network::revival::{
     RevivalProtocol, NetRevival,
 };
 pub use driver::simulation::{
     SimType, PeripheralSim,
+};
+pub use driver::mapper::{
+    MapperCategory, DriverMapper,
+};
+pub use driver::pods::{
+    PodType, PeripheralPod,
+};
+pub use security::bridge::{
+    LegacySecurityType, SecurityBridge,
 };

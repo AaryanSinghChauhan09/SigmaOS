@@ -3,6 +3,7 @@ pub mod cross_platform;
 pub mod linux_adapter;
 pub mod persona;
 pub mod abi_translator;
+pub mod lattice;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -16,4 +17,7 @@ pub use persona::{
 };
 pub use abi_translator::{
     CpuArchitecture, ABITranslator,
+};
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
 };
