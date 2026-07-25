@@ -5,6 +5,7 @@ pub mod persona;
 pub mod abi_translator;
 pub mod lattice;
 pub mod prism;
+pub mod canonical;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -24,4 +25,7 @@ pub use lattice::{
 };
 pub use prism::{
     PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
 };
