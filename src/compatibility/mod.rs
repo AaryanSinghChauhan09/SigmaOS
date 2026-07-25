@@ -1,35 +1,11 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
-pub mod gap_closure;
-pub mod historic_linux;
-pub mod personality;
-pub mod sigmawin;
-
-pub use gap_closure::{
-    AiTaskOrchestrator, BootInterface, BuildLedgerSystem, DriverClass, DriverRepositoryManager,
-    EmulatedPeripheral, FirmwareBridgeManager, GapSandboxPolicy, HardwareDriver, HidGraphicsDriver,
-    JobClass, KernelModule, KernelModuleManager, LedgerSnapshot, MemoryProtection, ModuleState,
-    NetworkStackGateway, PeripheralEmulationLibrary, SecurityPolicyManager,
-    SyscallCompatibilityRegistry, VirtualMemoryManager,
-};
-
-pub use constellation::{
-    ArchiveProfile, BuildArchive, ChronicleType, ConstellationNode, DriverMuseum, ExhibitType,
-    FirmwarePavilion, KernelConstellation, ObsoletePeripheral, PavilionType, PeripheralMuseum,
-    SecurityModel as ConstellationSecurityModel, SecurityPavilion, SyscallChronicle,
-};
-
-pub use personality::{
-    BuildCapsule, BuildProfile, CapsuleVersion, DriverEmulator, EmulatorProfile, FirmwarePersona,
-    FirmwareType, KernelShard, ObsoleteDevice, PeripheralPod, SecurityGrid, SecurityModel,
-    ShardType, SyscallCapsule,
-};
-
-pub use sigmawin::{
-    D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, User32MessageQueue, Win32Error,
-    Win32Message, WinSockAdapter,
-};
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -59,4 +35,16 @@ pub use mint_linux::{
 pub use chimera_linux::{
     DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
     ApkPackageMetadata, ApkPackageStore,
+};
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+};
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
+};
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
 };

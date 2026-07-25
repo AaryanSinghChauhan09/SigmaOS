@@ -8,7 +8,8 @@ pub mod integrity;
 pub mod mac;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod bridge;
+pub mod prism;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{
@@ -27,4 +28,9 @@ pub use password::{
 };
 pub use pki::{Certificate, CertificateAuthority, PkiError, PkiManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
+pub use bridge::{
+    LegacySecurityType, SecurityBridge,
+};
+pub use prism::{
+    SecurityFacet, SecurityPrism,
+};
