@@ -98,12 +98,6 @@ pub struct CapabilityToken {
     pub is_revoked: bool,
 }
 
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
@@ -164,6 +158,11 @@ impl CapabilityToken {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub active_token: Option<CapabilityToken>,
+}
+
     pub fn bits(&self) -> u64 {
         self.bits
     }
@@ -207,5 +206,22 @@ impl SecurityEnforcer {
 
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_capability_token_traversal_protection() {
+        let paths = vec!["/var/www"];
+        let token = CapabilityToken::new_with_args(1, &paths, &[]);
+
+        // Safe path starts with /var/www and has no traversal
+        assert!(token.can_access_path("/var/www/index.html"));
+
+        // Path starting with /var/www but containing traversal should be blocked
+        assert!(!token.can_access_path("/var/www/../../etc/passwd"));
     }
 }
