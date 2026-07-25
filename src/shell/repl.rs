@@ -70,8 +70,8 @@ impl ShellRepl {
             prompt: "ubuntu@sigmaos:~$ ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
-            services,
-            installed_packages,
+            services: std::collections::HashMap::new(),
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 

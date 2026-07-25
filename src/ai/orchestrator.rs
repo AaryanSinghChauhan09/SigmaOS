@@ -141,6 +141,8 @@ pub trait AgentOrchestrator {
 pub struct SimpleAgentOrchestrator {
     pub agents: Vec<Option<Box<dyn AIAgent>>>,
     pub next_id: AtomicUsize,
+    pub model_temperature: f32,
+    pub response_timeout_secs: u32,
 }
 
 impl SimpleAgentOrchestrator {
@@ -148,7 +150,17 @@ impl SimpleAgentOrchestrator {
         SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
+            model_temperature: 0.7,
+            response_timeout_secs: 30,
         }
+    }
+
+    pub fn set_model_temperature(&mut self, temp: f32) {
+        self.model_temperature = temp;
+    }
+
+    pub fn set_response_timeout(&mut self, secs: u32) {
+        self.response_timeout_secs = secs;
     }
 }
 

@@ -27,6 +27,9 @@ pub struct UsbHidDriver {
     pub capabilities: CapabilityToken,
     pub event_buffer: Vec<HidKeyboardEvent>,
     pub connected: bool,
+    pub repeat_delay_ms: u32,
+    pub repeat_rate_ms: u32,
+    pub layout: String,
 }
 
 impl UsbHidDriver {
@@ -37,7 +40,19 @@ impl UsbHidDriver {
             capabilities: CapabilityToken::new(),
             event_buffer: Vec::new(),
             connected: false,
+            repeat_delay_ms: 250,
+            repeat_rate_ms: 33,
+            layout: "US-QWERTY".to_string(),
         }
+    }
+
+    pub fn set_repeat_settings(&mut self, delay: u32, rate: u32) {
+        self.repeat_delay_ms = delay;
+        self.repeat_rate_ms = rate;
+    }
+
+    pub fn set_layout(&mut self, layout: &str) {
+        self.layout = layout.to_string();
     }
 
     pub fn connect(&mut self) -> Result<(), HidError> {
@@ -263,5 +278,20 @@ mod tests {
         let mut hid = UsbHidDriver::new(0x1234, 0x5678);
         let result = hid.send_report(HidReportType::Output, &[0x01]);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_repeat_and_layout_settings() {
+        let mut hid = UsbHidDriver::new(0x1234, 0x5678);
+        assert_eq!(hid.repeat_delay_ms, 250);
+        assert_eq!(hid.repeat_rate_ms, 33);
+        assert_eq!(hid.layout, "US-QWERTY");
+
+        hid.set_repeat_settings(500, 50);
+        assert_eq!(hid.repeat_delay_ms, 500);
+        assert_eq!(hid.repeat_rate_ms, 50);
+
+        hid.set_layout("FR-AZERTY");
+        assert_eq!(hid.layout, "FR-AZERTY");
     }
 }

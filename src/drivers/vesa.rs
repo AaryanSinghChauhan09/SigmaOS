@@ -19,6 +19,9 @@ pub struct VesaDriver {
     pub mode_info: VesaModeInfo,
     pub capabilities: CapabilityToken,
     pub current_mode: u16,
+    pub refresh_rate_hz: u32,
+    pub color_depth: u32,
+    pub aspect_ratio: &'static str,
 }
 
 impl VesaDriver {
@@ -33,11 +36,21 @@ impl VesaDriver {
             },
             capabilities: CapabilityToken::new(),
             current_mode: 0,
+            refresh_rate_hz: 60,
+            color_depth: 32,
+            aspect_ratio: "4:3",
         }
     }
 
     pub fn with_mode(width: u32, height: u32, bpp: u32) -> Self {
         let pitch = width * (bpp / 8);
+        let aspect_ratio = if width * 9 == height * 16 {
+            "16:9"
+        } else if width * 10 == height * 16 {
+            "16:10"
+        } else {
+            "4:3"
+        };
         Self {
             mode_info: VesaModeInfo {
                 width,
@@ -48,7 +61,22 @@ impl VesaDriver {
             },
             capabilities: CapabilityToken::new(),
             current_mode: 0,
+            refresh_rate_hz: 60,
+            color_depth: bpp,
+            aspect_ratio,
         }
+    }
+
+    pub fn set_refresh_rate(&mut self, rate: u32) {
+        self.refresh_rate_hz = rate;
+    }
+
+    pub fn set_color_depth(&mut self, depth: u32) {
+        self.color_depth = depth;
+    }
+
+    pub fn get_aspect_ratio(&self) -> &'static str {
+        self.aspect_ratio
     }
 
     pub fn initialize(&mut self) -> Result<(), VesaError> {
@@ -241,6 +269,23 @@ mod tests {
         assert_eq!(vesa.mode_info.width, 1024);
         assert_eq!(vesa.mode_info.height, 768);
         assert_eq!(vesa.mode_info.bpp, 32);
+    }
+
+    #[test]
+    fn test_vesa_settings() {
+        let mut vesa = VesaDriver::new();
+        assert_eq!(vesa.refresh_rate_hz, 60);
+        assert_eq!(vesa.color_depth, 32);
+        assert_eq!(vesa.get_aspect_ratio(), "4:3");
+
+        vesa.set_refresh_rate(144);
+        assert_eq!(vesa.refresh_rate_hz, 144);
+
+        vesa.set_color_depth(24);
+        assert_eq!(vesa.color_depth, 24);
+
+        let vesa_hd = VesaDriver::with_mode(1920, 1080, 32);
+        assert_eq!(vesa_hd.get_aspect_ratio(), "16:9");
     }
 
     #[test]
