@@ -74,7 +74,7 @@ impl ArchiveHandler for ZipArchiveHandler {
     fn create_archive(
         &mut self,
         files: &[PathBuf],
-        output: &Path,
+        _output: &Path,
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
@@ -153,7 +153,7 @@ impl ArchiveHandler for TarArchiveHandler {
     fn create_archive(
         &mut self,
         files: &[PathBuf],
-        output: &Path,
+        _output: &Path,
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
@@ -426,7 +426,7 @@ mod tests {
         ];
         let path = PathBuf::from("/test/archive.zip");
         let result = manager
-            .create_archive(&files, &PathBuf::from("/test/archive.zip"))
+            .create_archive(&files, &path)
             .unwrap();
         assert!(result.success);
     }
@@ -436,7 +436,7 @@ mod tests {
         let manager = ArchiveManager::default();
         let path = PathBuf::from("/test/archive.zip");
         let entries = manager
-            .list_contents(&PathBuf::from("/test/archive.zip"))
+            .list_contents(&path)
             .unwrap();
         assert!(!entries.is_empty());
     }
