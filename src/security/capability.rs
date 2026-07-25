@@ -103,6 +103,17 @@ impl CapabilityToken {
         self.bits
     }
 
+    /// Check if capability contains a specific u64 bit
+    pub fn contains(&self, bit: u64) -> bool {
+        (self.bits & bit) != 0
+    }
+
+    /// Allow a specific capability bit
+    pub fn allow_capability(&mut self, bit: u64) {
+        self.bits |= bit;
+    }
+}
+
     pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
         self.bits |= 1;
         if port != 0 {

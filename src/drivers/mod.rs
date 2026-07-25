@@ -31,6 +31,25 @@ pub use even_more_devices::{
 pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
+pub use kernel_io_suite::{
+    AclPacket, AdLibSynth, AlsaError, AlsaSoundDriver,
+    AncientDeviceLayer, AncientError, BluetoothError, BluetoothHciDriver, BluetoothMode, BssInfo,
+    CommandBuffer, CommandStatus, Cursor, DisplayMode, EgaCgaAdapter, FlipRequest, GestureState,
+    GestureType, GpuAccelerationDriver, GpuCommand as KernelGpuCommand, GpuError as KernelGpuError, HidFullError,
+    HidInputReport, HidOutputReport, IsaBus, IsaDevice, JobStatus, L2capChannel,
+    L2capState, MfmDiskInterface, MultiTouchDriver, Ne2000Ethernet, PixelFormat, PrimitiveType,
+    PrintJob, PrinterBackend, PrinterCupsDriver, PrinterError, PrinterProtocol,
+    QosMapping, RingBuffer, SampleFormat, ScanResult, ScoPacket, SecurityType, TouchContact,
+    TouchError, TouchProtocol, Uart8250, UsbHidFullDriver, VesaFramebufferDriver,
+    VesaFramebufferError, VideoMode, WifiError, WifiFullStackDriver, WifiState, WpaToken,
+    WpaTokenType,
+};
+pub use kernel_releases::{
+    KernelReleaseInfo, LinuxReleaseDriver,
+    Longterm5_10_TpmDriver, Longterm5_15_SerialDriver,
+    Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver, Longterm6_1_InputDriver,
+    Longterm6_6_AudioDriver, MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
+};
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
@@ -38,3 +57,15 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+
+// Test and backward compatibility aliases
+pub type Bluetooth5_4Adapter = Bluetooth5_4_Adapter;
+pub type MainlineReleaseDriver = MainlineGpuDriver;
+pub type StableReleaseDriver = Stable6_22_SensorDriver;
+pub type LongtermReleaseDriver = Longterm6_18_StorageDriver;
+pub type PrepatchRcDriver1 = Prepatch6_23_Rc1_AiDriver;
+pub type PrepatchRcDriver2 = Longterm6_12_NetworkDriver;
+pub type PrepatchRcDriver3 = Longterm6_6_AudioDriver;
+pub type PrepatchRcDriver4 = Longterm6_1_InputDriver;
+pub type PrepatchRcDriver5 = Longterm5_15_SerialDriver;
+pub type PrepatchRcDriver6 = Longterm5_10_TpmDriver;
