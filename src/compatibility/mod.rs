@@ -3,6 +3,7 @@ pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
 pub mod chimera_linux;
+pub mod relay_nexus;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -24,4 +25,15 @@ pub use mint_linux::{
 pub use chimera_linux::{
     DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
     ApkPackageMetadata, ApkPackageStore,
+};
+
+pub use relay_nexus::{
+    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
+    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
+    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
+    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
+    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
 };

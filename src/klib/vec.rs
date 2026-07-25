@@ -39,6 +39,14 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize { self.len }
     pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
+        for i in 0..self.len {
+            unsafe {
+                if &*self.data.add(i) == item { return true; }
+            }
+        }
+        false
+    }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter { vec: self, index: 0 }
     }
