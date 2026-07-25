@@ -1,12 +1,10 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
-pub mod linux_adapter;
-pub mod persona;
-pub mod abi_translator;
-pub mod lattice;
-pub mod prism;
-pub mod canonical;
+pub mod historic_linux;
+pub mod mint_linux;
+pub mod chimera_linux;
+pub mod relay_nexus;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -47,4 +45,15 @@ pub use constellation_mesh::{
 };
 pub use canonical::{
     SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+};
+
+pub use relay_nexus::{
+    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
+    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
+    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
+    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
+    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
 };
