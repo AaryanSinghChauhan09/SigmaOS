@@ -14,16 +14,6 @@ pub enum Permission {
     Ipc,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
-
 /// A cryptographic capability token required for any privileged action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
@@ -132,6 +122,29 @@ impl CapabilityGate {
 impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityGate {
+    pub token: CapabilityToken,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        Self {
+            token: CapabilityToken::new(),
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
     }
 }
 
