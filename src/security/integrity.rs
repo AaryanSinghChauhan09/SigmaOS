@@ -406,9 +406,3 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct IntegrityCheck;
-
-#[derive(Debug, Clone)]
-pub struct IntegrityVerifier;
