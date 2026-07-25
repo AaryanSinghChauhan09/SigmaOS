@@ -5,6 +5,14 @@ pub mod gap_closure;
 pub mod historic_linux;
 pub mod personality;
 pub mod sigmawin;
+pub mod superiority;
+
+pub use superiority::{
+    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
+    SigSection, SigSectionType, SovereignTimeMachine, ShardCheckpoint, NumaTask,
+    NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine, SovereignForensics,
+    SovereignRecoverUtility, ShardIgnitor,
+};
 
 pub use gap_closure::{
     AiTaskOrchestrator, BootInterface, BuildLedgerSystem, DriverClass, DriverRepositoryManager,
