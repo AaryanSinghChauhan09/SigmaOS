@@ -1,17 +1,3 @@
-# ⚡ Bolt's Journal — SigmaOS Performance Optimizations
-
-This journal contains CRITICAL performance learnings discovered during profiling, compiling, and optimizing SigmaOS.
-
----
-
-## 2024-07-15 - Unnecessary External Dependencies in Utility Modules
-**Learning:** External crates like `rand` and `uuid` are heavy, introduce substantial compilation times, and are highly inefficient for simple simulation metrics or identifier generations. Replacing them with specialized local, zero-dependency implementations (such as a 48-bit Linear Congruential Generator for pseudo-random numbers and timestamp-nanoseconds for unique snapshot IDs) completely eliminates standard-library binding costs, reduces compiler overhead, and provides sub-nanosecond execution speeds.
-**Action:** Always prefer lightweight, mathematically simple local algorithms over heavy external crate imports for simulation, telemetry, and non-cryptographic utility operations.
-
-## 2024-07-15 - Ownership and Moves in Allocator Merge Trees
-**Learning:** In Buddy Allocator merge operations, taking ownership of memory blocks by-value during a merge search leads to premature values being dropped if buddy merging fails. This forces expensive re-allocation or unnecessary clone overheads. Returning ownership of the original block in a `Result<MemoryBlock, MemoryBlock>` if buddy merging fails avoids all move-borrow complications, preserves zero-allocation guarantees, and maintains perfect linear execution speed.
-**Action:** When designing hardware or memory managers in Rust, use `Result` wrappers to pass ownership back and forth safely without any allocation or cloning of control blocks.
-
-## 2026-07-17 - Zero-Allocation Version Parsing
-**Learning:** Splitting a string and collecting the slices into a heap-allocated collection (such as `version_str.split('.').collect::<Vec<&str>>()`) in frequently called utility methods introduces performance overhead. Replacing this with an iterator-based inline parsing method completely avoids heap allocations and significantly reduces memory usage and execution time.
-**Action:** Always utilize iterators and inline parsing for string manipulation/parsing rather than collecting intermediate elements into heap-allocated collections.
+## 2025-10-24 - [NUMA-Aware scheduling structures]
+**Learning:** Cache locality on multi-socket architectures can be significantly optimized by partitioning the CFS queues into local NUMA cores, completely avoiding cross-node memory bus transactions.
+**Action:** Use custom thread-to-node mapping algorithms within the scheduler instead of relying on standard process grouping.

@@ -155,6 +155,129 @@ impl EcuController {
     }
 }
 
+// ==========================================
+// 6. EndeavourOS-Style Sovereign Utilities
+// ==========================================
+
+/// EndeavourOS-Style Welcome Engine to configure initial system states
+#[derive(Debug, Clone)]
+pub struct EosWelcomeEngine {
+    pub first_boot: bool,
+    pub mirrors_configured: bool,
+    pub drivers_installed: bool,
+}
+
+impl EosWelcomeEngine {
+    pub fn new() -> Self {
+        Self {
+            first_boot: true,
+            mirrors_configured: false,
+            drivers_installed: false,
+        }
+    }
+
+    pub fn update_mirrors(&mut self) -> Result<&'static str, &'static str> {
+        self.mirrors_configured = true;
+        Ok("Sovereign package mirrors configured successfully")
+    }
+
+    pub fn install_recommended_drivers(&mut self) -> Result<&'static str, &'static str> {
+        self.drivers_installed = true;
+        Ok("Modern Vulkan/GPU and HID drivers installed")
+    }
+}
+
+impl Default for EosWelcomeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// EndeavourOS-Style Mirror Speed Ranker
+#[derive(Debug, Clone)]
+pub struct MirrorRanker {
+    pub default_timeout_ms: u64,
+}
+
+impl MirrorRanker {
+    pub fn new(timeout: u64) -> Self {
+        Self {
+            default_timeout_ms: timeout,
+        }
+    }
+
+    /// Ranks list of regional mirrors based on simulated round-trip-time (RTT) latency
+    pub fn rank_mirrors(&self, mirrors: &[&str]) -> Vec<(String, u64)> {
+        let mut ranked = Vec::new();
+        for (i, &mirror) in mirrors.iter().enumerate() {
+            // Simulated RTT: base RTT modulated by index to make ranking deterministic
+            let rtt = 10 + (i as u64 * 15);
+            ranked.push((mirror.to_string(), rtt));
+        }
+        ranked.sort_by_key(|(_, rtt)| *rtt);
+        ranked
+    }
+}
+
+/// Background periodic checking service for new packages
+#[derive(Debug, Clone)]
+pub struct EosUpdateNotifier {
+    pub pending_updates_count: u32,
+}
+
+impl EosUpdateNotifier {
+    pub fn new() -> Self {
+        Self {
+            pending_updates_count: 0,
+        }
+    }
+
+    pub fn check_for_updates(&mut self) -> bool {
+        // Simulated background query
+        self.pending_updates_count = 5;
+        true
+    }
+}
+
+impl Default for EosUpdateNotifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Unified diagnostic collector for kernel and package manager logs
+#[derive(Debug, Clone)]
+pub struct DiagnosticLogTool {
+    pub collected_lines: Vec<String>,
+}
+
+impl DiagnosticLogTool {
+    pub fn new() -> Self {
+        Self {
+            collected_lines: Vec::new(),
+        }
+    }
+
+    pub fn record_log_entry(&mut self, source: &str, msg: &str) {
+        self.collected_lines.push(format!("[{}] {}", source, msg));
+    }
+
+    pub fn generate_troubleshooting_report(&self) -> String {
+        let mut report = String::from("--- SigmaOS Troubleshooting Report ---\n");
+        for line in &self.collected_lines {
+            report.push_str(line);
+            report.push('\n');
+        }
+        report
+    }
+}
+
+impl Default for DiagnosticLogTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Educational Sandbox Coding Challenge
 #[derive(Debug, Clone)]
 pub struct EduChallenge {
@@ -297,5 +420,54 @@ mod tests {
         let pass_res = play.submit_solution("fn main() { print!(\"hello\"); }");
         assert!(pass_res.is_ok());
         assert_eq!(play.current_score, 100);
+    }
+
+    #[test]
+    fn test_endeavour_welcome_engine() {
+        let mut welcome = EosWelcomeEngine::new();
+        assert!(welcome.first_boot);
+        assert_eq!(
+            welcome.update_mirrors().unwrap(),
+            "Sovereign package mirrors configured successfully"
+        );
+        assert!(welcome.mirrors_configured);
+
+        assert_eq!(
+            welcome.install_recommended_drivers().unwrap(),
+            "Modern Vulkan/GPU and HID drivers installed"
+        );
+        assert!(welcome.drivers_installed);
+    }
+
+    #[test]
+    fn test_mirror_ranker() {
+        let ranker = MirrorRanker::new(500);
+        let mirrors = vec![
+            "mirror.us.sigmaos.org",
+            "mirror.in.sigmaos.org",
+            "mirror.de.sigmaos.org",
+        ];
+        let ranked = ranker.rank_mirrors(&mirrors);
+        assert_eq!(ranked.len(), 3);
+        assert_eq!(ranked[0].0, "mirror.us.sigmaos.org");
+        assert_eq!(ranked[0].1, 10);
+    }
+
+    #[test]
+    fn test_update_notifier_and_log_tool() {
+        let mut notifier = EosUpdateNotifier::new();
+        assert!(notifier.check_for_updates());
+        assert_eq!(notifier.pending_updates_count, 5);
+
+        let mut log_tool = DiagnosticLogTool::new();
+        log_tool.record_log_entry("Kernel", "Vulkan context bound successfully");
+        log_tool.record_log_entry(
+            "PackageManager",
+            "Transaction completed: installed sigma-vim",
+        );
+
+        let report = log_tool.generate_troubleshooting_report();
+        assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
+        assert!(report.contains("[Kernel] Vulkan context bound successfully"));
     }
 }
