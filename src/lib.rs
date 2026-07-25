@@ -1,5 +1,6 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
@@ -13,10 +14,14 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod graphics;
+pub mod init;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
+pub mod plugin;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
@@ -65,12 +70,8 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, ApplicationBinary, BinaryCompatMatrix, BinaryFormat, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime, DiscontinuedFS, DriverBridge,
-    FSRevival, GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
-    LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform,
-    TranslationLayer, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -100,6 +101,10 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use plugin::{
+    ManagerCapability, Plugin, PluginCapability, PluginError, PluginID, PluginInfo, PluginManager,
+    PluginState, PluginStats, SimplePlugin, SimplePluginManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

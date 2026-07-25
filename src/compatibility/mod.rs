@@ -1,7 +1,7 @@
 // SigmaOS Compatibility Module
-pub mod constellation;
+pub mod chimera_linux;
 pub mod cross_platform;
-pub mod legacy_adapters;
+pub mod mint_linux;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,

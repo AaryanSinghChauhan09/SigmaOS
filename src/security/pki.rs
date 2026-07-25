@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -81,12 +83,7 @@ impl Certificate for SimpleCertificate {
         self.id
     }
     fn certificate_type(&self) -> CertificateType {
-        match self.certificate_type.load(Ordering::SeqCst) {
-            0 => CertificateType::Root,
-            1 => CertificateType::Intermediate,
-            2 => CertificateType::EndEntity,
-            _ => CertificateType::EndEntity,
-        }
+        unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) }
     }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
@@ -191,11 +188,6 @@ pub trait CRL {
     fn add_to_crl(&mut self, cert_id: CertificateID, reason: u32);
     fn is_revoked(&self, cert_id: CertificateID) -> bool;
     fn get_crl(&self) -> Vec<(CertificateID, u32)>;
-}
-
-#[derive(Debug, Clone)]
-pub struct CertificateAuthority {
-    pub name: alloc::string::String,
 }
 
 pub struct SimpleCRL {

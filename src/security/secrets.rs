@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks

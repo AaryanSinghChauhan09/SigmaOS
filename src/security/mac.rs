@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -443,23 +445,6 @@ impl MACEngine for SimpleMACEngine {
 
     fn stats(&self) -> MACStats {
         *self.stats.borrow()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MacRule {
-    pub name: alloc::string::String,
-    pub allowed: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct MacSecurity {
-    pub enabled: bool,
-}
-
-impl MacSecurity {
-    pub fn new() -> Self {
-        Self { enabled: true }
     }
 }
 
