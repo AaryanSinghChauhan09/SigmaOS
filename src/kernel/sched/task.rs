@@ -5,7 +5,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
-use crate::kernel::vfs::inode::{Inode, FileFlags, FsError};
+use crate::kernel::vfs::inode::{FileFlags, FsError, Inode};
 use crate::security::CapabilityToken;
 
 pub const PID_MAX_LIMIT: u32 = 32768;

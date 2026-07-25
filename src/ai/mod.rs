@@ -10,24 +10,21 @@ pub mod voice;
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use llm::{
-    LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
-    QuantizationType, InferenceBackend, BatchingStrategy,
-    StreamingLlmEngine, StreamingInference,
+    BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
+    LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
 };
-pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
-pub use sai::{
-    Agent, AgentRole, AgentTask as Task, TaskStatus,
-};
+pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
 };
+pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{
-    AiSystemService, AiServiceManager, AiServiceConfig, AiServiceState,
-    ResourceManagementService, PredictiveMaintenanceService, AdaptiveSchedulingService,
-    AiServiceType, ServicePriority, AiServiceMetrics,
+    AdaptiveSchedulingService, AiServiceConfig, AiServiceManager, AiServiceMetrics, AiServiceState,
+    AiServiceType, AiSystemService, PredictiveMaintenanceService, ResourceManagementService,
+    ServicePriority,
 };
 pub use voice::{
-    VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer,
-    RecognitionResult, SynthesisResult, AudioFormat, SynthesisModel,
+    AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
+    VoiceRecognizer, VoiceSynthesizer,
 };

@@ -1,13 +1,13 @@
 //! SigmaOS Local LLM Inference Optimization Module
-//! 
+//!
 //! This module provides optimized local large language model inference,
 //! including quantization, batching, and hardware acceleration.
 
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Quantization type for model compression
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -136,7 +136,7 @@ impl InferenceResponse {
         } else {
             0.0
         };
-        
+
         Self {
             text,
             tokens_generated,
@@ -169,7 +169,7 @@ impl LocalLlmEngine {
         // 2. Apply quantization if needed
         // 3. Initialize the inference backend
         // 4. Allocate GPU memory if using CUDA/Vulkan
-        
+
         self.loaded = true;
         Ok(())
     }
@@ -199,7 +199,7 @@ impl LocalLlmEngine {
 
         // For now, return a placeholder response
         let start_time = 0; // Would use actual timing
-        
+
         Ok(InferenceResponse::new(
             "Generated response placeholder".to_string(),
             10,
@@ -208,7 +208,10 @@ impl LocalLlmEngine {
     }
 
     /// Run batched inference
-    pub fn infer_batch(&self, requests: &[InferenceRequest]) -> Result<Vec<InferenceResponse>, String> {
+    pub fn infer_batch(
+        &self,
+        requests: &[InferenceRequest],
+    ) -> Result<Vec<InferenceResponse>, String> {
         if !self.loaded {
             return Err("Model not loaded".to_string());
         }
@@ -256,7 +259,7 @@ impl LocalLlmEngine {
     pub fn estimate_memory_usage(&self) -> usize {
         // Rough estimation based on model size and quantization
         let base_size: u64 = 7_000_000_000; // 7GB for a 7B model in fp32
-        
+
         let multiplier = match self.config.quantization {
             QuantizationType::Fp32 => 1.0,
             QuantizationType::Fp16 => 0.5,
@@ -284,10 +287,7 @@ pub struct StreamingLlmEngine {
 
 impl StreamingLlmEngine {
     pub fn new(engine: LocalLlmEngine, chunk_size: usize) -> Self {
-        Self {
-            engine,
-            chunk_size,
-        }
+        Self { engine, chunk_size }
     }
 
     /// Start streaming inference
@@ -369,7 +369,7 @@ mod tests {
             .with_quantization(QuantizationType::Int8)
             .with_backend(InferenceBackend::Cuda)
             .with_batching(BatchingStrategy::Static);
-        
+
         assert_eq!(config.quantization, QuantizationType::Int8);
         assert_eq!(config.backend, InferenceBackend::Cuda);
         assert_eq!(config.batching, BatchingStrategy::Static);
@@ -387,7 +387,7 @@ mod tests {
         let request = InferenceRequest::new("test".to_string())
             .with_max_tokens(512)
             .with_stop_sequence("END".to_string());
-        
+
         assert_eq!(request.max_tokens, 512);
         assert_eq!(request.stop_sequences.len(), 1);
     }
@@ -424,12 +424,12 @@ mod tests {
     fn test_local_llm_engine_batch() {
         let mut engine = LocalLlmEngine::new(LlmConfig::default());
         engine.load().unwrap();
-        
+
         let requests = vec![
             InferenceRequest::new("test1".to_string()),
             InferenceRequest::new("test2".to_string()),
         ];
-        
+
         assert!(engine.infer_batch(&requests).is_ok());
     }
 
@@ -439,12 +439,12 @@ mod tests {
         config.batching = BatchingStrategy::None;
         let mut engine = LocalLlmEngine::new(config);
         engine.load().unwrap();
-        
+
         let requests = vec![
             InferenceRequest::new("test1".to_string()),
             InferenceRequest::new("test2".to_string()),
         ];
-        
+
         assert!(engine.infer_batch(&requests).is_err());
     }
 
@@ -453,13 +453,13 @@ mod tests {
         let mut config = LlmConfig::default();
         config.quantization = QuantizationType::Fp32;
         let engine = LocalLlmEngine::new(config.clone());
-        
+
         let fp32_size = engine.estimate_memory_usage();
-        
+
         config.quantization = QuantizationType::Int8;
         let engine_int8 = LocalLlmEngine::new(config);
         let int8_size = engine_int8.estimate_memory_usage();
-        
+
         assert!(int8_size < fp32_size);
     }
 
@@ -467,17 +467,17 @@ mod tests {
     fn test_streaming_inference() {
         let mut engine = LocalLlmEngine::new(LlmConfig::default());
         engine.load().unwrap();
-        
+
         let streaming = StreamingLlmEngine::new(engine, 5);
         let request = InferenceRequest::new("test".to_string());
         let mut stream = streaming.infer_stream(&request).unwrap();
-        
+
         let chunk1 = stream.next_chunk();
         assert!(chunk1.is_some());
-        
+
         // Consume remaining chunks
         while stream.next_chunk().is_some() {}
-        
+
         assert!(stream.is_complete());
     }
 }

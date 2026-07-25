@@ -2,7 +2,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;
 pub const PAGE_SIZE_2M: usize = 2 * 1024 * 1024;
@@ -19,6 +19,18 @@ pub enum PageFaultError {
     PermissionDenied,
     InvalidAddress,
     AlreadyMapped,
+}
+
+use core::ptr::NonNull;
+
+pub struct Zone {
+    pub present_pages: u64,
+}
+
+#[derive(Debug)]
+pub struct MemoryBlock {
+    pub addr: NonNull<u8>,
+    pub size: usize,
 }
 
 pub struct Page {
@@ -49,13 +61,32 @@ impl Page {
     pub fn dec_ref(&self) -> bool {
         self.count.fetch_sub(1, Ordering::SeqCst) == 1
     }
+}
+
+pub struct BuddyAllocator {
+    pub free_lists: [Vec<MemoryBlock>; 12],
+    pub free_pages: usize,
+    pub total_pages: usize,
+    pub zones: Vec<Zone>,
+}
+
+impl BuddyAllocator {
+    pub fn new() -> Self {
+        Self {
+            free_lists: Default::default(),
+            free_pages: 0,
+            total_pages: 0,
+            zones: Vec::new(),
+        }
+    }
+
+    pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
+        let pages = size / PAGE_SIZE;
+        let order = self.calculate_order(pages);
 
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
+                let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
         }

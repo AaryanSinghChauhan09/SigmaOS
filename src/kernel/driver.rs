@@ -5,8 +5,8 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::device::{Device, DeviceType, DriverError, DeviceBinding};
-use crate::kernel::object::{KernelObject, KRef};
+use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
+use crate::kernel::object::{KRef, KernelObject};
 use crate::security::CapabilityToken;
 
 pub trait Driver: KernelObject + Send + Sync {
@@ -54,7 +54,11 @@ impl DriverRegistry {
         }
     }
 
-    pub fn register_driver(&mut self, driver: Box<dyn Driver>, priority: u32) -> Result<(), DriverError> {
+    pub fn register_driver(
+        &mut self,
+        driver: Box<dyn Driver>,
+        priority: u32,
+    ) -> Result<(), DriverError> {
         let name = driver.driver_name().to_string();
         for reg in &self.drivers {
             if reg.driver.driver_name() == name {
@@ -88,7 +92,11 @@ impl DriverRegistry {
     }
 
     pub fn unregister_driver(&mut self, name: &str) -> Option<Box<dyn Driver>> {
-        if let Some(idx) = self.drivers.iter().position(|d| d.driver.driver_name() == name) {
+        if let Some(idx) = self
+            .drivers
+            .iter()
+            .position(|d| d.driver.driver_name() == name)
+        {
             let reg = self.drivers.remove(idx);
             Some(reg.driver)
         } else {
@@ -97,18 +105,28 @@ impl DriverRegistry {
     }
 
     pub fn find_driver(&self, name: &str) -> Option<&dyn Driver> {
-        self.drivers.iter().find(|d| d.driver.driver_name() == name).map(|d| d.driver.as_ref())
+        self.drivers
+            .iter()
+            .find(|d| d.driver.driver_name() == name)
+            .map(|d| d.driver.as_ref())
     }
 
     pub fn find_driver_mut(&mut self, name: &str) -> Option<&mut dyn Driver> {
-        self.drivers.iter_mut().find(|d| d.driver.driver_name() == name).map(|d| d.driver.as_mut())
+        self.drivers
+            .iter_mut()
+            .find(|d| d.driver.driver_name() == name)
+            .map(|d| d.driver.as_mut())
     }
 
     pub fn register_device(&mut self, device: Box<dyn Device>) -> Result<(), DriverError> {
         self.device_manager.register_device(device)
     }
 
-    pub fn bind_device_driver(&mut self, device_name: &str, driver_name: &str) -> Result<(), DriverError> {
+    pub fn bind_device_driver(
+        &mut self,
+        device_name: &str,
+        driver_name: &str,
+    ) -> Result<(), DriverError> {
         self.device_manager.bind_driver(device_name, driver_name)
     }
 
@@ -118,7 +136,8 @@ impl DriverRegistry {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-                        self.device_manager.bind_driver(device.name(), reg.driver.driver_name())?;
+                        self.device_manager
+                            .bind_driver(device.name(), reg.driver.driver_name())?;
                         reg.loaded = true;
                         break;
                     }

@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlockStorageError {
@@ -181,8 +181,15 @@ impl SigmaFs {
     }
 
     /// Link two child nodes under a parent (CoW operation)
-    pub fn link_nodes(&mut self, parent_addr: u64, left: Option<u64>, right: Option<u64>) -> Result<(), BlockStorageError> {
-        let parent = self.merkle_nodes.get_mut(&parent_addr)
+    pub fn link_nodes(
+        &mut self,
+        parent_addr: u64,
+        left: Option<u64>,
+        right: Option<u64>,
+    ) -> Result<(), BlockStorageError> {
+        let parent = self
+            .merkle_nodes
+            .get_mut(&parent_addr)
             .ok_or(BlockStorageError::InvalidBlock)?;
 
         parent.left_child = left;
@@ -356,7 +363,7 @@ mod tests {
         let mut fs = SigmaFs::new();
         let hash = [0x01; 32];
         let addr = fs.create_node(hash, 4096);
-        
+
         assert_eq!(addr, 0);
         assert_eq!(fs.node_count(), 1);
     }
@@ -367,9 +374,9 @@ mod tests {
         let parent = fs.create_node([0x01; 32], 4096);
         let left = fs.create_node([0x02; 32], 2048);
         let right = fs.create_node([0x03; 32], 2048);
-        
+
         fs.link_nodes(parent, Some(left), Some(right)).unwrap();
-        
+
         let node = fs.get_node(parent).unwrap();
         assert_eq!(node.left_child, Some(left));
         assert_eq!(node.right_child, Some(right));
@@ -378,12 +385,12 @@ mod tests {
     #[test]
     fn test_transactional_journal() {
         let mut journal = TransactionalJournal::new();
-        
+
         journal.begin_transaction();
         journal.add_descriptor(vec![0x01, 0x02, 0x03]);
         journal.add_data(vec![0x04, 0x05, 0x06]);
         journal.commit();
-        
+
         assert!(journal.is_committed());
         assert_eq!(journal.block_count(), 3);
     }
@@ -391,20 +398,20 @@ mod tests {
     #[test]
     fn test_checksum_verification() {
         let mut journal = TransactionalJournal::new();
-        
+
         journal.begin_transaction();
         journal.add_descriptor(vec![0x01, 0x02, 0x03]);
-        
+
         assert!(journal.verify_checksums());
     }
 
     #[test]
     fn test_revoke_block() {
         let mut journal = TransactionalJournal::new();
-        
+
         journal.begin_transaction();
         journal.add_revoke(vec![0xFF; 32]);
-        
+
         assert_eq!(journal.block_count(), 1);
     }
 
@@ -412,7 +419,7 @@ mod tests {
     fn test_root_hash_update() {
         let mut fs = SigmaFs::new();
         let new_root = [0xAB; 32];
-        
+
         fs.update_root(new_root);
         assert_eq!(fs.get_root(), new_root);
     }
