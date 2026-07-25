@@ -24,7 +24,11 @@ pub struct FilePermissions {
 
 impl FilePermissions {
     pub fn new(read: bool, write: bool, execute: bool) -> Self {
-        Self { read, write, execute }
+        Self {
+            read,
+            write,
+            execute,
+        }
     }
 
     pub fn all() -> Self {
@@ -102,22 +106,22 @@ impl VirtualFilesystem {
             file_descriptors: HashMap::new(),
             next_fd: 0,
         };
-        
+
         // Create root directory
         let root = Inode::new(0, FileType::Directory, 0);
         fs.inodes.insert(0, root);
         fs.root_inode = 0;
-        
+
         fs
     }
 
     pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
         let inode_id = self.next_inode_id;
         self.next_inode_id += 1;
-        
+
         let inode = Inode::new(inode_id, file_type, owner);
         self.inodes.insert(inode_id, inode);
-        
+
         Ok(inode_id)
     }
 
@@ -125,13 +129,13 @@ impl VirtualFilesystem {
         if !self.inodes.contains_key(&inode_id) {
             return Err(FsError::NotFound);
         }
-        
+
         let fd = self.next_fd;
         self.next_fd += 1;
-        
+
         let file_descriptor = FileDescriptor::new(inode_id, flags);
         self.file_descriptors.insert(fd, file_descriptor);
-        
+
         Ok(fd)
     }
 
@@ -139,60 +143,74 @@ impl VirtualFilesystem {
         if !self.file_descriptors.contains_key(&fd) {
             return Err(FsError::InvalidFd);
         }
-        
+
         self.file_descriptors.remove(&fd);
         Ok(())
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self.file_descriptors.get_mut(&fd)
+        let file_descriptor = self
+            .file_descriptors
+            .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
-        
-        let inode = self.inodes.get(&file_descriptor.inode_id)
+
+        let inode = self
+            .inodes
+            .get(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
-        
+
         // Check read permission
         if !inode.permissions.read {
             return Err(FsError::PermissionDenied);
         }
-        
+
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
-        
+
         // Simulate read (in production, actual file I/O)
         let bytes_read = buffer.len().min(inode.size as usize);
         file_descriptor.offset += bytes_read as u64;
-        
+
         Ok(bytes_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self.file_descriptors.get_mut(&fd)
+        let file_descriptor = self
+            .file_descriptors
+            .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
-        
-        let inode = self.inodes.get_mut(&file_descriptor.inode_id)
+
+        let inode = self
+            .inodes
+            .get_mut(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
-        
+
         // Check write permission
         if !inode.permissions.write {
             return Err(FsError::PermissionDenied);
         }
 
         // Prevent integer overflow in size calculation
-        let _new_size = inode.size.checked_add(buffer.len() as u64)
+        let _new_size = inode
+            .size
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let _new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
-        
+
         // Simulate write (in production, actual file I/O)
         let bytes_written = buffer.len();
         inode.size += bytes_written as u64;
         file_descriptor.offset += bytes_written as u64;
         inode.modified = 0; // In production, actual timestamp
-        
+
         Ok(bytes_written)
     }
 
@@ -200,11 +218,11 @@ impl VirtualFilesystem {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
         }
-        
+
         if !self.inodes.contains_key(&inode_id) {
             return Err(FsError::NotFound);
         }
-        
+
         self.inodes.remove(&inode_id);
         Ok(())
     }
@@ -214,13 +232,12 @@ impl VirtualFilesystem {
     }
 
     pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
-        let inode = self.inodes.get(&inode_id)
-            .ok_or(FsError::NotFound)?;
-        
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+
         if inode.file_type != FileType::Directory {
             return Err(FsError::NotADirectory);
         }
-        
+
         // Return all inodes (in production, actual directory listing)
         Ok(self.inodes.keys().copied().collect())
     }
@@ -273,7 +290,7 @@ mod tests {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         let fd = vfs.open_file(inode_id, 0).unwrap();
-        
+
         let data = b"test data";
         let written = vfs.write_file(fd, data).unwrap();
         assert_eq!(written, data.len());
