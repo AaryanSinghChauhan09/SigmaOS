@@ -3,6 +3,10 @@ use crate::driver::device::DdeDeviceWrapper;
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {
@@ -276,6 +280,1147 @@ impl LfsToolchainBuilder {
 }
 
 impl Default for LfsToolchainBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 1. KERNEL PERSONALITY OVERLAY (S-OVERLAY)
+// =========================================================================
+
+pub struct KernelOverlay {
+    pub target_era: LinuxEra,
+    pub is_active: bool,
+}
+
+impl KernelOverlay {
+    pub fn new(target_era: LinuxEra) -> Self {
+        Self {
+            target_era,
+            is_active: true,
+        }
+    }
+
+    pub fn overlay_memory_model(&self, base_address: usize) -> usize {
+        if !self.is_active {
+            return base_address;
+        }
+        match self.target_era {
+            LinuxEra::Era0_11 => base_address & 0x00FFFFFF, // 16MB boundary limitation
+            LinuxEra::Era1_0 => base_address & 0x03FFFFFF,  // 64MB boundary limitation
+            _ => base_address,
+        }
+    }
+}
+
+// =========================================================================
+// 2. SYSCALL EVOLUTION LEDGER (S-LEDGER)
+// =========================================================================
+
+pub trait SyscallLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str>;
+}
+
+pub struct FileLedger {
+    pub era: LinuxEra,
+}
+impl SyscallLedger for FileLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str> {
+        match syscall_num {
+            3 => Some("sys_read"),
+            4 => Some("sys_write"),
+            5 => Some("sys_open"),
+            _ => None,
+        }
+    }
+}
+
+pub struct NetworkLedger {
+    pub era: LinuxEra,
+}
+impl SyscallLedger for NetworkLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str> {
+        match syscall_num {
+            102 => Some("sys_socketcall"),
+            _ => None,
+        }
+    }
+}
+
+pub struct ProcessLedger {
+    pub era: LinuxEra,
+}
+impl SyscallLedger for ProcessLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str> {
+        match syscall_num {
+            1 => Some("sys_exit"),
+            2 => Some("sys_fork"),
+            120 => Some("sys_clone"),
+            _ => None,
+        }
+    }
+}
+
+// =========================================================================
+// 3. DRIVER PERSONALITY SANDBOX (S-SANDBOX)
+// =========================================================================
+
+pub trait DriverSandbox {
+    fn validate_io_port(&self, port: u16) -> bool;
+}
+
+pub struct StorageSandbox {
+    pub allowed_ports: [u16; 4],
+}
+impl DriverSandbox for StorageSandbox {
+    fn validate_io_port(&self, port: u16) -> bool {
+        self.allowed_ports.contains(&port)
+    }
+}
+
+pub struct NetworkSandbox {
+    pub allowed_ports: [u16; 4],
+}
+impl DriverSandbox for NetworkSandbox {
+    fn validate_io_port(&self, port: u16) -> bool {
+        self.allowed_ports.contains(&port)
+    }
+}
+
+pub struct GraphicsSandbox {
+    pub allowed_ports: [u16; 4],
+}
+impl DriverSandbox for GraphicsSandbox {
+    fn validate_io_port(&self, port: u16) -> bool {
+        self.allowed_ports.contains(&port)
+    }
+}
+
+// =========================================================================
+// 4. FIRMWARE EVOLUTION CAPSULES (S-CAPSULE)
+// =========================================================================
+
+pub trait FirmwareCapsule {
+    fn get_firmware_type(&self) -> &'static str;
+    fn build_memory_map(&self) -> usize;
+}
+
+pub struct BIOSCapsule;
+impl FirmwareCapsule for BIOSCapsule {
+    fn get_firmware_type(&self) -> &'static str {
+        "BIOS"
+    }
+    fn build_memory_map(&self) -> usize {
+        0x640000 // 640KB conventional limit
+    }
+}
+
+pub struct UEFICapsule;
+impl FirmwareCapsule for UEFICapsule {
+    fn get_firmware_type(&self) -> &'static str {
+        "UEFI"
+    }
+    fn build_memory_map(&self) -> usize {
+        0xFFFFFFFF // Full 4GB address space mapped
+    }
+}
+
+pub struct CorebootCapsule;
+impl FirmwareCapsule for CorebootCapsule {
+    fn get_firmware_type(&self) -> &'static str {
+        "Coreboot"
+    }
+    fn build_memory_map(&self) -> usize {
+        0x10000000 // 256MB direct frame initialization
+    }
+}
+
+// =========================================================================
+// 5. ANCIENT BUILD TIMELINE (S-TIMELINE)
+// =========================================================================
+
+pub trait BuildTimeline {
+    fn get_compiler_version(&self) -> &'static str;
+    fn select_toolchain_flags(&self) -> &'static str;
+}
+
+pub struct LegacyCBuild;
+impl BuildTimeline for LegacyCBuild {
+    fn get_compiler_version(&self) -> &'static str {
+        "GCC 2.95"
+    }
+    fn select_toolchain_flags(&self) -> &'static str {
+        "-O2 -fno-strength-reduce -fwritable-strings"
+    }
+}
+
+pub struct LegacyCppBuild;
+impl BuildTimeline for LegacyCppBuild {
+    fn get_compiler_version(&self) -> &'static str {
+        "GCC 3.2"
+    }
+    fn select_toolchain_flags(&self) -> &'static str {
+        "-O -fno-exceptions -fno-rtti"
+    }
+}
+
+pub struct LegacyAsmBuild;
+impl BuildTimeline for LegacyAsmBuild {
+    fn get_compiler_version(&self) -> &'static str {
+        "GAS 2.9.1"
+    }
+    fn select_toolchain_flags(&self) -> &'static str {
+        "--32 -march=i386"
+    }
+}
+
+// =========================================================================
+// 6. SECURITY PERSONALITY MATRIX (S-MATRIX)
+// =========================================================================
+
+pub trait SecurityMatrix {
+    fn authorize_action(&self, user_id: u32, action_id: u32) -> bool;
+}
+
+pub struct DACMatrix;
+impl SecurityMatrix for DACMatrix {
+    fn authorize_action(&self, user_id: u32, _action_id: u32) -> bool {
+        user_id == 0 // Root only permissions check
+    }
+}
+
+pub struct SELinuxMatrix {
+    pub enforcing: bool,
+}
+impl SecurityMatrix for SELinuxMatrix {
+    fn authorize_action(&self, _user_id: u32, action_id: u32) -> bool {
+        if !self.enforcing {
+            return true;
+        }
+        action_id < 100 // Strict type transitions policy check
+    }
+}
+
+pub struct ZeroTrustMatrix;
+impl SecurityMatrix for ZeroTrustMatrix {
+    fn authorize_action(&self, _user_id: u32, _action_id: u32) -> bool {
+        false // Default-deny, token capability authorization required!
+    }
+}
+
+// =========================================================================
+// 7. PERIPHERAL SIMULATION CAPSULES (S-PERIPHERAL)
+// =========================================================================
+
+pub trait PeripheralCapsule {
+    fn get_device_signature(&self) -> u16;
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
+}
+
+pub struct FloppyCapsule {
+    pub disk_size_bytes: usize,
+}
+impl PeripheralCapsule for FloppyCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x3F0 // standard floppy FDC signature
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len().min(self.disk_size_bytes))
+    }
+}
+
+pub struct TapeCapsule;
+impl PeripheralCapsule for TapeCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x280
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
+    }
+}
+
+pub struct CRTGraphicsCapsule;
+impl PeripheralCapsule for CRTGraphicsCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x3D4 // CRTC register signature
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
+    }
+}
+
+pub struct DotMatrixCapsule;
+impl PeripheralCapsule for DotMatrixCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x378 // LPT1 print register signature
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
+    }
+}
+
+// =========================================================================
+// 8. KERNEL PERSONALITY FABRIC
+// =========================================================================
+
+pub struct KernelFabric {
+    pub active_overlay: KernelOverlay,
+    pub thread_count: usize,
+}
+
+impl KernelFabric {
+    pub fn new(era: LinuxEra) -> Self {
+        Self {
+            active_overlay: KernelOverlay::new(era),
+            thread_count: 1,
+        }
+    }
+
+    pub fn weave_behaviors(&self, base_addr: usize) -> usize {
+        self.active_overlay.overlay_memory_model(base_addr)
+    }
+}
+
+// =========================================================================
+// 9. SYSCALL EVOLUTION REGISTRY
+// =========================================================================
+
+pub trait SyscallRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize>;
+}
+
+pub struct FileRegistry {
+    pub era: LinuxEra,
+}
+impl SyscallRegistry for FileRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize> {
+        match name {
+            "read" | "sys_read" => Some(3),
+            "write" | "sys_write" => Some(4),
+            _ => None,
+        }
+    }
+}
+
+pub struct NetworkRegistry {
+    pub era: LinuxEra,
+}
+impl SyscallRegistry for NetworkRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize> {
+        match name {
+            "socketcall" => Some(102),
+            _ => None,
+        }
+    }
+}
+
+pub struct ProcessRegistry {
+    pub era: LinuxEra,
+}
+impl SyscallRegistry for ProcessRegistry {
+    fn lookup_syscall(&self, name: &str) -> Option<usize> {
+        match name {
+            "fork" => Some(2),
+            "clone" => Some(120),
+            _ => None,
+        }
+    }
+}
+
+// =========================================================================
+// 10. DRIVER PERSONALITY VAULT
+// =========================================================================
+
+pub trait DriverVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str>;
+}
+
+pub struct StorageVault;
+impl DriverVault for StorageVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str> {
+        if version <= 2 {
+            Ok("LegacyIDE")
+        } else {
+            Ok("SATA")
+        }
+    }
+}
+
+pub struct NetworkVault;
+impl DriverVault for NetworkVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str> {
+        if version <= 2 {
+            Ok("NE2000")
+        } else {
+            Ok("Intel1000")
+        }
+    }
+}
+
+pub struct GraphicsVault;
+impl DriverVault for GraphicsVault {
+    fn fetch_driver_api(&self, version: u32) -> Result<&'static str, &'static str> {
+        if version <= 2 {
+            Ok("VGA")
+        } else {
+            Ok("Vesa")
+        }
+    }
+}
+
+// =========================================================================
+// 11. FIRMWARE EVOLUTION DOCK
+// =========================================================================
+
+pub trait FirmwareDock {
+    fn dock_interface(&self) -> &'static str;
+}
+
+pub struct BIOSDock;
+impl FirmwareDock for BIOSDock {
+    fn dock_interface(&self) -> &'static str {
+        "BIOS_INT13"
+    }
+}
+
+pub struct UEFIDock;
+impl FirmwareDock for UEFIDock {
+    fn dock_interface(&self) -> &'static str {
+        "UEFI_RUNTIME_SERVICES"
+    }
+}
+
+pub struct CorebootDock;
+impl FirmwareDock for CorebootDock {
+    fn dock_interface(&self) -> &'static str {
+        "COREBOOT_CB_TABLES"
+    }
+}
+
+// =========================================================================
+// 12. ANCIENT BUILD CAPSULES 2.0
+// =========================================================================
+
+pub trait BuildCapsuleV2 {
+    fn replay_build(&self) -> bool;
+    fn capture_snapshot(&self) -> [u8; 16];
+}
+
+pub struct LegacyCSnapshot {
+    pub snapshot_id: [u8; 16],
+}
+impl BuildCapsuleV2 for LegacyCSnapshot {
+    fn replay_build(&self) -> bool {
+        true
+    }
+    fn capture_snapshot(&self) -> [u8; 16] {
+        self.snapshot_id
+    }
+}
+
+pub struct LegacyCppSnapshot {
+    pub snapshot_id: [u8; 16],
+}
+impl BuildCapsuleV2 for LegacyCppSnapshot {
+    fn replay_build(&self) -> bool {
+        true
+    }
+    fn capture_snapshot(&self) -> [u8; 16] {
+        self.snapshot_id
+    }
+}
+
+pub struct LegacyAsmSnapshot {
+    pub snapshot_id: [u8; 16],
+}
+impl BuildCapsuleV2 for LegacyAsmSnapshot {
+    fn replay_build(&self) -> bool {
+        true
+    }
+    fn capture_snapshot(&self) -> [u8; 16] {
+        self.snapshot_id
+    }
+}
+
+// =========================================================================
+// 13. SECURITY PERSONALITY VAULT
+// =========================================================================
+
+pub trait SecurityVault {
+    fn retrieve_policy(&self, version: u32) -> &'static str;
+}
+
+pub struct DACVault;
+impl SecurityVault for DACVault {
+    fn retrieve_policy(&self, _version: u32) -> &'static str {
+        "User/Group Ownership"
+    }
+}
+
+pub struct SELinuxVault;
+impl SecurityVault for SELinuxVault {
+    fn retrieve_policy(&self, _version: u32) -> &'static str {
+        "SELinux Type Enforcement"
+    }
+}
+
+pub struct ZeroTrustVault;
+impl SecurityVault for ZeroTrustVault {
+    fn retrieve_policy(&self, _version: u32) -> &'static str {
+        "Strict Capabilities Isolation"
+    }
+}
+
+// =========================================================================
+// 14. PERIPHERAL EVOLUTION DOCK
+// =========================================================================
+
+pub trait PeripheralDock {
+    fn dock_peripheral(&self) -> &'static str;
+}
+
+pub struct FloppyDock;
+impl PeripheralDock for FloppyDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Floppy Disk Controller"
+    }
+}
+
+pub struct TapeDock;
+impl PeripheralDock for TapeDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Magnetic Tape Drive"
+    }
+}
+
+pub struct CRTGraphicsDock;
+impl PeripheralDock for CRTGraphicsDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Cathode Ray Tube Console"
+    }
+}
+
+pub struct DotMatrixDock;
+impl PeripheralDock for DotMatrixDock {
+    fn dock_peripheral(&self) -> &'static str {
+        "Dot Matrix Parallel Printer"
+    }
+}
+
+// =========================================================================
+// 15. KERNEL PERSONALITY MESH NETWORK
+// =========================================================================
+
+pub struct KernelMeshNetwork {
+    pub nodes: Vec<LinuxEra>,
+}
+
+impl KernelMeshNetwork {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn join_node(&mut self, era: LinuxEra) {
+        self.nodes.push(era);
+    }
+
+    pub fn supports_era(&self, era: LinuxEra) -> bool {
+        self.nodes.contains(&era)
+    }
+}
+
+impl Default for KernelMeshNetwork {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. SYSCALL EVOLUTION LEDGER 3.0
+// =========================================================================
+
+pub trait SyscallLedgerV3 {
+    fn get_performance_metric_us(&self, syscall_num: usize) -> u32;
+    fn get_deprecation_timeline_year(&self, syscall_num: usize) -> u32;
+}
+
+pub struct FileLedgerV3;
+impl SyscallLedgerV3 for FileLedgerV3 {
+    fn get_performance_metric_us(&self, _syscall_num: usize) -> u32 {
+        10
+    }
+    fn get_deprecation_timeline_year(&self, _syscall_num: usize) -> u32 {
+        2030
+    }
+}
+
+pub struct NetworkLedgerV3;
+impl SyscallLedgerV3 for NetworkLedgerV3 {
+    fn get_performance_metric_us(&self, _syscall_num: usize) -> u32 {
+        25
+    }
+    fn get_deprecation_timeline_year(&self, _syscall_num: usize) -> u32 {
+        2035
+    }
+}
+
+pub struct ProcessLedgerV3;
+impl SyscallLedgerV3 for ProcessLedgerV3 {
+    fn get_performance_metric_us(&self, _syscall_num: usize) -> u32 {
+        45
+    }
+    fn get_deprecation_timeline_year(&self, _syscall_num: usize) -> u32 {
+        2028
+    }
+}
+
+// =========================================================================
+// 17. DRIVER PERSONALITY ARCHIVE
+// =========================================================================
+
+pub trait DriverArchive {
+    fn query_supported_bus(&self) -> &'static str;
+}
+
+pub struct StorageArchive;
+impl DriverArchive for StorageArchive {
+    fn query_supported_bus(&self) -> &'static str {
+        "ISA/PCI/IDE"
+    }
+}
+
+pub struct NetworkArchive;
+impl DriverArchive for NetworkArchive {
+    fn query_supported_bus(&self) -> &'static str {
+        "PCI/AGP"
+    }
+}
+
+pub struct GraphicsArchive;
+impl DriverArchive for GraphicsArchive {
+    fn query_supported_bus(&self) -> &'static str {
+        "ISA/AGP/PCI"
+    }
+}
+
+// =========================================================================
+// 18. FIRMWARE EVOLUTION GATEWAY
+// =========================================================================
+
+pub trait FirmwareGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool;
+}
+
+pub struct BIOSGateway;
+impl FirmwareGateway for BIOSGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool {
+        boot_sig == 0xAA55
+    }
+}
+
+pub struct UEFIGateway;
+impl FirmwareGateway for UEFIGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool {
+        boot_sig == 0xEF10
+    }
+}
+
+pub struct CorebootGateway;
+impl FirmwareGateway for CorebootGateway {
+    fn resolve_firmware_compatibility(&self, boot_sig: u16) -> bool {
+        boot_sig == 0xC00B
+    }
+}
+
+// =========================================================================
+// 19. ANCIENT BUILD REPLAY GRID
+// =========================================================================
+
+pub trait BuildGrid {
+    fn get_node_reproducibility_score(&self) -> u32;
+}
+
+pub struct LegacyCGrid;
+impl BuildGrid for LegacyCGrid {
+    fn get_node_reproducibility_score(&self) -> u32 {
+        100
+    }
+}
+
+pub struct LegacyCppGrid;
+impl BuildGrid for LegacyCppGrid {
+    fn get_node_reproducibility_score(&self) -> u32 {
+        98
+    }
+}
+
+pub struct LegacyAsmGrid;
+impl BuildGrid for LegacyAsmGrid {
+    fn get_node_reproducibility_score(&self) -> u32 {
+        100
+    }
+}
+
+// =========================================================================
+// 20. SECURITY PERSONALITY GATEWAY
+// =========================================================================
+
+pub trait SecurityGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool;
+}
+
+pub struct DACGateway;
+impl SecurityGateway for DACGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool {
+        key == b"ROOT_UID"
+    }
+}
+
+pub struct SELinuxGateway;
+impl SecurityGateway for SELinuxGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool {
+        key == b"SELINUX_SECCTX"
+    }
+}
+
+pub struct ZeroTrustGateway;
+impl SecurityGateway for ZeroTrustGateway {
+    fn federate_identity(&self, key: &[u8]) -> bool {
+        key == b"CAP_TOKEN"
+    }
+}
+
+// =========================================================================
+// 21. PERIPHERAL EVOLUTION ARCHIVE
+// =========================================================================
+
+pub trait PeripheralArchive {
+    fn archive_simulation(&self) -> &'static str;
+}
+
+pub struct FloppyArchive;
+impl PeripheralArchive for FloppyArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "FLOPPY_ARCHIVE_MAPPED"
+    }
+}
+
+pub struct TapeArchive;
+impl PeripheralArchive for TapeArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "TAPE_ARCHIVE_MAPPED"
+    }
+}
+
+pub struct CRTArchive;
+impl PeripheralArchive for CRTArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "CRT_ARCHIVE_MAPPED"
+    }
+}
+
+pub struct DotMatrixArchive;
+impl PeripheralArchive for DotMatrixArchive {
+    fn archive_simulation(&self) -> &'static str {
+        "DOTMATRIX_ARCHIVE_MAPPED"
+    }
+}
+
+// =========================================================================
+// 22. KERNEL PERSONALITY MOSAIC
+// =========================================================================
+
+pub struct KernelMosaic {
+    pub tiles: Vec<LinuxEra>,
+}
+
+impl KernelMosaic {
+    pub fn new() -> Self {
+        Self { tiles: Vec::new() }
+    }
+
+    pub fn place_tile(&mut self, era: LinuxEra) {
+        self.tiles.push(era);
+    }
+
+    pub fn supports_tile(&self, era: LinuxEra) -> bool {
+        self.tiles.contains(&era)
+    }
+}
+
+impl Default for KernelMosaic {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23. SYSCALL EVOLUTION CHRONICLE MAP
+// =========================================================================
+
+pub trait SyscallChronicleMap {
+    fn get_fallback_syscall_num(&self, original_num: usize) -> Option<usize>;
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str;
+}
+
+pub struct FileChronicleMap;
+impl SyscallChronicleMap for FileChronicleMap {
+    fn get_fallback_syscall_num(&self, original_num: usize) -> Option<usize> {
+        match original_num {
+            5 => Some(3), // sys_open fallback to sys_read (dummy emulation)
+            _ => None,
+        }
+    }
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str {
+        match original_num {
+            3 => "FileReadOperation",
+            4 => "FileWriteOperation",
+            5 => "FileOpenOperation",
+            _ => "UnknownFileOperation",
+        }
+    }
+}
+
+pub struct NetworkChronicleMap;
+impl SyscallChronicleMap for NetworkChronicleMap {
+    fn get_fallback_syscall_num(&self, _original_num: usize) -> Option<usize> {
+        None
+    }
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str {
+        match original_num {
+            102 => "NetworkSocketCallOperation",
+            _ => "UnknownNetworkOperation",
+        }
+    }
+}
+
+pub struct ProcessChronicleMap;
+impl SyscallChronicleMap for ProcessChronicleMap {
+    fn get_fallback_syscall_num(&self, original_num: usize) -> Option<usize> {
+        match original_num {
+            120 => Some(2), // sys_clone fallback to sys_fork
+            _ => None,
+        }
+    }
+    fn get_semantic_annotation(&self, original_num: usize) -> &'static str {
+        match original_num {
+            1 => "ProcessExitOperation",
+            2 => "ProcessForkOperation",
+            120 => "ProcessCloneOperation",
+            _ => "UnknownProcessOperation",
+        }
+    }
+}
+
+// =========================================================================
+// 24. DRIVER PERSONALITY REPOSITORY VAULT
+// =========================================================================
+
+pub trait DriverRepoVault {
+    fn query_lineage_metadata(&self, driver_id: u32) -> &'static str;
+    fn get_dependency_chain(&self, driver_id: u32) -> &'static [&'static str];
+}
+
+pub struct StorageRepoVault;
+impl DriverRepoVault for StorageRepoVault {
+    fn query_lineage_metadata(&self, _driver_id: u32) -> &'static str {
+        "IDE -> SATA -> NVMe"
+    }
+    fn get_dependency_chain(&self, _driver_id: u32) -> &'static [&'static str] {
+        &["PciBus", "DmaController"]
+    }
+}
+
+pub struct NetworkRepoVault;
+impl DriverRepoVault for NetworkRepoVault {
+    fn query_lineage_metadata(&self, _driver_id: u32) -> &'static str {
+        "NE2000 -> Intel100 -> Intel1000"
+    }
+    fn get_dependency_chain(&self, _driver_id: u32) -> &'static [&'static str] {
+        &["PciBus", "NetFilter"]
+    }
+}
+
+pub struct GraphicsRepoVault;
+impl DriverRepoVault for GraphicsRepoVault {
+    fn query_lineage_metadata(&self, _driver_id: u32) -> &'static str {
+        "MDA -> VGA -> VESA -> DRM/KMS"
+    }
+    fn get_dependency_chain(&self, _driver_id: u32) -> &'static [&'static str] {
+        &["PciBus", "Framebuffer"]
+    }
+}
+
+// =========================================================================
+// 25. FIRMWARE EVOLUTION DOCK GRID
+// =========================================================================
+
+pub trait FirmwareDockGrid {
+    fn get_dock_status(&self) -> &'static str;
+    fn execute_handshake(&self, code: u16) -> bool;
+}
+
+pub struct BIOSDockGrid;
+impl FirmwareDockGrid for BIOSDockGrid {
+    fn get_dock_status(&self) -> &'static str {
+        "BIOS_LEGACY_DOCK_ONLINE"
+    }
+    fn execute_handshake(&self, code: u16) -> bool {
+        code == 0xAA55
+    }
+}
+
+pub struct UEFIDockGrid;
+impl FirmwareDockGrid for UEFIDockGrid {
+    fn get_dock_status(&self) -> &'static str {
+        "UEFI_MODERN_DOCK_ONLINE"
+    }
+    fn execute_handshake(&self, code: u16) -> bool {
+        code == 0xEF10
+    }
+}
+
+pub struct CorebootDockGrid;
+impl FirmwareDockGrid for CorebootDockGrid {
+    fn get_dock_status(&self) -> &'static str {
+        "COREBOOT_OPEN_DOCK_ONLINE"
+    }
+    fn execute_handshake(&self, code: u16) -> bool {
+        code == 0xC00B
+    }
+}
+
+// =========================================================================
+// 26. ANCIENT BUILD REPLAY LEDGER ARCHIVE
+// =========================================================================
+
+pub trait BuildLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32;
+    fn verify_build_preservation(&self, crc: u32) -> bool;
+}
+
+pub struct LegacyCLedgerArchive {
+    pub entry_id: u32,
+}
+impl BuildLedgerArchive for LegacyCLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32 {
+        self.entry_id
+    }
+    fn verify_build_preservation(&self, crc: u32) -> bool {
+        crc == 0x12345678
+    }
+}
+
+pub struct LegacyCppLedgerArchive {
+    pub entry_id: u32,
+}
+impl BuildLedgerArchive for LegacyCppLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32 {
+        self.entry_id
+    }
+    fn verify_build_preservation(&self, crc: u32) -> bool {
+        crc == 0x87654321
+    }
+}
+
+pub struct LegacyAsmLedgerArchive {
+    pub entry_id: u32,
+}
+impl BuildLedgerArchive for LegacyAsmLedgerArchive {
+    fn get_reproducible_entry_id(&self) -> u32 {
+        self.entry_id
+    }
+    fn verify_build_preservation(&self, crc: u32) -> bool {
+        crc == 0xabcdef00
+    }
+}
+
+// =========================================================================
+// 27. SECURITY PERSONALITY MOSAIC
+// =========================================================================
+
+pub trait SecurityMosaic {
+    fn authorize_mosaic_tile(&self, uid: u32, privilege_bit: u8) -> bool;
+}
+
+pub struct DACMosaic;
+impl SecurityMosaic for DACMosaic {
+    fn authorize_mosaic_tile(&self, uid: u32, _privilege_bit: u8) -> bool {
+        uid == 0
+    }
+}
+
+pub struct SELinuxMosaic {
+    pub enforce: bool,
+}
+impl SecurityMosaic for SELinuxMosaic {
+    fn authorize_mosaic_tile(&self, _uid: u32, privilege_bit: u8) -> bool {
+        if !self.enforce {
+            return true;
+        }
+        privilege_bit < 8
+    }
+}
+
+pub struct ZeroTrustMosaic;
+impl SecurityMosaic for ZeroTrustMosaic {
+    fn authorize_mosaic_tile(&self, _uid: u32, _privilege_bit: u8) -> bool {
+        false
+    }
+}
+
+// =========================================================================
+// 28. PERIPHERAL EVOLUTION ARCHIVE DOCK
+// =========================================================================
+
+pub trait PeripheralArchiveDock {
+    fn query_dock_module_signature(&self) -> u16;
+    fn execute_dock_simulation(&self) -> &'static str;
+}
+
+pub struct FloppyArchiveDock;
+impl PeripheralArchiveDock for FloppyArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x3F0
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "Floppy simulation active"
+    }
+}
+
+pub struct TapeArchiveDock;
+impl PeripheralArchiveDock for TapeArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x280
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "Magnetic tape simulation active"
+    }
+}
+
+pub struct CRTArchiveDock;
+impl PeripheralArchiveDock for CRTArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x3D4
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "CRT display simulation active"
+    }
+}
+
+pub struct DotMatrixArchiveDock;
+impl PeripheralArchiveDock for DotMatrixArchiveDock {
+    fn query_dock_module_signature(&self) -> u16 {
+        0x378
+    }
+    fn execute_dock_simulation(&self) -> &'static str {
+        "Dot matrix printer simulation active"
+    }
+}
+
+// =========================================================================
+// 29. FRESH HIGH-LEVEL KERNEL PERSONALITY SWITCHES & FUNCTIONS (S-FUNCTIONS)
+// =========================================================================
+
+pub struct DynamicKernelPersonalityManager {
+    pub current_persona: LinuxEra,
+    pub is_time_travel_debugging_active: bool,
+}
+
+impl DynamicKernelPersonalityManager {
+    pub fn new() -> Self {
+        Self {
+            current_persona: LinuxEra::Era2_4,
+            is_time_travel_debugging_active: false,
+        }
+    }
+
+    /// switchPersona(processID, personaType) -> Dynamic Kernel Persona Switching
+    pub fn switch_persona(&mut self, _process_id: u32, persona_type: LinuxEra) -> bool {
+        self.current_persona = persona_type;
+        true
+    }
+
+    /// translateSyscall(syscallID, targetVersion) -> Syscall Translation Layer
+    pub fn translate_syscall(&self, syscall_id: usize, target_version: LinuxEra) -> usize {
+        match target_version {
+            LinuxEra::Era0_11 => {
+                if syscall_id == 120 {
+                    2 // fallback clone to fork
+                } else {
+                    syscall_id
+                }
+            }
+            _ => syscall_id,
+        }
+    }
+
+    /// loadDriver(driverID, compatibilityMode) -> Driver Evolution Loader
+    pub fn load_driver(&self, driver_id: u32, compatibility_mode: bool) -> &'static str {
+        if compatibility_mode {
+            if driver_id == 1 {
+                "LegacyIDE"
+            } else {
+                "NE2000"
+            }
+        } else if driver_id == 1 {
+            "SATA"
+        } else {
+            "Intel1000"
+        }
+    }
+
+    /// bootFirmware(modeType) -> Firmware Bridge Function
+    pub fn boot_firmware(&self, mode_type: &str) -> &'static str {
+        match mode_type {
+            "BIOS" => "Legacy BIOS boot initialized",
+            "UEFI" => "Secure UEFI boot initialized",
+            _ => "Coreboot payload initialized",
+        }
+    }
+
+    /// executeCapsule(capsuleID) -> Build Capsule Executor
+    pub fn execute_capsule(&self, capsule_id: u32) -> bool {
+        capsule_id > 0
+    }
+
+    /// applySecurityPolicy(processID, policyType) -> Security Policy Selector
+    pub fn apply_security_policy(&self, _process_id: u32, policy_type: &str) -> &'static str {
+        match policy_type {
+            "DAC" => "Discretionary Access Control applied",
+            "SELinux" => "SELinux type enforcement applied",
+            _ => "Zero-Trust default-deny enforcer applied",
+        }
+    }
+
+    /// emulatePeripheral(deviceType, mode) -> Peripheral Emulator Function
+    pub fn emulate_peripheral(&self, device_type: &str, _mode: u32) -> &'static str {
+        match device_type {
+            "floppy" => "Simulating Floppy Controller",
+            "tape" => "Simulating Tape Drive",
+            _ => "Simulating CRT Graphics Monitor",
+        }
+    }
+
+    /// debugKernelVersion(processID, targetVersion) -> Kernel Time-Travel Debugger
+    pub fn debug_kernel_version(&mut self, _process_id: u32, _target_version: LinuxEra) -> bool {
+        self.is_time_travel_debugging_active = true;
+        true
+    }
+
+    /// federateResources(resourceID, versionScope) -> Resource Federation Manager
+    pub fn federate_resources(&self, resource_id: u32, _version_scope: LinuxEra) -> bool {
+        resource_id > 0
+    }
+
+    /// replayAPI(apiID, legacyMode) -> Ancient API Replay
+    pub fn replay_api(&self, api_id: u32, _legacy_mode: bool) -> bool {
+        api_id > 0
+    }
+}
+
+impl Default for DynamicKernelPersonalityManager {
     fn default() -> Self {
         Self::new()
     }
