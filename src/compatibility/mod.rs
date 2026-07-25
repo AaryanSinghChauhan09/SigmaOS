@@ -1,10 +1,19 @@
 // SigmaOS Compatibility Module
 pub mod chimera_linux;
 pub mod cross_platform;
-pub mod federation;
-pub mod historic_linux;
-pub mod lattice_grid;
-pub mod mesh_hub;
+pub mod india_stack_localization;
+pub mod scosmos;
+pub mod standards;
+pub mod proxy;
+
+pub use proxy::{
+    KernelPersonality, KernelProxy, SyscallLedgerEntry, LedgerManager, LegacyDriver,
+    StorageProxy, NetworkProxy, GraphicsProxy, DriverProxy, FirmwareInterface,
+    BIOSProxy, UEFIProxy, CorebootProxy, FirmwareProxy, CompilerBackend, LegacyCProxy,
+    LegacyCppProxy, LegacyAsmProxy, BuildProxy, SecurityModel, DACProxy, SELinuxProxy,
+    ZeroTrustProxy, SecurityProxy, ObsoleteDevice, FloppyProxy, TapeProxy, CRTProxy,
+    DotMatrixProxy, PeripheralProxy,
+};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,

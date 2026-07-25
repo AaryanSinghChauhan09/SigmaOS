@@ -8,7 +8,15 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type SocketID = usize;
 pub type Port = u16;
 
-#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketOption {
+    ReuseAddr,
+    TcpNoDelay,
+    RcvBuf,
+    SndBuf,
+}
+
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
     TCP = 0,
@@ -47,21 +55,11 @@ pub trait Socket {
     fn remote_port(&self) -> Port;
 }
 
-/// Linux BSD Socket Option Interface
 pub trait BsdSocket: Socket {
     fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
     fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SocketOption {
-    ReuseAddr,
-    TcpNoDelay,
-    RcvBuf,
-    SndBuf,
-}
-
-#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
