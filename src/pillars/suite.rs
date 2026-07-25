@@ -555,6 +555,19 @@ impl Scheduler for FairScheduler {
     fn select_next_thread(&self) -> &'static str { "completely_fair_round_robin_thread" }
 }
 
+pub struct EnergyAwareScheduler {
+    pub thermal_constraint_active: bool,
+}
+impl Scheduler for EnergyAwareScheduler {
+    fn select_next_thread(&self) -> &'static str {
+        if self.thermal_constraint_active {
+            "low_power_energy_saving_thread"
+        } else {
+            "balanced_performance_thread"
+        }
+    }
+}
+
 // --- C. MEMORY MANAGER CLASS ---
 pub struct MemoryManager {
     pub active_pages: usize,
@@ -1672,9 +1685,13 @@ mod tests {
     fn test_polymorphic_scheduler_swap() {
         let realtime: Box<dyn Scheduler> = Box::new(RealtimeScheduler);
         let predictive: Box<dyn Scheduler> = Box::new(PredictiveScheduler);
+        let energy_low: Box<dyn Scheduler> = Box::new(EnergyAwareScheduler { thermal_constraint_active: true });
+        let energy_bal: Box<dyn Scheduler> = Box::new(EnergyAwareScheduler { thermal_constraint_active: false });
 
         assert_eq!(realtime.select_next_thread(), "realtime_priority_thread");
         assert_eq!(predictive.select_next_thread(), "ai_predicted_optimal_thread");
+        assert_eq!(energy_low.select_next_thread(), "low_power_energy_saving_thread");
+        assert_eq!(energy_bal.select_next_thread(), "balanced_performance_thread");
     }
 
     #[test]

@@ -25,8 +25,8 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
             buffer: [const { None }; N],
-            head: AtomicUsize::new(0),
-            tail: AtomicUsize::new(0),
+            head: 0,
+            tail: 0,
         }
     }
 
