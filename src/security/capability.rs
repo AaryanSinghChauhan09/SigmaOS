@@ -3,6 +3,7 @@
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
 use std::vec::Vec;
+use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -15,7 +16,7 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
@@ -28,19 +29,30 @@ impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
             id: 0,
-            allowed_paths: &[],
-            allowed_ports: &[],
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
+            bits_value: 0xFFFF_FFFF_FFFF_FFFF,
         }
     }
 
-    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
         CapabilityToken {
             id,
-            allowed_paths: paths,
-            allowed_ports: ports,
+            allowed_paths: paths.iter().map(|&s| s.to_string()).collect(),
+            allowed_ports: ports.to_vec(),
             is_revoked: false,
             bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: bits,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
+            is_revoked: false,
+            bits_value: bits,
         }
     }
 
@@ -78,10 +90,20 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
+
+        // Mitigate directory traversal vulnerability:
+        // Reject path traversal before checking prefixes
+        let path_obj = std::path::Path::new(path);
+        for component in path_obj.components() {
+            if let std::path::Component::ParentDir = component {
+                return false;
+            }
+        }
+
         if self.allowed_paths.is_empty() {
             return true; // Allow if no specific restriction
         }
-        self.allowed_paths.iter().any(|&p| path.starts_with(p))
+        self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
@@ -99,136 +121,12 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    // Builder pattern methods
-
-    pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
-        self
+    pub fn allow_capability(&mut self, cap: u64) {
+        self.bits_value |= cap;
     }
 
-    pub fn allow_read(self, _path: &str) -> Self {
-        self
-    }
-
-    pub fn allow_write(self, _path: &str) -> Self {
-        self
-    }
-
-    pub fn allow_exec(self) -> Self {
-        self
-    }
-
-    pub fn allow_ipc(self) -> Self {
-        self
-    }
-
-    pub fn allow_capability(&mut self, _cap: u64) {
-        // Mock method
-    }
-
-    pub fn contains(&self, _cap: u64) -> bool {
-        true
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-
-    /// Check if capability contains a specific u64 bit
-    pub fn contains(&self, bit: u64) -> bool {
-        (self.bits & bit) != 0
-    }
-
-    /// Allow a specific capability bit
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
-    }
-
-    /// Check if capability contains a specific u64 bit
-    pub fn contains(&self, bit: u64) -> bool {
-        (self.bits & bit) != 0
-    }
-
-    /// Allow a specific capability bit
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
-
-pub struct CapabilityGate {
-    pub active_token: Option<CapabilityToken>,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self { active_token: None }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.active_token = Some(token);
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
+    pub fn contains(&self, cap: u64) -> bool {
+        (self.bits_value & cap) != 0
     }
 }
 
@@ -256,13 +154,13 @@ impl CapabilityGate {
 }
 
 pub struct SecurityEnforcer {
-    active_tokens: Vec<CapabilityToken>,
+    active_tokens: std::vec::Vec<CapabilityToken>,
 }
 
 impl SecurityEnforcer {
     pub fn new() -> Self {
         SecurityEnforcer {
-            active_tokens: Vec::new(),
+            active_tokens: std::vec::Vec::new(),
         }
     }
 
@@ -271,14 +169,25 @@ impl SecurityEnforcer {
     }
 }
 
-impl Default for CapabilityToken {
+impl Default for SecurityEnforcer {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_capability_token_traversal_protection() {
+        let paths = vec!["/var/www"];
+        let token = CapabilityToken::new_with_args(1, &paths, &[]);
+
+        // Safe path starts with /var/www and has no traversal
+        assert!(token.can_access_path("/var/www/index.html"));
+
+        // Path starting with /var/www but containing traversal should be blocked
+        assert!(!token.can_access_path("/var/www/../../etc/passwd"));
     }
 }
