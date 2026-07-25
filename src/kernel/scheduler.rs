@@ -64,6 +64,8 @@ impl Process {
 pub struct Scheduler {
     processes: Vec<Process>,
     current_time: u64,
+    pub is_realtime_profile: bool,
+    pub is_hpc_profile: bool,
 }
 
 impl Scheduler {
@@ -71,6 +73,8 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
+            is_realtime_profile: false,
+            is_hpc_profile: false,
         }
     }
 
