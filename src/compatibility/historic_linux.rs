@@ -3,6 +3,10 @@ use crate::driver::device::DdeDeviceWrapper;
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {
@@ -242,6 +246,281 @@ impl VintagePackageConverter {
     }
 }
 
+// =========================================================================
+// 1. KERNEL PERSONALITY OVERLAY (S-OVERLAY)
+// =========================================================================
+
+pub struct KernelOverlay {
+    pub target_era: LinuxEra,
+    pub is_active: bool,
+}
+
+impl KernelOverlay {
+    pub fn new(target_era: LinuxEra) -> Self {
+        Self {
+            target_era,
+            is_active: true,
+        }
+    }
+
+    pub fn overlay_memory_model(&self, base_address: usize) -> usize {
+        if !self.is_active {
+            return base_address;
+        }
+        match self.target_era {
+            LinuxEra::Era0_11 => base_address & 0x00FFFFFF, // 16MB boundary limitation
+            LinuxEra::Era1_0 => base_address & 0x03FFFFFF,  // 64MB boundary limitation
+            _ => base_address,
+        }
+    }
+}
+
+// =========================================================================
+// 2. SYSCALL EVOLUTION LEDGER (S-LEDGER)
+// =========================================================================
+
+pub trait SyscallLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str>;
+}
+
+pub struct FileLedger {
+    pub era: LinuxEra,
+}
+impl SyscallLedger for FileLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str> {
+        match syscall_num {
+            3 => Some("sys_read"),
+            4 => Some("sys_write"),
+            5 => Some("sys_open"),
+            _ => None,
+        }
+    }
+}
+
+pub struct NetworkLedger {
+    pub era: LinuxEra,
+}
+impl SyscallLedger for NetworkLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str> {
+        match syscall_num {
+            102 => Some("sys_socketcall"),
+            _ => None,
+        }
+    }
+}
+
+pub struct ProcessLedger {
+    pub era: LinuxEra,
+}
+impl SyscallLedger for ProcessLedger {
+    fn query_syscall_name(&self, syscall_num: usize) -> Option<&'static str> {
+        match syscall_num {
+            1 => Some("sys_exit"),
+            2 => Some("sys_fork"),
+            120 => Some("sys_clone"),
+            _ => None,
+        }
+    }
+}
+
+// =========================================================================
+// 3. DRIVER PERSONALITY SANDBOX (S-SANDBOX)
+// =========================================================================
+
+pub trait DriverSandbox {
+    fn validate_io_port(&self, port: u16) -> bool;
+}
+
+pub struct StorageSandbox {
+    pub allowed_ports: [u16; 4],
+}
+impl DriverSandbox for StorageSandbox {
+    fn validate_io_port(&self, port: u16) -> bool {
+        self.allowed_ports.contains(&port)
+    }
+}
+
+pub struct NetworkSandbox {
+    pub allowed_ports: [u16; 4],
+}
+impl DriverSandbox for NetworkSandbox {
+    fn validate_io_port(&self, port: u16) -> bool {
+        self.allowed_ports.contains(&port)
+    }
+}
+
+pub struct GraphicsSandbox {
+    pub allowed_ports: [u16; 4],
+}
+impl DriverSandbox for GraphicsSandbox {
+    fn validate_io_port(&self, port: u16) -> bool {
+        self.allowed_ports.contains(&port)
+    }
+}
+
+// =========================================================================
+// 4. FIRMWARE EVOLUTION CAPSULES (S-CAPSULE)
+// =========================================================================
+
+pub trait FirmwareCapsule {
+    fn get_firmware_type(&self) -> &'static str;
+    fn build_memory_map(&self) -> usize;
+}
+
+pub struct BIOSCapsule;
+impl FirmwareCapsule for BIOSCapsule {
+    fn get_firmware_type(&self) -> &'static str {
+        "BIOS"
+    }
+    fn build_memory_map(&self) -> usize {
+        0x640000 // 640KB conventional limit
+    }
+}
+
+pub struct UEFICapsule;
+impl FirmwareCapsule for UEFICapsule {
+    fn get_firmware_type(&self) -> &'static str {
+        "UEFI"
+    }
+    fn build_memory_map(&self) -> usize {
+        0xFFFFFFFF // Full 4GB address space mapped
+    }
+}
+
+pub struct CorebootCapsule;
+impl FirmwareCapsule for CorebootCapsule {
+    fn get_firmware_type(&self) -> &'static str {
+        "Coreboot"
+    }
+    fn build_memory_map(&self) -> usize {
+        0x10000000 // 256MB direct frame initialization
+    }
+}
+
+// =========================================================================
+// 5. ANCIENT BUILD TIMELINE (S-TIMELINE)
+// =========================================================================
+
+pub trait BuildTimeline {
+    fn get_compiler_version(&self) -> &'static str;
+    fn select_toolchain_flags(&self) -> &'static str;
+}
+
+pub struct LegacyCBuild;
+impl BuildTimeline for LegacyCBuild {
+    fn get_compiler_version(&self) -> &'static str {
+        "GCC 2.95"
+    }
+    fn select_toolchain_flags(&self) -> &'static str {
+        "-O2 -fno-strength-reduce -fwritable-strings"
+    }
+}
+
+pub struct LegacyCppBuild;
+impl BuildTimeline for LegacyCppBuild {
+    fn get_compiler_version(&self) -> &'static str {
+        "GCC 3.2"
+    }
+    fn select_toolchain_flags(&self) -> &'static str {
+        "-O -fno-exceptions -fno-rtti"
+    }
+}
+
+pub struct LegacyAsmBuild;
+impl BuildTimeline for LegacyAsmBuild {
+    fn get_compiler_version(&self) -> &'static str {
+        "GAS 2.9.1"
+    }
+    fn select_toolchain_flags(&self) -> &'static str {
+        "--32 -march=i386"
+    }
+}
+
+// =========================================================================
+// 6. SECURITY PERSONALITY MATRIX (S-MATRIX)
+// =========================================================================
+
+pub trait SecurityMatrix {
+    fn authorize_action(&self, user_id: u32, action_id: u32) -> bool;
+}
+
+pub struct DACMatrix;
+impl SecurityMatrix for DACMatrix {
+    fn authorize_action(&self, user_id: u32, _action_id: u32) -> bool {
+        user_id == 0 // Root only permissions check
+    }
+}
+
+pub struct SELinuxMatrix {
+    pub enforcing: bool,
+}
+impl SecurityMatrix for SELinuxMatrix {
+    fn authorize_action(&self, _user_id: u32, action_id: u32) -> bool {
+        if !self.enforcing {
+            return true;
+        }
+        action_id < 100 // Strict type transitions policy check
+    }
+}
+
+pub struct ZeroTrustMatrix;
+impl SecurityMatrix for ZeroTrustMatrix {
+    fn authorize_action(&self, _user_id: u32, _action_id: u32) -> bool {
+        false // Default-deny, token capability authorization required!
+    }
+}
+
+// =========================================================================
+// 7. PERIPHERAL SIMULATION CAPSULES (S-PERIPHERAL)
+// =========================================================================
+
+pub trait PeripheralCapsule {
+    fn get_device_signature(&self) -> u16;
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
+}
+
+pub struct FloppyCapsule {
+    pub disk_size_bytes: usize,
+}
+impl PeripheralCapsule for FloppyCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x3F0 // standard floppy FDC signature
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len().min(self.disk_size_bytes))
+    }
+}
+
+pub struct TapeCapsule;
+impl PeripheralCapsule for TapeCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x280
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
+    }
+}
+
+pub struct CRTGraphicsCapsule;
+impl PeripheralCapsule for CRTGraphicsCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x3D4 // CRTC register signature
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
+    }
+}
+
+pub struct DotMatrixCapsule;
+impl PeripheralCapsule for DotMatrixCapsule {
+    fn get_device_signature(&self) -> u16 {
+        0x378 // LPT1 print register signature
+    }
+    fn simulate_data_write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HistoricError {
     SyscallNotImplemented,
@@ -314,5 +593,100 @@ mod tests {
         let conv = VintagePackageConverter;
         let res = conv.convert_package("old_bash", "tar.Z").unwrap();
         assert_eq!(res, "old_bash-sigpkg-compat");
+    }
+
+    #[test]
+    fn test_kernel_personality_overlay() {
+        let overlay = KernelOverlay::new(LinuxEra::Era0_11);
+        assert_eq!(overlay.overlay_memory_model(0x12345678), 0x345678); // Limited to 16MB
+    }
+
+    #[test]
+    fn test_syscall_evolution_ledgers() {
+        let file_led = FileLedger {
+            era: LinuxEra::Era1_0,
+        };
+        assert_eq!(file_led.query_syscall_name(5).unwrap(), "sys_open");
+
+        let net_led = NetworkLedger {
+            era: LinuxEra::Era1_0,
+        };
+        assert_eq!(net_led.query_syscall_name(102).unwrap(), "sys_socketcall");
+
+        let proc_led = ProcessLedger {
+            era: LinuxEra::Era2_4,
+        };
+        assert_eq!(proc_led.query_syscall_name(120).unwrap(), "sys_clone");
+    }
+
+    #[test]
+    fn test_driver_personality_sandboxes() {
+        let storage_sb = StorageSandbox {
+            allowed_ports: [0x1F0, 0x1F1, 0, 0],
+        };
+        assert!(storage_sb.validate_io_port(0x1F0));
+        assert!(!storage_sb.validate_io_port(0x3F8));
+
+        let net_sb = NetworkSandbox {
+            allowed_ports: [0x300, 0x301, 0, 0],
+        };
+        assert!(net_sb.validate_io_port(0x300));
+
+        let gfx_sb = GraphicsSandbox {
+            allowed_ports: [0x3D4, 0x3D5, 0, 0],
+        };
+        assert!(gfx_sb.validate_io_port(0x3D4));
+    }
+
+    #[test]
+    fn test_firmware_evolution_capsules() {
+        let bios: Box<dyn FirmwareCapsule> = Box::new(BIOSCapsule);
+        assert_eq!(bios.get_firmware_type(), "BIOS");
+        assert_eq!(bios.build_memory_map(), 0x640000);
+
+        let uefi: Box<dyn FirmwareCapsule> = Box::new(UEFICapsule);
+        assert_eq!(uefi.get_firmware_type(), "UEFI");
+        assert_eq!(uefi.build_memory_map(), 0xFFFFFFFF);
+    }
+
+    #[test]
+    fn test_ancient_build_timelines() {
+        let c_build: Box<dyn BuildTimeline> = Box::new(LegacyCBuild);
+        assert_eq!(c_build.get_compiler_version(), "GCC 2.95");
+
+        let cpp_build: Box<dyn BuildTimeline> = Box::new(LegacyCppBuild);
+        assert_eq!(cpp_build.get_compiler_version(), "GCC 3.2");
+    }
+
+    #[test]
+    fn test_security_personality_matrices() {
+        let dac: Box<dyn SecurityMatrix> = Box::new(DACMatrix);
+        assert!(dac.authorize_action(0, 10)); // Root only
+        assert!(!dac.authorize_action(1000, 10));
+
+        let selinux: Box<dyn SecurityMatrix> = Box::new(SELinuxMatrix { enforcing: true });
+        assert!(selinux.authorize_action(1000, 50));
+        assert!(!selinux.authorize_action(1000, 200));
+
+        let zero_trust: Box<dyn SecurityMatrix> = Box::new(ZeroTrustMatrix);
+        assert!(!zero_trust.authorize_action(0, 0));
+    }
+
+    #[test]
+    fn test_peripheral_simulation_capsules() {
+        let mut floppy: Box<dyn PeripheralCapsule> = Box::new(FloppyCapsule {
+            disk_size_bytes: 1440 * 1024,
+        });
+        assert_eq!(floppy.get_device_signature(), 0x3F0);
+        assert_eq!(floppy.simulate_data_write(b"SECTOR_DATA").unwrap(), 11);
+
+        let mut tape: Box<dyn PeripheralCapsule> = Box::new(TapeCapsule);
+        assert_eq!(tape.get_device_signature(), 0x280);
+
+        let mut crt: Box<dyn PeripheralCapsule> = Box::new(CRTGraphicsCapsule);
+        assert_eq!(crt.get_device_signature(), 0x3D4);
+
+        let mut printer: Box<dyn PeripheralCapsule> = Box::new(DotMatrixCapsule);
+        assert_eq!(printer.get_device_signature(), 0x378);
     }
 }
