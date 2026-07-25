@@ -426,12 +426,17 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
-        let mut password = String::new();
-        use rand::RngExt;
-        let mut rng = rand::rng();
+        let mut seed = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos() as u64;
 
+        let mut password = String::new();
         for _ in 0..length {
-            let index = rng.random_range(0..charset.len());
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let index = (seed as usize) % charset.len();
             password.push(charset[index] as char);
         }
 

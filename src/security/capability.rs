@@ -2,7 +2,9 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-use std::vec::Vec;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -15,32 +17,33 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-    pub bits_value: u64,
+    pub bits: u64,
 }
 
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
             id: 0,
-            allowed_paths: &[],
-            allowed_ports: &[],
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
+            bits: 0,
         }
     }
 
-    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
-            allowed_paths: paths,
-            allowed_ports: ports,
+            allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
+            allowed_ports: ports.to_vec(),
             is_revoked: false,
-            bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
+            bits: 0,
         }
     }
 
@@ -78,10 +81,7 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        if self.allowed_paths.is_empty() {
-            return true; // Allow if no specific restriction
-        }
-        self.allowed_paths.iter().any(|&p| path.starts_with(p))
+        self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
@@ -99,34 +99,38 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    // Builder pattern methods
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
 
-    pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
+    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
+        self.bits |= 1;
+        if port != 0 {
+            self.allowed_ports.push(port);
+        }
         self
     }
 
-    pub fn allow_read(self, _path: &str) -> Self {
+    pub fn allow_read(mut self, path: &str) -> Self {
+        self.bits |= 2;
+        self.allowed_paths.push(String::from(path));
         self
     }
 
-    pub fn allow_write(self, _path: &str) -> Self {
+    pub fn allow_write(mut self, path: &str) -> Self {
+        self.bits |= 4;
+        self.allowed_paths.push(String::from(path));
         self
     }
 
-    pub fn allow_exec(self) -> Self {
+    pub fn allow_exec(mut self) -> Self {
+        self.bits |= 8;
         self
     }
 
-    pub fn allow_ipc(self) -> Self {
+    pub fn allow_ipc(mut self) -> Self {
+        self.bits |= 16;
         self
-    }
-
-    pub fn allow_capability(&mut self, _cap: u64) {
-        // Mock method
-    }
-
-    pub fn contains(&self, _cap: u64) -> bool {
-        true
     }
 }
 
@@ -134,124 +138,28 @@ impl Default for CapabilityToken {
     fn default() -> Self {
         Self::new()
     }
-
-    /// Check if capability contains a specific u64 bit
-    pub fn contains(&self, bit: u64) -> bool {
-        (self.bits & bit) != 0
-    }
-
-    /// Allow a specific capability bit
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
-    }
-
-    /// Check if capability contains a specific u64 bit
-    pub fn contains(&self, bit: u64) -> bool {
-        (self.bits & bit) != 0
-    }
-
-    /// Allow a specific capability bit
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
-    }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
-
+#[derive(Debug, Clone)]
 pub struct CapabilityGate {
-    pub active_token: Option<CapabilityToken>,
+    pub token: CapabilityToken,
 }
 
 impl CapabilityGate {
     pub fn new() -> Self {
-        Self { active_token: None }
+        Self {
+            token: CapabilityToken::new(),
+        }
     }
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.active_token = Some(token);
+        self.token = token;
     }
 }
 
 impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
     }
 }
 
