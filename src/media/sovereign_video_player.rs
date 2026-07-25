@@ -114,7 +114,7 @@ pub struct SovereignVideoPlayer {
     /// Current video codec
     video_codec: Option<VideoCodec>,
     /// Current audio codec
-    Option<AudioCodec>,
+    audio_codec: Option<AudioCodec>,
     /// Container format
     container_format: Option<ContainerFormat>,
     /// Upscaling quality

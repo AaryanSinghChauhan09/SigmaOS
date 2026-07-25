@@ -187,7 +187,7 @@ impl AlsaAudioStack {
     }
 
     /// Read audio data from a capture stream
-    pub fn read_pcm(&mut self, id: u32, buffer: &mut [u8]) -> Result<usize, *&'static str> {
+    pub fn read_pcm(&mut self, id: u32, buffer: &mut [u8]) -> Result<usize, &'static str> {
         let stream = self.pcm_streams.get_mut(&id)
             .ok_or("PCM stream not found")?;
 
