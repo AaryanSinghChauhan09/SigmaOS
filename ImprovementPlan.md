@@ -672,3 +672,27 @@ core::mem::transmute(self.state.load(Ordering::SeqCst) as u32)
     ```rust
     self.current_report.as_ref().map(|r| r.leaked_allocations > 0)
     ```
+
+---
+
+## ⚡ 39. Performance Capability Enhancement Specification
+
+To push the **performance boundaries** of SigmaOS and ensure microsecond-level scheduling latency under extreme concurrent workloads, we implement the following core performance enhancement blueprint:
+
+### A. Lock-Free Concurrency & Memory Pipelines
+*   **Lock-Free Queue Management (`LockFreeQueue`):** Replaces traditional mutex-based synchronization loops inside microkernel message rings with high-performance, single-producer single-consumer (SPSC) and multi-producer single-consumer (MPSC) lock-free ring buffers using atomic `Ordering::SeqCst` operations.
+*   **Zero-Copy Direct Memory Access (DMA):** Enables Ethernet and storage blocks to stream data directly into user-space buffers using capability-gated page table structures, avoiding standard intermediate memory allocations or `memcpy` calls.
+*   **NUMA-Aware Core Allocation:** Optimizes multicore scheduling by placing thread contexts, memory pages, and I/O buffer regions on the physical processor node directly connected to the active peripheral bus, maximizing cache hits and reducing inter-node bus contention.
+
+### B. Hardware-Accelerated Vectorization & Math
+*   **SIMD-Accelerated Vector Primitives (`SigmaVector`):** Harnesses hardware-native AVX-512 and Neon vector blocks to execute 2D canvas clipping, bezier coordinate calculations, and cryptography blocks in parallel, achieving $O(1)$ coordinate translation speeds.
+*   **Branchless Mathematical Optimization:** Resolves EEVDF schedule lag and physical page order calculations using branchless bitwise operations (`next_power_of_two` and `trailing_zeros`) instead of linear loops, achieving predictable execution times and maximizing instruction cache efficiency.
+
+---
+
+## 🚀 40. Next-Gen Performance Implementation Roadmap
+
+1.  **Integrate Lock-Free Message Rings:** Connect lock-free SPSC queues directly within the microkernel inter-process communication (`src/kernel/ipc/`) layer.
+2.  **Deploy NUMA-Aware Allocations:** Map physical processor nodes and page tables dynamically within the memory manager (`src/kernel/memory.rs`) to ensure local page bindings.
+3.  **Optimize Vector Graphics Loops:** Enable SSE/AVX vector instruction sets inside Zenith compositor layout calculations to achieve fluid visual compositing.
+4.  **Enforce Branchless Bitwise Calculators:** Refactor scheduler lag evaluations inside `src/kernel/scheduler.rs` with branchless, constant-time assembly hooks.
