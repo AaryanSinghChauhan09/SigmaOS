@@ -78,7 +78,8 @@ impl Filesystem for SimpleFilesystem {
             4 => FilesystemType::APFS,
             5 => FilesystemType::SovereignP2P,
             6 => FilesystemType::EncryptedFS,
-            _ => FilesystemType::CompressedFS,
+            7 => FilesystemType::CompressedFS,
+            _ => FilesystemType::Ext4,
         }
     }
 
