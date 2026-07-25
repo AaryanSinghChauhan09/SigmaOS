@@ -51,6 +51,12 @@ pub mod toolchain {
     pub mod capsule;
     pub mod codex;
 }
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -176,6 +182,15 @@ pub use compatibility::lattice::{
 };
 pub use compatibility::prism::{
     PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+pub use compatibility::canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+};
+pub use scheduler::numa_scheduler::{
+    NumaNode, NumaScheduler, Node as LFNode, MichaelScottQueue, TreiberStack,
+};
+pub use crypto::vectorized_pqc::{
+    VectorizedPqcEngine,
 };
 pub use network::revival::{
     RevivalProtocol, NetRevival,

@@ -1,8 +1,12 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
-pub mod legacy_adapters;
-pub mod constellation_mesh;
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -40,4 +44,7 @@ pub use constellation_mesh::{
     CorebootGatewayMesh, BuildCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyAsmCodexGrid,
     SecurityConstellation, DACConstellation, SELinuxConstellation, ZeroTrustConstellation,
     PeripheralArchiveMesh, FloppyMesh, TapeMesh, CRTMesh, DotMatrixMesh,
+};
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
 };
