@@ -246,9 +246,8 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageDependencyResolver,
-    PackageError, PackageFormat, PackageSource, PackageState, SovereignPackage, SpacPackageManager,
-    UnifiedPackage, UniversalPackageManager, Version,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
