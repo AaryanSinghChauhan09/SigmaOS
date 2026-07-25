@@ -1,5 +1,5 @@
 //! SigmaOS AI-Native System Services Integration Module
-//! 
+//!
 //! This module provides AI integration into core system services,
 //! enabling intelligent resource management, predictive maintenance,
 //  and adaptive system behavior.
@@ -7,9 +7,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// AI system service type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -250,7 +250,7 @@ impl ResourceManagementService {
     pub fn new(prediction_window_seconds: u32) -> Self {
         let config = AiServiceConfig::new(AiServiceType::ResourceManagement)
             .with_priority(ServicePriority::High);
-        
+
         Self {
             service: AiSystemService::new("resource-management".to_string(), config),
             prediction_window_seconds,
@@ -265,7 +265,7 @@ impl ResourceManagementService {
 
         // In a real implementation, this would use ML models to predict
         // CPU, memory, disk, network usage based on historical data
-        
+
         Ok(0.75) // Placeholder: 75% predicted usage
     }
 
@@ -290,7 +290,7 @@ impl PredictiveMaintenanceService {
     pub fn new(check_interval_seconds: u32) -> Self {
         let config = AiServiceConfig::new(AiServiceType::PredictiveMaintenance)
             .with_priority(ServicePriority::Normal);
-        
+
         Self {
             service: AiSystemService::new("predictive-maintenance".to_string(), config),
             check_interval_seconds,
@@ -308,7 +308,7 @@ impl PredictiveMaintenanceService {
         // - System logs and error patterns
         // - Historical failure data
         // - Usage patterns
-        
+
         Ok(0.15) // Placeholder: 15% failure probability
     }
 
@@ -333,7 +333,7 @@ impl AdaptiveSchedulingService {
     pub fn new(learning_rate: f32) -> Self {
         let config = AiServiceConfig::new(AiServiceType::AdaptiveScheduling)
             .with_priority(ServicePriority::High);
-        
+
         Self {
             service: AiSystemService::new("adaptive-scheduling".to_string(), config),
             learning_rate,
@@ -351,7 +351,7 @@ impl AdaptiveSchedulingService {
         // - Consider system load and resource availability
         // - Use reinforcement learning to optimize scheduling
         // - Adapt to changing workloads
-        
+
         Ok("schedule-high-priority".to_string())
     }
 
@@ -460,7 +460,7 @@ mod tests {
         let config = AiServiceConfig::new(AiServiceType::PredictiveMaintenance)
             .with_priority(ServicePriority::High)
             .with_parameter("key".to_string(), "value".to_string());
-        
+
         assert_eq!(config.priority, ServicePriority::High);
         assert_eq!(config.parameters.len(), 1);
     }
@@ -541,7 +541,7 @@ mod tests {
         let mut manager = AiServiceManager::new();
         let config = AiServiceConfig::new(AiServiceType::ResourceManagement);
         let service = AiSystemService::new("test".to_string(), config);
-        
+
         assert!(manager.register(service).is_ok());
         assert!(manager.get("test").is_some());
         assert!(manager.unregister("test").is_ok());
@@ -554,7 +554,7 @@ mod tests {
         let config = AiServiceConfig::new(AiServiceType::ResourceManagement);
         let service1 = AiSystemService::new("test".to_string(), config.clone());
         let service2 = AiSystemService::new("test".to_string(), config);
-        
+
         assert!(manager.register(service1).is_ok());
         assert!(manager.register(service2).is_err());
     }
@@ -565,10 +565,10 @@ mod tests {
         let config = AiServiceConfig::new(AiServiceType::ResourceManagement);
         let service1 = AiSystemService::new("test1".to_string(), config.clone());
         let service2 = AiSystemService::new("test2".to_string(), config);
-        
+
         manager.register(service1).unwrap();
         manager.register(service2).unwrap();
-        
+
         assert!(manager.start_all().is_ok());
         assert_eq!(manager.running_services().len(), 2);
     }

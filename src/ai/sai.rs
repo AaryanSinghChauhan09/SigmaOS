@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AiError {
@@ -26,10 +26,10 @@ pub enum ComputeBackend {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModelSize {
-    Tiny,    // 1.5B
-    Small,   // 8B
-    Medium,  // 34B
-    Large,   // 70B MoE
+    Tiny,   // 1.5B
+    Small,  // 8B
+    Medium, // 34B
+    Large,  // 70B MoE
 }
 
 /// SovereignML Tensor - Zero-dependency tensor computation
@@ -96,7 +96,9 @@ impl Tensor {
             return Err(AiError::InvalidInput);
         }
 
-        let result: Vec<f32> = self.data.iter()
+        let result: Vec<f32> = self
+            .data
+            .iter()
             .zip(other.data.iter())
             .map(|(a, b)| a + b)
             .collect();
@@ -110,7 +112,9 @@ impl Tensor {
             return Err(AiError::InvalidInput);
         }
 
-        let result: Vec<f32> = self.data.iter()
+        let result: Vec<f32> = self
+            .data
+            .iter()
             .zip(other.data.iter())
             .map(|(a, b)| a * b)
             .collect();
@@ -284,10 +288,11 @@ impl AgentOrchestrator {
 
     /// Assign task to agent
     pub fn assign_task(&mut self, task_id: u64, agent_id: u64) -> Result<(), AiError> {
-        let task = self.tasks.get_mut(&task_id)
-            .ok_or(AiError::ModelNotFound)?;
+        let task = self.tasks.get_mut(&task_id).ok_or(AiError::ModelNotFound)?;
 
-        let agent = self.agents.get_mut(&agent_id)
+        let agent = self
+            .agents
+            .get_mut(&agent_id)
             .ok_or(AiError::ModelNotFound)?;
 
         task.assign_agent(agent_id);
@@ -299,8 +304,7 @@ impl AgentOrchestrator {
 
     /// Complete a task
     pub fn complete_task(&mut self, task_id: u64) -> Result<(), AiError> {
-        let task = self.tasks.get_mut(&task_id)
-            .ok_or(AiError::ModelNotFound)?;
+        let task = self.tasks.get_mut(&task_id).ok_or(AiError::ModelNotFound)?;
 
         task.set_status(TaskStatus::Completed);
 
@@ -316,13 +320,15 @@ impl AgentOrchestrator {
 
     /// Get available agent for role
     pub fn get_available_agent(&self, role: AgentRole) -> Option<&Agent> {
-        self.agents.values()
+        self.agents
+            .values()
             .find(|agent| agent.role == role && !agent.is_active())
     }
 
     /// Auto-assign task to available agent
     pub fn auto_assign_task(&mut self, task_id: u64, role: AgentRole) -> Result<(), AiError> {
-        let agent_id = self.get_available_agent(role)
+        let agent_id = self
+            .get_available_agent(role)
             .ok_or(AiError::ModelNotFound)?
             .id;
 
@@ -423,8 +429,7 @@ impl SaiEngine {
 
     /// Load a model
     pub fn load_model(&mut self, name: &str) -> Result<(), AiError> {
-        let model = self.models.get_mut(name)
-            .ok_or(AiError::ModelNotFound)?;
+        let model = self.models.get_mut(name).ok_or(AiError::ModelNotFound)?;
 
         model.load()
     }
@@ -519,7 +524,7 @@ mod tests {
     #[test]
     fn test_orchestrator() {
         let mut orchestrator = AgentOrchestrator::new();
-        
+
         let agent_id = orchestrator.create_agent(AgentRole::Coder, ModelSize::Small);
         let task_id = orchestrator.create_task("Write code".to_string());
 
@@ -532,11 +537,13 @@ mod tests {
     #[test]
     fn test_auto_assign() {
         let mut orchestrator = AgentOrchestrator::new();
-        
+
         orchestrator.create_agent(AgentRole::Researcher, ModelSize::Tiny);
         let task_id = orchestrator.create_task("Research topic".to_string());
 
-        orchestrator.auto_assign_task(task_id, AgentRole::Researcher).unwrap();
+        orchestrator
+            .auto_assign_task(task_id, AgentRole::Researcher)
+            .unwrap();
 
         let task = orchestrator.get_task(task_id).unwrap();
         assert!(task.assigned_agent.is_some());
@@ -545,7 +552,7 @@ mod tests {
     #[test]
     fn test_task_completion() {
         let mut orchestrator = AgentOrchestrator::new();
-        
+
         let agent_id = orchestrator.create_agent(AgentRole::Analyst, ModelSize::Small);
         let task_id = orchestrator.create_task("Analyze data".to_string());
 
@@ -567,7 +574,7 @@ mod tests {
     #[test]
     fn test_sai_engine() {
         let mut engine = SaiEngine::new();
-        
+
         engine.register_model("deepseek".to_string(), ModelSize::Medium, 4);
         engine.load_model("deepseek").unwrap();
 
@@ -578,7 +585,7 @@ mod tests {
     #[test]
     fn test_tensor_allocation() {
         let core = TensorCore::new(ComputeBackend::CpuSimd, 100);
-        
+
         assert!(core.allocate_tensor(50).is_ok());
         assert!(core.allocate_tensor(200).is_err());
     }

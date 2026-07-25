@@ -14,13 +14,6 @@ pub enum BuildSystem {
     Autotools,
     Meson,
     Ninja,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    Make,
-    CMake,
     Custom,
 }
 
@@ -30,6 +23,11 @@ pub enum RecipeError {
     MissingField,
     SignatureMismatch,
     DependencyConflict,
+    InvalidName,
+    InvalidSource,
+    InvalidHash,
+    NoBuildCommands,
+    InvalidRecipe,
 }
 
 pub struct RecipeManager;
@@ -66,18 +64,28 @@ impl PackageRecipe {
         minor: u32,
         patch: u32,
         url: &'static str,
-        dependencies: &'static [&'static str],
+        _dependencies: &'static [&'static str],
     ) -> Self {
         PackageRecipe {
-            name,
+            name: name.to_string(),
             version: Version {
                 major,
                 minor,
                 patch,
             },
-            source_url: url,
-            checksum: [0; 32], // Stub checksum
-            dependencies,
+            description: String::new(),
+            build_system: BuildSystem::Cargo,
+            dependencies: Vec::new(),
+            source_url: url.to_string(),
+            hash: String::new(),
+            build_commands: Vec::new(),
+            install_commands: Vec::new(),
+            environment: HashMap::new(),
+            pkgrel: 1,
+            arch: "any".to_string(),
+            license_spdx: "GPL".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -165,69 +173,7 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
+            BuildSystem::Custom => "make".to_string(),
         }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    Make,
-    CMake,
-    Ninja,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidRecipe,
-    MissingField,
-}
-
-pub struct RecipeManager;
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    Make,
-    CMake,
-    Ninja,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidRecipe,
-    MissingField,
-}
-
-pub struct RecipeManager;
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    Make,
-    CMake,
-    Ninja,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidRecipe,
-    MissingField,
-}
-
-pub struct RecipeManager;
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
     }
 }

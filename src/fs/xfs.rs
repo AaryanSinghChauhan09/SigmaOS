@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum XfsState {
@@ -123,7 +123,12 @@ impl XfsFilesystem {
     }
 
     /// Allocate blocks for an inode
-    pub fn allocate_blocks(&mut self, inode_id: u64, block_count: u64, strategy: AllocationStrategy) -> Result<Vec<XfsExtent>, &'static str> {
+    pub fn allocate_blocks(
+        &mut self,
+        inode_id: u64,
+        block_count: u64,
+        strategy: AllocationStrategy,
+    ) -> Result<Vec<XfsExtent>, &'static str> {
         if !self.inodes.contains_key(&inode_id) {
             return Err("Inode not found");
         }
@@ -192,8 +197,7 @@ impl XfsFilesystem {
 
     /// Delete an inode
     pub fn delete_inode(&mut self, id: u64) -> Result<(), &'static str> {
-        let inode = self.inodes.remove(&id)
-            .ok_or("Inode not found")?;
+        let inode = self.inodes.remove(&id).ok_or("Inode not found")?;
 
         // Free blocks
         if let Some(extents) = self.extents.remove(&id) {
@@ -265,7 +269,10 @@ impl XfsFilesystem {
 
     /// Get free space
     pub fn free_space(&self) -> u64 {
-        self.allocation_groups.values().map(|ag| ag.free_blocks).sum()
+        self.allocation_groups
+            .values()
+            .map(|ag| ag.free_blocks)
+            .sum()
     }
 
     /// Get used space
@@ -297,10 +304,10 @@ mod tests {
     #[test]
     fn test_create_inode() {
         let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         let id = fs.create_inode(4096, 0o644).unwrap();
         assert_eq!(fs.inode_count(), 1);
-        
+
         let inode = fs.get_inode(id).unwrap();
         assert_eq!(inode.size, 4096);
     }
@@ -308,10 +315,12 @@ mod tests {
     #[test]
     fn test_allocate_blocks() {
         let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         let id = fs.create_inode(4096, 0o644).unwrap();
-        let extents = fs.allocate_blocks(id, 8, AllocationStrategy::FirstFit).unwrap();
-        
+        let extents = fs
+            .allocate_blocks(id, 8, AllocationStrategy::FirstFit)
+            .unwrap();
+
         assert_eq!(extents.len(), 1);
         assert_eq!(extents[0].block_count, 8);
     }
@@ -319,21 +328,22 @@ mod tests {
     #[test]
     fn test_delete_inode() {
         let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         let id = fs.create_inode(4096, 0o644).unwrap();
-        fs.allocate_blocks(id, 8, AllocationStrategy::FirstFit).unwrap();
+        fs.allocate_blocks(id, 8, AllocationStrategy::FirstFit)
+            .unwrap();
         fs.delete_inode(id).unwrap();
-        
+
         assert_eq!(fs.inode_count(), 0);
     }
 
     #[test]
     fn test_journal() {
         let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         fs.enable_journal(1024 * 1024).unwrap();
         assert!(fs.journal.is_some());
-        
+
         fs.disable_journal().unwrap();
         assert!(fs.journal.is_none());
     }
@@ -341,10 +351,10 @@ mod tests {
     #[test]
     fn test_sync() {
         let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         fs.create_inode(4096, 0o644).unwrap();
         assert_eq!(fs.state(), XfsState::Dirty);
-        
+
         fs.sync().unwrap();
         assert_eq!(fs.state(), XfsState::Clean);
     }
@@ -352,7 +362,7 @@ mod tests {
     #[test]
     fn test_free_space() {
         let fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         assert_eq!(fs.free_space(), 1024 * 1024);
         assert_eq!(fs.used_space(), 0);
     }
@@ -360,9 +370,9 @@ mod tests {
     #[test]
     fn test_allocation_groups() {
         let fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         assert_eq!(fs.allocation_group_count(), 4);
-        
+
         let ag = fs.get_allocation_group(0).unwrap();
         assert_eq!(ag.free_blocks, 256 * 1024);
     }
@@ -370,10 +380,11 @@ mod tests {
     #[test]
     fn test_get_extents() {
         let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
-        
+
         let id = fs.create_inode(4096, 0o644).unwrap();
-        fs.allocate_blocks(id, 8, AllocationStrategy::FirstFit).unwrap();
-        
+        fs.allocate_blocks(id, 8, AllocationStrategy::FirstFit)
+            .unwrap();
+
         let extents = fs.get_extents(id).unwrap();
         assert_eq!(extents.len(), 1);
     }

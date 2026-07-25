@@ -133,7 +133,13 @@ pub trait InodeOperations: Send + Sync {
     fn unlink(&self, dir: &Inode, name: &str) -> Result<(), FsError>;
     fn mkdir(&self, dir: &Inode, name: &str, mode: u32) -> Result<(), FsError>;
     fn rmdir(&self, dir: &Inode, name: &str) -> Result<(), FsError>;
-    fn rename(&self, old_dir: &Inode, old_name: &str, new_dir: &Inode, new_name: &str) -> Result<(), FsError>;
+    fn rename(
+        &self,
+        old_dir: &Inode,
+        old_name: &str,
+        new_dir: &Inode,
+        new_name: &str,
+    ) -> Result<(), FsError>;
     fn symlink(&self, dir: &Inode, name: &str, target: &str) -> Result<(), FsError>;
     fn readlink(&self, inode: &Inode) -> Result<String, FsError>;
     fn setattr(&self, inode: &Inode, attr: &InodeAttr) -> Result<(), FsError>;
@@ -148,7 +154,14 @@ pub trait FileOperations: Send + Sync {
     fn read(&self, inode: &Inode, buf: &mut [u8], offset: u64) -> Result<usize, FsError>;
     fn write(&self, inode: &Inode, buf: &[u8], offset: u64) -> Result<usize, FsError>;
     fn llseek(&self, inode: &Inode, offset: i64, whence: u32) -> Result<u64, FsError>;
-    fn mmap(&self, inode: &Inode, addr: u64, len: usize, prot: u32, flags: u32) -> Result<(), FsError>;
+    fn mmap(
+        &self,
+        inode: &Inode,
+        addr: u64,
+        len: usize,
+        prot: u32,
+        flags: u32,
+    ) -> Result<(), FsError>;
     fn fsync(&self, inode: &Inode) -> Result<(), FsError>;
     fn unlocked_ioctl(&self, inode: &Inode, cmd: u32, arg: u64) -> Result<(), FsError>;
     fn compat_ioctl(&self, inode: &Inode, cmd: u32, arg: u64) -> Result<(), FsError>;
@@ -196,7 +209,12 @@ pub trait Filesystem: core::any::Any + Send + Sync {
     fn init(&mut self) -> Result<(), FsError>;
     fn mount(&mut self, device: &str, mount_point: &str) -> Result<VfsMount, FsError>;
     fn unmount(&mut self, mount: &mut VfsMount) -> Result<(), FsError>;
-    fn fill_super(&mut self, sb: &mut SuperBlock, data: Option<&str>, silent: bool) -> Result<(), FsError>;
+    fn fill_super(
+        &mut self,
+        sb: &mut SuperBlock,
+        data: Option<&str>,
+        silent: bool,
+    ) -> Result<(), FsError>;
     fn sync_fs(&self, wait: bool) -> Result<(), FsError>;
     fn freeze_fs(&self) -> Result<(), FsError>;
     fn thaw_fs(&self) -> Result<(), FsError>;

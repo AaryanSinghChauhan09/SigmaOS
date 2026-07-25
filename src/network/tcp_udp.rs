@@ -8,6 +8,14 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type SocketID = usize;
 pub type Port = u16;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketOption {
+    ReuseAddr,
+    TcpNoDelay,
+    RcvBuf,
+    SndBuf,
+}
+
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
@@ -45,6 +53,11 @@ pub trait Socket {
     fn protocol(&self) -> Protocol;
     fn local_port(&self) -> Port;
     fn remote_port(&self) -> Port;
+}
+
+pub trait BsdSocket: Socket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
 }
 
 pub struct SimpleSocket {
@@ -109,14 +122,14 @@ impl BsdSocket for SimpleSocket {
         }
         Ok(())
     }
-    fn protocol(&self) -> Protocol {
-        self.protocol
-    }
-    fn local_port(&self) -> Port {
-        self.local_port.load(Ordering::SeqCst) as Port
-    }
-    fn remote_port(&self) -> Port {
-        self.remote_port.load(Ordering::SeqCst) as Port
+
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
+        }
     }
 }
 
