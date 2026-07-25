@@ -44,10 +44,12 @@ pub mod observability {
 }
 pub mod boot {
     pub mod firmware_bridge;
+    pub mod bridge_grid;
 }
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
+    pub mod codex;
 }
 
 pub use accessibility::{
@@ -163,11 +165,17 @@ pub use observability::profiler::{
 pub use boot::firmware_bridge::{
     FirmwareType, FirmwareBridge,
 };
+pub use boot::bridge_grid::{
+    BIOSBridgeGrid, UEFIBridgeGrid, CorebootBridgeGrid, FirmwareBridgeGrid,
+};
 pub use toolchain::adapter::{
     ToolchainProfile, ToolchainAdapter,
 };
 pub use toolchain::capsule::{
     CapsuleProfile, BuildCapsule,
+};
+pub use toolchain::codex::{
+    CodexCategory, CodexEntry, BuildCodex,
 };
 pub use compatibility::persona::{
     PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
@@ -177,6 +185,9 @@ pub use compatibility::abi_translator::{
 };
 pub use compatibility::lattice::{
     LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use compatibility::prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
 };
 pub use network::revival::{
     RevivalProtocol, NetRevival,
@@ -190,6 +201,15 @@ pub use driver::mapper::{
 pub use driver::pods::{
     PodType, PeripheralPod,
 };
+pub use driver::vault::{
+    VaultEntry, DriverArchiveVault,
+};
+pub use driver::grid::{
+    GridSlotType, PeripheralArchiveGrid,
+};
 pub use security::bridge::{
     LegacySecurityType, SecurityBridge,
+};
+pub use security::prism::{
+    SecurityFacet, SecurityPrism,
 };

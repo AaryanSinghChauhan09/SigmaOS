@@ -4,6 +4,7 @@ pub mod linux_adapter;
 pub mod persona;
 pub mod abi_translator;
 pub mod lattice;
+pub mod prism;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -20,4 +21,7 @@ pub use abi_translator::{
 };
 pub use lattice::{
     LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
 };
