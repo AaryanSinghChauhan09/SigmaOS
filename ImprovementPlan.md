@@ -199,33 +199,80 @@ To systematically outmaneuver monolithic Linux distributions, SigmaOS leverages 
 
 ---
 
-## 📊 6. Comprehensive Comparative Edge Matrix
+## 🔍 6. Core Kernel & System Gaps: Comprehensive Implementation Backlog
 
-SigmaOS bridges ancient and modern software worlds with unmatched efficiency:
+While SigmaOS features highly innovative conceptual architectures, a thorough feature audit exposes key areas where implementation parity with mainstream Linux must be completed to ensure daily viability:
 
-| Architectural Metric | 🐧 Modern Linux Distros (Fedora/Mint) | 🛡️ SigmaOS Innovative Blueprint | Strategic Advantages |
-| :--- | :--- | :--- | :--- |
-| **Kernel Personas** | Single monolithic version at compile-time | **Adaptive KernelPersonaManager** | Real-time multi-generation persona adaptation |
-| **Legacy Apps** | Dropping 32-bit and outdated POSIX APIs | **CompatibilitySandbox** | Seamless emulated environments (DOS/Win32) |
-| **Driver Matching** | Requires manual config and backports | **DriverEvolutionMapper** | Auto-mapping driver updates across kernel version lines |
-| **Firmware Booting**| Dropping support for legacy BIOS systems | **FirmwareTimeTravel** | Dynamic boot emulation (BIOS / UEFI / Coreboot) |
-| **Compilation** | Vulnerable to system package dependency drift | **BuildCapsule** | Self-contained, fully reproducible legacy builds |
-| **Security Models** | Static global configurations (SELinux/AppArmor) | **SecurityFederation** | Co-existence of legacy DAC/MAC rules with Zero-Trust |
-| **Archaic Hardware**| Dropped completely | **PeripheralCloud** | P2P streaming virtualization of floppy, tape, and CRT |
+1. **Virtual Memory Management (VMM)**
+   - **Current Status:** Physical memory allocator (buddy allocator) is established in the core kernel.
+   - **Missing Gaps:** Lack of demand paging (swapping), active page fault handlers, hardware-assisted copy-on-write (CoW), and advanced thread-level memory layout protection.
+2. **Networking Stack**
+   - **Current Status:** Partial, conceptual TCP/UDP socket management exists.
+   - **Missing Gaps:** Missing full native IPv4/IPv6 stacks, dynamic routing table structures, netfilter-based firewall rules, integrated DNS resolver lookups, and secure HTTP/HTTPS transport layers.
+3. **Driver Ecosystem**
+   - **Current Status:** Basic storage controllers (NVMe) and USB host controllers (xHCI) are declared.
+   - **Missing Gaps:** Complete absence of standard Human Interface Device (HID) keyboard and mouse drivers, hardware graphics acceleration drivers (VESA / GPU frames), wireless connectivity (Wi-Fi, Bluetooth adapters), and legacy ISA/AGP buses for real retro-hardware setups.
+4. **Filesystem**
+   - **Current Status:** Traditional local filesystems (Ext4, FAT32) are modeled.
+   - **Missing Gaps:** The custom distributed filesystem (**SigmaFS**) lacks concrete journaling, peer-to-peer file block replication, and Merkle-tree verified directory synchronization.
+5. **Security Framework**
+   - **Current Status:** Post-quantum signature algorithms (Kyber, Dilithium) are designed.
+   - **Missing Gaps:** Pluggable Mandatory Access Control (MAC) subsystems, hardware container isolation limits, and secure process-level namespace isolation.
+6. **Package Management**
+   - **Current Status:** The high-level `sigma-pkg` command-line tool is defined.
+   - **Missing Gaps:** Complete cataloguing of package recipes, deep DPLL SAT solver dependency resolutions, and robust repository package networks.
+7. **Bootloader & Firmware**
+   - **Current Status:** Standard bootable ISO structures execute in emulation (QEMU).
+   - **Missing Gaps:** Unified boot paths for physical legacy BIOS, modern UEFI, and lightweight Coreboot platforms alongside PQC secure boot validation.
+8. **Userland & Shell**
+   - **Current Status:** A visual Zenith Desktop tiling layout prototype is designed.
+   - **Missing Gaps:** A fully interactive shell (`sigma-sh` REPL), standard userland terminal binaries (`ls`, `cp`, `grep`, `mkdir`), and a high-performance native GUI widget toolkit.
+9. **AI Integration**
+   - **Current Status:** The S-AI LLM local model orchestrator shard is conceptualized.
+   - **Missing Gaps:** Lock-free scheduling of ML task queues alongside CPU real-time threads, deep inference engine bindings, and hardware-accelerated tensor core scheduling.
 
 ---
 
-## 🛠️ 7. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
+## 📊 7. Gap-to-Branch Alignment Matrix
+
+The following index maps active repository code modules to functional gaps and target features:
+
+| Architectural Gap | Current Status inside Repository | Missing / Not Yet Implemented | Priority |
+| :--- | :--- | :--- | :--- |
+| **Virtual Memory** | Physical Buddy Allocator (`memory.rs`) | Demand paging, page fault handling, CoW | 🔴 **High** |
+| **Networking** | Partial TCP/UDP stubs (`net/stack.rs`) | Full IPv4/IPv6, firewalls, DNS client | 🔴 **High** |
+| **Drivers** | NVMe, USB xHCI controllers | Keyboard, mouse, accelerated GPU, Wi-Fi | 🔴 **High** |
+| **Filesystem** | Local Ext4 and FAT32 adapters | SigmaFS distributed replication & journals | 🟡 **Medium** |
+| **Security** | Post-quantum crypto primitives | AppArmor-style MAC, sandbox isolation | 🟡 **Medium** |
+| **Packaging** | Front-end CLI commands (`sigpkg`) | Recipes, deep tree dependency resolution | 🟡 **Medium** |
+| **Boot/Firmware**| Bootable ISO target layouts | Unified BIOS/UEFI/Coreboot terminals | 🟡 **Medium** |
+| **Userland** | Visual tiling compositor screens | `sigma-sh` REPL, standard POSIX CLI utilities| 🟢 **Low** |
+| **AI Shard** | Conceptual models (`ai/agent.rs`) | Local LLM CPU/GPU thread scheduling | 🟢 **Low** |
+
+---
+
+## 🚀 8. Tactical Implementation Roadmap & Priorities
+
+To guide developers in executing the system backlog:
+1. **Virtual Memory Paging (Immediate Step):** Complete PML4 page table directory walking and hook page fault handlers directly to standard scheduler thread-swap events.
+2. **Networking Stack Completion:** Implement robust IPv4 packet assembly/reassembly, basic static routing maps, and netfilter-style packet dropping rules.
+3. **Driver Expansion:** Build basic USB HID drivers to support standard mouse and keyboard devices on target bare-metal targets.
+4. **SigmaFS Distributed Core:** Implement transactional Copy-on-Write block tracking and Merkle-tree verified directory state checks.
+5. **Pluggable Security Policies:** Complete the `SecurityPolicyManager` to support sandbox isolation of untrusted compiler execution environments.
+
+---
+
+## 🛠️ 9. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
 
 SigmaOS rejects heavy, vulnerable external dependencies and bloated package runtimes. Instead of porting legacy Linux tools, SigmaOS integrates a comprehensive suite of native, zero-dependency, and capability-gated built-in tools that are strictly superior to their legacy open-source equivalents:
 
-### 7.1 Development & Database Tools
+### 9.1 Development & Database Tools
 * **VS Code / JetBrains → `SigmaCode` Shard:** Integrates a built-in Language Server Protocol (LSP) broker, syntax-highlighter, and a lightweight, zero-copy local AI autocomplete daemon, completely bypassing Electron memory leaks.
 * **Postman → `SigmaAPI` Utility:** A built-in, non-allocating HTTP/REST, GraphQL, and WebSockets sandbox utility capable of capturing and simulating socket sequences directly behind `CapabilityToken` gates.
 * **Git → `SigmaCommit` Engine:** A post-quantum secure distributed version control system. Replaces SHA-1 with Blake3 hashing, signs every transaction with native Dilithium-5 keys, and implements direct, zero-copy delta serialization.
 * **SQLite / PostgreSQL → `SigmaDB` Shard:** A native, transactional relational and NoSQL storage engine with page-level encryption, running fully in-memory with sub-nanosecond lookups and zero third-party database daemon overhead.
 
-### 7.2 Security & Forensic Tools
+### 9.2 Security & Forensic Tools
 * **Wireshark / tcpdump → `SigmaSniff` Monitor:** A built-in, SIMD-accelerated network packet and traffic analyzer, offering real-time zero-copy deep packet inspection (DPI) with visual timeline rendering directly in the Zenith desktop.
 * **Nmap → `SigmaScan` Network Utility:** A highly parallelized, lock-free network scanner that probes subnets, resolves topologies, and audits listening ports, guarded natively by S-NET capabilities.
 * **OpenSSL / GnuPG → `SigmaCrypt` Engine:** A modern, standard cryptographic toolbox implementing Kyber-1024 (key exchange), Dilithium-5 (signatures), and ChaCha20-Poly1305 (data encryption) with zero legacy OpenSSL code vulnerabilities.
@@ -233,7 +280,7 @@ SigmaOS rejects heavy, vulnerable external dependencies and bloated package runt
 
 ---
 
-## ⚡ 8. Bolt's Daily Performance Optimization
+## ⚡ 10. Bolt's Daily Performance Optimization
 
 ### 💡 What: Dependency Solver Iteration & Memoized State Cache
 The SAT solver in `src/sigpkg/resolver.rs` is responsible for resolving dependency trees. Currently, it uses a naive recursive approach in `resolve_recursive()` that visits nodes recursively and performs lookup operations on package names.
@@ -254,29 +301,7 @@ To verify this improvement:
 
 ---
 
-## 🎚️ 9. Prioritized Next Steps & Action Plan
-
-We rank the remaining improvements into a strict priority hierarchy:
-
-### 🔴 High Priority
-1. **Unify Capability Interfaces:** Resolve the missing `allow_exec()` and `allow_ipc()` methods in `src/security/pledge.rs` and update `CapabilityToken` in `src/security/capability.rs` to expose a consistent set of permission builders. (Fully implemented & resolved!)
-2. **Correct Borrow Checker Gaps:** Refactor `src/filesystem/manager.rs` to retrieve bookmark paths before executing mutable self navigations, decoupling the immutable borrow from the mutable borrow. (Fully implemented & resolved!)
-3. **Fix Move/Borrow Errors:** Standardize cloning for `String` and `PasswordEntry` in `src/productivity/clipboard_manager.rs` and `src/security/password.rs` to stop borrow-after-move errors.
-4. **Resolve Microkernel Compiling Bugs:** Correct non-standard `protocol` declarations in `src/net/stack.rs`, Python-like `def` syntax inside traits in `src/net/socket.rs`, and address the brace collisions in `src/kernel/memory.rs` to enable workspace-wide library compiling.
-5. **Implement Adaptive Personality Switchboards:** Develop prototypes of `KernelPersonaManager` and `CompatibilitySandbox` to dynamically route and isolate multi-generation software tasks.
-
-### 🟡 Medium Priority
-1. **Expand Unit Tests:** Refactor `tests/integration_test.rs` to implement real end-to-end integration tests for the MLFQ scheduler and SAT solver package resolver.
-2. **Develop FirmwareTimeTravel Modes:** Design boot manager handlers to simulate legacy BIOS, UEFI, and Coreboot structures.
-3. **Establish Argon2id Hashing:** Enhance GDPR/HIPAA compliance by upgrading the password hashing pipeline from mock algorithms to native Argon2id stretching.
-
-### 🟢 Low Priority
-1. **Build Out Peripheral Emulation Clouds:** Build out virtual modules to stream and virtualize archaic storage components such as tapes or floppy drives.
-2. **Zenith WCAG High-Contrast Polish:** Introduce high-contrast keyboard focus indicators inside `zenith_desktop.css` and emit standard accessibility attributes from visual layers.
-
----
-
-## 🛡️ 10. Self-Healing & System Resilience
+## 🛡️ 11. Self-Healing & System Resilience
 
 SigmaOS uses active supervision watchdogs to implement a highly resilient self-healing state machine:
 * **State Watchdogs:** S6-style processes monitor the wellness of critical userland and kernel tasks.
