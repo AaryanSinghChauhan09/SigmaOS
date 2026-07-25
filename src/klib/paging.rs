@@ -1,9 +1,9 @@
+use core::mem;
 /// OOP-based Paging + Virtual Memory for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 7-8
 /// Implements 4-level page tables, PML4, userspace isolation, page fault handling,
 /// and Linux-style Copy-on-Write (CoW) address space cloning.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::vec::Vec;
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
@@ -267,9 +267,6 @@ impl VirtualMemoryManager for SimpleVMM {
             false
         };
 
-        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
-        let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
-
         if !pdpt_present {
             let pdpt_table_mut: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
             if let Some(ref mut pdpt) = pdpt_table_mut {
@@ -323,8 +320,8 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        let pt_table_mut: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
-        if let Some(ref mut pt) = pt_table_mut {
+        let pt_idx_in_vec = pd_idx;
+        if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
             pt_entry.set_writable(writable);
@@ -347,28 +344,19 @@ impl VirtualMemoryManager for SimpleVMM {
             return Err(PageFaultError::NotPresent);
         }
 
-        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pml4_idx];
-        if let Some(ref mut pdpt) = pdpt_table {
+        if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
             let pdpt_present = pdpt.get_entry(pdpt_idx).is_present();
             if !pdpt_present {
                 return Err(PageFaultError::NotPresent);
             }
 
-            let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
-            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
-
-            let pd_table: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
-            if let Some(ref mut pd) = pd_table {
+            if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
                 let pd_present = pd.get_entry(pd_idx).is_present();
                 if !pd_present {
                     return Err(PageFaultError::NotPresent);
                 }
 
-                let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
-                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
-
-                let pt_table: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
-                if let Some(ref mut pt) = pt_table {
+                if let Some(ref mut pt) = self.pt_tables[pd_idx] {
                     let mut pt_entry = SimplePageTableEntry::new();
                     pt_entry.set_present(false);
                     pt.set_entry(pt_idx, pt_entry);
@@ -396,19 +384,13 @@ impl VirtualMemoryManager for SimpleVMM {
                 return None;
             }
 
-            let pdpt_phys = self.pml4.get_entry_ref(pml4_idx).get_physical_address();
-            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
-
-            if let Some(ref pd) = self.pd_tables[pd_idx_in_vec] {
+            if let Some(ref pd) = self.pd_tables[pdpt_idx] {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
                 }
 
-                let pd_phys = pdpt.get_entry_ref(pdpt_idx).get_physical_address();
-                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
-
-                if let Some(ref pt) = self.pt_tables[pt_idx_in_vec] {
+                if let Some(ref pt) = self.pt_tables[pd_idx] {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
                         let page_offset = virt & 0xFFF;
@@ -513,69 +495,166 @@ impl ProcessMemory for SimpleProcessMemory {
             return Err(PageFaultError::InvalidAddress);
         }
 
-        let child_id = self.create_address_space()?;
-        let mut child_vmm = SimpleVMM::new();
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-        if let Some(ref mut parent_vmm) = self.address_spaces[parent_id] {
-            // Iterate over active page directory indices
-            for pml4_idx in 0..512 {
-                if parent_vmm.pml4.get_entry(pml4_idx).is_present() {
-                    if let Some(ref mut pdpt_opt) = parent_vmm.pdpt_tables.get_mut(pml4_idx) {
-                        if let Some(ref mut pdpt) = *pdpt_opt {
-                            for pdpt_idx in 0..512 {
-                                if pdpt.get_entry(pdpt_idx).is_present() {
-                                    if let Some(ref mut pd_opt) =
-                                        parent_vmm.pd_tables.get_mut(pdpt_idx)
-                                    {
-                                        if let Some(ref mut pd) = *pd_opt {
-                                            for pd_idx in 0..512 {
-                                                if pd.get_entry(pd_idx).is_present() {
-                                                    if let Some(ref mut pt_opt) =
-                                                        parent_vmm.pt_tables.get_mut(pd_idx)
-                                                    {
-                                                        if let Some(ref mut pt) = *pt_opt {
-                                                            for pt_idx in 0..512 {
-                                                                let entry = pt.get_entry(pt_idx);
-                                                                if entry.is_present() {
-                                                                    let virt = (pml4_idx << 39)
-                                                                        | (pdpt_idx << 30)
-                                                                        | (pd_idx << 21)
-                                                                        | (pt_idx << 12);
-                                                                    let phys = entry
-                                                                        .get_physical_address();
-                                                                    let is_user =
-                                                                        entry.is_user_accessible();
-                                                                    let was_writable =
-                                                                        entry.is_writable();
-
-                                                                    // If it was writable, we apply Copy-On-Write (mark read-only)
-                                                                    if was_writable {
-                                                                        entry.set_writable(false);
-                                                                    }
-
-                                                                    // Map in child VMM as read-only too (Copy-On-Write)
-                                                                    child_vmm.map_page(
-                                                                        virt, phys, is_user, false,
-                                                                    )?;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
             }
         }
 
         self.address_spaces[child_id] = Some(child_vmm);
         Ok(child_id)
     }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -607,7 +686,9 @@ mod tests {
         let mut pm = SimpleProcessMemory::new();
         let space_id = pm.create_address_space().unwrap();
 
-        assert!(pm.map_region(space_id, 0x4000_0000, 8192, true, true).is_ok());
+        assert!(pm
+            .map_region(space_id, 0x4000_0000, 8192, true, true)
+            .is_ok());
 
         assert!(pm.destroy_address_space(space_id).is_ok());
     }

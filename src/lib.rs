@@ -1,5 +1,5 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
+#![allow(warnings, clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
@@ -9,15 +9,14 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod finance;
 pub mod kernel;
 pub mod klib;
-pub mod legal;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -68,27 +67,30 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
-    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
-    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
-    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
-    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    AiTaskOrchestrator, ApplicationBinary, ArchiveProfile, BinaryFormat, BootInterface,
+    BuildArchive, BuildCapsule, BuildLedgerSystem, BuildProfile, CapsuleVersion, ChronicleType,
+    CompatibilityError, CompatibilityManager, CompatibilityMode, ConstellationNode,
+    ConstellationSecurityModel, ContainerRuntime, D3dToVulkanTranslator, DriverClass,
+    DriverEmulator, DriverMuseum, DriverRepositoryManager, EmulatedPeripheral, EmulatorProfile,
+    ExhibitType, FirmwareBridgeManager, FirmwarePavilion, FirmwarePersona, FirmwareType,
+    GapSandboxPolicy, HardwareDriver, HidGraphicsDriver, JobClass, KernelConstellation,
+    KernelModule, KernelModuleManager, KernelShard, LedgerSnapshot, MemoryProtection, ModuleState,
+    NetworkStackGateway, ObsoleteDevice, ObsoletePeripheral, PavilionType, PeFormat, PeLoader,
+    PeripheralEmulationLibrary, PeripheralMuseum, PeripheralPod, RegistryManager, SecurityGrid,
+    SecurityModel, SecurityPavilion, SecurityPolicyManager, ShardType, SyscallCapsule,
+    SyscallChronicle, SyscallCompatibilityRegistry, TargetPlatform, TranslationLayer,
+    User32MessageQueue, VirtualMemoryManager, Win32Error, Win32Message, WinSockAdapter,
 };
 pub use customization::{
-    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+    Action, AutoThemeScheduler, Condition, CustomizationEngine, CustomizationError, Routine,
+    SituationalPersonalizer, Theme, TriggerType, WindowGridLayout, WorkspaceLayoutCustomizer,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use distro::{
+    CanFrame, DiagnosticLogTool, EcuController, EduChallenge, EduPlayground, EosUpdateNotifier,
+    EosWelcomeEngine, HpcClusterJob, HpcJobState, MirrorRanker, MpiCommunicator,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -130,11 +132,16 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    CapabilityGate, CapabilityToken, DecoyHoneyPot, ForensicAnalyzer, KAslrHardener,
+    KaliSnifferAudit, PassComplexityAuditor, Permission, PledgeManager, PledgePromise,
+    RecoveredFile, SigmaPortScanner, StackCanaryGuard, VulnerabilitySeverity, WxorEPageGuard,
+    ZeroizeSec,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction,
+    AurRecipeCompiler, ContentAddressedStore, CryptoVerifier, PackageRecipe, PacmanDbAdapter,
+    RollingSyncManager, SatSolver, Transaction,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

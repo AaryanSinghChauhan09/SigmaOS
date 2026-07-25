@@ -1,6 +1,7 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
+pub mod gap_closure;
 pub mod historic_linux;
 pub mod personality;
 pub mod sigmawin;
@@ -52,9 +53,9 @@ pub use historic_linux::{
 };
 
 pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
+    VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
 pub mod india_stack_localization;
