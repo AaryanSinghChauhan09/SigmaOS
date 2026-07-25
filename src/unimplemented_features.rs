@@ -1114,92 +1114,216 @@ impl UnifiedPackageManager {
 }
 
 // =========================================================================
-// CACHY LINUX INSPIRED BORE SCHEDULER & MICROARCHITECTURE PARSER
+// 17. FEDORA-STYLE MANDATORY ACCESS CONTROL (SELINUX PARITY)
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct BoreTask {
-    pub pid: u32,
-    pub burst_score: u32, // high burst = CPU hog, low burst = interactive
-    pub priority: u32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SecurityContextClass {
+    Process,
+    File,
+    Port,
 }
 
-pub struct CachyBoreScheduler {
-    pub tasks: Vec<BoreTask>,
-    pub base_timeslice_ms: u32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SecurityContext {
+    pub user: &'static str,
+    pub role: &'static str,
+    pub domain_type: &'static str,
 }
 
-impl CachyBoreScheduler {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MacPermission {
+    Read,
+    Write,
+    Execute,
+    Bind,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct AccessVectorCacheEntry {
+    pub subject_context: SecurityContext,
+    pub object_context: SecurityContext,
+    pub class: SecurityContextClass,
+    pub permission: MacPermission,
+    pub allowed: bool,
+}
+
+pub struct FedoraSELinuxMacEngine {
+    pub avc: [Option<AccessVectorCacheEntry>; 16],
+}
+
+impl FedoraSELinuxMacEngine {
     pub fn new() -> Self {
-        Self {
-            tasks: Vec::new(),
-            base_timeslice_ms: 10,
-        }
+        Self { avc: [None; 16] }
     }
 
-    pub fn register_task(&mut self, pid: u32, priority: u32) {
-        self.tasks.push(BoreTask {
-            pid,
-            burst_score: 0,
-            priority,
-        });
-    }
-
-    /// Logs runtime cpu burst periods, updating the dynamic interactive multiplier
-    pub fn log_cpu_burst(&mut self, pid: u32, burst_ms: u32) {
-        for t in &mut self.tasks {
-            if t.pid == pid {
-                t.burst_score = (t.burst_score + burst_ms).min(100);
+    pub fn register_rule(
+        &mut self,
+        subject: SecurityContext,
+        object: SecurityContext,
+        class: SecurityContextClass,
+        permission: MacPermission,
+        allowed: bool,
+    ) -> Result<(), &'static str> {
+        for slot in self.avc.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(AccessVectorCacheEntry {
+                    subject_context: subject,
+                    object_context: object,
+                    class,
+                    permission,
+                    allowed,
+                });
+                return Ok(());
             }
         }
+        Err("Mandatory Access Control Access Vector Cache rule limit exceeded")
     }
 
-    /// Evaluates dynamic scheduler timeslices, allocating wider windows to highly responsive/interactive tasks (BORE-style)
-    pub fn get_allocated_timeslice(&self, pid: u32) -> u32 {
-        for t in &self.tasks {
-            if t.pid == pid {
-                // Low burst tasks (interactive) get a latency multiplier/bonus
-                let interactive_bonus = 100 - t.burst_score;
-                return self.base_timeslice_ms + (interactive_bonus / 10);
+    pub fn check_permission(
+        &self,
+        subject: SecurityContext,
+        object: SecurityContext,
+        class: SecurityContextClass,
+        permission: MacPermission,
+    ) -> bool {
+        for slot in self.avc.iter() {
+            if let Some(ref entry) = slot {
+                if entry.subject_context == subject
+                    && entry.object_context == object
+                    && entry.class == class
+                    && entry.permission == permission
+                {
+                    return entry.allowed;
+                }
             }
         }
-        self.base_timeslice_ms
+        false // Default-Deny Security Model
     }
 }
 
-impl Default for CachyBoreScheduler {
-    fn default() -> Self {
-        Self::new()
-    }
+// =========================================================================
+// 18. FEDORA-STYLE SERVICE UNIT DEPENDENCY STATE MACHINE (SYSTEMD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceState {
+    Stopped,
+    Starting,
+    Running,
+    Failed,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MicroarchitectureLevel {
-    V1, // Basic x86_64
-    V2, // SSE4.2, SSSE3, popcnt
-    V3, // AVX, AVX2, BMI2, FMA
-    V4, // AVX-512
+pub struct SystemdService {
+    pub name: &'static str,
+    pub state: ServiceState,
+    pub dependencies: [&'static str; 4],
+    pub dep_count: usize,
 }
 
-pub struct CpuMicroarchitectureSelector {
-    pub supported_level: MicroarchitectureLevel,
+pub struct FedoraSystemdSupervisor {
+    pub services: [Option<SystemdService>; 8],
 }
 
-impl CpuMicroarchitectureSelector {
-    pub fn new(level: MicroarchitectureLevel) -> Self {
+impl FedoraSystemdSupervisor {
+    pub fn new() -> Self {
         Self {
-            supported_level: level,
+            services: [None; 8],
         }
     }
 
-    /// Checks if a dynamic compilation path can use AVX-512 or AVX2 optimized loops (Cachy Linux style)
-    pub fn can_use_avx512(&self) -> bool {
-        self.supported_level == MicroarchitectureLevel::V4
+    pub fn register_service(&mut self, service: SystemdService) -> Result<(), &'static str> {
+        for slot in self.services.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(service);
+                return Ok(());
+            }
+        }
+        Err("Systemd supervisor service registration limit reached")
     }
 
-    pub fn can_use_avx2(&self) -> bool {
-        self.supported_level == MicroarchitectureLevel::V3
-            || self.supported_level == MicroarchitectureLevel::V4
+    pub fn start_service(&mut self, name: &'static str) -> Result<(), &'static str> {
+        let mut service_idx = None;
+        for (idx, slot) in self.services.iter().enumerate() {
+            if let Some(ref s) = slot {
+                if s.name == name {
+                    service_idx = Some(idx);
+                    break;
+                }
+            }
+        }
+
+        let idx = service_idx.ok_or("Target systemd service not registered")?;
+
+        // Retrieve dependencies first
+        let deps = {
+            let s = self.services[idx].as_ref().unwrap();
+            if s.state == ServiceState::Running {
+                return Ok(());
+            }
+            s.dependencies
+        };
+        let dep_count = self.services[idx].as_ref().unwrap().dep_count;
+
+        // Verify dependencies are running first (parallel loading simulation)
+        for i in 0..dep_count {
+            let dep_name = deps[i];
+            let mut dep_running = false;
+            for other_slot in self.services.iter() {
+                if let Some(ref other) = other_slot {
+                    if other.name == dep_name && other.state == ServiceState::Running {
+                        dep_running = true;
+                        break;
+                    }
+                }
+            }
+            if !dep_running {
+                self.services[idx].as_mut().unwrap().state = ServiceState::Failed;
+                return Err("Failed to start service: dependency not active");
+            }
+        }
+
+        self.services[idx].as_mut().unwrap().state = ServiceState::Running;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 19. FEDORA-STYLE DELTARPM PATCH BLOCK RECONSTRUCTION (DELTARPM PARITY)
+// =========================================================================
+
+pub const DELTA_BLOCK_SIZE: usize = 128;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeltaRpmDiffBlock {
+    pub offset: usize,
+    pub patch_bytes: [u8; 16],
+    pub patch_len: usize,
+}
+
+pub struct FedoraDeltaRpmEngine;
+
+impl FedoraDeltaRpmEngine {
+    pub fn reconstruct_package(
+        base_package: &[u8],
+        diffs: &[DeltaRpmDiffBlock],
+        output_buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
+        if output_buffer.len() < base_package.len() {
+            return Err("Reconstruction buffer overflow: output space too small");
+        }
+        output_buffer[..base_package.len()].copy_from_slice(base_package);
+
+        for diff in diffs {
+            if diff.offset + diff.patch_len > output_buffer.len() {
+                return Err("Corrupt DeltaRPM block: patch offset exceeds bounds");
+            }
+            output_buffer[diff.offset..diff.offset + diff.patch_len]
+                .copy_from_slice(&diff.patch_bytes[..diff.patch_len]);
+        }
+
+        Ok(base_package.len())
     }
 }
 
@@ -1523,28 +1647,92 @@ mod tests {
     }
 
     #[test]
-    fn test_cachy_bore_scheduler() {
-        let mut scheduler = CachyBoreScheduler::new();
-        scheduler.register_task(101, 5);
-        scheduler.register_task(102, 10);
+    fn test_fedora_selinux_mac() {
+        let mut engine = FedoraSELinuxMacEngine::new();
+        let s_context = SecurityContext {
+            user: "unconfined_u",
+            role: "unconfined_r",
+            domain_type: "unconfined_t",
+        };
+        let o_context = SecurityContext {
+            user: "system_u",
+            role: "object_r",
+            domain_type: "httpd_sys_content_t",
+        };
 
-        // Intitially both tasks have 0 burst, getting the max interactive bonus timeslice
-        assert_eq!(scheduler.get_allocated_timeslice(101), 20);
+        assert!(engine
+            .register_rule(
+                s_context,
+                o_context,
+                SecurityContextClass::File,
+                MacPermission::Read,
+                true
+            )
+            .is_ok());
 
-        // Process 101 logs some CPU-burst hogging activity
-        scheduler.log_cpu_burst(101, 50);
-        // Interactive bonus is reduced, timeslice is narrower
-        assert_eq!(scheduler.get_allocated_timeslice(101), 15);
+        assert!(engine.check_permission(
+            s_context,
+            o_context,
+            SecurityContextClass::File,
+            MacPermission::Read
+        ));
+        assert!(!engine.check_permission(
+            s_context,
+            o_context,
+            SecurityContextClass::File,
+            MacPermission::Write
+        ));
     }
 
     #[test]
-    fn test_cpu_microarchitecture_levels() {
-        let v3_cpu = CpuMicroarchitectureSelector::new(MicroarchitectureLevel::V3);
-        assert!(v3_cpu.can_use_avx2());
-        assert!(!v3_cpu.can_use_avx512());
+    fn test_fedora_systemd_supervisor() {
+        let mut supervisor = FedoraSystemdSupervisor::new();
+        let db_service = SystemdService {
+            name: "postgresql",
+            state: ServiceState::Running,
+            dependencies: [""; 4],
+            dep_count: 0,
+        };
+        let app_service = SystemdService {
+            name: "web_app",
+            state: ServiceState::Stopped,
+            dependencies: {
+                let mut d = [""; 4];
+                d[0] = "postgresql";
+                d
+            },
+            dep_count: 1,
+        };
 
-        let v4_cpu = CpuMicroarchitectureSelector::new(MicroarchitectureLevel::V4);
-        assert!(v4_cpu.can_use_avx2());
-        assert!(v4_cpu.can_use_avx512());
+        assert!(supervisor.register_service(db_service).is_ok());
+        assert!(supervisor.register_service(app_service).is_ok());
+
+        assert!(supervisor.start_service("web_app").is_ok());
+        assert_eq!(
+            supervisor.services[1].as_ref().unwrap().state,
+            ServiceState::Running
+        );
+    }
+
+    #[test]
+    fn test_fedora_deltarpm_reconstruction() {
+        let base_pkg = [0x11, 0x22, 0x33, 0x44, 0x55];
+        let diffs = [DeltaRpmDiffBlock {
+            offset: 2,
+            patch_bytes: {
+                let mut b = [0u8; 16];
+                b[0] = 0x99;
+                b[1] = 0x88;
+                b
+            },
+            patch_len: 2,
+        }];
+
+        let mut reconstructed = [0u8; 16];
+        let len = FedoraDeltaRpmEngine::reconstruct_package(&base_pkg, &diffs, &mut reconstructed)
+            .unwrap();
+
+        assert_eq!(len, 5);
+        assert_eq!(reconstructed[..5], [0x11, 0x22, 0x99, 0x88, 0x55]);
     }
 }

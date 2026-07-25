@@ -1,12 +1,57 @@
-//! OOP-based Networking Stack (TCP/UDP) for SigmaOS
-//! Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
-//! Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-//! Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-
+use core::mem;
+/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
+/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
+/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
+/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Protocol {
+    TCP = 0,
+    UDP = 1,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+    InvalidParameter = 4,
+}
+
+pub trait Socket {
+    fn id(&self) -> SocketID;
+    fn protocol(&self) -> Protocol;
+    fn local_port(&self) -> Port;
+    fn remote_port(&self) -> Port;
+}
+
+/// Linux BSD Socket Option Interface
+pub trait BsdSocket: Socket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketOption {
