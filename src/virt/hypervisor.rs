@@ -1,29 +1,47 @@
-#![no_std]
-#![no_main]
-
+use crate::klib::Vec;
 /// OOP-based Hypervisor for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 181
 /// Implements virtualization and guest management
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type GuestID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum GuestState { Stopped = 0, Running = 1, Paused = 2, Crashed = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GuestState {
+    Stopped = 0,
+    Running = 1,
+    Paused = 2,
+    Crashed = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum HypervisorError { Success = 0, NotFound = 1, StartFailed = 2, InvalidConfig = 3 }
+pub enum HypervisorError {
+    Success = 0,
+    NotFound = 1,
+    StartFailed = 2,
+    InvalidConfig = 3,
+}
+
+/// Represents the virtualization generation model (Legacy software vs Modern hardware-assisted)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VirtualizationGeneration {
+    LegacySoftware, // Binary translation, shadow page tables (QEMU/VirtualBox style)
+    ModernHardwareAssisted, // VT-x/AMD-V, Extended Page Tables (EPT), Nested Virtualization
+}
 
 pub trait Guest {
     fn id(&self) -> GuestID;
     fn name(&self) -> &[u8];
     fn state(&self) -> GuestState;
+    fn set_state(&mut self, state: GuestState);
     fn vcpus(&self) -> u32;
     fn memory_mb(&self) -> u32;
+    fn generation(&self) -> VirtualizationGeneration;
+    fn configure_nested_virtualization(&mut self, enabled: bool) -> Result<(), HypervisorError>;
+    fn hardware_exit_count(&self) -> usize;
+    fn increment_exit_count(&mut self);
 }
 
 #[repr(C)]
@@ -33,10 +51,19 @@ pub struct SimpleGuest {
     pub state: AtomicUsize,
     pub vcpus: AtomicUsize,
     pub memory_mb: AtomicUsize,
+    pub gen: VirtualizationGeneration,
+    pub nested_virt: bool,
+    pub exit_count: AtomicUsize,
 }
 
 impl SimpleGuest {
-    pub fn new(id: GuestID, name: &[u8], vcpus: u32, memory_mb: u32) -> Self {
+    pub fn new(
+        id: GuestID,
+        name: &[u8],
+        vcpus: u32,
+        memory_mb: u32,
+        gen: VirtualizationGeneration,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
         unsafe {
@@ -48,34 +75,83 @@ impl SimpleGuest {
             state: AtomicUsize::new(GuestState::Stopped as usize),
             vcpus: AtomicUsize::new(vcpus as usize),
             memory_mb: AtomicUsize::new(memory_mb as usize),
+            gen,
+            nested_virt: false,
+            exit_count: AtomicUsize::new(0),
         }
     }
 }
 
 impl Guest for SimpleGuest {
-    fn id(&self) -> GuestID { self.id }
+    fn id(&self) -> GuestID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> GuestState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    fn vcpus(&self) -> u32 { self.vcpus.load(Ordering::SeqCst) as u32 }
-    fn memory_mb(&self) -> u32 { self.memory_mb.load(Ordering::SeqCst) as u32 }
+    fn state(&self) -> GuestState {
+        let state_val = self.state.load(Ordering::SeqCst);
+        match state_val {
+            0 => GuestState::Stopped,
+            1 => GuestState::Running,
+            2 => GuestState::Paused,
+            _ => GuestState::Crashed,
+        }
+    }
+    fn set_state(&mut self, state: GuestState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn vcpus(&self) -> u32 {
+        self.vcpus.load(Ordering::SeqCst) as u32
+    }
+    fn memory_mb(&self) -> u32 {
+        self.memory_mb.load(Ordering::SeqCst) as u32
+    }
+    fn generation(&self) -> VirtualizationGeneration {
+        self.gen
+    }
+    fn configure_nested_virtualization(&mut self, enabled: bool) -> Result<(), HypervisorError> {
+        if self.gen == VirtualizationGeneration::LegacySoftware {
+            return Err(HypervisorError::InvalidConfig); // Legacy cannot run nested VMs
+        }
+        self.nested_virt = enabled;
+        Ok(())
+    }
+    fn hardware_exit_count(&self) -> usize {
+        self.exit_count.load(Ordering::SeqCst)
+    }
+    fn increment_exit_count(&mut self) {
+        self.exit_count.fetch_add(1, Ordering::SeqCst);
+    }
 }
 
 pub trait Hypervisor {
-    fn create_guest(&mut self, name: &[u8], vcpus: u32, memory_mb: u32) -> Result<GuestID, HypervisorError>;
+    fn create_guest(
+        &mut self,
+        name: &[u8],
+        vcpus: u32,
+        memory_mb: u32,
+        gen: VirtualizationGeneration,
+    ) -> Result<GuestID, HypervisorError>;
     fn destroy_guest(&mut self, id: GuestID) -> Result<(), HypervisorError>;
     fn start_guest(&mut self, id: GuestID) -> Result<(), HypervisorError>;
     fn stop_guest(&mut self, id: GuestID) -> Result<(), HypervisorError>;
     fn pause_guest(&mut self, id: GuestID) -> Result<(), HypervisorError>;
     fn resume_guest(&mut self, id: GuestID) -> Result<(), HypervisorError>;
+    fn inject_hardware_exit(&mut self, id: GuestID) -> Result<(), HypervisorError>;
 }
 
 #[repr(C)]
 pub struct SimpleHypervisor {
     pub guests: Vec<Option<Box<dyn Guest>>>,
     pub next_id: AtomicUsize,
+}
+
+impl Default for SimpleHypervisor {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleHypervisor {
@@ -88,9 +164,15 @@ impl SimpleHypervisor {
 }
 
 impl Hypervisor for SimpleHypervisor {
-    fn create_guest(&mut self, name: &[u8], vcpus: u32, memory_mb: u32) -> Result<GuestID, HypervisorError> {
+    fn create_guest(
+        &mut self,
+        name: &[u8],
+        vcpus: u32,
+        memory_mb: u32,
+        gen: VirtualizationGeneration,
+    ) -> Result<GuestID, HypervisorError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let guest = SimpleGuest::new(id, name, vcpus, memory_mb);
+        let guest = SimpleGuest::new(id, name, vcpus, memory_mb, gen);
         self.guests.push(Some(Box::new(guest)));
         Ok(id)
     }
@@ -110,7 +192,7 @@ impl Hypervisor for SimpleHypervisor {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
                 if guest.id() == id {
-                    guest.state.store(GuestState::Running as usize, Ordering::SeqCst);
+                    guest.set_state(GuestState::Running);
                     return Ok(());
                 }
             }
@@ -122,7 +204,7 @@ impl Hypervisor for SimpleHypervisor {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
                 if guest.id() == id {
-                    guest.state.store(GuestState::Stopped as usize, Ordering::SeqCst);
+                    guest.set_state(GuestState::Stopped);
                     return Ok(());
                 }
             }
@@ -134,7 +216,7 @@ impl Hypervisor for SimpleHypervisor {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
                 if guest.id() == id {
-                    guest.state.store(GuestState::Paused as usize, Ordering::SeqCst);
+                    guest.set_state(GuestState::Paused);
                     return Ok(());
                 }
             }
@@ -146,7 +228,19 @@ impl Hypervisor for SimpleHypervisor {
         for guest_option in &mut self.guests {
             if let Some(ref mut guest) = *guest_option {
                 if guest.id() == id {
-                    guest.state.store(GuestState::Running as usize, Ordering::SeqCst);
+                    guest.set_state(GuestState::Running);
+                    return Ok(());
+                }
+            }
+        }
+        Err(HypervisorError::NotFound)
+    }
+
+    fn inject_hardware_exit(&mut self, id: GuestID) -> Result<(), HypervisorError> {
+        for guest_option in &mut self.guests {
+            if let Some(ref mut guest) = *guest_option {
+                if guest.id() == id {
+                    guest.increment_exit_count();
                     return Ok(());
                 }
             }
@@ -161,8 +255,15 @@ pub trait VMExitHandler {
 }
 
 #[repr(C)]
+#[allow(clippy::type_complexity)]
 pub struct SimpleVMExitHandler {
     pub handlers: Vec<(u64, fn(GuestID, u64))>,
+}
+
+impl Default for SimpleVMExitHandler {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleVMExitHandler {
@@ -189,29 +290,91 @@ impl VMExitHandler for SimpleVMExitHandler {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hypervisor_and_guest_generations_oop() {
+        let mut hypervisor = SimpleHypervisor::new();
+
+        // 1. Create a legacy software guest VM (e.g. simulating QEMU translation)
+        let guest_legacy_id = hypervisor
+            .create_guest(
+                b"qemu-legacy-winxp",
+                1,
+                512,
+                VirtualizationGeneration::LegacySoftware,
+            )
+            .unwrap();
+
+        // 2. Create a modern hardware-assisted guest VM (e.g. simulating VT-x / EPT nested guest)
+        let guest_modern_id = hypervisor
+            .create_guest(
+                b"kvm-modern-linux",
+                4,
+                4096,
+                VirtualizationGeneration::ModernHardwareAssisted,
+            )
+            .unwrap();
+
+        // Verify ID assignment and retrieve guests
+        assert_eq!(guest_legacy_id, 1);
+        assert_eq!(guest_modern_id, 2);
+
+        // Mutably configure guest parameters via OOP traits
+        for guest_opt in &mut hypervisor.guests {
+            if let Some(ref mut guest) = *guest_opt {
+                if guest.id() == guest_legacy_id {
+                    assert_eq!(guest.generation(), VirtualizationGeneration::LegacySoftware);
+                    assert_eq!(guest.state(), GuestState::Stopped);
+                    // Legacy software guests should fail on nested virtualization configuration
+                    assert!(guest.configure_nested_virtualization(true).is_err());
+                } else if guest.id() == guest_modern_id {
+                    assert_eq!(
+                        guest.generation(),
+                        VirtualizationGeneration::ModernHardwareAssisted
+                    );
+                    assert_eq!(guest.state(), GuestState::Stopped);
+                    // Modern nested virtualization configuration should succeed
+                    assert!(guest.configure_nested_virtualization(true).is_ok());
+                }
+            }
+        }
+
+        // Test start/stop guest lifecycles
+        assert!(hypervisor.start_guest(guest_modern_id).is_ok());
+        for guest_opt in &hypervisor.guests {
+            if let Some(ref guest) = *guest_opt {
+                if guest.id() == guest_modern_id {
+                    assert_eq!(guest.state(), GuestState::Running);
+                }
+            }
+        }
+
+        // Test Hardware-assisted VMExit handler statistics
+        assert!(hypervisor.inject_hardware_exit(guest_modern_id).is_ok());
+        for guest_opt in &hypervisor.guests {
+            if let Some(ref guest) = *guest_opt {
+                if guest.id() == guest_modern_id {
+                    assert_eq!(guest.hardware_exit_count(), 1);
+                }
             }
         }
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
+
+    #[test]
+    fn test_vmexit_handler() {
+        let mut exit_handler = SimpleVMExitHandler::new();
+
+        // Register sample handler for exit reason 0x80 (e.g. CPUID vmexit instruction)
+        fn handle_cpuid(_guest_id: GuestID, _reason: u64) {
+            println!("VMEXIT handle CPUID");
         }
+        exit_handler.register_handler(0x80, handle_cpuid);
+
+        assert!(exit_handler.handle_exit(1, 0x80).is_ok());
+        assert!(exit_handler.handle_exit(1, 0x99).is_err()); // Unregistered exit reason
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

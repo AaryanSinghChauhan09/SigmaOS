@@ -202,6 +202,100 @@ impl KubernetesPod {
     }
 }
 
+/// Strategy Pattern for managing virtualization life cycles (OOP Pattern)
+pub trait VirtualizationStrategy {
+    fn name(&self) -> &'static str;
+    fn generation(&self) -> &'static str; // "Legacy" (QEMU/VirtualBox) vs "Modern" (K8s/Docker/MicroVMs)
+    fn supports_live_migration(&self) -> bool;
+    fn execute_start(&self, target_name: &str) -> Result<(), VirtualizationError>;
+    fn execute_stop(&self, target_name: &str) -> Result<(), VirtualizationError>;
+}
+
+/// Abstract Factory for creating Virtualization Strategies based on technology (OOP Pattern)
+pub struct VirtualizationStrategyFactory;
+
+impl VirtualizationStrategyFactory {
+    pub fn get_strategy(tech: VirtualizationTech) -> Box<dyn VirtualizationStrategy> {
+        match tech {
+            VirtualizationTech::KVM | VirtualizationTech::QEMU | VirtualizationTech::VirtualBox => {
+                Box::new(LegacyVirtualizationStrategy { tech })
+            }
+            _ => Box::new(ModernVirtualizationStrategy { tech }),
+        }
+    }
+}
+
+pub struct LegacyVirtualizationStrategy {
+    pub tech: VirtualizationTech,
+}
+
+impl VirtualizationStrategy for LegacyVirtualizationStrategy {
+    fn name(&self) -> &'static str {
+        match self.tech {
+            VirtualizationTech::KVM => "KVM Hardware Emulation",
+            VirtualizationTech::QEMU => "QEMU Quick Emulator",
+            _ => "VirtualBox Emulation",
+        }
+    }
+
+    fn generation(&self) -> &'static str {
+        "Legacy"
+    }
+
+    fn supports_live_migration(&self) -> bool {
+        false
+    }
+
+    fn execute_start(&self, target_name: &str) -> Result<(), VirtualizationError> {
+        println!("Legacy software simulation starting VM: {}", target_name);
+        Ok(())
+    }
+
+    fn execute_stop(&self, target_name: &str) -> Result<(), VirtualizationError> {
+        println!("Legacy software simulation stopping VM: {}", target_name);
+        Ok(())
+    }
+}
+
+pub struct ModernVirtualizationStrategy {
+    pub tech: VirtualizationTech,
+}
+
+impl VirtualizationStrategy for ModernVirtualizationStrategy {
+    fn name(&self) -> &'static str {
+        match self.tech {
+            VirtualizationTech::Docker => "Docker Container Engine",
+            VirtualizationTech::Podman => "Podman Rootless Daemon",
+            VirtualizationTech::Kubernetes => "Kubernetes Container Orchestrator",
+            _ => "LXC/LXD System Containers",
+        }
+    }
+
+    fn generation(&self) -> &'static str {
+        "Modern"
+    }
+
+    fn supports_live_migration(&self) -> bool {
+        true
+    }
+
+    fn execute_start(&self, target_name: &str) -> Result<(), VirtualizationError> {
+        println!(
+            "Modern sandboxed hypervisor deploying target: {}",
+            target_name
+        );
+        Ok(())
+    }
+
+    fn execute_stop(&self, target_name: &str) -> Result<(), VirtualizationError> {
+        println!(
+            "Modern sandboxed hypervisor terminating target: {}",
+            target_name
+        );
+        Ok(())
+    }
+}
+
 /// Virtualization orchestrator
 pub struct VirtualizationOrchestrator {
     pub virtual_machines: HashMap<String, VirtualMachine>,
@@ -532,5 +626,21 @@ mod tests {
         .with_resources(2, 2048, 20);
         assert!(orchestrator.add_virtual_machine(vm).is_ok());
         assert_eq!(orchestrator.virtual_machines.len(), 1);
+    }
+
+    #[test]
+    fn test_virtualization_strategy_factory_oop() {
+        // Test Legacy Strategy
+        let legacy_strat = VirtualizationStrategyFactory::get_strategy(VirtualizationTech::QEMU);
+        assert_eq!(legacy_strat.generation(), "Legacy");
+        assert!(!legacy_strat.supports_live_migration());
+        assert!(legacy_strat.execute_start("win98_guest").is_ok());
+
+        // Test Modern Strategy
+        let modern_strat =
+            VirtualizationStrategyFactory::get_strategy(VirtualizationTech::Kubernetes);
+        assert_eq!(modern_strat.generation(), "Modern");
+        assert!(modern_strat.supports_live_migration());
+        assert!(modern_strat.execute_start("web-pod-v2").is_ok());
     }
 }

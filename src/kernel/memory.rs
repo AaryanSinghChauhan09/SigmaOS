@@ -66,7 +66,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -199,6 +199,12 @@ impl PageFlags {
 #[repr(C)]
 pub struct PageTableEntry(u64);
 
+impl Default for PageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
@@ -220,7 +226,7 @@ impl PageTableEntry {
     pub fn is_present(&self) -> bool {
         (self.0 & PageFlags::PRESENT) != 0
     }
-    
+
     pub fn clear(&mut self) {
         self.0 = 0;
     }
@@ -230,6 +236,12 @@ impl PageTableEntry {
 #[repr(align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 512],
+}
+
+impl Default for PageTable {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PageTable {
@@ -256,7 +268,7 @@ impl VirtualMemoryManager {
         // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_ref() };
-        
+
         let entry = &root.entries[pt_index as usize];
         if entry.is_present() {
             Some(entry.get_addr() + (virtual_addr & 0xFFF))
@@ -266,15 +278,20 @@ impl VirtualMemoryManager {
     }
 
     /// Maps a virtual page to a physical frame
-    pub fn map_page(&mut self, virtual_addr: u64, physical_addr: u64, flags: PageFlags) -> Result<(), &'static str> {
+    pub fn map_page(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        flags: PageFlags,
+    ) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
-        
+
         let entry = &mut root.entries[pt_index as usize];
         if entry.is_present() {
             return Err("Page already mapped!");
         }
-        
+
         entry.set_addr(physical_addr, flags);
         Ok(())
     }
@@ -283,12 +300,12 @@ impl VirtualMemoryManager {
     pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
-        
+
         let entry = &mut root.entries[pt_index as usize];
         if !entry.is_present() {
             return Err("Page is not mapped!");
         }
-        
+
         entry.clear();
         Ok(())
     }
@@ -317,7 +334,7 @@ mod tests {
         let mut allocator = BuddyAllocator::new();
         // This would need actual memory to work properly
         // For now, just test the interface
-        let result = allocator.allocate(4096);
+        let _result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
     }
 }

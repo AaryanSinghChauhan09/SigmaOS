@@ -1,21 +1,16 @@
-#![no_std]
-#![no_main]
-
+use crate::klib::Vec;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
 /// Implements microVM sandboxing using OOP principles with traits and structs
 /// No dependency on external virtualization frameworks
 /// Based on Roadmap Item 19: MicroVM sandboxing foundation
-
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// MicroVM ID
 pub type MicroVMID = usize;
 
 /// MicroVM state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MicroVMState {
     Stopped = 0,
     Starting = 1,
@@ -26,7 +21,7 @@ pub enum MicroVMState {
 
 /// Sandbox policy
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxPolicy {
     Strict = 0,
     Moderate = 1,
@@ -101,6 +96,12 @@ pub struct MicroVMCapability {
     pub can_pause: bool,
 }
 
+impl Default for MicroVMCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MicroVMCapability {
     pub fn new() -> Self {
         MicroVMCapability {
@@ -132,7 +133,12 @@ pub struct SimpleMicroVM {
 }
 
 impl SimpleMicroVM {
-    pub fn new(id: MicroVMID, name: &[u8], sandbox_policy: SandboxPolicy, capability: MicroVMCapability) -> Self {
+    pub fn new(
+        id: MicroVMID,
+        name: &[u8],
+        sandbox_policy: SandboxPolicy,
+        capability: MicroVMCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -157,8 +163,13 @@ impl SimpleMicroVM {
     }
 
     pub fn get_state(&self) -> MicroVMState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        let state_val = self.state.load(Ordering::SeqCst);
+        match state_val {
+            0 => MicroVMState::Stopped,
+            1 => MicroVMState::Starting,
+            2 => MicroVMState::Running,
+            3 => MicroVMState::Stopping,
+            _ => MicroVMState::Paused,
         }
     }
 
@@ -250,7 +261,11 @@ impl MicroVM for SimpleMicroVM {
 /// Sandbox manager trait (OOP interface)
 pub trait SandboxManager {
     /// Create microVM
-    fn create_microvm(&mut self, name: &[u8], sandbox_policy: SandboxPolicy) -> Result<MicroVMID, MicroVMError>;
+    fn create_microvm(
+        &mut self,
+        name: &[u8],
+        sandbox_policy: SandboxPolicy,
+    ) -> Result<MicroVMID, MicroVMError>;
     /// Destroy microVM
     fn destroy_microvm(&mut self, id: MicroVMID) -> Result<(), MicroVMError>;
     /// Start microVM
@@ -267,11 +282,18 @@ pub trait SandboxManager {
 
 /// Sandbox statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SandboxStats {
     pub total_microvms: usize,
     pub running_microvms: usize,
     pub paused_microvms: usize,
     pub by_policy: [usize; 3],
+}
+
+impl Default for SandboxStats {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SandboxStats {
@@ -300,6 +322,12 @@ pub struct ManagerCapability {
     pub can_create: bool,
     pub can_destroy: bool,
     pub can_manage: bool,
+}
+
+impl Default for ManagerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ManagerCapability {
@@ -332,7 +360,11 @@ impl SimpleSandboxManager {
 }
 
 impl SandboxManager for SimpleSandboxManager {
-    fn create_microvm(&mut self, name: &[u8], sandbox_policy: SandboxPolicy) -> Result<MicroVMID, MicroVMError> {
+    fn create_microvm(
+        &mut self,
+        name: &[u8],
+        sandbox_policy: SandboxPolicy,
+    ) -> Result<MicroVMID, MicroVMError> {
         if !self.capability.can_create {
             return Err(MicroVMError::PermissionDenied);
         }
@@ -441,60 +473,37 @@ impl SandboxManager for SimpleSandboxManager {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_microvm_sandbox_policy_oop() {
+        let manager_cap = ManagerCapability::full();
+        let mut manager = SimpleSandboxManager::new(manager_cap);
+
+        // 1. Create a Strict sandbox microVM (e.g. secure, zero network/shared filesystem)
+        let microvm_strict_id = manager
+            .create_microvm(b"strict-secure-vbox", SandboxPolicy::Strict)
+            .unwrap();
+
+        // 2. Create a Permissive sandbox microVM (e.g. development mode)
+        let _microvm_permissive_id = manager
+            .create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive)
+            .unwrap();
+
+        // Verify statistics
+        let stats = manager.stats();
+        assert_eq!(stats.total_microvms, 2);
+        assert_eq!(stats.by_policy[SandboxPolicy::Strict as usize], 1);
+        assert_eq!(stats.by_policy[SandboxPolicy::Permissive as usize], 1);
+
+        // Retrieve and start strict sandbox microVM
+        assert!(manager.start_microvm(microvm_strict_id).is_ok());
+
+        let microvm_strict = manager.get_microvm(microvm_strict_id).unwrap();
+        assert_eq!(microvm_strict.state(), MicroVMState::Running);
+        assert_eq!(microvm_strict.sandbox_policy(), SandboxPolicy::Strict);
     }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
