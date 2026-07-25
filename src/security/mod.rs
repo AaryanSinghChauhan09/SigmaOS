@@ -73,3 +73,6 @@ pub use secrets::{
 pub use vulnerability::{
     KAslrHardener, Severity as VulnerabilitySeverity, StackCanaryGuard, WxorEPageGuard, ZeroizeSec,
 };
+pub use vulnerability::{
+    KAslrHardener, Severity as VulnerabilitySeverity, StackCanaryGuard, WxorEPageGuard, ZeroizeSec,
+};

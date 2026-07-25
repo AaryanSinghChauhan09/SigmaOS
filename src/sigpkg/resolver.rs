@@ -184,8 +184,8 @@ mod tests {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            String::new(),
-        );
+            checksum: String::new(),
+        };
 
         let pkg_b = Package::new(
             "B".to_string(),

@@ -25,7 +25,7 @@ pub enum GpuCommand {
     Present,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct DrmModeInfo {
     pub hdisplay: u16,
     pub vdisplay: u16,

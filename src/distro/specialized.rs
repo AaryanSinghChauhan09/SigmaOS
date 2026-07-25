@@ -507,35 +507,51 @@ mod tests {
     }
 
     #[test]
-    fn test_sigma_hardware_detection_mhwd() {
-        let mut detector = SigmaHardwareDetector::new();
-        // Scan a list of detected PCI peripheral devices
-        let bus_scan = vec![
-            (0x10DE, 0x2204), // NVIDIA RTX 4090 GPU
-            (0x8086, 0x1533), // Intel E1000 NIC
-            (0x9999, 0x9999), // Unsupported/unknown device
-        ];
+    fn test_endeavour_welcome_engine() {
+        let mut welcome = EosWelcomeEngine::new();
+        assert!(welcome.first_boot);
+        assert_eq!(
+            welcome.update_mirrors().unwrap(),
+            "Sovereign package mirrors configured successfully"
+        );
+        assert!(welcome.mirrors_configured);
 
-        let loaded_count = detector.scan_and_load_drivers(&bus_scan);
-        assert_eq!(loaded_count, 2);
-        assert!(detector.loaded_drivers.contains(&"nvidia-pcie-gen6"));
-        assert!(detector.loaded_drivers.contains(&"e1000e-ethernet"));
+        assert_eq!(
+            welcome.install_recommended_drivers().unwrap(),
+            "Modern Vulkan/GPU and HID drivers installed"
+        );
+        assert!(welcome.drivers_installed);
     }
 
     #[test]
-    fn test_sigma_settings_manager_msm() {
-        let mut manager = SigmaSettingsManager::new();
-        assert_eq!(manager.active_kernel, "Sovereign-LTS-6.1");
+    fn test_mirror_ranker() {
+        let ranker = MirrorRanker::new(500);
+        let mirrors = vec![
+            "mirror.us.sigmaos.org",
+            "mirror.in.sigmaos.org",
+            "mirror.de.sigmaos.org",
+        ];
+        let ranked = ranker.rank_mirrors(&mirrors);
+        assert_eq!(ranked.len(), 3);
+        assert_eq!(ranked[0].0, "mirror.us.sigmaos.org");
+        assert_eq!(ranked[0].1, 10);
+    }
 
-        // Switch kernel dynamically
-        assert!(manager.switch_kernel("Sovereign-RT-6.6").is_ok());
-        assert_eq!(manager.active_kernel, "Sovereign-RT-6.6");
+    #[test]
+    fn test_update_notifier_and_log_tool() {
+        let mut notifier = EosUpdateNotifier::new();
+        assert!(notifier.check_for_updates());
+        assert_eq!(notifier.pending_updates_count, 5);
 
-        // Switching to unsupported fails
-        assert!(manager.switch_kernel("Linux-Legacy").is_err());
+        let mut log_tool = DiagnosticLogTool::new();
+        log_tool.record_log_entry("Kernel", "Vulkan context bound successfully");
+        log_tool.record_log_entry(
+            "PackageManager",
+            "Transaction completed: installed sigma-vim",
+        );
 
-        // Update timezone settings
-        manager.update_timezone("Asia/Kolkata");
-        assert_eq!(manager.active_timezone, "Asia/Kolkata");
+        let report = log_tool.generate_troubleshooting_report();
+        assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
+        assert!(report.contains("[Kernel] Vulkan context bound successfully"));
     }
 }
