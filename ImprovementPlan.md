@@ -1,14 +1,14 @@
-# 🇸🇴 SigmaOS Sovereign Operating System Improvement Plan
+# 🇸🇴 SigmaOS Sovereign Operating System Improvement Plan & Strategic Roadmap
 ## 🚀 Guidelines, Multi-Dimensional Deep-Dive Audits, Self-Healing Resilience & Next Steps
 
-This document acts as the primary master specification and daily development blueprint for **SigmaOS**. It integrates a complete multi-dimensional audit of the repository, identifies critical fixes, suggests new features, highlights compliance gaps, applies Object-Oriented Programming (OOP) principles, outlines Bolt's daily performance optimization, presents high-fidelity comparative dashboards and timelines against major Linux distributions, and ranks recommended next steps by priority.
+This document serves as the primary master systems specification, daily developmental blueprint, and diagnostic roadmap for **SigmaOS**. It integrates a complete multi-dimensional audit of the repository, identifies critical compiler bugs, suggests next-generation features, highlights compliance gaps, applies Object-Oriented Programming (OOP) principles, outlines Bolt's daily performance optimization, presents high-fidelity comparative dashboards against major Linux distributions, and ranks recommended next steps by priority.
 
 ---
 
 ## 📋 1. Architectural Guidelines & Best Practices
 
 To maintain high security, digital sovereignty, hard real-time latency, and self-healing resilience:
-1. **Avoid Temporary Allocations:** Inside rendering loops, theme composition, or device polling loops, do not use temporary strings or vectors. Favor standard references or zero-copy `.map(|s| s.as_str()).unwrap_or("")` operations to ensure micro-stutter-free (jank-free) 120 FPS desktop compositing.
+1. **Avoid Temporary Allocations:** Inside rendering loops, theme composition, or device polling loops, do not use temporary strings or vectors. Favor standard references or zero-copy operations to ensure micro-stutter-free (jank-free) 120 FPS desktop compositing.
 2. **Enforce Capability Gates:** Every driver execution, filesystem mount, or system call must require validation of a `CapabilityToken` to prevent ambient privilege escalation.
 3. **Encapsulate Security Bitmasks:** Keep core cryptographic and security privilege fields private at all times. All permission checks must happen through private fields exposed exclusively via getter interfaces (e.g., `bits()`).
 4. **No Dynamic Libraries:** Avoid calling dynamic or shared library objects (`.so`, `.dll`). Every package or system layer must compile natively or run sandboxed in WebAssembly to prevent runtime injection.
@@ -18,20 +18,20 @@ To maintain high security, digital sovereignty, hard real-time latency, and self
 ## 🔍 2. Comprehensive Multi-Dimensional Codebase Audits
 
 ### 📊 A. Code Quality & Testing Audit
-* **Syntax & Compilation Issues:**
-  - `src/sigpkg/resolver.rs` previously had an unclosed parenthesis in its test block (`let pkg_a = Package { ... );`) and an incorrect use of `Package::new`. This has been corrected so that the `sigpkg` package manager parser module is fully valid.
-  - `src/security/capability.rs` has been refactored to support consistent builders, `bits()`, and zero-argument constructors, resolving compile errors across all GPU, network, input, storage, VESA, USB HID, VFS, subsystem, and protocols modules.
-  - `src/security/pledge.rs` has been updated with full compatibility with the re-designed `CapabilityToken`, resolving pledge verification system checks.
-  - `src/filesystem/archive.rs` has been updated to derive `std::hash::Hash` on `ArchiveFormat`, and its unit tests have been fixed to borrow `PathBuf` cleanly.
-  - `src/filesystem/manager.rs` navigate-to-bookmark has been updated via `.cloned()` to prevent simultaneous mutable and immutable borrows.
+* **Syntax & Compilation Issues (Immediate Next Steps):**
+  - **`src/net/stack.rs` (line 152):** Currently uses non-standard `pub protocol TcpSk { ... }` syntax. This must be refactored to a standard Rust `pub trait TcpSk { ... }` or converted to a concrete `pub struct` depending on system requirements.
+  - **`src/net/socket.rs` (line 63, etc.):** Employs Python-style `def` keywords inside the `SocketManager` trait instead of Rust-native `fn` keywords. These need to be corrected to standard Rust function signatures.
+  - **`src/net/mod.rs` (lines 3-4):** Refers to missing module files `pub mod device;` and `pub mod qdisc;`. These must be created or registered under conditional compile attributes to prevent compiler failures.
+  - **`src/kernel/memory.rs` (line 195):** Contains an unexpected closing delimiter/braces collision that breaks paging and memory module compilation.
+  - **`zenith_desktop` (crate):** Displays type mismatch errors where `?` operators cannot automatically map `AccessibilityError` or `AIError` types to `CompositorError`. Additionally, it features mutable and immutable borrow checker collisions when switching profiles.
 * **Linting & Style Checks:**
   - Multiple unused imports and variables exist across `src/filesystem/archive.rs`, `src/filesystem/disk_usage.rs`, `src/filesystem/manager.rs`, `src/security/intrusion.rs`, `src/security/vpn.rs`, `src/productivity/editor.rs`, and `src/productivity/email.rs`.
-  - Systemic reliance on `#![allow(warnings, clippy::all)]` suppresses warnings in hosted tests. These should be addressed individually.
+  - Systemic reliance on `#![allow(warnings, clippy::all)]` suppresses warnings in hosted tests. These should be addressed individually to satisfy strict Clippy requirements.
 * **Unit Testing Gaps:**
   - The `tests/integration_test.rs` currently contains only a placeholder test `test_system_integration()`.
   - Most utility libraries inside `src/` lack comprehensive unit tests. We need code coverage tools like `cargo tarpaulin` to audit the 82% of untested helper routines.
 * **Refactoring Opportunities:**
-  - `src/unimplemented_features.rs` is extremely large (>1400 lines) and acts as a monolith of placeholders. These should be distributed to their respective submodules (e.g., `src/net/`, `src/drivers/`) to restore modular microkernel cohesion.
+  - `src/unimplemented_features.rs` is extremely large (>1500 lines) and acts as a monolith of placeholders. These should be distributed to their respective submodules (e.g., `src/net/`, `src/drivers/`) to restore modular microkernel cohesion.
   - Overlapping structures for `CapabilityToken` and `Permission` in `src/security/capability.rs`, `src/security/capability_enforcer.rs`, and `src/security/selinux.rs` should be unified into a single canonical security namespace.
 
 ---
@@ -61,12 +61,14 @@ To maintain high security, digital sovereignty, hard real-time latency, and self
 
 ### 🧩 D. Object-Oriented Programming (OOP) Principles Audit
 * **Encapsulation:**
-  - `CapabilityToken` and its internal bitmasks have been encapsulated with standard getter APIs (`bits()`) and self builders.
+  - Related data and methods must be tightly grouped. Ensure `CapabilityToken` and its internal bitmasks are private and exposed exclusively via clear builder interfaces.
 * **Inheritance & Polymorphism:**
-  - `DeviceDriver` polymorphic interface is established, but concrete classes can inherit more logic from a `BaseDriver` helper class.
-* **Design Patterns:**
-  - Use Singleton for `SystemAutomationManager` and `PledgeManager`.
-  - Use Factory pattern for dynamic package adapters and filesystem driver loading.
+  - The Microkernel driver ecosystem should establish concrete, polymorphic classes (such as `BaseDriver` base classes and device-family subclasses like `PS2MouseDriver` or `IntelProEthernetDriver`) to abstract driver dynamic-linking.
+* **Abstraction:**
+  - Complex microkernel functions (such as page directory controller walks or package verification pipelines) should be abstracted into simple reusable interfaces.
+* **OOP Design Patterns:**
+  - **Singleton Pattern:** Ensure central registers such as `PledgeManager`, `SystemAutomationManager`, or the `DriverRegistry` are instantiated strictly as thread-safe, lock-free singletons (e.g., using `lazy_static` or `OnceCell`).
+  - **Factory Pattern:** Adopt dynamic factories for lazy-loading package adapters and loading different file system driver strategies (`BtrfsFilesystem`, `XfsFilesystem`, `SigmaFs`).
 
 ---
 
@@ -174,6 +176,7 @@ We rank the remaining improvements into a strict priority hierarchy:
 1. **Unify Capability Interfaces:** Resolve the missing `allow_exec()` and `allow_ipc()` methods in `src/security/pledge.rs` and update `CapabilityToken` in `src/security/capability.rs` to expose a consistent set of permission builders. (Fully implemented & resolved!)
 2. **Correct Borrow Checker Gaps:** Refactor `src/filesystem/manager.rs` to retrieve bookmark paths before executing mutable self navigations, decoupling the immutable borrow from the mutable borrow. (Fully implemented & resolved!)
 3. **Fix Move/Borrow Errors:** Standardize cloning for `String` and `PasswordEntry` in `src/productivity/clipboard_manager.rs` and `src/security/password.rs` to stop borrow-after-move errors.
+4. **Resolve Microkernel Compiling Bugs:** Correct non-standard `protocol` declarations in `src/net/stack.rs`, Python-like `def` syntax inside traits in `src/net/socket.rs`, and address the brace collisions in `src/kernel/memory.rs` to enable workspace-wide library compiling.
 
 ### 🟡 Medium Priority
 1. **Expand Unit Tests:** Refactor `tests/integration_test.rs` to implement real end-to-end integration tests for the MLFQ scheduler and SAT solver package resolver.
