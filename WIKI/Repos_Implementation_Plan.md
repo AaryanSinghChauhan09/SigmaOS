@@ -6,8 +6,6 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 
 ## 📅 Roadmap Overview
 
-The integration follows a structured, multi-phase strategic milestone sequence to incrementally stabilize core systems before exposing advanced consumer features.
-
 ```text
   Phase 1: Stabilization & Foundation  [Q1-Q2]  -->  Phase 2: Capability & Hardening [Q2-Q3]
                                                                         |
@@ -18,8 +16,8 @@ The integration follows a structured, multi-phase strategic milestone sequence t
 
 ## 🚀 Milestones & Implementation Steps
 
-### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Q1-Q2)
-*Focus: Stabilizing memory management, multi-priority CPU scheduling, system initialization, and standard command utilities.*
+### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Short-Term: 1–3 Months)
+*Focus: Stabilizing the memory manager, multi-priority scheduler, and standard command utilities.*
 
 #### 1.1 Buddy Allocator & Real-Time Scheduler Integration
 *   **Actionable Tasks:**
@@ -38,8 +36,8 @@ The integration follows a structured, multi-phase strategic milestone sequence t
 
 ---
 
-### 🟡 Phase 2: Capability Gate & Security Hardening (Q2-Q3)
-*Focus: Enforcing privilege reduction, access control sandboxing, and secure network handshakes.*
+### 🟡 Phase 2: Capability Gate & Security Hardening (Medium-Term: 3–6 Months)
+*Focus: Enforcing privilege reduction, access control sandboxing, and post-quantum network keys.*
 
 #### 2.1 Capability-Gated Virtual File System & Drivers
 *   **Actionable Tasks:**
@@ -58,7 +56,7 @@ The integration follows a structured, multi-phase strategic milestone sequence t
 
 ---
 
-### 🟢 Phase 3: High-Performance Storage & Networking (Q3-Q4)
+### 🟢 Phase 3: High-Performance Storage & Networking (Long-Term: 6–9 Months)
 *Focus: Copy-on-Write snapshots, content-addressed packages, and wire-speed packet handlers.*
 
 #### 3.1 Merkle-Tree CoW File System & Self-Healing Rollbacks
@@ -79,7 +77,7 @@ The integration follows a structured, multi-phase strategic milestone sequence t
 
 ---
 
-### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (Q4)
+### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (9–12 Months)
 *Focus: High-performance dashboard telemetry, AI-powered predictive scaling, and screen accessibility.*
 
 #### 4.1 AI-Powered Adaptive Telemetry & Monitoring
@@ -99,9 +97,26 @@ The integration follows a structured, multi-phase strategic milestone sequence t
 
 ---
 
+## 🏗️ OOP-Based Plug-and-Play Driver Framework
+
+To ensure flawless driver dynamic-loading, SigmaOS defines abstract base traits and strict device-family hierarchies.
+
+### Polymorphic Device Framework:
+```rust
+pub trait DeviceDriver {
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn shutdown(&mut self) -> Result<(), &'static str>;
+    fn get_status(&self) -> &'static str;
+}
+```
+
+This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, `GpuDriver`, `NetworkDriver`, `BluetoothDriver`) executing within isolated userspace microkernel shards.
+
+---
+
 ## 📈 Quality Assurance & Sync Protocol
 
 To maintain 100% architectural integrity during execution:
-1.  **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
-2.  **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
-3.  **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
+1. **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
+2. **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
+3. **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
