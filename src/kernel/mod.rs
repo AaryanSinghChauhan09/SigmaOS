@@ -3,7 +3,6 @@ pub mod bus;
 pub mod device;
 pub mod driver;
 pub mod memory;
-pub mod object;
 pub mod performance;
 pub mod roundrobin;
 pub mod sched;

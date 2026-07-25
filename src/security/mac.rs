@@ -448,6 +448,7 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
+pub type MacPolicy = dyn MACPolicy;
 
 #[derive(Debug, Clone)]
 pub struct MacRule {

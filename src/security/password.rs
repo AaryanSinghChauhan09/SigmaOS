@@ -427,10 +427,12 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
+        use rand::RngExt;
+        let mut rng = rand::rng();
 
         let mut password = String::new();
         for _ in 0..length {
-            let index = (rand::random::<u32>() as usize) % charset.len();
+            let index = rng.random_range(0..charset.len());
             password.push(charset[index] as char);
         }
 

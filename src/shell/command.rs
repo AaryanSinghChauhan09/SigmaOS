@@ -51,7 +51,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        core::ops::Deref::deref(self).iter()
     }
 }
 
@@ -59,7 +59,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+        core::ops::DerefMut::deref_mut(self).iter_mut()
     }
 }
 

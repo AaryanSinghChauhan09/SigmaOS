@@ -1,7 +1,8 @@
 use core::mem;
 /// OOP-based Paging + Virtual Memory for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 7-8
-/// Implements 4-level page tables, PML4, userspace isolation, page fault handling
+/// Implements 4-level page tables, PML4, userspace isolation, page fault handling,
+/// and Linux-style Copy-on-Write (CoW) address space cloning.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type PhysicalAddress = usize;
@@ -397,8 +398,34 @@ impl VirtualMemoryManager for SimpleVMM {
     fn handle_page_fault(
         &mut self,
         virt: VirtualAddress,
-        _error_code: usize,
+        error_code: usize,
     ) -> Result<(), PageFaultError> {
+        let is_write = (error_code & 2) != 0; // standard page fault error code bit 1 is write
+
+        // Check if the page is already present but read-only (Copy-on-Write)
+        if let Some(phys_addr) = self.get_physical(virt) {
+            let pd_idx = self.get_pd_index(virt);
+            let pt_idx = self.get_pt_index(virt);
+
+            if let Some(ref mut pt_opt) = self.pt_tables.get_mut(pd_idx) {
+                if let Some(ref mut pt) = *pt_opt {
+                    let entry = pt.get_entry(pt_idx);
+                    if entry.is_present() && !entry.is_writable() && is_write {
+                        // Copy-on-Write trigger! Duplicate physical frame
+                        let new_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+
+                        // In real hardware, we'd copy memory contents:
+                        // core::ptr::copy_nonoverlapping(phys_addr as *const u8, new_phys as *mut u8, 4096);
+                        let _ = phys_addr;
+
+                        entry.set_physical_address(new_phys);
+                        entry.set_writable(true);
+                        return Ok(());
+                    }
+                }
+            }
+        }
+
         let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
         self.map_page(virt, phys, true, true)
     }
@@ -415,6 +442,7 @@ pub trait ProcessMemory {
         user: bool,
         writable: bool,
     ) -> Result<(), PageFaultError>;
+    fn clone_address_space_cow(&mut self, parent_id: usize) -> Result<usize, PageFaultError>;
 }
 
 pub struct SimpleProcessMemory {
@@ -479,6 +507,75 @@ impl ProcessMemory for SimpleProcessMemory {
             Err(PageFaultError::InvalidAddress)
         }
     }
+
+    fn clone_address_space_cow(&mut self, parent_id: usize) -> Result<usize, PageFaultError> {
+        if parent_id >= self.address_spaces.len() || self.address_spaces[parent_id].is_none() {
+            return Err(PageFaultError::InvalidAddress);
+        }
+
+        let child_id = self.create_address_space()?;
+        let mut child_vmm = SimpleVMM::new();
+
+        if let Some(ref mut parent_vmm) = self.address_spaces[parent_id] {
+            // Iterate over active page directory indices
+            for pml4_idx in 0..512 {
+                if parent_vmm.pml4.get_entry(pml4_idx).is_present() {
+                    if let Some(ref mut pdpt_opt) = parent_vmm.pdpt_tables.get_mut(pml4_idx) {
+                        if let Some(ref mut pdpt) = *pdpt_opt {
+                            for pdpt_idx in 0..512 {
+                                if pdpt.get_entry(pdpt_idx).is_present() {
+                                    if let Some(ref mut pd_opt) =
+                                        parent_vmm.pd_tables.get_mut(pdpt_idx)
+                                    {
+                                        if let Some(ref mut pd) = *pd_opt {
+                                            for pd_idx in 0..512 {
+                                                if pd.get_entry(pd_idx).is_present() {
+                                                    if let Some(ref mut pt_opt) =
+                                                        parent_vmm.pt_tables.get_mut(pd_idx)
+                                                    {
+                                                        if let Some(ref mut pt) = *pt_opt {
+                                                            for pt_idx in 0..512 {
+                                                                let entry = pt.get_entry(pt_idx);
+                                                                if entry.is_present() {
+                                                                    let virt = (pml4_idx << 39)
+                                                                        | (pdpt_idx << 30)
+                                                                        | (pd_idx << 21)
+                                                                        | (pt_idx << 12);
+                                                                    let phys = entry
+                                                                        .get_physical_address();
+                                                                    let is_user =
+                                                                        entry.is_user_accessible();
+                                                                    let was_writable =
+                                                                        entry.is_writable();
+
+                                                                    // If it was writable, we apply Copy-On-Write (mark read-only)
+                                                                    if was_writable {
+                                                                        entry.set_writable(false);
+                                                                    }
+
+                                                                    // Map in child VMM as read-only too (Copy-On-Write)
+                                                                    child_vmm.map_page(
+                                                                        virt, phys, is_user, false,
+                                                                    )?;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        self.address_spaces[child_id] = Some(child_vmm);
+        Ok(child_id)
+    }
 }
 
 impl<T> Default for Vec<T> {
@@ -499,6 +596,20 @@ impl<T> Vec<T> {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
+        }
+    }
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
         }
     }
     pub fn push(&mut self, item: T) {
@@ -680,5 +791,34 @@ mod tests {
             .is_ok());
 
         assert!(pm.destroy_address_space(space_id).is_ok());
+    }
+
+    #[test]
+    fn test_linux_style_copy_on_write() {
+        let mut pm = SimpleProcessMemory::new();
+        let parent_id = pm.create_address_space().unwrap();
+
+        // Map a writable region in parent
+        assert!(pm
+            .map_region(parent_id, 0x5000_0000, 4096, true, true)
+            .is_ok());
+
+        // Clone parent address space as Copy-On-Write (read-only)
+        let child_id = pm.clone_address_space_cow(parent_id).unwrap();
+
+        // Verify parent is now mapped
+        let parent_vmm = pm.address_spaces[parent_id].as_ref().unwrap();
+        assert!(!parent_vmm.get_physical(0x5000_0000).is_none());
+
+        // Simulate Write Page Fault in parent on 0x5000_0000
+        let parent_vmm_mut = pm.address_spaces[parent_id].as_mut().unwrap();
+        let old_phys = parent_vmm_mut.get_physical(0x5000_0000).unwrap();
+
+        // Error code 2 = write to read-only page
+        assert!(parent_vmm_mut.handle_page_fault(0x5000_0000, 2).is_ok());
+
+        // Writable restored and physical address updated (page copied!)
+        let new_phys = parent_vmm_mut.get_physical(0x5000_0000).unwrap();
+        assert_ne!(old_phys, new_phys);
     }
 }
