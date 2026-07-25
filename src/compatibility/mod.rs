@@ -1,7 +1,14 @@
 // SigmaOS Compatibility Module
 pub mod cross_platform;
 pub mod historic_linux;
+pub mod personality;
 pub mod sigmawin;
+
+pub use personality::{
+    BuildCapsule, BuildProfile, CapsuleVersion, DriverEmulator, EmulatorProfile, FirmwarePersona,
+    FirmwareType, KernelShard, ObsoleteDevice, PeripheralPod, SecurityGrid, SecurityModel,
+    ShardType, SyscallCapsule,
+};
 
 pub use sigmawin::{
     D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, User32MessageQueue, Win32Error,

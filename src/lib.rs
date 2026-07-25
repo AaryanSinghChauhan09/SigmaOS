@@ -35,9 +35,12 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, TargetPlatform,
-    TranslationLayer, User32MessageQueue, Win32Error, Win32Message, WinSockAdapter,
+    ApplicationBinary, BinaryFormat, BuildCapsule, BuildProfile, CapsuleVersion,
+    CompatibilityError, CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    D3dToVulkanTranslator, DriverEmulator, EmulatorProfile, FirmwarePersona, FirmwareType,
+    KernelShard, ObsoleteDevice, PeFormat, PeLoader, PeripheralPod, RegistryManager, SecurityGrid,
+    SecurityModel, ShardType, SyscallCapsule, TargetPlatform, TranslationLayer, User32MessageQueue,
+    Win32Error, Win32Message, WinSockAdapter,
 };
 pub use customization::{
     Action, AutoThemeScheduler, Condition, CustomizationEngine, CustomizationError, Routine,
