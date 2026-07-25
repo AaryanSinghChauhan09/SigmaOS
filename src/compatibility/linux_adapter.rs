@@ -6,10 +6,10 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxKernelVersion {
     Kernel2_6,
-    Kernel3_x,
-    Kernel4_x,
-    Kernel5_x,
-    Kernel6_x,
+    Kernel3x,
+    Kernel4x,
+    Kernel5x,
+    Kernel6x,
 }
 
 pub struct LegacyKernelAdapter {
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_legacy_kernel_syscalls() {
-        let adapter = LegacyKernelAdapter::new(LinuxKernelVersion::Kernel3_x);
+        let adapter = LegacyKernelAdapter::new(LinuxKernelVersion::Kernel3x);
         assert_eq!(adapter.dispatch_syscall(4).unwrap(), "Executing shim: sys_write");
         assert!(adapter.dispatch_syscall(999).is_err());
     }

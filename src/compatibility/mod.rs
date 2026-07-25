@@ -1,9 +1,12 @@
 // SigmaOS Compatibility Module
 pub mod chimera_linux;
 pub mod cross_platform;
-pub mod standards;
-pub mod legacy_adapters;
-pub mod constellation_mesh;
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -35,4 +38,22 @@ pub use constellation_mesh::{
     CorebootGatewayMesh, BuildCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyAsmCodexGrid,
     SecurityConstellation, DACConstellation, SELinuxConstellation, ZeroTrustConstellation,
     PeripheralArchiveMesh, FloppyMesh, TapeMesh, CRTMesh, DotMatrixMesh,
+};
+pub use linux_adapter::{
+    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+};
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
+};
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
 };

@@ -190,9 +190,7 @@ impl SelfHealingModule {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: &str) -> Result<(), ResilienceError> {
-        let snapshot = self
-            .get_snapshot(id)
-            .ok_or(ResilienceError::SnapshotNotFound)?;
+        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback

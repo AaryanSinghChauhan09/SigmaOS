@@ -5,10 +5,10 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PersonaVersion {
-    Linux_2_6,
-    Linux_3_x,
-    Linux_4_x,
-    Linux_5_x,
+    Linux26,
+    Linux3x,
+    Linux4x,
+    Linux5x,
 }
 
 pub struct KernelPersonaContainer {
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_kernel_persona_container() {
-        let mut container = KernelPersonaContainer::new(PersonaVersion::Linux_2_6);
+        let mut container = KernelPersonaContainer::new(PersonaVersion::Linux26);
         assert_eq!(container.active_processes, 0);
         container.enter_persona();
         assert_eq!(container.active_processes, 1);
