@@ -264,12 +264,68 @@ impl Default for DependencyResolver {
     }
 }
 
+/// Transactional package manager checkpoint
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
+}
+
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
+    }
+}
+
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
+    pub transaction_history: TransactionalHistory,
 }
 
 impl UniversalPackageManager {
@@ -279,6 +335,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
+            transaction_history: TransactionalHistory::new(),
         };
 
         manager.add_default_adapters();
@@ -306,6 +363,32 @@ impl UniversalPackageManager {
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
         self.packages.insert(package.name.clone(), package);
+    }
+
+    pub fn create_checkpoint(&mut self) -> usize {
+        self.transaction_history
+            .create_checkpoint(&self.installed_packages)
+    }
+
+    pub fn rollback_to_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), PackageError> {
+        if let Some(checkpoint) = self
+            .transaction_history
+            .get_checkpoint(checkpoint_id)
+            .cloned()
+        {
+            let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
+            for key in current_keys {
+                if !checkpoint.installed_keys.contains(&key) {
+                    self.remove(&key)?;
+                }
+            }
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(format!(
+                "Checkpoint {} not found",
+                checkpoint_id
+            )))
+        }
     }
 
     pub fn install(&mut self, package_name: &str) -> Result<(), PackageError> {
@@ -454,5 +537,30 @@ mod tests {
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_transactional_rollback() {
+        let mut manager = UniversalPackageManager::new();
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
+
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
+
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
+
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
     }
 }
