@@ -2,9 +2,8 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -123,21 +122,6 @@ impl Default for CapabilityToken {
     }
 }
 
-/// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CapabilityToken {
-    pub id: u64,
-    pub allowed_paths: &'static [&'static str],
-    pub allowed_ports: &'static [u16],
-    pub is_revoked: bool,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
@@ -217,6 +201,7 @@ impl CapabilityToken {
     pub fn revoke(&mut self) {
         self.is_revoked = true;
     }
+}
 
     pub fn bits(&self) -> u64 {
         self.bits
@@ -322,5 +307,22 @@ impl SecurityEnforcer {
 
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_capability_token_traversal_protection() {
+        let paths = vec!["/var/www"];
+        let token = CapabilityToken::new_with_args(1, &paths, &[]);
+
+        // Safe path starts with /var/www and has no traversal
+        assert!(token.can_access_path("/var/www/index.html"));
+
+        // Path starting with /var/www but containing traversal should be blocked
+        assert!(!token.can_access_path("/var/www/../../etc/passwd"));
     }
 }
