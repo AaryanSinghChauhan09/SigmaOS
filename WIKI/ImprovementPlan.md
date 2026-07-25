@@ -586,3 +586,113 @@ To stand completely apart from legacy operating systems (Linux, BSD, Windows, ma
 3.  **Formulate Whole-OS Snapshots:** Pair `GenerationManager` inode swaps with block storage CoW trees to enable instant rolling snapshots.
 4.  **Prototype Universal ABI Mapping:** Establish system call translation maps translating standard ELF and PE binary syscalls into capability rings.
 5.  **Assemble Local Model Slices:** Connect local neural network runtime tasks directly to microkernel task scheduling queues.
+
+---
+
+## 🐞 38. Comprehensive Bug & Fix Directory: Compiler & Borrow Checker Diagnostics
+
+This directory documents the comprehensive compilation, transmutations size, and borrow-checker diagnostics identified across active development branches, mapping out precise structural resolutions to achieve 100% compilation safety on modern hosted targets.
+
+### A. Diagnosed Compiler & Layout Discrepancies
+
+#### Category 1: Target Platform & Standard Library Conflicts
+1.  **Standard Library Missing Errors in Binaries:**
+    *   *Issue:* Declaring standard entrypoint `fn main() {}` alongside global `#![no_std]` attributes on hosted targets prevents compilation when compiling for host environments.
+    *   *Impact:* Prevents compilation of `sigma_userspace`, `sigma_drivers`, and `sigma_kernel` when target OS is host-configured (not bare-metal `target_os = "none"`).
+2.  **Duplicate `panic_impl` Lang Item:**
+    *   *Issue:* Standard library (`std`) already registers a panic handler on host, which conflicts with custom bare-metal `#[panic_handler]` definitions.
+    *   *Impact:* Halts testing suites instantly when executing `cargo test --all-targets` or `cargo test --tests` on host systems.
+
+#### Category 2: Type Transmutation & Size Mismatches
+1.  **Transmute Between Types of Different Sizes (E0512):**
+    *   *Issue:* Concurrently loading atomic 64-bit status fields and transmuting them directly into 32-bit enums represents layout discrepancies.
+    *   *Locations:*
+        -   `src/scheduler/process.rs:135` — transmuting `usize` (64 bits) to `ProcessState` enum (32 bits).
+        -   `src/scheduler/process.rs:145` — transmuting `usize` (64 bits) to `ProcessPriority` enum (32 bits).
+        -   `src/scheduler/scheduler.rs:93` — transmuting `usize` (64 bits) to `TaskState` enum (32 bits).
+        -   `src/scheduler/sovereign.rs:49` — transmuting `usize` (64 bits) to `ThreadState` enum (32 bits).
+    *   *Impact:* Fails standard compilation on 64-bit platforms due to layout discrepancies.
+
+#### Category 3: Rust Ownership & Borrow Checker Violations
+1.  **Use of Moved Value (E0382):**
+    *   *Issue:* Passing non-`Copy` types (e.g., `String` or `Vec<T>`) transfers ownership, preventing subsequent evaluations.
+    *   *Locations:*
+        -   `src/productivity/sigma_office.rs:452` — `title` is moved when building a document, then used again to initialize `PresentationProcessor`.
+        -   `src/storage/sql_engine.rs:197` — `columns` is matched on and moved on line 183, then used again on line 197.
+        -   `src/storage/sql_engine.rs:212` — `result_rows` is moved into rows on line 211, then evaluated using `.len()` on line 212.
+        -   `src/system/duplicate.rs:171` — `files` vector is consumed by `for file in files` (moves the value), then `.len()` is accessed on line 171.
+        -   `src/system/startup.rs:157/158` — `services_delayed` and `services_parallelized` are moved into returned struct on lines 152/153, then their lengths are checked afterward.
+2.  **Cannot Move Out of Shared Reference Behind Borrow (E0507):**
+    *   *Issue:* Taking ownership of fields accessed behind shared references is prohibited in Rust.
+    *   *Locations:*
+        -   `src/scheduler/process.rs:396` — `self.stats` is returned by value but lacks the `Copy` or `Clone` trait.
+        -   `src/system/memory.rs:273/280` — `self.current_report` is `Option<LeakReport>`, and calling `.map()` moves its content, but `self` is a shared reference `&self`.
+
+---
+
+### B. Standardized Step-by-Step Resolution Backlog
+
+#### 🛠️ Step 1: Standard Library & Panic Handlers in Binaries
+To resolve platform conflicts, conditional compilation attributes must be applied to target entrypoints:
+```rust
+// Replace #![no_std] with conditional attribute:
+#![cfg_attr(target_os = "none", no_std)]
+#![cfg_attr(target_os = "none", no_main)]
+
+// Wrap bare-metal panic with #[cfg(target_os = "none")]:
+#[cfg(target_os = "none")]
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
+}
+```
+
+#### 🛠️ Step 2: Fix Memory State Transmutes (Scheduler)
+To resolve E0512 size mismatches, Atomic state variables must be cast to `u32` (standard enum size) before transmuting:
+```rust
+// Replace:
+core::mem::transmute(self.state.load(Ordering::SeqCst))
+
+// With:
+core::mem::transmute(self.state.load(Ordering::SeqCst) as u32)
+```
+
+#### 🛠️ Step 3: Resolve Ownership Moves (Borrow Checker)
+*   **Sigma Office (`src/productivity/sigma_office.rs`):** Clone the title passed to `SigmaDocument::new`:
+    ```rust
+    let doc = SigmaDocument::new(DocumentType::Presentation, title.clone(), self.capability.clone());
+    ```
+*   **SQL Engine (`src/storage/sql_engine.rs`):** Pattern match `columns` as reference (`Some(ref cols)`) and pre-save `result_rows.len()` before moving ownership.
+*   **Duplicate Scanner (`src/system/duplicate.rs`):** Iterate using `&files` to avoid consuming the vector.
+*   **Startup Manager (`src/system/startup.rs`):** Store lengths of `services_delayed` and `services_parallelized` in variables before building returned structures.
+
+#### 🛠️ Step 4: Resolve Moves out of Shared References
+*   **Scheduler Stats (`src/scheduler/process.rs`):** Derive `Copy` and `Clone` for `SchedulerStats` (since it is made of plain numeric types).
+*   **Leak Detection (`src/system/memory.rs`):** Call `.as_ref()` on `self.current_report` before mapping:
+    ```rust
+    self.current_report.as_ref().map(|r| r.leaked_allocations > 0)
+    ```
+
+---
+
+## ⚡ 39. Performance Capability Enhancement Specification
+
+To push the **performance boundaries** of SigmaOS and ensure microsecond-level scheduling latency under extreme concurrent workloads, we implement the following core performance enhancement blueprint:
+
+### A. Lock-Free Concurrency & Memory Pipelines
+*   **Lock-Free Queue Management (`LockFreeQueue`):** Replaces traditional mutex-based synchronization loops inside microkernel message rings with high-performance, single-producer single-consumer (SPSC) and multi-producer single-consumer (MPSC) lock-free ring buffers using atomic `Ordering::SeqCst` operations.
+*   **Zero-Copy Direct Memory Access (DMA):** Enables Ethernet and storage blocks to stream data directly into user-space buffers using capability-gated page table structures, avoiding standard intermediate memory allocations or `memcpy` calls.
+*   **NUMA-Aware Core Allocation:** Optimizes multicore scheduling by placing thread contexts, memory pages, and I/O buffer regions on the physical processor node directly connected to the active peripheral bus, maximizing cache hits and reducing inter-node bus contention.
+
+### B. Hardware-Accelerated Vectorization & Math
+*   **SIMD-Accelerated Vector Primitives (`SigmaVector`):** Harnesses hardware-native AVX-512 and Neon vector blocks to execute 2D canvas clipping, bezier coordinate calculations, and cryptography blocks in parallel, achieving $O(1)$ coordinate translation speeds.
+*   **Branchless Mathematical Optimization:** Resolves EEVDF schedule lag and physical page order calculations using branchless bitwise operations (`next_power_of_two` and `trailing_zeros`) instead of linear loops, achieving predictable execution times and maximizing instruction cache efficiency.
+
+---
+
+## 🚀 40. Next-Gen Performance Implementation Roadmap
+
+1.  **Integrate Lock-Free Message Rings:** Connect lock-free SPSC queues directly within the microkernel inter-process communication (`src/kernel/ipc/`) layer.
+2.  **Deploy NUMA-Aware Allocations:** Map physical processor nodes and page tables dynamically within the memory manager (`src/kernel/memory.rs`) to ensure local page bindings.
+3.  **Optimize Vector Graphics Loops:** Enable SSE/AVX vector instruction sets inside Zenith compositor layout calculations to achieve fluid visual compositing.
+4.  **Enforce Branchless Bitwise Calculators:** Refactor scheduler lag evaluations inside `src/kernel/scheduler.rs` with branchless, constant-time assembly hooks.

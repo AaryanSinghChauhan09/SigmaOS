@@ -1,6 +1,6 @@
-/// OCI-Compliant Container Pod and Namespace Manager
-/// Manages pod configurations, limits, shared namespaces, and container orchestration
-/// to easily match and exceed Fedora's native Podman/Kubernetes setups.
+//! OCI-Compliant Container Pod and Namespace Manager
+//! Manages pod configurations, limits, shared namespaces, and container orchestration
+//! to easily match and exceed Fedora's native Podman/Kubernetes setups.
 
 use core::sync::atomic::AtomicUsize;
 

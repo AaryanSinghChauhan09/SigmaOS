@@ -449,8 +449,3 @@ mod tests {
         assert_eq!(keyring.stats().total_secrets, 0);
     }
 }
-
-pub type SecretManager = dyn Keyring;
-
-#[derive(Debug, Clone)]
-pub struct SecretStorage;
