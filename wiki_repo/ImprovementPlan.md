@@ -523,3 +523,25 @@ To successfully transition SigmaOS from a high-performance research prototype in
 3.  **Harden Microkernel Security:** Complete Mandatory Access Control definitions and verified boot signature checks.
 4.  **Formulate sigma-sh REPL:** Write the full interactive shell containing zero-dependency Rust-native implementations of essential file, process, and networking utilities.
 5.  **Assemble local AI Inference:** Compile lightweight local model inference hooks natively, supporting AVX-512 accelerated workload optimization.
+
+---
+
+## 🛠️ 33. Unified Blueprint for Unimplemented Wiki Ideas, Features, and Tools
+
+To completely absorb and deliver all outstanding, unimplemented research initiatives, systems features, and advanced diagnostic tools documented across the **SigmaOS Wiki**, we establish concrete implementation blueprints. These solutions are structured as clean, zero-dependency, `#![no_std]` Rust modules designed to integrate natively with our microkernel core.
+
+### A. Core Unimplemented Systems Blueprints
+1.  **NixOS-Style Atomic Inode Pointer-Swap (`GenerationManager`):** Performs zero-copy, sub-millisecond system rollbacks. Rather than modifying configuration directories in place, the system compiles changes into a content-addressed directory tree and swaps directory inodes atomically.
+2.  **Arch Linux-Style Transaction-Aware Package Manager (`RollingTransactionManager`):** Ensures complete transaction safety. Manages complex rolling package upgrades, validating dependencies, computing SAT solver topologies, and performing complete rollbacks via Copy-on-Write (CoW) filesystem snapshots if installation checks fail.
+3.  **Kali Linux-Style Automated Vulnerability Fuzzer (`AutomatedVulnerabilityFuzzer`):** Scans live user-space memories and system buffers. Performs automated, non-allocating bounds validation, boundary testing, and range fuzzing to actively identify memory safety gaps or access control leaks before code compilation.
+4.  **AOSP/Android-Style Dynamic Capability-Gate Permissions (`DynamicPermissionManager`):** Protects system resources dynamically. Replaces hardcoded Unix permissions with dynamic, fine-grained capability checks validated at each system call boundaries against a per-process `CapabilityToken` matrix.
+5.  **BusyBox-Style Multi-Call Utility Core (`MultiCallUtility`):** Combines essential POSIX utilities (e.g. `ls`, `cp`, `grep`, `find`) into a single capability-gated, non-allocating executable. Eliminates library linking overhead and keeps the userland footprint under `100KB` statically.
+
+---
+
+## 🚀 34. Next Steps for Wiki Implementation Roadmap
+
+1.  **Integrate Inode Pointer-Swaps:** Connect the generation manager directly into the Virtual Filesystem (`src/filesystem/vfs.rs`) mount handlers.
+2.  **Harden Rolling Transaction Upgrades:** Couple the rolling transaction solver with the `sigpkg` transactional rollback layer inside `src/sigpkg/resolver.rs`.
+3.  **Deploy Memory-Safety Fuzzers:** Build automated range fuzzing checks within our continuous integration test suite to run boundary stress testing.
+4.  **Unify Multi-Call REPL commands:** Merge REPL shell command handlers under the unified S-CLI multi-call binary inside `src/shell/command.rs`.
