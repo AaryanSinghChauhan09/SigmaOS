@@ -448,7 +448,6 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct MacRule {
     pub name: alloc::string::String,

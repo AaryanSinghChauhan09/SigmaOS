@@ -7,12 +7,12 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -87,9 +87,7 @@ pub use virtualization::{
 pub mod init {
     pub mod systemd_init;
 }
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub mod virt;
 pub use virt::hypervisor::{

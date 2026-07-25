@@ -190,7 +190,6 @@ pub trait CRL {
     fn get_crl(&self) -> Vec<(CertificateID, u32)>;
 }
 
-
 #[derive(Debug, Clone)]
 pub struct CertificateAuthority {
     pub name: alloc::string::String,
