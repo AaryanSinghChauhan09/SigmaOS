@@ -41,6 +41,15 @@
 //    - SecurityEvolutionMapper (DACMapper, SELinuxMapper, ZeroTrustMapper)
 //    - PeripheralEvolutionCapsules (FloppyCapsule, TapeCapsule, CRTGraphicsCapsule, DotMatrixCapsule)
 //
+// 11. KERNEL PERSONALITY RELAY, NEXUS, RING, & REGISTRY CORE:
+//    - KernelRelay & KernelRelayRing Class (mid-process handoff & ring-based persona routing)
+//    - SyscallEncyclopedia & SyscallAtlas (encyclopedic definitions & migration paths)
+//    - DriverVaultV2 & DriverRegistry (dependency-aware storage & dynamic registration)
+//    - FirmwareNexus & FirmwareBridgeyard (BIOS/UEFI/Coreboot unified nexus & bridges)
+//    - BuildChronicle & BuildLedgerGrid (reproducible build archival & grid-based replays)
+//    - SecurityNexus & SecurityRegistry (multi-security model mapping & context registries)
+//    - PeripheralArchiveV2 & PeripheralVault (obsolete device capsules with extended metadata)
+//
 // All code is #![no_std]-compatible and zero-allocation hot-path capable.
 // ============================================================================
 
@@ -1291,6 +1300,298 @@ impl PeripheralCapsule for DotMatrixCapsule {
 }
 
 // ============================================================================
+// 11. KERNEL PERSONALITY RELAY, NEXUS, RING, & REGISTRY SUITE
+// ============================================================================
+
+// --- A. KERNEL PERSONALITY RELAY & RING ---
+pub struct KernelRelay {
+    pub matrix: KernelMatrix,
+}
+
+impl KernelRelay {
+    pub fn new() -> Self {
+        Self { matrix: KernelMatrix::new() }
+    }
+
+    /// Transitions/relays the current process's active persona execution profile mid-process
+    pub fn relay_active_persona(&mut self, current_stage: &str) -> &'static str {
+        match current_stage {
+            "DATA_LOADING" => {
+                // Borrow memory/disk reading patterns from legacy 2.4 kernel
+                self.matrix.configure_hybrid_execution("mem_v2.4_legacy", "sched_v6.12_default", "net_v6.12_default");
+                "relayed_to_2.4_memory_profile"
+            }
+            "COMPUTE_JOB" => {
+                // Handoff to 3.x realtime scheduling
+                self.matrix.configure_hybrid_execution("mem_v6.12_default", "sched_v3.16_rt", "net_v6.12_default");
+                "relayed_to_3.x_realtime_scheduler"
+            }
+            "PACKET_TRANSMIT" => {
+                // Handoff to 6.x post-quantum network security
+                self.matrix.configure_hybrid_execution("mem_v6.12_default", "sched_v6.12_default", "net_v6.12_pqc");
+                "relayed_to_6.x_pqc_networking"
+            }
+            _ => "no_relay_context_found_retained_default",
+        }
+    }
+}
+
+pub struct KernelRelayRing {
+    pub active_orbit_ring: u32, // 0 = Inner (Legacy 2.2), 1 = Mid (3.16), 2 = Outer (Modern 6.12)
+}
+
+impl KernelRelayRing {
+    pub fn new() -> Self {
+        Self { active_orbit_ring: 2 }
+    }
+
+    pub fn route_process_orbit_ring(&mut self, required_api: &str) -> &'static str {
+        if required_api == "sys_ipc_v2.2" {
+            self.active_orbit_ring = 0; // enter inner ring
+            "routed_to_inner_legacy_ring_orbit"
+        } else if required_api == "sys_rt_sched" {
+            self.active_orbit_ring = 1; // enter mid ring
+            "routed_to_mid_scheduler_ring_orbit"
+        } else {
+            self.active_orbit_ring = 2; // default outer orbit
+            "routed_to_outer_modern_ring_orbit"
+        }
+    }
+}
+
+// --- B. SYSCALL EVOLUTION ENCYCLOPEDIA & ATLAS ---
+pub struct SyscallEncyclopediaEntry {
+    pub name: &'static str,
+    pub history: &'static str,
+    pub deprecation: &'static str,
+    pub modern_alternative: &'static str,
+}
+
+pub struct SyscallEncyclopedia {
+    pub entries: BTreeMap<u32, SyscallEncyclopediaEntry>,
+}
+
+impl SyscallEncyclopedia {
+    pub fn new() -> Self {
+        let mut db = BTreeMap::new();
+        db.insert(3, SyscallEncyclopediaEntry {
+            name: "sys_read_v2.6",
+            history: "Introduced in early 2.x kernel",
+            deprecation: "Deprecated in modern 64-bit systems",
+            modern_alternative: "sys_read (sys_code 0)",
+        });
+        db.insert(13, SyscallEncyclopediaEntry {
+            name: "sys_time_legacy",
+            history: "Returned 32-bit epoch timestamp",
+            deprecation: "Y2038 overflow bug risk",
+            modern_alternative: "sys_clock_gettime (64-bit safe)",
+        });
+        Self { entries: db }
+    }
+
+    pub fn query_syscall_definition(&self, sys_code: u32) -> Result<(&'static str, &'static str), &'static str> {
+        let entry = self.entries.get(&sys_code).ok_or("Syscall code not found in encyclopedia")?;
+        Ok((entry.name, entry.modern_alternative))
+    }
+}
+
+pub struct SyscallAtlas {
+    pub migration_paths: BTreeMap<&'static str, Vec<&'static str>>,
+}
+
+impl SyscallAtlas {
+    pub fn new() -> Self {
+        let mut paths = BTreeMap::new();
+        paths.insert("sys_read", vec!["sys_read_v2.4", "sys_read_v2.6", "sys_read_modern"]);
+        paths.insert("sys_socket", vec!["sys_socket_v2.6", "sys_socket_v4.19", "sys_socket_pqc_v6.12"]);
+        Self { migration_paths: paths }
+    }
+
+    pub fn resolve_syscall_migration_path(&self, canonical_name: &str) -> Result<Vec<&'static str>, &'static str> {
+        self.migration_paths.get(canonical_name).cloned().ok_or("No migration path resolved in atlas")
+    }
+}
+
+// --- C. DRIVER PERSONALITY VAULT 2.0 & REGISTRY ---
+pub struct DriverVaultV2 {
+    pub storage_vault: BTreeMap<&'static str, Vec<&'static str>>, // maps driver to its dependency names
+}
+
+impl DriverVaultV2 {
+    pub fn new() -> Self {
+        let mut vault = BTreeMap::new();
+        vault.insert("floppy-driver", vec!["dma-controller", "isa-bus"]);
+        vault.insert("vesa-driver", vec!["bios-framebuffer"]);
+        Self { storage_vault: vault }
+    }
+
+    pub fn resolve_dependencies(&self, driver: &str) -> Result<Vec<&'static str>, &'static str> {
+        self.storage_vault.get(driver).cloned().ok_or("Driver dependencies not registered in Vault v2.0")
+    }
+}
+
+pub struct DriverRegistry {
+    pub registry: BTreeMap<&'static str, &'static str>, // maps legacy device signature to driver name
+}
+
+impl DriverRegistry {
+    pub fn new() -> Self {
+        let mut reg = BTreeMap::new();
+        reg.insert("pci_ven_10de_dev_2204", "nvidia-gpu-v6.12");
+        reg.insert("isa_dev_sb16", "soundblaster-16-legacy");
+        Self { registry: reg }
+    }
+
+    pub fn register_driver(&mut self, signature: &'static str, driver_name: &'static str) {
+        self.registry.insert(signature, driver_name);
+    }
+
+    pub fn load_registered_driver(&self, signature: &str) -> Option<&'static str> {
+        self.registry.get(signature).cloned()
+    }
+}
+
+// --- D. FIRMWARE EVOLUTION NEXUS & BRIDGEYARD ---
+pub struct FirmwareNexus {
+    pub active_nexus_mode: &'static str,
+}
+
+impl FirmwareNexus {
+    pub fn new(mode: &'static str) -> Self {
+        Self { active_nexus_mode: mode }
+    }
+
+    pub fn query_nexus_capability(&self) -> &'static str {
+        match self.active_nexus_mode {
+            "BIOS" => "cbfs_real_mode_compatibility_active",
+            "UEFI" => "gpt_guid_partition_gop_render_active",
+            "Coreboot" => "open_coreboot_payload_boot_active",
+            _ => "unknown_firmware_nexus_mode",
+        }
+    }
+}
+
+pub struct FirmwareBridgeyard {
+    pub bridges: BTreeMap<&'static str, &'static str>,
+}
+
+impl FirmwareBridgeyard {
+    pub fn new() -> Self {
+        let mut mutyard = BTreeMap::new();
+        mutyard.insert("bios_to_uefi", "simulate_gpt_mbr_hybrid_partition");
+        mutyard.insert("coreboot_to_uefi", "payload_cbfs_entry_gop_handoff");
+        Self { bridges: mutyard }
+    }
+
+    pub fn resolve_bridge_procedure(&self, key: &str) -> Result<&'static str, &'static str> {
+        self.bridges.get(key).cloned().ok_or("Bridge yard path is not implemented")
+    }
+}
+
+// --- E. ANCIENT BUILD REPLAY CHRONICLE & LEDGER GRID ---
+pub struct BuildChronicle {
+    pub archived_compiles: Vec<&'static str>,
+}
+
+impl BuildChronicle {
+    pub fn new() -> Self {
+        Self { archived_compiles: Vec::new() }
+    }
+
+    pub fn record_compile_chronicle(&mut self, hash_signature: &'static str) {
+        self.archived_compiles.push(hash_signature);
+    }
+}
+
+pub struct BuildLedgerGrid {
+    pub grid_builds: BTreeMap<&'static str, u64>, // maps compiler to deterministic ledger ID
+}
+
+impl BuildLedgerGrid {
+    pub fn new() -> Self {
+        let mut grid = BTreeMap::new();
+        grid.insert("GCC-2.95", 0x2001);
+        grid.insert("G++3.3", 0x3003);
+        Self { grid_builds: grid }
+    }
+
+    pub fn fetch_ledger_context_id(&self, compiler: &str) -> Option<u64> {
+        self.grid_builds.get(compiler).cloned()
+    }
+}
+
+// --- F. SECURITY PERSONALITY NEXUS & REGISTRY ---
+pub struct SecurityNexus {
+    pub modern_mode: &'static str,
+}
+
+impl SecurityNexus {
+    pub fn new() -> Self {
+        Self { modern_mode: "CapabilityGuard" }
+    }
+
+    pub fn evaluate_nexus_rules(&self, legacy_rule: &str) -> &'static str {
+        if legacy_rule == "unix_chmod_000" {
+            "reject_all_contexts"
+        } else {
+            "delegate_to_zero_trust_sandbox"
+        }
+    }
+}
+
+pub struct SecurityRegistry {
+    pub registry: BTreeMap<&'static str, &'static str>, // maps legacy labels to modern caps
+}
+
+impl SecurityRegistry {
+    pub fn new() -> Self {
+        let mut reg = BTreeMap::new();
+        reg.insert("apparmor_profile_network", "CapabilityToken(NetSocketTransmit)");
+        reg.insert("selinux_context_read_only", "CapabilityToken(FileRead)");
+        Self { registry: reg }
+    }
+
+    pub fn resolve_registry_policy(&self, legacy_label: &str) -> Option<&'static str> {
+        self.registry.get(legacy_label).cloned()
+    }
+}
+
+// --- G. PERIPHERAL EVOLUTION ARCHIVE 2.0 & VAULT ---
+pub struct PeripheralArchiveV2 {
+    pub obsolete_archives: BTreeMap<&'static str, &'static str>,
+}
+
+impl PeripheralArchiveV2 {
+    pub fn new() -> Self {
+        let mut arch = BTreeMap::new();
+        arch.insert("dot_matrix", "EPSON-FX80-9PIN_V2.0_METADATA_ARCHIVE");
+        arch.insert("floppy", "3.5_INCH_HIGH_DENSITY_1.44MB_METADATA_ARCHIVE");
+        Self { obsolete_archives: arch }
+    }
+
+    pub fn get_metadata_archive(&self, key: &str) -> Result<&'static str, &'static str> {
+        self.obsolete_archives.get(key).cloned().ok_or("Peripheral metadata archive key not found")
+    }
+}
+
+pub struct PeripheralVault {
+    pub vault_registers: BTreeMap<&'static str, u16>,
+}
+
+impl PeripheralVault {
+    pub fn new() -> Self {
+        let mut registers = BTreeMap::new();
+        registers.insert("crt_scanline_port", 0x3D4);
+        registers.insert("floppy_controller_command_port", 0x3F5);
+        Self { vault_registers: registers }
+    }
+
+    pub fn fetch_vault_port_address(&self, register: &str) -> Option<u16> {
+        self.vault_registers.get(register).cloned()
+    }
+}
+
+// ============================================================================
 // UNIT TESTS & PATTERN VERIFICATION
 // ============================================================================
 
@@ -1603,5 +1904,82 @@ mod tests {
         assert_eq!(floppy.read_hardware_payload().unwrap(), b"BOOTSECTOR_SECTOR_0_SECTOR_1");
 
         assert_eq!(tape.query_obsolete_device_class(), "Magnetic Cartridge QIC Tape Drive");
+    }
+
+    // ============================================================================
+    // 11. RELAY, NEXUS, RING, & REGISTRY UNIT TESTS
+    // ============================================================================
+
+    #[test]
+    fn test_kernel_personality_relay_and_rings() {
+        let mut relay = KernelRelay::new();
+        assert_eq!(relay.relay_active_persona("DATA_LOADING"), "relayed_to_2.4_memory_profile");
+        assert_eq!(relay.relay_active_persona("COMPUTE_JOB"), "relayed_to_3.x_realtime_scheduler");
+
+        let mut ring = KernelRelayRing::new();
+        assert_eq!(ring.route_process_orbit_ring("sys_ipc_v2.2"), "routed_to_inner_legacy_ring_orbit");
+        assert_eq!(ring.active_orbit_ring, 0);
+    }
+
+    #[test]
+    fn test_syscall_encyclopedia_and_atlas() {
+        let enc = SyscallEncyclopedia::new();
+        let (name, alt) = enc.query_syscall_definition(3).unwrap();
+        assert_eq!(name, "sys_read_v2.6");
+        assert_eq!(alt, "sys_read (sys_code 0)");
+
+        let atlas = SyscallAtlas::new();
+        let path = atlas.resolve_syscall_migration_path("sys_read").unwrap();
+        assert_eq!(path[1], "sys_read_v2.6");
+    }
+
+    #[test]
+    fn test_driver_vault_and_registry() {
+        let vault = DriverVaultV2::new();
+        let deps = vault.resolve_dependencies("floppy-driver").unwrap();
+        assert_eq!(deps[0], "dma-controller");
+
+        let mut reg = DriverRegistry::new();
+        assert_eq!(reg.load_registered_driver("pci_ven_10de_dev_2204").unwrap(), "nvidia-gpu-v6.12");
+
+        reg.register_driver("isa_dev_sb16", "soundblaster-16-v2.0");
+        assert_eq!(reg.load_registered_driver("isa_dev_sb16").unwrap(), "soundblaster-16-v2.0");
+    }
+
+    #[test]
+    fn test_firmware_nexus_and_bridgeyards() {
+        let nexus = FirmwareNexus::new("BIOS");
+        assert_eq!(nexus.query_nexus_capability(), "cbfs_real_mode_compatibility_active");
+
+        let yard = FirmwareBridgeyard::new();
+        assert_eq!(yard.resolve_bridge_procedure("bios_to_uefi").unwrap(), "simulate_gpt_mbr_hybrid_partition");
+    }
+
+    #[test]
+    fn test_build_chronicles_and_ledger_grids() {
+        let mut chronicle = BuildChronicle::new();
+        chronicle.record_compile_chronicle("REPRODUCIBLE_BUILD_HASH_0X7F3A");
+        assert_eq!(chronicle.archived_compiles[0], "REPRODUCIBLE_BUILD_HASH_0X7F3A");
+
+        let grid = BuildLedgerGrid::new();
+        assert_eq!(grid.fetch_ledger_context_id("GCC-2.95").unwrap(), 0x2001);
+    }
+
+    #[test]
+    fn test_security_nexus_and_registries() {
+        let nexus = SecurityNexus::new();
+        assert_eq!(nexus.evaluate_nexus_rules("unix_chmod_000"), "reject_all_contexts");
+
+        let reg = SecurityRegistry::new();
+        assert_eq!(reg.resolve_registry_policy("apparmor_profile_network").unwrap(), "CapabilityToken(NetSocketTransmit)");
+    }
+
+    #[test]
+    fn test_peripheral_archives_and_vaults() {
+        let arch = PeripheralArchiveV2::new();
+        assert_eq!(arch.get_metadata_archive("floppy").unwrap(), "3.5_INCH_HIGH_DENSITY_1.44MB_METADATA_ARCHIVE");
+
+        let vault = PeripheralVault::new();
+        assert_eq!(vault.fetch_vault_port_address("crt_scanline_port").unwrap(), 0x3D4);
     }
 }
