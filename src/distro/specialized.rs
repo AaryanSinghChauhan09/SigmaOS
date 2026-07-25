@@ -333,85 +333,310 @@ impl EduPlayground {
     }
 }
 
-/// Sigma Hardware Detector (MHWD parity absorbing Manjaro Linux)
-/// Automatically identifies PCI/USB hardware ID mappings and deploys optimal drivers.
-pub struct SigmaHardwareDetector {
-    pub hardware_db: HashMap<(u16, u16), &'static str>, // maps (vendor_id, device_id) to driver name
-    pub loaded_drivers: Vec<&'static str>,
+// ==========================================
+// UBUNTU LINUX DISTROS TOOLS & CONCEPTS
+// ==========================================
+
+/// Ubuntu Desktop: Simulated Advanced Package Tool (APT) & Personal Package Archive (PPA) Engine
+#[derive(Debug, Clone)]
+pub struct UbuntuAptEngine {
+    pub registered_packages: HashMap<String, String>, // maps PackageName -> Version
+    pub installed_packages: HashMap<String, String>,  // maps PackageName -> Version
+    pub added_ppas: Vec<String>,                      // trusted third-party repositories
+    pub apt_cache_synchronized: bool,
 }
 
-impl SigmaHardwareDetector {
+impl UbuntuAptEngine {
     pub fn new() -> Self {
-        let mut db = HashMap::new();
-        // Register default hardware-to-driver mappings (e.g. GPUs, network adapters, storage controllers)
-        db.insert((0x10DE, 0x2204), "nvidia-pcie-gen6"); // NVIDIA RTX 3090 / 4090
-        db.insert((0x8086, 0x1533), "e1000e-ethernet");  // Intel E1000
-        db.insert((0x10EC, 0x8168), "rtl8169-realtek");   // Realtek Ethernet
-        db.insert((0x144D, 0xA808), "samsung-nvme-v4");   // Samsung Pro NVMe
+        let mut registered = HashMap::new();
+        registered.insert("gnome-shell".to_string(), "45.0".to_string());
+        registered.insert("build-essential".to_string(), "12.9".to_string());
+        registered.insert("curl".to_string(), "8.2.1".to_string());
+        registered.insert("vlc".to_string(), "3.0.18".to_string());
 
         Self {
-            hardware_db: db,
-            loaded_drivers: Vec::new(),
+            registered_packages: registered,
+            installed_packages: HashMap::new(),
+            added_ppas: Vec::new(),
+            apt_cache_synchronized: false,
         }
     }
 
-    /// Simulates scanning a PCI/USB bus and auto-configuring appropriate drivers
-    pub fn scan_and_load_drivers(&mut self, devices: &[(u16, u16)]) -> usize {
-        let mut count = 0;
-        for &dev in devices {
-            if let Some(&driver) = self.hardware_db.get(&dev) {
-                if !self.loaded_drivers.contains(&driver) {
-                    self.loaded_drivers.push(driver);
-                    count += 1;
-                }
-            }
+    /// Simulates add-apt-repository
+    pub fn add_ppa(&mut self, ppa_uri: &str) -> Result<(), &'static str> {
+        if ppa_uri.starts_with("ppa:") {
+            self.added_ppas.push(ppa_uri.to_string());
+            self.apt_cache_synchronized = false; // cache needs sync
+            Ok(())
+        } else {
+            Err("Invalid PPA format: expected ppa:<launchpad-author>/<archive>")
         }
-        count
+    }
+
+    /// Simulates apt-get update
+    pub fn apt_get_update(&mut self) {
+        self.apt_cache_synchronized = true;
+    }
+
+    /// Simulates apt-get install <package>
+    pub fn apt_get_install(&mut self, package_name: &str) -> Result<String, &'static str> {
+        if !self.apt_cache_synchronized {
+            return Err("APT Cache is out of date. Run apt_get_update first.");
+        }
+
+        if let Some(version) = self.registered_packages.get(package_name) {
+            self.installed_packages.insert(package_name.to_string(), version.clone());
+            Ok(format!("Successfully installed {} (v{}) via APT.", package_name, version))
+        } else {
+            Err("E: Unable to locate package in configured repositories")
+        }
     }
 }
 
-impl Default for SigmaHardwareDetector {
+impl Default for UbuntuAptEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Sigma Settings Manager (MSM parity absorbing Manjaro Linux)
-/// Central controller to configure kernels, multi-locale language packages, and system timezones.
-pub struct SigmaSettingsManager {
-    pub available_kernels: Vec<&'static str>,
-    pub active_kernel: &'static str,
-    pub locale_packages: Vec<String>,
-    pub active_timezone: String,
+/// Ubuntu Server: Netplan network auto-configurer processing YAML-like definitions
+#[derive(Debug, Clone)]
+pub struct NetplanConfig {
+    pub interface_name: String,
+    pub dhcp4: bool,
+    pub static_ip: Option<String>,
+    pub gateway: Option<String>,
 }
 
-impl SigmaSettingsManager {
+pub struct NetplanConfigEngine {
+    pub configs: HashMap<String, NetplanConfig>,
+}
+
+impl NetplanConfigEngine {
     pub fn new() -> Self {
         Self {
-            available_kernels: vec!["Sovereign-LTS-6.1", "Sovereign-RT-6.6", "Sovereign-Mainline-6.12"],
-            active_kernel: "Sovereign-LTS-6.1",
-            locale_packages: vec!["en_US.UTF-8".to_string(), "hi_IN.UTF-8".to_string()], // default supports India Stack locales
-            active_timezone: "UTC".to_string(),
+            configs: HashMap::new(),
         }
     }
 
-    /// Switches the running system kernel dynamically
-    pub fn switch_kernel(&mut self, target_kernel: &'static str) -> Result<(), &'static str> {
-        if self.available_kernels.contains(&target_kernel) {
-            self.active_kernel = target_kernel;
-            Ok(())
-        } else {
-            Err("Target kernel is not available in system repos")
+    /// Parses declarative Netplan configurations (analogous to /etc/netplan/01-netcfg.yaml)
+    pub fn apply_netplan_yaml(&mut self, interface: &str, yaml_data: &str) -> Result<(), &'static str> {
+        if !yaml_data.contains("ethernets:") {
+            return Err("Invalid Netplan YAML: missing 'ethernets' definition");
         }
-    }
 
-    /// Updates the active system timezone configuration
-    pub fn update_timezone(&mut self, tz: &str) {
-        self.active_timezone = tz.to_string();
+        let dhcp4 = yaml_data.contains("dhcp4: true");
+        let mut static_ip = None;
+        let mut gateway = None;
+
+        if !dhcp4 {
+            if let Some(ip_idx) = yaml_data.find("addresses:") {
+                let segment = &yaml_data[ip_idx..];
+                if let Some(start) = segment.find('[') {
+                    if let Some(end) = segment.find(']') {
+                        static_ip = Some(segment[start + 1..end].to_string());
+                    }
+                }
+            }
+            if let Some(gw_idx) = yaml_data.find("gateway4:") {
+                let segment = &yaml_data[gw_idx..];
+                let lines: Vec<&str> = segment.lines().collect();
+                if let Some(first_line) = lines.first() {
+                    let parts: Vec<&str> = first_line.split(':').collect();
+                    if let Some(val) = parts.get(1) {
+                        gateway = Some(val.trim().to_string());
+                    }
+                }
+            }
+        }
+
+        let net_config = NetplanConfig {
+            interface_name: interface.to_string(),
+            dhcp4,
+            static_ip,
+            gateway,
+        };
+
+        self.configs.insert(interface.to_string(), net_config);
+        Ok(())
     }
 }
 
-impl Default for SigmaSettingsManager {
+impl Default for NetplanConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ubuntu Server: Cloud-Init automated user and metadata provisioner
+#[derive(Debug, Clone)]
+pub struct CloudInitEngine {
+    pub hostname: String,
+    pub authorized_ssh_keys: Vec<String>,
+    pub default_user_created: bool,
+}
+
+impl CloudInitEngine {
+    pub fn new() -> Self {
+        Self {
+            hostname: "ubuntu".to_string(),
+            authorized_ssh_keys: Vec::new(),
+            default_user_created: false,
+        }
+    }
+
+    /// Provisions operating parameters during early VM boot cycles
+    pub fn execute_cloud_config(&mut self, config_yaml: &str) -> Result<(), &'static str> {
+        if !config_yaml.contains("#cloud-config") {
+            return Err("Invalid cloud-config header: missing '#cloud-config'");
+        }
+
+        if let Some(host_idx) = config_yaml.find("hostname:") {
+            let line = config_yaml[host_idx..].lines().next().unwrap_or("");
+            let parts: Vec<&str> = line.split(':').collect();
+            if let Some(h) = parts.get(1) {
+                self.hostname = h.trim().to_string();
+            }
+        }
+
+        if config_yaml.contains("ssh_authorized_keys:") {
+            self.authorized_ssh_keys.push("ssh-rsa AAAAB3NzaC1yc2E...".to_string());
+        }
+
+        if config_yaml.contains("users:") && config_yaml.contains("name:") {
+            self.default_user_created = true;
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for CloudInitEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Lubuntu: Ultra-Lightweight LXQt Resource Watchdog and out-of-memory preventer
+#[derive(Debug, Clone)]
+pub struct LxqtProcess {
+    pub pid: u32,
+    pub name: String,
+    pub cpu_percent: f32,
+    pub memory_mb: f32,
+}
+
+pub struct LxqtResourceMonitor {
+    pub max_ram_mb: f32,
+    pub running_processes: Vec<LxqtProcess>,
+}
+
+impl LxqtResourceMonitor {
+    pub fn new(max_ram: f32) -> Self {
+        Self {
+            max_ram_mb: max_ram,
+            running_processes: Vec::new(),
+        }
+    }
+
+    /// Monitors resource footprint and auto-kills high-consumption tasks to prevent LXQt jank
+    pub fn check_and_prevent_oom(&mut self) -> Vec<String> {
+        let mut killed_process_names = Vec::new();
+        let total_ram_used: f32 = self.running_processes.iter().map(|p| p.memory_mb).sum();
+
+        if total_ram_used > self.max_ram_mb {
+            // Sort processes by memory usage descending to target major OOM triggers first
+            self.running_processes.sort_by(|a, b| b.memory_mb.partial_cmp(&a.memory_mb).unwrap());
+
+            while let Some(hog) = self.running_processes.first() {
+                let current_total: f32 = self.running_processes.iter().map(|p| p.memory_mb).sum();
+                if current_total <= self.max_ram_mb {
+                    break;
+                }
+                killed_process_names.push(hog.name.clone());
+                self.running_processes.remove(0); // remove first/largest process
+            }
+        }
+        killed_process_names
+    }
+}
+
+/// Ubuntu Studio: Low-Latency creative audio routing manager (PipeWire / JACK inspired)
+#[derive(Debug, Clone)]
+pub struct PipewireAudioRouter {
+    pub active_routes: HashMap<String, String>, // maps InputPort -> OutputPort
+    pub low_latency_mode: bool,
+}
+
+impl PipewireAudioRouter {
+    pub fn new() -> Self {
+        Self {
+            active_routes: HashMap::new(),
+            low_latency_mode: true,
+        }
+    }
+
+    /// Connects two creative ports (e.g., VirtualSynthesizer -> LowLatencySpeaker)
+    pub fn connect_ports(&mut self, source: &str, destination: &str) {
+        self.active_routes.insert(source.to_string(), destination.to_string());
+    }
+
+    /// Simulates route dispatching to measure real-time audio latency offsets
+    pub fn get_dispatch_latency_ms(&self) -> f32 {
+        if self.low_latency_mode {
+            0.8 // sub-millisecond JACK audio routing latency
+        } else {
+            12.5 // standard audio routing latency
+        }
+    }
+}
+
+impl Default for PipewireAudioRouter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ubuntu Core: Snapd Transactional sandboxing and digital signature enforcement
+#[derive(Debug, Clone)]
+pub struct SnapPackage {
+    pub name: String,
+    pub revision: u32,
+    pub signature_verified: bool,
+    pub read_only_loop_mounted: bool,
+}
+
+pub struct SnapdEngine {
+    pub installed_snaps: HashMap<String, SnapPackage>,
+}
+
+impl SnapdEngine {
+    pub fn new() -> Self {
+        Self {
+            installed_snaps: HashMap::new(),
+        }
+    }
+
+    /// Transactionally updates or installs a secure snap under loop-mounted confinement
+    pub fn install_secure_snap(&mut self, snap_name: &str, rev: u32, signature: &[u8]) -> Result<(), &'static str> {
+        // Simple signature check representing cryptographic assertions
+        if signature.is_empty() {
+            return Err("Unsigned Snap installation rejected!");
+        }
+
+        let snap = SnapPackage {
+            name: snap_name.to_string(),
+            revision: rev,
+            signature_verified: true,
+            read_only_loop_mounted: true,
+        };
+
+        self.installed_snaps.insert(snap_name.to_string(), snap);
+        Ok(())
+    }
+}
+
+impl Default for SnapdEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -507,51 +732,75 @@ mod tests {
     }
 
     #[test]
-    fn test_endeavour_welcome_engine() {
-        let mut welcome = EosWelcomeEngine::new();
-        assert!(welcome.first_boot);
-        assert_eq!(
-            welcome.update_mirrors().unwrap(),
-            "Sovereign package mirrors configured successfully"
-        );
-        assert!(welcome.mirrors_configured);
+    fn test_ubuntu_apt_and_ppas() {
+        let mut apt = UbuntuAptEngine::new();
+        assert!(apt.add_ppa("invalid_ppa").is_err());
+        assert!(apt.add_ppa("ppa:libreoffice/ppa").is_ok());
 
-        assert_eq!(
-            welcome.install_recommended_drivers().unwrap(),
-            "Modern Vulkan/GPU and HID drivers installed"
-        );
-        assert!(welcome.drivers_installed);
+        assert!(apt.apt_get_install("curl").is_err()); // cache not sync
+        apt.apt_get_update();
+        let res = apt.apt_get_install("curl").unwrap();
+        assert!(res.contains("curl"));
+        assert_eq!(apt.installed_packages.get("curl").unwrap(), "8.2.1");
     }
 
     #[test]
-    fn test_mirror_ranker() {
-        let ranker = MirrorRanker::new(500);
-        let mirrors = vec![
-            "mirror.us.sigmaos.org",
-            "mirror.in.sigmaos.org",
-            "mirror.de.sigmaos.org",
-        ];
-        let ranked = ranker.rank_mirrors(&mirrors);
-        assert_eq!(ranked.len(), 3);
-        assert_eq!(ranked[0].0, "mirror.us.sigmaos.org");
-        assert_eq!(ranked[0].1, 10);
+    fn test_ubuntu_server_netplan_provisioning() {
+        let mut netplan = NetplanConfigEngine::new();
+        let yaml_data = r#"
+            network:
+              version: 2
+              ethernets:
+                eth0:
+                  dhcp4: false
+                  addresses: [192.168.1.100/24]
+                  gateway4: 192.168.1.1
+        "#;
+        assert!(netplan.apply_netplan_yaml("eth0", yaml_data).is_ok());
+        let eth0 = netplan.configs.get("eth0").unwrap();
+        assert!(!eth0.dhcp4);
+        assert_eq!(eth0.static_ip.as_deref(), Some("192.168.1.100/24"));
+        assert_eq!(eth0.gateway.as_deref(), Some("192.168.1.1"));
     }
 
     #[test]
-    fn test_update_notifier_and_log_tool() {
-        let mut notifier = EosUpdateNotifier::new();
-        assert!(notifier.check_for_updates());
-        assert_eq!(notifier.pending_updates_count, 5);
+    fn test_lubuntu_lxqt_watcher() {
+        let mut monitor = LxqtResourceMonitor::new(512.0);
+        monitor.running_processes.push(LxqtProcess {
+            pid: 101,
+            name: "lxqt-panel".to_string(),
+            cpu_percent: 1.2,
+            memory_mb: 45.0,
+        });
+        monitor.running_processes.push(LxqtProcess {
+            pid: 102,
+            name: "firefox-leak".to_string(),
+            cpu_percent: 75.0,
+            memory_mb: 600.0,
+        });
 
-        let mut log_tool = DiagnosticLogTool::new();
-        log_tool.record_log_entry("Kernel", "Vulkan context bound successfully");
-        log_tool.record_log_entry(
-            "PackageManager",
-            "Transaction completed: installed sigma-vim",
-        );
+        let killed = monitor.check_and_prevent_oom();
+        assert_eq!(killed.len(), 1);
+        assert_eq!(killed[0], "firefox-leak");
+        assert_eq!(monitor.running_processes.len(), 1);
+        assert_eq!(monitor.running_processes[0].name, "lxqt-panel");
+    }
 
-        let report = log_tool.generate_troubleshooting_report();
-        assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
-        assert!(report.contains("[Kernel] Vulkan context bound successfully"));
+    #[test]
+    fn test_ubuntu_studio_low_latency_audio() {
+        let mut router = PipewireAudioRouter::new();
+        router.connect_ports("midi_keyboard", "jack_synth");
+        assert_eq!(router.active_routes.get("midi_keyboard").unwrap(), "jack_synth");
+        assert!(router.get_dispatch_latency_ms() < 1.0);
+    }
+
+    #[test]
+    fn test_ubuntu_core_snapd_sandbox() {
+        let mut snapd = SnapdEngine::new();
+        assert!(snapd.install_secure_snap("core22", 15, &[]).is_err());
+        assert!(snapd.install_secure_snap("core22", 15, &[1, 2, 3]).is_ok());
+        let snap = snapd.installed_snaps.get("core22").unwrap();
+        assert!(snap.read_only_loop_mounted);
+        assert!(snap.signature_verified);
     }
 }

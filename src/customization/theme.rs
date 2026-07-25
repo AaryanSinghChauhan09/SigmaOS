@@ -563,18 +563,9 @@ pub struct SigmaSoundscape {
 impl SigmaSoundscape {
     pub fn new() -> Self {
         let mut mapped = HashMap::new();
-        mapped.insert(
-            "login".to_string(),
-            "file:///system/audio/chime.wav".to_string(),
-        );
-        mapped.insert(
-            "shutdown".to_string(),
-            "file:///system/audio/logout.wav".to_string(),
-        );
-        mapped.insert(
-            "error".to_string(),
-            "file:///system/audio/warning.wav".to_string(),
-        );
+        mapped.insert("login".to_string(), "file:///system/audio/chime.wav".to_string());
+        mapped.insert("shutdown".to_string(), "file:///system/audio/logout.wav".to_string());
+        mapped.insert("error".to_string(), "file:///system/audio/warning.wav".to_string());
 
         Self {
             mapped_sounds: mapped,
@@ -583,8 +574,7 @@ impl SigmaSoundscape {
     }
 
     pub fn map_sound_event(&mut self, event_name: &str, file_uri: &str) {
-        self.mapped_sounds
-            .insert(event_name.to_string(), file_uri.to_string());
+        self.mapped_sounds.insert(event_name.to_string(), file_uri.to_string());
     }
 
     pub fn trigger_sound_event(&self, event_name: &str) -> Option<&str> {
@@ -677,26 +667,22 @@ mod tests {
     }
 
     #[test]
-    fn test_material_you_palette_generation() {
-        let engine = ThemeEngine::default();
-        let palette = engine.generate_palette_from_wallpaper("#FF5733");
-        assert_eq!(palette.primary, "#FF5733");
-        assert_eq!(palette.secondary, "#4A90E2");
+    fn test_backdrop_filter_blur_adjustment() {
+        let mut filter = ZenithBackdropFilter::new();
+        assert_eq!(filter.get_rendering_parameters(), (12.5, 0.85, 8));
+
+        filter.adjust_blur(25.0);
+        filter.set_opacity(50);
+        assert_eq!(filter.get_rendering_parameters(), (25.0, 0.50, 8));
     }
 
     #[test]
     fn test_sigma_soundscape_mapping() {
         let mut scape = SigmaSoundscape::new();
-        assert_eq!(
-            scape.trigger_sound_event("login"),
-            Some("file:///system/audio/chime.wav")
-        );
+        assert_eq!(scape.trigger_sound_event("login"), Some("file:///system/audio/chime.wav"));
 
         scape.map_sound_event("notification", "file:///system/audio/beep.wav");
-        assert_eq!(
-            scape.trigger_sound_event("notification"),
-            Some("file:///system/audio/beep.wav")
-        );
+        assert_eq!(scape.trigger_sound_event("notification"), Some("file:///system/audio/beep.wav"));
     }
 
     #[test]

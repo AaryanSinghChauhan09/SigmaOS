@@ -28,10 +28,32 @@ pub enum CodecType {
 }
 
 pub struct SovereignVideoPlayer {
-    pub active_codec: CodecType,
-    pub state: PlayerState,
-    pub volume: u32,
-    pub is_gpu_accelerated: bool,
+    /// Capability token for access control
+    capability: CapabilityToken,
+    /// Current video codec
+    video_codec: Option<VideoCodec>,
+    /// Current audio codec
+    audio_codec: Option<AudioCodec>,
+    /// Container format
+    container_format: Option<ContainerFormat>,
+    /// Upscaling quality
+    upscaling_quality: UpscalingQuality,
+    /// Spatial audio mode
+    spatial_audio_mode: SpatialAudioMode,
+    /// PQC encryption enabled
+    pqc_encryption: bool,
+    /// AI upscaling enabled
+    ai_upscaling: bool,
+    /// Frame buffer
+    frame_buffer: Vec<VideoFrame>,
+    /// Audio buffer
+    audio_buffer: Vec<AudioSample>,
+    /// Current playback position
+    current_position: u64,
+    /// Total duration in nanoseconds
+    total_duration: u64,
+    /// Playing state
+    is_playing: bool,
 }
 
 impl SovereignVideoPlayer {
