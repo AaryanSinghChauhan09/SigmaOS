@@ -2,6 +2,7 @@
 pub mod cross_platform;
 pub mod federation;
 pub mod historic_linux;
+pub mod innovations;
 pub mod lattice_grid;
 pub mod mesh_hub;
 
@@ -15,6 +16,13 @@ pub use federation::{
     FederatedNode, FileSyscallVM, FloppySim, KernelFederation, LegacyCPod, LegacyCppPod,
     LegacyDACSandbox, NetworkSyscallVM, PeripheralSimulator, PersonaType, ProcessSyscallVM,
     SecuritySandbox, SyscallContext, SyscallVM, TapeDriveSim, UEFIBoot, ZeroTrustSandbox,
+};
+
+pub use innovations::{
+    GreenComputingPolicy, ICasDeduplicator, IFileSystemCore, IRecoveryStrategy,
+    ISemanticSearchPlugin, ISyscallTranslator, LinuxTranslator, MlAcceleratedPolicy,
+    RollbackRecovery, SelfHealingOS, SigmaFsPlusPlus, SigmaScheduler, UniversalAbiTranslator,
+    WindowsTranslator, WorkloadCategory,
 };
 
 pub use lattice_grid::{
