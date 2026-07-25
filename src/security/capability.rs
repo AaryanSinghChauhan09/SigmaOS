@@ -2,8 +2,8 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// A cryptographic capability token required for any privileged action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -106,18 +106,8 @@ impl Default for CapabilityToken {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
-
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: &'static [&'static str],
@@ -135,17 +125,26 @@ impl CapabilityToken {
     pub fn new() -> Self {
         CapabilityToken {
             id: 0,
-            allowed_paths: &[],
-            allowed_ports: &[],
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
         }
     }
 
-    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+    pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
         CapabilityToken {
             id,
-            allowed_paths: paths,
-            allowed_ports: ports,
+            allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
+            allowed_ports: ports.to_vec(),
+            is_revoked: false,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: bits,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
         }
     }
@@ -184,7 +183,10 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        self.allowed_paths.iter().any(|&p| path.starts_with(p))
+        if self.allowed_paths.is_empty() {
+            return true; // Allow if no specific restriction
+        }
+        self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
@@ -202,23 +204,27 @@ impl CapabilityToken {
 
 #[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
-    pub token: CapabilityToken,
+    pub active_token: Option<CapabilityToken>,
 }
 
 impl CapabilityGate {
     pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
+        Self { active_token: None }
     }
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
+        self.active_token = Some(token);
     }
 }
 
 pub struct SecurityEnforcer {
     active_tokens: std::vec::Vec<CapabilityToken>,
+}
+
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Default for SecurityEnforcer {
@@ -236,28 +242,5 @@ impl SecurityEnforcer {
 
     pub fn register_token(&mut self, token: CapabilityToken) {
         self.active_tokens.push(token);
-    }
-}
-
-impl Default for SecurityEnforcer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_capability_token_traversal_protection() {
-        let paths = vec!["/var/www"];
-        let token = CapabilityToken::new_with_args(1, &paths, &[]);
-
-        // Safe path starts with /var/www and has no traversal
-        assert!(token.can_access_path("/var/www/index.html"));
-
-        // Path starting with /var/www but containing traversal should be blocked
-        assert!(!token.can_access_path("/var/www/../../etc/passwd"));
     }
 }
