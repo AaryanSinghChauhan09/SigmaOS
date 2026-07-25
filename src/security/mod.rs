@@ -2,15 +2,13 @@ pub mod lsm;
 
 pub mod audit;
 pub mod capability;
-pub mod cleaner;
-pub mod forensics;
 pub mod integrity;
 pub mod mac;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
-pub mod bridge;
-pub mod prism;
+pub mod secrets;
+pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};

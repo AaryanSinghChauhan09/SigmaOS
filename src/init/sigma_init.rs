@@ -169,6 +169,23 @@ impl Default for SigmaInit {
     fn default() -> Self {
         Self::new()
     }
+
+    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        for svc_option in &mut self.services {
+            if let Some(ref mut svc) = *svc_option {
+                if svc.id() == id {
+                    return svc.restart();
+                }
+            }
+        }
+        Err(InitError::ServiceNotFound)
+    }
+}
+
+impl Default for SigmaInit {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl InitSystem for SigmaInit {

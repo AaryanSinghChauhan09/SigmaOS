@@ -402,9 +402,6 @@ impl Keyring for SimpleKeyring {
     }
 }
 
-pub struct SecretManager;
-pub struct SecretStorage;
-
 #[cfg(test)]
 mod tests {
     use super::*;
