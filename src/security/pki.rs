@@ -193,9 +193,6 @@ pub trait CRL {
     fn get_crl(&self) -> Vec<(CertificateID, u32)>;
 }
 
-pub type PkiError = PKIError;
-pub type PkiManager = dyn PKIManager;
-
 #[derive(Debug, Clone)]
 pub struct CertificateAuthority {
     pub name: alloc::string::String,
@@ -288,6 +285,3 @@ mod tests {
 
 pub type PkiError = PKIError;
 pub type PkiManager = dyn PKIManager;
-
-#[derive(Debug, Clone)]
-pub struct CertificateAuthority;

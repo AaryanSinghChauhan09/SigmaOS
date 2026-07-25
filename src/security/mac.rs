@@ -446,8 +446,6 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-pub type MacPolicy = dyn MACPolicy;
-
 #[derive(Debug, Clone)]
 pub struct MacRule {
     pub name: alloc::string::String,
@@ -513,9 +511,3 @@ mod tests {
 }
 
 pub type MacPolicy = dyn MACPolicy;
-
-#[derive(Debug, Clone)]
-pub struct MacRule;
-
-#[derive(Debug, Clone)]
-pub struct MacSecurity;

@@ -1,5 +1,4 @@
-#![allow(clippy::all, warnings)]
-
+#![allow(warnings, clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
@@ -24,7 +23,6 @@ pub mod filesystem;
 pub mod finance;
 pub mod kernel;
 pub mod klib;
-pub mod legal;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -168,9 +166,7 @@ pub use virtualization::{
 pub mod init {
     pub mod systemd_init;
 }
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub mod virt;
 pub use virt::hypervisor::{

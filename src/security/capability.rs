@@ -116,6 +116,91 @@ pub enum Permission {
     Ipc,
 }
 
+/// A cryptographic capability token required for any privileged action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub id: u64,
+    pub allowed_paths: &'static [&'static str],
+    pub allowed_ports: &'static [u16],
+    pub is_revoked: bool,
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        CapabilityToken {
+            id: 0,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
+        }
+    }
+
+    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+        CapabilityToken {
+            id,
+            allowed_paths: paths,
+            allowed_ports: ports,
+            is_revoked: false,
+        }
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.id
+    }
+
+    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
+        self.id |= 1;
+        self
+    }
+
+    pub fn allow_read(mut self, _path: &str) -> Self {
+        self.id |= 2;
+        self
+    }
+
+    pub fn allow_write(mut self, _path: &str) -> Self {
+        self.id |= 4;
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.id |= 8;
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.id |= 16;
+        self
+    }
+
+    /// Verifies if the token permits access to a given path.
+    pub fn can_access_path(&self, path: &str) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        self.allowed_paths.iter().any(|&p| path.starts_with(p))
+    }
+
+    /// Verifies if the token permits binding to a network port.
+    pub fn can_bind_port(&self, port: u16) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        self.allowed_ports.contains(&port)
+    }
+
+    pub fn revoke(&mut self) {
+        self.is_revoked = true;
+    }
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
     pub active_token: Option<CapabilityToken>,
 }
