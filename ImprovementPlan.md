@@ -251,28 +251,91 @@ The following index maps active repository code modules to functional gaps and t
 
 ---
 
-## 🚀 8. Tactical Implementation Roadmap & Priorities
+## 🎯 8. Strategic Gap Closure Roadmap
 
-To guide developers in executing the system backlog:
-1. **Virtual Memory Paging (Immediate Step):** Complete PML4 page table directory walking and hook page fault handlers directly to standard scheduler thread-swap events.
-2. **Networking Stack Completion:** Implement robust IPv4 packet assembly/reassembly, basic static routing maps, and netfilter-style packet dropping rules.
-3. **Driver Expansion:** Build basic USB HID drivers to support standard mouse and keyboard devices on target bare-metal targets.
-4. **SigmaFS Distributed Core:** Implement transactional Copy-on-Write block tracking and Merkle-tree verified directory state checks.
-5. **Pluggable Security Policies:** Complete the `SecurityPolicyManager` to support sandbox isolation of untrusted compiler execution environments.
+This comprehensive roadmap defines the active, prioritized execution checklist and staged milestones designed to close all existing system-level parity gaps and establish SigmaOS as a fully functional operating system.
+
+### 8.1 Gap Closure Checklist
+
+#### 🔍 8.1.1 Kernel & Core System
+- [ ] **Virtual Memory:** Bridge physical buddy allocator to demand paging, page fault handling mechanics, copy-on-write, and virtual memory protection.
+- [ ] **Process Management:** Upgrade the basic scheduler with cgroups support, namespace mappings, real-time priority schedules, and thread budget trackers.
+- [ ] **Networking:** Complete TCP/UDP stubs to support full IPv4/IPv6 packet construction, routing tables, firewall filtering, VPN clients, DHCP, and DNS.
+- [ ] **Interrupt & Power Management:** Implement multi-core interrupt load balancing, ACPI parsing, and power state changes (suspend/resume).
+
+#### 🗂 8.1.2 Filesystem & Storage
+- [ ] **SigmaFS:** Fully implement custom distributed block structures, replication, and data integrity engines.
+- [ ] **Advanced Storage Features:** Build concrete filesystem journaling improvements, snapshots, RAID, and cryptographic encryption at rest.
+
+#### 🔐 8.1.3 Security & Isolation
+- [ ] **Mandatory Access Control (MAC):** Deploy SELinux or AppArmor-style policy engines.
+- [ ] **Containerization & Sandboxing:** Secure isolated compilation spaces and runtime user namespaces.
+- [ ] **Hardening:** Implement compile-time stack guards and runtime address layout randomizations.
+
+#### 🖥 8.1.4 Userland & UI
+- [ ] **`sigma-sh` REPL Shell:** Complete the interactive shell environment to handle pipeline redirection and path variables.
+- [ ] **POSIX Core Utilities:** Build native, lightweight alternatives to standard tools (`ls`, `cp`, `grep`, `mkdir`, `rm`).
+- [ ] **GUI Widget Toolkit:** Construct hardware-accelerated UI templates for desktop applications.
+- [ ] **Ecosystem Packages:** Expand `sigpkg` to manage comprehensive software repository trees.
+
+#### ⚙️ 8.1.5 System Services
+- [ ] **Init/System Manager:** Complete event-triggered service supervisions matching S6 alignments.
+- [ ] **Daemon Services:** Integrate low-latency logging daemons, printing subsystems, NTP time sync, and network connection background services.
+
+#### 🌐 8.1.6 Ecosystem & Compatibility
+- [ ] **POSIX Compliance:** Establish compliance standards for core system calls.
+- **Cross-Distro Compatibility:** Create package compatibility mappings for Debian (`.deb`), Fedora (`.rpm`), and Arch (`.pkg.tar.zst`).
+- **Virtualization:** Deploy native container execution pipelines and QEMU/KVM integrations.
+
+#### 🤖 8.1.7 Advanced/Innovative Features
+- [ ] **S-AI Shard Orchestration:** Build local LLM inference schedulers to run ML queues safely alongside hard real-time tasks.
+- [ ] **Adaptive Kernel Personas:** Complete live process routing based on execution history.
 
 ---
 
-## 🛠️ 9. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
+### 8.2 Roadmap Milestones
+
+```
+  +-------------------------------------------------------------------------------+
+  |  Phase 1: Short-Term (3-6 Months)                                             |
+  |  - Implement Virtual Memory Paging (Demand paging, page fault handling, CoW) |
+  |  - Complete Networking Stack (IPv4/IPv6, firewall, static routing)           |
+  |  - Build basic HID drivers (keyboard, mouse)                                  |
+  |  - Launch sigma-sh REPL shell and standard POSIX core CLI utilities           |
+  +-----------------------------------+-------------------------------------------+
+                                      |
+                                      v
+  +-----------------------------------+-------------------------------------------+
+  |  Phase 2: Mid-Term (6-12 Months)                                              |
+  |  - Expand driver support (GPU frames, Wi-Fi, ALSA-audio codecs)               |
+  |  - Launch SigmaFS Distributed filesystem with journals and replica streams     |
+  |  - Integrate Security MAC sandboxing and process namespace isolations         |
+  |  - Build init/system manager and logging background daemons                   |
+  +-----------------------------------+-------------------------------------------+
+                                      |
+                                      v
+  +-----------------------------------+-------------------------------------------+
+  |  Phase 3: Long-Term (12-24 Months)                                            |
+  |  - Deploy Virtualization (QEMU/KVM) and container runtimes                    |
+  |  - Integrate S-AI Shard workload schedules and tensor core schedulers         |
+  |  - Establish cross-distro package adapters (Debian/Arch/Fedora packages)      |
+  |  - Construct native UI widget toolkit and secure multi-user environments      |
+  +-------------------------------------------------------------------------------+
+```
+
+---
+
+## 🛠️ 10. Sovereign Tool Absorption: Built-in Replacements for Open-Source Tools
 
 SigmaOS rejects heavy, vulnerable external dependencies and bloated package runtimes. Instead of porting legacy Linux tools, SigmaOS integrates a comprehensive suite of native, zero-dependency, and capability-gated built-in tools that are strictly superior to their legacy open-source equivalents:
 
-### 9.1 Development & Database Tools
+### 10.1 Development & Database Tools
 * **VS Code / JetBrains → `SigmaCode` Shard:** Integrates a built-in Language Server Protocol (LSP) broker, syntax-highlighter, and a lightweight, zero-copy local AI autocomplete daemon, completely bypassing Electron memory leaks.
 * **Postman → `SigmaAPI` Utility:** A built-in, non-allocating HTTP/REST, GraphQL, and WebSockets sandbox utility capable of capturing and simulating socket sequences directly behind `CapabilityToken` gates.
 * **Git → `SigmaCommit` Engine:** A post-quantum secure distributed version control system. Replaces SHA-1 with Blake3 hashing, signs every transaction with native Dilithium-5 keys, and implements direct, zero-copy delta serialization.
 * **SQLite / PostgreSQL → `SigmaDB` Shard:** A native, transactional relational and NoSQL storage engine with page-level encryption, running fully in-memory with sub-nanosecond lookups and zero third-party database daemon overhead.
 
-### 9.2 Security & Forensic Tools
+### 10.2 Security & Forensic Tools
 * **Wireshark / tcpdump → `SigmaSniff` Monitor:** A built-in, SIMD-accelerated network packet and traffic analyzer, offering real-time zero-copy deep packet inspection (DPI) with visual timeline rendering directly in the Zenith desktop.
 * **Nmap → `SigmaScan` Network Utility:** A highly parallelized, lock-free network scanner that probes subnets, resolves topologies, and audits listening ports, guarded natively by S-NET capabilities.
 * **OpenSSL / GnuPG → `SigmaCrypt` Engine:** A modern, standard cryptographic toolbox implementing Kyber-1024 (key exchange), Dilithium-5 (signatures), and ChaCha20-Poly1305 (data encryption) with zero legacy OpenSSL code vulnerabilities.
@@ -280,7 +343,7 @@ SigmaOS rejects heavy, vulnerable external dependencies and bloated package runt
 
 ---
 
-## ⚡ 10. Bolt's Daily Performance Optimization
+## ⚡ 11. Bolt's Daily Performance Optimization
 
 ### 💡 What: Dependency Solver Iteration & Memoized State Cache
 The SAT solver in `src/sigpkg/resolver.rs` is responsible for resolving dependency trees. Currently, it uses a naive recursive approach in `resolve_recursive()` that visits nodes recursively and performs lookup operations on package names.
@@ -301,7 +364,29 @@ To verify this improvement:
 
 ---
 
-## 🛡️ 11. Self-Healing & System Resilience
+## 🎚️ 12. Prioritized Next Steps & Action Plan
+
+We rank the remaining improvements into a strict priority hierarchy:
+
+### 🔴 High Priority
+1. **Unify Capability Interfaces:** Resolve the missing `allow_exec()` and `allow_ipc()` methods in `src/security/pledge.rs` and update `CapabilityToken` in `src/security/capability.rs` to expose a consistent set of permission builders. (Fully implemented & resolved!)
+2. **Correct Borrow Checker Gaps:** Refactor `src/filesystem/manager.rs` to retrieve bookmark paths before executing mutable self navigations, decoupling the immutable borrow from the mutable borrow. (Fully implemented & resolved!)
+3. **Fix Move/Borrow Errors:** Standardize cloning for `String` and `PasswordEntry` in `src/productivity/clipboard_manager.rs` and `src/security/password.rs` to stop borrow-after-move errors.
+4. **Resolve Microkernel Compiling Bugs:** Correct non-standard `protocol` declarations in `src/net/stack.rs`, Python-like `def` syntax inside traits in `src/net/socket.rs`, and address the brace collisions in `src/kernel/memory.rs` to enable workspace-wide library compiling.
+5. **Implement Adaptive Personality Switchboards:** Develop prototypes of `KernelPersonaManager` and `CompatibilitySandbox` to dynamically route and isolate multi-generation software tasks.
+
+### 🟡 Medium Priority
+1. **Expand Unit Tests:** Refactor `tests/integration_test.rs` to implement real end-to-end integration tests for the MLFQ scheduler and SAT solver package resolver.
+2. **Develop FirmwareTimeTravel Modes:** Design boot manager handlers to simulate legacy BIOS, UEFI, and Coreboot structures.
+3. **Establish Argon2id Hashing:** Enhance GDPR/HIPAA compliance by upgrading the password hashing pipeline from mock algorithms to native Argon2id stretching.
+
+### 🟢 Low Priority
+1. **Build Out Peripheral Emulation Clouds:** Build out virtual modules to stream and virtualize archaic storage components such as tapes or floppy drives.
+2. **Zenith WCAG High-Contrast Polish:** Introduce high-contrast keyboard focus indicators inside `zenith_desktop.css` and emit standard accessibility attributes from visual layers.
+
+---
+
+## 🛡️ 13. Self-Healing & System Resilience
 
 SigmaOS uses active supervision watchdogs to implement a highly resilient self-healing state machine:
 * **State Watchdogs:** S6-style processes monitor the wellness of critical userland and kernel tasks.
