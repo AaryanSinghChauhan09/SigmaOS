@@ -1,5 +1,5 @@
 //! SigPkg: Community Recipe Packaging (Arch Linux Absorption)
-//! 
+//!
 //! Zero-allocation package manager parsing simple, signed declarative community recipes.
 
 use core::cmp::Ordering;
@@ -27,11 +27,15 @@ impl PackageRecipe {
         minor: u32,
         patch: u32,
         url: &'static str,
-        dependencies: &'static [&'static str]
+        dependencies: &'static [&'static str],
     ) -> Self {
         PackageRecipe {
             name,
-            version: Version { major, minor, patch },
+            version: Version {
+                major,
+                minor,
+                patch,
+            },
             source_url: url,
             checksum: [0; 32], // Stub checksum
             dependencies,
@@ -43,3 +47,20 @@ impl PackageRecipe {
         true
     }
 }
+
+#[derive(Debug, Clone)]
+pub enum BuildSystem {
+    Cargo,
+    CMake,
+    Make,
+    None,
+}
+
+#[derive(Debug, Clone)]
+pub enum RecipeError {
+    InvalidRecipe,
+    SignatureMismatch,
+}
+
+#[derive(Debug, Clone)]
+pub struct RecipeManager;
