@@ -44,11 +44,17 @@ panic = "abort"
 [[bin]]
 name = "sigma_kernel"
 path = "src/kernel/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_drivers"
 path = "src/drivers/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_userspace"
 path = "src/userspace/main.rs"
+test = false
+required-features = ["microkernel"]
