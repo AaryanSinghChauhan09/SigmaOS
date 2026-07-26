@@ -77,10 +77,27 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 * **Success Criteria:** High thermal events automatically invoke CPU throttling rules.
 
 #### 4.2 Zenith Desktop Accessibility & Transition Polish
-* **Task:** Connect assistive tech (Screen Reader, High Contrast) to the UI compositor rendering loop. Implement responsive layouts and screen reader voice buffers.
-* **Target Directories:** `src/accessibility/`, `zenith_desktop/`
-* **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
-* **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
+*   **Task:** Connect assistive tech (Screen Reader, High Contrast) to the UI compositor rendering loop. Implement responsive layouts and screen reader voice buffers.
+*   **Target Directories:** `src/accessibility/`, `zenith_desktop/`
+*   **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
+*   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
+
+---
+
+## 🏗️ OOP-Based Plug-and-Play Driver Framework
+
+To ensure flawless driver dynamic-loading, SigmaOS defines abstract base traits and strict device-family hierarchies.
+
+### Polymorphic Device Framework:
+```rust
+pub trait DeviceDriver {
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn shutdown(&mut self) -> Result<(), &'static str>;
+    fn get_status(&self) -> &'static str;
+}
+```
+
+This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, `GpuDriver`, `NetworkDriver`, `BluetoothDriver`) executing within isolated userspace microkernel shards.
 
 ---
 
