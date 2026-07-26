@@ -487,6 +487,7 @@ impl ProcessMemory for SimpleProcessMemory {
             Err(PageFaultError::InvalidAddress)
         }
     }
+}
 
 impl<T> Default for Vec<T> {
     fn default() -> Self {
