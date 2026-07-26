@@ -634,6 +634,7 @@ mod tests {
             value: "echo running; ls".to_string(),
         };
         repl.execute_command(set_cmd).unwrap();
+    }
 
     #[test]
     fn test_cat_command() {
