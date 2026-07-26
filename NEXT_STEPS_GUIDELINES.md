@@ -314,7 +314,38 @@ To establish peerless visual elegance, intuitive control interfaces, and unmatch
 
 ---
 
-## 12. Astra Linux Inspired Military-Grade Security & Mandatory Access Controls (MAC)
+## 12. GIMP & Krita Inspired Bare-Metal GPU Graphics Manipulation Core
+
+To bridge the gap with advanced digital graphics applications (GIMP, Krita, and GEGL pipelines) and enable bare-metal, latency-free raster image manipulation, SigmaOS integrates a hardware-accelerated, non-destructive graphics pipeline:
+
+### 1. SIMD-Accelerated Blending & Compositing (SigmaPaint)
+* **GIMP/Krita Inspiration:** GEGL (Generic Graphics Library) raster processor.
+* **SigmaOS Sovereign Solution:** A high-performance, non-allocating raster blender utilizing SIMD hardware vectors (AVX-512 and ARM Neon). It implements standard blend equations (Normal, Multiply, Screen, Overlay, Soft Light, Color Dodge) directly on contiguous raw pixel slices, maximizing CPU throughput and achieving sub-millisecond composition times.
+* **OOP Mapping:** Governed by `ImageComposition`, `Layer`, and `BlendMode` structs inside `src/ui/gimp_krita_core.rs`.
+
+### 2. GPU-Accelerated Compute Shader Filters (ZenithShader)
+* **GIMP/Krita Inspiration:** Krita OpenGL Canvas & GPU-accelerated brush engines.
+* **SigmaOS Sovereign Solution:** Integrates bare-metal Vulkan and OpenGL-grade compute shader modules directly into the graphics compositor. Heavy filter computations (Gaussian Blur, High-Pass, Sobel Edge Detection, HSV Color Correction) are offloaded onto the GPU, avoiding standard PCIe bus bottleneck delays.
+* **OOP Mapping:** Orchestrated by the `ZenithCompositor` rendering loop.
+
+### 3. Copy-on-Write Merkle Image State Trees (CoW History)
+* **GIMP/Krita Inspiration:** Infinite Undo/Redo history buffers.
+* **SigmaOS Sovereign Solution:** A git-inspired historical state tracker. Instead of cloning complete layer canvases, SigmaOS structures layer histories into a Merkle Image Tree using Copy-on-Write (CoW) page mappings. Undo and Redo actions represent instantaneous pointer swaps of directory branch hashes, enabling millions of non-destructive undo states with near-zero memory footprint.
+* **OOP Mapping:** Mapped to the `SovereignTimeMachine` and `Snapshot` systems.
+
+### 4. Hybrid Vector-Raster Drafting Canvas (ZenithVector)
+* **GIMP/Krita Inspiration:** Vector layer painting and Bezier pen tools.
+* **SigmaOS Sovereign Solution:** Unifies the 2D vector sketching capabilities of `SigmaCAD` with raster layers. Vector-defined Bezier splines and shapes are rendered dynamically into the compositional overlays of the `ZenithCompositor` as responsive, hardware-accelerated geometry listeners.
+* **OOP Mapping:** Handled via the `SigmaCAD` and `VSCodeShard` primitives.
+
+### 5. Automated EXIF & Metadata Privacy Stripper (SigmaExif)
+* **GIMP/Krita Inspiration:** Exif/XMP metadata export options.
+* **SigmaOS Sovereign Solution:** An export-gated privacy sandbox that automatically inspects and strips geo-location coordinates, device profiles, camera manufacturer IDs, and user identification markers from JPEG/PNG/TIFF pipelines.
+* **OOP Mapping:** Enforced at the `Privacy-First Sandbox` boundary.
+
+---
+
+## 13. Astra Linux Inspired Military-Grade Security & Mandatory Access Controls (MAC)
 
 To absorb Astra Linux’s peerless security certifications, military-grade mandatory access controls (MAC), and secure auditing capabilities, SigmaOS establishes a specialized microkernel-native security architecture designed for classified operations:
 
