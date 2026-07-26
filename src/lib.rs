@@ -19,6 +19,7 @@ pub mod fs;
 pub mod net;
 pub mod filesystem;
 pub mod kernel;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;

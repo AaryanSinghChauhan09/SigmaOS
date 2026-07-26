@@ -11,6 +11,8 @@ pub mod pki;
 pub mod pledge;
 pub mod secrets;
 pub mod selinux;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
@@ -38,6 +40,12 @@ pub use password::{
 pub use pki::{Certificate, CertificateAuthority, PkiError, PkiManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use secrets::{SecretManager, SecretStorage, SecretType};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission,
+    SecurityContext as SelinuxSecurityContext, SecurityLabel, SecurityPolicy, SecurityRule,
+};
+pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
+pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
@@ -57,7 +65,8 @@ pub use integrity::{
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
+    SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{

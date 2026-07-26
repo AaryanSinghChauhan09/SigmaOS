@@ -9,6 +9,9 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
+pub mod even_more_devices;
+pub mod kernel_releases;
+pub mod more_devices;
 
 pub use even_more_devices::{
     AdLibSynthDriver, Bluetooth5_4_Adapter, Ne2000NetworkDriver,
@@ -55,3 +58,21 @@ pub type PrepatchRcDriver3 = Longterm6_6_AudioDriver;
 pub type PrepatchRcDriver4 = Longterm6_1_InputDriver;
 pub type PrepatchRcDriver5 = Longterm5_15_SerialDriver;
 pub type PrepatchRcDriver6 = Longterm5_10_TpmDriver;
+
+pub use more_devices::{
+    AppleSiliconUnifiedMemoryBus, CgaGraphicsDriver, CxlMemoryDriver, FloppyDiskDriver,
+    GameportJoystickDriver, IdeControllerDriver, IntelXeGpuDriver, ParallelPrinterDriver,
+    PcieGen5NvmeDriver, SoundBlaster16Driver, Thunderbolt4Controller, Wifi7Adapter,
+};
+
+pub use even_more_devices::{
+    AdLibSynthDriver, Bluetooth5_4_Adapter, Ne2000NetworkDriver, NvlinkBusDriver, PciIdeBridge,
+    PcieGen6Bridge, Ps2MouseDriver, Sata3Controller, SerialMouseDriver, Ufs4StorageDriver,
+    Usb4HostController, VgaTextModeDriver,
+};
+
+pub use kernel_releases::{
+    Longterm5_10_TpmDriver, Longterm5_15_SerialDriver, Longterm6_12_NetworkDriver,
+    Longterm6_18_StorageDriver, Longterm6_1_InputDriver, Longterm6_6_AudioDriver,
+    MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
+};

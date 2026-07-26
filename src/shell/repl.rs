@@ -691,5 +691,50 @@ mod tests {
         assert!(repl.execute_command(ShellCommand::Clipboard { subcommand: "get".to_string(), args: vec![] }).is_ok());
         assert!(repl.execute_command(ShellCommand::Clipboard { subcommand: "set".to_string(), args: vec!["CopiedText".to_string()] }).is_ok());
         assert_eq!(repl.clipboard_content, "CopiedText");
+
+        let run_cmd = repl.parse_command("platform run photoshop windows exe");
+        assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
+        let run_res = repl.execute_command(run_cmd).unwrap();
+        assert!(run_res.contains("photoshop"));
+        assert!(run_res.contains("Translation"));
+    }
+
+    #[test]
+    fn test_cli_resilience() {
+        let mut repl = ShellRepl::new();
+
+        let create_cmd = repl.parse_command("snapshot create");
+        assert!(matches!(create_cmd, ShellCommand::SnapshotCreate));
+        let create_res = repl.execute_command(create_cmd).unwrap();
+        assert!(create_res.contains("successfully created"));
+
+        let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
+        assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
+        let restore_res = repl.execute_command(restore_cmd);
+        // "checkpoint-1" won't exist initially, returns not found Err
+        assert!(restore_res.is_err());
+    }
+
+    #[test]
+    fn test_cli_defensive_auditing() {
+        let mut repl = ShellRepl::new();
+
+        let status_cmd = repl.parse_command("audit status");
+        assert!(matches!(status_cmd, ShellCommand::AuditStatus));
+        let status_res = repl.execute_command(status_cmd).unwrap();
+        assert!(status_res.contains("Defensive Audit Summary"));
+        assert!(status_res.contains("Enforced"));
+
+        let log_cmd = repl.parse_command("audit log");
+        assert!(matches!(log_cmd, ShellCommand::AuditLog));
+        let log_res = repl.execute_command(log_cmd).unwrap();
+        assert!(log_res.contains("Latest Defensive Access Logs"));
+        assert!(log_res.contains("CAP_CHECK"));
+
+        let check_cmd = repl.parse_command("audit check");
+        assert!(matches!(check_cmd, ShellCommand::AuditCheck));
+        let check_res = repl.execute_command(check_cmd).unwrap();
+        assert!(check_res.contains("System Safety Sanity Scan"));
+        assert!(check_res.contains("W^X strictly enforced"));
     }
 }

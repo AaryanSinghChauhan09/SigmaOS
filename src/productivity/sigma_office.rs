@@ -366,7 +366,7 @@ impl PresentationProcessor {
                 fill_color,
             },
             position,
-            size: (50.0, 50.0),
+            size: (100.0, 50.0),
         };
         self.slides[self.current_slide].push(node.clone());
         self.document.add_node(node)
@@ -484,11 +484,12 @@ impl SigmaOffice {
     /// Save document to SigmaFS
     pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
         // In real implementation, this would save to SigmaFS with capability checks
-        let _doc = self.documents.get(doc_idx).ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found"))?;
+        let _doc = self.documents.get(doc_idx).ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
+        })?;
         // Save logic here
         Ok(())
     }
-
     /// Load document from SigmaFS
     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
         // In real implementation, this would load from SigmaFS with capability checks
