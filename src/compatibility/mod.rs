@@ -6,6 +6,7 @@ pub mod abi_translator;
 pub mod lattice;
 pub mod prism;
 pub mod canonical;
+pub mod fedora;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -28,4 +29,7 @@ pub use prism::{
 };
 pub use canonical::{
     SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+};
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
