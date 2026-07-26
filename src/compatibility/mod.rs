@@ -6,6 +6,7 @@ pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod wasm_sandbox;
+pub mod absorb_tools;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -47,4 +48,9 @@ pub use solid_kernel::{
 
 pub use wasm_sandbox::{
     WasmState, WasmModule, WasmSandboxEngine,
+};
+
+pub use absorb_tools::{
+    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
+    DpllSatSolver, CasObject, ContentAddressedStorage,
 };
