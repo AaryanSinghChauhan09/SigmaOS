@@ -1720,25 +1720,37 @@ To maintain absolute competitive superiority, SigmaOS establishes core re-engine
 +-------------------------------------------------------------------------------------------------+
 |                                  COMPETITIVE EDGE DASHBOARD                                     |
 +--------------------+--------------------------------+-------------------------------------------+
-| Operational Area   | Linux / BSD / Windows / macOS  | SigmaOS Innovation (Sovereign Core)       |
+| Operational Area   | Linux/BSD/Windows/iOS/Android  | SigmaOS Innovation (Sovereign Core)       |
 +--------------------+--------------------------------+-------------------------------------------+
-| Binary Execution   | Limited; requires heavy virtual| Universal ABI Translation Shard maps PE,  |
-| (ABI Translation)  | machines or complex Wine shims | ELF, and Mach-O polymorphically natively.  |
+| Binary Execution   | POSIX, Wine, VMs, emulators    | Universal ABI Translator Shard maps PE,   |
+| (ABI Translation)  |                                | ELF, and Mach-O polymorphically natively.  |
 +--------------------+--------------------------------+-------------------------------------------+
-| Filesystem Core    | Rigid metadata; prone to       | Composable SigmaFS++ with native semantic |
-| (Storage & Audits) | corruption and lack of audits  | search vector databases and audit logs.   |
+| Filesystem Core    | Ext4, NTFS, APFS, ZFS          | Composable SigmaFS++ (semantic indexing,  |
+| (Storage & Audits) |                                | deduplication, blockchain audit trails).  |
 +--------------------+--------------------------------+-------------------------------------------+
-| OS Micro-Services  | Monolithic kernel panic risk;  | OOP microkernel modularity with           |
-| (Self-Healing)     | manual upgrades and reboots    | sub-millisecond automated crash restarts. |
+| OS Micro-Services  | Monolithic kernel panic risk;  | OOP microkernel modularity + self-healing |
+| (Self-Healing)     | manual upgrades and reboots    | with automated sub-millisecond restarts.  |
 +--------------------+--------------------------------+-------------------------------------------+
 | Task Scheduling    | Performance-only focus; heavy  | Energy-aware scheduling coupled with      |
 | (Predictive Sync)  | context-switching latency      | AI-driven predictive resource profiling.  |
 +--------------------+--------------------------------+-------------------------------------------+
-| System Security    | Complex SELinux/AppArmor;      | Zero-trust capability sandboxing with     |
-| (PQC Sandboxing)   | vulnerable to privilege escalation| post-quantum Dilithium-5 signatures.      |
+| System Security    | SELinux/AppArmor, Defender,    | Zero-trust capability sandboxing with     |
+| (PQC Sandboxing)   | iOS sandbox, rigid ACL models  | post-quantum Dilithium-5 signatures.      |
 +--------------------+--------------------------------+-------------------------------------------+
-| Kernel Scripting   | Hard compile blocks; dangerous | Sandboxed UDF interpreter VM executing    |
-| (Extensibility)    | un-verified system extensions  | safe, verified runtime bytecode scripts.  |
+| Drivers            | Monolithic kernel modules,     | Hot-swap, self-healing, predictive        |
+|                    | vendor-locked drivers          | diagnostics, and Liskov Substitution.     |
++--------------------+--------------------------------+-------------------------------------------+
+| Extensibility      | Limited, unverified extensions  | User-defined kernel functions (custom     |
+|                    | risking panic crashes          | schedulers, allocators, FS plugins).      |
++--------------------+--------------------------------+-------------------------------------------+
+| Ecosystem          | Fragmented systems with        | Cross-device continuity layer (seamless   |
+| (Continuity)       | external cloud synch layers    | file, window, and focus state sync).      |
++--------------------+--------------------------------+-------------------------------------------+
+| Documentation      | Manual man pages and wiki lists| Self-documentation tool auto-generating   |
+|                    | prone to aging and drift       | dependency maps and UML flows from code.  |
++--------------------+--------------------------------+-------------------------------------------+
+| Device Support     | Legacy hardware often dropped  | Unified OOP driver layer supporting       |
+|                    | in new mainline versions       | old + new devices natively via brokers.   |
 +--------------------+--------------------------------+-------------------------------------------+
 ```
 
@@ -2026,6 +2038,150 @@ pub trait ICurtinBlockInstaller {
     fn partition_disk(&mut self, disk_path: &str, layout: &[DiskPartition]) -> Result<(), u32>;
 }
 ```
+
+---
+
+## 24. CORE ARCHITECTURAL PRINCIPLES EMBEDDED IN SIGMAOS
+
+SigmaOS enforces a strict, multi-dimensional set of systems programming guidelines that guarantee absolute digital sovereignty, memory safety, and out-of-the-box sustainability:
+
+```
++-------------------------------------------------------------------------------------------------+
+|                                    18 CORE SYSTEMS PRINCIPLES                                   |
++-------------------------------------------------------------------------------------------------+
+|  OS PRINCIPLES                                                                                  |
+|  - User-Defined First       : Safe userspace APIs for custom schedulers, allocators, and FSs    |
+|  - Object-Oriented Kernel   : Subsystems fully modeled as classes and interfaces (SOLID)        |
+|  - Universal Compatibility  : Abstract translation layers for PE, ELF, Mach-O natively          |
+|  - Resilience & Self-Healing: Automatic rollback snapshots and sub-millisecond restarts        |
+|  - Energy Efficiency        : Sustainability-first EEVDF resource balancing and profiling       |
+|  - Cross-Device Continuity  : Real-time file, clipboard, window, and focus syncing across nodes|
+|  - Self-Documentation       : Auto-generation of system dependency maps and UML flows from code |
++-------------------------------------------------------------------------------------------------+
+|  DRIVER PRINCIPLES                                                                              |
+|  - Interface Segregation   : Drivers expose only the narrow, required operations to supervisors|
+|  - Liskov Substitution      : All device family subclasses replace base templates seamlessly    |
+|  - Dependency Inversion     : Microkernel depends strictly on driver abstractions (traits)      |
+|  - Self-Healing Drivers     : Auto-rollback on registry failures with predictive diagnostics    |
+|  - Hot-Swap Drivers         : Live in-memory driver replacement without microkernel reboots     |
+|  - Cross-Platform Abstraction: Normalized driver API bindings across x86, ARM64, and RISC-V     |
++-------------------------------------------------------------------------------------------------+
+|  SOFTWARE PRINCIPLES                                                                            |
+|  - Open/Closed              : Closed kernel core, extensible safe plugins                       |
+|  - Single Responsibility    : Each standalone utility/daemon does exactly one task flawlessly   |
+|  - Secure by Design         : Zero-trust capability-gated enclaves replacing ambient privileges |
+|  - Continuous Verification  : Cryptographically verified builds utilizing post-quantum trust   |
+|  - Adaptive UX              : Fluid visual compositor adapting layout structures on-the-fly     |
++-------------------------------------------------------------------------------------------------+
+```
+
+### 24.1 OS Principles
+* **User-Defined First Principle:** The microkernel exports high-level, safe, and isolated trait boundaries (such as `ISchedulerPolicy` and `IFileSystemPlugin`), empowering power users and researchers to run customized scheduling and file indexing policies without full kernel compilation.
+* **Object-Oriented Kernel Principle:** Core subsystems are modeled as encapsulated classes containing strict private properties, normalising interfaces using polymorphic traits.
+* **Universal Compatibility Principle:** Translates third-party binary registers on-the-fly inside the `ABITranslator` engine to execute compiled Linux, BSD, Windows, iOS, and Android software safely within sandboxed Ring 3 enclaves.
+* **Resilience & Self-Healing:** The background supervisor proactively audits system file integrity against cryptographic hashes, generating hot patches and rolling back to verified snapshots on failure.
+* **Energy Efficiency Principle:** Workloads are evaluated using cost models predicting core temperature and battery drain, balancing task frequency scaling dynamically.
+* **Cross-Device Continuity Principle:** Encapsulates state-synchronizing packets inside Noise-secure network tunnels to keep desktop, mobile, and IoT nodes aligned in real-time.
+* **Self-Documentation Principle:** An automated, offline code parser walks system traits and generates up-to-date dependency maps and ASCII sequence flowcharts dynamically.
+
+### 24.2 Driver Principles
+* **Interface Segregation:** Driver classes separate operations (e.g. splitting block-level I/O from storage-controller telemetry) to prevent bloated interfaces.
+* **Liskov Substitution:** Any concrete hardware class (such as `PcieGen6NvmeDriver` or `Sata3Controller`) can substitute parent abstractions seamlessly without altering the supervisor's execution path.
+* **Dependency Inversion:** High-level kernel layers coordinate only with abstract interfaces (such as `StorageVolume` and `NetworkChannel`), decoupling execution from concrete device registers.
+* **Self-Healing Drivers:** Auto-detects device lock-ups or thermal spikes, rolling back driver states or performing sandboxed restarts.
+* **Hot-Swap Drivers:** Deallocates and initializes active driver enclaves on-the-fly without system downtime.
+* **Cross-Platform Driver Abstraction:** Normalizes physical bus mappings across multiple CPU instruction sets (x86_64, ARM64, and RISC-V) inside a single unified driver interface.
+
+### 24.3 Software Principles
+* **Open/Closed Principle:** Core microkernel abstractions are closed to modifications but open to safe extension through dynamic plugins.
+* **Single Responsibility Principle:** Every utility (such as `sigma-pkg` or `S-VOID`) runs as a dedicated daemon completing exactly one systems task with zero side-effects.
+* **Secure by Design:** Capability-based access replaces old-style Unix permissions, gating system call paths at the microkernel gate.
+* **Continuous Verification:** Every package install or system update undergoes post-quantum cryptographic validation using Dilithium-5 signatures before execution.
+* **Adaptive UX:** Zenith window grids dynamically scale and adapt interface layouts based on active screen orientations and physical display boundaries.
+
+---
+
+## 25. THE DEEP RE-ENGINEERING ROADMAP & SEVEN-PHASE IMPLEMENTATION PLAN
+
+To fully close the gap and implement all documented subsystems from the SigmaOS Wiki, the systems engineering team follows a highly structured, 7-phase re-engineering pipeline:
+
+```
++-------------------------------------------------------------------------------------------------+
+|                                   7-PHASE PARITY ROADMAP PROGRESS                               |
++-------------------------------------------------------------------------------------------------+
+|  Phase I: Audit Wiki Modules                                                                    |
+|  - Maps out all documented subsystems and identifies pre-defined functions/libraries to replace. |
++-------------------------------------------------------------------------------------------------+
+|  Phase II: Refactor to OOP SOLID                                                                |
+|  - Converts procedural modules into cleanly encapsulated classes and polymorphic interfaces.  |
++-------------------------------------------------------------------------------------------------+
+|  Phase III: User-Defined APIs                                                                   |
+|  - Integrates ISchedulerPolicy and IFileSystemPlugin extension points in core microkernel loops.|
++-------------------------------------------------------------------------------------------------+
+|  Phase IV: Eliminate Library Dependencies                                                       |
+|  - Replaces external crates with modular, in-house abstractions and providers.                 |
++-------------------------------------------------------------------------------------------------+
+|  Phase V: Self-Healing & Observability                                                          |
+|  - Integrates append-only cryptographic logging, telemetry, and rollback snapshots.             |
++-------------------------------------------------------------------------------------------------+
+|  Phase VI: Cross-Platform ABI Verification                                                      |
+|  - Deploys and tests the Universal ABI Translator with real Linux, BSD, and Windows binaries.   |
++-------------------------------------------------------------------------------------------------+
+|  Phase VII: Legacy & Modern Driver Support                                                      |
+|  - Deploys unified OOP driver brokers, hot-swapping controllers, and predictive diagnostics.    |
++-------------------------------------------------------------------------------------------------+
+```
+
+### 25.1 Subsystem Re-engineering Blueprint & Parity Progress
+
+#### A. Scheduler Subsystem
+* **Wiki Specification:** Transition from monolithic scheduler loops to a purely Object-Oriented multi-queue design.
+* **Parity Implementation:**
+  - Exposes `ISchedulerPolicy` as an abstract interface.
+  - Integrates AI-driven predictive scheduling to pre-fetch cache lines.
+  - Embeds energy-aware scheduling policies dynamically throttling high-frequency core clusters.
+
+#### B. Filesystem Subsystem
+* **Wiki Specification:** Modular block-allocation matrices with integrated indexing.
+* **Parity Implementation:**
+  - Exposes `IFileSystemPlugin` for metadata parsing.
+  - Implements local, vector-based semantic search indexes.
+  - Records all block operations in an immutable, blockchain-style audit ledger.
+
+#### C. Networking Subsystem
+* **Wiki Specification:** Decoupled socket managers running directly on network card ring buffers.
+* **Parity Implementation:**
+  - Implements policy-driven, adaptive firewall modules.
+  - Embeds local machine-learning anomaly detection classifiers to intercept zero-day network threats character-by-character.
+
+#### D. Driver Subsystem
+* **Wiki Specification:** Modular hardware wrappers running in Ring 3.
+* **Parity Implementation:**
+  - Decouples driver initialization from kernel compilation using Userspace Driver Brokers.
+  - Integrates live hot-swappable driver modules without system reboots.
+
+#### E. Security Subsystem
+* **Wiki Specification:** Capability token delegation at syscall gates.
+* **Parity Implementation:**
+  - Implements encrypted, hardware-isolated memory enclaves.
+  - Deploys continuous, local biometric authentication gateways.
+
+#### F. Package Manager Subsystem
+* **Wiki Specification:** Transactional, content-addressed software stores.
+* **Parity Implementation:**
+  - Automates build validation using post-quantum Dilithium-5 cryptographic signatures.
+  - Incorporates local topological SAT dependency solvers to eliminate dynamic compilation risks.
+
+#### G. System Documentation Tooling
+* **Wiki Specification:** Live architectural mapping of the codebase.
+* **Parity Implementation:**
+  - Deploys an offline code parser that walks system traits to auto-generate ASCII sequence diagrams and UML dependency graphs.
+
+#### H. Zenith UI Subsystem
+* **Wiki Specification:** Direct framebuffer blitting with a complete absence of heavy display servers.
+* **Parity Implementation:**
+  - Employs hardware-level SIMD layout scaling and typography rendering.
+  - Implements Adaptive UX, dynamically scaling layout containers based on touch/gesture inputs.
 
 ```
 +-----------------------------------------------------------------------------------------+
