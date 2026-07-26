@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// Intent/Message structures for Multi-Agent AutoGen Simulation
+// Inspired by Microsoft AutoGen multi-agent conversational interfaces.
 
 extern crate alloc;
 use alloc::vec::Vec;

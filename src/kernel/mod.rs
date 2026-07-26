@@ -9,6 +9,7 @@ pub mod roundrobin;
 pub mod scheduler;
 pub mod meta;
 pub mod paging;
+pub mod user_defined;
 
 pub use boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -36,4 +37,7 @@ pub use meta::{
 };
 pub use paging::{
     PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2,
+};
+pub use user_defined::{
+    IAllocatorPolicy, IFilesystemPlugin, ISchedulerPolicy, UserDefinedExtensionRegistry,
 };
