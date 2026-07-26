@@ -31,5 +31,5 @@ pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant, SimpleExploitPayload, SimplePenetrationAssistant,
+    PenetrationAssistant,
 };
