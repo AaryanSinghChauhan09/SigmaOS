@@ -226,6 +226,37 @@ Welcome to the definitive Next Steps, Guidelines, and Roadmap for continuous qua
 
 ---
 
+## 9. Linux & BSD Inspired TCP/UDP Stack Enhancements
+
+To establish industry-leading networking capabilities and outperform standard operating systems, SigmaOS's TCP/UDP stack incorporates the following advanced architectural patterns inspired by the Linux kernel and FreeBSD stack:
+
+### 1. eBPF-Inspired Socket Redirect Bypass (Sockmap style)
+* **Inspiration:** Linux sockmap / Cilium.
+* **Mechanism:** Bypasses the entire TCP/IP state machine and packet payload serialization when both endpoints are local (e.g., localhost loopback or inter-container IPC). Packets are routed directly from the transmit ring buffer of the sending socket to the receive ring buffer of the destination socket in sub-microsecond latency.
+* **OOP Mapping:** Encapsulated in the `SovereignSockmapBypass` class which implements the `BsdSocket` interface.
+
+### 2. SYN Cookie Flooding Protection
+* **Inspiration:** Linux TCP syncookies.
+* **Mechanism:** Defends the TCP Listen queue against DDoS flood attacks. When the half-open connection table is saturated, the kernel does not allocate socket state structure. Instead, it encodes the client's connection info (sequence numbers, MSS) cryptographically inside the Initial Sequence Number (ISN) of the SYN-ACK packet. Upon receiving the ACK, the cookie is verified, and the connection is instantiated on-demand.
+* **OOP Mapping:** Managed by the `SynCookieEngine` singleton within the `SimpleNetworkStack`.
+
+### 3. Receive Packet Steering (RPS) & symmetric load-balancing
+* **Inspiration:** FreeBSD Netisr and Linux RPS.
+* **Mechanism:** Automatically distributes network interface packet-processing interrupts symmetrically across multi-core CPU topologies. A non-cryptographic MurmurHash3 hash of the packet 4-tuple (source IP, dest IP, source Port, dest Port) determines the target core queue, avoiding single-core CPU thrashing and optimizing cache locality.
+* **OOP Mapping:** Handled by the `ReceivePacketSteering` class, matching flow-director patterns.
+
+### 4. BBR v2 Congestion Control Engine
+* **Inspiration:** Linux BBR (Bottleneck Bandwidth and RTT) v2.
+* **Mechanism:** Replaces loss-based congestion control (Reno) with model-based estimation of bandwidth and propagation delay. This prevents bufferbloat on high-speed, lossy wireless and satellite networks, keeping queue occupancy minimized.
+* **OOP Mapping:** Fully integrated within the `BBRCongestionControl` class inheriting from the `CongestionControl` interface.
+
+### 5. Zero-Copy UDP RX Ring Buffer (mmap style)
+* **Inspiration:** FreeBSD netmap / Linux AF_PACKET memory-mapped rings.
+* **Mechanism:** Establishes shared circular ring buffers between kernel-space NIC DMA and userland address spaces. User applications read incoming UDP datagram packets directly from the DMA ring without executing standard `recvfrom` copy operations.
+* **OOP Mapping:** Provided via the `ZeroCopy` trait implemented by `ZeroCopyNetwork`.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
