@@ -1,12 +1,14 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod aur;
 pub mod recipe;
 pub mod resolver;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
 
+pub use aur::{AurSandboxOrchestrator, PkgbuildMeta, PkgSandboxConfig};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
