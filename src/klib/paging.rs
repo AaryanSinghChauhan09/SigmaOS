@@ -108,6 +108,12 @@ impl PageTableEntry for SimplePageTableEntry {
         self.user_accessible
             .store(if user { 1 } else { 0 }, Ordering::SeqCst);
     }
+    fn is_cow(&self) -> bool {
+        self.cow.load(Ordering::SeqCst) == 1
+    }
+    fn set_cow(&mut self, cow: bool) {
+        self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
+    }
     fn set_physical_address(&mut self, addr: PhysicalAddress) {
         self.physical_addr
             .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
@@ -115,7 +121,7 @@ impl PageTableEntry for SimplePageTableEntry {
 }
 
 pub trait PageTable {
-    fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry;
+    fn get_entry_concrete(&self, index: usize) -> &SimplePageTableEntry;
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry;
     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry);
@@ -141,7 +147,7 @@ impl SimplePageTable {
 }
 
 impl PageTable for SimplePageTable {
-    fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry {
+    fn get_entry_concrete(&self, index: usize) -> &SimplePageTableEntry {
         if index < 512 {
             &self.entries[index]
         } else {
@@ -189,6 +195,9 @@ pub struct SimpleVMM {
     pub pd_tables: Vec<Option<SimplePageTable>>,
     pub pt_tables: Vec<Option<SimplePageTable>>,
     pub next_table_addr: AtomicUsize,
+    pub tlb_flush_count: AtomicUsize,
+    pub page_fault_count: AtomicUsize,
+    pub mapped_pages_count: AtomicUsize,
 }
 
 impl Default for SimpleVMM {
@@ -206,7 +215,22 @@ impl SimpleVMM {
             pd_tables: Vec::new(),
             pt_tables: Vec::new(),
             next_table_addr: AtomicUsize::new(0x2000),
+            tlb_flush_count: AtomicUsize::new(0),
+            page_fault_count: AtomicUsize::new(0),
+            mapped_pages_count: AtomicUsize::new(0),
         }
+    }
+
+    /// BSD/Linux-style TLB Shootdown / Flush
+    pub fn flush_tlb(&self, virt: VirtualAddress) {
+        // Simulates assembly instruction `invlpg [virt]` to invalidate the CPU cache for the page
+        self.tlb_flush_count.fetch_add(1, Ordering::SeqCst);
+        let _ = virt;
+    }
+
+    pub fn flush_tlb_all(&self) {
+        // Simulates reloading CR3 register to flush all TLB entries
+        self.tlb_flush_count.fetch_add(1, Ordering::SeqCst);
     }
 
     fn get_pml4_index(&self, virt: VirtualAddress) -> usize {
@@ -330,8 +354,10 @@ impl VirtualMemoryManager for SimpleVMM {
             pt_entry.set_user_accessible(user);
             pt_entry.set_physical_address(phys);
             pt.set_entry(pt_idx, pt_entry);
+            self.mapped_pages_count.fetch_add(1, Ordering::SeqCst);
         }
 
+        self.flush_tlb(virt);
         Ok(())
     }
 
@@ -371,10 +397,12 @@ impl VirtualMemoryManager for SimpleVMM {
                     let mut pt_entry = SimplePageTableEntry::new();
                     pt_entry.set_present(false);
                     pt.set_entry(pt_idx, pt_entry);
+                    self.mapped_pages_count.fetch_sub(1, Ordering::SeqCst);
                 }
             }
         }
 
+        self.flush_tlb(virt);
         Ok(())
     }
 
@@ -425,6 +453,7 @@ impl VirtualMemoryManager for SimpleVMM {
         virt: VirtualAddress,
         _error_code: usize,
     ) -> Result<(), PageFaultError> {
+        self.page_fault_count.fetch_add(1, Ordering::SeqCst);
         let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
         self.map_page(virt, phys, true, true)
     }
@@ -533,9 +562,27 @@ mod tests {
         // Should be mapped with offset (the last 12 bits are page offset)
         assert_eq!(vmm.get_physical(virt).unwrap(), phys);
 
+        // Verify mapped pages count and TLB flush tracking
+        assert_eq!(vmm.mapped_pages_count.load(Ordering::SeqCst), 1);
+        assert_eq!(vmm.tlb_flush_count.load(Ordering::SeqCst), 1);
+
         // Unmap page
         assert!(vmm.unmap_page(virt).is_ok());
         assert!(vmm.get_physical(virt).is_none());
+
+        // Verify counts after unmapping
+        assert_eq!(vmm.mapped_pages_count.load(Ordering::SeqCst), 0);
+        assert_eq!(vmm.tlb_flush_count.load(Ordering::SeqCst), 2);
+    }
+
+    #[test]
+    fn test_vmm_page_fault_handling() {
+        let mut vmm = SimpleVMM::new();
+        let virt = 0x3000_3000;
+
+        assert!(vmm.handle_page_fault(virt, 0).is_ok());
+        assert_eq!(vmm.page_fault_count.load(Ordering::SeqCst), 1);
+        assert!(vmm.get_physical(virt).is_some());
     }
 
     #[test]
