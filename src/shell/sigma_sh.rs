@@ -1,18 +1,26 @@
+// OOP-based Sigma Shell for SigmaOS
+// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
+// Implements interactive shell with command parsing, echo, and basic utilities
+
 #![no_std]
-#![no_main]
 
-/// OOP-based Sigma Shell for SigmaOS
-/// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
-/// Implements interactive shell with command parsing, echo, and basic utilities
-
-use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CommandID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ShellError { Success = 0, CommandNotFound = 1, InvalidArgument = 2, PermissionDenied = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShellError {
+    Success = 0,
+    CommandNotFound = 1,
+    InvalidArgument = 2,
+    PermissionDenied = 3,
+}
 
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
@@ -26,21 +34,21 @@ pub struct EchoCommand {
 }
 
 impl EchoCommand {
-    pub fn new(id: CommandID) -> Self { EchoCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        EchoCommand { id }
+    }
 }
 
 impl ShellCommand for EchoCommand {
-    fn name(&self) -> &[u8] { b"echo" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        for (i, arg) in args.iter().enumerate() {
-            if i > 0 {
-            }
-            for &byte in *arg {
-            }
-        }
+    fn name(&self) -> &[u8] {
+        b"echo"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"echo [text] - Print text to output" }
+    fn help(&self) -> &[u8] {
+        b"echo [text] - Print text to output"
+    }
 }
 
 #[repr(C)]
@@ -49,15 +57,21 @@ pub struct ExitCommand {
 }
 
 impl ExitCommand {
-    pub fn new(id: CommandID) -> Self { ExitCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        ExitCommand { id }
+    }
 }
 
 impl ShellCommand for ExitCommand {
-    fn name(&self) -> &[u8] { b"exit" }
+    fn name(&self) -> &[u8] {
+        b"exit"
+    }
     fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"exit - Exit the shell" }
+    fn help(&self) -> &[u8] {
+        b"exit - Exit the shell"
+    }
 }
 
 #[repr(C)]
@@ -66,15 +80,21 @@ pub struct HelpCommand {
 }
 
 impl HelpCommand {
-    pub fn new(id: CommandID) -> Self { HelpCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        HelpCommand { id }
+    }
 }
 
 impl ShellCommand for HelpCommand {
-    fn name(&self) -> &[u8] { b"help" }
+    fn name(&self) -> &[u8] {
+        b"help"
+    }
     fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"help - Show available commands" }
+    fn help(&self) -> &[u8] {
+        b"help - Show available commands"
+    }
 }
 
 #[repr(C)]
@@ -83,19 +103,26 @@ pub struct ClearCommand {
 }
 
 impl ClearCommand {
-    pub fn new(id: CommandID) -> Self { ClearCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        ClearCommand { id }
+    }
 }
 
 impl ShellCommand for ClearCommand {
-    fn name(&self) -> &[u8] { b"clear" }
+    fn name(&self) -> &[u8] {
+        b"clear"
+    }
     fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"clear - Clear the screen" }
+    fn help(&self) -> &[u8] {
+        b"clear - Clear the screen"
+    }
 }
 
 pub trait Shell {
-    fn register_command(&mut self, command: Box<dyn ShellCommand>) -> Result<CommandID, ShellError>;
+    fn register_command(&mut self, command: Box<dyn ShellCommand>)
+        -> Result<CommandID, ShellError>;
     fn execute_line(&mut self, line: &[u8]) -> Result<(), ShellError>;
     fn get_prompt(&self) -> &[u8];
     fn set_prompt(&mut self, prompt: &[u8]);
@@ -123,43 +150,50 @@ impl SimpleShell {
     }
 }
 
+impl Default for SimpleShell {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Shell for SimpleShell {
-    fn register_command(&mut self, command: Box<dyn ShellCommand>) -> Result<CommandID, ShellError> {
+    fn register_command(
+        &mut self,
+        command: Box<dyn ShellCommand>,
+    ) -> Result<CommandID, ShellError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         self.commands.push(Some(command));
         Ok(id)
     }
-    
+
     fn execute_line(&mut self, line: &[u8]) -> Result<(), ShellError> {
         let mut args = Vec::new();
         let mut start = 0;
         let mut in_arg = false;
-        
+
         for (i, &byte) in line.iter().enumerate() {
             if byte == b' ' || byte == b'\t' || byte == b'\n' {
                 if in_arg {
                     args.push(&line[start..i]);
                     in_arg = false;
                 }
-            } else {
-                if !in_arg {
-                    start = i;
-                    in_arg = true;
-                }
+            } else if !in_arg {
+                start = i;
+                in_arg = true;
             }
         }
-        
+
         if in_arg {
             args.push(&line[start..line.len()]);
         }
-        
+
         if args.is_empty() {
             return Ok(());
         }
-        
+
         let cmd_name = args[0];
         let cmd_args: Vec<&[u8]> = args[1..].to_vec();
-        
+
         for cmd_option in &mut self.commands {
             if let Some(ref mut cmd) = *cmd_option {
                 if cmd.name() == cmd_name {
@@ -167,15 +201,15 @@ impl Shell for SimpleShell {
                 }
             }
         }
-        
+
         Err(ShellError::CommandNotFound)
     }
-    
+
     fn get_prompt(&self) -> &[u8] {
         let len = self.prompt_len.load(Ordering::SeqCst);
         &self.prompt[..len]
     }
-    
+
     fn set_prompt(&mut self, prompt: &[u8]) {
         let len = prompt.len().min(63);
         for i in 0..len {
@@ -208,6 +242,12 @@ impl SimpleShellHistory {
     }
 }
 
+impl Default for SimpleShellHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ShellHistory for SimpleShellHistory {
     fn add(&mut self, command: &[u8]) {
         let len = command.len().min(255);
@@ -219,7 +259,7 @@ impl ShellHistory for SimpleShellHistory {
         self.lengths.push(len);
         self.next_index.fetch_add(1, Ordering::SeqCst);
     }
-    
+
     fn get(&self, index: usize) -> Option<&[u8]> {
         if index >= self.history.len() {
             return None;
@@ -227,7 +267,7 @@ impl ShellHistory for SimpleShellHistory {
         let len = self.lengths[index];
         Some(&self.history[index][..len])
     }
-    
+
     fn get_last(&self) -> Option<&[u8]> {
         if self.history.is_empty() {
             return None;
@@ -262,21 +302,27 @@ impl SimpleShellEnvironment {
     }
 }
 
+impl Default for SimpleShellEnvironment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ShellEnvironment for SimpleShellEnvironment {
     fn set(&mut self, key: &[u8], value: &[u8]) {
         let key_len = key.len().min(63);
         let value_len = value.len().min(255);
-        
+
         let mut key_entry = [0u8; 64];
         let mut value_entry = [0u8; 256];
-        
+
         for i in 0..key_len {
             key_entry[i] = key[i];
         }
         for i in 0..value_len {
             value_entry[i] = value[i];
         }
-        
+
         for i in 0..self.keys.len() {
             if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
                 self.values[i] = value_entry;
@@ -284,13 +330,13 @@ impl ShellEnvironment for SimpleShellEnvironment {
                 return;
             }
         }
-        
+
         self.keys.push(key_entry);
         self.values.push(value_entry);
         self.key_lengths.push(key_len);
         self.value_lengths.push(value_len);
     }
-    
+
     fn get(&self, key: &[u8]) -> Option<&[u8]> {
         let key_len = key.len();
         for i in 0..self.keys.len() {
@@ -301,7 +347,7 @@ impl ShellEnvironment for SimpleShellEnvironment {
         }
         None
     }
-    
+
     fn unset(&mut self, key: &[u8]) {
         let key_len = key.len();
         for i in 0..self.keys.len() {
@@ -316,40 +362,67 @@ impl ShellEnvironment for SimpleShellEnvironment {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    #[test]
+    fn test_echo_command() {
+        let mut cmd = EchoCommand::new(1);
+        assert_eq!(cmd.name(), b"echo");
+        assert!(cmd.execute(&[b"hello", b"world"]).is_ok());
     }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
+
+    #[test]
+    fn test_exit_command() {
+        let mut cmd = ExitCommand::new(1);
+        assert_eq!(cmd.name(), b"exit");
+        assert!(cmd.execute(&[]).is_ok());
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_help_command() {
+        let mut cmd = HelpCommand::new(1);
+        assert_eq!(cmd.name(), b"help");
+        assert!(cmd.execute(&[]).is_ok());
+    }
+
+    #[test]
+    fn test_clear_command() {
+        let mut cmd = ClearCommand::new(1);
+        assert_eq!(cmd.name(), b"clear");
+        assert!(cmd.execute(&[]).is_ok());
+    }
+
+    #[test]
+    fn test_simple_shell_execution() {
+        let mut shell = SimpleShell::new();
+        let cmd = Box::new(EchoCommand::new(1));
+        shell.register_command(cmd).unwrap();
+
+        assert_eq!(shell.get_prompt(), b"sigma-sh> ");
+        assert!(shell.execute_line(b"echo hello world").is_ok());
+    }
+
+    #[test]
+    fn test_shell_history() {
+        let mut history = SimpleShellHistory::new();
+        assert!(history.get_last().is_none());
+
+        history.add(b"echo hello");
+        assert_eq!(history.get_last().unwrap(), b"echo hello");
+        assert_eq!(history.get(0).unwrap(), b"echo hello");
+    }
+
+    #[test]
+    fn test_shell_environment() {
+        let mut env = SimpleShellEnvironment::new();
+        assert!(env.get(b"PATH").is_none());
+
+        env.set(b"PATH", b"/bin:/usr/bin");
+        assert_eq!(env.get(b"PATH").unwrap(), b"/bin:/usr/bin");
+
+        env.unset(b"PATH");
+        assert!(env.get(b"PATH").is_none());
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

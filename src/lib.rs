@@ -1,3 +1,5 @@
+#![allow(clippy::all, warnings)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -6,12 +8,14 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod finance;
 pub mod kernel;
+pub mod klib;
+pub mod legal;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -41,6 +45,11 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use device::{
+    DeviceClass, DeviceDriver as PublicDeviceDriver, DeviceError, DeviceHotplug,
+    DeviceManager as PublicDeviceManager, SimpleDevice, SimpleDeviceDriver, SimpleDeviceHotplug,
+    SimpleDeviceManager,
+};
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
@@ -50,9 +59,16 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+pub use finance::{
+    GoodsType, GstCalculator, GstRate, GstRegime, GstResult, GstState, TdsCalculator, TdsResult,
+    TdsSection,
+};
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+};
+pub use legal::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{

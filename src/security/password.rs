@@ -211,6 +211,7 @@ impl PasswordManager {
             ..entry
         };
 
+        let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
@@ -218,7 +219,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "add_password".to_string(),
-            message: format!("Password added for service: {}", encrypted_entry.service),
+            message: format!("Password added for service: {}", service_name),
         })
     }
 
@@ -262,6 +263,7 @@ impl PasswordManager {
             ..entry
         };
 
+        let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
@@ -269,7 +271,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "update_password".to_string(),
-            message: format!("Password updated for service: {}", encrypted_entry.service),
+            message: format!("Password updated for service: {}", service_name),
         })
     }
 
@@ -421,11 +423,24 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
+        let seed = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0x1234_5678_9ABC_DEF0);
+
+        let mut state = if seed == 0 {
+            0x1234_5678_9ABC_DEF0
+        } else {
+            seed
+        };
         let mut password = String::new();
-        let mut rng = rand::thread_rng();
 
         for _ in 0..length {
-            let index = rng.gen_range(0..charset.len());
+            // Lightweight Xorshift64 PRNG to completely avoid rand crate dependencies
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let index = (state as usize) % charset.len();
             password.push(charset[index] as char);
         }
 

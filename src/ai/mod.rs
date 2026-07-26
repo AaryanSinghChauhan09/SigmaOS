@@ -13,6 +13,7 @@ pub use llm::{
     LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
     QuantizationType, InferenceBackend, BatchingStrategy,
     StreamingLlmEngine, StreamingInference,
+    AiTool, ToolCall, InferenceFormat,
 };
 pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
 pub use sai::{

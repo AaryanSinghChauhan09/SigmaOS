@@ -18,7 +18,7 @@ pub enum SecurityContext {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
+pub enum SelinuxPermission {
     Read,
     Write,
     Execute,
@@ -52,7 +52,7 @@ pub struct SecurityRule {
     pub source: SecurityLabel,
     pub target: SecurityLabel,
     pub object_type: ObjectType,
-    pub permissions: Vec<Permission>,
+    pub permissions: Vec<SelinuxPermission>,
     pub enabled: bool,
 }
 
@@ -83,7 +83,7 @@ impl SecurityPolicy {
         source: &SecurityLabel,
         target: &SecurityLabel,
         object_type: ObjectType,
-        permission: Permission,
+        permission: SelinuxPermission,
     ) -> bool {
         if !self.enforcing_mode {
             return true; // Permissive mode
@@ -167,7 +167,7 @@ impl Default for SecurityPolicy {
 pub struct AppArmorProfile {
     pub name: String,
     pub path: String,
-    pub permissions: Vec<Permission>,
+    pub permissions: Vec<SelinuxPermission>,
     pub enabled: bool,
 }
 
@@ -191,7 +191,7 @@ impl AppArmorManager {
     }
 
     /// Check if a path is allowed by its profile
-    pub fn check_path(&self, path: &str, permission: Permission) -> bool {
+    pub fn check_path(&self, path: &str, permission: SelinuxPermission) -> bool {
         if !self.enforcing_mode {
             return true;
         }
@@ -266,14 +266,15 @@ mod tests {
             source: source.clone(),
             target: target.clone(),
             object_type: ObjectType::File,
-            permissions: vec![Permission::Read, Permission::Write],
+            permissions: vec![SelinuxPermission::Read, SelinuxPermission::Write],
             enabled: true,
         };
 
         policy.add_rule(rule).unwrap();
         assert_eq!(policy.rule_count(), 1);
 
-        let allowed = policy.check_permission(&source, &target, ObjectType::File, Permission::Read);
+        let allowed =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed);
     }
 
@@ -310,7 +311,7 @@ mod tests {
             source: source.clone(),
             target: target.clone(),
             object_type: ObjectType::File,
-            permissions: vec![Permission::Read],
+            permissions: vec![SelinuxPermission::Read],
             enabled: true,
         };
 
@@ -323,8 +324,12 @@ mod tests {
             level: "s0".to_string(),
         };
 
-        let allowed =
-            policy.check_permission(&check_source, &target, ObjectType::File, Permission::Read);
+        let allowed = policy.check_permission(
+            &check_source,
+            &target,
+            ObjectType::File,
+            SelinuxPermission::Read,
+        );
         assert!(allowed);
     }
 
@@ -335,14 +340,14 @@ mod tests {
         let profile = AppArmorProfile {
             name: "test_profile".to_string(),
             path: "/etc/".to_string(),
-            permissions: vec![Permission::Read, Permission::Write],
+            permissions: vec![SelinuxPermission::Read, SelinuxPermission::Write],
             enabled: true,
         };
 
         manager.add_profile(profile).unwrap();
         assert_eq!(manager.profile_count(), 1);
 
-        let allowed = manager.check_path("/etc/passwd", Permission::Read);
+        let allowed = manager.check_path("/etc/passwd", SelinuxPermission::Read);
         assert!(allowed);
     }
 
@@ -379,7 +384,7 @@ mod tests {
             source,
             target,
             object_type: ObjectType::File,
-            permissions: vec![Permission::Read],
+            permissions: vec![SelinuxPermission::Read],
             enabled: true,
         };
 

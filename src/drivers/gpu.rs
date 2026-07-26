@@ -26,11 +26,36 @@ pub enum GpuCommand {
 }
 
 /// GPU driver interface
+#[derive(Debug, Clone)]
+pub struct DrmModeInfo {
+    pub hdisplay: u16,
+    pub vdisplay: u16,
+}
+
+#[derive(Debug, Clone)]
+pub struct DrmCrtc {
+    pub id: u32,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+    pub active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DrmConnector {
+    pub id: u32,
+    pub connected: bool,
+    pub modes: Vec<DrmModeInfo>,
+}
+
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
     pub capabilities: CapabilityToken,
     pub frame_buffer: Vec<u32>,
+    pub crtc: Option<DrmCrtc>,
+    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -41,6 +66,8 @@ impl GpuDriver {
             height,
             capabilities: CapabilityToken::new(),
             frame_buffer: vec![0; size],
+            crtc: None,
+            connector: None,
         }
     }
 
