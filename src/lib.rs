@@ -1,4 +1,5 @@
-#![allow(clippy::all, warnings)]
+#![allow(warnings)]
+#![allow(clippy::all)]
 
 // SigmaOS Library
 // Core library for SigmaOS operating system
@@ -9,12 +10,12 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -110,11 +111,7 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
-    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant,
-};
+pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
@@ -123,29 +120,4 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
-
-pub mod ai {
-    pub mod next_gen;
-}
-pub use ai::next_gen::{
-    WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
-    AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,
-    AIModel, MultiModelOrchestrator,
-};
-
-pub mod virt;
-pub use virt::hypervisor::{
-    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
-    VirtualizationGeneration,
-};
-pub use virt::microvm::{
-    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };

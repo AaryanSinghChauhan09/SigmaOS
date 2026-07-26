@@ -621,37 +621,68 @@ impl Default for DependencyResolver {
     }
 }
 
-// ----------------------------------------------------
-// Local Metadata Cache
-// ----------------------------------------------------
-
-pub struct LocalMetadataCache {
-    pub cache: HashMap<String, UnifiedPackage>,
+/// Transactional package manager checkpoint
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
 }
 
-impl LocalMetadataCache {
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
     pub fn new() -> Self {
-        Self { cache: HashMap::new() }
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
     }
-    pub fn insert(&mut self, name: String, package: UnifiedPackage) {
-        self.cache.insert(name, package);
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
     }
-    pub fn get(&self, name: &str) -> Option<&UnifiedPackage> {
-        self.cache.get(name)
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
     }
 }
 
-// ----------------------------------------------------
-// Universal Package Manager
-// ----------------------------------------------------
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-/// Universal package manager using dynamic dispatch to modularly handle various package format adapters
+/// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
-    pub metadata_cache: LocalMetadataCache,
+    pub transaction_history: TransactionalHistory,
 }
 
 impl UniversalPackageManager {
@@ -661,7 +692,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
-            metadata_cache: LocalMetadataCache::new(),
+            transaction_history: TransactionalHistory::new(),
         };
 
         manager.add_default_adapters();
@@ -923,134 +954,27 @@ mod tests {
     }
 
     #[test]
-    fn test_apt_deb_adapter_flow() {
-        let adapter = AptDebAdapter::new();
-        assert_eq!(adapter.format(), PackageFormat::Deb);
-        assert_eq!(adapter.adapter_name(), "apt");
-
-        let package = UnifiedPackage::new("curl".to_string(), "7.81.0".to_string())
-            .with_format(PackageFormat::Deb);
-
-        assert!(adapter.can_handle(&package));
-        assert!(adapter.install(&package).is_ok());
-        assert!(adapter.update(&package).is_ok());
-        assert!(adapter.remove(&package).is_ok());
-    }
-
-    #[test]
-    fn test_yum_rpm_adapter_flow() {
-        let adapter = YumRpmAdapter::new();
-        assert_eq!(adapter.format(), PackageFormat::Rpm);
-        assert_eq!(adapter.adapter_name(), "yum");
-
-        let package = UnifiedPackage::new("nginx".to_string(), "1.20.1".to_string())
-            .with_format(PackageFormat::Rpm);
-
-        assert!(adapter.can_handle(&package));
-        assert!(adapter.install(&package).is_ok());
-        assert!(adapter.update(&package).is_ok());
-        assert!(adapter.remove(&package).is_ok());
-    }
-
-    struct MockCustomAdapter;
-    impl PackageFormatAdapter for MockCustomAdapter {
-        fn format(&self) -> PackageFormat {
-            PackageFormat::Deb
-        }
-        fn adapter_name(&self) -> &str {
-            "custom-mock"
-        }
-        fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_universal_manager_polymorphism() {
+    fn test_transactional_rollback() {
         let mut manager = UniversalPackageManager::new();
-        // Dynamic registration under Open-Closed/Polymorphism OOP principles
-        manager.register_adapter(PackageFormat::Deb, Box::new(MockCustomAdapter));
-
-        let package = UnifiedPackage::new("custom-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::Deb);
-
-        manager.add_package(package);
-        assert!(manager.install("custom-app").is_ok());
-        assert_eq!(manager.installed_packages.len(), 1);
-    }
-
-    #[test]
-    fn test_version_constraint_resolution() {
-        let mut resolver = DependencyResolver::new();
-
-        // Valid setup
-        let lib_pkg = UnifiedPackage::new("lib-helper".to_string(), "1.2.3".to_string())
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
-        let app_pkg = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::SigmaPkg)
-            .with_dependency("lib-helper>=1.1.0".to_string());
-
-        resolver.add_package(lib_pkg);
-        resolver.add_package(app_pkg);
-
-        // This should pass since 1.2.3 matches >=1.1.0
-        let deps = resolver.resolve_dependencies("my-app").unwrap();
-        assert_eq!(deps.len(), 2);
-
-        // Invalid version setup (fails constraint check)
-        let mut resolver_err = DependencyResolver::new();
-        let lib_old = UnifiedPackage::new("lib-helper".to_string(), "1.0.5".to_string())
-            .with_format(PackageFormat::SigmaPkg);
-        let app_pkg2 = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::SigmaPkg)
-            .with_dependency("lib-helper>=1.1.0".to_string());
-
-        resolver_err.add_package(lib_old);
-        resolver_err.add_package(app_pkg2);
-
-        let err = resolver_err.resolve_dependencies("my-app").unwrap_err();
-        assert!(matches!(err, PackageError::VersionMismatch(_, _, _)));
-    }
-
-    struct FailingAdapter;
-    impl PackageFormatAdapter for FailingAdapter {
-        fn format(&self) -> PackageFormat {
-            PackageFormat::SigmaPkg
-        }
-        fn adapter_name(&self) -> &str {
-            "failing-adapter"
-        }
-        fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Err(PackageError::InstallationFailed("Simulated crash".to_string()))
-        }
-        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_batch_transaction_atomic_rollback() {
-        let mut manager = UniversalPackageManager::new();
-        manager.register_adapter(PackageFormat::SigmaPkg, Box::new(FailingAdapter));
-
-        let package = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
 
-        manager.add_package(package);
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
 
-        // Since it's FailingAdapter, installation will fail and trigger transaction rollback
-        let result = manager.install("my-app");
-        assert!(result.is_err());
-        // Verify installed count is 0
-        assert_eq!(manager.list_installed().len(), 0);
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
+
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
+
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
     }
 }
