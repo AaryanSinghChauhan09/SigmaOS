@@ -504,6 +504,37 @@ To provide users and developers with unparalleled power over the graphical look-
 
 ---
 
+## 18. Self-Healing, Multi-Level Fault Tolerance & Stability Engine
+
+To guarantee peerless reliability and ensure 99.999% system uptime under critical errors, hardware faults, and driver panics, SigmaOS establishes a microkernel-native Fault Tolerance and Stability engine:
+
+### 1. Isolated User-Space Driver Sandboxing (Microkernel Fault Isolation)
+* **MINIX 3 / QNX Inspiration:** User-space driver execution with automatic restarts.
+* **SigmaOS Sovereign Solution:** All device drivers (GPU, audio, network, USB, filesystem) run entirely in isolated user-space memory compartments, gated by restricted permissions. If a driver encounters a panic or memory corruption, the microkernel isolates the crash, halts the specific task, and instantly reloads a fresh driver instance dynamically without affecting the active user session or triggering a blue-screen kernel panic.
+* **OOP Mapping:** Governed by `DeviceDriver` abstractions, `DriverLibrary`, and `FirmwareDockyard` managers.
+
+### 2. Live Memory Hot-Patching (SigmaPatch)
+* **Linux kpatch / Livepatch Inspiration:** Zero-downtime kernel updates.
+* **SigmaOS Sovereign Solution:** Allows developers to hot-patch live, running microkernel code inside RAM without restarts. The `SigmaPatch` engine suspends active threads momentarily, redirects the call graph of specified functions to patched target memory blocks, and resumes execution seamlessly with zero-allocation safety.
+* **OOP Mapping:** Managed by the `SigmaPatch` module in `src/tools/sigmatools.rs`.
+
+### 3. Real-Time Keep-Alive Watchdog Monitor (SigmaWatchdog)
+* **Embedded RTOS / Aerospace Inspiration:** Heartbeat polling and hardware safety watchdogs.
+* **SigmaOS Sovereign Solution:** A dedicated, non-preemptible watchdog thread measuring keep-alive heartbeats from critical kernel tasks and driver subsystems. If a subsystem fails to respond within microsecond boundaries, the watchdog intercepts the process, performs safe memory garbage collection, and restarts the specific service loop gracefully.
+* **OOP Mapping:** Implemented inside the `src/kernel/watchdog.rs` and `SovereignCapsicum` enforcers.
+
+### 4. Volatile Exception Crash-Recovery Containers
+* **Erlang VM / Actor Model Inspiration:** "Let it crash" philosophy with supervisor trees.
+* **SigmaOS Sovereign Solution:** Captures thread-level execution errors within volatile application recovery frames. Instead of terminating the entire program, parent supervisor structures catch the thread exception, reclaim resources, and reconstruct the thread's workspace using dynamic transaction log replay.
+* **OOP Mapping:** Handled by the `SimpleContainerRuntime` and `rolling_transaction` managers.
+
+### 5. Hardware-Level Page Fault Recovery & Self-Healing
+* **Advanced Virtual Memory Inspiration:** Predictive page fault preemptive mapping.
+* **SigmaOS Sovereign Solution:** When an application triggers an out-of-bounds page fault, the memory paging system intercepts the signal. If the fault matches a known safe error pattern (such as stack growth or heap extension boundaries), the paging layer allocates physical pages dynamically and resumes instruction streams seamlessly rather than generating standard segfault terminations.
+* **OOP Mapping:** Managed by the `SimpleProcessMemory` and `SovereignAiPrefetcher` systems.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
