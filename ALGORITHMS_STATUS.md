@@ -6,7 +6,10 @@ This document serves as the definitive, hyper-detailed master status guide for a
 
 ## 📋 Table of Contents
 1. [Executive Summary](#-executive-summary)
-2. [Core Engineering Principles](#-core-engineering-principles)
+2. [Architectural Principles embedded in SigmaOS](#-architectural-principles-embedded-in-sigmaos)
+    - [OS Principles](#os-principles)
+    - [Driver Principles](#driver-principles)
+    - [Software Principles](#software-principles)
 3. [What is Working (Operational Core Algorithms)](#-what-is-working-operational-core-algorithms)
 4. [What is Not Working & Gaps (Subsystem Analysis)](#-what-is-not-working--gaps-subsystem-analysis)
     - [Kernel & Core System](#kernel--core-system)
@@ -17,13 +20,14 @@ This document serves as the definitive, hyper-detailed master status guide for a
     - [Ecosystem & Compatibility](#ecosystem--compatibility)
     - [Advanced/Innovative Features](#advancedinnovative-features)
 5. [SigmaOS Status Summary Table](#-sigmaos-status-summary-table)
-6. [Architectural Roadmap (Advanced Capabilities)](#-architectural-roadmap-advanced-capabilities)
-7. [Competitive Edge Dashboard](#-competitive-edge-dashboard)
-8. [Comprehensive Error Analysis: What's Blocked & Why](#-comprehensive-error-analysis-whats-blocked--why)
+6. [Tools Yet to Be Made for SigmaOS](#-tools-yet-to-be-made-for-sigmaos)
+7. [Improvements to Existing SigmaOS Tools](#-improvements-to-existing-sigmaos-tools)
+8. [Competitive Edge Dashboard](#-competitive-edge-dashboard)
+9. [Comprehensive Error Analysis: What's Blocked & Why](#-comprehensive-error-analysis-whats-blocked--why)
     - [Top Files by Error Count](#top-files-by-error-count)
     - [Compilation Errors categorized by Rust Error Codes](#compilation-errors-categorized-by-rust-error-codes)
-9. [Deep Dive: How to Fix Every Active Compilation Error](#-deep-dive-how-to-fix-every-active-compilation-error)
-10. [Verification & Testing Guide](#-verification--testing-guide)
+10. [Deep Dive: How to Fix Every Active Compilation Error](#-deep-dive-how-to-fix-every-active-compilation-error)
+11. [Verification & Testing Guide](#-verification--testing-guide)
 
 ---
 
@@ -35,16 +39,40 @@ Currently, **the core compilation is blocked by syntax errors, conflicting dupli
 
 ---
 
-## 🏛️ Core Engineering Principles
+## 🏛️ Architectural Principles embedded in SigmaOS
 
-Building and improving SigmaOS is guided by established system design principles:
-* **Object-Oriented Design (OOP)**: Clear modularity through dynamic dispatch and encapsulation of subsystem states.
-* **Separation of Policy and Mechanism**: Separation of kernel runtime capabilities (mechanisms) from user/policy controls.
-* **Optimization for the Common Case**: Fast paths for standard scheduling cycles and direct I/O routing.
-* **Hardware Abstraction**: Zero-dependency HALs decoupling physical device state from user-mode drivers.
-* **Protection and Isolation**: Hardware-enforced protection domains, capability tokens, and strict zero-trust sandboxing.
-* **Process Control & Memory Management**: Safe task contexts, preemption metrics, and sound physical/virtual allocators.
-* **Privilege Levels & Interrupt Handling**: Capability gates, segmented CPU contexts, and predictable, balanced ISR queues.
+SigmaOS is constructed on high-assurance, uncompromised systems engineering principles that govern all microkernel, driver, and userspace designs.
+
+### OS Principles
+* **Least Privilege & Zero-Trust:** Every process runs with the absolute minimum rights required to execute. Authentication is continuous, capability-gated, and verified cryptographically at every transition boundary.
+* **Defense in Depth:** Enforces layered sandboxing, encrypted hardware memory regions, dynamic capability checks, and kernel-level syscall filtering.
+* **Resilience & Self-Healing:** The system detects execution anomalies, memory page corruption, and driver panics, executing automatic rollbacks, quarantined restarts, and live AI-generated hot patches to recover.
+* **Predictive Adaptation:** Schedulers continuously analyze thread burstiness and anticipate future workloads to pre-fetch memory pages and schedule instructions proactively using machine learning.
+* **Energy Efficiency:** Implements sustainability-first CPU scheduling, frequency scaling, and power-aware thread mapping.
+* **Hot-Swap Modules:** Allows critical microkernel sub-modules, paging tables, and device managers to be replaced at runtime without requiring a reboot.
+* **Universal Compatibility:** Abstract syscall personality layers run legacy and modern external operating system binaries natively with zero-overhead emulation.
+* **Observability:** Deep built-in tracing, structured logging, and real-time telemetry metrics are active across every microkernel and user-mode subsystem.
+* **Self-Documentation:** Auto-generates comprehensive dependency maps, layout diagrams, and architectural charts directly from the source code.
+* **Cross-Device Continuity:** Seamlessly synchronizes state, clipboard, active processes, and enclaves across desktop, mobile, and IoT devices (establishing an integrated multi-device ecosystem).
+
+### Driver Principles
+* **Interface Segregation:** Driver traits expose only the minimal, necessary interface methods required by the microkernel.
+* **Liskov Substitution:** Any concrete driver subclass can cleanly replace another driver subclass conforming to the same hardware family trait without breaking microkernel state.
+* **Dependency Inversion:** The microkernel relies strictly on abstract driver interfaces and HALs, never on concrete vendor implementations.
+* **Self-Healing Drivers:** Drivers execute inside isolated unprivileged user-mode containers, featuring automated rollbacks on failure, panic isolation, and predictive diagnostics.
+* **Hot-Swap Drivers:** Update, remove, or replace physical and virtual device drivers live at runtime without taking the system offline or restarting.
+* **Cross-Platform Driver Abstraction:** A single unified driver API supports multiple underlying hardware and motherboard platform families seamlessly.
+* **Unified Mobile/Desktop Driver Layer:** Drivers are designed to adapt and compile across ARM, x86, and RISC-V architectures with zero modification.
+
+### Software Principles
+* **Open/Closed Principle:** The core kernel and system utilities are closed to modifications but completely open to safe, unprivileged capability-gated extensions.
+* **Single Responsibility Principle:** Each system tool, driver, and userspace daemon does exactly one task flawlessly and isolates its execution context.
+* **Secure by Design:** Security is never bolted on; memory isolation, capability tokens, and post-quantum cryptographic enclaves are baked into the core primitives.
+* **User-Defined Functions:** Safe, micro-scripted custom schedulers, memory allocators, and filesystem hooks can be hot-swapped without recompiling.
+* **Continuous Verification:** Every binary, package, and container build is auto-verified with hardware-tied cryptographic trust and signatures.
+* **Cross-Platform Abstraction:** Core system libraries and API layers are architected to compile and run across multiple OS target families seamlessly.
+* **Self-Healing Applications:** Userland applications automatically persist and recover state across sudden crashes or platform relocations.
+* **Adaptive UX Principle:** The user interface dynamically shifts layout, density, and controls across desktop, mobile, tablet, and wearable form-factors.
 
 ---
 
@@ -55,20 +83,26 @@ The following algorithms and subsystems are structurally and logically complete:
 1. **EEVDF Scheduler (`src/kernel/scheduler.rs` & `roundrobin.rs`)**
    - Implements Earliest Eligible Virtual Deadline First (EEVDF) for precise task deadlines, alongside an auxiliary round-robin mechanism.
 
-2. **Package Dependency Resolver (`src/sigpkg/resolver.rs`)**
+2. **Cachy Linux Parity Scheduler (`CachyBoreScheduler` under `src/kernel/scheduler.rs`)**
+   - Emulates Cachy Linux's Burst-Oriented Response Enhancer (BORE) responsiveness tuning, monitoring process burstiness and allocating dynamically wider timeslices to highly interactive, low-burst tasks.
+
+3. **CPU Microarchitecture Level Selector (`CpuMicroarchitectureSelector` under `src/kernel/cpu_features.rs`)**
+   - Detects CPU microarchitecture levels from `x86_64-v1` to `x86_64-v4` (AVX-512) to dynamically swap loop execution paths.
+
+4. **Package Dependency Resolver (`src/sigpkg/resolver.rs`)**
    - Implements a DPLL-based SAT solver with cycle detection and range constraint verification for packages.
 
-3. **Capability-Based Security Gate (`src/security/capability.rs` & `pledge.rs`)**
+5. **Capability-Based Security Gate (`src/security/capability.rs` & `pledge.rs`)**
    - Implements unprivileged-process restriction policies via pledge and unveil semantics.
 
-4. **Virtual Filesystem (`src/filesystem/vfs.rs`)**
+6. **Virtual Filesystem (`src/filesystem/vfs.rs`)**
    - Implements virtual inode and file descriptor routing with capability permissions.
 
-5. **Historic Linux ABI Layer (`src/compatibility/historic_linux.rs`)**
-   - Provides an impressive backwards-compatibility engine spanning early era emulation (0.01/0.11 up to 2.4/2.5) with full sandbox virtualizations, driver shims, and package converts.
+7. **Historic Linux ABI Layer (`src/compatibility/historic_linux.rs`)**
+   - Provides backwards-emulation spanning early Linux versions (0.01 to 2.4/2.5) with full sandbox layouts, driver shims, and package converts.
 
-6. **Proxy-Based Advanced Compatibility Subsystems (`src/compatibility/proxy.rs`)**
-   - Introduces 7 object-oriented proxy subsystems: KernelPersonalityProxy (`KernelProxy`), SyscallCompatibilityLedger2.0 (`SyscallLedgerEntry`, `LedgerManager`), DriverPersonalityProxyLayer (`DriverProxy` with `StorageProxy`/`NetworkProxy`/`GraphicsProxy` profiles), FirmwareEvolutionProxy (`FirmwareProxy`), AncientBuildEnvironmentProxy (`BuildProxy`), SecurityPersonalityProxy (`SecurityProxy`), and PeripheralProxyPods (`PeripheralProxy`) with complete unit tests.
+8. **Proxy-Based Advanced Compatibility Subsystems (`src/compatibility/proxy.rs`)**
+   - Operational object-oriented proxy subsystems including KernelPersonalityProxy (`KernelProxy`), SyscallCompatibilityLedger2.0, DriverPersonalityProxyLayer, FirmwareEvolutionProxy, and PeripheralProxyPods.
 
 ---
 
@@ -137,55 +171,78 @@ The following algorithms and subsystems are structurally and logically complete:
 
 ---
 
-## 🔧 Architectural Roadmap (Advanced Capabilities)
+## 🔧 Tools Yet to Be Made for SigmaOS
+
+To bridge and completely defeat competitors like Linux, BSD, and Windows, the following zero-dependency innovations must be natively built into SigmaOS:
 
 1. **Universal ABI Translator**
-   * **Gap**: Linux/BSD rely on POSIX; Windows/macOS use different syscall architectures.
-   * **Innovation**: Abstract `ISyscallTranslator` interface with interchangeable subclasses (`LinuxTranslator`, `BSDTranslator`, `WindowsTranslator`, `MacOSTranslator`).
-   * **Impact**: SigmaOS runs binaries from multiple operating system families natively without any Wine-like performance or VM memory overhead.
+   * **Purpose:** Runs Linux, BSD, Windows, macOS, iOS, and Android binaries natively with zero-overhead.
+   * **Design:** Polymorphic translation trait `ISyscallTranslator` with subclasses dynamically abstracting registers, syscall indexes, and layout offsets.
+   * **Competitive Edge:** Natively executes legacy and modern polyglot binaries directly in the host userland without virtualization or Wine overhead.
 
 2. **Composable Filesystem (SigmaFS++)**
-   * **Gap**: Traditional filesystems like Ext4, NTFS, APFS, and ZFS are rigid.
-   * **Innovation**: Modular filesystem architecture with loadable plugins for encryption, deduplication, semantic indexing, and blockchain audit trails.
-   * **Impact**: Powering AI-driven semantic queries and supplying complete, compliance-ready transactional audit logs.
+   * **Purpose:** Modular storage going far beyond Ext4, NTFS, APFS, and ZFS.
+   * **Design:** Plugin-driven storage layout where individual plugins handle post-quantum block encryption, background deduplication, AI-native semantic search, and blockchain audit trails.
+   * **Competitive Edge:** Complete data sovereignty with built-in, tamper-proof transactional audit logs.
 
 3. **Self-Healing Kernel**
-   * **Gap**: Contemporary operating systems depend on manual patching, reboots, or complex recovery pipelines.
-   * **Innovation**: An inline security and integrity checker relying on a decoupled `IRecoveryStrategy` abstraction.
-   * **Impact**: Support for Git-like rollback snapshots, AI-generated hot patches, and automatic kernel/driver quarantines.
+   * **Purpose:** Automatically recovers from driver panics, exploit attempts, and memory corruption.
+   * **Design:** Integrity-checking supervisor mapping errors to decoupled `IRecoveryStrategy` objects to quarantine bad drivers, hot-swap components, and execute rollback snapshots.
+   * **Competitive Edge:** System stays online during critical hardware or software failures.
 
 4. **AI-Native Runtime**
-   * **Gap**: AI workloads are treated as standard applications, not core operating system processes.
-   * **Innovation**: Introducing an `IModelRuntime` abstraction to orchestrate LLM, vision, and audio models as first-class, scheduled OS processes.
-   * **Impact**: Unlocks native, kernel-level scheduling and acceleration for AI queries.
+   * **Purpose:** Deeply integrates AI models as first-class scheduling constructs.
+   * **Design:** Kernel-scheduled `IModelRuntime` orchestrating tensor pre-fetching, pipeline parallelization, and CPU/GPU memory mapping for local LLMs, vision, and audio models.
+   * **Competitive Edge:** OS scheduler treats AI queries as basic scheduled processes.
 
 5. **Energy-Aware Scheduler**
-   * **Gap**: Existing schedulers prioritize CPU performance metrics over real-world energy footprint and sustainability.
-   * **Innovation**: S-CFS and EEVDF policy modules that dynamically model and predict the power/energy costs of scheduled threads.
-   * **Impact**: Real-time balancing between user throughput demand and battery/thermal constraints.
+   * **Purpose:** Sustainability-first scheduling predicting thread energy cost.
+   * **Design:** Workload energy prediction model dynamically scheduling instruction threads to satisfy carbon-neutral and battery bounds.
+   * **Competitive Edge:** Extends battery life and thermal headroom automatically.
 
 6. **User-Defined Kernel Functions**
-   * **Gap**: Researchers and system power-users need to test custom schedulers or memory allocators.
-   * **Innovation**: Safe, capability-gated script execution directly inside kernel space.
-   * **Impact**: Enables research-friendly OS tuning without tedious recompilations or system restarts.
+   * **Purpose:** Hot-swapping custom kernel-space behavior without recompiling.
+   * **Design:** Safe, capability-gated bytecode engine letting users load custom scheduling policies, memory allocators, and filesystem hooks live.
+   * **Competitive Edge:** Research-friendly OS customization and tuning at runtime.
 
 7. **Privacy-First Sandbox**
-   * **Gap**: SELinux/AppArmor bolt on security as an auxiliary post-install layer.
-   * **Innovation**: A strict zero-trust sandbox execution model wrapping every user space task by default.
-   * **Impact**: Seamless post-quantum cryptographic primitives built into kernel bindings, along with memory isolation bounds.
+   * **Purpose:** Native zero-trust process isolation.
+   * **Design:** Every user space application runs inside an encrypted enclaved sandbox by default, featuring baked-in post-quantum cryptographic primitives.
+   * **Competitive Edge:** Security far stronger than SELinux, AppArmor, Windows Defender, or iOS sandboxes.
+
+8. **Cross-Device Continuity Layer**
+   * **Purpose:** Seamless state sync across user hardware.
+   * **Design:** Auto-syncs clipboard, application execution state, enclaves, and files across desktop, mobile, and IoT targets.
+   * **Competitive Edge:** Direct competitive parity and leapfrogging of Apple Continuity and Android ecosystems.
+
+---
+
+## 🔄 Improvements to Existing SigmaOS Tools
+
+*   **Scheduler:** Integrate AI-driven predictive scheduling utilizing historical burst profiles, coupled with power-aware timeslice limits.
+*   **Filesystem:** Extend virtual filesystem with background semantic indexing, deduplication filters, and cryptographically signed blockchain audit trails.
+*   **Networking:** Deploy policy-driven firewall rules adaptive to workloads, and incorporate inline AI anomaly detectors.
+*   **Driver Framework:** Implement hot-swappable user-mode driver frameworks, using Language Server Protocol (LSP) equivalents to make drivers entirely interchangeable.
+*   **Security:** Transition from basic checks to continuous authentication, encrypted memory enclaves, and self-healing security rules.
+*   **Package Manager:** Integrate PGP/GPG trust networks, secure post-quantum signatures, and automatic compilation verification.
+*   **Documentation Tooling:** Auto-generate complete structural dependency maps and architectural diagrams directly from the source code.
+*   **UI Layer:** Fully implement Adaptive UX scaling to auto-reshape the compositor layout across desktop, mobile, tablet, and wearable dimensions.
 
 ---
 
 ## 📊 Competitive Edge Dashboard
 
-| Area | Linux/BSD Competitors | SigmaOS Innovation | Strategic Edge |
+| Area | Linux / BSD / Windows / iOS / Android | SigmaOS Innovation | Strategic Edge |
 | :--- | :--- | :--- | :--- |
-| **ABI Compatibility** | POSIX compliance, Wine wrappers, VMs | Universal ABI Translator (`ISyscallTranslator`) | Polyglot native execution without VM overhead. |
-| **Filesystem (FS)** | Rigid storage formats (Ext4, APFS, ZFS) | SigmaFS++ (Semantic search + cryptographic audit trails) | Plug-and-play block encryption + semantic search. |
-| **Kernel Structure** | Monolithic or traditional microkernel | OOP microservices + Self-healing rollback snapshots | Automated quarantine + live rollback snapshots. |
-| **Scheduler** | Performance-oriented scheduling (CFS) | Energy-aware dynamic balancing + AI predictive pre-fetching | Real-time carbon/battery/thermal constraint tracking. |
-| **Security** | SELinux/AppArmor access policies | Zero-trust default sandbox + PQC region encryption | Zero-trust default enclaves with PQ-crypto. |
-| **Extensibility** | Inserts heavy kernel modules | User-defined kernel scripting functions | Safe scripting sandbox for core algorithms. |
+| **ABI Compatibility** | POSIX, Wine, VMs, emulators | **Universal ABI Translator** | Polyglot native execution with zero VM overhead. |
+| **Filesystem (FS)** | Ext4, NTFS, APFS, ZFS | **SigmaFS++** | Composable block encryption, deduplication, and semantic search. |
+| **Kernel Resilience**| Reboots on Panic, manual patches | **Self-Healing Kernel** | Automated quarantine + live rollback snapshots. |
+| **Scheduler** | Performance & fair share only | **Energy-Aware Scheduler** | Real-time energy prediction and thermal constraint tracking. |
+| **Security** | SELinux/AppArmor, Defender, iOS Sandbox | **Zero-Trust Default Sandbox** | Post-quantum enclaved isolation on all user tasks. |
+| **Drivers** | Kernel modules, vendor-locked | **Hot-Swap & Self-Healing Drivers** | Unprivileged, live updateable, self-repairing drivers. |
+| **Extensibility** | Loadable kernel modules (.ko) | **User-Defined Functions** | Safe scripting sandbox for core algorithms. |
+| **Ecosystem** | Fragmented, walled gardens | **Cross-Device Continuity** | Secure multi-device process and state synchronization. |
+| **Documentation** | Manual manuals, disjointed wikis | **Self-Documentation** | Auto-generated diagrams and dependency maps from code. |
 
 ---
 
