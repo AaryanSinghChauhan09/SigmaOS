@@ -402,6 +402,18 @@ impl DocumentChunk {
     }
 }
 
+/// Newton-Raphson f32 square root for mathematically robust `#![no_std]` execution.
+pub fn f32_sqrt(val: f32) -> f32 {
+    if val <= 0.0f32 {
+        return 0.0f32;
+    }
+    let mut x = val;
+    for _ in 0..10 {
+        x = 0.5f32 * (x + val / x);
+    }
+    x
+}
+
 /// LlamaIndex/Chroma-style Semantic Vector Search and RAG Engine
 pub struct SemanticQueryEngine {
     pub chunks: Vec<Option<DocumentChunk>>,
@@ -416,18 +428,30 @@ impl SemanticQueryEngine {
         self.chunks.push(Some(DocumentChunk::new(text, embedding)));
     }
 
-    /// Retrieve the most semantically similar document context using cosine similarity (vector dot product)
+    /// Retrieve the most semantically similar document context using mathematically robust cosine similarity
     pub fn query(&self, query_vector: &[f32; 16]) -> Option<Vec<u8>> {
         let mut best_score = -1.0f32;
         let mut best_chunk = None;
 
         for i in 0..self.chunks.len {
             if let Some(ref chunk) = self.chunks[i] {
-                // Compute dot product (since our vectors are normalized)
-                let mut score = 0.0f32;
+                let mut dot_product = 0.0f32;
+                let mut query_norm_sq = 0.0f32;
+                let mut chunk_norm_sq = 0.0f32;
                 for j in 0..16 {
-                    score += query_vector[j] * chunk.embedding[j];
+                    dot_product += query_vector[j] * chunk.embedding[j];
+                    query_norm_sq += query_vector[j] * query_vector[j];
+                    chunk_norm_sq += chunk.embedding[j] * chunk.embedding[j];
                 }
+
+                let query_norm = f32_sqrt(query_norm_sq);
+                let chunk_norm = f32_sqrt(chunk_norm_sq);
+
+                let score = if query_norm > 1e-9f32 && chunk_norm > 1e-9f32 {
+                    dot_product / (query_norm * chunk_norm)
+                } else {
+                    0.0f32
+                };
 
                 if score > best_score {
                     best_score = score;
