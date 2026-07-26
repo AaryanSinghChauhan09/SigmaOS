@@ -641,6 +641,50 @@ impl LocalMetadataCache {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct PackageSnapshot {
+    pub id: usize,
+    pub description: String,
+    pub timestamp: u64,
+    pub installed_packages: HashMap<String, UnifiedPackage>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub id: usize,
+    pub installed_keys: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct TransactionHistory {
+    pub checkpoints: HashMap<usize, PackageCheckpoint>,
+    pub next_id: usize,
+}
+
+impl TransactionHistory {
+    pub fn new() -> Self {
+        Self {
+            checkpoints: HashMap::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        let checkpoint = PackageCheckpoint {
+            id,
+            installed_keys: installed.keys().cloned().collect(),
+        };
+        self.checkpoints.insert(id, checkpoint);
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        self.checkpoints.get(&id)
+    }
+}
+
 // ----------------------------------------------------
 // Universal Package Manager
 // ----------------------------------------------------
@@ -652,6 +696,9 @@ pub struct UniversalPackageManager {
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub metadata_cache: LocalMetadataCache,
+    pub transaction_history: TransactionHistory,
+    pub next_snapshot_id: usize,
+    pub snapshots: HashMap<usize, PackageSnapshot>,
 }
 
 impl UniversalPackageManager {
@@ -662,6 +709,9 @@ impl UniversalPackageManager {
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
             metadata_cache: LocalMetadataCache::new(),
+            transaction_history: TransactionHistory::new(),
+            next_snapshot_id: 1,
+            snapshots: HashMap::new(),
         };
 
         manager.add_default_adapters();
