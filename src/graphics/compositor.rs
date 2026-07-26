@@ -169,7 +169,7 @@ impl Default for SurfaceCapability {
 /// Bitmap surface (OOP: Concrete surface class)
 pub struct BitmapSurface {
     pub id: usize,
-    pub data: Vec<u32>,
+    pub data: std::vec::Vec<u32>,
     pub size: Size,
     pub stride: u32,
     pub capability: SurfaceCapability,
@@ -179,7 +179,7 @@ pub struct BitmapSurface {
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
-        let mut data = Vec::with_capacity(size);
+        let mut data = std::vec::Vec::with_capacity(size);
         data.resize(size, 0);
 
         BitmapSurface {
@@ -440,7 +440,7 @@ pub trait Compositor {
     /// Dynamic double buffering: Swap front and back display buffers
     fn swap_buffers(&mut self) -> Result<(), GraphicsError>;
     /// Captures a screenshot of the currently composed frame
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError>;
+    fn capture_screenshot(&self) -> Result<std::vec::Vec<u32>, GraphicsError>;
 }
 
 /// Graphics error types
@@ -663,7 +663,7 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
+    fn capture_screenshot(&self) -> Result<std::vec::Vec<u32>, GraphicsError> {
         if let Some(ref back) = self.back_buffer {
             Ok(back.data.clone())
         } else {
