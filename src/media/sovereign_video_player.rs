@@ -27,39 +27,103 @@ pub enum CodecType {
     AV1,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub id: u64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VideoCodec {
+    H264,
+    H265,
+    VP9,
+    AV1,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AudioCodec {
+    AAC,
+    FLAC,
+    Opus,
+    MP3,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerFormat {
+    MKV,
+    MP4,
+    AVI,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UpscalingQuality {
+    Standard,
+    High,
+    SuperResolution,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SpatialAudioMode {
+    Stereo,
+    Surround5_1,
+    Atmos,
+}
+
+#[derive(Debug, Clone)]
+pub struct VideoFrame {
+    pub width: u32,
+    pub height: u32,
+    pub timestamp: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct AudioSample {
+    pub sample_rate: u32,
+    pub channels: u32,
+}
+
 pub struct SovereignVideoPlayer {
-    /// Capability token for access control
-    capability: CapabilityToken,
-    /// Current video codec
-    video_codec: Option<VideoCodec>,
-    /// Current audio codec
-    audio_codec: Option<AudioCodec>,
-    /// Container format
-    container_format: Option<ContainerFormat>,
-    /// Upscaling quality
-    upscaling_quality: UpscalingQuality,
-    /// Spatial audio mode
-    spatial_audio_mode: SpatialAudioMode,
-    /// PQC encryption enabled
-    pqc_encryption: bool,
-    /// AI upscaling enabled
-    ai_upscaling: bool,
-    /// Frame buffer
-    frame_buffer: Vec<VideoFrame>,
-    /// Audio buffer
-    audio_buffer: Vec<AudioSample>,
-    /// Current playback position
-    current_position: u64,
-    /// Total duration in nanoseconds
-    total_duration: u64,
-    /// Playing state
-    is_playing: bool,
+    pub capability: CapabilityToken,
+    pub video_codec: Option<VideoCodec>,
+    pub audio_codec: Option<AudioCodec>,
+    pub container_format: Option<ContainerFormat>,
+    pub upscaling_quality: UpscalingQuality,
+    pub spatial_audio_mode: SpatialAudioMode,
+    pub pqc_encryption: bool,
+    pub ai_upscaling: bool,
+    pub frame_buffer: Vec<VideoFrame>,
+    pub audio_buffer: Vec<AudioSample>,
+    pub current_position: u64,
+    pub total_duration: u64,
+    pub is_playing: bool,
+    pub state: PlayerState,
+    pub volume: u32,
+    pub is_gpu_accelerated: bool,
 }
 
 impl SovereignVideoPlayer {
     pub fn new(codec: CodecType) -> Self {
+        let mapped_codec = match codec {
+            CodecType::H264 => VideoCodec::H264,
+            CodecType::H265 => VideoCodec::H265,
+            CodecType::VP9 => VideoCodec::VP9,
+            CodecType::AV1 => VideoCodec::AV1,
+        };
+
         Self {
-            active_codec: codec,
+            capability: CapabilityToken { id: 0 },
+            video_codec: Some(mapped_codec),
+            audio_codec: Some(AudioCodec::Opus),
+            container_format: Some(ContainerFormat::MKV),
+            upscaling_quality: UpscalingQuality::Standard,
+            spatial_audio_mode: SpatialAudioMode::Stereo,
+            pqc_encryption: false,
+            ai_upscaling: true,
+            frame_buffer: Vec::new(),
+            audio_buffer: Vec::new(),
+            current_position: 0,
+            total_duration: 0,
+            is_playing: false,
             state: PlayerState::Stopped,
             volume: 80,
             is_gpu_accelerated: true,
@@ -68,14 +132,18 @@ impl SovereignVideoPlayer {
 
     pub fn play(&mut self) {
         self.state = PlayerState::Playing;
+        self.is_playing = true;
     }
 
     pub fn pause(&mut self) {
         self.state = PlayerState::Paused;
+        self.is_playing = false;
     }
 
     pub fn stop(&mut self) {
         self.state = PlayerState::Stopped;
+        self.is_playing = false;
+        self.current_position = 0;
     }
 
     pub fn set_volume(&mut self, new_vol: u32) {
@@ -266,6 +334,7 @@ impl NtpClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_vlc_video_player() {
