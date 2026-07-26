@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🛡️ Sentinel's Journal — SigmaOS Security & Hardening
 
 This journal logs CRITICAL security lessons, vulnerability fixes, and proactive system hardening actions implemented across SigmaOS.
@@ -26,3 +27,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Vulnerability:** Having merge conflict markers committed directly to repository branches leads to immediate parser/compiler termination, acting as an unintentional Denial-of-Service (DoS) on CI pipelines and developer builds.
 **Learning:** Delimiter validation checks must be enforced strictly prior to commit stages to prevent broken master/main trunks.
 **Prevention:** Integrate pre-commit or pre-push gates that search for conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) to ensure only fully resolved files enter upstream integration.
+=======
+## 2025-10-24 - [Attested Cryptographic Audits]
+**Learning:** Normal filesystem logging is susceptible to modifications when a system is compromised.
+**Prevention:** Utilizing WORM (write-once-read-many) structures ensures that cryptographic audit logs cannot be modified once they are committed.
+>>>>>>> origin/agent-absorption-plan-incorporation-4628616561107371850

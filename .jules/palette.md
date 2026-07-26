@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🎨 Palette's Journal — SigmaOS UX & Accessibility Polish
 
 This journal captures CRITICAL accessibility (a11y) and user experience (UX) insights obtained while developing and auditing the Zenon/Zenith desktop compositors and global settings framework in SigmaOS.
@@ -15,3 +16,8 @@ This journal captures CRITICAL accessibility (a11y) and user experience (UX) ins
 ## 2026-07-20 - Multi-Language Accessibility Support and Auto-Theming Contrasts
 **Learning:** Dynamic time-based color switching in visual compositors can introduce layout recalculation costs if screen boundaries or contrast ratios are re-evaluated synchronously. Separating theme loading into a pre-compiled layout structure and adjusting contrast ratios dynamically using simple bitwise pixel color maps reduces visual jitter and guarantees consistent focus styling.
 **Action:** Always pre-allocate style constraints for time-based screen contrast switching to prevent layout jank.
+=======
+## 2025-10-24 - [Legacy Windowing Protocol Bottlenecks]
+**Learning:** Traditional window display architectures (e.g., X11, Wayland) introduce latency overhead due to heavy event marshaling and context switches.
+**Action:** Direct frame buffers coupled with a dedicated lightweight Vulkan compositing thread achieve latency parity with dedicated gaming consoles.
+>>>>>>> origin/agent-absorption-plan-incorporation-4628616561107371850

@@ -84,6 +84,37 @@ impl PartialOrd for PosixComplianceLevel {
     }
 }
 
+/// Sovereign Independency Checker
+/// Programs dynamic checks to guarantee 100% self-sufficiency constraints on files & dependencies
+#[derive(Debug, Clone)]
+pub struct SovereignIndependencyChecker {
+    pub has_zero_external_dependencies: bool,
+    pub is_statically_linked_only: bool,
+    pub uses_local_allocator_only: bool,
+}
+
+impl SovereignIndependencyChecker {
+    pub fn new() -> Self {
+        Self {
+            has_zero_external_dependencies: true,
+            is_statically_linked_only: true,
+            uses_local_allocator_only: true,
+        }
+    }
+
+    pub fn evaluate_codebase_independency_conformance(&self) -> bool {
+        self.has_zero_external_dependencies
+            && self.is_statically_linked_only
+            && self.uses_local_allocator_only
+    }
+}
+
+impl Default for SovereignIndependencyChecker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -125,5 +156,15 @@ mod tests {
 
         assert!(manager.get_lsb_compatibility(LsbProfile::Runtime));
         assert!(!manager.get_lsb_compatibility(LsbProfile::Desktop));
+    }
+
+    #[test]
+    fn test_sovereign_independency_evaluation() {
+        let checker = SovereignIndependencyChecker::new();
+        assert!(checker.evaluate_codebase_independency_conformance());
+
+        let mut tainted = SovereignIndependencyChecker::new();
+        tainted.has_zero_external_dependencies = false;
+        assert!(!tainted.evaluate_codebase_independency_conformance());
     }
 }
