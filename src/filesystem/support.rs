@@ -71,7 +71,6 @@ impl Filesystem for SimpleFilesystem {
     }
     fn fs_type(&self) -> FilesystemType {
         match self.fs_type.load(Ordering::SeqCst) {
-            0 => FilesystemType::Ext4,
             1 => FilesystemType::Btrfs,
             2 => FilesystemType::ZFS,
             3 => FilesystemType::Fat32,

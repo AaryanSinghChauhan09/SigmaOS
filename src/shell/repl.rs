@@ -127,14 +127,12 @@ impl ShellRepl {
 
         Self {
             running: true,
-            variables: HashMap::new(),
-            prompt: "sigma-sh> ".to_string(),
-            customization: CustomizationEngine::new(),
-            accessibility: AccessibilityFramework::new(),
-            package_manager: UniversalPackageManager::new(),
-            virt_orchestrator: VirtualizationOrchestrator::new(),
-            compatibility: CompatibilityManager::new(),
-            self_healing: SelfHealingModule::new(),
+            variables: std::collections::HashMap::new(),
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services: std::collections::HashMap::new(),
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 

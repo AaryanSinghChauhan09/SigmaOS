@@ -17,6 +17,9 @@ pub struct TorrentMetadata {
 pub struct TorrentClient {
     pub peer_id: String,
     pub active_torrents: Vec<TorrentMetadata>,
+    pub max_download_speed_kbps: usize,
+    pub max_upload_speed_kbps: usize,
+    pub peer_port: u16,
 }
 
 impl TorrentClient {
@@ -24,7 +27,22 @@ impl TorrentClient {
         Self {
             peer_id: String::from(peer_id),
             active_torrents: Vec::new(),
+            max_download_speed_kbps: 0, // 0 = unlimited
+            max_upload_speed_kbps: 0,
+            peer_port: 6881,
         }
+    }
+
+    pub fn set_download_limit(&mut self, speed: usize) {
+        self.max_download_speed_kbps = speed;
+    }
+
+    pub fn set_upload_limit(&mut self, speed: usize) {
+        self.max_upload_speed_kbps = speed;
+    }
+
+    pub fn set_peer_port(&mut self, port: u16) {
+        self.peer_port = port;
     }
 
     /// Very basic mock Bencode parser for `.torrent` files

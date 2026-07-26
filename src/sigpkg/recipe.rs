@@ -275,3 +275,20 @@ mod tests {
         );
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildSystem {
+    Cargo,
+    Make,
+    CMake,
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeError {
+    Success,
+    InvalidRecipe,
+    SignatureVerificationFailed,
+}
+
+pub struct RecipeManager;

@@ -226,6 +226,8 @@ pub struct NetworkTrafficAnalyzer {
     alerts: Vec<TrafficAlert>,
     capture_enabled: bool,
     max_connections: usize,
+    pub promiscuous_mode: bool,
+    pub custom_alert_level: AlertSeverity,
 }
 
 impl NetworkTrafficAnalyzer {
@@ -245,7 +247,17 @@ impl NetworkTrafficAnalyzer {
             alerts: Vec::new(),
             capture_enabled: false,
             max_connections: 10000,
+            promiscuous_mode: false,
+            custom_alert_level: AlertSeverity::Low,
         }
+    }
+
+    pub fn set_promiscuous_mode(&mut self, enabled: bool) {
+        self.promiscuous_mode = enabled;
+    }
+
+    pub fn set_custom_alert_level(&mut self, level: AlertSeverity) {
+        self.custom_alert_level = level;
     }
 
     /// Add analysis strategy
