@@ -924,6 +924,26 @@ Traditional tab completion only suggests static commands or standard file-path d
 * When a user presses `<Tab>` after a command (e.g., `sys control start --service=`), the shell queries the `CliCommandRegistry` and maps Suggester states dynamically.
 * Autocompletion dynamically lists and completes running microkernel daemons, loaded peripheral drivers, network interfaces, mounted CAS volumes, or sandboxed capsule identifiers on-the-fly, utilizing static memory buffers.
 
+```
++-----------------------------------------------------------------------------------------+
+|                          S-CLI DYNAMIC AUTOCOMPLETE SEQUENCE DIAGRAM                    |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|  User               S-Cli Terminal             CliCommandRegistry         SystemObserver|
+|   |                       |                             |                       |       |
+|   |--- 1. Types cmd ----->|                             |                       |       |
+|   |                       |--- 2. Query registry ------>|                       |       |
+|   |--- 3. Hits <Tab> ---->|                             |                       |       |
+|   |                       |--- 4. Fetch dynamic context ----------------------->|       |
+|   |                       |<-- 5. Return active stats (e.g. active services) ---|       |
+|   |                       |                             |                       |       |
+|   |                       |--- 6. Filter completions -->|                       |       |
+|   |                       |<-- 7. Suggestion list ------|                       |       |
+|   |<-- 8. Render options -|                             |                       |       |
+|   |                       |                             |                       |       |
++-----------------------------------------------------------------------------------------+
+```
+
 #### B. Live Syntactic Highlighting & Capability Validation
 To prevent command typos and unintended execution failures:
 * S-CLI tokenizes and parses input characters character-by-character in the text buffer.
@@ -1398,6 +1418,31 @@ To solve the grand design limits of legacy monolithic operating systems, SigmaOS
 ### 18.1 Universal ABI Translator
 * **The Legacy Gap:** No mainstream OS natively executes compiled ELF, PE, and Mach-O binaries concurrently, resulting in massive virtualization overhead and rigid ecosystem segmentation.
 * **OOP Principle:** **Liskov Substitution + Dependency Inversion.** Defines an abstract syscall translation interface (`ISyscallTranslator`) where OS-specific runtime adapters (e.g. `LinuxTranslator`, `WindowsTranslator`, `MacosTranslator`) implement target ABI translations polymorphically.
+
+```
++-----------------------------------------------------------------------------------------+
+|                          UNIVERSAL ABI TRANSLATOR UML DESIGN                            |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|                      +---------------------------------------+                          |
+|                      |         <<interface>>                 |                          |
+|                      |       ISyscallTranslator              |                          |
+|                      +---------------------------------------+                          |
+|                      | + translate(RegisterContext) -> u64   |                          |
+|                      +---------------------------------------+                          |
+|                                          ^                                              |
+|                                          |                                              |
+|                    +---------------------+---------------------+                        |
+|                    |                     |                     |                        |
+|        +-------------------+ +-------------------+ +-------------------+                |
+|        |   LinuxTranslator | | WindowsTranslator | |  MacosTranslator  |                |
+|        +-------------------+ +-------------------+ +-------------------+                |
+|        | + translate()     | | + translate()     | | + translate()     |                |
+|        +-------------------+ +-------------------+ +-------------------+                |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+```
+
 * **Component Specification (Pseudocode):**
 ```rust
 pub enum BinaryFormat {
@@ -1417,6 +1462,31 @@ pub trait ISyscallTranslator {
     // Intercepts and maps format-specific calls dynamically to native cap-checked syscalls
     fn translate(&self, context: &mut RegisterContext) -> Result<u64, u32>;
 }
+```
+
+```
++-----------------------------------------------------------------------------------------+
+|                        UNIVERSAL ABI TRANSLATOR SEQUENCE DIAGRAM                        |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|  Legacy Binary           S-VMM Loader         S-SEC Syscall Gate      Sovereign Syscall |
+|       |                       |                       |                        |        |
+|       |--- 1. Exec request -->|                       |                        |        |
+|       |                       |--- 2. Detect ABI ---->|                        |        |
+|       |                       |    (e.g., ELF/Linux)  |                        |        |
+|       |                       |<-- 3. Load Adaptor ---|                        |        |
+|       |                       |                       |                        |        |
+|       |--- 4. Syscall (0x80) ------------------------>|                        |        |
+|       |                                               |--- 5. Map & Translate -|        |
+|       |                                               |    to Sovereign format |        |
+|       |                                               |--- 6. Cap Verification |        |
+|       |                                               |<-- 7. Verified --------|        |
+|       |                                               |                        |        |
+|       |                                               |--- 8. Invoke native -->|        |
+|       |                                               |<-- 9. Syscall Result --|        |
+|       |<-- 10. Return translated registers -----------|                        |        |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
 ```
 
 ### 18.2 Composable Filesystem (SigmaFS++)
@@ -1443,6 +1513,31 @@ pub trait ISemanticIndex {
 ### 18.3 Self-Healing Kernel Engine
 * **The Legacy Gap:** Modern OSes fail to resolve runtime memory leaks, corrupted drivers, or security anomalies without a full reboot or manual human patch deployments.
 * **OOP Principle:** **Open/Closed + Dependency Inversion.** An isolated background loop runs continuous checking policies. The check loop acts on the abstract `IRecoveryStrategy` interface, separating anomaly detection from dynamic hot-patching logic.
+
+```
++-----------------------------------------------------------------------------------------+
+|                        SELF-HEALING KERNEL STRATEGY PATTERN UML DESIGN                  |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|                      +---------------------------------------+                          |
+|                      |         <<interface>>                 |                          |
+|                      |        IRecoveryStrategy              |                          |
+|                      +---------------------------------------+                          |
+|                      | + handle_anomaly(AnomalyType) -> Res  |                          |
+|                      +---------------------------------------+                          |
+|                                          ^                                              |
+|                                          |                                              |
+|                    +---------------------+---------------------+                        |
+|                    |                     |                     |                        |
+|        +-------------------+ +-------------------+ +-------------------+                |
+|        |DriverRestartStrat | |MemoryQuarantineStr| | StateHotPatchStrat|                |
+|        +-------------------+ +-------------------+ +-------------------+                |
+|        | + handle_anomaly()| | + handle_anomaly()| | + handle_anomaly()|                |
+|        +-------------------+ +-------------------+ +-------------------+                |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+```
+
 * **Component Specification (Procedural Outline):**
 ```rust
 pub enum AnomalyType {
@@ -1479,6 +1574,22 @@ pub trait IModelRuntime {
 ### 18.5 Energy-Aware Scheduler (EAS)
 * **The Legacy Gap:** CPU schedulers (e.g. CFS, EEVDF) prioritize processing speed and throughput under load, ignoring dynamic thermal thresholds and battery degradation curves.
 * **OOP Principle:** **Open/Closed.** Decoupled policy adapters dynamically inject workload cost predictions into scheduler queues based on active hardware telemetry.
+
+#### Mathematical Cost-Benefit Formulations
+The energy cost $E_{total}$ for executing a workload of length $W$ (cycles) on CPU core $c$ at frequency $f$ under active temperature $T$ is defined dynamically:
+
+$$E_{total}(c, f, T) = P_{static}(T) \cdot \frac{W}{f} + P_{dynamic}(c) \cdot f^2 \cdot W$$
+
+Where:
+* $P_{static}(T) = \alpha \cdot e^{\beta \cdot T}$ models leakages that increase exponentially with thermal output $T$.
+* $P_{dynamic}(c) \cdot f^2$ represents active dynamic switching power.
+
+To balance energy and deadline limits dynamically inside the EEVDF scheduler, the virtual runtime adjustment factor $V_{adj}$ is calculated:
+
+$$V_{adj} = \gamma \cdot \frac{E_{total}}{\text{budget}} + (1 - \gamma) \cdot \frac{\text{load}}{\text{capacity}}$$
+
+S-SCHED schedules the thread with the earliest eligible virtual runtime ($V_i + V_{adj}$).
+
 * **Component Specification (Pseudocode):**
 ```rust
 pub struct BatteryTelemetry {
@@ -1496,6 +1607,27 @@ pub trait IEnergyCostModel {
 ### 18.6 User-Defined Kernel Functions (Sandboxed VM Extensions)
 * **The Legacy Gap:** Modifying core systems behavior (such as adding custom scheduling policies or block allocation maps) requires kernel recompilation, risking panics or security compromises.
 * **OOP Principle:** **Open/Closed + Interface Segregation.** Exposes a safe scripting API allowing developers and researchers to run sandboxed driver/scheduling bytecodes natively without rebuilding the microkernel.
+
+```
++-----------------------------------------------------------------------------------------+
+|                        SANDBOXED VM REGISTER MACHINE REGISTER LAYOUT                    |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|       +--------+  +--------+  +--------+  +--------+                                    |
+|       | R0 (A) |  | R1 (B) |  | R2 (C) |  | R3 (D) |  <-- Virtual General registers     |
+|       +--------+  +--------+  +--------+  +--------+                                    |
+|       | R4 (E) |  | R5 (F) |  | R6 (G) |  | R7 (H) |                                    |
+|       +--------+  +--------+  +--------+  +--------+                                    |
+|                                                                                         |
+|       +--------------------------------------------+                                    |
+|       | PC (Program Counter - 64-bit)              |                                    |
+|       +--------------------------------------------+                                    |
+|       | SP (Stack Pointer - 512B stack limit)      |                                    |
+|       +--------------------------------------------+                                    |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+```
+
 * **Component Specification (Pseudocode):**
 ```rust
 pub struct BytecodeScript {

@@ -1,19 +1,14 @@
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
-use core::sync::atomic::{AtomicU64, Ordering};
+use std::string::String;
+use std::vec::Vec;
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     /// 64-bit capability bitmask
     bits: u64,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl CapabilityToken {
@@ -118,12 +113,6 @@ impl CapabilityGate {
         CapabilityToken {
             bits: self.current.load(Ordering::SeqCst),
         }
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
