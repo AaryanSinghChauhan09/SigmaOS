@@ -113,6 +113,9 @@ The following algorithms and subsystems are structurally and logically complete:
 11. **Sovereign Unimplemented Features Module (`src/unimplemented_features.rs`)**
    - Fully compiles and integrates 20+ advanced core systems-level specifications (including S-BOOT firmware scan registry, NixOS-style Generations snapshots, S-IPC microkernel transaction bus, S-SIGNAL dispatchers, BusyBox-style MultiCall Shell, Android-style security enforcers, Zenith tiling compositors, and system tracing/provenance watchdogs) natively into the compiled `sigmaos` library namespace.
 
+12. **Decentralized ID & Low-Resource Personalisation Module (`src/customization/routines.rs`)**
+   - Exposes DID-based cryptographic user profile personalization mapping (`SovereignDIDProfile`) alongside dynamic low-resource / rural adaptation loops (`RuralResourcePersonalizer`) that compress display buffers and scale network caches for low-bandwidth environments.
+
 ---
 
 ## ❌ What is Not Working & Gaps (Subsystem Analysis)

@@ -71,6 +71,8 @@ The following milestone checklist tracks the current operational status of the c
   - *Status:* Logically complete. Implements the high-density LZMA2 solid compression and multi-volume archive handler (`SevenZipArchiveHandler`) in safe Rust, integrated into `ArchiveManager`.
 - [x] **Compile Full-Fledged OS Subsystems**
   - *Status:* Logically complete. Successfully declared `unimplemented_features` module natively inside `src/lib.rs`, rendering 20+ core boot, VFS generation, signal, MAC security, IPC, and system tracing subsystems compiled and active in the core library namespace.
+- [x] **Enhance Customisation & Personalisation**
+  - *Status:* Logically complete. Implemented WIKI-specified Decentalized ID profile personalisation (`SovereignDIDProfile`) and rural device bandwidth-aware adaptive UI scaling rules (`RuralResourcePersonalizer`) inside `src/customization/routines.rs` with full unit tests.
 - [x] **Implement ABI translator prototype**
   - *Status:* Logically complete. The backwards-emulation proxy layers, Lindows-style Win32 translator, and historic Linux ABI shims in `src/compatibility/historic_linux.rs` and `src/compatibility/proxy.rs` successfully translate system calls dynamically.
 - [x] **Build continuity layer**

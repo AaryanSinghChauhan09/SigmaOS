@@ -70,7 +70,8 @@ pub use compatibility::{
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use customization::{
-    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+    Action, Condition, CustomizationEngine, CustomizationError, Routine, RuralResourcePersonalizer,
+    SovereignDIDProfile, Theme, TriggerType,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
