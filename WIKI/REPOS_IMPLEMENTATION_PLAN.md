@@ -77,10 +77,10 @@ This document maps out the systematic, step-by-step implementation roadmap to in
 * **Success Criteria:** High thermal events automatically invoke CPU throttling rules.
 
 #### 4.2 Zenith Desktop Accessibility & Transition Polish
-* **Task:** Connect assistive tech (Screen Reader, High Contrast) to the UI compositor rendering loop. Implement responsive layouts and screen reader voice buffers.
-* **Target Directories:** `src/accessibility/`, `zenith_desktop/`
-* **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
-* **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
+*   **Task:** Connect assistive tech (Screen Reader, High Contrast) to the UI compositor rendering loop. Implement responsive layouts and screen reader voice buffers.
+*   **Target Directories:** `src/accessibility/`, `zenith_desktop/`
+*   **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
+*   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
 
 ---
 

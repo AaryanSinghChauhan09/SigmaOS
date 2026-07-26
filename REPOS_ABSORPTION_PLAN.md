@@ -67,23 +67,6 @@ We have organized the target upstream repositories into distinct specialized sys
 
 ---
 
-### 12. 🔹 Server & Cloud Distros
-*   **Upstream Repositories:**
-    -   `rocky-linux/rocky` — RHEL-compatible distro.
-    -   `almalinux/almalinux` — RHEL downstream distro.
-    -   `oracle/linux` — Oracle’s RHEL-based distro.
-    -   `cloudlinux/cloudlinux` — Hosting-focused distro.
-    -   `coreos/fedora-coreos` — Immutable Fedora for containers.
-    -   `flatcar-linux/flatcar` — Container-optimized OS.
-    -   `rancher/os` — Docker-focused OS.
-    -   `k3os-io/k3os` — Kubernetes-native OS.
-    -   `bottlerocket-os/bottlerocket` — AWS container OS.
-    -   `ubuntu-core/ubuntu-core` — Snap-based Ubuntu variant.
-*   **Core Concepts to Absorb:** Immutable OS image structures, cloud-init provisioning scripts, daemonless container runtime systems, and extreme security-hardened read-only directories.
-*   **SigmaOS Adaptation Pathway:** Embed immutable directory protections inside the filesystem manager and load cluster-init profiles in `src/orchestration/`.
-
----
-
 ### 13. 🔹 Filesystems & Storage
 *   **Upstream Repositories:**
     -   `xfs/xfsprogs` — XFS filesystem tools.
