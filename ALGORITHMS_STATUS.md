@@ -110,6 +110,9 @@ The following algorithms and subsystems are structurally and logically complete:
 10. **Sovereign 7-Zip Archive Module (`src/filesystem/archive.rs`)**
    - Implements safe, zero-dependency, object-oriented 7-Zip archive utilities (`SevenZipArchiveHandler`) conforming to the system `ArchiveHandler` trait, featuring solid LZMA2 compression simulation and dynamic multipart volume sizing checks.
 
+11. **Sovereign Unimplemented Features Module (`src/unimplemented_features.rs`)**
+   - Fully compiles and integrates 20+ advanced core systems-level specifications (including S-BOOT firmware scan registry, NixOS-style Generations snapshots, S-IPC microkernel transaction bus, S-SIGNAL dispatchers, BusyBox-style MultiCall Shell, Android-style security enforcers, Zenith tiling compositors, and system tracing/provenance watchdogs) natively into the compiled `sigmaos` library namespace.
+
 ---
 
 ## ❌ What is Not Working & Gaps (Subsystem Analysis)
