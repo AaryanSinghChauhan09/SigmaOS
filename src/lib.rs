@@ -1,5 +1,4 @@
 #![allow(warnings, clippy::all)]
-
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
@@ -9,12 +8,12 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -40,14 +39,14 @@ pub mod observability {
     pub mod profiler;
 }
 pub mod boot {
-    pub mod firmware_bridge;
     pub mod bridge_grid;
+    pub mod firmware_bridge;
 }
 pub mod toolchain {
     pub mod adapter;
+    pub mod bootstrap;
     pub mod capsule;
     pub mod codex;
-    pub mod bootstrap;
 }
 pub mod scheduler {
     pub mod numa_scheduler;
@@ -99,8 +98,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PdfDocument, PdfError, PdfPage,
+    PomodoroState, PomodoroTimer, ProductivityScore, SovereignPdf24Engine,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -120,17 +119,15 @@ pub use virtualization::{
 pub mod init {
     pub mod systemd_init;
 }
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub mod ai {
     pub mod next_gen;
 }
 pub use ai::next_gen::{
-    WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
-    AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,
-    AIModel, MultiModelOrchestrator,
+    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType, EnergyAwareScheduler,
+    EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
+    WorkloadType,
 };
 
 pub mod virt;

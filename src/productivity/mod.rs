@@ -32,3 +32,6 @@ pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
+
+pub mod pdf;
+pub use pdf::{PdfDocument, PdfError, PdfPage, SovereignPdf24Engine};
