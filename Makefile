@@ -18,9 +18,31 @@ CARGO ?= cargo
 NASM ?= nasm
 QEMU ?= qemu-system-x86_64
 
-# Build directories
-BUILD_DIR ?= build
-TARGET_DIR ?= target
+# Determine Cargo Flags and Features dynamically based on PROFILE
+CARGO_FLAGS =
+
+ifeq ($(RELEASE),1)
+CARGO_FLAGS += --release
+endif
+
+ifeq ($(PROFILE),standalone)
+CARGO_FLAGS += --release --features "desktop drivers ai"
+else ifeq ($(PROFILE),microkernel)
+CARGO_FLAGS += --release --features "microkernel core-shards"
+else ifeq ($(PROFILE),rtos)
+CARGO_FLAGS += --release --features "rtos realtime"
+else ifeq ($(PROFILE),cloud)
+CARGO_FLAGS += --release --features "cloud cloud-init"
+else ifeq ($(PROFILE),browser)
+CARGO_FLAGS += --release --features "wasm browser"
+else
+CARGO_FLAGS += --profile $(if $(filter 1,$(RELEASE)),release,dev)
+endif
+
+# Verbose output
+ifeq ($(V),1)
+CARGO_FLAGS += --verbose
+endif
 
 # Help target
 help:
@@ -66,14 +88,14 @@ help:
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
-	@rm -rf $(BUILD_DIR)
+	@rm -rf build
 	@cargo clean
 	@echo "Clean complete."
 
 # Distclean - remove all generated files
 distclean: clean
 	@echo "Removing all generated files..."
-	@rm -rf $(TARGET_DIR)
+	@rm -rf target
 	@rm -f Cargo.lock
 	@echo "Distclean complete."
 
@@ -84,64 +106,37 @@ mrproper: distclean
 	@rm -f .config
 	@echo "Mrproper complete."
 
-# Create build directories
-$(BUILD_DIR):
-	@mkdir -p $(BUILD_DIR)
-
-# Build complete system
-build: $(BUILD_DIR)
+# Build complete system (Unified profile routing with no circular warnings)
+build:
+	@mkdir -p build
 	@echo "Building SigmaOS (Profile: $(PROFILE), Arch: $(ARCH))..."
-	@cargo build --profile $(if $(filter 1,$(RELEASE)),release,dev)
+	@cargo build $(CARGO_FLAGS)
+ifeq ($(PROFILE),browser)
+	@wasm-pack build --target web
+endif
+	@./scripts/build-iso.sh
 	@echo "Build complete."
 
 # Build kernel only
-kernel: $(BUILD_DIR)
+kernel:
+	@mkdir -p build
 	@echo "Building SigmaOS kernel..."
 	@cargo build --bin sigma_kernel
 	@echo "Kernel build complete."
 
 # Build drivers only
-drivers: $(BUILD_DIR)
+drivers:
+	@mkdir -p build
 	@echo "Building SigmaOS drivers..."
 	@cargo build --bin sigma_drivers
 	@echo "Drivers build complete."
 
 # Build userspace only
-userspace: $(BUILD_DIR)
+userspace:
+	@mkdir -p build
 	@echo "Building SigmaOS userspace..."
 	@cargo build --bin sigma_userspace
 	@echo "Userspace build complete."
-
-# Build standalone profile
-standalone: $(BUILD_DIR)
-	@echo "Building standalone profile..."
-	@cargo build --release --features "desktop drivers ai"
-	@echo "Standalone build complete."
-
-# Build microkernel profile
-microkernel: $(BUILD_DIR)
-	@echo "Building microkernel profile..."
-	@cargo build --release --features "microkernel core-shards"
-	@echo "Microkernel build complete."
-
-# Build RTOS profile
-rtos: $(BUILD_DIR)
-	@echo "Building RTOS profile..."
-	@cargo build --release --features "rtos realtime"
-	@echo "RTOS build complete."
-
-# Build cloud profile
-cloud: $(BUILD_DIR)
-	@echo "Building cloud profile..."
-	@cargo build --release --features "cloud cloud-init"
-	@echo "Cloud build complete."
-
-# Build browser profile
-browser: $(BUILD_DIR)
-	@echo "Building browser profile..."
-	@cargo build --release --features "wasm browser"
-	@wasm-pack build --target web
-	@echo "Browser build complete."
 
 # Run all tests
 test:
@@ -164,7 +159,7 @@ test-integration:
 # Run QEMU boot test
 test-qemu: build
 	@echo "Running QEMU boot test..."
-	@$(QEMU) -cdrom $(BUILD_DIR)/sigmaos.iso -m 2G -serial stdio -no-reboot -display none
+	@qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio -no-reboot -display none
 	@echo "QEMU boot test complete."
 
 # Format code
@@ -203,36 +198,9 @@ update:
 	@cargo update
 	@echo "Dependencies updated."
 
-# Profile-specific builds
-ifeq ($(PROFILE),standalone)
-build: standalone
-else ifeq ($(PROFILE),microkernel)
-build: microkernel
-else ifeq ($(PROFILE),rtos)
-build: rtos
-else ifeq ($(PROFILE),cloud)
-build: cloud
-else ifeq ($(PROFILE),browser)
-build: browser
-endif
-
 # Architecture-specific settings
 ifeq ($(ARCH),aarch64)
 CROSS_COMPILE ?= aarch64-linux-gnu-
 else ifeq ($(ARCH),riscv64)
 CROSS_COMPILE ?= riscv64-linux-gnu-
-endif
-
-# Debug/Release settings
-ifeq ($(DEBUG),1)
-CARGO_FLAGS += --debug
-endif
-
-ifeq ($(RELEASE),1)
-CARGO_FLAGS += --release
-endif
-
-# Verbose output
-ifeq ($(V),1)
-CARGO_FLAGS += --verbose
 endif
