@@ -271,6 +271,66 @@ To ensure immediate corporate and government suitability, SigmaOS incorporates b
 
 ---
 
+### 4.7 Sovereign VLC-Equivalent Video Player and Media Synthesis Pipeline
+Traditional media players like VLC require heavy user-space libraries (FFmpeg, Qt, etc.) and run on legacy POSIX architectures where a single buffer overflow inside an obscure codec can compromise the entire operating system. SigmaOS implements **Sovereign Video Player**, an OS-native, zero-dependency, and capability-gated media synthesis pipeline.
+
+```
+       [Stream File / Network Socket] ---> [Sovereign Demuxer Class]
+                                                    |
+                                                    v (Raw Frames / Audio Packets)
+                                      +-----------------------------+
+                                      |   Isolated Codec Enclaves   |
+                                      |   (Gated by MediaDecoder    |
+                                      |    Capability Tokens)       |
+                                      +-----------------------------+
+                                        /                         \
+                                       v (Video)                   v (Audio)
+                         [Direct Hardware Blits via DMA]   [Lock-Free Sound Ring Buffer]
+                                       |                           |
+                                       v                           v
+                         [Direct Framebuffer Screen]      [Audio Output Channels]
+```
+
+#### A. Direct Hardware Rendering & SIMD Blits
+- **Wayland/X11 Independence:** Decoded video frames are transferred directly from isolated userspace decoder memory pools to display hardware page regions using Direct Memory Access (DMA) and SIMD-accelerated scaling bit blits, completely eliminating intermediate graphical server layers.
+- **Lock-Free Audio Sync:** Encapsulates decoded audio samples into allocation-free circular ring buffers feeding directly into hardware audio FIFO channels, ensuring microsecond frame-audio synchronization.
+
+#### B. Gated Codec Isolation & Self-Healing Decoders
+- **Capability Gating:** Codecs (`mp4`, `mkv`, `avi`, `mp3`, `aac`, `flac`) are compiled as independent Object-Oriented classes running within strictly locked Ring 3 domains. Each decoder must present a valid `MediaDecoderCapability` token to read input blocks or register display frames.
+- **Fault-Isolation & Sub-Millisecond Restarts:** If a malformed file or zero-day exploit triggers a buffer overflow inside a codec, the microkernel's State Supervisor intercepts the fault, cleanses the container's page tables, and re-allocates a fresh instance of the codec in under 1 millisecond. Playback resumes seamlessly from the last verified block offset.
+
+#### C. Structural OOP Media Specification (Pseudocode)
+```rust
+pub enum MediaFormat {
+    Mp4,
+    Mkv,
+    Flac,
+    Mp3,
+}
+
+pub struct DecodedFrame {
+    pub width: u32,
+    pub height: u32,
+    pub pixel_format: u32,
+    pub buffer_address: u64,
+}
+
+pub trait IMediaCodec {
+    // Decodes a single chunk of input stream data into raw video frames
+    fn decode_chunk(&mut self, input: &[u8]) -> Result<DecodedFrame, u32>;
+
+    // Queries the active capability token required for execution
+    fn required_capability(&self) -> CapabilityToken;
+}
+
+pub struct SovereignVideoPlayer {
+    // Media orchestrator matches decoder classes to the source format dynamically
+    pub active_codec: Box<dyn IMediaCodec>,
+}
+```
+
+---
+
 ## 5. LINUX KERNEL.ORG DEFEATING SPECIFICATION
 
 To systematically challenge and replace the traditional monolithic kernel architectures sourced from kernel.org (including mainline 6.24, LTS 6.18, 5.15, and legacy variants), SigmaOS operates on an Object-Oriented, microkernel-based, zero-trust runtime model.
