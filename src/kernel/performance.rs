@@ -118,6 +118,11 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn get_metrics(&self) -> ZeroCopyMetrics {
         self.metrics
     }
+
+    /// Get high-fidelity performance metrics for the queue
+    pub fn get_metrics(&self) -> ZeroCopyMetrics {
+        self.metrics
+    }
 }
 
 impl<T: Clone, const N: usize> Default for ZeroCopyQueue<T, N> {

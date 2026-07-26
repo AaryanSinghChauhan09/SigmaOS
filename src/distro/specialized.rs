@@ -732,51 +732,75 @@ mod tests {
     }
 
     #[test]
-    fn test_endeavour_welcome_engine() {
-        let mut welcome = EosWelcomeEngine::new();
-        assert!(welcome.first_boot);
-        assert_eq!(
-            welcome.update_mirrors().unwrap(),
-            "Sovereign package mirrors configured successfully"
-        );
-        assert!(welcome.mirrors_configured);
+    fn test_ubuntu_apt_and_ppas() {
+        let mut apt = UbuntuAptEngine::new();
+        assert!(apt.add_ppa("invalid_ppa").is_err());
+        assert!(apt.add_ppa("ppa:libreoffice/ppa").is_ok());
 
-        assert_eq!(
-            welcome.install_recommended_drivers().unwrap(),
-            "Modern Vulkan/GPU and HID drivers installed"
-        );
-        assert!(welcome.drivers_installed);
+        assert!(apt.apt_get_install("curl").is_err()); // cache not sync
+        apt.apt_get_update();
+        let res = apt.apt_get_install("curl").unwrap();
+        assert!(res.contains("curl"));
+        assert_eq!(apt.installed_packages.get("curl").unwrap(), "8.2.1");
     }
 
     #[test]
-    fn test_mirror_ranker() {
-        let ranker = MirrorRanker::new(500);
-        let mirrors = vec![
-            "mirror.us.sigmaos.org",
-            "mirror.in.sigmaos.org",
-            "mirror.de.sigmaos.org",
-        ];
-        let ranked = ranker.rank_mirrors(&mirrors);
-        assert_eq!(ranked.len(), 3);
-        assert_eq!(ranked[0].0, "mirror.us.sigmaos.org");
-        assert_eq!(ranked[0].1, 10);
+    fn test_ubuntu_server_netplan_provisioning() {
+        let mut netplan = NetplanConfigEngine::new();
+        let yaml_data = r#"
+            network:
+              version: 2
+              ethernets:
+                eth0:
+                  dhcp4: false
+                  addresses: [192.168.1.100/24]
+                  gateway4: 192.168.1.1
+        "#;
+        assert!(netplan.apply_netplan_yaml("eth0", yaml_data).is_ok());
+        let eth0 = netplan.configs.get("eth0").unwrap();
+        assert!(!eth0.dhcp4);
+        assert_eq!(eth0.static_ip.as_deref(), Some("192.168.1.100/24"));
+        assert_eq!(eth0.gateway.as_deref(), Some("192.168.1.1"));
     }
 
     #[test]
-    fn test_update_notifier_and_log_tool() {
-        let mut notifier = EosUpdateNotifier::new();
-        assert!(notifier.check_for_updates());
-        assert_eq!(notifier.pending_updates_count, 5);
+    fn test_lubuntu_lxqt_watcher() {
+        let mut monitor = LxqtResourceMonitor::new(512.0);
+        monitor.running_processes.push(LxqtProcess {
+            pid: 101,
+            name: "lxqt-panel".to_string(),
+            cpu_percent: 1.2,
+            memory_mb: 45.0,
+        });
+        monitor.running_processes.push(LxqtProcess {
+            pid: 102,
+            name: "firefox-leak".to_string(),
+            cpu_percent: 75.0,
+            memory_mb: 600.0,
+        });
 
-        let mut log_tool = DiagnosticLogTool::new();
-        log_tool.record_log_entry("Kernel", "Vulkan context bound successfully");
-        log_tool.record_log_entry(
-            "PackageManager",
-            "Transaction completed: installed sigma-vim",
-        );
+        let killed = monitor.check_and_prevent_oom();
+        assert_eq!(killed.len(), 1);
+        assert_eq!(killed[0], "firefox-leak");
+        assert_eq!(monitor.running_processes.len(), 1);
+        assert_eq!(monitor.running_processes[0].name, "lxqt-panel");
+    }
 
-        let report = log_tool.generate_troubleshooting_report();
-        assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
-        assert!(report.contains("[Kernel] Vulkan context bound successfully"));
+    #[test]
+    fn test_ubuntu_studio_low_latency_audio() {
+        let mut router = PipewireAudioRouter::new();
+        router.connect_ports("midi_keyboard", "jack_synth");
+        assert_eq!(router.active_routes.get("midi_keyboard").unwrap(), "jack_synth");
+        assert!(router.get_dispatch_latency_ms() < 1.0);
+    }
+
+    #[test]
+    fn test_ubuntu_core_snapd_sandbox() {
+        let mut snapd = SnapdEngine::new();
+        assert!(snapd.install_secure_snap("core22", 15, &[]).is_err());
+        assert!(snapd.install_secure_snap("core22", 15, &[1, 2, 3]).is_ok());
+        let snap = snapd.installed_snaps.get("core22").unwrap();
+        assert!(snap.read_only_loop_mounted);
+        assert!(snap.signature_verified);
     }
 }
