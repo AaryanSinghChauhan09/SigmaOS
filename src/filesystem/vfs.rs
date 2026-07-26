@@ -154,12 +154,6 @@ impl VirtualFilesystem {
             .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
-        // Optimize: early return for zero-sized buffer requests to achieve sub-nanosecond latency
-        // after verifying that the file descriptor is valid.
-        if buffer.is_empty() {
-            return Ok(0);
-        }
-
         let inode = self
             .inodes
             .get(&file_descriptor.inode_id)
@@ -171,7 +165,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
@@ -188,12 +182,6 @@ impl VirtualFilesystem {
             .file_descriptors
             .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
-
-        // Optimize: early return for zero-sized buffer requests to achieve sub-nanosecond latency
-        // after verifying that the file descriptor is valid.
-        if buffer.is_empty() {
-            return Ok(0);
-        }
 
         let inode = self
             .inodes

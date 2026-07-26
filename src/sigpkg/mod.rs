@@ -8,8 +8,10 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod rpm_compat;
 
-pub use recipe::PackageRecipe;
+pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;

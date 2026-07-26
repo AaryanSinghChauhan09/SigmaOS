@@ -9,7 +9,7 @@ pub mod mac;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -29,15 +29,7 @@ pub use password::{
 };
 pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use secrets::{Keyring, Secret, SecretType};
-pub use vault::{
-    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
-    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
-    VaultResult,
+pub use vulnerability::{
+    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
+    PenetrationAssistant,
 };
-pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
-};
-pub use vulnerability::{Vulnerability, VulnerabilityScanner};
