@@ -317,6 +317,19 @@ mod tests {
     }
 
     #[test]
+    fn test_dynamic_compression_and_loading() {
+        // Run-length encoded bytecode for: [0x01, 0x01, 0x01, 0x04, 0x04] -> (1 count of 0x01, 1 count of 0x01, 1 count of 0x01, 2 count of 0x04)
+        let compressed = [1, 0x01, 1, 0x01, 1, 0x01, 2, 0x04];
+        let manager = DeviceManager::new();
+        let interpreter_res = manager.load_compressed_udf_driver(&compressed);
+        assert!(interpreter_res.is_ok());
+        let interpreter = interpreter_res.unwrap();
+        assert_eq!(interpreter.bytecode.len, 5);
+        assert_eq!(interpreter.bytecode[0], 0x01);
+        assert_eq!(interpreter.bytecode[4], 0x04);
+    }
+
+    #[test]
     fn test_linux_compatibility_and_override() {
         let mut manager = DeviceManager::new();
 
@@ -623,6 +636,19 @@ impl DeviceManager {
             DeviceType::Character,
             capability,
         )
+    }
+
+    /// On-demand driver decompressor and loader (Phase 4 of the blueprint).
+    /// Dynamically inflates a compressed UDF driver configuration block, instantiating the bytecode runner.
+    pub fn load_compressed_udf_driver(
+        &self,
+        compressed_bytecode: &[u8],
+    ) -> Result<UdfInterpreter, DeviceError> {
+        let mut decompressed = [0u8; 128];
+        let bytes_written = decompress_rle(compressed_bytecode, &mut decompressed)?;
+
+        let interpreter = UdfInterpreter::new(&decompressed[..bytes_written]);
+        Ok(interpreter)
     }
 
     pub fn register_device(
@@ -1037,6 +1063,34 @@ impl UnifiedPeripheral for ModernDevice {
             Ok(())
         }
     }
+}
+
+/// Compact, zero-allocation decompression engine (Run-Length Decoding)
+/// Used for dynamically inflating compressed UDF bytecode driver configurations at runtime
+/// to keep the on-disk footprint extremely small, matching Phase 4 goals of the plan.
+pub fn decompress_rle(compressed: &[u8], decompressed: &mut [u8]) -> Result<usize, DeviceError> {
+    let mut read_idx = 0;
+    let mut write_idx = 0;
+
+    while read_idx < compressed.len() {
+        if read_idx + 1 >= compressed.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+        let count = compressed[read_idx] as usize;
+        let value = compressed[read_idx + 1];
+        read_idx += 2;
+
+        if write_idx + count > decompressed.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+
+        for _ in 0..count {
+            decompressed[write_idx] = value;
+            write_idx += 1;
+        }
+    }
+
+    Ok(write_idx)
 }
 
 /// User-Defined Function (UDF) Interpreter (Custom Bytecode Runner)
