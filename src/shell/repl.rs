@@ -27,6 +27,7 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
+    History,
     Echo {
         message: String,
     },
@@ -109,6 +110,7 @@ pub struct ShellRepl {
     aliases: std::collections::HashMap<String, String>,
     prompt: String,
     agent_engine: AgentAutomationEngine,
+    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
@@ -123,6 +125,7 @@ impl ShellRepl {
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -171,6 +174,7 @@ impl ShellRepl {
     }
 
     pub fn execute_line(&mut self, line: &str) {
+        self.command_history.push(line.to_string());
         if line.contains(';') {
             let subcommands: Vec<&str> = line.split(';').collect();
             for sub in subcommands {
@@ -223,6 +227,7 @@ impl ShellRepl {
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
+            "history" => ShellCommand::History,
             "pwd" => ShellCommand::Pwd,
             "whoami" => ShellCommand::WhoAmI,
             "echo" => {
@@ -382,8 +387,16 @@ impl ShellRepl {
                    unalias - Remove an alias\n\
                    run     - Execute an automated macro/script variable\n\
                    agent   - Interface for AI Agent Automation tasks (register, list, run)\n\
+                   history - Show command execution history\n\
                    exit    - Exit the shell"
                 .to_string()),
+            ShellCommand::History => {
+                let mut history_str = String::new();
+                for (idx, cmd) in self.command_history.iter().enumerate() {
+                    history_str.push_str(&format!("  {}  {}\n", idx + 1, cmd));
+                }
+                Ok(history_str)
+            }
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
                    2    systemd     Running\n\
@@ -609,6 +622,15 @@ mod tests {
         let repl = ShellRepl::new();
         let command = repl.parse_command("help");
         assert!(matches!(command, ShellCommand::Help));
+    }
+
+    #[test]
+    fn test_history_logging() {
+        let mut repl = ShellRepl::new();
+        repl.execute_line("echo 123");
+        let command = repl.parse_command("history");
+        let res = repl.execute_command(command).unwrap();
+        assert!(res.contains("echo 123"));
     }
 
     #[test]

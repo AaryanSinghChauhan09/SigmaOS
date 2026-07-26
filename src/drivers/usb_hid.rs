@@ -129,6 +129,14 @@ const HID_SCANCODE_TO_ASCII: [u8; 57] = [
     b'\\', 0, b';', b'\'', b'`', b',', b'.', b'/',
 ];
 
+/// HID USB Scancode to ASCII mapping (French AZERTY, first 58 scancodes)
+const HID_SCANCODE_TO_ASCII_AZERTY: [u8; 57] = [
+    0, 0, 0, 0, b'q', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b',', b'n',
+    b'o', b'p', b'a', b'r', b's', b't', b'u', b'v', b'z', b'x', b'y', b'w', b'&', b'e', b'"', b'\'',
+    b'(', b'-', b'e', b'_', b'c', b'a', b'\n', 0, b'\x08', b'\t', b' ', b')', b'=', b'^', b'$',
+    b'*', 0, b'm', b'u', b'~', b';', b':', b'!',
+];
+
 /// Standalone HID Keyboard implementing PeripheralDevice for PeripheralManager
 pub struct HidKeyboard {
     inner: UsbHidDriver,
@@ -143,13 +151,18 @@ impl HidKeyboard {
         }
     }
 
-    /// Converts a USB HID scancode to ASCII character
-    pub fn scancode_to_ascii(scancode: u8, shift: bool) -> Option<u8> {
+    /// Converts a USB HID scancode to ASCII character with layout-awareness
+    pub fn scancode_to_ascii_layout(scancode: u8, shift: bool, layout: &str) -> Option<u8> {
         let idx = scancode as usize;
-        if idx >= HID_SCANCODE_TO_ASCII.len() {
+        let map = if layout == "FR-AZERTY" {
+            &HID_SCANCODE_TO_ASCII_AZERTY
+        } else {
+            &HID_SCANCODE_TO_ASCII
+        };
+        if idx >= map.len() {
             return None;
         }
-        let ch = HID_SCANCODE_TO_ASCII[idx];
+        let ch = map[idx];
         if ch == 0 {
             return None;
         }
@@ -160,10 +173,20 @@ impl HidKeyboard {
         }
     }
 
+    /// Converts a USB HID scancode to ASCII character
+    pub fn scancode_to_ascii(scancode: u8, shift: bool) -> Option<u8> {
+        Self::scancode_to_ascii_layout(scancode, shift, "US-QWERTY")
+    }
+
     /// Decode a keyboard event to a printable ASCII char
-    pub fn decode_event(event: &HidKeyboardEvent) -> Option<char> {
+    pub fn decode_event_layout(event: &HidKeyboardEvent, layout: &str) -> Option<char> {
         let shift = (event.modifiers & 0x22) != 0;
-        Self::scancode_to_ascii(event.keycode, shift).map(|b| b as char)
+        Self::scancode_to_ascii_layout(event.keycode, shift, layout).map(|b| b as char)
+    }
+
+    /// Decode a keyboard event to a printable ASCII char (backward compatible associated function)
+    pub fn decode_event(event: &HidKeyboardEvent) -> Option<char> {
+        Self::decode_event_layout(event, "US-QWERTY")
     }
 }
 
@@ -191,7 +214,7 @@ impl PeripheralDevice for HidKeyboard {
         while count < buffer.len() {
             match self.inner.poll_event() {
                 Some(event) if event.pressed => {
-                    if let Some(decoded) = Self::decode_event(&event) {
+                    if let Some(decoded) = Self::decode_event_layout(&event, &self.inner.layout) {
                         buffer[count] = decoded as u8;
                         count += 1;
                     }
@@ -293,5 +316,20 @@ mod tests {
 
         hid.set_layout("FR-AZERTY");
         assert_eq!(hid.layout, "FR-AZERTY");
+    }
+
+    #[test]
+    fn test_azerty_scancode_translation() {
+        let mut keyboard = HidKeyboard::new(0x1234, 0x5678);
+        keyboard.inner.set_layout("FR-AZERTY");
+
+        // In FR-AZERTY, scancode 4 maps to 'q' (unlike 'a' in QWERTY)
+        let event = HidKeyboardEvent {
+            keycode: 4,
+            pressed: true,
+            modifiers: 0,
+        };
+        let decoded = HidKeyboard::decode_event_layout(&event, "FR-AZERTY").unwrap();
+        assert_eq!(decoded, 'q');
     }
 }

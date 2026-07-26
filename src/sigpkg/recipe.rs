@@ -28,13 +28,57 @@ pub enum RecipeError {
     InvalidHash,
     NoBuildCommands,
     InvalidRecipe,
+    NotFound,
+    InvalidSyntax,
+    SerializationError,
 }
 
-pub struct RecipeManager;
+pub struct RecipeManager {
+    pub recipes: HashMap<String, PackageRecipe>,
+}
 
 impl RecipeManager {
     pub fn new() -> Self {
-        Self
+        let mut manager = Self {
+            recipes: HashMap::new(),
+        };
+        // Add distro-inspired standard package recipes
+        let neofetch = PackageRecipe::new("neofetch".to_string(), Version::new(7, 1, 0))
+            .with_description("A fast, highly customizable system info script".to_string())
+            .with_build_system(BuildSystem::Make)
+            .with_source("https://github.com/dylanaraps/neofetch".to_string(), "hash_neofetch".to_string())
+            .with_build_command("make build".to_string());
+        let curl = PackageRecipe::new("curl".to_string(), Version::new(8, 7, 1))
+            .with_description("Command line tool for transferring data with URLs".to_string())
+            .with_build_system(BuildSystem::CMake)
+            .with_source("https://curl.se/download/curl-8.7.1.tar.gz".to_string(), "hash_curl".to_string())
+            .with_build_command("cmake .".to_string());
+        let ripgrep = PackageRecipe::new("ripgrep".to_string(), Version::new(14, 1, 0))
+            .with_description("ripgrep recursively searches directories for a regex pattern".to_string())
+            .with_build_system(BuildSystem::Cargo)
+            .with_source("https://github.com/BurntSushi/ripgrep".to_string(), "hash_ripgrep".to_string())
+            .with_build_command("cargo build --release".to_string());
+
+        let _ = manager.add_recipe(neofetch);
+        let _ = manager.add_recipe(curl);
+        let _ = manager.add_recipe(ripgrep);
+        manager
+    }
+
+    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
+        recipe.validate()?;
+        self.recipes.insert(recipe.name.clone(), recipe);
+        Ok(())
+    }
+
+    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
+        self.recipes.values().collect()
+    }
+}
+
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -58,24 +102,23 @@ pub struct PackageRecipe {
 }
 
 impl PackageRecipe {
-    pub fn new(
-        name: &'static str,
-        major: u32,
-        minor: u32,
-        patch: u32,
-        url: &'static str,
-        dependencies: &'static [&'static str],
-    ) -> Self {
+    pub fn new(name: String, version: Version) -> Self {
         PackageRecipe {
             name,
-            version: Version {
-                major,
-                minor,
-                patch,
-            },
-            source_url: url,
-            checksum: [0; 32], // Stub checksum
-            dependencies,
+            version,
+            description: String::new(),
+            build_system: BuildSystem::Cargo,
+            dependencies: Vec::new(),
+            source_url: String::new(),
+            hash: String::new(),
+            build_commands: Vec::new(),
+            install_commands: Vec::new(),
+            environment: HashMap::new(),
+            pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "MIT".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -163,36 +206,8 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
+            BuildSystem::Custom => "custom_build_command".to_string(),
         }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    CMake,
-    Make,
-    Custom,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    NotFound,
-    InvalidSyntax,
-    SerializationError,
-}
-
-pub struct RecipeManager;
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -241,7 +256,8 @@ mod tests {
             .with_build_command("cargo build".to_string());
 
         assert!(manager.add_recipe(recipe).is_ok());
-        assert_eq!(manager.list_recipes().len(), 1);
+        // Includes 3 default distro-inspired recipes plus our test recipe
+        assert_eq!(manager.list_recipes().len(), 4);
     }
 
     #[test]
