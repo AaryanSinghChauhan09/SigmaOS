@@ -1,5 +1,8 @@
-pub mod task;
 pub mod scheduler;
+pub mod task;
 
-pub use task::{Task, Cred, ProcessState, SchedPolicy, PID_MAX_LIMIT, INIT_PID};
-pub use scheduler::{Scheduler, RunQueue, SchedClass, StopSchedClass, DeadlineSchedClass, RealtimeSchedClass, FairSchedClass, IdleSchedClass};
+pub use scheduler::{
+    DeadlineSchedClass, FairSchedClass, IdleSchedClass, RealtimeSchedClass, RunQueue, SchedClass,
+    Scheduler, StopSchedClass,
+};
+pub use task::{Cred, ProcessState, SchedPolicy, Task, INIT_PID, PID_MAX_LIMIT};

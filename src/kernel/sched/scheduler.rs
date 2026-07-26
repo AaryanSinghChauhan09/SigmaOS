@@ -88,13 +88,28 @@ impl SchedClass for StopSchedClass {
         rq.stop_rq.nr_running -= 1;
         Ok(())
     }
-    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool { true }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> { None }
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
+        true
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        None
+    }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
-    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn task_fork(&self, _rq: &mut RunQueue, _child: &mut Task, _parent: &Task) -> Result<(), FsError> { Ok(()) }
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn task_fork(
+        &self,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
+    ) -> Result<(), FsError> {
+        Ok(())
+    }
     fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
@@ -114,54 +129,124 @@ impl SchedClass for FairSchedClass {
         self.dequeue_task(rq, task)?;
         self.enqueue_task(rq, task)
     }
-    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool { false }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> { None }
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
+        false
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        None
+    }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
-    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn task_fork(&self, _rq: &mut RunQueue, _child: &mut Task, _parent: &Task) -> Result<(), FsError> { Ok(()) }
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn task_fork(
+        &self,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
+    ) -> Result<(), FsError> {
+        Ok(())
+    }
     fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 impl SchedClass for DeadlineSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool { false }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> { None }
+    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
+        false
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        None
+    }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
-    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn task_fork(&self, _rq: &mut RunQueue, _child: &mut Task, _parent: &Task) -> Result<(), FsError> { Ok(()) }
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn task_fork(
+        &self,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
+    ) -> Result<(), FsError> {
+        Ok(())
+    }
     fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 impl SchedClass for RealtimeSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool { false }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> { None }
+    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
+        false
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        None
+    }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
-    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn task_fork(&self, _rq: &mut RunQueue, _child: &mut Task, _parent: &Task) -> Result<(), FsError> { Ok(()) }
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn task_fork(
+        &self,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
+    ) -> Result<(), FsError> {
+        Ok(())
+    }
     fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 impl SchedClass for IdleSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool { false }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> { None }
+    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
+        false
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        None
+    }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
-    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> { Ok(()) }
-    fn task_fork(&self, _rq: &mut RunQueue, _child: &mut Task, _parent: &Task) -> Result<(), FsError> { Ok(()) }
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn task_fork(
+        &self,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
+    ) -> Result<(), FsError> {
+        Ok(())
+    }
     fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
@@ -175,31 +260,36 @@ pub struct Scheduler {
 impl Scheduler {
     pub fn new(num_cpus: u32) -> Self {
         Scheduler {
-            runqueues: (0..num_cpus).map(|i| RunQueue {
-                cfs_rq: CfsRunQueue {
-                    vruntime: 0,
-                    min_vruntime: 0,
-                    nr_running: 0,
-                    rb_leftmost: None,
-                    deadlines: Vec::new(),
-                },
-                rt_rq: RtRunQueue {
-                    active: [Vec::new(); 140],
-                    highest_prio: 140,
-                    nr_running: 0,
-                },
-                dl_rq: DeadlineRunQueue {
-                    earliest_deadline: u64::MAX,
-                    nr_running: 0,
-                    deadlines: Vec::new(),
-                },
-                stop_rq: StopRunQueue { pending: false, nr_running: 0 },
-                idle_rq: IdleRunQueue { nr_running: 0 },
-                nr_running: AtomicU32::new(0),
-                cpu_id: i,
-                load: 0,
-                avg_load: 0,
-            }).collect(),
+            runqueues: (0..num_cpus)
+                .map(|i| RunQueue {
+                    cfs_rq: CfsRunQueue {
+                        vruntime: 0,
+                        min_vruntime: 0,
+                        nr_running: 0,
+                        rb_leftmost: None,
+                        deadlines: Vec::new(),
+                    },
+                    rt_rq: RtRunQueue {
+                        active: [Vec::new(); 140],
+                        highest_prio: 140,
+                        nr_running: 0,
+                    },
+                    dl_rq: DeadlineRunQueue {
+                        earliest_deadline: u64::MAX,
+                        nr_running: 0,
+                        deadlines: Vec::new(),
+                    },
+                    stop_rq: StopRunQueue {
+                        pending: false,
+                        nr_running: 0,
+                    },
+                    idle_rq: IdleRunQueue { nr_running: 0 },
+                    nr_running: AtomicU32::new(0),
+                    cpu_id: i,
+                    load: 0,
+                    avg_load: 0,
+                })
+                .collect(),
             current: vec![0; num_cpus as usize],
             sched_class: Vec::new(),
         }

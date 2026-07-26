@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Lightweight Init System for SigmaOS
 /// Implements init system using OOP principles with traits and structs
 /// No dependency on external init frameworks
 /// Based on Roadmap Item 5: Lightweight init system
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Service ID
 pub type ServiceID = usize;
@@ -146,15 +145,15 @@ impl SimpleService {
 
     pub fn get_state(&self) -> ServiceState {
         {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ServiceState::Starting,
-            2 => ServiceState::Running,
-            3 => ServiceState::Stopping,
-            4 => ServiceState::Failed,
-            _ => ServiceState::Stopped,
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => ServiceState::Starting,
+                2 => ServiceState::Running,
+                3 => ServiceState::Stopping,
+                4 => ServiceState::Failed,
+                _ => ServiceState::Stopped,
+            }
         }
-    }
     }
 
     pub fn set_state(&self, state: ServiceState) {
@@ -496,7 +495,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

@@ -41,8 +41,12 @@ pub trait PageTableEntry {
     fn set_writable(&mut self, writable: bool);
     fn set_user_accessible(&mut self, user: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
-    fn get_page_size(&self) -> usize { 0 }
-    fn set_page_size(&mut self, size: usize) { let _ = size; }
+    fn get_page_size(&self) -> usize {
+        0
+    }
+    fn set_page_size(&mut self, size: usize) {
+        let _ = size;
+    }
 }
 
 #[repr(C)]

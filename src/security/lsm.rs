@@ -4,7 +4,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use crate::kernel::vfs::inode::{Inode, InodeAttr, FsError};
+use crate::kernel::vfs::inode::{FsError, Inode, InodeAttr};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityError {
@@ -123,19 +123,38 @@ pub trait MacPolicy: Send + Sync {
     fn cmp(&self, label1: &Label, label2: &Label) -> bool;
     fn validate_transition(&self, subject: &Label, object: &Label) -> bool;
     fn inode_permission(&self, inode: &Inode, request: u32) -> Result<(), SecurityError>;
-    fn task_create(&self, parent: &SecurityTask, child: &mut SecurityTask) -> Result<(), SecurityError>;
+    fn task_create(
+        &self,
+        parent: &SecurityTask,
+        child: &mut SecurityTask,
+    ) -> Result<(), SecurityError>;
     fn socket_create(&self, family: u32, type_: u32, protocol: u32) -> Result<(), SecurityError>;
     fn socket_bind(&self, sock: usize, addr: &[u8]) -> Result<(), SecurityError>;
     fn socket_connect(&self, sock: usize, addr: &[u8]) -> Result<(), SecurityError>;
     fn syscall_check(&self, syscall: u32) -> Result<(), SecurityError>;
-    fn ptrace_access_check(&self, tracer: &SecurityTask, tracee: &SecurityTask) -> Result<(), SecurityError>;
+    fn ptrace_access_check(
+        &self,
+        tracer: &SecurityTask,
+        tracee: &SecurityTask,
+    ) -> Result<(), SecurityError>;
     fn ptrace_traceme(&self, tracer: &SecurityTask) -> Result<(), SecurityError>;
     fn file_open(&self, inode: &Inode, flags: u32) -> Result<(), SecurityError>;
     fn file_exec(&self, inode: &Inode) -> Result<(), SecurityError>;
     fn inode_create(&self, dir: &Inode, name: &str, mode: u32) -> Result<(), SecurityError>;
-    fn inode_link(&self, old_inode: &Inode, new_dir: &Inode, new_name: &str) -> Result<(), SecurityError>;
+    fn inode_link(
+        &self,
+        old_inode: &Inode,
+        new_dir: &Inode,
+        new_name: &str,
+    ) -> Result<(), SecurityError>;
     fn inode_unlink(&self, dir: &Inode, name: &str) -> Result<(), SecurityError>;
-    fn inode_rename(&self, old_dir: &Inode, old_name: &str, new_dir: &Inode, new_name: &str) -> Result<(), SecurityError>;
+    fn inode_rename(
+        &self,
+        old_dir: &Inode,
+        old_name: &str,
+        new_dir: &Inode,
+        new_name: &str,
+    ) -> Result<(), SecurityError>;
 }
 
 pub struct AvcEntry {
@@ -151,12 +170,15 @@ pub struct AvcCache {
 
 impl AvcCache {
     pub fn new() -> Self {
-        AvcCache { entries: Vec::new() }
+        AvcCache {
+            entries: Vec::new(),
+        }
     }
 
     pub fn lookup(&self, subject: u64, object: u64, permission: u32) -> Option<bool> {
         for entry in &self.entries {
-            if entry.subject == subject && entry.object == object && entry.permission == permission {
+            if entry.subject == subject && entry.object == object && entry.permission == permission
+            {
                 return Some(entry.allowed);
             }
         }
@@ -164,7 +186,12 @@ impl AvcCache {
     }
 
     pub fn add(&mut self, subject: u64, object: u64, permission: u32, allowed: bool) {
-        self.entries.push(AvcEntry { subject, object, permission, allowed });
+        self.entries.push(AvcEntry {
+            subject,
+            object,
+            permission,
+            allowed,
+        });
     }
 
     pub fn flush(&mut self) {
@@ -187,7 +214,9 @@ pub struct AuditLog {
 
 impl AuditLog {
     pub fn new() -> Self {
-        AuditLog { entries: Vec::new() }
+        AuditLog {
+            entries: Vec::new(),
+        }
     }
 
     pub fn log(&mut self, subject: u64, object: u64, operation: &str, result: bool, info: &str) {
@@ -203,15 +232,36 @@ impl AuditLog {
 }
 
 pub trait LsmHook: Send + Sync {
-    fn security_inode_create(&self, dir: &Inode, name: &str, mode: u32) -> Result<(), SecurityError>;
-    fn security_inode_link(&self, old_inode: &Inode, new_dir: &Inode, new_name: &str) -> Result<(), SecurityError>;
+    fn security_inode_create(
+        &self,
+        dir: &Inode,
+        name: &str,
+        mode: u32,
+    ) -> Result<(), SecurityError>;
+    fn security_inode_link(
+        &self,
+        old_inode: &Inode,
+        new_dir: &Inode,
+        new_name: &str,
+    ) -> Result<(), SecurityError>;
     fn security_inode_unlink(&self, dir: &Inode, name: &str) -> Result<(), SecurityError>;
-    fn security_inode_rename(&self, old_dir: &Inode, old_name: &str, new_dir: &Inode, new_name: &str) -> Result<(), SecurityError>;
+    fn security_inode_rename(
+        &self,
+        old_dir: &Inode,
+        old_name: &str,
+        new_dir: &Inode,
+        new_name: &str,
+    ) -> Result<(), SecurityError>;
     fn security_inode_setattr(&self, inode: &Inode, attr: &InodeAttr) -> Result<(), SecurityError>;
     fn security_inode_getattr(&self, inode: &Inode) -> Result<(), SecurityError>;
     fn security_file_open(&self, inode: &Inode, flags: u32) -> Result<(), SecurityError>;
     fn security_file_permission(&self, inode: &Inode, mask: u32) -> Result<(), SecurityError>;
-    fn security_socket_create(&self, family: u32, type_: u32, protocol: u32) -> Result<(), SecurityError>;
+    fn security_socket_create(
+        &self,
+        family: u32,
+        type_: u32,
+        protocol: u32,
+    ) -> Result<(), SecurityError>;
     fn security_socket_bind(&self, sock: usize, addr: &[u8]) -> Result<(), SecurityError>;
     fn security_socket_connect(&self, sock: usize, addr: &[u8]) -> Result<(), SecurityError>;
     fn security_socket_listen(&self, sock: usize, backlog: u32) -> Result<(), SecurityError>;
@@ -222,6 +272,12 @@ pub trait LsmHook: Send + Sync {
     fn security_ptrace_traceme(&self, tracer: u64) -> Result<(), SecurityError>;
     fn security_capable(&self, cred: u64, cap: u64) -> Result<(), SecurityError>;
     fn security_bprm_set_uid(&self, bprm: usize) -> Result<(), SecurityError>;
-    fn security_inode_mknod(&self, dir: &Inode, name: &str, mode: u32) -> Result<(), SecurityError>;
-    fn security_inode_symlink(&self, dir: &Inode, name: &str, target: &str) -> Result<(), SecurityError>;
+    fn security_inode_mknod(&self, dir: &Inode, name: &str, mode: u32)
+        -> Result<(), SecurityError>;
+    fn security_inode_symlink(
+        &self,
+        dir: &Inode,
+        name: &str,
+        target: &str,
+    ) -> Result<(), SecurityError>;
 }
