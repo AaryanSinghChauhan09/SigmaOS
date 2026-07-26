@@ -1,23 +1,9 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
-pub mod historic_linux;
 pub mod standards;
-pub mod proxy;
-pub mod oldlinux;
-
-pub use oldlinux::{
-    OldLinuxRelease, OldLinuxCompatManager,
-};
-
-pub use proxy::{
-    KernelPersonality, KernelProxy, SyscallLedgerEntry, LedgerManager, LegacyDriver,
-    StorageProxy, NetworkProxy, GraphicsProxy, DriverProxy, FirmwareInterface,
-    BIOSProxy, UEFIProxy, CorebootProxy, FirmwareProxy, CompilerBackend, LegacyCProxy,
-    LegacyCppProxy, LegacyAsmProxy, BuildProxy, SecurityModel, DACProxy, SELinuxProxy,
-    ZeroTrustProxy, SecurityProxy, ObsoleteDevice, FloppyProxy, TapeProxy, CRTProxy,
-    DotMatrixProxy, PeripheralProxy,
-};
+pub mod legacy_adapters;
+pub mod constellation_mesh;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -34,4 +20,19 @@ pub use scosmos::{
 };
 pub use standards::{
     FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
+pub use legacy_adapters::{
+    LegacyKernelAdapter, LegacyDriverAdapter, LegacyPackageAdapter, LegacyFSAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use constellation_mesh::{
+    KernelConstellationGrid, ConstellationNode, SyscallAlmanacHub, FileAlmanacHub, NetworkAlmanacHub,
+    ProcessAlmanacHub, DriverArchiveGridV2, StorageArchiveGridV2, NetworkArchiveGridV2,
+    GraphicsArchiveGridV2, FirmwareGatewayMesh, BIOSGatewayMesh, UEFIGatewayMesh,
+    CorebootGatewayMesh, BuildCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyAsmCodexGrid,
+    SecurityConstellation, DACConstellation, SELinuxConstellation, ZeroTrustConstellation,
+    PeripheralArchiveMesh, FloppyMesh, TapeMesh, CRTMesh, DotMatrixMesh,
 };

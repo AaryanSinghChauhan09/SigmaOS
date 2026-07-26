@@ -9,11 +9,7 @@ pub mod mac;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
-pub mod scanner;
-pub mod secrets;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod vulnerability;
+pub mod qubes_isolation;
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -37,21 +33,4 @@ pub use password::{
 };
 pub use pki::{Certificate, PKIError, PKIManager, SimplePKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use secrets::{SecretManager, SecretStorage, SecretType};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType as SelinuxObjectType,
-    SecurityContext as SelinuxSecurityContext, SecurityLabel as SelinuxSecurityLabel,
-    SecurityPolicy as SelinuxSecurityPolicy, SecurityRule as SelinuxSecurityRule,
-    SelinuxPermission,
-};
-pub use vault::{
-    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
-    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
-    VaultResult,
-};
-pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
-};
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
