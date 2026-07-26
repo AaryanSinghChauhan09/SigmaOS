@@ -283,6 +283,37 @@ To fully eclipse Qubes OS and establish absolute, peerless compartment-based sec
 
 ---
 
+## 11. Deepin Linux Inspired Desktop & System Utilities
+
+To establish peerless visual elegance, intuitive control interfaces, and unmatched usability, SigmaOS absorbs the best-in-class utility designs from Deepin Linux and the Deepin Desktop Environment (DDE) directly into its system layer:
+
+### 1. GPU-Accelerated Process Visualizer (SigmaMonitor++)
+* **Deepin Inspiration:** Deepin System Monitor.
+* **SigmaOS Sovereign Solution:** A GPU-accelerated system monitor rendering high-fidelity performance metrics in real-time. It maps multi-core scheduling queues, NUMA memory node usage, lock-free queue latency, and SIMD thermal/leak gradients onto interactive, beautifully styled 3D visualizations, bypassing procedural command-line interfaces.
+* **OOP Mapping:** Managed by the `SigmaMonitor` and `ZeroCopyMetrics` subsystems.
+
+### 2. Live Theme & Control Center (ZenithCustomize)
+* **Deepin Inspiration:** Deepin Control Center / Personalization.
+* **SigmaOS Sovereign Solution:** A centralized, holographic configuration panel that lets users hot-swap window managers, visual themes, typography fonts, layout styles, and animations dynamically. All custom transitions are hardware-accelerated and computed via the `ZenithCompositor` loops with zero display lag.
+* **OOP Mapping:** Encapsulated in the `ThemingConfig` and `SovereignThemeEngine` classes.
+
+### 3. Cryptographic Disk Cloner & Snapshot Manager (SigmaClone)
+* **Deepin Inspiration:** Deepin Clone.
+* **SigmaOS Sovereign Solution:** A bare-metal, high-performance partition backup and disk cloner. It utilizes cryptographic Merkle Tree filesystem hashing to execute live, zero-downtime hot-cloning of active volume states, creating safe rollbacks and secure recovery images.
+* **OOP Mapping:** Implemented under `VolumeManager` and `SnapshotManager` components.
+
+### 4. Interactive Screen Recorder & Canvas Overlay (SigmaCapture)
+* **Deepin Inspiration:** Deepin Screen Recorder.
+* **SigmaOS Sovereign Solution:** An OS-level, non-allocating video recording engine that records window outputs directly from the compositor's framebuffers with sub-microsecond latency. Features a built-in sketching overlay, audio capturing, and direct RAW-to-MP4 hardware transcoding.
+* **OOP Mapping:** Integrated inside `ScreenRecorder` and the `VSCodeShard` workspace.
+
+### 5. Sandboxed App & Tool Repository (SigmaStore)
+* **Deepin Inspiration:** Deepin Store.
+* **SigmaOS Sovereign Solution:** A visually stunning application explorer that integrates with `sigpkg`. Users browse, review, and install universal software container recipes. Installed applications are automatically gated by the `Privacy-First Sandbox` with one-click permission controls.
+* **OOP Mapping:** Provided via the `UniversalPackage` traits and `UserDefinedPackageHook` structures.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
