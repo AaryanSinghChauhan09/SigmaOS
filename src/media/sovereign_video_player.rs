@@ -33,11 +33,51 @@ pub struct CapabilityToken {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum H264Profile {
+    Baseline,
+    Main,
+    High,
+    High10,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum H265Profile {
+    Main,
+    Main10,
+    MainStillPicture,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VP9Profile {
+    Profile0, // 8-bit 4:2:0
+    Profile1, // 8-bit 4:2:2 / 4:4:4
+    Profile2, // 10/12-bit 4:2:0
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AV1Profile {
+    Main,
+    High,
+    Professional,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WMVVersion {
+    V7,
+    V8,
+    V9,
+    VC1,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VideoCodec {
-    H264,
-    H265,
-    VP9,
-    AV1,
+    H264 { profile: H264Profile },
+    H265 { profile: H265Profile },
+    VP8,
+    VP9 { profile: VP9Profile },
+    AV1 { profile: AV1Profile },
+    WMV { version: WMVVersion },
+    FLV { sorenson_h263: bool },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,13 +86,18 @@ pub enum AudioCodec {
     FLAC,
     Opus,
     MP3,
+    WMA,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerFormat {
     MKV,
     MP4,
+    MOV,
     AVI,
+    WebM,
+    WMV,
+    FLV,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -104,10 +149,10 @@ pub struct SovereignVideoPlayer {
 impl SovereignVideoPlayer {
     pub fn new(codec: CodecType) -> Self {
         let mapped_codec = match codec {
-            CodecType::H264 => VideoCodec::H264,
-            CodecType::H265 => VideoCodec::H265,
-            CodecType::VP9 => VideoCodec::VP9,
-            CodecType::AV1 => VideoCodec::AV1,
+            CodecType::H264 => VideoCodec::H264 { profile: H264Profile::Main },
+            CodecType::H265 => VideoCodec::H265 { profile: H265Profile::Main },
+            CodecType::VP9 => VideoCodec::VP9 { profile: VP9Profile::Profile0 },
+            CodecType::AV1 => VideoCodec::AV1 { profile: AV1Profile::Main },
         };
 
         Self {
@@ -127,6 +172,23 @@ impl SovereignVideoPlayer {
             state: PlayerState::Stopped,
             volume: 80,
             is_gpu_accelerated: true,
+        }
+    }
+
+    /// Verifies if the loaded VideoCodec matches standard ContainerFormat constraints
+    pub fn verify_format_compatibility(&self) -> bool {
+        match (self.video_codec, self.container_format) {
+            (Some(VideoCodec::VP8), Some(ContainerFormat::WebM)) => true,
+            (Some(VideoCodec::VP9 { .. }), Some(ContainerFormat::WebM)) => true,
+            (Some(VideoCodec::AV1 { .. }), Some(ContainerFormat::WebM)) => true,
+            (Some(VideoCodec::WMV { .. }), Some(ContainerFormat::WMV)) => true,
+            (Some(VideoCodec::FLV { .. }), Some(ContainerFormat::FLV)) => true,
+            (Some(VideoCodec::H264 { .. }), Some(ContainerFormat::MP4)) => true,
+            (Some(VideoCodec::H264 { .. }), Some(ContainerFormat::MOV)) => true,
+            (Some(VideoCodec::H265 { .. }), Some(ContainerFormat::MKV)) => true,
+            (Some(VideoCodec::H264 { .. }), Some(ContainerFormat::MKV)) => true,
+            (_, Some(ContainerFormat::MKV)) => true, // MKV supports all codecs
+            _ => false,
         }
     }
 
@@ -335,6 +397,22 @@ impl NtpClient {
 mod tests {
     use super::*;
     use alloc::string::ToString;
+
+    #[test]
+    fn test_video_format_systems() {
+        let mut player = SovereignVideoPlayer::new(CodecType::H264);
+        assert_eq!(player.video_codec, Some(VideoCodec::H264 { profile: H264Profile::Main }));
+        assert_eq!(player.container_format, Some(ContainerFormat::MKV));
+        assert!(player.verify_format_compatibility());
+
+        // Incompatible WebM with H264
+        player.container_format = Some(ContainerFormat::WebM);
+        assert!(!player.verify_format_compatibility());
+
+        // Compatible WebM with AV1
+        player.video_codec = Some(VideoCodec::AV1 { profile: AV1Profile::Main });
+        assert!(player.verify_format_compatibility());
+    }
 
     #[test]
     fn test_vlc_video_player() {
