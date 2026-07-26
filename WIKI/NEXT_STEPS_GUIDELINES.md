@@ -473,6 +473,37 @@ To render Fedora OS entirely obsolete, SigmaOS integrates Fedora’s cutting-edg
 
 ---
 
+## 17. High-Definition Dynamic Personalization & Customization Engine
+
+To provide users and developers with unparalleled power over the graphical look-and-feel, behavior, and responsiveness of their environment, SigmaOS integrates a comprehensive Dynamic Personalization and Customization stack:
+
+### 1. Hardware-Accelerated CSS & Blur Injector (ZenithStyles)
+* **Deepin / macOS Inspiration:** Acrylic panels, variable backdrop blur, and custom CSS injectors.
+* **SigmaOS Sovereign Solution:** A styling compilation engine that parses user-defined CSS stylesheets on-the-fly and translates them into GPU instructions. It supports real-time backdrop blur, holographic reflection, adjustable rounded corners, transparency coefficients, and custom variable color-blind compensation matrices directly inside the compositor loop.
+* **OOP Mapping:** Governed by `ThemingConfig`, `Theme`, and `SovereignThemeEngine` subsystems.
+
+### 2. User-Defined Hotkey & Layout Adapters (SigmaShortcuts)
+* **Linux Window Managers Inspiration:** i3wm, Sway, and macOS keyboard schemes.
+* **SigmaOS Sovereign Solution:** A customizable layout and hotkey mapping coordinator. Users define layout algorithms (floating, cascaded, master-stack tiling, binary-partition tiling) and shortcut bindings (Vim-style navigation, Emacs shortcuts, standard macOS/Windows desktop layouts) dynamically using safe YAML declarations loaded at runtime.
+* **OOP Mapping:** Managed by the `UserProfile` configuration and window compositor listeners.
+
+### 3. Spring Physics & Elastic Animation Engine (SigmaAnimation)
+* **iOS / iPadOS Inspiration:** Non-linear spring curves and responsive gesture animations.
+* **SigmaOS Sovereign Solution:** An animation interpreter supporting user-defined custom easing functions, elastic overshoot, spring damping ratios, and duration constraints. Custom curves are evaluated as branchless mathematical equations inside the compositor, maintaining fluid 120Hz/140Hz refreshes under heavy system loads.
+* **OOP Mapping:** Controlled by the `AnimationConfig` and `EasingFunction` states in the `ZenithCompositor`.
+
+### 4. Holographic Overlay & Dynamic Widget Engine (ZenithOverlays)
+* **Android / Windows Widgets Inspiration:** Desktop widgets and productivity overlays.
+* **SigmaOS Sovereign Solution:** A dynamic desktop widget framework allowing creators to build lightweight HTML/JS or native WASM-driven widgets (system vitals, performance trackers, calendars, local LLM prompts, habit dashboards) that anchor to absolute canvas coordinates or snap to grid layouts. Widgets run inside restricted memory sandboxes.
+* **OOP Mapping:** Managed by the `VSCodeShard` canvas overlays.
+
+### 5. P2P Personalized Theme Registry (SigmaPersonalizeHub)
+* **GitHub / Pling Inspiration:** Global theme sharing marketplaces.
+* **SigmaOS Sovereign Solution:** A decentralized sharing hub integrated with `sigpkg`. Creators can securely pack, cryptographically sign, and distribute personalization bundles (themes, icon sets, animation presets, custom cursors) over peer-to-peer trust networks, enabling automated cryptographic validation before applying files.
+* **OOP Mapping:** Interfaced through `sigpkg/transaction.rs` and the `RollingTransactionManager`.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
