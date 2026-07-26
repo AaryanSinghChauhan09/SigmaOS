@@ -183,29 +183,17 @@ impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID {
         self.id
     }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+    fn name(&self) -> &str {
+        &self.name
     }
     fn state(&self) -> AgentState {
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => AgentState::Active,
-                2 => AgentState::Busy,
-                3 => AgentState::Error,
-                4 => AgentState::Learning,
-                _ => AgentState::Idle,
-            }
-        }
+        self.state
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state
-            .store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state = AgentState::Busy;
         let mut result = Vec::new();
-        let name = self.name();
-        for &byte in name {
+        for &byte in self.name.as_bytes() {
             result.push(byte);
         }
         result.push(b':');
@@ -213,8 +201,7 @@ impl AIAgent for SimpleAIAgent {
         for &byte in task {
             result.push(byte);
         }
-        self.state
-            .store(AgentState::Idle as usize, Ordering::SeqCst);
+        self.state = AgentState::Idle;
         Ok(result)
     }
 }
@@ -464,18 +451,7 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
+
 
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
