@@ -52,9 +52,9 @@ pub use screenshot::{
     ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
 pub use sigma_office::{
-    CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
-    ShapeType, SigmaDocument, SigmaOffice, SlideElementType, SpreadsheetProcessor, TextProcessor,
-    TypographyRenderer,
+    CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode,
+    DocumentType, PresentationProcessor, ShapeType, SigmaDocument, SigmaOffice, SlideElementType,
+    SpreadsheetProcessor, TextProcessor, TypographyRenderer,
 };
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,

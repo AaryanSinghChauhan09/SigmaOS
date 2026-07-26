@@ -4,6 +4,7 @@
 pub mod arch_compat;
 pub mod recipe;
 pub mod resolver;
+pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
@@ -11,6 +12,7 @@ pub mod verifier;
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
