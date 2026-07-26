@@ -131,3 +131,70 @@ mod tests {
         assert_eq!(optimizer.active_extension(), CpuInstructionExtension::Neon);
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum MicroarchitectureLevel {
+    X86_64_v1, // Baseline x86-64
+    X86_64_v2, // SSE4.2, Popcnt, SSSE3
+    X86_64_v3, // AVX, AVX2, FMA3, BMI1, BMI2
+    X86_64_v4, // AVX-512 feature levels
+}
+
+pub struct CpuMicroarchitectureSelector {
+    level: MicroarchitectureLevel,
+}
+
+impl CpuMicroarchitectureSelector {
+    pub fn new() -> Self {
+        Self {
+            level: Self::detect_microarchitecture(),
+        }
+    }
+
+    pub fn detect_microarchitecture() -> MicroarchitectureLevel {
+        // CPUID detection simulation
+        MicroarchitectureLevel::X86_64_v3
+    }
+
+    pub fn active_level(&self) -> MicroarchitectureLevel {
+        self.level
+    }
+
+    pub fn select_vector_loop<F1, F2>(&self, v3_v4_loop: F1, fallback_loop: F2)
+    where
+        F1: FnOnce(),
+        F2: FnOnce(),
+    {
+        if self.level >= MicroarchitectureLevel::X86_64_v3 {
+            v3_v4_loop();
+        } else {
+            fallback_loop();
+        }
+    }
+}
+
+#[cfg(test)]
+mod microarchitecture_tests {
+    use super::*;
+
+    #[test]
+    fn test_microarchitecture_detection() {
+        let selector = CpuMicroarchitectureSelector::new();
+        assert_eq!(selector.active_level(), MicroarchitectureLevel::X86_64_v3);
+    }
+
+    #[test]
+    fn test_vector_loop_selection() {
+        let selector = CpuMicroarchitectureSelector::new();
+        let mut executed_optimized = false;
+        let mut executed_fallback = false;
+
+        selector.select_vector_loop(
+            || executed_optimized = true,
+            || executed_fallback = true,
+        );
+
+        assert!(executed_optimized);
+        assert!(!executed_fallback);
+    }
+}

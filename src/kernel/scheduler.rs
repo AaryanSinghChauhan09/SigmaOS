@@ -215,3 +215,96 @@ mod tests {
         assert!(p_inter.virtual_deadline < p_cpu.virtual_deadline);
     }
 }
+
+pub struct CachyBoreScheduler {
+    processes: Vec<Process>,
+    current_time: u64,
+}
+
+impl CachyBoreScheduler {
+    pub fn new() -> Self {
+        Self {
+            processes: Vec::new(),
+            current_time: 0,
+        }
+    }
+
+    pub fn add_process(&mut self, process: Process) {
+        self.processes.push(process);
+    }
+
+    /// Evaluates burstiness and returns dynamically wider timeslices to highly interactive, low-burst tasks
+    pub fn calculate_bore_timeslice(&self, process: &Process) -> Duration {
+        let burst_score = process.sleep_count;
+        if burst_score > 10 {
+            Duration::from_millis(20) // Interactive (high sleep/low burst) tasks get wider slices
+        } else if burst_score > 5 {
+            Duration::from_millis(15)
+        } else {
+            Duration::from_millis(10) // Baseline slice for cpu-bound/high-burst tasks
+        }
+    }
+
+    pub fn schedule_next(&mut self) -> Option<&Process> {
+        // BORE (Burst-Oriented Response Enhancer) scheduling pick
+        self.processes
+            .iter()
+            .filter(|p| p.state == ProcessState::Ready)
+            .max_by_key(|p| p.sleep_count)
+    }
+}
+
+impl Default for CachyBoreScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod cachy_bore_tests {
+    use super::*;
+
+    #[test]
+    fn test_cachy_bore_scheduler_creation() {
+        let scheduler = CachyBoreScheduler::new();
+        assert!(scheduler.processes.is_empty());
+    }
+
+    #[test]
+    fn test_bore_timeslice_calculation() {
+        let scheduler = CachyBoreScheduler::new();
+        let mut p_cpu = Process::new(1, "cpu_worker".to_string(), Priority::Normal);
+        let mut p_inter = Process::new(2, "compositor".to_string(), Priority::Normal);
+
+        p_cpu.sleep_count = 0;
+        p_inter.sleep_count = 15;
+
+        assert_eq!(
+            scheduler.calculate_bore_timeslice(&p_cpu),
+            Duration::from_millis(10)
+        );
+        assert_eq!(
+            scheduler.calculate_bore_timeslice(&p_inter),
+            Duration::from_millis(20)
+        );
+    }
+
+    #[test]
+    fn test_bore_scheduling_interactive_prioritization() {
+        let mut scheduler = CachyBoreScheduler::new();
+        let mut p_cpu = Process::new(1, "cpu_worker".to_string(), Priority::Normal);
+        let mut p_inter = Process::new(2, "compositor".to_string(), Priority::Normal);
+
+        p_cpu.state = ProcessState::Ready;
+        p_cpu.sleep_count = 1;
+
+        p_inter.state = ProcessState::Ready;
+        p_inter.sleep_count = 12;
+
+        scheduler.add_process(p_cpu);
+        scheduler.add_process(p_inter);
+
+        let selected = scheduler.schedule_next().unwrap();
+        assert_eq!(selected.pid, 2); // Interactive compositor should be scheduled first
+    }
+}
