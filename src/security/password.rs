@@ -432,22 +432,10 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
-<<<<<<< HEAD
         let mut password = String::new();
         for _ in 0..length {
             let rand_val: u64 = rand::random();
             let index = (rand_val as usize) % charset.len();
-=======
-        let mut seed = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as u64;
-
-        let mut password = String::new();
-        for _ in 0..length {
-            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-            let index = (seed % charset.len() as u64) as usize;
->>>>>>> origin/improve-os-architecture-13148548228877311559
             password.push(charset[index] as char);
         }
 
