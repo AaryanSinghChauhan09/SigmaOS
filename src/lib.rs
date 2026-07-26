@@ -31,6 +31,7 @@ pub mod graphics {
     pub mod paint;
     pub mod video;
     pub mod compositor;
+    pub mod render3d;
 }
 pub mod hardware {
     pub mod win32;
@@ -164,6 +165,9 @@ pub use graphics::video::{
 };
 pub use graphics::compositor::{
     Position, Size, Rectangle, Color, Surface, SurfaceInfo, PixelFormat, SurfaceCapability, BitmapSurface, Window, WindowInfo, WindowCapability, SimpleWindow, Compositor, GraphicsError, CompositorStats, CompositorCapability, SimpleCompositor,
+};
+pub use graphics::render3d::{
+    Vec3, TriangleFace, MeshModel, MaterialShader, RenderCamera, BlenderRenderEngine,
 };
 pub use hardware::win32::{
     Win32Error, Win32Handle, PeFormat, PeLoader, RegistryManager, Win32Message, User32MessageQueue,
