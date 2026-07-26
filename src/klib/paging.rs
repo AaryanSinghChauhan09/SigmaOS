@@ -2,6 +2,7 @@
 // Based on 100-Improvement-Ideas.md #44: demand paging and page fault handler
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 pub type PhysicalAddress = u64;
 pub type VirtualAddress = u64;
