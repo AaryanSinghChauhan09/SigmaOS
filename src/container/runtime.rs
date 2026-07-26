@@ -530,9 +530,12 @@ impl SimpleContainerRuntime {
     pub fn new(capability: RuntimeCapability) -> Self {
         SimpleContainerRuntime {
             containers: Vec::new(),
-            runtime,
+            next_id: AtomicUsize::new(1),
+            stats: RuntimeStats::new(),
+            capability,
         }
     }
+}
 
 impl ContainerRuntime for SimpleContainerRuntime {
     fn create_container(
@@ -577,27 +580,55 @@ impl ContainerRuntime for SimpleContainerRuntime {
         }
     }
 
-    pub fn stop(&mut self, id: &str) -> Result<(), ContainerError> {
-        if let Some(container) = self.containers.iter_mut().find(|c| c.id == id) {
-            self.runtime.kill(container, 15)?;
-            Ok(())
+    fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.start();
+            if result.is_ok() {
+                self.stats.stopped_containers -= 1;
+                self.stats.running_containers += 1;
+            }
+            result
         } else {
             Err(ContainerError::NotFound)
         }
     }
 
-    pub fn remove(&mut self, id: &str) -> Result<(), ContainerError> {
-        if let Some(container) = self.containers.iter_mut().find(|c| c.id == id) {
-            self.runtime.delete(container)?;
-            self.containers.retain(|c| c.id != id);
-            Ok(())
+    fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.stop();
+            if result.is_ok() {
+                self.stats.running_containers -= 1;
+                self.stats.stopped_containers += 1;
+            }
+            result
         } else {
             Err(ContainerError::NotFound)
         }
     }
 
-    pub fn list(&self) -> &[Container] {
-        &self.containers
+    fn pause_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.pause();
+            if result.is_ok() {
+                self.stats.running_containers -= 1;
+                self.stats.paused_containers += 1;
+            }
+            result
+        } else {
+            Err(ContainerError::NotFound)
+        }
     }
 
     fn resume_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
@@ -608,15 +639,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.resume();
             if result.is_ok() {
-                let state = container.state();
-                if state == ContainerState::Running {
-                    self.stats.paused_containers -= 1;
-                    self.stats.running_containers += 1;
-                }
+                self.stats.paused_containers -= 1;
+                self.stats.running_containers += 1;
             }
             result
         } else {
-            Err(ContainerError::PermissionDenied)
+            Err(ContainerError::NotFound)
         }
     }
 
