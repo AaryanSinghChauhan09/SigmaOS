@@ -314,6 +314,37 @@ To establish peerless visual elegance, intuitive control interfaces, and unmatch
 
 ---
 
+## 12. Astra Linux Inspired Military-Grade Security & Mandatory Access Controls (MAC)
+
+To absorb Astra Linux’s peerless security certifications, military-grade mandatory access controls (MAC), and secure auditing capabilities, SigmaOS establishes a specialized microkernel-native security architecture designed for classified operations:
+
+### 1. Bell-LaPadula & Biba MAC Engine (SigmaParand)
+* **Astra Linux Inspiration:** Parand MAC module / Russian classified grade.
+* **SigmaOS Sovereign Solution:** A microkernel-enforced, multi-level security (MLS) mandatory access control engine. It natively enforces the **Bell-LaPadula** model (no read-up, no write-down for confidentiality levels: Unclassified, Confidential, Secret, Top Secret) and the **Biba** integrity model (no read-down, no write-up). Every process, file, socket, and memory region is labeled with security clearances, completely bypassing discretionary permissions.
+* **OOP Mapping:** Managed by the `SovereignCapsicum`, `LsmEnforcer`, and `mac.rs` security modules.
+
+### 2. Microkernel-Gated Cryptographic Audit Ledger (SigmaAudit)
+* **Astra Linux Inspiration:** Astra Linux Security Audit daemon.
+* **SigmaOS Sovereign Solution:** An append-only, non-volatile security audit ledger. It intercepts all privilege transitions, VM boundaries, and VFS file operations at the microkernel IPC level. Logs are cryptographically signed using high-speed SHA-3 hash chains, preventing tampering or deletion of event trails even by root/privileged processes.
+* **OOP Mapping:** Governed by the `ZeroCopyMetrics` and the `SecurityArchive` modules.
+
+### 3. Hardware-Bound Enclave & TPM Vault (SigmaKey)
+* **Astra Linux Inspiration:** Astra hardware security modules (HSM) / Gost encryption.
+* **SigmaOS Sovereign Solution:** Full disk and swap memory encryption bound dynamically to TPM 2.0 and CPU Secure Enclaves. Disk-encryption keys are never held in readable system RAM; instead, memory ranges are encrypted at the hardware level, protecting against physical bus-sniffing, cold-boot attacks, and side-channel intrusions.
+* **OOP Mapping:** Implemented in `tpm/module.rs` and `secure/enclave.rs`.
+
+### 4. Multi-Level Clearance Desktop Sessions (FlySafe)
+* **Astra Linux Inspiration:** Fly Desktop high-security sessions.
+* **SigmaOS Sovereign Solution:** Dual-layer isolated graphical environments in the `ZenithCompositor`. High-clearance apps (e.g., intelligence or financial administration) run in completely separate compositor pipelines from standard web-browsing containers. The compositor ensures zero memory leaks, screen-grabbing, or clipboard bleed between clearance domains.
+* **OOP Mapping:** Handled by `ZenithCompositor` and `SimpleContainerRuntime`.
+
+### 5. On-Execution Cryptographic Trust Validator (AstraVerify)
+* **Astra Linux Inspiration:** Astra executable signature verification (ELVS).
+* **SigmaOS Sovereign Solution:** A continuous, zero-overhead executable file validator. Every binary, container image, or driver module has its hash verified against signed Merkle filesystem trees on execution. If any block mismatch or unauthorized signature is detected, the process is instantly quarantined before executing a single instruction.
+* **OOP Mapping:** Managed by `sigpkg/verifier.rs` and the `RollingTransactionManager`.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
