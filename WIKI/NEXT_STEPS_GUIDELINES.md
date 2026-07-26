@@ -407,6 +407,41 @@ To absorb Astra Linux’s peerless security certifications, military-grade manda
 
 ---
 
+## 15. OOP-Based Universal Package Translation & Atomic Generation Rollbacks
+
+To bridge the gap with all mainstream Linux distributions and support Debian/Ubuntu (`apt`), RedHat/Fedora (`dnf`/`rpm`), Arch Linux (`pacman`), and canonical (`snap`) packages, SigmaOS implements an Object-Oriented, transaction-safe, generation-based package manager. It exposes polymorphic interfaces and strict rollback rules:
+
+### 1. The Polymorphic `UniversalPackage` Base Trait
+* **OOP Design Pattern:** Abstraction & Polymorphism.
+* **SigmaOS Sovereign Solution:** Rather than locking the OS into a single binary package layout, SigmaOS exposes the `UniversalPackage` base trait. It encapsulates standard properties (name, version, checksum, files, dependency array) and methods (`install()`, `uninstall()`, `verify()`).
+* **OOP Mapping:** Declared inside `src/sigpkg/spec.rs`.
+
+### 2. Multi-Format Legacy Adapters (Apt, Rpm, Pacman, Snap)
+* **OOP Design Pattern:** Adapter Pattern & Single Responsibility.
+* **SigmaOS Sovereign Solution:** Format-specific adapters subclass the `UniversalPackage` trait to map legacy binaries directly into SigmaOS concepts:
+  - `AptPackageAdapter`: Translates `.deb` control files and processes Debian package install scripts safely.
+  - `RpmPackageAdapter`: Parses RPM headers, CPIO archives, and yum dependency chains.
+  - `PacmanPackageAdapter`: Translates `.pkg.tar.zst` layouts and alpm registry database formats.
+  - `SnapPackageAdapter`: Mounts sandboxed SquashFS read-only loop devices onto isolated paths.
+* **OOP Mapping:** Implemented across `arch_compat.rs`, `rpm_compat.rs`, and `spec.rs`.
+
+### 3. Atomic Generation Manager (Generation-based Symlink Swaps)
+* **OOP Design Pattern:** Encapsulation & Open/Closed Principle.
+* **SigmaOS Sovereign Solution:** Every successful package addition, removal, or update transitions the OS to a new cryptographic **Generation** (e.g., `/sigstore/generations/12`). System paths (like `/bin`, `/lib`, and `/etc`) are managed via atomic symlink pointers. Transitioning to a new state represents a sub-microsecond, atomic pointer swap, avoiding directory fragmentation.
+* **OOP Mapping:** Governed by `GenerationManager` and `RollingTransactionManager`.
+
+### 4. Exception-Safe Transaction Rollbacks
+* **OOP Design Pattern:** Command Pattern & Self-Healing.
+* **SigmaOS Sovereign Solution:** Packaged operations are encapsulated as commands (`Install`, `Remove`, `Update`). The `Transaction` executor compiles operations and runs pre-flight dependency resolution checks via a DPLL SAT Solver. If any operation throws an exception or fails (such as block checksum mismatches, file collisions, or scripting errors), the `Transaction` catches the error, rolls back all changes, and reinstates the previous generation's symlink instantly.
+* **OOP Mapping:** Implemented inside `src/sigpkg/transaction.rs`.
+
+### 5. Content-Addressed Immutable Store (CAS Deduplication)
+* **OOP Design Pattern:** Abstraction & Single Instance.
+* **SigmaOS Sovereign Solution:** All package files are stored inside a global, immutable store indexed solely by their SHA-256 content hashes (e.g., `/sigstore/store/<hash>-file`). If multiple package adapters (.deb and .rpm versions) contain identical shared library binaries, they point to the exact same physical hash node, achieving 100% deduplication.
+* **OOP Mapping:** Managed by the `ContentAddressedStore` inside `src/sigpkg/store.rs`.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
