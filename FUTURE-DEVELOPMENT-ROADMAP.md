@@ -44,6 +44,9 @@ This roadmap formally codifies these gaps and establishes a rigorous execution s
   * **The Linux Standard:** Major distros provide predictable LTS (Long-Term Support), rolling releases, and bleeding-edge experimental channels.
   * **The SigmaOS Gap:** SigmaOS lacks formal versioning discipline, signed release builds, and fully reproducible bootable ISO compilation pipelines across multi-host environments.
   * **Inspiration Integration:** Modeling after robust **Linux From Scratch (LFS)** and bootable toolchain bootstrapping methodologies, we formally define a deterministic **two-stage bootstrapping release cycle**. Stage 1 compiles a minimal sandboxed toolchain (compiler, linker, core libraries) completely isolated from the host operating system, and Stage 2 leverages this isolated toolchain to build a 100% reproducible bootable ISO, eliminating host environment contamination entirely.
+  * **Canonical Ubuntu-Parity Utility Integration:** To automate system installation and volume provisioning on enterprise scale:
+    - **Subiquity-Parity Autoinstaller**: A declarative, zero-interaction installer framework parsing JSON configurations to automatically probe disks, establish network bounds, and initialize default user credentials.
+    - **Curtin-Parity Block Provisioner**: A low-level block storage partitioner laying out partition maps, setting up swap buffers, and deploying core bootloader parameters dynamically.
 * **Regression Testing Frameworks:**
   * **The Linux Standard:** The Linux Kernel Performance project and openQA test thousands of hardware configurations, compiler combinations, and software workloads in parallel on massive bare-metal build farms.
   * **The SigmaOS Gap:** SigmaOS currently runs basic unit tests and local script-based QEMU smoke tests, but lacks a large-scale, automated hardware-in-the-loop (HITL) CI/CD regression testing pipeline.
@@ -88,6 +91,10 @@ This roadmap formally codifies these gaps and establishes a rigorous execution s
 * **Container Ecosystem:**
   * **The Linux Standard:** Linux is the foundation of modern cloud native scaling, powering Docker, containeric, and Kubernetes via kernel primitives (Namespaces, Cgroups).
   * **The SigmaOS Gap:** SigmaOS has early microkernel isolation patterns, but lacks a native, production-ready container engine compatible with OCI (Open Container Initiative) standards.
+  * **Canonical Ubuntu-Parity Utility Integration:** To orchestrate sandboxed cloud container networks:
+    - **Netplan-Parity Network Configurator**: A declarative YAML network configuration engine parsing hardware links and auto-compiling optimized eBPF routing rules.
+    - **Cloud-Init-Parity Instance Poller**: Instantly fetches metadata parameters upon cloud boot, configuring network gateways, NTP servers, and storage mounts on the fly.
+    - **Multipass-Parity Local VM Orchestrator**: Manages local sandboxed micro-virtual machines directly on the microkernel with instant shell access commands.
 * **Cloud-Native Tooling:**
   * **The Linux Standard:** Linux integrates deeply with AWS, Azure, and Google Cloud Platform (GCP) through native metadata daemons, cloud-init, and optimized virtual machine drivers.
   * **The SigmaOS Gap:** SigmaOS lacks built-in cloud SDKs and automated configuration engines for rapid deployment in virtualized hyper-scaler environments.
