@@ -4,6 +4,57 @@ SigmaOS is designed to match and leapfrog standard operating systems (Linux, BSD
 
 ---
 
+## 🏗️ Stepwise Roadmap: Embracing the Linux Kernel Core
+
+To build an operating system of maximum stability and hardware support while preserving sovereign innovation, SigmaOS adopts a phased, structured approach to leverage the mature Linux kernel backbone: **Foundation → Parity → Differentiation → Ecosystem**.
+
+### 1. Foundation (Kernel Core Integration)
+- **Adopt Linux Kernel Base:** Use the upstream Linux kernel as SigmaOS's core instead of reinventing schedulers, memory allocators, and drivers from scratch.
+- **Maintain Modularity:** Keep SigmaOS's experimental subsystems (such as Sovereign FS and post-quantum crypto) as loadable, modular kernel extensions.
+- **Bootloader & Init Compatibility:** Ensure compatibility with standard GRUB and systemd layers for smooth boot-up and system service orchestration.
+
+### 2. Parity (Match Linux Capabilities)
+- **Device Drivers:** Port Linux's massive driver catalog (GPU, audio, USB, NVMe, HID) directly into SigmaOS to guarantee immediate hardware adoption.
+- **Networking Stack:** Integrate Linux's production-proven TCP/IP stack, then layer SigmaOS's sovereign networking and VPN features on top.
+- **Filesystems:** Provide native support for ext4, Btrfs, FAT, and journaling filesystems alongside SigmaFS.
+- **Security Frameworks:** Incorporate SELinux/AppArmor hook points while retaining SigmaOS's native post-quantum crypto capability gates.
+
+### 3. Differentiation (SigmaOS Identity)
+- **AI-Native Scheduling:** Enhance Linux's CFS (Completely Fair Scheduler) with SigmaOS's predictive ML-based thread prioritization.
+- **Post-Quantum Security:** Maintain SigmaOS's Kyber-1024 and Dilithium-5 cryptographic keys as unique differentiators.
+- **Sovereign FS:** Position SigmaFS as a distributed, secure alternative to NFS/Btrfs.
+
+### 4. Ecosystem (Userland & Community)
+- **Compatibility Layer:** Provide POSIX syscall compatibility so standard Linux applications run natively and seamlessly.
+- **Package Management:** Extend the `sigma-pkg` manager to support standard Linux software repositories (APT, RPM, Pacman).
+- **Desktop & UI:** Build the Zenith Desktop on stable Wayland/X11 foundations, while innovating with sovereign user interface paradigms.
+- **Community Adoption:** Ensure ABI/API stability to encourage developer onboarding.
+
+---
+
+## 📊 Linux Kernel vs. SigmaOS Integration Dashboard
+
+| Linux Kernel Strength | SigmaOS Current State | Integration Path & Hybrid Design |
+| :--- | :--- | :--- |
+| **Mature schedulers (CFS, RT)** | Predictive scheduler prototype | Merge with Linux scheduler, add ML prediction layer |
+| **Thousands of drivers** | Limited NVMe, USB, HID | Port Linux drivers directly into SigmaOS |
+| **Full TCP/IP stack** | Partial TCP/UDP | Adopt Linux networking, extend with sovereign stack |
+| **SELinux/AppArmor** | Post-quantum crypto | Combine both systems for layered Defense-in-Depth |
+| **Ext4, Btrfs, XFS** | Ext4 + SigmaFS | Support journaling filesystems, keep SigmaFS unique |
+| **KVM, namespaces, cgroups** | Sandbox namespaces | Integrate Linux virtualization primitives |
+| **POSIX syscalls** | Non-POSIX syscall layer | Add POSIX compatibility layer for app portability |
+
+---
+
+## 🔄 Practical Integration Workflow
+
+1. **Fork the Linux Kernel:** Treat SigmaOS as a custom, high-security distribution-like fork of upstream Linux with integrated sovereign modules.
+2. **Incremental Merging:** Gradually replace experimental subsystems with Linux core equivalents where production stability is critical.
+3. **Maintain Innovation Branches:** Keep SigmaOS's unique features highly modular so they can evolve without breaking base Linux kernel compatibility.
+4. **Testing & CI/CD Pipelines:** Adopt Linux's kernel regression testing frameworks to verify overall workspace stability.
+
+---
+
 ## 📐 Core Architectural Principles
 
 ### 1. OS Principles
@@ -49,7 +100,7 @@ SigmaOS is designed to match and leapfrog standard operating systems (Linux, BSD
 
 ### 3. Self-Healing Kernel
 - **Objective:** Complete immunity from permanent crashes or malware tampering.
-- **Features:** Automated runtime integrity checkers, kernel quarantine boundaries, and continuous memory rollbacks.
+- **Features:** Automated runtime integrity checkers, kernel quarantine boundaries, and memory rollbacks.
 
 ### 4. AI-Native Runtime
 - **Objective:** Model runtimes treated as first-class, scheduled OS processes.
@@ -57,7 +108,7 @@ SigmaOS is designed to match and leapfrog standard operating systems (Linux, BSD
 
 ### 5. Energy-Aware Scheduler
 - **Objective:** Minimizing power draw while preserving performance.
-- **Features:** ML-driven workload energy footprint predictions and intelligent core-affinity scaling.
+- **Features:** ML-driven workload energy footprint predictions and core-affinity scaling.
 
 ### 6. User-Defined Kernel Functions
 - **Objective:** Hot-swappable kernel policy customization.
