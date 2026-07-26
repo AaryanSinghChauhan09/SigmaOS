@@ -306,8 +306,8 @@ impl FileManager {
 
     /// Navigate to bookmark
     pub fn navigate_to_bookmark(&mut self, name: &str) -> Result<(), FileManagerError> {
-        if let Some(path) = self.bookmarks.get(name) {
-            self.navigate(path)
+        if let Some(path) = self.bookmarks.get(name).cloned() {
+            self.navigate(&path)
         } else {
             Err(FileManagerError::BookmarkNotFound(name.to_string()))
         }

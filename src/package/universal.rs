@@ -380,6 +380,15 @@ impl UniversalPackageManager {
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
     }
+
+    pub fn rollback_snapshot(&mut self, package_name: &str) -> Result<(), PackageError> {
+        if let Some(package) = self.packages.get(package_name) {
+            println!("Rolling back package snapshot: {}", package.name);
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(package_name.to_string()))
+        }
+    }
 }
 
 impl Default for UniversalPackageManager {

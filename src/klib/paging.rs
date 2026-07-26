@@ -28,6 +28,8 @@ pub trait PageTableEntry {
     fn set_writable(&mut self, writable: bool);
     fn set_user_accessible(&mut self, user: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
+    fn get_page_size(&self) -> usize { 0 }
+    fn set_page_size(&mut self, size: usize) { let _ = size; }
 }
 
 #[repr(C)]
@@ -38,6 +40,7 @@ pub struct SimplePageTableEntry {
     pub physical_addr: AtomicUsize,
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
+    pub page_size_flag: AtomicUsize,
 }
 
 impl Default for SimplePageTableEntry {
@@ -55,6 +58,7 @@ impl SimplePageTableEntry {
             physical_addr: AtomicUsize::new(0),
             accessed: AtomicUsize::new(0),
             dirty: AtomicUsize::new(0),
+            page_size_flag: AtomicUsize::new(0),
         }
     }
 }
@@ -77,6 +81,12 @@ impl PageTableEntry for SimplePageTableEntry {
     }
     fn set_physical_address(&mut self, addr: PhysicalAddress) {
         self.physical_addr.store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
+    }
+    fn get_page_size(&self) -> usize {
+        self.page_size_flag.load(Ordering::SeqCst)
+    }
+    fn set_page_size(&mut self, size: usize) {
+        self.page_size_flag.store(size, Ordering::SeqCst);
     }
 }
 
@@ -134,7 +144,10 @@ impl PageTable for SimplePageTable {
 }
 
 pub trait VirtualMemoryManager {
-    fn map_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError>;
+    fn map_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
+        self.map_page_with_size(virt, phys, user, writable, 4096)
+    }
+    fn map_page_with_size(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool, page_size: usize) -> Result<(), PageFaultError>;
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress>;
     fn handle_page_fault(&mut self, virt: VirtualAddress, error_code: usize) -> Result<(), PageFaultError>;
@@ -184,7 +197,15 @@ impl SimpleVMM {
 }
 
 impl VirtualMemoryManager for SimpleVMM {
-    fn map_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
+    fn map_page_with_size(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool, page_size: usize) -> Result<(), PageFaultError> {
+        // Enforce strict address alignment verification (must be page-aligned to its size)
+        if page_size != 4096 && page_size != 2097152 && page_size != 1073741824 {
+            return Err(PageFaultError::InvalidAddress);
+        }
+        if virt % page_size != 0 || phys % page_size != 0 {
+            return Err(PageFaultError::InvalidAddress);
+        }
+
         let pml4_idx = self.get_pml4_index(virt);
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
@@ -208,7 +229,39 @@ impl VirtualMemoryManager for SimpleVMM {
             self.pml4.set_entry(pml4_idx, pdpt_entry);
         }
         
+        // 1GB Giant Page support: mapped directly at PDPT level
+        if page_size == 1073741824 {
+            let pdpt_idx_in_vec = pml4_idx;
+            while self.pdpt_tables.len() <= pdpt_idx_in_vec {
+                self.pdpt_tables.push(None);
+            }
+            if self.pdpt_tables[pdpt_idx_in_vec].is_none() {
+                let pdpt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+                let pdpt_table = SimplePageTable::new(pdpt_phys);
+                self.pdpt_tables[pdpt_idx_in_vec] = Some(pdpt_table);
+            }
+            if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+                let mut pdpt_entry = SimplePageTableEntry::new();
+                pdpt_entry.set_present(true);
+                pdpt_entry.set_writable(writable);
+                pdpt_entry.set_user_accessible(user);
+                pdpt_entry.set_physical_address(phys);
+                pdpt_entry.set_page_size(1073741824);
+                pdpt.set_entry(pdpt_idx, pdpt_entry);
+            }
+            return Ok(());
+        }
+
         let pdpt_idx_in_vec = pml4_idx;
+        while self.pdpt_tables.len() <= pdpt_idx_in_vec {
+            self.pdpt_tables.push(None);
+        }
+        if self.pdpt_tables[pdpt_idx_in_vec].is_none() {
+            let pdpt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+            let pdpt_table = SimplePageTable::new(pdpt_phys);
+            self.pdpt_tables[pdpt_idx_in_vec] = Some(pdpt_table);
+        }
+
         let pdpt_present = if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
             pdpt.get_entry(pdpt_idx).is_present()
         } else {
@@ -231,6 +284,29 @@ impl VirtualMemoryManager for SimpleVMM {
                 self.pd_tables[pdpt_idx] = Some(pd_table);
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
+        }
+
+        // 2MB Huge Page support: mapped directly at PD level
+        if page_size == 2097152 {
+            let pd_idx_in_vec = pdpt_idx;
+            while self.pd_tables.len() <= pd_idx_in_vec {
+                self.pd_tables.push(None);
+            }
+            if self.pd_tables[pd_idx_in_vec].is_none() {
+                let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+                let pd_table = SimplePageTable::new(pd_phys);
+                self.pd_tables[pd_idx_in_vec] = Some(pd_table);
+            }
+            if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+                let mut pd_entry = SimplePageTableEntry::new();
+                pd_entry.set_present(true);
+                pd_entry.set_writable(writable);
+                pd_entry.set_user_accessible(user);
+                pd_entry.set_physical_address(phys);
+                pd_entry.set_page_size(2097152);
+                pd.set_entry(pd_idx, pd_entry);
+            }
+            return Ok(());
         }
 
         let pd_idx_in_vec = pdpt_idx;
@@ -265,6 +341,7 @@ impl VirtualMemoryManager for SimpleVMM {
             pt_entry.set_writable(writable);
             pt_entry.set_user_accessible(user);
             pt_entry.set_physical_address(phys);
+            pt_entry.set_page_size(4096);
             pt.set_entry(pt_idx, pt_entry);
         }
 
@@ -322,12 +399,24 @@ impl VirtualMemoryManager for SimpleVMM {
                 return None;
             }
             
+            // If 1GB Giant page is mapped at PDPT level
+            if pdpt_entry.get_page_size() == 1073741824 {
+                let page_offset = virt & 0x3FFFFFFF;
+                return Some(pdpt_entry.get_physical_address() | page_offset);
+            }
+
             if let Some(ref pd) = self.pd_tables[pdpt_idx] {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
                 }
                 
+                // If 2MB Huge page is mapped at PD level
+                if pd_entry.get_page_size() == 2097152 {
+                    let page_offset = virt & 0x1FFFFF;
+                    return Some(pd_entry.get_physical_address() | page_offset);
+                }
+
                 if let Some(ref pt) = self.pt_tables[pd_idx] {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
@@ -565,6 +654,27 @@ mod tests {
         // Unmap page
         assert!(vmm.unmap_page(virt).is_ok());
         assert!(vmm.get_physical(virt).is_none());
+    }
+
+    #[test]
+    fn test_vmm_huge_and_giant_pages() {
+        let mut vmm = SimpleVMM::new();
+
+        // 2MB Huge page mapping: virt and phys aligned to 2MB
+        let huge_virt = 0x2000_0000;
+        let huge_phys = 0x4000_0000;
+        assert!(vmm.map_page_with_size(huge_virt, huge_phys, false, true, 2097152).is_ok());
+        assert_eq!(vmm.get_physical(huge_virt).unwrap(), huge_phys);
+        // Test offset in huge page
+        assert_eq!(vmm.get_physical(huge_virt + 0x1000).unwrap(), huge_phys + 0x1000);
+
+        // 1GB Giant page mapping: virt and phys aligned to 1GB
+        let giant_virt = 0x4000_0000;
+        let giant_phys = 0x8000_0000;
+        assert!(vmm.map_page_with_size(giant_virt, giant_phys, false, true, 1073741824).is_ok());
+        assert_eq!(vmm.get_physical(giant_virt).unwrap(), giant_phys);
+        // Test offset in giant page
+        assert_eq!(vmm.get_physical(giant_virt + 0x2000).unwrap(), giant_phys + 0x2000);
     }
 
     #[test]

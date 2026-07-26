@@ -237,6 +237,8 @@ pub struct UnifiedControlCenter {
     widgets: Vec<DashboardWidget>,
     active_panel: Option<ControlPanel>,
     search_query: String,
+    pub contrast_setting: f32,
+    pub sound_volume_limit: u32,
 }
 
 impl UnifiedControlCenter {
@@ -247,7 +249,17 @@ impl UnifiedControlCenter {
             widgets: Vec::new(),
             active_panel: None,
             search_query: String::new(),
+            contrast_setting: 1.0,
+            sound_volume_limit: 100,
         }
+    }
+
+    pub fn set_contrast_setting(&mut self, contrast: f32) {
+        self.contrast_setting = contrast;
+    }
+
+    pub fn set_volume_limit(&mut self, limit: u32) {
+        self.sound_volume_limit = limit;
     }
 
     /// Add a control panel
