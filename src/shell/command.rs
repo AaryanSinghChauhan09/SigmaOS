@@ -411,21 +411,21 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-struct ShellVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+pub struct ShellVec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
 }
 
 impl<T> ShellVec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         ShellVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -436,7 +436,7 @@ impl<T> ShellVec<T> {
             }
         }
     }
-    unsafe fn grow(&mut self) {
+    pub unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
         } else {

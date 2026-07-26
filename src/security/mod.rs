@@ -13,8 +13,12 @@ pub mod secrets;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod cleaner;
+pub mod forensics;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use cleaner::{SecureCleaner, TorAnonymityGate, AmnesiaManager, MetadataScrubber};
+pub use forensics::{ForensicAnalyzer, ExtractedMetadata, RecoveredFile};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel, XorEncryption,
