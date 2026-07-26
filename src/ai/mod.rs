@@ -10,8 +10,14 @@ pub mod voice;
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use llm::{
-    BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
-    LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
+    LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
+    QuantizationType, InferenceBackend, BatchingStrategy,
+    StreamingLlmEngine, StreamingInference,
+    AiTool, ToolCall, InferenceFormat,
+};
+pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
+pub use sai::{
+    Agent, AgentRole, AgentTask as Task, TaskStatus,
 };
 pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
 pub use sai::{

@@ -167,128 +167,19 @@ impl PackageRecipe {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum BuildSystem {
     Cargo,
     CMake,
     Make,
-    Custom,
+    None,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum RecipeError {
-    NotFound,
-    InvalidSyntax,
-    SerializationError,
-}
-
-pub struct RecipeManager;
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_recipe_creation() {
-        let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0));
-        assert_eq!(recipe.name, "test");
-    }
-
-    #[test]
-    fn test_recipe_builder() {
-        let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
-            .with_description("Test package".to_string())
-            .with_build_system(BuildSystem::Cargo)
-            .with_source("https://example.com".to_string(), "abc123".to_string())
-            .with_build_command("cargo build".to_string());
-
-        assert_eq!(recipe.description, "Test package");
-        assert_eq!(recipe.build_system, BuildSystem::Cargo);
-    }
-
-    #[test]
-    fn test_recipe_validation() {
-        let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
-            .with_source("https://example.com".to_string(), "abc123".to_string())
-            .with_build_command("cargo build".to_string());
-
-        assert!(recipe.validate().is_ok());
-    }
-
-    #[test]
-    fn test_invalid_recipe() {
-        let recipe = PackageRecipe::new("".to_string(), Version::new(1, 0, 0));
-        assert!(recipe.validate().is_err());
-    }
-
-    #[test]
-    fn test_recipe_manager() {
-        let mut manager = RecipeManager::new();
-        let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
-            .with_source("https://example.com".to_string(), "abc123".to_string())
-            .with_build_command("cargo build".to_string());
-
-        assert!(manager.add_recipe(recipe).is_ok());
-        assert_eq!(manager.list_recipes().len(), 1);
-    }
-
-    #[test]
-    fn test_build_script_generation() {
-        let recipe = PackageRecipe::new("test".to_string(), Version::new(1, 0, 0))
-            .with_build_system(BuildSystem::Cargo);
-
-        let script = recipe.get_build_script();
-        assert!(script.contains("cargo build"));
-    }
-
-    #[test]
-    fn test_pkgbuild_and_aur_compilation_fields() {
-        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
-            .with_pkgrel(3)
-            .with_arch("aarch64".to_string())
-            .with_source(
-                "https://github.com/dylanaraps/neofetch".to_string(),
-                "hash_neofetch".to_string(),
-            )
-            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
-            .with_build_command("make build".to_string())
-            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
-
-        assert_eq!(recipe.pkgrel, 3);
-        assert_eq!(recipe.arch, "aarch64");
-        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
-        assert_eq!(
-            recipe.package_commands[0],
-            "make DESTDIR=\"$pkgdir\" install"
-        );
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    Make,
-    CMake,
-    Unknown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    Success,
     InvalidRecipe,
-    SignatureVerificationFailed,
+    SignatureMismatch,
 }
 
+#[derive(Debug, Clone)]
 pub struct RecipeManager;

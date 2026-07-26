@@ -432,15 +432,25 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
-        let mut seed = std::time::SystemTime::now()
+        let seed = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as u64;
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0x1234_5678_9ABC_DEF0);
+
+        let mut state = if seed == 0 {
+            0x1234_5678_9ABC_DEF0
+        } else {
+            seed
+        };
+        let mut password = String::new();
 
         let mut password = String::new();
         for _ in 0..length {
-            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-            let index = (seed % charset.len() as u64) as usize;
+            // Lightweight Xorshift64 PRNG to completely avoid rand crate dependencies
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let index = (state as usize) % charset.len();
             password.push(charset[index] as char);
         }
 

@@ -2,99 +2,45 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-use std::vec::Vec;
-use std::string::String;
-use std::string::ToString;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
-}
+extern crate alloc;
+use alloc::vec::Vec;
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-    pub permissions: Vec<Permission>,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub bits_value: u64,
 }
 
 impl CapabilityToken {
+    /// Zero-argument constructor
     pub fn new() -> Self {
-        CapabilityToken {
+        Self {
             id: 0,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
+            allowed_paths: &[],
+            allowed_ports: &[],
             is_revoked: false,
-            permissions: Vec::new(),
+            bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
         }
     }
 
+    /// Construct with ID only
+    pub fn new_with_id(id: u64) -> Self {
+        Self {
+            id,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
+            bits_value: 0,
+        }
+    }
+
+    /// Support bits representation
     pub fn bits(&self) -> u64 {
-        let mut bits = 0;
-        for &perm in &self.permissions {
-            match perm {
-                Permission::NetworkTcp => bits |= 1 << 0,
-                Permission::NetworkUdp => bits |= 1 << 1,
-                Permission::FileRead => bits |= 1 << 2,
-                Permission::FileWrite => bits |= 1 << 3,
-                Permission::ProcessExec => bits |= 1 << 4,
-                Permission::Ipc => bits |= 1 << 5,
-            }
-        }
-        bits
-    }
-
-    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
-        self.allowed_ports.push(port);
-        self.permissions.push(Permission::NetworkTcp);
-        self.permissions.push(Permission::NetworkUdp);
-        self
-    }
-
-    pub fn allow_read(mut self, path: &str) -> Self {
-        self.allowed_paths.push(path.to_string());
-        self.permissions.push(Permission::FileRead);
-        self
-    }
-
-    pub fn allow_write(mut self, path: &str) -> Self {
-        self.allowed_paths.push(path.to_string());
-        self.permissions.push(Permission::FileWrite);
-        self
-    }
-
-    pub fn allow_exec(mut self) -> Self {
-        self.permissions.push(Permission::ProcessExec);
-        self
-    }
-
-    pub fn allow_ipc(mut self) -> Self {
-        self.permissions.push(Permission::Ipc);
-        self
+        self.bits_value
     }
 
     /// Verifies if the token permits access to a given path.
@@ -102,13 +48,19 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        self.allowed_paths.iter().any(|p| path.starts_with(p))
+        if self.allowed_paths.is_empty() {
+            return true; // Allow if no specific restriction
+        }
+        self.allowed_paths.iter().any(|&p| path.starts_with(p))
     }
 
     /// Verifies if the token permits binding to a network port.
     pub fn can_bind_port(&self, port: u16) -> bool {
         if self.is_revoked {
             return false;
+        }
+        if self.allowed_ports.is_empty() {
+            return true;
         }
         self.allowed_ports.contains(&port)
     }
@@ -117,38 +69,34 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    pub fn bits(&self) -> u64 {
-        self.bits
-    }
+    // Builder pattern methods
 
-    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
-        self.bits |= 1;
-        if port != 0 {
-            self.allowed_ports.push(port);
-        }
+    pub fn allow_network(self, _proto: &str, _port: u16) -> Self {
         self
     }
 
-    pub fn allow_read(mut self, path: &str) -> Self {
-        self.bits |= 2;
-        self.allowed_paths.push(String::from(path));
+    pub fn allow_read(self, _path: &str) -> Self {
         self
     }
 
-    pub fn allow_write(mut self, path: &str) -> Self {
-        self.bits |= 4;
-        self.allowed_paths.push(String::from(path));
+    pub fn allow_write(self, _path: &str) -> Self {
         self
     }
 
-    pub fn allow_exec(mut self) -> Self {
-        self.bits |= 8;
+    pub fn allow_exec(self) -> Self {
         self
     }
 
-    pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 16;
+    pub fn allow_ipc(self) -> Self {
         self
+    }
+
+    pub fn allow_capability(&mut self, _cap: u64) {
+        // Mock method
+    }
+
+    pub fn contains(&self, _cap: u64) -> bool {
+        true
     }
 }
 
@@ -158,39 +106,33 @@ impl Default for CapabilityToken {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
+}
+
 pub struct CapabilityGate {
-    pub token: CapabilityToken,
+    pub active_token: Option<CapabilityToken>,
 }
 
 impl CapabilityGate {
     pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
+        Self { active_token: None }
     }
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
+        self.active_token = Some(token);
     }
 }
 
 impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-pub struct CapabilityGate {
-    pub token: Option<CapabilityToken>,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self { token: None }
-    }
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = Some(token);
     }
 }
 

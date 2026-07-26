@@ -1,5 +1,5 @@
 // SigmaOS Package Module
-pub mod store;
+pub mod dependency_resolver;
 pub mod universal;
 pub mod store;
 
@@ -8,6 +8,8 @@ pub use universal::{
     ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use store::{
-    StoreError, StoreApp, SigmaSoftwareStore,
+
+pub use dependency_resolver::{
+    PackageDependencyResolver, PackageRecipe as DeclarativePackageRecipe,
+    Version as DependencyVersion,
 };

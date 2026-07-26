@@ -67,27 +67,6 @@ impl<'a, T> IntoIterator for &'a mut ShellVec<T> {
     }
 }
 
-impl<T> core::ops::Deref for ShellVec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for ShellVec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
 impl<T> Drop for ShellVec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {
