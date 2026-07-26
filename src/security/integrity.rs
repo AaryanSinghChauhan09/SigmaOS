@@ -421,7 +421,10 @@ mod tests {
 
         // Tampered system triggers a safety shutdown / panic error
         watchdog.critical_files[0].set_status(IntegrityStatus::Corrupted);
-        assert_eq!(watchdog.check_integrity_loop(), Err("CRITICAL SYSTEM FILE TAMPERING DETECTED! Shuting down for safety."));
+        assert_eq!(
+            watchdog.check_integrity_loop(),
+            Err("CRITICAL SYSTEM FILE TAMPERING DETECTED! Shuting down for safety.")
+        );
     }
 
     #[test]

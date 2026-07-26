@@ -73,7 +73,9 @@ impl XorEncryption {
 impl ClipboardSecurity for XorEncryption {
     fn secure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
         if self.key.is_empty() {
-            return Err(ClipboardError::EncryptionError("Encryption key cannot be empty".to_string()));
+            return Err(ClipboardError::EncryptionError(
+                "Encryption key cannot be empty".to_string(),
+            ));
         }
         let mut encrypted = Vec::new();
         for (i, byte) in content.bytes().enumerate() {
@@ -85,7 +87,9 @@ impl ClipboardSecurity for XorEncryption {
 
     fn unsecure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
         if self.key.is_empty() {
-            return Err(ClipboardError::DecryptionError("Decryption key cannot be empty".to_string()));
+            return Err(ClipboardError::DecryptionError(
+                "Decryption key cannot be empty".to_string(),
+            ));
         }
         let mut decrypted = Vec::new();
         for (i, byte) in content.bytes().enumerate() {

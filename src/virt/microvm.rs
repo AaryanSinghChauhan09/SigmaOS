@@ -473,7 +473,6 @@ impl SandboxManager for SimpleSandboxManager {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

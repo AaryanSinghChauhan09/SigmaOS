@@ -4,6 +4,6 @@ pub mod universal;
 
 pub use store::{SigmaSoftwareStore, StoreApp, StoreError};
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageError, PackageFormat, PackageFormatAdapter,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };

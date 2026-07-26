@@ -290,7 +290,6 @@ impl VMExitHandler for SimpleVMExitHandler {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

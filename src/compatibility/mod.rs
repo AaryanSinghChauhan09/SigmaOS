@@ -1,53 +1,52 @@
 // SigmaOS Compatibility Module
+pub mod chimera_linux;
 pub mod constellation;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
-pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer, FreeBsdJailSandbox, KqueueEventNotifier,
+    ContainerRuntime, FreeBsdJailSandbox, KqueueEventNotifier, TargetPlatform, TranslationLayer,
 };
 pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox, LfsToolchainBuilder,
+    HistoricSyscallEmulator, HistoricalCpuState, LfsToolchainBuilder, LinuxEra,
+    VintageDriverTranslator, VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
 pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
+    VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
 pub use mint_linux::{
-    MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-    MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-    MintReportSystem,
+    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
 };
 
 pub use chimera_linux::{
-    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
-    ApkPackageMetadata, ApkPackageStore,
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+    DinitServiceState,
 };
 
 pub use relay_nexus::{
-    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
-    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
-    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
-    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
-    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
-    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
-    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
-    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
+    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
+    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
+    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
+    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
+    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
+    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
+    ZeroTrustNexus,
 };
 
 pub use solid_kernel::{
-    IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
-    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
+    SigmaFSPlusPlus, SolidKernelCore,
 };

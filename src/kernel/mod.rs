@@ -3,13 +3,13 @@ pub mod bus;
 pub mod device;
 pub mod driver;
 pub mod memory;
+pub mod meta;
 pub mod object;
+pub mod paging;
 pub mod performance;
+pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod meta;
-pub mod paging;
-pub mod policy_mechanism;
 
 pub use boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -29,16 +29,14 @@ pub use linux_absorb::{
     SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use meta::{
+    ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
+    MetaKernel, MicroDriver, NetPod,
+};
+pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
+pub use policy_mechanism::{
+    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
+    ResourceBroker,
+};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use meta::{
-    MetaKernel, KernelPersona, KernelPlugin, KernelPluginManager, MicroDriver,
-    ABIManager, NetPod, KernelGraph, LegacyScheduler,
-};
-pub use paging::{
-    PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2,
-};
-pub use policy_mechanism::{
-    ResourceBroker, PolicyManager, ProtectionDomain, InterruptMechanism, FastPathIpc,
-    PrivilegeLevel, PolicyError,
-};

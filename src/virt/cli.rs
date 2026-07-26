@@ -468,4 +468,3 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
         self.stats
     }
 }
-

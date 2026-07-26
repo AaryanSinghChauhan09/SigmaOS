@@ -7,11 +7,11 @@ pub mod zero_trust;
 
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use wireless::{
-    WirelessDeviceID, WirelessType, WirelessError, WirelessDevice, SimpleWirelessDevice,
-    WirelessAuditor, WiFiConnection, SimpleWiFiConnection, WirelessManager, SimpleWirelessManager,
-    WirelessSecurity, SimpleWirelessSecurity,
+    SimpleWiFiConnection, SimpleWirelessDevice, SimpleWirelessManager, SimpleWirelessSecurity,
+    WiFiConnection, WirelessAuditor, WirelessDevice, WirelessDeviceID, WirelessError,
+    WirelessManager, WirelessSecurity, WirelessType,
 };
 pub use zero_trust::{
-    PolicyID, NetworkAction, NetworkPolicy, PolicyInfo, PolicyCapability, SimpleNetworkPolicy,
-    ZeroTrustEngine, ZeroTrustError, ZeroTrustStats, SimpleZeroTrustEngine, EngineCapability,
+    EngineCapability, NetworkAction, NetworkPolicy, PolicyCapability, PolicyID, PolicyInfo,
+    SimpleNetworkPolicy, SimpleZeroTrustEngine, ZeroTrustEngine, ZeroTrustError, ZeroTrustStats,
 };

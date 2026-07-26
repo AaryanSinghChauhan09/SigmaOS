@@ -408,7 +408,16 @@ impl ShellRepl {
                 if action == "list" || action == "status" && service.is_empty() {
                     let mut list_str = "UNIT                ACTIVE   SUB\n".to_string();
                     for (s, st) in &self.services {
-                        list_str.push_str(&format!("{:<20} {}  {}\n", s, if st == "Running" { "active" } else { "inactive" }, st));
+                        list_str.push_str(&format!(
+                            "{:<20} {}  {}\n",
+                            s,
+                            if st == "Running" {
+                                "active"
+                            } else {
+                                "inactive"
+                            },
+                            st
+                        ));
                     }
                     Ok(list_str)
                 } else if action == "start" {
@@ -416,18 +425,33 @@ impl ShellRepl {
                         self.services.insert(service.clone(), "Running".to_string());
                         Ok(format!("Started {} service.", service))
                     } else {
-                        Err(format!("Failed to start {}.service: Unit not found.", service))
+                        Err(format!(
+                            "Failed to start {}.service: Unit not found.",
+                            service
+                        ))
                     }
                 } else if action == "stop" {
                     if self.services.contains_key(&service) {
                         self.services.insert(service.clone(), "Stopped".to_string());
                         Ok(format!("Stopped {} service.", service))
                     } else {
-                        Err(format!("Failed to stop {}.service: Unit not found.", service))
+                        Err(format!(
+                            "Failed to stop {}.service: Unit not found.",
+                            service
+                        ))
                     }
                 } else if action == "status" {
                     if let Some(status) = self.services.get(&service) {
-                        Ok(format!("● {}.service\n   Active: {} ({})\n   Main PID: 1234", service, if status == "Running" { "active" } else { "inactive" }, status))
+                        Ok(format!(
+                            "● {}.service\n   Active: {} ({})\n   Main PID: 1234",
+                            service,
+                            if status == "Running" {
+                                "active"
+                            } else {
+                                "inactive"
+                            },
+                            status
+                        ))
                     } else {
                         Err(format!("Unit {}.service could not be found.", service))
                     }
@@ -435,7 +459,10 @@ impl ShellRepl {
                     Err(format!("systemctl: Unknown action '{}'", action))
                 }
             }
-            ShellCommand::Apt { subcommand, package } => {
+            ShellCommand::Apt {
+                subcommand,
+                package,
+            } => {
                 if subcommand == "update" {
                     Ok("Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease\n\
                         Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease\n\
@@ -458,7 +485,14 @@ impl ShellRepl {
                             .to_string())
                     } else {
                         let mut results = Vec::new();
-                        let all_packages = ["sigma-sh", "sigma-vim", "sigma-curl", "sigma-gcc", "sigma-git", "sigma-python"];
+                        let all_packages = [
+                            "sigma-sh",
+                            "sigma-vim",
+                            "sigma-curl",
+                            "sigma-gcc",
+                            "sigma-git",
+                            "sigma-python",
+                        ];
                         for pkg in &all_packages {
                             if pkg.contains(&query) {
                                 results.push(format!("{} - Package matching query", pkg));
@@ -471,16 +505,20 @@ impl ShellRepl {
                         }
                     }
                 } else if subcommand == "install" {
-                    let pkg = package.ok_or_else(|| "apt: Please specify a package to install".to_string())?;
+                    let pkg = package
+                        .ok_or_else(|| "apt: Please specify a package to install".to_string())?;
                     self.installed_packages.insert(pkg.clone());
-                    Ok(format!("Reading package lists...\n\
+                    Ok(format!(
+                        "Reading package lists...\n\
                                 Building dependency tree...\n\
                                 The following NEW packages will be installed:\n\
                                   {}\n\
                                 Preparing to unpack ...\n\
                                 Unpacking {} ...\n\
                                 Setting up {} ...\n\
-                                Successfully installed.", pkg, pkg, pkg))
+                                Successfully installed.",
+                        pkg, pkg, pkg
+                    ))
                 } else {
                     Err(format!("apt: Unknown command '{}'", subcommand))
                 }

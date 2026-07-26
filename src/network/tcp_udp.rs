@@ -2,7 +2,6 @@
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
@@ -10,15 +9,35 @@ pub type Port = u16;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Protocol { TCP = 0, UDP = 1 }
+pub enum Protocol {
+    TCP = 0,
+    UDP = 1,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3, InvalidParameter = 4 }
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+    InvalidParameter = 4,
+}
 
 pub trait Socket {
     fn id(&self) -> SocketID;
@@ -431,7 +450,14 @@ impl NetfilterFirewall {
         self.rules.push(rule);
     }
 
-    pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
+    pub fn match_packet(
+        &self,
+        chain: NetfilterChain,
+        src: [u8; 4],
+        dest: [u8; 4],
+        proto: Protocol,
+        port: Port,
+    ) -> NetfilterAction {
         for rule in &self.rules {
             if rule.chain == chain
                 && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
@@ -505,7 +531,9 @@ impl Default for RoutingTable {
 
 impl RoutingTable {
     pub fn new() -> Self {
-        RoutingTable { entries: Vec::new() }
+        RoutingTable {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_route(&mut self, entry: RoutingEntry) {
@@ -520,7 +548,9 @@ impl RoutingTable {
             let mut matches = true;
             let mut mask_ones = 0;
             for i in 0..4 {
-                if (dest_ip[i] & entry.subnet_mask[i]) != (entry.dest_network[i] & entry.subnet_mask[i]) {
+                if (dest_ip[i] & entry.subnet_mask[i])
+                    != (entry.dest_network[i] & entry.subnet_mask[i])
+                {
                     matches = false;
                     break;
                 }
@@ -587,7 +617,12 @@ impl EpollInstance {
         }
     }
 
-    pub fn ctl(&mut self, op: EpollOp, fd: SocketID, event: EpollEvent) -> Result<(), NetworkError> {
+    pub fn ctl(
+        &mut self,
+        op: EpollOp,
+        fd: SocketID,
+        event: EpollEvent,
+    ) -> Result<(), NetworkError> {
         match op {
             EpollOp::Add => {
                 self.watched_sockets.push((fd, event));
@@ -713,10 +748,20 @@ impl<T> Default for Vec<T> {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -728,13 +773,25 @@ impl<T> Vec<T> {
             }
         }
     }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+        VecIter {
+            vec: self,
+            index: 0,
+        }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
@@ -746,14 +803,21 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
                     if write_idx != i {
-                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
                     }
                     write_idx += 1;
                 }
@@ -940,11 +1004,23 @@ mod tests {
         fw.add_rule(rule);
 
         // Packet matches rule: should be dropped
-        let action = fw.match_packet(NetfilterChain::Input, [192, 168, 1, 100], [10, 0, 0, 1], Protocol::TCP, 22);
+        let action = fw.match_packet(
+            NetfilterChain::Input,
+            [192, 168, 1, 100],
+            [10, 0, 0, 1],
+            Protocol::TCP,
+            22,
+        );
         assert_eq!(action, NetfilterAction::Drop);
 
         // Different IP: should be accepted (by default policy)
-        let action_other = fw.match_packet(NetfilterChain::Input, [192, 168, 1, 101], [10, 0, 0, 1], Protocol::TCP, 22);
+        let action_other = fw.match_packet(
+            NetfilterChain::Input,
+            [192, 168, 1, 101],
+            [10, 0, 0, 1],
+            Protocol::TCP,
+            22,
+        );
         assert_eq!(action_other, NetfilterAction::Accept);
     }
 
@@ -970,7 +1046,10 @@ mod tests {
     #[test]
     fn test_epoll_event_loop() {
         let mut epoll = EpollInstance::new(1);
-        let event = EpollEvent { events: 1, data: 999 };
+        let event = EpollEvent {
+            events: 1,
+            data: 999,
+        };
         epoll.ctl(EpollOp::Add, 10, event).unwrap();
 
         let mut events_out = [EpollEvent { events: 0, data: 0 }; 4];
