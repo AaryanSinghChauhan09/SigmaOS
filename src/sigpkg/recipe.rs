@@ -38,6 +38,12 @@ impl RecipeManager {
     }
 }
 
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Declarative package recipes.
 pub struct PackageRecipe {
     pub name: String,
@@ -58,24 +64,23 @@ pub struct PackageRecipe {
 }
 
 impl PackageRecipe {
-    pub fn new(
-        name: &'static str,
-        major: u32,
-        minor: u32,
-        patch: u32,
-        url: &'static str,
-        dependencies: &'static [&'static str],
-    ) -> Self {
+    pub fn new(name: String, version: Version) -> Self {
         PackageRecipe {
             name,
-            version: Version {
-                major,
-                minor,
-                patch,
-            },
-            source_url: url,
-            checksum: [0; 32], // Stub checksum
-            dependencies,
+            version,
+            description: String::new(),
+            build_system: BuildSystem::Cargo,
+            dependencies: Vec::new(),
+            source_url: String::new(),
+            hash: String::new(),
+            build_commands: Vec::new(),
+            install_commands: Vec::new(),
+            environment: HashMap::new(),
+            pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "MIT".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -163,38 +168,11 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
+            BuildSystem::Custom => "make".to_string(),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    CMake,
-    Make,
-    Custom,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    NotFound,
-    InvalidSyntax,
-    SerializationError,
-}
-
-pub struct RecipeManager;
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[cfg(test)]
 mod tests {
