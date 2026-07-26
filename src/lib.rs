@@ -89,6 +89,8 @@ pub use automation::{
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
+    LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata,
+    LocalSendSession,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
