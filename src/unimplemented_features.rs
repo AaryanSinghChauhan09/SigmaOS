@@ -1114,274 +1114,216 @@ impl UnifiedPackageManager {
 }
 
 // =========================================================================
-// CACHY LINUX INSPIRED BORE SCHEDULER & MICROARCHITECTURE PARSER
+// 17. FEDORA-STYLE MANDATORY ACCESS CONTROL (SELINUX PARITY)
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct BoreTask {
-    pub pid: u32,
-    pub burst_score: u32, // high burst = CPU hog, low burst = interactive
-    pub priority: u32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SecurityContextClass {
+    Process,
+    File,
+    Port,
 }
 
-pub struct CachyBoreScheduler {
-    pub tasks: Vec<BoreTask>,
-    pub base_timeslice_ms: u32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SecurityContext {
+    pub user: &'static str,
+    pub role: &'static str,
+    pub domain_type: &'static str,
 }
 
-impl CachyBoreScheduler {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MacPermission {
+    Read,
+    Write,
+    Execute,
+    Bind,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct AccessVectorCacheEntry {
+    pub subject_context: SecurityContext,
+    pub object_context: SecurityContext,
+    pub class: SecurityContextClass,
+    pub permission: MacPermission,
+    pub allowed: bool,
+}
+
+pub struct FedoraSELinuxMacEngine {
+    pub avc: [Option<AccessVectorCacheEntry>; 16],
+}
+
+impl FedoraSELinuxMacEngine {
     pub fn new() -> Self {
-        Self {
-            tasks: Vec::new(),
-            base_timeslice_ms: 10,
-        }
+        Self { avc: [None; 16] }
     }
 
-    pub fn register_task(&mut self, pid: u32, priority: u32) {
-        self.tasks.push(BoreTask {
-            pid,
-            burst_score: 0,
-            priority,
-        });
-    }
-
-    /// Logs runtime cpu burst periods, updating the dynamic interactive multiplier
-    pub fn log_cpu_burst(&mut self, pid: u32, burst_ms: u32) {
-        for t in &mut self.tasks {
-            if t.pid == pid {
-                t.burst_score = (t.burst_score + burst_ms).min(100);
-            }
-        }
-    }
-
-    /// Evaluates dynamic scheduler timeslices, allocating wider windows to highly responsive/interactive tasks (BORE-style)
-    pub fn get_allocated_timeslice(&self, pid: u32) -> u32 {
-        for t in &self.tasks {
-            if t.pid == pid {
-                // Low burst tasks (interactive) get a latency multiplier/bonus
-                let interactive_bonus = 100 - t.burst_score;
-                return self.base_timeslice_ms + (interactive_bonus / 10);
-            }
-        }
-        self.base_timeslice_ms
-    }
-}
-
-impl Default for CachyBoreScheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MicroarchitectureLevel {
-    V1, // Basic x86_64
-    V2, // SSE4.2, SSSE3, popcnt
-    V3, // AVX, AVX2, BMI2, FMA
-    V4, // AVX-512
-}
-
-pub struct CpuMicroarchitectureSelector {
-    pub supported_level: MicroarchitectureLevel,
-}
-
-impl CpuMicroarchitectureSelector {
-    pub fn new(level: MicroarchitectureLevel) -> Self {
-        Self {
-            supported_level: level,
-        }
-    }
-
-    /// Checks if a dynamic compilation path can use AVX-512 or AVX2 optimized loops (Cachy Linux style)
-    pub fn can_use_avx512(&self) -> bool {
-        self.supported_level == MicroarchitectureLevel::V4
-    }
-
-    pub fn can_use_avx2(&self) -> bool {
-        self.supported_level == MicroarchitectureLevel::V3
-            || self.supported_level == MicroarchitectureLevel::V4
-    }
-}
-
-// =========================================================================
-// 17. SOVEREIGN REAL-TIME LOCK-FREE AUDIO ENGINE
-// =========================================================================
-
-pub const AUDIO_BUFFER_SIZE: usize = 128;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AudioTrack {
-    pub id: u32,
-    pub volume: u8, // 0 to 100
-    pub is_active: bool,
-}
-
-pub struct SovereignAudioEngine {
-    pub tracks: [Option<AudioTrack>; 8],
-    pub master_volume: u8,
-}
-
-impl SovereignAudioEngine {
-    pub fn new() -> Self {
-        Self {
-            tracks: [None; 8],
-            master_volume: 80,
-        }
-    }
-
-    pub fn register_track(&mut self, id: u32, volume: u8) -> Result<(), &'static str> {
-        for slot in self.tracks.iter_mut() {
+    pub fn register_rule(
+        &mut self,
+        subject: SecurityContext,
+        object: SecurityContext,
+        class: SecurityContextClass,
+        permission: MacPermission,
+        allowed: bool,
+    ) -> Result<(), &'static str> {
+        for slot in self.avc.iter_mut() {
             if slot.is_none() {
-                *slot = Some(AudioTrack {
-                    id,
-                    volume,
-                    is_active: true,
+                *slot = Some(AccessVectorCacheEntry {
+                    subject_context: subject,
+                    object_context: object,
+                    class,
+                    permission,
+                    allowed,
                 });
                 return Ok(());
             }
         }
-        Err("Audio engine tracks registry full")
+        Err("Mandatory Access Control Access Vector Cache rule limit exceeded")
     }
 
-    /// Synthesizes and mixes active audio tracks into a single real-time channel
-    pub fn synthesize_mix(&self, buffer: &mut [i16; AUDIO_BUFFER_SIZE]) {
-        for val in buffer.iter_mut() {
-            *val = 0;
+    pub fn check_permission(
+        &self,
+        subject: SecurityContext,
+        object: SecurityContext,
+        class: SecurityContextClass,
+        permission: MacPermission,
+    ) -> bool {
+        for slot in self.avc.iter() {
+            if let Some(ref entry) = slot {
+                if entry.subject_context == subject
+                    && entry.object_context == object
+                    && entry.class == class
+                    && entry.permission == permission
+                {
+                    return entry.allowed;
+                }
+            }
+        }
+        false // Default-Deny Security Model
+    }
+}
+
+// =========================================================================
+// 18. FEDORA-STYLE SERVICE UNIT DEPENDENCY STATE MACHINE (SYSTEMD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceState {
+    Stopped,
+    Starting,
+    Running,
+    Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SystemdService {
+    pub name: &'static str,
+    pub state: ServiceState,
+    pub dependencies: [&'static str; 4],
+    pub dep_count: usize,
+}
+
+pub struct FedoraSystemdSupervisor {
+    pub services: [Option<SystemdService>; 8],
+}
+
+impl FedoraSystemdSupervisor {
+    pub fn new() -> Self {
+        Self {
+            services: [None; 8],
+        }
+    }
+
+    pub fn register_service(&mut self, service: SystemdService) -> Result<(), &'static str> {
+        for slot in self.services.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(service);
+                return Ok(());
+            }
+        }
+        Err("Systemd supervisor service registration limit reached")
+    }
+
+    pub fn start_service(&mut self, name: &'static str) -> Result<(), &'static str> {
+        let mut service_idx = None;
+        for (idx, slot) in self.services.iter().enumerate() {
+            if let Some(ref s) = slot {
+                if s.name == name {
+                    service_idx = Some(idx);
+                    break;
+                }
+            }
         }
 
-        let mut active_count = 0;
-        for slot in self.tracks.iter() {
-            if let Some(ref track) = slot {
-                if track.is_active {
-                    active_count += 1;
-                    for i in 0..AUDIO_BUFFER_SIZE {
-                        let sample = (((i * (track.id as usize)) % 200) as i16) - 100;
-                        let scaled_sample = (sample as i32 * (track.volume as i32) / 100) as i16;
-                        buffer[i] = buffer[i].wrapping_add(scaled_sample);
+        let idx = service_idx.ok_or("Target systemd service not registered")?;
+
+        // Retrieve dependencies first
+        let deps = {
+            let s = self.services[idx].as_ref().unwrap();
+            if s.state == ServiceState::Running {
+                return Ok(());
+            }
+            s.dependencies
+        };
+        let dep_count = self.services[idx].as_ref().unwrap().dep_count;
+
+        // Verify dependencies are running first (parallel loading simulation)
+        for i in 0..dep_count {
+            let dep_name = deps[i];
+            let mut dep_running = false;
+            for other_slot in self.services.iter() {
+                if let Some(ref other) = other_slot {
+                    if other.name == dep_name && other.state == ServiceState::Running {
+                        dep_running = true;
+                        break;
                     }
                 }
             }
-        }
-
-        if active_count > 0 {
-            for val in buffer.iter_mut() {
-                *val = ((*val as i32) * (self.master_volume as i32) / 100) as i16;
+            if !dep_running {
+                self.services[idx].as_mut().unwrap().state = ServiceState::Failed;
+                return Err("Failed to start service: dependency not active");
             }
         }
-    }
-}
 
-impl Default for SovereignAudioEngine {
-    fn default() -> Self {
-        Self::new()
+        self.services[idx].as_mut().unwrap().state = ServiceState::Running;
+        Ok(())
     }
 }
 
 // =========================================================================
-// 18. AI-NATIVE PREDICTIVE MEMORY PREFETCHER
+// 19. FEDORA-STYLE DELTARPM PATCH BLOCK RECONSTRUCTION (DELTARPM PARITY)
 // =========================================================================
 
-#[derive(Debug, Clone, Copy)]
-pub struct MemoryAccessPattern {
-    pub page_index: usize,
-    pub timestamp_ns: u64,
+pub const DELTA_BLOCK_SIZE: usize = 128;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeltaRpmDiffBlock {
+    pub offset: usize,
+    pub patch_bytes: [u8; 16],
+    pub patch_len: usize,
 }
 
-pub struct SovereignAiPrefetcher {
-    pub access_history: [Option<MemoryAccessPattern>; 16],
-    pub write_idx: usize,
-}
+pub struct FedoraDeltaRpmEngine;
 
-impl SovereignAiPrefetcher {
-    pub fn new() -> Self {
-        Self {
-            access_history: [None; 16],
-            write_idx: 0,
+impl FedoraDeltaRpmEngine {
+    pub fn reconstruct_package(
+        base_package: &[u8],
+        diffs: &[DeltaRpmDiffBlock],
+        output_buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
+        if output_buffer.len() < base_package.len() {
+            return Err("Reconstruction buffer overflow: output space too small");
         }
-    }
+        output_buffer[..base_package.len()].copy_from_slice(base_package);
 
-    pub fn record_access(&mut self, page_index: usize, timestamp_ns: u64) {
-        self.access_history[self.write_idx] = Some(MemoryAccessPattern {
-            page_index,
-            timestamp_ns,
-        });
-        self.write_idx = (self.write_idx + 1) % 16;
-    }
-
-    /// Dynamically predicts the next page to pre-fetch using memory sequence gradients
-    pub fn predict_next_page(&self) -> Option<usize> {
-        let mut last_page = None;
-        let mut second_last_page = None;
-
-        let mut checked = 0;
-        let mut idx = if self.write_idx == 0 { 15 } else { self.write_idx - 1 };
-
-        while checked < 2 {
-            if let Some(pattern) = self.access_history[idx] {
-                if last_page.is_none() {
-                    last_page = Some(pattern.page_index);
-                } else if second_last_page.is_none() {
-                    second_last_page = Some(pattern.page_index);
-                }
+        for diff in diffs {
+            if diff.offset + diff.patch_len > output_buffer.len() {
+                return Err("Corrupt DeltaRPM block: patch offset exceeds bounds");
             }
-            idx = if idx == 0 { 15 } else { idx - 1 };
-            checked += 1;
+            output_buffer[diff.offset..diff.offset + diff.patch_len]
+                .copy_from_slice(&diff.patch_bytes[..diff.patch_len]);
         }
 
-        if let (Some(last), Some(second)) = (last_page, second_last_page) {
-            if last > second {
-                let diff = last - second;
-                return Some(last + diff);
-            } else if last < second {
-                let diff = second - last;
-                if last >= diff {
-                    return Some(last - diff);
-                }
-            }
-        }
-        None
-    }
-}
-
-impl Default for SovereignAiPrefetcher {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 19. CRYPTOGRAPHIC MERKLE VIRTUAL FILE SYSTEM ENFORCER
-// =========================================================================
-
-pub struct SovereignMerkleVfs {
-    pub block_hashes: [[u8; 16]; 8],
-    pub root_hash: [u8; 16],
-}
-
-impl SovereignMerkleVfs {
-    pub fn new(leaves: [[u8; 16]; 8]) -> Self {
-        let mut root = [0u8; 16];
-        for leaf in leaves.iter() {
-            for i in 0..16 {
-                root[i] ^= leaf[i];
-            }
-        }
-        Self {
-            block_hashes: leaves,
-            root_hash: root,
-        }
-    }
-
-    /// Verifies system block integrity against the live Merkle root in sub-microsecond bounds
-    pub fn verify_block_integrity(&self, block_idx: usize, block_data: &[u8]) -> bool {
-        if block_idx >= 8 {
-            return false;
-        }
-        let mut computed_hash = [0u8; 16];
-        for (i, &byte) in block_data.iter().enumerate() {
-            computed_hash[i % 16] ^= byte.wrapping_add(i as u8);
-        }
-        computed_hash == self.block_hashes[block_idx]
+        Ok(base_package.len())
     }
 }
 
@@ -1705,96 +1647,92 @@ mod tests {
     }
 
     #[test]
-    fn test_cachy_bore_scheduler() {
-        let mut scheduler = CachyBoreScheduler::new();
-        scheduler.register_task(101, 5);
-        scheduler.register_task(102, 10);
+    fn test_fedora_selinux_mac() {
+        let mut engine = FedoraSELinuxMacEngine::new();
+        let s_context = SecurityContext {
+            user: "unconfined_u",
+            role: "unconfined_r",
+            domain_type: "unconfined_t",
+        };
+        let o_context = SecurityContext {
+            user: "system_u",
+            role: "object_r",
+            domain_type: "httpd_sys_content_t",
+        };
 
-        // Intitially both tasks have 0 burst, getting the max interactive bonus timeslice
-        assert_eq!(scheduler.get_allocated_timeslice(101), 20);
+        assert!(engine
+            .register_rule(
+                s_context,
+                o_context,
+                SecurityContextClass::File,
+                MacPermission::Read,
+                true
+            )
+            .is_ok());
 
-        // Process 101 logs some CPU-burst hogging activity
-        scheduler.log_cpu_burst(101, 50);
-        // Interactive bonus is reduced, timeslice is narrower
-        assert_eq!(scheduler.get_allocated_timeslice(101), 15);
+        assert!(engine.check_permission(
+            s_context,
+            o_context,
+            SecurityContextClass::File,
+            MacPermission::Read
+        ));
+        assert!(!engine.check_permission(
+            s_context,
+            o_context,
+            SecurityContextClass::File,
+            MacPermission::Write
+        ));
     }
 
     #[test]
-    fn test_cpu_microarchitecture_levels() {
-        let v3_cpu = CpuMicroarchitectureSelector::new(MicroarchitectureLevel::V3);
-        assert!(v3_cpu.can_use_avx2());
-        assert!(!v3_cpu.can_use_avx512());
+    fn test_fedora_systemd_supervisor() {
+        let mut supervisor = FedoraSystemdSupervisor::new();
+        let db_service = SystemdService {
+            name: "postgresql",
+            state: ServiceState::Running,
+            dependencies: [""; 4],
+            dep_count: 0,
+        };
+        let app_service = SystemdService {
+            name: "web_app",
+            state: ServiceState::Stopped,
+            dependencies: {
+                let mut d = [""; 4];
+                d[0] = "postgresql";
+                d
+            },
+            dep_count: 1,
+        };
 
-        let v4_cpu = CpuMicroarchitectureSelector::new(MicroarchitectureLevel::V4);
-        assert!(v4_cpu.can_use_avx2());
-        assert!(v4_cpu.can_use_avx512());
+        assert!(supervisor.register_service(db_service).is_ok());
+        assert!(supervisor.register_service(app_service).is_ok());
+
+        assert!(supervisor.start_service("web_app").is_ok());
+        assert_eq!(
+            supervisor.services[1].as_ref().unwrap().state,
+            ServiceState::Running
+        );
     }
 
     #[test]
-    fn test_sovereign_audio_engine() {
-        let mut engine = SovereignAudioEngine::new();
-        assert!(engine.register_track(1, 90).is_ok());
-        assert!(engine.register_track(2, 50).is_ok());
-        assert_eq!(engine.tracks[0].as_ref().unwrap().id, 1);
+    fn test_fedora_deltarpm_reconstruction() {
+        let base_pkg = [0x11, 0x22, 0x33, 0x44, 0x55];
+        let diffs = [DeltaRpmDiffBlock {
+            offset: 2,
+            patch_bytes: {
+                let mut b = [0u8; 16];
+                b[0] = 0x99;
+                b[1] = 0x88;
+                b
+            },
+            patch_len: 2,
+        }];
 
-        let mut buffer = [0i16; AUDIO_BUFFER_SIZE];
-        engine.synthesize_mix(&mut buffer);
+        let mut reconstructed = [0u8; 16];
+        let len = FedoraDeltaRpmEngine::reconstruct_package(&base_pkg, &diffs, &mut reconstructed)
+            .unwrap();
 
-        // Mix must produce active non-zero samples
-        let mut non_zero = false;
-        for &sample in &buffer {
-            if sample != 0 {
-                non_zero = true;
-                break;
-            }
-        }
-        assert!(non_zero);
-    }
-
-    #[test]
-    fn test_sovereign_ai_prefetcher() {
-        let mut prefetcher = SovereignAiPrefetcher::new();
-
-        // Sequence: page 100, page 101, page 102
-        prefetcher.record_access(100, 1000);
-        prefetcher.record_access(101, 2000);
-
-        let prediction = prefetcher.predict_next_page();
-        assert_eq!(prediction, Some(102));
-
-        // Decreasing sequence: page 200, page 198, page 196
-        prefetcher.record_access(200, 3000);
-        prefetcher.record_access(198, 4000);
-
-        let prediction_down = prefetcher.predict_next_page();
-        assert_eq!(prediction_down, Some(196));
-    }
-
-    #[test]
-    fn test_sovereign_merkle_vfs() {
-        let mut leaves = [[0u8; 16]; 8];
-        leaves[0] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-
-        let vfs = SovereignMerkleVfs::new(leaves);
-
-        // Verify root matches XOR accumulator
-        assert_eq!(vfs.root_hash, leaves[0]);
-
-        // Verify correct block hash matches computed data hash
-        let mut block_data = [0u8; 32];
-        block_data[0] = 1;
-        block_data[1] = 1; // Compute some hash
-
-        let mut leaf_hash = [0u8; 16];
-        for (i, &byte) in block_data.iter().enumerate() {
-            leaf_hash[i % 16] ^= byte.wrapping_add(i as u8);
-        }
-
-        let mut test_leaves = [[0u8; 16]; 8];
-        test_leaves[2] = leaf_hash;
-
-        let active_vfs = SovereignMerkleVfs::new(test_leaves);
-        assert!(active_vfs.verify_block_integrity(2, &block_data));
-        assert!(!active_vfs.verify_block_integrity(2, b"COMPROMISED_DATA"));
+        assert_eq!(len, 5);
+        assert_eq!(reconstructed[..5], [0x11, 0x22, 0x99, 0x88, 0x55]);
     }
 }

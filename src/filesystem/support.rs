@@ -70,16 +70,15 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        let raw = self.fs_type.load(Ordering::SeqCst);
-        match raw {
+        match self.fs_type.load(Ordering::SeqCst) {
+            0 => FilesystemType::Ext4,
             1 => FilesystemType::Btrfs,
             2 => FilesystemType::ZFS,
             3 => FilesystemType::Fat32,
             4 => FilesystemType::APFS,
             5 => FilesystemType::SovereignP2P,
             6 => FilesystemType::EncryptedFS,
-            7 => FilesystemType::CompressedFS,
-            _ => FilesystemType::Ext4,
+            _ => FilesystemType::CompressedFS,
         }
     }
 

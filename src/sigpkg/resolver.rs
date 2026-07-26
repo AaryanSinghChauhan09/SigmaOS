@@ -195,8 +195,8 @@ mod tests {
                 name: "A".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            String::new(),
-        );
+            checksum: String::new(),
+        };
 
         solver.add_package(pkg_a);
         solver.add_package(pkg_b);

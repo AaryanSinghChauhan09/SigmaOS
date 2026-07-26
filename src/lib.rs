@@ -15,6 +15,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -145,7 +146,7 @@ pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    ContentAddressedStore, CryptoVerifier, PackageRecipe,
     SatSolver, Transaction,
 };
 pub use virtualization::{

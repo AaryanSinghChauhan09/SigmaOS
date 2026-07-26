@@ -121,10 +121,9 @@ pub struct ShellRepl {
 impl ShellRepl {
     pub fn new() -> Self {
         let mut services = std::collections::HashMap::new();
+        services.insert("cron".to_string(), "Running".to_string());
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
-
         Self {
             running: true,
             variables: std::collections::HashMap::new(),

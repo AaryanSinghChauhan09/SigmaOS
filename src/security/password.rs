@@ -433,17 +433,9 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
-
-        let mut state = if seed == 0 {
-            0x1234_5678_9ABC_DEF0
-        } else {
-            seed
-        };
-        let mut password = String::new();
-
-        let mut password = String::new();
         for _ in 0..length {
-            let index = (rand::random::<u64>() as usize) % charset.len();
+            let rand_val: u64 = rand::random();
+            let index = (rand_val as usize) % charset.len();
             password.push(charset[index] as char);
         }
 

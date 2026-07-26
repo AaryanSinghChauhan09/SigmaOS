@@ -33,23 +33,6 @@ pub enum PrivilegeLevel {
     User = 3,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageSize {
-    Standard4KB,
-    Huge2MB,
-    Giant1GB,
-}
-
-impl PageSize {
-    pub fn byte_size(&self) -> usize {
-        match self {
-            PageSize::Standard4KB => 4096,
-            PageSize::Huge2MB => 2 * 1024 * 1024,
-            PageSize::Giant1GB => 1024 * 1024 * 1024,
-        }
-    }
-}
-
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
     fn is_writable(&self) -> bool;
@@ -546,23 +529,11 @@ impl VirtualMemoryManager for SimpleVMM {
             if !pdpt_entry.is_present() {
                 return None;
             }
-            
-            // If PDPT entry is marked as giant page
-            if pdpt_entry.is_giant() {
-                let page_offset = virt & 0x3FFFFFFF; // 1GB offset
-                return Some(pdpt_entry.get_physical_address() | page_offset);
-            }
 
             if let Some(ref pd) = self.pd_tables[pdpt_idx] {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
-                }
-                
-                // If PD entry is marked as huge page
-                if pd_entry.is_huge() {
-                    let page_offset = virt & 0x1FFFFF; // 2MB offset
-                    return Some(pd_entry.get_physical_address() | page_offset);
                 }
 
                 if let Some(ref pt) = self.pt_tables[pd_idx] {

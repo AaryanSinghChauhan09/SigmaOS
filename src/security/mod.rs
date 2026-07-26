@@ -17,20 +17,27 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel, XorEncryption,
 };
-pub use forensics::{
-    DecoyHoneyPot, ForensicAnalyzer, KaliSnifferAudit, PassComplexityAuditor, RecoveredFile,
-    SigmaPortScanner,
-};
-pub use integrity::{IntegrityError, IntegrityMonitor, SimpleIntegrityMonitor};
+pub use integrity::{File, IntegrityError, IntegrityMonitor, IntegrityStatus, SimpleIntegrityMonitor};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
-pub use mac::{MACEngine, MACPolicy, SimpleMACEngine};
+pub use mac::{MACEngine, MACPolicy, SecurityContext as MacSecurityContext, SimpleMACEngine};
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pki::{Certificate, PKIError, PKIManager, SimplePKIManager};
+pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
+pub use secrets::{Keyring, Secret, SecretType};
+pub use vault::{
+    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
+    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
+    VaultResult,
+};
+pub use vpn::{
+    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
+    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    WireGuardHandler,
+};
+pub use vulnerability::{Vulnerability, VulnerabilityScanner};
