@@ -23,7 +23,14 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod unimplemented_features;
 pub mod virtualization;
+
+pub use unimplemented_features::{
+    UniversalAbiTranslator, SigmaFsPlus, SelfHealingKernel, AiNativeRuntime,
+    EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
+    CrossDeviceContinuity, GuestOsType, FsPluginType, ModelType, ContinuationTask,
+};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
