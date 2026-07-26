@@ -1198,7 +1198,8 @@ impl CpuMicroarchitectureSelector {
     }
 
     pub fn can_use_avx2(&self) -> bool {
-        self.supported_level == MicroarchitectureLevel::V3 || self.supported_level == MicroarchitectureLevel::V4
+        self.supported_level == MicroarchitectureLevel::V3
+            || self.supported_level == MicroarchitectureLevel::V4
     }
 }
 

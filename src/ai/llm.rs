@@ -241,32 +241,14 @@ impl LocalLlmEngine {
             _ => "Generated response placeholder".to_string(),
         };
 
-        let mut response = InferenceResponse::new(text_output, 10, 100);
+        // For now, return a placeholder response
+        let start_time = 0; // Would use actual timing
 
-        // Simulate automatic tool trigger if tools are registered in request
-        if !request.tools.is_empty() {
-            let mut calls = Vec::new();
-            for tool in &request.tools {
-                if request.prompt.contains(&tool.name) {
-                    calls.push(ToolCall {
-                        id: "call_9999".to_string(),
-                        name: tool.name.clone(),
-                        arguments_json: "{\"param\": \"simulated_arg_val\"}".to_string(),
-                    });
-                }
-            }
-            response = response.with_tool_calls(calls);
-        }
-        
-        Ok(response)
-    }
-
-    /// Vercel AI SDK style generateObject: guarantees output conforms to structured JSON format
-    pub fn generate_object(&self, prompt: &str) -> Result<String, String> {
-        let request = InferenceRequest::new(prompt.to_string())
-            .with_format(InferenceFormat::Json);
-        let resp = self.infer(&request)?;
-        Ok(resp.text)
+        Ok(InferenceResponse::new(
+            "Generated response placeholder".to_string(),
+            10,
+            100,
+        ))
     }
 
     /// Run batched inference

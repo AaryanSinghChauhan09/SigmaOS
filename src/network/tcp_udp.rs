@@ -8,7 +8,15 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type SocketID = usize;
 pub type Port = u16;
 
-#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketOption {
+    ReuseAddr,
+    TcpNoDelay,
+    RcvBuf,
+    SndBuf,
+}
+
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
     TCP = 0,
@@ -28,37 +36,6 @@ pub enum TCPState {
     CloseWait = 7,
     Closing = 8,
     TimeWait = 9,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum NetworkError {
-    Success = 0,
-    InvalidSocket = 1,
-    ConnectionFailed = 2,
-    SendFailed = 3,
-    InvalidParameter = 4,
-}
-
-pub trait Socket {
-    fn id(&self) -> SocketID;
-    fn protocol(&self) -> Protocol;
-    fn local_port(&self) -> Port;
-    fn remote_port(&self) -> Port;
-}
-
-/// Linux BSD Socket Option Interface
-pub trait BsdSocket: Socket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SocketOption {
-    ReuseAddr,
-    TcpNoDelay,
-    RcvBuf,
-    SndBuf,
 }
 
 #[repr(C)]
