@@ -187,6 +187,17 @@ mod tests {
             checksum: String::new(),
         };
 
+        let pkg_b = Package::new(
+            "B".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
+                name: "B".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
+            checksum: String::new(),
+        };
+
         let pkg_b = Package {
             name: "B".to_string(),
             version: Version::new(1, 0, 0),
