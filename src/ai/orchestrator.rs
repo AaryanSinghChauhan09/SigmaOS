@@ -11,8 +11,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
 
-<<<<<<< HEAD
-=======
 /// Knowledge Distillation: Replicates frontier system outputs to optimize smaller "student" models
 pub struct KnowledgeDistillation {
     pub student_id: AgentID,
@@ -87,7 +85,6 @@ impl SparseAttention {
 }
 
 #[repr(C)]
->>>>>>> origin/improve-os-architecture-13148548228877311559
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentState {
     Idle = 0,
