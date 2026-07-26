@@ -102,7 +102,7 @@ The following algorithms and subsystems are structurally and logically complete:
    - Provides backwards-emulation spanning early Linux versions (0.01 to 2.4/2.5) with full sandbox layouts, driver shims, and package converts.
 
 8. **Proxy-Based Advanced Compatibility Subsystems (`src/compatibility/proxy.rs`)**
-   - Operational object-oriented proxy subsystems including KernelPersonalityProxy (`KernelProxy`), SyscallCompatibilityLedger2.0, DriverPersonalityProxyLayer, FirmwareEvolutionProxy, and PeripheralProxyPods.
+   - Introduces 8 object-oriented proxy subsystems: KernelPersonalityProxy (`KernelProxy`), SyscallCompatibilityLedger2.0, DriverPersonalityProxyLayer, FirmwareEvolutionProxy, PeripheralProxyPods, and the Lindows-style Win32 API translation shim (`LindowsWin32Translator`) with complete unit tests.
 
 ---
 

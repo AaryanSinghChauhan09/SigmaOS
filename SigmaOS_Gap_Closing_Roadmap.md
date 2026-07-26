@@ -66,7 +66,7 @@ The following milestone checklist tracks the current operational status of the c
 - [x] **Add user-defined FS plugins**
   - *Status:* Logically complete. The virtual filesystem (VFS) utilizes polymorphic inode trait abstractions allowing custom file-routing and permission-plugin extensions.
 - [x] **Implement ABI translator prototype**
-  - *Status:* Logically complete. The backwards-emulation proxy layers and historic Linux ABI shims in `src/compatibility/historic_linux.rs` and `src/compatibility/proxy.rs` successfully translate system calls dynamically.
+  - *Status:* Logically complete. The backwards-emulation proxy layers, Lindows-style Win32 translator, and historic Linux ABI shims in `src/compatibility/historic_linux.rs` and `src/compatibility/proxy.rs` successfully translate system calls dynamically.
 - [x] **Build continuity layer**
   - *Status:* Logically complete. The multi-device sync and cross-platform continuity interfaces are fully modeled with unit tests inside the unprivileged proxy frameworks.
 
