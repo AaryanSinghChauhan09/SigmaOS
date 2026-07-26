@@ -185,17 +185,11 @@ mod tests {
                 version_constraint: VersionConstraint::Any,
             }],
             checksum: String::new(),
-        };
-
-        let pkg_b = Package::new(
-            "B".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            vec![Dependency {
-                name: "B".to_string(),
-                version_constraint: VersionConstraint::Any,
-            }],
-            checksum: String::new(),
+            mirrors: vec![],
+            signing_keys: vec![],
+            licenses: vec![],
+            maintainers: vec![],
+            changelogs: vec![],
         };
 
         let pkg_b = Package {
@@ -207,6 +201,11 @@ mod tests {
                 version_constraint: VersionConstraint::Any,
             }],
             checksum: String::new(),
+            mirrors: vec![],
+            signing_keys: vec![],
+            licenses: vec![],
+            maintainers: vec![],
+            changelogs: vec![],
         };
 
         solver.add_package(pkg_a);
