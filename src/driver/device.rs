@@ -282,6 +282,286 @@ impl Device for SimpleBlockDevice {
     }
 }
 
+// ============================================================================
+// Multi-Device OOP Drivers Expansion
+// ============================================================================
+
+/// Unified GPU driver subclass (OOP Class)
+pub struct UnifiedGpuDriver {
+    pub descriptor: DeviceDescriptor,
+    pub width: u32,
+    pub height: u32,
+    pub vesa_modes: Vec<u32>,
+}
+
+impl UnifiedGpuDriver {
+    pub fn new(id: usize, name: &[u8]) -> Self {
+        let descriptor = DeviceDescriptor::new(id, name, DeviceType::Graphics, DeviceCapability::full());
+        Self {
+            descriptor,
+            width: 1024,
+            height: 768,
+            vesa_modes: Vec::new(),
+        }
+    }
+}
+
+impl Device for UnifiedGpuDriver {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Ready);
+        self.vesa_modes.push(0x117); // standard 1024x768 VESA mode
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        // Return active GPU width and height parameters as bytes
+        if buffer.len() >= 8 {
+            buffer[0..4].copy_from_slice(&self.width.to_ne_bytes());
+            buffer[4..8].copy_from_slice(&self.height.to_ne_bytes());
+            Ok(8)
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        // Direct pixel buffer draw emulations
+        Ok(buffer.len())
+    }
+
+    fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+        if command == 0x5001 {
+            // Update resolution width
+            self.width = arg as u32;
+            Ok(0)
+        } else {
+            Err(DeviceError::NotSupported)
+        }
+    }
+
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Graphics);
+        info.base_address = 0xE0000000;
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Shutdown);
+        Ok(())
+    }
+}
+
+/// Unified Audio driver subclass (OOP Class)
+pub struct UnifiedAudioDriver {
+    pub descriptor: DeviceDescriptor,
+    pub sample_rate_hz: u32,
+    pub volume_percent: u8,
+}
+
+impl UnifiedAudioDriver {
+    pub fn new(id: usize, name: &[u8]) -> Self {
+        let descriptor = DeviceDescriptor::new(id, name, DeviceType::Audio, DeviceCapability::full());
+        Self {
+            descriptor,
+            sample_rate_hz: 44100,
+            volume_percent: 80,
+        }
+    }
+}
+
+impl Device for UnifiedAudioDriver {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Ready);
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        // Record audio stream stub
+        Ok(buffer.len())
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        // Playback audio buffer
+        Ok(buffer.len())
+    }
+
+    fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+        if command == 0x3001 {
+            self.volume_percent = (arg as u8).min(100);
+            Ok(0)
+        } else {
+            Err(DeviceError::NotSupported)
+        }
+    }
+
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Audio);
+        info.irq = 5;
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Shutdown);
+        Ok(())
+    }
+}
+
+/// Unified Storage driver subclass (OOP Block Class)
+pub struct UnifiedStorageDriver {
+    pub descriptor: DeviceDescriptor,
+    pub payload: Vec<u8>,
+}
+
+impl UnifiedStorageDriver {
+    pub fn new(id: usize, name: &[u8]) -> Self {
+        let descriptor = DeviceDescriptor::new(id, name, DeviceType::Block, DeviceCapability::full());
+        let mut payload = Vec::new();
+        for _ in 0..1024 {
+            payload.push(0u8);
+        }
+        Self {
+            descriptor,
+            payload,
+        }
+    }
+}
+
+impl Device for UnifiedStorageDriver {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Ready);
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.payload.len());
+        buffer[..len].copy_from_slice(&self.payload.as_slice()[..len]);
+        Ok(len)
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.payload.len());
+        self.payload.as_mut_slice()[..len].copy_from_slice(&buffer[..len]);
+        Ok(len)
+    }
+
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Block);
+        info.base_address = 0x1F0;
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Shutdown);
+        Ok(())
+    }
+}
+
+impl BlockDevice for UnifiedStorageDriver {
+    fn read_block(&mut self, block: u64, buffer: &mut [u8]) -> Result<(), DeviceError> {
+        let offset = (block as usize) * 512;
+        if offset + buffer.len() > self.payload.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+        buffer.copy_from_slice(&self.payload.as_slice()[offset..(offset + buffer.len())]);
+        Ok(())
+    }
+
+    fn write_block(&mut self, block: u64, buffer: &[u8]) -> Result<(), DeviceError> {
+        let offset = (block as usize) * 512;
+        if offset + buffer.len() > self.payload.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+        self.payload.as_mut_slice()[offset..(offset + buffer.len())].copy_from_slice(buffer);
+        Ok(())
+    }
+
+    fn block_size(&self) -> usize {
+        512
+    }
+
+    fn total_blocks(&self) -> u64 {
+        2
+    }
+}
+
+/// Unified Network driver subclass (OOP Network Class)
+pub struct UnifiedNetworkDriver {
+    pub descriptor: DeviceDescriptor,
+    pub mac_addr: [u8; 6],
+    pub sent_packets_count: usize,
+}
+
+impl UnifiedNetworkDriver {
+    pub fn new(id: usize, name: &[u8]) -> Self {
+        let descriptor = DeviceDescriptor::new(id, name, DeviceType::Network, DeviceCapability::full());
+        Self {
+            descriptor,
+            mac_addr: [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E],
+            sent_packets_count: 0,
+        }
+    }
+}
+
+impl Device for UnifiedNetworkDriver {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Ready);
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Network);
+        info.irq = 11;
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        self.descriptor.set_state(DeviceState::Shutdown);
+        Ok(())
+    }
+}
+
+impl NetworkDevice for UnifiedNetworkDriver {
+    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DeviceError> {
+        if packet.is_empty() {
+            return Err(DeviceError::InvalidParameter);
+        }
+        self.sent_packets_count += 1;
+        Ok(())
+    }
+
+    fn receive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        if buffer.is_empty() {
+            return Err(DeviceError::InvalidParameter);
+        }
+        Ok(buffer.len())
+    }
+
+    fn get_mac_address(&self) -> [u8; 6] {
+        self.mac_addr
+    }
+
+    fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), DeviceError> {
+        self.mac_addr = mac;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -347,6 +627,61 @@ mod tests {
 
         // Test translated ioctl call
         assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
+    }
+
+    #[test]
+    fn test_unified_gpu_driver() {
+        let mut gpu = UnifiedGpuDriver::new(301, b"vesa_accelerated");
+        assert_eq!(gpu.descriptor.id, 301);
+        assert_eq!(gpu.width, 1024);
+
+        assert!(gpu.init().is_ok());
+        assert_eq!(gpu.vesa_modes[0], 0x117);
+
+        // Update resolution
+        assert!(gpu.ioctl(0x5001, 1920).is_ok());
+        assert_eq!(gpu.width, 1920);
+
+        let mut buf = [0u8; 8];
+        assert_eq!(gpu.read(&mut buf).unwrap(), 8);
+        assert!(gpu.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_unified_audio_driver() {
+        let mut audio = UnifiedAudioDriver::new(302, b"hd_audio");
+        assert!(audio.init().is_ok());
+        assert_eq!(audio.volume_percent, 80);
+
+        assert!(audio.ioctl(0x3001, 95).is_ok());
+        assert_eq!(audio.volume_percent, 95);
+        assert!(audio.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_unified_storage_driver() {
+        let mut disk = UnifiedStorageDriver::new(303, b"solid_state");
+        assert!(disk.init().is_ok());
+        assert_eq!(disk.block_size(), 512);
+
+        let write_buf = [0x55u8; 512];
+        assert!(disk.write_block(0, &write_buf).is_ok());
+
+        let mut read_buf = [0u8; 512];
+        assert!(disk.read_block(0, &mut read_buf).is_ok());
+        assert_eq!(read_buf, write_buf);
+        assert!(disk.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_unified_network_driver() {
+        let mut nic = UnifiedNetworkDriver::new(304, b"gigabit_ethernet");
+        assert!(nic.init().is_ok());
+        assert_eq!(nic.get_mac_address(), [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E]);
+
+        assert!(nic.send_packet(&[1u8; 64]).is_ok());
+        assert_eq!(nic.sent_packets_count, 1);
+        assert!(nic.shutdown().is_ok());
     }
 }
 

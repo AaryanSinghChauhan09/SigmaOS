@@ -23,6 +23,20 @@ pub mod device;
 pub mod distro;
 pub mod driver;
 pub mod drivers;
+
+pub use driver::{
+    Device as OopDevice, DeviceError as OopDeviceError, DeviceType as OopDeviceType,
+    DeviceInfo as OopDeviceInfo, DeviceCapability as OopDeviceCapability,
+    DeviceDescriptor as OopDeviceDescriptor, DeviceState as OopDeviceState,
+    BlockDevice as OopBlockDevice, CharacterDevice as OopCharacterDevice,
+    NetworkDevice as OopNetworkDevice, SimpleBlockDevice as OopSimpleBlockDevice,
+    SimpleCharacterDevice as OopSimpleCharacterDevice, DeviceManager as OopDeviceManager,
+    PortAddress as OopPortAddress, UnifiedPeripheral as OopUnifiedPeripheral,
+    LegacyDevice as OopLegacyDevice, ModernDevice as OopModernDevice,
+    DdeDeviceWrapper as OopDdeDeviceWrapper, UdfInterpreter as OopUdfInterpreter,
+    UnifiedGpuDriver as OopUnifiedGpuDriver, UnifiedAudioDriver as OopUnifiedAudioDriver,
+    UnifiedStorageDriver as OopUnifiedStorageDriver, UnifiedNetworkDriver as OopUnifiedNetworkDriver,
+};
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
