@@ -58,10 +58,16 @@ impl RecipeManager {
             .with_build_system(BuildSystem::Cargo)
             .with_source("https://github.com/BurntSushi/ripgrep".to_string(), "hash_ripgrep".to_string())
             .with_build_command("cargo build --release".to_string());
+        let almalinux_release = PackageRecipe::new("almalinux-release".to_string(), Version::new(9, 4, 0))
+            .with_description("AlmaLinux release file".to_string())
+            .with_build_system(BuildSystem::Custom)
+            .with_source("https://github.com/AlmaLinux/almalinux-release".to_string(), "hash_almalinux".to_string())
+            .with_build_command("echo 'Building AlmaLinux release'".to_string());
 
         let _ = manager.add_recipe(neofetch);
         let _ = manager.add_recipe(curl);
         let _ = manager.add_recipe(ripgrep);
+        let _ = manager.add_recipe(almalinux_release);
         manager
     }
 
@@ -256,8 +262,8 @@ mod tests {
             .with_build_command("cargo build".to_string());
 
         assert!(manager.add_recipe(recipe).is_ok());
-        // Includes 3 default distro-inspired recipes plus our test recipe
-        assert_eq!(manager.list_recipes().len(), 4);
+        // Includes 4 default distro-inspired recipes plus our test recipe
+        assert_eq!(manager.list_recipes().len(), 5);
     }
 
     #[test]

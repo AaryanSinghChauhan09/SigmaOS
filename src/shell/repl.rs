@@ -73,6 +73,10 @@ pub enum ShellCommand {
         subcommand: String,
         package: Option<String>,
     },
+    Dnf {
+        subcommand: String,
+        package: Option<String>,
+    },
     Theme {
         name: String,
     },
@@ -320,6 +324,22 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "dnf" | "yum" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let package = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Dnf {
+                        subcommand,
+                        package,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "set" => {
                 if parts.len() >= 3 {
                     ShellCommand::Set {
@@ -445,6 +465,7 @@ impl ShellRepl {
                    unalias - Remove an alias\n\
                    run     - Execute an automated macro/script variable\n\
                    agent   - Interface for AI Agent Automation tasks (register, list, run)\n\
+                   dnf     - Package manager for AlmaLinux (install, update, list)\n\
                    history - Show command execution history\n\
                    exit    - Exit the shell"
                 .to_string()),
@@ -577,6 +598,39 @@ impl ShellRepl {
                                 Successfully installed.", pkg, pkg, pkg))
                 } else {
                     Err(format!("apt: Unknown command '{}'", subcommand))
+                }
+            }
+            ShellCommand::Dnf { subcommand, package } => {
+                if subcommand == "check-update" || subcommand == "update" && package.is_none() {
+                    Ok("AlmaLinux x86_64 Repository                              12 kB/s | 3.8 kB     00:00\n\
+                        AlmaLinux BaseOS                                        45 kB/s | 4.3 MB     00:01\n\
+                        AlmaLinux AppStream                                     82 kB/s | 8.1 MB     00:01\n\
+                        AlmaLinux Extras                                        10 kB/s | 1.2 MB     00:00\n\
+                        Dependencies resolved.\n\
+                        Nothing to do. Complete!".to_string())
+                } else if subcommand == "install" {
+                    let pkg = package.ok_or_else(|| "dnf: Please specify a package to install".to_string())?;
+                    self.installed_packages.insert(pkg.clone());
+                    Ok(format!("AlmaLinux AppStream                                     82 kB/s | 8.1 MB     00:01\n\
+                                Resolving dependencies...\n\
+                                Running transaction check...\n\
+                                Transaction search completed.\n\
+                                To install:\n\
+                                  {}  noarch  1.0.0-1.el9  almalinux-appstream  124 k\n\
+                                Proceed with changes? [y/N]: y\n\
+                                Downloading Packages:\n\
+                                Running transaction test...\n\
+                                Installing {}...\n\
+                                Verifying {}...\n\
+                                Complete!", pkg, pkg, pkg))
+                } else if subcommand == "list" {
+                    let mut list_str = "Installed Packages\n".to_string();
+                    for pkg in &self.installed_packages {
+                        list_str.push_str(&format!("{:<20} 1.0.0-1.el9  @almalinux-appstream\n", pkg));
+                    }
+                    Ok(list_str)
+                } else {
+                    Err(format!("dnf: Unknown command '{}'", subcommand))
                 }
             }
             ShellCommand::Echo { message } => Ok(message),
@@ -829,5 +883,17 @@ mod tests {
         let run_res = repl.execute_command(run_cmd).unwrap();
         assert!(run_res.contains("[Agent Automation Run #1]"));
         assert!(run_res.contains("[Agent Automation Complete: Success]"));
+    }
+
+    #[test]
+    fn test_dnf_package_manager() {
+        let mut repl = ShellRepl::new();
+        let check_cmd = repl.parse_command("dnf check-update");
+        let res = repl.execute_command(check_cmd).unwrap();
+        assert!(res.contains("AlmaLinux"));
+
+        let install_cmd = repl.parse_command("dnf install almalinux-release");
+        let res_install = repl.execute_command(install_cmd).unwrap();
+        assert!(res_install.contains("Complete!"));
     }
 }
