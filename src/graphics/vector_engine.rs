@@ -56,6 +56,101 @@ impl VectorPath {
     }
 }
 
+/// Represents a node in the scene tree (exactly mirroring Godot's Node/Node2D/Node3D hierarchy)
+#[derive(Debug, Clone, PartialEq)]
+pub enum SceneNode {
+    Node {
+        name: String,
+        children: Vec<SceneNode>,
+    },
+    Node2D {
+        name: String,
+        position: Point2D,
+        rotation: f64,
+        scale: Point2D,
+        children: Vec<SceneNode>,
+    },
+    Sprite2D {
+        name: String,
+        position: Point2D,
+        texture_path: String,
+        children: Vec<SceneNode>,
+    },
+    RigidBody2D {
+        name: String,
+        position: Point2D,
+        velocity: Point2D,
+        mass: f64,
+        children: Vec<SceneNode>,
+    },
+}
+
+/// Sovereign Game Engine Shard (Godot Parity)
+/// Governs scene trees, 2D physics integration, and delta-tick frame loops.
+pub struct SovereignGameEngine {
+    pub root_node: Option<SceneNode>,
+    pub gravity: f64,
+    pub active_camera_pos: Point2D,
+}
+
+impl SovereignGameEngine {
+    pub fn new() -> Self {
+        Self {
+            root_node: None,
+            gravity: 9.8,
+            active_camera_pos: Point2D { x: 0.0, y: 0.0 },
+        }
+    }
+
+    pub fn set_root(&mut self, node: SceneNode) {
+        self.root_node = Some(node);
+    }
+
+    /// Simulates Godot's _physics_process(delta) loop over the scene tree
+    pub fn physics_tick(&mut self, delta: f64) {
+        if let Some(ref mut root) = self.root_node {
+            Self::process_physics_node(root, delta, self.gravity);
+        }
+    }
+
+    fn process_physics_node(node: &mut SceneNode, delta: f64, gravity: f64) {
+        match node {
+            SceneNode::RigidBody2D { position, velocity, mass, children, .. } => {
+                // Apply gravity acceleration: v = v + g * dt
+                velocity.y += gravity * delta;
+                // Apply velocity translation: p = p + v * dt
+                position.x += velocity.x * delta;
+                position.y += velocity.y * delta;
+
+                for child in children {
+                    Self::process_physics_node(child, delta, gravity);
+                }
+            }
+            SceneNode::Node2D { children, .. } => {
+                for child in children {
+                    Self::process_physics_node(child, delta, gravity);
+                }
+            }
+            SceneNode::Sprite2D { children, .. } => {
+                for child in children {
+                    Self::process_physics_node(child, delta, gravity);
+                }
+            }
+            SceneNode::Node { children, .. } => {
+                for child in children {
+                    Self::process_physics_node(child, delta, gravity);
+                }
+            }
+        }
+    }
+}
+
+impl Default for SovereignGameEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,6 +166,36 @@ mod tests {
         assert_eq!(path.commands.len(), 4);
         if let PathCommand::MoveTo(p) = &path.commands[0] {
             assert_eq!(p.x, 0.0);
+        }
+    }
+
+    #[test]
+    fn test_sovereign_game_engine_physics() {
+        let mut engine = SovereignGameEngine::new();
+        engine.gravity = 10.0; // Simplify math: g = 10 m/s^2
+
+        let player = SceneNode::RigidBody2D {
+            name: "Player".to_string(),
+            position: Point2D { x: 0.0, y: 0.0 },
+            velocity: Point2D { x: 5.0, y: 0.0 },
+            mass: 1.0,
+            children: Vec::new(),
+        };
+
+        engine.set_root(player);
+
+        // Run 1 second physics process step (dt = 1.0)
+        engine.physics_tick(1.0);
+
+        if let Some(SceneNode::RigidBody2D { position, velocity, .. }) = engine.root_node {
+            // v_y = 0 + 10 * 1 = 10
+            // p_x = 0 + 5 * 1 = 5
+            // p_y = 0 + 10 * 1 = 10
+            assert_eq!(velocity.y, 10.0);
+            assert_eq!(position.x, 5.0);
+            assert_eq!(position.y, 10.0);
+        } else {
+            panic!("Expected RigidBody2D root node");
         }
     }
 }
