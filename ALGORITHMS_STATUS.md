@@ -1,6 +1,6 @@
 # 🛠️ SigmaOS Algorithms, Compilation, & Status Guide
 
-This document serves as the definitive, hyper-detailed master guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, contains precise code blocks to fix every compiler error instantly, and outlines our cutting-edge **Proxy-Based Compatibility Architecture** and **Arch Linux Integration Layer**.
+This document serves as the definitive, hyper-detailed master guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, contains precise code blocks to fix every compiler error instantly, and outlines our cutting-edge **Proxy-Based Compatibility Architecture**, **Arch Linux Integration Layer**, and **TempleOS Compatibility Core**.
 
 ---
 
@@ -27,8 +27,13 @@ This document serves as the definitive, hyper-detailed master guide for any soft
     - [3. AUR Helper (AurHelper)](#3-aur-helper-aurhelper)
     - [4. Arch Chroot Isolation (ArchChrootEnclave)](#4-arch-chroot-isolation-archchrootenclave)
     - [5. mkinitcpio Boot Ramdisk (MkInitCpio)](#5-mkinitcpio-boot-ramdisk-mkinitcpio)
-7. [📊 Competitive Edge vs. Traditional OSes](#-competitive-edge-vs-traditional-oses)
-8. [🚦 Verification & Testing Guide](#-verification--testing-guide)
+7. [⛪ TempleOS Compatibility Core](#%E2%9B%AA-templeos-compatibility-core)
+    - [1. HolyC JIT Compiler (HolyCShell)](#1-holyc-jit-compiler-holycshell)
+    - [2. RedSea 64-bit Filesystem (RedSeaFilesystem)](#2-redsea-64-bit-filesystem-redseafilesystem)
+    - [3. Holy Spirit Oracle (HolySpiritOracle)](#3-holy-spirit-oracle-holyspiritoracle)
+    - [4. Ring-0 Cooperative Scheduler (RingZeroSandbox)](#4-ring-0-cooperative-scheduler-ringzerosandbox)
+8. [📊 Competitive Edge vs. Traditional OSes](#-competitive-edge-vs-traditional-oses)
+9. [🚦 Verification & Testing Guide](#-verification--testing-guide)
 
 ---
 
@@ -335,6 +340,28 @@ To achieve absolute parity with Arch Linux, SigmaOS implements five core Arch-sp
 
 ---
 
+## ⛪ TempleOS Compatibility Core
+
+To bridge the gap with the legendary, lightweight, bare-metal TempleOS, SigmaOS implements four iconic TempleOS-specific micro-abstractions natively inside `src/compatibility/templeos.rs`:
+
+### 1. HolyC JIT Compiler (HolyCShell)
+*   **Purpose**: Classic HolyC code runs immediately without heavy compilation or standard linking steps.
+*   **Design**: An OOP-based HolyC parser that processes HolyC syntax structures, executing custom JIT-style bytecode instantly within Ring-0 cooperative contexts.
+
+### 2. RedSea 64-bit Filesystem (RedSeaFilesystem)
+*   **Purpose**: Modern file systems use complex directories and inode maps, adding unnecessary latency.
+*   **Design**: A 64-bit, completely non-fragmented RedSea filesystem simulation that reads/writes contiguous sector ranges natively without block clustering.
+
+### 3. Holy Spirit Oracle (HolySpiritOracle)
+*   **Purpose**: TempleOS features a random oracle to communicate with the divine.
+*   **Design**: A highly optimized pseudorandom number generator serving as a Holy Oracle, dynamically composing randomized words and high-entropy prophecies for legacy scripts.
+
+### 4. Ring-0 Cooperative Scheduler (RingZeroSandbox)
+*   **Purpose**: Preemptive scheduling introduces task-switching overhead and CPU state thrashing.
+*   **Design**: A cooperative, non-preemptive task-switching sandbox where tasks yield control voluntarily, mimicking the zero-overhead bare-metal execution of TempleOS.
+
+---
+
 ## 📊 Competitive Edge vs. Traditional OSes
 
 | Subsystem | Traditional OS (Linux / Windows) | SigmaOS Innovation | Strategic Edge |
@@ -347,6 +374,7 @@ To achieve absolute parity with Arch Linux, SigmaOS implements five core Arch-sp
 | **Extensibility** | Inserts heavy kernel modules | **User-Defined Functions** | Safe scripting sandbox for core algorithms. |
 | **Sandboxing** | Bolted-on (SELinux, AppArmor) | **Privacy-First Sandbox** | Zero-trust default enclaves with PQ-crypto. |
 | **Arch Packaging**| Heavy userland Pacman utils | **PacmanEngine & AUR Helper**| Native, light containerized package syncing & ABS builds. |
+| **TempleOS Parity**| Dropped, legacy only | **HolyC Shell & RedSea FS** | Cooperative Ring-0 execution with contiguous RedSea maps. |
 
 ---
 

@@ -5,9 +5,14 @@ pub mod scosmos;
 pub mod standards;
 pub mod proxy;
 pub mod oldlinux;
+pub mod templeos;
 
 pub use oldlinux::{
     OldLinuxRelease, OldLinuxCompatManager,
+};
+
+pub use templeos::{
+    HolyCShell, RedSeaFilesystem, HolySpiritOracle, CooperativeTask, RingZeroSandbox,
 };
 
 pub use proxy::{

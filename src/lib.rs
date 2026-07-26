@@ -73,6 +73,7 @@ pub use compatibility::{
     ZeroTrustProxy, SecurityProxy, ObsoleteDevice, FloppyProxy, TapeProxy, CRTProxy,
     DotMatrixProxy, PeripheralProxy,
     OldLinuxRelease, OldLinuxCompatManager,
+    HolyCShell, RedSeaFilesystem, HolySpiritOracle, CooperativeTask, RingZeroSandbox,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
