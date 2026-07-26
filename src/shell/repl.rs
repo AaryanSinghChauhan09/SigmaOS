@@ -886,6 +886,12 @@ mod tests {
     #[test]
     fn test_cli_accessibility() {
         let mut repl = ShellRepl::new();
+        let set_cmd = ShellCommand::Set {
+            variable: "test_macro".to_string(),
+            value: "echo running; ls".to_string(),
+        };
+        repl.execute_command(set_cmd).unwrap();
+    }
 
         let set_cmd = repl.parse_command("a11y set screen_reader on");
         assert!(matches!(set_cmd, ShellCommand::A11ySet { .. }));
