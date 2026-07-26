@@ -1,4 +1,4 @@
-# ⚡ SigmaOS Master Integrated Absorption & Implementation Plan
+# 🌐 SigmaOS Master Integrated Absorption & Implementation Plan
 
 This document serves as the master blueprint for **SigmaOS** to achieve absolute digital self-sufficiency and full distro-parity by absorbing, adapting, and integrating features, algorithms, designs, and principles from **500+ leading open-source repositories** alongside the specialized operational workflows of three specialized autonomous agents.
 
@@ -29,13 +29,6 @@ By codifying these roles, SigmaOS establishes a continuous-improvement framework
     5.  **🎁 PRESENT - Share your speed boost:**
         *   Create a PR with Title: `⚡ Bolt: [performance improvement]`
         *   Provide Description: What, Why, Impact, Measurement.
-*   **Favorite Optimizations:**
-    - ⚡ Add React.memo() / custom cache blocks to prevent redundant re-renders or queries.
-    - ⚡ Cache expensive computation results or API outputs.
-    - ⚡ Replace O(n²) nested loop with O(n) hash map or index lookup.
-    - ⚡ Implement lazy loading and list virtualization.
-    - ⚡ Batch state updates or network requests into single transactions.
-    - ⚡ Add early returns to skip unnecessary compute loops.
 
 ---
 
@@ -61,13 +54,6 @@ By codifying these roles, SigmaOS establishes a continuous-improvement framework
     5.  **🎁 PRESENT - Share your enhancement:**
         *   Create a PR with Title: `🎨 Palette: [UX improvement]`
         *   Provide Description: What (the enhancement), Why (the problem solved), Before/After screenshots, Accessibility.
-*   **Favorite Enhancements:**
-    - ✨ Add ARIA labels to icon-only buttons.
-    - ✨ Add loading spinners and progress indicators for async tasks.
-    - ✨ Improve color contrast and focus rings for keyboard navigation.
-    - ✨ Add tooltips and helper text to explain complex inputs or disabled states.
-    - ✨ Add empty states with clear calls-to-action.
-    - ✨ Add success/error toast notifications and confirmation dialogs.
 
 ---
 
@@ -93,222 +79,178 @@ By codifying these roles, SigmaOS establishes a continuous-improvement framework
     5.  **🎁 PRESENT - Report your findings:**
         *   Create a PR with Title: `🛡️ Sentinel: [severity] Fix [vulnerability type]`
         *   Provide Description: Severity, Vulnerability, Impact, Fix, Verification.
-*   **Favorite Fixes:**
-    - 🚨 Remove hardcoded API keys or configuration secrets.
-    - 🚨 Parameters-based input validation and dynamic range checks.
-    - 🚨 Escape all shell arguments or block unauthorized path traversals.
-    - 🚨 Redact stack traces and internal debugging information from error logs.
-    - 🚨 Enforce zero-trust capabilities and cryptographically signed tokens.
 
 ---
 
 ## Part 2: Upstream Repository Absorption Plan (500+ Repositories)
 
-To establish complete systems-level parity and sovereignty, SigmaOS systematically catalogs and digests **500+ prominent upstream open-source GitHub repositories**, organized across **34 distinct functional domains**.
-
----
+We have organized the target upstream repositories into distinct specialized system domains, mapping out the precise mechanisms SigmaOS uses to absorb their engineering breakthroughs.
 
 ### 1. 🔹 Core Linux Kernel & Variants
-*   **Upstream Repositories:** `torvalds/linux`, `gregkh/linux`, `raspberrypi/linux`, `analogdevicesinc/linux`
-*   **Engineering Breakthroughs:** Zero-copy virtual memory mapping, scalable locking architectures, physical device drivers, multi-architecture configuration profiles.
-*   **SigmaOS Adaptation Pathway:** Abstract device control and interface primitives into clean, type-safe Rust-native traits in `src/drivers/`, utilizing lock-free communication rings to decouple driver shards from the core microkernel address space.
+*   **Upstream Repositories:** `torvalds/linux`, `gregkh/linux`, `raspberrypi/linux`, `analogdevicesinc/linux`.
+*   **Concepts to Absorb:** Interrupt handling, physical page allocation (buddy/slab), task switching, multi-arch configs, and GPIO/SPI/I2C bus drivers.
+*   **SigmaOS Adaptation Pathway:** Map hardware initialization natively in `src/drivers/`, utilizing clean, zero-allocation Rust structures.
 
 ### 2. 🔹 Popular Linux Distributions
-*   **Upstream Repositories:** `armbian/build`, `siderolabs/talos`, `kairos-io/kairos`, `FydeOS/chromium_os-raspberry_pi`, `redroselinux/redroselinux`, `jeffreysama/avalos`
-*   **Engineering Breakthroughs:** Immutable read-only system images, declarative configuration schemas, Edge/SBC optimization frameworks, low-overhead headless deployments.
-*   **SigmaOS Adaptation Pathway:** Absorb talos-style declarative system state definitions within `src/filesystem/vfs.rs` to support immutable, read-only root directories alongside dynamic memory overlay states.
+*   **Upstream Repositories:** `armbian/build`, `siderolabs/talos`, `kairos-io/kairos`, `FydeOS/chromium_os-raspberry_pi`, `redroselinux/redroselinux`, `jeffreysama/avalos`.
+*   **Concepts to Absorb:** Workspace compilation automation, API-gated immutable filesystem layouts, read-only system snapshots, and gaming performance governors.
+*   **SigmaOS Adaptation Pathway:** Integrate atomic system state transitions in `src/filesystem/vfs.rs` to allow immutable mounting of core paths.
 
 ### 3. 🔹 Utilities & OS Tools
-*   **Upstream Repositories:** `jaywcjlove/linux-command`, `0xAX/linux-insides`, `GameServerManagers/LinuxGSM`, `SuperManito/LinuxMirrors`, `bin456789/reinstall`, `termux/termux-packages`
-*   **Engineering Breakthroughs:** Streamlined CLI diagnostics, comprehensive system call manual tables, quick deployment scripts, sandboxed userspace utility packages.
-*   **SigmaOS Adaptation Pathway:** Incorporate robust CLI parser commands inside the S-CLI REPL shell engine in `src/shell/command.rs`.
+*   **Upstream Repositories:** `jaywcjlove/linux-command`, `0xAX/linux-insides`, `GameServerManagers/LinuxGSM`, `SuperManito/LinuxMirrors`, `bin456789/reinstall`, `termux/termux-packages`.
+*   **Concepts to Absorb:** Structured CLI command dictionaries, boot sequence profiling, and host-target package cross-compilation environments.
+*   **SigmaOS Adaptation Pathway:** Standardize command cards within S-CLI REPL shell in `src/shell/command.rs`.
 
-### 4. 🔹 "Awesome" Resource Lists
-*   **Upstream Repositories:** `inputsh/awesome-linux`, `sirredbeard/awesome-unix`
-*   **Engineering Breakthroughs:** Structured indices of POSIX standards, modular kernel designs, best-in-class algorithmic blueprints.
-*   **SigmaOS Adaptation Pathway:** Align microkernel roadmap milestones in `WIKI/FutureRoadmap.md` with best-of-breed open-source specifications.
+### 4. 🔹 “Awesome” Resource Lists
+*   **Upstream Repositories:** `inputsh/awesome-linux`, `sirredbeard/awesome-unix`.
+*   **Concepts to Absorb:** Curated lists of Linux projects, POSIX compatibility standards, and architectural guides.
+*   **SigmaOS Adaptation Pathway:** Guide microkernel development roadmap priorities (`WIKI/FutureRoadmap.md`) based on best-in-class listings.
 
 ### 5. 🔹 Mainstream Linux Distros
-*   **Upstream Repositories:** `void-linux/void-packages`, `clearlinux/distribution`, `nixos/nixpkgs`, `guix/guix`, `bedrocklinux/bedrocklinux-userland`, `alpinelinux/aports`, `openSUSE/obs-build`, `endeavouros-team/PKGBUILDS`, `manjaro/packages-core`, `slackware-contrib/slackbuilds`
-*   **Engineering Breakthroughs:** Declarative package managers, functional system states, musl-libc optimizations, rolling-release dependencies.
-*   **SigmaOS Adaptation Pathway:** Build purely declarative package trees and SAT solvers inside `src/sigpkg/resolver.rs` which can be fully processed in O(1) heap memory.
+*   **Upstream Repositories:** `void-linux/void-packages`, `clearlinux/distribution`, `nixos/nixpkgs`, `guix/guix`, `bedrocklinux/bedrocklinux-userland`, `alpinelinux/aports`, `openSUSE/obs-build`, `endeavouros-team/PKGBUILDS`, `manjaro/packages-core`, `slackware-contrib/slackbuilds`.
+*   **Concepts to Absorb:** Pure functional package states, lightweight runtimes, systemd-free supervision, and multi-distro dependency resolution.
+*   **SigmaOS Adaptation Pathway:** Build purely declarative package graphs inside `src/sigpkg/resolver.rs` which can be fully processed in O(1) memory.
 
 ### 6. 🔹 Lightweight / Special Purpose Distros
-*   **Upstream Repositories:** `tinycorelinux/Core`, `puppylinux-woof-CE/woof-CE`, `dietpi/dietpi`, `postmarketOS/pmaports`, `LFS/lfs`, `chimera-linux/chimera`, `serpent-os/core`, `hyperbola/hyperbola-packages`, `kisslinux/kiss`, `artix-linux/packages`
-*   **Engineering Breakthroughs:** Minimalist bootloader scripts, cross-compilation target setups, mobile-friendly Alpine packages, RAM-only systems initialization.
-*   **SigmaOS Adaptation Pathway:** Model low-overhead, zero-dependency static builds inside our system initializers in `src/init/systemd_init.rs`.
+*   **Upstream Repositories:** `tinycorelinux/Core`, `puppylinux-woof-CE/woof-CE`, `dietpi/dietpi`, `postmarketOS/pmaports`, `LFS/lfs`, `chimera-linux/chimera`, `serpent-os/core`, `hyperbola/hyperbola-packages`, `kisslinux/kiss`, `artix-linux/packages`.
+*   **Concepts to Absorb:** RAM-bootable minimalist image trees, system resource constraint mappings, and Musl/libc minimalist layouts.
+*   **SigmaOS Adaptation Pathway:** Restrict system footprint using system initialization in `src/init/systemd_init.rs`.
 
 ### 7. 🔹 Package Managers & Build Systems
-*   **Upstream Repositories:** `rpm-software-management/rpm`, `dpkg/dpkg`, `pacman/pacman`, `flatpak/flatpak`, `snapcore/snapd`, `homebrew/linuxbrew-core`, `spack/spack`, `guix/guix`, `nix-community/home-manager`, `openembedded/openembedded-core`
-*   **Engineering Breakthroughs:** Content-addressed files store, sandbox isolation limits, secure cryptographic signatures verification, parallel dependency maps.
+*   **Upstream Repositories:** `rpm-software-management/rpm`, `dpkg/dpkg`, `pacman/pacman`, `flatpak/flatpak`, `snapcore/snapd`, `homebrew/linuxbrew-core`, `spack/spack`, `guix/guix`, `nix-community/home-manager`, `openembedded/openembedded-core`.
+*   **Concepts to Absorb:** Content-addressed storage (CAS), digital cryptographic verification, sandboxing, and DPLL SAT solvers.
 *   **SigmaOS Adaptation Pathway:** Utilize Content Addressed Storage algorithms in `src/sigpkg/store.rs` and verify package recipes cryptographically in `src/sigpkg/verifier.rs`.
 
 ### 8. 🔹 System Utilities
-*   **Upstream Repositories:** `systemd/systemd`, `busybox/busybox`, `util-linux/util-linux`, `coreutils/coreutils`, `iputils/iputils`, `net-tools/net-tools`, `procps-ng/procps`, `e2fsprogs/e2fsprogs`, `btrfs/btrfs-progs`, `zfs/zfs`
-*   **Engineering Breakthroughs:** Single-binary utility maps, copy-on-write snapshot blocks, parallel systemd-style unit startup controllers.
-*   **SigmaOS Adaptation Pathway:** Implement structured service status monitoring and filesystem mount managers inside `src/filesystem/vfs.rs` and `src/init/systemd_init.rs`.
+*   **Upstream Repositories:** `systemd/systemd`, `busybox/busybox`, `util-linux/util-linux`, `coreutils/coreutils`, `iputils/iputils`, `net-tools/net-tools`, `procps-ng/procps`, `e2fsprogs/e2fsprogs`, `btrfs/btrfs-progs`, `zfs/zfs`.
+*   **Concepts to Absorb:** Single-binary optimization, copy-on-write snapshotting, stateful service supervision, and block device structures.
+*   **SigmaOS Adaptation Pathway:** Implement structured status parsing natively inside `src/dashboard/process.rs` and filesystem actions inside `src/filesystem/vfs.rs`.
 
 ### 9. 🔹 Security & Networking
-*   **Upstream Repositories:** `openvpn/openvpn`, `wireguard/wireguard-linux`, `iptables/iptables`, `nftables/nftables`, `openssh/openssh-portable`, `gnupg/gnupg`, `selinuxProject/selinux`, `clamav/clamav`, `fail2ban/fail2ban`, `suricata/suricata`
-*   **Engineering Breakthroughs:** Noise protocol cryptographic handshakes, stateless connection packet filters, dynamic intrusion prevention rulesets.
+*   **Upstream Repositories:** `openvpn/openvpn`, `wireguard/wireguard-linux`, `iptables/iptables`, `nftables/nftables`, `openssh/openssh-portable`, `gnupg/gnupg`, `selinuxProject/selinux`, `clamav/clamav`, `fail2ban/fail2ban`, `suricata/suricata`.
+*   **Concepts to Absorb:** Noise handshakes, stateful connection filtering, dynamic pattern attack rules, and asymmetric key validation.
 *   **SigmaOS Adaptation Pathway:** Deploy real-time intrusion monitoring models in `src/security/intrusion.rs` and adapt network security in `src/security/vpn.rs`.
 
 ### 10. 🔹 Desktop Environments & Window Managers
-*   **Upstream Repositories:** `GNOME/gnome-shell`, `KDE/plasma-desktop`, `xfce/xfce4-panel`, `lxde/lxde-common`, `mate-desktop/mate-panel`, `swaywm/sway`, `i3/i3`, `awesomeWM/awesome`, `openbox/openbox`, `fluxbox/fluxbox`
-*   **Engineering Breakthroughs:** Tree-based tiling coordinates, custom status panel indicators, responsive multi-monitor layouts, accessible high-contrast displays.
-*   **SigmaOS Adaptation Pathway:** Connect tiling window managers calculations and keyboard shortcut configurations within `zenith_desktop` and `src/customization/theme.rs`.
+*   **Upstream Repositories:** `GNOME/gnome-shell`, `KDE/plasma-desktop`, `xfce/xfce4-panel`, `lxde/lxde-common`, `mate-desktop/mate-panel`, `swaywm/sway`, `i3/i3`, `awesomeWM/awesome`, `openbox/openbox`, `fluxbox/fluxbox`.
+*   **Concepts to Absorb:** Tree-based tiling coordinate layouts, custom panel extensions, user settings profiles, accessible keyboard navigations, and fluid visual animations.
+*   **SigmaOS Adaptation Pathway:** Integrate tiling workspace layout calculations directly within `zenith_desktop` and map preferences in `src/customization/theme.rs`.
 
 ### 11. 🔹 Additional Linux Distributions
-*   **Upstream Repositories:** `calculate-linux/calculate`, `sabayon/sabayon-distro`, `chakra-linux/chakra`, `peppermintos/peppermintos`, `bodhilinux/bodhi`, `zorinos/zorin-os`, `elementary/os`, `deepin-community/deepin`, `mx-linux/mx`, `peppermintos/iso`
-*   **Engineering Breakthroughs:** Precompiled binary fallback paths, gorgeous minimal design elements, cloud-application integrations, ISO synthesis tools.
-*   **SigmaOS Adaptation Pathway:** Model unified configuration dashboards and automated live bootable ISO synthesis inside compilation tools in `src/distro/`.
+*   **Upstream Repositories:** `calculate-linux/calculate`, `sabayon/sabayon-distro`, `chakra-linux/chakra`, `peppermintos/peppermintos`, `bodhilinux/bodhi`, `zorinos/zorin-os`, `elementary/os`, `deepin-community/deepin`, `mx-linux/mx`, `peppermintos/iso`.
+*   **Concepts to Absorb:** Binary-to-source Gentoo fallback structures, design layouts, cloud-application integrations, and ISO image synthesis.
+*   **SigmaOS Adaptation Pathway:** Model standard ISO configurations inside installation automation tools in `src/distro/`.
 
 ### 12. 🔹 Server & Cloud Distros
-*   **Upstream Repositories:** `rocky-linux/rocky`, `almalinux/almalinux`, `oracle/linux`, `cloudlinux/cloudlinux`, `coreos/fedora-coreos`, `flatcar-linux/flatcar`, `rancher/os`, `k3os-io/k3os`, `bottlerocket-os/bottlerocket`, `ubuntu-core/ubuntu-core`
-*   **Engineering Breakthroughs:** Self-provisioning cloud-init modules, daemonless OCI container runtimes, extreme security-hardened read-only directories.
-*   **SigmaOS Adaptation Pathway:** Embed core hypervisor and cluster provisioning interfaces within our virtualization controller modules in `src/virtualization/`.
+*   **Upstream Repositories:** `rocky-linux/rocky`, `almalinux/almalinux`, `oracle/linux`, `cloudlinux/cloudlinux`, `coreos/fedora-coreos`, `flatcar-linux/flatcar`, `rancher/os`, `k3os-io/k3os`, `bottlerocket-os/bottlerocket`, `ubuntu-core/ubuntu-core`.
+*   **Concepts to Absorb:** Cloud-init provisioning scripts, daemonless container systems, and extreme security-hardened read-only directories.
+*   **SigmaOS Adaptation Pathway:** Embed directory protections inside filesystem manager and load cluster-init profiles in `src/orchestration/`.
 
 ### 13. 🔹 Filesystems & Storage
-*   **Upstream Repositories:** `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `nilfs/nilfs-tools`, `reiserfs/reiserfsprogs`, `ceph/ceph`, `gluster/glusterfs`, `lustre/lustre`, `bcachefs/bcachefs-tools`, `overlayfs/overlayfs-tools`, `squashfs-tools/squashfs-tools`
-*   **Engineering Breakthroughs:** Log-structured block allocation (optimizing flash storage lifespan), atomic directory stacking layers, highly concurrent network filesystems.
-*   **SigmaOS Adaptation Pathway:** Program robust stacking filesystem layouts inside `src/filesystem/archive.rs` using write-through journaling caches.
+*   **Upstream Repositories:** `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `nilfs/nilfs-tools`, `reiserfs/reiserfsprogs`, `ceph/ceph`, `gluster/glusterfs`, `lustre/lustre`, `bcachefs/bcachefs-tools`, `overlayfs/overlayfs-tools`, `squashfs-tools/squashfs-tools`.
+*   **Concepts to Absorb:** Log-structured block allocation (optimizing SSD lifetime), overlay directory stacking, and high-performance distributed storage clusters.
+*   **SigmaOS Adaptation Pathway:** Develop layering mount interfaces in `src/filesystem/archive.rs` and apply flash-friendly sector write strategies.
 
 ### 14. 🔹 Monitoring & Performance
-*   **Upstream Repositories:** `htop-dev/htop`, `atop/atop`, `glances/glances`, `collectd/collectd`, `sysstat/sysstat`, `iotop/iotop`, `dstat/dstat`, `nmon/nmon`, `sar/sar`, `perf/perf`
-*   **Engineering Breakthroughs:** Interactive process selection matrices, real-time IO/CPU scheduling delay tracking, kernel trace probes.
-*   **SigmaOS Adaptation Pathway:** Route thread metrics and scheduler statistics into process telemetry structures in `src/dashboard/process.rs`.
+*   **Upstream Repositories:** `htop-dev/htop`, `atop/atop`, `glances/glances`, `collectd/collectd`, `sysstat/sysstat`, `iotop/iotop`, `dstat/dstat`, `nmon/nmon`, `sar/sar`, `perf/perf`.
+*   **Concepts to Absorb:** CPU/IO task-tracking graphs, process scheduling lag calculations, and kernel-level trace profiling.
+*   **SigmaOS Adaptation Pathway:** Fuel process statistics maps natively into the dashboard engine `src/dashboard/process.rs` to display process scheduling information.
 
 ### 15. 🔹 Networking Tools
-*   **Upstream Repositories:** `curl/curl`, `wget/wget`, `netcat/netcat`, `traceroute/traceroute`, `tcpdump/tcpdump`, `wireshark/wireshark`, `iftop/iftop`, `mtr/mtr`, `ethtool/ethtool`, `bridge-utils/bridge-utils`
-*   **Engineering Breakthroughs:** Multi-protocol transport buffers, packet header parsing rings, hardware ethernet link parameters tuning.
-*   **SigmaOS Adaptation Pathway:** Integrate zero-copy packet rings and ethernet device socket drivers inside the networking stack in `src/network/`.
+*   **Upstream Repositories:** `curl/curl`, `wget/wget`, `netcat/netcat`, `traceroute/traceroute`, `tcpdump/tcpdump`, `wireshark/wireshark`, `iftop/iftop`, `mtr/mtr`, `ethtool/ethtool`, `bridge-utils/bridge-utils`.
+*   **Concepts to Absorb:** High-speed TCP/UDP data transfer buffers, packet header inspection rings, networking bridge routing, and network hardware configurations.
+*   **SigmaOS Adaptation Pathway:** Implement zero-copy networking loops inside our ethernet driver structure `src/network/` to minimize data copy actions.
 
 ### 16. 🔹 Shells & Terminals
-*   **Upstream Repositories:** `bash/bash`, `zsh-users/zsh`, `fish-shell/fish-shell`, `xonsh/xonsh`, `nushell/nushell`, `elvish/elvish`, `powershell/powershell`, `termux/termux-app`, `alacritty/alacritty`, `kitty/kitty`
-*   **Engineering Breakthroughs:** High-performance terminal text grids, interactive completion databases, GPU-accelerated glyph rendering pipelines.
-*   **SigmaOS Adaptation Pathway:** Fuel command parser logic inside `src/shell/command.rs` using low-latency non-allocating rendering streams.
+*   **Upstream Repositories:** `bash/bash`, `zsh-users/zsh`, `fish-shell/fish-shell`, `xonsh/xonsh`, `nushell/nushell`, `elvish/elvish`, `powershell/powershell`, `termux/termux-app`, `alacritty/alacritty`, `kitty/kitty`.
+*   **Concepts to Absorb:** Interactive REPL command processing, structured output pipelines, dynamic autocompletion databases, and hardware-accelerated grid rendering loops.
+*   **SigmaOS Adaptation Pathway:** Power the S-CLI console `src/shell/command.rs` using fast, non-allocating rendering buffers.
 
 ### 17. 🔹 Embedded & IoT Linux
-*   **Upstream Repositories:** `yoctoproject/poky`, `openwrt/openwrt`, `buildroot/buildroot`, `android/linux`, `ubiquiti/unifi-linux`, `balena-os/balena-os`, `resin-os/meta-resin`, `tizen/tizen`, `webos/webos`, `sailfishos/sailfishos`
-*   **Engineering Breakthroughs:** Declared device trees configurations, extreme RAM constraint maps, peripheral interface boards configurations.
-*   **SigmaOS Adaptation Pathway:** Establish micro-minimal target profiles in compilation targets mapped through conditional compile declarations in `Cargo.toml`.
+*   **Upstream Repositories:** `yoctoproject/poky`, `openwrt/openwrt`, `buildroot/buildroot`, `android/linux`, `ubiquiti/unifi-linux`, `balena-os/balena-os`, `resin-os/meta-resin`, `tizen/tizen`, `webos/webos`, `sailfishos/sailfishos`.
+*   **Concepts to Absorb:** Cross-compilation targets selection, lightweight router setups, device tree layout definitions, and embedded UI container loops.
+*   **SigmaOS Adaptation Pathway:** Build micro-minimal target configurations within compile-time rules inside `Cargo.toml`.
 
 ### 18. 🔹 Real-Time & Specialized Kernels
-*   **Upstream Repositories:** `rt-linux/rt-linux`, `xenomai/xenomai`, `preempt-rt/preempt-rt`, `unikernel-org/unikernel`, `rumpkernel/rumpkernel`, `seL4/seL4`, `genode/genode`, `haiku/haiku`, `reactos/reactos`, `plan9foundation/plan9`
-*   **Engineering Breakthroughs:** Guaranteed hard real-time latency boundaries, verified capability-based isolation layers, single-address space unikernels.
-*   **SigmaOS Adaptation Pathway:** Scale scheduler loops inside `src/kernel/scheduler.rs` and capability trees inside `src/security/capability.rs`.
+*   **Upstream Repositories:** `rt-linux/rt-linux`, `xenomai/xenomai`, `preempt-rt/preempt-rt`, `unikernel-org/unikernel`, `rumpkernel/rumpkernel`, `seL4/seL4`, `genode/genode`, `haiku/haiku`, `reactos/reactos`, `plan9foundation/plan9`.
+*   **Concepts to Absorb:** Hard real-time priority schedulers, capability-based delegation frameworks, single-address space execution (unikernels), and Windows application translation APIs.
+*   **SigmaOS Adaptation Pathway:** Refine scheduler algorithms inside `src/kernel/scheduler.rs` and manage capability trees in `src/security/capability.rs`.
 
 ### 19. 🔹 Container Runtimes & Virtualization
-*   **Upstream Repositories:** `docker/docker-ce`, `moby/moby`, `containerd/containerd`, `opencontainers/runc`, `podman/podman`, `lxc/lxc`, `kubernetes/kubernetes`, `cri-o/cri-o`, `kata-containers/kata-containers`, `firecracker-microvm/firecracker`
-*   **Engineering Breakthroughs:** Sandbox jail namespaces, hypercall VM boundaries, rapid container lifecycle execution hooks.
-*   **SigmaOS Adaptation Pathway:** Develop isolated container context allocations and VM hypervisor state structures in `src/virtualization/`.
+*   **Upstream Repositories:** `docker/docker-ce`, `moby/moby`, `containerd/containerd`, `opencontainers/runc`, `podman/podman`, `lxc/lxc`, `kubernetes/kubernetes`, `cri-o/cri-o`, `kata-containers/kata-containers`, `firecracker-microvm/firecracker`.
+*   **Concepts to Absorb:** Sandbox containment, kernel namespace isolations, rapid-boot microVM hypervisor interfaces, and container lifecycle hooks.
+*   **SigmaOS Adaptation Pathway:** Standardize VM state structures and sandbox allocations inside `src/virtualization/`.
 
 ### 20. 🔹 Init Systems & Alternatives
-*   **Upstream Repositories:** `openrc/openrc`, `runit/runit`, `s6/s6`, `upstart/upstart`, `monit/monit`, `supervisord/supervisor`, `daemontools/daemontools`, `systemd/systemd-stable`, `initng/initng`, `smf/smf`
-*   **Engineering Breakthroughs:** Parallel system init trees, watchdog process monitors, daemon supervision state graphs.
-*   **SigmaOS Adaptation Pathway:** Build parallel unit execution engines inside `src/init/systemd_init.rs` reacting to kernel capability flags.
+*   **Upstream Repositories:** `openrc/openrc`, `runit/runit`, `s6/s6`, `upstart/upstart`, `monit/monit`, `supervisord/supervisor`, `daemontools/daemontools`, `systemd/systemd-stable`, `initng/initng`, `smf/smf`.
+*   **Concepts to Absorb:** Parallel system units execution, supervision loop trees, lightweight process watchdogs, and configuration monitors.
+*   **SigmaOS Adaptation Pathway:** Model the parallel service controller in `src/init/systemd_init.rs` to process units dynamically based on active capabilities.
 
 ### 21. 🔹 Backup & Recovery Tools
-*   **Upstream Repositories:** `rsnapshot/rsnapshot`, `borgbackup/borg`, `restic/restic`, `duplicity/duplicity`, `timeshift/timeshift`, `rsync/rsync`, `tar/tar`, `ddrescue/ddrescue`, `clonezilla/clonezilla`, `partclone/partclone`
-*   **Engineering Breakthroughs:** Encrypted block deduplication, transactional directory synchronization, disk sector recovery engines.
-*   **SigmaOS Adaptation Pathway:** Implement incremental filesystem snapshotting in `src/filesystem/archive.rs` using secure SHA-256 block hash validation.
+*   **Upstream Repositories:** `rsnapshot/rsnapshot`, `borgbackup/borg`, `restic/restic`, `duplicity/duplicity`, `timeshift/timeshift`, `rsync/rsync`, `tar/tar`, `ddrescue/ddrescue`, `clonezilla/clonezilla`, `partclone/partclone`.
+*   **Concepts to Absorb:** Encrypted data deduplication, directory synchronizations, partition scanning, and rapid sector block cloning.
+*   **SigmaOS Adaptation Pathway:** Program archive management algorithms inside `src/filesystem/archive.rs` utilizing strict SHA-256 block hash verification.
 
 ### 22. 🔹 Miscellaneous Utilities
-*   **Upstream Repositories:** `screen/screen`, `tmux/tmux`, `mc/midnight-commander`, `nano/nano`, `vim/vim`, `emacs/emacs`, `joe-editor/joe`, `micro-editor/micro`, `neovim/neovim`, `helix-editor/helix`
-*   **Engineering Breakthroughs:** Terminal grid drawing APIs, high-efficiency editor buffers, modal keyboard layouts.
-*   **SigmaOS Adaptation Pathway:** Implement input shortcuts and syntax parser structures in our software editor core in `src/productivity/sigma_office.rs`.
+*   **Upstream Repositories:** `screen/screen`, `tmux/tmux`, `mc/midnight-commander`, `nano/nano`, `vim/vim`, `emacs/emacs`, `joe-editor/joe`, `micro-editor/micro`, `neovim/neovim`, `helix-editor/helix`.
+*   **Concepts to Absorb:** Multi-window terminal grids, interactive console menus, on-the-fly syntax highlighting trees, and fast modal keystroke maps.
+*   **SigmaOS Adaptation Pathway:** Build direct input bindings and syntax parsers natively in our software editor component inside `src/productivity/sigma_office.rs`.
 
 ### 23. 🔹 Alternative Shells & Terminals
-*   **Upstream Repositories:** `oil-shell/oil`, `dash-shell/dash`, `mksh/mksh`, `busybox/ash`, `ksh93/ksh`, `rc-shell/rc`, `es-shell/es`, `yash-shell/yash`, `osh/osh`, `closh/closh`
-*   **Engineering Breakthroughs:** Lightweight shell tokenizers, highly standard POSIX execution state machines.
-*   **SigmaOS Adaptation Pathway:** Refine lexical parsers in `src/shell/command.rs` to process user input without intermediate heap allocations.
+*   **Upstream Repositories:** `oil-shell/oil`, `dash-shell/dash`, `mksh/mksh`, `busybox/ash`, `ksh93/ksh`, `rc-shell/rc`, `es-shell/es`, `yash-shell/yash`, `osh/osh`, `closh/closh`.
+*   **Concepts to Absorb:** Clean POSIX execution pipelines, high-speed lexical parsers, minimal memory shell contexts, and functional shell variables.
+*   **SigmaOS Adaptation Pathway:** Refine lexical shell tokenizers in `src/shell/command.rs` to process user input without intermediate heap-allocated collections.
 
 ### 24. 🔹 Virtualization & Hypervisors
-*   **Upstream Repositories:** `qemu/qemu`, `kvm/kvm`, `xen-project/xen`, `virtualbox/virtualbox`, `proxmox/proxmox-ve`, `libvirt/libvirt`, `vagrant/vagrant`, `ganeti/ganeti`, `opennebula/one`, `cloudstack/cloudstack`
-*   **Engineering Breakthroughs:** Hardware register emulator loops, memory virtualization mapping APIs, guest CPU isolation controls.
-*   **SigmaOS Adaptation Pathway:** Integrate hypervisor hooks and VM device bridges inside `src/virt/hypervisor.rs`.
+*   **Upstream Repositories:** `qemu/qemu`, `kvm/kvm`, `xen-project/xen`, `virtualbox/virtualbox`, `proxmox/proxmox-ve`, `libvirt/libvirt`, `vagrant/vagrant`, `ganeti/ganeti`, `opennebula/one`, `cloudstack/cloudstack`.
+*   **Concepts to Absorb:** CPU state virtualization instructions, memory virtualization layouts, hardware emulator routines, and hypervisor communication registers.
+*   **SigmaOS Adaptation Pathway:** Build CPU thread mappings and guest isolation controls inside our virtualization driver modules in `src/virt/hypervisor.rs`.
 
 ### 25. 🔹 Monitoring & Logging
-*   **Upstream Repositories:** `prometheus/prometheus`, `grafana/grafana`, `elastic/elasticsearch`, `logstash/logstash`, `kibana/kibana`, `graylog/graylog`, `fluent/fluentd`, `vector/vector`, `loki/loki`, `syslog-ng/syslog-ng`
-*   **Engineering Breakthroughs:** High-efficiency telemetry routers, concurrent log aggregators, structured query match indexes.
-*   **SigmaOS Adaptation Pathway:** Build clean telemetry and log-routing pathways in `src/logging/unified.rs` without filesystem look-ups or locks.
+*   **Upstream Repositories:** `prometheus/prometheus`, `grafana/grafana`, `elastic/elasticsearch`, `logstash/logstash`, `kibana/kibana`, `graylog/graylog`, `fluent/fluentd`, `vector/vector`, `loki/loki`, `syslog-ng/syslog-ng`.
+*   **Concepts to Absorb:** Time-series metric charts, real-time log routing systems, database searching indexers, and log format collectors.
+*   **SigmaOS Adaptation Pathway:** Implement clean telemetry routers in `src/dashboard/monitor.rs` to gather microkernel statistics without file system lock-ups.
 
 ### 26. 🔹 Networking & Internet Tools
-*   **Upstream Repositories:** `bind/bind9`, `dnsmasq/dnsmasq`, `unbound/unbound`, `bird/bird`, `quagga/quagga`, `frrouting/frr`, `openvswitch/ovs`, `strongswan/strongswan`, `ppp/ppp`, `netdata/netdata`
-*   **Engineering Breakthroughs:** Concurrent DNS caching, dynamic routing protocol tables, software-defined network bridges.
-*   **SigmaOS Adaptation Pathway:** Standardize TCP/IP routing and packet translation tables inside our networking drivers in `src/network/`.
+*   **Upstream Repositories:** `bind/bind9`, `dnsmasq/dnsmasq`, `unbound/unbound`, `bird/bird`, `quagga/quagga`, `frrouting/frr`, `openvswitch/ovs`, `strongswan/strongswan`, `ppp/ppp`, `netdata/netdata`.
+*   **Concepts to Absorb:** High-speed DNS query resolver loops, dynamic DHCP allocation state tables, routing protocol topologies, and virtual switch ports configuration.
+*   **SigmaOS Adaptation Pathway:** Configure TCP/IP packet routers inside our networking stack in `src/network/`.
 
 ### 27. 🔹 File Systems & Storage (Duplicates / Additional)
-*   **Upstream Repositories:** `aufs/aufs`, `ocfs2/ocfs2-tools`, `gfs2/gfs2-utils`, `vfat/vfat-tools`, `exfat/exfat-utils`, `ntfs-3g/ntfs-3g`
-*   **Engineering Breakthroughs:** Stacking union directories, clustered lock managers, standard filesystem sector translators.
-*   **SigmaOS Adaptation Pathway:** Enforce permission and capability gates directly on directory stack overlays in `src/filesystem/vfs.rs`.
+*   **Upstream Repositories:** `aufs/aufs`, `ocfs2/ocfs2-tools`, `gfs2/gfs2-utils`, `vfat/vfat-tools`, `exfat/exfat-utils`, `ntfs-3g/ntfs-3g`.
+*   **Concepts to Absorb:** Multi-directory stack layouts (union mounts), cluster block locking structures, FAT file access loops, and NTFS sector reading strategies.
+*   **SigmaOS Adaptation Pathway:** Enforce standard filesystem capability checks directly on stack mounts in `src/filesystem/vfs.rs`.
 
 ### 28. 🔹 HPC & Scientific Tools
-*   **Upstream Repositories:** `slurm/slurm`, `openmpi/ompi`, `mpich/mpich`, `petsc/petsc`, `hdfgroup/hdf5`, `netcdf/netcdf-c`, `paraview/paraview`, `visit-dav/visit`, `openfoam/openfoam`, `gromacs/gromacs`
-*   **Engineering Breakthroughs:** Highly parallel scheduler queues, distributed task dispatchers, scientific matrix data storage.
-*   **SigmaOS Adaptation Pathway:** Incorporate task prioritization metrics inside the scheduler in `src/kernel/scheduler.rs`.
+*   **Upstream Repositories:** `slurm/slurm`, `openmpi/ompi`, `mpich/mpich`, `petsc/petsc`, `hdfgroup/hdf5`, `netcdf/netcdf-c`, `paraview/paraview`, `visit-dav/visit`, `openfoam/openfoam`, `gromacs/gromacs`.
+*   **Concepts to Absorb:** Multi-node thread scheduler structures, scientific mathematical vectors, and parallel coordinate solvers.
+*   **SigmaOS Adaptation Pathway:** Incorporate scheduling prioritization matrices within `src/kernel/scheduler.rs`.
 
 ### 29. 🔹 Security Tools (Duplicates / Additional)
-*   **Upstream Repositories:** `nmap/nmap`, `metasploit/metasploit-framework`, `aircrack-ng/aircrack-ng`, `john/john`, `hashcat/hashcat`, `openvas/openvas`, `ossec/ossec-hids`, `snort/snort`
-*   **Engineering Breakthroughs:** Real-time streams vulnerability scanners, intrusion audit triggers, rapid hash parsing iterations.
-*   **SigmaOS Adaptation Pathway:** Program automated vulnerabilities audit pipelines inside package managers in `src/security/vulnerability.rs`.
-
-### 30. 🔹 HPC Clustering & Orchestration
-*   **Upstream Repositories:** `kubernetes/kubernetes`, `hashicorp/nomad`, `apache/mesos`
-*   **Engineering Breakthroughs:** Dynamic cluster workload orchestration, robust failure recovery scheduling.
-*   **SigmaOS Adaptation Pathway:** Natively implement secure IPC orchestration tunnels in `src/orchestration/`.
-
-### 31. 🔹 Audio Primitives & Drivers
-*   **Upstream Repositories:** `alsa-project/alsa-lib`, `pulseaudio/pulseaudio`, `pipewire/pipewire`
-*   **Engineering Breakthroughs:** Zero-copy audio processing rings, graph-based media pipelines.
-*   **SigmaOS Adaptation Pathway:** Build lock-free sound mixers inside `src/audio/` to guarantee real-time playback.
-
-### 32. 🔹 Display Compositors
-*   **Upstream Repositories:** `weston/weston`, `swaywm/wlroots`, `smithay/smithay`
-*   **Engineering Breakthroughs:** Hardware-accelerated GPU display compositing, client isolation security layers.
-*   **SigmaOS Adaptation Pathway:** Model standard window geometry mapping inside the Zenith display controller in `zenith_desktop/`.
-
-### 33. 🔹 Game Controllers & Input
-*   **Upstream Repositories:** `libinput/libinput`, `SDL-mirror/SDL`
-*   **Engineering Breakthroughs:** Robust touchpad/mouse event processing, unified joystick/gamepad abstractions.
-*   **SigmaOS Adaptation Pathway:** Build HID keyboard and pointer event decoders in `src/drivers/`.
-
-### 34. 🔹 Fonts & Desktop Utilities
-*   **Upstream Repositories:** `freetype/freetype`, `behdad/harfbuzz`
-*   **Engineering Breakthroughs:** High-performance vector glyph renderers, advanced text layout engines.
-*   **SigmaOS Adaptation Pathway:** Deploy glyph shape processing inside the text terminal drawer in `src/productivity/`.
+*   **Upstream Repositories:** `nmap/nmap`, `metasploit/metasploit-framework`, `aircrack-ng/aircrack-ng`, `john/john`, `hashcat/hashcat`, `openvas/openvas`, `ossec/ossec-hids`, `snort/snort`.
+*   **Concepts to Absorb:** Dynamic port scanning state machines, vulnerability matching engines, high-speed hash scanning iterations, and host-level event audits.
+*   **SigmaOS Adaptation Pathway:** Run automated vulnerability inspection scans on package metadata inside `src/security/vulnerability.rs`.
 
 ---
 
 ## Part 3: Phased Integration & Strategic Implementation Roadmap
 
-To systematically execute these integrations, SigmaOS defines a disciplined timeline spanning **four stabilization phases** and **six sovereign strategic initiatives**.
-
-```text
-  Phase 1: Stabilization & Foundation  [Q1-Q2]  -->  Phase 2: Capability & Hardening [Q2-Q3]
-                                                                        |
-  Phase 4: Sovereign Integration & Delight [Q4] <--  Phase 3: High-Perf Storage & Net [Q3-Q4]
-                                        |
-                                        v
-                    [Phases L to Q: Sovereign Scale & AI-Native Layer]
-```
-
 ### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Q1-Q2)
-*Focus: Stabilizing the physical allocator, multi-priority scheduler, and standard command utilities.*
+*Focus: Stabilizing memory management, multi-priority CPU scheduling, system initialization, and standard command utilities.*
 
 #### 1.1 Buddy Allocator & Real-Time Scheduler Integration
 *   **Actionable Tasks:**
-    -   Integrate state-restoring error handling into the physical memory manager buddy allocator (`src/kernel/memory.rs`) to support crash recoveries.
+    -   Integrate state-restoring error handling into physical memory manager buddy allocator (`src/kernel/memory.rs`) to support crash recoveries.
     -   Integrate Earliest Deadline First (EDF) scheduler tick mechanisms inside `src/kernel/scheduler.rs`.
-*   **Upstream Inspiration:** `torvalds/linux`, `preempt-rt/preempt-rt`, `seL4/seL4`, `xenomai/xenomai`
-*   **Target Subsystems:** `src/kernel/`, `src/kernel/memory.rs`, `src/kernel/scheduler.rs`
+*   **Upstream Inspiration:** `torvalds/linux`, `preempt-rt/preempt-rt`, `seL4/seL4`, `xenomai/xenomai`.
+*   **Target Subsystems:** `src/kernel/`, `src/kernel/memory.rs`, `src/kernel/scheduler.rs`.
 *   **Success Criteria:** Zero-copy buddy merges; EDF task selection compiles and passes tests cleanly without heap allocation.
 
 #### 1.2 Multi-Call Command Utility (Sigma-Shell REPL)
 *   **Actionable Tasks:**
-    -   Implement a unified multi-call shell REPL binary that acts as `coreutils` + `procps-ng` + `util-linux` combined, keeping size to `< 100KB` statically.
-*   **Upstream Inspiration:** `busybox/busybox`, `coreutils/coreutils`, `util-linux/util-linux`
-*   **Target Subsystems:** `src/shell/`
+    -   Implement a unified multi-call shell REPL binary that acts as `coreutils` + `procps-ng` + `util-linux` combined, keeping memory footprint to `< 100KB` statically.
+*   **Upstream Inspiration:** `busybox/busybox`, `coreutils/coreutils`, `util-linux/util-linux`.
+*   **Target Subsystems:** `src/shell/`.
 *   **Success Criteria:** Native commands (`ls`, `cat`, `ps`, `clear`, `help`) execute correctly in S-CLI.
 
 ---
@@ -318,17 +260,17 @@ To systematically execute these integrations, SigmaOS defines a disciplined time
 
 #### 2.1 Capability-Gated Virtual File System & Drivers
 *   **Actionable Tasks:**
-    -   Connect the `CapabilityGate` validation token to all file reads and writes inside the Virtual Filesystem (`src/filesystem/vfs.rs`).
+    -   Connect `CapabilityGate` validation token to all file reads and writes inside the Virtual Filesystem (`src/filesystem/vfs.rs`).
     -   Guard device command execution (NVMe, GPU, USB) behind mandatory capability bits checking.
-*   **Upstream Inspiration:** `genode/genode`, `seL4/seL4`
-*   **Target Subsystems:** `src/filesystem/vfs.rs`, `src/drivers/`, `src/security/capability.rs`
+*   **Upstream Inspiration:** `genode/genode`, `seL4/seL4`.
+*   **Target Subsystems:** `src/filesystem/vfs.rs`, `src/drivers/`, `src/security/capability.rs`.
 *   **Success Criteria:** Any access without a valid `CapabilityToken` fails with a clean `FsError::PermissionDenied`.
 
 #### 2.2 Process Privilege Reduction (`sigma_pledge` & `sigma_unveil`)
 *   **Actionable Tasks:**
     -   Implement dynamic process privilege restriction on syscall bounds using sandboxing mechanisms.
-*   **Upstream Inspiration:** `openbsd/src` (pledge/unveil), `flatpak/flatpak`
-*   **Target Subsystems:** `src/security/pledge.rs`, `src/syscall/`
+*   **Upstream Inspiration:** `openbsd/src` (pledge/unveil), `flatpak/flatpak`.
+*   **Target Subsystems:** `src/security/pledge.rs`, `src/syscall/`.
 *   **Success Criteria:** Sockets or executables violating active pledges fail and invoke a healing fallback rule.
 
 ---
@@ -338,18 +280,18 @@ To systematically execute these integrations, SigmaOS defines a disciplined time
 
 #### 3.1 Merkle-Tree CoW File System & Self-Healing Rollbacks
 *   **Actionable Tasks:**
-    -   Integrate transactional log-structured writes in the block storage driver.
+    -   Integrate transactional log-structured writes in block storage driver.
     -   Use Merkle-tree state verification to allow atomic snapshots and system-level rollbacks in `src/resilience/self_healing.rs`.
-*   **Upstream Inspiration:** `btrfs/btrfs-progs`, `zfs/zfs`, `f2fs-tools/f2fs-tools`
-*   **Target Subsystems:** `src/resilience/self_healing.rs`, `src/filesystem/`
+*   **Upstream Inspiration:** `btrfs/btrfs-progs`, `zfs/zfs`, `f2fs-tools/f2fs-tools`.
+*   **Target Subsystems:** `src/resilience/self_healing.rs`, `src/filesystem/`.
 *   **Success Criteria:** Creating a snapshot returns a secure hash; rollbacks safely restore configuration tables in under `1ms`.
 
 #### 3.2 SAT-Solver Dependency Resolution & CAS Store
 *   **Actionable Tasks:**
     -   Scale `src/sigpkg/resolver.rs` to support complete DPLL SAT solving.
     -   Establish native content-addressed storage (CAS) folder format using SHA-256 hashes to guarantee conflict-free package states.
-*   **Upstream Inspiration:** `nixos/nixpkgs`, `flatpak/flatpak`, `pacman/pacman`
-*   **Target Subsystems:** `src/sigpkg/`, `src/package/universal.rs`
+*   **Upstream Inspiration:** `nixos/nixpkgs`, `flatpak/flatpak`, `pacman/pacman`.
+*   **Target Subsystems:** `src/sigpkg/`, `src/package/universal.rs`.
 *   **Success Criteria:** Conflict detection flags overlapping dependencies instantly; multiple packages share identical files safely via CAS hashes.
 
 ---
@@ -360,68 +302,21 @@ To systematically execute these integrations, SigmaOS defines a disciplined time
 #### 4.1 AI-Powered Adaptive Telemetry & Monitoring
 *   **Actionable Tasks:**
     -   Feed real-time telemetry metrics (from htop-like widgets) directly into an AI optimization model to dynamically scale cooling levels and CPU frequencies.
-*   **Upstream Inspiration:** `prometheus/prometheus`, `sysstat/sysstat`, `htop-dev/htop`
-*   **Target Subsystems:** `src/dashboard/`, `src/automation/system_level.rs`
+*   **Upstream Inspiration:** `prometheus/prometheus`, `sysstat/sysstat`, `htop-dev/htop`.
+*   **Target Subsystems:** `src/dashboard/`, `src/automation/system_level.rs`.
 *   **Success Criteria:** High thermal events automatically invoke CPU throttling rules.
 
 #### 4.2 Zenith Desktop Accessibility & Transition Polish
 *   **Actionable Tasks:**
-    -   Connect assistive tech (Screen Reader, High Contrast) to the UI compositor rendering loop.
+    -   Connect assistive tech (Screen Reader, High Contrast) to UI compositor rendering loop.
     -   Implement responsive layouts and screen reader voice buffers.
-*   **Upstream Inspiration:** `KDE/plasma-desktop`, `GNOME/gnome-shell`
-*   **Target Subsystems:** `src/accessibility/`, `zenith_desktop/`
+*   **Upstream Inspiration:** `KDE/plasma-desktop`, `GNOME/gnome-shell`.
+*   **Target Subsystems:** `src/accessibility/`, `zenith_desktop/`.
 *   **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
 
 ---
 
-## Part 4: Next-Phase Strategic Initiatives (Phases L to Q)
-
-To evolve from a core microkernel prototype into an industrial-grade, national-scale sovereign OS, the following next-generation phases are planned and implemented:
-
-### ⚙️ Phase L: Kernel Refinement & Microkernel Modularization
-*   **Focus:** Core microkernel modularization, standardizing syscall interfaces, and implementing POSIX compliance layers to ease Linux absorption.
-*   **Deliverables:** Completing demand paging, Copy-on-Write (CoW), and syscall table standardization in `src/kernel/`.
-
-### 🌐 Phase M: Networking & Distributed Systems (Mesh & SigmaNet)
-*   **Focus:** Implementing peer-to-peer mesh networking for sovereign communication. Developing SigmaNet, a PQC-secured alternative to TCP/IP.
-*   **Deliverables:** Custom TCP/UDP stack congestion control, mesh network routing tables, and QUIC latency benchmarks.
-
-### 📂 Phase N: Filesystem Evolution (SigmaFS Replication)
-*   **Focus:** Evolving SigmaFS with transactional journaling, cryptographic signatures, and distributed replication with NIC/MeitY data centers.
-*   **Deliverables:** Merkle-CoW journaling blocks and sovereign cloud integration interfaces.
-
-### 🖥️ Phase O: Desktop & Multilingual Support (Zenith GUI)
-*   **Focus:** Scaling the Zenith compositor to support GPU acceleration and full multilingual UI across 22 scheduled languages of India.
-*   **Deliverables:** Native screen magnification, high-contrast states, and a sovereign app store.
-
-### 🤖 Phase P: AI-Native Sovereign Layer (Agent Absorption)
-*   **Focus:** Sandboxed local inference engines (Rust-based GGML, candle) running predictive scheduling and self-healing diagnostics.
-*   **Deliverables:** AI kernel task scheduler and PQC-secured IPC agent communication tunnels.
-
-### 🛡️ Phase Q: Security & Sovereignty (Zero-Trust & Aadhaar Integration)
-*   **Focus:** Post-quantum cryptography integration across all networking, storage, and IPC layers. Identity-based access and Aadhaar-compliant verification.
-*   **Deliverables:** Zero-trust capability tokens and biometric-assisted secure boot sequences.
-
----
-
-## Part 5: OOP-Based Plug-and-Play Driver Framework
-
-To ensure flawless driver dynamic-loading, SigmaOS defines abstract base traits and strict device-family hierarchies.
-
-### Polymorphic Device Framework:
-```rust
-pub trait DeviceDriver {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn shutdown(&mut self) -> Result<(), &'static str>;
-    fn get_status(&self) -> &'static str;
-}
-```
-
-This polymorphic base is inherited by specialized drivers (e.g., `InputDriver`, `GpuDriver`, `NetworkDriver`, `BluetoothDriver`) executing within isolated userspace microkernel shards.
-
----
-
-## Part 6: Quality Assurance & Upstream Synchronization Protocol
+## Part 4: Quality Assurance & Upstream Synchronization Protocol
 
 To maintain 100% architectural integrity during execution:
 1.  **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
