@@ -9,7 +9,8 @@ pub mod mac;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod bridge;
+pub mod prism;
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -33,17 +34,9 @@ pub use password::{
 };
 pub use pki::{Certificate, PKIError, PKIManager, SimplePKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use secrets::SecretType;
-pub use vault::{
-    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
-    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
-    VaultResult,
+pub use bridge::{
+    LegacySecurityType, SecurityBridge,
 };
-pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
-};
-pub use vulnerability::{
-    KAslrHardener, Severity as VulnerabilitySeverity, StackCanaryGuard, WxorEPageGuard, ZeroizeSec,
+pub use prism::{
+    SecurityFacet, SecurityPrism,
 };

@@ -1,43 +1,12 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
 pub mod cross_platform;
-pub mod gap_closure;
-pub mod historic_linux;
-pub mod personality;
-pub mod sigmawin;
-pub mod superiority;
-
-pub use superiority::{
-    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
-    SigSection, SigSectionType, SovereignTimeMachine, ShardCheckpoint, NumaTask,
-    NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine, SovereignForensics,
-    SovereignRecoverUtility, ShardIgnitor,
-};
-
-pub use gap_closure::{
-    AiTaskOrchestrator, BootInterface, BuildLedgerSystem, DriverClass, DriverRepositoryManager,
-    EmulatedPeripheral, FirmwareBridgeManager, GapSandboxPolicy, HardwareDriver, HidGraphicsDriver,
-    JobClass, KernelModule, KernelModuleManager, LedgerSnapshot, MemoryProtection, ModuleState,
-    NetworkStackGateway, PeripheralEmulationLibrary, SecurityPolicyManager,
-    SyscallCompatibilityRegistry, VirtualMemoryManager,
-};
-
-pub use constellation::{
-    ArchiveProfile, BuildArchive, ChronicleType, ConstellationNode, DriverMuseum, ExhibitType,
-    FirmwarePavilion, KernelConstellation, ObsoletePeripheral, PavilionType, PeripheralMuseum,
-    SecurityModel as ConstellationSecurityModel, SecurityPavilion, SyscallChronicle,
-};
-
-pub use personality::{
-    BuildCapsule, BuildProfile, CapsuleVersion, DriverEmulator, EmulatorProfile, FirmwarePersona,
-    FirmwareType, KernelShard, ObsoleteDevice, PeripheralPod, SecurityGrid, SecurityModel,
-    ShardType, SyscallCapsule,
-};
-
-pub use sigmawin::{
-    D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, User32MessageQueue, Win32Error,
-    Win32Message, WinSockAdapter,
-};
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -76,4 +45,22 @@ pub use relay_nexus::{
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+};
+pub use linux_adapter::{
+    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+};
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
+};
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
 };
