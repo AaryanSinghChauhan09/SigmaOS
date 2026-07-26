@@ -2,9 +2,8 @@
 //!
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -17,13 +16,18 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-    pub bits: u64,
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CapabilityToken {
@@ -47,26 +51,32 @@ impl CapabilityToken {
 
     pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
-            id,
-            allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
-            allowed_ports: ports.to_vec(),
-            is_revoked: false,
-            bits: 0,
-        }
-    }
-
-    /// Construct with ID only
-    pub fn new_with_id(id: u64) -> Self {
-        Self {
-            id,
-            allowed_paths: &[],
-            allowed_ports: &[],
+            id: 0,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
             is_revoked: false,
             bits_value: 0,
         }
     }
 
-    /// Support bits representation
+    pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
+        CapabilityToken {
+            id,
+            allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
+            allowed_ports: ports.to_vec(),
+            is_revoked: false,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: bits,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
+            is_revoked: false,
+        }
+    }
+
     pub fn bits(&self) -> u64 {
         self.bits_value
     }
@@ -75,6 +85,9 @@ impl CapabilityToken {
     pub fn can_access_path(&self, path: &str) -> bool {
         if self.is_revoked {
             return false;
+        }
+        if self.allowed_paths.is_empty() {
+            return true; // Allow if no specific restriction
         }
         self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
@@ -93,6 +106,7 @@ impl CapabilityToken {
     pub fn revoke(&mut self) {
         self.is_revoked = true;
     }
+}
 
     pub fn bits(&self) -> u64 {
         self.bits
@@ -106,60 +120,14 @@ impl CapabilityToken {
         self
     }
 
-    pub fn allow_read(mut self, path: &str) -> Self {
-        self.bits |= 2;
-        self.allowed_paths.push(String::from(path));
-        self
-    }
-
-    pub fn allow_write(mut self, path: &str) -> Self {
-        self.bits |= 4;
-        self.allowed_paths.push(String::from(path));
-        self
-    }
-
-    pub fn allow_exec(mut self) -> Self {
-        self.bits |= 8;
-        self
-    }
-
-    pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 16;
-        self
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct SecurityEnforcer {
     active_tokens: Vec<CapabilityToken>,
+}
+
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SecurityEnforcer {

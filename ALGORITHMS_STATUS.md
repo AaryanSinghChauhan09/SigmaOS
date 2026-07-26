@@ -1,28 +1,27 @@
-# 🛠️ SigmaOS Algorithms, Compilation, & Subsystem Status Master Guide
+# 🛠️ SigmaOS Algorithms, Compilation, & Subsystem Status Guide
 
-This document serves as the definitive, hyper-detailed master guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, contains precise code blocks to fix every compiler error instantly, and outlines our cutting-edge **Proxy-Based Compatibility Architecture**.
+This document serves as the definitive, hyper-detailed master status guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, lists the exact compilation-blocking errors, and provides precise, copy-pasteable instructions to resolve every compiler error instantly.
 
 ---
 
 ## 📋 Table of Contents
 1. [Executive Summary](#-executive-summary)
-2. [What is Working (Operational Modules)](#-what-is-working-operational-modules)
-3. [What is Not Working (Active Compilation Blockers)](#-what-is-not-working-active-compilation-blockers)
-4. [Deep Dive: Why & How to Fix Every Error](#-deep-dive-why--how-to-fix-every-error)
-    - [Issue 1: Invalid `protocol` Keyword in `src/net/stack.rs`](#issue-1-invalid-protocol-keyword-in-srcnetstackrs)
-    - [Issue 2: Invalid Python-style `def` Keywords in `src/net/socket.rs`](#issue-2-invalid-python-style-def-keywords-in-srcnetsocketrs)
-    - [Issue 3: Missing Module Files (`device` and `qdisc`) in `src/net/mod.rs`](#issue-3-missing-module-files-device-and-qdisc-in-srcnetmodrs)
-    - [Issue 4: Mismatched Delimiters and Missing Definitions in `src/kernel/memory.rs`](#issue-4-mismatched-delimiters-and-missing-definitions-in-srckernelmemoryrs)
-5. [🔮 Advanced Proxy-Based Compatibility Subsystems](#-advanced-proxy-based-compatibility-subsystems)
-    - [1. Universal ABI Translator (ISyscallTranslator)](#1-universal-abi-translator-isyscalltranslator)
-    - [2. Composable Filesystem (SigmaFS++)](#2-composable-filesystem-sigmafs)
-    - [3. Self-Healing Kernel](#3-self-healing-kernel)
-    - [4. AI-Native Runtime](#4-ai-native-runtime)
-    - [5. Energy-Aware Scheduler](#5-energy-aware-scheduler)
-    - [6. User-Defined Kernel Functions](#6-user-defined-kernel-functions)
-    - [7. Privacy-First Sandbox](#7-privacy-first-sandbox)
-6. [📊 Competitive Edge vs. Traditional OSes](#-competitive-edge-vs-traditional-oses)
-7. [🚦 Verification & Testing Guide](#-verification--testing-guide)
+2. [Core Engineering Principles](#-core-engineering-principles)
+3. [What is Working (Operational Modules)](#-what-is-working-operational-modules)
+4. [What is Not Working & Gaps (Subsystem Analysis)](#-what-is-not-working--gaps-subsystem-analysis)
+    - [Kernel & Core System](#kernel--core-system)
+    - [Filesystem & Storage](#filesystem--storage)
+    - [Security & Isolation](#security--isolation)
+    - [Userland & UI](#userland--ui)
+    - [System Services](#system-services)
+    - [Ecosystem & Compatibility](#ecosystem--compatibility)
+    - [Advanced/Innovative Features](#advancedinnovative-features)
+5. [SigmaOS Status Summary Table](#-sigmaos-status-summary-table)
+6. [Architectural Roadmap (Tools Yet to Be Made)](#-architectural-roadmap-tools-yet-to-be-made)
+7. [Improvements to Existing SigmaOS Tools](#-improvements-to-existing-sigmaos-tools)
+8. [Competitive Edge Dashboard](#-competitive-edge-dashboard)
+9. [Deep Dive: Why & How to Fix Every Active Compilation Error](#-deep-dive-why--how-to-fix-every-active-compilation-error)
+10. [Verification & Testing Guide](#-verification--testing-guide)
 
 ---
 
@@ -30,7 +29,20 @@ This document serves as the definitive, hyper-detailed master guide for any soft
 
 SigmaOS is a capability-based, AI-native operating system built in safe Rust. It contains modular and high-performance algorithms for scheduling, physical and virtual memory allocation, package dependency resolution, security gating, and standard networking.
 
-Currently, **all core compilation blockers (including Swift-style/Python-style keyword typos and corrupt merge conflict structures) have been fully resolved**. Furthermore, SigmaOS implements an uncompromised **Proxy-Based Compatibility Layer** to run legacy applications and manage ancient peripherals seamlessly while maintaining safe OOP abstractions.
+Currently, **the core compilation is blocked by syntax errors, conflicting duplicate trait implementations, and missing helper/utility imports**. Furthermore, SigmaOS is a promising research OS prototype but still lacks several of the core, bread-and-butter subsystems of a complete, production-grade operating system. This guide documents both **active compiler blockers** and **architectural gaps**, giving subsequent AI agents a complete map to fix and advance SigmaOS.
+
+---
+
+## 🏛️ Core Engineering Principles
+
+Building and improving SigmaOS is guided by established system design principles:
+* **Object-Oriented Design (OOP)**: Clear modularity through dynamic dispatch and encapsulation of subsystem states.
+* **Separation of Policy and Mechanism**: Separation of kernel runtime capabilities (mechanisms) from user/policy controls.
+* **Optimization for the Common Case**: Fast paths for standard scheduling cycles and direct I/O routing.
+* **Hardware Abstraction**: Zero-dependency HALs decoupling physical device state from user-mode drivers.
+* **Protection and Isolation**: Hardware-enforced protection domains, capability tokens, and strict zero-trust sandboxing.
+* **Process Control & Memory Management**: Safe task contexts, preemption metrics, and sound physical/virtual allocators.
+* **Privilege Levels & Interrupt Handling**: Capability gates, segmented CPU contexts, and predictable, balanced ISR queues.
 
 ---
 
@@ -50,215 +62,179 @@ The following algorithms and subsystems are structurally and logically complete:
 4. **Virtual Filesystem (`src/filesystem/vfs.rs`)**
    - Implements virtual inode and file descriptor routing with capability permissions.
 
-5. **Legacy Linux Release Compatibility Layer (`src/compatibility/oldlinux.rs`)**
-   - Bridges early Linux kernel personalities (0.01, 0.11, 0.12, 0.95, 0.96, 0.97, 0.98, 0.99, and 1.0) with unified metadata, syscall routing, and obsolete hardware port I/O mapping.
+5. **Historic Linux ABI Layer (`src/compatibility/historic_linux.rs`)**
+   - Provides an impressive backwards-compatibility engine spanning early era emulation (0.01/0.11 up to 2.4/2.5) with full sandbox virtualizations, driver shims, and package converts.
 
 ---
 
-## ❌ What is Not Working (Active Compilation Blockers)
+## ❌ What is Not Working & Gaps (Subsystem Analysis)
 
-A standard compiler run (`cargo check` or `cargo test`) halts immediately due to **6 errors** in 4 files:
+### Kernel & Core System
+* **Virtual Memory**: Only physical allocator exists; missing paging, demand loading, page fault handling, copy-on-write.
+* **Process Management**: Basic scheduling present, but no namespaces, cgroups, priority scheduling, or real-time scheduling.
+* **Networking**: TCP/UDP stack is partial; missing full IPv4/IPv6, routing, firewall, VPN, DHCP, DNS resolver.
+* **Interrupt & Power Management**: No ACPI, suspend/resume, or multi-core interrupt balancing.
 
-| File Path | Line No. | Error Type | Impact |
-|---|---|---|---|
-| `src/net/stack.rs` | 152 | Syntax: Expected item, found keyword `protocol` | Blocks compilation of the networking stack. |
-| `src/net/socket.rs` | 63 | Syntax: Expected `fn` or `!` but found `def` | Blocks compilation of the socket API. |
-| `src/net/mod.rs` | 3 | File System: `device` module file not found | Blocks module tree resolution for `net`. |
-| `src/net/mod.rs` | 4 | File System: `qdisc` module file not found | Blocks module tree resolution for `net`. |
-| `src/kernel/memory.rs` | 195 | Structure: Unexpected closing delimiter `}` | Blocks memory subsystem compilation due to brace mismatch inside `impl Page`. |
+### Filesystem & Storage
+* **Implemented**: Ext4, FAT32.
+* **Missing**: SigmaFS distributed filesystem, journaling improvements, snapshots, RAID, encryption at rest, ZFS/Btrfs-like features.
 
----
+### Security & Isolation
+* **Implemented**: Post-quantum crypto primitives.
+* **Missing**: Mandatory Access Control (SELinux/AppArmor), sandboxing, containerization, namespaces, secure boot, kernel hardening.
 
-## 🔍 Deep Dive: Why & How to Fix Every Error
+### Userland & UI
+* **Implemented**: Zenith Desktop prototype.
+* **Missing**:
+  * Full shell (sigma-sh REPL).
+  * Core utilities (ls, cp, grep, etc.).
+  * GUI toolkit for apps.
+  * Multi-user environment with permissions.
+  * Package ecosystem comparable to apt/rpm/pacman.
 
-### Issue 1: Invalid `protocol` Keyword in `src/net/stack.rs`
+### System Services
+* **Missing**:
+  * Init/system manager (like systemd).
+  * Logging and monitoring services.
+  * Printing subsystem.
+  * Audio subsystem.
+  * Time synchronization (NTP).
+  * Background daemons for networking, jobs, and resource management.
 
-#### **Why it occurs**
-At line 152 in `src/net/stack.rs`, the keyword `protocol` is used to define `TcpSk`. In Rust, `protocol` is not a valid keyword (it resembles Swift, Objective-C, or pseudo-code).
+### Ecosystem & Compatibility
+* **Missing**:
+  * POSIX compliance layer.
+  * Cross-distro package compatibility.
+  * Legacy API replay for ancient binaries.
+  * Virtualization support (QEMU/KVM integration).
+  * Container runtime (Docker/Podman-style).
+  * Cross-platform portability layers.
 
-```rust
-pub protocol TcpSk {
-    snd_una: u32,
-    ...
-}
-```
-
-Since `TcpSk` lists a series of structural data fields (such as `snd_una: u32`, `snd_nxt: u32`, etc.), it must be declared as a **`pub struct`** instead of a `protocol`.
-
-#### **Exact Code Fix**
-Replace the `protocol` block with a standard `pub struct` block:
-
-```rust
-pub struct TcpSk {
-    pub snd_una: u32,
-    pub snd_nxt: u32,
-    pub rcv_nxt: u32,
-    pub snd_wl1: u32,
-    pub snd_wl2: u32,
-    pub snd_wnd: u32,
-    pub rcv_wnd: u32,
-    pub cwnd: u32,
-    pub ssthresh: u32,
-    pub retransmits: u32,
-    pub out_of_order: u32,
-    pub rcv_tstamp: bool,
-    pub snd_tstamp: bool,
-}
-```
+### Advanced/Innovative Features
+* **Conceptual only**: AI shard orchestration (S-AI).
+* **Missing**: Actual AI workload scheduling, inference integration, adaptive kernel personas, predictive syscall translation.
 
 ---
 
-### Issue 2: Invalid Python-style `def` Keywords in `src/net/socket.rs`
+## 📊 SigmaOS Status Summary Table
 
-#### **Why it occurs**
-Inside the `SocketManager` trait in `src/net/socket.rs`, multiple trait methods are declared using Python-style `def` instead of Rust-style `fn`.
-
-```rust
-pub trait SocketManager {
-    fn create_socket(&mut self, socket_type: SocketType) -> Result<SocketID, SocketError>;
-    def close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
-    ...
-}
-```
-
-#### **Exact Code Fix**
-Replace all occurrences of `def ` with `fn ` in `src/net/socket.rs`.
-
-```rust
-pub trait SocketManager {
-    fn create_socket(&mut self, socket_type: SocketType) -> Result<SocketID, SocketError>;
-    fn close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
-    fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
-    fn bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    fn connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    fn send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
-    fn receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
-}
-```
+| Area | SigmaOS Status | Full OS Expectation |
+| :--- | :--- | :--- |
+| **Memory** | Physical allocator | Full virtual memory, paging |
+| **Networking** | Partial TCP/UDP | IPv4/IPv6, firewall, DHCP, DNS |
+| **Drivers** | NVMe, USB xHCI | HID, GPU, Wi-Fi, sound, printers |
+| **Filesystem** | Ext4, FAT32 | ZFS/Btrfs, snapshots, encryption |
+| **Security** | PQC primitives | MAC, sandboxing, namespaces |
+| **Userland** | Zenith prototype | Shell, utilities, GUI toolkit |
+| **Services** | Minimal | Init, logging, audio, printing |
+| **Ecosystem** | Early stage | POSIX, package manager, virtualization |
+| **AI Integration** | Conceptual | Full orchestration + inference |
 
 ---
 
-### Issue 3: Missing Module Files (`device` and `qdisc`) in `src/net/mod.rs`
+## 🔧 Architectural Roadmap (Tools Yet to Be Made)
 
-#### **Why it occurs**
-`src/net/mod.rs` declares `pub mod device;` and `pub mod qdisc;`, which do not have corresponding files in the system (`src/net/device.rs` or `src/net/qdisc.rs` do not exist).
-Additionally, the types `Qdisc`, `PfifoFast`, and `QdiscManager` are actually defined directly in `src/net/stack.rs`.
+1. **Universal ABI Translator**
+   * **Gap**: Linux/BSD rely on POSIX; Windows/macOS use different syscall architectures.
+   * **Innovation**: Abstract `ISyscallTranslator` interface with interchangeable subclasses (`LinuxTranslator`, `BSDTranslator`, `WindowsTranslator`, `MacOSTranslator`).
+   * **Impact**: SigmaOS runs binaries from multiple operating system families natively without any Wine-like performance or VM memory overhead.
 
-```rust
-pub mod stack;
-pub mod socket;
-pub mod device;
-pub mod qdisc;
+2. **Composable Filesystem (SigmaFS++)**
+   * **Gap**: Traditional filesystems like Ext4, NTFS, APFS, and ZFS are rigid.
+   * **Innovation**: Modular filesystem architecture with loadable plugins for encryption, deduplication, semantic indexing, and blockchain audit trails.
+   * **Impact**: Powering AI-driven semantic queries and supplying complete, compliance-ready transactional audit logs.
 
-pub use stack::{Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl, Netfilter, NetfilterRule, NFAction};
-pub use qdisc::{Qdisc, PfifoFast, QdiscManager};
-```
+3. **Self-Healing Kernel**
+   * **Gap**: Contemporary operating systems depend on manual patching, reboots, or complex recovery pipelines.
+   * **Innovation**: An inline security and integrity checker relying on a decoupled `IRecoveryStrategy` abstraction.
+   * **Impact**: Support for Git-like rollback snapshots, AI-generated hot patches, and automatic kernel/driver quarantines.
 
-#### **Exact Code Fix**
-Remove the non-existent module declarations and re-export the types from `stack.rs`.
+4. **AI-Native Runtime**
+   * **Gap**: AI workloads are treated as standard applications, not core operating system processes.
+   * **Innovation**: Introducing an `IModelRuntime` abstraction to orchestrate LLM, vision, and audio models as first-class, scheduled OS processes.
+   * **Impact**: Unlocks native, kernel-level scheduling and acceleration for AI queries.
 
-```rust
-pub mod stack;
-pub mod socket;
+5. **Energy-Aware Scheduler**
+   * **Gap**: Existing schedulers prioritize CPU performance metrics over real-world energy footprint and sustainability.
+   * **Innovation**: S-CFS and EEVDF policy modules that dynamically model and predict the power/energy costs of scheduled threads.
+   * **Impact**: Real-time balancing between user throughput demand and battery/thermal constraints.
 
-pub use stack::{
-    Socket, NetDevice, SkBuff, CongestionControl, RenoCongestionControl, BbrCongestionControl,
-    Netfilter, NetfilterRule, NFAction, Qdisc, PfifoFast, QdiscManager,
-};
-```
+6. **User-Defined Kernel Functions**
+   * **Gap**: Researchers and system power-users need to test custom schedulers or memory allocators.
+   * **Innovation**: Safe, capability-gated script execution directly inside kernel space.
+   * **Impact**: Enables research-friendly OS tuning without tedious recompilations or system restarts.
+
+7. **Privacy-First Sandbox**
+   * **Gap**: SELinux/AppArmor bolt on security as an auxiliary post-install layer.
+   * **Innovation**: A strict zero-trust sandbox execution model wrapping every user space task by default.
+   * **Impact**: Seamless post-quantum cryptographic primitives built into kernel bindings, along with memory isolation bounds.
 
 ---
 
-### Issue 4: Mismatched Delimiters and Missing Definitions in `src/kernel/memory.rs`
+## 🔄 Improvements to Existing SigmaOS Tools
 
-#### **Why it occurs**
-An incomplete or corrupt merge/conflict resolution truncated the struct definitions of `MemoryBlock` and `BuddyAllocator` from `src/kernel/memory.rs`, leaving the implementation methods nested directly inside `impl Page`. This causes structural brace nesting mismatch and compiler errors.
+* **Scheduler**: Introduce AI-driven predictive scheduling to anticipate syscall trends and pre-fetch resources; incorporate energy-aware scheduling modules.
+* **Filesystem**: Extend standard storage abstractions with pluggable deduplication, semantic search, and cryptographically signed audit logs.
+* **Networking**: Deploy modular, policy-driven firewall rules adaptive to workloads; build inline anomaly and threat detectors.
+* **Driver Framework**: Use Language Server Protocol (LSP) equivalents to make device drivers entirely interchangeable; support live hot-swapping.
+* **Security**: Elevate beyond standard AppArmor profiles with self-healing policies and encrypted hardware memory vaults.
 
-We must:
-1. Complete and close `impl Page` block at line 51.
-2. Define the missing structures `MemoryBlock`, `Zone`, and `BuddyAllocator`.
-3. Provide the correct implementation header `impl BuddyAllocator` right before the allocator methods begin.
+---
 
-#### **Exact Code Fix**
-Replace the corrupt top of `src/kernel/memory.rs` to correctly close `impl Page` and define the required types.
+## 📊 Competitive Edge Dashboard
 
-```rust
-use core::ptr::NonNull;
+| Area | Linux/BSD Competitors | SigmaOS Innovation |
+| :--- | :--- | :--- |
+| **ABI Compatibility** | POSIX compliance, Wine wrappers, VMs | Universal ABI Translator (`ISyscallTranslator`) |
+| **Filesystem (FS)** | Rigid storage formats (Ext4, APFS, ZFS) | SigmaFS++ (Semantic search + cryptographic audit trails) |
+| **Kernel Structure** | Monolithic or traditional microkernel | OOP microservices + Self-healing rollback snapshots |
+| **Scheduler** | Performance-oriented scheduling (CFS) | Energy-aware dynamic balancing + AI predictive pre-fetching |
+| **Security** | SELinux/AppArmor access policies | Zero-trust default sandbox + PQC region encryption |
+| **Extensibility** | Loadable kernel modules (.ko) | Safe, live User-defined kernel scripting functions |
 
-pub struct Zone {
-    pub present_pages: u64,
-}
+---
 
-#[derive(Debug)]
-pub struct MemoryBlock {
-    pub addr: NonNull<u8>,
-    pub size: usize,
-}
+## 🔍 Deep Dive: Why & How to Fix Every Active Compilation Error
 
-pub struct Page {
-    pub flags: AtomicUsize,
-    pub count: AtomicUsize,
-    pub mapping: Option<usize>,
-    pub index: u64,
-    pub private: Option<usize>,
-    pub zone: Option<*const Zone>,
-}
+### Issue 1: Multiple conflicting implementations of `Default` for `SimplePageTableEntry` in `src/klib/paging.rs`
+* **Why it occurs**: In `src/klib/paging.rs`, the `Default` trait is implemented multiple times for `SimplePageTableEntry`. This happens due to duplicate source-code blocks added during multiple feature integrations.
+* **Exact Code Fix**: Locate `src/klib/paging.rs` and remove any duplicate `impl Default for SimplePageTableEntry` blocks, keeping only one clean implementation.
 
-impl Page {
-    pub fn new() -> Self {
-        Page {
-            flags: AtomicUsize::new(0),
-            count: AtomicUsize::new(1),
-            mapping: None,
-            index: 0,
-            private: None,
-            zone: None,
-        }
-    }
+### Issue 2: Conflicting implementations of `Debug`, `Clone`, and `Copy` for `DriverError` in `src/driver/framework.rs`
+* **Why it occurs**: In `src/driver/framework.rs`, `DriverError` is declared with `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` on its definition block, but also has explicit manual or duplicate macro derives lower down in the file.
+* **Exact Code Fix**: Inspect `src/driver/framework.rs`. Remove the duplicate derives or redundant `impl` blocks for `Debug`, `Clone`, and `Copy` traits for `DriverError`.
 
-    pub fn inc_ref(&self) {
-        self.count.fetch_add(1, Ordering::SeqCst);
-    }
+### Issue 3: Conflicting implementations of `Debug` and `Clone` in `src/drivers/gpu.rs`
+* **Why it occurs**: The structures `DrmModeInfo`, `DrmCrtc`, and `DrmConnector` in `src/drivers/gpu.rs` contain duplicate `#[derive(...)]` macro blocks or duplicate implementations of `Debug` and `Clone`.
+* **Exact Code Fix**: Edit `src/drivers/gpu.rs` and eliminate duplicate `derive` directives for these three structures.
 
-    pub fn dec_ref(&self) -> bool {
-        self.count.fetch_sub(1, Ordering::SeqCst) == 1
-    }
-}
+### Issue 4: Conflicting implementations of `Default`, `BsdSocket` in `src/network/tcp_udp.rs`
+* **Why it occurs**: In `src/network/tcp_udp.rs`, there are multiple overlapping or duplicate `impl Default` and `impl BsdSocket` blocks for `RenoCongestionControl`, `BBRCongestionControl`, `SimpleNetworkStack`, and `SimpleSocket`.
+* **Exact Code Fix**: Consolidate or delete the duplicate trait implementations in `src/network/tcp_udp.rs` to leave exactly one per type.
 
-pub struct BuddyAllocator {
-    pub free_lists: [Vec<MemoryBlock>; 12],
-    pub free_pages: usize,
-    pub total_pages: usize,
-    pub zones: Vec<Zone>,
-}
+### Issue 5: Unresolved module/crate `mem` in `src/network/tcp_udp.rs`
+* **Why it occurs**: The call `mem::size_of::<T>()` is used inside `src/network/tcp_udp.rs` at line 749, but the `core::mem` or `std::mem` module is not imported.
+* **Exact Code Fix**: Add `use core::mem;` or `use std::mem;` at the top of `src/network/tcp_udp.rs`.
 
-impl BuddyAllocator {
-    pub fn new() -> Self {
-        Self {
-            free_lists: Default::default(),
-            free_pages: 0,
-            total_pages: 0,
-            zones: Vec::new(),
-        }
-    }
+### Issue 6: Mismatched methods in `BsdSocket` trait implementation in `src/network/tcp_udp.rs`
+* **Why it occurs**: Methods `protocol()`, `local_port()`, and `remote_port()` are implemented for `BsdSocket`, but those methods are not declared inside the original `BsdSocket` trait definition (possibly defined in `src/network/stack.rs` or `src/network/mod.rs`).
+* **Exact Code Fix**: Either add these method signatures to the `BsdSocket` trait definition or remove them from the implementation blocks where they do not match.
 
-    pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
-        let pages = size / PAGE_SIZE;
-        let order = self.calculate_order(pages);
+### Issue 7: Conflicting implementations of `Clone`, `Copy`, `PartialEq`, `Eq` for `BuildSystem` in `src/sigpkg/recipe.rs`
+* **Why it occurs**: In `src/sigpkg/recipe.rs`, `recipe::BuildSystem` has redundant derive macros or manual trait implementations that conflict.
+* **Exact Code Fix**: Clean up the duplicate `derive` statements in `src/sigpkg/recipe.rs`.
 
-        if order < 12 {
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
-                self.free_lists[order].push(block);
-            }
-        }
-    }
+### Issue 8: Missing definitions for `SimpleDriver` in `src/driver/framework.rs`
+* **Why it occurs**: The struct `SimpleDriver` is reference/implemented in `src/driver/framework.rs` but it is never declared or was accidentally renamed.
+* **Exact Code Fix**: Ensure `pub struct SimpleDriver` is correctly declared in `src/driver/framework.rs`.
 
-    pub fn add_zone(&mut self, zone: Zone) {
-```
+### Issue 9: Missing `DriverMetadata` import/definition in `src/kernel/driver.rs`
+* **Why it occurs**: The `DriverMetadata` structure is referenced in `src/kernel/driver.rs` but is not imported.
+* **Exact Code Fix**: Import `DriverMetadata` by adding `use crate::kernel::bus::DriverMetadata;` or `use crate::kernel::DriverMetadata;` at the top of `src/kernel/driver.rs`.
+
+### Issue 10: Unresolved variable `a11y` in `src/shell/repl.rs`
+* **Why it occurs**: In `src/shell/repl.rs`, `a11y` is referenced in `a11y_features: a11y,` but `a11y` is not bound/defined in that scope.
+* **Exact Code Fix**: Locate the context in `src/shell/repl.rs` where `a11y` is used and declare it, or pass the correct boolean flag (e.g. `false`).
 
 ---
 
