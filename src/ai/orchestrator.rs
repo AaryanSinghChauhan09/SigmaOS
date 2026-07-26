@@ -150,18 +150,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
+
 
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
@@ -185,9 +174,8 @@ impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID {
         self.id
     }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+    fn name(&self) -> &str {
+        &self.name
     }
     fn state(&self) -> AgentState {
         {
@@ -206,7 +194,7 @@ impl AIAgent for SimpleAIAgent {
         self.state
             .store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
-        let name = self.name();
+        let name = self.name().as_bytes();
         for &byte in name {
             result.push(byte);
         }
