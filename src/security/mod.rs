@@ -12,11 +12,15 @@ pub mod pki;
 pub mod pledge;
 pub mod secrets;
 pub mod selinux;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
+pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
+pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,

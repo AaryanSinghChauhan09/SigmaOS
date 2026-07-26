@@ -12,7 +12,7 @@
 //! sigma_unveil!(nullptr, nullptr); // Lock the veil
 //! ```
 
-use sigma_types::{CapabilityToken, Result};
+use self::sigma_types::{CapabilityToken, Result};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
