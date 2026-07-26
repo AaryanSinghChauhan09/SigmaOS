@@ -15,8 +15,12 @@ pub mod vpn;
 pub mod vulnerability;
 pub mod cleaner;
 pub mod forensics;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter as SigmaSyscallFilter};
+pub use sigma_unveil::{UnveilPermissions, UnveilEntry, UnveilState, UnveilManager};
 pub use cleaner::{SecureCleaner, TorAnonymityGate, AmnesiaManager, MetadataScrubber};
 pub use forensics::{ForensicAnalyzer, ExtractedMetadata, RecoveredFile};
 pub use clipboard::{
