@@ -30,6 +30,22 @@ pub trait Schedulable {
     fn task_id(&self) -> usize;
     /// Get task capability
     fn capability(&self) -> TaskCapability;
+
+    // Distro-inspired scheduler extensions with default implementations
+    /// Get nice value
+    fn nice(&self) -> i32 { 0 }
+    /// Set nice value
+    fn set_nice(&mut self, _nice: i32) {}
+    /// Get interactivity
+    fn is_interactive(&self) -> bool { false }
+    /// Set interactivity
+    fn set_interactive(&mut self, _is_interactive: bool) {}
+    /// Get last sleep duration
+    fn last_sleep_duration(&self) -> u64 { 0 }
+    /// Set last sleep duration
+    fn set_last_sleep_duration(&mut self, _duration: u64) {}
+    /// Apply wakeup boost
+    fn apply_interactive_boost(&mut self) {}
 }
 
 /// Priority levels
@@ -64,6 +80,9 @@ pub struct Task {
     pub last_run_time: AtomicU64,
     pub quantum: u64,
     pub capability: TaskCapability,
+    pub nice: i32,
+    pub is_interactive: bool,
+    pub last_sleep_duration: u64,
 }
 
 impl Task {
@@ -76,6 +95,9 @@ impl Task {
             last_run_time: AtomicU64::new(0),
             quantum,
             capability,
+            nice: 0,
+            is_interactive: false,
+            last_sleep_duration: 0,
         }
     }
 }
@@ -180,6 +202,45 @@ impl Schedulable for Task {
 
     fn capability(&self) -> TaskCapability {
         self.capability
+    }
+
+    fn nice(&self) -> i32 {
+        self.nice
+    }
+
+    fn set_nice(&mut self, nice: i32) {
+        self.nice = nice;
+    }
+
+    fn is_interactive(&self) -> bool {
+        self.is_interactive
+    }
+
+    fn set_interactive(&mut self, is_interactive: bool) {
+        self.is_interactive = is_interactive;
+    }
+
+    fn last_sleep_duration(&self) -> u64 {
+        self.last_sleep_duration
+    }
+
+    fn set_last_sleep_duration(&mut self, duration: u64) {
+        self.last_sleep_duration = duration;
+    }
+
+    fn apply_interactive_boost(&mut self) {
+        if self.last_sleep_duration > 500 {
+            self.is_interactive = true;
+            self.priority = match self.priority {
+                Priority::Idle => Priority::Low,
+                Priority::Low => Priority::Normal,
+                Priority::Normal => Priority::High,
+                Priority::High => Priority::Realtime,
+                Priority::Realtime => Priority::Realtime,
+            };
+        } else {
+            self.is_interactive = false;
+        }
     }
 }
 
@@ -309,15 +370,37 @@ impl Scheduler for RoundRobinScheduler {
             return None;
         }
 
-        // Find next ready task
+        // Find ready task with highest priority (dynamic wakeup boost / nice scaling)
+        let mut best_index = None;
+        let mut highest_prio = Priority::Idle;
+
         for i in 0..self.ready_queue.len() {
             if let Some(ref task) = self.ready_queue[i] {
                 if task.state() == TaskState::Ready {
-                    let task_id = task.task_id();
-                    self.current_task.store(task_id, Ordering::SeqCst);
-                    self.context_switches.fetch_add(1, Ordering::SeqCst);
-                    return Some(task_id);
+                    let mut prio = task.priority();
+                    if task.is_interactive() {
+                        prio = match prio {
+                            Priority::Idle => Priority::Low,
+                            Priority::Low => Priority::Normal,
+                            Priority::Normal => Priority::High,
+                            Priority::High => Priority::Realtime,
+                            Priority::Realtime => Priority::Realtime,
+                        };
+                    }
+                    if prio >= highest_prio {
+                        highest_prio = prio;
+                        best_index = Some(i);
+                    }
                 }
+            }
+        }
+
+        if let Some(idx) = best_index {
+            if let Some(ref task) = self.ready_queue[idx] {
+                let task_id = task.task_id();
+                self.current_task.store(task_id, Ordering::SeqCst);
+                self.context_switches.fetch_add(1, Ordering::SeqCst);
+                return Some(task_id);
             }
         }
 
@@ -359,6 +442,9 @@ impl Scheduler for RoundRobinScheduler {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
                     task.set_state(TaskState::Ready);
+                    // Distro parity: Apply interactive boosting on wakeup from sleep / block
+                    task.set_last_sleep_duration(800);
+                    task.apply_interactive_boost();
                     return Ok(());
                 }
             }
