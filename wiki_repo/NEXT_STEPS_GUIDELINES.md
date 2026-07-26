@@ -442,6 +442,37 @@ To bridge the gap with all mainstream Linux distributions and support Debian/Ubu
 
 ---
 
+## 16. Fedora Inspired Immutable OS & High-Speed Sandboxed Apps (Eclipsing Fedora)
+
+To render Fedora OS entirely obsolete, SigmaOS integrates Fedora’s cutting-edge technologies—atomic immutability (Silverblue), dnf5 performance, Flatpak security, and modern systemd-grade services—into a cohesive, zero-overhead microkernel architecture:
+
+### 1. High-Speed Parallel Metadata Engine (SigmaDNF)
+* **Fedora Inspiration:** DNF5 package manager core.
+* **SigmaOS Sovereign Solution:** A multi-threaded, parallel metadata compiler that downloads and index-parses multiple repository branches simultaneously. It processes catalog databases using SIMD-accelerated deserialization and downloads packages via concurrent segmented HTTP connections, completely bypassing DNF5’s memory footprint and speed limits.
+* **OOP Mapping:** Managed by the `SatSolver` and `PackageRecipeParser`.
+
+### 2. Wayland-Native Zero-Buffer Graphics Pipeline (ZenithWayland)
+* **Fedora Inspiration:** Wayland-by-default session leadership.
+* **SigmaOS Sovereign Solution:** The `ZenithCompositor` implements a fully native Wayland protocol layer, completely bypassing legacy X11 dependencies. The pipeline uses direct DMA hardware sharing and a zero-buffer rendering queue to eliminate compositing latency, cursor lag, and screen tearing.
+* **OOP Mapping:** Governed by `ZenithCompositor` and `Window` managers.
+
+### 3. Immutable Root & Cryptographic Tree Layering (SigmaOSTree)
+* **Fedora Inspiration:** OSTree-based immutable host (Fedora Silverblue / Kinoite).
+* **SigmaOS Sovereign Solution:** The core system root directory (including `/usr` and `/lib`) is mounted as a cryptographically signed, read-only immutable file tree. Users layer specific development or system packages dynamically as Copy-on-Write symlink overlays without modifying the pristine base image, facilitating sub-second system rollback updates.
+* **OOP Mapping:** Integrated inside `GenerationManager` and `SovereignMerkleVfs`.
+
+### 4. Sandbox-Gated App Containers (SigmaFlatpak)
+* **Fedora Inspiration:** Flatpak-first application ecosystem.
+* **SigmaOS Sovereign Solution:** Run GUI applications in deeply sandboxed AppRealms. Utilizing lightweight kernel-enforced namespaces, strict memory cgroups, and seccomp filter profiles, graphical apps are completely isolated from system resources and other applications unless granted explicit permission by the user.
+* **OOP Mapping:** Orchestrated by the `SimpleContainerRuntime` and `Privacy-First Sandbox`.
+
+### 5. Encrypted DNS & Network Coordinator (SigmaResolved)
+* **Fedora Inspiration:** Systemd-resolved & modern NetworkManager integration.
+* **SigmaOS Sovereign Solution:** Secure network address resolution baked directly into the microkernel TCP/UDP stack. It enforces DNS-over-TLS (DoT) and DNS-over-HTTPS (DoH) with post-quantum encryption by default, preventing ISP-level query sniffing, DNS hijacking, and man-in-the-middle poisoning.
+* **OOP Mapping:** Fully integrated within the `SimpleNetworkStack` and `ZeroTrust` modules.
+
+---
+
 ## Priority Action Roadmap
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
