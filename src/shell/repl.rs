@@ -11,7 +11,7 @@ use crate::accessibility::{
 use crate::compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
 };
-use crate::customization::{CustomizationEngine, Theme};
+use crate::customization::{CustomizationEngine, Theme as CustomTheme};
 use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
 use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
 use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
@@ -55,6 +55,33 @@ pub enum ShellCommand {
     },
     AgentRun {
         task_id: usize,
+    },
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Theme {
+        name: String,
+    },
+    Profile {
+        name: String,
+    },
+    A11y {
+        feature: String,
+        state: String,
     },
     Unknown(String),
 }
@@ -105,11 +132,18 @@ impl Default for AgentAutomationEngine {
 
 /// Shell REPL
 pub struct ShellRepl {
-    running: bool,
-    variables: std::collections::HashMap<String, String>,
-    aliases: std::collections::HashMap<String, String>,
-    prompt: String,
-    agent_engine: AgentAutomationEngine,
+    pub running: bool,
+    pub variables: std::collections::HashMap<String, String>,
+    pub aliases: std::collections::HashMap<String, String>,
+    pub prompt: String,
+    pub agent_engine: AgentAutomationEngine,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
+    pub current_user: String,
+    pub current_dir: String,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
     pub command_history: Vec<String>,
 }
 
@@ -119,28 +153,24 @@ impl ShellRepl {
         services.insert("cron".to_string(), "Running".to_string());
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+
+        let mut a11y_features = std::collections::HashMap::new();
+        a11y_features.insert("high_contrast".to_string(), false);
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt: "sigma-sh> ".to_string(),
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            current_theme: "light".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features,
             command_history: Vec::new(),
-        }
-    }
-
-    pub fn with_prompt(prompt: String) -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
-
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            prompt,
-            agent_engine: AgentAutomationEngine::new(),
         }
     }
 
@@ -370,6 +400,34 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        state: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -594,6 +652,19 @@ impl ShellRepl {
                 } else {
                     Err(format!("Agent task #{} not found", task_id))
                 }
+            }
+            ShellCommand::Theme { name } => {
+                self.current_theme = name.clone();
+                Ok(format!("Theme changed to {}", name))
+            }
+            ShellCommand::Profile { name } => {
+                self.current_profile = name.clone();
+                Ok(format!("Profile changed to {}", name))
+            }
+            ShellCommand::A11y { feature, state } => {
+                let enabled = state == "on" || state == "true" || state == "enabled";
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!("Accessibility feature {} is now {}", feature, state))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
