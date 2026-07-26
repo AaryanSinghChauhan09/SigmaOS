@@ -91,6 +91,7 @@ pub use dashboard::{
 pub use distro::{
     CanFrame, DiagnosticLogTool, EcuController, EduChallenge, EduPlayground, EosUpdateNotifier,
     EosWelcomeEngine, HpcClusterJob, HpcJobState, MirrorRanker, MpiCommunicator,
+    RunitServiceManager, RumpKernelShim, ServiceStatus, RunitService,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,

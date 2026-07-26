@@ -333,6 +333,95 @@ impl EduPlayground {
     }
 }
 
+// ==========================================
+// 7. Void Linux & NetBSD Distro Gaps Closure
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceStatus {
+    Down,
+    Up,
+    Panicked,
+}
+
+#[derive(Debug, Clone)]
+pub struct RunitService {
+    pub name: String,
+    pub status: ServiceStatus,
+    pub restart_count: usize,
+}
+
+/// Void Linux-style Runit Service Manager
+pub struct RunitServiceManager {
+    pub active_services: HashMap<String, RunitService>,
+}
+
+impl RunitServiceManager {
+    pub fn new() -> Self {
+        Self {
+            active_services: HashMap::new(),
+        }
+    }
+
+    pub fn register_and_start_service(&mut self, name: &str) {
+        self.active_services.insert(
+            name.to_string(),
+            RunitService {
+                name: name.to_string(),
+                status: ServiceStatus::Up,
+                restart_count: 0,
+            },
+        );
+    }
+
+    pub fn supervise_and_recover_services(&mut self) -> usize {
+        let mut recovered_count = 0;
+        for service in self.active_services.values_mut() {
+            if service.status == ServiceStatus::Panicked {
+                service.status = ServiceStatus::Up;
+                service.restart_count += 1;
+                recovered_count += 1;
+            }
+        }
+        recovered_count
+    }
+}
+
+impl Default for RunitServiceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// NetBSD-style Rump Kernel Driver Shim Context
+pub struct RumpKernelShim {
+    pub active_drivers: HashMap<String, String>, // maps driver name to isolated process ID
+}
+
+impl RumpKernelShim {
+    pub fn new() -> Self {
+        Self {
+            active_drivers: HashMap::new(),
+        }
+    }
+
+    pub fn load_isolated_rump_driver(&mut self, name: &str) -> String {
+        let pid = format!("rump_pid_{:x}", name.len() * 12345);
+        self.active_drivers.insert(name.to_string(), pid.clone());
+        pid
+    }
+
+    pub fn check_driver_active(&self, name: &str) -> bool {
+        self.active_drivers.contains_key(name)
+    }
+}
+
+impl Default for RumpKernelShim {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -469,5 +558,30 @@ mod tests {
         let report = log_tool.generate_troubleshooting_report();
         assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
         assert!(report.contains("[Kernel] Vulkan context bound successfully"));
+    }
+
+    #[test]
+    fn test_runit_service_manager() {
+        let mut manager = RunitServiceManager::new();
+        manager.register_and_start_service("vfs_shard");
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
+
+        // Manually panic the service
+        manager.active_services.get_mut("vfs_shard").unwrap().status = ServiceStatus::Panicked;
+
+        let recovered = manager.supervise_and_recover_services();
+        assert_eq!(recovered, 1);
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().restart_count, 1);
+    }
+
+    #[test]
+    fn test_rump_kernel_shim() {
+        let mut shim = RumpKernelShim::new();
+        assert!(!shim.check_driver_active("e1000"));
+
+        let pid = shim.load_isolated_rump_driver("e1000");
+        assert!(shim.check_driver_active("e1000"));
+        assert_eq!(pid, format!("rump_pid_{:x}", "e1000".len() * 12345));
     }
 }
