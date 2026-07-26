@@ -51,6 +51,12 @@ impl RecipeManager {
     }
 }
 
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Declarative package recipes.
 pub struct PackageRecipe {
     pub name: String,
@@ -72,7 +78,7 @@ pub struct PackageRecipe {
 
 impl PackageRecipe {
     pub fn new(name: String, version: Version) -> Self {
-        Self {
+        PackageRecipe {
             name,
             version,
             description: String::new(),
@@ -84,8 +90,8 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
-            arch: String::new(),
-            license_spdx: String::new(),
+            arch: "x86_64".to_string(),
+            license_spdx: "MIT".to_string(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
@@ -175,7 +181,7 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "echo 'Custom build system - please run build manually'".to_string(),
+            BuildSystem::Custom => "make".to_string(),
         }
     }
 }
