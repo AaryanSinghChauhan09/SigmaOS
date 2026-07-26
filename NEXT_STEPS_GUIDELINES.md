@@ -345,7 +345,38 @@ To bridge the gap with advanced digital graphics applications (GIMP, Krita, and 
 
 ---
 
-## 13. Astra Linux Inspired Military-Grade Security & Mandatory Access Controls (MAC)
+## 13. Scratch Inspired Visual Block-Based Kernel Automation Engine (SigmaBlocks)
+
+To democratize kernel-level customization, system scripting, and OS education, SigmaOS integrates a visual, block-based programming environment inspired by Scratch for rapid prototyping, user-defined functions, and safe automation:
+
+### 1. Drag-and-Drop System Event Scripting (SigmaBlocks Canvas)
+* **Scratch Inspiration:** Block-based workspace (Scratch Canvas).
+* **SigmaOS Sovereign Solution:** A visual, puzzle-piece block editor hosted in the `ZenithDesktop`. Users build custom system scripts (e.g., "When file is created in /downloads -> run security scan -> if clean, notify user") using drag-and-drop blocks representing conditions, control loops, system triggers, and I/O channels.
+* **OOP Mapping:** Governed by `SigmaShParser` and the `AdaptiveUX` layout engine.
+
+### 2. Sandbox-Safe AST Bytecode Compiler (BlockCompiler)
+* **Scratch Inspiration:** Squeak/Smalltalk virtual machine execution.
+* **SigmaOS Sovereign Solution:** An on-the-fly Abstract Syntax Tree (AST) translator that compiles visual blocks into sandboxed, non-allocating WebAssembly (WASM) or eBPF-style bytecode. The bytecode is compiled with strict timeout limits and maximum loop iterations, ensuring visual scripts can never hang or crash the core microkernel.
+* **OOP Mapping:** Executes within the `UdfSchedVm` bytecode interpreter and `SovereignEbpfEngine`.
+
+### 3. Integrated Audio, Video, and GUI Triggers (ZenithBlocks)
+* **Scratch Inspiration:** Stage, Sprites, Sound, and Pen blocks.
+* **SigmaOS Sovereign Solution:** Blocks mapping directly to physical system hardware events. Users can visually program screen captures, video tracking overlays, synthesized sound frequencies (`SovereignAudioEngine`), keyboard macros, or window arrangement changes with zero procedural Rust code.
+* **OOP Mapping:** Connected directly to the `ZenithCompositor` event loop and display listeners.
+
+### 4. Direct Hardware Pin & Bus Mapping (SigmaIoT Blocks)
+* **Scratch Inspiration:** Scratch extensions for LEGO Mindstorms / micro:bit.
+* **SigmaOS Sovereign Solution:** Dedicated hardware-interaction block libraries that map directly to embedded system buses (GPIO, I2C, SPI) on supported ARM and RISC-V development boards. This enables students and hardware hackers to control sensors, motors, and robotics directly from visual scripts.
+* **OOP Mapping:** Connected to the `DeviceDriver` abstractions and `PeripheralLibrary`.
+
+### 5. P2P Sharing and Verification Hub (BlocksHub)
+* **Scratch Inspiration:** Online Scratch Community share project portal.
+* **SigmaOS Sovereign Solution:** A decentralized, peer-to-peer sharing registry built directly on top of `sigpkg`. Users can cryptographically sign, upload, download, and execute verified visual block packages with automatic compliance checks.
+* **OOP Mapping:** Handled by the `sigpkg` transactional resolver.
+
+---
+
+## 14. Astra Linux Inspired Military-Grade Security & Mandatory Access Controls (MAC)
 
 To absorb Astra Linux’s peerless security certifications, military-grade mandatory access controls (MAC), and secure auditing capabilities, SigmaOS establishes a specialized microkernel-native security architecture designed for classified operations:
 
