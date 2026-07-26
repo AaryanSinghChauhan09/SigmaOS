@@ -1420,6 +1420,147 @@ impl DynamicKernelPersonalityManager {
     }
 }
 
+// =========================================================================
+// 30. ANCIENT DIAL-UP HAYES MODEM EMULATION (S-MODEM)
+// =========================================================================
+
+pub struct HayesModemSimulator {
+    pub carrier_detect: bool,
+    pub active_connection: bool,
+}
+
+impl HayesModemSimulator {
+    pub fn new() -> Self {
+        Self {
+            carrier_detect: false,
+            active_connection: false,
+        }
+    }
+
+    /// Parses Hayes AT modem command sequences and returns connection handshakes
+    pub fn parse_command(&mut self, command: &[u8]) -> &'static str {
+        if command.len() < 2 || command[0] != b'A' || command[1] != b'T' {
+            return "ERROR";
+        }
+
+        if command.len() == 2 {
+            return "OK";
+        }
+
+        // Check dial-up command e.g., ATDT (AT dial tone)
+        if command.len() >= 4 && command[2] == b'D' && command[3] == b'T' {
+            self.carrier_detect = true;
+            self.active_connection = true;
+            return "CONNECT 9600";
+        }
+
+        // Check hang up e.g., ATH
+        if command.len() >= 3 && command[2] == b'H' {
+            self.carrier_detect = false;
+            self.active_connection = false;
+            return "OK";
+        }
+
+        "OK"
+    }
+}
+
+impl Default for HayesModemSimulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 31. ANCIENT STORAGE PATA/IDE CONTROLLER EMULATION (S-IDE)
+// =========================================================================
+
+pub struct IdeControllerSimulator {
+    pub status_register: u8, // IDE status byte (busy, ready, write fault, etc.)
+    pub drive_select: u8,    // 0 for Master, 1 for Slave
+}
+
+impl IdeControllerSimulator {
+    pub fn new() -> Self {
+        Self {
+            status_register: 0x50, // Default to Ready and Seek Complete
+            drive_select: 0,
+        }
+    }
+
+    /// Simulates direct writing to low-level PATA/IDE port registers
+    pub fn write_register(&mut self, port_offset: u16, val: u8) {
+        match port_offset {
+            6 => {
+                // Drive/Head Select register
+                self.drive_select = (val >> 4) & 1;
+            }
+            7 => {
+                // Command register: 0x20 = Read sectors, 0x30 = Write sectors
+                if val == 0x20 || val == 0x30 {
+                    self.status_register |= 0x08; // Set DRQ (Data Request) ready
+                }
+            }
+            _ => {}
+        }
+    }
+
+    /// Reads status register of the IDE controller
+    pub fn read_status(&self) -> u8 {
+        self.status_register
+    }
+}
+
+impl Default for IdeControllerSimulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 32. ANCIENT SOUND BLASTER 16 ISA DSP EMULATION (S-SOUNDBLASTER)
+// =========================================================================
+
+pub struct SoundBlasterSimulator {
+    pub dsp_version: (u8, u8),
+    pub dsp_initialized: bool,
+    pub fm_synthesis_mode: bool,
+}
+
+impl SoundBlasterSimulator {
+    pub fn new() -> Self {
+        Self {
+            dsp_version: (4, 5), // SB16 DSP version 4.05
+            dsp_initialized: false,
+            fm_synthesis_mode: false,
+        }
+    }
+
+    /// Simulates writing to the Sound Blaster ISA port addresses (e.g. 0x22C DSP write)
+    pub fn write_dsp_register(&mut self, port_offset: u16, val: u8) {
+        match port_offset {
+            0xC => {
+                // DSP Write register
+                if val == 0xE1 {
+                    // Get DSP Version command
+                    self.dsp_initialized = true;
+                }
+            }
+            0x8 => {
+                // FM Synthesis activation port
+                self.fm_synthesis_mode = val != 0;
+            }
+            _ => {}
+        }
+    }
+}
+
+impl Default for SoundBlasterSimulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for DynamicKernelPersonalityManager {
     fn default() -> Self {
         Self::new()
@@ -1762,5 +1903,51 @@ mod tests {
         assert!(mgr.debug_kernel_version(1, LinuxEra::Era1_0));
         assert!(mgr.federate_resources(1, LinuxEra::Era1_0));
         assert!(mgr.replay_api(1, true));
+    }
+
+    #[test]
+    fn test_ancient_dialup_modem_simulation() {
+        let mut modem = HayesModemSimulator::new();
+        assert_eq!(modem.parse_command(b"AT"), "OK");
+        assert_eq!(modem.parse_command(b"ATDT5551234"), "CONNECT 9600");
+        assert!(modem.carrier_detect);
+        assert!(modem.active_connection);
+
+        assert_eq!(modem.parse_command(b"ATH"), "OK");
+        assert!(!modem.carrier_detect);
+        assert!(!modem.active_connection);
+
+        assert_eq!(modem.parse_command(b"INVALID_CMD"), "ERROR");
+    }
+
+    #[test]
+    fn test_ancient_ide_pata_simulation() {
+        let mut ide = IdeControllerSimulator::new();
+        assert_eq!(ide.read_status(), 0x50); // Seek complete and Ready
+        assert_eq!(ide.drive_select, 0);
+
+        // Select head 1 (slave drive)
+        ide.write_register(6, 0x10);
+        assert_eq!(ide.drive_select, 1);
+
+        // Read sectors command 0x20
+        ide.write_register(7, 0x20);
+        assert_eq!(ide.read_status(), 0x58); // DRQ set ready
+    }
+
+    #[test]
+    fn test_ancient_soundblaster_dsp_simulation() {
+        let mut sb = SoundBlasterSimulator::new();
+        assert_eq!(sb.dsp_version, (4, 5));
+        assert!(!sb.dsp_initialized);
+        assert!(!sb.fm_synthesis_mode);
+
+        // DSP version command
+        sb.write_dsp_register(0xC, 0xE1);
+        assert!(sb.dsp_initialized);
+
+        // FM mode command
+        sb.write_dsp_register(0x8, 1);
+        assert!(sb.fm_synthesis_mode);
     }
 }
