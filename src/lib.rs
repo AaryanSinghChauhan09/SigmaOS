@@ -25,6 +25,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod unimplemented_tools;
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
