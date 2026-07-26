@@ -3,8 +3,19 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
+
+pub use ai::{
+    AIAgent, SimpleAIAgent, LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
+    QuantizationType, InferenceBackend, BatchingStrategy, StreamingLlmEngine, StreamingInference,
+    AgentOrchestrator, SimpleAgentOrchestrator, AgentState, SaiAgent, SaiOrchestrator, SaiTask,
+    AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer, RecognitionResult,
+    SynthesisResult, AudioFormat, SynthesisModel, ClawBackgroundDaemon, ClawVoiceTranscriber,
+    ClawChatIntegrator, AlertPlatform,
+};
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
