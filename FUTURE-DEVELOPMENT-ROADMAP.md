@@ -389,6 +389,66 @@ pub struct NoteKnowledgeEngine {
 
 ---
 
+### 4.9 Sovereign Hyper-Compartmentalized Enclave System (S-QUBES)
+Traditional security systems like Qubes OS implement "Security by Compartmentalization" using heavy hardware hypervisors (such as Xen or KVM). This requires running a complete, bloated monolithic operating system and kernel for every single browser tab, USB port, or file handler, leading to massive memory footprints, slow boot latencies, and high context-switching overheads. SigmaOS implements **S-QUBES**, a microkernel-native, hyper-compartmentalized enclave system executing directly within native userspace capsule enclaves.
+
+```
+       [Physical USB / Network Device] ---> [Microkernel IOMMU Page Maps]
+                                                      |
+                                                      v (Isolated DMA Access)
+                                      +-------------------------------+
+                                      |   Sovereign Capsule Enclaves  |
+                                      |   (Ring 3 Isolation Domains)  |
+                                      +-------------------------------+
+                                        /                           \
+                                       v                             v
+                         [Zenith Security Compositing]     [Disposable S-DispCapsule]
+                         - Strict Frame Color Coding       - Microsecond startup
+                         - Separate visual layers          - Amnesic RAM zeroing
+```
+
+#### A. Microkernel IOMMU Gating (Sovereign sys-usb & sys-net)
+- **Zero-Hypervisor Hardware Isolation:** S-QUBES eliminates Xen hypervisor layers entirely. Physical devices (such as xHCI USB hosts, Ethernet controllers, and sound engines) are mapped directly to isolated Ring 3 driver shards utilizing hardware IOMMU (Intel VT-d / AMD-Vi) page-table configurations managed by the microkernel. A USB or firmware exploit remains fully confined to its hardware driver slice, completely unable to read or write other system enclaves.
+- **Microsecond Inter-Enclave RPC:** Replaces the heavy Qubes-OS qrexec protocol with lock-free, zero-copy `SovereignIPC` registers, executing secure inter-enclave remote procedure calls (RPC) in under 1 microsecond.
+
+#### B. Security-Frame Compositing & Disposable S-DispCapsules
+- **Colored Window Frame Isolation:** The Zenith compositor core isolates window frames by assigning distinct security classifications (e.g., Red for untrusted email attachments, Green for cold-vault identity registers, Yellow for work documents). The compositor renders colored margins directly onto hardware framebuffer memory, preventing visual masquerading attacks natively.
+- **S-DispCapsule (Disposable Capsules):** Volatile, copy-on-write userspace capsule instances designed to handle suspicious files or open untrusted web links. Disposable capsules boot in microsecond ranges and are aggressively wiped, zeroed, and flushed from physical memory frames by `S-AMNESIA` upon execution termination.
+
+#### C. Structural OOP Compartment Specification (Pseudocode)
+```rust
+pub enum SecurityLabel {
+    UntrustedRed,
+    WorkYellow,
+    VaultGreen,
+    AmnesicDisposable,
+}
+
+pub struct CapsuleContext {
+    pub label: SecurityLabel,
+    pub capsule_id: u32,
+    pub restricted_io_ports: Vec<u16>,
+}
+
+pub trait ICapsuleManager {
+    // Spawns a lightweight, IOMMU-gated userspace capsule domain
+    fn spawn_capsule(&mut self, label: SecurityLabel) -> Result<u32, u32>;
+
+    // Enforces secure, capability-checked communication across enclaves
+    fn transfer_data(&mut self, src_id: u32, dst_id: u32, payload: &[u8]) -> Result<(), u32>;
+
+    // Tears down page tables and zero-wipes associated physical memory frames instantly
+    fn destroy_and_wipe(&mut self, capsule_id: u32) -> Result<(), u32>;
+}
+
+pub struct SovereignEnclaveSystem {
+    // Enclave manager coordinates compartmentalized tasks over the microkernel
+    pub active_manager: Box<dyn ICapsuleManager>,
+}
+```
+
+---
+
 ## 5. LINUX KERNEL.ORG DEFEATING SPECIFICATION
 
 To systematically challenge and replace the traditional monolithic kernel architectures sourced from kernel.org (including mainline 6.24, LTS 6.18, 5.15, and legacy variants), SigmaOS operates on an Object-Oriented, microkernel-based, zero-trust runtime model.
