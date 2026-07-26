@@ -417,27 +417,6 @@ struct Vec<T> {
     capacity: usize,
 }
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -517,14 +496,17 @@ mod tests {
     fn test_execute_sigpkg() {
         let mut session = SimpleShellSession::new();
         let result = session.execute_line(b"sigpkg").unwrap();
-        assert_eq!(&result[..6], b"sigpkg");
+        let result_slice: &[u8] = &result;
+        assert_eq!(&result_slice[..6], b"sigpkg");
     }
 
     #[test]
     fn test_command_history_add_and_list() {
         let mut history = SimpleCommandHistory::new();
         history.add(b"sigtrace trace task 256");
-        assert_eq!(history.list().len(), 1);
+        let list = history.list();
+        let list_slice: &[&[u8]] = &list;
+        assert_eq!(list_slice.len(), 1);
         assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
     }
 }
