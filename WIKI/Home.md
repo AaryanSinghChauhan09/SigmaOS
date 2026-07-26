@@ -17,7 +17,6 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
-
 ---
 
 ## 📊 System Architecture
@@ -41,7 +40,6 @@ graph TD
 - **S-SEC**: Security Framework (PQC + MAC + Sandbox).
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
 
-
 ---
 
 ## 🚀 Quick Start
@@ -51,22 +49,17 @@ graph TD
 Ensure you have the required compiler toolchain and emulation packages:
 
 ```bash
-
 # Install dependencies
-
 sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go xorriso
 
 # Clone the repository
-
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
 # Build the system image
-
 make clean && make all -j$(nproc)
 
 # Run in QEMU
-
 qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
 ```
 
@@ -83,20 +76,28 @@ make PROFILE=browser all       # WASM bundle
 
 ---
 
-## 🔒 Security & Sandboxing
+## 📚 Categorized Documentation Hub
 
-SigmaOS features a capability-native access control system. Programs are executed with explicit privilege tokens (capabilities) rather than generic user IDs.
+To facilitate seamless developer onboarding, our extensive documentation is categorized into functional zones:
 
-```rust
-// Capability delegation example
-let token = CapabilityToken::new()
-    .allow_network("tcp", 80)
-    .allow_read("/var/www");
-```
+### 🧩 1. Core Architecture & Kernel Designs
+* **[Maturity & Distro-Parity Roadmap](Maturity_Parity_Roadmap.md)** — Strategic milestones detailing gaps & improvements vs mainstream monolithic distributions.
+* **[Kernel Evolution Architecture](Kernel_Evolution_Architecture.md)** — Trait hierarchies and microkernel modular boundaries.
+* **[Virtual Memory & Paging](Virtual_Memory_Paging.md)** — Page allocation patterns, demand-paging models, and buddy splitting checks.
+* **[Real-Time HPC Scheduling](Realtime_HPC_Scheduling_Roadmap.md)** — EEVDF, MLFQ, and EDF scheduling blueprints under heavy CPU loads.
+* **[Sovereign BIOS & UEFI Firmware Spec](BIOS_FIRMWARE_SPEC.md)** — Boot phases, system diagnostics, and firmware time-travel modes.
 
-For a detailed review of all security policies, see the canonical [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) page on the Wiki.
+### 🔌 2. Drivers & Hardware Ecosystem
+* **[Driver Ecosystem & Plug-and-Play (PnP)](Driver_Ecosystem.md)** — Base interfaces, lazy dynamic loading registries, and hardware-evolution mapping.
+* **[Driver Management Roadmap](Driver_Management_Roadmap.md)** — Staged driver development loops (NVMe, USB xHCI, graphics card ports).
+* **[Peripheral Compatibility Plan](Peripheral_Compatibility_Plan.md)** — Emulation support for classic inputs and output nodes.
+* **[Zig Language Integration](ZIG_INTEGRATION_PLAN.md)** — Incorporating Zig native drivers and cross-language FFI boundary safety.
+* **[Nim Language Integration](NIM_INTEGRATION_PLAN.md)** — Interoping Nim safe heap routines with Rust-native allocators.
 
----
+### 🗂️ 3. Filesystems & Networking
+* **[SigmaFS Innovations](SigmaFS_Innovations.md)** — Decentralized COW storage, block replication, and semantic AI queries.
+* **[Network Stack & Zero-Copy Net](Network_Stack.md)** — Zero-copy DMA packet transfer schedules, adaptation logic, and VPN clients.
+* **[Sovereign Cloud Sync Engine](Core_Builtin_Apps.md)** — On-device P2P chunk sync, verification paths, and decentralized torrent clients.
 
 ## 📚 Canonical Documentation (GitHub Wiki)
 
@@ -127,21 +128,21 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 **Desktop & Productivity:**
 - ✅ Zenith Desktop prototype
-- ✅ Screen recorder with GPU acceleration
-- ✅ Screenshot tool with annotation
-- ✅ Calendar + task manager
-- ✅ Email client with IMAP/SMTP
-- ✅ Note-taking app with Markdown
-- ✅ Code editor with LSP support
+- 🔄 Screen recorder with GPU acceleration
+- 🔄 Screenshot tool with annotation
+- 🔄 Calendar + task manager
+- 🔄 Email client with IMAP/SMTP
+- 🔄 Note-taking app with Markdown
+- 🔄 Code editor with LSP support
 - ✅ Integrated terminal
 - ✅ Clipboard manager with history
-- ✅ Task manager
+- 🔄 Task manager
 
 **Security:**
 - ✅ Encrypted file vault
-- ✅ Password manager with biometric unlock
+- 🔄 Password manager with biometric unlock
 - ✅ Intrusion detection system
-- ✅ Secure VPN client
+- 🔄 Secure VPN client
 - ✅ Capability-based security framework
 
 **System Tools:**
@@ -150,35 +151,40 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Disk usage analyzer
 - ✅ System monitor
 - ✅ Process manager
-- ✅ Virtual machine manager (QEMU/KVM)
-- ✅ Container manager (Docker/Podman)
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
 
 **Package Management:**
 - ✅ sigma-pkg CLI
-- ✅ Universal package manager
-- ✅ Rollback package snapshots
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
 
 **Networking:**
-- ✅ Cloud sync engine
-- ✅ Built-in torrent client
-- ✅ Network traffic analyzer
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
 
 **AI & Automation:**
-- ✅ AI orchestrator for system optimization
+- 🔄 AI orchestrator for system optimization
 
 **Customization:**
-- ✅ Unified control center
+- 🔄 Unified control center
 - ✅ Declarative theming engine
 
 **Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
 
+### 🧠 5. AI, Automation, & User Interface
+* **[Sigma AI Agents](Sigma_AI_Agents.md)** — On-device local inference schedulers and S-CLI natural language parser routing.
+* **[Wayland Zenith UI Spec](WAYLAND_ZENITH_SPEC.md)** — 120 FPS high-contrast window composition, screen readers, and WCAG focus structures.
+* **[Zenith Desktop UI](Zenith_Desktop.md)** — Dynamic Island statuses, tile-auto panels, and desktop theme overlays.
+* **[Custom Personalization & Themes](CUSTOM_PERSONALIZATION_SPEC.md)** — Ambient color rendering rules and reduce-motion settings.
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [Contributor Guidelines](Contributor_Guidelines.md) for details.
 
 ### High-Impact Areas
 
@@ -197,6 +203,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ### Repository Documentation
 
 - [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions

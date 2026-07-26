@@ -9,6 +9,10 @@ use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 /// Process ID
 pub type ProcessID = usize;
 
@@ -187,7 +191,13 @@ impl SimpleProcess {
     }
 
     pub fn get_state(&self) -> ProcessState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ProcessState::Running,
+            2 => ProcessState::Blocked,
+            3 => ProcessState::Terminated,
+            _ => ProcessState::Ready,
+        }
     }
 
     pub fn set_state_atomic(&self, state: ProcessState) {
@@ -195,7 +205,14 @@ impl SimpleProcess {
     }
 
     pub fn get_priority(&self) -> ProcessPriority {
-        unsafe { core::mem::transmute(self.priority.load(Ordering::SeqCst)) }
+        let raw = self.priority.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ProcessPriority::Low,
+            2 => ProcessPriority::Normal,
+            3 => ProcessPriority::High,
+            4 => ProcessPriority::Critical,
+            _ => ProcessPriority::Idle,
+        }
     }
 
     pub fn set_priority_atomic(&self, priority: ProcessPriority) {
@@ -457,12 +474,6 @@ impl ProcessScheduler for SimpleProcessScheduler {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
 impl<T> Vec<T> {
     fn new() -> Self {
@@ -491,11 +502,7 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -509,6 +516,19 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

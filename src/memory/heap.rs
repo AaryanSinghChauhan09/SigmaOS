@@ -97,8 +97,21 @@ impl HeapAllocator for SimpleHeapAllocator {
     }
 
     fn deallocate(&mut self, ptr: *mut u8) -> Result<(), HeapError> {
+        if ptr.is_null() {
+            return Err(HeapError::InvalidPointer);
+        }
         let heap_start = self.heap_start.load(Ordering::SeqCst);
-        let offset = (ptr as usize) - heap_start;
+        let heap_size = self.heap_size.load(Ordering::SeqCst);
+        let ptr_val = ptr as usize;
+
+        if ptr_val < heap_start || ptr_val >= heap_start + heap_size {
+            return Err(HeapError::InvalidPointer);
+        }
+
+        let offset = ptr_val - heap_start;
+        if offset % 4096 != 0 {
+            return Err(HeapError::InvalidPointer);
+        }
         let block_id = offset / 4096;
 
         for block_option in &mut self.blocks {
@@ -216,13 +229,16 @@ impl<T> Vec<T> {
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
+            if !self.data.is_null() && self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
     fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -240,6 +256,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

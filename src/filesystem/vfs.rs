@@ -295,4 +295,27 @@ mod tests {
         let written = vfs.write_file(fd, data).unwrap();
         assert_eq!(written, data.len());
     }
+
+    #[test]
+    fn test_zero_sized_read_write_optimization() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        let fd = vfs.open_file(inode_id, 0).unwrap();
+
+        // 1. Zero-sized write should return Ok(0) immediately without touching file size
+        let written = vfs.write_file(fd, &[]).unwrap();
+        assert_eq!(written, 0);
+        let inode = vfs.get_inode(inode_id).unwrap();
+        assert_eq!(inode.size, 0);
+
+        // 2. Zero-sized read should return Ok(0) immediately even if file is empty
+        let mut buf = [];
+        let read = vfs.read_file(fd, &mut buf).unwrap();
+        assert_eq!(read, 0);
+
+        // 3. Zero-sized read/write on an invalid file descriptor must return Err(FsError::InvalidFd)
+        let invalid_fd = 9999;
+        assert_eq!(vfs.write_file(invalid_fd, &[]), Err(FsError::InvalidFd));
+        assert_eq!(vfs.read_file(invalid_fd, &mut []), Err(FsError::InvalidFd));
+    }
 }

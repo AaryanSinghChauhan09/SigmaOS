@@ -129,15 +129,8 @@ impl SimplePowerManager {
     }
     }
 
-    pub fn set_{
-        let raw = self.cpu_governor.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => CPUGovernor::Ondemand,
-            2 => CPUGovernor::Conservative,
-            3 => CPUGovernor::Powersave,
-            _ => CPUGovernor::Performance,
-        }
-    }rdering::SeqCst);
+    pub fn set_cpu_governor(&self, governor: CPUGovernor) {
+        self.cpu_governor.store(governor as usize, Ordering::SeqCst);
     }
 
     pub fn get_cpu_governor(&self) -> CPUGovernor {
@@ -362,6 +355,19 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

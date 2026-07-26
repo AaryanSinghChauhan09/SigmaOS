@@ -1,14 +1,22 @@
+#![no_std]
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 /// OOP-based Network Stack for SigmaOS
 /// Implements networking using OOP principles with traits and structs
 /// No dependency on external network frameworks
 /// Based on Roadmap Item 6: Network stack
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Socket ID
 pub type SocketID = usize;
 
 /// Socket type
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketType {
     TCP = 0,
@@ -17,7 +25,7 @@ pub enum SocketType {
 }
 
 /// Socket state
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketState {
     Closed = 0,
@@ -52,7 +60,7 @@ pub trait Socket {
 }
 
 /// Network error types
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     Success = 0,
@@ -114,8 +122,13 @@ impl SocketCapability {
     }
 }
 
+impl Default for SocketCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple socket (OOP: Concrete socket class)
-#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub socket_type: SocketType,
@@ -144,14 +157,7 @@ impl SimpleSocket {
     }
 
     pub fn get_state(&self) -> SocketState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => SocketState::Closed,
-            1 => SocketState::Listening,
-            2 => SocketState::Connecting,
-            3 => SocketState::Connected,
-            4 => SocketState::Closing,
-            _ => SocketState::Closed,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state(&self, state: SocketState) {
@@ -264,7 +270,7 @@ pub trait NetworkStack {
 
 /// Network statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NetworkStats {
     pub total_sockets: usize,
     pub active_sockets: usize,
@@ -278,6 +284,12 @@ impl NetworkStats {
             active_sockets: 0,
             by_type: [0; 3],
         }
+    }
+}
+
+impl Default for NetworkStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -310,6 +322,12 @@ impl StackCapability {
             can_create: true,
             can_destroy: true,
         }
+    }
+}
+
+impl Default for StackCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -391,5 +409,45 @@ impl NetworkStack for SimpleNetworkStack {
 
     fn stats(&self) -> NetworkStats {
         self.stats
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_socket_operations() {
+        let cap = SocketCapability::full();
+        let mut socket = SimpleSocket::new(101, SocketType::TCP, cap);
+        assert_eq!(socket.id(), 101);
+        assert_eq!(socket.socket_type(), SocketType::TCP);
+        assert!(socket.bind(80).is_ok());
+        assert!(socket.listen().is_ok());
+        assert!(socket.connect([127, 0, 0, 1], 8080).is_ok());
+
+        let data = b"hello";
+        assert_eq!(socket.send(data).unwrap(), 5);
+
+        let mut buf = [0u8; 10];
+        assert_eq!(socket.receive(&mut buf).unwrap(), 10);
+        assert_eq!(buf[0], 0);
+
+        assert!(socket.close().is_ok());
+    }
+
+    #[test]
+    fn test_network_stack() {
+        let cap = StackCapability::full();
+        let mut stack = SimpleNetworkStack::new(cap);
+        let id = stack.create_socket(SocketType::UDP).unwrap();
+        assert!(stack.get_socket(id).is_some());
+        assert_eq!(stack.list_sockets().len(), 1);
+
+        let stats = stack.stats();
+        assert_eq!(stats.total_sockets, 1);
+        assert_eq!(stats.by_type[SocketType::UDP as usize], 1);
+
+        assert!(stack.destroy_socket(id).is_ok());
     }
 }

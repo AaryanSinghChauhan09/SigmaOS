@@ -1,195 +1,264 @@
 #![no_std]
-#![no_main]
 
-/// OOP-based Package Management for SigmaOS
-/// Based on Roadmap Item: Package Management + Reproducible Builds
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-
-pub type PackageID = usize;
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PackageState { Installed = 0, Available = 1, Updating = 2, Corrupted = 3 }
-
-pub trait Package {
-    fn id(&self) -> PackageID;
-    fn name(&self) -> &[u8];
-    fn version(&self) -> &[u8];
-    fn state(&self) -> PackageState;
+#[derive(Debug, Clone)]
+pub struct VersionToken {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
 }
 
-#[repr(C)]
-pub struct SimplePackage {
-    pub id: PackageID,
-    pub name: [u8; 64],
-    pub version: [u8; 32],
-    pub state: AtomicUsize,
+impl VersionToken {
+    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
+        VersionToken { major, minor, patch }
+    }
+
+    pub fn to_string(&self) -> String {
+        format!("{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
-impl SimplePackage {
-    pub fn new(id: PackageID, name: &[u8], version: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let mut version_array = [0u8; 32];
-        let name_len = name.len().min(63);
-        let version_len = version.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+#[derive(Debug, Clone)]
+pub struct PackageMetadata {
+    pub name: String,
+    pub version: VersionToken,
+    pub description: String,
+    pub license: String,
+    pub maintainers: Vec<String>,
+    pub dependencies: Vec<Dependency>,
+    pub conflicts: Vec<String>,
+    pub provides: Vec<String>,
+    pub replaces: Vec<String>,
+    pub files: Vec<InstalledFile>,
+    pub scripts: Option<PackageScripts>,
+    pub source_url: Option<String>,
+    pub source_sha256: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Dependency {
+    pub name: String,
+    pub version_req: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct InstalledFile {
+    pub path: String,
+    pub sha256: String,
+    pub size: u64,
+}
+
+pub struct PackageScripts {
+    pub pre_install: Option<String>,
+    pub post_install: Option<String>,
+    pub pre_remove: Option<String>,
+    pub post_remove: Option<String>,
+}
+
+pub enum DependencyResolver {
+    Topological,
+    SatSolver,
+    Functional,
+}
+
+pub enum PackageBackend {
+    Native,
+    Ostree,
+    Container,
+}
+
+pub struct SigmaPackageManager {
+    pub backend: PackageBackend,
+    pub resolver_type: DependencyResolver,
+    pub packages: Vec<PackageMetadata>,
+    pub installed: Vec<String>,
+    pub store_path: String,
+}
+
+impl SigmaPackageManager {
+    pub fn new() -> Self {
+        SigmaPackageManager {
+            backend: PackageBackend::Native,
+            resolver_type: DependencyResolver::SatSolver,
+            packages: Vec::new(),
+            installed: Vec::new(),
+            store_path: String::from("/var/sigma-pkg"),
         }
-        SimplePackage {
-            id,
-            name: name_array,
-            version: version_array,
-            state: AtomicUsize::new(PackageState::Available as usize),
-        }
     }
-}
 
-impl Package for SimplePackage {
-    fn id(&self) -> PackageID { self.id }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
-    }
-    fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.version[..len]
-    }
-    fn state(&self) -> PackageState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PackageState::Available,
-            2 => PackageState::Updating,
-            3 => PackageState::Corrupted,
-            _ => PackageState::Installed,
-        }
-    } }
-}
-
-pub trait PackageManager {
-    fn install(&mut self, package: Box<dyn Package>) -> Result<PackageID, PackageError>;
-    fn uninstall(&mut self, id: PackageID) -> Result<(), PackageError>;
-    fn update(&mut self, id: PackageID) -> Result<(), PackageError>;
-    fn get_package(&self, id: PackageID) -> Option<&dyn Package>;
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PackageError { Success = 0, PackageNotFound = 1, InstallFailed = 2, UpdateFailed = 3 }
-
-pub struct SimplePackageManager {
-    packages: Vec<Option<Box<dyn Package>>>,
-    next_id: AtomicUsize,
-}
-
-impl SimplePackageManager {
-    pub fn new() -> Self { SimplePackageManager { packages: Vec::new(), next_id: AtomicUsize::new(1) } }
-}
-
-impl PackageManager for SimplePackageManager {
-    fn install(&mut self, package: Box<dyn Package>) -> Result<PackageID, PackageError> {
-        let id = package.id();
-        self.packages.push(Some(package));
-        Ok(id)
-    }
-    fn uninstall(&mut self, id: PackageID) -> Result<(), PackageError> {
-        for pkg_option in &mut self.packages {
-            if let Some(ref pkg) = *pkg_option {
-                if pkg.id() == id {
-                    self.packages.clear();
-                    return Ok(());
-                }
+    pub fn register_package(&mut self, package: PackageMetadata) -> Result<(), PackageError> {
+        for p in &self.packages {
+            if p.name == package.name && p.version.to_string() == package.version.to_string() {
+                return Err(PackageError::AlreadyExists);
             }
         }
-        Err(PackageError::PackageNotFound)
-    }
-    fn update(&mut self, id: PackageID) -> Result<(), PackageError> {
-        for pkg_option in &mut self.packages {
-            if let Some(ref mut pkg) = *pkg_option {
-                if pkg.id() == id {
-                    return Ok(());
-                }
-            }
-        }
-        Err(PackageError::PackageNotFound)
-    }
-    fn get_package(&self, id: PackageID) -> Option<&dyn Package> {
-        for pkg_option in &self.packages {
-            if let Some(ref pkg) = *pkg_option {
-                if pkg.id() == id { return Some(pkg.as_ref()); }
-            }
-        }
-        None
-    }
-}
-
-pub trait Repository {
-    fn add_package(&mut self, package: Box<dyn Package>) -> Result<(), PackageError>;
-    fn remove_package(&mut self, id: PackageID) -> Result<(), PackageError>;
-    fn list_packages(&self) -> Vec<PackageID>;
-}
-
-pub struct SimpleRepository {
-    packages: Vec<Option<Box<dyn Package>>>,
-}
-
-impl SimpleRepository {
-    pub fn new() -> Self { SimpleRepository { packages: Vec::new() } }
-}
-
-impl Repository for SimpleRepository {
-    fn add_package(&mut self, package: Box<dyn Package>) -> Result<(), PackageError> {
-        self.packages.push(Some(package));
+        self.packages.push(package);
         Ok(())
     }
-    fn remove_package(&mut self, id: PackageID) -> Result<(), PackageError> {
-        for pkg_option in &mut self.packages {
-            if let Some(ref pkg) = *pkg_option {
-                if pkg.id() == id {
-                    self.packages.clear();
-                    return Ok(());
-                }
-            }
-        }
-        Err(PackageError::PackageNotFound)
+
+    pub fn resolve_dependencies(&self, name: &str) -> Result<Vec<String>, PackageError> {
+        let mut resolved = Vec::new();
+        let mut visited = Vec::new();
+        self.resolve_recursive(name, &mut resolved, &mut visited)?;
+        Ok(resolved)
     }
-    fn list_packages(&self) -> Vec<PackageID> {
-        let mut ids = Vec::new();
-        for pkg_option in &self.packages {
-            if let Some(ref pkg) = *pkg_option {
-                ids.push(pkg.id());
+
+    fn resolve_recursive(&self, name: &str, resolved: &mut Vec<String>, visited: &mut Vec<String>) -> Result<(), PackageError> {
+        if visited.contains(&name.to_string()) {
+            return Ok(());
+        }
+        visited.push(name.to_string());
+        let package = self.packages.iter().find(|p| p.name == name)
+            .ok_or(PackageError::NotFound)?;
+        for dep in &package.dependencies {
+            self.resolve_recursive(&dep.name, resolved, visited)?;
+        }
+        resolved.push(name.to_string());
+        Ok(())
+    }
+
+    pub fn install(&mut self, name: &str) -> Result<(), PackageError> {
+        let deps = self.resolve_dependencies(name)?;
+        for dep_name in deps {
+            if !self.installed.contains(&dep_name) {
+                self.do_install(&dep_name)?;
             }
         }
-        ids
+        if !self.installed.contains(&name.to_string()) {
+            self.do_install(name)?;
+        }
+        Ok(())
+    }
+
+    fn do_install(&mut self, name: &str) -> Result<(), PackageError> {
+        let package = self.packages.iter().find(|p| p.name == name)
+            .ok_or(PackageError::NotFound)?;
+        self.installed.push(name.to_string());
+        Ok(())
+    }
+
+    pub fn remove(&mut self, name: &str) -> Result<(), PackageError> {
+        if let Some(idx) = self.installed.iter().position(|n| n == name) {
+            self.installed.remove(idx);
+            Ok(())
+        } else {
+            Err(PackageError::NotFound)
+        }
+    }
+
+    pub fn upgrade(&mut self, name: &str) -> Result<(), PackageError> {
+        self.remove(name)?;
+        self.install(name)
+    }
+
+    pub fn list_installed(&self) -> &[String] {
+        &self.installed
+    }
+
+    pub fn search(&self, query: &str) -> Vec<&PackageMetadata> {
+        self.packages.iter().filter(|p| p.name.contains(query)).collect()
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageError {
+    NotFound,
+    AlreadyExists,
+    DependencyConflict,
+    MissingDependency,
+    InstallFailed,
+    PermissionDenied,
+    InvalidPackage,
+}
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn clear(&mut self) { self.len = 0; }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
+pub struct Generation {
+    pub id: String,
+    pub creation_time: u64,
+    pub kernel: String,
+    pub packages: Vec<String>,
+    pub system_config: String,
+    pub boot_config: String,
+    pub prev: Option<String>,
+    pub next: Option<String>,
+}
+
+impl Generation {
+    pub fn new(id: &str) -> Self {
+        Generation {
+            id: id.to_string(),
+            creation_time: 0,
+            kernel: String::new(),
+            packages: Vec::new(),
+            system_config: String::new(),
+            boot_config: String::new(),
+            prev: None,
+            next: None,
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+pub trait SystemProfile: Send + Sync {
+    fn hostname(&self) -> &str;
+    fn set_hostname(&mut self, hostname: &str);
+    fn timezone(&self) -> &str;
+    fn set_timezone(&mut self, tz: &str);
+    fn locale(&self) -> &str;
+    fn set_locale(&mut self, locale: &str);
+    fn packages(&self) -> &[String];
+    fn add_package(&mut self, package: &str);
+    fn remove_package(&mut self, package: &str);
+    fn kernel_profile(&self) -> &str;
+    fn set_kernel_profile(&mut self, profile: &str);
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PreemptionMode {
+    Voluntary,
+    Full,
+    None,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+}
+
+pub struct KernelProfile {
+    pub preemption_mode: PreemptionMode,
+    pub tickless_cpus: Vec<u32>,
+    pub rcu_lazy: bool,
+    pub cpu_governor: CpuGovernor,
+}
+
+pub struct SystemConfig {
+    pub hostname: String,
+    pub timezone: String,
+    pub locale: String,
+    pub kernel: KernelProfile,
+    pub packages: Vec<String>,
+    pub security_profile: String,
+}
+
+impl SystemConfig {
+    pub fn new() -> Self {
+        SystemConfig {
+            hostname: String::from("sigmaos"),
+            timezone: String::from("UTC"),
+            locale: String::from("en_US.UTF-8"),
+            kernel: KernelProfile {
+                preemption_mode: PreemptionMode::Voluntary,
+                tickless_cpus: Vec::new(),
+                rcu_lazy: false,
+                cpu_governor: CpuGovernor::Schedutil,
+            },
+            packages: Vec::new(),
+            security_profile: String::from("default"),
+        }
+    }
+}

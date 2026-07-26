@@ -9,10 +9,15 @@ pub mod sigmafs;
 // pub mod vfs;
 pub mod xfs;
 
-pub use btrfs::{BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, CompressionType, ChecksumType};
-pub use sigmacas::{CasBlock, SigmaFsCasEngine, SHA256_HASH_SIZE, DILITHIUM5_SIGNATURE_SIZE};
+pub use btrfs::{
+    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
+};
+pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
     AhciSataController, BlockStorageDevice, BlockStorageError, JournalBlock, JournalBlockType,
     MerkleNode, NvmeStorageController, SigmaFs, TransactionalJournal,
 };
-pub use xfs::{AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal, XfsState};
+pub use xfs::{
+    AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal,
+    XfsState,
+};

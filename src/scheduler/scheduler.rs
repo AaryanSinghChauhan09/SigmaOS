@@ -142,7 +142,16 @@ impl Schedulable for Task {
     }
 
     fn state(&self) -> TaskState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TaskState::Running,
+            2 => TaskState::Blocked,
+            3 => TaskState::Sleeping,
+            4 => TaskState::Terminated,
+            _ => TaskState::Ready,
+        }
+    }
     }
 
     fn set_state(&mut self, state: TaskState) {
@@ -580,6 +589,19 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

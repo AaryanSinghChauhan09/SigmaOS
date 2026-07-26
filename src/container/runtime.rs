@@ -1,5 +1,4 @@
 #![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based Container Runtime for SigmaOS
@@ -47,51 +46,172 @@ pub trait Container {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
-    Success = 0,
-    AlreadyStarted = 1,
-    AlreadyStopped = 2,
-    StartFailed = 3,
-    StopFailed = 4,
-    PermissionDenied = 5,
-    ResourceLimit = 6,
+    NotFound,
+    AlreadyExists,
+    InvalidConfig,
+    ResourceLimit,
+    CapabilityDenied,
 }
 
-/// Container info
-#[repr(C)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
+pub struct NamespaceConfig {
+    pub pid: bool,
+    pub mnt: bool,
+    pub net: bool,
+    pub uts: bool,
+    pub ipc: bool,
+    pub user: bool,
+    pub cgroup: bool,
 }
 
-impl ContainerInfo {
-    pub fn new(id: ContainerID) -> Self {
-        ContainerInfo {
-            id,
-            name: [0; 64],
-            image: [0; 128],
-            state: ContainerState::Created,
-            pid: None,
-            memory_limit: 0,
-            cpu_limit: 0,
-            capability: ContainerCapability::new(),
+impl NamespaceConfig {
+    pub fn new() -> Self {
+        NamespaceConfig {
+            pid: false,
+            mnt: false,
+            net: false,
+            uts: false,
+            ipc: false,
+            user: false,
+            cgroup: false,
+        }
+    }
+
+    pub fn all(&self) -> bool {
+        self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
+    }
+}
+
+pub struct NamespaceSet {
+    pub pidns: Option<usize>,
+    pub mntns: Option<usize>,
+    pub netns: Option<usize>,
+    pub utsns: Option<usize>,
+    pub ipcns: Option<usize>,
+    pub userns: Option<usize>,
+    pub cgroupns: Option<usize>,
+}
+
+impl NamespaceSet {
+    pub fn new() -> Self {
+        NamespaceSet {
+            pidns: None,
+            mntns: None,
+            netns: None,
+            utsns: None,
+            ipcns: None,
+            userns: None,
+            cgroupns: None,
+        }
+    }
+
+    pub fn clone(&self) -> Self {
+        NamespaceSet {
+            pidns: self.pidns,
+            mntns: self.mntns,
+            netns: self.netns,
+            utsns: self.utsns,
+            ipcns: self.ipcns,
+            userns: self.userns,
+            cgroupns: self.cgroupns,
         }
     }
 }
 
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
+pub struct OciSpec {
+    pub version: String,
+    pub platform: String,
+    pub process: OciProcess,
+    pub mounts: Vec<OciMount>,
+}
+
+pub struct OciProcess {
+    pub args: Vec<String>,
+    pub env: Vec<String>,
+    pub cwd: String,
+    pub user: OciUser,
+    pub capabilities: Vec<String>,
+    pub rlimits: Vec<OciRlimit>,
+    pub no_new_privileges: bool,
+}
+
+pub struct OciUser {
+    pub uid: u32,
+    pub gid: u32,
+    pub additional_gids: Vec<u32>,
+}
+
+pub struct OciRlimit {
+    pub rlimit_type: String,
+    pub soft: u64,
+    pub hard: u64,
+}
+
+pub struct OciMount {
+    pub destination: String,
+    pub r#type: String,
+    pub source: String,
+    pub options: Vec<String>,
+}
+
+pub enum ContainerState {
+    Created,
+    Running,
+    Paused,
+    Stopped,
+    Deleted,
+}
+
+pub struct Container {
+    pub id: String,
+    pub bundle: String,
+    pub config: OciSpec,
+    pub image: String,
+    pub state: ContainerState,
+    pub pid: Option<u64>,
+    pub rootfs: String,
+    pub layers: Vec<String>,
+    pub namespaces: NamespaceConfig,
+}
+
+impl Container {
+    pub fn new(id: &str, bundle: &str) -> Self {
+        Container {
+            id: id.to_string(),
+            bundle: bundle.to_string(),
+            config: OciSpec {
+                version: String::new(),
+                platform: String::new(),
+                process: OciProcess {
+                    args: Vec::new(),
+                    env: Vec::new(),
+                    cwd: String::from("/"),
+                    user: OciUser { uid: 0, gid: 0, additional_gids: Vec::new() },
+                    capabilities: Vec::new(),
+                    rlimits: Vec::new(),
+                    no_new_privileges: false,
+                },
+                mounts: Vec::new(),
+            },
+            image: String::new(),
+            state: ContainerState::Created,
+            pid: None,
+            rootfs: String::new(),
+            layers: Vec::new(),
+            namespaces: NamespaceConfig::new(),
+        }
+    }
+}
+
+pub trait Runtime: Send + Sync {
+    fn create(&mut self, container: &mut Container) -> Result<(), ContainerError>;
+    fn start(&mut self, container: &mut Container) -> Result<(), ContainerError>;
+    fn kill(&mut self, container: &mut Container, signal: i32) -> Result<(), ContainerError>;
+    fn delete(&mut self, container: &mut Container) -> Result<(), ContainerError>;
+    fn pause(&mut self, container: &mut Container) -> Result<(), ContainerError>;
+    fn resume(&mut self, container: &mut Container) -> Result<(), ContainerError>;
+    fn exec(&mut self, container: &mut Container, args: &[String]) -> Result<(), ContainerError>;
+    fn state(&self, container: &Container) -> Result<ContainerState, ContainerError>;
+    fn update(&mut self, container: &mut Container, resources: &ResourceConfig) -> Result<(), ContainerError>;
 }
 
 impl ContainerCapability {
@@ -456,7 +576,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
             self.stats.total_containers -= 1;
             Ok(())
         } else {
-            Err(ContainerError::PermissionDenied)
+            Err(ContainerError::NotFound)
         }
     }
 
@@ -468,15 +588,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.start();
             if result.is_ok() {
-                let state = container.state();
-                if state == ContainerState::Running {
-                    self.stats.running_containers += 1;
-                    self.stats.stopped_containers -= 1;
-                }
+                self.stats.stopped_containers -= 1;
+                self.stats.running_containers += 1;
             }
             result
         } else {
-            Err(ContainerError::PermissionDenied)
+            Err(ContainerError::NotFound)
         }
     }
 
@@ -488,15 +605,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.stop();
             if result.is_ok() {
-                let state = container.state();
-                if state == ContainerState::Stopped {
-                    self.stats.running_containers -= 1;
-                    self.stats.stopped_containers += 1;
-                }
+                self.stats.running_containers -= 1;
+                self.stats.stopped_containers += 1;
             }
             result
         } else {
-            Err(ContainerError::PermissionDenied)
+            Err(ContainerError::NotFound)
         }
     }
 
@@ -508,15 +622,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.pause();
             if result.is_ok() {
-                let state = container.state();
-                if state == ContainerState::Paused {
-                    self.stats.running_containers -= 1;
-                    self.stats.paused_containers += 1;
-                }
+                self.stats.running_containers -= 1;
+                self.stats.paused_containers += 1;
             }
             result
         } else {
-            Err(ContainerError::PermissionDenied)
+            Err(ContainerError::NotFound)
         }
     }
 
@@ -528,15 +639,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.resume();
             if result.is_ok() {
-                let state = container.state();
-                if state == ContainerState::Running {
-                    self.stats.paused_containers -= 1;
-                    self.stats.running_containers += 1;
-                }
+                self.stats.paused_containers -= 1;
+                self.stats.running_containers += 1;
             }
             result
         } else {
-            Err(ContainerError::PermissionDenied)
+            Err(ContainerError::NotFound)
         }
     }
 

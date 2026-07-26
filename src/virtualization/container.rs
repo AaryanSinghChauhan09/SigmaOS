@@ -459,6 +459,7 @@ impl ContainerRuntime for PodmanRuntime {
 pub struct ContainerRuntimeManager {
     runtime: Box<dyn ContainerRuntime>,
     images: Vec<String>,
+    pub events_log: Vec<String>,
 }
 
 impl ContainerRuntimeManager {
@@ -466,42 +467,84 @@ impl ContainerRuntimeManager {
         Self {
             runtime,
             images: Vec::new(),
+            events_log: Vec::new(),
         }
+    }
+
+    /// Log a container lifecycle event
+    pub fn log_event(&mut self, message: String) {
+        self.events_log.push(message);
+    }
+
+    /// Perform a simulated container health check
+    pub fn health_check(&self, container_id: &str) -> Result<bool, ContainerError> {
+        let info = self.get_container_info(container_id)?;
+        Ok(info.state == ContainerState::Running)
+    }
+
+    /// Prune unused images from the cache
+    pub fn prune_images(&mut self) -> usize {
+        let count = self.images.len();
+        self.images.clear();
+        count
     }
 
     /// Create container
     pub fn create_container(&mut self, config: ContainerConfig) -> Result<String, ContainerError> {
-        self.runtime.create_container(&config)
+        let container_id = self.runtime.create_container(&config)?;
+        self.log_event(format!(
+            "[Event] Container '{}' successfully created",
+            container_id
+        ));
+        Ok(container_id)
     }
 
     /// Start container
     pub fn start_container(&mut self, container_id: &str) -> Result<(), ContainerError> {
-        self.runtime.start_container(container_id)
+        self.runtime.start_container(container_id)?;
+        self.log_event(format!(
+            "[Event] Container '{}' successfully started",
+            container_id
+        ));
+        Ok(())
     }
 
     /// Stop container
     pub fn stop_container(&mut self, container_id: &str) -> Result<(), ContainerError> {
-        self.runtime.stop_container(container_id)
+        self.runtime.stop_container(container_id)?;
+        self.log_event(format!(
+            "[Event] Container '{}' successfully stopped",
+            container_id
+        ));
+        Ok(())
     }
 
     /// Pause container
     pub fn pause_container(&mut self, container_id: &str) -> Result<(), ContainerError> {
-        self.runtime.pause_container(container_id)
+        self.runtime.pause_container(container_id)?;
+        self.log_event(format!("[Event] Container '{}' paused", container_id));
+        Ok(())
     }
 
     /// Resume container
     pub fn resume_container(&mut self, container_id: &str) -> Result<(), ContainerError> {
-        self.runtime.resume_container(container_id)
+        self.runtime.resume_container(container_id)?;
+        self.log_event(format!("[Event] Container '{}' resumed", container_id));
+        Ok(())
     }
 
     /// Restart container
     pub fn restart_container(&mut self, container_id: &str) -> Result<(), ContainerError> {
-        self.runtime.restart_container(container_id)
+        self.runtime.restart_container(container_id)?;
+        self.log_event(format!("[Event] Container '{}' restarted", container_id));
+        Ok(())
     }
 
     /// Remove container
     pub fn remove_container(&mut self, container_id: &str) -> Result<(), ContainerError> {
-        self.runtime.remove_container(container_id)
+        self.runtime.remove_container(container_id)?;
+        self.log_event(format!("[Event] Container '{}' removed", container_id));
+        Ok(())
     }
 
     /// Get container info
@@ -658,5 +701,47 @@ mod tests {
         manager.start_container(&container_id).unwrap();
         let info = manager.get_container_info(&container_id).unwrap();
         assert_eq!(info.state, ContainerState::Running);
+    }
+
+    #[test]
+    fn test_container_health_check_and_events_and_pruning() {
+        let mut manager = ContainerRuntimeManager::default();
+        let config = ContainerConfig {
+            name: "Audit Container".to_string(),
+            image: "redis:alpine".to_string(),
+            command: None,
+            env_vars: HashMap::new(),
+            ports: Vec::new(),
+            volumes: Vec::new(),
+            network_mode: NetworkMode::Bridge,
+            restart_policy: RestartPolicy::Always,
+            resource_limits: ResourceLimits {
+                cpu_shares: 512,
+                memory_mb: 256,
+                memory_swap_mb: 512,
+            },
+        };
+
+        // Create & verify event logged
+        let container_id = manager.create_container(config).unwrap();
+        assert!(manager
+            .events_log
+            .iter()
+            .any(|e| e.contains("successfully created")));
+
+        // Start & verify health check and start event
+        manager.start_container(&container_id).unwrap();
+        assert!(manager.health_check(&container_id).unwrap());
+        assert!(manager
+            .events_log
+            .iter()
+            .any(|e| e.contains("successfully started")));
+
+        // Pull and prune image verification
+        manager.pull_image("redis:alpine").unwrap();
+        assert_eq!(manager.list_images().len(), 1);
+        let pruned = manager.prune_images();
+        assert_eq!(pruned, 1);
+        assert_eq!(manager.list_images().len(), 0);
     }
 }

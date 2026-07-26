@@ -1113,6 +1113,220 @@ impl UnifiedPackageManager {
     }
 }
 
+// =========================================================================
+// 17. FEDORA-STYLE MANDATORY ACCESS CONTROL (SELINUX PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SecurityContextClass {
+    Process,
+    File,
+    Port,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SecurityContext {
+    pub user: &'static str,
+    pub role: &'static str,
+    pub domain_type: &'static str,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MacPermission {
+    Read,
+    Write,
+    Execute,
+    Bind,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct AccessVectorCacheEntry {
+    pub subject_context: SecurityContext,
+    pub object_context: SecurityContext,
+    pub class: SecurityContextClass,
+    pub permission: MacPermission,
+    pub allowed: bool,
+}
+
+pub struct FedoraSELinuxMacEngine {
+    pub avc: [Option<AccessVectorCacheEntry>; 16],
+}
+
+impl FedoraSELinuxMacEngine {
+    pub fn new() -> Self {
+        Self { avc: [None; 16] }
+    }
+
+    pub fn register_rule(
+        &mut self,
+        subject: SecurityContext,
+        object: SecurityContext,
+        class: SecurityContextClass,
+        permission: MacPermission,
+        allowed: bool,
+    ) -> Result<(), &'static str> {
+        for slot in self.avc.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(AccessVectorCacheEntry {
+                    subject_context: subject,
+                    object_context: object,
+                    class,
+                    permission,
+                    allowed,
+                });
+                return Ok(());
+            }
+        }
+        Err("Mandatory Access Control Access Vector Cache rule limit exceeded")
+    }
+
+    pub fn check_permission(
+        &self,
+        subject: SecurityContext,
+        object: SecurityContext,
+        class: SecurityContextClass,
+        permission: MacPermission,
+    ) -> bool {
+        for slot in self.avc.iter() {
+            if let Some(ref entry) = slot {
+                if entry.subject_context == subject
+                    && entry.object_context == object
+                    && entry.class == class
+                    && entry.permission == permission
+                {
+                    return entry.allowed;
+                }
+            }
+        }
+        false // Default-Deny Security Model
+    }
+}
+
+// =========================================================================
+// 18. FEDORA-STYLE SERVICE UNIT DEPENDENCY STATE MACHINE (SYSTEMD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceState {
+    Stopped,
+    Starting,
+    Running,
+    Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SystemdService {
+    pub name: &'static str,
+    pub state: ServiceState,
+    pub dependencies: [&'static str; 4],
+    pub dep_count: usize,
+}
+
+pub struct FedoraSystemdSupervisor {
+    pub services: [Option<SystemdService>; 8],
+}
+
+impl FedoraSystemdSupervisor {
+    pub fn new() -> Self {
+        Self {
+            services: [None; 8],
+        }
+    }
+
+    pub fn register_service(&mut self, service: SystemdService) -> Result<(), &'static str> {
+        for slot in self.services.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(service);
+                return Ok(());
+            }
+        }
+        Err("Systemd supervisor service registration limit reached")
+    }
+
+    pub fn start_service(&mut self, name: &'static str) -> Result<(), &'static str> {
+        let mut service_idx = None;
+        for (idx, slot) in self.services.iter().enumerate() {
+            if let Some(ref s) = slot {
+                if s.name == name {
+                    service_idx = Some(idx);
+                    break;
+                }
+            }
+        }
+
+        let idx = service_idx.ok_or("Target systemd service not registered")?;
+
+        // Retrieve dependencies first
+        let deps = {
+            let s = self.services[idx].as_ref().unwrap();
+            if s.state == ServiceState::Running {
+                return Ok(());
+            }
+            s.dependencies
+        };
+        let dep_count = self.services[idx].as_ref().unwrap().dep_count;
+
+        // Verify dependencies are running first (parallel loading simulation)
+        for i in 0..dep_count {
+            let dep_name = deps[i];
+            let mut dep_running = false;
+            for other_slot in self.services.iter() {
+                if let Some(ref other) = other_slot {
+                    if other.name == dep_name && other.state == ServiceState::Running {
+                        dep_running = true;
+                        break;
+                    }
+                }
+            }
+            if !dep_running {
+                self.services[idx].as_mut().unwrap().state = ServiceState::Failed;
+                return Err("Failed to start service: dependency not active");
+            }
+        }
+
+        self.services[idx].as_mut().unwrap().state = ServiceState::Running;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 19. FEDORA-STYLE DELTARPM PATCH BLOCK RECONSTRUCTION (DELTARPM PARITY)
+// =========================================================================
+
+pub const DELTA_BLOCK_SIZE: usize = 128;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeltaRpmDiffBlock {
+    pub offset: usize,
+    pub patch_bytes: [u8; 16],
+    pub patch_len: usize,
+}
+
+pub struct FedoraDeltaRpmEngine;
+
+impl FedoraDeltaRpmEngine {
+    pub fn reconstruct_package(
+        base_package: &[u8],
+        diffs: &[DeltaRpmDiffBlock],
+        output_buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
+        if output_buffer.len() < base_package.len() {
+            return Err("Reconstruction buffer overflow: output space too small");
+        }
+        output_buffer[..base_package.len()].copy_from_slice(base_package);
+
+        for diff in diffs {
+            if diff.offset + diff.patch_len > output_buffer.len() {
+                return Err("Corrupt DeltaRPM block: patch offset exceeds bounds");
+            }
+            output_buffer[diff.offset..diff.offset + diff.patch_len]
+                .copy_from_slice(&diff.patch_bytes[..diff.patch_len]);
+        }
+
+        Ok(base_package.len())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1218,11 +1432,13 @@ mod tests {
 
     #[test]
     fn test_sigmafs_cas_and_pqc() {
-        let trusted_key: [u8; 32] = std::time::SystemTime::now()
+        let nanos = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
             .to_le_bytes();
+        let mut trusted_key = [0u8; 32];
+        trusted_key[..16].copy_from_slice(&nanos);
         let mut fs = SigmaFsCasEngine::new(trusted_key);
 
         let data = b"CONFIDENTIAL_REPRODUCIBLE_SYSTEM_IMAGE";
@@ -1230,7 +1446,9 @@ mod tests {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
-            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE].try_into().unwrap();
+            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE]
+            .try_into()
+            .unwrap();
 
         let block_hash = fs.store_block(data, &signature).unwrap();
 
@@ -1249,13 +1467,17 @@ mod tests {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
-            .to_le_bytes()[..SHA256_HASH_SIZE].try_into().unwrap();
+            .to_le_bytes()[..SHA256_HASH_SIZE]
+            .try_into()
+            .unwrap();
         let hash_b: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
             .wrapping_add(1)
-            .to_le_bytes()[..SHA256_HASH_SIZE].try_into().unwrap();
+            .to_le_bytes()[..SHA256_HASH_SIZE]
+            .try_into()
+            .unwrap();
 
         engine.register_file_metadata(FileMetadata {
             path: "/var/tmp/session.log",
@@ -1422,5 +1644,95 @@ mod tests {
         assert_eq!(entry.base_low, 0x5678);
         assert_eq!(entry.base_middle, 0x34);
         assert_eq!(entry.base_high, 0x12);
+    }
+
+    #[test]
+    fn test_fedora_selinux_mac() {
+        let mut engine = FedoraSELinuxMacEngine::new();
+        let s_context = SecurityContext {
+            user: "unconfined_u",
+            role: "unconfined_r",
+            domain_type: "unconfined_t",
+        };
+        let o_context = SecurityContext {
+            user: "system_u",
+            role: "object_r",
+            domain_type: "httpd_sys_content_t",
+        };
+
+        assert!(engine
+            .register_rule(
+                s_context,
+                o_context,
+                SecurityContextClass::File,
+                MacPermission::Read,
+                true
+            )
+            .is_ok());
+
+        assert!(engine.check_permission(
+            s_context,
+            o_context,
+            SecurityContextClass::File,
+            MacPermission::Read
+        ));
+        assert!(!engine.check_permission(
+            s_context,
+            o_context,
+            SecurityContextClass::File,
+            MacPermission::Write
+        ));
+    }
+
+    #[test]
+    fn test_fedora_systemd_supervisor() {
+        let mut supervisor = FedoraSystemdSupervisor::new();
+        let db_service = SystemdService {
+            name: "postgresql",
+            state: ServiceState::Running,
+            dependencies: [""; 4],
+            dep_count: 0,
+        };
+        let app_service = SystemdService {
+            name: "web_app",
+            state: ServiceState::Stopped,
+            dependencies: {
+                let mut d = [""; 4];
+                d[0] = "postgresql";
+                d
+            },
+            dep_count: 1,
+        };
+
+        assert!(supervisor.register_service(db_service).is_ok());
+        assert!(supervisor.register_service(app_service).is_ok());
+
+        assert!(supervisor.start_service("web_app").is_ok());
+        assert_eq!(
+            supervisor.services[1].as_ref().unwrap().state,
+            ServiceState::Running
+        );
+    }
+
+    #[test]
+    fn test_fedora_deltarpm_reconstruction() {
+        let base_pkg = [0x11, 0x22, 0x33, 0x44, 0x55];
+        let diffs = [DeltaRpmDiffBlock {
+            offset: 2,
+            patch_bytes: {
+                let mut b = [0u8; 16];
+                b[0] = 0x99;
+                b[1] = 0x88;
+                b
+            },
+            patch_len: 2,
+        }];
+
+        let mut reconstructed = [0u8; 16];
+        let len = FedoraDeltaRpmEngine::reconstruct_package(&base_pkg, &diffs, &mut reconstructed)
+            .unwrap();
+
+        assert_eq!(len, 5);
+        assert_eq!(reconstructed[..5], [0x11, 0x22, 0x99, 0x88, 0x55]);
     }
 }

@@ -347,11 +347,13 @@ pub mod zenithnet {
         fn test_sovereign_guard_tun() {
             let mut tun = SovereignGuardTun::new();
             assert!(!tun.is_active());
-            let key: [u8; 32] = std::time::SystemTime::now()
+            let nanos = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos()
                 .to_le_bytes();
+            let mut key = [0u8; 32];
+            key[..16].copy_from_slice(&nanos);
             tun.establish(&key).unwrap();
             assert!(tun.is_active());
         }
@@ -1805,7 +1807,9 @@ pub mod sigmafs_extended {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos()
-                .to_le_bytes()[..64].try_into().unwrap();
+                .to_le_bytes()[..64]
+                .try_into()
+                .unwrap();
             let c1 = crc32c_block(&data);
             let c2 = crc32c_block(&data);
             assert_eq!(c1, c2);
@@ -1822,7 +1826,9 @@ pub mod sigmafs_extended {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos()
-                .to_le_bytes()[..BLOCK_SIZE].try_into().unwrap();
+                .to_le_bytes()[..BLOCK_SIZE]
+                .try_into()
+                .unwrap();
             node.update_hash(&data);
             assert!(!node.is_dirty);
             assert_ne!(node.hash[..4], [0u8; 4]);

@@ -42,8 +42,8 @@ impl SystemSnapshot {
     pub fn new(description: String) -> Self {
         let timestamp_nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
         Self {
             id: format!("snap-{}", timestamp_nanos),
             timestamp: (timestamp_nanos / 1_000_000_000) as u64,
@@ -190,11 +190,9 @@ impl SelfHealingModule {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: &str) -> Result<(), ResilienceError> {
-        if !self.snapshots.iter().any(|s| s.id == id) {
-            return Err(ResilienceError::SnapshotNotFound);
-        }
-
-        let snapshot = self.get_snapshot(id).unwrap();
+        let snapshot = self
+            .get_snapshot(id)
+            .ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback
@@ -211,8 +209,8 @@ impl SelfHealingModule {
             event_type,
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+                .map(|d| d.as_secs())
+                .unwrap_or(0),
         ));
 
         if !self.auto_recovery_enabled {

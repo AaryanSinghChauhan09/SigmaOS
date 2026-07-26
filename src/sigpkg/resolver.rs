@@ -149,13 +149,13 @@ mod tests {
     #[test]
     fn test_add_package() {
         let mut solver = SatSolver::new();
-        let package = Package {
-            name: "test".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: String::new(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
         solver.add_package(package);
         assert!(solver.packages.contains_key("test"));
     }

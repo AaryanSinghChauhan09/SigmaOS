@@ -1172,6 +1172,7 @@ impl UsbHidFullDriver {
         if let Some(led_byte) = report.data.first() {
             self.led_state = *led_byte;
         }
+        self.output_reports.push(report);
         Ok(())
     }
 
@@ -1294,10 +1295,9 @@ impl Uart8250 {
         }
     }
 
-    pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
+    pub fn write_byte(&mut self, _byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
-            // THRE set, can write
-            self.line_status |= 0x01; // Set Data Ready bit
+            self.line_status |= 0x01;
             Ok(())
         } else {
             Err(AncientError::DeviceBusy)
@@ -1626,7 +1626,7 @@ mod tests {
 
         let contact = TouchContact {
             id: 0,
-            x: 110,
+            x: 150,
             y: 200,
             pressure: 50,
             active: true,

@@ -58,7 +58,15 @@ impl Thread for SimpleThread {
         self.id
     }
     fn state(&self) -> ThreadState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        {
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ThreadState::Running,
+            2 => ThreadState::Blocked,
+            3 => ThreadState::Sleeping,
+            _ => ThreadState::Ready,
+        }
+    }
     }
     fn priority(&self) -> Priority {
         self.priority
@@ -370,7 +378,17 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

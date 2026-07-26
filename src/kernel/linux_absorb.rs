@@ -347,7 +347,6 @@ pub struct AbsorbedExt4Driver {
     fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
     mounted: bool,
     mount_point: String,
-    fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
 }
 
 impl AbsorbedExt4Driver {
@@ -386,18 +385,6 @@ impl AbsorbedExt4Driver {
             },
             mounted: false,
             mount_point: String::new(),
-            fs_metadata: crate::kernel::subsystem::FilesystemMetadata {
-                name: String::from("AbsorbedExt4"),
-                version: String::from("1.0.0"),
-                fs_type: crate::kernel::subsystem::FilesystemType::LinuxDerived,
-                linux_heritage: None,
-                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
-                max_filename_length: 255,
-                features: vec![
-                    crate::kernel::subsystem::FilesystemFeature::Journaling,
-                    crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
-                ],
-            },
         }
     }
 }
@@ -720,6 +707,207 @@ impl Scheduler for AbsorbedCfsScheduler {
 }
 
 // ============================================================================
+// Sovereign eBPF Network & Probe Filter Engine
+// ============================================================================
+
+/// SovereignEbpfEngine - eBPF sandboxed virtual machine inspired by Cilium and Linux's eBPF
+#[derive(Debug, Clone)]
+pub struct SovereignEbpfEngine {
+    pub registers: [u64; 10],
+    pub program_loaded: bool,
+}
+
+impl SovereignEbpfEngine {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 10],
+            program_loaded: false,
+        }
+    }
+
+    /// Executes eBPF instructions on a network packet buffer or kernel probe context
+    pub fn execute_program(&mut self, program: &[u64], context: &mut [u8]) -> Result<u64, &'static str> {
+        self.program_loaded = true;
+        self.registers[1] = context.as_ptr() as u64;
+        self.registers[2] = context.len() as u64;
+
+        for &inst in program {
+            let opcode = (inst >> 56) as u8;
+            let dst_reg = ((inst >> 52) & 0xF) as usize;
+            let src_reg = ((inst >> 48) & 0xF) as usize;
+            let offset = ((inst >> 32) & 0xFFFF) as i16;
+            let imm = (inst & 0xFFFFFFFF) as u64;
+
+            if dst_reg >= 10 || src_reg >= 10 {
+                return Err("Register index out of bounds");
+            }
+
+            match opcode {
+                0x07 => { // ADD immediate
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(imm);
+                }
+                0x0F => { // ADD register
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
+                }
+                0x17 => { // SUB immediate
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(imm);
+                }
+                0x1F => { // SUB register
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
+                }
+                0x27 => { // MOV immediate
+                    self.registers[dst_reg] = imm;
+                }
+                0x2F => { // MOV register
+                    self.registers[dst_reg] = self.registers[src_reg];
+                }
+                0x35 => { // LOAD from context with offset (packet parsing helper)
+                    if offset >= 0 && (offset as usize) < context.len() {
+                        self.registers[dst_reg] = context[offset as usize] as u64;
+                    } else {
+                        return Err("Context offset out of bounds");
+                    }
+                }
+                0x95 => { // EXIT
+                    return Ok(self.registers[0]);
+                }
+                _ => {}
+            }
+        }
+        Ok(self.registers[0])
+    }
+}
+
+impl Default for SovereignEbpfEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Sovereign Capsicum Sandbox
+// ============================================================================
+
+/// SovereignCapsicum - FreeBSD-inspired capability-based sandbox framework
+#[derive(Debug, Clone)]
+pub struct SovereignCapsicum {
+    pub capability_mask: u64,
+    pub is_sandboxed: bool,
+}
+
+impl SovereignCapsicum {
+    pub const CAP_READ: u64 = 0x01;
+    pub const CAP_WRITE: u64 = 0x02;
+    pub const CAP_SEEK: u64 = 0x04;
+    pub const CAP_IOCTL: u64 = 0x08;
+
+    pub fn new() -> Self {
+        Self {
+            capability_mask: 0xFFFF_FFFF_FFFF_FFFF,
+            is_sandboxed: false,
+        }
+    }
+
+    /// Enter capability mode, locking down process permissions
+    pub fn enter_capability_mode(&mut self, restricted_mask: u64) {
+        self.capability_mask &= restricted_mask;
+        self.is_sandboxed = true;
+    }
+
+    /// Checks if a specific action on a file descriptor is authorized under the capability mask
+    pub fn check_capability(&self, required_cap: u64) -> Result<(), &'static str> {
+        if self.is_sandboxed && (self.capability_mask & required_cap) == 0 {
+            return Err("Capability check failed: permission denied in Capsicum sandbox");
+        }
+        Ok(())
+    }
+}
+
+impl Default for SovereignCapsicum {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Plan 9 9P Protocol Server
+// ============================================================================
+
+/// Plan9Server - Bell Labs Plan 9 inspired "Everything is a File" universal protocol server
+#[derive(Debug, Clone)]
+pub struct Plan9Server {
+    pub max_message_size: u32,
+    pub active_fids: Vec<u32>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NinePMessage {
+    Tversion { msize: u32, version: String },
+    Rversion { msize: u32, version: String },
+    Tattach { fid: u32, afid: u32, uname: String, aname: String },
+    Rattach { qid_path: u64 },
+    Twalk { fid: u32, newfid: u32, names: Vec<String> },
+    Rwalk { qids: Vec<u64> },
+    Tread { fid: u32, offset: u64, count: u32 },
+    Rread { data: Vec<u8> },
+}
+
+impl Plan9Server {
+    pub fn new() -> Self {
+        Self {
+            max_message_size: 8192,
+            active_fids: Vec::new(),
+        }
+    }
+
+    /// Handles a 9P message, routing resource-oriented commands
+    pub fn handle_request(&mut self, request: NinePMessage) -> Result<NinePMessage, &'static str> {
+        match request {
+            NinePMessage::Tversion { msize, version } => {
+                self.max_message_size = msize.min(8192);
+                Ok(NinePMessage::Rversion {
+                    msize: self.max_message_size,
+                    version: String::from("9P2000"),
+                })
+            }
+            NinePMessage::Tattach { fid, afid, uname, aname } => {
+                if !self.active_fids.contains(&fid) {
+                    self.active_fids.push(fid);
+                }
+                Ok(NinePMessage::Rattach { qid_path: 0xFF10 })
+            }
+            NinePMessage::Twalk { fid, newfid, names } => {
+                if !self.active_fids.contains(&fid) {
+                    return Err("Fid not attached");
+                }
+                if !self.active_fids.contains(&newfid) {
+                    self.active_fids.push(newfid);
+                }
+                let mut qids = Vec::new();
+                for _ in &names {
+                    qids.push(0xFA00);
+                }
+                Ok(NinePMessage::Rwalk { qids })
+            }
+            NinePMessage::Tread { fid, offset, count } => {
+                if !self.active_fids.contains(&fid) {
+                    return Err("Fid not valid");
+                }
+                let data = vec![b'9'; count.min(10) as usize];
+                Ok(NinePMessage::Rread { data })
+            }
+            _ => Err("Unsupported 9P request"),
+        }
+    }
+}
+
+impl Default for Plan9Server {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Tests
 // ============================================================================
 
@@ -794,5 +982,79 @@ mod tests {
             memory_usage: 0,
         };
         assert!(scheduler.add_process(process).is_ok());
+    }
+
+    #[test]
+    fn test_sovereign_ebpf() {
+        let mut engine = SovereignEbpfEngine::new();
+        let mut packet = vec![0x10, 0x20, 0x30, 0x40];
+
+        // eBPF Bytecode Program:
+        // 1. MOV immediate 5 into R0: 0x2700000000000005
+        // 2. LOAD byte at index 2 (0x30) into R3: 0x3530000000000002
+        // 3. ADD register R3 to R0: 0x0F03000000000000
+        // 4. EXIT: 0x9500000000000000
+        let program = vec![
+            0x27_0_0_0000_00000005, // MOV R0, 5
+            0x35_3_0_0000_00000002, // LOAD R3, context[2] (value: 0x30 = 48)
+            0x0F_0_3_0000_00000000, // ADD R0, R3
+            0x95_0_0_0000_00000000, // EXIT
+        ];
+
+        let result = engine.execute_program(&program, &mut packet);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 53); // 5 + 48 = 53
+        assert!(engine.program_loaded);
+    }
+
+    #[test]
+    fn test_sovereign_capsicum() {
+        let mut sandbox = SovereignCapsicum::new();
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
+
+        // Restrict capabilities to READ and SEEK only
+        sandbox.enter_capability_mode(SovereignCapsicum::CAP_READ | SovereignCapsicum::CAP_SEEK);
+        assert!(sandbox.is_sandboxed);
+
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_SEEK).is_ok());
+
+        // WRITE is not allowed
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_WRITE).is_err());
+    }
+
+    #[test]
+    fn test_plan9_server() {
+        let mut server = Plan9Server::new();
+
+        // 1. Tversion
+        let version_req = NinePMessage::Tversion { msize: 4096, version: String::from("9P2000") };
+        let version_resp = server.handle_request(version_req).unwrap();
+        if let NinePMessage::Rversion { msize, ref version } = version_resp {
+            assert_eq!(msize, 4096);
+            assert_eq!(version, "9P2000");
+        } else {
+            panic!("Expected Rversion");
+        }
+
+        // 2. Tattach
+        let attach_req = NinePMessage::Tattach { fid: 10, afid: 0, uname: String::from("root"), aname: String::from("root") };
+        let attach_resp = server.handle_request(attach_req).unwrap();
+        if let NinePMessage::Rattach { qid_path } = attach_resp {
+            assert_eq!(qid_path, 0xFF10);
+        } else {
+            panic!("Expected Rattach");
+        }
+        assert!(server.active_fids.contains(&10));
+
+        // 3. Tread
+        let read_req = NinePMessage::Tread { fid: 10, offset: 0, count: 5 };
+        let read_resp = server.handle_request(read_req).unwrap();
+        if let NinePMessage::Rread { ref data } = read_resp {
+            assert_eq!(data.len(), 5);
+            assert_eq!(data, &[b'9', b'9', b'9', b'9', b'9']);
+        } else {
+            panic!("Expected Rread");
+        }
     }
 }

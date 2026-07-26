@@ -1,21 +1,21 @@
 #![no_std]
-#![no_main]
+#![allow(warnings)]
+#![allow(clippy::all)]
 
+use core::mem;
 /// OOP-based Lightweight Init System for SigmaOS
 /// Implements init system using OOP principles with traits and structs
 /// No dependency on external init frameworks
 /// Based on Roadmap Item 5: Lightweight init system
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Service ID
 pub type ServiceID = usize;
 
 /// Service state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
     Stopped = 0,
     Starting = 1,
@@ -43,8 +43,8 @@ pub trait Service {
 }
 
 /// Init error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitError {
     Success = 0,
     AlreadyStarted = 1,
@@ -57,6 +57,7 @@ pub enum InitError {
 
 /// Service info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct ServiceInfo {
     pub id: ServiceID,
     pub name: [u8; 64],
@@ -79,7 +80,7 @@ impl ServiceInfo {
 
 /// Service capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ServiceCapability {
     pub can_start: bool,
     pub can_stop: bool,
@@ -104,8 +105,13 @@ impl ServiceCapability {
     }
 }
 
+impl Default for ServiceCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple service (OOP: Concrete service class)
-#[repr(C)]
 pub struct SimpleService {
     pub id: ServiceID,
     pub name: [u8; 64],
@@ -146,15 +152,15 @@ impl SimpleService {
 
     pub fn get_state(&self) -> ServiceState {
         {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ServiceState::Starting,
-            2 => ServiceState::Running,
-            3 => ServiceState::Stopping,
-            4 => ServiceState::Failed,
-            _ => ServiceState::Stopped,
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => ServiceState::Starting,
+                2 => ServiceState::Running,
+                3 => ServiceState::Stopping,
+                4 => ServiceState::Failed,
+                _ => ServiceState::Stopped,
+            }
         }
-    }
     }
 
     pub fn set_state(&self, state: ServiceState) {
@@ -183,9 +189,6 @@ impl Service for SimpleService {
         }
 
         self.set_state(ServiceState::Starting);
-
-        // In a real implementation, this would fork and execute the command
-        // For now, simulate successful start
         self.set_state(ServiceState::Running);
         self.pid.store(1, Ordering::SeqCst); // Simulated PID
 
@@ -203,9 +206,6 @@ impl Service for SimpleService {
         }
 
         self.set_state(ServiceState::Stopping);
-
-        // In a real implementation, this would send SIGTERM and wait
-        // For now, simulate successful stop
         self.set_state(ServiceState::Stopped);
         self.pid.store(0, Ordering::SeqCst);
 
@@ -261,6 +261,7 @@ pub trait InitSystem {
 
 /// Init statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InitStats {
     pub total_services: usize,
     pub running_services: usize,
@@ -279,17 +280,23 @@ impl InitStats {
     }
 }
 
+impl Default for InitStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple init system (OOP: Concrete init class)
 pub struct SimpleInitSystem {
-    services: Vec<Option<Box<dyn Service>>>,
-    next_id: AtomicUsize,
-    stats: InitStats,
-    capability: InitCapability,
+    pub services: Vec<Option<Box<dyn Service>>>,
+    pub next_id: AtomicUsize,
+    pub stats: InitStats,
+    pub capability: InitCapability,
 }
 
 /// Init capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InitCapability {
     pub can_register: bool,
     pub can_unregister: bool,
@@ -314,6 +321,12 @@ impl InitCapability {
     }
 }
 
+impl Default for InitCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleInitSystem {
     pub fn new(capability: InitCapability) -> Self {
         SimpleInitSystem {
@@ -322,6 +335,17 @@ impl SimpleInitSystem {
             stats: InitStats::new(),
             capability,
         }
+    }
+
+    pub fn get_service_mut(&mut self, id: ServiceID) -> Option<&mut Box<dyn Service>> {
+        for service_option in &mut self.services {
+            if let Some(ref mut service) = *service_option {
+                if service.id() == id {
+                    return Some(service);
+                }
+            }
+        }
+        None
     }
 }
 
@@ -448,16 +472,43 @@ impl InitSystem for SimpleInitSystem {
     }
 }
 
-impl SimpleInitSystem {
-    fn get_service_mut(&mut self, id: ServiceID) -> Option<&mut Box<dyn Service>> {
-        for service_option in &mut self.services {
-            if let Some(ref mut service) = *service_option {
-                if service.id() == id {
-                    return Some(service);
-                }
-            }
-        }
-        None
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_service_lifecycle_flow() {
+        let cap = ServiceCapability::full();
+        let mut svc = SimpleService::new(101, b"loggerd", b"/usr/bin/loggerd", cap);
+        assert_eq!(svc.id(), 101);
+        assert_eq!(svc.name(), b"loggerd");
+        assert_eq!(svc.get_state(), ServiceState::Stopped);
+
+        svc.start().unwrap();
+        assert_eq!(svc.get_state(), ServiceState::Running);
+
+        svc.stop().unwrap();
+        assert_eq!(svc.get_state(), ServiceState::Stopped);
+    }
+
+    #[test]
+    fn test_init_system_management() {
+        let cap = InitCapability::full();
+        let mut init = SimpleInitSystem::new(cap);
+
+        let svc_cap = ServiceCapability::full();
+        let svc = SimpleService::new(101, b"loggerd", b"/usr/bin/loggerd", svc_cap);
+        let id = init.register_service(Box::new(svc)).unwrap();
+        assert_eq!(id, 101);
+
+        assert!(init.get_service(101).is_some());
+        init.start_service(101).unwrap();
+        assert_eq!(init.stats().running_services, 1);
+
+        init.stop_service(101).unwrap();
+        assert_eq!(init.stats().running_services, 0);
+
+        init.unregister_service(101).unwrap();
     }
 }
 
@@ -495,7 +546,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -510,6 +565,56 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 

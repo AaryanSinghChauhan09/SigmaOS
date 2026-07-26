@@ -26,6 +26,106 @@
 
 ---
 
+## 🔁 Compositor Event Loop
+
+To maintain solid, stutter-free 120 FPS window composition, Zenith runs an asynchronous, lock-free event loop that multiplexes input handling, surface trees updates, and display frame presentation:
+
+```rust
+// ZenithCompositor Main Event Loop
+pub struct ZenithEventLoop {
+    input_queue: LockFreeQueue<InputEvent>,
+    damage_tracker: DamageTracker,
+    scene_graph: Arc<RwLock<SceneGraph>>,
+    vsync_timer: VsyncTimer,
+}
+
+impl ZenithEventLoop {
+    pub fn run(&mut self) -> ! {
+        loop {
+            // 1. Poll input queue with low-latency drivers
+            while let Some(event) = self.input_queue.pop() {
+                self.process_input(event);
+            }
+
+            // 2. Refresh frame if damage or Vsync tick is registered
+            if self.damage_tracker.is_damaged() && self.vsync_timer.tick_ready() {
+                let scene = self.scene_graph.read().unwrap();
+                self.render_frame(&scene);
+                self.damage_tracker.clear();
+            }
+
+            // 3. Sleep briefly to yield CPU or wait for ACPI timer interrupts
+            self.yield_now();
+        }
+    }
+
+    fn render_frame(&self, scene: &SceneGraph) {
+        // Zero-copy DMA-BUF presentation to KMS/DRM display layers
+        for layer in scene.layers() {
+            if let Some(buf) = layer.dma_buffer() {
+                self.present_buffer(buf);
+            }
+        }
+    }
+}
+```
+
+---
+
+## 📐 Layout Paradigms
+
+Zenith implements native, highly modular tiling and floating window layout paradigms:
+
+1. **Auto-Tiling Mode:** Organizes windows dynamically into a non-overlapping grid (binary tree structure). Side panels, docks, and applications scale automatically when new tiles are opened.
+2. **Floating Mode:** Traditional floating window manager with overlap support, depth sorting (Z-index), and custom window shadows.
+3. **Picture-in-Picture (PiP) Overlay:** Capability-gated overlays that float on top of all virtual workspaces.
+
+---
+
+## ⌨️ System Keyboard Shortcuts
+
+Zenith features standard, intuitive system keyboard shortcuts for ultimate navigation efficiency:
+
+Shortcut | Context | Action
+--- | --- | ---
+`Super + Enter` | Desktop | Launch `sigma-sh` in Terminal
+`Super + Q` | Window | Close focused window
+`Super + Tab` | Workspace | Toggle between active workspaces
+`Super + Shift + Left/Right` | Window | Move focused window to next monitor
+`Super + Space` | Desktop | Launch Search / Command Launcher
+`Super + Ctrl + S` | Capture | Take interactive screenshot
+`Super + Ctrl + R` | Capture | Toggle screen recorder
+`Super + Alt + H` | Accessibility | Toggle Screen Reader
+`Super + Alt + Z` | Accessibility | Toggle Screen Magnifier
+
+---
+
+## ♿ WCAG & Screen Reader Accessibility Tags
+
+Sovereignty requires standard accessibility. Zenith emits semantic accessibility descriptors and screen-reader metadata directly from visual compositor elements:
+
+```rust
+// Screen Reader Accessibility descriptor layout
+pub struct AccessibleElement {
+    pub id: ElementID,
+    pub role: AccessibleRole,         // e.g., Button, Input, Container, Alert
+    pub label: String,                // ARIA equivalent label
+    pub active_state: ElementState,   // Focused, Expanded, Selected, Disabled
+    pub keyboard_shortcut: Option<String>,
+}
+
+impl AccessibleElement {
+    pub fn serialize_to_reader(&self) -> String {
+        format!(
+            "[Element: {:?}], Name: '{}', Status: {:?}, Key: {:?}",
+            self.role, self.label, self.active_state, self.keyboard_shortcut
+        )
+    }
+}
+```
+
+---
+
 ## ✨ Core Features
 
 ### Wayland Protocol Compatibility
@@ -70,7 +170,7 @@ ZenithCompositor uses **server-side decorations (SSD)** with a clean sovereign a
 
 ### Sigma Taskbar
 
-- **Sigma Dock** — macOS-style app dock with magnetic hover animations
+- **Sigma Dock** — app dock with magnetic hover animations
 - **Smart Workspace** — AI-suggested workspace grouping (related apps grouped together)
 - **Quick Settings** — One-click access to Wi-Fi, Bluetooth, Volume, Brightness
 - **Notification Center** — Grouped, actionable notifications with rich media previews
@@ -161,12 +261,6 @@ easing = "ease-out-cubic"
 | Kashmir Blue | Cool blue-grey inspired by Dal Lake |
 | Midnight Teal | Cyberpunk-inspired teal on near-black |
 | Paper White | Light mode — off-white with ink accents |
-
-### Dynamic Theming
-
-- **Time-based** — Auto-switch to light/dark at sunrise/sunset
-- **Location-aware** — Sunrise/sunset calculated from device location
-- **App-specific** — Different accent colors per application
 
 ---
 

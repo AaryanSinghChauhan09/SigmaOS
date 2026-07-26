@@ -358,6 +358,10 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+        exit_handler.register_handler(0x80, handle_cpuid);
+
+        assert!(exit_handler.handle_exit(1, 0x80).is_ok());
+        assert!(exit_handler.handle_exit(1, 0x99).is_err()); // Unregistered exit reason
     }
 }
 

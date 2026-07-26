@@ -67,7 +67,7 @@ pub trait ProtocolManager {
     fn register_protocol(&mut self, protocol_type: ProtocolType, scheme: &[u8]) -> Result<ProtocolID, ProtocolError>;
     fn unregister_protocol(&mut self, id: ProtocolID) -> Result<(), ProtocolError>;
     fn get_handler(&self, scheme: &[u8]) -> Option<&dyn ProtocolHandler>;
-    def open_url(&self, url: &[u8]) -> Result<(), ProtocolError>;
+    fn open_url(&self, url: &[u8]) -> Result<(), ProtocolError>;
 }
 
 #[repr(C)]
@@ -128,7 +128,7 @@ impl ProtocolManager for SimpleProtocolManager {
 
 pub trait URIResolver {
     fn resolve(&self, uri: &[u8]) -> Result<Vec<u8>, ProtocolError>;
-    def register_scheme(&mut self, scheme: &[u8], handler: ProtocolID);
+    fn register_scheme(&mut self, scheme: &[u8], handler: ProtocolID);
 }
 
 #[repr(C)]
@@ -182,6 +182,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

@@ -126,7 +126,7 @@ impl TargetCapability {
         TargetCapability {
             can_write: false,
             can_flush: false,
-            pub can_rotate: false,
+            can_rotate: false,
         }
     }
 
@@ -455,6 +455,19 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

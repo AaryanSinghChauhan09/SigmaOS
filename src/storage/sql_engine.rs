@@ -17,7 +17,7 @@ pub enum SqlType {
     Null,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SqlValue {
     Integer(i64),
     Text(String),
@@ -209,8 +209,8 @@ impl SqlEngine {
             (0..table.columns.len()).collect()
         };
 
-        let result_columns = if let Some(cols) = columns {
-            cols
+        let result_columns = if let Some(ref cols) = columns {
+            cols.clone()
         } else {
             table.columns.iter().map(|c| c.name.clone()).collect()
         };

@@ -257,7 +257,7 @@ impl SimpleInputHandler {
 
 impl InputHandler for SimpleInputHandler {
     fn handle_event(&mut self, event: &dyn InputEvent) -> InputResult {
-        if !self.capability.can handle {
+        if !self.capability.can_handle {
             return InputResult::Ignored;
         }
 
@@ -632,6 +632,19 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

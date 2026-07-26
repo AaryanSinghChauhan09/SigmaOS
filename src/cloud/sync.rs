@@ -76,13 +76,15 @@ impl SyncItem for SimpleSyncItem {
 pub trait CloudSync {
     fn add_sync(&mut self, local_path: &[u8], remote_path: &[u8]) -> Result<SyncID, SyncError>;
     fn remove_sync(&mut self, id: SyncID) -> Result<(), SyncError>;
-    def sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
+    fn sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
 }
 
 #[repr(C)]
 pub struct SimpleCloudSync {
     pub items: Vec<Option<Box<dyn SyncItem>>>,
     pub next_id: AtomicUsize,
+    pub max_bandwidth_limit_kbps: AtomicUsize,
+    pub retry_limit: AtomicUsize,
 }
 
 impl SimpleCloudSync {
@@ -90,7 +92,17 @@ impl SimpleCloudSync {
         SimpleCloudSync {
             items: Vec::new(),
             next_id: AtomicUsize::new(1),
+            max_bandwidth_limit_kbps: AtomicUsize::new(10240), // 10MB/s
+            retry_limit: AtomicUsize::new(3),
         }
+    }
+
+    pub fn set_bandwidth_limit(&mut self, limit_kbps: u32) {
+        self.max_bandwidth_limit_kbps.store(limit_kbps as usize, Ordering::SeqCst);
+    }
+
+    pub fn set_retry_limit(&mut self, limit: u32) {
+        self.retry_limit.store(limit as usize, Ordering::SeqCst);
     }
 }
 
@@ -182,6 +194,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

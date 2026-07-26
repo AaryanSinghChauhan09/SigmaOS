@@ -345,6 +345,109 @@ impl TcpConnection {
     }
 }
 
+// =================================================================────────
+// 20. SOVEREIGN SOCKMAP DIRECT REDIRECTION ENGINE (CILIUM/LINUX STYLE)
+// =================================================================────────
+
+pub struct SovereignSockmapBypass {
+    pub socket_map: HashMap<(u16, u16), (u16, u16)>,
+}
+
+impl SovereignSockmapBypass {
+    pub fn new() -> Self {
+        Self {
+            socket_map: HashMap::new(),
+        }
+    }
+
+    /// Registers a peer-to-peer socket map link for dynamic stack bypass
+    pub fn register_link(&mut self, src_port: u16, dst_port: u16, peer_src: u16, peer_dst: u16) {
+        self.socket_map.insert((src_port, dst_port), (peer_src, peer_dst));
+    }
+
+    /// Determines if a packet payload should bypass the standard TCP stack and redirect directly
+    pub fn redirect_payload(&self, src_port: u16, dst_port: u16, payload: &[u8], peer_receiver: &mut TcpConnection) -> bool {
+        if let Some(&(peer_src, peer_dst)) = self.socket_map.get(&(src_port, dst_port)) {
+            if peer_receiver.local_port == peer_src && peer_receiver.remote_port == peer_dst {
+                for &b in payload {
+                    peer_receiver.rcv_buf.push_back(b);
+                }
+                peer_receiver.segments_rx.fetch_add(1, Ordering::Relaxed);
+                peer_receiver.bytes_rx.fetch_add(payload.len(), Ordering::Relaxed);
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for SovereignSockmapBypass {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =================================================================────────
+// 21. SYN COOKIES SYN FLOOD PROTECTION (LINUX STYLE SYNC_COOKIES)
+// =================================================================────────
+
+pub struct SynCookieEngine {
+    pub secret_seed: u32,
+}
+
+impl SynCookieEngine {
+    pub fn new(seed: u32) -> Self {
+        Self { secret_seed: seed }
+    }
+
+    /// Generates a cryptographic SYN cookie sequence number based on connection tuple
+    pub fn generate_cookie(&self, src_port: u16, dst_port: u16, client_isn: u32, mss_idx: u8) -> u32 {
+        let hash = (src_port as u32)
+            .wrapping_mul(31)
+            .wrapping_add(dst_port as u32)
+            .wrapping_mul(31)
+            .wrapping_add(client_isn)
+            .wrapping_mul(31)
+            .wrapping_add(self.secret_seed);
+
+        (hash & 0xFFFFFFF8) | ((mss_idx & 0x07) as u32)
+    }
+
+    /// Verifies if a returned ACK number corresponds to a valid SYN cookie
+    pub fn verify_cookie(&self, src_port: u16, dst_port: u16, client_isn: u32, ack_num: u32) -> bool {
+        let expected_cookie = ack_num.wrapping_sub(1);
+        let computed_hash = (src_port as u32)
+            .wrapping_mul(31)
+            .wrapping_add(dst_port as u32)
+            .wrapping_mul(31)
+            .wrapping_add(client_isn)
+            .wrapping_mul(31)
+            .wrapping_add(self.secret_seed);
+
+        (expected_cookie & 0xFFFFFFF8) == (computed_hash & 0xFFFFFFF8)
+    }
+}
+
+// =================================================================────────
+// 22. RECEIVE PACKET STEERING (RPS/RSS CPU CORE INTERRUPT BALANCING)
+// =================================================================────────
+
+pub struct ReceivePacketSteering {
+    pub core_count: u32,
+}
+
+impl ReceivePacketSteering {
+    pub fn new(cores: u32) -> Self {
+        Self { core_count: cores }
+    }
+
+    /// Computes symmetric hash of packet ports to select designated CPU processing core
+    pub fn steer_packet(&self, src_port: u16, dst_port: u16) -> u32 {
+        let hash = (src_port as u32) ^ (dst_port as u32);
+        hash % self.core_count
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -422,5 +525,58 @@ mod tests {
         let fin = conn.close().unwrap();
         assert!(fin.has_flag(flags::FIN));
         assert_eq!(conn.state, TcpState::FinWait1);
+    }
+
+    #[test]
+    fn test_sockmap_direct_redirection() {
+        let mut sender = TcpConnection::new(9001, 80);
+        let mut receiver = TcpConnection::new(80, 9001);
+        receiver.state = TcpState::Established;
+
+        let mut sockmap = SovereignSockmapBypass::new();
+        sockmap.register_link(9001, 80, 80, 9001);
+
+        let data = b"SOCKMAP_FAST_PATH_BYPASS_DATA";
+
+        // Execute direct redirect bypass
+        let redirected = sockmap.redirect_payload(9001, 80, data, &mut receiver);
+        assert!(redirected);
+
+        // Verify receiver buffer received payload directly
+        assert_eq!(receiver.read(data.len()), data);
+        assert_eq!(receiver.bytes_rx(), data.len());
+        assert_eq!(receiver.segments_rx(), 1);
+    }
+
+    #[test]
+    fn test_syn_cookie_verification() {
+        let engine = SynCookieEngine::new(0xDEADBEEF);
+        let src_port = 12345;
+        let dst_port = 80;
+        let client_isn = 987654321;
+        let mss_idx = 4;
+
+        let cookie = engine.generate_cookie(src_port, dst_port, client_isn, mss_idx);
+
+        // Final ACK contains cookie + 1
+        let ack_num = cookie.wrapping_add(1);
+
+        assert!(engine.verify_cookie(src_port, dst_port, client_isn, ack_num));
+        assert!(!engine.verify_cookie(src_port, dst_port, client_isn + 1, ack_num));
+    }
+
+    #[test]
+    fn test_rps_load_balancing() {
+        let rps = ReceivePacketSteering::new(4); // 4 CPU cores
+
+        let core_1 = rps.steer_packet(9000, 80);
+        let core_2 = rps.steer_packet(9001, 80);
+
+        assert!(core_1 < 4);
+        assert!(core_2 < 4);
+
+        // Symmetric check: flow 9000 -> 80 must hash to same core as 80 -> 9000 (symmetric routing)
+        let core_sym = rps.steer_packet(80, 9000);
+        assert_eq!(core_1, core_sym);
     }
 }

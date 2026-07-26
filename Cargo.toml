@@ -16,7 +16,7 @@ rand = "0.10"
 # Test dependencies
 
 [features]
-default = []
+default = ["microkernel"]
 desktop = []
 drivers = []
 ai = []

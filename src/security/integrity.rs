@@ -1,5 +1,3 @@
-#![no_std]
-
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
@@ -130,15 +128,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        {
-            let raw = self.status.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => IntegrityStatus::Modified,
-                2 => IntegrityStatus::Corrupted,
-                3 => IntegrityStatus::Missing,
-                _ => IntegrityStatus::Valid,
-            }
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -383,6 +373,9 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
+pub struct IntegrityCheck;
+pub struct IntegrityVerifier;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -414,3 +407,9 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct IntegrityCheck;
+
+#[derive(Debug, Clone)]
+pub struct IntegrityVerifier;

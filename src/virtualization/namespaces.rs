@@ -220,12 +220,13 @@ mod tests {
     fn test_delete_namespace() {
         let mut manager = NamespaceManager::new();
 
+        let _init_id = manager.create_namespace(NamespaceType::Pid, None).unwrap();
         let id = manager
             .create_namespace(NamespaceType::Network, None)
             .unwrap();
         manager.delete_namespace(id).unwrap();
 
-        assert_eq!(manager.namespace_count(), 0);
+        assert_eq!(manager.namespace_count(), 1);
     }
 
     #[test]

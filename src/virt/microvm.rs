@@ -505,16 +505,15 @@ impl<T> Vec<T> {
                 self.grow();
             }
 
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
+        // 1. Create a Strict sandbox microVM (e.g. secure, zero network/shared filesystem)
+        let microvm_strict_id = manager
+            .create_microvm(b"strict-secure-vbox", SandboxPolicy::Strict)
+            .unwrap();
 
-    fn len(&self) -> usize {
-        self.len
-    }
+        // 2. Create a Permissive sandbox microVM (e.g. development mode)
+        let _microvm_permissive_id = manager
+            .create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive)
+            .unwrap();
 
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
@@ -540,18 +539,12 @@ impl<T> Vec<T> {
         };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
+        // Retrieve and start strict sandbox microVM
+        assert!(manager.start_microvm(microvm_strict_id).is_ok());
 
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+        let microvm_strict = manager.get_microvm(microvm_strict_id).unwrap();
+        assert_eq!(microvm_strict.state(), MicroVMState::Running);
+        assert_eq!(microvm_strict.sandbox_policy(), SandboxPolicy::Strict);
     }
 }
 

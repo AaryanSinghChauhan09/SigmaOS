@@ -1,19 +1,14 @@
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
-use core::sync::atomic::{AtomicU64, Ordering};
+use std::string::String;
+use std::vec::Vec;
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     /// 64-bit capability bitmask
     bits: u64,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl CapabilityToken {
@@ -66,24 +61,6 @@ impl CapabilityToken {
         (self.bits & (1 << permission as u64)) != 0
     }
 
-    /// Allow a specific capability ID or bit
-    pub fn allow_capability(&mut self, capability: u64) {
-        if capability < 64 {
-            self.bits |= 1 << capability;
-        } else {
-            self.bits |= capability;
-        }
-    }
-
-    /// Check if capability contains a specific u64
-    pub fn contains(&self, capability: u64) -> bool {
-        if capability < 64 {
-            (self.bits & (1 << capability)) != 0
-        } else {
-            (self.bits & capability) == capability
-        }
-    }
-
     /// Revoke all permissions
     pub fn revoke_all(&mut self) {
         self.bits = 0;
@@ -92,16 +69,6 @@ impl CapabilityToken {
     /// Get raw capability bits
     pub fn bits(&self) -> u64 {
         self.bits
-    }
-
-    /// Check if capability contains a specific u64 bit
-    pub fn contains(&self, bit: u64) -> bool {
-        (self.bits & bit) != 0
-    }
-
-    /// Allow a specific capability bit
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
     }
 }
 
@@ -146,12 +113,6 @@ impl CapabilityGate {
         CapabilityToken {
             bits: self.current.load(Ordering::SeqCst),
         }
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

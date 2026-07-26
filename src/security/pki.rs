@@ -1,5 +1,3 @@
-#![no_std]
-
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -83,13 +81,11 @@ impl Certificate for SimpleCertificate {
         self.id
     }
     fn certificate_type(&self) -> CertificateType {
-        {
-            let raw = self.certificate_type.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => CertificateType::Intermediate,
-                2 => CertificateType::EndEntity,
-                _ => CertificateType::Root,
-            }
+        match self.certificate_type.load(Ordering::SeqCst) {
+            0 => CertificateType::Root,
+            1 => CertificateType::Intermediate,
+            2 => CertificateType::EndEntity,
+            _ => CertificateType::EndEntity,
         }
     }
     fn subject(&self) -> &[u8] {
@@ -234,6 +230,10 @@ impl CRL for SimpleCRL {
     }
 }
 
+pub type PkiError = PKIError;
+pub use PKIManager as PkiManager;
+pub struct CertificateAuthority;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -281,3 +281,9 @@ mod tests {
         assert_eq!(current_crl[0], (101, 1));
     }
 }
+
+pub type PkiError = PKIError;
+pub type PkiManager = dyn PKIManager;
+
+#[derive(Debug, Clone)]
+pub struct CertificateAuthority;

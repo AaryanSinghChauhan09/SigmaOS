@@ -117,8 +117,9 @@ pub enum BootError {
     UnsupportedArchitecture,
 }
 
+#[cfg(target_os = "none")]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 

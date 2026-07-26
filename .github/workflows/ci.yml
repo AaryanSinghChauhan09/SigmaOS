@@ -43,19 +43,18 @@ jobs:
       run: cargo fmt -- --check || true
     
     - name: Clippy
-      run: cargo clippy -- -D warnings || true
+      run: cargo clippy -- -D warnings
     
     - name: Build
-      run: cargo build --verbose || true
+      run: cargo build --verbose
     
     - name: Run tests
-      run: cargo test --verbose || true
+      run: cargo test --verbose
     
     - name: Security audit
       uses: rustsec/audit-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true
 
   test:
     runs-on: ubuntu-latest
@@ -73,28 +72,18 @@ jobs:
       run: mkdir -p build
 
     - name: Run unit tests
-      run: cargo test --lib || true
+      run: cargo test --lib
     
     - name: Run integration tests
-      run: cargo test --test '*' || true
+      run: cargo test --test '*'
 
-    - name: Initialize build and compile workspace
+    - name: Build binaries and compile workspace for smoke test
       run: |
         mkdir -p build
-        cargo build || true
-    
-    - name: Build binaries and initialize build dir for smoke test
-      run: |
-        mkdir -p build
-        cargo build || true
+        cargo build
 
     - name: Run smoke tests
-      run: |
-        mkdir -p build
-        mkdir -p target/debug
-        touch target/debug/sigma_kernel
-        chmod +x ./scripts/smoke-test.sh
-        ./scripts/smoke-test.sh || true
+      run: bash scripts/smoke-test.sh
 
   security:
     runs-on: ubuntu-latest

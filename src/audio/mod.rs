@@ -14,4 +14,4 @@ pub use alsa::{
 pub use audio_codec::{
     AudioChannels, AudioCodec, AudioFormat, AudioMetadata, AudioSampleRate, DecodedAudio,
 };
-pub use driver::{AudioDriver, AudioDriverError, AudioDriverResult};
+pub use driver::{AudioDevice, AudioDeviceID, AudioError, AudioType};
