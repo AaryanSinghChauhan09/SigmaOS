@@ -199,6 +199,98 @@ impl Default for TimeTravelEngine {
     }
 }
 
+/// Ubuntu-style Declarative Netplan configuration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NetplanConfig {
+    pub interface_name: String,
+    pub ip_addresses: Vec<String>,
+    pub gateway: String,
+    pub dns_servers: Vec<String>,
+}
+
+pub struct NetplanManager {
+    pub configurations: HashMap<String, NetplanConfig>,
+}
+
+impl NetplanManager {
+    pub fn new() -> Self {
+        Self {
+            configurations: HashMap::new(),
+        }
+    }
+
+    /// Load declarative netplan configuration
+    pub fn load_config(&mut self, config: NetplanConfig) {
+        self.configurations.insert(config.interface_name.clone(), config);
+    }
+
+    /// Apply declarative settings to interfaces
+    pub fn apply_all(&self) -> Result<usize, &'static str> {
+        let mut count = 0;
+        for (interface, config) in &self.configurations {
+            println!(
+                "[Ubuntu Netplan]: Applying interface={} ip={:?} gateway={} dns={:?}",
+                interface, config.ip_addresses, config.gateway, config.dns_servers
+            );
+            count += 1;
+        }
+        Ok(count)
+    }
+}
+
+impl Default for NetplanManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Canonical-style Rebootless Livepatch instruction containing ftrace-style address redirects
+#[derive(Debug, Clone)]
+pub struct LivepatchPatch {
+    pub target_symbol: String,
+    pub old_function_address: usize,
+    pub new_function_address: usize,
+    pub checksum: String,
+}
+
+pub struct LivepatchManager {
+    pub active_patches: HashMap<String, LivepatchPatch>,
+    pub redirection_log: Vec<String>,
+}
+
+impl LivepatchManager {
+    pub fn new() -> Self {
+        Self {
+            active_patches: HashMap::new(),
+            redirection_log: Vec::new(),
+        }
+    }
+
+    /// Register and load a livepatch without reboots (Ftrace-style redirection)
+    pub fn register_patch(&mut self, patch: LivepatchPatch) -> Result<(), &'static str> {
+        if patch.old_function_address == 0 || patch.new_function_address == 0 {
+            return Err("Invalid memory address offset");
+        }
+        self.redirection_log.push(format!(
+            "LIVEPATCH: Redirecting calls of '{}' (0x{:x}) to patched body (0x{:x}). Checksum={}.",
+            patch.target_symbol, patch.old_function_address, patch.new_function_address, patch.checksum
+        ));
+        self.active_patches.insert(patch.target_symbol.clone(), patch);
+        Ok(())
+    }
+
+    /// Simulates redirecting a function call dynamically
+    pub fn redirect_call(&self, target_symbol: &str) -> Option<usize> {
+        self.active_patches.get(target_symbol).map(|patch| patch.new_function_address)
+    }
+}
+
+impl Default for LivepatchManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -260,5 +352,47 @@ mod tests {
         let checkpoint = travel.travel_to_checkpoint(100).unwrap();
         assert_eq!(checkpoint.register_rip, 0x00401010);
         assert_eq!(checkpoint.memory_state_checksum, "mem-hash-01");
+    }
+
+    #[test]
+    fn test_ubuntu_netplan_config() {
+        let mut netplan = NetplanManager::new();
+        let eth0 = NetplanConfig {
+            interface_name: "eth0".to_string(),
+            ip_addresses: vec!["192.168.1.50/24".to_string()],
+            gateway: "192.168.1.1".to_string(),
+            dns_servers: vec!["8.8.8.8".to_string(), "1.1.1.1".to_string()],
+        };
+
+        netplan.load_config(eth0);
+        assert_eq!(netplan.apply_all().unwrap(), 1);
+
+        let config = netplan.configurations.get("eth0").unwrap();
+        assert_eq!(config.gateway, "192.168.1.1");
+    }
+
+    #[test]
+    fn test_ubuntu_livepatch_engine() {
+        let mut patcher = LivepatchManager::new();
+        let patch = LivepatchPatch {
+            target_symbol: "sys_read".to_string(),
+            old_function_address: 0xffffffff8122c400,
+            new_function_address: 0xffffffffc0300100,
+            checksum: "livepatch-sha256-abcde".to_string(),
+        };
+
+        assert!(patcher.register_patch(patch).is_ok());
+        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
+        assert!(patcher.redirect_call("sys_write").is_none());
+        assert_eq!(patcher.redirection_log.len(), 1);
+
+        // Safety check for invalid address
+        let invalid_patch = LivepatchPatch {
+            target_symbol: "sys_write".to_string(),
+            old_function_address: 0,
+            new_function_address: 0,
+            checksum: "invalid-checksum".to_string(),
+        };
+        assert!(patcher.register_patch(invalid_patch).is_err());
     }
 }

@@ -14,6 +14,7 @@ pub mod filesystem;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
+pub mod distro;
 pub mod package;
 pub mod productivity;
 pub mod resilience;
@@ -54,6 +55,25 @@ pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+pub use distro::{
+    AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
+    HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
+    ReleaseStage, SoftwareCertificationProgram,
+    BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
+    ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
+    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
+    RegistryValue, Win32Gdi, WindowsRegistry,
+    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
+    TargetArch,
+    AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
+    ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
+    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
+    LivepatchPatch, LivepatchManager,
+    BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
+    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
+    MpiCommunicator,
+};
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -61,7 +81,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
