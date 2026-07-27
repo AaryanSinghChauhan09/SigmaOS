@@ -176,15 +176,20 @@ mod tests {
         let mut solver = SatSolver::new();
 
         // Create circular dependency: A -> B -> A
-        let pkg_a = Package::new(
-            "A".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            vec![Dependency {
+        let pkg_a = Package {
+            name: "A".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: vec![Dependency {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
             checksum: String::new(),
+            mirrors: vec![],
+            signing_keys: vec![],
+            licenses: vec![],
+            maintainers: vec![],
+            changelogs: vec![],
         };
 
         let pkg_b = Package {
@@ -196,6 +201,11 @@ mod tests {
                 version_constraint: VersionConstraint::Any,
             }],
             checksum: String::new(),
+            mirrors: vec![],
+            signing_keys: vec![],
+            licenses: vec![],
+            maintainers: vec![],
+            changelogs: vec![],
         };
 
         solver.add_package(pkg_a);

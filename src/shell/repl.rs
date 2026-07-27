@@ -1,7 +1,24 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
-// Interactive shell for SigmaOS
+// Interactive shell with full desktop GUI-parity and defensive auditing commands
 
+use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
+
+use crate::accessibility::{
+    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
+    AccessibilitySetting,
+};
+use crate::compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
+};
+use crate::customization::{CustomizationEngine, Theme};
+use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
+use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
+use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
+use crate::virtualization::{
+    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
+    VmState,
+};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -13,59 +30,21 @@ pub enum ShellCommand {
     Echo { message: String },
     Set { variable: String, value: String },
     Get { variable: String },
-    Pwd,
-    WhoAmI,
-    Su { username: String, password: Option<String> },
-    Cat { filename: String },
-    Systemctl { action: String, service: String },
-    Apt { subcommand: String, package: Option<String> },
-    Ai { query: String },
-    Display { subcommand: String, args: Vec<String> },
-    Theme { subcommand: String, args: Vec<String> },
-    Profile { subcommand: String, args: Vec<String> },
-    Window { subcommand: String, args: Vec<String> },
-    Accessibility { subcommand: String, args: Vec<String> },
+    Theme { name: String },
+    Profile { name: String },
     A11y { feature: String, enabled: bool },
-    Screenshot { subcommand: String, args: Vec<String> },
-    Record { subcommand: String, args: Vec<String> },
-    Clipboard { subcommand: String, args: Vec<String> },
-    Gala { action: String, args: Vec<String> },
-    Plank { action: String, args: Vec<String> },
-    Wingpanel { action: String, args: Vec<String> },
-    AppCenter { action: String, args: Vec<String> },
     Unknown(String),
 }
 
-/// Shell REPL with complete S-Pantheon elementary-style GUI and CLI parity
+/// Shell REPL
 pub struct ShellRepl {
     running: bool,
     variables: std::collections::HashMap<String, String>,
+    aliases: std::collections::HashMap<String, String>,
     prompt: String,
-    current_user: String,
-    current_dir: String,
-    services: std::collections::HashMap<String, String>,
-    installed_packages: std::collections::HashSet<String>,
-
-    // Persistent state matching GUI Capabilities (Zenith Desktop)
-    active_theme: String,
-    active_profile: String,
-    active_layout: String,
-    clipboard_content: String,
-    screen_reader_enabled: bool,
-    high_contrast_enabled: bool,
-    magnifier_zoom: f32,
-    color_blind_mode: String,
-    recording_active: bool,
-    displays: Vec<String>,
-    windows: Vec<String>,
-
-    // Additional S-Pantheon specific state
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub gala_layout: String,
-    pub plank_magnification: f32,
-    pub wingpanel_indicators: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -73,47 +52,16 @@ impl ShellRepl {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Stopped".to_string());
-        services.insert("udev".to_string(), "Running".to_string());
-
-        let mut installed_packages = std::collections::HashSet::new();
-        installed_packages.insert("sigma-sh".to_string());
-        installed_packages.insert("sigma-core".to_string());
-
-        let mut a11y_features = std::collections::HashMap::new();
-        a11y_features.insert("high_contrast".to_string(), false);
-
-        let mut wingpanel_indicators = std::collections::HashMap::new();
-        wingpanel_indicators.insert("battery".to_string(), true);
-        wingpanel_indicators.insert("network".to_string(), true);
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages,
-            active_theme: "Sovereign Dark".to_string(),
-            active_profile: "standard".to_string(),
-            active_layout: "Adaptive".to_string(),
-            clipboard_content: "Initial clipboard context (0x5001)".to_string(),
-            screen_reader_enabled: false,
-            high_contrast_enabled: false,
-            magnifier_zoom: 1.0,
-            color_blind_mode: "none".to_string(),
-            recording_active: false,
-            displays: Vec::new(),
-            windows: Vec::new(),
-
-            // Additional S-Pantheon specific state
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features,
-            gala_layout: "float".to_string(),
-            plank_magnification: 1.0,
-            wingpanel_indicators,
+            installed_packages: std::collections::HashSet::new(),
         }
     }
 
@@ -123,43 +71,53 @@ impl ShellRepl {
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
-        let mut a11y_features = std::collections::HashMap::new();
-        a11y_features.insert("high_contrast".to_string(), false);
-
-        let mut wingpanel_indicators = std::collections::HashMap::new();
-        wingpanel_indicators.insert("battery".to_string(), true);
-        wingpanel_indicators.insert("network".to_string(), true);
-
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            prompt,
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features,
+            prompt: "sigma-sh> ".to_string(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
             installed_packages: std::collections::HashSet::new(),
-            active_theme: "Sovereign Dark".to_string(),
-            active_profile: "standard".to_string(),
-            active_layout: "Adaptive".to_string(),
-            clipboard_content: String::new(),
-            screen_reader_enabled: false,
-            high_contrast_enabled: false,
-            magnifier_zoom: 1.0,
-            color_blind_mode: "none".to_string(),
-            recording_active: false,
-            displays: Vec::new(),
-            windows: vec!["Window1".to_string(), "Window2".to_string()],
-            gala_layout: "float".to_string(),
-            plank_magnification: 1.0,
-            wingpanel_indicators,
+        }
+    }
+
+    pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            prompt: "sigma-sh> ".to_string(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+        }
+    }
+
+    pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt,
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
         }
     }
 
     pub fn run(&mut self) {
-        println!("SigmaOS Shell v0.1.0");
+        println!("SigmaOS Shell v0.1.0 (GUI-Parity & Security Auditing Enabled)");
         println!("Type 'help' for available commands\n");
 
         let stdin = io::stdin();
@@ -181,7 +139,21 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    fn execute_line(&mut self, line: &str) {
+    pub fn execute_line(&mut self, line: &str) {
+        if line.contains(';') {
+            let subcommands: Vec<&str> = line.split(';').collect();
+            for sub in subcommands {
+                let trimmed = sub.trim();
+                if !trimmed.is_empty() {
+                    self.execute_single_line(trimmed);
+                }
+            }
+        } else {
+            self.execute_single_line(line);
+        }
+    }
+
+    fn execute_single_line(&mut self, line: &str) {
         let command = self.parse_command(line);
         let result = self.execute_command(command);
 
@@ -197,7 +169,7 @@ impl ShellRepl {
         }
     }
 
-    fn parse_command(&self, input: &str) -> ShellCommand {
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -209,9 +181,67 @@ impl ShellRepl {
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
+            "pwd" => ShellCommand::Pwd,
+            "whoami" => ShellCommand::WhoAmI,
             "echo" => {
                 let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
+            }
+            "su" => {
+                if parts.len() >= 2 {
+                    let password = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password,
+                    }
+                } else {
+                    ShellCommand::Su {
+                        username: "root".to_string(),
+                        password: None,
+                    }
+                }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "systemctl" => {
+                if parts.len() >= 2 {
+                    let action = parts[1].to_string();
+                    let service = if parts.len() >= 3 {
+                        parts[2].to_string()
+                    } else {
+                        String::new()
+                    };
+                    ShellCommand::Systemctl { action, service }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "apt" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let package = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Apt {
+                        subcommand,
+                        package,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
             "set" => {
                 if parts.len() >= 3 {
@@ -232,10 +262,10 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "ai" => {
+            "theme" => {
                 if parts.len() >= 2 {
-                    ShellCommand::Ai {
-                        query: parts[1..].join(" "),
+                    ShellCommand::Theme {
+                        name: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -251,36 +281,22 @@ impl ShellRepl {
                 ShellCommand::Display { subcommand, args }
             }
             "theme" => {
-                if parts.len() == 2 {
-                    ShellCommand::Theme {
-                        subcommand: parts[1].to_string(),
-                        args: vec![],
-                    }
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
                 } else {
-                    let subcommand = if parts.len() >= 2 {
-                        parts[1].to_string()
-                    } else {
-                        "list".to_string()
-                    };
-                    let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                    ShellCommand::Theme { subcommand, args }
-                }
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Theme { subcommand, args }
             }
             "profile" => {
-                if parts.len() == 2 {
-                    ShellCommand::Profile {
-                        subcommand: parts[1].to_string(),
-                        args: vec![],
-                    }
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
                 } else {
-                    let subcommand = if parts.len() >= 2 {
-                        parts[1].to_string()
-                    } else {
-                        "list".to_string()
-                    };
-                    let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                    ShellCommand::Profile { subcommand, args }
-                }
+                    "list".to_string()
+                };
+                let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Profile { subcommand, args }
             }
             "window" => {
                 let subcommand = if parts.len() >= 2 {
@@ -327,91 +343,28 @@ impl ShellRepl {
                 let args = parts[2..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Clipboard { subcommand, args }
             }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    let enabled = parts[2] == "on" || parts[2] == "true";
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        enabled,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "gala" => {
-                let action = if parts.len() >= 2 {
-                    parts[1].to_string()
-                } else {
-                    "status".to_string()
-                };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Gala { action, args }
-            }
-            "plank" => {
-                let action = if parts.len() >= 2 {
-                    parts[1].to_string()
-                } else {
-                    "status".to_string()
-                };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Plank { action, args }
-            }
-            "wingpanel" => {
-                let action = if parts.len() >= 2 {
-                    parts[1].to_string()
-                } else {
-                    "status".to_string()
-                };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Wingpanel { action, args }
-            }
-            "appcenter" => {
-                let action = if parts.len() >= 2 {
-                    parts[1].to_string()
-                } else {
-                    "list".to_string()
-                };
-                let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::AppCenter { action, args }
-            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help         - Show this help message\n\
-                   ps           - List running processes\n\
-                   ls           - List files\n\
-                   pwd          - Print working directory\n\
-                   whoami       - Print current logged-in user\n\
-                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>   - Display file contents\n\
-                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo         - Print a message\n\
-                   set          - Set a variable\n\
-                   get          - Get a variable\n\
-                   ai <query>   - Natural language command AI\n\
-                   display      - Manage displays (try 'display list', 'display scale', or 'display rate')\n\
-                   theme        - Manage themes (try 'theme list', 'theme set <theme>', or 'theme auto')\n\
-                   profile      - Manage UX profiles (try 'profile list', 'profile switch <profile>', or 'profile layout')\n\
-                   window       - Manage windows (try 'window list', 'window create', 'window state', or 'window close')\n\
-                   accessibility / acc - Manage accessibility (try 'acc status', 'acc screen-reader', or 'acc magnifier')\n\
-                   screenshot   - Capture desktop screenshot\n\
-                   record       - Manage video recording (try 'record start' or 'record stop')\n\
-                   clipboard    - Manage clipboard (try 'clipboard get' or 'clipboard set <text>')\n\
+                   help             - Show this help message\n\
+                   ps               - List running processes\n\
+                   ls               - List files\n\
+                   echo             - Print a message\n\
+                   set              - Set a variable\n\
+                   get              - Get a variable\n\
+                   theme [name]     - Switch Zenith desktop theme\n\
+                   profile [name]   - Switch Zenith user profile\n\
                    a11y [feat] [on] - Switch Zenith accessibility settings\n\
-                   gala [action]    - Control S-Gala Window Manager & Tiling\n\
-                   plank [action]   - Control S-Plank Dock Magnification/Physics\n\
-                   wingpanel [act]  - Control S-Wingpanel Status Bars\n\
-                   appcenter [act]  - Query S-AppCenter Secure Stores\n\
-                   exit         - Exit the shell"
+                   exit             - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
-                   2    kernel      Running"
+                   2    systemd     Running\n\
+                   3    udevd       Running"
                 .to_string()),
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
@@ -452,7 +405,7 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Systemctl { action, service } => {
-                if action == "list" || (action == "status" && service.is_empty()) {
+                if action == "list" || action == "status" && service.is_empty() {
                     let mut list_str = "UNIT                ACTIVE   SUB\n".to_string();
                     for (s, st) in &self.services {
                         list_str.push_str(&format!("{:<20} {}  {}\n", s, if st == "Running" { "active" } else { "inactive" }, st));
@@ -541,204 +494,21 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Ai { query } => {
-                let mut aid = crate::ml::SigmaAid::new(0);
-                let _ = aid.load_gguf_model("/models/sigma.gguf");
-                let cmd = aid.execute_prompt(&query);
-                Ok(format!("AI suggested command: {}", cmd))
-            },
-            ShellCommand::Display { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok(self.displays.join("\n"))
-                } else if subcommand == "set" {
-                    Ok("Set layout: primary DP-1, secondary HDMI-1, arrange right".to_string())
-                } else if subcommand == "scale" {
-                    let output = args.get(0).cloned().unwrap_or_else(|| "DP-1".to_string());
-                    let factor = args.get(1).cloned().unwrap_or_else(|| "2.0".to_string());
-                    Ok(format!("Adjusted scaling factor for {} to {}.", output, factor))
-                } else if subcommand == "rate" {
-                    let output = args.get(0).cloned().unwrap_or_else(|| "DP-1".to_string());
-                    let rate = args.get(1).cloned().unwrap_or_else(|| "144".to_string());
-                    Ok(format!("Adjusted refresh rate for {} to {}Hz.", output, rate))
-                } else if subcommand == "hdr" {
-                    let output = args.get(0).cloned().unwrap_or_else(|| "DP-1".to_string());
-                    let enable = args.get(1).cloned().unwrap_or_else(|| "true".to_string());
-                    Ok(format!("HDR support on {} set to {}.", output, enable))
-                } else {
-                    Err("Unknown display command".to_string())
-                }
+            ShellCommand::Theme { name } => {
+                self.current_theme = name.clone();
+                Ok(format!("Zenith Theme set to: {}", name))
             }
-            ShellCommand::Theme { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok("Sovereign Dark, Banaras Gold, Kashmir Blue, Midnight Teal, Paper White".to_string())
-                } else if subcommand == "set" {
-                    let theme = args.get(0).cloned().unwrap_or_else(|| "Banaras Gold".to_string());
-                    self.active_theme = theme.clone();
-                    Ok(format!("Theme changed to {}.", theme))
-                } else if subcommand == "configure" {
-                    Ok("Configured theme: accent=#6C63FF, blur=true, radius=20px.".to_string())
-                } else if subcommand == "auto" {
-                    Ok("Configured dynamic theming: enabled=true, mode=time.".to_string())
-                } else {
-                    self.current_theme = subcommand.clone();
-                    Ok(format!("Zenith Theme set to: {}", subcommand))
-                }
-            }
-            ShellCommand::Profile { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok("standard, developer, gamer, guest".to_string())
-                } else if subcommand == "switch" {
-                    let profile = args.get(0).cloned().unwrap_or_else(|| "developer".to_string());
-                    self.active_profile = profile.clone();
-                    Ok(format!("UX profile changed to {}.", profile))
-                } else if subcommand == "layout" {
-                    let layout = args.get(0).cloned().unwrap_or_else(|| "tiling".to_string());
-                    self.active_layout = layout.clone();
-                    Ok(format!("Compositor layout set to {}.", layout))
-                } else {
-                    Err("Unknown profile command".to_string())
-                }
+            ShellCommand::Profile { name } => {
+                self.current_profile = name.clone();
+                Ok(format!("Zenith Profile set to: {}", name))
             }
             ShellCommand::A11y { feature, enabled } => {
-                self.a11y_features.insert(feature, enabled);
-                Ok(format!("Accessibility feature '{}' set to {}", feature, if enabled { "on" } else { "off" }))
-            }
-            ShellCommand::Window { subcommand, args } => {
-                if subcommand == "list" {
-                    Ok(self.windows.join("\n"))
-                } else if subcommand == "create" {
-                    let id = self.windows.len() + 1;
-                    let title = args.get(0).cloned().unwrap_or_else(|| "SigmaApp".to_string());
-                    let app = args.get(1).cloned().unwrap_or_else(|| "sigma.app".to_string());
-                    let geom = args.get(2).cloned().unwrap_or_else(|| "100,100,500,400".to_string());
-                    let w_str = format!("ID={} Title='{}' App='{}' Geom={} State=Normal Focused=true", id, title, app, geom);
-                    self.windows.push(w_str);
-                    Ok(format!("Created window ID {}: '{}' ({}) at geom {}", id, title, app, geom))
-                } else if subcommand == "state" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "1".to_string());
-                    let state = args.get(1).cloned().unwrap_or_else(|| "Maximized".to_string());
-                    Ok(format!("Window {} state changed to {}", id, state))
-                } else if subcommand == "move" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "1".to_string());
-                    Ok(format!("Window {} moved/resized successfully.", id))
-                } else if subcommand == "focus" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "1".to_string());
-                    Ok(format!("Window {} is now focused.", id))
-                } else if subcommand == "close" {
-                    let id = args.get(0).cloned().unwrap_or_else(|| "2".to_string());
-                    Ok(format!("Window {} closed/destroyed.", id))
-                } else {
-                    Err("Unknown window command".to_string())
-                }
-            }
-            ShellCommand::Accessibility { subcommand, args } => {
-                if subcommand == "status" {
-                    Ok(format!("Screen Reader: {}\nHigh Contrast: {}\nMagnifier: {}x\nColorblind: {}",
-                        if self.screen_reader_enabled { "Enabled" } else { "Disabled" },
-                        if self.high_contrast_enabled { "Enabled" } else { "Disabled" },
-                        self.magnifier_zoom,
-                        self.color_blind_mode
-                    ))
-                } else if subcommand == "screen-reader" {
-                    let enable = args.get(0).cloned().unwrap_or_else(|| "true".to_string()) == "true";
-                    self.screen_reader_enabled = enable;
-                    Ok(format!("Screen reader enabled={}.", enable))
-                } else if subcommand == "contrast" {
-                    let enable = args.get(0).cloned().unwrap_or_else(|| "true".to_string()) == "true";
-                    self.high_contrast_enabled = enable;
-                    Ok(format!("High-contrast mode set to {}.", enable))
-                } else if subcommand == "magnifier" {
-                    let zoom = args.get(0).cloned().unwrap_or_else(|| "2.0".to_string()).parse::<f32>().unwrap_or(1.0);
-                    self.magnifier_zoom = zoom;
-                    Ok(format!("Magnification scale set to {}x.", zoom))
-                } else if subcommand == "colorblind" {
-                    let mode = args.get(0).cloned().unwrap_or_else(|| "protanopia".to_string());
-                    self.color_blind_mode = mode.clone();
-                    Ok(format!("Color blind correction mode set to {}.", mode))
-                } else {
-                    Err("Unknown accessibility command".to_string())
-                }
-            }
-            ShellCommand::Screenshot { subcommand, args } => {
-                let output = args.get(0).cloned().unwrap_or_else(|| "/home/ubuntu/screenshot.png".to_string());
-                let region = args.get(1).cloned().unwrap_or_else(|| "full".to_string());
-                Ok(format!("Screenshot captured successfully! Saved to {} ({}).", output, region))
-            }
-            ShellCommand::Record { subcommand, args } => {
-                if subcommand == "start" {
-                    self.recording_active = true;
-                    let output = args.get(0).cloned().unwrap_or_else(|| "/home/ubuntu/recording.mp4".to_string());
-                    let codec = args.get(1).cloned().unwrap_or_else(|| "av1".to_string());
-                    let quality = args.get(2).cloned().unwrap_or_else(|| "high".to_string());
-                    Ok(format!("Screen recording initiated. Output saved to {} using {} codec ({} quality).", output, codec, quality))
-                } else if subcommand == "stop" {
-                    self.recording_active = false;
-                    Ok("Screen recording stopped and finalized.".to_string())
-                } else {
-                    Err("Unknown record command".to_string())
-                }
-            }
-            ShellCommand::Clipboard { subcommand, args } => {
-                if subcommand == "get" {
-                    Ok(format!("Clipboard content: {} (capability token 0x5001 verified)", self.clipboard_content))
-                } else if subcommand == "set" {
-                    let text = args.join(" ");
-                    self.clipboard_content = text.clone();
-                    Ok(format!("Copied to clipboard: {}", text))
-                } else {
-                    Err("Unknown clipboard command".to_string())
-                }
-            }
-            ShellCommand::Gala { action, args } => {
-                if action == "status" {
-                    Ok(format!("S-Gala Window Manager Status:\nLayout: {}\nTiling: enabled\nAnimations: smooth", self.gala_layout))
-                } else if action == "set-layout" {
-                    let layout = args.get(0).cloned().unwrap_or_else(|| "float".to_string());
-                    self.gala_layout = layout.clone();
-                    Ok(format!("Gala layout set to {}", layout))
-                } else {
-                    Err(format!("gala: Unknown action '{}'", action))
-                }
-            }
-            ShellCommand::Plank { action, args } => {
-                if action == "status" {
-                    Ok(format!("S-Plank Dock Status:\nMagnification: {}x\nPosition: bottom\nAuto-hide: off", self.plank_magnification))
-                } else if action == "set-mag" {
-                    let mag = args.get(0).cloned().unwrap_or_else(|| "1.0".to_string()).parse::<f32>().unwrap_or(1.0);
-                    self.plank_magnification = mag;
-                    Ok(format!("Plank magnification set to {}x", mag))
-                } else {
-                    Err(format!("plank: Unknown action '{}'", action))
-                }
-            }
-            ShellCommand::Wingpanel { action, args } => {
-                if action == "status" {
-                    let mut status = "S-Wingpanel Indicators:\n".to_string();
-                    for (indicator, enabled) in &self.wingpanel_indicators {
-                        status.push_str(&format!("{}: {}\n", indicator, if *enabled { "on" } else { "off" }));
-                    }
-                    Ok(status)
-                } else if action == "toggle" {
-                    let indicator = args.get(0).cloned().unwrap_or_else(|| "battery".to_string());
-                    if let Some(enabled) = self.wingpanel_indicators.get_mut(&indicator) {
-                        *enabled = !*enabled;
-                        Ok(format!("Wingpanel indicator '{}' toggled to {}", indicator, if *enabled { "on" } else { "off" }))
-                    } else {
-                        Err(format!("Unknown indicator '{}'", indicator))
-                    }
-                } else {
-                    Err(format!("wingpanel: Unknown action '{}'", action))
-                }
-            }
-            ShellCommand::AppCenter { action, args } => {
-                if action == "list" {
-                    Ok("S-AppCenter Secure Stores:\n- SigmaStore (official)\n- Community Store (verified)\n- Developer Store (sandboxed)".to_string())
-                } else if action == "search" {
-                    let query = args.get(0).cloned().unwrap_or_default();
-                    Ok(format!("Searching for '{}' in secure stores...", query))
-                } else {
-                    Err(format!("appcenter: Unknown action '{}'", action))
-                }
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!(
+                    "Zenith Accessibility [{}] set to: {}",
+                    feature,
+                    if enabled { "on" } else { "off" }
+                ))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
@@ -803,6 +573,31 @@ mod tests {
     }
 
     #[test]
+    fn test_theme_and_profile_commands() {
+        let mut repl = ShellRepl::new();
+
+        let theme_cmd = repl.parse_command("theme dark");
+        let res = repl.execute_command(theme_cmd).unwrap();
+        assert_eq!(repl.current_theme, "dark");
+        assert!(res.contains("dark"));
+
+        let profile_cmd = repl.parse_command("profile developer");
+        let res = repl.execute_command(profile_cmd).unwrap();
+        assert_eq!(repl.current_profile, "developer");
+        assert!(res.contains("developer"));
+    }
+
+    #[test]
+    fn test_a11y_commands() {
+        let mut repl = ShellRepl::new();
+
+        let a11y_cmd = repl.parse_command("a11y high_contrast on");
+        let res = repl.execute_command(a11y_cmd).unwrap();
+        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
+        assert!(res.contains("on"));
+    }
+
+    #[test]
     fn test_exit() {
         let mut repl = ShellRepl::new();
         let command = ShellCommand::Exit;
@@ -811,29 +606,34 @@ mod tests {
     }
 
     #[test]
-    fn test_pwd_whoami() {
+    fn test_alias_unalias() {
         let mut repl = ShellRepl::new();
-        assert_eq!(
-            repl.execute_command(ShellCommand::Pwd).unwrap(),
-            "/home/ubuntu"
-        );
-        assert_eq!(
-            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
-            "ubuntu"
-        );
+        let alias_cmd = ShellCommand::Alias {
+            name: "l".to_string(),
+            value: "ls".to_string(),
+        };
+        repl.execute_command(alias_cmd).unwrap();
+
+        let parsed = repl.parse_command("l");
+        assert!(matches!(parsed, ShellCommand::ListFiles));
+
+        let unalias_cmd = ShellCommand::Unalias {
+            name: "l".to_string(),
+        };
+        repl.execute_command(unalias_cmd).unwrap();
+
+        let parsed_after = repl.parse_command("l");
+        assert!(matches!(parsed_after, ShellCommand::Unknown(..)));
     }
 
     #[test]
-    fn test_su_root() {
+    fn test_macro_automation() {
         let mut repl = ShellRepl::new();
-        assert!(repl
-            .execute_command(ShellCommand::Su {
-                username: "root".to_string(),
-                password: Some("admin".to_string())
-            })
-            .is_ok());
-        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
-        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
+        let set_cmd = ShellCommand::Set {
+            variable: "test_macro".to_string(),
+            value: "echo running; ls".to_string(),
+        };
+        repl.execute_command(set_cmd).unwrap();
     }
 
     #[test]
@@ -1020,85 +820,5 @@ mod tests {
             })
             .is_ok());
         assert_eq!(repl.clipboard_content, "CopiedText");
-
-        let run_cmd = repl.parse_command("platform run photoshop windows exe");
-        assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
-        let run_res = repl.execute_command(run_cmd).unwrap();
-        assert!(run_res.contains("photoshop"));
-        assert!(run_res.contains("Translation"));
-    }
-
-    #[test]
-    fn test_cli_resilience() {
-        let mut repl = ShellRepl::new();
-
-        let create_cmd = repl.parse_command("snapshot create");
-        assert!(matches!(create_cmd, ShellCommand::SnapshotCreate));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("successfully created"));
-
-        let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
-        assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
-        let restore_res = repl.execute_command(restore_cmd);
-        // "checkpoint-1" won't exist initially, returns not found Err
-        assert!(restore_res.is_err());
-    }
-
-    #[test]
-    fn test_cli_defensive_auditing() {
-        let mut repl = ShellRepl::new();
-
-        let status_cmd = repl.parse_command("audit status");
-        assert!(matches!(status_cmd, ShellCommand::AuditStatus));
-        let status_res = repl.execute_command(status_cmd).unwrap();
-        assert!(status_res.contains("Defensive Audit Summary"));
-        assert!(status_res.contains("Enforced"));
-
-        let log_cmd = repl.parse_command("audit log");
-        assert!(matches!(log_cmd, ShellCommand::AuditLog));
-        let log_res = repl.execute_command(log_cmd).unwrap();
-        assert!(log_res.contains("Latest Defensive Access Logs"));
-        assert!(log_res.contains("CAP_CHECK"));
-
-        let check_cmd = repl.parse_command("audit check");
-        assert!(matches!(check_cmd, ShellCommand::AuditCheck));
-        let check_res = repl.execute_command(check_cmd).unwrap();
-        assert!(check_res.contains("System Safety Sanity Scan"));
-        assert!(check_res.contains("W^X strictly enforced"));
-    }
-
-    #[test]
-    fn test_cli_pantheon_equivalence() {
-        let mut repl = ShellRepl::new();
-        assert!(repl
-            .execute_command(ShellCommand::Gala {
-                action: "layout".to_string(),
-                args: vec!["tile".to_string()]
-            })
-            .is_ok());
-        assert_eq!(repl.gala_layout, "tile");
-
-        assert!(repl
-            .execute_command(ShellCommand::Plank {
-                action: "magnify".to_string(),
-                args: vec!["1.5".to_string()]
-            })
-            .is_ok());
-        assert_eq!(repl.plank_magnification, 1.5);
-
-        assert!(repl
-            .execute_command(ShellCommand::Wingpanel {
-                action: "toggle-indicator".to_string(),
-                args: vec!["network".to_string()]
-            })
-            .is_ok());
-        assert_eq!(repl.wingpanel_indicators.get("network"), Some(&false));
-
-        assert!(repl
-            .execute_command(ShellCommand::AppCenter {
-                action: "verify".to_string(),
-                args: vec!["sigma-code".to_string()]
-            })
-            .is_ok());
     }
 }

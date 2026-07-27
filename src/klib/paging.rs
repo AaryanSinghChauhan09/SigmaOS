@@ -381,6 +381,7 @@ impl VirtualMemoryManager for SimpleVMM {
             Err(PageFaultError::PageNotPresent)
         }
     }
+}
 
     fn handle_page_fault(&mut self, fault_addr: VirtualAddress, present: bool, write_attempt: bool) -> Result<(), PageFaultError> {
         if !present {
