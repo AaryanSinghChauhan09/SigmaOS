@@ -32,7 +32,8 @@ pub use enterprise::{
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine,
+    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
+    LivepatchPatch, LivepatchManager,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,

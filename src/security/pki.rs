@@ -227,6 +227,10 @@ impl CRL for SimpleCRL {
     }
 }
 
+pub type PkiError = PKIError;
+pub use PKIManager as PkiManager;
+pub struct CertificateAuthority;
+
 #[cfg(test)]
 mod tests {
     use super::*;
