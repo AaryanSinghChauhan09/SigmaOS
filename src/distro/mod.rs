@@ -41,4 +41,5 @@ pub use specialized::{
     CanFrame, DiagnosticLogTool, EcuController, EduChallenge, EduPlayground, EosUpdateNotifier,
     EosWelcomeEngine, HpcClusterJob, HpcJobState, MirrorRanker, MpiCommunicator,
     RunitServiceManager, RumpKernelShim, ServiceStatus, RunitService,
+    AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer, AptPackageManifest,
 };

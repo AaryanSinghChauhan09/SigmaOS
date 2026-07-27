@@ -1,24 +1,58 @@
 // SigmaOS Compatibility Module
+pub mod constellation;
 pub mod cross_platform;
+pub mod gap_closure;
 pub mod historic_linux;
-pub mod localsend;
+pub mod personality;
+pub mod sigmawin;
+pub mod standards;
+pub mod superiority;
+
+pub use standards::{
+    SovereignIndependencyChecker, StandardsComplianceManager, PosixComplianceLevel,
+    FhsConventionStatus, LsbProfile,
+};
+
+pub use superiority::{
+    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
+    SigSection, SigSectionType, SovereignTimeMachine, ShardCheckpoint, NumaTask,
+    NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine, SovereignForensics,
+    SovereignRecoverUtility, ShardIgnitor,
+};
+
+pub use gap_closure::{
+    AiTaskOrchestrator, BootInterface, BuildLedgerSystem, DriverClass, DriverRepositoryManager,
+    EmulatedPeripheral, FirmwareBridgeManager, GapSandboxPolicy, HardwareDriver, HidGraphicsDriver,
+    JobClass, KernelModule, KernelModuleManager, LedgerSnapshot, MemoryProtection, ModuleState,
+    NetworkStackGateway, PeripheralEmulationLibrary, SecurityPolicyManager,
+    SyscallCompatibilityRegistry, VirtualMemoryManager,
+};
+
+pub use constellation::{
+    ArchiveProfile, BuildArchive, ChronicleType, ConstellationNode, DriverMuseum, ExhibitType,
+    FirmwarePavilion, KernelConstellation, ObsoletePeripheral, PavilionType, PeripheralMuseum,
+    SecurityModel as ConstellationSecurityModel, SecurityPavilion, SyscallChronicle,
+};
+
+pub use personality::{
+    BuildCapsule, BuildProfile, CapsuleVersion, DriverEmulator, EmulatorProfile, FirmwarePersona,
+    FirmwareType, KernelShard, ObsoleteDevice, PeripheralPod, SecurityGrid, SecurityModel,
+    ShardType, SyscallCapsule,
+};
+
+pub use sigmawin::{
+    D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, User32MessageQueue, Win32Error,
+    Win32Message, WinSockAdapter,
+};
 
 pub use cross_platform::{
-    ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
-    CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, HtmlRendererCapability,
-    MediaDecoderCapability,
-    SupersetApplicationCapability, TargetPlatform, TranslationLayer,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer, FreeBsdJailSandbox, KqueueEventNotifier,
+    OpenSourceOsGapBridge, OpenSourceToolsBridge, OpenSourceAiModelBridge,
 };
-pub use standards::{
-    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
-};
-pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
-pub use scosmos::{
-    ApkLoader, BinaryFormat as ScosmosBinaryFormat, BinderCallType,
-    CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
-};
-pub use localsend::{
-    LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata,
-    LocalSendSession,
+
+pub use historic_linux::{
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
+    VintagePackageConverter, VintageVirtualizationSandbox, LfsToolchainBuilder,
 };

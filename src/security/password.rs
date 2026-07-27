@@ -1,172 +1,424 @@
-// Sovereign and OOP-based Password & Credential Sandbox Manager
-// Provides biometric encryption bridges, secure hashing iterations,
-// and Aadhaar integration frameworks.
+// SigmaOS Password Manager
+// OOP-based password management with biometric unlock and encryption
 
 use std::collections::HashMap;
-use std::time::SystemTime;
-use crate::security::CapabilityToken;
+use std::path::PathBuf;
 
-/// Standard characters used for secure password generation
-const ALPHANUMERIC: &[u8] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const SYMBOLS: &[u8] = b"!@#$%^&*()-_=+[]{}|;:,.<>?";
-
-/// Polymorphic Credential Vault Base Interface
-pub trait CredentialVault {
-    fn store_credential(&mut self, service: &str, secret: &str) -> Result<(), &'static str>;
-    fn retrieve_credential(&self, service: &str) -> Result<String, &'static str>;
-    fn list_services(&self) -> Vec<String>;
+/// Password entry
+#[derive(Debug, Clone)]
+pub struct PasswordEntry {
+    pub id: String,
+    pub service: String,
+    pub username: String,
+    pub encrypted_password: Vec<u8>,
+    pub url: Option<String>,
+    pub notes: Option<String>,
+    pub created_at: u64,
+    pub last_modified: u64,
+    pub category: PasswordCategory,
 }
 
-/// Dynamic Biometric Sensor Interface
-pub trait BiometricSensor {
-    fn scan_fingerprint(&self) -> Result<Vec<u8>, &'static str>;
-    fn verify_match(&self, template: &[u8], sample: &[u8]) -> bool;
+/// Password category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PasswordCategory {
+    Social,
+    Email,
+    Banking,
+    Shopping,
+    Work,
+    Entertainment,
+    Other,
 }
 
-/// Simulated hardware biometric reader
-pub struct UsbBiometricReader {
-    pub is_calibrated: bool,
+/// Biometric type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BiometricType {
+    Fingerprint,
+    FaceID,
+    Iris,
+    Voice,
 }
 
-impl UsbBiometricReader {
+/// Biometric unlock result
+#[derive(Debug, Clone)]
+pub struct BiometricResult {
+    pub success: bool,
+    pub biometric_type: BiometricType,
+    pub confidence_score: f64,
+    pub message: String,
+}
+
+/// OOP trait for biometric authentication strategies
+pub trait BiometricAuth {
+    /// Authenticate with biometric
+    fn authenticate(&self, biometric_type: BiometricType)
+        -> Result<BiometricResult, PasswordError>;
+    /// Enroll biometric
+    fn enroll(&mut self, biometric_type: BiometricType) -> Result<(), PasswordError>;
+    /// Get strategy name
+    fn name(&self) -> &str;
+}
+
+/// Fingerprint authentication
+pub struct FingerprintAuth {
+    enrolled: bool,
+}
+
+impl FingerprintAuth {
     pub fn new() -> Self {
-        Self { is_calibrated: true }
+        Self { enrolled: false }
     }
 }
 
-impl BiometricSensor for UsbBiometricReader {
-    fn scan_fingerprint(&self) -> Result<Vec<u8>, &'static str> {
-        if self.is_calibrated {
-            // Returns a dummy cryptographic template representation
-            Ok(vec![0xAA, 0xBB, 0xCC, 0xDD, 0xEE])
-        } else {
-            Err("Sensor calibration error")
+impl BiometricAuth for FingerprintAuth {
+    fn authenticate(
+        &self,
+        biometric_type: BiometricType,
+    ) -> Result<BiometricResult, PasswordError> {
+        if biometric_type != BiometricType::Fingerprint {
+            return Err(PasswordError::BiometricNotSupported);
         }
-    }
 
-    fn verify_match(&self, template: &[u8], sample: &[u8]) -> bool {
-        template == sample
-    }
-}
-
-impl Default for UsbBiometricReader {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Aadhaar Biometric KYC Vault Integration Framework
-pub struct AadhaarKycVerifier {
-    pub provider_endpoint: String,
-    pub is_registered_with_cidr: bool,
-}
-
-impl AadhaarKycVerifier {
-    pub fn new(endpoint: &str) -> Self {
-        Self {
-            provider_endpoint: endpoint.to_string(),
-            is_registered_with_cidr: true,
+        if !self.enrolled {
+            return Err(PasswordError::BiometricNotEnrolled);
         }
+
+        // Simulated fingerprint authentication
+        Ok(BiometricResult {
+            success: true,
+            biometric_type,
+            confidence_score: 0.95,
+            message: "Fingerprint authenticated successfully".to_string(),
+        })
     }
 
-    /// Verifies dynamic OTP / biometric hash against simulated UIDAI CIDR registries
-    pub fn authenticate_uid(&self, uid: &str, fingerprint_hash: &[u8]) -> Result<bool, &'static str> {
-        if uid.len() != 12 {
-            return Err("Invalid Aadhaar UID format: Must be 12 digits");
+    fn enroll(&mut self, biometric_type: BiometricType) -> Result<(), PasswordError> {
+        if biometric_type != BiometricType::Fingerprint {
+            return Err(PasswordError::BiometricNotSupported);
         }
-        if !self.is_registered_with_cidr {
-            return Err("Terminal not registered with Central Identities Data Repository");
-        }
-        // Simulated signature matching check
-        if fingerprint_hash == [0xAA, 0xBB, 0xCC, 0xDD, 0xEE] {
-            Ok(true)
-        } else {
-            Ok(false)
-        }
-    }
-}
 
-/// Concrete secure sandbox vault implementation
-pub struct SecurePasswordVault {
-    pub credentials: HashMap<String, String>,
-    pub access_counter: HashMap<String, usize>,
-}
-
-impl SecurePasswordVault {
-    pub fn new() -> Self {
-        Self {
-            credentials: HashMap::new(),
-            access_counter: HashMap::new(),
-        }
-    }
-}
-
-impl CredentialVault for SecurePasswordVault {
-    fn store_credential(&mut self, service: &str, secret: &str) -> Result<(), &'static str> {
-        self.credentials.insert(service.to_string(), secret.to_string());
-        self.access_counter.insert(service.to_string(), 0);
+        self.enrolled = true;
         Ok(())
     }
 
-    fn retrieve_credential(&self, service: &str) -> Result<String, &'static str> {
-        self.credentials
-            .get(service)
-            .cloned()
-            .ok_or("Credential not found")
-    }
-
-    fn list_services(&self) -> Vec<String> {
-        self.credentials.keys().cloned().collect()
+    fn name(&self) -> &str {
+        "FingerprintAuth"
     }
 }
 
-impl Default for SecurePasswordVault {
-    fn default() -> Self {
-        Self::new()
+/// Face ID authentication
+pub struct FaceIdAuth {
+    enrolled: bool,
+}
+
+impl FaceIdAuth {
+    pub fn new() -> Self {
+        Self { enrolled: false }
     }
 }
 
-/// Sovereign Password and Vault Manager (OOP Controller)
+impl BiometricAuth for FaceIdAuth {
+    fn authenticate(
+        &self,
+        biometric_type: BiometricType,
+    ) -> Result<BiometricResult, PasswordError> {
+        if biometric_type != BiometricType::FaceID {
+            return Err(PasswordError::BiometricNotSupported);
+        }
+
+        if !self.enrolled {
+            return Err(PasswordError::BiometricNotEnrolled);
+        }
+
+        Ok(BiometricResult {
+            success: true,
+            biometric_type,
+            confidence_score: 0.92,
+            message: "Face ID authenticated successfully".to_string(),
+        })
+    }
+
+    fn enroll(&mut self, biometric_type: BiometricType) -> Result<(), PasswordError> {
+        if biometric_type != BiometricType::FaceID {
+            return Err(PasswordError::BiometricNotSupported);
+        }
+
+        self.enrolled = true;
+        Ok(())
+    }
+
+    fn name(&self) -> &str {
+        "FaceIdAuth"
+    }
+}
+
+/// Password manager result
+#[derive(Debug, Clone)]
+pub struct PasswordManagerResult {
+    pub success: bool,
+    pub operation: String,
+    pub message: String,
+}
+
+/// OOP-based Password Manager
 pub struct PasswordManager {
-    pub vault: SecurePasswordVault,
-    pub biometric_sensor: Box<dyn BiometricSensor>,
+    vault_path: PathBuf,
+    master_key: Vec<u8>,
+    passwords: HashMap<String, PasswordEntry>,
+    biometric_auth: Option<Box<dyn BiometricAuth>>,
+    biometric_enabled: bool,
+    auto_lock_timeout_seconds: u64,
+    last_access: Option<std::time::Instant>,
 }
 
 impl PasswordManager {
-    pub fn new() -> Self {
+    pub fn new(vault_path: PathBuf, master_key: Vec<u8>) -> Self {
         Self {
-            vault: SecurePasswordVault::new(),
-            biometric_sensor: Box::new(UsbBiometricReader::new()),
+            vault_path,
+            master_key,
+            passwords: HashMap::new(),
+            biometric_auth: None,
+            biometric_enabled: false,
+            auto_lock_timeout_seconds: 300, // 5 minutes
+            last_access: None,
         }
     }
 
-    /// Store service password securely requiring a valid capability token
-    pub fn store_password(
+    /// Enable biometric authentication
+    pub fn with_biometric(mut self, auth: Box<dyn BiometricAuth>) -> Self {
+        self.biometric_auth = Some(auth);
+        self.biometric_enabled = true;
+        self
+    }
+
+    /// Set auto-lock timeout
+    pub fn with_auto_lock(mut self, timeout_seconds: u64) -> Self {
+        self.auto_lock_timeout_seconds = timeout_seconds;
+        self
+    }
+
+    /// Add a password entry
+    pub fn add_password(
         &mut self,
-        service: &str,
-        raw_password: &str,
-        _cap: &CapabilityToken,
-    ) -> Result<(), &'static str> {
-        self.vault.store_credential(service, raw_password)
+        entry: PasswordEntry,
+    ) -> Result<PasswordManagerResult, PasswordError> {
+        self.check_auto_lock()?;
+
+        let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
+
+        let encrypted_entry = PasswordEntry {
+            encrypted_password,
+            ..entry
+        };
+
+        let service_name = encrypted_entry.service.clone();
+        self.passwords
+            .insert(encrypted_entry.id.clone(), encrypted_entry);
+        self.last_access = Some(std::time::Instant::now());
+
+        Ok(PasswordManagerResult {
+            success: true,
+            operation: "add_password".to_string(),
+            message: format!("Password added for service: {}", service_name),
+        })
     }
 
-    /// Retrieve service password if biometric validation matches
-    pub fn retrieve_password_with_biometric(
-        &self,
-        service: &str,
-        user_fingerprint: &[u8],
-    ) -> Result<String, &'static str> {
-        let template = vec![0xAA, 0xBB, 0xCC, 0xDD, 0xEE]; // Pre-configured admin template
-        if self.biometric_sensor.verify_match(&template, user_fingerprint) {
-            self.vault.retrieve_credential(service)
+    /// Get a password entry
+    pub fn get_password(&mut self, id: &str) -> Result<PasswordEntry, PasswordError> {
+        self.check_auto_lock()?;
+
+        let entry = self
+            .passwords
+            .get(id)
+            .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
+
+        let decrypted_password = self.decrypt_password(&entry.encrypted_password)?;
+
+        let mut decrypted_entry = entry.clone();
+        decrypted_entry.encrypted_password = decrypted_password;
+
+        self.last_access = Some(std::time::Instant::now());
+        Ok(decrypted_entry)
+    }
+
+    /// Update a password entry
+    pub fn update_password(
+        &mut self,
+        entry: PasswordEntry,
+    ) -> Result<PasswordManagerResult, PasswordError> {
+        self.check_auto_lock()?;
+
+        if !self.passwords.contains_key(&entry.id) {
+            return Err(PasswordError::PasswordNotFound(entry.id.clone()));
+        }
+
+        let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
+
+        let encrypted_entry = PasswordEntry {
+            encrypted_password,
+            last_modified: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            ..entry
+        };
+
+        let service_name = encrypted_entry.service.clone();
+        self.passwords
+            .insert(encrypted_entry.id.clone(), encrypted_entry);
+        self.last_access = Some(std::time::Instant::now());
+
+        Ok(PasswordManagerResult {
+            success: true,
+            operation: "update_password".to_string(),
+            message: format!("Password updated for service: {}", service_name),
+        })
+    }
+
+    /// Delete a password entry
+    pub fn delete_password(&mut self, id: &str) -> Result<PasswordManagerResult, PasswordError> {
+        self.check_auto_lock()?;
+
+        self.passwords
+            .remove(id)
+            .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
+
+        self.last_access = Some(std::time::Instant::now());
+
+        Ok(PasswordManagerResult {
+            success: true,
+            operation: "delete_password".to_string(),
+            message: format!("Password deleted: {}", id),
+        })
+    }
+
+    /// List all passwords
+    pub fn list_passwords(&mut self) -> Result<Vec<PasswordEntry>, PasswordError> {
+        self.check_auto_lock()?;
+
+        let entries: Vec<PasswordEntry> = self
+            .passwords
+            .values()
+            .map(|e| PasswordEntry {
+                encrypted_password: vec![], // Don't return actual passwords
+                ..e.clone()
+            })
+            .collect();
+
+        self.last_access = Some(std::time::Instant::now());
+        Ok(entries)
+    }
+
+    /// Search passwords by service
+    pub fn search_passwords(&mut self, query: &str) -> Result<Vec<PasswordEntry>, PasswordError> {
+        self.check_auto_lock()?;
+
+        let results: Vec<PasswordEntry> = self
+            .passwords
+            .values()
+            .filter(|e| e.service.to_lowercase().contains(&query.to_lowercase()))
+            .map(|e| PasswordEntry {
+                encrypted_password: vec![],
+                ..e.clone()
+            })
+            .collect();
+
+        self.last_access = Some(std::time::Instant::now());
+        Ok(results)
+    }
+
+    /// Authenticate with biometric
+    pub fn authenticate_biometric(
+        &mut self,
+        biometric_type: BiometricType,
+    ) -> Result<BiometricResult, PasswordError> {
+        if !self.biometric_enabled {
+            return Err(PasswordError::BiometricNotEnabled);
+        }
+
+        let auth = self
+            .biometric_auth
+            .as_ref()
+            .ok_or_else(|| PasswordError::BiometricNotEnabled)?;
+
+        let result = auth.authenticate(biometric_type)?;
+
+        if result.success {
+            self.last_access = Some(std::time::Instant::now());
+        }
+
+        Ok(result)
+    }
+
+    /// Enroll biometric
+    pub fn enroll_biometric(&mut self, biometric_type: BiometricType) -> Result<(), PasswordError> {
+        if let Some(ref mut auth) = self.biometric_auth {
+            auth.enroll(biometric_type)
         } else {
-            Err("Biometric verification mismatch")
+            Err(PasswordError::BiometricNotEnabled)
         }
     }
 
-    /// Cryptographically secure password generator using a local 64-bit LCG
-    pub fn generate_secure_password(length: usize, include_symbols: bool) -> String {
-        let mut charset = ALPHANUMERIC.to_vec();
+    /// Lock the password manager
+    pub fn lock(&mut self) {
+        self.last_access = None;
+    }
+
+    /// Unlock the password manager
+    pub fn unlock(&mut self) {
+        self.last_access = Some(std::time::Instant::now());
+    }
+
+    /// Check if locked
+    pub fn is_locked(&self) -> bool {
+        if let Some(last) = self.last_access {
+            last.elapsed() > std::time::Duration::from_secs(self.auto_lock_timeout_seconds)
+        } else {
+            true
+        }
+    }
+
+    /// Check auto-lock
+    fn check_auto_lock(&mut self) -> Result<(), PasswordError> {
+        if self.is_locked() {
+            Err(PasswordError::VaultLocked)
+        } else {
+            Ok(())
+        }
+    }
+
+    /// Encrypt password
+    fn encrypt_password(&self, password: &[u8]) -> Result<Vec<u8>, PasswordError> {
+        // Simulated encryption
+        let mut encrypted = password.to_vec();
+        for (i, byte) in encrypted.iter_mut().enumerate() {
+            *byte ^= self.master_key[i % self.master_key.len()];
+        }
+        Ok(encrypted)
+    }
+
+    /// Decrypt password
+    fn decrypt_password(&self, encrypted: &[u8]) -> Result<Vec<u8>, PasswordError> {
+        // Simulated decryption
+        let mut decrypted = encrypted.to_vec();
+        for (i, byte) in decrypted.iter_mut().enumerate() {
+            *byte ^= self.master_key[i % self.master_key.len()];
+        }
+        Ok(decrypted)
+    }
+
+    /// Generate strong password
+    pub fn generate_password(length: usize, include_symbols: bool) -> String {
+        const LOWERCASE: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
+        const UPPERCASE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const DIGITS: &[u8] = b"0123456789";
+        const SYMBOLS: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+        let mut charset = Vec::new();
+        charset.extend_from_slice(LOWERCASE);
+        charset.extend_from_slice(UPPERCASE);
+        charset.extend_from_slice(DIGITS);
+
         if include_symbols {
             charset.extend_from_slice(SYMBOLS);
         }
@@ -178,8 +430,10 @@ impl PasswordManager {
 
         let mut password = String::new();
         for _ in 0..length {
-            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-            let index = (seed % charset.len() as u64) as usize;
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let index = (seed as usize) % charset.len();
             password.push(charset[index] as char);
         }
 
@@ -189,8 +443,24 @@ impl PasswordManager {
 
 impl Default for PasswordManager {
     fn default() -> Self {
-        Self::new()
+        Self::new(
+            PathBuf::from("/home/user/.sigmaos/passwords"),
+            vec![0u8; 32],
+        )
     }
+}
+
+/// Password manager errors
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PasswordError {
+    PasswordNotFound(String),
+    VaultLocked,
+    BiometricNotEnabled,
+    BiometricNotSupported,
+    BiometricNotEnrolled,
+    EncryptionError(String),
+    DecryptionError(String),
+    IoError(String),
 }
 
 #[cfg(test)]
@@ -198,35 +468,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_biometric_authenticator() {
-        let sensor = UsbBiometricReader::new();
-        let sample = sensor.scan_fingerprint().unwrap();
-        assert!(sensor.verify_match(&[0xAA, 0xBB, 0xCC, 0xDD, 0xEE], &sample));
+    fn test_password_entry() {
+        let entry = PasswordEntry {
+            id: "test".to_string(),
+            service: "Test Service".to_string(),
+            username: "user".to_string(),
+            encrypted_password: vec![1, 2, 3],
+            url: None,
+            notes: None,
+            created_at: 1234567890,
+            last_modified: 1234567890,
+            category: PasswordCategory::Other,
+        };
+        assert_eq!(entry.service, "Test Service");
     }
 
     #[test]
-    fn test_aadhaar_kyc_verification() {
-        let verifier = AadhaarKycVerifier::new("https://uidai.gov.in/api/v2");
-        assert!(verifier.authenticate_uid("123456789012", &[0xAA, 0xBB, 0xCC, 0xDD, 0xEE]).unwrap());
-        assert!(!verifier.authenticate_uid("123456789012", &[0x00, 0x00]).unwrap());
+    fn test_fingerprint_auth() {
+        let mut auth = FingerprintAuth::new();
+        auth.enroll(BiometricType::Fingerprint).unwrap();
+        let result = auth.authenticate(BiometricType::Fingerprint).unwrap();
+        assert!(result.success);
     }
 
     #[test]
-    fn test_password_vault_flow() {
-        let mut manager = PasswordManager::new();
-        let cap = CapabilityToken::new();
-        manager.store_password("Sovereign_Mail", "secure_hashed_password_123", &cap).unwrap();
-
-        let raw = manager.retrieve_password_with_biometric("Sovereign_Mail", &[0xAA, 0xBB, 0xCC, 0xDD, 0xEE]).unwrap();
-        assert_eq!(raw, "secure_hashed_password_123");
+    fn test_face_id_auth() {
+        let mut auth = FaceIdAuth::new();
+        auth.enroll(BiometricType::FaceID).unwrap();
+        let result = auth.authenticate(BiometricType::FaceID).unwrap();
+        assert!(result.success);
     }
 
     #[test]
-    fn test_password_generation_reproducibility() {
-        let pass_simple = PasswordManager::generate_secure_password(16, false);
-        assert_eq!(pass_simple.len(), 16);
+    fn test_password_manager() {
+        let manager = PasswordManager::default();
+        assert!(manager.is_locked());
+    }
 
-        let pass_complex = PasswordManager::generate_secure_password(24, true);
-        assert_eq!(pass_complex.len(), 24);
+    #[test]
+    fn test_generate_password() {
+        let password = PasswordManager::generate_password(16, true);
+        assert_eq!(password.len(), 16);
     }
 }
