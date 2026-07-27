@@ -451,7 +451,3 @@ mod tests {
     }
 }
 
-pub type SecretManager = dyn Keyring;
-
-#[derive(Debug, Clone)]
-pub struct SecretStorage;
