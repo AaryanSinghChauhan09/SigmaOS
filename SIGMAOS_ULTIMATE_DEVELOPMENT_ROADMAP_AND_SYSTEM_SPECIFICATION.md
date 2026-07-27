@@ -374,6 +374,86 @@ pub trait ICapsule {
 }
 ```
 
+### 4.7 Sovereign Micro-Init & Service Supervision (S-VOID / S-INIT)
+
+Traditional monolithic init systems, particularly **systemd**, suffer from immense architectural complexity, running millions of lines of code with full ambient administrative privileges in PID 1. This exposes massive local attack surfaces, and a single crash in systemd triggers a kernel panic. Conversely, traditional light init models (like **runit** or **sysvinit**) lack declarative dependency resolution and dynamic, event-based socket activation.
+
+SigmaOS introduces **S-VOID** (Micro-Init) and **S-INIT** (Service Supervisor), a complete, zero-dependency `#![no_std]` OOP init ecosystem that combines the microsecond execution latency of **runit**, the declarative state graphs of **systemd**, the process group trees and ready notifications of **s6**, and the stacked runlevel profiles of **OpenRC**.
+
+```
+                +---------------------------------------+
+                |          S-VOID (PID 1 / Micro-Init)  |
+                +---------------------------------------+
+                                    | (Loads target runlevel)
+                                    v
+                +---------------------------------------+
+                |        S-INIT Service Supervisor      |
+                +---------------------------------------+
+                 /                  |                  \
+                v                   v                   v
+      [S-SocketActivator]    [S-DependencyResolver]   [S-s6GroupSupervisor]
+      - Passive Port Sniff   - DAG topological solver  - Process Trees
+      - Instantiates task    - Resolves parallel boot  - Event descriptors
+```
+
+#### A. Runit-Style Simplicity and Speed in PID 1 (S-VOID)
+S-VOID serves as the true PID 1 micro-init daemon. Written with absolute systems programming purity, it performs zero dynamic heap allocations and starts the system in under 100 microseconds:
+1.  **Zero-Allocation Signal Handlers:** PID 1 intercepts CPU interrupts and kernel signals directly into static, pre-allocated registers, preventing double-fault freezes under memory starvation.
+2.  **No Monolithic Bloat:** Unlike systemd, S-VOID does not manage network configuration, user logins, device paths, or system logs. It has exactly one job: spawn the master `S-INIT` service supervisor and enter an infinite, non-blocking `waitpid` loop to reap orphaned processes.
+
+#### B. Systemd-Style Declarative Service Dependency Graphs and Socket Activation
+The actual orchestration of system daemons is delegated to **S-INIT**, executing within a separate, isolated Ring 3 service domain:
+1.  **Declarative Directed Acyclic Graphs (DAGs):** System services declare their states and dependencies inside immutable JSON-exportable configuration files. S-INIT parses the target profile at boot time, building a dynamic Directed Acyclic Graph (DAG) using a topological sort algorithm to execute independent services in parallel:
+
+$$\text{Service } S_i \text{ is started if and only if } \forall S_j \in \text{Dependencies}(S_i), \text{ State}(S_j) == \text{Running}$$
+
+2.  **On-Demand Socket Activation:** To achieve near-zero boot latencies, S-INIT maps and binds passive system ports (e.g. TCP Port 80, socket descriptors under `/shards/ipc`) without executing the target daemon. The network driver redirects incoming traffic descriptors directly to S-INIT. Upon traffic arrival, S-INIT instantly spawns the associated daemon on-demand, passing the socket handle via standard environment descriptors, completely mirroring systemd's socket activation.
+
+#### C. s6-Style Ready Notifications and Supervised Process Trees
+Traditional init models cannot verify if a service has actually completed its startup initialization, leading to race conditions where dependent programs are launched prematurely:
+1.  **Ready-State Notifications:** S-INIT exposes a lock-free system notify channel. Daemons write a single byte (`0x01` Ready) to their designated state descriptor upon completing initialization. S-INIT delays booting dependent nodes until this ready signal is registered, completely avoiding race conditions without arbitrary wait timers.
+2.  **Supervised Process Group Trees:** S-INIT acts as an active daemon supervisor. It monitors spawned children process trees. If a service crashes or stalls, S-INIT catches the event via non-blocking wait-channels, automatically executing self-healing recovery actions (such as restarting the process or falling back to safe profiles) in under 1 millisecond.
+
+#### D. OpenRC-Style Stacked Runlevels
+To support flexible server, client, and maintenance contexts, S-VOID groups system configurations into structured, stacked runlevels:
+*   **Runlevel 1 (`sysinit`):** Pre-probes minimal hardware targets (such as keyboard, console character frames, memory mappers).
+*   **Runlevel 2 (`boot`):** Initializes local storage mappers, mounts immutable CAS root nodes, and starts basic file journals.
+*   **Runlevel 3 (`default`):** Spawns the graphical Zenith compositor core, local-first networking channels, and user enclaves.
+*   **Runlevel 4 (`shutdown`):** Gracefully terminates active processes, flushes storage journals, blocks physical block media, and zero-wipes volatile memory frames.
+
+#### E. OOP Init & Service Specification (Pseudocode)
+```rust
+pub enum ServiceStatus {
+    Inactive,
+    Starting,
+    ActiveRunning,
+    SignaledReady,
+    DegradedFailed,
+}
+
+pub struct ServiceUnit {
+    pub name: &'static str,
+    pub dependencies: Vec<&'static str>,
+    pub status: ServiceStatus,
+    pub process_id: Option<u32>,
+    pub socket_activation_port: Option<u16>,
+}
+
+pub trait IServiceSupervisor {
+    // Builds and evaluates Directed Acyclic Graphs to execute parallel daemons
+    fn resolve_and_boot(&mut self, target_runlevel: &'static str) -> Result<(), u32>;
+
+    // Listens for s6-style ready notifications on lock-free notify descriptors
+    fn wait_for_ready_notification(&self, service_name: &str) -> Result<bool, u32>;
+
+    // Monitors child process trees and executes sub-millisecond hot-restarts on failure
+    fn handle_child_death_signal(&mut self, dead_pid: u32) -> Result<(), u32>;
+
+    // Emulates systemd socket activation, instantiating services on-demand
+    fn activate_socket_service(&mut self, port: u16) -> Result<u32, u32>;
+}
+```
+
 ### 4.8 Sovereign Kali-Style Security Auditing & Intrusion Pipeline (S-KALI)
 
 SigmaOS implements **S-KALI**, a built-in security auditing, wireless packet injection, and deep traffic inspection system that runs within capability-gated boundaries:
