@@ -154,6 +154,16 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             }
             break;
         }
+
+            // If we are out of memory, try to reclaim cache pages (like Linux kswapd/lazy reclaim)
+            if retry_count == 0 {
+                if self.reclaim_pages(order).is_ok() {
+                    retry_count += 1;
+                    continue;
+                }
+            }
+            break;
+        }
         
         Err(AllocError::OutOfMemory)
     }
