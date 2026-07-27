@@ -34,3 +34,8 @@ To verify system integrity:
 3. Verify shard signatures via `pqc_verify <shard_id>`
 
 *"Security is not a feature; it is the fundamental state of the Shard."*
+
+
+---
+## Merged from Security-Hardening.md
+# Security Hardening\n\n## PQC Shards\nAll packages signed via CRYSTALS-Dilithium-5.\n\n## MAC Firewall Hooks\nMandatory Access Control over all inter-shard communication
