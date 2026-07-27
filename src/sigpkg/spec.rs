@@ -490,6 +490,10 @@ pub enum UniversalPackageType {
     RpmSubset,
     PacmanSubset,
     SnapSubset,
+    NixSubset,
+    EbuildSubset,
+    ApkSubset,
+    FlatpakSubset,
 }
 
 pub type HookFunction = fn(pkg_name: &[u8]) -> bool;
@@ -699,6 +703,186 @@ impl UniversalPackage for SnapPackageAdapter {
     }
 }
 
+/// NixOS Nix compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct NixPackageAdapter {
+    pub base: SimplePackage,
+    pub nix_expression: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl NixPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            nix_expression: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for NixPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for NixPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::NixSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Gentoo Ebuild compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct EbuildPackageAdapter {
+    pub base: SimplePackage,
+    pub ebuild_content: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl EbuildPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            ebuild_content: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for EbuildPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for EbuildPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::EbuildSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Alpine APK compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct ApkPackageAdapter {
+    pub base: SimplePackage,
+    pub apkindex_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl ApkPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            apkindex_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for ApkPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for ApkPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::ApkSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Flatpak compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct FlatpakPackageAdapter {
+    pub base: SimplePackage,
+    pub flatpak_metadata: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl FlatpakPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            flatpak_metadata: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for FlatpakPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for FlatpakPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::FlatpakSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
 /// Polymorphic Factory for creating and translating Linux system packages to SigmaOS UniversalPackages (OOP: Factory Pattern)
 pub struct PackageAdapterFactory;
 
@@ -747,6 +931,42 @@ impl PackageAdapterFactory {
                 let len = metadata.len().min(127);
                 unsafe {
                     core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.snapcraft_yaml.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::NixSubset => {
+                let mut adapter = NixPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.nix_expression.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::EbuildSubset => {
+                let mut adapter = EbuildPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.ebuild_content.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::ApkSubset => {
+                let mut adapter = ApkPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.apkindex_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::FlatpakSubset => {
+                let mut adapter = FlatpakPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.flatpak_metadata.as_mut_ptr(), len);
                 }
                 adapter.hooks = hooks;
                 Ok(Box::new(adapter))
@@ -862,6 +1082,18 @@ mod tests {
 
         let snap_pkg = SnapPackageAdapter::new(name, version);
         assert_eq!(snap_pkg.package_type(), UniversalPackageType::SnapSubset);
+
+        let nix_pkg = NixPackageAdapter::new(b"nix-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(nix_pkg.package_type(), UniversalPackageType::NixSubset);
+
+        let ebuild_pkg = EbuildPackageAdapter::new(b"ebuild-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(ebuild_pkg.package_type(), UniversalPackageType::EbuildSubset);
+
+        let apk_pkg = ApkPackageAdapter::new(b"apk-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(apk_pkg.package_type(), UniversalPackageType::ApkSubset);
+
+        let flatpak_pkg = FlatpakPackageAdapter::new(b"flatpak-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(flatpak_pkg.package_type(), UniversalPackageType::FlatpakSubset);
     }
 
     #[test]
