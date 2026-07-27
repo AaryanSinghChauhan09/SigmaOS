@@ -40,15 +40,21 @@ impl SovereignCompilerOptimizer {
         match self.active_extension {
             CpuInstructionExtension::Avx512 => {
                 // Vectorized AVX-512 FMA execution path
-                for i in (0..lhs.len()).step_by(16) {
-                    if i + 15 < lhs.len() {
-                        // In real production, execute native AVX-512 assembly blocks here
-                        for j in 0..16 {
-                            if i + j < out.len() {
-                                out[i + j] = lhs[i + j] * rhs[i + j];
-                            }
+                let mut i = 0;
+                while i + 15 < lhs.len() {
+                    for j in 0..16 {
+                        if i + j < out.len() {
+                            out[i + j] = lhs[i + j] * rhs[i + j];
                         }
                     }
+                    i += 16;
+                }
+                // Process remainder serially
+                while i < lhs.len() {
+                    if i < out.len() {
+                        out[i] = lhs[i] * rhs[i];
+                    }
+                    i += 1;
                 }
             }
             _ => {

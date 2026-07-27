@@ -3,6 +3,9 @@
 
 #![no_std]
 
+extern crate alloc;
+use alloc::vec::Vec;
+
 pub const MAX_RECIPE_DEPENDENCIES: usize = 8;
 pub const MAX_REGISTRY_SIZE: usize = 16;
 
@@ -56,12 +59,14 @@ impl PackageDependencyResolver {
     pub fn verify_reproducible_chain(&self, name: &'static str) -> bool {
         let mut visited: [&str; MAX_REGISTRY_SIZE] = [""; MAX_REGISTRY_SIZE];
         let mut visit_idx = 0;
-        self.check_cycles(name, &mut visited, &mut visit_idx)
+        let mut resolved: Vec<&'static str> = Vec::new();
+        self.check_cycles(name, &mut resolved, &mut visited, &mut visit_idx)
     }
 
     fn check_cycles(
         &self,
         name: &'static str,
+        resolved: &mut Vec<&'static str>,
         visited: &mut [&'static str; MAX_REGISTRY_SIZE],
         idx: &mut usize,
     ) -> bool {
@@ -70,6 +75,11 @@ impl PackageDependencyResolver {
             if visited[i] == name {
                 return false;
             }
+        }
+
+        // If already resolved, we don't need to re-resolve
+        if resolved.contains(&name) {
+            return true;
         }
 
         // Add to visited
@@ -84,11 +94,14 @@ impl PackageDependencyResolver {
         if let Some(recipe) = self.find_recipe(name) {
             for dep_idx in 0..recipe.dep_count {
                 let dep_name = recipe.dependencies[dep_idx];
-                if !self.check_cycles(dep_name, visited, idx) {
+                if !self.check_cycles(dep_name, resolved, visited, idx) {
                     return false;
                 }
             }
         }
+
+        resolved.push(name);
+        *idx -= 1;
         true
     }
 
@@ -133,6 +146,11 @@ impl PackageDependencyResolver {
             }
         }
 
+        // If already resolved, we don't need to re-resolve
+        if resolved.contains(&name) {
+            return true;
+        }
+
         // Add to visited
         if *idx < MAX_REGISTRY_SIZE {
             visited[*idx] = name;
@@ -143,12 +161,7 @@ impl PackageDependencyResolver {
 
         // Find package
         if let Some(recipe) = self.find_recipe(name) {
-            // Add package to resolved list
-            if !resolved.contains(&name) {
-                resolved.push(name);
-            }
-
-            // Recursively resolve dependencies
+            // Recursively resolve dependencies first
             for dep_idx in 0..recipe.dep_count {
                 let dep_name = recipe.dependencies[dep_idx];
                 if !self.resolve_recursive(dep_name, resolved, visited, idx) {
@@ -156,6 +169,14 @@ impl PackageDependencyResolver {
                 }
             }
         }
+
+        // Add package to resolved list after dependencies are resolved
+        if !resolved.contains(&name) {
+            resolved.push(name);
+        }
+
+        // Backtrack
+        *idx -= 1;
         true
     }
 

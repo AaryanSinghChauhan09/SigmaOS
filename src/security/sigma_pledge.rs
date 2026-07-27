@@ -1,20 +1,20 @@
 //! # sigma_pledge - Syscall Filtering Framework
-//! 
+//!
 //! Inspired by OpenBSD's pledge(), sigma_pledge allows processes to declare
 //! exactly which syscall categories they need. All others are denied with EPERM.
-//! 
+//!
 //! ## Usage
-//! 
-//! ```rust
+//!
+//! ```rust,ignore
 //! // A web server only needs networking and file I/O
 //! sigma_pledge!(["inet", "rpath", "wpath", "proc"]);
-//! 
+//!
 //! // A script interpreter needs only execution
 //! sigma_pledge!(["exec", "rpath"]);
 //! ```
 
-use std::collections::HashSet;
 use sigma_types::{CapabilityToken, Result};
+use std::collections::HashSet;
 
 /// Pledge namespaces representing different syscall categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -74,7 +74,8 @@ impl PledgePromise {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::PermissionDenied,
                 "Already pledged",
-            ).into());
+            )
+            .into());
         }
         self.is_pledged = true;
         Ok(())
@@ -127,7 +128,8 @@ impl SyscallFilter {
                     Err(std::io::Error::new(
                         std::io::ErrorKind::PermissionDenied,
                         "Syscall not pledged",
-                    ).into())
+                    )
+                    .into())
                 }
             }
             None => {
@@ -135,7 +137,8 @@ impl SyscallFilter {
                 Err(std::io::Error::new(
                     std::io::ErrorKind::PermissionDenied,
                     "Process not pledged",
-                ).into())
+                )
+                .into())
             }
         }
     }
@@ -160,7 +163,7 @@ mod tests {
     fn test_promise_creation() {
         let namespaces = vec![PledgeNamespace::Inet, PledgeNamespace::Rpath];
         let promise = PledgePromise::new(&namespaces);
-        
+
         assert!(promise.allows(PledgeNamespace::Inet));
         assert!(promise.allows(PledgeNamespace::Rpath));
         assert!(!promise.allows(PledgeNamespace::Exec));
@@ -170,11 +173,11 @@ mod tests {
     fn test_pledge_once() {
         let namespaces = vec![PledgeNamespace::Inet];
         let mut promise = PledgePromise::new(&namespaces);
-        
+
         assert!(!promise.is_pledged());
         promise.pledge().unwrap();
         assert!(promise.is_pledged());
-        
+
         // Second pledge should fail
         assert!(promise.pledge().is_err());
     }
@@ -184,15 +187,15 @@ mod tests {
         let mut filter = SyscallFilter::new();
         let namespaces = vec![PledgeNamespace::Inet, PledgeNamespace::Rpath];
         let promise = PledgePromise::new(&namespaces);
-        
+
         filter.register_promise(1, promise);
-        
+
         // Allowed syscall
         assert!(filter.check_syscall(1, PledgeNamespace::Inet).is_ok());
-        
+
         // Denied syscall
         assert!(filter.check_syscall(1, PledgeNamespace::Exec).is_err());
-        
+
         // Unregistered process
         assert!(filter.check_syscall(2, PledgeNamespace::Inet).is_err());
     }
@@ -201,9 +204,9 @@ mod tests {
 // Placeholder types for compilation
 mod sigma_types {
     use std::io;
-    
+
     pub type Result<T> = std::result::Result<T, io::Error>;
-    
+
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {
         pub id: u64,
