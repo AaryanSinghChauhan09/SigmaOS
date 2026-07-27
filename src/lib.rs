@@ -208,6 +208,9 @@ pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
+    PackageFormat as SigPackageFormat, PackageContext as SigPackageContext, IPackageAdapter,
+    AptPackageAdapter, YumPackageAdapter, PacmanPackageAdapter, PortagePackageAdapter,
+    SovereignPackageAdapter, HookType, UserDefinedPackageHook, SovereignPackageManager,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
