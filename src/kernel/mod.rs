@@ -11,6 +11,7 @@ pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod breakthroughs;
+pub mod sigma_kernel_autotuner;
 
 pub use boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
