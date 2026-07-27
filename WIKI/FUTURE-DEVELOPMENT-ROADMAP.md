@@ -1721,16 +1721,12 @@ SigmaOS is engineered to systematically replace, absorb, and dominate traditiona
   - **S-WINE PE Loader Shard:** Parses PE executable binary sections natively, translating standard Win32 calls (e.g. `CreateFile`, `VirtualAlloc`) into capability-checked SigmaOS syscalls dynamically.
   - **Direct-to-Hardware Graphics Splicing:** Bypasses proprietary compositing servers, drawing pixels directly onto the display framebuffer via the `VesaDriver`.
 
-<<<<<<< HEAD
 #### J. openKylin & Kylin OS (Sovereign Chinese Stack & Android Translation)
 * **The Linux Flaw:** Heavy virtualization overhead to run Android apps (KMRE) through full VM nesting, and slow Qt/GTK render pipelines for UKUI that introduce window resizing lag.
 * **The SigmaOS Domination:**
   - **S-KMRE Android Translation Shard:** Maps Android Runtime (ART) registers, Binder IPC commands, and Dalvik assembly code natively to Ring 3 capability-checked microkernel sockets. Eliminates full-scale nested hypervisor footprints, launching Android APK apps under 2ms.
   - **ZenithUKUI Compositor Extension:** Inherits UKUI's modular sidebar widget and customized control center layout aesthetics, synthesizing them into safe systems-level blitting frames rendered natively over the direct hardware framebuffer.
   - **SigmaGuard (Kylin Security Assistant):** A localized administrative diagnostic tool validating system files and checking security configurations. Fully compatible with domestic standards and regional security profiles natively at the zero-trust gate.
-
-=======
->>>>>>> origin/jules-14244045895548783839-435eb24a
 ### 17.2 The 6-Pillar Distro Absorption & Convergence Grid
 
 ```
@@ -2052,18 +2048,6 @@ To maintain absolute competitive superiority, SigmaOS establishes core re-engine
 +-------------------------------------------------------------------------------------------------+
 |                                  COMPETITIVE EDGE DASHBOARD                                     |
 +--------------------+--------------------------------+-------------------------------------------+
-<<<<<<< HEAD
-| Operational Area   | Linux / BSD / Windows / macOS  | SigmaOS Innovation (Sovereign Core)       |
-+--------------------+--------------------------------+-------------------------------------------+
-| Binary Execution   | Limited; requires heavy virtual| Universal ABI Translation Shard maps PE,  |
-| (ABI Translation)  | machines or complex Wine shims | ELF, and Mach-O polymorphically natively.  |
-+--------------------+--------------------------------+-------------------------------------------+
-| Filesystem Core    | Rigid metadata; prone to       | Composable SigmaFS++ with native semantic |
-| (Storage & Audits) | corruption and lack of audits  | search vector databases and audit logs.   |
-+--------------------+--------------------------------+-------------------------------------------+
-| OS Micro-Services  | Monolithic kernel panic risk;  | OOP microkernel modularity with           |
-| (Self-Healing)     | manual upgrades and reboots    | sub-millisecond automated crash restarts. |
-=======
 | Operational Area   | Linux/BSD/Windows/iOS/Android  | SigmaOS Innovation (Sovereign Core)       |
 +--------------------+--------------------------------+-------------------------------------------+
 | Binary Execution   | POSIX, Wine, VMs, emulators    | Universal ABI Translator Shard maps PE,   |
@@ -2074,20 +2058,10 @@ To maintain absolute competitive superiority, SigmaOS establishes core re-engine
 +--------------------+--------------------------------+-------------------------------------------+
 | OS Micro-Services  | Monolithic kernel panic risk;  | OOP microkernel modularity + self-healing |
 | (Self-Healing)     | manual upgrades and reboots    | with automated sub-millisecond restarts.  |
->>>>>>> origin/jules-14244045895548783839-435eb24a
 +--------------------+--------------------------------+-------------------------------------------+
 | Task Scheduling    | Performance-only focus; heavy  | Energy-aware scheduling coupled with      |
 | (Predictive Sync)  | context-switching latency      | AI-driven predictive resource profiling.  |
 +--------------------+--------------------------------+-------------------------------------------+
-<<<<<<< HEAD
-| System Security    | Complex SELinux/AppArmor;      | Zero-trust capability sandboxing with     |
-| (PQC Sandboxing)   | vulnerable to privilege escalation| post-quantum Dilithium-5 signatures.      |
-+--------------------+--------------------------------+-------------------------------------------+
-| Kernel Scripting   | Hard compile blocks; dangerous | Sandboxed UDF interpreter VM executing    |
-| (Extensibility)    | un-verified system extensions  | safe, verified runtime bytecode scripts.  |
-+--------------------+--------------------------------+-------------------------------------------+
-```
-=======
 | System Security    | SELinux/AppArmor, Defender,    | Zero-trust capability sandboxing with     |
 | (PQC Sandboxing)   | iOS sandbox, rigid ACL models  | post-quantum Dilithium-5 signatures.      |
 +--------------------+--------------------------------+-------------------------------------------+
@@ -2691,4 +2665,3 @@ impl SPlankDock {
 | **Graphics Latency** | Multiple composition loops (App -> GTK -> Gala -> Wayland -> DRM) | **Single-Pass Direct GPU Composition** | The application writes widgets to an allocated shared memory queue directly blit by Zenith. |
 | **Security Model** | DAC (User permissions), Flatpak bubblewrap sandbox | **Ring-0 Capability Gate Checks** | Each UI widget and app is gated via polymorphic zero-trust tokens verified on every syscall. |
 | **Microtransactions**| Stripe-backed AppCenter payments on traditional servers | **P2P Ledger with Zero Infrastructure Fees** | Built-in peer-to-peer registry distributions bypass centralized hosting infrastructure. |
->>>>>>> origin/jules-14244045895548783839-435eb24a

@@ -851,10 +851,7 @@ mod tests {
 
         assert!(pt.set_entry(512, entry).is_err());
     }
-<<<<<<< HEAD
-=======
-
-    #[test]
+#[test]
     fn test_vmm_address_alignment_verification() {
         let mut vmm = SimpleVMM::new();
 
@@ -924,5 +921,4 @@ mod tests {
         assert_eq!(restored_phys.0, virt.0);
         assert_eq!(vmm.zram_pool.len(), 0); // removed from zram compressed pool
     }
->>>>>>> origin/main-13246761802911497579
 }

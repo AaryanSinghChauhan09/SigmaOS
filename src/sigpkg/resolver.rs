@@ -185,14 +185,11 @@ mod tests {
                 version_constraint: VersionConstraint::Any,
             }],
             checksum: String::new(),
-<<<<<<< HEAD
             mirrors: vec![],
             signing_keys: vec![],
             licenses: vec![],
             maintainers: vec![],
             changelogs: vec![],
-=======
->>>>>>> origin/optimize-secure-clipboard-xor-speed-16178718694989914587
         };
 
         let pkg_b = Package {
