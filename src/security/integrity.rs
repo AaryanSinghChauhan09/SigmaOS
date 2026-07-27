@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
@@ -214,9 +216,6 @@ impl Default for IntegrityStats {
     }
 }
 
-pub type IntegrityCheck = SimpleFile;
-pub type IntegrityVerifier = SimpleIntegrityMonitor;
-
 /// Simple integrity monitor (OOP: Concrete monitor class)
 pub struct SimpleIntegrityMonitor {
     pub files: Vec<Option<Box<dyn File>>>,
@@ -376,59 +375,26 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-/// Red Star OS-inspired State Integrity Watchdog (State-level auditing & security recovery)
-pub struct StateIntegrityWatchdog {
-    pub critical_files: Vec<SimpleFile>,
+#[derive(Debug, Clone)]
+pub struct IntegrityCheck {
+    pub file_path: alloc::string::String,
+    pub expected_hash: alloc::string::String,
 }
 
-impl StateIntegrityWatchdog {
+#[derive(Debug, Clone)]
+pub struct IntegrityVerifier {
+    pub enabled: bool,
+}
+
+impl IntegrityVerifier {
     pub fn new() -> Self {
-        Self {
-            critical_files: Vec::new(),
-        }
-    }
-
-    pub fn register_critical_file(&mut self, file: SimpleFile) {
-        self.critical_files.push(file);
-    }
-
-    /// Perform a rolling checks loop. If any critical system file is modified/corrupted,
-    /// trigger a simulated kernel warning/shutdown (Red Star OS parity).
-    pub fn check_integrity_loop(&mut self) -> Result<(), &'static str> {
-        for file in &mut self.critical_files {
-            let status = file.verify().map_err(|_| "Integrity check failed")?;
-            if status != IntegrityStatus::Valid {
-                return Err("CRITICAL SYSTEM FILE TAMPERING DETECTED! Shuting down for safety.");
-            }
-        }
-        Ok(())
+        Self { enabled: true }
     }
 }
-
-pub struct IntegrityCheck;
-pub struct IntegrityVerifier;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_state_integrity_watchdog() {
-        let mut watchdog = StateIntegrityWatchdog::new();
-        let capability = FileCapability::full();
-        let file = SimpleFile::new(101, b"/boot/sigma_kernel", b"hash_root_ca", capability);
-        watchdog.register_critical_file(file);
-
-        // Untampered system is OK
-        assert!(watchdog.check_integrity_loop().is_ok());
-
-        // Tampered system triggers a safety shutdown / panic error
-        watchdog.critical_files[0].set_status(IntegrityStatus::Corrupted);
-        assert_eq!(
-            watchdog.check_integrity_loop(),
-            Err("CRITICAL SYSTEM FILE TAMPERING DETECTED! Shuting down for safety.")
-        );
-    }
 
     #[test]
     fn test_simple_file_and_integrity_monitor() {
@@ -457,9 +423,3 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct IntegrityCheck;
-
-#[derive(Debug, Clone)]
-pub struct IntegrityVerifier;

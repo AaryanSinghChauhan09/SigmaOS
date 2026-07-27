@@ -1,190 +1,241 @@
-// SigmaOS User-Defined Kernel Extensions (S-EXTENSION)
-// Implements safe OOP extension points and traits (User-Defined First Principle)
-// Enables users to define custom schedulers, allocators, and filesystem behaviors.
+//! Userspace-Defined and Dynamic Kernel Policy Subsystem (UDF / OOP / SOLID)
+//!
+//! Enables developers and system administrators to hot-swap scheduling,
+//! page replacement, and syscall security filters dynamically at runtime
+//! using polymorphic interface contracts without kernel recompilation.
+
+#![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
-use crate::kernel::scheduler::{Process, ProcessState, Priority};
-use crate::kernel::memory::MemoryBlock;
+use alloc::string::String;
+use alloc::vec::Vec;
 
-/// Custom Scheduler Policy interface (OOP user-defined extension point)
-pub trait ISchedulerPolicy {
-    fn select_next_task(&mut self, processes: &mut [Process]) -> Option<u64>;
-    fn on_task_tick(&mut self, active_pid: u64);
+// =========================================================================
+// 1. DYNAMIC USER-DEFINED SCHEDULER POLICY
+// =========================================================================
+
+pub trait IUserSchedulerPolicy {
+    fn policy_id(&self) -> &'static str;
+    fn evaluate_next_process(&self, priorities: &[u32]) -> Option<usize>;
 }
 
-/// Custom Memory Allocator Policy interface (OOP user-defined extension point)
-pub trait IAllocatorPolicy {
-    fn allocate_block(&mut self, size: usize) -> Result<MemoryBlock, ()>;
-    fn deallocate_block(&mut self, block: MemoryBlock);
+/// A User-Defined Priority-Boost Scheduler Policy
+pub struct PriorityBoostUserPolicy;
+impl IUserSchedulerPolicy for PriorityBoostUserPolicy {
+    fn policy_id(&self) -> &'static str {
+        "User-Defined Priority-Boost Policy"
+    }
+    fn evaluate_next_process(&self, priorities: &[u32]) -> Option<usize> {
+        // Polymorphically choose the process with the highest priority index
+        priorities
+            .iter()
+            .enumerate()
+            .max_by_key(|&(_, &p)| p)
+            .map(|(idx, _)| idx)
+    }
 }
 
-/// Custom Filesystem Plugin interface (OOP user-defined extension point)
-pub trait IFilesystemPlugin {
+/// A User-Defined Shortest-Job-First (SJF) Scheduler Policy
+pub struct SjfUserPolicy;
+impl IUserSchedulerPolicy for SjfUserPolicy {
+    fn policy_id(&self) -> &'static str {
+        "User-Defined Shortest-Job-First (SJF) Policy"
+    }
+    fn evaluate_next_process(&self, priorities: &[u32]) -> Option<usize> {
+        // Choose the one with the lowest value index (simulated runtime size)
+        priorities
+            .iter()
+            .enumerate()
+            .min_by_key(|&(_, &p)| p)
+            .map(|(idx, _)| idx)
+    }
+}
+
+// =========================================================================
+// 2. DYNAMIC USER-DEFINED PAGE REPLACEMENT ENGINE
+// =========================================================================
+
+pub trait IUserPageReplacement {
     fn name(&self) -> &'static str;
-    fn read_block(&self, sector: u64, buffer: &mut [u8]) -> Result<usize, ()>;
-    fn write_block(&mut self, sector: u64, data: &[u8]) -> Result<usize, ()>;
+    fn select_victim_page(&self, access_counters: &[u32]) -> usize;
 }
 
-/// User-Defined Extension Registry (Zero-Trust capability gated)
-pub struct UserDefinedExtensionRegistry {
-    pub scheduler_policy: Option<Box<dyn ISchedulerPolicy>>,
-    pub allocator_policy: Option<Box<dyn IAllocatorPolicy>>,
-    pub fs_plugins: Vec<Box<dyn IFilesystemPlugin>>,
-    pub capabilities_gated: bool,
+/// Least-Frequently-Used (LFU) User-Defined page replacement policy
+pub struct LfuUserPolicy;
+impl IUserPageReplacement for LfuUserPolicy {
+    fn name(&self) -> &'static str {
+        "Least-Frequently-Used (LFU) Page Policy"
+    }
+    fn select_victim_page(&self, access_counters: &[u32]) -> usize {
+        // Evict the page that has been accessed the least
+        access_counters
+            .iter()
+            .enumerate()
+            .min_by_key(|&(_, &c)| c)
+            .map(|(idx, _)| idx)
+            .unwrap_or(0)
+    }
 }
 
-impl UserDefinedExtensionRegistry {
-    pub fn new() -> Self {
+/// Most-Frequently-Used (MFU) User-Defined page replacement policy
+pub struct MfuUserPolicy;
+impl IUserPageReplacement for MfuUserPolicy {
+    fn name(&self) -> &'static str {
+        "Most-Frequently-Used (MFU) Page Policy"
+    }
+    fn select_victim_page(&self, access_counters: &[u32]) -> usize {
+        // Evict the page that has been accessed the most
+        access_counters
+            .iter()
+            .enumerate()
+            .max_by_key(|&(_, &c)| c)
+            .map(|(idx, _)| idx)
+            .unwrap_or(0)
+    }
+}
+
+// =========================================================================
+// 3. DYNAMIC USER-DEFINED SYSCALL FILTER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SyscallFilterAction {
+    Allow,
+    Kill,
+}
+
+pub trait IUserSyscallFilter {
+    fn filter_name(&self) -> &'static str;
+    fn audit_syscall(&self, sys_num: usize) -> SyscallFilterAction;
+}
+
+/// Custom Seccomp-like filter restricting dangerous execute or network syscalls
+pub struct CustomStrictSyscallFilter;
+impl IUserSyscallFilter for CustomStrictSyscallFilter {
+    fn filter_name(&self) -> &'static str {
+        "Strict Syscall Quarantine Filter"
+    }
+    fn audit_syscall(&self, sys_num: usize) -> SyscallFilterAction {
+        match sys_num {
+            59 => SyscallFilterAction::Kill, // Block sys_execve
+            _ => SyscallFilterAction::Allow,
+        }
+    }
+}
+
+// =========================================================================
+// 4. USER-DEFINED KERNEL MANAGER (UDF HUB)
+// =========================================================================
+
+pub struct UserDefinedKernelManager {
+    pub scheduler_policy: Box<dyn IUserSchedulerPolicy>,
+    pub page_replacement_policy: Box<dyn IUserPageReplacement>,
+    pub syscall_filter: Box<dyn IUserSyscallFilter>,
+}
+
+impl UserDefinedKernelManager {
+    pub fn new(
+        sched: Box<dyn IUserSchedulerPolicy>,
+        page: Box<dyn IUserPageReplacement>,
+        filter: Box<dyn IUserSyscallFilter>,
+    ) -> Self {
         Self {
-            scheduler_policy: None,
-            allocator_policy: None,
-            fs_plugins: Vec::new(),
-            capabilities_gated: true,
+            scheduler_policy: sched,
+            page_replacement_policy: page,
+            syscall_filter: filter,
         }
     }
 
-    pub fn register_scheduler_policy(
-        &mut self,
-        policy: Box<dyn ISchedulerPolicy>,
-    ) -> Result<(), &'static str> {
-        if !self.capabilities_gated {
-            return Err("CapabilityDenied: Cannot register kernel-level scheduler policy");
-        }
-        self.scheduler_policy = Some(policy);
-        Ok(())
+    pub fn set_scheduler_policy(&mut self, sched: Box<dyn IUserSchedulerPolicy>) {
+        self.scheduler_policy = sched;
     }
 
-    pub fn register_allocator_policy(
-        &mut self,
-        policy: Box<dyn IAllocatorPolicy>,
-    ) -> Result<(), &'static str> {
-        if !self.capabilities_gated {
-            return Err("CapabilityDenied: Cannot register kernel-level allocator policy");
-        }
-        self.allocator_policy = Some(policy);
-        Ok(())
+    pub fn set_page_policy(&mut self, page: Box<dyn IUserPageReplacement>) {
+        self.page_replacement_policy = page;
     }
 
-    pub fn register_fs_plugin(&mut self, plugin: Box<dyn IFilesystemPlugin>) -> Result<(), &'static str> {
-        if !self.capabilities_gated {
-            return Err("CapabilityDenied: Cannot register kernel-level VFS plugin");
-        }
-        self.fs_plugins.push(plugin);
-        Ok(())
+    pub fn set_syscall_filter(&mut self, filter: Box<dyn IUserSyscallFilter>) {
+        self.syscall_filter = filter;
     }
 }
 
-impl Default for UserDefinedExtensionRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// =========================================================================
+// TESTS
+// =========================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::time::Duration;
 
-    /// Dummy Stride Scheduler implementation representing user-defined scheduling policies
-    struct UserStrideScheduler {
-        pub active_tickets: u32,
-    }
+    #[test]
+    fn test_user_defined_scheduler() {
+        let mut manager = UserDefinedKernelManager::new(
+            Box::new(PriorityBoostUserPolicy),
+            Box::new(LfuUserPolicy),
+            Box::new(CustomStrictSyscallFilter),
+        );
 
-    impl ISchedulerPolicy for UserStrideScheduler {
-        fn select_next_task(&mut self, processes: &mut [Process]) -> Option<u64> {
-            if processes.is_empty() {
-                return None;
-            }
-            // Select first ready process
-            processes.iter()
-                .find(|p| p.state == ProcessState::Ready)
-                .map(|p| p.pid)
-        }
+        let process_priorities = [2, 10, 5, 8];
 
-        fn on_task_tick(&mut self, _active_pid: u64) {
-            self.active_tickets += 1;
-        }
-    }
+        // PriorityBoost chooses index 1 (highest priority: 10)
+        let chosen_idx = manager
+            .scheduler_policy
+            .evaluate_next_process(&process_priorities)
+            .unwrap();
+        assert_eq!(chosen_idx, 1);
 
-    /// Dummy Buddy Allocator sub-policy representing user-defined allocation controls
-    struct UserBuddyAllocatorPolicy {
-        pub allocations_count: usize,
-    }
-
-    impl IAllocatorPolicy for UserBuddyAllocatorPolicy {
-        fn allocate_block(&mut self, size: usize) -> Result<MemoryBlock, ()> {
-            self.allocations_count += 1;
-            Ok(MemoryBlock {
-                address: 0x500000,
-                size,
-                free: false,
-            })
-        }
-
-        fn deallocate_block(&mut self, _block: MemoryBlock) {
-            self.allocations_count = self.allocations_count.saturating_sub(1);
-        }
-    }
-
-    /// Dummy Encrypted Block storage overlay representing user-defined VFS plugins
-    struct UserEncryptionFSPlugin {
-        pub key_hash: u32,
-    }
-
-    impl IFilesystemPlugin for UserEncryptionFSPlugin {
-        fn name(&self) -> &'static str {
-            "SovereignEncryptionPlugin"
-        }
-
-        fn read_block(&self, _sector: u64, buffer: &mut [u8]) -> Result<usize, ()> {
-            if buffer.len() > 0 {
-                buffer[0] = 0xFF; // simulated decrypt
-            }
-            Ok(buffer.len())
-        }
-
-        fn write_block(&mut self, _sector: u64, data: &[u8]) -> Result<usize, ()> {
-            Ok(data.len())
-        }
+        // Hot-swap to Shortest-Job-First (SJF) policy dynamically!
+        manager.set_scheduler_policy(Box::new(SjfUserPolicy));
+        // SjfUserPolicy chooses index 1 in reverse, which is the lowest (priority 1)
+        let process_runtimes = [12, 1, 80, 50];
+        let chosen_idx_sjf = manager
+            .scheduler_policy
+            .evaluate_next_process(&process_runtimes)
+            .unwrap();
+        assert_eq!(chosen_idx_sjf, 1);
     }
 
     #[test]
-    fn test_user_defined_scheduler_policy() {
-        let mut registry = UserDefinedExtensionRegistry::new();
-        let policy = Box::new(UserStrideScheduler { active_tickets: 100 });
-        assert!(registry.register_scheduler_policy(policy).is_ok());
+    fn test_user_defined_page_replacement() {
+        let mut manager = UserDefinedKernelManager::new(
+            Box::new(PriorityBoostUserPolicy),
+            Box::new(LfuUserPolicy),
+            Box::new(CustomStrictSyscallFilter),
+        );
 
-        let mut processes = [
-            Process::new(1, "shell".into(), Priority::Normal),
-            Process::new(2, "ide".into(), Priority::High),
-        ];
+        let access_counters = [100, 50, 5, 500]; // Page 2 is least used, page 3 is most used
 
-        let selected = registry.scheduler_policy.as_mut().unwrap().select_next_task(&mut processes);
-        assert_eq!(selected, Some(1));
+        // LFU evicts page index 2 (least accessed: 5)
+        let victim_lfu = manager
+            .page_replacement_policy
+            .select_victim_page(&access_counters);
+        assert_eq!(victim_lfu, 2);
+
+        // Hot-swap to MFU policy dynamically!
+        manager.set_page_policy(Box::new(MfuUserPolicy));
+        let victim_mfu = manager
+            .page_replacement_policy
+            .select_victim_page(&access_counters);
+        assert_eq!(victim_mfu, 3);
     }
 
     #[test]
-    fn test_user_defined_allocator_policy() {
-        let mut registry = UserDefinedExtensionRegistry::new();
-        let policy = Box::new(UserBuddyAllocatorPolicy { allocations_count: 0 });
-        assert!(registry.register_allocator_policy(policy).is_ok());
+    fn test_user_defined_syscall_filter() {
+        let manager = UserDefinedKernelManager::new(
+            Box::new(PriorityBoostUserPolicy),
+            Box::new(LfuUserPolicy),
+            Box::new(CustomStrictSyscallFilter),
+        );
 
-        let block = registry.allocator_policy.as_mut().unwrap().allocate_block(4096).unwrap();
-        assert_eq!(block.address, 0x500000);
-        assert_eq!(block.size, 4096);
-    }
-
-    #[test]
-    fn test_user_defined_fs_plugins() {
-        let mut registry = UserDefinedExtensionRegistry::new();
-        let plugin = Box::new(UserEncryptionFSPlugin { key_hash: 0x99AA });
-        assert!(registry.register_fs_plugin(plugin).is_ok());
-
-        assert_eq!(registry.fs_plugins[0].name(), "SovereignEncryptionPlugin");
-        let mut buf = [0u8; 1];
-        assert_eq!(registry.fs_plugins[0].read_block(1, &mut buf), Ok(1));
-        assert_eq!(buf[0], 0xFF);
+        // Strictly block execution attempts
+        assert_eq!(
+            manager.syscall_filter.audit_syscall(59),
+            SyscallFilterAction::Kill
+        );
+        assert_eq!(
+            manager.syscall_filter.audit_syscall(3),
+            SyscallFilterAction::Allow
+        );
     }
 }

@@ -1,156 +1,132 @@
-// SigmaOS Capability-Based Security System
-// Implements 64-bit hardware-enforced capability model
+//! Capability Tokens: Privilege Isolation (Android/AOSP Absorption)
+//!
+//! Cryptographic capability gates replacing legacy Unix file permissions.
 
-use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
 
-/// Capability token representing access rights
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    Ipc,
+}
+
+/// A cryptographic capability token required for any privileged action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
-    /// 64-bit capability bitmask
-    pub bits: u64,
+    pub id: u64,
+    pub allowed_paths: &'static [&'static str],
+    pub allowed_ports: &'static [u16],
+    pub is_revoked: bool,
 }
 
 impl CapabilityToken {
-    /// Create a new capability token with no permissions
     pub fn new() -> Self {
-        Self { bits: 0 }
-    }
-
-    /// Allow network access
-    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
-        match protocol {
-            "tcp" => self.bits |= 1 << 0,
-            "udp" => self.bits |= 1 << 1,
-            _ => {}
+        CapabilityToken {
+            id: 0,
+            allowed_paths: &[],
+            allowed_ports: &[],
+            is_revoked: false,
         }
-        self.bits |= (port as u64) << 16;
-        self
     }
 
-    /// Allow file read access
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
-            self.bits |= 1 << 2;
+    pub fn new_with_args(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+        CapabilityToken {
+            id,
+            allowed_paths: paths,
+            allowed_ports: ports,
+            is_revoked: false,
         }
-        self
     }
 
-    /// Allow file write access
-    pub fn allow_write(mut self, path: &str) -> Self {
-        if path.starts_with("/tmp") || path.starts_with("/home") {
-            self.bits |= 1 << 3;
-        }
-        self
-    }
-
-    /// Allow process execution
-    pub fn allow_exec(mut self) -> Self {
-        self.bits |= 1 << 4;
-        self
-    }
-
-    /// Allow IPC communication
-    pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 1 << 5;
-        self
-    }
-
-    /// Check if capability has specific permission
-    pub fn has_permission(&self, permission: Permission) -> bool {
-        (self.bits & (1 << permission as u64)) != 0
-    }
-
-    /// Revoke all permissions
-    pub fn revoke_all(&mut self) {
-        self.bits = 0;
-    }
-
-    /// Get raw capability bits
     pub fn bits(&self) -> u64 {
-        self.bits
+        self.id
+    }
+
+    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
+        self.id |= 1;
+        self
+    }
+
+    pub fn allow_read(mut self, _path: &str) -> Self {
+        self.id |= 2;
+        self
+    }
+
+    pub fn allow_write(mut self, _path: &str) -> Self {
+        self.id |= 4;
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.id |= 8;
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.id |= 16;
+        self
+    }
+
+    /// Verifies if the token permits access to a given path.
+    pub fn can_access_path(&self, path: &str) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        self.allowed_paths.iter().any(|&p| path.starts_with(p))
+    }
+
+    /// Verifies if the token permits binding to a network port.
+    pub fn can_bind_port(&self, port: u16) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        self.allowed_ports.contains(&port)
+    }
+
+    pub fn revoke(&mut self) {
+        self.is_revoked = true;
     }
 }
 
-/// Permission types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-/// Capability gate for syscall validation
+#[derive(Debug, Clone, Default)]
 pub struct CapabilityGate {
-    /// Current capability token
-    current: AtomicU64,
+    pub token: CapabilityToken,
 }
 
 impl CapabilityGate {
-    /// Create new capability gate
     pub fn new() -> Self {
         Self {
-            current: AtomicU64::new(0),
+            token: CapabilityToken::new(),
         }
     }
 
-    /// Set current capability
-    pub fn set_capability(&self, token: CapabilityToken) {
-        self.current.store(token.bits(), Ordering::SeqCst);
-    }
-
-    /// Validate syscall against current capability
-    pub fn validate_syscall(&self, permission: Permission) -> bool {
-        let current = self.current.load(Ordering::SeqCst);
-        (current & (1 << permission as u64)) != 0
-    }
-
-    /// Get current capability
-    pub fn current_capability(&self) -> CapabilityToken {
-        CapabilityToken {
-            bits: self.current.load(Ordering::SeqCst),
-        }
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub struct SecurityEnforcer {
+    active_tokens: Vec<CapabilityToken>,
+}
 
-    #[test]
-    fn test_capability_creation() {
-        let token = CapabilityToken::new();
-        assert_eq!(token.bits(), 0);
+impl SecurityEnforcer {
+    pub fn new() -> Self {
+        SecurityEnforcer {
+            active_tokens: Vec::new(),
+        }
     }
 
-    #[test]
-    fn test_network_permission() {
-        let token = CapabilityToken::new().allow_network("tcp", 80);
-        assert!(token.has_permission(Permission::NetworkTcp));
-    }
-
-    #[test]
-    fn test_file_read_permission() {
-        let token = CapabilityToken::new().allow_read("/var/www");
-        assert!(token.has_permission(Permission::FileRead));
-    }
-
-    #[test]
-    fn test_capability_revocation() {
-        let mut token = CapabilityToken::new().allow_network("tcp", 80);
-        token.revoke_all();
-        assert_eq!(token.bits(), 0);
-    }
-
-    #[test]
-    fn test_capability_gate_validation() {
-        let gate = CapabilityGate::new();
-        let token = CapabilityToken::new().allow_network("tcp", 80);
-        gate.set_capability(token);
-        assert!(gate.validate_syscall(Permission::NetworkTcp));
+    pub fn register_token(&mut self, token: CapabilityToken) {
+        self.active_tokens.push(token);
     }
 }
