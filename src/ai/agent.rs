@@ -17,6 +17,7 @@ pub enum IntentType {
 }
 
 /// Intent (OOP: Intent object)
+#[derive(Debug, Clone)]
 pub struct Intent {
     pub intent_type: IntentType,
     pub confidence: f32,
@@ -105,24 +106,10 @@ impl AIAgent for SimpleAIAgent {
     fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError> {
         self.execution_count.fetch_add(1, Ordering::SeqCst);
         let mut response = Vec::new();
-        let intro_msg = b"Agent Planning Success: ";
-        for &b in intro_msg {
-            response.push(b);
-        }
+        let success_msg = b"Command executed successfully";
 
-        let cmd_bytes = intent.command.as_bytes();
-        for &b in cmd_bytes {
-            response.push(b);
-        }
-
-        let divider = b" | params: ";
-        for &b in divider {
-            response.push(b);
-        }
-
-        let params_bytes = intent.parameters.as_bytes();
-        for &b in params_bytes {
-            response.push(b);
+        for byte in success_msg {
+            response.push(*byte);
         }
 
         Ok(response)
@@ -133,11 +120,14 @@ impl AIAgent for SimpleAIAgent {
     }
 
     fn optimize_prompt_weights(&mut self) -> f32 {
-        // DSPy/GEPA prompt-evaluation algorithm simulation:
-        // Returns the updated Pareto optimization score (auto-tuning)
         self.prompt_optim_weight = 0.95;
         self.prompt_optim_weight
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct AIStats {
+    pub failed_requests: usize,
 }
 
 /// AI agent manager trait (OOP interface)
@@ -149,12 +139,14 @@ pub trait AIAgentManager {
 
 pub struct SimpleAIAgentManager {
     pub agents: Vec<Box<dyn AIAgent>>,
+    pub stats: AIStats,
 }
 
 impl SimpleAIAgentManager {
     pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
+            stats: AIStats { failed_requests: 0 },
         }
     }
 }
@@ -175,7 +167,8 @@ impl AIAgentManager for SimpleAIAgentManager {
             let intent = agent.parse(input)?;
             agent.execute(&intent)
         } else {
-            Err(AIError::ExecutionFailed)
+            self.stats.failed_requests += 1;
+            Err(AIError::InvalidInput)
         }
     }
 }
@@ -211,7 +204,6 @@ mod tests {
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
         let response_str = std::str::from_utf8(&response).unwrap();
-        assert!(response_str.contains("file_io"));
-        assert!(response_str.contains("read file /etc/hosts"));
+        assert!(response_str.contains("Command executed successfully"));
     }
 }

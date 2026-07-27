@@ -114,6 +114,21 @@ pub enum CrossDeviceAction {
     ExecuteAutomation {
         automation_id: String,
     },
+    SyncClipboard {
+        device_id: String,
+        clipboard_data: Vec<u8>,
+    },
+    CastMedia {
+        device_id: String,
+        media_url: String,
+        play: bool,
+    },
+    RemoteSyscall {
+        device_id: String,
+        syscall_number: u32,
+        arguments: Vec<u64>,
+        capability_token: u64,
+    },
 }
 
 /// Automation rule
@@ -352,8 +367,94 @@ impl CrossDeviceOrchestrator {
             CrossDeviceAction::ExecuteAutomation { automation_id } => {
                 println!("Executing automation: {}", automation_id);
             }
+            CrossDeviceAction::SyncClipboard {
+                device_id,
+                clipboard_data,
+            } => {
+                if !self.devices.contains_key(&device_id) {
+                    return Err(OrchestrationError::DeviceNotFound);
+                }
+                println!("Syncing clipboard (size={}) with device {}", clipboard_data.len(), device_id);
+            }
+            CrossDeviceAction::CastMedia {
+                device_id,
+                media_url,
+                play,
+            } => {
+                if !self.devices.contains_key(&device_id) {
+                    return Err(OrchestrationError::DeviceNotFound);
+                }
+                println!("Casting media {} to device {} (play={})", media_url, device_id, play);
+            }
+            CrossDeviceAction::RemoteSyscall {
+                device_id,
+                syscall_number,
+                arguments,
+                capability_token,
+            } => {
+                if !self.devices.contains_key(&device_id) {
+                    return Err(OrchestrationError::DeviceNotFound);
+                }
+                if capability_token == 0 {
+                    return Err(OrchestrationError::ActionFailed);
+                }
+                println!("Executing remote syscall {} on device {} with cap_token={}", syscall_number, device_id, capability_token);
+            }
         }
         Ok(())
+    }
+
+    pub fn discover_localsend_peers(&mut self) -> Vec<ConnectedDevice> {
+        // Simulate LocalSend-compatible peer discovery
+        let mut discovered = Vec::new();
+        discovered.push(
+            ConnectedDevice::new(
+                "localsend_peer_1".to_string(),
+                "LocalSend Desktop".to_string(),
+                DeviceType::Desktop,
+            )
+            .with_capability(DeviceCapability::FileTransfer)
+            .with_metadata("protocol_version".to_string(), "1.3".to_string())
+        );
+        for d in &discovered {
+            self.add_device(d.clone());
+        }
+        discovered
+    }
+
+    pub fn sync_secure_clipboard(&mut self, device_id: &str, data: &[u8]) -> Result<(), OrchestrationError> {
+        if !self.devices.contains_key(device_id) {
+            return Err(OrchestrationError::DeviceNotFound);
+        }
+        // Encrypt with simple XOR for transport simulation
+        let encrypted: Vec<u8> = data.iter().map(|b| b ^ 0x5A).collect();
+        self.execute_action(CrossDeviceAction::SyncClipboard {
+            device_id: device_id.to_string(),
+            clipboard_data: encrypted,
+        })
+    }
+
+    pub fn cast_media_stream(&mut self, device_id: &str, stream_url: &str) -> Result<(), OrchestrationError> {
+        if !self.devices.contains_key(device_id) {
+            return Err(OrchestrationError::DeviceNotFound);
+        }
+        self.execute_action(CrossDeviceAction::CastMedia {
+            device_id: device_id.to_string(),
+            media_url: stream_url.to_string(),
+            play: true,
+        })
+    }
+
+    pub fn execute_secure_rpc(&mut self, device_id: &str, syscall_num: u32, cap_token: u64) -> Result<(), OrchestrationError> {
+        if !self.devices.contains_key(device_id) {
+            return Err(OrchestrationError::DeviceNotFound);
+        }
+        self.execute_action(CrossDeviceAction::RemoteSyscall {
+            device_id: device_id.to_string(),
+            syscall_number: syscall_num,
+            arguments: vec![0, 1],
+            capability_token: cap_token,
+        })
     }
 
     pub fn discover_devices(&mut self) -> Vec<ConnectedDevice> {
@@ -605,5 +706,37 @@ mod tests {
         let discovered = orchestrator.discover_devices();
         assert!(!discovered.is_empty());
         assert_eq!(orchestrator.devices.len(), 2);
+    }
+
+    #[test]
+    fn test_enhanced_cross_device_features() {
+        let mut orchestrator = CrossDeviceOrchestrator::new();
+        let device = ConnectedDevice::new(
+            "device_id_123".to_string(),
+            "Parity Machine".to_string(),
+            DeviceType::Laptop,
+        );
+        orchestrator.add_device(device);
+
+        // 1. LocalSend-compatible peer discovery
+        let localsend_peers = orchestrator.discover_localsend_peers();
+        assert_eq!(localsend_peers.len(), 1);
+        assert_eq!(localsend_peers[0].name, "LocalSend Desktop");
+
+        // 2. Clipboard sharing
+        let clip_res = orchestrator.sync_secure_clipboard("device_id_123", b"SovereignClipboard");
+        assert!(clip_res.is_ok());
+
+        // 3. Media casting
+        let cast_res = orchestrator.cast_media_stream("device_id_123", "http://sigmaos.local/stream.mp4");
+        assert!(cast_res.is_ok());
+
+        // 4. Secure RPC System Calls
+        let rpc_res = orchestrator.execute_secure_rpc("device_id_123", 42, 0xCAFEBABE);
+        assert!(rpc_res.is_ok());
+
+        // Failed RPC on invalid token
+        let bad_rpc = orchestrator.execute_secure_rpc("device_id_123", 42, 0);
+        assert!(bad_rpc.is_err());
     }
 }

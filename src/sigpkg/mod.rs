@@ -7,7 +7,13 @@ pub mod resolver;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod universal_engine;
 
+pub use universal_engine::{
+    PackageFormat, PackageContext, IPackageAdapter, AptPackageAdapter, YumPackageAdapter,
+    PacmanPackageAdapter, PortagePackageAdapter, SovereignPackageAdapter, HookType,
+    UserDefinedPackageHook, SovereignPackageManager,
+};
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::PackageRecipe;
 pub use resolver::SatSolver;
