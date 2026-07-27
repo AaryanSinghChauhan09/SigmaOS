@@ -13,17 +13,17 @@ pub mod performance;
 pub mod profiler;
 pub mod roundrobin;
 pub mod scheduler;
-<<<<<<< HEAD
 pub mod secure_free;
 pub mod slab_allocator;
 pub mod subsystem;
 pub mod traits;
 pub mod watchdog;
-=======
 pub mod meta;
 pub mod paging;
 pub mod user_defined;
->>>>>>> origin/main-13246761802911497579
+pub mod policy_mechanism;
+pub mod breakthroughs;
+pub mod sigma_kernel_autotuner;
 
 // ── Phase J: subsystem registry & legacy device drivers ───────────────────
 pub mod drivers;
@@ -87,7 +87,6 @@ pub use subsystem::{
     MemoryManager, NetworkError, NetworkStack, Scheduler, SchedulerError, SecureDriverWrapper,
     SocketDomain, SocketHandle, SocketProtocol, SocketType,
 };
-<<<<<<< HEAD
 pub use traits::{
     DeviceDriver as TraitsDeviceDriver, DriverError as TraitsDriverError,
     DriverMetadata as TraitsDriverMetadata, FileSystem as TraitsFileSystem,
@@ -103,6 +102,9 @@ pub use traits::{
 pub use watchdog::{
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,
     WatchdogState,
+};
+pub use user_defined::{
+    IAllocatorPolicy, IFilesystemPlugin, ISchedulerPolicy, UserDefinedExtensionRegistry,
 };
 
 // ── Phase J + K consolidated re-exports ────────────────────────────────────
@@ -137,8 +139,3 @@ pub use net::{
     SockAddrIn, SocketLayer, SocketType as NetSocketType, Tbf, TcpConnection, TcpSegment, TcpState,
 };
 pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};
-=======
-pub use user_defined::{
-    IAllocatorPolicy, IFilesystemPlugin, ISchedulerPolicy, UserDefinedExtensionRegistry,
-};
->>>>>>> origin/main-13246761802911497579
