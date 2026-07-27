@@ -1,22 +1,33 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Container Runtime Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 17
 /// Implements OCI runtime and sandboxed container primitives
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ContainerID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ContainerState { Created = 0, Running = 1, Paused = 2, Stopped = 3, Deleting = 4 }
+pub enum ContainerState {
+    Created = 0,
+    Running = 1,
+    Paused = 2,
+    Stopped = 3,
+    Deleting = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ContainerError { Success = 0, InvalidConfig = 1, StartFailed = 2, StopFailed = 3, ResourceLimit = 4 }
+pub enum ContainerError {
+    Success = 0,
+    InvalidConfig = 1,
+    StartFailed = 2,
+    StopFailed = 3,
+    ResourceLimit = 4,
+}
 
 pub trait Container {
     fn id(&self) -> ContainerID;
@@ -53,21 +64,27 @@ impl SimpleContainer {
 }
 
 impl Container for SimpleContainer {
-    fn id(&self) -> ContainerID { self.id }
+    fn id(&self) -> ContainerID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ContainerState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ContainerState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
 
     fn start(&mut self) -> Result<(), ContainerError> {
-        self.state.store(ContainerState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(ContainerState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), ContainerError> {
-        self.state.store(ContainerState::Stopped as usize, Ordering::SeqCst);
+        self.state
+            .store(ContainerState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
@@ -76,7 +93,8 @@ impl Container for SimpleContainer {
         if self.state.load(Ordering::SeqCst) != ContainerState::Running as usize {
             return Err(ContainerError::StartFailed);
         }
-        self.state.store(ContainerState::Paused as usize, Ordering::SeqCst);
+        self.state
+            .store(ContainerState::Paused as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -84,7 +102,8 @@ impl Container for SimpleContainer {
         if self.state.load(Ordering::SeqCst) != ContainerState::Paused as usize {
             return Err(ContainerError::StartFailed);
         }
-        self.state.store(ContainerState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(ContainerState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -124,14 +143,34 @@ impl OCISpec for SimpleOCISpec {
 }
 
 pub trait Sandbox {
-    fn set_namespace(&mut self, container_id: ContainerID, ns_type: Namespace) -> Result<(), ContainerError>;
-    fn set_cgroup(&mut self, container_id: ContainerID, cpu_limit: usize, mem_limit: usize) -> Result<(), ContainerError>;
-    fn set_seccomp(&mut self, container_id: ContainerID, profile: &[u8]) -> Result<(), ContainerError>;
+    fn set_namespace(
+        &mut self,
+        container_id: ContainerID,
+        ns_type: Namespace,
+    ) -> Result<(), ContainerError>;
+    fn set_cgroup(
+        &mut self,
+        container_id: ContainerID,
+        cpu_limit: usize,
+        mem_limit: usize,
+    ) -> Result<(), ContainerError>;
+    fn set_seccomp(
+        &mut self,
+        container_id: ContainerID,
+        profile: &[u8],
+    ) -> Result<(), ContainerError>;
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Namespace { PID = 0, Network = 1, Mount = 2, IPC = 3, UTS = 4, User = 5 }
+pub enum Namespace {
+    PID = 0,
+    Network = 1,
+    Mount = 2,
+    IPC = 3,
+    UTS = 4,
+    User = 5,
+}
 
 #[repr(C)]
 pub struct SimpleSandbox {
@@ -151,17 +190,30 @@ impl SimpleSandbox {
 }
 
 impl Sandbox for SimpleSandbox {
-    fn set_namespace(&mut self, container_id: ContainerID, ns_type: Namespace) -> Result<(), ContainerError> {
+    fn set_namespace(
+        &mut self,
+        container_id: ContainerID,
+        ns_type: Namespace,
+    ) -> Result<(), ContainerError> {
         self.namespaces.push((container_id, ns_type));
         Ok(())
     }
 
-    fn set_cgroup(&mut self, container_id: ContainerID, cpu_limit: usize, mem_limit: usize) -> Result<(), ContainerError> {
+    fn set_cgroup(
+        &mut self,
+        container_id: ContainerID,
+        cpu_limit: usize,
+        mem_limit: usize,
+    ) -> Result<(), ContainerError> {
         self.cgroups.push((container_id, (cpu_limit, mem_limit)));
         Ok(())
     }
 
-    fn set_seccomp(&mut self, container_id: ContainerID, profile: &[u8]) -> Result<(), ContainerError> {
+    fn set_seccomp(
+        &mut self,
+        container_id: ContainerID,
+        profile: &[u8],
+    ) -> Result<(), ContainerError> {
         let mut profile_array = [0u8; 256];
         let len = profile.len().min(255);
         for i in 0..len {
@@ -185,9 +237,7 @@ pub struct SimpleImageManager {
 
 impl SimpleImageManager {
     pub fn new() -> Self {
-        SimpleImageManager {
-            images: Vec::new(),
-        }
+        SimpleImageManager { images: Vec::new() }
     }
 }
 
@@ -224,7 +274,11 @@ impl ImageManager for SimpleImageManager {
 }
 
 pub trait ContainerRuntime {
-    fn create_container(&mut self, name: &[u8], image: &[u8]) -> Result<ContainerID, ContainerError>;
+    fn create_container(
+        &mut self,
+        name: &[u8],
+        image: &[u8],
+    ) -> Result<ContainerID, ContainerError>;
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
@@ -249,7 +303,11 @@ impl SimpleContainerRuntime {
 }
 
 impl ContainerRuntime for SimpleContainerRuntime {
-    fn create_container(&mut self, name: &[u8], image: &[u8]) -> Result<ContainerID, ContainerError> {
+    fn create_container(
+        &mut self,
+        name: &[u8],
+        image: &[u8],
+    ) -> Result<ContainerID, ContainerError> {
         self.image_manager.pull_image(image, b"latest")?;
         let spec = name;
         let id = self.oci_spec.create_from_spec(spec)?;
@@ -307,13 +365,25 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -341,15 +411,26 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

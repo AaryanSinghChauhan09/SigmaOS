@@ -318,7 +318,11 @@ impl SovereignParted {
     /// User-defined physical alignment validation function
     /// Standard modern disks use 4KB physical sectors (8 logical 512-byte sectors).
     /// GNU Parted warning is generated if start_sector is not divisible by 8.
-    pub fn verify_alignment<F>(&self, index: u32, alignment_checker: F) -> Result<bool, &'static str>
+    pub fn verify_alignment<F>(
+        &self,
+        index: u32,
+        alignment_checker: F,
+    ) -> Result<bool, &'static str>
     where
         F: Fn(u64) -> bool,
     {
@@ -384,11 +388,15 @@ mod tests {
         let mut parted = SovereignParted::new(1000000, PartitionScheme::Gpt);
 
         // Add partition 1 (perfectly aligned with 8-sector boundary, start = 2048)
-        let idx1 = parted.add_partition("SovereignRoot".to_string(), 2048, 100000, FsType::SigmaFS).unwrap();
+        let idx1 = parted
+            .add_partition("SovereignRoot".to_string(), 2048, 100000, FsType::SigmaFS)
+            .unwrap();
         assert_eq!(idx1, 1);
 
         // Add partition 2 (misaligned, start = 100003)
-        let idx2 = parted.add_partition("UnstructuredData".to_string(), 100003, 200000, FsType::Ext4).unwrap();
+        let idx2 = parted
+            .add_partition("UnstructuredData".to_string(), 100003, 200000, FsType::Ext4)
+            .unwrap();
         assert_eq!(idx2, 2);
 
         // Verify alignments with 8-sector 4KB boundary physical alignment checker F

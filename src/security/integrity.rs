@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
 /// Based on Roadmap Item 66: System integrity monitoring
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// File ID
 pub type FileID = usize;
@@ -113,7 +112,11 @@ impl SimpleFile {
 
         unsafe {
             core::ptr::copy_nonoverlapping(path.as_ptr(), path_array.as_mut_ptr(), path_len);
-            core::ptr::copy_nonoverlapping(checksum.as_ptr(), checksum_array.as_mut_ptr(), checksum_len);
+            core::ptr::copy_nonoverlapping(
+                checksum.as_ptr(),
+                checksum_array.as_mut_ptr(),
+                checksum_len,
+            );
         }
 
         SimpleFile {
@@ -126,9 +129,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -397,7 +398,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
