@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ⚡ Bolt's Journal — SigmaOS Performance Optimizations
 
 This journal contains CRITICAL performance learnings discovered during profiling, compiling, and optimizing SigmaOS.
@@ -28,8 +27,7 @@ This journal contains CRITICAL performance learnings discovered during profiling
 ## 2026-07-22 - Replacing Vector Collection with Lazy Iterators in SemVer
 **Learning:** Using heap-allocated `Vec` buffers via `split('.').collect()` for checking format and parsing minor/major/patch parts of a package version string is a classic performance bottleneck in dependency solvers. Transitioning to direct, lazy iterators on the `.split()` object completely avoids the heap allocator.
 **Action:** Never eagerly collect string slices into a dynamic array unless the elements are reused multiple times in unrelated scopes.
-=======
+
 ## 2025-10-24 - [NUMA-Aware scheduling structures]
 **Learning:** Cache locality on multi-socket architectures can be significantly optimized by partitioning the CFS queues into local NUMA cores, completely avoiding cross-node memory bus transactions.
 **Action:** Use custom thread-to-node mapping algorithms within the scheduler instead of relying on standard process grouping.
->>>>>>> origin/agent-absorption-plan-incorporation-4628616561107371850
