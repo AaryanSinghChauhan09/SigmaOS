@@ -21,7 +21,12 @@ pub mod forensics;
 pub mod cleaner;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
+pub mod parrot_kali;
 
+pub use parrot_kali::{
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
+};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
