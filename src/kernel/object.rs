@@ -61,6 +61,9 @@ pub struct KObject {
     kref: KRef,
 }
 
+unsafe impl Send for KObject {}
+unsafe impl Sync for KObject {}
+
 impl KObject {
     pub fn new(name: &str) -> Self {
         KObject {

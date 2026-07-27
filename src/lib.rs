@@ -1,21 +1,23 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod finance;
 pub mod kernel;
 pub mod klib;
-pub mod media;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -25,6 +27,38 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+}
+pub mod boot;
+pub mod toolchain {
+    pub mod adapter;
+    pub mod capsule;
+    pub mod codex;
+    pub mod bootstrap;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -65,12 +99,15 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    ShareXFlameshotEngine, PotPlayerVlcEngine, EverythingSearchEngine, SevenZipCompressor,
+    EarTrumpetAudioRouter, BraveBrowserEngine, AudacityEditor, NotepadPlusWorkspace,
+    OneCommanderDualPane, ObsStudioMixer,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -85,13 +122,4 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-
-pub mod virt;
-pub use virt::hypervisor::{
-    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
-    VirtualizationGeneration,
-};
-pub use virt::microvm::{
-    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };

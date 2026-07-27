@@ -25,7 +25,7 @@ pub enum GpuCommand {
     Present,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct DrmModeInfo {
     pub hdisplay: u16,
     pub vdisplay: u16,
@@ -48,7 +48,6 @@ pub struct DrmConnector {
     pub modes: Vec<DrmModeInfo>,
 }
 
-/// GPU driver interface
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
