@@ -60,9 +60,9 @@ pub use gap_filling::{
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionEngine as LinuxAbsorptionEngine,
-    AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType, LinuxAbsorptionEngine,
-    SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
+    ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
+    SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use numa_allocator::{AllocationPolicy, NodeState, NumaAllocator, NumaNode};
@@ -71,10 +71,14 @@ pub use performance::{
     ZeroCopyQueue,
 };
 pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler as BaseScheduler};
 pub use secure_free::{SanitizationLevel, SecureFreeDetector, SecureFreeStats};
-pub use slab_allocator::{SlabAllocator, SlabCache, SlabCacheStats, SlabState};
+pub use slab_allocator::{
+    SlabAllocator as BaseSlabAllocator, SlabCache, SlabCacheStats, SlabState,
+};
 pub use subsystem::{
     DeviceDriver, DriverError, DriverMetadata, DriverRegistry, DriverType, FileFlags, FileHandle,
     FileSystem, FsError, IoOperation, IoResult, LinuxHeritage, MapFlags, MemoryError,
@@ -82,9 +86,7 @@ pub use subsystem::{
     SocketDomain, SocketHandle, SocketProtocol, SocketType,
 };
 pub use traits::{
-    DeviceDriver, DriverError, DriverMetadata, FileSystem, FilesystemMetadata, FsError,
-    MemoryError, MemoryManager, MemoryManagerMetadata, NetworkError, NetworkStack,
-    NetworkStackMetadata, Scheduler, SchedulerError, SchedulerMetadata,
+    FilesystemMetadata, MemoryManagerMetadata, NetworkStackMetadata, SchedulerMetadata,
 };
 pub use watchdog::{
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,
@@ -103,13 +105,10 @@ pub use irq::{
     Workqueue,
 };
 pub use mm::{
-    CachedPage, HugePageManager, HugePageSize, NumaNode, NumaTopologyManager, OomKiller, PageCache,
+    CachedPage, HugePageManager, HugePageSize, NumaTopologyManager, OomKiller, PageCache,
     PageStatus, SlabAllocator, VmallocManager,
 };
-pub use power::{
-    CpufreqGovernor, CpufreqManager, CpufreqPolicy, PowerStateManager, SleepState, ThermalManager,
-    ThermalZone,
-};
+pub use power::{CpufreqGovernor, PowerStateManager, SleepState, ThermalManager, ThermalZone};
 // net: single export covering Phase J (socket/netfilter/tc) + Phase K (IPv4/TCP)
 pub use block_dev::{
     Bio, BioOp, BlockDeviceManager, DeadlineScheduler, RamDisk, BLOCK_SIZE, SECTOR_SIZE,
@@ -120,6 +119,6 @@ pub use crypto::{
 pub use net::{
     AddressFamily, ArpTable, CongestionAlgorithm, Ipv4Header, Ipv4Stack, NetfilterTable,
     NfHookpoint, NfRule, NfVerdict, Pfifo, PfifoFast, Protocol, QPacket, Route, RoutingTable, Sfq,
-    SockAddrIn, SocketLayer, SocketType, Tbf, TcpConnection, TcpSegment, TcpState,
+    SockAddrIn, SocketLayer, Tbf, TcpConnection, TcpSegment, TcpState,
 };
 pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};

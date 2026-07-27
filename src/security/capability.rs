@@ -22,6 +22,11 @@ impl CapabilityToken {
         Self { bits: 0 }
     }
 
+    /// Allow arbitrary capability bits
+    pub fn allow_capability(&mut self, cap: u64) {
+        self.bits |= cap;
+    }
+
     /// Allow network access
     pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
         match protocol {

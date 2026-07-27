@@ -16,11 +16,13 @@ pub mod pledge;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
-pub use audit::{AuditLogger, AuditPolicy, LogFormat};
+pub use audit::{AuditLogger, AuditPolicy};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use clipboard::{
@@ -61,7 +63,8 @@ pub use integrity::{
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
+    SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{
