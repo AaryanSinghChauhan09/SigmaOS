@@ -16,7 +16,7 @@ Based on security learnings from .jules/sentinel.md, this document provides guid
 // Safe: Use textContent for plain text
 element.textContent = userInput;
 
-// Safe: Use innerText for plain text with layout awareness  
+// Safe: Use innerText for plain text with layout awareness
 element.innerText = userInput;
 ```
 

@@ -84,7 +84,7 @@ if(SIGMAOS_ENABLE_HARDENING)
         -D_FORTIFY_SOURCE=2
         -fPIE -fPIC
     )
-    
+
     add_link_options(
         -pie
         -Wl,-z,relro

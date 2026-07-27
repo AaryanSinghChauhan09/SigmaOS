@@ -18,25 +18,25 @@ use std::arch::x86_64::*;
 #[cfg(target_arch = "x86_64")]
 pub unsafe fn simd_to_uppercase(input: &[u8]) -> Vec<u8> {
     let mut output = input.to_vec();
-    
+
     for chunk in output.chunks_mut(16) {
         let vec = _mm_loadu_si128(chunk.as_ptr() as *const __m128i);
-        
+
         // Use bitwise inverse logical AND instead of direct AND
         let mask = _mm_set1_epi8(0xDF);  // 11011111 in binary
         let lower_mask = _mm_set1_epi8(0x20);  // 00100000 in binary
-        
+
         // Check if character is lowercase (bit 5 set)
         let is_lower = _mm_and_si128(vec, lower_mask);
         let is_lower_cmp = _mm_cmpeq_epi8(is_lower, lower_mask);
-        
+
         // Only apply transformation to lowercase characters
         let transformed = _mm_andnot_si128(is_lower_cmp, _mm_and_si128(vec, mask));
         let result = _mm_or_si128(transformed, _mm_and_si128(is_lower_cmp, _mm_and_si128(vec, mask)));
-        
+
         _mm_storeu_si128(chunk.as_mut_ptr() as *mut __m128i, result);
     }
-    
+
     output
 }
 ```
@@ -46,17 +46,17 @@ pub unsafe fn simd_to_uppercase(input: &[u8]) -> Vec<u8> {
 // Unsafe: Direct AND masks all characters
 pub unsafe fn simd_to_uppercase_bad(input: &[u8]) -> Vec<u8> {
     let mut output = input.to_vec();
-    
+
     for chunk in output.chunks_mut(16) {
         let vec = _mm_loadu_si128(chunk.as_ptr() as *const __m128i);
         let mask = _mm_set1_epi8(0xDF);
-        
+
         // This zeros out non-lowercase characters!
         let result = _mm_and_si128(vec, mask);
-        
+
         _mm_storeu_si128(chunk.as_mut_ptr() as *mut __m128i, result);
     }
-    
+
     output
 }
 ```
@@ -108,17 +108,17 @@ pub trait LlmBackend {
 pub fn fill_rect(buffer: &mut [u8], x: usize, y: usize, width: usize, height: usize, color: [u8; 4]) {
     let stride = width * 4;
     let total_bytes = height * stride;
-    
+
     // Hoist bounds check
     if x + width > buffer.len() || y + height > buffer.len() {
         return;
     }
-    
+
     // Pre-calculate pointers
     let base_ptr = buffer.as_mut_ptr();
     let start_offset = (y * stride) + (x * 4);
     let mut ptr = base_ptr.add(start_offset);
-    
+
     // Bulk row copy using pointer arithmetic
     for _ in 0..height {
         // Fill entire row at once
@@ -163,7 +163,7 @@ pub fn compare_semver(v1: &str, v2: &str) -> std::cmp::Ordering {
     // Use lazy iterator mapping instead of Vec allocation
     let mut parts1 = v1.split('.').map(|s| s.parse::<u32>().unwrap_or(0));
     let mut parts2 = v2.split('.').map(|s| s.parse::<u32>().unwrap_or(0));
-    
+
     loop {
         match (parts1.next(), parts2.next()) {
             (Some(a), Some(b)) => {
@@ -186,7 +186,7 @@ pub fn compare_semver(v1: &str, v2: &str) -> std::cmp::Ordering {
 pub fn compare_semver_slow(v1: &str, v2: &str) -> std::cmp::Ordering {
     let parts1: Vec<u32> = v1.split('.').map(|s| s.parse().unwrap()).collect();
     let parts2: Vec<u32> = v2.split('.').map(|s| s.parse().unwrap()).collect();
-    
+
     // Compare vectors
     parts1.cmp(&parts2)
 }
@@ -208,32 +208,32 @@ pub fn topological_sort<T: Clone + Eq + std::hash::Hash>(
 ) -> Result<Vec<T>, String> {
     let mut in_degree: HashMap<T, usize> = HashMap::new();
     let mut adj_list: HashMap<T, Vec<T>> = HashMap::new();
-    
+
     // Build adjacency list and calculate in-degrees
     for node in &nodes {
         in_degree.entry(node.clone()).or_insert(0);
         adj_list.entry(node.clone()).or_insert_with(Vec::new);
     }
-    
+
     for (from, to_list) in edges {
         for to in to_list {
             adj_list.entry(from.clone()).or_insert_with(Vec::new).push(to.clone());
             *in_degree.entry(to.clone()).or_insert(0) += 1;
         }
     }
-    
+
     // Kahn's algorithm
     let mut queue: VecDeque<T> = in_degree
         .iter()
         .filter(|(_, &deg)| deg == 0)
         .map(|(node, _)| node.clone())
         .collect();
-    
+
     let mut result = Vec::new();
-    
+
     while let Some(node) = queue.pop_front() {
         result.push(node.clone());
-        
+
         if let Some(neighbors) = adj_list.get(&node) {
             for neighbor in neighbors {
                 let deg = in_degree.get_mut(neighbor).unwrap();
@@ -244,12 +244,12 @@ pub fn topological_sort<T: Clone + Eq + std::hash::Hash>(
             }
         }
     }
-    
+
     // Check for cycles
     if result.len() != nodes.len() {
         return Err("Cycle detected in dependency graph".to_string());
     }
-    
+
     Ok(result)
 }
 ```
@@ -274,13 +274,13 @@ impl MmappedModel {
     pub fn load(path: &str) -> Result<Self, std::io::Error> {
         let file = File::open(path)?;
         let mmap = unsafe { Mmap::map(&file)? };
-        
+
         Ok(MmappedModel {
             mmap,
             _file: file,
         })
     }
-    
+
     pub fn weights(&self) -> &[u8] {
         &self.mmap
     }
@@ -333,38 +333,38 @@ impl AudioRingBuffer {
             tail: 0,
         }
     }
-    
+
     pub fn write(&mut self, samples: &[f32]) -> usize {
         let written = 0;
-        
+
         for &sample in samples {
             let next_tail = (self.tail + 1) % self.capacity;
-            
+
             // Check if buffer is full
             if next_tail == self.head {
                 break;
             }
-            
+
             self.buffer[self.tail] = sample;
             self.tail = next_tail;
         }
-        
+
         written
     }
-    
+
     pub fn read(&mut self, output: &mut [f32]) -> usize {
         let mut read = 0;
-        
+
         for out_sample in output {
             if self.head == self.tail {
                 break;  // Buffer empty
             }
-            
+
             *out_sample = self.buffer[self.head];
             self.head = (self.head + 1) % self.capacity;
             read += 1;
         }
-        
+
         read
     }
 }
@@ -381,7 +381,7 @@ impl DynamicAudioBuffer {
     pub fn write(&mut self, samples: &[f32]) {
         self.buffer.extend_from_slice(samples);  // May reallocate
     }
-    
+
     pub fn read(&mut self, count: usize) -> Vec<f32> {
         let result = self.buffer.drain(..count).collect();
         result

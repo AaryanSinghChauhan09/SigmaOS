@@ -79,6 +79,7 @@ impl ScancodeTranslator {
 pub struct MousePacketParser {
     state: u8,
     bytes: [u8; 3],
+    pub sensitivity: f32,
 }
 
 impl MousePacketParser {
@@ -86,7 +87,12 @@ impl MousePacketParser {
         Self {
             state: 0,
             bytes: [0; 3],
+            sensitivity: 1.0,
         }
+    }
+
+    pub fn set_sensitivity(&mut self, sensitivity: f32) {
+        self.sensitivity = sensitivity;
     }
 
     /// Push a raw byte from the PS/2 controller and return an event if packet is complete
@@ -110,19 +116,18 @@ impl MousePacketParser {
             let right = (flags & 0x02) != 0;
             let middle = (flags & 0x04) != 0;
 
-            // X and Y delta sign-extensions
-            let mut delta_x = raw_x as i32;
-            if (flags & 0x10) != 0 {
-                delta_x -= 256;
-            }
+            // X and Y delta sign-extensions with sensitivity scaling
+            let delta_x = if (flags & 0x10) != 0 {
+                (((raw_x as i32 - 256) as f32) * self.sensitivity) as i32
+            } else {
+                ((raw_x as i32) as f32 * self.sensitivity) as i32
+            };
 
-            let mut delta_y = raw_y as i32;
-            if (flags & 0x20) != 0 {
-                delta_y -= 256;
-            }
-
-            // Invert Y to match screen coordinate grids (down is positive)
-            delta_y = -delta_y;
+            let delta_y = if (flags & 0x20) != 0 {
+                -((((raw_y as i32 - 256) as f32) * self.sensitivity) as i32)
+            } else {
+                -(((raw_y as i32) as f32 * self.sensitivity) as i32)
+            };
 
             if left || right || middle {
                 return Some(InputEvent::MouseClick {
@@ -236,6 +241,23 @@ mod tests {
             InputEvent::MouseMove {
                 delta_x: 5,
                 delta_y: -10
+            }
+        );
+    }
+
+    #[test]
+    fn test_mouse_sensitivity() {
+        let mut parser = MousePacketParser::new();
+        parser.set_sensitivity(2.5);
+        assert_eq!(parser.push_byte(0x08), None);
+        assert_eq!(parser.push_byte(0x02), None);
+
+        let event = parser.push_byte(0x04).unwrap();
+        assert_eq!(
+            event,
+            InputEvent::MouseMove {
+                delta_x: 5, // 2 * 2.5
+                delta_y: -10 // - (4 * 2.5)
             }
         );
     }

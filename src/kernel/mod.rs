@@ -60,9 +60,9 @@ pub use gap_filling::{
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver,
-    AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType, LinuxAbsorptionEngine,
-    SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
+    ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
+    SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use numa_allocator::{AllocationPolicy, NodeState, NumaAllocator, NumaNode};
@@ -90,6 +90,8 @@ pub use traits::{
     NetworkStack as TraitsNetworkStack, NetworkStackMetadata as TraitsNetworkStackMetadata,
     Scheduler as TraitsScheduler, SchedulerError as TraitsSchedulerError,
     SchedulerMetadata as TraitsSchedulerMetadata,
+    DriverRegistry, DriverType, FileFlags, FileHandle, IoOperation, IoResult, LinuxHeritage,
+    MapFlags, SecureDriverWrapper, SocketDomain, SocketHandle, SocketProtocol,
 };
 pub use watchdog::{
     HardwareMonitor, MonitorThreshold, WatchdogAction, WatchdogDevice, WatchdogManager,

@@ -72,19 +72,19 @@ Shards are loaded by the Shard Loader:
 fn load_shard(shard_path: &str) -> Result<ShardHandle> {
     // 1. Load shard binary
     let binary = load_binary(shard_path)?;
-    
+
     // 2. Verify signature
     verify_signature(&binary)?;
-    
+
     // 3. Initialize shard
     let shard = Shard::new(binary)?;
-    
+
     // 4. Grant capabilities
     grant_capabilities(&shard, shard.required_capabilities())?;
-    
+
     // 5. Start shard
     shard.start()?;
-    
+
     Ok(shard.handle())
 }
 ```

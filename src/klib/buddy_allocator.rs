@@ -15,6 +15,8 @@ pub trait BuddyAllocator {
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError>;
     fn free(&mut self, block_id: BlockID, order: usize) -> Result<(), AllocError>;
     fn get_free_count(&self, order: usize) -> usize;
+    /// Linux-inspired lazy reclamation: free a page cache item or unused clean page if OOM
+    fn reclaim_pages(&mut self, target_order: usize) -> Result<(), AllocError>;
 }
 
 #[repr(C)]
@@ -23,6 +25,7 @@ pub struct Block {
     pub free: AtomicUsize,
     pub left: AtomicUsize,
     pub right: AtomicUsize,
+    pub is_cache: AtomicUsize, // 1 if occupied by reclaimable page cache/buffers, 0 otherwise
 }
 
 impl Block {
@@ -32,6 +35,7 @@ impl Block {
             free: AtomicUsize::new(1),
             left: AtomicUsize::new(0),
             right: AtomicUsize::new(0),
+            is_cache: AtomicUsize::new(0),
         }
     }
 }
@@ -69,46 +73,86 @@ impl SimpleBuddyAllocator {
 }
 
 impl BuddyAllocator for SimpleBuddyAllocator {
+    fn reclaim_pages(&mut self, target_order: usize) -> Result<(), AllocError> {
+        // Search for blocks allocated as is_cache, free them to satisfy target_order allocation
+        let mut found_reclaimable = None;
+        for (id, block_opt) in self.blocks.iter().enumerate() {
+            if let Some(block) = block_opt {
+                if block.free.load(Ordering::SeqCst) == 0 && block.is_cache.load(Ordering::SeqCst) == 1 {
+                    let order = block.order.load(Ordering::SeqCst);
+                    if order >= target_order {
+                        found_reclaimable = Some((id, order));
+                        break;
+                    }
+                }
+            }
+        }
+
+        if let Some((id, order)) = found_reclaimable {
+            // Free the cache page back to the allocator
+            self.free(id, order)?;
+            Ok(())
+        } else {
+            Err(AllocError::OutOfMemory)
+        }
+    }
+
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError> {
         if order > self.max_order.load(Ordering::SeqCst) {
             return Err(AllocError::OutOfMemory);
         }
-        
-        for current_order in order..=self.max_order.load(Ordering::SeqCst) {
-            if !self.free_lists[current_order].is_empty() {
-                let block_id = self.free_lists[current_order].remove(0);
-                
-                if current_order > order {
-                    let new_order = current_order - 1;
-                    let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-                    let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
+
+        let mut retry_count = 0;
+        loop {
+            for current_order in order..=self.max_order.load(Ordering::SeqCst) {
+                if !self.free_lists[current_order].is_empty() {
+                    let block_id = self.free_lists[current_order].remove(0);
                     
-                    let left_block = Block::new(new_order);
-                    let right_block = Block::new(new_order);
-                    
-                    if let Some(ref mut parent) = self.blocks[block_id] {
-                        parent.left.store(left_id, Ordering::SeqCst);
-                        parent.right.store(right_id, Ordering::SeqCst);
-                        parent.free.store(0, Ordering::SeqCst);
+                    if current_order > order {
+                        let new_order = current_order - 1;
+                        let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
+                        let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
+
+                        let left_block = Block::new(new_order);
+                        let right_block = Block::new(new_order);
+
+                        if let Some(ref mut parent) = self.blocks[block_id] {
+                            parent.left.store(left_id, Ordering::SeqCst);
+                            parent.right.store(right_id, Ordering::SeqCst);
+                            parent.free.store(0, Ordering::SeqCst);
+                        }
+
+                        while left_id >= self.blocks.len() {
+                            self.blocks.push(None);
+                        }
+                        while right_id >= self.blocks.len() {
+                            self.blocks.push(None);
+                        }
+
+                        self.blocks[left_id] = Some(left_block);
+                        self.blocks[right_id] = Some(right_block);
+
+                        self.free_lists[new_order].push(right_id);
+
+                        return Ok(left_id);
                     }
-                    
-                    while left_id >= self.blocks.len() { self.blocks.push(None); }
-                    while right_id >= self.blocks.len() { self.blocks.push(None); }
-                    
-                    self.blocks[left_id] = Some(left_block);
-                    self.blocks[right_id] = Some(right_block);
-                    
-                    self.free_lists[new_order].push(right_id);
-                    
-                    return Ok(left_id);
+
+                    if let Some(ref mut block) = self.blocks[block_id] {
+                        block.free.store(0, Ordering::SeqCst);
+                    }
+
+                    return Ok(block_id);
                 }
-                
-                if let Some(ref mut block) = self.blocks[block_id] {
-                    block.free.store(0, Ordering::SeqCst);
-                }
-                
-                return Ok(block_id);
             }
+
+            // If we are out of memory, try to reclaim cache pages (like Linux kswapd/lazy reclaim)
+            if retry_count == 0 {
+                if self.reclaim_pages(order).is_ok() {
+                    retry_count += 1;
+                    continue;
+                }
+            }
+            break;
         }
         
         Err(AllocError::OutOfMemory)
@@ -208,163 +252,7 @@ impl MemoryPool for SimpleBuddyAllocator {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
-        let mut write_idx = 0;
-        for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    if write_idx != i {
-                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
-                    }
-                    write_idx += 1;
-                }
-            }
-        }
-        self.len = write_idx;
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+pub use crate::klib::vec::Vec;
 
 #[cfg(test)]
 mod tests {
@@ -383,6 +271,24 @@ mod tests {
 
         assert!(allocator.free(block_1, 3).is_ok());
         assert!(allocator.free(block_2, 3).is_ok());
+    }
+
+    #[test]
+    fn test_lazy_reclaim() {
+        let mut allocator = SimpleBuddyAllocator::new(3, 8);
+
+        // Allocate all blocks
+        let b1 = allocator.allocate(2).unwrap();
+        let b2 = allocator.allocate(2).unwrap();
+
+        // Mark b1 as being used by page cache
+        if let Some(ref mut block) = allocator.blocks[b1] {
+            block.is_cache.store(1, Ordering::SeqCst);
+        }
+
+        // Next allocation of order 2 should fail due to OOM, but lazy reclaim should free b1 and succeed!
+        let b3 = allocator.allocate(2).unwrap();
+        assert_eq!(b3, b1);
     }
 
     #[test]

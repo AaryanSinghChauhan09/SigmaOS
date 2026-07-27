@@ -27,20 +27,20 @@ type PackageVerification struct {
 
 func VerifyPackage(data []byte, expectedHash string, signature []byte, publicKey ed25519.PublicKey) (*PackageVerification, error) {
     result := &PackageVerification{}
-    
+
     // Layer 1: Hash verification (integrity)
     hash := sha256.Sum256(data)
     actualHash := hex.EncodeToString(hash[:])
     if actualHash == expectedHash {
         result.HashValid = true
     }
-    
+
     // Layer 2: Signature verification (authenticity)
     if ed25519.Verify(publicKey, data, signature) {
         result.SignatureValid = true
         result.TrustedSource = true
     }
-    
+
     return result, nil
 }
 ```
@@ -72,24 +72,24 @@ func LoadSovereignKeyring() (*SovereignKeyring, error) {
     keyring := &SovereignKeyring{
         keys: make(map[string]ed25519.PublicKey),
     }
-    
+
     // Load trusted keys from secure storage
     files, err := os.ReadDir(KeyringPath)
     if err != nil {
         return nil, err
     }
-    
+
     for _, file := range files {
         keyData, err := os.ReadFile(filepath.Join(KeyringPath, file.Name()))
         if err != nil {
             continue
         }
-        
+
         var publicKey ed25519.PublicKey
         copy(publicKey, keyData)
         keyring.keys[file.Name()] = publicKey
     }
-    
+
     return keyring, nil
 }
 
@@ -121,32 +121,32 @@ func (tx *PackageTransaction) Verify() error {
     if err != nil {
         return fmt.Errorf("failed to load keyring: %w", err)
     }
-    
+
     // Get maintainer's public key
     publicKey, err := keyring.GetKey(tx.Maintainer)
     if err != nil {
         return fmt.Errorf("unknown maintainer: %w", err)
     }
-    
+
     // Perform dual-layer verification
     result, err := VerifyPackage(tx.Data, tx.Hash, tx.Signature, publicKey)
     if err != nil {
         return err
     }
-    
+
     // Reject if either layer fails
     if !result.HashValid {
         return fmt.Errorf("hash verification failed: possible corruption")
     }
-    
+
     if !result.SignatureValid {
         return fmt.Errorf("signature verification failed: possible tampering")
     }
-    
+
     if !result.TrustedSource {
         return fmt.Errorf("untrusted source: signature not from known maintainer")
     }
-    
+
     return nil
 }
 ```
@@ -175,7 +175,7 @@ func VerifyPackageInProduction(tx *PackageTransaction) error {
         if err := tx.Verify(); err != nil {
             return err
         }
-        
+
         // Additional production checks
         if tx.Maintainer == "" {
             return fmt.Errorf("production mode requires maintainer signature")

@@ -15,10 +15,21 @@ pub enum Protocol { TCP = 0, UDP = 1 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3, InvalidParameter = 4 }
 
 pub trait Socket {
@@ -73,10 +84,18 @@ impl SimpleSocket {
 }
 
 impl Socket for SimpleSocket {
-    fn id(&self) -> SocketID { self.id }
-    fn protocol(&self) -> Protocol { self.protocol }
-    fn local_port(&self) -> Port { self.local_port.load(Ordering::SeqCst) as Port }
-    fn remote_port(&self) -> Port { self.remote_port.load(Ordering::SeqCst) as Port }
+    fn id(&self) -> SocketID {
+        self.id
+    }
+    fn protocol(&self) -> Protocol {
+        self.protocol
+    }
+    fn local_port(&self) -> Port {
+        self.local_port.load(Ordering::SeqCst) as Port
+    }
+    fn remote_port(&self) -> Port {
+        self.remote_port.load(Ordering::SeqCst) as Port
+    }
 }
 
 impl BsdSocket for SimpleSocket {
@@ -386,7 +405,9 @@ impl Default for ZeroCopyNetwork {
 
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
-        ZeroCopyNetwork { dma_buffer: AtomicUsize::new(0) }
+        ZeroCopyNetwork {
+            dma_buffer: AtomicUsize::new(0),
+        }
     }
 }
 
@@ -619,10 +640,20 @@ impl<T> Default for Vec<T> {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
@@ -632,13 +663,25 @@ impl<T> Vec<T> {
             }
         }
     }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+        VecIter {
+            vec: self,
+            index: 0,
+        }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
@@ -797,6 +840,23 @@ mod tests {
 
         fw.block_port(80);
         assert!(!fw.is_allowed(80));
+    }
+
+    #[test]
+    fn test_zero_trust_port_binding() {
+        let mut stack = SimpleNetworkStack::new();
+
+        // Bind to non-privileged port (>= 1024) should succeed
+        assert!(stack.create_socket(Protocol::TCP, 8080).is_ok());
+
+        // Bind to privileged port (< 1024) should fail by default
+        assert!(stack.create_socket(Protocol::TCP, 80).is_err());
+
+        // Authorize port in firewall first
+        stack.firewall.allow_port(80);
+
+        // Bind to authorized privileged port should succeed now
+        assert!(stack.create_socket(Protocol::TCP, 80).is_ok());
     }
 
     #[test]

@@ -2,8 +2,8 @@
 
 ## Making SerenityOS/serenity Irrelevant
 
-> **Absorption Target**: https://github.com/SerenityOS/serenity  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/SerenityOS/serenity
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaKernel - Native Microkernel with Serenity-inspired GUI
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed SerenityOS by implementing a native microkern
 
 ### 1. Modern GUI Toolkit
 
-**Original**: Serenity's LibGUI with clean API  
+**Original**: Serenity's LibGUI with clean API
 **SigmaOS**: SigmaGUI with Serenity-inspired design
 
 ```rust
@@ -42,7 +42,7 @@ pub struct SigmaGUI {
 
 ### 2. Browser Engine Integration
 
-**Original**: Serenity's Ladybird browser  
+**Original**: Serenity's Ladybird browser
 **SigmaOS**: SigmaBrowser with modern web standards
 
 **Browser Features**:
@@ -57,7 +57,7 @@ pub struct SigmaGUI {
 
 ### 3. Terminal Emulator
 
-**Original**: Serenity's Terminal app  
+**Original**: Serenity's Terminal app
 **SigmaOS**: SigmaTerm with Serenity-inspired features
 
 **Terminal Features**:
@@ -72,7 +72,7 @@ pub struct SigmaGUI {
 
 ### 4. File Manager
 
-**Original**: Serenity's File Manager  
+**Original**: Serenity's File Manager
 **SigmaOS**: SigmaFileManager with Serenity-inspired design
 
 **File Manager Features**:
@@ -87,7 +87,7 @@ pub struct SigmaGUI {
 
 ### 5. Text Editor
 
-**Original**: Serenity's Text Editor  
+**Original**: Serenity's Text Editor
 **SigmaOS**: SigmaEdit with Serenity-inspired features
 
 **Editor Features**:
@@ -102,7 +102,7 @@ pub struct SigmaGUI {
 
 ### 6. System Settings
 
-**Original**: Serenity's Settings app  
+**Original**: Serenity's Settings app
 **SigmaOS**: SigmaSettings with unified configuration
 
 **Settings Features**:
@@ -140,13 +140,13 @@ pub struct SigmaGUI {
 pub mod gui {
     use sigma_graphics::gpu::GPURenderer;
     use sigma_gui::widgets::WidgetLibrary;
-    
+
     pub struct SigmaGUI {
         widget_library: WidgetLibrary,
         renderer: GPURenderer,
         theme_system: SerenityThemeSystem,
     }
-    
+
     impl SigmaGUI {
         pub fn create_widget(&self, widget_type: WidgetType) -> Widget {
             // Serenity-inspired widget creation
@@ -154,7 +154,7 @@ pub mod gui {
             let themed = self.theme_system.apply_serenity_style(widget);
             Widget::with_serenity_design(themed)
         }
-        
+
         pub fn render(&self, widget: &Widget) -> RenderedWidget {
             // Hardware-accelerated rendering
             self.renderer.render(widget)
@@ -172,7 +172,7 @@ pub mod browser {
         javascript_engine: JavaScriptEngine,
         network_stack: NetworkStack,
     }
-    
+
     impl SigmaBrowser {
         pub fn load_page(&self, url: URL) -> RenderedPage {
             // Modern web standards support

@@ -15,7 +15,7 @@ Based on UX/UI learnings from .Jules/palette.md, this document provides guidelin
 :focus-visible {
     outline: 3px solid var(--accent-color);
     outline-offset: 3px;
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.2), 
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.2),
                 0 0 15px var(--accent-glow);
 }
 
@@ -23,7 +23,7 @@ Based on UX/UI learnings from .Jules/palette.md, this document provides guidelin
 body.high-contrast-active :focus-visible {
     outline: 4px solid #ffffff;
     outline-offset: 4px;
-    box-shadow: 0 0 0 8px #000000, 
+    box-shadow: 0 0 0 8px #000000,
                 0 0 0 12px #ffffff;
 }
 ```
@@ -51,7 +51,7 @@ function renderEmptyState(query, container) {
             <h3>No results found for "${query}"</h3>
             <p class="warning-text">Your search didn't match any items</p>
             <div class="protip">
-                <strong>💡 Protip:</strong> Try different keywords, 
+                <strong>💡 Protip:</strong> Try different keywords,
                 check your spelling, or browse categories
             </div>
             <button class="action-button">
@@ -88,11 +88,11 @@ impl Compositor {
     pub fn mark_damaged(&mut self, surface_id: u64) {
         self.damaged_surfaces.insert(surface_id);
     }
-    
+
     pub fn composite_frame(&mut self) {
         // Atomically drain damaged set
         let damaged: Vec<u64> = self.damaged_surfaces.drain().collect();
-        
+
         // Only composite damaged surfaces
         for surface_id in damaged {
             self.composite_surface(surface_id);
@@ -163,15 +163,15 @@ class NeuralUI {
     async predictLayout(context) {
         // Show skeleton UI immediately
         this.showSkeleton();
-        
+
         // Run inference in background
         const prediction = await this.runInference(context);
-        
+
         // Swap layout when ready
         this.applyLayout(prediction);
         this.hideSkeleton();
     }
-    
+
     showSkeleton() {
         this.container.innerHTML = `
             <div class="skeleton-loader">

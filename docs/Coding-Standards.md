@@ -1,6 +1,6 @@
 # SigmaOS Coding Standards
 
-> **Core Principle**: "Sovereignty is the ultimate efficiency."  
+> **Core Principle**: "Sovereignty is the ultimate efficiency."
 > All code in SigmaOS must be self-contained, first-principles, and demonstrably correct.
 
 ---
@@ -32,7 +32,7 @@
 | Desktop GUI | **Nim** | Widget hierarchy via method dispatch |
 | Package manager | **Rust** | Correctness, trait-based extensibility |
 
-**Prohibited**: Python, JavaScript, Go, Java, C++ in the kernel or drivers.  
+**Prohibited**: Python, JavaScript, Go, Java, C++ in the kernel or drivers.
 C is permitted *only* as FFI glue with explicit `unsafe` documentation.
 
 ---

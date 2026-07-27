@@ -76,13 +76,23 @@ impl SyncItem for SimpleSyncItem {
 pub trait CloudSync {
     fn add_sync(&mut self, local_path: &[u8], remote_path: &[u8]) -> Result<SyncID, SyncError>;
     fn remove_sync(&mut self, id: SyncID) -> Result<(), SyncError>;
-    def sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
+    fn sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
+}
+
+/// Peer-to-Peer file synchronization and discovery (Syncthing Parity)
+pub trait PeerToPeerSync {
+    fn register_peer(&mut self, peer_id: &[u8; 32]) -> Result<(), SyncError>;
+    fn discover_peers(&self) -> usize;
+    fn exchange_blocks(&mut self, id: SyncID, peer_id: &[u8; 32]) -> Result<(), SyncError>;
 }
 
 #[repr(C)]
 pub struct SimpleCloudSync {
     pub items: Vec<Option<Box<dyn SyncItem>>>,
     pub next_id: AtomicUsize,
+    pub max_bandwidth_limit_kbps: AtomicUsize,
+    pub retry_limit: AtomicUsize,
+    pub peers: Vec<[u8; 32]>, // Registered Syncthing-like P2P peer device IDs
 }
 
 impl SimpleCloudSync {
@@ -90,7 +100,18 @@ impl SimpleCloudSync {
         SimpleCloudSync {
             items: Vec::new(),
             next_id: AtomicUsize::new(1),
+            max_bandwidth_limit_kbps: AtomicUsize::new(10240), // 10MB/s
+            retry_limit: AtomicUsize::new(3),
+            peers: Vec::new(),
         }
+    }
+
+    pub fn set_bandwidth_limit(&mut self, limit_kbps: u32) {
+        self.max_bandwidth_limit_kbps.store(limit_kbps as usize, Ordering::SeqCst);
+    }
+
+    pub fn set_retry_limit(&mut self, limit: u32) {
+        self.retry_limit.store(limit as usize, Ordering::SeqCst);
     }
 }
 
@@ -124,6 +145,22 @@ impl CloudSync for SimpleCloudSync {
             }
         }
         Err(SyncError::NotFound)
+    }
+}
+
+impl PeerToPeerSync for SimpleCloudSync {
+    fn register_peer(&mut self, peer_id: &[u8; 32]) -> Result<(), SyncError> {
+        self.peers.push(*peer_id);
+        Ok(())
+    }
+
+    fn discover_peers(&self) -> usize {
+        self.peers.len
+    }
+
+    fn exchange_blocks(&mut self, id: SyncID, _peer_id: &[u8; 32]) -> Result<(), SyncError> {
+        self.sync_now(id)?;
+        Ok(())
     }
 }
 

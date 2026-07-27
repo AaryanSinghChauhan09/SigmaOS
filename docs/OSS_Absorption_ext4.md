@@ -2,8 +2,8 @@
 
 ## Making torvalds/linux (ext4) Irrelevant
 
-> **Absorption Target**: https://github.com/torvalds/linux (ext4 filesystem)  
-> **Status**: ✅ Complete Feature Absorption  
+> **Absorption Target**: https://github.com/torvalds/linux (ext4 filesystem)
+> **Status**: ✅ Complete Feature Absorption
 > **SigmaOS Equivalent**: SigmaFS - Native POSIX-Compatible Filesystem
 
 ---
@@ -18,7 +18,7 @@ SigmaOS has absorbed and surpassed ext4 by implementing a native POSIX-compatibl
 
 ### 1. Filesystem Structure
 
-**Original**: ext4's filesystem structure  
+**Original**: ext4's filesystem structure
 **SigmaOS**: Native structure with enhanced features
 
 ```rust
@@ -42,7 +42,7 @@ pub struct SigmaFS {
 
 ### 2. Inode Management
 
-**Original**: ext4's inode system  
+**Original**: ext4's inode system
 **SigmaOS**: Native inode with enhanced features
 
 **Inode Features**:
@@ -57,7 +57,7 @@ pub struct SigmaFS {
 
 ### 3. Block Allocation
 
-**Original**: ext4's block allocation  
+**Original**: ext4's block allocation
 **SigmaOS**: Native allocation with enhanced features
 
 **Allocation Features**:
@@ -72,7 +72,7 @@ pub struct SigmaFS {
 
 ### 4. Journaling System
 
-**Original**: ext4's journaling  
+**Original**: ext4's journaling
 **SigmaOS**: Native journaling with enhanced features
 
 **Journaling Features**:
@@ -87,7 +87,7 @@ pub struct SigmaFS {
 
 ### 5. Directory Management
 
-**Original**: ext4's directory structure  
+**Original**: ext4's directory structure
 **SigmaOS**: Native directory with enhanced features
 
 **Directory Features**:
@@ -102,7 +102,7 @@ pub struct SigmaFS {
 
 ### 6. POSIX Semantics
 
-**Original**: ext4's POSIX compatibility  
+**Original**: ext4's POSIX compatibility
 **SigmaOS**: Native POSIX with enhanced features
 
 **POSIX Features**:
@@ -140,13 +140,13 @@ pub struct SigmaFS {
 pub mod filesystem {
     use sigma_fs::filesystem::FilesystemManager;
     use sigma_fs::inode::InodeManager;
-    
+
     pub struct SigmaFS {
         filesystem_manager: FilesystemManager,
         inode_manager: InodeManager,
         block_allocator: BlockAllocator,
     }
-    
+
     impl SigmaFS {
         pub fn create_filesystem(&self, config: FSConfig) -> Filesystem {
             // Native filesystem creation
@@ -167,7 +167,7 @@ pub mod journal {
         journal_recoverer: JournalRecoverer,
         compression_engine: CompressionEngine,
     }
-    
+
     impl JournalManager {
         pub fn journal_operation(&self, operation: Operation) -> JournalEntry {
             // Native journaling

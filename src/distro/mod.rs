@@ -40,4 +40,5 @@ pub use recovery::{
 pub use specialized::{
     CanFrame, DiagnosticLogTool, EcuController, EduChallenge, EduPlayground, EosUpdateNotifier,
     EosWelcomeEngine, HpcClusterJob, HpcJobState, MirrorRanker, MpiCommunicator,
+    RunitServiceManager, RumpKernelShim, ServiceStatus, RunitService,
 };

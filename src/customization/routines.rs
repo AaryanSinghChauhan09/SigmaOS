@@ -179,6 +179,141 @@ impl Theme {
     }
 }
 
+// ==========================================
+// 4. Advanced Situational Customization Engine
+// ==========================================
+
+/// Time-Based Auto-Theming Scheduler transitioning smoothly based on hours or sunrise/sunset offsets
+#[derive(Debug, Clone)]
+pub struct AutoThemeScheduler {
+    pub sunrise_hour: u8,
+    pub sunset_hour: u8,
+}
+
+impl AutoThemeScheduler {
+    pub fn new(sunrise: u8, sunset: u8) -> Self {
+        Self {
+            sunrise_hour: sunrise,
+            sunset_hour: sunset,
+        }
+    }
+
+    /// Returns the target theme name ("Light" or "Dark") based on current system hour
+    pub fn get_target_theme_for_hour(&self, hour: u8) -> &'static str {
+        if hour >= self.sunrise_hour && hour < self.sunset_hour {
+            "Light"
+        } else {
+            "Dark"
+        }
+    }
+}
+
+impl Default for AutoThemeScheduler {
+    fn default() -> Self {
+        Self::new(6, 18)
+    }
+}
+
+/// Workspace Window Grid Layout styles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WindowGridLayout {
+    Tiled,
+    Floating,
+    ThreeColumn,
+    Grid,
+}
+
+/// Workspace Window Layout Customizer
+#[derive(Debug, Clone)]
+pub struct WorkspaceLayoutCustomizer {
+    pub active_layout: WindowGridLayout,
+    pub spacing_px: u32,
+}
+
+impl WorkspaceLayoutCustomizer {
+    pub fn new() -> Self {
+        Self {
+            active_layout: WindowGridLayout::Floating,
+            spacing_px: 8,
+        }
+    }
+
+    pub fn set_layout(&mut self, layout: WindowGridLayout, spacing: u32) {
+        self.active_layout = layout;
+        self.spacing_px = spacing;
+    }
+}
+
+impl Default for WorkspaceLayoutCustomizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Situation-Aware Desktop Personalizer applying unified environments (Gaming, Developing, etc.)
+#[derive(Debug, Clone)]
+pub struct SituationalPersonalizer {
+    pub active_mode: String,
+    pub audio_volume: u8,
+    pub layout_customizer: WorkspaceLayoutCustomizer,
+}
+
+impl SituationalPersonalizer {
+    pub fn new() -> Self {
+        Self {
+            active_mode: String::from("Normal"),
+            audio_volume: 50,
+            layout_customizer: WorkspaceLayoutCustomizer::new(),
+        }
+    }
+
+    /// Triggers situational changes based on user activity context
+    pub fn activate_situational_mode(
+        &mut self,
+        mode_name: &str,
+    ) -> Result<String, CustomizationError> {
+        self.active_mode = mode_name.to_string();
+        match mode_name {
+            "Gaming" => {
+                self.audio_volume = 80;
+                self.layout_customizer
+                    .set_layout(WindowGridLayout::Tiled, 4);
+                Ok("Gaming Mode Enabled: High audio, Tiled layout, 4px spacing".to_string())
+            }
+            "Developer" => {
+                self.audio_volume = 20;
+                self.layout_customizer
+                    .set_layout(WindowGridLayout::ThreeColumn, 12);
+                Ok(
+                    "Developer Mode Enabled: Quiet audio, Three-Column layout, 12px spacing"
+                        .to_string(),
+                )
+            }
+            "Presentation" => {
+                self.audio_volume = 40;
+                self.layout_customizer
+                    .set_layout(WindowGridLayout::Floating, 16);
+                Ok(
+                    "Presentation Mode Enabled: Medium audio, Floating layout, 16px spacing"
+                        .to_string(),
+                )
+            }
+            _ => {
+                self.audio_volume = 50;
+                self.layout_customizer
+                    .set_layout(WindowGridLayout::Floating, 8);
+                Ok("Normal Mode Enabled: Default audio, Floating layout, 8px spacing".to_string())
+            }
+        }
+    }
+}
+
+impl Default for SituationalPersonalizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Customization engine
 pub struct CustomizationEngine {
     pub routines: HashMap<String, Routine>,
@@ -378,5 +513,116 @@ mod tests {
             });
         assert_eq!(routine.conditions.len(), 1);
         assert_eq!(routine.actions.len(), 1);
+    }
+
+    #[test]
+    fn test_auto_theming_schedule() {
+        let scheduler = AutoThemeScheduler::new(7, 19);
+        assert_eq!(scheduler.get_target_theme_for_hour(12), "Light");
+        assert_eq!(scheduler.get_target_theme_for_hour(6), "Dark");
+        assert_eq!(scheduler.get_target_theme_for_hour(21), "Dark");
+    }
+
+    #[test]
+    fn test_situational_personalizer() {
+        let mut personalizer = SituationalPersonalizer::new();
+        assert_eq!(personalizer.active_mode, "Normal");
+        assert_eq!(personalizer.audio_volume, 50);
+
+        let gam_res = personalizer.activate_situational_mode("Gaming").unwrap();
+        assert!(gam_res.contains("Gaming Mode Enabled"));
+        assert_eq!(personalizer.audio_volume, 80);
+        assert_eq!(
+            personalizer.layout_customizer.active_layout,
+            WindowGridLayout::Tiled
+        );
+        assert_eq!(personalizer.layout_customizer.spacing_px, 4);
+
+        let dev_res = personalizer.activate_situational_mode("Developer").unwrap();
+        assert!(dev_res.contains("Developer Mode Enabled"));
+        assert_eq!(personalizer.audio_volume, 20);
+        assert_eq!(
+            personalizer.layout_customizer.active_layout,
+            WindowGridLayout::ThreeColumn
+        );
+        assert_eq!(personalizer.layout_customizer.spacing_px, 12);
+    }
+}
+
+/// Sovereign DID (Decentralized Identifier) User Profile for Cryptographic Personalization
+#[derive(Debug, Clone)]
+pub struct SovereignDIDProfile {
+    pub did_uri: String,
+    pub username: String,
+    pub custom_accent_color: String,
+    pub cryptographic_key_fingerprint: String,
+}
+
+impl SovereignDIDProfile {
+    pub fn new(did_uri: String, username: String, accent: String) -> Self {
+        Self {
+            did_uri,
+            username,
+            custom_accent_color: accent,
+            cryptographic_key_fingerprint: "Dilithium5-Hash-8a9d10bc".to_string(),
+        }
+    }
+}
+
+/// Rural and Low-Resource Device Personalization Manager
+#[derive(Debug, Clone)]
+pub struct RuralResourcePersonalizer {
+    pub low_bandwidth_mode: bool,
+    pub offline_first_caching: bool,
+    pub ui_buffer_compression: bool,
+}
+
+impl RuralResourcePersonalizer {
+    pub fn new(rural_active: bool) -> Self {
+        Self {
+            low_bandwidth_mode: rural_active,
+            offline_first_caching: rural_active,
+            ui_buffer_compression: rural_active,
+        }
+    }
+
+    pub fn adapt_system_settings(&self, bandwidth_kbps: u32) -> String {
+        if bandwidth_kbps < 250 || self.low_bandwidth_mode {
+            "Adapted: Enabled aggressive network caching, offline-first local blocks, and high-contrast compressed displays"
+                .to_string()
+        } else {
+            "Adapted: Standard high-fidelity networking and uncompressed layout rendering active"
+                .to_string()
+        }
+    }
+}
+
+#[cfg(test)]
+mod personalization_additions_tests {
+    use super::*;
+
+    #[test]
+    fn test_did_based_personalization() {
+        let profile = SovereignDIDProfile::new(
+            "did:sigma:user123".to_string(),
+            "adv_sharma".to_string(),
+            "#FF5733".to_string(),
+        );
+        assert_eq!(profile.username, "adv_sharma");
+        assert_eq!(profile.custom_accent_color, "#FF5733");
+    }
+
+    #[test]
+    fn test_rural_personalization_high_resource() {
+        let personalizer = RuralResourcePersonalizer::new(false);
+        let status = personalizer.adapt_system_settings(5000);
+        assert!(status.contains("Standard high-fidelity"));
+    }
+
+    #[test]
+    fn test_rural_personalization_low_resource() {
+        let personalizer = RuralResourcePersonalizer::new(true);
+        let status = personalizer.adapt_system_settings(100);
+        assert!(status.contains("Adapted: Enabled aggressive"));
     }
 }

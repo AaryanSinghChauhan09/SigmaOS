@@ -1,8 +1,8 @@
 # SigmaOS UI/UX & Drivers Enhancement Roadmap 2026-2032
 
-> **Last Updated**: 2026-07-14  
-> **Status**: Active Planning  
-> **Focus**: Zenith Desktop Enhancement, Driver Ecosystem, User Experience  
+> **Last Updated**: 2026-07-14
+> **Status**: Active Planning
+> **Focus**: Zenith Desktop Enhancement, Driver Ecosystem, User Experience
 > **Target**: Production-Grade UI/UX + Hardware Support by v1.0 (Q4 2027)
 
 ---
@@ -96,7 +96,7 @@ Input Drivers
 
 #### **1.1 Zenith Compositor Core (24 hours)**
 
-**Current**: Basic Wayland, single layout (MasterStack)  
+**Current**: Basic Wayland, single layout (MasterStack)
 **Target**: Full-featured Wayland compositor with GPU acceleration
 
 **Goals**:
@@ -114,12 +114,12 @@ Input Drivers
 - Multi-monitor layout (4h)
 - GPU buffer management (4h)
 
-**Owner**: Graphics team  
+**Owner**: Graphics team
 **Effort**: 24 hours
 
 #### **1.2 Window Manager Enhancements (20 hours)**
 
-**Current**: Master-stack layout only  
+**Current**: Master-stack layout only
 **Target**: Master-stack + Floating + Tabbed + Grid
 
 **New Layouts**:
@@ -144,12 +144,12 @@ Input Drivers
 - Keyboard shortcuts (3h)
 - Snapping/alignment (3h)
 
-**Owner**: Desktop team  
+**Owner**: Desktop team
 **Effort**: 20 hours
 
 #### **1.3 Theme System v1 (18 hours)**
 
-**Current**: Hardcoded color schemes  
+**Current**: Hardcoded color schemes
 **Target**: Full theme engine with light/dark/custom modes
 
 **Theme Components**:
@@ -178,12 +178,12 @@ Input Drivers
 - Font management (3h)
 - Live reload on file change (2h)
 
-**Owner**: Design team  
+**Owner**: Design team
 **Effort**: 18 hours
 
 #### **1.4 Panel & Taskbar (16 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Configurable, customizable top/bottom panel
 
 **Features**:
@@ -206,12 +206,12 @@ Input Drivers
 - Volume/brightness (2h)
 - Network/battery (2h)
 
-**Owner**: UI team  
+**Owner**: UI team
 **Effort**: 16 hours
 
 #### **1.5 Application Launcher (18 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Modern app launcher (rofi-like + app grid)
 
 **Features**:
@@ -232,7 +232,7 @@ Input Drivers
 - Grid UI rendering (3h)
 - Keyboard/mouse control (3h)
 
-**Owner**: UI team  
+**Owner**: UI team
 **Effort**: 18 hours
 
 **Phase 1 Subtotal**: 96 hours | **Timeline**: 8 weeks
@@ -243,7 +243,7 @@ Input Drivers
 
 #### **2.1 Animations & Effects (16 hours)**
 
-**Current**: Fade in/out only  
+**Current**: Fade in/out only
 **Target**: Smooth animations for all transitions
 
 **Animations**:
@@ -263,13 +263,13 @@ Input Drivers
 - Workspace animations (3h)
 - UI element animations (3h)
 
-**Performance requirement**: 60 FPS sustained  
-**Owner**: Graphics team  
+**Performance requirement**: 60 FPS sustained
+**Owner**: Graphics team
 **Effort**: 16 hours
 
 #### **2.2 Settings/Control Center (20 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Full system settings GUI
 
 **Sections**:
@@ -294,7 +294,7 @@ Input Drivers
 - Power settings (2h)
 - Users settings (2h)
 
-**Owner**: System team  
+**Owner**: System team
 **Effort**: 20 hours
 
 #### **2.3 Accessibility Suite (24 hours)**
@@ -336,13 +336,13 @@ Input Drivers
 - Dynamic contrast adjustment (2h)
 - User testing (1h)
 
-**Owner**: Accessibility team  
-**Effort**: 24 hours  
+**Owner**: Accessibility team
+**Effort**: 24 hours
 **Requirement**: WCAG 2.1 AA compliance
 
 #### **2.4 Notifications System (12 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Desktop notification center
 
 **Features**:
@@ -362,12 +362,12 @@ Input Drivers
 - Notification center UI (3h)
 - Persistence & history (3h)
 
-**Owner**: UI team  
+**Owner**: UI team
 **Effort**: 12 hours
 
 #### **2.5 Keyboard & Input Customization (16 hours)**
 
-**Current**: Basic PS/2 support  
+**Current**: Basic PS/2 support
 **Target**: Full customization
 
 **Features**:
@@ -387,7 +387,7 @@ Input Drivers
 - Touchpad support (3h)
 - IME framework (2h)
 
-**Owner**: Input team  
+**Owner**: Input team
 **Effort**: 16 hours
 
 **Phase 2 Subtotal**: 88 hours | **Timeline**: 10 weeks
@@ -432,12 +432,12 @@ Input Drivers
 - AI integration (8h)
 - Testing & refinement (2h)
 
-**Owner**: AI/UX team  
+**Owner**: AI/UX team
 **Effort**: 24 hours
 
 #### **3.2 Virtual Desktops / Workspaces (16 hours)**
 
-**Current**: Single workspace  
+**Current**: Single workspace
 **Target**: 9 workspaces with smart management
 
 **Features**:
@@ -458,12 +458,12 @@ Input Drivers
 - Gesture support (3h)
 - Persistence (3h)
 
-**Owner**: Desktop team  
+**Owner**: Desktop team
 **Effort**: 16 hours
 
 #### **3.3 Screen Locker & Lock Screen (12 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Beautiful, secure lock screen
 
 **Features**:
@@ -491,12 +491,12 @@ Input Drivers
 - Security/timeout (3h)
 - Testing (3h)
 
-**Owner**: Security/UI team  
+**Owner**: Security/UI team
 **Effort**: 12 hours
 
 #### **3.4 Wallpaper & Visual Customization (12 hours)**
 
-**Current**: Hardcoded background  
+**Current**: Hardcoded background
 **Target**: Rich customization
 
 **Features**:
@@ -517,12 +517,12 @@ Input Drivers
 - Color extraction (2h)
 - Animated support (2h)
 
-**Owner**: Design team  
+**Owner**: Design team
 **Effort**: 12 hours
 
 #### **3.5 Screensaver & DPMS (8 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Configurable screensaver
 
 **Modes**:
@@ -545,12 +545,12 @@ Input Drivers
 - DPMS integration (2h)
 - Settings UI (2h)
 
-**Owner**: Desktop team  
+**Owner**: Desktop team
 **Effort**: 8 hours
 
 #### **3.6 Application Menu & Context Menus (8 hours)**
 
-**Current**: Nothing  
+**Current**: Nothing
 **Target**: Full right-click context menus
 
 **Window Context Menu**:
@@ -579,7 +579,7 @@ Input Drivers
 - Desktop menus (2h)
 - Taskbar menus (2h)
 
-**Owner**: UI team  
+**Owner**: UI team
 **Effort**: 8 hours
 
 **Phase 3 Subtotal**: 80 hours | **Timeline**: 12 weeks
@@ -1030,7 +1030,7 @@ Docs          20h      20h      20h      60h
 TOTAL        266h     268h     150h     684h
 ```
 
-**Team Size**: 8-12 people  
+**Team Size**: 8-12 people
 **Duration**: 12-18 months (Q3 2026 → Q4 2027)
 
 ---

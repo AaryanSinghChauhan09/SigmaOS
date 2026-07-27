@@ -269,6 +269,11 @@ impl SimpleVMM {
         writable: bool,
         execute_disable: bool,
     ) -> Result<(), MemoryError> {
+        // Alignment verification check (4KB = 4096 bytes = 0xFFF mask)
+        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -314,6 +319,11 @@ impl SimpleVMM {
         phys: PhysicalAddress,
         writable: bool,
     ) -> Result<(), MemoryError> {
+        // Alignment verification check (2MB = 2,097,152 bytes = 0x1F_FFFF mask)
+        if (virt.0 & 0x1F_FFFF) != 0 || (phys.0 & 0x1F_FFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -346,6 +356,11 @@ impl SimpleVMM {
         phys: PhysicalAddress,
         writable: bool,
     ) -> Result<(), MemoryError> {
+        // Alignment verification check (1GB = 1,073,741,824 bytes = 0x3FFF_FFFF mask)
+        if (virt.0 & 0x3FFF_FFFF) != 0 || (phys.0 & 0x3FFF_FFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
 

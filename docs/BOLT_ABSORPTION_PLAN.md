@@ -305,7 +305,7 @@ By formally institutionalizing these three personas, SigmaOS establishes a conti
   - **Bad Security Code:**
     ```typescript
     // ❌ BAD: Hardcoded secret
-    const apiKey = 'sk_live_abc123...';
+    const apiKey = 'sk_live_REMOVED_FOR_SECURITY_DURING_AUDIT_PLACEHOLDER';
 
     // ❌ BAD: No input validation
     function createUser(email: string) {

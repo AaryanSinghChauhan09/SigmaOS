@@ -34,5 +34,18 @@ proc newCanonicalizer*(base: string): Canonicalizer =
 
 ---
 
-## 2. Dynamic Process Spawning
-Utilizes userland IPC messaging to request capability escalation from the microkernel security shard.
+## 2. Dynamic Process Spawning & CLI Binding
+Utilizes userland IPC messaging to request capability escalation from the microkernel security shard. Nim utilities bind cleanly to our enhanced CLI commands:
+
+```nim
+proc runCliCommand(command: string, args: seq[string]): string {.importc: "execute_cli_command".}
+
+# Secure execution of display and window manager commands
+proc configureDisplay*(output: string, scale: float) =
+  let response = runCliCommand("display", @["scale", output, $scale])
+  echo "Display Configured: ", response
+
+proc createWidget*(title: string, app_id: string, geom: string) =
+  let response = runCliCommand("window", @["create", title, app_id, geom])
+  echo "Widget Spawned: ", response
+```

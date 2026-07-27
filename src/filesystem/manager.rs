@@ -73,25 +73,25 @@ pub trait FileOperation {
 pub struct StandardFileOperation;
 
 impl FileOperation for StandardFileOperation {
-    fn copy(&self, source: &Path, destination: &Path) -> Result<(), FileManagerError> {
+    fn copy(&self, _source: &Path, _destination: &Path) -> Result<(), FileManagerError> {
         // Simulated copy operation
         // In real implementation, would use std::fs::copy
         Ok(())
     }
 
-    fn move_file(&self, source: &Path, destination: &Path) -> Result<(), FileManagerError> {
+    fn move_file(&self, _source: &Path, _destination: &Path) -> Result<(), FileManagerError> {
         // Simulated move operation
         // In real implementation, would use std::fs::rename
         Ok(())
     }
 
-    fn delete(&self, path: &Path) -> Result<(), FileManagerError> {
+    fn delete(&self, _path: &Path) -> Result<(), FileManagerError> {
         // Simulated delete operation
         // In real implementation, would use std::fs::remove_file or remove_dir_all
         Ok(())
     }
 
-    fn create_directory(&self, path: &Path) -> Result<(), FileManagerError> {
+    fn create_directory(&self, _path: &Path) -> Result<(), FileManagerError> {
         // Simulated directory creation
         // In real implementation, would use std::fs::create_dir_all
         Ok(())
@@ -457,9 +457,7 @@ mod tests {
     #[test]
     fn test_list_directory() {
         let manager = FileManager::default();
-        let items = manager
-            .list_directory(&PathBuf::from("/home/user"))
-            .unwrap();
+        let items = manager.list_directory(&PathBuf::from("/home/user")).unwrap();
         assert!(!items.is_empty());
     }
 

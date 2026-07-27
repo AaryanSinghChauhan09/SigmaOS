@@ -20,12 +20,12 @@ func ValidatePackageName(name string) error {
     if !matched {
         return fmt.Errorf("invalid package name: contains disallowed characters")
     }
-    
+
     // Enforce length limits
     if len(name) < 1 || len(name) > 64 {
         return fmt.Errorf("package name must be 1-64 characters")
     }
-    
+
     return nil
 }
 ```
@@ -51,20 +51,20 @@ func ResolvePackagePath(baseDir, packageName string) (string, error) {
     if err := ValidatePackageName(packageName); err != nil {
         return "", err
     }
-    
+
     // Use filepath.Join to construct paths
     fullPath := filepath.Join(baseDir, packageName)
-    
+
     // Verify the resolved path is within baseDir
     resolved, err := filepath.EvalSymlinks(fullPath)
     if err != nil {
         return "", err
     }
-    
+
     if !strings.HasPrefix(resolved, baseDir) {
         return "", fmt.Errorf("path traversal attempt detected")
     }
-    
+
     return resolved, nil
 }
 ```
@@ -87,7 +87,7 @@ func ExecutePackageCommand(pkgName, command string) error {
     if err := ValidatePackageName(pkgName); err != nil {
         return err
     }
-    
+
     // Use exec.Command with separate arguments (no shell expansion)
     cmd := exec.Command(command, pkgName)
     return cmd.Run()

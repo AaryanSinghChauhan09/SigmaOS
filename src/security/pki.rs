@@ -1,5 +1,3 @@
-#![no_std]
-
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -83,7 +81,12 @@ impl Certificate for SimpleCertificate {
         self.id
     }
     fn certificate_type(&self) -> CertificateType {
-        unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) }
+        match self.certificate_type.load(Ordering::SeqCst) {
+            0 => CertificateType::Root,
+            1 => CertificateType::Intermediate,
+            2 => CertificateType::EndEntity,
+            _ => CertificateType::EndEntity,
+        }
     }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
@@ -190,14 +193,6 @@ pub trait CRL {
     fn get_crl(&self) -> Vec<(CertificateID, u32)>;
 }
 
-pub type PkiError = PKIError;
-pub type PkiManager = dyn PKIManager;
-
-#[derive(Debug, Clone)]
-pub struct CertificateAuthority {
-    pub name: alloc::string::String,
-}
-
 pub struct SimpleCRL {
     pub revoked: Vec<(CertificateID, u32)>,
 }
@@ -215,6 +210,10 @@ impl Default for SimpleCRL {
         Self::new()
     }
 }
+
+pub type CertificateAuthority = SimplePKIManager;
+pub type PkiError = PKIError;
+pub type PkiManager = SimplePKIManager;
 
 impl CRL for SimpleCRL {
     fn add_to_crl(&mut self, cert_id: CertificateID, reason: u32) {
@@ -234,6 +233,10 @@ impl CRL for SimpleCRL {
         self.revoked.clone()
     }
 }
+
+pub type PkiError = PKIError;
+pub use PKIManager as PkiManager;
+pub struct CertificateAuthority;
 
 #[cfg(test)]
 mod tests {
@@ -282,3 +285,9 @@ mod tests {
         assert_eq!(current_crl[0], (101, 1));
     }
 }
+
+pub type PkiError = PKIError;
+pub type PkiManager = dyn PKIManager;
+
+#[derive(Debug, Clone)]
+pub struct CertificateAuthority;

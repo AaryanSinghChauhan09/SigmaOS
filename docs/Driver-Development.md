@@ -324,11 +324,11 @@ mod tests {
     fn test_read_write() {
         let mut driver = SimpleBlockDriver::new(DeviceId::new(0x1234, 0x5678));
         driver.init().unwrap();
-        
+
         let mut buffer = vec![0u8; 512];
         let written = driver.write(&buffer).unwrap();
         assert_eq!(written, 512);
-        
+
         let read = driver.read(&mut buffer).unwrap();
         assert_eq!(read, 512);
     }

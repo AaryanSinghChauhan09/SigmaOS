@@ -1,8 +1,8 @@
 # SigmaOS Master Development Roadmap 2026-2035
 
-> **Last Updated**: 2026-07-14  
-> **Status**: Active Planning  
-> **Version**: 2.0 (Unified Master Roadmap)  
+> **Last Updated**: 2026-07-14
+> **Status**: Active Planning
+> **Version**: 2.0 (Unified Master Roadmap)
 > **Maintained By**: @AaryanSinghChauhan09
 
 ---
@@ -153,9 +153,9 @@ Phase 7: Innovation & Advanced         (2033-2035)    ⏳ Future
 **Subtotal**: ~17 hours (1-2 weeks, 1 developer)
 
 **CI/CD Setup**:
-- [ ] Create .github/workflows/build.yml 
-- [ ] Create .github/workflows/test.yml 
-- [ ] Create .github/workflows/lint.yml 
+- [ ] Create .github/workflows/build.yml
+- [ ] Create .github/workflows/test.yml
+- [ ] Create .github/workflows/lint.yml
 - [ ] Add branch protection rules
 - [ ] Set required status checks
 
@@ -844,6 +844,6 @@ v1.0 Production Release (End 2027)
 
 ## Feedback & Updates
 
-**To contribute feedback**: 
-- File GitHub issues with label roadmap 
+**To contribute feedback**:
+- File GitHub issues with label roadmap
 - Discuss in [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)

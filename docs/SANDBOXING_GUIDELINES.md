@@ -49,10 +49,10 @@ type ApplicationLauncher struct {
 func (l *ApplicationLauncher) Launch(manifest *AppManifest) error {
     // Parse manifest capabilities
     capabilities := manifest.Capabilities
-    
+
     // Build sandbox configuration
     sandboxConfig := l.sandboxManager.BuildConfig(capabilities)
-    
+
     // Launch in sandbox
     return l.sandboxManager.Execute(manifest.Entry, sandboxConfig)
 }
@@ -81,28 +81,28 @@ func BuildBwrapCommand(manifest *AppManifest) []string {
         "--unshare-all",
         "--die-with-parent",
     }
-    
+
     // Add network capability if requested
     if manifest.HasCapability("network") {
         cmd = append(cmd, "--share-net")
     } else {
         cmd = append(cmd, "--unshare-net")
     }
-    
+
     // Add filesystem bindings from manifest
     for _, path := range manifest.Filesystem.Read {
         cmd = append(cmd, "--ro-bind", path, path)
     }
-    
+
     for _, path := range manifest.Filesystem.Write {
         cmd = append(cmd, "--bind", path, path)
     }
-    
+
     // Add device access if requested
     if manifest.HasCapability("audio") {
         cmd = append(cmd, "--dev-bind", "/dev/snd", "/dev/snd")
     }
-    
+
     cmd = append(cmd, manifest.Entry)
     return cmd
 }
@@ -132,13 +132,13 @@ func ValidateCapabilities(caps []Capability) error {
         CapMicrophone: true,
         CapFilesystem: true,
     }
-    
+
     for _, cap := range caps {
         if !allowedCaps[cap] {
             return fmt.Errorf("unknown capability: %s", cap)
         }
     }
-    
+
     return nil
 }
 ```
@@ -151,23 +151,23 @@ func ValidateCapabilities(caps []Capability) error {
 class ApplicationLauncher {
     async launchApp(appId) {
         const manifest = await this.getAppManifest(appId);
-        
+
         // Request capability approval from user
         const approved = await this.requestCapabilityApproval(manifest);
         if (!approved) {
             throw new Error('User denied capability request');
         }
-        
+
         // Launch through sandbox manager
         const result = await navigator.sigmaos.sandbox.execute(manifest);
-        
+
         if (result.success) {
             this.showNotification(`Launched ${manifest.name}`);
         } else {
             this.showError(`Failed to launch: ${result.error}`);
         }
     }
-    
+
     async requestCapabilityApproval(manifest) {
         // Show capability request dialog
         const dialog = new CapabilityDialog(manifest);
@@ -181,7 +181,7 @@ class ApplicationLauncher {
 // Unsafe: Direct execution without sandbox
 async launchApp(appId) {
     const manifest = await this.getAppManifest(appId);
-    
+
     // Blindly execute - vulnerable to malicious .desktop files
     await navigator.sigmaos.process.exec(manifest.entry);
 }
@@ -197,9 +197,9 @@ func ParseDesktopFile(path string) (*AppManifest, error) {
     if err != nil {
         return nil, err
     }
-    
+
     manifest := &AppManifest{}
-    
+
     // Extract Exec line
     for _, line := range strings.Split(string(content), "\n") {
         if strings.HasPrefix(line, "Exec=") {
@@ -212,13 +212,13 @@ func ParseDesktopFile(path string) (*AppManifest, error) {
         }
         // ... other fields
     }
-    
+
     // Require manifest file for capability declaration
     manifestPath := strings.Replace(path, ".desktop", ".json", 1)
     if _, err := os.Stat(manifestPath); os.IsNotExist(err) {
         return nil, fmt.Errorf("missing capability manifest: %s", manifestPath)
     }
-    
+
     return manifest, nil
 }
 ```

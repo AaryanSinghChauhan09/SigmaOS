@@ -1,19 +1,19 @@
 # Peripheral Manager Architecture
 
-SigmaOS utilizes an Object-Oriented Programming (OOP) driven architecture to unify the handling of peripheral devices, regardless of their hardware generation. 
+SigmaOS utilizes an Object-Oriented Programming (OOP) driven architecture to unify the handling of peripheral devices, regardless of their hardware generation.
 
 ## The `PeripheralDevice` Trait
 
 By relying on the `PeripheralDevice` trait, the operating system kernel is completely decoupled from device-specific initialization or I/O. This means that:
-- **Legacy Devices** (e.g., PS/2 Keyboards, Serial Mice) 
+- **Legacy Devices** (e.g., PS/2 Keyboards, Serial Mice)
 - **Modern Devices** (e.g., USB 3.0, PCIe devices, Thunderbolt peripherals)
 
-...are all handled via the exact same polymorphic interface in Rust. 
+...are all handled via the exact same polymorphic interface in Rust.
 
 ## Disk Space and Binary Footprint
 
-To satisfy our constraints of low disk usage, SigmaOS employs **dynamic dispatch** (`Box<dyn PeripheralDevice>`) rather than massive, aggressively monomorphized generics. 
-This limits binary bloat, ensuring that adding countless user-defined driver functions for custom hardware takes minimal extra storage space. 
+To satisfy our constraints of low disk usage, SigmaOS employs **dynamic dispatch** (`Box<dyn PeripheralDevice>`) rather than massive, aggressively monomorphized generics.
+This limits binary bloat, ensuring that adding countless user-defined driver functions for custom hardware takes minimal extra storage space.
 
 ## Implementing a User-Defined Driver
 

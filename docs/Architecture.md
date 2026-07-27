@@ -20,14 +20,14 @@ graph TB
         App2[Applications]
         App3[Applications]
     end
-    
+
     subgraph "Optional Shards"
         Zenith[Zenith Compositor]
         Desktop[Desktop Shell]
         LLM[LLM Integration]
         Pkg[Package Manager]
     end
-    
+
     subgraph "Essential Shards"
         GPU[GPU Driver]
         Storage[Storage Driver]
@@ -35,7 +35,7 @@ graph TB
         Network[Network Driver]
         Input[Input Driver]
     end
-    
+
     subgraph "Core Shards"
         MM[S-MM Memory Manager]
         Sched[S-SCHED Scheduler]
@@ -45,27 +45,27 @@ graph TB
         SEC[S-SEC Security Manager]
         SYS[S-SYS Syscall Interface]
     end
-    
+
     subgraph "Kernel"
         Microkernel[Microkernel]
         Hardware[Hardware Abstraction]
     end
-    
+
     App1 --> SYS
     App2 --> SYS
     App3 --> SYS
-    
+
     Zenith --> GPU
     Desktop --> Input
     LLM --> MM
     Pkg --> FS
-    
+
     GPU --> Hardware
     Storage --> Hardware
     Audio --> Hardware
     Network --> Hardware
     Input --> Hardware
-    
+
     MM --> Microkernel
     Sched --> Microkernel
     Net --> Microkernel
@@ -73,7 +73,7 @@ graph TB
     IPC --> Microkernel
     SEC --> Microkernel
     SYS --> Microkernel
-    
+
     Microkernel --> Hardware
 ```
 
@@ -92,19 +92,19 @@ graph LR
         VM[Virtual Memory]
         IRQ[Interrupt Handling]
     end
-    
+
     subgraph "Core Shards"
         MM[Memory Manager]
         Sched[Scheduler]
         FS[Filesystem]
         Net[Network Stack]
     end
-    
+
     Thread --> Cap
     IPC --> Cap
     VM --> Cap
     IRQ --> Thread
-    
+
     MM --> VM
     Sched --> Thread
     FS --> IPC
@@ -123,17 +123,17 @@ graph TB
         Revocation[Revocation]
         Audit[Audit Trail]
     end
-    
+
     subgraph "Operations"
         Grant[Grant Capability]
         Revoke[Revoke Capability]
         Check[Check Access]
     end
-    
+
     Cap --> Rights
     Cap --> Revocation
     Cap --> Audit
-    
+
     Grant --> Cap
     Revoke --> Revocation
     Check --> Rights
@@ -160,7 +160,7 @@ sequenceDiagram
     participant Loader as Shard Loader
     participant Shard as Shard
     participant Cap as Capability System
-    
+
     App->>Sys: Load Shard Request
     Sys->>Loader: Load Shard
     Loader->>Shard: Initialize
@@ -180,23 +180,23 @@ graph TB
     subgraph "Shard A"
         Service[Service Interface]
     end
-    
+
     subgraph "Shard B"
         Client[Client Interface]
     end
-    
+
     subgraph "Communication"
         CapChannel[Capability Channel]
         SharedMem[Shared Memory]
         Events[Event Notifications]
     end
-    
+
     Client --> CapChannel
     Service --> CapChannel
-    
+
     Client --> SharedMem
     Service --> SharedMem
-    
+
     Client --> Events
     Service --> Events
 ```
@@ -212,19 +212,19 @@ graph TB
         Paging[Paging System]
         CapMem[Capability Memory]
     end
-    
+
     subgraph "Operations"
         Alloc[Allocate Memory]
         Free[Free Memory]
         Map[Map Pages]
         Unmap[Unmap Pages]
     end
-    
+
     Alloc --> Buddy
     Free --> Buddy
     Map --> Paging
     Unmap --> Paging
-    
+
     Alloc --> CapMem
     Map --> CapMem
 ```
@@ -239,13 +239,13 @@ graph TB
         Affinity[CPU Affinity]
         Balance[Load Balancing]
     end
-    
+
     subgraph "Task States"
         Running[Running]
         Ready[Ready]
         Blocked[Blocked]
     end
-    
+
     EEVDF --> Running
     EEVDF --> Ready
     RT --> Running
@@ -263,11 +263,11 @@ graph TB
         IP[IP Layer]
         Firewall[Zero-Trust Firewall]
     end
-    
+
     subgraph "Essential"
         NetDriver[Network Driver]
     end
-    
+
     TCP --> IP
     UDP --> IP
     IP --> Firewall
@@ -284,15 +284,15 @@ graph TB
         FAT32[FAT32]
         NTFS[NTFS]
     end
-    
+
     subgraph "Essential"
         StorageDriver[Storage Driver]
     end
-    
+
     VFS --> Ext4
     VFS --> FAT32
     VFS --> NTFS
-    
+
     Ext4 --> StorageDriver
     FAT32 --> StorageDriver
     NTFS --> StorageDriver
@@ -308,11 +308,11 @@ graph TB
         Sync[Sync/Async]
         ZeroCopy[Zero-Copy]
     end
-    
+
     subgraph "Security"
         CapIPC[Capability IPC]
     end
-    
+
     MsgPass --> CapIPC
     SharedMem --> CapIPC
     Sync --> CapIPC
@@ -329,12 +329,12 @@ graph TB
         Audit[Audit Logging]
         Crypto[Post-Quantum Crypto]
     end
-    
+
     subgraph "Cryptography"
         Kyber[Kyber-1024 KEM]
         Dilithium[Dilithium-5 Signatures]
     end
-    
+
     CapMgmt --> Access
     Access --> Audit
     Crypto --> Kyber
@@ -351,15 +351,15 @@ graph TB
         Monitor[Performance Monitor]
         Filter[Syscall Filter]
     end
-    
+
     subgraph "Applications"
         App1[Application 1]
         App2[Application 2]
     end
-    
+
     App1 --> Syscall
     App2 --> Syscall
-    
+
     Syscall --> CapCheck
     Syscall --> Monitor
     Syscall --> Filter
@@ -377,11 +377,11 @@ graph TB
         Framebuffer[Framebuffer Management]
         Accel[2D/3D Acceleration]
     end
-    
+
     subgraph "Hardware"
         GPU[NVIDIA/AMD/Intel GPU]
     end
-    
+
     Init --> GPU
     ModeSet --> GPU
     Framebuffer --> GPU
@@ -398,12 +398,12 @@ graph TB
         BlockIO[Block I/O]
         Queue[I/O Queue]
     end
-    
+
     subgraph "Hardware"
         SSD[NVMe SSD]
         HDD[AHCI HDD]
     end
-    
+
     NVMe --> SSD
     AHCI --> HDD
     BlockIO --> Queue
@@ -419,11 +419,11 @@ graph TB
         Capture[PCM Capture]
         Mixer[Mixer Controls]
     end
-    
+
     subgraph "Hardware"
         Audio[Audio Codec]
     end
-    
+
     Codec --> Audio
     PCM --> Audio
     Capture --> Audio
@@ -440,12 +440,12 @@ graph TB
         RX[Packet RX]
         DMA[DMA Operations]
     end
-    
+
     subgraph "Hardware"
         Eth[Ethernet NIC]
         WiFi[WiFi Adapter]
     end
-    
+
     NIC --> Eth
     NIC --> WiFi
     TX --> DMA
@@ -462,13 +462,13 @@ graph TB
         Touch[Touchscreen Driver]
         HID[HID Protocol]
     end
-    
+
     subgraph "Hardware"
         KB[USB Keyboard]
         MouseDev[USB Mouse]
         TouchDev[Touchscreen]
     end
-    
+
     Keyboard --> KB
     Mouse --> MouseDev
     Touch --> TouchDev
@@ -489,18 +489,18 @@ graph TB
         Revocation[Revocation]
         LeastPrivilege[Least Privilege]
     end
-    
+
     subgraph "Enforcement"
         Kernel[Kernel Enforcement]
         Shard[Shard Enforcement]
         Audit[Audit Trail]
     end
-    
+
     DefaultDeny --> Kernel
     ExplicitGrant --> Kernel
     Revocation --> Shard
     LeastPrivilege --> Shard
-    
+
     Kernel --> Audit
     Shard --> Audit
 ```
@@ -514,13 +514,13 @@ graph TB
         Dilithium[Dilithium-5 Signatures]
         Hybrid[Hybrid Mode]
     end
-    
+
     subgraph "Use Cases"
         KeyExchange[Key Exchange]
         Signing[Digital Signatures]
         Auth[Authentication]
     end
-    
+
     Kyber --> KeyExchange
     Dilithium --> Signing
     Hybrid --> Auth
@@ -538,7 +538,7 @@ graph TB
         Optional[Optional Shards]
         Desktop[Desktop Environment]
     end
-    
+
     Core --> Essential
     Essential --> Optional
     Optional --> Desktop
@@ -552,7 +552,7 @@ graph TB
         Core[Core Shards Only]
         Minimal[Minimal Footprint]
     end
-    
+
     Core --> Minimal
 ```
 
@@ -566,7 +566,7 @@ graph TB
         CloudInit[Cloud-Init]
         SSH[SSH Access]
     end
-    
+
     Core --> Essential
     Essential --> CloudInit
     Essential --> SSH
@@ -583,7 +583,7 @@ sequenceDiagram
     participant Core as Core Shards
     participant Essential as Essential Shards
     participant User as User Space
-    
+
     Boot->>Kernel: Load Kernel
     Kernel->>Kernel: Initialize
     Kernel->>Core: Load Core Shards
@@ -603,7 +603,7 @@ sequenceDiagram
     participant Cap as S-SEC
     participant Shard as Core Shard
     participant Kernel as Microkernel
-    
+
     App->>Sys: System Call
     Sys->>Cap: Check Capability
     Cap->>Sys: Access Granted
@@ -625,16 +625,16 @@ graph LR
         Cap[Capability Access]
         Direct[Direct Access]
     end
-    
+
     subgraph "Benefits"
         Perf[Performance]
         Latency[Low Latency]
         CPU[Low CPU Usage]
     end
-    
+
     Shared --> Cap
     Cap --> Direct
-    
+
     Direct --> Perf
     Direct --> Latency
     Direct --> CPU
@@ -650,17 +650,17 @@ graph TB
         Fair[Fairness]
         RT[Real-Time Support]
     end
-    
+
     subgraph "Benefits"
         O1[O1 Scheduling]
         LowLat[Low Latency]
         Predictable[Predictable]
     end
-    
+
     Virtual --> Eligible
     Eligible --> Fair
     Fair --> RT
-    
+
     Eligible --> O1
     RT --> LowLat
     Fair --> Predictable
@@ -678,13 +678,13 @@ graph TB
         Auto[Auto-Tuning]
         SelfHeal[Self-Healing]
     end
-    
+
     subgraph "Targets"
         Kernel[Kernel Parameters]
         Sched[Scheduler Tuning]
         Resource[Resource Allocation]
     end
-    
+
     Genetic --> Kernel
     RL --> Sched
     Auto --> Resource
@@ -701,17 +701,17 @@ graph TB
         Adaptive[Adaptive Resources]
         Predictive[Predictive Maintenance]
     end
-    
+
     subgraph "Benefits"
         Opt[Optimized Performance]
         Power[Power Efficiency]
         Smart[Smart Resource Use]
     end
-    
+
     NPU --> ML
     ML --> Adaptive
     Adaptive --> Predictive
-    
+
     ML --> Opt
     Adaptive --> Power
     Predictive --> Smart

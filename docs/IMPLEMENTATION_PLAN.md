@@ -20,7 +20,7 @@ This document outlines the implementation strategy for absorbing 100+ open sourc
 
 ### 2. Package Management from Nix/Guix
 
-**Status**: 🟡 In Progress  
+**Status**: 🟡 In Progress
 **Target Directory**: `sigma-pkg/`, `sigmapkg/`
 **Implementation**:
 

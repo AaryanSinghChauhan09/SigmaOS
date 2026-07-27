@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 pub const SHA256_HASH_SIZE: usize = 32;
 pub const DILITHIUM5_SIGNATURE_SIZE: usize = 64;
@@ -42,7 +42,11 @@ impl SigmaFsCasEngine {
     }
 
     /// Verifies Dilithium-5 Post-Quantum signature (simulated)
-    pub fn verify_pqc_signature(&self, data: &[u8], signature: &[u8; DILITHIUM5_SIGNATURE_SIZE]) -> bool {
+    pub fn verify_pqc_signature(
+        &self,
+        data: &[u8],
+        signature: &[u8; DILITHIUM5_SIGNATURE_SIZE],
+    ) -> bool {
         // Simulated verification - in production would use actual Dilithium-5 verification
         !signature.is_empty() && !data.is_empty()
     }
@@ -92,7 +96,11 @@ impl SigmaFsCasEngine {
     }
 
     /// Reads a block from CAS by its content hash
-    pub fn read_block(&self, hash: &[u8; SHA256_HASH_SIZE], buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn read_block(
+        &self,
+        hash: &[u8; SHA256_HASH_SIZE],
+        buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
         for (idx, block_opt) in self.storage_pool.iter().enumerate() {
             if let Some(ref block) = block_opt {
                 if block.hash == *hash {
@@ -125,7 +133,8 @@ impl SigmaFsCasEngine {
 
     /// Gets the total storage usage in bytes
     pub fn storage_usage(&self) -> usize {
-        self.storage_pool.iter()
+        self.storage_pool
+            .iter()
             .filter_map(|b| b.as_ref())
             .map(|b| b.data_length)
             .sum()
@@ -147,7 +156,7 @@ mod tests {
         let engine = SigmaFsCasEngine::new([0u8; 32]);
         let data = b"Hello, SigmaOS!";
         let hash = engine.compute_sha256(data);
-        
+
         assert_ne!(hash, [0u8; SHA256_HASH_SIZE]);
     }
 
@@ -156,7 +165,7 @@ mod tests {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let data = b"Test data block";
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         let hash = engine.store_block(data, &signature).unwrap();
         assert_eq!(engine.block_count(), 1);
     }
@@ -166,11 +175,11 @@ mod tests {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let data = b"Test data block";
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         let hash = engine.store_block(data, &signature).unwrap();
         let mut buffer = [0u8; 1024];
         let len = engine.read_block(&hash, &mut buffer).unwrap();
-        
+
         assert_eq!(len, data.len());
         assert_eq!(&buffer[..len], data);
     }
@@ -180,10 +189,10 @@ mod tests {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let data = b"Duplicate data";
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         let hash1 = engine.store_block(data, &signature).unwrap();
         let hash2 = engine.store_block(data, &signature).unwrap();
-        
+
         assert_eq!(hash1, hash2);
         assert_eq!(engine.block_count(), 1); // Should only store once
     }
@@ -193,10 +202,10 @@ mod tests {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let data = b"Test data";
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         let hash = engine.store_block(data, &signature).unwrap();
         engine.delete_block(&hash).unwrap();
-        
+
         assert_eq!(engine.block_count(), 0);
     }
 
@@ -205,7 +214,7 @@ mod tests {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let data = b"Test data";
         let signature = [0u8; DILITHIUM5_SIGNATURE_SIZE]; // Invalid signature
-        
+
         let result = engine.store_block(data, &signature);
         assert!(result.is_err());
     }
@@ -215,7 +224,7 @@ mod tests {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let large_data = vec![0u8; 1025]; // Exceeds 1024 byte limit
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         let result = engine.store_block(&large_data, &signature);
         assert!(result.is_err());
     }
@@ -224,13 +233,13 @@ mod tests {
     fn test_storage_pool_full() {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         // Fill the pool (16 blocks)
         for i in 0..16 {
             let data = format!("Block {}", i);
             engine.store_block(data.as_bytes(), &signature).unwrap();
         }
-        
+
         // Try to add one more
         let result = engine.store_block(b"Extra block", &signature);
         assert!(result.is_err());
@@ -240,10 +249,10 @@ mod tests {
     fn test_storage_usage() {
         let mut engine = SigmaFsCasEngine::new([0u8; 32]);
         let signature = [1u8; DILITHIUM5_SIGNATURE_SIZE];
-        
+
         engine.store_block(b"Block 1", &signature).unwrap();
         engine.store_block(b"Block 2", &signature).unwrap();
-        
+
         let usage = engine.storage_usage();
         assert_eq!(usage, 14); // "Block 1" (7) + "Block 2" (7)
     }
