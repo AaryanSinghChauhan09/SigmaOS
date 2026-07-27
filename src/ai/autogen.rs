@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// Intent/Message structures for Multi-Agent AutoGen Simulation
+// Inspired by Microsoft AutoGen multi-agent conversational interfaces.
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -23,6 +23,19 @@ pub enum AutoGenError {
     ExecutionFailed = 2,
     GroupChatFull = 3,
     SandboxViolation = 4,
+}
+
+/// Helper byte-level search function
+fn contains_bytes(haystack: &[u8], needle: &[u8]) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    haystack
+        .windows(needle.len())
+        .any(|window| window == needle)
 }
 
 /// Message payload representing a chat transmission between AutoGen Agents
@@ -125,7 +138,7 @@ impl ConversableAgent {
         let last_content = &last_msg.content[..last_msg.content_len];
 
         // Trigger function calling simulation if message asks to calculate or fetch stats
-        let is_tool_request = last_content.windows(4).any(|w| w == b"calc" || w == b"fetch");
+        let is_tool_request = contains_bytes(last_content, b"calc") || contains_bytes(last_content, b"fetch");
         if is_tool_request && self.tools.len() > 0 {
             let tool = &self.tools[0];
             let mut reply_content = [0u8; 128];
@@ -219,7 +232,7 @@ impl SandboxCodeExecutor {
     /// Verifies if a generated command/code matches safety criteria before executing in Ring 3
     pub fn execute_code_sandboxed(&self, code: &[u8]) -> Result<Vec<u8>, AutoGenError> {
         // Block obvious exploits or privilege escalations
-        let has_escalation = code.windows(7).any(|w| w == b"root" || w == b"sudo") || code.windows(5).any(|w| w == b"chmod");
+        let has_escalation = contains_bytes(code, b"root") || contains_bytes(code, b"sudo") || contains_bytes(code, b"chmod");
         if has_escalation {
             return Err(AutoGenError::SandboxViolation);
         }
@@ -251,7 +264,7 @@ mod tests {
         let reply = agent.generate_reply().unwrap();
         assert!(reply.content_len > 0);
         let content = &reply.content[..reply.content_len];
-        assert!(content.windows(11).any(|w| w == b"calculator"));
+        assert!(contains_bytes(content, b"calculator"));
     }
 
     #[test]

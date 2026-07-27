@@ -19,7 +19,10 @@ pub use spec::{
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
+pub use rpm_compat::{
+    PackageSourceFormat, RpmPackageTranslator, SpecMetadata,
+    MockChrootBuilder, DnfTransactionManager, KickstartParser,
+};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;

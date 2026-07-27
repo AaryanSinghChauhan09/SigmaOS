@@ -826,4 +826,27 @@ mod tests {
         settings.update_timezone("Asia/Kolkata");
         assert_eq!(settings.active_timezone, "Asia/Kolkata");
     }
+
+    #[test]
+    fn test_manjaro_style_hardware_and_settings_parity() {
+        let mut hw_detector = SigmaHardwareDetector::new();
+        let devices = vec![
+            (0x10DE, 0x2204), // NVIDIA RTX RTX 3090/4090
+            (0x8086, 0x1533), // Intel E1000
+            (0xFFFF, 0xFFFF), // Unknown Hardware
+        ];
+        let loaded_count = hw_detector.scan_and_load_drivers(&devices);
+        assert_eq!(loaded_count, 2);
+        assert!(hw_detector.loaded_drivers.contains(&"nvidia-pcie-gen6"));
+        assert!(hw_detector.loaded_drivers.contains(&"e1000e-ethernet"));
+
+        let mut settings = SigmaSettingsManager::new();
+        assert_eq!(settings.active_kernel, "Sovereign-LTS-6.1");
+        assert!(settings.switch_kernel("Sovereign-RT-6.6").is_ok());
+        assert_eq!(settings.active_kernel, "Sovereign-RT-6.6");
+        assert!(settings.switch_kernel("Unknown-Kernel").is_err());
+
+        settings.update_timezone("Asia/Kolkata");
+        assert_eq!(settings.active_timezone, "Asia/Kolkata");
+    }
 }
