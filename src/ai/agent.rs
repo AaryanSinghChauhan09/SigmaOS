@@ -298,7 +298,7 @@ impl SimpleAIAgent {
         }
 
         // WiFi connection checks
-        if self.contains_bytes(input, b"connect") && self.contains_bytes(input, b"wifi") {
+        if self.contains_bytes(input, b"connect") && (self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi")) {
             let mut out = Vec::new();
             for &b in b"sigma-wifi connect --ssid Home" { out.push(b); }
             return Ok(out);
@@ -614,9 +614,22 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+#[cfg(not(test))]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
+}
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn free(ptr: *mut u8) {
+    // In test mocks, avoid raw deallocation layout tracking to prevent alignment panics
 }
 
 #[cfg(test)]
@@ -634,16 +647,16 @@ mod tests {
         let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
 
         let install_en = agent.translate_natural_command(b"install libreoffice").unwrap();
-        assert_eq!(install_en, b"sigpkg install libreoffice");
+        assert_eq!(&install_en[..], b"sigpkg install libreoffice");
 
         let install_hi = agent.translate_natural_command(b"libreoffice install karo").unwrap();
-        assert_eq!(install_hi, b"sigpkg install libreoffice");
+        assert_eq!(&install_hi[..], b"sigpkg install libreoffice");
 
         let disk_usage = agent.translate_natural_command(b"show my disk usage").unwrap();
-        assert_eq!(disk_usage, b"df -h");
+        assert_eq!(&disk_usage[..], b"df -h");
 
         let wifi_connect = agent.translate_natural_command(b"connect to WiFi Home").unwrap();
-        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+        assert_eq!(&wifi_connect[..], b"sigma-wifi connect --ssid Home");
     }
 
     #[test]

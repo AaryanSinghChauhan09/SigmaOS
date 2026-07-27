@@ -14,6 +14,10 @@ pub struct VmConfig {
     pub network_enabled: bool,
     pub gpu_passthrough: bool,
     pub os_type: OsType,
+    // Distro-inspired Virtualization Enhancements
+    pub cpu_pinning_cores: Vec<u32>,
+    pub hugepages_enabled: bool,
+    pub vfio_pci_passthrough_address: Option<String>,
 }
 
 /// OS type
@@ -484,8 +488,14 @@ mod tests {
             network_enabled: true,
             gpu_passthrough: false,
             os_type: OsType::Linux,
+            cpu_pinning_cores: vec![0, 1],
+            hugepages_enabled: true,
+            vfio_pci_passthrough_address: Some("0000:01:00.0".to_string()),
         };
         assert_eq!(config.name, "Test VM");
+        assert_eq!(config.cpu_pinning_cores.len(), 2);
+        assert!(config.hugepages_enabled);
+        assert_eq!(config.vfio_pci_passthrough_address.unwrap(), "0000:01:00.0");
     }
 
     #[test]
@@ -517,6 +527,9 @@ mod tests {
             network_enabled: true,
             gpu_passthrough: false,
             os_type: OsType::Linux,
+            cpu_pinning_cores: Vec::new(),
+            hugepages_enabled: false,
+            vfio_pci_passthrough_address: None,
         };
         let vm_id = manager.create_vm(config).unwrap();
         assert!(!vm_id.is_empty());
@@ -533,6 +546,9 @@ mod tests {
             network_enabled: true,
             gpu_passthrough: false,
             os_type: OsType::Linux,
+            cpu_pinning_cores: Vec::new(),
+            hugepages_enabled: false,
+            vfio_pci_passthrough_address: None,
         };
         let vm_id = manager.create_vm(config).unwrap();
         manager.start_vm(&vm_id).unwrap();

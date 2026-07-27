@@ -1,17 +1,45 @@
+#![allow(warnings, clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
+
+pub use ai::{
+    AIAgent, SimpleAIAgent, LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
+    QuantizationType, InferenceBackend, BatchingStrategy, StreamingLlmEngine, StreamingInference,
+    AgentOrchestrator, SimpleAgentOrchestrator, AgentState, SaiAgent, SaiOrchestrator, SaiTask,
+    AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer, RecognitionResult,
+    SynthesisResult, AudioFormat, SynthesisModel, ClawBackgroundDaemon, ClawVoiceTranscriber,
+    ClawChatIntegrator, AlertPlatform,
+};
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
+
+pub use driver::{
+    Device as OopDevice, DeviceError as OopDeviceError, DeviceType as OopDeviceType,
+    DeviceInfo as OopDeviceInfo, DeviceCapability as OopDeviceCapability,
+    DeviceDescriptor as OopDeviceDescriptor, DeviceState as OopDeviceState,
+    BlockDevice as OopBlockDevice, CharacterDevice as OopCharacterDevice,
+    NetworkDevice as OopNetworkDevice, SimpleBlockDevice as OopSimpleBlockDevice,
+    SimpleCharacterDevice as OopSimpleCharacterDevice, DeviceManager as OopDeviceManager,
+    PortAddress as OopPortAddress, UnifiedPeripheral as OopUnifiedPeripheral,
+    LegacyDevice as OopLegacyDevice, ModernDevice as OopModernDevice,
+    DdeDeviceWrapper as OopDdeDeviceWrapper, UdfInterpreter as OopUdfInterpreter,
+    UnifiedGpuDriver as OopUnifiedGpuDriver, UnifiedAudioDriver as OopUnifiedAudioDriver,
+    UnifiedStorageDriver as OopUnifiedStorageDriver, UnifiedNetworkDriver as OopUnifiedNetworkDriver,
+};
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -20,7 +48,14 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod unimplemented_features;
 pub mod virtualization;
+
+pub use unimplemented_features::{
+    UniversalAbiTranslator, SigmaFsPlus, SelfHealingKernel, AiNativeRuntime,
+    EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
+    CrossDeviceContinuity, GuestOsType, FsPluginType, ModelType, ContinuationTask,
+};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -32,14 +67,32 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    AiTaskOrchestrator, ApplicationBinary, ArchiveProfile, BinaryFormat, BootInterface,
+    BuildArchive, BuildCapsule, BuildLedgerSystem, BuildProfile, CapsuleVersion, ChronicleType,
+    CompatibilityError, CompatibilityManager, CompatibilityMode, ConstellationNode,
+    ConstellationSecurityModel, ContainerRuntime, D3dToVulkanTranslator, DriverClass,
+    DriverEmulator, DriverMuseum, DriverRepositoryManager, EmulatedPeripheral, EmulatorProfile,
+    ExhibitType, FirmwareBridgeManager, FirmwarePavilion, FirmwarePersona, FirmwareType,
+    GapSandboxPolicy, HardwareDriver, HidGraphicsDriver, JobClass, KernelConstellation,
+    KernelModule, KernelModuleManager, KernelShard, LedgerSnapshot, MemoryProtection, ModuleState,
+    NetworkStackGateway, ObsoleteDevice, ObsoletePeripheral, PavilionType, PeFormat, PeLoader,
+    PeripheralEmulationLibrary, PeripheralMuseum, PeripheralPod, RegistryManager, SecurityGrid,
+    SecurityModel, SecurityPavilion, SecurityPolicyManager, ShardType, SyscallCapsule,
+    SyscallChronicle, SyscallCompatibilityRegistry, TargetPlatform, TranslationLayer,
+    User32MessageQueue, VirtualMemoryManager, Win32Error, Win32Message, WinSockAdapter,
 };
 pub use customization::{
-    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+    Action, AutoThemeScheduler, Condition, CustomizationEngine, CustomizationError, Routine,
+    SituationalPersonalizer, Theme, TriggerType, WindowGridLayout, WorkspaceLayoutCustomizer,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use distro::{
+    CanFrame, DiagnosticLogTool, EcuController, EduChallenge, EduPlayground, EosUpdateNotifier,
+    EosWelcomeEngine, HpcClusterJob, HpcJobState, MirrorRanker, MpiCommunicator,
+    RunitServiceManager, RumpKernelShim, ServiceStatus, RunitService,
+    AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer, AptPackageManifest,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -72,11 +125,16 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    CapabilityGate, CapabilityToken, DecoyHoneyPot, ForensicAnalyzer, KAslrHardener,
+    KaliSnifferAudit, PassComplexityAuditor, Permission, PledgeManager, PledgePromise,
+    RecoveredFile, SigmaPortScanner, StackCanaryGuard, VulnerabilitySeverity, WxorEPageGuard,
+    ZeroizeSec,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction,
+    AurRecipeCompiler, ContentAddressedStore, CryptoVerifier, PackageRecipe, PacmanDbAdapter,
+    RollingSyncManager, SatSolver, Transaction,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

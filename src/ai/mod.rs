@@ -5,8 +5,13 @@ pub mod agent;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
+pub mod openclaw;
 pub mod system;
 pub mod voice;
+
+pub use openclaw::{
+    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
+};
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use llm::{
