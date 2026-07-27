@@ -7,6 +7,7 @@ pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod breakthroughs;
+pub mod generation_manager;
 
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
@@ -27,3 +28,4 @@ pub use breakthroughs::{
     UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
     EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
 };
+pub use generation_manager::{Generation, GenerationManager};
