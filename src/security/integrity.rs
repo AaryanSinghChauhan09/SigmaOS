@@ -214,6 +214,9 @@ impl Default for IntegrityStats {
     }
 }
 
+pub type IntegrityCheck = SimpleFile;
+pub type IntegrityVerifier = SimpleIntegrityMonitor;
+
 /// Simple integrity monitor (OOP: Concrete monitor class)
 pub struct SimpleIntegrityMonitor {
     pub files: Vec<Option<Box<dyn File>>>,
