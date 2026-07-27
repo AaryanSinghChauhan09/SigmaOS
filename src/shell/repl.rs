@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::io::{self, BufRead, Write};
 
 use crate::accessibility::{
@@ -27,6 +27,23 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
     Echo {
         message: String,
     },
@@ -54,33 +71,6 @@ pub enum ShellCommand {
     },
     AgentRun {
         task_id: usize,
-    },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
-    Theme {
-        theme_name: String,
-    },
-    Profile {
-        profile_name: String,
-    },
-    A11y {
-        feature: String,
-        state: String,
     },
     Unknown(String),
 }
@@ -131,18 +121,15 @@ impl Default for AgentAutomationEngine {
 
 /// Shell REPL
 pub struct ShellRepl {
-    pub running: bool,
-    pub variables: std::collections::HashMap<String, String>,
-    pub aliases: std::collections::HashMap<String, String>,
-    pub prompt: String,
-    pub agent_engine: AgentAutomationEngine,
-    pub current_user: String,
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    aliases: std::collections::HashMap<String, String>,
+    prompt: String,
+    agent_engine: AgentAutomationEngine,
     pub current_dir: String,
+    pub current_user: String,
     pub services: std::collections::HashMap<String, String>,
     pub installed_packages: std::collections::HashSet<String>,
-    pub current_theme: String,
-    pub current_profile: String,
-    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -151,19 +138,21 @@ impl ShellRepl {
         services.insert("cron".to_string(), "Running".to_string());
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+        installed_packages.insert("sigma-vim".to_string());
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
-            current_user: "ubuntu".to_string(),
-            current_dir: "/home/ubuntu".to_string(),
+            current_dir: "/home/user".to_string(),
+            current_user: "user".to_string(),
             services,
-            installed_packages: std::collections::HashSet::new(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
+            installed_packages,
         }
     }
 
@@ -306,34 +295,6 @@ impl ShellRepl {
                     ShellCommand::Apt {
                         subcommand,
                         package,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        theme_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        profile_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -561,19 +522,6 @@ impl ShellRepl {
                 } else {
                     Err(format!("apt: Unknown command '{}'", subcommand))
                 }
-            }
-            ShellCommand::Theme { theme_name } => {
-                self.current_theme = theme_name.clone();
-                Ok(format!("Theme set to {}", theme_name))
-            }
-            ShellCommand::Profile { profile_name } => {
-                self.current_profile = profile_name.clone();
-                Ok(format!("Profile set to {}", profile_name))
-            }
-            ShellCommand::A11y { feature, state } => {
-                let is_on = state == "on" || state == "true";
-                self.a11y_features.insert(feature.clone(), is_on);
-                Ok(format!("A11y feature {} set to {}", feature, state))
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {

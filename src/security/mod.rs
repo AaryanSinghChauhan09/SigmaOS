@@ -10,11 +10,9 @@ pub mod phantom;
 pub mod pki;
 pub mod pledge;
 pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
+pub mod parrot_parity;
 
-pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
@@ -35,4 +33,8 @@ pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
     PenetrationAssistant,
+};
+pub use parrot_parity::{
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };

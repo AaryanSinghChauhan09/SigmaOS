@@ -10,7 +10,6 @@ pub mod transaction;
 pub mod verifier;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
