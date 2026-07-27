@@ -1,10 +1,8 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
-pub mod arch_compat;
 pub mod recipe;
 pub mod resolver;
-pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
@@ -16,17 +14,11 @@ pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
+    major: u64,
+    minor: u64,
+    patch: u64,
 }
 
 impl Version {
@@ -39,33 +31,28 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        // Optimized to be entirely allocation-free by using inline parsing with iterators.
-        // This avoids heap-allocated collections like Vec inside utility version parsing.
-        let mut parts = version_str.split('.');
-
-        let major = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        let minor = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        let patch = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        if parts.next().is_some() {
+        let parts: Vec<&str> = version_str.split('.').collect();
+        if parts.len() != 3 {
             return Err(ParseError::InvalidFormat);
         }
 
+        let major = parts[0]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = parts[1]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let patch = parts[2]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+
         Ok(Version::new(major, minor, patch))
+    }
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
@@ -113,24 +100,6 @@ impl Package {
     }
 }
 
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
 /// Package dependency
 #[derive(Debug, Clone)]
 pub struct Dependency {
@@ -139,7 +108,7 @@ pub struct Dependency {
 }
 
 /// Version constraint
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),

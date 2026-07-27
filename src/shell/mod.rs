@@ -1,4 +1,5 @@
 // SigmaOS Shell Module
+pub mod command;
 pub mod repl;
 pub mod command;
 
