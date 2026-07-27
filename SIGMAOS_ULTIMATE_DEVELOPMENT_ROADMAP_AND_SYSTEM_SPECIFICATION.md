@@ -606,6 +606,81 @@ impl SovereignPipe {
 }
 ```
 
+### 4.11 Sovereign Partitioning and Disk Utility (S-FDISK / S-PART)
+
+Traditional disk partitioning utilities, notably **fdisk**, **gdisk**, and **parted**, are prone to silent block alignment failures, lack transaction-level crash protections, and store partition definitions inside vulnerable, raw sectors (MBR, standard GPT tables) easily targetable by rootkits, partition-table viruses, or boot-block ransomware.
+
+SigmaOS implements **S-FDISK** (Sovereign Partitioning Utility) and **S-PART** (Sovereign Partition Engine), a secure, zero-dependency `#![no_std]` OOP partition utility designed to completely replace legacy tools. S-FDISK leverages post-quantum signatures and automatic block alignment algorithms to manage solid-state media with maximum durability and security.
+
+```
++-----------------------------------------------------------------------------------------+
+|                                    S-FDISK SOVEREIGN GPT (S-GPT)                        |
++-----------------------------------------------------------------------------------------+
+| [Header Signatures] -> Dilithium-5 Verified | [Sector Map] -> CAS Content-Addressed     |
++-----------------------------------------------------------------------------------------+
+|                 S-PART Partition Classes (Polymorphic Ext4, SigmaFS, NTFS)              |
++-----------------------------------------------------------------------------------------+
+|                       Automatic Physical SSD/NVMe Alignment Engine                      |
++-----------------------------------------------------------------------------------------+
+```
+
+#### A. Post-Quantum Encrypted Partition Tables (S-GPT)
+To secure the physical storage configuration, S-FDISK replaces historical partitioning layouts with the **S-GPT (Sovereign GUID Partition Table)**:
+1.  **Dilithium-5 Signature Chains:** The partition header and layout mapping registers are cryptographically signed using the owner's private Dilithium-5 signature key. The bootloader and kernel refuse to mount or read any partition whose S-GPT signature fails verification, neutralizing boot sector rootkits.
+2.  **CAS Content Address Mapping:** The location, size, and classification of partitions are tracked as content-addressed state nodes, making partition-table alteration dynamically impossible without valid security tokens.
+
+#### B. Automatic Wear-Leveling and SSD Block-Alignment Optimizers
+Writing partition blocks without aligning to physical flash page boundaries causes severe write amplification, decreasing the performance and lifespan of SSDs and NVMe devices by forcing double-write operations:
+1.  **Strict 4096-Byte Page Alignment:** S-FDISK automatically aligns partition sector bounds to integer multiples of the device's physical page size (typically 4096 bytes or larger), bypassing standard fdisk's manual boundary calculations.
+2.  **Bitwise Sector Offsets:** Alignment points are calculated natively using single-cycle bitwise masking and shifts, ensuring zero scheduling latency:
+
+$$\text{AlignedSector} = (\text{RequestedSector} + \text{PageMask}) \ \& \ \sim\text{PageMask}$$
+
+#### C. Polymorphic Partitions & Trans-Filesystem Mounting
+Partitions are modeled as Object-Oriented classes implementing the `IPartition` abstract interface, allowing the system to format, resize, and mount various filesystem geometries dynamically under consistent, uniform controls:
+*   `Ext4Partition`: Integrates with JBD2 log structures natively.
+*   `SigmaFsPartition`: Orchestrates Content-Addressed, deduplicated, and secure sector pools.
+*   `NtfsPartition`: Manages Windows-compatible metadata and NTFS cluster maps.
+
+#### D. OOP Partition & Disk Specification (Pseudocode)
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionClass {
+    SovereignSystem,
+    SecureData,
+    LegacyCompat,
+    AmnesicSwap,
+}
+
+pub struct PartitionBounds {
+    pub start_sector: u64,
+    pub total_sectors: u64,
+    pub block_size: u32,
+}
+
+pub trait IPartition {
+    fn query_bounds(&self) -> PartitionBounds;
+    fn class_type(&self) -> PartitionClass;
+    fn verify_table_signature(&self, public_key: &[u8; 32]) -> bool;
+    fn mount_partition(&mut self, target_path: &str) -> Result<(), u32>;
+}
+
+pub struct SovereignPartitionManager {
+    pub physical_sector_count: u64,
+    pub sector_page_size: u32, // e.g. 4096 bytes for SSDs
+}
+
+impl SovereignPartitionManager {
+    pub const SECTOR_ALIGNED_BYTES: u64 = 4096;
+
+    // Zero-allocation, user-defined function for automatic block boundary alignment
+    pub fn auto_align_sector_offset(&self, requested_offset: u64) -> u64 {
+        let page_mask = Self::SECTOR_ALIGNED_BYTES - 1;
+        (requested_offset + page_mask) & !page_mask
+    }
+}
+```
+
 ---
 
 ## 5. REPRODUCIBILITY & BUILDS SPECIFICATIONS
