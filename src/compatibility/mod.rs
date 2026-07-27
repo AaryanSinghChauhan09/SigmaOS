@@ -1,6 +1,7 @@
 // SigmaOS Compatibility Module
 pub mod cross_platform;
 pub mod historic_linux;
+pub mod localsend;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
@@ -16,4 +17,8 @@ pub use india_stack_localization::{IndianLanguage, LocalizationManager, Localiza
 pub use scosmos::{
     ApkLoader, BinaryFormat as ScosmosBinaryFormat, BinderCallType,
     CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
+};
+pub use localsend::{
+    LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata,
+    LocalSendSession,
 };

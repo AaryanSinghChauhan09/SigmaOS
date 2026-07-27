@@ -8,8 +8,15 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod spec;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use spec::{
+    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
+    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
+    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
+    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};

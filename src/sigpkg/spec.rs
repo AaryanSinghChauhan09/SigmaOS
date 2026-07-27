@@ -699,6 +699,63 @@ impl UniversalPackage for SnapPackageAdapter {
     }
 }
 
+/// Polymorphic Factory for creating and translating Linux system packages to SigmaOS UniversalPackages (OOP: Factory Pattern)
+pub struct PackageAdapterFactory;
+
+impl PackageAdapterFactory {
+    /// Translates raw metadata of other distro packages into corresponding UniversalPackage adapters
+    pub fn create_adapter(
+        pkg_type: UniversalPackageType,
+        name: &[u8],
+        major: u32,
+        minor: u32,
+        patch: u32,
+        metadata: &[u8],
+        hooks: Vec<UserDefinedPackageHook>,
+    ) -> Result<Box<dyn UniversalPackage>, &'static str> {
+        let version = PackageVersion::new(major, minor, patch);
+        match pkg_type {
+            UniversalPackageType::AptSubset => {
+                let mut adapter = AptPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.deb_control_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::RpmSubset => {
+                let mut adapter = RpmPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.spec_file_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::PacmanSubset => {
+                let mut adapter = PacmanPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.pkgbuild_content.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::SnapSubset => {
+                let mut adapter = SnapPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.snapcraft_yaml.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            _ => Err("Unsupported or native package type for factory mapping"),
+        }
+    }
+}
+
 /// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
@@ -805,5 +862,30 @@ mod tests {
 
         let snap_pkg = SnapPackageAdapter::new(name, version);
         assert_eq!(snap_pkg.package_type(), UniversalPackageType::SnapSubset);
+    }
+
+    #[test]
+    fn test_package_adapter_factory() {
+        let name = b"bash-deb";
+        let metadata = b"Package: bash\nVersion: 5.2\nArchitecture: amd64";
+        let mut hooks = Vec::new();
+        hooks.push(UserDefinedPackageHook {
+            hook_type: 1,
+            execute: dummy_pre_install_hook,
+        });
+
+        let adapter = PackageAdapterFactory::create_adapter(
+            UniversalPackageType::AptSubset,
+            name,
+            5,
+            2,
+            0,
+            metadata,
+            hooks,
+        ).unwrap();
+
+        assert_eq!(adapter.package_type(), UniversalPackageType::AptSubset);
+        assert_eq!(adapter.name(), name);
+        assert!(adapter.run_hook(1));
     }
 }
