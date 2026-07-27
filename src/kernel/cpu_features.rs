@@ -45,14 +45,16 @@ impl SovereignCompilerOptimizer {
                 let limit = len - rem;
                 for i in (0..limit).step_by(16) {
                     for j in 0..16 {
-                        if i + j < out.len() {
-                            out[i + j] = lhs[i + j] * rhs[i + j];
+                        let idx = i + j;
+                        if idx < len && idx < out.len() {
+                            out[idx] = lhs[idx] * rhs[idx];
                         }
                     }
                 }
-                for i in limit..len {
-                    if i < out.len() {
-                        out[i] = lhs[i] * rhs[i];
+                // Scalar fallback for remaining elements (placed outside the loop)
+                for k in limit..lhs.len() {
+                    if k < out.len() {
+                        out[k] = lhs[k] * rhs[k];
                     }
                 }
             }

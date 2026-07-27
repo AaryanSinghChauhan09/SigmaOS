@@ -192,11 +192,11 @@ mod tests {
             changelogs: vec![],
         };
 
-        let pkg_b = Package {
-            name: "B".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
+        let pkg_b = Package::new(
+            "B".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
                 name: "A".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
@@ -206,7 +206,7 @@ mod tests {
             licenses: vec![],
             maintainers: vec![],
             changelogs: vec![],
-        };
+        );
 
         solver.add_package(pkg_a);
         solver.add_package(pkg_b);
