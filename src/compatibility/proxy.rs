@@ -483,6 +483,20 @@ impl ISyscallTranslator for MacosSyscallTranslator {
     }
 }
 
+pub struct LindowsWin32Translator {
+    pub pe_loader_active: bool,
+    pub mapped_dlls: Vec<String>,
+}
+
+impl ISyscallTranslator for LindowsWin32Translator {
+    fn translate_syscall(&self, sys_num: u32, args: &[u64]) -> String {
+        format!(
+            "Lindows Win32-Parity Translated Call: PE offset #{} with args {:?}. Mapped DLLs: {:?}",
+            sys_num, args, self.mapped_dlls
+        )
+    }
+}
+
 pub struct UniversalAbiTranslator {
     pub active_platform: String,
     pub translator: Box<dyn ISyscallTranslator>,
@@ -827,6 +841,18 @@ mod tests {
         let translator = UniversalAbiTranslator::new("Linux", linux);
         let out = translator.execute(5, &[1, 2]);
         assert!(out.contains("Linux Syscall #5"));
+    }
+
+    #[test]
+    fn test_lindows_win32_translator() {
+        let lindows = Box::new(LindowsWin32Translator {
+            pe_loader_active: true,
+            mapped_dlls: vec!["kernel32.dll".to_string(), "user32.dll".to_string()],
+        });
+        let translator = UniversalAbiTranslator::new("Lindows", lindows);
+        let out = translator.execute(102, &[0x1000, 4]);
+        assert!(out.contains("Lindows Win32-Parity"));
+        assert!(out.contains("kernel32.dll"));
     }
 
     #[test]
