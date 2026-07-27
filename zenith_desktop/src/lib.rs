@@ -453,19 +453,12 @@ impl ZenithCompositor {
 
     /// Switch theme
     pub fn switch_theme(&mut self, theme_name: &str) -> Result<(), CompositorError> {
-<<<<<<< HEAD
-        let theme = (self.config.theming.theme.name == theme_name)
-            .then(|| self.config.theming.theme.clone())
-            .or_else(|| self.config.theming.custom_themes.iter().find(|t| t.name == theme_name).cloned())
-            .ok_or(CompositorError::ThemeNotFound(theme_name.to_string()))?;
-=======
-        let theme = if self.config.theming.theme.name == theme_name {
+let theme = if self.config.theming.theme.name == theme_name {
             Some(self.config.theming.theme.clone())
         } else {
             self.config.theming.custom_themes.iter().find(|t| t.name == theme_name).cloned()
         }
         .ok_or(CompositorError::ThemeNotFound(theme_name.to_string()))?;
->>>>>>> origin/main-9068296663537519830
         
         self.current_theme = theme_name.to_string();
         self.apply_theme(&theme)?;

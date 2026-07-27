@@ -75,8 +75,16 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-        // 1. Try to find a free object in existing slabs (without mutating yet)
-        let (found, slab_idx, obj_idx, object_size) = {
+        let cache_check = self.caches.get(cache_name).ok_or("Cache not found")?;
+
+        // ⚡ Bolt Optimization: If there are no known free objects across existing slabs,
+        // short-circuit the double-loop search completely and allocate a new slab directly.
+        // This avoids costly O(N * M) traversal pathways on fully saturated caches.
+        let skip_search = cache_check.free_objects == 0;
+
+        let (found, slab_idx, obj_idx, object_size) = if skip_search {
+            (false, 0, 0, cache_check.object_size)
+        } else {
             let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
             let mut res = None;
             for (s_idx, slab) in cache.slabs.iter().enumerate() {
@@ -126,7 +134,8 @@ impl SlabAllocator {
 
         let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
         cache.slabs.push(new_slab);
-        cache.free_objects = cache.objects_per_slab - 1;
+        // Correcting overwriting bug to accumulate free_objects:
+        cache.free_objects += cache.objects_per_slab - 1;
 
         Ok(obj)
     }
