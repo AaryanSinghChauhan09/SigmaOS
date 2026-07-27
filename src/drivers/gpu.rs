@@ -48,30 +48,6 @@ pub struct DrmConnector {
     pub modes: Vec<DrmModeInfo>,
 }
 
-/// GPU driver interface
-#[derive(Debug, Clone)]
-pub struct DrmModeInfo {
-    pub hdisplay: u16,
-    pub vdisplay: u16,
-}
-
-#[derive(Debug, Clone)]
-pub struct DrmCrtc {
-    pub id: u32,
-    pub x: u32,
-    pub y: u32,
-    pub width: u32,
-    pub height: u32,
-    pub active: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct DrmConnector {
-    pub id: u32,
-    pub connected: bool,
-    pub modes: Vec<DrmModeInfo>,
-}
-
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
