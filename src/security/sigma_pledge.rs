@@ -13,7 +13,7 @@
 //! sigma_pledge!(["exec", "rpath"]);
 //! ```
 
-use self::sigma_types::{CapabilityToken, Result};
+use sigma_types::{CapabilityToken, Result};
 use std::collections::HashSet;
 
 /// Pledge namespaces representing different syscall categories

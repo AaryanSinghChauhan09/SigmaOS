@@ -75,45 +75,41 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-        let cache_check = self.caches.get(cache_name).ok_or("Cache not found")?;
-
-        // ⚡ Bolt Optimization: If there are no known free objects across existing slabs,
-        // short-circuit the double-loop search completely and allocate a new slab directly.
-        // This avoids costly O(N * M) traversal pathways on fully saturated caches.
-        let skip_search = cache_check.free_objects == 0;
-
-        let (found, slab_idx, obj_idx, object_size) = if skip_search {
-            (false, 0, 0, cache_check.object_size)
-        } else {
-            let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
-            let mut res = None;
-            for (s_idx, slab) in cache.slabs.iter().enumerate() {
+        let (slab_idx, obj_idx, object_size, objects_per_slab) = {
+            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
+            let mut found = None;
+            'outer: for (s_idx, slab) in cache.slabs.iter().enumerate() {
                 if slab.state != SlabState::Full {
                     for (o_idx, obj) in slab.objects.iter().enumerate() {
                         if obj.is_none() {
-                            res = Some((true, s_idx, o_idx, cache.object_size));
-                            break;
+                            found = Some((s_idx, o_idx));
+                            break 'outer;
                         }
                     }
                 }
-                if res.is_some() {
-                    break;
-                }
             }
-            res.unwrap_or((false, 0, 0, cache.object_size))
+            if let Some((s_idx, o_idx)) = found {
+                (
+                    Some(s_idx),
+                    Some(o_idx),
+                    cache.object_size,
+                    cache.objects_per_slab,
+                )
+            } else {
+                (None, None, cache.object_size, cache.objects_per_slab)
+            }
         };
 
-        if found {
+        if let (Some(s_idx), Some(obj_idx)) = (slab_idx, obj_idx) {
             let ptr = self.allocate_memory(object_size);
-            let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
-            let slab = &mut cache.slabs[slab_idx];
-            let obj = &mut slab.objects[obj_idx];
-            *obj = Some(ptr);
+            let cache = self.caches.get_mut(cache_name).unwrap();
+            let slab = &mut cache.slabs[s_idx];
+            slab.objects[obj_idx] = Some(ptr);
             slab.inuse += 1;
             cache.free_objects -= 1;
 
             // Update slab state
-            slab.state = if slab.inuse == cache.objects_per_slab {
+            slab.state = if slab.inuse == objects_per_slab {
                 SlabState::Full
             } else if slab.inuse > 0 {
                 SlabState::Partial
@@ -125,17 +121,17 @@ impl SlabAllocator {
         }
 
         // No free objects, create a new slab
-        let (objects_per_slab, object_size) = {
-            let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
-            (cache.objects_per_slab, cache.object_size)
+        let (new_slab, objects_per_slab) = {
+            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
+            let slab = self.create_slab(cache)?;
+            (slab, cache.objects_per_slab)
         };
-        let new_slab = self.create_slab(objects_per_slab, object_size)?;
+
         let obj = new_slab.objects[0].unwrap();
 
-        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
+        let cache = self.caches.get_mut(cache_name).unwrap();
         cache.slabs.push(new_slab);
-        // Correcting overwriting bug to accumulate free_objects:
-        cache.free_objects += cache.objects_per_slab - 1;
+        cache.free_objects = objects_per_slab - 1;
 
         Ok(obj)
     }
@@ -169,15 +165,11 @@ impl SlabAllocator {
     }
 
     /// Create a new slab for a cache
-    fn create_slab(
-        &self,
-        objects_per_slab: usize,
-        object_size: usize,
-    ) -> Result<Slab, &'static str> {
-        let mut objects = Vec::with_capacity(objects_per_slab);
+    fn create_slab(&self, cache: &SlabCache) -> Result<Slab, &'static str> {
+        let mut objects = Vec::with_capacity(cache.objects_per_slab);
 
-        for _ in 0..objects_per_slab {
-            objects.push(Some(self.allocate_memory(object_size)));
+        for _ in 0..cache.objects_per_slab {
+            objects.push(Some(self.allocate_memory(cache.object_size)));
         }
 
         Ok(Slab {
@@ -188,13 +180,10 @@ impl SlabAllocator {
     }
 
     /// Allocate memory (simplified - would use actual allocator)
-    fn allocate_memory(&self, _size: usize) -> *mut u8 {
-        // For now, return a dummy pointer and increment slab ID to prevent identical pointers
-        let self_mut = self as *const Self as *mut Self;
-        unsafe {
-            (*self_mut).next_slab_id += 1;
-            (0x2000 + (*self_mut).next_slab_id as usize) as *mut u8
-        }
+    fn allocate_memory(&self, size: usize) -> *mut u8 {
+        static COUNTER: core::sync::atomic::AtomicUsize = core::sync::atomic::AtomicUsize::new(0);
+        let id = COUNTER.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+        (0x2000 + id) as *mut u8
     }
 
     /// Get cache statistics

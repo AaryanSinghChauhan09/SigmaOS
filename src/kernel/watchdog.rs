@@ -51,61 +51,11 @@ pub enum MonitorThreshold {
     DiskWarning,
 }
 
-/// Detailed state of a sovereign autonomous daemon/service shard
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DaemonState {
-    Stopped,
-    Running,
-    SelfHealing,
-    Halted,
-}
-
-/// Represents an advanced autonomous daemon/service shard (defeating legacy Linux systemd daemons)
-pub struct SovereignDaemonShard {
-    pub name: String,
-    pub state: DaemonState,
-    pub fail_count: u32,
-    pub restart_limit: u32,
-    pub cpu_budget: f32, // percentage cap
-    pub memory_budget: f32, // percentage cap
-}
-
-impl SovereignDaemonShard {
-    pub fn new(name: String, cpu_budget: f32, memory_budget: f32) -> Self {
-        Self {
-            name,
-            state: DaemonState::Running,
-            fail_count: 0,
-            restart_limit: 3,
-            cpu_budget,
-            memory_budget,
-        }
-    }
-
-    /// Simulates a failure and initiates user-defined self-healing loops (OOP strategy)
-    pub fn trigger_failure(&mut self) -> bool {
-        self.fail_count += 1;
-        if self.fail_count >= self.restart_limit {
-            self.state = DaemonState::Halted;
-            false // Hard halted - triggers Nix-style system generation rollback!
-        } else {
-            self.state = DaemonState::SelfHealing;
-            true // Successfully self-healed and restarted autonomously
-        }
-    }
-
-    pub fn reset_health(&mut self) {
-        self.state = DaemonState::Running;
-        self.fail_count = 0;
-    }
-}
-
 pub struct WatchdogManager {
     watchdogs: BTreeMap<String, WatchdogDevice>,
     active_watchdog: Option<String>,
     monitor: HardwareMonitor,
     thresholds: BTreeMap<MonitorThreshold, f32>,
-    pub daemons: Vec<SovereignDaemonShard>,
 }
 
 impl WatchdogManager {
@@ -126,10 +76,9 @@ impl WatchdogManager {
                 cpu_usage: 10.0,
                 memory_usage: 30.0,
                 disk_usage: 40.0,
-                uptime: 1,
+                uptime: 0,
             },
             thresholds,
-            daemons: Vec::new(),
         }
     }
 
@@ -158,11 +107,11 @@ impl WatchdogManager {
 
     /// Start a watchdog
     pub fn start_watchdog(&mut self, name: &str) -> Result<(), &'static str> {
-        let ts = self.get_timestamp();
+        let timestamp = self.get_timestamp();
         let watchdog = self.watchdogs.get_mut(name).ok_or("Watchdog not found")?;
 
         watchdog.state = WatchdogState::Running;
-        watchdog.last_keepalive = ts;
+        watchdog.last_keepalive = timestamp;
 
         if self.active_watchdog.is_none() {
             self.active_watchdog = Some(name.to_string());
@@ -186,14 +135,14 @@ impl WatchdogManager {
 
     /// Send keepalive to a watchdog
     pub fn keepalive(&mut self, name: &str) -> Result<(), &'static str> {
-        let ts = self.get_timestamp();
+        let timestamp = self.get_timestamp();
         let watchdog = self.watchdogs.get_mut(name).ok_or("Watchdog not found")?;
 
         if watchdog.state != WatchdogState::Running {
             return Err("Watchdog not running");
         }
 
-        watchdog.last_keepalive = ts;
+        watchdog.last_keepalive = timestamp;
         Ok(())
     }
 
@@ -314,7 +263,11 @@ impl WatchdogManager {
 
     /// Get timestamp (simplified)
     fn get_timestamp(&self) -> u64 {
-        self.monitor.uptime
+        if self.monitor.uptime == 0 {
+            1
+        } else {
+            self.monitor.uptime
+        }
     }
 }
 
@@ -431,26 +384,5 @@ mod tests {
 
         let expired = manager.check_watchdog("watchdog0").unwrap();
         assert!(expired);
-    }
-
-    #[test]
-    fn test_sovereign_daemon_self_healing_vs_systemd() {
-        let mut daemon = SovereignDaemonShard::new("network_shard".to_string(), 10.0, 512.0);
-
-        assert_eq!(daemon.state, DaemonState::Running);
-
-        // Trigger first failure (triggers autonomous OOP self-healing)
-        let healed1 = daemon.trigger_failure();
-        assert!(healed1);
-        assert_eq!(daemon.state, DaemonState::SelfHealing);
-
-        // Trigger second failure
-        let healed2 = daemon.trigger_failure();
-        assert!(healed2);
-
-        // Trigger third failure (reaches limit - hard halts and signals Nix rollback)
-        let healed3 = daemon.trigger_failure();
-        assert!(!healed3);
-        assert_eq!(daemon.state, DaemonState::Halted);
     }
 }

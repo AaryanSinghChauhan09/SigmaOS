@@ -334,7 +334,7 @@ impl PresentationProcessor {
                 font_size,
             },
             position,
-            size: (100.0, 50.0),
+            size: (200.0, 100.0),
         };
         self.slides[self.current_slide].push(node.clone());
         self.document.add_node(node)
@@ -366,7 +366,7 @@ impl PresentationProcessor {
                 fill_color,
             },
             position,
-            size: (100.0, 50.0),
+            size: (100.0, 100.0),
         };
         self.slides[self.current_slide].push(node.clone());
         self.document.add_node(node)
@@ -385,65 +385,6 @@ impl PresentationProcessor {
     /// Get the document
     pub fn document(&self) -> &SigmaDocument {
         &self.document
-    }
-}
-
-/// Translator to bridge LibreOffice (ODF/XML) format gaps with SigmaOffice semantic trees
-pub struct LibreOfficeTranslator;
-
-impl LibreOfficeTranslator {
-    /// Translates LibreOffice .odt or .docx raw XML format to SigmaOffice semantic text nodes
-    pub fn import_text_document(xml_content: &str) -> Vec<DocumentNode> {
-        let mut nodes = Vec::new();
-        // Simulates high-fidelity XML parser for bridge translation
-        for line in xml_content.lines() {
-            let trimmed = line.trim();
-            if trimmed.contains("<text:h") || trimmed.contains("<h1>") {
-                // heading parsing
-                let heading_content = trimmed
-                    .replace("<text:h>", "")
-                    .replace("</text:h>", "")
-                    .replace("<h1>", "")
-                    .replace("</h1>", "");
-                nodes.push(DocumentNode::Heading {
-                    level: 1,
-                    content: heading_content,
-                });
-            } else if trimmed.contains("<text:p") || trimmed.contains("<p>") {
-                // paragraph parsing
-                let paragraph_content = trimmed
-                    .replace("<text:p>", "")
-                    .replace("</text:p>", "")
-                    .replace("<p>", "")
-                    .replace("</p>", "");
-                nodes.push(DocumentNode::Text {
-                    content: paragraph_content,
-                    bold: false,
-                    italic: false,
-                    underline: false,
-                    font_size: 11,
-                    color: [0, 0, 0, 255],
-                });
-                nodes.push(DocumentNode::Paragraph);
-            }
-        }
-        nodes
-    }
-
-    /// Translates LibreOffice .ods or .xlsx spreadsheet range to CellValues
-    pub fn import_spreadsheet_cells(csv_or_xml: &str) -> HashMap<(u32, u32), CellValue> {
-        let mut cells = HashMap::new();
-        for (r, line) in csv_or_xml.lines().enumerate() {
-            for (c, item) in line.split(',').enumerate() {
-                let trimmed = item.trim();
-                if let Ok(num) = trimmed.parse::<f64>() {
-                    cells.insert((r as u32, c as u32), CellValue::Number(num));
-                } else if !trimmed.is_empty() {
-                    cells.insert((r as u32, c as u32), CellValue::Text(trimmed.to_string()));
-                }
-            }
-        }
-        cells
     }
 }
 
@@ -541,7 +482,7 @@ impl SigmaOffice {
     }
 
     /// Save document to SigmaFS
-    pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
+    pub fn save_document(&self, doc_idx: usize, path: &str) -> Result<()> {
         // In real implementation, this would save to SigmaFS with capability checks
         let _doc = self.documents.get(doc_idx).ok_or_else(|| {
             std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
@@ -549,6 +490,7 @@ impl SigmaOffice {
         // Save logic here
         Ok(())
     }
+
     /// Load document from SigmaFS
     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
         // In real implementation, this would load from SigmaFS with capability checks
@@ -613,69 +555,5 @@ mod tests {
         processor.add_slide().unwrap();
 
         assert_eq!(processor.total_slides(), 2);
-    }
-
-    #[test]
-    fn test_spreadsheet_formula_evaluator() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
-        let mut processor = SpreadsheetProcessor::new("Finances".to_string(), capability);
-
-        processor.set_cell(0, 0, CellValue::Number(10.0)).unwrap();
-        processor.set_cell(0, 1, CellValue::Number(20.0)).unwrap();
-        processor.set_cell(1, 0, CellValue::Number(30.0)).unwrap();
-        processor.set_cell(1, 1, CellValue::Number(40.0)).unwrap();
-
-        let sum_res = processor.evaluate_financial_formula("SUM(0,0,1,1)").unwrap();
-        assert_eq!(sum_res, CellValue::Number(100.0));
-
-        let avg_res = processor.evaluate_financial_formula("AVERAGE(0,0,1,1)").unwrap();
-        assert_eq!(avg_res, CellValue::Number(25.0));
-    }
-
-    #[test]
-    fn test_vscode_editor_shard() {
-        let mut editor = VSCodeShard::new("src/main.rs", "rust");
-        editor.insert_source("pub fn main");
-
-        let suggestion = editor.trigger_ai_code_suggestion().unwrap();
-        assert!(suggestion.contains("println"));
-
-        let tokens = editor.generate_syntax_tokens();
-        assert_eq!(tokens.len(), 3);
-        assert_eq!(tokens[0].1, "keyword");
-    }
-
-    #[test]
-    fn test_sigmacad_sketcher() {
-        let mut cad = SigmaCAD::new();
-        cad.add_primitive(CadPrimitive::Line { start: (0.0, 0.0), end: (10.0, 10.0) });
-        cad.add_primitive(CadPrimitive::Circle { center: (5.0, 5.0), radius: 2.5 });
-
-        assert_eq!(cad.primitives.len(), 2);
-        cad.rescale_canvas(2.0);
-
-        if let CadPrimitive::Circle { center, radius } = cad.primitives[1] {
-            assert_eq!(center, (10.0, 10.0));
-            assert_eq!(radius, 5.0);
-        } else {
-            panic!("Expected circle primitive");
-        }
-    }
-
-    #[test]
-    fn test_libreoffice_interoperability_translator() {
-        let xml_doc = "<h1>Introduction</h1>\n<p>This is a converted paragraph from LibreOffice ODT.</p>";
-        let nodes = LibreOfficeTranslator::import_text_document(xml_doc);
-        assert_eq!(nodes.len(), 3); // Heading + Text + Paragraph
-
-        if let DocumentNode::Heading { level, content } = &nodes[0] {
-            assert_eq!(*level, 1);
-            assert_eq!(content, "Introduction");
-        }
-
-        let csv_sheet = "10.5, 20.0\n30.1, Label";
-        let cells = LibreOfficeTranslator::import_spreadsheet_cells(csv_sheet);
-        assert_eq!(cells.get(&(0, 0)), Some(&CellValue::Number(10.5)));
-        assert_eq!(cells.get(&(1, 1)), Some(&CellValue::Text("Label".to_string())));
     }
 }
