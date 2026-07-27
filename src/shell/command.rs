@@ -2,8 +2,8 @@
 #![no_main]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
@@ -47,6 +47,76 @@ impl SimpleShellCommand {
         SimpleShellCommand {
             name: name_array,
             description: desc_array,
+        }
+    }
+}
+
+pub struct ShellVec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+impl<T> ShellVec<T> {
+    pub fn new() -> Self {
+        ShellVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
         }
     }
 }
@@ -259,10 +329,7 @@ impl ShellCommand for SigmaFindCommand {
         }
 
         // Simulate fd color/style matching
-        let matches: &[&[u8]] = &[
-            b"src/package/universal.rs",
-            b"tests/integration_test.rs",
-        ];
+        let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
 
         for text in matches {
             for &b in *text {
@@ -437,24 +504,6 @@ impl SimpleCommandRegistry {
 
         let pwd = SimpleShellCommand::new(b"pwd", b"Print working directory");
         self.commands.push(Some(Box::new(pwd)));
-
-        let sigpkg =
-            SimpleShellCommand::new(b"sigpkg", b"Manage packages (install, update, remove)");
-        self.commands.push(Some(Box::new(sigpkg)));
-
-        let sigtrace = SimpleShellCommand::new(b"sigtrace", b"System tracing control");
-        self.commands.push(Some(Box::new(sigtrace)));
-
-        let sigmetrics =
-            SimpleShellCommand::new(b"sigmetrics", b"System metrics telemetry exporter");
-        self.commands.push(Some(Box::new(sigmetrics)));
-
-        let sigstandards =
-            SimpleShellCommand::new(b"sigstandards", b"Verify POSIX and FHS compliance");
-        self.commands.push(Some(Box::new(sigstandards)));
-
-        let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
-        self.commands.push(Some(Box::new(sigsched)));
     }
 }
 
@@ -477,11 +526,9 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
-        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
-        let trimmed_name = &name[..name_len];
-        for command_option in &*self.commands {
-            if let Some(ref command) = command_option {
-                if command.name() == trimmed_name {
+        for command_option in &self.commands {
+            if let Some(ref command) = *command_option {
+                if command.name() == name {
                     return Some(command.as_ref());
                 }
             }
@@ -491,8 +538,8 @@ impl CommandRegistry for SimpleCommandRegistry {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut names = Vec::new();
-        for command_option in &*self.commands {
-            if let Some(ref command) = command_option {
+        for command_option in &self.commands {
+            if let Some(ref command) = *command_option {
                 names.push(command.name());
             }
         }
@@ -552,7 +599,7 @@ impl ShellSession for SimpleShellSession {
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &*self.environment {
+        for &(ref k, ref v) in &self.environment {
             let len = k.iter().position(|&b| b == 0).unwrap_or(64);
             if &k[..len] == key {
                 let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
@@ -625,14 +672,13 @@ impl CommandHistory for SimpleCommandHistory {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut commands = Vec::new();
-        for cmd in &*self.history {
+        for cmd in &self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
         }
         commands
     }
 }
-
 
 #[cfg(test)]
 mod tests {

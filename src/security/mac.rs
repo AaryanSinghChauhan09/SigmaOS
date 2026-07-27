@@ -75,6 +75,10 @@ impl Default for ContextCapability {
     }
 }
 
+pub type MacPolicy = dyn MACPolicy;
+pub type MacRule = PolicyInfo;
+pub type MacSecurity = SimpleMACEngine;
+
 impl SecurityContext {
     pub fn new(
         id: ContextID,

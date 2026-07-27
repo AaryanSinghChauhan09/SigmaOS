@@ -2784,11 +2784,8 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    if let Ok(layout) = Layout::from_size_align(size, 8) {
-        std_alloc(layout)
-    } else {
-        core::ptr::null_mut()
-    }
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

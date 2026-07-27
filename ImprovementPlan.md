@@ -325,3 +325,25 @@ By replacing intermediate heap allocations with lazy slice iterators, we complet
 | **Pure-Rust HTML Render** | Complete the zero-dependency HTML5 parser inside `src/net/browser_core/`. | **Medium** | Sovereign Browser |
 | **AVX Vector Optimization** | Enable AVX-512 hardware acceleration for local DeepSeek MoE inference routines. | **Medium** | AI Engine |
 | **Hardware Clock Gating** | Fully implement automatic power state gating within SOC controllers. | **Low** | Thermal & Power |
+
+---
+
+## 🔍 24. 8-Domain Master Audit & Recommendations Directory
+
+To guarantee production-readiness, SigmaOS implements specific architectural adjustments across eight key domains:
+1. **Code Quality & Testing:** Blanket warnings bypasses are replaced by selective, file-level rules. IO controllers are refactored under unified, safe port-mapped abstractions.
+2. **Performance & Optimization:** Linear page order checks in memory allocators are replaced with trail-zero instruction structures (O(1)). Iterative scheduler virtual-time checks are optimized using balanced tree structures.
+3. **Security & Compliance:** Directory traversal vulnerabilities are actively prevented by canonicalizing path structures. Cryptographic shredding is integrated into secure filesystems to enforce GDPR constraints.
+4. **Documentation & Workflow:** Comprehensive developer onboarding tutorials and step-by-step driver simulation guides are integrated into primary repositories.
+5. **Repo Governance:** Standardized triage labeling schemes are introduced to streamline bug tracking and feature staging operations.
+6. **Community & Collaboration:** Decentralized communication networks coordinate community developer efforts to securely wrap and gate new driver subclasses.
+7. **Tools & Utilities:** Automated CLI builders return detailed missing dependency alerts to streamline compiler boot-strapping loops.
+8. **Object-Oriented Design Principles:** Polymorphic trait hierarchies are established to structure custom audio, network, and storage driver layers cleanly under base hardware abstractions.
+
+---
+
+## 🎨 25. Palette & Sentinel Integration Specifications
+
+SigmaOS natively structures localized enhancements under specialized design roles:
+* **The Palette UX Layer:** All screen layout properties, window focus borders, and theme profiles are formatted as pre-allocated, Copy-safe structures, preventing screen reader stutter or visual jank in render pipelines.
+* **The Sentinel Security Layer:** Capability gates clear and mask target register properties before applying bitwise logical OR modifications, eliminating permission overlap vulnerabilities.

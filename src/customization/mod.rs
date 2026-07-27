@@ -4,5 +4,6 @@ pub mod theme;
 
 pub use routines::{
     Action, AutoThemeScheduler, Condition, CustomizationEngine, CustomizationError, Routine,
-    SituationalPersonalizer, Theme, TriggerType, WindowGridLayout, WorkspaceLayoutCustomizer,
+    RuralResourcePersonalizer, SituationalPersonalizer, SovereignDIDProfile, Theme, TriggerType,
+    WindowGridLayout, WorkspaceLayoutCustomizer,
 };

@@ -1,5 +1,4 @@
 // SigmaOS Network Stack Module
-pub mod stack;
 pub mod tcp;
 pub mod tcp_udp;
 

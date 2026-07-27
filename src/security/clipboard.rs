@@ -73,7 +73,9 @@ impl XorEncryption {
 impl ClipboardSecurity for XorEncryption {
     fn secure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
         if self.key.is_empty() {
-            return Err(ClipboardError::EncryptionError("Encryption key cannot be empty".to_string()));
+            return Err(ClipboardError::EncryptionError(
+                "Encryption key cannot be empty".to_string(),
+            ));
         }
         // Optimization: Use iterator zip with cycle, map, and collect.
         // This avoids manual vec capacity re-allocations and avoids expensive indexing/modulo operations.
@@ -88,7 +90,9 @@ impl ClipboardSecurity for XorEncryption {
 
     fn unsecure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
         if self.key.is_empty() {
-            return Err(ClipboardError::DecryptionError("Decryption key cannot be empty".to_string()));
+            return Err(ClipboardError::DecryptionError(
+                "Decryption key cannot be empty".to_string(),
+            ));
         }
         // Optimization: Use iterator zip with cycle, map, and collect.
         // This avoids manual vec capacity re-allocations and avoids expensive indexing/modulo operations.

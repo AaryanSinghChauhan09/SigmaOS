@@ -1,11 +1,10 @@
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::String;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -1442,13 +1441,8 @@ mod tests {
         let mut fs = SigmaFsCasEngine::new(trusted_key);
 
         let data = b"CONFIDENTIAL_REPRODUCIBLE_SYSTEM_IMAGE";
-        let signature: [u8; DILITHIUM5_SIGNATURE_SIZE] = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE]
-            .try_into()
-            .unwrap();
+        let mut signature = [0u8; DILITHIUM5_SIGNATURE_SIZE];
+        signature[..16].copy_from_slice(&nanos);
 
         let block_hash = fs.store_block(data, &signature).unwrap();
 
@@ -1463,21 +1457,22 @@ mod tests {
     #[test]
     fn test_ccleaner_equivalent_sweep_and_duplicate_finder() {
         let mut engine = SovereignCleanupEngine::new();
-        let hash_a: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
+        let nanos_a = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
-            .to_le_bytes()[..SHA256_HASH_SIZE]
-            .try_into()
-            .unwrap();
-        let hash_b: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
+            .to_le_bytes();
+        let mut hash_a = [0u8; SHA256_HASH_SIZE];
+        hash_a[..16].copy_from_slice(&nanos_a);
+
+        let nanos_b = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
             .wrapping_add(1)
-            .to_le_bytes()[..SHA256_HASH_SIZE]
-            .try_into()
-            .unwrap();
+            .to_le_bytes();
+        let mut hash_b = [0u8; SHA256_HASH_SIZE];
+        hash_b[..16].copy_from_slice(&nanos_b);
 
         engine.register_file_metadata(FileMetadata {
             path: "/var/tmp/session.log",

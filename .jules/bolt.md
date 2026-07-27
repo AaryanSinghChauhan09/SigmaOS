@@ -23,3 +23,15 @@ This journal contains CRITICAL performance learnings discovered during profiling
 ## 2026-07-20 - Custom Zero-Dependency LCG Utility Helpers vs. External Crate Footprint
 **Learning:** Incorporating external crates (like `rand` or `uuid`) for basic non-cryptographic telemetry IDs or random polling intervals adds immense build-time overhead, bloating the microkernel and triggering standard-library linker dependencies on host-hosted setups. Implementing a lightweight local 48-bit Linear Congruential Generator (LCG) with UNIX timestamp nanoseconds provides compile-time independence, sub-nanosecond execution speeds, and guarantees zero compilation dependencies on external environments.
 **Action:** Minimize external crate dependencies in modular kernels; prefer local mathematical utility implementations for basic simulation algorithms.
+
+## 2026-07-22 - Replacing Vector Collection with Lazy Iterators in SemVer
+**Learning:** Using heap-allocated `Vec` buffers via `split('.').collect()` for checking format and parsing minor/major/patch parts of a package version string is a classic performance bottleneck in dependency solvers. Transitioning to direct, lazy iterators on the `.split()` object completely avoids the heap allocator.
+**Action:** Never eagerly collect string slices into a dynamic array unless the elements are reused multiple times in unrelated scopes.
+
+## 2025-10-24 - NUMA-Aware Scheduling Structures
+**Learning:** Cache locality on multi-socket architectures can be significantly optimized by partitioning the CFS queues into local NUMA cores, completely avoiding cross-node memory bus transactions.
+**Action:** Use custom thread-to-node mapping algorithms within the scheduler instead of relying on standard process grouping.
+
+## 2026-07-26 - Atomic Load-Store Queue Synchronization
+**Learning:** For circular lock-free queues sharing state, using standard non-atomic indices causes compile failures and race conditions, whereas replacing them with `AtomicUsize` combined with Acquire-Release memory barriers ensures thread-safe, high-speed, and low-latency synchronization.
+**Action:** Ensure queue index operations utilize `AtomicUsize` with appropriate memory orderings rather than standard `usize` variables.

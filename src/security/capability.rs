@@ -3,6 +3,18 @@
 
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
+
+/// Permission types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp = 0,
+    NetworkUdp = 1,
+    FileRead = 2,
+    FileWrite = 3,
+    ProcessExec = 4,
+    Ipc = 5,
+}
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -11,10 +23,21 @@ pub struct CapabilityToken {
     bits: u64,
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CapabilityToken {
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
         Self { bits: 0 }
+    }
+
+    /// Create capability token from raw bits
+    pub fn from_bits(bits: u64) -> Self {
+        Self { bits }
     }
 
     /// Allow network access
@@ -30,7 +53,7 @@ impl CapabilityToken {
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
+        if path.starts_with("/var/www") || path.starts_with("/mount") {
             self.bits |= 1 << 2;
         }
         self
@@ -72,17 +95,6 @@ impl CapabilityToken {
     }
 }
 
-/// Permission types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
-}
-
 /// Capability gate for syscall validation
 pub struct CapabilityGate {
     /// Current capability token
@@ -113,6 +125,30 @@ impl CapabilityGate {
         CapabilityToken {
             bits: self.current.load(Ordering::SeqCst),
         }
+    }
+}
+
+impl Default for CapabilityGate {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SecurityEnforcer {
+    active_tokens: Vec<CapabilityToken>,
+}
+
+impl SecurityEnforcer {
+    pub fn new() -> Self {
+        Self {
+            active_tokens: Vec::new(),
+        }
+    }
+}
+
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
