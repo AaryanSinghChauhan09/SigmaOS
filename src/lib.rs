@@ -10,6 +10,7 @@ pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
+pub mod distro;
 pub mod device;
 pub mod driver;
 pub mod drivers;
@@ -207,4 +208,10 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use distro::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
 };
