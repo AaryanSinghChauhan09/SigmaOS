@@ -1050,10 +1050,26 @@ impl GanttChartPlanner {
     }
 }
 
+pub trait IPdfCompressor {
+    fn compress_pdf(&mut self, level: f32) -> Result<Vec<u8>, &'static str>;
+}
+
+pub trait IPdfMerger {
+    fn merge_documents(&mut self, other_pages: usize) -> usize;
+}
+
+pub trait IPdfSigner {
+    fn add_digital_signature(&mut self, signer_name: &str) -> String;
+}
+
 /// PDF Editor + converter [Adobe Acrobat, Foxit PDF Parity]
 pub struct PdfEditor {
     pub page_count: usize,
     pub document_version: String,
+    pub compression_ratio: f32,
+    pub is_password_protected: bool,
+    pub password_hash: Option<String>,
+    pub watermark_text: Option<String>,
 }
 
 impl PdfEditor {
@@ -1061,6 +1077,10 @@ impl PdfEditor {
         Self {
             page_count: pages,
             document_version: "PDF-1.7".to_string(),
+            compression_ratio: 1.0,
+            is_password_protected: false,
+            password_hash: None,
+            watermark_text: None,
         }
     }
 
@@ -1072,6 +1092,50 @@ impl PdfEditor {
         pdf_data.extend_from_slice(text.as_bytes());
         self.page_count += 1;
         pdf_data
+    }
+
+    pub fn split_pages(&mut self, start_page: usize, end_page: usize) -> Result<PdfEditor, &'static str> {
+        if start_page == 0 || end_page > self.page_count || start_page > end_page {
+            return Err("Invalid page range specified");
+        }
+        let pages_extracted = end_page - start_page + 1;
+        self.page_count = self.page_count.saturating_sub(pages_extracted);
+        Ok(PdfEditor::new(pages_extracted))
+    }
+
+    pub fn apply_watermark(&mut self, text: &str) {
+        self.watermark_text = Some(text.to_string());
+    }
+
+    pub fn add_password_protection(&mut self, password: &str) {
+        self.is_password_protected = true;
+        self.password_hash = Some(format!("hash_{}", password));
+    }
+}
+
+impl IPdfCompressor for PdfEditor {
+    fn compress_pdf(&mut self, level: f32) -> Result<Vec<u8>, &'static str> {
+        if level < 0.0 || level > 1.0 {
+            return Err("Invalid compression level; must be 0.0 to 1.0");
+        }
+        self.compression_ratio = level;
+        let mut compressed_data = Vec::new();
+        compressed_data.extend_from_slice(b"%PDF-COMPRESSED-");
+        compressed_data.extend_from_slice(self.document_version.as_bytes());
+        Ok(compressed_data)
+    }
+}
+
+impl IPdfMerger for PdfEditor {
+    fn merge_documents(&mut self, other_pages: usize) -> usize {
+        self.page_count = self.page_count.saturating_add(other_pages);
+        self.page_count
+    }
+}
+
+impl IPdfSigner for PdfEditor {
+    fn add_digital_signature(&mut self, signer_name: &str) -> String {
+        format!("Signed-by:{}-PDF-Signature-OK", signer_name)
     }
 }
 
@@ -2272,11 +2336,39 @@ mod tests {
     }
 
     #[test]
-    fn test_pdf_editor_converter() {
+    fn test_pdf_capabilities() {
         let mut pdf = PdfEditor::new(5);
         let stream = pdf.convert_text_to_pdf("Sovereignty");
         assert!(stream.starts_with(b"%PDF-"));
         assert_eq!(pdf.page_count, 6);
+
+        // Test splitting
+        let split_pdf = pdf.split_pages(2, 4).unwrap();
+        assert_eq!(split_pdf.page_count, 3);
+        assert_eq!(pdf.page_count, 3);
+        assert!(pdf.split_pages(1, 10).is_err());
+
+        // Test watermarking
+        pdf.apply_watermark("CONFIDENTIAL");
+        assert_eq!(pdf.watermark_text, Some("CONFIDENTIAL".to_string()));
+
+        // Test password protection
+        pdf.add_password_protection("sovereign_pwd");
+        assert!(pdf.is_password_protected);
+        assert_eq!(pdf.password_hash, Some("hash_sovereign_pwd".to_string()));
+
+        // Test compression
+        let comp_stream = pdf.compress_pdf(0.5).unwrap();
+        assert!(comp_stream.starts_with(b"%PDF-COMPRESSED-"));
+        assert_eq!(pdf.compression_ratio, 0.5);
+
+        // Test merging
+        let total_pages = pdf.merge_documents(4);
+        assert_eq!(total_pages, 7);
+
+        // Test signing
+        let signature = pdf.add_digital_signature("Aaryan");
+        assert_eq!(signature, "Signed-by:Aaryan-PDF-Signature-OK");
     }
 
     #[test]
