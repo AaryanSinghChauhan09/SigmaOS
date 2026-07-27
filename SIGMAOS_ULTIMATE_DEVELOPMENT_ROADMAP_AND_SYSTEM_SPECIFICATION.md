@@ -120,6 +120,7 @@ SigmaOS does not exist to coexist with standard Linux distributions; it exists t
 | **Alpine & Void Linux** | Glibc/musl portability conflicts; systemd-runit transition gaps; limited bare-metal graphics capabilities. | **S-VOID Runit-style Supervisor:** Direct visual blitting to Zenith framebuffers; static `#![no_std]` Micro-C shims. | Base footprint **under 10MB**; parallel microsecond boot latencies. |
 | **Tails & Whonix** | Heavy VM virtualization layers; RAM memory retention windows vulnerable to physical cold-boot forensics. | **S-AMNESIA Volatile Sandboxing:** Forensically-secured RAM-only execution frames with active zeroing loops. | 100% amnesic protection; zero persistent footprint; physical write-blocking overlays. |
 | **openKylin / Kylin OS** | Heavy Android VM translation layers (KMRE) causing severe latency; heavy desktop servers (UKUI/Wayland). | **S-KMRE Translation Shard + ZenithUKUI:** Native ART register mappings, direct framebuffer blitting. | APK applications launch **under 2ms**; fluid, lag-free sidebar widgets and customization states. |
+| **Qubes OS** | High virtual machine hypervisor latency (Xen/KVM CPU contexts); slow boots; heavy RAM duplicate allocations. | **S-QUBES Hyper-Compartmentalized Enclaves:** IOMMU-enforced userspace capsule isolation; direct secure-canvas. | **Near-zero latency context switches**; microsecond startup; 90% reduction in duplicate memory overhead. |
 
 ### 2.2 S-AMNESIA: Active Forensics Security
 
@@ -306,14 +307,74 @@ SigmaOS implements a local-first, high-performance note-taking engine (S-Notes) 
 1.  **Direct 3D Graph Blitting:** Graph nodes are stored in plain Markdown files natively linked inside `SigmaFS++`. S-Notes analyzes bi-directional node links using an $O(1)$ dynamic link graph analyzer, blitting interactive 3D connection graphs directly onto Zenith compositing framebuffers at a fluid 120 FPS.
 2.  **Kyber-1024 Secure Sync:** Markdown vaults are synchronized across decentralized nodes, fully encrypted using post-quantum Kyber-1024 keys.
 
-### 4.6 Sovereign Qubes-Style Enclave Isolation (S-QUBES)
+### 4.6 Sovereign Qubes-Style Compartmentalized Enclave System (S-QUBES)
 
-Traditional security models rely on hypervisors (such as Xen, KVM) to achieve compartmentalization, adding massive kernel footprints and context-switching overheads. SigmaOS implements **S-QUBES**, achieving hypervisor-grade isolation directly inside native userspace capsule enclaves:
+Traditional security models like Qubes OS implement "Security by Compartmentalization" using heavy hardware hypervisors (such as Xen or KVM). This requires running a complete, bloated monolithic operating system and kernel for every single browser tab, USB port, or file handler, leading to massive memory footprints, slow boot latencies, and high context-switching overheads.
 
-1.  **Hardware IOMMU Gating:** Physical controllers (such as USB ports, network adapters) are mapped directly to Ring 3 driver shards utilizing hardware IOMMU (Intel VT-d / AMD-Vi) page-table matrices managed by the microkernel. If a USB device or wireless driver is exploited, the payload remains restricted to its hardware partition.
-2.  **S-DispCapsule (Disposable Capsules):** Volatile, copy-on-write process domains designed to parse untrusted files or run web enclaves. Disposable capsules spawn in microsecond timespans, and their physical page maps are zeroed and swept by `S-AMNESIA` upon closure.
+SigmaOS implements **S-QUBES**, a microkernel-native, hyper-compartmentalized enclave system executing directly within native userspace capsule enclaves.
 
-### 4.7 Sovereign Kali-Style Security Auditing & Intrusion Pipeline (S-KALI)
+```
+       [Physical USB / Network Device] ---> [Microkernel IOMMU Page Maps]
+                                                      |
+                                                      v (Isolated DMA Access)
+                                      +-------------------------------+
+                                      |   Sovereign Capsule Enclaves  |
+                                      |   (Ring 3 Isolation Domains)  |
+                                      +-------------------------------+
+                                        /                           \
+                                       v                             v
+                         [Zenith Security Compositing]     [Disposable S-DispCapsule]
+                         - Strict Frame Color Coding       - Microsecond startup
+                         - Separate visual layers          - Amnesic RAM zeroing
+```
+
+#### A. Microkernel IOMMU Gating (Sovereign sys-usb & sys-net)
+- **Zero-Hypervisor Hardware Isolation:** S-QUBES eliminates Xen hypervisor layers entirely. Physical devices (such as xHCI USB hosts, Ethernet controllers, and sound engines) are mapped directly to isolated Ring 3 driver shards utilizing hardware IOMMU (Intel VT-d / AMD-Vi) page-table configurations managed by the microkernel. A USB or firmware exploit remains fully confined to its hardware driver slice, completely unable to read or write other system enclaves.
+- **Microsecond Inter-Enclave RPC:** Replaces the heavy Qubes-OS qrexec protocol with lock-free, zero-copy `SovereignIPC` registers, executing secure inter-enclave remote procedure calls (RPC) in under 1 microsecond.
+
+#### B. The Four-Tier Capsule Domain Architecture
+S-QUBES groups userspace execution environments into four highly specialized, polymorphic enclaves:
+1.  **Administrative Enclave (`S-Dom0`):** Coordinates core page tables, interrupt vectors, and system scheduling configurations. It is completely decoupled from standard graphic server or networking physical layers, preventing compromised drivers from threatening kernel orchestration.
+2.  **Base Templates (`S-TemplateCapsules`):** Merkle-Tree-backed read-only containers. They serve as golden software frames for all process instances. Multiple application containers reference the identical static page mappings on physical RAM, saving gigabytes of memory space.
+3.  **App Enclaves (`S-AppCapsules`):** Bounded sandboxes assigned to distinctive life contexts (Work, Personal, Untrusted, Untrusted-Web, Code-Auditing). Process nodes cannot communicate or access file regions across App enclaves unless authorized via the `SovereignIPC` transaction bus.
+4.  **Disposable Enclaves (`S-DispCapsules`):** Ephemeral execution contexts spawned on-the-fly to parse suspicious files or run untrusted browsers. Spawns within microsecond latency ranges, and its memory space is forcefully zeroed and cleared by `S-AMNESIA` upon task completion.
+
+#### C. Colored Window Frame Visual Compositing
+Zenith isolates visual windows and renders distinctive colored borders (Red for untrusted web pages, Yellow for corporate tools, Green for cryptographic vaults, Blue for personal files) directly onto the hardware display memory. Security classifications are enforced at the microkernel canvas gate, preventing visual masquerading attacks.
+
+#### D. S-QUBES Inter-Enclave File Copy & Unified Clipboard
+- **Zero-Copy Clipboard Transfer:** Copy-paste interactions between distinct domains are mediated by the `IpcManager` using capability checks. To prevent background information leakage, the microkernel blocks background reading of the clipboard canvas. A target domain must present an active user-focus token before read buffers are unlocked.
+- **Direct-Mapped File Sharing:** Transfers files across capsules by dynamically swapping COW physical pages at the page table layer, bypassing slow network socket loops.
+
+#### E. Split Cryptographic Shards (`S-SplitCrypto`)
+To match Qubes OS's `split-gpg` and `split-ssh` security:
+*   Private SSH, TLS, and PQC keys are isolated inside networkless, offline enclaves (`sys-crypto`).
+*   External communication modules (like web browsers or Git clients) cannot read or write to private key directories.
+*   Cryptographic operations (such as signing commits or executing SSL handshakes) are forwarded to the offline enclave over capability-gated RPC pipelines. The user must manually approve every cryptographic sign-off via a secure system overlay before the transaction is finalized.
+
+#### F. OOP Enclave Interface Design Pattern (Pseudocode)
+```rust
+pub enum CapsuleType {
+    Dom0,
+    Template,
+    AppVM,
+    Disposable,
+}
+
+pub struct MemoryRange {
+    pub start: u64,
+    pub length: usize,
+}
+
+pub trait ICapsule {
+    fn spawn(&mut self, cap_type: CapsuleType) -> Result<u32, u32>;
+    fn map_iommu_device(&mut self, vendor_id: u16, device_id: u16) -> Result<(), u32>;
+    fn isolate_memory(&mut self, region: MemoryRange) -> Result<(), u32>;
+    fn execute_gated_rpc(&mut self, target_capsule_id: u32, payload: &[u8]) -> Result<Vec<u8>, u32>;
+}
+```
+
+### 4.8 Sovereign Kali-Style Security Auditing & Intrusion Pipeline (S-KALI)
 
 SigmaOS implements **S-KALI**, a built-in security auditing, wireless packet injection, and deep traffic inspection system that runs within capability-gated boundaries:
 
