@@ -152,15 +152,9 @@ impl SimpleComponent {
     }
 
     pub fn get_status(&self) -> ValidationStatus {
-        {
-        let raw = self.status.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ValidationStatus::Invalid,
-            2 => ValidationStatus::Pending,
-            3 => ValidationStatus::Failed,
-            _ => ValidationStatus::Valid,
+        unsafe {
+            core::mem::transmute(self.status.load(Ordering::SeqCst))
         }
-    }
     }
 
     pub fn set_status(&self, status: ValidationStatus) {
@@ -468,19 +462,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

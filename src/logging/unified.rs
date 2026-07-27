@@ -126,7 +126,7 @@ impl TargetCapability {
         TargetCapability {
             can_write: false,
             can_flush: false,
-            can_rotate: false,
+            pub can_rotate: false,
         }
     }
 
@@ -309,16 +309,7 @@ impl UnifiedLogger for SimpleUnifiedLogger {
             return;
         }
 
-        let current_level = {
-        let raw = self.level.load(Ordering::SeqCst) as u32;
-        match raw {
-            2 => LogLevel::Info,
-            3 => LogLevel::Warning,
-            4 => LogLevel::Error,
-            5 => LogLevel::Fatal,
-            _ => LogLevel::Trace,
-        }
-    };
+        let current_level = unsafe { core::mem::transmute(self.level.load(Ordering::SeqCst)) };
         if level < current_level {
             return;
         }
@@ -348,16 +339,9 @@ impl UnifiedLogger for SimpleUnifiedLogger {
     }
 
     fn level(&self) -> LogLevel {
-        {
-        let raw = self.level.load(Ordering::SeqCst) as u32;
-        match raw {
-            2 => LogLevel::Info,
-            3 => LogLevel::Warning,
-            4 => LogLevel::Error,
-            5 => LogLevel::Fatal,
-            _ => LogLevel::Trace,
+        unsafe {
+            core::mem::transmute(self.level.load(Ordering::SeqCst))
         }
-    }
     }
 
     fn add_target(&mut self, target: Box<dyn LogTarget>) -> Result<(), LogError> {
@@ -455,19 +439,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -125,10 +125,11 @@ impl BuddyAllocator {
             current_order += 1;
         }
 
-        let mut block = match block {
-            Some(b) => b,
-            None => return ptr::null_mut(),
-        };
+        if block.is_none() {
+            return ptr::null_mut();
+        }
+
+        let mut block = block.unwrap();
         self.remove_from_free_list(block.as_ptr(), current_order);
 
         // Split block if necessary

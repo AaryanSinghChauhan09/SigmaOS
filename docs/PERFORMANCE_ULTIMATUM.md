@@ -8,9 +8,10 @@ SigmaOS has transcendently finalized its architecture for **Peak Performance See
 
 1
 
-| Metric | Industry Standard (Linux/Win) | SigmaOS Sovereign (S03/S10) | Leadership Impact |
-| :--- | :--- | :--- | :--- |
+| Metric | Industry Standard (Linux/Win) | SigmaOS Sovereign (S03/S10) | Leadership Impact | 
+| :--- | :--- | :--- | :--- | 
 
+<<<<<<< HEAD:docs/PERFORMANCE_ULTIMATUM.md
 | **Background Processes** | 150 - 300+ Active Threads | **0 Active** (On-Demand only) | No context-switch jitter. |
 
 | **Memory Resident** | 2GB - 8GB+ (Static) | **Core-Only (KB/MB)** | Full RAM available to task. |
@@ -18,6 +19,15 @@ SigmaOS has transcendently finalized its architecture for **Peak Performance See
 | **Response Time** | Interrupt dependent | **Hardware-Direct** (S04) | Micro-second task activation. |
 
 | **Power Efficiency** | Constant Background Drain | **Dynamic Pulsing** | Infinite shelf-life. |
+=======
+| **Background Processes**| 150 - 300+ Active Threads |**0 Active** (On-Demand only) | No context-switch jitter. | 
+
+| **Memory Resident**| 2GB - 8GB+ (Static) |**Core-Only (KB/MB)** | Full RAM available to task. | 
+
+| **Response Time**| Interrupt dependent |**Hardware-Direct** (S04) | Micro-second task activation. | 
+
+| **Power Efficiency**| Constant Background Drain |**Dynamic Pulsing** | Infinite shelf-life. | 
+>>>>>>> wiki/master:PERFORMANCE_ULTIMATUM.md
 
 ---
 

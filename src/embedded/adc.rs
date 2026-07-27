@@ -43,15 +43,7 @@ impl SimpleADCChannel {
 
 impl ADCChannel for SimpleADCChannel {
     fn id(&self) -> ChannelID { self.id }
-    fn resolution(&self) -> ADCResolution { {
-        let raw = self.resolution.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ADCResolution::Bits10,
-            2 => ADCResolution::Bits12,
-            3 => ADCResolution::Bits16,
-            _ => ADCResolution::Bits8,
-        }
-    } }
+    fn resolution(&self) -> ADCResolution { unsafe { core::mem::transmute(self.resolution.load(Ordering::SeqCst)) } }
     
     fn read(&self) -> u16 {
         self.value.load(Ordering::SeqCst) as u16
@@ -168,19 +160,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

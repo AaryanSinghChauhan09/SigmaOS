@@ -110,16 +110,7 @@ impl Workflow for SimpleWorkflow {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> WorkflowState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => WorkflowState::Active,
-            2 => WorkflowState::Paused,
-            3 => WorkflowState::Completed,
-            4 => WorkflowState::Failed,
-            _ => WorkflowState::Draft,
-        }
-    } }
+    fn state(&self) -> WorkflowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 
     fn add_step(&mut self, step: Box<dyn WorkflowStep>) -> Result<(), WorkflowError> {
         self.steps.push(Some(step));
@@ -346,19 +337,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

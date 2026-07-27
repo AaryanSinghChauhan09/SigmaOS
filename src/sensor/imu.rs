@@ -49,15 +49,7 @@ impl SimpleIMUSensor {
 
 impl IMUSensor for SimpleIMUSensor {
     fn id(&self) -> SensorID { self.id }
-    fn sensor_type(&self) -> SensorType { {
-        let raw = self.sensor_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => SensorType::Gyroscope,
-            2 => SensorType::Magnetometer,
-            3 => SensorType::IMU,
-            _ => SensorType::Accelerometer,
-        }
-    } }
+    fn sensor_type(&self) -> SensorType { unsafe { core::mem::transmute(self.sensor_type.load(Ordering::SeqCst)) } }
 
     fn read_acceleration(&self) -> (f32, f32, f32) {
         let x = (self.accel_x.load(Ordering::SeqCst) as f32) / 1000.0;
@@ -188,19 +180,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

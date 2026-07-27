@@ -18,6 +18,7 @@ validateEmailFormat: function( string ) {
 
   return emailExpression.test( string );
 }
+
 ```
 
 With the example above, we can use this test script to show how bad input can impact server responsiveness:
@@ -38,6 +39,7 @@ console.log(process.hrtime(start));
 start = process.hrtime();
 console.log(validateEmailFormat('jjjjjjjjjjjjjjjjjjjjjjjjjjjj@ccccccccccccccccccccccccccccc.555555555555555555555555555555555555555555555555555555{'));
 console.log(process.hrtime(start));
+
 ```
 
 Here are the results of running that script:
@@ -45,12 +47,16 @@ Here are the results of running that script:
 ```sh
 true
 [ 0, 9694442 ]  <- Match on good data takes little time
+
 false
 [ 0, 49849962 ]  <- Initial bad input baseline
+
 false
 [ 0, 55123953 ] <- Added 1 character to the input and you see minimal spike
+
 false
 [ 8, 487126563 ] <- Added 12 characters and you see it bumps up significantly
+
 ```
 
 One way you can check regular expressions for badness in an automated way is by using a module from [substack](https://twitter.com/substack) called [safe-regex](https://www.npmjs.org/package/safe-regex). It's prone to false positives, however, it can be useful to point to potentially vulnerable regular expressions you would have otherwise missed in your code.
@@ -76,6 +82,7 @@ module.exports = function (context) {
     },
   };
 };
+
 ```
 
 Additionally, OWASP has a [list of regular expressions](https://www.owasp.org/index.php/OWASP_Validation_Regex_Repository) for common validations that might be useful to you.

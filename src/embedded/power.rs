@@ -55,16 +55,7 @@ impl PowerState for SimplePowerState {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
-    fn mode(&self) -> PowerMode { {
-        let raw = self.mode.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PowerMode::Idle,
-            2 => PowerMode::Sleep,
-            3 => PowerMode::DeepSleep,
-            4 => PowerMode::Off,
-            _ => PowerMode::Active,
-        }
-    } }
+    fn mode(&self) -> PowerMode { unsafe { core::mem::transmute(self.mode.load(Ordering::SeqCst)) } }
     fn voltage(&self) -> f32 { (self.voltage.load(Ordering::SeqCst) as f32) / 1000.0 }
 }
 
@@ -96,16 +87,7 @@ impl PowerManager for SimplePowerManager {
     }
     
     fn get_mode(&self) -> PowerMode {
-        {
-        let raw = self.current_mode.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PowerMode::Idle,
-            2 => PowerMode::Sleep,
-            3 => PowerMode::DeepSleep,
-            4 => PowerMode::Off,
-            _ => PowerMode::Active,
-        }
-    }
+        unsafe { core::mem::transmute(self.current_mode.load(Ordering::SeqCst)) }
     }
     
     fn get_voltage(&self) -> f32 {
@@ -176,19 +158,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

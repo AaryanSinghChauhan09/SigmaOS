@@ -119,14 +119,7 @@ impl SimpleMultiArchSupport {
 
 impl MultiArchSupport for SimpleMultiArchSupport {
     fn detect_architecture(&self) -> Architecture {
-        {
-        let raw = self.current_arch.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => Architecture::ARM64,
-            2 => Architecture::RISCV64,
-            _ => Architecture::X86_64,
-        }
-    }
+        unsafe { core::mem::transmute(self.current_arch.load(Ordering::SeqCst)) }
     }
     fn switch_architecture(&mut self, arch: Architecture) -> Result<(), PortError> {
         self.current_arch.store(arch as usize, Ordering::SeqCst);

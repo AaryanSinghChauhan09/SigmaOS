@@ -53,15 +53,7 @@ impl Smartcard for SimpleSmartcard {
         let len = self.atr.iter().position(|&b| b == 0).unwrap_or(32);
         &self.atr[..len]
     }
-    fn state(&self) -> CardState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => CardState::Present,
-            2 => CardState::Active,
-            3 => CardState::Error,
-            _ => CardState::Empty,
-        }
-    } }
+    fn state(&self) -> CardState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 
     fn set_state(&mut self, state: CardState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -180,19 +172,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

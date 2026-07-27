@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ⚡ SigmaOS Kernel Performance Optimization Plan
 ## 🚀 High-Speed Zero-Copy IPC & Autonomic UDF CPU Scheduling Engine
 
@@ -264,3 +265,54 @@ All microkernel performance optimizations strictly comply with the execution par
 1. **Memory Safety**: IPC and VM loops operate without dynamic memory allocations or unaligned pointers.
 2. **Sub-Microsecond Latency**: Ring buffer indices use explicit atomic load/store memory fences (`Ordering::SeqCst` or `Acquire`/`Release`) to ensure lock-free execution across SMP CPU cores.
 3. **PQC Integrity Verification**: All injected UDF scheduler bytecodes must be digitally signed with a NIST Dilithium-5 signature before loading, shielding the scheduler ring from instruction injection attacks.
+=======
+# ⚡ Kernel Performance Plan for SigmaOS
+
+This document specifies the strategies for maintaining zero-allocation hot paths, lock-free priority scheduling, and high-throughput virtual networking in SigmaOS.
+
+---
+
+## 1. Hot Path Zero-Allocation Ring Buffer
+To avoid garbage collection or heap latency, communication between shards utilizes static memory buffers.
+
+### Rust Implementation (Thread-Safe Packet Queue)
+```rust
+pub struct ZeroAllocRingBuffer<T, const N: usize> {
+    buffer: [Option<T>; N],
+    head: usize,
+    tail: usize,
+}
+
+impl<T: Copy, const N: usize> ZeroAllocRingBuffer<T, N> {
+    pub fn new() -> Self {
+        // Compile-time safe zero initialization
+        unsafe {
+            Self {
+                buffer: core::mem::zeroed(),
+                head: 0,
+                tail: 0,
+            }
+        }
+    }
+
+    pub fn push(&mut self, item: T) -> Result<(), &'static str> {
+        let next = (self.head + 1) % N;
+        if next == self.tail {
+            return Err("Ring buffer is full");
+        }
+        self.buffer[self.head] = Some(item);
+        self.head = next;
+        Ok(())
+    }
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.head == self.tail {
+            return None;
+        }
+        let item = self.buffer[self.tail].take();
+        self.tail = (self.tail + 1) % N;
+        item
+    }
+}
+```
+>>>>>>> wiki/master

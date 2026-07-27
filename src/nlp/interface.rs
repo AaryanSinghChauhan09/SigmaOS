@@ -47,16 +47,7 @@ impl SimpleIntent {
 
 impl Intent for SimpleIntent {
     fn id(&self) -> IntentID { self.id }
-    fn intent_type(&self) -> IntentType { {
-        let raw = self.intent_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => IntentType::QuerySystem,
-            2 => IntentType::Configure,
-            3 => IntentType::Help,
-            4 => IntentType::Unknown,
-            _ => IntentType::ExecuteCommand,
-        }
-    } }
+    fn intent_type(&self) -> IntentType { unsafe { core::mem::transmute(self.intent_type.load(Ordering::SeqCst)) } }
     fn confidence(&self) -> f32 { (self.confidence.load(Ordering::SeqCst) as f32) / 100.0 }
     fn parameters(&self) -> &[[u8; 64]] { &self.parameters }
 }
@@ -301,19 +292,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -48,15 +48,7 @@ impl SimpleQuota {
 
 impl Quota for SimpleQuota {
     fn id(&self) -> QuotaID { self.id }
-    fn resource_type(&self) -> ResourceType { {
-        let raw = self.resource_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ResourceType::Memory,
-            2 => ResourceType::Disk,
-            3 => ResourceType::Network,
-            _ => ResourceType::CPU,
-        }
-    } }
+    fn resource_type(&self) -> ResourceType { unsafe { core::mem::transmute(self.resource_type.load(Ordering::SeqCst)) } }
     fn limit(&self) -> u64 { self.limit.load(Ordering::SeqCst) as u64 }
     fn usage(&self) -> u64 { self.usage.load(Ordering::SeqCst) as u64 }
 
@@ -217,19 +209,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

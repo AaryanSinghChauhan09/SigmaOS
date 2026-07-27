@@ -52,14 +52,7 @@ impl MQTTTopic for SimpleMQTTTopic {
         let len = self.topic.iter().position(|&b| b == 0).unwrap_or(128);
         &self.topic[..len]
     }
-    fn qos(&self) -> QoS { {
-        let raw = self.qos.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => QoS::AtLeastOnce,
-            2 => QoS::ExactlyOnce,
-            _ => QoS::AtMostOnce,
-        }
-    } }
+    fn qos(&self) -> QoS { unsafe { core::mem::transmute(self.qos.load(Ordering::SeqCst)) } }
 }
 
 pub trait MQTTClient {
@@ -114,7 +107,7 @@ impl MQTTClient for SimpleMQTTClient {
 }
 
 pub trait MessageHandler {
-    fn on_message(&self, topic: &[u8], payload: &[u8]);
+    def on_message(&self, topic: &[u8], payload: &[u8]);
 }
 
 #[repr(C)]
@@ -165,19 +158,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -40,14 +40,7 @@ impl SimpleDFUModule {
 
 impl DFUModule for SimpleDFUModule {
     fn id(&self) -> DFUID { self.id }
-    fn state(&self) -> DFUState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => DFUState::Busy,
-            2 => DFUState::Error,
-            _ => DFUState::Idle,
-        }
-    } }
+    fn state(&self) -> DFUState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 }
 
 pub trait DFUController {
@@ -178,19 +171,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

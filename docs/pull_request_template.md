@@ -1,31 +1,32 @@
 # PULL REQUEST TEMPLATE
 
-<!-- SigmaOS Pull Request Template
-     Fill in each section. Delete irrelevant items.
-     Inspired by Linux kernel patch submission guidelines. -->
+---
 
-## Description
+name: Pull Request
+about: Submit a new Sovereign Shard or bug fix
+---
 
-<!-- One paragraph: what does this PR do and why? -->
+# Pull Request
 
-## Subsystem(s) affected
+## Summary
 
-<!-- Check all that apply -->
+<!-- One-line description of what this PR does -->
 
-- [ ] kernel/core (scheduler, MM, syscalls, IRQ, boot)
+## Type
 
-- [ ] kernel/fs (VFS, tmpfs, sigmafs, ext4)
+- [ ] New Shard
 
-- [ ] kernel/net (TCP, UDP, sockets, Wi-Fi, DHCP, DNS)
+- [ ] Bug Fix
 
-- [ ] kernel/security (pledge, unveil, seccomp, PQC, audit)
+- [ ] Documentation Update
 
-- [ ] drivers (NVMe, USB, GPU, Wi-Fi, audio, input, storage)
+- [ ] GitHub Actions / CI improvement
 
-- [ ] arch (x86_64, ARM64, RISC-V)
+## Closes
 
-- [ ] sigma-sh (shell REPL)
+<!-- Reference the ROADMAP.md milestone, IDEAS_BACKLOG.md item, or issue number -->
 
+<<<<<<< HEAD:docs/pull_request_template.md
 - [ ] sigma-pkg (package manager, registry)
 
 - [ ] zenith_desktop (compositor, WM, GUI)
@@ -169,9 +170,36 @@ $ sigma-pkg install ...
 ## Linked issues
 
 <!-- Use "Closes #123" or "Related to #456" -->
+=======
+>>>>>>> wiki/master:pull_request_template.md
 Closes #
 
----
-<!-- By submitting this PR you certify that your contribution is your
-     original work and you have the right to submit it under the MIT/GPL-2.0
-     license as indicated in the file. (Developer Certificate of Origin) -->
+## Shard Checklist (New Shards Only)
+
+- [ ] C++ OOP Singleton with `getInstance()`
+
+- [ ] `extern "C"` wrappers for all public functions
+
+- [ ] Registered in `SovereignUSR` via `usr_register_shard()`
+
+- [ ] `cppcheck` passes with zero warnings
+
+- [ ] Wiki page created or updated in `SigmaOS.wiki/`
+
+- [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
+
+## Bug Fix Checklist
+
+- [ ] Root cause identified and documented
+
+- [ ] Regression test described
+
+- [ ] No new `cppcheck` warnings introduced
+
+## Testing
+
+<!-- Describe how you tested this change -->
+
+## Screenshots / Serial Output
+
+<!-- Paste sigma_log output or screenshots if applicable -->

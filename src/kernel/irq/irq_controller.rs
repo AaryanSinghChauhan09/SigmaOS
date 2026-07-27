@@ -2,22 +2,24 @@
 //! APIC (x86), GIC (ARM), PLIC (RISC-V) support
 //! Target: <1µs IRQ dispatch overhead
 
-use core::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
+#![no_std]
+
+use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 
 #[repr(C)]
 pub struct IRQController {
     controller_type: ControllerType,
     irq_count: AtomicUsize,
-    handlers: Vec<AtomicPtr<IRQHandler>>,
+    handlers: [AtomicPtr<IRQHandler>; 256],
     spurious_count: AtomicUsize,
 }
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ControllerType {
-    APIC, // x86 Advanced Programmable Interrupt Controller
-    GIC,  // ARM Generic Interrupt Controller
-    PLIC, // RISC-V Platform-Level Interrupt Controller
-    PIC,  // Legacy 8259 PIC
+    APIC,    // x86 Advanced Programmable Interrupt Controller
+    GIC,     // ARM Generic Interrupt Controller
+    PLIC,    // RISC-V Platform-Level Interrupt Controller
+    PIC,     // Legacy 8259 PIC
 }
 
 #[repr(C)]
@@ -54,14 +56,16 @@ pub struct PLIC {
 
 impl IRQController {
     pub fn new(controller_type: ControllerType) -> Self {
-        let mut handlers = Vec::with_capacity(256);
-        for _ in 0..256 {
-            handlers.push(AtomicPtr::new(core::ptr::null_mut()));
-        }
         IRQController {
             controller_type,
             irq_count: AtomicUsize::new(0),
-            handlers,
+            handlers: {
+                let mut arr = [AtomicPtr::new(core::ptr::null_mut()); 256];
+                for i in 0..256 {
+                    arr[i] = AtomicPtr::new(core::ptr::null_mut());
+                }
+                arr
+            },
             spurious_count: AtomicUsize::new(0),
         }
     }
@@ -105,8 +109,10 @@ impl IRQController {
         if irq >= 256 {
             return Err(IRQError::InvalidIRQ);
         }
+
         self.handlers[irq].store(handler, Ordering::SeqCst);
         self.enable_irq(irq);
+        
         Ok(())
     }
 
@@ -156,7 +162,7 @@ impl IRQController {
                     // Call handler function
                     let func = (*handler).handler.load(Ordering::Acquire);
                     let ctx = (*handler).context.load(Ordering::Acquire);
-
+                    
                     // In real implementation, would call the function pointer
                     // let handler_fn: fn(*mut u8) = core::mem::transmute(func);
                     // handler_fn(ctx);

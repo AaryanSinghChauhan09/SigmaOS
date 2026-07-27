@@ -48,14 +48,7 @@ impl LCDDisplay for SimpleLCDDisplay {
     fn id(&self) -> DisplayID { self.id }
     fn width(&self) -> u16 { self.width.load(Ordering::SeqCst) as u16 }
     fn height(&self) -> u16 { self.height.load(Ordering::SeqCst) as u16 }
-    fn color_format(&self) -> ColorFormat { {
-        let raw = self.color_format.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ColorFormat::RGB888,
-            2 => ColorFormat::ARGB8888,
-            _ => ColorFormat::RGB565,
-        }
-    } }
+    fn color_format(&self) -> ColorFormat { unsafe { core::mem::transmute(self.color_format.load(Ordering::SeqCst)) } }
 }
 
 pub trait LCDController {
@@ -174,19 +167,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

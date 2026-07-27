@@ -71,16 +71,7 @@ impl Window for SimpleWindow {
     fn y(&self) -> i32 { self.y.load(Ordering::SeqCst) as i32 }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> WindowState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => WindowState::Minimized,
-            2 => WindowState::Maximized,
-            3 => WindowState::Fullscreen,
-            4 => WindowState::Hidden,
-            _ => WindowState::Normal,
-        }
-    } }
+    fn state(&self) -> WindowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 
     fn set_state(&mut self, state: WindowState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -102,7 +93,7 @@ pub trait WindowManager {
     fn destroy_window(&mut self, id: WindowID) -> Result<(), WindowError>;
     fn get_window(&self, id: WindowID) -> Option<&dyn Window>;
     fn focus_window(&mut self, id: WindowID) -> Result<(), WindowError>;
-    fn list_windows(&self) -> Vec<WindowID>;
+    def list_windows(&self) -> Vec<WindowID>;
 }
 
 #[repr(C)]
@@ -217,12 +208,6 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn as_slice(&self) -> &[T] {
-        if self.data.is_null() { &[] } else { unsafe { core::slice::from_raw_parts(self.data, self.len) } }
-    }
-    fn as_slice_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() { &mut [] } else { unsafe { core::slice::from_raw_parts_mut(self.data, self.len) } }
-    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -231,48 +216,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        self.as_slice()
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_slice_mut()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.as_slice().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.as_slice_mut().iter_mut()
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -63,13 +63,7 @@ impl Gamepad for SimpleGamepad {
     fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
     fn get_button(&self, button: u8) -> ButtonState {
         if button < 16 {
-            {
-        let raw = self.buttons[button as usize].load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ButtonState::Pressed,
-            _ => ButtonState::Released,
-        }
-    }
+            unsafe { core::mem::transmute(self.buttons[button as usize].load(Ordering::SeqCst)) }
         } else {
             ButtonState::Released
         }
@@ -138,8 +132,8 @@ impl GamepadManager for SimpleGamepadManager {
 }
 
 pub trait InputMapping {
-    fn map_button(&mut self, physical: u8, r#virtual: u8);
-    fn map_axis(&mut self, physical: u8, r#virtual: u8);
+    fn map_button(&mut self, physical: u8, virtual: u8);
+    fn map_axis(&mut self, physical: u8, virtual: u8);
     fn get_mapped_button(&self, physical: u8) -> u8;
     fn get_mapped_axis(&self, physical: u8) -> u8;
 }
@@ -160,15 +154,15 @@ impl SimpleInputMapping {
 }
 
 impl InputMapping for SimpleInputMapping {
-    fn map_button(&mut self, physical: u8, r#virtual: u8) {
+    fn map_button(&mut self, physical: u8, virtual: u8) {
         if physical < 16 {
-            self.button_map[physical as usize] = r#virtual;
+            self.button_map[physical as usize] = virtual;
         }
     }
 
-    fn map_axis(&mut self, physical: u8, r#virtual: u8) {
+    fn map_axis(&mut self, physical: u8, virtual: u8) {
         if physical < 4 {
-            self.axis_map[physical as usize] = r#virtual;
+            self.axis_map[physical as usize] = virtual;
         }
     }
 
@@ -210,19 +204,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

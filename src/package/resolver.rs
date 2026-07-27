@@ -266,14 +266,7 @@ impl SimpleConflictResolver {
 
 impl ConflictResolver for SimpleConflictResolver {
     fn resolve_conflict(&mut self, pkg1: PackageID, pkg2: PackageID) -> Result<PackageID, ResolverError> {
-        let strategy = {
-        let raw = self.strategy.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ResolutionStrategy::Oldest,
-            2 => ResolutionStrategy::Manual,
-            _ => ResolutionStrategy::Newest,
-        }
-    };
+        let strategy = unsafe { core::mem::transmute(self.strategy.load(Ordering::SeqCst)) };
         match strategy {
             ResolutionStrategy::Newest => Ok(pkg1.max(pkg2)),
             ResolutionStrategy::Oldest => Ok(pkg1.min(pkg2)),
@@ -282,14 +275,7 @@ impl ConflictResolver for SimpleConflictResolver {
     }
 
     fn get_resolution_strategy(&self) -> ResolutionStrategy {
-        {
-        let raw = self.strategy.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ResolutionStrategy::Oldest,
-            2 => ResolutionStrategy::Manual,
-            _ => ResolutionStrategy::Newest,
-        }
-    }
+        unsafe { core::mem::transmute(self.strategy.load(Ordering::SeqCst)) }
     }
 }
 
@@ -332,19 +318,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -134,16 +134,9 @@ impl SimpleTask {
     }
 
     pub fn get_state(&self) -> TaskState {
-        {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => TaskState::Running,
-            2 => TaskState::Completed,
-            3 => TaskState::Failed,
-            4 => TaskState::Cancelled,
-            _ => TaskState::Pending,
+        unsafe {
+            core::mem::transmute(self.state.load(Ordering::SeqCst))
         }
-    }
     }
 
     pub fn set_state(&self, state: TaskState) {
@@ -564,19 +557,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -55,15 +55,7 @@ impl IoTDevice for SimpleIoTDevice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn device_type(&self) -> DeviceType { {
-        let raw = self.device_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => DeviceType::Actuator,
-            2 => DeviceType::Controller,
-            3 => DeviceType::Gateway,
-            _ => DeviceType::Sensor,
-        }
-    } }
+    fn device_type(&self) -> DeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
     fn is_online(&self) -> bool { self.online.load(Ordering::SeqCst) == 1 }
 }
 
@@ -71,7 +63,7 @@ pub trait IoTHub {
     fn add_device(&mut self, device: Box<dyn IoTDevice>) -> Result<DeviceID, IoTError>;
     fn remove_device(&mut self, id: DeviceID) -> Result<(), IoTError>;
     fn get_device(&self, id: DeviceID) -> Option<&dyn IoTDevice>;
-    fn send_command(&self, id: DeviceID, command: &[u8]) -> Result<(), IoTError>;
+    def send_command(&self, id: DeviceID, command: &[u8]) -> Result<(), IoTError>;
 }
 
 #[repr(C)]
@@ -127,7 +119,7 @@ impl IoTHub for SimpleIoTHub {
 
 pub trait AutomationRule {
     fn add_rule(&mut self, trigger: &[u8], action: &[u8]);
-    fn execute_rules(&self, event: &[u8]) -> Vec<&[u8]>;
+    def execute_rules(&self, event: &[u8]) -> Vec<&[u8]>;
 }
 
 #[repr(C)]
@@ -188,19 +180,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

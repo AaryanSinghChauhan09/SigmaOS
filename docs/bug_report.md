@@ -1,80 +1,48 @@
 # bug report
 
 ---
-name: Bug Report
-about: Report a bug in SigmaOS
-title: '[BUG] <short description>'
-labels: bug
-assignees: ''
 
+name: Bug Report
+about: Report a kernel shard malfunction or build failure
+title: "[BUG] <shard_name>: <short description>"
+labels: bug, triage
+assignees: ''
 ---
 
-## Bug Description
+## Affected Shard
 
-A clear and concise description of what the bug is.
+<!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
+
+## Description
+
+<!-- A clear description of the bug -->
+
+## Reproduction Steps
+
+1. Step one
+
+2. Step two
+
+3. Step three
 
 ## Expected Behavior
 
-What you expected to happen.
+<!-- What should happen -->
 
 ## Actual Behavior
 
-What actually happened. Include error messages, stack traces, or logs if available.
+<!-- What actually happens -->
 
-## Steps to Reproduce
+## Build Environment
 
-1. Go to '...'
+- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
 
-2. Click on '....'
+ sigma-build output: paste here
 
-3. Scroll down to '....'
+## Logs
 
-4. See error
+```text
 
-## Environment
+<!-- Paste sigma_log / serial output here -->
 
-- **SigmaOS Version**: (e.g., v0.1.0, commit hash)
-
-- **Architecture**: (e.g., x86_64, ARM64)
-
-- **Profile**: (e.g., standalone, cloud, microkernel)
-
-- **Hardware/VM**: (e.g., QEMU 8.0, Raspberry Pi 4, Dell XPS 15)
-
-## Affected Subsystem
-
-- [ ] Kernel Core (scheduler, memory, syscalls)
-
-- [ ] Drivers (network, storage, GPU, USB)
-
-- [ ] Filesystem
-
-- [ ] Network Stack
-
-- [ ] Security
-
-- [ ] Package Manager
-
-- [ ] Boot/ISO
-
-- [ ] Desktop/GUI
-
-- [ ] Shell/Userland
-
-- [ ] Documentation
-
-- [ ] CI/CD
-
-- [ ] Other (specify)
-
-## Additional Context
-
-Add any other context about the problem here.
-
-## Related Issues
-
-Link to related issues or PRs.
-
-## Security Impact
-
-If this is a security vulnerability, please follow the security reporting process in [SECURITY.md](../../SECURITY.md) instead of filing a public issue.
+```

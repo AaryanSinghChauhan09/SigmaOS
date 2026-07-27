@@ -1,64 +1,34 @@
 # feature request
 
 ---
-name: Feature Request
-about: Suggest a new feature or enhancement for SigmaOS
-title: '[FEAT] <short description>'
-labels: enhancement
-assignees: ''
 
+name: Feature Request / New Shard
+about: Propose a new Sovereign Shard or architectural improvement
+title: "[SHARD] <SovereignNewName>: <short description>"
+labels: enhancement, new-shard
+assignees: ''
 ---
 
-## Feature Description
+## Shard Name
 
-A clear and concise description of the feature you'd like to see added.
+<!-- e.g. SovereignQuantumCache -->
 
-## Motivation
+## Problem Statement
 
-Why is this feature needed? What problem does it solve? What use cases does it enable?
+<!-- What gap does this close? Reference MISSING_COMPONENTS.md if applicable -->
 
 ## Proposed Solution
 
-Describe the solution you'd like to see implemented. Include technical details if applicable.
+<!-- Describe the sovereign singleton design and USP -->
 
-## Alternatives Considered
+## Linux Equivalent
 
-Describe any alternative solutions or features you've considered.
+<!-- What does this replace? e.g. `systemctl`, `/proc`, `iptables` -->
 
-## Affected Subsystem
+## Algorithm / USP
 
-- [ ] Kernel Core (scheduler, memory, syscalls)
+<!-- Name the algorithm (e.g. QREP, UMSM, ZBT) and explain its advantage -->
 
-- [ ] Drivers (network, storage, GPU, USB)
+## Dependencies
 
-- [ ] Filesystem
-
-- [ ] Network Stack
-
-- [ ] Security
-
-- [ ] Package Manager
-
-- [ ] Boot/ISO
-
-- [ ] Desktop/GUI
-
-- [ ] Shell/Userland
-
-- [ ] Documentation
-
-- [ ] CI/CD
-
-- [ ] Other (specify)
-
-## Implementation Plan
-
-If you have ideas on how to implement this feature, outline the steps here.
-
-## Additional Context
-
-Add any other context, screenshots, or examples about the feature request here.
-
-## Related Issues
-
-Link to related issues, PRs, or discussions.
+<!-- Which existing shards does this require? -->

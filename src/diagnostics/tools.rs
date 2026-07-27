@@ -1,241 +1,21 @@
-#![cfg_attr(target_os = "none", no_std)]
-#![cfg_attr(target_os = "none", no_main)]
+#![no_std]
+#![no_main]
 
-use core::mem;
 /// OOP-based Low-Level Diagnostics Tools for SigmaOS
 /// Implements diagnostics using OOP principles with traits and structs
 /// No dependency on external diagnostics frameworks
 /// Based on Roadmap Item 16: Low-level diagnostics tools
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(target_os = "none"))]
-use std::boxed::Box;
-#[cfg(not(target_os = "none"))]
-use std::vec::Vec;
-
-#[cfg(target_os = "none")]
-pub struct Box<T: ?Sized>(*mut T);
-
-#[cfg(target_os = "none")]
-impl<T: ?Sized> Box<T> {
-    pub fn new(val: T) -> Self
-    where
-        T: Sized,
-    {
-        let ptr = unsafe { alloc(mem::size_of::<T>()) as *mut T };
-        if !ptr.is_null() {
-            unsafe {
-                core::ptr::write(ptr, val);
-            }
-        }
-        Box(ptr)
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T: ?Sized> core::ops::Deref for Box<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        unsafe { &*self.0 }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T: ?Sized> core::ops::DerefMut for Box<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { &mut *self.0 }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T: ?Sized> core::convert::AsRef<T> for Box<T> {
-    fn as_ref(&self) -> &T {
-        unsafe { &*self.0 }
-    }
-}
-
-#[cfg(target_os = "none")]
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-
-    pub fn as_slice(&self) -> &[T] {
-        if self.len == 0 {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-
-    pub fn as_mut_slice(&mut self) -> &mut [T] {
-        if self.len == 0 {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+use core::mem;
 
 /// Sensor ID
 pub type SensorID = usize;
 
 /// Sensor type
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum SensorType {
     CPU = 0,
     Memory = 1,
@@ -329,13 +109,7 @@ pub struct SimpleSensor {
 }
 
 impl SimpleSensor {
-    pub fn new(
-        id: SensorID,
-        name: &[u8],
-        sensor_type: SensorType,
-        unit: &[u8],
-        capability: SensorCapability,
-    ) -> Self {
+    pub fn new(id: SensorID, name: &[u8], sensor_type: SensorType, unit: &[u8], capability: SensorCapability) -> Self {
         let mut name_array = [0u8; 64];
         let mut unit_array = [0u8; 16];
 
@@ -396,8 +170,7 @@ impl Sensor for SimpleSensor {
             SensorType::Network => 100.0,
         };
 
-        self.value
-            .store(Self::f64_to_usize(simulated_value), Ordering::SeqCst);
+        self.value.store(Self::f64_to_usize(simulated_value), Ordering::SeqCst);
         Ok(simulated_value)
     }
 
@@ -407,151 +180,6 @@ impl Sensor for SimpleSensor {
             name: self.name,
             sensor_type: self.sensor_type,
             value: Self::usize_to_f64(self.value.load(Ordering::SeqCst)),
-            unit: self.unit,
-            capability: self.capability,
-        }
-    }
-}
-
-/// Memory Leak Sensor (OOP: Professional diagnostics concrete class)
-#[repr(C)]
-pub struct MemoryLeakSensor {
-    pub id: SensorID,
-    pub name: [u8; 64],
-    pub sensor_type: SensorType,
-    pub used_memory_history: [usize; 8], // Store history of allocations
-    pub history_index: usize,
-    pub unit: [u8; 16],
-    pub capability: SensorCapability,
-}
-
-impl MemoryLeakSensor {
-    pub fn new(id: SensorID, name: &[u8], capability: SensorCapability) -> Self {
-        let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
-        MemoryLeakSensor {
-            id,
-            name: name_array,
-            sensor_type: SensorType::Memory,
-            used_memory_history: [0; 8],
-            history_index: 0,
-            unit: *b"Bytes\0\0\0\0\0\0\0\0\0\0\0",
-            capability,
-        }
-    }
-}
-
-impl Sensor for MemoryLeakSensor {
-    fn id(&self) -> SensorID {
-        self.id
-    }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
-    }
-    fn sensor_type(&self) -> SensorType {
-        self.sensor_type
-    }
-    fn read(&mut self) -> Result<f64, DiagnosticsError> {
-        if !self.capability.can_read {
-            return Err(DiagnosticsError::PermissionDenied);
-        }
-        // Simulated used memory with upward leak trend
-        let base_val = 1024 * 1024;
-        let leaked_increment = self.history_index * 256 * 1024;
-        let value = (base_val + leaked_increment) as f64;
-
-        self.used_memory_history[self.history_index % 8] = value as usize;
-        self.history_index += 1;
-
-        Ok(value)
-    }
-    fn info(&self) -> SensorInfo {
-        SensorInfo {
-            id: self.id,
-            name: self.name,
-            sensor_type: self.sensor_type,
-            value: if self.history_index > 0 {
-                self.used_memory_history[(self.history_index - 1) % 8] as f64
-            } else {
-                0.0
-            },
-            unit: self.unit,
-            capability: self.capability,
-        }
-    }
-}
-
-/// CPU Cache Profiler Sensor (OOP: Professional diagnostics concrete class)
-#[repr(C)]
-pub struct CpuCacheProfilerSensor {
-    pub id: SensorID,
-    pub name: [u8; 64],
-    pub sensor_type: SensorType,
-    pub cache_misses: AtomicUsize,
-    pub cache_accesses: AtomicUsize,
-    pub unit: [u8; 16],
-    pub capability: SensorCapability,
-}
-
-impl CpuCacheProfilerSensor {
-    pub fn new(id: SensorID, name: &[u8], capability: SensorCapability) -> Self {
-        let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
-        CpuCacheProfilerSensor {
-            id,
-            name: name_array,
-            sensor_type: SensorType::CPU,
-            cache_misses: AtomicUsize::new(0),
-            cache_accesses: AtomicUsize::new(0),
-            unit: *b"Ratio\0\0\0\0\0\0\0\0\0\0\0",
-            capability,
-        }
-    }
-}
-
-impl Sensor for CpuCacheProfilerSensor {
-    fn id(&self) -> SensorID {
-        self.id
-    }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
-    }
-    fn sensor_type(&self) -> SensorType {
-        self.sensor_type
-    }
-    fn read(&mut self) -> Result<f64, DiagnosticsError> {
-        if !self.capability.can_read {
-            return Err(DiagnosticsError::PermissionDenied);
-        }
-
-        let misses = self.cache_misses.fetch_add(45, Ordering::SeqCst) + 45;
-        let accesses = self.cache_accesses.fetch_add(1000, Ordering::SeqCst) + 1000;
-
-        // Cache miss ratio
-        let ratio = (misses as f64) / (accesses as f64);
-        Ok(ratio)
-    }
-    fn info(&self) -> SensorInfo {
-        let misses = self.cache_misses.load(Ordering::SeqCst);
-        let accesses = self.cache_accesses.load(Ordering::SeqCst);
-        let ratio = if accesses > 0 {
-            (misses as f64) / (accesses as f64)
-        } else {
-            0.0
-        };
-        SensorInfo {
-            id: self.id,
-            name: self.name,
-            sensor_type: self.sensor_type,
-            value: ratio,
             unit: self.unit,
             capability: self.capability,
         }
@@ -578,7 +206,6 @@ pub trait DiagnosticsManager {
 
 /// Diagnostics statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct DiagnosticsStats {
     pub total_sensors: usize,
     pub active_sensors: usize,
@@ -745,72 +372,54 @@ impl DiagnosticsManager for SimpleDiagnosticsManager {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_memory_leak_sensor() {
-        let capability = SensorCapability::full();
-        let mut sensor = MemoryLeakSensor::new(201, b"MemLeakSensor", capability);
-        assert_eq!(sensor.id(), 201);
-        assert_eq!(sensor.name(), b"MemLeakSensor");
-        assert_eq!(sensor.sensor_type(), SensorType::Memory);
-
-        // Read sensor several times and check trend upward
-        let r1 = sensor.read().unwrap();
-        let r2 = sensor.read().unwrap();
-        assert!(r2 > r1);
-
-        let info = sensor.info();
-        assert_eq!(info.value, r2);
-    }
-
-    #[test]
-    fn test_cpu_cache_profiler_sensor() {
-        let capability = SensorCapability::full();
-        let mut sensor = CpuCacheProfilerSensor::new(202, b"CpuCacheSensor", capability);
-        assert_eq!(sensor.id(), 202);
-        assert_eq!(sensor.name(), b"CpuCacheSensor");
-        assert_eq!(sensor.sensor_type(), SensorType::CPU);
-
-        let ratio = sensor.read().unwrap();
-        assert!(ratio > 0.0);
-
-        let info = sensor.info();
-        assert_eq!(info.value, ratio);
-    }
-
-    #[test]
-    fn test_diagnostics_manager_registration() {
-        let mut manager = SimpleDiagnosticsManager::new(ManagerCapability::full());
-        let cap = SensorCapability::full();
-        let leak_sensor = Box::new(MemoryLeakSensor::new(301, b"Leak1", cap));
-        let cache_sensor = Box::new(CpuCacheProfilerSensor::new(302, b"Cache1", cap));
-
-        assert!(manager.register_sensor(leak_sensor).is_ok());
-        assert!(manager.register_sensor(cache_sensor).is_ok());
-
-        assert_eq!(manager.stats().total_sensors, 2);
-
-        // Read sensors through manager
-        let r1 = manager.read_sensor(301).unwrap();
-        assert!(r1 > 0.0);
-
-        let r2 = manager.read_sensor(302).unwrap();
-        assert!(r2 > 0.0);
-    }
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
                 free(self.data as *mut u8);
             }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
         }
     }
 }

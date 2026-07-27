@@ -1,16 +1,21 @@
-use core::mem;
+#![no_std]
+#![no_main]
+
 /// OOP-based Virtualization Management CLI for SigmaOS
 /// Implements virtualization CLI using OOP principles with traits and structs
 /// No dependency on external CLI frameworks
 /// Based on Roadmap Item 18: Virtualization management CLI
+
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 /// VM ID
 pub type VMID = usize;
 
 /// VM state
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum VMState {
     Stopped = 0,
     Starting = 1,
@@ -76,7 +81,7 @@ impl Command for SimpleCommand {
     fn execute(&mut self, _args: &[u8]) -> Result<Vec<u8>, CLIError> {
         let mut response = Vec::new();
         let msg = b"Command executed";
-
+        
         for byte in msg {
             response.push(*byte);
         }
@@ -138,12 +143,6 @@ pub struct VMCapability {
     pub can_stop: bool,
 }
 
-impl Default for VMCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl VMCapability {
     pub fn new() -> Self {
         VMCapability {
@@ -196,13 +195,8 @@ impl SimpleVM {
     }
 
     pub fn get_state(&self) -> VMState {
-        let state_val = self.state.load(Ordering::SeqCst);
-        match state_val {
-            0 => VMState::Stopped,
-            1 => VMState::Starting,
-            2 => VMState::Running,
-            3 => VMState::Stopping,
-            _ => VMState::Paused,
+        unsafe {
+            core::mem::transmute(self.state.load(Ordering::SeqCst))
         }
     }
 
@@ -284,17 +278,10 @@ pub trait VirtualizationCLI {
 
 /// CLI statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct CLIStats {
     pub total_commands: usize,
     pub total_vms: usize,
     pub running_vms: usize,
-}
-
-impl Default for CLIStats {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl CLIStats {
@@ -322,12 +309,6 @@ pub struct SimpleVirtualizationCLI {
 pub struct CLICapability {
     pub can_register_commands: bool,
     pub can_manage_vms: bool,
-}
-
-impl Default for CLICapability {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl CLICapability {
@@ -469,30 +450,20 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple Vec implementation for no_std
-pub struct Vec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
 
     fn push(&mut self, item: T) {
@@ -512,28 +483,8 @@ impl<T> Vec<T> {
         self.len
     }
 
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -551,95 +502,7 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
+// External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

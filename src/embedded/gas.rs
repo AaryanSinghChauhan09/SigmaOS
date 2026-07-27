@@ -43,15 +43,7 @@ impl SimpleGasSensor {
 
 impl GasSensor for SimpleGasSensor {
     fn id(&self) -> SensorID { self.id }
-    fn gas_type(&self) -> GasType { {
-        let raw = self.gas_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => GasType::CO,
-            2 => GasType::CH4,
-            3 => GasType::NO2,
-            _ => GasType::CO2,
-        }
-    } }
+    fn gas_type(&self) -> GasType { unsafe { core::mem::transmute(self.gas_type.load(Ordering::SeqCst)) } }
     fn read_ppm(&self) -> u32 { self.ppm.load(Ordering::SeqCst) as u32 }
 }
 
@@ -158,19 +150,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

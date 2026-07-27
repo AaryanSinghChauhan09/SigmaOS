@@ -21,33 +21,29 @@ Multi-dimensional comparison of **SigmaOS Zenith** against leading specialized O
 
 ### 1. Algorithms & System Performance
 
-### NUMA-Aware CFS Scheduling
-
+**NUMA-Aware CFS Scheduling**
 - Allocates execution threads to the nearest physical CPU memory node
-
 - Reduces cross-socket bus contention on multi-NUMA systems
-
 - Implementation: `kernel/sched/sigma_numa.cpp` — NUMA topology map read from ACPI SRAT table at boot
 
-### Lock-Free Concurrency Primitives
-
+**Lock-Free Concurrency Primitives**
 - Compare-and-swap (CAS) loops inside task scheduling queues
-
 - Completely eliminates spinlock pauses under high-contention workloads
-
 - Implementation: `klib/sigma_lockfree.h` — Michael-Scott queue + Treiber stack
 
-### Microsecond Ring Transitions
-
+**Microsecond Ring Transitions**
 - Custom-optimized Assembly entry points for `SYSCALL` / `SYSRET`
-
 - Target: < 12 clock cycles for context switch overhead
-
 - Implementation: `arch/x86_64/syscall_entry.asm` — hand-tuned to avoid pipeline stalls
 
+<<<<<<< HEAD:docs/Competitive-Gap-Matrix.md
 ### Vectorized PQC Operations
 
 ```text
+=======
+**Vectorized PQC Operations**
+```
+>>>>>>> wiki/master:Competitive-Gap-Matrix.md
 CRYSTALS-Kyber NTT (Number Theoretic Transform):
   Standard C:   ~2,400 cycles per polynomial multiply
   AVX-512:      ~180 cycles per polynomial multiply  (13x speedup)
@@ -56,52 +52,36 @@ CRYSTALS-Kyber NTT (Number Theoretic Transform):
 
 ### 2. Code & System Customization
 
-### Zero-Dependency Core
-
+**Zero-Dependency Core**
 - Compiles without GNU `libc` headers
-
 - Custom inline string operations (`sigma_memcpy`, `sigma_strlen`, etc.)
-
 - Custom slab allocator — no `malloc`/`free` in kernel paths
-
 - Implementation: `klib/include/sigma_nanolib.h`
 
-### Declarative Configuration Manager
-
+**Declarative Configuration Manager**
 - System boots by parsing a Dilithium-signed configuration registry
-
 - Configures: network adapters, memory segments, GPU shards, service topology
-
 - Format: TOML with cryptographic attestation chain
-
 - Implementation: `Config.sigma` parsed by `userland/ignite/sigma_ignite.cpp`
 
-### Profile-Based Hot-Swap
-
+**Profile-Based Hot-Swap**
 ```bash
-
 # Switch profiles without reboot:
-
 sigma-svc profile switch --to forensic --attest dilithium3
 sigma-svc profile switch --to gaming
 sigma-svc profile switch --to developer
 sigma-svc profile switch --to container-host
 
 # Each profile activates:
-
 # → different MAC policy (.sigma-policy file)
-
 # → different service set (dinit units)
-
 # → different kernel parameters (via sigma-sysctl)
-
 # → different resource limits (cgroup v2 slices)
-
 ```
 
 ### 3. Desktop UX & Compositor
 
-### SovereignThemeEngine
+**SovereignThemeEngine**
 
 ```text
 Traditional Linux compositor path:
@@ -114,35 +94,22 @@ SigmaOS Zenith compositor path:
 ```
 
 Features:
-
 - Smooth 120Hz animations with GPU-side easing curves
-
 - Dynamic layout scaling based on detected display DPI
-
 - Glassmorphism effects via Vulkan compute shaders (not CSS hacks)
-
 - Theme hot-swap without compositor restart
 
-### High-Contrast Screen Reader
-
+**High-Contrast Screen Reader**
 - Low-level screen-scraping via AT-SPI2 accessibility tree
-
 - Hardware audio output directly via sigma-audio (PipeWire-equivalent)
-
 - No round-trip through speech-dispatcher
-
 - Indian language TTS via sigma-bhashini (offline)
-
 - WCAG 2.2 AA compliant
 
-### Declarative UI Engine
-
+**Declarative UI Engine**
 - UI configs defined as lightweight JSON schemas
-
 - Users customize dashboard without touching C++ source
-
 - Hot-reload: changes apply within 200ms
-
 - Implementation: `userland/gui/sigma_ui_engine.h`
 
 ---

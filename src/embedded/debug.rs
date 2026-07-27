@@ -51,14 +51,7 @@ impl SimpleDebugLog {
 
 impl DebugLog for SimpleDebugLog {
     fn id(&self) -> LogID { self.id }
-    fn level(&self) -> LogLevel { {
-        let raw = self.level.load(Ordering::SeqCst) as u32;
-        match raw {
-            2 => LogLevel::Warning,
-            3 => LogLevel::Error,
-            _ => LogLevel::Info,
-        }
-    } }
+    fn level(&self) -> LogLevel { unsafe { core::mem::transmute(self.level.load(Ordering::SeqCst)) } }
     fn message(&self) -> &[u8] {
         let len = self.message.iter().position(|&b| b == 0).unwrap_or(256);
         &self.message[..len]
@@ -184,19 +177,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

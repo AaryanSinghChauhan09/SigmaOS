@@ -1,9 +1,6 @@
 # SigmaOS — Final Excellence Roadmap
-
 ## Feedback Loops · Boot Experience · IPC Quality · Data Management
-
 ## Error Handling · Accessibility Deep-Dive · Performance Profiling
-
 ## Security Hardening Checklist · Master Implementation Schedule
 
 Tenth and synthesising roadmap document. Covers remaining dimensions
@@ -16,30 +13,20 @@ and consolidates all work into a single executable schedule.
 ### FL1 — User Feedback System
 
 ```bash
-
 # Built into every tool — one command to report:
-
 sigma-feedback report \
   --tool sigma-ca \
   --severity minor \
   --msg "GST compute gives wrong IGST for e-commerce"
-
 # → Creates GitHub Issue automatically via sigma-bus → sigmad/feedback
-
 # → User gets issue number back immediately
-
 # → Issue tagged: sigma-ca, gstn, computation, minor
 
 # Rate an interaction after use:
-
 sigma-ca gst file --period 2026-06
-
 # ✓ GSTR-3B filed. ARN: AA2706250007XXX
-
 # Was this helpful? [y/n/s(kip)] y
-
 # Thanks! Rating saved locally, synced on next update-check.
-
 ```
 
 | Task | File | Branch | Detail |
@@ -55,27 +42,16 @@ sigma-ca gst file --period 2026-06
 SigmaOS collects zero telemetry. Quality metrics come from CI only.
 
 ```bash
-
 # Weekly automated quality report (no data leaves device):
-
 sigma_automation.sh quality-report
-
 # Generates: .sigma/reports/quality-2026-06-28.md
-
 # Contents:
-
 #   - Boot time trend (last 30 days, from CI)
-
 #   - Unit test pass rate (from CI logs)
-
 #   - Open critical issues (from CURRENT_PROBLEMS_MANIFEST.md)
-
 #   - Stub count trend (from make check-stubs)
-
 #   - Module size budget status
-
 #   - Wiki freshness (last update per page)
-
 ```
 
 | Task | File | Branch | Detail |
@@ -119,7 +95,7 @@ Kyber-1024 ops/sec (AVX-512)
 
 ### BE1 — Boot Sequence Quality
 
-### Target: user sees a usable screen in < 2 seconds from power-on.
+**Target: user sees a usable screen in < 2 seconds from power-on.**
 
 ```text
 t=0ms    sigma-boot.efi loads (UEFI firmware hands off)
@@ -211,17 +187,11 @@ Target latencies:
 
 ```bash
 sigma-bus monitor                    # live IPC message trace
-
 sigma-bus monitor --topic "sigma.gst.*"  # filter by topic glob
-
 sigma-bus stats                      # throughput + latency histogram
-
 sigma-bus trace sigma-ca             # trace all messages to/from sigma-ca
-
 sigma-bus list                       # registered services + caps
-
 sigma-bus capabilities sigma-ca      # list sigma-ca capability tokens
-
 ```
 
 | Task | File | Branch | Detail |
@@ -554,8 +524,12 @@ India Stack:
 The full ordered list of what to build, in strict dependency order:
 
 #### Tier 0 — Boot (Blocks Everything)
+<<<<<<< HEAD:docs/Final-Excellence-Roadmap.md
 
 ```text
+=======
+```
+>>>>>>> wiki/master:Final-Excellence-Roadmap.md
 Week 1-2:  sigma_sched.cpp bodies (round-robin first)
 Week 1-2:  sigma_mm.cpp bodies (buddy + slab + VMM)
 Week 2-3:  sigma_irq.cpp (APIC + PIC)
@@ -569,8 +543,12 @@ Week 7:    sigma_argon2id.cpp (fix Issue #44)
 ```
 
 #### Tier 1 — Connect (Unblocks Packages & Apps)
+<<<<<<< HEAD:docs/Final-Excellence-Roadmap.md
 
 ```text
+=======
+```
+>>>>>>> wiki/master:Final-Excellence-Roadmap.md
 Week 8-9:  e1000 DMA TX/RX rings (real hardware)
 Week 9-10: TCP state machine (RFC 793)
 Week 10:   UDP socket layer
@@ -584,8 +562,12 @@ Week 13-14:musl-libc bundle for sigma-compat
 ```
 
 #### Tier 2 — Visible (Unblocks Desktop & Profession Apps)
+<<<<<<< HEAD:docs/Final-Excellence-Roadmap.md
 
 ```text
+=======
+```
+>>>>>>> wiki/master:Final-Excellence-Roadmap.md
 Week 14-15:VirtIO-GPU DRM/KMS
 Week 15-16:Zenith compositor composite_window()
 Week 16-17:Input event loop (keyboard + pointer)
@@ -599,8 +581,12 @@ Week 23-24:sigma-accounts double-entry + GSTR-1
 ```
 
 #### Tier 3 — Indian (Unblocks Production Use)
+<<<<<<< HEAD:docs/Final-Excellence-Roadmap.md
 
 ```text
+=======
+```
+>>>>>>> wiki/master:Final-Excellence-Roadmap.md
 Month 6-7: ABDM FHIR R4 client
 Month 6-7: GST IRN + e-Way Bill live API
 Month 7-8: UPI pay + collect
@@ -614,8 +600,12 @@ Month 10-11:22-language UI strings
 ```
 
 #### Tier 4 — Trusted (Enterprise & Security Grade)
+<<<<<<< HEAD:docs/Final-Excellence-Roadmap.md
 
 ```text
+=======
+```
+>>>>>>> wiki/master:Final-Excellence-Roadmap.md
 Month 12: sigma-boot.efi + TPM2 PCR sealing
 Month 12: ML-DSA FIPS 204 final bindings
 Month 13: sigma-mac enforced on every syscall
@@ -644,50 +634,33 @@ Month 18: Zero critical bugs (CURRENT_PROBLEMS 🔴 = 0)
 
 ### MIS3 — Contributor Onboarding Path
 
-### For a new contributor starting today:
+**For a new contributor starting today:**
 
 ```bash
-
 # Day 1: Get building
-
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 cd SigmaOS
 ./scripts/setup.sh                   # install build deps
-
 make PROFILE=microkernel             # first build (~5 min)
-
 make test                            # unit tests pass
 
 # Day 2: Understand the codebase
-
 sigma-cli --help                     # explore CLI surface
-
 cat CONTRIBUTING.md                  # contribution guide
-
 cat CURRENT_PROBLEMS_MANIFEST.md     # find something to fix
 
 # Day 3: Pick a good-first-issue
-
 # Suggested first contributions:
-
 # 1. Write unit tests for sigma_nanolib.h functions
-
 # 2. Add --json flag to sigma-cli profile list
-
 # 3. Fix sigma_agri PMFBY API stub (call real pmfby.gov.in)
-
 # 4. Write Hindi translation strings (userland/locales/hi.sigma-l10n)
-
 # 5. Fix BSP tree rebuild on remove_window (known TODO)
 
 # Week 1: First PR
-
 sigma-contrib check                  # validate your changes
-
 git commit -m "feat(agri): PMFBY enrollment API integration"
-
 # PR is auto-labelled, auto-assigned to reviewer
-
 ```
 
 ---
@@ -697,8 +670,12 @@ git commit -m "feat(agri): PMFBY enrollment API integration"
 All 10 roadmap documents with page counts:
 
 | # | Document | Key topics | Lines |
+<<<<<<< HEAD:docs/Final-Excellence-Roadmap.md
 
 | --- | ---------- | ----------- | ------- |
+=======
+|---|----------|-----------|-------|
+>>>>>>> wiki/master:Final-Excellence-Roadmap.md
 | 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability S1-S4, Performance P1-P6, Quality Q1-Q5, UX U1-U6 | ~1,000 |
 | 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | Energy, Reliability, Observability, Release Engineering, Network QA | ~900 |
 | 3 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ~700 |
@@ -710,7 +687,7 @@ All 10 roadmap documents with page counts:
 | 9 | [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | Versioning, Code review, Testing, Docs, ZDL, sigma-nanolib | ~800 |
 | 10 | [Final-Excellence-Roadmap](Final-Excellence-Roadmap) | Feedback, Boot experience, IPC quality, Data mgmt, Error handling, Accessibility, Security checklist, Tools inventory, Master schedule | ~800 |
 
-### Total: 10 documents, ~7,700 lines of actionable engineering roadmap.
+**Total: 10 documents, ~7,700 lines of actionable engineering roadmap.**
 
 ---
 

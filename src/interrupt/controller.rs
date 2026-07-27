@@ -55,15 +55,7 @@ impl InterruptController for SimpleInterruptController {
     }
     fn get_irq_state(&self, irq: IRQNumber) -> IRQState {
         if irq >= 256 { return IRQState::Disabled; }
-        {
-        let raw = self.irq_states[irq].load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => IRQState::Enabled,
-            2 => IRQState::Pending,
-            3 => IRQState::InService,
-            _ => IRQState::Disabled,
-        }
-    }
+        unsafe { core::mem::transmute(self.irq_states[irq].load(Ordering::SeqCst)) }
     }
 }
 

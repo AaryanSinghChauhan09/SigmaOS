@@ -145,14 +145,7 @@ impl ABPartitioning for SimpleABPartitioning {
     }
     
     fn get_active_partition(&self) -> BootState {
-        {
-        let raw = self.active_state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => BootState::B,
-            2 => BootState::Recovery,
-            _ => BootState::A,
-        }
-    }
+        unsafe { core::mem::transmute(self.active_state.load(Ordering::SeqCst)) }
     }
 }
 
@@ -177,19 +170,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

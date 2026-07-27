@@ -65,24 +65,8 @@ impl SimpleFirewallRule {
 
 impl FirewallRule for SimpleFirewallRule {
     fn id(&self) -> RuleID { self.id }
-    fn action(&self) -> RuleAction { {
-        let raw = self.action.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => RuleAction::Drop,
-            2 => RuleAction::Reject,
-            3 => RuleAction::Log,
-            _ => RuleAction::Accept,
-        }
-    } }
-    fn protocol(&self) -> Protocol { {
-        let raw = self.protocol.load(Ordering::SeqCst) as u32;
-        match raw {
-            17 => Protocol::UDP,
-            1 => Protocol::ICMP,
-            255 => Protocol::Any,
-            _ => Protocol::TCP,
-        }
-    } }
+    fn action(&self) -> RuleAction { unsafe { core::mem::transmute(self.action.load(Ordering::SeqCst)) } }
+    fn protocol(&self) -> Protocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
     fn source_ip(&self) -> &[u8] { &self.source_ip }
     fn destination_ip(&self) -> &[u8] { &self.destination_ip }
     fn source_port(&self) -> u16 { self.source_port.load(Ordering::SeqCst) as u16 }
@@ -237,19 +221,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -1,29 +1,22 @@
-use core::mem;
+#![no_std]
+#![no_main]
+
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
 /// Implements device detection, registration, and management
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type DeviceID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceClass {
-    Block = 0,
-    Character = 1,
-    Network = 2,
-    Input = 3,
-    Output = 4,
-}
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum DeviceClass { Block = 0, Character = 1, Network = 2, Input = 3, Output = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DeviceError {
-    Success = 0,
-    NotFound = 1,
-    AlreadyRegistered = 2,
-    InitFailed = 3,
-}
+pub enum DeviceError { Success = 0, NotFound = 1, AlreadyRegistered = 2, InitFailed = 3 }
 
 pub trait Device {
     fn id(&self) -> DeviceID;
@@ -56,25 +49,12 @@ impl SimpleDevice {
 }
 
 impl Device for SimpleDevice {
-    fn id(&self) -> DeviceID {
-        self.id
-    }
+    fn id(&self) -> DeviceID { self.id }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn device_class(&self) -> DeviceClass {
-        {
-            let raw = self.device_class.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => DeviceClass::Character,
-                2 => DeviceClass::Network,
-                3 => DeviceClass::Input,
-                4 => DeviceClass::Output,
-                _ => DeviceClass::Block,
-            }
-        }
-    }
+    fn device_class(&self) -> DeviceClass { unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) } }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
         Ok(())
@@ -116,10 +96,9 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn unregister_device(&mut self, id: DeviceID) -> Result<(), DeviceError> {
-        for device_option in self.devices.iter_mut() {
+        for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
-                    *device_option = None;
                     return Ok(());
                 }
             }
@@ -128,11 +107,9 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
-        for device_option in self.devices.iter() {
+        for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.id() == id {
-                    return Some(device.as_ref());
-                }
+                if device.id() == id { return Some(device.as_ref()); }
             }
         }
         None
@@ -140,7 +117,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn list_devices(&self, device_class: DeviceClass) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in self.devices.iter() {
+        for device_option in &self.devices {
             if let Some(ref device) = *device_option {
                 if device.device_class() == device_class {
                     ids.push(device.id());
@@ -152,7 +129,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn scan_devices(&mut self) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in self.devices.iter() {
+        for device_option in &self.devices {
             if let Some(ref device) = *device_option {
                 ids.push(device.id());
             }
@@ -180,9 +157,7 @@ impl SimpleDeviceDriver {
 }
 
 impl DeviceDriver for SimpleDeviceDriver {
-    fn device_id(&self) -> DeviceID {
-        self.device_id
-    }
+    fn device_id(&self) -> DeviceID { self.device_id }
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         for i in 0..buffer.len() {
@@ -237,131 +212,33 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     }
 
     fn enable_hotplug(&mut self, enabled: bool) {
-        self.enabled
-            .store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
+        self.enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

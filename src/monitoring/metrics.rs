@@ -2,9 +2,8 @@
 #![no_main]
 
 /// OOP-based Metrics Collection for SigmaOS
-/// Based on 100-Improvement-Ideas.md #78: Code profiler + visualizer
-/// Implements comprehensive system metrics collection, monitoring,
-/// and export capabilities for observability and performance analysis
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 151
+/// Implements system metrics collection and monitoring
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -13,7 +12,7 @@ pub type MetricID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum MetricType { Counter = 0, Gauge = 1, Histogram = 2, Summary = 3, Trend = 4 }
+pub enum MetricType { Counter = 0, Gauge = 1, Histogram = 2, Summary = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -57,16 +56,7 @@ impl Metric for SimpleMetric {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn metric_type(&self) -> MetricType { {
-        let raw = self.metric_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => MetricType::Gauge,
-            2 => MetricType::Histogram,
-            3 => MetricType::Summary,
-            4 => MetricType::Trend,
-            _ => MetricType::Counter,
-        }
-    } }
+    fn metric_type(&self) -> MetricType { unsafe { core::mem::transmute(self.metric_type.load(Ordering::SeqCst)) } }
     fn value(&self) -> f64 { (self.value.load(Ordering::SeqCst) as f64) / 10000.0 }
 
     fn set_value(&mut self, value: f64) {
@@ -215,8 +205,8 @@ fn format_simple(value: f64) -> Vec<u8> {
             digits.push((n % 10) as u8 + b'0');
             n /= 10;
         }
-        while let Some(d) = digits.pop() {
-            result.push(d);
+        while !digits.is_empty() {
+            result.push(digits.pop().unwrap());
         }
     }
 
@@ -231,8 +221,8 @@ fn format_simple(value: f64) -> Vec<u8> {
             digits.push((n % 10) as u8 + b'0');
             n /= 10;
         }
-        while let Some(d) = digits.pop() {
-            result.push(d);
+        while !digits.is_empty() {
+            result.push(digits.pop().unwrap());
         }
     }
 
@@ -269,19 +259,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -62,22 +62,14 @@ impl Plugin for SimplePlugin {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(16);
         &self.version[..len]
     }
-    fn state(&self) -> PluginState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PluginState::Loaded,
-            2 => PluginState::Active,
-            3 => PluginState::Error,
-            _ => PluginState::Unloaded,
-        }
-    } }
+    fn state(&self) -> PluginState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 }
 
 pub trait PluginManager {
     fn load_plugin(&mut self, path: &[u8]) -> Result<PluginID, PluginError>;
     fn unload_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
     fn get_plugin(&self, id: PluginID) -> Option<&dyn Plugin>;
-    fn enable_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
+    def enable_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
 }
 
 #[repr(C)]
@@ -145,7 +137,7 @@ impl PluginManager for SimplePluginManager {
 
 pub trait PluginAPI {
     fn register_extension(&mut self, plugin_id: PluginID, extension: &[u8]);
-    fn get_extension(&self, plugin_id: PluginID, extension: &[u8]) -> Option<&[u8]>;
+    def get_extension(&self, plugin_id: PluginID, extension: &[u8]) -> Option<&[u8]>;
 }
 
 #[repr(C)]
@@ -205,19 +197,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

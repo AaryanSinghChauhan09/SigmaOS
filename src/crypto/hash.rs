@@ -48,14 +48,7 @@ impl SimpleHashFunction {
 
 impl HashFunction for SimpleHashFunction {
     fn id(&self) -> HashID { self.id }
-    fn algorithm(&self) -> HashAlgorithm { {
-        let raw = self.algorithm.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => HashAlgorithm::SHA3_256,
-            2 => HashAlgorithm::BLAKE3,
-            _ => HashAlgorithm::SHA256,
-        }
-    } }
+    fn algorithm(&self) -> HashAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
     fn hash_size(&self) -> usize { 32 }
 
     fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {
@@ -230,19 +223,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

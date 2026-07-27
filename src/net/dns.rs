@@ -61,16 +61,7 @@ impl DNSRecord for SimpleDNSRecord {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
     }
-    fn record_type(&self) -> RecordType { {
-        let raw = self.record_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            28 => RecordType::AAAA,
-            5 => RecordType::CNAME,
-            15 => RecordType::MX,
-            16 => RecordType::TXT,
-            _ => RecordType::A,
-        }
-    } }
+    fn record_type(&self) -> RecordType { unsafe { core::mem::transmute(self.record_type.load(Ordering::SeqCst)) } }
     fn ttl(&self) -> u32 { self.ttl.load(Ordering::SeqCst) as u32 }
     fn data(&self) -> &[u8] {
         let len = self.data.iter().position(|&b| b == 0).unwrap_or(128);
@@ -218,19 +209,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

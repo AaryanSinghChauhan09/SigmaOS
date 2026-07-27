@@ -49,16 +49,7 @@ impl USBDevice for SimpleUSBDevice {
     fn id(&self) -> USBDeviceID { self.id }
     fn vendor_id(&self) -> u16 { self.vendor_id.load(Ordering::SeqCst) as u16 }
     fn product_id(&self) -> u16 { self.product_id.load(Ordering::SeqCst) as u16 }
-    fn device_type(&self) -> USBDeviceType { {
-        let raw = self.device_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => USBDeviceType::MassStorage,
-            2 => USBDeviceType::Network,
-            3 => USBDeviceType::Audio,
-            4 => USBDeviceType::Unknown,
-            _ => USBDeviceType::HID,
-        }
-    } }
+    fn device_type(&self) -> USBDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
 
     fn initialize(&mut self) -> Result<(), USBError> {
         Ok(())
@@ -243,19 +234,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -397,39 +397,17 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
-    fn iter(&self) -> Iter<'_, T> {
+    fn iter(&self) -> Iter<T> {
         Iter {
             data: self.data,
             len: self.len,
             index: 0,
-            _marker: core::marker::PhantomData,
         }
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-struct Iter<'a, T> {
-    data: *const T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a T>,
-}
-
-impl<'a, T> Iterator for Iter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
+impl<T> Iter<T> {
+    fn next(&mut self) -> Option<&T> {
         if self.index < self.len {
             unsafe {
                 let item = &*self.data.add(self.index);
@@ -442,116 +420,24 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-/// LZMA-style Range Encoder/Decoder (7-Zip Parity)
-pub struct LzmaRangeEncoder {
-    pub low: u64,
-    pub range: u64,
+struct Iter<T> {
+    data: *const T,
+    len: usize,
+    index: usize,
 }
 
-impl LzmaRangeEncoder {
-    pub fn new() -> Self {
-        Self {
-            low: 0,
-            range: 0xFFFF_FFFF,
-        }
-    }
-
-    /// Encode a single bit based on probability (LZMA range interval division)
-    pub fn encode_bit(&mut self, bit: bool, probability: u32) -> alloc::vec::Vec<u8> {
-        let mut output = alloc::vec::Vec::new();
-        let bound = (self.range >> 11) * probability as u64;
-
-        if !bit {
-            self.range = bound;
+impl<T> Iterator for Iter<T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            unsafe {
+                let item = &*self.data.add(self.index);
+                self.index += 1;
+                Some(item)
+            }
         } else {
-            self.low += bound;
-            self.range -= bound;
+            None
         }
-
-        while self.range < 0x0100_0000 {
-            output.push((self.low >> 24) as u8);
-            self.low <<= 8;
-            self.range <<= 8;
-        }
-
-        output
-    }
-}
-
-/// 7z solid multi-file archiver
-pub struct ArchiveFile {
-    pub name: alloc::string::String,
-    pub content: alloc::vec::Vec<u8>,
-}
-
-pub struct SevenZipSolidArchiver {
-    pub files: alloc::vec::Vec<ArchiveFile>,
-}
-
-impl SevenZipSolidArchiver {
-    pub fn new() -> Self {
-        Self {
-            files: alloc::vec::Vec::new(),
-        }
-    }
-
-    pub fn add_file(&mut self, file: ArchiveFile) {
-        self.files.push(file);
-    }
-
-    pub fn pack_solid_stream(&self) -> alloc::vec::Vec<u8> {
-        let mut solid_stream = alloc::vec::Vec::new();
-
-        // Write directory header first (File names and boundary offsets)
-        for file in &self.files {
-            solid_stream.extend_from_slice(file.name.as_bytes());
-            solid_stream.push(b':');
-            solid_stream.extend_from_slice(&file.content.len().to_be_bytes());
-            solid_stream.push(b'\n');
-        }
-        solid_stream.push(b'\0'); // Header separator
-
-        // Append raw file contents sequentially
-        for file in &self.files {
-            solid_stream.extend_from_slice(&file.content);
-        }
-
-        solid_stream
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_lzma_range_encoding_bit_division() {
-        let mut encoder = LzmaRangeEncoder::new();
-        let prob = 1024; // 50% probability
-
-        let out_bits_0 = encoder.encode_bit(false, prob);
-        let out_bits_1 = encoder.encode_bit(true, prob);
-
-        assert!(encoder.range < 0xFFFF_FFFF);
-    }
-
-    #[test]
-    fn test_7z_solid_stream_packing() {
-        let mut archiver = SevenZipSolidArchiver::new();
-        archiver.add_file(ArchiveFile {
-            name: alloc::string::String::from("main.rs"),
-            content: alloc::vec![0x11, 0x22, 0x33],
-        });
-        archiver.add_file(ArchiveFile {
-            name: alloc::string::String::from("lib.rs"),
-            content: alloc::vec![0x44, 0x55],
-        });
-
-        let packed = archiver.pack_solid_stream();
-
-        assert!(packed.iter().any(|&b| b == b':'));
-        assert!(packed.iter().any(|&b| b == 0x11));
-        assert!(packed.iter().any(|&b| b == 0x44));
     }
 }
 

@@ -1,4 +1,4 @@
-﻿# Class: RetryAgent
+# Class: RetryAgent
 
 Extends: `undici.Dispatcher`
 
@@ -59,4 +59,5 @@ const res = await agent.request({
 })
 console.log(res.statusCode)
 console.log(await res.body.text())
+
 ```

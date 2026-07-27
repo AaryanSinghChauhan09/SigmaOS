@@ -27,3 +27,21 @@ SigmaOS is an AI-native operating system. We are embedding machine learning fram
 - **Phase 2:** Local LLM Shell Integration (Natural Language CLI).
 
 - **Phase 3:** Hardware NPU/GPU tensor acceleration bindings.
+
+
+---
+## Merged from AI_DataScience.md
+# AI & Data Science Ecosystem
+
+## Frameworks & Tooling
+
+SigmaOS bundles critical Data Science stacks, ensuring they are compiled reproducibly and perform optimally on bare metal.
+
+- **ML Frameworks:** PyTorch, TensorFlow, JAX.
+- **Data Science:** Pandas, NumPy, JupyterLab.
+- **Visualization:** Matplotlib, Seaborn, Plotly.
+- **MLOps:** MLflow, DVC, Airflow.
+
+## Local AI Runtime Integration
+
+These tools interface directly with the `SigmaAI` runtime, utilizing ONNX Runtime and Hugging Face Transformers for local, quantized model execution.

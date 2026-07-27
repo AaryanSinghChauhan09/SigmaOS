@@ -63,15 +63,7 @@ impl ClusterNode for SimpleClusterNode {
         let len = self.ip_address.iter().position(|&b| b == 0).unwrap_or(16);
         &self.ip_address[..len]
     }
-    fn state(&self) -> NodeState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => NodeState::Online,
-            2 => NodeState::Degraded,
-            3 => NodeState::Maintenance,
-            _ => NodeState::Offline,
-        }
-    } }
+    fn state(&self) -> NodeState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 
     fn set_state(&mut self, state: NodeState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -228,19 +220,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

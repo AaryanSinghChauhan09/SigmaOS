@@ -6,6 +6,18 @@
 ---
 
 ## 🎯 Overview
+<<<<<<< HEAD
+
+SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
+
+### Core Pillars
+
+- **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
+- **Capability-Based Security**: 64-bit hardware-enforced permission model replacing legacy ACLs.
+- **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
+- **AI-Native Design**: Local LLM inference as a first-class OS primitive.
+- **India-First**: Native GST, Income Tax, UPI, and 22-language support.
+=======
 
 SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
@@ -17,12 +29,21 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
+>>>>>>> wiki/master
+
 ---
 
 ## 📊 System Architecture
 
 SigmaOS decomposes the traditional monolithic kernel into specialized, isolated shards. The interaction between these shards is governed by a capability-enforced transaction bus.
 
+<<<<<<< HEAD
+=======
+### OOP Architecture Plan
+
+SigmaOS is undergoing a 9-pillar OOP-based architecture redesign grounded in Linux kernel subsystems and Linux distro best practices. See the [OOP Development Plan](OOP_Development_Plan.md) for the full implementation roadmap.
+
+>>>>>>> wiki/master
 ```mermaid
 graph TD
     UserLand[Userland Applications] -->|Syscall Capability Gate| KernelGate[S-SEC Security Shard]
@@ -34,6 +55,7 @@ graph TD
     Bus --> S-AI[S-AI: Local LLM Orchestrator]
 ```
 
+<<<<<<< HEAD
 - **S-MM**: Sovereign Memory Manager (Buddy Allocator + Page Directory Controller).
 - **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF + EEVDF).
 - **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
@@ -41,6 +63,14 @@ graph TD
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
 - **S-IPC**: Zero-Copy Capability-Gated Message Queue.
 - **S-Signal**: Capability-Gated Signal Dispatcher.
+=======
+- **S-MM**: Sovereign Memory Manager (Buddy Allocator).
+- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
+- **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
+- **S-SEC**: Security Framework (PQC + MAC + Sandbox).
+- **S-AI**: AI Task Orchestrator (Local LLM routing).
+
+>>>>>>> wiki/master
 
 ---
 
@@ -98,6 +128,7 @@ For a detailed review of all security policies, see the canonical [Security Fram
 
 ---
 
+<<<<<<< HEAD
 ## 📋 Implementation Status
 
 ### ✅ Completed Features
@@ -172,11 +203,105 @@ cargo test
 ### Contributing
 
 SigmaOS welcomes contributions! Please see [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for guidelines.
+=======
+## 📚 Canonical Documentation (GitHub Wiki)
+
+```text
+Phase F (Competitor Crusher)   ████████████████████  100% ✅
+Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
+Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
+```
+
+### Current Status
+
+**Kernel Core:**
+- ✅ Kernel scheduler (MLFQ+CFS+EDF)
+- ✅ Syscalls (I/O + Process)
+- ✅ Physical MM (buddy allocator)
+- 🔄 Virtual MM (paging) - Partial
+- ✅ APIC + timer
+- ✅ sigma_pledge + sigma_unveil
+- ✅ Kyber-1024 KEM + Dilithium-5
+- ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
+- ✅ Linux Driver Absorption Engine
+- ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+
+**Networking & Storage:**
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
+
+**Desktop & Productivity:**
+- ✅ Zenith Desktop prototype
+- ✅ Screen recorder with GPU acceleration
+- ✅ Screenshot tool with annotation
+- ✅ Calendar + task manager
+- ✅ Email client with IMAP/SMTP
+- ✅ Note-taking app with Markdown
+- ✅ Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- ✅ Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- ✅ Password manager with biometric unlock
+- ✅ Intrusion detection system
+- ✅ Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- ✅ Virtual machine manager (QEMU/KVM)
+- ✅ Container manager (Docker/Podman)
+
+**Package Management:**
+- ✅ sigma-pkg CLI
+- ✅ Universal package manager
+- ✅ Rollback package snapshots
+
+**Networking:**
+- ✅ Cloud sync engine
+- ✅ Built-in torrent client
+- ✅ Network traffic analyzer
+
+**AI & Automation:**
+- ✅ AI orchestrator for system optimization
+
+**Customization:**
+- ✅ Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
+- ⬜ Bootable ISO (Phase G)
+
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### High-Impact Areas
+
+- Round-robin scheduler implementation
+- Buddy allocator completion
+- sigma-sh REPL
+- USB HID keyboard driver
+- VESA framebuffer driver
+- Package recipes
+
+>>>>>>> wiki/master
 
 ---
 
 ## 📚 Documentation
 
+<<<<<<< HEAD
 - [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 - [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security_Framework)
 - [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
@@ -268,6 +393,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📚 Documentation
 
+=======
+>>>>>>> wiki/master
 ### Repository Documentation
 
 - [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
@@ -285,6 +412,12 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
+<<<<<<< HEAD
+=======
+- **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
+- **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
+>>>>>>> wiki/master
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)

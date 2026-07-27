@@ -2,9 +2,8 @@
 #![no_main]
 
 /// OOP-based Performance Profiler for SigmaOS
-/// Based on 100-Improvement-Ideas.md #78: Code profiler + visualizer
-/// Implements comprehensive CPU, memory, I/O, and network profiling
-/// with call graph analysis and hotspot detection
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 191
+/// Implements CPU and memory profiling
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -48,15 +47,7 @@ impl SimpleProfile {
 
 impl Profile for SimpleProfile {
     fn id(&self) -> ProfileID { self.id }
-    fn profile_type(&self) -> ProfileType { {
-        let raw = self.profile_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ProfileType::Memory,
-            2 => ProfileType::IO,
-            3 => ProfileType::Network,
-            _ => ProfileType::CPU,
-        }
-    } }
+    fn profile_type(&self) -> ProfileType { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
     fn start_time(&self) -> u64 { self.start_time.load(Ordering::SeqCst) as u64 }
     fn end_time(&self) -> u64 { self.end_time.load(Ordering::SeqCst) as u64 }
     fn duration(&self) -> u64 {
@@ -199,19 +190,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

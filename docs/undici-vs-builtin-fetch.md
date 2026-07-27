@@ -1,4 +1,4 @@
-﻿# Undici Module vs. Node.js Built-in Fetch
+# Undici Module vs. Node.js Built-in Fetch
 
 Node.js has shipped a built-in `fetch()` implementation powered by undici since
 Node.js v18. This guide explains the relationship between the `undici` npm
@@ -9,10 +9,12 @@ on the other.
 
 The `fetch()`, `Request`, `Response`, `Headers`, and `FormData` globals in
 Node.js v18+ are provided by a version of undici that is bundled into Node.js
+
 itself. You can check which version is bundled with:
 
 ```js
 console.log(process.versions.undici); // e.g., "7.5.0"
+
 ```
 
 When you install undici from npm, you get the full library with all of its
@@ -37,6 +39,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 ```
 
 ### `undici` module imports
@@ -52,6 +55,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 ```
 
 ### `undici.install()` globals
@@ -72,6 +76,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 ```
 
 `install()` replaces the global `fetch`, `Headers`, `Response`, `Request`, and
@@ -90,6 +95,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 ```
 
 ```js
@@ -101,6 +107,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 ```
 
 Those combinations may behave differently across Node.js and undici versions.
@@ -144,6 +151,7 @@ import { request } from 'undici';
 
 const { statusCode, headers, body } = await request('https://example.com');
 const data = await body.json();
+
 ```
 
 ### Connection pooling and dispatchers
@@ -157,12 +165,14 @@ import { Pool } from 'undici';
 
 const pool = new Pool('https://example.com', { connections: 10 });
 const { body } = await pool.request({ path: '/', method: 'GET' });
+
 ```
 
 ### Proxy support
 
 `ProxyAgent` and `EnvHttpProxyAgent` handle HTTP(S) proxying. Note that
 Node.js v22.21.0+ and v24.0.0+ support environment-variable-based proxy
+
 configuration for the built-in `fetch` via the `--use-env-proxy` flag (or
 `NODE_USE_ENV_PROXY=1`). However, undici's `ProxyAgent` still provides
 programmatic control through the dispatcher API:
@@ -172,6 +182,7 @@ import { ProxyAgent, fetch } from 'undici';
 
 const proxyAgent = new ProxyAgent('https://my-proxy.example.com:8080');
 const response = await fetch('https://example.com', { dispatcher: proxyAgent });
+
 ```
 
 ### Testing and mocking
@@ -187,6 +198,7 @@ setGlobalDispatcher(mockAgent);
 
 const pool = mockAgent.get('https://example.com');
 pool.intercept({ path: '/api' }).reply(200, { message: 'mocked' });
+
 ```
 
 ### Interceptors and middleware
@@ -202,12 +214,21 @@ feature, you can install a newer version directly.
 
 ## Version compatibility
 
+<<<<<<< HEAD:docs/undici-vs-builtin-fetch.md
 | Node.js version | Bundled undici version | Notes |
 | --- | --- | --- |
 | v18.x | ~5.x | `fetch` is experimental (behind `--experimental-fetch` in early v18) |
 | v20.x | ~6.x | `fetch` is stable |
 | v22.x | ~6.x / ~7.x | `fetch` is stable |
 | v24.x | ~7.x | `fetch` is stable; env-proxy support via `--use-env-proxy` |
+=======
+| Node.js version | Bundled undici version | Notes | 
+| --- | --- | --- | 
+| v18.x | ~5.x | `fetch` is experimental (behind `--experimental-fetch` in early v18) | 
+| v20.x | ~6.x | `fetch` is stable | 
+| v22.x | ~6.x / ~7.x | `fetch` is stable | 
+| v24.x | ~7.x | `fetch` is stable; env-proxy support via `--use-env-proxy` | 
+>>>>>>> wiki/master:undici-vs-builtin-fetch.md
 
 You can always check the exact bundled version at runtime with
 `process.versions.undici`.
@@ -219,6 +240,7 @@ directly from `'undici'`:
 
 ```js
 import { fetch } from 'undici' // uses your installed version, not the built-in
+
 ```
 
 ## Further reading

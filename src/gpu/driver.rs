@@ -52,15 +52,7 @@ impl SimpleGPUDevice {
 
 impl GPUDevice for SimpleGPUDevice {
     fn id(&self) -> GPUDeviceID { self.id }
-    fn vendor(&self) -> GPUVendor { {
-        let raw = self.vendor.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => GPUVendor::AMD,
-            2 => GPUVendor::NVIDIA,
-            3 => GPUVendor::Other,
-            _ => GPUVendor::Intel,
-        }
-    } }
+    fn vendor(&self) -> GPUVendor { unsafe { core::mem::transmute(self.vendor.load(Ordering::SeqCst)) } }
     fn model(&self) -> &[u8] {
         let len = self.model.iter().position(|&b| b == 0).unwrap_or(64);
         &self.model[..len]
@@ -243,19 +235,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

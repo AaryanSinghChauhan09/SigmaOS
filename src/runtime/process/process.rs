@@ -131,18 +131,9 @@ impl Process {
     }
 
     pub fn get_state(&self) -> ProcessState {
-        {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ProcessState::Created,
-            2 => ProcessState::Running,
-            3 => ProcessState::Sleeping,
-            4 => ProcessState::Stopped,
-            5 => ProcessState::Zombie,
-            6 => ProcessState::Terminated,
-            _ => ProcessState::Uninitialized,
+        unsafe {
+            core::mem::transmute(self.state.load(Ordering::SeqCst))
         }
-    }
     }
 
     pub fn set_state(&self, state: ProcessState) {

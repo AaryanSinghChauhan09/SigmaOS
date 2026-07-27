@@ -51,24 +51,8 @@ impl SimpleBuilder {
 
 impl Builder for SimpleBuilder {
     fn id(&self) -> BuilderID { self.id }
-    fn architecture(&self) -> Architecture { {
-        let raw = self.architecture.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => Architecture::ARM64,
-            2 => Architecture::RISCV64,
-            3 => Architecture::PPC64,
-            _ => Architecture::X86_64,
-        }
-    } }
-    fn state(&self) -> BuilderState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => BuilderState::Building,
-            2 => BuilderState::Failed,
-            3 => BuilderState::Success,
-            _ => BuilderState::Idle,
-        }
-    } }
+    fn architecture(&self) -> Architecture { unsafe { core::mem::transmute(self.architecture.load(Ordering::SeqCst)) } }
+    fn state(&self) -> BuilderState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 
     fn start_build(&mut self, target: &[u8]) -> Result<(), BuildError> {
         if self.state.load(Ordering::SeqCst) != BuilderState::Idle as usize {
@@ -309,19 +293,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -2,9 +2,8 @@
 #![no_main]
 
 /// OOP-based Battery Management for SigmaOS
-/// Based on 100-Improvement-Ideas.md #15: Battery saver mode
-/// Implements comprehensive battery monitoring, health tracking,
-/// and intelligent power saving for optimal battery life
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 251
+/// Implements battery monitoring and power management
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -13,7 +12,7 @@ pub type BatteryID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3, Critical = 4 }
+pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -56,16 +55,7 @@ impl Battery for SimpleBattery {
     fn capacity(&self) -> u32 { self.capacity.load(Ordering::SeqCst) as u32 }
     fn current_charge(&self) -> u32 { self.current_charge.load(Ordering::SeqCst) as u32 }
     fn voltage(&self) -> u32 { self.voltage.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> BatteryState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => BatteryState::Discharging,
-            2 => BatteryState::Full,
-            3 => BatteryState::NotPresent,
-            4 => BatteryState::Critical,
-            _ => BatteryState::Charging,
-        }
-    } }
+    fn state(&self) -> BatteryState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn health(&self) -> u32 { self.health.load(Ordering::SeqCst) as u32 }
 }
 
@@ -200,19 +190,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -130,15 +130,9 @@ impl SimplePermission {
     }
 
     pub fn get_state(&self) -> PermissionState {
-        {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PermissionState::Denied,
-            2 => PermissionState::Prompt,
-            3 => PermissionState::Revoked,
-            _ => PermissionState::Granted,
+        unsafe {
+            core::mem::transmute(self.state.load(Ordering::SeqCst))
         }
-    }
     }
 
     pub fn set_state(&self, state: PermissionState) {
@@ -448,19 +442,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

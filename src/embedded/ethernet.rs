@@ -44,14 +44,7 @@ impl SimpleEthernetMAC {
 impl EthernetMAC for SimpleEthernetMAC {
     fn id(&self) -> MACID { self.id }
     fn mac_address(&self) -> [u8; 6] { self.mac_address }
-    fn link_state(&self) -> LinkState { {
-        let raw = self.link_state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => LinkState::Up,
-            2 => LinkState::AutoNegotiating,
-            _ => LinkState::Down,
-        }
-    } }
+    fn link_state(&self) -> LinkState { unsafe { core::mem::transmute(self.link_state.load(Ordering::SeqCst)) } }
 }
 
 pub trait EthernetController {
@@ -164,19 +157,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -43,5 +43,4 @@ S-SCHED is ignited during **Stage 5**of the**Asynchronous Shard Ignition (ASI)**
 3. **Sovereign AI Shard (0x3001)**: Background neural compute.
 
 ---
-
-### Stay Sovereign.
+*Stay Sovereign.*

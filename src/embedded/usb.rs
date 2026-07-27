@@ -43,15 +43,7 @@ impl SimpleUSBEndpoint {
 
 impl USBEndpoint for SimpleUSBEndpoint {
     fn id(&self) -> EndpointID { self.id }
-    fn endpoint_type(&self) -> EndpointType { {
-        let raw = self.endpoint_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => EndpointType::Isochronous,
-            2 => EndpointType::Bulk,
-            3 => EndpointType::Interrupt,
-            _ => EndpointType::Control,
-        }
-    } }
+    fn endpoint_type(&self) -> EndpointType { unsafe { core::mem::transmute(self.endpoint_type.load(Ordering::SeqCst)) } }
     fn max_packet_size(&self) -> u16 { self.max_packet_size.load(Ordering::SeqCst) as u16 }
 }
 
@@ -170,19 +162,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -118,19 +118,13 @@ impl SimplePowerManager {
     }
 
     pub fn get_profile(&self) -> PowerProfile {
-        {
-        let raw = self.profile.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PowerProfile::Balanced,
-            2 => PowerProfile::PowerSaver,
-            3 => PowerProfile::Custom,
-            _ => PowerProfile::Performance,
+        unsafe {
+            core::mem::transmute(self.profile.load(Ordering::SeqCst))
         }
     }
-    }
 
-    pub fn set_cpu_governor(&self, governor: CPUGovernor) {
-        self.cpu_governor.store(governor as usize, Ordering::SeqCst);
+    pub fn set_profile_atomic(&self, profile: PowerProfile) {
+        self.profile.store(profile as usize, Ordering::SeqCst);
     }
 
     pub fn get_cpu_governor(&self) -> CPUGovernor {
@@ -355,19 +349,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

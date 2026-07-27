@@ -353,19 +353,14 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
     hasher.finalize()
 }
 
-/// Generate random bytes using cryptographically secure method
+/// Generate random bytes
 pub fn random_bytes(buf: &mut [u8]) {
     static mut RNG: Option<XorshiftRNG> = None;
     
     unsafe {
         if RNG.is_none() {
-            // Use hardware entropy source in production
-            // For now, use time-based seed as placeholder
-            let seed = std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos() as u64;
-            RNG = Some(XorshiftRNG::new(seed));
+            // In a real implementation, this would use hardware entropy
+            RNG = Some(XorshiftRNG::new(0x5eece66d));
         }
         
         if let Some(ref mut rng) = RNG {

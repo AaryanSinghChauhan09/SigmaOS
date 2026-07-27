@@ -62,37 +62,19 @@ impl SyncItem for SimpleSyncItem {
         let len = self.remote_path.iter().position(|&b| b == 0).unwrap_or(256);
         &self.remote_path[..len]
     }
-    fn status(&self) -> SyncStatus { {
-        let raw = self.status.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => SyncStatus::Syncing,
-            2 => SyncStatus::Completed,
-            3 => SyncStatus::Error,
-            _ => SyncStatus::Idle,
-        }
-    } }
+    fn status(&self) -> SyncStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
 }
 
 pub trait CloudSync {
     fn add_sync(&mut self, local_path: &[u8], remote_path: &[u8]) -> Result<SyncID, SyncError>;
     fn remove_sync(&mut self, id: SyncID) -> Result<(), SyncError>;
-    fn sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
-}
-
-/// Peer-to-Peer file synchronization and discovery (Syncthing Parity)
-pub trait PeerToPeerSync {
-    fn register_peer(&mut self, peer_id: &[u8; 32]) -> Result<(), SyncError>;
-    fn discover_peers(&self) -> usize;
-    fn exchange_blocks(&mut self, id: SyncID, peer_id: &[u8; 32]) -> Result<(), SyncError>;
+    def sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
 }
 
 #[repr(C)]
 pub struct SimpleCloudSync {
     pub items: Vec<Option<Box<dyn SyncItem>>>,
     pub next_id: AtomicUsize,
-    pub max_bandwidth_limit_kbps: AtomicUsize,
-    pub retry_limit: AtomicUsize,
-    pub peers: Vec<[u8; 32]>, // Registered Syncthing-like P2P peer device IDs
 }
 
 impl SimpleCloudSync {
@@ -100,18 +82,7 @@ impl SimpleCloudSync {
         SimpleCloudSync {
             items: Vec::new(),
             next_id: AtomicUsize::new(1),
-            max_bandwidth_limit_kbps: AtomicUsize::new(10240), // 10MB/s
-            retry_limit: AtomicUsize::new(3),
-            peers: Vec::new(),
         }
-    }
-
-    pub fn set_bandwidth_limit(&mut self, limit_kbps: u32) {
-        self.max_bandwidth_limit_kbps.store(limit_kbps as usize, Ordering::SeqCst);
-    }
-
-    pub fn set_retry_limit(&mut self, limit: u32) {
-        self.retry_limit.store(limit as usize, Ordering::SeqCst);
     }
 }
 
@@ -145,22 +116,6 @@ impl CloudSync for SimpleCloudSync {
             }
         }
         Err(SyncError::NotFound)
-    }
-}
-
-impl PeerToPeerSync for SimpleCloudSync {
-    fn register_peer(&mut self, peer_id: &[u8; 32]) -> Result<(), SyncError> {
-        self.peers.push(*peer_id);
-        Ok(())
-    }
-
-    fn discover_peers(&self) -> usize {
-        self.peers.len
-    }
-
-    fn exchange_blocks(&mut self, id: SyncID, _peer_id: &[u8; 32]) -> Result<(), SyncError> {
-        self.sync_now(id)?;
-        Ok(())
     }
 }
 
@@ -219,19 +174,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

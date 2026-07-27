@@ -292,16 +292,7 @@ impl Logger for SimpleLogger {
             return;
         }
 
-        let current_level = {
-        let raw = self.level.load(Ordering::SeqCst) as u32;
-        match raw {
-            2 => LogLevel::Info,
-            3 => LogLevel::Warning,
-            4 => LogLevel::Error,
-            5 => LogLevel::Fatal,
-            _ => LogLevel::Trace,
-        }
-    };
+        let current_level = unsafe { core::mem::transmute(self.level.load(Ordering::SeqCst)) };
         if level < current_level {
             return;
         }
@@ -326,16 +317,9 @@ impl Logger for SimpleLogger {
     }
 
     fn level(&self) -> LogLevel {
-        {
-        let raw = self.level.load(Ordering::SeqCst) as u32;
-        match raw {
-            2 => LogLevel::Info,
-            3 => LogLevel::Warning,
-            4 => LogLevel::Error,
-            5 => LogLevel::Fatal,
-            _ => LogLevel::Trace,
+        unsafe {
+            core::mem::transmute(self.level.load(Ordering::SeqCst))
         }
-    }
     }
 
     fn add_appender(&mut self, appender: Box<dyn LogAppender>) -> Result<(), LogError> {
@@ -378,8 +362,11 @@ impl Logger for SimpleLogger {
 
 /// Get current time (nanoseconds)
 fn get_current_time() -> u64 {
-    static COUNTER: AtomicUsize = AtomicUsize::new(0);
-    COUNTER.fetch_add(1_000_000, Ordering::SeqCst) as u64
+    static mut COUNTER: u64 = 0;
+    unsafe {
+        COUNTER += 1_000_000;
+        COUNTER
+    }
 }
 
 /// Simple Vec implementation for no_std
@@ -430,19 +417,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

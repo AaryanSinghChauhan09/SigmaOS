@@ -49,15 +49,7 @@ impl SimplePanel {
 
 impl Panel for SimplePanel {
     fn id(&self) -> PanelID { self.id }
-    fn position(&self) -> PanelPosition { {
-        let raw = self.position.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => PanelPosition::Bottom,
-            2 => PanelPosition::Left,
-            3 => PanelPosition::Right,
-            _ => PanelPosition::Top,
-        }
-    } }
+    fn position(&self) -> PanelPosition { unsafe { core::mem::transmute(self.position.load(Ordering::SeqCst)) } }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn is_autohide(&self) -> bool { self.autohide.load(Ordering::SeqCst) == 1 }
@@ -207,19 +199,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

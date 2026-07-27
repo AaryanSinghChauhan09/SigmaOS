@@ -44,14 +44,7 @@ impl SimpleDevice {
 impl Device for SimpleDevice {
     fn id(&self) -> DeviceID { self.id }
     fn device_type(&self) -> DeviceType { self.device_type }
-    fn state(&self) -> DeviceState { {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => DeviceState::Initialized,
-            2 => DeviceState::Active,
-            _ => DeviceState::Uninitialized,
-        }
-    } }
+    fn state(&self) -> DeviceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn initialize(&mut self) -> Result<(), HALError> {
         self.state.store(DeviceState::Initialized as usize, Ordering::SeqCst);
         Ok(())
@@ -109,19 +102,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

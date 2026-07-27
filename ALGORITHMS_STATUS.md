@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🛠️ SigmaOS Algorithms, Compilation, & Subsystem Status Guide
 
 This document serves as the definitive, hyper-detailed master status guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, lists the exact compilation-blocking errors, and provides precise, copy-pasteable instructions to resolve every compiler error instantly.
@@ -312,3 +313,29 @@ cargo test
 ```
 
 This ensures zero-error status, enabling rapid, clean feature and driver development across the SigmaOS microkernel.
+=======
+# 🧮 SigmaOS Core Algorithms Status
+
+This document registers the active implementation status of critical algorithms and zero-dependency utilities inside **SigmaOS**.
+
+---
+
+## 📈 Algorithmic Index
+
+### 1. S-MM Memory Manager (Buddy Allocator)
+*   **State:** Stable & Production Ready.
+*   **Complexity:** $O(1)$ buddy order calculations using branchless CPU instruction mapping.
+*   **Zero-Dependency:** 100% custom, native Rust implementations.
+
+### 2. S-SCHED Predictive Scheduler (EDF + CFS)
+*   **State:** Complete.
+*   **Complexity:** Min-heap binary tree for EDF deadlines; balanced virtual-runtime allocation slices for CFS.
+
+### 3. S-AI Multi-Agent Task Planner
+*   **State:** Complete.
+*   **Complexity:** Linear cosine similarity lookup over local vector storage databases.
+
+### 4. S-SEC Security Sandbox (Pledge & Unveil)
+*   **State:** Integrated.
+*   **Complexity:** Bitwise mask-comparisons over syscall gates and capability tokens.
+>>>>>>> wiki/master

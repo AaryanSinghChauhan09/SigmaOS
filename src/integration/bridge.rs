@@ -48,14 +48,7 @@ impl SimpleBridge {
 
 impl Bridge for SimpleBridge {
     fn id(&self) -> BridgeID { self.id }
-    fn bridge_type(&self) -> BridgeType { {
-        let raw = self.bridge_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => BridgeType::Foreign,
-            2 => BridgeType::Hybrid,
-            _ => BridgeType::Native,
-        }
-    } }
+    fn bridge_type(&self) -> BridgeType { unsafe { core::mem::transmute(self.bridge_type.load(Ordering::SeqCst)) } }
     fn target_system(&self) -> &[u8] {
         let len = self.target_system.iter().position(|&b| b == 0).unwrap_or(64);
         &self.target_system[..len]
@@ -66,7 +59,7 @@ pub trait BridgeManager {
     fn create_bridge(&mut self, bridge_type: BridgeType, target: &[u8]) -> Result<BridgeID, BridgeError>;
     fn destroy_bridge(&mut self, id: BridgeID) -> Result<(), BridgeError>;
     fn get_bridge(&self, id: BridgeID) -> Option<&dyn Bridge>;
-    fn send_data(&self, bridge_id: BridgeID, data: &[u8]) -> Result<(), BridgeError>;
+    def send_data(&self, bridge_id: BridgeID, data: &[u8]) -> Result<(), BridgeError>;
 }
 
 #[repr(C)]
@@ -163,19 +156,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

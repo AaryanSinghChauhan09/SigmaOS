@@ -58,15 +58,7 @@ impl MenuItem for SimpleMenuItem {
         let len = self.label.iter().position(|&b| b == 0).unwrap_or(128);
         &self.label[..len]
     }
-    fn item_type(&self) -> MenuItemType { {
-        let raw = self.item_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => MenuItemType::Action,
-            2 => MenuItemType::Submenu,
-            3 => MenuItemType::Checkbox,
-            _ => MenuItemType::Separator,
-        }
-    } }
+    fn item_type(&self) -> MenuItemType { unsafe { core::mem::transmute(self.item_type.load(Ordering::SeqCst)) } }
     fn is_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
     fn is_checked(&self) -> bool { self.checked.load(Ordering::SeqCst) == 1 }
 }
@@ -174,19 +166,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

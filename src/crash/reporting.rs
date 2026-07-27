@@ -54,16 +54,7 @@ impl SimpleCrashReport {
 
 impl CrashReport for SimpleCrashReport {
     fn id(&self) -> CrashReportID { self.id }
-    fn crash_type(&self) -> CrashType { {
-        let raw = self.crash_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => CrashType::BusError,
-            2 => CrashType::IllegalInstruction,
-            3 => CrashType::Abort,
-            4 => CrashType::Panic,
-            _ => CrashType::SegmentationFault,
-        }
-    } }
+    fn crash_type(&self) -> CrashType { unsafe { core::mem::transmute(self.crash_type.load(Ordering::SeqCst)) } }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn process_name(&self) -> &[u8] {
         let len = self.process_name.iter().position(|&b| b == 0).unwrap_or(64);
@@ -304,19 +295,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

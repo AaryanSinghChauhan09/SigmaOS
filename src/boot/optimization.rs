@@ -144,15 +144,9 @@ impl SimpleBootService {
     }
 
     pub fn get_status(&self) -> ServiceStatus {
-        {
-        let raw = self.status.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ServiceStatus::Initializing,
-            2 => ServiceStatus::Ready,
-            3 => ServiceStatus::Failed,
-            _ => ServiceStatus::Pending,
+        unsafe {
+            core::mem::transmute(self.status.load(Ordering::SeqCst))
         }
-    }
     }
 
     pub fn set_status(&self, status: ServiceStatus) {
@@ -457,19 +451,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

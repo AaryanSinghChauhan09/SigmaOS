@@ -100,6 +100,7 @@ To fit the operating system on low-cost older devices and save valuable NVMe sto
 
 ## 📅 5. Step-by-Step Implementation Roadmap
 
+<<<<<<< HEAD
 ### Phase 1: Establish OOP Unified Peripheral Abstraction
 - Define the `UnifiedPeripheral` interface trait in `src/driver/device.rs`.
 - Implement concrete structs `LegacyDevice` (encapsulating x86 `inb`/`outb` instructions or equivalent base-level port communications) and `ModernDevice` (encapsulating MMIO base addresses and memory offsets).
@@ -108,10 +109,23 @@ To fit the operating system on low-cost older devices and save valuable NVMe sto
 ### Phase 2: Design the UDF Micro-Interpreter Engine
 - Create a lightweight stack-based or register-based bytecode interpreter struct (`UdfInterpreter`) inside `src/driver/device.rs`.
 - Define a clean bytecode instruction set:
+=======
+Below is the concrete, 5-phase execution plan to implement this strategy within the SigmaOS codebase.
+
+### Phase 1: Establish OOP Unified Peripheral Abstraction
+- [ ] Define the `UnifiedPeripheral` interface trait in `src/driver/device.rs`.
+- [ ] Implement concrete structs `LegacyDevice` (encapsulating x86 `inb`/`outb` instructions or equivalent base-level port communications) and `ModernDevice` (encapsulating MMIO base addresses and memory offsets).
+- [ ] Add an enumerator wrapper `PeripheralChannel` to safely abstract Port I/O and Memory-Mapped I/O operations under a single API.
+
+### Phase 2: Design the UDF Micro-Interpreter Engine
+- [ ] Create a lightweight stack-based or register-based bytecode interpreter struct (`UdfInterpreter`) inside `src/driver/device.rs`.
+- [ ] Define a clean bytecode instruction set:
+>>>>>>> wiki/master
   - `0x01` (Read Port I/O / MMIO)
   - `0x02` (Write Port I/O / MMIO)
   - `0x03` (Arithmetic transformation)
   - `0x04` (Halting & returning status)
+<<<<<<< HEAD
 - Implement execution bounds-checking to guarantee that a user-defined function cannot read or write memory outside the peripheral's assigned I/O range.
 
 ---
@@ -131,12 +145,52 @@ pub enum PortAddress {
 
 /// Unified Peripheral Object-Oriented Interface (OOP Principle)
 pub trait UnifiedPeripheral: Device {
+=======
+- [ ] Implement execution bounds-checking to guarantee that a user-defined function cannot read or write memory outside the peripheral's assigned I/O range.
+
+### Phase 3: Implement Dual-Generation Auto-Negotiation Broker
+- [ ] Create a `PeripheralBroker` or expand `DeviceManager` to hold dynamic tables of both legacy and modern device profiles.
+- [ ] Add an auto-detection routine:
+  - If PCIe / USB xHCI registers a device, instantiate a `ModernDevice` with full capabilities.
+  - If legacy probing (e.g., ACPI, CMOS, PS/2 controller status registers) detects older hardware, instantiate a `LegacyDevice` with fallback functions.
+- [ ] Map both instances to the standard `UnifiedPeripheral` dynamic interface, allowing userland apps to use standard syscalls (`read`, `write`, `ioctl`) seamlessly.
+
+### Phase 4: Dynamic Compression and Memory Mapping
+- [ ] Integrate a compact, zero-allocation compression module (such as raw LZ4/LZMA decoder).
+- [ ] Store UDF driver bytecodes and optional firmware blocks in compressed formats.
+- [ ] Implement an on-demand decompression loader that inflates driver configurations only when the peripheral's physical ID is detected during bus scanning.
+
+### Phase 5: Verification & Quality Assurance
+- [ ] Ensure the entire codebase compiles successfully under `#![no_std]` environment constraints.
+- [ ] Run automated quality check tools (`scripts/sigma_quality_check.sh`) to verify licensing, style, and build integrity.
+- [ ] Validate runtime compatibility through automated unit and integration tests.
+
+---
+
+## 🔍 6. Architectural Reference Implementation
+
+Here is how the Rust implementation realizes these OOP and UDF compatibility principles cleanly in a zero-dependency environment:
+
+```rust
+// Unified representation of communication channels
+#[derive(Debug, Clone, Copy)]
+pub enum PortAddress {
+    PortIO(u16),      // Legacy 16-bit Port I/O (e.g., older x86 systems)
+    MemoryMapped(u32) // Modern 32/64-bit MMIO Address (e.g., PCIe, modern ARM/x86)
+}
+
+// Unified Peripheral Object-Oriented Interface
+pub trait UnifiedPeripheral {
+    fn initialize(&mut self) -> Result<(), DeviceError>;
+    fn handle_interrupt(&mut self) -> Result<(), DeviceError>;
+>>>>>>> wiki/master
     fn query_channel(&self) -> PortAddress;
     fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
     fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
 }
 ```
 
+<<<<<<< HEAD
 ### 6.2 Legacy & Modern Devices (from `src/driver/device.rs`)
 ```rust
 /// Legacy implementation of a peripheral using Port I/O
@@ -309,3 +363,6 @@ impl UdfInterpreter {
 ## 🛡️ 7. Conclusion
 
 This multi-generation device and customization architecture guarantees that **SigmaOS** remains remarkably lightweight (sub-megabyte kernel sizes) while retaining 100% feature and protocol compatibility with both legacy 8-bit/16-bit ports and modern 32-bit/64-bit MMIO devices.
+=======
+This model ensures that whether a device is an old 1980s 16550 UART serial chip or a high-end modern USB controller, the OS operates on it through a single, elegant, and low-footprint unified interface.
+>>>>>>> wiki/master

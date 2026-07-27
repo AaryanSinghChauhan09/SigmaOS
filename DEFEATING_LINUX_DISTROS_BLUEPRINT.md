@@ -66,7 +66,11 @@ Kubuntu thrives on highly customizable KDE Plasma layouts. SigmaOS surpasses Kub
 | **Usability** | Polished KDE applications | Gamified productivity + cross-device continuity | Seamless cross-platform state sync |
 | **Security** | AppArmor, standard user controls| Zero-trust capability gates + PQC + forensic logs | Strict, verifiable, and military-grade default safety |
 | **Cloud** | Ubuntu Ecosystem | SigmaNet mesh + offline-first sync engine | Complete peer-to-peer data sovereignty |
+<<<<<<< HEAD
 | **Dev Tools** | KDE developer tools, Snapcraft | SigmaDev IDE + container orchestration | Native Rust/Zig/Nim compilers and local AI review |
+=======
+| **Dev Tools** | KDE developer tools, Snapcraft | SigmaDev IDE + containers | AI-native, modern language focus and local AI review |
+>>>>>>> wiki/master
 | **Multimedia** | KDE multimedia apps | Native video editor + Game Hub Launcher | Professional-grade media timeline and latency-free audio |
 
 ---
