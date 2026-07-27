@@ -231,7 +231,8 @@ impl ShellSession for SimpleShellSession {
 
         if let Some(command) = self.registry.get(&command_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            cmd.execute(&args)
+            let slice = unsafe { core::slice::from_raw_parts(args.data, args.len) };
+            cmd.execute(slice)
         } else {
             Err(CommandError::NotFound)
         }
@@ -248,11 +249,13 @@ impl ShellSession for SimpleShellSession {
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &self.environment {
-            let len = k.iter().position(|&b| b == 0).unwrap_or(64);
-            if &k[..len] == key {
-                let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
-                return Some(&v[..vlen]);
+        for i in 0..self.environment.len() {
+            if let Some(&(ref k, ref v)) = self.environment.get(i) {
+                let len = k.iter().position(|&b| b == 0).unwrap_or(64);
+                if &k[..len] == key {
+                    let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
+                    return Some(&v[..vlen]);
+                }
             }
         }
         None
