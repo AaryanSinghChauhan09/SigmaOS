@@ -118,7 +118,7 @@ pub use security::{
     RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
     GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };
-pub use shell::{ShellCommand, ShellRepl};
+pub use shell::{ShellCommand, ShellRepl, TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
