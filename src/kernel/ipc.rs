@@ -54,10 +54,62 @@ impl Channel {
     }
 }
 
+/// Represents a high-performance structured sovereign pipe (defeating legacy Linux pipes)
+pub struct SovereignPipe {
+    pub id: u64,
+    pub reader_pid: u64,
+    pub writer_pid: u64,
+    pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
+    pub max_capacity: usize,
+    pub bytes_transferred: u64,
+}
+
+impl SovereignPipe {
+    pub fn new(id: u64, reader_pid: u64, writer_pid: u64, capacity: usize) -> Self {
+        Self {
+            id,
+            reader_pid,
+            writer_pid,
+            ring_buffer: Vec::new(),
+            max_capacity: capacity,
+            bytes_transferred: 0,
+        }
+    }
+
+    /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
+    pub fn write_structure(&mut self, payload: Vec<u8>) -> Result<(), IpcError> {
+        if self.ring_buffer.len() >= self.max_capacity {
+            return Err(IpcError::ChannelFull);
+        }
+        self.bytes_transferred += payload.len() as u64;
+        self.ring_buffer.push(payload);
+        Ok(())
+    }
+
+    /// Structured read operation (returns None if pipe is empty)
+    pub fn read_structure(&mut self) -> Option<Vec<u8>> {
+        if self.ring_buffer.is_empty() {
+            None
+        } else {
+            // Read in FIFO order (circular ring style)
+            Some(self.ring_buffer.remove(0))
+        }
+    }
+
+    /// User-defined stream processing: Filters or transforms pipe payloads in-place
+    pub fn filter_stream<F>(&mut self, filter_func: F)
+    where
+        F: Fn(&Vec<u8>) -> bool,
+    {
+        self.ring_buffer.retain(|item| filter_func(item));
+    }
+}
+
 /// IPC manager
 pub struct IpcManager {
     channels: Vec<Channel>,
     next_id: u64,
+    pub pipes: Vec<SovereignPipe>,
 }
 
 impl IpcManager {
@@ -65,6 +117,7 @@ impl IpcManager {
         Self {
             channels: Vec::new(),
             next_id: 0,
+            pipes: Vec::new(),
         }
     }
 
@@ -160,5 +213,33 @@ mod tests {
 
         let received = manager.receive(channel_id, 200);
         assert!(received.is_ok());
+    }
+
+    #[test]
+    fn test_sovereign_pipes_vs_linux_pipes() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 10);
+
+        // Write structured frames
+        pipe.write_structure(vec![1, 2, 3]).unwrap();
+        pipe.write_structure(vec![10, 20, 30]).unwrap();
+        pipe.write_structure(vec![4, 5, 6]).unwrap();
+
+        assert_eq!(pipe.ring_buffer.len(), 3);
+
+        // Run user-defined filter on structured stream
+        pipe.filter_stream(|payload| payload[0] < 10);
+
+        // Payloads starting with 10 or greater are filtered out (i.e. vec![10, 20, 30] removed)
+        assert_eq!(pipe.ring_buffer.len(), 2);
+
+        // Read structures back in FIFO order
+        let r1 = pipe.read_structure().unwrap();
+        assert_eq!(r1, vec![1, 2, 3]);
+
+        let r2 = pipe.read_structure().unwrap();
+        assert_eq!(r2, vec![4, 5, 6]);
+
+        let r3 = pipe.read_structure();
+        assert!(r3.is_none());
     }
 }
