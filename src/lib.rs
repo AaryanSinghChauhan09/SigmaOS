@@ -4,7 +4,16 @@
 // Core library for SigmaOS operating system
 
 pub mod ai;
+pub mod boot;
 pub mod accessibility;
+
+pub use boot::{
+    PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE,
+    PostDiagnostics, PostStatus, PostTest, TestType, SimpleUEFIBootloader,
+    UEFIBootloader, SecureBoot, SimpleSecureBoot, GopFramebuffer, AcpiParser,
+    UsbHostController, MultiKernelBootSelector, SovereignBootWatchdog,
+    GopSplashCanvas, MicrokernelProfile, BootError,
+};
 pub mod automation;
 
 pub use ai::{
