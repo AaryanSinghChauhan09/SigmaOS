@@ -30,11 +30,24 @@ pub enum RecipeError {
     InvalidRecipe,
 }
 
-pub struct RecipeManager;
+pub struct RecipeManager {
+    pub recipes: HashMap<String, PackageRecipe>,
+}
 
 impl RecipeManager {
     pub fn new() -> Self {
-        Self
+        Self {
+            recipes: HashMap::new(),
+        }
+    }
+
+    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
+        self.recipes.insert(recipe.name.clone(), recipe);
+        Ok(())
+    }
+
+    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
+        self.recipes.values().collect()
     }
 }
 
@@ -173,6 +186,11 @@ impl PackageRecipe {
     }
 }
 
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -253,3 +271,4 @@ mod tests {
         );
     }
 }
+
