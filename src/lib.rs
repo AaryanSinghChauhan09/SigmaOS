@@ -55,7 +55,8 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,

@@ -10,6 +10,7 @@ use sigmaos::compatibility::{
     WorkloadProfile, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
+use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
     MaliciousSignature, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
@@ -161,5 +162,67 @@ mod tests {
         let malicious_score = audit.evaluate_anomaly_score(b"sudo /bin/sh -c 'rm -rf /'");
         assert!(malicious_score >= 80);
         assert!(!audit.check_payload_safety(b"sudo /bin/sh -c 'rm -rf /'"));
+    }
+
+    #[test]
+    fn test_smart_symbolic_links() {
+        let mut link1 = SmartSymlink::new("lib-redirect-1", "/usr/lib/modern/libc.so");
+        assert!(link1.add_fallback_target("/usr/lib/legacy/libc.so"));
+        assert!(link1.add_fallback_target("/lib/libc.so"));
+
+        let mut link2 = SmartSymlink::new("lib-redirect-2", "/usr/lib/alt/libc.so");
+
+        let rule = LinuxPersonaRule;
+
+        // Case 1: Primary target exists
+        let res1 =
+            link1.resolve_symlink(KernelPersona::Linux_6_x, true, &[false, false], &rule, None);
+        assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
+
+        // Case 2: Primary target broken, heals to fallback index 1
+        let res2 =
+            link1.resolve_symlink(KernelPersona::Linux_6_x, false, &[false, true], &rule, None);
+        assert_eq!(res2, Ok("/lib/libc.so"));
+
+        // Case 3: Complete orphaning
+        let res3 = link1.resolve_symlink(
+            KernelPersona::Linux_6_x,
+            false,
+            &[false, false],
+            &rule,
+            None,
+        );
+        assert!(res3.is_err());
+
+        // Case 4: ELOOP infinite recursion detection (nested lookup chains)
+        let mut loop_err = Ok("");
+        for _ in 0..12 {
+            loop_err = link1.resolve_symlink(
+                KernelPersona::Linux_6_x,
+                true,
+                &[false, false],
+                &rule,
+                Some(&link2),
+            );
+            if loop_err.is_err() {
+                break;
+            }
+        }
+        assert_eq!(
+            loop_err,
+            Err("ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.")
+        );
+
+        // Case 5: Rule context-awareness evaluation
+        let legacy_rule = LegacyLinuxRule;
+        // On modern Linux_6_x kernel, Legacy rule rejects and points directly to first fallback path
+        let res_legacy = link1.resolve_symlink(
+            KernelPersona::Linux_6_x,
+            true,
+            &[false, false],
+            &legacy_rule,
+            None,
+        );
+        assert_eq!(res_legacy, Ok("/usr/lib/legacy/libc.so"));
     }
 }
