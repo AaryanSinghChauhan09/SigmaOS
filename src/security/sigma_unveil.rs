@@ -143,6 +143,17 @@ impl UnveilState {
 
     /// Check if a path is accessible with given permission
     pub fn check_access(&self, path: &Path, required_perm: UnveilPermissions) -> Result<()> {
+        // Mitigate directory traversal: reject paths containing parent directory segments
+        for component in path.components() {
+            if let std::path::Component::ParentDir = component {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    "Directory traversal sequence detected",
+                )
+                .into());
+            }
+        }
+
         // Find the most specific matching entry
         let mut best_entry: Option<&UnveilEntry> = None;
         let mut best_len = 0;
@@ -345,6 +356,11 @@ mod tests {
         // Access to /var should be denied (not unveiled)
         assert!(state
             .check_access(Path::new("/var/log"), UnveilPermissions::Read)
+            .is_err());
+
+        // Traversal sequences should be immediately blocked and return Err
+        assert!(state
+            .check_access(Path::new("/etc/../tmp/file"), UnveilPermissions::Read)
             .is_err());
     }
 
