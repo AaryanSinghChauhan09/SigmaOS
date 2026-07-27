@@ -31,10 +31,10 @@ impl ForensicAnalyzer {
         let mut files = Vec::new();
         // Simplified signature carving for PNG files as a forensic example
         let png_magic = b"\x89PNG\r\n\x1A\n";
-        
+
         let mut offset = 0;
         while offset + png_magic.len() <= raw_disk.len() {
-            if &raw_disk[offset..offset+png_magic.len()] == png_magic {
+            if &raw_disk[offset..offset + png_magic.len()] == png_magic {
                 // In a real implementation, we would parse chunks. Here we just grab a fixed size for the test.
                 let end = (offset + 1024).min(raw_disk.len());
                 files.push(RecoveredFile {
@@ -46,17 +46,20 @@ impl ForensicAnalyzer {
                 offset += 1;
             }
         }
-        
+
         files
     }
 
     /// Extracts EXIF/Metadata from raw memory regions
     pub fn extract_metadata(&self, memory_dump: &[u8]) -> Vec<ExtractedMetadata> {
         let mut metadata = Vec::new();
-        
+
         // Simulating finding EXIF headers
         let exif_magic = b"Exif\0\0";
-        if let Some(pos) = memory_dump.windows(exif_magic.len()).position(|w| w == exif_magic) {
+        if let Some(pos) = memory_dump
+            .windows(exif_magic.len())
+            .position(|w| w == exif_magic)
+        {
             metadata.push(ExtractedMetadata {
                 key: String::from("CameraMake"),
                 value: String::from("SigmaForensics_Simulated"),
@@ -66,7 +69,7 @@ impl ForensicAnalyzer {
                 value: alloc::format!("{}", pos),
             });
         }
-        
+
         metadata
     }
 }
@@ -81,8 +84,8 @@ mod tests {
         let mut disk = alloc::vec![0u8; 2048];
         // Inject a fake PNG signature
         let magic = b"\x89PNG\r\n\x1A\n";
-        disk[500..500+magic.len()].copy_from_slice(magic);
-        
+        disk[500..500 + magic.len()].copy_from_slice(magic);
+
         let recovered = analyzer.recover_orphan_files(&disk);
         assert_eq!(recovered.len(), 1);
         assert_eq!(recovered[0].filename, "recovered_image_500.png");
@@ -93,8 +96,8 @@ mod tests {
         let analyzer = ForensicAnalyzer::new();
         let mut mem = alloc::vec![0u8; 100];
         let magic = b"Exif\0\0";
-        mem[20..20+magic.len()].copy_from_slice(magic);
-        
+        mem[20..20 + magic.len()].copy_from_slice(magic);
+
         let meta = analyzer.extract_metadata(&mem);
         assert_eq!(meta.len(), 2);
         assert_eq!(meta[0].key, "CameraMake");

@@ -163,9 +163,7 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
             services_parallelized,
             message: format!(
                 "Optimized {} services: {} delayed, {} marked for parallel execution",
-                services_optimized,
-                delayed_count,
-                parallelized_count
+                services_optimized, delayed_count, parallelized_count
             ),
         }
     }

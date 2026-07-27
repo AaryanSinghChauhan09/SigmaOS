@@ -5,10 +5,16 @@ pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
+pub mod manjaro;
 pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 
+pub use manjaro::{
+    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
+    ManjaroKernelRelease, ManjaroKernelSwitcher,
+    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
+};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,

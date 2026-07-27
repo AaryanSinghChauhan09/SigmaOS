@@ -35,8 +35,13 @@ impl AudioMixer {
         if self.tracks.is_empty() {
             return Vec::new();
         }
-        
-        let max_len = self.tracks.iter().map(|t| t.pcm_data.len()).max().unwrap_or(0);
+
+        let max_len = self
+            .tracks
+            .iter()
+            .map(|t| t.pcm_data.len())
+            .max()
+            .unwrap_or(0);
         let mut mixed = alloc::vec![0_i16; max_len];
 
         for track in &self.tracks {
@@ -80,7 +85,7 @@ mod tests {
             volume: 0.5, // Will contribute 250, 500, 750
             is_muted: false,
         });
-        
+
         let mix = mixer.mixdown();
         assert_eq!(mix[0], 1250);
         assert_eq!(mix[2], 3750);
