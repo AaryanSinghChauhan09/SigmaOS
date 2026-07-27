@@ -178,7 +178,10 @@ impl NetworkPolicy for SimpleNetworkPolicy {
 /// Zero-trust engine trait (OOP interface)
 pub trait ZeroTrustEngine {
     /// Register policy
-    fn register_policy(&mut self, policy: Box<dyn NetworkPolicy>) -> Result<PolicyID, ZeroTrustError>;
+    fn register_policy(
+        &mut self,
+        policy: Box<dyn NetworkPolicy>,
+    ) -> Result<PolicyID, ZeroTrustError>;
     /// Unregister policy
     fn unregister_policy(&mut self, id: PolicyID) -> Result<(), ZeroTrustError>;
     /// Enable policy
@@ -281,7 +284,10 @@ impl SimpleZeroTrustEngine {
 }
 
 impl ZeroTrustEngine for SimpleZeroTrustEngine {
-    fn register_policy(&mut self, policy: Box<dyn NetworkPolicy>) -> Result<PolicyID, ZeroTrustError> {
+    fn register_policy(
+        &mut self,
+        policy: Box<dyn NetworkPolicy>,
+    ) -> Result<PolicyID, ZeroTrustError> {
         if !self.capability.can_register {
             return Err(ZeroTrustError::PermissionDenied);
         }

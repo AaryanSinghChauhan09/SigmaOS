@@ -232,6 +232,55 @@ impl FileDescriptor for SimpleFileDescriptor {
     }
 }
 
+/// FreeFileSync-inspired File Synchronizer (File Comparison & Sync Engine)
+pub struct FolderSyncEngine {
+    pub sync_db: Vec<(InodeID, usize)>, // Tracking file ID -> size database
+}
+
+impl FolderSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            sync_db: Vec::new(),
+        }
+    }
+
+    pub fn register_file_state(&mut self, id: InodeID, size: usize) {
+        self.sync_db.push((id, size));
+    }
+
+    /// Compare current file size with database state to detect differences
+    pub fn compare_and_detect(&self, id: InodeID, current_size: usize) -> bool {
+        for i in 0..self.sync_db.len() {
+            let entry = &self.sync_db[i];
+            if entry.0 == id {
+                return entry.1 != current_size; // Returns true if size is modified
+            }
+        }
+        true // Consider modified/new if not found in db
+    }
+
+    /// Synchronize data from source filesystem to target filesystem (Update Sync)
+    pub fn sync_files(
+        &mut self,
+        source_fs: &dyn Filesystem,
+        target_fs: &mut dyn Filesystem,
+        inode_id: InodeID,
+    ) -> Result<usize, VFSError> {
+        let inode = source_fs.read_inode(inode_id).ok_or(VFSError::NotFound)?;
+        let mut buffer = alloc::vec![0u8; inode.size()];
+
+        // Read data from source
+        let read_bytes = source_fs.read_data(inode_id, 0, &mut buffer)?;
+
+        // Write data to target
+        let written_bytes = target_fs.write_data(inode_id, 0, &buffer[..read_bytes])?;
+
+        // Save state in the sync database
+        self.register_file_state(inode_id, written_bytes);
+        Ok(written_bytes)
+    }
+}
+
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
@@ -257,6 +306,27 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 {
@@ -267,6 +337,60 @@ impl<T> Drop for Vec<T> {
                 free(self.data as *mut u8);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vfs_mount_and_resolve() {
+        let mut vfs = SimpleVFS::new();
+        let fs = SimpleFilesystem::new(1);
+        let mount_id = vfs.mount(Box::new(fs), b"/media/usb").unwrap();
+        assert_eq!(mount_id, 1);
+
+        let (m_id, inode_id) = vfs.resolve_path(b"/media/usb/data.txt").unwrap();
+        assert_eq!(m_id, 1);
+        assert_eq!(inode_id, 1);
+    }
+
+    #[test]
+    fn test_folder_sync_engine_comparison() {
+        let mut engine = FolderSyncEngine::new();
+        engine.register_file_state(101, 1024);
+
+        assert!(!engine.compare_and_detect(101, 1024)); // size matches
+        assert!(engine.compare_and_detect(101, 2048));  // size changed
+        assert!(engine.compare_and_detect(999, 1024));  // untracked file
+    }
+
+    #[test]
+    fn test_vfs_cross_sync_updating() {
+        let mut engine = FolderSyncEngine::new();
+
+        let mut fs_src = SimpleFilesystem::new(1);
+        let mut fs_tgt = SimpleFilesystem::new(2);
+
+        // Setup source file
+        let inode = SimpleInode::new(5, FileType::Regular, 3, 0o644);
+        fs_src.inodes.push(Some(Box::new(inode)));
+        fs_src.data.push(alloc::vec![0x11, 0x22, 0x33]);
+
+        // Setup target empty file slot
+        let target_inode = SimpleInode::new(5, FileType::Regular, 0, 0o644);
+        fs_tgt.inodes.push(Some(Box::new(target_inode)));
+        fs_tgt.data.push(alloc::vec![0x00, 0x00]);
+
+        // Sync file from source to target
+        let synced = engine.sync_files(&fs_src, &mut fs_tgt, 5).unwrap();
+        assert_eq!(synced, 3);
+
+        // Verify target file got copied
+        let mut read_buf = [0u8; 3];
+        fs_tgt.read_data(5, 0, &mut read_buf).unwrap();
+        assert_eq!(read_buf, [0x11, 0x22, 0x33]);
     }
 }
 

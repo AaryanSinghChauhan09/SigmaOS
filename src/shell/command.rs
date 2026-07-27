@@ -2,8 +2,8 @@
 #![no_main]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
@@ -259,10 +259,7 @@ impl ShellCommand for SigmaFindCommand {
         }
 
         // Simulate fd color/style matching
-        let matches: &[&[u8]] = &[
-            b"src/package/universal.rs",
-            b"tests/integration_test.rs",
-        ];
+        let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
 
         for text in matches {
             for &b in *text {
@@ -632,7 +629,6 @@ impl CommandHistory for SimpleCommandHistory {
         commands
     }
 }
-
 
 #[cfg(test)]
 mod tests {
