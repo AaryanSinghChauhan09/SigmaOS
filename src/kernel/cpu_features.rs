@@ -51,9 +51,10 @@ impl SovereignCompilerOptimizer {
                         }
                     }
                 }
-                for i in limit..len {
-                    if i < out.len() {
-                        out[i] = lhs[i] * rhs[i];
+                // Scalar fallback for remaining elements (placed outside the loop)
+                for k in limit..lhs.len() {
+                    if k < out.len() {
+                        out[k] = lhs[k] * rhs[k];
                     }
                 }
             }

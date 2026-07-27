@@ -467,17 +467,17 @@ SigmaOS implements **S-KALI**, a built-in security auditing, wireless packet inj
 Traditional Unix and GNU core utilities (e.g. `tar`, `grep`, `systemctl`, `mount`, `ifconfig`, `auditctl`) are highly fragmented, dependent on bloated libraries (like glibc, dbus, systemd), and execute with dangerous, ambient administrative privileges. To outclass all traditional Linux distributions, SigmaOS integrates a unified, statically compiled, `#![no_std]` and OOP-driven **SigmaTools Suite** that runs securely under strict capability boundaries:
 
 ```
-+-------------------------------------------------------------------------------------------------+
-|                                        SIGMATOOLS SUITE                                         |
-+-------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------+
+|                                        SIGMATOOLS SUITE                                 |
++-----------------------------------------------------------------------------------------+
 | [SigmaDeploy]    | [SigmaFS]       | [SigmaPatch]   | [SigmaCluster]     | [SigmaIdentity]      |
 | Automated        | Cross-FS Mount  | Zero-Downtime  | Supercomputer      | Enterprise Directory |
 | Provisioning     | Snapshot Manager| Hot Patching   | Grid Orchestrator  | Gated Access & Logs  |
-+-------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------+
 | [SigmaAccess]    | [SigmaDocs]     | [SigmaQA]      | [SigmaCertify]                            |
 | Core Accessibility| Core Man/Help   | Multi-Hardware | Rigorous FIPS                            |
 | Unified Composers| Localized Docs  | Validation     | CC Certification                          |
-+-------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------+
 ```
 
 1.  **SigmaDeploy (Automated Provisioning & Netboot):** A zero-dependency network boot and custom installer engine. Operates natively inside bare metal, utilizing pre-configured TFTP/DHCP sockets mapped directly to E1000 network channels. Executes automated, Kickstart/Preseed-style deployments through declarative JSON-style graphs, permitting zero-touch industrial provisioning.
@@ -515,6 +515,94 @@ pub trait ISigmaTools {
 
     // SigmaCertify: Runs continuous compliance scanning loops on storage and memory channels
     fn audit_compliance_bounds(&self) -> Result<u32, u32>; // Returns compliance scores (0-100)
+}
+```
+
+### 4.10 Sovereign Universal Stream Redirection & S-Pipe (S-REDIRECT)
+
+In traditional Unix-like systems, process stream redirection and pipe orchestration (e.g. `cat file.txt | grep patterns > output.txt`) suffer from severe bottlenecks and security issues. Traditional file-descriptor duplication (`dup2`) maps raw numbers anonymously in monolithic kernels, presenting severe context-switching overheads, memory copying operations, and complete visibility leakages where untrusted processes can sniff stream files.
+
+SigmaOS implements **S-REDIRECT** (Sovereign Stream Redirection Engine) and **S-PIPE** (Sovereign Pipe Engine), a secure, zero-dependency `#![no_std]` OOP stream redirection subsystem that replaces old UNIX file-descriptors with polymorphic, capability-checked stream objects:
+
+```
+    [Polymorphic Stream Endpoint 1] ---> [Sovereign Pipe (S-PIPE)] ---> [Polymorphic Stream Endpoint 2]
+    - ConsoleTerminal                    - Lock-free, allocation-free   - SecureEncryptedFile
+    - NetworkSocketChannel                 Ring Buffer                  - GraphicsCanvasWidget
+    - KernelTelemetryRing                - Bitwise Masking bounds       - AuditLedgerBuffer
+```
+
+#### A. Polymorphic Stream Endpoints (`IStream`)
+Under S-REDIRECT, any resource capable of reading or writing byte streams is modeled as an Object-Oriented class implementing the common `IStream` abstract interface:
+*   `ConsoleTerminal`: Reads keyboard events and draws ANSI text onto Zenith screens.
+*   `SecureEncryptedFile`: Handles sector-level cryptographically-signed file operations inside `SigmaFS++`.
+*   `NetworkSocketChannel`: Decapsulates TCP network payloads natively inside the E1000 driver rings.
+*   `GraphicsCanvasWidget`: Draws active pixel buffers directly onto bare-metal framebuffers.
+*   `AuditLedgerBuffer`: An immutable logging segment designed for SOC 2 forensic auditing.
+
+#### B. Microsecond-Latency Lock-Free S-PIPE Ring Buffers
+Traditional Unix pipes allocate kernel memory buffers and rely on thread rescheduling and core context-switches to transfer data between process pairs. S-PIPE connects polymorphic stream endpoints using lock-free, allocation-free single-writer single-reader ring buffers built over direct shared page tables.
+*   Uses bitwise masking bounds checks to prevent index overflows:
+
+$$\text{ReadPointer} = \text{ReadCount} \ \& \ (N - 1), \quad \text{WritePointer} = \text{WriteCount} \ \& \ (N - 1)$$
+
+Where buffer size $N$ is enforced as a strict power of two, substituting slow modulo arithmetic with single-cycle bitwise masking for $O(1)$ transfer latency.
+
+#### C. Capability-Gated Stream Redirection Filters
+Redirection routes are strictly governed by user security tokens checked at the microkernel gate. S-REDIRECT intercepts all stream bindings and verifies that the process possesses the mandatory `CapabilityToken` (such as `ReadIdentity` or `WriteSecureStore`) before coupling endpoints. A process cannot redirect administrative enclaves, secure biometric inputs, or private key rings to untrusted network channels or public files, neutralizing memory disclosure and command injection exploits natively.
+
+#### D. OOP Stream & Redirection Specification (Pseudocode)
+```rust
+pub enum StreamType {
+    AnsiTerminal,
+    EncryptedBlockFile,
+    NetworkSocket,
+    GraphicsCanvas,
+    AuditLedger,
+}
+
+pub struct StreamMetadata {
+    pub stream_type: StreamType,
+    pub owner_pid: u32,
+    pub required_capability: CapabilityToken,
+}
+
+pub trait IStream {
+    fn metadata(&self) -> StreamMetadata;
+    fn read_bytes(&mut self, buffer: &mut [u8]) -> Result<usize, u32>;
+    fn write_bytes(&mut self, payload: &[u8]) -> Result<usize, u32>;
+    fn flush_buffers(&mut self) -> Result<(), u32>;
+}
+
+pub struct SovereignPipe {
+    pub buffer: [u8; 2048], // Enforced 2048-byte power of two buffer
+    pub read_count: u64,
+    pub write_count: u64,
+}
+
+impl SovereignPipe {
+    pub const CAPACITY: u64 = 2048;
+
+    // Single-cycle bitwise masking O(1) pipe writing
+    pub fn write_byte(&mut self, val: u8) -> Result<(), u32> {
+        if self.write_count - self.read_count >= Self::CAPACITY {
+            return Err(1); // Overflow
+        }
+        let write_ptr = (self.write_count & (Self::CAPACITY - 1)) as usize;
+        self.buffer[write_ptr] = val;
+        self.write_count += 1;
+        Ok(())
+    }
+
+    // Single-cycle bitwise masking O(1) pipe reading
+    pub fn read_byte(&mut self) -> Result<u8, u32> {
+        if self.read_count == self.write_count {
+            return Err(2); // Underflow
+        }
+        let read_ptr = (self.read_count & (Self::CAPACITY - 1)) as usize;
+        let val = self.buffer[read_ptr];
+        self.read_count += 1;
+        Ok(val)
+    }
 }
 ```
 
