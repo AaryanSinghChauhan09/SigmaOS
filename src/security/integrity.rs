@@ -14,8 +14,8 @@ use core::mem;
 pub type FileID = usize;
 
 /// File integrity status
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityStatus {
     Valid = 0,
     Modified = 1,
@@ -191,6 +191,7 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,

@@ -226,6 +226,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,

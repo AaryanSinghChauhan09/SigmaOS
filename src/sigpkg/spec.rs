@@ -12,6 +12,7 @@ use core::mem;
 
 /// Package version
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -251,6 +252,7 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,

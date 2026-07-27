@@ -10,7 +10,7 @@ use core::mem;
 
 pub type CertificateID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
 
