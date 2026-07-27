@@ -3,10 +3,18 @@
 #![allow(unused, clippy::all)]
 
 use sigmaos::compatibility::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
-    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, BinaryCompatMatrix, BundleType,
+    DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, TribeInstaller, WorkloadOptimizer,
+    WorkloadProfile, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+};
+use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+use sigmaos::security::{
+    AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
+    MaliciousSignature, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
+    GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 
 #[cfg(test)]
@@ -22,11 +30,11 @@ mod tests {
     fn test_legacy_personality_and_syscall_adaptation_flow() {
         // Step 1: Initialize the multi-persona VM
         let vm = KernelPersonaVM::new();
-        assert_eq!(vm.current_persona.get(), KernelPersona::Linux_6_x);
+        assert_eq!(vm.get_persona(), KernelPersona::Linux_6_x);
 
         // Hot-swap kernel persona to 2.6 for legacy application expectations
         vm.hot_swap_persona(KernelPersona::Linux_2_6);
-        assert_eq!(vm.current_persona.get(), KernelPersona::Linux_2_6);
+        assert_eq!(vm.get_persona(), KernelPersona::Linux_2_6);
 
         // Step 2: Use the Binary Compatibility Matrix to decode and translate syscall expectations
         let matrix = BinaryCompatMatrix::new(LibcVersion::Libc5, SyscallAbi::Oabi_32);
@@ -59,16 +67,162 @@ mod tests {
     #[test]
     fn test_legacy_workload_optimizer_tuning() {
         let optimizer = WorkloadOptimizer::new();
-        assert_eq!(
-            optimizer.active_profile.get(),
-            WorkloadProfile::LowMemoryProfile
-        );
+        assert_eq!(optimizer.get_profile(), WorkloadProfile::LowMemoryProfile);
 
         // Apply Single Core scheduling locks for early thread assumptions
         optimizer.apply_workload_tuning(WorkloadProfile::SingleCoreProfile);
-        assert_eq!(
-            optimizer.active_profile.get(),
-            WorkloadProfile::SingleCoreProfile
+        assert_eq!(optimizer.get_profile(), WorkloadProfile::SingleCoreProfile);
+    }
+
+    #[test]
+    fn test_parrot_security_parity() {
+        // Test AnonSurf Shunt
+        let shunt = AnonSurfShunt::new();
+        assert_eq!(shunt.get_mode(), RoutingMode::DirectCleartext);
+        assert_eq!(shunt.get_packets_routed(), 0);
+
+        shunt.enable_anonsurf();
+        assert_eq!(shunt.get_mode(), RoutingMode::TorAnonymized);
+
+        shunt.shunt_packet(42, 1024);
+        assert_eq!(shunt.get_packets_routed(), 1);
+
+        shunt.disable_anonsurf();
+        assert_eq!(shunt.get_mode(), RoutingMode::DirectCleartext);
+
+        // Test AppSandbox
+        let sandbox = AppSandboxEngine::new();
+        // Default policy forbids raw sockets and network
+        assert!(!sandbox.validate_network_socket(true));
+        assert!(!sandbox.validate_network_socket(false));
+
+        // File system writes should only be allowed inside permitted subpath
+        assert!(sandbox.validate_filesystem_write("/sandbox/tmp/test.txt"));
+        assert!(!sandbox.validate_filesystem_write("/etc/passwd"));
+
+        sandbox.update_policy(SandboxPolicy {
+            allow_network: true,
+            allow_raw_sockets: true,
+            allow_filesystem_write: true,
+            permitted_subpath: "/anywhere",
+        });
+        assert!(sandbox.validate_network_socket(true));
+        assert!(sandbox.validate_filesystem_write("/etc/passwd"));
+
+        // Test ForensicStorageFilter
+        let filter = ForensicStorageFilter::new();
+        let mut buffer = [0u8; 512];
+        assert!(!filter.intercept_device_write(0, &buffer));
+
+        filter.set_write_blocker(false);
+        assert!(filter.intercept_device_write(0, &buffer));
+
+        let mut secure_key = [0xAAu8; 16];
+        filter.secure_memory_wipe(&mut secure_key);
+        for &b in &secure_key {
+            assert_eq!(b, 0x00);
+        }
+    }
+
+    #[test]
+    fn test_chakra_linux_inspirations() {
+        // Test Akabei Bundle Resolver
+        let akabei = AkabeiPackageEngine::new();
+        assert!(akabei.resolve_and_sandbox("gimp-app"));
+        assert!(akabei.resolve_and_sandbox("plasma-desktop"));
+        assert!(!akabei.resolve_and_sandbox("non-existent-app"));
+
+        // Test Kapudan setup assistant
+        let kapudan = KapudanAssistant::new();
+        kapudan.welcome_user();
+        assert_eq!(kapudan.get_theme(), DesktopTheme::CaledoniaDark);
+        kapudan.set_theme(DesktopTheme::ZenithTranslucent);
+        assert_eq!(kapudan.get_theme(), DesktopTheme::ZenithTranslucent);
+
+        // Test Tribe installer
+        let installer = TribeInstaller::new(120);
+        assert_eq!(installer.get_step(), InstallerStep::Welcome);
+        installer.execute_installation("admin");
+        assert_eq!(installer.get_step(), InstallerStep::Completed);
+    }
+
+    #[test]
+    fn test_defensive_audit_and_anomaly_detection() {
+        let audit = DefensiveAuditSystem::new(75);
+
+        // Log simple safe event
+        assert!(audit.log_event(1716000000, 1000, 4, b"ls -la").is_ok());
+
+        // Test safe payload anomaly scoring
+        let safe_score = audit.evaluate_anomaly_score(b"cat file.txt");
+        assert!(safe_score < 75);
+        assert!(audit.check_payload_safety(b"cat file.txt"));
+
+        // Test malicious payload anomaly scoring (contains "/bin/sh")
+        let malicious_score = audit.evaluate_anomaly_score(b"sudo /bin/sh -c 'rm -rf /'");
+        assert!(malicious_score >= 80);
+        assert!(!audit.check_payload_safety(b"sudo /bin/sh -c 'rm -rf /'"));
+    }
+
+    #[test]
+    fn test_smart_symbolic_links() {
+        let mut link1 = SmartSymlink::new("lib-redirect-1", "/usr/lib/modern/libc.so");
+        assert!(link1.add_fallback_target("/usr/lib/legacy/libc.so"));
+        assert!(link1.add_fallback_target("/lib/libc.so"));
+
+        let mut link2 = SmartSymlink::new("lib-redirect-2", "/usr/lib/alt/libc.so");
+
+        let rule = LinuxPersonaRule;
+
+        // Case 1: Primary target exists
+        let res1 =
+            link1.resolve_symlink(KernelPersona::Linux_6_x, true, &[false, false], &rule, None);
+        assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
+
+        // Case 2: Primary target broken, heals to fallback index 1
+        let res2 =
+            link1.resolve_symlink(KernelPersona::Linux_6_x, false, &[false, true], &rule, None);
+        assert_eq!(res2, Ok("/lib/libc.so"));
+
+        // Case 3: Complete orphaning
+        let res3 = link1.resolve_symlink(
+            KernelPersona::Linux_6_x,
+            false,
+            &[false, false],
+            &rule,
+            None,
         );
+        assert!(res3.is_err());
+
+        // Case 4: ELOOP infinite recursion detection (nested lookup chains)
+        let mut loop_err = Ok("");
+        for _ in 0..12 {
+            loop_err = link1.resolve_symlink(
+                KernelPersona::Linux_6_x,
+                true,
+                &[false, false],
+                &rule,
+                Some(&link2),
+            );
+            if loop_err.is_err() {
+                break;
+            }
+        }
+        assert_eq!(
+            loop_err,
+            Err("ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.")
+        );
+
+        // Case 5: Rule context-awareness evaluation
+        let legacy_rule = LegacyLinuxRule;
+        // On modern Linux_6_x kernel, Legacy rule rejects and points directly to first fallback path
+        let res_legacy = link1.resolve_symlink(
+            KernelPersona::Linux_6_x,
+            true,
+            &[false, false],
+            &legacy_rule,
+            None,
+        );
+        assert_eq!(res_legacy, Ok("/usr/lib/legacy/libc.so"));
     }
 }

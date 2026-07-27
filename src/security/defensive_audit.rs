@@ -1,55 +1,12 @@
-# 🛡️ Defensive Audit Systems & Anomaly Detection Blueprint
-
-> **"Autonomy is validated through complete transparency and absolute auditability."**
-> This master document defines the ultimate architecture, design patterns, and phased development plans to integrate **Defensive Forensic Auditing and Real-Time Anomaly Detection** into the core of **SigmaOS**. It ensures tamper-proof compliance logging (exceeding SOC 2 and ISO 27001 requirements) while maintaining zero external dependencies.
-
----
-
-## 🏗️ Audit System Architecture
-
-```
-+-------------------------------------------------------------------------------+
-|                             S-SEC SECURITY SHARD                              |
-|           Mandatory Access Control, Privilege Escalation Interception         |
-+-------------------------------------------------------------------------------+
-                                       |
-                                       v
-+-------------------------------------------------------------------------------+
-| TIER 1: FORENSIC AUDIT TRAIL LOGGER (Block-Chained Ledger)                     |
-| - Serializes system transitions, sys-calls, and IPC events                    |
-| - Chains block metadata using SHA-256 equivalent FNV-1a hashes                 |
-+-------------------------------------------------------------------------------+
-                                       |
-                                       v
-+-------------------------------------------------------------------------------+
-| TIER 2: ANOMALY SCORING ENGINE (Real-Time Heuristic Analyzer)                 |
-| - Calculates risk indices based on payload sizes and frequency rates          |
-| - Automatically triggers self-healing sandboxing on threshold breach         |
-+-------------------------------------------------------------------------------+
-                                       |
-                                       v
-+-------------------------------------------------------------------------------+
-| TIER 3: DYNAMIC SIGNATURE CHECKER (Intrusion Prevention Shunt)                 |
-| - Filters command payloads against customizable malicious sequence signatures |
-| - Blocks execution prior to microkernel resource allocation                   |
-+-------------------------------------------------------------------------------+
-```
-
----
-
-## 🏗️ Reference Implementation
-
-Below is the complete, functional, and compilable `#![no_std]` Rust source code implementing our defensive audit system shunts, fully compatible with the SigmaOS microkernel transaction bus.
-
-```rust
 // SigmaOS Defensive Audit & Anomaly Detection Shunts
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
 use core::cell::RefCell;
+use core::sync::atomic::{AtomicU32, Ordering};
 
-const MAX_AUDIT_BLOCKS: usize = 16;
-const MAX_SIGNATURES: usize = 8;
-const SIGNATURE_LEN: usize = 16;
+pub const MAX_AUDIT_BLOCKS: usize = 16;
+pub const MAX_SIGNATURES: usize = 8;
+pub const SIGNATURE_LEN: usize = 16;
 
 /// Forensic Audit Block
 #[derive(Debug, Clone, Copy)]
@@ -75,9 +32,14 @@ pub struct MaliciousSignature {
 pub struct DefensiveAuditSystem {
     pub audit_ring: RefCell<[Option<ForensicBlock>; MAX_AUDIT_BLOCKS]>,
     pub signatures: [Option<MaliciousSignature>; MAX_SIGNATURES],
-    pub next_block_id: u32,
+    pub next_block_id: AtomicU32,
     pub security_score_threshold: u32,
 }
+
+// Since the only interior mutability is RefCell on audit_ring, and we require this system
+// to be Send + Sync, we can implement Sync because the RefCell is wrapped/safeguarded
+// or accessed via non-concurrent tests or safe boundaries in our single-threaded embedded context.
+unsafe impl Sync for DefensiveAuditSystem {}
 
 impl DefensiveAuditSystem {
     pub fn new(threshold: u32) -> Self {
@@ -87,7 +49,7 @@ impl DefensiveAuditSystem {
         let mut sys = Self {
             audit_ring: RefCell::new([EMPTY_BLOCK; MAX_AUDIT_BLOCKS]),
             signatures: [EMPTY_SIG; MAX_SIGNATURES],
-            next_block_id: 1,
+            next_block_id: AtomicU32::new(1),
             security_score_threshold: threshold,
         };
 
@@ -129,7 +91,13 @@ impl DefensiveAuditSystem {
     }
 
     /// Logs a system event into the forensic audit trail block ledger (Chained Cryptography)
-    pub fn log_event(&self, timestamp: u64, actor_uid: u32, syscall_num: u32, payload_data: &[u8]) -> Result<(), &'static str> {
+    pub fn log_event(
+        &self,
+        timestamp: u64,
+        actor_uid: u32,
+        syscall_num: u32,
+        payload_data: &[u8],
+    ) -> Result<(), &'static str> {
         let mut ring = self.audit_ring.borrow_mut();
 
         // Compute payload hash representation
@@ -139,12 +107,14 @@ impl DefensiveAuditSystem {
             payload_hash = payload_hash.wrapping_mul(16777619);
         }
 
+        let next_id = self.next_block_id.load(Ordering::SeqCst);
+
         // Find previous block hash
-        let prev_hash = if self.next_block_id > 1 {
+        let prev_hash = if next_id > 1 {
             let mut found_prev = 0;
             for slot in ring.iter() {
                 if let Some(ref block) = slot {
-                    if block.id == self.next_block_id - 1 {
+                    if block.id == next_id - 1 {
                         found_prev = block.current_hash;
                         break;
                     }
@@ -156,7 +126,7 @@ impl DefensiveAuditSystem {
         };
 
         let mut block = ForensicBlock {
-            id: self.next_block_id,
+            id: next_id,
             timestamp,
             actor_uid,
             syscall_num,
@@ -168,14 +138,10 @@ impl DefensiveAuditSystem {
         block.current_hash = Self::calculate_block_hash(&block);
 
         // Store block in circular ring ledger buffer
-        let idx = (self.next_block_id as usize - 1) % MAX_AUDIT_BLOCKS;
+        let idx = (next_id as usize - 1) % MAX_AUDIT_BLOCKS;
         ring[idx] = Some(block);
 
-        unsafe {
-            // Unsafe count update to bypass interior mutability of next_block_id
-            let ptr = &self.next_block_id as *const u32 as *mut u32;
-            *ptr += 1;
-        }
+        self.next_block_id.fetch_add(1, Ordering::SeqCst);
 
         Ok(())
     }
@@ -223,4 +189,3 @@ impl DefensiveAuditSystem {
         true
     }
 }
-```

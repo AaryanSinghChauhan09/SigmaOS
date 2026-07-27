@@ -1,6 +1,5 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -14,7 +13,6 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
-pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -35,8 +33,14 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, ApplicationBinary, BinaryCompatMatrix,
+    BinaryFormat, BundleType, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge,
+    InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
+    LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform,
+    TranslationLayer, TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI,
+    GLOBAL_KAPUDAN, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -51,7 +55,8 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
@@ -75,7 +80,12 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
+    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
