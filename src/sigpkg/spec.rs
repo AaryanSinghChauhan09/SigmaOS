@@ -494,6 +494,8 @@ pub enum UniversalPackageType {
     EbuildSubset,
     ApkSubset,
     FlatpakSubset,
+    TxzSubset,
+    XbpsSubset,
 }
 
 pub type HookFunction = fn(pkg_name: &[u8]) -> bool;
@@ -883,6 +885,96 @@ impl UniversalPackage for FlatpakPackageAdapter {
     }
 }
 
+/// Slackware pkgtool TXZ compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct TxzPackageAdapter {
+    pub base: SimplePackage,
+    pub slack_desc_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl TxzPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            slack_desc_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for TxzPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for TxzPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::TxzSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Void Linux XBPS compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct XbpsPackageAdapter {
+    pub base: SimplePackage,
+    pub xbps_meta_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl XbpsPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            xbps_meta_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for XbpsPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for XbpsPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::XbpsSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
 /// Polymorphic Factory for creating and translating Linux system packages to SigmaOS UniversalPackages (OOP: Factory Pattern)
 pub struct PackageAdapterFactory;
 
@@ -967,6 +1059,24 @@ impl PackageAdapterFactory {
                 let len = metadata.len().min(127);
                 unsafe {
                     core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.flatpak_metadata.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::TxzSubset => {
+                let mut adapter = TxzPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.slack_desc_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::XbpsSubset => {
+                let mut adapter = XbpsPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.xbps_meta_fields.as_mut_ptr(), len);
                 }
                 adapter.hooks = hooks;
                 Ok(Box::new(adapter))
@@ -1094,6 +1204,12 @@ mod tests {
 
         let flatpak_pkg = FlatpakPackageAdapter::new(b"flatpak-pkg", PackageVersion::new(1, 0, 0));
         assert_eq!(flatpak_pkg.package_type(), UniversalPackageType::FlatpakSubset);
+
+        let txz_pkg = TxzPackageAdapter::new(b"txz-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(txz_pkg.package_type(), UniversalPackageType::TxzSubset);
+
+        let xbps_pkg = XbpsPackageAdapter::new(b"xbps-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(xbps_pkg.package_type(), UniversalPackageType::XbpsSubset);
     }
 
     #[test]

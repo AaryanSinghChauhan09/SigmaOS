@@ -16,6 +16,7 @@ pub use spec::{
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
     PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
     NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
+    TxzPackageAdapter, XbpsPackageAdapter,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
