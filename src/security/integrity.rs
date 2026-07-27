@@ -272,8 +272,8 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         let mut index = None;
-        for (i, file_option) in self.files.iter().enumerate() {
-            if let Some(ref file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(Some(ref file)) = self.files.get(i) {
                 if file.id() == id {
                     index = Some(i);
                     break;
@@ -282,7 +282,9 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         if let Some(i) = index {
-            self.files[i] = None;
+            if let Some(slot) = self.files.get_mut(i) {
+                *slot = None;
+            }
             self.stats.total_files -= 1;
             Ok(())
         } else {
@@ -295,8 +297,8 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(Some(ref mut file)) = self.files.get_mut(i) {
                 if file.id() == id {
                     let result = file.verify();
                     if let Ok(status) = result {
@@ -316,8 +318,8 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 
         let mut modified_files = Vec::new();
 
-        for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(Some(ref mut file)) = self.files.get_mut(i) {
                 let result = file.verify();
                 if let Ok(status) = result {
                     if status != IntegrityStatus::Valid {
@@ -332,8 +334,8 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 
     fn get_file(&self, id: FileID) -> Option<&dyn File> {
-        for file_option in &self.files {
-            if let Some(ref file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(Some(ref file)) = self.files.get(i) {
                 if file.id() == id {
                     return Some(file.as_ref());
                 }
@@ -395,6 +397,22 @@ impl<T> Vec<T> {
 
     fn len(&self) -> usize {
         self.len
+    }
+
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
     }
 
     unsafe fn grow(&mut self) {

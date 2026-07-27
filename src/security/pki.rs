@@ -110,8 +110,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError> {
-        for cert_option in &self.certificates {
-            if let Some(ref cert) = *cert_option {
+        for i in 0..self.certificates.len() {
+            if let Some(Some(ref cert)) = self.certificates.get(i) {
                 if cert.id() == id {
                     self.revoked.push(id);
                     return Ok(());
@@ -122,8 +122,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate> {
-        for cert_option in &self.certificates {
-            if let Some(ref cert) = *cert_option {
+        for i in 0..self.certificates.len() {
+            if let Some(Some(ref cert)) = self.certificates.get(i) {
                 if cert.id() == id { return Some(cert.as_ref()); }
             }
         }
@@ -132,7 +132,7 @@ impl PKIManager for SimplePKIManager {
 
     fn verify_certificate(&self, id: CertificateID, _issuer_id: CertificateID) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
-            if self.revoked.contains(&id) {
+            if self.revoked.contains(id) {
                 return Ok(false);
             }
             Ok(cert.is_valid())
@@ -167,9 +167,11 @@ impl CRL for SimpleCRL {
     }
 
     fn is_revoked(&self, cert_id: CertificateID) -> bool {
-        for &(id, _) in &self.revoked {
-            if id == cert_id {
-                return true;
+        for i in 0..self.revoked.len() {
+            if let Some(&(id, _)) = self.revoked.get(i) {
+                if id == cert_id {
+                    return true;
+                }
             }
         }
         false
@@ -182,6 +184,19 @@ impl CRL for SimpleCRL {
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+impl Vec<CertificateID> {
+    fn contains(&self, item: CertificateID) -> bool {
+        for i in 0..self.len {
+            unsafe {
+                if *self.data.add(i) == item {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -193,16 +208,20 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn contains(&self, item: CertificateID) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                let stored = core::ptr::read(self.data.add(i));
-                if stored == item {
-                    return true;
-                }
-            }
+    fn len(&self) -> usize { self.len }
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
         }
-        false
+    }
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
     }
     fn clone(&self) -> Vec<T> {
         let mut new_vec = Vec::new();
