@@ -25,6 +25,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod unimplemented_tools;
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -88,6 +89,10 @@ pub use drivers::{
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    FileSystem, FatFileSystem, FatVersion, NtfsFileSystem, ExFatFileSystem, BtrfsFileSystem, HfsPlusFileSystem, ExtFileSystem, ExtVersion,
+    LinuxFileType, LinuxFileMetadata, NixosGenerationManager, ArchSatSolver, AndroidSecurityEnforcer,
+    KaliSysTracer, BusyBoxMultiCallParser, TraceEvent, TraceSpan, PackageRecipe, SatVersion, CapabilityToken,
+    SysCommandType,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
@@ -111,8 +116,12 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
-pub use shell::{ShellCommand, ShellRepl};
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
+};
+pub use shell::{ShellCommand, ShellRepl, TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
