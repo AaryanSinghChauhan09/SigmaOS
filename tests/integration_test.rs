@@ -3,10 +3,17 @@
 #![allow(unused, clippy::all)]
 
 use sigmaos::compatibility::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
-    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, BinaryCompatMatrix, BundleType,
+    DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, TribeInstaller, WorkloadOptimizer,
+    WorkloadProfile, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+};
+use sigmaos::security::{
+    AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
+    MaliciousSignature, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
+    GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 
 #[cfg(test)]
@@ -64,5 +71,95 @@ mod tests {
         // Apply Single Core scheduling locks for early thread assumptions
         optimizer.apply_workload_tuning(WorkloadProfile::SingleCoreProfile);
         assert_eq!(optimizer.get_profile(), WorkloadProfile::SingleCoreProfile);
+    }
+
+    #[test]
+    fn test_parrot_security_parity() {
+        // Test AnonSurf Shunt
+        let shunt = AnonSurfShunt::new();
+        assert_eq!(shunt.get_mode(), RoutingMode::DirectCleartext);
+        assert_eq!(shunt.get_packets_routed(), 0);
+
+        shunt.enable_anonsurf();
+        assert_eq!(shunt.get_mode(), RoutingMode::TorAnonymized);
+
+        shunt.shunt_packet(42, 1024);
+        assert_eq!(shunt.get_packets_routed(), 1);
+
+        shunt.disable_anonsurf();
+        assert_eq!(shunt.get_mode(), RoutingMode::DirectCleartext);
+
+        // Test AppSandbox
+        let sandbox = AppSandboxEngine::new();
+        // Default policy forbids raw sockets and network
+        assert!(!sandbox.validate_network_socket(true));
+        assert!(!sandbox.validate_network_socket(false));
+
+        // File system writes should only be allowed inside permitted subpath
+        assert!(sandbox.validate_filesystem_write("/sandbox/tmp/test.txt"));
+        assert!(!sandbox.validate_filesystem_write("/etc/passwd"));
+
+        sandbox.update_policy(SandboxPolicy {
+            allow_network: true,
+            allow_raw_sockets: true,
+            allow_filesystem_write: true,
+            permitted_subpath: "/anywhere",
+        });
+        assert!(sandbox.validate_network_socket(true));
+        assert!(sandbox.validate_filesystem_write("/etc/passwd"));
+
+        // Test ForensicStorageFilter
+        let filter = ForensicStorageFilter::new();
+        let mut buffer = [0u8; 512];
+        assert!(!filter.intercept_device_write(0, &buffer));
+
+        filter.set_write_blocker(false);
+        assert!(filter.intercept_device_write(0, &buffer));
+
+        let mut secure_key = [0xAAu8; 16];
+        filter.secure_memory_wipe(&mut secure_key);
+        for &b in &secure_key {
+            assert_eq!(b, 0x00);
+        }
+    }
+
+    #[test]
+    fn test_chakra_linux_inspirations() {
+        // Test Akabei Bundle Resolver
+        let akabei = AkabeiPackageEngine::new();
+        assert!(akabei.resolve_and_sandbox("gimp-app"));
+        assert!(akabei.resolve_and_sandbox("plasma-desktop"));
+        assert!(!akabei.resolve_and_sandbox("non-existent-app"));
+
+        // Test Kapudan setup assistant
+        let kapudan = KapudanAssistant::new();
+        kapudan.welcome_user();
+        assert_eq!(kapudan.get_theme(), DesktopTheme::CaledoniaDark);
+        kapudan.set_theme(DesktopTheme::ZenithTranslucent);
+        assert_eq!(kapudan.get_theme(), DesktopTheme::ZenithTranslucent);
+
+        // Test Tribe installer
+        let installer = TribeInstaller::new(120);
+        assert_eq!(installer.get_step(), InstallerStep::Welcome);
+        installer.execute_installation("admin");
+        assert_eq!(installer.get_step(), InstallerStep::Completed);
+    }
+
+    #[test]
+    fn test_defensive_audit_and_anomaly_detection() {
+        let audit = DefensiveAuditSystem::new(75);
+
+        // Log simple safe event
+        assert!(audit.log_event(1716000000, 1000, 4, b"ls -la").is_ok());
+
+        // Test safe payload anomaly scoring
+        let safe_score = audit.evaluate_anomaly_score(b"cat file.txt");
+        assert!(safe_score < 75);
+        assert!(audit.check_payload_safety(b"cat file.txt"));
+
+        // Test malicious payload anomaly scoring (contains "/bin/sh")
+        let malicious_score = audit.evaluate_anomaly_score(b"sudo /bin/sh -c 'rm -rf /'");
+        assert!(malicious_score >= 80);
+        assert!(!audit.check_payload_safety(b"sudo /bin/sh -c 'rm -rf /'"));
     }
 }
