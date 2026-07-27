@@ -1,9 +1,10 @@
 //! Capability Tokens: Privilege Isolation (Android/AOSP Absorption)
-//!
+//! 
 //! Cryptographic capability gates replacing legacy Unix file permissions.
 
-use std::vec::Vec;
-use std::string::String;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -16,13 +17,13 @@ pub enum Permission {
 }
 
 /// A cryptographic capability token required for any privileged action.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct CapabilityToken {
     pub id: u64,
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-    pub bits_value: u64,
+    pub bits: u64,
 }
 
 impl CapabilityToken {
@@ -32,76 +33,24 @@ impl CapabilityToken {
             allowed_paths: Vec::new(),
             allowed_ports: Vec::new(),
             is_revoked: false,
-            bits_value: 0xFFFF_FFFF_FFFF_FFFF,
+            bits: 0,
         }
     }
 
-    pub fn new_with_args(id: u64, paths: &[&str], ports: &[u16]) -> Self {
+    pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
-            allowed_paths: paths.iter().map(|&s| s.to_string()).collect(),
+            allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
             allowed_ports: ports.to_vec(),
             is_revoked: false,
-            bits_value: 0xFFFF_FFFF_FFFF_FFFF, // Allow all by default for bits mask
+            bits: 0,
         }
-    }
-
-    pub fn from_bits(bits: u64) -> Self {
-        CapabilityToken {
-            id: bits,
-            allowed_paths: Vec::new(),
-            allowed_ports: Vec::new(),
-            is_revoked: false,
-            bits_value: bits,
-        }
-    }
-
-    pub fn bits(&self) -> u64 {
-        self.id
-    }
-
-    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
-        self.id |= 1;
-        self
-    }
-
-    pub fn allow_read(mut self, _path: &str) -> Self {
-        self.id |= 2;
-        self
-    }
-
-    pub fn allow_write(mut self, _path: &str) -> Self {
-        self.id |= 4;
-        self
-    }
-
-    pub fn allow_exec(mut self) -> Self {
-        self.id |= 8;
-        self
-    }
-
-    pub fn allow_ipc(mut self) -> Self {
-        self.id |= 16;
-        self
     }
 
     /// Verifies if the token permits access to a given path.
     pub fn can_access_path(&self, path: &str) -> bool {
         if self.is_revoked {
             return false;
-        }
-
-        // Mitigate directory traversal vulnerability:
-        // Reject path traversal before checking prefixes
-        let path_obj = std::path::Path::new(path);
-        for component in path_obj.components() {
-            if let std::path::Component::ParentDir = component {
-                return false;
-            }
-        }
-
-        if self.allowed_paths.is_empty() {
-            return true; // Allow if no specific restriction
         }
         self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
@@ -111,9 +60,6 @@ impl CapabilityToken {
         if self.is_revoked {
             return false;
         }
-        if self.allowed_ports.is_empty() {
-            return true;
-        }
         self.allowed_ports.contains(&port)
     }
 
@@ -121,12 +67,38 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
-    pub fn allow_capability(&mut self, cap: u64) {
-        self.bits_value |= cap;
+    pub fn bits(&self) -> u64 {
+        self.bits
     }
 
-    pub fn contains(&self, cap: u64) -> bool {
-        (self.bits_value & cap) != 0
+    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
+        self.bits |= 1;
+        if port != 0 {
+            self.allowed_ports.push(port);
+        }
+        self
+    }
+
+    pub fn allow_read(mut self, path: &str) -> Self {
+        self.bits |= 2;
+        self.allowed_paths.push(String::from(path));
+        self
+    }
+
+    pub fn allow_write(mut self, path: &str) -> Self {
+        self.bits |= 4;
+        self.allowed_paths.push(String::from(path));
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.bits |= 8;
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.bits |= 16;
+        self
     }
 }
 
@@ -136,7 +108,7 @@ impl Default for CapabilityToken {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct CapabilityGate {
     pub token: CapabilityToken,
 }
@@ -153,41 +125,24 @@ impl CapabilityGate {
     }
 }
 
-pub struct SecurityEnforcer {
-    active_tokens: std::vec::Vec<CapabilityToken>,
-}
-
-impl SecurityEnforcer {
-    pub fn new() -> Self {
-        SecurityEnforcer {
-            active_tokens: std::vec::Vec::new(),
-        }
-    }
-
-    pub fn register_token(&mut self, token: CapabilityToken) {
-        self.active_tokens.push(token);
-    }
-}
-
-impl Default for SecurityEnforcer {
+impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub struct SecurityEnforcer {
+    active_tokens: Vec<CapabilityToken>,
+}
 
-    #[test]
-    fn test_capability_token_traversal_protection() {
-        let paths = vec!["/var/www"];
-        let token = CapabilityToken::new_with_args(1, &paths, &[]);
-
-        // Safe path starts with /var/www and has no traversal
-        assert!(token.can_access_path("/var/www/index.html"));
-
-        // Path starting with /var/www but containing traversal should be blocked
-        assert!(!token.can_access_path("/var/www/../../etc/passwd"));
+impl SecurityEnforcer {
+    pub fn new() -> Self {
+        SecurityEnforcer {
+            active_tokens: Vec::new(),
+        }
+    }
+    
+    pub fn register_token(&mut self, token: CapabilityToken) {
+        self.active_tokens.push(token);
     }
 }

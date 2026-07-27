@@ -1,10 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
@@ -51,81 +47,12 @@ impl SimpleShellCommand {
     }
 }
 
-pub struct ShellVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-impl<T> ShellVec<T> {
-    pub fn new() -> Self {
-        ShellVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
 impl<'a, T> IntoIterator for &'a ShellVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        use core::ops::Deref;
+        self.deref().iter()
     }
 }
 
@@ -133,7 +60,8 @@ impl<'a, T> IntoIterator for &'a mut ShellVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -525,6 +453,15 @@ impl SimpleCommandRegistry {
 
         let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
         self.commands.push(Some(Box::new(sigsched)));
+
+        let sigmagrep = SigmaGrepCommand;
+        self.commands.push(Some(Box::new(sigmagrep)));
+
+        let sigmafind = SigmaFindCommand;
+        self.commands.push(Some(Box::new(sigmafind)));
+
+        let sigmadiff = SigmaDiffCommand;
+        self.commands.push(Some(Box::new(sigmadiff)));
     }
 }
 
@@ -703,6 +640,69 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
+struct ShellVec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> ShellVec<T> {
+    fn new() -> Self {
+        ShellVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {
@@ -734,5 +734,67 @@ mod tests {
         history.add(b"sigtrace trace task 256");
         assert_eq!(history.list().len(), 1);
         assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
+    }
+
+    #[test]
+    fn test_sigmagrep_execution() {
+        let mut cmd = SigmaGrepCommand;
+        assert_eq!(cmd.name(), b"sigmagrep");
+
+        let mut arg1 = [0u8; 64];
+        let mut arg2 = [0u8; 64];
+        let mut arg3 = [0u8; 64];
+        arg1[..14].copy_from_slice(b"my-search-term");
+        arg2[..2].copy_from_slice(b"-i");
+        arg3[..2].copy_from_slice(b"-n");
+
+        let args = vec![arg1, arg2, arg3];
+        let output = cmd.execute(&args).unwrap();
+        let output_str = std::str::from_utf8(&output).unwrap();
+
+        assert!(output_str.contains("my-search-term"));
+        assert!(output_str.contains("case-insensitive"));
+        assert!(output_str.contains("line-numbers"));
+    }
+
+    #[test]
+    fn test_sigmafind_execution() {
+        let mut cmd = SigmaFindCommand;
+        assert_eq!(cmd.name(), b"sigmafind");
+
+        let mut arg1 = [0u8; 64];
+        let mut arg2 = [0u8; 64];
+        let mut arg3 = [0u8; 64];
+        let mut arg4 = [0u8; 64];
+        arg1[..2].copy_from_slice(b"-e");
+        arg2[..2].copy_from_slice(b"-d");
+        arg3[..1].copy_from_slice(b"5");
+        arg4[..9].copy_from_slice(b"test-file");
+
+        let args = vec![arg1, arg2, arg3, arg4];
+        let output = cmd.execute(&args).unwrap();
+        let output_str = std::str::from_utf8(&output).unwrap();
+
+        assert!(output_str.contains("test-file"));
+        assert!(output_str.contains("regex-mode"));
+        assert!(output_str.contains("max-depth: 5"));
+    }
+
+    #[test]
+    fn test_sigmadiff_execution() {
+        let mut cmd = SigmaDiffCommand;
+        assert_eq!(cmd.name(), b"sigmadiff");
+
+        let mut arg1 = [0u8; 64];
+        let mut arg2 = [0u8; 64];
+        arg1[..2].copy_from_slice(b"-w");
+        arg2[..2].copy_from_slice(b"-y");
+
+        let args = vec![arg1, arg2];
+        let output = cmd.execute(&args).unwrap();
+        let output_str = std::str::from_utf8(&output).unwrap();
+
+        assert!(output_str.contains("ignoring whitespace"));
+        assert!(output_str.contains("side-by-side"));
     }
 }

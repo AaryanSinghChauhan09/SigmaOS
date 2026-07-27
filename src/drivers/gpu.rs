@@ -48,6 +48,7 @@ pub struct DrmConnector {
     pub modes: Vec<DrmModeInfo>,
 }
 
+/// GPU driver interface
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,

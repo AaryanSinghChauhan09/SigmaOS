@@ -3,7 +3,6 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
-use rand::Rng;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -205,7 +204,6 @@ impl PasswordManager {
     ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
-        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -254,7 +252,6 @@ impl PasswordManager {
             return Err(PasswordError::PasswordNotFound(entry.id.clone()));
         }
 
-        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -392,9 +389,6 @@ impl PasswordManager {
 
     /// Encrypt password
     fn encrypt_password(&self, password: &[u8]) -> Result<Vec<u8>, PasswordError> {
-        if self.master_key.is_empty() {
-            return Err(PasswordError::EncryptionError("Master key cannot be empty".to_string()));
-        }
         // Simulated encryption
         let mut encrypted = password.to_vec();
         for (i, byte) in encrypted.iter_mut().enumerate() {
@@ -405,9 +399,6 @@ impl PasswordManager {
 
     /// Decrypt password
     fn decrypt_password(&self, encrypted: &[u8]) -> Result<Vec<u8>, PasswordError> {
-        if self.master_key.is_empty() {
-            return Err(PasswordError::DecryptionError("Master key cannot be empty".to_string()));
-        }
         // Simulated decryption
         let mut decrypted = encrypted.to_vec();
         for (i, byte) in decrypted.iter_mut().enumerate() {
@@ -433,11 +424,9 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
-        use rand::RngExt;
-        let mut rng = rand::rng();
 
         for _ in 0..length {
-            let index = rng.random_range(0..charset.len());
+            let index = (rand::random::<u64>() as usize) % charset.len();
             password.push(charset[index] as char);
         }
 
