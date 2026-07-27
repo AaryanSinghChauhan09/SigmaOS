@@ -10,6 +10,7 @@ pub mod transaction;
 pub mod verifier;
 pub mod spec;
 pub mod zero_alloc_resolver;
+pub mod universal_adapter;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use spec::{
@@ -28,6 +29,10 @@ pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
