@@ -75,13 +75,10 @@ impl ClipboardSecurity for XorEncryption {
         if self.key.is_empty() {
             return Err(ClipboardError::EncryptionError("Encryption key cannot be empty".to_string()));
         }
-        // Optimization: Use iterator zip with cycle, map, and collect.
-        // This avoids manual vec capacity re-allocations and avoids expensive indexing/modulo operations.
-        let encrypted: Vec<u8> = content
-            .bytes()
-            .zip(self.key.iter().cycle())
-            .map(|(b, &k)| b ^ k)
-            .collect();
+        let mut encrypted = Vec::new();
+        for (i, byte) in content.bytes().enumerate() {
+            encrypted.push(byte ^ self.key[i % self.key.len()]);
+        }
         Ok(String::from_utf8(encrypted)
             .map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
     }
@@ -90,13 +87,10 @@ impl ClipboardSecurity for XorEncryption {
         if self.key.is_empty() {
             return Err(ClipboardError::DecryptionError("Decryption key cannot be empty".to_string()));
         }
-        // Optimization: Use iterator zip with cycle, map, and collect.
-        // This avoids manual vec capacity re-allocations and avoids expensive indexing/modulo operations.
-        let decrypted: Vec<u8> = content
-            .bytes()
-            .zip(self.key.iter().cycle())
-            .map(|(b, &k)| b ^ k)
-            .collect();
+        let mut decrypted = Vec::new();
+        for (i, byte) in content.bytes().enumerate() {
+            decrypted.push(byte ^ self.key[i % self.key.len()]);
+        }
         Ok(String::from_utf8(decrypted)
             .map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
     }
