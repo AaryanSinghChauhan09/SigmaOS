@@ -8,6 +8,7 @@
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
@@ -15,6 +16,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
 pub mod ml;
 pub mod network;
 pub mod orchestration;
@@ -44,10 +46,7 @@ pub mod ai {
     pub mod agent;
     pub mod orchestrator;
 }
-pub mod boot {
-    pub mod firmware_bridge;
-    pub mod bridge_grid;
-}
+pub mod boot;
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
@@ -100,12 +99,14 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
+    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
