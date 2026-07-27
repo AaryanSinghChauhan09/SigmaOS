@@ -44,13 +44,10 @@ pub trait PageTableEntry {
     fn set_user_accessible(&mut self, user: bool);
     fn set_cow(&mut self, cow: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
-<<<<<<< HEAD
     fn is_huge(&self) -> bool { false }
     fn is_giant(&self) -> bool { false }
-=======
     fn get_page_size(&self) -> usize { 0 }
     fn set_page_size(&mut self, size: usize) { let _ = size; }
->>>>>>> origin/improve-os-architecture-13148548228877311559
 }
 
 #[repr(C)]
@@ -61,9 +58,7 @@ pub struct SimplePageTableEntry {
     pub physical_addr: AtomicUsize,
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
-<<<<<<< HEAD
     pub cow: AtomicUsize,
-=======
     pub page_size_flag: AtomicUsize,
 }
 
@@ -71,7 +66,6 @@ impl Default for SimplePageTableEntry {
     fn default() -> Self {
         Self::new()
     }
->>>>>>> origin/improve-os-architecture-13148548228877311559
 }
 
 impl SimplePageTableEntry {
@@ -83,11 +77,8 @@ impl SimplePageTableEntry {
             physical_addr: AtomicUsize::new(0),
             accessed: AtomicUsize::new(0),
             dirty: AtomicUsize::new(0),
-<<<<<<< HEAD
             cow: AtomicUsize::new(0),
-=======
             page_size_flag: AtomicUsize::new(0),
->>>>>>> origin/improve-os-architecture-13148548228877311559
         }
     }
 }
@@ -119,17 +110,14 @@ impl PageTableEntry for SimplePageTableEntry {
         self.physical_addr
             .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
     }
-<<<<<<< HEAD
     fn is_huge(&self) -> bool { self.accessed.load(Ordering::SeqCst) == 1 }
     fn is_giant(&self) -> bool { self.dirty.load(Ordering::SeqCst) == 1 }
-=======
     fn get_page_size(&self) -> usize {
         self.page_size_flag.load(Ordering::SeqCst)
     }
     fn set_page_size(&mut self, size: usize) {
         self.page_size_flag.store(size, Ordering::SeqCst);
     }
->>>>>>> origin/improve-os-architecture-13148548228877311559
 }
 
 pub trait PageTable {
@@ -185,20 +173,10 @@ impl PageTable for SimplePageTable {
 }
 
 pub trait VirtualMemoryManager {
-<<<<<<< HEAD
-    fn map_page(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        user: bool,
-        writable: bool,
-    ) -> Result<(), PageFaultError>;
-=======
     fn map_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
         self.map_page_with_size(virt, phys, user, writable, 4096)
     }
     fn map_page_with_size(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool, page_size: usize) -> Result<(), PageFaultError>;
->>>>>>> origin/improve-os-architecture-13148548228877311559
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress>;
     fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
@@ -367,15 +345,6 @@ impl SimpleVMM {
 }
 
 impl VirtualMemoryManager for SimpleVMM {
-<<<<<<< HEAD
-    fn map_page(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        user: bool,
-        writable: bool,
-    ) -> Result<(), PageFaultError> {
-=======
     fn map_page_with_size(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool, page_size: usize) -> Result<(), PageFaultError> {
         // Enforce strict address alignment verification (must be page-aligned to its size)
         if page_size != 4096 && page_size != 2097152 && page_size != 1073741824 {
@@ -384,8 +353,6 @@ impl VirtualMemoryManager for SimpleVMM {
         if virt % page_size != 0 || phys % page_size != 0 {
             return Err(PageFaultError::InvalidAddress);
         }
-
->>>>>>> origin/improve-os-architecture-13148548228877311559
         let pml4_idx = self.get_pml4_index(virt);
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
@@ -433,10 +400,6 @@ impl VirtualMemoryManager for SimpleVMM {
         }
 
         let pdpt_idx_in_vec = pml4_idx;
-<<<<<<< HEAD
-        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
-        let pdpt_present = if let Some(ref mut pdpt) = pdpt_table {
-=======
         while self.pdpt_tables.len() <= pdpt_idx_in_vec {
             self.pdpt_tables.push(None);
         }
@@ -447,7 +410,6 @@ impl VirtualMemoryManager for SimpleVMM {
         }
 
         let pdpt_present = if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
->>>>>>> origin/improve-os-architecture-13148548228877311559
             pdpt.get_entry(pdpt_idx).is_present()
         } else {
             false
@@ -475,10 +437,6 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-<<<<<<< HEAD
-        let pd_table: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
-        let pd_present = if let Some(ref mut pd) = pd_table {
-=======
         // 2MB Huge Page support: mapped directly at PD level
         if page_size == 2097152 {
             let pd_idx_in_vec = pdpt_idx;
@@ -504,7 +462,6 @@ impl VirtualMemoryManager for SimpleVMM {
 
         let pd_idx_in_vec = pdpt_idx;
         let pd_present = if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
->>>>>>> origin/improve-os-architecture-13148548228877311559
             pd.get_entry(pd_idx).is_present()
         } else {
             false
