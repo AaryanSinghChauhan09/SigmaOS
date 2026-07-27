@@ -98,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        _context: &HashMap<String, String>,
+        context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -190,9 +190,7 @@ impl SelfHealingModule {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: &str) -> Result<(), ResilienceError> {
-        let snapshot = self
-            .get_snapshot(id)
-            .ok_or(ResilienceError::SnapshotNotFound)?;
+        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback

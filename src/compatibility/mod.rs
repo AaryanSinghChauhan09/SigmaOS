@@ -1,58 +1,35 @@
 // SigmaOS Compatibility Module
-pub mod constellation;
 pub mod cross_platform;
-pub mod gap_closure;
-pub mod historic_linux;
-pub mod personality;
-pub mod sigmawin;
-pub mod standards;
-pub mod superiority;
-
-pub use standards::{
-    SovereignIndependencyChecker, StandardsComplianceManager, PosixComplianceLevel,
-    FhsConventionStatus, LsbProfile,
-};
-
-pub use superiority::{
-    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
-    SigSection, SigSectionType, SovereignTimeMachine, ShardCheckpoint, NumaTask,
-    NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine, SovereignForensics,
-    SovereignRecoverUtility, ShardIgnitor,
-};
-
-pub use gap_closure::{
-    AiTaskOrchestrator, BootInterface, BuildLedgerSystem, DriverClass, DriverRepositoryManager,
-    EmulatedPeripheral, FirmwareBridgeManager, GapSandboxPolicy, HardwareDriver, HidGraphicsDriver,
-    JobClass, KernelModule, KernelModuleManager, LedgerSnapshot, MemoryProtection, ModuleState,
-    NetworkStackGateway, PeripheralEmulationLibrary, SecurityPolicyManager,
-    SyscallCompatibilityRegistry, VirtualMemoryManager,
-};
-
-pub use constellation::{
-    ArchiveProfile, BuildArchive, ChronicleType, ConstellationNode, DriverMuseum, ExhibitType,
-    FirmwarePavilion, KernelConstellation, ObsoletePeripheral, PavilionType, PeripheralMuseum,
-    SecurityModel as ConstellationSecurityModel, SecurityPavilion, SyscallChronicle,
-};
-
-pub use personality::{
-    BuildCapsule, BuildProfile, CapsuleVersion, DriverEmulator, EmulatorProfile, FirmwarePersona,
-    FirmwareType, KernelShard, ObsoleteDevice, PeripheralPod, SecurityGrid, SecurityModel,
-    ShardType, SyscallCapsule,
-};
-
-pub use sigmawin::{
-    D3dToVulkanTranslator, PeFormat, PeLoader, RegistryManager, User32MessageQueue, Win32Error,
-    Win32Message, WinSockAdapter,
-};
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
+pub mod fedora;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer, FreeBsdJailSandbox, KqueueEventNotifier,
-    OpenSourceOsGapBridge, OpenSourceToolsBridge, OpenSourceAiModelBridge,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-
-pub use historic_linux::{
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox, LfsToolchainBuilder,
+pub use linux_adapter::{
+    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+};
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
+};
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+};
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
