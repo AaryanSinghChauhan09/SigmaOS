@@ -3,14 +3,11 @@
 // and self-diagnosis capabilities for system optimization
 
 use core::mem;
-/// OOP-based AI Orchestrator for SigmaOS
-/// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
-/// Implements sigma-ai core with multi-agent coordination, workflow automation,
-/// and self-diagnosis capabilities for system optimization
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentState {
     Idle = 0,
@@ -21,7 +18,7 @@ pub enum AgentState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentError {
     Success = 0,
     NotFound = 1,
@@ -39,7 +36,7 @@ pub trait AIAgent {
 
 pub struct SimpleAIAgent {
     pub id: AgentID,
-    pub name: String,
+    pub name: std::string::String,
     pub state: AgentState,
 }
 
@@ -53,85 +50,21 @@ impl SimpleAIAgent {
     }
 }
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
 impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID {
         self.id
     }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+    fn name(&self) -> &str {
+        &self.name
     }
     fn state(&self) -> AgentState {
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => AgentState::Active,
-                2 => AgentState::Busy,
-                3 => AgentState::Error,
-                4 => AgentState::Learning,
-                _ => AgentState::Idle,
-            }
-        }
+        self.state
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state
-            .store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state = AgentState::Busy;
         let mut result = Vec::new();
-        let name = self.name();
-        for &byte in name {
+        for &byte in self.name.as_bytes() {
             result.push(byte);
         }
         result.push(b':');
@@ -139,8 +72,7 @@ impl AIAgent for SimpleAIAgent {
         for &byte in task {
             result.push(byte);
         }
-        self.state
-            .store(AgentState::Idle as usize, Ordering::SeqCst);
+        self.state = AgentState::Idle;
         Ok(result)
     }
 }
@@ -210,18 +142,20 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        for agent_option in &self.agents {
-            if let Some(ref agent) = *agent_option {
-                if agent.id() == id {
-                    return Some(agent.as_ref());
-                }
+        for agent in &self.agents {
+            if agent.id() == id {
+                return Some(agent.as_ref());
             }
         }
         None
     }
 
     fn list_agents(&self) -> Vec<AgentID> {
-        self.agents.iter().map(|a| a.id()).collect()
+        let mut ids = Vec::new();
+        for agent in &self.agents {
+            ids.push(agent.id());
+        }
+        ids
     }
 }
 
@@ -246,7 +180,9 @@ impl TaskQueue for SimpleTaskQueue {
     fn enqueue(&mut self, task: &[u8], priority: u8) {
         let mut task_array = [0u8; 256];
         let task_len = task.len().min(255);
-        task_array[..task_len].copy_from_slice(&task[..task_len]);
+        for i in 0..task_len {
+            task_array[i] = task[i];
+        }
         self.tasks.push((task_array, priority));
     }
 
@@ -311,42 +247,47 @@ impl AgentCommunication for SimpleAgentCommunication {
     ) -> Result<(), AgentError> {
         let mut msg_array = [0u8; 256];
         let msg_len = message.len().min(255);
-        msg_array[..msg_len].copy_from_slice(&message[..msg_len]);
+        for i in 0..msg_len {
+            msg_array[i] = message[i];
+        }
         self.messages.push((from, to, msg_array));
         Ok(())
     }
 
     fn receive_message(&mut self, agent_id: AgentID) -> Option<[u8; 256]> {
-        if let Some(pos) = self.messages.iter().position(|m| m.1 == agent_id) {
-            Some(self.messages.remove(pos).2)
-        } else {
-            None
+        for i in 0..self.messages.len() {
+            if self.messages[i].1 == agent_id {
+                return Some(self.messages.remove(i).2);
+            }
         }
+        None
     }
 
     fn broadcast(&mut self, from: AgentID, message: &[u8]) {
         let mut msg_array = [0u8; 256];
         let msg_len = message.len().min(255);
-        msg_array[..msg_len].copy_from_slice(&message[..msg_len]);
+        for i in 0..msg_len {
+            msg_array[i] = message[i];
+        }
         self.messages.push((from, 0, msg_array));
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -357,7 +298,7 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn remove(&mut self, index: usize) -> T {
+    pub fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -367,7 +308,7 @@ impl<T> Vec<T> {
             item
         }
     }
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len == 0
     }
     unsafe fn grow(&mut self) {
@@ -390,6 +331,27 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 {
@@ -400,6 +362,22 @@ impl<T> Drop for Vec<T> {
                 free(self.data as *mut u8);
             }
         }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.deref_mut().iter_mut()
     }
 }
 
