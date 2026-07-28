@@ -2,6 +2,6 @@
 pub mod universal;
 
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageError, PackageFormat, PackageFormatAdapter,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };

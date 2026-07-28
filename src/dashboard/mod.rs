@@ -1,6 +1,6 @@
 // SigmaOS Dashboard Module
-pub mod monitor;
 pub mod control_center;
+pub mod monitor;
 pub mod process;
 
 pub use control_center::{

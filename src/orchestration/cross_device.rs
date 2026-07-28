@@ -374,7 +374,11 @@ impl CrossDeviceOrchestrator {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
-                println!("Syncing clipboard (size={}) with device {}", clipboard_data.len(), device_id);
+                println!(
+                    "Syncing clipboard (size={}) with device {}",
+                    clipboard_data.len(),
+                    device_id
+                );
             }
             CrossDeviceAction::CastMedia {
                 device_id,
@@ -384,7 +388,10 @@ impl CrossDeviceOrchestrator {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
-                println!("Casting media {} to device {} (play={})", media_url, device_id, play);
+                println!(
+                    "Casting media {} to device {} (play={})",
+                    media_url, device_id, play
+                );
             }
             CrossDeviceAction::RemoteSyscall {
                 device_id,
@@ -398,7 +405,10 @@ impl CrossDeviceOrchestrator {
                 if capability_token == 0 {
                     return Err(OrchestrationError::ActionFailed);
                 }
-                println!("Executing remote syscall {} on device {} with cap_token={}", syscall_number, device_id, capability_token);
+                println!(
+                    "Executing remote syscall {} on device {} with cap_token={}",
+                    syscall_number, device_id, capability_token
+                );
             }
         }
         Ok(())
@@ -414,7 +424,7 @@ impl CrossDeviceOrchestrator {
                 DeviceType::Desktop,
             )
             .with_capability(DeviceCapability::FileTransfer)
-            .with_metadata("protocol_version".to_string(), "1.3".to_string())
+            .with_metadata("protocol_version".to_string(), "1.3".to_string()),
         );
         for d in &discovered {
             self.add_device(d.clone());
@@ -422,7 +432,11 @@ impl CrossDeviceOrchestrator {
         discovered
     }
 
-    pub fn sync_secure_clipboard(&mut self, device_id: &str, data: &[u8]) -> Result<(), OrchestrationError> {
+    pub fn sync_secure_clipboard(
+        &mut self,
+        device_id: &str,
+        data: &[u8],
+    ) -> Result<(), OrchestrationError> {
         if !self.devices.contains_key(device_id) {
             return Err(OrchestrationError::DeviceNotFound);
         }
@@ -434,7 +448,11 @@ impl CrossDeviceOrchestrator {
         })
     }
 
-    pub fn cast_media_stream(&mut self, device_id: &str, stream_url: &str) -> Result<(), OrchestrationError> {
+    pub fn cast_media_stream(
+        &mut self,
+        device_id: &str,
+        stream_url: &str,
+    ) -> Result<(), OrchestrationError> {
         if !self.devices.contains_key(device_id) {
             return Err(OrchestrationError::DeviceNotFound);
         }
@@ -445,7 +463,12 @@ impl CrossDeviceOrchestrator {
         })
     }
 
-    pub fn execute_secure_rpc(&mut self, device_id: &str, syscall_num: u32, cap_token: u64) -> Result<(), OrchestrationError> {
+    pub fn execute_secure_rpc(
+        &mut self,
+        device_id: &str,
+        syscall_num: u32,
+        cap_token: u64,
+    ) -> Result<(), OrchestrationError> {
         if !self.devices.contains_key(device_id) {
             return Err(OrchestrationError::DeviceNotFound);
         }
@@ -548,7 +571,8 @@ impl LocalSendShard {
 
     /// Updates local progress for active local file streams
     pub fn update_transfer_progress(&mut self, file_id: &str, percentage: usize) {
-        self.active_transfers.insert(file_id.to_string(), percentage.min(100));
+        self.active_transfers
+            .insert(file_id.to_string(), percentage.min(100));
     }
 }
 
@@ -728,7 +752,8 @@ mod tests {
         assert!(clip_res.is_ok());
 
         // 3. Media casting
-        let cast_res = orchestrator.cast_media_stream("device_id_123", "http://sigmaos.local/stream.mp4");
+        let cast_res =
+            orchestrator.cast_media_stream("device_id_123", "http://sigmaos.local/stream.mp4");
         assert!(cast_res.is_ok());
 
         // 4. Secure RPC System Calls

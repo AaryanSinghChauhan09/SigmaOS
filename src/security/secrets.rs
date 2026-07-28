@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Secret ID
 pub type SecretID = usize;
@@ -114,7 +113,12 @@ pub struct SimpleSecret {
 }
 
 impl SimpleSecret {
-    pub fn new(id: SecretID, name: &[u8], secret_type: SecretType, capability: SecretCapability) -> Self {
+    pub fn new(
+        id: SecretID,
+        name: &[u8],
+        secret_type: SecretType,
+        capability: SecretCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -411,7 +415,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

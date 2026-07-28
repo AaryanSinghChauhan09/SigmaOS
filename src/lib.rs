@@ -35,17 +35,17 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
+    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
+    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
     FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
     LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
     LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
-    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
-    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
-    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
-    Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
+    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
+    YayAurHelper, ZeroTrustConstellation,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -69,12 +69,12 @@ pub use filesystem::{
 };
 pub use kernel::{
     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
-    Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
-    KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
-    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
-    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
-    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions,
+    Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph,
+    KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler, MemoryBlock, Message,
+    MetaKernel, MicroDriver, NetPod, PolicyError, PolicyManager, Priority, PrivacyFirstSandbox,
+    PrivilegeLevel, Process, ProcessState, ProtectionDomain, ResourceBroker, RoundRobinConfig,
+    RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions, PAGE_SIZE,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -94,15 +94,15 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
+pub use productivity::{
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
+};
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
     RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
     SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
-};
-pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -110,16 +110,17 @@ pub use resilience::{
 };
 pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
-    PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    IsolationError, Permission, PledgeManager, PledgePromise,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
+    AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
+    PackageDependencyResolver, PackageFormatAdapter, PackageRecipe, PacmanAdapter, RecipeError,
+    RecipeManager, RpmAdapter, SatSolver, Transaction, UniversalPackageManager, Version,
+    MAX_RECIPE_DEPENDENCIES,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
