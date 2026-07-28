@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 🔌 Driver Development Plans
 
 > **"A hardware abstraction layer is only as good as its modularity, isolation boundaries, and object-oriented abstractions."**
@@ -266,6 +267,8 @@ impl DriverLifecycleManager {
 
         println!("LifecycleManager: Hot-swap pipeline complete. Hardware is fully operational.");
 =======
+=======
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
 # 🛡️ SigmaOS: Sovereign Master Driver Development Blueprint
 
 This document details the complete, industrial-grade development plans, architectural specifications, and fully executable reference implementations for **SigmaOS's Unified Multi-Generation OOP Driver Framework**.
@@ -429,14 +432,20 @@ impl BaseDevice for IntelGpuDriver {
     }
     fn shutdown(&mut self) -> Result<(), DriverError> {
         self.is_ready = false;
+<<<<<<< HEAD
 >>>>>>> wiki/master
+=======
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
         Ok(())
     }
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub static GLOBAL_LIFECYCLE_MANAGER: DriverLifecycleManager = DriverLifecycleManager::new();
 =======
+=======
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
 // ==========================================
 // 2. High-Performance NVMe Storage Driver
 // ==========================================
@@ -541,11 +550,15 @@ impl NetworkAdapterDevice for IntelE1000NetworkDriver {
         self.mac_addr
     }
 }
+<<<<<<< HEAD
 >>>>>>> wiki/master
+=======
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
 ```
 
 ---
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ## 🚀 SDK & Developer Roadmap
 
@@ -556,6 +569,8 @@ To write a brand new driver conforming to our OOP patterns, follow this standard
 3. Specialize the driver using `StorageDriver`, `NetworkDriver`, `GraphicsDriver`, or `InputDriver`.
 4. Register the driver struct with the static `GLOBAL_LIFECYCLE_MANAGER`.
 =======
+=======
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
 ## 🔬 4. Validation and Verification Strategy
 
 To guarantee absolute synchronicity and correctness of the driver ecosystem:
@@ -564,4 +579,7 @@ To guarantee absolute synchronicity and correctness of the driver ecosystem:
 3. **PQC Sandbox Attestation**: All memory read/write requests from user land are verified using post-quantum capability tags, ensuring perfect protection against hardware exploitation vectors.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized driver ecosystem that completely surpasses legacy OS assumptions.
+<<<<<<< HEAD
 >>>>>>> wiki/master
+=======
+>>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317
