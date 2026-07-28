@@ -66,7 +66,7 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
         self.head.store(head.wrapping_add(1), Ordering::Release);
         self.metrics.enqueued_count += 1;
 
-        let current_size = head.wrapping_sub(tail) + 1;
+        let current_size = head.wrapping_add(1).wrapping_sub(tail);
         if current_size > self.metrics.peak_occupancy {
             self.metrics.peak_occupancy = current_size;
         }
