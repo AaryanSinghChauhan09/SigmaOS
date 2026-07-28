@@ -46,5 +46,6 @@ pub use recovery::{
 };
 pub use specialized::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator,
+    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
+    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
 };
