@@ -45,7 +45,7 @@ impl SimpleDriver {
 impl Driver for SimpleDriver {
     fn id(&self) -> DriverID { self.id }
     fn driver_type(&self) -> DriverType { self.driver_type }
-    fn state(&self) -> DriverState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> DriverState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Loaded as usize, Ordering::SeqCst);
         Ok(())

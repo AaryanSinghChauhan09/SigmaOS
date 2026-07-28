@@ -143,7 +143,7 @@ impl DeviceDescriptor {
 
     pub fn get_state(&self) -> DeviceState {
         unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+            core::mem::transmute(self.state.load(Ordering::SeqCst) as u32)
         }
     }
 

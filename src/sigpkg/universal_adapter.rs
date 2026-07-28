@@ -36,9 +36,18 @@ pub enum AdapterError {
     HookError(String),
 }
 
+// ----------------------------------------------------
+// Type alias for User-Defined hooks to ensure OOP consistency
+// ----------------------------------------------------
+pub type UserHook = Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>;
+
+// ----------------------------------------------------
+// Concrete Implementations of Distro Adapters
+// ----------------------------------------------------
+
 /// Debian/Ubuntu .deb package adapter
 pub struct DebAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl DebAdapter {
@@ -49,7 +58,10 @@ impl DebAdapter {
     }
     
     /// Add user-defined processing hook
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -60,7 +72,6 @@ impl PackageFormatAdapter for DebAdapter {
     }
     
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        // Parse debian control file format
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         
@@ -77,7 +88,7 @@ impl PackageFormatAdapter for DebAdapter {
             } else if line.starts_with("Description: ") {
                 description = line[13..].to_string();
             } else if line.starts_with("Depends: ") {
-                let deps_str = line[9..];
+                let deps_str = &line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -113,7 +124,6 @@ impl PackageFormatAdapter for DebAdapter {
     }
     
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        // Basic validation: check if it looks like a debian control file
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
         
@@ -141,7 +151,7 @@ impl Default for DebAdapter {
 
 /// Fedora/RHEL .rpm package adapter
 pub struct RpmAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl RpmAdapter {
@@ -151,7 +161,10 @@ impl RpmAdapter {
         }
     }
     
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError>; + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -162,7 +175,6 @@ impl PackageFormatAdapter for RpmAdapter {
     }
     
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        // Parse RPM header format (simplified)
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         
@@ -241,7 +253,7 @@ impl Default for RpmAdapter {
 
 /// Arch Linux pacman package adapter
 pub struct PacmanAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl PacmanAdapter {
@@ -251,7 +263,10 @@ impl PacmanAdapter {
         }
     }
     
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -262,7 +277,6 @@ impl PackageFormatAdapter for PacmanAdapter {
     }
     
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        // Parse .PKGINFO format
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         
@@ -332,10 +346,1059 @@ impl Default for PacmanAdapter {
     }
 }
 
-/// Universal Package Manager (OOPS Facade Pattern)
+/// NixOS Nix Package Expression Adapter
+pub struct NixAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl NixAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for NixAdapter {
+    fn format_name(&self) -> &str {
+        "nix"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            let line_trimmed = line.trim();
+            if line_trimmed.starts_with("pname = \"") {
+                if let Some(end) = line_trimmed[9..].find('"') {
+                    name = line_trimmed[9..9+end].to_string();
+                }
+            } else if line_trimmed.starts_with("version = \"") {
+                if let Some(end) = line_trimmed[11..].find('"') {
+                    version_str = line_trimmed[11..11+end].to_string();
+                }
+            } else if line_trimmed.starts_with("meta.description = \"") {
+                if let Some(end) = line_trimmed[20..].find('"') {
+                    description = line_trimmed[20..20+end].to_string();
+                }
+            } else if line_trimmed.starts_with("inputs = [") {
+                let inputs_str = &line_trimmed[10..];
+                if let Some(end) = inputs_str.find(']') {
+                    for dep in inputs_str[..end].split_whitespace() {
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
+                    }
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str("{\n");
+        output.push_str(&format!("  pname = \"{}\";\n", package.name));
+        output.push_str(&format!("  version = \"{}.{}.{}\";\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("  meta.description = \"{}\";\n", package.description));
+        if !package.dependencies.is_empty() {
+            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            output.push_str(&format!("  inputs = [ {} ];\n", dep_names.join(" ")));
+        }
+        output.push_str("}\n");
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("pname =") || content.contains("meta.description =") || content.contains("/nix/store"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Gentoo Portage Ebuild Adapter
+pub struct EbuildAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl EbuildAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for EbuildAdapter {
+    fn format_name(&self) -> &str {
+        "ebuild"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            let line_trimmed = line.trim();
+            if line_trimmed.starts_with("PN=\"") {
+                if let Some(end) = line_trimmed[4..].find('"') {
+                    name = line_trimmed[4..4+end].to_string();
+                }
+            } else if line_trimmed.starts_with("PV=\"") {
+                if let Some(end) = line_trimmed[4..].find('"') {
+                    version_str = line_trimmed[4..4+end].to_string();
+                }
+            } else if line_trimmed.starts_with("DESCRIPTION=\"") {
+                if let Some(end) = line_trimmed[13..].find('"') {
+                    description = line_trimmed[13..13+end].to_string();
+                }
+            } else if line_trimmed.starts_with("RDEPEND=\"") {
+                if let Some(end) = line_trimmed[9..].find('"') {
+                    for dep in line_trimmed[9..9+end].split_whitespace() {
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
+                    }
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("PN=\"{}\"\n", package.name));
+        output.push_str(&format!("PV=\"{}.{}.{}\"\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("DESCRIPTION=\"{}\"\n", package.description));
+        if !package.dependencies.is_empty() {
+            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            output.push_str(&format!("RDEPEND=\"{}\"\n", dep_names.join(" ")));
+        }
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("PN=") || content.contains("PV=") || content.contains("ebuild") || content.contains("EAPI="))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Alpine Linux APK Package Adapter
+pub struct ApkAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl ApkAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for ApkAdapter {
+    fn format_name(&self) -> &str {
+        "apk"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            if line.starts_with("P:") {
+                name = line[2..].to_string();
+            } else if line.starts_with("V:") {
+                version_str = line[2..].to_string();
+            } else if line.starts_with("D:") {
+                let dep_name = line[2..].to_string();
+                if !dep_name.is_empty() {
+                    dependencies.push(Dependency {
+                        name: dep_name,
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            } else if line.starts_with("T:") {
+                description = line[2..].to_string();
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("P:{}\n", package.name));
+        output.push_str(&format!("V:{}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("T:{}\n", package.description));
+        for dep in &package.dependencies {
+            output.push_str(&format!("D:{}\n", dep.name));
+        }
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("P:") && content.contains("V:"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Slackware TXZ Package Adapter
+pub struct TxzAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl TxzAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for TxzAdapter {
+    fn format_name(&self) -> &str {
+        "pkgtool"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+
+        for line in content.lines() {
+            if line.starts_with("PACKAGE NAME: ") {
+                name = line[14..].to_string();
+            } else if line.starts_with("PACKAGE VERSION: ") {
+                version_str = line[17..].to_string();
+            } else if line.starts_with("slack-desc: ") {
+                description = line[12..].to_string();
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, Vec::new(), String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("PACKAGE NAME: {}\n", package.name));
+        output.push_str(&format!("PACKAGE VERSION: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("slack-desc: {}\n", package.description));
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("PACKAGE NAME:") || content.contains("slack-desc:"))
+    }
+
+    fn extract_dependencies(&self, _data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        Ok(Vec::new()) // Slackware traditionally lacks dependency information
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Void Linux XBPS Package Adapter
+pub struct XbpsAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl XbpsAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for XbpsAdapter {
+    fn format_name(&self) -> &str {
+        "xbps"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            if line.starts_with("pkgname: ") {
+                name = line[9..].to_string();
+            } else if line.starts_with("version: ") {
+                version_str = line[9..].to_string();
+            } else if line.starts_with("short_desc: ") {
+                description = line[12..].to_string();
+            } else if line.starts_with("run_depends: ") {
+                let deps_str = &line[13..];
+                for dep in deps_str.split_whitespace() {
+                    dependencies.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("pkgname: {}\n", package.name));
+        output.push_str(&format!("version: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("short_desc: {}\n", package.description));
+        if !package.dependencies.is_empty() {
+            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            output.push_str(&format!("run_depends: {}\n", dep_names.join(" ")));
+        }
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("pkgname:") || content.contains("run_depends:"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// CachyOS (x86-64 microarchitecture optimized) Package Adapter
+pub struct CachyosAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl CachyosAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for CachyosAdapter {
+    fn format_name(&self) -> &str {
+        "cachyos"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            if line.starts_with("pkgname = ") {
+                name = line[10..].to_string();
+            } else if line.starts_with("pkgver = ") {
+                version_str = line[9..].to_string();
+            } else if line.starts_with("pkgdesc = ") {
+                description = line[10..].to_string();
+            } else if line.starts_with("depend = ") {
+                let dep_name = line[9..].to_string();
+                dependencies.push(Dependency {
+                    name: dep_name,
+                    version_constraint: VersionConstraint::Any,
+                });
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("pkgname = {}\n", package.name));
+        output.push_str(&format!("pkgver = {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("pkgdesc = {}\n", package.description));
+        output.push_str("arch = x86_64-v3\n"); // CachyOS optimization profile
+        for dep in &package.dependencies {
+            output.push_str(&format!("depend = {}\n", dep.name));
+        }
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("pkgname") && content.contains("x86_64-v"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Ubuntu Snap Package Adapter
+pub struct SnapAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl SnapAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for SnapAdapter {
+    fn format_name(&self) -> &str {
+        "snap"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+
+        for line in content.lines() {
+            if line.starts_with("name: ") {
+                name = line[6..].to_string();
+            } else if line.starts_with("version: ") {
+                version_str = line[9..].to_string();
+            } else if line.starts_with("summary: ") {
+                description = line[9..].to_string();
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, Vec::new(), String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("name: {}\n", package.name));
+        output.push_str(&format!("version: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("summary: {}\n", package.description));
+        output.push_str("confinement: strict\n");
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("name:") && (content.contains("confinement:") || content.contains("grade:")))
+    }
+
+    fn extract_dependencies(&self, _data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        Ok(Vec::new()) // Snaps encapsulate their dependencies
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Flatpak Package Adapter
+pub struct FlatpakAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl FlatpakAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for FlatpakAdapter {
+    fn format_name(&self) -> &str {
+        "flatpak"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+
+        for line in content.lines() {
+            if line.starts_with("name=") {
+                name = line[5..].to_string();
+            } else if line.starts_with("version=") {
+                version_str = line[8..].to_string();
+            } else if line.starts_with("runtime=") {
+                description = format!("Flatpak sandbox. Runtime: {}", &line[8..]);
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, Vec::new(), String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str("[Application]\n");
+        output.push_str(&format!("name={}\n", package.name));
+        output.push_str(&format!("version={}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str("runtime=org.freedesktop.Platform/x86_64/23.08\n");
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("[Application]") || content.contains("[Extension]") || content.contains("runtime="))
+    }
+
+    fn extract_dependencies(&self, _data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        Ok(Vec::new()) // Flatpaks run in isolated runtimes
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Intel Clear Linux swupd Package Adapter
+pub struct SwupdAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl SwupdAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for SwupdAdapter {
+    fn format_name(&self) -> &str {
+        "swupd"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            if line.starts_with("BUNDLE_NAME: ") {
+                name = line[13..].to_string();
+            } else if line.starts_with("BUNDLE_VERSION: ") {
+                version_str = line[16..].to_string();
+            } else if line.starts_with("CONTENTS: ") {
+                description = format!("Clear Linux bundle content: {}", &line[10..]);
+                for dep in line[10..].split_whitespace() {
+                    dependencies.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("BUNDLE_NAME: {}\n", package.name));
+        output.push_str(&format!("BUNDLE_VERSION: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        if !package.dependencies.is_empty() {
+            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            output.push_str(&format!("CONTENTS: {}\n", dep_names.join(" ")));
+        }
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("BUNDLE_NAME:") || content.contains("swupd"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// Solus eopkg Package Adapter
+pub struct EopkgAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl EopkgAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for EopkgAdapter {
+    fn format_name(&self) -> &str {
+        "eopkg"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+
+        if let Some(start) = content.find("<Name>") {
+            if let Some(end) = content[start..].find("</Name>") {
+                name = content[start+6..start+end].to_string();
+            }
+        }
+        if let Some(start) = content.find("<Version>") {
+            if let Some(end) = content[start..].find("</Version>") {
+                version_str = content[start+9..start+end].to_string();
+            }
+        }
+        if let Some(start) = content.find("<Description>") {
+            if let Some(end) = content[start..].find("</Description>") {
+                description = content[start+13..start+end].to_string();
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, Vec::new(), String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str("<Package>\n");
+        output.push_str(&format!("  <Name>{}</Name>\n", package.name));
+        output.push_str(&format!("  <Version>{}.{}.{}</Version>\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("  <Description>{}</Description>\n", package.description));
+        output.push_str("</Package>\n");
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("<Package>") || content.contains("<eopkg>") || content.contains("eopkg"))
+    }
+
+    fn extract_dependencies(&self, _data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        Ok(Vec::new())
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// GNU Guix Package Adapter
+pub struct GuixAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl GuixAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for GuixAdapter {
+    fn format_name(&self) -> &str {
+        "guix"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            let line_trimmed = line.trim();
+            if line_trimmed.starts_with("(name \"") {
+                if let Some(end) = line_trimmed[7..].find('"') {
+                    name = line_trimmed[7..7+end].to_string();
+                }
+            } else if line_trimmed.starts_with("(version \"") {
+                if let Some(end) = line_trimmed[10..].find('"') {
+                    version_str = line_trimmed[10..10+end].to_string();
+                }
+            } else if line_trimmed.starts_with("(synopsis \"") {
+                if let Some(end) = line_trimmed[11..].find('"') {
+                    description = line_trimmed[11..11+end].to_string();
+                }
+            } else if line_trimmed.starts_with("(inputs (list ") {
+                let inputs_str = &line_trimmed[14..];
+                if let Some(end) = inputs_str.find(')') {
+                    for dep in inputs_str[..end].split_whitespace() {
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
+                    }
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str("(package\n");
+        output.push_str(&format!("  (name \"{}\")\n", package.name));
+        output.push_str(&format!("  (version \"{}.{}.{}\")\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("  (synopsis \"{}\")\n", package.description));
+        if !package.dependencies.is_empty() {
+            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            output.push_str(&format!("  (inputs (list {}))\n", dep_names.join(" ")));
+        }
+        output.push_str(")\n");
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("(package") || content.contains("(define-public") || content.contains("(synopsis"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+/// openSUSE Zypper Package Adapter
+pub struct ZypperAdapter {
+    user_hooks: Vec<UserHook>,
+}
+
+impl ZypperAdapter {
+    pub fn new() -> Self {
+        Self {
+            user_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
+    }
+}
+
+impl PackageFormatAdapter for ZypperAdapter {
+    fn format_name(&self) -> &str {
+        "zypper"
+    }
+
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            if line.starts_with("zypper: ") {
+                name = line[8..].to_string();
+            } else if line.starts_with("version: ") {
+                version_str = line[9..].to_string();
+            } else if line.starts_with("summary: ") {
+                description = line[9..].to_string();
+            } else if line.starts_with("requires: ") {
+                let deps_str = &line[10..];
+                for dep in deps_str.split_whitespace() {
+                    dependencies.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str)
+            .unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("zypper: {}\n", package.name));
+        output.push_str(&format!("version: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("summary: {}\n", package.description));
+        if !package.dependencies.is_empty() {
+            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            output.push_str(&format!("requires: {}\n", dep_names.join(" ")));
+        }
+        Ok(output.into_bytes())
+    }
+
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("zypper:") || content.contains("requires:"))
+    }
+
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+}
+
+// ----------------------------------------------------
+// Universal Package Manager (OOPS Facade Pattern)
+// ----------------------------------------------------
 pub struct UniversalPackageManager {
     adapters: HashMap<String, Box<dyn PackageFormatAdapter>>,
     default_adapter: Option<String>,
+    pub global_hooks: Vec<UserHook>,
 }
 
 impl UniversalPackageManager {
@@ -343,12 +1406,25 @@ impl UniversalPackageManager {
         let mut manager = Self {
             adapters: HashMap::new(),
             default_adapter: None,
+            global_hooks: Vec::new(),
         };
         
-        // Register built-in adapters
+        // Register built-in adapters for all major Linux distributions
         manager.register_adapter(Box::new(DebAdapter::new()));
         manager.register_adapter(Box::new(RpmAdapter::new()));
         manager.register_adapter(Box::new(PacmanAdapter::new()));
+        manager.register_adapter(Box::new(NixAdapter::new()));
+        manager.register_adapter(Box::new(EbuildAdapter::new()));
+        manager.register_adapter(Box::new(ApkAdapter::new()));
+        manager.register_adapter(Box::new(TxzAdapter::new()));
+        manager.register_adapter(Box::new(XbpsAdapter::new()));
+        manager.register_adapter(Box::new(CachyosAdapter::new()));
+        manager.register_adapter(Box::new(SnapAdapter::new()));
+        manager.register_adapter(Box::new(FlatpakAdapter::new()));
+        manager.register_adapter(Box::new(SwupdAdapter::new()));
+        manager.register_adapter(Box::new(EopkgAdapter::new()));
+        manager.register_adapter(Box::new(GuixAdapter::new()));
+        manager.register_adapter(Box::new(ZypperAdapter::new()));
         
         manager
     }
@@ -371,12 +1447,24 @@ impl UniversalPackageManager {
         }
     }
     
-    /// Auto-detect package format and parse
+    /// Add manager-level global user-defined verification hook
+    pub fn add_global_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.global_hooks.push(Box::new(hook));
+    }
+
+    /// Auto-detect package format and parse, running both adapter and manager UDF hooks
     pub fn auto_parse(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        for (format_name, adapter) in &self.adapters {
+        for (_format_name, adapter) in &self.adapters {
             if adapter.validate(data).unwrap_or(false) {
                 let mut package = adapter.parse_package(data)?;
                 adapter.process_hook(&mut package)?;
+                // Run manager-level global UDF hooks
+                for global_hook in &self.global_hooks {
+                    global_hook(&mut package)?;
+                }
                 return Ok(package);
             }
         }
@@ -386,6 +1474,10 @@ impl UniversalPackageManager {
             if let Some(adapter) = self.adapters.get(default_name) {
                 let mut package = adapter.parse_package(data)?;
                 adapter.process_hook(&mut package)?;
+                // Run manager-level global UDF hooks
+                for global_hook in &self.global_hooks {
+                    global_hook(&mut package)?;
+                }
                 return Ok(package);
             }
         }
@@ -400,6 +1492,10 @@ impl UniversalPackageManager {
         
         let mut package = adapter.parse_package(data)?;
         adapter.process_hook(&mut package)?;
+        // Run manager-level global UDF hooks
+        for global_hook in &self.global_hooks {
+            global_hook(&mut package)?;
+        }
         Ok(package)
     }
     
@@ -469,51 +1565,187 @@ depend = openssl";
     }
     
     #[test]
-    fn test_universal_manager_auto_parse() {
+    fn test_nix_adapter_parsing_and_serialization() {
+        let adapter = NixAdapter::new();
+        let nix_data = b"  pname = \"hello\";\n  version = \"2.12.1\";\n  meta.description = \"Gnu hello world\";\n  inputs = [ glibc coreutils ];";
+
+        let package = adapter.parse_package(nix_data).unwrap();
+        assert_eq!(package.name, "hello");
+        assert_eq!(package.version.major, 2);
+        assert_eq!(package.version.minor, 12);
+        assert_eq!(package.dependencies.len(), 2);
+
+        let serialized = adapter.serialize_package(&package).unwrap();
+        let serialized_str = String::from_utf8(serialized).unwrap();
+        assert!(serialized_str.contains("pname = \"hello\";"));
+    }
+
+    #[test]
+    fn test_ebuild_adapter_parsing_and_serialization() {
+        let adapter = EbuildAdapter::new();
+        let ebuild_data = b"PN=\"sys-apps/util-linux\"\nPV=\"2.39.2\"\nDESCRIPTION=\"Essential utilities for Linux\"\nRDEPEND=\"sys-libs/ncurses sys-libs/pam\"";
+
+        let package = adapter.parse_package(ebuild_data).unwrap();
+        assert_eq!(package.name, "sys-apps/util-linux");
+        assert_eq!(package.version.major, 2);
+        assert_eq!(package.dependencies.len(), 2);
+
+        let serialized = adapter.serialize_package(&package).unwrap();
+        let serialized_str = String::from_utf8(serialized).unwrap();
+        assert!(serialized_str.contains("PN=\"sys-apps/util-linux\""));
+    }
+
+    #[test]
+    fn test_apk_adapter_parsing() {
+        let adapter = ApkAdapter::new();
+        let apk_data = b"P:musl\nV:1.2.4\nT:standard musl libc\nD:so:libc.so.6";
+
+        let package = adapter.parse_package(apk_data).unwrap();
+        assert_eq!(package.name, "musl");
+        assert_eq!(package.version.major, 1);
+        assert_eq!(package.dependencies.len(), 1);
+    }
+
+    #[test]
+    fn test_xbps_adapter_parsing_and_serialization() {
+        let adapter = XbpsAdapter::new();
+        let xbps_data = b"pkgname: neovim\nversion: 0.9.1\nshort_desc: Vim-fork focused on extensibility\nrun_depends: libuv msgpack";
+
+        let package = adapter.parse_package(xbps_data).unwrap();
+        assert_eq!(package.name, "neovim");
+        assert_eq!(package.version.major, 0);
+        assert_eq!(package.dependencies.len(), 2);
+    }
+
+    #[test]
+    fn test_cachyos_adapter_microarch_validation() {
+        let adapter = CachyosAdapter::new();
+        let data = b"pkgname = cachyos-kernel\npkgver = 6.8.1\npkgdesc = Optimized kernel\narch = x86_64-v3";
+        assert!(adapter.validate(data).unwrap());
+    }
+
+    #[test]
+    fn test_snap_adapter_parsing() {
+        let adapter = SnapAdapter::new();
+        let data = b"name: core22\nversion: 2023.05.31\nsummary: Canonical runtime base";
+        let package = adapter.parse_package(data).unwrap();
+        assert_eq!(package.name, "core22");
+    }
+
+    #[test]
+    fn test_flatpak_adapter_parsing() {
+        let adapter = FlatpakAdapter::new();
+        let data = b"[Application]\nname=org.gimp.GIMP\nversion=2.10.36\nruntime=org.gnome.Platform";
+        let package = adapter.parse_package(data).unwrap();
+        assert_eq!(package.name, "org.gimp.GIMP");
+    }
+
+    #[test]
+    fn test_swupd_adapter_parsing() {
+        let adapter = SwupdAdapter::new();
+        let data = b"BUNDLE_NAME: sysadmin-basic\nBUNDLE_VERSION: 41220\nCONTENTS: bash curl sed";
+        let package = adapter.parse_package(data).unwrap();
+        assert_eq!(package.name, "sysadmin-basic");
+        assert_eq!(package.dependencies.len(), 3);
+    }
+
+    #[test]
+    fn test_eopkg_adapter_parsing_and_serialization() {
+        let adapter = EopkgAdapter::new();
+        let data = b"<Package>\n  <Name>firefox</Name>\n  <Version>120.0.0</Version>\n  <Description>Mozilla Firefox</Description>\n</Package>";
+        let package = adapter.parse_package(data).unwrap();
+        assert_eq!(package.name, "firefox");
+
+        let serialized = adapter.serialize_package(&package).unwrap();
+        let serialized_str = String::from_utf8(serialized).unwrap();
+        assert!(serialized_str.contains("<Name>firefox</Name>"));
+    }
+
+    #[test]
+    fn test_guix_adapter_parsing_and_serialization() {
+        let adapter = GuixAdapter::new();
+        let data = b"(package\n  (name \"readline\")\n  (version \"8.2.0\")\n  (synopsis \"GNU readline library\")\n  (inputs (list ncurses))\n)";
+        let package = adapter.parse_package(data).unwrap();
+        assert_eq!(package.name, "readline");
+        assert_eq!(package.dependencies.len(), 1);
+
+        let serialized = adapter.serialize_package(&package).unwrap();
+        let serialized_str = String::from_utf8(serialized).unwrap();
+        assert!(serialized_str.contains("(name \"readline\")"));
+    }
+
+    #[test]
+    fn test_zypper_adapter_parsing_and_serialization() {
+        let adapter = ZypperAdapter::new();
+        let data = b"zypper: patterns-openSUSE-base\nversion: 15.5.0\nsummary: openSUSE base system\nrequires: patterns-openSUSE-minimal_base";
+        let package = adapter.parse_package(data).unwrap();
+        assert_eq!(package.name, "patterns-openSUSE-base");
+        assert_eq!(package.dependencies.len(), 1);
+    }
+
+    #[test]
+    fn test_universal_manager_auto_parse_multiple_formats() {
         let manager = UniversalPackageManager::new();
-        let deb_data = b"Package: auto-test
-Version: 1.0.0
-Description: Auto-detection test";
         
-        let package = manager.auto_parse(deb_data).unwrap();
-        assert_eq!(package.name, "auto-test");
+        // 1. Test Nix format
+        let nix_data = b"  pname = \"nix-tool\";\n  version = \"1.0.0\";\n  meta.description = \"Nix tool description\";";
+        let nix_pkg = manager.auto_parse(nix_data).unwrap();
+        assert_eq!(nix_pkg.name, "nix-tool");
+
+        // 2. Test Ebuild format
+        let ebuild_data = b"PN=\"gentoo-tool\"\nPV=\"2.0.0\"\nDESCRIPTION=\"Gentoo tool ebuild\"";
+        let ebuild_pkg = manager.auto_parse(ebuild_data).unwrap();
+        assert_eq!(ebuild_pkg.name, "gentoo-tool");
+
+        // 3. Test APK format
+        let apk_data = b"P:apk-tool\nV:3.0.0\nT:Alpine tool description";
+        let apk_pkg = manager.auto_parse(apk_data).unwrap();
+        assert_eq!(apk_pkg.name, "apk-tool");
     }
     
     #[test]
-    fn test_user_defined_hook() {
-        let mut adapter = DebAdapter::new();
+    fn test_global_user_defined_hook() {
+        let mut manager = UniversalPackageManager::new();
         
-        // Add a user-defined hook that modifies the package
-        adapter.add_hook(|package: &mut Package| -> Result<(), AdapterError> {
-            package.name = format!("hooked-{}", package.name);
+        // Register global verification hook that enforces open-source licensing constraints
+        manager.add_global_hook(|package: &mut Package| -> Result<(), AdapterError> {
+            // Simulated validation of open source licensing compliance
+            if package.name.contains("proprietary") {
+                return Err(AdapterError::HookError("Non-free proprietary license detected!".to_string()));
+            }
+            package.description = format!("{} (Verified Open Source)", package.description);
             Ok(())
         });
         
-        let deb_data = b"Package: original
-Version: 1.0.0
-Description: Hook test";
+        let data = b"Package: open-curl\nVersion: 7.85.0\nDescription: Command line tool";
+        let parsed = manager.auto_parse(data).unwrap();
+        assert_eq!(parsed.name, "open-curl");
+        assert!(parsed.description.contains("(Verified Open Source)"));
         
-        let mut package = adapter.parse_package(deb_data).unwrap();
-        adapter.process_hook(&mut package).unwrap();
-        
-        assert_eq!(package.name, "hooked-original");
+        let proprietary_data = b"Package: proprietary-driver\nVersion: 525.60.11\nDescription: Closed source driver";
+        let parse_result = manager.auto_parse(proprietary_data);
+        assert!(parse_result.is_err());
     }
     
     #[test]
-    fn test_format_conversion() {
+    fn test_format_conversion_cross_platform() {
         let manager = UniversalPackageManager::new();
         let package = Package::new(
-            "convert-test".to_string(),
-            Version::new(1, 0, 0),
-            "Conversion test".to_string(),
-            vec![],
+            "universal-tool".to_string(),
+            Version::new(1, 2, 3),
+            "Unified utility".to_string(),
+            vec![Dependency { name: "libc".to_string(), version_constraint: VersionConstraint::Any }],
             String::new(),
         );
         
-        let rpm_data = manager.convert_format(&package, "rpm").unwrap();
-        let rpm_str = String::from_utf8(rpm_data).unwrap();
+        // Convert to Nix
+        let nix_data = manager.convert_format(&package, "nix").unwrap();
+        let nix_str = String::from_utf8(nix_data).unwrap();
+        assert!(nix_str.contains("pname = \"universal-tool\";"));
         
-        assert!(rpm_str.contains("Name: convert-test"));
-        assert!(rpm_str.contains("Version: 1.0.0"));
+        // Convert to Guix
+        let guix_data = manager.convert_format(&package, "guix").unwrap();
+        let guix_str = String::from_utf8(guix_data).unwrap();
+        assert!(guix_str.contains("(name \"universal-tool\")"));
     }
 }

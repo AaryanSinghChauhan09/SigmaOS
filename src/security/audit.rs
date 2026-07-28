@@ -54,7 +54,7 @@ impl SimpleAuditEvent {
 
 impl AuditEvent for SimpleAuditEvent {
     fn id(&self) -> EventID { self.id }
-    fn event_type(&self) -> EventType { unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) } }
+    fn event_type(&self) -> EventType { unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst) as u32) } }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn user_id(&self) -> usize { self.user_id.load(Ordering::SeqCst) }
     fn description(&self) -> &[u8] {
