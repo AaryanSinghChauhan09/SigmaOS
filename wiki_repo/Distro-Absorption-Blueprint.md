@@ -219,3 +219,12 @@ impl SigmaLivepatch {
 }
 ```
 ```
+
+## ⏰ 3. Multi-Distro Improved Cron Scheduling Subsystem (`tools/sigma_cron_compat.rs`)
+
+SigmaOS implements a zero-dependency, C-ABI compliant, safe `#![no_std]` Cron scheduling layer inspired by all major Linux distributions, combining their unique strengths:
+
+1. **RedHat / Debian (Category Directories)**: Categorizes jobs using directories or categories (`CronCategory: Hourly, Daily, Weekly, Monthly, Custom`).
+2. **Alpine / Busybox (Strict Security Isolation)**: Grants unique user identifiers (`run_as_user`) to lock process capabilities and restrict cron permissions.
+3. **Arch Linux (Jitter / Randomized Delay)**: Mitigates thundering herd scheduling conflicts on wake/boot by introducing randomized execution delays (`randomized_delay_sec`).
+4. **NixOS (Declarative Generations)**: Tracks configuration versioning via generation tags (`generation_id`), enabling transactional scheduling rollbacks.
