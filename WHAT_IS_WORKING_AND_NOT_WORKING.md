@@ -12,12 +12,18 @@ This document is the definitive master status and diagnostic reference guide for
     - [File 1: `src/sigpkg/mod.rs` (Duplicate `new` & Structural Gaps)](#file-1-srcsigpkgmodrs-duplicate-new--structural-gaps)
     - [File 2: `src/ai/orchestrator.rs` (Expected `;` found `None`)](#file-2-srcaiorchestratorrs-expected--found-none)
     - [File 3: `src/klib/paging.rs` (`#[test]` Attribute on Method)](#file-3-srcklibpagingrs-test-attribute-on-method)
-    - [File 4: `src/security/vulnerability.rs` (Duplicate Merge Blocks)](#file-4-srcsecurityvulnerabilityrs-duplicate-merge-blocks)
-    - [File 5: `src/security/capability.rs` (Duplicate Merge Blocks)](#file-5-srcsecuritycapabilityrs-duplicate-merge-blocks)
+    - [File 4: `src/security/vulnerability.rs` (Duplicate Merge Blocks & ScanError)](#file-4-srcsecurityvulnerabilityrs-duplicate-merge-blocks--scanerror)
+    - [File 5: `src/security/capability.rs` (Duplicate Merge Blocks & SecurityEnforcer)](#file-5-srcsecuritycapabilityrs-duplicate-merge-blocks--securityenforcer)
     - [File 6: `src/driver/framework.rs` (Trait Member Mismatch)](#file-6-srcdriverframeworkrs-trait-member-mismatch)
     - [File 7: `src/container/runtime.rs` (Missing Derives & Crate Attributes)](#file-7-srccontainerruntimers-missing-derives--crate-attributes)
     - [File 8: `src/klib/buddy_allocator.rs` (Custom `Vec<T>` Encapsulation Gaps)](#file-8-srcklibbuddy_allocatorrs-custom-vect-encapsulation-gaps)
     - [File 9: `src/network/tcp_udp.rs` (Missing Type Bindings & Atomics copying)](#file-9-srcnetworktcp_udprs-missing-type-bindings--atomics-copying)
+    - [File 10: `src/remote/desktop.rs` (get_session & Iterators)](#file-10-srcremotedesktoprs-get_session--iterators)
+    - [File 11: `src/remote/shell.rs` (Iterator Bounds)](#file-11-srcremoteshellrs-iterator-bounds)
+    - [File 12: `src/security/audit.rs` (Iterators, EventType Derives, unwrap_or)](#file-12-srcsecurityauditrs-iterators-eventtype-derives-unwrap_or)
+    - [File 13: `src/security/integrity.rs` (update_stats)](#file-13-srcsecurityintegrityrs-update_stats)
+    - [File 14: `src/security/pki.rs` (Mismatched contains bounds)](#file-14-srcsecuritypkirs-mismatched-contains-bounds)
+    - [File 15: `src/security/secrets.rs` (std::vec::Vec missing data field)](#file-15-srcsecuritysecretsrs-stdvecvec-missing-data-field)
 5. [Systematic AI Agent Recovery Action Plan](#5-systematic-ai-agent-recovery-action-plan)
 6. [Verification & Testing Commands](#6-verification--testing-commands)
 
@@ -64,7 +70,7 @@ Currently, full compilation of the workspace is blocked by several categories of
 - **Syntax/Parsing errors**: Caused by unclosed braces `}` in implementations and dangling unexpected values.
 - **E0428 (Duplicate type definitions)**: Caused by duplicate trait/struct definitions within the same module namespace (parallel merge duplication).
 - **E0407 (Trait method mismatch)**: Caused by implementing methods in trait `impl` blocks that are not defined on the original trait.
-- **E0599/E0277 (Missing Trait Implementations)**: Private custom utility fields and missing `Index`/`Iterator` traits.
+- **E0599/E0277 (Missing Trait Implementations)**: Private custom utility fields, missing `Index`/`Iterator` traits on custom `Vec<T>`, and missing `PartialEq` derives.
 - **E0425 (Undeclared types)**: Missing struct references and import declarations.
 
 ---
@@ -187,31 +193,42 @@ An AI agent or developer can resolve 100% of these compile errors by applying th
 
 ---
 
-### File 4: `src/security/vulnerability.rs` (Duplicate Merge Blocks)
+### File 4: `src/security/vulnerability.rs` (Duplicate Merge Blocks & ScanError)
 *   **Symptom**:
     ```
     error[E0428]: the name `Vulnerability` is defined multiple times
        --> src/security/vulnerability.rs:265:1
-    error[E0428]: the name `SimpleVulnerability` is defined multiple times
-       --> src/security/vulnerability.rs:274:1
+    error[E0599]: no variant, associated function, or constant named `PackageNotFound` found for enum `vulnerability::ScanError`
     ```
-*   **Why**: A merge conflict resolution or file concatenation has resulted in the entire set of core types (`Vulnerability`, `SimpleVulnerability`, `VulnerabilityScanner`, `SimpleVulnerabilityScanner`, `ScanReport`, `ScanSummary`, `SimpleScanReport`) being declared twice in `src/security/vulnerability.rs`.
+*   **Why**:
+    1. A merge conflict resolution or file concatenation has resulted in the entire set of core types (`Vulnerability`, `SimpleVulnerability`, etc.) being declared twice in `src/security/vulnerability.rs`.
+    2. The first declaration of `ScanError` has `PackageNotFound` but the second declaration of `ScanError` is missing it, resulting in E0599.
 *   **How to Fix**:
-    Locate lines 40-264 in `src/security/vulnerability.rs` and **delete** that entire duplicate first section, keeping the second section (lines 265 onwards) which contains the complete implementations and pipeline traits.
+    Locate lines 40-264 in `src/security/vulnerability.rs` and **delete** that entire duplicate first section. Ensure the remaining declaration of `ScanError` contains all necessary variants:
+    ```rust
+    #[repr(C)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum ScanError {
+        Success = 0,
+        PackageNotFound = 1,
+        ScanFailed = 2,
+    }
+    ```
 
 ---
 
-### File 5: `src/security/capability.rs` (Duplicate Merge Blocks)
+### File 5: `src/security/capability.rs` (Duplicate Merge Blocks & SecurityEnforcer)
 *   **Symptom**:
     ```
     error[E0428]: the name `Permission` is defined multiple times
-       --> src/security/capability.rs:207:1
-    error[E0428]: the name `CapabilityGate` is defined multiple times
-       --> src/security/capability.rs:217:1
+    error[E0560]: struct `capability::SecurityEnforcer` has no field named `bits`
     ```
-*   **Why**: Another file concatenation has duplicated `Permission`, `CapabilityGate` and associated method implementations.
+*   **Why**:
+    1. Another file concatenation has duplicated `Permission`, `CapabilityGate`, etc.
+    2. Modifying `SecurityEnforcer` to have `bits` while it was defined with `active_tokens` causes struct mismatch fields and E0560.
 *   **How to Fix**:
-    Locate the duplicate definitions at lines 207-260 in `src/security/capability.rs` and **delete** them entirely, keeping the first comprehensive section of the file.
+    1. Locate the duplicate definitions at lines 207-260 in `src/security/capability.rs` and **delete** them entirely.
+    2. Ensure `SecurityEnforcer` has the `active_tokens: Vec<CapabilityToken>` field or whatever fields match its capability enforcer implementation, or restore its expected structural configuration.
 
 ---
 
@@ -219,29 +236,11 @@ An AI agent or developer can resolve 100% of these compile errors by applying th
 *   **Symptom**:
     ```
     error[E0407]: method `set_state` is not a member of trait `Driver`
-      --> src/driver/framework.rs:80:5
-    error[E0407]: method `init` is not a member of trait `Driver`
-      --> src/driver/framework.rs:83:5
     ```
-*   **Why**: `impl Driver for SimpleStorageDriver` implements methods `set_state`, `init`, and `probe` which are not declared on the parent `Driver` trait. In Rust, you cannot implement non-members in trait blocks.
+*   **Why**: `impl Driver for SimpleStorageDriver` implements methods `set_state`, `init`, and `probe` which are not declared on the parent `Driver` trait.
 *   **How to Fix**:
     Move these three methods out of the `impl Driver for SimpleStorageDriver` block into a separate concrete `impl SimpleStorageDriver` block:
     ```rust
-    // REPLACE:
-    impl Driver for SimpleStorageDriver {
-        fn id(&self) -> DriverID { ... }
-        fn driver_type(&self) -> DriverType { ... }
-        fn state(&self) -> DriverState { ... }
-
-        fn set_state(&self, state: DriverState) { ... }
-        fn init(&mut self) -> Result<(), DriverError> { ... }
-        fn probe(&mut self) -> Result<bool, DriverError> { ... }
-
-        fn load(&mut self) -> Result<(), DriverError> { ... }
-        fn unload(&mut self) -> Result<(), DriverError> { ... }
-    }
-
-    // WITH:
     impl Driver for SimpleStorageDriver {
         fn id(&self) -> DriverID { self.id }
         fn driver_type(&self) -> DriverType { DriverType::Storage }
@@ -266,25 +265,15 @@ An AI agent or developer can resolve 100% of these compile errors by applying th
 ### File 7: `src/container/runtime.rs` (Missing Derives & Crate Attributes)
 *   **Symptom**:
     ```
-    warning: crate-level attribute should be in the root module (#![no_std] / #![no_main])
+    warning: crate-level attribute should be in the root module
     error[E0277]: `runtime::ContainerState` must implement `PartialEq`
-       --> src/container/runtime.rs:181:26
     ```
 *   **Why**:
-    1. `#![no_std]` and `#![no_main]` are specified at the top of a library submodule instead of the crate root.
-    2. The `ContainerState` enum lacks equality derives (`PartialEq`, `Eq`), blocking all downstream logical comparisons.
+    1. `#![no_std]` and `#![no_main]` are specified at the top of a submodule instead of the crate root.
+    2. The `ContainerState` enum lacks equality derives (`PartialEq`, `Eq`), blocking down-stream comparisons.
 *   **How to Fix**:
-    1. Remove `#![no_std]` and `#![no_main]` from the top of `src/container/runtime.rs`.
-    2. Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to the definition of `ContainerState`:
-    ```rust
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum ContainerState {
-        Created,
-        Running,
-        Paused,
-        Stopped,
-    }
-    ```
+    1. Remove `#![no_std]` and `#![no_main]` from the top of the file.
+    2. Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to the definition of `ContainerState`.
 
 ---
 
@@ -292,12 +281,10 @@ An AI agent or developer can resolve 100% of these compile errors by applying th
 *   **Symptom**:
     ```
     error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
-    error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>`
-    error[E0277]: `&buddy_allocator::Vec<Option<Block>>` is not an iterator
     ```
-*   **Why**: The custom, minimal `Vec<T>` struct defined in `src/klib/buddy_allocator.rs` does not have `pub` modifiers on its fields (`data`, `len`, `capacity`), completely lacks implementation of the `Index`/`IndexMut` traits, and does not implement `IntoIterator` or have an `.iter()` method.
+*   **Why**: The custom `Vec<T>` struct defined in `src/klib/buddy_allocator.rs` does not have `pub` modifiers on its fields and lacks `Index`/`IndexMut` and iterator trait implementations.
 *   **How to Fix**:
-    Update the `Vec<T>` struct and add Index / Iterator trait implementations inside `src/klib/buddy_allocator.rs` to match:
+    Update the `Vec<T>` struct and add Index / Iterator trait implementations inside `src/klib/buddy_allocator.rs`:
     ```rust
     pub struct Vec<T> {
         pub data: *mut T,
@@ -305,24 +292,11 @@ An AI agent or developer can resolve 100% of these compile errors by applying th
         pub capacity: usize,
     }
 
-    impl<T> Vec<T> {
-        pub fn new() -> Self { ... }
-        pub fn len(&self) -> usize { self.len }
-        // ...
-    }
-
     impl<T> core::ops::Index<usize> for Vec<T> {
         type Output = T;
         fn index(&self, index: usize) -> &T {
             if index >= self.len { panic!("Index out of bounds"); }
             unsafe { &*self.data.add(index) }
-        }
-    }
-
-    impl<T> core::ops::IndexMut<usize> for Vec<T> {
-        fn index_mut(&mut self, index: usize) -> &mut T {
-            if index >= self.len { panic!("Index out of bounds"); }
-            unsafe { &mut *self.data.add(index) }
         }
     }
     ```
@@ -333,29 +307,90 @@ An AI agent or developer can resolve 100% of these compile errors by applying th
 *   **Symptom**:
     ```
     error[E0425]: cannot find type `NetfilterFirewall` in this scope
-    error[E0609]: no field `reuse_addr` on type `&SimpleSocket`
-    error[E0277]: the trait bound `AtomicUsize: std::marker::Copy` is not satisfied
-       --> src/network/tcp_udp.rs:280:34
+    ```
+*   **Why**: Structs `NetfilterFirewall`, `RoutingTable`, and `NetworkInterface` are referenced but not defined or imported.
+*   **How to Fix**:
+    Define simple dummy/mock structures or imports for `NetfilterFirewall`, `RoutingTable` and `NetworkInterface` inside `src/network/tcp_udp.rs`.
+
+---
+
+### File 10: `src/remote/desktop.rs` (get_session & Iterators)
+*   **Symptom**:
+    ```
+    error[E0599]: no method named `get_session` found for reference `&SimpleRemoteDesktop`
+    error[E0277]: `&desktop::Vec<Option<Box<(dyn RemoteSession + 'static)>>>` is not an iterator
     ```
 *   **Why**:
-    1. Structs `NetfilterFirewall`, `RoutingTable`, and `NetworkInterface` are referenced but not defined or imported in `src/network/tcp_udp.rs`.
-    2. Socket configuration methods try to access properties that do not exist on `SimpleSocket`.
-    3. At line 280, it attempts to return `self.local_port` (an `AtomicUsize`) directly, which tries to copy it (violating `Copy` on atomics).
+    1. `SimpleRemoteDesktop` is calling `get_session` internally but it is not implemented on the concrete struct or in scope.
+    2. The custom `Vec<T>` used inside `desktop.rs` is missing an `IntoIterator` implementation for loop processing.
 *   **How to Fix**:
-    1. Define simple dummy/mock structures or imports for `NetfilterFirewall`, `RoutingTable` and `NetworkInterface` inside `src/network/tcp_udp.rs` (or import them from `crate::net` or `crate::kernel::net`).
-    2. Add fields `pub reuse_addr: bool`, `pub tcp_nodelay: bool`, `pub rcvbuf: usize`, `pub sndbuf: usize` to the `SimpleSocket` struct definition.
-    3. Use `.load(Ordering::SeqCst)` to read the port value instead of raw copying:
-    ```rust
-    // REPLACE:
-    fn local_port(&self) -> usize {
-        self.local_port
-    }
+    1. Implement `pub fn get_session(&self, id: SessionID) -> Option<&Box<dyn RemoteSession>>` on `SimpleRemoteDesktop`.
+    2. Provide an `.iter()` or iterator implementation for the custom `Vec<T>` in `desktop.rs` (or wrap loops with `.iter()` and ensure `.iter()` returns an iterator of references).
 
-    // WITH:
-    fn local_port(&self) -> usize {
-        self.local_port.load(Ordering::SeqCst)
-    }
+---
+
+### File 11: `src/remote/shell.rs` (Iterator Bounds)
+*   **Symptom**:
     ```
+    error[E0277]: `&mut remote::shell::Vec<Option<Box<(dyn RemoteShell + 'static)>>>` is not an iterator
+    ```
+*   **Why**: The custom `Vec<T>` inside `shell.rs` does not implement `IntoIterator` for standard `&mut Vec<T>` loop iterators.
+*   **How to Fix**:
+    Implement `.iter()` and `.iter_mut()` returning reference iterators, or implement `IntoIterator` for `&Vec<T>` and `&mut Vec<T>`.
+
+---
+
+### File 12: `src/security/audit.rs` (Iterators, EventType Derives, unwrap_or)
+*   **Symptom**:
+    ```
+    error[E0277]: `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` is not an iterator
+    error[E0369]: binary operation `==` cannot be applied to type `audit::EventType`
+    error[E0599]: no method named `unwrap_or` found for type `bool`
+    ```
+*   **Why**:
+    1. Loop iterator E0277 is thrown due to missing IntoIterator trait on the custom `Vec<T>`.
+    2. `EventType` enum does not derive `PartialEq`.
+    3. `unwrap_or(false)` is called on `check_compliance`, which already returns a boolean `bool`.
+*   **How to Fix**:
+    1. Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to `EventType`.
+    2. Remove the `.unwrap_or(false)` call on `self.check_compliance(event)`.
+    3. Ensure `Vec` has public fields and proper trait implementations.
+
+---
+
+### File 13: `src/security/integrity.rs` (update_stats)
+*   **Symptom**:
+    ```
+    error[E0599]: no method named `update_stats` found for mutable reference `&mut SimpleIntegrityMonitor`
+    ```
+*   **Why**: `self.update_stats(status)` is called inside `integrity.rs` but `update_stats` is not defined or is defined with a mismatched signature on `SimpleIntegrityMonitor`.
+*   **How to Fix**:
+    Define `fn update_stats(&mut self, status: IntegrityState)` or adjust the signature so that the call succeeds cleanly.
+
+---
+
+### File 14: `src/security/pki.rs` (Mismatched contains bounds)
+*   **Symptom**:
+    ```
+    error[E0308]: mismatched types: expected `&usize`, found `usize` in contains()
+    ```
+*   **Why**: Calling `self.revoked.contains(id)` when `id` is a `usize` but `.contains()` requires borrowing `&id`.
+*   **How to Fix**:
+    Change the line to:
+    ```rust
+    if self.revoked.contains(&id) {
+    ```
+
+---
+
+### File 15: `src/security/secrets.rs` (std::vec::Vec missing data field)
+*   **Symptom**:
+    ```
+    error[E0609]: no field `data` on type `std::vec::Vec<Option<Box<(dyn Secret + 'static)>>>`
+    ```
+*   **Why**: The code is trying to access raw pointer fields `.data` directly on standard `std::vec::Vec` or has imported standard `Vec` instead of using the custom `Vec` with unsafe pointer manipulation.
+*   **How to Fix**:
+    Ensure the file is using the correct custom `Vec` structure or perform pointer operations safely without assuming standard `Vec` has a `.data` field.
 
 ---
 
@@ -373,7 +408,7 @@ Any subsequent AI agent can fully automate resolving these errors and pass the t
 6.  **Fix SimpleStorageDriver trait implementation**: Extract `set_state`, `init`, and `probe` into `impl SimpleStorageDriver`.
 7.  **Derive PartialEq and Eq for ContainerState**: Ensure `ContainerState` has `#[derive(Debug, Clone, Copy, PartialEq, Eq)]`.
 8.  **Complete klib custom vectors**: Verify that both `src/klib/paging.rs` and `src/klib/buddy_allocator.rs`'s custom `Vec<T>` implement `core::ops::Index` and `core::ops::IndexMut`, have public fields/methods, and are compatible with loops.
-9.  **Load Atomics cleanly**: Locate any atomics that are directly copied, and replace them with `.load(Ordering::SeqCst)`.
+9.  **Fix mismatched borrows & unwraps**: Replace `.unwrap_or(false)` on boolean returns, and add `&` borrows in slice `.contains()` queries.
 
 ---
 
