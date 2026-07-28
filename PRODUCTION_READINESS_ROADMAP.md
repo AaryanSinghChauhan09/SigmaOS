@@ -10,6 +10,7 @@ This roadmap addresses the critical gaps between SigmaOS's current state and mai
 - ✅ Innovative microkernel architecture in Rust
 - ✅ Sovereign, AI-native design philosophy
 - ✅ India-first compliance features (GST, TDS, UPI integration)
+- ✅ Comprehensive Indian legal compliance framework
 - ✅ Post-quantum cryptography foundation
 - ✅ Capability-based security framework
 - ✅ Partial driver ecosystem (NVMe, USB, legacy drivers)
@@ -22,6 +23,128 @@ This roadmap addresses the critical gaps between SigmaOS's current state and mai
 - ❌ Stable virtualization/container integration
 - ❌ Enterprise security policies and compliance certifications
 - ❌ Widespread community adoption and support
+
+---
+
+## Phase 0: Indian Compliance Integration (Months 1-12)
+
+### Priority: CRITICAL (India-First Differentiator)
+
+#### 0.1 Corporate Governance Compliance (Months 1-4)
+**Timeline:** Months 1-4
+**Goal:** Complete Companies Act, 2013 compliance system
+
+**Milestones:**
+- **Month 1:** Board meeting management system
+  - Digital board meeting scheduling
+  - Quorum validation (Section 102)
+  - Minutes generation and filing
+  - Statutory register maintenance
+
+- **Month 2:** Annual return automation
+  - MCA-21 form generation
+  - ROC filing preparation
+  - Director KYC integration
+  - Share capital tracking
+
+- **Month 3:** CSR compliance system
+  - CSR obligation calculation (2% of net profit)
+  - CSR spending tracking
+  - CSR impact reporting
+  - Annual CSR report generation
+
+- **Month 4:** Auditor & secretary workflow
+  - Auditor appointment workflow
+  - Company secretary compliance
+  - Internal audit scheduling
+  - Compliance dashboard
+
+**Deliverables:**
+- Corporate governance compliance module
+- Board meeting management system
+- Annual return automation
+- CSR compliance tracking
+
+#### 0.2 Taxation Compliance (Months 2-6)
+**Timeline:** Months 2-6
+**Goal:** Complete Income Tax and GST compliance
+
+**Milestones:**
+- **Month 2-3:** Income Tax Act integration
+  - TDS calculation engine (Sections 192, 194A, 194C, 194I, 194J)
+  - Advance tax computation
+  - ITR form generation (ITR-1 to ITR-7)
+  - PAN verification integration
+
+- **Month 4-5:** GST Act integration
+  - GST registration workflow
+  - GSTR-1 filing automation
+  - GSTR-3B computation
+  - ITC reconciliation system
+
+- **Month 6:** E-invoicing and returns
+  - E-invoicing API integration
+  - Quarterly return filing
+  - Tax compliance alerts
+  - Compliance dashboard
+
+**Deliverables:**
+- TDS calculation and deduction system
+- Advance tax computation engine
+- GST registration and filing system
+- Tax compliance dashboard
+
+#### 0.3 Labour & Social Security (Months 4-8)
+**Timeline:** Months 4-8
+**Goal:** Complete EPF, ESI, and labour law compliance
+
+**Milestones:**
+- **Month 4-5:** EPF compliance
+  - EPF contribution calculation (12% each)
+  - ECR filing automation
+  - UAN management
+  - PF withdrawal processing
+
+- **Month 6-7:** ESI compliance
+  - ESI contribution calculation (3.25% + 0.75%)
+  - ESI return filing
+  - Medical benefit tracking
+  - ESI compliance dashboard
+
+- **Month 8:** Labour laws integration
+  - Gratuity calculation (Payment of Gratuity Act)
+  - Bonus calculation (Payment of Bonus Act)
+  - Maternity benefit tracking
+  - Contract labour compliance
+
+**Deliverables:**
+- EPF compliance system
+- ESI compliance system
+- Labour law compliance modules
+- Social security dashboard
+
+#### 0.4 Environmental & Banking Compliance (Months 6-10)
+**Timeline:** Months 6-10
+**Goal:** Environmental and financial compliance
+
+**Milestones:**
+- **Month 6-8:** Environmental compliance
+  - Air Act compliance (CTE/CTO tracking)
+  - Water Act compliance
+  - Environmental monitoring
+  - Compliance alerts
+
+- **Month 9-10:** Banking compliance
+  - CSR spending tracking
+  - Banking regulation compliance
+  - Financial reporting
+  - Compliance dashboard
+
+**Deliverables:**
+- Environmental compliance system
+- Banking compliance module
+- Unified compliance dashboard
+- Compliance reporting system
 
 ---
 
@@ -627,6 +750,7 @@ This roadmap addresses the critical gaps between SigmaOS's current state and mai
 
 | Phase | Duration | Priority | Key Deliverables |
 |-------|----------|----------|-----------------|
+| Phase 0: Indian Compliance Integration | 12 months | CRITICAL | Corporate governance, taxation, labour, environmental compliance |
 | Phase 1: Hardware Compatibility | 6 months | CRITICAL | GPU, Wi-Fi, ARM support |
 | Phase 2: Networking Stack | 4 months | HIGH | IPv6, VPN, routing |
 | Phase 3: Package Management | 4 months | CRITICAL | Dependency resolution, rollback, signed repos |
@@ -635,7 +759,7 @@ This roadmap addresses the critical gaps between SigmaOS's current state and mai
 | Phase 6: Security & Compliance | 4 months | HIGH | MAC policies, certifications |
 | Phase 7: Community & Ecosystem | 4 months | MEDIUM | Documentation, community, contributors |
 
-**Total Timeline:** 18 months to production readiness
+**Total Timeline:** 18 months to production readiness (with parallel compliance integration)
 
 ---
 
