@@ -2,7 +2,6 @@
 pub mod archive;
 pub mod complete_filesystems;
 pub mod cow_snapshot;
-pub mod cow_snapshot;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
@@ -16,7 +15,6 @@ pub use complete_filesystems::{
     BtrfsFileSystem, ExFatFileSystem, ExtFileSystem, ExtVersion, FatFileSystem, FatVersion,
     FileSystem, HfsPlusFileSystem, NtfsFileSystem,
 };
-pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
 pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
 pub use disk_usage::{
     AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
