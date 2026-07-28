@@ -47,7 +47,12 @@ impl PackageDependencyResolver {
         self.check_cycles(name, &mut visited, &mut visit_idx)
     }
 
-    fn check_cycles(&self, name: &'static str, visited: &mut [&'static str; 16], idx: &mut usize) -> bool {
+    fn check_cycles(
+        &self,
+        name: &'static str,
+        visited: &mut [&'static str; 16],
+        idx: &mut usize,
+    ) -> bool {
         // Cycle detected
         for i in 0..*idx {
             if visited[i] == name {

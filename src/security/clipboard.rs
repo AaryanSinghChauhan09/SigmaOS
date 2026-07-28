@@ -73,7 +73,9 @@ impl XorEncryption {
 impl ClipboardSecurity for XorEncryption {
     fn secure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
         if self.key.is_empty() {
-            return Err(ClipboardError::EncryptionError("Encryption key cannot be empty".to_string()));
+            return Err(ClipboardError::EncryptionError(
+                "Encryption key cannot be empty".to_string(),
+            ));
         }
         // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions
         let encrypted: Vec<u8> = content
@@ -87,7 +89,9 @@ impl ClipboardSecurity for XorEncryption {
 
     fn unsecure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
         if self.key.is_empty() {
-            return Err(ClipboardError::DecryptionError("Decryption key cannot be empty".to_string()));
+            return Err(ClipboardError::DecryptionError(
+                "Decryption key cannot be empty".to_string(),
+            ));
         }
         // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions
         let decrypted: Vec<u8> = content
