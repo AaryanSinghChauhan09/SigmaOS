@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**  
@@ -235,7 +234,11 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
-=======
+
+---
+
+## 🏛️ Legacy / Stable C++ Microkernel Architecture (v15.2)
+
 # SigmaOS Zenith (v15.2 - Release Microkernel)
 
 The Sovereign Industrial Microkernel.
@@ -294,4 +297,3 @@ qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio -m 2G
 npm run test
 ```
 All unit tests in `/tests` must return green states before submitting patches.
->>>>>>> wiki/master
