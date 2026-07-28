@@ -23,6 +23,67 @@ pub enum Architecture {
     RISCV64,
 }
 
+/// Represents a bootable kernel entry (systemd-boot/GRUB2 style)
+#[derive(Debug, Clone)]
+pub struct BootEntry {
+    pub title: &'static str,
+    pub kernel_path: &'static str,
+    pub initrd_path: Option<&'static str>,
+    pub cmdline_params: &'static str,
+}
+
+/// GRUB2/systemd-boot style interactive Bootloader Configuration Menu
+pub struct BootloaderMenu {
+    pub entries: [Option<BootEntry>; 4],
+    pub default_entry_idx: usize,
+    pub timeout_seconds: u32,
+}
+
+impl BootloaderMenu {
+    pub fn new() -> Self {
+        let mut entries = [None, None, None, None];
+        // Distro-inspired default entries (Standard, LTS, Recovery, Rollback)
+        entries[0] = Some(BootEntry {
+            title: "SigmaOS Standard (Kernel 6.12-RT)",
+            kernel_path: "/boot/sigma_kernel_std",
+            initrd_path: Some("/boot/initramfs_std.img"),
+            cmdline_params: "loglevel=debug init=/bin/sigma-sh audit=1",
+        });
+        entries[1] = Some(BootEntry {
+            title: "SigmaOS LTS (Kernel 6.6-Stable)",
+            kernel_path: "/boot/sigma_kernel_lts",
+            initrd_path: Some("/boot/initramfs_lts.img"),
+            cmdline_params: "loglevel=info init=/bin/sigma-sh security=pledge",
+        });
+        entries[2] = Some(BootEntry {
+            title: "SigmaOS Recovery Mode",
+            kernel_path: "/boot/sigma_kernel_recovery",
+            initrd_path: None,
+            cmdline_params: "loglevel=debug init=/bin/sigma-sh recovery_mode=true",
+        });
+
+        Self {
+            entries,
+            default_entry_idx: 0,
+            timeout_seconds: 5,
+        }
+    }
+
+    pub fn select_entry(&self, index: usize) -> Option<&BootEntry> {
+        if index < self.entries.len() {
+            self.entries[index].as_ref()
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for BootloaderMenu {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UefiBootloader {
     pub fn new(arch: Architecture) -> Self {
         UefiBootloader {
