@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Observability Stack for SigmaOS
 /// Implements observability using OOP principles with traits and structs
 /// No dependency on external observability frameworks
 /// Based on Roadmap Item 90: Observability stack
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub trait SigmaDebug {}
 pub trait SigmaMetrics {}
@@ -103,7 +102,12 @@ pub struct SimpleMetric {
 }
 
 impl SimpleMetric {
-    pub fn new(id: MetricID, name: &[u8], metric_type: MetricType, capability: MetricCapability) -> Self {
+    pub fn new(
+        id: MetricID,
+        name: &[u8],
+        metric_type: MetricType,
+        capability: MetricCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -150,13 +154,16 @@ impl Metric for SimpleMetric {
 
         match self.metric_type {
             MetricType::Counter => {
-                self.value.fetch_add(Self::f64_to_usize(value), Ordering::SeqCst);
+                self.value
+                    .fetch_add(Self::f64_to_usize(value), Ordering::SeqCst);
             }
             MetricType::Gauge => {
-                self.value.store(Self::f64_to_usize(value), Ordering::SeqCst);
+                self.value
+                    .store(Self::f64_to_usize(value), Ordering::SeqCst);
             }
             MetricType::Histogram | MetricType::Summary => {
-                self.value.fetch_add(Self::f64_to_usize(value), Ordering::SeqCst);
+                self.value
+                    .fetch_add(Self::f64_to_usize(value), Ordering::SeqCst);
             }
         }
     }
@@ -294,14 +301,16 @@ impl Span for SimpleSpan {
         if !self.capability.can_start {
             return;
         }
-        self.start_time.store(Self::get_current_time() as usize, Ordering::SeqCst);
+        self.start_time
+            .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
     fn stop(&mut self) {
         if !self.capability.can_stop {
             return;
         }
-        self.end_time.store(Self::get_current_time() as usize, Ordering::SeqCst);
+        self.end_time
+            .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
     fn duration(&self) -> u64 {
@@ -565,7 +574,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

@@ -1,32 +1,32 @@
 // SigmaOS Compatibility Module
-pub mod cross_platform;
-pub mod standards;
-pub mod legacy_adapters;
 pub mod constellation_mesh;
+pub mod cross_platform;
 pub mod endeavour;
+pub mod legacy_adapters;
+pub mod standards;
 
-pub use endeavour::{
-    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
-    Mirror, WelcomeTab,
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
+    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
 };
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use standards::{
-    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+pub use endeavour::{
+    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
+    YayAurHelper,
 };
 pub use legacy_adapters::{
-    LegacyKernelAdapter, LegacyDriverAdapter, LegacyPackageAdapter, LegacyFSAdapter,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
     LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
-pub use constellation_mesh::{
-    KernelConstellationGrid, ConstellationNode, SyscallAlmanacHub, FileAlmanacHub, NetworkAlmanacHub,
-    ProcessAlmanacHub, DriverArchiveGridV2, StorageArchiveGridV2, NetworkArchiveGridV2,
-    GraphicsArchiveGridV2, FirmwareGatewayMesh, BIOSGatewayMesh, UEFIGatewayMesh,
-    CorebootGatewayMesh, BuildCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyAsmCodexGrid,
-    SecurityConstellation, DACConstellation, SELinuxConstellation, ZeroTrustConstellation,
-    PeripheralArchiveMesh, FloppyMesh, TapeMesh, CRTMesh, DotMatrixMesh,
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };
 
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -67,10 +67,14 @@ impl KernelPersonaVM {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum LibcVersion { Libc5 }
+pub enum LibcVersion {
+    Libc5,
+}
 
 #[derive(Debug, Clone, Copy)]
-pub enum SyscallAbi { Oabi_32 }
+pub enum SyscallAbi {
+    Oabi_32,
+}
 
 pub struct BinaryCompatMatrix {
     _libc: LibcVersion,
@@ -79,7 +83,10 @@ pub struct BinaryCompatMatrix {
 
 impl BinaryCompatMatrix {
     pub fn new(libc: LibcVersion, abi: SyscallAbi) -> Self {
-        Self { _libc: libc, _abi: abi }
+        Self {
+            _libc: libc,
+            _abi: abi,
+        }
     }
     pub fn translate_sys_context(&self, val: usize) -> usize {
         val + 1000
@@ -100,7 +107,10 @@ impl APITimelineManager {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LegacyBus { Isa, Agp }
+pub enum LegacyBus {
+    Isa,
+    Agp,
+}
 
 pub struct StorageBridge {
     pub driver_name: &'static str,
@@ -108,8 +118,12 @@ pub struct StorageBridge {
 }
 
 impl StorageBridge {
-    pub fn bus_type(&self) -> LegacyBus { self.bus }
-    pub fn init_legacy(&self) -> bool { true }
+    pub fn bus_type(&self) -> LegacyBus {
+        self.bus
+    }
+    pub fn init_legacy(&self) -> bool {
+        true
+    }
 }
 
 pub struct GraphicsBridge {
@@ -118,12 +132,19 @@ pub struct GraphicsBridge {
 }
 
 impl GraphicsBridge {
-    pub fn bus_type(&self) -> LegacyBus { self.bus }
-    pub fn init_legacy(&self) -> bool { true }
+    pub fn bus_type(&self) -> LegacyBus {
+        self.bus
+    }
+    pub fn init_legacy(&self) -> bool {
+        true
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WorkloadProfile { LowMemoryProfile, SingleCoreProfile }
+pub enum WorkloadProfile {
+    LowMemoryProfile,
+    SingleCoreProfile,
+}
 
 pub struct WorkloadOptimizer {
     profile: AtomicUsize,
@@ -151,14 +172,19 @@ impl WorkloadOptimizer {
 pub struct AkabeiPackageEngine;
 
 impl AkabeiPackageEngine {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn resolve_and_sandbox(&self, app: &str) -> bool {
         app == "gimp-app" || app == "plasma-desktop"
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DesktopTheme { CaledoniaDark, ZenithTranslucent }
+pub enum DesktopTheme {
+    CaledoniaDark,
+    ZenithTranslucent,
+}
 
 pub struct KapudanAssistant {
     theme: AtomicUsize,
@@ -185,7 +211,10 @@ impl KapudanAssistant {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InstallerStep { Welcome, Completed }
+pub enum InstallerStep {
+    Welcome,
+    Completed,
+}
 
 pub struct TribeInstaller {
     _size: usize,
@@ -208,7 +237,8 @@ impl TribeInstaller {
         }
     }
     pub fn execute_installation(&self, _user: &str) {
-        self.step.store(InstallerStep::Completed as usize, Ordering::SeqCst);
+        self.step
+            .store(InstallerStep::Completed as usize, Ordering::SeqCst);
     }
 }
 

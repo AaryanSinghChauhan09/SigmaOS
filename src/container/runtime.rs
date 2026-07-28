@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Container ID
 pub type ContainerID = usize;
@@ -130,7 +129,12 @@ pub struct SimpleContainer {
 }
 
 impl SimpleContainer {
-    pub fn new(id: ContainerID, name: &[u8], image: &[u8], capability: ContainerCapability) -> Self {
+    pub fn new(
+        id: ContainerID,
+        name: &[u8],
+        image: &[u8],
+        capability: ContainerCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let mut image_array = [0u8; 128];
 
@@ -274,7 +278,12 @@ impl Container for SimpleContainer {
 /// Container runtime trait (OOP interface)
 pub trait ContainerRuntime {
     /// Create container
-    fn create_container(&mut self, name: &[u8], image: &[u8], capability: ContainerCapability) -> Result<ContainerID, ContainerError>;
+    fn create_container(
+        &mut self,
+        name: &[u8],
+        image: &[u8],
+        capability: ContainerCapability,
+    ) -> Result<ContainerID, ContainerError>;
     /// Remove container
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
     /// Start container
@@ -361,7 +370,12 @@ impl SimpleContainerRuntime {
 }
 
 impl ContainerRuntime for SimpleContainerRuntime {
-    fn create_container(&mut self, name: &[u8], image: &[u8], capability: ContainerCapability) -> Result<ContainerID, ContainerError> {
+    fn create_container(
+        &mut self,
+        name: &[u8],
+        image: &[u8],
+        capability: ContainerCapability,
+    ) -> Result<ContainerID, ContainerError> {
         if !self.capability.can_create {
             return Err(ContainerError::PermissionDenied);
         }
@@ -561,7 +575,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

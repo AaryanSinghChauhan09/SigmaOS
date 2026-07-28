@@ -1,21 +1,28 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Roadmap Item 1: Driver framework
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type DriverID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DriverType { Block = 0, Char = 1, Network = 2 }
+pub enum DriverType {
+    Block = 0,
+    Char = 1,
+    Network = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DriverState { Unloaded = 0, Loaded = 1, Active = 2 }
+pub enum DriverState {
+    Unloaded = 0,
+    Loaded = 1,
+    Active = 2,
+}
 
 pub trait Driver {
     fn id(&self) -> DriverID;
@@ -27,7 +34,11 @@ pub trait Driver {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DriverError { Success = 0, LoadFailed = 1, UnloadFailed = 2 }
+pub enum DriverError {
+    Success = 0,
+    LoadFailed = 1,
+    UnloadFailed = 2,
+}
 
 #[repr(C)]
 pub struct SimpleDriver {
@@ -38,13 +49,21 @@ pub struct SimpleDriver {
 
 impl SimpleDriver {
     pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
+        SimpleDriver {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
     }
 }
 
 impl Driver for SimpleDriver {
-    fn id(&self) -> DriverID { self.id }
-    fn driver_type(&self) -> DriverType { self.driver_type }
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
     fn state(&self) -> DriverState {
         let val = self.state.load(Ordering::SeqCst);
         match val {
@@ -55,11 +74,13 @@ impl Driver for SimpleDriver {
         }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Loaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Loaded as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -77,7 +98,12 @@ pub struct SimpleDriverFramework {
 }
 
 impl SimpleDriverFramework {
-    pub fn new() -> Self { SimpleDriverFramework { drivers: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleDriverFramework {
+            drivers: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl DriverFramework for SimpleDriverFramework {
@@ -89,7 +115,9 @@ impl DriverFramework for SimpleDriverFramework {
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
         for driver_option in &mut self.drivers {
             if let Some(ref mut driver) = *driver_option {
-                if driver.id() == id { return driver.load(); }
+                if driver.id() == id {
+                    return driver.load();
+                }
             }
         }
         Err(DriverError::LoadFailed)
@@ -97,7 +125,9 @@ impl DriverFramework for SimpleDriverFramework {
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
         for driver_option in &mut self.drivers {
             if let Some(ref mut driver) = *driver_option {
-                if driver.id() == id { return driver.unload(); }
+                if driver.id() == id {
+                    return driver.unload();
+                }
             }
         }
         Err(DriverError::UnloadFailed)
@@ -105,7 +135,9 @@ impl DriverFramework for SimpleDriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
         for driver_option in &self.drivers {
             if let Some(ref driver) = *driver_option {
-                if driver.id() == id { return Some(driver.as_ref()); }
+                if driver.id() == id {
+                    return Some(driver.as_ref());
+                }
             }
         }
         None
@@ -114,14 +146,26 @@ impl DriverFramework for SimpleDriverFramework {
 
 use core::ops::{Index, IndexMut};
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -142,11 +186,19 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -188,4 +240,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

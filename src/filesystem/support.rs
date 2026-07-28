@@ -1,22 +1,30 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type FilesystemID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+pub enum FilesystemType {
+    Ext4 = 0,
+    Btrfs = 1,
+    ZFS = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum FilesystemError { Success = 0, InvalidFS = 1, MountFailed = 2, SnapshotFailed = 3 }
+pub enum FilesystemError {
+    Success = 0,
+    InvalidFS = 1,
+    MountFailed = 2,
+    SnapshotFailed = 3,
+}
 
 pub trait Filesystem {
     fn id(&self) -> FilesystemID;
@@ -47,7 +55,9 @@ impl SimpleFilesystem {
 }
 
 impl Filesystem for SimpleFilesystem {
-    fn id(&self) -> FilesystemID { self.id }
+    fn id(&self) -> FilesystemID {
+        self.id
+    }
     fn fs_type(&self) -> FilesystemType {
         let val = self.fs_type.load(Ordering::SeqCst);
         match val {
@@ -203,7 +213,10 @@ impl ZFSFeatures for SimpleZFS {
 }
 
 pub trait FilesystemManager {
-    fn register_filesystem(&mut self, fs: Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError>;
+    fn register_filesystem(
+        &mut self,
+        fs: Box<dyn Filesystem>,
+    ) -> Result<FilesystemID, FilesystemError>;
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem>;
     fn list_filesystems(&self) -> Vec<FilesystemID>;
 }
@@ -224,7 +237,10 @@ impl SimpleFilesystemManager {
 }
 
 impl FilesystemManager for SimpleFilesystemManager {
-    fn register_filesystem(&mut self, fs: Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError> {
+    fn register_filesystem(
+        &mut self,
+        fs: Box<dyn Filesystem>,
+    ) -> Result<FilesystemID, FilesystemError> {
         let id = fs.id();
         self.filesystems.push(Some(fs));
         Ok(id)
@@ -233,7 +249,9 @@ impl FilesystemManager for SimpleFilesystemManager {
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
         for fs_option in &self.filesystems {
             if let Some(ref fs) = *fs_option {
-                if fs.id() == id { return Some(fs.as_ref()); }
+                if fs.id() == id {
+                    return Some(fs.as_ref());
+                }
             }
         }
         None
@@ -252,14 +270,26 @@ impl FilesystemManager for SimpleFilesystemManager {
 
 use core::ops::{Index, IndexMut};
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -279,7 +309,10 @@ impl<T> Vec<T> {
         unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
     }
 
-    fn clone(&self) -> Vec<T> where T: Copy {
+    fn clone(&self) -> Vec<T>
+    where
+        T: Copy,
+    {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
             unsafe {
@@ -302,11 +335,19 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -348,4 +389,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

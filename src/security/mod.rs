@@ -28,17 +28,20 @@ pub mod vulnerability;
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
-pub use forensics::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-};
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
     SIGNATURE_LEN,
 };
+pub use forensics::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+};
 pub const GLOBAL_ANONSURF: u32 = 0;
 pub const GLOBAL_FORENSIC: u32 = 0;
 pub const GLOBAL_SANDBOX: u32 = 0;
-pub use capability_token::{CapabilityToken as AndroidStyleCapabilityToken, SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
+pub use capability_token::{
+    CapabilityToken as AndroidStyleCapabilityToken,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
@@ -53,8 +56,8 @@ pub use password::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SelinuxPermission, SecurityContext as SelinuxSecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
+    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext as SelinuxSecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};

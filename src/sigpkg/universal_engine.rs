@@ -48,8 +48,15 @@ impl IPackageAdapter for AptPackageAdapter {
             hash: [0xAA; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("APT Adapter: Extracted deb layers to immut store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "APT Adapter: Extracted deb layers to immut store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -72,8 +79,15 @@ impl IPackageAdapter for YumPackageAdapter {
             hash: [0xBB; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("YUM Adapter: Extracted rpm structures to immut store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "YUM Adapter: Extracted rpm structures to immut store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -96,8 +110,15 @@ impl IPackageAdapter for PacmanPackageAdapter {
             hash: [0xCC; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Pacman Adapter: Extracted pkg.tar.zst to immut store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Pacman Adapter: Extracted pkg.tar.zst to immut store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -120,8 +141,15 @@ impl IPackageAdapter for PortagePackageAdapter {
             hash: [0xDD; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Portage Adapter: Compiled Gentoo ebuild into target store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Portage Adapter: Compiled Gentoo ebuild into target store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -144,8 +172,15 @@ impl IPackageAdapter for SovereignPackageAdapter {
             hash: [0xEE; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Sovereign Adapter: Created hermetic read-only link to CAS store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Sovereign Adapter: Created hermetic read-only link to CAS store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -172,7 +207,12 @@ pub struct UserDefinedPackageHook {
 }
 
 impl UserDefinedPackageHook {
-    pub fn new(hook_type: HookType, name: &str, capability_mask: u64, logic: fn(&PackageContext) -> bool) -> Self {
+    pub fn new(
+        hook_type: HookType,
+        name: &str,
+        capability_mask: u64,
+        logic: fn(&PackageContext) -> bool,
+    ) -> Self {
         Self {
             hook_type,
             hook_name: name.to_string(),
@@ -186,7 +226,10 @@ impl UserDefinedPackageHook {
             return Err("UDF execution blocked: insufficient capability token authorization");
         }
         if (self.check_logic)(ctx) {
-            println!("UDF Hook '{}' executed and verified successfully.", self.hook_name);
+            println!(
+                "UDF Hook '{}' executed and verified successfully.",
+                self.hook_name
+            );
             Ok(())
         } else {
             Err("UDF custom constraints validation failed")
@@ -218,7 +261,10 @@ impl SovereignPackageManager {
     }
 
     pub fn register_udf_hook(&mut self, hook: UserDefinedPackageHook) {
-        self.hooks.entry(hook.hook_type).or_insert_with(Vec::new).push(hook);
+        self.hooks
+            .entry(hook.hook_type)
+            .or_insert_with(Vec::new)
+            .push(hook);
     }
 
     /// Performs dynamic polymorphic installation of any package format, invoking custom UDFs and supporting rollback on failure
@@ -235,7 +281,10 @@ impl SovereignPackageManager {
         if let Some(pre_hooks) = self.hooks.get(&HookType::PreInstall) {
             for hook in pre_hooks {
                 if let Err(e) = hook.execute(&ctx, token) {
-                    println!("Pre-Install UDF Hook failed: {}. Initiating O(1) pointer abort.", e);
+                    println!(
+                        "Pre-Install UDF Hook failed: {}. Initiating O(1) pointer abort.",
+                        e
+                    );
                     return Err(e);
                 }
             }
@@ -243,33 +292,42 @@ impl SovereignPackageManager {
 
         // Create rollback backup snapshot (O(1) generation pointer capture)
         let old_generation = self.active_generation;
-        let mut current_packages: Vec<String> = self.store_generations.get(&old_generation).unwrap().clone();
+        let mut current_packages: Vec<String> =
+            self.store_generations.get(&old_generation).unwrap().clone();
 
         // Step 3: Perform extract and extraction
         let store_path = format!("/store/sha256-{}", hex_encode(&ctx.hash));
         adapter.extract_to_store(&ctx, &store_path)?;
 
         // Update working state
-        self.installed_packages.insert(ctx.name.clone(), ctx.clone());
+        self.installed_packages
+            .insert(ctx.name.clone(), ctx.clone());
         current_packages.push(ctx.name.clone());
 
         // Increment generation snapshot atomically (generation checkpoint)
         let new_generation = old_generation + 1;
-        self.store_generations.insert(new_generation, current_packages);
+        self.store_generations
+            .insert(new_generation, current_packages);
         self.active_generation = new_generation;
 
         // Step 4: Trigger User-Defined PostInstall hooks
         if let Some(post_hooks) = self.hooks.get(&HookType::PostInstall) {
             for hook in post_hooks {
                 if let Err(e) = hook.execute(&ctx, token) {
-                    println!("Post-Install UDF Hook failed: {}. Triggering instant O(1) state rollback!", e);
+                    println!(
+                        "Post-Install UDF Hook failed: {}. Triggering instant O(1) state rollback!",
+                        e
+                    );
                     self.rollback_to_generation(old_generation);
                     return Err(e);
                 }
             }
         }
 
-        println!("Sovereign Package Manager: Installed {} (generation={}) successfully.", ctx.name, self.active_generation);
+        println!(
+            "Sovereign Package Manager: Installed {} (generation={}) successfully.",
+            ctx.name, self.active_generation
+        );
         Ok(())
     }
 
@@ -277,7 +335,8 @@ impl SovereignPackageManager {
     pub fn rollback_to_generation(&mut self, generation_id: u32) {
         if let Some(snapshot) = self.store_generations.get(&generation_id) {
             // Revert active packages directly to the captured generation snapshot state
-            self.installed_packages.retain(|name, _| snapshot.contains(name));
+            self.installed_packages
+                .retain(|name, _| snapshot.contains(name));
             self.active_generation = generation_id;
             println!("O(1) Rollback Complete: Successfully reverted active generation directory pointer to: #{}", generation_id);
         }
@@ -339,7 +398,7 @@ mod tests {
             HookType::PreInstall,
             "CheckNameHook",
             0xAA55, // Required capability token
-            |c| c.name.starts_with("udf")
+            |c| c.name.starts_with("udf"),
         );
 
         // Execute with insufficient token should fail
@@ -359,7 +418,7 @@ mod tests {
             HookType::PostInstall,
             "FailPostHook",
             0,
-            |c| c.format != PackageFormat::Apt // Fails if Apt format
+            |c| c.format != PackageFormat::Apt, // Fails if Apt format
         );
         pm.register_udf_hook(fail_post_hook);
 

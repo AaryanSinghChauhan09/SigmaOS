@@ -111,7 +111,10 @@ impl MockChrootBuilder {
     }
 
     /// Builds the target SPEC metadata package inside the reproducible chroot sandbox
-    pub fn build_reproducible_package(&self, meta: &SpecMetadata) -> Result<[u8; 32], &'static str> {
+    pub fn build_reproducible_package(
+        &self,
+        meta: &SpecMetadata,
+    ) -> Result<[u8; 32], &'static str> {
         if !self.is_initialized {
             return Err("MockError: Isolated chroot sandbox not initialized");
         }
@@ -146,7 +149,10 @@ impl DnfTransactionManager {
     }
 
     /// Ranks available metalinks based on simulated round-trip latencies
-    pub fn rank_metalinks(&self, mirrors: &[&str]) -> extern_alloc::vec::Vec<(extern_alloc::string::String, u32)> {
+    pub fn rank_metalinks(
+        &self,
+        mirrors: &[&str],
+    ) -> extern_alloc::vec::Vec<(extern_alloc::string::String, u32)> {
         use extern_alloc::string::ToString;
         let mut ranked = extern_alloc::vec::Vec::new();
         for (i, &mirror) in mirrors.iter().enumerate() {
@@ -187,7 +193,10 @@ impl KickstartParser {
     }
 
     /// Parses Fedora-style automated unattended installation configuration strings
-    pub fn parse_ks_config(&self, lines: &[&str]) -> Result<(extern_alloc::string::String, extern_alloc::string::String), &'static str> {
+    pub fn parse_ks_config(
+        &self,
+        lines: &[&str],
+    ) -> Result<(extern_alloc::string::String, extern_alloc::string::String), &'static str> {
         use extern_alloc::string::ToString;
         let mut timezone = "UTC".to_string();
         let mut keyboard = "us".to_string();

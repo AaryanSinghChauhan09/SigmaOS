@@ -1,18 +1,22 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CommandID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CommandError { Success = 0, NotFound = 1, InvalidArgs = 2, ExecutionFailed = 3 }
+pub enum CommandError {
+    Success = 0,
+    NotFound = 1,
+    InvalidArgs = 2,
+    ExecutionFailed = 3,
+}
 
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
@@ -52,7 +56,9 @@ impl ShellCommand for SimpleShellCommand {
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
         let mut output = Vec::new();
         let name = self.name();
-        for &byte in name { output.push(byte); }
+        for &byte in name {
+            output.push(byte);
+        }
         output.push(b':');
         output.push(b' ');
         output.push(b'o');
@@ -76,7 +82,9 @@ pub trait CommandParser {
 pub struct SimpleCommandParser;
 
 impl SimpleCommandParser {
-    pub fn new() -> Self { SimpleCommandParser }
+    pub fn new() -> Self {
+        SimpleCommandParser
+    }
 }
 
 impl CommandParser for SimpleCommandParser {
@@ -240,8 +248,12 @@ impl ShellSession for SimpleShellSession {
         let mut value_array = [0u8; 128];
         let key_len = key.len().min(63);
         let value_len = value.len().min(127);
-        for i in 0..key_len { key_array[i] = key[i]; }
-        for i in 0..value_len { value_array[i] = value[i]; }
+        for i in 0..key_len {
+            key_array[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_array[i] = value[i];
+        }
         self.environment.push((key_array, value_array));
     }
 
@@ -283,15 +295,21 @@ impl CommandHistory for SimpleCommandHistory {
     fn add(&mut self, command: &[u8]) {
         let mut cmd_array = [0u8; 256];
         let cmd_len = command.len().min(255);
-        for i in 0..cmd_len { cmd_array[i] = command[i]; }
+        for i in 0..cmd_len {
+            cmd_array[i] = command[i];
+        }
         self.history.push(cmd_array);
-        self.current_index.store(self.history.len(), Ordering::SeqCst);
+        self.current_index
+            .store(self.history.len(), Ordering::SeqCst);
     }
 
     fn get_previous(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx > 0 && idx <= self.history.len() {
-            let len = self.history[idx - 1].iter().position(|&b| b == 0).unwrap_or(256);
+            let len = self.history[idx - 1]
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(256);
             Some(&self.history[idx - 1][..len])
         } else {
             None
@@ -301,7 +319,10 @@ impl CommandHistory for SimpleCommandHistory {
     fn get_next(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx < self.history.len() {
-            let len = self.history[idx].iter().position(|&b| b == 0).unwrap_or(256);
+            let len = self.history[idx]
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(256);
             Some(&self.history[idx][..len])
         } else {
             None
@@ -320,14 +341,26 @@ impl CommandHistory for SimpleCommandHistory {
 
 use core::ops::{Index, IndexMut};
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -352,11 +385,19 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -398,4 +439,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
