@@ -151,7 +151,7 @@ impl RpmAdapter {
         }
     }
     
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError>; + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
         self.user_hooks.push(Box::new(hook));
     }
 }
