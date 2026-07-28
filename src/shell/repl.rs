@@ -48,23 +48,6 @@ pub enum ShellCommand {
     Rm {
         filename: String,
     },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
     Theme {
         theme_name: String,
     },
@@ -79,6 +62,15 @@ pub enum ShellCommand {
 }
 
 /// Shell REPL
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine;
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine
+    }
+}
+
 pub struct ShellRepl {
     pub running: bool,
     pub variables: std::collections::HashMap<String, String>,
@@ -104,11 +96,16 @@ impl ShellRepl {
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
+            agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
             installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 
