@@ -22,6 +22,7 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod parrot_parity;
 
 pub use audit::{AuditLogger, AuditPolicy};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -81,4 +82,8 @@ pub use secrets::{
 pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
+};
+pub use parrot_parity::{
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };
