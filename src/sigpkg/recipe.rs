@@ -188,32 +188,3 @@ impl PackageRecipe {
         }
     }
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildSystem {
-    Cargo,
-    CMake,
-    Make,
-    Custom,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    NotFound,
-    InvalidSyntax,
-    SerializationError,
-}
-
-pub struct RecipeManager;
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
