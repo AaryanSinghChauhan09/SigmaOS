@@ -28,26 +28,29 @@ pub enum RecipeError {
     InvalidHash,
     NoBuildCommands,
     InvalidRecipe,
+    NotFound,
+    InvalidSyntax,
+    SerializationError,
 }
 
 pub struct RecipeManager {
-    pub recipes: HashMap<String, PackageRecipe>,
+    pub recipes: Vec<PackageRecipe>,
 }
 
 impl RecipeManager {
     pub fn new() -> Self {
-        Self {
-            recipes: HashMap::new(),
+        RecipeManager {
+            recipes: Vec::new(),
         }
     }
 
     pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
-        self.recipes.insert(recipe.name.clone(), recipe);
+        self.recipes.push(recipe);
         Ok(())
     }
 
-    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
-        self.recipes.values().collect()
+    pub fn list_recipes(&self) -> &Vec<PackageRecipe> {
+        &self.recipes
     }
 }
 
@@ -90,8 +93,8 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
-            arch: "x86_64".to_string(),
-            license_spdx: "MIT".to_string(),
+            arch: String::new(),
+            license_spdx: String::new(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
@@ -181,14 +184,8 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "make".to_string(),
+            BuildSystem::Custom => "make custom".to_string(),
         }
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

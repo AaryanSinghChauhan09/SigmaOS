@@ -350,20 +350,35 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-impl SimpleIntegrityMonitor {
-    fn update_stats(&mut self, status: IntegrityStatus) {
-        match status {
-            IntegrityStatus::Valid => {
-                self.stats.valid_files += 1;
-            }
-            IntegrityStatus::Modified => {
-                self.stats.modified_files += 1;
-            }
-            IntegrityStatus::Corrupted => {
-                self.stats.corrupted_files += 1;
-            }
-            IntegrityStatus::Missing => {}
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_file_and_integrity_monitor() {
+        let capability = FileCapability::full();
+        let mut file = SimpleFile::new(1, b"/var/www/index.html", b"checksum123", capability);
+        assert_eq!(file.id(), 1);
+        assert_eq!(file.path(), b"/var/www/index.html");
+        assert_eq!(file.checksum(), b"checksum123");
+        assert!(matches!(file.verify(), Ok(IntegrityStatus::Valid)));
+
+        let monitor_cap = MonitorCapability::full();
+        let mut monitor = SimpleIntegrityMonitor::new(monitor_cap);
+        let id = monitor.register_file(Box::new(file)).unwrap();
+        assert_eq!(id, 1);
+
+        assert!(matches!(monitor.verify_file(1), Ok(IntegrityStatus::Valid)));
+
+        let stats = monitor.stats();
+        assert_eq!(stats.total_files, 1);
+        assert_eq!(stats.valid_files, 2); // 1 from register, 1 from verify_file
+
+        let verify_all_results = monitor.verify_all().unwrap();
+        assert!(verify_all_results.is_empty());
+
+        monitor.unregister_file(1).unwrap();
+        assert_eq!(monitor.stats().total_files, 0);
     }
 }
 

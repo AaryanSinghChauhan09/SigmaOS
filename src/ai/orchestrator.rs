@@ -1,10 +1,11 @@
 #![no_std]
 #![no_main]
 
-/// OOP-based AI Orchestrator for SigmaOS
-/// Based on Ideas-999-Structured: AI & Automation Item 335
-/// Implements sigma-ai core with multi-agent coordination
-
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -28,7 +29,7 @@ pub trait AIAgent {
 #[repr(C)]
 pub struct SimpleAIAgent {
     pub id: AgentID,
-    pub name: [u8; 64],
+    pub name: String,
     pub state: AtomicUsize,
 }
 
@@ -41,28 +42,41 @@ impl SimpleAIAgent {
         }
         SimpleAIAgent {
             id,
-            name: name_array,
+            name: name.to_string(),
             state: AtomicUsize::new(AgentState::Idle as usize),
         }
     }
 }
 
 impl AIAgent for SimpleAIAgent {
-    fn id(&self) -> AgentID { self.id }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+    fn id(&self) -> AgentID {
+        self.id
     }
-    fn state(&self) -> AgentState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn state(&self) -> AgentState {
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            1 => AgentState::Active,
+            2 => AgentState::Busy,
+            3 => AgentState::Error,
+            4 => AgentState::Learning,
+            _ => AgentState::Idle,
+        }
+    }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
         self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
-        let name = self.name();
-        for &byte in name { result.push(byte); }
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
         result.push(b':');
         result.push(b' ');
-        for &byte in task { result.push(byte); }
+        for &byte in task {
+            result.push(byte);
+        }
         self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
     }
@@ -87,6 +101,12 @@ impl SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -120,9 +140,9 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        for agent_option in &self.agents {
-            if let Some(ref agent) = *agent_option {
-                if agent.id() == id { return Some(agent.as_ref()); }
+        for agent in &self.agents {
+            if agent.id() == id {
+                return Some(agent.as_ref());
             }
         }
         None
@@ -156,6 +176,12 @@ impl SimpleTaskQueue {
         SimpleTaskQueue {
             tasks: Vec::new(),
         }
+    }
+}
+
+impl Default for SimpleTaskQueue {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -215,6 +241,12 @@ impl SimpleAgentCommunication {
     }
 }
 
+impl Default for SimpleAgentCommunication {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AgentCommunication for SimpleAgentCommunication {
     fn send_message(&mut self, from: AgentID, to: AgentID, message: &[u8]) -> Result<(), AgentError> {
         let mut msg_array = [0u8; 256];
@@ -244,41 +276,3 @@ impl AgentCommunication for SimpleAgentCommunication {
         self.messages.push((from, 0, msg_array));
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
