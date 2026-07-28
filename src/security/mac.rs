@@ -226,6 +226,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -249,7 +250,10 @@ pub struct SimpleMACEngine {
     policies: Vec<Option<Box<dyn MACPolicy>>>,
     contexts: Vec<Option<SecurityContext>>,
     next_context_id: AtomicUsize,
-    stats: MACStats,
+    total_policies: AtomicUsize,
+    total_contexts: AtomicUsize,
+    access_checks: AtomicUsize,
+    access_denied: AtomicUsize,
     capability: EngineCapability,
 }
 
@@ -286,7 +290,10 @@ impl SimpleMACEngine {
             policies: Vec::new(),
             contexts: Vec::new(),
             next_context_id: AtomicUsize::new(1),
-            stats: MACStats::new(),
+            total_policies: AtomicUsize::new(0),
+            total_contexts: AtomicUsize::new(0),
+            access_checks: AtomicUsize::new(0),
+            access_denied: AtomicUsize::new(0),
             capability,
         }
     }
@@ -311,7 +318,7 @@ impl MACEngine for SimpleMACEngine {
 
         let id = self.policies.len();
         self.policies.push(Some(policy));
-        self.stats.total_policies += 1;
+        self.total_policies.fetch_add(1, Ordering::SeqCst);
         Ok(id)
     }
 
@@ -322,7 +329,7 @@ impl MACEngine for SimpleMACEngine {
 
         if id < self.policies.len() {
             self.policies[id] = None;
-            self.stats.total_policies -= 1;
+            self.total_policies.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
             Err(MACError::PolicyNotFound)
@@ -337,7 +344,7 @@ impl MACEngine for SimpleMACEngine {
         let id = self.next_context_id.fetch_add(1, Ordering::SeqCst);
         let context = SecurityContext::new(id, level, domain, capability);
         self.contexts.push(Some(context));
-        self.stats.total_contexts += 1;
+        self.total_contexts.fetch_add(1, Ordering::SeqCst);
         Ok(id)
     }
 
@@ -358,7 +365,7 @@ impl MACEngine for SimpleMACEngine {
 
         if let Some(i) = index {
             self.contexts[i] = None;
-            self.stats.total_contexts -= 1;
+            self.total_contexts.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
             Err(MACError::ContextNotFound)
@@ -366,7 +373,7 @@ impl MACEngine for SimpleMACEngine {
     }
 
     fn check_access(&self, context_id: ContextID, operation: SecurityOperation) -> bool {
-        self.stats.access_checks += 1;
+        self.access_checks.fetch_add(1, Ordering::SeqCst);
 
         if !self.capability.can_enforce {
             return true;
@@ -377,23 +384,30 @@ impl MACEngine for SimpleMACEngine {
                 for policy_option in &self.policies {
                     if let Some(ref policy) = *policy_option {
                         if !policy.check(context, operation) {
-                            self.stats.access_denied += 1;
+                            self.access_denied.fetch_add(1, Ordering::SeqCst);
                             return false;
                         }
                     }
                 }
                 true
             } else {
-                self.stats.access_denied += 1;
+                self.access_denied.fetch_add(1, Ordering::SeqCst);
                 false
             }
         }
     }
 
     fn stats(&self) -> MACStats {
-        self.stats
+        MACStats {
+            total_policies: self.total_policies.load(Ordering::SeqCst),
+            total_contexts: self.total_contexts.load(Ordering::SeqCst),
+            access_checks: self.access_checks.load(Ordering::SeqCst) as u64,
+            access_denied: self.access_denied.load(Ordering::SeqCst) as u64,
+        }
     }
 }
+
+use core::ops::{Index, IndexMut};
 
 /// Simple Vec implementation for no_std
 struct Vec<T> {
@@ -428,6 +442,14 @@ impl<T> Vec<T> {
         self.len
     }
 
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -444,6 +466,41 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 

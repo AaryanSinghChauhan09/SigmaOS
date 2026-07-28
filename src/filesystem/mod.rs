@@ -4,10 +4,11 @@ pub mod cow_snapshot;
 pub mod complete_filesystems;
 pub mod disk_usage;
 pub mod manager;
+pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
-pub mod cow_snapshot;
 
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
@@ -28,7 +29,4 @@ pub use support::{
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 pub use complete_filesystems::{
     FileSystem, FatFileSystem, FatVersion, NtfsFileSystem, ExFatFileSystem, BtrfsFileSystem, HfsPlusFileSystem, ExtFileSystem, ExtVersion,
-};
-pub use cow_snapshot::{
-    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
 };

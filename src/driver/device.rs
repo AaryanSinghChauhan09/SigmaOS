@@ -39,9 +39,11 @@ pub enum DeviceError {
     Timeout = 7,
 }
 
+extern crate alloc;
+
 /// Device type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
     Block = 0,
     Character = 1,
@@ -142,8 +144,15 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+         let val = self.state.load(Ordering::SeqCst);
+         match val {
+             0 => DeviceState::Uninitialized,
+             1 => DeviceState::Initializing,
+             2 => DeviceState::Ready,
+             3 => DeviceState::Busy,
+             4 => DeviceState::Error,
+             5 => DeviceState::Shutdown,
+             _ => DeviceState::Uninitialized,
         }
     }
 
@@ -162,7 +171,7 @@ impl DeviceDescriptor {
 
 /// Device state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -198,7 +207,7 @@ pub trait NetworkDevice: Device {
 /// Simple block device implementation (OOP: Concrete class)
 pub struct SimpleBlockDevice {
     descriptor: DeviceDescriptor,
-    blocks: Vec<Vec<u8>>,
+    blocks: alloc::vec::Vec<alloc::vec::Vec<u8>>,
     block_size: usize,
 }
 
@@ -213,10 +222,10 @@ impl SimpleBlockDevice {
         };
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Block, capability);
-        let mut blocks = Vec::new();
+        let mut blocks = alloc::vec::Vec::new();
 
         for _ in 0..num_blocks {
-            let block_data = vec![0u8; block_size];
+            let block_data = alloc::vec![0u8; block_size];
             blocks.push(block_data);
         }
 
@@ -313,7 +322,7 @@ impl BlockDevice for SimpleBlockDevice {
 /// Simple character device implementation (OOP: Concrete class)
 pub struct SimpleCharacterDevice {
     descriptor: DeviceDescriptor,
-    buffer: Vec<u8>,
+    buffer: alloc::vec::Vec<u8>,
     read_pos: usize,
     write_pos: usize,
 }
@@ -332,7 +341,7 @@ impl SimpleCharacterDevice {
 
         SimpleCharacterDevice {
             descriptor,
-            buffer: vec![0u8; buffer_size],
+            buffer: alloc::vec![0u8; buffer_size],
             read_pos: 0,
             write_pos: 0,
         }
@@ -492,7 +501,7 @@ impl DeviceManager {
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.departors.len() {
+        if id < self.descriptors.len() {
             self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
@@ -527,6 +536,8 @@ impl DeviceManager {
 }
 
 /// Simple Vec implementation for no_std
+use core::ops::{Index, IndexMut};
+
 struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -559,6 +570,14 @@ impl<T> Vec<T> {
         self.len
     }
 
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -575,6 +594,41 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 

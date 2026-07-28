@@ -8,10 +8,13 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
+#[derive(Debug, Clone, Copy)]
+pub enum LogFormat { JSON, Text, Binary }
+
 pub type EventID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType { Authentication = 0, Authorization = 1, FileAccess = 2, SystemChange = 3 }
 
 #[repr(C)]
@@ -54,7 +57,16 @@ impl SimpleAuditEvent {
 
 impl AuditEvent for SimpleAuditEvent {
     fn id(&self) -> EventID { self.id }
-    fn event_type(&self) -> EventType { unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) } }
+    fn event_type(&self) -> EventType {
+        let val = self.event_type.load(Ordering::SeqCst);
+        match val {
+            0 => EventType::Authentication,
+            1 => EventType::Authorization,
+            2 => EventType::FileAccess,
+            3 => EventType::SystemChange,
+            _ => EventType::Authentication,
+        }
+    }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn user_id(&self) -> usize { self.user_id.load(Ordering::SeqCst) }
     fn description(&self) -> &[u8] {
@@ -116,7 +128,7 @@ impl AuditLogger for SimpleAuditLogger {
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
         let mut i = 0;
         while i < self.events.len() {
-            if let Some(ref event) = *self.events[i] {
+            if let Some(ref event) = self.events[i] {
                 if event.timestamp() < older_than {
                     self.events.remove(i);
                 } else {
@@ -149,16 +161,16 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
         if self.require_authentication.load(Ordering::SeqCst) == 1 {
-            Ok(event.event_type() == EventType::Authentication)
+            event.event_type() == EventType::Authentication
         } else {
-            Ok(true)
+            true
         }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event).unwrap_or(false) {
+        if self.check_compliance(event) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)
@@ -166,10 +178,13 @@ impl AuditPolicy for SimpleAuditPolicy {
     }
 }
 
+use core::ops::{Index, IndexMut};
+
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
@@ -179,6 +194,19 @@ impl<T> Vec<T> {
             }
         }
     }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
@@ -189,6 +217,7 @@ impl<T> Vec<T> {
             item
         }
     }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -198,6 +227,41 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 
