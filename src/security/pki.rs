@@ -182,7 +182,13 @@ impl CRL for SimpleCRL {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub type PkiError = PKIError;
+pub use PKIManager as PkiManager;
+pub struct CertificateAuthority;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 impl Vec<CertificateID> {
     fn contains(&self, item: CertificateID) -> bool {

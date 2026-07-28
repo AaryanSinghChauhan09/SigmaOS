@@ -383,12 +383,12 @@ impl Keyring for SimpleKeyring {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+pub struct SecretManager;
+pub struct SecretStorage;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 impl<T> Vec<T> {
     fn new() -> Self {

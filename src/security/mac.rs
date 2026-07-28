@@ -431,12 +431,13 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+pub use MACPolicy as MacPolicy;
+pub struct MacRule;
+pub struct MacSecurity;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 impl<T> Vec<T> {
     fn new() -> Self {

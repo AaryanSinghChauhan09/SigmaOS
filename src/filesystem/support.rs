@@ -47,8 +47,22 @@ impl SimpleFilesystem {
 }
 
 impl Filesystem for SimpleFilesystem {
-    fn id(&self) -> FilesystemID { self.id }
-    fn fs_type(&self) -> FilesystemType { unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst)) } }
+    fn id(&self) -> FilesystemID {
+        self.id
+    }
+    fn fs_type(&self) -> FilesystemType {
+        let raw = self.fs_type.load(Ordering::SeqCst);
+        match raw {
+            1 => FilesystemType::Btrfs,
+            2 => FilesystemType::ZFS,
+            3 => FilesystemType::Fat32,
+            4 => FilesystemType::APFS,
+            5 => FilesystemType::SovereignP2P,
+            6 => FilesystemType::EncryptedFS,
+            7 => FilesystemType::CompressedFS,
+            _ => FilesystemType::Ext4,
+        }
+    }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
         let len = mountpoint.len().min(255);
