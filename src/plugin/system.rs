@@ -1,13 +1,11 @@
-#![no_std]
-#![no_main]
+// OOP-based Plugin System for SigmaOS
+// Implements plugin management using OOP principles with traits and structs.
 
-/// OOP-based Plugin System for SigmaOS
-/// Implements plugin management using OOP principles with traits and structs
-/// No dependency on external plugin frameworks
+extern crate alloc;
 
-use core::ptr::{self, NonNull};
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Plugin ID
 pub type PluginID = usize;
@@ -30,7 +28,7 @@ pub trait Plugin {
 
 /// Plugin error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PluginError {
     Success = 0,
     AlreadyInitialized = 1,
@@ -43,6 +41,7 @@ pub enum PluginError {
 
 /// Plugin info
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct PluginInfo {
     pub id: PluginID,
     pub name: [u8; 64],
@@ -69,7 +68,7 @@ impl PluginInfo {
 
 /// Plugin state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PluginState {
     Unloaded = 0,
     Loaded = 1,
@@ -81,7 +80,7 @@ pub enum PluginState {
 
 /// Plugin capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PluginCapability {
     pub can_initialize: bool,
     pub can_shutdown: bool,
@@ -89,7 +88,7 @@ pub struct PluginCapability {
 }
 
 impl PluginCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         PluginCapability {
             can_initialize: false,
             can_shutdown: false,
@@ -97,7 +96,7 @@ impl PluginCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         PluginCapability {
             can_initialize: true,
             can_shutdown: true,
@@ -106,25 +105,32 @@ impl PluginCapability {
     }
 }
 
+impl Default for PluginCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple plugin (OOP: Concrete plugin class)
-#[repr(C)]
 pub struct SimplePlugin {
     pub id: PluginID,
     pub name: [u8; 64],
     pub version: (u32, u32, u32),
     pub state: AtomicUsize, // PluginState as usize
     pub capability: PluginCapability,
-    pub data: Option<NonNull<u8>>,
-    pub data_size: usize,
+    pub data: Vec<u8>,
 }
 
 impl SimplePlugin {
-    pub fn new(id: PluginID, name: &[u8], version: (u32, u32, u32), capability: PluginCapability) -> Self {
+    pub fn new(
+        id: PluginID,
+        name: &[u8],
+        version: (u32, u32, u32),
+        capability: PluginCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
+        name_array[..len].copy_from_slice(&name[..len]);
 
         SimplePlugin {
             id,
@@ -132,34 +138,22 @@ impl SimplePlugin {
             version,
             state: AtomicUsize::new(PluginState::Unloaded as usize),
             capability,
-            data: None,
-            data_size: 0,
+            data: Vec::new(),
         }
     }
 
     pub fn set_data(&mut self, data: &[u8]) {
-        let data_ptr = unsafe {
-            let ptr = alloc(data.len()) as *mut u8;
-            if ptr.is_null() {
-                return;
-            }
-            core::ptr::copy_nonoverlapping(data.as_ptr(), ptr, data.len());
-            NonNull::new_unchecked(ptr)
-        };
-
-        if let Some(old_data) = self.data {
-            unsafe {
-                free(old_data.as_ptr());
-            }
-        }
-
-        self.data = Some(data_ptr);
-        self.data_size = data.len();
+        self.data = data.to_vec();
     }
 
     pub fn get_state(&self) -> PluginState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        match self.state.load(Ordering::SeqCst) {
+            0 => PluginState::Unloaded,
+            1 => PluginState::Loaded,
+            2 => PluginState::Initialized,
+            3 => PluginState::Running,
+            4 => PluginState::Stopped,
+            _ => PluginState::Error,
         }
     }
 
@@ -178,7 +172,7 @@ impl Plugin for SimplePlugin {
         &self.name[..len]
     }
 
-    fn version(&self) -> (u32, u32,-u32) {
+    fn version(&self) -> (u32, u32, u32) {
         self.version
     }
 
@@ -223,16 +217,6 @@ impl Plugin for SimplePlugin {
     }
 }
 
-impl Drop for SimplePlugin {
-    fn drop(&mut self) {
-        unsafe {
-            if let Some(data) = self.data {
-                free(data.as_ptr());
-            }
-        }
-    }
-}
-
 /// Plugin manager trait (OOP interface)
 pub trait PluginManager {
     /// Load plugin
@@ -243,16 +227,15 @@ pub trait PluginManager {
     fn initialize_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
     /// Shutdown plugin
     fn shutdown_plugin(&mut self, id: PluginID) -> Result<(), PluginError>;
-    /// Get plugin
+    /// Get plugin reference
     fn get_plugin(&self, id: PluginID) -> Option<&dyn Plugin>;
-    /// Get plugin mutable
-    fn get_plugin_mut(&mut self, id: PluginID) -> Option<&mut Box<dyn Plugin>>;
     /// Get manager statistics
     fn stats(&self) -> PluginStats;
 }
 
 /// Plugin statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PluginStats {
     pub total_plugins: usize,
     pub loaded_plugins: usize,
@@ -261,7 +244,7 @@ pub struct PluginStats {
 }
 
 impl PluginStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         PluginStats {
             total_plugins: 0,
             loaded_plugins: 0,
@@ -271,17 +254,22 @@ impl PluginStats {
     }
 }
 
+impl Default for PluginStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple plugin manager (OOP: Concrete manager class)
 pub struct SimplePluginManager {
     plugins: Vec<Option<Box<dyn Plugin>>>,
-    next_id: AtomicUsize,
     stats: PluginStats,
     capability: ManagerCapability,
 }
 
 /// Manager capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ManagerCapability {
     pub can_load: bool,
     pub can_unload: bool,
@@ -290,7 +278,7 @@ pub struct ManagerCapability {
 }
 
 impl ManagerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ManagerCapability {
             can_load: false,
             can_unload: false,
@@ -299,7 +287,7 @@ impl ManagerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         ManagerCapability {
             can_load: true,
             can_unload: true,
@@ -309,11 +297,16 @@ impl ManagerCapability {
     }
 }
 
+impl Default for ManagerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimplePluginManager {
     pub fn new(capability: ManagerCapability) -> Self {
         SimplePluginManager {
             plugins: Vec::new(),
-            next_id: AtomicUsize::new(1),
             stats: PluginStats::new(),
             capability,
         }
@@ -362,15 +355,18 @@ impl PluginManager for SimplePluginManager {
             return Err(PluginError::PermissionDenied);
         }
 
-        if let Some(ref mut plugin) = self.get_plugin_mut(id) {
-            let result = plugin.initialize();
-            if result.is_ok() {
-                self.stats.initialized_plugins += 1;
+        for plugin_option in &mut self.plugins {
+            if let Some(ref mut plugin) = *plugin_option {
+                if plugin.id() == id {
+                    let res = plugin.initialize();
+                    if res.is_ok() {
+                        self.stats.initialized_plugins += 1;
+                    }
+                    return res;
+                }
             }
-            result
-        } else {
-            Err(PluginError::InvalidState)
         }
+        Err(PluginError::InvalidState)
     }
 
     fn shutdown_plugin(&mut self, id: PluginID) -> Result<(), PluginError> {
@@ -378,15 +374,18 @@ impl PluginManager for SimplePluginManager {
             return Err(PluginError::PermissionDenied);
         }
 
-        if let Some(ref mut plugin) = self.get_plugin_mut(id) {
-            let result = plugin.shutdown();
-            if result.is_ok() {
-                self.stats.initialized_plugins -= 1;
+        for plugin_option in &mut self.plugins {
+            if let Some(ref mut plugin) = *plugin_option {
+                if plugin.id() == id {
+                    let res = plugin.shutdown();
+                    if res.is_ok() {
+                        self.stats.initialized_plugins -= 1;
+                    }
+                    return res;
+                }
             }
-            result
-        } else {
-            Err(PluginError::InvalidState)
         }
+        Err(PluginError::InvalidState)
     }
 
     fn get_plugin(&self, id: PluginID) -> Option<&dyn Plugin> {
@@ -400,76 +399,40 @@ impl PluginManager for SimplePluginManager {
         None
     }
 
-    fn get_plugin_mut(&mut self, id: PluginID) -> Option<&mut Box<dyn Plugin>> {
-        for plugin_option in &mut self.plugins {
-            if let Some(ref mut plugin) = *plugin_option {
-                if plugin.id() == id {
-                    return Some(plugin);
-                }
-            }
-        }
-        None
-    }
-
     fn stats(&self) -> PluginStats {
         self.stats
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn test_plugin_oop_system_flows() {
+        let mut manager = SimplePluginManager::new(ManagerCapability::full());
+        let plugin = SimplePlugin::new(
+            42,
+            b"SovereignSecurityAgent",
+            (1, 0, 0),
+            PluginCapability::full(),
+        );
+
+        let id = manager.load_plugin(Box::new(plugin)).unwrap();
+        assert_eq!(id, 42);
+
+        let stats_before = manager.stats();
+        assert_eq!(stats_before.loaded_plugins, 1);
+        assert_eq!(stats_before.initialized_plugins, 0);
+
+        // Initialize plugin
+        manager.initialize_plugin(42).unwrap();
+        let stats_after = manager.stats();
+        assert_eq!(stats_after.initialized_plugins, 1);
+
+        // Fetch plugin details
+        let plugin_ref = manager.get_plugin(42).unwrap();
+        assert_eq!(plugin_ref.name(), b"SovereignSecurityAgent");
+        assert_eq!(plugin_ref.version(), (1, 0, 0));
     }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
