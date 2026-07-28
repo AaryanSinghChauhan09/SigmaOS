@@ -10,7 +10,7 @@ use core::mem;
 
 pub type SessionID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum SessionState { Disconnected = 0, Connecting = 1, Connected = 2, Error = 3 }
 

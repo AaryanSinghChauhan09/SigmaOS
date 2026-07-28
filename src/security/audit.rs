@@ -10,7 +10,7 @@ use core::mem;
 
 pub type EventID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum EventType { Authentication = 0, Authorization = 1, FileAccess = 2, SystemChange = 3 }
 

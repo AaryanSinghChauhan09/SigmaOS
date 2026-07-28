@@ -166,9 +166,11 @@ impl CommandRegistry for SimpleCommandRegistry {
 
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError> {
         for i in 0..self.commands.len() {
-            if let Some(ref cmd) = self.commands[i] {
+            if let Some(Some(ref cmd)) = self.commands.get(i) {
                 if cmd.name() == name {
-                    self.commands[i] = None;
+                    if let Some(slot) = self.commands.get_mut(i) {
+                        *slot = None;
+                    }
                     return Ok(());
                 }
             }
@@ -177,8 +179,8 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
-        for command_option in &self.commands {
-            if let Some(ref command) = *command_option {
+        for i in 0..self.commands.len() {
+            if let Some(Some(ref command)) = self.commands.get(i) {
                 if command.name() == name {
                     return Some(command.as_ref());
                 }
@@ -189,8 +191,8 @@ impl CommandRegistry for SimpleCommandRegistry {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut names = Vec::new();
-        for command_option in &self.commands {
-            if let Some(ref command) = *command_option {
+        for i in 0..self.commands.len() {
+            if let Some(Some(ref command)) = self.commands.get(i) {
                 names.push(command.name());
             }
         }
@@ -229,7 +231,8 @@ impl ShellSession for SimpleShellSession {
 
         if let Some(command) = self.registry.get(&command_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            cmd.execute(&args)
+            let slice = unsafe { core::slice::from_raw_parts(args.data, args.len) };
+            cmd.execute(slice)
         } else {
             Err(CommandError::NotFound)
         }
@@ -246,11 +249,13 @@ impl ShellSession for SimpleShellSession {
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &self.environment {
-            let len = k.iter().position(|&b| b == 0).unwrap_or(64);
-            if &k[..len] == key {
-                let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
-                return Some(&v[..vlen]);
+        for i in 0..self.environment.len() {
+            if let Some(&(ref k, ref v)) = self.environment.get(i) {
+                let len = k.iter().position(|&b| b == 0).unwrap_or(64);
+                if &k[..len] == key {
+                    let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
+                    return Some(&v[..vlen]);
+                }
             }
         }
         None
@@ -291,8 +296,12 @@ impl CommandHistory for SimpleCommandHistory {
     fn get_previous(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx > 0 && idx <= self.history.len() {
-            let len = self.history[idx - 1].iter().position(|&b| b == 0).unwrap_or(256);
-            Some(&self.history[idx - 1][..len])
+            if let Some(cmd) = self.history.get(idx - 1) {
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                Some(&cmd[..len])
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -301,8 +310,12 @@ impl CommandHistory for SimpleCommandHistory {
     fn get_next(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx < self.history.len() {
-            let len = self.history[idx].iter().position(|&b| b == 0).unwrap_or(256);
-            Some(&self.history[idx][..len])
+            if let Some(cmd) = self.history.get(idx) {
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                Some(&cmd[..len])
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -310,9 +323,11 @@ impl CommandHistory for SimpleCommandHistory {
 
     fn list(&self) -> Vec<&[u8]> {
         let mut commands = Vec::new();
-        for cmd in &self.history {
-            let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
-            commands.push(&cmd[..len]);
+        for i in 0..self.history.len() {
+            if let Some(cmd) = self.history.get(i) {
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                commands.push(&cmd[..len]);
+            }
         }
         commands
     }
@@ -329,6 +344,21 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    fn len(&self) -> usize { self.len }
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
         }
     }
     unsafe fn grow(&mut self) {

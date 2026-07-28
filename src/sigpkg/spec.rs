@@ -12,6 +12,7 @@ use core::mem;
 
 /// Package version
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -44,6 +45,7 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -185,7 +187,9 @@ impl Package for SimplePackage {
     }
 
     fn dependencies(&self) -> &[PackageDependency] {
-        &self.dependencies
+        unsafe {
+            core::slice::from_raw_parts(self.dependencies.data, self.dependencies.len)
+        }
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
@@ -251,6 +255,7 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,
@@ -334,8 +339,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for (i, package_option) in self.packages.iter().enumerate() {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -344,8 +349,12 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            self.packages[i] = None;
-            self.installed[i] = None;
+            if let Some(p) = self.packages.get_mut(i) {
+                *p = None;
+            }
+            if let Some(inst) = self.installed.get_mut(i) {
+                *inst = None;
+            }
             self.stats.total_packages -= 1;
             Ok(())
         } else {
@@ -354,8 +363,8 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn get_package(&self, name: &[u8]) -> Option<&dyn Package> {
-        for package_option in &self.packages {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     return Some(package.as_ref());
                 }
@@ -370,8 +379,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for (i, package_option) in self.packages.iter().enumerate() {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -380,13 +389,15 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(ref package) = self.packages[i] {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 // Verify signature before installation
                 if !package.verify_signature(&package.info().checksum) {
                     return Err(PackageError::SignatureInvalid);
                 }
 
-                self.installed[i] = Some(true);
+                if let Some(inst) = self.installed.get_mut(i) {
+                    *inst = Some(true);
+                }
                 self.stats.installed_packages += 1;
                 Ok(())
             } else {
@@ -403,8 +414,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for (i, package_option) in self.packages.iter().enumerate() {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -413,8 +424,10 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if self.installed[i] == Some(true) {
-                self.installed[i] = Some(false);
+            if let Some(&Some(true)) = self.installed.get(i) {
+                if let Some(inst) = self.installed.get_mut(i) {
+                    *inst = Some(false);
+                }
                 self.stats.installed_packages -= 1;
                 Ok(())
             } else {
@@ -437,8 +450,8 @@ impl PackageManager for SimplePackageManager {
 
         for dep in dependencies {
             let mut found = false;
-            for package_option in &self.packages {
-                if let Some(ref pkg) = *package_option {
+            for i in 0..self.packages.len {
+                if let Some(Some(ref pkg)) = self.packages.get(i) {
                     let dep_name = dep.name;
                     let pkg_name = pkg.name();
                     
@@ -498,6 +511,22 @@ impl<T> Vec<T> {
 
     fn len(&self) -> usize {
         self.len
+    }
+
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
     }
 
     unsafe fn grow(&mut self) {

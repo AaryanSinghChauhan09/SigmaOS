@@ -226,6 +226,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -249,7 +250,10 @@ pub struct SimpleMACEngine {
     policies: Vec<Option<Box<dyn MACPolicy>>>,
     contexts: Vec<Option<SecurityContext>>,
     next_context_id: AtomicUsize,
-    stats: MACStats,
+    total_policies: AtomicUsize,
+    total_contexts: AtomicUsize,
+    access_checks: AtomicUsize,
+    access_denied: AtomicUsize,
     capability: EngineCapability,
 }
 
@@ -286,14 +290,17 @@ impl SimpleMACEngine {
             policies: Vec::new(),
             contexts: Vec::new(),
             next_context_id: AtomicUsize::new(1),
-            stats: MACStats::new(),
+            total_policies: AtomicUsize::new(0),
+            total_contexts: AtomicUsize::new(0),
+            access_checks: AtomicUsize::new(0),
+            access_denied: AtomicUsize::new(0),
             capability,
         }
     }
 
     unsafe fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
-        for context_option in &self.contexts {
-            if let Some(ref context) = *context_option {
+        for i in 0..self.contexts.len() {
+            if let Some(Some(ref context)) = self.contexts.get(i) {
                 if context.id == id {
                     return Some(context);
                 }
@@ -311,7 +318,7 @@ impl MACEngine for SimpleMACEngine {
 
         let id = self.policies.len();
         self.policies.push(Some(policy));
-        self.stats.total_policies += 1;
+        self.total_policies.fetch_add(1, Ordering::SeqCst);
         Ok(id)
     }
 
@@ -321,8 +328,10 @@ impl MACEngine for SimpleMACEngine {
         }
 
         if id < self.policies.len() {
-            self.policies[id] = None;
-            self.stats.total_policies -= 1;
+            if let Some(slot) = self.policies.get_mut(id) {
+                *slot = None;
+            }
+            self.total_policies.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
             Err(MACError::PolicyNotFound)
@@ -337,7 +346,7 @@ impl MACEngine for SimpleMACEngine {
         let id = self.next_context_id.fetch_add(1, Ordering::SeqCst);
         let context = SecurityContext::new(id, level, domain, capability);
         self.contexts.push(Some(context));
-        self.stats.total_contexts += 1;
+        self.total_contexts.fetch_add(1, Ordering::SeqCst);
         Ok(id)
     }
 
@@ -347,8 +356,8 @@ impl MACEngine for SimpleMACEngine {
         }
 
         let mut index = None;
-        for (i, context_option) in self.contexts.iter().enumerate() {
-            if let Some(ref context) = *context_option {
+        for i in 0..self.contexts.len() {
+            if let Some(Some(ref context)) = self.contexts.get(i) {
                 if context.id == id {
                     index = Some(i);
                     break;
@@ -357,8 +366,10 @@ impl MACEngine for SimpleMACEngine {
         }
 
         if let Some(i) = index {
-            self.contexts[i] = None;
-            self.stats.total_contexts -= 1;
+            if let Some(slot) = self.contexts.get_mut(i) {
+                *slot = None;
+            }
+            self.total_contexts.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
             Err(MACError::ContextNotFound)
@@ -366,7 +377,7 @@ impl MACEngine for SimpleMACEngine {
     }
 
     fn check_access(&self, context_id: ContextID, operation: SecurityOperation) -> bool {
-        self.stats.access_checks += 1;
+        self.access_checks.fetch_add(1, Ordering::SeqCst);
 
         if !self.capability.can_enforce {
             return true;
@@ -374,24 +385,29 @@ impl MACEngine for SimpleMACEngine {
 
         unsafe {
             if let Some(context) = self.get_context(context_id) {
-                for policy_option in &self.policies {
-                    if let Some(ref policy) = *policy_option {
+                for i in 0..self.policies.len() {
+                    if let Some(Some(ref policy)) = self.policies.get(i) {
                         if !policy.check(context, operation) {
-                            self.stats.access_denied += 1;
+                            self.access_denied.fetch_add(1, Ordering::SeqCst);
                             return false;
                         }
                     }
                 }
                 true
             } else {
-                self.stats.access_denied += 1;
+                self.access_denied.fetch_add(1, Ordering::SeqCst);
                 false
             }
         }
     }
 
     fn stats(&self) -> MACStats {
-        self.stats
+        MACStats {
+            total_policies: self.total_policies.load(Ordering::SeqCst),
+            total_contexts: self.total_contexts.load(Ordering::SeqCst),
+            access_checks: self.access_checks.load(Ordering::SeqCst) as u64,
+            access_denied: self.access_denied.load(Ordering::SeqCst) as u64,
+        }
     }
 }
 
@@ -426,6 +442,22 @@ impl<T> Vec<T> {
 
     fn len(&self) -> usize {
         self.len
+    }
+
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
     }
 
     unsafe fn grow(&mut self) {

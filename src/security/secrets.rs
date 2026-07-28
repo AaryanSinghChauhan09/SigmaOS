@@ -7,7 +7,7 @@
 /// Based on Roadmap Item 63: Secrets management
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
 use core::mem;
 
 /// Secret ID
@@ -225,6 +225,7 @@ pub trait Keyring {
 
 /// Keyring statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct KeyringStats {
     pub total_secrets: usize,
     pub encrypted_secrets: usize,
@@ -309,8 +310,8 @@ impl Keyring for SimpleKeyring {
         let mut index = None;
         let mut secret_type = SecretType::Password;
 
-        for (i, secret_option) in self.secrets.iter().enumerate() {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.id() == id {
                     index = Some(i);
                     secret_type = secret.secret_type();
@@ -320,7 +321,9 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
-            self.secrets[i] = None;
+            if let Some(slot) = self.secrets.get_mut(i) {
+                *slot = None;
+            }
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;
             Ok(())
@@ -330,8 +333,8 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret(&self, id: SecretID) -> Option<&dyn Secret> {
-        for secret_option in &self.secrets {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.id() == id {
                     return Some(secret.as_ref());
                 }
@@ -341,10 +344,13 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for secret_option in &mut self.secrets {
-            if let Some(ref mut secret) = *secret_option {
-                if secret.id() == id {
-                    return Some(secret);
+        for i in 0..self.secrets.len() {
+            unsafe {
+                let slot = &mut *self.secrets.data.add(i);
+                if let Some(ref mut secret) = *slot {
+                    if secret.id() == id {
+                        return Some(secret);
+                    }
                 }
             }
         }
@@ -353,8 +359,8 @@ impl Keyring for SimpleKeyring {
 
     fn list_secrets(&self) -> Vec<SecretID> {
         let mut ids = Vec::new();
-        for secret_option in &self.secrets {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 ids.push(secret.id());
             }
         }
@@ -362,11 +368,11 @@ impl Keyring for SimpleKeyring {
     }
 
     fn stats(&self) -> KeyringStats {
-        let mut stats = self.stats.clone();
+        let mut stats = self.stats;
         stats.encrypted_secrets = 0;
 
-        for secret_option in &self.secrets {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.info().is_encrypted {
                     stats.encrypted_secrets += 1;
                 }
@@ -408,6 +414,22 @@ impl<T> Vec<T> {
 
     fn len(&self) -> usize {
         self.len
+    }
+
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
     }
 
     unsafe fn grow(&mut self) {
