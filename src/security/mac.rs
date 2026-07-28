@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 62: Mandatory access control
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Security context ID
 pub type ContextID = usize;
@@ -71,7 +70,12 @@ impl ContextCapability {
 }
 
 impl SecurityContext {
-    pub fn new(id: ContextID, level: SecurityLevel, domain: SecurityDomain, capability: ContextCapability) -> Self {
+    pub fn new(
+        id: ContextID,
+        level: SecurityLevel,
+        domain: SecurityDomain,
+        capability: ContextCapability,
+    ) -> Self {
         SecurityContext {
             id,
             level,
@@ -123,7 +127,7 @@ impl PolicyInfo {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PolicyType {
-    MLS = 0, // Multi-Level Security
+    MLS = 0,  // Multi-Level Security
     Biba = 1, // Integrity
     RBAC = 2, // Role-Based
     Custom = 3,
@@ -180,11 +184,17 @@ impl MACPolicy for MLSPolicy {
         // MLS: Simple level check - context must meet or exceed policy strictness
         match operation {
             SecurityOperation::Read => context.level >= self.strictness,
-            SecurityOperation::Write => context.level >= self.strictness && context.capability.can_write,
-            SecurityOperation::Execute => context.level >= self.strictness && context.capability.can_execute,
+            SecurityOperation::Write => {
+                context.level >= self.strictness && context.capability.can_write
+            }
+            SecurityOperation::Execute => {
+                context.level >= self.strictness && context.capability.can_execute
+            }
             SecurityOperation::Create => context.level >= self.strictness,
             SecurityOperation::Delete => context.level >= SecurityLevel::High,
-            SecurityOperation::Modify => context.level >= self.strictness && context.capability.can_write,
+            SecurityOperation::Modify => {
+                context.level >= self.strictness && context.capability.can_write
+            }
         }
     }
 
@@ -204,7 +214,12 @@ pub trait MACEngine {
     /// Unregister policy
     fn unregister_policy(&mut self, id: usize) -> Result<(), MACError>;
     /// Create security context
-    fn create_context(&mut self, level: SecurityLevel, domain: SecurityDomain, capability: ContextCapability) -> Result<ContextID, MACError>;
+    fn create_context(
+        &mut self,
+        level: SecurityLevel,
+        domain: SecurityDomain,
+        capability: ContextCapability,
+    ) -> Result<ContextID, MACError>;
     /// Destroy security context
     fn destroy_context(&mut self, id: ContextID) -> Result<(), MACError>;
     /// Check access
@@ -338,7 +353,12 @@ impl MACEngine for SimpleMACEngine {
         }
     }
 
-    fn create_context(&mut self, level: SecurityLevel, domain: SecurityDomain, capability: ContextCapability) -> Result<ContextID, MACError> {
+    fn create_context(
+        &mut self,
+        level: SecurityLevel,
+        domain: SecurityDomain,
+        capability: ContextCapability,
+    ) -> Result<ContextID, MACError> {
         if !self.capability.can_create_contexts {
             return Err(MACError::PermissionDenied);
         }
@@ -461,7 +481,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

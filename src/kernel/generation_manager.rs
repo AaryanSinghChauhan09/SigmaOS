@@ -1,5 +1,5 @@
 // NixOS-Style: Atomic Inode Pointer-Swap Generation Manager
-// In monolithic systems, updates copy gigabytes of files, leading to fragmentation and potential boot failures. 
+// In monolithic systems, updates copy gigabytes of files, leading to fragmentation and potential boot failures.
 // SigmaOS achieves sub-millisecond, zero-copy system rollbacks by storing configurations as content-addressed nodes and swapping directory inodes.
 
 #![no_std]
@@ -28,7 +28,11 @@ impl GenerationManager {
     }
 
     /// Registers a new immutable configuration snapshot node
-    pub fn create_generation(&mut self, root_inode: u64, timestamp: u64) -> Result<u32, &'static str> {
+    pub fn create_generation(
+        &mut self,
+        root_inode: u64,
+        timestamp: u64,
+    ) -> Result<u32, &'static str> {
         let next_id = (self.generations.len() + 1) as u32;
         let gen = Generation {
             id: next_id,

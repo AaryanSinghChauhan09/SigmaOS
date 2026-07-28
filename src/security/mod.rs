@@ -27,7 +27,10 @@ pub mod parrot_parity;
 pub use audit::{AuditLogger, AuditPolicy};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
-pub use capability_token::{CapabilityToken as AndroidStyleCapabilityToken, SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
+pub use capability_token::{
+    CapabilityToken as AndroidStyleCapabilityToken,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,

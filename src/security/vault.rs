@@ -89,7 +89,9 @@ pub struct Aes256GcmEncryption;
 impl VaultEncryption for Aes256GcmEncryption {
     fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         if key.is_empty() {
-            return Err(VaultError::EncryptionError("Encryption key cannot be empty".to_string()));
+            return Err(VaultError::EncryptionError(
+                "Encryption key cannot be empty".to_string(),
+            ));
         }
         // Simulated AES-256-GCM encryption
         // In real implementation, use actual AES-256-GCM
@@ -113,7 +115,9 @@ impl VaultEncryption for Aes256GcmEncryption {
         _tag: &[u8],
     ) -> Result<Vec<u8>, VaultError> {
         if key.is_empty() {
-            return Err(VaultError::DecryptionError("Decryption key cannot be empty".to_string()));
+            return Err(VaultError::DecryptionError(
+                "Decryption key cannot be empty".to_string(),
+            ));
         }
         // Simulated decryption
         let mut decrypted = encrypted_data.to_vec();
@@ -136,7 +140,9 @@ pub struct ChaCha20Poly1305Encryption;
 impl VaultEncryption for ChaCha20Poly1305Encryption {
     fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         if key.is_empty() {
-            return Err(VaultError::EncryptionError("Encryption key cannot be empty".to_string()));
+            return Err(VaultError::EncryptionError(
+                "Encryption key cannot be empty".to_string(),
+            ));
         }
         // Simulated ChaCha20-Poly1305 encryption
         let iv = vec![0u8; 12];
@@ -159,7 +165,9 @@ impl VaultEncryption for ChaCha20Poly1305Encryption {
         _tag: &[u8],
     ) -> Result<Vec<u8>, VaultError> {
         if key.is_empty() {
-            return Err(VaultError::DecryptionError("Decryption key cannot be empty".to_string()));
+            return Err(VaultError::DecryptionError(
+                "Decryption key cannot be empty".to_string(),
+            ));
         }
         let mut decrypted = encrypted_data.to_vec();
 
@@ -181,7 +189,9 @@ pub struct Kyber1024Encryption;
 impl VaultEncryption for Kyber1024Encryption {
     fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         if key.is_empty() {
-            return Err(VaultError::EncryptionError("Encryption key cannot be empty".to_string()));
+            return Err(VaultError::EncryptionError(
+                "Encryption key cannot be empty".to_string(),
+            ));
         }
         // Simulated Kyber-1024 encryption
         let iv = vec![0u8; 32]; // Larger IV for post-quantum
@@ -204,7 +214,9 @@ impl VaultEncryption for Kyber1024Encryption {
         _tag: &[u8],
     ) -> Result<Vec<u8>, VaultError> {
         if key.is_empty() {
-            return Err(VaultError::DecryptionError("Decryption key cannot be empty".to_string()));
+            return Err(VaultError::DecryptionError(
+                "Decryption key cannot be empty".to_string(),
+            ));
         }
         let mut decrypted = encrypted_data.to_vec();
 

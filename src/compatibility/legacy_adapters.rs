@@ -19,10 +19,12 @@ impl LegacyKernelAdapter {
     /// Translates ancient Linux syscall numbers to native microkernel primitives
     pub fn translate_syscall(&self, sys_num: usize, args: &[usize]) -> Result<usize, &'static str> {
         // Mock translation logic for traditional sys_read, sys_write, sys_open
-        if sys_num == 3 { // sys_read
+        if sys_num == 3 {
+            // sys_read
             return Ok(args[2]); // returns bytes read simulated
         }
-        if sys_num == 4 { // sys_write
+        if sys_num == 4 {
+            // sys_write
             return Ok(args[2]); // returns bytes written simulated
         }
         Err("Unsupported ancient syscall version")
@@ -137,10 +139,17 @@ pub struct LegacyFSAdapter {
 
 impl LegacyFSAdapter {
     pub fn new(fs_type: &'static str, total_blocks: u64) -> Self {
-        Self { fs_type, total_blocks }
+        Self {
+            fs_type,
+            total_blocks,
+        }
     }
 
-    pub fn read_file_entry(&self, cluster_idx: u32, out_buf: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn read_file_entry(
+        &self,
+        cluster_idx: u32,
+        out_buf: &mut [u8],
+    ) -> Result<usize, &'static str> {
         if cluster_idx as u64 >= self.total_blocks {
             return Err("Cluster index out of filesystem bounds");
         }
@@ -168,7 +177,11 @@ impl LegacyProtocolAdapter {
         Self { protocol }
     }
 
-    pub fn encapsulate_packet(&self, raw_data: &[u8], out_buf: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn encapsulate_packet(
+        &self,
+        raw_data: &[u8],
+        out_buf: &mut [u8],
+    ) -> Result<usize, &'static str> {
         if out_buf.len() < raw_data.len() + 2 {
             return Err("Output buffer too small for framing");
         }
@@ -219,11 +232,16 @@ impl LegacyUIAdapter {
     }
 
     /// Intercepts legacy X11 protocol packets (e.g. CreateWindow) and renders them natively on the Zenith Compositor
-    pub fn translate_x11_event(&self, event_code: u32, out_render_cmd: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn translate_x11_event(
+        &self,
+        event_code: u32,
+        out_render_cmd: &mut [u8],
+    ) -> Result<usize, &'static str> {
         if out_render_cmd.is_empty() {
             return Ok(0);
         }
-        if event_code == 1 { // Create Window
+        if event_code == 1 {
+            // Create Window
             out_render_cmd[0] = 0xFF; // Zenith native draw window byte
             return Ok(1);
         }
@@ -280,7 +298,9 @@ mod tests {
         assert_eq!(proto_adapter.protocol(), "PPP");
 
         let mut out_pkt = [0u8; 20];
-        let len = proto_adapter.encapsulate_packet(b"Hello", &mut out_pkt).unwrap();
+        let len = proto_adapter
+            .encapsulate_packet(b"Hello", &mut out_pkt)
+            .unwrap();
         assert_eq!(len, 7);
         assert_eq!(out_pkt[0], 0xC0);
         assert_eq!(out_pkt[6], 0xC0);
