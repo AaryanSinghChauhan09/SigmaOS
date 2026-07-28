@@ -63,18 +63,25 @@ The script will:
 
 ### Windows
 
-Run the PowerShell build script:
+Run the improved PowerShell build script:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\build-iso.ps1
+powershell -ExecutionPolicy Bypass -File scripts\build-iso-improved.ps1
 ```
 
 The script will:
 1. Build the kernel if not already built
 2. Copy the kernel binary to the ISO root
 3. Generate GRUB configurations
-4. Create the ISO with checksums (using available tools)
-5. Output: `build/sigmaos-29.0-x86_64.iso`
+4. Create the ISO with proper ISO 9660 structure and headers
+5. Generate checksums
+6. Output: `build/sigmaos-29.0-x86_64.iso`
+
+**Alternative:** Use the basic PowerShell script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-iso.ps1
+```
 
 ## Boot Options
 
@@ -176,7 +183,7 @@ dd if=build/sigmaos-29.0-x86_64.iso of=/dev/sdX bs=4M status=progress
 
 ### Build Fails - Missing Tools
 
-If ISO creation tools are not found, the script will create a simulated ISO container. To create a bootable ISO:
+The improved Windows script creates a structured ISO with proper ISO 9660 headers even without external tools. However, for a fully bootable ISO with proper boot sectors:
 
 **Linux:**
 ```bash
@@ -188,9 +195,11 @@ sudo pacman -S grub xorriso
 ```
 
 **Windows:**
-- Install Windows ADK for `oscdimg`
+- Install Windows ADK for `oscdimg` (recommended for bootable ISO)
 - Or install Git Bash for `mkisofs`
 - Or install WSL and `xorriso`
+
+**Note:** The improved PowerShell script (`build-iso-improved.ps1) creates a structured ISO with proper headers that can be used for testing, even without external tools.
 
 ### Kernel Build Fails
 
