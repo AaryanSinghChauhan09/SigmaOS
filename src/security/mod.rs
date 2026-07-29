@@ -1,78 +1,40 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
+pub mod lsm;
 
 pub mod audit;
 pub mod capability;
-<<<<<<< HEAD
-pub mod capability_enforcer;
-pub mod capability_token;
 pub mod cleaner;
-pub mod clipboard;
 pub mod forensics;
-pub mod integrity;
-pub mod intrusion;
-pub mod mac;
-pub mod password;
-pub mod pki;
-pub mod pledge;
-pub mod scanner;
-pub mod secrets;
-pub mod selinux;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod vault;
-pub mod vpn;
-=======
 pub mod integrity;
 pub mod mac;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
-pub mod secrets;
-pub mod unveil;
->>>>>>> origin/jules-15532892492441614180-73ce6847
 pub mod vulnerability;
+pub mod parrot_parity;
 
-pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-<<<<<<< HEAD
-pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
-pub use capability_token::{
-    CapabilityToken as AndroidStyleCapabilityToken,
-    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
-};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
-    SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
+    SecureClipboardManager, SecurityLevel, XorEncryption,
 };
+pub use integrity::{File, IntegrityError, IntegrityMonitor, IntegrityStatus, SimpleIntegrityMonitor};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
+pub use mac::{MACEngine, MACPolicy, SecurityContext as MacSecurityContext, SimpleMACEngine};
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
+pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
+pub use vulnerability::{
+    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
+    PenetrationAssistant,
 };
-pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
-pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
-pub use vault::{
-    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
-    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
-    VaultResult,
+pub use parrot_parity::{
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };
-pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
-};
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
-=======
-pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
->>>>>>> origin/jules-15532892492441614180-73ce6847
