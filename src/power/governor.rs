@@ -3,9 +3,9 @@
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GovernorMode {
-    Performance,     // Keep high frequency for gaming/computation
-    Powersave,       // Minimize frequency for battery saving
-    Schedutil,       // Dynamic frequency scaling based on scheduler utilization
+    Performance, // Keep high frequency for gaming/computation
+    Powersave,   // Minimize frequency for battery saving
+    Schedutil,   // Dynamic frequency scaling based on scheduler utilization
 }
 
 pub struct CPUState {
@@ -77,8 +77,10 @@ impl SigmaGovernor {
                 GovernorMode::Schedutil => {
                     // Dynamically scale between min and max based on utilization
                     let delta = (core.max_frequency_mhz - core.min_frequency_mhz) as f32;
-                    let calculated = core.min_frequency_mhz + (delta * core.core_utilization) as u32;
-                    core.current_frequency_mhz = calculated.clamp(core.min_frequency_mhz, core.max_frequency_mhz);
+                    let calculated =
+                        core.min_frequency_mhz + (delta * core.core_utilization) as u32;
+                    core.current_frequency_mhz =
+                        calculated.clamp(core.min_frequency_mhz, core.max_frequency_mhz);
                 }
             }
         }

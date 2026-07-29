@@ -9,11 +9,26 @@ pub mod mac;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
+<<<<<<< HEAD
 pub mod vulnerability;
 pub mod parrot_parity;
+=======
+pub mod secrets;
+pub mod vault;
+pub mod vpn;
+pub mod vulnerability;
+pub mod cleaner;
+pub mod forensics;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter as SigmaSyscallFilter};
+pub use sigma_unveil::{UnveilPermissions, UnveilEntry, UnveilState, UnveilManager};
+pub use cleaner::{SecureCleaner, TorAnonymityGate, AmnesiaManager, MetadataScrubber};
+pub use forensics::{ForensicAnalyzer, ExtractedMetadata, RecoveredFile};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel, XorEncryption,
@@ -30,6 +45,7 @@ pub use password::{
 };
 pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+<<<<<<< HEAD
 pub use vulnerability::{
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
     PenetrationAssistant,
@@ -38,3 +54,17 @@ pub use parrot_parity::{
     RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
     GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };
+=======
+pub use secrets::{SecretManager, SecretStorage, SecretType};
+pub use vault::{
+    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
+    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
+    VaultResult,
+};
+pub use vpn::{
+    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
+    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    WireGuardHandler,
+};
+pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner, VulnerabilitySeverity};
+>>>>>>> origin/jules-18101178622594638830-97dc43c6

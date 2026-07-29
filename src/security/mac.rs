@@ -1,5 +1,12 @@
 #![no_std]
 
+<<<<<<< HEAD
+=======
+/// OOP-based Mandatory Access Control for SigmaOS
+/// Implements MAC using OOP principles with traits and structs
+/// No dependency on external security frameworks
+/// Based on Roadmap Item 62: Mandatory access control
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -85,6 +92,10 @@ impl Default for ContextCapability {
         Self::new()
     }
 }
+
+pub type MacPolicy = dyn MACPolicy;
+pub type MacRule = PolicyInfo;
+pub type MacSecurity = SimpleMACEngine;
 
 impl SecurityContext {
     pub fn new(
@@ -530,10 +541,6 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-pub use MACPolicy as MacPolicy;
-pub struct MacRule;
-pub struct MacSecurity;
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -606,4 +613,7 @@ mod tests {
         assert_eq!(stats.access_denied, 1);
     }
 }
+<<<<<<< HEAD
 >>>>>>> origin/jules-15532892492441614180-73ce6847
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6

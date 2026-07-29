@@ -1,2 +1,3 @@
-pub mod inference;
-pub mod training;
+pub mod sigma_aid;
+
+pub use sigma_aid::{LLMInterface, ModelStatus, SigmaAid};

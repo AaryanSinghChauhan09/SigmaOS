@@ -1,4 +1,5 @@
 // SigmaOS Package Module
+<<<<<<< HEAD
 pub mod linux_translation;
 pub mod universal;
 pub mod store;
@@ -15,3 +16,14 @@ pub use universal::{
 pub use store::{
     StoreError, StoreApp, SigmaSoftwareStore,
 };
+=======
+pub mod universal;
+pub mod spac;
+
+pub use universal::{
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+
+pub use spac::{PackageState, SovereignPackage, SpacPackageManager, AURRecipe};
+>>>>>>> origin/jules-18101178622594638830-97dc43c6

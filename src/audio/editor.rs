@@ -11,20 +11,24 @@ pub struct AudioTrack {
     pub name: &'static str,
     pub pcm_data: Vec<i16>,
     pub volume: f32,
-    pub pan: f32,          // Pan value: -1.0 (full left) to 1.0 (full right)
+    pub pan: f32, // Pan value: -1.0 (full left) to 1.0 (full right)
     pub is_muted: bool,
 }
 
 // --- A. DYNAMIC RANGE COMPRESSOR ---
 pub struct Compressor {
-    pub threshold: f32,    // Linear amplitude threshold (e.g. 0.0 to 1.0)
-    pub ratio: f32,        // Compression ratio (e.g. 2.0 for 2:1)
-    pub gain: f32,         // Makeup gain (multiplier)
+    pub threshold: f32, // Linear amplitude threshold (e.g. 0.0 to 1.0)
+    pub ratio: f32,     // Compression ratio (e.g. 2.0 for 2:1)
+    pub gain: f32,      // Makeup gain (multiplier)
 }
 
 impl Compressor {
     pub fn new(threshold: f32, ratio: f32, gain: f32) -> Self {
-        Self { threshold, ratio, gain }
+        Self {
+            threshold,
+            ratio,
+            gain,
+        }
     }
 
     /// Process a single PCM sample (scale to normalized float -1.0..1.0, compress, and scale back)
@@ -84,7 +88,9 @@ impl BiquadFilter {
         let x = sample as f32 / 32768.0;
 
         // y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] - a1*y[n-1] - a2*y[n-2]
-        let y = self.b0 * x + self.b1 * self.x1 + self.b2 * self.x2 - self.a1 * self.y1 - self.a2 * self.y2;
+        let y = self.b0 * x + self.b1 * self.x1 + self.b2 * self.x2
+            - self.a1 * self.y1
+            - self.a2 * self.y2;
 
         // Shift states
         self.x2 = self.x1;
@@ -148,7 +154,12 @@ impl AudioMixer {
             return Vec::new();
         }
 
-        let max_len = self.tracks.iter().map(|t| t.pcm_data.len()).max().unwrap_or(0);
+        let max_len = self
+            .tracks
+            .iter()
+            .map(|t| t.pcm_data.len())
+            .max()
+            .unwrap_or(0);
         // Interleaved stereo buffer (2 * max_len)
         let mut mixed = alloc::vec![0_i16; max_len * 2];
 
@@ -289,7 +300,7 @@ mod tests {
     #[test]
     fn test_spatializer_3d_panning() {
         let panner_left = Spatializer::new(-1.0); // Full Left
-        let panner_right = Spatializer::new(1.0);  // Full Right
+        let panner_right = Spatializer::new(1.0); // Full Right
         let panner_center = Spatializer::new(0.0); // Center
 
         let sample = 1000;

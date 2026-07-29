@@ -17,6 +17,7 @@ pub enum NetworkError {
     ConnectionAborted,
     NotConnected,
     AlreadyConnected,
+    IoError,
 }
 
 pub struct SkBuff {
@@ -35,6 +36,9 @@ pub struct SkBuff {
     pub pkt_type: PktType,
     pub tstamp: u64,
 }
+
+unsafe impl Send for SkBuff {}
+unsafe impl Sync for SkBuff {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PktType {
@@ -311,7 +315,7 @@ impl Qdisc for PfifoFast {
     fn dequeue(&mut self) -> Option<SkBuff> {
         for q in &mut self.queues {
             if !q.is_empty() {
-                return q.remove(0);
+                return Some(q.remove(0));
             }
         }
         None

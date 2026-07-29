@@ -1,6 +1,9 @@
 #![no_std]
 
+<<<<<<< HEAD
 use core::mem;
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
@@ -225,6 +228,9 @@ impl Default for IntegrityStats {
     }
 }
 
+pub type IntegrityCheck = SimpleFile;
+pub type IntegrityVerifier = SimpleIntegrityMonitor;
+
 /// Simple integrity monitor (OOP: Concrete monitor class)
 pub struct SimpleIntegrityMonitor {
     pub files: Vec<Option<Box<dyn File>>>,
@@ -391,11 +397,14 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub struct IntegrityCheck;
 pub struct IntegrityVerifier;
 
 =======
 >>>>>>> origin/jules-15532892492441614180-73ce6847
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -427,6 +436,7 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 /// Simple Vec implementation for no_std
@@ -508,3 +518,5 @@ extern "C" {
 }
 =======
 >>>>>>> origin/jules-15532892492441614180-73ce6847
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6

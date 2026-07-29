@@ -1,9 +1,12 @@
 #![no_std]
 
+<<<<<<< HEAD
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -417,9 +420,12 @@ impl Keyring for SimpleKeyring {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub struct SecretManager;
 pub struct SecretStorage;
 
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -486,4 +492,7 @@ mod tests {
         assert_eq!(keyring.stats().total_secrets, 0);
     }
 }
+<<<<<<< HEAD
 >>>>>>> origin/jules-15532892492441614180-73ce6847
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6

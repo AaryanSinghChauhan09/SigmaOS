@@ -46,7 +46,14 @@ impl SimpleSocket {
 
 impl Socket for SimpleSocket {
     fn id(&self) -> SocketID { self.id }
-    fn socket_type(&self) -> SocketType { unsafe { core::mem::transmute(self.socket_type.load(Ordering::SeqCst)) } }
+    fn socket_type(&self) -> SocketType { {
+        let raw = self.socket_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SocketType::Datagram,
+            2 => SocketType::Raw,
+            _ => SocketType::Stream,
+        }
+    } }
     fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
     fn is_bound(&self) -> bool { self.bound.load(Ordering::SeqCst) == 1 }
 }

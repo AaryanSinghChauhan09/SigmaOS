@@ -131,9 +131,42 @@ impl RoundRobinScheduler {
             return None;
         }
 
+        // Linux-style priority-aware scheduling: Find the highest priority level with ready processes
+        let mut highest_priority: Option<Priority> = None;
+        for entry in &self.processes {
+            if entry.process.state == ProcessState::Ready {
+                match highest_priority {
+                    None => highest_priority = Some(entry.process.priority),
+                    Some(current_highest) => {
+                        // Compare priority tiers
+                        let is_higher = match (entry.process.priority, current_highest) {
+                            (Priority::Realtime, _) => true,
+                            (Priority::High, Priority::Realtime) => false,
+                            (Priority::High, _) => true,
+                            (Priority::Normal, Priority::Realtime)
+                            | (Priority::Normal, Priority::High) => false,
+                            (Priority::Normal, _) => true,
+                            (Priority::Low, Priority::Idle) => true,
+                            (Priority::Low, _) => false,
+                            (Priority::Idle, _) => false,
+                        };
+                        if is_higher {
+                            highest_priority = Some(entry.process.priority);
+                        }
+                    }
+                }
+            }
+        }
+
+        let target_priority = highest_priority?;
+
+        // Dispatch in a round-robin manner within the targeted priority class
         let start_index = self.current_index;
         loop {
-            if self.processes[self.current_index].process.state == ProcessState::Ready {
+            let entry = &self.processes[self.current_index];
+            if entry.process.state == ProcessState::Ready
+                && entry.process.priority == target_priority
+            {
                 return Some(&self.processes[self.current_index].process);
             }
             self.current_index = (self.current_index + 1) % self.processes.len();
@@ -150,17 +183,14 @@ impl RoundRobinScheduler {
             return;
         }
 
-        // Safeguard current_index boundaries to prevent any out of bounds panic
-        if self.current_index >= self.processes.len() {
-            self.current_index = 0;
-        }
-
         let needs_switch = {
             let entry = &mut self.processes[self.current_index];
             entry.cpu_time_used += 1;
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
+
+            // Standard modulo check instead of experimental is_multiple_of
             yielding || (entry.cpu_time_used % slice == 0)
         };
 
@@ -274,10 +304,10 @@ mod tests {
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
-        let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(p1).unwrap();
-        scheduler.add_process(p2).unwrap();
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
 
         let initial_index = scheduler.current_index;
         // Normal priority multiplier is 2x base 10 = 20 ticks per slice

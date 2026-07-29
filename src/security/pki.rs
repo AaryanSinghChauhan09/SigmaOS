@@ -1,9 +1,12 @@
 #![no_std]
 
+<<<<<<< HEAD
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -228,6 +231,10 @@ impl Default for SimpleCRL {
     }
 }
 
+pub type CertificateAuthority = SimplePKIManager;
+pub type PkiError = PKIError;
+pub type PkiManager = SimplePKIManager;
+
 impl CRL for SimpleCRL {
     fn add_to_crl(&mut self, cert_id: CertificateID, reason: u32) {
         self.revoked.push((cert_id, reason));
@@ -250,10 +257,13 @@ impl CRL for SimpleCRL {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub type PkiError = PKIError;
 pub use PKIManager as PkiManager;
 pub struct CertificateAuthority;
 
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -317,4 +327,7 @@ mod tests {
         assert_eq!(current_crl[0], (101, 1));
     }
 }
+<<<<<<< HEAD
 >>>>>>> origin/jules-15532892492441614180-73ce6847
+=======
+>>>>>>> origin/jules-18101178622594638830-97dc43c6

@@ -1,9 +1,9 @@
-// Intent/Message structures for Multi-Agent AutoGen Simulation
-// Inspired by Microsoft AutoGen multi-agent conversational interfaces.
+#![no_std]
+#![no_main]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 /// Intent/Message structures for Multi-Agent AutoGen Simulation
 #[repr(C)]
@@ -23,19 +23,6 @@ pub enum AutoGenError {
     ExecutionFailed = 2,
     GroupChatFull = 3,
     SandboxViolation = 4,
-}
-
-/// Helper byte-level search function
-fn contains_bytes(haystack: &[u8], needle: &[u8]) -> bool {
-    if needle.is_empty() {
-        return true;
-    }
-    if haystack.len() < needle.len() {
-        return false;
-    }
-    haystack
-        .windows(needle.len())
-        .any(|window| window == needle)
 }
 
 /// Message payload representing a chat transmission between AutoGen Agents
@@ -138,30 +125,50 @@ impl ConversableAgent {
         let last_content = &last_msg.content[..last_msg.content_len];
 
         // Trigger function calling simulation if message asks to calculate or fetch stats
-        let is_tool_request = contains_bytes(last_content, b"calc") || contains_bytes(last_content, b"fetch");
+        let is_tool_request = last_content
+            .windows(4)
+            .any(|w| w == b"calc" || w == b"fetch");
         if is_tool_request && self.tools.len() > 0 {
             let tool = &self.tools[0];
             let mut reply_content = [0u8; 128];
             let reply_prefix = b"Executing registered capability: ";
             unsafe {
-                core::ptr::copy_nonoverlapping(reply_prefix.as_ptr(), reply_content.as_mut_ptr(), reply_prefix.len());
-                core::ptr::copy_nonoverlapping(tool.name.as_ptr(), reply_content.as_mut_ptr().add(reply_prefix.len()), tool.name_len);
+                core::ptr::copy_nonoverlapping(
+                    reply_prefix.as_ptr(),
+                    reply_content.as_mut_ptr(),
+                    reply_prefix.len(),
+                );
+                core::ptr::copy_nonoverlapping(
+                    tool.name.as_ptr(),
+                    reply_content.as_mut_ptr().add(reply_prefix.len()),
+                    tool.name_len,
+                );
             }
             let total_len = reply_prefix.len() + tool.name_len;
-            return Ok(AutoGenMessage::new(self.id, self.role, &reply_content[..total_len]));
+            return Ok(AutoGenMessage::new(
+                self.id,
+                self.role,
+                &reply_content[..total_len],
+            ));
         }
 
         // Standard response based on roles
         match self.role {
-            AgentRole::Assistant => {
-                Ok(AutoGenMessage::new(self.id, self.role, b"I have analyzed your input and verified standard system health."))
-            }
-            AgentRole::Critic => {
-                Ok(AutoGenMessage::new(self.id, self.role, b"Critique: The proposed architectural plan conforms perfectly to safety limits."))
-            }
-            _ => {
-                Ok(AutoGenMessage::new(self.id, self.role, b"Awaiting next turn."))
-            }
+            AgentRole::Assistant => Ok(AutoGenMessage::new(
+                self.id,
+                self.role,
+                b"I have analyzed your input and verified standard system health.",
+            )),
+            AgentRole::Critic => Ok(AutoGenMessage::new(
+                self.id,
+                self.role,
+                b"Critique: The proposed architectural plan conforms perfectly to safety limits.",
+            )),
+            _ => Ok(AutoGenMessage::new(
+                self.id,
+                self.role,
+                b"Awaiting next turn.",
+            )),
         }
     }
 }
@@ -191,7 +198,11 @@ impl GroupChat {
     }
 
     /// Broadcasters a message from a sender agent to all other conversing agents in the group chat
-    pub fn broadcast_message(&mut self, sender_id: usize, content: &[u8]) -> Result<(), AutoGenError> {
+    pub fn broadcast_message(
+        &mut self,
+        sender_id: usize,
+        content: &[u8],
+    ) -> Result<(), AutoGenError> {
         let mut sender_role = AgentRole::UserProxy;
         let mut found = false;
 
@@ -232,7 +243,8 @@ impl SandboxCodeExecutor {
     /// Verifies if a generated command/code matches safety criteria before executing in Ring 3
     pub fn execute_code_sandboxed(&self, code: &[u8]) -> Result<Vec<u8>, AutoGenError> {
         // Block obvious exploits or privilege escalations
-        let has_escalation = contains_bytes(code, b"root") || contains_bytes(code, b"sudo") || contains_bytes(code, b"chmod");
+        let has_escalation = code.windows(7).any(|w| w == b"root" || w == b"sudo")
+            || code.windows(5).any(|w| w == b"chmod");
         if has_escalation {
             return Err(AutoGenError::SandboxViolation);
         }
@@ -257,14 +269,18 @@ mod tests {
         agent.register_tool(tool);
 
         // Broadcasters user request
-        let msg = AutoGenMessage::new(2, AgentRole::UserProxy, b"Please calculate server uptime stats");
+        let msg = AutoGenMessage::new(
+            2,
+            AgentRole::UserProxy,
+            b"Please calculate server uptime stats",
+        );
         agent.receive_message(msg);
 
         // Generate automated reply utilizing function calling template
         let reply = agent.generate_reply().unwrap();
         assert!(reply.content_len > 0);
         let content = &reply.content[..reply.content_len];
-        assert!(contains_bytes(content, b"calculator"));
+        assert!(content.windows(11).any(|w| w == b"calculator"));
     }
 
     #[test]
@@ -276,7 +292,9 @@ mod tests {
         assert!(group.add_agent(agent1).is_ok());
         assert!(group.add_agent(agent2).is_ok());
 
-        assert!(group.broadcast_message(1, b"Let's draft system rollback policies").is_ok());
+        assert!(group
+            .broadcast_message(1, b"Let's draft system rollback policies")
+            .is_ok());
         assert_eq!(group.agents[0].history.len(), 1);
         assert_eq!(group.agents[1].history.len(), 1);
     }
