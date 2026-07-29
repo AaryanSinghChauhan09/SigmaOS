@@ -172,7 +172,7 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 
     pub fn set_state(&self, state: ContainerState) {
@@ -296,6 +296,7 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,

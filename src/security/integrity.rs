@@ -129,9 +129,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst) as u32)
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -194,7 +192,7 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,

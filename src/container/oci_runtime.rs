@@ -72,7 +72,7 @@ impl Container for SimpleContainer {
         &self.name[..len]
     }
     fn state(&self) -> ContainerState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {

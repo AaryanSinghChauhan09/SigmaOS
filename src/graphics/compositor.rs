@@ -504,7 +504,7 @@ impl SimpleCompositor {
             stats: CompositorStats::new(),
             capability,
             back_buffer: None,
-            double_buffering: AtomicBool::new(false),
+            double_buffering: core::sync::atomic::AtomicBool::new(false),
         }
     }
 }

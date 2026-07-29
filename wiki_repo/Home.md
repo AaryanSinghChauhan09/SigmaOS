@@ -237,6 +237,14 @@ Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
 
 ---
 
+# SigmaOS Zenith (v15.2 - Release Microkernel)
+
+The Sovereign Industrial Microkernel.
+
+This branch represents the core modular microkernel layout of SigmaOS, structured to align with established Linux distribution layouts for robustness, isolation, and silicon-direct execution.
+
+---
+
 ## 🏛️ Design Specification & Architecture Layers
 
 SigmaOS is organized into isolated functional layers to guarantee complete safety and hardware-isolation boundary conditions:
