@@ -1,26 +1,22 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub type EventID = usize;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum LogFormat {
+    JSON,
     Text,
-    Json,
     Binary,
 }
 
-#[repr(usize)]
+pub type EventID = usize;
+
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
     Authentication = 0,
@@ -76,7 +72,14 @@ impl AuditEvent for SimpleAuditEvent {
         self.id
     }
     fn event_type(&self) -> EventType {
-        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
+        let val = self.event_type.load(Ordering::SeqCst);
+        match val {
+            0 => EventType::Authentication,
+            1 => EventType::Authorization,
+            2 => EventType::FileAccess,
+            3 => EventType::SystemChange,
+            _ => EventType::Authentication,
+        }
     }
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
@@ -133,7 +136,7 @@ impl AuditLogger for SimpleAuditLogger {
     fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
         let mut ids = Vec::new();
         for event_option in &self.events {
-            if let Some(ref event) = event_option {
+            if let Some(ref event) = *event_option {
                 if event.event_type() == event_type && event.user_id() == user_id {
                     ids.push(event.id());
                 }
@@ -193,4 +196,116 @@ impl AuditPolicy for SimpleAuditPolicy {
             Err(AuditError::InvalidEvent)
         }
     }
+}
+
+use core::ops::{Index, IndexMut};
+
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

@@ -10,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type ContainerID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -20,7 +20,7 @@ pub enum ContainerState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ContainerError {
     Success = 0,
     InvalidConfig = 1,
@@ -72,12 +72,14 @@ impl Container for SimpleContainer {
         &self.name[..len]
     }
     fn state(&self) -> ContainerState {
-        match self.state.load(Ordering::SeqCst) {
+        let val = self.state.load(Ordering::SeqCst);
+        match val {
             0 => ContainerState::Created,
             1 => ContainerState::Running,
             2 => ContainerState::Paused,
             3 => ContainerState::Stopped,
-            _ => ContainerState::Deleting,
+            4 => ContainerState::Deleting,
+            _ => ContainerState::Created,
         }
     }
 
@@ -326,8 +328,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut *self.oci_spec.containers {
-            if let Some(ref mut container) = container_option {
+        for container_option in &mut self.oci_spec.containers {
+            if let Some(ref mut container) = *container_option {
                 if container.id() == id {
                     return container.start();
                 }
@@ -337,8 +339,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut *self.oci_spec.containers {
-            if let Some(ref mut container) = container_option {
+        for container_option in &mut self.oci_spec.containers {
+            if let Some(ref mut container) = *container_option {
                 if container.id() == id {
                     return container.stop();
                 }
@@ -362,8 +364,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &*self.oci_spec.containers {
-            if let Some(ref container) = container_option {
+        for container_option in &self.oci_spec.containers {
+            if let Some(ref container) = *container_option {
                 ids.push(container.id());
             }
         }
@@ -371,31 +373,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 }
 
+use core::ops::{Index, IndexMut};
+
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
 }
 
 impl<T> Vec<T> {
@@ -406,6 +389,7 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
+
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -417,7 +401,23 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn clone(&self) -> Vec<T> {
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
+    fn clone(&self) -> Vec<T>
+    where
+        T: Copy,
+    {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
             unsafe {
@@ -427,6 +427,7 @@ impl<T> Vec<T> {
         }
         new_vec
     }
+
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
@@ -437,6 +438,7 @@ impl<T> Vec<T> {
             item
         }
     }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -457,20 +459,41 @@ impl<T> Vec<T> {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
 }
 
-#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

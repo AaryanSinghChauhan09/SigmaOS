@@ -1,0 +1,567 @@
+    Checking sigmaos v0.1.0 (/app)
+error[E0252]: the name `PackageFormatAdapter` is defined multiple times
+   --> src/lib.rs:121:63
+    |
+ 94 | ...yResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    |               -------------------- previous import of the trait `PackageFormatAdapter` here
+...
+121 | ...on, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageM...
+    |                                 ^^^^^^^^^^^^^^^^^^^^ `PackageFormatAdapter` reimported here
+    |
+    = note: `PackageFormatAdapter` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+    |
+121 |     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter as OtherPackageFormatAdapter, UniversalPackageManager, AdapterError,
+    |                                                                                    ++++++++++++++++++++++++++++
+
+error[E0252]: the name `UniversalPackageManager` is defined multiple times
+   --> src/lib.rs:121:85
+    |
+ 95 | ...e, UniversalPackageManager,
+    |       ----------------------- previous import of the type `UniversalPackageManager` here
+...
+121 | ...ion, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, A...
+    |                                                        ^^^^^^^^^^^^^^^^^^^^^^^ `UniversalPackageManager` reimported here
+    |
+    = note: `UniversalPackageManager` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+    |
+121 |     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager as OtherUniversalPackageManager, AdapterError,
+    |                                                                                                             +++++++++++++++++++++++++++++++
+
+error[E0432]: unresolved import `qubes_isolation`
+  --> src/security/mod.rs:70:9
+   |
+70 | pub use qubes_isolation::{
+   |         ^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `qubes_isolation`
+   |
+help: to make use of source file src/security/qubes_isolation.rs, use `mod qubes_isolation` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod qubes_isolation;
+   |
+
+error[E0432]: unresolved import `audit::LogFormat`
+  --> src/security/mod.rs:26:43
+   |
+26 | pub use audit::{AuditLogger, AuditPolicy, LogFormat};
+   |                                           ^^^^^^^^^ no `LogFormat` in `security::audit`
+
+warning: unused import: `std::collections::HashMap`
+ --> src/automation/ai_optimizer.rs:4:5
+  |
+4 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/compatibility/constellation_mesh.rs:5:5
+  |
+5 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/compatibility/constellation_mesh.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/container/runtime.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `self`
+ --> src/driver/device.rs:8:17
+  |
+8 | use core::ptr::{self, NonNull};
+  |                 ^^^^
+
+warning: unused import: `AtomicU32`
+ --> src/kernel/memory.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+  |                          ^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/observability/stack.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `std::path::PathBuf`
+ --> src/productivity/notes.rs:5:5
+  |
+5 | use std::path::PathBuf;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Duration`
+ --> src/productivity/screen_recorder.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> src/productivity/sigma_office.rs:17:5
+   |
+17 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `Instant`
+ --> src/productivity/tasks.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^  ^^^^^^^
+
+warning: unused import: `alloc::vec::Vec`
+ --> src/security/cleaner.rs:4:5
+  |
+4 | use alloc::vec::Vec;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/integrity.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/mac.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/secrets.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `CapabilityToken`
+  --> src/security/sigma_pledge.rs:16:19
+   |
+16 | use sigma_types::{CapabilityToken, Result};
+   |                   ^^^^^^^^^^^^^^^
+
+warning: unused import: `CapabilityToken`
+  --> src/security/sigma_unveil.rs:15:19
+   |
+15 | use sigma_types::{CapabilityToken, Result};
+   |                   ^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/sigpkg/spec.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+  --> src/sigpkg/spec.rs:10:26
+   |
+10 | use core::sync::atomic::{AtomicUsize, Ordering};
+   |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `ParseError`
+ --> src/sigpkg/universal_adapter.rs:4:70
+  |
+4 | ...ersionConstraint, Dependency, ParseError};
+  |                                  ^^^^^^^^^^
+
+warning: unused imports: `PackageFormatAdapter` and `UniversalPackageManager`
+   --> src/lib.rs:121:63
+    |
+121 | ...ENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    |               ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/container/oci_runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: crate-level attribute should be in the root module
+ --> src/container/runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/device/manager.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/driver/device.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/driver/framework.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/filesystem/support.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/observability/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/remote/desktop.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/remote/shell.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/audit.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/integrity.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/mac.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/pki.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/secrets.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/vulnerability.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/shell/command.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/sigpkg/spec.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/oci_runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/device/manager.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/driver/device.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/driver/framework.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/complete_filesystems.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/support.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/generation_manager.rs:5:1
+  |
+5 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/gap_closing.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/observability/stack.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/remote/desktop.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/remote/shell.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/audit.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/capability_enforcer.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/capability_token.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/cleaner.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/forensics.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/integrity.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/mac.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/pki.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/scanner.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/secrets.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/selinux.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/vulnerability.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/shell/command.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/sigpkg/spec.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/sigpkg/zero_alloc_resolver.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/virtualization/namespaces.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: unused variable: `action`
+   --> src/automation/orchestrator.rs:327:27
+    |
+327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/compatibility/endeavour.rs:158:13
+    |
+158 |         let mut words: Vec<String> = sanitized
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `pid`
+   --> src/dashboard/process.rs:288:38
+    |
+288 | ...xecute_action(&mut self, pid: u32, action: ProcessAction) -> Result<...
+    |                             ^^^ help: if this is intentional, prefix it with an underscore: `_pid`
+
+warning: unused variable: `data`
+  --> src/drivers/usb_hid.rs:64:63
+   |
+64 | ...ort_type: HidReportType, data: &[u8]) -> Result<(), HidError> {
+   |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_data`
+
+warning: unused variable: `path`
+   --> src/filesystem/disk_usage.rs:211:36
+    |
+211 |     pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
+    |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `new_offset`
+   --> src/filesystem/vfs.rs:168:13
+    |
+168 |         let new_offset = file_descriptor
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_offset`
+
+warning: unused variable: `arguments`
+   --> src/orchestration/cross_device.rs:392:17
+    |
+392 |                 arguments,
+    |                 ^^^^^^^^^ help: try ignoring the field: `arguments: _`
+
+warning: unused variable: `font_size`
+   --> src/productivity/sigma_office.rs:405:43
+    |
+405 | ...ext(&self, text: &str, font_size: u32, position: (f32, f32)) -> Resu...
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_font_size`
+
+warning: unused variable: `position`
+   --> src/productivity/sigma_office.rs:405:59
+    |
+405 | ... &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_position`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:485:49
+    |
+485 | ...t(&self, doc_idx: usize, path: &str) -> Result<()> {
+    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:495:37
+    |
+495 |     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
+    |                                     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `context`
+   --> src/resilience/self_healing.rs:101:9
+    |
+101 |         context: &HashMap<String, String>,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
+
+warning: unused variable: `config`
+   --> src/security/vpn.rs:109:27
+    |
+109 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> src/security/vpn.rs:218:27
+    |
+218 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `meta`
+   --> src/sigpkg/rpm_compat.rs:114:46
+    |
+114 | ...roducible_package(&self, meta: &SpecMetadata) -> Result<[u8; 32], &'...
+    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_meta`
+
+warning: unused variable: `format_name`
+   --> src/sigpkg/universal_adapter.rs:376:14
+    |
+376 |         for (format_name, adapter) in &self.adapters {
+    |              ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_format_name`
+
+Some errors have detailed explanations: E0252, E0432.
+For more information about an error, try `rustc --explain E0252`.
+warning: `sigmaos` (lib) generated 84 warnings
+error: could not compile `sigmaos` (lib) due to 4 previous errors; 84 warnings emitted

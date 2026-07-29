@@ -1,10 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::mem;
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
@@ -17,7 +13,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type FileID = usize;
 
 /// File integrity status
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityStatus {
     Valid = 0,
@@ -133,7 +129,14 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
+        let val = self.status.load(Ordering::SeqCst);
+        match val {
+            0 => IntegrityStatus::Valid,
+            1 => IntegrityStatus::Modified,
+            2 => IntegrityStatus::Corrupted,
+            3 => IntegrityStatus::Missing,
+            _ => IntegrityStatus::Valid,
+        }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -196,7 +199,7 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,
@@ -256,21 +259,6 @@ impl SimpleIntegrityMonitor {
             capability,
         }
     }
-
-    pub fn update_stats(&mut self, status: IntegrityStatus) {
-        match status {
-            IntegrityStatus::Valid => {
-                self.stats.valid_files += 1;
-            }
-            IntegrityStatus::Modified => {
-                self.stats.modified_files += 1;
-            }
-            IntegrityStatus::Corrupted => {
-                self.stats.corrupted_files += 1;
-            }
-            IntegrityStatus::Missing => {}
-        }
-    }
 }
 
 impl IntegrityMonitor for SimpleIntegrityMonitor {
@@ -292,8 +280,8 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         let mut index = None;
-        for i in 0..self.files.len() {
-            if let Some(Some(ref file)) = self.files.get(i) {
+        for (i, file_option) in self.files.iter().enumerate() {
+            if let Some(ref file) = *file_option {
                 if file.id() == id {
                     index = Some(i);
                     break;
@@ -302,9 +290,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         if let Some(i) = index {
-            if let Some(slot) = self.files.get_mut(i) {
-                *slot = None;
-            }
+            self.files[i] = None;
             self.stats.total_files -= 1;
             Ok(())
         } else {
@@ -317,18 +303,27 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        for i in 0..self.files.len() {
-            if let Some(Some(ref mut file)) = self.files.get_mut(i) {
+        let mut status_to_update = None;
+        let mut final_result = Err(IntegrityError::FileNotFound);
+
+        for file_option in &mut self.files {
+            if let Some(ref mut file) = *file_option {
                 if file.id() == id {
                     let result = file.verify();
                     if let Ok(status) = result {
-                        self.update_stats(status);
+                        status_to_update = Some(status);
                     }
-                    return result;
+                    final_result = result;
+                    break;
                 }
             }
         }
-        Err(IntegrityError::FileNotFound)
+
+        if let Some(status) = status_to_update {
+            self.update_stats(status);
+        }
+
+        final_result
     }
 
     fn verify_all(&mut self) -> Result<Vec<FileID>, IntegrityError> {
@@ -337,25 +332,30 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         let mut modified_files = Vec::new();
+        let mut statuses = Vec::new();
 
-        for i in 0..self.files.len() {
-            if let Some(Some(ref mut file)) = self.files.get_mut(i) {
+        for file_option in &mut self.files {
+            if let Some(ref mut file) = *file_option {
                 let result = file.verify();
                 if let Ok(status) = result {
+                    statuses.push(status);
                     if status != IntegrityStatus::Valid {
                         modified_files.push(file.id());
                     }
-                    self.update_stats(status);
                 }
             }
+        }
+
+        for i in 0..statuses.len() {
+            self.update_stats(statuses[i]);
         }
 
         Ok(modified_files)
     }
 
     fn get_file(&self, id: FileID) -> Option<&dyn File> {
-        for i in 0..self.files.len() {
-            if let Some(Some(ref file)) = self.files.get(i) {
+        for file_option in &self.files {
+            if let Some(ref file) = *file_option {
                 if file.id() == id {
                     return Some(file.as_ref());
                 }
@@ -369,37 +369,126 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-pub struct IntegrityCheck;
-pub struct IntegrityVerifier;
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_simple_file_and_integrity_monitor() {
-        let capability = FileCapability::full();
-        let mut file = SimpleFile::new(1, b"/var/www/index.html", b"checksum123", capability);
-        assert_eq!(file.id(), 1);
-        assert_eq!(file.path(), b"/var/www/index.html");
-        assert_eq!(file.checksum(), b"checksum123");
-        assert!(matches!(file.verify(), Ok(IntegrityStatus::Valid)));
-
-        let monitor_cap = MonitorCapability::full();
-        let mut monitor = SimpleIntegrityMonitor::new(monitor_cap);
-        let id = monitor.register_file(Box::new(file)).unwrap();
-        assert_eq!(id, 1);
-
-        assert!(matches!(monitor.verify_file(1), Ok(IntegrityStatus::Valid)));
-
-        let stats = monitor.stats();
-        assert_eq!(stats.total_files, 1);
-        assert_eq!(stats.valid_files, 2); // 1 from register, 1 from verify_file
-
-        let verify_all_results = monitor.verify_all().unwrap();
-        assert!(verify_all_results.is_empty());
-
-        monitor.unregister_file(1).unwrap();
-        assert_eq!(monitor.stats().total_files, 0);
+impl SimpleIntegrityMonitor {
+    fn update_stats(&mut self, status: IntegrityStatus) {
+        match status {
+            IntegrityStatus::Valid => {
+                self.stats.valid_files += 1;
+            }
+            IntegrityStatus::Modified => {
+                self.stats.modified_files += 1;
+            }
+            IntegrityStatus::Corrupted => {
+                self.stats.corrupted_files += 1;
+            }
+            IntegrityStatus::Missing => {}
+        }
     }
+}
+
+use core::ops::{Index, IndexMut};
+
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

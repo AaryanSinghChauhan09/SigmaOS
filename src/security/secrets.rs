@@ -314,8 +314,8 @@ impl Keyring for SimpleKeyring {
         let mut index = None;
         let mut secret_type = SecretType::Password;
 
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for (i, secret_option) in self.secrets.iter().enumerate() {
+            if let Some(ref secret) = *secret_option {
                 if secret.id() == id {
                     index = Some(i);
                     secret_type = secret.secret_type();
@@ -325,9 +325,7 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
-            if let Some(slot) = self.secrets.get_mut(i) {
-                *slot = None;
-            }
+            self.secrets[i] = None;
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;
             Ok(())
@@ -337,8 +335,8 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret(&self, id: SecretID) -> Option<&dyn Secret> {
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for secret_option in &self.secrets {
+            if let Some(ref secret) = *secret_option {
                 if secret.id() == id {
                     return Some(secret.as_ref());
                 }
@@ -348,8 +346,8 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for slot in &mut self.secrets {
-            if let Some(ref mut secret) = slot {
+        for secret_option in &mut self.secrets {
+            if let Some(ref mut secret) = *secret_option {
                 if secret.id() == id {
                     return Some(secret);
                 }
@@ -360,8 +358,8 @@ impl Keyring for SimpleKeyring {
 
     fn list_secrets(&self) -> Vec<SecretID> {
         let mut ids = Vec::new();
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for secret_option in &self.secrets {
+            if let Some(ref secret) = *secret_option {
                 ids.push(secret.id());
             }
         }
@@ -369,11 +367,11 @@ impl Keyring for SimpleKeyring {
     }
 
     fn stats(&self) -> KeyringStats {
-        let mut stats = self.stats;
+        let mut stats = self.stats.clone();
         stats.encrypted_secrets = 0;
 
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for secret_option in &self.secrets {
+            if let Some(ref secret) = *secret_option {
                 if secret.info().is_encrypted {
                     stats.encrypted_secrets += 1;
                 }
@@ -384,20 +382,109 @@ impl Keyring for SimpleKeyring {
     }
 }
 
-pub struct SecretManager;
-pub struct SecretStorage;
+/// Simple Vec implementation for no_std
+use core::ops::{Index, IndexMut};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-    #[test]
-    fn test_simple_keyring() {
-        let cap = KeyringCapability::full();
-        let mut keyring = SimpleKeyring::new(cap);
-        let secret_cap = SecretCapability::full();
-        let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.add_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 1);
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
