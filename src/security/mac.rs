@@ -3,6 +3,8 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
@@ -10,8 +12,6 @@ use core::mem;
 /// Based on Roadmap Item 62: Mandatory access control
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 /// Security context ID
 pub type ContextID = usize;
@@ -438,4 +438,3 @@ impl MACEngine for SimpleMACEngine {
 pub use MACPolicy as MacPolicy;
 pub struct MacRule;
 pub struct MacSecurity;
-

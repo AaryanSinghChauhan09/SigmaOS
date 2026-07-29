@@ -3,13 +3,13 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Remote Desktop for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 956
 /// Implements remote desktop access
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type SessionID = usize;
 
@@ -67,7 +67,9 @@ impl RemoteSession for SimpleRemoteSession {
         let len = self.host.iter().position(|&b| b == 0).unwrap_or(128);
         &self.host[..len]
     }
-    fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> SessionState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
     fn set_state(&self, state: SessionState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -181,4 +183,3 @@ impl ScreenSharing for SimpleScreenSharing {
         self.sharing.load(Ordering::SeqCst) == 1
     }
 }
-

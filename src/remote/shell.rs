@@ -3,13 +3,13 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Remote Shell for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966
 /// Implements remote shell access
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type ShellID = usize;
 
@@ -171,4 +171,3 @@ impl FileTransfer for SimpleFileTransfer {
         }
     }
 }
-

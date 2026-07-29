@@ -11,8 +11,9 @@ pub use orchestration::{
 };
 
 pub use container::{
-    ContainerConfig as VirtContainerConfig, ContainerError, ContainerInfo, ContainerRuntime, ContainerRuntimeManager,
-    ContainerState as VirtContainerState, ContainerStats, DockerRuntime, NetworkMode, PodmanRuntime, PortMapping,
-    PortProtocol, ResourceLimits, RestartPolicy, VolumeMapping,
+    ContainerConfig as VirtContainerConfig, ContainerError, ContainerInfo, ContainerRuntime,
+    ContainerRuntimeManager, ContainerState as VirtContainerState, ContainerStats, DockerRuntime,
+    NetworkMode, PodmanRuntime, PortMapping, PortProtocol, ResourceLimits, RestartPolicy,
+    VolumeMapping,
 };
 pub use namespaces::{Namespace, NamespaceData, NamespaceManager, NamespaceType};

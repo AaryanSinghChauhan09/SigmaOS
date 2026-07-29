@@ -66,7 +66,9 @@ impl Device for SimpleDevice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn device_class(&self) -> DeviceClass { unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst) as u32) } }
+    fn device_class(&self) -> DeviceClass {
+        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst) as u32) }
+    }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
         Ok(())

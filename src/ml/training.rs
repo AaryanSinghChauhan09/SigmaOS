@@ -3,24 +3,31 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::mem;
 /// OOP-based ML Training for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 936
 /// Implements model training and optimization
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type TrainingID = usize;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
+pub enum OptimizerType {
+    SGD = 0,
+    Adam = 1,
+    RMSProp = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum TrainingError { Success = 0, InvalidData = 1, ConvergenceFailed = 2 }
+pub enum TrainingError {
+    Success = 0,
+    InvalidData = 1,
+    ConvergenceFailed = 2,
+}
 
 pub trait TrainingSession {
     fn id(&self) -> TrainingID;
@@ -49,10 +56,18 @@ impl SimpleTrainingSession {
 }
 
 impl TrainingSession for SimpleTrainingSession {
-    fn id(&self) -> TrainingID { self.id }
-    fn epoch(&self) -> usize { self.epoch.load(Ordering::SeqCst) }
-    fn loss(&self) -> f32 { self.loss.load(Ordering::SeqCst) as f32 }
-    fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
+    fn id(&self) -> TrainingID {
+        self.id
+    }
+    fn epoch(&self) -> usize {
+        self.epoch.load(Ordering::SeqCst)
+    }
+    fn loss(&self) -> f32 {
+        self.loss.load(Ordering::SeqCst) as f32
+    }
+    fn is_complete(&self) -> bool {
+        self.complete.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait Optimizer {
@@ -78,11 +93,16 @@ impl SimpleOptimizer {
 }
 
 impl Optimizer for SimpleOptimizer {
-    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst)) } }
-    fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
+    fn optimizer_type(&self) -> OptimizerType {
+        unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst)) }
+    }
+    fn learning_rate(&self) -> f32 {
+        (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0
+    }
 
     fn set_learning_rate(&mut self, rate: f32) {
-        self.learning_rate.store((rate * 10000.0) as usize, Ordering::SeqCst);
+        self.learning_rate
+            .store((rate * 10000.0) as usize, Ordering::SeqCst);
     }
 
     fn update(&mut self, weights: &mut [f32], gradients: &[f32]) {
@@ -95,7 +115,12 @@ impl Optimizer for SimpleOptimizer {
 
 pub trait Trainer {
     fn create_session(&mut self) -> Result<TrainingID, TrainingError>;
-    fn train_step(&mut self, session_id: TrainingID, inputs: &[f32], targets: &[f32]) -> Result<(), TrainingError>;
+    fn train_step(
+        &mut self,
+        session_id: TrainingID,
+        inputs: &[f32],
+        targets: &[f32],
+    ) -> Result<(), TrainingError>;
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession>;
 }
 
@@ -124,7 +149,12 @@ impl Trainer for SimpleTrainer {
         Ok(id)
     }
 
-    fn train_step(&mut self, session_id: TrainingID, inputs: &[f32], targets: &[f32]) -> Result<(), TrainingError> {
+    fn train_step(
+        &mut self,
+        session_id: TrainingID,
+        inputs: &[f32],
+        targets: &[f32],
+    ) -> Result<(), TrainingError> {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = session_option {
                 if session.id() == session_id {
@@ -137,7 +167,9 @@ impl Trainer for SimpleTrainer {
                     }
                     loss /= inputs.len() as f32;
 
-                    session.loss.store((loss * 10000.0) as usize, Ordering::SeqCst);
+                    session
+                        .loss
+                        .store((loss * 10000.0) as usize, Ordering::SeqCst);
 
                     if epoch >= 1000 {
                         session.complete.store(1, Ordering::SeqCst);
@@ -153,7 +185,9 @@ impl Trainer for SimpleTrainer {
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
         for session_option in &self.sessions {
             if let Some(ref session) = session_option {
-                if session.id() == id { return Some(session.as_ref()); }
+                if session.id() == id {
+                    return Some(session.as_ref());
+                }
             }
         }
         None
@@ -184,7 +218,9 @@ impl SimpleDataLoader {
 }
 
 impl DataLoader for SimpleDataLoader {
-    fn batch_size(&self) -> usize { self.batch_size.load(Ordering::SeqCst) }
+    fn batch_size(&self) -> usize {
+        self.batch_size.load(Ordering::SeqCst)
+    }
 
     fn next_batch(&mut self) -> Option<(Vec<f32>, Vec<f32>)> {
         let batch_size = self.batch_size();
@@ -212,4 +248,3 @@ impl DataLoader for SimpleDataLoader {
         self.index.store(0, Ordering::SeqCst);
     }
 }
-
