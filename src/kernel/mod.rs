@@ -1,46 +1,54 @@
 // SigmaOS Kernel Module
-pub mod breakthroughs;
-pub mod gap_closing;
-pub mod generation_manager;
-pub mod ipc;
+pub mod bus;
+pub mod device;
+pub mod driver;
 pub mod memory;
+pub mod object;
+pub mod performance;
+pub mod roundrobin;
+pub mod scheduler;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
+pub mod breakthroughs;
+pub mod ipc;
 pub mod linux_absorb;
+pub mod vfs;
 pub mod subsystem;
-pub mod bus;
-pub mod roundrobin;
-pub mod scheduler;
-pub mod object;
+pub mod traits;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
 };
 pub use bus::{Bus, PciBus, UsableBus};
-pub use crate::container::runtime::oci::{
+pub use crate::container::runtime::{
     Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
     ResourceConfig, Runtime,
 };
-pub use generation_manager::{Generation, GenerationManager};
+pub use device::{Device, DeviceBinding, DeviceManager, DeviceType, DriverError, DriverMetadata};
+pub use driver::{Driver, DriverRegistration, DriverRegistry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use gap_closing::{
-    GapError, Pml4PageTableEntry, VirtualMemoryPagingManager, IrqRoutingTable,
-    AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
-};
-pub use crate::unimplemented_features::{
-    UniversalAbiTranslator, SelfHealingKernel, AiNativeRuntime, EnergyAwareScheduler,
-    UserDefinedKernelFunctions, PrivacyFirstSandbox, SigmaFsPlus as SigmaFsPlusPlus,
+pub use linux_absorb::{
+    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
+    ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
+    SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use meta::{
-    ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
-    MetaKernel, MicroDriver, NetPod,
-};
-pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
-pub use policy_mechanism::{
-    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
-    ResourceBroker,
-};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use meta::{
+    MetaKernel, KernelPersona, KernelPlugin, KernelPluginManager, MicroDriver,
+    ABIManager, NetPod, KernelGraph, LegacyScheduler,
+};
+pub use paging::{
+    PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2,
+};
+pub use policy_mechanism::{
+    ResourceBroker, PolicyManager, ProtectionDomain, InterruptMechanism, FastPathIpc,
+    PrivilegeLevel, PolicyError,
+};
+pub use breakthroughs::{
+    UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
+    EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
+};

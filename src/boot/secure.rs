@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+use crate::klib::Vec;
+use core::ops::{Deref, DerefMut};
 
 /// OOP-based Secure Boot Validation for SigmaOS
 /// Implements secure boot using OOP principles with traits and structs
@@ -15,7 +15,7 @@ pub type ComponentID = usize;
 
 /// Component type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentType {
     Kernel = 0,
     Bootloader = 1,
@@ -25,7 +25,7 @@ pub enum ComponentType {
 
 /// Validation status
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ValidationStatus {
     Valid = 0,
     Invalid = 1,
@@ -152,9 +152,15 @@ impl SimpleComponent {
     }
 
     pub fn get_status(&self) -> ValidationStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst))
+        {
+        let raw = self.status.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => ValidationStatus::Invalid,
+            2 => ValidationStatus::Pending,
+            3 => ValidationStatus::Failed,
+            _ => ValidationStatus::Valid,
         }
+    }
     }
 
     pub fn set_status(&self, status: ValidationStatus) {
@@ -223,6 +229,7 @@ pub trait SecureBootValidator {
 
 /// Secure boot statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SecureBootStats {
     pub total_components: usize,
     pub valid_components: usize,
@@ -331,18 +338,26 @@ impl SecureBootValidator for SimpleSecureBootValidator {
             return Err(SecureBootError::PermissionDenied);
         }
 
-        for component_option in &mut self.components {
+        let mut status_to_update = None;
+        let mut result = Err(SecureBootError::ComponentNotFound);
+
+        for component_option in &mut *self.components {
             if let Some(ref mut component) = *component_option {
                 if component.id() == id {
-                    let result = component.validate();
-                    if let Ok(status) = result {
-                        self.update_stats(status);
+                    result = component.validate();
+                    if let Ok(ref status) = result {
+                        status_to_update = Some(*status);
                     }
-                    return result;
+                    break;
                 }
             }
         }
-        Err(SecureBootError::ComponentNotFound)
+
+        if let Some(status) = status_to_update {
+            self.update_stats(status);
+        }
+
+        result
     }
 
     fn validate_all(&mut self) -> Result<Vec<ComponentID>, SecureBootError> {
@@ -351,24 +366,29 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         }
 
         let mut invalid_components = Vec::new();
+        let mut statuses_to_update = Vec::new();
 
-        for component_option in &mut self.components {
+        for component_option in &mut *self.components {
             if let Some(ref mut component) = *component_option {
                 let result = component.validate();
-                if let Ok(status) = result {
-                    if status != ValidationStatus::Valid {
+                if let Ok(ref status) = result {
+                    if *status != ValidationStatus::Valid {
                         invalid_components.push(component.id());
                     }
-                    self.update_stats(status);
+                    statuses_to_update.push(*status);
                 }
             }
+        }
+
+        for status in &*statuses_to_update {
+            self.update_stats(*status);
         }
 
         Ok(invalid_components)
     }
 
     fn get_component(&self, id: ComponentID) -> Option<&dyn Component> {
-        for component_option in &self.components {
+        for component_option in &*self.components {
             if let Some(ref component) = *component_option {
                 if component.id() == id {
                     return Some(component.as_ref());
@@ -381,7 +401,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     fn list_components(&self, component_type: ComponentType) -> Vec<ComponentID> {
         let mut ids = Vec::new();
 
-        for component_option in &self.components {
+        for component_option in &*self.components {
             if let Some(ref component) = *component_option {
                 if component.component_type() == component_type {
                     ids.push(component.id());
@@ -414,60 +434,3 @@ impl SimpleSecureBootValidator {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}

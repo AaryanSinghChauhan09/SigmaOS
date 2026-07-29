@@ -249,7 +249,7 @@ impl FilesystemManager for SimpleFilesystemManager {
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
         for fs_option in &self.filesystems {
             if let Some(ref fs) = *fs_option {
-                if fs.id() == id {
+                if (**fs).id() == id {
                     return Some(fs.as_ref());
                 }
             }
@@ -261,7 +261,7 @@ impl FilesystemManager for SimpleFilesystemManager {
         let mut ids = Vec::new();
         for fs_option in &self.filesystems {
             if let Some(ref fs) = *fs_option {
-                ids.push(fs.id());
+                ids.push((**fs).id());
             }
         }
         ids
@@ -330,6 +330,25 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("Index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("Index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
     }
 }
 

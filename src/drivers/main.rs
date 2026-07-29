@@ -1,11 +1,8 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-<<<<<<< HEAD
-=======
-// SigmaOS Drivers Main Entry Point
->>>>>>> origin/jules-15532892492441614180-73ce6847
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
+#![allow(clippy::all, unused)]
 
 // SigmaOS Drivers Main Entry Point
 

@@ -1,5 +1,4 @@
 // SigmaOS Productivity Module
-pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
 pub mod notes;
@@ -8,13 +7,7 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
-pub mod tmux;
 
-pub use advanced_app_absorber::{
-    AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
-    NotepadPlusWorkspace, ObsStudioMixer, OneCommanderDualPane, PotPlayerVlcEngine,
-    SevenZipCompressor, ShareXFlameshotEngine,
-};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -44,7 +37,4 @@ pub use tasks::{
 pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
-};
-pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
