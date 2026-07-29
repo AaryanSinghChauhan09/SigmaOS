@@ -136,7 +136,7 @@ impl PKIManager for SimplePKIManager {
 
     fn verify_certificate(&self, id: CertificateID, _issuer_id: CertificateID) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
-            if self.revoked.contains(id) {
+            if self.revoked.contains(&id) {
                 return Ok(false);
             }
             Ok(cert.is_valid())
