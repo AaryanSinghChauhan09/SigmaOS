@@ -7,16 +7,16 @@ pub mod memory;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
-pub mod linux_absorb;
-pub mod subsystem;
+pub mod roundrobin;
+pub mod scheduler;
 
-pub use crate::boot::firmware::{
-    BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
-pub use bus::{Bus, PciBus, UsableBus};
-pub use crate::container::runtime::oci::{
-    Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
-    ResourceConfig, Runtime,
+pub use gap_closing::{
+    AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
+    Pml4PageTableEntry, VirtualMemoryPagingManager,
 };
 pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};

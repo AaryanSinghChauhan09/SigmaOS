@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
 /// OOP-based Container Runtime Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 17
@@ -7,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type ContainerID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -68,7 +71,9 @@ impl Container for SimpleContainer {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ContainerState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
+    fn state(&self) -> ContainerState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
 
     fn start(&mut self) -> Result<(), ContainerError> {
         self.state

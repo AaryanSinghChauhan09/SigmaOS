@@ -9,7 +9,7 @@ pub use linux_translation::{
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageError, PackageFormat, PackageFormatAdapter,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use store::{
