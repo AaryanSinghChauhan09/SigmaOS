@@ -1,5 +1,6 @@
 // SigmaOS Observability Module
 pub mod stack;
+pub mod profiler;
 
 pub use stack::{
     Metric, MetricCapability, MetricID, MetricInfo, MetricType, ObservabilityError,

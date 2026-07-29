@@ -570,3 +570,143 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
+extern crate alloc as alloc_crate;
+use alloc_crate::string::String;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalPackageType {
+    Apt,
+    Rpm,
+    Pacman,
+    Snap,
+    Nix,
+    Ebuild,
+    Apk,
+    Flatpak,
+    Txz,
+    Xbps,
+    Cachyos,
+}
+
+pub trait UniversalPackage {
+    fn package_type(&self) -> UniversalPackageType;
+    fn install(&self) -> Result<(), PackageError>;
+}
+
+pub struct UserDefinedPackageHook {
+    pub name: String,
+    pub hook_type: u32,
+}
+
+impl UserDefinedPackageHook {
+    pub fn new(name: String, hook_type: u32) -> Self {
+        Self { name, hook_type }
+    }
+}
+
+pub struct AptPackageAdapter;
+impl UniversalPackage for AptPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Apt }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct PacmanPackageAdapter;
+impl UniversalPackage for PacmanPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Pacman }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct SnapPackageAdapter;
+impl UniversalPackage for SnapPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Snap }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct NixPackageAdapter;
+impl UniversalPackage for NixPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Nix }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct EbuildPackageAdapter;
+impl UniversalPackage for EbuildPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Ebuild }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct ApkPackageAdapter;
+impl UniversalPackage for ApkPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Apk }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct FlatpakPackageAdapter;
+impl UniversalPackage for FlatpakPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Flatpak }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct TxzPackageAdapter;
+impl UniversalPackage for TxzPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Txz }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct XbpsPackageAdapter;
+impl UniversalPackage for XbpsPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Xbps }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct CachyosPackageAdapter;
+impl UniversalPackage for CachyosPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Cachyos }
+    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+}
+
+pub struct PackageAdapterFactory;
+impl PackageAdapterFactory {
+    pub fn create_adapter(ty: UniversalPackageType) -> Box<dyn UniversalPackage> {
+        match ty {
+            UniversalPackageType::Apt => Box::new(AptPackageAdapter),
+            UniversalPackageType::Pacman => Box::new(PacmanPackageAdapter),
+            UniversalPackageType::Snap => Box::new(SnapPackageAdapter),
+            UniversalPackageType::Nix => Box::new(NixPackageAdapter),
+            UniversalPackageType::Ebuild => Box::new(EbuildPackageAdapter),
+            UniversalPackageType::Apk => Box::new(ApkPackageAdapter),
+            UniversalPackageType::Flatpak => Box::new(FlatpakPackageAdapter),
+            UniversalPackageType::Txz => Box::new(TxzPackageAdapter),
+            UniversalPackageType::Xbps => Box::new(XbpsPackageAdapter),
+            UniversalPackageType::Cachyos => Box::new(CachyosPackageAdapter),
+            _ => Box::new(AptPackageAdapter),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CpuArchLevel {
+    V1,
+    V2,
+    V3,
+    V4,
+}
+
+pub struct CachyCpuDetector {
+    pub level: CpuArchLevel,
+}
+
+impl CachyCpuDetector {
+    pub fn new() -> Self {
+        Self { level: CpuArchLevel::V3 }
+    }
+    pub fn detect_level(&self) -> CpuArchLevel {
+        self.level
+    }
+}
+
+impl Default for CachyCpuDetector {
+    fn default() -> Self {
+        Self::new()
+    }
+}

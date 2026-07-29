@@ -108,3 +108,81 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct GopFramebuffer {
+    pub base_address: u64,
+    pub size: usize,
+    pub width: u32,
+    pub height: u32,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct AcpiParser;
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct UsbHostController;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicrokernelProfile {
+    Performance,
+    Security,
+    Minimalist,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiKernelBootSelector {
+    pub current_profile: MicrokernelProfile,
+}
+
+impl MultiKernelBootSelector {
+    pub fn new() -> Self {
+        Self {
+            current_profile: MicrokernelProfile::Performance,
+        }
+    }
+
+    pub fn select_profile(&mut self, profile: MicrokernelProfile) {
+        self.current_profile = profile;
+    }
+}
+
+impl Default for MultiKernelBootSelector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignBootWatchdog {
+    pub counter: AtomicUsize,
+}
+
+impl SovereignBootWatchdog {
+    pub fn new() -> Self {
+        Self {
+            counter: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn ping(&self) {
+        self.counter.fetch_add(1, Ordering::SeqCst);
+    }
+}
+
+impl Default for SovereignBootWatchdog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct GopSplashCanvas {
+    pub framebuffer: GopFramebuffer,
+}
+
+impl GopSplashCanvas {
+    pub fn new(fb: GopFramebuffer) -> Self {
+        Self { framebuffer: fb }
+    }
+
+    pub fn draw_pixel(&self, _x: u32, _y: u32, _color: u32) {}
+}

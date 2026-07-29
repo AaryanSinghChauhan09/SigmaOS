@@ -49,6 +49,7 @@ pub trait PageTableEntry {
     fn set_writable(&mut self, writable: bool);
     fn set_user_accessible(&mut self, user: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
+    fn set_cow(&mut self, cow: bool);
     fn is_huge(&self) -> bool { false }
     fn is_giant(&self) -> bool { false }
 }
@@ -161,6 +162,7 @@ pub trait VirtualMemoryManager {
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress>;
     fn handle_page_fault(&mut self, virt: VirtualAddress, error_code: usize) -> Result<(), PageFaultError>;
+    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
 }
 
 pub struct SimpleVMM {
@@ -650,6 +652,11 @@ impl ProcessMemory for SimpleProcessMemory {
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -672,6 +679,7 @@ impl<T> Vec<T> {
             self.capacity = new_capacity;
         }
     }
+}
 
     #[test]
     fn test_paging_and_cow() {
@@ -733,4 +741,3 @@ impl<T> Vec<T> {
         let res2 = vmm.map_large_page(virt_1gb, unaligned_phys, PageSize::Giant1GB, false, true);
         assert!(matches!(res2, Err(PageFaultError::InvalidAddress)));
     }
-}

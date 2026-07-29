@@ -2,6 +2,7 @@
 // Houses the core OOP designs for Kernel Constellations, Syscall Almanacs, Driver Archives,
 // Firmware Meshes, Build Codices, Security Constellations, and Peripheral Meshes.
 
+extern crate alloc;
 use crate::security::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -444,12 +445,12 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+// Allocator shim: uses alloc crate on hosted targets and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
+    use core::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    alloc::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

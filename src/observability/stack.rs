@@ -584,3 +584,32 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
+pub trait SigmaDebug {
+    fn log_debug(&self, msg: &str);
+}
+
+pub struct SimpleSigmaDebug;
+impl SigmaDebug for SimpleSigmaDebug {
+    fn log_debug(&self, _msg: &str) {}
+}
+
+pub trait SigmaMetrics {
+    fn record_metric(&self, name: &str, value: f64);
+}
+
+pub struct SimpleSigmaMetrics;
+impl SigmaMetrics for SimpleSigmaMetrics {
+    fn record_metric(&self, _name: &str, _value: f64) {}
+}
+
+pub trait SigmaTrace {
+    fn start_trace(&self, name: &str) -> TraceID;
+    fn end_trace(&self, id: TraceID);
+}
+
+pub struct SimpleSigmaTrace;
+impl SigmaTrace for SimpleSigmaTrace {
+    fn start_trace(&self, _name: &str) -> TraceID { 0 }
+    fn end_trace(&self, _id: TraceID) {}
+}

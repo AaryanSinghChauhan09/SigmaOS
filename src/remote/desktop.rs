@@ -72,6 +72,7 @@ pub trait RemoteDesktop {
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError>;
     fn send_input(&self, id: SessionID, input: &[u8]) -> Result<(), RemoteError>;
     fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError>;
+    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession>;
 }
 
 #[repr(C)]
@@ -226,4 +227,31 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct InputAuthGate;
+
+impl InputAuthGate {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PqcVideoCipher;
+
+impl PqcVideoCipher {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SigmaRendezvous;
+
+impl SigmaRendezvous {
+    pub fn new() -> Self {
+        Self
+    }
 }

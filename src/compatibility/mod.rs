@@ -8,6 +8,12 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
+pub mod endeavour;
+pub mod standards;
+
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -15,6 +21,8 @@ pub use legacy_adapters::{
     WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
     LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_WORKLOAD_OPTIMIZER,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
 
 pub use constellation_mesh::{

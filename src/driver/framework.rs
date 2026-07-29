@@ -23,12 +23,44 @@ pub enum DriverState {
     Active = 2,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverError {
+    InitializationFailed,
+    IoError,
+    InvalidOperation,
+    PermissionDenied,
+    DeviceNotFound,
+    BufferOverflow,
+    Timeout,
+    NotSupported,
+    LoadFailed,
+    UnloadFailed,
+}
+
 pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
+    fn set_state(&self, state: DriverState);
+    fn init(&mut self) -> Result<(), DriverError>;
+    fn probe(&mut self) -> Result<bool, DriverError>;
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
+}
+
+pub struct SimpleDriver {
+    pub id: DriverID,
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID { self.id }
+    fn driver_type(&self) -> DriverType { DriverType::Char }
+    fn state(&self) -> DriverState { DriverState::Loaded }
+    fn set_state(&self, _state: DriverState) {}
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
+    fn load(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn unload(&mut self) -> Result<(), DriverError> { Ok(()) }
 }
 
 pub trait StorageDriver: Driver {
