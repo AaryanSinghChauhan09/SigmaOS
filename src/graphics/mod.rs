@@ -4,19 +4,20 @@
 pub mod compositor;
 pub mod gpu_driver;
 pub mod image_decoder;
-pub mod zenith;
-pub mod zenith_compositor;
 pub mod raytracer;
 pub mod vector_engine;
 pub mod video_timeline;
+pub mod zenith;
+pub mod zenith_compositor;
 
 pub use raytracer::{Ray, Sphere, Vec3};
 pub use vector_engine::{PathCommand, Point2D, VectorPath};
 pub use video_timeline::{VideoClip, VideoTimeline, VideoTrack};
 
 pub use compositor::{
-    CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
-    RenderLayer, SigmaCompositor,
+    BitmapSurface, Color, Compositor, CompositorCapability, CompositorStats, GraphicsError,
+    Position, Rectangle, SimpleCompositor, SimpleWindow, Size, Surface, SurfaceCapability,
+    SurfaceInfo, Window, WindowCapability, WindowInfo,
 };
 pub use gpu_driver::{Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat};
 pub use image_decoder::{ColorSpace, DecodedImage, ImageDecoder, ImageFormat, ImageMetadata};

@@ -339,12 +339,16 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -384,6 +388,7 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

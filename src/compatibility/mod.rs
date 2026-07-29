@@ -7,10 +7,10 @@ pub mod standards;
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
     CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FhsConventionStatus, HtmlRendererCapability, LsbProfile,
-    MediaDecoderCapability, PosixComplianceLevel, StandardsComplianceManager,
+    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
+pub use standards::{FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager};
 pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
 pub use scosmos::{
     ApkLoader, BinaryFormat as ScosmosBinaryFormat, BinderCallType,

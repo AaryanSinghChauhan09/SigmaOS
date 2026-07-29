@@ -28,7 +28,7 @@ pub use dde::{
     UdfInterpreter, UnifiedPeripheral, WasmDriverVm, WindowsNdisWrapper,
 };
 pub use even_more_devices::{
-    AdLibSynthDriver, Bluetooth54Adapter, Bluetooth5_4_Adapter, Ne2000NetworkDriver,
+    AdLibSynthDriver, Bluetooth5_4_Adapter, Ne2000NetworkDriver,
     NvlinkBusDriver, PciIdeBridge, PcieGen6Bridge, Ps2MouseDriver, Sata3Controller,
     SerialMouseDriver, Ufs4StorageDriver, Usb4HostController, VgaTextModeDriver,
 };
@@ -36,10 +36,10 @@ pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use kernel_io_suite::{
-    AclPacket, AdLibSynth, AdLibSynthDriver as KernelAdLibSynth, AlsaError, AlsaSoundDriver,
+    AclPacket, AdLibSynth, AlsaError, AlsaSoundDriver,
     AncientDeviceLayer, AncientError, BluetoothError, BluetoothHciDriver, BluetoothMode, BssInfo,
     CommandBuffer, CommandStatus, Cursor, DisplayMode, EgaCgaAdapter, FlipRequest, GestureState,
-    GestureType, GpuAccelerationDriver, GpuCommand as KernelGpuCommand, GpuError, HidFullError,
+    GestureType, GpuAccelerationDriver, GpuCommand as KernelGpuCommand, GpuError as KernelGpuError, HidFullError,
     HidInputReport, HidOutputReport, HidTokenType, IsaBus, IsaDevice, JobStatus, L2capChannel,
     L2capState, MfmDiskInterface, MultiTouchDriver, Ne2000Ethernet, PixelFormat, PrimitiveType,
     PrintJob, PrinterBackend, PrinterCupsDriver, PrinterError, PrinterFormat, PrinterProtocol,
@@ -52,6 +52,9 @@ pub use kernel_releases::{
     KernelReleaseInfo, Linux5_15ReleaseDriver, Linux6_12ReleaseDriver, Linux6_1ReleaseDriver,
     Linux6_6ReleaseDriver, LinuxReleaseDriver, LongtermReleaseDriver, MainlineReleaseDriver,
     PrepatchReleaseDriver, RcReleaseDriver, StableReleaseDriver,
+    Longterm5_10_TpmDriver, Longterm5_15_SerialDriver,
+    Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver, Longterm6_1_InputDriver,
+    Longterm6_6_AudioDriver, MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
 };
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
@@ -69,17 +72,6 @@ pub use soc::{
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-
-pub use kernel_releases::{
-    KernelReleaseInfo, LinuxReleaseDriver, Longterm5_10_TpmDriver, Longterm5_15_SerialDriver,
-    Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver, Longterm6_1_InputDriver,
-    Longterm6_6_AudioDriver, MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
-};
-pub use more_devices::{
-    AppleSiliconUnifiedMemoryBus, CgaGraphicsDriver, CxlMemoryDriver, FloppyDiskDriver,
-    GameportJoystickDriver, IdeControllerDriver, IntelXeGpuDriver, ParallelPrinterDriver,
-    PcieGen5NvmeDriver, SoundBlaster16Driver, Thunderbolt4Controller, Wifi7Adapter,
-};
 
 // Test and backward compatibility aliases
 pub type Bluetooth5_4Adapter = Bluetooth5_4_Adapter;

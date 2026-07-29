@@ -4,21 +4,23 @@
 pub mod audit;
 pub mod capability;
 pub mod capability_enforcer;
+pub mod cleaner;
 pub mod clipboard;
+pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
+pub mod scanner;
 pub mod secrets;
 pub mod selinux;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod scanner;
-pub mod forensics;
-pub mod cleaner;
 
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -61,7 +63,7 @@ pub use integrity::{
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{

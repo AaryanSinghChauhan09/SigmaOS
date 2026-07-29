@@ -89,7 +89,7 @@ impl Filesystem for SimpleFilesystem {
 
     fn read_inode(&self, inode_id: InodeID) -> Option<&dyn Inode> {
         if inode_id > 0 && inode_id <= self.inodes.len() {
-            if let Some(ref inode) = *self.inodes[inode_id - 1] {
+            if let Some(ref inode) = self.inodes[inode_id - 1] {
                 return Some(inode.as_ref());
             }
         }
@@ -169,7 +169,7 @@ impl VFS for SimpleVFS {
 
     fn unmount(&mut self, mount_id: MountID) -> Result<(), VFSError> {
         for i in 0..self.filesystems.len() {
-            if let Some(ref fs) = *self.filesystems[i] {
+            if let Some(ref fs) = self.filesystems[i] {
                 if fs.mount_id() == mount_id {
                     return Ok(());
                 }
@@ -232,8 +232,10 @@ impl FileDescriptor for SimpleFileDescriptor {
     }
 }
 
+#[cfg(target_os = "none")]
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {

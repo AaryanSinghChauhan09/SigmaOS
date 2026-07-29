@@ -452,7 +452,7 @@ mod tests {
     fn test_memory_estimation() {
         let mut config = LlmConfig::default();
         config.quantization = QuantizationType::Fp32;
-        let engine = LocalLlmEngine::new(config);
+        let engine = LocalLlmEngine::new(config.clone());
         
         let fp32_size = engine.estimate_memory_usage();
         

@@ -6,7 +6,7 @@ use core::mem;
 /// Implements process/thread scheduling using OOP principles with traits and structs
 /// No dependency on external scheduler frameworks
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -26,8 +26,14 @@ pub trait Schedulable {
     fn last_run_time(&self) -> u64;
     /// Set last run time
     fn set_last_run_time(&mut self, time: u64);
-    /// Get task ID
+        /// Get task ID
     fn task_id(&self) -> usize;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
+    /// Check if task can yield
+    fn can_yield(&self) -> bool;
+    /// Check if task can block
+    fn can_block(&self) -> bool;
 }
 
 /// Priority levels
@@ -43,7 +49,7 @@ pub enum Priority {
 
 /// Task state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskState {
     Ready = 0,
     Running = 1,
@@ -89,15 +95,15 @@ impl Schedulable for Task {
 
     fn state(&self) -> TaskState {
         {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => TaskState::Running,
-            2 => TaskState::Blocked,
-            3 => TaskState::Sleeping,
-            4 => TaskState::Terminated,
-            _ => TaskState::Ready,
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => TaskState::Running,
+                2 => TaskState::Blocked,
+                3 => TaskState::Sleeping,
+                4 => TaskState::Terminated,
+                _ => TaskState::Ready,
+            }
         }
-    }
     }
 
     fn set_state(&mut self, state: TaskState) {
@@ -122,6 +128,14 @@ impl Schedulable for Task {
 
     fn task_id(&self) -> usize {
         self.id
+    }
+
+    fn can_yield(&self) -> bool {
+        self.capability.can_yield
+    }
+
+    fn can_block(&self) -> bool {
+        self.capability.can_block
     }
 }
 
@@ -270,7 +284,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability.can_yield {
+                    if !task.can_yield() {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Ready);
@@ -285,7 +299,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability.can_block {
+                    if !task.can_block() {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Blocked);
@@ -397,7 +411,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability.can_yield {
+                        if !task.can_yield() {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Ready);
@@ -414,7 +428,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability.can_block {
+                        if !task.can_block() {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Blocked);
@@ -463,12 +477,14 @@ impl Scheduler for PriorityScheduler {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -536,6 +552,7 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

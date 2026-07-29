@@ -198,6 +198,7 @@ pub trait Filesystem {
 
 /// FS statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FSStats {
     pub total_files: usize,
     pub total_size: u64,
@@ -326,12 +327,14 @@ impl Filesystem for SimpleFilesystem {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

@@ -35,7 +35,7 @@ pub enum RouteProtocol {
     Dhcp,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RouteKey {
     pub destination: String,
     pub prefix_length: u8,
@@ -93,11 +93,11 @@ impl RoutingTable {
     }
 
     /// Lookup a route for a destination
-    pub fn lookup_route(&mut self, destination: &str) -> Option<&RouteEntry> {
+    pub fn lookup_route(&mut self, destination: &str) -> Option<RouteEntry> {
         // Check cache first
         for cached_route in &self.route_cache {
             if self.matches_destination(destination, &cached_route.key.destination, cached_route.key.prefix_length) {
-                return Some(cached_route);
+                return Some(cached_route.clone());
             }
         }
 
@@ -127,7 +127,7 @@ impl RoutingTable {
             }
         }
 
-        best_route
+        best_route.cloned()
     }
 
     /// Check if destination matches a route prefix

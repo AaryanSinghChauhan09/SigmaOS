@@ -14,7 +14,7 @@ pub type ProcessID = usize;
 
 /// Process state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
     Ready = 0,
     Running = 1,
@@ -136,14 +136,14 @@ impl SimpleProcess {
 
     pub fn get_state(&self) -> ProcessState {
         {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ProcessState::Running,
-            2 => ProcessState::Blocked,
-            3 => ProcessState::Terminated,
-            _ => ProcessState::Ready,
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => ProcessState::Running,
+                2 => ProcessState::Blocked,
+                3 => ProcessState::Terminated,
+                _ => ProcessState::Ready,
+            }
         }
-    }
     }
 
     pub fn set_state_atomic(&self, state: ProcessState) {
@@ -152,15 +152,15 @@ impl SimpleProcess {
 
     pub fn get_priority(&self) -> ProcessPriority {
         {
-        let raw = self.priority.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ProcessPriority::Low,
-            2 => ProcessPriority::Normal,
-            3 => ProcessPriority::High,
-            4 => ProcessPriority::Critical,
-            _ => ProcessPriority::Idle,
+            let raw = self.priority.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => ProcessPriority::Low,
+                2 => ProcessPriority::Normal,
+                3 => ProcessPriority::High,
+                4 => ProcessPriority::Critical,
+                _ => ProcessPriority::Idle,
+            }
         }
-    }
     }
 
     pub fn set_priority_atomic(&self, priority: ProcessPriority) {
@@ -424,12 +424,14 @@ impl ProcessScheduler for SimpleProcessScheduler {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -480,6 +482,7 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

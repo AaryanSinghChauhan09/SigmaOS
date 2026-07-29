@@ -1,6 +1,11 @@
 #![no_std]
 #![no_main]
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+
 use core::mem;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
@@ -10,7 +15,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type AudioDeviceID = usize;
 
 #[repr(usize)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioType {
     Playback = 0,
     Capture = 1,
@@ -68,13 +73,13 @@ impl AudioDevice for SimpleAudioDevice {
     }
     fn audio_type(&self) -> AudioType {
         {
-        let raw = self.audio_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => AudioType::Capture,
-            2 => AudioType::Duplex,
-            _ => AudioType::Playback,
+            let raw = self.audio_type.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => AudioType::Capture,
+                2 => AudioType::Duplex,
+                _ => AudioType::Playback,
+            }
         }
-    }
     }
     fn sample_rate(&self) -> u32 {
         self.sample_rate.load(Ordering::SeqCst) as u32
@@ -261,12 +266,14 @@ impl AudioStream for SimpleAudioStream {
     }
 }
 
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

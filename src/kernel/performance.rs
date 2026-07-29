@@ -14,13 +14,13 @@ pub enum IpcError {
 }
 
 /// Thread-Safe, Lock-Free Circular Ring-Buffer for Zero-Copy IPC
-pub struct ZeroCopyQueue<T, const N: usize> {
+pub struct ZeroCopyQueue<T: Copy, const N: usize> {
     buffer: [Option<T>; N],
     head: usize,
     tail: usize,
 }
 
-impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
+impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
             buffer: [None; N],
@@ -75,7 +75,7 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     }
 }
 
-impl<T: Clone, const N: usize> Default for ZeroCopyQueue<T, N> {
+impl<T: Clone + Copy, const N: usize> Default for ZeroCopyQueue<T, N> {
     fn default() -> Self {
         Self::new()
     }

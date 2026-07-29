@@ -81,7 +81,7 @@ mod tests {
 
         let results = engine.search("quick");
         assert_eq!(results.len(), 2);
-        
+
         let first = results[0];
         // Doc 1 or 3 should have a non-zero score
         assert!(first.1 > 0.0);

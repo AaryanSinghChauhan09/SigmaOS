@@ -11,6 +11,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat { Json, Text, Binary }
+
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
@@ -68,14 +71,14 @@ impl AuditEvent for SimpleAuditEvent {
     }
     fn event_type(&self) -> EventType {
         {
-        let raw = self.event_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => EventType::Authorization,
-            2 => EventType::FileAccess,
-            3 => EventType::SystemChange,
-            _ => EventType::Authentication,
+            let raw = self.event_type.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => EventType::Authorization,
+                2 => EventType::FileAccess,
+                3 => EventType::SystemChange,
+                _ => EventType::Authentication,
+            }
         }
-    }
     }
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64

@@ -4,6 +4,9 @@
 
 pub mod accessibility;
 pub mod audio;
+pub mod ai;
+pub mod fs;
+pub mod net;
 pub mod automation;
 pub mod boot;
 pub mod community;
@@ -140,7 +143,7 @@ pub use governance::{
 pub use graphics::{
     Animation, AnimationCurve, ColorSpace, CompositorError, CompositorError as ZenithError,
     CompositorResult, CompositorStrategy, DecodedImage, Framebuffer as GpuFramebuffer,
-    FramebufferCompositor, Geometry, GpuDevice, GpuDriver, GpuState, GpuVendor, HighContrastMode,
+    FramebufferCompositor, Geometry, GpuDevice, GpuDriver as GraphicsGpuDriver, GpuState, GpuVendor, HighContrastMode,
     ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, LayoutStyle, Magnifier, Panel,
     PanelOrientation, PixelFormat, RenderLayer, ScreenReader, SigmaCompositor, Widget, WindowNode,
     WindowState, ZenithCompositor, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
@@ -155,10 +158,10 @@ pub use kernel::{
     AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
     AllocationPolicy as NumaAllocationPolicy, BuddyAllocator, Channel, CpuInstructionExtension,
     CpufreqManager, CpufreqPolicy, CpufreqStats, DeviceDriver, DriverError, DriverMetadata,
-    DriverRegistry, DriverType, FileFlags, FileHandle, FileSystem, FilesystemMetadata, FsError,
+    DriverRegistry, DriverType as KernelDriverType, FileFlags, FileHandle, FileSystem, FilesystemMetadata, FsError as KernelFsError,
     GovernorType, HardwareMonitor, IoOperation, IoResult, IpcError, IpcError as PerfIpcError,
     IpcManager, IpcMessage, LinuxAbsorptionEngine, LinuxHeritage, MapFlags, MemoryBlock,
-    MemoryError, MemoryManager, MemoryManagerMetadata, Message, MonitorThreshold, NetworkError,
+    MemoryError as KernelMemoryError, MemoryManager, MemoryManagerMetadata, Message, MonitorThreshold, NetworkError as KernelNetworkError,
     NetworkStack, NetworkStackMetadata, NodeState, NumaAllocator, NumaNode,
     PageDirectoryController, PageDirectoryEntry, Priority, Process, ProcessProfile, ProcessState,
     RoundRobinConfig, RoundRobinScheduler, SanitizationLevel, SchedInstruction, SchedOpcode,
@@ -177,15 +180,15 @@ pub use memory::{
 };
 pub use ml::{LLMInterface, ModelStatus, SigmaAid};
 pub use network::{
-    AdBlockRule as SovereignAdBlockRule, AdblockRule, BraveShield, BrowserCore, BrowserError,
-    BrowserTab, BrowserTab as SovereignBrowserTab, BrowserTabState, CipherSuite, DnsError,
-    DnsResolver, E1000NetworkDriver, Ipv6Address, Ipv6AddressType, Ipv6ExtensionHeader, Ipv6Header,
-    Ipv6Interface, Ipv6Route, Ipv6Stack, MDnsDiscovery, NetworkDriverDevice, NetworkDriverManager,
-    NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame, QuicConnection,
-    QuicError, RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver,
-    SecurityLevel, SecurityProfile, SovereignBrowser, TabCapabilities, TabContainer, TabState,
-    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, TlsConfig, TlsEngine, TlsSession,
-    TlsState, TlsVersion, TrackingProtection, ZeroCopyPacketRing,
+    DnsError, DnsResolver, MDnsDiscovery,
+    QuicConnection, QuicError,
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, ZeroCopyPacketRing,
+};
+pub use net::{
+    BraveShield, BrowserCore, BrowserError,
+    BrowserTab, BrowserTabState, CipherSuite, SovereignBrowser, TabCapabilities, TabContainer, TabState, TrackingProtection,
+    NetworkDriverDevice, NetworkDriverManager, NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame, RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver, SecurityLevel, SecurityProfile,
+    TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
@@ -210,10 +213,9 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use scheduler::{
-    ComputeUnit, EevdfScheduler, Priority as ShellPriority, ProcessLifecycleManager,
-    ResourceLimits, SInitSupervisor, Scheduler as ShellScheduler,
-    SchedulerError as ShellSchedulerError, Service, ServiceState, Signal, SignalHandler,
-    SignalManager, SimpleThread, Task, TaskState, Thread, ThreadID, ThreadState,
+    ComputeUnit, EevdfScheduler, Priority as ShellPriority,
+    SInitSupervisor, Scheduler as ShellScheduler,
+    SchedulerError as ShellSchedulerError, Service, ServiceState, SimpleThread, Task, TaskState, Thread, ThreadID, ThreadState,
 };
 pub use security::{
     AppArmorManager, AppArmorProfile, CapabilityGate, CapabilityToken,

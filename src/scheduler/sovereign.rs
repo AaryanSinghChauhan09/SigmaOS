@@ -1,7 +1,13 @@
 #![no_std]
 #![no_main]
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+
 use core::mem;
+use core::sync::atomic::AtomicUsize;
 /// OOP-based Sovereign Scheduler for SigmaOS
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
 /// Implements MLFQ (Multi-Level Feedback Queue) and MCS (Machine-to-Core Scheduling)
@@ -59,14 +65,14 @@ impl Thread for SimpleThread {
     }
     fn state(&self) -> ThreadState {
         {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => ThreadState::Running,
-            2 => ThreadState::Blocked,
-            3 => ThreadState::Sleeping,
-            _ => ThreadState::Ready,
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => ThreadState::Running,
+                2 => ThreadState::Blocked,
+                3 => ThreadState::Sleeping,
+                _ => ThreadState::Ready,
+            }
         }
-    }
     }
     fn priority(&self) -> Priority {
         self.priority
@@ -182,7 +188,7 @@ impl SimpleMCSScheduler {
         for _ in 0..num_cores {
             core_assignments.push(AtomicUsize::new(0));
         }
-        let mut core_loads = [AtomicUsize::new(0); 64];
+        let core_loads = core::array::from_fn(|_| AtomicUsize::new(0));
         SimpleMCSScheduler {
             scheduler: MLFQScheduler::new(),
             core_assignments,
@@ -259,12 +265,18 @@ impl RealTimeScheduler for SimpleRealTimeScheduler {
     }
 }
 
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -326,6 +338,7 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

@@ -1,6 +1,11 @@
 #![no_std]
 #![no_main]
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+
 use core::mem;
 /// OOP-based Debugger for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 171
@@ -62,13 +67,13 @@ impl Breakpoint for SimpleBreakpoint {
     }
     fn breakpoint_type(&self) -> BreakpointType {
         {
-        let raw = self.breakpoint_type.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => BreakpointType::Hardware,
-            2 => BreakpointType::Watchpoint,
-            _ => BreakpointType::Software,
+            let raw = self.breakpoint_type.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => BreakpointType::Hardware,
+                2 => BreakpointType::Watchpoint,
+                _ => BreakpointType::Software,
+            }
         }
-    }
     }
     fn is_enabled(&self) -> bool {
         self.enabled.load(Ordering::SeqCst) == 1
@@ -217,12 +222,14 @@ impl RegisterViewer for SimpleRegisterViewer {
     }
 }
 
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

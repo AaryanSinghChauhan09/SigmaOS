@@ -253,7 +253,7 @@ impl AIAgent for SimpleAIAgent {
             response.push(*byte);
         }
 
-        Ok(response
+        Ok(response)
     }
 
     fn learn(&mut self, input: &[u8], feedback: bool) {
@@ -270,7 +270,7 @@ impl AIAgent for SimpleAIAgent {
             name: self.name,
             version: self.version,
             total_intents: self.patterns.len(),
-            execution_count: self.execution_count,
+            execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
             capability: self.capability,
         }
     }
@@ -292,6 +292,7 @@ pub trait AIAgentManager {
 
 /// AI statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AIStats {
     pub total_agents: usize,
     pub total_requests: u64,
@@ -421,12 +422,14 @@ impl AIAgentManager for SimpleAIAgentManager {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

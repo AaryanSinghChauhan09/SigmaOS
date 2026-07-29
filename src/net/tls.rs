@@ -85,6 +85,8 @@ impl TlsEngine {
 
     /// Perform TLS handshake
     pub fn handshake(&mut self, session_id: usize) -> Result<(), &'static str> {
+        let master_secret = self.generate_master_secret();
+
         let session = self.sessions.get_mut(session_id)
             .ok_or("Session not found")?;
 
@@ -100,7 +102,7 @@ impl TlsEngine {
         }
         
         // Generate master secret
-        session.master_secret = self.generate_master_secret();
+        session.master_secret = master_secret;
         
         session.state = TlsState::Connected;
         Ok(())
