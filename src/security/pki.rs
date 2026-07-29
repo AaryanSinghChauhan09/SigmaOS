@@ -205,3 +205,4 @@ mod tests {
         assert_eq!(retrieved.subject(), b"Subject");
     }
 }
+}

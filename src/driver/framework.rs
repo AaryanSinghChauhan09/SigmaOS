@@ -15,8 +15,8 @@ pub enum DriverType {
     Storage = 3,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverState {
     Unloaded = 0,
     Loaded = 1,
