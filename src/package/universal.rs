@@ -90,6 +90,11 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
+    Nix,      // nix expression
+    Ebuild,   // gentoo ebuild
+    Apk,      // alpine apk
+    Txz,      // slackware pkgtool
+    Xbps,     // void xbps
 }
 
 /// Package source
@@ -236,6 +241,221 @@ impl PackageFormatAdapter for AptDebAdapter {
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!("[{}] Refreshing and updating DEB package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// SlackwareTxzAdapter handles Slackware pkgtool package format (`.txz`)
+pub struct SlackwareTxzAdapter {
+    pub install_log_path: String,
+}
+
+impl SlackwareTxzAdapter {
+    pub fn new() -> Self {
+        Self {
+            install_log_path: "/var/log/packages".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for SlackwareTxzAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Txz
+    }
+
+    fn adapter_name(&self) -> &str {
+        "pkgtool"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Logging to {}. Unpacking Slackware TXZ package {}",
+            self.adapter_name(),
+            self.install_log_path,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Removing slackware package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Upgrading slackware package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// VoidXbpsAdapter handles Void Linux XBPS binaries
+pub struct VoidXbpsAdapter {
+    pub xbps_db_path: String,
+}
+
+impl VoidXbpsAdapter {
+    pub fn new() -> Self {
+        Self {
+            xbps_db_path: "/var/db/xbps".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for VoidXbpsAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Xbps
+    }
+
+    fn adapter_name(&self) -> &str {
+        "xbps"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Updating XBPS db at {}. Installing Void XBPS package {}",
+            self.adapter_name(),
+            self.xbps_db_path,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Purging Void XBPS package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Upgrading Void XBPS package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// NixAdapter handles declarative Nix expressions
+pub struct NixAdapter {
+    pub store_dir: String,
+}
+
+impl NixAdapter {
+    pub fn new() -> Self {
+        Self {
+            store_dir: "/nix/store".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for NixAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nix
+    }
+
+    fn adapter_name(&self) -> &str {
+        "nix"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Constructing store path under {}. Realizing Nix derivation for {}",
+            self.adapter_name(),
+            self.store_dir,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Garbage collecting Nix path for {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Updating Nix channel / derivation target {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// GentooEbuildAdapter handles Gentoo source ebuild ports
+pub struct GentooEbuildAdapter {
+    pub portage_dir: String,
+}
+
+impl GentooEbuildAdapter {
+    pub fn new() -> Self {
+        Self {
+            portage_dir: "/var/db/repos/gentoo".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for GentooEbuildAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Ebuild
+    }
+
+    fn adapter_name(&self) -> &str {
+        "ebuild"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Fetching ebuild from {}. Compiling and emerging source package {}",
+            self.adapter_name(),
+            self.portage_dir,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Unmerging Gentoo package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Emerging updates for package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// AlpineApkAdapter handles lightweight Alpine APK binaries
+pub struct AlpineApkAdapter {
+    pub apk_cache_dir: String,
+}
+
+impl AlpineApkAdapter {
+    pub fn new() -> Self {
+        Self {
+            apk_cache_dir: "/etc/apk/cache".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for AlpineApkAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Apk
+    }
+
+    fn adapter_name(&self) -> &str {
+        "apk"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Downloading index to {}. Installing Alpine APK {}",
+            self.adapter_name(),
+            self.apk_cache_dir,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Deleting Alpine APK package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Upgrading Alpine APK package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -708,6 +928,11 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
         self.adapters.insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
         self.adapters.insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+        self.adapters.insert(PackageFormat::Nix, Box::new(NixAdapter::new()));
+        self.adapters.insert(PackageFormat::Ebuild, Box::new(GentooEbuildAdapter::new()));
+        self.adapters.insert(PackageFormat::Apk, Box::new(AlpineApkAdapter::new()));
+        self.adapters.insert(PackageFormat::Txz, Box::new(SlackwareTxzAdapter::new()));
+        self.adapters.insert(PackageFormat::Xbps, Box::new(VoidXbpsAdapter::new()));
     }
 
     /// Dynamic polymorphic registration of custom format adapters
@@ -904,7 +1129,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 6);
+        assert_eq!(manager.adapters.len(), 11);
     }
 
     #[test]
@@ -953,6 +1178,38 @@ mod tests {
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_linux_adapters_install_and_translation() {
+        let mut manager = UniversalPackageManager::new();
+
+        let nix_pkg = UnifiedPackage::new("nix-test".to_string(), "2.0.0".to_string())
+            .with_format(PackageFormat::Nix);
+        manager.add_package(nix_pkg);
+        assert!(manager.install("nix-test").is_ok());
+
+        let ebuild_pkg = UnifiedPackage::new("ebuild-test".to_string(), "3.0.0".to_string())
+            .with_format(PackageFormat::Ebuild);
+        manager.add_package(ebuild_pkg);
+        assert!(manager.install("ebuild-test").is_ok());
+
+        let apk_pkg = UnifiedPackage::new("apk-test".to_string(), "1.2.0".to_string())
+            .with_format(PackageFormat::Apk);
+        manager.add_package(apk_pkg);
+        assert!(manager.install("apk-test").is_ok());
+
+        let txz_pkg = UnifiedPackage::new("txz-test".to_string(), "5.4.1".to_string())
+            .with_format(PackageFormat::Txz);
+        manager.add_package(txz_pkg);
+        assert!(manager.install("txz-test").is_ok());
+
+        let xbps_pkg = UnifiedPackage::new("xbps-test".to_string(), "2024.03.11".to_string())
+            .with_format(PackageFormat::Xbps);
+        manager.add_package(xbps_pkg);
+        assert!(manager.install("xbps-test").is_ok());
+
+        assert_eq!(manager.installed_packages.len(), 5);
     }
 
     #[test]

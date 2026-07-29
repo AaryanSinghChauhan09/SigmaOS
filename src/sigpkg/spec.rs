@@ -1,21 +1,17 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 /// Package version
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -48,7 +44,6 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -154,11 +149,7 @@ impl SimplePackage {
     pub fn set_description(&mut self, description: &[u8]) {
         let len = description.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                description.as_ptr(),
-                self.description.as_mut_ptr(),
-                len,
-            );
+            core::ptr::copy_nonoverlapping(description.as_ptr(), self.description.as_mut_ptr(), len);
         }
     }
 
@@ -185,11 +176,7 @@ impl SimplePackage {
 
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(
-                version_constraint.as_ptr(),
-                constraint_array.as_mut_ptr(),
-                constraint_len,
-            );
+            core::ptr::copy_nonoverlapping(version_constraint.as_ptr(), constraint_array.as_mut_ptr(), constraint_len);
         }
 
         self.dependencies.push(PackageDependency {
@@ -210,7 +197,7 @@ impl Package for SimplePackage {
     }
 
     fn dependencies(&self) -> &[PackageDependency] {
-        unsafe { core::slice::from_raw_parts(self.dependencies.data, self.dependencies.len) }
+        &self.dependencies
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
@@ -259,10 +246,7 @@ pub trait PackageManager {
     /// Update package
     fn update(&mut self, name: &[u8]) -> Result<(), PackageError>;
     /// Resolve dependencies
-    fn resolve_dependencies(
-        &self,
-        package: &dyn Package,
-    ) -> Result<Vec<PackageDependency>, PackageError>;
+    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError>;
     /// Get manager statistics
     fn stats(&self) -> PackageStats;
 }
@@ -282,7 +266,6 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,
@@ -366,8 +349,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for (i, package_option) in self.packages.iter().enumerate() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -376,12 +359,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(p) = self.packages.get_mut(i) {
-                *p = None;
-            }
-            if let Some(inst) = self.installed.get_mut(i) {
-                *inst = None;
-            }
+            self.packages[i] = None;
+            self.installed[i] = None;
             self.stats.total_packages -= 1;
             Ok(())
         } else {
@@ -390,8 +369,8 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn get_package(&self, name: &[u8]) -> Option<&dyn Package> {
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for package_option in &self.packages {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     return Some(package.as_ref());
                 }
@@ -406,8 +385,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for (i, package_option) in self.packages.iter().enumerate() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -416,15 +395,13 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+            if let Some(ref package) = self.packages[i] {
                 // Verify signature before installation
                 if !package.verify_signature(&package.info().checksum) {
                     return Err(PackageError::SignatureInvalid);
                 }
 
-                if let Some(inst) = self.installed.get_mut(i) {
-                    *inst = Some(true);
-                }
+                self.installed[i] = Some(true);
                 self.stats.installed_packages += 1;
                 Ok(())
             } else {
@@ -441,8 +418,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for (i, package_option) in self.packages.iter().enumerate() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -451,10 +428,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(&Some(true)) = self.installed.get(i) {
-                if let Some(inst) = self.installed.get_mut(i) {
-                    *inst = Some(false);
-                }
+            if self.installed[i] == Some(true) {
+                self.installed[i] = Some(false);
                 self.stats.installed_packages -= 1;
                 Ok(())
             } else {
@@ -471,20 +446,17 @@ impl PackageManager for SimplePackageManager {
         self.install(name)
     }
 
-    fn resolve_dependencies(
-        &self,
-        package: &dyn Package,
-    ) -> Result<Vec<PackageDependency>, PackageError> {
+    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError> {
         let mut resolved = Vec::new();
         let dependencies = package.dependencies();
 
         for dep in dependencies {
             let mut found = false;
-            for i in 0..self.packages.len {
-                if let Some(Some(ref pkg)) = self.packages.get(i) {
+            for package_option in &self.packages {
+                if let Some(ref pkg) = *package_option {
                     let dep_name = dep.name;
                     let pkg_name = pkg.name();
-
+                    
                     let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
                     let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
 
@@ -510,186 +482,758 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UniversalPackageType {
-    Apt,
-    Rpm,
-    Pacman,
-    Snap,
-    Nix,
-    Ebuild,
-    Apk,
-    Flatpak,
-    Txz,
-    Xbps,
-    Cachyos,
+    SigmaNative,
+    AptSubset,
+    RpmSubset,
+    PacmanSubset,
+    SnapSubset,
+    NixSubset,
+    EbuildSubset,
+    ApkSubset,
+    FlatpakSubset,
+    TxzSubset,
+    XbpsSubset,
 }
 
-pub trait UniversalPackage {
-    fn package_type(&self) -> UniversalPackageType;
-}
+pub type HookFunction = fn(pkg_name: &[u8]) -> bool;
 
-pub struct UserDefinedPackageHook;
-
-pub struct PackageAdapterFactory;
-
-pub struct AptPackageAdapter;
-pub struct PacmanPackageAdapter;
-pub struct SnapPackageAdapter;
-pub struct NixPackageAdapter;
-pub struct EbuildPackageAdapter;
-pub struct ApkPackageAdapter;
-pub struct FlatpakPackageAdapter;
-pub struct TxzPackageAdapter;
-pub struct XbpsPackageAdapter;
-pub struct CachyosPackageAdapter;
-
-pub struct CachyCpuDetector;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchLevel {
-    V1,
-    V2,
-    V3,
-    V4,
-}
-
-extern crate alloc as alloc_crate;
-use alloc_crate::string::String;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UniversalPackageType {
-    Apt,
-    Rpm,
-    Pacman,
-    Snap,
-    Nix,
-    Ebuild,
-    Apk,
-    Flatpak,
-    Txz,
-    Xbps,
-    Cachyos,
-}
-
-pub trait UniversalPackage {
-    fn package_type(&self) -> UniversalPackageType;
-    fn install(&self) -> Result<(), PackageError>;
-}
-
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct UserDefinedPackageHook {
-    pub name: String,
-    pub hook_type: u32,
+    pub hook_type: u8, // 1 = Pre-Install, 2 = Post-Install
+    pub execute: HookFunction,
 }
 
-impl UserDefinedPackageHook {
-    pub fn new(name: String, hook_type: u32) -> Self {
-        Self { name, hook_type }
+/// Universal Package Trait (OOP Abstraction representing Linux systems as subsets)
+pub trait UniversalPackage: Package {
+    fn package_type(&self) -> UniversalPackageType;
+    fn get_hooks(&self) -> &[UserDefinedPackageHook];
+
+    /// Executes registered user-defined hook functions for the package
+    fn run_hook(&self, hook_type: u8) -> bool {
+        for hook in self.get_hooks() {
+            if hook.hook_type == hook_type {
+                if !(hook.execute)(self.name()) {
+                    return false;
+                }
+            }
+        }
+        true
     }
 }
 
-pub struct AptPackageAdapter;
-impl UniversalPackage for AptPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Apt }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
+/// Debian APT compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct AptPackageAdapter {
+    pub base: SimplePackage,
+    pub deb_control_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
 }
 
-pub struct PacmanPackageAdapter;
-impl UniversalPackage for PacmanPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Pacman }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct SnapPackageAdapter;
-impl UniversalPackage for SnapPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Snap }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct NixPackageAdapter;
-impl UniversalPackage for NixPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Nix }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct EbuildPackageAdapter;
-impl UniversalPackage for EbuildPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Ebuild }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct ApkPackageAdapter;
-impl UniversalPackage for ApkPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Apk }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct FlatpakPackageAdapter;
-impl UniversalPackage for FlatpakPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Flatpak }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct TxzPackageAdapter;
-impl UniversalPackage for TxzPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Txz }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct XbpsPackageAdapter;
-impl UniversalPackage for XbpsPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Xbps }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct CachyosPackageAdapter;
-impl UniversalPackage for CachyosPackageAdapter {
-    fn package_type(&self) -> UniversalPackageType { UniversalPackageType::Cachyos }
-    fn install(&self) -> Result<(), PackageError> { Ok(()) }
-}
-
-pub struct PackageAdapterFactory;
-impl PackageAdapterFactory {
-    pub fn create_adapter(ty: UniversalPackageType) -> Box<dyn UniversalPackage> {
-        match ty {
-            UniversalPackageType::Apt => Box::new(AptPackageAdapter),
-            UniversalPackageType::Pacman => Box::new(PacmanPackageAdapter),
-            UniversalPackageType::Snap => Box::new(SnapPackageAdapter),
-            UniversalPackageType::Nix => Box::new(NixPackageAdapter),
-            UniversalPackageType::Ebuild => Box::new(EbuildPackageAdapter),
-            UniversalPackageType::Apk => Box::new(ApkPackageAdapter),
-            UniversalPackageType::Flatpak => Box::new(FlatpakPackageAdapter),
-            UniversalPackageType::Txz => Box::new(TxzPackageAdapter),
-            UniversalPackageType::Xbps => Box::new(XbpsPackageAdapter),
-            UniversalPackageType::Cachyos => Box::new(CachyosPackageAdapter),
-            _ => Box::new(AptPackageAdapter),
+impl AptPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            deb_control_fields: [0; 128],
+            hooks: Vec::new(),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum CpuArchLevel {
-    V1,
-    V2,
-    V3,
-    V4,
-}
-
-pub struct CachyCpuDetector {
-    pub level: CpuArchLevel,
-}
-
-impl CachyCpuDetector {
-    pub fn new() -> Self {
-        Self { level: CpuArchLevel::V3 }
+impl Package for AptPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
     }
-    pub fn detect_level(&self) -> CpuArchLevel {
-        self.level
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
     }
 }
 
-impl Default for CachyCpuDetector {
-    fn default() -> Self {
-        Self::new()
+impl UniversalPackage for AptPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::AptSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// RedHat RPM compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct RpmPackageAdapter {
+    pub base: SimplePackage,
+    pub spec_file_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl RpmPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            spec_file_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for RpmPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for RpmPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::RpmSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Arch Pacman compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct PacmanPackageAdapter {
+    pub base: SimplePackage,
+    pub pkgbuild_content: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl PacmanPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            pkgbuild_content: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for PacmanPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for PacmanPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::PacmanSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Ubuntu Snap compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct SnapPackageAdapter {
+    pub base: SimplePackage,
+    pub snapcraft_yaml: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl SnapPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            snapcraft_yaml: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for SnapPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for SnapPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::SnapSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// NixOS Nix compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct NixPackageAdapter {
+    pub base: SimplePackage,
+    pub nix_expression: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl NixPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            nix_expression: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for NixPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for NixPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::NixSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Gentoo Ebuild compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct EbuildPackageAdapter {
+    pub base: SimplePackage,
+    pub ebuild_content: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl EbuildPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            ebuild_content: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for EbuildPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for EbuildPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::EbuildSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Alpine APK compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct ApkPackageAdapter {
+    pub base: SimplePackage,
+    pub apkindex_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl ApkPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            apkindex_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for ApkPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for ApkPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::ApkSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Flatpak compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct FlatpakPackageAdapter {
+    pub base: SimplePackage,
+    pub flatpak_metadata: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl FlatpakPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            flatpak_metadata: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for FlatpakPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for FlatpakPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::FlatpakSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Slackware pkgtool TXZ compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct TxzPackageAdapter {
+    pub base: SimplePackage,
+    pub slack_desc_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl TxzPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            slack_desc_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for TxzPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for TxzPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::TxzSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Void Linux XBPS compatibility adapter (OOP: Concrete adapter)
+#[repr(C)]
+pub struct XbpsPackageAdapter {
+    pub base: SimplePackage,
+    pub xbps_meta_fields: [u8; 128],
+    pub hooks: Vec<UserDefinedPackageHook>,
+}
+
+impl XbpsPackageAdapter {
+    pub fn new(name: &[u8], version: PackageVersion) -> Self {
+        Self {
+            base: SimplePackage::new(name, version, PackageCapability::full()),
+            xbps_meta_fields: [0; 128],
+            hooks: Vec::new(),
+        }
+    }
+}
+
+impl Package for XbpsPackageAdapter {
+    fn name(&self) -> &[u8] {
+        self.base.name()
+    }
+    fn version(&self) -> PackageVersion {
+        self.base.version()
+    }
+    fn dependencies(&self) -> &[PackageDependency] {
+        self.base.dependencies()
+    }
+    fn verify_signature(&self, signature: &[u8]) -> bool {
+        self.base.verify_signature(signature)
+    }
+    fn info(&self) -> PackageInfo {
+        self.base.info()
+    }
+}
+
+impl UniversalPackage for XbpsPackageAdapter {
+    fn package_type(&self) -> UniversalPackageType {
+        UniversalPackageType::XbpsSubset
+    }
+    fn get_hooks(&self) -> &[UserDefinedPackageHook] {
+        &self.hooks
+    }
+}
+
+/// Polymorphic Factory for creating and translating Linux system packages to SigmaOS UniversalPackages (OOP: Factory Pattern)
+pub struct PackageAdapterFactory;
+
+impl PackageAdapterFactory {
+    /// Translates raw metadata of other distro packages into corresponding UniversalPackage adapters
+    pub fn create_adapter(
+        pkg_type: UniversalPackageType,
+        name: &[u8],
+        major: u32,
+        minor: u32,
+        patch: u32,
+        metadata: &[u8],
+        hooks: Vec<UserDefinedPackageHook>,
+    ) -> Result<Box<dyn UniversalPackage>, &'static str> {
+        let version = PackageVersion::new(major, minor, patch);
+        match pkg_type {
+            UniversalPackageType::AptSubset => {
+                let mut adapter = AptPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.deb_control_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::RpmSubset => {
+                let mut adapter = RpmPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.spec_file_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::PacmanSubset => {
+                let mut adapter = PacmanPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.pkgbuild_content.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::SnapSubset => {
+                let mut adapter = SnapPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.snapcraft_yaml.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::NixSubset => {
+                let mut adapter = NixPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.nix_expression.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::EbuildSubset => {
+                let mut adapter = EbuildPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.ebuild_content.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::ApkSubset => {
+                let mut adapter = ApkPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.apkindex_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::FlatpakSubset => {
+                let mut adapter = FlatpakPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.flatpak_metadata.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::TxzSubset => {
+                let mut adapter = TxzPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.slack_desc_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            UniversalPackageType::XbpsSubset => {
+                let mut adapter = XbpsPackageAdapter::new(name, version);
+                let len = metadata.len().min(127);
+                unsafe {
+                    core::ptr::copy_nonoverlapping(metadata.as_ptr(), adapter.xbps_meta_fields.as_mut_ptr(), len);
+                }
+                adapter.hooks = hooks;
+                Ok(Box::new(adapter))
+            }
+            _ => Err("Unsupported or native package type for factory mapping"),
+        }
+    }
+}
+
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn dummy_pre_install_hook(pkg_name: &[u8]) -> bool {
+        pkg_name.len() > 0
+    }
+
+    #[test]
+    fn test_universal_package_adapters() {
+        let name = b"systemd-subset";
+        let version = PackageVersion::new(255, 4, 0);
+
+        let mut apt_pkg = AptPackageAdapter::new(name, version);
+        assert_eq!(apt_pkg.package_type(), UniversalPackageType::AptSubset);
+        assert_eq!(apt_pkg.name(), name);
+
+        // Add User-Defined hook
+        let hook = UserDefinedPackageHook {
+            hook_type: 1, // Pre-Install
+            execute: dummy_pre_install_hook,
+        };
+        apt_pkg.hooks.push(hook);
+
+        assert_eq!(apt_pkg.get_hooks().len(), 1);
+        assert!(apt_pkg.run_hook(1));
+    }
+
+    #[test]
+    fn test_universal_package_types() {
+        let name = b"firefox-snap-subset";
+        let version = PackageVersion::new(125, 0, 0);
+
+        let snap_pkg = SnapPackageAdapter::new(name, version);
+        assert_eq!(snap_pkg.package_type(), UniversalPackageType::SnapSubset);
+
+        let nix_pkg = NixPackageAdapter::new(b"nix-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(nix_pkg.package_type(), UniversalPackageType::NixSubset);
+
+        let ebuild_pkg = EbuildPackageAdapter::new(b"ebuild-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(ebuild_pkg.package_type(), UniversalPackageType::EbuildSubset);
+
+        let apk_pkg = ApkPackageAdapter::new(b"apk-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(apk_pkg.package_type(), UniversalPackageType::ApkSubset);
+
+        let flatpak_pkg = FlatpakPackageAdapter::new(b"flatpak-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(flatpak_pkg.package_type(), UniversalPackageType::FlatpakSubset);
+
+        let txz_pkg = TxzPackageAdapter::new(b"txz-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(txz_pkg.package_type(), UniversalPackageType::TxzSubset);
+
+        let xbps_pkg = XbpsPackageAdapter::new(b"xbps-pkg", PackageVersion::new(1, 0, 0));
+        assert_eq!(xbps_pkg.package_type(), UniversalPackageType::XbpsSubset);
+    }
+
+    #[test]
+    fn test_package_adapter_factory() {
+        let name = b"bash-deb";
+        let metadata = b"Package: bash\nVersion: 5.2\nArchitecture: amd64";
+        let mut hooks = Vec::new();
+        hooks.push(UserDefinedPackageHook {
+            hook_type: 1,
+            execute: dummy_pre_install_hook,
+        });
+
+        let adapter = PackageAdapterFactory::create_adapter(
+            UniversalPackageType::AptSubset,
+            name,
+            5,
+            2,
+            0,
+            metadata,
+            hooks,
+        ).unwrap();
+
+        assert_eq!(adapter.package_type(), UniversalPackageType::AptSubset);
+        assert_eq!(adapter.name(), name);
+        assert!(adapter.run_hook(1));
     }
 }
