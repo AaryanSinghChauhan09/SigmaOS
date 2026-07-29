@@ -5,6 +5,10 @@
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
 
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
