@@ -235,6 +235,9 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
 
+---
+
+## 🏛️ Design Specification & Architecture Layers
 ### 1. Kernel Layer (`/kernel/`)
 - **Process Scheduler**: Multi-level Feedback Queue (MLFQ) and Round-Robin scheduler handling task priorities and time-slice yields.
 - **Memory Management**: Physical Page Frame Allocator (PMM) and Virtual Memory Paging (VMM) supporting 4-level paging tables.

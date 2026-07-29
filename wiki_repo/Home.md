@@ -235,6 +235,8 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
 
+---
+
 ## 🏛️ Design Specification & Architecture Layers
 
 SigmaOS is organized into isolated functional layers to guarantee complete safety and hardware-isolation boundary conditions:
