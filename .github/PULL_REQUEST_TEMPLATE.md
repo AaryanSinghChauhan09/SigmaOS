@@ -1,47 +1,24 @@
-# Pull Request Template
-
 ## Description
-<!-- Describe your changes in detail -->
+Please include a summary of the changes and the related issue. Describe the architectural intent or the problem being solved.
 
-## Type of Change
-<!-- Mark the relevant options with an "x" -->
+Fixes # (issue number)
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
+## Type of change
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
-- [ ] Performance improvement
-- [ ] Code refactoring
-- [ ] Test addition/modification
+- [ ] Performance / Security improvement
 
-## Related Issues
-<!-- Link to related issues -->
-Fixes #
-Related to #
+## How Has This Been Tested?
+Please describe the tests that you ran to verify your changes. If applicable, attach `sigma-test` output.
+- [ ] `tests/sigma_test_runner.cpp` completes successfully.
+- [ ] Built via `tools/sigma_repro_build.sh` successfully.
 
-## Changes Made
-<!-- List the main changes -->
-- 
-- 
-- 
-
-## Testing
-<!-- Describe how you tested your changes -->
-- 
-- 
-- 
-
-## Checklist
-<!-- Mark the relevant options with an "x" -->
-
-- [ ] Code follows the project's style guidelines
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code where appropriate
-- [ ] I have updated the documentation accordingly
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective
-- [ ] All tests pass locally
-- [ ] I have updated the CHANGELOG if applicable
-
-## Additional Notes
-<!-- Any additional information -->
+## Checklist:
+- [ ] My code follows the SigmaOS zero-abstraction and security guidelines.
+- [ ] I have performed a self-review of my own code.
+- [ ] I have added/updated documentation where necessary.
+- [ ] I have added/updated tests that prove my fix is effective or my feature works.
+- [ ] New and existing unit tests pass locally with my changes.
+- [ ] I have signed my commits (DCO compliance).

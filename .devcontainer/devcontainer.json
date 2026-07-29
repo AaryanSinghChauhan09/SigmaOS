@@ -1,0 +1,26 @@
+{
+    "name": "SigmaOS Development",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "editor.formatOnSave": true,
+                "C_Cpp.default.cppStandard": "c++17",
+                "C_Cpp.default.cStandard": "c11",
+                "C_Cpp.default.includePath": [
+                    "${workspaceFolder}/**",
+                    "${workspaceFolder}/klib/include"
+                ]
+            },
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "davidanson.vscode-markdownlint"
+            ]
+        }
+    },
+    "remoteUser": "vscode",
+    "postCreateCommand": "echo 'Welcome to the SigmaOS Sovereign DevContainer!' && ./tools/sigma_repro_build.sh"
+}

@@ -1,0 +1,45 @@
+name: Nightly Build & Release
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Run at 2 AM UTC daily
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  build:
+    name: Reproducible Nightly Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential g++
+
+      - name: Run Reproducible Build
+        run: |
+          chmod +x ./tools/sigma_repro_build.sh
+          ./tools/sigma_repro_build.sh
+
+      - name: Run Tests
+        run: |
+          ./tests/sigma_test_runner --xml report.xml
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: report.xml
+
+      - name: Publish Nightly Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-nightly-buildinfo
+          path: |
+            *.buildinfo
+            userland/posix/sigma_coreutils
+            userland/containers/sigma_ctr
+            userland/installer/sigma_install
