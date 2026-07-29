@@ -142,8 +142,6 @@ impl BuddyAllocator for SimpleBuddyAllocator {
                             self.blocks.push(None);
                         }
 
-                        let mut left_block = left_block;
-                        left_block.free.store(0, Ordering::SeqCst);
                         self.blocks[left_id] = Some(left_block);
                         self.blocks[right_id] = Some(right_block);
 
