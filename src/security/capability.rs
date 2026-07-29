@@ -131,7 +131,7 @@ impl Default for CapabilityGate {
 }
 
 pub struct SecurityEnforcer {
-    active_tokens: Vec<CapabilityToken>,
+    pub bits: u64,
 }
 
 impl SecurityEnforcer {
