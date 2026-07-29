@@ -146,21 +146,7 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-<<<<<<< HEAD
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-=======
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => DeviceState::Initializing,
-                2 => DeviceState::Ready,
-                3 => DeviceState::Busy,
-                4 => DeviceState::Error,
-                5 => DeviceState::Shutdown,
-                _ => DeviceState::Uninitialized,
-            }
-        }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     }
 
     pub fn set_state(&self, state: DeviceState) {
@@ -610,30 +596,31 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
+#[derive(Debug, Clone)]
 pub struct DdeDeviceWrapper {
-    pub id: usize,
+    pub id: u32,
     pub name: [u8; 32],
-    pub io_port: u16,
-    pub proto: [u8; 8],
-    pub simulated_pci_bar: [u8; 256],
+    pub io_base: u16,
+    pub driver: [u8; 16],
+    pub simulated_pci_bar: [u32; 6],
 }
 
 impl DdeDeviceWrapper {
-    pub fn new(id: usize, name: &[u8], io_port: u16, proto: &[u8]) -> Self {
+    pub fn new(id: u32, name: &[u8], io_base: u16, driver: &[u8]) -> Self {
         let mut name_arr = [0u8; 32];
-        let mut proto_arr = [0u8; 8];
+        let mut driver_arr = [0u8; 16];
         let name_len = name.len().min(31);
-        let proto_len = proto.len().min(7);
+        let driver_len = driver.len().min(15);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(proto.as_ptr(), proto_arr.as_mut_ptr(), proto_len);
+            core::ptr::copy_nonoverlapping(driver.as_ptr(), driver_arr.as_mut_ptr(), driver_len);
         }
         Self {
             id,
             name: name_arr,
-            io_port,
-            proto: proto_arr,
-            simulated_pci_bar: [0u8; 256],
+            io_base,
+            driver: driver_arr,
+            simulated_pci_bar: [0; 6],
         }
     }
 }

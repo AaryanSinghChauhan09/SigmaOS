@@ -1,10 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Remote Desktop for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 956
@@ -34,7 +30,6 @@ pub trait RemoteSession {
     fn id(&self) -> SessionID;
     fn host(&self) -> &[u8];
     fn state(&self) -> SessionState;
-    fn set_state(&self, state: SessionState);
 }
 
 #[repr(C)]
@@ -70,9 +65,6 @@ impl RemoteSession for SimpleRemoteSession {
     fn state(&self) -> SessionState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
-    fn set_state(&self, state: SessionState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
 }
 
 pub trait RemoteDesktop {
@@ -80,6 +72,7 @@ pub trait RemoteDesktop {
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError>;
     fn send_input(&self, id: SessionID, input: &[u8]) -> Result<(), RemoteError>;
     fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError>;
+    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession>;
 }
 
 #[repr(C)]
@@ -109,7 +102,9 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
-                    session.set_state(SessionState::Disconnected);
+                    session
+                        .state
+                        .store(SessionState::Disconnected as usize, Ordering::SeqCst);
                     return Ok(());
                 }
             }
@@ -181,5 +176,82 @@ impl ScreenSharing for SimpleScreenSharing {
 
     fn is_sharing(&self) -> bool {
         self.sharing.load(Ordering::SeqCst) == 1
+    }
+}
+
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct InputAuthGate;
+
+impl InputAuthGate {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PqcVideoCipher;
+
+impl PqcVideoCipher {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SigmaRendezvous;
+
+impl SigmaRendezvous {
+    pub fn new() -> Self {
+        Self
     }
 }

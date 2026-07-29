@@ -1,27 +1,21 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use core::mem;
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Protocol {
-    TCP = 0,
-    UDP = 1,
-}
+pub enum Protocol { TCP = 0, UDP = 1 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -73,10 +67,6 @@ pub struct SimpleSocket {
     pub local_port: AtomicUsize,
     pub remote_port: AtomicUsize,
     pub state: AtomicUsize,
-    pub reuse_addr: AtomicUsize,
-    pub tcp_nodelay: AtomicUsize,
-    pub rcvbuf: AtomicUsize,
-    pub sndbuf: AtomicUsize,
 }
 
 impl SimpleSocket {
@@ -87,10 +77,6 @@ impl SimpleSocket {
             local_port: AtomicUsize::new(local_port as usize),
             remote_port: AtomicUsize::new(0),
             state: AtomicUsize::new(TCPState::Closed as usize),
-            reuse_addr: AtomicUsize::new(0),
-            tcp_nodelay: AtomicUsize::new(0),
-            rcvbuf: AtomicUsize::new(4096),
-            sndbuf: AtomicUsize::new(4096),
         }
     }
 }
@@ -151,17 +137,13 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
-        self.remote_port
-            .store(remote_port as usize, Ordering::SeqCst);
-        self.state
-            .store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state
-            .store(TCPState::Established as usize, Ordering::SeqCst);
+        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state
-            .store(TCPState::Listen as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
     fn accept(&mut self) -> Result<SocketID, NetworkError> {
@@ -187,12 +169,11 @@ impl TCPConnection for SimpleSocket {
         Ok(len)
     }
     fn close(&mut self) -> Result<(), NetworkError> {
-        self.state
-            .store(TCPState::Closed as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 }
 
@@ -203,8 +184,7 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port
-            .store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
     fn recvfrom(&mut self, buffer: &mut [u8]) -> Result<(usize, Port), NetworkError> {
@@ -251,9 +231,7 @@ impl CongestionControl for RenoCongestionControl {
         self.ssthresh.store(cwnd / 2, Ordering::SeqCst);
         self.cwnd.store(1, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize {
-        self.cwnd.load(Ordering::SeqCst)
-    }
+    fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
 }
 
 #[repr(C)]
@@ -281,12 +259,9 @@ impl CongestionControl for BBRCongestionControl {
         self.cwnd.store(target, Ordering::SeqCst);
     }
     fn on_loss(&mut self) {
-        self.cwnd
-            .store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
+        self.cwnd.store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize {
-        self.cwnd.load(Ordering::SeqCst)
-    }
+    fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
 }
 
 pub trait Firewall {
@@ -302,7 +277,7 @@ pub struct SimpleFirewall {
 
 impl SimpleFirewall {
     pub fn new() -> Self {
-        let mut allowed_ports = [const { AtomicUsize::new(0) }; 65536];
+        let mut allowed_ports = [AtomicUsize::new(0); 65536];
         SimpleFirewall { allowed_ports }
     }
 }
@@ -331,16 +306,13 @@ pub struct ZeroCopyNetwork {
 
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
-        ZeroCopyNetwork {
-            dma_buffer: AtomicUsize::new(0),
-        }
+        ZeroCopyNetwork { dma_buffer: AtomicUsize::new(0) }
     }
 }
 
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer
-            .store(data.as_ptr() as usize, Ordering::SeqCst);
+        self.dma_buffer.store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
@@ -357,10 +329,6 @@ pub trait NetworkStack {
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError>;
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
 }
-
-pub struct NetfilterFirewall;
-pub struct RoutingTable;
-pub struct NetworkInterface;
 
 pub struct SimpleNetworkStack {
     pub sockets: Vec<Option<Box<dyn Socket>>>,
@@ -396,7 +364,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
         for socket_option in &mut self.sockets {
-            if let Some(ref socket) = socket_option {
+            if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
                     return Ok(());
                 }
@@ -406,12 +374,46 @@ impl NetworkStack for SimpleNetworkStack {
     }
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
-            if let Some(ref socket) = socket_option {
-                if socket.id() == id {
-                    return Some(socket.as_ref());
-                }
+            if let Some(ref socket) = *socket_option {
+                if socket.id() == id { return Some(socket.as_ref()); }
             }
         }
         None
     }
 }
+
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct NetfilterFirewall;
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct RoutingTable;
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct NetworkInterface;

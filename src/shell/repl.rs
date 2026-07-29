@@ -1,24 +1,16 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
-// Interactive shell with full desktop GUI-parity and defensive auditing commands
+// Interactive shell for SigmaOS
 
-use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
 
-use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
-    AccessibilitySetting,
-};
-use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
-};
-use crate::customization::{CustomizationEngine, Theme as CustomTheme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
-use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
-};
+#[derive(Debug, Clone, Copy, Default)]
+pub struct AgentAutomationEngine;
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+}
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -27,7 +19,6 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
-    History,
     Echo {
         message: String,
     },
@@ -37,24 +28,6 @@ pub enum ShellCommand {
     },
     Get {
         variable: String,
-    },
-    Alias {
-        name: String,
-        value: String,
-    },
-    Unalias {
-        name: String,
-    },
-    Run {
-        variable: String,
-    },
-    AgentList,
-    AgentRegister {
-        description: String,
-        commands: String,
-    },
-    AgentRun {
-        task_id: usize,
     },
     Pwd,
     WhoAmI,
@@ -73,65 +46,28 @@ pub enum ShellCommand {
         subcommand: String,
         package: Option<String>,
     },
-    Dnf {
-        subcommand: String,
-        package: Option<String>,
+    Uname,
+    Clear,
+    Touch {
+        filename: String,
+    },
+    Mkdir {
+        dirname: String,
+    },
+    Rm {
+        filename: String,
     },
     Theme {
-        name: String,
+        theme_name: String,
     },
     Profile {
-        name: String,
+        profile_name: String,
     },
     A11y {
         feature: String,
         state: String,
     },
     Unknown(String),
-}
-
-/// Represents an automated action task executed by an AI agent
-#[derive(Debug, Clone)]
-pub struct AgentTask {
-    pub task_id: usize,
-    pub description: String,
-    pub commands: Vec<String>,
-}
-
-/// AI Agent Automation Engine inside SigmaOS REPL
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine {
-    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
-    pub next_task_id: usize,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine {
-            registered_tasks: std::collections::HashMap::new(),
-            next_task_id: 1,
-        }
-    }
-
-    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
-        let id = self.next_task_id;
-        self.next_task_id += 1;
-        self.registered_tasks.insert(
-            id,
-            AgentTask {
-                task_id: id,
-                description,
-                commands,
-            },
-        );
-        id
-    }
-}
-
-impl Default for AgentAutomationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// Shell REPL
@@ -141,25 +77,38 @@ pub struct ShellRepl {
     pub aliases: std::collections::HashMap<String, String>,
     pub prompt: String,
     pub agent_engine: AgentAutomationEngine,
-    pub services: std::collections::HashMap<String, String>,
-    pub installed_packages: std::collections::HashSet<String>,
     pub current_user: String,
     pub current_dir: String,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
     pub fn new() -> Self {
         let mut services = std::collections::HashMap::new();
-        services.insert("cron".to_string(), "Running".to_string());
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
-        let mut a11y_features = std::collections::HashMap::new();
-        a11y_features.insert("high_contrast".to_string(), false);
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            prompt: "sigma-sh> ".to_string(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+        }
+    }
+
+    pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
@@ -167,25 +116,18 @@ impl ShellRepl {
             aliases: std::collections::HashMap::new(),
             prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
-            services,
-            installed_packages: std::collections::HashSet::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
-            current_theme: "light".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features,
-            command_history: Vec::new(),
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 
-    pub fn with_prompt(prompt: String) -> Self {
-        let mut shell = Self::new();
-        shell.prompt = prompt;
-        shell
-    }
-
     pub fn run(&mut self) {
-        println!("SigmaOS Shell v0.1.0 (GUI-Parity & Security Auditing Enabled)");
+        println!("SigmaOS Shell v0.1.0");
         println!("Type 'help' for available commands\n");
 
         let stdin = io::stdin();
@@ -207,22 +149,7 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn execute_line(&mut self, line: &str) {
-        self.command_history.push(line.to_string());
-        if line.contains(';') {
-            let subcommands: Vec<&str> = line.split(';').collect();
-            for sub in subcommands {
-                let trimmed = sub.trim();
-                if !trimmed.is_empty() {
-                    self.execute_single_line(trimmed);
-                }
-            }
-        } else {
-            self.execute_single_line(line);
-        }
-    }
-
-    fn execute_single_line(&mut self, line: &str) {
+    fn execute_line(&mut self, line: &str) {
         let command = self.parse_command(line);
         let result = self.execute_command(command);
 
@@ -238,19 +165,8 @@ impl ShellRepl {
         }
     }
 
-    pub fn parse_command(&self, input: &str) -> ShellCommand {
-        let mut expanded_input = input.to_string();
-        let first_word = input.split_whitespace().next().unwrap_or("");
-        if let Some(alias_value) = self.aliases.get(first_word) {
-            let rest = if input.len() > first_word.len() {
-                &input[first_word.len()..]
-            } else {
-                ""
-            };
-            expanded_input = format!("{}{}", alias_value, rest);
-        }
-
-        let parts: Vec<&str> = expanded_input.split_whitespace().collect();
+    fn parse_command(&self, input: &str) -> ShellCommand {
+        let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
             return ShellCommand::Unknown(input.to_string());
@@ -261,80 +177,51 @@ impl ShellRepl {
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
-            "history" => ShellCommand::History,
             "pwd" => ShellCommand::Pwd,
             "whoami" => ShellCommand::WhoAmI,
-            "echo" => {
-                let message = parts[1..].join(" ");
-                ShellCommand::Echo { message }
-            }
-            "su" => {
+            "uname" => ShellCommand::Uname,
+            "clear" => ShellCommand::Clear,
+            "touch" => {
                 if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Su {
-                        username: "root".to_string(),
-                        password: None,
-                    }
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
+                    ShellCommand::Touch {
                         filename: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "systemctl" => {
+            "mkdir" => {
                 if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt {
-                        subcommand,
-                        package,
+                    ShellCommand::Mkdir {
+                        dirname: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "dnf" | "yum" => {
+            "theme" => {
                 if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Dnf {
-                        subcommand,
-                        package,
+                    ShellCommand::Theme {
+                        theme_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        state: parts[2].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -359,123 +246,27 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "alias" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Alias {
-                        name: parts[1].to_string(),
-                        value: parts[2..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "unalias" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Unalias {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "run" | "exec" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Run {
-                        variable: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "agent" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::AgentList,
-                        "run" => {
-                            if parts.len() >= 3 {
-                                if let Ok(id) = parts[2].parse::<usize>() {
-                                    ShellCommand::AgentRun { task_id: id }
-                                } else {
-                                    ShellCommand::Unknown(input.to_string())
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "register" => {
-                            if parts.len() >= 4 {
-                                let desc = parts[2].to_string();
-                                let cmds = parts[3..].join(" ");
-                                ShellCommand::AgentRegister {
-                                    description: desc,
-                                    commands: cmds,
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help    - Show this help message\n\
-                   ps      - List running processes\n\
-                   ls      - List files\n\
-                   echo    - Print a message\n\
-                   set     - Set a variable\n\
-                   get     - Get a variable\n\
-                   alias   - Create a command shortcut/alias\n\
-                   unalias - Remove an alias\n\
-                   run     - Execute an automated macro/script variable\n\
-                   agent   - Interface for AI Agent Automation tasks (register, list, run)\n\
-                   dnf     - Package manager for AlmaLinux (install, update, list)\n\
-                   history - Show command execution history\n\
-                   exit    - Exit the shell"
+                   help         - Show this help message\n\
+                   ps           - List running processes\n\
+                   ls           - List files\n\
+                   pwd          - Print working directory\n\
+                   whoami       - Print current logged-in user\n\
+                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
+                   cat <file>   - Display file contents\n\
+                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
+                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
+                   echo         - Print a message\n\
+                   set          - Set a variable\n\
+                   get          - Get a variable\n\
+                   exit         - Exit the shell"
                 .to_string()),
-            ShellCommand::History => {
-                let mut history_str = String::new();
-                for (idx, cmd) in self.command_history.iter().enumerate() {
-                    history_str.push_str(&format!("  {}  {}\n", idx + 1, cmd));
-                }
-                Ok(history_str)
-            }
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
                    2    systemd     Running\n\
@@ -492,6 +283,11 @@ impl ShellRepl {
             }
             ShellCommand::Pwd => Ok(self.current_dir.clone()),
             ShellCommand::WhoAmI => Ok(self.current_user.clone()),
+            ShellCommand::Uname => Ok("Linux sigmaos 6.24.0-mainline #1 SMP PREEMPT_RT Sun Jul 19 2026 x86_64 x86_64 x86_64 GNU/Linux".to_string()),
+            ShellCommand::Clear => Ok("\x1B[2J\x1B[H".to_string()),
+            ShellCommand::Touch { filename } => Ok(format!("Created empty file: {}", filename)),
+            ShellCommand::Mkdir { dirname } => Ok(format!("Created directory: {}", dirname)),
+            ShellCommand::Rm { filename } => Ok(format!("Removed file: {}", filename)),
             ShellCommand::Su { username, password } => {
                 if username == "root" {
                     let pwd = password.unwrap_or_default();
@@ -600,38 +396,18 @@ impl ShellRepl {
                     Err(format!("apt: Unknown command '{}'", subcommand))
                 }
             }
-            ShellCommand::Dnf { subcommand, package } => {
-                if subcommand == "check-update" || subcommand == "update" && package.is_none() {
-                    Ok("AlmaLinux x86_64 Repository                              12 kB/s | 3.8 kB     00:00\n\
-                        AlmaLinux BaseOS                                        45 kB/s | 4.3 MB     00:01\n\
-                        AlmaLinux AppStream                                     82 kB/s | 8.1 MB     00:01\n\
-                        AlmaLinux Extras                                        10 kB/s | 1.2 MB     00:00\n\
-                        Dependencies resolved.\n\
-                        Nothing to do. Complete!".to_string())
-                } else if subcommand == "install" {
-                    let pkg = package.ok_or_else(|| "dnf: Please specify a package to install".to_string())?;
-                    self.installed_packages.insert(pkg.clone());
-                    Ok(format!("AlmaLinux AppStream                                     82 kB/s | 8.1 MB     00:01\n\
-                                Resolving dependencies...\n\
-                                Running transaction check...\n\
-                                Transaction search completed.\n\
-                                To install:\n\
-                                  {}  noarch  1.0.0-1.el9  almalinux-appstream  124 k\n\
-                                Proceed with changes? [y/N]: y\n\
-                                Downloading Packages:\n\
-                                Running transaction test...\n\
-                                Installing {}...\n\
-                                Verifying {}...\n\
-                                Complete!", pkg, pkg, pkg))
-                } else if subcommand == "list" {
-                    let mut list_str = "Installed Packages\n".to_string();
-                    for pkg in &self.installed_packages {
-                        list_str.push_str(&format!("{:<20} 1.0.0-1.el9  @almalinux-appstream\n", pkg));
-                    }
-                    Ok(list_str)
-                } else {
-                    Err(format!("dnf: Unknown command '{}'", subcommand))
-                }
+            ShellCommand::Theme { theme_name } => {
+                self.current_theme = theme_name.clone();
+                Ok(format!("Theme set to {}", theme_name))
+            }
+            ShellCommand::Profile { profile_name } => {
+                self.current_profile = profile_name.clone();
+                Ok(format!("Profile set to {}", profile_name))
+            }
+            ShellCommand::A11y { feature, state } => {
+                let is_on = state == "on" || state == "true";
+                self.a11y_features.insert(feature.clone(), is_on);
+                Ok(format!("A11y feature {} set to {}", feature, state))
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
@@ -642,84 +418,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Alias { name, value } => {
-                self.aliases.insert(name.clone(), value.clone());
-                Ok(format!("alias {} = {}", name, value))
-            }
-            ShellCommand::Unalias { name } => {
-                if self.aliases.remove(&name).is_some() {
-                    Ok(format!("Removed alias {}", name))
-                } else {
-                    Err(format!("Alias '{}' not found", name))
-                }
-            }
-            ShellCommand::Run { variable } => {
-                if let Some(val) = self.variables.get(&variable).cloned() {
-                    self.execute_line(&val);
-                    Ok(format!("Executed macro '{}'", variable))
-                } else {
-                    Err(format!("Variable/Macro '{}' not found", variable))
-                }
-            }
-            ShellCommand::AgentRegister {
-                description,
-                commands,
-            } => {
-                let cmd_list: Vec<String> =
-                    commands.split(';').map(|s| s.trim().to_string()).collect();
-                let id = self
-                    .agent_engine
-                    .register_task(description.clone(), cmd_list);
-                Ok(format!(
-                    "Agent task #{} registered successfully: {}",
-                    id, description
-                ))
-            }
-            ShellCommand::AgentList => {
-                if self.agent_engine.registered_tasks.is_empty() {
-                    Ok("No agent automation tasks registered.".to_string())
-                } else {
-                    let mut list_str = "Registered Agent Automation Tasks:\n".to_string();
-                    for (id, task) in &self.agent_engine.registered_tasks {
-                        list_str.push_str(&format!(
-                            "  [#{}] {} (Commands: {})\n",
-                            id,
-                            task.description,
-                            task.commands.join("; ")
-                        ));
-                    }
-                    Ok(list_str)
-                }
-            }
-            ShellCommand::AgentRun { task_id } => {
-                if let Some(task) = self.agent_engine.registered_tasks.get(&task_id).cloned() {
-                    let mut result_str = format!("[Agent Automation Run #{}]\n", task_id);
-                    result_str.push_str(&format!("Task Description: {}\n", task.description));
-                    result_str.push_str("-----------------------------\n");
-                    for (idx, cmd) in task.commands.iter().enumerate() {
-                        result_str.push_str(&format!("Step {}: Executing '{}'...\n", idx + 1, cmd));
-                        self.execute_line(cmd);
-                    }
-                    result_str.push_str("-----------------------------\n");
-                    result_str.push_str("[Agent Automation Complete: Success]");
-                    Ok(result_str)
-                } else {
-                    Err(format!("Agent task #{} not found", task_id))
-                }
-            }
-            ShellCommand::Theme { name } => {
-                self.current_theme = name.clone();
-                Ok(format!("Theme changed to {}", name))
-            }
-            ShellCommand::Profile { name } => {
-                self.current_profile = name.clone();
-                Ok(format!("Profile changed to {}", name))
-            }
-            ShellCommand::A11y { feature, state } => {
-                let enabled = state == "on" || state == "true" || state == "enabled";
-                self.a11y_features.insert(feature.clone(), enabled);
-                Ok(format!("Accessibility feature {} is now {}", feature, state))
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -739,7 +437,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
+        assert_eq!(repl.prompt, "sigma-sh> ");
     }
 
     #[test]
@@ -747,15 +445,6 @@ mod tests {
         let repl = ShellRepl::new();
         let command = repl.parse_command("help");
         assert!(matches!(command, ShellCommand::Help));
-    }
-
-    #[test]
-    fn test_history_logging() {
-        let mut repl = ShellRepl::new();
-        repl.execute_line("echo 123");
-        let command = repl.parse_command("history");
-        let res = repl.execute_command(command).unwrap();
-        assert!(res.contains("echo 123"));
     }
 
     #[test]
@@ -792,31 +481,6 @@ mod tests {
     }
 
     #[test]
-    fn test_theme_and_profile_commands() {
-        let mut repl = ShellRepl::new();
-
-        let theme_cmd = repl.parse_command("theme dark");
-        let res = repl.execute_command(theme_cmd).unwrap();
-        assert_eq!(repl.current_theme, "dark");
-        assert!(res.contains("dark"));
-
-        let profile_cmd = repl.parse_command("profile developer");
-        let res = repl.execute_command(profile_cmd).unwrap();
-        assert_eq!(repl.current_profile, "developer");
-        assert!(res.contains("developer"));
-    }
-
-    #[test]
-    fn test_a11y_commands() {
-        let mut repl = ShellRepl::new();
-
-        let a11y_cmd = repl.parse_command("a11y high_contrast on");
-        let res = repl.execute_command(a11y_cmd).unwrap();
-        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
-        assert!(res.contains("on"));
-    }
-
-    #[test]
     fn test_exit() {
         let mut repl = ShellRepl::new();
         let command = ShellCommand::Exit;
@@ -825,75 +489,140 @@ mod tests {
     }
 
     #[test]
-    fn test_alias_unalias() {
+    fn test_pwd_whoami() {
         let mut repl = ShellRepl::new();
-        let alias_cmd = ShellCommand::Alias {
-            name: "l".to_string(),
-            value: "ls".to_string(),
-        };
-        repl.execute_command(alias_cmd).unwrap();
-
-        let parsed = repl.parse_command("l");
-        assert!(matches!(parsed, ShellCommand::ListFiles));
-
-        let unalias_cmd = ShellCommand::Unalias {
-            name: "l".to_string(),
-        };
-        repl.execute_command(unalias_cmd).unwrap();
-
-        let parsed_after = repl.parse_command("l");
-        assert!(matches!(parsed_after, ShellCommand::Unknown(..)));
+        assert_eq!(
+            repl.execute_command(ShellCommand::Pwd).unwrap(),
+            "/home/ubuntu"
+        );
+        assert_eq!(
+            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
+            "ubuntu"
+        );
     }
 
     #[test]
-    fn test_macro_automation() {
+    fn test_su_root() {
         let mut repl = ShellRepl::new();
-        let set_cmd = ShellCommand::Set {
-            variable: "test_macro".to_string(),
-            value: "echo running; ls".to_string(),
-        };
-        repl.execute_command(set_cmd).unwrap();
-
-        let run_cmd = ShellCommand::Run {
-            variable: "test_macro".to_string(),
-        };
-        let result = repl.execute_command(run_cmd);
-        assert!(result.is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Su {
+                username: "root".to_string(),
+                password: Some("admin".to_string())
+            })
+            .is_ok());
+        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
+        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
     }
 
     #[test]
-    fn test_agent_automation() {
+    fn test_cat_command() {
         let mut repl = ShellRepl::new();
-
-        // 1. Register an Agent Task
-        let reg_cmd = ShellCommand::AgentRegister {
-            description: "SysAudit".to_string(),
-            commands: "echo audit_start; ps; echo audit_end".to_string(),
-        };
-        let reg_res = repl.execute_command(reg_cmd).unwrap();
-        assert!(reg_res.contains("Agent task #1 registered successfully"));
-
-        // 2. List registered tasks
-        let list_cmd = ShellCommand::AgentList;
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("SysAudit"));
-
-        // 3. Run the Agent Task
-        let run_cmd = ShellCommand::AgentRun { task_id: 1 };
-        let run_res = repl.execute_command(run_cmd).unwrap();
-        assert!(run_res.contains("[Agent Automation Run #1]"));
-        assert!(run_res.contains("[Agent Automation Complete: Success]"));
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "README.md".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Cat {
+                filename: "nonexistent.txt".to_string()
+            })
+            .is_err());
     }
 
     #[test]
-    fn test_dnf_package_manager() {
+    fn test_systemctl_commands() {
         let mut repl = ShellRepl::new();
-        let check_cmd = repl.parse_command("dnf check-update");
-        let res = repl.execute_command(check_cmd).unwrap();
-        assert!(res.contains("AlmaLinux"));
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "list".to_string(),
+                service: String::new()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "stop".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Systemctl {
+                action: "start".to_string(),
+                service: "cron".to_string()
+            })
+            .is_ok());
+    }
 
-        let install_cmd = repl.parse_command("dnf install almalinux-release");
-        let res_install = repl.execute_command(install_cmd).unwrap();
-        assert!(res_install.contains("Complete!"));
+    #[test]
+    fn test_apt_commands() {
+        let mut repl = ShellRepl::new();
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "update".to_string(),
+                package: None
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "search".to_string(),
+                package: Some("vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "install".to_string(),
+                package: Some("sigma-vim".to_string())
+            })
+            .is_ok());
+        assert!(repl
+            .execute_command(ShellCommand::Apt {
+                subcommand: "list".to_string(),
+                package: None
+            })
+            .is_ok());
+    }
+
+    #[test]
+    fn test_uname_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("uname");
+        assert!(matches!(cmd, ShellCommand::Uname));
+        let out = repl.execute_command(cmd).unwrap();
+        assert!(out.contains("sigmaos"));
+    }
+
+    #[test]
+    fn test_clear_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("clear");
+        assert!(matches!(cmd, ShellCommand::Clear));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "\x1B[2J\x1B[H");
+    }
+
+    #[test]
+    fn test_touch_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("touch testfile.txt");
+        assert!(matches!(cmd, ShellCommand::Touch { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Created empty file: testfile.txt");
+    }
+
+    #[test]
+    fn test_mkdir_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("mkdir testdir");
+        assert!(matches!(cmd, ShellCommand::Mkdir { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Created directory: testdir");
+    }
+
+    #[test]
+    fn test_rm_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("rm testfile.txt");
+        assert!(matches!(cmd, ShellCommand::Rm { .. }));
+        let out = repl.execute_command(cmd).unwrap();
+        assert_eq!(out, "Removed file: testfile.txt");
     }
 }

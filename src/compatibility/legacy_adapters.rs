@@ -156,3 +156,11 @@ pub struct LegacyUIAdapter;
 pub const GLOBAL_PERSONA_VM: usize = 0;
 pub const GLOBAL_PLUGIN_MANAGER: usize = 0;
 pub const GLOBAL_WORKLOAD_OPTIMIZER: usize = 0;
+
+pub struct LegacyDriverAdapter;
+pub struct LegacyFSAdapter;
+pub struct LegacyKernelAdapter;
+pub struct LegacyPackageAdapter;
+pub struct LegacyProtocolAdapter;
+pub struct LegacySecurityAdapter;
+pub struct LegacyUIAdapter;

@@ -1,6 +1,7 @@
 // SigmaOS Observability Module
 pub mod profiler;
 pub mod stack;
+pub mod profiler;
 
 pub use profiler::{PerformanceMetric, SigmaProfiler, TracepointType};
 pub use stack::{

@@ -1,14 +1,11 @@
 // SigmaOS Drivers Module
-pub mod boot_init;
-pub mod dde;
 pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
 pub mod kernel_releases;
-pub mod legacy_floppy;
 pub mod legacy_keyboard;
 pub mod legacy_serial;
+pub mod legacy_floppy;
 pub mod modern_usb;
 pub mod more_devices;
 pub mod network;
@@ -16,14 +13,17 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
+pub mod boot_init;
+pub mod dde;
+pub mod flipper_gpio_sensor;
 
 pub use even_more_devices::*;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use kernel_releases::*;
-pub use legacy_floppy::LegacyFloppyDisk;
 pub use legacy_keyboard::LegacyKeyboard;
 pub use legacy_serial::LegacySerialPort;
+pub use legacy_floppy::LegacyFloppyDisk;
 pub use modern_usb::ModernUsbController;
 pub use more_devices::*;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};

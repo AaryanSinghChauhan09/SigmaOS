@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
@@ -101,12 +103,12 @@ impl<T> Drop for ShellVec<T> {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+// Allocator shim: uses alloc crate on hosted targets and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
+    use core::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    alloc::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
