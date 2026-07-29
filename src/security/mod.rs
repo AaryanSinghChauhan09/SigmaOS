@@ -17,11 +17,20 @@ pub mod secrets;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+<<<<<<< HEAD
 pub mod cleaner;
 pub mod forensics;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 >>>>>>> origin/jules-18101178622594638830-97dc43c6
+=======
+#[cfg(any())]
+pub mod clipboard;
+#[cfg(any())]
+pub mod intrusion;
+#[cfg(any())]
+pub mod password;
+>>>>>>> origin/jules-6565657164915217370-c04e8c01
 
 pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
