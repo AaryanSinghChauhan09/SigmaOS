@@ -1,6 +1,6 @@
 {
   "name": "sigmaos-zenith",
-  "version": "100.0.0",
+  "version": "15.0.0",
   "description": "SigmaOS Zenith Desktop Environment",
   "type": "module",
   "main": "zenith_desktop/index.js",
@@ -13,15 +13,17 @@
     "test:ui": "vitest --ui",
     "lint": "eslint zenith_desktop --ext .js --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write zenith_desktop",
+    "start": "electron .",
     "audit": "npm audit --audit-level=moderate"
   },
   "devDependencies": {
-    "@vitest/ui": "^4.1.5",
+    "@vitest/ui": "^3.2.0",
     "eslint": "^10.3.0",
-    "eslint-plugin-security": "^4.0.0",
+    "eslint-plugin-security": "^3.0.1",
     "jsdom": "^29.1.1",
     "prettier": "^3.5.3",
+    "electron": "^42.1.0",
     "vite": "^8.0.11",
-    "vitest": "^4.1.5"
+    "vitest": "^3.2.0"
   }
 }
