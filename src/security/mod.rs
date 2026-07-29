@@ -22,8 +22,11 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+#[cfg(any())]
 pub mod clipboard;
+#[cfg(any())]
 pub mod intrusion;
+#[cfg(any())]
 pub mod password;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};

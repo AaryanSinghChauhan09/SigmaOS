@@ -2,6 +2,7 @@
 pub mod ai_optimizer;
 pub mod orchestrator;
 pub mod system_level;
+#[cfg(any())]
 pub mod orchestrator;
 
 pub use ai_optimizer::{

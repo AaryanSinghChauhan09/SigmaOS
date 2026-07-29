@@ -1,6 +1,7 @@
 // SigmaOS Dashboard Module
 pub mod control_center;
 pub mod monitor;
+#[cfg(any())]
 pub mod control_center;
 pub mod process;
 

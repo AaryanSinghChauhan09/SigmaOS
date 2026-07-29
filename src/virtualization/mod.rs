@@ -3,7 +3,9 @@ pub mod container;
 pub mod namespaces;
 pub mod oci_pod;
 pub mod orchestration;
+#[cfg(any())]
 pub mod container;
+#[cfg(any())]
 pub mod namespaces;
 
 pub use orchestration::{

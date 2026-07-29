@@ -15,6 +15,7 @@ pub mod usb_hid;
 pub mod vesa;
 pub mod boot_init;
 pub mod dde;
+#[cfg(any())]
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 

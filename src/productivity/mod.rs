@@ -8,6 +8,7 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
+#[cfg(any())]
 pub mod advanced_app_absorber;
 pub mod tmux;
 
