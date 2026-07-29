@@ -126,7 +126,7 @@ pub trait Trainer {
 
 #[repr(C)]
 pub struct SimpleTrainer {
-    pub sessions: Vec<Option<Box<dyn TrainingSession>>>,
+    pub sessions: Vec<Option<SimpleTrainingSession>>,
     pub optimizer: SimpleOptimizer,
     pub next_id: AtomicUsize,
 }
@@ -145,7 +145,7 @@ impl Trainer for SimpleTrainer {
     fn create_session(&mut self) -> Result<TrainingID, TrainingError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let session = SimpleTrainingSession::new(id);
-        self.sessions.push(Some(Box::new(session)));
+        self.sessions.push(Some(session));
         Ok(id)
     }
 
@@ -186,7 +186,7 @@ impl Trainer for SimpleTrainer {
         for session_option in &self.sessions {
             if let Some(ref session) = session_option {
                 if session.id() == id {
-                    return Some(session.as_ref());
+                    return Some(session as &dyn TrainingSession);
                 }
             }
         }
