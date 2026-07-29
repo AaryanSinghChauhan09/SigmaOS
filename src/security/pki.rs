@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -61,7 +65,7 @@ impl SimpleCertificate {
 
 impl Certificate for SimpleCertificate {
     fn id(&self) -> CertificateID { self.id }
-    fn certificate_type(&self) -> CertificateType { unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) } }
+    fn certificate_type(&self) -> CertificateType { unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst) as u32) } }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
         &self.subject[..len]
@@ -200,4 +204,5 @@ mod tests {
         let retrieved = manager.get_certificate(1).unwrap();
         assert_eq!(retrieved.subject(), b"Subject");
     }
+}
 }

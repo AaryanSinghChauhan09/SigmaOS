@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
@@ -241,7 +245,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -454,4 +458,5 @@ mod tests {
 
         assert!(engine.check_access(ctx_id, SecurityOperation::Read));
     }
+}
 }

@@ -7,8 +7,6 @@ pub mod memory;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
-pub mod breakthroughs;
-pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
 

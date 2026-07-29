@@ -3,8 +3,6 @@ pub mod container;
 pub mod namespaces;
 pub mod oci_pod;
 pub mod orchestration;
-pub mod container;
-pub mod namespaces;
 
 pub use orchestration::{
     Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,

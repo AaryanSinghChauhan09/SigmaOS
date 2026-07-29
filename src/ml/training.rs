@@ -10,8 +10,8 @@ use core::mem;
 
 pub type TrainingID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
 
 #[repr(C)]
@@ -74,7 +74,7 @@ impl SimpleOptimizer {
 }
 
 impl Optimizer for SimpleOptimizer {
-    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst)) } }
+    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst) as u32) } }
     fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
 
     fn set_learning_rate(&mut self, rate: f32) {

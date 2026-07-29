@@ -8,7 +8,6 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
-pub mod advanced_app_absorber;
 pub mod tmux;
 
 pub use advanced_app_absorber::{
